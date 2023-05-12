@@ -1,0 +1,5 @@
+secondbrain/
+.env
+.streamlit/
+**/*.pyc
+toto.txt
