@@ -13,7 +13,7 @@ from supabase import Client, create_client
 
 # supabase_url = "https://fqgpcifsfmamprzldyiv.supabase.co"
 supabase_url = st.secrets.supabase_url
-supabase_key = st.secrets.supabase_key
+supabase_key = st.secrets.supabase_service_key
 openai_api_key = st.secrets.openai_api_key
 supabase: Client = create_client(supabase_url, supabase_key)
 
