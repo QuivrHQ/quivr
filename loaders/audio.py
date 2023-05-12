@@ -31,12 +31,15 @@ def _transcribe_audio(api_key, audio_file):
 
     return transcript
 
-def process_audio(openai_api_key, vector_store, file_name):
+def process_audio(vector_store, file_name):
     file_sha = ""
     dateshort = time.strftime("%Y%m%d-%H%M%S")
-    file_name = f"audiotranscript_{dateshort}.audio"
+    file_meta_name = f"audiotranscript_{dateshort}.txt"
+    openai_api_key = st.secrets["openai_api_key"]
     transcript = _transcribe_audio(openai_api_key, file_name)
     file_sha = compute_sha1_from_content(transcript.text.encode("utf-8"))
+    ## file size computed from transcript
+    file_size = len(transcript.text.encode("utf-8"))
 
 
     ## Load chunk size and overlap from sidebar
@@ -46,7 +49,7 @@ def process_audio(openai_api_key, vector_store, file_name):
     text_splitter = RecursiveCharacterTextSplitter.from_tiktoken_encoder(chunk_size=chunk_size, chunk_overlap=chunk_overlap)
     texts = text_splitter.split_text(transcript.text)
 
-    docs_with_metadata = [Document(page_content=text, metadata={"file_sha1": file_sha,"file_name": file_name, "chunk_size": chunk_size, "chunk_overlap": chunk_overlap, "date": dateshort}) for text in texts]
+    docs_with_metadata = [Document(page_content=text, metadata={"file_sha1": file_sha,"file_size": file_size, "file_name": file_meta_name, "chunk_size": chunk_size, "chunk_overlap": chunk_overlap, "date": dateshort}) for text in texts]
 
     
     vector_store.add_documents(docs_with_metadata)

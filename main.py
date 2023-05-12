@@ -5,6 +5,7 @@ import tempfile
 import streamlit as st
 from files import file_uploader
 from question import chat_with_doc
+from brain import brain
 from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.vectorstores import SupabaseVectorStore
 from supabase import Client, create_client
@@ -44,6 +45,8 @@ if 'chunk_overlap' not in st.session_state:
 user_choice = st.radio("Choose an action", ('Add Knowledge to the Brain', 'Ask a Question to the Brain'))
 
 st.markdown("---\n\n")
+
+brain(supabase)
 
 if user_choice == 'Add Knowledge to the Brain':
     # Display chunk size and overlap selection only when adding knowledge
