@@ -1,7 +1,7 @@
 import os
 import tempfile
 from io import BytesIO
-
+import time
 import openai
 import streamlit as st
 from langchain.document_loaders import TextLoader
@@ -16,6 +16,7 @@ from langchain.schema import Document
 def _transcribe_audio(api_key, audio_file):
     openai.api_key = api_key
     transcript = ""
+    
     with BytesIO(audio_file.read()) as audio_bytes:
         # Get the extension of the uploaded file
         file_extension = os.path.splitext(audio_file.name)[-1]
@@ -32,7 +33,8 @@ def _transcribe_audio(api_key, audio_file):
 
 def process_audio(openai_api_key, vector_store, file_name):
     file_sha = ""
-
+    dateshort = time.strftime("%Y%m%d-%H%M%S")
+    file_name = f"audiotranscript_{dateshort}.audio"
     transcript = _transcribe_audio(openai_api_key, file_name)
     file_sha = compute_sha1_from_content(transcript.text.encode("utf-8"))
 
@@ -44,7 +46,7 @@ def process_audio(openai_api_key, vector_store, file_name):
     text_splitter = RecursiveCharacterTextSplitter.from_tiktoken_encoder(chunk_size=chunk_size, chunk_overlap=chunk_overlap)
     texts = text_splitter.split_text(transcript.text)
 
-    docs_with_metadata = [Document(page_content=text, metadata={"file_sha1": file_sha}) for text in texts]
+    docs_with_metadata = [Document(page_content=text, metadata={"file_sha1": file_sha,"file_name": file_name, "chunk_size": chunk_size, "chunk_overlap": chunk_overlap, "date": dateshort}) for text in texts]
 
     
     vector_store.add_documents(docs_with_metadata)
