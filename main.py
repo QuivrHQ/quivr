@@ -43,6 +43,8 @@ if 'chunk_overlap' not in st.session_state:
 # Create a radio button for user to choose between adding knowledge or asking a question
 user_choice = st.radio("Choose an action", ('Add Knowledge to the Brain', 'Ask a Question to the Brain'))
 
+st.markdown("---\n\n")
+
 if user_choice == 'Add Knowledge to the Brain':
     # Display chunk size and overlap selection only when adding knowledge
     st.sidebar.title("Configuration") 
