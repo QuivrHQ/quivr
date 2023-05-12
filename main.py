@@ -42,25 +42,29 @@ if 'chunk_overlap' not in st.session_state:
     st.session_state['chunk_overlap'] = 0
 
 # Create a radio button for user to choose between adding knowledge or asking a question
-user_choice = st.radio("Choose an action", ('Add Knowledge to the Brain', 'Ask a Question to the Brain'))
+user_choice = st.radio("Choose an action", ('Add Knowledge', 'Chat with your Brain','Forget' ))
 
 st.markdown("---\n\n")
 
-brain(supabase)
 
-if user_choice == 'Add Knowledge to the Brain':
+
+if user_choice == 'Add Knowledge':
     # Display chunk size and overlap selection only when adding knowledge
     st.sidebar.title("Configuration") 
     st.sidebar.markdown("Choose your chunk size and overlap for adding knowledge.")
     st.session_state['chunk_size'] = st.sidebar.slider("Select Chunk Size", 100, 1000, st.session_state['chunk_size'], 50)
     st.session_state['chunk_overlap'] = st.sidebar.slider("Select Chunk Overlap", 0, 100, st.session_state['chunk_overlap'], 10)
     file_uploader(supabase, openai_api_key, vector_store)
-elif user_choice == 'Ask a Question to the Brain':
+elif user_choice == 'Chat with your Brain':
     # Display model and temperature selection only when asking questions
     st.sidebar.title("Configuration") 
     st.sidebar.markdown("Choose your model and temperature for asking questions.")
     st.session_state['model'] = st.sidebar.selectbox("Select Model", ["gpt-3.5-turbo", "gpt-4"], index=("gpt-3.5-turbo", "gpt-4").index(st.session_state['model']))
     st.session_state['temperature'] = st.sidebar.slider("Select Temperature", 0.0, 1.0, st.session_state['temperature'], 0.1)
     chat_with_doc(openai_api_key, vector_store)
+elif user_choice == 'Forget':
+    st.sidebar.title("Configuration")
+    
+    brain(supabase)
 
 st.markdown("---\n\n")
