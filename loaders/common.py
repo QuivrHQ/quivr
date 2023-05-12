@@ -1,6 +1,7 @@
 import tempfile
 from utils import compute_sha1_from_file
 from langchain.schema import Document
+import streamlit as st
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 
 def process_file(vector_store, file, loader_class, file_suffix):
