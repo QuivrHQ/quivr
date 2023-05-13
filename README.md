@@ -64,13 +64,13 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-- Create a streamlit secrets.toml file
+- Copy the streamlit secrets.toml example file
 
 ```bash
-touch secrets.toml
+cp .streamlit/secrets.toml.example .streamlit/secrets.toml
 ```
 
-- Add the following to the secrets.toml file
+- Add your credentials to .streamlit/secrets.toml file
 
 ```toml
 supabase_url = "SUPABASE_URL"
