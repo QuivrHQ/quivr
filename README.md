@@ -21,7 +21,11 @@ Quiver is your second brain in the cloud, designed to easily store and retrieve 
 - **Open Source**: Quiver is open source and free to use.
 ## Demo
 
-![|300](2023-05-13-02-16-02.png)
+
+
+https://github.com/StanGirard/quiver/assets/19614572/a3cddc6a-ca28-44ad-9ede-3122fa918b51
+
+
 
 ## Getting Started
 
