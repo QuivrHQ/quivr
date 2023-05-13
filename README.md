@@ -4,7 +4,7 @@
 <img src="./logo.png" alt="quiver-logo" width="30%">
 <p align="center">
 
-Quiver is your second brain in the cloud, designed to easily store and retrieve unstructured information. It's like Obsidian, but in text, and powered by generative AI.
+Quiver is your second brain in the cloud, designed to easily store and retrieve unstructured information. It's like Obsidian and powered by generative AI.
 
 ## Features
 
@@ -12,7 +12,13 @@ Quiver is your second brain in the cloud, designed to easily store and retrieve 
 - **Generative AI**: Quiver uses advanced AI to help you generate and retrieve information.
 - **Fast and Efficient**: Designed with speed and efficiency in mind. Quiver makes sure you can access your data as quickly as possible.
 - **Secure**: Your data is stored securely in the cloud and is always under your control.
-
+- **Compatible Files**: 
+  - **Text**
+  - **Markdown**
+  - **PDF**
+  - **Audio**
+  - **Video**
+- **Open Source**: Quiver is open source and free to use.
 ## Demo
 
 ![|300](2023-05-13-02-16-02.png)
