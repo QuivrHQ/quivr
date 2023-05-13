@@ -4,7 +4,7 @@
 <img src="./logo.png" alt="quiver-logo" width="30%">
 <p align="center">
 
-Quiver is your second brain in the cloud, designed to easily store and retrieve unstructured information. It's like Obsidian and powered by generative AI.
+Quiver is your second brain in the cloud, designed to easily store and retrieve unstructured information. It's like Obsidian but powered by generative AI.
 
 ## Features
 
@@ -43,7 +43,7 @@ What things you need to install the software and how to install them.
 - Clone the repository
 
 ```bash
-git clone
+git clone git@github.com:StanGirard/quiver.git & cd quiver
 ```
 
 - Create a virtual environment
@@ -78,7 +78,7 @@ supabase_service_key = "SUPABASE_SERVICE_KEY"
 openai_api_key = "OPENAI_API_KEY"
 ```
 
-- Run the migration script on the Supabase database
+- Run the migration script on the Supabase database via the web interface
 
 ```sql
 -- Enable the pgvector extension to work with embedding vectors
