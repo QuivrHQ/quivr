@@ -21,7 +21,7 @@ These instructions will get you a copy of the project up and running on your loc
 
 What things you need to install the software and how to install them.
 
-- Python 3.6 or higher
+- Python 3.10 or higher
 - Pip
 - Virtualenv
 - Supabase account
@@ -30,11 +30,99 @@ What things you need to install the software and how to install them.
 
 ### Installing
 
+- Clone the repository
 
+```bash
+git clone
+```
 
+- Create a virtual environment
+
+```bash
+virtualenv venv
+```
+
+- Activate the virtual environment
+
+```bash
+source venv/bin/activate
+```
+
+- Install the dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
+- Create a streamlit secrets.toml file
+
+```bash
+touch secrets.toml
+```
+
+- Add the following to the secrets.toml file
+
+```toml
+supabase_url = "SUPABASE_URL"
+supabase_service_key = "SUPABASE_SERVICE_KEY"
+openai_api_key = "OPENAI_API_KEY"
+```
+
+- Run the migration script on the Supabase database
+
+```sql
+-- Enable the pgvector extension to work with embedding vectors
+       create extension vector;
+
+       -- Create a table to store your documents
+       create table documents (
+       id bigserial primary key,
+       content text, -- corresponds to Document.pageContent
+       metadata jsonb, -- corresponds to Document.metadata
+       embedding vector(1536) -- 1536 works for OpenAI embeddings, change if needed
+       );
+
+       CREATE FUNCTION match_documents(query_embedding vector(1536), match_count int)
+           RETURNS TABLE(
+               id bigint,
+               content text,
+               metadata jsonb,
+               -- we return matched vectors to enable maximal marginal relevance searches
+               embedding vector(1536),
+               similarity float)
+           LANGUAGE plpgsql
+           AS $$
+           # variable_conflict use_column
+       BEGIN
+           RETURN query
+           SELECT
+               id,
+               content,
+               metadata,
+               embedding,
+               1 -(documents.embedding <=> query_embedding) AS similarity
+           FROM
+               documents
+           ORDER BY
+               documents.embedding <=> query_embedding
+           LIMIT match_count;
+       END;
+       $$;
+```
+
+- Run the app
+
+```bash
+streamlit run main.py
+```
 
 ## Built With
 
 * [Python](https://www.python.org/) - The programming language used.
 * [Streamlit](https://streamlit.io/) - The web framework used.
 * [Supabase](https://supabase.io/) - The open source Firebase alternative.
+
+## Contributing
+
+Open a pull request and we'll review it as soon as possible.
+
