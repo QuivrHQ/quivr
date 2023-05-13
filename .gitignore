@@ -1,5 +1,5 @@
 secondbrain/
 .env
-.streamlit/
+.streamlit/secrets.toml
 **/*.pyc
 toto.txt
