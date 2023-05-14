@@ -26,13 +26,13 @@ if anthropic_api_key:
 
 # Set the theme
 st.set_page_config(
-    page_title="Quiver",
+    page_title="Quivr",
     layout="wide",
     initial_sidebar_state="expanded",
 )
 
 
-st.title("🧠 Quiver - Your second brain 🧠")
+st.title("🧠 Quivr - Your second brain 🧠")
 st.markdown("Store your knowledge in a vector store and query it with OpenAI's GPT-3/4.")
 st.markdown("---\n\n")
 
