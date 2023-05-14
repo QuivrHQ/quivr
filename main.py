@@ -21,13 +21,13 @@ vector_store = SupabaseVectorStore(supabase, embeddings, table_name="documents")
 
 # Set the theme
 st.set_page_config(
-    page_title="Second Brain",
+    page_title="Quiver",
     layout="wide",
     initial_sidebar_state="expanded",
 
 )
 
-st.title("🧠 Second Brain 🧠")
+st.title("🧠 Quiver - Your second brain 🧠")
 st.markdown("Store your knowledge in a vector store and query it with OpenAI's GPT-3/4.")
 st.markdown("---\n\n")
 
