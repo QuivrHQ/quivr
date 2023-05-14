@@ -6,19 +6,14 @@ import streamlit as st
 from files import file_uploader
 from question import chat_with_doc
 from brain import brain
-from langchain.embeddings.openai import OpenAIEmbeddings
-from langchain.vectorstores import SupabaseVectorStore
-from supabase import Client, create_client
+from vectorstore import get_vectorestore
 
-supabase_url = st.secrets.supabase_url
-supabase_key = st.secrets.supabase_service_key
 openai_api_key = st.secrets.openai_api_key
 anthropic_api_key = st.secrets.anthropic_api_key
-supabase: Client = create_client(supabase_url, supabase_key)
 
-embeddings = OpenAIEmbeddings(openai_api_key=openai_api_key)
-vector_store = SupabaseVectorStore(
-    supabase, embeddings, table_name="documents")
+
+vector_store = get_vectorestore()
+
 models = ["gpt-3.5-turbo", "gpt-4"]
 if anthropic_api_key:
     models += ["claude-v1", "claude-v1.3",
@@ -74,7 +69,7 @@ elif user_choice == 'Chat with your Brain':
     st.session_state['temperature'] = st.sidebar.slider(
         "Select Temperature", 0.0, 1.0, st.session_state['temperature'], 0.1)
     st.session_state['max_tokens'] = st.sidebar.slider(
-        "Select Max Tokens", 256, 2048, st.session_state['max_tokens'], 2048)
+        "Select Max Tokens", 256, 2048, st.session_state['max_tokens'], 128)
     chat_with_doc(st.session_state['model'], vector_store)
 elif user_choice == 'Forget':
     st.sidebar.title("Configuration")

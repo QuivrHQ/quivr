@@ -13,7 +13,7 @@ anthropic_api_key = st.secrets.anthropic_api_key
 logger = get_logger(__name__)
 
 
-def chat_with_doc(model, vector_store: SupabaseVectorStore):
+def chat_with_doc(model, vector_store):
     question = st.text_area("## Ask a question")
     button = st.button("Ask")
     if button:

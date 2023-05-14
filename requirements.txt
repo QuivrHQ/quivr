@@ -9,3 +9,4 @@ supabase==1.0.3
 tiktoken==0.4.0
 unstructured==0.6.5
 anthropic==0.2.8
+pinecone-client==2.2.1
