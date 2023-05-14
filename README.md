@@ -1,16 +1,16 @@
-# Quiver
+# Quivr
 
 <p align="center">
-<img src="./logo.png" alt="quiver-logo" width="30%">
+<img src="./logo.png" alt="Quivr-logo" width="30%">
 <p align="center">
 
-Quiver is your second brain in the cloud, designed to easily store and retrieve unstructured information. It's like Obsidian but powered by generative AI.
+Quivr is your second brain in the cloud, designed to easily store and retrieve unstructured information. It's like Obsidian but powered by generative AI.
 
 ## Features
 
-- **Store Anything**: Quiver can handle almost any type of data you throw at it. Text, images, code snippets, you name it.
-- **Generative AI**: Quiver uses advanced AI to help you generate and retrieve information.
-- **Fast and Efficient**: Designed with speed and efficiency in mind. Quiver makes sure you can access your data as quickly as possible.
+- **Store Anything**: Quivr can handle almost any type of data you throw at it. Text, images, code snippets, you name it.
+- **Generative AI**: Quivr uses advanced AI to help you generate and retrieve information.
+- **Fast and Efficient**: Designed with speed and efficiency in mind. Quivr makes sure you can access your data as quickly as possible.
 - **Secure**: Your data is stored securely in the cloud and is always under your control.
 - **Compatible Files**: 
   - **Text**
@@ -18,12 +18,12 @@ Quiver is your second brain in the cloud, designed to easily store and retrieve 
   - **PDF**
   - **Audio**
   - **Video**
-- **Open Source**: Quiver is open source and free to use.
+- **Open Source**: Quivr is open source and free to use.
 ## Demo
 
 
 
-https://github.com/StanGirard/quiver/assets/19614572/a3cddc6a-ca28-44ad-9ede-3122fa918b51
+https://github.com/StanGirard/Quivr/assets/19614572/a3cddc6a-ca28-44ad-9ede-3122fa918b51
 
 
 
@@ -47,7 +47,7 @@ What things you need to install the software and how to install them.
 - Clone the repository
 
 ```bash
-git clone git@github.com:StanGirard/quiver.git & cd quiver
+git clone git@github.com:StanGirard/Quivr.git & cd Quivr
 ```
 
 - Create a virtual environment
