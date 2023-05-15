@@ -1,3 +1,4 @@
+import anthropic
 import streamlit as st
 from streamlit.logger import get_logger
 from langchain.chains import ConversationalRetrievalChain
@@ -13,9 +14,17 @@ anthropic_api_key = st.secrets.anthropic_api_key
 logger = get_logger(__name__)
 
 
+def count_tokens(question, model):
+    count = f'Words: {len(question.split())}'
+    if model.startswith("claude"):
+        count += f' | Tokens: {anthropic.count_tokens(question)}'
+    return count
+
+
 def chat_with_doc(model, vector_store: SupabaseVectorStore):
     question = st.text_area("## Ask a question")
     button = st.button("Ask")
+    count_button = st.button("Count Tokens", type='secondary')
     if button:
         if model.startswith("gpt"):
             logger.info('Using OpenAI model %s', model)
@@ -33,3 +42,6 @@ def chat_with_doc(model, vector_store: SupabaseVectorStore):
             result = qa({"question": question})
             logger.info('Result: %s', result)
             st.write(result["answer"])
+
+    if count_button:
+        st.write(count_tokens(question, model))
