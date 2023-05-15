@@ -22,10 +22,12 @@ Quivr is your second brain in the cloud, designed to easily store and retrieve u
 ## Demo
 
 
-
+### Demo with GPT3.5
 https://github.com/StanGirard/Quivr/assets/19614572/a3cddc6a-ca28-44ad-9ede-3122fa918b51
 
 
+### Demo with Claude 100k context
+https://github.com/StanGirard/quivr/assets/5101573/9dba918c-9032-4c8d-9eea-94336d2c8bd4
 
 ## Getting Started
 
