@@ -5,6 +5,7 @@ import tempfile
 import streamlit as st
 from files import file_uploader
 from question import chat_with_doc
+from prompt_manager import manage_prompts
 from brain import brain
 from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.vectorstores import SupabaseVectorStore
@@ -50,11 +51,15 @@ if 'max_tokens' not in st.session_state:
 
 # Create a radio button for user to choose between adding knowledge or asking a question
 user_choice = st.radio(
-    "Choose an action", ('Add Knowledge', 'Chat with your Brain', 'Forget'))
+    "Choose an action", ('Add Knowledge', 'Chat with your Brain', 'Forget', 'Manage Prompts'))
 
 st.markdown("---\n\n")
 
-if user_choice == 'Add Knowledge':
+if user_choice == 'Manage Prompts':
+    manage_prompts(supabase)
+    
+
+elif user_choice == 'Add Knowledge':
     # Display chunk size and overlap selection only when adding knowledge
     st.sidebar.title("Configuration")
     st.sidebar.markdown(
@@ -78,6 +83,8 @@ elif user_choice == 'Chat with your Brain':
     chat_with_doc(st.session_state['model'], vector_store)
 elif user_choice == 'Forget':
     st.sidebar.title("Configuration")
+
+
 
     brain(supabase)
 

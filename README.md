@@ -101,6 +101,28 @@ anthropic_api_key = "ANTHROPIC_API_KEY" # Optional
        embedding vector(1536) -- 1536 works for OpenAI embeddings, change if needed
        );
 
+       create table prompts (
+        id bigserial primary key,
+        created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+        updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+        prompt TEXT NOT NULL
+        prompt_title TEXT NOT NULL
+       );
+
+       CREATE OR REPLACE FUNCTION trigger_set_timestamp()
+        RETURNS TRIGGER AS $$
+            BEGIN
+                NEW.updated_at = NOW();
+            RETURN NEW;
+        END;
+        $$ LANGUAGE plpgsql;
+
+        CREATE TRIGGER set_timestamp
+        BEFORE UPDATE ON todos
+        FOR EACH ROW
+        EXECUTE PROCEDURE trigger_set_timestamp();
+       
+
        CREATE FUNCTION match_documents(query_embedding vector(1536), match_count int)
            RETURNS TABLE(
                id bigint,
