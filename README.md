@@ -80,6 +80,7 @@ cp .streamlit/secrets.toml.example .streamlit/secrets.toml
 supabase_url = "SUPABASE_URL"
 supabase_service_key = "SUPABASE_SERVICE_KEY"
 openai_api_key = "OPENAI_API_KEY"
+anthropic_api_key = "ANTHROPIC_API_KEY" # Optional
 ```
 
 - Run the migration script on the Supabase database via the web interface
