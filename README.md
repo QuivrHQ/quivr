@@ -145,3 +145,6 @@ streamlit run main.py
 
 Open a pull request and we'll review it as soon as possible.
 
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=StanGirard/quivr&type=Date)](https://star-history.com/#StanGirard/quivr&Date)
