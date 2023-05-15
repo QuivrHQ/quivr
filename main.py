@@ -3,7 +3,7 @@ import os
 import tempfile
 
 import streamlit as st
-from files import file_uploader
+from files import file_uploader, url_uploader
 from question import chat_with_doc
 from brain import brain
 from langchain.embeddings.openai import OpenAIEmbeddings
@@ -64,6 +64,7 @@ if user_choice == 'Add Knowledge':
     st.session_state['chunk_overlap'] = st.sidebar.slider(
         "Select Chunk Overlap", 0, 100, st.session_state['chunk_overlap'], 10)
     file_uploader(supabase, openai_api_key, vector_store)
+    url_uploader(supabase, openai_api_key, vector_store)
 elif user_choice == 'Chat with your Brain':
     # Display model and temperature selection only when asking questions
     st.sidebar.title("Configuration")
