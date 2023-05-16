@@ -8,6 +8,7 @@ from loaders.markdown import process_markdown
 from loaders.html import process_html
 from utils import compute_sha1_from_content
 from loaders.pdf import process_pdf
+from loaders.html import get_html, create_html_file, delete_tempfile
 import requests
 import re
 import unicodedata
@@ -30,7 +31,7 @@ file_processors = {
 }
 
 def file_uploader(supabase, openai_key, vector_store):
-    files = st.file_uploader("Upload a file", accept_multiple_files=True, type=list(file_processors.keys()))
+    files = st.file_uploader("**Upload a file**", accept_multiple_files=True, type=list(file_processors.keys()))
     if st.button("Add to Database"):
         if files is not None:
             for file in files:
@@ -60,8 +61,8 @@ def filter_file(file, supabase, vector_store):
             return False
 
 def url_uploader(supabase, openai_key, vector_store):
-    url = st.text_input("## Add an url",placeholder="https://www.quiver.app")
-    button = st.button("Add the website page to the database")
+    url = st.text_area("## Add an url",placeholder="https://www.quivr.app")
+    button = st.button("Add the URL to the database")
     if button:
         html = get_html(url)
         if html:
@@ -72,36 +73,3 @@ def url_uploader(supabase, openai_key, vector_store):
         else:
             st.write(f"❌ Failed to access to {url} .")
 
-def get_html(url):
-    response = requests.get(url)
-    if response.status_code == 200:
-        return response.text
-    else:
-        return None
-
-def create_html_file(url, content):
-    file_name = slugify(url) + ".html"
-    temp_file_path = os.path.join(tempfile.gettempdir(), file_name)
-    with open(temp_file_path, 'w') as temp_file:
-        temp_file.write(content)
-
-    record = UploadedFileRec(id=None, name=file_name, type='text/html', data=open(temp_file_path, 'rb').read())
-    uploaded_file = UploadedFile(record)
-    
-    return uploaded_file, temp_file_path
-
-def delete_tempfile(temp_file_path, url, ret):
-    try:
-        os.remove(temp_file_path)
-        if ret:
-            st.write(f"✅ Content saved... {url}  ")
-    except OSError as e:
-        print(f"Error while deleting the temporary file: {str(e)}")
-        if ret:
-            st.write(f"❌ Error while saving content... {url}  ")
-
-def slugify(text):
-    text = unicodedata.normalize('NFKD', text).encode('ascii', 'ignore').decode('utf-8')
-    text = re.sub(r'[^\w\s-]', '', text).strip().lower()
-    text = re.sub(r'[-\s]+', '-', text)
-    return text
