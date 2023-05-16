@@ -4,7 +4,9 @@
 <img src="./logo.png" alt="Quivr-logo" width="30%">
 <p align="center">
 
-Join our [discord](https://discord.gg/5SDcUSzF) 
+<a href="https://discord.gg/HUpRgp2HG8">
+  <img src="https://img.shields.io/badge/discord-join%20chat-blue.svg" alt="Join our Discord" height="40">
+</a>
 
 Quivr is your second brain in the cloud, designed to easily store and retrieve unstructured information. It's like Obsidian but powered by generative AI.
 
