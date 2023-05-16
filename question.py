@@ -25,6 +25,7 @@ def chat_with_doc(model, vector_store: SupabaseVectorStore):
 
     if 'chat_history' not in st.session_state:
         st.session_state['chat_history'] = []
+        
     
     
     question = st.text_area("## Ask a question")
@@ -36,8 +37,7 @@ def chat_with_doc(model, vector_store: SupabaseVectorStore):
     with columns[2]:
         clear_history = st.button("Clear History", type='secondary')
     
-    for speaker, text in st.session_state['chat_history']:
-            st.markdown(f"**{speaker}:** {text}")
+    
     
     if clear_history:
         st.session_state['chat_history'] = []
@@ -66,8 +66,8 @@ def chat_with_doc(model, vector_store: SupabaseVectorStore):
         st.session_state['chat_history'].append(("Quivr", model_response["answer"]))
 
         # Display chat history
+        st.empty()
         for speaker, text in st.session_state['chat_history']:
-            st.empty()
             st.markdown(f"**{speaker}:** {text}")
 
     if count_button:
