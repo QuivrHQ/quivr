@@ -9,6 +9,8 @@ from loaders.html import process_html
 from utils import compute_sha1_from_content
 from loaders.pdf import process_pdf
 from loaders.html import get_html, create_html_file, delete_tempfile
+from loaders.powerpoint import process_powerpoint
+from loaders.docx import process_docx
 import requests
 import re
 import unicodedata
@@ -28,6 +30,8 @@ file_processors = {
     ".mpeg": process_audio,
     ".pdf": process_pdf,
     ".html": process_html,
+     ".pptx": process_powerpoint,
+     ".docx": process_docx
 }
 
 def file_uploader(supabase, openai_key, vector_store):
