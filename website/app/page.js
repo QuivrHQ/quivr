@@ -11,7 +11,7 @@ export default function Home() {
       </div>
       <div className={styles.center}>
         <iframe 
-          src="https://github.com/StanGirard/Quivr/assets/19614572/a3cddc6a-ca28-44ad-9ede-3122fa918b51" 
+          src="https://github.com/StanGirard/quivr/assets/19614572/80721777-2313-468f-b75e-09379f694653" 
           width="1000" 
           height="480" 
           frameborder="0" 
