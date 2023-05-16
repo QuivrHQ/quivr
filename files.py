@@ -61,7 +61,7 @@ def filter_file(file, supabase, vector_store):
             return False
 
 def url_uploader(supabase, openai_key, vector_store):
-    url = st.text_area("## Add an url",placeholder="https://www.quivr.app")
+    url = st.text_area("**Add an url**",placeholder="https://www.quivr.app")
     button = st.button("Add the URL to the database")
     if button:
         html = get_html(url)
