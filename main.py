@@ -9,6 +9,7 @@ from brain import brain
 from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.vectorstores import SupabaseVectorStore
 from supabase import Client, create_client
+from explorer import view_document
 
 supabase_url = st.secrets.supabase_url
 supabase_key = st.secrets.supabase_service_key
@@ -50,7 +51,7 @@ if 'max_tokens' not in st.session_state:
 
 # Create a radio button for user to choose between adding knowledge or asking a question
 user_choice = st.radio(
-    "Choose an action", ('Add Knowledge', 'Chat with your Brain', 'Forget'))
+    "Choose an action", ('Add Knowledge', 'Chat with your Brain', 'Forget', "Explore"))
 
 st.markdown("---\n\n")
 
@@ -87,5 +88,8 @@ elif user_choice == 'Forget':
     st.sidebar.title("Configuration")
 
     brain(supabase)
+elif user_choice == 'Explore':
+    st.sidebar.title("Configuration")
+    view_document(supabase)
 
 st.markdown("---\n\n")
