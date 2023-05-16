@@ -43,6 +43,17 @@ export default function Home() {
     </h2>
     <p>Follow us on Twitter for updates.</p>
   </a>
+  <a
+    href="https://discord.gg/HUpRgp2HG8"
+    className={styles.card}
+    target="_blank"
+    rel="noopener noreferrer"
+  >
+    <h2>
+      Discord <span>-&gt;</span>
+    </h2>
+    <p>Join the discussion on Discord</p>
+  </a>
 
 
 </div>
