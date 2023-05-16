@@ -16,7 +16,7 @@ export default function Home() {
           height="480" 
           frameborder="0" 
           allow="autoplay; fullscreen; picture-in-picture" 
-          allowfullscreen
+          allowFullScreen
         ></iframe>
       </div>
       <div className={styles.grid}>
