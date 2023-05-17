@@ -55,9 +55,11 @@ def filter_file(file, supabase, vector_store):
         return False
     else:
         file_extension = os.path.splitext(file.name)[-1]
-        print(file.name, file_extension)
         if file_extension in file_processors:
-            file_processors[file_extension](vector_store, file)
+            if st.secrets.self_hosted == "false":
+                file_processors[file_extension](vector_store, file, stats_db=supabase)
+            else:
+                file_processors[file_extension](vector_store, file, stats_db=None)
             st.write(f"✅ {file.name} ")
             return True
         else:
@@ -65,15 +67,21 @@ def filter_file(file, supabase, vector_store):
             return False
 
 def url_uploader(supabase, openai_key, vector_store):
-    url = st.text_area("**Add an url**",placeholder="https://www.quivr.app")
-    button = st.button("Add the URL to the database")
-    if button:
-        html = get_html(url)
-        if html:
-            st.write(f"Getting content ... {url}  ")
-            file, temp_file_path = create_html_file(url, html)
-            ret = filter_file(file, supabase, vector_store)
-            delete_tempfile(temp_file_path, url, ret)
-        else:
-            st.write(f"❌ Failed to access to {url} .")
+    
+        url = st.text_area("**Add an url**",placeholder="https://www.quivr.app")
+        button = st.button("Add the URL to the database")
+
+        if button:
+            if not st.session_state["overused"]:
+                html = get_html(url)
+                if html:
+                    st.write(f"Getting content ... {url}  ")
+                    file, temp_file_path = create_html_file(url, html)
+                    ret = filter_file(file, supabase, vector_store)
+                    delete_tempfile(temp_file_path, url, ret)
+                else:
+                    st.write(f"❌ Failed to access to {url} .")
+            else:
+                st.write("You have reached your daily limit. Please come back later or self host the solution.")
+   
 

@@ -8,8 +8,8 @@ import os
 import streamlit as st
 from streamlit.runtime.uploaded_file_manager import UploadedFileRec, UploadedFile
 
-def process_html(vector_store, file):
-    return process_file(vector_store, file, UnstructuredHTMLLoader, ".html")
+def process_html(vector_store, file, stats_db):
+    return process_file(vector_store, file, UnstructuredHTMLLoader, ".html", stats_db=stats_db)
 
 
 def get_html(url):

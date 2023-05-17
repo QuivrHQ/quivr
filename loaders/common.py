@@ -4,12 +4,17 @@ from utils import compute_sha1_from_file
 from langchain.schema import Document
 import streamlit as st
 from langchain.text_splitter import RecursiveCharacterTextSplitter
+from stats import add_usage
 
-def process_file(vector_store, file, loader_class, file_suffix):
+def process_file(vector_store, file, loader_class, file_suffix, stats_db=None):
     documents = []
     file_sha = ""
     file_name = file.name
     file_size = file.size
+    if st.secrets.self_hosted == "false":
+        if file_size > 1000000:
+            st.error("File size is too large. Please upload a file smaller than 1MB or self host.")
+            return
     dateshort = time.strftime("%Y%m%d")
     with tempfile.NamedTemporaryFile(delete=True, suffix=file_suffix) as tmp_file:
         tmp_file.write(file.getvalue())
@@ -30,4 +35,6 @@ def process_file(vector_store, file, loader_class, file_suffix):
     docs_with_metadata = [Document(page_content=doc.page_content, metadata={"file_sha1": file_sha1,"file_size":file_size ,"file_name": file_name, "chunk_size": chunk_size, "chunk_overlap": chunk_overlap, "date": dateshort}) for doc in documents]
     
     vector_store.add_documents(docs_with_metadata)
+    if stats_db:
+        add_usage(stats_db, "embedding", "file", metadata={"file_name": file_name,"file_type": file_suffix, "chunk_size": chunk_size, "chunk_overlap": chunk_overlap})
     return 

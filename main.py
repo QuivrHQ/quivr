@@ -10,12 +10,16 @@ from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.vectorstores import SupabaseVectorStore
 from supabase import Client, create_client
 from explorer import view_document
+from stats import get_usage_today
 
 supabase_url = st.secrets.supabase_url
 supabase_key = st.secrets.supabase_service_key
 openai_api_key = st.secrets.openai_api_key
 anthropic_api_key = st.secrets.anthropic_api_key
 supabase: Client = create_client(supabase_url, supabase_key)
+self_hosted = st.secrets.self_hosted
+
+
 
 embeddings = OpenAIEmbeddings(openai_api_key=openai_api_key)
 vector_store = SupabaseVectorStore(
@@ -33,9 +37,24 @@ st.set_page_config(
 )
 
 
+    
+
 st.title("🧠 Quivr - Your second brain 🧠")
 st.markdown("Store your knowledge in a vector store and query it with OpenAI's GPT-3/4.")
 st.markdown("---\n\n")
+
+st.session_state["overused"] = False
+if self_hosted == "false":
+    usage = get_usage_today(supabase)
+    st.write(f"Usage today: {usage} tokens")
+    st.write("---")
+    if usage > st.secrets.usage_limit:
+        
+        st.error(
+            f"You have used {usage} tokens today, which is more than your daily limit of {st.secrets.usage_limit} tokens. Please come back in a few or self host.")
+        st.session_state["overused"] = True
+
+
 
 # Initialize session state variables
 if 'model' not in st.session_state:
@@ -77,13 +96,22 @@ elif user_choice == 'Chat with your Brain':
     st.sidebar.title("Configuration")
     st.sidebar.markdown(
         "Choose your model and temperature for asking questions.")
-    st.session_state['model'] = st.sidebar.selectbox(
+    if st.secrets.self_hosted != "false":
+        st.session_state['model'] = st.sidebar.selectbox(
         "Select Model", models, index=(models).index(st.session_state['model']))
+    else:
+        st.sidebar.write("**Model**: gpt-3.5-turbo")
+        st.sidebar.write("**Self Host to unlock more models such as claude-v1 and GPT4**")
+        st.session_state['model'] = "gpt-3.5-turbo"
     st.session_state['temperature'] = st.sidebar.slider(
         "Select Temperature", 0.0, 1.0, st.session_state['temperature'], 0.1)
-    st.session_state['max_tokens'] = st.sidebar.slider(
-        "Select Max Tokens", 256, 2048, st.session_state['max_tokens'], 2048)
-    chat_with_doc(st.session_state['model'], vector_store)
+    if st.secrets.self_hosted != "false":
+        st.session_state['max_tokens'] = st.sidebar.slider(
+            "Select Max Tokens", 256, 2048, st.session_state['max_tokens'], 2048)
+    else:
+        st.session_state['max_tokens'] = 100
+    
+    chat_with_doc(st.session_state['model'], vector_store, stats_db=supabase)
 elif user_choice == 'Forget':
     st.sidebar.title("Configuration")
 
