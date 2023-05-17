@@ -46,7 +46,7 @@ st.markdown("---\n\n")
 st.session_state["overused"] = False
 if self_hosted == "false":
     usage = get_usage_today(supabase)
-    st.write(f"Usage today: {usage} tokens")
+    st.write(f"Usage today: {usage} tokens out of {st.secrets.usage_limit}")
     st.write("---")
     if usage > st.secrets.usage_limit:
         
