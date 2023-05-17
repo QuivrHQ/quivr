@@ -1,5 +1,6 @@
 import tempfile
 import time 
+import os
 from utils import compute_sha1_from_file
 from langchain.schema import Document
 import streamlit as st
@@ -23,7 +24,7 @@ def process_file(vector_store, file, loader_class, file_suffix, stats_db=None):
         loader = loader_class(tmp_file.name)
         documents = loader.load()
         file_sha1 = compute_sha1_from_file(tmp_file.name)
-        tmp_file.delete = True
+    os.remove(tmp_file.name)
     
     chunk_size = st.session_state['chunk_size']
     chunk_overlap = st.session_state['chunk_overlap']
