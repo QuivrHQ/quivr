@@ -36,6 +36,8 @@ file_processors = {
 
 def file_uploader(supabase, openai_key, vector_store):
     files = st.file_uploader("**Upload a file**", accept_multiple_files=True, type=list(file_processors.keys()))
+    if st.secrets.self_hosted == "false":
+        st.markdown("**In demo mode, the max file size is 1MB**")
     if st.button("Add to Database"):
         if files is not None:
             for file in files:
