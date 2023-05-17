@@ -37,8 +37,8 @@ def _transcribe_audio(api_key, audio_file, stats_db):
 
 def process_audio(vector_store, file_name, stats_db):
     if st.secrets.self_hosted == "false":
-        if file_name.size > 100000000:
-            st.error("File size is too large. Please upload a file smaller than 2MB.")
+        if file_name.size > 10000000:
+            st.error("File size is too large. Please upload a file smaller than 1MB.")
             return
     file_sha = ""
     dateshort = time.strftime("%Y%m%d-%H%M%S")
