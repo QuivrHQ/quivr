@@ -32,7 +32,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
+supabase_url = os.environ.get("SUPABASE_URL")
+supabase_key = os.environ.get("SUPABASE_SERVICE_KEY")
+openai_api_key = os.environ.get("OPENAI_API_KEY")
 anthropic_api_key = ""
 supabase: Client = create_client(supabase_url, supabase_key)
 embeddings = OpenAIEmbeddings(openai_api_key=openai_api_key)
