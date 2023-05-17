@@ -1,5 +1,6 @@
 import tempfile
 import time 
+import os
 from utils import compute_sha1_from_file
 from langchain.schema import Document
 import streamlit as st
@@ -16,13 +17,14 @@ def process_file(vector_store, file, loader_class, file_suffix, stats_db=None):
             st.error("File size is too large. Please upload a file smaller than 1MB or self host.")
             return
     dateshort = time.strftime("%Y%m%d")
-    with tempfile.NamedTemporaryFile(delete=True, suffix=file_suffix) as tmp_file:
+    with tempfile.NamedTemporaryFile(delete=False, suffix=file_suffix) as tmp_file:
         tmp_file.write(file.getvalue())
         tmp_file.flush()
 
         loader = loader_class(tmp_file.name)
         documents = loader.load()
         file_sha1 = compute_sha1_from_file(tmp_file.name)
+    os.remove(tmp_file.name)
     
     chunk_size = st.session_state['chunk_size']
     chunk_overlap = st.session_state['chunk_overlap']
