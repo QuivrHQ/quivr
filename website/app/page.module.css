@@ -41,7 +41,7 @@
   
   .grid {
     display: grid;
-    grid-template-columns: repeat(4, minmax(25%, auto));
+    grid-template-columns: repeat(4, 1fr); /* Updated from 3 to 4 */
     width: var(--max-width);
     max-width: 100%;
   }
@@ -77,7 +77,7 @@
     justify-content: center;
     align-items: center;
     position: relative;
-    padding: 4rem 0;
+    padding: 2rem 0;
   }
   
   .center::before {
@@ -196,10 +196,9 @@
     }
   }
   
-  /* Tablet and Smaller Desktop */
   @media (min-width: 701px) and (max-width: 1120px) {
     .grid {
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(2, 1fr); /* Display two cards per row on tablet screens */
     }
   }
   
@@ -231,6 +230,6 @@
   /* Tablet and up */
   @media (min-width: 701px) {
     .grid {
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(4, 1fr);
     }
   }
