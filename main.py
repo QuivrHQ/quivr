@@ -19,8 +19,6 @@ anthropic_api_key = st.secrets.anthropic_api_key
 supabase: Client = create_client(supabase_url, supabase_key)
 self_hosted = st.secrets.self_hosted
 
-
-
 embeddings = OpenAIEmbeddings(openai_api_key=openai_api_key)
 vector_store = SupabaseVectorStore(
     supabase, embeddings, table_name="documents")
@@ -37,22 +35,24 @@ st.set_page_config(
 )
 
 
-    
-
 st.title("🧠 Quivr - Your second brain 🧠")
 st.markdown("Store your knowledge in a vector store and query it with OpenAI's GPT-3/4.")
+if self_hosted == "false":
+    st.markdown('**📢 Note: In the public demo, access to functionality is restricted. You can only use the GPT-3.5-turbo model and upload files up to 1Mb. To use more models and upload larger files, consider self-hosting Quivr.**')
+
 st.markdown("---\n\n")
 
 st.session_state["overused"] = False
 if self_hosted == "false":
     usage = get_usage_today(supabase)
-    st.write(f"Usage today: {usage} tokens out of {st.secrets.usage_limit}")
-    st.write("---")
     if usage > st.secrets.usage_limit:
-        
-        st.error(
-            f"You have used {usage} tokens today, which is more than your daily limit of {st.secrets.usage_limit} tokens. Please come back in a few or self host.")
+        st.markdown(
+            f"<span style='color:red'>You have used {usage} tokens today, which is more than your daily limit of {st.secrets.usage_limit} tokens. Please come back later or consider self-hosting.</span>", unsafe_allow_html=True)
         st.session_state["overused"] = True
+    else:
+        st.markdown(f"<span style='color:blue'>Usage today: {usage} tokens out of {st.secrets.usage_limit}</span>", unsafe_allow_html=True)
+    st.write("---")
+    
 
 
 
@@ -109,7 +109,7 @@ elif user_choice == 'Chat with your Brain':
         st.session_state['max_tokens'] = st.sidebar.slider(
             "Select Max Tokens", 256, 2048, st.session_state['max_tokens'], 2048)
     else:
-        st.session_state['max_tokens'] = 100
+        st.session_state['max_tokens'] = 256
     
     chat_with_doc(st.session_state['model'], vector_store, stats_db=supabase)
 elif user_choice == 'Forget':
