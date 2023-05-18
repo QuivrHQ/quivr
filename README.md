@@ -39,14 +39,17 @@ These instructions will get you a copy of the project up and running on your loc
 
 ### Prerequisites
 
-What things you need to install the software and how to install them.
+Make sure you have the following installed before continuing:
 
 - Python 3.10 or higher
 - Pip
 - Virtualenv
-- Supabase account
-- Supabase API key
-- Supabase URL
+
+You'll also need a [Supabase](https://supabase.com/) account for:
+
+- A new Supabase project
+- Supabase Project API key
+- Supabase Project URL
 
 ### Installing
 
@@ -89,7 +92,9 @@ openai_api_key = "OPENAI_API_KEY"
 anthropic_api_key = "ANTHROPIC_API_KEY" # Optional
 ```
 
-- Run the migration script on the Supabase database via the web interface
+_Note that the `supabase_service_key` is found in your Supabase dashboard under Project Settings -> API. Use the `anon` `public` key found in the `Project API keys` section._
+
+- Run the following migration scripts on the Supabase database via the web interface (SQL Editor -> `New query`)
 
 ```sql
 -- Enable the pgvector extension to work with embedding vectors
