@@ -1,13 +1,13 @@
 import Link from "next/link";
 import { FC } from "react";
-import Button from "../components/Button";
+import Button from "../components/ui/Button";
 import { MdNorthEast } from "react-icons/md";
 
 interface HeroProps {}
 
 const Hero: FC<HeroProps> = ({}) => {
   return (
-    <section className="w-full px-16 flex flex-col text-center h-screen">
+    <section className="w-full flex flex-col text-center h-screen">
       <div className="flex flex-col gap-2 items-center justify-center mt-48">
         <h1 className="mb-4 text-6xl font-bold">Get a Second Brain</h1>
         <p className="text-base max-w-sm">

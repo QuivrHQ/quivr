@@ -3,7 +3,7 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const ButtonVariants = cva(
-  "px-5 py-2 text-sm font-medium rounded-md focus:ring ring-primary/10 outline-none flex items-center gap-2 disabled:opacity-50 transition-opacity",
+  "px-8 py-3 text-sm font-medium rounded-md focus:ring ring-primary/10 outline-none flex items-center gap-2 disabled:opacity-50 transition-opacity",
   {
     variants: {
       variant: {
@@ -11,7 +11,7 @@ const ButtonVariants = cva(
         secondary: "text-black dark:text-white bg-transparent",
       },
       brightness: {
-        dim: "opacity-50 hover:opacity-100 focus:opacity-100 transition-opacity shadow-none",
+        dim: "border border-black bg-transparent text-black focus:bg-black hover:bg-black hover:text-white focus:text-white transition-colors py-2 px-4 shadow-none",
         default: "opacity-100",
       },
     },
