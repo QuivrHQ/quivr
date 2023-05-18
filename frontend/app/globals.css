@@ -2,14 +2,11 @@
 @import 'tailwindcss/components';
 @import 'tailwindcss/utilities';
 
-html, body {
-  @apply bg-white text-black dark:bg-black dark:text-white min-h-screen w-full;
-}
 
 main {
   @apply max-w-screen-xl mx-auto flex flex-col min-h-screen;
 }
 
 header, section {
-  @apply px-10;
+  @apply px-5 md:px-10;
 }
