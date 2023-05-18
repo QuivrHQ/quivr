@@ -9,3 +9,6 @@ supabase==1.0.3
 tiktoken==0.4.0
 unstructured==0.6.5
 anthropic==0.2.8
+fastapi==0.95.2
+python-multipart==0.0.6
+uvicorn==0.22.0
