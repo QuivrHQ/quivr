@@ -7,10 +7,10 @@ interface HeroProps {}
 
 const Hero: FC<HeroProps> = ({}) => {
   return (
-    <section className="w-full flex flex-col gap-24 items-center text-center min-h-[768px] py-12">
+    <section className="relative w-full flex flex-col gap-24 items-center text-center min-h-[768px] py-12">
       <div className="flex flex-col gap-2 items-center justify-center mt-12">
         <h1 className="text-7xl font-bold max-w-xl">
-          Get a Second Brain with Quivr
+          Get a Second Brain with <span className="text-primary">Quivr</span>
         </h1>
         <p className="text-base max-w-sm text-gray-500 mb-10">
           Quivr is your second brain in the cloud, designed to easily store and
