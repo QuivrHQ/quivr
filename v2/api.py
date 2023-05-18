@@ -13,14 +13,15 @@ from tempfile import SpooledTemporaryFile
 import shutil
 
 
-from files.common import file_already_exists
-from files.txt import process_txt
-from files.csv import process_csv
-from files.docx import process_docx
-from files.pdf import process_pdf
-from files.markdown import process_markdown
-from files.powerpoint import process_powerpoint
-from files.html import process_html
+from parsers.common import file_already_exists
+from parsers.txt import process_txt
+from parsers.csv import process_csv
+from parsers.docx import process_docx
+from parsers.pdf import process_pdf
+from parsers.markdown import process_markdown
+from parsers.powerpoint import process_powerpoint
+from parsers.html import process_html
+from parsers.audio import process_audio
 from crawl.crawler import CrawlWebsite
 
 
@@ -72,6 +73,8 @@ file_processors = {
     ".md": process_markdown,
     ".pptx": process_powerpoint,
     ".html": process_html,
+    ".mp4": process_audio,
+    ".m4a": process_audio,
 }
 
 async def filter_file(file: UploadFile, supabase, vector_store):
@@ -143,3 +146,5 @@ async def root():
     return {"message": "Hello World"}
 
 
+# curl to upload an an audio file
+# curl -X POST -F "file=@/path/to/file" http://localhost:8000/upload
