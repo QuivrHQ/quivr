@@ -68,13 +68,19 @@ class ChatMessage(BaseModel):
 file_processors = {
     ".txt": process_txt,
     ".csv": process_csv,
-    ".docx": process_docx,
-    ".pdf": process_pdf,
     ".md": process_markdown,
-    ".pptx": process_powerpoint,
-    ".html": process_html,
-    ".mp4": process_audio,
+    ".markdown": process_markdown,
     ".m4a": process_audio,
+    ".mp3": process_audio,
+    ".webm": process_audio,
+    ".mp4": process_audio,
+    ".mpga": process_audio,
+    ".wav": process_audio,
+    ".mpeg": process_audio,
+    ".pdf": process_pdf,
+    ".html": process_html,
+    ".pptx": process_powerpoint,
+    ".docx": process_docx
 }
 
 async def filter_file(file: UploadFile, supabase, vector_store):
