@@ -23,7 +23,7 @@ const DarkModeToggle: FC<DarkModeToggleProps> = ({}) => {
       onClick={() => setDark((d) => !d)}
       variant={"tertiary"}
     >
-      {dark ? <MdDarkMode /> : <MdLightMode />}
+      {dark ? <MdLightMode /> : <MdDarkMode />}
     </Button>
   );
 };
