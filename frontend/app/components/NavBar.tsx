@@ -31,7 +31,7 @@ const NavBar: FC<NavBarProps> = ({}) => {
         </li>
       </ul>
       <Link href={"/upload"}>
-        <Button brightness={"dim"}>Try Demo</Button>
+        <Button variant={"secondary"}>Try Demo</Button>
       </Link>
     </header>
   );

@@ -7,12 +7,15 @@ const ButtonVariants = cva(
   {
     variants: {
       variant: {
-        primary: "bg-black text-white dark:bg-white dark:text-black",
-        secondary: "text-black dark:text-white bg-transparent",
+        primary:
+          "bg-black text-white dark:bg-white dark:text-black hover:bg-gray-700 dark:hover:bg-gray-200 transition-colors",
+        tertiary: "text-black dark:text-white bg-transparent py-2 px-4",
+        secondary:
+          "border border-black dark:border-white bg-white dark:bg-black text-black dark:text-white focus:bg-black dark:focus:bg-white hover:bg-black dark:hover:bg-white hover:text-white dark:hover:text-black focus:text-white transition-colors py-2 px-4 shadow-none",
       },
       brightness: {
-        dim: "border border-black bg-transparent text-black focus:bg-black hover:bg-black hover:text-white focus:text-white transition-colors py-2 px-4 shadow-none",
-        default: "opacity-100",
+        dim: "",
+        default: "",
       },
     },
     defaultVariants: {
