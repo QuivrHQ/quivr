@@ -5,6 +5,7 @@ import axios from "axios";
 import { Message } from "@/lib/types";
 import Button from "../components/ui/Button";
 import { MdClose } from "react-icons/md";
+import { AnimatePresence, motion } from "framer-motion";
 
 export default function UploadPage() {
   const [message, setMessage] = useState<Message | null>(null);
@@ -36,15 +37,17 @@ export default function UploadPage() {
       return;
     }
     setMessage(null);
-    const file = acceptedFiles[0];
-    const isAlreadyInFiles =
-      files.filter((f) => f.name === file.name && f.size === file.size).length >
-      0;
-    if (isAlreadyInFiles) {
-      setMessage({ type: "warning", text: "File already added" });
-      return;
+    for (let i = 0; i < acceptedFiles.length; i++) {
+      const file = acceptedFiles[i];
+      const isAlreadyInFiles =
+        files.filter((f) => f.name === file.name && f.size === file.size)
+          .length > 0;
+      if (isAlreadyInFiles) {
+        setMessage({ type: "warning", text: `${file.name} was already added` });
+        acceptedFiles.splice(i, 1);
+      }
     }
-    setFiles((files) => [...files, file]);
+    setFiles((files) => [...files, ...acceptedFiles]);
   };
 
   const { getRootProps, getInputProps, isDragActive, open } = useDropzone({
@@ -66,11 +69,17 @@ export default function UploadPage() {
         <div className="shadow-md dark:shadow-primary/25 hover:shadow-xl transition-shadow rounded-xl overflow-hidden bg-white dark:bg-black border border-black/10 dark:border-white/25">
           <input {...getInputProps()} />
           <div className="text-center mt-2 p-6 max-w-sm w-full flex flex-col gap-5 items-center">
-            {files.length > 0
-              ? files.map((file, i) => (
-                  <FileComponent key={i} file={file} setFiles={setFiles} />
-                ))
-              : null}
+            {files.length > 0 ? (
+              <AnimatePresence>
+                {files.map((file, i) => (
+                  <FileComponent
+                    key={file.name + file.size}
+                    file={file}
+                    setFiles={setFiles}
+                  />
+                ))}
+              </AnimatePresence>
+            ) : null}
 
             {isDragActive ? (
               <p className="text-blue-600">Drop the files here...</p>
@@ -104,7 +113,12 @@ export default function UploadPage() {
           <Button variant={"secondary"} className="">
             Start Chatting with your brain
           </Button>
-          <Button onClick={() => upload(files[0])} className="">
+          <Button
+            onClick={() => {
+              files.forEach((file) => upload(file));
+            }}
+            className=""
+          >
             Add
           </Button>
         </div>
@@ -121,22 +135,29 @@ const FileComponent = ({
   setFiles: Dispatch<SetStateAction<File[]>>;
 }) => {
   return (
-    <div className="flex py-2 dark:bg-black border-b border-black/10 dark:border-white/25 w-full text-left leading-none">
+    <motion.div
+      initial={{ x: "-10%", opacity: 0 }}
+      animate={{ x: "0%", opacity: 1 }}
+      exit={{ x: "10%", opacity: 0 }}
+      className="flex py-2 dark:bg-black border-b border-black/10 dark:border-white/25 w-full text-left leading-none"
+    >
       <div className="flex flex-col gap-1 flex-1">
         <span className="flex-1 mr-10">{file.name}</span>
         <span className="text-xs opacity-50">
-          {(file.size / 1000).toFixed(3)} KB
+          {(file.size / 1000).toFixed(3)} kb
         </span>
       </div>
       <button
         role="remove file"
-        className="ml-5 text-xl text-red-500"
+        className="ml-5 text-xl text-red-500 px-5"
         onClick={() =>
-          setFiles((files) => files.filter((f) => f.name !== file.name))
+          setFiles((files) =>
+            files.filter((f) => f.name !== file.name && f.size !== file.size)
+          )
         }
       >
         <MdClose />
       </button>
-    </div>
+    </motion.div>
   );
 };
