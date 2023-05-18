@@ -9,15 +9,19 @@ from langchain.vectorstores import SupabaseVectorStore
 from langchain.chains import ConversationalRetrievalChain
 from langchain.llms import OpenAI
 from fastapi.openapi.utils import get_openapi
+from tempfile import SpooledTemporaryFile
+import shutil
 
 
-from loaders.common import file_already_exists
-from loaders.txt import process_txt
-from loaders.csv import process_csv
-from loaders.docx import process_docx
-from loaders.pdf import process_pdf
-from loaders.markdown import process_markdown
-from loaders.powerpoint import process_powerpoint
+from files.common import file_already_exists
+from files.txt import process_txt
+from files.csv import process_csv
+from files.docx import process_docx
+from files.pdf import process_pdf
+from files.markdown import process_markdown
+from files.powerpoint import process_powerpoint
+from files.html import process_html
+from crawl.crawler import CrawlWebsite
 
 
 from fastapi.middleware.cors import CORSMiddleware
@@ -57,13 +61,17 @@ class ChatMessage(BaseModel):
     question: str
     history: List[Tuple[str, str]]  # A list of tuples where each tuple is (speaker, text)
 
+
+
+
 file_processors = {
     ".txt": process_txt,
     ".csv": process_csv,
     ".docx": process_docx,
     ".pdf": process_pdf,
     ".md": process_markdown,
-    ".pptx": process_powerpoint
+    ".pptx": process_powerpoint,
+    ".html": process_html,
 }
 
 async def filter_file(file: UploadFile, supabase, vector_store):
@@ -115,6 +123,23 @@ async def chat_endpoint(chat_message: ChatMessage):
 
     return {"history": history}
 
+@app.post("/crawl/")
+async def crawl_endpoint(crawl_website: CrawlWebsite):
+    
+    file_path, file_name = crawl_website.process()
+
+    # Create a SpooledTemporaryFile from the file_path
+    spooled_file = SpooledTemporaryFile()
+    with open(file_path, 'rb') as f:
+        shutil.copyfileobj(f, spooled_file)
+
+    # Pass the SpooledTemporaryFile to UploadFile
+    file = UploadFile(file=spooled_file, filename=file_name)
+    message = await filter_file(file, supabase, vector_store)
+    print(message)
+    return {"message": message}
 @app.get("/")
 async def root():
     return {"message": "Hello World"}
+
+
