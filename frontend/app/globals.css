@@ -10,3 +10,7 @@ main {
 header, section {
   @apply px-5 md:px-10;
 }
+
+a {
+  @apply hover:text-primary dark:hover:text-gray-200 transition-colors;
+}

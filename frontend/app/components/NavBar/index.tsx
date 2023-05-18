@@ -9,8 +9,8 @@ interface NavBarProps {}
 
 const NavBar: FC<NavBarProps> = ({}) => {
   return (
-    <header className="sticky top-0 border-b border-b-black/10 dark:border-b-white/25 bg-white/50 dark:bg-black/50 bg-opacity-0 backdrop-blur-md z-50">
-      <nav className="max-w-screen-xl mx-auto py-3 flex items-center gap-8">
+    <header className="fixed top-0 w-full border-b border-b-black/10 dark:border-b-white/25 bg-white/50 dark:bg-black/50 bg-opacity-0 backdrop-blur-md z-50">
+      <nav className="max-w-screen-xl mx-auto py-1 flex items-center gap-8">
         <Link href={"/"} className="flex items-center gap-4">
           <Image
             className="rounded-full"
@@ -26,9 +26,8 @@ const NavBar: FC<NavBarProps> = ({}) => {
             <Link href={"https://github.com/StanGirard/quivr"}>Github</Link>
           </li>
           <li>
-            <Link href={"https://discord.gg/HUpRgp2HG8"}>Join the discord</Link>
+            <Link href={"https://discord.gg/HUpRgp2HG8"}>Discord</Link>
           </li>
-          
         </ul>
         <div className="flex">
           <Link href={"https://try-quivr.streamlit.app"}>
