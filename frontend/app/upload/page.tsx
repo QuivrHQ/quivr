@@ -45,7 +45,7 @@ export default function UploadPage() {
                     <p className="text-blue-600">Drop the files here...</p>
                 ) : (
                     <p className="text-gray-500">
-                        Drag 'n' drop some files here, or click to select files
+                        Drag and drop some files here, or click to select files
                     </p>
                 )}
             </div>
