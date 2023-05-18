@@ -8,10 +8,18 @@ from langchain.memory import ConversationBufferMemory
 from langchain.vectorstores import SupabaseVectorStore
 from langchain.chains import ConversationalRetrievalChain
 from langchain.llms import OpenAI
+from fastapi.openapi.utils import get_openapi
 
 
-from common import file_already_exists
-from txt import process_txt
+from loaders.common import file_already_exists
+from loaders.txt import process_txt
+from loaders.csv import process_csv
+from loaders.docx import process_docx
+from loaders.pdf import process_pdf
+from loaders.markdown import process_markdown
+from loaders.powerpoint import process_powerpoint
+
+
 from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
@@ -51,6 +59,11 @@ class ChatMessage(BaseModel):
 
 file_processors = {
     ".txt": process_txt,
+    ".csv": process_csv,
+    ".docx": process_docx,
+    ".pdf": process_pdf,
+    ".md": process_markdown,
+    ".pptx": process_powerpoint
 }
 
 async def filter_file(file: UploadFile, supabase, vector_store):
@@ -74,7 +87,7 @@ async def upload_file(file: UploadFile):
     print(f"Received file: {file.filename}")
    
     message = await filter_file(file, supabase, vector_store)
-    
+    print(message)
     return {"message": message}
 
 @app.post("/chat/")

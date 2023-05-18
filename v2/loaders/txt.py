@@ -1,4 +1,4 @@
-from common import process_file
+from .common import process_file
 from langchain.document_loaders import TextLoader
 from fastapi import UploadFile
 
