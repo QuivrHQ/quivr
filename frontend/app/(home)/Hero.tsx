@@ -7,7 +7,7 @@ interface HeroProps {}
 
 const Hero: FC<HeroProps> = ({}) => {
   return (
-    <section className="w-full flex flex-col gap-24 items-center text-center min-h-[768px] py-24">
+    <section className="w-full flex flex-col gap-24 items-center text-center min-h-[768px] py-12">
       <div className="flex flex-col gap-2 items-center justify-center mt-12">
         <h1 className="text-7xl font-bold max-w-xl">
           Get a Second Brain with Quivr
