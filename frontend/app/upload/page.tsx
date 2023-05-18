@@ -152,7 +152,7 @@ const FileComponent = ({
         className="ml-5 text-xl text-red-500 px-5"
         onClick={() =>
           setFiles((files) =>
-            files.filter((f) => f.name !== file.name && f.size !== file.size)
+            files.filter((f) => f.name !== file.name || f.size !== file.size)
           )
         }
       >
