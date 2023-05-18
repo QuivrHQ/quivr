@@ -2,32 +2,11 @@
 @import 'tailwindcss/components';
 @import 'tailwindcss/utilities';
 
-:root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
+
+main {
+  @apply max-w-screen-xl mx-auto flex flex-col min-h-screen;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 0, 0, 0;
-  }
-}
-
-body {
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
-}
-
-/* Tailwind's text-white is a utility class that sets the color of the text to white. 
-   This will override it to use the foreground color from your root variables. */
-.text-white {
-  color: rgb(var(--foreground-rgb)) !important;
+header, section {
+  @apply px-5 md:px-10;
 }
