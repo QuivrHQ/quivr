@@ -23,17 +23,15 @@ const NavBar: FC<NavBarProps> = ({}) => {
         </Link>
         <ul className="flex gap-4 text-sm flex-1">
           <li>
-            <Link href="/#features">Features</Link>
+            <Link href={"https://github.com/StanGirard/quivr"}>Github</Link>
           </li>
           <li>
-            <Link href="/chat">Chat</Link>
+            <Link href={"https://discord.gg/HUpRgp2HG8"}>Join the discord</Link>
           </li>
-          <li>
-            <Link href="/upload">Demo</Link>
-          </li>
+          
         </ul>
         <div className="flex">
-          <Link href={"/upload"}>
+          <Link href={"https://try-quivr.streamlit.app"}>
             <Button variant={"secondary"}>Try Demo</Button>
           </Link>
           <DarkModeToggle />
