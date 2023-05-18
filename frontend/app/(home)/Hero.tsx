@@ -1,27 +1,27 @@
 import Link from "next/link";
 import { FC } from "react";
+import Button from "../components/Button";
+import { MdNorthEast } from "react-icons/md";
 
 interface HeroProps {}
 
 const Hero: FC<HeroProps> = ({}) => {
   return (
-    <section>
-      <div className="m-4 p-6 max-w-md mx-auto bg-white rounded-xl shadow-md flex items-center space-x-4">
-        <h1 className="mb-4 text-xl font-bold text-gray-900">Welcome!</h1>
-        <div className="flex flex-col space-y-4">
-          <Link
-            href="/chat"
-            className="px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700"
-          >
-            Go to Chat
-          </Link>
-          <Link
-            href="/upload"
-            className="px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700"
-          >
-            Go to Upload
-          </Link>
-        </div>
+    <section className="w-full px-16 flex flex-col text-center h-screen">
+      <div className="flex flex-col gap-2 items-center justify-center mt-48">
+        <h1 className="mb-4 text-6xl font-bold">Get a Second Brain</h1>
+        <p className="text-base max-w-sm">
+          Quivr is your second brain in the cloud, designed to easily store and
+          retrieve unstructured information.
+        </p>
+        <Link href={"/upload"}>
+          <Button>Try Demo</Button>
+        </Link>
+        <Link target="_blank" href={"https://github.com/StanGirard/quivr/"}>
+          <Button variant={"secondary"}>
+            Github <MdNorthEast />
+          </Button>
+        </Link>
       </div>
     </section>
   );

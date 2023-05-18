@@ -3,9 +3,9 @@
 @import 'tailwindcss/utilities';
 
 html, body {
-  @apply bg-gray-100 min-h-screen w-full;
+  @apply bg-white text-black dark:bg-black dark:text-white min-h-screen w-full;
 }
 
 main {
-  @apply max-w-screen-xl mx-auto flex flex-col items-center justify-center min-h-screen ;
+  @apply max-w-screen-xl mx-auto flex flex-col items-center justify-center min-h-screen;
 }
