@@ -26,7 +26,7 @@ const Hero: FC<HeroProps> = ({}) => {
         </Link>
       </div>
       <video
-        className="rounded-md max-w-screen-lg shadow-lg border"
+        className="rounded-md max-w-screen-lg shadow-lg border w-full"
         src="https://user-images.githubusercontent.com/19614572/238774100-80721777-2313-468f-b75e-09379f694653.mp4"
         autoPlay
         muted
