@@ -56,23 +56,39 @@ What things you need to install the software and how to install them.
 git clone git@github.com:StanGirard/Quivr.git & cd Quivr
 ```
 
-- Create a virtual environment
+#### Create a virtual environment using virtualenv/pip
 
-```bash
-virtualenv venv
-```
+- Create virtual environment
+
+    ```bash
+    virtualenv venv
+    ```
 
 - Activate the virtual environment
 
-```bash
-source venv/bin/activate
-```
+    ```bash
+    source venv/bin/activate
+    ```
 
 - Install the dependencies
 
-```bash
-pip install -r requirements.txt
-```
+    ```bash
+    pip install -r requirements.txt
+    ```
+
+#### OR, Create a virtual environment using poetry
+
+- Activate the virtual environment
+
+    ```bash
+    poetry shell
+    ```
+
+- Install the dependencies
+
+    ```bash
+    poetry install
+    ```
 
 - Copy the streamlit secrets.toml example file
 
