@@ -7,7 +7,7 @@ html, body {
 }
 
 main {
-  @apply max-w-screen-xl mx-auto flex flex-col items-center justify-center min-h-screen;
+  @apply max-w-screen-xl mx-auto flex flex-col min-h-screen;
 }
 
 header, section {

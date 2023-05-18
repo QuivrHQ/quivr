@@ -8,7 +8,7 @@ interface NavBarProps {}
 
 const NavBar: FC<NavBarProps> = ({}) => {
   return (
-    <header className="max-w-screen-xl mx-auto sticky top-0 py-3 flex items-center gap-8 border-b border-b-black/10 dark:border-b-white/25">
+    <header className="max-w-screen-xl mx-auto sticky top-0 py-3 flex items-center gap-8 border-b border-b-black/10 dark:border-b-white/25 bg-white">
       <Link href={"/"} className="flex items-center gap-4">
         <Image
           className="rounded-full dark:invert"
