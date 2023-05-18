@@ -57,7 +57,7 @@ const Hero: FC<HeroProps> = ({}) => {
       </motion.div>
       <motion.video
         style={{ scale: videoScale }}
-        className="rounded-md max-w-screen-lg shadow-lg dark:shadow-white/25 border dark:border-white/25 w-full"
+        className="rounded-md max-w-screen-lg shadow-lg dark:shadow-white/25 border dark:border-white/25 w-full bg-white dark:bg-black"
         src="https://user-images.githubusercontent.com/19614572/238774100-80721777-2313-468f-b75e-09379f694653.mp4"
         autoPlay
         muted
