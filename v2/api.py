@@ -147,6 +147,25 @@ async def crawl_endpoint(crawl_website: CrawlWebsite):
     message = await filter_file(file, supabase, vector_store)
     print(message)
     return {"message": message}
+
+@app.get("/explore")
+async def explore_endpoint():
+    response = supabase.table("documents").select("name:metadata->>file_name, size:metadata->>file_size", count="exact").execute()
+    documents = response.data  # Access the data from the response
+    # Convert each dictionary to a tuple of items, then to a set to remove duplicates, and then back to a dictionary
+    unique_data = [dict(t) for t in set(tuple(d.items()) for d in documents)]
+    # Sort the list of documents by size in decreasing order
+    unique_data.sort(key=lambda x: int(x['size']), reverse=True)
+
+    return {"documents": unique_data}
+
+@app.delete("/explore/{file_name}")
+async def delete_endpoint(file_name: str):
+    response = supabase.table("documents").delete().match({"metadata->>file_name": file_name}).execute()
+    return {"message": f"{file_name} has been deleted."}
+## curl -X DELETE http://localhost:8000/explore/README.md
+
+
 @app.get("/")
 async def root():
     return {"message": "Hello World"}
