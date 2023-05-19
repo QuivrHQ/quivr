@@ -1,5 +1,11 @@
 "use client";
-import { Dispatch, SetStateAction, useCallback, useState } from "react";
+import {
+  Dispatch,
+  SetStateAction,
+  useCallback,
+  useState,
+  useTransition,
+} from "react";
 import { FileRejection, useDropzone } from "react-dropzone";
 import axios from "axios";
 import { Message } from "@/lib/types";
@@ -10,6 +16,7 @@ import Link from "next/link";
 
 export default function UploadPage() {
   const [message, setMessage] = useState<Message | null>(null);
+  const [isPending, startTransition] = useTransition();
   const [files, setFiles] = useState<File[]>([]);
 
   const upload = useCallback(async (file: File) => {
@@ -20,13 +27,13 @@ export default function UploadPage() {
         "http://localhost:8000/upload",
         formData
       );
-      console.log(response.data.message);
 
       setMessage({
-        type: "success",
+        type: response.data.type,
         text:
-          "File uploaded successfully: " +
-          JSON.stringify(response.data.message),
+          (response.data.type === "success"
+            ? "File uploaded successfully: "
+            : "") + JSON.stringify(response.data.message),
       });
     } catch (error: any) {
       setMessage({
