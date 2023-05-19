@@ -68,14 +68,13 @@ def file_uploader(supabase, vector_store):
     if st.secrets.self_hosted == "false":
         st.markdown("**In demo mode, the max file size is 1MB**")
     if st.button("Add to Database"):
-        if files is not None:
-            # Single file upload
-            if isinstance(files, UploadedFile):
-                filter_file(files, supabase, vector_store)
-            # Multiple files upload
-            elif isinstance(files, list):
-                for file in files:
-                    filter_file(file, supabase, vector_store)
+        # Single file upload
+        if isinstance(files, UploadedFile):
+            filter_file(files, supabase, vector_store)
+        # Multiple files upload
+        elif isinstance(files, list):
+            for file in files:
+                filter_file(file, supabase, vector_store)
 
 def file_already_exists(supabase, file):
     file_sha1 = compute_sha1_from_content(file.getvalue())
