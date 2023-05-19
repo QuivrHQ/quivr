@@ -22,7 +22,7 @@ def get_html(url):
 def create_html_file(url, content):
     file_name = slugify(url) + ".html"
     temp_file_path = os.path.join(tempfile.gettempdir(), file_name)
-    with open(temp_file_path, 'w') as temp_file:
+    with open(temp_file_path, "w", encoding="utf-8") as temp_file:
         temp_file.write(content)
 
     record = UploadedFileRec(id=None, name=file_name, type='text/html', data=open(temp_file_path, 'rb').read())
