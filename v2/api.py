@@ -58,9 +58,13 @@ memory = ConversationBufferMemory(
 
 
 class ChatMessage(BaseModel):
-    model: str
+    model: str = "gpt-3.5-turbo"
     question: str
     history: List[Tuple[str, str]]  # A list of tuples where each tuple is (speaker, text)
+    temperature: float = 0.0
+    max_tokens: int = 256
+
+
 
 
 
@@ -103,10 +107,10 @@ async def upload_file(file: UploadFile):
 
 @app.post("/chat/")
 async def chat_endpoint(chat_message: ChatMessage):
-
+    history = chat_message.history
     # Logic from your Streamlit app goes here. For example:
     qa = None
-    if model.startswith("gpt"):
+    if chat_message.model.startswith("gpt"):
         qa = ConversationalRetrievalChain.from_llm(
             OpenAI(
                 model_name=chat_message.model, openai_api_key=openai_api_key, temperature=chat_message.temperature, max_tokens=chat_message.max_tokens), vector_store.as_retriever(), memory=memory, verbose=True)
@@ -115,8 +119,8 @@ async def chat_endpoint(chat_message: ChatMessage):
             ChatAnthropic(
                 model=model, anthropic_api_key=anthropic_api_key, temperature=temperature, max_tokens_to_sample=max_tokens), vector_store.as_retriever(), memory=memory, verbose=True, max_tokens_limit=102400)
 
-    history.append(("user", question))
-    model_response = qa({"question": question})
+    history.append(("user", chat_message.question))
+    model_response = qa({"question": chat_message.question})
     history.append(("assistant", model_response["answer"]))
 
     return {"history": history}
