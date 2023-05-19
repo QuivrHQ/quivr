@@ -9,15 +9,20 @@ from langchain.vectorstores import SupabaseVectorStore
 from langchain.chains import ConversationalRetrievalChain
 from langchain.llms import OpenAI
 from fastapi.openapi.utils import get_openapi
+from tempfile import SpooledTemporaryFile
+import shutil
 
 
-from loaders.common import file_already_exists
-from loaders.txt import process_txt
-from loaders.csv import process_csv
-from loaders.docx import process_docx
-from loaders.pdf import process_pdf
-from loaders.markdown import process_markdown
-from loaders.powerpoint import process_powerpoint
+from parsers.common import file_already_exists
+from parsers.txt import process_txt
+from parsers.csv import process_csv
+from parsers.docx import process_docx
+from parsers.pdf import process_pdf
+from parsers.markdown import process_markdown
+from parsers.powerpoint import process_powerpoint
+from parsers.html import process_html
+from parsers.audio import process_audio
+from crawl.crawler import CrawlWebsite
 
 
 from fastapi.middleware.cors import CORSMiddleware
@@ -57,13 +62,25 @@ class ChatMessage(BaseModel):
     question: str
     history: List[Tuple[str, str]]  # A list of tuples where each tuple is (speaker, text)
 
+
+
+
 file_processors = {
     ".txt": process_txt,
     ".csv": process_csv,
-    ".docx": process_docx,
-    ".pdf": process_pdf,
     ".md": process_markdown,
-    ".pptx": process_powerpoint
+    ".markdown": process_markdown,
+    ".m4a": process_audio,
+    ".mp3": process_audio,
+    ".webm": process_audio,
+    ".mp4": process_audio,
+    ".mpga": process_audio,
+    ".wav": process_audio,
+    ".mpeg": process_audio,
+    ".pdf": process_pdf,
+    ".html": process_html,
+    ".pptx": process_powerpoint,
+    ".docx": process_docx
 }
 
 async def filter_file(file: UploadFile, supabase, vector_store):
@@ -115,6 +132,44 @@ async def chat_endpoint(chat_message: ChatMessage):
 
     return {"history": history}
 
+@app.post("/crawl/")
+async def crawl_endpoint(crawl_website: CrawlWebsite):
+    
+    file_path, file_name = crawl_website.process()
+
+    # Create a SpooledTemporaryFile from the file_path
+    spooled_file = SpooledTemporaryFile()
+    with open(file_path, 'rb') as f:
+        shutil.copyfileobj(f, spooled_file)
+
+    # Pass the SpooledTemporaryFile to UploadFile
+    file = UploadFile(file=spooled_file, filename=file_name)
+    message = await filter_file(file, supabase, vector_store)
+    print(message)
+    return {"message": message}
+
+@app.get("/explore")
+async def explore_endpoint():
+    response = supabase.table("documents").select("name:metadata->>file_name, size:metadata->>file_size", count="exact").execute()
+    documents = response.data  # Access the data from the response
+    # Convert each dictionary to a tuple of items, then to a set to remove duplicates, and then back to a dictionary
+    unique_data = [dict(t) for t in set(tuple(d.items()) for d in documents)]
+    # Sort the list of documents by size in decreasing order
+    unique_data.sort(key=lambda x: int(x['size']), reverse=True)
+
+    return {"documents": unique_data}
+
+@app.delete("/explore/{file_name}")
+async def delete_endpoint(file_name: str):
+    response = supabase.table("documents").delete().match({"metadata->>file_name": file_name}).execute()
+    return {"message": f"{file_name} has been deleted."}
+## curl -X DELETE http://localhost:8000/explore/README.md
+
+
 @app.get("/")
 async def root():
     return {"message": "Hello World"}
+
+
+# curl to upload an an audio file
+# curl -X POST -F "file=@/path/to/file" http://localhost:8000/upload

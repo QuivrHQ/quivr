@@ -9,7 +9,7 @@ import tempfile
 import time
 from utils import compute_sha1_from_file, compute_sha1_from_content
 
-async def process_file(vector_store, file: UploadFile, loader_class, stats_db: Optional = None):
+async def process_file(vector_store, file: UploadFile, loader_class,file_suffix, stats_db: Optional = None):
     documents = []
     file_sha = ""
     file_name = file.filename
