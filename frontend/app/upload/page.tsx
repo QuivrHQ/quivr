@@ -116,7 +116,7 @@ export default function UploadPage() {
         </p>
         <div className="flex gap-5">
           <Link href={"/chat"}>
-            <Button variant={"secondary"} className="">
+            <Button variant={"secondary"} className="py-3">
               Start Chatting with your brain
             </Button>
           </Link>
