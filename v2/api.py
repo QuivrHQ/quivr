@@ -85,42 +85,31 @@ file_processors = {
 
 async def filter_file(file: UploadFile, supabase, vector_store):
     if await file_already_exists(supabase, file):
-        return f"😎 {file.filename} is already in the database."
+        return {"message": f"🤔 {file.filename} already exists.", "type": "warning"}
     elif file.file._file.tell() < 1:
-        return f"💨 {file.filename} is empty."
+        return {"message": f"❌ {file.filename} is empty.", "type": "error"}
     else:
         file_extension = os.path.splitext(file.filename)[-1]
         if file_extension in file_processors:
             await file_processors[file_extension](vector_store, file, stats_db=None)
-            return f"✅ {file.filename} "
+            return {"message": f"✅ {file.filename} has been uploaded.", "type": "success"}
         else:
-            return f"❌ {file.filename} is not a valid file type."
+            return {"message": f"❌ {file.filename} is not supported.", "type": "error"}
 
 @app.post("/upload")
 async def upload_file(file: UploadFile):
-    # Modify your code to work with FastAPI
-    # Here we assume that you have some way to get `supabase`, `openai_key`, and `vector_store`
-   
-    print(f"Received file: {file.filename}")
-   
     message = await filter_file(file, supabase, vector_store)
-    print(message)
-    return {"message": message, "type": "success"}
+    return message
 
 @app.post("/chat/")
 async def chat_endpoint(chat_message: ChatMessage):
-    model = chat_message.model
-    question = chat_message.question
-    history = chat_message.history
-    temperature = 0
-    max_tokens = 100
 
     # Logic from your Streamlit app goes here. For example:
     qa = None
     if model.startswith("gpt"):
         qa = ConversationalRetrievalChain.from_llm(
             OpenAI(
-                model_name=model, openai_api_key=openai_api_key, temperature=temperature, max_tokens=max_tokens), vector_store.as_retriever(), memory=memory, verbose=True)
+                model_name=chat_message.model, openai_api_key=openai_api_key, temperature=chat_message.temperature, max_tokens=chat_message.max_tokens), vector_store.as_retriever(), memory=memory, verbose=True)
     elif anthropic_api_key and model.startswith("claude"):
         qa = ConversationalRetrievalChain.from_llm(
             ChatAnthropic(
