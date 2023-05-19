@@ -158,6 +158,14 @@ async def delete_endpoint(file_name: str):
     return {"message": f"{file_name} has been deleted."}
 ## curl -X DELETE http://localhost:8000/explore/README.md
 
+@app.get("/explore/{file_name}")
+async def download_endpoint(file_name: str):
+    response = supabase.table("documents").select("metadata->>file_name, metadata->>file_size, metadata->>file_extension, metadata->>file_url").match({"metadata->>file_name": file_name}).execute()
+    documents = response.data
+    ### Returns all documents with the same file name
+    return {"documents": documents}
+
+
 
 @app.get("/")
 async def root():
