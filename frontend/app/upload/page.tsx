@@ -6,6 +6,7 @@ import { Message } from "@/lib/types";
 import Button from "../components/ui/Button";
 import { MdClose } from "react-icons/md";
 import { AnimatePresence, motion } from "framer-motion";
+import Link from "next/link";
 
 export default function UploadPage() {
   const [message, setMessage] = useState<Message | null>(null);
@@ -19,9 +20,13 @@ export default function UploadPage() {
         "http://localhost:8000/upload",
         formData
       );
+      console.log(response.data.message);
+
       setMessage({
         type: "success",
-        text: "File uploaded successfully: " + JSON.stringify(response.data),
+        text:
+          "File uploaded successfully: " +
+          JSON.stringify(response.data.message),
       });
     } catch (error: any) {
       setMessage({
@@ -94,7 +99,7 @@ export default function UploadPage() {
           </div>
           {message && (
             <div
-              className={`mt-4 p-2 rounded ${
+              className={`mt-4 p-6 max-w-sm rounded ${
                 message.type === "success"
                   ? "bg-green-500"
                   : message.type === "warning"
@@ -110,9 +115,11 @@ export default function UploadPage() {
           This is the demo mode, the max file size is 1MB
         </p>
         <div className="flex gap-5">
-          <Button variant={"secondary"} className="">
-            Start Chatting with your brain
-          </Button>
+          <Link href={"/chat"}>
+            <Button variant={"secondary"} className="">
+              Start Chatting with your brain
+            </Button>
+          </Link>
           <Button
             onClick={() => {
               files.forEach((file) => upload(file));
