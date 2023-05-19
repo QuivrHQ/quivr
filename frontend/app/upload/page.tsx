@@ -1,11 +1,5 @@
 "use client";
-import {
-  Dispatch,
-  SetStateAction,
-  useCallback,
-  useState,
-  useTransition,
-} from "react";
+import { Dispatch, SetStateAction, useCallback, useState } from "react";
 import { FileRejection, useDropzone } from "react-dropzone";
 import axios from "axios";
 import { Message } from "@/lib/types";
@@ -18,6 +12,7 @@ export default function UploadPage() {
   const [message, setMessage] = useState<Message | null>(null);
   const [isPending, setIsPending] = useState(false);
   const [files, setFiles] = useState<File[]>([]);
+  const [pendingFileIndex, setPendingFileIndex] = useState<number>(0);
 
   const upload = useCallback(async (file: File) => {
     const formData = new FormData();
@@ -68,7 +63,9 @@ export default function UploadPage() {
     // files.forEach((file) => upload(file));
     for (const file of files) {
       await upload(file);
+      setPendingFileIndex((i) => i + 1);
     }
+    setPendingFileIndex(0);
     setIsPending(false);
   };
 
@@ -131,15 +128,15 @@ export default function UploadPage() {
         <p className="opacity-50">
           This is the demo mode, the max file size is 1MB
         </p>
-        <div className="flex gap-5">
+        <div className="flex flex-col items-center justify-center gap-5">
+          <Button isLoading={isPending} onClick={uploadAllFiles} className="">
+            {isPending ? `Adding - ${files[pendingFileIndex].name}` : "Add"}
+          </Button>
           <Link href={"/chat"}>
             <Button variant={"secondary"} className="py-3">
               Start Chatting with your brain
             </Button>
           </Link>
-          <Button isLoading={isPending} onClick={uploadAllFiles} className="">
-            Add
-          </Button>
         </div>
       </section>
     </main>
