@@ -16,7 +16,7 @@ import Link from "next/link";
 
 export default function UploadPage() {
   const [message, setMessage] = useState<Message | null>(null);
-  const [isPending, startTransition] = useTransition();
+  const [isPending, setIsPending] = useState(false);
   const [files, setFiles] = useState<File[]>([]);
 
   const upload = useCallback(async (file: File) => {
@@ -60,6 +60,16 @@ export default function UploadPage() {
       }
     }
     setFiles((files) => [...files, ...acceptedFiles]);
+  };
+
+  const uploadAllFiles = async () => {
+    setIsPending(true);
+    setMessage(null);
+    // files.forEach((file) => upload(file));
+    for (const file of files) {
+      await upload(file);
+    }
+    setIsPending(false);
   };
 
   const { getRootProps, getInputProps, isDragActive, open } = useDropzone({
@@ -127,12 +137,7 @@ export default function UploadPage() {
               Start Chatting with your brain
             </Button>
           </Link>
-          <Button
-            onClick={() => {
-              files.forEach((file) => upload(file));
-            }}
-            className=""
-          >
+          <Button isLoading={isPending} onClick={uploadAllFiles} className="">
             Add
           </Button>
         </div>

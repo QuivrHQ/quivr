@@ -1,6 +1,7 @@
 import { ButtonHTMLAttributes, FC } from "react";
 import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
+import { FaSpinner } from "react-icons/fa";
 
 const ButtonVariants = cva(
   "px-8 py-3 text-sm font-medium rounded-md focus:ring ring-primary/10 outline-none flex items-center gap-2 disabled:opacity-50 transition-opacity",
@@ -35,6 +36,7 @@ const Button: FC<ButtonProps> = ({
   children,
   variant,
   brightness,
+  isLoading,
   ...props
 }) => {
   return (
@@ -42,7 +44,7 @@ const Button: FC<ButtonProps> = ({
       className={cn(ButtonVariants({ variant, brightness, className }))}
       {...props}
     >
-      {children}
+      {children} {isLoading && <FaSpinner className="animate-spin" />}
     </button>
   );
 };
