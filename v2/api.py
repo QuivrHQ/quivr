@@ -105,7 +105,7 @@ async def upload_file(file: UploadFile):
    
     message = await filter_file(file, supabase, vector_store)
     print(message)
-    return {"message": message}
+    return {"message": message, "type": "success"}
 
 @app.post("/chat/")
 async def chat_endpoint(chat_message: ChatMessage):
