@@ -88,15 +88,15 @@ if user_choice == 'Add Knowledge':
     col1, col2 = st.columns(2)
     
     with col1:
-        file_uploader(supabase, openai_api_key, vector_store)
+        file_uploader(supabase, vector_store)
     with col2:
-        url_uploader(supabase, openai_api_key, vector_store)
+        url_uploader(supabase, vector_store)
 elif user_choice == 'Chat with your Brain':
     # Display model and temperature selection only when asking questions
     st.sidebar.title("Configuration")
     st.sidebar.markdown(
         "Choose your model and temperature for asking questions.")
-    if st.secrets.self_hosted != "false":
+    if self_hosted != "false":
         st.session_state['model'] = st.sidebar.selectbox(
         "Select Model", models, index=(models).index(st.session_state['model']))
     else:
