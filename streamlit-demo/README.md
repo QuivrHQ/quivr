@@ -1,39 +1,30 @@
-# Quivr - Your GenerativeAI Second Brain
+# Quivr
 
 <p align="center">
-<img src="./logo.png" alt="Quivr-logo" width="30%">
+<img src="../logo.png" alt="Quivr-logo" width="30%">
 <p align="center">
 
 <a href="https://discord.gg/HUpRgp2HG8">
   <img src="https://img.shields.io/badge/discord-join%20chat-blue.svg" alt="Join our Discord" height="40">
 </a>
 
-Quivr is your GenerativeAI second brain, designed to easily store and retrieve unstructured information. It's like Obsidian but powered by generative AI.
-
+Quivr is your second brain in the cloud, designed to easily store and retrieve unstructured information. It's like Obsidian but powered by generative AI.
 
 ## Features
 
 - **Store Anything**: Quivr can handle almost any type of data you throw at it. Text, images, code snippets, you name it.
 - **Generative AI**: Quivr uses advanced AI to help you generate and retrieve information.
 - **Fast and Efficient**: Designed with speed and efficiency in mind. Quivr makes sure you can access your data as quickly as possible.
-- **Secure**: Your data is always under your control.
+- **Secure**: Your data is stored securely in the cloud and is always under your control.
 - **Compatible Files**: 
   - **Text**
   - **Markdown**
   - **PDF**
-  - **Powerpoint**
-  - **Excel**
-  - **Word**
   - **Audio**
   - **Video**
 - **Open Source**: Quivr is open source and free to use.
+## Demo
 
-
-
-
-### DEMO WITH STREAMLIT IS USING OLD VERSION 
-New version is using a new UI and is not yet deployed as it doesn't have all the features of the old version.
-Should be up and live before 25/05/23
 
 ### Demo with GPT3.5
 https://github.com/StanGirard/quivr/assets/19614572/80721777-2313-468f-b75e-09379f694653
@@ -42,18 +33,17 @@ https://github.com/StanGirard/quivr/assets/19614572/80721777-2313-468f-b75e-0937
 ### Demo with Claude 100k context
 https://github.com/StanGirard/quivr/assets/5101573/9dba918c-9032-4c8d-9eea-94336d2c8bd4
 
+## Getting Started
 
-
-## Getting Started with the new version
 These instructions will get you a copy of the project up and running on your local machine for development and testing purposes.
-*Old version readme is in the streamlit-demo folder* [here](streamlit-demo/README.md)
 
 ### Prerequisites
 
 Make sure you have the following installed before continuing:
 
-- Docker
-- Docker Compose
+- Python 3.10 or higher
+- Pip
+- Virtualenv
 
 You'll also need a [Supabase](https://supabase.com/) account for:
 
@@ -69,17 +59,40 @@ You'll also need a [Supabase](https://supabase.com/) account for:
 git clone git@github.com:StanGirard/Quivr.git && cd Quivr
 ```
 
-- Copy the `.XXXXX_env` files
+- Create a virtual environment
 
 ```bash
-cp .backend_env.example .backend_env
-cp .frontend_env.example .frontend_env
+virtualenv venv
 ```
 
-- Update the `.backend_env` file 
+- Activate the virtual environment
+
+```bash
+source venv/bin/activate
+```
+
+- Install the dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
+- Copy the streamlit secrets.toml example file
+
+```bash
+cp .streamlit/secrets.toml.example .streamlit/secrets.toml
+```
+
+- Add your credentials to .streamlit/secrets.toml file
+
+```toml
+supabase_url = "SUPABASE_URL"
+supabase_service_key = "SUPABASE_SERVICE_KEY"
+openai_api_key = "OPENAI_API_KEY"
+anthropic_api_key = "ANTHROPIC_API_KEY" # Optional
+```
 
 _Note that the `supabase_service_key` is found in your Supabase dashboard under Project Settings -> API. Use the `anon` `public` key found in the `Project API keys` section._
-
 
 - Run the following migration scripts on the Supabase database via the web interface (SQL Editor -> `New query`)
 
@@ -143,12 +156,13 @@ create table
 - Run the app
 
 ```bash
-docker compose build && docker compose up
+streamlit run main.py
 ```
 
 ## Built With
 
-* [Python](https://www.python.org/) - The programming language used.
+* [NextJS](https://nextjs.org/) - The React framework used.
+* [FastAPI](https://fastapi.tiangolo.com/) - The API framework used.
 * [Supabase](https://supabase.io/) - The open source Firebase alternative.
 
 ## Contributing

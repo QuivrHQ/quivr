@@ -1,0 +1,31 @@
+version: "3"
+
+services:
+  frontend:
+    env_file:
+      - .frontend_env
+    build:
+      context: frontend
+      dockerfile: Dockerfile
+    container_name: web
+    restart: always
+    volumes:
+      - ./frontend/:/app
+      - /frontend/backend/app/node_modules
+      - /frontend/app/.next
+    ports:
+      - 3000:3000
+  backend:
+    env_file:
+      - .backend_env
+    environment:
+      - supabase_url="totot"
+    build:
+      context: backend
+      dockerfile: Dockerfile
+    container_name: backend
+    restart: always
+    volumes:
+      - ./backend/:/code/
+    ports:
+      - 5000:5000

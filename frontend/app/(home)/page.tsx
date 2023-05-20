@@ -1,12 +1,14 @@
-import Link from "next/link";
 import Hero from "./Hero";
-import { Analytics } from '@vercel/analytics/react';
+import { redirect } from "next/navigation";
 
 export default function HomePage() {
+  if (process.env.ENV === "local") {
+    redirect("/upload");
+  }
+
   return (
     <main className="">
       <Hero />
-      <Analytics />
     </main>
   );
 }
