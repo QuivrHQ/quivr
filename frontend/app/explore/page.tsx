@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
+import DocumentItem from './documentItem';
 
 interface Document {
     name: string;
@@ -33,16 +34,7 @@ export default function ExplorePage() {
         <div className="pt-20 flex flex-col items-center justify-center p-6">
             <h1 className="text-4xl mb-6">Explore Files</h1>
             {documents.map((document, index) => (
-                <div
-                    key={index}
-                    className="flex items-center justify-between w-1/2 p-4 mb-4 bg-white shadow rounded">
-                    <p className="text-lg">{document.name}</p>
-                    <button
-                        onClick={() => viewDocument(document)}
-                        className="py-2 px-4 bg-blue-500 text-white rounded mr-2 hover:bg-blue-600 transition duration-200">
-                        View
-                    </button>
-                </div>
+                <DocumentItem key={index} document={document} viewDocument={viewDocument} />
             ))}
             {selectedDocument && (
                 <div className="fixed inset-0 flex items-center justify-center z-10">
