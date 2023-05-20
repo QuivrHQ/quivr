@@ -43,8 +43,8 @@ export default function ChatPage() {
   };
 
   return (
-    <div className="min-h-screen w-full pt-24">
-      <div className="flex flex-col justify-center items-center gap-5">
+    <div className="min-h-screen w-full pt-24 flex flex-col">
+      <div className="flex flex-col justify-center items-center flex-1 gap-5 h-full">
         {/* Chat */}
         <div className="flex flex-col items-center justify-center">
           <h1 className="text-3xl font-bold text-center">
@@ -52,7 +52,7 @@ export default function ChatPage() {
           </h1>
           <h2 className="opacity-50">Your AI assistant</h2>
         </div>
-        <Card className="p-10 max-w-3xl mb-32">
+        <Card className="p-10 max-w-3xl w-full min-h-full flex-1 mb-24">
           <ChatMessages history={history} />
           <Card className="fixed left-1/2 w-full max-w-3xl bg-gray-100 dark:bg-gray-800 rounded-b-none -translate-x-1/2 bottom-0 px-5 py-5">
             <form
