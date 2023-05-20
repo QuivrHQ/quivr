@@ -43,7 +43,7 @@ export default function ChatPage() {
   };
 
   return (
-    <div className="min-h-screen grid items-center justify-center pt-24">
+    <div className="min-h-screen w-full pt-24">
       <div className="flex flex-col justify-center items-center gap-5">
         {/* Chat */}
         <div className="flex flex-col items-center justify-center">
@@ -52,27 +52,29 @@ export default function ChatPage() {
           </h1>
           <h2 className="opacity-50">Your AI assistant</h2>
         </div>
-        <Card className="p-10">
+        <Card className="p-10 max-w-3xl">
           <ChatMessages history={history} />
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              askQuestion();
-            }}
-            className="flex items-center justify-center"
-          >
-            <input
-              autoFocus
-              type="text"
-              value={question}
-              onChange={(e) => setQuestion(e.target.value)}
-              className="w-full p-2 border border-gray-300 rounded"
-              placeholder="Enter your question here..."
-            />
-            <Button type="submit" isLoading={isPending}>
-              {isPending ? "Thinking..." : "Ask"}
-            </Button>
-          </form>
+          <Card className="fixed left-1/2 w-full max-w-4xl -translate-x-1/2 bottom-0 p-10">
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                askQuestion();
+              }}
+              className="w-full flex items-center justify-center"
+            >
+              <input
+                autoFocus
+                type="text"
+                value={question}
+                onChange={(e) => setQuestion(e.target.value)}
+                className="w-full p-2 border border-gray-300 dark:border-gray-500 outline-none rounded dark:bg-gray-800"
+                placeholder="Enter your question here..."
+              />
+              <Button type="submit" isLoading={isPending}>
+                {isPending ? "Thinking..." : "Ask"}
+              </Button>
+            </form>
+          </Card>
         </Card>
 
         {/* Settings Modal */}

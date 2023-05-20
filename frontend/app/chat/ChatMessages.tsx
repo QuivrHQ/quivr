@@ -18,7 +18,7 @@ const ChatMessages: FC<ChatMessagesProps> = ({ history }) => {
   return (
     <div
       ref={scrollableRef}
-      className="mt-5 max-h-[50vh] overflow-y-auto flex flex-col gap-5 py-5 scrollbar scroll-smooth"
+      className="overflow-y-auto flex flex-col gap-5 py-5 scrollbar scroll-smooth"
     >
       {history.length === 0 ? (
         <div className="text-center opacity-50">
@@ -56,7 +56,7 @@ const ChatMessage = ({
       animate={{ x: 0, opacity: 1 }}
       exit={{ x: left ? 64 : -64, opacity: 0 }}
       className={cn(
-        "py-3 px-3 rounded-lg prose border border-black/10 dark:border-white/25 w-fit flex flex-col min-w-[10vw] max-w-lg",
+        "py-3 px-3 rounded-lg border border-black/10 dark:border-white/25 flex flex-col max-w-4xl",
         left ? "mr-20" : "self-end ml-20"
       )}
     >
@@ -64,7 +64,7 @@ const ChatMessage = ({
       <>
         <ReactMarkdown
           // remarkRehypeOptions={{}}
-          className="prose"
+          className="prose dark:prose-invert"
         >
           {text}
         </ReactMarkdown>
