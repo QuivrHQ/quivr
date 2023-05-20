@@ -10,13 +10,6 @@ import ChatMessages from "./ChatMessages";
 export default function ChatPage() {
   const [question, setQuestion] = useState("");
   const [history, setHistory] = useState<Array<[string, string]>>([
-    ["user", "Hello!"],
-    ["assistant", "Hello Back!"],
-    ["user", "Send some long message"],
-    [
-      "assistant",
-      "This is a very long and really long message which is longer than every other message.",
-    ],
     // ["user", "Hello!"],
     // ["assistant", "Hello Back!"],
     // ["user", "Send some long message"],
@@ -24,13 +17,8 @@ export default function ChatPage() {
     //   "assistant",
     //   "This is a very long and really long message which is longer than every other message.",
     // ],
-    // ["user", "Hello!"],
-    // ["assistant", "Hello Back!"],
-    // ["user", "Send some long message"],
-    // [
-    //   "assistant",
-    //   "This is a very long and really long message which is longer than every other message.",
-    // ],
+    // ["user", "What is redux"],
+    // ["assistant", ``],
   ]);
   const [model, setModel] = useState("gpt-3.5-turbo");
   const [temperature, setTemperature] = useState(0);
@@ -58,13 +46,13 @@ export default function ChatPage() {
     <div className="min-h-screen grid items-center justify-center pt-24">
       <div className="flex flex-col justify-center items-center gap-5">
         {/* Chat */}
+        <div className="flex flex-col items-center justify-center">
+          <h1 className="text-3xl font-bold text-center">
+            Chat with your brain
+          </h1>
+          <h2 className="opacity-50">Your AI assistant</h2>
+        </div>
         <Card className="p-10">
-          <div className="flex flex-col items-center justify-center">
-            <h1 className="text-3xl font-bold text-center">
-              Chat with your brain
-            </h1>
-            <h2 className="opacity-50">Your AI assistant</h2>
-          </div>
           <ChatMessages history={history} />
           <form
             onSubmit={(e) => {
@@ -74,6 +62,7 @@ export default function ChatPage() {
             className="flex items-center justify-center"
           >
             <input
+              autoFocus
               type="text"
               value={question}
               onChange={(e) => setQuestion(e.target.value)}
