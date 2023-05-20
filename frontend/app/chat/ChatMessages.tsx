@@ -1,18 +1,28 @@
+"use client";
 import { cn } from "@/lib/utils";
-import { FC } from "react";
-import Card from "../components/ui/Card";
+import { FC, useEffect, useRef } from "react";
 
 interface ChatMessagesProps {
   history: Array<[string, string]>;
 }
 
 const ChatMessages: FC<ChatMessagesProps> = ({ history }) => {
+  const scrollableRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    scrollableRef.current?.scrollTo(0, scrollableRef.current.scrollHeight);
+  }, [history]);
+
   return (
-    <div className="mt-5 max-w-lg max-h-[50vh] overflow-y-auto flex flex-col gap-5 py-5 scrollbar">
+    <div
+      ref={scrollableRef}
+      className="mt-5 max-w-lg max-h-[50vh] overflow-y-auto flex flex-col gap-5 py-5 scrollbar"
+    >
       {history.map(([speaker, text], idx) => {
-        if (idx % 2 === 0) return <ChatMessage speaker={speaker} text={text} />;
+        if (idx % 2 === 0)
+          return <ChatMessage key={idx} speaker={speaker} text={text} />;
         else {
-          return <ChatMessage speaker={speaker} text={text} left />;
+          return <ChatMessage key={idx} speaker={speaker} text={text} left />;
         }
       })}
     </div>
