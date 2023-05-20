@@ -52,13 +52,13 @@ export default function ChatPage() {
           </h1>
           <h2 className="opacity-50">Your AI assistant</h2>
         </div>
-        <Card className="p-10 max-w-3xl w-full min-h-full flex-1 mb-24">
+        <Card className="p-5 max-w-3xl w-full min-h-full flex-1 mb-24">
           <ChatMessages history={history} />
           <Card className="fixed left-1/2 w-full max-w-3xl bg-gray-100 dark:bg-gray-800 rounded-b-none -translate-x-1/2 bottom-0 px-5 py-5">
             <form
               onSubmit={(e) => {
                 e.preventDefault();
-                askQuestion();
+                if (!isPending) askQuestion();
               }}
               className="w-full flex items-center justify-center gap-2"
             >

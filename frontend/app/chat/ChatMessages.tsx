@@ -9,17 +9,14 @@ interface ChatMessagesProps {
 }
 
 const ChatMessages: FC<ChatMessagesProps> = ({ history }) => {
-  const scrollableRef = useRef<HTMLDivElement | null>(null);
+  const lastChatRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    scrollableRef.current?.scrollTo(0, scrollableRef.current.scrollHeight);
+    lastChatRef.current?.scrollIntoView({ behavior: "auto", block: "start" });
   }, [history]);
 
   return (
-    <div
-      ref={scrollableRef}
-      className="overflow-y-auto flex flex-col gap-5 py-5 scrollbar scroll-smooth"
-    >
+    <div className="overflow-hidden flex flex-col gap-5 scrollbar scroll-smooth">
       {history.length === 0 ? (
         <div className="text-center opacity-50">
           Start a conversation with your brain
@@ -28,10 +25,23 @@ const ChatMessages: FC<ChatMessagesProps> = ({ history }) => {
         <AnimatePresence initial={false}>
           {history.map(([speaker, text], idx) => {
             if (idx % 2 === 0)
-              return <ChatMessage key={idx} speaker={speaker} text={text} />;
+              return (
+                <ChatMessage
+                  ref={idx === history.length - 1 ? lastChatRef : null}
+                  key={idx}
+                  speaker={speaker}
+                  text={text}
+                />
+              );
             else {
               return (
-                <ChatMessage key={idx} speaker={speaker} text={text} left />
+                <ChatMessage
+                  ref={idx === history.length - 1 ? lastChatRef : null}
+                  key={idx}
+                  speaker={speaker}
+                  text={text}
+                  left
+                />
               );
             }
           })}
@@ -57,12 +67,16 @@ const ChatMessage = forwardRef(
     return (
       <motion.div
         ref={ref as Ref<HTMLDivElement>}
-        initial={{ x: left ? -64 : 64, opacity: 0 }}
-        animate={{ x: 0, opacity: 1 }}
-        exit={{ x: left ? 64 : -64, opacity: 0 }}
+        initial={{ y: -24, opacity: 0 }}
+        animate={{
+          y: 0,
+          opacity: 1,
+          transition: { duration: 0.2, ease: "easeOut" },
+        }}
+        exit={{ y: -24, opacity: 0 }}
         className={cn(
-          "py-3 px-3 rounded-lg border border-black/10 dark:border-white/25 flex flex-col max-w-4xl",
-          left ? "mr-20" : "self-end ml-20"
+          "py-3 px-3 rounded-lg border border-black/10 dark:border-white/25 flex flex-col max-w-4xl overflow-hidden scroll-pt-32",
+          left ? "self-start mr-20" : "self-end ml-20"
         )}
       >
         <span className={cn("capitalize text-xs")}>{speaker}</span>
