@@ -1,10 +1,12 @@
 import streamlit as st
 import numpy as np
 
+
 def brain(supabase):
-    ## List all documents
-    response = supabase.table("documents").select("name:metadata->>file_name, size:metadata->>file_size", count="exact").execute()
-    
+    # List all documents
+    response = supabase.table("documents").select(
+        "name:metadata->>file_name, size:metadata->>file_size", count="exact").execute()
+
     documents = response.data  # Access the data from the response
 
     # Convert each dictionary to a tuple of items, then to a set to remove duplicates, and then back to a dictionary
@@ -16,7 +18,8 @@ def brain(supabase):
     # Display some metrics at the top of the page
     col1, col2 = st.columns(2)
     col1.metric(label="Total Documents", value=len(unique_data))
-    col2.metric(label="Total Size (bytes)", value=sum(int(doc['size']) for doc in unique_data))
+    col2.metric(label="Total Size (bytes)", value=sum(
+        int(doc['size']) for doc in unique_data))
 
     for document in unique_data:
         # Create a unique key for each button by using the document name
@@ -25,13 +28,21 @@ def brain(supabase):
         # Display the document name, size and the delete button on the same line
         col1, col2, col3 = st.columns([3, 1, 1])
         col1.markdown(f"**{document['name']}** ({document['size']} bytes)")
-        
+
         if col2.button('❌', key=button_key):
             delete_document(supabase, document['name'])
 
+
 def delete_document(supabase, document_name):
+    # Cascade delete the summary from the database first, because it has a foreign key constraint
+    response = supabase.table("summaries").delete().match(
+        {"metadata->>file_name": document_name}).execute()
+    if len(response.data) > 0:
+        st.write(f"✂️ {document_name} summary was deleted.")
+
     # Delete the document from the database
-    response = supabase.table("documents").delete().match({"metadata->>file_name": document_name}).execute()
+    response = supabase.table("documents").delete().match(
+        {"metadata->>file_name": document_name}).execute()
     # Check if the deletion was successful
     if len(response.data) > 0:
         st.write(f"✂️ {document_name} was deleted.")

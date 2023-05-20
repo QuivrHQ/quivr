@@ -1,7 +1,7 @@
 # Quivr
 
 <p align="center">
-<img src="./logo.png" alt="Quivr-logo" width="30%">
+<img src="./assets/logo.png" alt="Quivr-logo" width="30%">
 <p align="center">
 
 <a href="https://discord.gg/HUpRgp2HG8">
@@ -23,6 +23,7 @@ Quivr is your second brain in the cloud, designed to easily store and retrieve u
   - **Audio**
   - **Video**
 - **Open Source**: Quivr is open source and free to use.
+- [New May 19 Update] **Powerful Search 1.0**: Quivr [summerizes your docments]() and [evaluate the similarity between them and your query](). It then returns the most relevant documents. See flowchart.
 ## Demo
 
 

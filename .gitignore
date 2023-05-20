@@ -3,6 +3,7 @@ secondbrain/
 .streamlit/secrets.toml
 **/*.pyc
 toto.txt
+*.ipynb
 
 
 

@@ -50,6 +50,7 @@ file_processors = {
     ".docx": process_docx
 }
 
+
 def file_uploader(supabase, vector_store):
     # Omit zip file support if the `st.secrets.self_hosted` != "true" because
     # a zip file can consist of multiple files so the limit on 1 file uploaded
@@ -76,10 +77,13 @@ def file_uploader(supabase, vector_store):
             for file in files:
                 filter_file(file, supabase, vector_store)
 
+
 def file_already_exists(supabase, file):
     file_sha1 = compute_sha1_from_content(file.getvalue())
-    response = supabase.table("documents").select("id").eq("metadata->>file_sha1", file_sha1).execute()
+    response = supabase.table("documents").select("id").eq(
+        "metadata->>file_sha1", file_sha1).execute()
     return len(response.data) > 0
+
 
 def file_to_uploaded_file(file: Any) -> Union[None, UploadedFile]:
     """Convert a file to a streamlit `UploadedFile` object.
@@ -108,13 +112,15 @@ def file_to_uploaded_file(file: Any) -> Union[None, UploadedFile]:
     file_data = file.read()
     # The file manager will automatically assign an ID so pass `None`
     # Reference: https://github.com/streamlit/streamlit/blob/9a6ce804b7977bdc1f18906d1672c45f9a9b3398/lib/streamlit/runtime/uploaded_file_manager.py#LL98C6-L98C6
-    uploaded_file_rec = UploadedFileRec(None, file_name, file_extension, file_data)
+    uploaded_file_rec = UploadedFileRec(
+        None, file_name, file_extension, file_data)
     uploaded_file_rec = manager.add_file(
         ctx.session_id,
         ComponentsKeys.FILE_UPLOADER,
         uploaded_file_rec,
     )
     return UploadedFile(uploaded_file_rec)
+
 
 def filter_zip_file(
     file: UploadedFile,
@@ -139,6 +145,7 @@ def filter_zip_file(
             with z.open(unzipped_file, "r") as f:
                 filter_file(f, supabase, vector_store)
 
+
 def filter_file(file, supabase, vector_store):
     # Streamlit file uploads are of type `UploadedFile` which has the
     # necessary methods and attributes for this app to work.
@@ -157,20 +164,21 @@ def filter_file(file, supabase, vector_store):
     if file.size < 1:
         st.write(f"💨 {file.name} is empty.")
         return False
-
-    if file_extension in file_processors:
-        if st.secrets.self_hosted == "false":
-            file_processors[file_extension](vector_store, file, stats_db=supabase)
+    else:
+        file_extension = os.path.splitext(file.name)[-1]
+        if file_extension in file_processors:
+            file_processors[file_extension](
+                vector_store, file, supabase)
+            st.write(f"✅ {file.name} ")
+            return True
         else:
-            file_processors[file_extension](vector_store, file, stats_db=None)
-        st.write(f"✅ {file.name} ")
-        return True
+            st.write(f"❌ {file.name} is not a valid file type.")
+            return False
 
-    st.write(f"❌ {file.name} is not a valid file type.")
-    return False
 
 def url_uploader(supabase, vector_store):
-    url = st.text_area("**Add an url**",placeholder="https://www.quivr.app")
+
+    url = st.text_area("**Add an url**", placeholder="https://www.quivr.app")
     button = st.button("Add the URL to the database")
 
     if button:
@@ -184,4 +192,5 @@ def url_uploader(supabase, vector_store):
             else:
                 st.write(f"❌ Failed to access to {url} .")
         else:
-            st.write("You have reached your daily limit. Please come back later or self host the solution.")
+            st.write(
+                "You have reached your daily limit. Please come back later or self host the solution.")
