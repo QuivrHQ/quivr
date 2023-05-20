@@ -41,6 +41,8 @@ def chat_with_doc(model, vector_store: SupabaseVectorStore, stats_db):
     
     
     if clear_history:
+        # Clear memory in Langchain
+        memory.clear()
         st.session_state['chat_history'] = []
         st.experimental_rerun()
 
