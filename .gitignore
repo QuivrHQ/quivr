@@ -44,3 +44,4 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 quivr/*
+streamlit-demo/.streamlit/secrets.toml
