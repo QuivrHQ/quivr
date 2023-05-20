@@ -186,11 +186,15 @@ def url_uploader(supabase, vector_store):
             html = get_html(url)
             if html:
                 st.write(f"Getting content ... {url}  ")
+                try:
+                    file, temp_file_path = create_html_file(url, html)
+                except UnicodeEncodeError as e:
+                    st.write(f"❌ Error encoding character: {e}")
                 file, temp_file_path = create_html_file(url, html)
                 ret = filter_file(file, supabase, vector_store)
                 delete_tempfile(temp_file_path, url, ret)
             else:
                 st.write(f"❌ Failed to access to {url} .")
         else:
-            st.write(
-                "You have reached your daily limit. Please come back later or self host the solution.")
+            st.write("You have reached your daily limit. Please come back later or self host the solution.")
+
