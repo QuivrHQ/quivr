@@ -35,8 +35,6 @@ async def process_audio(vector_store, upload_file: UploadFile, stats_db):
     dateshort = time.strftime("%Y%m%d-%H%M%S")
     file_meta_name = f"audiotranscript_{dateshort}.txt"
     ### uploaded file to file object
-   
-
 
 
     openai_api_key = os.environ.get("OPENAI_API_KEY")

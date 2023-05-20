@@ -87,7 +87,7 @@ file_processors = {
     ".docx": process_docx
 }
 
-async def filter_file(file: UploadFile, supabase, vector_store):
+async def filter_file(file: UploadFile, supabase, vector_store, stats_db):
     if await file_already_exists(supabase, file):
         return {"message": f"🤔 {file.filename} already exists.", "type": "warning"}
     elif file.file._file.tell() < 1:
@@ -102,7 +102,7 @@ async def filter_file(file: UploadFile, supabase, vector_store):
 
 @app.post("/upload")
 async def upload_file(file: UploadFile):
-    message = await filter_file(file, supabase, vector_store)
+    message = await filter_file(file, supabase, vector_store, stats_db=None)
     return message
 
 @app.post("/chat/")

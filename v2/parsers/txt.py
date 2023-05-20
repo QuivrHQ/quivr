@@ -3,4 +3,4 @@ from langchain.document_loaders import TextLoader
 from fastapi import UploadFile
 
 async def process_txt(vector_store, file: UploadFile, stats_db):
-    return await process_file(vector_store, file, TextLoader, stats_db=stats_db)
+    return await process_file(vector_store, file, TextLoader,".txt", stats_db=stats_db)
