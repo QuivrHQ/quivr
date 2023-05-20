@@ -1,0 +1,14 @@
+langchain==0.0.166
+Markdown==3.4.3
+openai==0.27.6
+pdf2image==1.16.3
+pypdf==3.8.1
+streamlit==1.22.0
+StrEnum==0.4.10
+supabase==1.0.3
+tiktoken==0.4.0
+unstructured==0.6.5
+anthropic==0.2.8
+fastapi==0.95.2
+python-multipart==0.0.6
+uvicorn==0.22.0
