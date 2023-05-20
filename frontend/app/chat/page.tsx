@@ -5,11 +5,32 @@ import Card from "../components/ui/Card";
 import Button from "../components/ui/Button";
 import Modal from "../components/ui/Modal";
 import { MdSettings } from "react-icons/md";
+import ChatMessages from "./ChatMessages";
 
 export default function ChatPage() {
   const [question, setQuestion] = useState("");
   const [history, setHistory] = useState<Array<[string, string]>>([
     ["user", "Hello!"],
+    ["assistant", "Hello Back!"],
+    ["user", "Send some long message"],
+    [
+      "assistant",
+      "This is a very long and really long message which is longer than every other message.",
+    ],
+    // ["user", "Hello!"],
+    // ["assistant", "Hello Back!"],
+    // ["user", "Send some long message"],
+    // [
+    //   "assistant",
+    //   "This is a very long and really long message which is longer than every other message.",
+    // ],
+    // ["user", "Hello!"],
+    // ["assistant", "Hello Back!"],
+    // ["user", "Send some long message"],
+    // [
+    //   "assistant",
+    //   "This is a very long and really long message which is longer than every other message.",
+    // ],
   ]);
   const [model, setModel] = useState("gpt-3.5-turbo");
   const [temperature, setTemperature] = useState(0);
@@ -34,20 +55,17 @@ export default function ChatPage() {
   };
 
   return (
-    <div className="flex justify-center items-center h-screen">
+    <div className="min-h-screen grid items-center justify-center pt-24">
       <div className="flex flex-col justify-center items-center gap-5">
+        {/* Chat */}
         <Card className="p-10">
           <div className="flex flex-col items-center justify-center">
-            <h1 className="text-3xl font-bold">Chat with your brain</h1>
+            <h1 className="text-3xl font-bold text-center">
+              Chat with your brain
+            </h1>
             <h2 className="opacity-50">Your AI assistant</h2>
           </div>
-          <div className="mt-5">
-            {history.map(([speaker, text], idx) => (
-              <p key={idx}>
-                <b>{speaker}:</b> {text}
-              </p>
-            ))}
-          </div>
+          <ChatMessages history={history} />
           <form
             onSubmit={(e) => {
               e.preventDefault();
@@ -62,17 +80,13 @@ export default function ChatPage() {
               className="w-full p-2 border border-gray-300 rounded"
               placeholder="Enter your question here..."
             />
-            <Button
-              type="submit"
-              isLoading={isPending}
-              // onClick={askQuestion}
-              // className="w-full mt-2 px-4 py-2 bg-blue-500 text-white rounded"
-            >
+            <Button type="submit" isLoading={isPending}>
               {isPending ? "Thinking..." : "Ask"}
             </Button>
           </form>
         </Card>
 
+        {/* Settings Modal */}
         <Modal
           Trigger={
             <Button className="" variant={"secondary"}>
