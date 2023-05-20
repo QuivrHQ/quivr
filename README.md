@@ -77,7 +77,7 @@ cp .backend_env.example .backend_env
 cp .frontend_env.example .frontend_env
 ```
 
-- Update the `.backend_env` file with your Supabase credentials
+- Update the `.backend_env` file 
 
 _Note that the `supabase_service_key` is found in your Supabase dashboard under Project Settings -> API. Use the `anon` `public` key found in the `Project API keys` section._
 
