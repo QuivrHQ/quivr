@@ -56,7 +56,7 @@ You'll also need a [Supabase](https://supabase.com/) account for:
 - Clone the repository
 
 ```bash
-git clone git@github.com:StanGirard/Quivr.git & cd Quivr
+git clone git@github.com:StanGirard/Quivr.git && cd Quivr
 ```
 
 - Create a virtual environment
