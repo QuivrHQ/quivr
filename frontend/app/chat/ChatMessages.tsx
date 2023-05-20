@@ -93,4 +93,6 @@ const ChatMessage = forwardRef(
   }
 );
 
+ChatMessage.displayName = 'ChatMessage';
+
 export default ChatMessages;

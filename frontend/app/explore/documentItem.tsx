@@ -28,4 +28,5 @@ const DocumentItem: FC<DocumentProps> = ({ document, viewDocument }) => {
   );
 };
 
+DocumentItem.displayName = 'DocumentItem';
 export default DocumentItem;

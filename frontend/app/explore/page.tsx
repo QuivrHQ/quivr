@@ -1,7 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import DocumentItem from './DocumentItem';
+import DocumentItem from './documentItem';
 
 interface Document {
     name: string;
