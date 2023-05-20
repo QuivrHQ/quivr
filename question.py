@@ -7,6 +7,9 @@ from langchain.llms import OpenAI
 from langchain.chat_models import ChatAnthropic
 from langchain.vectorstores import SupabaseVectorStore
 from stats import add_usage
+import LANGUAGE_PROMPT
+
+ConversationalRetrievalChain.prompts = LANGUAGE_PROMPT
 
 memory = ConversationBufferMemory(
     memory_key="chat_history", return_messages=True)
