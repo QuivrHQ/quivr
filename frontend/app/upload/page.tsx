@@ -20,7 +20,7 @@ export default function UploadPage() {
     formData.append("file", file);
     try {
       const response = await axios.post(
-        "http://localhost:8000/upload",
+        "http://localhost:5000/upload",
         formData
       );
 

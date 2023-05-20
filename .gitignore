@@ -45,3 +45,5 @@ yarn-error.log*
 next-env.d.ts
 quivr/*
 streamlit-demo/.streamlit/secrets.toml
+.backend_env
+.frontend_env

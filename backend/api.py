@@ -30,8 +30,6 @@ from fastapi.middleware.cors import CORSMiddleware
 app = FastAPI()
 
 origins = [
-    "http://localhost.tiangolo.com",
-    "https://localhost.tiangolo.com",
     "http://localhost",
     "http://localhost:3000",
     "http://localhost:8080",
@@ -156,7 +154,6 @@ async def explore_endpoint():
 async def delete_endpoint(file_name: str):
     response = supabase.table("documents").delete().match({"metadata->>file_name": file_name}).execute()
     return {"message": f"{file_name} has been deleted."}
-## curl -X DELETE http://localhost:8000/explore/README.md
 
 @app.get("/explore/{file_name}")
 async def download_endpoint(file_name: str):
@@ -172,5 +169,3 @@ async def root():
     return {"message": "Hello World"}
 
 
-# curl to upload an an audio file
-# curl -X POST -F "file=@/path/to/file" http://localhost:8000/upload

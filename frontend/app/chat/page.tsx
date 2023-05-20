@@ -28,7 +28,7 @@ export default function ChatPage() {
   const askQuestion = async () => {
     setHistory((hist) => [...hist, ["user", question]]);
     setIsPending(true);
-    const response = await axios.post("http://localhost:8000/chat/", {
+    const response = await axios.post("http://localhost:5000/chat/", {
       model,
       question,
       history,
