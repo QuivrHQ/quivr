@@ -178,6 +178,10 @@ def url_uploader(supabase, vector_store):
             html = get_html(url)
             if html:
                 st.write(f"Getting content ... {url}  ")
+                try:
+                    file, temp_file_path = create_html_file(url, html)
+                except UnicodeEncodeError as e:
+                    st.write(f"❌ Error encoding character: {e}")
                 file, temp_file_path = create_html_file(url, html)
                 ret = filter_file(file, supabase, vector_store)
                 delete_tempfile(temp_file_path, url, ret)
