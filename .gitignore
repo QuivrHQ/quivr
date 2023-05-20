@@ -47,5 +47,3 @@ quivr/*
 streamlit-demo/.streamlit/secrets.toml
 .backend_env
 .frontend_env
-next-env.d.ts
-quivr/*
