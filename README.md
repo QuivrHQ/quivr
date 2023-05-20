@@ -61,6 +61,15 @@ You'll also need a [Supabase](https://supabase.com/) account for:
 - Supabase Project API key
 - Supabase Project URL
 
+- Python 3.10 or higher
+- Pip
+- Virtualenv
+
+You'll also need a [Supabase](https://supabase.com/) account for:
+
+- A new Supabase project
+- Supabase Project API key
+- Supabase Project URL
 
 ### Installing
 
