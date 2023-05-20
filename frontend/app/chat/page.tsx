@@ -52,15 +52,15 @@ export default function ChatPage() {
           </h1>
           <h2 className="opacity-50">Your AI assistant</h2>
         </div>
-        <Card className="p-10 max-w-3xl">
+        <Card className="p-10 max-w-3xl mb-32">
           <ChatMessages history={history} />
-          <Card className="fixed left-1/2 w-full max-w-4xl -translate-x-1/2 bottom-0 p-10">
+          <Card className="fixed left-1/2 w-full max-w-3xl bg-gray-100 dark:bg-gray-800 rounded-b-none -translate-x-1/2 bottom-0 px-5 py-5">
             <form
               onSubmit={(e) => {
                 e.preventDefault();
                 askQuestion();
               }}
-              className="w-full flex items-center justify-center"
+              className="w-full flex items-center justify-center gap-2"
             >
               <input
                 autoFocus
@@ -73,67 +73,68 @@ export default function ChatPage() {
               <Button type="submit" isLoading={isPending}>
                 {isPending ? "Thinking..." : "Ask"}
               </Button>
+              {/* Settings Button */}
+              <Modal
+                Trigger={
+                  <Button className="px-3" variant={"tertiary"}>
+                    <MdSettings className="text-2xl" />
+                  </Button>
+                }
+                title="Settings"
+                desc="Modify your brain"
+              >
+                <form className="flex flex-col gap-5 py-5">
+                  <fieldset className="w-full flex">
+                    <label className="flex-1" htmlFor="model">
+                      Model:
+                    </label>
+                    <select
+                      name="model"
+                      id="model"
+                      value={model}
+                      onChange={(e) => setModel(e.target.value)}
+                    >
+                      <option value="gpt-3.5-turbo">gpt-3.5-turbo</option>
+                      <option value="gpt-4">gpt-4</option>
+                    </select>
+                  </fieldset>
+                  <fieldset className="w-full flex">
+                    <label className="flex-1" htmlFor="temp">
+                      Temperature: {temperature}
+                    </label>
+                    <input
+                      name="temp"
+                      id="temp"
+                      type="range"
+                      min="0"
+                      max="1"
+                      step="0.01"
+                      value={temperature}
+                      onChange={(e) => setTemperature(+e.target.value)}
+                    />
+                  </fieldset>
+                  <fieldset className="w-full flex">
+                    <label className="flex-1" htmlFor="tokens">
+                      Tokens: {maxTokens}
+                    </label>
+                    <input
+                      name="tokens"
+                      id="tokens"
+                      type="range"
+                      min="256"
+                      max="3000"
+                      step="1"
+                      value={maxTokens}
+                      onChange={(e) => setMaxTokens(+e.target.value)}
+                    />
+                  </fieldset>
+                </form>
+              </Modal>
             </form>
           </Card>
         </Card>
 
         {/* Settings Modal */}
-        <Modal
-          Trigger={
-            <Button className="" variant={"secondary"}>
-              Settings <MdSettings className="text-2xl" />
-            </Button>
-          }
-          title="Settings"
-          desc="Modify your brain"
-        >
-          <form className="flex flex-col gap-5 py-5">
-            <fieldset className="w-full flex">
-              <label className="flex-1" htmlFor="model">
-                Model:
-              </label>
-              <select
-                name="model"
-                id="model"
-                value={model}
-                onChange={(e) => setModel(e.target.value)}
-              >
-                <option value="gpt-3.5-turbo">gpt-3.5-turbo</option>
-                <option value="gpt-4">gpt-4</option>
-              </select>
-            </fieldset>
-            <fieldset className="w-full flex">
-              <label className="flex-1" htmlFor="temp">
-                Temperature: {temperature}
-              </label>
-              <input
-                name="temp"
-                id="temp"
-                type="range"
-                min="0"
-                max="1"
-                step="0.01"
-                value={temperature}
-                onChange={(e) => setTemperature(+e.target.value)}
-              />
-            </fieldset>
-            <fieldset className="w-full flex">
-              <label className="flex-1" htmlFor="tokens">
-                Tokens: {maxTokens}
-              </label>
-              <input
-                name="tokens"
-                id="tokens"
-                type="range"
-                min="256"
-                max="3000"
-                step="1"
-                value={maxTokens}
-                onChange={(e) => setMaxTokens(+e.target.value)}
-              />
-            </fieldset>
-          </form>
-        </Modal>
       </div>
     </div>
   );
