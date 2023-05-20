@@ -23,7 +23,7 @@ Quivr is your second brain in the cloud, designed to easily store and retrieve u
   - **Audio**
   - **Video**
 - **Open Source**: Quivr is open source and free to use.
-- [New May 19 Update] **Powerful Search 1.0**: Quivr [summerizes your docments]() and [evaluate the similarity between them and your query](). It then returns the most relevant documents. See flowchart.
+- [New May 19 Update] **Powerful Search 1.0**: Quivr [summerizes your docments](https://github.com/StanGirard/quivr/blob/7bd9dcc4e363175b0fd1a6e3416162aa1fbe76b3/assets/upload_with_summarization.png) and [evaluate the similarity between them and your query](https://github.com/StanGirard/quivr/blob/7bd9dcc4e363175b0fd1a6e3416162aa1fbe76b3/assets/question_with_summarization.png). It then returns the most relevant documents. See flowchart.
 ## Demo
 
 
