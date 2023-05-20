@@ -7,6 +7,7 @@ import Button from "../components/ui/Button";
 import { MdClose } from "react-icons/md";
 import { AnimatePresence, motion } from "framer-motion";
 import Link from "next/link";
+import Card from "../components/ui/Card";
 
 export default function UploadPage() {
   const [message, setMessage] = useState<Message | null>(null);
@@ -85,7 +86,7 @@ export default function UploadPage() {
           <h1 className="text-5xl font-bold">Add Knowledge</h1>
           <h2 className="opacity-50">Upload files to your second brain</h2>
         </div>
-        <div className="shadow-md dark:shadow-primary/25 hover:shadow-xl transition-shadow rounded-xl overflow-hidden bg-white dark:bg-black border border-black/10 dark:border-white/25">
+        <Card>
           <input {...getInputProps()} />
           <div className="text-center mt-2 p-6 max-w-sm w-full flex flex-col gap-5 items-center">
             {files.length > 0 ? (
@@ -124,7 +125,7 @@ export default function UploadPage() {
               <p className="text-white">{message.text}</p>
             </div>
           )}
-        </div>
+        </Card>
         <p className="opacity-50">
           This is the demo mode, the max file size is 1MB
         </p>
