@@ -16,7 +16,7 @@ const ChatMessages: FC<ChatMessagesProps> = ({ history }) => {
   return (
     <div
       ref={scrollableRef}
-      className="mt-5 max-w-lg max-h-[50vh] overflow-y-auto flex flex-col gap-5 py-5 scrollbar"
+      className="mt-5 max-w-lg max-h-[50vh] overflow-y-auto flex flex-col gap-5 py-5 scrollbar scroll-smooth"
     >
       {history.map(([speaker, text], idx) => {
         if (idx % 2 === 0)
