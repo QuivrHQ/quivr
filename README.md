@@ -42,6 +42,11 @@ https://github.com/StanGirard/quivr/assets/19614572/80721777-2313-468f-b75e-0937
 ### Demo with Claude 100k context
 https://github.com/StanGirard/quivr/assets/5101573/9dba918c-9032-4c8d-9eea-94336d2c8bd4
 
+### Demo of new version - WIP
+
+
+https://github.com/StanGirard/quivr/assets/19614572/a6463b73-76c7-4bc0-978d-70562dca71f5
+
 
 
 ## Getting Started with the new version
