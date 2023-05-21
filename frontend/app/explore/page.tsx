@@ -18,7 +18,8 @@ export default function ExplorePage() {
 
     const fetchDocuments = async () => {
         try {
-            const response = await axios.get<{ documents: Document[] }>('http://localhost:5000/explore');
+            console.log(`Fetching documents from ${process.env.NEXT_PUBLIC_BACKEND_URL}/explore`);
+            const response = await axios.get<{ documents: Document[] }>(`${process.env.NEXT_PUBLIC_BACKEND_URL}/explore`);
             setDocuments(response.data.documents);
         } catch (error) {
             console.error('Error fetching documents', error);

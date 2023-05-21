@@ -1,7 +1,7 @@
 create extension vector;
 
 -- Create a table to store your documents
-create table documents (
+create table if not exists documents (
 id bigserial primary key,
 content text, -- corresponds to Document.pageContent
 metadata jsonb, -- corresponds to Document.metadata

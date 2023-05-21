@@ -81,11 +81,11 @@ Additionally, you'll need a [Supabase](https://supabase.com/) account for:
 - **Step 2**: Copy the `.XXXXX_env` files
 
 ```bash
-cp .backend_env.example .backend_env
-cp .frontend_env.example .frontend_env
+cp .backend_env.example backend/.env
+cp .frontend_env.example frontend/.env
 ```
 
-- **Step 3**: Update the `.backend_env` file 
+- **Step 3**: Update the `backend/.env` file 
 
 > _Your `supabase_service_key` can be found in your Supabase dashboard under Project Settings -> API. Use the `anon` `public` key found in the `Project API keys` section._
 
@@ -94,6 +94,8 @@ cp .frontend_env.example .frontend_env
 [Migration Script 1](scripts/supabase_vector_store_document.sql)
 
 [Migration Script 2](scripts/supabase_usage_table.sql)
+
+[Migration Script 3](scripts/supabase_vector_store_document.sql)
 
 - **Step 5**: Launch the app
 

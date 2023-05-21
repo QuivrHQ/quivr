@@ -3,7 +3,7 @@ version: "3"
 services:
   frontend:
     env_file:
-      - .frontend_env
+      - ./frontend/.env
     build:
       context: frontend
       dockerfile: Dockerfile
@@ -17,9 +17,7 @@ services:
       - 3000:3000
   backend:
     env_file:
-      - .backend_env
-    environment:
-      - supabase_url="totot"
+      - ./backend/.env
     build:
       context: backend
       dockerfile: Dockerfile
@@ -28,4 +26,4 @@ services:
     volumes:
       - ./backend/:/code/
     ports:
-      - 5000:5000
+      - 5050:5050
