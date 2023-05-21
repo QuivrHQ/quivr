@@ -19,6 +19,7 @@ from parsers.txt import process_txt
 from parsers.csv import process_csv
 from parsers.docx import process_docx
 from parsers.pdf import process_pdf
+from parsers.notebook import process_ipnyb
 from parsers.markdown import process_markdown
 from parsers.powerpoint import process_powerpoint
 from parsers.html import process_html
@@ -91,6 +92,7 @@ file_processors = {
     ".pptx": process_powerpoint,
     ".docx": process_docx,
     ".epub": process_epub,
+    ".ipynb": process_ipnyb,
 }
 
 async def filter_file(file: UploadFile, supabase, vector_store, stats_db):
