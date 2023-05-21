@@ -154,6 +154,9 @@ docker compose build && docker compose up
 ## Contributing
 
 Open a pull request and we'll review it as soon as possible.
+You can find all the subject we would like to tackle here -> https://github.com/users/StanGirard/projects/5
+
+Don't hesitate to come with new ones too :) 
 
 ## Star History
 
