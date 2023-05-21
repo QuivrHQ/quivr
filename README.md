@@ -63,6 +63,8 @@ Additionally, you'll need a [Supabase](https://supabase.com/) account for:
 
 ### Installation Steps 💽
 
+- **Step 0**: If needed, here is the installation explained on Youtube [here](https://youtu.be/rC-s4QdfY80)
+
 - **Step 1**: Clone the repository using **one** of these commands:
 
   - If you don't have an SSH key set up:
