@@ -121,15 +121,16 @@ export default function UploadPage() {
 
     return (
       <main>
-        <section
-          {...getRootProps()}
-          className="w-full h-full min-h-screen text-center flex flex-col items-center gap-5 pt-32 outline-none"
-        >
-          <div className="flex flex-col items-center justify-center">
-            <h1 className="text-5xl font-bold">Add Knowledge</h1>
-            <h2 className="opacity-50">Upload files to your second brain</h2>
-          </div>
-          <Card>
+      <section
+        {...getRootProps()}
+        className="w-full h-full min-h-screen text-center flex flex-col items-center gap-5 pt-32 outline-none"
+      >
+        <div className="flex flex-col items-center justify-center">
+          <h1 className="text-5xl font-bold">Add Knowledge</h1>
+          <h2 className="opacity-50">Upload files to your second brain</h2>
+        </div>
+        <div className="flex justify-center gap-5">  {/* Wrap the cards in a flex container */}
+          <Card className="w-1/2">  {/* Assign a width of 50% to each card */}
             <input {...getInputProps()} />
             <div className="text-center mt-2 p-6 max-w-sm w-full flex flex-col gap-5 items-center">
               {files.length > 0 ? (
@@ -155,34 +156,23 @@ export default function UploadPage() {
                 </button>
               )}
             </div>
-            {message && (
-              <div
-                className={`mt-4 p-6 max-w-sm rounded ${message.type === "success"
-                    ? "bg-green-500"
-                    : message.type === "warning"
-                      ? "bg-yellow-600"
-                      : "bg-red-500"
-                  }`}
-              >
-                <p className="text-white">{message.text}</p>
-              </div>
-            )}
           </Card>
-          <Card>
-          <div className="text-center mt-2 p-6 max-w-sm w-full flex flex-col gap-5 items-center">
-            <input
-              ref={urlInputRef}
-              type="text"
-              placeholder="Enter a website URL"
-            />
-            <button
-              onClick={crawlWebsite}
-              className="opacity-50 cursor-pointer hover:opacity-100 hover:underline transition-opacity"
-            >
-              Crawl Website
-            </button>
+          <Card className="w-1/2">  {/* Assign a width of 50% to each card */}
+            <div className="text-center mt-2 p-6 max-w-sm w-full flex flex-col gap-5 items-center">
+              <input
+                ref={urlInputRef}
+                type="text"
+                placeholder="Enter a website URL"
+              />
+              <button
+                onClick={crawlWebsite}
+                className="opacity-50 cursor-pointer hover:opacity-100 hover:underline transition-opacity"
+              >
+                Crawl Website
+              </button>
+            </div>
+          </Card>
           </div>
-        </Card>
           <div className="flex flex-col items-center justify-center gap-5">
             <Button isLoading={isPending} onClick={uploadAllFiles} className="">
               {isPending ? `Adding - ${files[pendingFileIndex].name}` : "Add"}
@@ -194,6 +184,18 @@ export default function UploadPage() {
             </Link>
           </div>
         </section>
+        {message && (
+              <div
+                className={`fixed bottom-0 inset-x-0 m-4 p-4 max-w-sm mx-auto rounded ${message.type === "success"
+                    ? "bg-green-500"
+                    : message.type === "warning"
+                      ? "bg-yellow-600"
+                      : "bg-red-500"
+                  }`}
+              >
+                <p className="text-white">{message.text}</p>
+              </div>
+            )}
       </main>
     );
   }
