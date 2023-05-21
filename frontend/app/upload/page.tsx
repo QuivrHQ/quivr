@@ -15,11 +15,11 @@ export default function UploadPage() {
   const [isPending, setIsPending] = useState(false);
   const [files, setFiles] = useState<File[]>([]);
   const [pendingFileIndex, setPendingFileIndex] = useState<number>(0);
-  const urlInputRef = useRef(null);
+  const urlInputRef = useRef<HTMLInputElement | null>(null);
 
   const crawlWebsite = useCallback(async () => {
     // Validate URL
-    const url = urlInputRef.current.value;
+    const url = urlInputRef.current ? urlInputRef.current.value : null;
     if (!url || !isValidUrl(url)) {  // Assuming you have a function to validate URLs
       setMessage({
         type: "error",
