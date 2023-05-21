@@ -12,4 +12,5 @@ anthropic==0.2.8
 fastapi==0.95.2
 python-multipart==0.0.6
 uvicorn==0.22.0
+pypandoc==1.11
 docx2txt==0.8
