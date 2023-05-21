@@ -73,7 +73,7 @@ export default function UploadPage() {
   const { getRootProps, getInputProps, isDragActive, open } = useDropzone({
     onDrop,
     noClick: true,
-    maxSize: 1000000, // 1 MB
+    maxSize: 100000000, // 1 MB
   });
 
   return (
@@ -126,9 +126,6 @@ export default function UploadPage() {
             </div>
           )}
         </Card>
-        <p className="opacity-50">
-          This is the demo mode, the max file size is 1MB
-        </p>
         <div className="flex flex-col items-center justify-center gap-5">
           <Button isLoading={isPending} onClick={uploadAllFiles} className="">
             {isPending ? `Adding - ${files[pendingFileIndex].name}` : "Add"}
