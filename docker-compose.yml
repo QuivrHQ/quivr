@@ -11,8 +11,8 @@ services:
     restart: always
     volumes:
       - ./frontend/:/app
-      - /frontend/backend/app/node_modules
-      - /frontend/app/.next
+      - /app/node_modules
+      - /app/.next
     ports:
       - 3000:3000
   backend:
