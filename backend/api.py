@@ -12,7 +12,7 @@ from fastapi.openapi.utils import get_openapi
 from tempfile import SpooledTemporaryFile
 import shutil
 import LANGUAGE_PROMPT
-
+import pypandoc
 
 from parsers.common import file_already_exists
 from parsers.txt import process_txt
@@ -22,6 +22,7 @@ from parsers.pdf import process_pdf
 from parsers.markdown import process_markdown
 from parsers.powerpoint import process_powerpoint
 from parsers.html import process_html
+from parsers.epub import process_epub
 from parsers.audio import process_audio
 from crawl.crawler import CrawlWebsite
 
@@ -43,6 +44,12 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+@app.on_event("startup")
+async def startup_event():
+    pypandoc.download_pandoc()
+
 
 supabase_url = os.environ.get("SUPABASE_URL")
 supabase_key = os.environ.get("SUPABASE_SERVICE_KEY")
@@ -82,7 +89,8 @@ file_processors = {
     ".pdf": process_pdf,
     ".html": process_html,
     ".pptx": process_powerpoint,
-    ".docx": process_docx
+    ".docx": process_docx,
+    ".epub": process_epub,
 }
 
 async def filter_file(file: UploadFile, supabase, vector_store, stats_db):

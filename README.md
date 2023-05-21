@@ -1,168 +1,128 @@
-# Quivr - Your GenerativeAI Second Brain
+# Quivr - Your Second Brain, Empowered by Generative AI
 
-<p align="center">
-<img src="./logo.png" alt="Quivr-logo" width="30%">
-<p align="center">
+<div align="center">
+    <img src="./logo.png" alt="Quivr-logo" width="30%"  style="border-radius: 50%; padding-bottom: 20px"/>
+</div>
 
+<div align="center">
 <a href="https://discord.gg/HUpRgp2HG8">
   <img src="https://img.shields.io/badge/discord-join%20chat-blue.svg" alt="Join our Discord" height="40">
 </a>
+</div>
 
-Quivr is your GenerativeAI second brain, designed to easily store and retrieve unstructured information. It's like Obsidian but powered by generative AI.
+Quivr, your second brain, utilizes the power of GenerativeAI to store and retrieve unstructured information. Think of it as Obsidian, but turbocharged with AI capabilities.
 
+## Key Features 🎯
 
-## Features
+- **Universal Data Acceptance**: Quivr can handle almost any type of data you throw at it. Text, images, code snippets, we've got you covered.
+- **Generative AI**: Quivr employs advanced AI to assist you in generating and retrieving information.
+- **Fast and Efficient**: Designed with speed and efficiency at its core. Quivr ensures rapid access to your data.
+- **Secure**: Your data, your control. Always.
+- **File Compatibility**: 
+  - Text
+  - Markdown
+  - PDF
+  - Powerpoint
+  - Excel
+  - Word
+  - Audio
+  - Video
+- **Open Source**: Freedom is beautiful, so is Quivr. Open source and free to use.
 
-- **Store Anything**: Quivr can handle almost any type of data you throw at it. Text, images, code snippets, you name it.
-- **Generative AI**: Quivr uses advanced AI to help you generate and retrieve information.
-- **Fast and Efficient**: Designed with speed and efficiency in mind. Quivr makes sure you can access your data as quickly as possible.
-- **Secure**: Your data is always under your control.
-- **Compatible Files**: 
-  - **Text**
-  - **Markdown**
-  - **PDF**
-  - **Powerpoint**
-  - **Excel**
-  - **Word**
-  - **Audio**
-  - **Video**
-- **Open Source**: Quivr is open source and free to use.
+## Demo Highlights 🎥
 
+> **Please note: The DEMO WITH STREAMLIT IS USING AN OLD VERSION**  
+> The new version showcases a fresh UI, however, it is not yet deployed as it lacks some features of the old version. Expected to go live before 25/05/23
 
-
-
-### DEMO WITH STREAMLIT IS USING OLD VERSION 
-New version is using a new UI and is not yet deployed as it doesn't have all the features of the old version.
-Should be up and live before 25/05/23
-
-### Demo with GPT3.5
+### **Demo with GPT3.5**:
 https://github.com/StanGirard/quivr/assets/19614572/80721777-2313-468f-b75e-09379f694653
 
+### **Demo with Claude 100k context**: https://github.com/StanGirard/quivr/assets/5101573/9dba918c-9032-4c8d-9eea-94336d2c8bd4
 
-### Demo with Claude 100k context
-https://github.com/StanGirard/quivr/assets/5101573/9dba918c-9032-4c8d-9eea-94336d2c8bd4
-
-### Demo of new version - WIP
-
-
+### **Demo of the new version (Work in progress)**: 
 https://github.com/StanGirard/quivr/assets/19614572/a6463b73-76c7-4bc0-978d-70562dca71f5
 
+## Getting Started: New Version 🚀
 
+Follow these instructions to get a copy of the project up and running on your local machine for development and testing purposes.
 
-## Getting Started with the new version
-These instructions will get you a copy of the project up and running on your local machine for development and testing purposes.
-*Old version readme is in the streamlit-demo folder* [here](streamlit-demo/README.md)
+**Old version's readme** is located in the streamlit-demo folder [here](streamlit-demo/README.md)
 
-### Prerequisites
+### Prerequisites 📋
 
-Make sure you have the following installed before continuing:
+Before you proceed, ensure you have the following installed:
 
 - Docker
 - Docker Compose
 
-You'll also need a [Supabase](https://supabase.com/) account for:
+Additionally, you'll need a [Supabase](https://supabase.com/) account for:
 
-- A new Supabase project
+- Creating a new Supabase project
 - Supabase Project API key
 - Supabase Project URL
 
-### Installing
+### Installation Steps 💽
 
-- Clone the repository
+- **Step 1**: Clone the repository using **one** of these commands:
 
-```bash
-git clone git@github.com:StanGirard/Quivr.git && cd Quivr
-```
+  - If you don't have an SSH key set up:
+  
+  ```bash
+  git clone https://github.com/StanGirard/Quivr.git && cd Quivr
+  ```
+  - If you have an SSH key set up or want to add it ([guide here](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/adding-a-new-ssh-key-to-your-github-account))
+  
+  ```bash
+  git clone git@github.com:StanGirard/Quivr.git && cd Quivr
+  ```
 
-- Copy the `.XXXXX_env` files
+- **Step 2**: Copy the `.XXXXX_env` files
 
 ```bash
 cp .backend_env.example .backend_env
 cp .frontend_env.example .frontend_env
 ```
 
-- Update the `.backend_env` file 
+- **Step 3**: Update the `.backend_env` file 
 
-_Note that the `supabase_service_key` is found in your Supabase dashboard under Project Settings -> API. Use the `anon` `public` key found in the `Project API keys` section._
+> _Your `supabase_service_key` can be found in your Supabase dashboard under Project Settings -> API. Use the `anon` `public` key found in the `Project API keys` section._
 
+- **Step 4**: Run the following migration scripts on the Supabase database via the web interface (SQL Editor -> `New query`)
 
-- Run the following migration scripts on the Supabase database via the web interface (SQL Editor -> `New query`)
+[Migration Script 1](scripts/supabase_vector_store_document.sql)
 
-```sql
--- Enable the pgvector extension to work with embedding vectors
-       create extension vector;
+[Migration Script 2](scripts/supabase_usage_table.sql)
 
-       -- Create a table to store your documents
-       create table documents (
-       id bigserial primary key,
-       content text, -- corresponds to Document.pageContent
-       metadata jsonb, -- corresponds to Document.metadata
-       embedding vector(1536) -- 1536 works for OpenAI embeddings, change if needed
-       );
-
-       CREATE FUNCTION match_documents(query_embedding vector(1536), match_count int)
-           RETURNS TABLE(
-               id bigint,
-               content text,
-               metadata jsonb,
-               -- we return matched vectors to enable maximal marginal relevance searches
-               embedding vector(1536),
-               similarity float)
-           LANGUAGE plpgsql
-           AS $$
-           # variable_conflict use_column
-       BEGIN
-           RETURN query
-           SELECT
-               id,
-               content,
-               metadata,
-               embedding,
-               1 -(documents.embedding <=> query_embedding) AS similarity
-           FROM
-               documents
-           ORDER BY
-               documents.embedding <=> query_embedding
-           LIMIT match_count;
-       END;
-       $$;
-```
-
-and 
-
-```sql
-create table
-  stats (
-    -- A column called "time" with data type "timestamp"
-    time timestamp,
-    -- A column called "details" with data type "text"
-    chat boolean,
-    embedding boolean,
-    details text,
-    metadata jsonb,
-    -- An "integer" primary key column called "id" that is generated always as identity
-    id integer primary key generated always as identity
-  );
-```
-
-- Run the app
+- **Step 5**: Launch the app
 
 ```bash
 docker compose build && docker compose up
 ```
 
-## Built With
+- **Step 6**: Navigate to `localhost:3000` in your browser
 
-* [Python](https://www.python.org/) - The programming language used.
-* [Supabase](https://supabase.io/) - The open source Firebase alternative.
 
-## Contributing
 
-Open a pull request and we'll review it as soon as possible.
-You can find all the subject we would like to tackle here -> https://github.com/users/StanGirard/projects/5
+## Contributors ✨
 
-Don't hesitate to come with new ones too :) 
+Thanks goes to these wonderful people:
+<a href="https://github.com/stangirard/quivr/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=stangirard/quivr" />
+</a>
 
-## Star History
+## Contribute 🤝
+
+Got a pull request? Open it, and we'll review it as soon as possible. Check out our project board [here](https://github.com/users/StanGirard/projects/5) to see what we're currently focused on, and feel free to bring your fresh ideas to the table!
+
+
+- [Roadmap](https://github.com/users/StanGirard/projects/5)
+- [Open Issues](https://github.com/StanGirard/quivr/issues)
+- [Open Pull Requests](https://github.com/StanGirard/quivr/pulls)
+- [Good First Issues](https://github.com/StanGirard/quivr/issues?q=is%3Aopen+is%3Aissue+label%3A%22good+first+issue%22)
+- [Frontend Issues](https://github.com/StanGirard/quivr/issues?q=is%3Aopen+is%3Aissue+label%3Afrontend)
+- [Backend Issues](https://github.com/StanGirard/quivr/issues?q=is%3Aopen+is%3Aissue+label%3Abackend)
+
+## Star History 🌟
+
 
 [![Star History Chart](https://api.star-history.com/svg?repos=StanGirard/quivr&type=Date)](https://star-history.com/#StanGirard/quivr&Date)
