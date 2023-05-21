@@ -61,7 +61,7 @@ export default function UploadPage() {
     formData.append("file", file);
     try {
       const response = await axios.post(
-        "http://localhost:5000/upload",
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/upload`,
         formData
       );
 

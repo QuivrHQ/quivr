@@ -34,6 +34,7 @@
   },
   "devDependencies": {
     "@tailwindcss/typography": "^0.5.9",
+    "@types/next": "^9.0.0",
     "react-icons": "^4.8.0"
   }
 }
