@@ -68,11 +68,18 @@ You'll also need a [Supabase](https://supabase.com/) account for:
 
 ### Installing
 
-- Clone the repository
+- Clone the repository by running **one** of these commands:
 
-```bash
-git clone git@github.com:StanGirard/Quivr.git && cd Quivr
-```
+  1. If you don't have an SSH key set up:
+  ```bash
+  git clone https://github.com/StanGirard/Quivr.git && cd Quivr
+  ```
+
+  2. If you have an SSH key set up or want to add it (https://docs.github.com/en/authentication/connecting-to-github-with-ssh/adding-a-new-ssh-key-to-your-github-account)
+
+  ```bash
+  git clone git@github.com:StanGirard/Quivr.git && cd Quivr
+  ```
 
 - Copy the `.XXXXX_env` files
 
