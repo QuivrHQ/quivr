@@ -67,12 +67,10 @@ memory = ConversationBufferMemory(
 class ChatMessage(BaseModel):
     model: str = "gpt-3.5-turbo"
     question: str
-    history: List[Tuple[str, str]]  # A list of tuples where each tuple is (speaker, text)
+    # A list of tuples where each tuple is (speaker, text)
+    history: List[Tuple[str, str]]
     temperature: float = 0.0
     max_tokens: int = 256
-
-
-
 
 
 file_processors = {
@@ -95,6 +93,7 @@ file_processors = {
     ".ipynb": process_ipnyb,
 }
 
+
 async def filter_file(file: UploadFile, supabase, vector_store, stats_db):
     if await file_already_exists(supabase, file):
         return {"message": f"🤔 {file.filename} already exists.", "type": "warning"}
@@ -108,17 +107,19 @@ async def filter_file(file: UploadFile, supabase, vector_store, stats_db):
         else:
             return {"message": f"❌ {file.filename} is not supported.", "type": "error"}
 
+
 @app.post("/upload")
 async def upload_file(file: UploadFile):
     message = await filter_file(file, supabase, vector_store, stats_db=None)
     return message
+
 
 @app.post("/chat/")
 async def chat_endpoint(chat_message: ChatMessage):
     history = chat_message.history
     # Logic from your Streamlit app goes here. For example:
 
-    #this overwrites the built-in prompt of the ConversationalRetrievalChain
+    # this overwrites the built-in prompt of the ConversationalRetrievalChain
     ConversationalRetrievalChain.prompts = LANGUAGE_PROMPT
 
     qa = None
@@ -137,9 +138,10 @@ async def chat_endpoint(chat_message: ChatMessage):
 
     return {"history": history}
 
+
 @app.post("/crawl/")
 async def crawl_endpoint(crawl_website: CrawlWebsite):
-    
+
     file_path, file_name = crawl_website.process()
 
     # Create a SpooledTemporaryFile from the file_path
@@ -152,9 +154,11 @@ async def crawl_endpoint(crawl_website: CrawlWebsite):
     message = await filter_file(file, supabase, vector_store, stats_db=None)
     return message
 
+
 @app.get("/explore")
 async def explore_endpoint():
-    response = supabase.table("documents").select("name:metadata->>file_name, size:metadata->>file_size", count="exact").execute()
+    response = supabase.table("documents").select(
+        "name:metadata->>file_name, size:metadata->>file_size", count="exact").execute()
     documents = response.data  # Access the data from the response
     # Convert each dictionary to a tuple of items, then to a set to remove duplicates, and then back to a dictionary
     unique_data = [dict(t) for t in set(tuple(d.items()) for d in documents)]
@@ -163,22 +167,23 @@ async def explore_endpoint():
 
     return {"documents": unique_data}
 
+
 @app.delete("/explore/{file_name}")
 async def delete_endpoint(file_name: str):
-    response = supabase.table("documents").delete().match({"metadata->>file_name": file_name}).execute()
+    response = supabase.table("documents").delete().match(
+        {"metadata->>file_name": file_name}).execute()
     return {"message": f"{file_name} has been deleted."}
+
 
 @app.get("/explore/{file_name}")
 async def download_endpoint(file_name: str):
-    response = supabase.table("documents").select("metadata->>file_name, metadata->>file_size, metadata->>file_extension, metadata->>file_url").match({"metadata->>file_name": file_name}).execute()
+    response = supabase.table("documents").select(
+        "metadata->>file_name, metadata->>file_size, metadata->>file_extension, metadata->>file_url").match({"metadata->>file_name": file_name}).execute()
     documents = response.data
-    ### Returns all documents with the same file name
+    # Returns all documents with the same file name
     return {"documents": documents}
-
 
 
 @app.get("/")
 async def root():
     return {"message": "Hello World"}
-
-
