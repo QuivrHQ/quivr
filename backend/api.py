@@ -147,9 +147,8 @@ async def crawl_endpoint(crawl_website: CrawlWebsite):
 
     # Pass the SpooledTemporaryFile to UploadFile
     file = UploadFile(file=spooled_file, filename=file_name)
-    message = await filter_file(file, supabase, vector_store)
-    print(message)
-    return {"message": message}
+    message = await filter_file(file, supabase, vector_store, stats_db=None)
+    return message
 
 @app.get("/explore")
 async def explore_endpoint():
