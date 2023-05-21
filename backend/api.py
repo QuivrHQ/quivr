@@ -11,6 +11,7 @@ from langchain.llms import OpenAI
 from fastapi.openapi.utils import get_openapi
 from tempfile import SpooledTemporaryFile
 import shutil
+import LANGUAGE_PROMPT
 
 
 from parsers.common import file_already_exists
@@ -66,7 +67,6 @@ class ChatMessage(BaseModel):
 
 
 
-
 file_processors = {
     ".txt": process_txt,
     ".csv": process_csv,
@@ -107,6 +107,10 @@ async def upload_file(file: UploadFile):
 async def chat_endpoint(chat_message: ChatMessage):
     history = chat_message.history
     # Logic from your Streamlit app goes here. For example:
+
+    #this overwrites the built-in prompt of the ConversationalRetrievalChain
+    ConversationalRetrievalChain.prompts = LANGUAGE_PROMPT
+
     qa = None
     if chat_message.model.startswith("gpt"):
         qa = ConversationalRetrievalChain.from_llm(
