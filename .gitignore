@@ -47,3 +47,4 @@ quivr/*
 streamlit-demo/.streamlit/secrets.toml
 .backend_env
 .frontend_env
+backend/pandoc-*
