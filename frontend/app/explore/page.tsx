@@ -28,7 +28,10 @@ export default function ExplorePage() {
 
   return (
     <div className="pt-20 flex flex-col items-center justify-center p-6">
-      <h1 className="text-4xl mb-6">Explore Files</h1>
+      <div className="flex flex-col items-center justify-center">
+        <h1 className="text-3xl font-bold text-center">Explore Your Brain</h1>
+        <h2 className="opacity-50">View what&rsquo;s in your second brain</h2>
+      </div>
       <div className="w-full max-w-xl flex flex-col gap-5">
         {documents.map((document, index) => (
           <DocumentItem key={index} document={document} />
