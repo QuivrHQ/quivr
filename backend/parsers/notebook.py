@@ -3,5 +3,5 @@ from langchain.document_loaders import NotebookLoader
 from fastapi import UploadFile
 
 
-def process_ipnyb(vector_store, file: UploadFile, stats_db):
-    return process_file(vector_store, file, NotebookLoader, "ipynb", stats_db=stats_db)
+def process_ipnyb(file: UploadFile, enable_summarization):
+    return process_file(file, NotebookLoader, "ipynb", enable_summarization)
