@@ -1,20 +1,25 @@
 import { cn } from "@/lib/utils";
-import { FC, HTMLAttributes } from "react";
+import { motion } from "framer-motion";
+import { FC, HTMLAttributes, LegacyRef, forwardRef } from "react";
 
 interface CardProps extends HTMLAttributes<HTMLDivElement> {}
 
-const Card: FC<CardProps> = ({ children, className, ...props }) => {
-  return (
-    <div
-      className={cn(
-        "shadow-md dark:shadow-primary/25 hover:shadow-xl transition-shadow rounded-xl overflow-hidden bg-white dark:bg-black border border-black/10 dark:border-white/25",
-        className
-      )}
-      {...props}
-    >
-      {children}
-    </div>
-  );
-};
+const Card: FC<CardProps> = forwardRef(
+  ({ children, className, ...props }, ref) => {
+    return (
+      <div
+        ref={ref as LegacyRef<HTMLDivElement>}
+        className={cn(
+          "shadow-md dark:shadow-primary/25 hover:shadow-xl transition-shadow rounded-xl overflow-hidden bg-white dark:bg-black border border-black/10 dark:border-white/25",
+          className
+        )}
+        {...props}
+      >
+        {children}
+      </div>
+    );
+  }
+);
 
+export const AnimatedCard = motion(Card);
 export default Card;
