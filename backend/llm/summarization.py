@@ -47,7 +47,7 @@ def llm_evaluate_summaries(question, summaries, model):
 {{#system~}}
 You are a world best evaluator. You evaluate the relevance of summaries based \
 on user input question. Return evaluation in following csv format, csv headers \
-are [summary_id, evaluation, reason].
+are [summary_id,document_id,evaluation,reason].
 Evaluator Task
 - Evaluation should be a score number between 0 and 5.
 - Reason should be a short sentence within 20 words explain why the evaluation.
