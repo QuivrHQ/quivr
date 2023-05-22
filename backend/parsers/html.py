@@ -8,8 +8,8 @@ import os
 from fastapi import UploadFile
 
 
-def process_html(vector_store, file: UploadFile, stats_db):
-    return process_file(vector_store, file, UnstructuredHTMLLoader, ".html", stats_db=stats_db)
+def process_html(file: UploadFile, enable_summarization):
+    return process_file(file, UnstructuredHTMLLoader, ".html", enable_summarization)
 
 
 def get_html(url):
@@ -19,8 +19,10 @@ def get_html(url):
     else:
         return None
 
+
 def slugify(text):
-    text = unicodedata.normalize('NFKD', text).encode('ascii', 'ignore').decode('utf-8')
+    text = unicodedata.normalize('NFKD', text).encode(
+        'ascii', 'ignore').decode('utf-8')
     text = re.sub(r'[^\w\s-]', '', text).strip().lower()
     text = re.sub(r'[-\s]+', '-', text)
     return text
