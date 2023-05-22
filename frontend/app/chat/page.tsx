@@ -28,13 +28,16 @@ export default function ChatPage() {
   const askQuestion = async () => {
     setHistory((hist) => [...hist, ["user", question]]);
     setIsPending(true);
-    const response = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/chat/`, {
-      model,
-      question,
-      history,
-      temperature,
-      max_tokens: maxTokens,
-    });
+    const response = await axios.post(
+      `${process.env.NEXT_PUBLIC_BACKEND_URL}/chat/`,
+      {
+        model,
+        question,
+        history,
+        temperature,
+        max_tokens: maxTokens,
+      }
+    );
     setHistory(response.data.history);
     console.log(response.data.history);
 
@@ -92,6 +95,7 @@ export default function ChatPage() {
                       name="model"
                       id="model"
                       value={model}
+                      className="px-5 py-2 dark:bg-gray-700 bg-gray-200 rounded-md"
                       onChange={(e) => setModel(e.target.value)}
                     >
                       <option value="gpt-3.5-turbo">gpt-3.5-turbo</option>
