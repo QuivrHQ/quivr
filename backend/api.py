@@ -166,7 +166,12 @@ async def explore_endpoint():
 @app.delete("/explore/{file_name}")
 async def delete_endpoint(file_name: str):
     response = supabase.table("documents").delete().match({"metadata->>file_name": file_name}).execute()
-    return {"message": f"{file_name} has been deleted."}
+    
+    return response
+   ## if response.status == 204:
+   #     # Return a success message
+  #      return {"message": f"{file_name} has been deleted."}
+
 
 @app.get("/explore/{file_name}")
 async def download_endpoint(file_name: str):
@@ -180,5 +185,3 @@ async def download_endpoint(file_name: str):
 @app.get("/")
 async def root():
     return {"message": "Hello World"}
-
-

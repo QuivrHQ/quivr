@@ -30,12 +30,27 @@ export default function ExplorePage() {
         setSelectedDocument(document);
     };
 
+const deleteDocument = async (document: { name: string }) => {
+    try {
+        const response = await axios.delete(`http://localhost:5000/explore/${document.name}`);
+        
+        console.log('Delete response:', response);
+
+        if (response.status === 200) {
+            // Refresh the list of documents
+            fetchDocuments();
+        }
+    } catch (error) {
+        console.error('Error deleting document', error);
+    }
+};
+
     return (
         <div className="pt-20 flex flex-col items-center justify-center p-6">
             <h1 className="text-4xl mb-6">Explore Files</h1>
             <div className="overflow-y-auto h-[50vh] w-full max-w-xl">
                 {documents.map((document, index) => (
-                    <DocumentItem key={index} document={document} viewDocument={viewDocument} />
+                    <DocumentItem key={index} document={document} viewDocument={viewDocument} deleteDocument={deleteDocument} />
                 ))}
             </div>
             {selectedDocument && (
@@ -43,7 +58,7 @@ export default function ExplorePage() {
                     <div className="bg-white p-6 w-1/2 h-1/2 overflow-auto rounded-lg">
                         <h2 className="text-2xl mb-4">{selectedDocument.name}</h2>
                         <pre>{JSON.stringify(selectedDocument, null, 2)}</pre>
-                        <button 
+                        <button
                             onClick={() => setSelectedDocument(null)}
                             className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition duration-200"
                         >
