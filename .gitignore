@@ -4,7 +4,7 @@ secondbrain/
 **/*.pyc
 toto.txt
 *.ipynb
-
+log.txt
 
 
 
