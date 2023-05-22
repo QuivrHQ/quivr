@@ -22,4 +22,5 @@ const Card: FC<CardProps> = forwardRef(
 );
 
 export const AnimatedCard = motion(Card);
+AnimatedCard.displayName = "AnimatedCard";
 export default Card;
