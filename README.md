@@ -95,6 +95,8 @@ cp .frontend_env.example frontend/.env
 
 [Migration Script 2](scripts/supabase_usage_table.sql)
 
+[Migration Script 3](scripts/supabase_vector_store_summary.sql)
+
 - **Step 5**: Launch the app
 
 ```bash

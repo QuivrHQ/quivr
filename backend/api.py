@@ -1,19 +1,18 @@
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi import FastAPI, UploadFile, File, HTTPException
 import os
 from pydantic import BaseModel
 from typing import List, Tuple
 from supabase import create_client, Client
-from langchain.embeddings.openai import OpenAIEmbeddings
-from langchain.memory import ConversationBufferMemory
-from langchain.vectorstores import SupabaseVectorStore
-from langchain.chains import ConversationalRetrievalChain
-from langchain.llms import OpenAI
-from fastapi.openapi.utils import get_openapi
 from tempfile import SpooledTemporaryFile
 import shutil
-import LANGUAGE_PROMPT
 import pypandoc
 
+from llm.summarization import llm_evaluate_summaries
+from utils import similarity_search
+from utils import CommonsDep
+from utils import ChatMessage
+from llm.qa import get_qa_llm
 from parsers.common import file_already_exists
 from parsers.txt import process_txt
 from parsers.csv import process_csv
@@ -26,9 +25,10 @@ from parsers.html import process_html
 from parsers.epub import process_epub
 from parsers.audio import process_audio
 from crawl.crawler import CrawlWebsite
+from logger import get_logger
 
+logger = get_logger(__name__)
 
-from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
 
@@ -52,27 +52,6 @@ async def startup_event():
     pypandoc.download_pandoc()
 
 
-supabase_url = os.environ.get("SUPABASE_URL")
-supabase_key = os.environ.get("SUPABASE_SERVICE_KEY")
-openai_api_key = os.environ.get("OPENAI_API_KEY")
-anthropic_api_key = ""
-supabase: Client = create_client(supabase_url, supabase_key)
-embeddings = OpenAIEmbeddings(openai_api_key=openai_api_key)
-vector_store = SupabaseVectorStore(
-    supabase, embeddings, table_name="documents")
-memory = ConversationBufferMemory(
-    memory_key="chat_history", return_messages=True)
-
-
-class ChatMessage(BaseModel):
-    model: str = "gpt-3.5-turbo"
-    question: str
-    # A list of tuples where each tuple is (speaker, text)
-    history: List[Tuple[str, str]]
-    temperature: float = 0.0
-    max_tokens: int = 256
-
-
 file_processors = {
     ".txt": process_txt,
     ".csv": process_csv,
@@ -94,54 +73,59 @@ file_processors = {
 }
 
 
-async def filter_file(file: UploadFile, supabase, vector_store, stats_db):
-    if await file_already_exists(supabase, file):
+async def filter_file(file: UploadFile, enable_summarization: bool, supabase_client: Client):
+    if await file_already_exists(supabase_client, file):
         return {"message": f"🤔 {file.filename} already exists.", "type": "warning"}
     elif file.file._file.tell() < 1:
         return {"message": f"❌ {file.filename} is empty.", "type": "error"}
     else:
         file_extension = os.path.splitext(file.filename)[-1]
         if file_extension in file_processors:
-            await file_processors[file_extension](vector_store, file, stats_db=None)
+            await file_processors[file_extension](file, enable_summarization)
             return {"message": f"✅ {file.filename} has been uploaded.", "type": "success"}
         else:
             return {"message": f"❌ {file.filename} is not supported.", "type": "error"}
 
 
 @app.post("/upload")
-async def upload_file(file: UploadFile):
-    message = await filter_file(file, supabase, vector_store, stats_db=None)
+async def upload_file(commons: CommonsDep, file: UploadFile, enable_summarization: bool = False):
+    message = await filter_file(file, enable_summarization, commons['supabase'])
     return message
 
 
 @app.post("/chat/")
-async def chat_endpoint(chat_message: ChatMessage):
+async def chat_endpoint(commons: CommonsDep, chat_message: ChatMessage):
     history = chat_message.history
-    # Logic from your Streamlit app goes here. For example:
-
-    # this overwrites the built-in prompt of the ConversationalRetrievalChain
-    ConversationalRetrievalChain.prompts = LANGUAGE_PROMPT
-
-    qa = None
-    if chat_message.model.startswith("gpt"):
-        qa = ConversationalRetrievalChain.from_llm(
-            OpenAI(
-                model_name=chat_message.model, openai_api_key=openai_api_key, temperature=chat_message.temperature, max_tokens=chat_message.max_tokens), vector_store.as_retriever(), memory=memory, verbose=True)
-    elif anthropic_api_key and model.startswith("claude"):
-        qa = ConversationalRetrievalChain.from_llm(
-            ChatAnthropic(
-                model=model, anthropic_api_key=anthropic_api_key, temperature=temperature, max_tokens_to_sample=max_tokens), vector_store.as_retriever(), memory=memory, verbose=True, max_tokens_limit=102400)
-
+    qa = get_qa_llm(chat_message)
     history.append(("user", chat_message.question))
-    model_response = qa({"question": chat_message.question})
+
+    if chat_message.use_summarization:
+        # 1. get summaries from the vector store based on question
+        summaries = similarity_search(
+            chat_message.question, table='match_summaries')
+        # 2. evaluate summaries against the question
+        evaluations = llm_evaluate_summaries(
+            chat_message.question, summaries, chat_message.model)
+        # 3. pull in the top documents from summaries
+        logger.info('Evaluations: %s', evaluations)
+        if evaluations:
+            reponse = commons['supabase'].from_('documents').select(
+                '*').in_('id', values=[e['document_id'] for e in evaluations]).execute()
+        # 4. use top docs as additional context
+            additional_context = '---\nAdditional Context={}'.format(
+                '---\n'.join(data['content'] for data in reponse.data)
+            ) + '\n'
+        model_response = qa(
+            {"question": additional_context + chat_message.question})
+    else:
+        model_response = qa({"question": chat_message.question})
     history.append(("assistant", model_response["answer"]))
 
     return {"history": history}
 
 
 @app.post("/crawl/")
-async def crawl_endpoint(crawl_website: CrawlWebsite):
-
+async def crawl_endpoint(commons: CommonsDep, crawl_website: CrawlWebsite, enable_summarization: bool = False):
     file_path, file_name = crawl_website.process()
 
     # Create a SpooledTemporaryFile from the file_path
@@ -151,13 +135,13 @@ async def crawl_endpoint(crawl_website: CrawlWebsite):
 
     # Pass the SpooledTemporaryFile to UploadFile
     file = UploadFile(file=spooled_file, filename=file_name)
-    message = await filter_file(file, supabase, vector_store, stats_db=None)
+    message = await filter_file(file, enable_summarization, commons['supabase'])
     return message
 
 
 @app.get("/explore")
-async def explore_endpoint():
-    response = supabase.table("documents").select(
+async def explore_endpoint(commons: CommonsDep):
+    response = commons['supabase'].table("documents").select(
         "name:metadata->>file_name, size:metadata->>file_size", count="exact").execute()
     documents = response.data  # Access the data from the response
     # Convert each dictionary to a tuple of items, then to a set to remove duplicates, and then back to a dictionary
@@ -169,15 +153,18 @@ async def explore_endpoint():
 
 
 @app.delete("/explore/{file_name}")
-async def delete_endpoint(file_name: str):
-    response = supabase.table("documents").delete().match(
+async def delete_endpoint(commons: CommonsDep, file_name: str):
+    # Cascade delete the summary from the database first, because it has a foreign key constraint
+    commons['supabase'].table("summaries").delete().match(
+        {"metadata->>file_name": file_name}).execute()
+    commons['supabase'].table("documents").delete().match(
         {"metadata->>file_name": file_name}).execute()
     return {"message": f"{file_name} has been deleted."}
 
 
 @app.get("/explore/{file_name}")
-async def download_endpoint(file_name: str):
-    response = supabase.table("documents").select(
+async def download_endpoint(commons: CommonsDep, file_name: str):
+    response = commons['supabase'].table("documents").select(
         "metadata->>file_name, metadata->>file_size, metadata->>file_extension, metadata->>file_url").match({"metadata->>file_name": file_name}).execute()
     documents = response.data
     # Returns all documents with the same file name
