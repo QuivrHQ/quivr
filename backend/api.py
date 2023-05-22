@@ -136,7 +136,7 @@ async def crawl_endpoint(commons: CommonsDep, crawl_website: CrawlWebsite, enabl
     # Pass the SpooledTemporaryFile to UploadFile
     file = UploadFile(file=spooled_file, filename=file_name)
     message = await filter_file(file, enable_summarization, commons['supabase'])
-    return {"message": message}
+    return message
 
 
 @app.get("/explore")
