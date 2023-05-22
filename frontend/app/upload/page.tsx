@@ -39,7 +39,7 @@ export default function UploadPage() {
 
     try {
       const response = await axios.post(
-        "http://localhost:5000/crawl",
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/crawl`,
         config
       );
 
@@ -61,7 +61,7 @@ export default function UploadPage() {
     formData.append("file", file);
     try {
       const response = await axios.post(
-        "http://localhost:5000/upload",
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/upload`,
         formData
       );
 
@@ -121,81 +121,87 @@ export default function UploadPage() {
 
     return (
       <main>
-      <section
-        {...getRootProps()}
-        className="w-full h-full min-h-screen text-center flex flex-col items-center gap-5 pt-32 outline-none"
-      >
-        <div className="flex flex-col items-center justify-center">
-          <h1 className="text-5xl font-bold">Add Knowledge</h1>
-          <h2 className="opacity-50">Upload files to your second brain</h2>
-        </div>
-        <div className="flex justify-center gap-5">  {/* Wrap the cards in a flex container */}
-          <Card className="w-1/2">  {/* Assign a width of 50% to each card */}
-            <input {...getInputProps()} />
-            <div className="text-center mt-2 p-6 max-w-sm w-full flex flex-col gap-5 items-center">
-              {files.length > 0 ? (
-                <AnimatePresence>
-                  {files.map((file, i) => (
-                    <FileComponent
-                      key={file.name + file.size}
-                      file={file}
-                      setFiles={setFiles}
-                    />
-                  ))}
-                </AnimatePresence>
-              ) : null}
-
-              {isDragActive ? (
-                <p className="text-blue-600">Drop the files here...</p>
-              ) : (
-                <button
-                  onClick={open}
-                  className="opacity-50 cursor-pointer hover:opacity-100 hover:underline transition-opacity"
-                >
-                  Drag and drop some files here, or click to browse files
-                </button>
-              )}
-            </div>
-          </Card>
-          <Card className="w-1/2">  {/* Assign a width of 50% to each card */}
-            <div className="text-center mt-2 p-6 max-w-sm w-full flex flex-col gap-5 items-center">
-              <input
-                ref={urlInputRef}
-                type="text"
-                placeholder="Enter a website URL"
-              />
-              <button
-                onClick={crawlWebsite}
-                className="opacity-50 cursor-pointer hover:opacity-100 hover:underline transition-opacity"
-              >
-                Crawl Website
-              </button>
-            </div>
-          </Card>
+        <section
+          {...getRootProps()}
+          className="w-full h-full min-h-screen text-center flex flex-col items-center gap-5 pt-32 outline-none"
+        >
+          <div className="flex flex-col items-center justify-center">
+            <h1 className="text-5xl font-bold">Upload Knowledge</h1>
+            <h2 className="opacity-50">Upload files or crawl websites for your brain</h2>
           </div>
-          <div className="flex flex-col items-center justify-center gap-5">
-            <Button isLoading={isPending} onClick={uploadAllFiles} className="">
-              {isPending ? `Adding - ${files[pendingFileIndex].name}` : "Add"}
-            </Button>
-            <Link href={"/chat"}>
-              <Button variant={"secondary"} className="py-3">
-                Start Chatting with your brain
-              </Button>
-            </Link>
-          </div>
-        </section>
-        {message && (
-              <div
-                className={`fixed bottom-0 inset-x-0 m-4 p-4 max-w-sm mx-auto rounded ${message.type === "success"
-                    ? "bg-green-500"
-                    : message.type === "warning"
-                      ? "bg-yellow-600"
-                      : "bg-red-500"
-                  }`}
-              >
-                <p className="text-white">{message.text}</p>
+          <div className="flex justify-center gap-5">
+            <div className="flex flex-col items-center w-1/2">
+              <Card>
+                <input {...getInputProps()} />
+                <div className="text-center mt-2 p-6 max-w-sm w-full flex flex-col gap-5 items-center">
+                {files.length > 0 ? (
+                  <AnimatePresence>
+                    {files.map((file, i) => (
+                      <FileComponent
+                        key={file.name + file.size}
+                        file={file}
+                        setFiles={setFiles}
+                      />
+                    ))}
+                  </AnimatePresence>
+                ) : null}
+  
+                {isDragActive ? (
+                  <p className="text-blue-600">Drop the files here...</p>
+                ) : (
+                  <button
+                    onClick={open}
+                    className="opacity-50 cursor-pointer hover:opacity-100 hover:underline transition-opacity"
+                  >
+                    Drag and drop files, or click to browse
+                  </button>
+                )}
               </div>
-            )}
+            </Card>
+            <div className="flex justify-center mt-4 mb-8">
+              <Button isLoading={isPending} onClick={uploadAllFiles} className="">
+                {isPending ? `Uploading ${files[pendingFileIndex].name}` : "Add"}
+              </Button>
+            </div>
+          </div>
+
+          <div className="flex flex-col items-center w-1/2">
+            <Card>
+              <div className="text-center mt-2 p-6 max-w-sm w-full flex flex-col gap-5 items-center">
+                <input
+                  ref={urlInputRef}
+                  type="text"
+                  placeholder="Enter a website URL"
+                />
+              </div>
+            </Card>
+            <div className="flex justify-center mt-4 mb-8">
+              <Button isLoading={isPending} onClick={crawlWebsite} className="">
+                Crawl
+              </Button>
+            </div>
+          </div>
+        </div>
+        <div className="flex flex-col items-center justify-center gap-5">
+          <Link href={"/chat"}>
+            <Button variant={"secondary"} className="py-3">
+              Start Chat
+            </Button>
+          </Link>
+        </div>
+      </section>
+        {message && (
+          <div
+            className={`fixed bottom-0 inset-x-0 m-4 p-4 max-w-sm mx-auto rounded ${message.type === "success"
+              ? "bg-green-500"
+              : message.type === "warning"
+              ? "bg-yellow-600"
+              : "bg-red-500"
+            }`}
+          >
+            <p className="text-white">{message.text}</p>
+          </div>
+        )}
       </main>
     );
   }
