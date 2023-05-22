@@ -39,7 +39,7 @@ export default function UploadPage() {
 
     try {
       const response = await axios.post(
-        "http://localhost:5000/crawl",
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/crawl`,
         config
       );
 
