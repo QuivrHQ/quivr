@@ -38,7 +38,7 @@ const Modal: FC<ModalProps> = ({ title, desc, children, Trigger }) => {
                     initial={{ opacity: 0, y: "-40%" }}
                     animate={{ opacity: 1, y: "0%" }}
                     exit={{ opacity: 0, y: "40%" }}
-                    className="w-[90vw] flex flex-col max-w-lg rounded bg-white p-10 shadow-xl focus:outline-none cursor-auto"
+                    className="w-[90vw] flex flex-col max-w-lg rounded-xl bg-white dark:bg-black border border-black/10 dark:border-white/25 p-10 shadow-xl dark:shadow-primary/50 focus:outline-none cursor-auto"
                   >
                     <Dialog.Title className="m-0 text-2xl font-bold">
                       {title}
