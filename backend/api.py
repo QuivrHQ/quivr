@@ -88,7 +88,7 @@ async def filter_file(file: UploadFile, enable_summarization: bool, supabase_cli
 
 
 @app.post("/upload")
-async def upload_file(commons: CommonsDep, file: UploadFile, enable_summarization: bool):
+async def upload_file(commons: CommonsDep, file: UploadFile, enable_summarization: bool = False):
     message = await filter_file(file, enable_summarization, commons['supabase'])
     return message
 
@@ -125,7 +125,7 @@ async def chat_endpoint(commons: CommonsDep, chat_message: ChatMessage):
 
 
 @app.post("/crawl/")
-async def crawl_endpoint(commons: CommonsDep, crawl_website: CrawlWebsite, enable_summarization: bool, summary: str):
+async def crawl_endpoint(commons: CommonsDep, crawl_website: CrawlWebsite, enable_summarization: bool = False):
     file_path, file_name = crawl_website.process()
 
     # Create a SpooledTemporaryFile from the file_path
