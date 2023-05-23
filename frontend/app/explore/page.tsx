@@ -37,7 +37,11 @@ export default function ExplorePage() {
       <div className="w-full max-w-xl flex flex-col gap-5">
         {documents.length !== 0 ? (
           documents.map((document, index) => (
-            <DocumentItem key={index} document={document} />
+            <DocumentItem
+              key={index}
+              document={document}
+              setDocuments={setDocuments}
+            />
           ))
         ) : (
           <div className="flex flex-col items-center justify-center mt-10 gap-1">

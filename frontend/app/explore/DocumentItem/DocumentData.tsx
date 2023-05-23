@@ -25,9 +25,7 @@ const DocumentData = async ({ documentName }: DocumentDataProps) => {
                 <span className="capitalize font-bold">
                   {k.replaceAll("_", " ")}
                 </span>
-                <span className="capitalize">
-                  {documents[0][k] || "Not Available"}
-                </span>
+                <span className="">{documents[0][k] || "Not Available"}</span>
               </div>
             );
           })}
