@@ -10,9 +10,16 @@ interface ModalProps {
   desc: string;
   children?: ReactNode;
   Trigger: ReactNode;
+  CloseTrigger?: ReactNode;
 }
 
-const Modal: FC<ModalProps> = ({ title, desc, children, Trigger }) => {
+const Modal: FC<ModalProps> = ({
+  title,
+  desc,
+  children,
+  Trigger,
+  CloseTrigger,
+}) => {
   const [open, setOpen] = useState(false);
   return (
     <Dialog.Root onOpenChange={setOpen}>
@@ -51,9 +58,13 @@ const Modal: FC<ModalProps> = ({ title, desc, children, Trigger }) => {
                     {children}
 
                     <Dialog.Close asChild>
-                      <Button variant={"secondary"} className="self-end">
-                        Done
-                      </Button>
+                      {CloseTrigger ? (
+                        CloseTrigger
+                      ) : (
+                        <Button variant={"secondary"} className="self-end">
+                          Done
+                        </Button>
+                      )}
                     </Dialog.Close>
 
                     <Dialog.Close asChild>
