@@ -1,6 +1,5 @@
 import requests
 from pydantic import BaseModel
-import requests
 import re
 import unicodedata
 import tempfile
@@ -12,6 +11,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from urllib.parse import urljoin, urlparse
 
+
 class CrawlWebsite(BaseModel):
     url: str
     js: bool = True
@@ -20,9 +20,9 @@ class CrawlWebsite(BaseModel):
     max_time: int = 60
 
     def _crawl(self, url):
-        # parsed_url = urlparse(url)
-        # if parsed_url.scheme not in ["http", "https"]:
-        #     return None
+        parsed_url = urlparse(url)
+        if parsed_url.scheme not in ["http", "https"]:
+            return None
 
         if self.js:
             # Configure Selenium with Chrome options
@@ -54,7 +54,6 @@ class CrawlWebsite(BaseModel):
 
         return content
 
-
     def process(self):
         visited_urls = set()
         queue = []
@@ -69,13 +68,12 @@ class CrawlWebsite(BaseModel):
 
             # Extract links from the initial page
             links = self._extract_links(initial_content, self.url)
-            print(links)
 
             # Add links to the queue
             queue.extend([(link, 1) for link in links])
 
-        while links and crawled_pages < self.max_pages:
-            url, depth = links.pop(0)
+        while queue and crawled_pages < self.max_pages:
+            url, depth = queue.pop(0)
 
             if url in visited_urls or depth > self.depth:
                 continue
@@ -91,14 +89,19 @@ class CrawlWebsite(BaseModel):
                 links = self._extract_links(content, url)
 
                 # Add links to the queue for further crawling
-                # queue.extend([(link, depth + 1) for link in links])
+                queue.extend([(link, depth + 1) for link in links])
+
+                # Add the content of linked pages to the main content
+                for link in links:
+                    linked_content = self._crawl(link)
+                    if linked_content:
+                        all_content += linked_content
 
         # Create a file
         file_name = slugify(self.url) + ".html"
         temp_file_path = os.path.join(tempfile.gettempdir(), file_name)
         with open(temp_file_path, 'w') as temp_file:
             temp_file.write(all_content)
-            # Process the file
 
         return temp_file_path, file_name
 
@@ -122,3 +125,10 @@ def slugify(text):
     text = re.sub(r'[^\w\s-]', '', text).strip().lower()
     text = re.sub(r'[-\s]+', '-', text)
     return text
+
+
+if __name__ == "__main__":
+    crawler = CrawlWebsite(url="https://www.cre8ion.com")
+    result = crawler.process()
+    print("Temporary file path:", result[0])
+    print("File name:", result[1])
