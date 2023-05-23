@@ -6,6 +6,7 @@ import Button from "../components/ui/Button";
 import Modal from "../components/ui/Modal";
 import { MdSettings } from "react-icons/md";
 import ChatMessages from "./ChatMessages";
+import PageHeading from "../components/ui/PageHeading";
 
 export default function ChatPage() {
   const [question, setQuestion] = useState("");
@@ -46,15 +47,13 @@ export default function ChatPage() {
   };
 
   return (
-    <div className="min-h-screen w-full pt-24 flex flex-col">
-      <div className="flex flex-col justify-center items-center flex-1 gap-5 h-full">
+    <main className="min-h-screen w-full flex flex-col pt-20">
+      <section className="flex flex-col justify-center items-center flex-1 gap-5 h-full">
+        <PageHeading
+          title="Chat with your brain"
+          subtitle="Your AI assistant"
+        />
         {/* Chat */}
-        <div className="flex flex-col items-center justify-center">
-          <h1 className="text-3xl font-bold text-center">
-            Chat with your brain
-          </h1>
-          <h2 className="opacity-50">Your AI assistant</h2>
-        </div>
         <Card className="p-5 max-w-3xl w-full min-h-full flex-1 mb-24">
           <ChatMessages history={history} />
           <Card className="fixed left-1/2 w-full max-w-3xl bg-gray-100 dark:bg-gray-800 rounded-b-none -translate-x-1/2 bottom-0 px-5 py-5">
@@ -137,9 +136,7 @@ export default function ChatPage() {
             </form>
           </Card>
         </Card>
-
-        {/* Settings Modal */}
-      </div>
-    </div>
+      </section>
+    </main>
   );
 }
