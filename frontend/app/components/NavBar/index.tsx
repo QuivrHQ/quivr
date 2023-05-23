@@ -47,7 +47,7 @@ const NavBar: FC<NavBarProps> = ({}) => {
           />
           <h1 className="font-bold">Quivr</h1>
         </Link>
-        {process.env.ENV === "local" ? (
+        {process.env.NEXT_PUBLIC_ENV === "local" ? (
           <ul className="flex gap-4 text-sm flex-1">
             <li>
               <Link href={"/upload"}>Upload</Link>
