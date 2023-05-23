@@ -35,10 +35,10 @@ const DocumentItem = ({ document, setDocuments }: DocumentProps) => {
       initial={{ x: -64, opacity: 0 }}
       animate={{ x: 0, opacity: 1 }}
       exit={{ x: 64, opacity: 0 }}
-      className="flex items-center justify-between w-full p-5 gap-10"
+      className="flex flex-col sm:flex-row sm:items-center justify-between w-full p-5 gap-5"
     >
       <p className="text-lg leading-tight max-w-sm">{document.name}</p>
-      <div className="flex gap-2">
+      <div className="flex gap-2 self-end">
         {/* VIEW MODAL */}
         <Modal
           title={document.name}
