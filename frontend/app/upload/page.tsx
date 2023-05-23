@@ -9,7 +9,6 @@ import { AnimatePresence, motion } from "framer-motion";
 import Link from "next/link";
 import Card from "../components/ui/Card";
 
-
 export default function UploadPage() {
   const [message, setMessage] = useState<Message | null>(null);
   const [isPending, setIsPending] = useState(false);
@@ -20,7 +19,7 @@ export default function UploadPage() {
   const crawlWebsite = useCallback(async () => {
     // Validate URL
     const url = urlInputRef.current ? urlInputRef.current.value : null;
-    if (!url || !isValidUrl(url)) {  // Assuming you have a function to validate URLs
+    if (!url || !isValidUrl(url)) {
       setMessage({
         type: "error",
         text: "Invalid URL"
@@ -55,7 +54,6 @@ export default function UploadPage() {
     }
   }, []);
 
-
   const upload = useCallback(async (file: File) => {
     const formData = new FormData();
     formData.append("file", file);
@@ -69,9 +67,14 @@ export default function UploadPage() {
         type: response.data.type,
         text:
           (response.data.type === "success"
-            ? "File uploaded successfully: "
+            ? ""
             : "") + JSON.stringify(response.data.message),
       });
+
+      // Remove the file from the list after uploading
+      setFiles((files) =>
+        files.filter((f) => f.name !== file.name || f.size !== file.size)
+      );
     } catch (error: any) {
       setMessage({
         type: "error",
@@ -79,8 +82,6 @@ export default function UploadPage() {
       });
     }
   }, []);
-
-  
 
     const onDrop = (acceptedFiles: File[], fileRejections: FileRejection[]) => {
       if (fileRejections.length > 0) {
@@ -119,18 +120,18 @@ export default function UploadPage() {
       maxSize: 100000000, // 1 MB
     });
 
-    return (
-      <main>
+  return (
+    <main>
       <section
         {...getRootProps()}
         className="w-full h-full min-h-screen text-center flex flex-col items-center gap-5 pt-32 outline-none"
       >
         <div className="flex flex-col items-center justify-center">
-          <h1 className="text-5xl font-bold">Add Knowledge</h1>
-          <h2 className="opacity-50">Upload files to your second brain</h2>
+          <h1 className="text-5xl font-bold">Upload Knowledge</h1>
+          <h2 className="opacity-50">Upload document, video, and audio files, or crawl a website</h2>
         </div>
-        <div className="flex justify-center gap-5">  {/* Wrap the cards in a flex container */}
-          <Card className="w-1/2">  {/* Assign a width of 50% to each card */}
+        <div className="flex justify-center gap-5">
+          <Card className="w-1/2">
             <input {...getInputProps()} />
             <div className="text-center mt-2 p-6 max-w-sm w-full flex flex-col gap-5 items-center">
               {files.length > 0 ? (
@@ -152,53 +153,63 @@ export default function UploadPage() {
                   onClick={open}
                   className="opacity-50 cursor-pointer hover:opacity-100 hover:underline transition-opacity"
                 >
-                  Drag and drop some files here, or click to browse files
+                  Drag and drop files, or click to browse
                 </button>
               )}
             </div>
           </Card>
-          <Card className="w-1/2">  {/* Assign a width of 50% to each card */}
+          <div className="flex flex-col items-center justify-center gap-5">
+              <Button
+                isLoading={isPending}
+                onClick={uploadAllFiles}
+                className=""
+              >
+                {isPending
+                  ? `Uploading ${files[pendingFileIndex].name}`
+                  : "Add"}
+              </Button>
+            </div>
+          <Card className="w-1/2">
             <div className="text-center mt-2 p-6 max-w-sm w-full flex flex-col gap-5 items-center">
               <input
                 ref={urlInputRef}
                 type="text"
                 placeholder="Enter a website URL"
               />
-              <button
-                onClick={crawlWebsite}
-                className="opacity-50 cursor-pointer hover:opacity-100 hover:underline transition-opacity"
-              >
-                Crawl Website
-              </button>
             </div>
           </Card>
-          </div>
           <div className="flex flex-col items-center justify-center gap-5">
-            <Button isLoading={isPending} onClick={uploadAllFiles} className="">
-              {isPending ? `Adding - ${files[pendingFileIndex].name}` : "Add"}
-            </Button>
-            <Link href={"/chat"}>
-              <Button variant={"secondary"} className="py-3">
-                Start Chatting with your brain
-              </Button>
-            </Link>
-          </div>
-        </section>
-        {message && (
-              <div
-                className={`fixed bottom-0 inset-x-0 m-4 p-4 max-w-sm mx-auto rounded ${message.type === "success"
-                    ? "bg-green-500"
-                    : message.type === "warning"
-                      ? "bg-yellow-600"
-                      : "bg-red-500"
-                  }`}
+              <Button
+                isLoading={isPending}
+                onClick={crawlWebsite}
+                className=""
               >
-                <p className="text-white">{message.text}</p>
-              </div>
-            )}
-      </main>
-    );
-  }
+                {isPending ? `Crawling ${urlInputRef.current?.value}` : "Crawl"}
+              </Button>
+            </div>
+        </div>
+        <Link href={"/chat"}>
+          <Button variant={"secondary"} className="py-3">
+            Start Chat
+          </Button>
+        </Link>
+      </section>
+      {message && (
+        <div
+          className={`fixed bottom-0 inset-x-0 m-4 p-4 max-w-sm mx-auto rounded ${
+            message.type === "success"
+              ? "bg-green-500"
+              : message.type === "warning"
+              ? "bg-yellow-600"
+              : "bg-red-500"
+          }`}
+        >
+          <p className="text-white">{message.text}</p>
+        </div>
+      )}
+    </main>
+  );
+}
 
 const FileComponent = ({
     file,
