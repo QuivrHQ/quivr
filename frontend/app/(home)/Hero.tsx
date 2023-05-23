@@ -24,7 +24,7 @@ const Hero: FC<HeroProps> = ({}) => {
     return "sticky";
   });
 
-  const videoScaleSync = useTransform(scrollYProgress, [0, 0.5], [0.9, 0.95]);
+  const videoScaleSync = useTransform(scrollYProgress, [0, 0.5], [0.9, 1]);
   const videoScale = useSpring(videoScaleSync, { mass: 0.1, stiffness: 100 });
 
   const opacitySync = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
@@ -39,10 +39,10 @@ const Hero: FC<HeroProps> = ({}) => {
         style={{ scale, opacity, position }}
         className="top-24 -z-0 flex flex-col gap-2 items-center justify-center pt-24"
       >
-        <h1 className="text-7xl font-bold max-w-xl">
+        <h1 className="text-5xl sm:text-7xl font-bold max-w-lg sm:max-w-xl">
           Get a Second Brain with <span className="text-primary">Quivr</span>
         </h1>
-        <p className="text-base max-w-sm text-gray-500 mb-10">
+        <p className="text-base max-w-sm text-gray-500 mb-5 sm:mb-10">
           Quivr is your second brain in the cloud, designed to easily store and
           retrieve unstructured information.
         </p>
