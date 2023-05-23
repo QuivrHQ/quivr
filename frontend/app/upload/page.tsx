@@ -10,12 +10,14 @@ import Link from "next/link";
 import Card from "../components/ui/Card";
 import PageHeading from "../components/ui/PageHeading";
 
+
 export default function UploadPage() {
   const [message, setMessage] = useState<Message | null>(null);
   const [isPending, setIsPending] = useState(false);
   const [files, setFiles] = useState<File[]>([]);
   const [pendingFileIndex, setPendingFileIndex] = useState<number>(0);
   const urlInputRef = useRef<HTMLInputElement | null>(null);
+  const [allFilesUploaded, setAllFilesUploaded] = useState(false);
 
   const crawlWebsite = useCallback(async () => {
     // Validate URL
@@ -102,13 +104,28 @@ export default function UploadPage() {
   const uploadAllFiles = async () => {
     setIsPending(true);
     setMessage(null);
-    // files.forEach((file) => upload(file));
+
+    // Check if a URL is provided
+    const url = urlInputRef.current ? urlInputRef.current.value : null;
+    if (url && isValidUrl(url)) {
+      await crawlWebsite();
+    }
+
+    // Upload files
     for (const file of files) {
       await upload(file);
       setPendingFileIndex((i) => i + 1);
     }
     setPendingFileIndex(0);
     setIsPending(false);
+
+    // Show notification for all files uploaded
+    if (files.length > 0) {
+      setAllFilesUploaded(true);
+      setTimeout(() => {
+        setAllFilesUploaded(false);
+      }, 3000);
+    }
   };
 
   const { getRootProps, getInputProps, isDragActive, open } = useDropzone({
@@ -125,8 +142,8 @@ export default function UploadPage() {
         className="w-full outline-none pt-20 flex flex-col gap-5 items-center justify-center p-6"
       >
         <PageHeading
-          title="Add Knowledge"
-          subtitle="Upload files to your second brain"
+          title="Upload Knowledge"
+          subtitle="Add text, document, spreadsheet, presentation, video, and audio files."
         />
         {/* Wrap the cards in a flex container */}
         <div className="flex justify-center gap-5">
@@ -153,7 +170,7 @@ export default function UploadPage() {
                   onClick={open}
                   className="opacity-50 cursor-pointer hover:opacity-100 hover:underline transition-opacity"
                 >
-                  Drag and drop some files here, or click to browse files
+                  Drag and drop files, or click to browse
                 </button>
               )}
             </div>
@@ -167,12 +184,6 @@ export default function UploadPage() {
                 placeholder="Enter a website URL"
                 className="dark:bg-black"
               />
-              <button
-                onClick={crawlWebsite}
-                className="opacity-50 cursor-pointer hover:opacity-100 hover:underline transition-opacity"
-              >
-                Crawl Website
-              </button>
             </div>
           </Card>
         </div>
@@ -182,7 +193,7 @@ export default function UploadPage() {
           </Button>
           <Link href={"/chat"}>
             <Button variant={"secondary"} className="py-3">
-              Start Chatting with your brain
+              Start Chat
             </Button>
           </Link>
         </div>
@@ -198,11 +209,21 @@ export default function UploadPage() {
           }`}
         >
           <p className="text-white">{message.text}</p>
+          {message.type === "success" &&
+            setTimeout(() => {
+              setMessage(null);
+            }, 3000)}
+        </div>
+      )}
+      {allFilesUploaded && (
+        <div className="fixed bottom-0 inset-x-0 m-4 p-4 max-w-sm mx-auto rounded bg-green-500">
+          <p className="text-white">All files uploaded.</p>
         </div>
       )}
     </main>
   );
 }
+
 
 const FileComponent = ({
   file,
