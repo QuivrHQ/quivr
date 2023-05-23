@@ -1,5 +1,5 @@
 "use client";
-import { Dispatch, SetStateAction, useCallback, useState, useRef } from "react";
+import { Dispatch, SetStateAction, useCallback, useState, useRef, useEffect } from "react";
 import { FileRejection, useDropzone } from "react-dropzone";
 import axios from "axios";
 import { Message } from "@/lib/types";
@@ -18,6 +18,23 @@ export default function UploadPage() {
   const [pendingFileIndex, setPendingFileIndex] = useState<number>(0);
   const urlInputRef = useRef<HTMLInputElement | null>(null);
   const [allFilesUploaded, setAllFilesUploaded] = useState(false);
+  const [hideMessageTimeout, setHideMessageTimeout] = useState<NodeJS.Timeout | null>(null);
+
+  useEffect(() => {
+    if (message && message.type === "success") {
+      setHideMessageTimeout(
+        setTimeout(() => {
+          setMessage(null);
+        }, 3000)
+      );
+    }
+    return () => {
+      if (hideMessageTimeout) {
+        clearTimeout(hideMessageTimeout);
+      }
+    };
+  }, [message]);
+
 
   const crawlWebsite = useCallback(async () => {
     // Validate URL
@@ -189,7 +206,7 @@ export default function UploadPage() {
         </div>
         <div className="flex flex-col items-center justify-center gap-5">
           <Button isLoading={isPending} onClick={uploadAllFiles} className="">
-            {isPending ? `Adding - ${files[pendingFileIndex].name}` : "Add"}
+            {isPending ? `Uploading ${files[pendingFileIndex].name}` : "Add"}
           </Button>
           <Link href={"/chat"}>
             <Button variant={"secondary"} className="py-3">
@@ -199,21 +216,18 @@ export default function UploadPage() {
         </div>
       </section>
       {message && (
-        <div
-          className={`fixed bottom-0 inset-x-0 m-4 p-4 max-w-sm mx-auto rounded ${
-            message.type === "success"
-              ? "bg-green-500"
-              : message.type === "warning"
-              ? "bg-yellow-600"
-              : "bg-red-500"
-          }`}
-        >
-          <p className="text-white">{message.text}</p>
-          {message.type === "success" &&
-            setTimeout(() => {
-              setMessage(null);
-            }, 3000)}
-        </div>
+<div
+  className={`fixed bottom-0 inset-x-0 m-4 p-4 max-w-sm mx-auto rounded ${
+    message.type === "success"
+      ? "bg-green-500"
+      : message.type === "warning"
+      ? "bg-yellow-600"
+      : "bg-red-500"
+  }`}
+>
+  <p className="text-white">{message.text}</p>
+</div>
+
       )}
       {allFilesUploaded && (
         <div className="fixed bottom-0 inset-x-0 m-4 p-4 max-w-sm mx-auto rounded bg-green-500">
