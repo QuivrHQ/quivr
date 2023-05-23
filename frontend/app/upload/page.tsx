@@ -165,6 +165,7 @@ export default function UploadPage() {
                 ref={urlInputRef}
                 type="text"
                 placeholder="Enter a website URL"
+                className="dark:bg-black"
               />
               <button
                 onClick={crawlWebsite}
