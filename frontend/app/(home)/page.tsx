@@ -1,3 +1,4 @@
+import Features from "./Features";
 import Hero from "./Hero";
 import { redirect } from "next/navigation";
 
@@ -9,6 +10,7 @@ export default function HomePage() {
   return (
     <main className="">
       <Hero />
+      <Features />
     </main>
   );
 }
