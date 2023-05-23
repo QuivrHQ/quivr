@@ -35,7 +35,7 @@ export default function ExplorePage() {
 
   return (
     <div className="pt-20 flex flex-col items-center justify-center p-6">
-      <div className="flex flex-col items-center justify-center">
+      <div className="flex flex-col items-center justify-center my-10">
         <h1 className="text-3xl font-bold text-center">Explore Your Brain</h1>
         <h2 className="opacity-50">View what&rsquo;s in your second brain</h2>
       </div>
