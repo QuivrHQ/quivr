@@ -1,10 +1,11 @@
 "use client";
-import { Document } from "./types";
-import Button from "../components/ui/Button";
-import Modal from "../components/ui/Modal";
-import { AnimatedCard } from "../components/ui/Card";
-import { useState } from "react";
+import { Document } from "../types";
+import Button from "../../components/ui/Button";
+import Modal from "../../components/ui/Modal";
+import { AnimatedCard } from "../../components/ui/Card";
+import { Suspense, useState } from "react";
 import axios from "axios";
+import DocumentData from "./DocumentData";
 
 interface DocumentProps {
   document: Document;
@@ -39,9 +40,13 @@ const DocumentItem = ({ document }: DocumentProps) => {
           desc={""}
           Trigger={<Button className="">View</Button>}
         >
-          <div className="bg-white py-10 w-full h-1/2 overflow-auto rounded-lg prose">
+          {/* <div className="bg-white py-10 w-full h-1/2 overflow-auto rounded-lg prose">
             <pre>{JSON.stringify(document, null, 2)}</pre>
-          </div>
+          </div> */}
+          <Suspense fallback="Loading...">
+            {/* @ts-expect-error */}
+            <DocumentData documentName={document.name} />
+          </Suspense>
         </Modal>
         <Modal
           title={"Confirm"}
