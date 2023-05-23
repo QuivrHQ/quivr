@@ -3,15 +3,17 @@ import { Document } from "../types";
 import Button from "../../components/ui/Button";
 import Modal from "../../components/ui/Modal";
 import { AnimatedCard } from "../../components/ui/Card";
-import { Suspense, useState } from "react";
+import { Dispatch, SetStateAction, Suspense, useState } from "react";
 import axios from "axios";
 import DocumentData from "./DocumentData";
+import Spinner from "@/app/components/ui/Spinner";
 
 interface DocumentProps {
   document: Document;
+  setDocuments: Dispatch<SetStateAction<Document[]>>;
 }
 
-const DocumentItem = ({ document }: DocumentProps) => {
+const DocumentItem = ({ document, setDocuments }: DocumentProps) => {
   const [isDeleting, setIsDeleting] = useState(false);
 
   const deleteDocument = async (name: string) => {
@@ -21,6 +23,7 @@ const DocumentItem = ({ document }: DocumentProps) => {
       const response = await axios.delete(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/explore/${name}`
       );
+      setDocuments((docs) => docs.filter((doc) => doc.name !== name)); // Optimistic update
     } catch (error) {
       console.error(`Error deleting ${name}`, error);
     }
@@ -35,19 +38,19 @@ const DocumentItem = ({ document }: DocumentProps) => {
     >
       <p className="text-lg leading-tight max-w-sm">{document.name}</p>
       <div className="flex gap-2">
+        {/* VIEW MODAL */}
         <Modal
           title={document.name}
           desc={""}
           Trigger={<Button className="">View</Button>}
         >
-          {/* <div className="bg-white py-10 w-full h-1/2 overflow-auto rounded-lg prose">
-            <pre>{JSON.stringify(document, null, 2)}</pre>
-          </div> */}
-          <Suspense fallback="Loading...">
+          <Suspense fallback={<Spinner />}>
             {/* @ts-expect-error */}
             <DocumentData documentName={document.name} />
           </Suspense>
         </Modal>
+
+        {/* DELETE MODAL */}
         <Modal
           title={"Confirm"}
           desc={`Do you really want to delete?`}
