@@ -1,15 +1,41 @@
+"use client";
 import Image from "next/image";
-import { FC } from "react";
+import { FC, useEffect, useRef, useState } from "react";
 import logo from "../../logo.png";
 import Link from "next/link";
 import Button from "../ui/Button";
 import DarkModeToggle from "./DarkModeToggle";
+import { motion } from "framer-motion";
 
 interface NavBarProps {}
 
 const NavBar: FC<NavBarProps> = ({}) => {
+  const scrollPos = useRef<number>(0);
+  const [hidden, setHidden] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = (e: Event) => {
+      const target = e.currentTarget as Window;
+      if (target.scrollY > scrollPos.current && !hidden) {
+        setHidden(true);
+      } else {
+        setHidden(false);
+      }
+      scrollPos.current = target.scrollY;
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   return (
-    <header className="fixed top-0 w-full border-b border-b-black/10 dark:border-b-white/25 bg-white/50 dark:bg-black/50 bg-opacity-0 backdrop-blur-md z-50">
+    <motion.header
+      animate={{
+        y: hidden ? "-100%" : "0%",
+        transition: { ease: "circOut" },
+      }}
+      className="fixed top-0 w-full border-b border-b-black/10 dark:border-b-white/25 bg-white dark:bg-black z-50"
+    >
       <nav className="max-w-screen-xl mx-auto py-1 flex items-center gap-8">
         <Link href={"/"} className="flex items-center gap-4">
           <Image
@@ -51,7 +77,7 @@ const NavBar: FC<NavBarProps> = ({}) => {
           <DarkModeToggle />
         </div>
       </nav>
-    </header>
+    </motion.header>
   );
 };
 
