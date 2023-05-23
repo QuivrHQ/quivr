@@ -34,6 +34,7 @@ const DocumentItem = ({ document, setDocuments }: DocumentProps) => {
     <AnimatedCard
       initial={{ x: -64, opacity: 0 }}
       animate={{ x: 0, opacity: 1 }}
+      exit={{ x: 64, opacity: 0 }}
       className="flex items-center justify-between w-full p-5 gap-10"
     >
       <p className="text-lg leading-tight max-w-sm">{document.name}</p>
