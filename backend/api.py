@@ -170,6 +170,14 @@ async def download_endpoint(commons: CommonsDep, file_name: str):
     # Returns all documents with the same file name
     return {"documents": documents}
 
+@app.post("/register")
+async def register(commons: CommonsDep, email: str, password: str):
+    response = commons['supabase'].auth.sign_up({
+        'email': email,
+        'password': password
+    })
+    return "true"
+
 
 @app.get("/")
 async def root():
