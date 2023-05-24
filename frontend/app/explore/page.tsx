@@ -7,10 +7,13 @@ import Button from "../components/ui/Button";
 import Link from "next/link";
 import Spinner from "../components/ui/Spinner";
 import { AnimatePresence } from "framer-motion";
+import { useSupabase } from "../supabase-provider";
+
 
 export default function ExplorePage() {
   const [documents, setDocuments] = useState<Document[]>([]);
   const [isPending, setIsPending] = useState(true);
+  const { supabase, session } = useSupabase();
 
   useEffect(() => {
     fetchDocuments();

@@ -1,10 +1,12 @@
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi import FastAPI, UploadFile, File, HTTPException
+from fastapi import FastAPI, UploadFile, File, HTTPException, Header, Depends
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 import os
 from pydantic import BaseModel
-from typing import List, Tuple
+from typing import List, Tuple, Annotated
 from supabase import create_client, Client
 from tempfile import SpooledTemporaryFile
+from auth_bearer import JWTBearer
 import shutil
 import pypandoc
 
@@ -87,9 +89,16 @@ async def filter_file(file: UploadFile, enable_summarization: bool, supabase_cli
             return {"message": f"❌ {file.filename} is not supported.", "type": "error"}
 
 
-@app.post("/upload")
-async def upload_file(commons: CommonsDep, file: UploadFile, enable_summarization: bool = False):
+
+@app.post("/upload", dependencies=[Depends(JWTBearer())])
+async def upload_file(commons: CommonsDep, file: UploadFile, enable_summarization: bool = False,
+    authorization: Annotated[str | None, Header()] = None):
+    ## Get the headers from the request 
+    print("#####")
+    print(authorization)
+    print("######")
     message = await filter_file(file, enable_summarization, commons['supabase'])
+
     return message
 
 
