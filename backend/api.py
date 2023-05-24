@@ -1,31 +1,32 @@
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi import FastAPI, UploadFile, File, HTTPException
 import os
-from pydantic import BaseModel
-from typing import List, Tuple
-from supabase import create_client, Client
-from tempfile import SpooledTemporaryFile
 import shutil
-import pypandoc
+from configparser import ConfigParser
+from tempfile import SpooledTemporaryFile
+from typing import List, Tuple
 
-from llm.summarization import llm_evaluate_summaries
-from utils import similarity_search
-from utils import CommonsDep
-from utils import ChatMessage
+import jwt
+import pypandoc
+from crawl.crawler import CrawlWebsite
+from fastapi import Depends, FastAPI, File, HTTPException, UploadFile,Response, status
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.security import HTTPBearer
 from llm.qa import get_qa_llm
+from llm.summarization import llm_evaluate_summaries
+from logger import get_logger
+from parsers.audio import process_audio
 from parsers.common import file_already_exists
-from parsers.txt import process_txt
 from parsers.csv import process_csv
 from parsers.docx import process_docx
-from parsers.pdf import process_pdf
-from parsers.notebook import process_ipnyb
-from parsers.markdown import process_markdown
-from parsers.powerpoint import process_powerpoint
-from parsers.html import process_html
 from parsers.epub import process_epub
-from parsers.audio import process_audio
-from crawl.crawler import CrawlWebsite
-from logger import get_logger
+from parsers.html import process_html
+from parsers.markdown import process_markdown
+from parsers.notebook import process_ipnyb
+from parsers.pdf import process_pdf
+from parsers.powerpoint import process_powerpoint
+from parsers.txt import process_txt
+from pydantic import BaseModel
+from supabase import Client, create_client
+from utils import ChatMessage, CommonsDep, similarity_search
 
 logger = get_logger(__name__)
 
@@ -46,6 +47,63 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Scheme for the Authorization header
+token_auth_scheme = HTTPBearer()  # 👈 new code
+
+
+def set_up():
+    """Sets up configuration for the app"""
+
+    env = os.getenv("ENV", ".config")
+
+    if env == ".config":
+        config = ConfigParser()
+        config.read(".config")
+        config = config["AUTH0"]
+    else:
+        config = {
+            "DOMAIN": os.getenv("DOMAIN", "your.domain.com"),
+            "API_AUDIENCE": os.getenv("API_AUDIENCE", "your.audience.com"),
+            "ISSUER": os.getenv("ISSUER", "https://your.domain.com/"),
+            "ALGORITHMS": os.getenv("ALGORITHMS", "RS256"),
+        }
+    return config
+class VerifyToken():
+    """Does all the token verification using PyJWT"""
+
+    def __init__(self, token):
+        self.token = token
+        self.config = set_up()
+        print(token)
+
+        # This gets the JWKS from a given URL and does processing so you can
+        # use any of the keys available
+        jwks_url = f'https://{self.config["DOMAIN"]}/.well-known/jwks.json'
+        self.jwks_client = jwt.PyJWKClient(jwks_url)
+
+    def verify(self):
+        # This gets the 'kid' from the passed token
+        try:
+            self.signing_key = self.jwks_client.get_signing_key_from_jwt(
+                self.token
+            ).key
+        except jwt.exceptions.PyJWKClientError as error:
+            return {"status": "error", "msg": error.__str__()}
+        except jwt.exceptions.DecodeError as error:
+            return {"status": "error", "msg": error.__str__()}
+
+        try:
+            payload = jwt.decode(
+                self.token,
+                self.signing_key,
+                algorithms=self.config["ALGORITHMS"],
+                audience=self.config["API_AUDIENCE"],
+                issuer=self.config["ISSUER"],
+            )
+        except Exception as e:
+            return {"status": "error", "message": str(e)}
+
+        return payload
 
 @app.on_event("startup")
 async def startup_event():
@@ -86,6 +144,20 @@ async def filter_file(file: UploadFile, enable_summarization: bool, supabase_cli
         else:
             return {"message": f"❌ {file.filename} is not supported.", "type": "error"}
 
+
+@app.get("/private")
+def private(response: Response, token: str = Depends(token_auth_scheme)):  # 👈 updated code
+    """A valid access token is required to access this route"""
+ 
+    result = VerifyToken(token.credentials).verify()  # 👈 updated code
+
+    # 👇 new code
+    if result.get("status"):
+       response.status_code = status.HTTP_400_BAD_REQUEST
+       return result
+    # 👆 new code
+ 
+    return result
 
 @app.post("/upload")
 async def upload_file(commons: CommonsDep, file: UploadFile, enable_summarization: bool = False):

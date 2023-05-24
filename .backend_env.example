@@ -2,3 +2,8 @@ SUPABASE_URL="XXXXX"
 SUPABASE_SERVICE_KEY="eyXXXXX"
 OPENAI_API_KEY="sk-XXXXXX"
 ANTHROPIC_API_KEY="XXXXXX"
+[AUTH0]
+DOMAIN = your.domain.auth0.com
+API_AUDIENCE = your.api.audience
+ALGORITHMS = RS256
+ISSUER = https://your.domain.auth0.com/
