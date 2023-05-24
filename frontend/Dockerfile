@@ -1,4 +1,8 @@
 FROM node:18-alpine
+# Install Python and essential build tools
+RUN apk add --update --no-cache python3 make g++ && ln -sf python3 /usr/bin/python
+RUN python3 -m ensurepip
+RUN pip3 install --no-cache --upgrade pip setuptools
 
 # Create the directory on the node image 
 # where our Next.js app will live
@@ -9,13 +13,13 @@ WORKDIR /app
 
 # Copy package.json and package-lock.json
 # to the /app working directory
-COPY package*.json /app/
+COPY package*.json ./
 
 # Install dependencies in /app
 RUN yarn install
 
 # Copy the rest of our Next.js folder into /app
-COPY . /app/
+COPY . .
 
 # Ensure port 3000 is accessible to our system
 EXPOSE 3000
