@@ -60,8 +60,6 @@ async def process_audio(upload_file: UploadFile, stats_db):
 
     text_splitter = RecursiveCharacterTextSplitter.from_tiktoken_encoder(
         chunk_size=chunk_size, chunk_overlap=chunk_overlap)
-    print(transcript)
-    print("#########")
     texts = text_splitter.split_text(transcript)
 
     docs_with_metadata = [Document(page_content=text, metadata={"file_sha1": file_sha, "file_size": file_size, "file_name": file_meta_name,

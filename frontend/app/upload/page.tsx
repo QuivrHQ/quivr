@@ -9,6 +9,8 @@ import { AnimatePresence, motion } from "framer-motion";
 import Link from "next/link";
 import Card from "../components/ui/Card";
 import PageHeading from "../components/ui/PageHeading";
+import { useSupabase } from "../supabase-provider";
+import { redirect } from "next/navigation";
 
 export default function UploadPage() {
   const [message, setMessage] = useState<Message | null>(null);
@@ -16,6 +18,10 @@ export default function UploadPage() {
   const [files, setFiles] = useState<File[]>([]);
   const [pendingFileIndex, setPendingFileIndex] = useState<number>(0);
   const urlInputRef = useRef<HTMLInputElement | null>(null);
+  const { supabase, session } = useSupabase()
+  if (session === null) {
+    redirect('/login')
+  }
 
   const crawlWebsite = useCallback(async () => {
     // Validate URL
@@ -41,7 +47,12 @@ export default function UploadPage() {
     try {
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/crawl`,
-        config
+        config,
+        {
+          headers: {
+            'Authorization': `Bearer ${session.access_token}`,
+          },
+        }
       );
 
       setMessage({
@@ -62,7 +73,12 @@ export default function UploadPage() {
     try {
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/upload`,
-        formData
+        formData,
+        {
+          headers: {
+            'Authorization': `Bearer ${session.access_token}`,
+          },
+        }
       );
 
       setMessage({

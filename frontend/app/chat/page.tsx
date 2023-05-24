@@ -7,24 +7,20 @@ import Modal from "../components/ui/Modal";
 import { MdSettings } from "react-icons/md";
 import ChatMessages from "./ChatMessages";
 import PageHeading from "../components/ui/PageHeading";
+import { useSupabase } from "../supabase-provider";
+import { redirect } from "next/navigation";
 
 export default function ChatPage() {
   const [question, setQuestion] = useState("");
-  const [history, setHistory] = useState<Array<[string, string]>>([
-    // ["user", "Hello!"],
-    // ["assistant", "Hello Back!"],
-    // ["user", "Send some long message"],
-    // [
-    //   "assistant",
-    //   "This is a very long and really long message which is longer than every other message.",
-    // ],
-    // ["user", "What is redux"],
-    // ["assistant", ``],
-  ]);
+  const [history, setHistory] = useState<Array<[string, string]>>([]);
   const [model, setModel] = useState("gpt-3.5-turbo");
   const [temperature, setTemperature] = useState(0);
   const [maxTokens, setMaxTokens] = useState(500);
   const [isPending, setIsPending] = useState(false);
+  const { supabase, session } = useSupabase()
+  if (session === null) {
+    redirect('/login')
+  }
 
   const askQuestion = async () => {
     setHistory((hist) => [...hist, ["user", question]]);
@@ -37,6 +33,11 @@ export default function ChatPage() {
         history,
         temperature,
         max_tokens: maxTokens,
+      },
+      {
+        headers: {
+          'Authorization': `Bearer ${session.access_token}`,
+        },
       }
     );
     setHistory(response.data.history);
