@@ -8,7 +8,7 @@ import { MdSettings } from "react-icons/md";
 import ChatMessages from "./ChatMessages";
 import PageHeading from "../components/ui/PageHeading";
 import { useSupabase } from "../supabase-provider";
-
+import { redirect } from "next/navigation";
 
 export default function ChatPage() {
   const [question, setQuestion] = useState("");
@@ -18,6 +18,9 @@ export default function ChatPage() {
   const [maxTokens, setMaxTokens] = useState(500);
   const [isPending, setIsPending] = useState(false);
   const { supabase, session } = useSupabase()
+  if (session === null) {
+    redirect('/login')
+  }
 
   const askQuestion = async () => {
     setHistory((hist) => [...hist, ["user", question]]);
