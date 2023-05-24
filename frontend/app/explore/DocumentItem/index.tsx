@@ -17,6 +17,10 @@ interface DocumentProps {
 const DocumentItem = ({ document, setDocuments }: DocumentProps) => {
   const [isDeleting, setIsDeleting] = useState(false);
   const { supabase, session } = useSupabase()
+  if (!session) {
+    throw new Error('User session not found');
+  }
+  
 
   const deleteDocument = async (name: string) => {
     setIsDeleting(true);

@@ -4,11 +4,15 @@ import Card from "../components/ui/Card";
 import Button from "../components/ui/Button";
 import PageHeading from "../components/ui/PageHeading";
 import { useSupabase } from "../supabase-provider";
+import { redirect } from "next/navigation";
+import Link from "next/link";
+
 
 export default function Login() {
   const { supabase } = useSupabase();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
 
   const handleLogin = async () => {
     const { data, error } = await supabase.auth.signInWithPassword({
@@ -47,7 +51,9 @@ export default function Login() {
             />
             <div className="flex justify-center gap-3">
               <Button onClick={handleLogin}>Login</Button>
+              <Link href="/signup">Dont have an account? Sign up</Link>
             </div>
+            
           </div>
         </Card>
       </section>

@@ -8,6 +8,10 @@ interface DocumentDataProps {
 
 const DocumentData = async ({ documentName }: DocumentDataProps) => {
   const { supabase, session } = useSupabase();
+  if (!session) {
+    throw new Error('User session not found');
+  }
+
   const res = await axios.get(
     `${process.env.NEXT_PUBLIC_BACKEND_URL}/explore/${documentName}`,
     {
