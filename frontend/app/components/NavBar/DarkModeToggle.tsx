@@ -29,7 +29,7 @@ const DarkModeToggle: FC<DarkModeToggleProps> = ({}) => {
   return (
     <Button
       aria-label="toggle dark mode"
-      className="focus:outline-none"
+      className="focus:outline-none text-3xl"
       onClick={() => setDark((d) => !d)}
       variant={"tertiary"}
     >
