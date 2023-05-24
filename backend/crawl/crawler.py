@@ -72,7 +72,6 @@ class CrawlWebsite(BaseModel):
 
             # Extract links from the initial page
             links = self._extract_links(initial_content, self.url)
-            print(links)
 
             # Add links to the queue
             queue.extend([(link, 1) for link in links])
@@ -108,7 +107,6 @@ class CrawlWebsite(BaseModel):
         with open(temp_file_path, 'w') as temp_file:
             temp_file.write(all_content)
             # Process the file
-            print(temp_file)
 
         return temp_file_path, file_name
 
