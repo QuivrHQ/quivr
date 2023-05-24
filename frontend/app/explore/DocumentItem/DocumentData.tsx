@@ -1,13 +1,20 @@
 import axios from "axios";
 import { Document } from "../types";
+import { useSupabase } from "../../supabase-provider";
 
 interface DocumentDataProps {
   documentName: string;
 }
 
 const DocumentData = async ({ documentName }: DocumentDataProps) => {
+  const { supabase, session } = useSupabase();
   const res = await axios.get(
-    `${process.env.NEXT_PUBLIC_BACKEND_URL}/explore/${documentName}`
+    `${process.env.NEXT_PUBLIC_BACKEND_URL}/explore/${documentName}`,
+    {
+      headers: {
+        'Authorization': `Bearer ${session.access_token}`,
+      },
+    }
   );
   const documents = res.data.documents as any[];
   const doc = documents[0];

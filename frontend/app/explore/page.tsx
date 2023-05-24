@@ -26,7 +26,12 @@ export default function ExplorePage() {
         `Fetching documents from ${process.env.NEXT_PUBLIC_BACKEND_URL}/explore`
       );
       const response = await axios.get<{ documents: Document[] }>(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/explore`
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/explore`,
+        {
+          headers: {
+            'Authorization': `Bearer ${session.access_token}`,
+          },
+        }
       );
       setDocuments(response.data.documents);
     } catch (error) {
