@@ -11,6 +11,7 @@ import Card from "../components/ui/Card";
 import PageHeading from "../components/ui/PageHeading";
 
 export default function UploadPage() {
+  const [enableSummarization, setEnableSummarization] = useState(false);
   const [message, setMessage] = useState<Message | null>(null);
   const [isPending, setIsPending] = useState(false);
   const [files, setFiles] = useState<File[]>([]);
@@ -41,7 +42,8 @@ export default function UploadPage() {
     try {
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/crawl`,
-        config
+        config,
+        { params: { enable_summarization: enableSummarization } }
       );
 
       setMessage({
@@ -62,7 +64,8 @@ export default function UploadPage() {
     try {
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/upload`,
-        formData
+        formData,
+        { params: { enable_summarization: enableSummarization } }
       );
 
       setMessage({
@@ -125,8 +128,8 @@ export default function UploadPage() {
         className="w-full outline-none pt-20 flex flex-col gap-5 items-center justify-center p-6"
       >
         <PageHeading
-          title="Add Knowledge"
-          subtitle="Upload files to your second brain"
+          title="Upload Knowledge"
+          subtitle="Text, documents, spreadsheets, audio, video, and URLs supported"
         />
         {/* Wrap the cards in a flex container */}
         <div className="flex justify-center gap-5">
@@ -153,7 +156,7 @@ export default function UploadPage() {
                   onClick={open}
                   className="opacity-50 cursor-pointer hover:opacity-100 hover:underline transition-opacity"
                 >
-                  Drag and drop some files here, or click to browse files
+                  Drag and drop files here, or click to browse
                 </button>
               )}
             </div>
@@ -171,18 +174,28 @@ export default function UploadPage() {
                 onClick={crawlWebsite}
                 className="opacity-50 cursor-pointer hover:opacity-100 hover:underline transition-opacity"
               >
-                Crawl Website
+                Crawl
               </button>
             </div>
           </Card>
         </div>
         <div className="flex flex-col items-center justify-center gap-5">
+        <label htmlFor="enableSummarization" className="inline-flex items-center cursor-pointer">
+  <input
+    id="enableSummarization"
+    type="checkbox"
+    checked={enableSummarization}
+    onChange={(e) => setEnableSummarization(e.target.checked)}
+    className="cursor-pointer"
+  />
+  <span className="ml-2 text-sm">Enable summarization</span>
+</label>
           <Button isLoading={isPending} onClick={uploadAllFiles} className="">
-            {isPending ? `Adding - ${files[pendingFileIndex].name}` : "Add"}
+            {isPending ? `Uploading ${files[pendingFileIndex].name}` : "Add"}
           </Button>
           <Link href={"/chat"}>
             <Button variant={"secondary"} className="py-3">
-              Start Chatting with your brain
+              Chat
             </Button>
           </Link>
         </div>
