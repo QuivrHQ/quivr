@@ -7,6 +7,7 @@ import { Dispatch, SetStateAction, Suspense, useState } from "react";
 import axios from "axios";
 import DocumentData from "./DocumentData";
 import Spinner from "@/app/components/ui/Spinner";
+import { useSupabase } from "@/app/supabase-provider";
 
 interface DocumentProps {
   document: Document;
@@ -15,13 +16,23 @@ interface DocumentProps {
 
 const DocumentItem = ({ document, setDocuments }: DocumentProps) => {
   const [isDeleting, setIsDeleting] = useState(false);
+  const { supabase, session } = useSupabase()
+  if (!session) {
+    throw new Error('User session not found');
+  }
+  
 
   const deleteDocument = async (name: string) => {
     setIsDeleting(true);
     try {
       console.log(`Deleting Document ${name}`);
       const response = await axios.delete(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/explore/${name}`
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/explore/${name}`,
+        {
+          headers: {
+            Authorization: `Bearer ${session.access_token}`,
+          },
+        }
       );
       setDocuments((docs) => docs.filter((doc) => doc.name !== name)); // Optimistic update
     } catch (error) {

@@ -1,10 +1,12 @@
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi import FastAPI, UploadFile, File, HTTPException
+from fastapi import FastAPI, UploadFile, File, HTTPException, Header, Depends
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 import os
 from pydantic import BaseModel
-from typing import List, Tuple
+from typing import List, Tuple, Annotated
 from supabase import create_client, Client
 from tempfile import SpooledTemporaryFile
+from auth_bearer import JWTBearer
 import shutil
 import pypandoc
 
@@ -87,13 +89,15 @@ async def filter_file(file: UploadFile, enable_summarization: bool, supabase_cli
             return {"message": f"❌ {file.filename} is not supported.", "type": "error"}
 
 
-@app.post("/upload")
+
+@app.post("/upload", dependencies=[Depends(JWTBearer())])
 async def upload_file(commons: CommonsDep, file: UploadFile, enable_summarization: bool = False):
     message = await filter_file(file, enable_summarization, commons['supabase'])
+
     return message
 
 
-@app.post("/chat/")
+@app.post("/chat/", dependencies=[Depends(JWTBearer())])
 async def chat_endpoint(commons: CommonsDep, chat_message: ChatMessage):
     history = chat_message.history
     qa = get_qa_llm(chat_message)
@@ -124,7 +128,7 @@ async def chat_endpoint(commons: CommonsDep, chat_message: ChatMessage):
     return {"history": history}
 
 
-@app.post("/crawl/")
+@app.post("/crawl/", dependencies=[Depends(JWTBearer())])
 async def crawl_endpoint(commons: CommonsDep, crawl_website: CrawlWebsite, enable_summarization: bool = False):
     file_path, file_name = crawl_website.process()
 
@@ -139,7 +143,7 @@ async def crawl_endpoint(commons: CommonsDep, crawl_website: CrawlWebsite, enabl
     return message
 
 
-@app.get("/explore")
+@app.get("/explore", dependencies=[Depends(JWTBearer())])
 async def explore_endpoint(commons: CommonsDep):
     response = commons['supabase'].table("documents").select(
         "name:metadata->>file_name, size:metadata->>file_size", count="exact").execute()
@@ -152,7 +156,7 @@ async def explore_endpoint(commons: CommonsDep):
     return {"documents": unique_data}
 
 
-@app.delete("/explore/{file_name}")
+@app.delete("/explore/{file_name}", dependencies=[Depends(JWTBearer())])
 async def delete_endpoint(commons: CommonsDep, file_name: str):
     # Cascade delete the summary from the database first, because it has a foreign key constraint
     commons['supabase'].table("summaries").delete().match(
@@ -162,7 +166,7 @@ async def delete_endpoint(commons: CommonsDep, file_name: str):
     return {"message": f"{file_name} has been deleted."}
 
 
-@app.get("/explore/{file_name}")
+@app.get("/explore/{file_name}", dependencies=[Depends(JWTBearer())])
 async def download_endpoint(commons: CommonsDep, file_name: str):
     response = commons['supabase'].table("documents").select(
         "metadata->>file_name, metadata->>file_size, metadata->>file_extension, metadata->>file_url").match({"metadata->>file_name": file_name}).execute()

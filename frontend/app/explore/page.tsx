@@ -7,10 +7,18 @@ import Button from "../components/ui/Button";
 import Link from "next/link";
 import Spinner from "../components/ui/Spinner";
 import { AnimatePresence } from "framer-motion";
+import { useSupabase } from "../supabase-provider";
+import { redirect } from "next/navigation";
+
+
 
 export default function ExplorePage() {
   const [documents, setDocuments] = useState<Document[]>([]);
   const [isPending, setIsPending] = useState(true);
+  const { supabase, session } = useSupabase();
+  if (session === null) {
+    redirect('/login')
+  }
 
   useEffect(() => {
     fetchDocuments();
@@ -23,7 +31,12 @@ export default function ExplorePage() {
         `Fetching documents from ${process.env.NEXT_PUBLIC_BACKEND_URL}/explore`
       );
       const response = await axios.get<{ documents: Document[] }>(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/explore`
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/explore`,
+        {
+          headers: {
+            'Authorization': `Bearer ${session.access_token}`,
+          },
+        }
       );
       setDocuments(response.data.documents);
     } catch (error) {
