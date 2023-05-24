@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils";
 import Link from "next/link";
-import { FC, HTMLAttributes } from "react";
+import { FC, HTMLAttributes, ReactNode } from "react";
 import DarkModeToggle from "./DarkModeToggle";
 import Button from "../ui/Button";
 
@@ -18,24 +18,14 @@ const NavItems: FC<NavItemsProps> = ({ className, ...props }) => {
     >
       {process.env.NEXT_PUBLIC_ENV === "local" ? (
         <>
-          <li>
-            <Link href={"/upload"}>Upload</Link>
-          </li>
-          <li>
-            <Link href={"/chat"}>Chat</Link>
-          </li>
-          <li>
-            <Link href={"/explore"}>Explore</Link>
-          </li>
+          <NavLink to="/upload">Upload</NavLink>
+          <NavLink to="/chat">Chat</NavLink>
+          <NavLink to="/explore">Explore</NavLink>
         </>
       ) : (
         <>
-          <li>
-            <Link href={"https://github.com/StanGirard/quivr"}>Github</Link>
-          </li>
-          <li>
-            <Link href={"https://discord.gg/HUpRgp2HG8"}>Discord</Link>
-          </li>
+          <NavLink to="https://github.com/StanGirard/quivr">Github</NavLink>
+          <NavLink to="https://discord.gg/HUpRgp2HG8">Discord</NavLink>
         </>
       )}
       <div className="flex sm:flex-1 sm:justify-end flex-col items-center justify-center sm:flex-row gap-5 sm:gap-2">
@@ -46,6 +36,20 @@ const NavItems: FC<NavItemsProps> = ({ className, ...props }) => {
       </div>
     </ul>
     // </div>
+  );
+};
+
+interface NavLinkProps {
+  children: ReactNode;
+  to: string;
+}
+
+const NavLink: FC<NavLinkProps> = ({ children, to }) => {
+  return (
+    <li className="group relative">
+      <Link href={to}>{children}</Link>
+      <hr className="aboslute top-full border border-transparent border-b-primary dark:border-b-white scale-x-0 group-hover:scale-x-100 group-focus-within:scale-x-100 transition-transform" />
+    </li>
   );
 };
 
