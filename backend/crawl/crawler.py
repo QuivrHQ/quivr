@@ -20,12 +20,15 @@ class CrawlWebsite(BaseModel):
     max_time: int = 60
 
     def _crawl(self, url):
-        # parsed_url = urlparse(url)
-        # if parsed_url.scheme not in ["http", "https"]:
-        #     return None
-
+        parsed_url = urlparse(url)
+        if parsed_url.scheme not in ["http", "https"]:
+            return None
+        
+        print(parsed_url)
+        self.js = False
         if self.js:
             # Configure Selenium with Chrome options
+            print('chrome')
             chrome_options = Options()
             chrome_options.add_argument("--headless")  # Run in headless mode
             chrome_options.add_argument("--disable-gpu")
@@ -73,9 +76,13 @@ class CrawlWebsite(BaseModel):
 
             # Add links to the queue
             queue.extend([(link, 1) for link in links])
+            print(queue)
 
-        while links and crawled_pages < self.max_pages:
-            url, depth = links.pop(0)
+        while crawled_pages < self.max_pages:
+            if not queue:
+                break
+
+            url, depth = queue.pop(0)
 
             if url in visited_urls or depth > self.depth:
                 continue
@@ -88,17 +95,20 @@ class CrawlWebsite(BaseModel):
                 crawled_pages += 1
 
                 # Extract links from the page
-                links = self._extract_links(content, url)
+                # links = self._extract_links(content, url)
 
                 # Add links to the queue for further crawling
                 # queue.extend([(link, depth + 1) for link in links])
 
         # Create a file
+        print(all_content)
+        print(crawled_pages)
         file_name = slugify(self.url) + ".html"
         temp_file_path = os.path.join(tempfile.gettempdir(), file_name)
         with open(temp_file_path, 'w') as temp_file:
             temp_file.write(all_content)
             # Process the file
+            print(temp_file)
 
         return temp_file_path, file_name
 
