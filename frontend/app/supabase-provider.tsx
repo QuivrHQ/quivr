@@ -5,12 +5,12 @@ import { Session, createBrowserSupabaseClient } from '@supabase/auth-helpers-nex
 import { useRouter } from 'next/navigation'
 
 import type { SupabaseClient } from '@supabase/auth-helpers-nextjs'
-import type { Database } from '@/lib/database.types'
+
 
 type MaybeSession = Session | null
 
 type SupabaseContext = {
-  supabase: SupabaseClient<Database>
+  supabase: SupabaseClient
   session: MaybeSession
 }
 
