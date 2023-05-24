@@ -129,9 +129,9 @@ async def crawl_endpoint(commons: CommonsDep, crawl_website: CrawlWebsite, enabl
     file_path, file_name = crawl_website.process()
 
     # Create a SpooledTemporaryFile from the file_path
-    spooled_file = SpooledTemporaryFile()
-    with open(file_path, 'rb') as f:
-        shutil.copyfileobj(f, spooled_file)
+    # spooled_file = SpooledTemporaryFile()
+    # with open(file_path, 'rb') as f:
+    #     shutil.copyfileobj(f, spooled_file)
 
     # Pass the SpooledTemporaryFile to UploadFile
     file = UploadFile(file=spooled_file, filename=file_name)
