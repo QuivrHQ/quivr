@@ -30,7 +30,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       <body
         className={`bg-white text-black dark:bg-black dark:text-white min-h-screen w-full ${inter.className}`}
       >
-      <NavBar />
+        <NavBar />
         <SupabaseProvider session={session}>{children}</SupabaseProvider>
         <Analytics />
       </body>
