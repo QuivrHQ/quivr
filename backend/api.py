@@ -176,7 +176,7 @@ async def register(commons: CommonsDep, email: str, password: str):
         'email': email,
         'password': password
     })
-    return "true"
+    return {"message": "please verify your e-mail"}
 
 
 @app.get("/")
