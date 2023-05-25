@@ -10,7 +10,7 @@ interface MobileMenuProps {}
 const MobileMenu: FC<MobileMenuProps> = ({}) => {
   const [open, setOpen] = useState(false);
   return (
-    <Dialog.Root onOpenChange={setOpen}>
+    <Dialog.Root onOpenChange={setOpen} open={open}>
       <Dialog.Trigger asChild>
         <button className="block sm:hidden" aria-label="open menu">
           <MdMenu className="text-4xl" />
@@ -29,7 +29,10 @@ const MobileMenu: FC<MobileMenuProps> = ({}) => {
               >
                 <Dialog.Content asChild forceMount>
                   <div className="flex flex-col items-center justify-between py-24 flex-1 w-full bg-white dark:bg-black border border-black/10 dark:border-white/25 p-10 shadow-xl dark:shadow-primary/50 focus:outline-none cursor-auto z-50">
-                    <NavItems className="text-3xl h-fit text-center flex-col items-center justify-center gap-10" />
+                    <NavItems
+                      setOpen={setOpen}
+                      className="text-3xl h-fit text-center flex-col items-center justify-center gap-10"
+                    />
 
                     <p className="">
                       Get a Second Brain with{" "}

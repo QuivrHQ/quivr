@@ -65,9 +65,9 @@ export default function SignUp() {
             </div>
           </form>
         </Card>
-      </section>{" "}
+      </section>
       <Toast variant="success" ref={signupToast}>
-        Account Created Successfully
+        Confirmation Email sent
       </Toast>
       <Toast variant="danger" ref={signupErrorToast}>
         {error}
