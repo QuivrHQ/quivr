@@ -29,24 +29,32 @@ export default function SignUp() {
   return (
     <main>
       <section className="w-full min-h-screen h-full outline-none flex flex-col gap-5 items-center justify-center p-6">
-        <PageHeading title="SignUp" subtitle="Create your account" />
-        <Card className="max-w-md w-full flex flex-col p-5 sm:p-10 gap-2 text-left">
-          <Field
-            name="email"
-            type="email"
-            placeholder="Email"
-            onChange={(e) => setEmail(e.target.value)}
-          />
-          <Field
-            name="password"
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="Password"
-          />
-          <div className="flex flex-col items-center justify-center mt-2 gap-2">
-            <Button onClick={handleSignUp}>Sign Up</Button>
-          </div>
+        <PageHeading title="Sign Up" subtitle="Create your account" />
+        <Card className="max-w-md w-full p-5 sm:p-10 text-left">
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              handleSignUp();
+            }}
+            className="flex flex-col gap-2"
+          >
+            <Field
+              name="email"
+              type="email"
+              placeholder="Email"
+              onChange={(e) => setEmail(e.target.value)}
+            />
+            <Field
+              name="password"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Password"
+            />
+            <div className="flex flex-col items-center justify-center mt-2 gap-2">
+              <Button>Sign Up</Button>
+            </div>
+          </form>
         </Card>
       </section>
     </main>
