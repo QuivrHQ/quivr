@@ -11,6 +11,7 @@ import Card from "../components/ui/Card";
 import PageHeading from "../components/ui/PageHeading";
 import { useSupabase } from "../supabase-provider";
 import { redirect } from "next/navigation";
+import Field from "../components/ui/Field";
 
 export default function UploadPage() {
   const [message, setMessage] = useState<Message | null>(null);
@@ -177,11 +178,11 @@ export default function UploadPage() {
           {/* Assign a width of 50% to each card */}
           <Card className="w-1/2">
             <div className="text-center mt-2 p-6 max-w-sm w-full flex flex-col gap-5 items-center">
-              <input
+              <Field
+                name="crawlurl"
                 ref={urlInputRef}
                 type="text"
                 placeholder="Enter a website URL"
-                className="dark:bg-black"
               />
               <button
                 onClick={crawlWebsite}
