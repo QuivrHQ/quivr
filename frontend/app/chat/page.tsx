@@ -52,7 +52,7 @@ export default function ChatPage() {
       <section className="flex flex-col justify-center items-center flex-1 gap-5 h-full">
         <PageHeading
           title="Chat with your brain"
-          subtitle="Your AI assistant"
+          subtitle="Talk to a language model about your uploaded data"
         />
         {/* Chat */}
         <Card className="p-5 max-w-3xl w-full min-h-full flex-1 mb-24">
@@ -71,10 +71,10 @@ export default function ChatPage() {
                 value={question}
                 onChange={(e) => setQuestion(e.target.value)}
                 className="w-full p-2 border border-gray-300 dark:border-gray-500 outline-none rounded dark:bg-gray-800"
-                placeholder="Enter your question here..."
+                placeholder="Begin conversation here..."
               />
               <Button type="submit" isLoading={isPending}>
-                {isPending ? "Thinking..." : "Ask"}
+                {isPending ? "Thinking..." : "Chat"}
               </Button>
               {/* Settings Button */}
               <Modal
