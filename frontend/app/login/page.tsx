@@ -12,8 +12,10 @@ export default function Login() {
   const { supabase } = useSupabase();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [isPending, setIsPending] = useState(false);
 
   const handleLogin = async () => {
+    setIsPending(true);
     const { data, error } = await supabase.auth.signInWithPassword({
       email: email,
       password: password,
@@ -26,6 +28,7 @@ export default function Login() {
       console.log("User logged in:", data);
       alert("Login successful!");
     }
+    setIsPending(false);
   };
 
   return (
@@ -54,7 +57,7 @@ export default function Login() {
               placeholder="Password"
             />
             <div className="flex flex-col items-center justify-center mt-2 gap-2">
-              <Button>Login</Button>
+              <Button isLoading={isPending}>Login</Button>
               <Link href="/signup">Dont have an account? Sign up</Link>
             </div>
           </form>

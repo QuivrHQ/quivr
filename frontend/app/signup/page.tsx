@@ -10,8 +10,10 @@ export default function SignUp() {
   const { supabase } = useSupabase();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [isPending, setIsPending] = useState(false);
 
   const handleSignUp = async () => {
+    setIsPending(true);
     const { data, error } = await supabase.auth.signUp({
       email: email,
       password: password,
@@ -24,6 +26,7 @@ export default function SignUp() {
       console.log("User signed up:", data);
       alert("Signup successful!");
     }
+    setIsPending(false);
   };
 
   return (
@@ -52,7 +55,7 @@ export default function SignUp() {
               placeholder="Password"
             />
             <div className="flex flex-col items-center justify-center mt-2 gap-2">
-              <Button>Sign Up</Button>
+              <Button isLoading={isPending}>Sign Up</Button>
             </div>
           </form>
         </Card>
