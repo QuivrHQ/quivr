@@ -1,16 +1,21 @@
 "use client";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import Card from "../components/ui/Card";
 import Button from "../components/ui/Button";
 import PageHeading from "../components/ui/PageHeading";
 import { useSupabase } from "../supabase-provider";
 import Field from "../components/ui/Field";
+import Toast, { ToastRef } from "../components/ui/Toast";
 
 export default function SignUp() {
   const { supabase } = useSupabase();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isPending, setIsPending] = useState(false);
+
+  const signupToast = useRef<ToastRef>(null);
+  const signupErrorToast = useRef<ToastRef>(null);
+  const [error, setError] = useState("Unknown Error");
 
   const handleSignUp = async () => {
     setIsPending(true);
@@ -21,10 +26,11 @@ export default function SignUp() {
 
     if (error) {
       console.error("Error signing up:", error.message);
-      alert(`Error signing up: ${error.message}`);
+      setError(error.message);
+      signupErrorToast.current?.publish();
     } else if (data) {
-      console.log("User signed up:", data);
-      alert("Signup successful!");
+      console.log("User signed up");
+      signupToast.current?.publish();
     }
     setIsPending(false);
   };
@@ -59,7 +65,13 @@ export default function SignUp() {
             </div>
           </form>
         </Card>
-      </section>
+      </section>{" "}
+      <Toast variant="success" ref={signupToast}>
+        Account Created Successfully
+      </Toast>
+      <Toast variant="danger" ref={signupErrorToast}>
+        {error}
+      </Toast>
     </main>
   );
 }

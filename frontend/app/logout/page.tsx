@@ -1,14 +1,19 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Card from "../components/ui/Card";
 import PageHeading from "../components/ui/PageHeading";
 import { useSupabase } from "../supabase-provider";
 import Button from "../components/ui/Button";
 import Link from "next/link";
+import Toast, { ToastRef } from "../components/ui/Toast";
 
 export default function Logout() {
   const { supabase } = useSupabase();
   const [isPending, setIsPending] = useState(false);
+
+  const logoutToast = useRef<ToastRef>(null);
+  const logoutErrorToast = useRef<ToastRef>(null);
+  const [error, setError] = useState("Unknown Error");
 
   const handleLogout = async () => {
     setIsPending(true);
@@ -16,10 +21,11 @@ export default function Logout() {
 
     if (error) {
       console.error("Error logging out:", error.message);
-      alert(`Error logging out: ${error.message}`);
+      setError(error.message);
+      logoutErrorToast.current?.publish();
     } else {
       console.log("User logged out");
-      alert("Logout successful!");
+      logoutToast.current?.publish();
     }
     setIsPending(false);
   };
@@ -48,6 +54,12 @@ export default function Logout() {
           </div>
         </Card>
       </section>
+      <Toast variant="success" ref={logoutToast}>
+        Logged Out Successfully
+      </Toast>
+      <Toast variant="danger" ref={logoutErrorToast}>
+        {error}
+      </Toast>
     </main>
   );
 }

@@ -27,12 +27,10 @@ export default function Login() {
 
     if (error) {
       console.error("Error logging in:", error.message);
-      // alert(`Error logging in: ${error.message}`);
       setError(error.message);
       loginErrorToast.current?.publish();
     } else if (data) {
       console.log("User logged in:", data);
-      // alert("Login successful!");
       loginToast.current?.publish();
     }
     setIsPending(false);
