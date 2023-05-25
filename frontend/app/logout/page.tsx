@@ -1,15 +1,19 @@
 "use client";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Card from "../components/ui/Card";
 import PageHeading from "../components/ui/PageHeading";
 import { useSupabase } from "../supabase-provider";
+import Button from "../components/ui/Button";
+import Link from "next/link";
 
 export default function Logout() {
   const { supabase } = useSupabase();
+  const [isPending, setIsPending] = useState(false);
 
   const handleLogout = async () => {
+    setIsPending(true);
     const { error } = await supabase.auth.signOut();
-    
+
     if (error) {
       console.error("Error logging out:", error.message);
       alert(`Error logging out: ${error.message}`);
@@ -17,19 +21,30 @@ export default function Logout() {
       console.log("User logged out");
       alert("Logout successful!");
     }
+    setIsPending(false);
   };
 
-  useEffect(() => {
-    handleLogout();
-  }, []);
+  // useEffect(() => {
+  //   handleLogout();
+  // }, []);
 
   return (
     <main>
-      <section className="w-full outline-none pt-20 flex flex-col gap-5 items-center justify-center p-6">
-        <PageHeading title="Logout" subtitle="See you next time"/>
-        <Card className="w-1/2 flex justify-center items-center">
-          <div className="text-center mt-2 p-6 max-w-sm w-full flex flex-col gap-5 items-center">
-            <h1>You are now logged out.</h1>
+      <section className="w-full min-h-screen h-full outline-none flex flex-col gap-5 items-center justify-center p-6">
+        <PageHeading title="Logout" subtitle="See you next time" />
+        <Card className="max-w-md w-full p-5 sm:p-10 text-center flex flex-col items-center gap-5">
+          <h2 className="text-lg">Are you sure you want to sign out?</h2>
+          <div className="flex gap-5 items-center justify-center">
+            <Link href={"/"}>
+              <Button variant={"primary"}>Go back</Button>
+            </Link>
+            <Button
+              isLoading={isPending}
+              variant={"danger"}
+              onClick={() => handleLogout()}
+            >
+              Log Out
+            </Button>
           </div>
         </Card>
       </section>

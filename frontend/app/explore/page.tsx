@@ -10,14 +10,12 @@ import { AnimatePresence } from "framer-motion";
 import { useSupabase } from "../supabase-provider";
 import { redirect } from "next/navigation";
 
-
-
 export default function ExplorePage() {
   const [documents, setDocuments] = useState<Document[]>([]);
   const [isPending, setIsPending] = useState(true);
   const { supabase, session } = useSupabase();
   if (session === null) {
-    redirect('/login')
+    redirect("/login");
   }
 
   useEffect(() => {
@@ -34,7 +32,7 @@ export default function ExplorePage() {
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/explore`,
         {
           headers: {
-            'Authorization': `Bearer ${session.access_token}`,
+            Authorization: `Bearer ${session.access_token}`,
           },
         }
       );
@@ -48,7 +46,7 @@ export default function ExplorePage() {
 
   return (
     <main>
-      <section className="w-full outline-none pt-20 flex flex-col gap-5 items-center justify-center p-6">
+      <section className="w-full outline-none pt-32 flex flex-col gap-5 items-center justify-center p-6">
         <div className="flex flex-col items-center justify-center my-10">
           <h1 className="text-3xl font-bold text-center">Explore Your Brain</h1>
           <h2 className="opacity-50">View what&rsquo;s in your second brain</h2>

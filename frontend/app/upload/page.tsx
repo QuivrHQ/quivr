@@ -18,9 +18,9 @@ export default function UploadPage() {
   const [files, setFiles] = useState<File[]>([]);
   const [pendingFileIndex, setPendingFileIndex] = useState<number>(0);
   const urlInputRef = useRef<HTMLInputElement | null>(null);
-  const { supabase, session } = useSupabase()
+  const { supabase, session } = useSupabase();
   if (session === null) {
-    redirect('/login')
+    redirect("/login");
   }
 
   const crawlWebsite = useCallback(async () => {
@@ -50,7 +50,7 @@ export default function UploadPage() {
         config,
         {
           headers: {
-            'Authorization': `Bearer ${session.access_token}`,
+            Authorization: `Bearer ${session.access_token}`,
           },
         }
       );
@@ -76,7 +76,7 @@ export default function UploadPage() {
         formData,
         {
           headers: {
-            'Authorization': `Bearer ${session.access_token}`,
+            Authorization: `Bearer ${session.access_token}`,
           },
         }
       );
@@ -138,7 +138,7 @@ export default function UploadPage() {
       <section
         {...getRootProps()}
         // className="w-full h-full min-h-screen text-center flex flex-col items-center gap-5 pt-32 outline-none"
-        className="w-full outline-none pt-20 flex flex-col gap-5 items-center justify-center p-6"
+        className="w-full outline-none pt-32 flex flex-col gap-5 items-center justify-center p-6"
       >
         <PageHeading
           title="Add Knowledge"

@@ -17,9 +17,9 @@ export default function ChatPage() {
   const [temperature, setTemperature] = useState(0);
   const [maxTokens, setMaxTokens] = useState(500);
   const [isPending, setIsPending] = useState(false);
-  const { supabase, session } = useSupabase()
+  const { supabase, session } = useSupabase();
   if (session === null) {
-    redirect('/login')
+    redirect("/login");
   }
 
   const askQuestion = async () => {
@@ -36,7 +36,7 @@ export default function ChatPage() {
       },
       {
         headers: {
-          'Authorization': `Bearer ${session.access_token}`,
+          Authorization: `Bearer ${session.access_token}`,
         },
       }
     );
@@ -48,7 +48,7 @@ export default function ChatPage() {
   };
 
   return (
-    <main className="min-h-screen w-full flex flex-col pt-20">
+    <main className="min-h-screen w-full flex flex-col pt-32">
       <section className="flex flex-col justify-center items-center flex-1 gap-5 h-full">
         <PageHeading
           title="Chat with your brain"
