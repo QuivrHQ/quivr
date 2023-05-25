@@ -6,6 +6,7 @@ import { useSupabase } from "../supabase-provider";
 import Button from "../components/ui/Button";
 import Link from "next/link";
 import Toast, { ToastRef } from "../components/ui/Toast";
+import { useRouter } from "next/navigation";
 
 export default function Logout() {
   const { supabase } = useSupabase();
@@ -14,6 +15,8 @@ export default function Logout() {
   const logoutToast = useRef<ToastRef>(null);
   const logoutErrorToast = useRef<ToastRef>(null);
   const [error, setError] = useState("Unknown Error");
+
+  const router = useRouter();
 
   const handleLogout = async () => {
     setIsPending(true);
@@ -26,6 +29,7 @@ export default function Logout() {
     } else {
       console.log("User logged out");
       logoutToast.current?.publish();
+      router.replace("/");
     }
     setIsPending(false);
   };

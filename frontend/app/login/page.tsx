@@ -7,6 +7,7 @@ import { useSupabase } from "../supabase-provider";
 import Link from "next/link";
 import Field from "../components/ui/Field";
 import Toast, { ToastRef } from "../components/ui/Toast";
+import { useRouter } from "next/navigation";
 
 export default function Login() {
   const { supabase } = useSupabase();
@@ -17,6 +18,8 @@ export default function Login() {
   const loginToast = useRef<ToastRef>(null);
   const loginErrorToast = useRef<ToastRef>(null);
   const [error, setError] = useState("Unknown Error");
+
+  const router = useRouter();
 
   const handleLogin = async () => {
     setIsPending(true);
@@ -32,6 +35,7 @@ export default function Login() {
     } else if (data) {
       console.log("User logged in:", data);
       loginToast.current?.publish();
+      router.replace("/");
     }
     setIsPending(false);
   };
@@ -50,12 +54,14 @@ export default function Login() {
           >
             <Field
               name="email"
+              required
               type="email"
               placeholder="Email"
               onChange={(e) => setEmail(e.target.value)}
             />
             <Field
               name="password"
+              required
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}

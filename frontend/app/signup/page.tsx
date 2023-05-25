@@ -15,7 +15,7 @@ export default function SignUp() {
 
   const signupToast = useRef<ToastRef>(null);
   const signupErrorToast = useRef<ToastRef>(null);
-  const [error, setError] = useState("Unknown Error");
+  const [error, setError] = useState<string | null>(null);
 
   const handleSignUp = async () => {
     setIsPending(true);
@@ -49,12 +49,14 @@ export default function SignUp() {
           >
             <Field
               name="email"
+              required
               type="email"
               placeholder="Email"
               onChange={(e) => setEmail(e.target.value)}
             />
             <Field
               name="password"
+              required
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -67,7 +69,8 @@ export default function SignUp() {
         </Card>
       </section>
       <Toast variant="success" ref={signupToast}>
-        Confirmation Email sent
+        <h1 className="font-bold">Confirmation Email sent</h1>
+        <p className="text-sm">Check your email.</p>
       </Toast>
       <Toast variant="danger" ref={signupErrorToast}>
         {error}
