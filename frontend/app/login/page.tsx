@@ -1,18 +1,19 @@
 "use client";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import Card from "../components/ui/Card";
 import Button from "../components/ui/Button";
 import PageHeading from "../components/ui/PageHeading";
 import { useSupabase } from "../supabase-provider";
-import { redirect } from "next/navigation";
 import Link from "next/link";
 import Field from "../components/ui/Field";
+import Toast from "../components/ui/Toast";
 
 export default function Login() {
   const { supabase } = useSupabase();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isPending, setIsPending] = useState(false);
+  const loggedToast = useRef<{ publish: () => void }>(null);
 
   const handleLogin = async () => {
     setIsPending(true);
@@ -26,7 +27,8 @@ export default function Login() {
       alert(`Error logging in: ${error.message}`);
     } else if (data) {
       console.log("User logged in:", data);
-      alert("Login successful!");
+      // alert("Login successful!");
+      loggedToast.current?.publish();
     }
     setIsPending(false);
   };
@@ -63,6 +65,7 @@ export default function Login() {
           </form>
         </Card>
       </section>
+      <Toast ref={loggedToast}>Logged In Successfully</Toast>
     </main>
   );
 }
