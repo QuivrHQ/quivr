@@ -141,8 +141,8 @@ export default function UploadPage() {
         className="w-full outline-none pt-20 flex flex-col gap-5 items-center justify-center p-6"
       >
         <PageHeading
-          title="Add Knowledge"
-          subtitle="Upload files to your second brain"
+          title="Upload Knowledge"
+          subtitle="Text, document, spreadsheet, presentation, audio, video, and URLs supported"
         />
         {/* Wrap the cards in a flex container */}
         <div className="flex justify-center gap-5">
@@ -169,7 +169,7 @@ export default function UploadPage() {
                   onClick={open}
                   className="opacity-50 cursor-pointer hover:opacity-100 hover:underline transition-opacity"
                 >
-                  Drag and drop some files here, or click to browse files
+                  Drag and drop files here, or click to browse
                 </button>
               )}
             </div>
@@ -187,18 +187,18 @@ export default function UploadPage() {
                 onClick={crawlWebsite}
                 className="opacity-50 cursor-pointer hover:opacity-100 hover:underline transition-opacity"
               >
-                Crawl Website
+                Crawl
               </button>
             </div>
           </Card>
         </div>
         <div className="flex flex-col items-center justify-center gap-5">
           <Button isLoading={isPending} onClick={uploadAllFiles} className="">
-            {isPending ? `Adding - ${files[pendingFileIndex].name}` : "Add"}
+            {isPending ? `Uploading ${files[pendingFileIndex].name}` : "Upload"}
           </Button>
           <Link href={"/chat"}>
             <Button variant={"secondary"} className="py-3">
-              Start Chatting with your brain
+              Chat
             </Button>
           </Link>
         </div>
