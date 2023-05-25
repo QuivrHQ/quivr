@@ -3,7 +3,7 @@ import Button from "@/app/components/ui/Button";
 import Card from "@/app/components/ui/Card";
 import Field from "@/app/components/ui/Field";
 import PageHeading from "@/app/components/ui/PageHeading";
-import { ToastRef, Toast } from "@/app/components/ui/Toast";
+import Toast, { ToastRef } from "@/app/components/ui/Toast";
 import { useSupabase } from "@/app/supabase-provider";
 import { useRef, useState } from "react";
 
