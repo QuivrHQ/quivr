@@ -90,6 +90,7 @@ class CrawlWebsite(BaseModel):
             content = self._crawl(url)
 
             if content:
+                print('true')
                 all_content += content
                 crawled_pages += 1
 
@@ -100,7 +101,7 @@ class CrawlWebsite(BaseModel):
                 # queue.extend([(link, depth + 1) for link in links])
 
         # Create a file
-        print(all_content)
+        # print(all_content)
         print(crawled_pages)
         file_name = slugify(self.url) + ".html"
         temp_file_path = os.path.join(tempfile.gettempdir(), file_name)
