@@ -6,14 +6,17 @@ import PageHeading from "../components/ui/PageHeading";
 import { useSupabase } from "../supabase-provider";
 import Link from "next/link";
 import Field from "../components/ui/Field";
-import Toast from "../components/ui/Toast";
+import Toast, { ToastRef } from "../components/ui/Toast";
 
 export default function Login() {
   const { supabase } = useSupabase();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isPending, setIsPending] = useState(false);
-  const loggedToast = useRef<{ publish: () => void }>(null);
+
+  const loginToast = useRef<ToastRef>(null);
+  const loginErrorToast = useRef<ToastRef>(null);
+  const [error, setError] = useState("Unknown Error");
 
   const handleLogin = async () => {
     setIsPending(true);
@@ -24,11 +27,13 @@ export default function Login() {
 
     if (error) {
       console.error("Error logging in:", error.message);
-      alert(`Error logging in: ${error.message}`);
+      // alert(`Error logging in: ${error.message}`);
+      setError(error.message);
+      loginErrorToast.current?.publish();
     } else if (data) {
       console.log("User logged in:", data);
       // alert("Login successful!");
-      loggedToast.current?.publish();
+      loginToast.current?.publish();
     }
     setIsPending(false);
   };
@@ -65,7 +70,12 @@ export default function Login() {
           </form>
         </Card>
       </section>
-      <Toast ref={loggedToast}>Logged In Successfully</Toast>
+      <Toast variant="danger" ref={loginToast}>
+        Logged In Successfully
+      </Toast>
+      <Toast variant="danger" ref={loginErrorToast}>
+        {error}
+      </Toast>
     </main>
   );
 }

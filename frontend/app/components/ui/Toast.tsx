@@ -2,13 +2,37 @@
 import { ReactNode, forwardRef, useImperativeHandle, useState } from "react";
 import * as ToastPrimitive from "@radix-ui/react-toast";
 import Button from "./Button";
+import { VariantProps, cva } from "class-variance-authority";
+import { cn } from "@/lib/utils";
 
-interface ToastProps extends ToastPrimitive.ToastProps {
+export interface ToastRef {
+  publish: () => void;
+}
+
+const ToastVariants = cva(
+  "bg-white dark:bg-black px-8 max-w-sm w-full py-5 border border-black/10 dark:border-white/25 rounded-xl shadow-xl flex items-center",
+  {
+    variants: {
+      variant: {
+        neutral: "",
+        danger: "bg-red-400 dark:bg-red-600",
+        success: "bg-green-400 dark:bg-green-600",
+      },
+    },
+    defaultVariants: {
+      variant: "neutral",
+    },
+  }
+);
+
+interface ToastProps
+  extends ToastPrimitive.ToastProps,
+    VariantProps<typeof ToastVariants> {
   children?: ReactNode;
 }
 
 export const Toast = forwardRef(
-  ({ children, ...props }: ToastProps, forwardedRef) => {
+  ({ children, variant, ...props }: ToastProps, forwardedRef) => {
     const [count, setCount] = useState(0);
 
     useImperativeHandle(forwardedRef, () => ({
@@ -20,7 +44,7 @@ export const Toast = forwardRef(
         <ToastPrimitive.Provider duration={Infinity}>
           {Array.from({ length: count }).map((_, index) => (
             <ToastPrimitive.Root
-              className="bg-white dark:bg-black px-8 max-w-sm w-full py-5 border rounded-xl shadow-xl flex items-center"
+              className={cn(ToastVariants({ variant }))}
               key={index}
               {...props}
             >
