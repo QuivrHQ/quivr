@@ -70,7 +70,7 @@ export default function Login() {
           </form>
         </Card>
       </section>
-      <Toast variant="danger" ref={loginToast}>
+      <Toast variant="success" ref={loginToast}>
         Logged In Successfully
       </Toast>
       <Toast variant="danger" ref={loginErrorToast}>

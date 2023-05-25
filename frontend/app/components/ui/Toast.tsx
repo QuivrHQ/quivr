@@ -10,7 +10,7 @@ export interface ToastRef {
 }
 
 const ToastVariants = cva(
-  "bg-white dark:bg-black px-8 max-w-sm w-full py-5 border border-black/10 dark:border-white/25 rounded-xl shadow-xl flex items-center",
+  "bg-white dark:bg-black px-8 max-w-sm w-full py-5 border border-black/10 dark:border-white/25 rounded-xl shadow-xl flex items-center pointer-events-auto",
   {
     variants: {
       variant: {
@@ -41,26 +41,28 @@ export const Toast = forwardRef(
 
     return (
       <>
-        <ToastPrimitive.Provider duration={Infinity}>
-          {Array.from({ length: count }).map((_, index) => (
-            <ToastPrimitive.Root
-              className={cn(ToastVariants({ variant }))}
-              key={index}
-              {...props}
-            >
-              <ToastPrimitive.Description className="flex-1">
-                {children}
-              </ToastPrimitive.Description>
-              <ToastPrimitive.Close asChild>
-                <Button variant={"tertiary"}>Dismiss</Button>
-              </ToastPrimitive.Close>
-            </ToastPrimitive.Root>
-          ))}
-          <ToastPrimitive.Viewport className="fixed flex-col bottom-0 left-0 right-0 p-5 flex items-end gap-2 outline-none" />
-        </ToastPrimitive.Provider>
+        {Array.from({ length: count }).map((_, index) => (
+          <ToastPrimitive.Root
+            className={cn(ToastVariants({ variant }))}
+            key={index}
+            {...props}
+          >
+            <ToastPrimitive.Description className="flex-1">
+              {children}
+            </ToastPrimitive.Description>
+            <ToastPrimitive.Close asChild>
+              <Button variant={"tertiary"}>Dismiss</Button>
+            </ToastPrimitive.Close>
+          </ToastPrimitive.Root>
+        ))}
+        <ToastPrimitive.Viewport className="fixed flex-col bottom-0 left-0 right-0 p-5 flex items-end gap-2 outline-none pointer-events-none" />
       </>
     );
   }
 );
+
+export const ToastProvider = ({ children }: { children?: ReactNode }) => {
+  return <ToastPrimitive.Provider>{children}</ToastPrimitive.Provider>;
+};
 
 export default Toast;
