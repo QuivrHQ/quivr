@@ -6,7 +6,7 @@ import { VariantProps, cva } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 export interface ToastRef {
-  publish: () => void;
+  publish: (toast: ToastContent) => void;
 }
 
 const ToastVariants = cva(
@@ -25,6 +25,10 @@ const ToastVariants = cva(
   }
 );
 
+interface ToastContent extends VariantProps<typeof ToastVariants> {
+  text: string;
+}
+
 interface ToastProps
   extends ToastPrimitive.ToastProps,
     VariantProps<typeof ToastVariants> {
@@ -34,21 +38,27 @@ interface ToastProps
 export const Toast = forwardRef(
   ({ children, variant, ...props }: ToastProps, forwardedRef) => {
     const [count, setCount] = useState(0);
+    const [toasts, setToasts] = useState<ToastContent[]>([]);
 
-    useImperativeHandle(forwardedRef, () => ({
-      publish: () => setCount((count) => count + 1),
-    }));
+    useImperativeHandle(
+      forwardedRef,
+      (): ToastRef => ({
+        publish: (toast: ToastContent) => {
+          setToasts((toasts) => [...toasts, toast]);
+        },
+      })
+    );
 
     return (
       <>
-        {Array.from({ length: count }).map((_, index) => (
+        {toasts.map((toast, index) => (
           <ToastPrimitive.Root
-            className={cn(ToastVariants({ variant }))}
+            className={cn(ToastVariants({ variant: toast.variant }))}
             key={index}
             {...props}
           >
             <ToastPrimitive.Description className="flex-1">
-              {children}
+              {toast.text}
             </ToastPrimitive.Description>
             <ToastPrimitive.Close asChild>
               <Button variant={"tertiary"}>Dismiss</Button>

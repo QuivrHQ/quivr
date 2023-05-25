@@ -16,8 +16,6 @@ export default function Login() {
   const [isPending, setIsPending] = useState(false);
 
   const loginToast = useRef<ToastRef>(null);
-  const loginErrorToast = useRef<ToastRef>(null);
-  const [error, setError] = useState("Unknown Error");
 
   const router = useRouter();
 
@@ -30,11 +28,16 @@ export default function Login() {
 
     if (error) {
       console.error("Error logging in:", error.message);
-      setError(error.message);
-      loginErrorToast.current?.publish();
+      loginToast.current?.publish({
+        variant: "danger",
+        text: error.message,
+      });
     } else if (data) {
       console.log("User logged in:", data);
-      loginToast.current?.publish();
+      loginToast.current?.publish({
+        variant: "success",
+        text: "Successfully logged in",
+      });
       router.replace("/");
     }
     setIsPending(false);
@@ -74,12 +77,7 @@ export default function Login() {
           </form>
         </Card>
       </section>
-      <Toast variant="success" ref={loginToast}>
-        Logged In Successfully
-      </Toast>
-      <Toast variant="danger" ref={loginErrorToast}>
-        {error}
-      </Toast>
+      <Toast variant="success" ref={loginToast} />
     </main>
   );
 }

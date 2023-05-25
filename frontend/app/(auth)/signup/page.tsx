@@ -14,8 +14,6 @@ export default function SignUp() {
   const [isPending, setIsPending] = useState(false);
 
   const signupToast = useRef<ToastRef>(null);
-  const signupErrorToast = useRef<ToastRef>(null);
-  const [error, setError] = useState<string | null>(null);
 
   const handleSignUp = async () => {
     setIsPending(true);
@@ -26,11 +24,13 @@ export default function SignUp() {
 
     if (error) {
       console.error("Error signing up:", error.message);
-      setError(error.message);
-      signupErrorToast.current?.publish();
+      signupToast.current?.publish({
+        variant: "danger",
+        text: `Error signing up: ${error.message}`,
+      });
     } else if (data) {
       console.log("User signed up");
-      signupToast.current?.publish();
+      signupToast.current?.publish({ variant: "success", text: "Sign" });
     }
     setIsPending(false);
   };
@@ -72,9 +72,7 @@ export default function SignUp() {
         <h1 className="font-bold">Confirmation Email sent</h1>
         <p className="text-sm">Check your email.</p>
       </Toast>
-      <Toast variant="danger" ref={signupErrorToast}>
-        {error}
-      </Toast>
+      <Toast variant="danger" ref={signupToast} />
     </main>
   );
 }

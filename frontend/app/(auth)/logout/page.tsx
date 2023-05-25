@@ -13,7 +13,6 @@ export default function Logout() {
   const [isPending, setIsPending] = useState(false);
 
   const logoutToast = useRef<ToastRef>(null);
-  const logoutErrorToast = useRef<ToastRef>(null);
   const [error, setError] = useState("Unknown Error");
 
   const router = useRouter();
@@ -25,10 +24,16 @@ export default function Logout() {
     if (error) {
       console.error("Error logging out:", error.message);
       setError(error.message);
-      logoutErrorToast.current?.publish();
+      logoutToast.current?.publish({
+        variant: "danger",
+        text: `Error logging out: ${error.message}`,
+      });
     } else {
       console.log("User logged out");
-      logoutToast.current?.publish();
+      logoutToast.current?.publish({
+        variant: "success",
+        text: "Logged out successfully",
+      });
       router.replace("/");
     }
     setIsPending(false);
@@ -61,7 +66,7 @@ export default function Logout() {
       <Toast variant="success" ref={logoutToast}>
         Logged Out Successfully
       </Toast>
-      <Toast variant="danger" ref={logoutErrorToast}>
+      <Toast variant="danger" ref={logoutToast}>
         {error}
       </Toast>
     </main>
