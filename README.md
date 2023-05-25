@@ -85,9 +85,10 @@ cp .backend_env.example backend/.env
 cp .frontend_env.example frontend/.env
 ```
 
-- **Step 3**: Update the `backend/.env` file 
+- **Step 3**: Update the `backend/.env` and `frontend/.env` file 
 
 > _Your `supabase_service_key` can be found in your Supabase dashboard under Project Settings -> API. Use the `anon` `public` key found in the `Project API keys` section._
+> _Your  `JWT_SECRET_KEY`can be found in your supabase settings under Project Settings -> JWT Settings -> JWT Secret_
 
 - **Step 4**: Run the following migration scripts on the Supabase database via the web interface (SQL Editor -> `New query`)
 
@@ -126,7 +127,3 @@ Got a pull request? Open it, and we'll review it as soon as possible. Check out 
 - [Frontend Issues](https://github.com/StanGirard/quivr/issues?q=is%3Aopen+is%3Aissue+label%3Afrontend)
 - [Backend Issues](https://github.com/StanGirard/quivr/issues?q=is%3Aopen+is%3Aissue+label%3Abackend)
 
-## Star History 🌟
-
-
-[![Star History Chart](https://api.star-history.com/svg?repos=StanGirard/quivr&type=Date)](https://star-history.com/#StanGirard/quivr&Date)
