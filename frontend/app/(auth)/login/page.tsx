@@ -1,12 +1,12 @@
 "use client";
 import { useRef, useState } from "react";
-import Card from "../components/ui/Card";
-import Button from "../components/ui/Button";
-import PageHeading from "../components/ui/PageHeading";
-import { useSupabase } from "../supabase-provider";
+import Card from "../../components/ui/Card";
+import Button from "../../components/ui/Button";
+import PageHeading from "../../components/ui/PageHeading";
+import { useSupabase } from "../../supabase-provider";
 import Link from "next/link";
-import Field from "../components/ui/Field";
-import Toast, { ToastRef } from "../components/ui/Toast";
+import Field from "../../components/ui/Field";
+import Toast, { ToastRef } from "../../components/ui/Toast";
 import { useRouter } from "next/navigation";
 
 export default function Login() {

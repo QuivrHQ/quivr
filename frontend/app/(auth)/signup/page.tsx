@@ -1,11 +1,11 @@
 "use client";
+import Button from "@/app/components/ui/Button";
+import Card from "@/app/components/ui/Card";
+import Field from "@/app/components/ui/Field";
+import PageHeading from "@/app/components/ui/PageHeading";
+import { ToastRef, Toast } from "@/app/components/ui/Toast";
+import { useSupabase } from "@/app/supabase-provider";
 import { useRef, useState } from "react";
-import Card from "../components/ui/Card";
-import Button from "../components/ui/Button";
-import PageHeading from "../components/ui/PageHeading";
-import { useSupabase } from "../supabase-provider";
-import Field from "../components/ui/Field";
-import Toast, { ToastRef } from "../components/ui/Toast";
 
 export default function SignUp() {
   const { supabase } = useSupabase();

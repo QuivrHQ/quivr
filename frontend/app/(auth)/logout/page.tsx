@@ -1,12 +1,12 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
-import Card from "../components/ui/Card";
-import PageHeading from "../components/ui/PageHeading";
-import { useSupabase } from "../supabase-provider";
-import Button from "../components/ui/Button";
-import Link from "next/link";
-import Toast, { ToastRef } from "../components/ui/Toast";
 import { useRouter } from "next/navigation";
+import { useSupabase } from "@/app/supabase-provider";
+import Toast, { ToastRef } from "@/app/components/ui/Toast";
+import PageHeading from "@/app/components/ui/PageHeading";
+import Button from "@/app/components/ui/Button";
+import Card from "@/app/components/ui/Card";
+import Link from "next/link";
 
 export default function Logout() {
   const { supabase } = useSupabase();
