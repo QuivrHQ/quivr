@@ -89,36 +89,39 @@ export default function UploadPage() {
         text: "Failed to crawl website: " + error.toString(),
       });
     }
-  }, []);
+  }, [session.access_token]);
 
-  const upload = useCallback(async (file: File) => {
-    const formData = new FormData();
-    formData.append("file", file);
-    try {
-      const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/upload`,
-        formData,
-        {
-          headers: {
-            Authorization: `Bearer ${session.access_token}`,
-          },
-        }
-      );
+  const upload = useCallback(
+    async (file: File) => {
+      const formData = new FormData();
+      formData.append("file", file);
+      try {
+        const response = await axios.post(
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}/upload`,
+          formData,
+          {
+            headers: {
+              Authorization: `Bearer ${session.access_token}`,
+            },
+          }
+        );
 
-      setMessage({
-        type: response.data.type,
-        text:
-          (response.data.type === "success"
-            ? "File uploaded successfully: "
-            : "") + JSON.stringify(response.data.message),
-      });
-    } catch (error: any) {
-      setMessage({
-        type: "error",
-        text: "Failed to upload file: " + error.toString(),
-      });
-    }
-  }, []);
+        setMessage({
+          type: response.data.type,
+          text:
+            (response.data.type === "success"
+              ? "File uploaded successfully: "
+              : "") + JSON.stringify(response.data.message),
+        });
+      } catch (error: any) {
+        setMessage({
+          type: "error",
+          text: "Failed to upload file: " + error.toString(),
+        });
+      }
+    },
+    [session.access_token]
+  );
 
   const onDrop = (acceptedFiles: File[], fileRejections: FileRejection[]) => {
     if (fileRejections.length > 0) {

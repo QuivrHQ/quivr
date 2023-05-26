@@ -111,4 +111,6 @@ export const ToastProvider = ({ children }: { children?: ReactNode }) => {
   return <ToastPrimitive.Provider>{children}</ToastPrimitive.Provider>;
 };
 
+Toast.displayName = "Toast";
+
 export default Toast;
