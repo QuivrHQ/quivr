@@ -1,5 +1,12 @@
 "use client";
-import { Dispatch, SetStateAction, useCallback, useState, useRef } from "react";
+import {
+  Dispatch,
+  SetStateAction,
+  useCallback,
+  useState,
+  useRef,
+  useEffect,
+} from "react";
 import { FileRejection, useDropzone } from "react-dropzone";
 import axios from "axios";
 import { Message } from "@/lib/types";
@@ -12,6 +19,7 @@ import PageHeading from "../components/ui/PageHeading";
 import { useSupabase } from "../supabase-provider";
 import { redirect } from "next/navigation";
 import Field from "../components/ui/Field";
+import Toast, { ToastRef } from "../components/ui/Toast";
 
 export default function UploadPage() {
   const [message, setMessage] = useState<Message | null>(null);
@@ -23,6 +31,21 @@ export default function UploadPage() {
   if (session === null) {
     redirect("/login");
   }
+
+  const messageToast = useRef<ToastRef>(null);
+
+  useEffect(() => {
+    if (!message) return;
+    messageToast.current?.publish({
+      variant:
+        message.type === "error"
+          ? "danger"
+          : message.type === "warning"
+          ? "neutral"
+          : "success",
+      text: message.text,
+    });
+  }, [message]);
 
   const crawlWebsite = useCallback(async () => {
     // Validate URL
@@ -204,19 +227,7 @@ export default function UploadPage() {
           </Link>
         </div>
       </section>
-      {message && (
-        <div
-          className={`fixed bottom-0 inset-x-0 m-4 p-4 max-w-sm mx-auto rounded ${
-            message.type === "success"
-              ? "bg-green-500"
-              : message.type === "warning"
-              ? "bg-yellow-600"
-              : "bg-red-500"
-          }`}
-        >
-          <p className="text-white">{message.text}</p>
-        </div>
-      )}
+      <Toast ref={messageToast} />
     </main>
   );
 }
