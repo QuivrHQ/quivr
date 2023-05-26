@@ -18,7 +18,7 @@ const NavBar: FC<NavBarProps> = ({}) => {
   useEffect(() => {
     const handleScroll = (e: Event) => {
       const target = e.currentTarget as Window;
-      if (target.scrollY > scrollPos.current && !hidden) {
+      if (target.scrollY > scrollPos.current) {
         setHidden(true);
       } else {
         setHidden(false);
@@ -28,7 +28,7 @@ const NavBar: FC<NavBarProps> = ({}) => {
 
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
-  }, [hidden]);
+  }, []);
 
   return (
     <motion.header
