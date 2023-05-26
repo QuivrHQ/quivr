@@ -1,25 +1,25 @@
 "use client";
+import { Message } from "@/lib/types";
+import axios from "axios";
+import { AnimatePresence, motion } from "framer-motion";
+import Link from "next/link";
+import { redirect } from "next/navigation";
 import {
   Dispatch,
   SetStateAction,
   useCallback,
-  useState,
-  useRef,
   useEffect,
+  useRef,
+  useState,
 } from "react";
 import { FileRejection, useDropzone } from "react-dropzone";
-import axios from "axios";
-import { Message } from "@/lib/types";
-import Button from "../components/ui/Button";
 import { MdClose } from "react-icons/md";
-import { AnimatePresence, motion } from "framer-motion";
-import Link from "next/link";
+import Button from "../components/ui/Button";
 import Card from "../components/ui/Card";
-import PageHeading from "../components/ui/PageHeading";
-import { useSupabase } from "../supabase-provider";
-import { redirect } from "next/navigation";
 import Field from "../components/ui/Field";
+import PageHeading from "../components/ui/PageHeading";
 import Toast, { ToastRef } from "../components/ui/Toast";
+import { useSupabase } from "../supabase-provider";
 
 export default function UploadPage() {
   const [message, setMessage] = useState<Message | null>(null);
@@ -27,7 +27,7 @@ export default function UploadPage() {
   const [files, setFiles] = useState<File[]>([]);
   const [pendingFileIndex, setPendingFileIndex] = useState<number>(0);
   const urlInputRef = useRef<HTMLInputElement | null>(null);
-  const { supabase, session } = useSupabase();
+  const { session } = useSupabase();
   if (session === null) {
     redirect("/login");
   }
@@ -83,10 +83,10 @@ export default function UploadPage() {
         type: response.data.type,
         text: response.data.message,
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       setMessage({
         type: "error",
-        text: "Failed to crawl website: " + error.toString(),
+        text: "Failed to crawl website: " + JSON.stringify(error),
       });
     }
   }, [session.access_token]);
@@ -113,10 +113,10 @@ export default function UploadPage() {
               ? "File uploaded successfully: "
               : "") + JSON.stringify(response.data.message),
         });
-      } catch (error: any) {
+      } catch (error: unknown) {
         setMessage({
           type: "error",
-          text: "Failed to upload file: " + error.toString(),
+          text: "Failed to upload file: " + JSON.stringify(error),
         });
       }
     },
@@ -179,7 +179,7 @@ export default function UploadPage() {
             <div className="text-center mt-2 p-6 max-w-sm w-full flex flex-col gap-5 items-center">
               {files.length > 0 ? (
                 <AnimatePresence>
-                  {files.map((file, i) => (
+                  {files.map((file) => (
                     <FileComponent
                       key={file.name + file.size}
                       file={file}

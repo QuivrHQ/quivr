@@ -1,5 +1,4 @@
 import axios from "axios";
-import { Document } from "../types";
 import { useSupabase } from "../../supabase-provider";
 
 interface DocumentDataProps {
@@ -7,21 +6,22 @@ interface DocumentDataProps {
 }
 
 const DocumentData = async ({ documentName }: DocumentDataProps) => {
-  const { supabase, session } = useSupabase();
+  const { session } = useSupabase();
   if (!session) {
-    throw new Error('User session not found');
+    throw new Error("User session not found");
   }
 
   const res = await axios.get(
     `${process.env.NEXT_PUBLIC_BACKEND_URL}/explore/${documentName}`,
     {
       headers: {
-        'Authorization': `Bearer ${session.access_token}`,
+        Authorization: `Bearer ${session.access_token}`,
       },
     }
   );
+  // TODO: review the logic of this part and try to use unknown instead of any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const documents = res.data.documents as any[];
-  const doc = documents[0];
   return (
     <div className="prose">
       <p>No. of documents: {documents.length}</p>
