@@ -1,14 +1,17 @@
+import { useSupabase } from "@/app/supabase-provider";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { Dispatch, FC, HTMLAttributes, ReactNode, SetStateAction } from "react";
-import DarkModeToggle from "./DarkModeToggle";
 import Button from "../ui/Button";
+import DarkModeToggle from "./DarkModeToggle";
 
 interface NavItemsProps extends HTMLAttributes<HTMLUListElement> {
   setOpen?: Dispatch<SetStateAction<boolean>>;
 }
 
 const NavItems: FC<NavItemsProps> = ({ className, setOpen, ...props }) => {
+  const { session } = useSupabase();
+  const isUserLoggedIn = session?.user !== undefined;
   return (
     <ul
       className={cn(
@@ -44,6 +47,11 @@ const NavItems: FC<NavItemsProps> = ({ className, setOpen, ...props }) => {
           <Button variant={"secondary"}>Try Demo</Button>
         </Link>
         <DarkModeToggle />
+        {isUserLoggedIn && (
+          <Link href={"/logout"}>
+            <Button variant={"secondary"}>Logout</Button>
+          </Link>
+        )}
       </div>
     </ul>
   );
