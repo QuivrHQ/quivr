@@ -1,11 +1,11 @@
-import { Analytics } from "@vercel/analytics/react";
-import NavBar from "./components/NavBar";
-import "./globals.css";
-import { Inter } from "next/font/google";
-import SupabaseProvider from "./supabase-provider";
 import { createServerComponentSupabaseClient } from "@supabase/auth-helpers-nextjs";
-import { headers, cookies } from "next/headers";
+import { Analytics } from "@vercel/analytics/react";
+import { Inter } from "next/font/google";
+import { cookies, headers } from "next/headers";
+import NavBar from "./components/NavBar";
 import { ToastProvider } from "./components/ui/Toast";
+import "./globals.css";
+import SupabaseProvider from "./supabase-provider";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -34,9 +34,11 @@ export default async function RootLayout({
       <body
         className={`bg-white text-black dark:bg-black dark:text-white min-h-screen w-full ${inter.className}`}
       >
-        <NavBar />
         <ToastProvider>
-          <SupabaseProvider session={session}>{children}</SupabaseProvider>
+          <SupabaseProvider session={session}>
+            <NavBar />
+            {children}
+          </SupabaseProvider>
         </ToastProvider>
         <Analytics />
       </body>
