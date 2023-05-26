@@ -10,7 +10,6 @@ interface NavItemsProps extends HTMLAttributes<HTMLUListElement> {
 
 const NavItems: FC<NavItemsProps> = ({ className, setOpen, ...props }) => {
   return (
-    // <div className={cn("flex flex-1 items-center", className)} {...props}>
     <ul
       className={cn(
         "flex flex-row items-center gap-4 text-sm flex-1",
@@ -47,7 +46,6 @@ const NavItems: FC<NavItemsProps> = ({ className, setOpen, ...props }) => {
         <DarkModeToggle />
       </div>
     </ul>
-    // </div>
   );
 };
 
