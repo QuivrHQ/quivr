@@ -4,13 +4,14 @@ import * as ToastPrimitive from "@radix-ui/react-toast";
 import Button from "./Button";
 import { VariantProps, cva } from "class-variance-authority";
 import { cn } from "@/lib/utils";
+import { AnimatePresence, motion } from "framer-motion";
 
 export interface ToastRef {
   publish: (toast: ToastContent) => void;
 }
 
 const ToastVariants = cva(
-  "bg-white dark:bg-black px-8 max-w-sm w-full py-5 border border-black/10 dark:border-white/25 rounded-xl shadow-xl flex items-center pointer-events-auto",
+  "bg-white dark:bg-black px-8 max-w-sm w-full py-5 border border-black/10 dark:border-white/25 rounded-xl shadow-xl flex items-center pointer-events-auto data-[swipe=end]:opacity-0 data-[state=closed]:opacity-0 transition-opacity",
   {
     variants: {
       variant: {
@@ -27,6 +28,7 @@ const ToastVariants = cva(
 
 interface ToastContent extends VariantProps<typeof ToastVariants> {
   text: string;
+  open?: boolean;
 }
 
 interface ToastProps
@@ -37,34 +39,68 @@ interface ToastProps
 
 export const Toast = forwardRef(
   ({ children, variant, ...props }: ToastProps, forwardedRef) => {
-    const [count, setCount] = useState(0);
     const [toasts, setToasts] = useState<ToastContent[]>([]);
+
+    const toggleToast = (value: boolean, index: number) => {
+      setToasts((toasts) =>
+        toasts.map((toast, i) => {
+          if (i === index) {
+            toast.open = value;
+          }
+          return toast;
+        })
+      );
+    };
 
     useImperativeHandle(
       forwardedRef,
       (): ToastRef => ({
         publish: (toast: ToastContent) => {
-          setToasts((toasts) => [...toasts, toast]);
+          setToasts((toasts) => {
+            const newToasts = [...toasts];
+            toast.open = true;
+            newToasts.push(toast);
+            return newToasts;
+          });
         },
       })
     );
 
     return (
       <>
-        {toasts.map((toast, index) => (
-          <ToastPrimitive.Root
-            className={cn(ToastVariants({ variant: toast.variant }))}
-            key={index}
-            {...props}
-          >
-            <ToastPrimitive.Description className="flex-1">
-              {toast.text}
-            </ToastPrimitive.Description>
-            <ToastPrimitive.Close asChild>
-              <Button variant={"tertiary"}>Dismiss</Button>
-            </ToastPrimitive.Close>
-          </ToastPrimitive.Root>
-        ))}
+        <AnimatePresence mode="popLayout">
+          {toasts.map((toast, index) => {
+            if (!toast.open) return;
+            return (
+              <ToastPrimitive.Root
+                open={toast.open}
+                onOpenChange={(value) => toggleToast(value, index)}
+                asChild
+                forceMount
+                key={index}
+                {...props}
+              >
+                <motion.div
+                  layout
+                  initial={{ x: "100%", opacity: 0 }}
+                  animate={{
+                    x: "0%",
+                    opacity: 1,
+                  }}
+                  exit={{ opacity: 0 }}
+                  className={cn(ToastVariants({ variant: toast.variant }))}
+                >
+                  <ToastPrimitive.Description className="flex-1">
+                    {toast.text}
+                  </ToastPrimitive.Description>
+                  <ToastPrimitive.Close asChild>
+                    <Button variant={"tertiary"}>Dismiss</Button>
+                  </ToastPrimitive.Close>
+                </motion.div>
+              </ToastPrimitive.Root>
+            );
+          })}
+        </AnimatePresence>
         <ToastPrimitive.Viewport className="fixed flex-col bottom-0 left-0 right-0 p-5 flex items-end gap-2 outline-none pointer-events-none" />
       </>
     );
