@@ -51,4 +51,3 @@ streamlit-demo/.streamlit/secrets.toml
 backend/pandoc-*
 **/yarn.lock
 **/.pandoc-*
-frontend/pnpm-lock.yaml
