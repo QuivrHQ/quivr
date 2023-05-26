@@ -5,6 +5,7 @@ import Field from "@/app/components/ui/Field";
 import PageHeading from "@/app/components/ui/PageHeading";
 import Toast, { ToastRef } from "@/app/components/ui/Toast";
 import { useSupabase } from "@/app/supabase-provider";
+import Link from "next/link";
 import { useRef, useState } from "react";
 
 export default function SignUp() {
@@ -64,6 +65,7 @@ export default function SignUp() {
             />
             <div className="flex flex-col items-center justify-center mt-2 gap-2">
               <Button isLoading={isPending}>Sign Up</Button>
+              <Link href="/login">Already registered? Sign in</Link>
             </div>
           </form>
         </Card>
