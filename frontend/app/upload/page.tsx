@@ -83,10 +83,10 @@ export default function UploadPage() {
         type: response.data.type,
         text: response.data.message,
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       setMessage({
         type: "error",
-        text: "Failed to crawl website: " + error.toString(),
+        text: "Failed to crawl website: " + JSON.stringify(error),
       });
     }
   }, [session.access_token]);
@@ -113,10 +113,10 @@ export default function UploadPage() {
               ? "File uploaded successfully: "
               : "") + JSON.stringify(response.data.message),
         });
-      } catch (error: any) {
+      } catch (error: unknown) {
         setMessage({
           type: "error",
-          text: "Failed to upload file: " + error.toString(),
+          text: "Failed to upload file: " + JSON.stringify(error),
         });
       }
     },

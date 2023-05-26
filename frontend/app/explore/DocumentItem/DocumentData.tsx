@@ -19,6 +19,8 @@ const DocumentData = async ({ documentName }: DocumentDataProps) => {
       },
     }
   );
+  // TODO: review the logic of this part and try to use unknown instead of any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const documents = res.data.documents as any[];
   return (
     <div className="prose">
