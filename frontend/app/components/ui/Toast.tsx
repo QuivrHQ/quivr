@@ -3,7 +3,7 @@ import { ReactNode, forwardRef, useImperativeHandle, useState } from "react";
 import * as ToastPrimitive from "@radix-ui/react-toast";
 import Button from "./Button";
 import { VariantProps, cva } from "class-variance-authority";
-import { cn } from "@/lib/utils";
+import { cn, generateUniqueId } from "@/lib/utils";
 import { AnimatePresence, motion } from "framer-motion";
 
 export interface ToastRef {
@@ -29,6 +29,7 @@ const ToastVariants = cva(
 interface ToastContent extends VariantProps<typeof ToastVariants> {
   text: string;
   open?: boolean;
+  id?: string;
 }
 
 interface ToastProps
@@ -59,6 +60,7 @@ export const Toast = forwardRef(
           setToasts((toasts) => {
             const newToasts = [...toasts];
             toast.open = true;
+            toast.id = generateUniqueId();
             newToasts.push(toast);
             return newToasts;
           });
@@ -77,7 +79,7 @@ export const Toast = forwardRef(
                 onOpenChange={(value) => toggleToast(value, index)}
                 asChild
                 forceMount
-                key={index}
+                key={toast.id}
                 {...props}
               >
                 <motion.div
