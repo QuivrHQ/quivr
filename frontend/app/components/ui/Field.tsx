@@ -1,7 +1,6 @@
 import { cn } from "@/lib/utils";
 import {
   DetailedHTMLProps,
-  FC,
   InputHTMLAttributes,
   RefObject,
   forwardRef,
@@ -17,7 +16,7 @@ interface FieldProps
 }
 
 const Field = forwardRef(
-  ({ label, className, name, id, ...props }: FieldProps, forwardedRef) => {
+  ({ label, className, name, ...props }: FieldProps, forwardedRef) => {
     return (
       <fieldset className={cn("flex flex-col w-full", className)} name={name}>
         {label && (

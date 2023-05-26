@@ -1,19 +1,19 @@
 "use client";
-import { useState, useEffect } from "react";
 import axios from "axios";
+import { AnimatePresence } from "framer-motion";
+import Link from "next/link";
+import { redirect } from "next/navigation";
+import { useEffect, useState } from "react";
+import Button from "../components/ui/Button";
+import Spinner from "../components/ui/Spinner";
+import { useSupabase } from "../supabase-provider";
 import DocumentItem from "./DocumentItem";
 import { Document } from "./types";
-import Button from "../components/ui/Button";
-import Link from "next/link";
-import Spinner from "../components/ui/Spinner";
-import { AnimatePresence } from "framer-motion";
-import { useSupabase } from "../supabase-provider";
-import { redirect } from "next/navigation";
 
 export default function ExplorePage() {
   const [documents, setDocuments] = useState<Document[]>([]);
   const [isPending, setIsPending] = useState(true);
-  const { supabase, session } = useSupabase();
+  const { session } = useSupabase();
   if (session === null) {
     redirect("/login");
   }
