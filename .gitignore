@@ -50,3 +50,4 @@ streamlit-demo/.streamlit/secrets.toml
 .frontend_env
 backend/pandoc-*
 **/yarn.lock
+**/.pandoc-*
