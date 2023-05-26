@@ -28,7 +28,7 @@ const NavBar: FC<NavBarProps> = ({}) => {
 
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  }, [hidden]);
 
   return (
     <motion.header

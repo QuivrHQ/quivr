@@ -1,5 +1,12 @@
 "use client";
-import { Dispatch, SetStateAction, useCallback, useState, useRef } from "react";
+import {
+  Dispatch,
+  SetStateAction,
+  useCallback,
+  useState,
+  useRef,
+  useEffect,
+} from "react";
 import { FileRejection, useDropzone } from "react-dropzone";
 import axios from "axios";
 import { Message } from "@/lib/types";
@@ -11,6 +18,8 @@ import Card from "../components/ui/Card";
 import PageHeading from "../components/ui/PageHeading";
 import { useSupabase } from "../supabase-provider";
 import { redirect } from "next/navigation";
+import Field from "../components/ui/Field";
+import Toast, { ToastRef } from "../components/ui/Toast";
 
 export default function UploadPage() {
   const [message, setMessage] = useState<Message | null>(null);
@@ -18,10 +27,25 @@ export default function UploadPage() {
   const [files, setFiles] = useState<File[]>([]);
   const [pendingFileIndex, setPendingFileIndex] = useState<number>(0);
   const urlInputRef = useRef<HTMLInputElement | null>(null);
-  const { supabase, session } = useSupabase()
+  const { supabase, session } = useSupabase();
   if (session === null) {
-    redirect('/login')
+    redirect("/login");
   }
+
+  const messageToast = useRef<ToastRef>(null);
+
+  useEffect(() => {
+    if (!message) return;
+    messageToast.current?.publish({
+      variant:
+        message.type === "error"
+          ? "danger"
+          : message.type === "warning"
+          ? "neutral"
+          : "success",
+      text: message.text,
+    });
+  }, [message]);
 
   const crawlWebsite = useCallback(async () => {
     // Validate URL
@@ -50,7 +74,7 @@ export default function UploadPage() {
         config,
         {
           headers: {
-            'Authorization': `Bearer ${session.access_token}`,
+            Authorization: `Bearer ${session.access_token}`,
           },
         }
       );
@@ -65,36 +89,39 @@ export default function UploadPage() {
         text: "Failed to crawl website: " + error.toString(),
       });
     }
-  }, []);
+  }, [session.access_token]);
 
-  const upload = useCallback(async (file: File) => {
-    const formData = new FormData();
-    formData.append("file", file);
-    try {
-      const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/upload`,
-        formData,
-        {
-          headers: {
-            'Authorization': `Bearer ${session.access_token}`,
-          },
-        }
-      );
+  const upload = useCallback(
+    async (file: File) => {
+      const formData = new FormData();
+      formData.append("file", file);
+      try {
+        const response = await axios.post(
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}/upload`,
+          formData,
+          {
+            headers: {
+              Authorization: `Bearer ${session.access_token}`,
+            },
+          }
+        );
 
-      setMessage({
-        type: response.data.type,
-        text:
-          (response.data.type === "success"
-            ? "File uploaded successfully: "
-            : "") + JSON.stringify(response.data.message),
-      });
-    } catch (error: any) {
-      setMessage({
-        type: "error",
-        text: "Failed to upload file: " + error.toString(),
-      });
-    }
-  }, []);
+        setMessage({
+          type: response.data.type,
+          text:
+            (response.data.type === "success"
+              ? "File uploaded successfully: "
+              : "") + JSON.stringify(response.data.message),
+        });
+      } catch (error: any) {
+        setMessage({
+          type: "error",
+          text: "Failed to upload file: " + error.toString(),
+        });
+      }
+    },
+    [session.access_token]
+  );
 
   const onDrop = (acceptedFiles: File[], fileRejections: FileRejection[]) => {
     if (fileRejections.length > 0) {
@@ -138,7 +165,7 @@ export default function UploadPage() {
       <section
         {...getRootProps()}
         // className="w-full h-full min-h-screen text-center flex flex-col items-center gap-5 pt-32 outline-none"
-        className="w-full outline-none pt-20 flex flex-col gap-5 items-center justify-center p-6"
+        className="w-full outline-none pt-32 flex flex-col gap-5 items-center justify-center p-6"
       >
         <PageHeading
           title="Upload Knowledge"
@@ -177,11 +204,11 @@ export default function UploadPage() {
           {/* Assign a width of 50% to each card */}
           <Card className="w-1/2">
             <div className="text-center mt-2 p-6 max-w-sm w-full flex flex-col gap-5 items-center">
-              <input
+              <Field
+                name="crawlurl"
                 ref={urlInputRef}
                 type="text"
                 placeholder="Enter a website URL"
-                className="dark:bg-black"
               />
               <button
                 onClick={crawlWebsite}
@@ -203,19 +230,7 @@ export default function UploadPage() {
           </Link>
         </div>
       </section>
-      {message && (
-        <div
-          className={`fixed bottom-0 inset-x-0 m-4 p-4 max-w-sm mx-auto rounded ${
-            message.type === "success"
-              ? "bg-green-500"
-              : message.type === "warning"
-              ? "bg-yellow-600"
-              : "bg-red-500"
-          }`}
-        >
-          <p className="text-white">{message.text}</p>
-        </div>
-      )}
+      <Toast ref={messageToast} />
     </main>
   );
 }
