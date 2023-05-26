@@ -1,6 +1,4 @@
 import { FC, ReactNode } from "react";
-import PageHeading from "../components/ui/PageHeading";
-import Card from "../components/ui/Card";
 import {
   GiArtificialIntelligence,
   GiBrain,
@@ -9,10 +7,9 @@ import {
   GiLockedDoor,
   GiOpenBook,
 } from "react-icons/gi";
+import Card from "../components/ui/Card";
 
-interface FeaturesProps {}
-
-const Features: FC<FeaturesProps> = ({}) => {
+const Features: FC = () => {
   return (
     <section className="my-20 text-center flex flex-col items-center justify-center gap-10">
       <div>

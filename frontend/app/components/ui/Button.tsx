@@ -1,12 +1,6 @@
-import {
-  ButtonHTMLAttributes,
-  FC,
-  LegacyRef,
-  MutableRefObject,
-  forwardRef,
-} from "react";
-import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
+import { cva, type VariantProps } from "class-variance-authority";
+import { ButtonHTMLAttributes, FC, LegacyRef, forwardRef } from "react";
 import { FaSpinner } from "react-icons/fa";
 
 const ButtonVariants = cva(

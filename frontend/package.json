@@ -6,7 +6,10 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "test-type": "tsc --noEmit --emitDeclarationOnly false",
+    "test": "yarn test-type",
+    "precommit": "yarn lint && yarn test"
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.0.3",
@@ -18,13 +21,14 @@
     "@types/node": "20.1.7",
     "@types/react": "18.2.6",
     "@types/react-dom": "18.2.4",
+    "@typescript-eslint/eslint-plugin": "^5.59.7",
     "@vercel/analytics": "^1.0.1",
     "autoprefixer": "10.4.14",
     "axios": "^1.4.0",
     "class-variance-authority": "^0.6.0",
     "clsx": "^1.2.1",
     "encoding": "^0.1.13",
-    "eslint": "8.40.0",
+    "eslint": "^8.41.0",
     "eslint-config-next": "13.4.2",
     "framer-motion": "^10.12.12",
     "next": "13.4.2",
@@ -36,11 +40,12 @@
     "rehype-highlight": "^6.0.0",
     "tailwind-merge": "^1.12.0",
     "tailwindcss": "3.3.2",
-    "typescript": "5.0.4"
+    "typescript": "^5.0.4"
   },
   "devDependencies": {
     "@tailwindcss/typography": "^0.5.9",
     "@types/next": "^9.0.0",
+    "husky": "^8.0.3",
     "react-icons": "^4.8.0"
   }
 }

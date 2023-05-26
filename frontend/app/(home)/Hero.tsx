@@ -1,13 +1,11 @@
 "use client";
+import { motion, useScroll, useSpring, useTransform } from "framer-motion";
 import Link from "next/link";
 import { FC, useRef } from "react";
-import Button from "../components/ui/Button";
 import { MdNorthEast } from "react-icons/md";
-import { motion, useScroll, useSpring, useTransform } from "framer-motion";
+import Button from "../components/ui/Button";
 
-interface HeroProps {}
-
-const Hero: FC<HeroProps> = ({}) => {
+const Hero: FC = () => {
   const targetRef = useRef<HTMLDivElement | null>(null);
   const { scrollYProgress } = useScroll({
     target: targetRef,
