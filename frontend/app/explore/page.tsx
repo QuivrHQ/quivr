@@ -18,31 +18,30 @@ export default function ExplorePage() {
     redirect("/login");
   }
 
-  const fetchDocuments = async () => {
-    setIsPending(true);
-    try {
-      console.log(
-        `Fetching documents from ${process.env.NEXT_PUBLIC_BACKEND_URL}/explore`
-      );
-      const response = await axios.get<{ documents: Document[] }>(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/explore`,
-        {
-          headers: {
-            Authorization: `Bearer ${session.access_token}`,
-          },
-        }
-      );
-      setDocuments(response.data.documents);
-    } catch (error) {
-      console.error("Error fetching documents", error);
-      setDocuments([]);
-    }
-    setIsPending(false);
-  };
-
   useEffect(() => {
+    const fetchDocuments = async () => {
+      setIsPending(true);
+      try {
+        console.log(
+          `Fetching documents from ${process.env.NEXT_PUBLIC_BACKEND_URL}/explore`
+        );
+        const response = await axios.get<{ documents: Document[] }>(
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}/explore`,
+          {
+            headers: {
+              Authorization: `Bearer ${session.access_token}`,
+            },
+          }
+        );
+        setDocuments(response.data.documents);
+      } catch (error) {
+        console.error("Error fetching documents", error);
+        setDocuments([]);
+      }
+      setIsPending(false);
+    };
     fetchDocuments();
-  }, [fetchDocuments]);
+  }, []);
 
   return (
     <main>
