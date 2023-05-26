@@ -84,6 +84,10 @@ export default function Login() {
               <Link href="/signup">Don{"'"}t have an account? Sign up</Link>
             </div>
             <Divider text="or" />
+            <div className="flex flex-col items-center justify-center mt-2 gap-2">
+              <GoogleLoginButton />
+            </div>
+            <Divider text="or" />
             <MagicLinkLogin email={email} setEmail={setEmail} />
           </form>
         </Card>
