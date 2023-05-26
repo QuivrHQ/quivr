@@ -6,7 +6,10 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "test-type": "tsc --noEmit --emitDeclarationOnly false",
+    "test": "yarn test-type",
+    "precommit": "yarn lint && yarn test"
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.0.3",
@@ -41,6 +44,7 @@
   "devDependencies": {
     "@tailwindcss/typography": "^0.5.9",
     "@types/next": "^9.0.0",
+    "husky": "^8.0.3",
     "react-icons": "^4.8.0"
   }
 }

@@ -1,14 +1,13 @@
 "use client";
 import Image from "next/image";
 import { FC, useEffect, useRef, useState } from "react";
-import logo from "../../logo.png";
+
 import Link from "next/link";
 import Button from "../ui/Button";
 import DarkModeToggle from "./DarkModeToggle";
 import { motion } from "framer-motion";
 import MobileMenu from "./MobileMenu";
 import NavItems from "./NavItems";
-
 interface NavBarProps {}
 
 const NavBar: FC<NavBarProps> = ({}) => {
@@ -42,7 +41,7 @@ const NavBar: FC<NavBarProps> = ({}) => {
         <Link href={"/"} className="flex items-center gap-4">
           <Image
             className="rounded-full"
-            src={logo}
+            src={"/logo.png"}
             alt="Quivr Logo"
             width={48}
             height={48}
