@@ -72,7 +72,7 @@ export default function Login() {
             />
             <div className="flex flex-col items-center justify-center mt-2 gap-2">
               <Button isLoading={isPending}>Login</Button>
-              <Link href="/signup">Dont have an account? Sign up</Link>
+              <Link href="/signup">Don{"'"}t have an account? Sign up</Link>
             </div>
           </form>
         </Card>
