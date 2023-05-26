@@ -10,7 +10,7 @@ import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 
 export default function Login() {
-  const { supabase } = useSupabase();
+  const { supabase, session } = useSupabase();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isPending, setIsPending] = useState(false);
@@ -27,21 +27,22 @@ export default function Login() {
     });
 
     if (error) {
-      console.error("Error logging in:", error.message);
       loginToast.current?.publish({
         variant: "danger",
         text: error.message,
       });
     } else if (data) {
-      console.log("User logged in:", data);
       loginToast.current?.publish({
         variant: "success",
         text: "Successfully logged in",
       });
-      router.replace("/");
     }
     setIsPending(false);
   };
+
+  if (session?.user !== undefined) {
+    router.replace("/");
+  }
 
   return (
     <main>
