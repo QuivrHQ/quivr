@@ -14,10 +14,11 @@ export const FileComponent = ({
       initial={{ x: "-10%", opacity: 0 }}
       animate={{ x: "0%", opacity: 1 }}
       exit={{ x: "10%", opacity: 0 }}
-      className="flex flex-row gap-1 py-2 dark:bg-black border-b border-black/10 dark:border-white/25 leading-none px-6"
+      layout
+      className="relative flex flex-row gap-1 py-2 dark:bg-black border-b last:border-none border-black/10 dark:border-white/25 leading-none px-6 overflow-hidden"
     >
       <div className="flex flex-1">
-        <div className="flex flex flex-col">
+        <div className="flex flex-col">
           <span className="overflow-ellipsis overflow-hidden whitespace-nowrap">
             {file.name}
           </span>
@@ -26,19 +27,15 @@ export const FileComponent = ({
           </span>
         </div>
       </div>
-      <div className="flex w-5">
-        <button
-          role="remove file"
-          className="text-xl text-red-500 text-ellipsis"
-          onClick={() =>
-            setFiles((files) =>
-              files.filter((f) => f.name !== file.name || f.size !== file.size)
-            )
-          }
-        >
-          <MdClose />
-        </button>
-      </div>
+      <button
+        role="remove file"
+        className="text-xl text-red-500 text-ellipsis absolute top-0 h-full right-0 flex items-center justify-center bg-white dark:bg-black p-3 shadow-md aspect-square"
+        onClick={() =>
+          setFiles((files) => files.filter((f) => f.name !== file.name))
+        }
+      >
+        <MdClose />
+      </button>
     </motion.div>
   );
 };
