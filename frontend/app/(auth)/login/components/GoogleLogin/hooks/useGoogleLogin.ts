@@ -1,11 +1,11 @@
-import { useToast } from "@/app/hooks/useToast";
 import { useSupabase } from "@/app/supabase-provider";
+import { useToast } from "@/lib/hooks/useToast";
 import { useState } from "react";
 
 export const useGoogleLogin = () => {
   const { supabase } = useSupabase();
 
-  const { setMessage, messageToast } = useToast();
+  const { publish } = useToast();
   const [isPending, setIsPending] = useState(false);
   const signInWithGoogle = async () => {
     const { error } = await supabase.auth.signInWithOAuth({
@@ -19,8 +19,8 @@ export const useGoogleLogin = () => {
     });
     setIsPending(false);
     if (error) {
-      setMessage({
-        type: "error",
+      publish({
+        variant: "danger",
         text: "An error occurred ",
       });
     }
@@ -29,6 +29,5 @@ export const useGoogleLogin = () => {
   return {
     signInWithGoogle,
     isPending,
-    messageToast,
   };
 };

@@ -24,7 +24,6 @@ const DocumentItem = ({ document, setDocuments }: DocumentProps) => {
   const deleteDocument = async (name: string) => {
     setIsDeleting(true);
     try {
-      console.log(`Deleting Document ${name}`);
       await axios.delete(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/explore/${name}`,
         {

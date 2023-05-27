@@ -41,8 +41,6 @@ export default function ChatPage() {
       }
     );
     setHistory(response.data.history);
-    console.log(response.data.history);
-
     setQuestion("");
     setIsPending(false);
   };
