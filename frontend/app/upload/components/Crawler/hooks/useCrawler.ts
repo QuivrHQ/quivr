@@ -2,7 +2,7 @@ import { useSupabase } from "@/app/supabase-provider";
 import axios from "axios";
 import { redirect } from "next/navigation";
 import { useCallback, useRef, useState } from "react";
-import { useToast } from "../../../hooks/useToast";
+import { useToast } from "../../../../hooks/useToast";
 import { isValidUrl } from "../helpers/isValidUrl";
 
 export const useCrawler = () => {

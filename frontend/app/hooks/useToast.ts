@@ -1,6 +1,6 @@
-import { ToastRef } from "@/app/components/ui/Toast";
 import { Message } from "postcss";
 import { useEffect, useRef, useState } from "react";
+import { ToastRef } from "../components/ui/Toast";
 
 export const useToast = () => {
   const [message, setMessage] = useState<Message | null>(null);
