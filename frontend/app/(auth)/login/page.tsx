@@ -1,13 +1,17 @@
 "use client";
 import Button from "@/app/components/ui/Button";
 import Card from "@/app/components/ui/Card";
+import { Divider } from "@/app/components/ui/Divider";
 import Field from "@/app/components/ui/Field";
 import PageHeading from "@/app/components/ui/PageHeading";
-import Toast, { ToastRef } from "@/app/components/ui/Toast";
+import Toast from "@/app/components/ui/Toast";
+import { useToast } from "@/app/hooks/useToast";
 import { useSupabase } from "@/app/supabase-provider";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useRef, useState } from "react";
+import { useState } from "react";
+import { GoogleLoginButton } from "./components/GoogleLogin";
+import { MagicLinkLogin } from "./components/MagicLinkLogin";
 
 export default function Login() {
   const { supabase, session } = useSupabase();
@@ -15,7 +19,7 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const [isPending, setIsPending] = useState(false);
 
-  const loginToast = useRef<ToastRef>(null);
+  const { setMessage, messageToast } = useToast();
 
   const router = useRouter();
 
@@ -27,15 +31,17 @@ export default function Login() {
     });
 
     if (error) {
-      loginToast.current?.publish({
-        variant: "danger",
+      setMessage({
+        type: "danger",
         text: error.message,
       });
     } else if (data) {
-      loginToast.current?.publish({
-        variant: "success",
+      setMessage({
+        type: "success",
         text: "Successfully logged in",
       });
+    } else {
+      setEmail("");
     }
     setIsPending(false);
   };
@@ -72,13 +78,21 @@ export default function Login() {
               placeholder="Password"
             />
             <div className="flex flex-col items-center justify-center mt-2 gap-2">
-              <Button isLoading={isPending}>Login</Button>
+              <Button type="submit" isLoading={isPending}>
+                Login
+              </Button>
               <Link href="/signup">Don{"'"}t have an account? Sign up</Link>
             </div>
+            <Divider text="or" />
+            <div className="flex flex-col items-center justify-center mt-2 gap-2">
+              <GoogleLoginButton />
+            </div>
+            <Divider text="or" />
+            <MagicLinkLogin email={email} setEmail={setEmail} />
           </form>
         </Card>
       </section>
-      <Toast variant="success" ref={loginToast} />
+      <Toast ref={messageToast} />
     </main>
   );
 }
