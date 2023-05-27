@@ -47,6 +47,7 @@ const DocumentItem = ({ document, setDocuments }: DocumentProps) => {
       initial={{ x: -64, opacity: 0 }}
       animate={{ x: 0, opacity: 1 }}
       exit={{ x: 64, opacity: 0 }}
+      layout
       className="flex flex-col sm:flex-row sm:items-center justify-between w-full p-5 gap-5"
     >
       <p className="text-lg leading-tight max-w-sm">{document.name}</p>
