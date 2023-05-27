@@ -6,10 +6,10 @@ import { generateToastUniqueId } from "../helpers/generateToastUniqueId";
 export const useToastBuilder = () => {
   const [toasts, setToasts] = useState<ToastContent[]>([]);
 
-  const toggleToast = (value: boolean, index: number) => {
+  const toggleToast = (value: boolean, toastId: string) => {
     setToasts((toasts) =>
-      toasts.map((toast, i) => {
-        if (i === index) {
+      toasts.map((toast) => {
+        if (toast.id === toastId) {
           toast.open = value;
         }
         return toast;
