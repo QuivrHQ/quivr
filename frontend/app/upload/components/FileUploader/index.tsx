@@ -48,7 +48,7 @@ export const FileUploader = (): JSX.Element => {
             <div className="w-1/2">
               <Card className="h-52 py-3 overflow-y-auto">
                 {files.length > 0 ? (
-                  <AnimatePresence>
+                  <AnimatePresence mode="popLayout">
                     {files.map((file) => (
                       <FileComponent
                         key={file.name + file.size}
