@@ -1,5 +1,5 @@
-import { useToast } from "@/app/hooks/useToast";
 import { useSupabase } from "@/app/supabase-provider";
+import { useToast } from "@/lib/hooks/useToast";
 import axios from "axios";
 import { redirect } from "next/navigation";
 import { useCallback, useState } from "react";
@@ -7,7 +7,7 @@ import { FileRejection, useDropzone } from "react-dropzone";
 
 export const useFileUploader = () => {
   const [isPending, setIsPending] = useState(false);
-  const { messageToast, setMessage } = useToast();
+  const { publish } = useToast();
   const [files, setFiles] = useState<File[]>([]);
   const [pendingFileIndex, setPendingFileIndex] = useState<number>(0);
   const { session } = useSupabase();
@@ -31,16 +31,16 @@ export const useFileUploader = () => {
           }
         );
 
-        setMessage({
-          type: response.data.type,
+        publish({
+          variant: response.data.type,
           text:
             (response.data.type === "success"
               ? "File uploaded successfully: "
               : "") + JSON.stringify(response.data.message),
         });
       } catch (error: unknown) {
-        setMessage({
-          type: "error",
+        publish({
+          variant: "danger",
           text: "Failed to upload file: " + JSON.stringify(error),
         });
       }
@@ -50,18 +50,18 @@ export const useFileUploader = () => {
 
   const onDrop = (acceptedFiles: File[], fileRejections: FileRejection[]) => {
     if (fileRejections.length > 0) {
-      setMessage({ type: "error", text: "File too big." });
+      publish({ variant: "danger", text: "File too big." });
       return;
     }
-    setMessage(null);
+
     for (let i = 0; i < acceptedFiles.length; i++) {
       const file = acceptedFiles[i];
       const isAlreadyInFiles =
         files.filter((f) => f.name === file.name && f.size === file.size)
           .length > 0;
       if (isAlreadyInFiles) {
-        setMessage({
-          type: "warning",
+        publish({
+          variant: "warning",
           text: `${file.name} was already added`,
         });
         acceptedFiles.splice(i, 1);
@@ -71,9 +71,15 @@ export const useFileUploader = () => {
   };
 
   const uploadAllFiles = async () => {
+    if (files.length === 0) {
+      publish({
+        text: "Please, add files to upload",
+        variant: "warning",
+      });
+      return;
+    }
     setIsPending(true);
-    setMessage(null);
-    // files.forEach((file) => upload(file));
+
     for (const file of files) {
       await upload(file);
       setPendingFileIndex((i) => i + 1);
@@ -96,7 +102,7 @@ export const useFileUploader = () => {
     open,
     uploadAllFiles,
     pendingFileIndex,
-    messageToast,
+
     files,
     setFiles,
   };

@@ -2,11 +2,10 @@
 import Button from "@/app/components/ui/Button";
 import Card from "@/app/components/ui/Card";
 import Field from "@/app/components/ui/Field";
-import Toast from "@/app/components/ui/Toast";
 import { useCrawler } from "./hooks/useCrawler";
 
 export const Crawler = (): JSX.Element => {
-  const { urlInputRef, isCrawling, messageToast, crawlWebsite } = useCrawler();
+  const { urlInputRef, isCrawling, crawlWebsite } = useCrawler();
   return (
     <div className="w-full">
       <div className="flex justify-center gap-5">
@@ -29,7 +28,6 @@ export const Crawler = (): JSX.Element => {
               </div>
             </Card>
           </div>
-          <Toast ref={messageToast} />
         </div>
       </div>
     </div>

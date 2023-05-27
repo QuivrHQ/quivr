@@ -1,15 +1,15 @@
 import { useSupabase } from "@/app/supabase-provider";
+import { useToast } from "@/lib/hooks/useToast";
 import axios from "axios";
 import { redirect } from "next/navigation";
 import { useCallback, useRef, useState } from "react";
-import { useToast } from "../../../../hooks/useToast";
 import { isValidUrl } from "../helpers/isValidUrl";
 
 export const useCrawler = () => {
   const [isCrawling, setCrawling] = useState(false);
   const urlInputRef = useRef<HTMLInputElement | null>(null);
-  const { setMessage, messageToast } = useToast();
   const { session } = useSupabase();
+  const { publish } = useToast();
   if (session === null) {
     redirect("/login");
   }
@@ -21,8 +21,8 @@ export const useCrawler = () => {
 
     if (!url || !isValidUrl(url)) {
       // Assuming you have a function to validate URLs
-      setMessage({
-        type: "error",
+      publish({
+        variant: "danger",
         text: "Invalid URL",
       });
       setCrawling(false);
@@ -49,13 +49,13 @@ export const useCrawler = () => {
         }
       );
 
-      setMessage({
-        type: response.data.type,
+      publish({
+        variant: response.data.type,
         text: response.data.message,
       });
     } catch (error: unknown) {
-      setMessage({
-        type: "error",
+      publish({
+        variant: "danger",
         text: "Failed to crawl website: " + JSON.stringify(error),
       });
     } finally {
@@ -66,7 +66,7 @@ export const useCrawler = () => {
   return {
     isCrawling,
     urlInputRef,
-    messageToast,
+
     crawlWebsite,
   };
 };

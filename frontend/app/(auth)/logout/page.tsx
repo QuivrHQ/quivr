@@ -2,19 +2,17 @@
 import Button from "@/app/components/ui/Button";
 import Card from "@/app/components/ui/Card";
 import PageHeading from "@/app/components/ui/PageHeading";
-import Toast, { ToastRef } from "@/app/components/ui/Toast";
 import { useSupabase } from "@/app/supabase-provider";
+import { useToast } from "@/lib/hooks/useToast";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useRef, useState } from "react";
+import { useState } from "react";
 
 export default function Logout() {
   const { supabase } = useSupabase();
   const [isPending, setIsPending] = useState(false);
 
-  const logoutToast = useRef<ToastRef>(null);
-  const [error, setError] = useState("Unknown Error");
-
+  const { publish } = useToast();
   const router = useRouter();
 
   const handleLogout = async () => {
@@ -23,14 +21,12 @@ export default function Logout() {
 
     if (error) {
       console.error("Error logging out:", error.message);
-      setError(error.message);
-      logoutToast.current?.publish({
+      publish({
         variant: "danger",
         text: `Error logging out: ${error.message}`,
       });
     } else {
-      console.log("User logged out");
-      logoutToast.current?.publish({
+      publish({
         variant: "success",
         text: "Logged out successfully",
       });
@@ -38,10 +34,6 @@ export default function Logout() {
     }
     setIsPending(false);
   };
-
-  // useEffect(() => {
-  //   handleLogout();
-  // }, []);
 
   return (
     <main>
@@ -63,12 +55,6 @@ export default function Logout() {
           </div>
         </Card>
       </section>
-      <Toast variant="success" ref={logoutToast}>
-        Logged Out Successfully
-      </Toast>
-      <Toast variant="danger" ref={logoutToast}>
-        {error}
-      </Toast>
     </main>
   );
 }
