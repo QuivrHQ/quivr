@@ -1,6 +1,7 @@
 "use client";
 import Spinner from "@/app/components/ui/Spinner";
 import { useSupabase } from "@/app/supabase-provider";
+import { useToast } from "@/lib/hooks/useToast";
 import axios from "axios";
 import { Dispatch, SetStateAction, Suspense, useState } from "react";
 import Button from "../../components/ui/Button";
@@ -16,6 +17,7 @@ interface DocumentProps {
 
 const DocumentItem = ({ document, setDocuments }: DocumentProps) => {
   const [isDeleting, setIsDeleting] = useState(false);
+  const { publish } = useToast();
   const { session } = useSupabase();
   if (!session) {
     throw new Error("User session not found");
@@ -33,6 +35,7 @@ const DocumentItem = ({ document, setDocuments }: DocumentProps) => {
         }
       );
       setDocuments((docs) => docs.filter((doc) => doc.name !== name)); // Optimistic update
+      publish({ variant: "success", text: `${name} deleted.` });
     } catch (error) {
       console.error(`Error deleting ${name}`, error);
     }
