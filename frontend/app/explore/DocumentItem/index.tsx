@@ -1,13 +1,13 @@
 "use client";
-import { Document } from "../types";
-import Button from "../../components/ui/Button";
-import Modal from "../../components/ui/Modal";
-import { AnimatedCard } from "../../components/ui/Card";
-import { Dispatch, SetStateAction, Suspense, useState } from "react";
-import axios from "axios";
-import DocumentData from "./DocumentData";
 import Spinner from "@/app/components/ui/Spinner";
 import { useSupabase } from "@/app/supabase-provider";
+import axios from "axios";
+import { Dispatch, SetStateAction, Suspense, useState } from "react";
+import Button from "../../components/ui/Button";
+import { AnimatedCard } from "../../components/ui/Card";
+import Modal from "../../components/ui/Modal";
+import { Document } from "../types";
+import DocumentData from "./DocumentData";
 
 interface DocumentProps {
   document: Document;
@@ -16,17 +16,16 @@ interface DocumentProps {
 
 const DocumentItem = ({ document, setDocuments }: DocumentProps) => {
   const [isDeleting, setIsDeleting] = useState(false);
-  const { supabase, session } = useSupabase()
+  const { session } = useSupabase();
   if (!session) {
-    throw new Error('User session not found');
+    throw new Error("User session not found");
   }
-  
 
   const deleteDocument = async (name: string) => {
     setIsDeleting(true);
     try {
       console.log(`Deleting Document ${name}`);
-      const response = await axios.delete(
+      await axios.delete(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/explore/${name}`,
         {
           headers: {
@@ -57,7 +56,7 @@ const DocumentItem = ({ document, setDocuments }: DocumentProps) => {
           Trigger={<Button className="">View</Button>}
         >
           <Suspense fallback={<Spinner />}>
-            {/* @ts-expect-error */}
+            {/* @ts-expect-error TODO: check if DocumentData component can be sync */}
             <DocumentData documentName={document.name} />
           </Suspense>
         </Modal>

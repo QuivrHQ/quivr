@@ -1,14 +1,14 @@
 "use client";
-import { useState } from "react";
 import axios from "axios";
-import Card from "../components/ui/Card";
-import Button from "../components/ui/Button";
-import Modal from "../components/ui/Modal";
+import { redirect } from "next/navigation";
+import { useState } from "react";
 import { MdSettings } from "react-icons/md";
-import ChatMessages from "./ChatMessages";
+import Button from "../components/ui/Button";
+import Card from "../components/ui/Card";
+import Modal from "../components/ui/Modal";
 import PageHeading from "../components/ui/PageHeading";
 import { useSupabase } from "../supabase-provider";
-import { redirect } from "next/navigation";
+import ChatMessages from "./ChatMessages";
 
 export default function ChatPage() {
   const [question, setQuestion] = useState("");
@@ -17,9 +17,9 @@ export default function ChatPage() {
   const [temperature, setTemperature] = useState(0);
   const [maxTokens, setMaxTokens] = useState(500);
   const [isPending, setIsPending] = useState(false);
-  const { supabase, session } = useSupabase()
+  const { session } = useSupabase();
   if (session === null) {
-    redirect('/login')
+    redirect("/login");
   }
 
   const askQuestion = async () => {
@@ -36,7 +36,7 @@ export default function ChatPage() {
       },
       {
         headers: {
-          'Authorization': `Bearer ${session.access_token}`,
+          Authorization: `Bearer ${session.access_token}`,
         },
       }
     );
@@ -48,7 +48,7 @@ export default function ChatPage() {
   };
 
   return (
-    <main className="min-h-screen w-full flex flex-col pt-20">
+    <main className="min-h-screen w-full flex flex-col pt-32">
       <section className="flex flex-col justify-center items-center flex-1 gap-5 h-full">
         <PageHeading
           title="Chat with your brain"
