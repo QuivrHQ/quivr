@@ -18,12 +18,12 @@ export const Toast = ({
       <ToastContext.Provider value={{ publish }}>
         {children}
         <AnimatePresence mode="popLayout">
-          {toasts.map((toast, index) => {
+          {toasts.map((toast) => {
             if (!toast.open) return;
             return (
               <ToastPrimitive.Root
                 open={toast.open}
-                onOpenChange={(value) => toggleToast(value, index)}
+                onOpenChange={(value) => toggleToast(value, toast.id)}
                 asChild
                 forceMount
                 key={toast.id}
