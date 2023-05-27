@@ -4,9 +4,8 @@ import Card from "@/app/components/ui/Card";
 import { Divider } from "@/app/components/ui/Divider";
 import Field from "@/app/components/ui/Field";
 import PageHeading from "@/app/components/ui/PageHeading";
-import Toast from "@/app/components/ui/Toast";
-import { useToast } from "@/app/hooks/useToast";
 import { useSupabase } from "@/app/supabase-provider";
+import { useToast } from "@/lib/hooks/useToast";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -19,7 +18,7 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const [isPending, setIsPending] = useState(false);
 
-  const { setMessage, messageToast } = useToast();
+  const { publish } = useToast();
 
   const router = useRouter();
 
@@ -31,17 +30,15 @@ export default function Login() {
     });
 
     if (error) {
-      setMessage({
-        type: "danger",
+      publish({
+        variant: "danger",
         text: error.message,
       });
     } else if (data) {
-      setMessage({
-        type: "success",
+      publish({
+        variant: "success",
         text: "Successfully logged in",
       });
-    } else {
-      setEmail("");
     }
     setIsPending(false);
   };
@@ -68,6 +65,7 @@ export default function Login() {
               type="email"
               placeholder="Email"
               onChange={(e) => setEmail(e.target.value)}
+              value={email}
             />
             <Field
               name="password"
@@ -92,7 +90,6 @@ export default function Login() {
           </form>
         </Card>
       </section>
-      <Toast ref={messageToast} />
     </main>
   );
 }

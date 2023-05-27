@@ -15,7 +15,9 @@ const Divider: FC<DividerProps> = forwardRef(
       >
         <hr className="border-t border-gray-300 w-12" />
         {text !== undefined && (
-          <p className="px-3 bg-white text-center text-gray-500">{text}</p>
+          <p className="px-3 text-center text-gray-500 dark:text-white">
+            {text}
+          </p>
         )}
         <hr className="border-t border-gray-300 w-12" />
       </div>
