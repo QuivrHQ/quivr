@@ -3,10 +3,10 @@ import Button from "@/app/components/ui/Button";
 import Card from "@/app/components/ui/Card";
 import Field from "@/app/components/ui/Field";
 import PageHeading from "@/app/components/ui/PageHeading";
-import Toast, { ToastRef } from "@/app/components/ui/Toast";
 import { useSupabase } from "@/app/supabase-provider";
+import { useToast } from "@/lib/hooks/useToast";
 import Link from "next/link";
-import { useRef, useState } from "react";
+import { useState } from "react";
 
 export default function SignUp() {
   const { supabase } = useSupabase();
@@ -14,8 +14,7 @@ export default function SignUp() {
   const [password, setPassword] = useState("");
   const [isPending, setIsPending] = useState(false);
 
-  const signupToast = useRef<ToastRef>(null);
-
+  const { publish } = useToast();
   const handleSignUp = async () => {
     setIsPending(true);
     const { data, error } = await supabase.auth.signUp({
@@ -25,13 +24,15 @@ export default function SignUp() {
 
     if (error) {
       console.error("Error signing up:", error.message);
-      signupToast.current?.publish({
+      publish({
         variant: "danger",
         text: `Error signing up: ${error.message}`,
       });
     } else if (data) {
-      console.log("User signed up");
-      signupToast.current?.publish({ variant: "success", text: "Sign" });
+      publish({
+        variant: "success",
+        text: "Confirmation Email sent, please check your email",
+      });
     }
     setIsPending(false);
   };
@@ -70,11 +71,6 @@ export default function SignUp() {
           </form>
         </Card>
       </section>
-      <Toast variant="success" ref={signupToast}>
-        <h1 className="font-bold">Confirmation Email sent</h1>
-        <p className="text-sm">Check your email.</p>
-      </Toast>
-      <Toast variant="danger" ref={signupToast} />
     </main>
   );
 }

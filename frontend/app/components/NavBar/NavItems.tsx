@@ -1,3 +1,4 @@
+"use client";
 import { useSupabase } from "@/app/supabase-provider";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
@@ -12,6 +13,7 @@ interface NavItemsProps extends HTMLAttributes<HTMLUListElement> {
 const NavItems: FC<NavItemsProps> = ({ className, setOpen, ...props }) => {
   const { session } = useSupabase();
   const isUserLoggedIn = session?.user !== undefined;
+  const isLocal = process.env.NEXT_PUBLIC_ENV === "local";
   return (
     <ul
       className={cn(
@@ -20,7 +22,7 @@ const NavItems: FC<NavItemsProps> = ({ className, setOpen, ...props }) => {
       )}
       {...props}
     >
-      {process.env.NEXT_PUBLIC_ENV === "local" ? (
+      {isLocal ? (
         <>
           <NavLink setOpen={setOpen} to="/upload">
             Upload
@@ -43,15 +45,17 @@ const NavItems: FC<NavItemsProps> = ({ className, setOpen, ...props }) => {
         </>
       )}
       <div className="flex sm:flex-1 sm:justify-end flex-col items-center justify-center sm:flex-row gap-5 sm:gap-2">
-        <Link href={"https://try-quivr.streamlit.app"}>
-          <Button variant={"secondary"}>Try Demo</Button>
-        </Link>
-        <DarkModeToggle />
         {isUserLoggedIn && (
           <Link href={"/logout"}>
             <Button variant={"secondary"}>Logout</Button>
           </Link>
         )}
+        {!isLocal && (
+          <Link href={"https://try-quivr.streamlit.app"}>
+            <Button variant={"secondary"}>Try Demo</Button>
+          </Link>
+        )}
+        <DarkModeToggle />
       </div>
     </ul>
   );
