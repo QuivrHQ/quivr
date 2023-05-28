@@ -1,8 +1,8 @@
 "use client";
 import axios from "axios";
 import { redirect } from "next/navigation";
-import { useState } from "react";
-import { MdSettings } from "react-icons/md";
+import { useEffect, useState } from "react";
+import { MdMic, MdMicOff, MdSettings } from "react-icons/md";
 import Button from "../components/ui/Button";
 import Card from "../components/ui/Card";
 import Modal from "../components/ui/Modal";
@@ -17,14 +17,58 @@ export default function ChatPage() {
   const [temperature, setTemperature] = useState(0);
   const [maxTokens, setMaxTokens] = useState(500);
   const [isPending, setIsPending] = useState(false);
+  const [isListening, setIsListening] = useState(false);
   const { session } = useSupabase();
   if (session === null) {
     redirect("/login");
   }
 
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const SpeechRecognition =
+        window.SpeechRecognition || window.webkitSpeechRecognition;
+
+      const mic = new SpeechRecognition();
+
+      mic.continuous = true;
+      mic.interimResults = false;
+      mic.lang = "en-US";
+
+      mic.onstart = () => {
+        console.log("Mics on");
+      };
+
+      mic.onend = () => {
+        console.log("Mics off");
+      };
+
+      mic.onerror = (event: SpeechRecognitionErrorEvent) => {
+        console.log(event.error);
+        setIsListening(false);
+      };
+
+      mic.onresult = (event: SpeechRecognitionEvent) => {
+        const interimTranscript =
+          event.results[event.results.length - 1][0].transcript;
+        setQuestion((prevQuestion) => prevQuestion + interimTranscript);
+      };
+
+      if (isListening) {
+        mic.start();
+      }
+
+      return () => {
+        if (mic) {
+          mic.stop();
+        }
+      };
+    }
+  }, [isListening]);
+
   const askQuestion = async () => {
     setHistory((hist) => [...hist, ["user", question]]);
     setIsPending(true);
+    setIsListening(false);
     const response = await axios.post(
       `${process.env.NEXT_PUBLIC_BACKEND_URL}/chat/`,
       {
@@ -43,6 +87,10 @@ export default function ChatPage() {
     setHistory(response.data.history);
     setQuestion("");
     setIsPending(false);
+  };
+
+  const handleListen = () => {
+    setIsListening((prevIsListening) => !prevIsListening);
   };
 
   return (
@@ -73,6 +121,19 @@ export default function ChatPage() {
               />
               <Button type="submit" isLoading={isPending}>
                 {isPending ? "Thinking..." : "Chat"}
+              </Button>
+              {/* Mic Button */}
+              <Button
+                className="px-3"
+                variant={"tertiary"}
+                type="button"
+                onClick={handleListen}
+              >
+                {isListening ? (
+                  <MdMicOff className="text-2xl" />
+                ) : (
+                  <MdMic className="text-2xl" />
+                )}
               </Button>
               {/* Settings Button */}
               <Modal
