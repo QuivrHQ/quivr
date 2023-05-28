@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: quivr
+  namespace: namespace-workflow-1685279343352
+spec:
+  type: LoadBalancer
+  selector:
+    app: quivr
+  ports:
+    - protocol: TCP
+      port: 8000
+      targetPort: 8000
