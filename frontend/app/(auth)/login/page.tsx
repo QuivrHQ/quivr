@@ -7,7 +7,7 @@ import PageHeading from "@/app/components/ui/PageHeading";
 import { useSupabase } from "@/app/supabase-provider";
 import { useToast } from "@/lib/hooks/useToast";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { redirect } from "next/navigation";
 import { useState } from "react";
 import { GoogleLoginButton } from "./components/GoogleLogin";
 import { MagicLinkLogin } from "./components/MagicLinkLogin";
@@ -19,8 +19,6 @@ export default function Login() {
   const [isPending, setIsPending] = useState(false);
 
   const { publish } = useToast();
-
-  const router = useRouter();
 
   const handleLogin = async () => {
     setIsPending(true);
@@ -44,7 +42,7 @@ export default function Login() {
   };
 
   if (session?.user !== undefined) {
-    router.replace("/");
+    redirect("/");
   }
 
   return (

@@ -5,7 +5,7 @@ import PageHeading from "@/app/components/ui/PageHeading";
 import { useSupabase } from "@/app/supabase-provider";
 import { useToast } from "@/lib/hooks/useToast";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { redirect } from "next/navigation";
 import { useState } from "react";
 
 export default function Logout() {
@@ -13,7 +13,6 @@ export default function Logout() {
   const [isPending, setIsPending] = useState(false);
 
   const { publish } = useToast();
-  const router = useRouter();
 
   const handleLogout = async () => {
     setIsPending(true);
@@ -30,7 +29,7 @@ export default function Logout() {
         variant: "success",
         text: "Logged out successfully",
       });
-      router.replace("/");
+      redirect("/");
     }
     setIsPending(false);
   };
