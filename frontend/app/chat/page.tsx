@@ -26,12 +26,12 @@ export default function ChatPage() {
   useEffect(() => {
     if (typeof window !== "undefined") {
       const SpeechRecognition =
-        (window as any).SpeechRecognition ||
-        (window as any).webkitSpeechRecognition;
+        window.SpeechRecognition || window.webkitSpeechRecognition;
+
       const mic = new SpeechRecognition();
 
       mic.continuous = true;
-      mic.interim = true;
+      mic.interimResults = false;
       mic.lang = "en-US";
 
       mic.onstart = () => {
@@ -42,12 +42,12 @@ export default function ChatPage() {
         console.log("Mics off");
       };
 
-      mic.onerror = (event: any) => {
+      mic.onerror = (event: SpeechRecognitionErrorEvent) => {
         console.log(event.error);
         setIsListening(false);
       };
 
-      mic.onresult = (event: any) => {
+      mic.onresult = (event: SpeechRecognitionEvent) => {
         const interimTranscript =
           event.results[event.results.length - 1][0].transcript;
         setQuestion((prevQuestion) => prevQuestion + interimTranscript);
