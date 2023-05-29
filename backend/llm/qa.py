@@ -1,16 +1,15 @@
 import os
-from langchain.embeddings.openai import OpenAIEmbeddings
-from langchain.vectorstores import SupabaseVectorStore
+
+import llm.LANGUAGE_PROMPT as LANGUAGE_PROMPT
 from langchain.chains import ConversationalRetrievalChain
-from langchain.memory import ConversationBufferMemory
-from supabase import create_client, Client
-from langchain.llms import OpenAI
 from langchain.chat_models import AzureChatOpenAI
 from langchain.chat_models.anthropic import ChatAnthropic
-
+from langchain.embeddings.openai import OpenAIEmbeddings
+from langchain.llms import OpenAI
+from langchain.memory import ConversationBufferMemory
+from langchain.vectorstores import SupabaseVectorStore
+from supabase import Client, create_client
 from utils import ChatMessage
-import llm.LANGUAGE_PROMPT as LANGUAGE_PROMPT
-
 
 openai_api_key = os.environ.get("OPENAI_API_KEY")
 openai_api_type = os.environ.get("OPENAI_API_TYPE")
@@ -43,7 +42,6 @@ def get_qa_llm(chat_message: ChatMessage):
                 deployment_name=openai_api_deployment,
                 openai_api_key=openai_api_key,
                 openai_api_type = openai_api_type,
-                streaming=True,
                 verbose=True
             ),
             vector_store.as_retriever(),
