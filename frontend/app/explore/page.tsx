@@ -41,7 +41,7 @@ export default function ExplorePage() {
       setIsPending(false);
     };
     fetchDocuments();
-  }, []);
+  }, [session.access_token]);
 
   return (
     <main>

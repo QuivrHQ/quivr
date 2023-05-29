@@ -45,7 +45,7 @@ export const useFileUploader = () => {
         });
       }
     },
-    [session.access_token]
+    [session.access_token, publish]
   );
 
   const onDrop = (acceptedFiles: File[], fileRejections: FileRejection[]) => {
