@@ -7,7 +7,7 @@ interface FileComponentProps {
   setFiles: Dispatch<SetStateAction<File[]>>;
 }
 
-export const FileComponent = forwardRef(
+const FileComponent = forwardRef(
   ({ file, setFiles }: FileComponentProps, forwardedRef) => {
     return (
       <motion.div
@@ -41,3 +41,7 @@ export const FileComponent = forwardRef(
     );
   }
 );
+
+FileComponent.displayName = "FileComponent";
+
+export default FileComponent;
