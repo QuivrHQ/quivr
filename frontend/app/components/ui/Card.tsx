@@ -3,7 +3,7 @@ import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { FC, HTMLAttributes, LegacyRef, forwardRef } from "react";
 
-interface CardProps extends HTMLAttributes<HTMLDivElement> {}
+type CardProps = HTMLAttributes<HTMLDivElement>;
 
 const Card: FC<CardProps> = forwardRef(
   ({ children, className, ...props }, ref) => {

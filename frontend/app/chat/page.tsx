@@ -1,14 +1,14 @@
 "use client";
-import { useState } from "react";
 import axios from "axios";
-import Card from "../components/ui/Card";
+import { redirect } from "next/navigation";
+import { useEffect, useState } from "react";
+import { MdMic, MdMicOff, MdSettings } from "react-icons/md";
 import Button from "../components/ui/Button";
+import Card from "../components/ui/Card";
 import Modal from "../components/ui/Modal";
-import { MdSettings } from "react-icons/md";
-import ChatMessages from "./ChatMessages";
 import PageHeading from "../components/ui/PageHeading";
 import { useSupabase } from "../supabase-provider";
-import { redirect } from "next/navigation";
+import ChatMessages from "./ChatMessages";
 
 export default function ChatPage() {
   const [question, setQuestion] = useState("");
@@ -17,14 +17,58 @@ export default function ChatPage() {
   const [temperature, setTemperature] = useState(0);
   const [maxTokens, setMaxTokens] = useState(500);
   const [isPending, setIsPending] = useState(false);
-  const { supabase, session } = useSupabase()
+  const [isListening, setIsListening] = useState(false);
+  const { session } = useSupabase();
   if (session === null) {
-    redirect('/login')
+    redirect("/login");
   }
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const SpeechRecognition =
+        window.SpeechRecognition || window.webkitSpeechRecognition;
+
+      const mic = new SpeechRecognition();
+
+      mic.continuous = true;
+      mic.interimResults = false;
+      mic.lang = "en-US";
+
+      mic.onstart = () => {
+        console.log("Mics on");
+      };
+
+      mic.onend = () => {
+        console.log("Mics off");
+      };
+
+      mic.onerror = (event: SpeechRecognitionErrorEvent) => {
+        console.log(event.error);
+        setIsListening(false);
+      };
+
+      mic.onresult = (event: SpeechRecognitionEvent) => {
+        const interimTranscript =
+          event.results[event.results.length - 1][0].transcript;
+        setQuestion((prevQuestion) => prevQuestion + interimTranscript);
+      };
+
+      if (isListening) {
+        mic.start();
+      }
+
+      return () => {
+        if (mic) {
+          mic.stop();
+        }
+      };
+    }
+  }, [isListening]);
 
   const askQuestion = async () => {
     setHistory((hist) => [...hist, ["user", question]]);
     setIsPending(true);
+    setIsListening(false);
     const response = await axios.post(
       `${process.env.NEXT_PUBLIC_BACKEND_URL}/chat/`,
       {
@@ -36,19 +80,21 @@ export default function ChatPage() {
       },
       {
         headers: {
-          'Authorization': `Bearer ${session.access_token}`,
+          Authorization: `Bearer ${session.access_token}`,
         },
       }
     );
     setHistory(response.data.history);
-    console.log(response.data.history);
-
     setQuestion("");
     setIsPending(false);
   };
 
+  const handleListen = () => {
+    setIsListening((prevIsListening) => !prevIsListening);
+  };
+
   return (
-    <main className="min-h-screen w-full flex flex-col pt-20">
+    <main className="min-h-screen w-full flex flex-col pt-32">
       <section className="flex flex-col justify-center items-center flex-1 gap-5 h-full">
         <PageHeading
           title="Chat with your brain"
@@ -75,6 +121,19 @@ export default function ChatPage() {
               />
               <Button type="submit" isLoading={isPending}>
                 {isPending ? "Thinking..." : "Chat"}
+              </Button>
+              {/* Mic Button */}
+              <Button
+                className="px-3"
+                variant={"tertiary"}
+                type="button"
+                onClick={handleListen}
+              >
+                {isListening ? (
+                  <MdMicOff className="text-2xl" />
+                ) : (
+                  <MdMic className="text-2xl" />
+                )}
               </Button>
               {/* Settings Button */}
               <Modal
