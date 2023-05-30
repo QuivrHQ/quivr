@@ -1,13 +1,11 @@
 "use client";
-import Spinner from "@/app/components/ui/Spinner";
 import { useSupabase } from "@/app/supabase-provider";
 import { useToast } from "@/lib/hooks/useToast";
-import axios from "axios";
+import { useAxios } from "@/lib/useAxios";
 import {
   Dispatch,
   RefObject,
   SetStateAction,
-  Suspense,
   forwardRef,
   useState,
 } from "react";
@@ -27,6 +25,8 @@ const DocumentItem = forwardRef(
     const [isDeleting, setIsDeleting] = useState(false);
     const { publish } = useToast();
     const { session } = useSupabase();
+    const { axiosInstance } = useAxios();
+
     if (!session) {
       throw new Error("User session not found");
     }
@@ -34,14 +34,7 @@ const DocumentItem = forwardRef(
     const deleteDocument = async (name: string) => {
       setIsDeleting(true);
       try {
-        await axios.delete(
-          `${process.env.NEXT_PUBLIC_BACKEND_URL}/explore/${name}`,
-          {
-            headers: {
-              Authorization: `Bearer ${session.access_token}`,
-            },
-          }
-        );
+        await axiosInstance.delete(`/explore/${name}`);
         setDocuments((docs) => docs.filter((doc) => doc.name !== name)); // Optimistic update
         publish({ variant: "success", text: `${name} deleted.` });
       } catch (error) {
@@ -61,19 +54,14 @@ const DocumentItem = forwardRef(
       >
         <p className="text-lg leading-tight max-w-sm">{document.name}</p>
         <div className="flex gap-2 self-end">
-          {/* VIEW MODAL */}
           <Modal
             title={document.name}
             desc={""}
             Trigger={<Button className="">View</Button>}
           >
-            <Suspense fallback={<Spinner />}>
-              {/* @ts-expect-error TODO: check if DocumentData component can be sync */}
-              <DocumentData documentName={document.name} />
-            </Suspense>
+            <DocumentData documentName={document.name} />
           </Modal>
 
-          {/* DELETE MODAL */}
           <Modal
             title={"Confirm"}
             desc={`Do you really want to delete?`}

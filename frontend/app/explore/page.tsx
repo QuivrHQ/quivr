@@ -1,5 +1,5 @@
 "use client";
-import axios from "axios";
+import { useAxios } from "@/lib/useAxios";
 import { AnimatePresence, motion } from "framer-motion";
 import Link from "next/link";
 import { redirect } from "next/navigation";
@@ -14,6 +14,8 @@ export default function ExplorePage() {
   const [documents, setDocuments] = useState<Document[]>([]);
   const [isPending, setIsPending] = useState(true);
   const { session } = useSupabase();
+  const { axiosInstance } = useAxios();
+
   if (session === null) {
     redirect("/login");
   }
@@ -25,13 +27,8 @@ export default function ExplorePage() {
         console.log(
           `Fetching documents from ${process.env.NEXT_PUBLIC_BACKEND_URL}/explore`
         );
-        const response = await axios.get<{ documents: Document[] }>(
-          `${process.env.NEXT_PUBLIC_BACKEND_URL}/explore`,
-          {
-            headers: {
-              Authorization: `Bearer ${session.access_token}`,
-            },
-          }
+        const response = await axiosInstance.get<{ documents: Document[] }>(
+          "/explore"
         );
         setDocuments(response.data.documents);
       } catch (error) {

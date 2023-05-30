@@ -1,5 +1,5 @@
 "use client";
-import axios from "axios";
+import { useAxios } from "@/lib/useAxios";
 import { redirect } from "next/navigation";
 import { useEffect, useState } from "react";
 import { MdMic, MdMicOff, MdSettings } from "react-icons/md";
@@ -19,6 +19,8 @@ export default function ChatPage() {
   const [isPending, setIsPending] = useState(false);
   const [isListening, setIsListening] = useState(false);
   const { session } = useSupabase();
+  const { axiosInstance } = useAxios();
+
   if (session === null) {
     redirect("/login");
   }
@@ -69,21 +71,14 @@ export default function ChatPage() {
     setHistory((hist) => [...hist, ["user", question]]);
     setIsPending(true);
     setIsListening(false);
-    const response = await axios.post(
-      `${process.env.NEXT_PUBLIC_BACKEND_URL}/chat/`,
-      {
-        model,
-        question,
-        history,
-        temperature,
-        max_tokens: maxTokens,
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${session.access_token}`,
-        },
-      }
-    );
+
+    const response = await axiosInstance.post(`/chat/`, {
+      model,
+      question,
+      history,
+      temperature,
+      max_tokens: maxTokens,
+    });
     setHistory(response.data.history);
     setQuestion("");
     setIsPending(false);
