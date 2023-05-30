@@ -11,9 +11,9 @@ RUN mkdir -p /app
 # Set /app as the working directory
 WORKDIR /app
 
-# Copy package.json and package-lock.json
+# Copy package.json and yarn.lock
 # to the /app working directory
-COPY package*.json ./
+COPY package*.json yarn.lock ./
 
 # Install dependencies in /app
 RUN yarn install
