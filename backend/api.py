@@ -1,33 +1,32 @@
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi import FastAPI, UploadFile, File, HTTPException, Header, Depends
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 import os
-from pydantic import BaseModel
-from typing import List, Tuple, Annotated
-from supabase import create_client, Client
-from tempfile import SpooledTemporaryFile
-from auth_bearer import JWTBearer
 import shutil
-import pypandoc
+from tempfile import SpooledTemporaryFile
+from typing import Annotated, List, Tuple
 
-from llm.summarization import llm_evaluate_summaries
-from utils import similarity_search
-from utils import CommonsDep
-from utils import ChatMessage
+import pypandoc
+from auth_bearer import JWTBearer
+from crawl.crawler import CrawlWebsite
+from fastapi import Depends, FastAPI, File, Header, HTTPException, UploadFile
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from llm.qa import get_qa_llm
+from llm.summarization import llm_evaluate_summaries
+from logger import get_logger
+from parsers.audio import process_audio
 from parsers.common import file_already_exists
-from parsers.txt import process_txt
 from parsers.csv import process_csv
 from parsers.docx import process_docx
-from parsers.pdf import process_pdf
-from parsers.notebook import process_ipnyb
-from parsers.markdown import process_markdown
-from parsers.powerpoint import process_powerpoint
-from parsers.html import process_html
 from parsers.epub import process_epub
-from parsers.audio import process_audio
-from crawl.crawler import CrawlWebsite
-from logger import get_logger
+from parsers.html import process_html
+from parsers.markdown import process_markdown
+from parsers.notebook import process_ipnyb
+from parsers.odt import process_odt
+from parsers.pdf import process_pdf
+from parsers.powerpoint import process_powerpoint
+from parsers.txt import process_txt
+from pydantic import BaseModel
+from supabase import Client, create_client
+from utils import ChatMessage, CommonsDep, similarity_search
 
 logger = get_logger(__name__)
 
@@ -70,6 +69,7 @@ file_processors = {
     ".html": process_html,
     ".pptx": process_powerpoint,
     ".docx": process_docx,
+    ".odt": process_odt,
     ".epub": process_epub,
     ".ipynb": process_ipnyb,
 }
