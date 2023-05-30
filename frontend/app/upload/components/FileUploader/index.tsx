@@ -2,7 +2,7 @@
 import { AnimatePresence } from "framer-motion";
 import Button from "../../../components/ui/Button";
 import Card from "../../../components/ui/Card";
-import { FileComponent } from "./components/FileComponent";
+import FileComponent from "./components/FileComponent";
 import { useFileUploader } from "./hooks/useFileUploader";
 
 export const FileUploader = (): JSX.Element => {
