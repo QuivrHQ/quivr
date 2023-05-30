@@ -33,6 +33,9 @@ const NavItems: FC<NavItemsProps> = ({ className, setOpen, ...props }) => {
           <NavLink setOpen={setOpen} to="/explore">
             Explore
           </NavLink>
+          <NavLink setOpen={setOpen} to="/config">
+            Config
+          </NavLink>
         </>
       ) : (
         <>
