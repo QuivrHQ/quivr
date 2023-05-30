@@ -9,6 +9,9 @@ import tempfile
 import time
 from utils import compute_sha1_from_file, compute_sha1_from_content, create_summary, documents_vector_store
 
+from logger import get_logger
+
+logger = get_logger(__name__)
 
 async def process_file(file: UploadFile, loader_class, file_suffix, enable_summarization):
     documents = []
@@ -47,9 +50,14 @@ async def process_file(file: UploadFile, loader_class, file_suffix, enable_summa
             "date": dateshort,
             "summarization": "true" if enable_summarization else "false"
         }
-        doc_with_metadata = Document(
-            page_content=doc.page_content, metadata=metadata)
-        ids = documents_vector_store.add_documents([doc_with_metadata])
+        # Remove non-escaped unicode nulls
+        page_content = doc.page_content.replace("\x00", "")
+        doc_with_metadata = Document(page_content=page_content, metadata=metadata)
+        try:
+            ids = documents_vector_store.add_documents([doc_with_metadata])
+        except Exception as e:
+            logger.error(f"Error adding document to vector store: {e}")
+            continue
         if enable_summarization and ids and len(ids) > 0:
             create_summary(ids[0], doc.page_content, metadata)
     return
