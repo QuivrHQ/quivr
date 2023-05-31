@@ -1,16 +1,18 @@
-from typing import Optional
-from fastapi import UploadFile
-from langchain.schema import Document
-from langchain.text_splitter import RecursiveCharacterTextSplitter
 # from stats import add_usage
 import asyncio
 import os
 import tempfile
 import time
-from utils import compute_sha1_from_file, compute_sha1_from_content, create_summary, documents_vector_store
+from typing import Optional
+
+from fastapi import UploadFile
+from langchain.schema import Document
+from langchain.text_splitter import RecursiveCharacterTextSplitter
+from utils import (compute_sha1_from_content, compute_sha1_from_file,
+                   create_summary, create_vector, documents_vector_store)
 
 
-async def process_file(file: UploadFile, loader_class, file_suffix, enable_summarization):
+async def process_file(file: UploadFile, loader_class, file_suffix, enable_summarization, user):
     documents = []
     file_name = file.filename
     file_size = file.file._file.tell()  # Getting the size of the file
@@ -49,15 +51,15 @@ async def process_file(file: UploadFile, loader_class, file_suffix, enable_summa
         }
         doc_with_metadata = Document(
             page_content=doc.page_content, metadata=metadata)
-        ids = documents_vector_store.add_documents([doc_with_metadata])
+        create_vector(user.email, doc_with_metadata)
         if enable_summarization and ids and len(ids) > 0:
             create_summary(ids[0], doc.page_content, metadata)
     return
 
 
-async def file_already_exists(supabase, file):
+async def file_already_exists(supabase, file, user):
     file_content = await file.read()
     file_sha1 = compute_sha1_from_content(file_content)
-    response = supabase.table("documents").select("id").eq(
-        "metadata->>file_sha1", file_sha1).execute()
+    response = supabase.table("vectors").select("id").filter("metadata->>file_sha1", "eq", file_sha1) \
+        .filter("user_id", "eq", user.email).execute()
     return len(response.data) > 0
