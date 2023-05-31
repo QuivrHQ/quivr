@@ -26,11 +26,10 @@ memory = ConversationBufferMemory(
 def get_qa_llm(chat_message: ChatMessage):
     qa = None
     # this overwrites the built-in prompt of the ConversationalRetrievalChain
-    ConversationalRetrievalChain.prompts = LANGUAGE_PROMPT
     if chat_message.model.startswith("gpt"):
         qa = ConversationalRetrievalChain.from_llm(
             OpenAI(
-                model_name=chat_message.model, openai_api_key=openai_api_key, temperature=chat_message.temperature, max_tokens=chat_message.max_tokens), vector_store.as_retriever(), memory=memory, verbose=False, max_tokens_limit=1024)
+                model_name=chat_message.model, openai_api_key=openai_api_key, temperature=chat_message.temperature, max_tokens=chat_message.max_tokens), vector_store.as_retriever(), memory=memory, verbose=False, max_tokens_limit=1024, combine_docs_chain_kwargs={'prompt': LANGUAGE_PROMPT.QA_PROMPT}, condense_question_prompt=LANGUAGE_PROMPT.CONDENSE_QUESTION_PROMPT)
     elif anthropic_api_key and chat_message.model.startswith("claude"):
         qa = ConversationalRetrievalChain.from_llm(
             ChatAnthropic(
