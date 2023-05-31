@@ -15,10 +15,15 @@ from utils import ChatMessage
 
 class CustomSupabaseVectorStore(SupabaseVectorStore):
     '''A custom vector store that uses the match_vectors table instead of the vectors table.'''
+    user_id: str
+    def __init__(self, client: Client, embedding: OpenAIEmbeddings, table_name: str, user_id: str = "none"):
+        super().__init__(client, embedding, table_name)
+        self.user_id = user_id
+    
     def similarity_search(
         self, 
         query: str, 
-        user_id: str = "toto", 
+        user_id: str = "none",
         table: str = "match_vectors", 
         k: int = 4, 
         threshold: float = 0.5, 
@@ -31,7 +36,7 @@ class CustomSupabaseVectorStore(SupabaseVectorStore):
             {
                 "query_embedding": query_embedding,
                 "match_count": k,
-                "p_user_id": user_id,
+                "p_user_id": self.user_id,
             },
         ).execute()
 
@@ -67,13 +72,13 @@ def create_clients_and_embeddings(openai_api_key, supabase_url, supabase_key):
     
     return supabase_client, embeddings
 
-def get_qa_llm(chat_message: ChatMessage):
+def get_qa_llm(chat_message: ChatMessage, user_id: str):
     '''Get the question answering language model.'''
     openai_api_key, anthropic_api_key, supabase_url, supabase_key = get_environment_variables()
     supabase_client, embeddings = create_clients_and_embeddings(openai_api_key, supabase_url, supabase_key)
     
     vector_store = CustomSupabaseVectorStore(
-        supabase_client, embeddings, table_name="vectors")
+        supabase_client, embeddings, table_name="vectors", user_id=user_id)
     memory = ConversationBufferMemory(
         memory_key="chat_history", return_messages=True)
     

@@ -79,15 +79,15 @@ class User (BaseModel):
     email: str
 
 
-async def filter_file(file: UploadFile, enable_summarization: bool, supabase_client: Client):
-    if await file_already_exists(supabase_client, file):
+async def filter_file(file: UploadFile, enable_summarization: bool, supabase_client: Client, user: User):
+    if await file_already_exists(supabase_client, file, user):
         return {"message": f"🤔 {file.filename} already exists.", "type": "warning"}
     elif file.file._file.tell() < 1:
         return {"message": f"❌ {file.filename} is empty.", "type": "error"}
     else:
         file_extension = os.path.splitext(file.filename)[-1].lower()  # Convert file extension to lowercase
         if file_extension in file_processors:
-            await file_processors[file_extension](file, enable_summarization)
+            await file_processors[file_extension](file, enable_summarization, user)
             return {"message": f"✅ {file.filename} has been uploaded.", "type": "success"}
         else:
             return {"message": f"❌ {file.filename} is not supported.", "type": "error"}
@@ -96,16 +96,17 @@ async def filter_file(file: UploadFile, enable_summarization: bool, supabase_cli
 
 @app.post("/upload", dependencies=[Depends(JWTBearer())])
 async def upload_file(commons: CommonsDep,  file: UploadFile, enable_summarization: bool = False, credentials: dict = Depends(JWTBearer())):
-    user_email = credentials.get('email', 'none')
-    message = await filter_file(file, enable_summarization, commons['supabase'])
+    user = User(email=credentials.get('email', 'none'))
+    message = await filter_file(file, enable_summarization, commons['supabase'], user)
 
     return message
 
 
 @app.post("/chat/", dependencies=[Depends(JWTBearer())])
-async def chat_endpoint(commons: CommonsDep, chat_message: ChatMessage):
+async def chat_endpoint(commons: CommonsDep, chat_message: ChatMessage, credentials: dict = Depends(JWTBearer())):
+    user = User(email=credentials.get('email', 'none'))
     history = chat_message.history
-    qa = get_qa_llm(chat_message)
+    qa = get_qa_llm(chat_message, user.email)
     history.append(("user", chat_message.question))
 
     if chat_message.use_summarization:
