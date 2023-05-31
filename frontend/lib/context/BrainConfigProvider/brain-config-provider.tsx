@@ -1,6 +1,10 @@
 "use client";
 
-import { createContext, useState } from "react";
+import { createContext, useEffect, useState } from "react";
+import {
+  getBrainConfigFromLocalStorage,
+  saveBrainConfigInLocalStorage,
+} from "./helpers/brainConfigLocalStorage";
 import { BrainConfig, ConfigContext } from "./types";
 
 export const BrainConfigContext = createContext<ConfigContext | undefined>(
@@ -12,7 +16,7 @@ export const BrainConfigProvider = ({
 }: {
   children: React.ReactNode;
 }) => {
-  const [config, setConfig] = useState<BrainConfig>({
+  const [brainConfig, setBrainConfig] = useState<BrainConfig>({
     model: "gpt-3.5-turbo",
     temperature: 0,
     maxTokens: 500,
@@ -23,11 +27,23 @@ export const BrainConfigProvider = ({
   });
 
   const updateConfig = (newConfig: Partial<BrainConfig>) => {
-    setConfig({ ...config, ...newConfig });
+    setBrainConfig((config) => {
+      const updatedConfig: BrainConfig = {
+        ...config,
+        ...newConfig,
+      };
+      saveBrainConfigInLocalStorage(updatedConfig);
+
+      return updatedConfig;
+    });
   };
 
+  useEffect(() => {
+    setBrainConfig(getBrainConfigFromLocalStorage() ?? defaultBrainConfig);
+  }, []);
+
   return (
-    <BrainConfigContext.Provider value={{ config, updateConfig }}>
+    <BrainConfigContext.Provider value={{ config: brainConfig, updateConfig }}>
       {children}
     </BrainConfigContext.Provider>
   );
