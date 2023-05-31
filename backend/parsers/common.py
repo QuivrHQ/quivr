@@ -60,6 +60,6 @@ async def process_file(file: UploadFile, loader_class, file_suffix, enable_summa
 async def file_already_exists(supabase, file):
     file_content = await file.read()
     file_sha1 = compute_sha1_from_content(file_content)
-    response = supabase.table("documents").select("id").eq(
+    response = supabase.table("vectors").select("id").eq(
         "metadata->>file_sha1", file_sha1).execute()
     return len(response.data) > 0

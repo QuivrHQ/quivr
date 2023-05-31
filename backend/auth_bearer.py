@@ -1,9 +1,10 @@
-from fastapi import Request, HTTPException
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-from typing import Optional
 import os
+from typing import Optional
 
 from auth_handler import decode_access_token
+from fastapi import HTTPException, Request
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+
 
 class JWTBearer(HTTPBearer):
     def __init__(self, auto_error: bool = True):
@@ -19,13 +20,10 @@ class JWTBearer(HTTPBearer):
             token = credentials.credentials
             if not self.verify_jwt(token):
                 raise HTTPException(status_code=402, detail="Invalid token or expired token.")
-            return credentials.credentials
+            return self.verify_jwt(token)  # change this line
         else:
             raise HTTPException(status_code=403, detail="Invalid authorization code.")
 
-    def verify_jwt(self, jwtoken: str) -> bool:
-        isTokenValid: bool = False
+    def verify_jwt(self, jwtoken: str):
         payload = decode_access_token(jwtoken)
-        if payload:
-            isTokenValid = True
-        return isTokenValid
+        return payload

@@ -75,6 +75,10 @@ file_processors = {
 }
 
 
+class User (BaseModel):
+    email: str
+
+
 async def filter_file(file: UploadFile, enable_summarization: bool, supabase_client: Client):
     if await file_already_exists(supabase_client, file):
         return {"message": f"🤔 {file.filename} already exists.", "type": "warning"}
@@ -91,7 +95,8 @@ async def filter_file(file: UploadFile, enable_summarization: bool, supabase_cli
 
 
 @app.post("/upload", dependencies=[Depends(JWTBearer())])
-async def upload_file(commons: CommonsDep, file: UploadFile, enable_summarization: bool = False):
+async def upload_file(commons: CommonsDep,  file: UploadFile, enable_summarization: bool = False, credentials: dict = Depends(JWTBearer())):
+    user_email = credentials.get('email', 'none')
     message = await filter_file(file, enable_summarization, commons['supabase'])
 
     return message
@@ -113,7 +118,7 @@ async def chat_endpoint(commons: CommonsDep, chat_message: ChatMessage):
         # 3. pull in the top documents from summaries
         logger.info('Evaluations: %s', evaluations)
         if evaluations:
-            reponse = commons['supabase'].from_('documents').select(
+            reponse = commons['supabase'].from_('vectors').select(
                 '*').in_('id', values=[e['document_id'] for e in evaluations]).execute()
         # 4. use top docs as additional context
             additional_context = '---\nAdditional Context={}'.format(
@@ -145,7 +150,7 @@ async def crawl_endpoint(commons: CommonsDep, crawl_website: CrawlWebsite, enabl
 
 @app.get("/explore", dependencies=[Depends(JWTBearer())])
 async def explore_endpoint(commons: CommonsDep):
-    response = commons['supabase'].table("documents").select(
+    response = commons['supabase'].table("vectors").select(
         "name:metadata->>file_name, size:metadata->>file_size", count="exact").execute()
     documents = response.data  # Access the data from the response
     # Convert each dictionary to a tuple of items, then to a set to remove duplicates, and then back to a dictionary
@@ -161,14 +166,14 @@ async def delete_endpoint(commons: CommonsDep, file_name: str):
     # Cascade delete the summary from the database first, because it has a foreign key constraint
     commons['supabase'].table("summaries").delete().match(
         {"metadata->>file_name": file_name}).execute()
-    commons['supabase'].table("documents").delete().match(
+    commons['supabase'].table("vectors").delete().match(
         {"metadata->>file_name": file_name}).execute()
     return {"message": f"{file_name} has been deleted."}
 
 
 @app.get("/explore/{file_name}", dependencies=[Depends(JWTBearer())])
 async def download_endpoint(commons: CommonsDep, file_name: str):
-    response = commons['supabase'].table("documents").select(
+    response = commons['supabase'].table("vectors").select(
         "metadata->>file_name, metadata->>file_size, metadata->>file_extension, metadata->>file_url").match({"metadata->>file_name": file_name}).execute()
     documents = response.data
     # Returns all documents with the same file name
