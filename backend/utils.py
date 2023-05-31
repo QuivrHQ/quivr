@@ -1,16 +1,15 @@
 import hashlib
 import os
 from typing import Annotated, List, Tuple
+
 from fastapi import Depends
 from langchain.embeddings.openai import OpenAIEmbeddings
-from langchain.vectorstores import SupabaseVectorStore
-from pydantic import BaseModel
-from supabase import create_client, Client
 from langchain.schema import Document
-
+from langchain.vectorstores import SupabaseVectorStore
 from llm.summarization import llm_summerize
-
 from logger import get_logger
+from pydantic import BaseModel
+from supabase import Client, create_client
 
 logger = get_logger(__name__)
 
@@ -22,7 +21,7 @@ supabase_key = os.environ.get("SUPABASE_SERVICE_KEY")
 embeddings = OpenAIEmbeddings(openai_api_key=openai_api_key)
 supabase_client: Client = create_client(supabase_url, supabase_key)
 documents_vector_store = SupabaseVectorStore(
-    supabase_client, embeddings, table_name="documents")
+    supabase_client, embeddings, table_name="vectors")
 summaries_vector_store = SupabaseVectorStore(
     supabase_client, embeddings, table_name="summaries")
 
@@ -74,9 +73,19 @@ def create_summary(document_id, content, metadata):
         supabase_client.table("summaries").update(
             {"document_id": document_id}).match({"id": sids[0]}).execute()
 
+def create_vector(user_id,doc):
+    logger.info(f"Creating vector for document")
+    logger.info(f"Document: {doc}")
+    sids = documents_vector_store.add_documents(
+        [doc])
+    if sids and len(sids) > 0:
+        supabase_client.table("vectors").update(
+            {"user_id": user_id}).match({"id": sids[0]}).execute()
+
 
 def create_embedding(content):
     return embeddings.embed_query(content)
+
 
 
 def similarity_search(query, table='match_summaries', top_k=5, threshold=0.5):

@@ -25,8 +25,9 @@ from parsers.pdf import process_pdf
 from parsers.powerpoint import process_powerpoint
 from parsers.txt import process_txt
 from pydantic import BaseModel
-from supabase import Client, create_client
 from utils import ChatMessage, CommonsDep, similarity_search
+
+from supabase import Client
 
 logger = get_logger(__name__)
 
@@ -75,15 +76,19 @@ file_processors = {
 }
 
 
-async def filter_file(file: UploadFile, enable_summarization: bool, supabase_client: Client):
-    if await file_already_exists(supabase_client, file):
+class User (BaseModel):
+    email: str
+
+
+async def filter_file(file: UploadFile, enable_summarization: bool, supabase_client: Client, user: User):
+    if await file_already_exists(supabase_client, file, user):
         return {"message": f"🤔 {file.filename} already exists.", "type": "warning"}
     elif file.file._file.tell() < 1:
         return {"message": f"❌ {file.filename} is empty.", "type": "error"}
     else:
         file_extension = os.path.splitext(file.filename)[-1].lower()  # Convert file extension to lowercase
         if file_extension in file_processors:
-            await file_processors[file_extension](file, enable_summarization)
+            await file_processors[file_extension](file, enable_summarization, user)
             return {"message": f"✅ {file.filename} has been uploaded.", "type": "success"}
         else:
             return {"message": f"❌ {file.filename} is not supported.", "type": "error"}
@@ -91,16 +96,18 @@ async def filter_file(file: UploadFile, enable_summarization: bool, supabase_cli
 
 
 @app.post("/upload", dependencies=[Depends(JWTBearer())])
-async def upload_file(commons: CommonsDep, file: UploadFile, enable_summarization: bool = False):
-    message = await filter_file(file, enable_summarization, commons['supabase'])
+async def upload_file(commons: CommonsDep,  file: UploadFile, enable_summarization: bool = False, credentials: dict = Depends(JWTBearer())):
+    user = User(email=credentials.get('email', 'none'))
+    message = await filter_file(file, enable_summarization, commons['supabase'], user)
 
     return message
 
 
 @app.post("/chat/", dependencies=[Depends(JWTBearer())])
-async def chat_endpoint(commons: CommonsDep, chat_message: ChatMessage):
+async def chat_endpoint(commons: CommonsDep, chat_message: ChatMessage, credentials: dict = Depends(JWTBearer())):
+    user = User(email=credentials.get('email', 'none'))
     history = chat_message.history
-    qa = get_qa_llm(chat_message)
+    qa = get_qa_llm(chat_message, user.email)
     history.append(("user", chat_message.question))
 
     if chat_message.use_summarization:
@@ -113,7 +120,7 @@ async def chat_endpoint(commons: CommonsDep, chat_message: ChatMessage):
         # 3. pull in the top documents from summaries
         logger.info('Evaluations: %s', evaluations)
         if evaluations:
-            reponse = commons['supabase'].from_('documents').select(
+            reponse = commons['supabase'].from_('vectors').select(
                 '*').in_('id', values=[e['document_id'] for e in evaluations]).execute()
         # 4. use top docs as additional context
             additional_context = '---\nAdditional Context={}'.format(
@@ -129,7 +136,8 @@ async def chat_endpoint(commons: CommonsDep, chat_message: ChatMessage):
 
 
 @app.post("/crawl/", dependencies=[Depends(JWTBearer())])
-async def crawl_endpoint(commons: CommonsDep, crawl_website: CrawlWebsite, enable_summarization: bool = False):
+async def crawl_endpoint(commons: CommonsDep, crawl_website: CrawlWebsite, enable_summarization: bool = False, credentials: dict = Depends(JWTBearer())):
+    user = User(email=credentials.get('email', 'none'))
     file_path, file_name = crawl_website.process()
 
     # Create a SpooledTemporaryFile from the file_path
@@ -139,14 +147,15 @@ async def crawl_endpoint(commons: CommonsDep, crawl_website: CrawlWebsite, enabl
 
     # Pass the SpooledTemporaryFile to UploadFile
     file = UploadFile(file=spooled_file, filename=file_name)
-    message = await filter_file(file, enable_summarization, commons['supabase'])
+    message = await filter_file(file, enable_summarization, commons['supabase'], user=user)
     return message
 
 
 @app.get("/explore", dependencies=[Depends(JWTBearer())])
-async def explore_endpoint(commons: CommonsDep):
-    response = commons['supabase'].table("documents").select(
-        "name:metadata->>file_name, size:metadata->>file_size", count="exact").execute()
+async def explore_endpoint(commons: CommonsDep,credentials: dict = Depends(JWTBearer()) ):
+    user = User(email=credentials.get('email', 'none'))
+    response = commons['supabase'].table("vectors").select(
+        "name:metadata->>file_name, size:metadata->>file_size", count="exact").filter("user_id", "eq", user.email).execute()
     documents = response.data  # Access the data from the response
     # Convert each dictionary to a tuple of items, then to a set to remove duplicates, and then back to a dictionary
     unique_data = [dict(t) for t in set(tuple(d.items()) for d in documents)]
@@ -157,19 +166,21 @@ async def explore_endpoint(commons: CommonsDep):
 
 
 @app.delete("/explore/{file_name}", dependencies=[Depends(JWTBearer())])
-async def delete_endpoint(commons: CommonsDep, file_name: str):
+async def delete_endpoint(commons: CommonsDep, file_name: str, credentials: dict = Depends(JWTBearer())):
+    user = User(email=credentials.get('email', 'none'))
     # Cascade delete the summary from the database first, because it has a foreign key constraint
     commons['supabase'].table("summaries").delete().match(
         {"metadata->>file_name": file_name}).execute()
-    commons['supabase'].table("documents").delete().match(
-        {"metadata->>file_name": file_name}).execute()
-    return {"message": f"{file_name} has been deleted."}
+    commons['supabase'].table("vectors").delete().match(
+        {"metadata->>file_name": file_name, "user_id": user.email}).execute()
+    return {"message": f"{file_name} of user {user.email} has been deleted."}
 
 
 @app.get("/explore/{file_name}", dependencies=[Depends(JWTBearer())])
-async def download_endpoint(commons: CommonsDep, file_name: str):
-    response = commons['supabase'].table("documents").select(
-        "metadata->>file_name, metadata->>file_size, metadata->>file_extension, metadata->>file_url").match({"metadata->>file_name": file_name}).execute()
+async def download_endpoint(commons: CommonsDep, file_name: str,credentials: dict = Depends(JWTBearer()) ):
+    user = User(email=credentials.get('email', 'none'))
+    response = commons['supabase'].table("vectors").select(
+        "metadata->>file_name, metadata->>file_size, metadata->>file_extension, metadata->>file_url").match({"metadata->>file_name": file_name, "user_id": user.email}).execute()
     documents = response.data
     # Returns all documents with the same file name
     return {"documents": documents}
