@@ -9,12 +9,17 @@ const axiosInstance = axios.create({
 export const useAxios = () => {
   const { session } = useSupabase();
   const {
-    config: { backendUrl },
+    config: { backendUrl, supabaseKey, supabaseUrl },
   } = useBrainConfig();
   axiosInstance.interceptors.request.use(
     async (config) => {
       config.headers["Authorization"] = "Bearer " + session?.access_token;
       config.baseURL = backendUrl ?? config.baseURL;
+      config.data = {
+        ...config.data,
+        supabaseKey,
+        supabaseUrl,
+      };
       return config;
     },
     (error) => {
