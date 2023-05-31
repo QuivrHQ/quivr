@@ -5,7 +5,7 @@ import { useBrainConfig } from "@/lib/context/BrainConfigProvider/hooks/useBrain
 import { useEffect } from "react";
 
 export const useConfig = () => {
-  const { config, updateConfig } = useBrainConfig();
+  const { config, updateConfig, resetConfig } = useBrainConfig();
   const { publish } = useToast();
   const {
     register,
@@ -34,6 +34,14 @@ export const useConfig = () => {
     });
   };
 
+  const resetBrainConfig = () => {
+    resetConfig();
+    publish({
+      text: "Config reset",
+      variant: "success",
+    });
+  };
+
   return {
     handleSubmit,
     saveConfig,
@@ -42,5 +50,6 @@ export const useConfig = () => {
     isDirty,
     register,
     model,
+    resetBrainConfig,
   };
 };

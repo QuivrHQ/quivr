@@ -2,10 +2,10 @@ export type BrainConfig = {
   model: Model;
   temperature: number;
   maxTokens: number;
+  keepLocal: boolean;
   backendUrl?: string;
   openAiKey?: string;
   anthropicKey?: string;
-  keepLocal: boolean;
   supabaseUrl?: string;
   supabaseKey?: string;
 };
@@ -15,6 +15,7 @@ type OptionalConfig = { [K in keyof BrainConfig]?: BrainConfig[K] | undefined };
 export type ConfigContext = {
   config: BrainConfig;
   updateConfig: (config: OptionalConfig) => void;
+  resetConfig: () => void;
 };
 
 export const openAiModels = ["gpt-3.5-turbo", "gpt-4"] as const;

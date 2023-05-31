@@ -20,6 +20,7 @@ export default function ExplorePage() {
     register,
     temperature,
     model,
+    resetBrainConfig,
   } = useConfig();
 
   if (session === null) {
@@ -51,7 +52,6 @@ export default function ExplorePage() {
             label="Open AI Key"
             {...register("openAiKey")}
           />
-
           <fieldset className="w-full flex  flex flex-col">
             <label className="flex-1 text-sm" htmlFor="model">
               Model
@@ -104,13 +104,11 @@ export default function ExplorePage() {
               {...register("maxTokens")}
             />
           </fieldset>
-
           <div className="border-b border-gray-300 mt-8 mb-8">
             <p className="text-center text-gray-600 uppercase tracking-wide font-semibold">
               Backend config
             </p>
           </div>
-
           <Field
             type="text"
             placeholder="Backend URL"
@@ -132,7 +130,6 @@ export default function ExplorePage() {
             label="Supabase key"
             {...register("supabaseKey")}
           />
-
           <label className="flex items-center">
             <input
               type="checkbox"
@@ -143,14 +140,23 @@ export default function ExplorePage() {
             />
             <span className="ml-2 text-gray-700">Keep in local</span>
           </label>
-
-          <Button
-            disabled={!isDirty}
-            variant={"secondary"}
-            className="self-end"
-          >
-            Done
-          </Button>
+          <div className="flex justify-between">
+            <Button
+              variant="danger"
+              className="self-end"
+              type="button"
+              onClick={resetBrainConfig}
+            >
+              Reset
+            </Button>
+            <Button
+              disabled={!isDirty}
+              variant="secondary"
+              className="self-end"
+            >
+              Done
+            </Button>
+          </div>
         </form>
       </section>
     </main>
