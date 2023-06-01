@@ -24,10 +24,9 @@ from parsers.pdf import process_pdf
 from parsers.powerpoint import process_powerpoint
 from parsers.txt import process_txt
 from pydantic import BaseModel
+from supabase import Client
 from utils import (ChatMessage, CommonsDep, convert_bytes, create_user,
                    get_file_size, similarity_search, update_user_request_count)
-
-from supabase import Client
 
 logger = get_logger(__name__)
 
