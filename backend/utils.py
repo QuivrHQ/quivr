@@ -2,7 +2,7 @@ import hashlib
 import os
 from typing import Annotated, List, Tuple
 
-from fastapi import Depends
+from fastapi import Depends, UploadFile
 from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.schema import Document
 from langchain.vectorstores import SupabaseVectorStore
@@ -106,3 +106,24 @@ def similarity_search(query, table='match_summaries', top_k=5, threshold=0.5):
                 'match_count': top_k, 'match_threshold': threshold}
     ).execute()
     return summaries.data
+
+def get_file_size(file: UploadFile):
+    # move the cursor to the end of the file
+    file.file._file.seek(0, 2)
+    file_size = file.file._file.tell()  # Getting the size of the file
+    # move the cursor back to the beginning of the file 
+    file.file.seek(0)
+
+    return file_size
+
+def convert_bytes(bytes, precision=2):
+    """Converts bytes into a human-friendly format."""
+    abbreviations = ['B', 'KB', 'MB']
+    if bytes <= 0:
+        return '0 B'
+    size = bytes
+    index = 0
+    while size >= 1024 and index < len(abbreviations) - 1:
+        size /= 1024
+        index += 1
+    return f'{size:.{precision}f} {abbreviations[index]}'
