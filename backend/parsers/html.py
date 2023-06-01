@@ -1,15 +1,17 @@
-from .common import process_file
-from langchain.document_loaders import UnstructuredHTMLLoader
-import requests
-import re
-import unicodedata
-import tempfile
 import os
+import re
+import tempfile
+import unicodedata
+
+import requests
 from fastapi import UploadFile
+from langchain.document_loaders import UnstructuredHTMLLoader
+
+from .common import process_file
 
 
-def process_html(file: UploadFile, enable_summarization):
-    return process_file(file, UnstructuredHTMLLoader, ".html", enable_summarization)
+def process_html(file: UploadFile, enable_summarization, user):
+    return process_file(file, UnstructuredHTMLLoader, ".html", enable_summarization, user)
 
 
 def get_html(url):

@@ -92,7 +92,7 @@ cp .frontend_env.example frontend/.env
 
 - **Step 4**: Run the following migration scripts on the Supabase database via the web interface (SQL Editor -> `New query`)
 
-[Migration Script 1](scripts/supabase_vector_store_document.sql)
+[Migration Script 1](scripts/supabase_new_store_documents.sql)
 
 [Migration Script 2](scripts/supabase_usage_table.sql)
 

@@ -1,7 +1,7 @@
 -- Create a table to store your summaries
 create table if not exists summaries (
     id bigserial primary key,
-    document_id bigint references documents(id),
+    document_id bigint references vectors(id),
     content text, -- corresponds to the summarized content
     metadata jsonb, -- corresponds to Document.metadata
     embedding vector(1536) -- 1536 works for OpenAI embeddings, change if needed
