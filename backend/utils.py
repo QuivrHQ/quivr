@@ -2,13 +2,14 @@ import hashlib
 import os
 from typing import Annotated, List, Tuple
 
-from fastapi import Depends
+from fastapi import Depends, UploadFile
 from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.schema import Document
 from langchain.vectorstores import SupabaseVectorStore
 from llm.summarization import llm_summerize
 from logger import get_logger
 from pydantic import BaseModel
+
 from supabase import Client, create_client
 
 logger = get_logger(__name__)
@@ -82,6 +83,16 @@ def create_vector(user_id,doc):
         supabase_client.table("vectors").update(
             {"user_id": user_id}).match({"id": sids[0]}).execute()
 
+def create_user(user_id, date):
+    logger.info(f"New user entry in db document for user {user_id}")
+    supabase_client.table("users").insert(
+        {"user_id": user_id, "date": date, "requests_count": 1}).execute()
+
+def update_user_request_count(user_id, date, requests_count):
+    logger.info(f"User {user_id} request count updated to {requests_count}")
+    supabase_client.table("users").update(
+        { "requests_count": requests_count}).match({"user_id": user_id, "date": date}).execute()
+
 
 def create_embedding(content):
     return embeddings.embed_query(content)
@@ -95,3 +106,24 @@ def similarity_search(query, table='match_summaries', top_k=5, threshold=0.5):
                 'match_count': top_k, 'match_threshold': threshold}
     ).execute()
     return summaries.data
+
+def get_file_size(file: UploadFile):
+    # move the cursor to the end of the file
+    file.file._file.seek(0, 2)
+    file_size = file.file._file.tell()  # Getting the size of the file
+    # move the cursor back to the beginning of the file 
+    file.file.seek(0)
+
+    return file_size
+
+def convert_bytes(bytes, precision=2):
+    """Converts bytes into a human-friendly format."""
+    abbreviations = ['B', 'KB', 'MB']
+    if bytes <= 0:
+        return '0 B'
+    size = bytes
+    index = 0
+    while size >= 1024 and index < len(abbreviations) - 1:
+        size /= 1024
+        index += 1
+    return f'{size:.{precision}f} {abbreviations[index]}'

@@ -6,3 +6,5 @@ JWT_SECRET_KEY=Found in Supabase settings in the API tab
 AUTHENTICATE=true
 GOOGLE_APPLICATION_CREDENTIALS=/code/application_default_credentials.json
 GOOGLE_CLOUD_PROJECT=XXXXX to  be changed with your GCP id
+MAX_BRAIN_SIZE=52428800
+MAX_REQUESTS_NUMBER=200
