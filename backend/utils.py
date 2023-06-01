@@ -9,6 +9,7 @@ from langchain.vectorstores import SupabaseVectorStore
 from llm.summarization import llm_summerize
 from logger import get_logger
 from pydantic import BaseModel
+
 from supabase import Client, create_client
 
 logger = get_logger(__name__)
@@ -81,6 +82,16 @@ def create_vector(user_id,doc):
     if sids and len(sids) > 0:
         supabase_client.table("vectors").update(
             {"user_id": user_id}).match({"id": sids[0]}).execute()
+
+def create_user(user_id, date):
+    logger.info(f"New user entry in db document for user {user_id}")
+    supabase_client.table("users").insert(
+        {"user_id": user_id, "date": date, "requests_count": 1}).execute()
+
+def update_user_request_count(user_id, date, requests_count):
+    logger.info(f"User {user_id} request count updated to {requests_count}")
+    supabase_client.table("users").update(
+        { "requests_count": requests_count}).match({"user_id": user_id, "date": date}).execute()
 
 
 def create_embedding(content):

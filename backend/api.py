@@ -2,15 +2,12 @@ import os
 import shutil
 import time
 from tempfile import SpooledTemporaryFile
-from typing import Annotated, List, Tuple
 
 import pypandoc
 from auth_bearer import JWTBearer
 from crawl.crawler import CrawlWebsite
-from fastapi import (Depends, FastAPI, File, Header, HTTPException, Request,
-                     UploadFile)
+from fastapi import Depends, FastAPI, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from llm.qa import get_qa_llm
 from llm.summarization import llm_evaluate_summaries
 from logger import get_logger
@@ -27,8 +24,10 @@ from parsers.pdf import process_pdf
 from parsers.powerpoint import process_powerpoint
 from parsers.txt import process_txt
 from pydantic import BaseModel
+from utils import (ChatMessage, CommonsDep, create_user, get_file_size,
+                   similarity_search, update_user_request_count)
+
 from supabase import Client
-from utils import ChatMessage, CommonsDep, similarity_search
 
 logger = get_logger(__name__)
 
@@ -84,7 +83,7 @@ class User (BaseModel):
 async def filter_file(file: UploadFile, enable_summarization: bool, supabase_client: Client, user: User):
     if await file_already_exists(supabase_client, file, user):
         return {"message": f"🤔 {file.filename} already exists.", "type": "warning"}
-    elif file.file._file.tell() < 1:
+    elif file.file._file.tell()  < 1:
         return {"message": f"❌ {file.filename} is empty.", "type": "error"}
     else:
         file_extension = os.path.splitext(file.filename)[-1].lower()  # Convert file extension to lowercase
@@ -107,9 +106,28 @@ async def upload_file(commons: CommonsDep,  file: UploadFile, enable_summarizati
 @app.post("/chat/", dependencies=[Depends(JWTBearer())])
 async def chat_endpoint(commons: CommonsDep, chat_message: ChatMessage, credentials: dict = Depends(JWTBearer())):
     user = User(email=credentials.get('email', 'none'))
+    date = time.strftime("%Y%m%d")
+    max_requests_number = os.getenv("MAX_REQUESTS_NUMBER")
+    response = commons['supabase'].from_('users').select(
+    '*').filter("user_id", "eq", user.email).filter("date", "eq", date).execute()
+
+
+    userItem = next(iter(response.data or []), {"requests_count": 0})
+    old_request_count = userItem['requests_count']
+
     history = chat_message.history
-    qa = get_qa_llm(chat_message, user.email)
     history.append(("user", chat_message.question))
+
+    qa = get_qa_llm(chat_message, user.email)
+
+    if old_request_count == 0: 
+        create_user(user_id= user.email, date=date)
+    elif  old_request_count <  float(max_requests_number) : 
+        update_user_request_count(user_id=user.email,  date=date, requests_count= old_request_count+1)
+    else: 
+        history.append(('assistant', "You have reached your requests limit"))
+        return {"history": history }
+
 
     if chat_message.use_summarization:
         # 1. get summaries from the vector store based on question
