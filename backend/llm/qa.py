@@ -86,8 +86,6 @@ def get_qa_llm(chat_message: ChatMessage, user_id: str):
     ConversationalRetrievalChain.prompts = LANGUAGE_PROMPT
     
     qa = None
-    print("🧠", "Loading model...")
-    print("Value of chat_message.model: ", chat_message.model)
     # this overwrites the built-in prompt of the ConversationalRetrievalChain
     ConversationalRetrievalChain.prompts = LANGUAGE_PROMPT
     if chat_message.model.startswith("gpt"):
@@ -98,8 +96,6 @@ def get_qa_llm(chat_message: ChatMessage, user_id: str):
                 vector_store.as_retriever(), memory=memory, verbose=True, 
                 max_tokens_limit=1024)
     elif chat_message.model.startswith("vertex"):
-        print("🎯🎯🎯🎯🎯🎯🎯")
-        print("🧠", "Loading Vertex AI model...")
         qa = ConversationalRetrievalChain.from_llm(
             ChatVertexAI(), vector_store.as_retriever(), memory=memory, verbose=False, max_tokens_limit=1024)
     elif anthropic_api_key and chat_message.model.startswith("claude"):
