@@ -159,6 +159,7 @@ export default function ChatPage() {
                     >
                       <option value="gpt-3.5-turbo">gpt-3.5-turbo</option>
                       <option value="gpt-4">gpt-4</option>
+                      <option value="vertexai">vertexai</option>
                     </select>
                   </fieldset>
                   <fieldset className="w-full flex">

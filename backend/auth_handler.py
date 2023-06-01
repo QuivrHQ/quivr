@@ -23,7 +23,6 @@ def decode_access_token(token: str):
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM], options={"verify_aud": False})
         return payload
     except JWTError as e:
-        print(f"JWTError: {str(e)}")
         return None
 
 def get_user_email_from_token(token: str):

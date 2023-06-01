@@ -25,5 +25,6 @@ services:
     restart: always
     volumes:
       - ./backend/:/code/
+      - ~/.config/gcloud:/root/.config/gcloud
     ports:
       - 5050:5050

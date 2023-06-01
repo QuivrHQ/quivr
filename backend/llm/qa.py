@@ -2,10 +2,11 @@ import os
 from typing import Any, List
 
 from langchain.chains import ConversationalRetrievalChain
-from langchain.chat_models import ChatOpenAI
+from langchain.chat_models import ChatOpenAI, ChatVertexAI
 from langchain.chat_models.anthropic import ChatAnthropic
 from langchain.docstore.document import Document
 from langchain.embeddings.openai import OpenAIEmbeddings
+from langchain.llms import VertexAI
 from langchain.memory import ConversationBufferMemory
 from langchain.vectorstores import SupabaseVectorStore
 from llm import LANGUAGE_PROMPT
@@ -94,6 +95,9 @@ def get_qa_llm(chat_message: ChatMessage, user_id: str):
                 temperature=chat_message.temperature, max_tokens=chat_message.max_tokens), 
                 vector_store.as_retriever(), memory=memory, verbose=True, 
                 max_tokens_limit=1024)
+    elif chat_message.model.startswith("vertex"):
+        qa = ConversationalRetrievalChain.from_llm(
+            ChatVertexAI(), vector_store.as_retriever(), memory=memory, verbose=False, max_tokens_limit=1024)
     elif anthropic_api_key and chat_message.model.startswith("claude"):
         qa = ConversationalRetrievalChain.from_llm(
             ChatAnthropic(

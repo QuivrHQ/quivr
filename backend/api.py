@@ -1,12 +1,14 @@
 import os
 import shutil
+import time
 from tempfile import SpooledTemporaryFile
 from typing import Annotated, List, Tuple
 
 import pypandoc
 from auth_bearer import JWTBearer
 from crawl.crawler import CrawlWebsite
-from fastapi import Depends, FastAPI, File, Header, HTTPException, UploadFile
+from fastapi import (Depends, FastAPI, File, Header, HTTPException, Request,
+                     UploadFile)
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from llm.qa import get_qa_llm
@@ -25,12 +27,10 @@ from parsers.pdf import process_pdf
 from parsers.powerpoint import process_powerpoint
 from parsers.txt import process_txt
 from pydantic import BaseModel
+from supabase import Client
 from utils import ChatMessage, CommonsDep, similarity_search
 
-from supabase import Client
-
 logger = get_logger(__name__)
-
 
 app = FastAPI()
 
@@ -47,6 +47,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 
 
 @app.on_event("startup")
