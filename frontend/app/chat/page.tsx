@@ -9,6 +9,7 @@ import Modal from "../components/ui/Modal";
 import PageHeading from "../components/ui/PageHeading";
 import { useSupabase } from "../supabase-provider";
 import ChatMessages from "./ChatMessages";
+import { isSpeechRecognitionSupported } from "./helpers";
 
 export default function ChatPage() {
   const [question, setQuestion] = useState("");
@@ -24,7 +25,7 @@ export default function ChatPage() {
   }
 
   useEffect(() => {
-    if (typeof window !== "undefined") {
+    if (isSpeechRecognitionSupported()) {
       const SpeechRecognition =
         window.SpeechRecognition || window.webkitSpeechRecognition;
 
@@ -128,6 +129,7 @@ export default function ChatPage() {
                 variant={"tertiary"}
                 type="button"
                 onClick={handleListen}
+                disabled={!isSpeechRecognitionSupported()}
               >
                 {isListening ? (
                   <MdMicOff className="text-2xl" />
