@@ -85,6 +85,7 @@ export const useFileUploader = () => {
       setPendingFileIndex((i) => i + 1);
     }
     setPendingFileIndex(0);
+    setFiles([]);
     setIsPending(false);
   };
 
