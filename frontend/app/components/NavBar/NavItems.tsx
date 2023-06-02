@@ -13,7 +13,7 @@ interface NavItemsProps extends HTMLAttributes<HTMLUListElement> {
 const NavItems: FC<NavItemsProps> = ({ className, setOpen, ...props }) => {
   const { session } = useSupabase();
   const isUserLoggedIn = session?.user !== undefined;
-  const isLocal = process.env.NEXT_PUBLIC_ENV === "local";
+  const isLocal = (process.env.NEXT_PUBLIC_ENV === "local") || (session !== null);
   return (
     <ul
       className={cn(
