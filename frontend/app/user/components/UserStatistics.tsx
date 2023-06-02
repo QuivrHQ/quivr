@@ -3,8 +3,11 @@ import prettyBytes from "pretty-bytes";
 import { UserStats } from "../types";
 
 export const UserStatistics = (userStats: UserStats): JSX.Element => {
-  const { email, current_brain_size, max_brain_size } = userStats;
+  const { email, current_brain_size, max_brain_size, requests_stats } =
+    userStats;
   const brainFilling = current_brain_size / max_brain_size;
+
+  console.log(requests_stats);
 
   return (
     <Grid container spacing={2}>
