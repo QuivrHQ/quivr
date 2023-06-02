@@ -3,6 +3,7 @@ import { useSupabase } from "@/app/supabase-provider";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { Dispatch, FC, HTMLAttributes, ReactNode, SetStateAction } from "react";
+import { MdSettings } from "react-icons/md";
 import Button from "../ui/Button";
 import DarkModeToggle from "./DarkModeToggle";
 
@@ -13,7 +14,8 @@ interface NavItemsProps extends HTMLAttributes<HTMLUListElement> {
 const NavItems: FC<NavItemsProps> = ({ className, setOpen, ...props }) => {
   const { session } = useSupabase();
   const isUserLoggedIn = session?.user !== undefined;
-  const isLocal = (process.env.NEXT_PUBLIC_ENV === "local") || (session !== null);
+  const isLocal = process.env.NEXT_PUBLIC_ENV === "local";
+
   return (
     <ul
       className={cn(
@@ -22,7 +24,7 @@ const NavItems: FC<NavItemsProps> = ({ className, setOpen, ...props }) => {
       )}
       {...props}
     >
-      {isLocal ? (
+      {isLocal || isUserLoggedIn ? (
         <>
           <NavLink setOpen={setOpen} to="/upload">
             Upload
@@ -46,11 +48,21 @@ const NavItems: FC<NavItemsProps> = ({ className, setOpen, ...props }) => {
       )}
       <div className="flex sm:flex-1 sm:justify-end flex-col items-center justify-center sm:flex-row gap-5 sm:gap-2">
         {isUserLoggedIn && (
-          <Link href={"/logout"}>
-            <Button variant={"secondary"}>Logout</Button>
-          </Link>
+          <>
+            <Link href={"/logout"}>
+              <Button variant={"secondary"}>Logout</Button>
+            </Link>
+            <Link href={"/config"}>
+              <Button
+                variant={"tertiary"}
+                className="focus:outline-none text-2xl"
+              >
+                <MdSettings />
+              </Button>
+            </Link>
+          </>
         )}
-        {!isLocal && (
+        {!isLocal && !isUserLoggedIn && (
           <Link href={"https://try-quivr.streamlit.app"}>
             <Button variant={"secondary"}>Try Demo</Button>
           </Link>
