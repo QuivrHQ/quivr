@@ -1,6 +1,6 @@
 import { useSupabase } from "@/app/supabase-provider";
 import { useToast } from "@/lib/hooks/useToast";
-import axios from "axios";
+import { useAxios } from "@/lib/useAxios";
 import { redirect } from "next/navigation";
 import { useCallback, useRef, useState } from "react";
 import { isValidUrl } from "../helpers/isValidUrl";
@@ -10,6 +10,8 @@ export const useCrawler = () => {
   const urlInputRef = useRef<HTMLInputElement | null>(null);
   const { session } = useSupabase();
   const { publish } = useToast();
+  const { axiosInstance } = useAxios();
+
   if (session === null) {
     redirect("/login");
   }
@@ -39,15 +41,7 @@ export const useCrawler = () => {
     };
 
     try {
-      const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/crawl`,
-        config,
-        {
-          headers: {
-            Authorization: `Bearer ${session.access_token}`,
-          },
-        }
-      );
+      const response = await axiosInstance.post(`/crawl`, config);
 
       publish({
         variant: response.data.type,

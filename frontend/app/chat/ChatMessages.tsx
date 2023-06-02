@@ -19,7 +19,7 @@ const ChatMessages: FC<ChatMessagesProps> = ({ history }) => {
     <div className="overflow-hidden flex flex-col gap-5 scrollbar scroll-smooth">
       {history.length === 0 ? (
         <div className="text-center opacity-50">
-          Ask a question, or describe a task. 
+          Ask a question, or describe a task.
         </div>
       ) : (
         <AnimatePresence initial={false}>
@@ -93,6 +93,6 @@ const ChatMessage = forwardRef(
   }
 );
 
-ChatMessage.displayName = 'ChatMessage';
+ChatMessage.displayName = "ChatMessage";
 
 export default ChatMessages;

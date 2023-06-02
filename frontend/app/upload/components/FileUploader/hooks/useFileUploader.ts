@@ -1,6 +1,6 @@
 import { useSupabase } from "@/app/supabase-provider";
 import { useToast } from "@/lib/hooks/useToast";
-import axios from "axios";
+import { useAxios } from "@/lib/useAxios";
 import { redirect } from "next/navigation";
 import { useCallback, useState } from "react";
 import { FileRejection, useDropzone } from "react-dropzone";
@@ -12,6 +12,8 @@ export const useFileUploader = () => {
   const [pendingFileIndex, setPendingFileIndex] = useState<number>(0);
   const { session } = useSupabase();
 
+  const { axiosInstance } = useAxios();
+
   if (session === null) {
     redirect("/login");
   }
@@ -21,15 +23,7 @@ export const useFileUploader = () => {
       const formData = new FormData();
       formData.append("file", file);
       try {
-        const response = await axios.post(
-          `${process.env.NEXT_PUBLIC_BACKEND_URL}/upload`,
-          formData,
-          {
-            headers: {
-              Authorization: `Bearer ${session.access_token}`,
-            },
-          }
-        );
+        const response = await axiosInstance.post(`/upload`, formData);
 
         publish({
           variant: response.data.type,

@@ -1,27 +1,35 @@
-import axios from "axios";
+import { useAxios } from "@/lib/useAxios";
+import { useEffect, useState } from "react";
 import { useSupabase } from "../../supabase-provider";
 
 interface DocumentDataProps {
   documentName: string;
 }
 
-const DocumentData = async ({ documentName }: DocumentDataProps) => {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type DocumentDetails = any;
+//TODO: review this component logic, types and purposes
+
+const DocumentData = ({ documentName }: DocumentDataProps): JSX.Element => {
   const { session } = useSupabase();
+  const { axiosInstance } = useAxios();
+
+  const [documents, setDocuments] = useState<DocumentDetails[]>([]);
+
   if (!session) {
     throw new Error("User session not found");
   }
 
-  const res = await axios.get(
-    `${process.env.NEXT_PUBLIC_BACKEND_URL}/explore/${documentName}`,
-    {
-      headers: {
-        Authorization: `Bearer ${session.access_token}`,
-      },
-    }
-  );
-  // TODO: review the logic of this part and try to use unknown instead of any
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const documents = res.data.documents as any[];
+  useEffect(() => {
+    const fetchDocuments = async () => {
+      const res = await axiosInstance.get<{ documents: DocumentDetails[] }>(
+        `/explore/${documentName}`
+      );
+      setDocuments(res.data.documents);
+    };
+    fetchDocuments();
+  }, [axiosInstance, documentName]);
+
   return (
     <div className="prose">
       <p>No. of documents: {documents.length}</p>
