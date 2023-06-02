@@ -3,6 +3,7 @@ import axios from "axios";
 import { redirect } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useSupabase } from "../supabase-provider";
+import { UserStatistics } from "./components";
 import { UserStats } from "./types";
 
 export default function UserPage() {
@@ -44,14 +45,9 @@ export default function UserPage() {
       <main className="pt-24">
         <div>
           {userStats && (
-            <div>
-              <h2>Email: {userStats.email}</h2>
-              <h2>Max Brain Size: {userStats.max_brain_size}</h2>
-              <h2>Current Brain Size: {userStats.current_brain_size}</h2>
-              {/* <h2>Max Requests Number: {userStats.max_requests_number}</h2>
-            <h2>Requests Stats: {userStats.requests_stats}</h2> */}
-              <h2>Date: {userStats.date}</h2>
-            </div>
+            <>
+              <UserStatistics {...userStats} />
+            </>
           )}
         </div>
       </main>
