@@ -27,6 +27,12 @@ export const anthropicModels = [
   "claude-instant-v1.1-100k",
 ] as const;
 
-export const models = [...openAiModels, ...anthropicModels] as const;
+export const googleModels = ["vertexai"] as const;
+
+export const models = [
+  ...openAiModels,
+  ...anthropicModels,
+  ...googleModels,
+] as const;
 
 export type Model = (typeof models)[number];
