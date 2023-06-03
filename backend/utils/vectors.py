@@ -1,4 +1,3 @@
-import hashlib
 import os
 from typing import Annotated, List, Tuple
 
@@ -9,7 +8,6 @@ from langchain.vectorstores import SupabaseVectorStore
 from llm.summarization import llm_summerize
 from logger import get_logger
 from pydantic import BaseModel
-
 from supabase import Client, create_client
 
 logger = get_logger(__name__)
@@ -27,16 +25,7 @@ summaries_vector_store = SupabaseVectorStore(
     supabase_client, embeddings, table_name="summaries")
 
 
-def compute_sha1_from_file(file_path):
-    with open(file_path, "rb") as file:
-        bytes = file.read()
-        readable_hash = compute_sha1_from_content(bytes)
-    return readable_hash
 
-
-def compute_sha1_from_content(content):
-    readable_hash = hashlib.sha1(content).hexdigest()
-    return readable_hash
 
 
 def common_dependencies():
@@ -51,14 +40,6 @@ def common_dependencies():
 CommonsDep = Annotated[dict, Depends(common_dependencies)]
 
 
-class ChatMessage(BaseModel):
-    model: str = "gpt-3.5-turbo"
-    question: str
-    # A list of tuples where each tuple is (speaker, text)
-    history: List[Tuple[str, str]]
-    temperature: float = 0.0
-    max_tokens: int = 256
-    use_summarization: bool = False
 
 
 def create_summary(document_id, content, metadata):
@@ -107,23 +88,5 @@ def similarity_search(query, table='match_summaries', top_k=5, threshold=0.5):
     ).execute()
     return summaries.data
 
-def get_file_size(file: UploadFile):
-    # move the cursor to the end of the file
-    file.file._file.seek(0, 2)
-    file_size = file.file._file.tell()  # Getting the size of the file
-    # move the cursor back to the beginning of the file 
-    file.file.seek(0)
 
-    return file_size
 
-def convert_bytes(bytes, precision=2):
-    """Converts bytes into a human-friendly format."""
-    abbreviations = ['B', 'KB', 'MB']
-    if bytes <= 0:
-        return '0 B'
-    size = bytes
-    index = 0
-    while size >= 1024 and index < len(abbreviations) - 1:
-        size /= 1024
-        index += 1
-    return f'{size:.{precision}f} {abbreviations[index]}'

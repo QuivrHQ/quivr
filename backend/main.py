@@ -4,51 +4,28 @@ import time
 from tempfile import SpooledTemporaryFile
 
 import pypandoc
-from auth_bearer import JWTBearer
+from auth.auth_bearer import JWTBearer
 from crawl.crawler import CrawlWebsite
 from fastapi import Depends, FastAPI, UploadFile
-from fastapi.middleware.cors import CORSMiddleware
 from llm.qa import get_qa_llm
 from llm.summarization import llm_evaluate_summaries
 from logger import get_logger
-from parsers.audio import process_audio
-from parsers.common import file_already_exists
-from parsers.csv import process_csv
-from parsers.docx import process_docx
-from parsers.epub import process_epub
-from parsers.html import process_html
-from parsers.markdown import process_markdown
-from parsers.notebook import process_ipnyb
-from parsers.odt import process_odt
-from parsers.pdf import process_pdf
-from parsers.powerpoint import process_powerpoint
-from parsers.txt import process_txt
+from middlewares.cors import add_cors_middleware
+from models.chats import ChatMessage
+from models.users import User
 from pydantic import BaseModel
 from supabase import Client
-from utils import (ChatMessage, CommonsDep, convert_bytes, create_user,
-                   get_file_size, similarity_search, update_user_request_count)
+from utils.file import convert_bytes, get_file_size
+from utils.processors import filter_file
+from utils.vectors import (CommonsDep, create_user, similarity_search,
+                           update_user_request_count)
 
 logger = get_logger(__name__)
 
 app = FastAPI()
 
-origins = [
-    "http://localhost",
-    "http://localhost:3000",
-    "https://quivr.app",
-    "https://www.quivr.app",
-    "http://quivr.app",
-    "http://www.quivr.app",
-    "*"
-]
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=origins,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+add_cors_middleware(app)
 
 
 
@@ -56,45 +33,6 @@ app.add_middleware(
 async def startup_event():
     pypandoc.download_pandoc()
 
-
-file_processors = {
-    ".txt": process_txt,
-    ".csv": process_csv,
-    ".md": process_markdown,
-    ".markdown": process_markdown,
-    ".m4a": process_audio,
-    ".mp3": process_audio,
-    ".webm": process_audio,
-    ".mp4": process_audio,
-    ".mpga": process_audio,
-    ".wav": process_audio,
-    ".mpeg": process_audio,
-    ".pdf": process_pdf,
-    ".html": process_html,
-    ".pptx": process_powerpoint,
-    ".docx": process_docx,
-    ".odt": process_odt,
-    ".epub": process_epub,
-    ".ipynb": process_ipnyb,
-}
-
-
-class User (BaseModel):
-    email: str
-
-
-async def filter_file(file: UploadFile, enable_summarization: bool, supabase_client: Client, user: User):
-    if await file_already_exists(supabase_client, file, user):
-        return {"message": f"🤔 {file.filename} already exists.", "type": "warning"}
-    elif file.file._file.tell()  < 1:
-        return {"message": f"❌ {file.filename} is empty.", "type": "error"}
-    else:
-        file_extension = os.path.splitext(file.filename)[-1].lower()  # Convert file extension to lowercase
-        if file_extension in file_processors:
-            await file_processors[file_extension](file, enable_summarization, user)
-            return {"message": f"✅ {file.filename} has been uploaded.", "type": "success"}
-        else:
-            return {"message": f"❌ {file.filename} is not supported.", "type": "error"}
 
 
 
@@ -221,7 +159,7 @@ async def delete_endpoint(commons: CommonsDep, file_name: str, credentials: dict
 async def download_endpoint(commons: CommonsDep, file_name: str,credentials: dict = Depends(JWTBearer()) ):
     user = User(email=credentials.get('email', 'none'))
     response = commons['supabase'].table("vectors").select(
-        "metadata->>file_name, metadata->>file_size, metadata->>file_extension, metadata->>file_url").match({"metadata->>file_name": file_name, "user_id": user.email}).execute()
+        "metadata->>file_name, metadata->>file_size, metadata->>file_extension, metadata->>file_url", "content").match({"metadata->>file_name": file_name, "user_id": user.email}).execute()
     documents = response.data
     # Returns all documents with the same file name
     return {"documents": documents}
@@ -229,4 +167,4 @@ async def download_endpoint(commons: CommonsDep, file_name: str,credentials: dic
 
 @app.get("/")
 async def root():
-    return {"message": "Hello World"}
+    return {"status": "OK"}

@@ -10,8 +10,8 @@ from langchain.llms import VertexAI
 from langchain.memory import ConversationBufferMemory
 from langchain.vectorstores import SupabaseVectorStore
 from llm import LANGUAGE_PROMPT
+from models.chats import ChatMessage
 from supabase import Client, create_client
-from utils import ChatMessage
 
 
 class CustomSupabaseVectorStore(SupabaseVectorStore):
