@@ -8,8 +8,8 @@ from typing import Optional
 from fastapi import UploadFile
 from langchain.schema import Document
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-from utils import (compute_sha1_from_content, compute_sha1_from_file,
-                   create_summary, create_vector, documents_vector_store)
+from utils.file import compute_sha1_from_content, compute_sha1_from_file
+from utils.vectors import create_summary, create_vector, documents_vector_store
 
 
 async def process_file(file: UploadFile, loader_class, file_suffix, enable_summarization, user):
@@ -52,6 +52,8 @@ async def process_file(file: UploadFile, loader_class, file_suffix, enable_summa
         doc_with_metadata = Document(
             page_content=doc.page_content, metadata=metadata)
         create_vector(user.email, doc_with_metadata)
+            #     add_usage(stats_db, "embedding", "audio", metadata={"file_name": file_meta_name,"file_type": ".txt", "chunk_size": chunk_size, "chunk_overlap": chunk_overlap})
+
         if enable_summarization and ids and len(ids) > 0:
             create_summary(ids[0], doc.page_content, metadata)
     return
