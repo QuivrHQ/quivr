@@ -37,6 +37,9 @@ origins = [
     "http://localhost:3000",
     "https://quivr.app",
     "https://www.quivr.app",
+    "http://quivr.app",
+    "http://www.quivr.app",
+    "*"
 ]
 
 app.add_middleware(
