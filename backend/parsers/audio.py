@@ -10,7 +10,8 @@ from langchain.document_loaders import TextLoader
 from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.schema import Document
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-from utils import compute_sha1_from_content, documents_vector_store
+from utils.file import compute_sha1_from_content
+from utils.vectors import documents_vector_store
 
 # # Create a function to transcribe audio using Whisper
 # def _transcribe_audio(api_key, audio_file, stats_db):

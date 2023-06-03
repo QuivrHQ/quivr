@@ -1,9 +1,10 @@
 import os
 from typing import Optional
 
-from auth_handler import decode_access_token
 from fastapi import HTTPException, Request
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+
+from .auth_handler import decode_access_token
 
 
 class JWTBearer(HTTPBearer):
