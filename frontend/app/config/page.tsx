@@ -32,12 +32,12 @@ export default function ExplorePage() {
       <section className="w-full outline-none pt-32 flex flex-col gap-5 items-center justify-center p-6">
         <div className="flex flex-col items-center justify-center">
           <h1 className="text-3xl font-bold text-center">Configuration</h1>
-          <h2 className="opacity-50">
+          <h2 className="opacity-50 text-center">
             Here, you can choose your model, set your credentials...
           </h2>
         </div>
         <form
-          className="flex flex-col gap-5 py-5 w-1/2"
+          className="flex flex-col gap-5 py-5 w-full max-w-xl"
           onSubmit={handleSubmit(saveConfig)}
         >
           <div className="border-b border-gray-300 mt-8 mb-8">
@@ -52,7 +52,7 @@ export default function ExplorePage() {
             label="Open AI Key"
             {...register("openAiKey")}
           />
-          <fieldset className="w-full flex  flex flex-col">
+          <fieldset className="w-full flex flex-col">
             <label className="flex-1 text-sm" htmlFor="model">
               Model
             </label>
