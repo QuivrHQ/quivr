@@ -35,7 +35,8 @@ app = FastAPI()
 origins = [
     "http://localhost",
     "http://localhost:3000",
-    "https://api.quivr.app"
+    "https://quivr.app",
+    "https://www.quivr.app",
 ]
 
 app.add_middleware(
