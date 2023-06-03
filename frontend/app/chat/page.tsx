@@ -1,93 +1,17 @@
 "use client";
-import { useBrainConfig } from "@/lib/context/BrainConfigProvider/hooks/useBrainConfig";
-import { useAxios } from "@/lib/useAxios";
 import Link from "next/link";
-import { redirect } from "next/navigation";
-import { useEffect, useState } from "react";
 import { MdMic, MdMicOff, MdSettings } from "react-icons/md";
 import Button from "../components/ui/Button";
 import Card from "../components/ui/Card";
 import PageHeading from "../components/ui/PageHeading";
-import { useSupabase } from "../supabase-provider";
-import ChatMessages from "./ChatMessages";
-import { isSpeechRecognitionSupported } from "./helpers";
+import ChatMessages from "./components/ChatMessages";
+import { useQuestion } from "./hooks/useQuestion";
+import { useSpeech } from "./hooks/useSpeech";
 
 export default function ChatPage() {
-  const [question, setQuestion] = useState("");
-  const [history, setHistory] = useState<Array<[string, string]>>([]);
-  const [isPending, setIsPending] = useState(false);
-  const [isListening, setIsListening] = useState(false);
-  const { session } = useSupabase();
-  const { axiosInstance } = useAxios();
-  const {
-    config: { maxTokens, model, temperature },
-  } = useBrainConfig();
-  if (session === null) {
-    redirect("/login");
-  }
-
-  useEffect(() => {
-    if (isSpeechRecognitionSupported()) {
-      const SpeechRecognition =
-        window.SpeechRecognition || window.webkitSpeechRecognition;
-
-      const mic = new SpeechRecognition();
-
-      mic.continuous = true;
-      mic.interimResults = false;
-      mic.lang = "en-US";
-
-      mic.onstart = () => {
-        console.log("Mics on");
-      };
-
-      mic.onend = () => {
-        console.log("Mics off");
-      };
-
-      mic.onerror = (event: SpeechRecognitionErrorEvent) => {
-        console.log(event.error);
-        setIsListening(false);
-      };
-
-      mic.onresult = (event: SpeechRecognitionEvent) => {
-        const interimTranscript =
-          event.results[event.results.length - 1][0].transcript;
-        setQuestion((prevQuestion) => prevQuestion + interimTranscript);
-      };
-
-      if (isListening) {
-        mic.start();
-      }
-
-      return () => {
-        if (mic) {
-          mic.stop();
-        }
-      };
-    }
-  }, [isListening]);
-
-  const askQuestion = async () => {
-    setHistory((hist) => [...hist, ["user", question]]);
-    setIsPending(true);
-    setIsListening(false);
-
-    const response = await axiosInstance.post(`/chat/`, {
-      model,
-      question,
-      history,
-      temperature,
-      max_tokens: maxTokens,
-    });
-    setHistory(response.data.history);
-    setQuestion("");
-    setIsPending(false);
-  };
-
-  const handleListen = () => {
-    setIsListening((prevIsListening) => !prevIsListening);
-  };
+  const { history, isPending, question, askQuestion, setQuestion } =
+    useQuestion();
+  const { isListening, speechSupported, startListening } = useSpeech();
 
   return (
     <main className="min-h-screen w-full flex flex-col pt-32">
@@ -123,8 +47,8 @@ export default function ChatPage() {
                 className="px-3"
                 variant={"tertiary"}
                 type="button"
-                onClick={handleListen}
-                disabled={!isSpeechRecognitionSupported()}
+                onClick={startListening}
+                disabled={!speechSupported}
               >
                 {isListening ? (
                   <MdMicOff className="text-2xl" />
