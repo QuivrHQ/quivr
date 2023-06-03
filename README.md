@@ -110,10 +110,16 @@ cp .frontend_env.example frontend/.env
 - **Step 5**: Launch the app
 
 ```bash
-docker compose build && docker compose up
+docker compose -f docker-compose.yml up --build
 ```
 
 - **Step 6**: Navigate to `localhost:3000` in your browser
+
+- ** Step 7**: Want to contribute to the project? 
+
+```
+docker compose -f docker-compose.dev.yml up --build
+```
 
 
 

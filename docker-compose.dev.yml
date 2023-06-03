@@ -6,9 +6,13 @@ services:
       - ./frontend/.env
     build:
       context: frontend
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.dev
     container_name: web
     restart: always
+    volumes:
+      - ./frontend/:/app
+      - /app/node_modules
+      - /app/.next
     ports:
       - 3000:3000
   backend:
