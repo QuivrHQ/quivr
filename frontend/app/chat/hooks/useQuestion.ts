@@ -20,7 +20,6 @@ export const useQuestion = () => {
   const askQuestion = async () => {
     setHistory((hist) => [...hist, ["user", question]]);
     setIsPending(true);
-    // TODO:
 
     const response = await axiosInstance.post(`/chat/`, {
       model,
