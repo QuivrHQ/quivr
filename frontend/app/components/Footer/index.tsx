@@ -16,7 +16,7 @@ const Footer = () => {
           />
         </a>
         <a
-          href="https://twitter.com/quivr"
+          href="https://twitter.com/Quivr_app"
           target="_blank"
           rel="noopener noreferrer"
           aria-label="Quivr Twitter"
