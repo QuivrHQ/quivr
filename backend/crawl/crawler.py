@@ -36,7 +36,7 @@ class CrawlWebsite(BaseModel):
 
         return content
 
-    def process_v2(self):
+    def process(self):
         # parsing the url
         _max_pages = self.max_pages
         max_depth = self.max_depth
@@ -71,11 +71,10 @@ class CrawlWebsite(BaseModel):
 
         file_name = slugify(self.url) + ".html"
         temp_file_path = os.path.join(tempfile.gettempdir(), file_name)
+        # Process the file
         with open(temp_file_path, 'w') as temp_file:
             temp_file.write(text)
-            # Process the file
-        with open("test.txt", 'w') as f:
-            f.write(text)
+
         return temp_file_path, file_name
 
     def get_links(self, soup: BeautifulSoup, original_loc: str, path: str) -> list: 
@@ -117,7 +116,9 @@ class CrawlWebsite(BaseModel):
                 footer.extract()
             internal_links = self.get_links(soup, loc, path)
             [links.put(internal_link) for internal_link in internal_links]
+            # adding path name 
             text += path + "\n"
+            # adding file content after formating it
             text += slugify(soup.get_text(), type='html') + "\n"
         return text
 
@@ -129,7 +130,3 @@ def slugify(text, type=None):
     else:
         text = re.sub(r'[-\s]+', '-', text)
     return text
-
-# next steps : can add depth of crawl, can add max size of crawl, can add max time of crawl
-# can add stop button, or can add a processing tag when the crawl is happening and remove it when it is done
-# can add an option to crawl from javascript rendered pages or html pages (html pages are faster to scrape)
