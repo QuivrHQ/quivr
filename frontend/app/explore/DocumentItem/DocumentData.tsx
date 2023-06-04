@@ -2,6 +2,7 @@ import { useAxios } from "@/lib/useAxios";
 import { useEffect, useState } from "react";
 import { useSupabase } from "../../supabase-provider";
 
+
 interface DocumentDataProps {
   documentName: string;
 }
@@ -31,7 +32,7 @@ const DocumentData = ({ documentName }: DocumentDataProps): JSX.Element => {
   }, [axiosInstance, documentName]);
 
   return (
-    <div className="prose">
+    <div className="prose custom-prose">
       <p>No. of documents: {documents.length}</p>
       {/* {documents.map((doc) => (
         <pre key={doc.name}>{JSON.stringify(doc)}</pre>
