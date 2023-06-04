@@ -26,7 +26,7 @@ Quivr, your second brain, utilizes the power of GenerativeAI to store and retrie
   - Excel
   - Word
   - Audio
-  - Video
+  <!-- - Video It's reading audio currently https://github.com/StanGirard/quivr/issues/139 -->
 - **Open Source**: Freedom is beautiful, so is Quivr. Open source and free to use.
 
 ## Demo Highlights 🎥
