@@ -2,14 +2,13 @@
 import axios from "axios";
 import { redirect } from "next/navigation";
 import { useEffect, useState } from "react";
+import Card from "../components/ui/Card";
 import { useSupabase } from "../supabase-provider";
 import { UserStatistics } from "./components";
 import { UserStats } from "./types";
 
 export default function UserPage() {
-  // need to fetch everything with a user effect
   const [userStats, setUserStats] = useState<UserStats>();
-  // const [isPending, setIsPending] = useState(true);
   const { session } = useSupabase();
   if (session === null) {
     redirect("/login");
@@ -35,22 +34,21 @@ export default function UserPage() {
         console.error("Error fetching user stats", error);
         setUserStats(undefined);
       }
-      // setIsPending(false);
     };
     fetchUserStats();
   }, [session.access_token]);
 
   return (
-    <>
-      <main className="pt-24">
-        <div>
+    <main className="min-h-screen w-full flex flex-col pt-32">
+      <section className="flex flex-col justify-center items-center flex-1 gap-5 h-full">
+        <Card className="p-5 max-w-3xl w-full min-h-full flex-1 mb-24">
           {userStats && (
             <>
               <UserStatistics {...userStats} />
             </>
           )}
-        </div>
-      </main>
-    </>
+        </Card>
+      </section>
+    </main>
   );
 }
