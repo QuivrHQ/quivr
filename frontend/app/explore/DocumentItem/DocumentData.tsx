@@ -31,21 +31,21 @@ const DocumentData = ({ documentName }: DocumentDataProps): JSX.Element => {
   }, [axiosInstance, documentName]);
 
   return (
-    <div className="prose custom-prose">
-      <h1 className="text-bold text-xl break-words">{documentName}</h1>
-      <p>No. of documents: {documents.length}</p>
-      {/* {documents.map((doc) => (
-        <pre key={doc.name}>{JSON.stringify(doc)}</pre>
-      ))} */}
-      <div className="flex flex-col gap-2">
+    <div className="prose">
+      <h1 className="text-bold text-3xl break-words">{documentName}</h1>
+      <p>No. of chunks: {documents.length}</p>
+
+      <div className="flex flex-col">
         {documents[0] &&
           Object.keys(documents[0]).map((doc) => {
             return (
-              <div className="grid grid-cols-2 border-b py-2" key={doc}>
+              <div className="grid grid-cols-2 py-2 border-b" key={doc}>
                 <p className="capitalize font-bold break-words">
                   {doc.replaceAll("_", " ")}
                 </p>
-                <span className="">{documents[0][doc] || "Not Available"}</span>
+                <span className="break-words my-auto">
+                  {documents[0][doc] || "Not Available"}
+                </span>
               </div>
             );
           })}
