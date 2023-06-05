@@ -39,7 +39,7 @@ export default function UserPage() {
   }, [session.access_token]);
 
   return (
-    <main className="min-h-screen w-full flex flex-col pt-32">
+    <main className="w-full flex flex-col pt-32">
       <section className="flex flex-col justify-center items-center flex-1 gap-5 h-full">
         <Card className="p-5 max-w-3xl w-full min-h-full flex-1 mb-24">
           {userStats && (

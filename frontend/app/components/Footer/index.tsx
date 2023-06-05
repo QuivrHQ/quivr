@@ -1,4 +1,3 @@
-
 const Footer = () => {
   return (
     <footer className="bg-white dark:bg-black border-t dark:border-white/10 py-4 mt-auto">
@@ -9,11 +8,7 @@ const Footer = () => {
           rel="noopener noreferrer"
           aria-label="Quivr GitHub"
         >
-          <img
-            className="h-8 w-auto"
-            src="/github.svg"
-            alt="GitHub"
-          />
+          <img className="h-8 w-auto" src="/github.svg" alt="GitHub" />
         </a>
         <a
           href="https://twitter.com/Quivr_app"
@@ -21,11 +16,7 @@ const Footer = () => {
           rel="noopener noreferrer"
           aria-label="Quivr Twitter"
         >
-          <img
-            className="h-8 w-auto"
-            src="/twitter.svg"
-            alt="Twitter"
-          />
+          <img className="h-8 w-auto" src="/twitter.svg" alt="Twitter" />
         </a>
       </div>
     </footer>
