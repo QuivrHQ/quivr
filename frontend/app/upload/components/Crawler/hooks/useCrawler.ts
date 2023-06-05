@@ -17,7 +17,6 @@ export const useCrawler = () => {
   }
 
   const crawlWebsite = useCallback(async () => {
-    setCrawling(true);
     // Validate URL
     const url = urlInputRef.current ? urlInputRef.current.value : null;
 
@@ -27,7 +26,6 @@ export const useCrawler = () => {
         variant: "danger",
         text: "Invalid URL",
       });
-      setCrawling(false);
       return;
     }
 
@@ -40,8 +38,10 @@ export const useCrawler = () => {
       max_time: 60,
     };
 
+    setCrawling(true);
+
     try {
-      const response = await axiosInstance.post(`/crawl`, config);
+      const response = await axiosInstance.post(`/crawl/`, config);
 
       publish({
         variant: response.data.type,
