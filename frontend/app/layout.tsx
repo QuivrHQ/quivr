@@ -34,7 +34,7 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`bg-white text-black dark:bg-black dark:text-white min-h-screen w-full pb-20 ${inter.className}`}
+        className={`bg-white text-black dark:bg-black dark:text-white min-h-screen w-full ${inter.className}`}
       >
         <ToastProvider>
           <SupabaseProvider session={session}>
