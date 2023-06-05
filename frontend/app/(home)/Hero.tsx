@@ -44,7 +44,7 @@ const Hero: FC = () => {
           Quivr is your second brain in the cloud, designed to easily store and
           retrieve unstructured information.
         </p>
-        <Link href={"https://try-quivr.streamlit.app"}>
+        <Link href={"/signup"}>
           <Button>Try Demo</Button>
         </Link>
         <Link target="_blank" href={"https://github.com/StanGirard/quivr/"}>
