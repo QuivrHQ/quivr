@@ -1,4 +1,5 @@
 "use client";
+import Ellipsis from "@/app/components/ui/Ellipsis";
 import { useSupabase } from "@/app/supabase-provider";
 import { useToast } from "@/lib/hooks/useToast";
 import { useAxios } from "@/lib/useAxios";
@@ -52,13 +53,11 @@ const DocumentItem = forwardRef(
         ref={forwardedRef as RefObject<HTMLDivElement>}
         className="flex flex-col sm:flex-row sm:items-center justify-between w-full p-5 gap-5"
       >
-        <p className="text-lg leading-tight max-w-sm">{document.name}</p>
+        <Ellipsis tooltip maxCharacters={30}>
+          {document.name}
+        </Ellipsis>
         <div className="flex gap-2 self-end">
-          <Modal
-            title={document.name}
-            desc={""}
-            Trigger={<Button className="">View</Button>}
-          >
+          <Modal Trigger={<Button className="">View</Button>}>
             <DocumentData documentName={document.name} />
           </Modal>
 
