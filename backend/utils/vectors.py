@@ -58,11 +58,14 @@ def create_summary(document_id, content, metadata):
 def create_vector(user_id,doc):
     logger.info(f"Creating vector for document")
     logger.info(f"Document: {doc}")
-    sids = documents_vector_store.add_documents(
-        [doc])
-    if sids and len(sids) > 0:
-        supabase_client.table("vectors").update(
-            {"user_id": user_id}).match({"id": sids[0]}).execute()
+    try:
+        sids = documents_vector_store.add_documents(
+            [doc])
+        if sids and len(sids) > 0:
+            supabase_client.table("vectors").update(
+                {"user_id": user_id}).match({"id": sids[0]}).execute()
+    except Exception as e:
+        logger.error(f"Error creating vector for document {e}")
 
 def create_user(user_id, date):
     logger.info(f"New user entry in db document for user {user_id}")
