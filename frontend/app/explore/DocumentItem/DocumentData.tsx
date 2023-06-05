@@ -31,7 +31,7 @@ const DocumentData = ({ documentName }: DocumentDataProps): JSX.Element => {
   }, [axiosInstance, documentName]);
 
   return (
-    <div className="prose">
+    <div className="prose dark:prose-invert">
       <h1 className="text-bold text-3xl break-words">{documentName}</h1>
       <p>No. of chunks: {documents.length}</p>
 
