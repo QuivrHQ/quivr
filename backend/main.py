@@ -13,8 +13,6 @@ from logger import get_logger
 from middlewares.cors import add_cors_middleware
 from models.chats import ChatMessage
 from models.users import User
-from utils import (ChatMessage, CommonsDep, convert_bytes, create_user,
-                   get_file_size, similarity_search, update_user_request_count)
 from utils.file import convert_bytes, get_file_size
 from utils.processors import filter_file
 from utils.vectors import (CommonsDep, create_user, similarity_search,
