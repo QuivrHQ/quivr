@@ -13,8 +13,8 @@ from logger import get_logger
 from middlewares.cors import add_cors_middleware
 from models.chats import ChatMessage
 from models.users import User
-from pydantic import BaseModel
-from supabase import Client
+from utils import (ChatMessage, CommonsDep, convert_bytes, create_user,
+                   get_file_size, similarity_search, update_user_request_count)
 from utils.file import convert_bytes, get_file_size
 from utils.processors import filter_file
 from utils.vectors import (CommonsDep, create_user, similarity_search,
@@ -163,6 +163,39 @@ async def download_endpoint(commons: CommonsDep, file_name: str,credentials: dic
     documents = response.data
     # Returns all documents with the same file name
     return {"documents": documents}
+
+@app.get("/user", dependencies=[Depends(JWTBearer())])
+async def get_user_endpoint(commons: CommonsDep, credentials: dict = Depends(JWTBearer())):
+    # Create a function that returns the unique documents out of the vectors 
+    # Create a function that returns the list of documents that can take in what to put in the select + the filter 
+    user = User(email=credentials.get('email', 'none'))
+    # Cascade delete the summary from the database first, because it has a foreign key constraint
+    user_vectors_response = commons['supabase'].table("vectors").select(
+        "name:metadata->>file_name, size:metadata->>file_size", count="exact") \
+            .filter("user_id", "eq", user.email)\
+            .execute()
+    documents = user_vectors_response.data  # Access the data from the response
+    # Convert each dictionary to a tuple of items, then to a set to remove duplicates, and then back to a dictionary
+    user_unique_vectors = [dict(t) for t in set(tuple(d.items()) for d in documents)]
+
+    current_brain_size = sum(float(doc['size']) for doc in user_unique_vectors)
+
+    max_brain_size = os.getenv("MAX_BRAIN_SIZE")
+
+    # Create function get user request stats -> nombre de requetes par jour + max number of requests -> svg to display the number of requests ? une fusee ?
+    user = User(email=credentials.get('email', 'none'))
+    date = time.strftime("%Y%m%d")
+    max_requests_number = os.getenv("MAX_REQUESTS_NUMBER")
+    requests_stats = commons['supabase'].from_('users').select(
+    '*').filter("user_id", "eq", user.email).execute()
+
+    return {"email":user.email, 
+            "max_brain_size": max_brain_size, 
+            "current_brain_size": current_brain_size, 
+            "max_requests_number": max_requests_number,
+            "requests_stats" : requests_stats.data,
+            "date": date,
+            }
 
 
 @app.get("/")

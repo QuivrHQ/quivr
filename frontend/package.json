@@ -12,6 +12,10 @@
     "precommit": "yarn lint && yarn test"
   },
   "dependencies": {
+    "@emotion/react": "^11.11.0",
+    "@emotion/styled": "^11.11.0",
+    "@material-ui/core": "^4.12.4",
+    "@mui/material": "^5.13.3",
     "@radix-ui/react-dialog": "^1.0.3",
     "@radix-ui/react-toast": "^1.1.3",
     "@radix-ui/react-tooltip": "^1.0.6",
@@ -29,12 +33,14 @@
     "axios": "^1.4.0",
     "class-variance-authority": "^0.6.0",
     "clsx": "^1.2.1",
+    "date-fns": "^2.30.0",
     "encoding": "^0.1.13",
     "eslint": "^8.41.0",
     "eslint-config-next": "13.4.2",
     "framer-motion": "^10.12.12",
     "next": "13.4.2",
     "postcss": "8.4.23",
+    "pretty-bytes": "^6.1.0",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-dropzone": "^14.2.3",
@@ -43,7 +49,8 @@
     "rehype-highlight": "^6.0.0",
     "tailwind-merge": "^1.12.0",
     "tailwindcss": "3.3.2",
-    "typescript": "^5.0.4"
+    "typescript": "^5.0.4",
+    "victory": "^36.6.10"
   },
   "devDependencies": {
     "@tailwindcss/typography": "^0.5.9",
