@@ -42,7 +42,7 @@ export default function Login() {
   };
 
   if (session?.user !== undefined) {
-    redirect("/");
+    redirect("/upload");
   }
 
   return (
