@@ -57,11 +57,7 @@ const DocumentItem = forwardRef(
           {document.name}
         </Ellipsis>
         <div className="flex gap-2 self-end">
-          <Modal
-            title={document.name}
-            desc={""}
-            Trigger={<Button className="">View</Button>}
-          >
+          <Modal Trigger={<Button className="">View</Button>}>
             <DocumentData documentName={document.name} />
           </Modal>
 

@@ -1,8 +1,9 @@
 "use client";
-import { FC } from "react";
+import { cn } from "@/lib/utils";
+import { FC, HTMLAttributes } from "react";
 import Tooltip from "./Tooltip";
 
-interface EllipsisProps {
+interface EllipsisProps extends HTMLAttributes<HTMLDivElement> {
   children: string;
   maxCharacters: number;
   tooltip?: boolean;
@@ -10,6 +11,7 @@ interface EllipsisProps {
 
 const Ellipsis: FC<EllipsisProps> = ({
   children: originalContent,
+  className,
   maxCharacters,
   tooltip = false,
 }) => {
@@ -22,7 +24,7 @@ const Ellipsis: FC<EllipsisProps> = ({
   if (tooltip && originalContent !== renderedContent) {
     return (
       <Tooltip tooltip={originalContent}>
-        <span aria-label={originalContent} className="">
+        <span aria-label={originalContent} className={cn("", className)}>
           {renderedContent}
         </span>
       </Tooltip>
@@ -30,7 +32,7 @@ const Ellipsis: FC<EllipsisProps> = ({
   }
 
   return (
-    <span aria-label={originalContent} className="">
+    <span aria-label={originalContent} className={cn("", className)}>
       {renderedContent}
     </span>
   );

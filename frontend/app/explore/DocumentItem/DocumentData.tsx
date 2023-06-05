@@ -1,6 +1,7 @@
 import { useAxios } from "@/lib/useAxios";
 import { useEffect, useState } from "react";
 import { useSupabase } from "../../supabase-provider";
+import Ellipsis from "@/app/components/ui/Ellipsis";
 
 interface DocumentDataProps {
   documentName: string;
@@ -32,19 +33,20 @@ const DocumentData = ({ documentName }: DocumentDataProps): JSX.Element => {
 
   return (
     <div className="prose">
+      <h1 className="text-bold text-xl break-words">{documentName}</h1>
       <p>No. of documents: {documents.length}</p>
       {/* {documents.map((doc) => (
         <pre key={doc.name}>{JSON.stringify(doc)}</pre>
       ))} */}
       <div className="flex flex-col gap-2">
         {documents[0] &&
-          Object.keys(documents[0]).map((k) => {
+          Object.keys(documents[0]).map((doc) => {
             return (
-              <div className="grid grid-cols-2 border-b py-2" key={k}>
-                <span className="capitalize font-bold">
-                  {k.replaceAll("_", " ")}
-                </span>
-                <span className="">{documents[0][k] || "Not Available"}</span>
+              <div className="grid grid-cols-2 border-b py-2" key={doc}>
+                <p className="capitalize font-bold break-words">
+                  {doc.replaceAll("_", " ")}
+                </p>
+                <span className="">{documents[0][doc] || "Not Available"}</span>
               </div>
             );
           })}
