@@ -12,7 +12,6 @@ export const FileUploader = (): JSX.Element => {
     isDragActive,
     isPending,
     open,
-    pendingFileIndex,
     uploadAllFiles,
     files,
     setFiles,
@@ -62,7 +61,7 @@ export const FileUploader = (): JSX.Element => {
       </div>
       <div className="flex flex-col items-center justify-center">
         <Button isLoading={isPending} onClick={uploadAllFiles}>
-          {isPending ? `Uploading ${files[pendingFileIndex].name}` : "Upload"}
+          {isPending ? "Uploading..." : "Upload"}
         </Button>
       </div>
     </section>
