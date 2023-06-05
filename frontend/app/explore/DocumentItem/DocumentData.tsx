@@ -1,7 +1,6 @@
 import { useAxios } from "@/lib/useAxios";
 import { useEffect, useState } from "react";
 import { useSupabase } from "../../supabase-provider";
-import Ellipsis from "@/app/components/ui/Ellipsis";
 
 interface DocumentDataProps {
   documentName: string;
@@ -32,7 +31,7 @@ const DocumentData = ({ documentName }: DocumentDataProps): JSX.Element => {
   }, [axiosInstance, documentName]);
 
   return (
-    <div className="prose">
+    <div className="prose custom-prose">
       <h1 className="text-bold text-xl break-words">{documentName}</h1>
       <p>No. of documents: {documents.length}</p>
       {/* {documents.map((doc) => (

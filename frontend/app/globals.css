@@ -38,3 +38,9 @@ a {
     @apply bg-gray-500;
   }
 }
+
+.custom-prose {
+  max-height: 60vh; /* Adjust this value based on the desired maximum height */
+  overflow-y: auto; /* Enable vertical scroll if the content exceeds the maximum height */
+  padding-right: 1rem; /* Optional: Add some padding if the scrollbar appears, so the text is not squished */
+}
