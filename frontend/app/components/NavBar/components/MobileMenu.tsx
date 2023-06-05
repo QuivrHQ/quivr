@@ -2,9 +2,9 @@ import * as Dialog from "@radix-ui/react-dialog";
 import { AnimatePresence, motion } from "framer-motion";
 import { FC, useState } from "react";
 import { MdClose, MdMenu } from "react-icons/md";
-import NavItems from "./NavItems";
+import { NavItems } from "./NavItems";
 
-const MobileMenu: FC = () => {
+export const MobileMenu: FC = () => {
   const [open, setOpen] = useState(false);
   return (
     <Dialog.Root onOpenChange={setOpen} open={open}>
@@ -56,5 +56,3 @@ const MobileMenu: FC = () => {
     </Dialog.Root>
   );
 };
-
-export default MobileMenu;
