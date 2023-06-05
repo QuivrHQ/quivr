@@ -65,3 +65,9 @@ async def file_already_exists(supabase, file, user):
     response = supabase.table("vectors").select("id").filter("metadata->>file_sha1", "eq", file_sha1) \
         .filter("user_id", "eq", user.email).execute()
     return len(response.data) > 0
+
+async def file_already_exists_from_content(supabase, file_content, user):
+    file_sha1 = compute_sha1_from_content(file_content)
+    response = supabase.table("vectors").select("id").filter("metadata->>file_sha1", "eq", file_sha1) \
+        .filter("user_id", "eq", user.email).execute()
+    return len(response.data) > 0

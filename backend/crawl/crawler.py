@@ -1,10 +1,11 @@
-import requests
-from pydantic import BaseModel
-import requests
-import re
-import unicodedata
-import tempfile
 import os
+import re
+import tempfile
+import unicodedata
+
+import requests
+from langchain.document_loaders import GitLoader
+from pydantic import BaseModel
 
 
 class CrawlWebsite(BaseModel):
@@ -23,6 +24,7 @@ class CrawlWebsite(BaseModel):
 
     def process(self):
         content = self._crawl(self.url)
+            
         ## Create a file
         file_name = slugify(self.url) + ".html"
         temp_file_path = os.path.join(tempfile.gettempdir(), file_name)
@@ -34,6 +36,12 @@ class CrawlWebsite(BaseModel):
             return temp_file_path, file_name
         else:
             return None
+    def checkGithub(self):
+        if "github.com" in self.url:
+            return True
+        else:
+            return False
+
 
 
 def slugify(text):
