@@ -1,3 +1,4 @@
+pymupdf==1.22.3
 langchain==0.0.187
 Markdown==3.4.3
 openai==0.27.6
