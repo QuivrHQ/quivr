@@ -1,5 +1,7 @@
 "use client";
+import Button from "@/app/components/ui/Button";
 import { cn } from "@/lib/utils";
+import Link from "next/link";
 import prettyBytes from "pretty-bytes";
 import { HTMLAttributes } from "react";
 import { UserStats } from "../types";
@@ -14,11 +16,16 @@ export const UserStatistics = (userStats: UserStats): JSX.Element => {
   return (
     <>
       <div className="flex flex-col sm:flex-row sm:items-center py-10 gap-5">
-        <div className="flex-1">
+        <div className="flex-1 flex flex-col">
           <h1 className="text-4xl font-semibold">
             {email.split("@")[0] + "'"}s Brain Usage
           </h1>
           <p className="opacity-50">{email}</p>
+          <Link className="mt-2" href={"/logout"}>
+            <Button className="px-3 py-2" variant={"danger"}>
+              Logout
+            </Button>
+          </Link>
         </div>
 
         <BrainConsumption {...userStats} />

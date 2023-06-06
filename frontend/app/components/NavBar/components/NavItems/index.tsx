@@ -54,13 +54,14 @@ export const NavItems: FC<NavItemsProps> = ({
       <div className="flex sm:flex-1 sm:justify-end flex-col items-center justify-center sm:flex-row gap-5 sm:gap-2">
         {isUserLoggedIn && (
           <>
-            <Link href={"/logout"}>
-              <Button variant={"secondary"}>Logout</Button>
+            <Link className="" href={"/user"}>
+              {session.user.email}
             </Link>
             <Link href={"/config"}>
               <Button
                 variant={"tertiary"}
                 className="focus:outline-none text-2xl"
+                aria-label="Settings"
               >
                 <MdSettings />
               </Button>
