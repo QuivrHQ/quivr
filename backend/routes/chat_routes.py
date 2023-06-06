@@ -18,7 +18,7 @@ async def chat_endpoint(commons: CommonsDep, chat_message: ChatMessage, credenti
     date = time.strftime("%Y%m%d")
     max_requests_number = os.getenv("MAX_REQUESTS_NUMBER")
     response = commons['supabase'].from_('users').select(
-    '*').filter("user_id", "eq", user.email).filter("date", "eq", date).execute()
+    '*').filter("email", "eq", user.email).filter("date", "eq", date).execute()
 
 
     userItem = next(iter(response.data or []), {"requests_count": 0})
@@ -30,9 +30,9 @@ async def chat_endpoint(commons: CommonsDep, chat_message: ChatMessage, credenti
     qa = get_qa_llm(chat_message, user.email)
 
     if old_request_count == 0: 
-        create_user(user_id= user.email, date=date)
+        create_user(email= user.email, date=date)
     elif  old_request_count <  float(max_requests_number) : 
-        update_user_request_count(user_id=user.email,  date=date, requests_count= old_request_count+1)
+        update_user_request_count(email=user.email,  date=date, requests_count= old_request_count+1)
     else: 
         history.append(('assistant', "You have reached your requests limit"))
         return {"history": history }
