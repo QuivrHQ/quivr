@@ -2,9 +2,9 @@
 import axios from "axios";
 import { redirect } from "next/navigation";
 import { useEffect, useState } from "react";
-import Card from "../components/ui/Card";
+import Spinner from "../components/ui/Spinner";
 import { useSupabase } from "../supabase-provider";
-import { UserStatistics } from "./components";
+import { UserStatistics } from "./components/UserStatistics";
 import { UserStats } from "./types";
 
 export default function UserPage() {
@@ -41,13 +41,18 @@ export default function UserPage() {
   return (
     <main className="w-full flex flex-col pt-32">
       <section className="flex flex-col justify-center items-center flex-1 gap-5 h-full">
-        <Card className="p-5 max-w-3xl w-full min-h-full flex-1 mb-24">
-          {userStats && (
+        <div className="p-5 max-w-3xl w-full min-h-full flex-1 mb-24">
+          {userStats ? (
             <>
               <UserStatistics {...userStats} />
             </>
+          ) : (
+            <div className="flex items-center justify-center">
+              <span>Fetching your data...</span>
+              <Spinner />
+            </div>
           )}
-        </Card>
+        </div>
       </section>
     </main>
   );

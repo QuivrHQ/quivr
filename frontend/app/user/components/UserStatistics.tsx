@@ -1,50 +1,74 @@
-import { Box, Grid, Typography } from "@mui/material";
+"use client";
+import { cn } from "@/lib/utils";
 import prettyBytes from "pretty-bytes";
+import { HTMLAttributes } from "react";
 import { UserStats } from "../types";
 import { BrainConsumption } from "./BrainConsumption";
 import { DateComponent } from "./Date";
-import { RequestsPerDayChart } from "./RequestsPerDayChart";
+import BrainSpaceChart from "./Graphs/BrainSpaceChart";
+import { RequestsPerDayChart } from "./Graphs/RequestsPerDayChart";
 
 export const UserStatistics = (userStats: UserStats): JSX.Element => {
-  const { email, current_brain_size, max_brain_size } = userStats;
-  const brainFilling = current_brain_size / max_brain_size;
+  const { email, current_brain_size, max_brain_size, date, requests_stats } =
+    userStats;
   return (
-    <Box>
-      <Grid container spacing={2}>
-        <Grid item xs={6}>
-          <Typography variant="h6">Email</Typography>
-          <Typography variant="body1">{email}</Typography>
-        </Grid>
-        <Grid item xs={6} style={{ textAlign: "right" }}>
-          <DateComponent {...userStats} />
-        </Grid>
-      </Grid>
-      <Grid container spacing={2}>
-        <Grid item xs={8}>
-          <div
-            style={{
-              position: "relative",
-              maxWidth: "100%",
-              maxHeight: "100%",
-              width: "200px", // Set a width
-              height: "200px", // Set a height
-            }}
-          >
+    <>
+      <div className="flex flex-col sm:flex-row sm:items-center py-10 gap-5">
+        <div className="flex-1">
+          <h1 className="text-4xl font-semibold">
+            {email.split("@")[0] + "'"}s Brain Usage
+          </h1>
+          <p className="opacity-50">{email}</p>
+        </div>
+
+        <BrainConsumption {...userStats} />
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+        <UserStatisticsCard className="">
+          <div>
+            <h1 className="text-2xl font-semibold">
+              {/* The last element corresponds to today's request_count */}
+              Today{"'"}s Requests: {requests_stats.at(-1)?.requests_count}
+            </h1>
+            <DateComponent date={date} />
+          </div>
+          <div className="">
             <RequestsPerDayChart {...userStats} />
           </div>
-        </Grid>
-        <Grid item xs={4}>
-          <BrainConsumption {...userStats} />
-          <Typography variant="h6">Brain filling</Typography>
-          <Typography variant="body1">
-            {(brainFilling * 100).toFixed(2) + "%"}
-          </Typography>
-          <Typography variant="h6">Remaining brain size</Typography>
-          <Typography variant="body1">
-            {prettyBytes(max_brain_size - current_brain_size, { binary: true })}
-          </Typography>
-        </Grid>
-      </Grid>
-    </Box>
+        </UserStatisticsCard>
+
+        <UserStatisticsCard>
+          <div>
+            <h1 className="text-2xl font-semibold">Remaining Brain size</h1>
+            <p>
+              {/* How much brain space is left */}
+              {prettyBytes(max_brain_size - current_brain_size, {
+                binary: true,
+              })}
+              /{prettyBytes(max_brain_size - 0, { binary: true })}
+            </p>
+          </div>
+          <div className="">
+            <BrainSpaceChart
+              current_brain_size={current_brain_size}
+              max_brain_size={max_brain_size}
+            />
+          </div>
+        </UserStatisticsCard>
+      </div>
+    </>
   );
 };
+
+const UserStatisticsCard = ({
+  children,
+  className,
+}: HTMLAttributes<HTMLDivElement>) => {
+  return (
+    <div className={cn("w-full h-full flex flex-col gap-5", className)}>
+      {children}
+    </div>
+  );
+};
+
+export default UserStatistics;
