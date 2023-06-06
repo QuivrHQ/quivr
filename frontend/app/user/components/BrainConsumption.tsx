@@ -36,6 +36,7 @@ export const BrainConsumption = (userStats: UserStats): JSX.Element => {
       </div>
       <div className="flex flex-col items-center justify-center">
         <span className="font-semibold">
+          {/* Percentage of brain space left */}
           {(100 - brainFilling * 100).toFixed(2)}%{" "}
         </span>
         <span className="text-sm opacity-50">Empty</span>
