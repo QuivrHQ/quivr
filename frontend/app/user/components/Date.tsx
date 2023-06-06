@@ -1,7 +1,14 @@
-import { Typography } from "@mui/material";
+import { HTMLAttributes } from "react";
 import { UserStats } from "../types";
 
-export const DateComponent = ({ date }: UserStats): JSX.Element => {
+interface DateComponentProps extends HTMLAttributes<HTMLSpanElement> {
+  date: UserStats["date"];
+}
+
+export const DateComponent = ({
+  date,
+  ...props
+}: DateComponentProps): JSX.Element => {
   // Extract year, month, and day from the date string
   const year = date.slice(0, 4);
   const month = date.slice(4, 6);
@@ -11,10 +18,5 @@ export const DateComponent = ({ date }: UserStats): JSX.Element => {
     `${year}-${month}-${day}`
   ).toLocaleDateString();
 
-  return (
-    <>
-      <Typography variant="h5">{"Today's date"}</Typography>
-      <Typography variant="body1">{formattedDate}</Typography>
-    </>
-  );
+  return <span {...props}>{formattedDate}</span>;
 };
