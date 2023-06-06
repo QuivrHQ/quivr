@@ -3,7 +3,7 @@ import { useSupabase } from "@/app/supabase-provider";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { Dispatch, FC, HTMLAttributes, SetStateAction } from "react";
-import { MdSettings } from "react-icons/md";
+import { MdPerson, MdSettings } from "react-icons/md";
 import Button from "../../../ui/Button";
 import { AuthButtons } from "./components/AuthButtons";
 import { DarkModeToggle } from "./components/DarkModeToggle";
@@ -54,13 +54,14 @@ export const NavItems: FC<NavItemsProps> = ({
       <div className="flex sm:flex-1 sm:justify-end flex-col items-center justify-center sm:flex-row gap-5 sm:gap-2">
         {isUserLoggedIn && (
           <>
-            <Link href={"/logout"}>
-              <Button variant={"secondary"}>Logout</Button>
+            <Link aria-label="account" className="" href={"/user"}>
+              <MdPerson />
             </Link>
             <Link href={"/config"}>
               <Button
                 variant={"tertiary"}
                 className="focus:outline-none text-2xl"
+                aria-label="Settings"
               >
                 <MdSettings />
               </Button>
