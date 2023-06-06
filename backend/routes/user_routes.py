@@ -33,7 +33,7 @@ async def get_user_endpoint(commons: CommonsDep, credentials: dict = Depends(JWT
     date = time.strftime("%Y%m%d")
     max_requests_number = os.getenv("MAX_REQUESTS_NUMBER")
     requests_stats = commons['supabase'].from_('users').select(
-    '*').filter("user_id", "eq", user.email).execute()
+    '*').filter("email", "eq", user.email).execute()
 
     return {"email":user.email, 
             "max_brain_size": max_brain_size, 
