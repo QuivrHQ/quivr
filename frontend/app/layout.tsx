@@ -34,14 +34,17 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`bg-white text-black dark:bg-black dark:text-white min-h-screen w-full ${inter.className}`}
+        className={`bg-white text-black dark:bg-black dark:text-white w-full ${inter.className}`}
+        style={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}
       >
         <ToastProvider>
           <SupabaseProvider session={session}>
             <BrainConfigProvider>
               <NavBar />
-              {children}
-              <Footer />
+              <div style={{ flex: "1 0 auto" }}>{children}</div>
+              <div style={{ position: "sticky", bottom: 0 }}>
+                <Footer />
+              </div>
             </BrainConfigProvider>
           </SupabaseProvider>
         </ToastProvider>

@@ -30,6 +30,7 @@ const ChatMessage = forwardRef(
           "py-3 px-3 rounded-lg border border-black/10 dark:border-white/25 flex flex-col max-w-4xl overflow-hidden scroll-pt-32",
           left ? "self-start mr-20" : "self-end ml-20"
         )}
+        style={speaker === "user" ? { whiteSpace: "pre-line" } : {}} // Add this line to preserve line breaks
       >
         <span className={cn("capitalize text-xs")}>{speaker}</span>
         <>

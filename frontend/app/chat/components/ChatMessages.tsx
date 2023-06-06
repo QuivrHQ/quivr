@@ -15,7 +15,7 @@ const ChatMessages: FC<ChatMessagesProps> = ({ history }) => {
   }, [history]);
 
   return (
-    <div className="overflow-hidden flex flex-col gap-5 scrollbar scroll-smooth">
+    <div className="overflow-hidden flex flex-col gap-5 scrollbar scroll-smooth flex-1">
       {history.length === 0 ? (
         <div className="text-center opacity-50">
           Ask a question, or describe a task.
