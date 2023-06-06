@@ -12,6 +12,8 @@
 
 Quivr, your second brain, utilizes the power of GenerativeAI to store and retrieve unstructured information. Think of it as Obsidian, but turbocharged with AI capabilities.
 
+[Roadmap here](https://getquivr.notion.site/Quivr-GenerativeAI-Second-Brain-3b22a6f50ffe4d259a6f120a17bc0543) 
+
 ## Key Features 🎯
 
 - **Universal Data Acceptance**: Quivr can handle almost any type of data you throw at it. Text, images, code snippets, we've got you covered.
