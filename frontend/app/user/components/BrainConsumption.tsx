@@ -13,7 +13,6 @@ export const BrainConsumption = (userStats: UserStats): JSX.Element => {
         height: "100%",
       }}
       className="fill-green-200 stroke-black stroke-1"
-      // size={12}
     />
   );
 
