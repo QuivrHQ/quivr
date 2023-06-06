@@ -42,7 +42,9 @@ export default async function RootLayout({
             <BrainConfigProvider>
               <NavBar />
               <div style={{ flex: "1 0 auto" }}>{children}</div>
-              <Footer />
+              <div style={{ position: "sticky", bottom: 0 }}>
+                <Footer />
+              </div>
             </BrainConfigProvider>
           </SupabaseProvider>
         </ToastProvider>
