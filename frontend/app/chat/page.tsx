@@ -32,11 +32,16 @@ export default function ChatPage() {
             }}
             className="w-full flex items-center justify-center gap-2"
           >
-            <input
+            <textarea
               autoFocus
-              type="text"
               value={question}
               onChange={(e) => setQuestion(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && !e.shiftKey) {
+                  e.preventDefault(); // Prevents the newline from being entered in the textarea
+                  if (!isPending) askQuestion(); // Call the submit function here
+                }
+              }}
               className="w-full p-2 border border-gray-300 dark:border-gray-500 outline-none rounded dark:bg-gray-800"
               placeholder="Begin conversation here..."
             />
