@@ -70,14 +70,30 @@ def create_vector(user_id,doc):
 
 def create_user(email, date):
     logger.info(f"New user entry in db document for user {email}")
-    supabase_client.table("users").insert(
-        {"email": email, "date": date, "requests_count": 1}).execute()
+    return(supabase_client.table("users").insert(
+        {"email": email, "date": date, "requests_count": 1}).execute())
 
 def update_user_request_count(email, date, requests_count):
     logger.info(f"User {email} request count updated to {requests_count}")
     supabase_client.table("users").update(
         { "requests_count": requests_count}).match({"email": email, "date": date}).execute()
 
+def create_chat(user_id):
+    logger.info(f"New chat entry in chats table for user {user_id}")
+
+    # Insert a new row into the chats table
+    new_chat = {
+        "user_id": user_id,
+        "history": {}  # Empty chat to start
+    }
+    insert_response = supabase_client.table('chats').insert(new_chat).execute()
+    return(insert_response)
+
+def update_chat(chat_id, history):
+    supabase_client.table("chats").update(
+        { "history": history}).match({"chat_id": chat_id}).execute()
+    logger.info(f"Chat {chat_id} updated")
+    
 
 def create_embedding(content):
     return embeddings.embed_query(content)
