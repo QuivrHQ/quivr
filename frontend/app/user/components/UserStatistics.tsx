@@ -60,12 +60,10 @@ export const UserStatistics = (userStats: UserStats): JSX.Element => {
   );
 };
 
-interface UserStatisticsCardProps extends HTMLAttributes<HTMLDivElement> {}
-
 const UserStatisticsCard = ({
   children,
   className,
-}: UserStatisticsCardProps) => {
+}: HTMLAttributes<HTMLDivElement>) => {
   return (
     <div className={cn("w-full h-full flex flex-col gap-5", className)}>
       {children}
