@@ -24,7 +24,7 @@ export default function ChatPage() {
         <Card className="p-5 max-w-3xl w-full flex-1 mb-24 overflow-auto flex flex-col">
           <ChatMessages history={history} />
         </Card>
-        <Card className="fixed left-1/2 w-full max-w-3xl bg-gray-100 dark:bg-gray-800 rounded-b-none -translate-x-1/2 bottom-16 px-5 py-5">
+        <Card className="fixed left-1/2 w-full max-w-3xl bg-gray-100 dark:bg-gray-800 -translate-x-1/2 bottom-16 px-5 py-5 mb-5">
           <form
             onSubmit={(e) => {
               e.preventDefault();
