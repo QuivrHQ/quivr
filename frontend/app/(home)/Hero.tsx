@@ -45,7 +45,7 @@ const Hero: FC = () => {
           retrieve unstructured information.
         </p>
         <Link href={"/signup"}>
-          <Button>Try Demo</Button>
+          <Button>Get Started</Button>
         </Link>
         <Link target="_blank" href={"https://github.com/StanGirard/quivr/"}>
           <Button variant={"tertiary"}>
