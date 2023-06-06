@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { MdMic, MdMicOff, MdSettings } from "react-icons/md";
+import { MdAutorenew, MdMic, MdMicOff, MdSettings } from "react-icons/md";
 import Button from "../components/ui/Button";
 import Card from "../components/ui/Card";
 import PageHeading from "../components/ui/PageHeading";
@@ -9,7 +9,7 @@ import { useQuestion } from "./hooks/useQuestion";
 import { useSpeech } from "./hooks/useSpeech";
 
 export default function ChatPage() {
-  const { history, isPending, question, askQuestion, setQuestion } =
+  const { history, isPending, question, askQuestion, setQuestion, resetHistory } =
     useQuestion();
   const { isListening, speechSupported, startListening } = useSpeech();
 
@@ -47,6 +47,16 @@ export default function ChatPage() {
             />
             <Button type="submit" isLoading={isPending}>
               {isPending ? "Thinking..." : "Chat"}
+            </Button>
+            {/* Reset Button */}
+            <Button
+              className="px-3"
+              variant={"tertiary"}
+              type="button"
+              onClick={resetHistory}
+              disabled={isPending}
+            >
+              <MdAutorenew className="text-2xl" />
             </Button>
             {/* Mic Button */}
             <Button
