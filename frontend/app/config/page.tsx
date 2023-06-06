@@ -172,7 +172,7 @@ export default function ExplorePage() {
                 Logout
               </Button>
             </Link>
-            // TODO: add functionality to change password
+            {/* TODO: add functionality to change password */}
           </div>
         </form>
       </section>
