@@ -28,11 +28,7 @@ const ChatMessage = forwardRef(
         exit={{ y: -24, opacity: 0 }}
         className={cn(
           "py-3 px-3 md:px-6 w-full dark:border-white/25 flex flex-col max-w-4xl overflow-hidden scroll-pt-32",
-          `${
-            speaker === "user"
-              ? ""
-              : "bg-gray-200 dark:bg-gray-800 bg-opacity-60 py-8 "
-          }`
+          speaker === "user" ? "" : "bg-gray-200 dark:bg-gray-800 bg-opacity-60 py-8",
         )}
         style={speaker === "user" ? { whiteSpace: "pre-line" } : {}} // Add this line to preserve line breaks
       >

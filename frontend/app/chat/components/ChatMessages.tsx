@@ -1,18 +1,18 @@
-"use client"
-import { AnimatePresence } from "framer-motion"
-import { FC, useEffect, useRef } from "react"
-import ChatMessage from "./ChatMessage"
+"use client";
+import { AnimatePresence } from "framer-motion";
+import { FC, useEffect, useRef } from "react";
+import ChatMessage from "./ChatMessage";
 
 interface ChatMessagesProps {
-  history: Array<[string, string]>
+  history: Array<[string, string]>;
 }
 
 const ChatMessages: FC<ChatMessagesProps> = ({ history }) => {
-  const lastChatRef = useRef<HTMLDivElement | null>(null)
+  const lastChatRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    lastChatRef.current?.scrollIntoView({ behavior: "auto", block: "start" })
-  }, [history])
+    lastChatRef.current?.scrollIntoView({ behavior: "auto", block: "start" });
+  }, [history]);
 
   return (
     <div className="space-y-8 grid grid-cols-1 overflow-hidden scrollbar scroll-smooth">
@@ -31,11 +31,11 @@ const ChatMessages: FC<ChatMessagesProps> = ({ history }) => {
                 text={text}
                 left={idx % 2 !== 0}
               />
-            )
+            );
           })}
         </AnimatePresence>
       )}
     </div>
-  )
-}
-export default ChatMessages
+  );
+};
+export default ChatMessages;
