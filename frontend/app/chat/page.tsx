@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { MdAutorenew, MdMic, MdMicOff, MdSettings } from "react-icons/md";
+import { MdAutorenew, MdMic, MdMicOff, MdSend, MdSettings } from "react-icons/md";
 import Button from "../components/ui/Button";
 import Card from "../components/ui/Card";
 import PageHeading from "../components/ui/PageHeading";
@@ -21,18 +21,19 @@ export default function ChatPage() {
           subtitle="Talk to a language model about your uploaded data"
         />
         {/* Chat */}
-        <Card className="p-5 max-w-3xl w-full flex-1 mb-24 overflow-auto flex flex-col">
+        <Card className="py-4 max-w-3xl w-full  flex-1 md:mb-24 overflow-auto flex flex-col hover:shadow-none shadow-none ">
           <ChatMessages history={history} />
         </Card>
-        <Card className="fixed left-1/2 w-full max-w-3xl bg-gray-100 dark:bg-gray-800 -translate-x-1/2 bottom-16 px-5 py-5 mb-5">
+        <Card className="md:fixed md:rounded md:left-1/2 w-full max-w-3xl bg-gray-100  dark:bg-gray-800 md:-translate-x-1/2 md:bottom-16 px-5 py-5 md:mb-5 hover:shadow-none shadow-none">
           <form
             onSubmit={(e) => {
               e.preventDefault();
               if (!isPending) askQuestion();
             }}
-            className="w-full flex items-center justify-center gap-2"
+            className="w-full flex flex-col md:flex-row items-center justify-center gap-2 "
           >
-            <textarea
+            <div className="flex gap-1 w-full">
+              <input
               autoFocus
               value={question}
               onChange={(e) => setQuestion(e.target.value)}
@@ -42,41 +43,45 @@ export default function ChatPage() {
                   if (!isPending) askQuestion(); // Call the submit function here
                 }
               }}
-              className="w-full p-2 border border-gray-300 dark:border-gray-500 outline-none rounded dark:bg-gray-800"
+              className="w-full  p-2 border border-gray-300 dark:border-gray-500 outline-none rounded dark:bg-gray-800"
               placeholder="Begin conversation here..."
             />
             <Button type="submit" isLoading={isPending}>
-              {isPending ? "Thinking..." : "Chat"}
+                {isPending ? "" : <MdSend />}
             </Button>
-            {/* Reset Button */}
-            <Button
-              className="px-3"
-              variant={"tertiary"}
-              type="button"
-              onClick={resetHistory}
-              disabled={isPending}
-            >
-              <MdAutorenew className="text-2xl" />
-            </Button>
-            {/* Mic Button */}
-            <Button
-              className="px-3"
-              variant={"tertiary"}
-              type="button"
-              onClick={startListening}
-              disabled={!speechSupported}
-            >
-              {isListening ? (
-                <MdMicOff className="text-2xl" />
-              ) : (
-                <MdMic className="text-2xl" />
-              )}
-            </Button>
-            <Link href={"/config"}>
-              <Button className="px-3" variant={"tertiary"}>
-                <MdSettings className="text-2xl" />
+            </div>
+            
+            <div className="flex">
+             {/* Reset Button */}
+              <Button
+                className="px-3"
+                variant={"tertiary"}
+                type="button"
+                onClick={resetHistory}
+                disabled={isPending}
+              >
+                <MdAutorenew className="text-2xl" />
               </Button>
-            </Link>
+              {/* Mic Button */}
+              <Button
+                className="px-3"
+                variant={"tertiary"}
+                type="button"
+                onClick={startListening}
+                disabled={!speechSupported}
+              >
+                {isListening ? (
+                  <MdMicOff className="text-2xl" />
+                ) : (
+                  <MdMic className="text-2xl" />
+                )}
+              </Button>
+              <Link href={"/config"}>
+                <Button className="px-3" variant={"tertiary"}>
+                  <MdSettings className="text-2xl" />
+                </Button>
+              </Link>
+            </div>
           </form>
         </Card>
       </section>
