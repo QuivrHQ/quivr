@@ -29,7 +29,6 @@ const ChatMessages: FC<ChatMessagesProps> = ({ history }) => {
                 key={idx}
                 speaker={speaker}
                 text={text}
-                left={idx % 2 !== 0}
               />
             );
           })}

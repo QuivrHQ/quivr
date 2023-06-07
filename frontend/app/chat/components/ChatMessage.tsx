@@ -8,11 +8,9 @@ const ChatMessage = forwardRef(
     {
       speaker,
       text,
-      left = false,
     }: {
       speaker: string
       text: string
-      left?: boolean
     },
     ref
   ) => {
