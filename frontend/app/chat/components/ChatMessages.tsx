@@ -1,13 +1,13 @@
 "use client";
 import { AnimatePresence } from "framer-motion";
-import { FC, useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import ChatMessage from "./ChatMessage";
 
 interface ChatMessagesProps {
   history: Array<[string, string]>;
 }
 
-const ChatMessages: FC<ChatMessagesProps> = ({ history }) => {
+export const ChatMessages = ({ history }: ChatMessagesProps): JSX.Element => {
   const lastChatRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -38,4 +38,3 @@ const ChatMessages: FC<ChatMessagesProps> = ({ history }) => {
     </div>
   );
 };
-export default ChatMessages;
