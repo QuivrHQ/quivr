@@ -5,17 +5,17 @@ import { useBrainConfig } from "@/lib/context/BrainConfigProvider/hooks/useBrain
 import { useAxios } from "@/lib/useAxios";
 import { UUID } from "crypto";
 import { redirect } from "next/navigation";
-import { Chat } from "../types";
+import useChats from "./useChats";
 
 interface QuestionParams {
-  chatId: string | undefined;
-  history?: Array<[string, string]> | undefined;
-  setChats: Dispatch<SetStateAction<Chat[]>>;
+  chatId?: string;
+  history?: Array<[string, string]>;
 }
 
-export const useQuestion = (params: QuestionParams) => {
+export const useQuestion = (params?: QuestionParams) => {
   const [question, setQuestion] = useState("");
   const [chatId, setChatId] = useState(params?.chatId);
+  const { setChats } = useChats();
   const [history, setHistory] = useState<Array<[string, string]>>(
     params?.history ?? []
   );
@@ -50,7 +50,7 @@ export const useQuestion = (params: QuestionParams) => {
     setIsPending(false);
 
     if (chatId === undefined) {
-      params.setChats((chats) => [
+      setChats((chats) => [
         ...chats,
         { chatId: response.data.chatId, history },
       ]);
