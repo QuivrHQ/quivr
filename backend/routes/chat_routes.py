@@ -1,22 +1,54 @@
 import os
 import time
+from typing import Optional
 from uuid import UUID
 
 from auth.auth_bearer import JWTBearer
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends
 from llm.qa import get_qa_llm
 from llm.summarization import llm_evaluate_summaries
 from models.chats import ChatMessage
 from models.users import User
 from utils.vectors import (CommonsDep, create_chat, create_user,
-                           similarity_search, update_chat,
-                           update_user_request_count)
+                           fetch_user_id_from_credentials, similarity_search,
+                           update_chat, update_user_request_count)
 
 chat_router = APIRouter()
 
+# get all chats
+@chat_router.get("/chat", dependencies=[Depends(JWTBearer())])
+async def get_chats(commons: CommonsDep, credentials: dict = Depends(JWTBearer())):
+    user_id = fetch_user_id_from_credentials(commons, credentials)
+    
+    # Fetch all chats for the user
+    response = commons['supabase'].from_('chats').select('chatId:chat_id, history').filter("user_id", "eq", user_id).execute()
+    chats = response.data
+
+    return {"chats": chats}
+
+# get one chat
+@chat_router.get("/chat/{chat_id}", dependencies=[Depends(JWTBearer())])
+async def get_chats(commons: CommonsDep, chat_id: UUID):
+    
+    # Fetch all chats for the user
+    response = commons['supabase'].from_('chats').select('*').filter("chat_id", "eq", chat_id).execute()
+    chats = response.data
+
+    print("/chat/{chat_id}",chats)
+    return {"chatId": chat_id, "history": chats[0]['history']}
+
+# delete one chat
+@chat_router.delete("/chat/{chat_id}", dependencies=[Depends(JWTBearer())])
+async def delete_chat(commons: CommonsDep,chat_id: UUID):
+    commons['supabase'].table("chats").delete().match(
+        {"chat_id": chat_id}).execute()
+
+    return {"message": f"{chat_id}  has been deleted."}
+
+
 # continue chatting
-@chat_router.post("/chat/{chat_id}", dependencies=[Depends(JWTBearer())])
-async def chat_endpoint(commons: CommonsDep, chat_id: UUID, chat_message: ChatMessage, credentials: dict = Depends(JWTBearer())):
+@chat_router.post("/chat", dependencies=[Depends(JWTBearer())])
+async def chat_endpoint(commons: CommonsDep,  chat_message: ChatMessage, credentials: dict = Depends(JWTBearer())):
     user = User(email=credentials.get('email', 'none'))
     date = time.strftime("%Y%m%d")
     max_requests_number = os.getenv("MAX_REQUESTS_NUMBER")
@@ -63,51 +95,11 @@ async def chat_endpoint(commons: CommonsDep, chat_id: UUID, chat_message: ChatMe
         model_response = qa({"question": chat_message.question})
     history.append(("assistant", model_response["answer"]))
 
-    print('CHAT_ID:', chat_id)
-    # Use the chat_id to update the chats table with this history
-    update_chat(chat_id=chat_id, history=history)
-    print('HISTORY', history)
-    return {"history": history}
+    chat_id = chat_message.chat_id
+    if chat_id!=(None,): 
+        update_chat(chat_id=chat_id, history=history)
+    else :
+        user_id = fetch_user_id_from_credentials(commons, credentials)
+        new_chat = create_chat(user_id, history)
 
-# new chat 
-@chat_router.post("/chat/", dependencies=[Depends(JWTBearer())])
-async def chat_endpoint(commons: CommonsDep, chat_message: ChatMessage, credentials: dict = Depends(JWTBearer())):
-    date = time.strftime("%Y%m%d")
-    user = User(email=credentials.get('email', 'none'))
-
-    # Fetch the user's UUID based on their email
-    response = commons['supabase'].from_('users').select('user_id').filter("email", "eq", user.email).execute()
-
-    userItem = next(iter(response.data or []), {})
-
-    if userItem == {}: 
-        create_user_response = create_user(email= user.email, date=date)
-        user_id = create_user_response.data[0]['user_id']
-
-    else: 
-        user_id = userItem['user_id']
-
-    create_chat_response = create_chat(user_id)
-
-    return {"chat_id": create_chat_response.data[0]['chat_id']}
-
-@chat_router.get("/chats/", dependencies=[Depends(JWTBearer())])
-async def get_chats(commons: CommonsDep, credentials: dict = Depends(JWTBearer())):
-    email = User(email=credentials.get('email', 'none'))
-
-    # Fetch the user's UUID based on their email
-    response = commons['supabase'].from_('users').select('user_id').filter("email", "eq", email).execute()
-    user_id = response.data[0]['user_id']
-    
-    # Fetch all chats for the user
-    response = commons['supabase'].from_('chats').select('*').filter("user_id", "eq", user_id).execute()
-    chats = response.data
-
-    return {"chats": chats}
-
-@chat_router.delete("/chats/{chat_id}", dependencies=[Depends(JWTBearer())])
-async def delete_chat(commons: CommonsDep,chat_id: UUID):
-    commons['supabase'].table("chats").delete().match(
-        {"chat_id": chat_id}).execute()
-
-    return {"message": f"{chat_id}  has been deleted."}
+    return {"history": history, "chatId": chat_id if chat_id!=(None,) else new_chat.data[0]['chat_id']}
