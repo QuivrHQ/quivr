@@ -1,48 +1,63 @@
-import { useEffect, useState } from "react";
+import { Dispatch, SetStateAction, useState } from "react";
 
 import { useSupabase } from "@/app/supabase-provider";
 import { useBrainConfig } from "@/lib/context/BrainConfigProvider/hooks/useBrainConfig";
 import { useAxios } from "@/lib/useAxios";
+import { UUID } from "crypto";
 import { redirect } from "next/navigation";
-export const useQuestion = () => {
+import { Chat } from "../types";
+
+interface QuestionParams {
+  chatId: string | undefined;
+  history?: Array<[string, string]> | undefined;
+  setChats: Dispatch<SetStateAction<Chat[]>>;
+}
+
+export const useQuestion = (params: QuestionParams) => {
   const [question, setQuestion] = useState("");
-  const [history, setHistory] = useState<Array<[string, string]>>([]);
+  const [chatId, setChatId] = useState(params?.chatId);
+  const [history, setHistory] = useState<Array<[string, string]>>(
+    params?.history ?? []
+  );
   const [isPending, setIsPending] = useState(false);
   const { session } = useSupabase();
   const { axiosInstance } = useAxios();
   const {
     config: { maxTokens, model, temperature },
   } = useBrainConfig();
+
   if (session === null) {
     redirect("/login");
   }
-
-  useEffect(() => {
-    // Check if history exists in local storage. If it does, fetch it and set it as history
-    (async () => {
-      const localHistory = localStorage.getItem("history");
-      if (localHistory) {
-        setHistory(JSON.parse(localHistory));
-      }
-    })();
-  }, []);
 
   const askQuestion = async () => {
     setHistory((hist) => [...hist, ["user", question]]);
     setIsPending(true);
 
     try {
-      const response = await axiosInstance.post(`/chat/`, {
+      const response = await axiosInstance.post<{
+        chatId: UUID;
+        history: Array<[string, string]>;
+      }>(`/chat`, {
+        ...(chatId && { chat_id: chatId }),
         model,
         question,
         history,
         temperature,
         max_tokens: maxTokens,
       });
-
       setHistory(response.data.history);
       localStorage.setItem("history", JSON.stringify(response.data.history));
       setQuestion("");
+
+      if (chatId === undefined) {
+        params.setChats((chats) => [
+          ...chats,
+          { chatId: response.data.chatId, history },
+        ]);
+      }
+
+      setChatId(response.data.chatId);
     } catch (error) {
       console.error(error);
     } finally {
@@ -62,5 +77,7 @@ export const useQuestion = () => {
     setQuestion,
     resetHistory,
     askQuestion,
+    setChatId,
+    setHistory,
   };
 };
