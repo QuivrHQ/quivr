@@ -50,7 +50,7 @@ export default function ExplorePage() {
             </p>
           </div>
           <Field
-            type="text"
+            type="password"
             placeholder="Open AI Key"
             className="w-full"
             label="Open AI Key"
