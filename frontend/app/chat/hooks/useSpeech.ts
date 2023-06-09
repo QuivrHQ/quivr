@@ -48,7 +48,7 @@ export const useSpeech = () => {
         }
       };
     }
-  }, [isListening]);
+  }, [isListening, setQuestion]);
 
   const startListening = () => {
     setIsListening((prevIsListening) => !prevIsListening);

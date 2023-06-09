@@ -17,37 +17,43 @@ export const useQuestion = () => {
     redirect("/login");
   }
 
-  useEffect(()=>{
+  useEffect(() => {
     // Check if history exists in local storage. If it does, fetch it and set it as history
-    (async ()=>{
-      const localHistory = await localStorage.getItem('history')
-      if(localHistory){
-        setHistory(JSON.parse(localHistory))
+    (async () => {
+      const localHistory = localStorage.getItem("history");
+      if (localHistory) {
+        setHistory(JSON.parse(localHistory));
       }
-    })()
-  }, [])
-  
+    })();
+  }, []);
+
   const askQuestion = async () => {
     setHistory((hist) => [...hist, ["user", question]]);
     setIsPending(true);
 
-    const response = await axiosInstance.post(`/chat/`, {
-      model,
-      question,
-      history,
-      temperature,
-      max_tokens: maxTokens,
-    });
-    setHistory(response.data.history);
-    localStorage.setItem('history', JSON.stringify(response.data.history))
-    setQuestion("");
-    setIsPending(false);
+    try {
+      const response = await axiosInstance.post(`/chat/`, {
+        model,
+        question,
+        history,
+        temperature,
+        max_tokens: maxTokens,
+      });
+
+      setHistory(response.data.history);
+      localStorage.setItem("history", JSON.stringify(response.data.history));
+      setQuestion("");
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsPending(false);
+    }
   };
 
   const resetHistory = () => {
-    localStorage.setItem('history', JSON.stringify([]))
-    setHistory([])
-  }
+    localStorage.setItem("history", JSON.stringify([]));
+    setHistory([]);
+  };
 
   return {
     isPending,

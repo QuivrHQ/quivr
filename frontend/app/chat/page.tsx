@@ -1,6 +1,12 @@
 "use client";
 import Link from "next/link";
-import { MdAutorenew, MdMic, MdMicOff, MdSend, MdSettings } from "react-icons/md";
+import {
+  MdAutorenew,
+  MdMic,
+  MdMicOff,
+  MdSend,
+  MdSettings,
+} from "react-icons/md";
 import Button from "../components/ui/Button";
 import Card from "../components/ui/Card";
 import PageHeading from "../components/ui/PageHeading";
@@ -9,8 +15,14 @@ import { useQuestion } from "./hooks/useQuestion";
 import { useSpeech } from "./hooks/useSpeech";
 
 export default function ChatPage() {
-  const { history, isPending, question, askQuestion, setQuestion, resetHistory } =
-    useQuestion();
+  const {
+    history,
+    isPending,
+    question,
+    askQuestion,
+    setQuestion,
+    resetHistory,
+  } = useQuestion();
   const { isListening, speechSupported, startListening } = useSpeech();
 
   return (
@@ -34,25 +46,25 @@ export default function ChatPage() {
           >
             <div className="flex gap-1 w-full">
               <input
-              autoFocus
-              value={question}
-              onChange={(e) => setQuestion(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" && !e.shiftKey) {
-                  e.preventDefault(); // Prevents the newline from being entered in the textarea
-                  if (!isPending) askQuestion(); // Call the submit function here
-                }
-              }}
-              className="w-full  p-2 border border-gray-300 dark:border-gray-500 outline-none rounded dark:bg-gray-800"
-              placeholder="Begin conversation here..."
-            />
-            <Button type="submit" isLoading={isPending}>
+                autoFocus
+                value={question}
+                onChange={(e) => setQuestion(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && !e.shiftKey) {
+                    e.preventDefault(); // Prevents the newline from being entered in the textarea
+                    if (!isPending) askQuestion(); // Call the submit function here
+                  }
+                }}
+                className="w-full  p-2 border border-gray-300 dark:border-gray-500 outline-none rounded dark:bg-gray-800"
+                placeholder="Begin conversation here..."
+              />
+              <Button type="submit" isLoading={isPending}>
                 {isPending ? "" : <MdSend />}
-            </Button>
+              </Button>
             </div>
-            
+
             <div className="flex">
-             {/* Reset Button */}
+              {/* Reset Button */}
               <Button
                 className="px-3"
                 variant={"tertiary"}
