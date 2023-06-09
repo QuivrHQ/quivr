@@ -1,5 +1,5 @@
 "use client";
-import axios from "axios";
+import { useAxios } from "@/lib/useAxios";
 import { redirect } from "next/navigation";
 import { useEffect, useState } from "react";
 import Spinner from "../components/ui/Spinner";
@@ -10,6 +10,7 @@ import { UserStats } from "./types";
 export default function UserPage() {
   const [userStats, setUserStats] = useState<UserStats>();
   const { session } = useSupabase();
+  const { axiosInstance } = useAxios();
   if (session === null) {
     redirect("/login");
   }
@@ -21,7 +22,7 @@ export default function UserPage() {
         console.log(
           `Fetching user stats from ${process.env.NEXT_PUBLIC_BACKEND_URL}/user`
         );
-        const response = await axios.get<UserStats>(
+        const response = await axiosInstance.get<UserStats>(
           `${process.env.NEXT_PUBLIC_BACKEND_URL}/user`,
           {
             headers: {

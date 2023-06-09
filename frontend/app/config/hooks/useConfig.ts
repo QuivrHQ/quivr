@@ -22,6 +22,7 @@ export const useConfig = () => {
   const model = watch("model");
   const temperature = watch("temperature");
   const maxTokens = watch("maxTokens");
+  const openAiKey = watch("openAiKey");
 
   useEffect(() => {
     reset(config);
@@ -72,6 +73,7 @@ export const useConfig = () => {
     handleSubmit,
     saveConfig,
     maxTokens,
+    openAiKey,
     temperature,
     isDirty,
     register,
