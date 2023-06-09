@@ -6,12 +6,7 @@ import { FiTrash } from "react-icons/fi";
 import useChats from "../hooks/useChats";
 import { NewChatButton } from "./NewChatButton";
 export function ChatsList({ currentChatId }: { currentChatId?: UUID }) {
-  const { allChats, fetchAllChats, deleteChat } = useChats();
-
-  useEffect(() => {
-    fetchAllChats();
-  }, []);
-
+  const { allChats, deleteChat } = useChats();
   return (
     <div>
       <NewChatButton />
