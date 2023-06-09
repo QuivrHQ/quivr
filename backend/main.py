@@ -67,7 +67,7 @@ async def chat_endpoint(request: Request, commons: CommonsDep, chat_message: Cha
     user = User(email=credentials.get('email', 'none'))
     date = time.strftime("%Y%m%d")
     max_requests_number = os.getenv("MAX_REQUESTS_NUMBER")
-    user_openai_api_key = request.headers.get('OpenAI-API-Key')
+    user_openai_api_key = request.headers.get('Openai-Api-Key')
 
     response = commons['supabase'].from_('users').select(
     '*').filter("user_id", "eq", user.email).filter("date", "eq", date).execute()

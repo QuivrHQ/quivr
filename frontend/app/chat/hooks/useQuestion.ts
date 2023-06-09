@@ -43,7 +43,6 @@ export const useQuestion = () => {
       setHistory(response.data.history);
       localStorage.setItem("history", JSON.stringify(response.data.history));
       setQuestion("");
-      setIsPending(false);
     } catch (error) {
       console.error(error);
     } finally {

@@ -27,32 +27,18 @@ export const useConfig = () => {
     reset(config);
   }, [config, reset]);
 
-  const openAiKeyPattern = /^sk-[a-zA-Z0-9]{45,50}$/;
-
   const saveConfig = () => {
-    const { openAiKey } = getValues();
+    const values = getValues();
 
-    const isKeyEmpty = openAiKey === undefined || openAiKey === "";
-
-    if (isKeyEmpty || openAiKeyPattern.test(openAiKey)) {
-      if (isKeyEmpty) {
-        localStorage.removeItem("openAiKey");
-      } else {
-        localStorage.setItem("openAiKey", openAiKey);
-      }
-
-      updateConfig({ openAiKey });
-      publish({
-        text: "Config saved",
-        variant: "success",
-      });
-    } else {
-      publish({
-        text: "Invalid OpenAI Key",
-        variant: "danger",
-      });
-      setError("openAiKey", { type: "pattern", message: "Invalid OpenAI Key" });
+    if (!validateConfig()) {
+      return;
     }
+
+    updateConfig(values);
+    publish({
+      text: "Config saved",
+      variant: "success",
+    });
   };
 
   const resetBrainConfig = () => {
@@ -61,6 +47,25 @@ export const useConfig = () => {
       text: "Config reset",
       variant: "success",
     });
+  };
+
+  const openAiKeyPattern = /^sk-[a-zA-Z0-9]{45,50}$/;
+
+  const validateConfig = (): boolean => {
+    const { openAiKey } = getValues();
+
+    const isKeyEmpty = openAiKey === "" || openAiKey === undefined;
+    if (isKeyEmpty || openAiKeyPattern.test(openAiKey)) {
+      return true;
+    }
+
+    publish({
+      text: "Invalid OpenAI Key",
+      variant: "danger",
+    });
+    setError("openAiKey", { type: "pattern", message: "Invalid OpenAI Key" });
+
+    return false;
   };
 
   return {
