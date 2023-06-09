@@ -30,24 +30,29 @@ export const useConfig = () => {
   const openAiKeyPattern = /^sk-[a-zA-Z0-9]{45,50}$/;
 
   const saveConfig = () => {
-    const values = getValues();
+    const { openAiKey } = getValues();
 
-    if (values.openAiKey != null && !openAiKeyPattern.test(values.openAiKey)) {
+    const isKeyEmpty = openAiKey === undefined || openAiKey === "";
+
+    if (isKeyEmpty || openAiKeyPattern.test(openAiKey)) {
+      if (isKeyEmpty) {
+        localStorage.removeItem("openAiKey");
+      } else {
+        localStorage.setItem("openAiKey", openAiKey);
+      }
+
+      updateConfig({ openAiKey });
+      publish({
+        text: "Config saved",
+        variant: "success",
+      });
+    } else {
       publish({
         text: "Invalid OpenAI Key",
         variant: "danger",
       });
       setError("openAiKey", { type: "pattern", message: "Invalid OpenAI Key" });
-      return;
-    } else {
-      localStorage.setItem("openAiKey", values.openAiKey ?? "");
     }
-
-    updateConfig(values);
-    publish({
-      text: "Config saved",
-      variant: "success",
-    });
   };
 
   const resetBrainConfig = () => {
