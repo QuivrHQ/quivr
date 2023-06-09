@@ -58,7 +58,7 @@ export default function ExplorePage() {
           />
           <fieldset className="w-full flex flex-col">
             <label className="flex-1 text-sm" htmlFor="model">
-              Model {openAiKey}
+              Model
             </label>
             <select
               id="model"
