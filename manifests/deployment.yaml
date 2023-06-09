@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: quivr
+  labels:
+    app: quivr
+  namespace: namespace-workflow-1685279343352
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: quivr
+  template:
+    metadata:
+      labels:
+        app: quivr
+    spec:
+      containers:
+        - name: quivr
+          image: acrworkflow1685279343352.azurecr.io/image-workflow-1685279343352:latest
+          ports:
+            - containerPort: 8000
