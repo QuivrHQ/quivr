@@ -40,7 +40,7 @@ export function ChatInput({
       <Button type="submit" isLoading={isPending}>
         {isPending ? "Thinking..." : "Chat"}
       </Button>
-      <MicButton />
+      <MicButton setQuestion={setQuestion} />
       <ConfigButton />
     </form>
   );
