@@ -73,9 +73,14 @@ def create_clients_and_embeddings(openai_api_key, supabase_url, supabase_key):
     
     return supabase_client, embeddings
 
-def get_qa_llm(chat_message: ChatMessage, user_id: str):
+def get_qa_llm(chat_message: ChatMessage, user_id: str, user_openai_api_key: str):
     '''Get the question answering language model.'''
     openai_api_key, anthropic_api_key, supabase_url, supabase_key = get_environment_variables()
+
+    '''User can override the openai_api_key'''
+    if user_openai_api_key is not None and user_openai_api_key != "":
+        openai_api_key = user_openai_api_key
+
     supabase_client, embeddings = create_clients_and_embeddings(openai_api_key, supabase_url, supabase_key)
     
     vector_store = CustomSupabaseVectorStore(

@@ -14,6 +14,7 @@ export const useConfig = () => {
     getValues,
     reset,
     formState: { isDirty },
+    setError,
   } = useForm({
     defaultValues: config,
   });
@@ -27,7 +28,13 @@ export const useConfig = () => {
   }, [config, reset]);
 
   const saveConfig = () => {
-    updateConfig(getValues());
+    const values = getValues();
+
+    if (!validateConfig()) {
+      return;
+    }
+
+    updateConfig(values);
     publish({
       text: "Config saved",
       variant: "success",
@@ -40,6 +47,25 @@ export const useConfig = () => {
       text: "Config reset",
       variant: "success",
     });
+  };
+
+  const openAiKeyPattern = /^sk-[a-zA-Z0-9]{45,50}$/;
+
+  const validateConfig = (): boolean => {
+    const { openAiKey } = getValues();
+
+    const isKeyEmpty = openAiKey === "" || openAiKey === undefined;
+    if (isKeyEmpty || openAiKeyPattern.test(openAiKey)) {
+      return true;
+    }
+
+    publish({
+      text: "Invalid OpenAI Key",
+      variant: "danger",
+    });
+    setError("openAiKey", { type: "pattern", message: "Invalid OpenAI Key" });
+
+    return false;
   };
 
   return {

@@ -6,7 +6,7 @@ from tempfile import SpooledTemporaryFile
 import pypandoc
 from auth.auth_bearer import JWTBearer
 from crawl.crawler import CrawlWebsite
-from fastapi import Depends, FastAPI, UploadFile
+from fastapi import Depends, FastAPI, UploadFile, Request
 from llm.qa import get_qa_llm
 from llm.summarization import llm_evaluate_summaries
 from logger import get_logger
@@ -63,13 +63,14 @@ async def upload_file(commons: CommonsDep,  file: UploadFile, enable_summarizati
 
 
 @app.post("/chat/", dependencies=[Depends(JWTBearer())])
-async def chat_endpoint(commons: CommonsDep, chat_message: ChatMessage, credentials: dict = Depends(JWTBearer())):
+async def chat_endpoint(request: Request, commons: CommonsDep, chat_message: ChatMessage, credentials: dict = Depends(JWTBearer())):
     user = User(email=credentials.get('email', 'none'))
     date = time.strftime("%Y%m%d")
     max_requests_number = os.getenv("MAX_REQUESTS_NUMBER")
+    user_openai_api_key = request.headers.get('Openai-Api-Key')
+
     response = commons['supabase'].from_('users').select(
     '*').filter("user_id", "eq", user.email).filter("date", "eq", date).execute()
-
 
     userItem = next(iter(response.data or []), {"requests_count": 0})
     old_request_count = userItem['requests_count']
@@ -77,7 +78,7 @@ async def chat_endpoint(commons: CommonsDep, chat_message: ChatMessage, credenti
     history = chat_message.history
     history.append(("user", chat_message.question))
 
-    qa = get_qa_llm(chat_message, user.email)
+    qa = get_qa_llm(chat_message, user.email, user_openai_api_key)
 
     if old_request_count == 0: 
         create_user(user_id= user.email, date=date)
