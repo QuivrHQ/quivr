@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import { isSpeechRecognitionSupported } from "../helpers/isSpeechRecognitionSupported";
 import { useQuestion } from "./useQuestion";
+import useChats from "./useChats";
 
 export const useSpeech = () => {
   const [isListening, setIsListening] = useState(false);
   const [speechSupported, setSpeechSupported] = useState(false);
-  const { setQuestion } = useQuestion();
+  const { setMessage } = useChats();
 
   useEffect(() => {
     if (isSpeechRecognitionSupported()) {
@@ -35,7 +36,9 @@ export const useSpeech = () => {
       mic.onresult = (event: SpeechRecognitionEvent) => {
         const interimTranscript =
           event.results[event.results.length - 1][0].transcript;
-        setQuestion((prevQuestion) => prevQuestion + interimTranscript);
+        setMessage((prevMessage) => {
+          return [prevMessage[0], prevMessage[1] + interimTranscript];
+        });
       };
 
       if (isListening) {

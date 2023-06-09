@@ -9,13 +9,10 @@ interface LayoutProps {
 }
 
 const Layout: FC<LayoutProps> = ({ children }) => {
-  const [chats, setChats] = useState<Chat[]>([]);
-  const router = useRouter();
-
   return (
     <div className="flex h-screen pt-20 overflow-hidden">
       <aside className="w-1/5 h-full border-r overflow-auto">
-        <ChatsList chats={chats} setChats={setChats} router={router} />
+        <ChatsList />
       </aside>
       {children}
     </div>
