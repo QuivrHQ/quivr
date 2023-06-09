@@ -15,7 +15,7 @@ export const ChatMessages = ({ history }: ChatMessagesProps): JSX.Element => {
   }, [history]);
 
   return (
-    <div className="overflow-hidden flex flex-col gap-5 scrollbar scroll-smooth flex-1">
+    <div className="space-y-8 grid grid-cols-1 overflow-hidden scrollbar scroll-smooth">
       {history.length === 0 ? (
         <div className="text-center opacity-50">
           Ask a question, or describe a task.
@@ -29,7 +29,6 @@ export const ChatMessages = ({ history }: ChatMessagesProps): JSX.Element => {
                 key={idx}
                 speaker={speaker}
                 text={text}
-                left={idx % 2 !== 0}
               />
             );
           })}
@@ -38,3 +37,4 @@ export const ChatMessages = ({ history }: ChatMessagesProps): JSX.Element => {
     </div>
   );
 };
+export default ChatMessages;

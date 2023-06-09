@@ -39,7 +39,7 @@ export default function SignUp() {
 
   return (
     <main>
-      <section className="w-full h-full outline-none flex flex-col gap-5 items-center justify-center p-6">
+      <section className="min-h-screen w-full h-full outline-none flex flex-col gap-5 items-center justify-center p-6">
         <PageHeading title="Sign Up" subtitle="Create your account" />
         <Card className="max-w-md w-full p-5 sm:p-10 text-left">
           <form

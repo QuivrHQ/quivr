@@ -1,8 +1,10 @@
+"use client";
 import { format, subDays } from "date-fns";
 import React from "react";
 import {
   VictoryAxis,
   VictoryChart,
+  VictoryChartProps,
   VictoryContainer,
   VictoryLine,
   VictoryTheme,
@@ -14,12 +16,13 @@ type RequestStat = {
   user_id: string;
 };
 
-type RequestsPerDayChartProps = {
+interface RequestsPerDayChartProps extends VictoryChartProps {
   requests_stats: RequestStat[];
-};
+}
 
 export const RequestsPerDayChart: React.FC<RequestsPerDayChartProps> = ({
   requests_stats,
+  ...props
 }) => {
   const data = Array.from({ length: 7 }, (_, i) => subDays(new Date(), i))
     .map((date) => {
@@ -34,9 +37,18 @@ export const RequestsPerDayChart: React.FC<RequestsPerDayChartProps> = ({
 
   return (
     <VictoryChart
-      domainPadding={20}
       theme={VictoryTheme.material}
-      containerComponent={<VictoryContainer responsive={true} />}
+      containerComponent={
+        <VictoryContainer
+          className="bg-white rounded-md w-full h-full"
+          responsive={true}
+        />
+      }
+      animate={{
+        duration: 1000,
+        onLoad: { duration: 1000 },
+      }}
+      {...props}
     >
       <VictoryAxis
         tickFormat={(tick) => {
