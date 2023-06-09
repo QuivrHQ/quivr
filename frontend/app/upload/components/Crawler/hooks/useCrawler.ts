@@ -55,7 +55,7 @@ export const useCrawler = () => {
     } finally {
       setCrawling(false);
     }
-  }, [session.access_token, publish]);
+  }, [publish, axiosInstance]);
 
   return {
     isCrawling,

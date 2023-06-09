@@ -38,7 +38,7 @@ export const useFileUploader = () => {
         });
       }
     },
-    [session.access_token, publish]
+    [publish, axiosInstance]
   );
 
   const onDrop = (acceptedFiles: File[], fileRejections: FileRejection[]) => {

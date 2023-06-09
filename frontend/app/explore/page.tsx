@@ -38,7 +38,7 @@ export default function ExplorePage() {
       setIsPending(false);
     };
     fetchDocuments();
-  }, [session.access_token]);
+  }, [session.access_token, axiosInstance]);
 
   return (
     <main>
