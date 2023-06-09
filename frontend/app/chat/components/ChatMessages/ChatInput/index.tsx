@@ -1,7 +1,7 @@
 "use client";
 import { UUID } from "crypto";
-import Button from "../../components/ui/Button";
-import useChats from "../hooks/useChats";
+import Button from "../../../../components/ui/Button";
+import useChats from "../../../hooks/useChats";
 import { ConfigButton } from "./ConfigButton";
 import { MicButton } from "./MicButton";
 
@@ -13,7 +13,7 @@ export function ChatInput({ chatId }: { chatId?: UUID }) {
         e.preventDefault();
         if (!isSendingMessage) sendMessage(chatId);
       }}
-      className="w-full flex items-center justify-center gap-2"
+      className="sticky bottom-0 w-full flex items-center justify-center gap-2"
     >
       <textarea
         autoFocus
