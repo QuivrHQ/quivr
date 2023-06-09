@@ -1,11 +1,13 @@
-import { useEffect, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { isSpeechRecognitionSupported } from "../helpers/isSpeechRecognitionSupported";
-import { useQuestion } from "./useQuestion";
 
-export const useSpeech = () => {
+export const useSpeech = ({
+  setQuestion,
+}: {
+  setQuestion: Dispatch<SetStateAction<string>>;
+}) => {
   const [isListening, setIsListening] = useState(false);
   const [speechSupported, setSpeechSupported] = useState(false);
-  const { setQuestion } = useQuestion();
 
   useEffect(() => {
     if (isSpeechRecognitionSupported()) {
@@ -48,7 +50,7 @@ export const useSpeech = () => {
         }
       };
     }
-  }, [isListening]);
+  }, [isListening, setQuestion]);
 
   const startListening = () => {
     setIsListening((prevIsListening) => !prevIsListening);
