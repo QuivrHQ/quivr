@@ -6,7 +6,7 @@ from tempfile import SpooledTemporaryFile
 import pypandoc
 from auth.auth_bearer import JWTBearer
 from crawl.crawler import CrawlWebsite
-from fastapi import Depends, FastAPI, UploadFile, Request
+from fastapi import Depends, FastAPI, Request, UploadFile
 from llm.qa import get_qa_llm
 from llm.summarization import llm_evaluate_summaries
 from logger import get_logger
@@ -25,7 +25,8 @@ app = FastAPI()
 
 
 add_cors_middleware(app)
-
+max_brain_size = os.getenv("MAX_BRAIN_SIZE")
+max_brain_size_with_own_key = os.getenv("MAX_BRAIN_SIZE_WITH_KEY",209715200)
 
 
 @app.on_event("startup")
@@ -36,8 +37,7 @@ async def startup_event():
 
 
 @app.post("/upload", dependencies=[Depends(JWTBearer())])
-async def upload_file(commons: CommonsDep,  file: UploadFile, enable_summarization: bool = False, credentials: dict = Depends(JWTBearer())):
-    max_brain_size = os.getenv("MAX_BRAIN_SIZE")
+async def upload_file(request: Request, commons: CommonsDep,  file: UploadFile, enable_summarization: bool = False, credentials: dict = Depends(JWTBearer())):
    
     user = User(email=credentials.get('email', 'none'))
     user_vectors_response = commons['supabase'].table("vectors").select(
@@ -52,7 +52,11 @@ async def upload_file(commons: CommonsDep,  file: UploadFile, enable_summarizati
 
     file_size = get_file_size(file)
 
-    remaining_free_space =  float(max_brain_size) - (current_brain_size)
+    remaining_free_space = 0
+    if request.headers.get('Openai-Api-Key'):
+        remaining_free_space =  float(max_brain_size_with_own_key) - (current_brain_size)
+    else:
+        remaining_free_space = float(max_brain_size) - (current_brain_size)
 
     if remaining_free_space - file_size < 0:
         message = {"message": f"❌ User's brain will exceed maximum capacity with this upload. Maximum file allowed is : {convert_bytes(remaining_free_space)}", "type": "error"}
@@ -77,16 +81,16 @@ async def chat_endpoint(request: Request, commons: CommonsDep, chat_message: Cha
 
     history = chat_message.history
     history.append(("user", chat_message.question))
-
     qa = get_qa_llm(chat_message, user.email, user_openai_api_key)
 
-    if old_request_count == 0: 
-        create_user(user_id= user.email, date=date)
-    elif  old_request_count <  float(max_requests_number) : 
-        update_user_request_count(user_id=user.email,  date=date, requests_count= old_request_count+1)
-    else: 
-        history.append(('assistant', "You have reached your requests limit"))
-        return {"history": history }
+    if user_openai_api_key is None:
+        if old_request_count == 0: 
+            create_user(user_id= user.email, date=date)
+        elif  old_request_count <  float(max_requests_number) : 
+            update_user_request_count(user_id=user.email,  date=date, requests_count= old_request_count+1)
+        else: 
+            history.append(('assistant', "You have reached your requests limit"))
+            return {"history": history }
 
 
     if chat_message.use_summarization:
@@ -115,9 +119,13 @@ async def chat_endpoint(request: Request, commons: CommonsDep, chat_message: Cha
 
 
 @app.post("/crawl/", dependencies=[Depends(JWTBearer())])
-async def crawl_endpoint(commons: CommonsDep, crawl_website: CrawlWebsite, enable_summarization: bool = False, credentials: dict = Depends(JWTBearer())):
+async def crawl_endpoint(request: Request,commons: CommonsDep, crawl_website: CrawlWebsite, enable_summarization: bool = False, credentials: dict = Depends(JWTBearer())):
     max_brain_size = os.getenv("MAX_BRAIN_SIZE")
-   
+    if request.headers.get('Openai-Api-Key'):
+        max_brain_size = os.getenv("MAX_BRAIN_SIZE_WITH_KEY",209715200)
+    
+
+
     user = User(email=credentials.get('email', 'none'))
     user_vectors_response = commons['supabase'].table("vectors").select(
         "name:metadata->>file_name, size:metadata->>file_size", count="exact") \
@@ -189,7 +197,7 @@ async def download_endpoint(commons: CommonsDep, file_name: str,credentials: dic
     return {"documents": documents}
 
 @app.get("/user", dependencies=[Depends(JWTBearer())])
-async def get_user_endpoint(commons: CommonsDep, credentials: dict = Depends(JWTBearer())):
+async def get_user_endpoint(request: Request, commons: CommonsDep, credentials: dict = Depends(JWTBearer())):
     # Create a function that returns the unique documents out of the vectors 
     # Create a function that returns the list of documents that can take in what to put in the select + the filter 
     user = User(email=credentials.get('email', 'none'))
@@ -205,11 +213,16 @@ async def get_user_endpoint(commons: CommonsDep, credentials: dict = Depends(JWT
     current_brain_size = sum(float(doc['size']) for doc in user_unique_vectors)
 
     max_brain_size = os.getenv("MAX_BRAIN_SIZE")
+    if request.headers.get('Openai-Api-Key'):
+        max_brain_size = max_brain_size_with_own_key
+
 
     # Create function get user request stats -> nombre de requetes par jour + max number of requests -> svg to display the number of requests ? une fusee ?
     user = User(email=credentials.get('email', 'none'))
     date = time.strftime("%Y%m%d")
     max_requests_number = os.getenv("MAX_REQUESTS_NUMBER")
+    if request.headers.get('Openai-Api-Key'):
+        max_requests_number = 1000000
     requests_stats = commons['supabase'].from_('users').select(
     '*').filter("user_id", "eq", user.email).execute()
 
