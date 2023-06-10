@@ -1,8 +1,12 @@
-import { useEffect, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { isSpeechRecognitionSupported } from "../helpers/isSpeechRecognitionSupported";
 import useChats from "./useChats";
 
-export const useSpeech = () => {
+export const useSpeech = ({
+  setQuestion,
+}: {
+  setQuestion: Dispatch<SetStateAction<string>>;
+}) => {
   const [isListening, setIsListening] = useState(false);
   const [speechSupported, setSpeechSupported] = useState(false);
   const { setMessage } = useChats();
