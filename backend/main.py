@@ -1,7 +1,6 @@
 import pypandoc
 from auth.auth_bearer import JWTBearer
 from fastapi import Depends, FastAPI
-from llm.qa import get_qa_llm
 from llm.summarization import llm_evaluate_summaries
 from logger import get_logger
 from middlewares.cors import add_cors_middleware

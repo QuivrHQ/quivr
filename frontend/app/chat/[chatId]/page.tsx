@@ -16,28 +16,24 @@ interface ChatPageProps {
 }
 
 export default function ChatPage({ params }: ChatPageProps) {
-  const { chatId } = params;
   const [chats, setChats] = useState<Chat[]>([]);
   const router = useRouter();
 
-  const question = useQuestion({
-    chatId,
-    setChats,
-  });
+  const question = useQuestion({ chatId: params.chatId, setChats });
   const { axiosInstance } = useAxios();
 
-  const { setHistory } = question;
+  const { setHistory, chatId } = question;
   useEffect(() => {
     const fetchChatHistory = async () => {
-      if (!chatId) return; // Skip fetching history if chatId is not present (i.e., a new chat)
+      if (!params.chatId) return; // Skip fetching history if chatId is not present (i.e., a new chat)
 
       try {
         console.log(
-          `Fetching history from ${process.env.NEXT_PUBLIC_BACKEND_URL}/chat/${chatId}`
+          `Fetching history from ${process.env.NEXT_PUBLIC_BACKEND_URL}/chat/${params.chatId}`
         );
         const response = await axiosInstance.get<{
           history: Array<[string, string]>;
-        }>(`/chat/${chatId}`);
+        }>(`/chat/${params.chatId}`);
         setHistory(response.data.history);
       } catch (error) {
         console.error("Error fetching the history of this chat", error);
@@ -46,7 +42,7 @@ export default function ChatPage({ params }: ChatPageProps) {
     };
 
     fetchChatHistory();
-  }, [chatId, setHistory, axiosInstance]);
+  }, [params.chatId, setHistory, axiosInstance]);
 
   return (
     <div className="flex h-screen pt-20 overflow-hidden">
@@ -63,7 +59,14 @@ export default function ChatPage({ params }: ChatPageProps) {
             <ChatMessages history={question.history} />
           </Card>
           <Card className="fixed  w-full max-w-3xl bg-gray-100 dark:bg-gray-800 rounded-b-none  bottom-16 px-5 py-5">
-            <ChatInput {...question} />
+            {chatId ? (
+              <ChatInput askQuestion={question.askNextQuestion} {...question} />
+            ) : (
+              <ChatInput
+                askQuestion={question.askFirstQuestion}
+                {...question}
+              />
+            )}
           </Card>
         </section>
       </main>

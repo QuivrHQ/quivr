@@ -9,16 +9,13 @@ import { Chat } from "../types";
 
 interface QuestionParams {
   chatId: string | undefined;
-  history?: Array<[string, string]> | undefined;
   setChats: Dispatch<SetStateAction<Chat[]>>;
 }
 
 export const useQuestion = (params: QuestionParams) => {
   const [question, setQuestion] = useState("");
-  const [chatId, setChatId] = useState(params?.chatId);
-  const [history, setHistory] = useState<Array<[string, string]>>(
-    params?.history ?? []
-  );
+  const [chatId, setChatId] = useState("");
+  const [history, setHistory] = useState<Array<[string, string]>>([]);
   const [isPending, setIsPending] = useState(false);
   const { session } = useSupabase();
   const { axiosInstance } = useAxios();
@@ -27,10 +24,11 @@ export const useQuestion = (params: QuestionParams) => {
   } = useBrainConfig();
 
   if (session === null) {
+    // Declarer mes urls dans un next url -> const URL_LOGIN
     redirect("/login");
   }
 
-  const askQuestion = async () => {
+  const askFirstQuestion = async () => {
     setHistory((hist) => [...hist, ["user", question]]);
     setIsPending(true);
 
@@ -39,7 +37,6 @@ export const useQuestion = (params: QuestionParams) => {
         chatId: UUID;
         history: Array<[string, string]>;
       }>(`/chat`, {
-        ...(chatId && { chat_id: chatId }),
         model,
         question,
         history,
@@ -47,15 +44,12 @@ export const useQuestion = (params: QuestionParams) => {
         max_tokens: maxTokens,
       });
       setHistory(response.data.history);
-      localStorage.setItem("history", JSON.stringify(response.data.history));
       setQuestion("");
 
-      if (chatId === undefined) {
-        params.setChats((chats) => [
-          ...chats,
-          { chatId: response.data.chatId, history },
-        ]);
-      }
+      params.setChats((chats) => [
+        ...chats,
+        { chatId: response.data.chatId, history },
+      ]);
 
       setChatId(response.data.chatId);
     } catch (error) {
@@ -65,9 +59,27 @@ export const useQuestion = (params: QuestionParams) => {
     }
   };
 
-  const resetHistory = () => {
-    localStorage.setItem("history", JSON.stringify([]));
-    setHistory([]);
+  const askNextQuestion = async () => {
+    setHistory((hist) => [...hist, ["user", question]]);
+    setIsPending(true);
+    try {
+      const response = await axiosInstance.post<{
+        chatId: UUID;
+        history: Array<[string, string]>;
+      }>(`/chat/${chatId}`, {
+        model,
+        question,
+        history,
+        temperature,
+        max_tokens: maxTokens,
+      });
+      setHistory(response.data.history);
+      setQuestion("");
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsPending(false);
+    }
   };
 
   return {
@@ -75,9 +87,9 @@ export const useQuestion = (params: QuestionParams) => {
     history,
     question,
     setQuestion,
-    resetHistory,
-    askQuestion,
-    setChatId,
+    askFirstQuestion,
+    askNextQuestion,
     setHistory,
+    chatId,
   };
 };

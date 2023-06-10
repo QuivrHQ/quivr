@@ -23,7 +23,7 @@ async def get_chats(commons: CommonsDep, credentials: dict = Depends(JWTBearer()
     # Fetch all chats for the user
     response = commons['supabase'].from_('chats').select('chatId:chat_id, history').filter("user_id", "eq", user_id).execute()
     chats = response.data
-
+    # TODO: Only get the chat name instead of the history
     return {"chats": chats}
 
 # get one chat
@@ -46,9 +46,9 @@ async def delete_chat(commons: CommonsDep,chat_id: UUID):
     return {"message": f"{chat_id}  has been deleted."}
 
 
-# continue chatting
-@chat_router.post("/chat", dependencies=[Depends(JWTBearer())])
-async def chat_endpoint(commons: CommonsDep,  chat_message: ChatMessage, credentials: dict = Depends(JWTBearer())):
+# update existing chat
+@chat_router.put("/chat/{chat_id}", dependencies=[Depends(JWTBearer())])
+async def chat_endpoint(commons: CommonsDep,  chat_id: UUID, chat_message: ChatMessage, credentials: dict = Depends(JWTBearer())):
     user = User(email=credentials.get('email', 'none'))
     date = time.strftime("%Y%m%d")
     max_requests_number = os.getenv("MAX_REQUESTS_NUMBER")
@@ -62,7 +62,39 @@ async def chat_endpoint(commons: CommonsDep,  chat_message: ChatMessage, credent
     history = chat_message.history
     history.append(("user", chat_message.question))
 
-    qa = get_qa_llm(chat_message, user.email)
+    if old_request_count == 0: 
+        create_user(email= user.email, date=date)
+    elif  old_request_count <  float(max_requests_number) : 
+        update_user_request_count(email=user.email,  date=date, requests_count= old_request_count+1)
+    else: 
+        history.append(('assistant', "You have reached your requests limit"))
+        update_chat(chat_id=chat_id, history=history)
+        return {"history": history }
+
+    model_response = get_model_response(commons, chat_message, user.email)
+    history.append(("assistant", model_response["answer"]))
+    update_chat(chat_id=chat_id, history=history)
+    
+    return {"history": history}
+
+
+# create new chat
+@chat_router.post("/chat", dependencies=[Depends(JWTBearer())])
+async def chat_endpoint(commons: CommonsDep,  chat_message: ChatMessage, credentials: dict = Depends(JWTBearer())):
+    user = User(email=credentials.get('email', 'none'))
+    user_id = fetch_user_id_from_credentials(commons, credentials)
+
+    date = time.strftime("%Y%m%d")
+    max_requests_number = os.getenv("MAX_REQUESTS_NUMBER")
+    response = commons['supabase'].from_('users').select(
+    '*').filter("email", "eq", user.email).filter("date", "eq", date).execute()
+
+
+    userItem = next(iter(response.data or []), {"requests_count": 0})
+    old_request_count = userItem['requests_count']
+
+    history = chat_message.history
+    history.append(("user", chat_message.question))
 
     if old_request_count == 0: 
         create_user(email= user.email, date=date)
@@ -70,7 +102,18 @@ async def chat_endpoint(commons: CommonsDep,  chat_message: ChatMessage, credent
         update_user_request_count(email=user.email,  date=date, requests_count= old_request_count+1)
     else: 
         history.append(('assistant', "You have reached your requests limit"))
-        return {"history": history }
+        new_chat = create_chat(user_id, history) 
+        return {"history": history,  "chatId": new_chat.data[0]['chat_id'] }
+
+    model_response = get_model_response(commons, chat_message, user.email)
+    history.append(("assistant", model_response["answer"]))
+    new_chat = create_chat(user_id, history)
+
+    return {"history": history, "chatId": new_chat.data[0]['chat_id']}
+
+
+def get_model_response(commons: CommonsDep,  chat_message: ChatMessage, email: str):
+    qa = get_qa_llm(chat_message, email)
 
 
     if chat_message.use_summarization:
@@ -81,7 +124,7 @@ async def chat_endpoint(commons: CommonsDep,  chat_message: ChatMessage, credent
         evaluations = llm_evaluate_summaries(
             chat_message.question, summaries, chat_message.model)
         # 3. pull in the top documents from summaries
-        logger.info('Evaluations: %s', evaluations)
+        # logger.info('Evaluations: %s', evaluations)
         if evaluations:
             reponse = commons['supabase'].from_('vectors').select(
                 '*').in_('id', values=[e['document_id'] for e in evaluations]).execute()
@@ -93,13 +136,6 @@ async def chat_endpoint(commons: CommonsDep,  chat_message: ChatMessage, credent
             {"question": additional_context + chat_message.question})
     else:
         model_response = qa({"question": chat_message.question})
-    history.append(("assistant", model_response["answer"]))
 
-    chat_id = chat_message.chat_id
-    if chat_id!=(None,): 
-        update_chat(chat_id=chat_id, history=history)
-    else :
-        user_id = fetch_user_id_from_credentials(commons, credentials)
-        new_chat = create_chat(user_id, history)
-
-    return {"history": history, "chatId": chat_id if chat_id!=(None,) else new_chat.data[0]['chat_id']}
+    return model_response
+   
