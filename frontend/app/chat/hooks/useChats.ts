@@ -9,7 +9,6 @@ import { Chat, ChatMessage } from "../types";
 export default function useChats(chatId?: UUID) {
   const [allChats, setAllChats] = useState<Chat[]>([]);
   const [chat, setChat] = useState<Chat | null>(null);
-  const [currentChatId, setCurrentChatId] = useState<UUID | undefined>(chatId);
   const [isSendingMessage, setIsSendingMessage] = useState(false);
   const [message, setMessage] = useState<ChatMessage>(["", ""]); // for optimistic updates
 
@@ -38,15 +37,12 @@ export default function useChats(chatId?: UUID) {
   }, []);
 
   const fetchChat = useCallback(async (chatId?: UUID) => {
-    console.log(currentChatId, chatId);
-
-    if (!currentChatId && !chatId) throw new Error("No ID provided");
-    setCurrentChatId(chatId);
+    if (!chatId) return;
     try {
-      console.log(`Fetching chat ${chatId ?? currentChatId}`);
-      const response = await axiosInstance.get<Chat>(
-        `/chat/${chatId ?? currentChatId}`
-      );
+      console.log(`Fetching chat ${chatId}`);
+      const response = await axiosInstance.get<Chat>(`/chat/${chatId}`);
+      console.log(response.data);
+
       setChat(response.data);
     } catch (error) {
       console.error(error);
@@ -70,11 +66,7 @@ export default function useChats(chatId?: UUID) {
     const options = {
       // ...(chat_id && { chat_id }),
       // chat_id gets set only if either chatId or currentChatId exists, by the priority of chatId
-      chat_id: chatId
-        ? chatId[0]
-        : currentChatId
-        ? currentChatId[0]
-        : undefined,
+      chat_id: chatId,
       model,
       question: msg ? msg[1] : message[1],
       history: chat ? chat.history : [],
@@ -104,6 +96,7 @@ export default function useChats(chatId?: UUID) {
     const newChat = {
       chatId: response.data.chatId,
       history: response.data.history,
+      chatName: response.data.chatName,
     };
     if (!chatId) {
       // Creating a new chat
@@ -111,8 +104,7 @@ export default function useChats(chatId?: UUID) {
       //   console.log({ chats });
       //   return [...chats, newChat];
       // });
-      fetchAllChats();
-      setCurrentChatId(response.data.chatId);
+      console.log("---- Creating a new chat ----");
       setChat(newChat);
       router.push(`/chat/${response.data.chatId}`);
     }
@@ -126,7 +118,6 @@ export default function useChats(chatId?: UUID) {
       await axiosInstance.delete(`/chat/${chatId}`);
       setAllChats((chats) => chats.filter((chat) => chat.chatId !== chatId));
       // TODO: Change route only when the current chat is being deleted
-      console.log({ chatIdsaldkfj: chat?.chatId, currentChatId, chatId });
       router.push("/chat");
       publish({
         text: `Chat sucessfully deleted. Id: ${chatId}`,
@@ -142,7 +133,6 @@ export default function useChats(chatId?: UUID) {
     fetchAllChats();
     console.log(chatId);
     if (chatId) {
-      setCurrentChatId(chatId);
       fetchChat(chatId);
     }
   }, [fetchAllChats, fetchChat, chatId]);
@@ -150,7 +140,6 @@ export default function useChats(chatId?: UUID) {
   return {
     allChats,
     chat,
-    currentChatId,
     isSendingMessage,
     message,
     setMessage,

@@ -1,75 +1,30 @@
 "use client";
-import { useAxios } from "@/lib/useAxios";
 import { UUID } from "crypto";
-import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-import Card from "../../components/ui/Card";
 import PageHeading from "../../components/ui/PageHeading";
-import { ChatInput, ChatMessages, ChatsList } from "../components";
-import { useQuestion } from "../hooks/useQuestion";
-import { Chat } from "../types";
+import { ChatInput, ChatMessages } from "../components";
+import useChats from "../hooks/useChats";
 
 interface ChatPageProps {
-  params: {
+  params?: {
     chatId?: UUID;
   };
 }
 
 export default function ChatPage({ params }: ChatPageProps) {
-  const [chats, setChats] = useState<Chat[]>([]);
-  const router = useRouter();
+  const chatId: UUID | undefined = params?.chatId;
 
-  const question = useQuestion({ chatId: params.chatId, setChats });
-  const { axiosInstance } = useAxios();
-
-  const { setHistory, chatId } = question;
-  useEffect(() => {
-    const fetchChatHistory = async () => {
-      if (!params.chatId) return; // Skip fetching history if chatId is not present (i.e., a new chat)
-
-      try {
-        console.log(
-          `Fetching history from ${process.env.NEXT_PUBLIC_BACKEND_URL}/chat/${params.chatId}`
-        );
-        const response = await axiosInstance.get<{
-          history: Array<[string, string]>;
-        }>(`/chat/${params.chatId}`);
-        setHistory(response.data.history);
-      } catch (error) {
-        console.error("Error fetching the history of this chat", error);
-        setHistory([]);
-      }
-    };
-
-    fetchChatHistory();
-  }, [params.chatId, setHistory, axiosInstance]);
+  const { chat, ...others } = useChats(chatId);
 
   return (
-    <div className="flex h-screen pt-20 overflow-hidden">
-      <aside className="w-1/5 h-full border-r overflow-auto">
-        <ChatsList chats={chats} setChats={setChats} router={router} />
-      </aside>
-      <main className="w-4/5 flex flex-col overflow-auto">
-        <section className="flex flex-col justify-center items-center flex-1 overflow-auto">
-          <PageHeading
-            title="Chat with your brain"
-            subtitle="Talk to a language model about your uploaded data"
-          />
-          <Card className="p-5 max-w-3xl w-full flex-1 mb-24 overflow-auto flex flex-col ">
-            <ChatMessages history={question.history} />
-          </Card>
-          <Card className="fixed  w-full max-w-3xl bg-gray-100 dark:bg-gray-800 rounded-b-none  bottom-16 px-5 py-5">
-            {chatId ? (
-              <ChatInput askQuestion={question.askNextQuestion} {...question} />
-            ) : (
-              <ChatInput
-                askQuestion={question.askFirstQuestion}
-                {...question}
-              />
-            )}
-          </Card>
-        </section>
-      </main>
-    </div>
+    <main className="flex flex-col w-full">
+      <section className="flex flex-col items-center w-full overflow-auto">
+        <PageHeading
+          title="Chat with your brain"
+          subtitle="Talk to a language model about your uploaded data"
+        />
+        {chat && <ChatMessages chat={chat} />}
+        <ChatInput chatId={chatId} {...others} />
+      </section>
+    </main>
   );
 }

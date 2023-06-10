@@ -19,7 +19,7 @@ export const ChatMessages = ({ chat }: ChatMessagesProps): JSX.Element => {
   return (
     <Card className="p-5 max-w-3xl w-full flex-1 flex flex-col mb-8">
       <div className="">
-        {history.length === 0 ? (
+        {chat.history.length === 0 ? (
           <div className="text-center opacity-50">
             Ask a question, or describe a task.
           </div>
@@ -28,7 +28,7 @@ export const ChatMessages = ({ chat }: ChatMessagesProps): JSX.Element => {
             {chat.history.map(([speaker, text], idx) => {
               return (
                 <ChatMessage
-                  ref={idx === history.length - 1 ? lastChatRef : null}
+                  ref={idx === chat.history.length - 1 ? lastChatRef : null}
                   key={idx}
                   speaker={speaker}
                   text={text}

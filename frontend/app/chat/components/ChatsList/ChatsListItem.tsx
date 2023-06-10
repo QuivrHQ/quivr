@@ -31,9 +31,7 @@ const ChatsListItem: FC<ChatsListItemProps> = ({ chat, deleteChat }) => {
         <div className="flex items-center gap-2">
           <MdChatBubbleOutline className="text-xl" />
 
-          <p className="min-w-0 flex-1 whitespace-nowrap">
-            {chat.history[chat.history.length - 1][1]}
-          </p>
+          <p className="min-w-0 flex-1 whitespace-nowrap">{chat.chatName}</p>
         </div>
         <div className="grid-cols-2 text-xs opacity-50 whitespace-nowrap">
           {chat.chatId}
