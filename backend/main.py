@@ -113,7 +113,23 @@ async def chat_endpoint(request: Request, commons: CommonsDep, chat_message: Cha
             {"question": additional_context + chat_message.question})
     else:
         model_response = qa({"question": chat_message.question})
-    history.append(("assistant", model_response["answer"]))
+    
+    answer = model_response["answer"]
+    
+    # append sources (file_name) to answer
+    if "source_documents" in model_response:
+        logger.debug('Source Documents: %s', model_response["source_documents"])
+        sources = [
+            doc.metadata["file_name"] for doc in model_response["source_documents"]
+            if "file_name" in doc.metadata]
+        logger.debug('Sources: %s', sources)
+        if sources:
+            files = dict.fromkeys(sources)
+            # # shall provide file links until pages available
+            # files = [f"[{f}](/explore/{f})" for f in files]
+            answer = answer + "\n\nRef: " + "; ".join(files)
+    
+    history.append(("assistant", answer))
 
     return {"history": history}
 
