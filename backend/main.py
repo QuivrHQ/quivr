@@ -22,7 +22,8 @@ app = FastAPI()
 
 
 add_cors_middleware(app)
-
+max_brain_size = os.getenv("MAX_BRAIN_SIZE")
+max_brain_size_with_own_key = os.getenv("MAX_BRAIN_SIZE_WITH_KEY",209715200)
 
 
 @app.on_event("startup")

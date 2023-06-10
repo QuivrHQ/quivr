@@ -11,7 +11,7 @@ const Footer = () => {
           <img className="h-8 w-auto" src="/github.svg" alt="GitHub" />
         </a>
         <a
-          href="https://twitter.com/Quivr_app"
+          href="https://twitter.com/quivr_brain"
           target="_blank"
           rel="noopener noreferrer"
           aria-label="Quivr Twitter"

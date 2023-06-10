@@ -1,5 +1,5 @@
 import os
-from typing import Any, List
+from typing import Any, Dict, List
 
 from langchain.chains import ConversationalRetrievalChain
 from langchain.chat_models import ChatOpenAI, ChatVertexAI
@@ -57,6 +57,14 @@ class CustomSupabaseVectorStore(SupabaseVectorStore):
 
         return documents
 
+
+class AnswerConversationBufferMemory(ConversationBufferMemory):
+    """ref https://github.com/hwchase17/langchain/issues/5630#issuecomment-1574222564"""
+    def save_context(self, inputs: Dict[str, Any], outputs: Dict[str, str]) -> None:
+        return super(AnswerConversationBufferMemory, self).save_context(
+            inputs, {'response': outputs['answer']})
+
+
 def get_environment_variables():
     '''Get the environment variables.'''
     openai_api_key = os.getenv("OPENAI_API_KEY")
@@ -73,15 +81,25 @@ def create_clients_and_embeddings(openai_api_key, supabase_url, supabase_key):
     
     return supabase_client, embeddings
 
-def get_qa_llm(chat_message: ChatMessage, user_id: str):
+def get_qa_llm(chat_message: ChatMessage, user_id: str, user_openai_api_key: str, with_sources: bool = True):
     '''Get the question answering language model.'''
     openai_api_key, anthropic_api_key, supabase_url, supabase_key = get_environment_variables()
+
+    '''User can override the openai_api_key'''
+    if user_openai_api_key is not None and user_openai_api_key != "":
+        openai_api_key = user_openai_api_key
+
     supabase_client, embeddings = create_clients_and_embeddings(openai_api_key, supabase_url, supabase_key)
     
     vector_store = CustomSupabaseVectorStore(
         supabase_client, embeddings, table_name="vectors", user_id=user_id)
-    memory = ConversationBufferMemory(
-        memory_key="chat_history", return_messages=True)
+    
+    if with_sources:
+        memory = AnswerConversationBufferMemory(
+            memory_key="chat_history", return_messages=True)
+    else:
+        memory = ConversationBufferMemory(
+            memory_key="chat_history", return_messages=True)
     
     ConversationalRetrievalChain.prompts = LANGUAGE_PROMPT
     
@@ -94,12 +112,17 @@ def get_qa_llm(chat_message: ChatMessage, user_id: str):
                 model_name=chat_message.model, openai_api_key=openai_api_key, 
                 temperature=chat_message.temperature, max_tokens=chat_message.max_tokens), 
                 vector_store.as_retriever(), memory=memory, verbose=True, 
+                return_source_documents=with_sources,
                 max_tokens_limit=1024)
     elif chat_message.model.startswith("vertex"):
         qa = ConversationalRetrievalChain.from_llm(
-            ChatVertexAI(), vector_store.as_retriever(), memory=memory, verbose=False, max_tokens_limit=1024)
+            ChatVertexAI(), vector_store.as_retriever(), memory=memory, verbose=False, 
+            return_source_documents=with_sources, max_tokens_limit=1024)
     elif anthropic_api_key and chat_message.model.startswith("claude"):
         qa = ConversationalRetrievalChain.from_llm(
             ChatAnthropic(
-                model=chat_message.model, anthropic_api_key=anthropic_api_key, temperature=chat_message.temperature, max_tokens_to_sample=chat_message.max_tokens), vector_store.as_retriever(), memory=memory, verbose=False, max_tokens_limit=102400)
+                model=chat_message.model, anthropic_api_key=anthropic_api_key, temperature=chat_message.temperature, max_tokens_to_sample=chat_message.max_tokens), 
+                vector_store.as_retriever(), memory=memory, verbose=False, 
+                return_source_documents=with_sources,
+                max_tokens_limit=102400)
     return qa
