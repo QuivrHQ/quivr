@@ -1,19 +1,33 @@
 "use client";
+import { ChatMessage } from "@/app/chat/types";
 import { UUID } from "crypto";
+import { Dispatch, SetStateAction } from "react";
 import Button from "../../../../components/ui/Button";
-import useChats from "../../../hooks/useChats";
 import { ConfigButton } from "./ConfigButton";
 import { MicButton } from "./MicButton";
 
-export function ChatInput({ chatId }: { chatId?: UUID }) {
-  const { isSendingMessage, sendMessage, setMessage, message } = useChats();
+interface ChatInputProps {
+  isSendingMessage: boolean;
+  sendMessage: (chatId?: UUID, msg?: ChatMessage) => Promise<void>;
+  setMessage: Dispatch<SetStateAction<ChatMessage>>;
+  message: ChatMessage;
+  chatId?: UUID;
+}
+
+export function ChatInput({
+  chatId,
+  isSendingMessage,
+  message,
+  sendMessage,
+  setMessage,
+}: ChatInputProps) {
   return (
     <form
       onSubmit={(e) => {
         e.preventDefault();
         if (!isSendingMessage) sendMessage(chatId);
       }}
-      className="sticky bottom-0 w-full flex items-center justify-center gap-2"
+      className="fixed p-5 bg-white dark:bg-black rounded-t-md border border-black/10 dark:border-white/25 bottom-0 w-full max-w-3xl flex items-center justify-center gap-2 z-20"
     >
       <textarea
         autoFocus

@@ -1,5 +1,7 @@
 "use client";
+import { redirect } from "next/navigation";
 import { FC, ReactNode } from "react";
+import { useSupabase } from "../supabase-provider";
 import { ChatsList } from "./components";
 
 interface LayoutProps {
@@ -7,9 +9,14 @@ interface LayoutProps {
 }
 
 const Layout: FC<LayoutProps> = ({ children }) => {
+  const { session } = useSupabase();
+  if (!session) redirect("/login");
+
   return (
-    <div className="flex h-screen pt-20 overflow-hidden">
-      <ChatsList />
+    <div className="relative h-full w-full flex pt-20">
+      <div className="h-full">
+        <ChatsList />
+      </div>
       {children}
     </div>
   );

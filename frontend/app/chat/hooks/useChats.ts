@@ -150,6 +150,7 @@ export default function useChats(chatId?: UUID) {
   return {
     allChats,
     chat,
+    currentChatId,
     isSendingMessage,
     message,
     setMessage,

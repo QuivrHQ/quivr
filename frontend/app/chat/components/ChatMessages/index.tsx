@@ -1,40 +1,44 @@
 "use client";
+import Card from "@/app/components/ui/Card";
 import { AnimatePresence } from "framer-motion";
 import { useEffect, useRef } from "react";
+import { Chat } from "../../types";
 import ChatMessage from "./ChatMessage";
 
 interface ChatMessagesProps {
-  history: Array<[string, string]>;
+  chat: Chat;
 }
 
-export const ChatMessages = ({ history }: ChatMessagesProps): JSX.Element => {
+export const ChatMessages = ({ chat }: ChatMessagesProps): JSX.Element => {
   const lastChatRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     lastChatRef.current?.scrollIntoView({ behavior: "auto", block: "start" });
-  }, [history]);
+  }, [chat]);
 
   return (
-    <div className="space-y-8 grid grid-cols-1 overflow-hidden scrollbar scroll-smooth">
-      {history.length === 0 ? (
-        <div className="text-center opacity-50">
-          Ask a question, or describe a task.
-        </div>
-      ) : (
-        <AnimatePresence initial={false}>
-          {history.map(([speaker, text], idx) => {
-            return (
-              <ChatMessage
-                ref={idx === history.length - 1 ? lastChatRef : null}
-                key={idx}
-                speaker={speaker}
-                text={text}
-              />
-            );
-          })}
-        </AnimatePresence>
-      )}
-    </div>
+    <Card className="p-5 max-w-3xl w-full flex-1 flex flex-col mb-8">
+      <div className="">
+        {history.length === 0 ? (
+          <div className="text-center opacity-50">
+            Ask a question, or describe a task.
+          </div>
+        ) : (
+          <AnimatePresence initial={false}>
+            {chat.history.map(([speaker, text], idx) => {
+              return (
+                <ChatMessage
+                  ref={idx === history.length - 1 ? lastChatRef : null}
+                  key={idx}
+                  speaker={speaker}
+                  text={text}
+                />
+              );
+            })}
+          </AnimatePresence>
+        )}
+      </div>
+    </Card>
   );
 };
 export default ChatMessages;
