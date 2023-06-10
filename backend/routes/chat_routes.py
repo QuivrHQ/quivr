@@ -71,8 +71,8 @@ async def chat_endpoint(commons: CommonsDep,  chat_id: UUID, chat_message: ChatM
         update_chat(chat_id=chat_id, history=history)
         return {"history": history }
 
-    model_response = get_model_response(commons, chat_message, user.email)
-    history.append(("assistant", model_response["answer"]))
+    answer = get_answer(commons, chat_message, user.email)
+    history.append(("assistant", answer))
     update_chat(chat_id=chat_id, history=history)
     
     return {"history": history}
@@ -105,14 +105,14 @@ async def chat_endpoint(commons: CommonsDep,  chat_message: ChatMessage, credent
         new_chat = create_chat(user_id, history) 
         return {"history": history,  "chatId": new_chat.data[0]['chat_id'] }
 
-    model_response = get_model_response(commons, chat_message, user.email)
-    history.append(("assistant", model_response["answer"]))
+    answer = get_answer(commons, chat_message, user.email)
+    history.append(("assistant", answer))
     new_chat = create_chat(user_id, history)
 
     return {"history": history, "chatId": new_chat.data[0]['chat_id']}
 
 
-def get_model_response(commons: CommonsDep,  chat_message: ChatMessage, email: str):
+def get_answer(commons: CommonsDep,  chat_message: ChatMessage, email: str):
     qa = get_qa_llm(chat_message, email)
 
 
@@ -132,10 +132,25 @@ def get_model_response(commons: CommonsDep,  chat_message: ChatMessage, email: s
             additional_context = '---\nAdditional Context={}'.format(
                 '---\n'.join(data['content'] for data in reponse.data)
             ) + '\n'
-        model_response = qa(
+        answer = qa(
             {"question": additional_context + chat_message.question})
     else:
-        model_response = qa({"question": chat_message.question})
+        answer = qa({"question": chat_message.question})
 
-    return model_response
+    answer = answer   
+
+    # append sources (file_name) to answer
+    if "source_documents" in answer:
+        logger.debug('Source Documents: %s', answer["source_documents"])
+        sources = [
+            doc.metadata["file_name"] for doc in answer["source_documents"]
+            if "file_name" in doc.metadata]
+        logger.debug('Sources: %s', sources)
+        if sources:
+            files = dict.fromkeys(sources)
+            # # shall provide file links until pages available
+            # files = [f"[{f}](/explore/{f})" for f in files]
+            answer = answer + "\n\nRef: " + "; ".join(files)
+
+    return answer
    
