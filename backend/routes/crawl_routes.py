@@ -50,7 +50,7 @@ async def crawl_endpoint(request: Request,commons: CommonsDep, crawl_website: Cr
 
             # Pass the SpooledTemporaryFile to UploadFile
             file = UploadFile(file=spooled_file, filename=file_name)
-            message = await filter_file(file, enable_summarization, commons['supabase'], user=user)
+            message = await filter_file(file, enable_summarization, commons['supabase'], user=user, openai_api_key=request.headers.get('Openai-Api-Key', None))
             return message
         else:
-            message = await process_github(crawl_website.url, "false", user=user, supabase=commons['supabase'])
+            message = await process_github(crawl_website.url, "false", user=user, supabase=commons['supabase'], user_openai_api_key=request.headers.get('Openai-Api-Key', None))
