@@ -121,7 +121,7 @@ def similarity_search(query, table='match_summaries', top_k=5, threshold=0.5):
 
 
 
-def fetch_user_id_from_credentials(commons: CommonsDep,credentials: dict = Depends(JWTBearer())):
+def fetch_user_id_from_credentials(commons: CommonsDep,date,credentials):
     user = User(email=credentials.get('email', 'none'))
 
     # Fetch the user's UUID based on their email

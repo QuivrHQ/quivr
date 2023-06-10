@@ -17,7 +17,8 @@ chat_router = APIRouter()
 # get all chats
 @chat_router.get("/chat", dependencies=[Depends(JWTBearer())])
 async def get_chats(commons: CommonsDep, credentials: dict = Depends(JWTBearer())):
-    user_id = fetch_user_id_from_credentials(commons, credentials)
+    date = time.strftime("%Y%m%d")
+    user_id = fetch_user_id_from_credentials(commons,date, credentials)
     
     # Fetch all chats for the user
     response = commons['supabase'].from_('chats').select('chatId:chat_id, chatName:chat_name').filter("user_id", "eq", user_id).execute()
@@ -83,9 +84,10 @@ async def chat_endpoint(request: Request,commons: CommonsDep,  chat_id: UUID, ch
 @chat_router.post("/chat", dependencies=[Depends(JWTBearer())])
 async def chat_endpoint(request: Request,commons: CommonsDep,  chat_message: ChatMessage, credentials: dict = Depends(JWTBearer())):
     user = User(email=credentials.get('email', 'none'))
-    user_id = fetch_user_id_from_credentials(commons, credentials)
-
     date = time.strftime("%Y%m%d")
+
+    user_id = fetch_user_id_from_credentials(commons, date,credentials)
+
     max_requests_number = os.getenv("MAX_REQUESTS_NUMBER")
     user_openai_api_key = request.headers.get('Openai-Api-Key')
 
