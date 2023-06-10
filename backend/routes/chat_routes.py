@@ -77,7 +77,7 @@ async def chat_endpoint(request: Request,commons: CommonsDep,  chat_id: UUID, ch
     history.append(("assistant", answer))
     update_chat(chat_id=chat_id, history=history)
     
-    return {"history": history}
+    return {"history": history, "chatId": chat_id}
 
 
 # create new chat

@@ -53,6 +53,24 @@ export default function useChats(chatId?: UUID) {
     }
   }, []);
 
+  type ChatResponse = Omit<Chat, "chatId"> & { chatId: UUID | undefined };
+
+  const createChat = ({
+    options,
+  }: {
+    options: Record<string, string | unknown>;
+  }) => {
+    return axiosInstance.post<ChatResponse>(`/chat`, options);
+  };
+
+  const updateChat = ({
+    options,
+  }: {
+    options: Record<string, string | unknown>;
+  }) => {
+    return axiosInstance.put<ChatResponse>(`/chat/${options.chat_id}`, options);
+  };
+
   const sendMessage = async (chatId?: UUID, msg?: ChatMessage) => {
     setIsSendingMessage(true);
 
@@ -63,7 +81,7 @@ export default function useChats(chatId?: UUID) {
     // };
 
     if (msg) setMessage(msg);
-    const options = {
+    const options: Record<string, unknown> = {
       // ...(chat_id && { chat_id }),
       // chat_id gets set only if either chatId or currentChatId exists, by the priority of chatId
       chat_id: chatId,
@@ -75,12 +93,9 @@ export default function useChats(chatId?: UUID) {
       use_summarization: false,
     };
 
-    console.log({ options });
-
-    const response = await axiosInstance.post<
-      // response.data.chatId can be undefined when the max number of requests has reached
-      Omit<Chat, "chatId"> & { chatId: UUID | undefined }
-    >(`/chat`, options);
+    const response = await (chatId !== undefined
+      ? updateChat({ options })
+      : createChat({ options }));
 
     // response.data.chatId can be undefined when the max number of requests has reached
     if (!response.data.chatId) {
