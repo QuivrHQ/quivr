@@ -11,8 +11,7 @@ interface ChatPageProps {
 }
 
 export default function ChatPage({ params }: ChatPageProps) {
-  let chatId: UUID | undefined;
-  chatId = params?.chatId;
+  const chatId: UUID | undefined = params?.chatId;
 
   const { chat, ...others } = useChats(chatId);
 
