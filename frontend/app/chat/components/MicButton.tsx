@@ -9,9 +9,7 @@ export function MicButton({
 }: {
   setQuestion: Dispatch<SetStateAction<string>>;
 }) {
-  const { isListening, speechSupported, startListening } = useSpeech({
-    setQuestion,
-  });
+  const { isListening, speechSupported, startListening } = useSpeech();
 
   return (
     <Button
