@@ -1,4 +1,5 @@
 import pypandoc
+import os
 from auth.auth_bearer import JWTBearer
 from fastapi import Depends, FastAPI
 from llm.qa import get_qa_llm
