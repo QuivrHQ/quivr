@@ -2,8 +2,7 @@ import os
 
 import pypandoc
 from auth.auth_bearer import JWTBearer
-from fastapi import Depends, FastAPI
-from llm.summarization import llm_evaluate_summaries
+from fastapi import FastAPI
 from logger import get_logger
 from middlewares.cors import add_cors_middleware
 from models.chats import ChatMessage

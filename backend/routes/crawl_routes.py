@@ -4,7 +4,7 @@ from tempfile import SpooledTemporaryFile
 
 from auth.auth_bearer import JWTBearer
 from crawl.crawler import CrawlWebsite
-from fastapi import APIRouter, Depends, UploadFile
+from fastapi import APIRouter, Depends, Request, UploadFile
 from middlewares.cors import add_cors_middleware
 from models.users import User
 from parsers.github import process_github
@@ -15,9 +15,11 @@ from utils.vectors import CommonsDep
 crawl_router = APIRouter()
 
 @crawl_router.post("/crawl/", dependencies=[Depends(JWTBearer())])
-async def crawl_endpoint(commons: CommonsDep, crawl_website: CrawlWebsite, enable_summarization: bool = False, credentials: dict = Depends(JWTBearer())):
+async def crawl_endpoint(request: Request,commons: CommonsDep, crawl_website: CrawlWebsite, enable_summarization: bool = False, credentials: dict = Depends(JWTBearer())):
     max_brain_size = os.getenv("MAX_BRAIN_SIZE")
-   
+    if request.headers.get('Openai-Api-Key'):
+        max_brain_size = os.getenv("MAX_BRAIN_SIZE_WITH_KEY",209715200)
+
     user = User(email=credentials.get('email', 'none'))
     user_vectors_response = commons['supabase'].table("vectors").select(
         "name:metadata->>file_name, size:metadata->>file_size", count="exact") \
