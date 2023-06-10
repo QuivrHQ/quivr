@@ -57,12 +57,7 @@ export function ChatsList({
         <Link href={`/chat/${chat.chatId}`} key={chat.chatId}>
           <div className="block mb-4 border rounded overflow-hidden shadow-md">
             <div className="px-4 py-2">
-              <div className="font-bold text-xl mb-2">
-                Chat ID: {chat.chatId}
-              </div>
-              <p className="text-gray-700 text-base">
-                Last message: {"New Chat"}
-              </p>
+              <div className="font-bold text-xl mb-2">{chat.chatName}</div>
               <button
                 type="button"
                 onClick={() => handleDeleteChat(chat.chatId)}

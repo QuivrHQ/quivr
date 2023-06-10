@@ -4,14 +4,13 @@ from typing import Optional
 from uuid import UUID
 
 from auth.auth_bearer import JWTBearer
-from fastapi import APIRouter, Depends
-from llm.qa import get_qa_llm
-from llm.summarization import llm_evaluate_summaries
+from fastapi import APIRouter, Depends, Request
 from models.chats import ChatMessage
 from models.users import User
 from utils.vectors import (CommonsDep, create_chat, create_user,
-                           fetch_user_id_from_credentials, similarity_search,
-                           update_chat, update_user_request_count)
+                           fetch_user_id_from_credentials, get_answer,
+                           get_chat_name_from_first_question, update_chat,
+                           update_user_request_count)
 
 chat_router = APIRouter()
 
@@ -21,7 +20,7 @@ async def get_chats(commons: CommonsDep, credentials: dict = Depends(JWTBearer()
     user_id = fetch_user_id_from_credentials(commons, credentials)
     
     # Fetch all chats for the user
-    response = commons['supabase'].from_('chats').select('chatId:chat_id, history').filter("user_id", "eq", user_id).execute()
+    response = commons['supabase'].from_('chats').select('chatId:chat_id, chatName:chat_name').filter("user_id", "eq", user_id).execute()
     chats = response.data
     # TODO: Only get the chat name instead of the history
     return {"chats": chats}
@@ -48,10 +47,12 @@ async def delete_chat(commons: CommonsDep,chat_id: UUID):
 
 # update existing chat
 @chat_router.put("/chat/{chat_id}", dependencies=[Depends(JWTBearer())])
-async def chat_endpoint(commons: CommonsDep,  chat_id: UUID, chat_message: ChatMessage, credentials: dict = Depends(JWTBearer())):
+async def chat_endpoint(request: Request,commons: CommonsDep,  chat_id: UUID, chat_message: ChatMessage, credentials: dict = Depends(JWTBearer())):
     user = User(email=credentials.get('email', 'none'))
     date = time.strftime("%Y%m%d")
     max_requests_number = os.getenv("MAX_REQUESTS_NUMBER")
+    user_openai_api_key = request.headers.get('Openai-Api-Key')
+
     response = commons['supabase'].from_('users').select(
     '*').filter("email", "eq", user.email).filter("date", "eq", date).execute()
 
@@ -71,7 +72,7 @@ async def chat_endpoint(commons: CommonsDep,  chat_id: UUID, chat_message: ChatM
         update_chat(chat_id=chat_id, history=history)
         return {"history": history }
 
-    answer = get_answer(commons, chat_message, user.email)
+    answer = get_answer(commons, chat_message, user.email,user_openai_api_key)
     history.append(("assistant", answer))
     update_chat(chat_id=chat_id, history=history)
     
@@ -80,12 +81,14 @@ async def chat_endpoint(commons: CommonsDep,  chat_id: UUID, chat_message: ChatM
 
 # create new chat
 @chat_router.post("/chat", dependencies=[Depends(JWTBearer())])
-async def chat_endpoint(commons: CommonsDep,  chat_message: ChatMessage, credentials: dict = Depends(JWTBearer())):
+async def chat_endpoint(request: Request,commons: CommonsDep,  chat_message: ChatMessage, credentials: dict = Depends(JWTBearer())):
     user = User(email=credentials.get('email', 'none'))
     user_id = fetch_user_id_from_credentials(commons, credentials)
 
     date = time.strftime("%Y%m%d")
     max_requests_number = os.getenv("MAX_REQUESTS_NUMBER")
+    user_openai_api_key = request.headers.get('Openai-Api-Key')
+
     response = commons['supabase'].from_('users').select(
     '*').filter("email", "eq", user.email).filter("date", "eq", date).execute()
 
@@ -96,61 +99,19 @@ async def chat_endpoint(commons: CommonsDep,  chat_message: ChatMessage, credent
     history = chat_message.history
     history.append(("user", chat_message.question))
 
+    chat_name = get_chat_name_from_first_question(chat_message)
+    print('chat_name',chat_name)  
     if old_request_count == 0: 
         create_user(email= user.email, date=date)
     elif  old_request_count <  float(max_requests_number) : 
         update_user_request_count(email=user.email,  date=date, requests_count= old_request_count+1)
     else: 
         history.append(('assistant', "You have reached your requests limit"))
-        new_chat = create_chat(user_id, history) 
+        new_chat = create_chat(user_id, history, chat_name) 
         return {"history": history,  "chatId": new_chat.data[0]['chat_id'] }
 
-    answer = get_answer(commons, chat_message, user.email)
+    answer = get_answer(commons, chat_message, user.email, user_openai_api_key)
     history.append(("assistant", answer))
-    new_chat = create_chat(user_id, history)
+    new_chat = create_chat(user_id, history, chat_name)
 
-    return {"history": history, "chatId": new_chat.data[0]['chat_id']}
-
-
-def get_answer(commons: CommonsDep,  chat_message: ChatMessage, email: str):
-    qa = get_qa_llm(chat_message, email)
-
-
-    if chat_message.use_summarization:
-        # 1. get summaries from the vector store based on question
-        summaries = similarity_search(
-            chat_message.question, table='match_summaries')
-        # 2. evaluate summaries against the question
-        evaluations = llm_evaluate_summaries(
-            chat_message.question, summaries, chat_message.model)
-        # 3. pull in the top documents from summaries
-        # logger.info('Evaluations: %s', evaluations)
-        if evaluations:
-            reponse = commons['supabase'].from_('vectors').select(
-                '*').in_('id', values=[e['document_id'] for e in evaluations]).execute()
-        # 4. use top docs as additional context
-            additional_context = '---\nAdditional Context={}'.format(
-                '---\n'.join(data['content'] for data in reponse.data)
-            ) + '\n'
-        answer = qa(
-            {"question": additional_context + chat_message.question})
-    else:
-        answer = qa({"question": chat_message.question})
-
-    answer = answer   
-
-    # append sources (file_name) to answer
-    if "source_documents" in answer:
-        logger.debug('Source Documents: %s', answer["source_documents"])
-        sources = [
-            doc.metadata["file_name"] for doc in answer["source_documents"]
-            if "file_name" in doc.metadata]
-        logger.debug('Sources: %s', sources)
-        if sources:
-            files = dict.fromkeys(sources)
-            # # shall provide file links until pages available
-            # files = [f"[{f}](/explore/{f})" for f in files]
-            answer = answer + "\n\nRef: " + "; ".join(files)
-
-    return answer
-   
+    return {"history": history, "chatId": new_chat.data[0]['chat_id'], "chatName":new_chat.data[0]['chat_name'] }

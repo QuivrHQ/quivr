@@ -35,6 +35,7 @@ export const useQuestion = (params: QuestionParams) => {
     try {
       const response = await axiosInstance.post<{
         chatId: UUID;
+        chatName: string;
         history: Array<[string, string]>;
       }>(`/chat`, {
         model,
@@ -48,7 +49,11 @@ export const useQuestion = (params: QuestionParams) => {
 
       params.setChats((chats) => [
         ...chats,
-        { chatId: response.data.chatId, history },
+        {
+          chatId: response.data.chatId,
+          history,
+          chatName: response.data.chatName,
+        },
       ]);
 
       setChatId(response.data.chatId);

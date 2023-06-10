@@ -1,3 +1,5 @@
+import os
+
 import pypandoc
 from auth.auth_bearer import JWTBearer
 from fastapi import Depends, FastAPI
