@@ -38,7 +38,7 @@ async def upload_file(request: Request,commons: CommonsDep,  file: UploadFile, e
     if remaining_free_space - file_size < 0:
         message = {"message": f"❌ User's brain will exceed maximum capacity with this upload. Maximum file allowed is : {convert_bytes(remaining_free_space)}", "type": "error"}
     else: 
-        message = await filter_file(file, enable_summarization, commons['supabase'], user)
+        message = await filter_file(file, enable_summarization, commons['supabase'], user, openai_api_key=request.headers.get('Openai-Api-Key', None))
  
     return message
 

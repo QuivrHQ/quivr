@@ -32,7 +32,7 @@ from utils.vectors import documents_vector_store
 #     return transcript
 
 # async def process_audio(upload_file: UploadFile, stats_db):
-async def process_audio(upload_file: UploadFile, enable_summarization: bool, user):
+async def process_audio(upload_file: UploadFile, enable_summarization: bool, user, user_openai_api_key):
 
     file_sha = ""
     dateshort = time.strftime("%Y%m%d-%H%M%S")
@@ -40,6 +40,8 @@ async def process_audio(upload_file: UploadFile, enable_summarization: bool, use
     # uploaded file to file object
 
     openai_api_key = os.environ.get("OPENAI_API_KEY")
+    if user_openai_api_key:
+        openai_api_key = user_openai_api_key
 
     # Here, we're writing the uploaded file to a temporary file, so we can use it with your existing code.
     with tempfile.NamedTemporaryFile(delete=False, suffix=upload_file.filename) as tmp_file:

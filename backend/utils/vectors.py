@@ -60,10 +60,13 @@ def create_summary(document_id, content, metadata):
         supabase_client.table("summaries").update(
             {"document_id": document_id}).match({"id": sids[0]}).execute()
 
-def create_vector(user_id,doc):
+def create_vector(user_id,doc, user_openai_api_key=None):
     logger.info(f"Creating vector for document")
     logger.info(f"Document: {doc}")
+    if user_openai_api_key:
+        documents_vector_store._embedding = embeddings_request = OpenAIEmbeddings(openai_api_key=user_openai_api_key)
     try:
+        
         sids = documents_vector_store.add_documents(
             [doc])
         if sids and len(sids) > 0:
