@@ -10,8 +10,8 @@ from langchain.document_loaders import UnstructuredHTMLLoader
 from .common import process_file
 
 
-def process_html(file: UploadFile, enable_summarization, user):
-    return process_file(file, UnstructuredHTMLLoader, ".html", enable_summarization, user)
+def process_html(file: UploadFile, enable_summarization, user, user_openai_api_key):
+    return process_file(file, UnstructuredHTMLLoader, ".html", enable_summarization, user, user_openai_api_key)
 
 
 def get_html(url):

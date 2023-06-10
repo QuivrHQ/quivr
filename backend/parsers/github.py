@@ -12,7 +12,7 @@ from utils.vectors import create_summary, create_vector, documents_vector_store
 from .common import process_file
 
 
-async def process_github(repo, enable_summarization, user, supabase): 
+async def process_github(repo, enable_summarization, user, supabase, user_openai_api_key): 
     random_dir_name = os.urandom(16).hex()
     dateshort = time.strftime("%Y%m%d")
     loader = GitLoader(
@@ -46,7 +46,7 @@ async def process_github(repo, enable_summarization, user, supabase):
             page_content=doc.page_content, metadata=metadata)
         exist = await file_already_exists_from_content(supabase, doc.page_content.encode("utf-8"), user)
         if not exist:
-            create_vector(user.email, doc_with_metadata)
+            create_vector(user.email, doc_with_metadata, user_openai_api_key)
             print("Created vector for ", doc.metadata["file_name"])
 
     return {"message": f"✅ Github with {len(documents)} files has been uploaded.", "type": "success"}

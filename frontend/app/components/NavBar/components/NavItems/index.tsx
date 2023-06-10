@@ -55,7 +55,7 @@ export const NavItems: FC<NavItemsProps> = ({
         {isUserLoggedIn && (
           <>
             <Link aria-label="account" className="" href={"/user"}>
-              <MdPerson />
+              <MdPerson className="text-2xl" />
             </Link>
             <Link href={"/config"}>
               <Button

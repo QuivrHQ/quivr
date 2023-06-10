@@ -1,5 +1,6 @@
 create table if not exists users(
+    user_id uuid,
+    email text,
     date text,
-    user_id text,
     requests_count int
 );
