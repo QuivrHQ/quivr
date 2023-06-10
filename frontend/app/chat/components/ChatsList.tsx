@@ -19,6 +19,7 @@ export function ChatsList({
   router: AppRouterInstance;
 }) {
   const { axiosInstance } = useAxios();
+
   useEffect(() => {
     const fetchChats = async () => {
       try {
@@ -38,10 +39,7 @@ export function ChatsList({
     try {
       await axiosInstance.delete(`/chat/${chatId}`);
       setChats(chats.filter((chat) => chat.chatId !== chatId));
-      //DOES NOT WORK
-      // check if the current chat is the one being deleted
       if (currentChatId === chatId) {
-        // redirect to the new chat page
         router.push("/chat");
       }
     } catch (error) {
@@ -56,11 +54,14 @@ export function ChatsList({
       {chats.map((chat) => (
         <Link href={`/chat/${chat.chatId}`} key={chat.chatId}>
           <div className="block mb-4 border rounded overflow-hidden shadow-md">
-            <div className="px-4 py-2">
+            <div className="px-4 py-2 flex justify-between items-center">
               <div className="font-bold text-xl mb-2">{chat.chatName}</div>
               <button
                 type="button"
-                onClick={() => handleDeleteChat(chat.chatId)}
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleDeleteChat(chat.chatId);
+                }}
               >
                 <FiTrash className="hover:text-red-700" />
               </button>
