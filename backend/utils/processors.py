@@ -14,6 +14,7 @@ from parsers.odt import process_odt
 from parsers.pdf import process_pdf
 from parsers.powerpoint import process_powerpoint
 from parsers.txt import process_txt
+
 from supabase import Client
 
 file_processors = {
@@ -40,7 +41,7 @@ file_processors = {
 
 
 
-async def filter_file(file: UploadFile, enable_summarization: bool, supabase_client: Client, user: User):
+async def filter_file(file: UploadFile, enable_summarization: bool, supabase_client: Client, user: User, openai_api_key):
     if await file_already_exists(supabase_client, file, user):
         return {"message": f"🤔 {file.filename} already exists.", "type": "warning"}
     elif file.file._file.tell()  < 1:
@@ -48,7 +49,7 @@ async def filter_file(file: UploadFile, enable_summarization: bool, supabase_cli
     else:
         file_extension = os.path.splitext(file.filename)[-1].lower()  # Convert file extension to lowercase
         if file_extension in file_processors:
-            await file_processors[file_extension](file, enable_summarization, user)
+            await file_processors[file_extension](file, enable_summarization, user ,openai_api_key )
             return {"message": f"✅ {file.filename} has been uploaded.", "type": "success"}
         else:
             return {"message": f"❌ {file.filename} is not supported.", "type": "error"}

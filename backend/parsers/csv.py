@@ -4,5 +4,5 @@ from langchain.document_loaders.csv_loader import CSVLoader
 from .common import process_file
 
 
-def process_csv(file: UploadFile, enable_summarization, user):
-    return process_file(file, CSVLoader, ".csv", enable_summarization, user)
+def process_csv(file: UploadFile, enable_summarization, user, user_openai_api_key):
+    return process_file(file, CSVLoader, ".csv", enable_summarization, user, user_openai_api_key)
