@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { MdSettings } from "react-icons/md";
-import Button from "../../components/ui/Button";
+import Button from "../../../../components/ui/Button";
 
 export function ConfigButton() {
   return (

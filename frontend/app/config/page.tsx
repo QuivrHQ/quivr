@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import {
   anthropicModels,
   models,
+  paidModels
 } from "@/lib/context/BrainConfigProvider/types";
 import Link from "next/link";
 import Button from "../components/ui/Button";
@@ -17,6 +18,7 @@ export default function ExplorePage() {
     handleSubmit,
     isDirty,
     maxTokens,
+    openAiKey,
     saveConfig,
     register,
     temperature,
@@ -24,6 +26,7 @@ export default function ExplorePage() {
     resetBrainConfig,
   } = useConfig();
 
+  
   if (session === null) {
     redirect("/login");
   }
@@ -47,7 +50,7 @@ export default function ExplorePage() {
             </p>
           </div>
           <Field
-            type="text"
+            type="password"
             placeholder="Open AI Key"
             className="w-full"
             label="Open AI Key"
@@ -62,7 +65,7 @@ export default function ExplorePage() {
               {...register("model")}
               className="px-5 py-2 dark:bg-gray-700 bg-gray-200 rounded-md"
             >
-              {models.map((model) => (
+              {(openAiKey ? paidModels : models).map((model) => (
                 <option value={model} key={model}>
                   {model}
                 </option>

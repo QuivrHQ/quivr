@@ -2,5 +2,9 @@ import { UUID } from "crypto";
 
 export interface Chat {
   chatId: UUID;
-  history: Array<[string, string]>;
+  history: ChatHistory;
 }
+
+export type ChatMessage = [string, string];
+
+export type ChatHistory = ChatMessage[];
