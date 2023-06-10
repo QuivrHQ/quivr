@@ -103,14 +103,15 @@ async def chat_endpoint(request: Request,commons: CommonsDep,  chat_message: Cha
 
     chat_name = get_chat_name_from_first_question(chat_message)
     print('chat_name',chat_name)  
-    if old_request_count == 0: 
-        create_user(email= user.email, date=date)
-    elif  old_request_count <  float(max_requests_number) : 
-        update_user_request_count(email=user.email,  date=date, requests_count= old_request_count+1)
-    else: 
-        history.append(('assistant', "You have reached your requests limit"))
-        new_chat = create_chat(user_id, history, chat_name) 
-        return {"history": history,  "chatId": new_chat.data[0]['chat_id'] }
+    if user_openai_api_key is None:
+        if old_request_count == 0: 
+            create_user(email= user.email, date=date)
+        elif  old_request_count <  float(max_requests_number) : 
+            update_user_request_count(email=user.email,  date=date, requests_count= old_request_count+1)
+        else: 
+            history.append(('assistant', "You have reached your requests limit"))
+            new_chat = create_chat(user_id, history, chat_name) 
+            return {"history": history,  "chatId": new_chat.data[0]['chat_id'] }
 
     answer = get_answer(commons, chat_message, user.email, user_openai_api_key)
     history.append(("assistant", answer))
