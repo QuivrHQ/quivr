@@ -1,14 +1,9 @@
 "use client";
-import { Dispatch, SetStateAction } from "react";
 import { MdMic, MdMicOff } from "react-icons/md";
 import Button from "../../components/ui/Button";
 import { useSpeech } from ".././hooks/useSpeech";
 
-export function MicButton({
-  setQuestion,
-}: {
-  setQuestion: Dispatch<SetStateAction<string>>;
-}) {
+export function MicButton() {
   const { isListening, speechSupported, startListening } = useSpeech();
 
   return (
