@@ -1,34 +1,11 @@
-import { useAxios } from "@/lib/useAxios";
-import { useEffect, useState } from "react";
-import { useSupabase } from "../../supabase-provider";
+import useDocumentData from "./hooks/useDocumentData";
 
 interface DocumentDataProps {
   documentName: string;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type DocumentDetails = any;
-//TODO: review this component logic, types and purposes
-
 const DocumentData = ({ documentName }: DocumentDataProps): JSX.Element => {
-  const { session } = useSupabase();
-  const { axiosInstance } = useAxios();
-
-  const [documents, setDocuments] = useState<DocumentDetails[]>([]);
-
-  if (!session) {
-    throw new Error("User session not found");
-  }
-
-  useEffect(() => {
-    const fetchDocuments = async () => {
-      const res = await axiosInstance.get<{ documents: DocumentDetails[] }>(
-        `/explore/${documentName}`
-      );
-      setDocuments(res.data.documents);
-    };
-    fetchDocuments();
-  }, [axiosInstance, documentName]);
+  const { documents } = useDocumentData(documentName);
 
   return (
     <div className="prose dark:prose-invert">
