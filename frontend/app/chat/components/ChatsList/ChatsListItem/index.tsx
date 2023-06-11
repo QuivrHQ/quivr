@@ -1,11 +1,12 @@
+import { Chat } from "@/app/chat/types";
 import { cn } from "@/lib/utils";
 import { UUID } from "crypto";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { FC } from "react";
-import { FiTrash2 } from "react-icons/fi";
 import { MdChatBubbleOutline } from "react-icons/md";
-import { Chat } from "../../types";
+import DeleteChat from "./components/DeleteChat";
+import ScopeChat from "./components/ScopeChat";
 
 interface ChatsListItemProps {
   chat: Chat;
@@ -39,14 +40,9 @@ const ChatsListItem: FC<ChatsListItemProps> = ({ chat, deleteChat }) => {
           {chat.chatId}
         </div>
       </Link>
-      <div className="opacity-0 group-hover:opacity-100 flex items-center justify-center hover:text-red-700 bg-gradient-to-l from-white dark:from-black to-transparent z-10 transition-opacity">
-        <button
-          className="p-5"
-          type="button"
-          onClick={() => deleteChat(chat.chatId)}
-        >
-          <FiTrash2 />
-        </button>
+      <div className="opacity-0 group-hover:opacity-100 flex items-center justify-center bg-gradient-to-l from-white dark:from-black to-transparent z-10 transition-opacity pr-3">
+        <ScopeChat />
+        <DeleteChat chat={chat} deleteChat={deleteChat} />
       </div>
 
       {/* Fade to white */}
