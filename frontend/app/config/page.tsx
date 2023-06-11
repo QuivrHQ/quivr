@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import {
   anthropicModels,
   models,
-  paidModels
+  paidModels,
 } from "@/lib/context/BrainConfigProvider/types";
 import Link from "next/link";
 import Button from "../components/ui/Button";
@@ -26,14 +26,13 @@ export default function ExplorePage() {
     resetBrainConfig,
   } = useConfig();
 
-  
   if (session === null) {
     redirect("/login");
   }
 
   return (
     <main className="w-full flex flex-col">
-      <section className="w-full outline-none pt-32 flex flex-col gap-5 items-center justify-center p-6">
+      <section className="w-full outline-none pt-10 flex flex-col gap-5 items-center justify-center p-6">
         <div className="flex flex-col items-center justify-center">
           <h1 className="text-3xl font-bold text-center">Configuration</h1>
           <h2 className="opacity-50 text-center">

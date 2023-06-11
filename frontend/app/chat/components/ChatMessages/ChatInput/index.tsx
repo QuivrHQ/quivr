@@ -27,7 +27,7 @@ export function ChatInput({
         e.preventDefault();
         if (!isSendingMessage) sendMessage(chatId);
       }}
-      className="fixed p-5 bg-white dark:bg-black rounded-t-md border border-black/10 dark:border-white/25 bottom-0 w-full max-w-3xl flex items-center justify-center gap-2 z-20"
+      className="sticky bottom-0 p-5 bg-white dark:bg-black rounded-t-md border border-black/10 dark:border-white/25 border-b-0 w-full max-w-3xl flex items-center justify-center gap-2 z-20"
     >
       <textarea
         autoFocus
