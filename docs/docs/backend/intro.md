@@ -4,4 +4,4 @@ sidebar_position: 1
 
 # Introduction
 
-You have just learned the **Quivrs**
+You have just learned the **Quivr**

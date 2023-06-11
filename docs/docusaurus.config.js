@@ -77,6 +77,11 @@ const config = {
             label: 'Tutorial',
           },
           {
+            href: '/docs/roadmap',
+            label: 'Roadmap',
+            position: 'left',
+          },
+          {
             href: 'https://github.com/stangirard/Quivr',
             label: 'GitHub',
             position: 'right',
@@ -90,7 +95,7 @@ const config = {
             title: 'Docs',
             items: [
               {
-                label: 'Tutorial',
+                label: 'Get Started',
                 to: '/docs/intro',
               },
             ],
