@@ -94,20 +94,20 @@ cp .frontend_env.example frontend/.env
 
 > _Your  `JWT_SECRET_KEY`can be found in your supabase settings under Project Settings -> JWT Settings -> JWT Secret_
 
-> _To activate vertexAI with PaLM from GCP follow the instructions [here](https://python.langchain.com/en/latest/modules/models/llms/integrations/google_vertex_ai_palm.html) and update `bacend/.env`- It is an advanced feature, please be expert in GCP before trying to use it_
+> _To activate vertexAI with PaLM from GCP follow the instructions [here](https://python.langchain.com/en/latest/modules/models/llms/integrations/google_vertex_ai_palm.html) and update `backend/.env`- It is an advanced feature, please be expert in GCP before trying to use it_
 
 - [ ] Change variables in `backend/.env`
 - [ ] Change variables in `frontend/.env`
 
-- **Step 4**: Run the following migration scripts on the Supabase database via the web interface (SQL Editor -> `New query`)
+- **Step 4**: Run the following scripts on the Supabase database via the web interface (SQL Editor -> `New query`)
 
-[Migration Script 1](scripts/supabase_new_store_documents.sql)
+[supabase_new_store_documents.sql](scripts/supabase_new_store_documents.sql)
 
-[Migration Script 2](scripts/supabase_usage_table.sql)
+[supabase_usage_table.sql](scripts/supabase_usage_table.sql)
 
-[Migration Script 3](scripts/supabase_vector_store_summary.sql)
+[supabase_vector_store_summary.sql](scripts/supabase_vector_store_summary.sql)
 
-[Migrations Script 4](scripts/supabase_users_table.sql)
+[supabase_users_table.sql](scripts/supabase_users_table.sql)
 
 - **Step 5**: Launch the app
 
@@ -117,7 +117,7 @@ docker compose -f docker-compose.yml up --build
 
 - **Step 6**: Navigate to `localhost:3000` in your browser
 
-- ** Step 7**: Want to contribute to the project? 
+- **Step 7**: Want to contribute to the project?
 
 ```
 docker compose -f docker-compose.dev.yml up --build
