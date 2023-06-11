@@ -16,7 +16,7 @@ export default function ChatPage({ params }: ChatPageProps) {
   const { chat, ...others } = useChats(chatId);
 
   return (
-    <main className="flex flex-col w-full">
+    <main className="flex flex-col w-full pt-10">
       <section className="flex flex-col items-center w-full overflow-auto">
         <PageHeading
           title="Chat with your brain"

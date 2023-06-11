@@ -42,7 +42,7 @@ export default function ExplorePage() {
 
   return (
     <main>
-      <section className="w-full outline-none pt-32 flex flex-col gap-5 items-center justify-center p-6">
+      <section className="w-full outline-none pt-10 flex flex-col gap-5 items-center justify-center p-6">
         <div className="flex flex-col items-center justify-center">
           <h1 className="text-3xl font-bold text-center">
             Explore uploaded data

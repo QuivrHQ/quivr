@@ -34,8 +34,7 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`bg-white text-black dark:bg-black dark:text-white w-full ${inter.className}`}
-        style={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}
+        className={`bg-white text-black min-h-screen flex flex-col dark:bg-black dark:text-white w-full ${inter.className}`}
       >
         <ToastProvider>
           <SupabaseProvider session={session}>

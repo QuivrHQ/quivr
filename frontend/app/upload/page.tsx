@@ -8,7 +8,7 @@ import { FileUploader } from "./components/FileUploader";
 
 export default function UploadPage() {
   return (
-    <main className="pt-24">
+    <main className="pt-10">
       <PageHeading
         title="Upload Knowledge"
         subtitle="Text, document, spreadsheet, presentation, audio, video, and URLs supported"
