@@ -101,13 +101,13 @@ cp .frontend_env.example frontend/.env
 
 - **Step 4**: Run the following migration scripts on the Supabase database via the web interface (SQL Editor -> `New query`)
 
-[DB Table creation Script 1](scripts/supabase_new_store_documents.sql)
+[Migration Script 1](scripts/supabase_new_store_documents.sql)
 
-[DB Table creation Script 2](scripts/supabase_usage_table.sql)
+[Migration Script 2](scripts/supabase_usage_table.sql)
 
-[DB Table creation Script 3](scripts/supabase_vector_store_summary.sql)
+[Migration Script 3](scripts/supabase_vector_store_summary.sql)
 
-[DB Table creation Script 4](scripts/supabase_users_table.sql)
+[Migrations Script 4](scripts/supabase_users_table.sql)
 
 - **Step 5**: Launch the app
 
@@ -143,4 +143,3 @@ Got a pull request? Open it, and we'll review it as soon as possible. Check out 
 - [Good First Issues](https://github.com/StanGirard/quivr/issues?q=is%3Aopen+is%3Aissue+label%3A%22good+first+issue%22)
 - [Frontend Issues](https://github.com/StanGirard/quivr/issues?q=is%3Aopen+is%3Aissue+label%3Afrontend)
 - [Backend Issues](https://github.com/StanGirard/quivr/issues?q=is%3Aopen+is%3Aissue+label%3Abackend)
-
