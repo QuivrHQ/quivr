@@ -17,13 +17,17 @@ export default function ChatPage({ params }: ChatPageProps) {
 
   return (
     <main className="flex flex-col w-full pt-10">
-      <section className="flex flex-col items-center w-full overflow-auto">
+      <section className="flex flex-col flex-1 items-center w-full h-full min-h-screen">
         <PageHeading
           title="Chat with your brain"
           subtitle="Talk to a language model about your uploaded data"
         />
-        {chat && <ChatMessages chat={chat} />}
-        <ChatInput chatId={chatId} {...others} />
+        <div className="relative h-full w-full flex flex-col flex-1">
+          <div className="h-full flex-1">
+            {chat && <ChatMessages chat={chat} />}
+          </div>
+          <ChatInput chatId={chatId} {...others} />
+        </div>
       </section>
     </main>
   );

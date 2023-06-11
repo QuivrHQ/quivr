@@ -40,8 +40,8 @@ export default async function RootLayout({
           <SupabaseProvider session={session}>
             <BrainConfigProvider>
               <NavBar />
-              <div style={{ flex: "1 0 auto" }}>{children}</div>
-              <div style={{ position: "sticky", bottom: 0 }}>
+              <div className="flex-1">{children}</div>
+              <div className="mt-20">
                 <Footer />
               </div>
             </BrainConfigProvider>
