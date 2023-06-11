@@ -19,7 +19,7 @@ export const ChatMessages = ({ chat }: ChatMessagesProps): JSX.Element => {
   }, [chat]);
 
   return (
-    <Card className="p-5 max-w-3xl w-full flex-1 flex flex-col h-full mb-8">
+    <Card className="p-5 max-w-3xl w-full flex flex-col h-full mb-8">
       <div className="flex-1">
         {chat.history.length === 0 ? (
           <div className="text-center opacity-50">

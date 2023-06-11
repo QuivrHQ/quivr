@@ -23,7 +23,7 @@ export default function ChatPage({ params }: ChatPageProps) {
           subtitle="Talk to a language model about your uploaded data"
         />
         <div className="relative h-full w-full flex flex-col flex-1 items-center">
-          <div className="h-full flex-1 w-full">
+          <div className="h-full flex-1 w-full flex flex-col items-center">
             {chat && <ChatMessages chat={chat} />}
           </div>
           <ChatInput chatId={chatId} {...others} />
