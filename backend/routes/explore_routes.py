@@ -10,7 +10,7 @@ explore_router = APIRouter()
 async def explore_endpoint(commons: CommonsDep, credentials: dict = Depends(JWTBearer())):
     user = User(email=credentials.get('email', 'none'))
     response = commons['supabase'].table("vectors").select(
-        "name:metadata->>file_name, size:metadata->>file_size, size:metadata->>file_sha1", count="exact").filter("user_id", "eq", user.email).execute()
+        "name:metadata->>file_name, size:metadata->>file_size, sha1:metadata->>file_sha1", count="exact").filter("user_id", "eq", user.email).execute()
     documents = response.data  # Access the data from the response
     # Convert each dictionary to a tuple of items, then to a set to remove duplicates, and then back to a dictionary
     unique_data = [dict(t) for t in set(tuple(d.items()) for d in documents)]
