@@ -101,17 +101,9 @@ cp .frontend_env.example frontend/.env
 
 - **Step 4**: Run the following migration scripts on the Supabase database via the web interface (SQL Editor -> `New query`)
 
-[Migration Script 1](scripts/supabase_new_store_documents.sql)
+[Creation Script 1](scripts/tables.sql)
 
-[Migration Script 2](scripts/supabase_usage_table.sql)
-
-[Migration Script 3](scripts/supabase_vector_store_summary.sql)
-
-[Migrations Script 4](scripts/supabase_users_table.sql)
-
-[Migration Script 5](scripts/supabase_chats_table.sql)
-
-[Migration Script 6](supabase/migrations/20230606131110_add_uuid_user_id.sql)
+> _If you come from an old version of Quivr, you can use the [migration script](scripts/20230606131110_add_uuid_user_id.sql) to migrate your data to the new version_
 
 - **Step 5**: Launch the app
 
