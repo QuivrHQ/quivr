@@ -5,9 +5,9 @@ import { NewChatButton } from "./NewChatButton";
 export function ChatsList() {
   const { allChats, deleteChat } = useChats();
   return (
-    <aside className="bg-white dark:bg-black max-w-xs w-full border-r border-black/10 dark:border-white/25 ">
+    <aside className="relative bg-white dark:bg-black max-w-xs w-full border-r border-black/10 dark:border-white/25 ">
       <NewChatButton />
-      <div className="flex flex-col gap-0">
+      <div className="flex flex-col gap-0 pb-32">
         {allChats.map((chat) => (
           <ChatsListItem
             key={chat.chatId}
