@@ -13,10 +13,8 @@ const Layout: FC<LayoutProps> = ({ children }) => {
   if (!session) redirect("/login");
 
   return (
-    <div className="relative h-full w-full flex pt-20">
-      <div className="h-full">
-        <ChatsList />
-      </div>
+    <div className="relative h-full w-full flex items-start">
+      <ChatsList />
       {children}
     </div>
   );
