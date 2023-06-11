@@ -41,9 +41,7 @@ export default async function RootLayout({
             <BrainConfigProvider>
               <NavBar />
               <div className="flex-1">{children}</div>
-              <div className="mt-20">
-                <Footer />
-              </div>
+              <Footer />
             </BrainConfigProvider>
           </SupabaseProvider>
         </ToastProvider>
