@@ -1,6 +1,5 @@
 "use client";
 import { cn } from "@/lib/utils";
-import { motion } from "framer-motion";
 import { forwardRef, Ref } from "react";
 import ReactMarkdown from "react-markdown";
 
@@ -16,17 +15,10 @@ const ChatMessage = forwardRef(
     ref
   ) => {
     return (
-      <motion.div
+      <div
         ref={ref as Ref<HTMLDivElement>}
-        initial={{ y: -24, opacity: 0 }}
-        animate={{
-          y: 0,
-          opacity: 1,
-          transition: { duration: 0.2, ease: "easeOut" },
-        }}
-        exit={{ y: -24, opacity: 0 }}
         className={cn(
-          "py-3 px-3 md:px-6 w-full dark:border-white/25 flex flex-col max-w-4xl overflow-hidden scroll-pt-32",
+          "py-3 px-3 md:px-6 w-full dark:border-white/25 flex flex-col max-w-4xl overflow-hidden scroll-pb-32",
           speaker === "user"
             ? ""
             : "bg-gray-200 dark:bg-gray-800 bg-opacity-60 py-8"
@@ -48,7 +40,7 @@ const ChatMessage = forwardRef(
             {text}
           </ReactMarkdown>
         </>
-      </motion.div>
+      </div>
     );
   }
 );
