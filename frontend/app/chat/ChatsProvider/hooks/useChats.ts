@@ -108,11 +108,11 @@ export default function useChats() {
     };
     if (!chatId) {
       // Creating a new chat
-      // setAllChats((chats) => {
-      //   console.log({ chats });
-      //   return [...chats, newChat];
-      // });
       console.log("---- Creating a new chat ----");
+      setAllChats((chats) => {
+        console.log({ chats });
+        return [...chats, newChat];
+      });
       setChat(newChat);
       router.push(`/chat/${response.data.chatId}`);
     }
@@ -139,7 +139,7 @@ export default function useChats() {
 
   const resetChat = async () => {
     setChat(null);
-  }
+  };
 
   useEffect(() => {
     fetchAllChats();
