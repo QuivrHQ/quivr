@@ -1,19 +1,26 @@
 "use client";
 import { UUID } from "crypto";
+import { useEffect } from "react";
 import PageHeading from "../../components/ui/PageHeading";
+import useChatsContext from "../ChatsProvider/hooks/useChatsContext";
 import { ChatInput, ChatMessages } from "../components";
-import useChats from "../hooks/useChats";
 
 interface ChatPageProps {
-  params?: {
-    chatId?: UUID;
+  params: {
+    chatId: UUID;
   };
 }
 
 export default function ChatPage({ params }: ChatPageProps) {
-  const chatId: UUID | undefined = params?.chatId;
+  const chatId: UUID | undefined = params.chatId;
 
-  const { chat, ...others } = useChats(chatId);
+  const { fetchChat, resetChat } = useChatsContext();
+
+  useEffect(() => {
+    // if (chatId)
+    if (!chatId) resetChat();
+    fetchChat(chatId);
+  }, [fetchChat, chatId]);
 
   return (
     <main className="flex flex-col w-full pt-10">
@@ -24,9 +31,9 @@ export default function ChatPage({ params }: ChatPageProps) {
         />
         <div className="relative h-full w-full flex flex-col flex-1 items-center">
           <div className="h-full flex-1 w-full flex flex-col items-center">
-            {chat && <ChatMessages chat={chat} />}
+            <ChatMessages />
           </div>
-          <ChatInput chatId={chatId} {...others} />
+          <ChatInput />
         </div>
       </section>
     </main>

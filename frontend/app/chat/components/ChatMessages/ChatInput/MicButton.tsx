@@ -1,7 +1,7 @@
 "use client";
 import { MdMic, MdMicOff } from "react-icons/md";
 import Button from "../../../../components/ui/Button";
-import { useSpeech } from "../../../hooks/useSpeech";
+import { useSpeech } from "../../../ChatsProvider/hooks/useSpeech";
 
 export function MicButton() {
   const { isListening, speechSupported, startListening } = useSpeech();
