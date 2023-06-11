@@ -100,11 +100,9 @@ cp .frontend_env.example frontend/.env
 
 [DB Table Creation Script 1](https://github.com/StanGirard/quivr/tree/main/scripts/supabase_new_store_documents.sql)
 
-[DB Table Creation Script 2](https://github.com/StanGirard/quivr/tree/main/scripts/supabase_usage_table.sql)
+[Creation Script 1](https://github.com/StanGirard/quivr/tree/main/scripts/tables.sql)
 
-[DB Table Creation Script 3](https://github.com/StanGirard/quivr/tree/main/scripts/supabase_vector_store_summary.sql)
-
-[DB Table Creation Script 4](https://github.com/StanGirard/quivr/tree/main/scripts/supabase_users_table.sql)
+> _If you come from an old version of Quivr, you can use the [migration script](https://github.com/StanGirard/quivr/tree/main/scripts/20230606131110_add_uuid_user_id.sql) to migrate your data to the new version_
 
 - **Step 5**: Launch the app
 
