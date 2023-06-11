@@ -1,6 +1,5 @@
 "use client";
 import Card from "@/app/components/ui/Card";
-import { AnimatePresence } from "framer-motion";
 import { FC, useEffect, useRef } from "react";
 import useChatsContext from "../../ChatsProvider/hooks/useChatsContext";
 import ChatMessage from "./ChatMessage";
@@ -11,11 +10,16 @@ export const ChatMessages: FC = () => {
   const { chat } = useChatsContext();
 
   useEffect(() => {
-    if (!chat) return;
-    if (chat.history.length > 2) {
-      lastChatRef.current?.scrollIntoView({ behavior: "auto", block: "start" });
-    }
-  }, [chat]);
+    if (!chat || !lastChatRef.current) return;
+
+    // if (chat.history.length > 2) {
+    lastChatRef.current?.scrollIntoView({
+      behavior: "smooth",
+      block: "end",
+    });
+    // }
+  }, [chat, lastChatRef]);
+
   if (!chat) return null;
 
   return (
@@ -26,18 +30,16 @@ export const ChatMessages: FC = () => {
             Ask a question, or describe a task.
           </div>
         ) : (
-          <AnimatePresence initial={false}>
-            {chat.history.map(([speaker, text], idx) => {
-              return (
-                <ChatMessage
-                  ref={idx === chat.history.length - 1 ? lastChatRef : null}
-                  key={idx}
-                  speaker={speaker}
-                  text={text}
-                />
-              );
-            })}
-          </AnimatePresence>
+          chat.history.map(([speaker, text], idx) => {
+            return (
+              <ChatMessage
+                ref={idx === chat.history.length - 1 ? lastChatRef : null}
+                key={idx}
+                speaker={speaker}
+                text={text}
+              />
+            );
+          })
         )}
       </div>
     </Card>
