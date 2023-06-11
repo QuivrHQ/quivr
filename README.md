@@ -109,6 +109,10 @@ cp .frontend_env.example frontend/.env
 
 [Migrations Script 4](scripts/supabase_users_table.sql)
 
+[Migration Script 5](scripts/supabase_chats_table.sql)
+
+[Migration Script 6](supabase/migrations/20230606131110_add_uuid_user_id.sql)
+
 - **Step 5**: Launch the app
 
 ```bash
