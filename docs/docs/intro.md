@@ -45,7 +45,7 @@ https://github.com/StanGirard/quivr/assets/19614572/a6463b73-76c7-4bc0-978d-7056
 
 Follow these instructions to get a copy of the project up and running on your local machine for development and testing purposes.
 
-**Old version's readme** is located in the streamlit-demo folder [here](streamlit-demo/README.md)
+**Old version's readme** is located in the streamlit-demo folder [here](https://github.com/StanGirard/quivr/tree/main/streamlit-demo/README.md)
 
 ### Prerequisites 📋
 
@@ -98,13 +98,13 @@ cp .frontend_env.example frontend/.env
 
 - **Step 4**: Run the following migration scripts on the Supabase database via the web interface (SQL Editor -> `New query`)
 
-[Migration Script 1](scripts/supabase_new_store_documents.sql)
+[Migration Script 1](https://github.com/StanGirard/quivr/tree/main/scripts/supabase_new_store_documents.sql)
 
-[Migration Script 2](scripts/supabase_usage_table.sql)
+[Migration Script 2](https://github.com/StanGirard/quivr/tree/main/scripts/supabase_usage_table.sql)
 
-[Migration Script 3](scripts/supabase_vector_store_summary.sql)
+[Migration Script 3](https://github.com/StanGirard/quivr/tree/main/scripts/supabase_vector_store_summary.sql)
 
-[Migrations Script 4](scripts/supabase_users_table.sql)
+[Migrations Script 4](https://github.com/StanGirard/quivr/tree/main/scripts/supabase_users_table.sql)
 
 - **Step 5**: Launch the app
 
