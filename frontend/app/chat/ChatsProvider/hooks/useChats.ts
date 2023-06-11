@@ -4,9 +4,9 @@ import { useAxios } from "@/lib/useAxios";
 import { UUID } from "crypto";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
-import { Chat, ChatMessage } from "../types";
+import { Chat, ChatMessage } from "../../types";
 
-export default function useChats(chatId?: UUID) {
+export default function useChats() {
   const [allChats, setAllChats] = useState<Chat[]>([]);
   const [chat, setChat] = useState<Chat | null>(null);
   const [isSendingMessage, setIsSendingMessage] = useState(false);
@@ -60,6 +60,7 @@ export default function useChats(chatId?: UUID) {
   }: {
     options: Record<string, string | unknown>;
   }) => {
+    fetchAllChats();
     return axiosInstance.post<ChatResponse>(`/chat`, options);
   };
 
@@ -74,16 +75,8 @@ export default function useChats(chatId?: UUID) {
   const sendMessage = async (chatId?: UUID, msg?: ChatMessage) => {
     setIsSendingMessage(true);
 
-    // const chat_id = {
-    //   ...((chatId || currentChatId) && {
-    //     chat_id: chatId ?? currentChatId,
-    //   }),
-    // };
-
     if (msg) setMessage(msg);
     const options: Record<string, unknown> = {
-      // ...(chat_id && { chat_id }),
-      // chat_id gets set only if either chatId or currentChatId exists, by the priority of chatId
       chat_id: chatId,
       model,
       question: msg ? msg[1] : message[1],
@@ -116,11 +109,11 @@ export default function useChats(chatId?: UUID) {
     };
     if (!chatId) {
       // Creating a new chat
-      // setAllChats((chats) => {
-      //   console.log({ chats });
-      //   return [...chats, newChat];
-      // });
       console.log("---- Creating a new chat ----");
+      setAllChats((chats) => {
+        console.log({ chats });
+        return [...chats, newChat];
+      });
       setChat(newChat);
       router.push(`/chat/${response.data.chatId}`);
     }
@@ -145,13 +138,13 @@ export default function useChats(chatId?: UUID) {
     }
   };
 
+  const resetChat = async () => {
+    setChat(null);
+  };
+
   useEffect(() => {
     fetchAllChats();
-    console.log(chatId);
-    if (chatId) {
-      fetchChat(chatId);
-    }
-  }, [fetchAllChats, fetchChat, chatId]);
+  }, [fetchAllChats]);
 
   return {
     allChats,
@@ -159,6 +152,7 @@ export default function useChats(chatId?: UUID) {
     isSendingMessage,
     message,
     setMessage,
+    resetChat,
 
     fetchAllChats,
     fetchChat,
