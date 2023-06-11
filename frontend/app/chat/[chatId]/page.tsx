@@ -22,8 +22,8 @@ export default function ChatPage({ params }: ChatPageProps) {
           title="Chat with your brain"
           subtitle="Talk to a language model about your uploaded data"
         />
-        <div className="relative h-full w-full flex flex-col flex-1">
-          <div className="h-full flex-1">
+        <div className="relative h-full w-full flex flex-col flex-1 items-center">
+          <div className="h-full flex-1 w-full">
             {chat && <ChatMessages chat={chat} />}
           </div>
           <ChatInput chatId={chatId} {...others} />

@@ -14,9 +14,7 @@ const Layout: FC<LayoutProps> = ({ children }) => {
 
   return (
     <div className="relative h-full w-full flex items-start">
-      <div className="sticky top-0 max-h-screen overflow-auto">
-        <ChatsList />
-      </div>
+      <ChatsList />
       {children}
     </div>
   );

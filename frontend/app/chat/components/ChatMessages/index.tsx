@@ -13,7 +13,9 @@ export const ChatMessages = ({ chat }: ChatMessagesProps): JSX.Element => {
   const lastChatRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    lastChatRef.current?.scrollIntoView({ behavior: "auto", block: "start" });
+    if (chat.history.length > 2) {
+      lastChatRef.current?.scrollIntoView({ behavior: "auto", block: "start" });
+    }
   }, [chat]);
 
   return (
