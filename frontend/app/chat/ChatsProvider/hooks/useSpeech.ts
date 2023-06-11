@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
-import { isSpeechRecognitionSupported } from "../helpers/isSpeechRecognitionSupported";
-import useChats from "./useChats";
+import { isSpeechRecognitionSupported } from "../../helpers/isSpeechRecognitionSupported";
+import useChatsContext from "./useChatsContext";
 
 export const useSpeech = () => {
   const [isListening, setIsListening] = useState(false);
   const [speechSupported, setSpeechSupported] = useState(false);
 
-  const { setMessage } = useChats();
+  const { setMessage } = useChatsContext();
 
   useEffect(() => {
     if (isSpeechRecognitionSupported()) {

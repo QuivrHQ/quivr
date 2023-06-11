@@ -2,6 +2,7 @@
 import { redirect } from "next/navigation";
 import { FC, ReactNode } from "react";
 import { useSupabase } from "../supabase-provider";
+import { ChatsProvider } from "./ChatsProvider/chats-provider";
 import { ChatsList } from "./components";
 
 interface LayoutProps {
@@ -13,10 +14,12 @@ const Layout: FC<LayoutProps> = ({ children }) => {
   if (!session) redirect("/login");
 
   return (
-    <div className="relative h-full w-full flex items-start">
-      <ChatsList />
-      {children}
-    </div>
+    <ChatsProvider>
+      <div className="relative h-full w-full flex items-start">
+        <ChatsList />
+        {children}
+      </div>
+    </ChatsProvider>
   );
 };
 
