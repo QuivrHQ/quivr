@@ -1,4 +1,4 @@
-from typing import List, Tuple, Optional
+from typing import List, Optional, Tuple
 from uuid import UUID
 
 from pydantic import BaseModel
@@ -12,4 +12,6 @@ class ChatMessage(BaseModel):
     temperature: float = 0.0
     max_tokens: int = 256
     use_summarization: bool = False
-    chat_id: Optional[UUID] = None, 
+    chat_id: Optional[UUID] = None,
+    # A list of sha1 hashes of the files that will be used to chat
+    file_sha1s: Optional[List[str]] = None

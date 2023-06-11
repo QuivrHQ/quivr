@@ -91,6 +91,7 @@ export default function useChats(chatId?: UUID) {
       temperature,
       max_tokens: maxTokens,
       use_summarization: false,
+      file_sha1s: [],
     };
 
     const response = await (chatId !== undefined
