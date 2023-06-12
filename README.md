@@ -101,7 +101,7 @@ cp .frontend_env.example frontend/.env
 
 - **Step 4**: Run the following migration scripts on the Supabase database via the web interface (SQL Editor -> `New query`)
 
-[Creation Script 1](scripts/tables.sql)
+[DB Creation Script 1](scripts/tables.sql)
 
 > _If you come from an old version of Quivr, you can use the [migration script](scripts/20230606131110_add_uuid_user_id.sql) to migrate your data to the new version_
 
@@ -113,7 +113,7 @@ docker compose -f docker-compose.yml up --build
 
 - **Step 6**: Navigate to `localhost:3000` in your browser
 
-- ** Step 7**: Want to contribute to the project? 
+- **Step 7**: Want to contribute to the project? 
 
 ```
 docker compose -f docker-compose.dev.yml up --build
