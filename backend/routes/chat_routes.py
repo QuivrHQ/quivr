@@ -33,7 +33,7 @@ def fetch_user_stats(commons, user, date):
 @chat_router.get("/chat", dependencies=[Depends(JWTBearer())])
 async def get_chats(commons: CommonsDep, current_user: User = Depends(get_current_user)):
     date = time.strftime("%Y%m%d")
-    user_id = fetch_user_id_from_credentials(commons, date, current_user.email)
+    user_id = fetch_user_id_from_credentials(commons, date, {"email": current_user.email})
     chats = get_user_chats(commons, user_id)
     return {"chats": chats}
 
@@ -53,30 +53,28 @@ async def delete_chat(commons: CommonsDep, chat_id: UUID):
     return {"message": f"{chat_id}  has been deleted."}
 
 # helper method for update and create chat
-def chat_handler(request, commons, chat_id, chat_message, credentials, is_new_chat=False):
-    user = User(email=credentials.get('email', 'none'))
+def chat_handler(request, commons, chat_id, chat_message, email, is_new_chat=False):
     date = time.strftime("%Y%m%d")
-    user_id = fetch_user_id_from_credentials(commons, date, credentials)
+    user_id = fetch_user_id_from_credentials(commons, date, {"email": email})
     max_requests_number = os.getenv("MAX_REQUESTS_NUMBER")
     user_openai_api_key = request.headers.get('Openai-Api-Key')
 
-    userItem = fetch_user_stats(commons, user, date)
+    userItem = fetch_user_stats(commons, User(email=email), date)
     old_request_count = userItem['requests_count']
 
     history = chat_message.history
     history.append(("user", chat_message.question))
 
     if old_request_count == 0: 
-        create_user(email= user.email, date=date)
-    elif  old_request_count <  float(max_requests_number) : 
-        update_user_request_count(email=user.email,  date=date, requests_count= old_request_count+
-        1)
+        create_user(email= email, date=date)
+    elif old_request_count < float(max_requests_number): 
+        update_user_request_count(email=email, date=date, requests_count=old_request_count + 1)
     else: 
         history.append(('assistant', "You have reached your requests limit"))
         update_chat(chat_id=chat_id, history=history)
-        return {"history": history }
+        return {"history": history}
 
-    answer = get_answer(commons, chat_message, user.email, user_openai_api_key)
+    answer = get_answer(commons, chat_message, email, user_openai_api_key)
     history.append(("assistant", answer))
 
     if is_new_chat:
@@ -87,6 +85,7 @@ def chat_handler(request, commons, chat_id, chat_message, credentials, is_new_ch
         update_chat(chat_id=chat_id, history=history)
 
     return {"history": history, "chatId": chat_id}
+
 
 # update existing chat
 @chat_router.put("/chat/{chat_id}", dependencies=[Depends(JWTBearer())])
