@@ -6,7 +6,6 @@ import { usePathname } from "next/navigation";
 import { FC } from "react";
 import { MdChatBubbleOutline } from "react-icons/md";
 import DeleteChat from "./components/DeleteChat";
-import ScopeChat from "./components/ScopeChat";
 
 interface ChatsListItemProps {
   chat: Chat;
@@ -41,7 +40,6 @@ const ChatsListItem: FC<ChatsListItemProps> = ({ chat, deleteChat }) => {
         </div>
       </Link>
       <div className="opacity-0 group-hover:opacity-100 flex items-center justify-center bg-gradient-to-l from-white dark:from-black to-transparent z-10 transition-opacity pr-3">
-        <ScopeChat />
         <DeleteChat chat={chat} deleteChat={deleteChat} />
       </div>
 
