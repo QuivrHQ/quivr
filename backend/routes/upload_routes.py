@@ -1,10 +1,7 @@
 import os
-from tempfile import SpooledTemporaryFile
 
 from auth.auth_bearer import JWTBearer
-from crawl.crawler import CrawlWebsite
 from fastapi import APIRouter, Depends, Request, UploadFile
-from models.chats import ChatMessage
 from models.users import User
 from utils.file import convert_bytes, get_file_size
 from utils.processors import filter_file
@@ -41,4 +38,3 @@ async def upload_file(request: Request,commons: CommonsDep,  file: UploadFile, e
         message = await filter_file(file, enable_summarization, commons['supabase'], user, openai_api_key=request.headers.get('Openai-Api-Key', None))
  
     return message
-

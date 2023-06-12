@@ -5,7 +5,6 @@ from tempfile import SpooledTemporaryFile
 from auth.auth_bearer import JWTBearer
 from crawl.crawler import CrawlWebsite
 from fastapi import APIRouter, Depends, Request, UploadFile
-from middlewares.cors import add_cors_middleware
 from models.users import User
 from parsers.github import process_github
 from utils.file import convert_bytes

@@ -1,6 +1,5 @@
 import os
 import time
-from typing import Optional
 from uuid import UUID
 
 from auth.auth_bearer import JWTBearer

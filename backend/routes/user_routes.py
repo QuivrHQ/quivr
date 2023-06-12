@@ -1,4 +1,3 @@
-
 import os
 import time
 
@@ -48,4 +47,3 @@ async def get_user_endpoint(request: Request,commons: CommonsDep, credentials: d
             "requests_stats" : requests_stats.data,
             "date": date,
             }
-
