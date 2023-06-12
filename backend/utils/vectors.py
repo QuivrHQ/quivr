@@ -1,8 +1,7 @@
 import os
-from typing import Annotated, List, Tuple
+from typing import Annotated
 
-from auth.auth_bearer import JWTBearer
-from fastapi import Depends, UploadFile
+from fastapi import Depends
 from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.schema import Document
 from langchain.vectorstores import SupabaseVectorStore
@@ -11,26 +10,22 @@ from llm.summarization import llm_evaluate_summaries, llm_summerize
 from logger import get_logger
 from models.chats import ChatMessage
 from models.users import User
-from pydantic import BaseModel
 
 from supabase import Client, create_client
 
 logger = get_logger(__name__)
 
-
 openai_api_key = os.environ.get("OPENAI_API_KEY")
 anthropic_api_key = os.environ.get("ANTHROPIC_API_KEY")
 supabase_url = os.environ.get("SUPABASE_URL")
 supabase_key = os.environ.get("SUPABASE_SERVICE_KEY")
+
 embeddings = OpenAIEmbeddings(openai_api_key=openai_api_key)
 supabase_client: Client = create_client(supabase_url, supabase_key)
 documents_vector_store = SupabaseVectorStore(
     supabase_client, embeddings, table_name="vectors")
 summaries_vector_store = SupabaseVectorStore(
     supabase_client, embeddings, table_name="summaries")
-
-
-
 
 
 def common_dependencies():
@@ -43,8 +38,6 @@ def common_dependencies():
 
 
 CommonsDep = Annotated[dict, Depends(common_dependencies)]
-
-
 
 
 def create_summary(document_id, content, metadata):
@@ -64,9 +57,8 @@ def create_vector(user_id,doc, user_openai_api_key=None):
     logger.info(f"Creating vector for document")
     logger.info(f"Document: {doc}")
     if user_openai_api_key:
-        documents_vector_store._embedding = embeddings_request = OpenAIEmbeddings(openai_api_key=user_openai_api_key)
+        documents_vector_store._embedding = OpenAIEmbeddings(openai_api_key=user_openai_api_key)
     try:
-        
         sids = documents_vector_store.add_documents(
             [doc])
         if sids and len(sids) > 0:
@@ -110,8 +102,6 @@ def update_chat(chat_id, history):
 def create_embedding(content):
     return embeddings.embed_query(content)
 
-
-
 def similarity_search(query, table='match_summaries', top_k=5, threshold=0.5):
     query_embedding = create_embedding(query)
     summaries = supabase_client.rpc(
@@ -119,10 +109,6 @@ def similarity_search(query, table='match_summaries', top_k=5, threshold=0.5):
                 'match_count': top_k, 'match_threshold': threshold}
     ).execute()
     return summaries.data
-
-
-
-
 
 def fetch_user_id_from_credentials(commons: CommonsDep,date,credentials):
     user = User(email=credentials.get('email', 'none'))
@@ -139,21 +125,18 @@ def fetch_user_id_from_credentials(commons: CommonsDep,date,credentials):
     else: 
         user_id = userItem['user_id']
 
-    # if not(user_id):
-    #     throw error
     return user_id
 
 def get_chat_name_from_first_question(chat_message: ChatMessage):
     # Step 1: Get the summary of the first question        
-    # first_question_summary = summerize_as_title(chat_message.question)
+    # first_question_summary = summarize_as_title(chat_message.question)
     # Step 2: Process this summary to create a chat name by selecting the first three words
     chat_name = ' '.join(chat_message.question.split()[:3])
-    print('chat_name')
+
     return chat_name
    
 def get_answer(commons: CommonsDep,  chat_message: ChatMessage, email: str, user_openai_api_key:str):
     qa = get_qa_llm(chat_message, email, user_openai_api_key)
-
 
     if chat_message.use_summarization:
         # 1. get summaries from the vector store based on question
@@ -163,13 +146,12 @@ def get_answer(commons: CommonsDep,  chat_message: ChatMessage, email: str, user
         evaluations = llm_evaluate_summaries(
             chat_message.question, summaries, chat_message.model)
         # 3. pull in the top documents from summaries
-        # logger.info('Evaluations: %s', evaluations)
         if evaluations:
-            reponse = commons['supabase'].from_('vectors').select(
+            response = commons['supabase'].from_('vectors').select(
                 '*').in_('id', values=[e['document_id'] for e in evaluations]).execute()
         # 4. use top docs as additional context
             additional_context = '---\nAdditional Context={}'.format(
-                '---\n'.join(data['content'] for data in reponse.data)
+                '---\n'.join(data['content'] for data in response.data)
             ) + '\n'
         model_response = qa(
             {"question": additional_context + chat_message.question})
@@ -192,5 +174,3 @@ def get_answer(commons: CommonsDep,  chat_message: ChatMessage, email: str, user
             answer = answer + "\n\nRef: " + "; ".join(files)
 
     return answer
-   
-

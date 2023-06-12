@@ -1,9 +1,9 @@
 import os
 from typing import Optional
 
-from fastapi import HTTPException, Request
+from fastapi import HTTPException, Request, Depends
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
-
+from models.users import User
 from .auth_handler import decode_access_token
 
 
@@ -28,3 +28,7 @@ class JWTBearer(HTTPBearer):
     def verify_jwt(self, jwtoken: str):
         payload = decode_access_token(jwtoken)
         return payload
+
+
+def get_current_user(credentials: dict = Depends(JWTBearer())) -> User:
+    return User(email=credentials.get('email', 'none'))
