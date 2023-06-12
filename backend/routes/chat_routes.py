@@ -2,7 +2,7 @@ import os
 import time
 from uuid import UUID
 
-from auth.auth_bearer import JWTBearer
+from auth.auth_bearer import JWTBearer, get_current_user
 from fastapi import APIRouter, Depends, Request
 from models.chats import ChatMessage
 from models.users import User
@@ -31,9 +31,9 @@ def fetch_user_stats(commons, user, date):
 
 # get all chats
 @chat_router.get("/chat", dependencies=[Depends(JWTBearer())])
-async def get_chats(commons: CommonsDep, credentials: dict = Depends(JWTBearer())):
+async def get_chats(commons: CommonsDep, current_user: User = Depends(get_current_user)):
     date = time.strftime("%Y%m%d")
-    user_id = fetch_user_id_from_credentials(commons, date, credentials)
+    user_id = fetch_user_id_from_credentials(commons, date, current_user.email)
     chats = get_user_chats(commons, user_id)
     return {"chats": chats}
 
@@ -90,10 +90,10 @@ def chat_handler(request, commons, chat_id, chat_message, credentials, is_new_ch
 
 # update existing chat
 @chat_router.put("/chat/{chat_id}", dependencies=[Depends(JWTBearer())])
-async def chat_endpoint(request: Request, commons: CommonsDep, chat_id: UUID, chat_message: ChatMessage, credentials: dict = Depends(JWTBearer())):
-    return chat_handler(request, commons, chat_id, chat_message, credentials)
+async def chat_endpoint(request: Request, commons: CommonsDep, chat_id: UUID, chat_message: ChatMessage, current_user: User = Depends(get_current_user)):
+    return chat_handler(request, commons, chat_id, chat_message, current_user.email)
 
 # create new chat
 @chat_router.post("/chat", dependencies=[Depends(JWTBearer())])
-async def chat_endpoint(request: Request, commons: CommonsDep, chat_message: ChatMessage, credentials: dict = Depends(JWTBearer())):
-    return chat_handler(request, commons, None, chat_message, credentials, is_new_chat=True)
+async def chat_endpoint(request: Request, commons: CommonsDep, chat_message: ChatMessage, current_user: User = Depends(get_current_user)):
+    return chat_handler(request, commons, None, chat_message, current_user.email, is_new_chat=True)

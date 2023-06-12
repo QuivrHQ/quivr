@@ -1,6 +1,6 @@
 import os
 
-from auth.auth_bearer import JWTBearer
+from auth.auth_bearer import JWTBearer, get_current_user
 from fastapi import APIRouter, Depends, Request, UploadFile
 from models.users import User
 from utils.file import convert_bytes, get_file_size
@@ -24,12 +24,11 @@ def calculate_remaining_space(request, max_brain_size, max_brain_size_with_own_k
     return remaining_free_space
 
 @upload_router.post("/upload", dependencies=[Depends(JWTBearer())])
-async def upload_file(request: Request, commons: CommonsDep,  file: UploadFile, enable_summarization: bool = False, credentials: dict = Depends(JWTBearer())):
+async def upload_file(request: Request, commons: CommonsDep,  file: UploadFile, enable_summarization: bool = False, current_user: User = Depends(get_current_user)):
     max_brain_size = os.getenv("MAX_BRAIN_SIZE")
     max_brain_size_with_own_key = os.getenv("MAX_BRAIN_SIZE_WITH_KEY",209715200)
     
-    user = User(email=credentials.get('email', 'none'))
-    user_unique_vectors = get_user_vectors(commons, user)
+    user_unique_vectors = get_user_vectors(commons, current_user)
     current_brain_size = sum(float(doc['size']) for doc in user_unique_vectors)
 
     remaining_free_space = calculate_remaining_space(request, max_brain_size, max_brain_size_with_own_key, current_brain_size)
@@ -39,6 +38,6 @@ async def upload_file(request: Request, commons: CommonsDep,  file: UploadFile, 
     if remaining_free_space - file_size < 0:
         message = {"message": f"❌ User's brain will exceed maximum capacity with this upload. Maximum file allowed is : {convert_bytes(remaining_free_space)}", "type": "error"}
     else: 
-        message = await filter_file(file, enable_summarization, commons['supabase'], user, openai_api_key=request.headers.get('Openai-Api-Key', None))
+        message = await filter_file(file, enable_summarization, commons['supabase'], current_user, openai_api_key=request.headers.get('Openai-Api-Key', None))
  
     return message

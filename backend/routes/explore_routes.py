@@ -1,4 +1,4 @@
-from auth.auth_bearer import JWTBearer
+from auth.auth_bearer import JWTBearer, get_current_user
 from fastapi import APIRouter, Depends
 from models.users import User
 from utils.vectors import CommonsDep
@@ -14,13 +14,11 @@ def get_unique_user_data(commons, user):
     return unique_data
 
 @explore_router.get("/explore", dependencies=[Depends(JWTBearer())])
-async def explore_endpoint(commons: CommonsDep,credentials: dict = Depends(JWTBearer())):
-    user = User(email=credentials.get('email', 'none'))
-    unique_data = get_unique_user_data(commons, user)
-    # Sort the list of documents by size in decreasing order
+async def explore_endpoint(commons: CommonsDep, current_user: User = Depends(get_current_user)):
+    unique_data = get_unique_user_data(commons, current_user)
     unique_data.sort(key=lambda x: int(x['size']), reverse=True)
-
     return {"documents": unique_data}
+
 
 @explore_router.delete("/explore/{file_name}", dependencies=[Depends(JWTBearer())])
 async def delete_endpoint(commons: CommonsDep, file_name: str, credentials: dict = Depends(JWTBearer())):
@@ -33,10 +31,8 @@ async def delete_endpoint(commons: CommonsDep, file_name: str, credentials: dict
     return {"message": f"{file_name} of user {user.email} has been deleted."}
 
 @explore_router.get("/explore/{file_name}", dependencies=[Depends(JWTBearer())])
-async def download_endpoint(commons: CommonsDep, file_name: str,credentials: dict = Depends(JWTBearer())):
-    user = User(email=credentials.get('email', 'none'))
+async def download_endpoint(commons: CommonsDep, file_name: str, current_user: User = Depends(get_current_user)):
     response = commons['supabase'].table("vectors").select(
-        "metadata->>file_name, metadata->>file_size, metadata->>file_extension, metadata->>file_url", "content").match({"metadata->>file_name": file_name, "user_id": user.email}).execute()
+        "metadata->>file_name, metadata->>file_size, metadata->>file_extension, metadata->>file_url", "content").match({"metadata->>file_name": file_name, "user_id": current_user.email}).execute()
     documents = response.data
-    # Returns all documents with the same file name
     return {"documents": documents}

@@ -2,7 +2,7 @@ import os
 import shutil
 from tempfile import SpooledTemporaryFile
 
-from auth.auth_bearer import JWTBearer
+from auth.auth_bearer import JWTBearer, get_current_user
 from crawl.crawler import CrawlWebsite
 from fastapi import APIRouter, Depends, Request, UploadFile
 from models.users import User
@@ -24,13 +24,12 @@ def get_unique_user_data(commons, user):
     return user_unique_vectors
 
 @crawl_router.post("/crawl/", dependencies=[Depends(JWTBearer())])
-async def crawl_endpoint(request: Request,commons: CommonsDep, crawl_website: CrawlWebsite, enable_summarization: bool = False, credentials: dict = Depends(JWTBearer())):
+async def crawl_endpoint(request: Request,commons: CommonsDep, crawl_website: CrawlWebsite, enable_summarization: bool = False, current_user: User = Depends(get_current_user)):
     max_brain_size = os.getenv("MAX_BRAIN_SIZE")
     if request.headers.get('Openai-Api-Key'):
         max_brain_size = os.getenv("MAX_BRAIN_SIZE_WITH_KEY",209715200)
 
-    user = User(email=credentials.get('email', 'none'))
-    user_unique_vectors = get_unique_user_data(commons, user)
+    user_unique_vectors = get_unique_user_data(commons, current_user)
 
     current_brain_size = sum(float(doc['size']) for doc in user_unique_vectors)
 
@@ -49,7 +48,7 @@ async def crawl_endpoint(request: Request,commons: CommonsDep, crawl_website: Cr
 
             # Pass the SpooledTemporaryFile to UploadFile
             file = UploadFile(file=spooled_file, filename=file_name)
-            message = await filter_file(file, enable_summarization, commons['supabase'], user=user, openai_api_key=request.headers.get('Openai-Api-Key', None))
+            message = await filter_file(file, enable_summarization, commons['supabase'], user=current_user, openai_api_key=request.headers.get('Openai-Api-Key', None))
             return message
         else:
-            message = await process_github(crawl_website.url, "false", user=user, supabase=commons['supabase'], user_openai_api_key=request.headers.get('Openai-Api-Key', None))
+            message = await process_github(crawl_website.url, "false", user=current_user, supabase=commons['supabase'], user_openai_api_key=request.headers.get('Openai-Api-Key', None))
