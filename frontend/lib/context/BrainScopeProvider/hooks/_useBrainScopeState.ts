@@ -1,6 +1,6 @@
-import useDocuments from "@/app/explore/hooks/useDocuments";
 import { Document } from "@/app/explore/types";
 import generateUUID from "@/lib/helpers/generateUUID";
+import { useAxios } from "@/lib/useAxios";
 import { UUID } from "crypto";
 import { useEffect, useState } from "react";
 import { BrainScope } from "../types";
@@ -11,7 +11,8 @@ export default function _useBrainScopeState() {
   // currentBrain will change if we change currentBrainIndex or allBrains
   const currentBrain = allBrains.find((brain) => brain.id === currentBrainId);
 
-  const { documents: allDocuments } = useDocuments();
+  const [allDocuments, setAllDocuments] = useState<Document[]>([]);
+  const { axiosInstance } = useAxios();
 
   const createBrain = (name: string, id?: UUID) => {
     let _id = generateUUID();
@@ -57,12 +58,21 @@ export default function _useBrainScopeState() {
   };
 
   useEffect(() => {
-    // setCurrentBrain(getBrainFromLocalStorage());
-    // TODO: redo logic to fetch brains from db or localstorage
-    setAllBrains([
-      { name: "Super Brain", id: "super-duper-brain", documents: allDocuments },
-    ]);
-  }, [allDocuments]);
+    (async () => {
+      const response = await axiosInstance.get<{ documents: Document[] }>(
+        "/explore"
+      );
+      setAllDocuments(response.data.documents);
+      // TODO: redo logic to fetch brains from db or localstorage
+      setAllBrains([
+        {
+          name: "Super Brain",
+          id: "super-duper-brain",
+          documents: response.data.documents,
+        },
+      ]);
+    })();
+  }, []);
 
   return {
     currentBrain,

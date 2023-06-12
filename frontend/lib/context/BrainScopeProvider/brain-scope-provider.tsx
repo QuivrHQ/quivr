@@ -1,9 +1,8 @@
 "use client";
 
-import { setEmptyStringsUndefined } from "@/lib/helpers/setEmptyStringsUndefined";
-import { createContext, useEffect, useState } from "react";
-import { BrainScope, ScopeContext } from "./types";
+import { createContext } from "react";
 import _useBrainScopeState from "./hooks/_useBrainScopeState";
+import { ScopeContext } from "./types";
 
 export const BrainScopeContext = createContext<ScopeContext | undefined>(
   undefined
