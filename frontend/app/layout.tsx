@@ -1,3 +1,4 @@
+import { BrainScopeProvider } from "@/lib/context/BrainScopeProvider/brain-scope-provider";
 import { createServerComponentSupabaseClient } from "@supabase/auth-helpers-nextjs";
 import { Analytics } from "@vercel/analytics/react";
 import { Inter } from "next/font/google";
@@ -39,9 +40,11 @@ export default async function RootLayout({
         <ToastProvider>
           <SupabaseProvider session={session}>
             <BrainConfigProvider>
-              <NavBar />
-              <div className="flex-1">{children}</div>
-              <Footer />
+              <BrainScopeProvider>
+                <NavBar />
+                <div className="flex-1">{children}</div>
+                <Footer />
+              </BrainScopeProvider>
             </BrainConfigProvider>
           </SupabaseProvider>
         </ToastProvider>
