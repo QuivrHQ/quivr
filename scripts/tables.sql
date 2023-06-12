@@ -1,3 +1,6 @@
+-- Drop users table if it already exists
+DROP TABLE IF EXISTS users;
+
 -- Create users table
 CREATE TABLE IF NOT EXISTS users(
     user_id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
@@ -57,7 +60,7 @@ END;
 $$;
 
 -- Create stats table
-CREATE TABLE stats (
+CREATE TABLE IF NOT EXISTS stats (
     time TIMESTAMP,
     chat BOOLEAN,
     embedding BOOLEAN,
