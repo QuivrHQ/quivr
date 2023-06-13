@@ -1,6 +1,6 @@
 "use client";
-import useChatsContext from "@/app/chat/ChatsProvider/hooks/useChatsContext";
-import Button from "../../../../components/ui/Button";
+import Button from "@/lib/components/ui/Button";
+import useChatsContext from "@/lib/context/ChatsProvider/hooks/useChatsContext";
 import { ConfigButton } from "./ConfigButton";
 import { MicButton } from "./MicButton";
 
