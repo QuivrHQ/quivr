@@ -57,7 +57,7 @@ END;
 $$;
 
 -- Create stats table
-CREATE TABLE stats (
+CREATE TABLE IF NOT EXISTS stats (
     time TIMESTAMP,
     chat BOOLEAN,
     embedding BOOLEAN,
