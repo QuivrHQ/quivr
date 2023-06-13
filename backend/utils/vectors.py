@@ -66,6 +66,7 @@ def create_vector(user_id,doc, user_openai_api_key=None):
                 {"user_id": user_id}).match({"id": sids[0]}).execute()
     except Exception as e:
         logger.error(f"Error creating vector for document {e}")
+    return sids
 
 def create_user(email, date):
     logger.info(f"New user entry in db document for user {email}")

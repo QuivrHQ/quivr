@@ -51,7 +51,7 @@ async def process_file(file: UploadFile, loader_class, file_suffix, enable_summa
         }
         doc_with_metadata = Document(
             page_content=doc.page_content, metadata=metadata)
-        create_vector(user.email, doc_with_metadata, user_openai_api_key)
+        ids = create_vector(user.email, doc_with_metadata, user_openai_api_key)
             #     add_usage(stats_db, "embedding", "audio", metadata={"file_name": file_meta_name,"file_type": ".txt", "chunk_size": chunk_size, "chunk_overlap": chunk_overlap})
 
         if enable_summarization and ids and len(ids) > 0:
