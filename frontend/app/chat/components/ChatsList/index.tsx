@@ -1,5 +1,5 @@
 "use client";
-import useChatsContext from "../../ChatsProvider/hooks/useChatsContext";
+import useChatsContext from "@/lib/context/ChatsProvider/hooks/useChatsContext";
 import ChatsListItem from "./ChatsListItem";
 import { NewChatButton } from "./NewChatButton";
 export function ChatsList() {

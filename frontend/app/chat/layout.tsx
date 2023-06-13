@@ -1,8 +1,8 @@
 "use client";
+import { ChatsProvider } from "@/lib/context/ChatsProvider/chats-provider";
 import { redirect } from "next/navigation";
 import { FC, ReactNode } from "react";
 import { useSupabase } from "../supabase-provider";
-import { ChatsProvider } from "./ChatsProvider/chats-provider";
 import { ChatsList } from "./components";
 
 interface LayoutProps {
