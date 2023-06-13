@@ -31,7 +31,9 @@ export function ChatsList() {
           animate={{
             width: open ? "fit-content" : "0px",
             opacity: open ? 1 : 0.5,
-            boxShadow: open ? "none" : "10px 10px 16px rgba(0, 0, 0, 0.5)",
+            boxShadow: open
+              ? "10px 10px 16px rgba(0, 0, 0, 0)"
+              : "10px 10px 16px rgba(0, 0, 0, 0.5)",
             // shadow: open ? "none" : "10px 10px 16px black",
           }}
           className={cn("overflow-hidden")}
