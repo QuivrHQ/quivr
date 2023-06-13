@@ -1,8 +1,8 @@
 "use client";
 
+import Field from "@/lib/components/ui/Field";
 import { BrainConfig } from "@/lib/context/BrainConfigProvider/types";
 import { UseFormRegister } from "react-hook-form";
-import Field from "../../components/ui/Field";
 
 interface BackendConfigProps {
   register: UseFormRegister<BrainConfig>;

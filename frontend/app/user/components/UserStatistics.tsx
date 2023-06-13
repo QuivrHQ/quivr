@@ -1,5 +1,5 @@
 "use client";
-import Button from "@/app/components/ui/Button";
+import Button from "@/lib/components/ui/Button";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import prettyBytes from "pretty-bytes";

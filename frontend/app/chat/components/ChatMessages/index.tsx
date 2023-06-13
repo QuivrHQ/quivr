@@ -1,5 +1,5 @@
 "use client";
-import Card from "@/app/components/ui/Card";
+import Card from "@/lib/components/ui/Card";
 import { FC, useEffect, useRef } from "react";
 import useChatsContext from "../../ChatsProvider/hooks/useChatsContext";
 import ChatMessage from "./ChatMessage";

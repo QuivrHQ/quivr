@@ -1,10 +1,10 @@
 "use client";
+import Button from "@/lib/components/ui/Button";
 import { useAxios } from "@/lib/useAxios";
 import { AnimatePresence, motion } from "framer-motion";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { useEffect, useState } from "react";
-import Button from "../components/ui/Button";
 import Spinner from "../components/ui/Spinner";
 import { useSupabase } from "../supabase-provider";
 import DocumentItem from "./DocumentItem";

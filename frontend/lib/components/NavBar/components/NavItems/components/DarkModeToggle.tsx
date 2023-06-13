@@ -1,5 +1,5 @@
 "use client";
-import Button from "@/app/components/ui/Button";
+import Button from "@/lib/components/ui/Button";
 import { FC, useEffect, useLayoutEffect, useState } from "react";
 import { MdDarkMode, MdLightMode } from "react-icons/md";
 

@@ -1,7 +1,7 @@
 "use client";
 
+import Button from "@/lib/components/ui/Button";
 import { useRouter } from "next/navigation";
-import Button from "../../components/ui/Button";
 import { useConfig } from "../hooks/useConfig";
 import { BackendConfig } from "./BackendConfig";
 import { ModelConfig } from "./ModelConfig";

@@ -1,4 +1,4 @@
-import Button from "@/app/components/ui/Button";
+import Button from "@/lib/components/ui/Button";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
