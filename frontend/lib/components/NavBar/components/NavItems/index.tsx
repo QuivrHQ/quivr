@@ -1,6 +1,6 @@
 "use client";
-import Button from "@/app/components/ui/Button";
 import { useSupabase } from "@/app/supabase-provider";
+import Button from "@/lib/components/ui/Button";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { Dispatch, FC, HTMLAttributes, SetStateAction } from "react";

@@ -1,5 +1,6 @@
 "use client";
 
+import Field from "@/lib/components/ui/Field";
 import {
   BrainConfig,
   Model,
@@ -8,7 +9,6 @@ import {
   paidModels,
 } from "@/lib/context/BrainConfigProvider/types";
 import { UseFormRegister } from "react-hook-form";
-import Field from "../../components/ui/Field";
 
 interface ModelConfigProps {
   register: UseFormRegister<BrainConfig>;

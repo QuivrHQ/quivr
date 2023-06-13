@@ -1,7 +1,7 @@
 "use client";
-import Button from "@/app/components/ui/Button";
-import Card from "@/app/components/ui/Card";
-import Field from "@/app/components/ui/Field";
+import Button from "@/lib/components/ui/Button";
+import Card from "@/lib/components/ui/Card";
+import Field from "@/lib/components/ui/Field";
 import { useCrawler } from "./hooks/useCrawler";
 
 export const Crawler = (): JSX.Element => {

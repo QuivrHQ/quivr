@@ -1,6 +1,6 @@
 "use client";
-import Button from "@/app/components/ui/Button";
 import { useSupabase } from "@/app/supabase-provider";
+import Button from "@/lib/components/ui/Button";
 import { useToast } from "@/lib/hooks/useToast";
 import { useState } from "react";
 
