@@ -1,10 +1,10 @@
 "use client";
+import Button from "@/app/components/ui/Button";
 import { useSupabase } from "@/app/supabase-provider";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { Dispatch, FC, HTMLAttributes, SetStateAction } from "react";
 import { MdPerson, MdSettings } from "react-icons/md";
-import Button from "../../../ui/Button";
 import { AuthButtons } from "./components/AuthButtons";
 import { DarkModeToggle } from "./components/DarkModeToggle";
 import { NavLink } from "./components/NavLink";
