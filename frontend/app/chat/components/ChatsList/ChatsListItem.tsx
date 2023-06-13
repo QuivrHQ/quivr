@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { FC } from "react";
 import { FiTrash2 } from "react-icons/fi";
 import { MdChatBubbleOutline } from "react-icons/md";
-import { Chat } from "../../types";
+import { Chat } from "../../../../lib/types/Chat";
 
 interface ChatsListItemProps {
   chat: Chat;

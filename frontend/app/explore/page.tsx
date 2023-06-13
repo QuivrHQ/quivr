@@ -5,10 +5,10 @@ import { AnimatePresence, motion } from "framer-motion";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { useEffect, useState } from "react";
+import { Document } from "../../lib/types/Document";
 import Spinner from "../components/ui/Spinner";
 import { useSupabase } from "../supabase-provider";
 import DocumentItem from "./DocumentItem";
-import { Document } from "./types";
 
 export default function ExplorePage() {
   const [documents, setDocuments] = useState<Document[]>([]);
