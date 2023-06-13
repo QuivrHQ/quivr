@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { isSpeechRecognitionSupported } from "../../helpers/isSpeechRecognitionSupported";
+import { isSpeechRecognitionSupported } from "../../../../app/chat/helpers/isSpeechRecognitionSupported";
 import useChatsContext from "./useChatsContext";
 
 export const useSpeech = () => {
