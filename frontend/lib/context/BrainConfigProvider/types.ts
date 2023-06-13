@@ -31,16 +31,14 @@ export const anthropicModels = [
 
 // export const googleModels = ["vertexai"] as const; ## TODO activate when not in demo mode
 
-export const googleModels = [] as const; 
+export const googleModels = [] as const;
 export const models = [
   ...openAiModels,
   ...anthropicModels,
   ...googleModels,
 ] as const;
 
-export const paidModels= [
-  ...openAiPaidModels,
-] as const;
+export const paidModels = [...openAiPaidModels] as const;
 
 export type PaidModels = (typeof paidModels)[number];
 
