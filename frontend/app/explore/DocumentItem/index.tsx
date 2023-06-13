@@ -13,7 +13,7 @@ import {
   forwardRef,
   useState,
 } from "react";
-import { Document } from "../types";
+import { Document } from "../../../lib/types/Document";
 import DocumentData from "./DocumentData";
 
 interface DocumentProps {

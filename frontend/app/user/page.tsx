@@ -3,9 +3,9 @@ import Spinner from "@/lib/components/ui/Spinner";
 import { useAxios } from "@/lib/useAxios";
 import { redirect } from "next/navigation";
 import { useEffect, useState } from "react";
+import { UserStats } from "../../lib/types/User";
 import { useSupabase } from "../supabase-provider";
 import { UserStatistics } from "./components/UserStatistics";
-import { UserStats } from "./types";
 
 export default function UserPage() {
   const [userStats, setUserStats] = useState<UserStats>();
