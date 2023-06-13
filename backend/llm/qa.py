@@ -129,5 +129,6 @@ def get_qa_llm(chat_message: ChatMessage, user_id: str, user_openai_api_key: str
                 vector_store.as_retriever(), memory=memory, verbose=False, 
                 return_source_documents=with_sources,
                 max_tokens_limit=102400)
+        qa.combine_docs_chain = load_qa_chain(ChatAnthropic(), chain_type="stuff", prompt=LANGUAGE_PROMPT.QA_PROMPT)
     
     return qa
