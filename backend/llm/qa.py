@@ -107,7 +107,7 @@ def get_qa_llm(chat_message: ChatMessage, user_id: str, user_openai_api_key: str
     
     qa = None
     # this overwrites the built-in prompt of the ConversationalRetrievalChain
-    doc_chain = load_qa_chain(OpenAI(temperature=0), chain_type="stuff", prompt=LANGUAGE_PROMPT.QA_PROMPT)
+    
     if chat_message.model.startswith("gpt"):
         qa = ConversationalRetrievalChain.from_llm(
             ChatOpenAI(
@@ -116,10 +116,12 @@ def get_qa_llm(chat_message: ChatMessage, user_id: str, user_openai_api_key: str
                 vector_store.as_retriever(), memory=memory, verbose=True, 
                 return_source_documents=with_sources,
                 max_tokens_limit=1024)
+        qa.combine_docs_chain = load_qa_chain(OpenAI(temperature=0), chain_type="stuff", prompt=LANGUAGE_PROMPT.QA_PROMPT)
     elif chat_message.model.startswith("vertex"):
         qa = ConversationalRetrievalChain.from_llm(
             ChatVertexAI(), vector_store.as_retriever(), memory=memory, verbose=True, 
             return_source_documents=with_sources, max_tokens_limit=1024)
+        qa.combine_docs_chain = load_qa_chain(ChatVertexAI(), chain_type="stuff", prompt=LANGUAGE_PROMPT.QA_PROMPT)
     elif anthropic_api_key and chat_message.model.startswith("claude"):
         qa = ConversationalRetrievalChain.from_llm(
             ChatAnthropic(
@@ -127,5 +129,5 @@ def get_qa_llm(chat_message: ChatMessage, user_id: str, user_openai_api_key: str
                 vector_store.as_retriever(), memory=memory, verbose=False, 
                 return_source_documents=with_sources,
                 max_tokens_limit=102400)
-    qa.combine_docs_chain = doc_chain
+    
     return qa
