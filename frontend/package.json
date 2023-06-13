@@ -9,7 +9,9 @@
     "lint": "next lint",
     "test-type": "tsc --noEmit --emitDeclarationOnly false",
     "test": "yarn test-type",
-    "precommit": "yarn lint && yarn test"
+    "precommit": "yarn lint && yarn test",
+    "format-check": "prettier --check .",
+    "format-fix": "prettier --write ."
   },
   "dependencies": {
     "@emotion/react": "^11.11.0",
@@ -39,6 +41,7 @@
     "framer-motion": "^10.12.12",
     "next": "13.4.2",
     "postcss": "8.4.23",
+    "prettier": "^2.8.8",
     "pretty-bytes": "^6.1.0",
     "react": "18.2.0",
     "react-dom": "18.2.0",

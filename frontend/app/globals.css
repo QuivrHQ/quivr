@@ -1,13 +1,13 @@
-@import 'tailwindcss/base';
-@import 'tailwindcss/components';
-@import 'tailwindcss/utilities';
-
+@import "tailwindcss/base";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";
 
 main {
   @apply max-w-screen-xl mx-auto flex flex-col;
 }
 
-header, section {
+header,
+section {
   @apply px-5 md:px-10;
 }
 
