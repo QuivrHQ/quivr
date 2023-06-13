@@ -1,4 +1,4 @@
-import Button from "@/app/components/ui/Button";
+import Button from "@/lib/components/ui/Button";
 
 import { useGoogleLogin } from "./hooks/useGoogleLogin";
 

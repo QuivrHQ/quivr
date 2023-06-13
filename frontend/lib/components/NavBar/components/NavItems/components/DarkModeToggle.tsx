@@ -1,7 +1,7 @@
 "use client";
+import Button from "@/lib/components/ui/Button";
 import { FC, useEffect, useLayoutEffect, useState } from "react";
 import { MdDarkMode, MdLightMode } from "react-icons/md";
-import Button from "../../../../ui/Button";
 
 export const DarkModeToggle: FC = () => {
   const [dark, setDark] = useState(false);

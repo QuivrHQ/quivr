@@ -1,14 +1,14 @@
 "use client";
+import Button from "@/lib/components/ui/Button";
+import Spinner from "@/lib/components/ui/Spinner";
+import { Document } from "@/lib/types/Document";
 import { useAxios } from "@/lib/useAxios";
 import { AnimatePresence, motion } from "framer-motion";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { useEffect, useState } from "react";
-import Button from "../components/ui/Button";
-import Spinner from "../components/ui/Spinner";
 import { useSupabase } from "../supabase-provider";
 import DocumentItem from "./DocumentItem";
-import { Document } from "./types";
 
 export default function ExplorePage() {
   const [documents, setDocuments] = useState<Document[]>([]);

@@ -1,9 +1,9 @@
 "use client";
+import Button from "@/lib/components/ui/Button";
 import { motion, useScroll, useSpring, useTransform } from "framer-motion";
 import Link from "next/link";
 import { FC, useRef } from "react";
 import { MdNorthEast } from "react-icons/md";
-import Button from "../components/ui/Button";
 
 const Hero: FC = () => {
   const targetRef = useRef<HTMLDivElement | null>(null);

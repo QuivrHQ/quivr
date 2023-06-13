@@ -1,3 +1,4 @@
+import Card from "@/lib/components/ui/Card";
 import { FC, ReactNode } from "react";
 import {
   GiArtificialIntelligence,
@@ -7,7 +8,6 @@ import {
   GiLockedDoor,
   GiOpenBook,
 } from "react-icons/gi";
-import Card from "../components/ui/Card";
 
 const Features: FC = () => {
   return (

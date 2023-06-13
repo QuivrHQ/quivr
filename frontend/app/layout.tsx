@@ -1,11 +1,11 @@
+import Footer from "@/lib/components/Footer";
+import { NavBar } from "@/lib/components/NavBar";
+import { ToastProvider } from "@/lib/components/ui/Toast";
 import { createServerComponentSupabaseClient } from "@supabase/auth-helpers-nextjs";
 import { Analytics } from "@vercel/analytics/react";
 import { Inter } from "next/font/google";
 import { cookies, headers } from "next/headers";
 import { BrainConfigProvider } from "../lib/context/BrainConfigProvider/brain-config-provider";
-import Footer from "./components/Footer";
-import { NavBar } from "./components/NavBar";
-import { ToastProvider } from "./components/ui/Toast";
 import "./globals.css";
 import SupabaseProvider from "./supabase-provider";
 

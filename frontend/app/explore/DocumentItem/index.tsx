@@ -1,6 +1,9 @@
 "use client";
-import Ellipsis from "@/app/components/ui/Ellipsis";
 import { useSupabase } from "@/app/supabase-provider";
+import Button from "@/lib/components/ui/Button";
+import { AnimatedCard } from "@/lib/components/ui/Card";
+import Ellipsis from "@/lib/components/ui/Ellipsis";
+import Modal from "@/lib/components/ui/Modal";
 import { useToast } from "@/lib/hooks/useToast";
 import { useAxios } from "@/lib/useAxios";
 import {
@@ -10,10 +13,7 @@ import {
   forwardRef,
   useState,
 } from "react";
-import Button from "../../components/ui/Button";
-import { AnimatedCard } from "../../components/ui/Card";
-import Modal from "../../components/ui/Modal";
-import { Document } from "../types";
+import { Document } from "../../../lib/types/Document";
 import DocumentData from "./DocumentData";
 
 interface DocumentProps {
