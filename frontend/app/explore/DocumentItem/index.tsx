@@ -3,6 +3,7 @@ import Ellipsis from "@/app/components/ui/Ellipsis";
 import { useSupabase } from "@/app/supabase-provider";
 import { useToast } from "@/lib/hooks/useToast";
 import { useAxios } from "@/lib/useAxios";
+import { motion } from "framer-motion";
 import {
   Dispatch,
   RefObject,
@@ -11,7 +12,6 @@ import {
   useState,
 } from "react";
 import Button from "../../components/ui/Button";
-import { AnimatedCard } from "../../components/ui/Card";
 import Modal from "../../components/ui/Modal";
 import { Document } from "../types";
 import DocumentData from "./DocumentData";
@@ -45,13 +45,13 @@ const DocumentItem = forwardRef(
     };
 
     return (
-      <AnimatedCard
+      <motion.div
         initial={{ x: -64, opacity: 0 }}
         animate={{ x: 0, opacity: 1 }}
         exit={{ x: 64, opacity: 0 }}
         layout
         ref={forwardedRef as RefObject<HTMLDivElement>}
-        className="flex flex-col sm:flex-row sm:items-center justify-between w-full p-5 gap-5"
+        className="flex flex-col sm:flex-row sm:items-center justify-between w-full p-5 gap-5 border-b last:border-none border-black/10 dark:border-white/25"
       >
         <Ellipsis tooltip maxCharacters={30}>
           {document.name}
@@ -85,7 +85,7 @@ const DocumentItem = forwardRef(
             <p>{document.name}</p>
           </Modal>
         </div>
-      </AnimatedCard>
+      </motion.div>
     );
   }
 );
