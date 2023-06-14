@@ -5,6 +5,7 @@ import { AnimatedCard } from "@/lib/components/ui/Card";
 import Ellipsis from "@/lib/components/ui/Ellipsis";
 import Modal from "@/lib/components/ui/Modal";
 import { useToast } from "@/lib/hooks/useToast";
+import { Document } from "@/lib/types/Document";
 import { useAxios } from "@/lib/useAxios";
 import {
   Dispatch,
@@ -13,7 +14,6 @@ import {
   forwardRef,
   useState,
 } from "react";
-import { Document } from "../../../lib/types/Document";
 import DocumentData from "./DocumentData";
 
 interface DocumentProps {
