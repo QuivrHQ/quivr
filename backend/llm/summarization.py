@@ -9,7 +9,7 @@ logger = get_logger(__name__)
 
 openai_api_key = os.environ.get("OPENAI_API_KEY")
 openai.api_key = openai_api_key
-summary_llm = guidance.llms.OpenAI('gpt-3.5-turbo', caching=False)
+summary_llm = guidance.llms.OpenAI('gpt-3.5-turbo-0613', caching=False)
 
 
 def llm_summerize(document):
@@ -40,7 +40,7 @@ def llm_evaluate_summaries(question, summaries, model):
     if not model.startswith('gpt'):
         logger.info(
             f'Model {model} not supported. Using gpt-3.5-turbo instead.')
-        model = 'gpt-3.5-turbo'
+        model = 'gpt-3.5-turbo-0613'
     logger.info(f'Evaluating summaries with {model}')
     evaluation_llm = guidance.llms.OpenAI(model, caching=False)
     evaluation = guidance("""
