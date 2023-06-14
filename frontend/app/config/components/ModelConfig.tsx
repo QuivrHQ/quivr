@@ -34,7 +34,7 @@ export const ModelConfig = ({
       case "gpt-3.5-turbo-0613":
         return 3000;
       case "gpt-3.5-turbo-16k":
-        return 15000;
+        return 14000;
       case "gpt-4":
         return 6000;
       case "gpt-4-0613":
