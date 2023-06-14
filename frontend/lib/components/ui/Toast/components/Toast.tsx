@@ -13,7 +13,9 @@ import { useToastBuilder } from "../hooks/useToastBuilder";
 export const Toast = ({
   children,
   ...toastProviderProps
-}: { children?: ReactNode } & ToastPrimitive.ToastProviderProps) => {
+}: {
+  children?: ReactNode;
+} & ToastPrimitive.ToastProviderProps): JSX.Element => {
   const { publish, toasts, toggleToast } = useToastBuilder();
 
   return (
@@ -22,7 +24,9 @@ export const Toast = ({
         {children}
         <AnimatePresence mode="popLayout">
           {toasts.map((toast) => {
-            if (!toast.open) {return;}
+            if (toast.open !== true) {
+              return;
+            }
 
             return (
               <ToastPrimitive.Root

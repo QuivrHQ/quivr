@@ -60,7 +60,7 @@ const Modal = ({
                     {children}
 
                     <Dialog.Close asChild>
-                      {CloseTrigger ? (
+                      {CloseTrigger !== undefined ? (
                         CloseTrigger
                       ) : (
                         <Button variant={"secondary"} className="self-end">

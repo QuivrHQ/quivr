@@ -7,6 +7,8 @@ import { Toast } from "./Toast";
 export const ToastProvider = ({
   children,
   ...toastProviderProps
-}: { children?: ReactNode } & ToastPrimitive.ToastProviderProps) => {
+}: {
+  children?: ReactNode;
+} & ToastPrimitive.ToastProviderProps): JSX.Element => {
   return <Toast {...toastProviderProps}>{children}</Toast>;
 };

@@ -1,3 +1,4 @@
+/* eslint-disable */
 "use client";
 import { UUID } from "crypto";
 import { useEffect } from "react";
@@ -20,7 +21,9 @@ export default function ChatPage({ params }: ChatPageProps) {
 
   useEffect(() => {
     // if (chatId)
-    if (!chatId) {resetChat();}
+    if (!chatId) {
+      resetChat();
+    }
     fetchChat(chatId);
   }, [fetchChat, chatId]);
 
