@@ -107,9 +107,9 @@ module.exports = {
   parserOptions: {
     ecmaVersion: 9,
     sourceType: "module",
-    "babelOptions": {
-      "presets": [require.resolve('next/babel')]
-    }
+    babelOptions: {
+      presets: [require.resolve("next/babel")],
+    },
   },
   overrides: [
     {
@@ -123,7 +123,7 @@ module.exports = {
       parserOptions: {
         project: "./tsconfig.eslint.json",
         tsconfigRootDir: __dirname,
-        sourceType: "module"
+        sourceType: "module",
       },
       rules: {
         "@typescript-eslint/prefer-optional-chain": "error",

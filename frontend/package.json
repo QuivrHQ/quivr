@@ -7,6 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "lint-fix": "eslint --fix .",
     "test-type": "tsc --noEmit --emitDeclarationOnly false",
     "test": "yarn test-type",
     "precommit": "yarn lint && yarn test",
