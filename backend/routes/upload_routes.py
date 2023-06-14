@@ -1,6 +1,6 @@
 import os
 
-from auth.auth_bearer import JWTBearer, get_current_user
+from auth.auth_bearer import AuthBearer, get_current_user
 from fastapi import APIRouter, Depends, Request, UploadFile
 from models.users import User
 from utils.file import convert_bytes, get_file_size
@@ -23,7 +23,7 @@ def calculate_remaining_space(request, max_brain_size, max_brain_size_with_own_k
     remaining_free_space = float(max_brain_size_with_own_key) - current_brain_size if request.headers.get('Openai-Api-Key') else float(max_brain_size) - current_brain_size
     return remaining_free_space
 
-@upload_router.post("/upload", dependencies=[Depends(JWTBearer())])
+@upload_router.post("/upload", dependencies=[Depends(AuthBearer())])
 async def upload_file(request: Request, commons: CommonsDep,  file: UploadFile, enable_summarization: bool = False, current_user: User = Depends(get_current_user)):
     max_brain_size = os.getenv("MAX_BRAIN_SIZE")
     max_brain_size_with_own_key = os.getenv("MAX_BRAIN_SIZE_WITH_KEY",209715200)

@@ -10,6 +10,7 @@ from routes.explore_routes import explore_router
 from routes.misc_routes import misc_router
 from routes.upload_routes import upload_router
 from routes.user_routes import user_router
+from routes.api_key_routes import api_key_router
 
 logger = get_logger(__name__)
 
@@ -29,3 +30,4 @@ app.include_router(explore_router)
 app.include_router(misc_router)
 app.include_router(upload_router)
 app.include_router(user_router)
+app.include_router(api_key_router)
