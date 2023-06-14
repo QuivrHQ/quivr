@@ -28,11 +28,17 @@ export function ChatInput() {
         className="w-full p-2 border border-gray-300 dark:border-gray-500 outline-none rounded dark:bg-gray-800"
         placeholder="Begin conversation here..."
       />
-      <Button type="submit" isLoading={isSendingMessage}>
+      <Button
+        className="px-3 py-2 sm:px-4 sm:py-2"
+        type="submit"
+        isLoading={isSendingMessage}
+      >
         {isSendingMessage ? "Thinking..." : "Chat"}
       </Button>
-      <MicButton />
-      <ConfigButton />
+      <div className="flex items-center">
+        <MicButton />
+        <ConfigButton />
+      </div>
     </form>
   );
 }
