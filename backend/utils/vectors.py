@@ -110,22 +110,21 @@ def similarity_search(query, table='match_summaries', top_k=5, threshold=0.5):
     ).execute()
     return summaries.data
 
-def fetch_user_id_from_credentials(commons: CommonsDep,date,credentials):
-    user = User(email=credentials.get('email', 'none'))
+def fetch_user_id_from_credentials(commons: CommonsDep, date, credentials):
+    user = User(email=credentials.get('email', 'none'), user_id=credentials.get('user_id'))
 
-    # Fetch the user's UUID based on their email
-    response = commons['supabase'].from_('users').select('user_id').filter("email", "eq", user.email).execute()
+    if not user.user_id:
+        # Fetch the user's UUID based on their user_id
+        response = commons['supabase'].from_('users').select('user_id').filter("user_id", "eq", user.user_id).execute()
+        userItem = next(iter(response.data or []), {})
 
-    userItem = next(iter(response.data or []), {})
+        if userItem == {}:
+            create_user_response = create_user(email=user.email, date=date)
+            user.user_id = create_user_response.data[0]['user_id']
+        else:
+            user.user_id = userItem['user_id']
 
-    if userItem == {}: 
-        create_user_response = create_user(email= user.email, date=date)
-        user_id = create_user_response.data[0]['user_id']
-
-    else: 
-        user_id = userItem['user_id']
-
-    return user_id
+    return user.user_id
 
 def get_chat_name_from_first_question(chat_message: ChatMessage):
     # Step 1: Get the summary of the first question        
