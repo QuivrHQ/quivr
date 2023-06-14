@@ -2,7 +2,7 @@ import os
 import time
 
 from fastapi import APIRouter, Depends, Request
-from auth.auth_bearer import JWTBearer, get_current_user
+from auth.auth_bearer import AuthBearer, get_current_user
 from models.users import User
 from utils.vectors import CommonsDep
 
@@ -27,7 +27,7 @@ def get_user_request_stats(commons, email):
         '*').filter("email", "eq", email).execute()
     return requests_stats.data
 
-@user_router.get("/user", dependencies=[Depends(JWTBearer())])
+@user_router.get("/user", dependencies=[Depends(AuthBearer())])
 async def get_user_endpoint(request: Request, commons: CommonsDep, current_user: User = Depends(get_current_user)):
     
     user_vectors = get_user_vectors(commons, current_user.email)
