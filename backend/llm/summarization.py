@@ -64,7 +64,7 @@ Question: {{question}}
 {{#each summaries}}
 Summary
     summary_id: {{this.id}}
-    document_id: {{this.document_id}}
+    document_id: {{this.id}}
     evaluation: ""
     reason: ""
     Summary Content: {{this.content}}

@@ -28,7 +28,7 @@ class CrawlWebsite(BaseModel):
         ## Create a file
         file_name = slugify(self.url) + ".html"
         temp_file_path = os.path.join(tempfile.gettempdir(), file_name)
-        with open(temp_file_path, 'w') as temp_file:
+        with open(temp_file_path, 'w', encoding='utf-8') as temp_file:
             temp_file.write(content)
             ## Process the file
         

@@ -111,6 +111,15 @@ def similarity_search(query, table='match_summaries', top_k=5, threshold=0.5):
     ).execute()
     return summaries.data
 
+def similarity_search_doc(query, func='match_docs', top_k=2, threshold=0.75, email = 'test@test.com'):
+    query_embedding = create_embedding(query)
+    summaries = supabase_client.rpc(
+        func, {'query_embedding': query_embedding,
+                'match_count': top_k, 'match_threshold': threshold,
+                'p_user_id': email}
+    ).execute()
+    return summaries.data
+
 def fetch_user_id_from_credentials(commons: CommonsDep,date,credentials):
     user = User(email=credentials.get('email', 'none'))
 
@@ -138,7 +147,7 @@ def get_chat_name_from_first_question(chat_message: ChatMessage):
    
 def get_answer(commons: CommonsDep,  chat_message: ChatMessage, email: str, user_openai_api_key:str):
     qa = get_qa_llm(chat_message, email, user_openai_api_key)
-
+    additional_context = ''
     if chat_message.use_summarization:
         # 1. get summaries from the vector store based on question
         summaries = similarity_search(
@@ -156,6 +165,17 @@ def get_answer(commons: CommonsDep,  chat_message: ChatMessage, email: str, user
             ) + '\n'
         model_response = qa(
             {"question": additional_context + chat_message.question})
+    
+    elif chat_message.use_docs:
+        results = similarity_search_doc(
+            chat_message.question, email = email)
+        if results:
+            additional_context = '---\nAdditional Context={}'.format(
+                '---\n'.join(data['content'] for data in results)
+            ) + '\n'
+        model_response = qa(
+            {"question": additional_context + chat_message.question})          
+
     else:
         model_response = qa({"question": chat_message.question})
 

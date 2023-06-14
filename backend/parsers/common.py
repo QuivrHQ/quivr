@@ -33,11 +33,11 @@ async def process_file(file: UploadFile, loader_class, file_suffix, enable_summa
     os.remove(tmp_file.name)
     chunk_size = 500
     chunk_overlap = 0
-
-    text_splitter = RecursiveCharacterTextSplitter.from_tiktoken_encoder(
-        chunk_size=chunk_size, chunk_overlap=chunk_overlap)
-
-    documents = text_splitter.split_documents(documents)
+    if file_suffix not in [".csv"]:
+        text_splitter = RecursiveCharacterTextSplitter.from_tiktoken_encoder(
+            chunk_size=chunk_size, chunk_overlap=chunk_overlap)
+    
+        documents = text_splitter.split_documents(documents)
 
     for doc in documents:
         metadata = {

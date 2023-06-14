@@ -26,7 +26,7 @@ export default function ChatPage({ params }: ChatPageProps) {
     <main className="flex flex-col w-full pt-10">
       <section className="flex flex-col flex-1 items-center w-full h-full min-h-screen">
         <PageHeading
-          title="Chat with your brain"
+          title="Chat with Aesop"
           subtitle="Talk to a language model about your uploaded data"
         />
         <div className="relative h-full w-full flex flex-col flex-1 items-center">
