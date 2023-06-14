@@ -103,3 +103,14 @@ BEGIN
     LIMIT match_count;
 END;
 $$;
+
+-- Create api_keys table
+CREATE TABLE IF NOT EXISTS api_keys(
+    key_id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    user_id UUID REFERENCES users(user_id),
+    api_key TEXT UNIQUE,
+    creation_time TIMESTAMP DEFAULT current_timestamp,
+    deleted_time TIMESTAMP,
+    is_active BOOLEAN DEFAULT true
+);
+
