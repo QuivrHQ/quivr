@@ -5,5 +5,6 @@ export function isSpeechRecognitionSupported() {
   ) {
     return true;
   }
+
   return false;
 }

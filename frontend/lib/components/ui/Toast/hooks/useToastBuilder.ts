@@ -1,4 +1,5 @@
 import { useState } from "react";
+
 import { ToastContent, ToastData, ToastPublisher } from "../domain/types";
 import { generateToastUniqueId } from "../helpers/generateToastUniqueId";
 
@@ -12,6 +13,7 @@ export const useToastBuilder = () => {
         if (toast.id === toastId) {
           toast.open = value;
         }
+
         return toast;
       })
     );

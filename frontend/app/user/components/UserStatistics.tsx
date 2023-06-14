@@ -1,18 +1,21 @@
 "use client";
-import Button from "@/lib/components/ui/Button";
-import { cn } from "@/lib/utils";
 import Link from "next/link";
 import prettyBytes from "pretty-bytes";
 import { HTMLAttributes } from "react";
-import { UserStats } from "../../../lib/types/User";
+
+import Button from "@/lib/components/ui/Button";
+import { cn } from "@/lib/utils";
+
 import { BrainConsumption } from "./BrainConsumption";
 import { DateComponent } from "./Date";
 import BrainSpaceChart from "./Graphs/BrainSpaceChart";
 import { RequestsPerDayChart } from "./Graphs/RequestsPerDayChart";
+import { UserStats } from "../../../lib/types/User";
 
 export const UserStatistics = (userStats: UserStats): JSX.Element => {
   const { email, current_brain_size, max_brain_size, date, requests_stats } =
     userStats;
+
   return (
     <>
       <div className="flex flex-col sm:flex-row sm:items-center py-10 gap-5">

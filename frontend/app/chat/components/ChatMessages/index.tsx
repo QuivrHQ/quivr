@@ -1,7 +1,9 @@
 "use client";
+import { FC, useEffect, useRef } from "react";
+
 import Card from "@/lib/components/ui/Card";
 import useChatsContext from "@/lib/context/ChatsProvider/hooks/useChatsContext";
-import { FC, useEffect, useRef } from "react";
+
 import ChatMessage from "./ChatMessage";
 
 export const ChatMessages: FC = () => {
@@ -10,17 +12,17 @@ export const ChatMessages: FC = () => {
   const { chat } = useChatsContext();
 
   useEffect(() => {
-    if (!chat || !lastChatRef.current) return;
+    if (!chat || !lastChatRef.current) {return;}
 
     // if (chat.history.length > 2) {
-    lastChatRef.current?.scrollIntoView({
+    lastChatRef.current.scrollIntoView({
       behavior: "smooth",
       block: "end",
     });
     // }
   }, [chat, lastChatRef]);
 
-  if (!chat) return null;
+  if (!chat) {return null;}
 
   return (
     <Card className="p-5 max-w-3xl w-full flex flex-col h-full mb-8">

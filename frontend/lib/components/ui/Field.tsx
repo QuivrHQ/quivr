@@ -1,10 +1,11 @@
-import { cn } from "@/lib/utils";
 import {
   DetailedHTMLProps,
+  forwardRef,
   InputHTMLAttributes,
   RefObject,
-  forwardRef,
 } from "react";
+
+import { cn } from "@/lib/utils";
 
 interface FieldProps
   extends DetailedHTMLProps<

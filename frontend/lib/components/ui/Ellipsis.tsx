@@ -1,6 +1,8 @@
 "use client";
-import { cn } from "@/lib/utils";
 import { FC, HTMLAttributes } from "react";
+
+import { cn } from "@/lib/utils";
+
 import Tooltip from "./Tooltip";
 
 interface EllipsisProps extends HTMLAttributes<HTMLDivElement> {

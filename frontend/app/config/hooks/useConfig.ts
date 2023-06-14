@@ -1,8 +1,10 @@
-import { useToast } from "@/lib/hooks/useToast";
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 
 import { useBrainConfig } from "@/lib/context/BrainConfigProvider/hooks/useBrainConfig";
-import { useEffect } from "react";
+import { useToast } from "@/lib/hooks/useToast";
+
+
 
 export const useConfig = () => {
   const { config, updateConfig, resetConfig } = useBrainConfig();

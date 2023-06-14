@@ -1,5 +1,7 @@
-import { useSupabase } from "@/app/supabase-provider";
 import axios from "axios";
+
+import { useSupabase } from "@/app/supabase-provider";
+
 import { useBrainConfig } from "./context/BrainConfigProvider/hooks/useBrainConfig";
 
 const axiosInstance = axios.create({

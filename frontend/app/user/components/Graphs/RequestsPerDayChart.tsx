@@ -28,6 +28,7 @@ export const RequestsPerDayChart: React.FC<RequestsPerDayChartProps> = ({
     .map((date) => {
       const dateString = format(date, "yyyyMMdd");
       const stat = requests_stats.find((s) => s.date === dateString);
+
       return {
         date: format(date, "MM/dd/yyyy"),
         requests_count: stat ? stat.requests_count : 0,

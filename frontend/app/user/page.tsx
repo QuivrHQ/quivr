@@ -1,11 +1,13 @@
 "use client";
+import { redirect } from "next/navigation";
+import { useEffect, useState } from "react";
+
 import Spinner from "@/lib/components/ui/Spinner";
 import { UserStats } from "@/lib/types/User";
 import { useAxios } from "@/lib/useAxios";
-import { redirect } from "next/navigation";
-import { useEffect, useState } from "react";
-import { useSupabase } from "../supabase-provider";
+
 import { UserStatistics } from "./components/UserStatistics";
+import { useSupabase } from "../supabase-provider";
 
 export default function UserPage() {
   const [userStats, setUserStats] = useState<UserStats>();

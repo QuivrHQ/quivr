@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+
 import { useHeader } from "./hooks/useHeader";
 
 export const Header = ({ children }: { children: React.ReactNode }) => {

@@ -1,13 +1,12 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState } from "react";
 import {
-  Session,
   createBrowserSupabaseClient,
+  Session,
 } from "@supabase/auth-helpers-nextjs";
-import { useRouter } from "next/navigation";
-
 import type { SupabaseClient } from "@supabase/auth-helpers-nextjs";
+import { useRouter } from "next/navigation";
+import { createContext, useContext, useEffect, useState } from "react";
 
 type MaybeSession = Session | null;
 

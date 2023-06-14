@@ -3,6 +3,7 @@ import * as Dialog from "@radix-ui/react-dialog";
 import { AnimatePresence, motion } from "framer-motion";
 import { FC, ReactNode, useState } from "react";
 import { MdClose } from "react-icons/md";
+
 import Button from "./Button";
 
 interface ModalProps {
@@ -21,6 +22,7 @@ const Modal: FC<ModalProps> = ({
   CloseTrigger,
 }) => {
   const [open, setOpen] = useState(false);
+
   return (
     <Dialog.Root onOpenChange={setOpen}>
       <Dialog.Trigger asChild>

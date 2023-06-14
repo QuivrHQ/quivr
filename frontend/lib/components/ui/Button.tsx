@@ -1,7 +1,8 @@
-import { cn } from "@/lib/utils";
 import { cva, type VariantProps } from "class-variance-authority";
-import { ButtonHTMLAttributes, FC, LegacyRef, forwardRef } from "react";
+import { ButtonHTMLAttributes, FC, forwardRef, LegacyRef } from "react";
 import { FaSpinner } from "react-icons/fa";
+
+import { cn } from "@/lib/utils";
 
 const ButtonVariants = cva(
   "px-8 py-3 text-sm disabled:opacity-80 text-center font-medium rounded-md focus:ring ring-primary/10 outline-none flex items-center justify-center gap-2 transition-opacity",

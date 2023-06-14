@@ -10,6 +10,7 @@ interface TooltipProps {
 
 const Tooltip: FC<TooltipProps> = ({ children, tooltip }) => {
   const [open, setOpen] = useState(false);
+
   return (
     <TooltipPrimitive.Provider>
       <TooltipPrimitive.Root onOpenChange={setOpen} open={open}>

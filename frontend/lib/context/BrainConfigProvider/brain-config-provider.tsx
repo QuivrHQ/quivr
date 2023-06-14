@@ -1,7 +1,9 @@
 "use client";
 
-import { setEmptyStringsUndefined } from "@/lib/helpers/setEmptyStringsUndefined";
 import { createContext, useEffect, useState } from "react";
+
+import { setEmptyStringsUndefined } from "@/lib/helpers/setEmptyStringsUndefined";
+
 import {
   getBrainConfigFromLocalStorage,
   saveBrainConfigInLocalStorage,

@@ -1,5 +1,6 @@
+import { FC, forwardRef, HTMLAttributes, LegacyRef } from "react";
+
 import { cn } from "@/lib/utils";
-import { FC, HTMLAttributes, LegacyRef, forwardRef } from "react";
 
 type DividerProps = HTMLAttributes<HTMLDivElement> & {
   text?: string;

@@ -1,10 +1,12 @@
-import { cn } from "@/lib/utils";
 import { UUID } from "crypto";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { FC } from "react";
 import { FiTrash2 } from "react-icons/fi";
 import { MdChatBubbleOutline } from "react-icons/md";
+
+import { cn } from "@/lib/utils";
+
 import { Chat } from "../../../../lib/types/Chat";
 
 interface ChatsListItemProps {

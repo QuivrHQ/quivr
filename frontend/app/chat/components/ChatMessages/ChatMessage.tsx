@@ -1,7 +1,8 @@
 "use client";
-import { cn } from "@/lib/utils";
 import { forwardRef, Ref } from "react";
 import ReactMarkdown from "react-markdown";
+
+import { cn } from "@/lib/utils";
 
 const ChatMessage = forwardRef(
   (

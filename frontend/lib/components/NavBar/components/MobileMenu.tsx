@@ -2,10 +2,12 @@ import * as Dialog from "@radix-ui/react-dialog";
 import { AnimatePresence, motion } from "framer-motion";
 import { FC, useState } from "react";
 import { MdClose, MdMenu } from "react-icons/md";
+
 import { NavItems } from "./NavItems";
 
 export const MobileMenu: FC = () => {
   const [open, setOpen] = useState(false);
+
   return (
     <Dialog.Root onOpenChange={setOpen} open={open}>
       <Dialog.Trigger asChild>

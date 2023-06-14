@@ -1,11 +1,13 @@
 "use client";
 
-import Button from "@/lib/components/ui/Button";
 import { useRouter } from "next/navigation";
-import { useConfig } from "../hooks/useConfig";
+
+import Button from "@/lib/components/ui/Button";
+
 import { BackendConfig } from "./BackendConfig";
 import { ModelConfig } from "./ModelConfig";
 import { UserAccountSection } from "./UserAccountSection";
+import { useConfig } from "../hooks/useConfig";
 
 export const ConfigForm = (): JSX.Element => {
   const {
