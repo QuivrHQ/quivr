@@ -1,4 +1,4 @@
-from auth.auth_bearer import JWTBearer, get_current_user
+from auth.auth_bearer import AuthBearer, get_current_user
 from fastapi import APIRouter, Depends
 from models.users import User
 from utils.vectors import CommonsDep
@@ -13,15 +13,15 @@ def get_unique_user_data(commons, user):
     unique_data = [dict(t) for t in set(tuple(d.items()) for d in documents)]
     return unique_data
 
-@explore_router.get("/explore", dependencies=[Depends(JWTBearer())])
+@explore_router.get("/explore", dependencies=[Depends(AuthBearer())])
 async def explore_endpoint(commons: CommonsDep, current_user: User = Depends(get_current_user)):
     unique_data = get_unique_user_data(commons, current_user)
     unique_data.sort(key=lambda x: int(x['size']), reverse=True)
     return {"documents": unique_data}
 
 
-@explore_router.delete("/explore/{file_name}", dependencies=[Depends(JWTBearer())])
-async def delete_endpoint(commons: CommonsDep, file_name: str, credentials: dict = Depends(JWTBearer())):
+@explore_router.delete("/explore/{file_name}", dependencies=[Depends(AuthBearer())])
+async def delete_endpoint(commons: CommonsDep, file_name: str, credentials: dict = Depends(AuthBearer())):
     user = User(email=credentials.get('email', 'none'))
     # Cascade delete the summary from the database first, because it has a foreign key constraint
     commons['supabase'].table("summaries").delete().match(
@@ -30,7 +30,7 @@ async def delete_endpoint(commons: CommonsDep, file_name: str, credentials: dict
         {"metadata->>file_name": file_name, "user_id": user.email}).execute()
     return {"message": f"{file_name} of user {user.email} has been deleted."}
 
-@explore_router.get("/explore/{file_name}", dependencies=[Depends(JWTBearer())])
+@explore_router.get("/explore/{file_name}", dependencies=[Depends(AuthBearer())])
 async def download_endpoint(commons: CommonsDep, file_name: str, current_user: User = Depends(get_current_user)):
     response = commons['supabase'].table("vectors").select(
         "metadata->>file_name, metadata->>file_size, metadata->>file_extension, metadata->>file_url", "content").match({"metadata->>file_name": file_name, "user_id": current_user.email}).execute()

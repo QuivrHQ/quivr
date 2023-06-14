@@ -2,7 +2,7 @@ from datetime import datetime
 import time
 from typing import List
 from pydantic import BaseModel
-from auth.auth_bearer import JWTBearer, get_current_user
+from auth.auth_bearer import AuthBearer, get_current_user
 from fastapi import APIRouter, Depends
 from utils.vectors import fetch_user_id_from_credentials
 from models.users import User
@@ -26,7 +26,7 @@ class ApiKey(BaseModel):
 api_key_router = APIRouter()
 
 
-@api_key_router.post("/api-key", response_model=ApiKey, dependencies=[Depends(JWTBearer())])
+@api_key_router.post("/api-key", response_model=ApiKey, dependencies=[Depends(AuthBearer())])
 async def create_api_key(commons: CommonsDep, current_user: User = Depends(get_current_user)):
 
     date = time.strftime("%Y%m%d")
@@ -60,7 +60,7 @@ async def create_api_key(commons: CommonsDep, current_user: User = Depends(get_c
     return {"api_key": new_api_key}
 
 
-@api_key_router.delete("/api-key/{key_id}", dependencies=[Depends(JWTBearer())])
+@api_key_router.delete("/api-key/{key_id}", dependencies=[Depends(AuthBearer())])
 async def delete_api_key(key_id: str, commons: CommonsDep, current_user: User = Depends(get_current_user)):
     """Delete (deactivate) an API key for current user."""
 
@@ -72,7 +72,7 @@ async def delete_api_key(key_id: str, commons: CommonsDep, current_user: User = 
     return {"message": "API key deleted."}
 
 
-@api_key_router.get("/api-keys", response_model=List[ApiKeyInfo], dependencies=[Depends(JWTBearer())])
+@api_key_router.get("/api-keys", response_model=List[ApiKeyInfo], dependencies=[Depends(AuthBearer())])
 async def get_api_keys(commons: CommonsDep, current_user: User = Depends(get_current_user)):
     """Get all active API keys for current user."""
 

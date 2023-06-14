@@ -2,7 +2,7 @@ import os
 import shutil
 from tempfile import SpooledTemporaryFile
 
-from auth.auth_bearer import JWTBearer, get_current_user
+from auth.auth_bearer import AuthBearer, get_current_user
 from crawl.crawler import CrawlWebsite
 from fastapi import APIRouter, Depends, Request, UploadFile
 from models.users import User
@@ -23,7 +23,7 @@ def get_unique_user_data(commons, user):
     user_unique_vectors = [dict(t) for t in set(tuple(d.items()) for d in documents)]
     return user_unique_vectors
 
-@crawl_router.post("/crawl/", dependencies=[Depends(JWTBearer())])
+@crawl_router.post("/crawl/", dependencies=[Depends(AuthBearer())])
 async def crawl_endpoint(request: Request,commons: CommonsDep, crawl_website: CrawlWebsite, enable_summarization: bool = False, current_user: User = Depends(get_current_user)):
     max_brain_size = os.getenv("MAX_BRAIN_SIZE")
     if request.headers.get('Openai-Api-Key'):
