@@ -17,7 +17,7 @@ export const ApiKeyConfig = (): JSX.Element => {
     }
   };
 
-  const copyToClipboard = async (text) => {
+  const copyToClipboard = async (text: string) => {
     try {
       await navigator.clipboard.writeText(text);
     } catch (err) {
