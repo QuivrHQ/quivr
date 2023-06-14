@@ -1,5 +1,4 @@
 "use client";
-import { FC } from "react";
 import {
   VictoryContainer,
   VictoryPie,
@@ -12,11 +11,11 @@ interface BrainSpaceChartProps extends VictoryPieProps {
   max_brain_size: number;
 }
 
-const BrainSpaceChart: FC<BrainSpaceChartProps> = ({
+const BrainSpaceChart = ({
   current_brain_size,
   max_brain_size,
   ...props
-}) => {
+}: BrainSpaceChartProps): JSX.Element => {
   return (
     <VictoryPie
       data={[

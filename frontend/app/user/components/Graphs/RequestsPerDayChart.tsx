@@ -1,6 +1,5 @@
 "use client";
 import { format, subDays } from "date-fns";
-import React from "react";
 import {
   VictoryAxis,
   VictoryChart,
@@ -20,10 +19,10 @@ interface RequestsPerDayChartProps extends VictoryChartProps {
   requests_stats: RequestStat[];
 }
 
-export const RequestsPerDayChart: React.FC<RequestsPerDayChartProps> = ({
+export const RequestsPerDayChart = ({
   requests_stats,
   ...props
-}) => {
+}: RequestsPerDayChartProps): JSX.Element => {
   const data = Array.from({ length: 7 }, (_, i) => subDays(new Date(), i))
     .map((date) => {
       const dateString = format(date, "yyyyMMdd");

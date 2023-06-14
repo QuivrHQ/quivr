@@ -1,13 +1,13 @@
 "use client";
 import { motion } from "framer-motion";
-import { FC, forwardRef, HTMLAttributes, LegacyRef } from "react";
+import { forwardRef, HTMLAttributes, LegacyRef } from "react";
 
 import { cn } from "@/lib/utils";
 
 type CardProps = HTMLAttributes<HTMLDivElement>;
 
-const Card: FC<CardProps> = forwardRef(
-  ({ children, className, ...props }, ref) => {
+const Card = forwardRef(
+  ({ children, className, ...props }: CardProps, ref): JSX.Element => {
     return (
       <div
         ref={ref as LegacyRef<HTMLDivElement>}

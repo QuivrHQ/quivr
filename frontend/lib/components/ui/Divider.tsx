@@ -1,4 +1,4 @@
-import { FC, forwardRef, HTMLAttributes, LegacyRef } from "react";
+import { forwardRef, HTMLAttributes, LegacyRef } from "react";
 
 import { cn } from "@/lib/utils";
 
@@ -6,8 +6,8 @@ type DividerProps = HTMLAttributes<HTMLDivElement> & {
   text?: string;
 };
 
-const Divider: FC<DividerProps> = forwardRef(
-  ({ className, text, ...props }, ref) => {
+const Divider = forwardRef(
+  ({ className, text, ...props }: DividerProps, ref): JSX.Element => {
     return (
       <div
         ref={ref as LegacyRef<HTMLDivElement>}

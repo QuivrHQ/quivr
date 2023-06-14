@@ -1,14 +1,14 @@
 "use client";
 import * as TooltipPrimitive from "@radix-ui/react-tooltip";
 import { AnimatePresence, motion } from "framer-motion";
-import { FC, ReactNode, useState } from "react";
+import { ReactNode, useState } from "react";
 
 interface TooltipProps {
   children?: ReactNode;
   tooltip?: ReactNode;
 }
 
-const Tooltip: FC<TooltipProps> = ({ children, tooltip }) => {
+const Tooltip = ({ children, tooltip }: TooltipProps): JSX.Element => {
   const [open, setOpen] = useState(false);
 
   return (

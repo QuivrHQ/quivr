@@ -1,5 +1,5 @@
 "use client";
-import { FC, HTMLAttributes } from "react";
+import { HTMLAttributes } from "react";
 
 import { cn } from "@/lib/utils";
 
@@ -11,12 +11,12 @@ interface EllipsisProps extends HTMLAttributes<HTMLDivElement> {
   tooltip?: boolean;
 }
 
-const Ellipsis: FC<EllipsisProps> = ({
+const Ellipsis = ({
   children: originalContent,
   className,
   maxCharacters,
   tooltip = false,
-}) => {
+}: EllipsisProps): JSX.Element => {
   const renderedContent =
     originalContent.length > maxCharacters
       ? `${originalContent.slice(0, maxCharacters)}...`

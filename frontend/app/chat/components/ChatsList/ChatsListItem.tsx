@@ -1,7 +1,6 @@
 import { UUID } from "crypto";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { FC } from "react";
 import { FiTrash2 } from "react-icons/fi";
 import { MdChatBubbleOutline } from "react-icons/md";
 
@@ -14,7 +13,10 @@ interface ChatsListItemProps {
   deleteChat: (id: UUID) => void;
 }
 
-const ChatsListItem: FC<ChatsListItemProps> = ({ chat, deleteChat }) => {
+const ChatsListItem = ({
+  chat,
+  deleteChat,
+}: ChatsListItemProps): JSX.Element => {
   const pathname = usePathname()?.split("/").at(-1);
   const selected = chat.chatId === pathname;
 

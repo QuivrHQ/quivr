@@ -1,5 +1,5 @@
 import { cva, type VariantProps } from "class-variance-authority";
-import { ButtonHTMLAttributes, FC, forwardRef, LegacyRef } from "react";
+import { ButtonHTMLAttributes, forwardRef, LegacyRef } from "react";
 import { FaSpinner } from "react-icons/fa";
 
 import { cn } from "@/lib/utils";
@@ -35,11 +35,18 @@ export interface ButtonProps
   isLoading?: boolean;
 }
 
-const Button: FC<ButtonProps> = forwardRef(
+const Button = forwardRef(
   (
-    { className, children, variant, brightness, isLoading, ...props },
+    {
+      className,
+      children,
+      variant,
+      brightness,
+      isLoading,
+      ...props
+    }: ButtonProps,
     forwardedRef
-  ) => {
+  ): JSX.Element => {
     return (
       <button
         className={cn(ButtonVariants({ variant, brightness, className }))}

@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { Dispatch, FC, HTMLAttributes, SetStateAction } from "react";
+import { Dispatch, HTMLAttributes, SetStateAction } from "react";
 import { MdPerson, MdSettings } from "react-icons/md";
 
 import { useSupabase } from "@/app/supabase-provider";
@@ -15,11 +15,11 @@ interface NavItemsProps extends HTMLAttributes<HTMLUListElement> {
   setOpen?: Dispatch<SetStateAction<boolean>>;
 }
 
-export const NavItems: FC<NavItemsProps> = ({
+export const NavItems = ({
   className,
   setOpen,
   ...props
-}) => {
+}: NavItemsProps): JSX.Element => {
   const { session } = useSupabase();
   const isUserLoggedIn = session?.user !== undefined;
 

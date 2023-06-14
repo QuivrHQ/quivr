@@ -1,10 +1,10 @@
 "use client";
-import { FC, useEffect, useLayoutEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useState } from "react";
 import { MdDarkMode, MdLightMode } from "react-icons/md";
 
 import Button from "@/lib/components/ui/Button";
 
-export const DarkModeToggle: FC = () => {
+export const DarkModeToggle = (): JSX.Element => {
   const [dark, setDark] = useState(false);
 
   useLayoutEffect(() => {
