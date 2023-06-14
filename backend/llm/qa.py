@@ -12,7 +12,6 @@ from langchain.memory import ConversationBufferMemory
 from langchain.vectorstores import SupabaseVectorStore
 from llm import LANGUAGE_PROMPT
 from models.chats import ChatMessage
-
 from supabase import Client, create_client
 
 
@@ -116,7 +115,7 @@ def get_qa_llm(chat_message: ChatMessage, user_id: str, user_openai_api_key: str
                 vector_store.as_retriever(), memory=memory, verbose=True, 
                 return_source_documents=with_sources,
                 max_tokens_limit=1024)
-        qa.combine_docs_chain = load_qa_chain(OpenAI(temperature=0), chain_type="stuff", prompt=LANGUAGE_PROMPT.QA_PROMPT)
+        qa.combine_docs_chain = load_qa_chain(OpenAI(temperature=chat_message.temperature, model_name=chat_message.model, max_tokens=chat_message.max_tokens), chain_type="stuff", prompt=LANGUAGE_PROMPT.QA_PROMPT)
     elif chat_message.model.startswith("vertex"):
         qa = ConversationalRetrievalChain.from_llm(
             ChatVertexAI(), vector_store.as_retriever(), memory=memory, verbose=True, 
