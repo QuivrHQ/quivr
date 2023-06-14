@@ -4,8 +4,8 @@ import { ReactNode } from "react";
 
 import { ChatsProvider } from "@/lib/context/ChatsProvider/chats-provider";
 
-import { useSupabase } from "../supabase-provider";
 import { ChatsList } from "./components";
+import { useSupabase } from "../supabase-provider";
 
 interface LayoutProps {
   children?: ReactNode;

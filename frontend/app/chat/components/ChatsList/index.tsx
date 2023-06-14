@@ -7,7 +7,8 @@ import { MdChevronRight } from "react-icons/md";
 
 import ChatsListItem from "./ChatsListItem";
 import { NewChatButton } from "./NewChatButton";
-export function ChatsList() {
+
+export const ChatsList = (): JSX.Element => {
   const { allChats, deleteChat } = useChatsContext();
 
   const [open, setOpen] = useState(false);
@@ -70,4 +71,4 @@ export function ChatsList() {
       </motion.div>
     </MotionConfig>
   );
-}
+};

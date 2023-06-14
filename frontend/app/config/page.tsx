@@ -6,7 +6,7 @@ import { ConfigForm, ConfigTitle } from "./components";
 import { ApiKeyConfig } from "./components/ApiKeyConfig";
 
 // TODO: Use states instead of NEXTJS router to open and close modal
-export default function ConfigPage() {
+const ConfigPage = (): JSX.Element => {
   const { session } = useSupabase();
 
   if (session === null) {
@@ -22,4 +22,6 @@ export default function ConfigPage() {
       </section>
     </main>
   );
-}
+};
+
+export default ConfigPage;

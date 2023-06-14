@@ -4,7 +4,7 @@ import { MdSettings } from "react-icons/md";
 
 import Button from "@/lib/components/ui/Button";
 
-export function ConfigButton() {
+export const ConfigButton = (): JSX.Element => {
   return (
     <Link href={"/config"}>
       <Button className="p-2 sm:px-3" variant={"tertiary"}>
@@ -12,4 +12,4 @@ export function ConfigButton() {
       </Button>
     </Link>
   );
-}
+};

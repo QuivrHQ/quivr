@@ -25,7 +25,7 @@ export const ChatMessages = (): JSX.Element => {
   }, [chat, lastChatRef]);
 
   if (!chat) {
-    return null;
+    return <></>;
   }
 
   return (

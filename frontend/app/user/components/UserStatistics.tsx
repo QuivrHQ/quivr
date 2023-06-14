@@ -4,13 +4,13 @@ import prettyBytes from "pretty-bytes";
 import { HTMLAttributes } from "react";
 
 import Button from "@/lib/components/ui/Button";
+import { UserStats } from "@/lib/types/User";
 import { cn } from "@/lib/utils";
 
 import { BrainConsumption } from "./BrainConsumption";
 import { DateComponent } from "./Date";
 import BrainSpaceChart from "./Graphs/BrainSpaceChart";
 import { RequestsPerDayChart } from "./Graphs/RequestsPerDayChart";
-import { UserStats } from "../../../lib/types/User";
 
 export const UserStatistics = (userStats: UserStats): JSX.Element => {
   const { email, current_brain_size, max_brain_size, date, requests_stats } =
@@ -21,7 +21,7 @@ export const UserStatistics = (userStats: UserStats): JSX.Element => {
       <div className="flex flex-col sm:flex-row sm:items-center py-10 gap-5">
         <div className="flex-1 flex flex-col">
           <h1 className="text-4xl font-semibold">
-            {email.split("@")[0] + "'"}s Brain Usage
+            `${email.split("@")[0]}&apos;s Brain Usage`
           </h1>
           <p className="opacity-50">{email}</p>
           <Link className="mt-2" href={"/logout"}>

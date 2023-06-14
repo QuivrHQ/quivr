@@ -6,10 +6,10 @@ import Spinner from "@/lib/components/ui/Spinner";
 import { UserStats } from "@/lib/types/User";
 import { useAxios } from "@/lib/useAxios";
 
-import { UserStatistics } from "./components/UserStatistics";
 import { useSupabase } from "../supabase-provider";
+import { UserStatistics } from "./components/UserStatistics";
 
-export default function UserPage() {
+const UserPage = (): JSX.Element => {
   const [userStats, setUserStats] = useState<UserStats>();
   const { session } = useSupabase();
   const { axiosInstance } = useAxios();
@@ -59,4 +59,5 @@ export default function UserPage() {
       </section>
     </main>
   );
-}
+};
+export default UserPage;

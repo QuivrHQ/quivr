@@ -1,4 +1,4 @@
-export function isSpeechRecognitionSupported() {
+export const isSpeechRecognitionSupported = (): boolean => {
   if (
     typeof window !== "undefined" &&
     ("SpeechRecognition" in window || "webkitSpeechRecognition" in window)
@@ -7,4 +7,4 @@ export function isSpeechRecognitionSupported() {
   }
 
   return false;
-}
+};

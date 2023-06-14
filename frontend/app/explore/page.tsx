@@ -9,10 +9,10 @@ import Spinner from "@/lib/components/ui/Spinner";
 import { Document } from "@/lib/types/Document";
 import { useAxios } from "@/lib/useAxios";
 
-import DocumentItem from "./DocumentItem";
 import { useSupabase } from "../supabase-provider";
+import DocumentItem from "./DocumentItem";
 
-export default function ExplorePage() {
+const ExplorePage = (): JSX.Element => {
   const [documents, setDocuments] = useState<Document[]>([]);
   const [isPending, setIsPending] = useState(true);
   const { session } = useSupabase();
@@ -80,4 +80,6 @@ export default function ExplorePage() {
       </section>
     </main>
   );
-}
+};
+
+export default ExplorePage;

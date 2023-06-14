@@ -8,7 +8,7 @@ import PageHeading from "@/lib/components/ui/PageHeading";
 import { Crawler } from "./components/Crawler";
 import { FileUploader } from "./components/FileUploader";
 
-export default function UploadPage() {
+const UploadPage = (): JSX.Element => {
   return (
     <main className="pt-10">
       <PageHeading
@@ -27,4 +27,6 @@ export default function UploadPage() {
       </div>
     </main>
   );
-}
+};
+
+export default UploadPage;

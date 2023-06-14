@@ -5,7 +5,7 @@ import useChatsContext from "@/lib/context/ChatsProvider/hooks/useChatsContext";
 import { ConfigButton } from "./ConfigButton";
 import { MicButton } from "./MicButton";
 
-export function ChatInput() {
+export const ChatInput = (): JSX.Element => {
   const { isSendingMessage, sendMessage, setMessage, message, chat } =
     useChatsContext();
 
@@ -13,7 +13,9 @@ export function ChatInput() {
     <form
       onSubmit={(e) => {
         e.preventDefault();
-        if (!isSendingMessage) {sendMessage(chat?.chatId);}
+        if (!isSendingMessage) {
+          sendMessage(chat?.chatId);
+        }
       }}
       className="sticky bottom-0 p-5 bg-white dark:bg-black rounded-t-md border border-black/10 dark:border-white/25 border-b-0 w-full max-w-3xl flex items-center justify-center gap-2 z-20"
     >
@@ -24,7 +26,9 @@ export function ChatInput() {
         onKeyDown={(e) => {
           if (e.key === "Enter" && !e.shiftKey) {
             e.preventDefault(); // Prevents the newline from being entered in the textarea
-            if (!isSendingMessage) {sendMessage(chat?.chatId);} // Call the submit function here
+            if (!isSendingMessage) {
+              sendMessage(chat?.chatId);
+            } // Call the submit function here
           }
         }}
         className="w-full p-2 border border-gray-300 dark:border-gray-500 outline-none rounded dark:bg-gray-800"
@@ -43,4 +47,4 @@ export function ChatInput() {
       </div>
     </form>
   );
-}
+};
