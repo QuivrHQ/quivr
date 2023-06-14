@@ -4,6 +4,7 @@ import Field from "@/lib/components/ui/Field";
 import {
   BrainConfig,
   Model,
+  PaidModels,
   anthropicModels,
   models,
   paidModels,
@@ -12,7 +13,7 @@ import { UseFormRegister } from "react-hook-form";
 
 interface ModelConfigProps {
   register: UseFormRegister<BrainConfig>;
-  model: Model;
+  model: Model | PaidModels;
   openAiKey: string | undefined;
   temperature: number;
   maxTokens: number;
@@ -25,6 +26,24 @@ export const ModelConfig = ({
   temperature,
   maxTokens,
 }: ModelConfigProps): JSX.Element => {
+  const defineMaxTokens = (model: Model | PaidModels): number => {
+    //At the moment is evaluating only models from OpenAI
+    switch (model) {
+      case "gpt-3.5-turbo":
+        return 3000;
+      case "gpt-3.5-turbo-0613":
+        return 3000;
+      case "gpt-3.5-turbo-16k":
+        return 14000;
+      case "gpt-4":
+        return 6000;
+      case "gpt-4-0613":
+        return 6000;
+      default:
+        return 3000;
+    }
+  };
+
   return (
     <>
       <div className="border-b border-gray-300 mt-8 mb-8">
@@ -85,8 +104,8 @@ export const ModelConfig = ({
         <input
           type="range"
           min="256"
-          max="3000"
-          step="1"
+          max={defineMaxTokens(model)}
+          step="32"
           value={maxTokens}
           {...register("maxTokens")}
         />
