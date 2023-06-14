@@ -24,7 +24,7 @@
   },
   "ts-node": {
     "compilerOptions": {
-      "module": "Node16"
+      "module": "NodeNext"
     },
     "require": ["tsconfig-paths/register"]
   }

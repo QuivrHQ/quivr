@@ -2,6 +2,7 @@
 module.exports = {
   plugins: ["prefer-arrow", "import"],
   extends: [
+    "next",
     "next/core-web-vitals",
     "eslint:recommended",
     "plugin:import/recommended",
@@ -106,6 +107,9 @@ module.exports = {
   parserOptions: {
     ecmaVersion: 9,
     sourceType: "module",
+    "babelOptions": {
+      "presets": [require.resolve('next/babel')]
+    }
   },
   overrides: [
     {
@@ -117,7 +121,9 @@ module.exports = {
       ],
       parser: "@typescript-eslint/parser",
       parserOptions: {
-        project: "tsconfig.eslint.json",
+        project: "./tsconfig.eslint.json",
+        tsconfigRootDir: __dirname,
+        sourceType: "module"
       },
       rules: {
         "@typescript-eslint/prefer-optional-chain": "error",
