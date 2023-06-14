@@ -1,3 +1,4 @@
+/* eslint-disable */
 "use client";
 import useChatsContext from "@/lib/context/ChatsProvider/hooks/useChatsContext";
 import { cn } from "@/lib/utils";

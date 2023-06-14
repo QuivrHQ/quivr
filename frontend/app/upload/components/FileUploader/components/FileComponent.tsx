@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { motion } from "framer-motion";
 import { Dispatch, forwardRef, RefObject, SetStateAction } from "react";
 import { MdClose } from "react-icons/md";

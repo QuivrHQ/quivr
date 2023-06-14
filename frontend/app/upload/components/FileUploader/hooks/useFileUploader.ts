@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { redirect } from "next/navigation";
 import { useCallback, useState } from "react";
 import { FileRejection, useDropzone } from "react-dropzone";

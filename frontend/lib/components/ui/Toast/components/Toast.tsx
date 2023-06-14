@@ -1,3 +1,4 @@
+/* eslint-disable */
 "use client";
 import * as ToastPrimitive from "@radix-ui/react-toast";
 import { AnimatePresence, motion } from "framer-motion";

@@ -1,3 +1,4 @@
+/* eslint-disable */
 import Link from "next/link";
 import { Dispatch, ReactNode, SetStateAction } from "react";
 

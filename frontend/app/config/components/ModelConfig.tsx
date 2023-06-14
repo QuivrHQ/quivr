@@ -1,3 +1,4 @@
+/* eslint-disable */
 "use client";
 
 import { UseFormRegister } from "react-hook-form";

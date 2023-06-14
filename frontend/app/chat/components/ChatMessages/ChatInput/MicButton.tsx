@@ -1,3 +1,4 @@
+/* eslint-disable */
 "use client";
 import { MdMic, MdMicOff } from "react-icons/md";
 

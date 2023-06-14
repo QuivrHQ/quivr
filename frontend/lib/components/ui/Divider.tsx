@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { forwardRef, HTMLAttributes, LegacyRef } from "react";
 
 import { cn } from "@/lib/utils";

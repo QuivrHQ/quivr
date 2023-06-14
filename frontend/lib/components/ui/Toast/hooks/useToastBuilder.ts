@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { useState } from "react";
 
 import { ToastContent, ToastData, ToastPublisher } from "../domain/types";

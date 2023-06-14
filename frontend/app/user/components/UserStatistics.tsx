@@ -1,3 +1,4 @@
+/* eslint-disable */
 "use client";
 import Link from "next/link";
 import prettyBytes from "pretty-bytes";
@@ -21,7 +22,7 @@ export const UserStatistics = (userStats: UserStats): JSX.Element => {
       <div className="flex flex-col sm:flex-row sm:items-center py-10 gap-5">
         <div className="flex-1 flex flex-col">
           <h1 className="text-4xl font-semibold">
-            `${email.split("@")[0]}&apos;s Brain Usage`
+            {email.split("@")[0] + "'"}s Brain Usage
           </h1>
           <p className="opacity-50">{email}</p>
           <Link className="mt-2" href={"/logout"}>

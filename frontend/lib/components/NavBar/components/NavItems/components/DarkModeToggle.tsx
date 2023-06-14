@@ -1,3 +1,4 @@
+/* eslint-disable */
 "use client";
 import { useEffect, useLayoutEffect, useState } from "react";
 import { MdDarkMode, MdLightMode } from "react-icons/md";

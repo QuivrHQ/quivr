@@ -1,10 +1,10 @@
 "use client";
 
+import type { SupabaseClient } from "@supabase/auth-helpers-nextjs";
 import {
   createBrowserSupabaseClient,
   Session,
 } from "@supabase/auth-helpers-nextjs";
-import type { SupabaseClient } from "@supabase/auth-helpers-nextjs";
 import { useRouter } from "next/navigation";
 import { createContext, useContext, useEffect, useState } from "react";
 
@@ -17,13 +17,13 @@ type SupabaseContext = {
 
 const Context = createContext<SupabaseContext | undefined>(undefined);
 
-export default function SupabaseProvider({
+const SupabaseProvider = ({
   children,
   session,
 }: {
   children: React.ReactNode;
   session: MaybeSession;
-}) {
+}): JSX.Element => {
   const [supabase] = useState(() => createBrowserSupabaseClient());
   const router = useRouter();
 
@@ -44,9 +44,9 @@ export default function SupabaseProvider({
       <>{children}</>
     </Context.Provider>
   );
-}
+};
 
-export const useSupabase = () => {
+export const useSupabase = (): SupabaseContext => {
   const context = useContext(Context);
 
   if (context === undefined) {
@@ -55,3 +55,5 @@ export const useSupabase = () => {
 
   return context;
 };
+
+export default SupabaseProvider;

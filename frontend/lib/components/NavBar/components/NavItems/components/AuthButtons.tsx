@@ -6,12 +6,13 @@ import Button from "@/lib/components/ui/Button";
 export const AuthButtons = (): JSX.Element => {
   const pathname = usePathname();
 
-  if (pathname === "/signup")
-    {return (
+  if (pathname === "/signup") {
+    return (
       <Link href={"/login"}>
         <Button variant={"secondary"}>Login</Button>
       </Link>
-    );}
+    );
+  }
 
   return (
     <Link href={"/signup"}>

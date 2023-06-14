@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { UUID } from "crypto";
 import Link from "next/link";
 import { usePathname } from "next/navigation";

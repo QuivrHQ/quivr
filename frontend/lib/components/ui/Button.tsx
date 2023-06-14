@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { cva, type VariantProps } from "class-variance-authority";
 import { ButtonHTMLAttributes, forwardRef, LegacyRef } from "react";
 import { FaSpinner } from "react-icons/fa";

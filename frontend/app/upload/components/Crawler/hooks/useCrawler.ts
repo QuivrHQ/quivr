@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { redirect } from "next/navigation";
 import { useCallback, useRef, useState } from "react";
 

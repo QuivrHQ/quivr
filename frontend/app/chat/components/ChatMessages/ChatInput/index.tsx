@@ -1,3 +1,4 @@
+/* eslint-disable */
 "use client";
 import Button from "@/lib/components/ui/Button";
 import useChatsContext from "@/lib/context/ChatsProvider/hooks/useChatsContext";

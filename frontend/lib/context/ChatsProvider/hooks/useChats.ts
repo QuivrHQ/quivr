@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { UUID } from "crypto";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";

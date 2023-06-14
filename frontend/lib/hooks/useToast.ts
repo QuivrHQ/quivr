@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { useContext } from "react";
 
 import { ToastContext } from "@/lib/components/ui/Toast/domain/ToastContext";

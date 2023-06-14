@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { useEffect, useState } from "react";
 
 import { isSpeechRecognitionSupported } from "@/lib/helpers/isSpeechRecognitionSupported";

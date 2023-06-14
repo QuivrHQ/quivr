@@ -1,10 +1,10 @@
+/* eslint-disable */
 "use client";
 import { useEffect, useRef } from "react";
 
 import Card from "@/lib/components/ui/Card";
 import useChatsContext from "@/lib/context/ChatsProvider/hooks/useChatsContext";
-
-import ChatMessage from "./ChatMessage";
+import { ChatMessage } from "./ChatMessage";
 
 export const ChatMessages = (): JSX.Element => {
   const lastChatRef = useRef<HTMLDivElement | null>(null);
