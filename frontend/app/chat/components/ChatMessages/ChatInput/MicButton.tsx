@@ -8,16 +8,16 @@ export function MicButton() {
 
   return (
     <Button
-      className="px-3"
+      className="p-2 sm:px-3"
       variant={"tertiary"}
       type="button"
       onClick={startListening}
       disabled={!speechSupported}
     >
       {isListening ? (
-        <MdMicOff className="text-2xl" />
+        <MdMicOff className="text-lg sm:text-xl lg:text-2xl" />
       ) : (
-        <MdMic className="text-2xl" />
+        <MdMic className="text-lg sm:text-xl lg:text-2xl" />
       )}
     </Button>
   );
