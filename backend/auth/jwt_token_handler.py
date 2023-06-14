@@ -24,6 +24,10 @@ def decode_access_token(token: str):
         return payload
     except JWTError as e:
         return None
+    
+def verify_token(token: str):
+    payload = decode_access_token(token)
+    return payload is not None
 
 def get_user_email_from_token(token: str):
     payload = decode_access_token(token)

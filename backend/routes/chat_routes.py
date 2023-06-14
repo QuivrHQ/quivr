@@ -2,7 +2,7 @@ import os
 import time
 from uuid import UUID
 
-from auth.auth_bearer import JWTBearer, get_current_user
+from auth.auth_bearer import AuthBearer, get_current_user
 from fastapi import APIRouter, Depends, Request
 from models.chats import ChatMessage
 from models.users import User
@@ -30,7 +30,7 @@ def fetch_user_stats(commons, user, date):
     return userItem
 
 # get all chats
-@chat_router.get("/chat", dependencies=[Depends(JWTBearer())])
+@chat_router.get("/chat", dependencies=[Depends(AuthBearer())])
 async def get_chats(commons: CommonsDep, current_user: User = Depends(get_current_user)):
     date = time.strftime("%Y%m%d")
     user_id = fetch_user_id_from_credentials(commons, date, {"email": current_user.email})
@@ -38,7 +38,7 @@ async def get_chats(commons: CommonsDep, current_user: User = Depends(get_curren
     return {"chats": chats}
 
 # get one chat
-@chat_router.get("/chat/{chat_id}", dependencies=[Depends(JWTBearer())])
+@chat_router.get("/chat/{chat_id}", dependencies=[Depends(AuthBearer())])
 async def get_chats(commons: CommonsDep, chat_id: UUID):
     chats = get_chat_details(commons, chat_id)
     if len(chats) > 0:
@@ -47,7 +47,7 @@ async def get_chats(commons: CommonsDep, chat_id: UUID):
         return {"error": "Chat not found"}
 
 # delete one chat
-@chat_router.delete("/chat/{chat_id}", dependencies=[Depends(JWTBearer())])
+@chat_router.delete("/chat/{chat_id}", dependencies=[Depends(AuthBearer())])
 async def delete_chat(commons: CommonsDep, chat_id: UUID):
     delete_chat_from_db(commons, chat_id)
     return {"message": f"{chat_id}  has been deleted."}
@@ -91,11 +91,11 @@ def chat_handler(request, commons, chat_id, chat_message, email, is_new_chat=Fal
 
 
 # update existing chat
-@chat_router.put("/chat/{chat_id}", dependencies=[Depends(JWTBearer())])
+@chat_router.put("/chat/{chat_id}", dependencies=[Depends(AuthBearer())])
 async def chat_endpoint(request: Request, commons: CommonsDep, chat_id: UUID, chat_message: ChatMessage, current_user: User = Depends(get_current_user)):
     return chat_handler(request, commons, chat_id, chat_message, current_user.email)
 
 # create new chat
-@chat_router.post("/chat", dependencies=[Depends(JWTBearer())])
+@chat_router.post("/chat", dependencies=[Depends(AuthBearer())])
 async def chat_endpoint(request: Request, commons: CommonsDep, chat_message: ChatMessage, current_user: User = Depends(get_current_user)):
     return chat_handler(request, commons, None, chat_message, current_user.email, is_new_chat=True)
