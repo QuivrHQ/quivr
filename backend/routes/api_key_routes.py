@@ -74,7 +74,7 @@ async def delete_api_key(key_id: str, commons: CommonsDep, current_user: User = 
 
 @api_key_router.get("/api-keys", response_model=List[ApiKeyInfo], dependencies=[Depends(JWTBearer())])
 async def get_api_keys(commons: CommonsDep, current_user: User = Depends(get_current_user)):
-    """Get all active API keys for current user."""
+    """Get all active API keys for the current user. Return only the key_id and the creation_time."""
 
     user_id = fetch_user_id_from_credentials(commons, time.strftime("%Y%m%d"), {"email": current_user.email})
 
