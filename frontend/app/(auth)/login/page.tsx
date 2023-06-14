@@ -1,10 +1,10 @@
 "use client";
-import Button from "@/app/components/ui/Button";
-import Card from "@/app/components/ui/Card";
-import { Divider } from "@/app/components/ui/Divider";
-import Field from "@/app/components/ui/Field";
-import PageHeading from "@/app/components/ui/PageHeading";
 import { useSupabase } from "@/app/supabase-provider";
+import Button from "@/lib/components/ui/Button";
+import Card from "@/lib/components/ui/Card";
+import { Divider } from "@/lib/components/ui/Divider";
+import Field from "@/lib/components/ui/Field";
+import PageHeading from "@/lib/components/ui/PageHeading";
 import { useToast } from "@/lib/hooks/useToast";
 import Link from "next/link";
 import { redirect } from "next/navigation";

@@ -1,10 +1,10 @@
 "use client";
-import Button from "@/app/components/ui/Button";
+import Button from "@/lib/components/ui/Button";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import prettyBytes from "pretty-bytes";
 import { HTMLAttributes } from "react";
-import { UserStats } from "../types";
+import { UserStats } from "../../../lib/types/User";
 import { BrainConsumption } from "./BrainConsumption";
 import { DateComponent } from "./Date";
 import BrainSpaceChart from "./Graphs/BrainSpaceChart";

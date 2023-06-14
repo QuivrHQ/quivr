@@ -4,7 +4,7 @@ import { useAxios } from "@/lib/useAxios";
 import { UUID } from "crypto";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
-import { Chat, ChatMessage } from "../../types";
+import { Chat, ChatMessage } from "../../../types/Chat";
 
 export default function useChats() {
   const [allChats, setAllChats] = useState<Chat[]>([]);

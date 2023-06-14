@@ -1,5 +1,5 @@
 import { GiBrain } from "react-icons/gi";
-import { UserStats } from "../types";
+import { UserStats } from "../../../lib/types/User";
 
 export const BrainConsumption = (userStats: UserStats): JSX.Element => {
   const { current_brain_size, max_brain_size } = userStats;

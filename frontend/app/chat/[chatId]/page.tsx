@@ -1,8 +1,8 @@
 "use client";
+import PageHeading from "@/lib/components/ui/PageHeading";
+import useChatsContext from "@/lib/context/ChatsProvider/hooks/useChatsContext";
 import { UUID } from "crypto";
 import { useEffect } from "react";
-import PageHeading from "../../components/ui/PageHeading";
-import useChatsContext from "../ChatsProvider/hooks/useChatsContext";
 import { ChatInput, ChatMessages } from "../components";
 
 interface ChatPageProps {
