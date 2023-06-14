@@ -1,5 +1,5 @@
 pymupdf==1.22.3
-langchain==0.0.187
+langchain==0.0.200
 Markdown==3.4.3
 openai==0.27.6
 pdf2image==1.16.3
