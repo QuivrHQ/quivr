@@ -25,7 +25,7 @@ class AuthBearer(HTTPBearer):
         elif not credentials:
             raise HTTPException(status_code=403, detail="Invalid authorization code.")
 
-    async def authenticate(self, token, commons):
+    async def authenticate(self, token: str, commons: CommonsDep):
         if os.environ.get("AUTHENTICATE") == "false":
             return self.get_test_user()
         elif verify_token(token):
