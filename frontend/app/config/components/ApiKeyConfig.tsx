@@ -1,8 +1,10 @@
+/* eslint-disable */
 "use client";
+
+import { useState } from "react";
 
 import Button from "@/lib/components/ui/Button";
 import { useAxios } from "@/lib/useAxios";
-import { useState } from "react";
 
 export const ApiKeyConfig = (): JSX.Element => {
   const [apiKey, setApiKey] = useState("");
@@ -40,13 +42,13 @@ export const ApiKeyConfig = (): JSX.Element => {
       </div>
       <div className="flex justify-between items-center">
         <div className="flex items-center space-x-4">
-          {!apiKey && (
+          {apiKey === "" && (
             <Button variant="secondary" onClick={handleCreateClick}>
               Create New Key
             </Button>
           )}
         </div>
-        {apiKey && (
+        {apiKey !== "" && (
           <div className="flex items-center space-x-4">
             <span className="text-gray-600">{apiKey}</span>
             <Button variant="secondary" onClick={handleCopyClick}>

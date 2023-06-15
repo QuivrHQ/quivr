@@ -1,9 +1,11 @@
+/* eslint-disable */
 "use client";
-import Button from "@/lib/components/ui/Button";
-import { FC, useEffect, useLayoutEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useState } from "react";
 import { MdDarkMode, MdLightMode } from "react-icons/md";
 
-export const DarkModeToggle: FC = () => {
+import Button from "@/lib/components/ui/Button";
+
+export const DarkModeToggle = (): JSX.Element => {
   const [dark, setDark] = useState(false);
 
   useLayoutEffect(() => {

@@ -20,8 +20,18 @@ export type ConfigContext = {
 
 // export const openAiModels = ["gpt-3.5-turbo", "gpt-4"] as const; ## TODO activate GPT4 when not in demo mode
 
-export const openAiModels = ["gpt-3.5-turbo","gpt-3.5-turbo-0613","gpt-3.5-turbo-16k"] as const;
-export const openAiPaidModels = ["gpt-3.5-turbo","gpt-3.5-turbo-0613","gpt-3.5-turbo-16k","gpt-4","gpt-4-0613"] as const;
+export const openAiModels = [
+  "gpt-3.5-turbo",
+  "gpt-3.5-turbo-0613",
+  "gpt-3.5-turbo-16k",
+] as const;
+export const openAiPaidModels = [
+  "gpt-3.5-turbo",
+  "gpt-3.5-turbo-0613",
+  "gpt-3.5-turbo-16k",
+  "gpt-4",
+  "gpt-4-0613",
+] as const;
 
 export const anthropicModels = [
   // "claude-v1",
@@ -39,7 +49,7 @@ export const models = [
   ...googleModels,
 ] as const;
 
-export const paidModels = [...openAiPaidModels, ...googleModels] as const;
+export const paidModels = [...openAiPaidModels] as const;
 
 export type PaidModels = (typeof paidModels)[number];
 

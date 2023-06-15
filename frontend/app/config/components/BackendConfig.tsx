@@ -1,8 +1,10 @@
+/* eslint-disable */
 "use client";
+
+import { UseFormRegister } from "react-hook-form";
 
 import Field from "@/lib/components/ui/Field";
 import { BrainConfig } from "@/lib/context/BrainConfigProvider/types";
-import { UseFormRegister } from "react-hook-form";
 
 interface BackendConfigProps {
   register: UseFormRegister<BrainConfig>;

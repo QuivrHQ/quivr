@@ -1,7 +1,9 @@
-import { cn } from "@/lib/utils";
+/* eslint-disable */
 import { cva, type VariantProps } from "class-variance-authority";
-import { ButtonHTMLAttributes, FC, LegacyRef, forwardRef } from "react";
+import { ButtonHTMLAttributes, forwardRef, LegacyRef } from "react";
 import { FaSpinner } from "react-icons/fa";
+
+import { cn } from "@/lib/utils";
 
 const ButtonVariants = cva(
   "px-8 py-3 text-sm disabled:opacity-80 text-center font-medium rounded-md focus:ring ring-primary/10 outline-none flex items-center justify-center gap-2 transition-opacity",
@@ -34,11 +36,18 @@ export interface ButtonProps
   isLoading?: boolean;
 }
 
-const Button: FC<ButtonProps> = forwardRef(
+const Button = forwardRef(
   (
-    { className, children, variant, brightness, isLoading, ...props },
+    {
+      className,
+      children,
+      variant,
+      brightness,
+      isLoading,
+      ...props
+    }: ButtonProps,
     forwardedRef
-  ) => {
+  ): JSX.Element => {
     return (
       <button
         className={cn(ButtonVariants({ variant, brightness, className }))}

@@ -1,7 +1,12 @@
 import { motion } from "framer-motion";
+
 import { useHeader } from "./hooks/useHeader";
 
-export const Header = ({ children }: { children: React.ReactNode }) => {
+export const Header = ({
+  children,
+}: {
+  children: React.ReactNode;
+}): JSX.Element => {
   const { hidden } = useHeader();
 
   return (

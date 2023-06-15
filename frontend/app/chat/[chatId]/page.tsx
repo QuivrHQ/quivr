@@ -1,8 +1,11 @@
+/* eslint-disable */
 "use client";
-import PageHeading from "@/lib/components/ui/PageHeading";
-import useChatsContext from "@/lib/context/ChatsProvider/hooks/useChatsContext";
 import { UUID } from "crypto";
 import { useEffect } from "react";
+
+import PageHeading from "@/lib/components/ui/PageHeading";
+import useChatsContext from "@/lib/context/ChatsProvider/hooks/useChatsContext";
+
 import { ChatInput, ChatMessages } from "../components";
 
 interface ChatPageProps {
@@ -18,7 +21,9 @@ export default function ChatPage({ params }: ChatPageProps) {
 
   useEffect(() => {
     // if (chatId)
-    if (!chatId) resetChat();
+    if (!chatId) {
+      resetChat();
+    }
     fetchChat(chatId);
   }, [fetchChat, chatId]);
 

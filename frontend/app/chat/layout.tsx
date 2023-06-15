@@ -1,17 +1,21 @@
 "use client";
-import { ChatsProvider } from "@/lib/context/ChatsProvider/chats-provider";
 import { redirect } from "next/navigation";
-import { FC, ReactNode } from "react";
-import { useSupabase } from "../supabase-provider";
+import { ReactNode } from "react";
+
+import { ChatsProvider } from "@/lib/context/ChatsProvider/chats-provider";
+
 import { ChatsList } from "./components";
+import { useSupabase } from "../supabase-provider";
 
 interface LayoutProps {
   children?: ReactNode;
 }
 
-const Layout: FC<LayoutProps> = ({ children }) => {
+const Layout = ({ children }: LayoutProps): JSX.Element => {
   const { session } = useSupabase();
-  if (!session) redirect("/login");
+  if (!session) {
+    redirect("/login");
+  }
 
   return (
     <ChatsProvider>

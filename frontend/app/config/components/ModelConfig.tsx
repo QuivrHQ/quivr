@@ -1,4 +1,7 @@
+/* eslint-disable */
 "use client";
+
+import { UseFormRegister } from "react-hook-form";
 
 import Field from "@/lib/components/ui/Field";
 import {
@@ -9,7 +12,6 @@ import {
   models,
   paidModels,
 } from "@/lib/context/BrainConfigProvider/types";
-import { UseFormRegister } from "react-hook-form";
 
 interface ModelConfigProps {
   register: UseFormRegister<BrainConfig>;

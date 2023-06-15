@@ -1,6 +1,9 @@
+/* eslint-disable */
 "use client";
+import { HTMLAttributes } from "react";
+
 import { cn } from "@/lib/utils";
-import { FC, HTMLAttributes } from "react";
+
 import Tooltip from "./Tooltip";
 
 interface EllipsisProps extends HTMLAttributes<HTMLDivElement> {
@@ -9,12 +12,12 @@ interface EllipsisProps extends HTMLAttributes<HTMLDivElement> {
   tooltip?: boolean;
 }
 
-const Ellipsis: FC<EllipsisProps> = ({
+const Ellipsis = ({
   children: originalContent,
   className,
   maxCharacters,
   tooltip = false,
-}) => {
+}: EllipsisProps): JSX.Element => {
   const renderedContent =
     originalContent.length > maxCharacters
       ? `${originalContent.slice(0, maxCharacters)}...`
