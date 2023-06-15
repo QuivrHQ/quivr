@@ -62,6 +62,7 @@ def create_vector(commons: CommonsDep, user_id,doc, user_openai_api_key=None):
         if sids and len(sids) > 0:
             commons['supabase'].table("vectors").update(
                 {"user_id": user_id}).match({"id": sids[0]}).execute()
+            # TODO: create entry in brains_vectors table with brain_id and vector_id
     except Exception as e:
         logger.error(f"Error creating vector for document {e}")
 
