@@ -14,6 +14,9 @@ from utils.vectors import CommonsDep
 crawl_router = APIRouter()
 
 def get_unique_user_data(commons, user):
+    """
+    Retrieve unique user data vectors.
+    """
     user_vectors_response = commons['supabase'].table("vectors").select(
         "name:metadata->>file_name, size:metadata->>file_size", count="exact") \
             .filter("user_id", "eq", user.email)\
@@ -23,8 +26,11 @@ def get_unique_user_data(commons, user):
     user_unique_vectors = [dict(t) for t in set(tuple(d.items()) for d in documents)]
     return user_unique_vectors
 
-@crawl_router.post("/crawl/", dependencies=[Depends(AuthBearer())])
+@crawl_router.post("/crawl/", dependencies=[Depends(AuthBearer())], tags=["Crawl"])
 async def crawl_endpoint(request: Request,commons: CommonsDep, crawl_website: CrawlWebsite, enable_summarization: bool = False, current_user: User = Depends(get_current_user)):
+    """
+    Crawl a website and process the crawled data.
+    """
     max_brain_size = os.getenv("MAX_BRAIN_SIZE")
     if request.headers.get('Openai-Api-Key'):
         max_brain_size = os.getenv("MAX_BRAIN_SIZE_WITH_KEY",209715200)
