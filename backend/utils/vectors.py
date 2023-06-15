@@ -10,7 +10,6 @@ from llm.summarization import llm_evaluate_summaries, llm_summerize
 from logger import get_logger
 from models.chats import ChatMessage
 from models.users import User
-
 from supabase import Client, create_client
 
 logger = get_logger(__name__)
@@ -156,7 +155,7 @@ def get_answer(commons: CommonsDep,  chat_message: ChatMessage, email: str, user
         model_response = qa(
             {"question": additional_context + chat_message.question})
     else:
-        model_response = qa({"question": chat_message.question})
+        model_response = qa({"question": chat_message.question, "chat_history": chat_message.history})
 
     answer = model_response['answer']   
 
