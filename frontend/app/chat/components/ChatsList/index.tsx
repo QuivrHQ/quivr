@@ -12,7 +12,7 @@ import { NewChatButton } from "./NewChatButton";
 export const ChatsList = (): JSX.Element => {
   const { allChats, deleteChat } = useChatsContext();
 
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(true);
 
   return (
     <MotionConfig transition={{ mass: 1, damping: 10 }}>
