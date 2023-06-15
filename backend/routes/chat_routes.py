@@ -64,8 +64,6 @@ async def get_chats(commons: CommonsDep, chat_id: UUID):
     else:
         return {"error": "Chat not found"}
 
-
-
 # delete one chat
 @chat_router.delete("/chat/{chat_id}", dependencies=[Depends(AuthBearer())], tags=["Chat"])
 async def delete_chat(commons: CommonsDep, chat_id: UUID):
@@ -74,6 +72,43 @@ async def delete_chat(commons: CommonsDep, chat_id: UUID):
     """
     delete_chat_from_db(commons, chat_id)
     return {"message": f"{chat_id}  has been deleted."}
+
+# helper method for update and create chat
+def chat_handler(request, commons, chat_id, chat_message, email, is_new_chat=False):
+    date = time.strftime("%Y%m%d")
+    user_id = fetch_user_id_from_credentials(commons, date, {"email": email})
+    max_requests_number = os.getenv("MAX_REQUESTS_NUMBER")
+    user_openai_api_key = request.headers.get('Openai-Api-Key')
+
+    userItem = fetch_user_stats(commons, User(email=email), date)
+    old_request_count = userItem['requests_count']
+
+    history = chat_message.history
+    history.append(("user", chat_message.question))
+
+    
+    if old_request_count == 0: 
+        create_user(email= email, date=date)
+    else:
+        update_user_request_count(email=email, date=date, requests_count=old_request_count + 1)
+    if user_openai_api_key is None and old_request_count >= float(max_requests_number):
+        history.append(('assistant', "You have reached your requests limit"))
+        update_chat(chat_id=chat_id, history=history)
+        return {"history": history}
+
+
+
+    answer = get_answer(commons, chat_message, email, user_openai_api_key)
+    history.append(("assistant", answer))
+
+    if is_new_chat:
+        chat_name = get_chat_name_from_first_question(chat_message)
+        new_chat = create_chat(user_id, history, chat_name)
+        chat_id = new_chat.data[0]['chat_id']
+    else:
+        update_chat(chat_id=chat_id, history=history)
+
+    return {"history": history, "chatId": chat_id}
 
 # update existing chat
 @chat_router.put("/chat/{chat_id}", dependencies=[Depends(AuthBearer())], tags=["Chat"])
