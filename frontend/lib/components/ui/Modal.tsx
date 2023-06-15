@@ -1,8 +1,9 @@
 "use client";
 import * as Dialog from "@radix-ui/react-dialog";
 import { AnimatePresence, motion } from "framer-motion";
-import { FC, ReactNode, useState } from "react";
+import { ReactNode, useState } from "react";
 import { MdClose } from "react-icons/md";
+
 import Button from "./Button";
 
 interface ModalProps {
@@ -13,14 +14,15 @@ interface ModalProps {
   CloseTrigger?: ReactNode;
 }
 
-const Modal: FC<ModalProps> = ({
+const Modal = ({
   title,
   desc,
   children,
   Trigger,
   CloseTrigger,
-}) => {
+}: ModalProps): JSX.Element => {
   const [open, setOpen] = useState(false);
+
   return (
     <Dialog.Root onOpenChange={setOpen}>
       <Dialog.Trigger asChild>
@@ -58,7 +60,7 @@ const Modal: FC<ModalProps> = ({
                     {children}
 
                     <Dialog.Close asChild>
-                      {CloseTrigger ? (
+                      {CloseTrigger !== undefined ? (
                         CloseTrigger
                       ) : (
                         <Button variant={"secondary"} className="self-end">

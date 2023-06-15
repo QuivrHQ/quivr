@@ -1,5 +1,8 @@
-import { isSpeechRecognitionSupported } from "@/lib/helpers/isSpeechRecognitionSupported";
+/* eslint-disable */
 import { useEffect, useState } from "react";
+
+import { isSpeechRecognitionSupported } from "@/lib/helpers/isSpeechRecognitionSupported";
+
 import useChatsContext from "./useChatsContext";
 
 export const useSpeech = () => {

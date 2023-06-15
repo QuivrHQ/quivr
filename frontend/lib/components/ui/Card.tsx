@@ -1,12 +1,14 @@
+/* eslint-disable */
 "use client";
-import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
-import { FC, HTMLAttributes, LegacyRef, forwardRef } from "react";
+import { forwardRef, HTMLAttributes, LegacyRef } from "react";
+
+import { cn } from "@/lib/utils";
 
 type CardProps = HTMLAttributes<HTMLDivElement>;
 
-const Card: FC<CardProps> = forwardRef(
-  ({ children, className, ...props }, ref) => {
+const Card = forwardRef(
+  ({ children, className, ...props }: CardProps, ref): JSX.Element => {
     return (
       <div
         ref={ref as LegacyRef<HTMLDivElement>}

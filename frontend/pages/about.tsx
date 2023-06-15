@@ -1,3 +1,5 @@
-export default function About() {
-    return <div>About</div>;
-  }
+const About = (): JSX.Element => {
+  return <div>About</div>;
+};
+
+export default About;

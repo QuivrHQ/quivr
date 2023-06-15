@@ -1,9 +1,11 @@
+/* eslint-disable */
 "use client";
-import Button from "@/lib/components/ui/Button";
-import { useSpeech } from "@/lib/context/ChatsProvider/hooks/useSpeech";
 import { MdMic, MdMicOff } from "react-icons/md";
 
-export function MicButton() {
+import Button from "@/lib/components/ui/Button";
+import { useSpeech } from "@/lib/context/ChatsProvider/hooks/useSpeech";
+
+export const MicButton = (): JSX.Element => {
   const { isListening, speechSupported, startListening } = useSpeech();
 
   return (
@@ -21,4 +23,4 @@ export function MicButton() {
       )}
     </Button>
   );
-}
+};

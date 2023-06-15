@@ -1,12 +1,14 @@
+/* eslint-disable */
 "use client";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+
 import { useSupabase } from "@/app/supabase-provider";
 import Button from "@/lib/components/ui/Button";
 import Card from "@/lib/components/ui/Card";
 import PageHeading from "@/lib/components/ui/PageHeading";
 import { useToast } from "@/lib/hooks/useToast";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
 
 export default function Logout() {
   const { supabase } = useSupabase();

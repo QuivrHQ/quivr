@@ -1,8 +1,10 @@
+/* eslint-disable */
 "use client";
+import { useState } from "react";
+
 import { useSupabase } from "@/app/supabase-provider";
 import Button from "@/lib/components/ui/Button";
 import { useToast } from "@/lib/hooks/useToast";
-import { useState } from "react";
 
 type MaginLinkLoginProps = {
   email: string;
@@ -21,6 +23,7 @@ export const MagicLinkLogin = ({ email, setEmail }: MaginLinkLoginProps) => {
         variant: "danger",
         text: "Please enter your email address",
       });
+
       return;
     }
 

@@ -1,4 +1,6 @@
+/* eslint-disable */
 import { useContext } from "react";
+
 import { ChatsContext } from "../chats-provider";
 
 const useChatsContext = () => {

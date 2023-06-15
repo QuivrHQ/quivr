@@ -1,7 +1,10 @@
+/* eslint-disable */
 "use client";
+import { AnimatePresence } from "framer-motion";
+
 import Button from "@/lib/components/ui/Button";
 import Card from "@/lib/components/ui/Card";
-import { AnimatePresence } from "framer-motion";
+
 import FileComponent from "./components/FileComponent";
 import { useFileUploader } from "./hooks/useFileUploader";
 
