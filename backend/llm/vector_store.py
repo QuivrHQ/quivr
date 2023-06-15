@@ -1,9 +1,9 @@
 from typing import Any, List
 
-from supabase import Client
-from langchain.vectorstores import SupabaseVectorStore
 from langchain.docstore.document import Document
 from langchain.embeddings.openai import OpenAIEmbeddings
+from langchain.vectorstores import SupabaseVectorStore
+from supabase import Client
 
 
 class CustomSupabaseVectorStore(SupabaseVectorStore):

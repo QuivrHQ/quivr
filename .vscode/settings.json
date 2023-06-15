@@ -6,5 +6,6 @@
   "editor.codeActionsOnSave": {
     "source.organizeImports": true
   },
-  "python.linting.enabled": true
+  "python.linting.enabled": true,
+  "python.analysis.typeCheckingMode": "basic"
 }
