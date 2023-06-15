@@ -1,16 +1,16 @@
-from datetime import datetime
 import time
+from datetime import datetime
+from secrets import token_hex
 from typing import List
-from pydantic import BaseModel
+from uuid import uuid4
+
+from asyncpg.exceptions import UniqueViolationError
 from auth.auth_bearer import AuthBearer, get_current_user
 from fastapi import APIRouter, Depends
-from utils.vectors import fetch_user_id_from_credentials
-from models.users import User
-from utils.vectors import CommonsDep
-from uuid import uuid4
-from secrets import token_hex
-from asyncpg.exceptions import UniqueViolationError
 from logger import get_logger
+from models.users import User
+from pydantic import BaseModel
+from utils.vectors import CommonsDep, fetch_user_id_from_credentials
 
 logger = get_logger(__name__)
 
@@ -25,14 +25,20 @@ class ApiKey(BaseModel):
 
 api_key_router = APIRouter()
 
-
-@api_key_router.post("/api-key", response_model=ApiKey, dependencies=[Depends(AuthBearer())])
+@api_key_router.post("/api-key", response_model=ApiKey, dependencies=[Depends(AuthBearer())], tags=["API Key"])
 async def create_api_key(commons: CommonsDep, current_user: User = Depends(get_current_user)):
+    """
+    Create new API key for the current user.
+
+    - `current_user`: The current authenticated user.
+    - Returns the newly created API key.
+
+    This endpoint generates a new API key for the current user. The API key is stored in the database and associated with
+    the user. It returns the newly created API key.
+    """
 
     date = time.strftime("%Y%m%d")
     user_id = fetch_user_id_from_credentials(commons, date, {"email": current_user.email})
-
-    """Create new API key for current user."""
 
     new_key_id = str(uuid4())
     new_api_key = token_hex(16)
@@ -59,10 +65,17 @@ async def create_api_key(commons: CommonsDep, current_user: User = Depends(get_c
 
     return {"api_key": new_api_key}
 
-
-@api_key_router.delete("/api-key/{key_id}", dependencies=[Depends(AuthBearer())])
+@api_key_router.delete("/api-key/{key_id}", dependencies=[Depends(AuthBearer())],  tags=["API Key"])
 async def delete_api_key(key_id: str, commons: CommonsDep, current_user: User = Depends(get_current_user)):
-    """Delete (deactivate) an API key for current user."""
+    """
+    Delete (deactivate) an API key for the current user.
+
+    - `key_id`: The ID of the API key to delete.
+
+    This endpoint deactivates and deletes the specified API key associated with the current user. The API key is marked
+    as inactive in the database.
+
+    """
 
     commons['supabase'].table('api_keys').update({
         "is_active": False,
@@ -71,10 +84,17 @@ async def delete_api_key(key_id: str, commons: CommonsDep, current_user: User = 
 
     return {"message": "API key deleted."}
 
-
-@api_key_router.get("/api-keys", response_model=List[ApiKeyInfo], dependencies=[Depends(AuthBearer())])
+@api_key_router.get("/api-keys", response_model=List[ApiKeyInfo], dependencies=[Depends(AuthBearer())], tags=["API Key"])
 async def get_api_keys(commons: CommonsDep, current_user: User = Depends(get_current_user)):
-    """Get all active API keys for the current user. Return only the key_id and the creation_time."""
+    """
+    Get all active API keys for the current user.
+
+    - `current_user`: The current authenticated user.
+    - Returns a list of active API keys with their IDs and creation times.
+
+    This endpoint retrieves all the active API keys associated with the current user. It returns a list of API key objects
+    containing the key ID and creation time for each API key.
+    """
 
     user_id = fetch_user_id_from_credentials(commons, time.strftime("%Y%m%d"), {"email": current_user.email})
 
