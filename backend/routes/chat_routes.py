@@ -6,10 +6,12 @@ from auth.auth_bearer import AuthBearer, get_current_user
 from fastapi import APIRouter, Depends, Request
 from models.chats import ChatMessage
 from models.users import User
-from utils.vectors import (CommonsDep, create_chat, create_user,
-                           fetch_user_id_from_credentials, get_answer,
-                           get_chat_name_from_first_question, update_chat,
-                           update_user_request_count)
+from utils.chats import (create_chat, get_chat_name_from_first_question,
+                         update_chat)
+from utils.common import CommonsDep
+from utils.users import (create_user, fetch_user_id_from_credentials,
+                         update_user_request_count)
+from utils.vectors import get_answer
 
 chat_router = APIRouter()
 
@@ -87,12 +89,12 @@ def chat_handler(request, commons, chat_id, chat_message, email, is_new_chat=Fal
 
     
     if old_request_count == 0: 
-        create_user(email= email, date=date)
+        create_user(commons, email= email, date=date)
     else:
-        update_user_request_count(email=email, date=date, requests_count=old_request_count + 1)
+        update_user_request_count(commons,email, date, requests_count=old_request_count + 1)
     if user_openai_api_key is None and old_request_count >= float(max_requests_number):
         history.append(('assistant', "You have reached your requests limit"))
-        update_chat(chat_id=chat_id, history=history)
+        update_chat(commons, chat_id=chat_id, history=history)
         return {"history": history}
 
 
@@ -102,10 +104,10 @@ def chat_handler(request, commons, chat_id, chat_message, email, is_new_chat=Fal
 
     if is_new_chat:
         chat_name = get_chat_name_from_first_question(chat_message)
-        new_chat = create_chat(user_id, history, chat_name)
+        new_chat = create_chat(commons, user_id, history, chat_name)
         chat_id = new_chat.data[0]['chat_id']
     else:
-        update_chat(chat_id=chat_id, history=history)
+        update_chat(commons, chat_id=chat_id, history=history)
 
     return {"history": history, "chatId": chat_id}
 

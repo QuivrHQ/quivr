@@ -1,9 +1,9 @@
 
 from datetime import datetime
-from fastapi import HTTPException
 
+from fastapi import HTTPException
 from pydantic import DateError
-from utils.vectors import CommonsDep
+from utils.common import CommonsDep
 
 
 async def verify_api_key(api_key: str, commons: CommonsDep):     
