@@ -23,10 +23,22 @@ def calculate_remaining_space(request, max_brain_size, max_brain_size_with_own_k
     remaining_free_space = float(max_brain_size_with_own_key) - current_brain_size if request.headers.get('Openai-Api-Key') else float(max_brain_size) - current_brain_size
     return remaining_free_space
 
-@upload_router.post("/upload", dependencies=[Depends(AuthBearer())])
+@upload_router.post("/upload", dependencies=[Depends(AuthBearer())], tags=["Upload"])
 async def upload_file(request: Request, commons: CommonsDep,  file: UploadFile, enable_summarization: bool = False, current_user: User = Depends(get_current_user)):
+    """
+    Upload a file to the user's storage.
+
+    - `file`: The file to be uploaded.
+    - `enable_summarization`: Flag to enable summarization of the file's content.
+    - `current_user`: The current authenticated user.
+    - Returns the response message indicating the success or failure of the upload.
+
+    This endpoint allows users to upload files to their storage (brain). It checks the remaining free space in the user's storage (brain)
+    and ensures that the file size does not exceed the maximum capacity. If the file is within the allowed size limit,
+    it can optionally apply summarization to the file's content. The response message will indicate the status of the upload.
+    """
     max_brain_size = os.getenv("MAX_BRAIN_SIZE")
-    max_brain_size_with_own_key = os.getenv("MAX_BRAIN_SIZE_WITH_KEY",209715200)
+    max_brain_size_with_own_key = os.getenv("MAX_BRAIN_SIZE_WITH_KEY", 209715200)
     
     user_unique_vectors = get_user_vectors(commons, current_user)
     current_brain_size = sum(float(doc['size']) for doc in user_unique_vectors)
