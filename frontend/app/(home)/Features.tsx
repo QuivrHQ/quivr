@@ -1,5 +1,4 @@
-import Card from "@/lib/components/ui/Card";
-import { FC, ReactNode } from "react";
+import { ReactNode } from "react";
 import {
   GiArtificialIntelligence,
   GiBrain,
@@ -9,7 +8,9 @@ import {
   GiOpenBook,
 } from "react-icons/gi";
 
-const Features: FC = () => {
+import Card from "@/lib/components/ui/Card";
+
+const Features = (): JSX.Element => {
   return (
     <section className="my-20 text-center flex flex-col items-center justify-center gap-10">
       <div>
@@ -58,7 +59,7 @@ interface FeatureProps {
   desc: string;
 }
 
-const Feature: FC<FeatureProps> = ({ title, desc, icon }) => {
+const Feature = ({ title, desc, icon }: FeatureProps): JSX.Element => {
   return (
     <Card className="p-10 max-w-xs flex flex-col gap-5 w-full">
       {icon}

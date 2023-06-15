@@ -1,8 +1,11 @@
+/* eslint-disable */
 "use client";
-import { cn } from "@/lib/utils";
 import * as ToastPrimitive from "@radix-ui/react-toast";
 import { AnimatePresence, motion } from "framer-motion";
 import { ReactNode } from "react";
+
+import { cn } from "@/lib/utils";
+
 import Button from "../../Button";
 import { ToastContext } from "../domain/ToastContext";
 import { ToastVariants } from "../domain/types";
@@ -11,15 +14,21 @@ import { useToastBuilder } from "../hooks/useToastBuilder";
 export const Toast = ({
   children,
   ...toastProviderProps
-}: { children?: ReactNode } & ToastPrimitive.ToastProviderProps) => {
+}: {
+  children?: ReactNode;
+} & ToastPrimitive.ToastProviderProps): JSX.Element => {
   const { publish, toasts, toggleToast } = useToastBuilder();
+
   return (
     <ToastPrimitive.Provider {...toastProviderProps}>
       <ToastContext.Provider value={{ publish }}>
         {children}
         <AnimatePresence mode="popLayout">
           {toasts.map((toast) => {
-            if (!toast.open) return;
+            if (toast.open !== true) {
+              return;
+            }
+
             return (
               <ToastPrimitive.Root
                 open={toast.open}

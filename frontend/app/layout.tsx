@@ -1,11 +1,13 @@
-import Footer from "@/lib/components/Footer";
-import { NavBar } from "@/lib/components/NavBar";
-import { ToastProvider } from "@/lib/components/ui/Toast";
 import { createServerComponentSupabaseClient } from "@supabase/auth-helpers-nextjs";
 import { Analytics } from "@vercel/analytics/react";
 import { Inter } from "next/font/google";
 import { cookies, headers } from "next/headers";
-import { BrainConfigProvider } from "../lib/context/BrainConfigProvider/brain-config-provider";
+
+import Footer from "@/lib/components/Footer";
+import { NavBar } from "@/lib/components/NavBar";
+import { ToastProvider } from "@/lib/components/ui/Toast";
+import { BrainConfigProvider } from "@/lib/context/BrainConfigProvider/brain-config-provider";
+
 import "./globals.css";
 import SupabaseProvider from "./supabase-provider";
 
@@ -17,11 +19,11 @@ export const metadata = {
     "Quivr is your second brain in the cloud, designed to easily store and retrieve unstructured information.",
 };
 
-export default async function RootLayout({
+const RootLayout = async ({
   children,
 }: {
   children: React.ReactNode;
-}) {
+}): Promise<JSX.Element> => {
   const supabase = createServerComponentSupabaseClient({
     headers,
     cookies,
@@ -49,4 +51,6 @@ export default async function RootLayout({
       </body>
     </html>
   );
-}
+};
+
+export default RootLayout;

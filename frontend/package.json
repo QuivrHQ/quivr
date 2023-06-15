@@ -7,9 +7,12 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "lint-fix": "eslint --fix .",
     "test-type": "tsc --noEmit --emitDeclarationOnly false",
     "test": "yarn test-type",
-    "precommit": "yarn lint && yarn test"
+    "precommit": "yarn lint && yarn test",
+    "format-check": "prettier --check .",
+    "format-fix": "prettier --write ."
   },
   "dependencies": {
     "@emotion/react": "^11.11.0",
@@ -35,9 +38,11 @@
     "encoding": "^0.1.13",
     "eslint": "^8.41.0",
     "eslint-config-next": "13.4.2",
+    "eslint-plugin-prefer-arrow": "^1.2.3",
     "framer-motion": "^10.12.12",
     "next": "13.4.2",
     "postcss": "8.4.23",
+    "prettier": "^2.8.8",
     "pretty-bytes": "^6.1.0",
     "react": "18.2.0",
     "react-dom": "18.2.0",

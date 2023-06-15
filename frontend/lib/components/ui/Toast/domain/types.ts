@@ -1,4 +1,4 @@
-import { VariantProps, cva } from "class-variance-authority";
+import { cva, VariantProps } from "class-variance-authority";
 
 export const ToastVariants = cva(
   "bg-white dark:bg-black px-8 max-w-sm w-full py-5 border border-black/10 dark:border-white/25 rounded-xl shadow-xl flex items-center pointer-events-auto data-[swipe=end]:opacity-0 data-[state=closed]:opacity-0 transition-opacity",

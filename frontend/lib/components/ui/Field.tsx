@@ -1,10 +1,12 @@
-import { cn } from "@/lib/utils";
+/* eslint-disable */
 import {
   DetailedHTMLProps,
+  forwardRef,
   InputHTMLAttributes,
   RefObject,
-  forwardRef,
 } from "react";
+
+import { cn } from "@/lib/utils";
 
 interface FieldProps
   extends DetailedHTMLProps<

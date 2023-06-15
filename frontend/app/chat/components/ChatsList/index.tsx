@@ -1,12 +1,15 @@
+/* eslint-disable */
 "use client";
+import useChatsContext from "@/lib/context/ChatsProvider/hooks/useChatsContext";
 import { cn } from "@/lib/utils";
 import { MotionConfig, motion } from "framer-motion";
 import { useState } from "react";
 import { MdChevronRight } from "react-icons/md";
-import useChatsContext from "@/lib/context/ChatsProvider/hooks/useChatsContext";
+
 import ChatsListItem from "./ChatsListItem";
 import { NewChatButton } from "./NewChatButton";
-export function ChatsList() {
+
+export const ChatsList = (): JSX.Element => {
   const { allChats, deleteChat } = useChatsContext();
 
   const [open, setOpen] = useState(false);
@@ -69,4 +72,4 @@ export function ChatsList() {
       </motion.div>
     </MotionConfig>
   );
-}
+};

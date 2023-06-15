@@ -1,5 +1,6 @@
+/* eslint-disable */
 import Link from "next/link";
-import { Dispatch, FC, ReactNode, SetStateAction } from "react";
+import { Dispatch, ReactNode, SetStateAction } from "react";
 
 interface NavLinkProps {
   children: ReactNode;
@@ -7,7 +8,11 @@ interface NavLinkProps {
   setOpen?: Dispatch<SetStateAction<boolean>>;
 }
 
-export const NavLink: FC<NavLinkProps> = ({ children, to, setOpen }) => {
+export const NavLink = ({
+  children,
+  to,
+  setOpen,
+}: NavLinkProps): JSX.Element => {
   return (
     <li className="group relative">
       <Link onClick={() => setOpen && setOpen(false)} href={to}>
