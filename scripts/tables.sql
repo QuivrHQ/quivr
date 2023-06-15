@@ -120,7 +120,7 @@ CREATE TABLE  IF NOT EXISTS brains (
   name TEXT,
   status TEXT,
   model TEXT,
-  chunking TEXT,
+  max_tokens TEXT,
   temperature FLOAT
 );
 

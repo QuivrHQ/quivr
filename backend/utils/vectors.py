@@ -1,4 +1,5 @@
 import os
+import time
 from typing import Annotated
 
 from fastapi import Depends
@@ -109,7 +110,7 @@ def similarity_search(query, table='match_summaries', top_k=5, threshold=0.5):
     ).execute()
     return summaries.data
 
-def fetch_user_id_from_credentials(commons: CommonsDep,date,credentials):
+def fetch_user_id_from_credentials(commons: CommonsDep,credentials):
     user = User(email=credentials.get('email', 'none'))
 
     # Fetch the user's UUID based on their email
@@ -118,6 +119,7 @@ def fetch_user_id_from_credentials(commons: CommonsDep,date,credentials):
     userItem = next(iter(response.data or []), {})
 
     if userItem == {}: 
+        date = time.strftime("%Y%m%d")
         create_user_response = create_user(email= user.email, date=date)
         user_id = create_user_response.data[0]['user_id']
 
