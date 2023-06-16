@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import { useCallback, useState } from "react";
 import { FileRejection, useDropzone } from "react-dropzone";
 
-import { useSupabase } from "@/app/supabase-provider";
+import { useSupabase } from "@/lib/context/SupabaseProvider";
 import { useToast } from "@/lib/hooks/useToast";
 import { useAxios } from "@/lib/useAxios";
 

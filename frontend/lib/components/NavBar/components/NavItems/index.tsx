@@ -4,8 +4,8 @@ import Link from "next/link";
 import { Dispatch, HTMLAttributes, SetStateAction } from "react";
 import { MdPerson, MdSettings } from "react-icons/md";
 
-import { useSupabase } from "@/app/supabase-provider";
 import Button from "@/lib/components/ui/Button";
+import { useSupabase } from "@/lib/context/SupabaseProvider";
 import { cn } from "@/lib/utils";
 
 import { AuthButtons } from "./components/AuthButtons";

@@ -7,9 +7,9 @@ import Footer from "@/lib/components/Footer";
 import { NavBar } from "@/lib/components/NavBar";
 import { ToastProvider } from "@/lib/components/ui/Toast";
 import { BrainConfigProvider } from "@/lib/context/BrainConfigProvider/brain-config-provider";
+import { SupabaseProvider } from "@/lib/context/SupabaseProvider";
 
 import "./globals.css";
-import SupabaseProvider from "./supabase-provider";
 
 const inter = Inter({ subsets: ["latin"] });
 
