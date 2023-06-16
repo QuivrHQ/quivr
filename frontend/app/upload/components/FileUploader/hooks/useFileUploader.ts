@@ -4,8 +4,8 @@ import { useCallback, useState } from "react";
 import { FileRejection, useDropzone } from "react-dropzone";
 
 import { useSupabase } from "@/lib/context/SupabaseProvider";
+import { useAxios } from "@/lib/hooks";
 import { useToast } from "@/lib/hooks/useToast";
-import { useAxios } from "@/lib/useAxios";
 
 export const useFileUploader = () => {
   const [isPending, setIsPending] = useState(false);

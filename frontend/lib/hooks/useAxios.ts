@@ -1,7 +1,7 @@
 import axios, { AxiosError, AxiosInstance } from "axios";
 
-import { useBrainConfig } from "./context/BrainConfigProvider/hooks/useBrainConfig";
-import { useSupabase } from "./context/SupabaseProvider";
+import { useBrainConfig } from "../context/BrainConfigProvider/hooks/useBrainConfig";
+import { useSupabase } from "../context/SupabaseProvider";
 
 const axiosInstance = axios.create({
   baseURL: `${process.env.NEXT_PUBLIC_BACKEND_URL ?? ""}`,

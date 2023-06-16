@@ -1,7 +1,7 @@
 /* eslint-disable */
 import { useEffect, useState } from "react";
 
-import { useAxios } from "@/lib/useAxios";
+import { useAxios } from "@/lib/hooks";
 
 import { useSupabase } from "../../../lib/context/SupabaseProvider";
 

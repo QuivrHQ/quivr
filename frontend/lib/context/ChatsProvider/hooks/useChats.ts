@@ -4,8 +4,8 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import { useBrainConfig } from "@/lib/context/BrainConfigProvider/hooks/useBrainConfig";
+import { useAxios } from "@/lib/hooks";
 import { useToast } from "@/lib/hooks/useToast";
-import { useAxios } from "@/lib/useAxios";
 
 import { Chat, ChatMessage } from "../../../types/Chat";
 

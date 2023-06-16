@@ -4,7 +4,7 @@
 import { useState } from "react";
 
 import Button from "@/lib/components/ui/Button";
-import { useAxios } from "@/lib/useAxios";
+import { useAxios } from "@/lib/hooks";
 
 export const ApiKeyConfig = (): JSX.Element => {
   const [apiKey, setApiKey] = useState("");

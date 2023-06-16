@@ -4,8 +4,8 @@ import { redirect } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import Spinner from "@/lib/components/ui/Spinner";
+import { useAxios } from "@/lib/hooks";
 import { UserStats } from "@/lib/types/User";
-import { useAxios } from "@/lib/useAxios";
 
 import { useSupabase } from "@/lib/context/SupabaseProvider";
 import { UserStatistics } from "./components/UserStatistics";

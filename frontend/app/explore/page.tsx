@@ -8,8 +8,8 @@ import { useEffect, useState } from "react";
 import Button from "@/lib/components/ui/Button";
 import Spinner from "@/lib/components/ui/Spinner";
 import { useSupabase } from "@/lib/context/SupabaseProvider";
+import { useAxios } from "@/lib/hooks";
 import { Document } from "@/lib/types/Document";
-import { useAxios } from "@/lib/useAxios";
 
 import DocumentItem from "./DocumentItem";
 
