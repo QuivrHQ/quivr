@@ -1,11 +1,11 @@
-from typing import List, Tuple, Optional
+from typing import List, Optional, Tuple
 from uuid import UUID
 
 from pydantic import BaseModel
 
 
 class ChatMessage(BaseModel):
-    model: str = "gpt-3.5-turbo-0613"
+    model: str = "gpt-3.5-turbo-16k"
     question: str
     # A list of tuples where each tuple is (speaker, text)
     history: List[Tuple[str, str]]

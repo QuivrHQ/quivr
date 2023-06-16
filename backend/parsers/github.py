@@ -22,7 +22,7 @@ async def process_github(repo, enable_summarization, user, supabase, user_openai
     documents = loader.load()
     os.system("rm -rf /tmp/" + random_dir_name)
 
-    chunk_size = 500
+    chunk_size = 250
     chunk_overlap = 0
     text_splitter = RecursiveCharacterTextSplitter.from_tiktoken_encoder(
         chunk_size=chunk_size, chunk_overlap=chunk_overlap)
