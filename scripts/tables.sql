@@ -114,3 +114,32 @@ CREATE TABLE IF NOT EXISTS api_keys(
     is_active BOOLEAN DEFAULT true
 );
 
+-- Create brains table
+CREATE TABLE  IF NOT EXISTS brains (
+  brain_id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  name TEXT,
+  status TEXT,
+  model TEXT,
+  max_tokens TEXT,
+  temperature FLOAT
+);
+
+-- Create brains X users table
+CREATE TABLE IF NOT EXISTS brains_users (
+  brain_id UUID,
+  user_id UUID,
+  rights VARCHAR(255),
+  PRIMARY KEY (brain_id, user_id),
+  FOREIGN KEY (user_id) REFERENCES Users(user_id),
+  FOREIGN KEY (brain_id) REFERENCES Brains(brain_id)
+);
+
+-- Create brains X vectors table
+CREATE TABLE IF NOT EXISTS brains_vectors (
+  brain_id UUID,
+  vector_id BIGSERIAL,
+  rights VARCHAR(255),
+  PRIMARY KEY (brain_id, vector_id),
+  FOREIGN KEY (vector_id) REFERENCES vectors(id),
+  FOREIGN KEY (brain_id) REFERENCES brains(brain_id)
+);

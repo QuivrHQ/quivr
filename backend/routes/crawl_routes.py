@@ -7,9 +7,9 @@ from crawl.crawler import CrawlWebsite
 from fastapi import APIRouter, Depends, Request, UploadFile
 from models.users import User
 from parsers.github import process_github
+from utils.common import CommonsDep
 from utils.file import convert_bytes
 from utils.processors import filter_file
-from utils.vectors import CommonsDep
 
 crawl_router = APIRouter()
 
@@ -54,7 +54,7 @@ async def crawl_endpoint(request: Request,commons: CommonsDep, crawl_website: Cr
 
             # Pass the SpooledTemporaryFile to UploadFile
             file = UploadFile(file=spooled_file, filename=file_name)
-            message = await filter_file(file, enable_summarization, commons['supabase'], user=current_user, openai_api_key=request.headers.get('Openai-Api-Key', None))
+            message = await filter_file(commons, file, enable_summarization, user=current_user, openai_api_key=request.headers.get('Openai-Api-Key', None))
             return message
         else:
             message = await process_github(crawl_website.url, "false", user=current_user, supabase=commons['supabase'], user_openai_api_key=request.headers.get('Openai-Api-Key', None))

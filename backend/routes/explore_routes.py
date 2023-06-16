@@ -1,7 +1,7 @@
 from auth.auth_bearer import AuthBearer, get_current_user
 from fastapi import APIRouter, Depends
 from models.users import User
-from utils.vectors import CommonsDep
+from utils.common import CommonsDep
 
 explore_router = APIRouter()
 

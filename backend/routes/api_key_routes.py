@@ -10,7 +10,8 @@ from fastapi import APIRouter, Depends
 from logger import get_logger
 from models.users import User
 from pydantic import BaseModel
-from utils.vectors import CommonsDep, fetch_user_id_from_credentials
+from utils.common import CommonsDep
+from utils.users import fetch_user_id_from_credentials
 
 logger = get_logger(__name__)
 
@@ -37,8 +38,7 @@ async def create_api_key(commons: CommonsDep, current_user: User = Depends(get_c
     the user. It returns the newly created API key.
     """
 
-    date = time.strftime("%Y%m%d")
-    user_id = fetch_user_id_from_credentials(commons, date, {"email": current_user.email})
+    user_id = fetch_user_id_from_credentials(commons, {"email": current_user.email})
 
     new_key_id = str(uuid4())
     new_api_key = token_hex(16)
@@ -96,7 +96,7 @@ async def get_api_keys(commons: CommonsDep, current_user: User = Depends(get_cur
     containing the key ID and creation time for each API key.
     """
 
-    user_id = fetch_user_id_from_credentials(commons, time.strftime("%Y%m%d"), {"email": current_user.email})
+    user_id = fetch_user_id_from_credentials(commons, {"email": current_user.email})
 
     response = commons['supabase'].table('api_keys').select("key_id, creation_time").filter('user_id', 'eq', user_id).filter('is_active', 'eq', True).execute()
     return response.data
