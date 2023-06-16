@@ -69,9 +69,16 @@ def get_answer(commons: CommonsDep,  chat_message: ChatMessage, email: str, user
         model_response = qa(
             {"question": additional_context + chat_message.question})
     else:
-        model_response = qa({"question": chat_message.question, "chat_history": chat_message.history})
+        transformed_history = []
 
-    answer = model_response['answer']   
+        # Iterate through pairs in the history (assuming each user message is followed by an assistant message)
+        for i in range(0, len(chat_message.history) - 1, 2):
+            user_message = chat_message.history[i][1]
+            assistant_message = chat_message.history[i + 1][1]
+            transformed_history.append((user_message, assistant_message))
+        model_response = qa({"question": chat_message.question, "chat_history":transformed_history})
+
+    answer = model_response['answer']
 
     # append sources (file_name) to answer
     if "source_documents" in answer:
