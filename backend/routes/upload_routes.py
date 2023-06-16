@@ -3,9 +3,9 @@ import os
 from auth.auth_bearer import AuthBearer, get_current_user
 from fastapi import APIRouter, Depends, Request, UploadFile
 from models.users import User
+from utils.common import CommonsDep
 from utils.file import convert_bytes, get_file_size
 from utils.processors import filter_file
-from utils.vectors import CommonsDep
 
 upload_router = APIRouter()
 
@@ -50,6 +50,6 @@ async def upload_file(request: Request, commons: CommonsDep,  file: UploadFile, 
     if remaining_free_space - file_size < 0:
         message = {"message": f"❌ User's brain will exceed maximum capacity with this upload. Maximum file allowed is : {convert_bytes(remaining_free_space)}", "type": "error"}
     else: 
-        message = await filter_file(file, enable_summarization, commons['supabase'], current_user, openai_api_key=request.headers.get('Openai-Api-Key', None))
+        message = await filter_file(commons, file, enable_summarization, current_user, openai_api_key=request.headers.get('Openai-Api-Key', None))
  
     return message
