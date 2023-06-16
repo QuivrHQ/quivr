@@ -7,6 +7,7 @@ import { useBrainConfig } from "@/lib/context/BrainConfigProvider/hooks/useBrain
 import { useToast } from "@/lib/hooks/useToast";
 import { useAxios } from "@/lib/useAxios";
 
+import { useEventSource } from "@/lib/useEventSource";
 import { Chat, ChatMessage } from "../../../types/Chat";
 
 export default function useChats() {
@@ -21,6 +22,7 @@ export default function useChats() {
   } = useBrainConfig();
   const router = useRouter();
   const { publish } = useToast();
+  const { openStream } = useEventSource();
 
   const fetchAllChats = useCallback(async () => {
     try {
@@ -63,6 +65,25 @@ export default function useChats() {
 
   type ChatResponse = Omit<Chat, "chatId"> & { chatId: UUID | undefined };
 
+  const openChatStream = (
+    url: string,
+    options: Record<string, string | unknown>
+  ) => {
+    openStream(
+      url,
+      options,
+      (data) => {
+        console.log(data);
+      },
+      (err) => {
+        console.error(err);
+      },
+      () => {
+        console.log("Connection closed by the server");
+      }
+    );
+  };
+
   const createChat = ({
     options,
   }: {
@@ -78,7 +99,7 @@ export default function useChats() {
   }: {
     options: Record<string, string | unknown>;
   }) => {
-    return axiosInstance.put<ChatResponse>(`/chat/${options.chat_id}`, options);
+    return openChatStream(`/chat/${options.chat_id}/stream`, options);
   };
 
   const sendMessage = async (chatId?: UUID, msg?: ChatMessage) => {

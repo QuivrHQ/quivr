@@ -34,11 +34,21 @@ def create_clients_and_embeddings(openai_api_key, supabase_url, supabase_key):
     return supabase_client, embeddings
 
 
+def get_vector_store_and_memory(supabase_client, embeddings, user_id):
+    vector_store = CustomSupabaseVectorStore(
+        supabase_client, embeddings, table_name="vectors", user_id=user_id)
+    memory = ConversationBufferMemory(
+        memory_key="chat_history", return_messages=True)
+    return vector_store, memory
+
+
 def get_qa_llm(
     chat_message: ChatMessage,
     user_id: str,
     user_openai_api_key: str,
     with_sources: bool = False,
+    with_streaming: bool = False,
+    callback_handler=None,
 ):
     '''User can override the openai_api_key'''
     (
@@ -55,41 +65,59 @@ def get_qa_llm(
         openai_api_key, supabase_url, supabase_key
     )
 
-    vector_store = CustomSupabaseVectorStore(
-        supabase_client, embeddings, table_name="vectors", user_id=user_id)
-
-    memory = ConversationBufferMemory(
-        memory_key="chat_history", return_messages=True)
+    vector_store, memory = get_vector_store_and_memory(
+        supabase_client, embeddings, user_id
+    )
 
     qa = None
     # this overwrites the built-in prompt of the ConversationalRetrievalChain
 
     if chat_message.model.startswith("gpt"):
-        llm = ChatOpenAI(temperature=0)
+        if with_streaming:
+            llm = ChatOpenAI(temperature=0)
 
-        streaming_llm = ChatOpenAI(
-            model_name=chat_message.model,
-            openai_api_key=openai_api_key,
-            temperature=chat_message.temperature,
-            max_tokens=chat_message.max_tokens,
-            streaming=True,
-            callbacks=[StreamingCallbackHandler()],
-        )
+            streaming_llm = ChatOpenAI(
+                model_name=chat_message.model,
+                openai_api_key=openai_api_key,
+                temperature=chat_message.temperature,
+                max_tokens=chat_message.max_tokens,
+                streaming=with_streaming,
+                callbacks=[callback_handler] if callback_handler else [],
+            )
 
-        question_generator = LLMChain(llm=llm, prompt=CONDENSE_QUESTION_PROMPT)
-        docs_chain = load_qa_chain(
-            streaming_llm,
-            chain_type="stuff",
-            prompt=QA_PROMPT,
-        )
+            question_generator = LLMChain(
+                llm=llm, prompt=CONDENSE_QUESTION_PROMPT)
+            docs_chain = load_qa_chain(
+                streaming_llm,
+                chain_type="stuff",
+                prompt=QA_PROMPT,
+            )
 
-        qa = ConversationalRetrievalChain(
-            retriever=vector_store.as_retriever(),
-            combine_docs_chain=docs_chain,
-            question_generator=question_generator,
-            verbose=True,
-            max_tokens_limit=1024,
-        )
+            qa = ConversationalRetrievalChain(
+                retriever=vector_store.as_retriever(),
+                combine_docs_chain=docs_chain,
+                question_generator=question_generator,
+                verbose=True,
+                max_tokens_limit=1024,
+            )
+        else:
+            qa = ConversationalRetrievalChain.from_llm(
+                ChatOpenAI(
+                    model_name=chat_message.model,
+                    openai_api_key=openai_api_key,
+                    temperature=chat_message.temperature,
+                    max_tokens=chat_message.max_tokens,
+                ),
+                vector_store.as_retriever(),
+                memory=memory,
+                verbose=True,
+                return_source_documents=with_sources,
+                max_tokens_limit=1024,
+            )
+
+            qa.combine_docs_chain = load_qa_chain(
+                ChatOpenAI(), chain_type="stuff", prompt=QA_PROMPT
+            )
 
     elif chat_message.model.startswith("vertex"):
         qa = ConversationalRetrievalChain.from_llm(

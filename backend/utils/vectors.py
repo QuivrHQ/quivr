@@ -5,6 +5,7 @@ from fastapi import Depends
 from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.schema import Document
 from langchain.vectorstores import SupabaseVectorStore
+from llm.callback import StreamingCallbackHandler
 from llm.qa import get_qa_llm
 from llm.summarization import llm_evaluate_summaries, llm_summerize
 from logger import get_logger
@@ -145,8 +146,20 @@ def get_chat_name_from_first_question(chat_message: ChatMessage):
     return chat_name
 
 
-def get_answer(commons: CommonsDep,  chat_message: ChatMessage, email: str, user_openai_api_key: str):
-    qa = get_qa_llm(chat_message, email, user_openai_api_key)
+async def get_answer(commons: CommonsDep,  chat_message: ChatMessage, email: str, user_openai_api_key: str, streaming_queue=None):
+    """
+    Get the answer from the LLM.
+    If streaming_queue is provided, the answer will be streamed to the queue.
+    """
+    if streaming_queue:
+        with_streaming = True
+        callback_handler = StreamingCallbackHandler(streaming_queue)
+        qa = get_qa_llm(chat_message, email,
+                        user_openai_api_key, with_streaming, callback_handler=callback_handler)
+        logger.info(f"Streaming answer to queue")
+
+    else:
+        qa = get_qa_llm(chat_message, email, user_openai_api_key)
 
     if chat_message.use_summarization:
         # 1. get summaries from the vector store based on question
