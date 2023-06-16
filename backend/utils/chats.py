@@ -21,6 +21,9 @@ def create_chat(commons: CommonsDep, user_id, history, chat_name):
     return(insert_response)
 
 def update_chat(commons: CommonsDep, chat_id, history):
+    if not chat_id:
+        logger.error("No chat_id provided")
+        return
     commons['supabase'].table("chats").update(
         { "history": history}).match({"chat_id": chat_id}).execute()
     logger.info(f"Chat {chat_id} updated")
