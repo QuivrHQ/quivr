@@ -1,5 +1,6 @@
-import streamlit as st
 import numpy as np
+import streamlit as st
+
 
 def brain(supabase):
     ## List all documents
