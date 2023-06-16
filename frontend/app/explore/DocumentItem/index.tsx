@@ -13,8 +13,7 @@ import { AnimatedCard } from "@/lib/components/ui/Card";
 import Ellipsis from "@/lib/components/ui/Ellipsis";
 import Modal from "@/lib/components/ui/Modal";
 import { useSupabase } from "@/lib/context/SupabaseProvider";
-import { useAxios } from "@/lib/hooks";
-import { useToast } from "@/lib/hooks/useToast";
+import { useAxios, useToast } from "@/lib/hooks";
 import { Document } from "@/lib/types/Document";
 import { useEventTracking } from "@/services/analytics/useEventTracking";
 

@@ -4,12 +4,11 @@ import { useCallback, useState } from "react";
 import { FileRejection, useDropzone } from "react-dropzone";
 
 import { useSupabase } from "@/lib/context/SupabaseProvider";
-import { useAxios } from "@/lib/hooks";
-import { useToast } from "@/lib/hooks/useToast";
+import { useAxios, useToast } from "@/lib/hooks";
 import { useEventTracking } from "@/services/analytics/useEventTracking";
 
 export const useFileUploader = () => {
-  const { track} = useEventTracking();
+  const { track } = useEventTracking();
   const [isPending, setIsPending] = useState(false);
   const { publish } = useToast();
   const [files, setFiles] = useState<File[]>([]);

@@ -3,10 +3,8 @@ import { redirect } from "next/navigation";
 import { useCallback, useRef, useState } from "react";
 
 import { useSupabase } from "@/lib/context/SupabaseProvider";
-import { useAxios } from "@/lib/hooks";
-import { useToast } from "@/lib/hooks/useToast";
+import { useAxios, useToast } from "@/lib/hooks";
 import { useEventTracking } from "@/services/analytics/useEventTracking";
-
 
 import { isValidUrl } from "../helpers/isValidUrl";
 
@@ -16,8 +14,7 @@ export const useCrawler = () => {
   const { session } = useSupabase();
   const { publish } = useToast();
   const { axiosInstance } = useAxios();
-  const { track} = useEventTracking();
-
+  const { track } = useEventTracking();
 
   if (session === null) {
     redirect("/login");
