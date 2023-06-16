@@ -32,7 +32,7 @@ class CustomSupabaseVectorStore(SupabaseVectorStore):
         query: str, 
         user_id: str = "none",
         table: str = "match_vectors", 
-        k: int = 8, 
+        k: int = 16, 
         threshold: float = 0.5, 
         **kwargs: Any
     ) -> List[Document]:

@@ -58,7 +58,7 @@ async def process_audio(upload_file: UploadFile, enable_summarization: bool, use
     file_size = len(transcript.text.encode("utf-8"))
 
     # Load chunk size and overlap from sidebar
-    chunk_size = 250
+    chunk_size = 1000
     chunk_overlap = 0
 
     text_splitter = RecursiveCharacterTextSplitter.from_tiktoken_encoder(
