@@ -31,7 +31,7 @@ async def process_file(file: UploadFile, loader_class, file_suffix, enable_summa
         file_sha1 = compute_sha1_from_file(tmp_file.name)
 
     os.remove(tmp_file.name)
-    chunk_size = 500
+    chunk_size = 250
     chunk_overlap = 0
 
     text_splitter = RecursiveCharacterTextSplitter.from_tiktoken_encoder(
