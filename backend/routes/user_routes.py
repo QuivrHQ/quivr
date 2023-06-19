@@ -3,8 +3,8 @@ import time
 
 from auth.auth_bearer import AuthBearer, get_current_user
 from fastapi import APIRouter, Depends, Request
+from models.settings import CommonsDep
 from models.users import User
-from utils.common import CommonsDep
 
 user_router = APIRouter()
 

@@ -5,9 +5,9 @@ from tempfile import SpooledTemporaryFile
 from auth.auth_bearer import AuthBearer, get_current_user
 from crawl.crawler import CrawlWebsite
 from fastapi import APIRouter, Depends, Request, UploadFile
+from models.settings import CommonsDep
 from models.users import User
 from parsers.github import process_github
-from utils.common import CommonsDep
 from utils.file import convert_bytes
 from utils.processors import filter_file
 

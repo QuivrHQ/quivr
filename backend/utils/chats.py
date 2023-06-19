@@ -1,6 +1,6 @@
 from logger import get_logger
 from models.chats import ChatMessage
-from utils.common import CommonsDep
+from models.settings import CommonsDep
 
 logger = get_logger(__name__)
 
