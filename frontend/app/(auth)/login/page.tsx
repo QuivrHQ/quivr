@@ -51,7 +51,7 @@ export default function Login() {
   return (
     <main>
       <section className="w-full min-h-[80vh] h-full outline-none flex flex-col gap-5 items-center justify-center p-6">
-        <PageHeading title="Login" subtitle="Welcome back" />
+        <PageHeading title="登录" subtitle="欢迎回来" />
         <Card className="max-w-md w-full p-5 sm:p-10 text-left">
           <form
             onSubmit={(e) => {
@@ -80,14 +80,14 @@ export default function Login() {
               <Button type="submit" isLoading={isPending}>
                 Login
               </Button>
-              <Link href="/signup">Don{"'"}t have an account? Sign up</Link>
+              <Link href="/signup">还没有账号？先注册</Link>
             </div>
-            <Divider text="or" />
+           {/*    <Divider text="or" />
             <div className="flex flex-col items-center justify-center mt-2 gap-2">
               <GoogleLoginButton />
             </div>
             <Divider text="or" />
-            <MagicLinkLogin email={email} setEmail={setEmail} />
+            <MagicLinkLogin email={email} setEmail={setEmail} /> */}
           </form>
         </Card>
       </section>

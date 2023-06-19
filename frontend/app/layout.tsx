@@ -3,7 +3,7 @@ import { Analytics } from "@vercel/analytics/react";
 import { Inter } from "next/font/google";
 import { cookies, headers } from "next/headers";
 
-import Footer from "@/lib/components/Footer";
+//import Footer from "@/lib/components/Footer";
 import { NavBar } from "@/lib/components/NavBar";
 import { ToastProvider } from "@/lib/components/ui/Toast";
 import { BrainConfigProvider } from "@/lib/context/BrainConfigProvider/brain-config-provider";
@@ -43,7 +43,7 @@ const RootLayout = async ({
             <BrainConfigProvider>
               <NavBar />
               <div className="flex-1">{children}</div>
-              <Footer />
+                    {/*      <Footer /> */}
             </BrainConfigProvider>
           </SupabaseProvider>
         </ToastProvider>

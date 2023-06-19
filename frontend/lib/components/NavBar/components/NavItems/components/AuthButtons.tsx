@@ -9,14 +9,14 @@ export const AuthButtons = (): JSX.Element => {
   if (pathname === "/signup") {
     return (
       <Link href={"/login"}>
-        <Button variant={"secondary"}>Login</Button>
+        <Button variant={"secondary"}>登录</Button>
       </Link>
     );
   }
 
   return (
     <Link href={"/signup"}>
-      <Button variant={"secondary"}>Register</Button>
+      <Button variant={"secondary"}>注册</Button>
     </Link>
   );
 };
