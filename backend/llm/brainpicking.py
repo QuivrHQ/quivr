@@ -59,7 +59,7 @@ class BrainPicking(BaseModel):
         self.doc_chain = load_qa_chain(self.llm, chain_type="stuff")
         return self
     
-    def get_qa(self, chat_message: ChatMessage, user_openai_api_key) -> ConversationalRetrievalChain:
+    def _get_qa(self, chat_message: ChatMessage, user_openai_api_key) -> ConversationalRetrievalChain:
         if user_openai_api_key is not None and user_openai_api_key != "":
             self.settings.openai_api_key = user_openai_api_key
         qa = ConversationalRetrievalChain(
@@ -67,3 +67,16 @@ class BrainPicking(BaseModel):
                 max_tokens_limit=chat_message.max_tokens, question_generator=self.question_generator,
                 combine_docs_chain=self.doc_chain, get_chat_history=get_chat_history)
         return qa
+
+    def generate_answer(self, chat_message: ChatMessage, user_openai_api_key) -> str:
+        transformed_history = []
+
+        qa = self._get_qa(chat_message, user_openai_api_key)
+        for i in range(0, len(chat_message.history) - 1, 2):
+            user_message = chat_message.history[i][1]
+            assistant_message = chat_message.history[i + 1][1]
+            transformed_history.append((user_message, assistant_message))
+        model_response = qa({"question": chat_message.question, "chat_history": transformed_history})
+        answer = model_response['answer']
+
+        return answer
