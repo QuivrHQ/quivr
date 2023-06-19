@@ -52,7 +52,7 @@ export const ConfigForm = (): JSX.Element => {
           type="button"
           onClick={resetBrainConfig}
         >
-          充值
+          重置
         </Button>
         <Button variant="secondary" className="self-end">
           设置
