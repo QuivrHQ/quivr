@@ -13,7 +13,7 @@ interface LayoutProps {
 
 const Layout = ({ children }: LayoutProps): JSX.Element => {
   const { session } = useSupabase();
-  if (session === undefined) {
+  if (session === null) {
     redirect("/login");
   }
 

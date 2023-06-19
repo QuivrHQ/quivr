@@ -60,12 +60,12 @@ export default function useChats() {
 
   type ChatResponse = Omit<Chat, "chatId"> & { chatId: UUID | undefined };
 
-  const createChat = ({
+  const createChat = async ({
     options,
   }: {
     options: Record<string, string | unknown>;
   }) => {
-    fetchAllChats();
+    await fetchAllChats();
 
     return axiosInstance.post<ChatResponse>(`/chat`, options);
   };

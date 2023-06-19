@@ -51,7 +51,7 @@ export const FileUploader = (): JSX.Element => {
                 <AnimatePresence mode="popLayout">
                   {files.map((file) => (
                     <FileComponent
-                      key={file.name + file.size}
+                      key={`${file.name} ${file.size}`}
                       file={file}
                       setFiles={setFiles}
                     />
@@ -63,7 +63,7 @@ export const FileUploader = (): JSX.Element => {
         )}
       </div>
       <div className="flex flex-col items-center justify-center">
-        <Button isLoading={isPending} onClick={uploadAllFiles}>
+        <Button isLoading={isPending} onClick={void uploadAllFiles}>
           {isPending ? "Uploading..." : "Upload"}
         </Button>
       </div>
