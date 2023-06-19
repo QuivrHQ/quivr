@@ -1,14 +1,16 @@
 "use client";
 import Link from "next/link";
-import Button from "../components/ui/Button";
-import { Divider } from "../components/ui/Divider";
-import PageHeading from "../components/ui/PageHeading";
+
+import Button from "@/lib/components/ui/Button";
+import { Divider } from "@/lib/components/ui/Divider";
+import PageHeading from "@/lib/components/ui/PageHeading";
+
 import { Crawler } from "./components/Crawler";
 import { FileUploader } from "./components/FileUploader";
 
-export default function UploadPage() {
+const UploadPage = (): JSX.Element => {
   return (
-    <main className="pt-24">
+    <main className="pt-10">
       <PageHeading
         title="Upload Knowledge"
         subtitle="Text, document, spreadsheet, presentation, audio, video, and URLs supported"
@@ -25,4 +27,6 @@ export default function UploadPage() {
       </div>
     </main>
   );
-}
+};
+
+export default UploadPage;

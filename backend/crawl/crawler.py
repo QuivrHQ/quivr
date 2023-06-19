@@ -1,17 +1,19 @@
-import requests
-from pydantic import BaseModel
-import re
-import unicodedata
-import tempfile
 import os
+import queue
+import re
+import tempfile
+import unicodedata
+from urllib.parse import urljoin, urlparse
+
+import requests
+from bs4 import BeautifulSoup
+from pydantic import BaseModel
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from urllib.parse import urljoin, urlparse
-import queue
-from bs4 import BeautifulSoup
+from selenium.webdriver.support.ui import WebDriverWait
+
 
 class CrawlWebsite(BaseModel):
     url: str
@@ -121,6 +123,13 @@ class CrawlWebsite(BaseModel):
             # adding file content after formating it
             text += slugify(soup.get_text(), type='html') + "\n"
         return text
+        
+    def checkGithub(self):
+        if "github.com" in self.url:
+            return True
+        else:
+            return False
+
 
 def slugify(text, type=None):
     text = unicodedata.normalize('NFKD', text).encode('ascii', 'ignore').decode('utf-8')

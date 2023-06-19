@@ -1,15 +1,16 @@
-import { useSupabase } from "@/app/supabase-provider";
-import { useToast } from "@/lib/hooks/useToast";
-import { useAxios } from "@/lib/useAxios";
+/* eslint-disable */
 import { redirect } from "next/navigation";
 import { useCallback, useState } from "react";
 import { FileRejection, useDropzone } from "react-dropzone";
+
+import { useSupabase } from "@/app/supabase-provider";
+import { useToast } from "@/lib/hooks/useToast";
+import { useAxios } from "@/lib/useAxios";
 
 export const useFileUploader = () => {
   const [isPending, setIsPending] = useState(false);
   const { publish } = useToast();
   const [files, setFiles] = useState<File[]>([]);
-  const [pendingFileIndex, setPendingFileIndex] = useState<number>(0);
   const { session } = useSupabase();
 
   const { axiosInstance } = useAxios();
@@ -45,6 +46,7 @@ export const useFileUploader = () => {
   const onDrop = (acceptedFiles: File[], fileRejections: FileRejection[]) => {
     if (fileRejections.length > 0) {
       publish({ variant: "danger", text: "File too big." });
+
       return;
     }
 
@@ -70,15 +72,13 @@ export const useFileUploader = () => {
         text: "Please, add files to upload",
         variant: "warning",
       });
+
       return;
     }
     setIsPending(true);
 
-    for (const file of files) {
-      await upload(file);
-      setPendingFileIndex((i) => i + 1);
-    }
-    setPendingFileIndex(0);
+    await Promise.all(files.map((file) => upload(file)));
+
     setFiles([]);
     setIsPending(false);
   };
@@ -96,7 +96,6 @@ export const useFileUploader = () => {
     isDragActive,
     open,
     uploadAllFiles,
-    pendingFileIndex,
 
     files,
     setFiles,

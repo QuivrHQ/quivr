@@ -1,18 +1,22 @@
+/* eslint-disable */
 "use client";
-import { useSupabase } from "@/app/supabase-provider";
-import { useToast } from "@/lib/hooks/useToast";
-import { useAxios } from "@/lib/useAxios";
 import {
   Dispatch,
+  forwardRef,
   RefObject,
   SetStateAction,
-  forwardRef,
   useState,
 } from "react";
-import Button from "../../components/ui/Button";
-import { AnimatedCard } from "../../components/ui/Card";
-import Modal from "../../components/ui/Modal";
-import { Document } from "../types";
+
+import { useSupabase } from "@/app/supabase-provider";
+import Button from "@/lib/components/ui/Button";
+import { AnimatedCard } from "@/lib/components/ui/Card";
+import Ellipsis from "@/lib/components/ui/Ellipsis";
+import Modal from "@/lib/components/ui/Modal";
+import { useToast } from "@/lib/hooks/useToast";
+import { Document } from "@/lib/types/Document";
+import { useAxios } from "@/lib/useAxios";
+
 import DocumentData from "./DocumentData";
 
 interface DocumentProps {
@@ -52,13 +56,11 @@ const DocumentItem = forwardRef(
         ref={forwardedRef as RefObject<HTMLDivElement>}
         className="flex flex-col sm:flex-row sm:items-center justify-between w-full p-5 gap-5"
       >
-        <p className="text-lg leading-tight max-w-sm">{document.name}</p>
+        <Ellipsis tooltip maxCharacters={30}>
+          {document.name}
+        </Ellipsis>
         <div className="flex gap-2 self-end">
-          <Modal
-            title={document.name}
-            desc={""}
-            Trigger={<Button className="">View</Button>}
-          >
+          <Modal Trigger={<Button className="">View</Button>}>
             <DocumentData documentName={document.name} />
           </Modal>
 

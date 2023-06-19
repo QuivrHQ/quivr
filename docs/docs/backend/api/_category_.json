@@ -1,0 +1,8 @@
+{
+  "label": "API",
+  "position": 1,
+  "link": {
+    "type": "generated-index",
+    "description": "How does the API works ?"
+  }
+}

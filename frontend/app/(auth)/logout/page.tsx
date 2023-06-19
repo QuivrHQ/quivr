@@ -1,12 +1,14 @@
+/* eslint-disable */
 "use client";
-import Button from "@/app/components/ui/Button";
-import Card from "@/app/components/ui/Card";
-import PageHeading from "@/app/components/ui/PageHeading";
-import { useSupabase } from "@/app/supabase-provider";
-import { useToast } from "@/lib/hooks/useToast";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+
+import { useSupabase } from "@/app/supabase-provider";
+import Button from "@/lib/components/ui/Button";
+import Card from "@/lib/components/ui/Card";
+import PageHeading from "@/lib/components/ui/PageHeading";
+import { useToast } from "@/lib/hooks/useToast";
 
 export default function Logout() {
   const { supabase } = useSupabase();
@@ -37,7 +39,7 @@ export default function Logout() {
 
   return (
     <main>
-      <section className="w-full min-h-screen h-full outline-none flex flex-col gap-5 items-center justify-center p-6">
+      <section className="w-full min-h-[80vh] h-full outline-none flex flex-col gap-5 items-center justify-center p-6">
         <PageHeading title="Logout" subtitle="See you next time" />
         <Card className="max-w-md w-full p-5 sm:p-10 text-center flex flex-col items-center gap-5">
           <h2 className="text-lg">Are you sure you want to sign out?</h2>

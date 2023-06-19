@@ -12,6 +12,8 @@
 
 Quivr, your second brain, utilizes the power of GenerativeAI to store and retrieve unstructured information. Think of it as Obsidian, but turbocharged with AI capabilities.
 
+[Roadmap here](https://getquivr.notion.site/Quivr-GenerativeAI-Second-Brain-3b22a6f50ffe4d259a6f120a17bc0543) 
+
 ## Key Features 🎯
 
 - **Universal Data Acceptance**: Quivr can handle almost any type of data you throw at it. Text, images, code snippets, we've got you covered.
@@ -99,13 +101,9 @@ cp .frontend_env.example frontend/.env
 
 - **Step 4**: Run the following migration scripts on the Supabase database via the web interface (SQL Editor -> `New query`)
 
-[Migration Script 1](scripts/supabase_new_store_documents.sql)
+[Creation Script 1](scripts/tables.sql)
 
-[Migration Script 2](scripts/supabase_usage_table.sql)
-
-[Migration Script 3](scripts/supabase_vector_store_summary.sql)
-
-[Migrations Script 4](scripts/supabase_users_table.sql)
+> _If you come from an old version of Quivr, you can use the [migration script](scripts/20230606131110_add_uuid_user_id.sql) to migrate your data to the new version_
 
 - **Step 5**: Launch the app
 
@@ -141,4 +139,3 @@ Got a pull request? Open it, and we'll review it as soon as possible. Check out 
 - [Good First Issues](https://github.com/StanGirard/quivr/issues?q=is%3Aopen+is%3Aissue+label%3A%22good+first+issue%22)
 - [Frontend Issues](https://github.com/StanGirard/quivr/issues?q=is%3Aopen+is%3Aissue+label%3Afrontend)
 - [Backend Issues](https://github.com/StanGirard/quivr/issues?q=is%3Aopen+is%3Aissue+label%3Abackend)
-

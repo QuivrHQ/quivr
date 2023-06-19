@@ -10,8 +10,8 @@ from langchain.document_loaders import TextLoader
 from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.schema import Document
 from langchain.text_splitter import RecursiveCharacterTextSplitter
+from utils.common import documents_vector_store
 from utils.file import compute_sha1_from_content
-from utils.vectors import documents_vector_store
 
 # # Create a function to transcribe audio using Whisper
 # def _transcribe_audio(api_key, audio_file, stats_db):
@@ -32,7 +32,7 @@ from utils.vectors import documents_vector_store
 #     return transcript
 
 # async def process_audio(upload_file: UploadFile, stats_db):
-async def process_audio(upload_file: UploadFile, enable_summarization: bool, user):
+async def process_audio(upload_file: UploadFile, enable_summarization: bool, user, user_openai_api_key):
 
     file_sha = ""
     dateshort = time.strftime("%Y%m%d-%H%M%S")
@@ -40,6 +40,8 @@ async def process_audio(upload_file: UploadFile, enable_summarization: bool, use
     # uploaded file to file object
 
     openai_api_key = os.environ.get("OPENAI_API_KEY")
+    if user_openai_api_key:
+        openai_api_key = user_openai_api_key
 
     # Here, we're writing the uploaded file to a temporary file, so we can use it with your existing code.
     with tempfile.NamedTemporaryFile(delete=False, suffix=upload_file.filename) as tmp_file:
@@ -56,7 +58,7 @@ async def process_audio(upload_file: UploadFile, enable_summarization: bool, use
     file_size = len(transcript.text.encode("utf-8"))
 
     # Load chunk size and overlap from sidebar
-    chunk_size = 500
+    chunk_size = 1000
     chunk_overlap = 0
 
     text_splitter = RecursiveCharacterTextSplitter.from_tiktoken_encoder(
