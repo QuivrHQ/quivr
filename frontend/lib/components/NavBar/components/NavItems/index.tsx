@@ -1,5 +1,5 @@
 "use client";
-import { useFeature } from '@growthbook/growthbook-react';
+import { useFeature } from "@growthbook/growthbook-react";
 import Link from "next/link";
 import { Dispatch, HTMLAttributes, SetStateAction } from "react";
 import { MdPerson, MdSettings } from "react-icons/md";
@@ -24,8 +24,8 @@ export const NavItems = ({
 }: NavItemsProps): JSX.Element => {
   const { session } = useSupabase();
   const isUserLoggedIn = session?.user !== undefined;
-  const shouldUseMultipleBrains = useFeature('multiple-brains').on;
-  
+  const shouldUseMultipleBrains = useFeature("multiple-brains").on;
+
   return (
     <ul
       className={cn(
@@ -59,7 +59,7 @@ export const NavItems = ({
       <div className="flex sm:flex-1 sm:justify-end flex-col items-center justify-center sm:flex-row gap-5 sm:gap-2">
         {isUserLoggedIn && (
           <>
-            {shouldUseMultipleBrains && (<BrainsDropDown />)}
+            {shouldUseMultipleBrains && <BrainsDropDown />}
             <Link aria-label="account" className="" href={"/user"}>
               <MdPerson className="text-2xl" />
             </Link>
