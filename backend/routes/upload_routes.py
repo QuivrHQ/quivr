@@ -2,7 +2,7 @@ import os
 
 from auth.auth_bearer import AuthBearer, get_current_user
 from fastapi import APIRouter, Depends, Request, UploadFile
-from models.settings import CommonsDep
+from models.settings import CommonsDep, common_dependencies
 from models.users import User
 from utils.file import convert_bytes, get_file_size
 from utils.processors import filter_file
@@ -24,7 +24,7 @@ def calculate_remaining_space(request, max_brain_size, max_brain_size_with_own_k
     return remaining_free_space
 
 @upload_router.post("/upload", dependencies=[Depends(AuthBearer())], tags=["Upload"])
-async def upload_file(request: Request, commons: CommonsDep,  file: UploadFile, enable_summarization: bool = False, current_user: User = Depends(get_current_user)):
+async def upload_file(request: Request,  file: UploadFile, enable_summarization: bool = False, current_user: User = Depends(get_current_user)):
     """
     Upload a file to the user's storage.
 
@@ -37,6 +37,7 @@ async def upload_file(request: Request, commons: CommonsDep,  file: UploadFile, 
     and ensures that the file size does not exceed the maximum capacity. If the file is within the allowed size limit,
     it can optionally apply summarization to the file's content. The response message will indicate the status of the upload.
     """
+    commons = common_dependencies()
     max_brain_size = os.getenv("MAX_BRAIN_SIZE")
     max_brain_size_with_own_key = os.getenv("MAX_BRAIN_SIZE_WITH_KEY", 209715200)
     
