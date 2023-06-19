@@ -7,7 +7,7 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 from parsers.common import file_already_exists_from_content
 from utils.common import CommonsDep
 from utils.file import compute_sha1_from_content
-from utils.vectors import create_vector
+from utils.vectors import Neurons
 
 
 async def process_github(commons: CommonsDep, repo, enable_summarization, user, supabase, user_openai_api_key): 
@@ -44,7 +44,8 @@ async def process_github(commons: CommonsDep, repo, enable_summarization, user, 
             page_content=doc.page_content, metadata=metadata)
         exist = await file_already_exists_from_content(supabase, doc.page_content.encode("utf-8"), user)
         if not exist:
-            create_vector(commons, user.email, doc_with_metadata, user_openai_api_key)
+            neurons =  Neurons(commons=commons)
+            neurons.create_vector(user.email, doc_with_metadata, user_openai_api_key)
             print("Created vector for ", doc.metadata["file_name"])
 
     return {"message": f"✅ Github with {len(documents)} files has been uploaded.", "type": "success"}
