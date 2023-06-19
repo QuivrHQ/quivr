@@ -19,13 +19,13 @@ export const Crawler = (): JSX.Element => {
                   name="crawlurl"
                   ref={urlInputRef}
                   type="text"
-                  placeholder="Enter a website URL"
+                  placeholder="请输入网址"
                   className="w-full"
                 />
               </div>
               <div className="flex flex-col items-center justify-center gap-5">
                 <Button isLoading={isCrawling} onClick={crawlWebsite}>
-                  Crawl
+                  抓取数据
                 </Button>
               </div>
             </Card>

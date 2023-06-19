@@ -17,7 +17,7 @@ export const UserAccountSection = (): JSX.Element => {
     <>
       <div className="border-b border-gray-300 mt-8 mb-8">
         <p className="text-center text-gray-600 uppercase tracking-wide font-semibold">
-          Your Account
+          账户信息
         </p>
       </div>
       <div className="flex justify-between items-center w-full">
@@ -26,7 +26,7 @@ export const UserAccountSection = (): JSX.Element => {
         </span>
         <Link className="mt-2" href={"/logout"}>
           <Button className="px-3 py-2" variant={"danger"}>
-            Logout
+            退出
           </Button>
         </Link>
         {/* TODO: add functionality to change password */}

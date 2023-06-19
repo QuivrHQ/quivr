@@ -37,7 +37,7 @@ export const FileUploader = (): JSX.Element => {
                   onClick={open}
                   className="opacity-50 h-full cursor-pointer hover:opacity-100 hover:underline transition-opacity"
                 >
-                  Drag and drop files here, or click to browse
+                 将文件拖放到此处，或单击浏览
                 </button>
               )}
             </div>
@@ -64,7 +64,7 @@ export const FileUploader = (): JSX.Element => {
       </div>
       <div className="flex flex-col items-center justify-center">
         <Button isLoading={isPending} onClick={uploadAllFiles}>
-          {isPending ? "Uploading..." : "Upload"}
+          {isPending ? "上传中..." : "上传"}
         </Button>
       </div>
     </section>

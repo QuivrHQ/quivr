@@ -33,14 +33,14 @@ export const ChatInput = (): JSX.Element => {
           }
         }}
         className="w-full p-2 border border-gray-300 dark:border-gray-500 outline-none rounded dark:bg-gray-800"
-        placeholder="Begin conversation here..."
+        placeholder="请输入问题 ..."
       />
       <Button
         className="px-3 py-2 sm:px-4 sm:py-2"
         type="submit"
         isLoading={isSendingMessage}
       >
-        {isSendingMessage ? "Thinking..." : "Chat"}
+        {isSendingMessage ? "思考中..." : "对话"}
       </Button>
       <div className="flex items-center">
         <MicButton />

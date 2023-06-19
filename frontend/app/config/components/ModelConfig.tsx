@@ -50,7 +50,7 @@ export const ModelConfig = ({
     <>
       <div className="border-b border-gray-300 mt-8 mb-8">
         <p className="text-center text-gray-600 uppercase tracking-wide font-semibold">
-          Model config
+          模型设置
         </p>
       </div>
       <Field

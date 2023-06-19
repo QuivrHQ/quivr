@@ -44,7 +44,7 @@ export const ConfigForm = (): JSX.Element => {
         temperature={temperature}
         maxTokens={maxTokens}
       />
-      <BackendConfig register={register} />
+        {/* <BackendConfig register={register} /> */}
       <div className="flex justify-between">
         <Button
           variant="danger"
@@ -52,10 +52,10 @@ export const ConfigForm = (): JSX.Element => {
           type="button"
           onClick={resetBrainConfig}
         >
-          Reset
+          充值
         </Button>
         <Button variant="secondary" className="self-end">
-          Done
+          设置
         </Button>
       </div>
       <UserAccountSection />

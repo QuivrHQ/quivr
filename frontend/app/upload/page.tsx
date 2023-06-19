@@ -12,7 +12,7 @@ const UploadPage = (): JSX.Element => {
   return (
     <main className="pt-10">
       <PageHeading
-        title="Upload Knowledge"
+        title="上传知识库"
         subtitle="Text, document, spreadsheet, presentation, audio, video, and URLs supported"
       />
       <FileUploader />
@@ -21,7 +21,7 @@ const UploadPage = (): JSX.Element => {
       <div className="flex flex-col items-center justify-center gap-5 mt-5">
         <Link href={"/chat"}>
           <Button variant={"secondary"} className="py-3">
-            Chat
+            对话
           </Button>
         </Link>
       </div>

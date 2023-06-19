@@ -60,16 +60,16 @@ const DocumentItem = forwardRef(
           {document.name}
         </Ellipsis>
         <div className="flex gap-2 self-end">
-          <Modal Trigger={<Button className="">View</Button>}>
+          <Modal Trigger={<Button className="">查看</Button>}>
             <DocumentData documentName={document.name} />
           </Modal>
 
           <Modal
-            title={"Confirm"}
-            desc={`Do you really want to delete?`}
+            title={"确认"}
+            desc={`确认删除?`}
             Trigger={
               <Button isLoading={isDeleting} variant={"danger"} className="">
-                Delete
+                删除
               </Button>
             }
             CloseTrigger={
@@ -81,7 +81,7 @@ const DocumentItem = forwardRef(
                 }}
                 className="self-end"
               >
-                Delete forever
+                永久删除
               </Button>
             }
           >

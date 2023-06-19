@@ -78,7 +78,7 @@ export default function Login() {
             />
             <div className="flex flex-col items-center justify-center mt-2 gap-2">
               <Button type="submit" isLoading={isPending}>
-                Login
+                登录
               </Button>
               <Link href="/signup">还没有账号？先注册</Link>
             </div>

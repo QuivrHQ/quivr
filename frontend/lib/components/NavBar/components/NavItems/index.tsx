@@ -35,13 +35,13 @@ export const NavItems = ({
       {isUserLoggedIn ? (
         <>
           <NavLink setOpen={setOpen} to="/upload">
-            Upload
+            上传
           </NavLink>
           <NavLink setOpen={setOpen} to="/chat">
-            Chat
+            对话
           </NavLink>
           <NavLink setOpen={setOpen} to="/explore">
-            Explore
+            查看
           </NavLink>
         </>
       ) : (
