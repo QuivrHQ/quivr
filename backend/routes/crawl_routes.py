@@ -57,4 +57,4 @@ async def crawl_endpoint(request: Request,commons: CommonsDep, crawl_website: Cr
             message = await filter_file(commons, file, enable_summarization, user=current_user, openai_api_key=request.headers.get('Openai-Api-Key', None))
             return message
         else:
-            message = await process_github(crawl_website.url, "false", user=current_user, supabase=commons['supabase'], user_openai_api_key=request.headers.get('Openai-Api-Key', None))
+            message = await process_github(commons,crawl_website.url, "false", user=current_user, supabase=commons['supabase'], user_openai_api_key=request.headers.get('Openai-Api-Key', None))
