@@ -4,6 +4,7 @@ from uuid import UUID
 
 from auth.auth_bearer import AuthBearer, get_current_user
 from fastapi import APIRouter, Depends, Request
+from llm.brainpicking import BrainPicking
 from models.chats import ChatMessage
 from models.settings import CommonsDep, common_dependencies
 from models.users import User
@@ -11,8 +12,6 @@ from utils.chats import (create_chat, get_chat_name_from_first_question,
                          update_chat)
 from utils.users import (create_user, fetch_user_id_from_credentials,
                          update_user_request_count)
-from utils.vectors import get_answer
-from llm.brainpicking import BrainPicking
 
 chat_router = APIRouter()
 
