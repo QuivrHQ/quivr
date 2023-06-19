@@ -1,7 +1,7 @@
 /* eslint-disable */
 import { UUID } from "crypto";
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 import { useBrainConfig } from "@/lib/context/BrainConfigProvider/hooks/useBrainConfig";
 import { useToast } from "@/lib/hooks/useToast";
@@ -22,7 +22,7 @@ export default function useChats() {
   const router = useRouter();
   const { publish } = useToast();
 
-  const fetchAllChats = useCallback(async () => {
+  const fetchAllChats = async () => {
     try {
       console.log("Fetching all chats");
       const response = await axiosInstance.get<{
@@ -37,29 +37,26 @@ export default function useChats() {
         text: "Error occured while fetching your chats",
       });
     }
-  }, [axiosInstance, publish]);
+  };
 
-  const fetchChat = useCallback(
-    async (chatId?: UUID) => {
-      if (!chatId) {
-        return;
-      }
-      try {
-        console.log(`Fetching chat ${chatId}`);
-        const response = await axiosInstance.get<Chat>(`/chat/${chatId}`);
-        console.log(response.data);
+  const fetchChat = async (chatId?: UUID) => {
+    if (!chatId) {
+      return;
+    }
+    try {
+      console.log(`Fetching chat ${chatId}`);
+      const response = await axiosInstance.get<Chat>(`/chat/${chatId}`);
+      console.log(response.data);
 
-        setChat(response.data);
-      } catch (error) {
-        console.error(error);
-        publish({
-          variant: "danger",
-          text: `Error occured while fetching ${chatId}`,
-        });
-      }
-    },
-    [axiosInstance, publish]
-  );
+      setChat(response.data);
+    } catch (error) {
+      console.error(error);
+      publish({
+        variant: "danger",
+        text: `Error occured while fetching ${chatId}`,
+      });
+    }
+  };
 
   type ChatResponse = Omit<Chat, "chatId"> & { chatId: UUID | undefined };
 
@@ -156,7 +153,7 @@ export default function useChats() {
 
   useEffect(() => {
     fetchAllChats();
-  }, [fetchAllChats]);
+  }, []);
 
   return {
     allChats,

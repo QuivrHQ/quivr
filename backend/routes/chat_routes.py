@@ -1,17 +1,17 @@
 import os
 import time
 from uuid import UUID
-
 from auth.auth_bearer import AuthBearer, get_current_user
 from fastapi import APIRouter, Depends, Request
 from llm.brainpicking import BrainPicking
-from models.chats import ChatMessage
+from models.chats import ChatMessage, ChatAttributes
 from models.settings import CommonsDep, common_dependencies
 from models.users import User
 from utils.chats import (create_chat, get_chat_name_from_first_question,
                          update_chat)
 from utils.users import (create_user, fetch_user_id_from_credentials,
                          update_user_request_count)
+from http.client import HTTPException
 
 chat_router = APIRouter()
 
@@ -75,7 +75,7 @@ async def get_chats(current_user: User = Depends(get_current_user)):
 
 # get one chat
 @chat_router.get("/chat/{chat_id}", dependencies=[Depends(AuthBearer())], tags=["Chat"])
-async def get_chats( chat_id: UUID):
+async def get_chat_handler(chat_id: UUID):
     """
     Retrieve details of a specific chat by chat ID.
 
@@ -95,7 +95,7 @@ async def get_chats( chat_id: UUID):
 
 # delete one chat
 @chat_router.delete("/chat/{chat_id}", dependencies=[Depends(AuthBearer())], tags=["Chat"])
-async def delete_chat( chat_id: UUID):
+async def delete_chat(chat_id: UUID):
     """
     Delete a specific chat by chat ID.
     """
@@ -159,9 +159,28 @@ async def chat_endpoint(
     return chat_handler(request, commons, chat_id, chat_message, current_user.email)
 
 
+# update existing chat
+@chat_router.put("/chat/{chat_id}/metadata", dependencies=[Depends(AuthBearer())], tags=["Chat"])
+async def update_chat_attributes_handler(
+    commons: CommonsDep,
+    chat_message: ChatAttributes,
+    chat_id: UUID,
+    current_user: User = Depends(get_current_user),
+):
+    """
+    Update chat attributes
+    """
+
+    user_id = fetch_user_id_from_credentials(commons, {"email": current_user.email})
+    chat = get_chat_details(commons, chat_id)[0]
+    if user_id != chat.get('user_id'):
+        raise HTTPException(status_code=403, detail="Chat not owned by user")
+    return update_chat(commons=commons, chat_id=chat_id, chat_name=chat_message.chat_name)
+
+
 # create new chat
 @chat_router.post("/chat", dependencies=[Depends(AuthBearer())], tags=["Chat"])
-async def chat_endpoint(
+async def create_chat_handler(
     request: Request,
     commons: CommonsDep,
     chat_message: ChatMessage,

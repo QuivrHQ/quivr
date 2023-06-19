@@ -15,3 +15,6 @@ class ChatMessage(BaseModel):
     chat_id: Optional[UUID] = None
     chat_name: Optional[str] = None
 
+
+class ChatAttributes(BaseModel):
+    chat_name: Optional[str] = None
