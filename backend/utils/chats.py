@@ -20,14 +20,26 @@ def create_chat(commons: CommonsDep, user_id, history, chat_name):
 
     return(insert_response)
 
-def update_chat(commons: CommonsDep, chat_id, history):
+def update_chat(commons: CommonsDep, chat_id,  history=None, chat_name=None):
     if not chat_id:
         logger.error("No chat_id provided")
         return
-    commons['supabase'].table("chats").update(
-        { "history": history}).match({"chat_id": chat_id}).execute()
-    logger.info(f"Chat {chat_id} updated")
+
+    updates = {}
     
+    if history is not None:
+        updates['history'] = history
+
+    if chat_name is not None:
+        updates['chat_name'] = chat_name
+
+    if updates:
+        commons['supabase'].table("chats").update(updates).match({"chat_id": chat_id}).execute()
+        logger.info(f"Chat {chat_id} updated")
+    else:
+        logger.info(f"No updates to apply for chat {chat_id}")
+
+
 
 def get_chat_name_from_first_question( chat_message: ChatMessage):
     # Step 1: Get the summary of the first question        

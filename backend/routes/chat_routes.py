@@ -90,6 +90,7 @@ def chat_handler(request, commons, chat_id, chat_message, email, is_new_chat=Fal
     history = chat_message.history
     history.append(("user", chat_message.question))
 
+    chat_name = chat_message.chat_name
     
     if old_request_count == 0: 
         create_user(commons, email= email, date=date)
@@ -97,7 +98,7 @@ def chat_handler(request, commons, chat_id, chat_message, email, is_new_chat=Fal
         update_user_request_count(commons,email, date, requests_count=old_request_count + 1)
     if user_openai_api_key is None and old_request_count >= float(max_requests_number):
         history.append(('assistant', "You have reached your requests limit"))
-        update_chat(commons, chat_id=chat_id, history=history)
+        update_chat(commons, chat_id=chat_id, history=history,chat_name=chat_name)
         return {"history": history}
 
 
@@ -110,7 +111,7 @@ def chat_handler(request, commons, chat_id, chat_message, email, is_new_chat=Fal
         new_chat = create_chat(commons, user_id, history, chat_name)
         chat_id = new_chat.data[0]['chat_id']
     else:
-        update_chat(commons, chat_id=chat_id, history=history)
+        update_chat(commons, chat_id=chat_id, history=history, chat_name=chat_name)
 
     return {"history": history, "chatId": chat_id}
 
