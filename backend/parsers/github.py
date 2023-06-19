@@ -4,8 +4,8 @@ import time
 from langchain.document_loaders import GitLoader
 from langchain.schema import Document
 from langchain.text_splitter import RecursiveCharacterTextSplitter
+from models.settings import CommonsDep
 from parsers.common import file_already_exists_from_content
-from utils.common import CommonsDep
 from utils.file import compute_sha1_from_content
 from utils.vectors import Neurons
 

@@ -1,6 +1,7 @@
 import os
 
 from fastapi import Depends, FastAPI, UploadFile
+from models.settings import CommonsDep
 from models.users import User
 from parsers.audio import process_audio
 from parsers.common import file_already_exists
@@ -14,8 +15,6 @@ from parsers.odt import process_odt
 from parsers.pdf import process_pdf
 from parsers.powerpoint import process_powerpoint
 from parsers.txt import process_txt
-from utils.common import CommonsDep
-
 from supabase import Client
 
 file_processors = {

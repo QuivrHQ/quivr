@@ -2,8 +2,8 @@
 from datetime import datetime
 
 from fastapi import HTTPException
+from models.settings import CommonsDep
 from pydantic import DateError
-from utils.common import CommonsDep
 
 
 async def verify_api_key(api_key: str, commons: CommonsDep):     

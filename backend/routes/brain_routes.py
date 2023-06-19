@@ -7,8 +7,8 @@ from auth.auth_bearer import AuthBearer, get_current_user
 from fastapi import APIRouter, Depends, Request
 from logger import get_logger
 from models.brains import Brain, BrainToUpdate
+from models.settings import CommonsDep
 from models.users import User
-from utils.common import CommonsDep
 from utils.users import fetch_user_id_from_credentials
 
 logger = get_logger(__name__)

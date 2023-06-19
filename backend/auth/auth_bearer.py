@@ -5,8 +5,8 @@ from auth.api_key_handler import get_user_from_api_key, verify_api_key
 from auth.jwt_token_handler import decode_access_token, verify_token
 from fastapi import Depends, HTTPException, Request
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+from models.settings import CommonsDep
 from models.users import User
-from utils.common import CommonsDep
 
 
 class AuthBearer(HTTPBearer):

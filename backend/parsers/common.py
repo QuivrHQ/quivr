@@ -8,7 +8,7 @@ from typing import Optional
 from fastapi import UploadFile
 from langchain.schema import Document
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-from utils.common import CommonsDep
+from models.settings import CommonsDep
 from utils.file import compute_sha1_from_content, compute_sha1_from_file
 from utils.vectors import Neurons, create_summary
 

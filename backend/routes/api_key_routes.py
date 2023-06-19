@@ -8,9 +8,9 @@ from asyncpg.exceptions import UniqueViolationError
 from auth.auth_bearer import AuthBearer, get_current_user
 from fastapi import APIRouter, Depends
 from logger import get_logger
+from models.settings import CommonsDep
 from models.users import User
 from pydantic import BaseModel
-from utils.common import CommonsDep
 from utils.users import fetch_user_id_from_credentials
 
 logger = get_logger(__name__)

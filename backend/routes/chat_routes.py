@@ -5,10 +5,10 @@ from uuid import UUID
 from auth.auth_bearer import AuthBearer, get_current_user
 from fastapi import APIRouter, Depends, Request
 from models.chats import ChatMessage
+from models.settings import CommonsDep, common_dependencies
 from models.users import User
 from utils.chats import (create_chat, get_chat_name_from_first_question,
                          update_chat)
-from utils.common import CommonsDep
 from utils.users import (create_user, fetch_user_id_from_credentials,
                          update_user_request_count)
 from utils.vectors import get_answer
@@ -33,7 +33,7 @@ def fetch_user_stats(commons, user, date):
 
 # get all chats
 @chat_router.get("/chat", dependencies=[Depends(AuthBearer())], tags=["Chat"])
-async def get_chats(commons: CommonsDep, current_user: User = Depends(get_current_user)):
+async def get_chats(current_user: User = Depends(get_current_user)):
     """
     Retrieve all chats for the current user.
 
@@ -43,13 +43,14 @@ async def get_chats(commons: CommonsDep, current_user: User = Depends(get_curren
     This endpoint retrieves all the chats associated with the current authenticated user. It returns a list of chat objects
     containing the chat ID and chat name for each chat.
     """
+    commons = common_dependencies()
     user_id = fetch_user_id_from_credentials(commons, {"email": current_user.email})
     chats = get_user_chats(commons, user_id)
     return {"chats": chats}
 
 # get one chat
 @chat_router.get("/chat/{chat_id}", dependencies=[Depends(AuthBearer())], tags=["Chat"])
-async def get_chats(commons: CommonsDep, chat_id: UUID):
+async def get_chats( chat_id: UUID):
     """
     Retrieve details of a specific chat by chat ID.
 
@@ -59,6 +60,7 @@ async def get_chats(commons: CommonsDep, chat_id: UUID):
     This endpoint retrieves the details of a specific chat identified by the provided chat ID. It returns the chat ID and its
     history, which includes the chat messages exchanged in the chat.
     """
+    commons = common_dependencies()
     chats = get_chat_details(commons, chat_id)
     if len(chats) > 0:
         return {"chatId": chat_id, "history": chats[0]['history']}
@@ -67,10 +69,11 @@ async def get_chats(commons: CommonsDep, chat_id: UUID):
 
 # delete one chat
 @chat_router.delete("/chat/{chat_id}", dependencies=[Depends(AuthBearer())], tags=["Chat"])
-async def delete_chat(commons: CommonsDep, chat_id: UUID):
+async def delete_chat( chat_id: UUID):
     """
     Delete a specific chat by chat ID.
     """
+    commons = common_dependencies()
     delete_chat_from_db(commons, chat_id)
     return {"message": f"{chat_id}  has been deleted."}
 

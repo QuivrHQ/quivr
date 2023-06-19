@@ -4,9 +4,8 @@ from llm.qa import BrainPicking, BrainSettings
 from llm.summarization import llm_evaluate_summaries, llm_summerize
 from logger import get_logger
 from models.chats import ChatMessage
-from models.settings import BrainSettings
+from models.settings import BrainSettings, CommonsDep
 from pydantic import BaseModel
-from utils.common import CommonsDep
 
 logger = get_logger(__name__)
 
