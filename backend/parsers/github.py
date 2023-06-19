@@ -29,7 +29,7 @@ async def process_github(commons: CommonsDep, repo, enable_summarization, user, 
     print(documents[:1])
 
     for doc in documents:
-        if doc.metadata["file_type"] in [".pyc", ".env", ".lock", ".gitignore", ".gitmodules", ".gitattributes", ".gitkeep", ".git"]:
+        if doc.metadata["file_type"] in [".pyc",".png",".svg", ".env", ".lock", ".gitignore", ".gitmodules", ".gitattributes", ".gitkeep", ".git", ".json"]:
             continue
         metadata = {
             "file_sha1": compute_sha1_from_content(doc.page_content.encode("utf-8")),
