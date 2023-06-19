@@ -5,7 +5,7 @@ from tempfile import SpooledTemporaryFile
 from auth.auth_bearer import AuthBearer, get_current_user
 from crawl.crawler import CrawlWebsite
 from fastapi import APIRouter, Depends, Request, UploadFile
-from models.settings import CommonsDep
+from models.settings import CommonsDep, common_dependencies
 from models.users import User
 from parsers.github import process_github
 from utils.file import convert_bytes
@@ -27,10 +27,11 @@ def get_unique_user_data(commons, user):
     return user_unique_vectors
 
 @crawl_router.post("/crawl/", dependencies=[Depends(AuthBearer())], tags=["Crawl"])
-async def crawl_endpoint(request: Request,commons: CommonsDep, crawl_website: CrawlWebsite, enable_summarization: bool = False, current_user: User = Depends(get_current_user)):
+async def crawl_endpoint(request: Request, crawl_website: CrawlWebsite, enable_summarization: bool = False, current_user: User = Depends(get_current_user)):
     """
     Crawl a website and process the crawled data.
     """
+    commons = common_dependencies()
     max_brain_size = os.getenv("MAX_BRAIN_SIZE")
     if request.headers.get('Openai-Api-Key'):
         max_brain_size = os.getenv("MAX_BRAIN_SIZE_WITH_KEY",209715200)
