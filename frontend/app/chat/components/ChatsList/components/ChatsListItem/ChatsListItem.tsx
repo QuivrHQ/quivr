@@ -98,5 +98,3 @@ export const ChatsListItem = ({
     </div>
   );
 };
-
-
