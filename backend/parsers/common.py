@@ -10,7 +10,7 @@ from langchain.schema import Document
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from utils.common import CommonsDep
 from utils.file import compute_sha1_from_content, compute_sha1_from_file
-from utils.vectors import create_summary, create_vector
+from utils.vectors import Neurons, create_summary
 
 
 async def process_file(commons: CommonsDep, file: UploadFile, loader_class, file_suffix, enable_summarization, user, user_openai_api_key):
@@ -52,7 +52,8 @@ async def process_file(commons: CommonsDep, file: UploadFile, loader_class, file
         }
         doc_with_metadata = Document(
             page_content=doc.page_content, metadata=metadata)
-        create_vector(commons, user.email, doc_with_metadata, user_openai_api_key)
+        neurons = Neurons(commons=commons)
+        neurons.create_vector(user.email, doc_with_metadata, user_openai_api_key)
             #     add_usage(stats_db, "embedding", "audio", metadata={"file_name": file_meta_name,"file_type": ".txt", "chunk_size": chunk_size, "chunk_overlap": chunk_overlap})
 
         # Remove the enable_summarization and ids 
