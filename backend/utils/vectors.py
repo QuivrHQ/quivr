@@ -1,6 +1,6 @@
 from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.schema import Document
-from llm.qa import BrainPicking, BrainSettings
+from llm.brainpicking import BrainPicking, BrainSettings
 from llm.summarization import llm_evaluate_summaries, llm_summerize
 from logger import get_logger
 from models.chats import ChatMessage
