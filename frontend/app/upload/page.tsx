@@ -13,7 +13,7 @@ const UploadPage = (): JSX.Element => {
     <main className="pt-10">
       <PageHeading
         title="上传知识库"
-        subtitle="Text, document, spreadsheet, presentation, audio, video, and URLs supported"
+        subtitle="支持文本, 文档, 电子表格, 演示文件, 声音, 视频, 网址"
       />
       <FileUploader />
       <Divider text="or" className="m-5" />
