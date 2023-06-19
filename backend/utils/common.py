@@ -5,7 +5,6 @@ from fastapi import Depends
 from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.vectorstores import SupabaseVectorStore
 from logger import get_logger
-
 from supabase import Client, create_client
 
 logger = get_logger(__name__)

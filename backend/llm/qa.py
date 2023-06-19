@@ -17,16 +17,10 @@ from langchain.vectorstores import SupabaseVectorStore
 from llm.prompt import LANGUAGE_PROMPT
 from llm.prompt.CONDENSE_PROMPT import CONDENSE_QUESTION_PROMPT
 from models.chats import ChatMessage
+from models.settings import BrainSettings
 from pydantic import BaseModel, BaseSettings
 from supabase import Client, create_client
 from vectorstore.supabase import CustomSupabaseVectorStore
-
-
-class BrainSettings(BaseSettings):
-    openai_api_key: str
-    anthropic_api_key: str
-    supabase_url: str
-    supabase_service_key: str
 
 
 class AnswerConversationBufferMemory(ConversationBufferMemory):
