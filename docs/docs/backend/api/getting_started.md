@@ -1,8 +1,12 @@
 ---
-sidebar_position: 2
+sidebar_position: 1
 ---
 
-# API Backend Documentation
+# How to use the API
+
+**URL**: https://api.quivr.app
+
+**Swagger**: https://api.quivr.app/docs
 
 ## Overview
 This documentation outlines the key points and usage instructions for interacting with the API backend. Please follow the guidelines below to use the backend services effectively.
