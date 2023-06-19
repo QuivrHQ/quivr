@@ -1,6 +1,6 @@
 from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.schema import Document
-from llm.qa import get_qa_llm
+from llm.qa import BrainPicking
 from llm.summarization import llm_evaluate_summaries, llm_summerize
 from logger import get_logger
 from models.chats import ChatMessage
@@ -49,7 +49,9 @@ def similarity_search(commons: CommonsDep, query, table='match_summaries', top_k
     return summaries.data
    
 def get_answer(commons: CommonsDep,  chat_message: ChatMessage, email: str, user_openai_api_key:str):
-    qa = get_qa_llm(chat_message, email, user_openai_api_key)
+    
+    Brain = BrainPicking().init(chat_message.model, email)
+    qa = Brain.get_qa(chat_message, user_openai_api_key)
 
     if chat_message.use_summarization:
         # 1. get summaries from the vector store based on question
