@@ -1,4 +1,3 @@
-/* eslint-disable */
 "use client";
 import { AnimatePresence } from "framer-motion";
 
