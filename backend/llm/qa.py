@@ -32,7 +32,7 @@ class CustomSupabaseVectorStore(SupabaseVectorStore):
         query: str, 
         user_id: str = "none",
         table: str = "match_vectors", 
-        k: int = 8, 
+        k: int = 6, 
         threshold: float = 0.5, 
         **kwargs: Any
     ) -> List[Document]:
@@ -113,7 +113,7 @@ def get_qa_llm(chat_message: ChatMessage, user_id: str, user_openai_api_key: str
     if chat_message.model.startswith("gpt"):
         llm = ChatOpenAI(temperature=0, model_name=chat_message.model)
         question_generator = LLMChain(llm=llm, prompt=CONDENSE_QUESTION_PROMPT)
-        doc_chain = load_qa_chain(llm, chain_type="map_reduce")
+        doc_chain = load_qa_chain(llm, chain_type="stuff")
 
         qa = ConversationalRetrievalChain(
                 retriever=vector_store.as_retriever(),
