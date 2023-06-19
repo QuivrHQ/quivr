@@ -30,6 +30,9 @@
         "name": "next"
       }
     ],
+    "paths": {
+      "@/*": ["./*"],
+    }
   },
   "ts-node": {
     "compilerOptions": {
