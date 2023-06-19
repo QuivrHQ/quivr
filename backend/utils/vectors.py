@@ -56,37 +56,36 @@ def get_answer(commons: CommonsDep, chat_message: ChatMessage, email: str, user_
     Brain = BrainPicking().init(chat_message.model, email)
     qa = Brain.get_qa(chat_message, user_openai_api_key)
 
-    neurons =  Neurons(commons=commons)
 
-    if chat_message.use_summarization:
-        summaries = neurons.similarity_search(chat_message.question, table='match_summaries')
-        evaluations = llm_evaluate_summaries(
-            chat_message.question, summaries, chat_message.model)
-        if evaluations:
-            response = commons['supabase'].from_('vectors').select(
-                '*').in_('id', values=[e['document_id'] for e in evaluations]).execute()
-            additional_context = '---\nAdditional Context={}'.format(
-                '---\n'.join(data['content'] for data in response.data)
-            ) + '\n'
-            model_response = qa(
-                {"question": additional_context + chat_message.question})
-    else:
-        transformed_history = []
+    # if chat_message.use_summarization:
+    #     summaries = neurons.similarity_search(chat_message.question, table='match_summaries')
+    #     evaluations = llm_evaluate_summaries(
+    #         chat_message.question, summaries, chat_message.model)
+    #     if evaluations:
+    #         response = commons['supabase'].from_('vectors').select(
+    #             '*').in_('id', values=[e['document_id'] for e in evaluations]).execute()
+    #         additional_context = '---\nAdditional Context={}'.format(
+    #             '---\n'.join(data['content'] for data in response.data)
+    #         ) + '\n'
+    #         model_response = qa(
+    #             {"question": additional_context + chat_message.question})
+    # else:
+    #     transformed_history = []
 
-        for i in range(0, len(chat_message.history) - 1, 2):
-            user_message = chat_message.history[i][1]
-            assistant_message = chat_message.history[i + 1][1]
-            transformed_history.append((user_message, assistant_message))
-        model_response = qa({"question": chat_message.question, "chat_history": transformed_history})
+    #     for i in range(0, len(chat_message.history) - 1, 2):
+    #         user_message = chat_message.history[i][1]
+    #         assistant_message = chat_message.history[i + 1][1]
+    #         transformed_history.append((user_message, assistant_message))
+    #     model_response = qa({"question": chat_message.question, "chat_history": transformed_history})
 
-    answer = model_response['answer']
+    # answer = model_response['answer']
 
-    if "source_documents" in answer:
-        sources = [
-            doc.metadata["file_name"] for doc in answer["source_documents"]
-            if "file_name" in doc.metadata]
-        if sources:
-            files = dict.fromkeys(sources)
-            answer = answer + "\n\nRef: " + "; ".join(files)
+    # if "source_documents" in answer:
+    #     sources = [
+    #         doc.metadata["file_name"] for doc in answer["source_documents"]
+    #         if "file_name" in doc.metadata]
+    #     if sources:
+    #         files = dict.fromkeys(sources)
+    #         answer = answer + "\n\nRef: " + "; ".join(files)
 
     return answer

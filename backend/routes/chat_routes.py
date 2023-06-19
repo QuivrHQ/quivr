@@ -12,6 +12,7 @@ from utils.chats import (create_chat, get_chat_name_from_first_question,
 from utils.users import (create_user, fetch_user_id_from_credentials,
                          update_user_request_count)
 from utils.vectors import get_answer
+from llm.brainpicking import BrainPicking
 
 chat_router = APIRouter()
 
@@ -101,8 +102,8 @@ def chat_handler(request, commons, chat_id, chat_message, email, is_new_chat=Fal
         return {"history": history}
 
 
-
-    answer = get_answer(commons, chat_message, email, user_openai_api_key)
+    brainPicking = BrainPicking().init(chat_message.model, email)
+    answer = brainPicking.generate_answer(chat_message, user_openai_api_key)
     history.append(("assistant", answer))
 
     if is_new_chat:
