@@ -6,6 +6,7 @@ import { cookies, headers } from "next/headers";
 import Footer from "@/lib/components/Footer";
 import { NavBar } from "@/lib/components/NavBar";
 import { ToastProvider } from "@/lib/components/ui/Toast";
+import { BrainProvider } from "@/lib/context";
 import { BrainConfigProvider } from "@/lib/context/BrainConfigProvider/brain-config-provider";
 import { SupabaseProvider } from "@/lib/context/SupabaseProvider";
 
@@ -41,9 +42,11 @@ const RootLayout = async ({
         <ToastProvider>
           <SupabaseProvider session={session}>
             <BrainConfigProvider>
-              <NavBar />
-              <div className="flex-1">{children}</div>
-              <Footer />
+              <BrainProvider>
+                <NavBar />
+                <div className="flex-1">{children}</div>
+                <Footer />
+              </BrainProvider>
             </BrainConfigProvider>
           </SupabaseProvider>
         </ToastProvider>
