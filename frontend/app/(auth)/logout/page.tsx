@@ -42,10 +42,10 @@ export default function Logout() {
       <section className="w-full min-h-[80vh] h-full outline-none flex flex-col gap-5 items-center justify-center p-6">
         <PageHeading title="Logout" subtitle="See you next time" />
         <Card className="max-w-md w-full p-5 sm:p-10 text-center flex flex-col items-center gap-5">
-          <h2 className="text-lg">Are you sure you want to sign out?</h2>
+          <h2 className="text-lg">确认退出?</h2>
           <div className="flex gap-5 items-center justify-center">
             <Link href={"/"}>
-              <Button variant={"primary"}>Go back</Button>
+              <Button variant={"primary"}>后退</Button>
             </Link>
             <Button
               isLoading={isPending}
