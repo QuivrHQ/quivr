@@ -20,12 +20,11 @@ export default function ChatPage({ params }: ChatPageProps) {
   const { fetchChat, resetChat } = useChatsContext();
 
   useEffect(() => {
-    // if (chatId)
     if (!chatId) {
       resetChat();
     }
     fetchChat(chatId);
-  }, [fetchChat, chatId]);
+  }, []);
 
   return (
     <main className="flex flex-col w-full pt-10">

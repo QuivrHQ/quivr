@@ -12,4 +12,9 @@ class ChatMessage(BaseModel):
     temperature: float = 0.0
     max_tokens: int = 256
     use_summarization: bool = False
-    chat_id: Optional[UUID] = None,
+    chat_id: Optional[UUID] = None
+    chat_name: Optional[str] = None
+
+
+class ChatAttributes(BaseModel):
+    chat_name: Optional[str] = None

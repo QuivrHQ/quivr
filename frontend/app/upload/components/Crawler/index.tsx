@@ -24,7 +24,7 @@ export const Crawler = (): JSX.Element => {
                 />
               </div>
               <div className="flex flex-col items-center justify-center gap-5">
-                <Button isLoading={isCrawling} onClick={crawlWebsite}>
+                <Button isLoading={isCrawling} onClick={() => void crawlWebsite()}>
                   Crawl
                 </Button>
               </div>

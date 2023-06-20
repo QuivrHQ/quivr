@@ -10,9 +10,11 @@ user_router = APIRouter()
 
 MAX_BRAIN_SIZE_WITH_OWN_KEY = int(os.getenv("MAX_BRAIN_SIZE_WITH_KEY", 209715200))
 
+
 def get_unique_documents(vectors):
     # Convert each dictionary to a tuple of items, then to a set to remove duplicates, and then back to a dictionary
     return [dict(t) for t in set(tuple(d.items()) for d in vectors)]
+
 
 def get_user_vectors(commons, email):
     # Access the supabase table and get the vectors
@@ -22,10 +24,12 @@ def get_user_vectors(commons, email):
             .execute()
     return user_vectors_response.data
 
+
 def get_user_request_stats(commons, email):
     requests_stats = commons['supabase'].from_('users').select(
         '*').filter("email", "eq", email).execute()
     return requests_stats.data
+
 
 @user_router.get("/user", dependencies=[Depends(AuthBearer())], tags=["User"])
 async def get_user_endpoint(request: Request, current_user: User = Depends(get_current_user)):
