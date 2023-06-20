@@ -1,4 +1,4 @@
-from typing import Annotated, Any, Dict, List, Tuple, Union
+from typing import Annotated
 
 from fastapi import Depends
 from langchain.embeddings.openai import OpenAIEmbeddings
