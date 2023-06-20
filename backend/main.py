@@ -4,13 +4,14 @@ import pypandoc
 from fastapi import FastAPI
 from logger import get_logger
 from middlewares.cors import add_cors_middleware
+from routes.api_key_routes import api_key_router
+from routes.brain_routes import brain_router
 from routes.chat_routes import chat_router
 from routes.crawl_routes import crawl_router
 from routes.explore_routes import explore_router
 from routes.misc_routes import misc_router
 from routes.upload_routes import upload_router
 from routes.user_routes import user_router
-from routes.api_key_routes import api_key_router
 
 logger = get_logger(__name__)
 
@@ -24,6 +25,7 @@ max_brain_size_with_own_key = os.getenv("MAX_BRAIN_SIZE_WITH_KEY",209715200)
 async def startup_event():
     pypandoc.download_pandoc()
 
+app.include_router(brain_router)
 app.include_router(chat_router)
 app.include_router(crawl_router)
 app.include_router(explore_router)

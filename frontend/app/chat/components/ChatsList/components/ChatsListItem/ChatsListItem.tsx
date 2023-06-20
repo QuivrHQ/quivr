@@ -1,16 +1,15 @@
-/* eslint-disable */
 import { UUID } from "crypto";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useState } from "react";
 import { FiEdit, FiSave, FiTrash2 } from "react-icons/fi";
 import { MdChatBubbleOutline } from "react-icons/md";
 
+
+import { useAxios, useToast } from "@/lib/hooks";
+import { Chat, ChatResponse } from "@/lib/types/Chat";
 import { cn } from "@/lib/utils";
 
-import { useToast } from "@/lib/hooks/useToast";
-import { useAxios } from "@/lib/useAxios";
-import { useState } from "react";
-import { Chat, ChatResponse } from "../../../../../../lib/types/Chat";
 import { ChatName } from "./components/ChatName";
 
 interface ChatsListItemProps {
@@ -99,5 +98,3 @@ export const ChatsListItem = ({
     </div>
   );
 };
-
-

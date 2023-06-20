@@ -4,8 +4,8 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import { useBrainConfig } from "@/lib/context/BrainConfigProvider/hooks/useBrainConfig";
+import { useAxios } from "@/lib/hooks";
 import { useToast } from "@/lib/hooks/useToast";
-import { useAxios } from "@/lib/useAxios";
 
 import { Chat, ChatMessage } from "../../../types/Chat";
 
@@ -60,12 +60,12 @@ export default function useChats() {
 
   type ChatResponse = Omit<Chat, "chatId"> & { chatId: UUID | undefined };
 
-  const createChat = ({
+  const createChat = async ({
     options,
   }: {
     options: Record<string, string | unknown>;
   }) => {
-    fetchAllChats();
+    await fetchAllChats();
 
     return axiosInstance.post<ChatResponse>(`/chat`, options);
   };

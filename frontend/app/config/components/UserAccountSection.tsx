@@ -3,8 +3,8 @@
 
 import Link from "next/link";
 
-import { useSupabase } from "@/app/supabase-provider";
 import Button from "@/lib/components/ui/Button";
+import { useSupabase } from "@/lib/context/SupabaseProvider";
 
 export const UserAccountSection = (): JSX.Element => {
   const { session } = useSupabase();
