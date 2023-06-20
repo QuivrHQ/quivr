@@ -6,12 +6,18 @@ from uuid import UUID
 from auth.auth_bearer import AuthBearer, get_current_user
 from fastapi import APIRouter, Depends, Request
 from logger import get_logger
-from models.brains import Brain, BrainToUpdate
+from models.brains import Brain
 from models.settings import CommonsDep, common_dependencies
 from models.users import User
-from utils.brains import (create_brain, create_brain_user, delete_brain,
-                          get_brain_details, get_user_brains,
-                          update_brain_fields, update_brain_with_file)
+from utils.brains import (
+    create_brain,
+    create_brain_user,
+    delete_brain,
+    get_brain_details,
+    get_user_brains,
+    update_brain_fields,
+    update_brain_with_file,
+)
 from utils.users import fetch_user_id_from_credentials
 
 logger = get_logger(__name__)
@@ -32,12 +38,15 @@ async def brain_endpoint(current_user: User = Depends(get_current_user)):
     containing the brain ID and brain name for each brain.
     """
     commons = common_dependencies()
-    user_id = fetch_user_id_from_credentials(commons,  {"email": current_user.email})
+    user_id = fetch_user_id_from_credentials(commons, {"email": current_user.email})
     brains = get_user_brains(commons, user_id)
     return {"brains": brains}
 
+
 # get one brain
-@brain_router.get("/brains/{brain_id}", dependencies=[Depends(AuthBearer())], tags=["Brain"])
+@brain_router.get(
+    "/brains/{brain_id}", dependencies=[Depends(AuthBearer())], tags=["Brain"]
+)
 async def brain_endpoint(brain_id: UUID):
     """
     Retrieve details of a specific brain by brain ID.
@@ -51,12 +60,19 @@ async def brain_endpoint(brain_id: UUID):
     commons = common_dependencies()
     brains = get_brain_details(commons, brain_id)
     if len(brains) > 0:
-        return {"brainId": brain_id, "brainName": brains[0]['name'], "status": brains[0]['status']}
+        return {
+            "brainId": brain_id,
+            "brainName": brains[0]["name"],
+            "status": brains[0]["status"],
+        }
     else:
-        return {"error": f'No brain found with brain_id {brain_id}'}
+        return {"error": f"No brain found with brain_id {brain_id}"}
+
 
 # delete one brain
-@brain_router.delete("/brains/{brain_id}", dependencies=[Depends(AuthBearer())], tags=["Brain"])
+@brain_router.delete(
+    "/brains/{brain_id}", dependencies=[Depends(AuthBearer())], tags=["Brain"]
+)
 async def brain_endpoint(brain_id: UUID):
     """
     Delete a specific brain by brain ID.
@@ -68,9 +84,11 @@ async def brain_endpoint(brain_id: UUID):
 
 # create new brain
 @brain_router.post("/brains", dependencies=[Depends(AuthBearer())], tags=["Brain"])
-async def brain_endpoint(request: Request, brain: Brain, current_user: User = Depends(get_current_user)):
+async def brain_endpoint(
+    request: Request, brain: Brain, current_user: User = Depends(get_current_user)
+):
     """
-    Create a new brain with given 
+    Create a new brain with given
         name
         status
         model
@@ -78,32 +96,42 @@ async def brain_endpoint(request: Request, brain: Brain, current_user: User = De
         temperature
     In the brains table & in the brains_users table and put the creator user as 'Owner'
     """
-    commons = common_dependencies() 
-    user_id = fetch_user_id_from_credentials(commons,  {"email": current_user.email})
+    commons = common_dependencies()
+    user_id = fetch_user_id_from_credentials(commons, {"email": current_user.email})
     created_brain = create_brain(commons, brain)[0]
     # create a brain X user entry
-    create_brain_user(commons, created_brain['brain_id'], user_id, rights='Owner')
+    create_brain_user(commons, created_brain["brain_id"], user_id, rights="Owner")
 
-    return {"id": created_brain['brain_id'], "name": created_brain['name']}
+    return {"id": created_brain["brain_id"], "name": created_brain["name"]}
+
 
 # update existing brain
-@brain_router.put("/brains/{brain_id}", dependencies=[Depends(AuthBearer())], tags=["Brain"])
-async def brain_endpoint(request: Request, brain_id: UUID, brain: BrainToUpdate, fileName: Optional[str], current_user: User = Depends(get_current_user)):
+@brain_router.put(
+    "/brains/{brain_id}", dependencies=[Depends(AuthBearer())], tags=["Brain"]
+)
+async def brain_endpoint(
+    request: Request,
+    brain_id: UUID,
+    brain: Brain,
+    fileName: Optional[str],
+    current_user: User = Depends(get_current_user),
+):
     """
     Update an existing brain with new brain parameters/files.
-    If the file is contained in Add file to brain : 
-        if given a fileName/ file sha1 / -> add all the vector Ids to the brains_vectors 
-    Modify other brain fields: 
-        name, status, model, max_tokens, temperature 
-    Return modified brain ? No need -> do an optimistic update 
+    If the file is contained in Add file to brain :
+        if given a fileName/ file sha1 / -> add all the vector Ids to the brains_vectors
+    Modify other brain fields:
+        name, status, model, max_tokens, temperature
+    Return modified brain ? No need -> do an optimistic update
     """
     commons = common_dependencies()
     # Add new file to brain , il file_sha1 already exists in brains_vectors -> out (not now)
-    if brain.file_sha1 : 
+    if brain.file_sha1:
         # add all the vector Ids to the brains_vectors  with the given brain.brain_id
-        update_brain_with_file(commons, brain_id= brain.brain_id, file_sha1=brain.file_sha1)
+        update_brain_with_file(
+            commons, brain_id=brain.brain_id, file_sha1=brain.file_sha1
+        )
         print("brain:", brain)
 
     update_brain_fields(commons, brain)
     return {"message": f"Brain {brain_id} has been updated."}
-
