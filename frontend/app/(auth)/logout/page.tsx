@@ -52,7 +52,7 @@ export default function Logout() {
               variant={"danger"}
               onClick={() => handleLogout()}
             >
-              Log Out
+              退出
             </Button>
           </div>
         </Card>
