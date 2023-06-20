@@ -44,7 +44,7 @@ export const ChatInput = (): JSX.Element => {
       </Button>
       <div className="flex items-center">
         <MicButton />
-        <ConfigButton />
+              {/*   <ConfigButton />  */}
       </div>
     </form>
   );
