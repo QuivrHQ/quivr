@@ -36,7 +36,7 @@ class BrainPicking(BaseModel):
     settings = BrainSettings()
     embeddings: OpenAIEmbeddings = None
     supabase_client: Client = None
-    vector_store: CustomSupabaseVectorStore = None
+    vector_store: CustomSupabaseVectorStore = None  # type: ignore
     llm: ChatOpenAI = None
     question_generator: LLMChain = None
     doc_chain: ConversationalRetrievalChain = None
@@ -63,7 +63,7 @@ class BrainPicking(BaseModel):
         self.question_generator = LLMChain(
             llm=self.llm, prompt=CONDENSE_QUESTION_PROMPT
         )
-        self.doc_chain = load_qa_chain(self.llm, chain_type="stuff")
+        self.doc_chain = load_qa_chain(self.llm, chain_type="map_reduce")
         return self
 
     def _get_qa(
