@@ -63,7 +63,7 @@ class BrainPicking(BaseModel):
         self.question_generator = LLMChain(
             llm=self.llm, prompt=CONDENSE_QUESTION_PROMPT
         )
-        self.doc_chain = load_qa_chain(self.llm, chain_type="map_reduce")
+        self.doc_chain = load_qa_chain(self.llm, chain_type="stuff")
         return self
 
     def _get_qa(
