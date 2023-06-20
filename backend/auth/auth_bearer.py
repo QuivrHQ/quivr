@@ -14,7 +14,9 @@ class AuthBearer(HTTPBearer):
         super().__init__(auto_error=auto_error)
 
     async def __call__(self, request: Request, commons: CommonsDep):
-        credentials: Optional[HTTPAuthorizationCredentials] = await super().__call__(request)
+        credentials: Optional[HTTPAuthorizationCredentials] = await super().__call__(
+            request
+        )
         self.check_scheme(credentials)
         token = credentials.credentials
         return await self.authenticate(token, commons)
@@ -33,10 +35,13 @@ class AuthBearer(HTTPBearer):
         elif await verify_api_key(token, commons):
             return await get_user_from_api_key(token, commons)
         else:
-            raise HTTPException(status_code=402, detail="Invalid token or expired token.")
+            raise HTTPException(
+                status_code=402, detail="Invalid token or expired token."
+            )
 
     def get_test_user(self):
-        return {'email': 'test@example.com'}  # replace with test user information
+        return {"email": "test@example.com"}  # replace with test user information
+
 
 def get_current_user(credentials: dict = Depends(AuthBearer())) -> User:
-    return User(email=credentials.get('email', 'none'))
+    return User(email=credentials.get("email", "none"))
