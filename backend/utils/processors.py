@@ -1,6 +1,6 @@
 import os
 
-from fastapi import Depends, FastAPI, UploadFile
+from fastapi import UploadFile
 from models.settings import CommonsDep
 from models.users import User
 from parsers.audio import process_audio
@@ -15,7 +15,6 @@ from parsers.odt import process_odt
 from parsers.pdf import process_pdf
 from parsers.powerpoint import process_powerpoint
 from parsers.txt import process_txt
-from supabase import Client
 
 file_processors = {
     ".txt": process_txt,
@@ -39,18 +38,28 @@ file_processors = {
 }
 
 
-
-
-async def filter_file(commons: CommonsDep, file: UploadFile, enable_summarization: bool, user: User, openai_api_key):
-    if await file_already_exists(commons['supabase'], file, user):
+async def filter_file(
+    commons: CommonsDep,
+    file: UploadFile,
+    enable_summarization: bool,
+    user: User,
+    openai_api_key,
+):
+    if await file_already_exists(commons["supabase"], file, user):
         return {"message": f"🤔 {file.filename} already exists.", "type": "warning"}
-    elif file.file._file.tell()  < 1:
+    elif file.file._file.tell() < 1:
         return {"message": f"❌ {file.filename} is empty.", "type": "error"}
     else:
-        file_extension = os.path.splitext(file.filename)[-1].lower()  # Convert file extension to lowercase
+        file_extension = os.path.splitext(file.filename)[
+            -1
+        ].lower()  # Convert file extension to lowercase
         if file_extension in file_processors:
-            await file_processors[file_extension](commons,file, enable_summarization, user ,openai_api_key )
-            return {"message": f"✅ {file.filename} has been uploaded.", "type": "success"}
+            await file_processors[file_extension](
+                commons, file, enable_summarization, user, openai_api_key
+            )
+            return {
+                "message": f"✅ {file.filename} has been uploaded.",
+                "type": "success",
+            }
         else:
             return {"message": f"❌ {file.filename} is not supported.", "type": "error"}
-

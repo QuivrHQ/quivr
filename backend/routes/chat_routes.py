@@ -1,17 +1,20 @@
 import os
 import time
+from http.client import HTTPException
 from uuid import UUID
+
 from auth.auth_bearer import AuthBearer, get_current_user
 from fastapi import APIRouter, Depends, Request
 from llm.brainpicking import BrainPicking
-from models.chats import ChatMessage, ChatAttributes
+from models.chats import ChatAttributes, ChatMessage
 from models.settings import CommonsDep, common_dependencies
 from models.users import User
-from utils.chats import (create_chat, get_chat_name_from_first_question,
-                         update_chat)
-from utils.users import (create_user, fetch_user_id_from_credentials,
-                         update_user_request_count)
-from http.client import HTTPException
+from utils.chats import create_chat, get_chat_name_from_first_question, update_chat
+from utils.users import (
+    create_user,
+    fetch_user_id_from_credentials,
+    update_user_request_count,
+)
 
 chat_router = APIRouter()
 
@@ -94,7 +97,9 @@ async def get_chat_handler(chat_id: UUID):
 
 
 # delete one chat
-@chat_router.delete("/chat/{chat_id}", dependencies=[Depends(AuthBearer())], tags=["Chat"])
+@chat_router.delete(
+    "/chat/{chat_id}", dependencies=[Depends(AuthBearer())], tags=["Chat"]
+)
 async def delete_chat(chat_id: UUID):
     """
     Delete a specific chat by chat ID.
@@ -160,7 +165,9 @@ async def chat_endpoint(
 
 
 # update existing chat
-@chat_router.put("/chat/{chat_id}/metadata", dependencies=[Depends(AuthBearer())], tags=["Chat"])
+@chat_router.put(
+    "/chat/{chat_id}/metadata", dependencies=[Depends(AuthBearer())], tags=["Chat"]
+)
 async def update_chat_attributes_handler(
     commons: CommonsDep,
     chat_message: ChatAttributes,
@@ -173,9 +180,11 @@ async def update_chat_attributes_handler(
 
     user_id = fetch_user_id_from_credentials(commons, {"email": current_user.email})
     chat = get_chat_details(commons, chat_id)[0]
-    if user_id != chat.get('user_id'):
+    if user_id != chat.get("user_id"):
         raise HTTPException(status_code=403, detail="Chat not owned by user")
-    return update_chat(commons=commons, chat_id=chat_id, chat_name=chat_message.chat_name)
+    return update_chat(
+        commons=commons, chat_id=chat_id, chat_name=chat_message.chat_name
+    )
 
 
 # create new chat
