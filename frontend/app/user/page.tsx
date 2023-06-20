@@ -52,7 +52,7 @@ const UserPage = (): JSX.Element => {
             </>
           ) : (
             <div className="flex items-center justify-center">
-              <span>Fetching your data...</span>
+              <span>获取数据中...</span>
               <Spinner />
             </div>
           )}
