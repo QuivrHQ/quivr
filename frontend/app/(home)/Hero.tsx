@@ -1,11 +1,12 @@
 "use client";
 import { motion, useScroll, useSpring, useTransform } from "framer-motion";
 import Link from "next/link";
-import { FC, useRef } from "react";
+import { useRef } from "react";
 import { MdNorthEast } from "react-icons/md";
-import Button from "../components/ui/Button";
 
-const Hero: FC = () => {
+import Button from "@/lib/components/ui/Button";
+
+const Hero = (): JSX.Element => {
   const targetRef = useRef<HTMLDivElement | null>(null);
   const { scrollYProgress } = useScroll({
     target: targetRef,
@@ -19,6 +20,7 @@ const Hero: FC = () => {
     if (pos === 1) {
       return "relative";
     }
+
     return "sticky";
   });
 

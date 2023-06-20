@@ -1,5 +1,6 @@
 import { HTMLAttributes } from "react";
-import { UserStats } from "../types";
+
+import { UserStats } from "../../../lib/types/User";
 
 interface DateComponentProps extends HTMLAttributes<HTMLSpanElement> {
   date: UserStats["date"];

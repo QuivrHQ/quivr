@@ -1,26 +1,32 @@
+/* eslint-disable */
 "use client";
-import Card from "@/app/components/ui/Card";
-import { FC, useEffect, useRef } from "react";
-import useChatsContext from "../../ChatsProvider/hooks/useChatsContext";
-import ChatMessage from "./ChatMessage";
+import { useEffect, useRef } from "react";
 
-export const ChatMessages: FC = () => {
+import Card from "@/lib/components/ui/Card";
+import useChatsContext from "@/lib/context/ChatsProvider/hooks/useChatsContext";
+import { ChatMessage } from "./ChatMessage";
+
+export const ChatMessages = (): JSX.Element => {
   const lastChatRef = useRef<HTMLDivElement | null>(null);
 
   const { chat } = useChatsContext();
 
   useEffect(() => {
-    if (!chat || !lastChatRef.current) return;
+    if (!chat || !lastChatRef.current) {
+      return;
+    }
 
     // if (chat.history.length > 2) {
-    lastChatRef.current?.scrollIntoView({
+    lastChatRef.current.scrollIntoView({
       behavior: "smooth",
       block: "end",
     });
     // }
   }, [chat, lastChatRef]);
 
-  if (!chat) return null;
+  if (!chat) {
+    return <></>;
+  }
 
   return (
     <Card className="p-5 max-w-3xl w-full flex flex-col h-full mb-8">

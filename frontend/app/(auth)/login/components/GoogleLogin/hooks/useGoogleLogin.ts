@@ -1,6 +1,8 @@
-import { useSupabase } from "@/app/supabase-provider";
-import { useToast } from "@/lib/hooks/useToast";
+/* eslint-disable */
 import { useState } from "react";
+
+import { useSupabase } from "@/lib/context/SupabaseProvider";
+import { useToast } from "@/lib/hooks/useToast";
 
 export const useGoogleLogin = () => {
   const { supabase } = useSupabase();

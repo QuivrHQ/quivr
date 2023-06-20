@@ -1,7 +1,9 @@
 import { useContext } from "react";
-import { ToastContext } from "../../app/components/ui/Toast/domain/ToastContext";
 
-export const useToast = () => {
+import { ToastContext } from "../components/ui/Toast/domain/ToastContext";
+import { ToastPublisher } from "../components/ui/Toast/domain/types";
+
+export const useToast = (): { publish: ToastPublisher } => {
   const { publish } = useContext(ToastContext);
 
   return {

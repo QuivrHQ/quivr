@@ -1,12 +1,14 @@
+/* eslint-disable */
 "use client";
-import Button from "@/app/components/ui/Button";
-import Card from "@/app/components/ui/Card";
-import Field from "@/app/components/ui/Field";
-import PageHeading from "@/app/components/ui/PageHeading";
-import { useSupabase } from "@/app/supabase-provider";
-import { useToast } from "@/lib/hooks/useToast";
 import Link from "next/link";
 import { useState } from "react";
+
+import Button from "@/lib/components/ui/Button";
+import Card from "@/lib/components/ui/Card";
+import Field from "@/lib/components/ui/Field";
+import PageHeading from "@/lib/components/ui/PageHeading";
+import { useSupabase } from "@/lib/context/SupabaseProvider";
+import { useToast } from "@/lib/hooks/useToast";
 
 export default function SignUp() {
   const { supabase } = useSupabase();

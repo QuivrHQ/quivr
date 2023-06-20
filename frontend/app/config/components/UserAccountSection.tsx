@@ -1,8 +1,10 @@
+/* eslint-disable */
 "use client";
 
-import { useSupabase } from "@/app/supabase-provider";
 import Link from "next/link";
-import Button from "../../components/ui/Button";
+
+import Button from "@/lib/components/ui/Button";
+import { useSupabase } from "@/lib/context/SupabaseProvider";
 
 export const UserAccountSection = (): JSX.Element => {
   const { session } = useSupabase();

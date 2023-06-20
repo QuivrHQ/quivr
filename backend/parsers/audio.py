@@ -10,8 +10,8 @@ from langchain.document_loaders import TextLoader
 from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.schema import Document
 from langchain.text_splitter import RecursiveCharacterTextSplitter
+from models.settings import CommonsDep
 from utils.file import compute_sha1_from_content
-from utils.vectors import documents_vector_store
 
 # # Create a function to transcribe audio using Whisper
 # def _transcribe_audio(api_key, audio_file, stats_db):
@@ -32,7 +32,7 @@ from utils.vectors import documents_vector_store
 #     return transcript
 
 # async def process_audio(upload_file: UploadFile, stats_db):
-async def process_audio(upload_file: UploadFile, enable_summarization: bool, user, user_openai_api_key):
+async def process_audio(commons: CommonsDep, upload_file: UploadFile, enable_summarization: bool, user, user_openai_api_key):
 
     file_sha = ""
     dateshort = time.strftime("%Y%m%d-%H%M%S")
@@ -70,6 +70,6 @@ async def process_audio(upload_file: UploadFile, enable_summarization: bool, use
 
     # if st.secrets.self_hosted == "false":
     #     add_usage(stats_db, "embedding", "audio", metadata={"file_name": file_meta_name,"file_type": ".txt", "chunk_size": chunk_size, "chunk_overlap": chunk_overlap})
-    documents_vector_store.add_documents(docs_with_metadata)
+    commons.documents_vector_store.add_documents(docs_with_metadata)
 
     return documents_vector_store

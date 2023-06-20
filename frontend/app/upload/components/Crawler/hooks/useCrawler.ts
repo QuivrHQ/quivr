@@ -1,8 +1,11 @@
-import { useSupabase } from "@/app/supabase-provider";
-import { useToast } from "@/lib/hooks/useToast";
-import { useAxios } from "@/lib/useAxios";
+/* eslint-disable */
 import { redirect } from "next/navigation";
 import { useCallback, useRef, useState } from "react";
+
+import { useSupabase } from "@/lib/context/SupabaseProvider";
+import { useAxios } from "@/lib/hooks";
+import { useToast } from "@/lib/hooks/useToast";
+
 import { isValidUrl } from "../helpers/isValidUrl";
 
 export const useCrawler = () => {
@@ -26,6 +29,7 @@ export const useCrawler = () => {
         variant: "danger",
         text: "Invalid URL",
       });
+
       return;
     }
 

@@ -1,18 +1,16 @@
 import os
 import time
 
-from fastapi import UploadFile
 from langchain.document_loaders import GitLoader
 from langchain.schema import Document
 from langchain.text_splitter import RecursiveCharacterTextSplitter
+from models.settings import CommonsDep
 from parsers.common import file_already_exists_from_content
-from utils.file import compute_sha1_from_content, compute_sha1_from_file
-from utils.vectors import create_summary, create_vector, documents_vector_store
-
-from .common import process_file
+from utils.file import compute_sha1_from_content
+from utils.vectors import Neurons
 
 
-async def process_github(repo, enable_summarization, user, supabase, user_openai_api_key): 
+async def process_github(commons: CommonsDep, repo, enable_summarization, user, supabase, user_openai_api_key): 
     random_dir_name = os.urandom(16).hex()
     dateshort = time.strftime("%Y%m%d")
     loader = GitLoader(
@@ -31,7 +29,7 @@ async def process_github(repo, enable_summarization, user, supabase, user_openai
     print(documents[:1])
 
     for doc in documents:
-        if doc.metadata["file_type"] in [".pyc", ".env", ".lock", ".gitignore", ".gitmodules", ".gitattributes", ".gitkeep", ".git"]:
+        if doc.metadata["file_type"] in [".pyc",".png",".svg", ".env", ".lock", ".gitignore", ".gitmodules", ".gitattributes", ".gitkeep", ".git", ".json"]:
             continue
         metadata = {
             "file_sha1": compute_sha1_from_content(doc.page_content.encode("utf-8")),
@@ -46,7 +44,8 @@ async def process_github(repo, enable_summarization, user, supabase, user_openai
             page_content=doc.page_content, metadata=metadata)
         exist = await file_already_exists_from_content(supabase, doc.page_content.encode("utf-8"), user)
         if not exist:
-            create_vector(user.email, doc_with_metadata, user_openai_api_key)
+            neurons =  Neurons(commons=commons)
+            neurons.create_vector(user.email, doc_with_metadata, user_openai_api_key)
             print("Created vector for ", doc.metadata["file_name"])
 
     return {"message": f"✅ Github with {len(documents)} files has been uploaded.", "type": "success"}

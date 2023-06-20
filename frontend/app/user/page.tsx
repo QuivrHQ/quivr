@@ -1,13 +1,16 @@
+/* eslint-disable */
 "use client";
-import { useAxios } from "@/lib/useAxios";
 import { redirect } from "next/navigation";
 import { useEffect, useState } from "react";
-import Spinner from "../components/ui/Spinner";
-import { useSupabase } from "../supabase-provider";
-import { UserStatistics } from "./components/UserStatistics";
-import { UserStats } from "./types";
 
-export default function UserPage() {
+import Spinner from "@/lib/components/ui/Spinner";
+import { useAxios } from "@/lib/hooks";
+import { UserStats } from "@/lib/types/User";
+
+import { useSupabase } from "@/lib/context/SupabaseProvider";
+import { UserStatistics } from "./components/UserStatistics";
+
+const UserPage = (): JSX.Element => {
   const [userStats, setUserStats] = useState<UserStats>();
   const { session } = useSupabase();
   const { axiosInstance } = useAxios();
@@ -57,4 +60,5 @@ export default function UserPage() {
       </section>
     </main>
   );
-}
+};
+export default UserPage;

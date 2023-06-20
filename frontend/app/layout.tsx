@@ -2,12 +2,15 @@ import { createServerComponentSupabaseClient } from "@supabase/auth-helpers-next
 import { Analytics } from "@vercel/analytics/react";
 import { Inter } from "next/font/google";
 import { cookies, headers } from "next/headers";
-import { BrainConfigProvider } from "../lib/context/BrainConfigProvider/brain-config-provider";
-import Footer from "./components/Footer";
-import { NavBar } from "./components/NavBar";
-import { ToastProvider } from "./components/ui/Toast";
+
+import Footer from "@/lib/components/Footer";
+import { NavBar } from "@/lib/components/NavBar";
+import { ToastProvider } from "@/lib/components/ui/Toast";
+import { BrainProvider, FeatureFlagsProvider } from "@/lib/context";
+import { BrainConfigProvider } from "@/lib/context/BrainConfigProvider/brain-config-provider";
+import { SupabaseProvider } from "@/lib/context/SupabaseProvider";
+
 import "./globals.css";
-import SupabaseProvider from "./supabase-provider";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -17,11 +20,11 @@ export const metadata = {
     "Quivr is your second brain in the cloud, designed to easily store and retrieve unstructured information.",
 };
 
-export default async function RootLayout({
+const RootLayout = async ({
   children,
 }: {
   children: React.ReactNode;
-}) {
+}): Promise<JSX.Element> => {
   const supabase = createServerComponentSupabaseClient({
     headers,
     cookies,
@@ -36,17 +39,23 @@ export default async function RootLayout({
       <body
         className={`bg-white text-black min-h-screen flex flex-col dark:bg-black dark:text-white w-full ${inter.className}`}
       >
+        <FeatureFlagsProvider>
         <ToastProvider>
           <SupabaseProvider session={session}>
             <BrainConfigProvider>
-              <NavBar />
-              <div className="flex-1">{children}</div>
-              <Footer />
+              <BrainProvider>
+                <NavBar />
+                <div className="flex-1">{children}</div>
+                <Footer />
+              </BrainProvider>
             </BrainConfigProvider>
           </SupabaseProvider>
         </ToastProvider>
-        <Analytics />
+          <Analytics />
+        </FeatureFlagsProvider>
       </body>
     </html>
   );
-}
+};
+
+export default RootLayout;

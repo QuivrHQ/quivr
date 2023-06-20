@@ -1,9 +1,11 @@
+/* eslint-disable */
 "use client";
-import { cn } from "@/lib/utils";
 import { forwardRef, Ref } from "react";
 import ReactMarkdown from "react-markdown";
 
-const ChatMessage = forwardRef(
+import { cn } from "@/lib/utils";
+
+export const ChatMessage = forwardRef(
   (
     {
       speaker,
@@ -46,5 +48,3 @@ const ChatMessage = forwardRef(
 );
 
 ChatMessage.displayName = "ChatMessage";
-
-export default ChatMessage;

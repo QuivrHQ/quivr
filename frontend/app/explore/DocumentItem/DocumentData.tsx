@@ -1,6 +1,9 @@
-import { useAxios } from "@/lib/useAxios";
+/* eslint-disable */
 import { useEffect, useState } from "react";
-import { useSupabase } from "../../supabase-provider";
+
+import { useAxios } from "@/lib/hooks";
+
+import { useSupabase } from "../../../lib/context/SupabaseProvider";
 
 interface DocumentDataProps {
   documentName: string;

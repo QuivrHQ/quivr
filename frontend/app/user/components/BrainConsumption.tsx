@@ -1,5 +1,6 @@
 import { GiBrain } from "react-icons/gi";
-import { UserStats } from "../types";
+
+import { UserStats } from "../../../lib/types/User";
 
 export const BrainConsumption = (userStats: UserStats): JSX.Element => {
   const { current_brain_size, max_brain_size } = userStats;
@@ -27,6 +28,7 @@ export const BrainConsumption = (userStats: UserStats): JSX.Element => {
       className="fill-pink-300 stroke-black stoke-1"
     />
   );
+
   return (
     <div className="flex flex-col items-center justify-center w-fit">
       <div className="w-24 h-24 relative">
