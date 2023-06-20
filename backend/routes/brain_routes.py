@@ -9,20 +9,22 @@ from logger import get_logger
 from models.brains import Brain
 from models.settings import CommonsDep, common_dependencies
 from models.users import User
-from utils.brains import (
-    create_brain,
-    create_brain_user,
-    delete_brain,
-    get_brain_details,
-    get_user_brains,
-    update_brain_fields,
-    update_brain_with_file,
-)
+from pydantic import BaseModel
 from utils.users import fetch_user_id_from_credentials
 
 logger = get_logger(__name__)
 
 brain_router = APIRouter()
+
+
+class BrainToUpdate(BaseModel):
+    brain_id: UUID
+    name: Optional[str] = "New Brain"
+    status: Optional[str] = "public"
+    model: Optional[str] = "gpt-3.5-turbo-0613"
+    temperature: Optional[float] = 0.0
+    max_tokens: Optional[int] = 256
+    file_sha1: Optional[str] = ""
 
 
 # get all brains
@@ -38,8 +40,9 @@ async def brain_endpoint(current_user: User = Depends(get_current_user)):
     containing the brain ID and brain name for each brain.
     """
     commons = common_dependencies()
+    brain = Brain()
     user_id = fetch_user_id_from_credentials(commons, {"email": current_user.email})
-    brains = get_user_brains(commons, user_id)
+    brains = brain.get_user_brains(user_id)
     return {"brains": brains}
 
 
@@ -57,8 +60,8 @@ async def brain_endpoint(brain_id: UUID):
     This endpoint retrieves the details of a specific brain identified by the provided brain ID. It returns the brain ID and its
     history, which includes the brain messages exchanged in the brain.
     """
-    commons = common_dependencies()
-    brains = get_brain_details(commons, brain_id)
+    brain = Brain(brain_id=brain_id)
+    brains = brain.get_brain_details()
     if len(brains) > 0:
         return {
             "brainId": brain_id,
@@ -77,15 +80,27 @@ async def brain_endpoint(brain_id: UUID):
     """
     Delete a specific brain by brain ID.
     """
-    commons = common_dependencies()
-    delete_brain(commons, brain_id)
+    brain = Brain(brain_id=brain_id)
+    brain.delete_brain()
     return {"message": f"{brain_id}  has been deleted."}
+
+
+class BrainObject(BaseModel):
+    brain_id: Optional[UUID]
+    name: Optional[str] = "New Brain"
+    status: Optional[str] = "public"
+    model: Optional[str] = "gpt-3.5-turbo-0613"
+    temperature: Optional[float] = 0.0
+    max_tokens: Optional[int] = 256
+    file_sha1: Optional[str] = ""
 
 
 # create new brain
 @brain_router.post("/brains", dependencies=[Depends(AuthBearer())], tags=["Brain"])
 async def brain_endpoint(
-    request: Request, brain: Brain, current_user: User = Depends(get_current_user)
+    request: Request,
+    brain: BrainObject,
+    current_user: User = Depends(get_current_user),
 ):
     """
     Create a new brain with given
@@ -97,10 +112,11 @@ async def brain_endpoint(
     In the brains table & in the brains_users table and put the creator user as 'Owner'
     """
     commons = common_dependencies()
+    brain = Brain(name=brain.name)
     user_id = fetch_user_id_from_credentials(commons, {"email": current_user.email})
-    created_brain = create_brain(commons, brain)[0]
+    created_brain = brain.create_brain(brain.name)[0]
     # create a brain X user entry
-    create_brain_user(commons, created_brain["brain_id"], user_id, rights="Owner")
+    brain.create_brain_user(created_brain["brain_id"], user_id, rights="Owner")
 
     return {"id": created_brain["brain_id"], "name": created_brain["name"]}
 
@@ -112,7 +128,7 @@ async def brain_endpoint(
 async def brain_endpoint(
     request: Request,
     brain_id: UUID,
-    brain: Brain,
+    input_brain: Brain,
     fileName: Optional[str],
     current_user: User = Depends(get_current_user),
 ):
@@ -125,13 +141,13 @@ async def brain_endpoint(
     Return modified brain ? No need -> do an optimistic update
     """
     commons = common_dependencies()
+    brain = Brain(brain_id=brain_id)
+
     # Add new file to brain , il file_sha1 already exists in brains_vectors -> out (not now)
     if brain.file_sha1:
         # add all the vector Ids to the brains_vectors  with the given brain.brain_id
-        update_brain_with_file(
-            commons, brain_id=brain.brain_id, file_sha1=brain.file_sha1
-        )
+        brain.update_brain_with_file(file_sha1=input_brain.file_sha1)
         print("brain:", brain)
 
-    update_brain_fields(commons, brain)
+    brain.update_brain_fields(commons, brain)
     return {"message": f"Brain {brain_id} has been updated."}
