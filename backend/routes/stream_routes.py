@@ -2,7 +2,7 @@ import asyncio
 import os
 from typing import AsyncIterable, Awaitable
 
-from auth.auth_bearer import AuthBearer, get_current_user
+from auth.auth_bearer import AuthBearer
 from fastapi import APIRouter, Depends
 from fastapi.responses import StreamingResponse
 from langchain.callbacks import AsyncIteratorCallbackHandler
@@ -10,8 +10,6 @@ from langchain.chat_models import ChatOpenAI
 from langchain.schema import HumanMessage
 from logger import get_logger
 from models.chats import ChatMessage
-from models.settings import CommonsDep
-from models.users import User
 
 logger = get_logger(__name__)
 
@@ -21,6 +19,7 @@ openai_api_key = os.getenv("OPENAI_API_KEY")
 
 
 async def send_message(chat_message: ChatMessage) -> AsyncIterable[str]:
+    # Callback provides the on_llm_new_token method
     callback = AsyncIteratorCallbackHandler()
 
     streaming_llm = ChatOpenAI(
@@ -36,12 +35,12 @@ async def send_message(chat_message: ChatMessage) -> AsyncIterable[str]:
             resp = await fn
             logger.debug("Done: %s", resp)
         except Exception as e:
-            # TODO: handle exception
-            print(f"Caught exception: {e}")
+            logger.error(f"Caught exception: {e}")
         finally:
             # Signal the aiter to stop.
             event.set()
 
+    # Use the agenerate method (Supported for models not chains)
     task = asyncio.create_task(
         wrap_done(
             streaming_llm.agenerate(
@@ -51,9 +50,9 @@ async def send_message(chat_message: ChatMessage) -> AsyncIterable[str]:
         )
     )
 
+    # Use the aiter method of the callback to stream the response with server-sent-events
     async for token in callback.aiter():
         logger.info("Token: %s", token)
-        # Use server-sent-events to stream the response
         yield f"data: {token}\n\n"
 
     await task
