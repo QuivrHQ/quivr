@@ -6,8 +6,8 @@ import { MotionConfig, motion } from "framer-motion";
 import { useState } from "react";
 import { MdChevronRight } from "react-icons/md";
 
-import ChatsListItem from "./ChatsListItem";
 import { NewChatButton } from "./NewChatButton";
+import { ChatsListItem } from "./components/ChatsListItem/";
 
 export const ChatsList = (): JSX.Element => {
   const { allChats, deleteChat } = useChatsContext();

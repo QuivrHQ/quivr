@@ -1,6 +1,6 @@
 from fastapi import UploadFile
 from langchain.document_loaders import Docx2txtLoader
-from utils.common import CommonsDep
+from models.settings import CommonsDep
 
 from .common import process_file
 
