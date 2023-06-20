@@ -19,7 +19,7 @@ const ConfigPage = (): JSX.Element => {
       <section className="w-full outline-none pt-10 flex flex-col gap-5 items-center justify-center p-6">
         <ConfigTitle />
         <ConfigForm />
-        <ApiKeyConfig />
+              {/*<ApiKeyConfig />*/}
       </section>
     </main>
   );
