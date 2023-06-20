@@ -62,7 +62,7 @@ export const FileUploader = (): JSX.Element => {
         )}
       </div>
       <div className="flex flex-col items-center justify-center">
-        <Button isLoading={isPending} onClick={void uploadAllFiles}>
+        <Button isLoading={isPending} onClick={() => void uploadAllFiles()}>
           {isPending ? "Uploading..." : "Upload"}
         </Button>
       </div>
