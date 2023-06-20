@@ -1,17 +1,25 @@
 import os
 import time
 from uuid import UUID
+from models.chats import ChatHistory
 from auth.auth_bearer import AuthBearer, get_current_user
 from fastapi import APIRouter, Depends, Request
 from llm.brainpicking import BrainPicking
-from models.chats import ChatMessage, ChatAttributes
+from models.chats import ChatMessage, ChatAttributes, ChatQuestion
 from models.settings import CommonsDep, common_dependencies
 from models.users import User
-from utils.chats import (create_chat, get_chat_name_from_first_question,
-                         update_chat)
-from utils.users import (create_user, fetch_user_id_from_credentials,
-                         update_user_request_count)
+from repository.chat.get_chat_history import get_chat_history
+from utils.chats import create_chat, get_chat_name_from_first_question, update_chat
+from utils.users import (
+    create_user,
+    fetch_user_id_from_credentials,
+    update_user_request_count,
+)
+
+from repository.chat.update_chat_history import update_chat_history
+
 from http.client import HTTPException
+from llm.GPTAnswerGenerator.GPTAnswerGenerator import GPTAnswerGenerator
 
 chat_router = APIRouter()
 
@@ -94,7 +102,9 @@ async def get_chat_handler(chat_id: UUID):
 
 
 # delete one chat
-@chat_router.delete("/chat/{chat_id}", dependencies=[Depends(AuthBearer())], tags=["Chat"])
+@chat_router.delete(
+    "/chat/{chat_id}", dependencies=[Depends(AuthBearer())], tags=["Chat"]
+)
 async def delete_chat(chat_id: UUID):
     """
     Delete a specific chat by chat ID.
@@ -160,7 +170,9 @@ async def chat_endpoint(
 
 
 # update existing chat
-@chat_router.put("/chat/{chat_id}/metadata", dependencies=[Depends(AuthBearer())], tags=["Chat"])
+@chat_router.put(
+    "/chat/{chat_id}/metadata", dependencies=[Depends(AuthBearer())], tags=["Chat"]
+)
 async def update_chat_attributes_handler(
     commons: CommonsDep,
     chat_message: ChatAttributes,
@@ -173,9 +185,11 @@ async def update_chat_attributes_handler(
 
     user_id = fetch_user_id_from_credentials(commons, {"email": current_user.email})
     chat = get_chat_details(commons, chat_id)[0]
-    if user_id != chat.get('user_id'):
+    if user_id != chat.get("user_id"):
         raise HTTPException(status_code=403, detail="Chat not owned by user")
-    return update_chat(commons=commons, chat_id=chat_id, chat_name=chat_message.chat_name)
+    return update_chat(
+        commons=commons, chat_id=chat_id, chat_name=chat_message.chat_name
+    )
 
 
 # create new chat
@@ -192,3 +206,41 @@ async def create_chat_handler(
     return chat_handler(
         request, commons, None, chat_message, current_user.email, is_new_chat=True
     )
+
+
+# create new chat
+@chat_router.post(
+    "/chat/{chat_id}/question", dependencies=[Depends(AuthBearer())], tags=["Chat"]
+)
+async def create_question_handler(
+    chat_question: ChatQuestion,
+    chat_id: UUID,
+    current_user: User = Depends(get_current_user),
+) -> ChatHistory:
+    # TODO: RBAC with current_user
+    answer_generator = GPTAnswerGenerator(
+        model=chat_question.model,
+        chat_id=chat_id,
+        temperature=chat_question.temperature,
+        max_tokens=chat_question.max_tokens,
+        # TODO: use user_id in vectors table instead of email
+        user_email=current_user.email,
+    )
+    answer = answer_generator.get_answer(chat_question.question)
+
+    chat_answer = update_chat_history(
+        chat_id=chat_id, user_message=chat_question.question, assistant_answer=answer
+    )
+    return chat_answer
+
+
+# create new chat
+@chat_router.get(
+    "/chat/{chat_id}/history", dependencies=[Depends(AuthBearer())], tags=["Chat"]
+)
+async def get_chat_history_handler(
+    chat_id: UUID,
+    current_user: User = Depends(get_current_user),
+) -> list[ChatHistory]:
+    # TODO: RBAC with current_user
+    return get_chat_history(chat_id)

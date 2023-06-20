@@ -34,6 +34,7 @@ from logger import get_logger
 
 logger = get_logger(__name__)
 
+
 class AnswerConversationBufferMemory(ConversationBufferMemory):
     """
     This class is a specialized version of ConversationBufferMemory.
@@ -98,7 +99,7 @@ class BrainPicking(BaseModel):
             table_name="vectors",
             user_id=user_id,
         )
-                    
+
         self.llm = self._determine_llm(
             private_model_args={
                 "model_path": self.llm_config.model_path,
@@ -128,7 +129,7 @@ class BrainPicking(BaseModel):
             model_path = private_model_args["model_path"]
             model_n_ctx = private_model_args["n_ctx"]
             model_n_batch = private_model_args["n_batch"]
-            
+
             logger.info("Using private model: %s", model_path)
 
             return GPT4All(

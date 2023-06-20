@@ -22,17 +22,22 @@ class LLMSettings(BaseSettings):
 def common_dependencies() -> dict:
     settings = BrainSettings()
     embeddings = OpenAIEmbeddings(openai_api_key=settings.openai_api_key)
-    supabase_client: Client = create_client(settings.supabase_url, settings.supabase_service_key)
+    supabase_client: Client = create_client(
+        settings.supabase_url, settings.supabase_service_key
+    )
     documents_vector_store = SupabaseVectorStore(
-    supabase_client, embeddings, table_name="vectors")
+        supabase_client, embeddings, table_name="vectors"
+    )
     summaries_vector_store = SupabaseVectorStore(
-        supabase_client, embeddings, table_name="summaries")
-    
+        supabase_client, embeddings, table_name="summaries"
+    )
+
     return {
         "supabase": supabase_client,
         "embeddings": embeddings,
         "documents_vector_store": documents_vector_store,
-        "summaries_vector_store": summaries_vector_store
+        "summaries_vector_store": summaries_vector_store,
     }
+
 
 CommonsDep = Annotated[dict, Depends(common_dependencies)]
