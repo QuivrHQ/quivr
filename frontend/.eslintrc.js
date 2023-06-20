@@ -105,7 +105,7 @@ module.exports = {
     browser: true,
   },
   parserOptions: {
-    ecmaVersion: 9,
+    ecmaVersion: 2021,
     sourceType: "module",
     babelOptions: {
       presets: [require.resolve("next/babel")],

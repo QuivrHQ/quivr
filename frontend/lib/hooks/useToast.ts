@@ -1,9 +1,9 @@
-/* eslint-disable */
 import { useContext } from "react";
 
-import { ToastContext } from "@/lib/components/ui/Toast/domain/ToastContext";
+import { ToastContext } from "../components/ui/Toast/domain/ToastContext";
+import { ToastPublisher } from "../components/ui/Toast/domain/types";
 
-export const useToast = () => {
+export const useToast = (): { publish: ToastPublisher } => {
   const { publish } = useContext(ToastContext);
 
   return {

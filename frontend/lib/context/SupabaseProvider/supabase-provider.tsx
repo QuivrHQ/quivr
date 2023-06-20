@@ -10,14 +10,14 @@ import { createContext, useContext, useEffect, useState } from "react";
 
 type MaybeSession = Session | null;
 
-type SupabaseContext = {
+export type SupabaseContext = {
   supabase: SupabaseClient;
   session: MaybeSession;
 };
 
 const Context = createContext<SupabaseContext | undefined>(undefined);
 
-const SupabaseProvider = ({
+export const SupabaseProvider = ({
   children,
   session,
 }: {
@@ -55,5 +55,3 @@ export const useSupabase = (): SupabaseContext => {
 
   return context;
 };
-
-export default SupabaseProvider;
