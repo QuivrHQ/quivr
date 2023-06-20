@@ -2,7 +2,7 @@
   "python.formatting.provider": "black",
   "editor.codeActionsOnSave": {
     "source.organizeImports": true,
-    "source.fixAll":true
+    "source.fixAll": true
   },
   "python.linting.enabled": true,
   "python.linting.flake8Enabled": true,
@@ -11,5 +11,11 @@
     "editor.defaultFormatter": "esbenp.prettier-vscode",
     "editor.formatOnSave": true
   },
-  "editor.formatOnSaveMode": "modifications"
+  "[python]": {
+    "editor.defaultFormatter": "ms-python.black-formatter",
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+      "source.organizeImports": true
+    }
+  }
 }
