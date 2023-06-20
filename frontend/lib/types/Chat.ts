@@ -8,3 +8,7 @@ export interface Chat {
 export type ChatMessage = [string, string];
 
 export type ChatHistory = ChatMessage[];
+
+  export type ChatResponse = Omit<Chat, "chatId"> & {
+    chatId: UUID | undefined;
+  };

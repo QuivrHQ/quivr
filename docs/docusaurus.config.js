@@ -71,19 +71,18 @@ const config = {
         },
         items: [
           {
-            type: 'docSidebar',
-            sidebarId: 'tutorialSidebar',
-            position: 'left',
-            label: 'Tutorial',
-          },
-          {
             href: '/docs/roadmap',
             label: 'Roadmap',
             position: 'left',
           },
           {
+            href: 'https://quivr.app',
+            position: 'right',
+            label: 'Try me now',
+          },
+          {
             href: 'https://github.com/stangirard/Quivr',
-            label: 'GitHub',
+            label: 'Star us on GitHub',
             position: 'right',
           },
         ],
@@ -96,7 +95,7 @@ const config = {
             items: [
               {
                 label: 'Get Started',
-                to: '/docs/intro',
+                to: '/docs/get_started/intro',
               },
             ],
           },

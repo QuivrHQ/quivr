@@ -1,8 +1,8 @@
 import time
 
 from logger import get_logger
+from models.settings import CommonsDep
 from models.users import User
-from utils.common import CommonsDep
 
 logger = get_logger(__name__)
 

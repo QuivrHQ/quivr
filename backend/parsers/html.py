@@ -6,7 +6,7 @@ import unicodedata
 import requests
 from fastapi import UploadFile
 from langchain.document_loaders import UnstructuredHTMLLoader
-from utils.common import CommonsDep
+from models.settings import CommonsDep
 
 from .common import process_file
 

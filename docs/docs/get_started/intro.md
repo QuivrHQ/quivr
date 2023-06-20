@@ -26,22 +26,14 @@ Quivr, your second brain, utilizes the power of GenerativeAI to store and retrie
 
 ## Demo Highlights 🎥
 
-> **Please note: The DEMO WITH STREAMLIT IS USING AN OLD VERSION**  
-> The new version showcases a fresh UI, however, it is not yet deployed as it lacks some features of the old version. Expected to go live before 25/05/23
+### **Demo**: 
 
-### **Demo with GPT3.5**:
+<video width="640" height="480" controls>
+  <source src="https://github.com/StanGirard/quivr/assets/19614572/a6463b73-76c7-4bc0-978d-70562dca71f5" type="video/mp4"/>
+  Your browser does not support the video tag.
+</video>
 
-https://github.com/StanGirard/quivr/assets/19614572/80721777-2313-468f-b75e-09379f694653
-
-### **Demo with Claude 100k context**:
-
-https://github.com/StanGirard/quivr/assets/5101573/9dba918c-9032-4c8d-9eea-94336d2c8bd4
-
-### **Demo of the new version (Work in progress)**: 
-
-https://github.com/StanGirard/quivr/assets/19614572/a6463b73-76c7-4bc0-978d-70562dca71f5
-
-## Getting Started: New Version 🚀
+## Getting Started: 🚀
 
 Follow these instructions to get a copy of the project up and running on your local machine for development and testing purposes.
 

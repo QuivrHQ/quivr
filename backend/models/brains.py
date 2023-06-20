@@ -11,12 +11,13 @@ class Brain(BaseModel):
     model: str = "gpt-3.5-turbo-0613"
     temperature: float = 0.0
     max_tokens: int = 256
-    
-class BrainToUpdate(BaseModel): 
+
+
+class BrainToUpdate(BaseModel):
     brain_id: UUID
     brain_name: Optional[str] = "New Brain"
     status: Optional[str] = "public"
     model: Optional[str] = "gpt-3.5-turbo-0613"
     temperature: Optional[float] = 0.0
     max_tokens: Optional[int] = 256
-    file_sha1: Optional[str] = ''
+    file_sha1: Optional[str] = ""
