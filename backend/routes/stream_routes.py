@@ -1,7 +1,6 @@
 import asyncio
 import os
-from functools import lru_cache
-from typing import AsyncIterable, Awaitable, Callable
+from typing import AsyncIterable, Awaitable
 
 from auth.auth_bearer import AuthBearer, get_current_user
 from fastapi import APIRouter, Depends
@@ -44,7 +43,8 @@ async def send_message(
             # Signal the aiter to stop.
             event.set()
 
-    # Use the agenerate method (Supported for models not chains)
+    # Use the agenerate method for models.
+    # Use the acall method for chains.
     task = asyncio.create_task(
         wrap_done(
             chain.acall(
@@ -65,7 +65,7 @@ async def send_message(
     await task
 
 
-def create_qa(commons: CommonsDep, current_user: User):
+def create_chain(commons: CommonsDep, current_user: User):
     user_id = fetch_user_id_from_credentials(commons, {"email": current_user.email})
 
     embeddings = OpenAIEmbeddings(openai_api_key=openai_api_key)
@@ -115,9 +115,9 @@ async def stream(
 ) -> StreamingResponse:
     commons = common_dependencies()
 
-    qa, callback = create_qa(commons, current_user)
+    qa_chain, callback = create_chain(commons, current_user)
 
     return StreamingResponse(
-        send_message(chat_message, qa, callback),
+        send_message(chat_message, qa_chain, callback),
         media_type="text/event-stream",
     )
