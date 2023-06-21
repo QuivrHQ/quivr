@@ -72,7 +72,7 @@ get_context_schema = {
 
 class GPTAnswerGenerator:
     # Default class attributes
-    model: str = "gpt-3.5-turbo-16k"
+    model: str = "gpt-3.5-turbo-0613"
     temperature: float = 0.0
     max_tokens: int = 256
     chat_id: str

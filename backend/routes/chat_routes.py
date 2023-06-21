@@ -225,17 +225,11 @@ async def create_question_handler(
     chat_id: UUID,
     current_user: User = Depends(get_current_user),
 ) -> ChatHistory:
-    openai_models = [
-        "gpt-3.5-turbo",
+    openai_function_compatible_models = [
         "gpt-3.5-turbo-0613",
-        "gpt-3.5-turbo-16k",
-        "gpt-3.5-turbo",
-        "gpt-3.5-turbo-0613",
-        "gpt-3.5-turbo-16k",
-        "gpt-4",
         "gpt-4-0613",
     ]
-    if chat_question.model in openai_models:
+    if chat_question.model in openai_function_compatible_models:
         # TODO: RBAC with current_user
         gpt_answer_generator = GPTAnswerGenerator(
             model=chat_question.model,
