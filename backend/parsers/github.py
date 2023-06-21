@@ -45,8 +45,9 @@ async def process_github(commons: CommonsDep, repo, enable_summarization, user, 
         exist = await file_already_exists_from_content(supabase, doc.page_content.encode("utf-8"), user)
         if not exist:
             neurons =  Neurons(commons=commons)
-            neurons.create_vector(user.email, doc_with_metadata, user_openai_api_key)
+            created_vector = neurons.create_vector(doc_with_metadata, user_openai_api_key)
             print("Created vector for ", doc.metadata["file_name"])
+            # add created_vector x brains in db
 
     return {"message": f"✅ Github with {len(documents)} files has been uploaded.", "type": "success"}
 

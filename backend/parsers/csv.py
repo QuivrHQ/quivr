@@ -9,7 +9,7 @@ def process_csv(
     commons: CommonsDep,
     file: UploadFile,
     enable_summarization,
-    user,
+    brain_id,
     user_openai_api_key,
 ):
     return process_file(
@@ -18,6 +18,6 @@ def process_csv(
         CSVLoader,
         ".csv",
         enable_summarization,
-        user,
+        brain_id,
         user_openai_api_key,
     )

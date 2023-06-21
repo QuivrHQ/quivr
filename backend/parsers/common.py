@@ -8,6 +8,7 @@ from typing import Optional
 from fastapi import UploadFile
 from langchain.schema import Document
 from langchain.text_splitter import RecursiveCharacterTextSplitter
+from models.brains import Brain
 from models.settings import CommonsDep
 from utils.file import compute_sha1_from_content, compute_sha1_from_file
 from utils.vectors import Neurons, create_summary
@@ -19,7 +20,7 @@ async def process_file(
     loader_class,
     file_suffix,
     enable_summarization,
-    user,
+    brain_id,
     user_openai_api_key,
 ):
     documents = []
@@ -62,8 +63,13 @@ async def process_file(
         doc_with_metadata = Document(
             page_content=doc.page_content, metadata=metadata)
         neurons = Neurons(commons=commons)
-        neurons.create_vector(user.email, doc_with_metadata, user_openai_api_key)
+        created_vector = neurons.create_vector(doc_with_metadata, user_openai_api_key)
         # add_usage(stats_db, "embedding", "audio", metadata={"file_name": file_meta_name,"file_type": ".txt", "chunk_size": chunk_size, "chunk_overlap": chunk_overlap})
+
+        created_vector_id = created_vector[0]
+
+        brain = Brain(brain_id=brain_id)
+        brain.create_brain_vector(created_vector_id)
 
         # Remove the enable_summarization and ids
         if enable_summarization and ids and len(ids) > 0:
@@ -73,28 +79,34 @@ async def process_file(
     return
 
 
-async def file_already_exists(supabase, file, user):
+async def file_already_exists(supabase, file, brain_id):
     # TODO: user brain id instead of user
     file_content = await file.read()
+    return file_already_exists_from_content(supabase, file_content, brain_id)
+
+
+async def file_already_exists_from_content(supabase, file_content, brain_id):
     file_sha1 = compute_sha1_from_content(file_content)
     response = (
         supabase.table("vectors")
         .select("id")
         .filter("metadata->>file_sha1", "eq", file_sha1)
-        .filter("user_id", "eq", user.email)
         .execute()
     )
-    return len(response.data) > 0
+    vectors_ids = response.data
 
+    for vector_id in vectors_ids:
+        response = (
+            supabase.table("brains_vectors")
+            .select("brain_id, vector_id")
+            .filter("brain_id", "eq", brain_id)
+            .filter("vector_id", "eq", vector_id)
+            .execute()
+        )
+        if len(response.data) == 0:
+            # This means we found a vector_id that has no related entry in the "brains_vectors"
+            # So, we return False indicating the file is not fully loaded or not loaded at all in the brain
+            return False
 
-async def file_already_exists_from_content(supabase, file_content, user):
-    # TODO: user brain id instead of user
-    file_sha1 = compute_sha1_from_content(file_content)
-    response = (
-        supabase.table("vectors")
-        .select("id")
-        .filter("metadata->>file_sha1", "eq", file_sha1)
-        .filter("user_id", "eq", user.email)
-        .execute()
-    )
-    return len(response.data) > 0
+    # If we have not returned False, it means all vector_ids have a related entry in "brains_vectors"
+    return True
