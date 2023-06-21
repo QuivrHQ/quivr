@@ -19,7 +19,9 @@ from utils.users import (
 from repository.chat.update_chat_history import update_chat_history
 
 from http.client import HTTPException
-from llm.GPTAnswerGenerator.GPTAnswerGenerator import GPTAnswerGenerator
+from llm.OpenAiFunctionBasedAnswerGenerator.OpenAiFunctionBasedAnswerGenerator import (
+    OpenAiFunctionBasedAnswerGenerator,
+)
 
 chat_router = APIRouter()
 
@@ -147,6 +149,7 @@ def chat_handler(
         model=chat_message.model,
         max_tokens=chat_message.max_tokens,
         user_id=user_id,
+        user_openai_api_key=user_openai_api_key,
     )
     answer = brainPicking.generate_answer(chat_message.question)
     history.append(("assistant", answer))
@@ -221,23 +224,26 @@ async def create_chat_handler(
     "/chat/{chat_id}/question", dependencies=[Depends(AuthBearer())], tags=["Chat"]
 )
 async def create_question_handler(
+    request: Request,
     chat_question: ChatQuestion,
     chat_id: UUID,
     current_user: User = Depends(get_current_user),
 ) -> ChatHistory:
+    user_openai_api_key = request.headers.get("Openai-Api-Key")
     openai_function_compatible_models = [
         "gpt-3.5-turbo-0613",
         "gpt-4-0613",
     ]
     if chat_question.model in openai_function_compatible_models:
         # TODO: RBAC with current_user
-        gpt_answer_generator = GPTAnswerGenerator(
+        gpt_answer_generator = OpenAiFunctionBasedAnswerGenerator(
             model=chat_question.model,
             chat_id=chat_id,
             temperature=chat_question.temperature,
             max_tokens=chat_question.max_tokens,
             # TODO: use user_id in vectors table instead of email
             user_email=current_user.email,
+            user_openai_api_key=user_openai_api_key,
         )
         answer = gpt_answer_generator.get_answer(chat_question.question)
     else:
@@ -246,6 +252,7 @@ async def create_question_handler(
             model=chat_question.model,
             max_tokens=chat_question.max_tokens,
             user_id=current_user.email,
+            user_openai_api_key=user_openai_api_key,
         )
         answer = brainPicking.generate_answer(chat_question.question)
 

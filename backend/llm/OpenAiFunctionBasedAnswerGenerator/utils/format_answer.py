@@ -1,5 +1,5 @@
-from llm.GPTAnswerGenerator.models.OpenAiAnswer import OpenAiAnswer
-from llm.GPTAnswerGenerator.models.FunctionCall import FunctionCall
+from llm.OpenAiFunctionBasedAnswerGenerator.models.OpenAiAnswer import OpenAiAnswer
+from llm.OpenAiFunctionBasedAnswerGenerator.models.FunctionCall import FunctionCall
 from typing import Any, Dict  # For type hinting
 
 

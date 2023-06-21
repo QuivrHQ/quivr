@@ -85,16 +85,31 @@ class BrainPicking(BaseModel):
         # Allowing arbitrary types for class validation
         arbitrary_types_allowed = True
 
-    def init(
-        self, model: str, user_id: str, chat_id: str, max_tokens: int
+    def __init__(
+        self,
+        model: str,
+        user_id: str,
+        chat_id: str,
+        max_tokens: int,
+        user_openai_api_key: str,
     ) -> "BrainPicking":
-        print("Initializing BrainPicking", user_id, chat_id, max_tokens)
         """
         Initialize the BrainPicking class by setting embeddings, supabase client, vector store, language model and chains.
         :param model: Language model name to be used.
         :param user_id: The user id to be used for CustomSupabaseVectorStore.
         :return: BrainPicking instance
         """
+        super().__init__(
+            model=model,
+            user_id=user_id,
+            chat_id=chat_id,
+            max_tokens=max_tokens,
+            user_openai_api_key=user_openai_api_key,
+        )
+        # If user provided an API key, update the settings
+        if user_openai_api_key is not None:
+            self.settings.openai_api_key = user_openai_api_key
+
         self.embeddings = OpenAIEmbeddings(openai_api_key=self.settings.openai_api_key)
         self.supabase_client = create_client(
             self.settings.supabase_url, self.settings.supabase_service_key
@@ -121,7 +136,6 @@ class BrainPicking(BaseModel):
         self.doc_chain = load_qa_chain(self.llm, chain_type="stuff")
         self.chat_id = chat_id
         self.max_tokens = max_tokens
-        return self
 
     def _determine_llm(
         self, private_model_args: dict, private: bool = False, model_name: str = None
@@ -159,10 +173,6 @@ class BrainPicking(BaseModel):
         :param user_openai_api_key: The OpenAI API key to be used.
         :return: ConversationalRetrievalChain instance
         """
-        user_openai_api_key = self.settings.openai_api_key
-        # If user provided an API key, update the settings
-        if user_openai_api_key is not None and user_openai_api_key != "":
-            self.settings.openai_api_key = user_openai_api_key
 
         # Initialize and return a ConversationalRetrievalChain
         qa = ConversationalRetrievalChain(
@@ -176,9 +186,8 @@ class BrainPicking(BaseModel):
 
     def generate_answer(self, question: str) -> str:
         """
-        Generate an answer to a given chat message by interacting with the language model.
-        :param chat_message: The chat message containing history.
-        :param user_openai_api_key: The OpenAI API key to be used.
+        Generate an answer to a given question by interacting with the language model.
+        :param question: The question
         :return: The generated answer.
         """
         transformed_history = []

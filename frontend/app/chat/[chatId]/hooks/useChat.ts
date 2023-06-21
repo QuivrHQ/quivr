@@ -52,15 +52,14 @@ export const useChat = () => {
       max_tokens: maxTokens,
     };
 
-    const currentChatId =
-      chatId ??
-      // if chatId is undefined, we need to create a new chat on fly
-      (await generateNewChatIdFromName(
-        question.split(" ").slice(0, 3).join(" ")
-      ));
-
     try {
       setGeneratingAnswer(true);
+      const currentChatId =
+        chatId ??
+        // if chatId is undefined, we need to create a new chat on fly
+        (await generateNewChatIdFromName(
+          question.split(" ").slice(0, 3).join(" ")
+        ));
       const answer = await addQuestionToChat(currentChatId, chatQuestion);
       addToHistory(answer);
       callback?.();

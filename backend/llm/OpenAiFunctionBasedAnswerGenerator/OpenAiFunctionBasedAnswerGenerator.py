@@ -34,10 +34,8 @@ from pydantic import (
     BaseModel,  # For data validation and settings management
     BaseSettings,
 )
-from llm.GPTAnswerGenerator.models.FunctionCall import FunctionCall
-from llm.GPTAnswerGenerator.models.OpenAiAnswer import OpenAiAnswer
-
-from repository.chat.get_chat_by_id import get_chat_by_id
+from llm.OpenAiFunctionBasedAnswerGenerator.models.FunctionCall import FunctionCall
+from llm.OpenAiFunctionBasedAnswerGenerator.models.OpenAiAnswer import OpenAiAnswer
 
 from supabase import Client, create_client  # For interacting with Supabase database
 from vectorstore.supabase import (
@@ -62,7 +60,7 @@ get_history_schema = {
 
 get_context_schema = {
     "name": "get_context",
-    "description": "Get user documents that is can used for context. It is like it's brain uploaded",
+    "description": "Get user documents that can used for context. It is like it's brain uploaded",
     "parameters": {
         "type": "object",
         "properties": {},
@@ -70,7 +68,7 @@ get_context_schema = {
 }
 
 
-class GPTAnswerGenerator:
+class OpenAiFunctionBasedAnswerGenerator:
     # Default class attributes
     model: str = "gpt-3.5-turbo-0613"
     temperature: float = 0.0
@@ -89,17 +87,20 @@ class GPTAnswerGenerator:
         temperature: float,
         max_tokens: int,
         user_email: str,
-    ) -> "GPTAnswerGenerator":
+        user_openai_api_key: str,
+    ) -> "OpenAiFunctionBasedAnswerGenerator":
         self.model = model
         self.temperature = temperature
         self.max_tokens = max_tokens
         self.chat_id = chat_id
-        self.embeddings = OpenAIEmbeddings(openai_api_key=self.settings.openai_api_key)
         self.supabase_client = create_client(
             self.settings.supabase_url, self.settings.supabase_service_key
         )
         self.user_email = user_email
-        self.openai_client = ChatOpenAI()
+        if user_openai_api_key is not None:
+            self.settings.openai_api_key = user_openai_api_key
+        self.embeddings = OpenAIEmbeddings(openai_api_key=self.settings.openai_api_key)
+        self.openai_client = ChatOpenAI(openai_api_key=self.settings.openai_api_key)
 
     def _get_model_response(
         self,
