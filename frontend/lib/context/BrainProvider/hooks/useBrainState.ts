@@ -1,71 +1,16 @@
 /* eslint-disable max-lines */
-import { AxiosInstance } from "axios";
 import { UUID } from "crypto";
 import { useCallback, useEffect, useState } from "react";
 
+import {
+  createBrainFromBackend,
+  deleteBrainFromBE,
+  getAllUserBrainsFromBE,
+  getBrainFromBE,
+} from "@/lib/api";
 import { useAxios, useToast } from "@/lib/hooks";
 
 import { Brain } from "../types";
-
-
-const createBrainFromBackend = async (
-  axiosInstance: AxiosInstance,
-  name: string
-): Promise<Brain | undefined> => {
-  try {
-    const createdBrain = (await axiosInstance.post<Brain>(`/brains`, { name }))
-      .data;
-
-    return createdBrain;
-  } catch (error) {
-    console.error(`Error creating brain ${name}`, error);
-  }
-};
-
-const getBrainFromBE = async (
-  axiosInstance: AxiosInstance,
-  brainId: UUID
-): Promise<Brain | undefined> => {
-  try {
-    const brain = (await axiosInstance.get<Brain>(`/brains/${brainId}`)).data;
-
-    return brain;
-  } catch (error) {
-    console.error(`Error getting brain ${brainId}`, error);
-
-    throw new Error(`Error getting brain ${brainId}`);
-  }
-};
-
-const deleteBrainFromBE = async (
-  axiosInstance: AxiosInstance,
-  brainId: UUID
-): Promise<void> => {
-  try {
-    (await axiosInstance.delete(`/brain/${brainId}`)).data;
-  } catch (error) {
-    console.error(`Error deleting brain ${brainId}`, error);
-
-    throw new Error(`Error deleting brain ${brainId}`);
-  }
-};
-
-const getAllUserBrainsFromBE = async (
-  axiosInstance: AxiosInstance
-): Promise<Brain[] | undefined> => {
-  try {
-    const brains = (await axiosInstance.get<{ brains: Brain[] }>(`/brains`))
-      .data;
-
-    console.log("BRAINS", brains);
-
-    return brains.brains;
-  } catch (error) {
-    console.error(`Error getting brain  for current user}`, error);
-
-    throw new Error(`Error getting brain  for current user`);
-  }
-};
 
 export interface BrainStateProps {
   currentBrain: Brain | undefined;
