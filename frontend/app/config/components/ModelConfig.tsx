@@ -53,13 +53,13 @@ export const ModelConfig = ({
           模型设置
         </p>
       </div>
-      <Field
+          {/*<Field
         type="password"
         placeholder="Open AI Key"
         className="w-full"
         label="Open AI Key"
         {...register("openAiKey")}
-      />
+      /> */}
       <fieldset className="w-full flex flex-col">
         <label className="flex-1 text-sm" htmlFor="model">
           Model
