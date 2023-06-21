@@ -5,7 +5,7 @@ from models.chats import ChatHistory
 from auth.auth_bearer import AuthBearer, get_current_user
 from fastapi import APIRouter, Depends, Request
 from llm.brainpicking import BrainPicking
-from models.chats import ChatMessage, ChatAttributes, ChatQuestion
+from models.chats import ChatMessage, ChatAttributes, ChatQuestion, CreateChat
 from models.settings import CommonsDep, common_dependencies
 from models.users import User
 from repository.chat.get_chat_history import get_chat_history
@@ -153,8 +153,8 @@ def chat_handler(
 
     if is_new_chat:
         chat_name = get_chat_name_from_first_question(chat_message)
-        new_chat = create_chat(commons, user_id, history, chat_name)
-        chat_id = new_chat.data[0]["chat_id"]
+        new_chat = create_chat(user_id, chat_name)
+        chat_id = new_chat["chat_id"]
     else:
         update_chat(commons, chat_id=chat_id, history=history, chat_name=chat_name)
 
@@ -202,16 +202,17 @@ async def update_chat_attributes_handler(
 # create new chat
 @chat_router.post("/chat", dependencies=[Depends(AuthBearer())], tags=["Chat"])
 async def create_chat_handler(
-    request: Request,
-    commons: CommonsDep,
-    chat_message: ChatMessage,
+    chat: CreateChat,
     current_user: User = Depends(get_current_user),
 ):
     """
     Create a new chat with initial chat messages.
     """
-    return chat_handler(
-        request, commons, None, chat_message, current_user.email, is_new_chat=True
+    commons = common_dependencies()
+    user_id = fetch_user_id_from_credentials(commons, {"email": current_user.email})
+    return create_chat(
+        user_id=user_id,
+        chat_name=chat.name,
     )
 
 

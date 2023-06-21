@@ -42,3 +42,8 @@ class ChatHistory:
         self.user_message = chat_dict.get("user_message")
         self.assistant = chat_dict.get("assistant")
         self.message_time = chat_dict.get("message_time")
+
+
+@dataclass
+class CreateChat:
+    name: str

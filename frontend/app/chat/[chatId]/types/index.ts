@@ -11,3 +11,10 @@ export type ChatHistory = {
   assistant: string;
   message_time: string;
 };
+
+export type ChatEntity = {
+  chat_id: string;
+  user_id: string;
+  creation_time: string;
+  chat_name: string;
+};

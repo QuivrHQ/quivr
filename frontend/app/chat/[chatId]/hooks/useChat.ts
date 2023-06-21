@@ -2,36 +2,47 @@ import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import { useBrainConfig } from "@/lib/context/BrainConfigProvider/hooks/useBrainConfig";
-import { useAxios, useToast } from "@/lib/hooks";
+import { useToast } from "@/lib/hooks";
 
+import { useChatService } from "./useChatService";
 import { useChatContext } from "../context/ChatContext";
-import { ChatHistory, ChatQuestion } from "../types";
+import { ChatQuestion } from "../types";
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const useChat = () => {
   const params = useParams();
-  const chatId = params?.chatId as string | undefined;
+  const [chatId, setChatId] = useState<string | undefined>(
+    params?.chatId as string | undefined
+  );
   const [generatingAnswer, setGeneratingAnswer] = useState(false);
-  const { axiosInstance } = useAxios();
   const {
     config: { maxTokens, model, temperature },
   } = useBrainConfig();
   const { history, setHistory, addMessage } = useChatContext();
   const { publish } = useToast();
 
+  const {
+    createChat,
+    getChatHistory,
+    addQuestion: addQuestionToChat,
+  } = useChatService();
+
   useEffect(() => {
     const fetchHistory = async () => {
-      if (chatId === undefined) {
-        return;
-      }
-      const rep = await axiosInstance.get<ChatHistory[]>(
-        `/chat/${chatId}/history`
-      );
-
-      setHistory(rep.data);
+      const chatHistory = await getChatHistory(chatId);
+      setHistory(chatHistory);
     };
     void fetchHistory();
-  }, [chatId, axiosInstance, setHistory]);
+  }, [chatId]);
+
+  const generateNewChatIdFromName = async (
+    chatName: string
+  ): Promise<string> => {
+    const rep = await createChat({ name: chatName });
+    setChatId(rep.data.chat_id);
+
+    return rep.data.chat_id;
+  };
 
   const addQuestion = async (question: string, callback?: () => void) => {
     const chatQuestion: ChatQuestion = {
@@ -41,16 +52,17 @@ export const useChat = () => {
       max_tokens: maxTokens,
     };
 
-    if (chatId === undefined) {
-      return;
-    }
+    const currentChatId =
+      chatId ??
+      // if chatId is undefined, we need to create a new chat on fly
+      (await generateNewChatIdFromName(
+        question.split(" ").slice(0, 3).join(" ")
+      ));
+
     try {
       setGeneratingAnswer(true);
-      const rep = await axiosInstance.post<ChatHistory>(
-        `/chat/${chatId}/question`,
-        chatQuestion
-      );
-      addMessage(rep.data);
+      const answer = await addQuestionToChat(currentChatId, chatQuestion);
+      addMessage(answer);
       callback?.();
     } catch (error) {
       console.error(error);

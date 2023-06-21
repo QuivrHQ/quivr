@@ -1,24 +1,25 @@
 from logger import get_logger
 from models.chats import ChatMessage
-from models.settings import CommonsDep
+from models.settings import CommonsDep, common_dependencies
 
 logger = get_logger(__name__)
 
 
-def create_chat(commons: CommonsDep, user_id, history, chat_name):
+def create_chat(user_id: str, chat_name: str):
+    commons = common_dependencies()
+
     # Chat is created upon the user's first question asked
     logger.info(f"New chat entry in chats table for user {user_id}")
 
     # Insert a new row into the chats table
     new_chat = {
         "user_id": user_id,
-        "history": history,  # Empty chat to start
         "chat_name": chat_name,
     }
     insert_response = commons["supabase"].table("chats").insert(new_chat).execute()
     logger.info(f"Insert response {insert_response.data}")
 
-    return insert_response
+    return insert_response.data[0]
 
 
 def update_chat(commons: CommonsDep, chat_id, history=None, chat_name=None):
