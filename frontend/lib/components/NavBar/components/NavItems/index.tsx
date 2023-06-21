@@ -48,10 +48,10 @@ export const NavItems = ({
         <>
         {/*  <NavLink setOpen={setOpen} to="https://github.com/StanGirard/quivr">
             Github
-          </NavLink>
-          <NavLink setOpen={setOpen} to="https://discord.gg/HUpRgp2HG8">
-            Discord
-          </NavLink> */}
+          </NavLink>*/}
+                      <NavLink setOpen={setOpen} to="https://qun.qq.com/qqweb/qunpro/share?_wv=3&_wwv=128&appChannel=share&inviteCode=208ySzsw81s&businessType=9&from=181074&biz=ka&mainSourceId=share&subSourceId=others&jumpsource=shorturl#/out">
+            QQ频道
+          </NavLink> 
         </>
       )}
       <div className="flex sm:flex-1 sm:justify-end flex-col items-center justify-center sm:flex-row gap-5 sm:gap-2">
