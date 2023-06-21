@@ -1,3 +1,4 @@
+import { AxiosError } from "axios";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -64,7 +65,17 @@ export const useChat = () => {
       addToHistory(answer);
       callback?.();
     } catch (error) {
-      console.error(error);
+      console.error({ error });
+
+      if ((error as AxiosError).response?.status === 429) {
+        publish({
+          variant: "danger",
+          text: "You have reached the limit of requests, please try again later",
+        });
+
+        return;
+      }
+
       publish({
         variant: "danger",
         text: "Error occurred while getting answer",
