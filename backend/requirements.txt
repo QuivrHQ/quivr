@@ -22,3 +22,4 @@ transformers==4.30.1
 asyncpg==0.27.0
 flake8==6.0.0
 flake8-black==0.3.6
+sentence_transformers>=2.0.0
