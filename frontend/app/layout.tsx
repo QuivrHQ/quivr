@@ -14,9 +14,9 @@ import SupabaseProvider from "./supabase-provider";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
-  title: "Quivr - Get a Second Brain with Generative AI",
+  title: "Vantoo - 专有知识库聊天机器人",
   description:
-    "Quivr is your second brain in the cloud, designed to easily store and retrieve unstructured information.",
+    "专有知识库聊天机器人，可以处理各种类型文档，网页等内容，基于私有数据进行问答",
 };
 
 const RootLayout = async ({
