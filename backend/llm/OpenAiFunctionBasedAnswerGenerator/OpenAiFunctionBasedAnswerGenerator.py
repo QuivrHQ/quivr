@@ -60,7 +60,7 @@ get_history_schema = {
 
 get_context_schema = {
     "name": "get_context",
-    "description": "Get user documents that can used for context. It is like it's brain uploaded",
+    "description": "A function which returns user uploaded documents and which must be used when you don't now the answer to a question or when the question seems to refer to user uploaded documents",
     "parameters": {
         "type": "object",
         "properties": {},
@@ -145,7 +145,9 @@ class OpenAiFunctionBasedAnswerGenerator:
         ]
 
         if not useHistory and not useContext:
-            messages.append({"role": "user", "content": question})
+            messages.append(
+                {"role": "user", "content": question},
+            )
             return messages
 
         if useHistory:
@@ -153,28 +155,24 @@ class OpenAiFunctionBasedAnswerGenerator:
             if len(history):
                 messages.append(
                     {
-                        "role": "user",
-                        "content": "Here are previous messages:",
+                        "role": "system",
+                        "content": "Previous messages are already in chat.",
                     },
                 )
                 messages.extend(history)
             else:
-                messages.extend(
-                    [
-                        {
-                            "role": "user",
-                            "content": "This is the first message of the chat. There is no previous one",
-                        },
-                    ]
-                )
-
-            messages.extend(
-                [
+                messages.append(
                     {
                         "role": "user",
-                        "content": f"Question: {question}\n\nAnswer",
-                    },
-                ]
+                        "content": "This is the first message of the chat. There is no previous one",
+                    }
+                )
+
+            messages.append(
+                {
+                    "role": "user",
+                    "content": f"Question: {question}\n\nAnswer:",
+                }
             )
         if useContext:
             chat_context = self._get_context(question)
@@ -183,7 +181,7 @@ class OpenAiFunctionBasedAnswerGenerator:
             messages.append(
                 {
                     "role": "user",
-                    "content": f"Question: {question}\n\nAnswer",
+                    "content": f"Question: {question}\n\nAnswer:",
                 }
             )
         return messages
