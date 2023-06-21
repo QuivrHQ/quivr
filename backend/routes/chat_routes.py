@@ -115,7 +115,9 @@ async def delete_chat(chat_id: UUID):
 
 
 # helper method for update and create chat
-def chat_handler(request, commons, chat_id, chat_message, email, is_new_chat=False):
+def chat_handler(
+    request, commons, chat_id, chat_message: ChatMessage, email, is_new_chat=False
+):
     date = time.strftime("%Y%m%d")
     user_id = fetch_user_id_from_credentials(commons, {"email": email})
     max_requests_number = os.getenv("MAX_REQUESTS_NUMBER")
@@ -140,8 +142,13 @@ def chat_handler(request, commons, chat_id, chat_message, email, is_new_chat=Fal
         update_chat(commons, chat_id=chat_id, history=history, chat_name=chat_name)
         return {"history": history}
 
-    brainPicking = BrainPicking().init(chat_message.model, email)
-    answer = brainPicking.generate_answer(chat_message, user_openai_api_key)
+    brainPicking = BrainPicking(
+        chat_id=str(chat_id),
+        model=chat_message.model,
+        max_tokens=chat_message.max_tokens,
+        user_id=user_id,
+    )
+    answer = brainPicking.generate_answer(chat_message.question)
     history.append(("assistant", answer))
 
     if is_new_chat:
@@ -217,16 +224,35 @@ async def create_question_handler(
     chat_id: UUID,
     current_user: User = Depends(get_current_user),
 ) -> ChatHistory:
-    # TODO: RBAC with current_user
-    answer_generator = GPTAnswerGenerator(
-        model=chat_question.model,
-        chat_id=chat_id,
-        temperature=chat_question.temperature,
-        max_tokens=chat_question.max_tokens,
-        # TODO: use user_id in vectors table instead of email
-        user_email=current_user.email,
-    )
-    answer = answer_generator.get_answer(chat_question.question)
+    openai_models = [
+        "gpt-3.5-turbo",
+        "gpt-3.5-turbo-0613",
+        "gpt-3.5-turbo-16k",
+        "gpt-3.5-turbo",
+        "gpt-3.5-turbo-0613",
+        "gpt-3.5-turbo-16k",
+        "gpt-4",
+        "gpt-4-0613",
+    ]
+    if chat_question.model in openai_models:
+        # TODO: RBAC with current_user
+        gpt_answer_generator = GPTAnswerGenerator(
+            model=chat_question.model,
+            chat_id=chat_id,
+            temperature=chat_question.temperature,
+            max_tokens=chat_question.max_tokens,
+            # TODO: use user_id in vectors table instead of email
+            user_email=current_user.email,
+        )
+        answer = gpt_answer_generator.get_answer(chat_question.question)
+    else:
+        brainPicking = BrainPicking(
+            chat_id=str(chat_id),
+            model=chat_question.model,
+            max_tokens=chat_question.max_tokens,
+            user_id=current_user.email,
+        )
+        answer = brainPicking.generate_answer(chat_question.question)
 
     chat_answer = update_chat_history(
         chat_id=chat_id, user_message=chat_question.question, assistant_answer=answer

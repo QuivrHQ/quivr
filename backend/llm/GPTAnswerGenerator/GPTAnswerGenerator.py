@@ -80,7 +80,7 @@ class GPTAnswerGenerator:
     embeddings: OpenAIEmbeddings = None
     settings = BrainSettings()
     openai_client: ChatOpenAI = None
-    user_email: str = None
+    user_email: str
 
     def __init__(
         self,

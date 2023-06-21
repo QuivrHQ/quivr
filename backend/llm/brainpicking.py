@@ -27,6 +27,7 @@ from pydantic import BaseModel  # For data validation and settings management
 from pydantic import BaseSettings
 from supabase import Client  # For interacting with Supabase database
 from supabase import create_client
+from repository.chat.get_chat_history import get_chat_history
 from vectorstore.supabase import (
     CustomSupabaseVectorStore,
 )  # Custom class for handling vector storage with Supabase
@@ -49,7 +50,7 @@ class AnswerConversationBufferMemory(ConversationBufferMemory):
         )
 
 
-def get_chat_history(inputs) -> str:
+def format_chat_history(inputs) -> str:
     """
     Function to concatenate chat history into a single string.
     :param inputs: List of tuples containing human and AI messages.
@@ -77,12 +78,17 @@ class BrainPicking(BaseModel):
     llm: LLM = None
     question_generator: LLMChain = None
     doc_chain: ConversationalRetrievalChain = None
+    chat_id: str
+    max_tokens: int = 256
 
     class Config:
         # Allowing arbitrary types for class validation
         arbitrary_types_allowed = True
 
-    def init(self, model: str, user_id: str) -> "BrainPicking":
+    def init(
+        self, model: str, user_id: str, chat_id: str, max_tokens: int
+    ) -> "BrainPicking":
+        print("Initializing BrainPicking", user_id, chat_id, max_tokens)
         """
         Initialize the BrainPicking class by setting embeddings, supabase client, vector store, language model and chains.
         :param model: Language model name to be used.
@@ -113,6 +119,8 @@ class BrainPicking(BaseModel):
             llm=self.llm, prompt=CONDENSE_QUESTION_PROMPT
         )
         self.doc_chain = load_qa_chain(self.llm, chain_type="stuff")
+        self.chat_id = chat_id
+        self.max_tokens = max_tokens
         return self
 
     def _determine_llm(
@@ -143,7 +151,7 @@ class BrainPicking(BaseModel):
             return ChatOpenAI(temperature=0, model_name=model_name)
 
     def _get_qa(
-        self, chat_message: ChatMessage, user_openai_api_key
+        self,
     ) -> ConversationalRetrievalChain:
         """
         Retrieves a QA chain for the given chat message and API key.
@@ -151,6 +159,7 @@ class BrainPicking(BaseModel):
         :param user_openai_api_key: The OpenAI API key to be used.
         :return: ConversationalRetrievalChain instance
         """
+        user_openai_api_key = self.settings.openai_api_key
         # If user provided an API key, update the settings
         if user_openai_api_key is not None and user_openai_api_key != "":
             self.settings.openai_api_key = user_openai_api_key
@@ -158,14 +167,14 @@ class BrainPicking(BaseModel):
         # Initialize and return a ConversationalRetrievalChain
         qa = ConversationalRetrievalChain(
             retriever=self.vector_store.as_retriever(),
-            max_tokens_limit=chat_message.max_tokens,
+            max_tokens_limit=self.max_tokens,
             question_generator=self.question_generator,
             combine_docs_chain=self.doc_chain,
-            get_chat_history=get_chat_history,
+            get_chat_history=format_chat_history,
         )
         return qa
 
-    def generate_answer(self, chat_message: ChatMessage, user_openai_api_key) -> str:
+    def generate_answer(self, question: str) -> str:
         """
         Generate an answer to a given chat message by interacting with the language model.
         :param chat_message: The chat message containing history.
@@ -175,18 +184,14 @@ class BrainPicking(BaseModel):
         transformed_history = []
 
         # Get the QA chain
-        qa = self._get_qa(chat_message, user_openai_api_key)
+        qa = self._get_qa()
+        history = get_chat_history(self.chat_id)
 
-        # Transform the chat history into a list of tuples
-        for i in range(0, len(chat_message.history) - 1, 2):
-            user_message = chat_message.history[i][1]
-            assistant_message = chat_message.history[i + 1][1]
-            transformed_history.append((user_message, assistant_message))
+        # Format the chat history into a list of tuples (human, ai)
+        transformed_history = [(chat.user_message, chat.assistant) for chat in history]
 
         # Generate the model response using the QA chain
-        model_response = qa(
-            {"question": chat_message.question, "chat_history": transformed_history}
-        )
+        model_response = qa({"question": question, "chat_history": transformed_history})
         answer = model_response["answer"]
 
         return answer
