@@ -1,7 +1,9 @@
 import os
+from uuid import UUID
 
 from auth.auth_bearer import AuthBearer, get_current_user
 from fastapi import APIRouter, Depends, Request, UploadFile
+from models.brains import Brain
 from models.settings import CommonsDep, common_dependencies
 from models.users import User
 from utils.file import convert_bytes, get_file_size
@@ -19,12 +21,9 @@ def get_user_vectors(commons, user):
     user_unique_vectors = [dict(t) for t in set(tuple(d.items()) for d in documents)]
     return user_unique_vectors
 
-def calculate_remaining_space(request, max_brain_size, max_brain_size_with_own_key, current_brain_size):
-    remaining_free_space = float(max_brain_size_with_own_key) - current_brain_size if request.headers.get('Openai-Api-Key') else float(max_brain_size) - current_brain_size
-    return remaining_free_space
 
 @upload_router.post("/upload", dependencies=[Depends(AuthBearer())], tags=["Upload"])
-async def upload_file(request: Request,  file: UploadFile, enable_summarization: bool = False, current_user: User = Depends(get_current_user)):
+async def upload_file(request: Request,  file: UploadFile, enable_summarization: bool = False, brain_id = UUID, current_user: User = Depends(get_current_user)):
     """
     Upload a file to the user's storage.
 
@@ -37,15 +36,16 @@ async def upload_file(request: Request,  file: UploadFile, enable_summarization:
     and ensures that the file size does not exceed the maximum capacity. If the file is within the allowed size limit,
     it can optionally apply summarization to the file's content. The response message will indicate the status of the upload.
     """
+    # //Check the rights user_id and 
+    brain = Brain(brain_id = brain_id)
+
     commons = common_dependencies()
-    max_brain_size = os.getenv("MAX_BRAIN_SIZE")
-    max_brain_size_with_own_key = os.getenv("MAX_BRAIN_SIZE_WITH_KEY", 209715200)
+
+    if request.headers.get('Openai-Api-Key'):
+        brain.max_brain_size = os.getenv("MAX_BRAIN_SIZE_WITH_KEY",209715200)
+    remaining_free_space =  brain.remaining_brain_size
+
     
-    user_unique_vectors = get_user_vectors(commons, current_user)
-    current_brain_size = sum(float(doc['size']) for doc in user_unique_vectors)
-
-    remaining_free_space = calculate_remaining_space(request, max_brain_size, max_brain_size_with_own_key, current_brain_size)
-
     file_size = get_file_size(file)
 
     if remaining_free_space - file_size < 0:

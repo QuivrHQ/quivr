@@ -1,10 +1,12 @@
 import os
 import shutil
 from tempfile import SpooledTemporaryFile
+from uuid import UUID
 
 from auth.auth_bearer import AuthBearer, get_current_user
 from crawl.crawler import CrawlWebsite
 from fastapi import APIRouter, Depends, Request, UploadFile
+from models.brains import Brain
 from models.settings import CommonsDep, common_dependencies
 from models.users import User
 from parsers.github import process_github
@@ -12,6 +14,7 @@ from utils.file import convert_bytes
 from utils.processors import filter_file
 
 crawl_router = APIRouter()
+
 
 def get_unique_user_data(commons, user):
     """
@@ -27,21 +30,21 @@ def get_unique_user_data(commons, user):
     return user_unique_vectors
 
 @crawl_router.post("/crawl/", dependencies=[Depends(AuthBearer())], tags=["Crawl"])
-async def crawl_endpoint(request: Request, crawl_website: CrawlWebsite, enable_summarization: bool = False, current_user: User = Depends(get_current_user)):
+async def crawl_endpoint(request: Request, crawl_website: CrawlWebsite, brain_id: UUID,enable_summarization: bool = False,  current_user: User = Depends(get_current_user)):
     """
     Crawl a website and process the crawled data.
     """
+
+    # //Check the rights user_id and 
+    brain = Brain(brain_id = brain_id)
+
     commons = common_dependencies()
-    max_brain_size = os.getenv("MAX_BRAIN_SIZE")
+
     if request.headers.get('Openai-Api-Key'):
-        max_brain_size = os.getenv("MAX_BRAIN_SIZE_WITH_KEY",209715200)
-
-    user_unique_vectors = get_unique_user_data(commons, current_user)
-
-    current_brain_size = sum(float(doc['size']) for doc in user_unique_vectors)
+        brain.max_brain_size = os.getenv("MAX_BRAIN_SIZE_WITH_KEY",209715200)
 
     file_size = 1000000
-    remaining_free_space =  float(max_brain_size) - (current_brain_size)
+    remaining_free_space =  brain.remaining_brain_size
 
     if remaining_free_space - file_size < 0:
         message = {"message": f"❌ User's brain will exceed maximum capacity with this upload. Maximum file allowed is : {convert_bytes(remaining_free_space)}", "type": "error"}
@@ -55,7 +58,11 @@ async def crawl_endpoint(request: Request, crawl_website: CrawlWebsite, enable_s
 
             # Pass the SpooledTemporaryFile to UploadFile
             file = UploadFile(file=spooled_file, filename=file_name)
+            
+            #  check remaining free space here !!
             message = await filter_file(commons, file, enable_summarization, user=current_user, openai_api_key=request.headers.get('Openai-Api-Key', None))
             return message
         else:
+
+            #  check remaining free space here !!
             message = await process_github(commons,crawl_website.url, "false", user=current_user, supabase=commons['supabase'], user_openai_api_key=request.headers.get('Openai-Api-Key', None))
