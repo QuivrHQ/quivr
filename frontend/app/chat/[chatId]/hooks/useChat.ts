@@ -18,7 +18,7 @@ export const useChat = () => {
   const {
     config: { maxTokens, model, temperature },
   } = useBrainConfig();
-  const { history, setHistory, addMessage } = useChatContext();
+  const { history, setHistory, addToHistory } = useChatContext();
   const { publish } = useToast();
 
   const {
@@ -62,7 +62,7 @@ export const useChat = () => {
     try {
       setGeneratingAnswer(true);
       const answer = await addQuestionToChat(currentChatId, chatQuestion);
-      addMessage(answer);
+      addToHistory(answer);
       callback?.();
     } catch (error) {
       console.error(error);

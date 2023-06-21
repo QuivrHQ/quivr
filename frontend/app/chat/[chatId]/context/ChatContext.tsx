@@ -7,7 +7,7 @@ import { ChatHistory } from "../types";
 type ChatContextProps = {
   history: ChatHistory[];
   setHistory: (history: ChatHistory[]) => void;
-  addMessage: (message: ChatHistory) => void;
+  addToHistory: (message: ChatHistory) => void;
 };
 
 export const ChatContext = createContext<ChatContextProps | undefined>(
@@ -20,7 +20,7 @@ export const ChatProvider = ({
   children: JSX.Element | JSX.Element[];
 }): JSX.Element => {
   const [history, setHistory] = useState<ChatHistory[]>([]);
-  const addMessage = (message: ChatHistory) => {
+  const addToHistory = (message: ChatHistory) => {
     setHistory((prevHistory) => [...prevHistory, message]);
   };
 
@@ -29,7 +29,7 @@ export const ChatProvider = ({
       value={{
         history,
         setHistory,
-        addMessage,
+        addToHistory,
       }}
     >
       {children}
