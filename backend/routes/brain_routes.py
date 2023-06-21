@@ -8,7 +8,6 @@ from models.brains import Brain
 from models.settings import common_dependencies
 from models.users import User
 from pydantic import BaseModel
-from utils.users import fetch_user_id_from_credentials
 
 logger = get_logger(__name__)
 
@@ -37,10 +36,8 @@ async def brain_endpoint(current_user: User = Depends(get_current_user)):
     This endpoint retrieves all the brains associated with the current authenticated user. It returns a list of brains objects
     containing the brain ID and brain name for each brain.
     """
-    commons = common_dependencies()
     brain = Brain()
-    user_id = fetch_user_id_from_credentials(commons, {"email": current_user.email})
-    brains = brain.get_user_brains(user_id)
+    brains = brain.get_user_brains(current_user.id)
     return {"brains": brains}
 
 
@@ -111,10 +108,9 @@ async def create_brain_endpoint(
     """
     commons = common_dependencies()
     brain = Brain(name=brain.name)
-    user_id = fetch_user_id_from_credentials(commons, {"email": current_user.email})
     created_brain = brain.create_brain(brain.name)[0]
     # create a brain X user entry
-    brain.create_brain_user(created_brain["brain_id"], user_id, rights="Owner")
+    brain.create_brain_user(created_brain["brain_id"], current_user.id, rights="Owner")
 
     return {"id": created_brain["brain_id"], "name": created_brain["name"]}
 

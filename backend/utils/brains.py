@@ -3,9 +3,8 @@ from uuid import UUID
 from fastapi import APIRouter
 from logger import get_logger
 from models.brains import Brain, BrainToUpdate
-from models.users import User
 from models.settings import CommonsDep
-from utils.users import fetch_user_id_from_credentials
+from models.users import User
 
 logger = get_logger(__name__)
 

@@ -1,13 +1,13 @@
 import os
 import time
+from http.client import HTTPException
 from uuid import UUID
 
 from auth.auth_bearer import AuthBearer, get_current_user
 from fastapi import APIRouter, Depends, HTTPException, Request
 from llm.brainpicking import BrainPicking
-from llm.BrainPickingOpenAIFunctions.BrainPickingOpenAIFunctions import (
-    BrainPickingOpenAIFunctions,
-)
+from llm.BrainPickingOpenAIFunctions.BrainPickingOpenAIFunctions import \
+    BrainPickingOpenAIFunctions
 from llm.PrivateBrainPicking import PrivateBrainPicking
 from models.chat import Chat, ChatHistory
 from models.chats import ChatQuestion
@@ -19,7 +19,7 @@ from repository.chat.get_chat_history import get_chat_history
 from repository.chat.get_user_chats import get_user_chats
 from repository.chat.update_chat import ChatUpdatableProperties, update_chat
 from repository.chat.update_chat_history import update_chat_history
-from utils.users import fetch_user_id_from_credentials, update_user_request_count
+from utils.users import (update_user_request_count)
 
 chat_router = APIRouter()
 
@@ -44,7 +44,7 @@ def fetch_user_stats(commons, user, date):
         commons["supabase"]
         .from_("users")
         .select("*")
-        .filter("email", "eq", user.email)
+        .filter("user_id", "eq", user.id)
         .filter("date", "eq", date)
         .execute()
     )
@@ -65,8 +65,7 @@ async def get_chats(current_user: User = Depends(get_current_user)):
     containing the chat ID and chat name for each chat.
     """
     commons = common_dependencies()
-    user_id = fetch_user_id_from_credentials(commons, {"email": current_user.email})
-    chats = get_user_chats(user_id)
+    chats = get_user_chats(commons, current_user.id)
     return {"chats": chats}
 
 
@@ -97,9 +96,9 @@ async def update_chat_metadata_handler(
     """
     commons = common_dependencies()
 
-    user_id = fetch_user_id_from_credentials(commons, {"email": current_user.email})
+    
     chat = get_chat_by_id(chat_id)
-    if user_id != chat.user_id:
+    if current_user.id != chat.user_id:
         raise HTTPException(
             status_code=403, detail="You should be the owner of the chat to update it."
         )
@@ -141,8 +140,7 @@ async def create_chat_handler(
     """
 
     commons = common_dependencies()
-    user_id = fetch_user_id_from_credentials(commons, {"email": current_user.email})
-    return create_chat(user_id=user_id, chat_data=chat_data)
+    return create_chat(user_id=current_user.id, chat_data=chat_data)
 
 
 # add new question to chat

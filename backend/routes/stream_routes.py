@@ -16,9 +16,9 @@ from logger import get_logger
 from models.chats import ChatMessage
 from models.settings import CommonsDep, common_dependencies
 from models.users import User
-from supabase import create_client
-from utils.users import fetch_user_id_from_credentials
 from vectorstore.supabase import CustomSupabaseVectorStore
+
+from supabase import create_client
 
 logger = get_logger(__name__)
 
@@ -66,14 +66,12 @@ async def send_message(
 
 
 def create_chain(commons: CommonsDep, current_user: User):
-    user_id = fetch_user_id_from_credentials(commons, {"email": current_user.email})
-
     embeddings = OpenAIEmbeddings(openai_api_key=openai_api_key)
 
     supabase_client = create_client(supabase_url, supabase_service_key)
 
     vector_store = CustomSupabaseVectorStore(
-        supabase_client, embeddings, table_name="vectors", user_id=user_id
+        supabase_client, embeddings, table_name="vectors", user_id=current_user.id
     )
 
     generator_llm = ChatOpenAI(
