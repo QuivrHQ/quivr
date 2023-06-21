@@ -34,9 +34,9 @@ export const MobileMenu = (): JSX.Element => {
                     />
 
                     <p className="">
-                      Get a Second Brain with{" "}
+                      专有知识库聊天机器人{" "}
                       <span className="text-primary dark:bg-white rounded-sm">
-                        Quivr
+                        Vantoo
                       </span>
                     </p>
 
