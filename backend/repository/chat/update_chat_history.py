@@ -1,6 +1,7 @@
 from models.chat import ChatHistory
 from models.settings import common_dependencies
 from typing import List  # For type hinting
+from fastapi import HTTPException
 
 
 def update_chat_history(
@@ -20,5 +21,7 @@ def update_chat_history(
         .execute()
     ).data
     if len(response) == 0:
-        raise Exception("Error while updating chat history")
+        raise HTTPException(
+            status_code=500, detail="An exception occurred while updating chat history."
+        )
     return response[0]

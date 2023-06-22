@@ -108,7 +108,9 @@ async def update_chat_metadata_handler(
     user_id = fetch_user_id_from_credentials(commons, {"email": current_user.email})
     chat = get_chat_by_id(chat_id)
     if user_id != chat.user_id:
-        raise HTTPException(status_code=403, detail="Chat not owned by user")
+        raise HTTPException(
+            status_code=403, detail="You should be the owner of the chat to update it."
+        )
     return update_chat(chat_id=chat_id, chat_data=chat_data)
 
 
