@@ -13,6 +13,11 @@ class BrainSettings(BaseSettings):
     supabase_url: str
     supabase_service_key: str
 
+class LLMSettings(BaseSettings):
+    private: bool
+    model_path: str
+    model_n_ctx: int
+    model_n_batch: int
 
 def common_dependencies() -> dict:
     settings = BrainSettings()
