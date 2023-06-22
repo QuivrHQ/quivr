@@ -1,7 +1,7 @@
 from typing import Any, List
 
 from langchain.docstore.document import Document
-from langchain.embeddings.base import Embeddings
+from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.vectorstores import SupabaseVectorStore
 from supabase import Client
 
