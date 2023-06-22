@@ -1,22 +1,27 @@
 import os
 import time
 from uuid import UUID
-from models.chats import ChatHistory
+from models.chat import ChatHistory
 from auth.auth_bearer import AuthBearer, get_current_user
 from fastapi import APIRouter, Depends, Request
 from llm.brainpicking import BrainPicking
 from fastapi import HTTPException
-from models.chats import ChatMessage, ChatAttributes, ChatQuestion, CreateChat
-from models.settings import CommonsDep, common_dependencies
+from models.chat import Chat
+from models.chats import ChatQuestion
+from models.settings import common_dependencies
 from models.users import User
 from repository.chat.get_chat_history import get_chat_history
-from utils.chats import create_chat, get_chat_name_from_first_question, update_chat
+from repository.chat.update_chat import update_chat, ChatUpdatableProperties
+from repository.chat.create_chat import create_chat, CreateChatProperties
 from utils.users import (
-    create_user,
     fetch_user_id_from_credentials,
     update_user_request_count,
 )
 
+
+from repository.chat.get_chat_by_id import get_chat_by_id
+
+from repository.chat.get_user_chats import get_user_chats
 from repository.chat.update_chat_history import update_chat_history
 
 
@@ -25,17 +30,6 @@ from llm.OpenAiFunctionBasedAnswerGenerator.OpenAiFunctionBasedAnswerGenerator i
 )
 
 chat_router = APIRouter()
-
-
-def get_user_chats(commons, user_id):
-    response = (
-        commons["supabase"]
-        .from_("chats")
-        .select("chatId:chat_id, chatName:chat_name")
-        .filter("user_id", "eq", user_id)
-        .execute()
-    )
-    return response.data
 
 
 def get_chat_details(commons, chat_id):
@@ -80,7 +74,7 @@ async def get_chats(current_user: User = Depends(get_current_user)):
     """
     commons = common_dependencies()
     user_id = fetch_user_id_from_credentials(commons, {"email": current_user.email})
-    chats = get_user_chats(commons, user_id)
+    chats = get_user_chats(user_id)
     return {"chats": chats}
 
 
@@ -101,23 +95,21 @@ async def delete_chat(chat_id: UUID):
 @chat_router.put(
     "/chat/{chat_id}/metadata", dependencies=[Depends(AuthBearer())], tags=["Chat"]
 )
-async def update_chat_attributes_handler(
-    commons: CommonsDep,
-    chat_message: ChatAttributes,
+async def update_chat_metadata_handler(
+    chat_data: ChatUpdatableProperties,
     chat_id: UUID,
     current_user: User = Depends(get_current_user),
-):
+) -> Chat:
     """
     Update chat attributes
     """
+    commons = common_dependencies()
 
     user_id = fetch_user_id_from_credentials(commons, {"email": current_user.email})
-    chat = get_chat_details(commons, chat_id)[0]
-    if user_id != chat.get("user_id"):
+    chat = get_chat_by_id(chat_id)
+    if user_id != chat.user_id:
         raise HTTPException(status_code=403, detail="Chat not owned by user")
-    return update_chat(
-        commons=commons, chat_id=chat_id, chat_name=chat_message.chat_name
-    )
+    return update_chat(chat_id=chat_id, chat_data=chat_data)
 
 
 # helper method for update and create chat
@@ -143,18 +135,16 @@ def check_user_limit(
 # create new chat
 @chat_router.post("/chat", dependencies=[Depends(AuthBearer())], tags=["Chat"])
 async def create_chat_handler(
-    chat: CreateChat,
+    chat_data: CreateChatProperties,
     current_user: User = Depends(get_current_user),
 ):
     """
     Create a new chat with initial chat messages.
     """
+
     commons = common_dependencies()
     user_id = fetch_user_id_from_credentials(commons, {"email": current_user.email})
-    return create_chat(
-        user_id=user_id,
-        chat_name=chat.name,
-    )
+    return create_chat(user_id=user_id, chat_data=chat_data)
 
 
 # add new question to chat

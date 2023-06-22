@@ -6,10 +6,10 @@ import { useEffect, useState } from "react";
 import { useAxios } from "@/lib/hooks";
 import { useToast } from "@/lib/hooks/useToast";
 
-import { Chat } from "../../../types/Chat";
+import { ChatEntity } from "@/app/chat/[chatId]/types";
 
 export default function useChats() {
-  const [allChats, setAllChats] = useState<Chat[]>([]);
+  const [allChats, setAllChats] = useState<ChatEntity[]>([]);
 
   const { axiosInstance } = useAxios();
 
@@ -20,7 +20,7 @@ export default function useChats() {
     try {
       console.log("Fetching all chats");
       const response = await axiosInstance.get<{
-        chats: Chat[];
+        chats: ChatEntity[];
       }>(`/chat`);
       setAllChats(response.data.chats);
       console.log("Fetched all chats");
@@ -36,7 +36,7 @@ export default function useChats() {
   const deleteChat = async (chatId: UUID) => {
     try {
       await axiosInstance.delete(`/chat/${chatId}`);
-      setAllChats((chats) => chats.filter((chat) => chat.chatId !== chatId));
+      setAllChats((chats) => chats.filter((chat) => chat.chat_id !== chatId));
       // TODO: Change route only when the current chat is being deleted
       router.push("/chat");
       publish({

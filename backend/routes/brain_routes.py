@@ -1,5 +1,3 @@
-import os
-import time
 from typing import Optional
 from uuid import UUID
 
@@ -7,7 +5,7 @@ from auth.auth_bearer import AuthBearer, get_current_user
 from fastapi import APIRouter, Depends, Request
 from logger import get_logger
 from models.brains import Brain
-from models.settings import CommonsDep, common_dependencies
+from models.settings import common_dependencies
 from models.users import User
 from pydantic import BaseModel
 from utils.users import fetch_user_id_from_credentials
@@ -50,7 +48,7 @@ async def brain_endpoint(current_user: User = Depends(get_current_user)):
 @brain_router.get(
     "/brains/{brain_id}", dependencies=[Depends(AuthBearer())], tags=["Brain"]
 )
-async def brain_endpoint(brain_id: UUID):
+async def get_brain_endpoint(brain_id: UUID):
     """
     Retrieve details of a specific brain by brain ID.
 
@@ -76,7 +74,7 @@ async def brain_endpoint(brain_id: UUID):
 @brain_router.delete(
     "/brains/{brain_id}", dependencies=[Depends(AuthBearer())], tags=["Brain"]
 )
-async def brain_endpoint(brain_id: UUID):
+async def delete_brain_endpoint(brain_id: UUID):
     """
     Delete a specific brain by brain ID.
     """
@@ -97,7 +95,7 @@ class BrainObject(BaseModel):
 
 # create new brain
 @brain_router.post("/brains", dependencies=[Depends(AuthBearer())], tags=["Brain"])
-async def brain_endpoint(
+async def create_brain_endpoint(
     request: Request,
     brain: BrainObject,
     current_user: User = Depends(get_current_user),
@@ -125,7 +123,7 @@ async def brain_endpoint(
 @brain_router.put(
     "/brains/{brain_id}", dependencies=[Depends(AuthBearer())], tags=["Brain"]
 )
-async def brain_endpoint(
+async def update_brain_endpoint(
     request: Request,
     brain_id: UUID,
     input_brain: Brain,

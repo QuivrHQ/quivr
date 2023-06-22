@@ -32,11 +32,18 @@ export const ChatMessages = (): JSX.Element => {
           </div>
         ) : (
           history.map(({ assistant, message_id, user_message }, idx) => (
-            <ChatMessage
-              key={message_id}
-              speaker={user_message}
-              text={assistant}
-            />
+            <>
+              <ChatMessage
+                key={message_id}
+                speaker={"user"}
+                text={user_message}
+              />
+              <ChatMessage
+                key={message_id}
+                speaker={"assistant"}
+                text={assistant}
+              />
+            </>
           ))
         )}
         <div ref={lastChatRef} />

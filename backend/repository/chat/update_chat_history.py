@@ -1,4 +1,4 @@
-from models.chats import ChatHistory
+from models.chat import ChatHistory
 from models.settings import common_dependencies
 from typing import List  # For type hinting
 

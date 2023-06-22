@@ -1,3 +1,5 @@
+import { UUID } from "crypto";
+
 export type ChatQuestion = {
   model: string;
   question?: string;
@@ -13,7 +15,7 @@ export type ChatHistory = {
 };
 
 export type ChatEntity = {
-  chat_id: string;
+  chat_id: UUID;
   user_id: string;
   creation_time: string;
   chat_name: string;
