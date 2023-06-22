@@ -1,7 +1,7 @@
 import os
-
+from fastapi import FastAPI, HTTPException
+from fastapi.responses import JSONResponse
 import pypandoc
-from fastapi import FastAPI
 from logger import get_logger
 from middlewares.cors import add_cors_middleware
 from routes.api_key_routes import api_key_router
@@ -37,3 +37,11 @@ app.include_router(upload_router)
 app.include_router(user_router)
 app.include_router(api_key_router)
 app.include_router(stream_router)
+
+
+@app.exception_handler(HTTPException)
+async def http_exception_handler(request, exc):
+    return JSONResponse(
+        status_code=exc.status_code,
+        content={"detail": exc.detail},
+    )

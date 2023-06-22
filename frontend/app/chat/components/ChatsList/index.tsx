@@ -47,7 +47,7 @@ export const ChatsList = (): JSX.Element => {
               <div className="flex flex-col gap-0">
                 {allChats.map((chat) => (
                   <ChatsListItem
-                    key={chat.chatId}
+                    key={chat.chat_id}
                     chat={chat}
                     deleteChat={deleteChat}
                   />

@@ -1,38 +1,28 @@
-import os  # A module to interact with the OS
-from typing import Any, Dict, List
+from typing import Any, Dict
 from models.settings import LLMSettings  # For type hinting
 
 # Importing various modules and classes from a custom library 'langchain' likely used for natural language processing
 from langchain.chains import ConversationalRetrievalChain, LLMChain
 from langchain.chains.question_answering import load_qa_chain
-from langchain.chains.router.llm_router import LLMRouterChain, RouterOutputParser
-from langchain.chains.router.multi_prompt_prompt import MULTI_PROMPT_ROUTER_TEMPLATE
-from langchain.chat_models import ChatOpenAI, ChatVertexAI
-from langchain.chat_models.anthropic import ChatAnthropic
-from langchain.docstore.document import Document
-from langchain.embeddings.base import Embeddings
+from langchain.chat_models import ChatOpenAI
 from langchain.embeddings.openai import OpenAIEmbeddings
-from langchain.embeddings.huggingface import HuggingFaceEmbeddings
 from langchain.llms import GPT4All
 from langchain.llms.base import LLM
 from langchain.memory import ConversationBufferMemory
-from langchain.vectorstores import SupabaseVectorStore
-from llm.prompt import LANGUAGE_PROMPT
+
 from llm.prompt.CONDENSE_PROMPT import CONDENSE_QUESTION_PROMPT
-from models.chats import (
-    ChatMessage,
-)  # Importing a custom ChatMessage class for handling chat messages
 from models.settings import BrainSettings  # Importing settings related to the 'brain'
 from pydantic import BaseModel  # For data validation and settings management
-from pydantic import BaseSettings
 from supabase import Client  # For interacting with Supabase database
 from supabase import create_client
+from repository.chat.get_chat_history import get_chat_history
 from vectorstore.supabase import (
     CustomSupabaseVectorStore,
 )  # Custom class for handling vector storage with Supabase
 from logger import get_logger
 
 logger = get_logger(__name__)
+
 
 class AnswerConversationBufferMemory(ConversationBufferMemory):
     """
@@ -48,7 +38,7 @@ class AnswerConversationBufferMemory(ConversationBufferMemory):
         )
 
 
-def get_chat_history(inputs) -> str:
+def format_chat_history(inputs) -> str:
     """
     Function to concatenate chat history into a single string.
     :param inputs: List of tuples containing human and AI messages.
@@ -76,18 +66,38 @@ class BrainPicking(BaseModel):
     llm: LLM = None
     question_generator: LLMChain = None
     doc_chain: ConversationalRetrievalChain = None
+    chat_id: str
+    max_tokens: int = 256
 
     class Config:
         # Allowing arbitrary types for class validation
         arbitrary_types_allowed = True
 
-    def init(self, model: str, user_id: str) -> "BrainPicking":
+    def __init__(
+        self,
+        model: str,
+        user_id: str,
+        chat_id: str,
+        max_tokens: int,
+        user_openai_api_key: str,
+    ) -> "BrainPicking":
         """
         Initialize the BrainPicking class by setting embeddings, supabase client, vector store, language model and chains.
         :param model: Language model name to be used.
         :param user_id: The user id to be used for CustomSupabaseVectorStore.
         :return: BrainPicking instance
         """
+        super().__init__(
+            model=model,
+            user_id=user_id,
+            chat_id=chat_id,
+            max_tokens=max_tokens,
+            user_openai_api_key=user_openai_api_key,
+        )
+        # If user provided an API key, update the settings
+        if user_openai_api_key is not None:
+            self.settings.openai_api_key = user_openai_api_key
+
         self.embeddings = OpenAIEmbeddings(openai_api_key=self.settings.openai_api_key)
         self.supabase_client = create_client(
             self.settings.supabase_url, self.settings.supabase_service_key
@@ -98,7 +108,7 @@ class BrainPicking(BaseModel):
             table_name="vectors",
             user_id=user_id,
         )
-                    
+
         self.llm = self._determine_llm(
             private_model_args={
                 "model_path": self.llm_config.model_path,
@@ -112,7 +122,8 @@ class BrainPicking(BaseModel):
             llm=self.llm, prompt=CONDENSE_QUESTION_PROMPT
         )
         self.doc_chain = load_qa_chain(self.llm, chain_type="stuff")
-        return self
+        self.chat_id = chat_id
+        self.max_tokens = max_tokens
 
     def _determine_llm(
         self, private_model_args: dict, private: bool = False, model_name: str = None
@@ -128,7 +139,7 @@ class BrainPicking(BaseModel):
             model_path = private_model_args["model_path"]
             model_n_ctx = private_model_args["n_ctx"]
             model_n_batch = private_model_args["n_batch"]
-            
+
             logger.info("Using private model: %s", model_path)
 
             return GPT4All(
@@ -142,7 +153,7 @@ class BrainPicking(BaseModel):
             return ChatOpenAI(temperature=0, model_name=model_name)
 
     def _get_qa(
-        self, chat_message: ChatMessage, user_openai_api_key
+        self,
     ) -> ConversationalRetrievalChain:
         """
         Retrieves a QA chain for the given chat message and API key.
@@ -150,42 +161,34 @@ class BrainPicking(BaseModel):
         :param user_openai_api_key: The OpenAI API key to be used.
         :return: ConversationalRetrievalChain instance
         """
-        # If user provided an API key, update the settings
-        if user_openai_api_key is not None and user_openai_api_key != "":
-            self.settings.openai_api_key = user_openai_api_key
 
         # Initialize and return a ConversationalRetrievalChain
         qa = ConversationalRetrievalChain(
             retriever=self.vector_store.as_retriever(),
-            max_tokens_limit=chat_message.max_tokens,
+            max_tokens_limit=self.max_tokens,
             question_generator=self.question_generator,
             combine_docs_chain=self.doc_chain,
-            get_chat_history=get_chat_history,
+            get_chat_history=format_chat_history,
         )
         return qa
 
-    def generate_answer(self, chat_message: ChatMessage, user_openai_api_key) -> str:
+    def generate_answer(self, question: str) -> str:
         """
-        Generate an answer to a given chat message by interacting with the language model.
-        :param chat_message: The chat message containing history.
-        :param user_openai_api_key: The OpenAI API key to be used.
+        Generate an answer to a given question by interacting with the language model.
+        :param question: The question
         :return: The generated answer.
         """
         transformed_history = []
 
         # Get the QA chain
-        qa = self._get_qa(chat_message, user_openai_api_key)
+        qa = self._get_qa()
+        history = get_chat_history(self.chat_id)
 
-        # Transform the chat history into a list of tuples
-        for i in range(0, len(chat_message.history) - 1, 2):
-            user_message = chat_message.history[i][1]
-            assistant_message = chat_message.history[i + 1][1]
-            transformed_history.append((user_message, assistant_message))
+        # Format the chat history into a list of tuples (human, ai)
+        transformed_history = [(chat.user_message, chat.assistant) for chat in history]
 
         # Generate the model response using the QA chain
-        model_response = qa(
-            {"question": chat_message.question, "chat_history": transformed_history}
-        )
+        model_response = qa({"question": question, "chat_history": transformed_history})
         answer = model_response["answer"]
 
         return answer

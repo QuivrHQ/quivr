@@ -2,7 +2,8 @@
   "python.formatting.provider": "black",
   "editor.codeActionsOnSave": {
     "source.organizeImports": true,
-    "source.fixAll": true
+    "source.fixAll": true,
+    "source.unusedImports": true
   },
   "python.linting.enabled": true,
   "python.linting.flake8Enabled": true,
