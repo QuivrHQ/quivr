@@ -1,30 +1,18 @@
-import os  # A module to interact with the OS
-from typing import Any, Dict, List
+from typing import Any, Dict
 from models.settings import LLMSettings  # For type hinting
 
 # Importing various modules and classes from a custom library 'langchain' likely used for natural language processing
 from langchain.chains import ConversationalRetrievalChain, LLMChain
 from langchain.chains.question_answering import load_qa_chain
-from langchain.chains.router.llm_router import LLMRouterChain, RouterOutputParser
-from langchain.chains.router.multi_prompt_prompt import MULTI_PROMPT_ROUTER_TEMPLATE
-from langchain.chat_models import ChatOpenAI, ChatVertexAI
-from langchain.chat_models.anthropic import ChatAnthropic
-from langchain.docstore.document import Document
-from langchain.embeddings.base import Embeddings
+from langchain.chat_models import ChatOpenAI
 from langchain.embeddings.openai import OpenAIEmbeddings
-from langchain.embeddings.huggingface import HuggingFaceEmbeddings
 from langchain.llms import GPT4All
 from langchain.llms.base import LLM
 from langchain.memory import ConversationBufferMemory
-from langchain.vectorstores import SupabaseVectorStore
-from llm.prompt import LANGUAGE_PROMPT
+
 from llm.prompt.CONDENSE_PROMPT import CONDENSE_QUESTION_PROMPT
-from models.chats import (
-    ChatMessage,
-)  # Importing a custom ChatMessage class for handling chat messages
 from models.settings import BrainSettings  # Importing settings related to the 'brain'
 from pydantic import BaseModel  # For data validation and settings management
-from pydantic import BaseSettings
 from supabase import Client  # For interacting with Supabase database
 from supabase import create_client
 from repository.chat.get_chat_history import get_chat_history

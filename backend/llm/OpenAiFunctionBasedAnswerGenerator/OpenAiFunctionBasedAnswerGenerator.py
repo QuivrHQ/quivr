@@ -1,40 +1,17 @@
-import os  # A module to interact with the OS
 from typing import Optional
 
 
 from typing import Any, Dict, List  # For type hinting
-from models.settings import common_dependencies
-from langchain.chat_models import ChatOpenAI, ChatVertexAI
-from langchain.schema import RUN_KEY, BaseMemory, RunInfo
+from langchain.chat_models import ChatOpenAI
 from repository.chat.get_chat_history import get_chat_history
 from .utils.format_answer import format_answer
 
 
 # Importing various modules and classes from a custom library 'langchain' likely used for natural language processing
-from langchain.chains import ConversationalRetrievalChain, LLMChain
-from langchain.chains.question_answering import load_qa_chain
-from langchain.chains.router.llm_router import LLMRouterChain, RouterOutputParser
-from langchain.chains.router.multi_prompt_prompt import MULTI_PROMPT_ROUTER_TEMPLATE
-from langchain.chat_models.anthropic import ChatAnthropic
-from langchain.docstore.document import Document
 from langchain.embeddings.openai import OpenAIEmbeddings
 
 
-from langchain.llms import OpenAI, VertexAI
-from langchain.memory import ConversationBufferMemory
-from langchain.vectorstores import SupabaseVectorStore
-from llm.prompt import LANGUAGE_PROMPT
-from llm.prompt.CONDENSE_PROMPT import CONDENSE_QUESTION_PROMPT
-from models.chats import (
-    ChatMessage,
-    ChatHistory,
-)  # Importing a custom ChatMessage class for handling chat messages
 from models.settings import BrainSettings  # Importing settings related to the 'brain'
-from pydantic import (
-    BaseModel,  # For data validation and settings management
-    BaseSettings,
-)
-from llm.OpenAiFunctionBasedAnswerGenerator.models.FunctionCall import FunctionCall
 from llm.OpenAiFunctionBasedAnswerGenerator.models.OpenAiAnswer import OpenAiAnswer
 
 from supabase import Client, create_client  # For interacting with Supabase database
