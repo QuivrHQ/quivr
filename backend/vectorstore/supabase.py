@@ -1,15 +1,9 @@
 from typing import Any, List
 
-from langchain.chains import ConversationalRetrievalChain, LLMChain
-from langchain.chains.question_answering import load_qa_chain
-from langchain.chat_models import ChatOpenAI, ChatVertexAI
-from langchain.client import arun_on_dataset
 from langchain.docstore.document import Document
 from langchain.embeddings.openai import OpenAIEmbeddings
-from langchain.llms import OpenAI, VertexAI
-from langchain.prompts.prompt import PromptTemplate
 from langchain.vectorstores import SupabaseVectorStore
-from supabase import Client, create_client
+from supabase import Client
 
 
 class CustomSupabaseVectorStore(SupabaseVectorStore):
@@ -22,7 +16,6 @@ class CustomSupabaseVectorStore(SupabaseVectorStore):
     def similarity_search(
         self, 
         query: str, 
-        user_id: str = "none",
         table: str = "match_vectors", 
         k: int = 6, 
         threshold: float = 0.5, 
