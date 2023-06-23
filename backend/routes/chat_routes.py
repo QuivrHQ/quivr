@@ -1,33 +1,24 @@
 import os
 import time
 from uuid import UUID
-from models.chat import ChatHistory
+
 from auth.auth_bearer import AuthBearer, get_current_user
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Depends, HTTPException, Request
 from llm.brainpicking import BrainPicking
-from fastapi import HTTPException
-from models.chat import Chat
-from models.chats import ChatQuestion
-from models.settings import common_dependencies
-from models.users import User
-from repository.chat.get_chat_history import get_chat_history
-from repository.chat.update_chat import update_chat, ChatUpdatableProperties
-from repository.chat.create_chat import create_chat, CreateChatProperties
-from utils.users import (
-    fetch_user_id_from_credentials,
-    update_user_request_count,
-)
-
-
-from repository.chat.get_chat_by_id import get_chat_by_id
-
-from repository.chat.get_user_chats import get_user_chats
-from repository.chat.update_chat_history import update_chat_history
-
-
 from llm.OpenAiFunctionBasedAnswerGenerator.OpenAiFunctionBasedAnswerGenerator import (
     OpenAiFunctionBasedAnswerGenerator,
 )
+from models.chat import Chat, ChatHistory
+from models.chats import ChatQuestion
+from models.settings import common_dependencies
+from models.users import User
+from repository.chat.create_chat import CreateChatProperties, create_chat
+from repository.chat.get_chat_by_id import get_chat_by_id
+from repository.chat.get_chat_history import get_chat_history
+from repository.chat.get_user_chats import get_user_chats
+from repository.chat.update_chat import ChatUpdatableProperties, update_chat
+from repository.chat.update_chat_history import update_chat_history
+from utils.users import fetch_user_id_from_credentials, update_user_request_count
 
 chat_router = APIRouter()
 
@@ -117,21 +108,25 @@ async def update_chat_metadata_handler(
 # helper method for update and create chat
 def check_user_limit(
     email,
+    user_openai_api_key: str = None,
 ):
-    date = time.strftime("%Y%m%d")
-    max_requests_number = os.getenv("MAX_REQUESTS_NUMBER")
-    commons = common_dependencies()
-    userItem = fetch_user_stats(commons, User(email=email), date)
-    old_request_count = userItem["requests_count"]
+    if user_openai_api_key is None:
+        date = time.strftime("%Y%m%d")
+        max_requests_number = os.getenv("MAX_REQUESTS_NUMBER")
+        commons = common_dependencies()
+        userItem = fetch_user_stats(commons, User(email=email), date)
+        old_request_count = userItem["requests_count"]
 
-    update_user_request_count(
-        commons, email, date, requests_count=old_request_count + 1
-    )
-    if old_request_count >= float(max_requests_number):
-        raise HTTPException(
-            status_code=429,
-            detail="You have reached the maximum number of requests for today.",
+        update_user_request_count(
+            commons, email, date, requests_count=old_request_count + 1
         )
+        if old_request_count >= float(max_requests_number):
+            raise HTTPException(
+                status_code=429,
+                detail="You have reached the maximum number of requests for today.",
+            )
+    else:
+        pass
 
 
 # create new chat
@@ -160,8 +155,8 @@ async def create_question_handler(
     current_user: User = Depends(get_current_user),
 ) -> ChatHistory:
     try:
-        check_user_limit(current_user.email)
         user_openai_api_key = request.headers.get("Openai-Api-Key")
+        check_user_limit(current_user.email, user_openai_api_key)
         openai_function_compatible_models = [
             "gpt-3.5-turbo-0613",
             "gpt-4-0613",
