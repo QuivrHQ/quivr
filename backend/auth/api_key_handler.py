@@ -1,14 +1,17 @@
 from datetime import datetime
 
 from fastapi import HTTPException
-from models.settings import CommonsDep
+from models.settings import common_dependencies
 from pydantic import DateError
 
 
-async def verify_api_key(api_key: str, commons: CommonsDep):
+async def verify_api_key(
+    api_key: str,
+):
     try:
         # Use UTC time to avoid timezone issues
         current_date = datetime.utcnow().date()
+        commons = common_dependencies()
         result = (
             commons["supabase"]
             .table("api_keys")
@@ -30,7 +33,11 @@ async def verify_api_key(api_key: str, commons: CommonsDep):
         return False
 
 
-async def get_user_from_api_key(api_key: str, commons: CommonsDep):
+async def get_user_from_api_key(
+    api_key: str,
+):
+    commons = common_dependencies()
+
     # Lookup the user_id from the api_keys table
     user_id_data = (
         commons["supabase"]
