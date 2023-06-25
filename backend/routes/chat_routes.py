@@ -5,8 +5,8 @@ from uuid import UUID
 from auth.auth_bearer import AuthBearer, get_current_user
 from fastapi import APIRouter, Depends, HTTPException, Request
 from llm.brainpicking import BrainPicking
-from llm.OpenAiFunctionBasedAnswerGenerator.OpenAiFunctionBasedAnswerGenerator import (
-    OpenAiFunctionBasedAnswerGenerator,
+from llm.BrainPickingOpenAIFunctions.BrainPickingOpenAIFunctions import (
+    BrainPickingOpenAIFunctions,
 )
 from models.chat import Chat, ChatHistory
 from models.chats import ChatQuestion
@@ -163,7 +163,7 @@ async def create_question_handler(
         ]
         if chat_question.model in openai_function_compatible_models:
             # TODO: RBAC with current_user
-            gpt_answer_generator = OpenAiFunctionBasedAnswerGenerator(
+            gpt_answer_generator = BrainPickingOpenAIFunctions(
                 model=chat_question.model,
                 chat_id=chat_id,
                 temperature=chat_question.temperature,

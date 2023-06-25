@@ -1,5 +1,4 @@
 from typing import Any, Dict
-from models.settings import LLMSettings  # For type hinting
 
 # Importing various modules and classes from a custom library 'langchain' likely used for natural language processing
 from langchain.chains import ConversationalRetrievalChain, LLMChain
@@ -9,17 +8,17 @@ from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.llms import GPT4All
 from langchain.llms.base import LLM
 from langchain.memory import ConversationBufferMemory
-
 from llm.prompt.CONDENSE_PROMPT import CONDENSE_QUESTION_PROMPT
+from logger import get_logger
 from models.settings import BrainSettings  # Importing settings related to the 'brain'
+from models.settings import LLMSettings  # For type hinting
 from pydantic import BaseModel  # For data validation and settings management
+from repository.chat.get_chat_history import get_chat_history
 from supabase import Client  # For interacting with Supabase database
 from supabase import create_client
-from repository.chat.get_chat_history import get_chat_history
 from vectorstore.supabase import (
     CustomSupabaseVectorStore,
 )  # Custom class for handling vector storage with Supabase
-from logger import get_logger
 
 logger = get_logger(__name__)
 

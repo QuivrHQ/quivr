@@ -2,7 +2,7 @@ from typing import Any, Dict, List, Optional
 
 from langchain.chat_models import ChatOpenAI
 from langchain.embeddings.openai import OpenAIEmbeddings
-from llm.OpenAiFunctionBasedAnswerGenerator.models.OpenAiAnswer import OpenAiAnswer
+from llm.BrainPickingOpenAIFunctions.models.OpenAiAnswer import OpenAiAnswer
 from logger import get_logger
 from models.settings import BrainSettings
 from repository.chat.get_chat_history import get_chat_history
@@ -14,7 +14,7 @@ from .utils.format_answer import format_answer
 logger = get_logger(__name__)
 
 
-class OpenAiFunctionBasedAnswerGenerator:
+class BrainPickingOpenAIFunctions:
     DEFAULT_MODEL = "gpt-3.5-turbo-0613"
     DEFAULT_TEMPERATURE = 0.0
     DEFAULT_MAX_TOKENS = 256
