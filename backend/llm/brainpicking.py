@@ -57,6 +57,7 @@ class BrainPicking(BaseModel):
 
     # Default class attributes
     llm_name: str = "gpt-3.5-turbo"
+    temperature: float = 0.0
     settings = BrainSettings()
     llm_config = LLMSettings()
     embeddings: OpenAIEmbeddings = None
@@ -101,6 +102,7 @@ class BrainPicking(BaseModel):
         self.supabase_client = create_client(
             self.settings.supabase_url, self.settings.supabase_service_key
         )
+        self.llm_name = model
         self.vector_store = CustomSupabaseVectorStore(
             self.supabase_client,
             self.embeddings,

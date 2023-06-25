@@ -2,6 +2,7 @@ from typing import Any, Dict, List, Optional
 
 from langchain.chat_models import ChatOpenAI
 from langchain.embeddings.openai import OpenAIEmbeddings
+from llm.brainpicking import BrainPicking
 from llm.BrainPickingOpenAIFunctions.models.OpenAiAnswer import OpenAiAnswer
 from logger import get_logger
 from models.settings import BrainSettings
@@ -14,10 +15,12 @@ from .utils.format_answer import format_answer
 logger = get_logger(__name__)
 
 
-class BrainPickingOpenAIFunctions:
+class BrainPickingOpenAIFunctions(BrainPicking):
     DEFAULT_MODEL = "gpt-3.5-turbo-0613"
     DEFAULT_TEMPERATURE = 0.0
     DEFAULT_MAX_TOKENS = 256
+
+    openai_client: ChatOpenAI = None
 
     def __init__(
         self,
@@ -28,21 +31,15 @@ class BrainPickingOpenAIFunctions:
         user_email: str,
         user_openai_api_key: str,
     ) -> None:
-        self.model = model or self.DEFAULT_MODEL
-        self.temperature = temperature or self.DEFAULT_TEMPERATURE
-        self.max_tokens = max_tokens or self.DEFAULT_MAX_TOKENS
-        self.chat_id = chat_id
-        self.user_email = user_email
-
-        settings = BrainSettings()
-        if user_openai_api_key:
-            settings.openai_api_key = user_openai_api_key
-
-        self.supabase_client = create_client(
-            settings.supabase_url, settings.supabase_service_key
+        # Call the constructor of the parent class (BrainPicking)
+        super().__init__(
+            model=model,
+            user_id=user_email,
+            chat_id=chat_id,
+            max_tokens=max_tokens,
+            user_openai_api_key=user_openai_api_key,
         )
-        self.embeddings = OpenAIEmbeddings(openai_api_key=settings.openai_api_key)
-        self.openai_client = ChatOpenAI(openai_api_key=settings.openai_api_key)
+        self.openai_client = ChatOpenAI(openai_api_key=self.settings.openai_api_key)
 
     def _get_model_response(
         self,
@@ -55,7 +52,7 @@ class BrainPickingOpenAIFunctions:
         logger.info("Getting model response")
         kwargs = {
             "messages": messages,
-            "model": self.model,
+            "model": self.llm_name,
             "temperature": self.temperature,
             "max_tokens": self.max_tokens,
         }

@@ -165,7 +165,7 @@ async def create_question_handler(
             # TODO: RBAC with current_user
             gpt_answer_generator = BrainPickingOpenAIFunctions(
                 model=chat_question.model,
-                chat_id=chat_id,
+                chat_id=str(chat_id),
                 temperature=chat_question.temperature,
                 max_tokens=chat_question.max_tokens,
                 # TODO: use user_id in vectors table instead of email
