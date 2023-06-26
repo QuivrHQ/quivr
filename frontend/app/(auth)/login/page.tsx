@@ -12,6 +12,7 @@ import PageHeading from "@/lib/components/ui/PageHeading";
 import { useSupabase } from "@/lib/context/SupabaseProvider";
 import { useToast } from "@/lib/hooks/useToast";
 
+import { useEventTracking } from "@/services/analytics/useEventTracking";
 import { GoogleLoginButton } from "./components/GoogleLogin";
 import { MagicLinkLogin } from "./components/MagicLinkLogin";
 
@@ -20,8 +21,8 @@ export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isPending, setIsPending] = useState(false);
-
   const { publish } = useToast();
+  const { track } = useEventTracking();
 
   const handleLogin = async () => {
     setIsPending(true);
@@ -45,6 +46,7 @@ export default function Login() {
   };
 
   if (session?.user !== undefined) {
+    track("SIGNED_IN");
     redirect("/upload");
   }
 
