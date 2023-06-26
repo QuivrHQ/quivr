@@ -5,11 +5,11 @@ import { cookies, headers } from "next/headers";
 
 import Footer from "@/lib/components/Footer";
 import { NavBar } from "@/lib/components/NavBar";
+import { TrackingWrapper } from "@/lib/components/TrackingWrapper";
 import { ToastProvider } from "@/lib/components/ui/Toast";
 import { BrainProvider, FeatureFlagsProvider } from "@/lib/context";
 import { BrainConfigProvider } from "@/lib/context/BrainConfigProvider/brain-config-provider";
 import { SupabaseProvider } from "@/lib/context/SupabaseProvider";
-
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -40,17 +40,18 @@ const RootLayout = async ({
         className={`bg-white text-black min-h-screen flex flex-col dark:bg-black dark:text-white w-full ${inter.className}`}
       >
         <FeatureFlagsProvider>
-        <ToastProvider>
-          <SupabaseProvider session={session}>
-            <BrainConfigProvider>
-              <BrainProvider>
-                <NavBar />
-                <div className="flex-1">{children}</div>
-                <Footer />
-              </BrainProvider>
-            </BrainConfigProvider>
-          </SupabaseProvider>
-        </ToastProvider>
+          <ToastProvider>
+            <SupabaseProvider session={session}>
+              <BrainConfigProvider>
+                <BrainProvider>
+                  <TrackingWrapper />
+                  <NavBar />
+                  <div className="flex-1">{children}</div>
+                  <Footer />
+                </BrainProvider>
+              </BrainConfigProvider>
+            </SupabaseProvider>
+          </ToastProvider>
           <Analytics />
         </FeatureFlagsProvider>
       </body>
