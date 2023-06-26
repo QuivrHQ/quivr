@@ -1,5 +1,4 @@
 from typing import Any, Dict
-from models.settings import LLMSettings  # For type hinting
 
 # Importing various modules and classes from a custom library 'langchain' likely used for natural language processing
 from langchain.chains import ConversationalRetrievalChain, LLMChain
@@ -9,17 +8,17 @@ from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.llms import GPT4All
 from langchain.llms.base import LLM
 from langchain.memory import ConversationBufferMemory
-
 from llm.prompt.CONDENSE_PROMPT import CONDENSE_QUESTION_PROMPT
+from logger import get_logger
 from models.settings import BrainSettings  # Importing settings related to the 'brain'
+from models.settings import LLMSettings  # For type hinting
 from pydantic import BaseModel  # For data validation and settings management
+from repository.chat.get_chat_history import get_chat_history
 from supabase import Client  # For interacting with Supabase database
 from supabase import create_client
-from repository.chat.get_chat_history import get_chat_history
 from vectorstore.supabase import (
     CustomSupabaseVectorStore,
 )  # Custom class for handling vector storage with Supabase
-from logger import get_logger
 
 logger = get_logger(__name__)
 
@@ -58,6 +57,7 @@ class BrainPicking(BaseModel):
 
     # Default class attributes
     llm_name: str = "gpt-3.5-turbo"
+    temperature: float = 0.0
     settings = BrainSettings()
     llm_config = LLMSettings()
     embeddings: OpenAIEmbeddings = None
@@ -77,6 +77,7 @@ class BrainPicking(BaseModel):
         self,
         model: str,
         user_id: str,
+        temperature: float,
         chat_id: str,
         max_tokens: int,
         user_openai_api_key: str,
@@ -92,16 +93,19 @@ class BrainPicking(BaseModel):
             user_id=user_id,
             chat_id=chat_id,
             max_tokens=max_tokens,
+            temperature=temperature,
             user_openai_api_key=user_openai_api_key,
         )
         # If user provided an API key, update the settings
         if user_openai_api_key is not None:
             self.settings.openai_api_key = user_openai_api_key
 
+        self.temperature = temperature
         self.embeddings = OpenAIEmbeddings(openai_api_key=self.settings.openai_api_key)
         self.supabase_client = create_client(
             self.settings.supabase_url, self.settings.supabase_service_key
         )
+        self.llm_name = model
         self.vector_store = CustomSupabaseVectorStore(
             self.supabase_client,
             self.embeddings,
@@ -135,22 +139,8 @@ class BrainPicking(BaseModel):
         :param private: Boolean value to determine if private model is to be used.
         :return: Language model instance
         """
-        if private:
-            model_path = private_model_args["model_path"]
-            model_n_ctx = private_model_args["n_ctx"]
-            model_n_batch = private_model_args["n_batch"]
 
-            logger.info("Using private model: %s", model_path)
-
-            return GPT4All(
-                model=model_path,
-                n_ctx=model_n_ctx,
-                n_batch=model_n_batch,
-                backend="gptj",
-                verbose=True,
-            )
-        else:
-            return ChatOpenAI(temperature=0, model_name=model_name)
+        return ChatOpenAI(temperature=0, model_name=model_name)
 
     def _get_qa(
         self,

@@ -1,6 +1,7 @@
-from llm.OpenAiFunctionBasedAnswerGenerator.models.OpenAiAnswer import OpenAiAnswer
-from llm.OpenAiFunctionBasedAnswerGenerator.models.FunctionCall import FunctionCall
 from typing import Any, Dict  # For type hinting
+
+from llm.BrainPickingOpenAIFunctions.models.FunctionCall import FunctionCall
+from llm.BrainPickingOpenAIFunctions.models.OpenAiAnswer import OpenAiAnswer
 
 
 def format_answer(model_response: Dict[str, Any]) -> OpenAiAnswer:

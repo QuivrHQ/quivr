@@ -15,10 +15,10 @@ class BrainSettings(BaseSettings):
 
 
 class LLMSettings(BaseSettings):
-    private: bool
-    model_path: str
-    model_n_ctx: int
-    model_n_batch: int
+    private: bool = False
+    model_path: str = "gpt2"
+    model_n_ctx: int = 1000
+    model_n_batch: int = 8
 
 
 def common_dependencies() -> dict:
