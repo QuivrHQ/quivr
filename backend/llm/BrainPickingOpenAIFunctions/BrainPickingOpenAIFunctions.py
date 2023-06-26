@@ -1,13 +1,9 @@
 from typing import Any, Dict, List, Optional
 
 from langchain.chat_models import ChatOpenAI
-from langchain.embeddings.openai import OpenAIEmbeddings
 from llm.brainpicking import BrainPicking
-from llm.BrainPickingOpenAIFunctions.models.OpenAiAnswer import OpenAiAnswer
 from logger import get_logger
-from models.settings import BrainSettings
 from repository.chat.get_chat_history import get_chat_history
-from supabase import Client, create_client
 from vectorstore.supabase import CustomSupabaseVectorStore
 
 from .utils.format_answer import format_answer
@@ -164,8 +160,9 @@ class BrainPickingOpenAIFunctions(BrainPicking):
             logger.info("Model called for history")
             response = self._get_model_response(
                 messages=self._construct_prompt(question, useHistory=True),
-                functions=functions,
+                functions=[],
             )
+
             formatted_response = format_answer(response)
 
         # If the model calls for context, try again with context included
@@ -178,7 +175,7 @@ class BrainPickingOpenAIFunctions(BrainPicking):
                 messages=self._construct_prompt(
                     question, useContext=True, useHistory=False
                 ),
-                functions=functions,
+                functions=[],
             )
             formatted_response = format_answer(response)
 
@@ -191,7 +188,7 @@ class BrainPickingOpenAIFunctions(BrainPicking):
                 messages=self._construct_prompt(
                     question, useContext=True, useHistory=True
                 ),
-                functions=functions,
+                functions=[],
             )
             formatted_response = format_answer(response)
 
