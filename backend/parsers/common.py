@@ -85,7 +85,10 @@ async def file_already_exists(supabase, file, brain_id):
     return file_already_exists_from_content(supabase, file_content, brain_id)
 
 
-async def file_already_exists_from_content(supabase, file_content, brain_id):
+async def file_already_exists_from_content(supabase, file_content, brain_id) -> bool:
+    """
+        Returns true if all vector_ids have a related entry in "brains_vectors"
+    """
     file_sha1 = compute_sha1_from_content(file_content)
     response = (
         supabase.table("vectors")
@@ -104,9 +107,6 @@ async def file_already_exists_from_content(supabase, file_content, brain_id):
             .execute()
         )
         if len(response.data) == 0:
-            # This means we found a vector_id that has no related entry in the "brains_vectors"
-            # So, we return False indicating the file is not fully loaded or not loaded at all in the brain
             return False
 
-    # If we have not returned False, it means all vector_ids have a related entry in "brains_vectors"
     return True

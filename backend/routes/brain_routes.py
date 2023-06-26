@@ -92,8 +92,7 @@ class BrainObject(BaseModel):
 
 # create new brain
 @brain_router.post("/brains", dependencies=[Depends(AuthBearer())], tags=["Brain"])
-async def create_brain_endpoint(
-    request: Request,
+async def brain_endpoint(
     brain: BrainObject,
     current_user: User = Depends(get_current_user),
 ):
@@ -106,14 +105,13 @@ async def create_brain_endpoint(
         temperature
     In the brains table & in the brains_users table and put the creator user as 'Owner'
     """
-    commons = common_dependencies()
     brain = Brain(name=brain.name)
-    created_brain = brain.create_brain(brain.name)[0]
+    
+    brain.create_brain()
     # create a brain X user entry
-    brain.create_brain_user(created_brain["brain_id"], current_user.id, rights="Owner")
+    brain.create_brain_user(user_id = current_user.id, rights="Owner")
 
-    return {"id": created_brain["brain_id"], "name": created_brain["name"]}
-
+    return {"id": brain.id, "name": brain.name}
 
 # update existing brain
 @brain_router.put(

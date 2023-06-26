@@ -7,22 +7,14 @@ from pydantic import BaseModel
 
 
 class Brain(BaseModel):
-    brain_id: Optional[UUID] = None
-    name: str = "New Brain"
+    id: Optional[UUID] = None
+    name: str = "Default brain"
     status: Optional[str]= "public"
     model: Optional[str] = "gpt-3.5-turbo-0613"
     temperature: Optional[float] = 0.0
     max_tokens: Optional[int] = 256
     brain_size: Optional[float] = 0.0
     max_brain_size: Optional[int] = int(os.getenv("MAX_BRAIN_SIZE", 0))
-    
-class BrainToUpdate(BaseModel): 
-    brain_id: UUID
-    name: Optional[str] = "New Brain"
-    status: Optional[str] = "public"
-    model: Optional[str] = "gpt-3.5-turbo-0613"
-    temperature: Optional[float] = 0.0
-    max_tokens: Optional[int] = 256
     file_sha1: Optional[str] = ""
     _commons: Optional[CommonsDep] = None
 
@@ -68,6 +60,7 @@ class BrainToUpdate(BaseModel):
             .filter("user_id", "eq", user_id)
             .execute()
         )
+        print('response.data', response.data)
         return [item["brains"] for item in response.data]
 
     def get_brain(self):
@@ -75,7 +68,7 @@ class BrainToUpdate(BaseModel):
             self.commons["supabase"]
             .from_("brains")
             .select("brainId:brain_id, brainName:brain_name")
-            .filter("brain_id", "eq", self.brain_id)
+            .filter("brain_id", "eq", self.id)
             .execute()
         )
         return response.data
@@ -92,23 +85,22 @@ class BrainToUpdate(BaseModel):
 
     def delete_brain(self):
         self.commons["supabase"].table("brains").delete().match(
-            {"brain_id": self.brain_id}
+            {"brain_id": self.id}
         ).execute()
 
-    @classmethod
-    def create_brain(cls, name):
+    def create_brain(self):
         commons = common_dependencies()
-        response = commons["supabase"].table("brains").insert({"name": name}).execute()
+        response = commons["supabase"].table("brains").insert({"name": self.name}).execute()
         # set the brainId with response.data
+
+        self.id = response.data[0]['brain_id']   
         return response.data
 
-    def create_brain_user(self, brain_id, user_id, rights):
-        response = (
-            self.commons["supabase"]
-            .table("brains_users")
-            .insert({"brain_id": brain_id, "user_id": user_id, "rights": rights})
-            .execute()
-        )
+    def create_brain_user(self, user_id : UUID, rights):
+        commons = common_dependencies()
+        response = commons["supabase"].table("brains_users").insert({"brain_id": str(self.id), "user_id":str( user_id), "rights": rights}).execute()
+        
+
         return response.data
 
     def create_brain_vector(self, vector_id):
