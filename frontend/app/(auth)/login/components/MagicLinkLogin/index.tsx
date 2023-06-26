@@ -2,8 +2,8 @@
 "use client";
 import { useState } from "react";
 
-import { useSupabase } from "@/app/supabase-provider";
 import Button from "@/lib/components/ui/Button";
+import { useSupabase } from "@/lib/context/SupabaseProvider";
 import { useToast } from "@/lib/hooks/useToast";
 
 type MaginLinkLoginProps = {

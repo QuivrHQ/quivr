@@ -3,9 +3,9 @@ import { redirect } from "next/navigation";
 import { ReactNode } from "react";
 
 import { ChatsProvider } from "@/lib/context/ChatsProvider/chats-provider";
+import { useSupabase } from "@/lib/context/SupabaseProvider";
 
 import { ChatsList } from "./components";
-import { useSupabase } from "../supabase-provider";
 
 interface LayoutProps {
   children?: ReactNode;
@@ -13,7 +13,7 @@ interface LayoutProps {
 
 const Layout = ({ children }: LayoutProps): JSX.Element => {
   const { session } = useSupabase();
-  if (!session) {
+  if (session === null) {
     redirect("/login");
   }
 

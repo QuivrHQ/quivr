@@ -4,12 +4,12 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { useState } from "react";
 
-import { useSupabase } from "@/app/supabase-provider";
 import Button from "@/lib/components/ui/Button";
 import Card from "@/lib/components/ui/Card";
 import { Divider } from "@/lib/components/ui/Divider";
 import Field from "@/lib/components/ui/Field";
 import PageHeading from "@/lib/components/ui/PageHeading";
+import { useSupabase } from "@/lib/context/SupabaseProvider";
 import { useToast } from "@/lib/hooks/useToast";
 
 import { GoogleLoginButton } from "./components/GoogleLogin";

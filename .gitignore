@@ -51,3 +51,6 @@ streamlit-demo/.streamlit/secrets.toml
 backend/pandoc-*
 **/.pandoc-*
 backend/application_default_credentials.json
+
+#local models
+backend/local_models/*

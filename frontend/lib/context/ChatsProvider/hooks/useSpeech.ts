@@ -3,13 +3,13 @@ import { useEffect, useState } from "react";
 
 import { isSpeechRecognitionSupported } from "@/lib/helpers/isSpeechRecognitionSupported";
 
-import useChatsContext from "./useChatsContext";
+type useSpeechProps = {
+  setMessage: (newValue: string | ((prevValue: string) => string)) => void;
+};
 
-export const useSpeech = () => {
+export const useSpeech = ({ setMessage }: useSpeechProps) => {
   const [isListening, setIsListening] = useState(false);
   const [speechSupported, setSpeechSupported] = useState(false);
-
-  const { setMessage } = useChatsContext();
 
   useEffect(() => {
     if (isSpeechRecognitionSupported()) {
@@ -39,7 +39,7 @@ export const useSpeech = () => {
       mic.onresult = (event: SpeechRecognitionEvent) => {
         const interimTranscript =
           event.results[event.results.length - 1][0].transcript;
-        setMessage((prevMessage) => ["user", prevMessage + interimTranscript]);
+        setMessage((prevMessage) => prevMessage + interimTranscript);
       };
 
       if (isListening) {
