@@ -67,7 +67,7 @@ async def process_audio(commons: CommonsDep, upload_file: UploadFile, enable_sum
 
         text_splitter = RecursiveCharacterTextSplitter.from_tiktoken_encoder(
             chunk_size=chunk_size, chunk_overlap=chunk_overlap)
-        texts = text_splitter.split_text(transcript)
+        texts = text_splitter.split_text(transcript.text.encode("utf-8"))
 
         docs_with_metadata = [Document(page_content=text, metadata={"file_sha1": file_sha, "file_size": file_size, "file_name": file_meta_name,
                                     "chunk_size": chunk_size, "chunk_overlap": chunk_overlap, "date": dateshort}) for text in texts]
