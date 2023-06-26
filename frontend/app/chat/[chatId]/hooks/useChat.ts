@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 
 import { useBrainConfig } from "@/lib/context/BrainConfigProvider/hooks/useBrainConfig";
 import { useToast } from "@/lib/hooks";
+import { useEventTracking } from "@/services/analytics/useEventTracking";
 
 import { useChatService } from "./useChatService";
 import { useChatContext } from "../context/ChatContext";
@@ -11,6 +12,7 @@ import { ChatQuestion } from "../types";
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const useChat = () => {
+  const { track } = useEventTracking();
   const params = useParams();
   const [chatId, setChatId] = useState<string | undefined>(
     params?.chatId as string | undefined
@@ -54,6 +56,7 @@ export const useChat = () => {
     };
 
     try {
+      void track("QUESTION_ASKED");
       setGeneratingAnswer(true);
       const currentChatId =
         chatId ??
