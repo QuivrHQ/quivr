@@ -21,6 +21,7 @@ class BrainPickingOpenAIFunctions(BrainPicking):
     DEFAULT_MAX_TOKENS = 256
 
     openai_client: ChatOpenAI = None
+    user_email: str = None
 
     def __init__(
         self,
@@ -41,6 +42,7 @@ class BrainPickingOpenAIFunctions(BrainPicking):
             temperature=temperature,
         )
         self.openai_client = ChatOpenAI(openai_api_key=self.settings.openai_api_key)
+        self.user_email = user_email
 
     def _get_model_response(
         self,
@@ -141,6 +143,11 @@ class BrainPickingOpenAIFunctions(BrainPicking):
                 "description": "Used for retrieving documents related to the question to help answer the question",
                 "parameters": {"type": "object", "properties": {}},
             },
+            {
+                "name": "get_history_and_context",
+                "description": "Used for retrieving documents related to the question to help answer the question and the previous chat history",
+                "parameters": {"type": "object", "properties": {}},
+            },
         ]
 
         # First, try to get an answer using just the question
@@ -167,6 +174,19 @@ class BrainPickingOpenAIFunctions(BrainPicking):
             and formatted_response.function_call.name == "get_context"
         ):
             logger.info("Model called for context")
+            response = self._get_model_response(
+                messages=self._construct_prompt(
+                    question, useContext=True, useHistory=False
+                ),
+                functions=functions,
+            )
+            formatted_response = format_answer(response)
+
+        if (
+            formatted_response.function_call
+            and formatted_response.function_call.name == "get_history_and_context"
+        ):
+            logger.info("Model called for history and context")
             response = self._get_model_response(
                 messages=self._construct_prompt(
                     question, useContext=True, useHistory=True
