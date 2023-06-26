@@ -5,12 +5,13 @@ from uuid import UUID
 from auth.auth_bearer import AuthBearer, get_current_user
 from fastapi import APIRouter, Depends, HTTPException, Request
 from llm.brainpicking import BrainPicking
-from llm.OpenAiFunctionBasedAnswerGenerator.OpenAiFunctionBasedAnswerGenerator import (
-    OpenAiFunctionBasedAnswerGenerator,
+from llm.BrainPickingOpenAIFunctions.BrainPickingOpenAIFunctions import (
+    BrainPickingOpenAIFunctions,
 )
+from llm.PrivateBrainPicking import PrivateBrainPicking
 from models.chat import Chat, ChatHistory
 from models.chats import ChatQuestion
-from models.settings import common_dependencies
+from models.settings import LLMSettings, common_dependencies
 from models.users import User
 from repository.chat.create_chat import CreateChatProperties, create_chat
 from repository.chat.get_chat_by_id import get_chat_by_id
@@ -157,27 +158,39 @@ async def create_question_handler(
     try:
         user_openai_api_key = request.headers.get("Openai-Api-Key")
         check_user_limit(current_user.email, user_openai_api_key)
+        llm_settings = LLMSettings()
         openai_function_compatible_models = [
             "gpt-3.5-turbo-0613",
             "gpt-4-0613",
         ]
-        if chat_question.model in openai_function_compatible_models:
-            # TODO: RBAC with current_user
-            gpt_answer_generator = OpenAiFunctionBasedAnswerGenerator(
+        if llm_settings.private:
+            gpt_answer_generator = PrivateBrainPicking(
                 model=chat_question.model,
-                chat_id=chat_id,
+                chat_id=str(chat_id),
+                temperature=chat_question.temperature,
+                max_tokens=chat_question.max_tokens,
+                user_id=current_user.email,
+                user_openai_api_key=user_openai_api_key,
+            )
+            answer = gpt_answer_generator.generate_answer(chat_question.question)
+        elif chat_question.model in openai_function_compatible_models:
+            # TODO: RBAC with current_user
+            gpt_answer_generator = BrainPickingOpenAIFunctions(
+                model=chat_question.model,
+                chat_id=str(chat_id),
                 temperature=chat_question.temperature,
                 max_tokens=chat_question.max_tokens,
                 # TODO: use user_id in vectors table instead of email
                 user_email=current_user.email,
                 user_openai_api_key=user_openai_api_key,
             )
-            answer = gpt_answer_generator.get_answer(chat_question.question)
+            answer = gpt_answer_generator.generate_answer(chat_question.question)
         else:
             brainPicking = BrainPicking(
                 chat_id=str(chat_id),
                 model=chat_question.model,
                 max_tokens=chat_question.max_tokens,
+                temperature=chat_question.temperature,
                 user_id=current_user.email,
                 user_openai_api_key=user_openai_api_key,
             )
