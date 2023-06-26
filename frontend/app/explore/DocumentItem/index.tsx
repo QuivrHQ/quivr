@@ -8,14 +8,14 @@ import {
   useState,
 } from "react";
 
-import { useSupabase } from "@/app/supabase-provider";
 import Button from "@/lib/components/ui/Button";
 import { AnimatedCard } from "@/lib/components/ui/Card";
 import Ellipsis from "@/lib/components/ui/Ellipsis";
 import Modal from "@/lib/components/ui/Modal";
+import { useSupabase } from "@/lib/context/SupabaseProvider";
+import { useAxios } from "@/lib/hooks";
 import { useToast } from "@/lib/hooks/useToast";
 import { Document } from "@/lib/types/Document";
-import { useAxios } from "@/lib/useAxios";
 
 import DocumentData from "./DocumentData";
 

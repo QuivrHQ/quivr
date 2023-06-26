@@ -1,9 +1,7 @@
-/* eslint-disable */
-import axios, { AxiosInstance } from "axios";
+import axios, { AxiosError, AxiosInstance } from "axios";
 
-import { useSupabase } from "@/app/supabase-provider";
-
-import { useBrainConfig } from "./context/BrainConfigProvider/hooks/useBrainConfig";
+import { useBrainConfig } from "../context/BrainConfigProvider/hooks/useBrainConfig";
+import { useSupabase } from "../context/SupabaseProvider";
 
 const axiosInstance = axios.create({
   baseURL: `${process.env.NEXT_PUBLIC_BACKEND_URL ?? ""}`,
@@ -17,13 +15,13 @@ export const useAxios = (): { axiosInstance: AxiosInstance } => {
   axiosInstance.interceptors.request.clear();
   axiosInstance.interceptors.request.use(
     (config) => {
-      config.headers["Authorization"] = `Bearer ${session?.access_token}`;
+      config.headers["Authorization"] = `Bearer ${session?.access_token ?? ""}`;
       config.headers["Openai-Api-Key"] = openAiKey;
       config.baseURL = backendUrl ?? config.baseURL;
 
       return config;
     },
-    (error) => {
+    (error: AxiosError) => {
       console.error({ error });
       void Promise.reject(error);
     }

@@ -2,7 +2,7 @@
 "use client";
 import { redirect } from "next/navigation";
 
-import { useSupabase } from "../supabase-provider";
+import { useSupabase } from "@/lib/context/SupabaseProvider";
 import { ConfigForm, ConfigTitle } from "./components";
 import { ApiKeyConfig } from "./components/ApiKeyConfig";
 

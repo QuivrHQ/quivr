@@ -5,8 +5,14 @@ import { MdMic, MdMicOff } from "react-icons/md";
 import Button from "@/lib/components/ui/Button";
 import { useSpeech } from "@/lib/context/ChatsProvider/hooks/useSpeech";
 
-export const MicButton = (): JSX.Element => {
-  const { isListening, speechSupported, startListening } = useSpeech();
+type MicButtonProps = {
+  setMessage: (newValue: string | ((prevValue: string) => string)) => void;
+};
+
+export const MicButton = ({ setMessage }: MicButtonProps): JSX.Element => {
+  const { isListening, speechSupported, startListening } = useSpeech({
+    setMessage,
+  });
 
   return (
     <Button
