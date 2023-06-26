@@ -27,7 +27,7 @@ export const useFileUploader = () => {
       formData.append("file", file);
       try {
         const response = await axiosInstance.post(`/upload`, formData);
-        track("FILE_UPLOADED");
+        void track("FILE_UPLOADED");
         publish({
           variant: response.data.type,
           text:

@@ -5,13 +5,16 @@ import { useState } from "react";
 
 import Button from "@/lib/components/ui/Button";
 import { useAxios } from "@/lib/hooks";
+import { useEventTracking } from "@/services/analytics/useEventTracking";
 
 export const ApiKeyConfig = (): JSX.Element => {
   const [apiKey, setApiKey] = useState("");
   const { axiosInstance } = useAxios();
+  const { track} = useEventTracking();
 
   const handleCreateClick = async () => {
     try {
+      void track("CREATE_API_KEY")
       const response = await axiosInstance.post("/api-key"); // replace with your api-key endpoint URL
       setApiKey(response.data.api_key);
     } catch (error) {
@@ -21,6 +24,7 @@ export const ApiKeyConfig = (): JSX.Element => {
 
   const copyToClipboard = async (text: string) => {
     try {
+      void track("COPY_API_KEY")
       await navigator.clipboard.writeText(text);
     } catch (err) {
       console.error("Failed to copy:", err);

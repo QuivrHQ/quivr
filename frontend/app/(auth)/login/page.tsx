@@ -46,7 +46,7 @@ export default function Login() {
   };
 
   if (session?.user !== undefined) {
-    track("SIGNED_IN");
+    void track("SIGNED_IN");
     redirect("/upload");
   }
 
