@@ -3,9 +3,11 @@ import { redirect } from "next/navigation";
 import { useCallback, useState } from "react";
 import { FileRejection, useDropzone } from "react-dropzone";
 
+import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 import { useSupabase } from "@/lib/context/SupabaseProvider";
 import { useAxios, useToast } from "@/lib/hooks";
 import { useEventTracking } from "@/services/analytics/useEventTracking";
+import { UUID } from "crypto";
 
 export const useFileUploader = () => {
   const { track } = useEventTracking();
@@ -14,6 +16,7 @@ export const useFileUploader = () => {
   const [files, setFiles] = useState<File[]>([]);
   const { session } = useSupabase();
 
+  const { currentBrain } = useBrainContext();
   const { axiosInstance } = useAxios();
 
   if (session === null) {
@@ -21,12 +24,16 @@ export const useFileUploader = () => {
   }
 
   const upload = useCallback(
-    async (file: File) => {
+    async (file: File, brainId: UUID) => {
       const formData = new FormData();
       formData.append("file", file);
       try {
-        const response = await axiosInstance.post(`/upload`, formData);
         void track("FILE_UPLOADED");
+        const response = await axiosInstance.post(
+          `/upload/?brain_id=${brainId}`,
+          formData
+        );
+        track("FILE_UPLOADED");
         publish({
           variant: response.data.type,
           text:
@@ -77,10 +84,11 @@ export const useFileUploader = () => {
       return;
     }
     setIsPending(true);
-
-    await Promise.all(files.map((file) => upload(file)));
-
-    setFiles([]);
+    if (currentBrain?.id !== undefined) {
+      setFiles([]);
+      await Promise.all(files.map((file) => upload(file, currentBrain?.id)));
+    }
+    console.log("Please select or create a brain to upload a file");
     setIsPending(false);
   };
 

@@ -68,7 +68,7 @@ async def process_file(
 
         created_vector_id = created_vector[0]
 
-        brain = Brain(brain_id=brain_id)
+        brain = Brain(id=brain_id)
         brain.create_brain_vector(created_vector_id)
 
         # Remove the enable_summarization and ids
@@ -82,7 +82,7 @@ async def process_file(
 async def file_already_exists(supabase, file, brain_id):
     # TODO: user brain id instead of user
     file_content = await file.read()
-    return file_already_exists_from_content(supabase, file_content, brain_id)
+    return await file_already_exists_from_content(supabase, file_content, brain_id)
 
 
 async def file_already_exists_from_content(supabase, file_content, brain_id) -> bool:
@@ -98,15 +98,20 @@ async def file_already_exists_from_content(supabase, file_content, brain_id) -> 
     )
     vectors_ids = response.data
 
-    for vector_id in vectors_ids:
+    print("vectors_ids", vectors_ids)
+    print("len(vectors_ids)", len(vectors_ids))
+    if len(vectors_ids) == 0:
+        return False
+    
+    for vector in vectors_ids:
         response = (
             supabase.table("brains_vectors")
             .select("brain_id, vector_id")
             .filter("brain_id", "eq", brain_id)
-            .filter("vector_id", "eq", vector_id)
+            .filter("vector_id", "eq", vector['id'])
             .execute()
         )
         if len(response.data) == 0:
             return False
-
+            
     return True

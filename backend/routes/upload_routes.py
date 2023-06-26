@@ -2,10 +2,11 @@ import os
 from uuid import UUID
 
 from auth.auth_bearer import AuthBearer, get_current_user
-from fastapi import APIRouter, Depends, Request, UploadFile
+from fastapi import APIRouter, Depends, Query, Request, UploadFile
 from models.brains import Brain
 from models.settings import CommonsDep, common_dependencies
 from models.users import User
+from pydantic import BaseModel
 from utils.file import convert_bytes, get_file_size
 from utils.processors import filter_file
 
@@ -23,7 +24,7 @@ def get_user_vectors(commons, user):
 
 
 @upload_router.post("/upload", dependencies=[Depends(AuthBearer())], tags=["Upload"])
-async def upload_file(request: Request,  file: UploadFile, enable_summarization: bool = False, brain_id = UUID, current_user: User = Depends(get_current_user)):
+async def upload_file(request: Request,  file: UploadFile, brain_id: UUID = Query(..., description="The ID of the brain"), enable_summarization: bool = False, current_user: User = Depends(get_current_user)):
     """
     Upload a file to the user's storage.
 
@@ -36,9 +37,12 @@ async def upload_file(request: Request,  file: UploadFile, enable_summarization:
     and ensures that the file size does not exceed the maximum capacity. If the file is within the allowed size limit,
     it can optionally apply summarization to the file's content. The response message will indicate the status of the upload.
     """
-    # //Check the rights user_id and 
-    brain = Brain(brain_id = brain_id)
 
+    print(brain_id,"brain_id")
+
+    # //Check the rights user_id and 
+    brain = Brain(id = brain_id)
+    print("brain", brain)
     commons = common_dependencies()
 
     if request.headers.get('Openai-Api-Key'):
@@ -51,6 +55,6 @@ async def upload_file(request: Request,  file: UploadFile, enable_summarization:
     if remaining_free_space - file_size < 0:
         message = {"message": f"❌ User's brain will exceed maximum capacity with this upload. Maximum file allowed is : {convert_bytes(remaining_free_space)}", "type": "error"}
     else: 
-        message = await filter_file(commons, file, enable_summarization, current_user, openai_api_key=request.headers.get('Openai-Api-Key', None))
+        message = await filter_file(commons, file, enable_summarization, brain_id=brain_id ,openai_api_key=request.headers.get('Openai-Api-Key', None))
  
     return message

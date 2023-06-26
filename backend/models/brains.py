@@ -60,7 +60,6 @@ class Brain(BaseModel):
             .filter("user_id", "eq", user_id)
             .execute()
         )
-        print('response.data', response.data)
         return [item["brains"] for item in response.data]
 
     def get_brain(self):
@@ -78,7 +77,7 @@ class Brain(BaseModel):
             self.commons["supabase"]
             .from_("brains")
             .select("id:brain_id, name, *")
-            .filter("brain_id", "eq", self.brain_id)
+            .filter("brain_id", "eq", self.id)
             .execute()
         )
         return response.data
@@ -106,8 +105,8 @@ class Brain(BaseModel):
     def create_brain_vector(self, vector_id):
         response = (
             self.commons["supabase"]
-            .table("brains_users")
-            .insert({"brain_id": self.brain_id, "vector_id": vector_id})
+            .table("brains_vectors")
+            .insert({"brain_id": str(self.id), "vector_id": str(vector_id)})
             .execute()
         )
         return response.data
@@ -125,7 +124,7 @@ class Brain(BaseModel):
 
     def update_brain_fields(self):
         self.commons["supabase"].table("brains").update({"name": self.name}).match(
-            {"brain_id": self.brain_id}
+            {"brain_id": self.id}
         ).execute()
 
     def update_brain_with_file(self, file_sha1: str):
@@ -143,7 +142,7 @@ class Brain(BaseModel):
                 self.commons["supabase"]
                 .from_("brains_vectors")
                 .select("vector_id")
-                .filter("brain_id", "eq", self.brain_id)
+                .filter("brain_id", "eq", self.id)
                 .execute()
             )
         
@@ -151,19 +150,22 @@ class Brain(BaseModel):
 
         print('vector_ids', vector_ids)
 
+        if len(vector_ids) == 0:
+            return []
+        
         unique_files = self.get_unique_files_from_vector_ids(vector_ids)
         print('unique_files', unique_files)
 
         return unique_files
 
-    def get_unique_files_from_vector_ids(self, vectors_ids):
+    def get_unique_files_from_vector_ids(self, vectors_ids : List[int]):
         # Move into Vectors class
         """
         Retrieve unique user data vectors.
         """
         vectors_response = self.commons['supabase'].table("vectors").select(
             "name:metadata->>file_name, size:metadata->>file_size", count="exact") \
-                .filter("vector_id", "in",vectors_ids)\
+                .filter("id", "in", tuple(vectors_ids))\
                 .execute()
         documents = vectors_response.data  # Access the data from the response
         # Convert each dictionary to a tuple of items, then to a set to remove duplicates, and then back to a dictionary
