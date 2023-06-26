@@ -16,6 +16,7 @@ import { useSupabase } from "@/lib/context/SupabaseProvider";
 import { useAxios } from "@/lib/hooks";
 import { useToast } from "@/lib/hooks/useToast";
 import { Document } from "@/lib/types/Document";
+import { useEventTracking } from "@/services/analytics/useEventTracking";
 
 import DocumentData from "./DocumentData";
 
@@ -30,6 +31,7 @@ const DocumentItem = forwardRef(
     const { publish } = useToast();
     const { session } = useSupabase();
     const { axiosInstance } = useAxios();
+    const { track } = useEventTracking();
 
     if (!session) {
       throw new Error("User session not found");
@@ -37,6 +39,7 @@ const DocumentItem = forwardRef(
 
     const deleteDocument = async (name: string) => {
       setIsDeleting(true);
+      void track("DELETE_DOCUMENT");
       try {
         await axiosInstance.delete(`/explore/${name}`);
         setDocuments((docs) => docs.filter((doc) => doc.name !== name)); // Optimistic update

@@ -9,10 +9,12 @@ import Card from "@/lib/components/ui/Card";
 import PageHeading from "@/lib/components/ui/PageHeading";
 import { useSupabase } from "@/lib/context/SupabaseProvider";
 import { useToast } from "@/lib/hooks/useToast";
+import { useEventTracking } from "@/services/analytics/useEventTracking";
 
 export default function Logout() {
   const { supabase } = useSupabase();
   const [isPending, setIsPending] = useState(false);
+  const { track } = useEventTracking();
 
   const { publish } = useToast();
   const router = useRouter();
@@ -20,7 +22,7 @@ export default function Logout() {
   const handleLogout = async () => {
     setIsPending(true);
     const { error } = await supabase.auth.signOut();
-
+    void track("LOGOUT")
     if (error) {
       console.error("Error logging out:", error.message);
       publish({

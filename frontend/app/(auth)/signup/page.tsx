@@ -9,15 +9,19 @@ import Field from "@/lib/components/ui/Field";
 import PageHeading from "@/lib/components/ui/PageHeading";
 import { useSupabase } from "@/lib/context/SupabaseProvider";
 import { useToast } from "@/lib/hooks/useToast";
+import { useEventTracking } from "@/services/analytics/useEventTracking";
 
 export default function SignUp() {
   const { supabase } = useSupabase();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isPending, setIsPending] = useState(false);
+  const { track } = useEventTracking();
+
 
   const { publish } = useToast();
   const handleSignUp = async () => {
+    void track("SIGNUP")
     setIsPending(true);
     const { data, error } = await supabase.auth.signUp({
       email: email,
