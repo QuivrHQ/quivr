@@ -16,7 +16,7 @@ class CustomSupabaseVectorStore(SupabaseVectorStore):
         client: Client,
         embedding: OpenAIEmbeddings,
         table_name: str,
-        user_id: str = "none",
+        user_id: str,
     ):
         super().__init__(client, embedding, table_name)
         self.user_id = user_id
@@ -24,6 +24,7 @@ class CustomSupabaseVectorStore(SupabaseVectorStore):
     def similarity_search(
         self,
         query: str,
+        user_id: str,
         table: str = "match_vectors",
         k: int = 6,
         threshold: float = 0.5,
