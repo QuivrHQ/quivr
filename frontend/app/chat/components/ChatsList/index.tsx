@@ -18,7 +18,6 @@ export const ChatsList = (): JSX.Element => {
       <motion.div
         drag="x"
         dragConstraints={{ right: 0, left: 0 }}
-        // dragSnapToOrigin
         dragElastic={0.15}
         onDragEnd={(event, info) => {
           if (info.offset.x > 100 && !open) {
@@ -36,11 +35,10 @@ export const ChatsList = (): JSX.Element => {
             boxShadow: open
               ? "10px 10px 16px rgba(0, 0, 0, 0)"
               : "10px 10px 16px rgba(0, 0, 0, 0.5)",
-            // shadow: open ? "none" : "10px 10px 16px black",
           }}
           className={cn("overflow-hidden")}
         >
-          <div className="min-w-fit max-h-screen  overflow-auto scrollbar">
+          <div className="min-w-fit max-h-screen overflow-auto scrollbar pt-20">
             <aside className="relative max-w-xs w-full h-screen">
               <NewChatButton />
               <div className="flex flex-col gap-0">
