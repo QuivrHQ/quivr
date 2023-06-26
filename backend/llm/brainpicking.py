@@ -77,6 +77,7 @@ class BrainPicking(BaseModel):
         self,
         model: str,
         user_id: str,
+        temperature: float,
         chat_id: str,
         max_tokens: int,
         user_openai_api_key: str,
@@ -92,12 +93,14 @@ class BrainPicking(BaseModel):
             user_id=user_id,
             chat_id=chat_id,
             max_tokens=max_tokens,
+            temperature=temperature,
             user_openai_api_key=user_openai_api_key,
         )
         # If user provided an API key, update the settings
         if user_openai_api_key is not None:
             self.settings.openai_api_key = user_openai_api_key
 
+        self.temperature = temperature
         self.embeddings = OpenAIEmbeddings(openai_api_key=self.settings.openai_api_key)
         self.supabase_client = create_client(
             self.settings.supabase_url, self.settings.supabase_service_key
@@ -136,22 +139,8 @@ class BrainPicking(BaseModel):
         :param private: Boolean value to determine if private model is to be used.
         :return: Language model instance
         """
-        if private:
-            model_path = private_model_args["model_path"]
-            model_n_ctx = private_model_args["n_ctx"]
-            model_n_batch = private_model_args["n_batch"]
 
-            logger.info("Using private model: %s", model_path)
-
-            return GPT4All(
-                model=model_path,
-                n_ctx=model_n_ctx,
-                n_batch=model_n_batch,
-                backend="gptj",
-                verbose=True,
-            )
-        else:
-            return ChatOpenAI(temperature=0, model_name=model_name)
+        return ChatOpenAI(temperature=0, model_name=model_name)
 
     def _get_qa(
         self,

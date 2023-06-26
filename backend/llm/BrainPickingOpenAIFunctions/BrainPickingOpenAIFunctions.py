@@ -38,6 +38,7 @@ class BrainPickingOpenAIFunctions(BrainPicking):
             chat_id=chat_id,
             max_tokens=max_tokens,
             user_openai_api_key=user_openai_api_key,
+            temperature=temperature,
         )
         self.openai_client = ChatOpenAI(openai_api_key=self.settings.openai_api_key)
 
@@ -124,7 +125,7 @@ class BrainPickingOpenAIFunctions(BrainPicking):
 
         return system_messages
 
-    def get_answer(self, question: str) -> str:
+    def generate_answer(self, question: str) -> str:
         """
         Main function to get an answer for the given question
         """
