@@ -1,5 +1,7 @@
 -- Create users table
 CREATE TABLE IF NOT EXISTS users(
+    //change primary key  to user_id x date
+
     user_id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     email TEXT,
     date TEXT,
@@ -9,6 +11,7 @@ CREATE TABLE IF NOT EXISTS users(
 -- Create chats table
 CREATE TABLE IF NOT EXISTS chats(
     chat_id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+    --   //update to auth.supabase 
     user_id UUID REFERENCES users(user_id),
     creation_time TIMESTAMP DEFAULT current_timestamp,
     history JSONB,
@@ -116,6 +119,7 @@ $$;
 -- Create api_keys table
 CREATE TABLE IF NOT EXISTS api_keys(
     key_id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    --   //update to auth.supabase 
     user_id UUID REFERENCES users(user_id),
     api_key TEXT UNIQUE,
     creation_time TIMESTAMP DEFAULT current_timestamp,
@@ -140,6 +144,7 @@ CREATE TABLE IF NOT EXISTS brains_users (
   rights VARCHAR(255),
   default_brain BOOLEAN DEFAULT false,
   PRIMARY KEY (brain_id, user_id),
+--   //update to auth.supabase 
   FOREIGN KEY (user_id) REFERENCES Users(user_id),
   FOREIGN KEY (brain_id) REFERENCES Brains(brain_id)
 );
