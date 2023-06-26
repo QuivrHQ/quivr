@@ -1,3 +1,4 @@
+import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import { useDevice } from "@/lib/hooks/useDevice";
@@ -8,9 +9,15 @@ export const useChatsList = () => {
 
   const [open, setOpen] = useState(!isMobile);
 
+  const pathname = usePathname();
+
   useEffect(() => {
     setOpen(!isMobile);
   }, [isMobile]);
+
+  useEffect(() => {
+    setOpen(!isMobile);
+  }, [isMobile, pathname]);
 
   return {
     open,
