@@ -20,7 +20,6 @@ export const ChatsListItem = ({
   chat,
   deleteChat,
 }: ChatsListItemProps): JSX.Element => {
-  console.log({ chat });
   const pathname = usePathname()?.split("/").at(-1);
   const selected = chat.chat_id === pathname;
   const [chatName, setChatName] = useState(chat.chat_name);

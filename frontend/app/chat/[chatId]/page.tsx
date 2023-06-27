@@ -15,8 +15,8 @@ export default function ChatPage() {
           subtitle="Talk to a language model about your uploaded data"
         />
         <ChatProvider>
-          <div className="relative h-full w-full flex flex-col flex-1 items-center">
-            <div className="h-full flex-1 w-full flex flex-col items-center">
+          <div className="relative w-full flex flex-col flex-1 items-center">
+            <div className="flex-1 w-full flex flex-col items-center">
               <ChatMessages />
             </div>
             <ChatInput />
