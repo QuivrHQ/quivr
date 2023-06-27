@@ -1,4 +1,4 @@
+export * from "./ChatInput";
 export * from "./ChatMessages";
-export * from "./ChatMessages/ChatInput";
-export * from "./ChatMessages/ChatMessage";
+export * from "./ChatMessages/components/ChatMessage";
 export * from "./ChatsList";

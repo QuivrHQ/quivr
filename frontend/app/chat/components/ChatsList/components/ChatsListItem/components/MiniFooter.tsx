@@ -1,14 +1,6 @@
-"use client";
 import { DISCORD_URL, GITHUB_URL, TWITTER_URL } from "@/lib/config/CONSTANTS";
-import { useSupabase } from "@/lib/context/SupabaseProvider";
 
-const Footer = (): JSX.Element => {
-  const { session } = useSupabase();
-
-  if (session?.user !== undefined) {
-    return <div />;
-  }
-
+export const MiniFooter = (): JSX.Element => {
   return (
     <footer className="bg-white dark:bg-black border-t dark:border-white/10 mt-auto py-4">
       <div className="max-w-screen-xl mx-auto flex justify-center items-center gap-4">
@@ -19,7 +11,7 @@ const Footer = (): JSX.Element => {
           aria-label="Quivr GitHub"
         >
           <img
-            className="h-8 w-auto dark:invert"
+            className="h-4 w-auto dark:invert"
             src="/github.svg"
             alt="GitHub"
           />
@@ -30,7 +22,7 @@ const Footer = (): JSX.Element => {
           rel="noopener noreferrer"
           aria-label="Quivr Twitter"
         >
-          <img className="h-8 w-auto" src="/twitter.svg" alt="Twitter" />
+          <img className="h-4 w-auto" src="/twitter.svg" alt="Twitter" />
         </a>
         <a
           href={DISCORD_URL}
@@ -38,11 +30,9 @@ const Footer = (): JSX.Element => {
           rel="noopener noreferrer"
           aria-label="Quivr Discord"
         >
-          <img className="h-8 w-auto" src="/discord.svg" alt="Discord" />
+          <img className="h-4 w-auto" src="/discord.svg" alt="Discord" />
         </a>
       </div>
     </footer>
   );
 };
-
-export default Footer;

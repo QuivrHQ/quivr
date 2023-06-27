@@ -15,7 +15,7 @@ export const Header = ({
         y: hidden ? "-100%" : "0%",
         transition: { ease: "circOut" },
       }}
-      className="sticky top-0 w-full border-b border-b-black/10 dark:border-b-white/25 bg-white dark:bg-black z-20"
+      className="sticky top-0 w-full border-b border-b-black/10 dark:border-b-white/25 bg-white dark:bg-black z-[1200]"
     >
       <nav className="max-w-screen-xl mx-auto py-1 flex items-center justify-between gap-8">
         {children}
