@@ -8,6 +8,7 @@ type ChatContextProps = {
   history: ChatHistory[];
   setHistory: (history: ChatHistory[]) => void;
   addToHistory: (message: ChatHistory) => void;
+  updateHistory: (message: ChatHistory) => void;
 };
 
 export const ChatContext = createContext<ChatContextProps | undefined>(
@@ -24,12 +25,21 @@ export const ChatProvider = ({
     setHistory((prevHistory) => [...prevHistory, message]);
   };
 
+  const updateHistory = (message: ChatHistory) => {
+    console.log("updateHistory", message);
+    setHistory(
+      history.map((item) => (item.chat_id === message.chat_id ? message : item))
+    );
+    console.log("updateHistory", history);
+  };
+
   return (
     <ChatContext.Provider
       value={{
         history,
         setHistory,
         addToHistory,
+        updateHistory,
       }}
     >
       {children}

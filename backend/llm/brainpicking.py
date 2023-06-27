@@ -237,7 +237,7 @@ class BrainPicking(BaseModel):
             # Add the token to the response_tokens list
             response_tokens.append(token)
 
-            yield token
+            yield f"data: {token}\n\n"
 
         await task
 

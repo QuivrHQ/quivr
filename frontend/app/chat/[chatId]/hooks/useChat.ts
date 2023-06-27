@@ -24,13 +24,7 @@ export const useChat = () => {
   const { history, setHistory, addToHistory } = useChatContext();
   const { publish } = useToast();
 
-  const {
-    createChat,
-    getChatHistory,
-    addQuestion: addQuestionToChat,
-    streamResponse,
-    addStreamQuestion,
-  } = useChatService();
+  const { createChat, getChatHistory, addStreamQuestion } = useChatService();
 
   useEffect(() => {
     const fetchHistory = async () => {
@@ -66,8 +60,18 @@ export const useChat = () => {
         (await generateNewChatIdFromName(
           question.split(" ").slice(0, 3).join(" ")
         ));
-      addStreamQuestion(currentChatId, chatQuestion);
-      // addToHistory(answer);
+
+      const chatHistoryItem = {
+        assistant: "",
+        chat_id: currentChatId,
+        message_id: "",
+        message_time: "",
+        user_message: chatQuestion.question ?? "",
+      };
+
+      addToHistory(chatHistoryItem);
+      await addStreamQuestion(currentChatId, chatQuestion, chatHistoryItem);
+
       callback?.();
     } catch (error) {
       console.error({ error });
@@ -90,5 +94,9 @@ export const useChat = () => {
     }
   };
 
-  return { history, addQuestion, generatingAnswer, streamResponse };
+  return {
+    history,
+    addQuestion,
+    generatingAnswer,
+  };
 };
