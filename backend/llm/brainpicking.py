@@ -12,7 +12,6 @@ from langchain.llms.base import LLM
 from llm.prompt.CONDENSE_PROMPT import CONDENSE_QUESTION_PROMPT
 from logger import get_logger
 from models.settings import BrainSettings  # Importing settings related to the 'brain'
-from models.settings import LLMSettings  # For type hinting
 from pydantic import BaseModel  # For data validation and settings management
 from repository.chat.get_chat_history import get_chat_history
 from repository.chat.update_chat_history import update_chat_history
@@ -25,40 +24,36 @@ from vectorstore.supabase import (
 logger = get_logger(__name__)
 
 
-def format_chat_history(inputs) -> str:
-    """
-    Function to concatenate chat history into a single string.
-    :param inputs: List of tuples containing human and AI messages.
-    :return: concatenated string of chat history
-    """
-    res = []
-    for human, ai in inputs:
-        res.append(f"{human}:{ai}\n")
-    return "\n".join(res)
-
-
 class BrainPicking(BaseModel):
     """
     Main class for the Brain Picking functionality.
     It allows to initialize a Chat model, generate questions and retrieve answers using ConversationalRetrievalChain.
     """
 
+    # Instantiate settings
+    settings = BrainSettings()
+
     # Default class attributes
     llm_name: str = "gpt-3.5-turbo"
     temperature: float = 0.0
-    settings = BrainSettings()
-    llm_config = LLMSettings()
-    embeddings: OpenAIEmbeddings = None
-    supabase_client: Client = None
-    vector_store: CustomSupabaseVectorStore = None
-    question_llm: LLM = None
-    doc_llm: LLM = None
-    streaming: bool = False
-    question_generator: LLMChain = None
-    doc_chain: ConversationalRetrievalChain = None
     chat_id: str
     max_tokens: int = 256
+
+    # Storage
+    supabase_client: Client = None
+    vector_store: CustomSupabaseVectorStore = None
+
+    # Language models
+    embeddings: OpenAIEmbeddings = None
+    question_llm: LLM = None
+    doc_llm: LLM = None
+    question_generator: LLMChain = None
+    doc_chain: LLMChain = None
+    qa: ConversationalRetrievalChain = None
+
+    # Streaming
     callback: AsyncIteratorCallbackHandler = None
+    streaming: bool = False
 
     class Config:
         # Allowing arbitrary types for class validation
@@ -148,7 +143,6 @@ class BrainPicking(BaseModel):
         :param private: Boolean value to determine if private model is to be used.
         :return: Language model instance
         """
-
         return ChatOpenAI(
             temperature=0,
             model_name=model_name,

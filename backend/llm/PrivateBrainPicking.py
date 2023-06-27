@@ -1,25 +1,9 @@
-from typing import Any, Dict
-
 # Importing various modules and classes from a custom library 'langchain' likely used for natural language processing
-from langchain.chains import ConversationalRetrievalChain, LLMChain
-from langchain.chains.question_answering import load_qa_chain
-from langchain.chat_models import ChatOpenAI
-from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.llms import GPT4All
 from langchain.llms.base import LLM
-from langchain.memory import ConversationBufferMemory
 from llm.brainpicking import BrainPicking
-from llm.prompt.CONDENSE_PROMPT import CONDENSE_QUESTION_PROMPT
 from logger import get_logger
-from models.settings import BrainSettings  # Importing settings related to the 'brain'
-from models.settings import LLMSettings  # For type hinting
-from pydantic import BaseModel  # For data validation and settings management
-from repository.chat.get_chat_history import get_chat_history
-from supabase import Client  # For interacting with Supabase database
-from supabase import create_client
-from vectorstore.supabase import (
-    CustomSupabaseVectorStore,
-)  # Custom class for handling vector storage with Supabase
+from models.settings import LLMSettings
 
 logger = get_logger(__name__)
 
@@ -28,6 +12,9 @@ class PrivateBrainPicking(BrainPicking):
     """
     This subclass of BrainPicking is used to specifically work with a private language model.
     """
+
+    # Initialize class settings
+    llm_settings = LLMSettings()
 
     def __init__(
         self,
@@ -44,7 +31,7 @@ class PrivateBrainPicking(BrainPicking):
         :param user_id: The user id to be used for CustomSupabaseVectorStore.
         :return: PrivateBrainPicking instance
         """
-        # Call the parent class's initializer
+
         super().__init__(
             model=model,
             user_id=user_id,
@@ -54,20 +41,17 @@ class PrivateBrainPicking(BrainPicking):
             user_openai_api_key=user_openai_api_key,
         )
 
-    def _determine_llm(
-        self, private_model_args: dict, private: bool = True, model_name: str = None
-    ) -> LLM:
+    def _create_llm(self, model_name, streaming=False, callbacks=None) -> LLM:
         """
-        Override the _determine_llm method to enforce the use of a private model.
+        Override the _create_llm method to enforce the use of a private model.
         :param model_name: Language model name to be used.
         :param private_model_args: Dictionary containing model_path, n_ctx and n_batch.
         :param private: Boolean value to determine if private model is to be used. Defaulted to True.
         :return: Language model instance
         """
-        # Force the use of a private model by setting private to True.
-        model_path = private_model_args["model_path"]
-        model_n_ctx = private_model_args["n_ctx"]
-        model_n_batch = private_model_args["n_batch"]
+        model_path = self.llm_settings.model_path
+        model_n_ctx = self.llm_settings.model_n_ctx
+        model_n_batch = self.llm_settings.model_n_batch
 
         logger.info("Using private model: %s", model_path)
 
