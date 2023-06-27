@@ -2,7 +2,6 @@ import asyncio
 from typing import AsyncIterable, Awaitable
 
 from langchain.callbacks import AsyncIteratorCallbackHandler
-
 # Importing various modules and classes from a custom library 'langchain' likely used for natural language processing
 from langchain.chains import ConversationalRetrievalChain, LLMChain
 from langchain.chains.question_answering import load_qa_chain
@@ -13,7 +12,6 @@ from llm.prompt.CONDENSE_PROMPT import CONDENSE_QUESTION_PROMPT
 from logger import get_logger
 from models.settings import \
     BrainSettings  # Importing settings related to the 'brain'
-from models.settings import LLMSettings  # For type hinting
 from pydantic import BaseModel  # For data validation and settings management
 from repository.chat.get_chat_history import get_chat_history
 from vectorstore.supabase import \
@@ -21,6 +19,8 @@ from vectorstore.supabase import \
 
 from supabase import Client  # For interacting with Supabase database
 from supabase import create_client
+from vectorstore.supabase import \
+    CustomSupabaseVectorStore  # Custom class for handling vector storage with Supabase
 
 logger = get_logger(__name__)
 
@@ -235,7 +235,7 @@ class BrainPicking(BaseModel):
             # Add the token to the response_tokens list
             response_tokens.append(token)
 
-            yield f"data: {token}\n\n"
+            yield token
 
         await task
 
