@@ -1,19 +1,21 @@
-from typing import Any, Dict
+import asyncio
+from typing import AsyncIterable, Awaitable
+
+from langchain.callbacks import AsyncIteratorCallbackHandler
 
 # Importing various modules and classes from a custom library 'langchain' likely used for natural language processing
 from langchain.chains import ConversationalRetrievalChain, LLMChain
 from langchain.chains.question_answering import load_qa_chain
 from langchain.chat_models import ChatOpenAI
 from langchain.embeddings.openai import OpenAIEmbeddings
-from langchain.llms import GPT4All
 from langchain.llms.base import LLM
-from langchain.memory import ConversationBufferMemory
 from llm.prompt.CONDENSE_PROMPT import CONDENSE_QUESTION_PROMPT
 from logger import get_logger
 from models.settings import BrainSettings  # Importing settings related to the 'brain'
 from models.settings import LLMSettings  # For type hinting
 from pydantic import BaseModel  # For data validation and settings management
 from repository.chat.get_chat_history import get_chat_history
+from repository.chat.update_chat_history import update_chat_history
 from supabase import Client  # For interacting with Supabase database
 from supabase import create_client
 from vectorstore.supabase import (
@@ -21,20 +23,6 @@ from vectorstore.supabase import (
 )  # Custom class for handling vector storage with Supabase
 
 logger = get_logger(__name__)
-
-
-class AnswerConversationBufferMemory(ConversationBufferMemory):
-    """
-    This class is a specialized version of ConversationBufferMemory.
-    It overrides the save_context method to save the response using the 'answer' key in the outputs.
-    Reference to some issue comment is given in the docstring.
-    """
-
-    def save_context(self, inputs: Dict[str, Any], outputs: Dict[str, str]) -> None:
-        # Overriding the save_context method of the parent class
-        return super(AnswerConversationBufferMemory, self).save_context(
-            inputs, {"response": outputs["answer"]}
-        )
 
 
 def format_chat_history(inputs) -> str:
@@ -63,11 +51,14 @@ class BrainPicking(BaseModel):
     embeddings: OpenAIEmbeddings = None
     supabase_client: Client = None
     vector_store: CustomSupabaseVectorStore = None
-    llm: LLM = None
+    question_llm: LLM = None
+    doc_llm: LLM = None
+    streaming: bool = False
     question_generator: LLMChain = None
     doc_chain: ConversationalRetrievalChain = None
     chat_id: str
     max_tokens: int = 256
+    callback: AsyncIteratorCallbackHandler = None
 
     class Config:
         # Allowing arbitrary types for class validation
@@ -81,6 +72,7 @@ class BrainPicking(BaseModel):
         chat_id: str,
         max_tokens: int,
         user_openai_api_key: str,
+        streaming: bool = False,
     ) -> "BrainPicking":
         """
         Initialize the BrainPicking class by setting embeddings, supabase client, vector store, language model and chains.
@@ -106,32 +98,49 @@ class BrainPicking(BaseModel):
             self.settings.supabase_url, self.settings.supabase_service_key
         )
         self.llm_name = model
-        self.vector_store = CustomSupabaseVectorStore(
-            self.supabase_client,
-            self.embeddings,
-            table_name="vectors",
-            user_id=user_id,
-        )
 
-        self.llm = self._determine_llm(
-            private_model_args={
-                "model_path": self.llm_config.model_path,
-                "n_ctx": self.llm_config.model_n_ctx,
-                "n_batch": self.llm_config.model_n_batch,
-            },
-            private=self.llm_config.private,
+        try:
+            self.vector_store = CustomSupabaseVectorStore(
+                self.supabase_client,
+                self.embeddings,
+                table_name="vectors",
+                user_id=user_id,
+            )
+        except Exception as e:
+            logger.error(f"Caught exception: {e}")
+
+        self.question_llm = self._create_llm(
             model_name=self.llm_name,
+            streaming=False,
         )
         self.question_generator = LLMChain(
-            llm=self.llm, prompt=CONDENSE_QUESTION_PROMPT
+            llm=self.question_llm, prompt=CONDENSE_QUESTION_PROMPT
         )
-        self.doc_chain = load_qa_chain(self.llm, chain_type="stuff")
+
+        if streaming:
+            self.callback = AsyncIteratorCallbackHandler()
+            self.doc_llm = self._create_llm(
+                model_name=self.llm_name,
+                streaming=streaming,
+                callbacks=[self.callback],
+            )
+            self.doc_chain = load_qa_chain(
+                llm=self.doc_llm,
+                chain_type="stuff",
+            )
+            self.streaming = streaming
+        else:
+            self.doc_llm = self._create_llm(
+                model_name=self.llm_name,
+                streaming=streaming,
+            )
+            self.doc_chain = load_qa_chain(llm=self.doc_llm, chain_type="stuff")
+            self.streaming = streaming
+
         self.chat_id = chat_id
         self.max_tokens = max_tokens
 
-    def _determine_llm(
-        self, private_model_args: dict, private: bool = False, model_name: str = None
-    ) -> LLM:
+    def _create_llm(self, model_name, streaming=False, callbacks=None) -> LLM:
         """
         Determine the language model to be used.
         :param model_name: Language model name to be used.
@@ -140,7 +149,12 @@ class BrainPicking(BaseModel):
         :return: Language model instance
         """
 
-        return ChatOpenAI(temperature=0, model_name=model_name)
+        return ChatOpenAI(
+            temperature=0,
+            model_name=model_name,
+            streaming=streaming,
+            callbacks=callbacks,
+        )
 
     def _get_qa(
         self,
@@ -155,11 +169,11 @@ class BrainPicking(BaseModel):
         # Initialize and return a ConversationalRetrievalChain
         qa = ConversationalRetrievalChain(
             retriever=self.vector_store.as_retriever(),
-            max_tokens_limit=self.max_tokens,
             question_generator=self.question_generator,
             combine_docs_chain=self.doc_chain,
-            get_chat_history=format_chat_history,
+            verbose=True,
         )
+
         return qa
 
     def generate_answer(self, question: str) -> str:
@@ -182,3 +196,63 @@ class BrainPicking(BaseModel):
         answer = model_response["answer"]
 
         return answer
+
+    async def generate_stream(self, question: str) -> AsyncIterable:
+        """
+        Generate a streaming answer to a given question by interacting with the language model.
+        :param question: The question
+        :return: An async iterable which generates the answer.
+        """
+
+        # Get the QA chain
+        qa = self._get_qa()
+        history = get_chat_history(self.chat_id)
+        callback = self.callback
+
+        # # Format the chat history into a list of tuples (human, ai)
+        transformed_history = [(chat.user_message, chat.assistant) for chat in history]
+
+        # Initialize a list to hold the tokens
+        response_tokens = []
+
+        # Wrap an awaitable with a event to signal when it's done or an exception is raised.
+        async def wrap_done(fn: Awaitable, event: asyncio.Event):
+            try:
+                await fn
+            except Exception as e:
+                logger.error(f"Caught exception: {e}")
+            finally:
+                event.set()
+
+        # Use the acall method to perform an async call to the QA chain
+        task = asyncio.create_task(
+            wrap_done(
+                qa.acall(
+                    {
+                        "question": question,
+                        "chat_history": transformed_history,
+                    }
+                ),
+                callback.done,
+            )
+        )
+
+        # Use the aiter method of the callback to stream the response with server-sent-events
+        async for token in callback.aiter():
+            logger.info("Token: %s", token)
+
+            # Add the token to the response_tokens list
+            response_tokens.append(token)
+
+            yield f"data: {token}\n\n"
+
+        await task
+
+        # Join the tokens to create the assistant's response
+        assistant_answer = "".join(response_tokens)
+
+        update_chat_history(
+            chat_id=self.chat_id,
+            user_message=question,
+            assistant_answer=assistant_answer,
+        )

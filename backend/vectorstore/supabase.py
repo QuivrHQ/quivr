@@ -24,6 +24,7 @@ class CustomSupabaseVectorStore(SupabaseVectorStore):
     def similarity_search(
         self,
         query: str,
+        user_id: str = "none",
         table: str = "match_vectors",
         k: int = 6,
         threshold: float = 0.5,
