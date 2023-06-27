@@ -6,9 +6,9 @@ import { useBrainConfig } from "@/lib/context/BrainConfigProvider/hooks/useBrain
 import { useToast } from "@/lib/hooks";
 import { useEventTracking } from "@/services/analytics/useEventTracking";
 
-import { useChatService } from "./useChatService";
 import { useChatContext } from "../context/ChatContext";
 import { ChatQuestion } from "../types";
+import { useChatService } from "./useChatService";
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const useChat = () => {
@@ -28,6 +28,8 @@ export const useChat = () => {
     createChat,
     getChatHistory,
     addQuestion: addQuestionToChat,
+    streamResponse,
+    addStreamQuestion,
   } = useChatService();
 
   useEffect(() => {
@@ -64,8 +66,8 @@ export const useChat = () => {
         (await generateNewChatIdFromName(
           question.split(" ").slice(0, 3).join(" ")
         ));
-      const answer = await addQuestionToChat(currentChatId, chatQuestion);
-      addToHistory(answer);
+      addStreamQuestion(currentChatId, chatQuestion);
+      // addToHistory(answer);
       callback?.();
     } catch (error) {
       console.error({ error });
@@ -88,5 +90,5 @@ export const useChat = () => {
     }
   };
 
-  return { history, addQuestion, generatingAnswer };
+  return { history, addQuestion, generatingAnswer, streamResponse };
 };
