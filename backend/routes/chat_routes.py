@@ -5,7 +5,9 @@ from typing import List
 from uuid import UUID
 
 from auth.auth_bearer import AuthBearer, get_current_user
+
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
+
 from fastapi.responses import StreamingResponse
 from llm.brainpicking import BrainPicking
 from llm.BrainPickingOpenAIFunctions.BrainPickingOpenAIFunctions import (
@@ -26,7 +28,7 @@ from utils.constants import (
     openai_function_compatible_models,
     streaming_compatible_models,
 )
-from utils.users import fetch_user_id_from_credentials, update_user_request_count
+from utils.users import update_user_request_count
 
 chat_router = APIRouter()
 
