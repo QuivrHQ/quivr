@@ -39,7 +39,22 @@ class BrainPicking(BaseModel):
     temperature: float = 0.0
     chat_id: str
     max_tokens: int = 256
+
+    # Storage
+    supabase_client: Client = None
+    vector_store: CustomSupabaseVectorStore = None
+
+    # Language models
+    embeddings: OpenAIEmbeddings = None
+    question_llm: LLM = None
+    doc_llm: LLM = None
+    question_generator: LLMChain = None
+    doc_chain: LLMChain = None
+    qa: ConversationalRetrievalChain = None
+
+    # Streaming
     callback: AsyncIteratorCallbackHandler = None
+    streaming: bool = False
 
     # Storage
     supabase_client: Client = None
