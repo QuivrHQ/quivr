@@ -1,4 +1,6 @@
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
+import { useState } from "react";
+
 import { useAxios } from "@/lib/hooks";
 
 import { ChatEntity, ChatHistory, ChatQuestion } from "../types";
@@ -21,6 +23,7 @@ export const useChatService = () => {
 
     return rep;
   };
+
   const addQuestion = async (
     chatId: string,
     chatQuestion: ChatQuestion
@@ -37,9 +40,32 @@ export const useChatService = () => {
     ).data;
   };
 
+  const [streamResponse, setStreamResponse] = useState("");
+
+  const addStreamQuestion = (
+    chatId: string,
+    chatQuestion: ChatQuestion
+  ): void => {
+    axiosInstance
+      .post<string>(`/chat/${chatId}/question/stream`, chatQuestion, {
+        headers: {
+          Accept: "text/event-stream",
+        },
+      })
+      .then((response) => {
+        setStreamResponse((prev) => prev + JSON.stringify(response.data));
+        console.log({ data: response.data });
+      })
+      .catch((error) => {
+        console.log({ error: JSON.stringify(error) });
+      });
+  };
+
   return {
     createChat,
     getChatHistory,
     addQuestion,
+    addStreamQuestion,
+    streamResponse,
   };
 };
