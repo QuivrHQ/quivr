@@ -34,8 +34,6 @@ class File(BaseModel):
             self.file_size = self.file.file._file.tell() 
             self.file_extension = os.path.splitext(self.file.filename)[-1].lower()
       
-
-
     async def compute_file_sha1(self):
         with tempfile.NamedTemporaryFile(delete=False, suffix=self.file.filename) as tmp_file:
             await self.file.seek(0)
@@ -82,6 +80,7 @@ class File(BaseModel):
     
     def file_already_exists(self, brain_id):
         commons = common_dependencies() 
+
         self.set_file_vectors_ids()
 
         print("file_sha1", self.file_sha1)
