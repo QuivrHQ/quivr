@@ -5,6 +5,8 @@ import { useCallback, useRef, useState } from "react";
 import { useSupabase } from "@/lib/context/SupabaseProvider";
 import { useAxios } from "@/lib/hooks";
 import { useToast } from "@/lib/hooks/useToast";
+import { useEventTracking } from "@/services/analytics/useEventTracking";
+
 
 import { isValidUrl } from "../helpers/isValidUrl";
 
@@ -14,6 +16,8 @@ export const useCrawler = () => {
   const { session } = useSupabase();
   const { publish } = useToast();
   const { axiosInstance } = useAxios();
+  const { track} = useEventTracking();
+
 
   if (session === null) {
     redirect("/login");
@@ -25,6 +29,7 @@ export const useCrawler = () => {
 
     if (!url || !isValidUrl(url)) {
       // Assuming you have a function to validate URLs
+      void track("URL_INVALID");
       publish({
         variant: "danger",
         text: "Invalid URL",
@@ -43,6 +48,7 @@ export const useCrawler = () => {
     };
 
     setCrawling(true);
+    void track("URL_CRAWLED");
 
     try {
       const response = await axiosInstance.post(`/crawl/`, config);
