@@ -1,8 +1,9 @@
-from logger import get_logger
-from models.settings import common_dependencies
 from dataclasses import dataclass
-from models.chat import Chat
+from uuid import UUID
 
+from logger import get_logger
+from models.chat import Chat
+from models.settings import common_dependencies
 
 logger = get_logger(__name__)
 
@@ -15,7 +16,7 @@ class CreateChatProperties:
         self.name = name
 
 
-def create_chat(user_id: str, chat_data: CreateChatProperties) -> Chat:
+def create_chat(user_id: UUID, chat_data: CreateChatProperties) -> Chat:
     commons = common_dependencies()
 
     # Chat is created upon the user's first question asked
@@ -23,7 +24,7 @@ def create_chat(user_id: str, chat_data: CreateChatProperties) -> Chat:
 
     # Insert a new row into the chats table
     new_chat = {
-        "user_id": user_id,
+        "user_id": str(user_id),
         "chat_name": chat_data.name,
     }
     insert_response = commons["supabase"].table("chats").insert(new_chat).execute()
