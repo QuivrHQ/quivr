@@ -27,6 +27,7 @@ class BrainPickingOpenAIFunctions(BrainPicking):
         max_tokens: int,
         user_email: str,
         user_openai_api_key: str,
+        docRetrieval: bool,
     ) -> None:
         # Call the constructor of the parent class (BrainPicking)
         super().__init__(
@@ -36,6 +37,7 @@ class BrainPickingOpenAIFunctions(BrainPicking):
             max_tokens=max_tokens,
             user_openai_api_key=user_openai_api_key,
             temperature=temperature,
+            docRetrieval=docRetrieval,
         )
         self.openai_client = ChatOpenAI(openai_api_key=self.settings.openai_api_key)
         self.user_email = user_email
@@ -98,12 +100,21 @@ class BrainPickingOpenAIFunctions(BrainPicking):
         Constructs a prompt given a question, and optionally include context and history
         """
         logger.info("Constructing prompt")
-        system_messages = [
-            {
-                "role": "system",
-                "content": "Your name is Quivr. You are a second brain. A person will ask you a question and you will provide a helpful answer. Write the answer in the same language as the question.If you don't know the answer, just say that you don't know. Don't try to make up an answer.our main goal is to answer questions about user uploaded documents. Unless basic questions or greetings, you should always refer to user uploaded documents by fetching them with the get_context function.",
-            }
-        ]
+        system_messages = []
+        if self.docRetrieval:
+            system_messages = [
+                {
+                    "role": "system",
+                    "content": "Your name is Quivr. You are a second brain. A person will ask you a question and you will provide a helpful answer. Write the answer in the same language as the question.If you don't know the answer, just say that you don't know. Don't try to make up an answer.our main goal is to answer questions about user uploaded documents. Unless basic questions or greetings, you should always refer to user uploaded documents by fetching them with the get_context function.",
+                }
+            ]
+        else:
+            system_messages = [
+                {
+                    "role": "system",
+                    "content": "Your name is Quivr. You are a personal assistant.",
+                }
+            ]
 
         if useHistory:
             logger.info("Adding chat history to prompt")
@@ -127,25 +138,37 @@ class BrainPickingOpenAIFunctions(BrainPicking):
         """
         Main function to get an answer for the given question
         """
-        logger.info("Getting answer")
-        functions = [
-            {
-                "name": "get_history",
-                "description": "Used to get the chat history between the user and the assistant",
-                "parameters": {"type": "object", "properties": {}},
-            },
-            {
-                "name": "get_context",
-                "description": "Used for retrieving documents related to the question to help answer the question",
-                "parameters": {"type": "object", "properties": {}},
-            },
-            {
-                "name": "get_history_and_context",
-                "description": "Used for retrieving documents related to the question to help answer the question and the previous chat history",
-                "parameters": {"type": "object", "properties": {}},
-            },
-        ]
 
+        functions = []
+
+        if self.docRetrieval:
+            logger.info("Getting answer")
+            functions = [
+                {
+                    "name": "get_history",
+                    "description": "Used to get the chat history between the user and the assistant",
+                    "parameters": {"type": "object", "properties": {}},
+                },
+                {
+                    "name": "get_context",
+                    "description": "Used for retrieving documents related to the question to help answer the question",
+                    "parameters": {"type": "object", "properties": {}},
+                },
+                {
+                    "name": "get_history_and_context",
+                    "description": "Used for retrieving documents related to the question to help answer the question and the previous chat history",
+                    "parameters": {"type": "object", "properties": {}},
+                },
+            ]
+        else:
+            logger.info("Not using doc retrieval")
+            functions = [
+                {
+                    "name": "get_history",
+                    "description": "Always use this function",
+                    "parameters": {"type": "object", "properties": {}},
+                },
+            ]
         # First, try to get an answer using just the question
         response = self._get_model_response(
             messages=self._construct_prompt(question), functions=functions

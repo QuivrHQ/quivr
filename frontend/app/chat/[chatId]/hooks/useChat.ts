@@ -6,9 +6,9 @@ import { useBrainConfig } from "@/lib/context/BrainConfigProvider/hooks/useBrain
 import { useToast } from "@/lib/hooks";
 import { useEventTracking } from "@/services/analytics/useEventTracking";
 
-import { useChatService } from "./useChatService";
 import { useChatContext } from "../context/ChatContext";
 import { ChatQuestion } from "../types";
+import { useChatService } from "./useChatService";
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const useChat = () => {
@@ -21,7 +21,7 @@ export const useChat = () => {
   const {
     config: { maxTokens, model, temperature },
   } = useBrainConfig();
-  const { history, setHistory, addToHistory } = useChatContext();
+  const { history, setHistory, addToHistory, docRetrieval } = useChatContext();
   const { publish } = useToast();
 
   const {
@@ -53,6 +53,7 @@ export const useChat = () => {
       question,
       temperature,
       max_tokens: maxTokens,
+      docRetrieval,
     };
 
     try {

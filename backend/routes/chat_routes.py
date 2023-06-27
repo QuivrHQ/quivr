@@ -171,6 +171,7 @@ async def create_question_handler(
                 max_tokens=chat_question.max_tokens,
                 user_id=current_user.email,
                 user_openai_api_key=user_openai_api_key,
+                docRetrieval=chat_question.docRetrieval,
             )
             answer = gpt_answer_generator.generate_answer(chat_question.question)
         elif chat_question.model in openai_function_compatible_models:
@@ -183,6 +184,7 @@ async def create_question_handler(
                 # TODO: use user_id in vectors table instead of email
                 user_email=current_user.email,
                 user_openai_api_key=user_openai_api_key,
+                docRetrieval=chat_question.docRetrieval,
             )
             answer = gpt_answer_generator.generate_answer(chat_question.question)
         else:
@@ -193,6 +195,7 @@ async def create_question_handler(
                 temperature=chat_question.temperature,
                 user_id=current_user.email,
                 user_openai_api_key=user_openai_api_key,
+                docRetrieval=chat_question.docRetrieval,
             )
             answer = brainPicking.generate_answer(chat_question.question)
 

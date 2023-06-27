@@ -8,6 +8,8 @@ type ChatContextProps = {
   history: ChatHistory[];
   setHistory: (history: ChatHistory[]) => void;
   addToHistory: (message: ChatHistory) => void;
+  setDocRetrieval: (docRetrieval: boolean) => void;
+  docRetrieval: boolean;
 };
 
 export const ChatContext = createContext<ChatContextProps | undefined>(
@@ -23,6 +25,7 @@ export const ChatProvider = ({
   const addToHistory = (message: ChatHistory) => {
     setHistory((prevHistory) => [...prevHistory, message]);
   };
+  const [docRetrieval, setDocRetrieval] = useState<boolean>(false);
 
   return (
     <ChatContext.Provider
@@ -30,6 +33,8 @@ export const ChatProvider = ({
         history,
         setHistory,
         addToHistory,
+        docRetrieval,
+        setDocRetrieval,
       }}
     >
       {children}

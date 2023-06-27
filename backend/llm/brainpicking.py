@@ -68,6 +68,7 @@ class BrainPicking(BaseModel):
     doc_chain: ConversationalRetrievalChain = None
     chat_id: str
     max_tokens: int = 256
+    docRetrieval: bool
 
     class Config:
         # Allowing arbitrary types for class validation
@@ -81,6 +82,7 @@ class BrainPicking(BaseModel):
         chat_id: str,
         max_tokens: int,
         user_openai_api_key: str,
+        docRetrieval: bool,
     ) -> "BrainPicking":
         """
         Initialize the BrainPicking class by setting embeddings, supabase client, vector store, language model and chains.
@@ -95,11 +97,13 @@ class BrainPicking(BaseModel):
             max_tokens=max_tokens,
             temperature=temperature,
             user_openai_api_key=user_openai_api_key,
+            docRetrieval=docRetrieval,
         )
         # If user provided an API key, update the settings
         if user_openai_api_key is not None:
             self.settings.openai_api_key = user_openai_api_key
 
+        self.docRetrieval = docRetrieval
         self.temperature = temperature
         self.embeddings = OpenAIEmbeddings(openai_api_key=self.settings.openai_api_key)
         self.supabase_client = create_client(
