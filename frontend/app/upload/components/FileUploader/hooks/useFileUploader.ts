@@ -26,7 +26,7 @@ export const useFileUploader = () => {
   const upload = useCallback(
     async (file: File, brainId: UUID) => {
       const formData = new FormData();
-      formData.append("file", file);
+      formData.append("uploadFile", file);
       try {
         void track("FILE_UPLOADED");
         const response = await axiosInstance.post(

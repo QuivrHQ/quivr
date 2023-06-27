@@ -4,9 +4,9 @@ from uuid import UUID
 from auth.auth_bearer import AuthBearer, get_current_user
 from fastapi import APIRouter, Depends, Query, Request, UploadFile
 from models.brains import Brain
-from models.settings import CommonsDep, common_dependencies
+from models.files import File
+from models.settings import common_dependencies
 from models.users import User
-from pydantic import BaseModel
 from utils.file import convert_bytes, get_file_size
 from utils.processors import filter_file
 
@@ -24,7 +24,7 @@ def get_user_vectors(commons, user):
 
 
 @upload_router.post("/upload", dependencies=[Depends(AuthBearer())], tags=["Upload"])
-async def upload_file(request: Request,  file: UploadFile, brain_id: UUID = Query(..., description="The ID of the brain"), enable_summarization: bool = False, current_user: User = Depends(get_current_user)):
+async def upload_file(request: Request,  uploadFile: UploadFile, brain_id: UUID = Query(..., description="The ID of the brain"), enable_summarization: bool = False, current_user: User = Depends(get_current_user)):
     """
     Upload a file to the user's storage.
 
@@ -49,12 +49,15 @@ async def upload_file(request: Request,  file: UploadFile, brain_id: UUID = Quer
         brain.max_brain_size = os.getenv("MAX_BRAIN_SIZE_WITH_KEY",209715200)
     remaining_free_space =  brain.remaining_brain_size
 
-    
-    file_size = get_file_size(file)
 
+    
+    file_size = get_file_size(uploadFile)
+
+    file = File(file=uploadFile)
     if remaining_free_space - file_size < 0:
         message = {"message": f"❌ User's brain will exceed maximum capacity with this upload. Maximum file allowed is : {convert_bytes(remaining_free_space)}", "type": "error"}
     else: 
+
         message = await filter_file(commons, file, enable_summarization, brain_id=brain_id ,openai_api_key=request.headers.get('Openai-Api-Key', None))
  
     return message

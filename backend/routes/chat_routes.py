@@ -1,10 +1,11 @@
 import os
 import time
 from http.client import HTTPException
+from typing import List
 from uuid import UUID
 
 from auth.auth_bearer import AuthBearer, get_current_user
-from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from llm.brainpicking import BrainPicking
 from llm.BrainPickingOpenAIFunctions.BrainPickingOpenAIFunctions import \
     BrainPickingOpenAIFunctions
@@ -19,7 +20,6 @@ from repository.chat.get_chat_history import get_chat_history
 from repository.chat.get_user_chats import get_user_chats
 from repository.chat.update_chat import ChatUpdatableProperties, update_chat
 from repository.chat.update_chat_history import update_chat_history
-from utils.users import (update_user_request_count)
 
 chat_router = APIRouter()
 
@@ -39,19 +39,6 @@ def delete_chat_from_db(commons, chat_id):
     commons["supabase"].table("chats").delete().match({"chat_id": chat_id}).execute()
 
 
-def fetch_user_stats(commons, user, date):
-    response = (
-        commons["supabase"]
-        .from_("users")
-        .select("*")
-        .filter("user_id", "eq", user.id)
-        .filter("date", "eq", date)
-        .execute()
-    )
-    userItem = next(iter(response.data or []), {"requests_count": 0})
-    return userItem
-
-
 # get all chats
 @chat_router.get("/chat", dependencies=[Depends(AuthBearer())], tags=["Chat"])
 async def get_chats(current_user: User = Depends(get_current_user)):
@@ -65,7 +52,7 @@ async def get_chats(current_user: User = Depends(get_current_user)):
     containing the chat ID and chat name for each chat.
     """
     commons = common_dependencies()
-    chats = get_user_chats(commons, current_user.id)
+    chats = get_user_chats( current_user.id)
     return {"chats": chats}
 
 
@@ -107,20 +94,15 @@ async def update_chat_metadata_handler(
 
 # helper method for update and create chat
 def check_user_limit(
-    email,
-    user_openai_api_key: str = None,
+    user : User,
+    
 ):
-    if user_openai_api_key is None:
+    if user.user_openai_api_key is None:
         date = time.strftime("%Y%m%d")
         max_requests_number = os.getenv("MAX_REQUESTS_NUMBER")
-        commons = common_dependencies()
-        userItem = fetch_user_stats(commons, User(email=email), date)
-        old_request_count = userItem["requests_count"]
 
-        update_user_request_count(
-            commons, email, date, requests_count=old_request_count + 1
-        )
-        if old_request_count >= float(max_requests_number):
+        user.increment_user_request_count( date )
+        if user.requests_count >= float(max_requests_number):
             raise HTTPException(
                 status_code=429,
                 detail="You have reached the maximum number of requests for today.",
@@ -139,8 +121,7 @@ async def create_chat_handler(
     Create a new chat with initial chat messages.
     """
 
-    commons = common_dependencies()
-    return create_chat(user_id=current_user.id, chat_data=chat_data)
+    return create_chat(user_id=current_user.id,chat_data=chat_data)
 
 
 # add new question to chat
@@ -151,11 +132,13 @@ async def create_question_handler(
     request: Request,
     chat_question: ChatQuestion,
     chat_id: UUID,
+    brain_id: UUID = Query(..., description="The ID of the brain"),
     current_user: User = Depends(get_current_user),
 ) -> ChatHistory:
+    current_user.user_openai_api_key = request.headers.get("Openai-Api-Key")
+    print("current_user", current_user)
     try:
-        user_openai_api_key = request.headers.get("Openai-Api-Key")
-        check_user_limit(current_user.email, user_openai_api_key)
+        check_user_limit(current_user)
         llm_settings = LLMSettings()
         openai_function_compatible_models = [
             "gpt-3.5-turbo-0613",
@@ -167,8 +150,8 @@ async def create_question_handler(
                 chat_id=str(chat_id),
                 temperature=chat_question.temperature,
                 max_tokens=chat_question.max_tokens,
-                user_id=current_user.email,
-                user_openai_api_key=user_openai_api_key,
+                brain_id = brain_id,
+                user_openai_api_key=current_user.user_openai_api_key,
             )
             answer = gpt_answer_generator.generate_answer(chat_question.question)
         elif chat_question.model in openai_function_compatible_models:
@@ -179,8 +162,8 @@ async def create_question_handler(
                 temperature=chat_question.temperature,
                 max_tokens=chat_question.max_tokens,
                 # TODO: use user_id in vectors table instead of email
-                user_email=current_user.email,
-                user_openai_api_key=user_openai_api_key,
+                brain_id = brain_id,
+                user_openai_api_key=current_user.user_openai_api_key,
             )
             answer = gpt_answer_generator.generate_answer(chat_question.question)
         else:
@@ -190,7 +173,8 @@ async def create_question_handler(
                 max_tokens=chat_question.max_tokens,
                 temperature=chat_question.temperature,
                 user_id=current_user.email,
-                user_openai_api_key=user_openai_api_key,
+                brain_id = brain_id,
+                user_openai_api_key=current_user.user_openai_api_key,
             )
             answer = brainPicking.generate_answer(chat_question.question)
 
@@ -210,7 +194,6 @@ async def create_question_handler(
 )
 async def get_chat_history_handler(
     chat_id: UUID,
-    current_user: User = Depends(get_current_user),
-) -> list[ChatHistory]:
+) -> List[ChatHistory]:
     # TODO: RBAC with current_user
     return get_chat_history(chat_id)
