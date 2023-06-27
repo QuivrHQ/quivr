@@ -38,29 +38,32 @@ export const ChatsList = (): JSX.Element => {
           }}
           className={cn("overflow-hidden")}
         >
-          <div className="min-w-fit max-h-screen overflow-auto scrollbar pt-20">
-            <aside className="relative max-w-xs w-full h-screen">
-              <NewChatButton />
-              <div className="flex flex-col gap-0">
-                {allChats.map((chat) => (
-                  <ChatsListItem
-                    key={chat.chat_id}
-                    chat={chat}
-                    deleteChat={deleteChat}
-                  />
-                ))}
-              </div>
-            </aside>
-            <div className="fixed bottom-0 left-0 p-4 py-1 absolute w-full bg-white">
-              <MiniFooter />
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              flex: 1,
+              height: "90vh",
+            }}
+          >
+            <NewChatButton />
+            <div style={{ flex: 1, overflow: "scroll", height: "100%" }}>
+              {allChats.map((chat) => (
+                <ChatsListItem
+                  key={chat.chat_id}
+                  chat={chat}
+                  deleteChat={deleteChat}
+                />
+              ))}
             </div>
+            <MiniFooter />
           </div>
         </motion.div>
         <button
           onClick={() => {
             setOpen(!open);
           }}
-          className="absolute left-full top-16 lg:top-0 text-3xl bg-black dark:bg-white text-white dark:text-black rounded-r-full p-3 pl-1"
+          className="absolute left-full top-16 text-3xl bg-black dark:bg-white text-white dark:text-black rounded-r-full p-3 pl-1"
         >
           <motion.div
             whileTap={{ scale: 0.9 }}
