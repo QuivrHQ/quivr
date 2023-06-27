@@ -3,7 +3,7 @@ import time
 
 from auth.auth_bearer import AuthBearer, get_current_user
 from fastapi import APIRouter, Depends, Request
-from models.settings import CommonsDep, common_dependencies
+from models.brains import Brain, get_default_user_brain
 from models.users import User
 
 user_router = APIRouter()
@@ -39,7 +39,6 @@ async def get_user_endpoint(request: Request, current_user: User = Depends(get_c
     user's uploaded vectors, and the maximum brain size is obtained from the environment variables. The requests statistics provide
     information about the user's API usage.
     """
-    commons = common_dependencies()
     # user_vectors = get_user_vectors(commons, current_user.email)
     # user_unique_vectors = get_unique_documents(user_vectors)
 
@@ -53,9 +52,11 @@ async def get_user_endpoint(request: Request, current_user: User = Depends(get_c
     max_requests_number = os.getenv("MAX_REQUESTS_NUMBER")
     requests_stats = current_user.get_user_request_stats()
 
+    defaultBrain = Brain(id=get_default_user_brain(current_user)['id'])
+    
     return {"email": current_user.email, 
             "max_brain_size": max_brain_size, 
-            "current_brain_size": 35, 
+            "current_brain_size": defaultBrain.brain_size, 
             "max_requests_number": max_requests_number,
             "requests_stats" : requests_stats,
             "date": date,

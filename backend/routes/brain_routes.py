@@ -4,7 +4,7 @@ from uuid import UUID
 from auth.auth_bearer import AuthBearer, get_current_user
 from fastapi import APIRouter, Depends, Request
 from logger import get_logger
-from models.brains import Brain
+from models.brains import Brain, get_default_user_brain
 from models.settings import common_dependencies
 from models.users import User
 from pydantic import BaseModel
@@ -41,6 +41,21 @@ async def brain_endpoint(current_user: User = Depends(get_current_user)):
     return {"brains": brains}
 
 
+@brain_router.get("/brains/default", dependencies=[Depends(AuthBearer())], tags=["Brain"])
+async def get_default_brain_endpoint(current_user: User = Depends(get_current_user)):
+    """
+    Retrieve the default brain for the current user.
+
+    - `current_user`: The current authenticated user.
+    - Returns the default brain for the user.
+
+    This endpoint retrieves the default brain associated with the current authenticated user. 
+    The default brain is defined as the brain marked as default in the brains_users table.
+    """
+
+    default_brain = get_default_user_brain(current_user)
+    return default_brain
+
 # get one brain
 @brain_router.get(
     "/brains/{brain_id}", dependencies=[Depends(AuthBearer())], tags=["Brain"]
@@ -55,7 +70,7 @@ async def get_brain_endpoint(brain_id: UUID):
     This endpoint retrieves the details of a specific brain identified by the provided brain ID. It returns the brain ID and its
     history, which includes the brain messages exchanged in the brain.
     """
-    brain = Brain(brain_id=brain_id)
+    brain = Brain(id=brain_id)
     brains = brain.get_brain_details()
     if len(brains) > 0:
         return {
@@ -75,7 +90,7 @@ async def delete_brain_endpoint(brain_id: UUID):
     """
     Delete a specific brain by brain ID.
     """
-    brain = Brain(brain_id=brain_id)
+    brain = Brain(id=brain_id)
     brain.delete_brain()
     return {"message": f"{brain_id}  has been deleted."}
 
@@ -133,7 +148,7 @@ async def update_brain_endpoint(
     Return modified brain ? No need -> do an optimistic update
     """
     commons = common_dependencies()
-    brain = Brain(brain_id=brain_id)
+    brain = Brain(id=brain_id)
 
     # Add new file to brain , il file_sha1 already exists in brains_vectors -> out (not now)
     if brain.file_sha1:

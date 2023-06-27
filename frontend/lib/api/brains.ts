@@ -17,6 +17,19 @@ export const createBrainFromBackend = async (
   }
 };
 
+export const getUserDefaultBrainFromBackend = async (
+  axiosInstance: AxiosInstance
+): Promise<Brain | undefined> => {
+  try {
+    const defaultBrain = (await axiosInstance.get<Brain>(`/brains/default`))
+      .data;
+
+    return { id: defaultBrain.id, name: defaultBrain.name };
+  } catch (error) {
+    console.error(`Error getting user's default brain`, error);
+  }
+};
+
 export const getBrainFromBE = async (
   axiosInstance: AxiosInstance,
   brainId: UUID
