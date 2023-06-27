@@ -1,7 +1,8 @@
+from typing import List  # For type hinting
+
+from fastapi import HTTPException
 from models.chat import ChatHistory
 from models.settings import common_dependencies
-from typing import List  # For type hinting
-from fastapi import HTTPException
 
 
 def update_chat_history(

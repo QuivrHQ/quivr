@@ -10,7 +10,6 @@ from routes.chat_routes import chat_router
 from routes.crawl_routes import crawl_router
 from routes.explore_routes import explore_router
 from routes.misc_routes import misc_router
-from routes.stream_routes import stream_router
 from routes.upload_routes import upload_router
 from routes.user_routes import user_router
 
@@ -35,7 +34,6 @@ app.include_router(misc_router)
 app.include_router(upload_router)
 app.include_router(user_router)
 app.include_router(api_key_router)
-app.include_router(stream_router)
 
 
 @app.exception_handler(HTTPException)
