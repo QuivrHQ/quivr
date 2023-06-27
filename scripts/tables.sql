@@ -40,10 +40,10 @@ CREATE TABLE IF NOT EXISTS vectors (
 );
 
 -- Create function to match vectors
-CREATE OR REPLACE FUNCTION match_vectors(query_embedding VECTOR(1536), match_count INT, p_user_id TEXT)
+CREATE OR REPLACE FUNCTION match_vectors(query_embedding VECTOR(1536), match_count INT, p_brain_id UUID)
 RETURNS TABLE(
     id BIGINT,
-    user_id TEXT,
+    brain_id UUID,
     content TEXT,
     metadata JSONB,
     embedding VECTOR(1536),
@@ -53,20 +53,23 @@ RETURNS TABLE(
 BEGIN
     RETURN QUERY
     SELECT
-        id,
-        user_id,
-        content,
-        metadata,
-        embedding,
+        vectors.id,
+        brains_vectors.brain_id,
+        vectors.content,
+        vectors.metadata,
+        vectors.embedding,
         1 - (vectors.embedding <=> query_embedding) AS similarity
     FROM
         vectors
-    WHERE vectors.user_id = p_user_id
+    INNER JOIN
+        brains_vectors ON vectors.id = brains_vectors.vector_id
+    WHERE brains_vectors.brain_id = p_brain_id
     ORDER BY
         vectors.embedding <=> query_embedding
     LIMIT match_count;
 END;
 $$;
+
 
 -- Create stats table
 CREATE TABLE IF NOT EXISTS stats (

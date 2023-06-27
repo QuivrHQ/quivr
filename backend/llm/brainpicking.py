@@ -5,20 +5,20 @@ from langchain.chains import ConversationalRetrievalChain, LLMChain
 from langchain.chains.question_answering import load_qa_chain
 from langchain.chat_models import ChatOpenAI
 from langchain.embeddings.openai import OpenAIEmbeddings
-from langchain.llms import GPT4All
 from langchain.llms.base import LLM
 from langchain.memory import ConversationBufferMemory
 from llm.prompt.CONDENSE_PROMPT import CONDENSE_QUESTION_PROMPT
 from logger import get_logger
-from models.settings import BrainSettings  # Importing settings related to the 'brain'
+from models.settings import \
+    BrainSettings  # Importing settings related to the 'brain'
 from models.settings import LLMSettings  # For type hinting
 from pydantic import BaseModel  # For data validation and settings management
 from repository.chat.get_chat_history import get_chat_history
+from vectorstore.supabase import \
+    CustomSupabaseVectorStore  # Custom class for handling vector storage with Supabase
+
 from supabase import Client  # For interacting with Supabase database
 from supabase import create_client
-from vectorstore.supabase import (
-    CustomSupabaseVectorStore,
-)  # Custom class for handling vector storage with Supabase
 
 logger = get_logger(__name__)
 
@@ -76,7 +76,7 @@ class BrainPicking(BaseModel):
     def __init__(
         self,
         model: str,
-        user_id: str,
+        brain_id: str,
         temperature: float,
         chat_id: str,
         max_tokens: int,
@@ -85,12 +85,12 @@ class BrainPicking(BaseModel):
         """
         Initialize the BrainPicking class by setting embeddings, supabase client, vector store, language model and chains.
         :param model: Language model name to be used.
-        :param user_id: The user id to be used for CustomSupabaseVectorStore.
+        :param user_brain_idid: The brain id to be used for CustomSupabaseVectorStore.
         :return: BrainPicking instance
         """
         super().__init__(
             model=model,
-            user_id=user_id,
+            brain_id=brain_id,
             chat_id=chat_id,
             max_tokens=max_tokens,
             temperature=temperature,
@@ -110,7 +110,7 @@ class BrainPicking(BaseModel):
             self.supabase_client,
             self.embeddings,
             table_name="vectors",
-            user_id=user_id,
+            brain_id=brain_id,
         )
 
         self.llm = self._determine_llm(
