@@ -9,7 +9,7 @@ import { MicButton } from "./MicButton";
 
 export const ChatInput = (): JSX.Element => {
   const [message, setMessage] = useState<string>(""); // for optimistic updates
-  const { addQuestion, generatingAnswer } = useChat();
+  const { addQuestion, generatingAnswer, streamResponse } = useChat();
 
   const submitQuestion = () => {
     addQuestion(message, () => setMessage(""));
@@ -24,6 +24,7 @@ export const ChatInput = (): JSX.Element => {
       }}
       className="sticky bottom-0 p-5 bg-white dark:bg-black rounded-t-md border border-black/10 dark:border-white/25 border-b-0 w-full max-w-3xl flex items-center justify-center gap-2 z-20"
     >
+      <p>{streamResponse}</p>
       <textarea
         autoFocus
         value={message}
