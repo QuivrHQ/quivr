@@ -1,15 +1,11 @@
 import os
 import tempfile
 import time
-from io import BytesIO
-from tempfile import NamedTemporaryFile
 
 import openai
-from fastapi import UploadFile
-from langchain.document_loaders import TextLoader
-from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.schema import Document
 from langchain.text_splitter import RecursiveCharacterTextSplitter
+from models.files import File
 from models.settings import CommonsDep
 from utils.file import compute_sha1_from_content
 
@@ -31,8 +27,9 @@ from utils.file import compute_sha1_from_content
 
 #     return transcript
 
-# async def process_audio(upload_file: UploadFile, stats_db):
-async def process_audio(commons: CommonsDep, upload_file: UploadFile, enable_summarization: bool, user, user_openai_api_key):
+# async def process_audio(upload_file: File, stats_db):
+
+async def process_audio(commons: CommonsDep, file: File, enable_summarization: bool, user, user_openai_api_key):
 
     temp_filename = None
     file_sha = ""
@@ -45,6 +42,7 @@ async def process_audio(commons: CommonsDep, upload_file: UploadFile, enable_sum
         openai_api_key = user_openai_api_key
 
     try:
+        upload_file = file.file
         # Here, we're writing the uploaded file to a temporary file, so we can use it with your existing code.
         with tempfile.NamedTemporaryFile(delete=False, suffix=upload_file.filename) as tmp_file:
             await upload_file.seek(0)
@@ -80,4 +78,3 @@ async def process_audio(commons: CommonsDep, upload_file: UploadFile, enable_sum
         if temp_filename and os.path.exists(temp_filename):
             os.remove(temp_filename)
 
-    return documents_vector_store
