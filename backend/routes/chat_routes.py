@@ -240,17 +240,18 @@ async def create_stream_question_handler(
     chat_id: UUID,
     current_user: User = Depends(get_current_user),
 ) -> StreamingResponse:
+    if (
+        os.getenv("PRIVATE") == "True"
+        or chat_question.model not in streaming_compatible_models
+    ):
+        # forward the request to the none streaming endpoint create_question_handler function
+        return await create_question_handler(
+            request, chat_question, chat_id, current_user
+        )
+
     try:
         user_openai_api_key = request.headers.get("Openai-Api-Key")
         check_user_limit(current_user.email, user_openai_api_key)
-
-        streaming = True
-
-        if chat_question.model not in streaming_compatible_models:
-            raise HTTPException(
-                status_code=400,
-                detail=f"Model {chat_question.model} is not compatible with streaming.",
-            )
 
         brain = BrainPicking(
             chat_id=str(chat_id),
@@ -259,7 +260,7 @@ async def create_stream_question_handler(
             temperature=chat_question.temperature,
             user_id=current_user.email,
             user_openai_api_key=user_openai_api_key,
-            streaming=streaming,
+            streaming=True,
         )
 
         return StreamingResponse(
