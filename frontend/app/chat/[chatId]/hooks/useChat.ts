@@ -8,9 +8,9 @@ import { generateUUID } from "@/lib/helpers/uuid";
 import { useToast } from "@/lib/hooks";
 import { useEventTracking } from "@/services/analytics/useEventTracking";
 
+import { useChatService } from "./useChatService";
 import { useChatContext } from "../context/ChatContext";
 import { ChatQuestion } from "../types";
-import { useChatService } from "./useChatService";
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const useChat = () => {
