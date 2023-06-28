@@ -34,6 +34,7 @@ from utils.file import compute_sha1_from_content
 # async def process_audio(upload_file: UploadFile, stats_db):
 async def process_audio(commons: CommonsDep, upload_file: UploadFile, enable_summarization: bool, user, user_openai_api_key):
 
+    temp_filename = None
     file_sha = ""
     dateshort = time.strftime("%Y%m%d-%H%M%S")
     file_meta_name = f"audiotranscript_{dateshort}.txt"
@@ -43,33 +44,40 @@ async def process_audio(commons: CommonsDep, upload_file: UploadFile, enable_sum
     if user_openai_api_key:
         openai_api_key = user_openai_api_key
 
-    # Here, we're writing the uploaded file to a temporary file, so we can use it with your existing code.
-    with tempfile.NamedTemporaryFile(delete=False, suffix=upload_file.filename) as tmp_file:
-        await upload_file.seek(0)
-        content = await upload_file.read()
-        tmp_file.write(content)
-        tmp_file.flush()
-        tmp_file.close()
+    try:
+        # Here, we're writing the uploaded file to a temporary file, so we can use it with your existing code.
+        with tempfile.NamedTemporaryFile(delete=False, suffix=upload_file.filename) as tmp_file:
+            await upload_file.seek(0)
+            content = await upload_file.read()
+            tmp_file.write(content)
+            tmp_file.flush()
+            tmp_file.close()
 
-        with open(tmp_file.name, "rb") as audio_file:
-            transcript = openai.Audio.transcribe("whisper-1", audio_file)
+            temp_filename = tmp_file.name
 
-    file_sha = compute_sha1_from_content(transcript.text.encode("utf-8"))
-    file_size = len(transcript.text.encode("utf-8"))
+            with open(tmp_file.name, "rb") as audio_file:
+                transcript = openai.Audio.transcribe("whisper-1", audio_file)
 
-    # Load chunk size and overlap from sidebar
-    chunk_size = 500
-    chunk_overlap = 0
+        file_sha = compute_sha1_from_content(transcript.text.encode("utf-8"))
+        file_size = len(transcript.text.encode("utf-8"))
 
-    text_splitter = RecursiveCharacterTextSplitter.from_tiktoken_encoder(
-        chunk_size=chunk_size, chunk_overlap=chunk_overlap)
-    texts = text_splitter.split_text(transcript)
+        # Load chunk size and overlap from sidebar
+        chunk_size = 500
+        chunk_overlap = 0
 
-    docs_with_metadata = [Document(page_content=text, metadata={"file_sha1": file_sha, "file_size": file_size, "file_name": file_meta_name,
-                                   "chunk_size": chunk_size, "chunk_overlap": chunk_overlap, "date": dateshort}) for text in texts]
+        text_splitter = RecursiveCharacterTextSplitter.from_tiktoken_encoder(
+            chunk_size=chunk_size, chunk_overlap=chunk_overlap)
+        texts = text_splitter.split_text(transcript.text.encode("utf-8"))
 
-    # if st.secrets.self_hosted == "false":
-    #     add_usage(stats_db, "embedding", "audio", metadata={"file_name": file_meta_name,"file_type": ".txt", "chunk_size": chunk_size, "chunk_overlap": chunk_overlap})
-    commons.documents_vector_store.add_documents(docs_with_metadata)
+        docs_with_metadata = [Document(page_content=text, metadata={"file_sha1": file_sha, "file_size": file_size, "file_name": file_meta_name,
+                                    "chunk_size": chunk_size, "chunk_overlap": chunk_overlap, "date": dateshort}) for text in texts]
+
+        # if st.secrets.self_hosted == "false":
+        #     add_usage(stats_db, "embedding", "audio", metadata={"file_name": file_meta_name,"file_type": ".txt", "chunk_size": chunk_size, "chunk_overlap": chunk_overlap})
+        commons.documents_vector_store.add_documents(docs_with_metadata)
+
+    finally:
+        if temp_filename and os.path.exists(temp_filename):
+            os.remove(temp_filename)
 
     return documents_vector_store
