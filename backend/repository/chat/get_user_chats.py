@@ -1,8 +1,10 @@
-from models.settings import common_dependencies
+from typing import List
+
 from models.chat import Chat
+from models.settings import common_dependencies
 
 
-def get_user_chats(user_id: str) -> list[Chat]:
+def get_user_chats(user_id: str) -> List[Chat]:
     commons = common_dependencies()
     response = (
         commons["supabase"]

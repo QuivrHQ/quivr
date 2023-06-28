@@ -2,11 +2,13 @@
 import Button from "@/lib/components/ui/Button";
 import Card from "@/lib/components/ui/Card";
 import Field from "@/lib/components/ui/Field";
+import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 
 import { useCrawler } from "./hooks/useCrawler";
 
 export const Crawler = (): JSX.Element => {
   const { urlInputRef, isCrawling, crawlWebsite } = useCrawler();
+  const { currentBrain } = useBrainContext();
 
   return (
     <div className="w-full">
@@ -24,7 +26,10 @@ export const Crawler = (): JSX.Element => {
                 />
               </div>
               <div className="flex flex-col items-center justify-center gap-5">
-                <Button isLoading={isCrawling} onClick={() => void crawlWebsite()}>
+                <Button
+                  isLoading={isCrawling}
+                  onClick={() => void crawlWebsite(currentBrain?.id)}
+                >
                   Crawl
                 </Button>
               </div>

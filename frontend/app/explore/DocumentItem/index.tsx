@@ -13,11 +13,11 @@ import { AnimatedCard } from "@/lib/components/ui/Card";
 import Ellipsis from "@/lib/components/ui/Ellipsis";
 import Modal from "@/lib/components/ui/Modal";
 import { useSupabase } from "@/lib/context/SupabaseProvider";
-import { useAxios } from "@/lib/hooks";
-import { useToast } from "@/lib/hooks/useToast";
+import { useAxios, useToast } from "@/lib/hooks";
 import { Document } from "@/lib/types/Document";
 import { useEventTracking } from "@/services/analytics/useEventTracking";
 
+import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 import DocumentData from "./DocumentData";
 
 interface DocumentProps {
@@ -32,6 +32,7 @@ const DocumentItem = forwardRef(
     const { session } = useSupabase();
     const { axiosInstance } = useAxios();
     const { track } = useEventTracking();
+    const { currentBrain } = useBrainContext();
 
     if (!session) {
       throw new Error("User session not found");
@@ -41,9 +42,16 @@ const DocumentItem = forwardRef(
       setIsDeleting(true);
       void track("DELETE_DOCUMENT");
       try {
-        await axiosInstance.delete(`/explore/${name}`);
+        if (currentBrain?.id === undefined)
+          throw new Error("Brain id not found");
+        await axiosInstance.delete(
+          `/explore/${name}/?brain_id=${currentBrain.id}`
+        );
         setDocuments((docs) => docs.filter((doc) => doc.name !== name)); // Optimistic update
-        publish({ variant: "success", text: `${name} deleted.` });
+        publish({
+          variant: "success",
+          text: `${name} deleted from brain ${currentBrain.name}.`,
+        });
       } catch (error) {
         console.error(`Error deleting ${name}`, error);
       }

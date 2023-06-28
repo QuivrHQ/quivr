@@ -4,13 +4,14 @@ import time
 from langchain.document_loaders import GitLoader
 from langchain.schema import Document
 from langchain.text_splitter import RecursiveCharacterTextSplitter
+from models.brains import Brain
+from models.files import File
 from models.settings import CommonsDep
-from parsers.common import file_already_exists_from_content
 from utils.file import compute_sha1_from_content
 from utils.vectors import Neurons
 
 
-async def process_github(commons: CommonsDep, repo, enable_summarization, user, supabase, user_openai_api_key): 
+async def process_github(commons: CommonsDep, repo, enable_summarization, brain_id, user_openai_api_key): 
     random_dir_name = os.urandom(16).hex()
     dateshort = time.strftime("%Y%m%d")
     loader = GitLoader(
@@ -42,11 +43,22 @@ async def process_github(commons: CommonsDep, repo, enable_summarization, user, 
         }
         doc_with_metadata = Document(
             page_content=doc.page_content, metadata=metadata)
-        exist = await file_already_exists_from_content(supabase, doc.page_content.encode("utf-8"), user)
+        
+        file = File(file_sha1 = compute_sha1_from_content(doc.page_content.encode("utf-8")))
+        
+        exist = file.file_already_exists(brain_id)
         if not exist:
             neurons =  Neurons(commons=commons)
-            neurons.create_vector(user.email, doc_with_metadata, user_openai_api_key)
+            created_vector = neurons.create_vector(doc_with_metadata, user_openai_api_key)
+
+            created_vector_id = created_vector[0]
+
+            brain = Brain(id=brain_id)
+            brain.create_brain_vector(created_vector_id)
+
             print("Created vector for ", doc.metadata["file_name"])
+            # add created_vector x brains in db
+            
 
     return {"message": f"✅ Github with {len(documents)} files has been uploaded.", "type": "success"}
 

@@ -1,3 +1,2 @@
 export * from "./BrainProvider";
-export * from './FeatureFlagProvider';
-
+export * from "./FeatureFlagProvider";

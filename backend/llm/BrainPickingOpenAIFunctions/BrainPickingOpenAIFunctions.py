@@ -17,7 +17,7 @@ class BrainPickingOpenAIFunctions(BrainPicking):
     DEFAULT_MAX_TOKENS = 256
 
     openai_client: ChatOpenAI = None
-    user_email: str = None
+    brain_id: str = None
 
     def __init__(
         self,
@@ -25,20 +25,19 @@ class BrainPickingOpenAIFunctions(BrainPicking):
         chat_id: str,
         temperature: float,
         max_tokens: int,
-        user_email: str,
+        brain_id: str,
         user_openai_api_key: str,
     ) -> None:
         # Call the constructor of the parent class (BrainPicking)
         super().__init__(
             model=model,
-            user_id=user_email,
             chat_id=chat_id,
             max_tokens=max_tokens,
             user_openai_api_key=user_openai_api_key,
             temperature=temperature,
+            brain_id=str(brain_id),
         )
         self.openai_client = ChatOpenAI(openai_api_key=self.settings.openai_api_key)
-        self.user_email = user_email
 
     def _get_model_response(
         self,
@@ -86,10 +85,10 @@ class BrainPickingOpenAIFunctions(BrainPicking):
             self.supabase_client,
             self.embeddings,
             table_name="vectors",
-            user_id=self.user_email,
+            brain_id=self.brain_id,
         )
 
-        return vector_store.similarity_search(query=question, user_id=self.user_email)
+        return vector_store.similarity_search(query=question)
 
     def _construct_prompt(
         self, question: str, useContext: bool = False, useHistory: bool = False

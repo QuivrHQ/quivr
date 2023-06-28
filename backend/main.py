@@ -27,7 +27,6 @@ max_brain_size_with_own_key = os.getenv("MAX_BRAIN_SIZE_WITH_KEY", 209715200)
 async def startup_event():
     pypandoc.download_pandoc()
 
-
 app.include_router(brain_router)
 app.include_router(chat_router)
 app.include_router(crawl_router)

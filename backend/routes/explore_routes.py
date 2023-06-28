@@ -1,35 +1,22 @@
+from uuid import UUID
+
 from auth.auth_bearer import AuthBearer, get_current_user
-from fastapi import APIRouter, Depends
-from models.settings import CommonsDep, common_dependencies
+from fastapi import APIRouter, Depends, Query
+from models.brains import Brain
+from models.settings import common_dependencies
 from models.users import User
 
 explore_router = APIRouter()
 
 
-def get_unique_user_data(commons, user):
-    """
-    Retrieve unique user data vectors.
-    """
-    response = (
-        commons["supabase"]
-        .table("vectors")
-        .select("name:metadata->>file_name, size:metadata->>file_size", count="exact")
-        .filter("user_id", "eq", user.email)
-        .execute()
-    )
-    documents = response.data  # Access the data from the response
-    # Convert each dictionary to a tuple of items, then to a set to remove duplicates, and then back to a dictionary
-    unique_data = [dict(t) for t in set(tuple(d.items()) for d in documents)]
-    return unique_data
-
-
 @explore_router.get("/explore", dependencies=[Depends(AuthBearer())], tags=["Explore"])
-async def explore_endpoint(current_user: User = Depends(get_current_user)):
+async def explore_endpoint(brain_id: UUID = Query(..., description="The ID of the brain"),current_user: User = Depends(get_current_user)):
     """
     Retrieve and explore unique user data vectors.
     """
-    commons = common_dependencies()
-    unique_data = get_unique_user_data(commons, current_user)
+    brain = Brain(id=brain_id)
+    unique_data = brain.get_unique_brain_files()
+
     unique_data.sort(key=lambda x: int(x["size"]), reverse=True)
     return {"documents": unique_data}
 
@@ -37,20 +24,14 @@ async def explore_endpoint(current_user: User = Depends(get_current_user)):
 @explore_router.delete(
     "/explore/{file_name}", dependencies=[Depends(AuthBearer())], tags=["Explore"]
 )
-async def delete_endpoint(file_name: str, credentials: dict = Depends(AuthBearer())):
+async def delete_endpoint(file_name: str, current_user: User = Depends(get_current_user), brain_id: UUID = Query(..., description="The ID of the brain")):
     """
     Delete a specific user file by file name.
     """
-    commons = common_dependencies()
-    user = User(email=credentials.get("email", "none"))
-    # Cascade delete the summary from the database first, because it has a foreign key constraint
-    commons["supabase"].table("summaries").delete().match(
-        {"metadata->>file_name": file_name}
-    ).execute()
-    commons["supabase"].table("vectors").delete().match(
-        {"metadata->>file_name": file_name, "user_id": user.email}
-    ).execute()
-    return {"message": f"{file_name} of user {user.email} has been deleted."}
+    brain = Brain(id=brain_id)
+    brain.delete_file_from_brain(file_name)
+
+    return {"message": f"{file_name} of brain {brain_id} has been deleted by user {current_user.email}."}
 
 
 @explore_router.get(
@@ -62,6 +43,8 @@ async def download_endpoint(
     """
     Download a specific user file by file name.
     """
+    # check if user has the right to get the file: add brain_id to the query 
+
     commons = common_dependencies()
     response = (
         commons["supabase"]
@@ -70,7 +53,7 @@ async def download_endpoint(
             "metadata->>file_name, metadata->>file_size, metadata->>file_extension, metadata->>file_url",
             "content",
         )
-        .match({"metadata->>file_name": file_name, "user_id": current_user.email})
+        .match({"metadata->>file_name": file_name})
         .execute()
     )
     documents = response.data
