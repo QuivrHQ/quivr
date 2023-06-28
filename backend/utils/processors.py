@@ -1,10 +1,7 @@
-import os
 
-from fastapi import Depends, FastAPI, UploadFile
+from models.files import File
 from models.settings import CommonsDep
-from models.users import User
 from parsers.audio import process_audio
-from parsers.common import file_already_exists
 from parsers.csv import process_csv
 from parsers.docx import process_docx
 from parsers.epub import process_epub
@@ -15,7 +12,6 @@ from parsers.odt import process_odt
 from parsers.pdf import process_pdf
 from parsers.powerpoint import process_powerpoint
 from parsers.txt import process_txt
-from supabase import Client
 
 file_processors = {
     ".txt": process_txt,
@@ -41,16 +37,18 @@ file_processors = {
 
 
 
-async def filter_file(commons: CommonsDep, file: UploadFile, enable_summarization: bool, user: User, openai_api_key):
-    if await file_already_exists(commons['supabase'], file, user):
-        return {"message": f"🤔 {file.filename} already exists.", "type": "warning"}
-    elif file.file._file.tell()  < 1:
-        return {"message": f"❌ {file.filename} is empty.", "type": "error"}
+async def filter_file(commons: CommonsDep, file: File, enable_summarization: bool, brain_id, openai_api_key):
+    await file.compute_file_sha1()
+    
+    print("file sha1", file.file_sha1)
+    if file.file_already_exists( brain_id):
+        return {"message": f"🤔 {file.file.filename} already exists in brain {brain_id}.", "type": "warning"}
+    elif file.file_is_empty():
+        return {"message": f"❌ {file.file.filename} is empty.", "type": "error"}
     else:
-        file_extension = os.path.splitext(file.filename)[-1].lower()  # Convert file extension to lowercase
-        if file_extension in file_processors:
-            await file_processors[file_extension](commons,file, enable_summarization, user ,openai_api_key )
-            return {"message": f"✅ {file.filename} has been uploaded.", "type": "success"}
+        if file.file_extension in file_processors:
+            await file_processors[file.file_extension](commons,file, enable_summarization, brain_id ,openai_api_key )
+            return {"message": f"✅ {file.file.filename} has been uploaded to brain {brain_id}.", "type": "success"}
         else:
-            return {"message": f"❌ {file.filename} is not supported.", "type": "error"}
+            return {"message": f"❌ {file.file.filename} is not supported.", "type": "error"}
 

@@ -1,15 +1,16 @@
 -- Create users table
 CREATE TABLE IF NOT EXISTS users(
-    user_id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    user_id UUID REFERENCES auth.users (id),
     email TEXT,
     date TEXT,
-    requests_count INT
+    requests_count INT,
+    PRIMARY KEY (user_id, date)
 );
 
 -- Create chats table
 CREATE TABLE IF NOT EXISTS chats(
     chat_id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
-    user_id UUID REFERENCES users(user_id),
+    user_id UUID REFERENCES auth.users (id),
     creation_time TIMESTAMP DEFAULT current_timestamp,
     history JSONB,
     chat_name TEXT
@@ -31,17 +32,16 @@ CREATE EXTENSION IF NOT EXISTS vector;
 -- Create vectors table
 CREATE TABLE IF NOT EXISTS vectors (
     id BIGSERIAL PRIMARY KEY,
-    user_id TEXT,
     content TEXT,
     metadata JSONB,
     embedding VECTOR(1536)
 );
 
 -- Create function to match vectors
-CREATE OR REPLACE FUNCTION match_vectors(query_embedding VECTOR(1536), match_count INT, p_user_id TEXT)
+CREATE OR REPLACE FUNCTION match_vectors(query_embedding VECTOR(1536), match_count INT, p_brain_id UUID)
 RETURNS TABLE(
     id BIGINT,
-    user_id TEXT,
+    brain_id UUID,
     content TEXT,
     metadata JSONB,
     embedding VECTOR(1536),
@@ -51,20 +51,23 @@ RETURNS TABLE(
 BEGIN
     RETURN QUERY
     SELECT
-        id,
-        user_id,
-        content,
-        metadata,
-        embedding,
+        vectors.id,
+        brains_vectors.brain_id,
+        vectors.content,
+        vectors.metadata,
+        vectors.embedding,
         1 - (vectors.embedding <=> query_embedding) AS similarity
     FROM
         vectors
-    WHERE vectors.user_id = p_user_id
+    INNER JOIN
+        brains_vectors ON vectors.id = brains_vectors.vector_id
+    WHERE brains_vectors.brain_id = p_brain_id
     ORDER BY
         vectors.embedding <=> query_embedding
     LIMIT match_count;
 END;
 $$;
+
 
 -- Create stats table
 CREATE TABLE IF NOT EXISTS stats (
@@ -117,7 +120,7 @@ $$;
 -- Create api_keys table
 CREATE TABLE IF NOT EXISTS api_keys(
     key_id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-    user_id UUID REFERENCES users(user_id),
+    user_id UUID REFERENCES auth.users (id),
     api_key TEXT UNIQUE,
     creation_time TIMESTAMP DEFAULT current_timestamp,
     deleted_time TIMESTAMP,
@@ -139,17 +142,17 @@ CREATE TABLE IF NOT EXISTS brains_users (
   brain_id UUID,
   user_id UUID,
   rights VARCHAR(255),
+  default_brain BOOLEAN DEFAULT false,
   PRIMARY KEY (brain_id, user_id),
-  FOREIGN KEY (user_id) REFERENCES Users(user_id),
-  FOREIGN KEY (brain_id) REFERENCES Brains(brain_id)
+  FOREIGN KEY (user_id) REFERENCES auth.users (id),
+  FOREIGN KEY (brain_id) REFERENCES Brains (brain_id)
 );
 
 -- Create brains X vectors table
 CREATE TABLE IF NOT EXISTS brains_vectors (
   brain_id UUID,
-  vector_id BIGSERIAL,
-  rights VARCHAR(255),
+  vector_id BIGINT,
   PRIMARY KEY (brain_id, vector_id),
-  FOREIGN KEY (vector_id) REFERENCES vectors(id),
-  FOREIGN KEY (brain_id) REFERENCES brains(brain_id)
+  FOREIGN KEY (vector_id) REFERENCES vectors (id),
+  FOREIGN KEY (brain_id) REFERENCES brains (brain_id)
 );

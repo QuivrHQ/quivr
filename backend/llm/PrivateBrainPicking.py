@@ -1,25 +1,9 @@
-from typing import Any, Dict
 
 # Importing various modules and classes from a custom library 'langchain' likely used for natural language processing
-from langchain.chains import ConversationalRetrievalChain, LLMChain
-from langchain.chains.question_answering import load_qa_chain
-from langchain.chat_models import ChatOpenAI
-from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.llms import GPT4All
 from langchain.llms.base import LLM
-from langchain.memory import ConversationBufferMemory
 from llm.brainpicking import BrainPicking
-from llm.prompt.CONDENSE_PROMPT import CONDENSE_QUESTION_PROMPT
 from logger import get_logger
-from models.settings import BrainSettings  # Importing settings related to the 'brain'
-from models.settings import LLMSettings  # For type hinting
-from pydantic import BaseModel  # For data validation and settings management
-from repository.chat.get_chat_history import get_chat_history
-from supabase import Client  # For interacting with Supabase database
-from supabase import create_client
-from vectorstore.supabase import (
-    CustomSupabaseVectorStore,
-)  # Custom class for handling vector storage with Supabase
 
 logger = get_logger(__name__)
 
@@ -32,8 +16,8 @@ class PrivateBrainPicking(BrainPicking):
     def __init__(
         self,
         model: str,
-        user_id: str,
         chat_id: str,
+        brain_id:str,
         temperature: float,
         max_tokens: int,
         user_openai_api_key: str,
@@ -41,13 +25,13 @@ class PrivateBrainPicking(BrainPicking):
         """
         Initialize the PrivateBrainPicking class by calling the parent class's initializer.
         :param model: Language model name to be used.
-        :param user_id: The user id to be used for CustomSupabaseVectorStore.
+        :param brain_id: The user id to be used for CustomSupabaseVectorStore.
         :return: PrivateBrainPicking instance
         """
         # Call the parent class's initializer
         super().__init__(
             model=model,
-            user_id=user_id,
+            brain_id=brain_id,
             chat_id=chat_id,
             max_tokens=max_tokens,
             temperature=temperature,
