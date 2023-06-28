@@ -117,9 +117,12 @@ def check_user_limit(
         userItem = fetch_user_stats(commons, User(email=email), date)
         old_request_count = userItem["requests_count"]
 
+        if(old_request_count < float(max_requests_number))
+        {
         update_user_request_count(
-            commons, email, date, requests_count=old_request_count + 1
+                commons, email, date, requests_count=old_request_count + 1
         )
+        }
         if old_request_count >= float(max_requests_number):
             raise HTTPException(
                 status_code=429,
