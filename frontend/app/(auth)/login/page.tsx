@@ -2,7 +2,6 @@
 "use client";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { useState } from "react";
 
 import Button from "@/lib/components/ui/Button";
 import Card from "@/lib/components/ui/Card";
@@ -10,44 +9,30 @@ import { Divider } from "@/lib/components/ui/Divider";
 import Field from "@/lib/components/ui/Field";
 import PageHeading from "@/lib/components/ui/PageHeading";
 import { useSupabase } from "@/lib/context/SupabaseProvider";
-import { useToast } from "@/lib/hooks/useToast";
+
+import { useSearchParams } from "next/navigation";
 
 import { useEventTracking } from "@/services/analytics/useEventTracking";
 import { GoogleLoginButton } from "./components/GoogleLogin";
 import { MagicLinkLogin } from "./components/MagicLinkLogin";
+import { PasswordForgotten } from "./components/PasswordForgotten";
+import { useLogin } from "./hooks/useLogin";
 
 export default function Login() {
-  const { supabase, session } = useSupabase();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [isPending, setIsPending] = useState(false);
-  const { publish } = useToast();
+  const { session } = useSupabase();
   const { track } = useEventTracking();
+  const { handleLogin, setEmail, setPassword, email, isPending, password } =
+    useLogin();
 
-  const handleLogin = async () => {
-    setIsPending(true);
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email: email,
-      password: password,
-    });
-
-    if (error) {
-      publish({
-        variant: "danger",
-        text: error.message,
-      });
-    } else if (data) {
-      publish({
-        variant: "success",
-        text: "Successfully logged in",
-      });
-    }
-    setIsPending(false);
-  };
+  const params = useSearchParams();
+  const previousPage = params?.get("previous-page");
 
   if (session?.user !== undefined) {
     void track("SIGNED_IN");
-    redirect("/upload");
+    if (previousPage === undefined || previousPage === null) {
+      redirect("/upload");
+    }
+    redirect(previousPage as string);
   }
 
   return (
@@ -78,12 +63,16 @@ export default function Login() {
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Password"
             />
+
             <div className="flex flex-col items-center justify-center mt-2 gap-2">
               <Button type="submit" isLoading={isPending}>
                 Login
               </Button>
+              <PasswordForgotten setEmail={setEmail} email={email} />
+
               <Link href="/signup">Don{"'"}t have an account? Sign up</Link>
             </div>
+
             <Divider text="or" />
             <div className="flex flex-col items-center justify-center mt-2 gap-2">
               <GoogleLoginButton />
