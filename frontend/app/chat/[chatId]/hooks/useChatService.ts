@@ -1,8 +1,9 @@
 /* eslint-disable max-lines */
 
-import { useState } from "react";
+import { useCallback } from "react";
 
 import { useAxios } from "@/lib/hooks";
+import { useFetch } from "@/lib/hooks/useFetch";
 
 import { useChatContext } from "../context/ChatContext";
 import { ChatEntity, ChatHistory, ChatQuestion } from "../types";
@@ -20,57 +21,61 @@ interface UseChatService {
     chatQuestion: ChatQuestion,
     chatHistory: ChatHistory
   ) => Promise<void>;
-  streamResponse: string;
 }
 
 export const useChatService = (): UseChatService => {
   const { axiosInstance } = useAxios();
-  const { updateHistory } = useChatContext();
-  const [streamResponse, setStreamResponse] = useState<string>("");
+  const { fetchInstance } = useFetch();
+  const { updateHistory, updateStreamingHistory } = useChatContext();
 
   const createChat = async ({
     name,
   }: {
     name: string;
   }): Promise<ChatEntity> => {
-    return axiosInstance.post<ChatEntity>(`/chat`, { name });
+    const response = (await axiosInstance.post<ChatEntity>(`/chat`, { name }))
+      .data;
+
+    return response;
   };
 
-  const getChatHistory = async (
-    chatId: string | undefined
-  ): Promise<ChatHistory[]> => {
-    if (chatId === undefined) {
-      return [];
-    }
-    const rep = (
-      await axiosInstance.get<ChatHistory[]>(`/chat/${chatId}/history`)
-    ).data;
+  const getChatHistory = useCallback(
+    async (chatId: string | undefined): Promise<ChatHistory[]> => {
+      if (chatId === undefined) {
+        return [];
+      }
+      const response = (
+        await axiosInstance.get<ChatHistory[]>(`/chat/${chatId}/history`)
+      ).data;
 
-    return rep;
-  };
+      return response;
+    },
+    [axiosInstance]
+  );
 
   const addQuestion = async (
     chatId: string,
-    chatQuestion: ChatQuestion
+    chatQuestion: ChatQuestion,
+    chatHistory: ChatHistory
   ): Promise<void> => {
     const response = await axiosInstance.post<ChatHistory>(
       `/chat/${chatId}/question`,
       chatQuestion
     );
 
-    updateHistory(response.data);
+    updateHistory(chatHistory.message_id, response.data);
   };
 
   const handleStream = async (
     reader: ReadableStreamDefaultReader,
-    chatHistory: ChatHistory
-  ) => {
+    message_id: string
+  ): Promise<void> => {
     const decoder = new TextDecoder("utf-8");
     let buffer = "";
 
     while (true) {
       const { done, value } = await reader.read();
-      console.log("Reader status:", { done, value }); // log the status of the reader
+      console.log("Reader status:", { done, value });
 
       if (done || value === undefined) {
         break;
@@ -78,19 +83,16 @@ export const useChatService = (): UseChatService => {
 
       buffer += decoder.decode(value, { stream: true });
       const payloads = buffer.split("\n\n");
-      console.log("Payloads:", payloads); // log the payloads
       buffer = payloads.pop() as string;
-      console.log("Buffer:", buffer); // log the buffer
 
       payloads
         .filter((payload) => payload.startsWith("data:"))
         .map((dataPayload) =>
           dataPayload.replace("data: ", "").replace("\n\n", "")
         )
-        .forEach((data) => {
+        .forEach((data: string) => {
           console.log("Received data:", data);
-          setStreamResponse(`${streamResponse}${data}`);
-          updateHistory({ ...chatHistory, assistant: streamResponse });
+          updateStreamingHistory(message_id, data);
         });
     }
   };
@@ -100,28 +102,25 @@ export const useChatService = (): UseChatService => {
     chatQuestion: ChatQuestion,
     chatHistory: ChatHistory
   ): Promise<void> => {
-    const url = `http://localhost:5050/chat/${chatId}/question/stream`;
-    const requestOptions = {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "text/event-stream",
-        Authorization: "Bearer 27f13b64eb9ded70e241617fe01f0830",
-      },
-      body: JSON.stringify(chatQuestion),
+    const headers = {
+      "Content-Type": "application/json",
+      Accept: "text/event-stream",
     };
-
-    setStreamResponse("");
+    const body = JSON.stringify(chatQuestion);
 
     try {
-      const response = await fetch(url, requestOptions);
+      const response = await fetchInstance.post(
+        `/chat/${chatId}/question/stream`,
+        body,
+        headers
+      );
 
       if (response.body === null) {
         throw new Error("Response body is null");
       }
 
-      console.log("Received response. Starting to handle stream..."); // log when starting to handle the stream
-      await handleStream(response.body.getReader(), chatHistory);
+      console.log("Received response. Starting to handle stream...");
+      await handleStream(response.body.getReader(), chatHistory.message_id);
     } catch (error) {
       console.error("Error calling the API:", error);
     }
