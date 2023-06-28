@@ -2,8 +2,7 @@
 
 import { useCallback } from "react";
 
-import { useAxios } from "@/lib/hooks";
-import { useFetch } from "@/lib/hooks/useFetch";
+import { useAxios, useFetch } from "@/lib/hooks";
 
 import { useChatContext } from "../context/ChatContext";
 import { ChatEntity, ChatHistory, ChatQuestion } from "../types";
@@ -67,18 +66,17 @@ export const useChatService = (): UseChatService => {
   };
 
   const handleStream = async (
-    reader: ReadableStreamDefaultReader,
+    reader: ReadableStreamDefaultReader<Uint8Array>,
     message_id: string
   ): Promise<void> => {
     const decoder = new TextDecoder("utf-8");
     let buffer = "";
 
-    while (true) {
+    const handleStreamRecursively = async () => {
       const { done, value } = await reader.read();
-      console.log("Reader status:", { done, value });
 
-      if (done || value === undefined) {
-        break;
+      if (done) {
+        return;
       }
 
       buffer += decoder.decode(value, { stream: true });
@@ -91,10 +89,13 @@ export const useChatService = (): UseChatService => {
           dataPayload.replace("data: ", "").replace("\n\n", "")
         )
         .forEach((data: string) => {
-          console.log("Received data:", data);
           updateStreamingHistory(message_id, data);
         });
-    }
+
+      await handleStreamRecursively();
+    };
+
+    await handleStreamRecursively();
   };
 
   const addStreamQuestion = async (
