@@ -1,8 +1,10 @@
+/* eslint-disable max-lines */
 import { AxiosError } from "axios";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import { useBrainConfig } from "@/lib/context/BrainConfigProvider/hooks/useBrainConfig";
+import { generateUUID } from "@/lib/helpers/uuid";
 import { useToast } from "@/lib/hooks";
 import { useEventTracking } from "@/services/analytics/useEventTracking";
 
@@ -24,23 +26,31 @@ export const useChat = () => {
   const { history, setHistory, addToHistory } = useChatContext();
   const { publish } = useToast();
 
-  const { createChat, getChatHistory, addStreamQuestion } = useChatService();
+  const {
+    createChat,
+    getChatHistory,
+    addStreamQuestion,
+    addQuestion: addQuestionToModel,
+  } = useChatService();
 
   useEffect(() => {
     const fetchHistory = async () => {
-      const chatHistory = await getChatHistory(chatId);
-      setHistory(chatHistory);
+      const currentChatId = chatId;
+      const chatHistory = await getChatHistory(currentChatId);
+      console.log("Fetched history:", chatHistory); // log the fetched history
+      if (chatId === currentChatId && chatHistory.length > 0) {
+        setHistory(chatHistory);
+      }
     };
     void fetchHistory();
-  }, [chatId]);
+  }, [chatId, getChatHistory, setHistory]);
 
   const generateNewChatIdFromName = async (
     chatName: string
   ): Promise<string> => {
-    const rep = await createChat({ name: chatName });
-    setChatId(rep.data.chat_id);
+    const chat = await createChat({ name: chatName });
 
-    return rep.data.chat_id;
+    return chat.chat_id;
   };
 
   const addQuestion = async (question: string, callback?: () => void) => {
@@ -61,16 +71,27 @@ export const useChat = () => {
           question.split(" ").slice(0, 3).join(" ")
         ));
 
+      setChatId(currentChatId);
+
+      //create a temp message_id, this is overwritten by the response from the backend
       const chatHistoryItem = {
         assistant: "",
         chat_id: currentChatId,
-        message_id: "",
-        message_time: "",
+        message_id: generateUUID(),
+        message_time: Date.now().toString(),
         user_message: chatQuestion.question ?? "",
       };
 
+      console.log("Chat history item to insert:", chatHistoryItem);
+
       addToHistory(chatHistoryItem);
-      await addStreamQuestion(currentChatId, chatQuestion, chatHistoryItem);
+      console.log("Chat History", history);
+
+      if (chatQuestion.model === "gpt-3.5-turbo") {
+        await addStreamQuestion(currentChatId, chatQuestion, chatHistoryItem);
+      } else {
+        await addQuestionToModel(currentChatId, chatQuestion, chatHistoryItem);
+      }
 
       callback?.();
     } catch (error) {

@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 
 import { ChatHistory } from "../types";
 
@@ -8,7 +8,11 @@ type ChatContextProps = {
   history: ChatHistory[];
   setHistory: (history: ChatHistory[]) => void;
   addToHistory: (message: ChatHistory) => void;
-  updateHistory: (message: ChatHistory) => void;
+  updateHistory: (message_id: string, message: ChatHistory) => void;
+  updateStreamingHistory: (
+    message_id: string,
+    assistantResponse: string
+  ) => void;
 };
 
 export const ChatContext = createContext<ChatContextProps | undefined>(
@@ -21,16 +25,48 @@ export const ChatProvider = ({
   children: JSX.Element | JSX.Element[];
 }): JSX.Element => {
   const [history, setHistory] = useState<ChatHistory[]>([]);
+
+  // Log the history whenever it changes
+  useEffect(() => {
+    console.log("Updated history:", history);
+  }, [history]);
+
   const addToHistory = (message: ChatHistory) => {
     setHistory((prevHistory) => [...prevHistory, message]);
   };
 
-  const updateHistory = (message: ChatHistory) => {
-    console.log("updateHistory", message);
-    setHistory(
-      history.map((item) => (item.chat_id === message.chat_id ? message : item))
-    );
-    console.log("updateHistory", history);
+  const updateStreamingHistory = (
+    message_id: string,
+    assistantResponse: string
+  ): void => {
+    console.log(
+      "Updating message:",
+      message_id,
+      "with response:",
+      assistantResponse
+    ); // Log the message ID and response
+
+    setHistory((prevHistory: ChatHistory[]) => {
+      const newHistory = prevHistory.map((item: ChatHistory) =>
+        item.message_id === message_id
+          ? { ...item, assistant: item.assistant + assistantResponse }
+          : item
+      );
+
+      console.log("New history", newHistory);
+
+      return newHistory;
+    });
+  };
+
+  const updateHistory = (message_id: string, message: ChatHistory): void => {
+    setHistory((prevHistory: ChatHistory[]) => {
+      const newHistory = prevHistory.map((item: ChatHistory) =>
+        item.message_id === message_id ? message : item
+      );
+
+      return newHistory;
+    });
   };
 
   return (
@@ -40,6 +76,7 @@ export const ChatProvider = ({
         setHistory,
         addToHistory,
         updateHistory,
+        updateStreamingHistory,
       }}
     >
       {children}
