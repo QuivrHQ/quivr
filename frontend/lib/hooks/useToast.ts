@@ -8,6 +8,6 @@ export const useToast = (): { publish: ToastPublisher; setTop:() =>void } => {
 
   return {
       publish,
-      setTop,
+      setTop: setTop as () => void,
   };
 };
