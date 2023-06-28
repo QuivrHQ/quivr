@@ -8,9 +8,9 @@ import { generateUUID } from "@/lib/helpers/uuid";
 import { useToast } from "@/lib/hooks";
 import { useEventTracking } from "@/services/analytics/useEventTracking";
 
+import { useChatService } from "./useChatService";
 import { useChatContext } from "../context/ChatContext";
 import { ChatQuestion } from "../types";
-import { useChatService } from "./useChatService";
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const useChat = () => {
@@ -37,7 +37,7 @@ export const useChat = () => {
     const fetchHistory = async () => {
       const currentChatId = chatId;
       const chatHistory = await getChatHistory(currentChatId);
-      console.log("Fetched history:", chatHistory); // log the fetched history
+
       if (chatId === currentChatId && chatHistory.length > 0) {
         setHistory(chatHistory);
       }
@@ -82,10 +82,7 @@ export const useChat = () => {
         user_message: chatQuestion.question ?? "",
       };
 
-      console.log("Chat history item to insert:", chatHistoryItem);
-
       addToHistory(chatHistoryItem);
-      console.log("Chat History", history);
 
       if (chatQuestion.model === "gpt-3.5-turbo") {
         await addStreamQuestion(currentChatId, chatQuestion, chatHistoryItem);
