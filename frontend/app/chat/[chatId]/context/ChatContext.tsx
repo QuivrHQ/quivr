@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useState } from "react";
 
 import { ChatHistory } from "../types";
 
@@ -26,11 +26,6 @@ export const ChatProvider = ({
 }): JSX.Element => {
   const [history, setHistory] = useState<ChatHistory[]>([]);
 
-  // Log the history whenever it changes
-  useEffect(() => {
-    console.log("Updated history:", history);
-  }, [history]);
-
   const addToHistory = (message: ChatHistory) => {
     setHistory((prevHistory) => [...prevHistory, message]);
   };
@@ -39,21 +34,12 @@ export const ChatProvider = ({
     message_id: string,
     assistantResponse: string
   ): void => {
-    console.log(
-      "Updating message:",
-      message_id,
-      "with response:",
-      assistantResponse
-    ); // Log the message ID and response
-
     setHistory((prevHistory: ChatHistory[]) => {
       const newHistory = prevHistory.map((item: ChatHistory) =>
         item.message_id === message_id
           ? { ...item, assistant: item.assistant + assistantResponse }
           : item
       );
-
-      console.log("New history", newHistory);
 
       return newHistory;
     });

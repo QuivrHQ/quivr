@@ -27,7 +27,7 @@ const fetchInstance: FetchInstance = {
   delete: async (url, headers) => fetch(url, { method: "DELETE", headers }),
 };
 
-export const useFetch = () => {
+export const useFetch = (): { fetchInstance: FetchInstance } => {
   const { session } = useSupabase();
   const {
     config: { backendUrl: configBackendUrl, openAiKey },
