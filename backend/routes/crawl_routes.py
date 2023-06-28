@@ -22,7 +22,7 @@ async def crawl_endpoint(request: Request, crawl_website: CrawlWebsite, brain_id
     Crawl a website and process the crawled data.
     """
 
-    # //Check the rights user_id and 
+   # [TODO] check if the user is the owner/editor of the brain
     brain = Brain(id= brain_id)
 
     commons = common_dependencies()

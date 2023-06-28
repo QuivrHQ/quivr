@@ -172,7 +172,6 @@ async def create_question_handler(
                 model=chat_question.model,
                 max_tokens=chat_question.max_tokens,
                 temperature=chat_question.temperature,
-                user_id=current_user.email,
                 brain_id = brain_id,
                 user_openai_api_key=current_user.user_openai_api_key,
             )

@@ -36,13 +36,6 @@ class Brain(BaseModel):
         print('current_brain_size', current_brain_size)
         return current_brain_size
 
-    # To keep ??
-    @property
-    def brain_filling(self):
-        if self.max_brain_size == 0:
-            return 0
-        return self.brain_size / self.max_brain_size
-
     @property
     def remaining_brain_size(self):
         return float(self.max_brain_size) - self.brain_size
@@ -62,17 +55,6 @@ class Brain(BaseModel):
             .execute()
         )
         return [item["brains"] for item in response.data]
-
-    def get_brain(self):
-        commons = common_dependencies()
-        response = (
-            commons["supabase"]
-            .from_("brains")
-            .select("brainId:brain_id, brainName:brain_name")
-            .filter("brain_id", "eq", self.id)
-            .execute()
-        )
-        return response.data
 
     def get_brain_details(self):
         response = (
@@ -97,9 +79,9 @@ class Brain(BaseModel):
         self.id = response.data[0]['brain_id']   
         return response.data
 
-    def create_brain_user(self, user_id : UUID, rights):
+    def create_brain_user(self, user_id : UUID, rights, default_brain):
         commons = common_dependencies()
-        response = commons["supabase"].table("brains_users").insert({"brain_id": str(self.id), "user_id":str( user_id), "rights": rights}).execute()
+        response = commons["supabase"].table("brains_users").insert({"brain_id": str(self.id), "user_id":str( user_id), "rights": rights, "default_brain": default_brain}).execute()
         
 
         return response.data

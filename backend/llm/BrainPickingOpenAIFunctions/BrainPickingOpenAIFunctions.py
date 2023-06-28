@@ -88,7 +88,7 @@ class BrainPickingOpenAIFunctions(BrainPicking):
             brain_id=self.brain_id,
         )
 
-        return vector_store.similarity_search(query=question, user_id=self.user_email)
+        return vector_store.similarity_search(query=question)
 
     def _construct_prompt(
         self, question: str, useContext: bool = False, useHistory: bool = False

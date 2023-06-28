@@ -37,7 +37,7 @@ class CustomSupabaseVectorStore(SupabaseVectorStore):
             {
                 "query_embedding": query_embedding,
                 "match_count": k,
-                "p_brain_id": self.brain_id,
+                "p_brain_id": str(self.brain_id),
             },
         ).execute()
 

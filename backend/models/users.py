@@ -13,6 +13,14 @@ class User(BaseModel):
     user_openai_api_key: str = None
 
 
+    # [TODO] Rename the user table and its references to 'user_usage'
+    def create_user( self,date):
+
+        commons = common_dependencies()
+        logger.info(f"New user entry in db document for user {self.email}")
+
+        return(commons['supabase'].table("users").insert(
+            {"user_id": self.id, "email": self.email, "date": date, "requests_count": 1}).execute())
 
 
     def get_user_request_stats(self):

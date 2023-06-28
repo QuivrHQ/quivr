@@ -86,12 +86,17 @@ async def get_brain_endpoint(brain_id: UUID):
 @brain_router.delete(
     "/brains/{brain_id}", dependencies=[Depends(AuthBearer())], tags=["Brain"]
 )
-async def delete_brain_endpoint(brain_id: UUID):
+async def delete_brain_endpoint(brain_id: UUID, current_user: User = Depends(get_current_user),):
     """
     Delete a specific brain by brain ID.
     """
+    # [TODO] check if the user is the owner of the brain
+    
+    current_user.id, 
     brain = Brain(id=brain_id)
     brain.delete_brain()
+
+
     return {"message": f"{brain_id}  has been deleted."}
 
 
@@ -120,12 +125,16 @@ async def brain_endpoint(
         temperature
     In the brains table & in the brains_users table and put the creator user as 'Owner'
     """
+
     brain = Brain(name=brain.name)
     
     brain.create_brain()
-    # create a brain X user entry
-    brain.create_brain_user(user_id = current_user.id, rights="Owner")
-
+    default_brain = get_default_user_brain(current_user)
+    if default_brain:
+        # create a brain X user entry
+        brain.create_brain_user(user_id = current_user.id, rights="Owner", default_brain=False)
+    else:
+        brain.create_brain_user(user_id = current_user.id, rights="Owner", default_brain=True)
     return {"id": brain.id, "name": brain.name}
 
 # update existing brain

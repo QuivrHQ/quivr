@@ -40,7 +40,7 @@ async def upload_file(request: Request,  uploadFile: UploadFile, brain_id: UUID 
 
     print(brain_id,"brain_id")
 
-    # //Check the rights user_id and 
+   # [TODO] check if the user is the owner/editor of the brain
     brain = Brain(id = brain_id)
     print("brain", brain)
     commons = common_dependencies()

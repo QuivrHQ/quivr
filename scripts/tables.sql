@@ -1,18 +1,16 @@
 -- Create users table
 CREATE TABLE IF NOT EXISTS users(
-    //change primary key  to user_id x date
-
-    user_id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    user_id UUID REFERENCES auth.users (id),
     email TEXT,
     date TEXT,
-    requests_count INT
+    requests_count INT,
+    PRIMARY KEY (user_id, date)
 );
 
 -- Create chats table
 CREATE TABLE IF NOT EXISTS chats(
     chat_id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
-    --   //update to auth.supabase 
-    user_id UUID REFERENCES users(user_id),
+    user_id UUID REFERENCES auth.users (id),
     creation_time TIMESTAMP DEFAULT current_timestamp,
     history JSONB,
     chat_name TEXT
@@ -122,8 +120,7 @@ $$;
 -- Create api_keys table
 CREATE TABLE IF NOT EXISTS api_keys(
     key_id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-    --   //update to auth.supabase 
-    user_id UUID REFERENCES users(user_id),
+    user_id UUID REFERENCES auth.users (id),
     api_key TEXT UNIQUE,
     creation_time TIMESTAMP DEFAULT current_timestamp,
     deleted_time TIMESTAMP,
@@ -147,16 +144,15 @@ CREATE TABLE IF NOT EXISTS brains_users (
   rights VARCHAR(255),
   default_brain BOOLEAN DEFAULT false,
   PRIMARY KEY (brain_id, user_id),
---   //update to auth.supabase 
-  FOREIGN KEY (user_id) REFERENCES Users(user_id),
-  FOREIGN KEY (brain_id) REFERENCES Brains(brain_id)
+  FOREIGN KEY (user_id) REFERENCES auth.users (id),
+  FOREIGN KEY (brain_id) REFERENCES Brains (brain_id)
 );
 
 -- Create brains X vectors table
 CREATE TABLE IF NOT EXISTS brains_vectors (
   brain_id UUID,
-  vector_id BIGSERIAL,
+  vector_id BIGINT,
   PRIMARY KEY (brain_id, vector_id),
-  FOREIGN KEY (vector_id) REFERENCES vectors(id),
-  FOREIGN KEY (brain_id) REFERENCES brains(brain_id)
+  FOREIGN KEY (vector_id) REFERENCES vectors (id),
+  FOREIGN KEY (brain_id) REFERENCES brains (brain_id)
 );

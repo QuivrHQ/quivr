@@ -33,7 +33,6 @@ class PrivateBrainPicking(BrainPicking):
             model=model,
             brain_id=brain_id,
             chat_id=chat_id,
-            brain_i=brain_id,
             max_tokens=max_tokens,
             temperature=temperature,
             user_openai_api_key=user_openai_api_key,
