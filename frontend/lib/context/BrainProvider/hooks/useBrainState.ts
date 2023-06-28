@@ -21,7 +21,7 @@ export interface BrainStateProps {
   currentBrain: Brain | undefined;
   currentBrainId: UUID | null;
   allBrains: Brain[];
-  createBrain: (name: string) => Promise<void>;
+  createBrain: (name: string) => Promise<UUID | undefined>;
   deleteBrain: (id: UUID) => Promise<void>;
   setActiveBrain: (id: UUID) => void;
   getBrainWithId: (brainId: UUID) => Promise<Brain>;
@@ -40,11 +40,13 @@ export const useBrainState = (): BrainStateProps => {
 
   // options: Record<string, string | unknown>;
 
-  const createBrain = async (name: string) => {
+  const createBrain = async (name: string): Promise<UUID | undefined> => {
     const createdBrain = await createBrainFromBackend(axiosInstance, name);
     if (createdBrain !== undefined) {
       setAllBrains((prevBrains) => [...prevBrains, createdBrain]);
       saveBrainInLocalStorage(createdBrain);
+
+      return createdBrain.id;
     } else {
       publish({
         variant: "danger",

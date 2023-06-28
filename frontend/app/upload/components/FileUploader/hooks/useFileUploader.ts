@@ -7,6 +7,7 @@ import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainConte
 import { useSupabase } from "@/lib/context/SupabaseProvider";
 import { useAxios, useToast } from "@/lib/hooks";
 import { useEventTracking } from "@/services/analytics/useEventTracking";
+import { useFeature } from "@growthbook/growthbook-react";
 import { UUID } from "crypto";
 
 export const useFileUploader = () => {
@@ -16,8 +17,10 @@ export const useFileUploader = () => {
   const [files, setFiles] = useState<File[]>([]);
   const { session } = useSupabase();
 
-  const { currentBrain } = useBrainContext();
+  const { currentBrain, createBrain } = useBrainContext();
   const { axiosInstance } = useAxios();
+
+  const shouldUseMultipleBrains = useFeature("multiple-brains").on;
 
   if (session === null) {
     redirect("/login");
@@ -89,6 +92,15 @@ export const useFileUploader = () => {
       await Promise.all(files.map((file) => upload(file, currentBrain?.id)));
     }
     console.log("Please select or create a brain to upload a file");
+
+    if (currentBrain?.id === undefined && shouldUseMultipleBrains !== true) {
+      const createdBrainId = await createBrain("Default");
+      createdBrainId
+        ? await Promise.all(files.map((file) => upload(file, createdBrainId)))
+        : null;
+      setFiles([]);
+    }
+
     setIsPending(false);
   };
 
