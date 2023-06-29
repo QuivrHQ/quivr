@@ -20,5 +20,6 @@ jobs:
         with:
           node-version: 18
           cache: 'yarn'
-          cache-dependency-path: yarn.lock
+          cache-dependency-path: frontend/yarn.lock
+      - run: yarn
       - run: yarn run test-unit
