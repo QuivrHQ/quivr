@@ -9,7 +9,7 @@ const HomePage = (): JSX.Element => {
   }
 
   return (
-    <main className="">
+    <main data-testid="home-page">
       <Hero />
       <Features />
     </main>
