@@ -72,17 +72,6 @@ export const useChat = () => {
 
       setChatId(currentChatId);
 
-      // //create a temp message_id, this is overwritten by the response from the backend
-      // const chatHistoryItem = {
-      //   assistant: "",
-      //   chat_id: currentChatId,
-      //   message_id: generateUUID(),
-      //   message_time: Date.now().toString(),
-      //   user_message: chatQuestion.question ?? "",
-      // };
-
-      // addToHistory(chatHistoryItem);
-
       if (chatQuestion.model === "gpt-3.5-turbo") {
         await addStreamQuestion(currentChatId, chatQuestion);
       } else {
