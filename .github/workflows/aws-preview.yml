@@ -1,4 +1,4 @@
-name: Deploy to Amazon ECS
+name: Deploy Backend to Preview ECS
 
 on:
   push:
