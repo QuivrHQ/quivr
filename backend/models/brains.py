@@ -79,18 +79,17 @@ class Brain(BaseModel):
         self.id = response.data[0]['brain_id']   
         return response.data
 
-    def create_brain_user(self, user_id : UUID, rights, default_brain):
+    def create_brain_user(self, user_id: UUID, rights, default_brain):
         commons = common_dependencies()
-        response = commons["supabase"].table("brains_users").insert({"brain_id": str(self.id), "user_id":str( user_id), "rights": rights, "default_brain": default_brain}).execute()
+        response = commons["supabase"].table("brains_users").insert({"brain_id": str(self.id), "user_id": str(user_id), "rights": rights, "default_brain": default_brain}).execute()
         
-
         return response.data
 
-    def create_brain_vector(self, vector_id):
+    def create_brain_vector(self, vector_id, file_sha1):
         response = (
             self.commons["supabase"]
             .table("brains_vectors")
-            .insert({"brain_id": str(self.id), "vector_id": str(vector_id)})
+            .insert({"brain_id": str(self.id), "vector_id": str(vector_id), "file_sha1": file_sha1})
             .execute()
         )
         return response.data
@@ -115,7 +114,7 @@ class Brain(BaseModel):
         # not  used
         vector_ids = self.get_vector_ids_from_file_sha1(file_sha1)
         for vector_id in vector_ids:
-            self.create_brain_vector(vector_id)
+            self.create_brain_vector(vector_id, file_sha1)
 
     def get_unique_brain_files(self):
         """

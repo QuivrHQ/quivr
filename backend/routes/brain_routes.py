@@ -131,10 +131,13 @@ async def brain_endpoint(
     brain.create_brain()
     default_brain = get_default_user_brain(current_user)
     if default_brain:
-        # create a brain X user entry
+        logger.info(f"Default brain already exists for user {current_user.id}")
         brain.create_brain_user(user_id = current_user.id, rights="Owner", default_brain=False)
     else:
+        logger.info(f"Default brain does not exist for user {current_user.id}. It will be created.")
         brain.create_brain_user(user_id = current_user.id, rights="Owner", default_brain=True)
+
+    
     return {"id": brain.id, "name": brain.name}
 
 # update existing brain

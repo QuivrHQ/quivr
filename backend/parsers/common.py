@@ -31,6 +31,7 @@ async def process_file(
         }
         doc_with_metadata = Document(
             page_content=doc.page_content, metadata=metadata)
+        
         neurons = Neurons(commons=commons)
         created_vector = neurons.create_vector(doc_with_metadata, user_openai_api_key)
         # add_usage(stats_db, "embedding", "audio", metadata={"file_name": file_meta_name,"file_type": ".txt", "chunk_size": chunk_size, "chunk_overlap": chunk_overlap})
@@ -38,7 +39,7 @@ async def process_file(
         created_vector_id = created_vector[0]
 
         brain = Brain(id=brain_id)
-        brain.create_brain_vector(created_vector_id)
+        brain.create_brain_vector(created_vector_id, file.file_sha1)
 
     return
 
