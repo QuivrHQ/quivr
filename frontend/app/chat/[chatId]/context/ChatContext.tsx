@@ -8,11 +8,8 @@ type ChatContextProps = {
   history: ChatHistory[];
   setHistory: (history: ChatHistory[]) => void;
   addToHistory: (message: ChatHistory) => void;
-  updateHistory: (message_id: string, message: ChatHistory) => void;
-  updateStreamingHistory: (
-    message_id: string,
-    assistantResponse: string
-  ) => void;
+  updateHistory: (chat: ChatHistory) => void;
+  updateStreamingHistory: (streamedChat: ChatHistory) => void;
 };
 
 export const ChatContext = createContext<ChatContextProps | undefined>(
@@ -30,28 +27,38 @@ export const ChatProvider = ({
     setHistory((prevHistory) => [...prevHistory, message]);
   };
 
-  const updateStreamingHistory = (
-    message_id: string,
-    assistantResponse: string
-  ): void => {
+  const updateStreamingHistory = (streamedChat: ChatHistory): void => {
     setHistory((prevHistory: ChatHistory[]) => {
-      const newHistory = prevHistory.map((item: ChatHistory) =>
-        item.message_id === message_id
-          ? { ...item, assistant: item.assistant + assistantResponse }
-          : item
-      );
+      console.log("new chat", streamedChat);
+      const updatedHistory = prevHistory.find(
+        (item) => item.message_id === streamedChat.message_id
+      )
+        ? prevHistory.map((item: ChatHistory) =>
+            item.message_id === streamedChat.message_id
+              ? { ...item, assistant: item.assistant + streamedChat.assistant }
+              : item
+          )
+        : [...prevHistory, streamedChat];
 
-      return newHistory;
+      console.log("updated history", updatedHistory);
+
+      return updatedHistory;
     });
   };
 
-  const updateHistory = (message_id: string, message: ChatHistory): void => {
+  const updateHistory = (chat: ChatHistory): void => {
     setHistory((prevHistory: ChatHistory[]) => {
-      const newHistory = prevHistory.map((item: ChatHistory) =>
-        item.message_id === message_id ? message : item
-      );
+      const updatedHistory = prevHistory.find(
+        (item) => item.message_id === chat.message_id
+      )
+        ? prevHistory.map((item: ChatHistory) =>
+            item.message_id === chat.message_id
+              ? { ...item, assistant: chat.assistant }
+              : item
+          )
+        : [...prevHistory, chat];
 
-      return newHistory;
+      return updatedHistory;
     });
   };
 

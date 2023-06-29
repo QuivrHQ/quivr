@@ -5,9 +5,7 @@ from models.chat import ChatHistory
 from models.settings import common_dependencies
 
 
-def update_chat_history(
-    chat_id: str, user_message: str, assistant_answer: str
-) -> ChatHistory:
+def update_chat_history(chat_id: str, user_message: str, assistant: str) -> ChatHistory:
     commons = common_dependencies()
     response: List[ChatHistory] = (
         commons["supabase"]
@@ -16,7 +14,7 @@ def update_chat_history(
             {
                 "chat_id": str(chat_id),
                 "user_message": user_message,
-                "assistant": assistant_answer,
+                "assistant": assistant,
             }
         )
         .execute()
@@ -25,4 +23,4 @@ def update_chat_history(
         raise HTTPException(
             status_code=500, detail="An exception occurred while updating chat history."
         )
-    return response[0]
+    return ChatHistory(response[0])

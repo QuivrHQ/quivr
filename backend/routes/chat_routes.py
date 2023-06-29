@@ -194,7 +194,7 @@ async def create_question_handler(
         chat_answer = update_chat_history(
             chat_id=chat_id,
             user_message=chat_question.question,
-            assistant_answer=answer,
+            assistant=answer,
         )
         return chat_answer
     except HTTPException as e:

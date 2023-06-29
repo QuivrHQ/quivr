@@ -1,4 +1,5 @@
 import asyncio
+import json
 from typing import AsyncIterable, Awaitable
 
 from langchain.callbacks import AsyncIteratorCallbackHandler
@@ -15,6 +16,7 @@ from models.settings import BrainSettings  # Importing settings related to the '
 from pydantic import BaseModel  # For data validation and settings management
 from repository.chat.get_chat_history import get_chat_history
 from repository.chat.update_chat_history import update_chat_history
+from repository.chat.update_message_by_id import update_message_by_id
 from supabase import Client  # For interacting with Supabase database
 from supabase import create_client
 from vectorstore.supabase import (
@@ -227,22 +229,29 @@ class BrainPicking(BaseModel):
             )
         )
 
+        streamed_chat_history = update_chat_history(
+            chat_id=self.chat_id,
+            user_message=question,
+            assistant="",
+        )
+
         # Use the aiter method of the callback to stream the response with server-sent-events
         async for token in callback.aiter():
             logger.info("Token: %s", token)
 
             # Add the token to the response_tokens list
             response_tokens.append(token)
+            streamed_chat_history.assistant = token
 
-            yield f"data: {token}\n\n"
+            yield f"data: {json.dumps(streamed_chat_history.to_dict())}"
 
         await task
 
         # Join the tokens to create the assistant's response
-        assistant_answer = "".join(response_tokens)
+        assistant = "".join(response_tokens)
 
-        update_chat_history(
-            chat_id=self.chat_id,
+        update_message_by_id(
+            message_id=streamed_chat_history.message_id,
             user_message=question,
-            assistant_answer=assistant_answer,
+            assistant=assistant,
         )

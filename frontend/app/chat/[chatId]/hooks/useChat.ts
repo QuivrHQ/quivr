@@ -4,7 +4,6 @@ import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import { useBrainConfig } from "@/lib/context/BrainConfigProvider/hooks/useBrainConfig";
-import { generateUUID } from "@/lib/helpers/uuid";
 import { useToast } from "@/lib/hooks";
 import { useEventTracking } from "@/services/analytics/useEventTracking";
 
@@ -23,7 +22,7 @@ export const useChat = () => {
   const {
     config: { maxTokens, model, temperature },
   } = useBrainConfig();
-  const { history, setHistory, addToHistory } = useChatContext();
+  const { history, setHistory } = useChatContext();
   const { publish } = useToast();
 
   const {
@@ -73,21 +72,21 @@ export const useChat = () => {
 
       setChatId(currentChatId);
 
-      //create a temp message_id, this is overwritten by the response from the backend
-      const chatHistoryItem = {
-        assistant: "",
-        chat_id: currentChatId,
-        message_id: generateUUID(),
-        message_time: Date.now().toString(),
-        user_message: chatQuestion.question ?? "",
-      };
+      // //create a temp message_id, this is overwritten by the response from the backend
+      // const chatHistoryItem = {
+      //   assistant: "",
+      //   chat_id: currentChatId,
+      //   message_id: generateUUID(),
+      //   message_time: Date.now().toString(),
+      //   user_message: chatQuestion.question ?? "",
+      // };
 
-      addToHistory(chatHistoryItem);
+      // addToHistory(chatHistoryItem);
 
       if (chatQuestion.model === "gpt-3.5-turbo") {
-        await addStreamQuestion(currentChatId, chatQuestion, chatHistoryItem);
+        await addStreamQuestion(currentChatId, chatQuestion);
       } else {
-        await addQuestionToModel(currentChatId, chatQuestion, chatHistoryItem);
+        await addQuestionToModel(currentChatId, chatQuestion);
       }
 
       callback?.();

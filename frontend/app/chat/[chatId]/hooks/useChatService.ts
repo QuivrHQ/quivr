@@ -11,15 +11,10 @@ import { ChatEntity, ChatHistory, ChatQuestion } from "../types";
 interface UseChatService {
   createChat: (name: { name: string }) => Promise<ChatEntity>;
   getChatHistory: (chatId: string | undefined) => Promise<ChatHistory[]>;
-  addQuestion: (
-    chatId: string,
-    chatQuestion: ChatQuestion,
-    chatHistory: ChatHistory
-  ) => Promise<void>;
+  addQuestion: (chatId: string, chatQuestion: ChatQuestion) => Promise<void>;
   addStreamQuestion: (
     chatId: string,
-    chatQuestion: ChatQuestion,
-    chatHistory: ChatHistory
+    chatQuestion: ChatQuestion
   ) => Promise<void>;
 }
 
@@ -55,8 +50,7 @@ export const useChatService = (): UseChatService => {
 
   const addQuestion = async (
     chatId: string,
-    chatQuestion: ChatQuestion,
-    chatHistory: ChatHistory
+    chatQuestion: ChatQuestion
   ): Promise<void> => {
     if (currentBrain?.id === undefined) {
       throw new Error("No current brain");
@@ -67,15 +61,13 @@ export const useChatService = (): UseChatService => {
       chatQuestion
     );
 
-    updateHistory(chatHistory.message_id, response.data);
+    updateHistory(response.data);
   };
 
   const handleStream = async (
-    reader: ReadableStreamDefaultReader<Uint8Array>,
-    message_id: string
+    reader: ReadableStreamDefaultReader<Uint8Array>
   ): Promise<void> => {
     const decoder = new TextDecoder("utf-8");
-    let buffer = "";
 
     const handleStreamRecursively = async () => {
       const { done, value } = await reader.read();
@@ -84,18 +76,20 @@ export const useChatService = (): UseChatService => {
         return;
       }
 
-      buffer += decoder.decode(value, { stream: true });
-      const payloads = buffer.split("\n\n");
-      buffer = payloads.pop() as string;
+      const dataStrings = decoder
+        .decode(value)
+        .trim()
+        .split("data: ")
+        .filter(Boolean);
 
-      payloads
-        .filter((payload) => payload.startsWith("data:"))
-        .map((dataPayload) =>
-          dataPayload.replace("data: ", "").replace("\n\n", "")
-        )
-        .forEach((data: string) => {
-          updateStreamingHistory(message_id, data);
-        });
+      dataStrings.forEach((data) => {
+        try {
+          const parsedData = JSON.parse(data) as ChatHistory;
+          updateStreamingHistory(parsedData);
+        } catch (error) {
+          console.error("Error parsing data:", error);
+        }
+      });
 
       await handleStreamRecursively();
     };
@@ -105,8 +99,7 @@ export const useChatService = (): UseChatService => {
 
   const addStreamQuestion = async (
     chatId: string,
-    chatQuestion: ChatQuestion,
-    chatHistory: ChatHistory
+    chatQuestion: ChatQuestion
   ): Promise<void> => {
     if (currentBrain?.id === undefined) {
       throw new Error("No current brain");
@@ -129,7 +122,7 @@ export const useChatService = (): UseChatService => {
       }
 
       console.log("Received response. Starting to handle stream...");
-      await handleStream(response.body.getReader(), chatHistory.message_id);
+      await handleStream(response.body.getReader());
     } catch (error) {
       console.error("Error calling the API:", error);
     }
