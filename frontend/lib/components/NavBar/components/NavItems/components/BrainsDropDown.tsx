@@ -24,9 +24,11 @@ export const BrainsDropDown = (): JSX.Element => {
     setNewBrainName(""); // Reset the new brain name input
   };
 
-  const handleClickOutside = (event : MouseEvent) => {
+  const handleClickOutside = (event: MouseEvent) => {
     if (
-      dropdownRef.current && !dropdownRef.current.contains(event.target as Node | null)) {
+      dropdownRef.current &&
+      !dropdownRef.current.contains(event.target as Node | null)
+    ) {
       setShowDropdown(false);
     }
   };
@@ -78,7 +80,7 @@ export const BrainsDropDown = (): JSX.Element => {
                 className={`block w-full text-left px-4 py-2 text-sm leading-5 ${
                   currentBrain?.id === brain.id ? "bg-blue-100" : ""
                 } text-gray-900 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 focus:bg-gray-100 dark:focus:bg-gray-700 focus:outline-none`}
-                onClick={() => setActiveBrain(brain.id)}
+                onClick={() => setActiveBrain({ ...brain })}
               >
                 {brain.name}
               </button>
