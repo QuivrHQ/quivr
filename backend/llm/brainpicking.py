@@ -21,6 +21,8 @@ from supabase import Client  # For interacting with Supabase database
 from supabase import create_client
 from vectorstore.supabase import \
     CustomSupabaseVectorStore  # Custom class for handling vector storage with Supabase
+from vectorstore.supabase import \
+    CustomSupabaseVectorStore  # Custom class for handling vector storage with Supabase
 
 logger = get_logger(__name__)
 
