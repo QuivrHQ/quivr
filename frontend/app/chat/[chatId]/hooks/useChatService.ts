@@ -108,6 +108,9 @@ export const useChatService = (): UseChatService => {
     chatQuestion: ChatQuestion,
     chatHistory: ChatHistory
   ): Promise<void> => {
+    if (currentBrain?.id === undefined) {
+      throw new Error("No current brain");
+    }
     const headers = {
       "Content-Type": "application/json",
       Accept: "text/event-stream",
@@ -116,7 +119,7 @@ export const useChatService = (): UseChatService => {
 
     try {
       const response = await fetchInstance.post(
-        `/chat/${chatId}/question/stream`,
+        `/chat/${chatId}/question/stream?brain_id=${currentBrain.id}`,
         body,
         headers
       );

@@ -211,6 +211,7 @@ async def create_stream_question_handler(
     request: Request,
     chat_question: ChatQuestion,
     chat_id: UUID,
+    brain_id: UUID = Query(..., description="The ID of the brain"),
     current_user: User = Depends(get_current_user),
 ) -> StreamingResponse:
     if (
@@ -231,7 +232,7 @@ async def create_stream_question_handler(
             model=chat_question.model,
             max_tokens=chat_question.max_tokens,
             temperature=chat_question.temperature,
-            user_id=current_user.email,
+            brain_id=brain_id,
             user_openai_api_key=user_openai_api_key,
             streaming=True,
         )
