@@ -13,18 +13,19 @@ from utils.file import compute_sha1_from_file
 
 logger = get_logger(__name__)
 
+
 class File(BaseModel):
     id: Optional[UUID] = None
     file: Optional[UploadFile]
     file_name: Optional[str] = ""
     file_size: Optional[int] = ""
     file_sha1: Optional[str] = ""
-    vectors_ids: Optional[int]=[]
+    vectors_ids: Optional[int] = []
     file_extension: Optional[str] = ""
-    content: Optional[Any]= None
+    content: Optional[Any] = None
     chunk_size: int = 500
-    chunk_overlap: int= 0
-    documents: Optional[Any]= None
+    chunk_overlap: int = 0
+    documents: Optional[Any] = None
     _commons: Optional[CommonsDep] = None
 
     def __init__(self, **kwargs):
@@ -56,7 +57,6 @@ class File(BaseModel):
             documents = loader.load()
             
             print("documents", documents)
-
 
         os.remove(tmp_file.name)
     

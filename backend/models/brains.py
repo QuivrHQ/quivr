@@ -146,10 +146,18 @@ class Brain(BaseModel):
         Retrieve unique user data vectors.
         """
         print('vectors_ids', vectors_ids)
-        vectors_response = self.commons['supabase'].table("vectors").select(
-            "name:metadata->>file_name, size:metadata->>file_size", count="exact") \
-            .filter("id", "in", tuple(vectors_ids))\
-            .execute()
+        print('tuple(vectors_ids)', tuple(vectors_ids))
+        if len(vectors_ids) == 1:
+            vectors_response = self.commons['supabase'].table("vectors").select(
+                "name:metadata->>file_name, size:metadata->>file_size", count="exact") \
+                .filter("id", "eq", vectors_ids[0])\
+                .execute()
+        else:
+            vectors_response = self.commons['supabase'].table("vectors").select(
+                "name:metadata->>file_name, size:metadata->>file_size", count="exact") \
+                .filter("id", "in", tuple(vectors_ids))\
+                .execute()
+            
         documents = vectors_response.data  # Access the data from the response
         # Convert each dictionary to a tuple of items, then to a set to remove duplicates, and then back to a dictionary
         unique_files = [dict(t) for t in set(tuple(d.items()) for d in documents)]

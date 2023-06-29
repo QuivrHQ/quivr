@@ -24,7 +24,7 @@ export const NavItems = ({
 }: NavItemsProps): JSX.Element => {
   const { session } = useSupabase();
   const isUserLoggedIn = session?.user !== undefined;
-  const shouldUseMultipleBrains = !useFeature("multiple-brains").on;
+  const shouldUseMultipleBrains = useFeature("multiple-brains").on;
 
   return (
     <ul
