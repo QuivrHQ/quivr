@@ -224,7 +224,7 @@ async def create_stream_question_handler(
 
     try:
         user_openai_api_key = request.headers.get("Openai-Api-Key")
-        check_user_limit(current_user.email, user_openai_api_key)
+        check_user_limit(current_user)
 
         brain = BrainPicking(
             chat_id=str(chat_id),
