@@ -33,7 +33,7 @@ export const useFileUploader = () => {
       try {
         void track("FILE_UPLOADED");
         const response = await axiosInstance.post(
-          `/upload/?brain_id=${brainId}`,
+          `/upload?brain_id=${brainId}`,
           formData
         );
         track("FILE_UPLOADED");
