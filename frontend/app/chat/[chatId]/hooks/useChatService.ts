@@ -1,8 +1,8 @@
 /* eslint-disable max-lines */
 
-import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 import { useCallback } from "react";
 
+import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 import { useAxios, useFetch } from "@/lib/hooks";
 
 import { useChatContext } from "../context/ChatContext";

@@ -5,8 +5,7 @@ from typing import List
 from uuid import UUID
 
 from auth.auth_bearer import AuthBearer, get_current_user
-from fastapi import APIRouter, Depends, HTTPException, Query, Request
-from fastapi.responses import StreamingResponse
+from fastapi import APIRouter, Depends, Query, Request
 from fastapi.responses import StreamingResponse
 from llm.brainpicking import BrainPicking
 from llm.BrainPickingOpenAIFunctions.BrainPickingOpenAIFunctions import (
@@ -27,7 +26,6 @@ from utils.constants import (
     openai_function_compatible_models,
     streaming_compatible_models,
 )
-from utils.users import fetch_user_id_from_credentials, update_user_request_count
 
 chat_router = APIRouter()
 
@@ -61,20 +59,14 @@ def fetch_user_stats(commons, user, date):
 
 
 def check_user_limit(
-    email,
-    user_openai_api_key: str = None,
+    user: User,
 ):
-    if user_openai_api_key is None:
+    if user.user_openai_api_key is None:
         date = time.strftime("%Y%m%d")
         max_requests_number = os.getenv("MAX_REQUESTS_NUMBER")
-        commons = common_dependencies()
-        userItem = fetch_user_stats(commons, User(email=email), date)
-        old_request_count = userItem["requests_count"]
 
-        update_user_request_count(
-            commons, email, date, requests_count=old_request_count + 1
-        )
-        if old_request_count >= float(max_requests_number):
+        user.increment_user_request_count(date)
+        if user.requests_count >= float(max_requests_number):
             raise HTTPException(
                 status_code=429,
                 detail="You have reached the maximum number of requests for today.",
@@ -95,7 +87,6 @@ async def get_chats(current_user: User = Depends(get_current_user)):
     This endpoint retrieves all the chats associated with the current authenticated user. It returns a list of chat objects
     containing the chat ID and chat name for each chat.
     """
-    commons = common_dependencies()
     chats = get_user_chats(current_user.id)
     return {"chats": chats}
 
@@ -125,7 +116,6 @@ async def update_chat_metadata_handler(
     """
     Update chat attributes
     """
-    commons = common_dependencies()
 
     chat = get_chat_by_id(chat_id)
     if current_user.id != chat.user_id:
@@ -133,24 +123,6 @@ async def update_chat_metadata_handler(
             status_code=403, detail="You should be the owner of the chat to update it."
         )
     return update_chat(chat_id=chat_id, chat_data=chat_data)
-
-
-# helper method for update and create chat
-def check_user_limit(
-    user: User,
-):
-    if user.user_openai_api_key is None:
-        date = time.strftime("%Y%m%d")
-        max_requests_number = os.getenv("MAX_REQUESTS_NUMBER")
-
-        user.increment_user_request_count(date)
-        if user.requests_count >= float(max_requests_number):
-            raise HTTPException(
-                status_code=429,
-                detail="You have reached the maximum number of requests for today.",
-            )
-    else:
-        pass
 
 
 # create new chat
@@ -183,7 +155,6 @@ async def create_question_handler(
         check_user_limit(current_user)
         llm_settings = LLMSettings()
 
-
         if llm_settings.private:
             gpt_answer_generator = PrivateBrainPicking(
                 model=chat_question.model,
@@ -194,7 +165,6 @@ async def create_question_handler(
                 user_openai_api_key=current_user.user_openai_api_key,
             )
             answer = gpt_answer_generator.generate_answer(chat_question.question)
-
 
         elif chat_question.model in openai_function_compatible_models:
             # TODO: RBAC with current_user
@@ -209,7 +179,6 @@ async def create_question_handler(
             )
             answer = gpt_answer_generator.generate_answer(chat_question.question)
 
-
         else:
             brainPicking = BrainPicking(
                 chat_id=str(chat_id),
@@ -220,7 +189,6 @@ async def create_question_handler(
                 user_openai_api_key=current_user.user_openai_api_key,
             )
 
-
             answer = brainPicking.generate_answer(chat_question.question)
 
         chat_answer = update_chat_history(
@@ -229,50 +197,6 @@ async def create_question_handler(
             assistant_answer=answer,
         )
         return chat_answer
-    except HTTPException as e:
-        raise e
-
-
-# stream new question response from chat
-@chat_router.post(
-    "/chat/{chat_id}/question/stream",
-    dependencies=[Depends(AuthBearer())],
-    tags=["Chat"],
-)
-async def create_stream_question_handler(
-    request: Request,
-    chat_question: ChatQuestion,
-    chat_id: UUID,
-    current_user: User = Depends(get_current_user),
-) -> StreamingResponse:
-    if (
-        os.getenv("PRIVATE") == "True"
-        or chat_question.model not in streaming_compatible_models
-    ):
-        # forward the request to the none streaming endpoint create_question_handler function
-        return await create_question_handler(
-            request, chat_question, chat_id, current_user
-        )
-
-    try:
-        user_openai_api_key = request.headers.get("Openai-Api-Key")
-        check_user_limit(current_user.email, user_openai_api_key)
-
-        brain = BrainPicking(
-            chat_id=str(chat_id),
-            model=chat_question.model,
-            max_tokens=chat_question.max_tokens,
-            temperature=chat_question.temperature,
-            user_id=current_user.email,
-            user_openai_api_key=user_openai_api_key,
-            streaming=True,
-        )
-
-        return StreamingResponse(
-            brain.generate_stream(chat_question.question),
-            media_type="text/event-stream",
-        )
-
     except HTTPException as e:
         raise e
 
