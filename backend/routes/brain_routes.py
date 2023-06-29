@@ -2,7 +2,7 @@ from typing import Optional
 from uuid import UUID
 
 from auth.auth_bearer import AuthBearer, get_current_user
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Depends
 from logger import get_logger
 from models.brains import Brain, get_default_user_brain
 from models.settings import common_dependencies
@@ -25,7 +25,7 @@ class BrainToUpdate(BaseModel):
 
 
 # get all brains
-@brain_router.get("/brains", dependencies=[Depends(AuthBearer())], tags=["Brain"])
+@brain_router.get("/brains/", dependencies=[Depends(AuthBearer())], tags=["Brain"])
 async def brain_endpoint(current_user: User = Depends(get_current_user)):
     """
     Retrieve all brains for the current user.
@@ -55,6 +55,7 @@ async def get_default_brain_endpoint(current_user: User = Depends(get_current_us
 
     default_brain = get_default_user_brain(current_user)
     return default_brain
+
 
 # get one brain
 @brain_router.get(
@@ -96,7 +97,6 @@ async def delete_brain_endpoint(brain_id: UUID, current_user: User = Depends(get
     brain = Brain(id=brain_id)
     brain.delete_brain()
 
-
     return {"message": f"{brain_id}  has been deleted."}
 
 
@@ -111,8 +111,8 @@ class BrainObject(BaseModel):
 
 
 # create new brain
-@brain_router.post("/brains", dependencies=[Depends(AuthBearer())], tags=["Brain"])
-async def brain_endpoint(
+@brain_router.post("/brains/", dependencies=[Depends(AuthBearer())], tags=["Brain"])
+async def create_brain_endpoint(
     brain: BrainObject,
     current_user: User = Depends(get_current_user),
 ):
@@ -132,24 +132,21 @@ async def brain_endpoint(
     default_brain = get_default_user_brain(current_user)
     if default_brain:
         logger.info(f"Default brain already exists for user {current_user.id}")
-        brain.create_brain_user(user_id = current_user.id, rights="Owner", default_brain=False)
+        brain.create_brain_user(user_id=current_user.id, rights="Owner", default_brain=False)
     else:
         logger.info(f"Default brain does not exist for user {current_user.id}. It will be created.")
-        brain.create_brain_user(user_id = current_user.id, rights="Owner", default_brain=True)
+        brain.create_brain_user(user_id=current_user.id, rights="Owner", default_brain=True)
 
-    
     return {"id": brain.id, "name": brain.name}
+
 
 # update existing brain
 @brain_router.put(
     "/brains/{brain_id}", dependencies=[Depends(AuthBearer())], tags=["Brain"]
 )
 async def update_brain_endpoint(
-    request: Request,
     brain_id: UUID,
     input_brain: Brain,
-    fileName: Optional[str],
-    current_user: User = Depends(get_current_user),
 ):
     """
     Update an existing brain with new brain parameters/files.
