@@ -194,6 +194,7 @@ def get_default_user_brain(user: User):
         .execute()
     )
 
+    print("Default brain response:", response.data)
     default_brain_id = response.data[0]["brain_id"] if response.data else None
 
     print(f"Default brain id: {default_brain_id}")
