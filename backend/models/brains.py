@@ -40,7 +40,6 @@ class Brain(BaseModel):
     def remaining_brain_size(self):
         return float(self.max_brain_size) - self.brain_size
 
-
     @classmethod
     def create(cls, *args, **kwargs):
         commons = common_dependencies()
@@ -141,15 +140,16 @@ class Brain(BaseModel):
 
         return self.files
 
-    def get_unique_files_from_vector_ids(self, vectors_ids : List[int]):
+    def get_unique_files_from_vector_ids(self, vectors_ids: List[int]):
         # Move into Vectors class
         """
         Retrieve unique user data vectors.
         """
+        print('vectors_ids', vectors_ids)
         vectors_response = self.commons['supabase'].table("vectors").select(
             "name:metadata->>file_name, size:metadata->>file_size", count="exact") \
-                .filter("id", "in", tuple(vectors_ids))\
-                .execute()
+            .filter("id", "in", tuple(vectors_ids))\
+            .execute()
         documents = vectors_response.data  # Access the data from the response
         # Convert each dictionary to a tuple of items, then to a set to remove duplicates, and then back to a dictionary
         unique_files = [dict(t) for t in set(tuple(d.items()) for d in documents)]
