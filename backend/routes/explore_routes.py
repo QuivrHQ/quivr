@@ -9,8 +9,8 @@ from models.users import User
 explore_router = APIRouter()
 
 
-@explore_router.get("/explore", dependencies=[Depends(AuthBearer())], tags=["Explore"])
-async def explore_endpoint(brain_id: UUID = Query(..., description="The ID of the brain"),current_user: User = Depends(get_current_user)):
+@explore_router.get("/explore/", dependencies=[Depends(AuthBearer())], tags=["Explore"])
+async def explore_endpoint(brain_id: UUID = Query(..., description="The ID of the brain"), current_user: User = Depends(get_current_user)):
     """
     Retrieve and explore unique user data vectors.
     """
