@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "lint-fix": "eslint --fix .",
+    "test-unit": "vitest run",
     "test-type": "tsc --noEmit --emitDeclarationOnly false",
     "test": "yarn test-type",
     "precommit": "yarn lint && yarn test",
@@ -62,6 +63,11 @@
     "@tailwindcss/typography": "^0.5.9",
     "@types/next": "^9.0.0",
     "husky": "^8.0.3",
+    "vitest": "^0.32.2",
+    "@testing-library/react": "^14.0.0",
+    "@vitejs/plugin-react": "^4.0.1",
+    "dotenv": "^16.3.1",
+    "jsdom": "^22.1.0",
     "react-icons": "^4.8.0"
   }
 }
