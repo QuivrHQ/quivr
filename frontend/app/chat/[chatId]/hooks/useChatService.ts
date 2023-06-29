@@ -31,7 +31,7 @@ export const useChatService = () => {
 
     return (
       await axiosInstance.post<ChatHistory>(
-        `/chat/${chatId}/question/?brain_id=${currentBrain.id}`,
+        `/chat/${chatId}/question?brain_id=${currentBrain.id}`,
         chatQuestion
       )
     ).data;
