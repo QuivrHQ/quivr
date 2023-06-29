@@ -6,11 +6,13 @@ from uuid import UUID
 from fastapi import UploadFile
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from logger import get_logger
+from models.brains import Brain
 from models.settings import CommonsDep, common_dependencies
 from pydantic import BaseModel
 from utils.file import compute_sha1_from_file
 
 logger = get_logger(__name__)
+
 
 class File(BaseModel):
     id: Optional[UUID] = None
@@ -18,12 +20,12 @@ class File(BaseModel):
     file_name: Optional[str] = ""
     file_size: Optional[int] = ""
     file_sha1: Optional[str] = ""
-    vectors_ids: Optional[int]=[]
+    vectors_ids: Optional[int] = []
     file_extension: Optional[str] = ""
-    content: Optional[Any]= None
+    content: Optional[Any] = None
     chunk_size: int = 500
-    chunk_overlap: int= 0
-    documents: Optional[Any]= None
+    chunk_overlap: int = 0
+    documents: Optional[Any] = None
     _commons: Optional[CommonsDep] = None
 
     def __init__(self, **kwargs):
@@ -56,7 +58,6 @@ class File(BaseModel):
             
             print("documents", documents)
 
-
         os.remove(tmp_file.name)
     
         text_splitter = RecursiveCharacterTextSplitter.from_tiktoken_encoder(
@@ -68,6 +69,11 @@ class File(BaseModel):
         print(self.documents)
 
     def set_file_vectors_ids(self):
+        """
+        Set the vectors_ids property with the ids of the vectors 
+        that are associated with the file in the vectors table
+        """
+
         commons = common_dependencies() 
         response = (
             commons["supabase"].table("vectors")
@@ -78,32 +84,45 @@ class File(BaseModel):
         self.vectors_ids = response.data
         return
     
-    def file_already_exists(self, brain_id):
-        commons = common_dependencies() 
-
+    def file_already_exists(self):
+        """
+        Check if file already exists in vectors table
+        """
         self.set_file_vectors_ids()
 
         print("file_sha1", self.file_sha1)
         print("vectors_ids", self.vectors_ids)
         print("len(vectors_ids)", len(self.vectors_ids))
 
+        # if the file does not exist in vectors then no need to go check in brains_vectors
         if len(self.vectors_ids) == 0:
             return False
-        
-        for vector in self.vectors_ids:
-            response = (
-                commons["supabase"].table("brains_vectors")
-                .select("brain_id, vector_id")
-                .filter("brain_id", "eq", brain_id)
-                .filter("vector_id", "eq", vector['id'])
-                .execute()
-            )
-            print("response.data", response.data)
-            if len(response.data) == 0:
-                return False
-                
+       
         return True
     
+    def file_already_exists_in_brain(self, brain_id):
+        commons = common_dependencies() 
+        self.set_file_vectors_ids()
+        # Check if file exists in that brain
+        response = (
+            commons["supabase"].table("brains_vectors")
+            .select("brain_id, vector_id")
+            .filter("brain_id", "eq", brain_id)
+            .filter("file_sha1", "eq", self.file_sha1)
+            .execute()
+        )
+        print("response.data", response.data)
+        if len(response.data) == 0:
+            return False
+                
+        return True
+  
     def file_is_empty(self):
         return self.file.file._file.tell()  < 1
     
+    def link_file_to_brain(self, brain: Brain):
+        self.set_file_vectors_ids()
+
+        for vector_id in self.vectors_ids:
+            brain.create_brain_vector(vector_id['id'], self.file_sha1)
+        print(f"Successfully linked file {self.file_sha1} to brain {brain.id}")
