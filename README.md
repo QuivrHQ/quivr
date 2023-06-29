@@ -25,7 +25,8 @@ Quivr, your second brain, utilizes the power of GenerativeAI to store and retrie
   - Markdown
   - PDF
   - Powerpoint
-  - Excel
+  - Excel (Not Yet)
+  - Csv
   - Word
   - Audio
   - Video
