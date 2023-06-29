@@ -53,7 +53,7 @@ export const useCrawler = () => {
         console.log("Crawling website...", brainId);
         if (brainId !== undefined) {
           const response = await axiosInstance.post(
-            `/crawl/?brain_id=${brainId}`,
+            `/crawl?brain_id=${brainId}`,
             config
           );
 
