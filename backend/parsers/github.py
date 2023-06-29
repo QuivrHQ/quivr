@@ -15,8 +15,8 @@ async def process_github(commons: CommonsDep, repo, enable_summarization, brain_
     random_dir_name = os.urandom(16).hex()
     dateshort = time.strftime("%Y%m%d")
     loader = GitLoader(
-    clone_url=repo,
-    repo_path="/tmp/" + random_dir_name,
+        clone_url=repo,
+        repo_path="/tmp/" + random_dir_name,
     )
     documents = loader.load()
     os.system("rm -rf /tmp/" + random_dir_name)
@@ -44,21 +44,21 @@ async def process_github(commons: CommonsDep, repo, enable_summarization, brain_
         doc_with_metadata = Document(
             page_content=doc.page_content, metadata=metadata)
         
-        file = File(file_sha1 = compute_sha1_from_content(doc.page_content.encode("utf-8")))
+        file = File(file_sha1=compute_sha1_from_content(doc.page_content.encode("utf-8")))
         
-        exist = file.file_already_exists(brain_id)
-        if not exist:
+        file_exists = file.file_already_exists()
+
+        if not file_exists:
+            print(f"Creating entry for file {file.file_sha1} in vectors...")
             neurons =  Neurons(commons=commons)
             created_vector = neurons.create_vector(doc_with_metadata, user_openai_api_key)
-
-            created_vector_id = created_vector[0]
-
-            brain = Brain(id=brain_id)
-            brain.create_brain_vector(created_vector_id)
-
+            print("Created vector sids ", created_vector)
             print("Created vector for ", doc.metadata["file_name"])
-            # add created_vector x brains in db
-            
 
+        file_exists_in_brain = file.file_already_exists_in_brain(brain_id)
+
+        if not file_exists_in_brain:
+            file.add_file_to_brain(brain_id)
+            brain = Brain(id=brain_id)
+            file.link_file_to_brain(brain)
     return {"message": f"✅ Github with {len(documents)} files has been uploaded.", "type": "success"}
-

@@ -40,7 +40,6 @@ class Brain(BaseModel):
     def remaining_brain_size(self):
         return float(self.max_brain_size) - self.brain_size
 
-
     @classmethod
     def create(cls, *args, **kwargs):
         commons = common_dependencies()
@@ -79,18 +78,17 @@ class Brain(BaseModel):
         self.id = response.data[0]['brain_id']   
         return response.data
 
-    def create_brain_user(self, user_id : UUID, rights, default_brain):
+    def create_brain_user(self, user_id: UUID, rights, default_brain):
         commons = common_dependencies()
-        response = commons["supabase"].table("brains_users").insert({"brain_id": str(self.id), "user_id":str( user_id), "rights": rights, "default_brain": default_brain}).execute()
+        response = commons["supabase"].table("brains_users").insert({"brain_id": str(self.id), "user_id": str(user_id), "rights": rights, "default_brain": default_brain}).execute()
         
-
         return response.data
 
-    def create_brain_vector(self, vector_id):
+    def create_brain_vector(self, vector_id, file_sha1):
         response = (
             self.commons["supabase"]
             .table("brains_vectors")
-            .insert({"brain_id": str(self.id), "vector_id": str(vector_id)})
+            .insert({"brain_id": str(self.id), "vector_id": str(vector_id), "file_sha1": file_sha1})
             .execute()
         )
         return response.data
@@ -115,7 +113,7 @@ class Brain(BaseModel):
         # not  used
         vector_ids = self.get_vector_ids_from_file_sha1(file_sha1)
         for vector_id in vector_ids:
-            self.create_brain_vector(vector_id)
+            self.create_brain_vector(vector_id, file_sha1)
 
     def get_unique_brain_files(self):
         """
@@ -142,15 +140,24 @@ class Brain(BaseModel):
 
         return self.files
 
-    def get_unique_files_from_vector_ids(self, vectors_ids : List[int]):
+    def get_unique_files_from_vector_ids(self, vectors_ids: List[int]):
         # Move into Vectors class
         """
         Retrieve unique user data vectors.
         """
-        vectors_response = self.commons['supabase'].table("vectors").select(
-            "name:metadata->>file_name, size:metadata->>file_size", count="exact") \
+        print('vectors_ids', vectors_ids)
+        print('tuple(vectors_ids)', tuple(vectors_ids))
+        if len(vectors_ids) == 1:
+            vectors_response = self.commons['supabase'].table("vectors").select(
+                "name:metadata->>file_name, size:metadata->>file_size", count="exact") \
+                .filter("id", "eq", vectors_ids[0])\
+                .execute()
+        else:
+            vectors_response = self.commons['supabase'].table("vectors").select(
+                "name:metadata->>file_name, size:metadata->>file_size", count="exact") \
                 .filter("id", "in", tuple(vectors_ids))\
                 .execute()
+            
         documents = vectors_response.data  # Access the data from the response
         # Convert each dictionary to a tuple of items, then to a set to remove duplicates, and then back to a dictionary
         unique_files = [dict(t) for t in set(tuple(d.items()) for d in documents)]
@@ -187,6 +194,7 @@ def get_default_user_brain(user: User):
         .execute()
     )
 
+    print("Default brain response:", response.data)
     default_brain_id = response.data[0]["brain_id"] if response.data else None
 
     print(f"Default brain id: {default_brain_id}")
