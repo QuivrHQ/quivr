@@ -28,7 +28,7 @@ export default function useChats() {
       console.error(error);
       publish({
         variant: "danger",
-        text: "Error occured while fetching your chats",
+        text: "Error occurred while fetching your chats",
       });
     }
   };
