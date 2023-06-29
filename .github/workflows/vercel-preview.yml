@@ -9,6 +9,9 @@ jobs:
   Deploy-Preview:
     environment: production
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./frontend
     steps:
       - uses: actions/checkout@v3
       - name: Install Vercel CLI
