@@ -27,7 +27,7 @@ const ExplorePage = (): JSX.Element => {
   const fetchAndSetActiveBrain = async () => {
     const storedBrain = getBrainFromLocalStorage();
     if (storedBrain) {
-      setActiveBrain(storedBrain.id);
+      setActiveBrain({ ...storedBrain });
       return storedBrain;
     } else {
       const defaultBrain = await setDefaultBrain();

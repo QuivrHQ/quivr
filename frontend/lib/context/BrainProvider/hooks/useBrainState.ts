@@ -23,7 +23,7 @@ export interface BrainStateProps {
   allBrains: Brain[];
   createBrain: (name: string) => Promise<UUID | undefined>;
   deleteBrain: (id: UUID) => Promise<void>;
-  setActiveBrain: (id: UUID) => void;
+  setActiveBrain: ({ id, name }: { id: UUID; name: string }) => void;
   getBrainWithId: (brainId: UUID) => Promise<Brain>;
   fetchAllBrains: () => Promise<void>;
   setDefaultBrain: () => Promise<void>;
@@ -84,19 +84,15 @@ export const useBrainState = (): BrainStateProps => {
     }
   }, [axiosInstance]);
 
-  const setActiveBrain = useCallback((id: UUID) => {
-    //get brain with id from BE ?
-
-    const newActiveBrain = { id, name: "Default Brain" };
-    // if (newActiveBrain) {
-    console.log("newActiveBrain", newActiveBrain);
-    saveBrainInLocalStorage(newActiveBrain);
-    setCurrentBrainId(id);
-    console.log("Setting active brain", newActiveBrain);
-    // } else {
-    //   console.warn(`No brain found with ID ${id}`);
-    // }
-  }, []);
+  const setActiveBrain = useCallback(
+    ({ id, name }: { id: UUID; name: string }) => {
+      const newActiveBrain = { id, name };
+      saveBrainInLocalStorage(newActiveBrain);
+      setCurrentBrainId(id);
+      console.log("Setting active brain", newActiveBrain);
+    },
+    []
+  );
 
   const setDefaultBrain = useCallback(async () => {
     console.log("Setting default brain");
@@ -104,7 +100,7 @@ export const useBrainState = (): BrainStateProps => {
     console.log("defaultBrain", defaultBrain);
     if (defaultBrain) {
       saveBrainInLocalStorage(defaultBrain);
-      setActiveBrain(defaultBrain.id);
+      setActiveBrain({ ...defaultBrain });
     } else {
       console.warn("No brains found");
     }
@@ -118,7 +114,7 @@ export const useBrainState = (): BrainStateProps => {
     if (storedBrain?.id !== undefined) {
       console.log("Setting active brain from local storage");
       console.log("storedBrain", storedBrain);
-      setActiveBrain(storedBrain.id);
+      setActiveBrain({ ...storedBrain });
     } else {
       console.log("Setting default brain for first time");
       await setDefaultBrain();

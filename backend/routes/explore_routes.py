@@ -22,7 +22,7 @@ async def explore_endpoint(brain_id: UUID = Query(..., description="The ID of th
 
 
 @explore_router.delete(
-    "/explore/{file_name}", dependencies=[Depends(AuthBearer())], tags=["Explore"]
+    "/explore/{file_name}/", dependencies=[Depends(AuthBearer())], tags=["Explore"]
 )
 async def delete_endpoint(file_name: str, current_user: User = Depends(get_current_user), brain_id: UUID = Query(..., description="The ID of the brain")):
     """
@@ -35,7 +35,7 @@ async def delete_endpoint(file_name: str, current_user: User = Depends(get_curre
 
 
 @explore_router.get(
-    "/explore/{file_name}", dependencies=[Depends(AuthBearer())], tags=["Explore"]
+    "/explore/{file_name}/", dependencies=[Depends(AuthBearer())], tags=["Explore"]
 )
 async def download_endpoint(
     file_name: str, current_user: User = Depends(get_current_user)

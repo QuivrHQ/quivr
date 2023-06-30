@@ -15,17 +15,6 @@ def get_unique_documents(vectors):
     # Convert each dictionary to a tuple of items, then to a set to remove duplicates, and then back to a dictionary
     return [dict(t) for t in set(tuple(d.items()) for d in vectors)]
 
-
-def get_user_vectors(commons, email):
-    # Access the supabase table and get the vectors
-    user_vectors_response = commons['supabase'].table("vectors").select(
-        "name:metadata->>file_name, size:metadata->>file_size", count="exact") \
-            .filter("user_id", "eq", email)\
-            .execute()
-    return user_vectors_response.data
-
-
-
 @user_router.get("/user", dependencies=[Depends(AuthBearer())], tags=["User"])
 async def get_user_endpoint(request: Request, current_user: User = Depends(get_current_user)):
     """
@@ -39,10 +28,6 @@ async def get_user_endpoint(request: Request, current_user: User = Depends(get_c
     user's uploaded vectors, and the maximum brain size is obtained from the environment variables. The requests statistics provide
     information about the user's API usage.
     """
-    # user_vectors = get_user_vectors(commons, current_user.email)
-    # user_unique_vectors = get_unique_documents(user_vectors)
-
-    # current_brain_size = sum(float(doc.get('size', 0)) for doc in user_unique_vectors)
 
     max_brain_size = int(os.getenv("MAX_BRAIN_SIZE", 0))
     if request.headers.get('Openai-Api-Key'):
@@ -51,13 +36,17 @@ async def get_user_endpoint(request: Request, current_user: User = Depends(get_c
     date = time.strftime("%Y%m%d")
     max_requests_number = os.getenv("MAX_REQUESTS_NUMBER")
     requests_stats = current_user.get_user_request_stats()
+    default_brain = get_default_user_brain(current_user)
 
-    defaultBrain = Brain(id=get_default_user_brain(current_user)['id'])
-    
-    return {"email": current_user.email, 
-            "max_brain_size": max_brain_size, 
-            "current_brain_size": defaultBrain.brain_size, 
+    if default_brain:
+        defaul_brain_size = Brain(id=default_brain.id).size
+    else: 
+        defaul_brain_size = 0
+
+    return {"email": current_user.email,
+            "max_brain_size": max_brain_size,
+            "current_brain_size": defaul_brain_size,
             "max_requests_number": max_requests_number,
-            "requests_stats" : requests_stats,
+            "requests_stats": requests_stats,
             "date": date,
             }
