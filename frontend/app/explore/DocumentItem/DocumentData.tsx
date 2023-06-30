@@ -19,7 +19,6 @@ const DocumentData = ({ documentName }: DocumentDataProps): JSX.Element => {
   const { axiosInstance } = useAxios();
   const { track } = useEventTracking();
 
-
   const [documents, setDocuments] = useState<DocumentDetails[]>([]);
 
   if (!session) {
@@ -30,7 +29,7 @@ const DocumentData = ({ documentName }: DocumentDataProps): JSX.Element => {
     const fetchDocuments = async () => {
       void track("GET_DOCUMENT_DETAILS");
       const res = await axiosInstance.get<{ documents: DocumentDetails[] }>(
-        `/explore/${documentName}`
+        `/explore/${documentName}/`
       );
       setDocuments(res.data.documents);
     };
