@@ -1,4 +1,4 @@
-from langchain.document_loaders.csv_loader import CSVLoader
+from langchain.document_loaders import CSVLoader
 from models.files import File
 from models.settings import CommonsDep
 
