@@ -1,44 +1,14 @@
 /* eslint-disable */
 "use client";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
 
 import Button from "@/lib/components/ui/Button";
 import Card from "@/lib/components/ui/Card";
 import PageHeading from "@/lib/components/ui/PageHeading";
-import { useSupabase } from "@/lib/context/SupabaseProvider";
-import { useToast } from "@/lib/hooks/useToast";
-import { useEventTracking } from "@/services/analytics/useEventTracking";
+import { useLogout } from "./hooks/useLogout";
 
 export default function Logout() {
-  const { supabase } = useSupabase();
-  const [isPending, setIsPending] = useState(false);
-  const { track } = useEventTracking();
-
-  const { publish } = useToast();
-  const router = useRouter();
-
-  const handleLogout = async () => {
-    setIsPending(true);
-    const { error } = await supabase.auth.signOut();
-    void track("LOGOUT")
-    if (error) {
-      console.error("Error logging out:", error.message);
-      publish({
-        variant: "danger",
-        text: `Error logging out: ${error.message}`,
-      });
-    } else {
-      publish({
-        variant: "success",
-        text: "Logged out successfully",
-      });
-      router.replace("/");
-    }
-    setIsPending(false);
-  };
-
+  const { handleLogout, isPending } = useLogout();
   return (
     <main>
       <section className="w-full min-h-[80vh] h-full outline-none flex flex-col gap-5 items-center justify-center p-6">
