@@ -152,6 +152,7 @@ CREATE TABLE IF NOT EXISTS brains_users (
 CREATE TABLE IF NOT EXISTS brains_vectors (
   brain_id UUID,
   vector_id BIGINT,
+  file_sha1 TEXT,
   PRIMARY KEY (brain_id, vector_id),
   FOREIGN KEY (vector_id) REFERENCES vectors (id),
   FOREIGN KEY (brain_id) REFERENCES brains (brain_id)
