@@ -1,7 +1,7 @@
 /* eslint-disable */
 "use client";
 import Link from "next/link";
-import { redirect } from "next/navigation";
+import { redirect, useSearchParams } from "next/navigation";
 
 import Button from "@/lib/components/ui/Button";
 import Card from "@/lib/components/ui/Card";
@@ -9,8 +9,6 @@ import { Divider } from "@/lib/components/ui/Divider";
 import Field from "@/lib/components/ui/Field";
 import PageHeading from "@/lib/components/ui/PageHeading";
 import { useSupabase } from "@/lib/context/SupabaseProvider";
-
-import { useSearchParams } from "next/navigation";
 
 import { useEventTracking } from "@/services/analytics/useEventTracking";
 import { GoogleLoginButton } from "./components/GoogleLogin";
@@ -31,8 +29,9 @@ export default function Login() {
     void track("SIGNED_IN");
     if (previousPage === undefined || previousPage === null) {
       redirect("/upload");
+    } else {
+      redirect(previousPage);
     }
-    redirect(previousPage as string);
   }
 
   return (
@@ -41,6 +40,7 @@ export default function Login() {
         <PageHeading title="Login" subtitle="Welcome back" />
         <Card className="max-w-md w-full p-5 sm:p-10 text-left">
           <form
+            data-testid="sign-in-form"
             onSubmit={(e) => {
               e.preventDefault();
               handleLogin();
