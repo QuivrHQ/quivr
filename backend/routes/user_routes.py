@@ -39,7 +39,7 @@ async def get_user_endpoint(request: Request, current_user: User = Depends(get_c
     default_brain = get_default_user_brain(current_user)
 
     if default_brain:
-        defaul_brain_size = Brain(id=default_brain['id']).size
+        defaul_brain_size = Brain(id=default_brain['id']).brain_size
     else: 
         defaul_brain_size = 0
 
