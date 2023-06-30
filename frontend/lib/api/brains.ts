@@ -8,7 +8,7 @@ export const createBrainFromBackend = async (
   name: string
 ): Promise<Brain | undefined> => {
   try {
-    const createdBrain = (await axiosInstance.post<Brain>(`/brains`, { name }))
+    const createdBrain = (await axiosInstance.post<Brain>(`/brains/`, { name }))
       .data;
 
     return createdBrain;
@@ -21,7 +21,7 @@ export const getUserDefaultBrainFromBackend = async (
   axiosInstance: AxiosInstance
 ): Promise<Brain | undefined> => {
   try {
-    const defaultBrain = (await axiosInstance.get<Brain>(`/brains/default`))
+    const defaultBrain = (await axiosInstance.get<Brain>(`/brains/default/`))
       .data;
 
     return { id: defaultBrain.id, name: defaultBrain.name };
@@ -35,7 +35,7 @@ export const getBrainFromBE = async (
   brainId: UUID
 ): Promise<Brain | undefined> => {
   try {
-    const brain = (await axiosInstance.get<Brain>(`/brains/${brainId}`)).data;
+    const brain = (await axiosInstance.get<Brain>(`/brains/${brainId}/`)).data;
 
     return brain;
   } catch (error) {
@@ -50,7 +50,7 @@ export const deleteBrainFromBE = async (
   brainId: UUID
 ): Promise<void> => {
   try {
-    (await axiosInstance.delete(`/brain/${brainId}`)).data;
+    (await axiosInstance.delete(`/brain/${brainId}/`)).data;
   } catch (error) {
     console.error(`Error deleting brain ${brainId}`, error);
 
@@ -62,7 +62,7 @@ export const getAllUserBrainsFromBE = async (
   axiosInstance: AxiosInstance
 ): Promise<Brain[] | undefined> => {
   try {
-    const brains = (await axiosInstance.get<{ brains: Brain[] }>(`/brains`))
+    const brains = (await axiosInstance.get<{ brains: Brain[] }>(`/brains/`))
       .data;
 
     console.log("BRAINS", brains);
