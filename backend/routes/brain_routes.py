@@ -41,7 +41,7 @@ async def brain_endpoint(current_user: User = Depends(get_current_user)):
     return {"brains": brains}
 
 
-@brain_router.get("/brains/default", dependencies=[Depends(AuthBearer())], tags=["Brain"])
+@brain_router.get("/brains/default/", dependencies=[Depends(AuthBearer())], tags=["Brain"])
 async def get_default_brain_endpoint(current_user: User = Depends(get_current_user)):
     """
     Retrieve the default brain for the current user.
@@ -59,7 +59,7 @@ async def get_default_brain_endpoint(current_user: User = Depends(get_current_us
 
 # get one brain
 @brain_router.get(
-    "/brains/{brain_id}", dependencies=[Depends(AuthBearer())], tags=["Brain"]
+    "/brains/{brain_id}/", dependencies=[Depends(AuthBearer())], tags=["Brain"]
 )
 async def get_brain_endpoint(brain_id: UUID):
     """
@@ -85,7 +85,7 @@ async def get_brain_endpoint(brain_id: UUID):
 
 # delete one brain
 @brain_router.delete(
-    "/brains/{brain_id}", dependencies=[Depends(AuthBearer())], tags=["Brain"]
+    "/brains/{brain_id}/", dependencies=[Depends(AuthBearer())], tags=["Brain"]
 )
 async def delete_brain_endpoint(brain_id: UUID, current_user: User = Depends(get_current_user),):
     """
@@ -142,7 +142,7 @@ async def create_brain_endpoint(
 
 # update existing brain
 @brain_router.put(
-    "/brains/{brain_id}", dependencies=[Depends(AuthBearer())], tags=["Brain"]
+    "/brains/{brain_id}/", dependencies=[Depends(AuthBearer())], tags=["Brain"]
 )
 async def update_brain_endpoint(
     brain_id: UUID,
