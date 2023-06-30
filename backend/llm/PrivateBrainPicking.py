@@ -1,9 +1,9 @@
-
 # Importing various modules and classes from a custom library 'langchain' likely used for natural language processing
 from langchain.llms import GPT4All
 from langchain.llms.base import LLM
 from llm.brainpicking import BrainPicking
 from logger import get_logger
+from models.settings import LLMSettings
 
 logger = get_logger(__name__)
 
@@ -12,6 +12,9 @@ class PrivateBrainPicking(BrainPicking):
     """
     This subclass of BrainPicking is used to specifically work with a private language model.
     """
+
+    # Initialize class settings
+    llm_settings = LLMSettings()
 
     def __init__(
         self,
@@ -28,7 +31,7 @@ class PrivateBrainPicking(BrainPicking):
         :param brain_id: The user id to be used for CustomSupabaseVectorStore.
         :return: PrivateBrainPicking instance
         """
-        # Call the parent class's initializer
+
         super().__init__(
             model=model,
             brain_id=brain_id,
@@ -38,20 +41,17 @@ class PrivateBrainPicking(BrainPicking):
             user_openai_api_key=user_openai_api_key,
         )
 
-    def _determine_llm(
-        self, private_model_args: dict, private: bool = True, model_name: str = None
-    ) -> LLM:
+    def _create_llm(self, model_name, streaming=False, callbacks=None) -> LLM:
         """
-        Override the _determine_llm method to enforce the use of a private model.
+        Override the _create_llm method to enforce the use of a private model.
         :param model_name: Language model name to be used.
         :param private_model_args: Dictionary containing model_path, n_ctx and n_batch.
         :param private: Boolean value to determine if private model is to be used. Defaulted to True.
         :return: Language model instance
         """
-        # Force the use of a private model by setting private to True.
-        model_path = private_model_args["model_path"]
-        model_n_ctx = private_model_args["n_ctx"]
-        model_n_batch = private_model_args["n_batch"]
+        model_path = self.llm_settings.model_path
+        model_n_ctx = self.llm_settings.model_n_ctx
+        model_n_batch = self.llm_settings.model_n_batch
 
         logger.info("Using private model: %s", model_path)
 

@@ -1,10 +1,9 @@
+from dataclasses import dataclass
+from typing import Optional
+
 from logger import get_logger
 from models.chat import Chat
-from typing import Optional
-from dataclasses import dataclass
-
 from models.settings import common_dependencies
-
 
 logger = get_logger(__name__)
 

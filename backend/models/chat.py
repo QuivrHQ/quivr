@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
 
 
 @dataclass
@@ -29,3 +29,6 @@ class ChatHistory:
         self.user_message = chat_dict.get("user_message")
         self.assistant = chat_dict.get("assistant")
         self.message_time = chat_dict.get("message_time")
+
+    def to_dict(self):
+        return asdict(self)
