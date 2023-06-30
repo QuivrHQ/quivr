@@ -8,7 +8,9 @@ export const useGoogleLogin = () => {
   const { supabase } = useSupabase();
 
   const { publish } = useToast();
+
   const [isPending, setIsPending] = useState(false);
+
   const signInWithGoogle = async () => {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
