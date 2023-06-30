@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 import { AxiosError } from "axios";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -21,30 +22,34 @@ export const useChat = () => {
   const {
     config: { maxTokens, model, temperature },
   } = useBrainConfig();
-  const { history, setHistory, addToHistory } = useChatContext();
+  const { history, setHistory } = useChatContext();
   const { publish } = useToast();
 
   const {
     createChat,
     getChatHistory,
-    addQuestion: addQuestionToChat,
+    addStreamQuestion,
+    addQuestion: addQuestionToModel,
   } = useChatService();
 
   useEffect(() => {
     const fetchHistory = async () => {
-      const chatHistory = await getChatHistory(chatId);
-      setHistory(chatHistory);
+      const currentChatId = chatId;
+      const chatHistory = await getChatHistory(currentChatId);
+
+      if (chatId === currentChatId && chatHistory.length > 0) {
+        setHistory(chatHistory);
+      }
     };
     void fetchHistory();
-  }, [chatId]);
+  }, [chatId, getChatHistory, setHistory]);
 
   const generateNewChatIdFromName = async (
     chatName: string
   ): Promise<string> => {
-    const rep = await createChat({ name: chatName });
-    setChatId(rep.data.chat_id);
+    const chat = await createChat({ name: chatName });
 
-    return rep.data.chat_id;
+    return chat.chat_id;
   };
 
   const addQuestion = async (question: string, callback?: () => void) => {
@@ -64,8 +69,15 @@ export const useChat = () => {
         (await generateNewChatIdFromName(
           question.split(" ").slice(0, 3).join(" ")
         ));
-      const answer = await addQuestionToChat(currentChatId, chatQuestion);
-      addToHistory(answer);
+
+      setChatId(currentChatId);
+
+      if (chatQuestion.model === "gpt-3.5-turbo") {
+        await addStreamQuestion(currentChatId, chatQuestion);
+      } else {
+        await addQuestionToModel(currentChatId, chatQuestion);
+      }
+
       callback?.();
     } catch (error) {
       console.error({ error });
@@ -88,5 +100,9 @@ export const useChat = () => {
     }
   };
 
-  return { history, addQuestion, generatingAnswer };
+  return {
+    history,
+    addQuestion,
+    generatingAnswer,
+  };
 };
