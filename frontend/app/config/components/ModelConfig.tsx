@@ -31,8 +31,6 @@ export const ModelConfig = ({
   const defineMaxTokens = (model: Model | PaidModels): number => {
     //At the moment is evaluating only models from OpenAI
     switch (model) {
-      case "gpt-3.5-turbo":
-        return 3000;
       case "gpt-3.5-turbo-0613":
         return 3000;
       case "gpt-3.5-turbo-16k":
