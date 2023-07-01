@@ -21,6 +21,7 @@ class ApiKeyInfo(BaseModel):
 
 class ApiKey(BaseModel):
     api_key: str
+    key_id: str
 
 
 api_key_router = APIRouter()
@@ -76,7 +77,7 @@ async def create_api_key(
             return {"api_key": "Error creating new API key."}
     logger.info(f"Created new API key for user {current_user.email}.")
 
-    return {"api_key": new_api_key}
+    return {"api_key": new_api_key, "key_id": str(new_key_id)}
 
 
 @api_key_router.delete(

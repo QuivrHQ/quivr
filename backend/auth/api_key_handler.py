@@ -62,7 +62,7 @@ async def get_user_from_api_key(
     )
 
     return (
-        {"email": user_email_data.data[0]["email"]}
+        {"email": user_email_data.data[0]["email"], "sub": user_id}
         if user_email_data.data
         else {"email": None}
     )
