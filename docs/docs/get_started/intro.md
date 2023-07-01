@@ -1,5 +1,6 @@
 ---
 sidebar_position: 1
+title: Getting Started
 ---
 
 # Intro
@@ -33,11 +34,15 @@ Quivr, your second brain, utilizes the power of GenerativeAI to store and retrie
   Your browser does not support the video tag.
 </video>
 
+## Demo Highlights 🎥
+
+https://github.com/StanGirard/quivr/assets/19614572/a6463b73-76c7-4bc0-978d-70562dca71f5
+
 ## Getting Started: 🚀
 
 Follow these instructions to get a copy of the project up and running on your local machine for development and testing purposes.
 
-**Old version's readme** is located in the streamlit-demo folder [here](https://github.com/StanGirard/quivr/tree/main/streamlit-demo/README.md)
+You can find everything on the documentation [here](https://brains.quivr.app/)
 
 ### Prerequisites 📋
 
@@ -81,7 +86,7 @@ cp .frontend_env.example frontend/.env
 > _Your `supabase_service_key` can be found in your Supabase dashboard under Project Settings -> API. Use the `anon` `public` key found in the `Project API keys` section._
 
 
-> _Your  `JWT_SECRET_KEY`can be found in your supabase settings under Project Settings -> JWT Settings -> JWT Secret_
+> _Your  `JWT_SECRET_KEY`can be found in your supabase settings under Project Settings -> API -> JWT Settings -> JWT Secret_
 
 > _To activate vertexAI with PaLM from GCP follow the instructions [here](https://python.langchain.com/en/latest/modules/models/llms/integrations/google_vertex_ai_palm.html) and update `bacend/.env`- It is an advanced feature, please be expert in GCP before trying to use it_
 
@@ -90,11 +95,9 @@ cp .frontend_env.example frontend/.env
 
 - **Step 4**: Run the following migration scripts on the Supabase database via the web interface (SQL Editor -> `New query`)
 
-[DB Table Creation Script 1](https://github.com/StanGirard/quivr/tree/main/scripts/supabase_new_store_documents.sql)
+[Creation Script 1](https://github.com/stangirard/quivr/scripts/tables.sql)
 
-[Creation Script 1](https://github.com/StanGirard/quivr/tree/main/scripts/tables.sql)
-
-> _If you come from an old version of Quivr, you can use the [migration script](https://github.com/StanGirard/quivr/tree/main/scripts/20230606131110_add_uuid_user_id.sql) to migrate your data to the new version_
+> _If you come from an old version of Quivr, run the scripts in [migration script](https://github.com/stangirard/quivr/scripts/) to migrate your data to the new version in the order of date_
 
 - **Step 5**: Launch the app
 
@@ -119,15 +122,19 @@ Thanks goes to these wonderful people:
   <img src="https://contrib.rocks/image?repo=stangirard/quivr" />
 </a>
 
+
 ## Contribute 🤝
 
 Got a pull request? Open it, and we'll review it as soon as possible. Check out our project board [here](https://github.com/users/StanGirard/projects/5) to see what we're currently focused on, and feel free to bring your fresh ideas to the table!
 
 
-- [Roadmap](https://github.com/users/StanGirard/projects/5)
 - [Open Issues](https://github.com/StanGirard/quivr/issues)
 - [Open Pull Requests](https://github.com/StanGirard/quivr/pulls)
 - [Good First Issues](https://github.com/StanGirard/quivr/issues?q=is%3Aopen+is%3Aissue+label%3A%22good+first+issue%22)
 - [Frontend Issues](https://github.com/StanGirard/quivr/issues?q=is%3Aopen+is%3Aissue+label%3Afrontend)
 - [Backend Issues](https://github.com/StanGirard/quivr/issues?q=is%3Aopen+is%3Aissue+label%3Abackend)
 
+
+## License 📄
+
+This project is licensed under the Apache 2.0 License - see the [LICENSE.md](https://github.com/StanGirard/quivr/LICENSE.md) file for details
