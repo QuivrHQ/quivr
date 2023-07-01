@@ -4,7 +4,6 @@ Markdown==3.4.3
 openai==0.27.6
 pdf2image==1.16.3
 pypdf==3.8.1
-streamlit==1.22.0
 StrEnum==0.4.10
 supabase==1.0.3
 tiktoken==0.4.0
@@ -23,3 +22,4 @@ asyncpg==0.27.0
 flake8==6.0.0
 flake8-black==0.3.6
 sentence_transformers>=2.0.0
+sentry-sdk==1.26.0
