@@ -1,8 +1,11 @@
+/* eslint-disable */
 import { useEffect, useRef, useState } from "react";
 import { FaBrain } from "react-icons/fa";
 import { IoMdAdd } from "react-icons/io";
 
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
+import { useEventTracking } from "@/services/analytics/useEventTracking";
+
 
 export const BrainsDropDown = (): JSX.Element => {
   const [showDropdown, setShowDropdown] = useState(false);
@@ -10,9 +13,11 @@ export const BrainsDropDown = (): JSX.Element => {
   const { allBrains, createBrain, setActiveBrain, currentBrain } =
     useBrainContext();
   const dropdownRef = useRef<HTMLDivElement | null>(null);
+  const { track } = useEventTracking();
 
   const toggleDropdown = () => {
     setShowDropdown((prevState) => !prevState);
+    void track("SHOW_BRAINS_DROPDOWN")
   };
 
   const handleCreateBrain = () => {
@@ -22,6 +27,7 @@ export const BrainsDropDown = (): JSX.Element => {
 
     void createBrain(newBrainName);
     setNewBrainName(""); // Reset the new brain name input
+    void track("BRAIN_CREATED")
   };
 
   const handleClickOutside = (event: MouseEvent) => {
@@ -32,6 +38,12 @@ export const BrainsDropDown = (): JSX.Element => {
       setShowDropdown(false);
     }
   };
+
+  const changeBrains = (value: string) => {
+        void track("CHANGE_BRAIN")
+        setNewBrainName(value)
+  }
+
   useEffect(() => {
     document.addEventListener("mousedown", handleClickOutside);
 
@@ -60,7 +72,7 @@ export const BrainsDropDown = (): JSX.Element => {
                   type="text"
                   placeholder="Add a new brain"
                   value={newBrainName}
-                  onChange={(e) => setNewBrainName(e.target.value)}
+                  onChange={(e) => changeBrains(e.target.value)}
                   className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none"
                 />
                 <button
