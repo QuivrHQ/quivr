@@ -135,13 +135,13 @@ Got a pull request? Open it, and we'll review it as soon as possible. Check out 
 This project could not be possible without the support of our sponsors. Thank you for your support!
 
 <a href="https://www.theodo.fr/">
-  <img src="https://avatars.githubusercontent.com/u/332041?s=200&v=4" alt="Theodo" style="max-width: 70px;">
+  <img src="https://avatars.githubusercontent.com/u/332041?s=200&v=4" alt="Theodo" style="padding: 10px" width="70px">
 </a>
 <a href="https://www.padok.fr/">
-  <img src="https://avatars.githubusercontent.com/u/46325765?s=200&v=4" alt="Padok" style="max-width: 70px;">
+  <img src="https://avatars.githubusercontent.com/u/46325765?s=200&v=4" alt="Padok" style="padding: 10px" width="70px">
 </a>
 <a href="https://www.aleios.com/">
-  <img src="https://avatars.githubusercontent.com/u/97908131?s=200&v=4" alt="Aleios" style="max-width: 70px;">
+  <img src="https://avatars.githubusercontent.com/u/97908131?s=200&v=4" alt="Aleios" style="padding: 10px" width="70px">
 </a>
 
 
