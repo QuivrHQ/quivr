@@ -45,27 +45,35 @@ async def create_api_key(
     the user. It returns the newly created API key.
     """
 
-    new_key_id = str(uuid4())
+    new_key_id = uuid4()
     new_api_key = token_hex(16)
     api_key_inserted = False
 
     while not api_key_inserted:
         try:
             # Attempt to insert new API key into database
-            commons['supabase'].table('api_keys').insert([{
-                "key_id": new_key_id,
-                "user_id": current_user.id,
-                "api_key": new_api_key,
-                "creation_time": datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S"),
-                "is_active": True
-            }]).execute()
+            commons["supabase"].table("api_keys").insert(
+                [
+                    {
+                        "key_id": str(new_key_id),
+                        "user_id": str(current_user.id),
+                        "api_key": str(new_api_key),
+                        "creation_time": datetime.utcnow().strftime(
+                            "%Y-%m-%d %H:%M:%S"
+                        ),
+                        "is_active": True,
+                    }
+                ]
+            ).execute()
 
             api_key_inserted = True
 
         except UniqueViolationError:
             # Generate a new API key if the current one is already in use
             new_api_key = token_hex(16)
-
+        except Exception as e:
+            logger.error(f"Error creating new API key: {e}")
+            return {"api_key": "Error creating new API key."}
     logger.info(f"Created new API key for user {current_user.email}.")
 
     return {"api_key": new_api_key}
@@ -87,10 +95,12 @@ async def delete_api_key(
 
     """
 
-    commons['supabase'].table('api_keys').update({
-        "is_active": False,
-        "deleted_time": datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
-    }).match({"key_id": key_id, "user_id": current_user.id}).execute()
+    commons["supabase"].table("api_keys").update(
+        {
+            "is_active": False,
+            "deleted_time": datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S"),
+        }
+    ).match({"key_id": key_id, "user_id": current_user.id}).execute()
 
     return {"message": "API key deleted."}
 
@@ -114,5 +124,12 @@ async def get_api_keys(
     containing the key ID and creation time for each API key.
     """
 
-    response = commons['supabase'].table('api_keys').select("key_id, creation_time").filter('user_id', 'eq', current_user.id).filter('is_active', 'eq', True).execute()
+    response = (
+        commons["supabase"]
+        .table("api_keys")
+        .select("key_id, creation_time")
+        .filter("user_id", "eq", current_user.id)
+        .filter("is_active", "eq", True)
+        .execute()
+    )
     return response.data
