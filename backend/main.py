@@ -1,7 +1,9 @@
 import os
+
+import pypandoc
+import sentry_sdk
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import JSONResponse
-import pypandoc
 from logger import get_logger
 from middlewares.cors import add_cors_middleware
 from routes.api_key_routes import api_key_router
@@ -15,6 +17,15 @@ from routes.user_routes import user_router
 
 logger = get_logger(__name__)
 
+if os.getenv("SENTRY_DSN"):
+    sentry_sdk.init(
+        dsn=os.getenv("SENTRY_DSN"),
+        # Set traces_sample_rate to 1.0 to capture 100%
+        # of transactions for performance monitoring.
+        # We recommend adjusting this value in production,
+        traces_sample_rate=1.0,
+    )
+
 app = FastAPI()
 
 add_cors_middleware(app)
@@ -25,6 +36,7 @@ max_brain_size_with_own_key = os.getenv("MAX_BRAIN_SIZE_WITH_KEY", 209715200)
 @app.on_event("startup")
 async def startup_event():
     pypandoc.download_pandoc()
+
 
 app.include_router(brain_router)
 app.include_router(chat_router)
