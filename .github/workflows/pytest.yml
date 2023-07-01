@@ -1,0 +1,40 @@
+name: Pytest
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]    
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./backend
+    environment: preview
+    strategy:
+      matrix:
+        python-version: [ "3.11"]
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: 'pip'
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pytest
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+      - name: Test with pytest
+        env:
+          SUPABASE_URL: ${{vars.SUPABASE_URL}}
+          SUPABASE_SERVICE_KEY: ${{vars.SUPABASE_SERVICE_KEY}}
+          OPENAI_API_KEY: ${{vars.OPENAI_API_KEY}}
+          ANTHROPIC_API_KEY: ${{vars.ANTHROPIC_API_KEY}}
+          JWT_SECRET_KEY: ${{vars.JWT_SECRET_KEY}}
+          CI_TEST_API_KEY: ${{vars.CI_TEST_API_KEY}} 
+        run: |
+          pytest
