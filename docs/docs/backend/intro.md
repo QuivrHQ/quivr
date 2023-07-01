@@ -1,5 +1,6 @@
 ---
 sidebar_position: 1
+title: Architecture
 ---
 
 Quivr is using FastAPI to provide a RESTful API for the backend. The API is currently in beta and is subject to change. The API is available at [https://api.quivr.app](https://api.quivr.app).

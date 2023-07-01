@@ -42,7 +42,20 @@ def get_chat_details(commons, chat_id):
 
 
 def delete_chat_from_db(commons, chat_id):
-    commons["supabase"].table("chats").delete().match({"chat_id": chat_id}).execute()
+    try:
+        commons["supabase"].table("chat_history").delete().match(
+            {"chat_id": chat_id}
+        ).execute()
+    except Exception as e:
+        print(e)
+        pass
+    try:
+        commons["supabase"].table("chats").delete().match(
+            {"chat_id": chat_id}
+        ).execute()
+    except Exception as e:
+        print(e)
+        pass
 
 
 def fetch_user_stats(commons, user, date):

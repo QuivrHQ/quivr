@@ -1,14 +1,39 @@
+/* eslint-disable */
 "use client";
 import Link from "next/link";
+import { useEffect } from "react";
 
 import Button from "@/lib/components/ui/Button";
 import { Divider } from "@/lib/components/ui/Divider";
 import PageHeading from "@/lib/components/ui/PageHeading";
+import { getBrainFromLocalStorage } from "@/lib/context/BrainProvider/helpers/brainLocalStorage";
+import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
+
 
 import { Crawler } from "./components/Crawler";
 import { FileUploader } from "./components/FileUploader";
 
 const UploadPage = (): JSX.Element => {
+  const { setActiveBrain, setDefaultBrain } = useBrainContext();
+
+  const fetchAndSetActiveBrain = async () => {
+    const storedBrain = getBrainFromLocalStorage();
+    if (storedBrain) {
+      setActiveBrain({ ...storedBrain });
+      return storedBrain;
+    } else {
+      const defaultBrain = await setDefaultBrain();
+      return defaultBrain;
+    }
+  };
+
+  useEffect(() => {
+    const fetchBrains = async () => {
+      await fetchAndSetActiveBrain();
+    };
+    fetchBrains();
+  }, []);
+
   return (
     <main className="pt-10">
       <PageHeading
