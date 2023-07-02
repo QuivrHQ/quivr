@@ -8,11 +8,11 @@ main {
 
 header,
 section {
-  @apply px-5 md:px-10;
+  @apply px-5 px-10;
 }
 
 a {
-  @apply hover:text-primary dark:hover:text-gray-200 transition-colors;
+  @apply text-primary transition-colors;
 }
 
 @layer utilities {
@@ -23,14 +23,14 @@ a {
   .scrollbar::-webkit-scrollbar-track {
     /* border-radius: 5px; */
     /* background: #fff; */
-    @apply bg-white dark:bg-black;
+    @apply bg-white;
   }
 
   .scrollbar::-webkit-scrollbar-thumb {
     /* background: #000; */
     /* border-radius: 100vh; */
     /* border: 3px solid #fff; */
-    @apply bg-gray-200 dark:bg-gray-600 border border-white rounded-sm;
+    @apply bg-gray-200 border border-white rounded-sm;
   }
 
   .scrollbar::-webkit-scrollbar-thumb:hover {
@@ -40,7 +40,10 @@ a {
 }
 
 .custom-prose {
-  max-height: 60vh; /* Adjust this value based on the desired maximum height */
-  overflow-y: auto; /* Enable vertical scroll if the content exceeds the maximum height */
-  padding-right: 1rem; /* Optional: Add some padding if the scrollbar appears, so the text is not squished */
+  max-height: 60vh;
+  /* Adjust this value based on the desired maximum height */
+  overflow-y: auto;
+  /* Enable vertical scroll if the content exceeds the maximum height */
+  padding-right: 1rem;
+  /* Optional: Add some padding if the scrollbar appears, so the text is not squished */
 }
