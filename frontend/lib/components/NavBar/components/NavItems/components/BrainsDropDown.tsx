@@ -1,19 +1,19 @@
 /* eslint-disable */
 import { useEffect, useRef, useState } from "react";
 import { FaBrain } from "react-icons/fa";
-import { IoMdAdd } from "react-icons/io";
+import { IoMdAdd, IoMdTrash } from "react-icons/io";
 
 import Button from "@/lib/components/ui/Button";
 import Field from "@/lib/components/ui/Field";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 import { useEventTracking } from "@/services/analytics/useEventTracking";
 import { AnimatePresence, motion } from "framer-motion";
-import { MdCheck } from "react-icons/md";
+import { MdCheck, MdDelete } from "react-icons/md";
 
 export const BrainsDropDown = (): JSX.Element => {
   const [showDropdown, setShowDropdown] = useState(false);
   const [newBrainName, setNewBrainName] = useState("");
-  const { allBrains, createBrain, setActiveBrain, currentBrain } =
+  const { allBrains, createBrain, setActiveBrain, currentBrain, deleteBrain } =
     useBrainContext();
   const dropdownRef = useRef<HTMLDivElement | null>(null);
   const { track } = useEventTracking();
@@ -100,19 +100,35 @@ export const BrainsDropDown = (): JSX.Element => {
               <div className="overflow-auto scrollbar flex flex-col h-full">
                 {/* List of brains */}
                 {allBrains.map((brain) => (
-                  <button
+                  <div
                     key={brain.id}
-                    type="button"
-                    className={`flex items-center gap-2 w-full text-left px-4 py-2 text-sm leading-5 text-gray-900 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 focus:bg-gray-100 dark:focus:bg-gray-700 focus:outline-none`}
-                    onClick={() => setActiveBrain({ ...brain })}
+                    className="relative flex group items-center"
                   >
-                    <span className="flex-1">{brain.name}</span>
-                    <span>
-                      {currentBrain?.id === brain.id && (
-                        <MdCheck className="text-xl" width={32} height={32} />
-                      )}
-                    </span>
-                  </button>
+                    <button
+                      type="button"
+                      className={`flex flex-1 items-center gap-2 w-full text-left px-4 py-2 text-sm leading-5 text-gray-900 dark:text-gray-300 group-hover:bg-gray-100 dark:group-hover:bg-gray-700 group-focus:bg-gray-100 dark:group-focus:bg-gray-700 group-focus:outline-none transition-colors`}
+                      onClick={() => setActiveBrain({ ...brain })}
+                    >
+                      <span>
+                        <MdCheck
+                          style={{
+                            opacity: currentBrain?.id === brain.id ? 1 : 0,
+                          }}
+                          className="text-xl transition-opacity"
+                          width={32}
+                          height={32}
+                        />
+                      </span>
+                      <span className="flex-1">{brain.name}</span>
+                    </button>
+                    <Button
+                      className="group-hover:opacity-100 opacity-0 absolute right-0 hover:text-red-500 transition-[colors,opacity]"
+                      onClick={() => deleteBrain(brain.id)}
+                      variant={"tertiary"}
+                    >
+                      <MdDelete className="text-xl" />
+                    </Button>
+                  </div>
                 ))}
               </div>
             </motion.div>
