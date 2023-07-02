@@ -1,6 +1,9 @@
+/* eslint-disable max-lines */
 import { fireEvent, render } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
+
 import RecoverPassword from "../page";
+
 const mockUsePathname = vi.fn(() => "/previous-page");
 const mockRedirect = vi.fn((url: string) => ({ url }));
 
@@ -55,12 +58,13 @@ describe("RecoverPassword component", () => {
   });
 
   it("should update the password and shows success toast", async () => {
+    const updateUserMock = vi.fn(() => ({
+      data: {},
+    }));
     mockUseSupabase.mockReturnValue({
       supabase: {
         auth: {
-          updateUser: vi.fn(() => ({
-            data: {},
-          })),
+          updateUser: updateUserMock,
         },
       },
       session: { user: {} },
@@ -72,12 +76,19 @@ describe("RecoverPassword component", () => {
     fireEvent.change(passwordField, { target: { value: "new-password" } });
     fireEvent.click(updateButton);
 
-    await expect(mockTrack).toHaveBeenCalledTimes(1);
-    await expect(mockTrack).toHaveBeenCalledWith("UPDATE_PASSWORD");
-    await expect(mockPublish).toHaveBeenCalledTimes(1);
-    await expect(mockPublish).toHaveBeenCalledWith({
-      variant: "success",
-      text: "Password updated successfully!",
+    expect(mockTrack).toHaveBeenCalledTimes(1);
+    expect(mockTrack).toHaveBeenCalledWith("UPDATE_PASSWORD");
+
+    return new Promise<void>((resolve) => {
+      setTimeout(() => {
+        expect(updateUserMock).toHaveBeenCalledTimes(1);
+        expect(mockPublish).toHaveBeenCalledTimes(1);
+        expect(mockPublish).toHaveBeenCalledWith({
+          variant: "success",
+          text: "Password updated successfully!",
+        });
+        resolve();
+      }, 0);
     });
   });
 
@@ -100,10 +111,16 @@ describe("RecoverPassword component", () => {
     fireEvent.change(passwordField, { target: { value: "new-password" } });
     fireEvent.click(updateButton);
 
-    await expect(mockPublish).toHaveBeenCalledTimes(1);
-    await expect(mockPublish).toHaveBeenCalledWith({
-      variant: "danger",
-      text: `Error: ${errorMessage}`,
+    expect(mockPublish).toHaveBeenCalledTimes(1);
+
+    return new Promise<void>((resolve) => {
+      setTimeout(() => {
+        expect(mockPublish).toHaveBeenCalledWith({
+          variant: "danger",
+          text: `Error: ${errorMessage}`,
+        });
+        resolve();
+      }, 0);
     });
   });
 });
