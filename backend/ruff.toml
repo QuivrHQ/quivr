@@ -1,0 +1,8 @@
+# Enable flake8-bugbear (`B`) rules.
+select = ["E", "F", "B", "ARG001", "ANN001", "ANN002"]
+
+# Never enforce `E501` (line length violations).
+ignore = ["E501","B008"]
+
+# Enumerate all fixed violations.
+show-fixes = true

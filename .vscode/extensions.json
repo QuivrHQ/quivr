@@ -1,0 +1,8 @@
+{
+    "recommendations": [
+        "charliermarsh.ruff",
+        "dbaeumer.vscode-eslint",
+        "ms-python.vscode-pylance",
+        "ms-pyright.pyright"
+    ]
+}

@@ -4,7 +4,6 @@ import tempfile
 import unicodedata
 
 import requests
-from langchain.document_loaders import GitLoader
 from pydantic import BaseModel
 
 

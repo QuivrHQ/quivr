@@ -1,8 +1,9 @@
 from datetime import datetime
 
 from fastapi import HTTPException
-from models.settings import common_dependencies
 from pydantic import DateError
+
+from models.settings import common_dependencies
 
 
 async def verify_api_key(

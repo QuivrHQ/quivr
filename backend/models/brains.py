@@ -2,9 +2,10 @@ import os
 from typing import Any, List, Optional
 from uuid import UUID
 
+from pydantic import BaseModel
+
 from models.settings import CommonsDep, common_dependencies
 from models.users import User
-from pydantic import BaseModel
 
 
 class Brain(BaseModel):
@@ -43,7 +44,7 @@ class Brain(BaseModel):
     @classmethod
     def create(cls, *args, **kwargs):
         commons = common_dependencies()
-        return cls(commons=commons, *args, **kwargs)
+        return cls(commons=commons, *args, **kwargs)  # noqa: B026
 
     def get_user_brains(self, user_id):
         response = (

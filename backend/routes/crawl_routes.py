@@ -3,9 +3,10 @@ import shutil
 from tempfile import SpooledTemporaryFile
 from uuid import UUID
 
+from fastapi import APIRouter, Depends, Query, Request, UploadFile
+
 from auth.auth_bearer import AuthBearer, get_current_user
 from crawl.crawler import CrawlWebsite
-from fastapi import APIRouter, Depends, Query, Request, UploadFile
 from models.brains import Brain
 from models.files import File
 from models.settings import common_dependencies

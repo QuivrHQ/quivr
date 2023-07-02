@@ -1,6 +1,5 @@
 from logger import get_logger
 from models.chats import ChatMessage
-from models.settings import common_dependencies
 
 logger = get_logger(__name__)
 

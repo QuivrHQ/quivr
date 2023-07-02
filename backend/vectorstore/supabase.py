@@ -4,7 +4,7 @@ from langchain.docstore.document import Document
 from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.vectorstores import SupabaseVectorStore
 
-from supabase import Client
+from supabase.client import Client
 
 
 class CustomSupabaseVectorStore(SupabaseVectorStore):

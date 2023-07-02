@@ -10,6 +10,9 @@ client = TestClient(app)
 
 API_KEY = os.getenv("CI_TEST_API_KEY")
 
+if API_KEY is None:
+    raise Exception("CI_TEST_API_KEY environment variable not set.")
+
 
 def test_read_main():
     response = client.get("/")

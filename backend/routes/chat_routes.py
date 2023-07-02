@@ -242,10 +242,6 @@ async def create_stream_question_handler(
 
         brain = BrainPicking(
             chat_id=str(chat_id),
-            model=chat_question.model,
-            max_tokens=chat_question.max_tokens,
-            temperature=chat_question.temperature,
-            brain_id=brain_id,
             user_openai_api_key=user_openai_api_key,
             streaming=True,
         )

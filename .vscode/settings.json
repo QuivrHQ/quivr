@@ -6,13 +6,13 @@
     "source.unusedImports": true
   },
   "python.linting.enabled": true,
-  "python.linting.flake8Enabled": true,
   "editor.formatOnSave": true,
   "[python]": {
     "editor.defaultFormatter": "ms-python.black-formatter",
     "editor.formatOnSave": true,
     "editor.codeActionsOnSave": {
-      "source.organizeImports": true
+      "source.fixAll": true,
+      "source.organizeImports.ruff": true
     }
   },
   "[typescriptreact]": {
@@ -30,5 +30,10 @@
     "editor.defaultFormatter": "esbenp.prettier-vscode",
     "editor.formatOnSave": true
   },
-  "editor.formatOnSaveMode": "file"
+  "editor.formatOnSaveMode": "file",
+  "ruff.args": ["--config=/backend/ruff.toml"],
+  "python.linting.pycodestyleCategorySeverity.W": "Error",
+  "python.defaultInterpreterPath": "python3",
+  "python.linting.flake8CategorySeverity.W": "Error",
+  "python.analysis.typeCheckingMode": "strict"
 }
