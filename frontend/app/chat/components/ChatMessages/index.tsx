@@ -12,7 +12,7 @@ export const ChatMessages = (): JSX.Element => {
 
   return (
     <Card
-      className="p-5 max-w-3xl w-full flex flex-col mb-8 overflow-y-auto"
+      className="p-5 max-w-3xl w-full flex flex-col mb-8 overflow-y-auto scrollbar"
       ref={chatListRef}
     >
       <div className="flex-1">

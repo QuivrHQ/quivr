@@ -9,7 +9,7 @@ import { ChatProvider } from "./context/ChatContext";
 export default function ChatPage() {
   return (
     <main className="flex flex-col w-full pt-10">
-      <section className="flex flex-col flex-1 items-center w-full h-full min-h-screen">
+      <section className="flex flex-col flex-1 items-center w-full h-full min-h-[70vh]">
         <PageHeading
           title="Chat with your brain"
           subtitle="Talk to a language model about your uploaded data"
