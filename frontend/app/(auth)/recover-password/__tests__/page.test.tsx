@@ -73,7 +73,8 @@ describe("RecoverPassword component", () => {
     const passwordField = getByTestId("password-field");
     const updateButton = getByTestId("update-button");
 
-    fireEvent.change(passwordField, { target: { value: "new-password" } });
+    const newPassword = "new-password";
+    fireEvent.change(passwordField, { target: { value: newPassword } });
     fireEvent.click(updateButton);
 
     expect(mockTrack).toHaveBeenCalledTimes(1);
@@ -81,11 +82,14 @@ describe("RecoverPassword component", () => {
 
     return new Promise<void>((resolve) => {
       setTimeout(() => {
-        expect(updateUserMock).toHaveBeenCalledTimes(1);
         expect(mockPublish).toHaveBeenCalledTimes(1);
         expect(mockPublish).toHaveBeenCalledWith({
           variant: "success",
           text: "Password updated successfully!",
+        });
+        expect(updateUserMock).toHaveBeenCalledTimes(1);
+        expect(updateUserMock).toHaveBeenCalledWith({
+          password: newPassword,
         });
         resolve();
       }, 0);
@@ -94,12 +98,13 @@ describe("RecoverPassword component", () => {
 
   it("should show error toast when password update fails", async () => {
     const errorMessage = "Password update failed";
+    const updateUserMock = vi.fn(() => ({
+      error: { message: errorMessage },
+    }));
     mockUseSupabase.mockReturnValue({
       supabase: {
         auth: {
-          updateUser: vi.fn(() => ({
-            error: { message: errorMessage },
-          })),
+          updateUser: updateUserMock,
         },
       },
       session: { user: {} },
