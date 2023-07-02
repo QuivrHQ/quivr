@@ -41,7 +41,9 @@ async def brain_endpoint(current_user: User = Depends(get_current_user)):
     return {"brains": brains}
 
 
-@brain_router.get("/brains/default/", dependencies=[Depends(AuthBearer())], tags=["Brain"])
+@brain_router.get(
+    "/brains/default/", dependencies=[Depends(AuthBearer())], tags=["Brain"]
+)
 async def get_default_brain_endpoint(current_user: User = Depends(get_current_user)):
     """
     Retrieve the default brain for the current user.
@@ -49,7 +51,7 @@ async def get_default_brain_endpoint(current_user: User = Depends(get_current_us
     - `current_user`: The current authenticated user.
     - Returns the default brain for the user.
 
-    This endpoint retrieves the default brain associated with the current authenticated user. 
+    This endpoint retrieves the default brain associated with the current authenticated user.
     The default brain is defined as the brain marked as default in the brains_users table.
     """
 
@@ -87,15 +89,17 @@ async def get_brain_endpoint(brain_id: UUID):
 @brain_router.delete(
     "/brains/{brain_id}/", dependencies=[Depends(AuthBearer())], tags=["Brain"]
 )
-async def delete_brain_endpoint(brain_id: UUID, current_user: User = Depends(get_current_user),):
+async def delete_brain_endpoint(
+    brain_id: UUID,
+    current_user: User = Depends(get_current_user),
+):
     """
     Delete a specific brain by brain ID.
     """
     # [TODO] check if the user is the owner of the brain
-    
-    current_user.id, 
+
     brain = Brain(id=brain_id)
-    brain.delete_brain()
+    brain.delete_brain(current_user.id)
 
     return {"message": f"{brain_id}  has been deleted."}
 
@@ -127,15 +131,21 @@ async def create_brain_endpoint(
     """
 
     brain = Brain(name=brain.name)
-    
+
     brain.create_brain()
     default_brain = get_default_user_brain(current_user)
     if default_brain:
         logger.info(f"Default brain already exists for user {current_user.id}")
-        brain.create_brain_user(user_id=current_user.id, rights="Owner", default_brain=False)
+        brain.create_brain_user(
+            user_id=current_user.id, rights="Owner", default_brain=False
+        )
     else:
-        logger.info(f"Default brain does not exist for user {current_user.id}. It will be created.")
-        brain.create_brain_user(user_id=current_user.id, rights="Owner", default_brain=True)
+        logger.info(
+            f"Default brain does not exist for user {current_user.id}. It will be created."
+        )
+        brain.create_brain_user(
+            user_id=current_user.id, rights="Owner", default_brain=True
+        )
 
     return {"id": brain.id, "name": brain.name}
 
