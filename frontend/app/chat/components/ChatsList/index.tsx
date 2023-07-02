@@ -26,7 +26,7 @@ export const ChatsList = (): JSX.Element => {
             setOpen(false);
           }
         }}
-        className="lg:sticky fixed top-0 left-0 bottom-0 overflow-visible z-30 border-r border-black/10 dark:border-white/25 bg-white dark:bg-black"
+        className="flex flex-col lg:sticky fixed top-16 left-0 bottom-0 lg:h-[90vh] overflow-visible z-30 border-r border-black/10 dark:border-white/25 bg-white dark:bg-black"
       >
         <motion.div
           animate={{
@@ -36,18 +36,11 @@ export const ChatsList = (): JSX.Element => {
               ? "10px 10px 16px rgba(0, 0, 0, 0)"
               : "10px 10px 16px rgba(0, 0, 0, 0.5)",
           }}
-          className={cn("overflow-hidden")}
+          className={cn("overflow-hidden flex flex-col flex-1")}
         >
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              flex: 1,
-              height: "90vh",
-            }}
-          >
+          <div className="flex flex-col flex-1">
             <NewChatButton />
-            <div style={{ flex: 1, overflow: "scroll", height: "100%" }}>
+            <div className="flex-1 overflow-auto scrollbar h-full">
               {allChats.map((chat) => (
                 <ChatsListItem
                   key={chat.chat_id}

@@ -19,7 +19,7 @@ const Layout = ({ children }: LayoutProps): JSX.Element => {
 
   return (
     <ChatsProvider>
-      <div className="relative h-full w-full flex items-start">
+      <div className="relative h-full w-full flex justify-stretch items-stretch">
         <ChatsList />
         {children}
       </div>
