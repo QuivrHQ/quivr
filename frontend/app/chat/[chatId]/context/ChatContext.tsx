@@ -34,10 +34,10 @@ export const ChatProvider = ({
         (item) => item.message_id === streamedChat.message_id
       )
         ? prevHistory.map((item: ChatHistory) =>
-            item.message_id === streamedChat.message_id
-              ? { ...item, assistant: item.assistant + streamedChat.assistant }
-              : item
-          )
+          item.message_id === streamedChat.message_id
+            ? { ...item, assistant: item.assistant + streamedChat.assistant }
+            : item
+        )
         : [...prevHistory, streamedChat];
 
       console.log("updated history", updatedHistory);
@@ -52,10 +52,10 @@ export const ChatProvider = ({
         (item) => item.message_id === chat.message_id
       )
         ? prevHistory.map((item: ChatHistory) =>
-            item.message_id === chat.message_id
-              ? { ...item, assistant: chat.assistant }
-              : item
-          )
+          item.message_id === chat.message_id
+            ? { ...item, assistant: chat.assistant }
+            : item
+        )
         : [...prevHistory, chat];
 
       return updatedHistory;

@@ -25,8 +25,10 @@ async def verify_api_key(
                 result.data[0]["creation_time"], "%Y-%m-%dT%H:%M:%S"
             ).date()
 
-            # Check if the API key was created today: Todo remove this check and use deleted_time instead.
-            if api_key_creation_date == current_date:
+            # Check if the API key was created in the month of the current date
+            if (api_key_creation_date.month == current_date.month) and (
+                api_key_creation_date.year == current_date.year
+            ):
                 return True
         return False
     except DateError:
@@ -62,7 +64,7 @@ async def get_user_from_api_key(
     )
 
     return (
-        {"email": user_email_data.data[0]["email"]}
+        {"email": user_email_data.data[0]["email"], "sub": user_id}
         if user_email_data.data
         else {"email": None}
     )

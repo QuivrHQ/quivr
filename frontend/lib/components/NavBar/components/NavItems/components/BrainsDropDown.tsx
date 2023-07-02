@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { useEffect, useRef, useState } from "react";
 import { FaBrain } from "react-icons/fa";
 import { IoMdAdd } from "react-icons/io";
@@ -5,6 +6,7 @@ import { IoMdAdd } from "react-icons/io";
 import Button from "@/lib/components/ui/Button";
 import Field from "@/lib/components/ui/Field";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
+import { useEventTracking } from "@/services/analytics/useEventTracking";
 import { AnimatePresence, motion } from "framer-motion";
 import { MdCheck } from "react-icons/md";
 
@@ -14,9 +16,11 @@ export const BrainsDropDown = (): JSX.Element => {
   const { allBrains, createBrain, setActiveBrain, currentBrain } =
     useBrainContext();
   const dropdownRef = useRef<HTMLDivElement | null>(null);
+  const { track } = useEventTracking();
 
   const toggleDropdown = () => {
     setShowDropdown((prevState) => !prevState);
+    void track("SHOW_BRAINS_DROPDOWN");
   };
 
   const handleCreateBrain = () => {
@@ -26,6 +30,7 @@ export const BrainsDropDown = (): JSX.Element => {
 
     void createBrain(newBrainName);
     setNewBrainName(""); // Reset the new brain name input
+    void track("BRAIN_CREATED");
   };
 
   const handleClickOutside = (event: MouseEvent) => {
@@ -36,6 +41,12 @@ export const BrainsDropDown = (): JSX.Element => {
       setShowDropdown(false);
     }
   };
+
+  const changeBrains = (value: string) => {
+    void track("CHANGE_BRAIN");
+    setNewBrainName(value);
+  };
+
   useEffect(() => {
     document.addEventListener("mousedown", handleClickOutside);
 
@@ -80,7 +91,7 @@ export const BrainsDropDown = (): JSX.Element => {
                   name="brainname"
                   placeholder="Add a new brain"
                   autoFocus
-                  onChange={(e) => setNewBrainName(e.target.value)}
+                  onChange={(e) => changeBrains(e.target.value)}
                 />
                 <Button type="submit" className="px-2 py-2">
                   <IoMdAdd className="w-5 h-5" />
