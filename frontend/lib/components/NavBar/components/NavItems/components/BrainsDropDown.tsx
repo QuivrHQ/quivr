@@ -1,12 +1,13 @@
 /* eslint-disable */
 import { useEffect, useRef, useState } from "react";
 import { FaBrain } from "react-icons/fa";
-import { IoMdAdd, IoMdTrash } from "react-icons/io";
+import { IoMdAdd } from "react-icons/io";
 
 import Button from "@/lib/components/ui/Button";
 import Field from "@/lib/components/ui/Field";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 import { useEventTracking } from "@/services/analytics/useEventTracking";
+import { UUID } from "crypto";
 import { AnimatePresence, motion } from "framer-motion";
 import { MdCheck, MdDelete } from "react-icons/md";
 
@@ -45,6 +46,11 @@ export const BrainsDropDown = (): JSX.Element => {
   const changeBrains = (value: string) => {
     void track("CHANGE_BRAIN");
     setNewBrainName(value);
+  };
+
+  const deteleBrains = (id: UUID) => {
+    void track("DELETE_BRAIN");
+    deleteBrain(id);
   };
 
   useEffect(() => {
@@ -123,7 +129,7 @@ export const BrainsDropDown = (): JSX.Element => {
                     </button>
                     <Button
                       className="group-hover:opacity-100 opacity-0 absolute right-0 hover:text-red-500 transition-[colors,opacity]"
-                      onClick={() => deleteBrain(brain.id)}
+                      onClick={() => deteleBrains(brain.id)}
                       variant={"tertiary"}
                     >
                       <MdDelete className="text-xl" />
