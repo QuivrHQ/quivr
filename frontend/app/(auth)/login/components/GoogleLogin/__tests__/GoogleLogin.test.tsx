@@ -13,7 +13,7 @@ vi.mock("../hooks/useGoogleLogin", () => ({
   useGoogleLogin: () => mockUseGoogleLogin(),
 }));
 
-describe("GoogleLoginButton", () => {
+describe.concurrent("GoogleLoginButton", () => {
   it("renders correctly", () => {
     const { getByTestId } = render(<GoogleLoginButton />);
 
