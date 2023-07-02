@@ -3,8 +3,12 @@ name: Pytest
 on:
   push:
     branches: [ main ]
+    paths:
+      - 'backend/**'
   pull_request:
-    branches: [ main ]    
+    branches: [ main ] 
+    paths:
+      - 'backend/**'  
 jobs:
   build:
     runs-on: ubuntu-latest
