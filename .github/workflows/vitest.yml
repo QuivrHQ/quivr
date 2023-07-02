@@ -26,4 +26,3 @@ jobs:
           cache-dependency-path: frontend/yarn.lock
       - run: yarn
       - run: yarn run test-unit
-      - run: yarn run build
