@@ -63,9 +63,12 @@ export default function RecoverPassword() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="New password"
+              data-testid="password-field"
             />
             <div className="flex flex-col items-center justify-center mt-2 gap-2">
-              <Button isLoading={isPending}>Update</Button>
+              <Button isLoading={isPending} data-testid="update-button">
+                Update
+              </Button>
             </div>
           </form>
         </Card>
