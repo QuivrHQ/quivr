@@ -1,42 +1,44 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {};
 
-module.exports = nextConfig;
+// Check if the SENTRY_DSN environment variable is defined
+if (process.env.SENTRY_DSN) {
+    // SENTRY_DSN exists, include Sentry configuration
+    const { withSentryConfig } = require("@sentry/nextjs");
 
+    module.exports = withSentryConfig(
+        nextConfig,
+        {
+            // For all available options, see:
+            // https://github.com/getsentry/sentry-webpack-plugin#options
 
-// Injected content via Sentry wizard below
+            // Suppresses source map uploading logs during build
+            silent: true,
 
-const { withSentryConfig } = require("@sentry/nextjs");
+            org: "quivr-0f",
+            project: "javascript-nextjs",
+        },
+        {
+            // For all available options, see:
+            // https://docs.sentry.io/platforms/javascript/guides/nextjs/manual-setup/
 
-module.exports = withSentryConfig(
-  module.exports,
-  {
-    // For all available options, see:
-    // https://github.com/getsentry/sentry-webpack-plugin#options
+            // Upload a larger set of source maps for prettier stack traces (increases build time)
+            widenClientFileUpload: true,
 
-    // Suppresses source map uploading logs during build
-    silent: true,
+            // Transpiles SDK to be compatible with IE11 (increases bundle size)
+            transpileClientSDK: true,
 
-    org: "quivr-0f",
-    project: "javascript-nextjs",
-  },
-  {
-    // For all available options, see:
-    // https://docs.sentry.io/platforms/javascript/guides/nextjs/manual-setup/
+            // Routes browser requests to Sentry through a Next.js rewrite to circumvent ad-blockers (increases server load)
+            tunnelRoute: "/monitoring",
 
-    // Upload a larger set of source maps for prettier stack traces (increases build time)
-    widenClientFileUpload: true,
+            // Hides source maps from generated client bundles
+            hideSourceMaps: true,
 
-    // Transpiles SDK to be compatible with IE11 (increases bundle size)
-    transpileClientSDK: true,
-
-    // Routes browser requests to Sentry through a Next.js rewrite to circumvent ad-blockers (increases server load)
-    tunnelRoute: "/monitoring",
-
-    // Hides source maps from generated client bundles
-    hideSourceMaps: true,
-
-    // Automatically tree-shake Sentry logger statements to reduce bundle size
-    disableLogger: true,
-  }
-);
+            // Automatically tree-shake Sentry logger statements to reduce bundle size
+            disableLogger: true,
+        }
+    );
+} else {
+    // SENTRY_DSN does not exist, export nextConfig without Sentry
+    module.exports = nextConfig;
+}
