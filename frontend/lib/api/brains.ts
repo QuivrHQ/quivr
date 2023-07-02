@@ -50,7 +50,7 @@ export const deleteBrainFromBE = async (
   brainId: UUID
 ): Promise<void> => {
   try {
-    (await axiosInstance.delete(`/brain/${brainId}/`)).data;
+    (await axiosInstance.delete(`/brains/${brainId}/`)).data;
   } catch (error) {
     console.error(`Error deleting brain ${brainId}`, error);
 
