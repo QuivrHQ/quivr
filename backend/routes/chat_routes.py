@@ -76,10 +76,10 @@ def check_user_limit(
 ):
     if user.user_openai_api_key is None:
         date = time.strftime("%Y%m%d")
-        max_requests_number = os.getenv("MAX_REQUESTS_NUMBER", 1000)
+        max_requests_number = int(os.getenv("MAX_REQUESTS_NUMBER", 1000))
 
         user.increment_user_request_count(date)
-        if str(user.requests_count) >= str(max_requests_number):
+        if int(user.requests_count) >= int(max_requests_number):
             raise HTTPException(
                 status_code=429,
                 detail="You have reached the maximum number of requests for today.",
