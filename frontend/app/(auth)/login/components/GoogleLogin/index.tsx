@@ -12,6 +12,7 @@ export const GoogleLoginButton = () => {
       isLoading={isPending}
       variant={"secondary"}
       type="button"
+      data-testid="google-login-button"
     >
       Login with Google
     </Button>
