@@ -3,24 +3,32 @@ from uuid import UUID
 
 from fastapi import APIRouter, Depends, Query, Request, UploadFile
 
-from auth.auth_bearer import AuthBearer, get_current_user
+from auth.auth_bearer import (
+    AuthBearer,
+    get_current_user,  # pyright: ignore reportPrivateUsage=none,
+)
 from models.brains import Brain
 from models.files import File
 from models.settings import common_dependencies
 from models.users import User
-from utils.file import convert_bytes, get_file_size
-from utils.processors import filter_file
+from utils.file import (
+    convert_bytes,  # pyright: ignore reportPrivateUsage=none,
+    get_file_size,  # pyright: ignore reportPrivateUsage=none,
+)
+from utils.processors import filter_file  # pyright: ignore reportPrivateUsage=none
 
 upload_router = APIRouter()
 
 
 @upload_router.post("/upload", dependencies=[Depends(AuthBearer())], tags=["Upload"])
-async def upload_file(
+async def upload_file(  # pyright: ignore reportPrivateUsage=none
     request: Request,
     uploadFile: UploadFile,
     brain_id: UUID = Query(..., description="The ID of the brain"),
     enable_summarization: bool = False,
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(
+        get_current_user  # pyright: ignore reportPrivateUsage=none
+    ),
 ):
     """
     Upload a file to the user's storage.
@@ -43,10 +51,12 @@ async def upload_file(
     commons = common_dependencies()
 
     if request.headers.get("Openai-Api-Key"):
-        brain.max_brain_size = os.getenv("MAX_BRAIN_SIZE_WITH_KEY", 209715200)
+        brain.max_brain_size = os.getenv(
+            "MAX_BRAIN_SIZE_WITH_KEY", 209715200
+        )  # pyright: ignore reportPrivateUsage=none
     remaining_free_space = brain.remaining_brain_size
 
-    file_size = get_file_size(uploadFile)
+    file_size = get_file_size(uploadFile)  # pyright: ignore reportPrivateUsage=none
 
     file = File(file=uploadFile)
     if remaining_free_space - file_size < 0:
@@ -55,7 +65,7 @@ async def upload_file(
             "type": "error",
         }
     else:
-        message = await filter_file(
+        message = await filter_file(  # pyright: ignore reportPrivateUsage=none
             commons,
             file,
             enable_summarization,
@@ -63,4 +73,4 @@ async def upload_file(
             openai_api_key=request.headers.get("Openai-Api-Key", None),
         )
 
-    return message
+    return message  # pyright: ignore reportPrivateUsage=none

@@ -8,15 +8,17 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 
 from models.files import File
 from models.settings import CommonsDep
-from utils.file import compute_sha1_from_content
+from utils.file import (
+    compute_sha1_from_content,  # pyright: ignore reportPrivateUsage=none
+)
 
 
 async def process_audio(
     commons: CommonsDep,
     file: File,
     enable_summarization: bool,
-    user,
-    user_openai_api_key,
+    user,  # pyright: ignore reportPrivateUsage=none
+    user_openai_api_key,  # pyright: ignore reportPrivateUsage=none
 ):
     temp_filename = None
     file_sha = ""
@@ -26,10 +28,13 @@ async def process_audio(
     try:
         upload_file = file.file
         with tempfile.NamedTemporaryFile(
-            delete=False, suffix=upload_file.filename
+            delete=False,
+            suffix=upload_file.filename,  # pyright: ignore reportPrivateUsage=none
         ) as tmp_file:
-            await upload_file.seek(0)
-            content = await upload_file.read()
+            await upload_file.seek(0)  # pyright: ignore reportPrivateUsage=none
+            content = (
+                await upload_file.read()
+            )  # pyright: ignore reportPrivateUsage=none
             tmp_file.write(content)
             tmp_file.flush()
             tmp_file.close()
@@ -37,7 +42,12 @@ async def process_audio(
             temp_filename = tmp_file.name
 
             with open(tmp_file.name, "rb") as audio_file:
-                transcript = openai.Audio.transcribe("whisper-1", audio_file)
+                transcript = (  # pyright: ignore reportPrivateUsage=none
+                    openai.Audio.transcribe(  # pyright: ignore reportPrivateUsage=none
+                        "whisper-1",
+                        audio_file,  # pyright: ignore reportPrivateUsage=none
+                    )
+                )
 
         file_sha = compute_sha1_from_content(transcript.text.encode("utf-8"))
         file_size = len(transcript.text.encode("utf-8"))

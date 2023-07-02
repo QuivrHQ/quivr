@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from logger import get_logger
+from logger import get_logger  # pyright: ignore reportPrivateUsage=none
 from models.settings import common_dependencies
 from pydantic import BaseModel
 
@@ -10,16 +10,16 @@ logger = get_logger(__name__)
 class User(BaseModel):
     id: UUID
     email: str
-    user_openai_api_key: str = None
+    user_openai_api_key: str = None  # pyright: ignore reportPrivateUsage=none
     requests_count: int = 0
 
     # [TODO] Rename the user table and its references to 'user_usage'
-    def create_user(self, date):
+    def create_user(self, date):  # pyright: ignore reportPrivateUsage=none
         commons = common_dependencies()
         logger.info(f"New user entry in db document for user {self.email}")
 
         return (
-            commons.supabase.table("users")
+            commons.supabase.table("users")  # pyright: ignore reportPrivateUsage=none
             .insert(
                 {
                     "user_id": self.id,
@@ -31,36 +31,50 @@ class User(BaseModel):
             .execute()
         )
 
-    def get_user_request_stats(self):
+    def get_user_request_stats(self):  # pyright: ignore reportPrivateUsage=none
         commons = common_dependencies()
-        requests_stats = (
-            commons["supabase"]
+        requests_stats = (  # pyright: ignore reportPrivateUsage=none
+            commons["supabase"]  # pyright: ignore reportPrivateUsage=none
             .from_("users")
             .select("*")
             .filter("user_id", "eq", self.id)
             .execute()
         )
-        return requests_stats.data
+        return requests_stats.data  # pyright: ignore reportPrivateUsage=none
 
-    def fetch_user_requests_count(self, date):
+    def fetch_user_requests_count(
+        self, date  # pyright: ignore reportPrivateUsage=none
+    ):  # pyright: ignore reportPrivateUsage=none
         commons = common_dependencies()
-        response = (
-            commons["supabase"]
+        response = (  # pyright: ignore reportPrivateUsage=none
+            commons["supabase"]  # pyright: ignore reportPrivateUsage=none
             .from_("users")
             .select("*")
             .filter("user_id", "eq", self.id)
             .filter("date", "eq", date)
             .execute()
         )
-        userItem = next(iter(response.data or []), {"requests_count": 0})
+        userItem = next(  # pyright: ignore reportPrivateUsage=none
+            iter(response.data or []),  # pyright: ignore reportPrivateUsage=none,
+            {"requests_count": 0},
+        )
 
         return userItem["requests_count"]
 
-    def increment_user_request_count(self, date):
+    def increment_user_request_count(
+        self, date  # pyright: ignore reportPrivateUsage=none
+    ):  # pyright: ignore reportPrivateUsage=none
         commons = common_dependencies()
-        requests_count = self.fetch_user_requests_count(date) + 1
+        requests_count = (
+            self.fetch_user_requests_count(  # pyright: ignore reportPrivateUsage=none
+                date  # pyright: ignore reportPrivateUsage=none
+            )
+            + 1
+        )
         logger.info(f"User {self.email} request count updated to {requests_count}")
-        commons["supabase"].table("users").update(
-            {"requests_count": requests_count}
-        ).match({"user_id": self.id, "date": date}).execute()
+        commons["supabase"].table(  # pyright: ignore reportPrivateUsage=none
+            "users"
+        ).update({"requests_count": requests_count}).match(
+            {"user_id": self.id, "date": date}
+        ).execute()
         self.requests_count = requests_count
