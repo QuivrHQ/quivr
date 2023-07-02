@@ -40,7 +40,7 @@ export const ChatsList = (): JSX.Element => {
         >
           <div className="flex flex-col flex-1">
             <NewChatButton />
-            <div className="flex-1 overflow-auto h-full">
+            <div className="flex-1 overflow-auto scrollbar h-full">
               {allChats.map((chat) => (
                 <ChatsListItem
                   key={chat.chat_id}
