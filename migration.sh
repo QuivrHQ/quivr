@@ -35,7 +35,7 @@ else
     # Running migrations
 
     # Get the last migration that was executed
-    LAST_MIGRATION=$(PGPASSWORD=${DB_PASSWORD} psql -h "${DB_HOST}" -p "${DB_PORT}" -d "${DB_NAME}" -U "${DB_USER}" -tAc "SELECT id FROM migrations ORDER BY executed_at DESC LIMIT 1;")
+    LAST_MIGRATION=$(PGPASSWORD=${DB_PASSWORD} psql -h "${DB_HOST}" -p "${DB_PORT}" -d "${DB_NAME}" -U "${DB_USER}" -tAc "SELECT name FROM migrations ORDER BY executed_at DESC LIMIT 1;")
     
     echo "Last migration executed: $LAST_MIGRATION"
     # Iterate through the migration files
