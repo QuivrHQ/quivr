@@ -4,7 +4,6 @@ from typing import AsyncIterable, List
 from langchain.callbacks import AsyncCallbackHandler, AsyncIteratorCallbackHandler
 from langchain.chains import ConversationalRetrievalChain, LLMChain
 from langchain.llms import LLM
-
 from logger import get_logger
 from models.settings import BrainSettings  # Importing settings related to the 'brain'
 from pydantic import BaseModel  # For data validation and settings management
@@ -28,11 +27,9 @@ class BaseBrainPicking(BaseModel):
     chat_id: str = None
     brain_id: str = None
     max_tokens: int = 256
-    streaming: bool = False
     user_openai_api_key: str = None
+    streaming: bool = False
 
-    # the below functions define the logic for overwriting and defining the variables needed for this class.
-    # openai_api_key
     def _determine_api_key(self, openai_api_key, user_openai_api_key):
         """If user provided an API key, use it."""
         if user_openai_api_key is not None:
@@ -40,15 +37,18 @@ class BaseBrainPicking(BaseModel):
         else:
             return openai_api_key
 
-    # streaming
     def _determine_streaming(self, model_name: str, streaming: bool) -> bool:
         """If the model name allows for streaming and streaming is declared, set streaming to True."""
         if model_name in streaming_compatible_models and streaming:
             return True
+        if model_name not in streaming_compatible_models and streaming:
+            logger.warning(
+                f"Streaming is not compatible with {model_name}. Streaming will be set to False."
+            )
+            return False
         else:
             return False
 
-    # callbacks
     def _determine_callback_array(self, streaming) -> List[AsyncCallbackHandler]:
         """If streaming is set, set the AsyncIteratorCallbackHandler as the only callback."""
         if streaming:
@@ -57,6 +57,7 @@ class BaseBrainPicking(BaseModel):
     def __init__(self, **data):
         super().__init__(**data)
 
+        # Set the attributes
         self.openai_api_key = self._determine_api_key(
             self.brain_settings.openai_api_key, self.user_openai_api_key
         )

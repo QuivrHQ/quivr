@@ -1,14 +1,14 @@
 # Importing various modules and classes from a custom library 'langchain' likely used for natural language processing
 from langchain.llms import GPT4All
 from langchain.llms.base import LLM
-from llm.brainpicking import BrainPicking
 from logger import get_logger
 from models.settings import LLMSettings
+from .base import BaseBrainPicking
 
 logger = get_logger(__name__)
 
 
-class PrivateBrainPicking(BrainPicking):
+class PrivateGPT4AllBrainPicking(BaseBrainPicking):
     """
     This subclass of BrainPicking is used to specifically work with a private language model.
     """
@@ -20,7 +20,7 @@ class PrivateBrainPicking(BrainPicking):
         self,
         model: str,
         chat_id: str,
-        brain_id:str,
+        brain_id: str,
         temperature: float,
         max_tokens: int,
         user_openai_api_key: str,

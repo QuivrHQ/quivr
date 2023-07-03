@@ -1,5 +1,5 @@
 from typing import Optional
-from typing import Any, Dict  # For type hinting
+from typing import Any, Dict
 
 
 class FunctionCall:

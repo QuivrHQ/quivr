@@ -2,136 +2,119 @@ import asyncio
 import json
 from typing import AsyncIterable, Awaitable
 
-from langchain.callbacks import AsyncIteratorCallbackHandler
-
-# Importing various modules and classes from a custom library 'langchain' likely used for natural language processing
 from langchain.chains import ConversationalRetrievalChain, LLMChain
 from langchain.chains.question_answering import load_qa_chain
 from langchain.chat_models import ChatOpenAI
 from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.llms.base import LLM
-from llm.prompt.CONDENSE_PROMPT import CONDENSE_QUESTION_PROMPT
 from logger import get_logger
-from models.settings import BrainSettings  # Importing settings related to the 'brain'
-from pydantic import BaseModel  # For data validation and settings management
+from models.chat import ChatHistory
+from models.settings import BrainSettings
 from repository.chat.get_chat_history import get_chat_history
 from repository.chat.update_chat_history import update_chat_history
 from repository.chat.update_message_by_id import update_message_by_id
-from supabase import Client  # For interacting with Supabase database
-from supabase import create_client
+from supabase import Client, create_client
 from vectorstore.supabase import (
     CustomSupabaseVectorStore,
 )  # Custom class for handling vector storage with Supabase
 
+from .base import BaseBrainPicking
+from .prompts.CONDENSE_PROMPT import CONDENSE_QUESTION_PROMPT
+
 logger = get_logger(__name__)
 
 
-class BrainPicking(BaseModel):
+class OpenAIBrainPicking(BaseBrainPicking):
     """
     Main class for the Brain Picking functionality.
     It allows to initialize a Chat model, generate questions and retrieve answers using ConversationalRetrievalChain.
     """
 
     # Instantiate settings
-    settings = BrainSettings()
+    brain_settings = BrainSettings()
 
     # Default class attributes
-    llm_name: str = "gpt-3.5-turbo"
+    model_name: str = "gpt-3.5-turbo"
     temperature: float = 0.0
+    brain_id: str
     chat_id: str
     max_tokens: int = 256
-
-    # Storage
-    supabase_client: Client = None
-    vector_store: CustomSupabaseVectorStore = None
-
-    # Language models
-    embeddings: OpenAIEmbeddings = None
-    question_llm: LLM = None
-    doc_llm: LLM = None
-    question_generator: LLMChain = None
-    doc_chain: LLMChain = None
-    qa: ConversationalRetrievalChain = None
-
-    # Streaming
-    callback: AsyncIteratorCallbackHandler = None
     streaming: bool = False
-
-    class Config:
-        # Allowing arbitrary types for class validation
-        arbitrary_types_allowed = True
 
     def __init__(
         self,
-        model: str,
+        model_name: str,
         brain_id: str,
         temperature: float,
         chat_id: str,
         max_tokens: int,
         user_openai_api_key: str,
         streaming: bool = False,
-    ) -> "BrainPicking":
+    ):
         """
         Initialize the BrainPicking class by setting embeddings, supabase client, vector store, language model and chains.
-        :param model: Language model name to be used.
-        :param user_brain_idid: The brain id to be used for CustomSupabaseVectorStore.
-        :return: BrainPicking instance
+        :return: OpenAIBrainPicking instance
         """
         super().__init__(
-            model=model,
+            model_name=model_name,
             brain_id=brain_id,
             chat_id=chat_id,
             max_tokens=max_tokens,
             temperature=temperature,
             user_openai_api_key=user_openai_api_key,
+            streaming=streaming,
         )
-        # If user provided an API key, update the settings
-        if user_openai_api_key is not None:
-            self.settings.openai_api_key = user_openai_api_key
 
+        # Set the class attributes
         self.temperature = temperature
-        self.embeddings = OpenAIEmbeddings(openai_api_key=self.settings.openai_api_key)
-        self.supabase_client = create_client(
-            self.settings.supabase_url, self.settings.supabase_service_key
+        self.model_name = model_name
+        self.chat_id = chat_id
+        self.brain_id = brain_id
+        self.max_tokens = max_tokens
+
+    @property
+    def embeddings(self) -> OpenAIEmbeddings:
+        return OpenAIEmbeddings(openai_api_key=self.openai_api_key)
+
+    @property
+    def supabase_client(self) -> Client:
+        return create_client(
+            self.brain_settings.supabase_url, self.brain_settings.supabase_service_key
         )
-        self.llm_name = model
-        self.vector_store = CustomSupabaseVectorStore(
+
+    @property
+    def vector_store(self) -> CustomSupabaseVectorStore:
+        return CustomSupabaseVectorStore(
             self.supabase_client,
             self.embeddings,
             table_name="vectors",
-            brain_id=brain_id,
+            brain_id=self.brain_id,
         )
 
-        self.question_llm = self._create_llm(
-            model_name=self.llm_name,
-            streaming=False,
-        )
-        self.question_generator = LLMChain(
-            llm=self.question_llm, prompt=CONDENSE_QUESTION_PROMPT
-        )
+    @property
+    def question_llm(self) -> LLM:
+        return self._create_llm(streaming=False)
 
-        if streaming:
-            self.callback = AsyncIteratorCallbackHandler()
-            self.doc_llm = self._create_llm(
-                model_name=self.llm_name,
-                streaming=streaming,
-                callbacks=[self.callback],
-            )
-            self.doc_chain = load_qa_chain(
-                llm=self.doc_llm,
-                chain_type="stuff",
-            )
-            self.streaming = streaming
-        else:
-            self.doc_llm = self._create_llm(
-                model_name=self.llm_name,
-                streaming=streaming,
-            )
-            self.doc_chain = load_qa_chain(llm=self.doc_llm, chain_type="stuff")
-            self.streaming = streaming
+    @property
+    def doc_llm(self) -> LLM:
+        return self._create_llm(streaming=self.streaming, callbacks=self.callbacks)
 
-        self.chat_id = chat_id
-        self.max_tokens = max_tokens
+    @property
+    def question_generator(self) -> LLMChain:
+        return LLMChain(llm=self.question_llm, prompt=CONDENSE_QUESTION_PROMPT)
+
+    @property
+    def doc_chain(self) -> LLMChain:
+        return load_qa_chain(llm=self.doc_llm, chain_type="stuff")
+
+    @property
+    def qa(self) -> ConversationalRetrievalChain:
+        return ConversationalRetrievalChain(
+            retriever=self.vector_store.as_retriever(),
+            question_generator=self.question_generator,
+            combine_docs_chain=self.doc_chain,
+            verbose=True,
+        )
 
     def _create_llm(self, model_name, streaming=False, callbacks=None) -> LLM:
         """
@@ -148,27 +131,22 @@ class BrainPicking(BaseModel):
             callbacks=callbacks,
         )
 
-    def _get_qa(
-        self,
-    ) -> ConversationalRetrievalChain:
+    def _call_chain(self, chain, question, history):
         """
-        Retrieves a QA chain for the given chat message and API key.
-        :param chat_message: The chat message containing history.
-        :param user_openai_api_key: The OpenAI API key to be used.
-        :return: ConversationalRetrievalChain instance
+        Call a chain with a given question and history.
+        :param chain: The chain eg QA (ConversationalRetrievalChain)
+        :param question: The user prompt
+        :param history: The chat history from DB
+        :return: The answer.
         """
-
-        # Initialize and return a ConversationalRetrievalChain
-        qa = ConversationalRetrievalChain(
-            retriever=self.vector_store.as_retriever(),
-            question_generator=self.question_generator,
-            combine_docs_chain=self.doc_chain,
-            verbose=True,
+        return chain(
+            {
+                "question": question,
+                "chat_history": history,
+            }
         )
 
-        return qa
-
-    def generate_answer(self, question: str) -> str:
+    def generate_answer(self, question: str) -> ChatHistory:
         """
         Generate an answer to a given question by interacting with the language model.
         :param question: The question
@@ -176,18 +154,40 @@ class BrainPicking(BaseModel):
         """
         transformed_history = []
 
-        # Get the QA chain
-        qa = self._get_qa()
+        # Get the history from the database
         history = get_chat_history(self.chat_id)
 
         # Format the chat history into a list of tuples (human, ai)
-        transformed_history = [(chat.user_message, chat.assistant) for chat in history]
+        transformed_history = self.format_chat_history(history)
 
         # Generate the model response using the QA chain
-        model_response = qa({"question": question, "chat_history": transformed_history})
+        model_response = self._call_chain(self.qa, question, transformed_history)
+
         answer = model_response["answer"]
 
-        return answer
+        # Update chat history
+        chat_answer = update_chat_history(
+            chat_id=self.chat_id,
+            user_message=question,
+            assistant=answer,
+        )
+
+        return chat_answer
+
+    async def _acall_chain(self, chain, question, history):
+        """
+        Call a chain with a given question and history.
+        :param chain: The chain eg QA (ConversationalRetrievalChain)
+        :param question: The user prompt
+        :param history: The chat history from DB
+        :return: The answer.
+        """
+        return chain.acall(
+            {
+                "question": question,
+                "chat_history": history,
+            }
+        )
 
     async def generate_stream(self, question: str) -> AsyncIterable:
         """
@@ -196,13 +196,13 @@ class BrainPicking(BaseModel):
         :return: An async iterable which generates the answer.
         """
 
-        # Get the QA chain
-        qa = self._get_qa()
         history = get_chat_history(self.chat_id)
-        callback = self.callback
+        callback = self.callbacks[0]
 
-        # # Format the chat history into a list of tuples (human, ai)
-        transformed_history = [(chat.user_message, chat.assistant) for chat in history]
+        transformed_history = []
+
+        # Format the chat history into a list of tuples (human, ai)
+        transformed_history = self.format_chat_history(history)
 
         # Initialize a list to hold the tokens
         response_tokens = []
@@ -216,15 +216,9 @@ class BrainPicking(BaseModel):
             finally:
                 event.set()
 
-        # Use the acall method to perform an async call to the QA chain
         task = asyncio.create_task(
             wrap_done(
-                qa.acall(
-                    {
-                        "question": question,
-                        "chat_history": transformed_history,
-                    }
-                ),
+                self.qa._acall_chain(self.qa, question, transformed_history),
                 callback.done,
             )
         )
