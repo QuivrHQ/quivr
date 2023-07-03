@@ -35,4 +35,10 @@ BEGIN
 END;
 $$;
 
+INSERT INTO migrations (name) 
+SELECT ('20230627151100_update_match_vectors');
+WHERE NOT EXISTS (
+    SELECT 1 FROM migrations WHERE name = '20230627151100_update_match_vectors'
+);
+
 COMMIT;

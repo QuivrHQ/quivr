@@ -54,3 +54,7 @@ backend/application_default_credentials.json
 
 #local models
 backend/local_models/*
+
+
+## scripts
+.migration_info
