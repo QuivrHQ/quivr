@@ -1,4 +1,5 @@
 ---
+name: Epic
 about: Use this template for epics.
 title: "[Epic]"
 labels: epic
