@@ -53,6 +53,7 @@ export const ChatsListItem = ({
           ? "bg-gray-100 dark:bg-gray-800 text-primary dark:text-white"
           : ""
       )}
+      data-testid="chats-list-item"
     >
       <Link
         className="flex flex-col flex-1 min-w-0 p-4"

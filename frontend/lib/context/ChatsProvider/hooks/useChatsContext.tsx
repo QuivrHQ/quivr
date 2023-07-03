@@ -3,7 +3,7 @@ import { useContext } from "react";
 
 import { ChatsContext } from "../chats-provider";
 
-const useChatsContext = () => {
+export const useChatsContext = () => {
   const context = useContext(ChatsContext);
 
   if (context === undefined) {
@@ -12,5 +12,3 @@ const useChatsContext = () => {
 
   return context;
 };
-
-export default useChatsContext;
