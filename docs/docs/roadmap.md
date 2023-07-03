@@ -21,22 +21,22 @@ Quivr is a platform for building second brains and personnal assistants. It is a
   - [X] Multiple chats
   - [X] Use own keys
 - [ ] **v0.2** - Time to share
-  - [ ] Improved Documentation
+  - [X] Improved Documentation
     - [ ] Add a tutorial
     - [ ] Add a FAQ
     - [X] Create a website - https://brain.quivr.app
-  - [ ] Create public & private brains
+  - [X] Create public & private brains
   - [ ] Allow users to share/subcribe brains 
   - [ ] Improved UX/UI
     - [ ] Stream response
-    - [ ] Better error handling
-    - [ ] Mobile friendly
+    - [X] Better error handling
+    - [X] Mobile friendly
   - [ ] Chat with one or more files
-  - [ ] Better API Interface 
+  - [X] Better API Interface 
   - [ ] Refactor backend & frontend for better development experience
 - [ ] **v0.3** - Make it smarter & private
   - [ ] Private Brains
-    - [ ] Use PrivateGPT as LLM and Embedding
+    - [X] Use PrivateGPT as LLM and Embedding
   - [ ] Better Storage
     - [ ] Use a vectorstore for storing embeddings
   - [ ] Add metadata
