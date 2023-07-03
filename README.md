@@ -103,8 +103,17 @@ cp .frontend_env.example frontend/.env
 
 - **Step 4**: Run the following migration scripts on the Supabase database via the web interface (SQL Editor -> `New query`)
 
-[Creation Script 1](scripts/tables.sql)
+Use the `migration.sh` script to run the migration scripts
 
+```bash
+chmod +x migration.sh
+./migration.sh
+```
+
+And choose either create_scripts if first time or migrations if you are updating your database
+
+
+All scripts can be found in the [scripts](scripts/) folder
 > _If you come from an old version of Quivr, run the scripts in [migration script](scripts/) to migrate your data to the new version in the order of date_
 
 - **Step 5**: Launch the app

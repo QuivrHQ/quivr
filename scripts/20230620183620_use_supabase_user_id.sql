@@ -210,3 +210,9 @@ $$;
 -- Optionally Drop the 'old_user_id' column from the 'users' table
 -- Uncomment if you are sure that it is no longer needed.
 --ALTER TABLE users DROP COLUMN old_user_id;
+
+INSERT INTO migrations (name) 
+SELECT ('20230627151100_update_match_vectors')
+WHERE NOT EXISTS (
+    SELECT 1 FROM migrations WHERE name = '20230627151100_update_match_vectors'
+);

@@ -69,6 +69,8 @@ if grep -q "NEXT_PUBLIC_SUPABASE_ANON_KEY=<change-me>" frontend/.env; then
 fi
 
 # Step 4: Run the migration scripts (this is supposed to be done manually as per the instructions)
+echo "Running the migration scripts..."
+./migration.sh
 
 # Step 5: Launch the app
 echo "Launching the app..."
