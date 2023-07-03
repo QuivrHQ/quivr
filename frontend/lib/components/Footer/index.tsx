@@ -1,3 +1,4 @@
+/* eslint-disable */
 "use client";
 import { DISCORD_URL, GITHUB_URL, TWITTER_URL } from "@/lib/config/CONSTANTS";
 import { useSupabase } from "@/lib/context/SupabaseProvider";

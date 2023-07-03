@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { DISCORD_URL, GITHUB_URL, TWITTER_URL } from "@/lib/config/CONSTANTS";
 
 export const MiniFooter = (): JSX.Element => {

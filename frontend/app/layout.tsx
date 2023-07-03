@@ -10,6 +10,8 @@ import { ToastProvider } from "@/lib/components/ui/Toast";
 import { BrainProvider } from "@/lib/context";
 import { BrainConfigProvider } from "@/lib/context/BrainConfigProvider/brain-config-provider";
 import { SupabaseProvider } from "@/lib/context/SupabaseProvider";
+import "@/styles/prosemirror.css";
+import "@/styles/tailwind.css";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"] });
