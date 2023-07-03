@@ -30,5 +30,15 @@
     "editor.defaultFormatter": "esbenp.prettier-vscode",
     "editor.formatOnSave": true
   },
-  "editor.formatOnSaveMode": "file"
+  "editor.formatOnSaveMode": "file",
+  "files.exclude": {
+    "**/__pycache__": true,
+    "**/.benchmarks/": true,
+    "**/.cache/": true,
+    "**/.pytest_cache/": true,
+    "**/.next/": true,
+    "**/build/": true,
+    "**/.docusaurus/": true,
+    "**/node_modules/": true,
+  },
 }
