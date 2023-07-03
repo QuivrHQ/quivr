@@ -31,7 +31,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 INSERT INTO migrations (name) 
-SELECT ('20230606131110_add_uuid_user_id')
+SELECT '20230606131110_add_uuid_user_id'
 WHERE NOT EXISTS (
     SELECT 1 FROM migrations WHERE name = '20230606131110_add_uuid_user_id'
 );

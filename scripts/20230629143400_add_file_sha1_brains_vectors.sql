@@ -14,8 +14,9 @@ FROM (
 WHERE brains_vectors.vector_id = subquery.id
 AND (brains_vectors.file_sha1 IS NULL OR brains_vectors.file_sha1 = '');
 
+
 INSERT INTO migrations (name) 
-SELECT ('20230629143400_add_file_sha1_brains_vectors')
+SELECT '20230629143400_add_file_sha1_brains_vectors'
 WHERE NOT EXISTS (
     SELECT 1 FROM migrations WHERE name = '20230629143400_add_file_sha1_brains_vectors'
 );
