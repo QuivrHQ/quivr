@@ -92,7 +92,7 @@ $$;
 
 
 INSERT INTO migrations (name) 
-SELECT ('20230620170840_add_vectors_brains')
+SELECT '20230620170840_add_vectors_brains'
 WHERE NOT EXISTS (
     SELECT 1 FROM migrations WHERE name = '20230620170840_add_vectors_brains'
 );

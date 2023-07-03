@@ -26,13 +26,12 @@ else
 fi
 
 # Ask user whether to create tables or run migrations
-CHOICE=$(gum choose --header "Choose an option" "create_tables" "run_migrations")
+CHOICE=$(gum choose --header "Choose an option" "Create all tables" "Run Migrations")
 
-if [ "$CHOICE" == "create_tables" ]; then
+if [ "$CHOICE" == "Create all tables" ]; then
     # Running the tables.sql file to create tables
     run_sql_file "scripts/tables.sql"
 else
-    # Running migrations
 
     # Get the last migration that was executed
     LAST_MIGRATION=$(PGPASSWORD=${DB_PASSWORD} psql -h "${DB_HOST}" -p "${DB_PORT}" -d "${DB_NAME}" -U "${DB_USER}" -tAc "SELECT name FROM migrations ORDER BY executed_at DESC LIMIT 1;")
