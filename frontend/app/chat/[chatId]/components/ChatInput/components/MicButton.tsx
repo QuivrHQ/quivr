@@ -21,6 +21,7 @@ export const MicButton = ({ setMessage }: MicButtonProps): JSX.Element => {
       type="button"
       onClick={startListening}
       disabled={!speechSupported}
+      data-testid="mic-button"
     >
       {isListening ? (
         <MdMicOff className="text-lg sm:text-xl lg:text-2xl" />

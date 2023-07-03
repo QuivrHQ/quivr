@@ -3,8 +3,8 @@
 
 import PageHeading from "@/lib/components/ui/PageHeading";
 
-import { ChatInput, ChatMessages } from "../components";
-import { ChatProvider } from "./context/ChatContext";
+import { ChatProvider } from "../../../lib/context/ChatProvider";
+import { ChatInput, ChatMessages } from "./components";
 
 export default function ChatPage() {
   return (

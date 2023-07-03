@@ -5,7 +5,7 @@ import { useCallback } from "react";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 import { useAxios, useFetch } from "@/lib/hooks";
 
-import { useChatContext } from "../context/ChatContext";
+import { useChatContext } from "../../../../lib/context/ChatProvider";
 import { ChatEntity, ChatHistory, ChatQuestion } from "../types";
 
 interface UseChatService {

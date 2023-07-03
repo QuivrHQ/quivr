@@ -7,7 +7,11 @@ import Button from "@/lib/components/ui/Button";
 export const ConfigButton = (): JSX.Element => {
   return (
     <Link href={"/config"}>
-      <Button className="p-2 sm:px-3" variant={"tertiary"}>
+      <Button
+        className="p-2 sm:px-3"
+        variant={"tertiary"}
+        data-testid="config-button"
+      >
         <MdSettings className="text-lg sm:text-xl lg:text-2xl" />
       </Button>
     </Link>

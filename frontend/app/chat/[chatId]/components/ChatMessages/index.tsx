@@ -1,10 +1,10 @@
 import React from "react";
 
 import Card from "@/lib/components/ui/Card";
+import { useChatContext } from "@/lib/context";
 
-import { ChatMessage } from "./components/ChatMessage";
+import { ChatMessage } from "./components/ChatMessage/components/ChatMessage";
 import { useChatMessages } from "./hooks/useChatMessages";
-import { useChatContext } from "../../[chatId]/context/ChatContext";
 
 export const ChatMessages = (): JSX.Element => {
   const { chatListRef } = useChatMessages();
