@@ -1,9 +1,9 @@
 from abc import abstractmethod
 from typing import AsyncIterable, List
 
-from langchain.callbacks import AsyncCallbackHandler, AsyncIteratorCallbackHandler
+from langchain.callbacks import AsyncIteratorCallbackHandler
 from langchain.chains import ConversationalRetrievalChain, LLMChain
-from langchain.llms import LLM
+from langchain.llms.base import LLM
 from logger import get_logger
 from models.settings import BrainSettings  # Importing settings related to the 'brain'
 from pydantic import BaseModel  # For data validation and settings management
@@ -49,7 +49,9 @@ class BaseBrainPicking(BaseModel):
         else:
             return False
 
-    def _determine_callback_array(self, streaming) -> List[AsyncCallbackHandler]:
+    def _determine_callback_array(
+        self, streaming
+    ) -> List[AsyncIteratorCallbackHandler]:
         """If streaming is set, set the AsyncIteratorCallbackHandler as the only callback."""
         if streaming:
             return [AsyncIteratorCallbackHandler]

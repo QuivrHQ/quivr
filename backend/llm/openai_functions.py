@@ -74,7 +74,7 @@ class OpenAIFunctionsBrainPicking(BaseBrainPicking):
         logger.info("Getting model response")
         kwargs = {
             "messages": messages,
-            "model": self.llm_name,
+            "model": self.model_name,
             "temperature": self.temperature,
             "max_tokens": self.max_tokens,
         }

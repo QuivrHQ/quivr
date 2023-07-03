@@ -169,14 +169,10 @@ async def create_question_handler(
 
         if llm_settings.private:
             gpt_answer_generator = PrivateGPT4AllBrainPicking(
-                model=chat_question.model,
                 chat_id=str(chat_id),
-                temperature=chat_question.temperature,
-                max_tokens=chat_question.max_tokens,
                 brain_id=brain_id,
-                user_openai_api_key=current_user.user_openai_api_key,
+                streaming=False,
             )
-            chat_answer = gpt_answer_generator.generate_answer(chat_question.question)
 
         elif chat_question.model in openai_function_compatible_models:
             gpt_answer_generator = OpenAIFunctionsBrainPicking(
@@ -187,7 +183,6 @@ async def create_question_handler(
                 brain_id=brain_id,
                 user_openai_api_key=current_user.user_openai_api_key,
             )
-            chat_answer = gpt_answer_generator.generate_answer(chat_question.question)
 
         else:
             gpt_answer_generator = OpenAIBrainPicking(
@@ -199,7 +194,7 @@ async def create_question_handler(
                 user_openai_api_key=current_user.user_openai_api_key,
             )
 
-            chat_answer = gpt_answer_generator.generate_answer(chat_question.question)
+        chat_answer = gpt_answer_generator.generate_answer(chat_question.question)
 
         return chat_answer
     except HTTPException as e:
@@ -219,10 +214,7 @@ async def create_stream_question_handler(
     brain_id: UUID = Query(..., description="The ID of the brain"),
     current_user: User = Depends(get_current_user),
 ) -> StreamingResponse:
-    if (
-        os.getenv("PRIVATE") == "True"
-        or chat_question.model not in streaming_compatible_models
-    ):
+    if chat_question.model not in streaming_compatible_models:
         # Forward the request to the none streaming endpoint
         return await create_question_handler(
             request, chat_question, chat_id, current_user
@@ -231,16 +223,24 @@ async def create_stream_question_handler(
     try:
         user_openai_api_key = request.headers.get("Openai-Api-Key")
         check_user_limit(current_user)
+        llm_settings = LLMSettings()
 
-        gpt_answer_generator = OpenAIBrainPicking(
-            chat_id=str(chat_id),
-            model=chat_question.model,
-            max_tokens=chat_question.max_tokens,
-            temperature=chat_question.temperature,
-            brain_id=brain_id,
-            user_openai_api_key=user_openai_api_key,
-            streaming=True,
-        )
+        if llm_settings.private:
+            gpt_answer_generator = PrivateGPT4AllBrainPicking(
+                chat_id=str(chat_id),
+                brain_id=brain_id,
+                streaming=False,
+            )
+        else:
+            gpt_answer_generator = OpenAIBrainPicking(
+                chat_id=str(chat_id),
+                model=chat_question.model,
+                max_tokens=chat_question.max_tokens,
+                temperature=chat_question.temperature,
+                brain_id=brain_id,
+                user_openai_api_key=user_openai_api_key,
+                streaming=True,
+            )
 
         return StreamingResponse(
             gpt_answer_generator.generate_stream(chat_question.question),
