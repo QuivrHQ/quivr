@@ -5,9 +5,9 @@ import { cn } from "@/lib/utils";
 import { MotionConfig, motion } from "framer-motion";
 import { MdChevronRight } from "react-icons/md";
 
-import { NewChatButton } from "./NewChatButton";
-import { ChatsListItem } from "./components/ChatsListItem/";
+import { ChatsListItem } from "./components/ChatsListItem";
 import { MiniFooter } from "./components/ChatsListItem/components/MiniFooter";
+import { NewChatButton } from "./components/NewChatButton";
 import { useChatsList } from "./hooks/useChatsList";
 
 export const ChatsList = (): JSX.Element => {

@@ -8,7 +8,7 @@ import { useToast } from "@/lib/hooks";
 import { useEventTracking } from "@/services/analytics/useEventTracking";
 
 import { useChatService } from "./useChatService";
-import { useChatContext } from "../context/ChatContext";
+import { useChatContext } from "../../../../lib/context/ChatProvider";
 import { ChatQuestion } from "../types";
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
