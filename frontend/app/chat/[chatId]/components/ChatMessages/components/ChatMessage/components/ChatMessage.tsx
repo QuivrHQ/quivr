@@ -34,14 +34,10 @@ export const ChatMessage = forwardRef(
         >
           {speaker}
         </span>
-        <>
-          <ReactMarkdown
-            // remarkRehypeOptions={{}}
-            className="prose dark:prose-invert ml-[6px]  mt-1"
-          >
-            {text}
-          </ReactMarkdown>
-        </>
+
+        <ReactMarkdown className="prose dark:prose-invert ml-[6px]  mt-1">
+          {text}
+        </ReactMarkdown>
       </div>
     );
   }
