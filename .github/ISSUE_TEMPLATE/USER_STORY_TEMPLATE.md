@@ -1,4 +1,5 @@
 ---
+name: User story
 about: Use this template for user stories.
 title: "[Epic]: User story"
 labels: user story
