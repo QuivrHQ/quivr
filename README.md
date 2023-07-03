@@ -71,7 +71,18 @@ Additionally, you'll need a [Supabase](https://supabase.com/) account for:
   git clone git@github.com:StanGirard/Quivr.git && cd Quivr
   ```
 
-- **Step 2**: Copy the `.XXXXX_env` files
+- ** Step 2**: Use the install helper
+
+You can use the install_helper.sh script to setup your env files
+
+```bash
+brew install gum # Windows (via Scoop) scoop install charm-gum
+
+chmod +x install_helper.sh
+./install_helper.sh
+```
+
+- **Step 2 - Bis**: Copy the `.XXXXX_env` files
 
 ```bash
 cp .backend_env.example backend/.env
