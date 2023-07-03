@@ -42,7 +42,7 @@ https://github.com/StanGirard/quivr/assets/19614572/a6463b73-76c7-4bc0-978d-7056
 
 Follow these instructions to get a copy of the project up and running on your local machine for development and testing purposes.
 
-You can find everything on the documentation [here](https://brains.quivr.app/)
+You can find everything on the documentation [here](https://brain.quivr.app/)
 
 ### Prerequisites 📋
 
