@@ -12,7 +12,8 @@ export const useChatMessages = () => {
 
   const scrollToBottom = useCallback(() => {
     if (chatListRef.current) {
-      chatListRef.current.scrollTo({
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+      chatListRef.current.scrollTo?.({
         top: chatListRef.current.scrollHeight,
         behavior: "smooth",
       });
