@@ -1,23 +1,41 @@
 from typing import Any, Dict, List, Optional
 
 from langchain.chat_models import ChatOpenAI
-from llm.brainpicking import BrainPicking
+from llm.models.FunctionCall import FunctionCall
+from llm.models.OpenAiAnswer import OpenAiAnswer
 from logger import get_logger
+from models.chat import ChatHistory
 from repository.chat.get_chat_history import get_chat_history
+from repository.chat.update_chat_history import update_chat_history
 from vectorstore.supabase import CustomSupabaseVectorStore
 
-from .utils.format_answer import format_answer
+from .base import BaseBrainPicking
 
 logger = get_logger(__name__)
 
 
-class BrainPickingOpenAIFunctions(BrainPicking):
-    DEFAULT_MODEL = "gpt-3.5-turbo-0613"
-    DEFAULT_TEMPERATURE = 0.0
-    DEFAULT_MAX_TOKENS = 256
+def format_answer(model_response: Dict[str, Any]) -> OpenAiAnswer:
+    answer = model_response["choices"][0]["message"]
+    content = answer["content"]
+    function_call = None
 
-    openai_client: ChatOpenAI = None
-    brain_id: str = None
+    if answer.get("function_call", None) is not None:
+        function_call = FunctionCall(
+            answer["function_call"]["name"],
+            answer["function_call"]["arguments"],
+        )
+
+    return OpenAiAnswer(content=content, function_call=function_call)
+
+
+class OpenAIFunctionsBrainPicking(BaseBrainPicking):
+    """
+    Class for the OpenAI Brain Picking functionality using OpenAI Functions.
+    It allows to initialize a Chat model, generate questions and retrieve answers using ConversationalRetrievalChain.
+    """
+
+    # Default class attributes
+    model: str = "gpt-3.5-turbo-0613"
 
     def __init__(
         self,
@@ -27,8 +45,8 @@ class BrainPickingOpenAIFunctions(BrainPicking):
         max_tokens: int,
         brain_id: str,
         user_openai_api_key: str,
-    ) -> None:
-        # Call the constructor of the parent class (BrainPicking)
+        # TODO: add streaming
+    ) -> "OpenAIFunctionsBrainPicking":
         super().__init__(
             model=model,
             chat_id=chat_id,
@@ -36,8 +54,12 @@ class BrainPickingOpenAIFunctions(BrainPicking):
             user_openai_api_key=user_openai_api_key,
             temperature=temperature,
             brain_id=str(brain_id),
+            streaming=False,
         )
-        self.openai_client = ChatOpenAI(openai_api_key=self.settings.openai_api_key)
+
+    @property
+    def openai_client(self) -> ChatOpenAI:
+        return ChatOpenAI(openai_api_key=self.openai_api_key)
 
     def _get_model_response(
         self,
@@ -50,7 +72,7 @@ class BrainPickingOpenAIFunctions(BrainPicking):
         logger.info("Getting model response")
         kwargs = {
             "messages": messages,
-            "model": self.llm_name,
+            "model": self.model,
             "temperature": self.temperature,
             "max_tokens": self.max_tokens,
         }
@@ -100,7 +122,7 @@ class BrainPickingOpenAIFunctions(BrainPicking):
         system_messages = [
             {
                 "role": "system",
-                "content": "Your name is Quivr. You are a second brain. A person will ask you a question and you will provide a helpful answer. Write the answer in the same language as the question.If you don't know the answer, just say that you don't know. Don't try to make up an answer.our main goal is to answer questions about user uploaded documents. Unless basic questions or greetings, you should always refer to user uploaded documents by fetching them with the get_history_and_context function. If the user ask a question that is not common knowledge for a 10 years old, then use get_history_and_context to find a document that can help you answer the question. If the user ask a question that is common knowledge for a 10 years old, then you can answer the question without using get_history_and_context.",
+                "content": "Your name is Quivr. You are a second brain. A person will ask you a question and you will provide a helpful answer. Write the answer in the same language as the question. If you don't know the answer, just say that you don't know. Don't try to make up an answer. Our goal is to answer questions about user uploaded documents. Unless basic questions or greetings, you should always refer to user uploaded documents by fetching them with the get_history_and_context function. If the user ask a question that is not common knowledge for a 10 years old, then use get_history_and_context to find a document that can help you answer the question. If the user ask a question that is common knowledge for a 10 years old, then you can answer the question without using get_history_and_context.",
             }
         ]
 
@@ -122,7 +144,7 @@ class BrainPickingOpenAIFunctions(BrainPicking):
 
         return system_messages
 
-    def generate_answer(self, question: str) -> str:
+    def generate_answer(self, question: str) -> ChatHistory:
         """
         Main function to get an answer for the given question
         """
@@ -172,4 +194,11 @@ class BrainPickingOpenAIFunctions(BrainPicking):
             )
             formatted_response = format_answer(response)
 
-        return formatted_response.content or ""
+        # Update chat history
+        chat_history = update_chat_history(
+            chat_id=self.chat_id,
+            user_message=question,
+            assistant=formatted_response.content or "",
+        )
+
+        return chat_history

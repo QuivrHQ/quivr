@@ -2,12 +2,13 @@ from datetime import datetime
 
 from fastapi import HTTPException
 from models.settings import common_dependencies
+from models.users import User
 from pydantic import DateError
 
 
 async def verify_api_key(
     api_key: str,
-):
+) -> bool:
     try:
         # Use UTC time to avoid timezone issues
         current_date = datetime.utcnow().date()
@@ -37,7 +38,7 @@ async def verify_api_key(
 
 async def get_user_from_api_key(
     api_key: str,
-):
+) -> User:
     commons = common_dependencies()
 
     # Lookup the user_id from the api_keys table
@@ -63,8 +64,6 @@ async def get_user_from_api_key(
         .execute()
     )
 
-    return (
-        {"email": user_email_data.data[0]["email"], "sub": user_id}
-        if user_email_data.data
-        else {"email": None}
-    )
+    email = user_email_data.data[0]["email"] if user_email_data.data else None
+
+    return User(email=email, id=user_id)

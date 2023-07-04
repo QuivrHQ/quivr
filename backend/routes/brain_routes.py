@@ -1,7 +1,7 @@
 from typing import Optional
 from uuid import UUID
 
-from auth.auth_bearer import AuthBearer, get_current_user
+from auth import AuthBearer, get_current_user
 from fastapi import APIRouter, Depends
 from logger import get_logger
 from models.brains import Brain, get_default_user_brain
@@ -46,7 +46,7 @@ async def brain_endpoint(current_user: User = Depends(get_current_user)):
 )
 async def get_default_brain_endpoint(current_user: User = Depends(get_current_user)):
     """
-    Retrieve the default brain for the current user.
+    Retrieve the default brain for the current user. If the user doesnt have one, it creates one.
 
     - `current_user`: The current authenticated user.
     - Returns the default brain for the user.
@@ -56,6 +56,18 @@ async def get_default_brain_endpoint(current_user: User = Depends(get_current_us
     """
 
     default_brain = get_default_user_brain(current_user)
+
+    if default_brain is None:
+        logger.info(f"No default brain found for user {current_user.id}. Creating one.")
+
+        brain = Brain(name="Default brain")
+        brain.create_brain()
+        brain.create_brain_user(
+            user_id=current_user.id, rights="Owner", default_brain=True
+        )
+
+        default_brain = get_default_user_brain(current_user)
+
     return default_brain
 
 

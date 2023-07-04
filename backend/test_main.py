@@ -69,7 +69,6 @@ def test_retrieve_default_brain():
 def test_create_brain():
     # Generate a random UUID for brain_id
     random_brain_id = str(uuid.uuid4())
-    random_brain_id = str(uuid.uuid4())
 
     # Generate a random name for the brain
     random_brain_name = "".join(

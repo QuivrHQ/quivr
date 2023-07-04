@@ -6,7 +6,7 @@ logger = get_logger(__name__)
 
 
 def update_message_by_id(
-    message_id: str, user_message: str, assistant: str
+    message_id: str, user_message: str = None, assistant: str = None
 ) -> ChatHistory:
     commons = common_dependencies()
 
@@ -20,7 +20,7 @@ def update_message_by_id(
         updates["user_message"] = user_message
 
     if assistant is not None:
-        updates["assistant"] = user_message
+        updates["assistant"] = assistant
 
     updated_message = None
 

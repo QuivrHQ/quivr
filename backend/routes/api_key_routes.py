@@ -4,7 +4,7 @@ from typing import List
 from uuid import uuid4
 
 from asyncpg.exceptions import UniqueViolationError
-from auth.auth_bearer import AuthBearer, get_current_user
+from auth import AuthBearer, get_current_user
 from fastapi import APIRouter, Depends
 from logger import get_logger
 from models.settings import CommonsDep

@@ -1,16 +1,16 @@
-# Importing various modules and classes from a custom library 'langchain' likely used for natural language processing
-from langchain.llms import GPT4All
 from langchain.llms.base import LLM
-from llm.brainpicking import BrainPicking
+from langchain.llms.gpt4all import GPT4All
 from logger import get_logger
 from models.settings import LLMSettings
+
+from .base import BaseBrainPicking
 
 logger = get_logger(__name__)
 
 
-class PrivateBrainPicking(BrainPicking):
+class PrivateGPT4AllBrainPicking(BaseBrainPicking):
     """
-    This subclass of BrainPicking is used to specifically work with a private language model.
+    This subclass of BrainPicking is used to specifically work with the private language model GPT4All.
     """
 
     # Initialize class settings
@@ -18,35 +18,31 @@ class PrivateBrainPicking(BrainPicking):
 
     def __init__(
         self,
-        model: str,
         chat_id: str,
-        brain_id:str,
-        temperature: float,
-        max_tokens: int,
-        user_openai_api_key: str,
-    ) -> "PrivateBrainPicking":
+        brain_id: str,
+        streaming: bool,
+    ) -> "PrivateGPT4AllBrainPicking":
         """
         Initialize the PrivateBrainPicking class by calling the parent class's initializer.
-        :param model: Language model name to be used.
-        :param brain_id: The user id to be used for CustomSupabaseVectorStore.
+        :param brain_id: The brain_id in the DB.
+        :param chat_id: The id of the chat in the DB.
+        :param streaming: Whether to enable streaming of the model
         :return: PrivateBrainPicking instance
         """
+
+        # set defaults
+        model = "gpt4all-j-1.3"
 
         super().__init__(
             model=model,
             brain_id=brain_id,
             chat_id=chat_id,
-            max_tokens=max_tokens,
-            temperature=temperature,
-            user_openai_api_key=user_openai_api_key,
+            streaming=streaming,
         )
 
-    def _create_llm(self, model_name, streaming=False, callbacks=None) -> LLM:
+    def _create_llm(self) -> LLM:
         """
         Override the _create_llm method to enforce the use of a private model.
-        :param model_name: Language model name to be used.
-        :param private_model_args: Dictionary containing model_path, n_ctx and n_batch.
-        :param private: Boolean value to determine if private model is to be used. Defaulted to True.
         :return: Language model instance
         """
         model_path = self.llm_settings.model_path
