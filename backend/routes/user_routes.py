@@ -1,7 +1,7 @@
 import os
 import time
 
-from auth.auth_bearer import AuthBearer, get_current_user
+from auth import AuthBearer, get_current_user
 from fastapi import APIRouter, Depends, Request
 from models.brains import Brain, get_default_user_brain
 from models.users import User
@@ -15,8 +15,11 @@ def get_unique_documents(vectors):
     # Convert each dictionary to a tuple of items, then to a set to remove duplicates, and then back to a dictionary
     return [dict(t) for t in set(tuple(d.items()) for d in vectors)]
 
+
 @user_router.get("/user", dependencies=[Depends(AuthBearer())], tags=["User"])
-async def get_user_endpoint(request: Request, current_user: User = Depends(get_current_user)):
+async def get_user_endpoint(
+    request: Request, current_user: User = Depends(get_current_user)
+):
     """
     Get user information and statistics.
 
@@ -30,7 +33,7 @@ async def get_user_endpoint(request: Request, current_user: User = Depends(get_c
     """
 
     max_brain_size = int(os.getenv("MAX_BRAIN_SIZE", 0))
-    if request.headers.get('Openai-Api-Key'):
+    if request.headers.get("Openai-Api-Key"):
         max_brain_size = MAX_BRAIN_SIZE_WITH_OWN_KEY
 
     date = time.strftime("%Y%m%d")
@@ -39,14 +42,15 @@ async def get_user_endpoint(request: Request, current_user: User = Depends(get_c
     default_brain = get_default_user_brain(current_user)
 
     if default_brain:
-        defaul_brain_size = Brain(id=default_brain['id']).brain_size
-    else: 
+        defaul_brain_size = Brain(id=default_brain["id"]).brain_size
+    else:
         defaul_brain_size = 0
 
-    return {"email": current_user.email,
-            "max_brain_size": max_brain_size,
-            "current_brain_size": defaul_brain_size,
-            "max_requests_number": max_requests_number,
-            "requests_stats": requests_stats,
-            "date": date,
-            }
+    return {
+        "email": current_user.email,
+        "max_brain_size": max_brain_size,
+        "current_brain_size": defaul_brain_size,
+        "max_requests_number": max_requests_number,
+        "requests_stats": requests_stats,
+        "date": date,
+    }

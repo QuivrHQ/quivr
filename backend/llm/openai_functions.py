@@ -30,12 +30,13 @@ def format_answer(model_response: Dict[str, Any]) -> OpenAiAnswer:
 
 class OpenAIFunctionsBrainPicking(BaseBrainPicking):
     # Default class attributes
-    model_name: str = "gpt-3.5-turbo-0613"
+    model: str = "gpt-3.5-turbo-0613"
     temperature: float = 0.0
     chat_id: str = None
     brain_id: str = None
     max_tokens: int = 256
-    user_openai_api_key: str = None
+    openai_api_key: str = None
+    callbacks: List[Any] = None
     streaming: bool = False
 
     def __init__(
@@ -47,7 +48,7 @@ class OpenAIFunctionsBrainPicking(BaseBrainPicking):
         brain_id: str,
         user_openai_api_key: str,
         # TODO: add streaming
-    ):
+    ) -> "OpenAIFunctionsBrainPicking":
         super().__init__(
             model=model,
             chat_id=chat_id,
@@ -60,8 +61,7 @@ class OpenAIFunctionsBrainPicking(BaseBrainPicking):
 
     @property
     def openai_client(self) -> ChatOpenAI:
-        if self._openai_client is None:
-            self._openai_client = ChatOpenAI(openai_api_key=self.openai_api_key)
+        return ChatOpenAI(openai_api_key=self.openai_api_key)
 
     def _get_model_response(
         self,
@@ -74,7 +74,7 @@ class OpenAIFunctionsBrainPicking(BaseBrainPicking):
         logger.info("Getting model response")
         kwargs = {
             "messages": messages,
-            "model": self.model_name,
+            "model": self.model,
             "temperature": self.temperature,
             "max_tokens": self.max_tokens,
         }

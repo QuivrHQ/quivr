@@ -22,7 +22,7 @@ class BaseBrainPicking(BaseModel):
     brain_settings = BrainSettings()
 
     # Default class attributes
-    model_name: str = "gpt-3.5-turbo"
+    model: str = "gpt-3.5-turbo"
     temperature: float = 0.0
     chat_id: str = None
     brain_id: str = None
@@ -37,13 +37,13 @@ class BaseBrainPicking(BaseModel):
         else:
             return openai_api_key
 
-    def _determine_streaming(self, model_name: str, streaming: bool) -> bool:
+    def _determine_streaming(self, model: str, streaming: bool) -> bool:
         """If the model name allows for streaming and streaming is declared, set streaming to True."""
-        if model_name in streaming_compatible_models and streaming:
+        if model in streaming_compatible_models and streaming:
             return True
-        if model_name not in streaming_compatible_models and streaming:
+        if model not in streaming_compatible_models and streaming:
             logger.warning(
-                f"Streaming is not compatible with {model_name}. Streaming will be set to False."
+                f"Streaming is not compatible with {model}. Streaming will be set to False."
             )
             return False
         else:
@@ -63,7 +63,7 @@ class BaseBrainPicking(BaseModel):
         self.openai_api_key = self._determine_api_key(
             self.brain_settings.openai_api_key, self.user_openai_api_key
         )
-        self.streaming = self._determine_streaming(self.model_name, self.streaming)
+        self.streaming = self._determine_streaming(self.model, self.streaming)
         self.callbacks = self._determine_callback_array(self.streaming)
 
     class Config:
@@ -72,19 +72,12 @@ class BaseBrainPicking(BaseModel):
         # Allowing arbitrary types for class validation
         arbitrary_types_allowed = True
 
-        # Util methods
-        @staticmethod
-        def format_chat_history(history) -> list[tuple[str, str]]:
-            """Format the chat history into a list of tuples (human, ai)"""
-
-            return [(chat.user_message, chat.assistant) for chat in history]
-
         # the below methods define the names, arguments and return types for the most useful functions for the child classes. These should be overwritten if they are used.
         @abstractmethod
-        def _create_llm(self, model_name, streaming=False, callbacks=None) -> LLM:
+        def _create_llm(self, model, streaming=False, callbacks=None) -> LLM:
             """
             Determine and construct the language model.
-            :param model_name: Language model name to be used.
+            :param model: Language model name to be used.
             :return: Language model instance
 
             This method should take into account the following:
@@ -94,10 +87,10 @@ class BaseBrainPicking(BaseModel):
             """
 
         @abstractmethod
-        def _create_question_chain(self, model_name) -> LLMChain:
+        def _create_question_chain(self, model) -> LLMChain:
             """
             Determine and construct the question chain.
-            :param model_name: Language model name to be used.
+            :param model: Language model name to be used.
             :return: Question chain instance
 
             This method should take into account the following:
@@ -105,10 +98,10 @@ class BaseBrainPicking(BaseModel):
             """
 
         @abstractmethod
-        def _create_doc_chain(self, model_name) -> LLMChain:
+        def _create_doc_chain(self, model) -> LLMChain:
             """
             Determine and construct the document chain.
-            :param model_name Language model name to be used.
+            :param model Language model name to be used.
             :return: Document chain instance
 
             This method should take into account the following:

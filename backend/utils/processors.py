@@ -1,4 +1,3 @@
-
 from models.brains import Brain
 from models.files import File
 from models.settings import CommonsDep
@@ -40,28 +39,45 @@ def create_response(message, type):
     return {"message": message, "type": type}
 
 
-async def filter_file(commons: CommonsDep, file: File, enable_summarization: bool, brain_id, openai_api_key):
+async def filter_file(
+    commons: CommonsDep,
+    file: File,
+    enable_summarization: bool,
+    brain_id,
+    openai_api_key,
+):
     await file.compute_file_sha1()
-    
+
     print("file sha1", file.file_sha1)
     file_exists = file.file_already_exists()
     file_exists_in_brain = file.file_already_exists_in_brain(brain_id)
 
     if file_exists_in_brain:
-        return create_response(f"🤔 {file.file.filename} already exists in brain {brain_id}.", "warning")
+        return create_response(
+            f"🤔 {file.file.filename} already exists in brain {brain_id}.", "warning"
+        )
     elif file.file_is_empty():
         return create_response(f"❌ {file.file.filename} is empty.", "error")
     elif file_exists:
         file.link_file_to_brain(brain=Brain(id=brain_id))
-        return create_response(f"✅ {file.file.filename} has been uploaded to brain {brain_id}.", "success")
-    
+        return create_response(
+            f"✅ {file.file.filename} has been uploaded to brain {brain_id}.", "success"
+        )
+
     if file.file_extension in file_processors:
         try:
-            await file_processors[file.file_extension](commons, file, enable_summarization, brain_id, openai_api_key)
-            return create_response(f"✅ {file.file.filename} has been uploaded to brain {brain_id}.", "success")
+            await file_processors[file.file_extension](
+                commons, file, enable_summarization, brain_id, openai_api_key
+            )
+            return create_response(
+                f"✅ {file.file.filename} has been uploaded to brain {brain_id}.",
+                "success",
+            )
         except Exception as e:
             # Add more specific exceptions as needed.
             print(f"Error processing file: {e}")
-            return create_response(f"⚠️ An error occurred while processing {file.file.filename}.", "error")
+            return create_response(
+                f"⚠️ An error occurred while processing {file.file.filename}.", "error"
+            )
 
     return create_response(f"❌ {file.file.filename} is not supported.", "error")

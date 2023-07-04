@@ -1,7 +1,7 @@
 from typing import Optional
 from uuid import UUID
 
-from auth.auth_bearer import AuthBearer, get_current_user
+from auth import AuthBearer, get_current_user
 from fastapi import APIRouter, Depends
 from logger import get_logger
 from models.brains import Brain, get_default_user_brain

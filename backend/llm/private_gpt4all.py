@@ -31,10 +31,10 @@ class PrivateGPT4AllBrainPicking(BaseBrainPicking):
         """
 
         # set defaults
-        model_name = "gpt4all-j-1.3"
+        model = "gpt4all-j-1.3"
 
         super().__init__(
-            model_name=model_name,
+            model=model,
             brain_id=brain_id,
             chat_id=chat_id,
             streaming=streaming,

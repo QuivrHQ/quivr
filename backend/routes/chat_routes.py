@@ -4,7 +4,7 @@ from http.client import HTTPException
 from typing import List
 from uuid import UUID
 
-from auth.auth_bearer import AuthBearer, get_current_user
+from auth import AuthBearer, get_current_user
 from fastapi import APIRouter, Depends, Query, Request
 from fastapi.responses import StreamingResponse
 from llm.openai import OpenAIBrainPicking
@@ -170,7 +170,7 @@ async def create_question_handler(
         if llm_settings.private:
             gpt_answer_generator = PrivateGPT4AllBrainPicking(
                 chat_id=str(chat_id),
-                brain_id=brain_id,
+                brain_id=str(brain_id),
                 streaming=False,
             )
 
@@ -180,7 +180,7 @@ async def create_question_handler(
                 chat_id=str(chat_id),
                 temperature=chat_question.temperature,
                 max_tokens=chat_question.max_tokens,
-                brain_id=brain_id,
+                brain_id=str(brain_id),
                 user_openai_api_key=current_user.user_openai_api_key,
             )
 
@@ -190,7 +190,7 @@ async def create_question_handler(
                 model=chat_question.model,
                 max_tokens=chat_question.max_tokens,
                 temperature=chat_question.temperature,
-                brain_id=brain_id,
+                brain_id=str(brain_id),
                 user_openai_api_key=current_user.user_openai_api_key,
             )
 
@@ -228,7 +228,7 @@ async def create_stream_question_handler(
         if llm_settings.private:
             gpt_answer_generator = PrivateGPT4AllBrainPicking(
                 chat_id=str(chat_id),
-                brain_id=brain_id,
+                brain_id=str(brain_id),
                 streaming=False,
             )
         else:
@@ -237,7 +237,7 @@ async def create_stream_question_handler(
                 model=chat_question.model,
                 max_tokens=chat_question.max_tokens,
                 temperature=chat_question.temperature,
-                brain_id=brain_id,
+                brain_id=str(brain_id),
                 user_openai_api_key=user_openai_api_key,
                 streaming=True,
             )

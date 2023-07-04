@@ -1,6 +1,6 @@
 import asyncio
 import json
-from typing import AsyncIterable, Awaitable
+from typing import Any, AsyncIterable, Awaitable, List
 
 from langchain.chains import ConversationalRetrievalChain, LLMChain
 from langchain.chains.question_answering import load_qa_chain
@@ -10,6 +10,7 @@ from langchain.llms.base import LLM
 from logger import get_logger
 from models.chat import ChatHistory
 from models.settings import BrainSettings
+from repository.chat.format_chat_history import format_chat_history
 from repository.chat.get_chat_history import get_chat_history
 from repository.chat.update_chat_history import update_chat_history
 from repository.chat.update_message_by_id import update_message_by_id
@@ -34,29 +35,32 @@ class OpenAIBrainPicking(BaseBrainPicking):
     brain_settings = BrainSettings()
 
     # Default class attributes
-    model_name: str = "gpt-3.5-turbo"
+    model: str = "gpt-3.5-turbo"
     temperature: float = 0.0
     brain_id: str
     chat_id: str
     max_tokens: int = 256
     streaming: bool = False
 
+    openai_api_key: str = None
+    callbacks: List[Any] = None
+
     def __init__(
         self,
-        model_name: str,
+        model: str,
         brain_id: str,
         temperature: float,
         chat_id: str,
         max_tokens: int,
         user_openai_api_key: str,
         streaming: bool = False,
-    ):
+    ) -> "OpenAIBrainPicking":
         """
         Initialize the BrainPicking class by setting embeddings, supabase client, vector store, language model and chains.
         :return: OpenAIBrainPicking instance
         """
         super().__init__(
-            model_name=model_name,
+            model=model,
             brain_id=brain_id,
             chat_id=chat_id,
             max_tokens=max_tokens,
@@ -67,7 +71,7 @@ class OpenAIBrainPicking(BaseBrainPicking):
 
         # Set the class attributes
         self.temperature = temperature
-        self.model_name = model_name
+        self.model = model
         self.chat_id = chat_id
         self.brain_id = brain_id
         self.max_tokens = max_tokens
@@ -93,11 +97,13 @@ class OpenAIBrainPicking(BaseBrainPicking):
 
     @property
     def question_llm(self) -> LLM:
-        return self._create_llm(streaming=False)
+        return self._create_llm(model=self.model, streaming=False)
 
     @property
     def doc_llm(self) -> LLM:
-        return self._create_llm(streaming=self.streaming, callbacks=self.callbacks)
+        return self._create_llm(
+            model=self.model, streaming=self.streaming, callbacks=self.callbacks
+        )
 
     @property
     def question_generator(self) -> LLMChain:
@@ -116,17 +122,17 @@ class OpenAIBrainPicking(BaseBrainPicking):
             verbose=True,
         )
 
-    def _create_llm(self, model_name, streaming=False, callbacks=None) -> LLM:
+    def _create_llm(self, model, streaming=False, callbacks=None) -> LLM:
         """
         Determine the language model to be used.
-        :param model_name: Language model name to be used.
+        :param model: Language model name to be used.
         :param private_model_args: Dictionary containing model_path, n_ctx and n_batch.
         :param private: Boolean value to determine if private model is to be used.
         :return: Language model instance
         """
         return ChatOpenAI(
             temperature=0,
-            model_name=model_name,
+            model=model,
             streaming=streaming,
             callbacks=callbacks,
         )
@@ -158,7 +164,7 @@ class OpenAIBrainPicking(BaseBrainPicking):
         history = get_chat_history(self.chat_id)
 
         # Format the chat history into a list of tuples (human, ai)
-        transformed_history = self.format_chat_history(history)
+        transformed_history = format_chat_history(history)
 
         # Generate the model response using the QA chain
         model_response = self._call_chain(self.qa, question, transformed_history)
@@ -202,7 +208,7 @@ class OpenAIBrainPicking(BaseBrainPicking):
         transformed_history = []
 
         # Format the chat history into a list of tuples (human, ai)
-        transformed_history = self.format_chat_history(history)
+        transformed_history = format_chat_history(history)
 
         # Initialize a list to hold the tokens
         response_tokens = []
