@@ -69,13 +69,6 @@ class OpenAIBrainPicking(BaseBrainPicking):
             streaming=streaming,
         )
 
-        # Set the class attributes
-        self.temperature = temperature
-        self.model = model
-        self.chat_id = chat_id
-        self.brain_id = brain_id
-        self.max_tokens = max_tokens
-
     @property
     def embeddings(self) -> OpenAIEmbeddings:
         return OpenAIEmbeddings(openai_api_key=self.openai_api_key)
