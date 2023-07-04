@@ -1,18 +1,24 @@
 "use client";
 import * as PopoverPrimitive from "@radix-ui/react-popover";
 import { ReactNode, useState } from "react";
-import { MdClose } from "react-icons/md";
 
-import { FC } from "react";
 import { AnimatePresence, motion } from "framer-motion";
+import { FC } from "react";
 import Button from "./Button";
 
 interface PopoverProps {
   children?: ReactNode;
   Trigger: ReactNode;
+  ActionTrigger?: ReactNode;
+  CloseTrigger?: ReactNode;
 }
 
-const Popover: FC<PopoverProps> = ({ children, Trigger }) => {
+const Popover: FC<PopoverProps> = ({
+  children,
+  Trigger,
+  ActionTrigger,
+  CloseTrigger,
+}) => {
   const [open, setOpen] = useState(false);
   return (
     <PopoverPrimitive.Root open={open} onOpenChange={setOpen}>
@@ -32,15 +38,26 @@ const Popover: FC<PopoverProps> = ({ children, Trigger }) => {
                 className="relative flex flex-col p-4 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg shadow-lg z-50"
               >
                 <div className="flex-1">{children}</div>
-                <PopoverPrimitive.Close asChild>
-                  <Button
-                    variant={"secondary"}
-                    className="px-3 py-2 self-end mt-4"
-                    aria-label="Close"
-                  >
-                    Done
-                  </Button>
-                </PopoverPrimitive.Close>
+                <div className="mt-4 self-end flex gap-4">
+                  {ActionTrigger && (
+                    <PopoverPrimitive.Close asChild>
+                      {ActionTrigger}
+                    </PopoverPrimitive.Close>
+                  )}
+                  <PopoverPrimitive.Close asChild>
+                    {CloseTrigger === undefined ? (
+                      <Button
+                        variant={"secondary"}
+                        className="px-3 py-2"
+                        aria-label="Close"
+                      >
+                        Close
+                      </Button>
+                    ) : (
+                      CloseTrigger
+                    )}
+                  </PopoverPrimitive.Close>
+                </div>
                 <PopoverPrimitive.Arrow className="fill-white stroke-gray-300 stroke-2" />
               </motion.div>
             </PopoverPrimitive.Content>

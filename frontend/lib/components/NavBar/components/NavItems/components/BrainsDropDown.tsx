@@ -1,5 +1,5 @@
 /* eslint-disable */
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { FaBrain } from "react-icons/fa";
 import { IoMdAdd } from "react-icons/io";
 
@@ -9,8 +9,7 @@ import Popover from "@/lib/components/ui/Popover";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 import { useEventTracking } from "@/services/analytics/useEventTracking";
 import { UUID } from "crypto";
-import { AnimatePresence, motion } from "framer-motion";
-import { MdCheck, MdDelete } from "react-icons/md";
+import { MdAdd, MdCheck, MdDelete } from "react-icons/md";
 
 export const BrainsDropDown = (): JSX.Element => {
   const [newBrainName, setNewBrainName] = useState("");
@@ -52,8 +51,15 @@ export const BrainsDropDown = (): JSX.Element => {
               <FaBrain className="w-6 h-6" />
             </button>
           }
+          ActionTrigger={
+            <Button variant={"secondary"}>
+              Add New Brain
+              <MdAdd className="text-xl" />
+            </Button>
+          }
+          CloseTrigger={false}
         >
-          <div className="">
+          <div>
             <form
               onSubmit={(e) => {
                 e.preventDefault();
@@ -71,7 +77,7 @@ export const BrainsDropDown = (): JSX.Element => {
                 <IoMdAdd className="w-5 h-5" />
               </Button>
             </form>
-            <div className="overflow-auto scrollbar flex flex-col h-48">
+            <div className="overflow-auto scrollbar flex flex-col h-48 mt-5">
               {/* List of brains */}
               {allBrains.map((brain) => (
                 <div
