@@ -59,7 +59,6 @@ class BaseBrainPicking(BaseModel):
     def __init__(self, **data):
         super().__init__(**data)
 
-        # Set the attributes
         self.openai_api_key = self._determine_api_key(
             self.brain_settings.openai_api_key, self.user_openai_api_key
         )
