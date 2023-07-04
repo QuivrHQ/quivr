@@ -1,6 +1,6 @@
 import asyncio
 import json
-from typing import Any, AsyncIterable, Awaitable, List
+from typing import AsyncIterable, Awaitable
 
 from langchain.chains import ConversationalRetrievalChain, LLMChain
 from langchain.chains.question_answering import load_qa_chain
@@ -9,7 +9,6 @@ from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.llms.base import LLM
 from logger import get_logger
 from models.chat import ChatHistory
-from models.settings import BrainSettings
 from repository.chat.format_chat_history import format_chat_history
 from repository.chat.get_chat_history import get_chat_history
 from repository.chat.update_chat_history import update_chat_history
@@ -27,23 +26,12 @@ logger = get_logger(__name__)
 
 class OpenAIBrainPicking(BaseBrainPicking):
     """
-    Main class for the Brain Picking functionality.
+    Main class for the OpenAI Brain Picking functionality.
     It allows to initialize a Chat model, generate questions and retrieve answers using ConversationalRetrievalChain.
     """
 
-    # Instantiate settings
-    brain_settings = BrainSettings()
-
     # Default class attributes
     model: str = "gpt-3.5-turbo"
-    temperature: float = 0.0
-    brain_id: str
-    chat_id: str
-    max_tokens: int = 256
-    streaming: bool = False
-
-    openai_api_key: str = None
-    callbacks: List[Any] = None
 
     def __init__(
         self,

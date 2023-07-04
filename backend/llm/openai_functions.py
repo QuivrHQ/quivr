@@ -29,15 +29,13 @@ def format_answer(model_response: Dict[str, Any]) -> OpenAiAnswer:
 
 
 class OpenAIFunctionsBrainPicking(BaseBrainPicking):
+    """
+    Class for the OpenAI Brain Picking functionality using OpenAI Functions.
+    It allows to initialize a Chat model, generate questions and retrieve answers using ConversationalRetrievalChain.
+    """
+
     # Default class attributes
     model: str = "gpt-3.5-turbo-0613"
-    temperature: float = 0.0
-    chat_id: str = None
-    brain_id: str = None
-    max_tokens: int = 256
-    openai_api_key: str = None
-    callbacks: List[Any] = None
-    streaming: bool = False
 
     def __init__(
         self,

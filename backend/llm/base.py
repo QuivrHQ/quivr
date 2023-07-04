@@ -2,6 +2,7 @@ from abc import abstractmethod
 from typing import AsyncIterable, List
 
 from langchain.callbacks import AsyncIteratorCallbackHandler
+from langchain.callbacks.base import AsyncCallbackHandler
 from langchain.chains import ConversationalRetrievalChain, LLMChain
 from langchain.llms.base import LLM
 from logger import get_logger
@@ -22,13 +23,16 @@ class BaseBrainPicking(BaseModel):
     brain_settings = BrainSettings()
 
     # Default class attributes
-    model: str = "gpt-3.5-turbo"
+    model: str = None
     temperature: float = 0.0
     chat_id: str = None
     brain_id: str = None
     max_tokens: int = 256
     user_openai_api_key: str = None
     streaming: bool = False
+
+    openai_api_key: str = None
+    callbacks: List[AsyncCallbackHandler] = None
 
     def _determine_api_key(self, openai_api_key, user_openai_api_key):
         """If user provided an API key, use it."""
