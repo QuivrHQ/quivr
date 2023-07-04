@@ -10,13 +10,13 @@ import {
   getUserDefaultBrainFromBackend,
 } from "@/lib/api";
 import { useAxios, useToast } from "@/lib/hooks";
+import { useEventTracking } from "@/services/analytics/useEventTracking";
 
 import {
   getBrainFromLocalStorage,
   saveBrainInLocalStorage,
 } from "../helpers/brainLocalStorage";
 import { Brain } from "../types";
-import { useEventTracking } from "@/services/analytics/useEventTracking";
 
 export interface BrainStateProps {
   currentBrain: Brain | undefined;

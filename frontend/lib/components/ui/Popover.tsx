@@ -1,9 +1,8 @@
 "use client";
 import * as PopoverPrimitive from "@radix-ui/react-popover";
+import { AnimatePresence, motion } from "framer-motion";
 import { ReactNode, useState } from "react";
 
-import { AnimatePresence, motion } from "framer-motion";
-import { FC } from "react";
 import Button from "./Button";
 
 interface PopoverProps {
@@ -13,13 +12,14 @@ interface PopoverProps {
   CloseTrigger?: ReactNode;
 }
 
-const Popover: FC<PopoverProps> = ({
+const Popover = ({
   children,
   Trigger,
   ActionTrigger,
   CloseTrigger,
-}) => {
+}: PopoverProps): JSX.Element => {
   const [open, setOpen] = useState(false);
+
   return (
     <PopoverPrimitive.Root open={open} onOpenChange={setOpen}>
       <PopoverPrimitive.Trigger asChild>{Trigger}</PopoverPrimitive.Trigger>
@@ -39,7 +39,7 @@ const Popover: FC<PopoverProps> = ({
               >
                 <div className="flex-1">{children}</div>
                 <div className="mt-4 self-end flex gap-4">
-                  {ActionTrigger && (
+                  {ActionTrigger !== undefined && (
                     <PopoverPrimitive.Close asChild>
                       {ActionTrigger}
                     </PopoverPrimitive.Close>

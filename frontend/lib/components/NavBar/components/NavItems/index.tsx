@@ -8,9 +8,9 @@ import { useSupabase } from "@/lib/context/SupabaseProvider";
 import { cn } from "@/lib/utils";
 
 import { AuthButtons } from "./components/AuthButtons";
+import { BrainsDropDown } from "./components/BrainsDropDown";
 import { DarkModeToggle } from "./components/DarkModeToggle";
 import { NavLink } from "./components/NavLink";
-import { BrainsDropDown } from "./components/BrainsDropDown";
 
 interface NavItemsProps extends HTMLAttributes<HTMLUListElement> {
   setOpen?: Dispatch<SetStateAction<boolean>>;

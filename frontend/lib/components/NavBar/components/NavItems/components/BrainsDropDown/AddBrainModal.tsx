@@ -1,21 +1,22 @@
+import { FormEvent, useState } from "react";
+import { MdAdd } from "react-icons/md";
+
 import Button from "@/lib/components/ui/Button";
 import Field from "@/lib/components/ui/Field";
 import Modal from "@/lib/components/ui/Modal";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
-import { FC, FormEvent, useState } from "react";
-import { MdAdd } from "react-icons/md";
 
-interface AddBrainModalProps {}
-
-const AddBrainModal: FC<AddBrainModalProps> = ({}) => {
+const AddBrainModal = (): JSX.Element => {
   const [newBrainName, setNewBrainName] = useState("");
   const [isPending, setIsPending] = useState(false);
 
-  const { createBrain, allBrains } = useBrainContext();
+  const { createBrain } = useBrainContext();
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    if (newBrainName.trim() === "" || isPending) return;
+    if (newBrainName.trim() === "" || isPending) {
+      return;
+    }
     setIsPending(true);
     await createBrain(newBrainName);
     setNewBrainName("");
@@ -33,7 +34,7 @@ const AddBrainModal: FC<AddBrainModalProps> = ({}) => {
       title="Add Brain"
       desc="Add a new brain"
     >
-      <form onSubmit={handleSubmit} className="my-10 flex items-center gap-2">
+      <form onSubmit={(e) => void handleSubmit(e)} className="my-10 flex items-center gap-2">
         <Field
           name="brainname"
           label="Enter a brain name"
