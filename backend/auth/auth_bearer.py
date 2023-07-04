@@ -36,7 +36,7 @@ class AuthBearer(HTTPBearer):
     async def authenticate(
         self,
         token: str,
-    ):
+    ) -> User:
         if os.environ.get("AUTHENTICATE") == "false":
             return self.get_test_user()
         elif verify_token(token):
@@ -50,11 +50,11 @@ class AuthBearer(HTTPBearer):
         else:
             raise HTTPException(status_code=401, detail="Invalid token or api key.")
 
-    def get_test_user(self):
-        return {"email": "test@example.com"}  # replace with test user information
+    def get_test_user(self) -> User:
+        return User(
+            email="test@example.com", id="XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX"
+        )  # replace with test user information
 
 
-def get_current_user(credentials: dict = Depends(AuthBearer())) -> User:
-    return User(
-        email=credentials.get("email", "none"), id=credentials.get("sub", "none")
-    )
+def get_current_user(user: dict = Depends(AuthBearer())) -> User:
+    return user

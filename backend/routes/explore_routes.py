@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from auth.auth_bearer import AuthBearer, get_current_user
+from auth import AuthBearer, get_current_user
 from fastapi import APIRouter, Depends, Query
 from models.brains import Brain
 from models.settings import common_dependencies
@@ -10,7 +10,10 @@ explore_router = APIRouter()
 
 
 @explore_router.get("/explore/", dependencies=[Depends(AuthBearer())], tags=["Explore"])
-async def explore_endpoint(brain_id: UUID = Query(..., description="The ID of the brain"), current_user: User = Depends(get_current_user)):
+async def explore_endpoint(
+    brain_id: UUID = Query(..., description="The ID of the brain"),
+    current_user: User = Depends(get_current_user),
+):
     """
     Retrieve and explore unique user data vectors.
     """
@@ -24,14 +27,20 @@ async def explore_endpoint(brain_id: UUID = Query(..., description="The ID of th
 @explore_router.delete(
     "/explore/{file_name}/", dependencies=[Depends(AuthBearer())], tags=["Explore"]
 )
-async def delete_endpoint(file_name: str, current_user: User = Depends(get_current_user), brain_id: UUID = Query(..., description="The ID of the brain")):
+async def delete_endpoint(
+    file_name: str,
+    current_user: User = Depends(get_current_user),
+    brain_id: UUID = Query(..., description="The ID of the brain"),
+):
     """
     Delete a specific user file by file name.
     """
     brain = Brain(id=brain_id)
     brain.delete_file_from_brain(file_name)
 
-    return {"message": f"{file_name} of brain {brain_id} has been deleted by user {current_user.email}."}
+    return {
+        "message": f"{file_name} of brain {brain_id} has been deleted by user {current_user.email}."
+    }
 
 
 @explore_router.get(
@@ -43,7 +52,7 @@ async def download_endpoint(
     """
     Download a specific user file by file name.
     """
-    # check if user has the right to get the file: add brain_id to the query 
+    # check if user has the right to get the file: add brain_id to the query
 
     commons = common_dependencies()
     response = (
