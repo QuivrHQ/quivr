@@ -7,7 +7,7 @@ export const useBrainConfig = () => {
   const context = useContext(BrainConfigContext);
 
   if (context === undefined) {
-    throw new Error("useConfig must be used inside SupabaseProvider");
+    throw new Error("useBrainConfig must be used inside BrainConfigProvider");
   }
 
   return context;

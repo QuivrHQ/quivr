@@ -1,7 +1,13 @@
 "use client";
 
-import { BrainContext } from "./hooks/useBrainContext";
+import { createContext } from "react";
+
 import { useBrainState } from "./hooks/useBrainState";
+import { BrainContextType } from "./types";
+
+export const BrainContext = createContext<BrainContextType | undefined>(
+  undefined
+);
 
 export const BrainProvider = ({
   children,
