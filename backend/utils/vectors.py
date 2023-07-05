@@ -1,8 +1,11 @@
+import multiprocessing as mp
+from typing import List
+
 from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.schema import Document
 from llm.utils.summarization import llm_summerize
 from logger import get_logger
-from models.settings import BrainSettings, CommonsDep
+from models.settings import BrainSettings, CommonsDep, common_dependencies
 from pydantic import BaseModel
 
 logger = get_logger(__name__)
@@ -58,3 +61,66 @@ def create_summary(commons: CommonsDep, document_id, content, metadata):
         commons["supabase"].table("summaries").update(
             {"document_id": document_id}
         ).match({"id": sids[0]}).execute()
+
+
+def error_callback(exception):
+    print('An exception occurred:', exception)
+
+
+def process_batch(batch_ids):
+    commons = common_dependencies()
+    if len(batch_ids) == 1:
+        return (
+            commons["supabase"]
+            .table("vectors")
+            .select(
+                "name:metadata->>file_name, size:metadata->>file_size",
+                count="exact",
+            )
+            .filter("id", "eq", batch_ids[0])
+            .execute()
+        ).data
+    else:
+        return (
+            commons["supabase"]
+            .table("vectors")
+            .select(
+                "name:metadata->>file_name, size:metadata->>file_size",
+                count="exact",
+            )
+            .filter("id", "in", tuple(batch_ids))
+            .execute()
+        ).data
+
+
+def get_unique_files_from_vector_ids(vectors_ids: List[int]):
+    # Move into Vectors class
+    """
+    Retrieve unique user data vectors.
+    """
+    print("vectors_ids", vectors_ids)
+
+    manager = mp.Manager()
+    vectors_responses = manager.list()
+
+    # constants
+    BATCH_SIZE = 5
+
+    # if __name__ == '__main__':
+    # multiprocessing pool initialization
+
+    pool = mp.Pool()
+    results = []
+    for i in range(0, len(vectors_ids), BATCH_SIZE):
+        batch_ids = vectors_ids[i:i + BATCH_SIZE]
+        result = pool.apply_async(process_batch, args=(batch_ids,), error_callback=error_callback)
+        results.append(result)
+    # Retrieve the results
+    vectors_responses = [result.get() for result in results]
+    pool.close()
+    pool.join()
+
+    documents = [item for sublist in vectors_responses for item in sublist]
+    print('document', documents)
+    unique_files = [dict(t) for t in set(tuple(d.items()) for d in documents)]
+    return unique_files
