@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 import { renderHook } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
@@ -96,5 +97,20 @@ describe("useChatApi", () => {
       `/chat/${chatId}/question?brain_id=${brainId}`,
       chatQuestion
     );
+  });
+
+  it("should call getHistory with the correct parameters", async () => {
+    const chatId = "test-chat-id";
+    axiosGetMock.mockReturnValue({ data: {} });
+    const {
+      result: {
+        current: { getHistory },
+      },
+    } = renderHook(() => useChatApi());
+
+    await getHistory(chatId);
+
+    expect(axiosGetMock).toHaveBeenCalledTimes(1);
+    expect(axiosGetMock).toHaveBeenCalledWith(`/chat/${chatId}/history`);
   });
 });
