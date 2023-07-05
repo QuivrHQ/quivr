@@ -1,4 +1,4 @@
-import multiprocessing as mp
+from concurrent.futures import ThreadPoolExecutor
 from typing import List
 
 from langchain.embeddings.openai import OpenAIEmbeddings
@@ -100,26 +100,19 @@ def get_unique_files_from_vector_ids(vectors_ids: List[int]):
     """
     print("vectors_ids", vectors_ids)
 
-    manager = mp.Manager()
-    vectors_responses = manager.list()
-
     # constants
     BATCH_SIZE = 5
 
-    # if __name__ == '__main__':
-    # multiprocessing pool initialization
+    with ThreadPoolExecutor() as executor:
+        futures = []
+        for i in range(0, len(vectors_ids), BATCH_SIZE):
+            batch_ids = vectors_ids[i:i + BATCH_SIZE]
+            future = executor.submit(process_batch, batch_ids)
+            futures.append(future)
 
-    pool = mp.Pool()
-    results = []
-    for i in range(0, len(vectors_ids), BATCH_SIZE):
-        batch_ids = vectors_ids[i:i + BATCH_SIZE]
-        result = pool.apply_async(process_batch, args=(batch_ids,), error_callback=error_callback)
-        results.append(result)
-    # Retrieve the results
-    vectors_responses = [result.get() for result in results]
-    pool.close()
-    pool.join()
-
+        # Retrieve the results
+        vectors_responses = [future.result() for future in futures]
+   
     documents = [item for sublist in vectors_responses for item in sublist]
     print('document', documents)
     unique_files = [dict(t) for t in set(tuple(d.items()) for d in documents)]
