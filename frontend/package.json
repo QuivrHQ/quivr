@@ -46,6 +46,7 @@
     "eslint-plugin-prefer-arrow": "^1.2.3",
     "framer-motion": "^10.12.12",
     "next": "13.4.2",
+    "nock": "^13.3.1",
     "postcss": "8.4.23",
     "prettier": "^2.8.8",
     "pretty-bytes": "^6.1.0",

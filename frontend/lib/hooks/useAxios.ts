@@ -1,10 +1,12 @@
 import axios, { AxiosError, AxiosInstance } from "axios";
 
-import { useBrainConfig } from "@/lib/context/BrainConfigProvider/hooks/useBrainConfig";
+import { useBrainConfig } from "@/lib/context/BrainConfigProvider";
 import { useSupabase } from "@/lib/context/SupabaseProvider";
 
+import { DEFAULT_BACKEND_URL } from "../config/CONSTANTS";
+
 const axiosInstance = axios.create({
-  baseURL: `${process.env.NEXT_PUBLIC_BACKEND_URL ?? ""}`,
+  baseURL: `${process.env.NEXT_PUBLIC_BACKEND_URL ?? DEFAULT_BACKEND_URL}`,
 });
 
 export const useAxios = (): { axiosInstance: AxiosInstance } => {

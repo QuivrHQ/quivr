@@ -6,10 +6,9 @@ import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainConte
 import { useChatContext } from "@/lib/context/ChatProvider/hooks/useChatContext";
 import { useAxios, useFetch } from "@/lib/hooks";
 
-import { ChatEntity, ChatHistory, ChatQuestion } from "../types";
+import { ChatHistory, ChatQuestion } from "../types";
 
 interface UseChatService {
-  createChat: (name: { name: string }) => Promise<ChatEntity>;
   getChatHistory: (chatId: string | undefined) => Promise<ChatHistory[]>;
   addQuestion: (chatId: string, chatQuestion: ChatQuestion) => Promise<void>;
   addStreamQuestion: (
@@ -23,16 +22,6 @@ export const useChatService = (): UseChatService => {
   const { fetchInstance } = useFetch();
   const { updateHistory, updateStreamingHistory } = useChatContext();
   const { currentBrain } = useBrainContext();
-  const createChat = async ({
-    name,
-  }: {
-    name: string;
-  }): Promise<ChatEntity> => {
-    const response = (await axiosInstance.post<ChatEntity>(`/chat`, { name }))
-      .data;
-
-    return response;
-  };
 
   const getChatHistory = useCallback(
     async (chatId: string | undefined): Promise<ChatHistory[]> => {
@@ -129,7 +118,6 @@ export const useChatService = (): UseChatService => {
   };
 
   return {
-    createChat,
     getChatHistory,
     addQuestion,
     addStreamQuestion,

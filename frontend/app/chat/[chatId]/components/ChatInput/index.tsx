@@ -5,7 +5,7 @@ import Button from "@/lib/components/ui/Button";
 import { useChat } from "@/app/chat/[chatId]/hooks/useChat";
 import { useState } from "react";
 import { ConfigButton } from "./components/ConfigButton";
-import { MicButton } from "./components/MicButton";
+import { MicButton } from "./components/MicButton/MicButton";
 
 export const ChatInput = (): JSX.Element => {
   const [message, setMessage] = useState<string>(""); // for optimistic updates
