@@ -2,6 +2,7 @@
 
 import { useCallback } from "react";
 
+import { useChatApi } from "@/lib/api/chat/useChatApi";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 import { useChatContext } from "@/lib/context/ChatProvider/hooks/useChatContext";
 import { useAxios, useFetch } from "@/lib/hooks";
@@ -22,6 +23,7 @@ export const useChatService = (): UseChatService => {
   const { fetchInstance } = useFetch();
   const { updateHistory, updateStreamingHistory } = useChatContext();
   const { currentBrain } = useBrainContext();
+  const { addQuestion } = useChatApi();
 
   const getChatHistory = useCallback(
     async (chatId: string | undefined): Promise<ChatHistory[]> => {
@@ -37,7 +39,7 @@ export const useChatService = (): UseChatService => {
     [axiosInstance]
   );
 
-  const addQuestion = async (
+  const addQuestionHandler = async (
     chatId: string,
     chatQuestion: ChatQuestion
   ): Promise<void> => {
@@ -45,12 +47,13 @@ export const useChatService = (): UseChatService => {
       throw new Error("No current brain");
     }
 
-    const response = await axiosInstance.post<ChatHistory>(
-      `/chat/${chatId}/question?brain_id=${currentBrain.id}`,
-      chatQuestion
-    );
+    const response = await addQuestion({
+      chatId,
+      brainId: currentBrain.id,
+      chatQuestion,
+    });
 
-    updateHistory(response.data);
+    updateHistory(response);
   };
 
   const handleStream = async (
@@ -119,7 +122,7 @@ export const useChatService = (): UseChatService => {
 
   return {
     getChatHistory,
-    addQuestion,
+    addQuestion: addQuestionHandler,
     addStreamQuestion,
   };
 };
