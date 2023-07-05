@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 import { renderHook } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
@@ -96,5 +97,38 @@ describe("useChatApi", () => {
       `/chat/${chatId}/question?brain_id=${brainId}`,
       chatQuestion
     );
+  });
+
+  it("should call getHistory with the correct parameters", async () => {
+    const chatId = "test-chat-id";
+    axiosGetMock.mockReturnValue({ data: {} });
+    const {
+      result: {
+        current: { getHistory },
+      },
+    } = renderHook(() => useChatApi());
+
+    await getHistory(chatId);
+
+    expect(axiosGetMock).toHaveBeenCalledTimes(1);
+    expect(axiosGetMock).toHaveBeenCalledWith(`/chat/${chatId}/history`);
+  });
+
+  it("should call updateChat with the correct parameters", async () => {
+    const chatId = "test-chat-id";
+    const chatName = "test-chat-name";
+    axiosPutMock.mockReturnValue({ data: {} });
+    const {
+      result: {
+        current: { updateChat },
+      },
+    } = renderHook(() => useChatApi());
+
+    await updateChat(chatId, { chat_name: chatName });
+
+    expect(axiosPutMock).toHaveBeenCalledTimes(1);
+    expect(axiosPutMock).toHaveBeenCalledWith(`/chat/${chatId}/metadata`, {
+      chat_name: chatName,
+    });
   });
 });

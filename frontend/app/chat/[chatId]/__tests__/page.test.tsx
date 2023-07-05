@@ -18,7 +18,7 @@ import {
   SupabaseProviderMock,
 } from "@/lib/context/SupabaseProvider/mocks/SupabaseProviderMock";
 
-import ChatPage from "../page";
+import SelectedChatPage from "../page";
 
 vi.mock("@/lib/context/ChatProvider/ChatProvider", () => ({
   ChatContext: ChatContextMock,
@@ -43,7 +43,7 @@ describe("Chat page", () => {
       <SupabaseProviderMock>
         <BrainConfigProviderMock>
           <BrainProviderMock>
-            <ChatPage />,
+            <SelectedChatPage />,
           </BrainProviderMock>
         </BrainConfigProviderMock>
       </SupabaseProviderMock>
