@@ -1,8 +1,9 @@
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 
 import { ChatEntity } from "@/app/chat/[chatId]/types";
 import { useChatApi } from "@/lib/api/chat/useChatApi";
+import { useChatsContext } from "@/lib/context/ChatsProvider/hooks/useChatsContext";
 import { useToast } from "@/lib/hooks";
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
@@ -12,7 +13,31 @@ export const useChatsListItem = (chat: ChatEntity) => {
   const [chatName, setChatName] = useState(chat.chat_name);
   const { publish } = useToast();
   const [editingName, setEditingName] = useState(false);
-  const { updateChat } = useChatApi();
+  const { updateChat, deleteChat } = useChatApi();
+  const { setAllChats } = useChatsContext();
+  const router = useRouter();
+
+  const deleteChatHandler = async () => {
+    const chatId = chat.chat_id;
+    try {
+      await deleteChat(chatId);
+      setAllChats((chats) =>
+        chats.filter((currentChat) => currentChat.chat_id !== chatId)
+      );
+      // TODO: Change route only when the current chat is being deleted
+      void router.push("/chat");
+      publish({
+        text: `Chat sucessfully deleted. Id: ${chatId}`,
+        variant: "success",
+      });
+    } catch (error) {
+      console.error("Error deleting chat:", error);
+      publish({
+        text: `Error deleting chat: ${JSON.stringify(error)}`,
+        variant: "danger",
+      });
+    }
+  };
 
   const updateChatName = async () => {
     if (chatName !== chat.chat_name) {
@@ -36,5 +61,6 @@ export const useChatsListItem = (chat: ChatEntity) => {
     chatName,
     selected,
     handleEditNameClick,
+    deleteChat: deleteChatHandler,
   };
 };

@@ -1,17 +1,31 @@
 /* eslint-disable */
 "use client";
 
-import { createContext } from "react";
+import { createContext, useState } from "react";
 
-import useChats from "./hooks/useChats";
-import { ChatsState } from "./types";
+import { ChatEntity } from "@/app/chat/[chatId]/types";
 
-export const ChatsContext = createContext<ChatsState | undefined>(undefined);
+type ChatsContextType = {
+  allChats: ChatEntity[];
+  //set setAllChats is from the useState hook so it can take a function as params
+  setAllChats: React.Dispatch<React.SetStateAction<ChatEntity[]>>;
+};
+
+export const ChatsContext = createContext<ChatsContextType | undefined>(
+  undefined
+);
 
 export const ChatsProvider = ({ children }: { children: React.ReactNode }) => {
-  const chatsState = useChats();
+  const [allChats, setAllChats] = useState<ChatEntity[]>([]);
 
   return (
-    <ChatsContext.Provider value={chatsState}>{children}</ChatsContext.Provider>
+    <ChatsContext.Provider
+      value={{
+        allChats,
+        setAllChats,
+      }}
+    >
+      {children}
+    </ChatsContext.Provider>
   );
 };

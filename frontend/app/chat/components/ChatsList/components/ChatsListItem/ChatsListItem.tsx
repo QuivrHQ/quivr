@@ -1,4 +1,3 @@
-import { UUID } from "crypto";
 import Link from "next/link";
 import { FiEdit, FiSave, FiTrash2 } from "react-icons/fi";
 import { MdChatBubbleOutline } from "react-icons/md";
@@ -11,15 +10,17 @@ import { useChatsListItem } from "./hooks/useChatsListItem";
 
 interface ChatsListItemProps {
   chat: ChatEntity;
-  deleteChat: (id: UUID) => void;
 }
 
-export const ChatsListItem = ({
-  chat,
-  deleteChat,
-}: ChatsListItemProps): JSX.Element => {
-  const { setChatName, handleEditNameClick, selected, chatName, editingName } =
-    useChatsListItem(chat);
+export const ChatsListItem = ({ chat }: ChatsListItemProps): JSX.Element => {
+  const {
+    setChatName,
+    deleteChat,
+    handleEditNameClick,
+    selected,
+    chatName,
+    editingName,
+  } = useChatsListItem(chat);
 
   return (
     <div
@@ -52,11 +53,7 @@ export const ChatsListItem = ({
         <button className="p-0" type="button" onClick={handleEditNameClick}>
           {editingName ? <FiSave /> : <FiEdit />}
         </button>
-        <button
-          className="p-5"
-          type="button"
-          onClick={() => deleteChat(chat.chat_id)}
-        >
+        <button className="p-5" type="button" onClick={() => void deleteChat()}>
           <FiTrash2 />
         </button>
       </div>
