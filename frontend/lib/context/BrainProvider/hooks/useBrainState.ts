@@ -10,6 +10,7 @@ import {
   getUserDefaultBrainFromBackend,
 } from "@/lib/api";
 import { useAxios, useToast } from "@/lib/hooks";
+import { useEventTracking } from "@/services/analytics/useEventTracking";
 
 import {
   getBrainFromLocalStorage,
@@ -36,6 +37,8 @@ export const useBrainState = (): BrainStateProps => {
   const [currentBrainId, setCurrentBrainId] = useState<null | UUID>(null);
   const { axiosInstance } = useAxios();
 
+  const { track } = useEventTracking();
+
   const currentBrain = allBrains.find((brain) => brain.id === currentBrainId);
 
   // options: Record<string, string | unknown>;
@@ -45,6 +48,7 @@ export const useBrainState = (): BrainStateProps => {
     if (createdBrain !== undefined) {
       setAllBrains((prevBrains) => [...prevBrains, createdBrain]);
       saveBrainInLocalStorage(createdBrain);
+      void track("BRAIN_CREATED");
 
       return createdBrain.id;
     } else {
@@ -58,6 +62,7 @@ export const useBrainState = (): BrainStateProps => {
   const deleteBrain = async (id: UUID) => {
     await deleteBrainFromBE(axiosInstance, id);
     setAllBrains((prevBrains) => prevBrains.filter((brain) => brain.id !== id));
+    void track("DELETE_BRAIN");
   };
 
   const getBrainWithId = async (brainId: UUID): Promise<Brain> => {
@@ -90,6 +95,7 @@ export const useBrainState = (): BrainStateProps => {
       saveBrainInLocalStorage(newActiveBrain);
       setCurrentBrainId(id);
       console.log("Setting active brain", newActiveBrain);
+      void track("CHANGE_BRAIN");
     },
     []
   );
