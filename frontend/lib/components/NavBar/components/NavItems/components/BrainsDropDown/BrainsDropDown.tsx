@@ -1,13 +1,13 @@
-/* eslint-disable */
 import { useState } from "react";
 import { FaBrain } from "react-icons/fa";
+import { MdCheck, MdDelete } from "react-icons/md";
 
 import Button from "@/lib/components/ui/Button";
 import Field from "@/lib/components/ui/Field";
 import Popover from "@/lib/components/ui/Popover";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
-import { MdCheck, MdDelete } from "react-icons/md";
-import AddBrainModal from "./AddBrainModal";
+
+import { AddBrainModal } from "./AddBrainModal";
 
 export const BrainsDropDown = (): JSX.Element => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -42,7 +42,7 @@ export const BrainsDropDown = (): JSX.Element => {
             <div className="overflow-auto scrollbar flex flex-col h-48 mt-5">
               {/* List of brains */}
               {allBrains.map((brain) => {
-                if (brain.name.includes(searchQuery))
+                if (brain.name.includes(searchQuery)) {
                   return (
                     <div
                       key={brain.id}
@@ -70,13 +70,14 @@ export const BrainsDropDown = (): JSX.Element => {
                       </button>
                       <Button
                         className="group-hover:visible invisible absolute right-0 hover:text-red-500 transition-[colors,opacity]"
-                        onClick={() => deleteBrain(brain.id)}
+                        onClick={() => void deleteBrain(brain.id)}
                         variant={"tertiary"}
                       >
                         <MdDelete className="text-xl" />
                       </Button>
                     </div>
                   );
+                }
               })}
             </div>
           </div>

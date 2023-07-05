@@ -34,7 +34,10 @@ const AddBrainModal = (): JSX.Element => {
       title="Add Brain"
       desc="Add a new brain"
     >
-      <form onSubmit={(e) => void handleSubmit(e)} className="my-10 flex items-center gap-2">
+      <form
+        onSubmit={(e) => void handleSubmit(e)}
+        className="my-10 flex items-center gap-2"
+      >
         <Field
           name="brainname"
           label="Enter a brain name"
@@ -45,12 +48,7 @@ const AddBrainModal = (): JSX.Element => {
           onChange={(e) => setNewBrainName(e.currentTarget.value)}
           className="flex-1"
         />
-        <Button
-          isLoading={isPending}
-          className="self-end"
-          type="submit"
-          // onClick={handleSubmit}
-        >
+        <Button isLoading={isPending} className="self-end" type="submit">
           Create
           <MdAdd className="text-xl" />
         </Button>
@@ -59,4 +57,4 @@ const AddBrainModal = (): JSX.Element => {
   );
 };
 
-export default AddBrainModal;
+export { AddBrainModal };
