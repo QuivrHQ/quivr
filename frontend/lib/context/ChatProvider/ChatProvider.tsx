@@ -1,16 +1,10 @@
 "use client";
 
-import { createContext, useContext, useState } from "react";
+import { createContext, useState } from "react";
 
-import { ChatHistory } from "../../app/chat/[chatId]/types";
+import { ChatHistory } from "@/app/chat/[chatId]/types";
 
-type ChatContextProps = {
-  history: ChatHistory[];
-  setHistory: (history: ChatHistory[]) => void;
-  addToHistory: (message: ChatHistory) => void;
-  updateHistory: (chat: ChatHistory) => void;
-  updateStreamingHistory: (streamedChat: ChatHistory) => void;
-};
+import { ChatContextProps } from "./types";
 
 export const ChatContext = createContext<ChatContextProps | undefined>(
   undefined
@@ -29,7 +23,6 @@ export const ChatProvider = ({
 
   const updateStreamingHistory = (streamedChat: ChatHistory): void => {
     setHistory((prevHistory: ChatHistory[]) => {
-      console.log("new chat", streamedChat);
       const updatedHistory = prevHistory.find(
         (item) => item.message_id === streamedChat.message_id
       )
@@ -39,8 +32,6 @@ export const ChatProvider = ({
               : item
           )
         : [...prevHistory, streamedChat];
-
-      console.log("updated history", updatedHistory);
 
       return updatedHistory;
     });
@@ -75,14 +66,4 @@ export const ChatProvider = ({
       {children}
     </ChatContext.Provider>
   );
-};
-
-export const useChatContext = (): ChatContextProps => {
-  const context = useContext(ChatContext);
-
-  if (context === undefined) {
-    throw new Error("useChatContext must be used inside ChatProvider");
-  }
-
-  return context;
 };

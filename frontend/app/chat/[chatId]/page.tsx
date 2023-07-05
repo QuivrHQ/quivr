@@ -1,14 +1,13 @@
-/* eslint-disable */
 "use client";
 
 import PageHeading from "@/lib/components/ui/PageHeading";
+import { ChatProvider } from "@/lib/context/ChatProvider";
 
-import { ChatProvider } from "../../../lib/context/ChatProvider";
 import { ChatInput, ChatMessages } from "./components";
 
-export default function ChatPage() {
+const ChatPage = (): JSX.Element => {
   return (
-    <main className="flex flex-col w-full pt-10">
+    <main className="flex flex-col w-full pt-10" data-testid="chat-page">
       <section className="flex flex-col flex-1 items-center w-full h-full min-h-[70vh]">
         <PageHeading
           title="Chat with your brain"
@@ -25,4 +24,6 @@ export default function ChatPage() {
       </section>
     </main>
   );
-}
+};
+
+export default ChatPage;

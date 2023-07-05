@@ -1,8 +1,8 @@
-/* eslint-disable */
 import { useContext } from "react";
 
 import { ChatsContext } from "../chats-provider";
 
+// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const useChatsContext = () => {
   const context = useContext(ChatsContext);
 

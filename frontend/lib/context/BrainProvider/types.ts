@@ -14,4 +14,4 @@ export type Brain = {
   temperature?: string;
 };
 
-export type ScopeContext = ReturnType<typeof useBrainState>;
+export type BrainContextType = ReturnType<typeof useBrainState>;

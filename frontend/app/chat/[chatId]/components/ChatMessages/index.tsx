@@ -14,6 +14,7 @@ export const ChatMessages = (): JSX.Element => {
     <Card
       className="p-5 max-w-3xl w-full flex flex-col mb-8 overflow-y-auto scrollbar"
       ref={chatListRef}
+      data-testid="chat-messages"
     >
       <div className="flex-1">
         {history.length === 0 ? (
