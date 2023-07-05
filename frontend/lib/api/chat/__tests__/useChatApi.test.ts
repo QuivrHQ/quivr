@@ -113,4 +113,22 @@ describe("useChatApi", () => {
     expect(axiosGetMock).toHaveBeenCalledTimes(1);
     expect(axiosGetMock).toHaveBeenCalledWith(`/chat/${chatId}/history`);
   });
+
+  it("should call updateChat with the correct parameters", async () => {
+    const chatId = "test-chat-id";
+    const chatName = "test-chat-name";
+    axiosPutMock.mockReturnValue({ data: {} });
+    const {
+      result: {
+        current: { updateChat },
+      },
+    } = renderHook(() => useChatApi());
+
+    await updateChat(chatId, { chat_name: chatName });
+
+    expect(axiosPutMock).toHaveBeenCalledTimes(1);
+    expect(axiosPutMock).toHaveBeenCalledWith(`/chat/${chatId}/metadata`, {
+      chat_name: chatName,
+    });
+  });
 });
