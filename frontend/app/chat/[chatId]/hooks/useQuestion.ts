@@ -15,7 +15,7 @@ interface UseChatService {
   ) => Promise<void>;
 }
 
-export const useChatService = (): UseChatService => {
+export const useQuestion = (): UseChatService => {
   const { fetchInstance } = useFetch();
   const { updateHistory, updateStreamingHistory } = useChatContext();
   const { currentBrain } = useBrainContext();
