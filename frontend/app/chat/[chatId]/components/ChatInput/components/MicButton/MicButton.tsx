@@ -3,7 +3,7 @@
 import { MdMic, MdMicOff } from "react-icons/md";
 
 import Button from "@/lib/components/ui/Button";
-import { useSpeech } from "@/lib/context/ChatsProvider/hooks/useSpeech";
+import { useSpeech } from "./hooks/useSpeech";
 
 type MicButtonProps = {
   setMessage: (newValue: string | ((prevValue: string) => string)) => void;
