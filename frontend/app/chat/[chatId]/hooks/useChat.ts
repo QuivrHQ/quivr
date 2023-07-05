@@ -25,25 +25,26 @@ export const useChat = () => {
   } = useBrainConfig();
   const { history, setHistory } = useChatContext();
   const { publish } = useToast();
-  const { createChat } = useChatApi();
+  const { createChat, getHistory } = useChatApi();
 
-  const {
-    getChatHistory,
-    addStreamQuestion,
-    addQuestion: addQuestionToModel,
-  } = useChatService();
+  const { addStreamQuestion, addQuestion: addQuestionToModel } =
+    useChatService();
 
   useEffect(() => {
     const fetchHistory = async () => {
       const currentChatId = chatId;
-      const chatHistory = await getChatHistory(currentChatId);
+      if (currentChatId === undefined) {
+        return;
+      }
+
+      const chatHistory = await getHistory(currentChatId);
 
       if (chatId === currentChatId && chatHistory.length > 0) {
         setHistory(chatHistory);
       }
     };
     void fetchHistory();
-  }, [chatId, getChatHistory, setHistory]);
+  }, [chatId, setHistory]);
 
   const generateNewChatIdFromName = async (
     chatName: string

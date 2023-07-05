@@ -6,6 +6,7 @@ import {
   createChat,
   deleteChat,
   getChats,
+  getHistory,
 } from "./chat";
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
@@ -18,5 +19,6 @@ export const useChatApi = () => {
     deleteChat: async (chatId: string) => deleteChat(chatId, axiosInstance),
     addQuestion: async (props: AddQuestionParams) =>
       addQuestion(props, axiosInstance),
+    getHistory: async (chatId: string) => getHistory(chatId, axiosInstance),
   };
 };

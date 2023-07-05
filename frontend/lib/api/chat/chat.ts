@@ -51,3 +51,9 @@ export const addQuestion = async (
 
   return response.data;
 };
+
+export const getHistory = async (
+  chatId: string,
+  axiosInstance: AxiosInstance
+): Promise<ChatHistory[]> =>
+  (await axiosInstance.get<ChatHistory[]>(`/chat/${chatId}/history`)).data;
