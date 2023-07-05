@@ -20,12 +20,14 @@ Quivr, your second brain, utilizes the power of GenerativeAI to store and retrie
 - **Generative AI**: Quivr employs advanced AI to assist you in generating and retrieving information.
 - **Fast and Efficient**: Designed with speed and efficiency at its core. Quivr ensures rapid access to your data.
 - **Secure**: Your data, your control. Always.
+- **OS Compatible**: Ubuntu 22 or upper.
 - **File Compatibility**: 
   - Text
   - Markdown
   - PDF
   - Powerpoint
-  - Excel
+  - Excel (Not Yet)
+  - Csv
   - Word
   - Audio
   - Video
