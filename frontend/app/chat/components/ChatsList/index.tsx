@@ -11,7 +11,7 @@ import { NewChatButton } from "./components/NewChatButton";
 import { useChatsList } from "./hooks/useChatsList";
 
 export const ChatsList = (): JSX.Element => {
-  const { allChats, deleteChat } = useChatsContext();
+  const { allChats } = useChatsContext();
   const { open, setOpen } = useChatsList();
 
   return (
@@ -47,12 +47,7 @@ export const ChatsList = (): JSX.Element => {
               className="flex-1 overflow-auto scrollbar h-full"
             >
               {allChats.map((chat) => (
-                <ChatsListItem
-                  key={chat.chat_id}
-                  chat={chat}
-                  // eslint-disable-next-line @typescript-eslint/no-misused-promises
-                  deleteChat={deleteChat}
-                />
+                <ChatsListItem key={chat.chat_id} chat={chat} />
               ))}
             </div>
             <MiniFooter />

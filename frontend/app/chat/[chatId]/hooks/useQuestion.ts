@@ -1,16 +1,13 @@
 /* eslint-disable max-lines */
 
-import { useCallback } from "react";
-
 import { useChatApi } from "@/lib/api/chat/useChatApi";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 import { useChatContext } from "@/lib/context/ChatProvider/hooks/useChatContext";
-import { useAxios, useFetch } from "@/lib/hooks";
+import { useFetch } from "@/lib/hooks";
 
 import { ChatHistory, ChatQuestion } from "../types";
 
 interface UseChatService {
-  getChatHistory: (chatId: string | undefined) => Promise<ChatHistory[]>;
   addQuestion: (chatId: string, chatQuestion: ChatQuestion) => Promise<void>;
   addStreamQuestion: (
     chatId: string,
@@ -18,26 +15,11 @@ interface UseChatService {
   ) => Promise<void>;
 }
 
-export const useChatService = (): UseChatService => {
-  const { axiosInstance } = useAxios();
+export const useQuestion = (): UseChatService => {
   const { fetchInstance } = useFetch();
   const { updateHistory, updateStreamingHistory } = useChatContext();
   const { currentBrain } = useBrainContext();
   const { addQuestion } = useChatApi();
-
-  const getChatHistory = useCallback(
-    async (chatId: string | undefined): Promise<ChatHistory[]> => {
-      if (chatId === undefined) {
-        return [];
-      }
-      const response = (
-        await axiosInstance.get<ChatHistory[]>(`/chat/${chatId}/history`)
-      ).data;
-
-      return response;
-    },
-    [axiosInstance]
-  );
 
   const addQuestionHandler = async (
     chatId: string,
@@ -121,7 +103,6 @@ export const useChatService = (): UseChatService => {
   };
 
   return {
-    getChatHistory,
     addQuestion: addQuestionHandler,
     addStreamQuestion,
   };

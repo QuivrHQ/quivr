@@ -9,7 +9,7 @@ import { useChatContext } from "@/lib/context/ChatProvider/hooks/useChatContext"
 import { useToast } from "@/lib/hooks";
 import { useEventTracking } from "@/services/analytics/useEventTracking";
 
-import { useChatService } from "./useChatService";
+import { useQuestion } from "./useQuestion";
 import { ChatQuestion } from "../types";
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
@@ -25,33 +25,25 @@ export const useChat = () => {
   } = useBrainConfig();
   const { history, setHistory } = useChatContext();
   const { publish } = useToast();
-  const { createChat } = useChatApi();
+  const { createChat, getHistory } = useChatApi();
 
-  const {
-    getChatHistory,
-    addStreamQuestion,
-    addQuestion: addQuestionToModel,
-  } = useChatService();
+  const { addStreamQuestion, addQuestion: addQuestionToModel } = useQuestion();
 
   useEffect(() => {
     const fetchHistory = async () => {
       const currentChatId = chatId;
-      const chatHistory = await getChatHistory(currentChatId);
+      if (currentChatId === undefined) {
+        return;
+      }
+
+      const chatHistory = await getHistory(currentChatId);
 
       if (chatId === currentChatId && chatHistory.length > 0) {
         setHistory(chatHistory);
       }
     };
     void fetchHistory();
-  }, [chatId, getChatHistory, setHistory]);
-
-  const generateNewChatIdFromName = async (
-    chatName: string
-  ): Promise<string> => {
-    const chat = await createChat(chatName);
-
-    return chat.chat_id;
-  };
+  }, [chatId, setHistory]);
 
   const addQuestion = async (question: string, callback?: () => void) => {
     const chatQuestion: ChatQuestion = {
@@ -62,16 +54,19 @@ export const useChat = () => {
     };
 
     try {
-      void track("QUESTION_ASKED");
       setGeneratingAnswer(true);
-      const currentChatId =
-        chatId ??
-        // if chatId is undefined, we need to create a new chat on fly
-        (await generateNewChatIdFromName(
-          question.split(" ").slice(0, 3).join(" ")
-        ));
 
-      setChatId(currentChatId);
+      let currentChatId = chatId;
+
+      //if chatId is not set, create a new chat. Chat name is from the first question
+      if (currentChatId === undefined) {
+        const chatName = question.split(" ").slice(0, 3).join(" ");
+        const chat = await createChat(chatName);
+        currentChatId = chat.chat_id;
+        setChatId(currentChatId);
+      }
+
+      void track("QUESTION_ASKED");
 
       if (chatQuestion.model === "gpt-3.5-turbo") {
         await addStreamQuestion(currentChatId, chatQuestion);

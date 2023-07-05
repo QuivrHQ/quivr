@@ -1,49 +1,26 @@
-import { UUID } from "crypto";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { useState } from "react";
 import { FiEdit, FiSave, FiTrash2 } from "react-icons/fi";
 import { MdChatBubbleOutline } from "react-icons/md";
 
 import { ChatEntity } from "@/app/chat/[chatId]/types";
-import { useAxios, useToast } from "@/lib/hooks";
 import { cn } from "@/lib/utils";
 
 import { ChatName } from "./components/ChatName";
+import { useChatsListItem } from "./hooks/useChatsListItem";
 
 interface ChatsListItemProps {
   chat: ChatEntity;
-  deleteChat: (id: UUID) => void;
 }
 
-export const ChatsListItem = ({
-  chat,
-  deleteChat,
-}: ChatsListItemProps): JSX.Element => {
-  const pathname = usePathname()?.split("/").at(-1);
-  const selected = chat.chat_id === pathname;
-  const [chatName, setChatName] = useState(chat.chat_name);
-  const { axiosInstance } = useAxios();
-  const { publish } = useToast();
-  const [editingName, setEditingName] = useState(false);
-
-  const updateChatName = async () => {
-    if (chatName !== chat.chat_name) {
-      await axiosInstance.put<ChatEntity>(`/chat/${chat.chat_id}/metadata`, {
-        chat_name: chatName,
-      });
-      publish({ text: "Chat name updated", variant: "success" });
-    }
-  };
-
-  const handleEditNameClick = () => {
-    if (editingName) {
-      setEditingName(false);
-      void updateChatName();
-    } else {
-      setEditingName(true);
-    }
-  };
+export const ChatsListItem = ({ chat }: ChatsListItemProps): JSX.Element => {
+  const {
+    setChatName,
+    deleteChat,
+    handleEditNameClick,
+    selected,
+    chatName,
+    editingName,
+  } = useChatsListItem(chat);
 
   return (
     <div
@@ -76,11 +53,7 @@ export const ChatsListItem = ({
         <button className="p-0" type="button" onClick={handleEditNameClick}>
           {editingName ? <FiSave /> : <FiEdit />}
         </button>
-        <button
-          className="p-5"
-          type="button"
-          onClick={() => deleteChat(chat.chat_id)}
-        >
+        <button className="p-5" type="button" onClick={() => void deleteChat()}>
           <FiTrash2 />
         </button>
       </div>
