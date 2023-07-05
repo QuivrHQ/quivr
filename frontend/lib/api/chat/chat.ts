@@ -1,6 +1,10 @@
 import { AxiosInstance } from "axios";
 
-import { ChatEntity } from "@/app/chat/[chatId]/types";
+import {
+  ChatEntity,
+  ChatHistory,
+  ChatQuestion,
+} from "@/app/chat/[chatId]/types";
 
 export const createChat = async (
   name: string,
@@ -28,4 +32,22 @@ export const deleteChat = async (
   axiosInstance: AxiosInstance
 ): Promise<void> => {
   await axiosInstance.delete(`/chat/${chatId}`);
+};
+
+export type AddQuestionParams = {
+  chatId: string;
+  chatQuestion: ChatQuestion;
+  brainId: string;
+};
+
+export const addQuestion = async (
+  { chatId, chatQuestion, brainId }: AddQuestionParams,
+  axiosInstance: AxiosInstance
+): Promise<ChatHistory> => {
+  const response = await axiosInstance.post<ChatHistory>(
+    `/chat/${chatId}/question?brain_id=${brainId}`,
+    chatQuestion
+  );
+
+  return response.data;
 };
