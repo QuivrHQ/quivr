@@ -1,16 +1,13 @@
 import { UUID } from "crypto";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { useState } from "react";
 import { FiEdit, FiSave, FiTrash2 } from "react-icons/fi";
 import { MdChatBubbleOutline } from "react-icons/md";
 
 import { ChatEntity } from "@/app/chat/[chatId]/types";
-import { useChatApi } from "@/lib/api/chat/useChatApi";
-import { useToast } from "@/lib/hooks";
 import { cn } from "@/lib/utils";
 
 import { ChatName } from "./components/ChatName";
+import { useChatsListItem } from "./hooks/useChatsListItem";
 
 interface ChatsListItemProps {
   chat: ChatEntity;
@@ -21,28 +18,8 @@ export const ChatsListItem = ({
   chat,
   deleteChat,
 }: ChatsListItemProps): JSX.Element => {
-  const pathname = usePathname()?.split("/").at(-1);
-  const selected = chat.chat_id === pathname;
-  const [chatName, setChatName] = useState(chat.chat_name);
-  const { publish } = useToast();
-  const [editingName, setEditingName] = useState(false);
-  const { updateChat } = useChatApi();
-
-  const updateChatName = async () => {
-    if (chatName !== chat.chat_name) {
-      await updateChat(chat.chat_id, { chat_name: chatName });
-      publish({ text: "Chat name updated", variant: "success" });
-    }
-  };
-
-  const handleEditNameClick = () => {
-    if (editingName) {
-      setEditingName(false);
-      void updateChatName();
-    } else {
-      setEditingName(true);
-    }
-  };
+  const { setChatName, handleEditNameClick, selected, chatName, editingName } =
+    useChatsListItem(chat);
 
   return (
     <div
