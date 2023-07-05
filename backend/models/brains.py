@@ -5,6 +5,7 @@ from uuid import UUID
 from models.settings import CommonsDep, common_dependencies
 from models.users import User
 from pydantic import BaseModel
+from utils.vectors import get_unique_files_from_vector_ids
 
 
 class Brain(BaseModel):
@@ -191,45 +192,10 @@ class Brain(BaseModel):
         if len(vector_ids) == 0:
             return []
 
-        self.files = self.get_unique_files_from_vector_ids(vector_ids)
+        self.files = get_unique_files_from_vector_ids(vector_ids)
         print("unique_files", self.files)
 
         return self.files
-
-    def get_unique_files_from_vector_ids(self, vectors_ids: List[int]):
-        # Move into Vectors class
-        """
-        Retrieve unique user data vectors.
-        """
-        print("vectors_ids", vectors_ids)
-        print("tuple(vectors_ids)", tuple(vectors_ids))
-        if len(vectors_ids) == 1:
-            vectors_response = (
-                self.commons["supabase"]
-                .table("vectors")
-                .select(
-                    "name:metadata->>file_name, size:metadata->>file_size",
-                    count="exact",
-                )
-                .filter("id", "eq", vectors_ids[0])
-                .execute()
-            )
-        else:
-            vectors_response = (
-                self.commons["supabase"]
-                .table("vectors")
-                .select(
-                    "name:metadata->>file_name, size:metadata->>file_size",
-                    count="exact",
-                )
-                .filter("id", "in", tuple(vectors_ids))
-                .execute()
-            )
-
-        documents = vectors_response.data  # Access the data from the response
-        # Convert each dictionary to a tuple of items, then to a set to remove duplicates, and then back to a dictionary
-        unique_files = [dict(t) for t in set(tuple(d.items()) for d in documents)]
-        return unique_files
 
     def delete_file_from_brain(self, file_name: str):
         # First, get the vector_ids associated with the file_name
