@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 
+import { useSupabase } from "@/lib/context/SupabaseProvider";
+
 import { useBrainConfig } from "../context/BrainConfigProvider/hooks/useBrainConfig";
-import { useSupabase } from "../context/SupabaseProvider";
 
 interface FetchInstance {
   get: (url: string, headers?: HeadersInit) => Promise<Response>;

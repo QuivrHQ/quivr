@@ -4,11 +4,11 @@ import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import { useBrainConfig } from "@/lib/context/BrainConfigProvider/hooks/useBrainConfig";
+import { useChatContext } from "@/lib/context/ChatProvider/hooks/useChatContext";
 import { useToast } from "@/lib/hooks";
 import { useEventTracking } from "@/services/analytics/useEventTracking";
 
 import { useChatService } from "./useChatService";
-import { useChatContext } from "../../../../lib/context/ChatProvider";
 import { ChatQuestion } from "../types";
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types

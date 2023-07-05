@@ -7,8 +7,8 @@ import Footer from "@/lib/components/Footer";
 import { NavBar } from "@/lib/components/NavBar";
 import { TrackingWrapper } from "@/lib/components/TrackingWrapper";
 import { ToastProvider } from "@/lib/components/ui/Toast";
-import { BrainProvider } from "@/lib/context";
-import { BrainConfigProvider } from "@/lib/context/BrainConfigProvider/brain-config-provider";
+import { BrainConfigProvider } from "@/lib/context/BrainConfigProvider";
+import { BrainProvider } from "@/lib/context/BrainProvider";
 import { SupabaseProvider } from "@/lib/context/SupabaseProvider";
 import "./globals.css";
 

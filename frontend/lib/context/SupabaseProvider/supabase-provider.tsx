@@ -1,28 +1,24 @@
 "use client";
 
-import type { SupabaseClient } from "@supabase/auth-helpers-nextjs";
 import {
   createBrowserSupabaseClient,
   Session,
 } from "@supabase/auth-helpers-nextjs";
 import { useRouter } from "next/navigation";
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useEffect, useState } from "react";
 
-type MaybeSession = Session | null;
+import { SupabaseContextType } from "./types";
 
-export type SupabaseContext = {
-  supabase: SupabaseClient;
-  session: MaybeSession;
-};
-
-const Context = createContext<SupabaseContext | undefined>(undefined);
+export const SupabaseContext = createContext<SupabaseContextType | undefined>(
+  undefined
+);
 
 export const SupabaseProvider = ({
   children,
   session,
 }: {
   children: React.ReactNode;
-  session: MaybeSession;
+  session: Session | null;
 }): JSX.Element => {
   const [supabase] = useState(() => createBrowserSupabaseClient());
   const router = useRouter();
@@ -40,18 +36,8 @@ export const SupabaseProvider = ({
   }, [router, supabase]);
 
   return (
-    <Context.Provider value={{ supabase, session }}>
+    <SupabaseContext.Provider value={{ supabase, session }}>
       <>{children}</>
-    </Context.Provider>
+    </SupabaseContext.Provider>
   );
-};
-
-export const useSupabase = (): SupabaseContext => {
-  const context = useContext(Context);
-
-  if (context === undefined) {
-    throw new Error("useSupabase must be used inside SupabaseProvider");
-  }
-
-  return context;
 };
