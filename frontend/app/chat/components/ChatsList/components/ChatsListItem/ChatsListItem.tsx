@@ -6,7 +6,8 @@ import { FiEdit, FiSave, FiTrash2 } from "react-icons/fi";
 import { MdChatBubbleOutline } from "react-icons/md";
 
 import { ChatEntity } from "@/app/chat/[chatId]/types";
-import { useAxios, useToast } from "@/lib/hooks";
+import { useChatApi } from "@/lib/api/chat/useChatApi";
+import { useToast } from "@/lib/hooks";
 import { cn } from "@/lib/utils";
 
 import { ChatName } from "./components/ChatName";
@@ -23,15 +24,13 @@ export const ChatsListItem = ({
   const pathname = usePathname()?.split("/").at(-1);
   const selected = chat.chat_id === pathname;
   const [chatName, setChatName] = useState(chat.chat_name);
-  const { axiosInstance } = useAxios();
   const { publish } = useToast();
   const [editingName, setEditingName] = useState(false);
+  const { updateChat } = useChatApi();
 
   const updateChatName = async () => {
     if (chatName !== chat.chat_name) {
-      await axiosInstance.put<ChatEntity>(`/chat/${chat.chat_id}/metadata`, {
-        chat_name: chatName,
-      });
+      await updateChat(chat.chat_id, { chat_name: chatName });
       publish({ text: "Chat name updated", variant: "success" });
     }
   };

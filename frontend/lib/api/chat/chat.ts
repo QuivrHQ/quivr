@@ -57,3 +57,15 @@ export const getHistory = async (
   axiosInstance: AxiosInstance
 ): Promise<ChatHistory[]> =>
   (await axiosInstance.get<ChatHistory[]>(`/chat/${chatId}/history`)).data;
+
+export type ChatUpdatableProperties = {
+  chat_name?: string;
+};
+export const updateChat = async (
+  chatId: string,
+  chat: ChatUpdatableProperties,
+  axiosInstance: AxiosInstance
+): Promise<ChatEntity> => {
+  return (await axiosInstance.put<ChatEntity>(`/chat/${chatId}/metadata`, chat))
+    .data;
+};
