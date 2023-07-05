@@ -1,5 +1,7 @@
 import { renderHook } from "@testing-library/react";
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
+
+import { ChatQuestion } from "@/app/chat/[chatId]/types";
 
 import { useChatApi } from "../useChatApi";
 
@@ -20,10 +22,13 @@ vi.mock("@/lib/hooks", () => ({
 }));
 
 describe("useChatApi", () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
   it("should call createChat with the correct parameters", async () => {
     const chatName = "Test Chat";
     axiosPostMock.mockReturnValue({ data: {} });
-
     const {
       result: {
         current: { createChat },
@@ -64,5 +69,32 @@ describe("useChatApi", () => {
 
     expect(axiosDeleteMock).toHaveBeenCalledTimes(1);
     expect(axiosDeleteMock).toHaveBeenCalledWith(`/chat/${chatId}`);
+  });
+
+  it("should call addQuestion with the correct parameters", async () => {
+    const chatId = "test-chat-id";
+
+    const chatQuestion: ChatQuestion = {
+      question: "test-question",
+      max_tokens: 10,
+      model: "test-model",
+      temperature: 0.5,
+    };
+
+    const brainId = "test-brain-id";
+
+    const {
+      result: {
+        current: { addQuestion },
+      },
+    } = renderHook(() => useChatApi());
+
+    await addQuestion({ chatId, chatQuestion, brainId });
+
+    expect(axiosPostMock).toHaveBeenCalledTimes(1);
+    expect(axiosPostMock).toHaveBeenCalledWith(
+      `/chat/${chatId}/question?brain_id=${brainId}`,
+      chatQuestion
+    );
   });
 });
