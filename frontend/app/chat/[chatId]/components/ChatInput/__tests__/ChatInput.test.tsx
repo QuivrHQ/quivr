@@ -19,9 +19,7 @@ afterEach(() => {
 describe("ChatInput", () => {
   it("should render correctly", () => {
     // Rendering the ChatInput component
-    const { getByTestId, baseElement } = render(<ChatInput />);
-
-    console.log({ baseElement });
+    const { getByTestId } = render(<ChatInput />);
 
     const chatInputForm = getByTestId("chat-input-form");
     expect(chatInputForm).toBeDefined();
