@@ -3,67 +3,20 @@
 import { AnimatePresence, motion } from "framer-motion";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { useEffect, useState } from "react";
 
 import Button from "@/lib/components/ui/Button";
 import Spinner from "@/lib/components/ui/Spinner";
 import { useSupabase } from "@/lib/context/SupabaseProvider";
-import { useAxios } from "@/lib/hooks";
-import { Document } from "@/lib/types/Document";
 
-import { getBrainFromLocalStorage } from "@/lib/context/BrainProvider/helpers/brainLocalStorage";
-import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
-import { UUID } from "crypto";
 import DocumentItem from "./DocumentItem";
+import { useExplore } from "./hooks/useExplore";
 
 const ExplorePage = (): JSX.Element => {
-  const [documents, setDocuments] = useState<Document[]>([]);
-  const [isPending, setIsPending] = useState(true);
   const { session } = useSupabase();
-  const { axiosInstance } = useAxios();
-  const { setActiveBrain, setDefaultBrain, currentBrain, currentBrainId } =
-    useBrainContext();
-
-  const fetchAndSetActiveBrain = async () => {
-    const storedBrain = getBrainFromLocalStorage();
-    if (storedBrain) {
-      setActiveBrain({ ...storedBrain });
-      return storedBrain;
-    } else {
-      const defaultBrain = await setDefaultBrain();
-      return defaultBrain;
-    }
-  };
-
+  const { documents, setDocuments, isPending } = useExplore();
   if (session === null) {
     redirect("/login");
   }
-
-  useEffect(() => {
-    const fetchDocuments = async (brainId: UUID | null) => {
-      setIsPending(true);
-      await fetchAndSetActiveBrain();
-      try {
-        if (brainId === undefined || brainId === null) {
-          throw new Error("Brain id not found");
-        }
-
-        console.log(
-          `Fetching documents from ${process.env.NEXT_PUBLIC_BACKEND_URL}/explore/?brain_id=${brainId}`
-        );
-
-        const response = await axiosInstance.get<{ documents: Document[] }>(
-          `/explore/?brain_id=${brainId}`
-        );
-        setDocuments(response.data.documents);
-      } catch (error) {
-        console.error("Error fetching documents", error);
-        setDocuments([]);
-      }
-      setIsPending(false);
-    };
-    fetchDocuments(currentBrainId);
-  }, [session.access_token, axiosInstance, currentBrainId]);
 
   return (
     <main>
