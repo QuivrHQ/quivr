@@ -3,8 +3,7 @@
 import { redirect } from "next/navigation";
 
 import { useSupabase } from "@/lib/context/SupabaseProvider";
-import { ConfigForm, ConfigTitle } from "./components";
-import { ApiKeyConfig } from "./components/ApiKeyConfig";
+import { ApiKeyConfig, ConfigForm, ConfigTitle } from "./components";
 
 // TODO: Use states instead of NEXTJS router to open and close modal
 const ConfigPage = (): JSX.Element => {
