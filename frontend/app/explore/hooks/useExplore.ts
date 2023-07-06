@@ -1,6 +1,7 @@
 import { UUID } from "crypto";
 import { useEffect, useState } from "react";
 
+import { useBrainApi } from "@/lib/api/brain/useBrainApi";
 import { getBrainFromLocalStorage } from "@/lib/context/BrainProvider/helpers/brainLocalStorage";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 import { useSupabase } from "@/lib/context/SupabaseProvider";
@@ -14,7 +15,7 @@ export const useExplore = () => {
   const { session } = useSupabase();
   const { axiosInstance } = useAxios();
   const { setActiveBrain, setDefaultBrain, currentBrainId } = useBrainContext();
-
+  const { getBrainDocuments } = useBrainApi();
   const fetchAndSetActiveBrain = async () => {
     const storedBrain = getBrainFromLocalStorage();
     if (storedBrain) {
@@ -36,16 +37,8 @@ export const useExplore = () => {
         if (brainId === null) {
           throw new Error("Brain id not found");
         }
-
-        console.log(
-          `Fetching documents from ${process.env
-            .NEXT_PUBLIC_BACKEND_URL!}/explore/?brain_id=${brainId}`
-        );
-
-        const response = await axiosInstance.get<{ documents: Document[] }>(
-          `/explore/?brain_id=${brainId}`
-        );
-        setDocuments(response.data.documents);
+        const brainDocuments = await getBrainDocuments(brainId);
+        setDocuments(brainDocuments);
       } catch (error) {
         console.error("Error fetching documents", error);
         setDocuments([]);
