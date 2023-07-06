@@ -1,21 +1,19 @@
 import { useState } from "react";
 
-import { useAxios } from "@/lib/hooks";
+import { useAuthApi } from "@/lib/api/auth/useAuthApi";
 import { useEventTracking } from "@/services/analytics/useEventTracking";
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const useApiKeyConfig = () => {
   const [apiKey, setApiKey] = useState("");
-  const { axiosInstance } = useAxios();
   const { track } = useEventTracking();
+  const { createApiKey } = useAuthApi();
 
   const handleCreateClick = async () => {
     try {
       void track("CREATE_API_KEY");
-      const response = await axiosInstance.post<{ api_key: string }>(
-        "/api-key"
-      ); // replace with your api-key endpoint URL
-      setApiKey(response.data.api_key);
+      const createdApiKey = await createApiKey();
+      setApiKey(createdApiKey);
     } catch (error) {
       console.error("Error creating API key: ", error);
     }
