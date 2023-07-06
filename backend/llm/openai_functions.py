@@ -1,12 +1,14 @@
 from typing import Any, Dict, List, Optional
 
 from langchain.chat_models import ChatOpenAI
+from langchain.embeddings.openai import OpenAIEmbeddings
 from llm.models.FunctionCall import FunctionCall
 from llm.models.OpenAiAnswer import OpenAiAnswer
 from logger import get_logger
 from models.chat import ChatHistory
 from repository.chat.get_chat_history import get_chat_history
 from repository.chat.update_chat_history import update_chat_history
+from supabase import Client, create_client
 from vectorstore.supabase import CustomSupabaseVectorStore
 
 from .base import BaseBrainPicking
@@ -61,6 +63,25 @@ class OpenAIFunctionsBrainPicking(BaseBrainPicking):
     def openai_client(self) -> ChatOpenAI:
         return ChatOpenAI(openai_api_key=self.openai_api_key)
 
+    @property
+    def embeddings(self) -> OpenAIEmbeddings:
+        return OpenAIEmbeddings(openai_api_key=self.openai_api_key)
+
+    @property
+    def supabase_client(self) -> Client:
+        return create_client(
+            self.brain_settings.supabase_url, self.brain_settings.supabase_service_key
+        )
+
+    @property
+    def vector_store(self) -> CustomSupabaseVectorStore:
+        return CustomSupabaseVectorStore(
+            self.supabase_client,
+            self.embeddings,
+            table_name="vectors",
+            brain_id=self.brain_id,
+        )
+
     def _get_model_response(
         self,
         messages: List[Dict[str, str]],
@@ -103,14 +124,8 @@ class OpenAIFunctionsBrainPicking(BaseBrainPicking):
         Retrieve documents related to the question
         """
         logger.info("Getting context")
-        vector_store = CustomSupabaseVectorStore(
-            self.supabase_client,
-            self.embeddings,
-            table_name="vectors",
-            brain_id=self.brain_id,
-        )
 
-        return vector_store.similarity_search(query=question)
+        return self.vector_store.similarity_search(query=question)
 
     def _construct_prompt(
         self, question: str, useContext: bool = False, useHistory: bool = False
