@@ -34,11 +34,11 @@ jobs:
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
       - name: Test with pytest
         env:
-          SUPABASE_URL: ${{vars.SUPABASE_URL}}
-          SUPABASE_SERVICE_KEY: ${{vars.SUPABASE_SERVICE_KEY}}
-          OPENAI_API_KEY: ${{vars.OPENAI_API_KEY}}
-          ANTHROPIC_API_KEY: ${{vars.ANTHROPIC_API_KEY}}
-          JWT_SECRET_KEY: ${{vars.JWT_SECRET_KEY}}
-          CI_TEST_API_KEY: ${{vars.CI_TEST_API_KEY}} 
+          SUPABASE_URL: ${{secrets.SUPABASE_URL}}
+          SUPABASE_SERVICE_KEY: ${{secrets.SUPABASE_SERVICE_KEY}}
+          OPENAI_API_KEY: ${{secrets.OPENAI_API_KEY}}
+          ANTHROPIC_API_KEY: ${{secrets.ANTHROPIC_API_KEY}}
+          JWT_SECRET_KEY: ${{secrets.JWT_SECRET_KEY}}
+          CI_TEST_API_KEY: ${{secrets.CI_TEST_API_KEY}} 
         run: |
           pytest
