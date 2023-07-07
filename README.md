@@ -58,7 +58,7 @@ Additionally, you'll need a [Supabase](https://supabase.com/) account for:
 
 ### Installation Steps 💽
 
-- **Step 0**: If needed, here is the installation explained on Youtube [here](https://youtu.be/rC-s4QdfY80)
+- **Step 0**: If needed, the installation is explained on Youtube [here](https://youtu.be/rC-s4QdfY80)
 
 - **Step 1**: Clone the repository using **one** of these commands:
 
@@ -112,10 +112,10 @@ chmod +x migration.sh
 ./migration.sh
 ```
 
-And choose either create_scripts if first time or migrations if you are updating your database
+And choose either create_scripts if it's your first time or migrations if you are updating your database.
 
 
-All scripts can be found in the [scripts](scripts/) folder
+All the scripts can be found in the [scripts](scripts/) folder
 > _If you come from an old version of Quivr, run the scripts in [migration script](scripts/) to migrate your data to the new version in the order of date_
 
 - **Step 5**: Launch the app
@@ -126,7 +126,7 @@ docker compose -f docker-compose.yml up --build
 
 - **Step 6**: Navigate to `localhost:3000` in your browser
 
-- ** Step 7**: Want to contribute to the project? 
+- **Step 7**: Want to contribute to the project? 
 
 ```
 docker compose -f docker-compose.dev.yml up --build
