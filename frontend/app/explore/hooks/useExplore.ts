@@ -2,7 +2,6 @@ import { UUID } from "crypto";
 import { useEffect, useState } from "react";
 
 import { useBrainApi } from "@/lib/api/brain/useBrainApi";
-import { getBrainFromLocalStorage } from "@/lib/context/BrainProvider/helpers/brainLocalStorage";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 import { useSupabase } from "@/lib/context/SupabaseProvider";
 import { useAxios } from "@/lib/hooks";
@@ -14,25 +13,12 @@ export const useExplore = () => {
   const [isPending, setIsPending] = useState(true);
   const { session } = useSupabase();
   const { axiosInstance } = useAxios();
-  const { setActiveBrain, setDefaultBrain, currentBrainId } = useBrainContext();
+  const { currentBrainId } = useBrainContext();
   const { getBrainDocuments } = useBrainApi();
-  const fetchAndSetActiveBrain = async () => {
-    const storedBrain = getBrainFromLocalStorage();
-    if (storedBrain) {
-      setActiveBrain({ ...storedBrain });
-
-      return storedBrain;
-    } else {
-      const defaultBrain = await setDefaultBrain();
-
-      return defaultBrain;
-    }
-  };
 
   useEffect(() => {
     const fetchDocuments = async (brainId: UUID | null) => {
       setIsPending(true);
-      await fetchAndSetActiveBrain();
       try {
         if (brainId === null) {
           throw new Error("Brain id not found");

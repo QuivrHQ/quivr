@@ -2,7 +2,7 @@ import { UUID } from "crypto";
 
 import { Document } from "@/lib/types/Document";
 
-import { useBrainState } from "./hooks/useBrainState";
+import { useBrainProvider } from "./hooks/useBrainProvider";
 
 export type Brain = {
   id: UUID;
@@ -14,4 +14,4 @@ export type Brain = {
   temperature?: string;
 };
 
-export type BrainContextType = ReturnType<typeof useBrainState>;
+export type BrainContextType = ReturnType<typeof useBrainProvider>;

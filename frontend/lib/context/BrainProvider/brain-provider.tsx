@@ -2,7 +2,7 @@
 
 import { createContext } from "react";
 
-import { useBrainState } from "./hooks/useBrainState";
+import { useBrainProvider } from "./hooks/useBrainProvider";
 import { BrainContextType } from "./types";
 
 export const BrainContext = createContext<BrainContextType | undefined>(
@@ -14,9 +14,11 @@ export const BrainProvider = ({
 }: {
   children: React.ReactNode;
 }): JSX.Element => {
-  const brainState = useBrainState();
+  const brainProviderUtils = useBrainProvider();
 
   return (
-    <BrainContext.Provider value={brainState}>{children}</BrainContext.Provider>
+    <BrainContext.Provider value={brainProviderUtils}>
+      {children}
+    </BrainContext.Provider>
   );
 };
