@@ -1,9 +1,9 @@
 import { useContext } from "react";
 
-import { BrainStateProps } from "./useBrainState";
 import { BrainContext } from "../brain-provider";
+import { BrainContextType } from "../types";
 
-export const useBrainContext = (): BrainStateProps => {
+export const useBrainContext = (): BrainContextType => {
   const context = useContext(BrainContext);
 
   if (context === undefined) {

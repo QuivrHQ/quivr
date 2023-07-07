@@ -1,6 +1,6 @@
 /* eslint-disable max-lines */
 import { UUID } from "crypto";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 
 import {
   createBrainFromBackend,
@@ -18,30 +18,19 @@ import {
 } from "../helpers/brainLocalStorage";
 import { Brain } from "../types";
 
-export interface BrainStateProps {
-  currentBrain: Brain | undefined;
-  currentBrainId: UUID | null;
-  allBrains: Brain[];
-  createBrain: (name: string) => Promise<UUID | undefined>;
-  deleteBrain: (id: UUID) => Promise<void>;
-  setActiveBrain: ({ id, name }: { id: UUID; name: string }) => void;
-  getBrainWithId: (brainId: UUID) => Promise<Brain>;
-  fetchAllBrains: () => Promise<void>;
-  setDefaultBrain: () => Promise<void>;
-}
+// CAUTION: This hook should be use in BrainProvider only. You may be need `useBrainContext` instead.
 
-export const useBrainState = (): BrainStateProps => {
+// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+export const useBrainProvider = () => {
   const { publish } = useToast();
+  const { track } = useEventTracking();
+  const { axiosInstance } = useAxios();
 
   const [allBrains, setAllBrains] = useState<Brain[]>([]);
   const [currentBrainId, setCurrentBrainId] = useState<null | UUID>(null);
-  const { axiosInstance } = useAxios();
-
-  const { track } = useEventTracking();
+  const [isFetchingBrains, setIsFetchingBrains] = useState(false);
 
   const currentBrain = allBrains.find((brain) => brain.id === currentBrainId);
-
-  // options: Record<string, string | unknown>;
 
   const createBrain = async (name: string): Promise<UUID | undefined> => {
     const createdBrain = await createBrainFromBackend(axiosInstance, name);
@@ -78,14 +67,14 @@ export const useBrainState = (): BrainStateProps => {
   };
 
   const fetchAllBrains = useCallback(async () => {
+    setIsFetchingBrains(true);
     try {
-      console.log("Fetching all brains for a user");
       const brains = await getAllUserBrainsFromBE(axiosInstance);
-      console.log(brains);
       setAllBrains(brains ?? []);
-      console.log("Fetched all brains for user");
     } catch (error) {
       console.error(error);
+    } finally {
+      setIsFetchingBrains(false);
     }
   }, [axiosInstance]);
 
@@ -94,17 +83,14 @@ export const useBrainState = (): BrainStateProps => {
       const newActiveBrain = { id, name };
       saveBrainInLocalStorage(newActiveBrain);
       setCurrentBrainId(id);
-      console.log("Setting active brain", newActiveBrain);
       void track("CHANGE_BRAIN");
     },
     []
   );
 
   const setDefaultBrain = useCallback(async () => {
-    console.log("Setting default brain");
     const defaultBrain = await getUserDefaultBrainFromBackend(axiosInstance);
-    console.log("defaultBrain", defaultBrain);
-    if (defaultBrain) {
+    if (defaultBrain !== undefined) {
       saveBrainInLocalStorage(defaultBrain);
       setActiveBrain({ ...defaultBrain });
     } else {
@@ -113,26 +99,13 @@ export const useBrainState = (): BrainStateProps => {
   }, [axiosInstance, setActiveBrain]);
 
   const fetchAndSetActiveBrain = useCallback(async () => {
-    console.log(
-      "Fetching and setting active brain use effect in useBrainState"
-    );
     const storedBrain = getBrainFromLocalStorage();
     if (storedBrain?.id !== undefined) {
-      console.log("Setting active brain from local storage");
-      console.log("storedBrain", storedBrain);
       setActiveBrain({ ...storedBrain });
     } else {
-      console.log("Setting default brain for first time");
       await setDefaultBrain();
     }
   }, [setDefaultBrain, setActiveBrain]);
-
-  useEffect(() => {
-    void fetchAllBrains();
-
-    console.log("brainId", currentBrainId);
-    void fetchAndSetActiveBrain();
-  }, [fetchAllBrains, fetchAndSetActiveBrain, currentBrainId]);
 
   return {
     currentBrain,
@@ -144,5 +117,8 @@ export const useBrainState = (): BrainStateProps => {
     getBrainWithId,
     fetchAllBrains,
     setDefaultBrain,
+    fetchAndSetActiveBrain,
+    isFetchingBrains,
+    setIsFetchingBrains,
   };
 };
