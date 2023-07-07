@@ -1,22 +1,26 @@
 const nextConfig = {
   // eslint-disable-next-line prefer-arrow/prefer-arrow-functions
   async headers() {
-    return [
-      {
-        source: "/(.*)",
-        headers: securityHeaders,
-      },
-    ];
+    if (process.env.NEXT_PUBLIC_ENV === "prod") {
+      return [
+        {
+          source: "/(.*)",
+          headers: securityHeaders,
+        },
+      ];
+    } else {
+      return [];
+    }
   },
 };
-//add check of if localhsot of not
+
 const ContentSecurityPolicy = `
-  default-src 'self' https://fonts.googleapis.com ${process.env.NEXT_PUBLIC_SUPABASE_URL} https://api.june.so http://localhost:3001/; 
+  default-src 'self' https://fonts.googleapis.com ${process.env.NEXT_PUBLIC_SUPABASE_URL} https://api.june.so https://www.quivr.app/; 
   connect-src 'self' ${process.env.NEXT_PUBLIC_SUPABASE_URL} ${process.env.NEXT_PUBLIC_BACKEND_URL} https://api.june.so;
   img-src 'self' data:;
-  script-src 'unsafe-inline' 'unsafe-eval' https://va.vercel-scripts.com/  http://localhost:3001/;
+  script-src 'unsafe-inline' 'unsafe-eval' https://va.vercel-scripts.com/  https://www.quivr.app/;
   frame-ancestors 'none';
-  style-src 'unsafe-inline' http://localhost:3001/;
+  style-src 'unsafe-inline' https://www.quivr.app/;
 `;
 
 // Define headers
