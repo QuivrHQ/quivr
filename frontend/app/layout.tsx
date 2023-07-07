@@ -3,13 +3,12 @@ import { Analytics } from "@vercel/analytics/react";
 import { Inter } from "next/font/google";
 import { cookies, headers } from "next/headers";
 
-import Footer from "@/lib/components/Footer";
-import { NavBar } from "@/lib/components/NavBar";
-import { TrackingWrapper } from "@/lib/components/TrackingWrapper";
 import { ToastProvider } from "@/lib/components/ui/Toast";
 import { BrainConfigProvider } from "@/lib/context/BrainConfigProvider";
 import { BrainProvider } from "@/lib/context/BrainProvider";
 import { SupabaseProvider } from "@/lib/context/SupabaseProvider";
+
+import { App } from "./App";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -43,10 +42,9 @@ const RootLayout = async ({
           <SupabaseProvider session={session}>
             <BrainConfigProvider>
               <BrainProvider>
-                <TrackingWrapper />
-                <NavBar />
-                <div className="flex-1">{children}</div>
-                <Footer />
+                <App>
+                  <div className="flex-1">{children}</div>
+                </App>
               </BrainProvider>
             </BrainConfigProvider>
           </SupabaseProvider>
