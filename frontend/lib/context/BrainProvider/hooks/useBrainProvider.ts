@@ -2,14 +2,8 @@
 import { UUID } from "crypto";
 import { useCallback, useState } from "react";
 
-import {
-  createBrainFromBackend,
-  deleteBrainFromBE,
-  getAllUserBrainsFromBE,
-  getBrainFromBE,
-  getUserDefaultBrainFromBackend,
-} from "@/lib/api";
-import { useAxios, useToast } from "@/lib/hooks";
+import { useBrainApi } from "@/lib/api/brain/useBrainApi";
+import { useToast } from "@/lib/hooks";
 import { useEventTracking } from "@/services/analytics/useEventTracking";
 
 import {
@@ -24,7 +18,8 @@ import { Brain } from "../types";
 export const useBrainProvider = () => {
   const { publish } = useToast();
   const { track } = useEventTracking();
-  const { axiosInstance } = useAxios();
+  const { createBrain, deleteBrain, getBrains, getDefaultBrain } =
+    useBrainApi();
 
   const [allBrains, setAllBrains] = useState<Brain[]>([]);
   const [currentBrainId, setCurrentBrainId] = useState<null | UUID>(null);
@@ -32,15 +27,17 @@ export const useBrainProvider = () => {
 
   const currentBrain = allBrains.find((brain) => brain.id === currentBrainId);
 
-  const createBrain = async (name: string): Promise<UUID | undefined> => {
-    const createdBrain = await createBrainFromBackend(axiosInstance, name);
-    if (createdBrain !== undefined) {
+  const createBrainHandler = async (
+    name: string
+  ): Promise<UUID | undefined> => {
+    const createdBrain = await createBrain(name);
+    try {
       setAllBrains((prevBrains) => [...prevBrains, createdBrain]);
       saveBrainInLocalStorage(createdBrain);
       void track("BRAIN_CREATED");
 
       return createdBrain.id;
-    } else {
+    } catch {
       publish({
         variant: "danger",
         text: "Error occured while creating a brain",
@@ -48,35 +45,23 @@ export const useBrainProvider = () => {
     }
   };
 
-  const deleteBrain = async (id: UUID) => {
-    await deleteBrainFromBE(axiosInstance, id);
+  const deleteBrainHandler = async (id: UUID) => {
+    await deleteBrain(id);
     setAllBrains((prevBrains) => prevBrains.filter((brain) => brain.id !== id));
     void track("DELETE_BRAIN");
-  };
-
-  const getBrainWithId = async (brainId: UUID): Promise<Brain> => {
-    const brain =
-      allBrains.find(({ id }) => id === brainId) ??
-      (await getBrainFromBE(axiosInstance, brainId));
-
-    if (brain === undefined) {
-      throw new Error(`Error finding brain ${brainId}`);
-    }
-
-    return brain;
   };
 
   const fetchAllBrains = useCallback(async () => {
     setIsFetchingBrains(true);
     try {
-      const brains = await getAllUserBrainsFromBE(axiosInstance);
-      setAllBrains(brains ?? []);
+      const brains = await getBrains();
+      setAllBrains(brains);
     } catch (error) {
       console.error(error);
     } finally {
       setIsFetchingBrains(false);
     }
-  }, [axiosInstance]);
+  }, []);
 
   const setActiveBrain = useCallback(
     ({ id, name }: { id: UUID; name: string }) => {
@@ -89,14 +74,14 @@ export const useBrainProvider = () => {
   );
 
   const setDefaultBrain = useCallback(async () => {
-    const defaultBrain = await getUserDefaultBrainFromBackend(axiosInstance);
+    const defaultBrain = await getDefaultBrain();
     if (defaultBrain !== undefined) {
       saveBrainInLocalStorage(defaultBrain);
       setActiveBrain({ ...defaultBrain });
     } else {
       console.warn("No brains found");
     }
-  }, [axiosInstance, setActiveBrain]);
+  }, [setActiveBrain]);
 
   const fetchAndSetActiveBrain = useCallback(async () => {
     const storedBrain = getBrainFromLocalStorage();
@@ -111,10 +96,9 @@ export const useBrainProvider = () => {
     currentBrain,
     currentBrainId,
     allBrains,
-    createBrain,
-    deleteBrain,
+    createBrain: createBrainHandler,
+    deleteBrain: deleteBrainHandler,
     setActiveBrain,
-    getBrainWithId,
     fetchAllBrains,
     setDefaultBrain,
     fetchAndSetActiveBrain,
