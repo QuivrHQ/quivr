@@ -18,6 +18,7 @@ const ContentSecurityPolicy = `
   default-src 'self' https://fonts.googleapis.com ${process.env.NEXT_PUBLIC_SUPABASE_URL} https://api.june.so https://www.quivr.app/; 
   connect-src 'self' ${process.env.NEXT_PUBLIC_SUPABASE_URL} ${process.env.NEXT_PUBLIC_BACKEND_URL} https://api.june.so;
   img-src 'self' data:;
+  media-src 'self' https://user-images.githubusercontent.com;
   script-src 'unsafe-inline' 'unsafe-eval' https://va.vercel-scripts.com/  https://www.quivr.app/;
   frame-ancestors 'none';
   style-src 'unsafe-inline' https://www.quivr.app/;
