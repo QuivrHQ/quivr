@@ -137,7 +137,11 @@ class OpenAIFunctionsBrainPicking(BaseBrainPicking):
         system_messages = [
             {
                 "role": "system",
-                "content": "Your name is Quivr. You are a second brain. A person will ask you a question and you will provide a helpful answer. Write the answer in the same language as the question. If you don't know the answer, just say that you don't know. Don't try to make up an answer. Our goal is to answer questions about user uploaded documents. Unless basic questions or greetings, you should always refer to user uploaded documents by fetching them with the get_history_and_context function. If the user ask a question that is not common knowledge for a 10 years old, then use get_history_and_context to find a document that can help you answer the question. If the user ask a question that is common knowledge for a 10 years old, then you can answer the question without using get_history_and_context.",
+                "content": """Your name is Quivr. You are an assistant that has access to a person's documents and that can answer questions about them.
+                A person will ask you a question and you will provide a helpful answer. 
+                Write the answer in the same language as the question. 
+                You have access to functions to help you answer the question.
+                If you don't know the answer, just say that you don't know but be helpful and explain why you can't answer""",
             }
         ]
 
@@ -152,7 +156,7 @@ class OpenAIFunctionsBrainPicking(BaseBrainPicking):
         if useContext:
             logger.info("Adding chat context to prompt")
             chat_context = self._get_context(question)
-            context_message = f"Here is chat context: {chat_context if chat_context else 'No document found'}"
+            context_message = f"Here are the documents you have access to: {chat_context if chat_context else 'No document found'}"
             system_messages.append({"role": "user", "content": context_message})
 
         system_messages.append({"role": "user", "content": question})
@@ -166,13 +170,8 @@ class OpenAIFunctionsBrainPicking(BaseBrainPicking):
         logger.info("Getting answer")
         functions = [
             {
-                "name": "get_history",
-                "description": "Used to get the chat history between the user and the assistant",
-                "parameters": {"type": "object", "properties": {}},
-            },
-            {
                 "name": "get_history_and_context",
-                "description": "Used for retrieving documents related to the question to help answer the question and the previous chat history",
+                "description": "Get the chat history between you and the user and also get the relevant documents to answer the question. Always use that unless a very simple question is asked that a 5 years old could answer.",
                 "parameters": {"type": "object", "properties": {}},
             },
         ]
