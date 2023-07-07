@@ -1,5 +1,4 @@
 import { AxiosInstance } from "axios";
-import { UUID } from "crypto";
 
 import { Brain } from "@/lib/context/BrainProvider/types";
 import { Document } from "@/lib/types/Document";
@@ -26,7 +25,7 @@ export const createBrain = async (
 };
 
 export const getBrain = async (
-  brainId: UUID,
+  brainId: string,
   axiosInstance: AxiosInstance
 ): Promise<Brain | undefined> => {
   const brain = (
@@ -37,7 +36,7 @@ export const getBrain = async (
 };
 
 export const deleteBrain = async (
-  brainId: UUID,
+  brainId: string,
   axiosInstance: AxiosInstance
 ): Promise<void> => {
   await axiosInstance.delete(`/brains/${brainId}/`);

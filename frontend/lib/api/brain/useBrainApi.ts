@@ -1,5 +1,3 @@
-import { UUID } from "crypto";
-
 import { useAxios } from "@/lib/hooks";
 
 import {
@@ -19,9 +17,9 @@ export const useBrainApi = () => {
     getBrainDocuments: async (brainId: string) =>
       getBrainDocuments(brainId, axiosInstance),
     createBrain: async (name: string) => createBrain(name, axiosInstance),
-    deleteBrain: async (id: UUID) => deleteBrain(id, axiosInstance),
+    deleteBrain: async (id: string) => deleteBrain(id, axiosInstance),
     getDefaultBrain: async () => getDefaultBrain(axiosInstance),
     getBrains: async () => getBrains(axiosInstance),
-    getBrain: async (id: UUID) => getBrain(id, axiosInstance),
+    getBrain: async (id: string) => getBrain(id, axiosInstance),
   };
 };
