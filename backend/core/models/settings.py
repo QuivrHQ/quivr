@@ -18,7 +18,11 @@ class BrainSettings(BaseSettings):
     pg_database_url: str = "not implemented"
     resend_api_key: str = "null"
     resend_email_address: str = "brain@mail.quivr.app"
-
+    openai_api_base: str = "https://api.openai.com/v1"
+    openai_api_type: str = "open_ai"
+    openai_gpt_deployment_id : str = None   # pyright: ignore reportPrivateUsage=none
+    openai_embedding_deployment_id : str = None  # pyright: ignore reportPrivateUsage=none
+    openai_api_version : str = "2023-07-01-preview"
 
 class LLMSettings(BaseSettings):
     private: bool = False
@@ -40,8 +44,12 @@ def get_supabase_db() -> SupabaseDB:
 
 def get_embeddings() -> OpenAIEmbeddings:
     settings = BrainSettings()  # pyright: ignore reportPrivateUsage=none
+
     embeddings = OpenAIEmbeddings(
-        openai_api_key=settings.openai_api_key
+        openai_api_key=settings.openai_api_key,
+        openai_api_base=settings.openai_api_base,
+        deployment=settings.openai_embedding_deployment_id,
+        openai_api_type=settings.openai_api_type,
     )  # pyright: ignore reportPrivateUsage=none
     return embeddings
 

@@ -1,0 +1,26 @@
+SUPABASE_URL=<change-me>
+SUPABASE_SERVICE_KEY=<change-me>
+PG_DATABASE_URL=notimplementedyet
+OPENAI_API_KEY=<change-me>
+OPENAI_API_TYPE=azure
+OPENAI_API_BASE=https://<Your-Endpoint>.openai.azure.com/
+OPENAI_GPT_DEPLOYMENT_ID=<change-me>
+OPENAI_EMBEDDING_DEPLOYMENT_ID=<change-me>
+OPENAI_API_VERSION="2023-07-01-preview"
+ANTHROPIC_API_KEY=null
+JWT_SECRET_KEY=<change-me>
+AUTHENTICATE=true
+GOOGLE_APPLICATION_CREDENTIALS=<change-me>
+GOOGLE_CLOUD_PROJECT=<change-me>
+
+MAX_BRAIN_SIZE=52428800
+MAX_REQUESTS_NUMBER=200
+MAX_BRAIN_PER_USER=5
+
+#Private LLM Variables
+PRIVATE=False
+MODEL_PATH=./local_models/ggml-gpt4all-j-v1.3-groovy.bin
+
+#RESEND
+RESEND_API_KEY=<change-me>
+RESEND_EMAIL_ADDRESS=onboarding@resend.dev

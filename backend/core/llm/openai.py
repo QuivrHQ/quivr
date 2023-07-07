@@ -41,7 +41,10 @@ class OpenAIBrainPicking(QABaseBrainPicking):
     @property
     def embeddings(self) -> OpenAIEmbeddings:
         return OpenAIEmbeddings(
-            openai_api_key=self.openai_api_key
+            openai_api_key=self.openai_api_key,
+            openai_api_base=self.openai_api_base,
+            deployment=self.openai_embedding_deployment_id,
+            openai_api_type=self.openai_api_type,
         )  # pyright: ignore reportPrivateUsage=none
 
     
