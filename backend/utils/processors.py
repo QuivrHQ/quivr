@@ -12,6 +12,7 @@ from parsers.odt import process_odt
 from parsers.pdf import process_pdf
 from parsers.powerpoint import process_powerpoint
 from parsers.txt import process_txt
+from parsers.xlsx import process_xlsx
 
 file_processors = {
     ".txt": process_txt,
@@ -32,6 +33,8 @@ file_processors = {
     ".odt": process_odt,
     ".epub": process_epub,
     ".ipynb": process_ipnyb,
+    ".xlsx": process_xlsx,
+    ".xls": process_xlsx,
 }
 
 
