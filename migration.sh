@@ -15,7 +15,7 @@ else
     DB_NAME=$(gum input --placeholder "Database name")
     DB_PORT=$(gum input --placeholder "Port")
     DB_USER=$(gum input --placeholder "User")
-    DB_PASSWORD=$(gum input --placeholder "Password" --secret)
+    DB_PASSWORD=$(gum input --placeholder "Password" --password)
     
     # Save the inputs in .migration_info file
     echo "DB_HOST=$DB_HOST" > .migration_info
