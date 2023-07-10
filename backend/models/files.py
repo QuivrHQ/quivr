@@ -19,9 +19,9 @@ class File(BaseModel):
     id: Optional[UUID] = None
     file: Optional[UploadFile]
     file_name: Optional[str] = ""
-    file_size: Optional[int] = ""  # pyright: ignore reportPrivateUsage=none
+    file_size: Optional[int] = None
     file_sha1: Optional[str] = ""
-    vectors_ids: Optional[int] = []  # pyright: ignore reportPrivateUsage=none
+    vectors_ids: Optional[list] = []
     file_extension: Optional[str] = ""
     content: Optional[Any] = None
     chunk_size: int = 500
@@ -142,6 +142,9 @@ class File(BaseModel):
 
     def link_file_to_brain(self, brain: Brain):
         self.set_file_vectors_ids()
+
+        if self.vectors_ids is None:
+            return
 
         for vector_id in self.vectors_ids:  # pyright: ignore reportPrivateUsage=none
             brain.create_brain_vector(vector_id["id"], self.file_sha1)
