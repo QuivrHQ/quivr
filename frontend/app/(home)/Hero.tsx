@@ -46,7 +46,7 @@ const Hero = (): JSX.Element => {
           Quivr is your second brain in the cloud, designed to easily store and
           retrieve unstructured information.
         </p>
-        <Link href={"/signup"}>
+        <Link href={"/login"}>
           <Button>Get Started</Button>
         </Link>
         <Link target="_blank" href={"https://github.com/StanGirard/quivr/"}>
