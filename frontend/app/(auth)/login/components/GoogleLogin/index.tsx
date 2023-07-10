@@ -10,7 +10,7 @@ export const GoogleLoginButton = () => {
     <Button
       onClick={signInWithGoogle}
       isLoading={isPending}
-      variant={"secondary"}
+      variant={"danger"}
       type="button"
       data-testid="google-login-button"
     >
