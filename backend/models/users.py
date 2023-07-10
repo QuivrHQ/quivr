@@ -16,6 +16,12 @@ class User(BaseModel):
 
     # [TODO] Rename the user table and its references to 'user_usage'
     def create_user(self, date):
+        """
+        Create a new user entry in the database
+
+        Args:
+            date (str): Date of the request
+        """
         commons = common_dependencies()
         logger.info(f"New user entry in db document for user {self.email}")
 
@@ -34,6 +40,9 @@ class User(BaseModel):
         )
 
     def get_user_request_stats(self):
+        """
+        Fetch the user request stats from the database
+        """
         commons = common_dependencies()
         requests_stats = (
             commons["supabase"]
@@ -45,6 +54,9 @@ class User(BaseModel):
         return requests_stats.data
 
     def fetch_user_requests_count(self, date):
+        """
+        Fetch the user request count from the database
+        """
         commons = common_dependencies()
         response = (
             commons["supabase"]
@@ -59,6 +71,9 @@ class User(BaseModel):
         return userItem["requests_count"]
 
     def increment_user_request_count(self, date):
+        """
+        Increment the user request count in the database
+        """
         commons = common_dependencies()
         requests_count = self.fetch_user_requests_count(date) + 1
         logger.info(f"User {self.email} request count updated to {requests_count}")
