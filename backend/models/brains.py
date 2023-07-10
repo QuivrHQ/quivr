@@ -2,11 +2,13 @@ import os
 from typing import Any, List, Optional
 from uuid import UUID
 
+from logger import get_logger
+from models.settings import CommonsDep, common_dependencies
+from models.users import User
 from pydantic import BaseModel
 from utils.vectors import get_unique_files_from_vector_ids
 
-from models.settings import CommonsDep, common_dependencies
-from models.users import User
+logger = get_logger(__name__)
 
 
 class Brain(BaseModel):
@@ -245,19 +247,17 @@ def get_default_user_brain(user: User):
     commons = common_dependencies()
     response = (
         commons["supabase"]
-        .from_("brains_users")  # I'm assuming this is the correct table
+        .from_("brains_users")
         .select("brain_id")
         .filter("user_id", "eq", user.id)
-        .filter(
-            "default_brain", "eq", True
-        )  # Assuming 'default' is the correct column name
+        .filter("default_brain", "eq", True)
         .execute()
     )
 
-    print("Default brain response:", response.data)
+    logger.info("Default brain response:", response.data)
     default_brain_id = response.data[0]["brain_id"] if response.data else None
 
-    print(f"Default brain id: {default_brain_id}")
+    logger.info(f"Default brain id: {default_brain_id}")
 
     if default_brain_id:
         brain_response = (

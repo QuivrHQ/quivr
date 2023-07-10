@@ -153,6 +153,59 @@ def test_delete_all_brains():
         assert delete_response.status_code == 200
 
 
+def test_delete_all_brains_and_get_default_brain():
+    # First create a new brain
+    test_create_brain()
+
+    # Now, retrieve all brains for the current user
+    response = client.get(
+        "/brains/",
+        headers={"Authorization": "Bearer " + API_KEY},
+    )
+
+    # Assert that the response status code is 200 (HTTP OK)
+    assert response.status_code == 200
+    assert len(response.json()["brains"]) > 0
+
+    test_delete_all_brains()
+
+    # Now, retrieve all brains for the current user
+    response = client.get(
+        "/brains/",
+        headers={"Authorization": "Bearer " + API_KEY},
+    )
+
+    # Assert that the response status code is 200 (HTTP OK)
+    assert response.status_code == 200
+    assert len(response.json()["brains"]) == 0
+
+    # Get the default brain, it should create one if it doesn't exist
+    response = client.get(
+        "/brains/default/",
+        headers={"Authorization": "Bearer " + API_KEY},
+    )
+
+    # Assert that the response status code is 200 (HTTP OK)
+    assert response.status_code == 200
+    assert response.json()["name"] == "Default brain"
+
+    # Now, retrieve all brains for the current user
+    response = client.get(
+        "/brains/",
+        headers={"Authorization": "Bearer " + API_KEY},
+    )
+
+    # Assert that there is only one brain
+    response_data = response.json()
+    assert len(response_data) == 1
+    for brain in response_data["brains"]:
+        assert "id" in brain
+        assert "name" in brain
+
+    # Assert that the brain is the default brain
+    assert response_data["brains"][0]["name"] == "Default brain"
+
+
 def test_get_all_chats():
     # Making a GET request to the /chat endpoint to retrieve all chats
     response = client.get(
