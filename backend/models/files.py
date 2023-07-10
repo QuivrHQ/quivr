@@ -6,11 +6,10 @@ from uuid import UUID
 from fastapi import UploadFile
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from logger import get_logger
-from pydantic import BaseModel
-from utils.file import compute_sha1_from_file
-
 from models.brains import Brain
 from models.settings import CommonsDep, common_dependencies
+from pydantic import BaseModel
+from utils.file import compute_sha1_from_file
 
 logger = get_logger(__name__)
 
@@ -19,9 +18,9 @@ class File(BaseModel):
     id: Optional[UUID] = None
     file: Optional[UploadFile]
     file_name: Optional[str] = ""
-    file_size: Optional[int] = ""  # pyright: ignore reportPrivateUsage=none
+    file_size: Optional[int] = None
     file_sha1: Optional[str] = ""
-    vectors_ids: Optional[int] = []  # pyright: ignore reportPrivateUsage=none
+    vectors_ids: Optional[list] = []
     file_extension: Optional[str] = ""
     content: Optional[Any] = None
     chunk_size: int = 500
@@ -42,6 +41,9 @@ class File(BaseModel):
             )[-1].lower()
 
     async def compute_file_sha1(self):
+        """
+        Compute the sha1 of the file using a temporary file
+        """
         with tempfile.NamedTemporaryFile(
             delete=False,
             suffix=self.file.filename,  # pyright: ignore reportPrivateUsage=none
@@ -57,6 +59,12 @@ class File(BaseModel):
         os.remove(tmp_file.name)
 
     def compute_documents(self, loader_class):
+        """
+        Compute the documents from the file
+
+        Args:
+            loader_class (class): The class of the loader to use to load the file
+        """
         logger.info(f"Computing documents from file {self.file_name}")
 
         documents = []
@@ -118,6 +126,12 @@ class File(BaseModel):
         return True
 
     def file_already_exists_in_brain(self, brain_id):
+        """
+        Check if file already exists in a brain
+
+        Args:
+            brain_id (str): Brain id
+        """
         commons = common_dependencies()
         self.set_file_vectors_ids()
         # Check if file exists in that brain
@@ -136,12 +150,18 @@ class File(BaseModel):
         return True
 
     def file_is_empty(self):
+        """
+        Check if file is empty by checking if the file pointer is at the beginning of the file
+        """
         return (
             self.file.file._file.tell() < 1  # pyright: ignore reportPrivateUsage=none
         )
 
     def link_file_to_brain(self, brain: Brain):
         self.set_file_vectors_ids()
+
+        if self.vectors_ids is None:
+            return
 
         for vector_id in self.vectors_ids:  # pyright: ignore reportPrivateUsage=none
             brain.create_brain_vector(vector_id["id"], self.file_sha1)
