@@ -35,7 +35,9 @@ async def crawl_endpoint(
     commons = common_dependencies()
 
     if request.headers.get("Openai-Api-Key"):
-        brain.max_brain_size = os.getenv("MAX_BRAIN_SIZE_WITH_KEY", 209715200)
+        brain.max_brain_size = os.getenv(
+            "MAX_BRAIN_SIZE_WITH_KEY", 209715200
+        )  # pyright: ignore reportPrivateUsage=none
 
     file_size = 1000000
     remaining_free_space = brain.remaining_brain_size
@@ -47,14 +49,20 @@ async def crawl_endpoint(
         }
     else:
         if not crawl_website.checkGithub():
-            file_path, file_name = crawl_website.process()
+            (
+                file_path,
+                file_name,
+            ) = crawl_website.process()  # pyright: ignore reportPrivateUsage=none
             # Create a SpooledTemporaryFile from the file_path
             spooled_file = SpooledTemporaryFile()
             with open(file_path, "rb") as f:
                 shutil.copyfileobj(f, spooled_file)
 
             # Pass the SpooledTemporaryFile to UploadFile
-            uploadFile = UploadFile(file=spooled_file, filename=file_name)
+            uploadFile = UploadFile(
+                file=spooled_file,  # pyright: ignore reportPrivateUsage=none
+                filename=file_name,
+            )
             file = File(file=uploadFile)
             #  check remaining free space here !!
             message = await filter_file(

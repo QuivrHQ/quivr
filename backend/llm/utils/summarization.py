@@ -31,7 +31,7 @@ Summarize the following text:
 {{/assistant~}}
 """,
         llm=summary_llm,
-    )
+    )  # pyright: ignore reportPrivateUsage=none
 
     summary = summary(document=document)
     logger.info("Summarization: %s", summary)
@@ -78,10 +78,12 @@ Summary
 {{/assistant~}}
 """,
         llm=evaluation_llm,
-    )
+    )  # pyright: ignore reportPrivateUsage=none
     result = evaluation(question=question, summaries=summaries)
     evaluations = {}
-    for evaluation in result["evaluation"].split("\n"):
+    for evaluation in result["evaluation"].split(
+        "\n"
+    ):  # pyright: ignore reportPrivateUsage=none
         if evaluation == "" or not evaluation[0].isdigit():
             continue
         logger.info("Evaluation Row: %s", evaluation)

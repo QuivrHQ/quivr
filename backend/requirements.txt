@@ -23,3 +23,4 @@ flake8==6.0.0
 flake8-black==0.3.6
 sentence_transformers>=2.0.0
 sentry-sdk==1.26.0
+pyright==1.1.316

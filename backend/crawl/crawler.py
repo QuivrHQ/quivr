@@ -4,7 +4,6 @@ import tempfile
 import unicodedata
 
 import requests
-from langchain.document_loaders import GitLoader
 from pydantic import BaseModel
 
 
@@ -29,7 +28,7 @@ class CrawlWebsite(BaseModel):
         file_name = slugify(self.url) + ".html"
         temp_file_path = os.path.join(tempfile.gettempdir(), file_name)
         with open(temp_file_path, "w") as temp_file:
-            temp_file.write(content)
+            temp_file.write(content)  # pyright: ignore reportPrivateUsage=none
             # Process the file
 
         if content:

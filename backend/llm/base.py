@@ -20,19 +20,21 @@ class BaseBrainPicking(BaseModel):
     """
 
     # Instantiate settings
-    brain_settings = BrainSettings()
+    brain_settings = BrainSettings()  # type: ignore other parameters are optional
 
     # Default class attributes
-    model: str = None
+    model: str = None  # pyright: ignore reportPrivateUsage=none
     temperature: float = 0.0
-    chat_id: str = None
-    brain_id: str = None
+    chat_id: str = None  # pyright: ignore reportPrivateUsage=none
+    brain_id: str = None  # pyright: ignore reportPrivateUsage=none
     max_tokens: int = 256
-    user_openai_api_key: str = None
+    user_openai_api_key: str = None  # pyright: ignore reportPrivateUsage=none
     streaming: bool = False
 
-    openai_api_key: str = None
-    callbacks: List[AsyncCallbackHandler] = None
+    openai_api_key: str = None  # pyright: ignore reportPrivateUsage=none
+    callbacks: List[
+        AsyncCallbackHandler
+    ] = None  # pyright: ignore reportPrivateUsage=none
 
     def _determine_api_key(self, openai_api_key, user_openai_api_key):
         """If user provided an API key, use it."""
@@ -55,10 +57,12 @@ class BaseBrainPicking(BaseModel):
 
     def _determine_callback_array(
         self, streaming
-    ) -> List[AsyncIteratorCallbackHandler]:
+    ) -> List[AsyncIteratorCallbackHandler]:  # pyright: ignore reportPrivateUsage=none
         """If streaming is set, set the AsyncIteratorCallbackHandler as the only callback."""
         if streaming:
-            return [AsyncIteratorCallbackHandler]
+            return [
+                AsyncIteratorCallbackHandler  # pyright: ignore reportPrivateUsage=none
+            ]
 
     def __init__(self, **data):
         super().__init__(**data)
@@ -66,8 +70,12 @@ class BaseBrainPicking(BaseModel):
         self.openai_api_key = self._determine_api_key(
             self.brain_settings.openai_api_key, self.user_openai_api_key
         )
-        self.streaming = self._determine_streaming(self.model, self.streaming)
-        self.callbacks = self._determine_callback_array(self.streaming)
+        self.streaming = self._determine_streaming(
+            self.model, self.streaming
+        )  # pyright: ignore reportPrivateUsage=none
+        self.callbacks = self._determine_callback_array(
+            self.streaming
+        )  # pyright: ignore reportPrivateUsage=none
 
     class Config:
         """Configuration of the Pydantic Object"""
