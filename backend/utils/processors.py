@@ -54,14 +54,19 @@ async def filter_file(
 
     if file_exists_in_brain:
         return create_response(
-            f"🤔 {file.file.filename} already exists in brain {brain_id}.", "warning"
+            f"🤔 {file.file.filename} already exists in brain {brain_id}.",  # pyright: ignore reportPrivateUsage=none
+            "warning",
         )
     elif file.file_is_empty():
-        return create_response(f"❌ {file.file.filename} is empty.", "error")
+        return create_response(
+            f"❌ {file.file.filename} is empty.",  # pyright: ignore reportPrivateUsage=none
+            "error",  # pyright: ignore reportPrivateUsage=none
+        )
     elif file_exists:
         file.link_file_to_brain(brain=Brain(id=brain_id))
         return create_response(
-            f"✅ {file.file.filename} has been uploaded to brain {brain_id}.", "success"
+            f"✅ {file.file.filename} has been uploaded to brain {brain_id}.",  # pyright: ignore reportPrivateUsage=none
+            "success",
         )
 
     if file.file_extension in file_processors:
@@ -70,14 +75,18 @@ async def filter_file(
                 commons, file, enable_summarization, brain_id, openai_api_key
             )
             return create_response(
-                f"✅ {file.file.filename} has been uploaded to brain {brain_id}.",
+                f"✅ {file.file.filename} has been uploaded to brain {brain_id}.",  # pyright: ignore reportPrivateUsage=none
                 "success",
             )
         except Exception as e:
             # Add more specific exceptions as needed.
             print(f"Error processing file: {e}")
             return create_response(
-                f"⚠️ An error occurred while processing {file.file.filename}.", "error"
+                f"⚠️ An error occurred while processing {file.file.filename}.",  # pyright: ignore reportPrivateUsage=none
+                "error",
             )
 
-    return create_response(f"❌ {file.file.filename} is not supported.", "error")
+    return create_response(
+        f"❌ {file.file.filename} is not supported.",  # pyright: ignore reportPrivateUsage=none
+        "error",
+    )

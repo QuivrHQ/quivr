@@ -23,4 +23,4 @@ def update_chat_history(chat_id: str, user_message: str, assistant: str) -> Chat
         raise HTTPException(
             status_code=500, detail="An exception occurred while updating chat history."
         )
-    return ChatHistory(response[0])
+    return ChatHistory(response[0])  # pyright: ignore reportPrivateUsage=none

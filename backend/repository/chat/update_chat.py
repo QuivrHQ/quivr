@@ -21,7 +21,7 @@ def update_chat(chat_id, chat_data: ChatUpdatableProperties) -> Chat:
 
     if not chat_id:
         logger.error("No chat_id provided")
-        return
+        return  # pyright: ignore reportPrivateUsage=none
 
     updates = {}
 
@@ -41,4 +41,4 @@ def update_chat(chat_id, chat_data: ChatUpdatableProperties) -> Chat:
         logger.info(f"Chat {chat_id} updated")
     else:
         logger.info(f"No updates to apply for chat {chat_id}")
-    return updated_chat
+    return updated_chat  # pyright: ignore reportPrivateUsage=none

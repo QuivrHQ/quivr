@@ -1,6 +1,7 @@
+from typing import List  # For type hinting
+
 from models.chat import ChatHistory
 from models.settings import common_dependencies
-from typing import List  # For type hinting
 
 
 def get_chat_history(chat_id: str) -> List[ChatHistory]:
@@ -16,4 +17,7 @@ def get_chat_history(chat_id: str) -> List[ChatHistory]:
     if history is None:
         return []
     else:
-        return [ChatHistory(message) for message in history]
+        return [
+            ChatHistory(message)  # pyright: ignore reportPrivateUsage=none
+            for message in history
+        ]

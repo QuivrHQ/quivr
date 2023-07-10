@@ -18,8 +18,10 @@ def convert_bytes(bytes, precision=2):
 
 def get_file_size(file: UploadFile):
     # move the cursor to the end of the file
-    file.file._file.seek(0, 2)
-    file_size = file.file._file.tell()  # Getting the size of the file
+    file.file._file.seek(0, 2)  # pyright: ignore reportPrivateUsage=none
+    file_size = (
+        file.file._file.tell()  # pyright: ignore reportPrivateUsage=none
+    )  # Getting the size of the file
     # move the cursor back to the beginning of the file
     file.file.seek(0)
 

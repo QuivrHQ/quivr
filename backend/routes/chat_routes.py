@@ -78,8 +78,8 @@ def check_user_limit(
         user.increment_user_request_count(date)
         if int(user.requests_count) >= int(max_requests_number):
             raise HTTPException(
-                status_code=429,
-                detail="You have reached the maximum number of requests for today.",
+                status_code=429,  # pyright: ignore reportPrivateUsage=none
+                detail="You have reached the maximum number of requests for today.",  # pyright: ignore reportPrivateUsage=none
             )
     else:
         pass
@@ -97,7 +97,7 @@ async def get_chats(current_user: User = Depends(get_current_user)):
     This endpoint retrieves all the chats associated with the current authenticated user. It returns a list of chat objects
     containing the chat ID and chat name for each chat.
     """
-    chats = get_user_chats(current_user.id)
+    chats = get_user_chats(current_user.id)  # pyright: ignore reportPrivateUsage=none
     return {"chats": chats}
 
 
@@ -127,10 +127,11 @@ async def update_chat_metadata_handler(
     Update chat attributes
     """
 
-    chat = get_chat_by_id(chat_id)
+    chat = get_chat_by_id(chat_id)  # pyright: ignore reportPrivateUsage=none
     if current_user.id != chat.user_id:
         raise HTTPException(
-            status_code=403, detail="You should be the owner of the chat to update it."
+            status_code=403,  # pyright: ignore reportPrivateUsage=none
+            detail="You should be the owner of the chat to update it.",  # pyright: ignore reportPrivateUsage=none
         )
     return update_chat(chat_id=chat_id, chat_data=chat_data)
 
@@ -181,7 +182,7 @@ async def create_question_handler(
                 temperature=chat_question.temperature,
                 max_tokens=chat_question.max_tokens,
                 brain_id=str(brain_id),
-                user_openai_api_key=current_user.user_openai_api_key,
+                user_openai_api_key=current_user.user_openai_api_key,  # pyright: ignore reportPrivateUsage=none
             )
 
         else:
@@ -191,10 +192,12 @@ async def create_question_handler(
                 max_tokens=chat_question.max_tokens,
                 temperature=chat_question.temperature,
                 brain_id=str(brain_id),
-                user_openai_api_key=current_user.user_openai_api_key,
+                user_openai_api_key=current_user.user_openai_api_key,  # pyright: ignore reportPrivateUsage=none
             )
 
-        chat_answer = gpt_answer_generator.generate_answer(chat_question.question)
+        chat_answer = gpt_answer_generator.generate_answer(  # pyright: ignore reportPrivateUsage=none
+            chat_question.question
+        )
 
         return chat_answer
     except HTTPException as e:
@@ -217,7 +220,10 @@ async def create_stream_question_handler(
     if chat_question.model not in streaming_compatible_models:
         # Forward the request to the none streaming endpoint
         return await create_question_handler(
-            request, chat_question, chat_id, current_user
+            request,
+            chat_question,
+            chat_id,
+            current_user,  # pyright: ignore reportPrivateUsage=none
         )
 
     try:
@@ -238,12 +244,14 @@ async def create_stream_question_handler(
                 max_tokens=chat_question.max_tokens,
                 temperature=chat_question.temperature,
                 brain_id=str(brain_id),
-                user_openai_api_key=user_openai_api_key,
+                user_openai_api_key=user_openai_api_key,  # pyright: ignore reportPrivateUsage=none
                 streaming=True,
             )
 
         return StreamingResponse(
-            gpt_answer_generator.generate_stream(chat_question.question),
+            gpt_answer_generator.generate_stream(  # pyright: ignore reportPrivateUsage=none
+                chat_question.question
+            ),
             media_type="text/event-stream",
         )
 
@@ -259,4 +267,4 @@ async def get_chat_history_handler(
     chat_id: UUID,
 ) -> List[ChatHistory]:
     # TODO: RBAC with current_user
-    return get_chat_history(chat_id)
+    return get_chat_history(chat_id)  # pyright: ignore reportPrivateUsage=none

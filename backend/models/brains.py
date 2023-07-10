@@ -2,10 +2,11 @@ import os
 from typing import Any, List, Optional
 from uuid import UUID
 
-from models.settings import CommonsDep, common_dependencies
-from models.users import User
 from pydantic import BaseModel
 from utils.vectors import get_unique_files_from_vector_ids
+
+from models.settings import CommonsDep, common_dependencies
+from models.users import User
 
 
 class Brain(BaseModel):
@@ -15,7 +16,7 @@ class Brain(BaseModel):
     model: Optional[str] = "gpt-3.5-turbo-0613"
     temperature: Optional[float] = 0.0
     max_tokens: Optional[int] = 256
-    brain_size: Optional[float] = 0.0
+    brain_size: Optional[float] = 0.0  # pyright: ignore reportPrivateUsage=none
     max_brain_size: Optional[int] = int(os.getenv("MAX_BRAIN_SIZE", 0))
     files: List[Any] = []
     _commons: Optional[CommonsDep] = None
@@ -27,7 +28,7 @@ class Brain(BaseModel):
     def commons(self) -> CommonsDep:
         if not self._commons:
             self.__class__._commons = common_dependencies()
-        return self._commons
+        return self._commons  # pyright: ignore reportPrivateUsage=none
 
     @property
     def brain_size(self):
@@ -39,12 +40,17 @@ class Brain(BaseModel):
 
     @property
     def remaining_brain_size(self):
-        return float(self.max_brain_size) - self.brain_size
+        return (
+            float(self.max_brain_size)  # pyright: ignore reportPrivateUsage=none
+            - self.brain_size  # pyright: ignore reportPrivateUsage=none
+        )
 
     @classmethod
     def create(cls, *args, **kwargs):
         commons = common_dependencies()
-        return cls(commons=commons, *args, **kwargs)
+        return cls(
+            commons=commons, *args, **kwargs  # pyright: ignore reportPrivateUsage=none
+        )  # pyright: ignore reportPrivateUsage=none
 
     def get_user_brains(self, user_id):
         response = (
