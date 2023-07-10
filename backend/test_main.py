@@ -10,6 +10,9 @@ client = TestClient(app)
 
 API_KEY = os.getenv("CI_TEST_API_KEY")
 
+if not API_KEY:
+    raise ValueError("CI_TEST_API_KEY environment variable not set. Cannot run tests.")
+
 
 def test_read_main():
     response = client.get("/")
@@ -54,7 +57,8 @@ def test_create_and_delete_api_key():
 def test_retrieve_default_brain():
     # Making a GET request to the /brains/default/ endpoint
     response = client.get(
-        "/brains/default/", headers={"Authorization": "Bearer " + API_KEY}
+        "/brains/default/",
+        headers={"Authorization": "Bearer " + API_KEY},
     )
 
     # Assert that the response status code is 200 (HTTP OK)
@@ -88,7 +92,9 @@ def test_create_brain():
 
     # Making a POST request to the /brains/ endpoint
     response = client.post(
-        "/brains/", json=payload, headers={"Authorization": "Bearer " + API_KEY}
+        "/brains/",
+        json=payload,
+        headers={"Authorization": "Bearer " + API_KEY},
     )
 
     # Assert that the response status code is 200 (HTTP OK)
@@ -106,7 +112,10 @@ def test_create_brain():
 
 def test_retrieve_all_brains():
     # Making a GET request to the /brains/ endpoint to retrieve all brains for the current user
-    response = client.get("/brains/", headers={"Authorization": "Bearer " + API_KEY})
+    response = client.get(
+        "/brains/",
+        headers={"Authorization": "Bearer " + API_KEY},
+    )
 
     # Assert that the response status code is 200 (HTTP OK)
     assert response.status_code == 200
@@ -120,7 +129,10 @@ def test_retrieve_all_brains():
 
 def test_delete_all_brains():
     # First, retrieve all brains for the current user
-    response = client.get("/brains/", headers={"Authorization": "Bearer " + API_KEY})
+    response = client.get(
+        "/brains/",
+        headers={"Authorization": "Bearer " + API_KEY},
+    )
 
     # Assert that the response status code is 200 (HTTP OK)
     assert response.status_code == 200
@@ -133,7 +145,8 @@ def test_delete_all_brains():
 
         # Send a DELETE request to delete the specific brain
         delete_response = client.delete(
-            f"/brains/{brain_id}/", headers={"Authorization": "Bearer " + API_KEY}
+            f"/brains/{brain_id}/",
+            headers={"Authorization": "Bearer " + API_KEY},
         )
 
         # Assert that the DELETE response status code is 200 (HTTP OK)
@@ -142,7 +155,10 @@ def test_delete_all_brains():
 
 def test_get_all_chats():
     # Making a GET request to the /chat endpoint to retrieve all chats
-    response = client.get("/chat", headers={"Authorization": "Bearer " + API_KEY})
+    response = client.get(
+        "/chat",
+        headers={"Authorization": "Bearer " + API_KEY},
+    )
 
     # Assert that the response status code is 200 (HTTP OK)
     assert response.status_code == 200

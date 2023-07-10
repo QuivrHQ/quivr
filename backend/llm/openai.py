@@ -13,11 +13,12 @@ from repository.chat.format_chat_history import format_chat_history
 from repository.chat.get_chat_history import get_chat_history
 from repository.chat.update_chat_history import update_chat_history
 from repository.chat.update_message_by_id import update_message_by_id
-from supabase import Client, create_client
+from supabase.client import Client, create_client
 from vectorstore.supabase import (
     CustomSupabaseVectorStore,
-)  # Custom class for handling vector storage with Supabase
+)
 
+# Custom class for handling vector storage with Supabase
 from .base import BaseBrainPicking
 from .prompts.CONDENSE_PROMPT import CONDENSE_QUESTION_PROMPT
 
@@ -42,7 +43,7 @@ class OpenAIBrainPicking(BaseBrainPicking):
         max_tokens: int,
         user_openai_api_key: str,
         streaming: bool = False,
-    ) -> "OpenAIBrainPicking":
+    ) -> "OpenAIBrainPicking":  # pyright: ignore reportPrivateUsage=none
         """
         Initialize the BrainPicking class by setting embeddings, supabase client, vector store, language model and chains.
         :return: OpenAIBrainPicking instance
@@ -59,7 +60,9 @@ class OpenAIBrainPicking(BaseBrainPicking):
 
     @property
     def embeddings(self) -> OpenAIEmbeddings:
-        return OpenAIEmbeddings(openai_api_key=self.openai_api_key)
+        return OpenAIEmbeddings(
+            openai_api_key=self.openai_api_key
+        )  # pyright: ignore reportPrivateUsage=none
 
     @property
     def supabase_client(self) -> Client:
@@ -92,14 +95,16 @@ class OpenAIBrainPicking(BaseBrainPicking):
 
     @property
     def doc_chain(self) -> LLMChain:
-        return load_qa_chain(llm=self.doc_llm, chain_type="stuff")
+        return load_qa_chain(
+            llm=self.doc_llm, chain_type="stuff"
+        )  # pyright: ignore reportPrivateUsage=none
 
     @property
     def qa(self) -> ConversationalRetrievalChain:
         return ConversationalRetrievalChain(
             retriever=self.vector_store.as_retriever(),
             question_generator=self.question_generator,
-            combine_docs_chain=self.doc_chain,
+            combine_docs_chain=self.doc_chain,  # pyright: ignore reportPrivateUsage=none
             verbose=True,
         )
 
@@ -116,7 +121,7 @@ class OpenAIBrainPicking(BaseBrainPicking):
             model=model,
             streaming=streaming,
             callbacks=callbacks,
-        )
+        )  # pyright: ignore reportPrivateUsage=none
 
     def _call_chain(self, chain, question, history):
         """
@@ -205,8 +210,10 @@ class OpenAIBrainPicking(BaseBrainPicking):
 
         task = asyncio.create_task(
             wrap_done(
-                self.qa._acall_chain(self.qa, question, transformed_history),
-                callback.done,
+                self.qa._acall_chain(  # pyright: ignore reportPrivateUsage=none
+                    self.qa, question, transformed_history
+                ),
+                callback.done,  # pyright: ignore reportPrivateUsage=none
             )
         )
 
@@ -217,7 +224,7 @@ class OpenAIBrainPicking(BaseBrainPicking):
         )
 
         # Use the aiter method of the callback to stream the response with server-sent-events
-        async for token in callback.aiter():
+        async for token in callback.aiter():  # pyright: ignore reportPrivateUsage=none
             logger.info("Token: %s", token)
 
             # Add the token to the response_tokens list

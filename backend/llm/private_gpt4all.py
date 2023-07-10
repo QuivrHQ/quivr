@@ -21,7 +21,7 @@ class PrivateGPT4AllBrainPicking(BaseBrainPicking):
         chat_id: str,
         brain_id: str,
         streaming: bool,
-    ) -> "PrivateGPT4AllBrainPicking":
+    ) -> "PrivateGPT4AllBrainPicking":  # pyright: ignore reportPrivateUsage=none
         """
         Initialize the PrivateBrainPicking class by calling the parent class's initializer.
         :param brain_id: The brain_id in the DB.
@@ -57,4 +57,4 @@ class PrivateGPT4AllBrainPicking(BaseBrainPicking):
             n_batch=model_n_batch,
             backend="gptj",
             verbose=True,
-        )
+        )  # pyright: ignore reportPrivateUsage=none

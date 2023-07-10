@@ -13,7 +13,7 @@ logger = get_logger(__name__)
 
 class Neurons(BaseModel):
     commons: CommonsDep
-    settings = BrainSettings()
+    settings = BrainSettings()  # pyright: ignore reportPrivateUsage=none
 
     def create_vector(self, doc, user_openai_api_key=None):
         logger.info("Creating vector for document")
@@ -21,7 +21,7 @@ class Neurons(BaseModel):
         if user_openai_api_key:
             self.commons["documents_vector_store"]._embedding = OpenAIEmbeddings(
                 openai_api_key=user_openai_api_key
-            )
+            )  # pyright: ignore reportPrivateUsage=none
         try:
             sids = self.commons["documents_vector_store"].add_documents([doc])
             if sids and len(sids) > 0:
@@ -64,7 +64,7 @@ def create_summary(commons: CommonsDep, document_id, content, metadata):
 
 
 def error_callback(exception):
-    print('An exception occurred:', exception)
+    print("An exception occurred:", exception)
 
 
 def process_batch(batch_ids):
@@ -106,14 +106,14 @@ def get_unique_files_from_vector_ids(vectors_ids: List[int]):
     with ThreadPoolExecutor() as executor:
         futures = []
         for i in range(0, len(vectors_ids), BATCH_SIZE):
-            batch_ids = vectors_ids[i:i + BATCH_SIZE]
+            batch_ids = vectors_ids[i : i + BATCH_SIZE]
             future = executor.submit(process_batch, batch_ids)
             futures.append(future)
 
         # Retrieve the results
         vectors_responses = [future.result() for future in futures]
-   
+
     documents = [item for sublist in vectors_responses for item in sublist]
-    print('document', documents)
+    print("document", documents)
     unique_files = [dict(t) for t in set(tuple(d.items()) for d in documents)]
     return unique_files

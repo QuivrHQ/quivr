@@ -1,11 +1,12 @@
 import os
 from typing import Optional
 
-from auth.api_key_handler import get_user_from_api_key, verify_api_key
-from auth.jwt_token_handler import decode_access_token, verify_token
 from fastapi import Depends, HTTPException, Request
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from models.users import User
+
+from auth.api_key_handler import get_user_from_api_key, verify_api_key
+from auth.jwt_token_handler import decode_access_token, verify_token
 
 
 class AuthBearer(HTTPBearer):
@@ -20,7 +21,7 @@ class AuthBearer(HTTPBearer):
             request
         )
         self.check_scheme(credentials)
-        token = credentials.credentials
+        token = credentials.credentials  # pyright: ignore reportPrivateUsage=none
         return await self.authenticate(
             token,
         )
@@ -52,7 +53,7 @@ class AuthBearer(HTTPBearer):
 
     def get_test_user(self) -> User:
         return User(
-            email="test@example.com", id="XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX"
+            email="test@example.com", id="XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX"  # type: ignore
         )  # replace with test user information
 
 

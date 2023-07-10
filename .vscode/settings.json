@@ -12,7 +12,8 @@
     "editor.defaultFormatter": "ms-python.black-formatter",
     "editor.formatOnSave": true,
     "editor.codeActionsOnSave": {
-      "source.organizeImports": true
+      "source.organizeImports": true,
+      "source.fixAll": true
     }
   },
   "[typescriptreact]": {
@@ -41,4 +42,7 @@
     "**/.docusaurus/": true,
     "**/node_modules/": true,
   },
+  "python.linting.pycodestyleCategorySeverity.W": "Error",
+  "python.defaultInterpreterPath": "python3",
+  "python.linting.flake8CategorySeverity.W": "Error",
 }
