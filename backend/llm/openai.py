@@ -14,9 +14,7 @@ from repository.chat.get_chat_history import get_chat_history
 from repository.chat.update_chat_history import update_chat_history
 from repository.chat.update_message_by_id import update_message_by_id
 from supabase.client import Client, create_client
-from vectorstore.supabase import (
-    CustomSupabaseVectorStore,
-)
+from vectorstore.supabase import CustomSupabaseVectorStore
 
 # Custom class for handling vector storage with Supabase
 from .base import BaseBrainPicking
@@ -112,16 +110,14 @@ class OpenAIBrainPicking(BaseBrainPicking):
         """
         Determine the language model to be used.
         :param model: Language model name to be used.
-        :param private_model_args: Dictionary containing model_path, n_ctx and n_batch.
-        :param private: Boolean value to determine if private model is to be used.
         :return: Language model instance
         """
         return ChatOpenAI(
-            temperature=0,
+            temperature=self.temperature,
             model=model,
             streaming=streaming,
             callbacks=callbacks,
-        )  # pyright: ignore reportPrivateUsage=none
+        )
 
     def _call_chain(self, chain, question, history):
         """
