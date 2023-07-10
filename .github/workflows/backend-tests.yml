@@ -1,4 +1,4 @@
-name: Pytest
+name: Backend Tests
 
 on:
   push:
@@ -31,6 +31,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install pytest
+          pip install pyright
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
       - name: Test with pytest
         env:
@@ -42,3 +43,7 @@ jobs:
           CI_TEST_API_KEY: ${{secrets.CI_TEST_API_KEY}} 
         run: |
           pytest
+        
+      - name: Static type checking with pyright
+        run: |
+          pyright
