@@ -3,10 +3,9 @@ from typing import Optional
 from uuid import UUID
 
 import resend
+from logger import get_logger
 from models.settings import CommonsDep, common_dependencies
 from pydantic import BaseModel
-
-from backend.logger import get_logger
 
 logger = get_logger(__name__)
 
@@ -25,7 +24,8 @@ class BrainSubscription(BaseModel):
     def commons(self) -> CommonsDep:
         if not self._commons:
             self.__class__._commons = common_dependencies()
-        return self._commons
+
+        return self._commons # pyright: ignore reportPrivateUsage=none
 
     @classmethod
     def create(cls, *args, **kwargs):
