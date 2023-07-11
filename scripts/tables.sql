@@ -158,13 +158,23 @@ CREATE TABLE IF NOT EXISTS brains_vectors (
   FOREIGN KEY (brain_id) REFERENCES brains (brain_id)
 );
 
+-- Create brains X vectors table
+CREATE TABLE IF NOT EXISTS brain_subscription_invitations (
+  brain_id UUID,
+  email VARCHAR(255),
+  rights VARCHAR(255),
+  PRIMARY KEY (brain_id, email),
+  FOREIGN KEY (brain_id) REFERENCES Brains (brain_id)
+);
+
+
 CREATE TABLE IF NOT EXISTS migrations (
   name VARCHAR(255)  PRIMARY KEY,
   executed_at TIMESTAMPTZ DEFAULT current_timestamp
 );
 
 INSERT INTO migrations (name) 
-SELECT '20230629143400_add_file_sha1_brains_vectors'
+SELECT '202307111517030_add_subscription_invitations_table'
 WHERE NOT EXISTS (
-    SELECT 1 FROM migrations WHERE name = '20230629143400_add_file_sha1_brains_vectors'
+    SELECT 1 FROM migrations WHERE name = '202307111517030_add_subscription_invitations_table'
 );
