@@ -15,22 +15,13 @@ class BrainSubscription(BaseModel):
     inviter_email: Optional[str]
     email: Optional[str]
     rights: Optional[str]
-    _commons: Optional[CommonsDep] = None
 
     class Config:
         arbitrary_types_allowed = True
 
     @property
     def commons(self) -> CommonsDep:
-        if not self._commons:
-            self.__class__._commons = common_dependencies()
-
-        return self._commons # pyright: ignore reportPrivateUsage=none
-
-    @classmethod
-    def create(cls, *args, **kwargs):
-        commons = common_dependencies()
-        return cls(commons=commons, *args, **kwargs)
+        return common_dependencies()
 
     def create_subscription_invitation(self):
         logger.info("Creating subscription invitation")

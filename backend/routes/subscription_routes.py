@@ -14,7 +14,7 @@ async def invite_user_to_brain(brain_id: UUID, users: List[dict], current_user: 
     # TODO: Ensure the current user has permissions to invite users to this brain
     
     for user in users:
-        subscription = BrainSubscription.create(brain_id=brain_id, email=user['email'], rights=user['rights'], inviter_email=current_user.email or "Quivr")
+        subscription = BrainSubscription(brain_id=brain_id, email=user['email'], rights=user['rights'], inviter_email=current_user.email or "Quivr")
         
         try:
             subscription.create_or_update_subscription_invitation()
