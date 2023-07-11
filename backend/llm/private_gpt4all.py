@@ -1,25 +1,26 @@
+from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.llms.base import LLM
 from langchain.llms.gpt4all import GPT4All
-from llm.openai import OpenAIBrainPicking
+from llm.qa_base import QABaseBrainPicking
 from logger import get_logger
-from models.settings import LLMSettings
 
 logger = get_logger(__name__)
 
 
-class PrivateGPT4AllBrainPicking(OpenAIBrainPicking):
+class PrivateGPT4AllBrainPicking(QABaseBrainPicking):
     """
     This subclass of BrainPicking is used to specifically work with the private language model GPT4All.
     """
 
-    # Initialize class settings
-    llm_settings = LLMSettings()
+    # Default class attributes
+    model_path: str = "./local_models/ggml-gpt4all-j-v1.3-groovy.bin"
 
     def __init__(
         self,
         chat_id: str,
         brain_id: str,
         streaming: bool,
+        model_path: str,
     ) -> "PrivateGPT4AllBrainPicking":  # pyright: ignore reportPrivateUsage=none
         """
         Initialize the PrivateBrainPicking class by calling the parent class's initializer.
@@ -29,21 +30,25 @@ class PrivateGPT4AllBrainPicking(OpenAIBrainPicking):
         :return: PrivateBrainPicking instance
         """
 
-        # set defaults to use the parent class's initializer
-        model = "gpt4all-j-1.3"
-        user_openai_api_key = ""
-        temperature = 0.0
-        max_tokens = 256
+        # Set the model name
+        model: str = "gpt4all-j-1.3"
 
         super().__init__(
             model=model,
             brain_id=brain_id,
             chat_id=chat_id,
-            max_tokens=max_tokens,
-            temperature=temperature,
-            user_openai_api_key=user_openai_api_key,
             streaming=streaming,
         )
+
+        # Set the model path of the private model
+        self.model_path = model_path
+
+    # TODO: Use private embeddings model. This involves some restructuring of how we store the embeddings.
+    @property
+    def embeddings(self) -> OpenAIEmbeddings:
+        return OpenAIEmbeddings(
+            openai_api_key=self.openai_api_key
+        )  # pyright: ignore reportPrivateUsage=none
 
     def _create_llm(
         self,
@@ -53,9 +58,12 @@ class PrivateGPT4AllBrainPicking(OpenAIBrainPicking):
     ) -> LLM:
         """
         Override the _create_llm method to enforce the use of a private model.
+        :param model: Language model name to be used.
+        :param streaming: Whether to enable streaming of the model
+        :param callbacks: Callbacks to be used for streaming
         :return: Language model instance
         """
-        model_path = self.llm_settings.model_path
+        model_path = self.model_path
 
         logger.info("Using private model: %s", model)
         logger.info("Streaming is set to %s", streaming)
