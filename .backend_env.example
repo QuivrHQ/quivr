@@ -14,3 +14,6 @@ PRIVATE=False
 MODEL_PATH=./local_models/ggml-gpt4all-j-v1.3-groovy.bin
 MODEL_N_CTX=1000
 MODEL_N_BATCH=8
+
+#RESEND
+RESEND_API_KEY=
