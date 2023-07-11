@@ -78,11 +78,11 @@ class OpenAIBrainPicking(BaseBrainPicking):
         )
 
     @property
-    def question_llm(self) -> LLM:
+    def question_llm(self):
         return self._create_llm(model=self.model, streaming=False)
 
     @property
-    def doc_llm(self) -> LLM:
+    def doc_llm(self):
         return self._create_llm(
             model=self.model, streaming=self.streaming, callbacks=self.callbacks
         )
