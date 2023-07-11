@@ -11,8 +11,13 @@ import { AddBrainModal } from "./AddBrainModal";
 
 export const BrainsDropDown = (): JSX.Element => {
   const [searchQuery, setSearchQuery] = useState("");
-  const { allBrains, setActiveBrain, currentBrain, deleteBrain } =
-    useBrainContext();
+  const {
+    allBrains,
+    isFetchingBrains,
+    setActiveBrain,
+    currentBrain,
+    deleteBrain,
+  } = useBrainContext();
 
   return (
     <>
@@ -41,6 +46,11 @@ export const BrainsDropDown = (): JSX.Element => {
             />
             <div className="overflow-auto scrollbar flex flex-col h-48 mt-5">
               {/* List of brains */}
+              {isFetchingBrains && (
+                <div className="flex items-center justify-center h-full">
+                  <p className="text-gray-500">Loading...</p>
+                </div>
+              )}
               {allBrains.map((brain) => {
                 if (brain.name.includes(searchQuery)) {
                   return (
