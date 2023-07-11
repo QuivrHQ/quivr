@@ -1,5 +1,5 @@
 from langchain.embeddings.openai import OpenAIEmbeddings
-from langchain.llms.base import LLM
+from langchain.llms.base import BaseLLM
 from langchain.llms.gpt4all import GPT4All
 from llm.qa_base import QABaseBrainPicking
 from logger import get_logger
@@ -12,29 +12,23 @@ class PrivateGPT4AllBrainPicking(QABaseBrainPicking):
     This subclass of BrainPicking is used to specifically work with the private language model GPT4All.
     """
 
-    # Default class attributes
-    model_path: str = "./local_models/ggml-gpt4all-j-v1.3-groovy.bin"
-
     def __init__(
         self,
         chat_id: str,
         brain_id: str,
         streaming: bool,
-        model_path: str,
-    ) -> "PrivateGPT4AllBrainPicking":  # pyright: ignore reportPrivateUsage=none
+        model_path: str = "./local_models/ggml-gpt4all-j-v1.3-groovy.bin",
+    ) -> None:
         """
         Initialize the PrivateBrainPicking class by calling the parent class's initializer.
         :param brain_id: The brain_id in the DB.
         :param chat_id: The id of the chat in the DB.
         :param streaming: Whether to enable streaming of the model
-        :return: PrivateBrainPicking instance
+        :param model_path: The path to the model. If not provided, a default path is used.
         """
 
-        # Set the model name
-        model: str = "gpt4all-j-1.3"
-
         super().__init__(
-            model=model,
+            model="gpt4all-j-1.3",
             brain_id=brain_id,
             chat_id=chat_id,
             streaming=streaming,
@@ -55,7 +49,7 @@ class PrivateGPT4AllBrainPicking(QABaseBrainPicking):
         model,
         streaming=False,
         callbacks=None,
-    ) -> LLM:
+    ) -> BaseLLM:
         """
         Override the _create_llm method to enforce the use of a private model.
         :param model: Language model name to be used.

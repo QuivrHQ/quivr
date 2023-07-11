@@ -1,10 +1,12 @@
 import asyncio
 import json
-from abc import abstractmethod
+from abc import abstractmethod, abstractproperty
 from typing import AsyncIterable, Awaitable
 
 from langchain.chains import ConversationalRetrievalChain, LLMChain
 from langchain.chains.question_answering import load_qa_chain
+from langchain.embeddings.openai import OpenAIEmbeddings
+from langchain.llms.base import BaseLLM
 from logger import get_logger
 from models.chat import ChatHistory
 from repository.chat.format_chat_history import format_chat_history
@@ -46,11 +48,9 @@ class QABaseBrainPicking(BaseBrainPicking):
             **kwargs,
         )
 
-    @property
-    def embeddings(self):
-        return NotImplementedError(
-            "Specific embeddings are not implemented for this BrainPicking Class. Please use a subclass."
-        )
+    @abstractproperty
+    def embeddings(self) -> OpenAIEmbeddings:
+        raise NotImplementedError("This property should be overridden in a subclass.")
 
     @property
     def supabase_client(self) -> Client:
@@ -97,7 +97,7 @@ class QABaseBrainPicking(BaseBrainPicking):
         )
 
     @abstractmethod
-    def _create_llm(self, model, streaming=False, callbacks=None):
+    def _create_llm(self, model, streaming=False, callbacks=None) -> BaseLLM:
         """
         Determine the language model to be used.
         :param model: Language model name to be used.
