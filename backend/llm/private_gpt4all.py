@@ -62,6 +62,4 @@ class PrivateGPT4AllBrainPicking(OpenAIBrainPicking):
 
         return GPT4All(
             model=model_path,
-            backend="gptj",
-            verbose=True,
         )  # pyright: ignore reportPrivateUsage=none

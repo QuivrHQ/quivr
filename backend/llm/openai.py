@@ -117,7 +117,7 @@ class OpenAIBrainPicking(BaseBrainPicking):
             model=model,
             streaming=streaming,
             callbacks=callbacks,
-        ) # pyright: ignore reportPrivateUsage=none
+        )  # pyright: ignore reportPrivateUsage=none
 
     def _call_chain(self, chain, question, history):
         """
