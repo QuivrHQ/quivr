@@ -1,17 +1,17 @@
 import { useState } from "react";
 import { FaBrain } from "react-icons/fa";
-import { MdCheck, MdDelete } from "react-icons/md";
+import { MdCheck } from "react-icons/md";
 
-import Button from "@/lib/components/ui/Button";
 import Field from "@/lib/components/ui/Field";
 import Popover from "@/lib/components/ui/Popover";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 
-import { AddBrainModal } from "./AddBrainModal";
+import { AddBrainModal } from "./components/AddBrainModal";
+import { BrainActions } from "./components/BrainActions/BrainActions";
 
 export const BrainsDropDown = (): JSX.Element => {
   const [searchQuery, setSearchQuery] = useState("");
-  const { allBrains, setActiveBrain, currentBrain, deleteBrain } =
+  const { allBrains, isFetchingBrains, setActiveBrain, currentBrain } =
     useBrainContext();
 
   return (
@@ -41,6 +41,11 @@ export const BrainsDropDown = (): JSX.Element => {
             />
             <div className="overflow-auto scrollbar flex flex-col h-48 mt-5">
               {/* List of brains */}
+              {isFetchingBrains && (
+                <div className="flex items-center justify-center h-full">
+                  <p className="text-gray-500">Loading...</p>
+                </div>
+              )}
               {allBrains.map((brain) => {
                 if (brain.name.includes(searchQuery)) {
                   return (
@@ -68,13 +73,7 @@ export const BrainsDropDown = (): JSX.Element => {
                         </span>
                         <span className="flex-1">{brain.name}</span>
                       </button>
-                      <Button
-                        className="group-hover:visible invisible absolute right-0 hover:text-red-500 transition-[colors,opacity]"
-                        onClick={() => void deleteBrain(brain.id)}
-                        variant={"tertiary"}
-                      >
-                        <MdDelete className="text-xl" />
-                      </Button>
+                      <BrainActions brainId={brain.id} />
                     </div>
                   );
                 }

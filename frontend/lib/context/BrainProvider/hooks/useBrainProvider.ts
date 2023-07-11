@@ -103,6 +103,5 @@ export const useBrainProvider = () => {
     setDefaultBrain,
     fetchAndSetActiveBrain,
     isFetchingBrains,
-    setIsFetchingBrains,
   };
 };
