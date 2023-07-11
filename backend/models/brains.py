@@ -62,6 +62,19 @@ class Brain(BaseModel):
         )
         return [item["brains"] for item in response.data]
 
+    def get_brain_for_user(self, user_id):
+        response = (
+            self.commons["supabase"]
+            .from_("brains_users")
+            .select("id:brain_id, rights, brains (id: brain_id, name)")
+            .filter("user_id", "eq", user_id)
+            .filter("brain_id", "eq", self.id)
+            .execute()
+        )
+        if len(response.data) == 0:
+            return None
+        return response.data[0]
+
     def get_brain_details(self):
         response = (
             self.commons["supabase"]
