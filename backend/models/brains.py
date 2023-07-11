@@ -20,16 +20,13 @@ class Brain(BaseModel):
     max_tokens: Optional[int] = 256
     max_brain_size: Optional[int] = int(os.getenv("MAX_BRAIN_SIZE", 0))
     files: List[Any] = []
-    _commons: Optional[CommonsDep] = None
 
     class Config:
         arbitrary_types_allowed = True
 
     @property
     def commons(self) -> CommonsDep:
-        if not self._commons:
-            self.__class__._commons = common_dependencies()
-        return self._commons  # pyright: ignore reportPrivateUsage=none
+        return common_dependencies()
 
     @property
     def brain_size(self):
