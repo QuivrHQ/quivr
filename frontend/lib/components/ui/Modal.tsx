@@ -12,6 +12,7 @@ interface ModalProps {
   children?: ReactNode;
   Trigger: ReactNode;
   CloseTrigger?: ReactNode;
+  opened?: boolean;
 }
 
 const Modal = ({
@@ -20,8 +21,9 @@ const Modal = ({
   children,
   Trigger,
   CloseTrigger,
+  opened = false,
 }: ModalProps): JSX.Element => {
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(opened);
 
   return (
     <Dialog.Root onOpenChange={setOpen}>

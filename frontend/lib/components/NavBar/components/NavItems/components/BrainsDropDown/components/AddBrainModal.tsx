@@ -6,7 +6,7 @@ import Field from "@/lib/components/ui/Field";
 import Modal from "@/lib/components/ui/Modal";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 
-const AddBrainModal = (): JSX.Element => {
+export const AddBrainModal = (): JSX.Element => {
   const [newBrainName, setNewBrainName] = useState("");
   const [isPending, setIsPending] = useState(false);
 
@@ -56,5 +56,3 @@ const AddBrainModal = (): JSX.Element => {
     </Modal>
   );
 };
-
-export { AddBrainModal };
