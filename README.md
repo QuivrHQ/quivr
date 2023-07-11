@@ -168,6 +168,9 @@ This project could not be possible without the support of our sponsors. Thank yo
 <a href="https://www.bam.tech/">
   <img src="https://avatars.githubusercontent.com/u/9597329?s=200&v=4" alt="BAM" style="padding: 10px" width="70px">
 </a>
+<a href="https://www.sicara.fr/">
+  <img src="https://avatars.githubusercontent.com/u/23194788?s=200&v=4" alt="Sicara" style="padding: 10px" width="70px">
+</a>
 
 
 
