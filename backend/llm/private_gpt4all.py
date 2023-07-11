@@ -31,7 +31,7 @@ class PrivateGPT4AllBrainPicking(OpenAIBrainPicking):
 
         # set defaults to use the parent class's initializer
         model = "gpt4all-j-1.3"
-        user_openai_api_key = None
+        user_openai_api_key = ""
         temperature = 0.0
         max_tokens = 256
 

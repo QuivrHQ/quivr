@@ -106,7 +106,7 @@ class OpenAIBrainPicking(BaseBrainPicking):
             verbose=True,
         )
 
-    def _create_llm(self, model, streaming=False, callbacks=None) -> LLM:
+    def _create_llm(self, model, streaming=False, callbacks=None):
         """
         Determine the language model to be used.
         :param model: Language model name to be used.
