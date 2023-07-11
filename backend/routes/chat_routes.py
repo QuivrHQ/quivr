@@ -172,6 +172,7 @@ async def create_question_handler(
             gpt_answer_generator = PrivateGPT4AllBrainPicking(
                 chat_id=str(chat_id),
                 brain_id=str(brain_id),
+                user_openai_api_key=current_user.user_openai_api_key,
                 streaming=False,
                 model_path=llm_settings.model_path,
             )
@@ -237,6 +238,7 @@ async def create_stream_question_handler(
             gpt_answer_generator = PrivateGPT4AllBrainPicking(
                 chat_id=str(chat_id),
                 brain_id=str(brain_id),
+                user_openai_api_key=user_openai_api_key,
                 streaming=streaming,
                 model_path=llm_settings.model_path,
             )
