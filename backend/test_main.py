@@ -45,8 +45,9 @@ def test_create_and_delete_api_key():
     assert verify_response.status_code == 200
 
     # Now, let's delete the API key
-    # Assuming the key_id is part of the api_key_info response. If not, adjust this.
+    assert "key_id" in api_key_info
     key_id = api_key_info["key_id"]
+
     delete_response = client.delete(
         f"/api-key/{key_id}", headers={"Authorization": f"Bearer {API_KEY}"}
     )
@@ -71,8 +72,6 @@ def test_retrieve_default_brain():
 
 
 def test_create_brain():
-    # Generate a random UUID for brain_id
-    random_brain_id = str(uuid.uuid4())
 
     # Generate a random name for the brain
     random_brain_name = "".join(
@@ -81,7 +80,6 @@ def test_create_brain():
 
     # Set up the request payload
     payload = {
-        "brain_id": random_brain_id,
         "name": random_brain_name,
         "status": "public",
         "model": "gpt-3.5-turbo-0613",
@@ -151,6 +149,59 @@ def test_delete_all_brains():
 
         # Assert that the DELETE response status code is 200 (HTTP OK)
         assert delete_response.status_code == 200
+
+
+def test_delete_all_brains_and_get_default_brain():
+    # First create a new brain
+    test_create_brain()
+
+    # Now, retrieve all brains for the current user
+    response = client.get(
+        "/brains/",
+        headers={"Authorization": "Bearer " + API_KEY},
+    )
+
+    # Assert that the response status code is 200 (HTTP OK)
+    assert response.status_code == 200
+    assert len(response.json()["brains"]) > 0
+
+    test_delete_all_brains()
+
+    # Now, retrieve all brains for the current user
+    response = client.get(
+        "/brains/",
+        headers={"Authorization": "Bearer " + API_KEY},
+    )
+
+    # Assert that the response status code is 200 (HTTP OK)
+    assert response.status_code == 200
+    assert len(response.json()["brains"]) == 0
+
+    # Get the default brain, it should create one if it doesn't exist
+    response = client.get(
+        "/brains/default/",
+        headers={"Authorization": "Bearer " + API_KEY},
+    )
+
+    # Assert that the response status code is 200 (HTTP OK)
+    assert response.status_code == 200
+    assert response.json()["name"] == "Default brain"
+
+    # Now, retrieve all brains for the current user
+    response = client.get(
+        "/brains/",
+        headers={"Authorization": "Bearer " + API_KEY},
+    )
+
+    # Assert that there is only one brain
+    response_data = response.json()
+    assert len(response_data) == 1
+    for brain in response_data["brains"]:
+        assert "id" in brain
+        assert "name" in brain
+
+    # Assert that the brain is the default brain
+    assert response_data["brains"][0]["name"] == "Default brain"
 
 
 def test_get_all_chats():

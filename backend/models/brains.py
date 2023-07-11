@@ -2,11 +2,13 @@ import os
 from typing import Any, List, Optional
 from uuid import UUID
 
+from logger import get_logger
+from models.settings import CommonsDep, common_dependencies
+from models.users import User
 from pydantic import BaseModel
 from utils.vectors import get_unique_files_from_vector_ids
 
-from models.settings import CommonsDep, common_dependencies
-from models.users import User
+logger = get_logger(__name__)
 
 
 class Brain(BaseModel):
@@ -16,7 +18,6 @@ class Brain(BaseModel):
     model: Optional[str] = "gpt-3.5-turbo-0613"
     temperature: Optional[float] = 0.0
     max_tokens: Optional[int] = 256
-    brain_size: Optional[float] = 0.0  # pyright: ignore reportPrivateUsage=none
     max_brain_size: Optional[int] = int(os.getenv("MAX_BRAIN_SIZE", 0))
     files: List[Any] = []
     _commons: Optional[CommonsDep] = None
@@ -35,7 +36,6 @@ class Brain(BaseModel):
         self.get_unique_brain_files()
         current_brain_size = sum(float(doc["size"]) for doc in self.files)
 
-        print("current_brain_size", current_brain_size)
         return current_brain_size
 
     @property
@@ -86,8 +86,6 @@ class Brain(BaseModel):
         return response.data
 
     def delete_brain(self, user_id):
-        print("user_id", user_id)
-        print("self.id", self.id)
         results = (
             self.commons["supabase"]
             .table("brains_users")
@@ -96,7 +94,6 @@ class Brain(BaseModel):
             .execute()
         )
         if len(results.data) == 0:
-            print("You are not the owner of this brain.")
             return {"message": "You are not the owner of this brain."}
         else:
             results = (
@@ -106,7 +103,6 @@ class Brain(BaseModel):
                 .match({"brain_id": self.id})
                 .execute()
             )
-            print("results", results)
 
             results = (
                 self.commons["supabase"]
@@ -115,7 +111,6 @@ class Brain(BaseModel):
                 .match({"brain_id": self.id})
                 .execute()
             )
-            print("results", results)
 
             results = (
                 self.commons["supabase"]
@@ -124,14 +119,12 @@ class Brain(BaseModel):
                 .match({"brain_id": self.id})
                 .execute()
             )
-            print("results", results)
 
     def create_brain(self):
         commons = common_dependencies()
         response = (
             commons["supabase"].table("brains").insert({"name": self.name}).execute()
         )
-        # set the brainId with response.data
 
         self.id = response.data[0]["brain_id"]
         return response.data
@@ -206,13 +199,10 @@ class Brain(BaseModel):
 
         vector_ids = [item["vector_id"] for item in response.data]
 
-        print("vector_ids", vector_ids)
-
         if len(vector_ids) == 0:
             return []
 
         self.files = get_unique_files_from_vector_ids(vector_ids)
-        print("unique_files", self.files)
 
         return self.files
 
@@ -258,19 +248,17 @@ def get_default_user_brain(user: User):
     commons = common_dependencies()
     response = (
         commons["supabase"]
-        .from_("brains_users")  # I'm assuming this is the correct table
+        .from_("brains_users")
         .select("brain_id")
         .filter("user_id", "eq", user.id)
-        .filter(
-            "default_brain", "eq", True
-        )  # Assuming 'default' is the correct column name
+        .filter("default_brain", "eq", True)
         .execute()
     )
 
-    print("Default brain response:", response.data)
+    logger.info("Default brain response:", response.data)
     default_brain_id = response.data[0]["brain_id"] if response.data else None
 
-    print(f"Default brain id: {default_brain_id}")
+    logger.info(f"Default brain id: {default_brain_id}")
 
     if default_brain_id:
         brain_response = (
