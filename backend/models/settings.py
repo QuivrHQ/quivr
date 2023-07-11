@@ -16,9 +16,7 @@ class BrainSettings(BaseSettings):
 
 class LLMSettings(BaseSettings):
     private: bool = False
-    model_path: str = "gpt2"
-    model_n_ctx: int = 1000
-    model_n_batch: int = 8
+    model_path: str = "./local_models/ggml-gpt4all-j-v1.3-groovy.bin"
 
 
 def common_dependencies() -> dict:
