@@ -2,15 +2,14 @@ from typing import Any, Dict, List, Optional
 
 from langchain.chat_models import ChatOpenAI
 from langchain.embeddings.openai import OpenAIEmbeddings
+from llm.models.FunctionCall import FunctionCall
+from llm.models.OpenAiAnswer import OpenAiAnswer
 from logger import get_logger
 from models.chat import ChatHistory
 from repository.chat.get_chat_history import get_chat_history
 from repository.chat.update_chat_history import update_chat_history
 from supabase.client import Client, create_client
 from vectorstore.supabase import CustomSupabaseVectorStore
-
-from llm.models.FunctionCall import FunctionCall
-from llm.models.OpenAiAnswer import OpenAiAnswer
 
 from .base import BaseBrainPicking
 
@@ -148,8 +147,8 @@ class OpenAIFunctionsBrainPicking(BaseBrainPicking):
             {
                 "role": "system",
                 "content": """Your name is Quivr. You are an assistant that has access to a person's documents and that can answer questions about them.
-                A person will ask you a question and you will provide a helpful answer. 
-                Write the answer in the same language as the question. 
+                A person will ask you a question and you will provide a helpful answer.
+                Write the answer in the same language as the question.
                 You have access to functions to help you answer the question.
                 If you don't know the answer, just say that you don't know but be helpful and explain why you can't answer""",
             }

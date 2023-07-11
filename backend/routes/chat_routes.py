@@ -172,7 +172,9 @@ async def create_question_handler(
             gpt_answer_generator = PrivateGPT4AllBrainPicking(
                 chat_id=str(chat_id),
                 brain_id=str(brain_id),
+                user_openai_api_key=current_user.user_openai_api_key,
                 streaming=False,
+                model_path=llm_settings.model_path,
             )
 
         elif chat_question.model in openai_function_compatible_models:
@@ -228,6 +230,7 @@ async def create_stream_question_handler(
 
     try:
         user_openai_api_key = request.headers.get("Openai-Api-Key")
+        streaming = True
         check_user_limit(current_user)
         llm_settings = LLMSettings()
 
@@ -235,7 +238,9 @@ async def create_stream_question_handler(
             gpt_answer_generator = PrivateGPT4AllBrainPicking(
                 chat_id=str(chat_id),
                 brain_id=str(brain_id),
-                streaming=False,
+                user_openai_api_key=user_openai_api_key,
+                streaming=streaming,
+                model_path=llm_settings.model_path,
             )
         else:
             gpt_answer_generator = OpenAIBrainPicking(
@@ -245,7 +250,7 @@ async def create_stream_question_handler(
                 temperature=chat_question.temperature,
                 brain_id=str(brain_id),
                 user_openai_api_key=user_openai_api_key,  # pyright: ignore reportPrivateUsage=none
-                streaming=True,
+                streaming=streaming,
             )
 
         return StreamingResponse(
