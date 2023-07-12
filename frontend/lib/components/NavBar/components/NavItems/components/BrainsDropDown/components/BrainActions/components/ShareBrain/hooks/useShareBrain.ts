@@ -1,5 +1,7 @@
+/* eslint-disable max-lines */
 import { useState } from "react";
 
+import { useBrainApi } from "@/lib/api/brain/useBrainApi";
 import { useToast } from "@/lib/hooks";
 
 import { BrainRoleAssignation } from "../../../types";
@@ -9,9 +11,11 @@ import { generateBrainAssignation } from "../utils/generateBrainAssignation";
 export const useShareBrain = (brainId: string) => {
   const baseUrl = window.location.origin;
   const { publish } = useToast();
+  const { addBrainSubscriptions } = useBrainApi();
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
 
   const brainShareLink = `${baseUrl}/brain_subscription_invitation=${brainId}`;
-
+  const [sendingInvitation, setSendingInvitation] = useState(false);
   const [roleAssignations, setRoleAssignation] = useState<
     BrainRoleAssignation[]
   >([generateBrainAssignation()]);
@@ -52,19 +56,32 @@ export const useShareBrain = (brainId: string) => {
       }
     };
 
-  const inviteUsers = (): void => {
-    const inviteUsersPayload = roleAssignations
-      .filter(({ email }) => email !== "")
-      .map((assignation) => ({
-        email: assignation.email,
-        role: assignation.role,
-      }));
+  const inviteUsers = async (): Promise<void> => {
+    setSendingInvitation(true);
+    try {
+      const inviteUsersPayload = roleAssignations
+        .filter(({ email }) => email !== "")
+        .map((assignation) => ({
+          email: assignation.email,
+          rights: assignation.role,
+        }));
 
-    alert(
-      `You will soon be able to invite ${JSON.stringify(
-        inviteUsersPayload
-      )}. Wait a bit`
-    );
+      await addBrainSubscriptions(brainId, inviteUsersPayload);
+
+      publish({
+        variant: "success",
+        text: "Users successfully invited",
+      });
+
+      setIsShareModalOpen(false);
+    } catch (error) {
+      publish({
+        variant: "danger",
+        text: "An error occurred while sending invitations",
+      });
+    } finally {
+      setSendingInvitation(false);
+    }
   };
 
   const addNewRoleAssignationRole = () => {
@@ -79,5 +96,8 @@ export const useShareBrain = (brainId: string) => {
     removeRoleAssignation,
     inviteUsers,
     addNewRoleAssignationRole,
+    sendingInvitation,
+    setIsShareModalOpen,
+    isShareModalOpen,
   };
 };

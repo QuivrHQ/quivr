@@ -11,7 +11,7 @@ import {
 import Button from "@/lib/components/ui/Button";
 import { AnimatedCard } from "@/lib/components/ui/Card";
 import Ellipsis from "@/lib/components/ui/Ellipsis";
-import Modal from "@/lib/components/ui/Modal";
+import { Modal } from "@/lib/components/ui/Modal";
 import { useSupabase } from "@/lib/context/SupabaseProvider";
 import { useAxios, useToast } from "@/lib/hooks";
 import { Document } from "@/lib/types/Document";

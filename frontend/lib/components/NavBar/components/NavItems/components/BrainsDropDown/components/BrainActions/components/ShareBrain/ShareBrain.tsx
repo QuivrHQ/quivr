@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 "use client";
 
 import { UUID } from "crypto";
@@ -5,7 +6,7 @@ import { ImUserPlus } from "react-icons/im";
 import { MdContentPaste, MdShare } from "react-icons/md";
 
 import Button from "@/lib/components/ui/Button";
-import Modal from "@/lib/components/ui/Modal";
+import { Modal } from "@/lib/components/ui/Modal";
 
 import { InvitedUserRow } from "./components/InvitedUserRow";
 import { useShareBrain } from "./hooks/useShareBrain";
@@ -23,6 +24,9 @@ export const ShareBrain = ({ brainId }: ShareBrainModalProps): JSX.Element => {
     removeRoleAssignation,
     inviteUsers,
     addNewRoleAssignationRole,
+    sendingInvitation,
+    setIsShareModalOpen,
+    isShareModalOpen,
   } = useShareBrain(brainId);
 
   const canAddNewRow =
@@ -44,6 +48,8 @@ export const ShareBrain = ({ brainId }: ShareBrainModalProps): JSX.Element => {
       }
       CloseTrigger={<div />}
       title="Share brain"
+      isOpen={isShareModalOpen}
+      setOpen={setIsShareModalOpen}
     >
       <form
         onSubmit={(event) => {
@@ -79,7 +85,8 @@ export const ShareBrain = ({ brainId }: ShareBrainModalProps): JSX.Element => {
           <Button
             className="my-5"
             onClick={addNewRoleAssignationRole}
-            disabled={!canAddNewRow}
+            disabled={sendingInvitation || !canAddNewRow}
+            isLoading={sendingInvitation}
             data-testid="add-new-row-role-button"
           >
             <ImUserPlus />
