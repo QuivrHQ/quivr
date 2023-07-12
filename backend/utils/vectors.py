@@ -67,38 +67,39 @@ def error_callback(exception):
     print("An exception occurred:", exception)
 
 
-def process_batch(batch_ids):
+def process_batch(batch_ids: List[str]):
     commons = common_dependencies()
-    if len(batch_ids) == 1:
-        return (
-            commons["supabase"]
-            .table("vectors")
-            .select(
-                "name:metadata->>file_name, size:metadata->>file_size",
-                count="exact",
-            )
-            .filter("id", "eq", batch_ids[0])
-            .execute()
-        ).data
-    else:
-        return (
-            commons["supabase"]
-            .table("vectors")
-            .select(
-                "name:metadata->>file_name, size:metadata->>file_size",
-                count="exact",
-            )
-            .filter("id", "in", tuple(batch_ids))
-            .execute()
-        ).data
+    supabase = commons["supabase"]
+    try:
+        if len(batch_ids) == 1:
+            return (
+                supabase.table("vectors")
+                .select(
+                    "name:metadata->>file_name, size:metadata->>file_size",
+                    count="exact",
+                )
+                .eq("id", batch_ids[0])  # Use parameter binding for single ID
+                .execute()
+            ).data
+        else:
+            return (
+                supabase.table("vectors")
+                .select(
+                    "name:metadata->>file_name, size:metadata->>file_size",
+                    count="exact",
+                )
+                .in_("id", batch_ids)  # Use parameter binding for multiple IDs
+                .execute()
+            ).data
+    except Exception as e:
+        logger.error("Error retrieving batched vectors", e)
 
 
-def get_unique_files_from_vector_ids(vectors_ids: List[int]):
+def get_unique_files_from_vector_ids(vectors_ids: List[str]):
     # Move into Vectors class
     """
     Retrieve unique user data vectors.
     """
-    print("vectors_ids", vectors_ids)
 
     # constants
     BATCH_SIZE = 5
