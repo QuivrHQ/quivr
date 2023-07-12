@@ -252,7 +252,7 @@ def get_default_user_brain(user: User):
         .execute()
     )
 
-    logger.info("Default brain response:", json.dumps(response.data, indent=2))
+    logger.info(f"Default brain response : {json.dumps(response.data, indent=2)}")
     default_brain_id = response.data[0]["brain_id"] if response.data else None
 
     logger.info(f"Default brain id: {default_brain_id}")
