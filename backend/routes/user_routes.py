@@ -32,7 +32,7 @@ async def get_user_endpoint(
     information about the user's API usage.
     """
 
-    max_brain_size = int(os.getenv("MAX_BRAIN_SIZE", 0))
+    max_brain_size = int(os.getenv("MAX_BRAIN_SIZE", 52428800))
     if request.headers.get("Openai-Api-Key"):
         max_brain_size = MAX_BRAIN_SIZE_WITH_OWN_KEY
 
