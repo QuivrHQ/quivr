@@ -31,7 +31,7 @@ CREATE EXTENSION IF NOT EXISTS vector;
 
 -- Create vectors table
 CREATE TABLE IF NOT EXISTS vectors (
-    id BIGSERIAL PRIMARY KEY,
+    id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
     content TEXT,
     metadata JSONB,
     embedding VECTOR(1536)
@@ -40,7 +40,7 @@ CREATE TABLE IF NOT EXISTS vectors (
 -- Create function to match vectors
 CREATE OR REPLACE FUNCTION match_vectors(query_embedding VECTOR(1536), match_count INT, p_brain_id UUID)
 RETURNS TABLE(
-    id BIGINT,
+    id UUID,
     brain_id UUID,
     content TEXT,
     metadata JSONB,
@@ -68,7 +68,6 @@ BEGIN
 END;
 $$;
 
-
 -- Create stats table
 CREATE TABLE IF NOT EXISTS stats (
     time TIMESTAMP,
@@ -82,7 +81,7 @@ CREATE TABLE IF NOT EXISTS stats (
 -- Create summaries table
 CREATE TABLE IF NOT EXISTS summaries (
     id BIGSERIAL PRIMARY KEY,
-    document_id BIGINT REFERENCES vectors(id),
+    document_id UUID REFERENCES vectors(id),
     content TEXT,
     metadata JSONB,
     embedding VECTOR(1536)
@@ -92,7 +91,7 @@ CREATE TABLE IF NOT EXISTS summaries (
 CREATE OR REPLACE FUNCTION match_summaries(query_embedding VECTOR(1536), match_count INT, match_threshold FLOAT)
 RETURNS TABLE(
     id BIGINT,
-    document_id BIGINT,
+    document_id UUID,
     content TEXT,
     metadata JSONB,
     embedding VECTOR(1536),
@@ -145,13 +144,13 @@ CREATE TABLE IF NOT EXISTS brains_users (
   default_brain BOOLEAN DEFAULT false,
   PRIMARY KEY (brain_id, user_id),
   FOREIGN KEY (user_id) REFERENCES auth.users (id),
-  FOREIGN KEY (brain_id) REFERENCES Brains (brain_id)
+  FOREIGN KEY (brain_id) REFERENCES brains (brain_id)
 );
 
 -- Create brains X vectors table
 CREATE TABLE IF NOT EXISTS brains_vectors (
   brain_id UUID,
-  vector_id BIGINT,
+  vector_id UUID,
   file_sha1 TEXT,
   PRIMARY KEY (brain_id, vector_id),
   FOREIGN KEY (vector_id) REFERENCES vectors (id),
@@ -164,9 +163,8 @@ CREATE TABLE IF NOT EXISTS brain_subscription_invitations (
   email VARCHAR(255),
   rights VARCHAR(255),
   PRIMARY KEY (brain_id, email),
-  FOREIGN KEY (brain_id) REFERENCES Brains (brain_id)
+  FOREIGN KEY (brain_id) REFERENCES brains (brain_id)
 );
-
 
 CREATE TABLE IF NOT EXISTS migrations (
   name VARCHAR(255)  PRIMARY KEY,
@@ -174,7 +172,7 @@ CREATE TABLE IF NOT EXISTS migrations (
 );
 
 INSERT INTO migrations (name) 
-SELECT '202307111517030_add_subscription_invitations_table'
+SELECT '202307111517031_change_vectors_id_type'
 WHERE NOT EXISTS (
-    SELECT 1 FROM migrations WHERE name = '202307111517030_add_subscription_invitations_table'
+    SELECT 1 FROM migrations WHERE name = '202307111517031_change_vectors_id_type'
 );
