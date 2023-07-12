@@ -1,3 +1,4 @@
+import os
 from typing import List
 from uuid import UUID
 
@@ -6,32 +7,34 @@ from fastapi import APIRouter, Depends, HTTPException
 from models.brains import Brain
 from models.brains_subscription_invitations import BrainSubscription
 from models.users import User
+from repository.brain_subscription.email_service import EmailService
+from repository.brain_subscription.subscription_invitation_service import \
+    SubscriptionInvitationService
 from repository.user.get_user_email_by_user_id import get_user_email_by_user_id
-
-from routes.authorizations.brain_authorization import (
-    has_brain_authorization,
-)
+from routes.authorizations.brain_authorization import has_brain_authorization
 
 subscription_router = APIRouter()
+subscription_service = SubscriptionInvitationService()
+email_service = EmailService(os.getenv("RESEND_API_KEY"))
 
 
-@subscription_router.post("/brain/{brain_id}/subscription")
-async def invite_user_to_brain(
-    brain_id: UUID, users: List[dict], current_user: User = Depends(get_current_user)
-):
-    # TODO: Ensure the current user has permissions to invite users to this brain
-
+@subscription_router.post(
+    "/brain/{brain_id}/subscription",
+    dependencies=[
+        Depends(
+            AuthBearer(),
+        ),
+        Depends(has_brain_authorization),
+    ],
+    tags=["Brain"],
+)
+async def invite_users_to_brain(brain_id: UUID, users: List[dict], current_user: User = Depends(get_current_user)): 
     for user in users:
-        subscription = BrainSubscription(
-            brain_id=brain_id,
-            email=user["email"],
-            rights=user["rights"],
-            inviter_email=current_user.email or "Quivr",
-        )
-
+        subscription = BrainSubscription(brain_id=brain_id, email=user['email'], rights=user['rights'])
+        
         try:
-            subscription.create_or_update_subscription_invitation()
-            subscription.resend_invitation_email()
+            subscription_service.create_or_update_subscription_invitation(subscription)
+            email_service.resend_invitation_email(subscription, inviter_email=current_user.email or "Quivr")
         except Exception as e:
             raise HTTPException(status_code=400, detail=f"Error inviting user: {e}")
 
