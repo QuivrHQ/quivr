@@ -1,4 +1,5 @@
 from typing import Optional
+from uuid import UUID
 
 from logger import get_logger
 from models.brains_subscription_invitations import BrainSubscription
@@ -42,3 +43,37 @@ class SubscriptionInvitationService:
            response = self.create_subscription_invitation(brain_subscription)
 
         return response
+
+    def check_invitation(self, brain_subscription: BrainSubscription):
+        response = self.commons["supabase"].table("brain_subscription_invitations").select("*").eq("brain_id", str(brain_subscription.brain_id)).eq("email", brain_subscription.email).execute()
+        print(response.data)
+        return response.data != []
+
+    def fetch_invitation(self, subscription: BrainSubscription):
+        logger.info("Fetching subscription invitation")
+        response = (
+            self.commons["supabase"]
+            .table("brain_subscription_invitations")
+            .select("*")
+            .eq("brain_id", str(subscription.brain_id))
+            .eq("email", subscription.email)
+            .execute()
+        )
+        if response.data:
+            return response.data[0]  # return the first matching invitation
+        else:
+            return None
+    
+    def remove_invitation(self, subscription: BrainSubscription):
+        logger.info(f"Removing subscription invitation for email {subscription.email} and brain {subscription.brain_id}")
+        response = (
+            self.commons["supabase"]
+            .table("brain_subscription_invitations")
+            .delete()
+            .eq("brain_id", str(subscription.brain_id))
+            .eq("email", subscription.email)
+            .execute()
+        )
+        logger.info(f"Removed subscription invitation for email {subscription.email} and brain {subscription.brain_id}")
+        logger.info(response)
+        return response.data

@@ -26,9 +26,9 @@ email_service = EmailService(os.getenv("RESEND_API_KEY"))
         ),
         Depends(has_brain_authorization),
     ],
-    tags=["Brain"],
+    tags=["BrainSubscription"],
 )
-async def invite_users_to_brain(brain_id: UUID, users: List[dict], current_user: User = Depends(get_current_user)): 
+def invite_users_to_brain(brain_id: UUID, users: List[dict], current_user: User = Depends(get_current_user)): 
     for user in users:
         subscription = BrainSubscription(brain_id=brain_id, email=user['email'], rights=user['rights'])
         
@@ -104,3 +104,76 @@ async def remove_user_subscription(
             brain.delete_user_from_brain(current_user.id)
 
     return {"message": f"Subscription removed successfully from brain {brain_id}"}
+
+
+@subscription_router.get(
+    "/brain/{brain_id}/subscription",
+    dependencies=[Depends(AuthBearer())],
+    tags=["BrainSubscription"],
+)
+def get_user_invitation(brain_id: UUID, current_user: User = Depends(get_current_user)):
+    if not current_user.email:
+        raise HTTPException(status_code=400, detail="User email is not defined")
+
+    subscription = BrainSubscription(brain_id=brain_id, email=current_user.email)
+
+    has_invitation = subscription_service.check_invitation(subscription)
+    return {"hasInvitation": has_invitation}
+
+@subscription_router.post(
+    "/brain/{brain_id}/subscription/accept",
+    tags=["Brain"],
+)
+async def accept_invitation(brain_id: UUID, current_user: User = Depends(get_current_user)):
+    if not current_user.email:
+        raise HTTPException(status_code=400, detail="User email is not defined")
+
+    subscription = BrainSubscription(brain_id=brain_id, email=current_user.email)
+
+    try:
+        invitation = subscription_service.fetch_invitation(subscription)
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Error fetching invitation: {e}")
+
+    if not invitation:
+        raise HTTPException(status_code=404, detail="Invitation not found")
+    
+    try:
+        subscription_service.remove_invitation(subscription)
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Error removing invitation: {e}")
+
+    try:
+        brain = Brain(id=brain_id)
+        brain.create_brain_user(
+            user_id=current_user.id, rights=invitation['rights'], default_brain=True
+        )
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Error adding user to brain: {e}")
+
+    return {"message": "Invitation accepted successfully"}
+
+@subscription_router.post(
+    "/brain/{brain_id}/subscription/decline",
+    tags=["Brain"],
+)
+async def decline_invitation(brain_id: UUID, current_user: User = Depends(get_current_user)):
+    if not current_user.email:
+        raise HTTPException(status_code=400, detail="User email is not defined")
+
+    subscription = BrainSubscription(brain_id=brain_id, email=current_user.email)
+
+    try:
+        invitation = subscription_service.fetch_invitation(subscription)
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Error fetching invitation: {e}")
+    
+    if not invitation:
+        raise HTTPException(status_code=404, detail="Invitation not found")
+
+    try:
+        subscription_service.remove_invitation(subscription)
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Error removing invitation: {e}")
+
+    return {"message": "Invitation declined successfully"}
