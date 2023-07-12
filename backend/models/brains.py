@@ -1,4 +1,4 @@
-import os
+import os,json
 from typing import Any, List, Optional
 from uuid import UUID
 
@@ -252,7 +252,7 @@ def get_default_user_brain(user: User):
         .execute()
     )
 
-    logger.info("Default brain response:", response.data)
+    logger.info("Default brain response:", json.dumps(response.data, indent=2))
     default_brain_id = response.data[0]["brain_id"] if response.data else None
 
     logger.info(f"Default brain id: {default_brain_id}")
