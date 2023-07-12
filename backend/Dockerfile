@@ -15,4 +15,5 @@ RUN chmod +x /code/scripts/start.sh
 
 COPY . /code/
 
-ENTRYPOINT ["/code/scripts/start.sh"]
+# ENTRYPOINT ["/code/scripts/start.sh"]
+ENTRYPOINT exec uvicorn main:app --reload --host 0.0.0.0 --port 5050
