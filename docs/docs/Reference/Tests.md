@@ -19,7 +19,7 @@ How:
 
 # Frontend
 
-- Functionnal tests
+- Functional tests
   - Good rendering of components
   - Backend call is made
   - State is updated
