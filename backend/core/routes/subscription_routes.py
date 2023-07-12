@@ -28,7 +28,12 @@ email_service = EmailService(os.getenv("RESEND_API_KEY"))
     ],
     tags=["BrainSubscription"],
 )
-def invite_users_to_brain(brain_id: UUID, users: List[dict], current_user: User = Depends(get_current_user)): 
+def invite_users_to_brain(brain_id: UUID, users: List[dict], current_user: User = Depends(get_current_user)):
+    """
+    Invite multiple users to a brain by their emails. This function creates
+    or updates a brain subscription invitation for each user and sends an
+    invitation email to each user.
+    """
     for user in users:
         subscription = BrainSubscription(brain_id=brain_id, email=user['email'], rights=user['rights'])
         
@@ -112,6 +117,10 @@ async def remove_user_subscription(
     tags=["BrainSubscription"],
 )
 def get_user_invitation(brain_id: UUID, current_user: User = Depends(get_current_user)):
+    """
+    Get an invitation to a brain for a user. This function checks if the user
+    has been invited to the brain and returns the invitation status.
+    """
     if not current_user.email:
         raise HTTPException(status_code=400, detail="User email is not defined")
 
@@ -120,11 +129,17 @@ def get_user_invitation(brain_id: UUID, current_user: User = Depends(get_current
     has_invitation = subscription_service.check_invitation(subscription)
     return {"hasInvitation": has_invitation}
 
+
 @subscription_router.post(
     "/brain/{brain_id}/subscription/accept",
     tags=["Brain"],
 )
 async def accept_invitation(brain_id: UUID, current_user: User = Depends(get_current_user)):
+    """
+    Accept an invitation to a brain for a user. This function removes the
+    invitation from the subscription invitations and adds the user to the
+    brain users.
+    """
     if not current_user.email:
         raise HTTPException(status_code=400, detail="User email is not defined")
 
@@ -153,11 +168,16 @@ async def accept_invitation(brain_id: UUID, current_user: User = Depends(get_cur
 
     return {"message": "Invitation accepted successfully"}
 
+
 @subscription_router.post(
     "/brain/{brain_id}/subscription/decline",
     tags=["Brain"],
 )
 async def decline_invitation(brain_id: UUID, current_user: User = Depends(get_current_user)):
+    """
+    Decline an invitation to a brain for a user. This function removes the
+    invitation from the subscription invitations.
+    """
     if not current_user.email:
         raise HTTPException(status_code=400, detail="User email is not defined")
 
