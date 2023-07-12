@@ -172,7 +172,7 @@ CREATE TABLE IF NOT EXISTS migrations (
 );
 
 INSERT INTO migrations (name) 
-SELECT '202307111517030_add_subscription_invitations_table'
+SELECT '202307111517031_change_vectors_id_type'
 WHERE NOT EXISTS (
-    SELECT 1 FROM migrations WHERE name = '202307111517030_add_subscription_invitations_table'
+    SELECT 1 FROM migrations WHERE name = '202307111517031_change_vectors_id_type'
 );
