@@ -27,25 +27,25 @@ Quivr, your second brain, utilizes the power of GenerativeAI to store and retrie
   - PDF
   - Powerpoint
   - Excel (Not Yet)
-  - Csv
+  - CSV
   - Word
   - Audio
   - Video
-- **Open Source**: Freedom is beautiful, so is Quivr. Open source and free to use.
+- **Open Source**: Freedom is beautiful, and so is Quivr. Open source and free to use.
 
 ## Demo Highlights 🎥
 
 https://github.com/StanGirard/quivr/assets/19614572/a6463b73-76c7-4bc0-978d-70562dca71f5
 
-## Getting Started: 🚀
+## Getting Started 🚀
 
 Follow these instructions to get a copy of the project up and running on your local machine for development and testing purposes.
 
-You can find everything on the documentation [here](https://brain.quivr.app/)
+You can find everything on the [documentation](https://brain.quivr.app/).
 
 ### Prerequisites 📋
 
-Before you proceed, ensure you have the following installed:
+Ensure you have the following installed:
 
 - Docker
 - Docker Compose
@@ -75,68 +75,64 @@ Additionally, you'll need a [Supabase](https://supabase.com/) account for:
 
 - **Step 2**: Use the install helper
 
-You can use the install_helper.sh script to setup your env files
-
-```bash
-brew install gum # Windows (via Scoop) scoop install charm-gum
-
-chmod +x install_helper.sh
-./install_helper.sh
-```
+    You can use the install_helper.sh script to setup your env files
+    
+    ```bash
+    brew install gum # Windows (via Scoop) scoop install charm-gum
+    
+    chmod +x install_helper.sh
+    ./install_helper.sh
+    ```
 
 - **Step 2 - Bis**: Copy the `.XXXXX_env` files
 
-```bash
-cp .backend_env.example backend/.env
-cp .frontend_env.example frontend/.env
-```
+    ```bash
+    cp .backend_env.example backend/.env
+    cp .frontend_env.example frontend/.env
+    ```
 
 - **Step 3**: Update the `backend/.env` and `frontend/.env` file 
 
-> _Your `supabase_service_key` can be found in your Supabase dashboard under Project Settings -> API. Use the `anon` `public` key found in the `Project API keys` section._
-
-
-> _Your  `JWT_SECRET_KEY`can be found in your supabase settings under Project Settings -> API -> JWT Settings -> JWT Secret_
-
-> _To activate vertexAI with PaLM from GCP follow the instructions [here](https://python.langchain.com/en/latest/modules/models/llms/integrations/google_vertex_ai_palm.html) and update `backend/.env`- It is an advanced feature, please be expert in GCP before trying to use it_
-
-- [ ] Change variables in `backend/.env`
-- [ ] Change variables in `frontend/.env`
+    > _Your `supabase_service_key` can be found in your Supabase dashboard under Project Settings -> API. Use the `anon` `public` key found in the `Project API keys` section._
+    
+    > _Your  `JWT_SECRET_KEY`can be found in your supabase settings under Project Settings -> API -> JWT Settings -> JWT Secret_
+    
+    > _To activate vertexAI with PaLM from GCP follow the instructions [here](https://python.langchain.com/en/latest/modules/models/llms/integrations/google_vertex_ai_palm.html) and update `backend/.env`- It is an advanced feature, please be expert in GCP before trying to use it_
+    
+    - [ ] Change variables in `backend/.env`
+    - [ ] Change variables in `frontend/.env`
 
 - **Step 4**: Run the following migration scripts on the Supabase database via the web interface (SQL Editor -> `New query`)
 
-Use the `migration.sh` script to run the migration scripts
+    Use the `migration.sh` script to run the migration scripts
+    
+    ```bash
+    chmod +x migration.sh
+    ./migration.sh
+    ```
 
-```bash
-chmod +x migration.sh
-./migration.sh
-```
-
-And choose either create_scripts if it's your first time or migrations if you are updating your database.
-
-
-All the scripts can be found in the [scripts](scripts/) folder
-> _If you come from an old version of Quivr, run the scripts in [migration script](scripts/) to migrate your data to the new version in the order of date_
+    Choose either create_scripts if it's your first time or migrations if you are updating your database.
+    
+    All the scripts can be found in the [scripts](scripts/) folder
+    > _If you come from an old version of Quivr, run the scripts in [migration script](scripts/) to migrate your data to the new version in the order of date_
 
 - **Step 5**: Launch the app
 
-```bash
-docker compose -f docker-compose.yml up --build
-```
+    ```bash
+    docker compose -f docker-compose.yml up --build
+    ```
 
 - **Step 6**: Navigate to `localhost:3000` in your browser
 
 - **Step 7**: Want to contribute to the project? 
 
-```
-docker compose -f docker-compose.dev.yml up --build
-```
-
-
+    ```
+    docker compose -f docker-compose.dev.yml up --build
+    ```
 
 ## Contributors ✨
 
-Thanks goes to these wonderful people:
+Thanks go to these wonderful people:
 <a href="https://github.com/stangirard/quivr/graphs/contributors">
   <img src="https://contrib.rocks/image?repo=stangirard/quivr" />
 </a>
@@ -144,7 +140,6 @@ Thanks goes to these wonderful people:
 ## Contribute 🤝
 
 Got a pull request? Open it, and we'll review it as soon as possible. Check out our project board [here](https://github.com/users/StanGirard/projects/5) to see what we're currently focused on, and feel free to bring your fresh ideas to the table!
-
 
 - [Open Issues](https://github.com/StanGirard/quivr/issues)
 - [Open Pull Requests](https://github.com/StanGirard/quivr/pulls)
@@ -172,12 +167,9 @@ This project could not be possible without the support of our sponsors. Thank yo
   <img src="https://avatars.githubusercontent.com/u/23194788?s=200&v=4" alt="Sicara" style="padding: 10px" width="70px">
 </a>
 
-
-
 ## License 📄
 
 This project is licensed under the Apache 2.0 License - see the [LICENSE](LICENSE) file for details
-
 
 ## Stars History 📈
 
