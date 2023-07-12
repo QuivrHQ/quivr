@@ -5,7 +5,6 @@ from fastapi import APIRouter, Depends, Query
 from models.brains import Brain
 from models.settings import common_dependencies
 from models.users import User
-
 from routes.authorizations.brain_authorization import (
     has_brain_authorization,
     validate_brain_authorization,
@@ -23,6 +22,8 @@ async def explore_endpoint(
     """
     brain = Brain(id=brain_id)
     unique_data = brain.get_unique_brain_files()
+
+    print("unique_data", unique_data)
 
     unique_data.sort(key=lambda x: int(x["size"]), reverse=True)
     return {"documents": unique_data}

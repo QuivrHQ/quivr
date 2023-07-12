@@ -18,7 +18,7 @@ class Brain(BaseModel):
     model: Optional[str] = "gpt-3.5-turbo-0613"
     temperature: Optional[float] = 0.0
     max_tokens: Optional[int] = 256
-    max_brain_size: Optional[int] = int(os.getenv("MAX_BRAIN_SIZE",52428800))
+    max_brain_size: Optional[int] = int(os.getenv("MAX_BRAIN_SIZE", 52428800))
     files: List[Any] = []
 
     class Config:
