@@ -1,12 +1,37 @@
 import { fireEvent, render } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
+
+import {
+  BrainConfigContextMock,
+  BrainConfigProviderMock,
+} from "@/lib/context/BrainConfigProvider/mocks/BrainConfigProviderMock";
+import {
+  SupabaseContextMock,
+  SupabaseProviderMock,
+} from "@/lib/context/SupabaseProvider/mocks/SupabaseProviderMock";
 
 import { ShareBrain } from "../ShareBrain";
 
+vi.mock("@/lib/context/SupabaseProvider/supabase-provider", () => ({
+  SupabaseContext: SupabaseContextMock,
+}));
+
+vi.mock("@/lib/context/BrainConfigProvider/brain-config-provider", () => ({
+  BrainConfigContext: BrainConfigContextMock,
+}));
+
 describe("ShareBrain", () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
   it("should render ShareBrain component properly", () => {
     const { getByTestId } = render(
-      <ShareBrain brainId="cf9bb422-b1b6-4fd7-abc1-01bd395d2318" />
+      <SupabaseProviderMock>
+        <BrainConfigProviderMock>
+          <ShareBrain brainId="cf9bb422-b1b6-4fd7-abc1-01bd395d2318" />
+        </BrainConfigProviderMock>
+      </SupabaseProviderMock>
     );
     const shareButton = getByTestId("share-brain-button");
     expect(shareButton).toBeDefined();
@@ -14,7 +39,12 @@ describe("ShareBrain", () => {
 
   it("should render open share modal when share button is clicked", () => {
     const { getByText, getByTestId } = render(
-      <ShareBrain brainId="cf9bb422-b1b6-4fd7-abc1-01bd395d2318" />
+      // Todo: add a custom render function that wraps the component with the providers
+      <SupabaseProviderMock>
+        <BrainConfigProviderMock>
+          <ShareBrain brainId="cf9bb422-b1b6-4fd7-abc1-01bd395d2318" />
+        </BrainConfigProviderMock>
+      </SupabaseProviderMock>
     );
     const shareButton = getByTestId("share-brain-button");
     fireEvent.click(shareButton);
@@ -23,7 +53,11 @@ describe("ShareBrain", () => {
 
   it('shoud add new user row when "Add new user" button is clicked and only where there is no empty field', async () => {
     const { getByTestId, findAllByTestId } = render(
-      <ShareBrain brainId="cf9bb422-b1b6-4fd7-abc1-01bd395d2318" />
+      <SupabaseProviderMock>
+        <BrainConfigProviderMock>
+          <ShareBrain brainId="cf9bb422-b1b6-4fd7-abc1-01bd395d2318" />
+        </BrainConfigProviderMock>
+      </SupabaseProviderMock>
     );
     const shareButton = getByTestId("share-brain-button");
     fireEvent.click(shareButton);

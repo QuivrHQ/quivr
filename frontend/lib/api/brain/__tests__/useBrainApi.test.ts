@@ -109,4 +109,26 @@ describe("useBrainApi", () => {
     expect(axiosGetMock).toHaveBeenCalledTimes(1);
     expect(axiosGetMock).toHaveBeenCalledWith(`/brains/${id}/`);
   });
+
+  it("should call addBrainSubscription with the correct parameters", async () => {
+    const {
+      result: {
+        current: { addBrainSubscriptions },
+      },
+    } = renderHook(() => useBrainApi());
+    const id = "123";
+    const subscriptions = [
+      {
+        email: "user@quivr.app",
+        rights: "viewer",
+      },
+    ];
+    await addBrainSubscriptions(id, subscriptions);
+
+    expect(axiosPostMock).toHaveBeenCalledTimes(1);
+    expect(axiosPostMock).toHaveBeenCalledWith(
+      `/brain/${id}/subscription`,
+      subscriptions
+    );
+  });
 });

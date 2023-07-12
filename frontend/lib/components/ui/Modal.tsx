@@ -6,27 +6,36 @@ import { MdClose } from "react-icons/md";
 
 import Button from "./Button";
 
-interface ModalProps {
+type CommonModalProps = {
   title?: string;
   desc?: string;
   children?: ReactNode;
   Trigger: ReactNode;
   CloseTrigger?: ReactNode;
-  opened?: boolean;
-}
+  isOpen?: undefined;
+  setOpen?: undefined;
+};
 
-const Modal = ({
+type ModalProps =
+  | CommonModalProps
+  | (Omit<CommonModalProps, "isOpen" | "setOpen"> & {
+      isOpen: boolean;
+      setOpen: (isOpen: boolean) => void;
+    });
+
+export const Modal = ({
   title,
   desc,
   children,
   Trigger,
   CloseTrigger,
-  opened = false,
+  isOpen: customIsOpen,
+  setOpen: customSetOpen,
 }: ModalProps): JSX.Element => {
-  const [open, setOpen] = useState(opened);
+  const [isOpen, setOpen] = useState(false);
 
   return (
-    <Dialog.Root onOpenChange={setOpen}>
+    <Dialog.Root onOpenChange={customSetOpen ?? setOpen}>
       <Dialog.Trigger asChild>
         {Trigger}
         {/* <button className="text-violet11 shadow-blackA7 hover:bg-mauve3 inline-flex h-[35px] items-center justify-center rounded-[4px] bg-white px-[15px] font-medium leading-none shadow-[0_2px_10px] focus:shadow-[0_0_0_2px] focus:shadow-black focus:outline-none">
@@ -34,7 +43,7 @@ const Modal = ({
         </button> */}
       </Dialog.Trigger>
       <AnimatePresence>
-        {open ? (
+        {customIsOpen ?? isOpen ? (
           <Dialog.Portal forceMount>
             <Dialog.Overlay asChild forceMount>
               <motion.div
@@ -89,5 +98,3 @@ const Modal = ({
     </Dialog.Root>
   );
 };
-
-export default Modal;
