@@ -68,7 +68,5 @@ export const addBrainSubscriptions = async (
   subscriptions: Subscription,
   axiosInstance: AxiosInstance
 ): Promise<void> => {
-  await axiosInstance.post(`/brain/${brainId}/subscription`, {
-    users: subscriptions,
-  });
+  await axiosInstance.post(`/brain/${brainId}/subscription`, subscriptions);
 };

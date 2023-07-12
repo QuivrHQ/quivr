@@ -3,7 +3,7 @@ import { MdAdd } from "react-icons/md";
 
 import Button from "@/lib/components/ui/Button";
 import Field from "@/lib/components/ui/Field";
-import Modal from "@/lib/components/ui/Modal";
+import { Modal } from "@/lib/components/ui/Modal";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 
 export const AddBrainModal = (): JSX.Element => {
