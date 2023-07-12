@@ -78,6 +78,6 @@ export const useShareBrain = (brainId: string) => {
     updateRoleAssignation,
     removeRoleAssignation,
     inviteUsers,
-    addNewUserRow: addNewRoleAssignationRole,
+    addNewRoleAssignationRole,
   };
 };

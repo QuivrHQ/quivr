@@ -22,7 +22,7 @@ export const ShareBrain = ({ brainId }: ShareBrainModalProps): JSX.Element => {
     updateRoleAssignation,
     removeRoleAssignation,
     inviteUsers,
-    addNewUserRow,
+    addNewRoleAssignationRole,
   } = useShareBrain(brainId);
 
   const canAddNewRow =
@@ -37,6 +37,7 @@ export const ShareBrain = ({ brainId }: ShareBrainModalProps): JSX.Element => {
           className="group-hover:visible invisible hover:text-red-500 transition-[colors,opacity] p-1"
           onClick={() => void 0}
           variant={"tertiary"}
+          data-testId="share-brain-button"
         >
           <MdShare className="text-xl" />
         </Button>
@@ -56,7 +57,10 @@ export const ShareBrain = ({ brainId }: ShareBrainModalProps): JSX.Element => {
               <div className="flex flex-1 overflow-hidden">
                 <p className="flex-1 color-gray-500">{brainShareLink}</p>
               </div>
-              <Button onClick={() => void handleCopyInvitationLink()}>
+              <Button
+                type="button"
+                onClick={() => void handleCopyInvitationLink()}
+              >
                 <MdContentPaste />
               </Button>
             </div>
@@ -74,8 +78,9 @@ export const ShareBrain = ({ brainId }: ShareBrainModalProps): JSX.Element => {
           ))}
           <Button
             className="my-5"
-            onClick={addNewUserRow}
+            onClick={addNewRoleAssignationRole}
             disabled={!canAddNewRow}
+            data-testid="add-new-row-role-button"
           >
             <ImUserPlus />
           </Button>

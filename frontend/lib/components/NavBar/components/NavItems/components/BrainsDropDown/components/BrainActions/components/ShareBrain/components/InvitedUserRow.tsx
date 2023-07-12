@@ -40,7 +40,10 @@ export const InvitedUserRow = ({
   }, [email, selectedRole]);
 
   return (
-    <div className="flex flex-row align-center my-2 gap-3 items-center">
+    <div
+      data-testid="assignation-row"
+      className="flex flex-row align-center my-2 gap-3 items-center"
+    >
       <div className="cursor-pointer" onClick={removeCurrentInvitation}>
         <MdOutlineRemoveCircle />
       </div>
@@ -53,6 +56,7 @@ export const InvitedUserRow = ({
           onChange={(e) => setEmail(e.target.value)}
           value={email}
           onBlur={() => email === "" && removeCurrentInvitation?.()}
+          data-testid="role-assignation-email-input"
         />
       </div>
       <Select
