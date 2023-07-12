@@ -15,7 +15,7 @@ from routes.authorizations.brain_authorization import has_brain_authorization
 
 subscription_router = APIRouter()
 subscription_service = SubscriptionInvitationService()
-email_service = EmailService(os.getenv("RESEND_API_KEY"))
+email_service = EmailService()
 
 
 @subscription_router.post(
@@ -34,6 +34,7 @@ def invite_users_to_brain(brain_id: UUID, users: List[dict], current_user: User 
     or updates a brain subscription invitation for each user and sends an
     invitation email to each user.
     """
+
     for user in users:
         subscription = BrainSubscription(brain_id=brain_id, email=user['email'], rights=user['rights'])
         

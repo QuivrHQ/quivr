@@ -1,17 +1,20 @@
+import os
 from typing import Optional
 from uuid import UUID
 
 import resend
 from logger import get_logger
 from models.brains_subscription_invitations import BrainSubscription
+from repository.brain_subscription.get_brain_url import get_brain_url
 
 logger = get_logger(__name__)
 
 
 class EmailService:
-    def __init__(self, api_key: Optional[str]):
+    def __init__(self):
+        api_key = os.getenv("RESEND_API_KEY")
         if not api_key:
-            raise ValueError("API key is not defined.")
+            raise ValueError("RESEND API key is not defined.")
         self.api_key = api_key
 
     def get_brain_url(self, brain_id: UUID) -> str:
@@ -22,7 +25,7 @@ class EmailService:
     def resend_invitation_email(self, brain_subscription: BrainSubscription, inviter_email: str):
         resend.api_key = self.api_key
 
-        brain_url = self.get_brain_url(brain_subscription.brain_id)
+        brain_url = get_brain_url(brain_subscription.brain_id)
 
         html_body = f"""
         <p>This brain has been shared with you by {inviter_email}.</p>
