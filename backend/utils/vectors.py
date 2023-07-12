@@ -100,7 +100,6 @@ def get_unique_files_from_vector_ids(vectors_ids: List[str]):
     """
     Retrieve unique user data vectors.
     """
-    print("vectors_ids", vectors_ids)
 
     # constants
     BATCH_SIZE = 5
@@ -109,13 +108,11 @@ def get_unique_files_from_vector_ids(vectors_ids: List[str]):
         futures = []
         for i in range(0, len(vectors_ids), BATCH_SIZE):
             batch_ids = vectors_ids[i : i + BATCH_SIZE]
-            print("batch_ids", batch_ids)
             future = executor.submit(process_batch, batch_ids)
             futures.append(future)
 
         # Retrieve the results
         vectors_responses = [future.result() for future in futures]
-        print("vectors_responses", vectors_responses)
 
     documents = [item for sublist in vectors_responses for item in sublist]
     print("document", documents)
