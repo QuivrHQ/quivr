@@ -1,9 +1,9 @@
 "use client";
-import { redirect } from "next/navigation";
 import { ReactNode } from "react";
 
 import { ChatsProvider } from "@/lib/context/ChatsProvider/chats-provider";
 import { useSupabase } from "@/lib/context/SupabaseProvider";
+import { redirectToLogin } from "@/lib/router/redirectToLogin";
 
 import { ChatsList } from "./components/ChatsList";
 
@@ -14,7 +14,7 @@ interface LayoutProps {
 const Layout = ({ children }: LayoutProps): JSX.Element => {
   const { session } = useSupabase();
   if (session === null) {
-    redirect("/login");
+    redirectToLogin();
   }
 
   return (
