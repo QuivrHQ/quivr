@@ -7,6 +7,7 @@ from models.settings import common_dependencies
 from models.users import User
 
 from routes.authorizations.brain_authorization import (
+    has_brain_authorization,
     validate_brain_authorization,
 )
 
@@ -31,6 +32,7 @@ async def explore_endpoint(
     "/explore/{file_name}/",
     dependencies=[
         Depends(AuthBearer()),
+        Depends(has_brain_authorization()),
     ],
     tags=["Explore"],
 )
@@ -42,7 +44,6 @@ async def delete_endpoint(
     """
     Delete a specific user file by file name.
     """
-    validate_brain_authorization(brain_id, current_user.id)
     brain = Brain(id=brain_id)
     brain.delete_file_from_brain(file_name)
 
