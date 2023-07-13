@@ -1,11 +1,11 @@
 /* eslint-disable */
-import { redirect } from "next/navigation";
 import { useCallback, useState } from "react";
 import { FileRejection, useDropzone } from "react-dropzone";
 
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 import { useSupabase } from "@/lib/context/SupabaseProvider";
 import { useAxios, useToast } from "@/lib/hooks";
+import { redirectToLogin } from "@/lib/router/redirectToLogin";
 import { useEventTracking } from "@/services/analytics/useEventTracking";
 import { UUID } from "crypto";
 
@@ -20,7 +20,7 @@ export const useFileUploader = () => {
   const { axiosInstance } = useAxios();
 
   if (session === null) {
-    redirect("/login");
+    redirectToLogin();
   }
 
   const upload = useCallback(

@@ -1,7 +1,9 @@
-import { useState } from "react";
+import { redirect } from "next/navigation";
+import { useEffect, useState } from "react";
 
 import { useSupabase } from "@/lib/context/SupabaseProvider";
 import { useToast } from "@/lib/hooks";
+import { useEventTracking } from "@/services/analytics/useEventTracking";
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const useLogin = () => {
@@ -9,7 +11,9 @@ export const useLogin = () => {
   const [password, setPassword] = useState("");
   const [isPending, setIsPending] = useState(false);
   const { publish } = useToast();
-  const { supabase } = useSupabase();
+  const { supabase, session } = useSupabase();
+
+  const { track } = useEventTracking();
 
   const handleLogin = async () => {
     setIsPending(true);
@@ -31,6 +35,20 @@ export const useLogin = () => {
     }
     setIsPending(false);
   };
+
+  useEffect(() => {
+    if (session?.user !== undefined) {
+      void track("SIGNED_IN");
+
+      const previousPage = sessionStorage.getItem("previous-page");
+      if (previousPage === null) {
+        redirect("/upload");
+      } else {
+        sessionStorage.removeItem("previous-page");
+        redirect(previousPage);
+      }
+    }
+  }, [session?.user]);
 
   return {
     handleLogin,

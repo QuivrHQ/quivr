@@ -3,10 +3,11 @@ from typing import Any, List, Optional
 from uuid import UUID
 
 from logger import get_logger
-from models.settings import CommonsDep, common_dependencies
-from models.users import User
 from pydantic import BaseModel
 from utils.vectors import get_unique_files_from_vector_ids
+
+from models.settings import CommonsDep, common_dependencies
+from models.users import User
 
 logger = get_logger(__name__)
 
@@ -48,6 +49,32 @@ class Brain(BaseModel):
         return cls(
             commons=commons, *args, **kwargs  # pyright: ignore reportPrivateUsage=none
         )  # pyright: ignore reportPrivateUsage=none
+
+    # TODO: move this to a brand new BrainService
+    def get_brain_users(self):
+        response = (
+            self.commons["supabase"]
+            .table("brains_users")
+            .select("id:brain_id, *")
+            .filter("brain_id", "eq", self.id)
+            .execute()
+        )
+        return response.data
+
+    # TODO: move this to a brand new BrainService
+    def delete_user_from_brain(self, user_id):
+        results = (
+            self.commons["supabase"]
+            .table("brains_users")
+            .select("*")
+            .match({"brain_id": self.id, "user_id": user_id})
+            .execute()
+        )
+
+        if len(results.data) != 0:
+            self.commons["supabase"].table("brains_users").delete().match(
+                {"brain_id": self.id, "user_id": user_id}
+            ).execute()
 
     def get_user_brains(self, user_id):
         response = (
