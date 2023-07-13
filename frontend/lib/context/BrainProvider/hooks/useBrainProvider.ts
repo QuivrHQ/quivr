@@ -49,6 +49,10 @@ export const useBrainProvider = () => {
     await deleteBrain(id);
     setAllBrains((prevBrains) => prevBrains.filter((brain) => brain.id !== id));
     void track("DELETE_BRAIN");
+    publish({
+      variant: "success",
+      text: "Brain deleted",
+    });
   };
 
   const fetchAllBrains = useCallback(async () => {
