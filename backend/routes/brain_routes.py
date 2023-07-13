@@ -10,9 +10,7 @@ from models.brains import (
 )
 from models.settings import common_dependencies
 from models.users import User
-from routes.authorizations.brain_authorization import (
-    validate_brain_authorization,
-)
+from routes.authorizations.brain_authorization import validate_brain_authorization
 
 logger = get_logger(__name__)
 
@@ -50,7 +48,11 @@ async def get_default_brain_endpoint(current_user: User = Depends(get_current_us
     The default brain is defined as the brain marked as default in the brains_users table.
     """
 
-    return get_default_user_brain_or_create_new(current_user)
+    brain = get_default_user_brain_or_create_new(current_user)
+    return {
+        "brainId": brain.id,
+        "brainName": brain.name,
+    }
 
 
 # get one brain
