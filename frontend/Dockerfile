@@ -1,5 +1,4 @@
 FROM node:18-alpine
-
 # Install Python and essential build tools
 RUN apk add --update --no-cache python3 make g++ && ln -sf python3 /usr/bin/python
 RUN python3 -m ensurepip
@@ -17,7 +16,7 @@ WORKDIR /app
 COPY package*.json yarn.lock ./
 
 # Install dependencies in /app
-RUN yarn install
+RUN yarn install --network-timeout 1000000
 
 # Copy the rest of our Next.js folder into /app
 COPY . .
