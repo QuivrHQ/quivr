@@ -1,34 +1,25 @@
-from functools import wraps
 from typing import Optional
 from uuid import UUID
 
-from fastapi import HTTPException, status
+from auth.auth_bearer import get_current_user
+from fastapi import Depends, HTTPException, status
 from models.brains import Brain
 from models.users import User
 
 
 def has_brain_authorization(required_role: Optional[str] = "Owner"):
-    def decorator(func):
-        @wraps(func)
-        async def wrapper(current_user: User, *args, **kwargs):
-            brain_id: Optional[UUID] = kwargs.get("brain_id")
-            user_id = current_user.id
+    """
+    Decorator to check if the user has the required role for the brain
+    param: required_role: The role required to access the brain
+    return: A wrapper function that checks the authorization
+    """
 
-            if brain_id is None:
-                raise HTTPException(
-                    status_code=status.HTTP_400_BAD_REQUEST,
-                    detail="Missing brain ID",
-                )
+    async def wrapper(brain_id: UUID, current_user: User = Depends(get_current_user)):
+        validate_brain_authorization(
+            brain_id=brain_id, user_id=current_user.id, required_role=required_role
+        )
 
-            validate_brain_authorization(
-                brain_id, user_id=user_id, required_role=required_role
-            )
-
-            return await func(*args, **kwargs)
-
-        return wrapper
-
-    return decorator
+    return wrapper
 
 
 def validate_brain_authorization(
@@ -36,6 +27,14 @@ def validate_brain_authorization(
     user_id: UUID,
     required_role: Optional[str] = "Owner",
 ):
+    """
+    Function to check if the user has the required role for the brain
+    param: brain_id: The id of the brain
+    param: user_id: The id of the user
+    param: required_role: The role required to access the brain
+    return: None
+    """
+
     if required_role is None:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
