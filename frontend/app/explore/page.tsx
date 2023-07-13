@@ -2,12 +2,12 @@
 "use client";
 import { AnimatePresence, motion } from "framer-motion";
 import Link from "next/link";
-import { redirect } from "next/navigation";
 
 import Button from "@/lib/components/ui/Button";
 import Spinner from "@/lib/components/ui/Spinner";
 import { useSupabase } from "@/lib/context/SupabaseProvider";
 
+import { redirectToLogin } from "@/lib/router/redirectToLogin";
 import DocumentItem from "./DocumentItem";
 import { useExplore } from "./hooks/useExplore";
 
@@ -15,7 +15,7 @@ const ExplorePage = (): JSX.Element => {
   const { session } = useSupabase();
   const { documents, setDocuments, isPending } = useExplore();
   if (session === null) {
-    redirect("/login");
+    redirectToLogin();
   }
 
   return (
