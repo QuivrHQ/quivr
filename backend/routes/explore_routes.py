@@ -5,8 +5,8 @@ from fastapi import APIRouter, Depends, Query
 from models.brains import Brain
 from models.settings import common_dependencies
 from models.users import User
+
 from routes.authorizations.brain_authorization import (
-    has_brain_authorization,
     validate_brain_authorization,
 )
 
@@ -31,7 +31,6 @@ async def explore_endpoint(
     "/explore/{file_name}/",
     dependencies=[
         Depends(AuthBearer()),
-        Depends(has_brain_authorization),
     ],
     tags=["Explore"],
 )
@@ -43,6 +42,7 @@ async def delete_endpoint(
     """
     Delete a specific user file by file name.
     """
+    validate_brain_authorization(brain_id, current_user.id)
     brain = Brain(id=brain_id)
     brain.delete_file_from_brain(file_name)
 
@@ -69,6 +69,7 @@ async def download_endpoint(
         .select(
             "metadata->>file_name, metadata->>file_size, metadata->>file_extension, metadata->>file_url",
             "content",
+            "brains_vectors(brain_id,vector_id)",
         )
         .match({"metadata->>file_name": file_name})
         .execute()
@@ -78,11 +79,14 @@ async def download_endpoint(
     if len(documents) == 0:
         return {"documents": []}
 
-    related_brain_id = UUID(documents[0]["brain_id"])
+    related_brain_id = (
+        documents[0]["brains_vectors"][0]["brain_id"]
+        if len(documents[0]["brains_vectors"]) != 0
+        else None
+    )
+
     if related_brain_id is None:
-        raise Exception(
-            f"File {file_name} has no brain_id associated with it. Please contact support."
-        )
+        raise Exception(f"File {file_name} has no brain_id associated with it")
 
     validate_brain_authorization(brain_id=related_brain_id, user_id=current_user.id)
 

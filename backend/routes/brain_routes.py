@@ -10,7 +10,9 @@ from models.brains import (
 )
 from models.settings import common_dependencies
 from models.users import User
-from routes.authorizations.brain_authorization import has_brain_authorization
+from routes.authorizations.brain_authorization import (
+    validate_brain_authorization,
+)
 
 logger = get_logger(__name__)
 
@@ -56,12 +58,12 @@ async def get_default_brain_endpoint(current_user: User = Depends(get_current_us
     "/brains/{brain_id}/",
     dependencies=[
         Depends(AuthBearer()),
-        Depends(has_brain_authorization),
     ],
     tags=["Brain"],
 )
 async def get_brain_endpoint(
     brain_id: UUID,
+    current_user: User = Depends(get_current_user),
 ):
     """
     Retrieve details of a specific brain by brain ID.
@@ -72,6 +74,7 @@ async def get_brain_endpoint(
     This endpoint retrieves the details of a specific brain identified by the provided brain ID. It returns the brain ID and its
     history, which includes the brain messages exchanged in the brain.
     """
+    validate_brain_authorization(brain_id, current_user.id)
     brain = Brain(id=brain_id)
     brains = brain.get_brain_details()
     if len(brains) > 0:
@@ -89,7 +92,6 @@ async def get_brain_endpoint(
     "/brains/{brain_id}/",
     dependencies=[
         Depends(AuthBearer()),
-        Depends(has_brain_authorization),
     ],
     tags=["Brain"],
 )
@@ -100,6 +102,8 @@ async def delete_brain_endpoint(
     """
     Delete a specific brain by brain ID.
     """
+    # [TODO] check if the user is the owner of the brain
+    validate_brain_authorization(brain_id, current_user.id)
     brain = Brain(id=brain_id)
     brain.delete_brain(current_user.id)
 
@@ -152,7 +156,6 @@ async def create_brain_endpoint(
         Depends(
             AuthBearer(),
         ),
-        Depends(has_brain_authorization),
     ],
     tags=["Brain"],
 )
@@ -169,6 +172,7 @@ async def update_brain_endpoint(
         name, status, model, max_tokens, temperature
     Return modified brain ? No need -> do an optimistic update
     """
+    validate_brain_authorization(brain_id, current_user.id)
     commons = common_dependencies()
     brain = Brain(id=brain_id)
 
