@@ -350,7 +350,7 @@ def test_upload_and_delete_file():
     assert "message" in delete_response_data
 
 
-def test_upload_explore_and_delete_file():
+def test_upload_explore_and_delete_file_txt():
     # Retrieve the default brain
     brain_response = client.get(
         "/brains/default", headers={"Authorization": "Bearer " + API_KEY}
@@ -430,14 +430,12 @@ def test_upload_explore_and_delete_file_pdf():
     # Assert that the upload response status code is 200 (HTTP OK)
     assert upload_response.status_code == 200
     # assert it starts with File uploaded successfully:
-    assert upload_response.json()["message"].startswith("File uploaded successfully:")
-    # show message if it fails
-    if not upload_response.json()["message"].startswith("File uploaded successfully:"):
-        print(upload_response.json()["message"])
 
     # Optionally, you can assert on specific fields in the upload response data
     upload_response_data = upload_response.json()
     assert "message" in upload_response_data
+    assert "type" in upload_response_data
+    assert upload_response_data["type"] == "success"
 
     # Explore (Download) the file
     explore_response = client.get(
