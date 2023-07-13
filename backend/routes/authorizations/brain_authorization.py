@@ -7,7 +7,7 @@ from models.brains import Brain
 from models.users import User
 
 
-def has_brain_authorization(required_role: str = "Owner"):
+def has_brain_authorization(required_role: Optional[str] = "Owner"):
     def decorator(func):
         @wraps(func)
         async def wrapper(current_user: User, *args, **kwargs):
@@ -44,7 +44,6 @@ def validate_brain_authorization(
 
     brain = Brain(id=brain_id)
     user_brain = brain.get_brain_for_user(user_id)
-
     if user_brain is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
