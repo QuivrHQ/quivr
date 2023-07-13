@@ -70,7 +70,7 @@ describe("useBrainApi", () => {
     await deleteBrain(id);
 
     expect(axiosDeleteMock).toHaveBeenCalledTimes(1);
-    expect(axiosDeleteMock).toHaveBeenCalledWith(`/brain/${id}/subscription`);
+    expect(axiosDeleteMock).toHaveBeenCalledWith(`/brains/${id}/subscription`);
   });
 
   it("should call getDefaultBrain with the correct parameters", async () => {
@@ -127,7 +127,7 @@ describe("useBrainApi", () => {
 
     expect(axiosPostMock).toHaveBeenCalledTimes(1);
     expect(axiosPostMock).toHaveBeenCalledWith(
-      `/brain/${id}/subscription`,
+      `/brains/${id}/subscription`,
       subscriptions
     );
   });
@@ -142,6 +142,6 @@ describe("useBrainApi", () => {
     await getBrainUsers(id);
 
     expect(axiosGetMock).toHaveBeenCalledTimes(1);
-    expect(axiosGetMock).toHaveBeenCalledWith(`/brain/${id}/users`);
+    expect(axiosGetMock).toHaveBeenCalledWith(`/brains/${id}/users`);
   });
 });

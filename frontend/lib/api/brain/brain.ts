@@ -40,7 +40,7 @@ export const deleteBrain = async (
   brainId: string,
   axiosInstance: AxiosInstance
 ): Promise<void> => {
-  await axiosInstance.delete(`/brain/${brainId}/subscription`);
+  await axiosInstance.delete(`/brains/${brainId}/subscription`);
 };
 
 export const getDefaultBrain = async (
@@ -68,13 +68,13 @@ export const addBrainSubscriptions = async (
   subscriptions: Subscription[],
   axiosInstance: AxiosInstance
 ): Promise<void> => {
-  await axiosInstance.post(`/brain/${brainId}/subscription`, subscriptions);
+  await axiosInstance.post(`/brains/${brainId}/subscription`, subscriptions);
 };
 
 export const getBrainUsers = async (
   brainId: string,
   axiosInstance: AxiosInstance
 ): Promise<Subscription[]> => {
-  return (await axiosInstance.get<Subscription[]>(`/brain/${brainId}/users`))
+  return (await axiosInstance.get<Subscription[]>(`/brains/${brainId}/users`))
     .data;
 };

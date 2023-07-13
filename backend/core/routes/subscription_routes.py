@@ -19,7 +19,7 @@ email_service = EmailService()
 
 
 @subscription_router.post(
-    "/brain/{brain_id}/subscription",
+    "/brains/{brain_id}/subscription",
     dependencies=[
         Depends(
             AuthBearer(),
@@ -113,7 +113,7 @@ async def remove_user_subscription(
 
 
 @subscription_router.get(
-    "/brain/{brain_id}/subscription",
+    "/brains/{brain_id}/subscription",
     dependencies=[Depends(AuthBearer())],
     tags=["BrainSubscription"],
 )
@@ -132,7 +132,7 @@ def get_user_invitation(brain_id: UUID, current_user: User = Depends(get_current
 
 
 @subscription_router.post(
-    "/brain/{brain_id}/subscription/accept",
+    "/brains/{brain_id}/subscription/accept",
     tags=["Brain"],
 )
 async def accept_invitation(brain_id: UUID, current_user: User = Depends(get_current_user)):
@@ -171,7 +171,7 @@ async def accept_invitation(brain_id: UUID, current_user: User = Depends(get_cur
 
 
 @subscription_router.post(
-    "/brain/{brain_id}/subscription/decline",
+    "/brains/{brain_id}/subscription/decline",
     tags=["Brain"],
 )
 async def decline_invitation(brain_id: UUID, current_user: User = Depends(get_current_user)):
