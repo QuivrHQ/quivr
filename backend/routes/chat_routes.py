@@ -10,6 +10,7 @@ from fastapi.responses import StreamingResponse
 from llm.openai import OpenAIBrainPicking
 from llm.openai_functions import OpenAIFunctionsBrainPicking
 from llm.private_gpt4all import PrivateGPT4AllBrainPicking
+from models.brains import get_default_user_brain_or_create_new
 from models.chat import Chat, ChatHistory
 from models.chats import ChatQuestion
 from models.settings import LLMSettings, common_dependencies
@@ -19,6 +20,7 @@ from repository.chat.get_chat_by_id import get_chat_by_id
 from repository.chat.get_chat_history import get_chat_history
 from repository.chat.get_user_chats import get_user_chats
 from repository.chat.update_chat import ChatUpdatableProperties, update_chat
+from routes.authorizations.brain_authorization import has_brain_authorization
 from utils.constants import (
     openai_function_compatible_models,
     streaming_compatible_models,
@@ -151,7 +153,14 @@ async def create_chat_handler(
 
 # add new question to chat
 @chat_router.post(
-    "/chat/{chat_id}/question", dependencies=[Depends(AuthBearer())], tags=["Chat"]
+    "/chat/{chat_id}/question",
+    dependencies=[
+        Depends(
+            AuthBearer(),
+        ),
+        Depends(has_brain_authorization),
+    ],
+    tags=["Chat"],
 )
 async def create_question_handler(
     request: Request,
@@ -161,12 +170,12 @@ async def create_question_handler(
     current_user: User = Depends(get_current_user),
 ) -> ChatHistory:
     current_user.user_openai_api_key = request.headers.get("Openai-Api-Key")
-    print("current_user", current_user)
     try:
         check_user_limit(current_user)
         llm_settings = LLMSettings()
 
-        # TODO: RBAC with current_user
+        if not brain_id:
+            brain_id = get_default_user_brain_or_create_new(current_user).get("id")
 
         if llm_settings.private:
             gpt_answer_generator = PrivateGPT4AllBrainPicking(
@@ -209,7 +218,12 @@ async def create_question_handler(
 # stream new question response from chat
 @chat_router.post(
     "/chat/{chat_id}/question/stream",
-    dependencies=[Depends(AuthBearer())],
+    dependencies=[
+        Depends(
+            AuthBearer(),
+        ),
+        Depends(has_brain_authorization),
+    ],
     tags=["Chat"],
 )
 async def create_stream_question_handler(
@@ -219,6 +233,9 @@ async def create_stream_question_handler(
     brain_id: UUID = Query(..., description="The ID of the brain"),
     current_user: User = Depends(get_current_user),
 ) -> StreamingResponse:
+    if not brain_id:
+        brain_id = get_default_user_brain_or_create_new(current_user).get("id")
+
     if chat_question.model not in streaming_compatible_models:
         # Forward the request to the none streaming endpoint
         return await create_question_handler(

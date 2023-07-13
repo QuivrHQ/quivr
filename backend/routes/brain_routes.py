@@ -1,29 +1,20 @@
-from typing import Optional
 from uuid import UUID
 
 from auth import AuthBearer, get_current_user
 from fastapi import APIRouter, Depends
 from logger import get_logger
-from models.brains import Brain, get_default_user_brain
+from models.brains import (
+    Brain,
+    get_default_user_brain,
+    get_default_user_brain_or_create_new,
+)
 from models.settings import common_dependencies
 from models.users import User
-from pydantic import BaseModel
-
 from routes.authorizations.brain_authorization import has_brain_authorization
 
 logger = get_logger(__name__)
 
 brain_router = APIRouter()
-
-
-class BrainToUpdate(BaseModel):
-    brain_id: UUID
-    name: Optional[str] = "New Brain"
-    status: Optional[str] = "public"
-    model: Optional[str] = "gpt-3.5-turbo-0613"
-    temperature: Optional[float] = 0.0
-    max_tokens: Optional[int] = 256
-    file_sha1: Optional[str] = ""
 
 
 # get all brains
@@ -57,20 +48,7 @@ async def get_default_brain_endpoint(current_user: User = Depends(get_current_us
     The default brain is defined as the brain marked as default in the brains_users table.
     """
 
-    default_brain = get_default_user_brain(current_user)
-
-    if default_brain is None:
-        logger.info(f"No default brain found for user {current_user.id}. Creating one.")
-
-        brain = Brain(name="Default brain")
-        brain.create_brain()
-        brain.create_brain_user(
-            user_id=current_user.id, rights="Owner", default_brain=True
-        )
-
-        default_brain = get_default_user_brain(current_user)
-
-    return default_brain
+    return get_default_user_brain_or_create_new(current_user)
 
 
 # get one brain
@@ -122,28 +100,16 @@ async def delete_brain_endpoint(
     """
     Delete a specific brain by brain ID.
     """
-    # [TODO] check if the user is the owner of the brain
-
     brain = Brain(id=brain_id)
     brain.delete_brain(current_user.id)
 
     return {"message": f"{brain_id}  has been deleted."}
 
 
-class BrainObject(BaseModel):
-    brain_id: Optional[UUID]
-    name: Optional[str] = "New Brain"
-    status: Optional[str] = "public"
-    model: Optional[str] = "gpt-3.5-turbo-0613"
-    temperature: Optional[float] = 0.0
-    max_tokens: Optional[int] = 256
-    file_sha1: Optional[str] = ""
-
-
 # create new brain
 @brain_router.post("/brains/", dependencies=[Depends(AuthBearer())], tags=["Brain"])
 async def create_brain_endpoint(
-    brain: BrainObject,
+    brain: Brain,
     current_user: User = Depends(get_current_user),
 ):
     """
