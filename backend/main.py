@@ -18,25 +18,22 @@ from routes.user_routes import user_router
 
 logger = get_logger(__name__)
 
-if os.getenv("SENTRY_DSN"):
+sentry_dsn = os.getenv("SENTRY_DSN")
+if sentry_dsn:
     sentry_sdk.init(
-        dsn=os.getenv("SENTRY_DSN"),
-        # Set traces_sample_rate to 1.0 to capture 100%
-        # of transactions for performance monitoring.
-        # We recommend adjusting this value in production,
+        dsn=sentry_dsn,
         traces_sample_rate=1.0,
     )
 
 app = FastAPI()
 
 add_cors_middleware(app)
-max_brain_size = os.getenv("MAX_BRAIN_SIZE", 52428800)
-max_brain_size_with_own_key = os.getenv("MAX_BRAIN_SIZE_WITH_KEY", 209715200)
 
 
 @app.on_event("startup")
 async def startup_event():
-    pypandoc.download_pandoc()
+    if not os.path.exists(pypandoc.get_pandoc_path()):
+        pypandoc.download_pandoc()
 
 
 app.include_router(brain_router)
@@ -48,6 +45,7 @@ app.include_router(upload_router)
 app.include_router(user_router)
 app.include_router(api_key_router)
 app.include_router(subscription_router)
+
 
 @app.exception_handler(HTTPException)
 async def http_exception_handler(_, exc):
