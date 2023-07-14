@@ -28,6 +28,21 @@ from utils.constants import (
 chat_router = APIRouter()
 
 
+class NullableUUID:
+    @classmethod
+    def __get_validators__(cls):
+        yield cls.validate
+
+    @classmethod
+    def validate(cls, v):
+        if v == "":
+            return None
+        try:
+            return UUID(v)
+        except ValueError:
+            return None
+
+
 def get_chat_details(commons, chat_id):
     response = (
         commons["supabase"]
@@ -164,7 +179,9 @@ async def create_question_handler(
     request: Request,
     chat_question: ChatQuestion,
     chat_id: UUID,
-    brain_id: UUID | str = Query(..., description="The ID of the brain"),
+    brain_id: NullableUUID
+    | UUID
+    | None = Query(..., description="The ID of the brain"),
     current_user: User = Depends(get_current_user),
 ) -> ChatHistory:
     current_user.user_openai_api_key = request.headers.get("Openai-Api-Key")
@@ -172,7 +189,6 @@ async def create_question_handler(
         check_user_limit(current_user)
         llm_settings = LLMSettings()
 
-        # TODO: check if the user has access to the brain
         if not brain_id:
             brain_id = get_default_user_brain_or_create_new(current_user).id
 
@@ -228,7 +244,9 @@ async def create_stream_question_handler(
     request: Request,
     chat_question: ChatQuestion,
     chat_id: UUID,
-    brain_id: UUID | str = Query(..., description="The ID of the brain"),
+    brain_id: NullableUUID
+    | UUID
+    | None = Query(..., description="The ID of the brain"),
     current_user: User = Depends(get_current_user),
 ) -> StreamingResponse:
     # TODO: check if the user has access to the brain
