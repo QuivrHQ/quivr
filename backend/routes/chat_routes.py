@@ -164,7 +164,7 @@ async def create_question_handler(
     request: Request,
     chat_question: ChatQuestion,
     chat_id: UUID,
-    brain_id: UUID = Query(..., description="The ID of the brain"),
+    brain_id: UUID | str = Query(..., description="The ID of the brain"),
     current_user: User = Depends(get_current_user),
 ) -> ChatHistory:
     current_user.user_openai_api_key = request.headers.get("Openai-Api-Key")
@@ -228,7 +228,7 @@ async def create_stream_question_handler(
     request: Request,
     chat_question: ChatQuestion,
     chat_id: UUID,
-    brain_id: UUID = Query(..., description="The ID of the brain"),
+    brain_id: UUID | str = Query(..., description="The ID of the brain"),
     current_user: User = Depends(get_current_user),
 ) -> StreamingResponse:
     # TODO: check if the user has access to the brain
