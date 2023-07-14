@@ -49,6 +49,7 @@ app.include_router(user_router)
 app.include_router(api_key_router)
 app.include_router(subscription_router)
 
+
 @app.exception_handler(HTTPException)
 async def http_exception_handler(_, exc):
     return JSONResponse(

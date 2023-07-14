@@ -1,4 +1,5 @@
 from typing import Optional
+
 from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.llms.base import BaseLLM
 from langchain.llms.gpt4all import GPT4All

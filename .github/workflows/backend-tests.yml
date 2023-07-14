@@ -4,11 +4,13 @@ on:
   push:
     branches: [ main ]
     paths:
-      - 'backend/**'
+      - 'backend/core/**'
+      - 'backend/lib/**'
   pull_request:
     branches: [ main ] 
     paths:
-      - 'backend/**'  
+      - 'backend/core/**'
+      - 'backend/lib/**'  
 jobs:
   build:
     runs-on: ubuntu-latest

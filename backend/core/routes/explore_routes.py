@@ -1,11 +1,10 @@
 from uuid import UUID
 
-from auth import AuthBearer, get_current_user
 from fastapi import APIRouter, Depends, Query
+from auth import AuthBearer, get_current_user
 from models.brains import Brain
 from models.settings import common_dependencies
 from models.users import User
-
 from routes.authorizations.brain_authorization import (
     has_brain_authorization,
     validate_brain_authorization,

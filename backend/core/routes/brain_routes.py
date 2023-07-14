@@ -8,10 +8,7 @@ from models.brains import Brain, get_default_user_brain
 from models.settings import common_dependencies
 from models.users import User
 from pydantic import BaseModel
-
-from routes.authorizations.brain_authorization import (
-    has_brain_authorization,
-)
+from routes.authorizations.brain_authorization import has_brain_authorization
 
 logger = get_logger(__name__)
 
