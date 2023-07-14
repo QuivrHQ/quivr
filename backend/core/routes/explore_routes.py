@@ -1,7 +1,7 @@
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, Query
 from auth import AuthBearer, get_current_user
+from fastapi import APIRouter, Depends, Query
 from models.brains import Brain
 from models.settings import common_dependencies
 from models.users import User
