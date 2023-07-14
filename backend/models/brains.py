@@ -3,11 +3,10 @@ from typing import Any, List, Optional
 from uuid import UUID
 
 from logger import get_logger
-from pydantic import BaseModel
-from utils.vectors import get_unique_files_from_vector_ids
-
 from models.settings import CommonsDep, common_dependencies
 from models.users import User
+from pydantic import BaseModel
+from utils.vectors import get_unique_files_from_vector_ids
 
 logger = get_logger(__name__)
 

@@ -1,7 +1,7 @@
 from uuid import UUID
 
 from auth import AuthBearer, get_current_user
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from logger import get_logger
 from models.brains import (
     Brain,
@@ -34,6 +34,7 @@ async def brain_endpoint(current_user: User = Depends(get_current_user)):
     return {"brains": brains}
 
 
+# get default brain
 @brain_router.get(
     "/brains/default/", dependencies=[Depends(AuthBearer())], tags=["Brain"]
 )
@@ -55,7 +56,7 @@ async def get_default_brain_endpoint(current_user: User = Depends(get_current_us
     }
 
 
-# get one brain
+# get one brain - Currently not used in FE
 @brain_router.get(
     "/brains/{brain_id}/",
     dependencies=[Depends(AuthBearer()), Depends(has_brain_authorization())],
@@ -77,12 +78,15 @@ async def get_brain_endpoint(
     brains = brain.get_brain_details()
     if len(brains) > 0:
         return {
-            "brainId": brain_id,
-            "brainName": brains[0]["name"],
+            "id": brain_id,
+            "name": brains[0]["name"],
             "status": brains[0]["status"],
         }
     else:
-        return {"error": f"No brain found with brain_id {brain_id}"}
+        return HTTPException(
+            status_code=404,
+            detail="Brain not found",
+        )
 
 
 # delete one brain
@@ -175,7 +179,6 @@ async def update_brain_endpoint(
         brain.update_brain_with_file(
             file_sha1=input_brain.file_sha1  # pyright: ignore reportPrivateUsage=none
         )
-        print("brain:", brain)
 
     brain.update_brain_fields(commons, brain)  # pyright: ignore reportPrivateUsage=none
     return {"message": f"Brain {brain_id} has been updated."}
