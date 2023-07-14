@@ -15,4 +15,4 @@ RUN chmod +x /code/scripts/start.sh
 
 COPY . /code/
 
-ENTRYPOINT ["/code/scripts/start.sh"]
+ENTRYPOINT ["bash", "/code/scripts/start.sh"]
