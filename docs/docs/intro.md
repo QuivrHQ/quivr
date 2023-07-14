@@ -96,7 +96,13 @@ cp .frontend_env.example frontend/.env
 - [ ] Change variables in `backend/.env`
 - [ ] Change variables in `frontend/.env`
 
-- **Step 4**: Run the following migration scripts on the Supabase database via the web interface (SQL Editor -> `New query`)
+- **Step 4**: Use the migration.sh script to run the migration scripts
+
+```
+  chmod +x migration.sh
+  ./migration.sh
+```
+
 
 [DB Table Creation Script 1](https://github.com/StanGirard/quivr/tree/main/scripts/supabase_new_store_documents.sql)
 
