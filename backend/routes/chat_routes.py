@@ -25,7 +25,6 @@ from utils.constants import (
     streaming_compatible_models,
 )
 
-
 chat_router = APIRouter()
 
 
@@ -175,7 +174,7 @@ async def create_question_handler(
 
         # TODO: check if the user has access to the brain
         if not brain_id:
-            brain_id = get_default_user_brain_or_create_new(current_user).get("id")
+            brain_id = get_default_user_brain_or_create_new(current_user).id
 
         if llm_settings.private:
             gpt_answer_generator = PrivateGPT4AllBrainPicking(
@@ -234,7 +233,7 @@ async def create_stream_question_handler(
 ) -> StreamingResponse:
     # TODO: check if the user has access to the brain
     if not brain_id:
-        brain_id = get_default_user_brain_or_create_new(current_user).get("id")
+        brain_id = get_default_user_brain_or_create_new(current_user).id
 
     if chat_question.model not in streaming_compatible_models:
         # Forward the request to the none streaming endpoint
