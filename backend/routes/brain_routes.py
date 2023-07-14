@@ -1,31 +1,20 @@
-from typing import Optional
 from uuid import UUID
 
 from auth import AuthBearer, get_current_user
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from logger import get_logger
-from models.brains import Brain, get_default_user_brain
+from models.brains import (
+    Brain,
+    get_default_user_brain,
+    get_default_user_brain_or_create_new,
+)
 from models.settings import common_dependencies
 from models.users import User
-from pydantic import BaseModel
-
-from routes.authorizations.brain_authorization import (
-    has_brain_authorization,
-)
+from routes.authorizations.brain_authorization import has_brain_authorization
 
 logger = get_logger(__name__)
 
 brain_router = APIRouter()
-
-
-class BrainToUpdate(BaseModel):
-    brain_id: UUID
-    name: Optional[str] = "New Brain"
-    status: Optional[str] = "public"
-    model: Optional[str] = "gpt-3.5-turbo-0613"
-    temperature: Optional[float] = 0.0
-    max_tokens: Optional[int] = 256
-    file_sha1: Optional[str] = ""
 
 
 # get all brains
@@ -45,6 +34,7 @@ async def brain_endpoint(current_user: User = Depends(get_current_user)):
     return {"brains": brains}
 
 
+# get default brain
 @brain_router.get(
     "/brains/default/", dependencies=[Depends(AuthBearer())], tags=["Brain"]
 )
@@ -59,23 +49,14 @@ async def get_default_brain_endpoint(current_user: User = Depends(get_current_us
     The default brain is defined as the brain marked as default in the brains_users table.
     """
 
-    default_brain = get_default_user_brain(current_user)
-
-    if default_brain is None:
-        logger.info(f"No default brain found for user {current_user.id}. Creating one.")
-
-        brain = Brain(name="Default brain")
-        brain.create_brain()
-        brain.create_brain_user(
-            user_id=current_user.id, rights="Owner", default_brain=True
-        )
-
-        default_brain = get_default_user_brain(current_user)
-
-    return default_brain
+    brain = get_default_user_brain_or_create_new(current_user)
+    return {
+        "id": brain.id,
+        "name": brain.name,
+    }
 
 
-# get one brain
+# get one brain - Currently not used in FE
 @brain_router.get(
     "/brains/{brain_id}/",
     dependencies=[Depends(AuthBearer()), Depends(has_brain_authorization())],
@@ -97,12 +78,15 @@ async def get_brain_endpoint(
     brains = brain.get_brain_details()
     if len(brains) > 0:
         return {
-            "brainId": brain_id,
-            "brainName": brains[0]["name"],
+            "id": brain_id,
+            "name": brains[0]["name"],
             "status": brains[0]["status"],
         }
     else:
-        return {"error": f"No brain found with brain_id {brain_id}"}
+        return HTTPException(
+            status_code=404,
+            detail="Brain not found",
+        )
 
 
 # delete one brain
@@ -124,20 +108,10 @@ async def delete_brain_endpoint(
     return {"message": f"{brain_id}  has been deleted."}
 
 
-class BrainObject(BaseModel):
-    brain_id: Optional[UUID]
-    name: Optional[str] = "New Brain"
-    status: Optional[str] = "public"
-    model: Optional[str] = "gpt-3.5-turbo-0613"
-    temperature: Optional[float] = 0.0
-    max_tokens: Optional[int] = 256
-    file_sha1: Optional[str] = ""
-
-
 # create new brain
 @brain_router.post("/brains/", dependencies=[Depends(AuthBearer())], tags=["Brain"])
 async def create_brain_endpoint(
-    brain: BrainObject,
+    brain: Brain,
     current_user: User = Depends(get_current_user),
 ):
     """
@@ -205,7 +179,6 @@ async def update_brain_endpoint(
         brain.update_brain_with_file(
             file_sha1=input_brain.file_sha1  # pyright: ignore reportPrivateUsage=none
         )
-        print("brain:", brain)
 
     brain.update_brain_fields(commons, brain)  # pyright: ignore reportPrivateUsage=none
     return {"message": f"Brain {brain_id} has been updated."}

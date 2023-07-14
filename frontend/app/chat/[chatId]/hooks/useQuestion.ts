@@ -25,13 +25,9 @@ export const useQuestion = (): UseChatService => {
     chatId: string,
     chatQuestion: ChatQuestion
   ): Promise<void> => {
-    if (currentBrain?.id === undefined) {
-      throw new Error("No current brain");
-    }
-
     const response = await addQuestion({
       chatId,
-      brainId: currentBrain.id,
+      brainId: currentBrain?.id ?? "",
       chatQuestion,
     });
 

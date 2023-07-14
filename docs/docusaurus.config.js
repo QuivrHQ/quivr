@@ -121,7 +121,7 @@ const config = {
               },
               {
                 label: 'GitHub',
-                href: 'https://github.com/StangGirard/Quivr',
+                href: 'https://github.com/stangirard/Quivr',
               },
             ],
           },

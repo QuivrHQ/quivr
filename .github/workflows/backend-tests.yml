@@ -42,7 +42,7 @@ jobs:
           JWT_SECRET_KEY: ${{secrets.JWT_SECRET_KEY}}
           CI_TEST_API_KEY: ${{secrets.CI_TEST_API_KEY}} 
         run: |
-          pytest
+          python -m pytest tests/
         
       - name: Static type checking with pyright
         run: |

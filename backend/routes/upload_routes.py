@@ -34,11 +34,8 @@ async def upload_file(
     it can optionally apply summarization to the file's content. The response message will indicate the status of the upload.
     """
 
-    print(brain_id, "brain_id")
-
     # [TODO] check if the user is the owner/editor of the brain
     brain = Brain(id=brain_id)
-    print("brain", brain)
     commons = common_dependencies()
 
     if request.headers.get("Openai-Api-Key"):
