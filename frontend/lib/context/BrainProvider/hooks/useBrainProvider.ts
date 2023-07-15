@@ -40,7 +40,7 @@ export const useBrainProvider = () => {
     } catch {
       publish({
         variant: "danger",
-        text: "Error occured while creating a brain",
+        text: "Error occurred while creating a brain",
       });
     }
   };
