@@ -16,7 +16,7 @@ WORKDIR /app
 COPY package*.json yarn.lock ./
 
 # Install dependencies in /app
-RUN yarn install
+RUN yarn install --network-timeout 1000000
 
 # Copy the rest of our Next.js folder into /app
 COPY . .
