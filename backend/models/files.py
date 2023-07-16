@@ -82,7 +82,7 @@ class File(BaseModel):
         os.remove(tmp_file.name)
 
         text_splitter = RecursiveCharacterTextSplitter.from_tiktoken_encoder(
-            chunk_size=self.chunk_size, chunk_overlap=self.chunk_overlap
+            chunk_size=self.chunk_size, chunk_overlap=self.chunk_overlap, model_name="gpt-4"
         )
 
         self.documents = text_splitter.split_documents(documents)
