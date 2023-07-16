@@ -80,7 +80,6 @@ async def process_github(
         file_exists_in_brain = file.file_already_exists_in_brain(brain_id)
 
         if not file_exists_in_brain:
-            file.add_file_to_brain(brain_id)  # pyright: ignore reportPrivateUsage=none
             brain = Brain(id=brain_id)
             file.link_file_to_brain(brain)
     return {
