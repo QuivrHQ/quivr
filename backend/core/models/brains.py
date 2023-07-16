@@ -152,7 +152,7 @@ class Brain(BaseModel):
         self.id = response.data[0]["brain_id"]
         return response.data
 
-    def create_brain_user(self, user_id: UUID, rights, default_brain):
+    def create_brain_user(self, user_id: UUID, rights, default_brain: bool):
         commons = common_dependencies()
         response = (
             commons["supabase"]
@@ -278,7 +278,6 @@ def get_default_user_brain(user: User):
         .execute()
     )
 
-    logger.info("Default brain response:", response.data)
     default_brain_id = response.data[0]["brain_id"] if response.data else None
 
     logger.info(f"Default brain id: {default_brain_id}")
@@ -294,4 +293,14 @@ def get_default_user_brain(user: User):
 
         return brain_response.data[0] if brain_response.data else None
 
-    return None
+
+def get_default_user_brain_or_create_new(user: User) -> Brain:
+    default_brain = get_default_user_brain(user)
+
+    if default_brain:
+        return Brain.create(**default_brain)
+    else:
+        brain = Brain.create()
+        brain.create_brain()
+        brain.create_brain_user(user.id, "Owner", True)
+        return brain
