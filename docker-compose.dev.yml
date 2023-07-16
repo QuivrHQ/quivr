@@ -11,10 +11,11 @@ services:
     restart: always
     volumes:
       - ./frontend/:/app
-      - /app/node_modules
       - /app/.next
     ports:
       - 3000:3000
+    command:
+      - npm run start
   backend:
     env_file:
       - ./backend/.env

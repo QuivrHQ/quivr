@@ -5,6 +5,7 @@ from typing import List
 from uuid import UUID
 
 from auth import AuthBearer, get_current_user
+from pydantic import Field
 from fastapi import APIRouter, Depends, Query, Request
 from fastapi.responses import StreamingResponse
 from llm.openai import OpenAIBrainPicking
@@ -28,7 +29,7 @@ from utils.constants import (
 chat_router = APIRouter()
 
 
-class NullableUUID:
+class NullableUUID(UUID):
     @classmethod
     def __get_validators__(cls):
         yield cls.validate

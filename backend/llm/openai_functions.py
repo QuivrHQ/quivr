@@ -146,7 +146,7 @@ class OpenAIFunctionsBrainPicking(BaseBrainPicking):
         system_messages = [
             {
                 "role": "system",
-                "content": """Your name is Quivr. You are an assistant that has access to a person's documents and that can answer questions about them.
+                "content": """Your name is Qamar. You are an assistant that has access to a person's documents and that can answer questions about them.
                 A person will ask you a question and you will provide a helpful answer.
                 Write the answer in the same language as the question.
                 You have access to functions to help you answer the question.
