@@ -20,6 +20,20 @@ vi.mock("@/lib/context/BrainConfigProvider/brain-config-provider", () => ({
   BrainConfigContext: BrainConfigContextMock,
 }));
 
+vi.mock("@/lib/api/brain/useBrainApi", async () => {
+  const actual = await vi.importActual<
+    typeof import("@/lib/api/brain/useBrainApi")
+  >("@/lib/api/brain/useBrainApi");
+
+  return {
+    ...actual,
+    useBrainApi: () => ({
+      ...actual.useBrainApi(),
+      getBrainUsers: () => Promise.resolve([]),
+    }),
+  };
+});
+
 describe("ShareBrain", () => {
   afterEach(() => {
     vi.restoreAllMocks();

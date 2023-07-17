@@ -61,12 +61,20 @@ export const getBrains = async (
   return brains.brains;
 };
 
-export type Subscription = { email: string; rights: BrainRoleType }[];
+export type Subscription = { email: string; rights: BrainRoleType };
 
 export const addBrainSubscriptions = async (
   brainId: string,
-  subscriptions: Subscription,
+  subscriptions: Subscription[],
   axiosInstance: AxiosInstance
 ): Promise<void> => {
   await axiosInstance.post(`/brain/${brainId}/subscription`, subscriptions);
+};
+
+export const getBrainUsers = async (
+  brainId: string,
+  axiosInstance: AxiosInstance
+): Promise<Subscription[]> => {
+  return (await axiosInstance.get<Subscription[]>(`/brain/${brainId}/users`))
+    .data;
 };

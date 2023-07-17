@@ -8,7 +8,8 @@ import { MdContentPaste, MdShare } from "react-icons/md";
 import Button from "@/lib/components/ui/Button";
 import { Modal } from "@/lib/components/ui/Modal";
 
-import { InvitedUserRow } from "./components/InvitedUserRow";
+import { BrainUser } from "./components";
+import { UserToInvite } from "./components/UserToInvite";
 import { useShareBrain } from "./hooks/useShareBrain";
 
 type ShareBrainModalProps = {
@@ -27,6 +28,7 @@ export const ShareBrain = ({ brainId }: ShareBrainModalProps): JSX.Element => {
     sendingInvitation,
     setIsShareModalOpen,
     isShareModalOpen,
+    brainUsers,
   } = useShareBrain(brainId);
 
   const canAddNewRow =
@@ -75,7 +77,7 @@ export const ShareBrain = ({ brainId }: ShareBrainModalProps): JSX.Element => {
           <div className="bg-gray-100 h-0.5 mb-5 border-gray-200 dark:border-gray-700" />
 
           {roleAssignations.map((roleAssignation, index) => (
-            <InvitedUserRow
+            <UserToInvite
               key={roleAssignation.id}
               onChange={updateRoleAssignation(index)}
               removeCurrentInvitation={removeRoleAssignation(index)}
@@ -99,6 +101,15 @@ export const ShareBrain = ({ brainId }: ShareBrainModalProps): JSX.Element => {
           </Button>
         </div>
       </form>
+      <div className="bg-gray-100 h-0.5 mb-5 border-gray-200 dark:border-gray-700" />
+      <p className="text-lg font-bold">Users with access</p>
+      {brainUsers.map((subscription) => (
+        <BrainUser
+          key={subscription.email}
+          email={subscription.email}
+          rights={subscription.rights}
+        />
+      ))}
     </Modal>
   );
 };

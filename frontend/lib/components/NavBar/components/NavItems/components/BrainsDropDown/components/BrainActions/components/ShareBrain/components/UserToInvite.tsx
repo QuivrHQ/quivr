@@ -5,29 +5,21 @@ import Field from "@/lib/components/ui/Field";
 import { Select } from "@/lib/components/ui/Select";
 
 import { BrainRoleAssignation, BrainRoleType } from "../../../types";
+import { availableRoles } from "../types";
 
-type AddUserRowProps = {
+type UserToInviteProps = {
   onChange: (newRole: BrainRoleAssignation) => void;
   removeCurrentInvitation?: () => void;
   roleAssignation: BrainRoleAssignation;
 };
 
-type SelectOptionsProps = {
-  label: string;
-  value: BrainRoleType;
-};
-const SelectOptions: SelectOptionsProps[] = [
-  { label: "Viewer", value: "viewer" },
-  { label: "Editor", value: "editor" },
-];
-
-export const InvitedUserRow = ({
+export const UserToInvite = ({
   onChange,
   removeCurrentInvitation,
   roleAssignation,
-}: AddUserRowProps): JSX.Element => {
+}: UserToInviteProps): JSX.Element => {
   const [selectedRole, setSelectedRole] = useState<BrainRoleType>(
-    roleAssignation.role
+    roleAssignation.rights
   );
   const [email, setEmail] = useState(roleAssignation.email);
 
@@ -35,7 +27,7 @@ export const InvitedUserRow = ({
     onChange({
       ...roleAssignation,
       email,
-      role: selectedRole,
+      rights: selectedRole,
     });
   }, [email, selectedRole]);
 
@@ -62,7 +54,7 @@ export const InvitedUserRow = ({
       <Select
         onChange={setSelectedRole}
         value={selectedRole}
-        options={SelectOptions}
+        options={availableRoles}
       />
     </div>
   );

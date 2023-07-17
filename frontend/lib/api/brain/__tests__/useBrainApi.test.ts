@@ -131,4 +131,17 @@ describe("useBrainApi", () => {
       subscriptions
     );
   });
+
+  it("should call getBrainUsers with the correct parameters", async () => {
+    const {
+      result: {
+        current: { getBrainUsers },
+      },
+    } = renderHook(() => useBrainApi());
+    const id = "123";
+    await getBrainUsers(id);
+
+    expect(axiosGetMock).toHaveBeenCalledTimes(1);
+    expect(axiosGetMock).toHaveBeenCalledWith(`/brain/${id}/users`);
+  });
 });

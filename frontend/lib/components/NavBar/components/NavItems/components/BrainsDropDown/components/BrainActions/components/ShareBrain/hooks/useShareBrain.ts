@@ -1,7 +1,9 @@
 /* eslint-disable max-lines */
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
+import { Subscription } from "@/lib/api/brain/brain";
 import { useBrainApi } from "@/lib/api/brain/useBrainApi";
+import { useSupabase } from "@/lib/context/SupabaseProvider";
 import { useToast } from "@/lib/hooks";
 
 import { BrainRoleAssignation } from "../../../types";
@@ -9,16 +11,19 @@ import { generateBrainAssignation } from "../utils/generateBrainAssignation";
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const useShareBrain = (brainId: string) => {
-  const baseUrl = window.location.origin;
-  const { publish } = useToast();
-  const { addBrainSubscriptions } = useBrainApi();
-  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
-
-  const brainShareLink = `${baseUrl}/brain_subscription_invitation=${brainId}`;
+  const [brainUsers, setBrainUsers] = useState<Subscription[]>([]);
   const [sendingInvitation, setSendingInvitation] = useState(false);
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [roleAssignations, setRoleAssignation] = useState<
     BrainRoleAssignation[]
   >([generateBrainAssignation()]);
+
+  const baseUrl = window.location.origin;
+  const brainShareLink = `${baseUrl}/brain_subscription_invitation=${brainId}`;
+
+  const { publish } = useToast();
+  const { addBrainSubscriptions, getBrainUsers } = useBrainApi();
+  const { session } = useSupabase();
 
   const handleCopyInvitationLink = async () => {
     await navigator.clipboard.writeText(brainShareLink);
@@ -63,7 +68,7 @@ export const useShareBrain = (brainId: string) => {
         .filter(({ email }) => email !== "")
         .map((assignation) => ({
           email: assignation.email,
-          rights: assignation.role,
+          rights: assignation.rights,
         }));
 
       await addBrainSubscriptions(brainId, inviteUsersPayload);
@@ -88,6 +93,15 @@ export const useShareBrain = (brainId: string) => {
     setRoleAssignation([...roleAssignations, generateBrainAssignation()]);
   };
 
+  useEffect(() => {
+    const fetchBrainUsers = async () => {
+      const users = await getBrainUsers(brainId);
+      setBrainUsers(users.filter(({ email }) => email !== session?.user.email));
+    };
+
+    void fetchBrainUsers();
+  }, []);
+
   return {
     roleAssignations,
     brainShareLink,
@@ -99,5 +113,6 @@ export const useShareBrain = (brainId: string) => {
     sendingInvitation,
     setIsShareModalOpen,
     isShareModalOpen,
+    brainUsers,
   };
 };
