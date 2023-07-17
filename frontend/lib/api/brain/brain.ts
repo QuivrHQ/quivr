@@ -1,6 +1,9 @@
 import { AxiosInstance } from "axios";
 
-import { BrainRoleType } from "@/lib/components/NavBar/components/NavItems/components/BrainsDropDown/components/BrainActions/types";
+import {
+  BrainRoleAssignation,
+  BrainRoleType,
+} from "@/lib/components/NavBar/components/NavItems/components/BrainsDropDown/components/BrainActions/types";
 import { Brain } from "@/lib/context/BrainProvider/types";
 import { Document } from "@/lib/types/Document";
 
@@ -69,4 +72,13 @@ export const addBrainSubscriptions = async (
   axiosInstance: AxiosInstance
 ): Promise<void> => {
   await axiosInstance.post(`/brain/${brainId}/subscription`, subscriptions);
+};
+
+export const getBrainUsers = async (
+  brainId: string,
+  axiosInstance: AxiosInstance
+): Promise<BrainRoleAssignation[]> => {
+  return (
+    await axiosInstance.get<BrainRoleAssignation[]>(`/brain/${brainId}/users`)
+  ).data;
 };

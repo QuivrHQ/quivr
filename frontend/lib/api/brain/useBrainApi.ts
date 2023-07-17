@@ -7,6 +7,7 @@ import {
   getBrain,
   getBrainDocuments,
   getBrains,
+  getBrainUsers,
   getDefaultBrain,
   Subscription,
 } from "./brain";
@@ -27,5 +28,7 @@ export const useBrainApi = () => {
       brainId: string,
       subscriptions: Subscription
     ) => addBrainSubscriptions(brainId, subscriptions, axiosInstance),
+    getBrainUsers: async (brainId: string) =>
+      getBrainUsers(brainId, axiosInstance),
   };
 };
