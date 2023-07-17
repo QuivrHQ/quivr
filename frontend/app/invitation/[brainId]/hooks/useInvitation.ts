@@ -78,11 +78,13 @@ export const useInvitation = (): UseInvitationReturn => {
         text: JSON.stringify(response.message),
       });
     } catch (error) {
+      // @ts-ignore Error is of unknown type
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
       if (error.response.data.detail !== undefined) {
         publish({
           variant: "danger",
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+          // @ts-ignore Error is of unknown type
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
           text: error.response.data.detail,
         });
       } else {
@@ -109,11 +111,13 @@ export const useInvitation = (): UseInvitationReturn => {
         text: JSON.stringify(response.message),
       });
     } catch (error) {
+      // @ts-ignore Error is of unknown type
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
       if (error.response.data.detail !== undefined) {
         publish({
           variant: "danger",
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+          // @ts-ignore Error is of unknown type
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
           text: error.response.data.detail,
         });
       } else {

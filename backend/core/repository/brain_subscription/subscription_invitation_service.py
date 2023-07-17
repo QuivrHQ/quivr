@@ -10,7 +10,7 @@ logger = get_logger(__name__)
 
 class SubscriptionInvitationService:
     def __init__(self, commons: Optional[CommonsDep] = None):
-        self.commons = commons if commons else common_dependencies()
+        self.commons = common_dependencies()
 
     def create_subscription_invitation(self, brain_subscription: BrainSubscription):
         logger.info("Creating subscription invitation")
@@ -46,7 +46,6 @@ class SubscriptionInvitationService:
 
     def check_invitation(self, brain_subscription: BrainSubscription):
         response = self.commons["supabase"].table("brain_subscription_invitations").select("*").eq("brain_id", str(brain_subscription.brain_id)).eq("email", brain_subscription.email).execute()
-        print(response.data)
         return response.data != []
 
     def fetch_invitation(self, subscription: BrainSubscription):
