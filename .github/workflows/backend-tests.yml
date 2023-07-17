@@ -4,17 +4,17 @@ on:
   push:
     branches: [ main ]
     paths:
-      - 'backend/**'
+      - 'backend/core/**'
   pull_request:
     branches: [ main ] 
     paths:
-      - 'backend/**'  
+      - 'backend/core/**'  
 jobs:
   build:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: ./backend
+        working-directory: ./backend/core
     environment: preview
     strategy:
       matrix:

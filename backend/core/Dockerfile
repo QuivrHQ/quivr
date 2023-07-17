@@ -5,14 +5,14 @@ RUN apt-get update && apt-get install -y libgeos-dev pandoc
 
 WORKDIR /code
 
-COPY ./requirements.txt /code/requirements.txt
+COPY ./core/requirements.txt /code/requirements.txt
 
 RUN pip install --no-cache-dir -r /code/requirements.txt --timeout 100
 
-#You may need to run `chmod +x ./backend/scripts/start.sh` on your host machine if you get a permission error
-COPY ./scripts/start.sh /code/scripts/start.sh
+#You may need to run `chmod +x ./backend/core/scripts/start.sh` on your host machine if you get a permission error
+COPY ./core/scripts/start.sh /code/scripts/start.sh
 RUN chmod +x /code/scripts/start.sh
 
-COPY . /code/
+COPY ./core /code/
 
 ENTRYPOINT ["bash", "/code/scripts/start.sh"]

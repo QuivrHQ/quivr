@@ -40,7 +40,7 @@
     "**/.next/": true,
     "**/build/": true,
     "**/.docusaurus/": true,
-    "**/node_modules/": true,
+    "**/node_modules/": true
   },
   "python.linting.pycodestyleCategorySeverity.W": "Error",
   "python.defaultInterpreterPath": "python3",
