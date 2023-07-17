@@ -70,7 +70,7 @@ describe("useBrainApi", () => {
     await deleteBrain(id);
 
     expect(axiosDeleteMock).toHaveBeenCalledTimes(1);
-    expect(axiosDeleteMock).toHaveBeenCalledWith(`/brains/${id}/`);
+    expect(axiosDeleteMock).toHaveBeenCalledWith(`/brain/${id}/subscription`);
   });
 
   it("should call getDefaultBrain with the correct parameters", async () => {

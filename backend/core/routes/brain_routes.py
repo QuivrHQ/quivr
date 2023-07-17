@@ -10,6 +10,7 @@ from models.brains import (
 )
 from models.settings import common_dependencies
 from models.users import User
+
 from routes.authorizations.brain_authorization import has_brain_authorization
 
 logger = get_logger(__name__)
@@ -87,25 +88,6 @@ async def get_brain_endpoint(
             status_code=404,
             detail="Brain not found",
         )
-
-
-# delete one brain
-@brain_router.delete(
-    "/brains/{brain_id}/",
-    dependencies=[Depends(AuthBearer()), Depends(has_brain_authorization())],
-    tags=["Brain"],
-)
-async def delete_brain_endpoint(
-    brain_id: UUID,
-    current_user: User = Depends(get_current_user),
-):
-    """
-    Delete a specific brain by brain ID.
-    """
-    brain = Brain(id=brain_id)
-    brain.delete_brain(current_user.id)
-
-    return {"message": f"{brain_id}  has been deleted."}
 
 
 # create new brain
