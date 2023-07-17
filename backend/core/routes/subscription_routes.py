@@ -1,11 +1,16 @@
 from typing import List
 from uuid import UUID
 
-from auth.auth_bearer import get_current_user
+from auth.auth_bearer import AuthBearer, get_current_user
 from fastapi import APIRouter, Depends, HTTPException
 from models.brains import Brain
 from models.brains_subscription_invitations import BrainSubscription
 from models.users import User
+from repository.user.get_user_email_by_user_id import get_user_email_by_user_id
+
+from routes.authorizations.brain_authorization import (
+    has_brain_authorization,
+)
 
 subscription_router = APIRouter()
 
@@ -33,6 +38,33 @@ async def invite_user_to_brain(
     return {"message": "Invitations sent successfully"}
 
 
+@subscription_router.get(
+    "/brain/{brain_id}/users",
+    dependencies=[Depends(AuthBearer()), Depends(has_brain_authorization())],
+)
+def get_brain_users(
+    brain_id: UUID,
+):
+    """
+    Get all users for a brain
+    """
+    brain = Brain(
+        id=brain_id,
+    )
+    brain_users = brain.get_brain_users()
+
+    brain_access_list = []
+
+    for brain_user in brain_users:
+        brain_access = {}
+        # TODO: find a way to fetch user email concurrently
+        brain_access["email"] = get_user_email_by_user_id(brain_user["user_id"])
+        brain_access["rights"] = brain_user["rights"]
+        brain_access_list.append(brain_access)
+
+    return brain_access_list
+
+
 @subscription_router.delete(
     "/brain/{brain_id}/subscription",
 )
@@ -55,10 +87,10 @@ async def remove_user_subscription(
     if user_brain.get("rights") != "Owner":
         brain.delete_user_from_brain(current_user.id)
     else:
-        brain_other_users = brain.get_brain_users()
+        brain_users = brain.get_brain_users()
         brain_other_owners = [
             brain
-            for brain in brain_other_users
+            for brain in brain_users
             if brain["rights"] == "Owner"
             and str(brain["user_id"]) != str(current_user.id)
         ]
