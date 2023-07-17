@@ -1,10 +1,9 @@
-import os
 from typing import Optional
 from uuid import UUID
 
 import resend
 from logger import get_logger
-from models.settings import CommonsDep, common_dependencies
+from models.settings import BrainSettings, CommonsDep, common_dependencies
 from pydantic import BaseModel
 
 logger = get_logger(__name__)
@@ -74,7 +73,8 @@ class BrainSubscription(BaseModel):
         return f"{base_url}?brain_subscription_invitation={self.brain_id}"
 
     def resend_invitation_email(self):
-        resend.api_key = os.getenv("RESEND_API_KEY")
+        brains_settings = BrainSettings()  # pyright: ignore reportPrivateUsage=none
+        resend.api_key = brains_settings.resend_api_key
 
         brain_url = self.get_brain_url()
 
@@ -86,7 +86,7 @@ class BrainSubscription(BaseModel):
         try:
             r = resend.Emails.send(
                 {
-                    "from": "onboarding@resend.dev",
+                    "from": brains_settings.resend_email_address,
                     "to": self.email,
                     "subject": "Quivr - Brain Shared With You",
                     "html": html_body,
