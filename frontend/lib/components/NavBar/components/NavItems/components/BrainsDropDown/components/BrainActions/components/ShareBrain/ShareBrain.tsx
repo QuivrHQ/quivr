@@ -29,6 +29,8 @@ export const ShareBrain = ({ brainId }: ShareBrainModalProps): JSX.Element => {
     setIsShareModalOpen,
     isShareModalOpen,
     brainUsers,
+    fetchBrainUsers,
+    isFetchingBrainUsers,
   } = useShareBrain(brainId);
 
   const canAddNewRow =
@@ -103,13 +105,19 @@ export const ShareBrain = ({ brainId }: ShareBrainModalProps): JSX.Element => {
       </form>
       <div className="bg-gray-100 h-0.5 mb-5 border-gray-200 dark:border-gray-700" />
       <p className="text-lg font-bold">Users with access</p>
-      {brainUsers.map((subscription) => (
-        <BrainUser
-          key={subscription.email}
-          email={subscription.email}
-          rights={subscription.rights}
-        />
-      ))}
+      {isFetchingBrainUsers ? (
+        <p className="text-gray-500">Loading...</p>
+      ) : (
+        brainUsers.map((subscription) => (
+          <BrainUser
+            key={subscription.email}
+            email={subscription.email}
+            rights={subscription.rights}
+            brainId={brainId}
+            fetchBrainUsers={fetchBrainUsers}
+          />
+        ))
+      )}
     </Modal>
   );
 };
