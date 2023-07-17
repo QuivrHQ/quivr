@@ -18,7 +18,7 @@ import { Brain } from "../types";
 export const useBrainProvider = () => {
   const { publish } = useToast();
   const { track } = useEventTracking();
-  const { createBrain, deleteBrain, getBrains, getDefaultBrain } =
+  const { createBrain, deleteBrain, getBrains, getDefaultBrain, getBrain } =
     useBrainApi();
 
   const [allBrains, setAllBrains] = useState<Brain[]>([]);
@@ -41,6 +41,28 @@ export const useBrainProvider = () => {
       publish({
         variant: "danger",
         text: "Error occurred while creating a brain",
+      });
+    }
+  };
+
+  const addBrain = async (id: UUID): Promise<void> => {
+    const brain = await getBrain(id);
+    if (brain === undefined) {
+      publish({
+        variant: "danger",
+        text: "Error occurred while adding a brain",
+      });
+
+      return;
+    }
+    try {
+      setAllBrains((prevBrains) => [...prevBrains, brain]);
+      saveBrainInLocalStorage(brain);
+      void track("BRAIN_ADDED");
+    } catch {
+      publish({
+        variant: "danger",
+        text: "Error occurred while adding a brain",
       });
     }
   };
@@ -102,6 +124,7 @@ export const useBrainProvider = () => {
     allBrains,
     createBrain: createBrainHandler,
     deleteBrain: deleteBrainHandler,
+    addBrain,
     setActiveBrain,
     fetchAllBrains,
     setDefaultBrain,
