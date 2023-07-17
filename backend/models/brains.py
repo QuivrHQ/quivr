@@ -123,6 +123,10 @@ class Brain(BaseModel):
             commons["supabase"].table("brains").insert({"name": self.name}).execute()
         )
 
+        res = commons["db"].insert("brains", {"name": self.name})
+
+        print(res.data[0]["brain_id"])
+
         self.id = response.data[0]["brain_id"]
         return response.data
 

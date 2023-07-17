@@ -1,4 +1,5 @@
 from typing import Annotated
+from models.databases.postgres import PostgresDB
 
 from fastapi import Depends
 from langchain.embeddings.openai import OpenAIEmbeddings
@@ -36,12 +37,20 @@ def common_dependencies() -> dict:
     summaries_vector_store = SupabaseVectorStore(
         supabase_client, embeddings, table_name="summaries"
     )
-    engine = create_engine(settings.database_url)
-    Session = sessionmaker(bind=engine)
+
+    db = None
+    # create db equals to session if database_url is of postgresql format
+    if settings.database_url.startswith("postgresql"):
+        engine = create_engine(settings.database_url)
+        Session = sessionmaker(bind=engine)
+        session = Session()
+        db = PostgresDB(session)
+    else:
+        db = supabase_client
 
     return {
         "supabase": supabase_client,
-        "neon": Session,
+        "db": db,
         "embeddings": embeddings,
         "documents_vector_store": documents_vector_store,
         "summaries_vector_store": summaries_vector_store,
