@@ -8,12 +8,14 @@ import { BrainRoleType } from "../../../types";
 import { availableRoles } from "../types";
 
 type BrainUserProps = {
-  id: string;
   email: string;
-  role: BrainRoleType;
+  rights: BrainRoleType;
 };
 
-export const BrainUser = ({ email, role }: BrainUserProps): JSX.Element => {
+export const BrainUser = ({
+  email,
+  rights: role,
+}: BrainUserProps): JSX.Element => {
   const [selectedRole, setSelectedRole] = useState<BrainRoleType>(role);
 
   const updateSelectedRole = (newRole: BrainRoleType) => {

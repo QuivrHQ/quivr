@@ -103,12 +103,11 @@ export const ShareBrain = ({ brainId }: ShareBrainModalProps): JSX.Element => {
       </form>
       <div className="bg-gray-100 h-0.5 mb-5 border-gray-200 dark:border-gray-700" />
       <p className="text-lg font-bold">Users with access</p>
-      {brainUsers.map((roleAssignation) => (
+      {brainUsers.map((subscription) => (
         <BrainUser
-          key={roleAssignation.id}
-          id={roleAssignation.id}
-          email={roleAssignation.email}
-          role={roleAssignation.role}
+          key={subscription.email}
+          email={subscription.email}
+          rights={subscription.rights}
         />
       ))}
     </Modal>

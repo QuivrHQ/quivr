@@ -6,6 +6,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from models.brains import Brain
 from models.brains_subscription_invitations import BrainSubscription
 from models.users import User
+from repository.user.get_user_email_by_user_id import get_user_email_by_user_id
 
 from routes.authorizations.brain_authorization import (
     has_brain_authorization,
@@ -41,9 +42,11 @@ async def invite_user_to_brain(
     "/brain/{brain_id}/users",
     dependencies=[Depends(AuthBearer()), Depends(has_brain_authorization())],
 )
-def get_brain_users(brain_id: UUID, current_user: User = Depends(get_current_user)):
+def get_brain_users(
+    brain_id: UUID,
+):
     """
-    Get all users for a brain excluding the current user
+    Get all users for a brain
     """
     brain = Brain(
         id=brain_id,
@@ -54,18 +57,12 @@ def get_brain_users(brain_id: UUID, current_user: User = Depends(get_current_use
 
     for brain_user in brain_users:
         brain_access = {}
-        brain_access["email"] = brain_user["user_id"]
+        # TODO: find a way to fetch user email concurrently
+        brain_access["email"] = get_user_email_by_user_id(brain_user["user_id"])
         brain_access["rights"] = brain_user["rights"]
-        brain_access["id"] = brain_user["id"]
         brain_access_list.append(brain_access)
 
-    filtered_brain_access_list = [
-        brain_access
-        for brain_access in brain_access_list
-        if str(brain_access["email"]) != str(current_user.email)
-    ]
-
-    return filtered_brain_access_list
+    return brain_access_list
 
 
 @subscription_router.delete(

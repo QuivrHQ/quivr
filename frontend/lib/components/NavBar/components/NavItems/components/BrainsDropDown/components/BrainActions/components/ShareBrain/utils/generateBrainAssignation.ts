@@ -3,7 +3,7 @@ import { BrainRoleAssignation } from "../../../types";
 export const generateBrainAssignation = (): BrainRoleAssignation => {
   return {
     email: "",
-    role: "viewer",
+    rights: "viewer",
     id: Math.random().toString(),
   };
 };
