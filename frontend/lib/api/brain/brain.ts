@@ -78,3 +78,19 @@ export const getBrainUsers = async (
   return (await axiosInstance.get<Subscription[]>(`/brains/${brainId}/users`))
     .data;
 };
+
+export type SubscriptionUpdatableProperties = {
+  rights: BrainRoleType | null;
+};
+
+export const updateBrainAccess = async (
+  brainId: string,
+  userEmail: string,
+  subscription: SubscriptionUpdatableProperties,
+  axiosInstance: AxiosInstance
+): Promise<void> => {
+  await axiosInstance.put(`/brains/${brainId}/subscription`, {
+    ...subscription,
+    email: userEmail,
+  });
+};
