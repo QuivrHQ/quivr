@@ -155,19 +155,19 @@ async def accept_invitation(brain_id: UUID, current_user: User = Depends(get_cur
 
     if not invitation:
         raise HTTPException(status_code=404, detail="Invitation not found")
-    
-    try:
-        subscription_service.remove_invitation(subscription)
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=f"Error removing invitation: {e}")
 
     try:
         brain = Brain(id=brain_id)
         brain.create_brain_user(
-            user_id=current_user.id, rights=invitation['rights'], default_brain=True
+            user_id=current_user.id, rights=invitation['rights'], default_brain=False
         )
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"Error adding user to brain: {e}")
+
+    try:
+        subscription_service.remove_invitation(subscription)
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Error removing invitation: {e}")
 
     return {"message": "Invitation accepted successfully"}
 
