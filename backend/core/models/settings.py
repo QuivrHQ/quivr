@@ -12,6 +12,8 @@ class BrainSettings(BaseSettings):
     anthropic_api_key: str
     supabase_url: str
     supabase_service_key: str
+    resend_api_key: str
+    resend_email_address: str = "onboarding@resend.dev"
 
 
 class LLMSettings(BaseSettings):
