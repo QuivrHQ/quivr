@@ -40,7 +40,7 @@ export const deleteBrain = async (
   brainId: string,
   axiosInstance: AxiosInstance
 ): Promise<void> => {
-  await axiosInstance.delete(`/brains/${brainId}/`);
+  await axiosInstance.delete(`/brain/${brainId}/subscription`);
 };
 
 export const getDefaultBrain = async (
