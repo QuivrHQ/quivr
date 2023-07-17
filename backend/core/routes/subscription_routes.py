@@ -7,28 +7,30 @@ from fastapi import APIRouter, Depends, HTTPException
 from models.brains import Brain
 from models.brains_subscription_invitations import BrainSubscription
 from models.users import User
-from repository.brain_subscription.email_service import EmailService
+from repository.brain_subscription.resend_invitation_email import \
+    resend_invitation_email
 from repository.brain_subscription.subscription_invitation_service import \
     SubscriptionInvitationService
 from repository.user.get_user_email_by_user_id import get_user_email_by_user_id
 from routes.authorizations.brain_authorization import has_brain_authorization
+from routes.headers.get_origin_header import get_origin_header
 
 subscription_router = APIRouter()
 subscription_service = SubscriptionInvitationService()
-email_service = EmailService()
 
 
 @subscription_router.post(
     "/brains/{brain_id}/subscription",
     dependencies=[
         Depends(
-            AuthBearer(),
+            AuthBearer(),      
         ),
         Depends(has_brain_authorization),
+        Depends(get_origin_header),
     ],
     tags=["BrainSubscription"],
 )
-def invite_users_to_brain(brain_id: UUID, users: List[dict], current_user: User = Depends(get_current_user)):
+def invite_users_to_brain(brain_id: UUID, users: List[dict], origin: str = Depends(get_origin_header), current_user: User = Depends(get_current_user)):
     """
     Invite multiple users to a brain by their emails. This function creates
     or updates a brain subscription invitation for each user and sends an
@@ -40,7 +42,7 @@ def invite_users_to_brain(brain_id: UUID, users: List[dict], current_user: User 
         
         try:
             subscription_service.create_or_update_subscription_invitation(subscription)
-            email_service.resend_invitation_email(subscription, inviter_email=current_user.email or "Quivr")
+            resend_invitation_email(subscription, inviter_email=current_user.email or "Quivr", origin=origin)
         except Exception as e:
             raise HTTPException(status_code=400, detail=f"Error inviting user: {e}")
 
@@ -48,7 +50,7 @@ def invite_users_to_brain(brain_id: UUID, users: List[dict], current_user: User 
 
 
 @subscription_router.get(
-    "/brain/{brain_id}/users",
+    "/brains/{brain_id}/users",
     dependencies=[Depends(AuthBearer()), Depends(has_brain_authorization())],
 )
 def get_brain_users(
@@ -75,7 +77,7 @@ def get_brain_users(
 
 
 @subscription_router.delete(
-    "/brain/{brain_id}/subscription",
+    "/brains/{brain_id}/subscription",
 )
 async def remove_user_subscription(
     brain_id: UUID, current_user: User = Depends(get_current_user)

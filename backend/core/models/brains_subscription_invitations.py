@@ -65,8 +65,3 @@ class BrainSubscription(BaseModel):
             response = self.create_subscription_invitation()
 
         return response
-
-    def get_brain_url(self) -> str:
-        """Generates the brain URL based on the brain_id."""
-        base_url = "https://www.quivr.app/chat"
-        return f"{base_url}?brain_subscription_invitation={self.brain_id}"
