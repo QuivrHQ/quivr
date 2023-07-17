@@ -5,6 +5,8 @@ from langchain.embeddings.openai import OpenAIEmbeddings
 from pydantic import BaseSettings
 from supabase.client import Client, create_client
 from vectorstore.supabase import SupabaseVectorStore
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
 
 
 class BrainSettings(BaseSettings):
@@ -12,6 +14,7 @@ class BrainSettings(BaseSettings):
     anthropic_api_key: str
     supabase_url: str
     supabase_service_key: str
+    database_url: str
 
 
 class LLMSettings(BaseSettings):
@@ -33,9 +36,12 @@ def common_dependencies() -> dict:
     summaries_vector_store = SupabaseVectorStore(
         supabase_client, embeddings, table_name="summaries"
     )
+    engine = create_engine(settings.database_url)
+    Session = sessionmaker(bind=engine)
 
     return {
         "supabase": supabase_client,
+        "neon": Session,
         "embeddings": embeddings,
         "documents_vector_store": documents_vector_store,
         "summaries_vector_store": summaries_vector_store,
