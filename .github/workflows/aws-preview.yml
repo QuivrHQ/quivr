@@ -4,7 +4,7 @@ on:
   push:
     branches: [ "main" ]
     paths:
-      - 'backend/**'
+      - 'backend/core/**'
 
 env:
   AWS_REGION: eu-west-3                 # set this to your preferred AWS region, e.g. us-west-1
@@ -25,7 +25,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: ./backend
+        working-directory: ./backend/core
     environment: production
 
     steps:

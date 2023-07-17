@@ -28,13 +28,19 @@ class BrainSubscription(BaseModel):
         response = (
             self.commons["supabase"]
             .table("brain_subscription_invitations")
-            .insert({"brain_id": str(self.brain_id), "email": self.email, "rights": self.rights})
+            .insert(
+                {
+                    "brain_id": str(self.brain_id),
+                    "email": self.email,
+                    "rights": self.rights,
+                }
+            )
             .execute()
         )
         return response.data
 
     def update_subscription_invitation(self):
-        logger.info('Updating subscription invitation')
+        logger.info("Updating subscription invitation")
         response = (
             self.commons["supabase"]
             .table("brain_subscription_invitations")
@@ -46,12 +52,19 @@ class BrainSubscription(BaseModel):
         return response.data
 
     def create_or_update_subscription_invitation(self):
-        response = self.commons["supabase"].table("brain_subscription_invitations").select("*").eq("brain_id", str(self.brain_id)).eq("email", self.email).execute()
+        response = (
+            self.commons["supabase"]
+            .table("brain_subscription_invitations")
+            .select("*")
+            .eq("brain_id", str(self.brain_id))
+            .eq("email", self.email)
+            .execute()
+        )
 
         if response.data:
             response = self.update_subscription_invitation()
         else:
-           response = self.create_subscription_invitation()
+            response = self.create_subscription_invitation()
 
         return response
 
@@ -71,13 +84,15 @@ class BrainSubscription(BaseModel):
         """
 
         try:
-            r = resend.Emails.send({
-                "from": "onboarding@resend.dev",
-                "to": self.email,
-                "subject": "Quivr - Brain Shared With You",
-                "html": html_body
-            })
-            print('Resend response', r)
+            r = resend.Emails.send(
+                {
+                    "from": "onboarding@resend.dev",
+                    "to": self.email,
+                    "subject": "Quivr - Brain Shared With You",
+                    "html": html_body,
+                }
+            )
+            print("Resend response", r)
         except Exception as e:
             logger.error(f"Error sending email: {e}")
             return

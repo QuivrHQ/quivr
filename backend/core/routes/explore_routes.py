@@ -5,7 +5,6 @@ from fastapi import APIRouter, Depends, Query
 from models.brains import Brain
 from models.settings import common_dependencies
 from models.users import User
-
 from routes.authorizations.brain_authorization import (
     has_brain_authorization,
     validate_brain_authorization,

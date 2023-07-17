@@ -21,8 +21,8 @@ replace_in_file() {
 }
 
 # Step 2: Copy the .XXXXX_env files if they don't exist
-if [ ! -f backend/.env ]; then
-    echo "Copying backend .env example file..."
+if [ ! -f backend/core/.env ]; then
+    echo "Copying backend-core .env example file..."
     cp .backend_env.example backend/.env
 fi
 
@@ -34,29 +34,29 @@ fi
 # Step 3: Ask the user for environment variables and update .env files
 # only if they haven't been set.
 
-# Update backend/.env
-if grep -q "SUPABASE_URL=<change-me>" backend/.env; then
+# Update backend/core/.env
+if grep -q "SUPABASE_URL=<change-me>" backend/core/.env; then
     echo "SUPABASE_URL can be found in your Supabase dashboard under Settings > API."
-    SUPABASE_URL=$(gum input --placeholder "Enter SUPABASE_URL for backend")
-    replace_in_file backend/.env "SUPABASE_URL=.*" "SUPABASE_URL=${SUPABASE_URL}"
+    SUPABASE_URL=$(gum input --placeholder "Enter SUPABASE_URL for backend/core")
+    replace_in_file backend/core/.env "SUPABASE_URL=.*" "SUPABASE_URL=${SUPABASE_URL}"
 fi
 
-if grep -q "SUPABASE_SERVICE_KEY=<change-me>" backend/.env; then
+if grep -q "SUPABASE_SERVICE_KEY=<change-me>" backend/core/.env; then
     echo "SUPABASE_SERVICE_KEY can be found in your Supabase dashboard under Settings > API. Use the anon public key found in the Project API keys section."
-    SUPABASE_SERVICE_KEY=$(gum input --placeholder "Enter SUPABASE_SERVICE_KEY for backend")
-    replace_in_file backend/.env "SUPABASE_SERVICE_KEY=.*" "SUPABASE_SERVICE_KEY=${SUPABASE_SERVICE_KEY}"
+    SUPABASE_SERVICE_KEY=$(gum input --placeholder "Enter SUPABASE_SERVICE_KEY for backend/core")
+    replace_in_file backend/core/.env "SUPABASE_SERVICE_KEY=.*" "SUPABASE_SERVICE_KEY=${SUPABASE_SERVICE_KEY}"
 fi
 
-if grep -q "OPENAI_API_KEY=<change-me>" backend/.env; then
+if grep -q "OPENAI_API_KEY=<change-me>" backend/core/.env; then
     echo "OPENAI_API_KEY is the API key from OpenAI, if you are using OpenAI services."
-    OPENAI_API_KEY=$(gum input --placeholder "Enter OPENAI_API_KEY for backend")
-    replace_in_file backend/.env "OPENAI_API_KEY=.*" "OPENAI_API_KEY=${OPENAI_API_KEY}"
+    OPENAI_API_KEY=$(gum input --placeholder "Enter OPENAI_API_KEY for backend/core")
+    replace_in_file backend/core/.env "OPENAI_API_KEY=.*" "OPENAI_API_KEY=${OPENAI_API_KEY}"
 fi
 
-if grep -q "JWT_SECRET_KEY=<change-me>" backend/.env; then
+if grep -q "JWT_SECRET_KEY=<change-me>" backend/core/.env; then
     echo "JWT_SECRET_KEY can be found in your Supabase project dashboard under Settings > API > JWT Settings > JWT Secret."
-    JWT_SECRET_KEY=$(gum input --placeholder "Enter JWT_SECRET_KEY for backend")
-    replace_in_file backend/.env "JWT_SECRET_KEY=.*" "JWT_SECRET_KEY=${JWT_SECRET_KEY}"
+    JWT_SECRET_KEY=$(gum input --placeholder "Enter JWT_SECRET_KEY for backend/core")
+    replace_in_file backend/core/.env "JWT_SECRET_KEY=.*" "JWT_SECRET_KEY=${JWT_SECRET_KEY}"
 fi
 
 # Update frontend/.env using the same SUPABASE_URL and SUPABASE_SERVICE_KEY
