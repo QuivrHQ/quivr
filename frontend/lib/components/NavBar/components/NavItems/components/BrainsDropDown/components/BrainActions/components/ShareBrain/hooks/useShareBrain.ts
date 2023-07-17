@@ -1,5 +1,5 @@
 /* eslint-disable max-lines */
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { useBrainApi } from "@/lib/api/brain/useBrainApi";
 import { useToast } from "@/lib/hooks";
@@ -9,16 +9,18 @@ import { generateBrainAssignation } from "../utils/generateBrainAssignation";
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const useShareBrain = (brainId: string) => {
-  const baseUrl = window.location.origin;
-  const { publish } = useToast();
-  const { addBrainSubscriptions } = useBrainApi();
-  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
-
-  const brainShareLink = `${baseUrl}/brain_subscription_invitation=${brainId}`;
+  const [brainUsers, setBrainUsers] = useState<BrainRoleAssignation[]>([]);
   const [sendingInvitation, setSendingInvitation] = useState(false);
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [roleAssignations, setRoleAssignation] = useState<
     BrainRoleAssignation[]
   >([generateBrainAssignation()]);
+
+  const baseUrl = window.location.origin;
+  const brainShareLink = `${baseUrl}/brain_subscription_invitation=${brainId}`;
+
+  const { publish } = useToast();
+  const { addBrainSubscriptions, getBrainUsers } = useBrainApi();
 
   const handleCopyInvitationLink = async () => {
     await navigator.clipboard.writeText(brainShareLink);
@@ -88,6 +90,15 @@ export const useShareBrain = (brainId: string) => {
     setRoleAssignation([...roleAssignations, generateBrainAssignation()]);
   };
 
+  useEffect(() => {
+    const fetchBrainUsers = async () => {
+      const users = await getBrainUsers(brainId);
+      setBrainUsers(users);
+    };
+
+    void fetchBrainUsers();
+  }, []);
+
   return {
     roleAssignations,
     brainShareLink,
@@ -99,5 +110,6 @@ export const useShareBrain = (brainId: string) => {
     sendingInvitation,
     setIsShareModalOpen,
     isShareModalOpen,
+    brainUsers,
   };
 };
