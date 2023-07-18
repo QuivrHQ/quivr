@@ -8,13 +8,13 @@ RUN apt-get update && apt-get install -y liblzma-dev cmake git
 WORKDIR /app
 
 # Copy the requirements file
-COPY ./private/requirements.txt /app/requirements.txt
+COPY ./requirements.txt /app/requirements.txt
 
 # Install Python dependencies
 RUN pip install --no-cache-dir -r /app/requirements.txt --timeout 100
 
 # Copy your application's code to the Docker container
-COPY ./private /app
+COPY . /app
 
 # Start the Uvicorn server on port 5051
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "5051"]
