@@ -90,7 +90,6 @@ export const ShareBrain = ({ brainId }: ShareBrainModalProps): JSX.Element => {
             className="my-5"
             onClick={addNewRoleAssignationRole}
             disabled={sendingInvitation || !canAddNewRow}
-            isLoading={sendingInvitation}
             data-testid="add-new-row-role-button"
           >
             <ImUserPlus />
@@ -98,7 +97,11 @@ export const ShareBrain = ({ brainId }: ShareBrainModalProps): JSX.Element => {
         </div>
 
         <div className="mb-3 flex flex-row justify-end">
-          <Button disabled={roleAssignations.length === 0} type="submit">
+          <Button
+            isLoading={sendingInvitation}
+            disabled={roleAssignations.length === 0}
+            type="submit"
+          >
             Share
           </Button>
         </div>

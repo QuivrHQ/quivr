@@ -80,6 +80,7 @@ export const useShareBrain = (brainId: string) => {
       });
 
       setIsShareModalOpen(false);
+      setRoleAssignation([generateBrainAssignation()]);
     } catch (error) {
       publish({
         variant: "danger",
