@@ -25,7 +25,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: ./backend/core
+        working-directory: ./backend
     environment: production
 
     steps:
