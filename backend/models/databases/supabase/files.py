@@ -1,7 +1,7 @@
-from models.databases.database import Database
+from models.databases.repository import Repository
 
 
-class File(Database):
+class File(Repository):
     def __init__(self, supabase_client):
         super().__init__(supabase_client)
 

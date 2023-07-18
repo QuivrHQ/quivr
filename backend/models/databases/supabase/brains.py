@@ -1,12 +1,12 @@
 from uuid import UUID
-from models.databases.database import Database
+from models.databases.repository import Repository
 
 from logger import get_logger
 
 logger = get_logger(__name__)
 
 
-class Brain(Database):
+class Brain(Repository):
     def __init__(self, supabase_client):
         super().__init__(supabase_client)
         

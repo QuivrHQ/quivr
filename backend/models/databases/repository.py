@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from uuid import UUID
 
 
-class Database(ABC):
+class Repository(ABC):
     @abstractmethod
     def get_user_brains(self, user_id):
         pass

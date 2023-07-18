@@ -1,4 +1,4 @@
-from models.databases.database import Database
+from models.databases.database import Repository
 import models.sqlalchemy_repository as repo
 from sqlalchemy.orm import class_mapper
 
@@ -26,7 +26,7 @@ class Response:
         self.data = data
 
 
-class PostgresDB(Database):
+class PostgresDB(Repository):
     def __init__(self, session):
         self.session = session
 
