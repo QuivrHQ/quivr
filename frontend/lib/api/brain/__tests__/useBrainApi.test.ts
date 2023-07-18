@@ -2,6 +2,7 @@
 import { renderHook } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
+import { Subscription, SubscriptionUpdatableProperties } from "../brain";
 import { useBrainApi } from "../useBrainApi";
 
 const axiosGetMock = vi.fn(() => ({
@@ -119,10 +120,10 @@ describe("useBrainApi", () => {
       },
     } = renderHook(() => useBrainApi());
     const id = "123";
-    const subscriptions = [
+    const subscriptions: Subscription[] = [
       {
         email: "user@quivr.app",
-        rights: "viewer",
+        rights: "Viewer",
       },
     ];
     await addBrainSubscriptions(id, subscriptions);
@@ -154,8 +155,8 @@ describe("useBrainApi", () => {
     } = renderHook(() => useBrainApi());
     const brainId = "123";
     const email = "456";
-    const subscription = {
-      rights: "viewer",
+    const subscription: SubscriptionUpdatableProperties = {
+      rights: "Viewer",
     };
     await updateBrainAccess(brainId, email, subscription);
     expect(axiosPutMock).toHaveBeenCalledTimes(1);
