@@ -118,7 +118,7 @@ def test_delete_all_brains(client, api_key):
 
         # Send a DELETE request to delete the specific brain
         delete_response = client.delete(
-            f"/brain/{brain_id}/subscription",
+            f"/brains/{brain_id}/subscription",
             headers={"Authorization": "Bearer " + api_key},
         )
 

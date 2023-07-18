@@ -19,7 +19,7 @@ export const useShareBrain = (brainId: string) => {
   >([generateBrainAssignation()]);
 
   const baseUrl = window.location.origin;
-  const brainShareLink = `${baseUrl}/brain_subscription_invitation=${brainId}`;
+  const brainShareLink = `${baseUrl}/invitation/${brainId}`;
 
   const { publish } = useToast();
   const { addBrainSubscriptions, getBrainUsers } = useBrainApi();

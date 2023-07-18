@@ -3,14 +3,10 @@ from uuid import UUID
 from auth import AuthBearer, get_current_user
 from fastapi import APIRouter, Depends, HTTPException
 from logger import get_logger
-from models.brains import (
-    Brain,
-    get_default_user_brain,
-    get_default_user_brain_or_create_new,
-)
+from models.brains import (Brain, get_default_user_brain,
+                           get_default_user_brain_or_create_new)
 from models.settings import common_dependencies
 from models.users import User
-
 from routes.authorizations.brain_authorization import has_brain_authorization
 
 logger = get_logger(__name__)
