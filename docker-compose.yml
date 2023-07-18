@@ -15,8 +15,8 @@ services:
     env_file:
       - ./backend/core/.env
     build:
-      context: backend
-      dockerfile: core/Dockerfile
+      context: backend/core/
+      dockerfile: Dockerfile
     container_name: backend-core
     restart: always
     volumes:
