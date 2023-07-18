@@ -1,16 +1,19 @@
 "use client";
 
 import PageHeading from "@/lib/components/ui/PageHeading";
+import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 import { ChatProvider } from "@/lib/context/ChatProvider";
 
 import { ChatInput, ChatMessages } from "./components";
 
 const SelectedChatPage = (): JSX.Element => {
+  const { currentBrain } = useBrainContext();
+
   return (
     <main className="flex flex-col w-full pt-10" data-testid="chat-page">
       <section className="flex flex-col flex-1 items-center w-full h-full min-h-[70vh]">
         <PageHeading
-          title="Chat with your brain"
+          title={`Chat with ${currentBrain?.name ?? ""}`}
           subtitle="Talk to a language model about your uploaded data"
         />
         <ChatProvider>
