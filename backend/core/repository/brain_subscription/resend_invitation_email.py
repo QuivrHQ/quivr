@@ -1,7 +1,3 @@
-import os
-from typing import Optional
-from uuid import UUID
-
 import resend
 from logger import get_logger
 from models.brains_subscription_invitations import BrainSubscription
@@ -24,7 +20,7 @@ def resend_invitation_email(brain_subscription: BrainSubscription, inviter_email
 
     try:
         r = resend.Emails.send({
-            "from": "onboarding@resend.dev",
+            "from": brains_settings.resend_email_address,
             "to": brain_subscription.email,
             "subject": "Quivr - Brain Shared With You",
             "html": html_body
