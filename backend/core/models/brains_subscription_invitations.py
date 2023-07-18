@@ -10,10 +10,9 @@ logger = get_logger(__name__)
 
 
 class BrainSubscription(BaseModel):
-    brain_id: Optional[UUID] = None
-    inviter_email: Optional[str]
-    email: Optional[str]
-    rights: Optional[str]
+    brain_id: UUID
+    email: str
+    rights: str = "Viewer"
 
     class Config:
         arbitrary_types_allowed = True
@@ -66,35 +65,3 @@ class BrainSubscription(BaseModel):
             response = self.create_subscription_invitation()
 
         return response
-
-    def get_brain_url(self) -> str:
-        """Generates the brain URL based on the brain_id."""
-        base_url = "https://www.quivr.app/chat"
-        return f"{base_url}?brain_subscription_invitation={self.brain_id}"
-
-    def resend_invitation_email(self):
-        brains_settings = BrainSettings()  # pyright: ignore reportPrivateUsage=none
-        resend.api_key = brains_settings.resend_api_key
-
-        brain_url = self.get_brain_url()
-
-        html_body = f"""
-        <p>This brain has been shared with you by {self.inviter_email}.</p>
-        <p><a href='{brain_url}'>Click here</a> to access your brain.</p>
-        """
-
-        try:
-            r = resend.Emails.send(
-                {
-                    "from": brains_settings.resend_email_address,
-                    "to": self.email,
-                    "subject": "Quivr - Brain Shared With You",
-                    "html": html_body,
-                }
-            )
-            print("Resend response", r)
-        except Exception as e:
-            logger.error(f"Error sending email: {e}")
-            return
-
-        return r
