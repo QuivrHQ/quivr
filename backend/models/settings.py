@@ -1,13 +1,11 @@
 from typing import Annotated
-from models.databases.postgres import PostgresDB
+from models.databases.supabase.supabase import SupabaseDB
 
 from fastapi import Depends
 from langchain.embeddings.openai import OpenAIEmbeddings
 from pydantic import BaseSettings
 from supabase.client import Client, create_client
 from vectorstore.supabase import SupabaseVectorStore
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
 
 
 class BrainSettings(BaseSettings):
@@ -39,14 +37,7 @@ def common_dependencies() -> dict:
     )
 
     db = None
-    # create db equals to session if database_url is of postgresql format
-    if settings.database_url.startswith("postgresql"):
-        engine = create_engine(settings.database_url)
-        Session = sessionmaker(bind=engine)
-        session = Session()
-        db = PostgresDB(session)
-    else:
-        db = supabase_client
+    db = SupabaseDB(supabase_client)
 
     return {
         "supabase": supabase_client,
