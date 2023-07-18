@@ -24,36 +24,13 @@ class BrainSubscription(BaseModel):
         return common_dependencies()
 
     def create_subscription_invitation(self):
-        logger.info("Creating subscription invitation")
-        response = (
-            self.commons["supabase"]
-            .table("brain_subscription_invitations")
-            .insert({"brain_id": str(self.brain_id), "email": self.email, "rights": self.rights})
-            .execute()
-        )
-        return response.data
+        return self.commons["db"].create_subscription_invitation(self.brain_id, self.email, self.rights)
 
     def update_subscription_invitation(self):
-        logger.info('Updating subscription invitation')
-        response = (
-            self.commons["supabase"]
-            .table("brain_subscription_invitations")
-            .update({"rights": self.rights})
-            .eq("brain_id", str(self.brain_id))
-            .eq("email", self.email)
-            .execute()
-        )
-        return response.data
+        return self.commons["db"].update_subscription_invitation(self.brain_id, self.email, self.rights)
 
     def create_or_update_subscription_invitation(self):
-        response = self.commons["supabase"].table("brain_subscription_invitations").select("*").eq("brain_id", str(self.brain_id)).eq("email", self.email).execute()
-
-        if response.data:
-            response = self.update_subscription_invitation()
-        else:
-           response = self.create_subscription_invitation()
-
-        return response
+        return self.commons["db"].create_or_update_subscription_invitation(self.brain_id, self.email)
 
     def get_brain_url(self) -> str:
         """Generates the brain URL based on the brain_id."""
