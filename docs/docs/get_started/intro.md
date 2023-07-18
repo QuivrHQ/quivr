@@ -81,7 +81,7 @@ cp .backend_env.example backend/core/.env
 cp .frontend_env.example frontend/.env
 ```
 
-- **Step 3**: Update the `backend/core/.env` and `frontend/.env` file
+- **Step 3**: Update the `backend/.env` and `frontend/.env` file
 
 > _Your `supabase_service_key` can be found in your Supabase dashboard under Project Settings -> API. Use the `anon` `public` key found in the `Project API keys` section._
 
@@ -94,9 +94,21 @@ cp .frontend_env.example frontend/.env
 - [ ] Change variables in `backend/core/.env`
 - [ ] Change variables in `frontend/.env`
 
-- **Step 4**: Run the following migration scripts on the Supabase database via the web interface (SQL Editor -> `New query`)
+- **Step 4**: Create your database tables and functions with one of these two options:
+  a. Run the following migration scripts on the Supabase database via the web interface (SQL Editor -> `New query`)
 
 [Creation Script 1](https://github.com/stangirard/quivr/scripts/tables.sql)
+
+b. Use the `migration.sh` script to run the migration scripts
+
+    ```bash
+    chmod +x migration.sh
+    ./migration.sh
+    ```
+
+    Choose either create_scripts if it's your first time or migrations if you are updating your database.
+
+All the scripts can be found in the [scripts](scripts/) folder
 
 > _If you come from an old version of Quivr, run the scripts in [migration script](https://github.com/stangirard/quivr/scripts/) to migrate your data to the new version in the order of date_
 
@@ -108,7 +120,11 @@ docker compose -f docker-compose.yml up --build
 
 - **Step 6**: Navigate to `localhost:3000` in your browser
 
-- ** Step 7**: Want to contribute to the project?
+<<<<<<< HEAD
+
+- # ** Step 7**: Want to contribute to the project?
+- **Step 7**: Want to contribute to the project?
+  > > > > > > > 45b1978 (📝 add migrations script to get_started doc)
 
 ```
 docker compose -f docker-compose.dev.yml up --build
