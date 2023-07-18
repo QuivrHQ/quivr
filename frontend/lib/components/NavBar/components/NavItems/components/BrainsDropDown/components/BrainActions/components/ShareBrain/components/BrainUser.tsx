@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { MdOutlineRemoveCircle } from "react-icons/md";
+import { MdOutlineRemoveCircle, MdOutlineTimelapse } from "react-icons/md";
 
 import { useBrainApi } from "@/lib/api/brain/useBrainApi";
 import Field from "@/lib/components/ui/Field";
@@ -25,6 +25,7 @@ export const BrainUser = ({
   const { updateBrainAccess } = useBrainApi();
   const { publish } = useToast();
   const [selectedRole, setSelectedRole] = useState<BrainRoleType>(role);
+  const [isRemovingAccess, setIsRemovingAccess] = useState(false);
 
   const updateSelectedRole = async (newRole: BrainRoleType) => {
     setSelectedRole(newRole);
@@ -35,12 +36,22 @@ export const BrainUser = ({
     void fetchBrainUsers();
   };
 
-  const removeCurrentInvitation = async () => {
-    await updateBrainAccess(brainId, email, {
-      rights: null,
-    });
-    publish({ variant: "success", text: `Removed ${email} from brain` });
-    void fetchBrainUsers();
+  const removeUserAccess = async () => {
+    setIsRemovingAccess(true);
+    try {
+      await updateBrainAccess(brainId, email, {
+        rights: null,
+      });
+      publish({ variant: "success", text: `Removed ${email} from brain` });
+      void fetchBrainUsers();
+    } catch (e) {
+      publish({
+        variant: "danger",
+        text: `Failed to remove ${email} from brain`,
+      });
+    } finally {
+      setIsRemovingAccess(false);
+    }
   };
 
   return (
@@ -48,12 +59,15 @@ export const BrainUser = ({
       data-testid="assignation-row"
       className="flex flex-row align-center my-2 gap-3 items-center"
     >
-      <div
-        className="cursor-pointer"
-        onClick={() => void removeCurrentInvitation()}
-      >
-        <MdOutlineRemoveCircle />
-      </div>
+      {isRemovingAccess ? (
+        <div className="animate-pulse">
+          <MdOutlineTimelapse />
+        </div>
+      ) : (
+        <div className="cursor-pointer" onClick={() => void removeUserAccess()}>
+          <MdOutlineRemoveCircle />
+        </div>
+      )}
       <div className="flex flex-1">
         <Field
           name="email"
