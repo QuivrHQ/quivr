@@ -3,26 +3,26 @@ import { BsCheckCircleFill } from "react-icons/bs";
 
 import Popover from "@/lib/components/ui/Popover";
 
-type SelectOptionProps = {
+type SelectOptionProps<T> = {
   label: string;
-  value: string;
+  value: T;
 };
 
-type SelectProps = {
-  options: SelectOptionProps[];
-  value?: SelectOptionProps["value"];
-  onChange: (option: SelectOptionProps["value"]) => void;
+type SelectProps<T> = {
+  options: SelectOptionProps<T>[];
+  value?: T;
+  onChange: (option: T) => void;
   label?: string;
 };
 
 const selectedStyle = "rounded-lg bg-black text-white";
 
-export const Select = ({
+export const Select = <T extends string | number>({
   onChange,
   options,
   value,
   label,
-}: SelectProps): JSX.Element => {
+}: SelectProps<T>): JSX.Element => {
   const selectedValueLabel = options.find(
     (option) => option.value === value
   )?.label;

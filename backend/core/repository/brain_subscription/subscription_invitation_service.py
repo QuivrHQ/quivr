@@ -1,5 +1,4 @@
 from typing import Optional
-from uuid import UUID
 
 from logger import get_logger
 from models.brains_subscription_invitations import BrainSubscription
@@ -17,13 +16,19 @@ class SubscriptionInvitationService:
         response = (
             self.commons["supabase"]
             .table("brain_subscription_invitations")
-            .insert({"brain_id": str(brain_subscription.brain_id), "email": brain_subscription.email, "rights": brain_subscription.rights})
+            .insert(
+                {
+                    "brain_id": str(brain_subscription.brain_id),
+                    "email": brain_subscription.email,
+                    "rights": brain_subscription.rights,
+                }
+            )
             .execute()
         )
         return response.data
 
     def update_subscription_invitation(self, brain_subscription: BrainSubscription):
-        logger.info('Updating subscription invitation')
+        logger.info("Updating subscription invitation")
         response = (
             self.commons["supabase"]
             .table("brain_subscription_invitations")
@@ -34,19 +39,24 @@ class SubscriptionInvitationService:
         )
         return response.data
 
-    def create_or_update_subscription_invitation(self, brain_subscription: BrainSubscription):
-        response = self.commons["supabase"].table("brain_subscription_invitations").select("*").eq("brain_id", str(brain_subscription.brain_id)).eq("email", brain_subscription.email).execute()
+    def create_or_update_subscription_invitation(
+        self, brain_subscription: BrainSubscription
+    ):
+        response = (
+            self.commons["supabase"]
+            .table("brain_subscription_invitations")
+            .select("*")
+            .eq("brain_id", str(brain_subscription.brain_id))
+            .eq("email", brain_subscription.email)
+            .execute()
+        )
 
         if response.data:
             response = self.update_subscription_invitation(brain_subscription)
         else:
-           response = self.create_subscription_invitation(brain_subscription)
+            response = self.create_subscription_invitation(brain_subscription)
 
         return response
-
-    def check_invitation(self, brain_subscription: BrainSubscription):
-        response = self.commons["supabase"].table("brain_subscription_invitations").select("*").eq("brain_id", str(brain_subscription.brain_id)).eq("email", brain_subscription.email).execute()
-        return response.data != []
 
     def fetch_invitation(self, subscription: BrainSubscription):
         logger.info("Fetching subscription invitation")
@@ -62,9 +72,11 @@ class SubscriptionInvitationService:
             return response.data[0]  # return the first matching invitation
         else:
             return None
-    
+
     def remove_invitation(self, subscription: BrainSubscription):
-        logger.info(f"Removing subscription invitation for email {subscription.email} and brain {subscription.brain_id}")
+        logger.info(
+            f"Removing subscription invitation for email {subscription.email} and brain {subscription.brain_id}"
+        )
         response = (
             self.commons["supabase"]
             .table("brain_subscription_invitations")
@@ -73,6 +85,8 @@ class SubscriptionInvitationService:
             .eq("email", subscription.email)
             .execute()
         )
-        logger.info(f"Removed subscription invitation for email {subscription.email} and brain {subscription.brain_id}")
+        logger.info(
+            f"Removed subscription invitation for email {subscription.email} and brain {subscription.brain_id}"
+        )
         logger.info(response)
         return response.data

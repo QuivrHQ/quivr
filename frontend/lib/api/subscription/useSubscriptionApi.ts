@@ -4,8 +4,8 @@ import { useAxios } from "@/lib/hooks";
 
 import {
   acceptInvitation,
-  checkValidInvitation,
   declineInvitation,
+  getInvitation,
 } from "./subscription";
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
@@ -17,7 +17,7 @@ export const useSubscriptionApi = () => {
       acceptInvitation(brainId, axiosInstance),
     declineInvitation: async (brainId: UUID) =>
       declineInvitation(brainId, axiosInstance),
-    checkValidInvitation: async (brainId: UUID) =>
-      checkValidInvitation(brainId, axiosInstance),
+    getInvitation: async (brainId: UUID) =>
+      getInvitation(brainId, axiosInstance),
   };
 };
