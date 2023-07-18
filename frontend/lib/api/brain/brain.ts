@@ -1,7 +1,7 @@
 import { AxiosInstance } from "axios";
 
 import { BrainRoleType } from "@/lib/components/NavBar/components/NavItems/components/BrainsDropDown/components/BrainActions/types";
-import { Brain } from "@/lib/context/BrainProvider/types";
+import { Brain, MinimalBrainForUser } from "@/lib/context/BrainProvider/types";
 import { Document } from "@/lib/types/Document";
 
 export const getBrainDocuments = async (
@@ -18,9 +18,10 @@ export const getBrainDocuments = async (
 export const createBrain = async (
   name: string,
   axiosInstance: AxiosInstance
-): Promise<Brain> => {
-  const createdBrain = (await axiosInstance.post<Brain>(`/brains/`, { name }))
-    .data;
+): Promise<MinimalBrainForUser> => {
+  const createdBrain = (
+    await axiosInstance.post<MinimalBrainForUser>(`/brains/`, { name })
+  ).data;
 
   return createdBrain;
 };
@@ -45,18 +46,17 @@ export const deleteBrain = async (
 
 export const getDefaultBrain = async (
   axiosInstance: AxiosInstance
-): Promise<Brain | undefined> => {
-  const defaultBrain = (await axiosInstance.get<Brain>(`/brains/default/`))
+): Promise<MinimalBrainForUser | undefined> => {
+  return (await axiosInstance.get<MinimalBrainForUser>(`/brains/default/`))
     .data;
-
-  return { id: defaultBrain.id, name: defaultBrain.name };
 };
 
 export const getBrains = async (
   axiosInstance: AxiosInstance
-): Promise<Brain[]> => {
-  const brains = (await axiosInstance.get<{ brains: Brain[] }>(`/brains/`))
-    .data;
+): Promise<MinimalBrainForUser[]> => {
+  const brains = (
+    await axiosInstance.get<{ brains: MinimalBrainForUser[] }>(`/brains/`)
+  ).data;
 
   return brains.brains;
 };
@@ -77,4 +77,20 @@ export const getBrainUsers = async (
 ): Promise<Subscription[]> => {
   return (await axiosInstance.get<Subscription[]>(`/brains/${brainId}/users`))
     .data;
+};
+
+export type SubscriptionUpdatableProperties = {
+  rights: BrainRoleType | null;
+};
+
+export const updateBrainAccess = async (
+  brainId: string,
+  userEmail: string,
+  subscription: SubscriptionUpdatableProperties,
+  axiosInstance: AxiosInstance
+): Promise<void> => {
+  await axiosInstance.put(`/brains/${brainId}/subscription`, {
+    ...subscription,
+    email: userEmail,
+  });
 };

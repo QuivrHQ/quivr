@@ -12,6 +12,7 @@ import { generateBrainAssignation } from "../utils/generateBrainAssignation";
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const useShareBrain = (brainId: string) => {
   const [brainUsers, setBrainUsers] = useState<Subscription[]>([]);
+  const [isFetchingBrainUsers, setFetchingBrainUsers] = useState(false);
   const [sendingInvitation, setSendingInvitation] = useState(false);
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [roleAssignations, setRoleAssignation] = useState<
@@ -93,12 +94,23 @@ export const useShareBrain = (brainId: string) => {
     setRoleAssignation([...roleAssignations, generateBrainAssignation()]);
   };
 
-  useEffect(() => {
-    const fetchBrainUsers = async () => {
+  const fetchBrainUsers = async () => {
+    // Optimistic update
+    setFetchingBrainUsers(brainUsers.length === 0);
+    try {
       const users = await getBrainUsers(brainId);
       setBrainUsers(users.filter(({ email }) => email !== session?.user.email));
-    };
+    } catch {
+      publish({
+        variant: "danger",
+        text: "An error occurred while fetching brain users",
+      });
+    } finally {
+      setFetchingBrainUsers(false);
+    }
+  };
 
+  useEffect(() => {
     void fetchBrainUsers();
   }, []);
 
@@ -114,5 +126,7 @@ export const useShareBrain = (brainId: string) => {
     setIsShareModalOpen,
     isShareModalOpen,
     brainUsers,
+    fetchBrainUsers,
+    isFetchingBrainUsers,
   };
 };

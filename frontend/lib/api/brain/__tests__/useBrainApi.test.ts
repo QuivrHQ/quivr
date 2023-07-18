@@ -18,6 +18,7 @@ const axiosPostMock = vi.fn(() => ({
 }));
 
 const axiosDeleteMock = vi.fn(() => ({}));
+const axiosPutMock = vi.fn(() => ({}));
 
 vi.mock("@/lib/hooks", () => ({
   useAxios: vi.fn(() => ({
@@ -25,6 +26,7 @@ vi.mock("@/lib/hooks", () => ({
       get: axiosGetMock,
       post: axiosPostMock,
       delete: axiosDeleteMock,
+      put: axiosPutMock,
     },
   })),
 }));
@@ -143,5 +145,23 @@ describe("useBrainApi", () => {
 
     expect(axiosGetMock).toHaveBeenCalledTimes(1);
     expect(axiosGetMock).toHaveBeenCalledWith(`/brains/${id}/users`);
+  });
+  it("should call updateBrainAccess with the correct parameters", async () => {
+    const {
+      result: {
+        current: { updateBrainAccess },
+      },
+    } = renderHook(() => useBrainApi());
+    const brainId = "123";
+    const email = "456";
+    const subscription = {
+      rights: "viewer",
+    };
+    await updateBrainAccess(brainId, email, subscription);
+    expect(axiosPutMock).toHaveBeenCalledTimes(1);
+    expect(axiosPutMock).toHaveBeenCalledWith(
+      `/brains/${brainId}/subscription`,
+      { ...subscription, email }
+    );
   });
 });

@@ -73,7 +73,7 @@ export const BrainsDropDown = (): JSX.Element => {
                         </span>
                         <span className="flex-1">{brain.name}</span>
                       </button>
-                      <BrainActions brainId={brain.id} />
+                      <BrainActions brain={brain} />
                     </div>
                   );
                 }

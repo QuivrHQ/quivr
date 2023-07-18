@@ -3,11 +3,11 @@ from uuid import UUID
 from models.settings import common_dependencies
 
 
-def get_user_email_by_user_id(user_id: UUID) -> str:
+def get_user_id_by_user_email(email: str) -> UUID:
     commons = common_dependencies()
     response = (
         commons["supabase"]
-        .rpc("get_user_email_by_user_id", {"user_id": user_id})
+        .rpc("get_user_id_by_user_email", {"user_email": email})
         .execute()
     )
-    return response.data[0]["email"]
+    return response.data[0]["user_id"]

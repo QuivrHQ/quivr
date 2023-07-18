@@ -10,7 +10,7 @@ import {
   getBrainFromLocalStorage,
   saveBrainInLocalStorage,
 } from "../helpers/brainLocalStorage";
-import { Brain } from "../types";
+import { MinimalBrainForUser } from "../types";
 
 // CAUTION: This hook should be use in BrainProvider only. You may be need `useBrainContext` instead.
 
@@ -18,10 +18,10 @@ import { Brain } from "../types";
 export const useBrainProvider = () => {
   const { publish } = useToast();
   const { track } = useEventTracking();
-  const { createBrain, deleteBrain, getBrains, getDefaultBrain, getBrain } =
+  const { createBrain, deleteBrain, getBrains, getDefaultBrain } =
     useBrainApi();
 
-  const [allBrains, setAllBrains] = useState<Brain[]>([]);
+  const [allBrains, setAllBrains] = useState<MinimalBrainForUser[]>([]);
   const [currentBrainId, setCurrentBrainId] = useState<null | UUID>(null);
   const [isFetchingBrains, setIsFetchingBrains] = useState(false);
 
@@ -41,28 +41,6 @@ export const useBrainProvider = () => {
       publish({
         variant: "danger",
         text: "Error occurred while creating a brain",
-      });
-    }
-  };
-
-  const addBrain = async (id: UUID): Promise<void> => {
-    const brain = await getBrain(id);
-    if (brain === undefined) {
-      publish({
-        variant: "danger",
-        text: "Error occurred while adding a brain",
-      });
-
-      return;
-    }
-    try {
-      setAllBrains((prevBrains) => [...prevBrains, brain]);
-      saveBrainInLocalStorage(brain);
-      void track("BRAIN_ADDED");
-    } catch {
-      publish({
-        variant: "danger",
-        text: "Error occurred while adding a brain",
       });
     }
   };
@@ -124,7 +102,6 @@ export const useBrainProvider = () => {
     allBrains,
     createBrain: createBrainHandler,
     deleteBrain: deleteBrainHandler,
-    addBrain,
     setActiveBrain,
     fetchAllBrains,
     setDefaultBrain,
