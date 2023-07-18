@@ -20,6 +20,13 @@ vi.mock("next/navigation", () => ({
 vi.mock("@/lib/context/SupabaseProvider", () => ({
   useSupabase: () => mockUseSupabase(),
 }));
+const clearLocalStorageMock = vi.fn();
+
+Object.defineProperty(window, "localStorage", {
+  value: {
+    clear: clearLocalStorageMock,
+  },
+});
 
 describe("useLogout", () => {
   it("should call signOut", async () => {
@@ -28,5 +35,6 @@ describe("useLogout", () => {
     await act(() => result.current.handleLogout());
 
     expect(mockSignOut).toHaveBeenCalledTimes(1);
+    expect(clearLocalStorageMock).toHaveBeenCalledTimes(1);
   });
 });
