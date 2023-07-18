@@ -1,16 +1,16 @@
-import { UUID } from "crypto";
+import { MinimalBrainForUser } from "@/lib/context/BrainProvider/types";
 
 import { DeleteBrain, ShareBrain } from "./components";
 
 type BrainActionsProps = {
-  brainId: UUID;
+  brain: MinimalBrainForUser;
 };
 
-export const BrainActions = ({ brainId }: BrainActionsProps): JSX.Element => {
+export const BrainActions = ({ brain }: BrainActionsProps): JSX.Element => {
   return (
     <div className="absolute right-0 flex flex-row">
-      <ShareBrain brainId={brainId} />
-      <DeleteBrain brainId={brainId} />
+      {brain.rights === "Owner" && <ShareBrain brainId={brain.id} />}
+      <DeleteBrain brainId={brain.id} />
     </div>
   );
 };
