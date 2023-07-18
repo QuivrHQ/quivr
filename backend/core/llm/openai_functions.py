@@ -180,7 +180,7 @@ class OpenAIFunctionsBrainPicking(BaseBrainPicking):
         functions = [
             {
                 "name": "get_history_and_context",
-                "description": "Get the chat history between you and the user and also get the relevant documents to answer the question. Always use that unless a very simple question is asked that a 5 years old could answer or if the user says continue or something like that",
+                "description": "Get the chat history between you and the user and also get the relevant documents to answer the question. Always use that unless a very simple question is asked that a 5 years old could answer or if the user says continue or something like that.",
                 "parameters": {"type": "object", "properties": {}},
             },
         ]
