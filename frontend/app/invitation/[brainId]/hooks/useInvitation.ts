@@ -1,93 +1,83 @@
 /* eslint-disable max-lines */
 "use client";
+import axios, { AxiosResponse } from "axios";
 import { UUID } from "crypto";
 import { useParams, useRouter } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 import { useSubscriptionApi } from "@/lib/api/subscription/useSubscriptionApi";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 import { useToast } from "@/lib/hooks";
 import { useEventTracking } from "@/services/analytics/useEventTracking";
 
-interface UseInvitationReturn {
-  brainId: UUID | undefined;
-  handleAccept: () => Promise<void>;
-  handleDecline: () => Promise<void>;
-  isValidInvitation: boolean;
-  isLoading: boolean;
-}
-
-export const useInvitation = (): UseInvitationReturn => {
+// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+export const useInvitation = () => {
   const params = useParams();
   const brainId = params?.brainId as UUID | undefined;
+  const [isLoading, setIsLoading] = useState(false);
+  const [brainName, setBrainName] = useState<string>("");
+  const [isProcessingRequest, setIsProcessingRequest] = useState(false);
+
   const { publish } = useToast();
   const { track } = useEventTracking();
+  const { getInvitation, acceptInvitation, declineInvitation } =
+    useSubscriptionApi();
+
   if (brainId === undefined) {
     throw new Error("Brain ID is undefined");
   }
 
-  const [isLoading, setIsLoading] = useState(false);
-  const [isValidInvitation, setIsValidInvitation] = useState(false);
-  const { acceptInvitation, declineInvitation } = useSubscriptionApi();
-  const checkValidInvitation = useCallback(
-    useSubscriptionApi().checkValidInvitation,
-    []
-  );
-
   const { fetchAllBrains, setActiveBrain } = useBrainContext();
   const router = useRouter();
-  // Check invitation on component mount
+
   useEffect(() => {
     setIsLoading(true);
 
     const checkInvitationValidity = async () => {
       try {
-        console.log("Checking invitation validity...");
-        const validInvitation = await checkValidInvitation(brainId);
-        setIsValidInvitation(validInvitation);
-        console.log("validInvitation", validInvitation);
-        if (!validInvitation) {
+        const invitationBrain = await getInvitation(brainId);
+        setBrainName(invitationBrain.name);
+      } catch (error) {
+        if (axios.isAxiosError(error) && error.response?.status === 404) {
           publish({
             variant: "warning",
             text: "This invitation is not valid.",
           });
-          router.push("/");
+        } else {
+          publish({
+            variant: "danger",
+            text: "An unknown error occurred while checking the invitaiton",
+          });
         }
-      } catch (error) {
-        console.error("Error checking invitation validity:", error);
+        router.push("/");
       } finally {
         setIsLoading(false);
       }
     };
-    checkInvitationValidity().catch((error) => {
-      console.error("Error checking invitation validity:", error);
-    });
-  }, [brainId, checkValidInvitation]);
+    void checkInvitationValidity();
+  }, [brainId]);
 
   const handleAccept = async () => {
-    // API call to accept the invitation
-    // After success, redirect user to a specific page ->  chat page
+    setIsProcessingRequest(true);
     try {
       const response = await acceptInvitation(brainId);
-      void track("BRAIN_ADDED");
+      void track("INVITATION_ACCEPTED");
 
       await fetchAllBrains();
-      setActiveBrain({ id: brainId, name: "BrainName" });
-
-      //set brainId as active brain
       publish({
         variant: "success",
         text: JSON.stringify(response.message),
       });
+      setActiveBrain({ id: brainId, name: brainName });
     } catch (error) {
-      // @ts-ignore Error is of unknown type
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-      if (error.response.data.detail !== undefined) {
+      if (axios.isAxiosError(error) && error.response?.data !== undefined) {
         publish({
           variant: "danger",
-          // @ts-ignore Error is of unknown type
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-          text: error.response.data.detail,
+          text: (
+            error.response as AxiosResponse<{
+              detail: string;
+            }>
+          ).data.detail,
         });
       } else {
         console.error("Error calling the API:", error);
@@ -97,48 +87,47 @@ export const useInvitation = (): UseInvitationReturn => {
         });
       }
     } finally {
+      setIsProcessingRequest(false);
       void router.push("/chat");
     }
   };
 
   const handleDecline = async () => {
-    // API call to accept the invitation
-    // After success, redirect user to a specific page ->  home page
+    setIsProcessingRequest(true);
     try {
       const response = await declineInvitation(brainId);
-      console.log(response.message);
-
       publish({
         variant: "success",
         text: JSON.stringify(response.message),
       });
+      void track("INVITATION_DECLINED");
     } catch (error) {
-      // @ts-ignore Error is of unknown type
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-      if (error.response.data.detail !== undefined) {
+      if (axios.isAxiosError(error) && error.response?.data !== undefined) {
         publish({
           variant: "danger",
-          // @ts-ignore Error is of unknown type
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-          text: error.response.data.detail,
+          text: (
+            error.response as AxiosResponse<{
+              detail: string;
+            }>
+          ).data.detail,
         });
       } else {
-        console.error("Error calling the API:", error);
         publish({
           variant: "danger",
-          text: "An unknown error occurred while declining the invitaiton",
+          text: "An unknown error occurred while declining the invitation",
         });
       }
     } finally {
+      setIsProcessingRequest(false);
       void router.push("/upload");
     }
   };
 
   return {
-    brainId,
     handleAccept,
     handleDecline,
-    isValidInvitation,
     isLoading,
+    brainName,
+    isProcessingRequest,
   };
 };

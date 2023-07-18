@@ -9,15 +9,18 @@ import { redirectToLogin } from "@/lib/router/redirectToLogin";
 import { useInvitation } from "./hooks/useInvitation";
 
 const InvitationPage = (): JSX.Element => {
-  const { handleAccept, handleDecline, isLoading } = useInvitation();
+  const {
+    handleAccept,
+    isProcessingRequest,
+    handleDecline,
+    isLoading,
+    brainName,
+  } = useInvitation();
   const { session } = useSupabase();
-  // Show the loader while invitation validity is being checked
+
   if (isLoading) {
     return <Spinner />;
   }
-
-  // TODO: Modify this to fetch the brain name from the database
-  const brain = { name: "TestBrain" };
 
   if (session?.user === undefined) {
     redirectToLogin();
@@ -26,25 +29,32 @@ const InvitationPage = (): JSX.Element => {
   return (
     <main className="pt-10">
       <PageHeading
-        title={`Welcome to ${brain.name}!`}
-        subtitle="You have been exclusively invited to join this brain and start exploring. Do you accept this exciting journey?"
+        title={`Welcome to ${brainName}!`}
+        subtitle="You have been invited to join this brain and start exploring. Do you accept this exciting journey?"
       />
-      <div className="flex flex-col items-center justify-center gap-5 mt-5">
-        <Button
-          onClick={() => void handleAccept()}
-          variant={"secondary"}
-          className="py-3"
-        >
-          Yes, count me in!
-        </Button>
-        <Button
-          onClick={() => void handleDecline()}
-          variant={"danger"}
-          className="py-3"
-        >
-          No, thank you.
-        </Button>
-      </div>
+      {isProcessingRequest ? (
+        <div className="flex flex-col items-center justify-center mt-5">
+          <Spinner />
+          <p className="text-center">Processing your request...</p>
+        </div>
+      ) : (
+        <div className="flex flex-col items-center justify-center gap-5 mt-5">
+          <Button
+            onClick={() => void handleAccept()}
+            variant={"secondary"}
+            className="py-3"
+          >
+            Yes, count me in!
+          </Button>
+          <Button
+            onClick={() => void handleDecline()}
+            variant={"danger"}
+            className="py-3"
+          >
+            No, thank you.
+          </Button>
+        </div>
+      )}
     </main>
   );
 };

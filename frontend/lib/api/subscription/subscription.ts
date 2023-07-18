@@ -29,15 +29,15 @@ export const declineInvitation = async (
   return deletedInvitation;
 };
 
-export const checkValidInvitation = async (
+export type InvitationBrain = {
+  name: string;
+};
+
+export const getInvitation = async (
   brainId: UUID,
   axiosInstance: AxiosInstance
-): Promise<boolean> => {
-  const answer = await axiosInstance.get<{ hasInvitation: boolean }>(
-    `/brains/${brainId}/subscription`
-  );
-  const toto = answer.data["hasInvitation"];
-  console.log(answer);
-
-  return toto;
+): Promise<InvitationBrain> => {
+  return (
+    await axiosInstance.get<InvitationBrain>(`/brains/${brainId}/subscription`)
+  ).data;
 };
