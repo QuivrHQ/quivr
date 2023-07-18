@@ -17,7 +17,7 @@ services:
       - 3000:3000
   backend-core:
     env_file:
-      - ./backend/core/.env
+      - ./backend/.env
     build:
       context: backend
       dockerfile: core/Dockerfile
@@ -30,7 +30,7 @@ services:
       - 5050:5050
   backend-private:
     env_file:
-      - ./backend/private/.env
+      - ./backend/.env
     build:
       context: backend
       dockerfile: private/Dockerfile

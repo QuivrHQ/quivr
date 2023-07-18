@@ -13,7 +13,7 @@ services:
       - 3000:3000
   backend-core:
     env_file:
-      - ./backend/core/.env
+      - ./backend/.env
     build:
       context: backend
       dockerfile: core/Dockerfile
