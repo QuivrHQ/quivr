@@ -3,10 +3,11 @@ from typing import Any, List, Optional
 from uuid import UUID
 
 from logger import get_logger
-from models.settings import CommonsDep, common_dependencies
-from models.users import User
 from pydantic import BaseModel
 from utils.vectors import get_unique_files_from_vector_ids
+
+from models.settings import CommonsDep, common_dependencies
+from models.users import User
 
 logger = get_logger(__name__)
 
@@ -79,11 +80,15 @@ class Brain(BaseModel):
         response = (
             self.commons["supabase"]
             .from_("brains_users")
-            .select("id:brain_id, brains (id: brain_id, name)")
+            .select("id:brain_id, rights, brains (id: brain_id, name)")
             .filter("user_id", "eq", user_id)
             .execute()
         )
-        return [item["brains"] for item in response.data]
+        user_brains = []
+        for item in response.data:
+            user_brains.append(item["brains"])
+            user_brains[-1]["rights"] = item["rights"]
+        return user_brains
 
     def get_brain_for_user(self, user_id):
         response = (

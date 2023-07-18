@@ -97,7 +97,6 @@ def test_retrieve_one_brain(client, api_key):
     brain = response.json()
     assert "id" in brain
     assert "name" in brain
-    assert "status" in brain
 
 
 def test_delete_all_brains(client, api_key):

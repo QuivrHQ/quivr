@@ -5,6 +5,7 @@ export type SelectOptionsProps = {
   value: BrainRoleType;
 };
 export const availableRoles: SelectOptionsProps[] = [
-  { label: "Viewer", value: "viewer" },
-  { label: "Editor", value: "editor" },
+  { label: "Viewer", value: "Viewer" },
+  { label: "Editor", value: "Editor" },
+  { label: "Owner", value: "Owner" },
 ];

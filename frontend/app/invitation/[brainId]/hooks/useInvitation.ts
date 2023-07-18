@@ -7,6 +7,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useSubscriptionApi } from "@/lib/api/subscription/useSubscriptionApi";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 import { useToast } from "@/lib/hooks";
+import { useEventTracking } from "@/services/analytics/useEventTracking";
 
 interface UseInvitationReturn {
   brainId: UUID | undefined;
@@ -20,6 +21,7 @@ export const useInvitation = (): UseInvitationReturn => {
   const params = useParams();
   const brainId = params?.brainId as UUID | undefined;
   const { publish } = useToast();
+  const { track } = useEventTracking();
   if (brainId === undefined) {
     throw new Error("Brain ID is undefined");
   }
@@ -32,7 +34,7 @@ export const useInvitation = (): UseInvitationReturn => {
     []
   );
 
-  const { addBrain, setActiveBrain } = useBrainContext();
+  const { fetchAllBrains, setActiveBrain } = useBrainContext();
   const router = useRouter();
   // Check invitation on component mount
   useEffect(() => {
@@ -67,9 +69,9 @@ export const useInvitation = (): UseInvitationReturn => {
     // After success, redirect user to a specific page ->  chat page
     try {
       const response = await acceptInvitation(brainId);
-      console.log(response.message);
+      void track("BRAIN_ADDED");
 
-      await addBrain(brainId);
+      await fetchAllBrains();
       setActiveBrain({ id: brainId, name: "BrainName" });
 
       //set brainId as active brain
