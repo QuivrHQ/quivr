@@ -34,7 +34,9 @@ class User(BaseModel):
         """
         Fetch the user request stats from the database
         """
-        return self.commons["db"].get_user_request_stats(self.id).data
+        request = self.commons["db"].get_user_request_stats(self.id)
+
+        return request.data
 
     def increment_user_request_count(self, date):
         """
