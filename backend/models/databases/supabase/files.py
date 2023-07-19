@@ -14,7 +14,7 @@ class File(Repository):
         )
         return response.data
 
-    def file_already_exists_in_brain(self, brain_id, file_sha1):
+    def get_brain_vectors_by_brain_id_and_file_sha1(self, brain_id, file_sha1):
         self.set_file_vectors_ids(file_sha1)
         # Check if file exists in that brain
         response = (
@@ -24,8 +24,5 @@ class File(Repository):
             .filter("file_sha1", "eq", file_sha1)
             .execute()
         )
-        print("response.data", response.data)
-        if len(response.data) == 0:
-            return False
 
-        return True
+        return response
