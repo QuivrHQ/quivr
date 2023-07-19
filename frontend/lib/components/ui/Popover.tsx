@@ -35,7 +35,7 @@ const Popover = ({
                 }}
                 exit={{ opacity: 0, y: -32 }}
                 transition={{ duration: 0.2, ease: "easeInOut" }}
-                className="relative flex flex-col p-4 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg shadow-lg z-40"
+                className="relative flex flex-col p-4 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg shadow-lg z-50 md:z-40"
               >
                 <div className="flex-1">{children}</div>
                 <div className="mt-4 self-end flex gap-4">
