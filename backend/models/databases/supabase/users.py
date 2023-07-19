@@ -47,21 +47,18 @@ class User(Repository):
             .filter("date", "eq", date)
             .execute()
         )
-        userItem = next(iter(response.data or []), {"requests_count": 0})
 
-        return userItem["requests_count"]
+        return response
 
-    def increment_user_request_count(self, date):
-        """
-        Increment the user request count in the database
-        """
-        requests_count = self.fetch_user_requests_count(date) + 1
-        logger.info(f"User {self.email} request count updated to {requests_count}")
-        self.db.table("users").update({"requests_count": requests_count}).match(
-            {"user_id": self.id, "date": date}
-        ).execute()
+    def update_user_request_count(self, user_id, requests_count, date):
+        response = (
+            self.db.table("users")
+            .update({"requests_count": requests_count})
+            .match({"user_id": user_id, "date": date})
+            .execute()
+        )
 
-        return requests_count
+        return response
 
     def get_user_email(self, user_id):
         """

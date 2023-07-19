@@ -102,7 +102,7 @@ class Brain(BaseModel):
 def get_default_user_brain(user: User):
     commons = common_dependencies()
     response = commons["db"].get_default_user_brain_id(user.id)
-    
+       
     logger.info("Default brain response:", response.data)
     default_brain_id = response.data[0]["brain_id"] if response.data else None
 

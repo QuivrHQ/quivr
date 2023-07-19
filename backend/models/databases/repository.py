@@ -67,7 +67,7 @@ class Repository(ABC):
         pass
 
     @abstractmethod
-    def increment_user_request_count(self, date: str):
+    def update_user_request_count(self, date: str):
         pass
 
     @abstractmethod

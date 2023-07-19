@@ -36,14 +36,14 @@ class User(BaseModel):
         """
         return self.commons["db"].get_user_request_stats(self.id)
 
-    def fetch_user_requests_count(self, date):
-        """
-        Fetch the user request count from the database
-        """
-        return self.commons["db"].fetch_user_requests_count(self.id, date)
-
     def increment_user_request_count(self, date):
         """
         Increment the user request count in the database
         """
-        self.requests_count = self.commons["db"].increment_user_request_count(date)
+        response = self.commons["db"].fetch_user_requests_count(self.id, date)
+        
+        userItem = next(iter(response.data or []), {"requests_count": 0})
+        requests_count = userItem["requests_count"] + 1
+        logger.info(f"User {self.email} request count updated to {requests_count}")
+
+        self.requests_count = self.commons["db"].update_user_request_count(date)
