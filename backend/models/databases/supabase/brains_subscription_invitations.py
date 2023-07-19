@@ -12,18 +12,16 @@ class BrainSubscription(Repository):
     def create_subscription_invitation(self, brain_id, user_email, rights):
         logger.info("Creating subscription invitation")
         response = (
-            self.db
-            .table("brain_subscription_invitations")
+            self.db.table("brain_subscription_invitations")
             .insert({"brain_id": str(brain_id), "email": user_email, "rights": rights})
             .execute()
         )
         return response.data
 
     def update_subscription_invitation(self, brain_id, user_email, rights):
-        logger.info('Updating subscription invitation')
+        logger.info("Updating subscription invitation")
         response = (
-            self.db
-            .table("brain_subscription_invitations")
+            self.db.table("brain_subscription_invitations")
             .update({"rights": rights})
             .eq("brain_id", str(brain_id))
             .eq("email", user_email)
@@ -36,12 +34,12 @@ class BrainSubscription(Repository):
             self.db.table("brain_subscription_invitations")
             .select("*")
             .eq("brain_id", str(brain_id))
-            .eq("email", user_email).execute()
+            .eq("email", user_email)
+            .execute()
         )
         if response.data:
             response = self.update_subscription_invitation()
         else:
-           response = self.create_subscription_invitation()
+            response = self.create_subscription_invitation()
 
         return response
-

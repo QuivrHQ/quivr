@@ -11,14 +11,6 @@ class User(Repository):
 
     # [TODO] Rename the user table and its references to 'user_usage'
     def create_user(self, user_id, user_email, date):
-        """
-        Create a new user entry in the database
-
-        Args:
-            date (str): Date of the request
-        """
-        logger.info(f"New user entry in db document for user {user_email}")
-
         return (
             self.db.table("users")
             .insert(
@@ -65,8 +57,33 @@ class User(Repository):
         """
         requests_count = self.fetch_user_requests_count(date) + 1
         logger.info(f"User {self.email} request count updated to {requests_count}")
-        self.db.table("users").update(
-            {"requests_count": requests_count}
-        ).match({"user_id": self.id, "date": date}).execute()
-        
+        self.db.table("users").update({"requests_count": requests_count}).match(
+            {"user_id": self.id, "date": date}
+        ).execute()
+
         return requests_count
+
+    def get_user_email(self, user_id):
+        """
+        Fetch the user email from the database
+        """
+        response = (
+            self.db.from_("users")
+            .select("email")
+            .filter("user_id", "eq", user_id)
+            .execute()
+        )
+
+        return response
+    
+    def get_user_stats(self, user_email, date):
+        response = (
+            self.db
+            .from_("users")
+            .select("*")
+            .filter("email", "eq", user_email)
+            .filter("date", "eq", date)
+            .execute()
+        )
+
+        return response

@@ -13,7 +13,7 @@ class File(Repository):
             .execute()
         )
         return response.data
-    
+
     def file_already_exists_in_brain(self, brain_id, file_sha1):
         self.set_file_vectors_ids()
         # Check if file exists in that brain

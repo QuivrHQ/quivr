@@ -9,7 +9,7 @@ logger = get_logger(__name__)
 class Brain(Repository):
     def __init__(self, supabase_client):
         super().__init__(supabase_client)
-        
+
     def get_user_brains(self, user_id):
         response = (
             self.db.from_("brains_users")
@@ -30,7 +30,7 @@ class Brain(Repository):
         if len(response.data) == 0:
             return None
         return response.data[0]
-    
+
     def get_brain_details(self, brain_id):
         response = (
             self.db.from_("brains")
@@ -70,7 +70,6 @@ class Brain(Repository):
 
     def create_brain(self, name):
         return self.db.table("brains").insert({"name": name}).execute()
-
 
     def create_brain_user(self, user_id: UUID, brain_id, rights, default_brain):
         response = (
@@ -133,7 +132,7 @@ class Brain(Repository):
 
         if len(vector_ids) == 0:
             return []
-        
+
         return vector_ids
 
     def delete_file_from_brain(self, brain_id, file_name: str):

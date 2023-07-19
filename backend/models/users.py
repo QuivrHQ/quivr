@@ -26,6 +26,8 @@ class User(BaseModel):
         Args:
             date (str): Date of the request
         """
+        logger.info(f"New user entry in db document for user {self.email}")
+
         return self.commons["db"].create_user(self.id, self.email, date)
 
     def get_user_request_stats(self):
