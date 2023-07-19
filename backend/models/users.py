@@ -46,4 +46,4 @@ class User(BaseModel):
         requests_count = userItem["requests_count"] + 1
         logger.info(f"User {self.email} request count updated to {requests_count}")
 
-        self.requests_count = self.commons["db"].update_user_request_count(date)
+        self.requests_count = self.commons["db"].update_user_request_count(self.id, requests_count, date)
