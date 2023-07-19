@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 import { fireEvent, render } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
@@ -43,7 +44,10 @@ describe("ShareBrain", () => {
     const { getByTestId } = render(
       <SupabaseProviderMock>
         <BrainConfigProviderMock>
-          <ShareBrain brainId="cf9bb422-b1b6-4fd7-abc1-01bd395d2318" />
+          <ShareBrain
+            name="test"
+            brainId="cf9bb422-b1b6-4fd7-abc1-01bd395d2318"
+          />
         </BrainConfigProviderMock>
       </SupabaseProviderMock>
     );
@@ -56,20 +60,26 @@ describe("ShareBrain", () => {
       // Todo: add a custom render function that wraps the component with the providers
       <SupabaseProviderMock>
         <BrainConfigProviderMock>
-          <ShareBrain brainId="cf9bb422-b1b6-4fd7-abc1-01bd395d2318" />
+          <ShareBrain
+            name="test"
+            brainId="cf9bb422-b1b6-4fd7-abc1-01bd395d2318"
+          />
         </BrainConfigProviderMock>
       </SupabaseProviderMock>
     );
     const shareButton = getByTestId("share-brain-button");
     fireEvent.click(shareButton);
-    expect(getByText("Share brain")).toBeDefined();
+    expect(getByText("Share brain test")).toBeDefined();
   });
 
   it('shoud add new user row when "Add new user" button is clicked and only where there is no empty field', async () => {
     const { getByTestId, findAllByTestId } = render(
       <SupabaseProviderMock>
         <BrainConfigProviderMock>
-          <ShareBrain brainId="cf9bb422-b1b6-4fd7-abc1-01bd395d2318" />
+          <ShareBrain
+            name="test"
+            brainId="cf9bb422-b1b6-4fd7-abc1-01bd395d2318"
+          />
         </BrainConfigProviderMock>
       </SupabaseProviderMock>
     );
