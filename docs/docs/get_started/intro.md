@@ -33,10 +33,6 @@ Quivr, your second brain, utilizes the power of GenerativeAI to store and retrie
   Your browser does not support the video tag.
 </video>
 
-## Demo Highlights 🎥
-
-https://github.com/StanGirard/quivr/assets/19614572/a6463b73-76c7-4bc0-978d-70562dca71f5
-
 ## Getting Started: 🚀
 
 Follow these instructions to get a copy of the project up and running on your local machine for development and testing purposes.
@@ -108,7 +104,7 @@ b. Use the `migration.sh` script to run the migration scripts
 
     Choose either create_scripts if it's your first time or migrations if you are updating your database.
 
-All the scripts can be found in the [scripts](scripts/) folder
+All the scripts can be found in the [scripts](https://github.com/stangirard/quivr/scripts/) folder
 
 > _If you come from an old version of Quivr, run the scripts in [migration script](https://github.com/stangirard/quivr/scripts/) to migrate your data to the new version in the order of date_
 
@@ -120,11 +116,8 @@ docker compose -f docker-compose.yml up --build
 
 - **Step 6**: Navigate to `localhost:3000` in your browser
 
-<<<<<<< HEAD
-
-- # ** Step 7**: Want to contribute to the project?
 - **Step 7**: Want to contribute to the project?
-  > > > > > > > 45b1978 (📝 add migrations script to get_started doc)
+- **Step 7**: Want to contribute to the project?
 
 ```
 docker compose -f docker-compose.dev.yml up --build
