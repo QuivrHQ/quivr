@@ -14,9 +14,13 @@ import { useShareBrain } from "./hooks/useShareBrain";
 
 type ShareBrainModalProps = {
   brainId: UUID;
+  name: string;
 };
 
-export const ShareBrain = ({ brainId }: ShareBrainModalProps): JSX.Element => {
+export const ShareBrain = ({
+  brainId,
+  name,
+}: ShareBrainModalProps): JSX.Element => {
   const {
     roleAssignations,
     brainShareLink,
@@ -48,7 +52,7 @@ export const ShareBrain = ({ brainId }: ShareBrainModalProps): JSX.Element => {
         </Button>
       }
       CloseTrigger={<div />}
-      title="Share brain"
+      title={`Share brain ${name}`}
       isOpen={isShareModalOpen}
       setOpen={setIsShareModalOpen}
     >
