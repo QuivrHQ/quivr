@@ -1,6 +1,6 @@
 import { UUID } from "crypto";
 
-import { BrainUser } from "./BrainUser";
+import { BrainUser } from "./components";
 import { useBrainUsers } from "./hooks/useBrainUsers";
 
 type BrainUsersProps = {

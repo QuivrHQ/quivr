@@ -1,30 +1,25 @@
-/* eslint-disable max-lines */
-import axios from "axios";
+import axios, { AxiosResponse } from "axios";
 import { useState } from "react";
-import { MdOutlineRemoveCircle, MdOutlineTimelapse } from "react-icons/md";
 
 import { useBrainApi } from "@/lib/api/brain/useBrainApi";
-import Field from "@/lib/components/ui/Field";
-import { Select } from "@/lib/components/ui/Select";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 import { useToast } from "@/lib/hooks";
 
-import { BrainRoleType } from "../../../../types";
-import { availableRoles } from "../../types";
+import { BrainRoleType } from "../../../../../../../types";
 
-type BrainUserProps = {
-  email: string;
+type UseBrainUserProps = {
+  fetchBrainUsers: () => Promise<void>;
   rights: BrainRoleType;
   brainId: string;
-  fetchBrainUsers: () => Promise<void>;
+  email: string;
 };
-
-export const BrainUser = ({
-  email,
-  rights,
+// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+export const useBrainUser = ({
   brainId,
   fetchBrainUsers,
-}: BrainUserProps): JSX.Element => {
+  rights,
+  email,
+}: UseBrainUserProps) => {
   const { updateBrainAccess } = useBrainApi();
   const { publish } = useToast();
   const [selectedRole, setSelectedRole] = useState<BrainRoleType>(rights);
@@ -68,46 +63,32 @@ export const BrainUser = ({
       publish({ variant: "success", text: `Removed ${email} from brain` });
       void fetchBrainUsers();
     } catch (e) {
-      publish({
-        variant: "danger",
-        text: `Failed to remove ${email} from brain`,
-      });
+      if (axios.isAxiosError(e) && e.response?.data !== undefined) {
+        publish({
+          variant: "danger",
+          text: (
+            e.response as AxiosResponse<{
+              detail: string;
+            }>
+          ).data.detail,
+        });
+      } else {
+        publish({
+          variant: "danger",
+          text: `Failed to remove ${email} from brain`,
+        });
+      }
     } finally {
       setIsRemovingAccess(false);
     }
   };
+  const canRemoveAccess = currentBrain?.rights === "Owner";
 
-  return (
-    <div
-      data-testid="assignation-row"
-      className="flex flex-row align-center my-2 gap-3 items-center"
-    >
-      {isRemovingAccess ? (
-        <div className="animate-pulse">
-          <MdOutlineTimelapse />
-        </div>
-      ) : (
-        <div className="cursor-pointer" onClick={() => void removeUserAccess()}>
-          <MdOutlineRemoveCircle />
-        </div>
-      )}
-      <div className="flex flex-1">
-        <Field
-          name="email"
-          required
-          type="email"
-          placeholder="Email"
-          value={email}
-          data-testid="role-assignation-email-input"
-          readOnly
-        />
-      </div>
-      <Select
-        onChange={(newRole) => void updateSelectedRole(newRole)}
-        value={selectedRole}
-        options={availableRoles}
-        readOnly={currentBrain?.rights !== "Owner" && selectedRole === "Owner"}
-      />
-    </div>
-  );
+  return {
+    isRemovingAccess,
+    removeUserAccess,
+    updateSelectedRole,
+    selectedRole,
+    canRemoveAccess,
+  };
 };
