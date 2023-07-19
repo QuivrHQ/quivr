@@ -6,8 +6,8 @@ logger = get_logger(__name__)
 
 
 class BrainSubscription(Repository):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self, supabase_client):
+        self.db = supabase_client
 
     def create_subscription_invitation(self, brain_id, user_email, rights):
         logger.info("Creating subscription invitation")

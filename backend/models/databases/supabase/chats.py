@@ -3,7 +3,7 @@ from models.databases.repository import Repository
 
 class Chats(Repository):
     def __init__(self, supabase_client):
-        super().__init__(supabase_client)
+        self.db = supabase_client
 
     def create_chat(self, new_chat):
         response = self.db.table("chats").insert(new_chat).execute()

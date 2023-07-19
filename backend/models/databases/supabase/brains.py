@@ -8,7 +8,7 @@ logger = get_logger(__name__)
 
 class Brain(Repository):
     def __init__(self, supabase_client):
-        super().__init__(supabase_client)
+        self.db = supabase_client
 
     def get_user_brains(self, user_id):
         response = (

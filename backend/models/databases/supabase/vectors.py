@@ -3,7 +3,7 @@ from models.databases.repository import Repository
 
 class Vector(Repository):
     def __init__(self, supabase_client):
-        super().__init__(supabase_client)
+        self.db = supabase_client
 
     def get_vectors_by_file_name(self, file_name):
         response = (

@@ -4,7 +4,7 @@ from datetime import datetime
 
 class ApiKeyHandler(Repository):
     def __init__(self, supabase_client):
-        super().__init__(supabase_client)
+        self.db = supabase_client
 
     def create_api_key(self, new_key_id, new_api_key, user_id):
         response = (

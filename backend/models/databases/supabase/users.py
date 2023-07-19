@@ -7,7 +7,7 @@ logger = get_logger(__name__)
 
 class User(Repository):
     def __init__(self, supabase_client):
-        super().__init__(supabase_client)
+        self.db = supabase_client
 
     # [TODO] Rename the user table and its references to 'user_usage'
     def create_user(self, user_id, user_email, date):

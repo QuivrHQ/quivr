@@ -3,7 +3,7 @@ from models.databases.repository import Repository
 
 class File(Repository):
     def __init__(self, supabase_client):
-        super().__init__(supabase_client)
+        self.db = supabase_client
 
     def set_file_vectors_ids(self, file_sha1):
         response = (
