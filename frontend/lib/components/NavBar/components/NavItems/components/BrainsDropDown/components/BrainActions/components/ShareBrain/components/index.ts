@@ -1,2 +1,2 @@
-export * from "./BrainUsers/BrainUser";
+export * from "./BrainUsers/components/BrainUser/BrainUser";
 export * from "./UserToInvite";
