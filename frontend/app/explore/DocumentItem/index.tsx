@@ -34,6 +34,8 @@ const DocumentItem = forwardRef(
     const { track } = useEventTracking();
     const { currentBrain } = useBrainContext();
 
+    const canDeleteFile = currentBrain?.rights === "Owner";
+
     if (!session) {
       throw new Error("User session not found");
     }
@@ -75,29 +77,31 @@ const DocumentItem = forwardRef(
             <DocumentData documentName={document.name} />
           </Modal>
 
-          <Modal
-            title={"Confirm"}
-            desc={`Do you really want to delete?`}
-            Trigger={
-              <Button isLoading={isDeleting} variant={"danger"} className="">
-                Delete
-              </Button>
-            }
-            CloseTrigger={
-              <Button
-                variant={"danger"}
-                isLoading={isDeleting}
-                onClick={() => {
-                  deleteDocument(document.name);
-                }}
-                className="self-end"
-              >
-                Delete forever
-              </Button>
-            }
-          >
-            <p>{document.name}</p>
-          </Modal>
+          {canDeleteFile && (
+            <Modal
+              title={"Confirm"}
+              desc={`Do you really want to delete?`}
+              Trigger={
+                <Button isLoading={isDeleting} variant={"danger"} className="">
+                  Delete
+                </Button>
+              }
+              CloseTrigger={
+                <Button
+                  variant={"danger"}
+                  isLoading={isDeleting}
+                  onClick={() => {
+                    deleteDocument(document.name);
+                  }}
+                  className="self-end"
+                >
+                  Delete forever
+                </Button>
+              }
+            >
+              <p>{document.name}</p>
+            </Modal>
+          )}
         </div>
       </AnimatedCard>
     );
