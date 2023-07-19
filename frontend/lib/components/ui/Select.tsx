@@ -13,6 +13,7 @@ type SelectProps<T> = {
   value?: T;
   onChange: (option: T) => void;
   label?: string;
+  readOnly?: boolean;
 };
 
 const selectedStyle = "rounded-lg bg-black text-white";
@@ -22,10 +23,40 @@ export const Select = <T extends string | number>({
   options,
   value,
   label,
+  readOnly = false,
 }: SelectProps<T>): JSX.Element => {
   const selectedValueLabel = options.find(
     (option) => option.value === value
   )?.label;
+
+  if (readOnly) {
+    return (
+      <div>
+        {label !== undefined && (
+          <label
+            id="listbox-label"
+            className="block text-sm font-medium leading-6 text-gray-900 mb-2"
+          >
+            {label}
+          </label>
+        )}
+        <div className="relative">
+          <button
+            type="button"
+            className="relative w-full cursor-default rounded-md bg-white py-1.5 px-3 text-left text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 sm:text-sm sm:leading-6"
+            aria-haspopup="listbox"
+            disabled
+          >
+            <span className="flex items-center">
+              <span className="mx-4 block truncate">
+                {selectedValueLabel ?? label ?? "Select"}
+              </span>
+            </span>
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div>
