@@ -47,7 +47,11 @@ class Repository(ABC):
         pass
 
     @abstractmethod
-    def get_default_user_brain(self, user_id: UUID):
+    def get_default_user_brain_id(self, user_id: UUID):
+        pass
+
+    @abstractmethod
+    def get_brain_by_id(self, brain_id: UUID):
         pass
 
     @abstractmethod
@@ -59,11 +63,11 @@ class Repository(ABC):
         pass
 
     @abstractmethod
-    def fetch_user_requests_count(self, user_id: UUID, date: datetime):
+    def fetch_user_requests_count(self, user_id: UUID, date: str):
         pass
 
     @abstractmethod
-    def increment_user_request_count(self, date: datetime):
+    def increment_user_request_count(self, date: str):
         pass
 
     @abstractmethod
@@ -174,4 +178,8 @@ class Repository(ABC):
 
     @abstractmethod
     def get_vectors_in_batch(self, batch_ids):
+        pass
+
+    @abstractmethod
+    def get_vectors_by_file_sha1(self, file_sha1):
         pass

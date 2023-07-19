@@ -11,8 +11,19 @@ class Vector(Repository):
             .select(
                 "metadata->>file_name, metadata->>file_size, metadata->>file_extension, metadata->>file_url",
                 "content",
+                "brains_vectors(brain_id,vector_id)",
             )
             .match({"metadata->>file_name": file_name})
+            .execute()
+        )
+
+        return response
+
+    def get_vectors_by_file_sha1(self, file_sha1):
+        response = (
+            self.db.table("vectors")
+            .select("id")
+            .filter("metadata->>file_sha1", "eq", file_sha1)
             .execute()
         )
 
@@ -46,7 +57,7 @@ class Vector(Repository):
             )
             .eq("id", batch_id)
             .execute()
-        ).data
+        )
 
         return response
 

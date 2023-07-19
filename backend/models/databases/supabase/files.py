@@ -15,7 +15,7 @@ class File(Repository):
         return response.data
 
     def file_already_exists_in_brain(self, brain_id, file_sha1):
-        self.set_file_vectors_ids()
+        self.set_file_vectors_ids(file_sha1)
         # Check if file exists in that brain
         response = (
             self.db.table("brains_vectors")

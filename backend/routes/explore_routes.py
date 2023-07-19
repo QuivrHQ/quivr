@@ -63,7 +63,7 @@ async def download_endpoint(
     # check if user has the right to get the file: add brain_id to the query
 
     commons = common_dependencies()
-    response = commons["db"].get_user_file_by_name(file_name)
+    response = commons["db"].get_vectors_by_file_name(file_name)
     documents = response.data
 
     if len(documents) == 0:

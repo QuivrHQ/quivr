@@ -170,7 +170,7 @@ class Brain(Repository):
 
         return {"message": f"File {file_name} in brain {brain_id} has been deleted."}
 
-    def get_default_user_brain(self, user_id: UUID):
+    def get_default_user_brain_id(self, user_id: UUID):
         response = (
             self.db.from_("brains_users")
             .select("brain_id")
@@ -179,19 +179,14 @@ class Brain(Repository):
             .execute()
         )
 
-        logger.info("Default brain response:", response.data)
-        default_brain_id = response.data[0]["brain_id"] if response.data else None
+        return response
 
-        logger.info(f"Default brain id: {default_brain_id}")
+    def get_brain_by_id(self, brain_id: UUID):
+        response = (
+            self.db.from_("brains")
+            .select("id:brain_id, name, *")
+            .filter("brain_id", "eq", brain_id)
+            .execute()
+        )
 
-        if default_brain_id:
-            brain_response = (
-                self.db.from_("brains")
-                .select("id:brain_id, name, *")
-                .filter("brain_id", "eq", default_brain_id)
-                .execute()
-            )
-
-            return brain_response.data[0] if brain_response.data else None
-
-        return None
+        return response
