@@ -5,8 +5,12 @@ from fastapi import APIRouter, Depends, Query
 from models.brains import Brain
 from models.settings import common_dependencies
 from models.users import User
+
 from routes.authorizations.brain_authorization import (
-    has_brain_authorization, validate_brain_authorization)
+    RoleEnum,
+    has_brain_authorization,
+    validate_brain_authorization,
+)
 
 explore_router = APIRouter()
 
@@ -29,7 +33,7 @@ async def explore_endpoint(
     "/explore/{file_name}/",
     dependencies=[
         Depends(AuthBearer()),
-        Depends(has_brain_authorization()),
+        Depends(has_brain_authorization(RoleEnum.Owner)),
     ],
     tags=["Explore"],
 )

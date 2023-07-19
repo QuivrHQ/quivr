@@ -300,8 +300,21 @@ def update_brain_subscription(
                 detail="You can't change the permissions of an owner",
             )
 
+    # removing user access from brain
     if subscription.rights is None:
-        brain.delete_user_from_brain(user_id)
+        try:
+            # only owners can remove user access to a brain
+            validate_brain_authorization(
+                brain_id,
+                current_user.id,
+                RoleEnum.Owner,
+            )
+            brain.delete_user_from_brain(user_id)
+        except HTTPException:
+            raise HTTPException(
+                status_code=403,
+                detail="You don't have the rights to remove user access",
+            )
     else:
         update_brain_user_rights(brain_id, user_id, subscription.rights)
 
