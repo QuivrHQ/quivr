@@ -13,7 +13,7 @@ class BrainSettings(BaseSettings):
     anthropic_api_key: str
     supabase_url: str
     supabase_service_key: str
-    database_url: str
+    pg_database_url: str
 
 
 class LLMSettings(BaseSettings):
