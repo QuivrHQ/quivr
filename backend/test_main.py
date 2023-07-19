@@ -1,7 +1,6 @@
 import os
 import random
 import string
-import uuid
 
 from fastapi.testclient import TestClient
 from main import app
@@ -430,7 +429,7 @@ def test_upload_explore_and_delete_file_pdf():
     # Assert that the upload response status code is 200 (HTTP OK)
     assert upload_response.status_code == 200
     # assert it starts with File uploaded successfully:
-    assert upload_response.json()["message"].startswith("File uploaded successfully:")
+    assert upload_response.json()["message"].startswith("✅ test.pdf has been uploaded to brain")
     # show message if it fails
     if not upload_response.json()["message"].startswith("File uploaded successfully:"):
         print(upload_response.json()["message"])
