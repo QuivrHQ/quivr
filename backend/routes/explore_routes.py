@@ -69,7 +69,12 @@ async def download_endpoint(
     if len(documents) == 0:
         return {"documents": []}
 
-    related_brain_id = UUID(documents[0]["brain_id"])
+    related_brain_id = (
+        documents[0]["brains_vectors"][0]["brain_id"]
+        if len(documents[0]["brains_vectors"]) != 0
+        else None
+    )
+    
     if related_brain_id is None:
         raise Exception(
             f"File {file_name} has no brain_id associated with it. Please contact support."
