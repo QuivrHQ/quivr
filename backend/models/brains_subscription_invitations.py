@@ -30,7 +30,12 @@ class BrainSubscription(BaseModel):
         return self.commons["db"].update_subscription_invitation(self.brain_id, self.email, self.rights)
 
     def create_or_update_subscription_invitation(self):
-        return self.commons["db"].create_or_update_subscription_invitation(self.brain_id, self.email)
+        response = self.commons["db"].get_subscription_invitations_by_brain_id_and_email(self.brain_id, self.email)
+
+        if response.data:
+            response = self.update_subscription_invitation()
+        else:
+            response = self.create_subscription_invitation()
 
     def get_brain_url(self) -> str:
         """Generates the brain URL based on the brain_id."""

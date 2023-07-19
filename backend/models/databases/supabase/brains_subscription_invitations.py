@@ -29,7 +29,7 @@ class BrainSubscription(Repository):
         )
         return response.data
 
-    def create_or_update_subscription_invitation(self, brain_id, user_email):
+    def get_subscription_invitations_by_brain_id_and_email(self, brain_id, user_email):
         response = (
             self.db.table("brain_subscription_invitations")
             .select("*")
@@ -37,9 +37,5 @@ class BrainSubscription(Repository):
             .eq("email", user_email)
             .execute()
         )
-        if response.data:
-            response = self.update_subscription_invitation()
-        else:
-            response = self.create_subscription_invitation()
 
         return response

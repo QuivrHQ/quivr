@@ -95,7 +95,7 @@ class Repository(ABC):
         pass
 
     @abstractmethod
-    def create_or_update_subscription_invitation(self, brain_id: UUID, user_email: str):
+    def get_subscription_invitations_by_brain_id_and_email(self, brain_id: UUID, user_email: str):
         pass
 
     @abstractmethod
