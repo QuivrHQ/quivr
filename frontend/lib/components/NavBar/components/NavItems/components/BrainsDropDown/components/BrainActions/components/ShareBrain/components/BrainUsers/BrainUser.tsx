@@ -6,8 +6,8 @@ import Field from "@/lib/components/ui/Field";
 import { Select } from "@/lib/components/ui/Select";
 import { useToast } from "@/lib/hooks";
 
-import { BrainRoleType } from "../../../types";
-import { availableRoles } from "../types";
+import { BrainRoleType } from "../../../../types";
+import { availableRoles } from "../../types";
 
 type BrainUserProps = {
   email: string;

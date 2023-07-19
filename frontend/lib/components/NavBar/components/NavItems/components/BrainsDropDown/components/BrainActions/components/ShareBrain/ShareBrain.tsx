@@ -8,7 +8,7 @@ import { MdContentPaste, MdShare } from "react-icons/md";
 import Button from "@/lib/components/ui/Button";
 import { Modal } from "@/lib/components/ui/Modal";
 
-import { BrainUsers } from "./components/BrainUsers";
+import { BrainUsers } from "./components/BrainUsers/BrainUsers";
 import { UserToInvite } from "./components/UserToInvite";
 import { useShareBrain } from "./hooks/useShareBrain";
 
@@ -28,9 +28,6 @@ export const ShareBrain = ({ brainId }: ShareBrainModalProps): JSX.Element => {
     sendingInvitation,
     setIsShareModalOpen,
     isShareModalOpen,
-    brainUsers,
-    fetchBrainUsers,
-    isFetchingBrainUsers,
   } = useShareBrain(brainId);
 
   const canAddNewRow =
@@ -108,12 +105,7 @@ export const ShareBrain = ({ brainId }: ShareBrainModalProps): JSX.Element => {
       </form>
       <div className="bg-gray-100 h-0.5 mb-5 border-gray-200 dark:border-gray-700" />
       <p className="text-lg font-bold">Users with access</p>
-      <BrainUsers
-        isFetchingBrainUsers={isFetchingBrainUsers}
-        brainId={brainId}
-        fetchBrainUsers={fetchBrainUsers}
-        users={brainUsers}
-      />
+      <BrainUsers brainId={brainId} />
     </Modal>
   );
 };
