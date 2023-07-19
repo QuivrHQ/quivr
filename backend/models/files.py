@@ -98,7 +98,7 @@ class File(BaseModel):
         Set the vectors_ids property with the ids of the vectors
         that are associated with the file in the vectors table
         """
-        self.vectors_ids = self.commons["db"].get_vectors_by_file_sha1(self.file_sha1)
+        self.vectors_ids = self.commons["db"].get_vectors_by_file_sha1(self.file_sha1).data
 
     def file_already_exists(self):
         """
