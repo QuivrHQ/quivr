@@ -25,3 +25,15 @@ To switch to a different brain, simply click on the brain name in the menu and s
 If you have not chosen a brain, you can assume that any documentation you upload will be added to the default brain.
 
 **Note: If you are having problems with the chat functionality, try selecting a brain from the menu. The default brain is not always selected automatically and you will need a brain selected to use the chat functionality.**
+
+## Using Resend API
+
+We have integrated [Resend](https://resend.com/docs/introduction), an email API for developers, in our application to handle sharing brains with an email invitation.
+
+Two environment variables have been introduced to handle this integration:
+
+- RESEND_API_KEY: This is the unique API key provided by Resend for our application. It allows us to communicate with the Resend platform in a secure way.
+
+- RESEND_EMAIL_ADDRESS: This is the email address we use as the sender address when sending emails through Resend.
+
+After fetching our Resend API key and email address from environment variables, we use it to send an email via resend.Emails.send method.
