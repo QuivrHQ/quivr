@@ -63,16 +63,7 @@ async def download_endpoint(
     # check if user has the right to get the file: add brain_id to the query
 
     commons = common_dependencies()
-    response = (
-        commons["supabase"]
-        .table("vectors")
-        .select(
-            "metadata->>file_name, metadata->>file_size, metadata->>file_extension, metadata->>file_url",
-            "content",
-        )
-        .match({"metadata->>file_name": file_name})
-        .execute()
-    )
+    response = commons["db"].get_user_file_by_name(file_name)
     documents = response.data
 
     if len(documents) == 0:

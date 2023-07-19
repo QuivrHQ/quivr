@@ -21,7 +21,9 @@ class Repository(ABC):
         pass
 
     @abstractmethod
-    def create_brain_user(self, user_id: UUID, brain_id: UUID, rights: str, default_brain: bool):
+    def create_brain_user(
+        self, user_id: UUID, brain_id: UUID, rights: str, default_brain: bool
+    ):
         pass
 
     @abstractmethod
@@ -77,11 +79,15 @@ class Repository(ABC):
         pass
 
     @abstractmethod
-    def create_subscription_invitation(self, brain_id: UUID, user_email: str, rights: str):
+    def create_subscription_invitation(
+        self, brain_id: UUID, user_email: str, rights: str
+    ):
         pass
 
     @abstractmethod
-    def update_subscription_invitation(self, brain_id: UUID, user_email: str, rights: str):
+    def update_subscription_invitation(
+        self, brain_id: UUID, user_email: str, rights: str
+    ):
         pass
 
     @abstractmethod
@@ -146,4 +152,26 @@ class Repository(ABC):
 
     @abstractmethod
     def delete_chat_history(self, chat_id: UUID):
+        pass
+
+    @abstractmethod
+    def get_vectors_by_file_name(self, file_name: str):
+        pass
+
+    @abstractmethod
+    def similarity_search(
+        self, query_embedding, table: str, top_k: int, threshold: float
+    ):
+        pass
+
+    @abstractmethod
+    def update_summary(self, document_id: UUID, summary_id: int):
+        pass
+
+    @abstractmethod
+    def get_vectors_by_batch(self, batch_id: UUID):
+        pass
+
+    @abstractmethod
+    def get_vectors_in_batch(self, batch_ids):
         pass

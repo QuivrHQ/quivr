@@ -75,11 +75,10 @@ class User(Repository):
         )
 
         return response
-    
+
     def get_user_stats(self, user_email, date):
         response = (
-            self.db
-            .from_("users")
+            self.db.from_("users")
             .select("*")
             .filter("email", "eq", user_email)
             .filter("date", "eq", date)
