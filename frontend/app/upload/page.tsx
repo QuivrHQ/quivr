@@ -1,13 +1,12 @@
-/* eslint-disable */
 "use client";
 import Link from "next/link";
 
+import { BrainRoleType } from "@/lib/components/NavBar/components/NavItems/components/BrainsDropDown/components/BrainActions/types";
 import Button from "@/lib/components/ui/Button";
 import { Divider } from "@/lib/components/ui/Divider";
 import PageHeading from "@/lib/components/ui/PageHeading";
-
-import { BrainRoleType } from "@/lib/components/NavBar/components/NavItems/components/BrainsDropDown/components/BrainActions/types";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
+
 import { Crawler } from "./components/Crawler";
 import { FileUploader } from "./components/FileUploader";
 
@@ -22,16 +21,14 @@ const UploadPage = (): JSX.Element => {
         <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative max-w-md">
           <strong className="font-bold mr-1">Oh no!</strong>
           <span className="block sm:inline">
-            You need to select a brain first. 🧠💡🥲
+            {"You need to select a brain first. 🧠💡🥲"}
           </span>
         </div>
       </div>
     );
   }
 
-  const hasUploadRights =
-    currentBrain?.rights !== undefined &&
-    requiredRolesForUpload.includes(currentBrain?.rights);
+  const hasUploadRights = requiredRolesForUpload.includes(currentBrain.rights);
 
   if (!hasUploadRights) {
     return (
@@ -39,8 +36,9 @@ const UploadPage = (): JSX.Element => {
         <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative max-w-md">
           <strong className="font-bold mr-1">Oh no!</strong>
           <span className="block sm:inline">
-            You don't have the necessary rights to upload content to the
-            selected brain. 🧠💡🥲
+            {
+              "You don't have the necessary rights to upload content to the selected brain. 🧠💡🥲"
+            }
           </span>
         </div>
       </div>
@@ -50,7 +48,7 @@ const UploadPage = (): JSX.Element => {
   return (
     <main className="pt-10">
       <PageHeading
-        title="Upload Knowledge"
+        title={`Upload Knowledge to ${currentBrain.name}`}
         subtitle="Text, document, spreadsheet, presentation, audio, video, and URLs supported"
       />
       <FileUploader />
