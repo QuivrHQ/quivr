@@ -1,32 +1,25 @@
 import { UUID } from "crypto";
 
-import { Subscription } from "@/lib/api/brain/brain";
-
 import { BrainUser } from "./BrainUser";
+import { useBrainUsers } from "./hooks/useBrainUsers";
 
 type BrainUsersProps = {
-  users: Subscription[];
   brainId: UUID;
-  fetchBrainUsers: () => Promise<void>;
-  isFetchingBrainUsers: boolean;
 };
-export const BrainUsers = ({
-  users,
-  brainId,
-  fetchBrainUsers,
-  isFetchingBrainUsers,
-}: BrainUsersProps): JSX.Element => {
+export const BrainUsers = ({ brainId }: BrainUsersProps): JSX.Element => {
+  const { brainUsers, fetchBrainUsers, isFetchingBrainUsers } =
+    useBrainUsers(brainId);
   if (isFetchingBrainUsers) {
     return <p className="text-gray-500">Loading...</p>;
   }
 
-  if (users.length === 0) {
-    return <p className="text-gray-500">No users</p>;
+  if (brainUsers.length === 0) {
+    return <p className="text-gray-500">No brainUsers</p>;
   }
 
   return (
     <>
-      {users.map((subscription) => (
+      {brainUsers.map((subscription) => (
         <BrainUser
           key={subscription.email}
           email={subscription.email}
