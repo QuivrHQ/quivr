@@ -79,7 +79,7 @@ class Repository(ABC):
         pass
 
     @abstractmethod
-    def file_already_exists_in_brain(self, brain_id: UUID, file_sha1: str):
+    def get_brain_vectors_by_brain_id_and_file_sha1(self, brain_id: UUID, file_sha1: str):
         pass
 
     @abstractmethod

@@ -126,7 +126,13 @@ class File(BaseModel):
         Args:
             brain_id (str): Brain id
         """
-        return self.commons["db"].file_already_exists_in_brain(brain_id, self.file_sha1)
+        response = self.commons["db"].get_brain_vectors_by_brain_id_and_file_sha1(brain_id, self.file_sha1)
+
+        print("response.data", response.data)
+        if len(response.data) == 0:
+            return False
+
+        return True
 
     def file_is_empty(self):
         """
