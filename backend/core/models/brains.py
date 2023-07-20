@@ -1,4 +1,3 @@
-import os
 from typing import Any, List, Optional
 from uuid import UUID
 
@@ -6,7 +5,7 @@ from logger import get_logger
 from pydantic import BaseModel
 from utils.vectors import get_unique_files_from_vector_ids
 
-from models.settings import CommonsDep, common_dependencies
+from models.settings import BrainRateLimiting, CommonsDep, common_dependencies
 from models.users import User
 
 logger = get_logger(__name__)
@@ -19,11 +18,15 @@ class Brain(BaseModel):
     model: Optional[str] = "gpt-3.5-turbo-0613"
     temperature: Optional[float] = 0.0
     max_tokens: Optional[int] = 256
-    max_brain_size: Optional[int] = int(os.getenv("MAX_BRAIN_SIZE", 52428800))
     files: List[Any] = []
 
     class Config:
         arbitrary_types_allowed = True
+
+    @property
+    def max_brain_size(self) -> int:
+        brain_rate_limiting = BrainRateLimiting()
+        return brain_rate_limiting.max_brain_size
 
     @property
     def commons(self) -> CommonsDep:

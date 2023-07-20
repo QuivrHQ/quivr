@@ -28,7 +28,7 @@ const InvitationPage = (): JSX.Element => {
   }
 
   if (rights === undefined) {
-    throw new Error("Rights are undefined");
+    throw new Error("Role are undefined");
   }
 
   return (
