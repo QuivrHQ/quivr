@@ -7,6 +7,11 @@ from supabase.client import Client, create_client
 from vectorstore.supabase import SupabaseVectorStore
 
 
+class BrainRateLimiting(BaseSettings):
+    max_brain_size = 52428800
+    max_brain_per_user = 5
+
+
 class BrainSettings(BaseSettings):
     openai_api_key: str
     anthropic_api_key: str

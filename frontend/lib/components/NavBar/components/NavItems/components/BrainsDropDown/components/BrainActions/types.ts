@@ -4,6 +4,6 @@ export type BrainRoleType = (typeof roles)[number];
 
 export type BrainRoleAssignation = {
   email: string;
-  rights: BrainRoleType;
+  role: BrainRoleType;
   id: string;
 };

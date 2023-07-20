@@ -8,7 +8,7 @@ from models.brains import (
     get_default_user_brain,
     get_default_user_brain_or_create_new,
 )
-from models.settings import common_dependencies
+from models.settings import BrainRateLimiting, common_dependencies
 from models.users import User
 
 from routes.authorizations.brain_authorization import has_brain_authorization
@@ -103,6 +103,15 @@ async def create_brain_endpoint(
     """
 
     brain = Brain(name=brain.name)  # pyright: ignore reportPrivateUsage=none
+
+    user_brains = brain.get_user_brains(current_user.id)
+    max_brain_per_user = BrainRateLimiting().max_brain_per_user
+
+    if len(user_brains) >= max_brain_per_user:
+        raise HTTPException(
+            status_code=429,
+            detail=f"Maximum number of brains reached ({max_brain_per_user}).",
+        )
 
     brain.create_brain()  # pyright: ignore reportPrivateUsage=none
     default_brain = get_default_user_brain(current_user)

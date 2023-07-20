@@ -34,7 +34,7 @@ const DocumentItem = forwardRef(
     const { track } = useEventTracking();
     const { currentBrain } = useBrainContext();
 
-    const canDeleteFile = currentBrain?.rights === "Owner";
+    const canDeleteFile = currentBrain?.role === "Owner";
 
     if (!session) {
       throw new Error("User session not found");

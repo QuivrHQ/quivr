@@ -20,7 +20,7 @@ export const UserToInvite = ({
   roleAssignation,
 }: UserToInviteProps): JSX.Element => {
   const [selectedRole, setSelectedRole] = useState<BrainRoleType>(
-    roleAssignation.rights
+    roleAssignation.role
   );
   const [email, setEmail] = useState(roleAssignation.email);
   const { currentBrain } = useBrainContext();
@@ -33,7 +33,7 @@ export const UserToInvite = ({
     onChange({
       ...roleAssignation,
       email,
-      rights: selectedRole,
+      role: selectedRole,
     });
   }, [email, selectedRole]);
 
@@ -60,7 +60,7 @@ export const UserToInvite = ({
       <Select
         onChange={setSelectedRole}
         value={selectedRole}
-        options={userRoleToAssignableRoles[currentBrain.rights]}
+        options={userRoleToAssignableRoles[currentBrain.role]}
       />
     </div>
   );

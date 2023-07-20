@@ -1,3 +1,4 @@
+import axios from "axios";
 import { FormEvent, useState } from "react";
 import { MdAdd } from "react-icons/md";
 
@@ -5,11 +6,12 @@ import Button from "@/lib/components/ui/Button";
 import Field from "@/lib/components/ui/Field";
 import { Modal } from "@/lib/components/ui/Modal";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
+import { useToast } from "@/lib/hooks";
 
 export const AddBrainModal = (): JSX.Element => {
   const [newBrainName, setNewBrainName] = useState("");
   const [isPending, setIsPending] = useState(false);
-
+  const { publish } = useToast();
   const { createBrain } = useBrainContext();
 
   const handleSubmit = async (e: FormEvent) => {
@@ -17,10 +19,31 @@ export const AddBrainModal = (): JSX.Element => {
     if (newBrainName.trim() === "" || isPending) {
       return;
     }
-    setIsPending(true);
-    await createBrain(newBrainName);
-    setNewBrainName("");
-    setIsPending(false);
+    try {
+      setIsPending(true);
+      await createBrain(newBrainName);
+      setNewBrainName("");
+    } catch (err) {
+      if (axios.isAxiosError(err) && err.response?.status === 429) {
+        publish({
+          variant: "danger",
+          text: `${JSON.stringify(
+            (
+              err.response as {
+                data: { detail: string };
+              }
+            ).data.detail
+          )}`,
+        });
+      } else {
+        publish({
+          variant: "danger",
+          text: `${JSON.stringify(err)}`,
+        });
+      }
+    } finally {
+      setIsPending(false);
+    }
   };
 
   return (
