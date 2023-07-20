@@ -46,6 +46,13 @@ class OpenAIBrainPicking(QABaseBrainPicking):
             openai_api_key=self.openai_api_key
         )  # pyright: ignore reportPrivateUsage=none
 
+    # def _get_token_count(self, response: str) -> int:
+    #     """
+    #     calculate the number of tokens
+    #     """
+    #     num_tokens = self.openai_client.get_num_tokens(response)
+    #     return num_tokens
+
     def _create_llm(self, model, streaming=False, callbacks=None) -> BaseLLM:
         """
         Determine the language model to be used.
@@ -54,6 +61,7 @@ class OpenAIBrainPicking(QABaseBrainPicking):
         :param callbacks: Callbacks to be used for streaming
         :return: Language model instance
         """
+        logger.info("i am working .. ")
         return ChatOpenAI(
             temperature=self.temperature,
             model=model,
