@@ -71,7 +71,7 @@ class Brain(Repository):
 
     def delete_brain(self, brain_id: str):
         results = (
-            self.db.table("brains").delete().match({"brain_id": self.id}).execute()
+            self.db.table("brains").delete().match({"brain_id": brain_id}).execute()
         )
 
         return results
