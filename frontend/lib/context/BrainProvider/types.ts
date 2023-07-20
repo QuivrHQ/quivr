@@ -18,6 +18,11 @@ export type Brain = {
 export type MinimalBrainForUser = {
   id: UUID;
   name: string;
+  role: BrainRoleType;
+};
+
+//TODO: rename rights to role in Backend and use MinimalBrainForUser instead of BackendMinimalBrainForUser
+export type BackendMinimalBrainForUser = Omit<MinimalBrainForUser, "role"> & {
   rights: BrainRoleType;
 };
 

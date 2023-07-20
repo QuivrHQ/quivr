@@ -2,7 +2,8 @@
 import { renderHook } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { Subscription, SubscriptionUpdatableProperties } from "../brain";
+import { Subscription } from "../brain";
+import { SubscriptionUpdatableProperties } from "../types";
 import { useBrainApi } from "../useBrainApi";
 
 const axiosGetMock = vi.fn(() => ({
@@ -89,6 +90,12 @@ describe("useBrainApi", () => {
   });
 
   it("should call getBrains with the correct parameters", async () => {
+    axiosGetMock.mockImplementationOnce(() => ({
+      data: {
+        //@ts-ignore we don't really need returned value here
+        brains: [],
+      },
+    }));
     const {
       result: {
         current: { getBrains },
@@ -123,19 +130,26 @@ describe("useBrainApi", () => {
     const subscriptions: Subscription[] = [
       {
         email: "user@quivr.app",
-        rights: "Viewer",
+        role: "Viewer",
       },
     ];
     await addBrainSubscriptions(id, subscriptions);
 
     expect(axiosPostMock).toHaveBeenCalledTimes(1);
-    expect(axiosPostMock).toHaveBeenCalledWith(
-      `/brains/${id}/subscription`,
-      subscriptions
-    );
+    expect(axiosPostMock).toHaveBeenCalledWith(`/brains/${id}/subscription`, [
+      {
+        email: "user@quivr.app",
+        rights: "Viewer",
+      },
+    ]);
   });
 
   it("should call getBrainUsers with the correct parameters", async () => {
+    axiosGetMock.mockImplementationOnce(() => ({
+      //@ts-ignore we don't really need returned value here
+      data: [],
+    }));
+
     const {
       result: {
         current: { getBrainUsers },
@@ -156,13 +170,13 @@ describe("useBrainApi", () => {
     const brainId = "123";
     const email = "456";
     const subscription: SubscriptionUpdatableProperties = {
-      rights: "Viewer",
+      role: "Viewer",
     };
     await updateBrainAccess(brainId, email, subscription);
     expect(axiosPutMock).toHaveBeenCalledTimes(1);
     expect(axiosPutMock).toHaveBeenCalledWith(
       `/brains/${brainId}/subscription`,
-      { ...subscription, email }
+      { rights: "Viewer", email }
     );
   });
 });

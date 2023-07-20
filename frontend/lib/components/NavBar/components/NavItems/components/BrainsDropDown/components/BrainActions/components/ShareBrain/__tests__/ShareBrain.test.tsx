@@ -39,7 +39,7 @@ vi.mock("@/lib/context/BrainProvider/hooks/useBrainContext", async () => {
     useBrainContext: () => ({
       ...actual.useBrainContext(),
       currentBrain: {
-        rights: "Editor",
+        role: "Editor",
       },
     }),
   };

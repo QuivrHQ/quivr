@@ -23,7 +23,7 @@ export const BrainUsers = ({ brainId }: BrainUsersProps): JSX.Element => {
         <BrainUser
           key={subscription.email}
           email={subscription.email}
-          rights={subscription.rights}
+          role={subscription.role}
           brainId={brainId}
           fetchBrainUsers={fetchBrainUsers}
         />
