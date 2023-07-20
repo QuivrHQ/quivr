@@ -6,7 +6,7 @@ toto.txt
 *.ipynb
 log.txt
 
-.idea/
+.idea
 .vscode
 backend/myenv
 
