@@ -28,7 +28,10 @@ const InvitationPage = (): JSX.Element => {
   }
 
   if (rights === undefined) {
-    throw new Error("Role are undefined");
+    // This should never happen
+    // It is a way to prevent the page from crashing when invitation is invalid instead of throwing an error
+    // The user will be redirected to the home page (handled in the useInvitation hook)
+    return <div />;
   }
 
   return (
