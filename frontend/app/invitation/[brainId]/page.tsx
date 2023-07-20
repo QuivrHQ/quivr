@@ -15,6 +15,7 @@ const InvitationPage = (): JSX.Element => {
     handleDecline,
     isLoading,
     brainName,
+    rights,
   } = useInvitation();
   const { session } = useSupabase();
 
@@ -26,11 +27,15 @@ const InvitationPage = (): JSX.Element => {
     redirectToLogin();
   }
 
+  if (rights === undefined) {
+    throw new Error("Rights are undefined");
+  }
+
   return (
     <main className="pt-10">
       <PageHeading
         title={`Welcome to ${brainName}!`}
-        subtitle="You have been invited to join this brain and start exploring. Do you accept this exciting journey?"
+        subtitle={`You have been invited to join this brain as a ${rights} and start exploring. Do you accept this exciting journey?`}
       />
       {isProcessingRequest ? (
         <div className="flex flex-col items-center justify-center mt-5">

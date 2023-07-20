@@ -1,6 +1,8 @@
 import { AxiosInstance } from "axios";
 import { UUID } from "crypto";
 
+import { BrainRoleType } from "@/lib/components/NavBar/components/NavItems/components/BrainsDropDown/components/BrainActions/types";
+
 export const acceptInvitation = async (
   brainId: UUID,
   axiosInstance: AxiosInstance
@@ -31,6 +33,7 @@ export const declineInvitation = async (
 
 export type InvitationBrain = {
   name: string;
+  rights: BrainRoleType;
 };
 
 export const getInvitation = async (
