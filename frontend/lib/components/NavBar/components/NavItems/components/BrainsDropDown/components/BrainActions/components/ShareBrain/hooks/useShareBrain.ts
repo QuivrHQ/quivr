@@ -1,4 +1,5 @@
 /* eslint-disable max-lines */
+import axios, { AxiosResponse } from "axios";
 import { useState } from "react";
 
 import { useBrainApi } from "@/lib/api/brain/useBrainApi";
@@ -77,10 +78,21 @@ export const useShareBrain = (brainId: string) => {
       setIsShareModalOpen(false);
       setRoleAssignation([generateBrainAssignation()]);
     } catch (error) {
-      publish({
-        variant: "danger",
-        text: "An error occurred while sending invitations",
-      });
+      if (axios.isAxiosError(error) && error.response?.data !== undefined) {
+        publish({
+          variant: "danger",
+          text: (
+            error.response as AxiosResponse<{
+              detail: string;
+            }>
+          ).data.detail,
+        });
+      } else {
+        publish({
+          variant: "danger",
+          text: "An error occurred while sending invitations",
+        });
+      }
     } finally {
       setSendingInvitation(false);
     }

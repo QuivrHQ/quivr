@@ -7,6 +7,10 @@ import {
   BrainConfigProviderMock,
 } from "@/lib/context/BrainConfigProvider/mocks/BrainConfigProviderMock";
 import {
+  BrainContextMock,
+  BrainProviderMock,
+} from "@/lib/context/BrainProvider/mocks/BrainProviderMock";
+import {
   SupabaseContextMock,
   SupabaseProviderMock,
 } from "@/lib/context/SupabaseProvider/mocks/SupabaseProviderMock";
@@ -20,6 +24,26 @@ vi.mock("@/lib/context/SupabaseProvider/supabase-provider", () => ({
 vi.mock("@/lib/context/BrainConfigProvider/brain-config-provider", () => ({
   BrainConfigContext: BrainConfigContextMock,
 }));
+
+vi.mock("@/lib/context/BrainProvider/brain-provider", () => ({
+  BrainContext: BrainContextMock,
+}));
+
+vi.mock("@/lib/context/BrainProvider/hooks/useBrainContext", async () => {
+  const actual = await vi.importActual<
+    typeof import("@/lib/context/BrainProvider/hooks/useBrainContext")
+  >("@/lib/context/BrainProvider/hooks/useBrainContext");
+
+  return {
+    ...actual,
+    useBrainContext: () => ({
+      ...actual.useBrainContext(),
+      currentBrain: {
+        rights: "Editor",
+      },
+    }),
+  };
+});
 
 vi.mock("@/lib/api/brain/useBrainApi", async () => {
   const actual = await vi.importActual<
@@ -44,10 +68,12 @@ describe("ShareBrain", () => {
     const { getByTestId } = render(
       <SupabaseProviderMock>
         <BrainConfigProviderMock>
-          <ShareBrain
-            name="test"
-            brainId="cf9bb422-b1b6-4fd7-abc1-01bd395d2318"
-          />
+          <BrainProviderMock>
+            <ShareBrain
+              name="test"
+              brainId="cf9bb422-b1b6-4fd7-abc1-01bd395d2318"
+            />
+          </BrainProviderMock>
         </BrainConfigProviderMock>
       </SupabaseProviderMock>
     );
@@ -59,12 +85,14 @@ describe("ShareBrain", () => {
     const { getByText, getByTestId } = render(
       // Todo: add a custom render function that wraps the component with the providers
       <SupabaseProviderMock>
-        <BrainConfigProviderMock>
-          <ShareBrain
-            name="test"
-            brainId="cf9bb422-b1b6-4fd7-abc1-01bd395d2318"
-          />
-        </BrainConfigProviderMock>
+        <BrainProviderMock>
+          <BrainConfigProviderMock>
+            <ShareBrain
+              name="test"
+              brainId="cf9bb422-b1b6-4fd7-abc1-01bd395d2318"
+            />
+          </BrainConfigProviderMock>
+        </BrainProviderMock>
       </SupabaseProviderMock>
     );
     const shareButton = getByTestId("share-brain-button");
@@ -76,10 +104,12 @@ describe("ShareBrain", () => {
     const { getByTestId, findAllByTestId } = render(
       <SupabaseProviderMock>
         <BrainConfigProviderMock>
-          <ShareBrain
-            name="test"
-            brainId="cf9bb422-b1b6-4fd7-abc1-01bd395d2318"
-          />
+          <BrainProviderMock>
+            <ShareBrain
+              name="test"
+              brainId="cf9bb422-b1b6-4fd7-abc1-01bd395d2318"
+            />
+          </BrainProviderMock>
         </BrainConfigProviderMock>
       </SupabaseProviderMock>
     );
