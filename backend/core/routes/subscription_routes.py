@@ -179,7 +179,7 @@ def get_user_invitation(brain_id: UUID, current_user: User = Depends(get_current
             detail="Brain not found while trying to get invitation",
         )
 
-    return {"name": brain_details[0]["name"]}
+    return {"name": brain_details[0]["name"], "rights": invitation["rights"]}
 
 
 @subscription_router.post(

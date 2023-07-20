@@ -6,6 +6,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import { useSubscriptionApi } from "@/lib/api/subscription/useSubscriptionApi";
+import { BrainRoleType } from "@/lib/components/NavBar/components/NavItems/components/BrainsDropDown/components/BrainActions/types";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 import { useToast } from "@/lib/hooks";
 import { useEventTracking } from "@/services/analytics/useEventTracking";
@@ -16,6 +17,7 @@ export const useInvitation = () => {
   const brainId = params?.brainId as UUID | undefined;
   const [isLoading, setIsLoading] = useState(false);
   const [brainName, setBrainName] = useState<string>("");
+  const [rights, setRights] = useState<BrainRoleType | undefined>();
   const [isProcessingRequest, setIsProcessingRequest] = useState(false);
 
   const { publish } = useToast();
@@ -35,8 +37,9 @@ export const useInvitation = () => {
 
     const checkInvitationValidity = async () => {
       try {
-        const invitationBrain = await getInvitation(brainId);
-        setBrainName(invitationBrain.name);
+        const { name, rights: assignedRights } = await getInvitation(brainId);
+        setBrainName(name);
+        setRights(assignedRights);
       } catch (error) {
         if (axios.isAxiosError(error) && error.response?.status === 404) {
           publish({
@@ -126,8 +129,9 @@ export const useInvitation = () => {
   return {
     handleAccept,
     handleDecline,
-    isLoading,
     brainName,
+    rights,
+    isLoading,
     isProcessingRequest,
   };
 };
