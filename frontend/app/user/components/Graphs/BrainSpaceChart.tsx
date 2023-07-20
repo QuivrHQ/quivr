@@ -18,7 +18,6 @@ const BrainSpaceChart = ({
 }: BrainSpaceChartProps): JSX.Element => {
   return (
     <>
-      {/* @ts-expect-error Server Component */}
       <VictoryPie
         data={[
           { x: "Used", y: current_brain_size },
