@@ -63,22 +63,18 @@ async def download_endpoint(
     # check if user has the right to get the file: add brain_id to the query
 
     commons = common_dependencies()
-    response = (
-        commons["supabase"]
-        .table("vectors")
-        .select(
-            "metadata->>file_name, metadata->>file_size, metadata->>file_extension, metadata->>file_url",
-            "content",
-        )
-        .match({"metadata->>file_name": file_name})
-        .execute()
-    )
+    response = commons["db"].get_vectors_by_file_name(file_name)
     documents = response.data
 
     if len(documents) == 0:
         return {"documents": []}
 
-    related_brain_id = UUID(documents[0]["brain_id"])
+    related_brain_id = (
+        documents[0]["brains_vectors"][0]["brain_id"]
+        if len(documents[0]["brains_vectors"]) != 0
+        else None
+    )
+    
     if related_brain_id is None:
         raise Exception(
             f"File {file_name} has no brain_id associated with it. Please contact support."

@@ -8,16 +8,7 @@ from models.settings import common_dependencies
 def update_chat_history(chat_id: str, user_message: str, assistant: str) -> ChatHistory:
     commons = common_dependencies()
     response: List[ChatHistory] = (
-        commons["supabase"]
-        .table("chat_history")
-        .insert(
-            {
-                "chat_id": str(chat_id),
-                "user_message": user_message,
-                "assistant": assistant,
-            }
-        )
-        .execute()
+        commons["db"].update_chat_history(chat_id, user_message, assistant)
     ).data
     if len(response) == 0:
         raise HTTPException(

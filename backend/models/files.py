@@ -28,6 +28,10 @@ class File(BaseModel):
     documents: Optional[Any] = None
     _commons: Optional[CommonsDep] = None
 
+    @property
+    def commons(self) -> CommonsDep:
+        return common_dependencies()
+
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
@@ -94,17 +98,7 @@ class File(BaseModel):
         Set the vectors_ids property with the ids of the vectors
         that are associated with the file in the vectors table
         """
-
-        commons = common_dependencies()
-        response = (
-            commons["supabase"]
-            .table("vectors")
-            .select("id")
-            .filter("metadata->>file_sha1", "eq", self.file_sha1)
-            .execute()
-        )
-        self.vectors_ids = response.data
-        return
+        self.vectors_ids = self.commons["db"].get_vectors_by_file_sha1(self.file_sha1).data
 
     def file_already_exists(self):
         """
@@ -132,17 +126,8 @@ class File(BaseModel):
         Args:
             brain_id (str): Brain id
         """
-        commons = common_dependencies()
-        self.set_file_vectors_ids()
-        # Check if file exists in that brain
-        response = (
-            commons["supabase"]
-            .table("brains_vectors")
-            .select("brain_id, vector_id")
-            .filter("brain_id", "eq", brain_id)
-            .filter("file_sha1", "eq", self.file_sha1)
-            .execute()
-        )
+        response = self.commons["db"].get_brain_vectors_by_brain_id_and_file_sha1(brain_id, self.file_sha1)
+
         print("response.data", response.data)
         if len(response.data) == 0:
             return False

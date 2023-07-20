@@ -1,5 +1,6 @@
 SUPABASE_URL=<change-me>
 SUPABASE_SERVICE_KEY=<change-me>
+PG_DATABASE_URL=<change-me>
 OPENAI_API_KEY=<change-me>
 ANTHROPIC_API_KEY=null
 JWT_SECRET_KEY=<change-me>

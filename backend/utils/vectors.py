@@ -35,18 +35,7 @@ class Neurons(BaseModel):
 
     def similarity_search(self, query, table="match_summaries", top_k=5, threshold=0.5):
         query_embedding = self.create_embedding(query)
-        summaries = (
-            self.commons["supabase"]
-            .rpc(
-                table,
-                {
-                    "query_embedding": query_embedding,
-                    "match_count": top_k,
-                    "match_threshold": threshold,
-                },
-            )
-            .execute()
-        )
+        summaries = self.commons["db"].similarity_search(query_embedding, table, top_k, threshold)
         return summaries.data
 
 
@@ -58,9 +47,7 @@ def create_summary(commons: CommonsDep, document_id, content, metadata):
     summary_doc_with_metadata = Document(page_content=summary, metadata=metadata)
     sids = commons["summaries_vector_store"].add_documents([summary_doc_with_metadata])
     if sids and len(sids) > 0:
-        commons["supabase"].table("summaries").update(
-            {"document_id": document_id}
-        ).match({"id": sids[0]}).execute()
+        commons["db"].update_summary(document_id, sids[0])
 
 
 def error_callback(exception):
@@ -69,28 +56,12 @@ def error_callback(exception):
 
 def process_batch(batch_ids: List[str]):
     commons = common_dependencies()
-    supabase = commons["supabase"]
+    db = commons["db"]
     try:
         if len(batch_ids) == 1:
-            return (
-                supabase.table("vectors")
-                .select(
-                    "name:metadata->>file_name, size:metadata->>file_size",
-                    count="exact",
-                )
-                .eq("id", batch_ids[0])  # Use parameter binding for single ID
-                .execute()
-            ).data
+            return (db.get_vectors_by_batch(batch_ids[0])).data
         else:
-            return (
-                supabase.table("vectors")
-                .select(
-                    "name:metadata->>file_name, size:metadata->>file_size",
-                    count="exact",
-                )
-                .in_("id", batch_ids)  # Use parameter binding for multiple IDs
-                .execute()
-            ).data
+            return (db.get_vectors_in_batch(batch_ids)).data
     except Exception as e:
         logger.error("Error retrieving batched vectors", e)
 

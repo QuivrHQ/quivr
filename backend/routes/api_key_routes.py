@@ -1,4 +1,3 @@
-from datetime import datetime
 from secrets import token_hex
 from typing import List
 from uuid import uuid4
@@ -53,20 +52,7 @@ async def create_api_key(
     while not api_key_inserted:
         try:
             # Attempt to insert new API key into database
-            commons["supabase"].table("api_keys").insert(
-                [
-                    {
-                        "key_id": str(new_key_id),
-                        "user_id": str(current_user.id),
-                        "api_key": str(new_api_key),
-                        "creation_time": datetime.utcnow().strftime(
-                            "%Y-%m-%d %H:%M:%S"
-                        ),
-                        "is_active": True,
-                    }
-                ]
-            ).execute()
-
+            commons["db"].create_api_key(new_key_id, new_api_key, current_user.id)
             api_key_inserted = True
 
         except UniqueViolationError:
@@ -96,12 +82,7 @@ async def delete_api_key(
 
     """
 
-    commons["supabase"].table("api_keys").update(
-        {
-            "is_active": False,
-            "deleted_time": datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S"),
-        }
-    ).match({"key_id": key_id, "user_id": current_user.id}).execute()
+    commons["db"].delete_api_key(key_id, current_user.id)
 
     return {"message": "API key deleted."}
 
@@ -125,12 +106,5 @@ async def get_api_keys(
     containing the key ID and creation time for each API key.
     """
 
-    response = (
-        commons["supabase"]
-        .table("api_keys")
-        .select("key_id, creation_time")
-        .filter("user_id", "eq", current_user.id)
-        .filter("is_active", "eq", True)
-        .execute()
-    )
+    response = commons["db"].get_user_api_keys(current_user.id)
     return response.data

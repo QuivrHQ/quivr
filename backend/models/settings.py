@@ -1,4 +1,5 @@
 from typing import Annotated
+from models.databases.supabase.supabase import SupabaseDB
 
 from fastapi import Depends
 from langchain.embeddings.openai import OpenAIEmbeddings
@@ -12,6 +13,7 @@ class BrainSettings(BaseSettings):
     anthropic_api_key: str
     supabase_url: str
     supabase_service_key: str
+    pg_database_url: str
 
 
 class LLMSettings(BaseSettings):
@@ -34,8 +36,12 @@ def common_dependencies() -> dict:
         supabase_client, embeddings, table_name="summaries"
     )
 
+    db = None
+    db = SupabaseDB(supabase_client)
+
     return {
         "supabase": supabase_client,
+        "db": db,
         "embeddings": embeddings,
         "documents_vector_store": documents_vector_store,
         "summaries_vector_store": summaries_vector_store,
