@@ -185,34 +185,36 @@ class OpenAIFunctionsBrainPicking(BaseBrainPicking):
             },
         ]
 
-        # First, try to get an answer using just the question
+        # First, try to get an answer using the documents and history
         response = self._get_model_response(
-            messages=self._construct_prompt(question), functions=functions
+            messages=self._construct_prompt(question, useContext=True, useHistory=True),
+            functions=functions,
         )
+        print(response)
+
         formatted_response = format_answer(response)
 
-        # If the model calls for history, try again with history included
+        # If the model calls for history, try again with just the question
         if (
             formatted_response.function_call
             and formatted_response.function_call.name == "get_history"
         ):
             logger.info("Model called for history")
             response = self._get_model_response(
-                messages=self._construct_prompt(question, useHistory=True),
+                messages=self._construct_prompt(question),
                 functions=[],
             )
 
             formatted_response = format_answer(response)
 
+        # If the model calls for history and context, try again with just the question
         if (
             formatted_response.function_call
             and formatted_response.function_call.name == "get_history_and_context"
         ):
             logger.info("Model called for history and context")
             response = self._get_model_response(
-                messages=self._construct_prompt(
-                    question, useContext=True, useHistory=True
-                ),
+                messages=self._construct_prompt(question),
                 functions=[],
             )
             formatted_response = format_answer(response)
