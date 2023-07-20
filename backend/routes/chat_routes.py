@@ -34,7 +34,7 @@ def delete_chat_from_db(commons, chat_id):
         print(e)
         pass
     try:
-        commons["db"].delete_chat
+        commons["db"].delete_chat(chat_id)
     except Exception as e:
         print(e)
         pass
