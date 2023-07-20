@@ -13,7 +13,19 @@ class Repository(ABC):
         pass
 
     @abstractmethod
-    def delete_brain(self, user_id: str, brain_id: str):
+    def delete_brain_user_by_id(self, user_id: str, brain_id: str):
+        pass
+
+    @abstractmethod
+    def delete_brain_vector(self, brain_id: str):
+        pass
+
+    @abstractmethod
+    def delete_brain_user(self, brain_id: str):
+        pass
+
+    @abstractmethod
+    def delete_brain(self, brain_id: str):
         pass
 
     @abstractmethod
@@ -79,7 +91,9 @@ class Repository(ABC):
         pass
 
     @abstractmethod
-    def get_brain_vectors_by_brain_id_and_file_sha1(self, brain_id: UUID, file_sha1: str):
+    def get_brain_vectors_by_brain_id_and_file_sha1(
+        self, brain_id: UUID, file_sha1: str
+    ):
         pass
 
     @abstractmethod
@@ -95,7 +109,9 @@ class Repository(ABC):
         pass
 
     @abstractmethod
-    def get_subscription_invitations_by_brain_id_and_email(self, brain_id: UUID, user_email: str):
+    def get_subscription_invitations_by_brain_id_and_email(
+        self, brain_id: UUID, user_email: str
+    ):
         pass
 
     @abstractmethod

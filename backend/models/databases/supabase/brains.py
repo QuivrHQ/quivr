@@ -40,13 +40,40 @@ class Brain(Repository):
         )
         return response.data
 
-    def delete_brain(self, user_id, brain_id):
+    def delete_brain_user_by_id(self, user_id, brain_id):
         results = (
             self.db.table("brains_users")
             .select("*")
             .match({"brain_id": brain_id, "user_id": user_id, "rights": "Owner"})
             .execute()
         )
+        return results
+
+    def delete_brain_vector(self, brain_id: str):
+        results = (
+            self.db.table("brains_vectors")
+            .delete()
+            .match({"brain_id": brain_id})
+            .execute()
+        )
+
+        return results
+
+    def delete_brain_user(self, brain_id: str):
+        results = (
+            self.db.table("brains_users")
+            .delete()
+            .match({"brain_id": brain_id})
+            .execute()
+        )
+
+        return results
+
+    def delete_brain(self, brain_id: str):
+        results = (
+            self.db.table("brains").delete().match({"brain_id": self.id}).execute()
+        )
+
         return results
 
     def create_brain(self, name):

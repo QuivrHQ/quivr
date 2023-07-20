@@ -59,28 +59,14 @@ class Brain(BaseModel):
         return self.commons["db"].get_brain_details(self.id)
 
     def delete_brain(self, user_id):
-        results = self.commons["db"].delete_brain(user_id, self.id)
+        results = self.commons["db"].delete_brain_user_by_id(user_id, self.id)
         
         if len(results.data) == 0:
             return {"message": "You are not the owner of this brain."}
         else:
-            results = (
-                self.db.table("brains_vectors")
-                .delete()
-                .match({"brain_id": self.id})
-                .execute()
-            )
-
-            results = (
-                self.db.table("brains_users")
-                .delete()
-                .match({"brain_id": self.id})
-                .execute()
-            )
-
-            results = (
-                self.db.table("brains").delete().match({"brain_id": self.id}).execute()
-            )
+            self.commons["db"].delete_brain_vector(self.id)
+            self.commons["db"].delete_brain_user(self.id)
+            self.commons["db"].delete_brain(self.id)
 
     def create_brain(self):
         response = self.commons["db"].create_brain(self.name)
