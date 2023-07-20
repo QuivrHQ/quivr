@@ -13,6 +13,7 @@ export const AddBrainModal = (): JSX.Element => {
   const [isPending, setIsPending] = useState(false);
   const { publish } = useToast();
   const { createBrain } = useBrainContext();
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -23,6 +24,11 @@ export const AddBrainModal = (): JSX.Element => {
       setIsPending(true);
       await createBrain(newBrainName);
       setNewBrainName("");
+      setIsShareModalOpen(false);
+      publish({
+        variant: "success",
+        text: "Brain created successfully",
+      });
     } catch (err) {
       if (axios.isAxiosError(err) && err.response?.status === 429) {
         publish({
@@ -56,6 +62,9 @@ export const AddBrainModal = (): JSX.Element => {
       }
       title="Add Brain"
       desc="Add a new brain"
+      isOpen={isShareModalOpen}
+      setOpen={setIsShareModalOpen}
+      CloseTrigger={<div />}
     >
       <form
         onSubmit={(e) => void handleSubmit(e)}
