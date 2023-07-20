@@ -54,6 +54,19 @@ def invite_users_to_brain(
         subscription = BrainSubscription(
             brain_id=brain_id, email=user["email"], rights=user["rights"]
         )
+        # check if user is an editor but trying to give high level permissions
+        if subscription.rights == "Owner":
+            try:
+                validate_brain_authorization(
+                    brain_id,
+                    current_user.id,
+                    RoleEnum.Owner,
+                )
+            except HTTPException:
+                raise HTTPException(
+                    status_code=403,
+                    detail="You don't have the rights to give owner permissions",
+                )
 
         try:
             subscription_service.create_or_update_subscription_invitation(subscription)
