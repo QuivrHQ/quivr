@@ -58,3 +58,9 @@ backend/core/local_models/*
 
 ## scripts
 .migration_info
+
+# pyenv version
+.python-version
+
+# pycharm files
+.idea/
