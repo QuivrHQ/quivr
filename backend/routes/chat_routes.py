@@ -4,6 +4,7 @@ from http.client import HTTPException
 from typing import List
 from uuid import UUID
 
+import logging
 from auth import AuthBearer, get_current_user
 from pydantic import Field
 from fastapi import APIRouter, Depends, Query, Request
@@ -27,6 +28,8 @@ from utils.constants import (
 )
 
 chat_router = APIRouter()
+
+logger = logging.getLogger(__name__)
 
 
 class NullableUUID(UUID):
@@ -192,7 +195,7 @@ async def create_question_handler(
 
         if not brain_id:
             brain_id = get_default_user_brain_or_create_new(current_user).id
-
+        logger.info(f"{chat_question.model}")
         if llm_settings.private:
             gpt_answer_generator = PrivateGPT4AllBrainPicking(
                 chat_id=str(chat_id),
@@ -203,7 +206,7 @@ async def create_question_handler(
             )
 
         elif chat_question.model in openai_function_compatible_models:
-            gpt_answer_generator = OpenAIFunctionsBrainPicking(
+            gpt_answer_generator = OpenAIBrainPicking(
                 model=chat_question.model,
                 chat_id=str(chat_id),
                 temperature=chat_question.temperature,
@@ -213,7 +216,7 @@ async def create_question_handler(
             )
 
         else:
-            gpt_answer_generator = OpenAIBrainPicking(
+            gpt_answer_generator = OpenAIFunctionsBrainPicking(
                 chat_id=str(chat_id),
                 model=chat_question.model,
                 max_tokens=chat_question.max_tokens,

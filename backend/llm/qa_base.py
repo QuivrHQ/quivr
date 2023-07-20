@@ -4,6 +4,7 @@ from abc import abstractmethod, abstractproperty
 from typing import AsyncIterable, Awaitable
 
 from langchain.chains import ConversationalRetrievalChain, LLMChain
+from langchain.chains.combine_documents.base import BaseCombineDocumentsChain
 from langchain.chains.question_answering import load_qa_chain
 from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.llms.base import BaseLLM
@@ -18,6 +19,8 @@ from vectorstore.supabase import CustomSupabaseVectorStore
 
 from .base import BaseBrainPicking
 from .prompts.CONDENSE_PROMPT import CONDENSE_QUESTION_PROMPT
+from .prompts.LANGUAGE_PROMPT import QA_PROMPT
+# from .utils.cleaning import sanitize_output, sanitize_input
 
 logger = get_logger(__name__)
 
@@ -69,26 +72,31 @@ class QABaseBrainPicking(BaseBrainPicking):
 
     @property
     def question_llm(self):
+
         return self._create_llm(model=self.model, streaming=False)
 
     @property
     def doc_llm(self):
+
         return self._create_llm(
             model=self.model, streaming=self.streaming, callbacks=self.callbacks
         )
 
     @property
     def question_generator(self) -> LLMChain:
+
         return LLMChain(llm=self.question_llm, prompt=CONDENSE_QUESTION_PROMPT)
 
     @property
-    def doc_chain(self) -> LLMChain:
+    def doc_chain(self) -> BaseCombineDocumentsChain:
+
         return load_qa_chain(
-            llm=self.doc_llm, chain_type="stuff"
+            llm=self.doc_llm, chain_type="stuff", prompt=QA_PROMPT, verbose=False
         )  # pyright: ignore reportPrivateUsage=none
 
     @property
     def qa(self) -> ConversationalRetrievalChain:
+
         return ConversationalRetrievalChain(
             retriever=self.vector_store.as_retriever(),
             question_generator=self.question_generator,
@@ -114,6 +122,7 @@ class QABaseBrainPicking(BaseBrainPicking):
         :param history: The chat history from DB
         :return: The answer.
         """
+        logger.info("Calling the chain . . .")
         return chain(
             {
                 "question": question,
@@ -127,6 +136,7 @@ class QABaseBrainPicking(BaseBrainPicking):
         :param question: The question
         :return: The generated answer.
         """
+        logger.info("Generating the answer . . .")
         transformed_history = []
 
         # Get the history from the database
