@@ -47,26 +47,7 @@ class Brain(Repository):
             .match({"brain_id": brain_id, "user_id": user_id, "rights": "Owner"})
             .execute()
         )
-        if len(results.data) == 0:
-            return {"message": "You are not the owner of this brain."}
-        else:
-            results = (
-                self.db.table("brains_vectors")
-                .delete()
-                .match({"brain_id": brain_id})
-                .execute()
-            )
-
-            results = (
-                self.db.table("brains_users")
-                .delete()
-                .match({"brain_id": brain_id})
-                .execute()
-            )
-
-            results = (
-                self.db.table("brains").delete().match({"brain_id": brain_id}).execute()
-            )
+        return results
 
     def create_brain(self, name):
         return self.db.table("brains").insert({"name": name}).execute()
@@ -85,7 +66,7 @@ class Brain(Repository):
             .execute()
         )
 
-        return response.data
+        return response
 
     def create_brain_vector(self, brain_id, vector_id, file_sha1):
         response = (

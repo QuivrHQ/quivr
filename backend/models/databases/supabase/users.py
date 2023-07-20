@@ -34,7 +34,7 @@ class User(Repository):
             .filter("user_id", "eq", user_id)
             .execute()
         )
-        return requests_stats.data
+        return requests_stats
 
     def fetch_user_requests_count(self, user_id, date):
         """

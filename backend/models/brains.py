@@ -59,7 +59,28 @@ class Brain(BaseModel):
         return self.commons["db"].get_brain_details(self.id)
 
     def delete_brain(self, user_id):
-        return self.commons["db"].delete_brain(user_id, self.id)
+        results = self.commons["db"].delete_brain(user_id, self.id)
+        
+        if len(results.data) == 0:
+            return {"message": "You are not the owner of this brain."}
+        else:
+            results = (
+                self.db.table("brains_vectors")
+                .delete()
+                .match({"brain_id": self.id})
+                .execute()
+            )
+
+            results = (
+                self.db.table("brains_users")
+                .delete()
+                .match({"brain_id": self.id})
+                .execute()
+            )
+
+            results = (
+                self.db.table("brains").delete().match({"brain_id": self.id}).execute()
+            )
 
     def create_brain(self):
         response = self.commons["db"].create_brain(self.name)
@@ -67,8 +88,8 @@ class Brain(BaseModel):
         return response.data
 
     def create_brain_user(self, user_id: UUID, rights, default_brain):
-        return self.commons["db"].create_brain_user(user_id=user_id, brain_id=self.id, rights=rights, default_brain=default_brain)
-
+        results = self.commons["db"].create_brain_user(user_id=user_id, brain_id=self.id, rights=rights, default_brain=default_brain)
+        return results.data
 
     def create_brain_vector(self, vector_id, file_sha1):
         return self.commons["db"].create_brain_vector(self.id, vector_id, file_sha1)
