@@ -35,7 +35,7 @@ const UploadPage = (): JSX.Element => {
     );
   }
 
-  const hasUploadRights = requiredRolesForUpload.includes(currentBrain.rights);
+  const hasUploadRights = requiredRolesForUpload.includes(currentBrain.role);
 
   if (!hasUploadRights) {
     return (
@@ -44,7 +44,7 @@ const UploadPage = (): JSX.Element => {
           <strong className="font-bold mr-1">Oh no!</strong>
           <span className="block sm:inline">
             {
-              "You don't have the necessary rights to upload content to the selected brain. 🧠💡🥲"
+              "You don't have the necessary role to upload content to the selected brain. 🧠💡🥲"
             }
           </span>
         </div>

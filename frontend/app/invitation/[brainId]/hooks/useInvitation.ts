@@ -17,7 +17,7 @@ export const useInvitation = () => {
   const brainId = params?.brainId as UUID | undefined;
   const [isLoading, setIsLoading] = useState(false);
   const [brainName, setBrainName] = useState<string>("");
-  const [rights, setRights] = useState<BrainRoleType | undefined>();
+  const [role, setRole] = useState<BrainRoleType | undefined>();
   const [isProcessingRequest, setIsProcessingRequest] = useState(false);
 
   const { publish } = useToast();
@@ -37,9 +37,9 @@ export const useInvitation = () => {
 
     const checkInvitationValidity = async () => {
       try {
-        const { name, rights: assignedRights } = await getInvitation(brainId);
+        const { name, role: assignedRole } = await getInvitation(brainId);
         setBrainName(name);
-        setRights(assignedRights);
+        setRole(assignedRole);
       } catch (error) {
         if (axios.isAxiosError(error) && error.response?.status === 404) {
           publish({
@@ -130,7 +130,7 @@ export const useInvitation = () => {
     handleAccept,
     handleDecline,
     brainName,
-    rights,
+    role,
     isLoading,
     isProcessingRequest,
   };

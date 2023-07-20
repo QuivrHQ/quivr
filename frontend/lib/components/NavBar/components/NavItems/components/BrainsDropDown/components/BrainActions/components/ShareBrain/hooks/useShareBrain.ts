@@ -2,6 +2,7 @@
 import axios, { AxiosResponse } from "axios";
 import { useState } from "react";
 
+import { Subscription } from "@/lib/api/brain/brain";
 import { useBrainApi } from "@/lib/api/brain/useBrainApi";
 import { useToast } from "@/lib/hooks";
 
@@ -61,11 +62,11 @@ export const useShareBrain = (brainId: string) => {
   const inviteUsers = async (): Promise<void> => {
     setSendingInvitation(true);
     try {
-      const inviteUsersPayload = roleAssignations
+      const inviteUsersPayload: Subscription[] = roleAssignations
         .filter(({ email }) => email !== "")
         .map((assignation) => ({
           email: assignation.email,
-          rights: assignation.rights,
+          role: assignation.role,
         }));
 
       await addBrainSubscriptions(brainId, inviteUsersPayload);

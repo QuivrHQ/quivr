@@ -10,9 +10,9 @@ import {
   getBrainUsers,
   getDefaultBrain,
   Subscription,
-  SubscriptionUpdatableProperties,
   updateBrainAccess,
 } from "./brain";
+import { SubscriptionUpdatableProperties } from "./types";
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const useBrainApi = () => {

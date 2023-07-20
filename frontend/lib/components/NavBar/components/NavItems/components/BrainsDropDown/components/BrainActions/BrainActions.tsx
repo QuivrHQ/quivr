@@ -12,7 +12,7 @@ const requiredAccessToShareBrain: BrainRoleType[] = ["Owner", "Editor"];
 export const BrainActions = ({ brain }: BrainActionsProps): JSX.Element => {
   return (
     <div className="absolute right-0 flex flex-row">
-      {requiredAccessToShareBrain.includes(brain.rights) && (
+      {requiredAccessToShareBrain.includes(brain.role) && (
         <ShareBrain brainId={brain.id} name={brain.name} />
       )}
       <DeleteBrain brainId={brain.id} />
