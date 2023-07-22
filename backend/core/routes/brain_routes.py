@@ -105,7 +105,8 @@ async def create_brain_endpoint(
     brain = Brain(name=brain.name)  # pyright: ignore reportPrivateUsage=none
 
     user_brains = brain.get_user_brains(current_user.id)
-    max_brain_per_user = BrainRateLimiting().max_brain_per_user
+    if (max_brain_per_user := brain.rate_limiting.max_brain_per_user) is None:
+        max_brain_per_user = BrainRateLimiting().max_brain_per_user
 
     if len(user_brains) >= max_brain_per_user:
         raise HTTPException(
