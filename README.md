@@ -137,7 +137,7 @@ Additionally, you'll need a [Supabase](https://supabase.com/) account for:
 ## Contributors ✨
 
 Thanks go to these wonderful people:
-<a href="https://github.com/stangirard/quivr/graphs/ciontributors">
+<a href="https://github.com/stangirard/quivr/graphs/contributors">
 <img src="https://contrib.rocks/image?repo=stangirard/quivr" />
 </a>
 
