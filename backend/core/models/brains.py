@@ -2,7 +2,7 @@ from typing import Any, List, Optional
 from uuid import UUID
 
 from logger import get_logger
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from utils.vectors import get_unique_files_from_vector_ids
 
 from models.settings import BrainRateLimiting, CommonsDep, common_dependencies
@@ -19,14 +19,14 @@ class Brain(BaseModel):
     temperature: Optional[float] = 0.0
     max_tokens: Optional[int] = 256
     files: List[Any] = []
+    rate_limiting: BrainRateLimiting = Field(default_factory=BrainRateLimiting)
 
     class Config:
         arbitrary_types_allowed = True
 
     @property
     def max_brain_size(self) -> int:
-        brain_rate_limiting = BrainRateLimiting()
-        return brain_rate_limiting.max_brain_size
+        return self.rate_limiting.max_brain_size
 
     @property
     def commons(self) -> CommonsDep:
