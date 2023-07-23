@@ -1,6 +1,7 @@
+import os
 from typing import Annotated
 
-from fastapi import Depends
+from fastapi import Depends, Request
 from langchain.embeddings.openai import OpenAIEmbeddings
 from pydantic import BaseSettings
 from supabase.client import Client, create_client
@@ -48,5 +49,15 @@ def common_dependencies() -> dict:
         "summaries_vector_store": summaries_vector_store,
     }
 
+async def brain_rate_limiting(request: Request) -> BrainRateLimiting:
+    rate_limiting = BrainRateLimiting()
+    if request.headers.get('Openai-Api-Key'):
+        openai_limit = int(os.getenv(
+                    "MAX_BRAIN_SIZE_WITH_KEY", 209715200
+                ))
+        return rate_limiting.copy(update=dict(max_brain_size=openai_limit))
+    return rate_limiting
 
 CommonsDep = Annotated[dict, Depends(common_dependencies)]
+ProvideBrainRateLimit = Annotated[BrainRateLimiting, Depends(brain_rate_limiting)]
+
