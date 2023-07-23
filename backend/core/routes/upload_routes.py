@@ -5,7 +5,7 @@ from auth import AuthBearer, get_current_user
 from fastapi import APIRouter, Depends, Query, Request, UploadFile
 from models.brains import Brain
 from models.files import File
-from models.settings import common_dependencies
+from models.settings import ProvideBrainRateLimit, common_dependencies
 from models.users import User
 from utils.file import convert_bytes, get_file_size
 from utils.processors import filter_file
@@ -17,11 +17,11 @@ from routes.authorizations.brain_authorization import (
 
 upload_router = APIRouter()
 
-
 @upload_router.post("/upload", dependencies=[Depends(AuthBearer())], tags=["Upload"])
 async def upload_file(
     request: Request,
     uploadFile: UploadFile,
+    brain_rate_limiting: ProvideBrainRateLimit,
     brain_id: UUID = Query(..., description="The ID of the brain"),
     enable_summarization: bool = False,
     current_user: User = Depends(get_current_user),
@@ -42,13 +42,9 @@ async def upload_file(
         brain_id, current_user.id, [RoleEnum.Editor, RoleEnum.Owner]
     )
 
-    brain = Brain(id=brain_id)
+    brain = Brain(id=brain_id, rate_limiting=brain_rate_limiting)
     commons = common_dependencies()
 
-    if request.headers.get("Openai-Api-Key"):
-        brain.max_brain_size = int(os.getenv(
-            "MAX_BRAIN_SIZE_WITH_KEY", 209715200
-        ))
     remaining_free_space = brain.remaining_brain_size
 
     file_size = get_file_size(uploadFile)
