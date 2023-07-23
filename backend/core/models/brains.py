@@ -28,10 +28,6 @@ class Brain(BaseModel):
     def max_brain_size(self) -> int:
         return self.rate_limiting.max_brain_size
 
-    @max_brain_size.setter
-    def max_brain_size(self, value: int):
-        self.rate_limiting.max_brain_size = value
-
     @property
     def commons(self) -> CommonsDep:
         return common_dependencies()
