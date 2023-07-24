@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 import { useDevice } from "@/lib/hooks/useDevice";
 
+import { sortBrainsByName } from "../utils/sortByName";
+
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const useBrainsList = () => {
   const { isMobile } = useDevice();
@@ -29,7 +31,6 @@ export const useBrainsList = () => {
     setOpen,
     searchQuery,
     setSearchQuery,
-
-    brains,
+    brains: sortBrainsByName(brains),
   };
 };
