@@ -3,11 +3,8 @@ from uuid import UUID
 from auth import AuthBearer, get_current_user
 from fastapi import APIRouter, Depends, HTTPException
 from logger import get_logger
-from models.brains import (
-    Brain,
-    get_default_user_brain,
-    get_default_user_brain_or_create_new,
-)
+from models.brains import (Brain, get_default_user_brain,
+                           get_default_user_brain_or_create_new)
 from models.settings import BrainRateLimiting, common_dependencies
 from models.users import User
 from routes.authorizations.brain_authorization import has_brain_authorization
@@ -176,3 +173,28 @@ async def update_brain_endpoint(
 
     brain.update_brain_fields()  # pyright: ignore reportPrivateUsage=none
     return {"message": f"Brain {brain_id} has been updated."}
+
+
+# set as default brain
+@brain_router.post(
+    "/brains/{brain_id}/default",
+    dependencies=[
+        Depends(
+            AuthBearer(),
+        ),
+        Depends(has_brain_authorization()),
+    ],
+    tags=["Brain"],
+)
+async def set_as_default_brain_endpoint(
+    brain_id: UUID,
+    user: User = Depends(get_current_user),
+):
+    """
+    Set a brain as default for the current user.
+    """
+    brain = Brain(id=brain_id)
+
+    brain.set_as_default_brain_for_user(user)
+
+    return {"message": f"Brain {brain_id} has been set as default brain."}

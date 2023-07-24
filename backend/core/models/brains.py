@@ -189,6 +189,23 @@ class Brain(BaseModel):
 
         return response.data
 
+    def set_as_default_brain_for_user(self, user: User):
+        old_default_brain = get_default_user_brain(user)
+
+        if old_default_brain is not None:
+            self.commons["supabase"].table("brains_users").update(
+                {"default_brain": False}
+            ).match(
+                {"brain_id": old_default_brain["id"], "user_id": user.id}
+            ).execute()
+
+        # Step 2: Set the current brain as default
+        self.commons["supabase"].table("brains_users").update(
+            {"default_brain": True}
+        ).match(
+            {"brain_id": self.id, "user_id": user.id}
+        ).execute()
+
     def create_brain_vector(self, vector_id, file_sha1):
         response = (
             self.commons["supabase"]
@@ -331,4 +348,3 @@ def get_default_user_brain_or_create_new(user: User) -> Brain:
         brain.create_brain()
         brain.create_brain_user(user.id, "Owner", True)
         return brain
-
