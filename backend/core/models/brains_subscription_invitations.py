@@ -1,10 +1,9 @@
-from typing import Optional
 from uuid import UUID
 
-import resend
 from logger import get_logger
-from models.settings import BrainSettings, CommonsDep, common_dependencies
 from pydantic import BaseModel
+
+from models.settings import CommonsDep, common_dependencies
 
 logger = get_logger(__name__)
 

@@ -28,13 +28,14 @@ from utils.constants import (
 chat_router = APIRouter()
 
 
-class NullableUUID:
+class NullableUUID(UUID):
+
     @classmethod
     def __get_validators__(cls):
         yield cls.validate
 
     @classmethod
-    def validate(cls, v):
+    def validate(cls, v) -> UUID | None:
         if v == "":
             return None
         try:

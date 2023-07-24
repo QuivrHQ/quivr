@@ -4,6 +4,7 @@ import time
 from auth import AuthBearer, get_current_user
 from fastapi import APIRouter, Depends, Request
 from models.brains import Brain, get_default_user_brain
+from models.settings import BrainRateLimiting
 from models.users import User
 
 user_router = APIRouter()
@@ -32,7 +33,8 @@ async def get_user_endpoint(
     information about the user's API usage.
     """
 
-    max_brain_size = int(os.getenv("MAX_BRAIN_SIZE", 52428800))
+    max_brain_size = BrainRateLimiting().max_brain_size
+
     if request.headers.get("Openai-Api-Key"):
         max_brain_size = MAX_BRAIN_SIZE_WITH_OWN_KEY
 

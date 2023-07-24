@@ -3,9 +3,10 @@ import { MdOutlineRemoveCircle } from "react-icons/md";
 
 import Field from "@/lib/components/ui/Field";
 import { Select } from "@/lib/components/ui/Select";
+import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 
 import { BrainRoleAssignation, BrainRoleType } from "../../../types";
-import { availableRoles } from "../types";
+import { userRoleToAssignableRoles } from "../types";
 
 type UserToInviteProps = {
   onChange: (newRole: BrainRoleAssignation) => void;
@@ -19,15 +20,20 @@ export const UserToInvite = ({
   roleAssignation,
 }: UserToInviteProps): JSX.Element => {
   const [selectedRole, setSelectedRole] = useState<BrainRoleType>(
-    roleAssignation.rights
+    roleAssignation.role
   );
   const [email, setEmail] = useState(roleAssignation.email);
+  const { currentBrain } = useBrainContext();
+
+  if (currentBrain === undefined) {
+    throw new Error("Brain is undefined");
+  }
 
   useEffect(() => {
     onChange({
       ...roleAssignation,
       email,
-      rights: selectedRole,
+      role: selectedRole,
     });
   }, [email, selectedRole]);
 
@@ -54,7 +60,7 @@ export const UserToInvite = ({
       <Select
         onChange={setSelectedRole}
         value={selectedRole}
-        options={availableRoles}
+        options={userRoleToAssignableRoles[currentBrain.role]}
       />
     </div>
   );

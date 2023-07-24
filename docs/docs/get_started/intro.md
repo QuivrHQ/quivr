@@ -85,7 +85,7 @@ cp .frontend_env.example frontend/.env
 
 > _The `NEXT_PUBLIC_BACKEND_URL` is set to localhost:5050 for the docker. Update it if you are running the backend on a different machine._
 
-> _To activate vertexAI with PaLM from GCP follow the instructions [here](https://python.langchain.com/en/latest/modules/models/llms/integrations/google_vertex_ai_palm.html) and update `backend/.env`- It is an advanced feature, please be expert in GCP before trying to use it_
+> _To activate vertexAI with PaLM from GCP follow the instructions [here](https://python.langchain.com/en/latest/modules/models/llms/integrations/google_vertex_ai_palm.html) and update `backend/core/.env`- It is an advanced feature, please be expert in GCP before trying to use it_
 
 - [ ] Change variables in `backend/core/.env`
 - [ ] Change variables in `frontend/.env`

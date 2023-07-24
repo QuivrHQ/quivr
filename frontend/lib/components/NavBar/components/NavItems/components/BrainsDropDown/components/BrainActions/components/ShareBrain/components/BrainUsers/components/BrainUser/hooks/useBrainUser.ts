@@ -9,7 +9,7 @@ import { BrainRoleType } from "../../../../../../../types";
 
 type UseBrainUserProps = {
   fetchBrainUsers: () => Promise<void>;
-  rights: BrainRoleType;
+  role: BrainRoleType;
   brainId: string;
   email: string;
 };
@@ -17,19 +17,19 @@ type UseBrainUserProps = {
 export const useBrainUser = ({
   brainId,
   fetchBrainUsers,
-  rights,
+  role,
   email,
 }: UseBrainUserProps) => {
   const { updateBrainAccess } = useBrainApi();
   const { publish } = useToast();
-  const [selectedRole, setSelectedRole] = useState<BrainRoleType>(rights);
+  const [selectedRole, setSelectedRole] = useState<BrainRoleType>(role);
   const [isRemovingAccess, setIsRemovingAccess] = useState(false);
   const { currentBrain } = useBrainContext();
   const updateSelectedRole = async (newRole: BrainRoleType) => {
     setSelectedRole(newRole);
     try {
       await updateBrainAccess(brainId, email, {
-        rights: newRole,
+        role: newRole,
       });
       publish({ variant: "success", text: `Updated ${email} to ${newRole}` });
       void fetchBrainUsers();
@@ -58,7 +58,7 @@ export const useBrainUser = ({
     setIsRemovingAccess(true);
     try {
       await updateBrainAccess(brainId, email, {
-        rights: null,
+        role: null,
       });
       publish({ variant: "success", text: `Removed ${email} from brain` });
       void fetchBrainUsers();
@@ -82,7 +82,7 @@ export const useBrainUser = ({
       setIsRemovingAccess(false);
     }
   };
-  const canRemoveAccess = currentBrain?.rights === "Owner";
+  const canRemoveAccess = currentBrain?.role === "Owner";
 
   return {
     isRemovingAccess,

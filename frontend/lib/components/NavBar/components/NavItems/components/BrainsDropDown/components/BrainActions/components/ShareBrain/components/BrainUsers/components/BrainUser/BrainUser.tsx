@@ -11,14 +11,14 @@ import { availableRoles } from "../../../../types";
 
 type BrainUserProps = {
   email: string;
-  rights: BrainRoleType;
+  role: BrainRoleType;
   brainId: string;
   fetchBrainUsers: () => Promise<void>;
 };
 
 export const BrainUser = ({
   email,
-  rights,
+  role,
   brainId,
   fetchBrainUsers,
 }: BrainUserProps): JSX.Element => {
@@ -30,7 +30,7 @@ export const BrainUser = ({
     updateSelectedRole,
   } = useBrainUser({
     fetchBrainUsers: fetchBrainUsers,
-    rights,
+    role,
     brainId,
     email,
   });
@@ -62,7 +62,7 @@ export const BrainUser = ({
         onChange={(newRole) => void updateSelectedRole(newRole)}
         value={selectedRole}
         options={availableRoles}
-        readOnly={currentBrain?.rights !== "Owner" && selectedRole === "Owner"}
+        readOnly={currentBrain?.role !== "Owner" && selectedRole === "Owner"}
       />
     </div>
   );

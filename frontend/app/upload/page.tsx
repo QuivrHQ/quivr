@@ -6,6 +6,8 @@ import Button from "@/lib/components/ui/Button";
 import { Divider } from "@/lib/components/ui/Divider";
 import PageHeading from "@/lib/components/ui/PageHeading";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
+import { useSupabase } from "@/lib/context/SupabaseProvider";
+import { redirectToLogin } from "@/lib/router/redirectToLogin";
 
 import { Crawler } from "./components/Crawler";
 import { FileUploader } from "./components/FileUploader";
@@ -14,6 +16,11 @@ const requiredRolesForUpload: BrainRoleType[] = ["Editor", "Owner"];
 
 const UploadPage = (): JSX.Element => {
   const { currentBrain } = useBrainContext();
+  const { session } = useSupabase();
+
+  if (session === null) {
+    redirectToLogin();
+  }
 
   if (currentBrain === undefined) {
     return (
@@ -28,7 +35,7 @@ const UploadPage = (): JSX.Element => {
     );
   }
 
-  const hasUploadRights = requiredRolesForUpload.includes(currentBrain.rights);
+  const hasUploadRights = requiredRolesForUpload.includes(currentBrain.role);
 
   if (!hasUploadRights) {
     return (
@@ -37,7 +44,7 @@ const UploadPage = (): JSX.Element => {
           <strong className="font-bold mr-1">Oh no!</strong>
           <span className="block sm:inline">
             {
-              "You don't have the necessary rights to upload content to the selected brain. 🧠💡🥲"
+              "You don't have the necessary role to upload content to the selected brain. 🧠💡🥲"
             }
           </span>
         </div>

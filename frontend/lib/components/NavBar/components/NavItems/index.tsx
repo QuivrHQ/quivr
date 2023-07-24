@@ -8,6 +8,7 @@ import { useSupabase } from "@/lib/context/SupabaseProvider";
 import { cn } from "@/lib/utils";
 
 import { AuthButtons } from "./components/AuthButtons";
+import { BrainManagementButton } from "./components/BrainManagementButton";
 import { BrainsDropDown } from "./components/BrainsDropDown";
 import { DarkModeToggle } from "./components/DarkModeToggle";
 import { NavLink } from "./components/NavLink";
@@ -58,6 +59,7 @@ export const NavItems = ({
         {isUserLoggedIn && (
           <>
             <BrainsDropDown />
+            <BrainManagementButton />
             <Link aria-label="account" className="" href={"/user"}>
               <MdPerson className="text-2xl" />
             </Link>

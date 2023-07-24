@@ -23,7 +23,7 @@ replace_in_file() {
 # Step 2: Copy the .XXXXX_env files if they don't exist
 if [ ! -f backend/core/.env ]; then
     echo "Copying backend-core .env example file..."
-    cp .backend_env.example backend/.env
+    cp .backend_env.example backend/core/.env
 fi
 
 if [ ! -f frontend/.env ]; then

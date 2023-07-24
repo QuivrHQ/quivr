@@ -12,7 +12,7 @@ This means that your data never leaves the server. The LLM is downloaded to the 
 
 ## How to use
 
-Set the 'private' flag to True in the /backend/.env file. You can also set other model parameters in the .env file.
+Set the 'private' flag to True in the /backend/core/.env file. You can also set other model parameters in the .env file.
 
 Download the GPT4All model from [here](https://gpt4all.io/models/ggml-gpt4all-j-v1.3-groovy.bin) and place it in the /backend/local_models folder. Or you can download any model from their ecosystem on there [website](https://gpt4all.io/index.html).
 
