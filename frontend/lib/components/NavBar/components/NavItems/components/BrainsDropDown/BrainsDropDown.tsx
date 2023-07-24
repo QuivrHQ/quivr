@@ -6,8 +6,8 @@ import Field from "@/lib/components/ui/Field";
 import Popover from "@/lib/components/ui/Popover";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 
-import { AddBrainModal } from "./components/AddBrainModal";
 import { BrainActions } from "./components/BrainActions/BrainActions";
+import { AddBrainModal } from "../../../../../AddBrainModal";
 
 export const BrainsDropDown = (): JSX.Element => {
   const [searchQuery, setSearchQuery] = useState("");
