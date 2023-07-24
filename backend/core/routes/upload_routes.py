@@ -46,9 +46,8 @@ async def upload_file(
     commons = common_dependencies()
 
     if request.headers.get("Openai-Api-Key"):
-        brain.max_brain_size = os.getenv(
-            "MAX_BRAIN_SIZE_WITH_KEY", 209715200
-        )  # pyright: ignore reportPrivateUsage=none
+        brain.max_brain_size = int(os.getenv("MAX_BRAIN_SIZE_WITH_KEY", 209715200))
+
     remaining_free_space = brain.remaining_brain_size
 
     file_size = get_file_size(uploadFile)

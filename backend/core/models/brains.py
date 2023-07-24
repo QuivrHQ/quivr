@@ -19,14 +19,10 @@ class Brain(BaseModel):
     temperature: Optional[float] = 0.0
     max_tokens: Optional[int] = 256
     files: List[Any] = []
+    max_brain_size = BrainRateLimiting().max_brain_size
 
     class Config:
         arbitrary_types_allowed = True
-
-    @property
-    def max_brain_size(self) -> int:
-        brain_rate_limiting = BrainRateLimiting()
-        return brain_rate_limiting.max_brain_size
 
     @property
     def commons(self) -> CommonsDep:
