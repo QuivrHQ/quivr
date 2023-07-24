@@ -10,7 +10,6 @@ from models.brains import (
 )
 from models.settings import BrainRateLimiting, common_dependencies
 from models.users import User
-
 from routes.authorizations.brain_authorization import has_brain_authorization
 
 logger = get_logger(__name__)
@@ -158,9 +157,16 @@ async def update_brain_endpoint(
         name, status, model, max_tokens, temperature
     Return modified brain ? No need -> do an optimistic update
     """
-    commons = common_dependencies()
-    brain = Brain(id=brain_id)
-
+    brain = Brain(
+        id=brain_id,
+        name=input_brain.name,
+        description=input_brain.description,
+        model=input_brain.model,
+        max_tokens=input_brain.max_tokens,
+        temperature=input_brain.temperature,
+        openai_api_key=input_brain.openai_api_key,
+    )
+    print("brain", brain)
     # Add new file to brain , il file_sha1 already exists in brains_vectors -> out (not now)
     if brain.file_sha1:  # pyright: ignore reportPrivateUsage=none
         # add all the vector Ids to the brains_vectors  with the given brain.brain_id
@@ -168,5 +174,5 @@ async def update_brain_endpoint(
             file_sha1=input_brain.file_sha1  # pyright: ignore reportPrivateUsage=none
         )
 
-    brain.update_brain_fields(commons, brain)  # pyright: ignore reportPrivateUsage=none
+    brain.update_brain_fields()  # pyright: ignore reportPrivateUsage=none
     return {"message": f"Brain {brain_id} has been updated."}
