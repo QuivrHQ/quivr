@@ -1,2 +1,2 @@
-export * from "./AddBrainModal";
+export * from "../../../../../../AddBrainModal";
 export * from "./BrainActions";

@@ -2,6 +2,7 @@
 import { motion, MotionConfig } from "framer-motion";
 import { MdChevronRight } from "react-icons/md";
 
+import { AddBrainModal } from "@/lib/components/AddBrainModal";
 import { cn } from "@/lib/utils";
 
 import { BrainListItem } from "./BrainListItem/BrainListItem";
@@ -50,6 +51,9 @@ export const BrainsList = (): JSX.Element => {
               {brains.map((brain) => (
                 <BrainListItem brain={brain} key={brain.id} />
               ))}
+            </div>
+            <div className="m-2 mb flex flex-col">
+              <AddBrainModal />
             </div>
           </div>
         </motion.div>
