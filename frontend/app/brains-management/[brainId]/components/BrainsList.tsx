@@ -5,8 +5,8 @@ import { MdChevronRight } from "react-icons/md";
 import { AddBrainModal } from "@/lib/components/AddBrainModal";
 import { cn } from "@/lib/utils";
 
-import { BrainListItem } from "./BrainListItem/BrainListItem";
-import { BrainSearchBar } from "./BrainSearchBar/BrainSearchBar";
+import { BrainListItem } from "./BrainListItem";
+import { BrainSearchBar } from "./BrainSearchBar";
 import { useBrainsList } from "../hooks/useBrainsList";
 
 export const BrainsList = (): JSX.Element => {
@@ -37,7 +37,7 @@ export const BrainsList = (): JSX.Element => {
               : "10px 10px 16px rgba(0, 0, 0, 0.5)",
           }}
           className={cn("overflow-hidden flex flex-col flex-1")}
-          data-testid="chats-list"
+          data-testid="brains-list"
         >
           <div className="flex flex-col flex-1">
             <BrainSearchBar
@@ -45,7 +45,7 @@ export const BrainsList = (): JSX.Element => {
               setSearchQuery={setSearchQuery}
             />
             <div
-              data-testid="chats-list-items"
+              data-testid="brains-list-items"
               className="flex-1 overflow-auto scrollbar h-full"
             >
               {brains.map((brain) => (
@@ -62,7 +62,7 @@ export const BrainsList = (): JSX.Element => {
             setOpen(!open);
           }}
           className="absolute left-full top-16 text-3xl bg-black dark:bg-white text-white dark:text-black rounded-r-full p-3 pl-1"
-          data-testid="chats-list-toggle"
+          data-testid="brains-list-toggle"
         >
           <motion.div
             whileTap={{ scale: 0.9 }}

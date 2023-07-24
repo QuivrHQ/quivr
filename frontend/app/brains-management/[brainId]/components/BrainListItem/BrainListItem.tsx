@@ -6,11 +6,11 @@ import { cn } from "@/lib/utils";
 
 import { useBrainListItem } from "./hooks/useBrainListItem";
 
-interface ChatsListItemProps {
+interface BrainsListItemProps {
   brain: MinimalBrainForUser;
 }
 
-export const BrainListItem = ({ brain }: ChatsListItemProps): JSX.Element => {
+export const BrainListItem = ({ brain }: BrainsListItemProps): JSX.Element => {
   const { selected } = useBrainListItem(brain);
 
   return (
@@ -21,7 +21,8 @@ export const BrainListItem = ({ brain }: ChatsListItemProps): JSX.Element => {
           ? "bg-gray-100 dark:bg-gray-800 text-primary dark:text-white"
           : ""
       )}
-      data-testid="chats-list-item"
+      data-testid="brains
+      -list-item"
     >
       <Link
         className="flex flex-col flex-1 min-w-0 p-4"

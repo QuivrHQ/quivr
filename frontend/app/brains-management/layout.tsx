@@ -4,7 +4,7 @@ import { ReactNode } from "react";
 import { useSupabase } from "@/lib/context/SupabaseProvider";
 import { redirectToLogin } from "@/lib/router/redirectToLogin";
 
-import { BrainsList } from "./[brainId]/components/BrainsList";
+import { BrainsList } from "./[brainId]/components";
 
 interface LayoutProps {
   children?: ReactNode;
