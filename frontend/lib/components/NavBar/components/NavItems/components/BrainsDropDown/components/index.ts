@@ -1,2 +1,2 @@
-export * from "@/lib/components/AddBrainModal";
+export * from "@/lib/components/AddBrainModal/AddBrainModal";
 export * from "./BrainActions";
