@@ -2,15 +2,15 @@
 import { motion, MotionConfig } from "framer-motion";
 import { MdChevronRight } from "react-icons/md";
 
-import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 import { cn } from "@/lib/utils";
 
 import { BrainListItem } from "./BrainListItem/BrainListItem";
+import { BrainSearchBar } from "./BrainSearchBar/BrainSearchBar";
 import { useBrainsList } from "../hooks/useBrainsList";
 
 export const BrainsList = (): JSX.Element => {
-  const { allBrains } = useBrainContext();
-  const { open, setOpen } = useBrainsList();
+  const { open, setOpen, searchQuery, setSearchQuery, brains } =
+    useBrainsList();
 
   return (
     <MotionConfig transition={{ massq: 1, damping: 10 }}>
@@ -39,11 +39,15 @@ export const BrainsList = (): JSX.Element => {
           data-testid="chats-list"
         >
           <div className="flex flex-col flex-1">
+            <BrainSearchBar
+              searchQuery={searchQuery}
+              setSearchQuery={setSearchQuery}
+            />
             <div
               data-testid="chats-list-items"
               className="flex-1 overflow-auto scrollbar h-full"
             >
-              {allBrains.map((brain) => (
+              {brains.map((brain) => (
                 <BrainListItem brain={brain} key={brain.id} />
               ))}
             </div>
