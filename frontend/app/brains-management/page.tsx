@@ -1,11 +1,4 @@
 "use client";
+import BrainsManagementPage from "./[brainId]/page";
 
-const BrainsManagement = (): JSX.Element => {
-  return (
-    <main className="flex flex-col w-full pt-10" data-testid="chat-page">
-      <p>Coming soon</p>
-    </main>
-  );
-};
-
-export default BrainsManagement;
+export default BrainsManagementPage;

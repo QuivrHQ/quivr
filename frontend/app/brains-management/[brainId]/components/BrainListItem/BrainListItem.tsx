@@ -25,7 +25,7 @@ export const BrainListItem = ({ brain }: ChatsListItemProps): JSX.Element => {
     >
       <Link
         className="flex flex-col flex-1 min-w-0 p-4"
-        href={`/brain/${brain.id}`}
+        href={`/brains-management/${brain.id}`}
         key={brain.id}
       >
         <div className="flex items-center gap-2">
