@@ -6,8 +6,8 @@ import { Subscription } from "@/lib/api/brain/brain";
 import { useBrainApi } from "@/lib/api/brain/useBrainApi";
 import { useToast } from "@/lib/hooks";
 
-import { BrainRoleAssignation } from "../../../types";
-import { generateBrainAssignation } from "../utils/generateBrainAssignation";
+import { generateBrainAssignation } from "../components/NavBar/components/NavItems/components/BrainsDropDown/components/BrainActions/components/ShareBrain/utils/generateBrainAssignation";
+import { BrainRoleAssignation } from "../components/NavBar/components/NavItems/components/BrainsDropDown/components/BrainActions/types";
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const useShareBrain = (brainId: string) => {
@@ -102,6 +102,10 @@ export const useShareBrain = (brainId: string) => {
   const addNewRoleAssignationRole = () => {
     setRoleAssignation([...roleAssignations, generateBrainAssignation()]);
   };
+  const canAddNewRow =
+    roleAssignations.length === 0 ||
+    roleAssignations.filter((invitingUser) => invitingUser.email === "")
+      .length === 0;
 
   return {
     roleAssignations,
@@ -114,5 +118,6 @@ export const useShareBrain = (brainId: string) => {
     sendingInvitation,
     setIsShareModalOpen,
     isShareModalOpen,
+    canAddNewRow,
   };
 };

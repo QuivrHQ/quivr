@@ -1,14 +1,18 @@
 import { Content, List, Root } from "@radix-ui/react-tabs";
 
-import { BrainTabTrigger } from "./components";
+import { BrainTabTrigger, PeopleTab } from "./components";
 import { useBrainManagementTabs } from "./hooks/useBrainManagementTabs";
 
 export const BrainManagementTabs = (): JSX.Element => {
-  const { selectedTab, setSelectedTab } = useBrainManagementTabs();
+  const { selectedTab, setSelectedTab, brainId } = useBrainManagementTabs();
+
+  if (brainId === undefined) {
+    return <div />;
+  }
 
   return (
     <Root
-      className="shadow-md min-h-[50%] dark:shadow-primary/25 hover:shadow-xl transition-shadow rounded-xl overflow-hidden bg-white dark:bg-black border border-black/10 dark:border-white/25 p-4"
+      className="shadow-md min-h-[50%] dark:shadow-primary/25 hover:shadow-xl transition-shadow rounded-xl overflow-hidden bg-white dark:bg-black border border-black/10 dark:border-white/25 p-4 pt-10"
       defaultValue="settings"
     >
       <List className="flex justify-between" aria-label="Manage your brain">
@@ -31,9 +35,15 @@ export const BrainManagementTabs = (): JSX.Element => {
           onChange={setSelectedTab}
         />
       </List>
-      <Content value="settings">
-        <p>coming soon</p>
-      </Content>
+
+      <div className="p-20 pt-5">
+        <Content value="settings">
+          <p>coming soon</p>
+        </Content>
+        <Content value="people">
+          <PeopleTab brainId={brainId} />
+        </Content>
+      </div>
     </Root>
   );
 };
