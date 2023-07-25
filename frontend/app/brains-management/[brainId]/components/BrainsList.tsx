@@ -2,7 +2,7 @@
 import { motion, MotionConfig } from "framer-motion";
 import { MdChevronRight } from "react-icons/md";
 
-import { AddBrainModal } from "@/lib/components/AddBrainModal";
+import { AddBrainModal } from "@/lib/components/AddBrainModal/AddBrainModal";
 import { cn } from "@/lib/utils";
 
 import { BrainListItem } from "./BrainListItem";

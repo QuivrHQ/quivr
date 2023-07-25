@@ -3,12 +3,14 @@ import { useAxios } from "@/lib/hooks";
 import {
   addBrainSubscriptions,
   createBrain,
+  CreateBrainInput,
   deleteBrain,
   getBrain,
   getBrainDocuments,
   getBrains,
   getBrainUsers,
   getDefaultBrain,
+  setAsDefaultBrain,
   Subscription,
   updateBrainAccess,
 } from "./brain";
@@ -21,7 +23,8 @@ export const useBrainApi = () => {
   return {
     getBrainDocuments: async (brainId: string) =>
       getBrainDocuments(brainId, axiosInstance),
-    createBrain: async (name: string) => createBrain(name, axiosInstance),
+    createBrain: async (brain: CreateBrainInput) =>
+      createBrain(brain, axiosInstance),
     deleteBrain: async (id: string) => deleteBrain(id, axiosInstance),
     getDefaultBrain: async () => getDefaultBrain(axiosInstance),
     getBrains: async () => getBrains(axiosInstance),
@@ -37,5 +40,7 @@ export const useBrainApi = () => {
       userEmail: string,
       subscription: SubscriptionUpdatableProperties
     ) => updateBrainAccess(brainId, userEmail, subscription, axiosInstance),
+    setAsDefaultBrain: async (brainId: string) =>
+      setAsDefaultBrain(brainId, axiosInstance),
   };
 };
