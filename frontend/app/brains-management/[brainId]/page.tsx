@@ -3,7 +3,7 @@
 import { UUID } from "crypto";
 import { useParams } from "next/navigation";
 
-import { BrainManagementTabs } from "./components/BrainManagementTabs/BrainManagementTabs";
+import { BrainManagementTabs } from "./components";
 
 const BrainsManagement = (): JSX.Element => {
   const params = useParams();
@@ -21,7 +21,7 @@ const BrainsManagement = (): JSX.Element => {
   }
 
   return (
-    <main className="flex flex-col w-full pt-20 px-20">
+    <main className="flex flex-col w-full pt-20 px-20 mb-10">
       <BrainManagementTabs />
     </main>
   );
