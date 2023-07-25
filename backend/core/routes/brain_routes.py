@@ -101,8 +101,6 @@ async def create_brain_endpoint(
     In the brains table & in the brains_users table and put the creator user as 'Owner'
     """
 
-    brain = Brain(name=brain.name)  # pyright: ignore reportPrivateUsage=none
-
     user_brains = brain.get_user_brains(current_user.id)
     max_brain_per_user = BrainRateLimiting().max_brain_per_user
 
