@@ -16,8 +16,8 @@ export const BrainTabTrigger = ({
 }: BrainTabTriggerProps): JSX.Element => {
   return (
     <Trigger
-      className={`tracking-wide flex-1 text-lg align-center ${
-        selected ? "font-bold" : ""
+      className={`tracking-wide flex-1 pb-4 border-gray-500	 text-lg align-center ${
+        selected ? "font-bold border-b-2" : ""
       }`}
       value={value}
       onClick={() => onChange(value)}

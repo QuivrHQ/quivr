@@ -52,7 +52,6 @@ export const AddBrainModal = (): JSX.Element => {
 
         <TextArea
           label="Enter a brain description"
-          autoFocus
           placeholder="My new brain is about..."
           autoComplete="off"
           className="flex-1 m-3"
@@ -61,7 +60,6 @@ export const AddBrainModal = (): JSX.Element => {
 
         <Field
           label="OpenAI API Key"
-          autoFocus
           placeholder="sk-xxx"
           autoComplete="off"
           className="flex-1"

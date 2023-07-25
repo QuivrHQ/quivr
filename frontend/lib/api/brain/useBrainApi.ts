@@ -3,7 +3,6 @@ import { useAxios } from "@/lib/hooks";
 import {
   addBrainSubscriptions,
   createBrain,
-  CreateBrainInput,
   deleteBrain,
   getBrain,
   getBrainDocuments,
@@ -12,9 +11,14 @@ import {
   getDefaultBrain,
   setAsDefaultBrain,
   Subscription,
+  updateBrain,
   updateBrainAccess,
 } from "./brain";
-import { SubscriptionUpdatableProperties } from "./types";
+import {
+  CreateBrainInput,
+  SubscriptionUpdatableProperties,
+  UpdateBrainInput,
+} from "./types";
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const useBrainApi = () => {
@@ -42,5 +46,7 @@ export const useBrainApi = () => {
     ) => updateBrainAccess(brainId, userEmail, subscription, axiosInstance),
     setAsDefaultBrain: async (brainId: string) =>
       setAsDefaultBrain(brainId, axiosInstance),
+    updateBrain: async (brainId: string, brain: UpdateBrainInput) =>
+      updateBrain(brainId, brain, axiosInstance),
   };
 };

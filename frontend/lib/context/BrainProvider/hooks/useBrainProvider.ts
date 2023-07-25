@@ -1,8 +1,8 @@
 /* eslint-disable max-lines */
 import { UUID } from "crypto";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
-import { CreateBrainInput } from "@/lib/api/brain/brain";
+import { CreateBrainInput } from "@/lib/api/brain/types";
 import { useBrainApi } from "@/lib/api/brain/useBrainApi";
 import { useToast } from "@/lib/hooks";
 import { useEventTracking } from "@/services/analytics/useEventTracking";
@@ -24,10 +24,10 @@ export const useBrainProvider = () => {
 
   const [allBrains, setAllBrains] = useState<MinimalBrainForUser[]>([]);
   const [currentBrainId, setCurrentBrainId] = useState<null | UUID>(null);
+  const [defaultBrainId, setDefaultBrainId] = useState<UUID>();
   const [isFetchingBrains, setIsFetchingBrains] = useState(false);
 
   const currentBrain = allBrains.find((brain) => brain.id === currentBrainId);
-
   const createBrainHandler = async (
     brain: CreateBrainInput
   ): Promise<UUID | undefined> => {
@@ -79,10 +79,10 @@ export const useBrainProvider = () => {
   );
 
   const setDefaultBrain = useCallback(async () => {
-    const defaultBrain = await getDefaultBrain();
-    if (defaultBrain !== undefined) {
-      saveBrainInLocalStorage(defaultBrain);
-      setActiveBrain({ ...defaultBrain });
+    const userDefaultBrain = await getDefaultBrain();
+    if (userDefaultBrain !== undefined) {
+      saveBrainInLocalStorage(userDefaultBrain);
+      setActiveBrain(userDefaultBrain);
     } else {
       console.warn("No brains found");
     }
@@ -97,6 +97,13 @@ export const useBrainProvider = () => {
     }
   }, [setDefaultBrain, setActiveBrain]);
 
+  useEffect(() => {
+    const fetchDefaultBrain = async () => {
+      setDefaultBrainId((await getDefaultBrain())?.id);
+    };
+    void fetchDefaultBrain();
+  }, []);
+
   return {
     currentBrain,
     currentBrainId,
@@ -108,5 +115,6 @@ export const useBrainProvider = () => {
     setDefaultBrain,
     fetchAndSetActiveBrain,
     isFetchingBrains,
+    defaultBrainId,
   };
 };
