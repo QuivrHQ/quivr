@@ -5,7 +5,7 @@ import { useBrainApi } from "@/lib/api/brain/useBrainApi";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 import { useToast } from "@/lib/hooks";
 
-import { BrainRoleType } from "../../../../../../../types";
+import { BrainRoleType } from "../../../../NavBar/components/NavItems/components/BrainsDropDown/components/BrainActions/types";
 
 type UseBrainUserProps = {
   fetchBrainUsers: () => Promise<void>;

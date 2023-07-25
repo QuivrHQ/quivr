@@ -5,8 +5,11 @@ import Field from "@/lib/components/ui/Field";
 import { Select } from "@/lib/components/ui/Select";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 
-import { BrainRoleAssignation, BrainRoleType } from "../../../types";
-import { userRoleToAssignableRoles } from "../types";
+import { userRoleToAssignableRoles } from "./NavBar/components/NavItems/components/BrainsDropDown/components/BrainActions/components/ShareBrain/types";
+import {
+  BrainRoleAssignation,
+  BrainRoleType,
+} from "./NavBar/components/NavItems/components/BrainsDropDown/components/BrainActions/types";
 
 type UserToInviteProps = {
   onChange: (newRole: BrainRoleAssignation) => void;
@@ -25,10 +28,6 @@ export const UserToInvite = ({
   const [email, setEmail] = useState(roleAssignation.email);
   const { currentBrain } = useBrainContext();
 
-  if (currentBrain === undefined) {
-    throw new Error("Brain is undefined");
-  }
-
   useEffect(() => {
     onChange({
       ...roleAssignation,
@@ -36,6 +35,10 @@ export const UserToInvite = ({
       role: selectedRole,
     });
   }, [email, selectedRole]);
+
+  if (currentBrain === undefined) {
+    return <div />;
+  }
 
   return (
     <div
