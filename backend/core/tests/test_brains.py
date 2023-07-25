@@ -1,7 +1,7 @@
 import random
 import string
 
-from core.models.brains import Brain, get_default_user_brain
+from models.brains import get_default_user_brain
 
 
 def test_retrieve_default_brain(client, api_key):
