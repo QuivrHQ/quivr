@@ -9,7 +9,6 @@ import { TextArea } from "@/lib/components/ui/TextField";
 import { models, paidModels } from "@/lib/context/BrainConfigProvider/types";
 import { defineMaxTokens } from "@/lib/helpers/defineMexTokens";
 
-import { ApiKeyConfig } from "./components";
 import { useSettingsTab } from "./hooks/useSettingsTab";
 
 type SettingsTabProps = {
@@ -28,6 +27,7 @@ export const SettingsTab = ({ brainId }: SettingsTabProps): JSX.Element => {
     setAsDefaultBrainHandler,
     isSettingAsDefault,
     isUpdating,
+    isDefaultBrain,
   } = useSettingsTab({ brainId });
 
   return (
@@ -35,13 +35,32 @@ export const SettingsTab = ({ brainId }: SettingsTabProps): JSX.Element => {
       onSubmit={(e) => void handleSubmit(e)}
       className="my-10 mb-0 flex flex-col items-center gap-2"
     >
-      <Field
-        label="Name"
-        placeholder="E.g. History notes"
-        autoComplete="off"
-        className="flex-1"
-        {...register("name")}
-      />
+      <div className="flex flex-row flex-1 justify-between w-full">
+        <div>
+          <Field
+            label="Name"
+            placeholder="E.g. History notes"
+            autoComplete="off"
+            className="flex-1"
+            {...register("name")}
+          />
+        </div>
+        <div className="mt-4">
+          {isDefaultBrain ? (
+            <div className="border rounded-lg border-dashed border-black dark:border-white bg-white dark:bg-black text-black dark:text-white focus:bg-black dark:focus:bg-white dark dark focus:text-white dark:focus:text-black transition-colors py-2 px-4 shadow-none">
+              Default brain
+            </div>
+          ) : (
+            <Button
+              variant={"secondary"}
+              isLoading={isSettingAsDefault}
+              onClick={() => void setAsDefaultBrainHandler()}
+            >
+              Set as default brain
+            </Button>
+          )}
+        </div>
+      </div>
       <TextArea
         label="Description"
         placeholder="My new brain is about..."
@@ -106,16 +125,6 @@ export const SettingsTab = ({ brainId }: SettingsTabProps): JSX.Element => {
           Save changes
         </Button>
       </div>
-      <Divider text="Default brain" className="mt-4" />
-      <Button
-        variant={"secondary"}
-        isLoading={isSettingAsDefault}
-        onClick={() => void setAsDefaultBrainHandler()}
-      >
-        Set as default brain
-      </Button>
-
-      <ApiKeyConfig />
     </form>
   );
 };

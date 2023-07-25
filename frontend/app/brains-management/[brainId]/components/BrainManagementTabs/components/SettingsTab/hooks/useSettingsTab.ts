@@ -7,6 +7,7 @@ import { useForm } from "react-hook-form";
 
 import { useBrainApi } from "@/lib/api/brain/useBrainApi";
 import { useBrainConfig } from "@/lib/context/BrainConfigProvider";
+import { useBrainProvider } from "@/lib/context/BrainProvider/hooks/useBrainProvider";
 import { defineMaxTokens } from "@/lib/helpers/defineMexTokens";
 import { useToast } from "@/lib/hooks";
 
@@ -36,7 +37,6 @@ export const useSettingsTab = ({ brainId }: UseSettingsTabProps) => {
     reset,
     watch,
     setValue,
-
     formState: { dirtyFields },
   } = useForm({
     defaultValues,
@@ -111,7 +111,6 @@ export const useSettingsTab = ({ brainId }: UseSettingsTabProps) => {
 
       await updateBrain(brainId, getValues());
 
-      reset(defaultValues);
       publish({
         variant: "success",
         text: "Brain created successfully",
@@ -138,6 +137,8 @@ export const useSettingsTab = ({ brainId }: UseSettingsTabProps) => {
       setIsUpdating(false);
     }
   };
+  const { defaultBrainId } = useBrainProvider();
+  const isDefaultBrain = defaultBrainId === brainId;
 
   return {
     handleSubmit,
@@ -150,5 +151,6 @@ export const useSettingsTab = ({ brainId }: UseSettingsTabProps) => {
     hasChanges: Object.keys(dirtyFields).length > 0,
     setAsDefaultBrainHandler,
     isSettingAsDefault,
+    isDefaultBrain,
   };
 };

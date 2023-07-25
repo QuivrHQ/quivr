@@ -11,7 +11,7 @@ export const ApiKeyConfig = (): JSX.Element => {
   return (
     <>
       <Divider text="API Key Config" className="mt-4" />
-      <div className="flex justify-between items-center mt-4">
+      <div className="flex justify-center items-center mt-4">
         <div className="flex items-center space-x-4">
           {apiKey === "" && (
             <Button
