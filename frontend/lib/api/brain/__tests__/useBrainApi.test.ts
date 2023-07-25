@@ -2,7 +2,7 @@
 import { renderHook } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { Subscription } from "../brain";
+import { CreateBrainInput, Subscription } from "../brain";
 import { SubscriptionUpdatableProperties } from "../types";
 import { useBrainApi } from "../useBrainApi";
 
@@ -57,11 +57,21 @@ describe("useBrainApi", () => {
         current: { createBrain },
       },
     } = renderHook(() => useBrainApi());
-    const name = "Test Brain";
-    await createBrain(name);
+
+    const brain: CreateBrainInput = {
+      name: "Test Brain",
+      description: "This is a description",
+      status: "public",
+      model: "gpt-3.5-turbo-0613",
+      temperature: 0.0,
+      max_tokens: 256,
+      openai_api_key: "123",
+    };
+
+    await createBrain(brain);
 
     expect(axiosPostMock).toHaveBeenCalledTimes(1);
-    expect(axiosPostMock).toHaveBeenCalledWith("/brains/", { name });
+    expect(axiosPostMock).toHaveBeenCalledWith("/brains/", brain);
   });
 
   it("should call deleteBrain with the correct parameters", async () => {

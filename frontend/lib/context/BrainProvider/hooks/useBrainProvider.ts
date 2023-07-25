@@ -2,6 +2,7 @@
 import { UUID } from "crypto";
 import { useCallback, useState } from "react";
 
+import { CreateBrainInput } from "@/lib/api/brain/brain";
 import { useBrainApi } from "@/lib/api/brain/useBrainApi";
 import { useToast } from "@/lib/hooks";
 import { useEventTracking } from "@/services/analytics/useEventTracking";
@@ -28,9 +29,9 @@ export const useBrainProvider = () => {
   const currentBrain = allBrains.find((brain) => brain.id === currentBrainId);
 
   const createBrainHandler = async (
-    name: string
+    brain: CreateBrainInput
   ): Promise<UUID | undefined> => {
-    const createdBrain = await createBrain(name);
+    const createdBrain = await createBrain(brain);
     try {
       setAllBrains((prevBrains) => [...prevBrains, createdBrain]);
       saveBrainInLocalStorage(createdBrain);

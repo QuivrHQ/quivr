@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 import axios from "axios";
 import { FormEvent, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -49,7 +50,18 @@ export const useAddBrainModal = () => {
 
     try {
       setIsPending(true);
-      await createBrain(name);
+      await createBrain({
+        name,
+        description,
+        max_tokens: maxTokens,
+        model,
+        openai_api_key: openAiKey,
+        temperature,
+      });
+
+      if (setDefault) {
+        //
+      }
 
       setIsShareModalOpen(false);
       reset(defaultValues);
