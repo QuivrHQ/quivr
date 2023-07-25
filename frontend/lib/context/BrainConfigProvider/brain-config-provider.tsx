@@ -3,8 +3,7 @@
 
 import { createContext, useEffect, useState } from "react";
 
-import { setEmptyStringsUndefined } from "@/lib/helpers/setEmptyStringsUndefined";
-
+import { removeUndefined } from "@/lib/helpers/removeUndefined";
 import {
   getBrainConfigFromLocalStorage,
   saveBrainConfigInLocalStorage,
@@ -39,7 +38,7 @@ export const BrainConfigProvider = ({
     setBrainConfig((config) => {
       const updatedConfig: BrainConfig = {
         ...config,
-        ...setEmptyStringsUndefined(newConfig),
+        ...removeUndefined(newConfig),
       };
       saveBrainConfigInLocalStorage(updatedConfig);
 

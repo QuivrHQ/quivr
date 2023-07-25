@@ -10,6 +10,7 @@ from models.brains import (
 )
 from models.settings import BrainRateLimiting
 from models.users import User
+
 from routes.authorizations.brain_authorization import RoleEnum, has_brain_authorization
 
 logger = get_logger(__name__)
@@ -74,10 +75,7 @@ async def get_brain_endpoint(
     brain = Brain(id=brain_id)
     brains = brain.get_brain_details()
     if len(brains) > 0:
-        return {
-            "id": brain_id,
-            "name": brains[0]["name"],
-        }
+        return brains[0]
     else:
         return HTTPException(
             status_code=404,

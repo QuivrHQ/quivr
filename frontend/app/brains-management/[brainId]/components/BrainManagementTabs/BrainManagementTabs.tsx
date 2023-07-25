@@ -1,6 +1,7 @@
 import { Content, List, Root } from "@radix-ui/react-tabs";
 
 import { BrainTabTrigger, PeopleTab } from "./components";
+import { SettingsTab } from "./components/SettingsTab/SettingsTab";
 import { useBrainManagementTabs } from "./hooks/useBrainManagementTabs";
 
 export const BrainManagementTabs = (): JSX.Element => {
@@ -38,10 +39,13 @@ export const BrainManagementTabs = (): JSX.Element => {
 
       <div className="p-20 pt-5">
         <Content value="settings">
-          <p>coming soon</p>
+          <SettingsTab brainId={brainId} />
         </Content>
         <Content value="people">
           <PeopleTab brainId={brainId} />
+        </Content>
+        <Content value="knowledge">
+          <p>Coming soon</p>
         </Content>
       </div>
     </Root>
