@@ -9,7 +9,10 @@ import {
 } from "@/lib/context/BrainProvider/types";
 import { Document } from "@/lib/types/Document";
 
-import { SubscriptionUpdatableProperties } from "./types";
+import {
+  CreateOrUpdateBrainInput,
+  SubscriptionUpdatableProperties,
+} from "./types";
 import { mapBackendMinimalBrainToMinimalBrain } from "./utils/mapBackendMinimalBrainToMinimalBrain";
 import {
   BackendSubscription,
@@ -28,17 +31,8 @@ export const getBrainDocuments = async (
   return response.data.documents;
 };
 
-export type CreateBrainInput = {
-  name: string;
-  description?: string;
-  status?: string;
-  model?: string;
-  temperature?: number;
-  max_tokens?: number;
-  openai_api_key?: string;
-};
 export const createBrain = async (
-  brain: CreateBrainInput,
+  brain: CreateOrUpdateBrainInput,
   axiosInstance: AxiosInstance
 ): Promise<MinimalBrainForUser> => {
   return mapBackendMinimalBrainToMinimalBrain(
@@ -132,4 +126,12 @@ export const setAsDefaultBrain = async (
   axiosInstance: AxiosInstance
 ): Promise<void> => {
   await axiosInstance.post(`/brains/${brainId}/default`);
+};
+
+export const updateBrain = async (
+  brainId: string,
+  brain: CreateOrUpdateBrainInput,
+  axiosInstance: AxiosInstance
+): Promise<void> => {
+  await axiosInstance.put(`/brains/${brainId}/`, brain);
 };
