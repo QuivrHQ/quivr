@@ -20,7 +20,6 @@ class Brain(BaseModel):
     max_tokens: Optional[int] = 256
     openai_api_key: Optional[str] = None
     files: List[Any] = []
-    file_sha1: Optional[str] = None
     max_brain_size = BrainRateLimiting().max_brain_size
 
     class Config:
@@ -195,16 +194,11 @@ class Brain(BaseModel):
         if old_default_brain is not None:
             self.commons["supabase"].table("brains_users").update(
                 {"default_brain": False}
-            ).match(
-                {"brain_id": old_default_brain["id"], "user_id": user.id}
-            ).execute()
+            ).match({"brain_id": old_default_brain["id"], "user_id": user.id}).execute()
 
-        # Step 2: Set the current brain as default
         self.commons["supabase"].table("brains_users").update(
             {"default_brain": True}
-        ).match(
-            {"brain_id": self.id, "user_id": user.id}
-        ).execute()
+        ).match({"brain_id": self.id, "user_id": user.id}).execute()
 
     def create_brain_vector(self, vector_id, file_sha1):
         response = (
@@ -244,12 +238,6 @@ class Brain(BaseModel):
                 "status": self.status,
             }
         ).match({"brain_id": self.id}).execute()
-
-    def update_brain_with_file(self, file_sha1: str):
-        # not  used
-        vector_ids = self.get_vector_ids_from_file_sha1(file_sha1)
-        for vector_id in vector_ids:
-            self.create_brain_vector(vector_id, file_sha1)
 
     def get_unique_brain_files(self):
         """

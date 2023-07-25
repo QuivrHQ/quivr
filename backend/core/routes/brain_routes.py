@@ -1,10 +1,14 @@
 from uuid import UUID
 
 from auth import AuthBearer, get_current_user
+from core.routes.authorizations.brain_authorization import RoleEnum
 from fastapi import APIRouter, Depends, HTTPException
 from logger import get_logger
-from models.brains import (Brain, get_default_user_brain,
-                           get_default_user_brain_or_create_new)
+from models.brains import (
+    Brain,
+    get_default_user_brain,
+    get_default_user_brain_or_create_new,
+)
 from models.settings import BrainRateLimiting, common_dependencies
 from models.users import User
 from routes.authorizations.brain_authorization import has_brain_authorization
@@ -138,7 +142,7 @@ async def create_brain_endpoint(
         Depends(
             AuthBearer(),
         ),
-        Depends(has_brain_authorization()),
+        Depends(has_brain_authorization([RoleEnum.Editor, RoleEnum.Owner])),
     ],
     tags=["Brain"],
 )
@@ -147,31 +151,12 @@ async def update_brain_endpoint(
     input_brain: Brain,
 ):
     """
-    Update an existing brain with new brain parameters/files.
-    If the file is contained in Add file to brain :
-        if given a fileName/ file sha1 / -> add all the vector Ids to the brains_vectors
-    Modify other brain fields:
-        name, status, model, max_tokens, temperature
-    Return modified brain ? No need -> do an optimistic update
+    Update an existing brain with new brain configuration
     """
-    brain = Brain(
-        id=brain_id,
-        name=input_brain.name,
-        description=input_brain.description,
-        model=input_brain.model,
-        max_tokens=input_brain.max_tokens,
-        temperature=input_brain.temperature,
-        openai_api_key=input_brain.openai_api_key,
-    )
-    print("brain", brain)
-    # Add new file to brain , il file_sha1 already exists in brains_vectors -> out (not now)
-    if brain.file_sha1:  # pyright: ignore reportPrivateUsage=none
-        # add all the vector Ids to the brains_vectors  with the given brain.brain_id
-        brain.update_brain_with_file(
-            file_sha1=input_brain.file_sha1  # pyright: ignore reportPrivateUsage=none
-        )
+    input_brain.id = brain_id
+    print("brain", input_brain)
 
-    brain.update_brain_fields()  # pyright: ignore reportPrivateUsage=none
+    input_brain.update_brain_fields()
     return {"message": f"Brain {brain_id} has been updated."}
 
 
