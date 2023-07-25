@@ -131,5 +131,5 @@ export const setAsDefaultBrain = async (
   brainId: string,
   axiosInstance: AxiosInstance
 ): Promise<void> => {
-  await axiosInstance.put(`/brains/${brainId}/default`);
+  await axiosInstance.post(`/brains/${brainId}/default`);
 };

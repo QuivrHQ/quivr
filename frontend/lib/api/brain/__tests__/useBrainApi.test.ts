@@ -198,7 +198,7 @@ describe("useBrainApi", () => {
     } = renderHook(() => useBrainApi());
     const brainId = "123";
     await setAsDefaultBrain(brainId);
-    expect(axiosPutMock).toHaveBeenCalledTimes(1);
-    expect(axiosPutMock).toHaveBeenCalledWith(`/brains/${brainId}/default`);
+    expect(axiosPostMock).toHaveBeenCalledTimes(1);
+    expect(axiosPostMock).toHaveBeenCalledWith(`/brains/${brainId}/default`);
   });
 });
