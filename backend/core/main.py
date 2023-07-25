@@ -1,4 +1,6 @@
 import os
+from dotenv import load_dotenv
+load_dotenv()
 
 import pypandoc
 import sentry_sdk
@@ -53,3 +55,8 @@ async def http_exception_handler(_, exc):
         status_code=exc.status_code,
         content={"detail": exc.detail},
     )
+
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=5050)
