@@ -28,12 +28,21 @@ export const getBrainDocuments = async (
   return response.data.documents;
 };
 
+export type CreateBrainInput = {
+  name: string;
+  description?: string;
+  status?: string;
+  model?: string;
+  temperature?: number;
+  max_tokens?: number;
+  openai_api_key?: string;
+};
 export const createBrain = async (
-  name: string,
+  brain: CreateBrainInput,
   axiosInstance: AxiosInstance
 ): Promise<MinimalBrainForUser> => {
   return mapBackendMinimalBrainToMinimalBrain(
-    (await axiosInstance.post<BackendMinimalBrainForUser>(`/brains/`, { name }))
+    (await axiosInstance.post<BackendMinimalBrainForUser>(`/brains/`, brain))
       .data
   );
 };
@@ -116,4 +125,11 @@ export const updateBrainAccess = async (
     ),
     email: userEmail,
   });
+};
+
+export const setAsDefaultBrain = async (
+  brainId: string,
+  axiosInstance: AxiosInstance
+): Promise<void> => {
+  await axiosInstance.put(`/brains/${brainId}/default`);
 };
