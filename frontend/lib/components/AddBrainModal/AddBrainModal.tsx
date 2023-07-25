@@ -107,9 +107,8 @@ export const AddBrainModal = (): JSX.Element => {
           </label>
           <input
             type="range"
-            min="256"
+            min="10"
             max={defineMaxTokens(model)}
-            step="32"
             value={maxTokens}
             {...register("maxTokens")}
           />
