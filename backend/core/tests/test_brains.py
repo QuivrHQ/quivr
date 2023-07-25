@@ -1,6 +1,8 @@
 import random
 import string
 
+from models.brains import get_default_user_brain
+
 
 def test_retrieve_default_brain(client, api_key):
     # Making a GET request to the /brains/default/ endpoint
@@ -161,3 +163,55 @@ def test_delete_all_brains_and_get_default_brain(client, api_key):
     # Assert that the response status code is 200 (HTTP OK)
     assert response.status_code == 200
     assert response.json()["name"] == "Default brain"
+
+
+def test_set_as_default_brain_endpoint(client, api_key):
+    random_brain_name = "".join(
+        random.choices(string.ascii_letters + string.digits, k=10)
+    )
+    # Set up the request payload
+    payload = {
+        "name": random_brain_name,
+        "status": "public",
+        "model": "gpt-3.5-turbo-0613",
+        "temperature": 0,
+        "max_tokens": 256,
+    }
+
+    # Making a POST request to the /brains/ endpoint
+    response = client.post(
+        "/brains/",
+        json=payload,
+        headers={"Authorization": "Bearer " + api_key},
+    )
+
+    response_data = response.json()
+
+    brain_id = response_data["id"]
+
+    # Make a POST request to set the brain as default for the user
+    response = client.post(
+        f"/brains/{brain_id}/default",
+        headers={"Authorization": "Bearer " + api_key},
+    )
+
+    # Assert that the response status code is 200 (HTTP OK)
+    assert response.status_code == 200
+
+    # Assert the response message
+    assert response.json() == {
+        "message": f"Brain {brain_id} has been set as default brain."
+    }
+
+    # Check if the brain is now the default for the user
+
+    # Send a request to get user information
+    response = client.get("/user", headers={"Authorization": "Bearer " + api_key})
+    # Assert that the response contains the expected fields
+    user_info = response.json()
+    user_id = user_info["id"]
+
+    default_brain = get_default_user_brain(user_id)
+    assert default_brain is not None
+    assert default_brain["id"] == brain_id
+    assert default_brain["default_brain"] is True

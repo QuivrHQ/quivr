@@ -1,11 +1,12 @@
 /* eslint-disable max-lines */
 import axios from "axios";
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 
 import { useBrainApi } from "@/lib/api/brain/useBrainApi";
 import { useBrainConfig } from "@/lib/context/BrainConfigProvider";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
+import { defineMaxTokens } from "@/lib/helpers/defineMexTokens";
 import { useToast } from "@/lib/hooks";
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
@@ -23,7 +24,7 @@ export const useAddBrainModal = () => {
     setDefault: false,
   };
 
-  const { register, getValues, reset, watch } = useForm({
+  const { register, getValues, reset, watch, setValue } = useForm({
     defaultValues,
   });
 
@@ -32,19 +33,13 @@ export const useAddBrainModal = () => {
   const temperature = watch("temperature");
   const maxTokens = watch("maxTokens");
 
+  useEffect(() => {
+    setValue("maxTokens", Math.min(maxTokens, defineMaxTokens(model)));
+  }, [maxTokens, model, setValue]);
+
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     const { name, description, setDefault } = getValues();
-
-    console.log({
-      name,
-      description,
-      maxTokens,
-      model,
-      setDefault,
-      openAiKey,
-      temperature,
-    });
 
     if (name.trim() === "" || isPending) {
       return;
