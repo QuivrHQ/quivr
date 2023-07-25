@@ -4,7 +4,7 @@ export type SubscriptionUpdatableProperties = {
   role: BrainRoleType | null;
 };
 
-export type CreateOrUpdateBrainInput = {
+export type CreateBrainInput = {
   name: string;
   description?: string;
   status?: string;
@@ -13,3 +13,5 @@ export type CreateOrUpdateBrainInput = {
   max_tokens?: number;
   openai_api_key?: string;
 };
+
+export type UpdateBrainInput = Partial<CreateBrainInput>;

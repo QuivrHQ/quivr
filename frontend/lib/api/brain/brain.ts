@@ -10,8 +10,9 @@ import {
 import { Document } from "@/lib/types/Document";
 
 import {
-  CreateOrUpdateBrainInput,
+  CreateBrainInput,
   SubscriptionUpdatableProperties,
+  UpdateBrainInput,
 } from "./types";
 import { mapBackendMinimalBrainToMinimalBrain } from "./utils/mapBackendMinimalBrainToMinimalBrain";
 import {
@@ -32,7 +33,7 @@ export const getBrainDocuments = async (
 };
 
 export const createBrain = async (
-  brain: CreateOrUpdateBrainInput,
+  brain: CreateBrainInput,
   axiosInstance: AxiosInstance
 ): Promise<MinimalBrainForUser> => {
   return mapBackendMinimalBrainToMinimalBrain(
@@ -130,7 +131,7 @@ export const setAsDefaultBrain = async (
 
 export const updateBrain = async (
   brainId: string,
-  brain: CreateOrUpdateBrainInput,
+  brain: UpdateBrainInput,
   axiosInstance: AxiosInstance
 ): Promise<void> => {
   await axiosInstance.put(`/brains/${brainId}/`, brain);

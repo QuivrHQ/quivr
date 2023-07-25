@@ -4,8 +4,9 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { Subscription } from "../brain";
 import {
-  CreateOrUpdateBrainInput,
+  CreateBrainInput,
   SubscriptionUpdatableProperties,
+  UpdateBrainInput,
 } from "../types";
 import { useBrainApi } from "../useBrainApi";
 
@@ -61,7 +62,7 @@ describe("useBrainApi", () => {
       },
     } = renderHook(() => useBrainApi());
 
-    const brain: CreateOrUpdateBrainInput = {
+    const brain: CreateBrainInput = {
       name: "Test Brain",
       description: "This is a description",
       status: "public",
@@ -212,7 +213,7 @@ describe("useBrainApi", () => {
       },
     } = renderHook(() => useBrainApi());
     const brainId = "123";
-    const brain: CreateOrUpdateBrainInput = {
+    const brain: UpdateBrainInput = {
       name: "Test Brain",
       description: "This is a description",
       status: "public",
