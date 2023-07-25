@@ -189,4 +189,16 @@ describe("useBrainApi", () => {
       { rights: "Viewer", email }
     );
   });
+
+  it("should call setAsDefaultBrain with correct brainId", async () => {
+    const {
+      result: {
+        current: { setAsDefaultBrain },
+      },
+    } = renderHook(() => useBrainApi());
+    const brainId = "123";
+    await setAsDefaultBrain(brainId);
+    expect(axiosPutMock).toHaveBeenCalledTimes(1);
+    expect(axiosPutMock).toHaveBeenCalledWith(`/brains/${brainId}/default`);
+  });
 });

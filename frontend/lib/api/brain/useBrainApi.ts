@@ -10,6 +10,7 @@ import {
   getBrains,
   getBrainUsers,
   getDefaultBrain,
+  setAsDefaultBrain,
   Subscription,
   updateBrainAccess,
 } from "./brain";
@@ -39,5 +40,7 @@ export const useBrainApi = () => {
       userEmail: string,
       subscription: SubscriptionUpdatableProperties
     ) => updateBrainAccess(brainId, userEmail, subscription, axiosInstance),
+    setAsDefaultBrain: async (brainId: string) =>
+      setAsDefaultBrain(brainId, axiosInstance),
   };
 };

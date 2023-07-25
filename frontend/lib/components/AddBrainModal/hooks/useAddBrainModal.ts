@@ -3,6 +3,7 @@ import axios from "axios";
 import { FormEvent, useState } from "react";
 import { useForm } from "react-hook-form";
 
+import { useBrainApi } from "@/lib/api/brain/useBrainApi";
 import { useBrainConfig } from "@/lib/context/BrainConfigProvider";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 import { useToast } from "@/lib/hooks";
@@ -12,6 +13,7 @@ export const useAddBrainModal = () => {
   const [isPending, setIsPending] = useState(false);
   const { publish } = useToast();
   const { createBrain } = useBrainContext();
+  const { setAsDefaultBrain } = useBrainApi();
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const { config } = useBrainConfig();
   const defaultValues = {
@@ -50,7 +52,7 @@ export const useAddBrainModal = () => {
 
     try {
       setIsPending(true);
-      await createBrain({
+      const createdBrainId = await createBrain({
         name,
         description,
         max_tokens: maxTokens,
@@ -60,7 +62,15 @@ export const useAddBrainModal = () => {
       });
 
       if (setDefault) {
-        //
+        if (createdBrainId === undefined) {
+          publish({
+            variant: "danger",
+            text: "Error occurred while creating a brain",
+          });
+
+          return;
+        }
+        await setAsDefaultBrain(createdBrainId);
       }
 
       setIsShareModalOpen(false);

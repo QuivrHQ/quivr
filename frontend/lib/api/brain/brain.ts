@@ -126,3 +126,10 @@ export const updateBrainAccess = async (
     email: userEmail,
   });
 };
+
+export const setAsDefaultBrain = async (
+  brainId: string,
+  axiosInstance: AxiosInstance
+): Promise<void> => {
+  await axiosInstance.put(`/brains/${brainId}/default`);
+};
