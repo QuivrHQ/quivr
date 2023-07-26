@@ -93,7 +93,7 @@ cp .frontend_env.example frontend/.env
 - **Step 4**: Create your database tables and functions with one of these two options:
   a. Run the following migration scripts on the Supabase database via the web interface (SQL Editor -> `New query`)
 
-[Creation Script 1](https://github.com/stangirard/quivr/scripts/tables.sql)
+[Creation Script 1](https://github.com/stangirard/quivr/tree/main/scripts/tables.sql)
 
 b. Use the `migration.sh` script to run the migration scripts
 
@@ -104,9 +104,9 @@ b. Use the `migration.sh` script to run the migration scripts
 
     Choose either create_scripts if it's your first time or migrations if you are updating your database.
 
-All the scripts can be found in the [scripts](https://github.com/stangirard/quivr/scripts/) folder
+All the scripts can be found in the [scripts](https://github.com/stangirard/quivr/tree/main/scripts) folder
 
-> _If you come from an old version of Quivr, run the scripts in [migration script](https://github.com/stangirard/quivr/scripts/) to migrate your data to the new version in the order of date_
+> _If you come from an old version of Quivr, run the scripts in [migration script](https://github.com/stangirard/quivr/tree/main/scripts) to migrate your data to the new version in the order of date_
 
 - **Step 5**: Launch the app
 
