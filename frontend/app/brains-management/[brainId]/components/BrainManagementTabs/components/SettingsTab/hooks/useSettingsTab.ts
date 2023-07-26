@@ -2,7 +2,7 @@
 /* eslint-disable max-lines */
 import axios from "axios";
 import { UUID } from "crypto";
-import { FormEvent, useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 
 import { useBrainApi } from "@/lib/api/brain/useBrainApi";
@@ -20,7 +20,7 @@ export const useSettingsTab = ({ brainId }: UseSettingsTabProps) => {
   const [isUpdating, setIsUpdating] = useState(false);
   const [isSettingAsDefault, setIsSettingHasDefault] = useState(false);
   const { publish } = useToast();
-
+  const formRef = useRef<HTMLFormElement>(null);
   const { setAsDefaultBrain, getBrain, updateBrain } = useBrainApi();
   const { config } = useBrainConfig();
 
@@ -93,8 +93,12 @@ export const useSettingsTab = ({ brainId }: UseSettingsTabProps) => {
     }
   };
 
-  const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async () => {
+    const hasChanges = Object.keys(dirtyFields).length > 0;
+
+    if (!hasChanges) {
+      return;
+    }
     const { name: isNameDirty } = dirtyFields;
     const { name } = getValues();
     if (isNameDirty !== undefined && isNameDirty && name.trim() === "") {
@@ -140,6 +144,21 @@ export const useSettingsTab = ({ brainId }: UseSettingsTabProps) => {
   const { defaultBrainId } = useBrainProvider();
   const isDefaultBrain = defaultBrainId === brainId;
 
+  useEffect(() => {
+    const handleKeyPress = (event: KeyboardEvent) => {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        void handleSubmit();
+      }
+    };
+
+    formRef.current?.addEventListener("keydown", handleKeyPress);
+
+    return () => {
+      formRef.current?.removeEventListener("keydown", handleKeyPress);
+    };
+  }, [formRef.current]);
+
   return {
     handleSubmit,
     register,
@@ -148,9 +167,10 @@ export const useSettingsTab = ({ brainId }: UseSettingsTabProps) => {
     temperature,
     maxTokens,
     isUpdating,
-    hasChanges: Object.keys(dirtyFields).length > 0,
+
     setAsDefaultBrainHandler,
     isSettingAsDefault,
     isDefaultBrain,
+    formRef,
   };
 };
