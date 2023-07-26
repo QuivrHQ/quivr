@@ -7,7 +7,13 @@ import { useBrainApi } from "@/lib/api/brain/useBrainApi";
 import { useToast } from "@/lib/hooks";
 
 import { generateBrainAssignation } from "../components/NavBar/components/NavItems/components/BrainsDropDown/components/BrainActions/components/ShareBrain/utils/generateBrainAssignation";
-import { BrainRoleAssignation } from "../components/NavBar/components/NavItems/components/BrainsDropDown/components/BrainActions/types";
+import {
+  BrainRoleAssignation,
+  BrainRoleType,
+} from "../components/NavBar/components/NavItems/components/BrainsDropDown/components/BrainActions/types";
+import { useBrainContext } from "../context/BrainProvider/hooks/useBrainContext";
+
+const requiredAccessToShareBrain: BrainRoleType[] = ["Owner", "Editor"];
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const useShareBrain = (brainId: string) => {
@@ -22,6 +28,11 @@ export const useShareBrain = (brainId: string) => {
 
   const { publish } = useToast();
   const { addBrainSubscriptions } = useBrainApi();
+
+  const { allBrains } = useBrainContext();
+  const hasShareBrainRights = requiredAccessToShareBrain.includes(
+    allBrains.find((brain) => brain.id === brainId)?.role ?? "Viewer"
+  );
 
   const handleCopyInvitationLink = async () => {
     await navigator.clipboard.writeText(brainShareLink);
@@ -119,5 +130,6 @@ export const useShareBrain = (brainId: string) => {
     setIsShareModalOpen,
     isShareModalOpen,
     canAddNewRow,
+    hasShareBrainRights,
   };
 };
