@@ -2,11 +2,10 @@ from typing import Any, List, Optional
 from uuid import UUID
 
 from logger import get_logger
-from pydantic import BaseModel
-from utils.vectors import get_unique_files_from_vector_ids
-
 from models.settings import BrainRateLimiting, CommonsDep, common_dependencies
 from models.users import User
+from pydantic import BaseModel
+from utils.vectors import get_unique_files_from_vector_ids
 
 logger = get_logger(__name__)
 
@@ -14,10 +13,12 @@ logger = get_logger(__name__)
 class Brain(BaseModel):
     id: Optional[UUID] = None
     name: Optional[str] = "Default brain"
-    status: Optional[str] = "public"
+    description: Optional[str] = "This is a description"
+    status: Optional[str] = "private"
     model: Optional[str] = "gpt-3.5-turbo-0613"
     temperature: Optional[float] = 0.0
     max_tokens: Optional[int] = 256
+    openai_api_key: Optional[str] = None
     files: List[Any] = []
     max_brain_size = BrainRateLimiting().max_brain_size
 
@@ -150,7 +151,20 @@ class Brain(BaseModel):
     def create_brain(self):
         commons = common_dependencies()
         response = (
-            commons["supabase"].table("brains").insert({"name": self.name}).execute()
+            commons["supabase"]
+            .table("brains")
+            .insert(
+                {
+                    "name": self.name,
+                    "description": self.description,
+                    "temperature": self.temperature,
+                    "model": self.model,
+                    "max_tokens": self.max_tokens,
+                    "openai_api_key": self.openai_api_key,
+                    "status": self.status,
+                }
+            )
+            .execute()
         )
 
         self.id = response.data[0]["brain_id"]
@@ -173,6 +187,18 @@ class Brain(BaseModel):
         )
 
         return response.data
+
+    def set_as_default_brain_for_user(self, user: User):
+        old_default_brain = get_default_user_brain(user)
+
+        if old_default_brain is not None:
+            self.commons["supabase"].table("brains_users").update(
+                {"default_brain": False}
+            ).match({"brain_id": old_default_brain["id"], "user_id": user.id}).execute()
+
+        self.commons["supabase"].table("brains_users").update(
+            {"default_brain": True}
+        ).match({"brain_id": self.id, "user_id": user.id}).execute()
 
     def create_brain_vector(self, vector_id, file_sha1):
         response = (
@@ -201,15 +227,17 @@ class Brain(BaseModel):
         return vectorsResponse.data
 
     def update_brain_fields(self):
-        self.commons["supabase"].table("brains").update({"name": self.name}).match(
-            {"brain_id": self.id}
-        ).execute()
-
-    def update_brain_with_file(self, file_sha1: str):
-        # not  used
-        vector_ids = self.get_vector_ids_from_file_sha1(file_sha1)
-        for vector_id in vector_ids:
-            self.create_brain_vector(vector_id, file_sha1)
+        self.commons["supabase"].table("brains").update(
+            {
+                "name": self.name,
+                "description": self.description,
+                "model": self.model,
+                "temperature": self.temperature,
+                "max_tokens": self.max_tokens,
+                "openai_api_key": self.openai_api_key,
+                "status": self.status,
+            }
+        ).match({"brain_id": self.id}).execute()
 
     def get_unique_brain_files(self):
         """

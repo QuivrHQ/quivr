@@ -8,6 +8,7 @@ import Button from "@/lib/components/ui/Button";
 import { UserStats } from "@/lib/types/User";
 import { cn } from "@/lib/utils";
 
+import { ApiKeyConfig } from "./ApiKeyConfig";
 import { BrainConsumption } from "./BrainConsumption";
 import { DateComponent } from "./Date";
 import BrainSpaceChart from "./Graphs/BrainSpaceChart";
@@ -67,6 +68,7 @@ export const UserStatistics = (userStats: UserStats): JSX.Element => {
           </div>
         </UserStatisticsCard>
       </div>
+      <ApiKeyConfig />
     </>
   );
 };

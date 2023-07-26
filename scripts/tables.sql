@@ -126,14 +126,15 @@ CREATE TABLE IF NOT EXISTS api_keys(
     is_active BOOLEAN DEFAULT true
 );
 
--- Create brains table
-CREATE TABLE  IF NOT EXISTS brains (
+CREATE TABLE IF NOT EXISTS brains (
   brain_id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  name TEXT,
+  name TEXT NOT NULL,
   status TEXT,
+  description TEXT,
   model TEXT,
-  max_tokens TEXT,
-  temperature FLOAT
+  max_tokens INT,
+  temperature FLOAT,
+  openai_api_key TEXT
 );
 
 -- Create brains X users table
@@ -193,7 +194,7 @@ CREATE TABLE IF NOT EXISTS migrations (
 );
 
 INSERT INTO migrations (name) 
-SELECT '20230717173000_add_get_user_id_by_user_email'
+SELECT '202307241530031_add_fields_to_brain'
 WHERE NOT EXISTS (
-    SELECT 1 FROM migrations WHERE name = '20230717173000_add_get_user_id_by_user_email'
+    SELECT 1 FROM migrations WHERE name = '202307241530031_add_fields_to_brain'
 );

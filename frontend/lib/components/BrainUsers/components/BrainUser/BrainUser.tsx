@@ -6,8 +6,8 @@ import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainConte
 
 import { RemoveAccessIcon } from "./components/RemoveAccessIcon";
 import { useBrainUser } from "./hooks/useBrainUser";
-import { BrainRoleType } from "../../../../../../types";
-import { availableRoles } from "../../../../types";
+import { availableRoles } from "../../../NavBar/components/NavItems/components/BrainsDropDown/components/BrainActions/components/ShareBrain/types";
+import { BrainRoleType } from "../../../NavBar/components/NavItems/components/BrainsDropDown/components/BrainActions/types";
 
 type BrainUserProps = {
   email: string;
