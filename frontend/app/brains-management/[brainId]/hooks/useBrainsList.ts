@@ -1,4 +1,5 @@
-import { usePathname } from "next/navigation";
+import { UUID } from "crypto";
+import { redirect, useParams, usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
@@ -12,6 +13,10 @@ export const useBrainsList = () => {
   const [open, setOpen] = useState(!isMobile);
   const [searchQuery, setSearchQuery] = useState("");
   const { allBrains } = useBrainContext();
+  const { currentBrainId } = useBrainContext();
+  const params = useParams();
+
+  const brainId = params?.brainId as UUID | undefined;
 
   const pathname = usePathname();
 
@@ -25,6 +30,16 @@ export const useBrainsList = () => {
 
     return name.includes(query);
   });
+
+  useEffect(() => {
+    if (brainId !== undefined) {
+      return;
+    }
+
+    if (currentBrainId !== null) {
+      redirect(`/brains-management/${currentBrainId}`);
+    }
+  }, [currentBrainId]);
 
   return {
     open,

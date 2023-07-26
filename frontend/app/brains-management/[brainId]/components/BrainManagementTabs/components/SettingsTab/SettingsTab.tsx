@@ -1,6 +1,7 @@
 /* eslint-disable max-lines */
 
 import { UUID } from "crypto";
+import { FaSpinner } from "react-icons/fa";
 
 import Button from "@/lib/components/ui/Button";
 import { Divider } from "@/lib/components/ui/Divider";
@@ -19,7 +20,6 @@ export const SettingsTab = ({ brainId }: SettingsTabProps): JSX.Element => {
   const {
     handleSubmit,
     register,
-    hasChanges,
     openAiKey,
     temperature,
     maxTokens,
@@ -28,12 +28,17 @@ export const SettingsTab = ({ brainId }: SettingsTabProps): JSX.Element => {
     isSettingAsDefault,
     isUpdating,
     isDefaultBrain,
+    formRef,
   } = useSettingsTab({ brainId });
 
   return (
     <form
-      onSubmit={(e) => void handleSubmit(e)}
+      onSubmit={(e) => {
+        e.preventDefault();
+        void handleSubmit();
+      }}
       className="my-10 mb-0 flex flex-col items-center gap-2"
+      ref={formRef}
     >
       <div className="flex flex-row flex-1 justify-between w-full">
         <div>
@@ -55,6 +60,7 @@ export const SettingsTab = ({ brainId }: SettingsTabProps): JSX.Element => {
               variant={"secondary"}
               isLoading={isSettingAsDefault}
               onClick={() => void setAsDefaultBrainHandler()}
+              type="button"
             >
               Set as default brain
             </Button>
@@ -121,9 +127,10 @@ export const SettingsTab = ({ brainId }: SettingsTabProps): JSX.Element => {
         />
       </fieldset>
       <div className="flex flex-row justify-end flex-1 w-full mt-8">
-        <Button isLoading={isUpdating} disabled={!hasChanges}>
-          Save changes
-        </Button>
+        {isUpdating && <FaSpinner className="animate-spin" />}
+        {isUpdating && (
+          <span className="ml-2 text-sm">Updating brain settings...</span>
+        )}
       </div>
     </form>
   );

@@ -14,7 +14,7 @@ export const BrainUsers = ({ brainId }: BrainUsersProps): JSX.Element => {
   }
 
   if (brainUsers.length === 0) {
-    return <p className="text-gray-500">No brainUsers</p>;
+    return <p className="text-gray-500">No user</p>;
   }
 
   return (

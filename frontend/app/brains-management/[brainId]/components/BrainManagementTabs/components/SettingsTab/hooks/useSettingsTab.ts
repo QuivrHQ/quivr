@@ -2,12 +2,14 @@
 /* eslint-disable max-lines */
 import axios from "axios";
 import { UUID } from "crypto";
-import { FormEvent, useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 
 import { useBrainApi } from "@/lib/api/brain/useBrainApi";
 import { useBrainConfig } from "@/lib/context/BrainConfigProvider";
+import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 import { useBrainProvider } from "@/lib/context/BrainProvider/hooks/useBrainProvider";
+import { Brain } from "@/lib/context/BrainProvider/types";
 import { defineMaxTokens } from "@/lib/helpers/defineMexTokens";
 import { useToast } from "@/lib/hooks";
 
@@ -20,9 +22,10 @@ export const useSettingsTab = ({ brainId }: UseSettingsTabProps) => {
   const [isUpdating, setIsUpdating] = useState(false);
   const [isSettingAsDefault, setIsSettingHasDefault] = useState(false);
   const { publish } = useToast();
-
+  const formRef = useRef<HTMLFormElement>(null);
   const { setAsDefaultBrain, getBrain, updateBrain } = useBrainApi();
   const { config } = useBrainConfig();
+  const { fetchAllBrains, fetchDefaultBrain } = useBrainContext();
 
   const defaultValues = {
     ...config,
@@ -34,7 +37,7 @@ export const useSettingsTab = ({ brainId }: UseSettingsTabProps) => {
   const {
     register,
     getValues,
-    reset,
+
     watch,
     setValue,
     formState: { dirtyFields },
@@ -48,10 +51,23 @@ export const useSettingsTab = ({ brainId }: UseSettingsTabProps) => {
       if (brain === undefined) {
         return;
       }
-      reset({
-        ...brain,
-        maxTokens: brain.max_tokens,
-      });
+
+      for (const key in brain) {
+        const brainKey = key as keyof Brain;
+        if (!(key in brain)) {
+          return;
+        }
+
+        if (brainKey === "max_tokens") {
+          if (brain["max_tokens"] !== undefined) {
+            setValue("maxTokens", brain["max_tokens"]);
+          }
+        } else {
+          // @ts-expect-error bad type inference from typescript
+          // eslint-disable-next-line
+          setValue(key, brain[key]);
+        }
+      }
     };
     void fetchBrain();
   }, []);
@@ -73,6 +89,8 @@ export const useSettingsTab = ({ brainId }: UseSettingsTabProps) => {
         variant: "success",
         text: "Brain set as default successfully",
       });
+      void fetchAllBrains();
+      void fetchDefaultBrain();
     } catch (err) {
       if (axios.isAxiosError(err) && err.response?.status === 429) {
         publish({
@@ -93,8 +111,12 @@ export const useSettingsTab = ({ brainId }: UseSettingsTabProps) => {
     }
   };
 
-  const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async () => {
+    const hasChanges = Object.keys(dirtyFields).length > 0;
+
+    if (!hasChanges) {
+      return;
+    }
     const { name: isNameDirty } = dirtyFields;
     const { name } = getValues();
     if (isNameDirty !== undefined && isNameDirty && name.trim() === "") {
@@ -113,8 +135,9 @@ export const useSettingsTab = ({ brainId }: UseSettingsTabProps) => {
 
       publish({
         variant: "success",
-        text: "Brain created successfully",
+        text: "Brain updated successfully",
       });
+      void fetchAllBrains();
     } catch (err) {
       if (axios.isAxiosError(err) && err.response?.status === 429) {
         publish({
@@ -140,6 +163,21 @@ export const useSettingsTab = ({ brainId }: UseSettingsTabProps) => {
   const { defaultBrainId } = useBrainProvider();
   const isDefaultBrain = defaultBrainId === brainId;
 
+  useEffect(() => {
+    const handleKeyPress = (event: KeyboardEvent) => {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        void handleSubmit();
+      }
+    };
+
+    formRef.current?.addEventListener("keydown", handleKeyPress);
+
+    return () => {
+      formRef.current?.removeEventListener("keydown", handleKeyPress);
+    };
+  }, [formRef.current]);
+
   return {
     handleSubmit,
     register,
@@ -148,9 +186,9 @@ export const useSettingsTab = ({ brainId }: UseSettingsTabProps) => {
     temperature,
     maxTokens,
     isUpdating,
-    hasChanges: Object.keys(dirtyFields).length > 0,
     setAsDefaultBrainHandler,
     isSettingAsDefault,
     isDefaultBrain,
+    formRef,
   };
 };
