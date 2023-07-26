@@ -46,9 +46,15 @@ const DocumentData = ({ documentName }: DocumentDataProps): JSX.Element => {
           Object.entries(documents[0]).map(([key, value]) => {
             return (
               <div className="grid grid-cols-2 py-2 border-b" key={key}>
-                <p className="capitalize font-bold break-words">{key.replaceAll('_', ' ')}</p>
+                <p className="capitalize font-bold break-words">
+                  {key.replaceAll("_", " ")}
+                </p>
                 <span className="break-words my-auto">
-                  {typeof value === 'object' ? (<pre>{JSON.stringify(value, undefined, 2)}</pre>) : String(value) || 'Not Available'}
+                  {typeof value === "object" ? (
+                    <pre>{JSON.stringify(value, undefined, 2)}</pre>
+                  ) : (
+                    String(value) || "Not Available"
+                  )}
                 </span>
               </div>
             );
