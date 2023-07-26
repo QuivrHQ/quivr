@@ -97,10 +97,10 @@ export const useBrainProvider = () => {
     }
   }, [setDefaultBrain, setActiveBrain]);
 
+  const fetchDefaultBrain = async () => {
+    setDefaultBrainId((await getDefaultBrain())?.id);
+  };
   useEffect(() => {
-    const fetchDefaultBrain = async () => {
-      setDefaultBrainId((await getDefaultBrain())?.id);
-    };
     void fetchDefaultBrain();
   }, []);
 
@@ -116,5 +116,6 @@ export const useBrainProvider = () => {
     fetchAndSetActiveBrain,
     isFetchingBrains,
     defaultBrainId,
+    fetchDefaultBrain,
   };
 };

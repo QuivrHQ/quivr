@@ -24,7 +24,22 @@ export const PeopleTab = ({ brainId }: ShareBrainModalProps): JSX.Element => {
     addNewRoleAssignationRole,
     sendingInvitation,
     canAddNewRow,
+    hasShareBrainRights,
   } = useShareBrain(brainId);
+
+  if (!hasShareBrainRights) {
+    return (
+      <div className="flex justify-center items-center mt-5">
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative max-w-md">
+          <strong className="font-bold mr-1">Oh no!</strong>
+          <span className="block sm:inline">
+            You {"don't"} have the necessary role to access this tab 🧠💡🥲.
+          </span>
+          <p>Please require access from the owner.</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <>
