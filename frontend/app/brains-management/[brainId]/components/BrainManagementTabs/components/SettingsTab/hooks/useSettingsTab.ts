@@ -9,6 +9,7 @@ import { useBrainApi } from "@/lib/api/brain/useBrainApi";
 import { useBrainConfig } from "@/lib/context/BrainConfigProvider";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 import { useBrainProvider } from "@/lib/context/BrainProvider/hooks/useBrainProvider";
+import { Brain } from "@/lib/context/BrainProvider/types";
 import { defineMaxTokens } from "@/lib/helpers/defineMexTokens";
 import { useToast } from "@/lib/hooks";
 
@@ -24,7 +25,7 @@ export const useSettingsTab = ({ brainId }: UseSettingsTabProps) => {
   const formRef = useRef<HTMLFormElement>(null);
   const { setAsDefaultBrain, getBrain, updateBrain } = useBrainApi();
   const { config } = useBrainConfig();
-  const { fetchAllBrains } = useBrainContext();
+  const { fetchAllBrains, fetchDefaultBrain } = useBrainContext();
 
   const defaultValues = {
     ...config,
@@ -36,7 +37,7 @@ export const useSettingsTab = ({ brainId }: UseSettingsTabProps) => {
   const {
     register,
     getValues,
-    reset,
+
     watch,
     setValue,
     formState: { dirtyFields },
@@ -50,10 +51,23 @@ export const useSettingsTab = ({ brainId }: UseSettingsTabProps) => {
       if (brain === undefined) {
         return;
       }
-      reset({
-        ...brain,
-        maxTokens: brain.max_tokens,
-      });
+
+      for (const key in brain) {
+        const brainKey = key as keyof Brain;
+        if (!(key in brain)) {
+          return;
+        }
+
+        if (brainKey === "max_tokens") {
+          if (brain["max_tokens"] !== undefined) {
+            setValue("maxTokens", brain["max_tokens"]);
+          }
+        } else {
+          // @ts-expect-error bad type inference from typescript
+          // eslint-disable-next-line
+          setValue(key, brain[key]);
+        }
+      }
     };
     void fetchBrain();
   }, []);
@@ -76,6 +90,7 @@ export const useSettingsTab = ({ brainId }: UseSettingsTabProps) => {
         text: "Brain set as default successfully",
       });
       void fetchAllBrains();
+      void fetchDefaultBrain();
     } catch (err) {
       if (axios.isAxiosError(err) && err.response?.status === 429) {
         publish({
@@ -171,7 +186,6 @@ export const useSettingsTab = ({ brainId }: UseSettingsTabProps) => {
     temperature,
     maxTokens,
     isUpdating,
-
     setAsDefaultBrainHandler,
     isSettingAsDefault,
     isDefaultBrain,

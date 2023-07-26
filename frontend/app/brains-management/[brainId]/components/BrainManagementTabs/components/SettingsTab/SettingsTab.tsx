@@ -60,6 +60,7 @@ export const SettingsTab = ({ brainId }: SettingsTabProps): JSX.Element => {
               variant={"secondary"}
               isLoading={isSettingAsDefault}
               onClick={() => void setAsDefaultBrainHandler()}
+              type="button"
             >
               Set as default brain
             </Button>
