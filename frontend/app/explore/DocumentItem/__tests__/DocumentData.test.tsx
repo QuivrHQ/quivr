@@ -1,4 +1,4 @@
-import { render, waitFor } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
 import { BrainConfigProvider } from "@/lib/context/BrainConfigProvider";
@@ -62,18 +62,18 @@ vi.mock("@/lib/hooks", async () => {
 describe("DocumentData", () => {
   it("should render document data", async () => {
     const documentName = "Test document";
-    const { getByText } = render(
+    render(
       <BrainConfigProvider>
         <DocumentData documentName={documentName} />
       </BrainConfigProvider>
     );
 
-    expect(getByText(documentName)).toBeDefined();
+    expect(screen.getByText(documentName)).toBeDefined();
 
     await waitFor(() => {
-      expect(getByText("mock_vector_id_1")).toBeDefined();
-      // TODO: second vector is not rendered
-      // expect(getByText('mock_vector_id_2')).toBeDefined()
+      expect(screen.getByText("content")).toBeDefined();
+      expect(screen.getByText("foo,bar", { exact: false })).toBeDefined();
+      expect(screen.getByText("baz,bat", { exact: false })).toBeDefined();
     });
   });
 });

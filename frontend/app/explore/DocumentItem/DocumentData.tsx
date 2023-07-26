@@ -44,17 +44,14 @@ const DocumentData = ({ documentName }: DocumentDataProps): JSX.Element => {
       <div className="flex flex-col">
         {documents[0] &&
           Object.entries(documents[0]).map(([key, value]) => {
+            if (value && typeof value === "object") return;
             return (
               <div className="grid grid-cols-2 py-2 border-b" key={key}>
                 <p className="capitalize font-bold break-words">
                   {key.replaceAll("_", " ")}
                 </p>
                 <span className="break-words my-auto">
-                  {value && typeof value === "object" ? (
-                    <pre>{JSON.stringify(value, undefined, 2)}</pre>
-                  ) : (
-                    String(value || "Not Available")
-                  )}
+                  {String(value || "Not Available")}
                 </span>
               </div>
             );
