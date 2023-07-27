@@ -1,4 +1,4 @@
-name: Check PR title
+name: Check PR title conventional commit
 
 on:
   pull_request:
