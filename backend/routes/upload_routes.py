@@ -4,22 +4,23 @@ from uuid import UUID
 from auth import AuthBearer, get_current_user
 from celery_worker import process_file_and_notify
 from fastapi import APIRouter, Depends, Query, Request, UploadFile
+from logger import get_logger
 from models import Brain, UserIdentity, UserUsage
-from models.databases.supabase.notifications import (
-    CreateNotificationProperties,
-)
+from models.databases.supabase.notifications import CreateNotificationProperties
+from models.knowledge import Knowledge
 from models.notifications import NotificationsStatusEnum
 from repository.brain import get_brain_details
 from repository.files.upload_file import upload_file_storage
+from repository.knowledge.add_knowledge import add_knowledge
 from repository.notification.add_notification import add_notification
 from repository.user_identity import get_user_identity
-from utils.file import convert_bytes, get_file_size
-
 from routes.authorizations.brain_authorization import (
     RoleEnum,
     validate_brain_authorization,
 )
+from utils.file import convert_bytes, get_file_size
 
+logger = get_logger(__name__)
 upload_router = APIRouter()
 
 
@@ -81,7 +82,39 @@ async def upload_file(
     # filename_with_brain_id = str(brain_id) + "/" + str(uploadFile.filename)
     filename_with_brain_id = str(brain_id) + "/" + str(uploadFile.filename)
 
-    upload_file_storage(file_content, filename_with_brain_id)
+    fileInStorage = upload_file_storage(file_content, filename_with_brain_id)
+
+    logger.info(f"File {fileInStorage} uploaded successfully")
+
+    # except Exception as e:
+    #     if 'The resource already exists' in str(e):
+    #         raise HTTPException(status_code=403, detail=f"File {uploadFile.filename} already exists in storage.")
+    #     else:
+    #         raise HTTPException(status_code=500, detail="Failed to upload file to storage.")
+    knowledge = Knowledge(
+        file_id=fileInStorage["Id"],
+        # TODO: calculate sha1
+        content_sha1="8f4a81b263393be504b23eba5c30281669309cdd",
+        owner_id=current_user.id,
+        name=uploadFile.filename,
+        summary="",
+        extension=os.path.splitext(
+            uploadFile.filename  # pyright: ignore reportPrivateUsage=none
+        )[-1].lower(),
+    )
+
+    # try:
+    added_knowledge = add_knowledge(knowledge)
+    logger.info(f"Knowledge {added_knowledge} added successfully")
+    # except Exception as e:
+    #     logger.error(e)
+    #     raise HTTPException(status_code=500, detail="Failed to add knowledge.")
+
+    added_brain_knowledge = add_brain_knowledge(brain_id, added_knowledge["id"])
+    logger.info(
+        f"Knowledge {added_brain_knowledge} added to brain {brain_id} successfully"
+    )
+
     process_file_and_notify.delay(
         file_name=filename_with_brain_id,
         file_original_name=uploadFile.filename,
