@@ -1,6 +1,9 @@
 import os
-from dotenv import load_dotenv
-load_dotenv()
+
+if __name__ == "__main__":
+    # import needed here when running main.py to debug backend
+    from dotenv import load_dotenv
+    load_dotenv()
 
 import pypandoc
 import sentry_sdk
@@ -58,5 +61,6 @@ async def http_exception_handler(_, exc):
 
 
 if __name__ == "__main__":
+    # run main.py to debug backend
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=5050)
