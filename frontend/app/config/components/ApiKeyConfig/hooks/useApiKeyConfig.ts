@@ -6,6 +6,7 @@ import { useEventTracking } from "@/services/analytics/useEventTracking";
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const useApiKeyConfig = () => {
   const [apiKey, setApiKey] = useState("");
+  const [openAiApiKey, setOpenAiApiKey] = useState("");
   const { track } = useEventTracking();
   const { createApiKey } = useAuthApi();
 
@@ -38,5 +39,7 @@ export const useApiKeyConfig = () => {
     handleCreateClick,
     apiKey,
     handleCopyClick,
+    openAiApiKey,
+    setOpenAiApiKey,
   };
 };

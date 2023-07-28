@@ -6,6 +6,12 @@ import { useApiKeyConfig } from "../useApiKeyConfig";
 const createApiKeyMock = vi.fn(() => "dummyApiKey");
 const trackMock = vi.fn((props: unknown) => ({ props }));
 
+const mockUseSupabase = vi.fn(() => ({
+  session: {
+    user: {},
+  },
+}));
+
 const useAuthApiMock = vi.fn(() => ({
   createApiKey: () => createApiKeyMock(),
 }));
@@ -19,6 +25,31 @@ vi.mock("@/lib/api/auth/useAuthApi", () => ({
 }));
 vi.mock("@/services/analytics/useEventTracking", () => ({
   useEventTracking: () => useEventTrackingMock(),
+}));
+vi.mock("@/lib/context/SupabaseProvider", () => ({
+  useSupabase: () => mockUseSupabase(),
+}));
+
+vi.mock("@/lib/hooks", async () => {
+  const actual = await vi.importActual<typeof import("@/lib/hooks")>(
+    "@/lib/hooks"
+  );
+
+  return {
+    ...actual,
+    useAxios: () => ({
+      axiosInstance: {
+        put: vi.fn(() => ({})),
+        get: vi.fn(() => ({})),
+      },
+    }),
+  };
+});
+
+vi.mock("@/lib/context/BrainConfigProvider", () => ({
+  useBrainConfig: () => ({
+    config: {},
+  }),
 }));
 
 describe("useApiKeyConfig", () => {
