@@ -1,16 +1,21 @@
-import { UUID } from "crypto";
+import { MinimalBrainForUser } from "@/lib/context/BrainProvider/types";
 
 import { DeleteBrain, ShareBrain } from "./components";
+import { BrainRoleType } from "./types";
 
 type BrainActionsProps = {
-  brainId: UUID;
+  brain: MinimalBrainForUser;
 };
 
-export const BrainActions = ({ brainId }: BrainActionsProps): JSX.Element => {
+const requiredAccessToShareBrain: BrainRoleType[] = ["Owner", "Editor"];
+
+export const BrainActions = ({ brain }: BrainActionsProps): JSX.Element => {
   return (
     <div className="absolute right-0 flex flex-row">
-      <ShareBrain brainId={brainId} />
-      <DeleteBrain brainId={brainId} />
+      {requiredAccessToShareBrain.includes(brain.role) && (
+        <ShareBrain brainId={brain.id} name={brain.name} />
+      )}
+      <DeleteBrain brainId={brain.id} />
     </div>
   );
 };

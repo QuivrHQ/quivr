@@ -4,11 +4,11 @@ on:
   push:
     branches: [main]
     paths:
-      - "backend/**"
+      - 'backend/core/**'
   pull_request:
     branches: [main]
     paths:
-      - "backend/**"
+      - 'backend/core/**'
   workflow_dispatch:
     inputs:
       logLevel:
@@ -34,7 +34,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: ./backend
+        working-directory: ./backend/core
     environment: preview
     strategy:
       matrix:
@@ -63,7 +63,7 @@ jobs:
           JWT_SECRET_KEY: ${{secrets.JWT_SECRET_KEY}}
           CI_TEST_API_KEY: ${{secrets.CI_TEST_API_KEY}}
         run: |
-          pytest
+          python -m pytest tests/
 
       - name: Static type checking with pyright
         run: |

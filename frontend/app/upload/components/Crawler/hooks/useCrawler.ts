@@ -1,11 +1,11 @@
 /* eslint-disable */
-import { redirect } from "next/navigation";
 import { useCallback, useRef, useState } from "react";
 
 import { useSupabase } from "@/lib/context/SupabaseProvider";
 import { useAxios, useToast } from "@/lib/hooks";
 import { useEventTracking } from "@/services/analytics/useEventTracking";
 
+import { redirectToLogin } from "@/lib/router/redirectToLogin";
 import { UUID } from "crypto";
 import { isValidUrl } from "../helpers/isValidUrl";
 
@@ -18,7 +18,7 @@ export const useCrawler = () => {
   const { track } = useEventTracking();
 
   if (session === null) {
-    redirect("/login");
+    redirectToLogin();
   }
 
   const crawlWebsite = useCallback(

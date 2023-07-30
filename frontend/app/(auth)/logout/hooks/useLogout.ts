@@ -18,6 +18,8 @@ export const useLogout = () => {
     setIsPending(true);
     const { error } = await supabase.auth.signOut();
     void track("LOGOUT");
+    localStorage.clear();
+
     if (error) {
       console.error("Error logging out:", error.message);
       publish({

@@ -15,16 +15,16 @@ services:
       - /app/.next
     ports:
       - 3000:3000
-  backend:
+  backend-core:
     env_file:
-      - ./backend/.env
+      - ./backend/core/.env
     build:
-      context: backend
+      context: backend/core
       dockerfile: Dockerfile
-    container_name: backend
+    container_name: backend-core
     restart: always
     volumes:
-      - ./backend/:/code/
+      - ./backend/core/:/code/
       - ~/.config/gcloud:/root/.config/gcloud
     ports:
       - 5050:5050

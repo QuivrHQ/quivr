@@ -53,7 +53,7 @@ describe("Chat page", () => {
     expect(getByTestId("chat-messages")).toBeDefined();
     expect(getByTestId("chat-input")).toBeDefined();
 
-    expect(getByText("Chat with your brain")).toBeDefined();
+    expect(getByText("Chat with")).toBeDefined();
     expect(
       getByText("Talk to a language model about your uploaded data")
     ).toBeDefined();

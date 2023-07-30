@@ -7,12 +7,15 @@ JWT_SECRET_KEY=<change-me>
 AUTHENTICATE=true
 GOOGLE_APPLICATION_CREDENTIALS=<change-me>
 GOOGLE_CLOUD_PROJECT=<change-me>
+
 MAX_BRAIN_SIZE=52428800
 MAX_REQUESTS_NUMBER=200
+MAX_BRAIN_PER_USER=5
 
 #Private LLM Variables
 PRIVATE=False
 MODEL_PATH=./local_models/ggml-gpt4all-j-v1.3-groovy.bin
 
 #RESEND
-RESEND_API_KEY=
+RESEND_API_KEY=<change-me>
+RESEND_EMAIL_ADDRESS=onboarding@resend.dev

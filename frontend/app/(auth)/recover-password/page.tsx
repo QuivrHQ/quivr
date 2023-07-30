@@ -1,6 +1,5 @@
 /* eslint-disable */
 "use client";
-import { redirect, usePathname } from "next/navigation";
 import { useState } from "react";
 
 import Button from "@/lib/components/ui/Button";
@@ -9,6 +8,7 @@ import Field from "@/lib/components/ui/Field";
 import PageHeading from "@/lib/components/ui/PageHeading";
 import { useSupabase } from "@/lib/context/SupabaseProvider";
 import { useToast } from "@/lib/hooks/useToast";
+import { redirectToLogin } from "@/lib/router/redirectToLogin";
 import { useEventTracking } from "@/services/analytics/useEventTracking";
 
 export default function RecoverPassword() {
@@ -16,12 +16,12 @@ export default function RecoverPassword() {
   const [password, setPassword] = useState("");
   const [isPending, setIsPending] = useState(false);
   const { track } = useEventTracking();
-  const pathname = usePathname();
+
   const { publish } = useToast();
   const handleChangePassword = async () => {
     void track("UPDATE_PASSWORD");
     setIsPending(true);
-    const { data, error } = await supabase.auth.updateUser({
+    const { error } = await supabase.auth.updateUser({
       password: password,
     });
 
@@ -41,7 +41,7 @@ export default function RecoverPassword() {
   };
 
   if (session?.user === undefined) {
-    redirect(`/login?previous-page=${pathname}`);
+    redirectToLogin();
   }
 
   return (
