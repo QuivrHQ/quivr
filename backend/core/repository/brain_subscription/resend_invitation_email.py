@@ -20,7 +20,9 @@ def resend_invitation_email(
     brain_url = get_brain_url(origin, brain_subscription.brain_id)
 
     invitation_brain_client = Brain(id=brain_subscription.brain_id)
-    invitation_brain = invitation_brain_client.get_brain_details()[0]
+    invitation_brain = invitation_brain_client.get_brain_details()
+    if invitation_brain is None:
+        raise Exception("Brain not found")
     brain_name = invitation_brain["name"]
 
     html_body = f"""
