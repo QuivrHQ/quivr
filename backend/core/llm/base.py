@@ -1,14 +1,12 @@
 from abc import abstractmethod
 from typing import AsyncIterable, List
 
-from langchain.callbacks import AsyncIteratorCallbackHandler
-from langchain.callbacks.base import AsyncCallbackHandler
+from langchain.callbacks.streaming_aiter import AsyncIteratorCallbackHandler
 from langchain.chains import ConversationalRetrievalChain, LLMChain
 from langchain.llms.base import LLM
 from logger import get_logger
 from models.settings import BrainSettings  # Importing settings related to the 'brain'
 from pydantic import BaseModel  # For data validation and settings management
-from utils.constants import streaming_compatible_models
 
 logger = get_logger(__name__)
 
@@ -33,7 +31,7 @@ class BaseBrainPicking(BaseModel):
 
     openai_api_key: str = None  # pyright: ignore reportPrivateUsage=none
     callbacks: List[
-        AsyncCallbackHandler
+        AsyncIteratorCallbackHandler
     ] = None  # pyright: ignore reportPrivateUsage=none
 
     def _determine_api_key(self, openai_api_key, user_openai_api_key):
@@ -45,23 +43,14 @@ class BaseBrainPicking(BaseModel):
 
     def _determine_streaming(self, model: str, streaming: bool) -> bool:
         """If the model name allows for streaming and streaming is declared, set streaming to True."""
-        if model in streaming_compatible_models and streaming:
-            return True
-        if model not in streaming_compatible_models and streaming:
-            logger.warning(
-                f"Streaming is not compatible with {model}. Streaming will be set to False."
-            )
-            return False
-        else:
-            return False
-
+        return streaming
     def _determine_callback_array(
         self, streaming
     ) -> List[AsyncIteratorCallbackHandler]:  # pyright: ignore reportPrivateUsage=none
         """If streaming is set, set the AsyncIteratorCallbackHandler as the only callback."""
         if streaming:
             return [
-                AsyncIteratorCallbackHandler  # pyright: ignore reportPrivateUsage=none
+                AsyncIteratorCallbackHandler()  # pyright: ignore reportPrivateUsage=none
             ]
 
     def __init__(self, **data):

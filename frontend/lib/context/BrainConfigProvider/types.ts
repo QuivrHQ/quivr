@@ -21,6 +21,7 @@ export type BrainConfigContextType = {
 // export const openAiModels = ["gpt-3.5-turbo", "gpt-4"] as const; ## TODO activate GPT4 when not in demo mode
 
 export const openAiModels = [
+  "gpt-3.5-turbo",
   "gpt-3.5-turbo-0613",
   "gpt-3.5-turbo-16k",
 ] as const;
