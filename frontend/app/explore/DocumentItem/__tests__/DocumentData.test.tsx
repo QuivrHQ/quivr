@@ -1,6 +1,8 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
+
 import { BrainConfigProvider } from "@/lib/context/BrainConfigProvider";
+
 import DocumentData from "../DocumentData";
 
 const useSupabaseMock = vi.fn(() => ({
