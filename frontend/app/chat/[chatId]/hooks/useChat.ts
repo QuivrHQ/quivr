@@ -3,14 +3,17 @@ import { AxiosError } from "axios";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
+
 import { useChatApi } from "@/lib/api/chat/useChatApi";
 import { useBrainConfig } from "@/lib/context/BrainConfigProvider/hooks/useBrainConfig";
 import { useChatContext } from "@/lib/context/ChatProvider/hooks/useChatContext";
 import { useToast } from "@/lib/hooks";
 import { useEventTracking } from "@/services/analytics/useEventTracking";
 
-import { ChatQuestion } from "../types";
+
 import { useQuestion } from "./useQuestion";
+import { ChatQuestion } from "../types";
+
 
 
 
@@ -29,7 +32,7 @@ export const useChat = () => {
   const { publish } = useToast();
   const { createChat, getHistory } = useChatApi();
 
-  const { addStreamQuestion, addQuestion: addQuestionToModel } = useQuestion();
+  const { addStreamQuestion } = useQuestion();
 
   useEffect(() => {
     const fetchHistory = async () => {
