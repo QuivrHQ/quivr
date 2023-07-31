@@ -4,7 +4,7 @@ import Button from "@/lib/components/ui/Button";
 
 import { useChat } from "@/app/chat/[chatId]/hooks/useChat";
 import { useState } from "react";
-import { ConfigButton } from "./components/ConfigButton";
+import { ConfigModal } from "./components/ConfigModal";
 import { MicButton } from "./components/MicButton/MicButton";
 
 export const ChatInput = (): JSX.Element => {
@@ -52,7 +52,7 @@ export const ChatInput = (): JSX.Element => {
       </Button>
       <div className="flex items-center">
         <MicButton setMessage={setMessage} />
-        <ConfigButton />
+        <ConfigModal />
       </div>
     </form>
   );
