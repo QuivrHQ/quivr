@@ -8,7 +8,6 @@ from auth import AuthBearer, get_current_user
 from fastapi import APIRouter, Depends, Query, Request
 from fastapi.responses import StreamingResponse
 from llm.openai import OpenAIBrainPicking
-from llm.openai_functions import OpenAIFunctionsBrainPicking
 from llm.private_gpt4all import PrivateGPT4AllBrainPicking
 from models.brains import get_default_user_brain_or_create_new
 from models.chat import Chat, ChatHistory
@@ -21,7 +20,6 @@ from repository.chat.get_chat_history import get_chat_history
 from repository.chat.get_user_chats import get_user_chats
 from repository.chat.update_chat import ChatUpdatableProperties, update_chat
 from utils.constants import (
-    openai_function_compatible_models,
     streaming_compatible_models,
 )
 
@@ -193,34 +191,14 @@ async def create_question_handler(
         if not brain_id:
             brain_id = get_default_user_brain_or_create_new(current_user).id
 
-        if llm_settings.private:
-            gpt_answer_generator = PrivateGPT4AllBrainPicking(
-                chat_id=str(chat_id),
-                brain_id=str(brain_id),
-                user_openai_api_key=current_user.user_openai_api_key,
-                streaming=False,
-                model_path=llm_settings.model_path,
-            )
-
-        elif chat_question.model in openai_function_compatible_models:
-            gpt_answer_generator = OpenAIFunctionsBrainPicking(
-                model=chat_question.model,
-                chat_id=str(chat_id),
-                temperature=chat_question.temperature,
-                max_tokens=chat_question.max_tokens,
-                brain_id=str(brain_id),
-                user_openai_api_key=current_user.user_openai_api_key,  # pyright: ignore reportPrivateUsage=none
-            )
-
-        else:
-            gpt_answer_generator = OpenAIBrainPicking(
-                chat_id=str(chat_id),
-                model=chat_question.model,
-                max_tokens=chat_question.max_tokens,
-                temperature=chat_question.temperature,
-                brain_id=str(brain_id),
-                user_openai_api_key=current_user.user_openai_api_key,  # pyright: ignore reportPrivateUsage=none
-            )
+        gpt_answer_generator = OpenAIBrainPicking(
+            chat_id=str(chat_id),
+            model=chat_question.model,
+            max_tokens=chat_question.max_tokens,
+            temperature=chat_question.temperature,
+            brain_id=str(brain_id),
+            user_openai_api_key=current_user.user_openai_api_key,  # pyright: ignore reportPrivateUsage=none
+        )
 
         chat_answer = gpt_answer_generator.generate_answer(  # pyright: ignore reportPrivateUsage=none
             chat_question.question
