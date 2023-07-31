@@ -49,7 +49,6 @@ class BaseBrainPicking(BaseModel):
     ) -> List[AsyncIteratorCallbackHandler]:  # pyright: ignore reportPrivateUsage=none
         """If streaming is set, set the AsyncIteratorCallbackHandler as the only callback."""
         if streaming:
-            print("Streaming is enabled. Callbacks will be set to AsyncIteratorCallbackHandler.")
             return [
                 AsyncIteratorCallbackHandler()  # pyright: ignore reportPrivateUsage=none
             ]
