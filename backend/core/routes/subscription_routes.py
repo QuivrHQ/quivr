@@ -173,13 +173,13 @@ def get_user_invitation(brain_id: UUID, current_user: User = Depends(get_current
     brain = Brain(id=brain_id)
     brain_details = brain.get_brain_details()
 
-    if len(brain_details) == 0:
+    if brain_details is None:
         raise HTTPException(
             status_code=404,
             detail="Brain not found while trying to get invitation",
         )
 
-    return {"name": brain_details[0]["name"], "rights": invitation["rights"]}
+    return {"name": brain_details["name"], "rights": invitation["rights"]}
 
 
 @subscription_router.post(

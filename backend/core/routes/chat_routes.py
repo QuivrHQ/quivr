@@ -9,7 +9,7 @@ from auth import AuthBearer, get_current_user
 from fastapi import APIRouter, Depends, Query, Request
 from fastapi.responses import StreamingResponse
 from llm.openai import OpenAIBrainPicking
-from models.brains import get_default_user_brain_or_create_new
+from models.brains import Brain, get_default_user_brain_or_create_new
 from models.chat import Chat, ChatHistory
 from models.chats import ChatQuestion
 from models.settings import LLMSettings, common_dependencies
@@ -19,12 +19,12 @@ from repository.chat.get_chat_by_id import get_chat_by_id
 from repository.chat.get_chat_history import get_chat_history
 from repository.chat.get_user_chats import get_user_chats
 from repository.chat.update_chat import ChatUpdatableProperties, update_chat
+from repository.user_identity.get_user_identity import get_user_identity
 
 chat_router = APIRouter()
 
 
 class NullableUUID(UUID):
-
     @classmethod
     def __get_validators__(cls):
         yield cls.validate
@@ -180,10 +180,38 @@ async def create_question_handler(
     | None = Query(..., description="The ID of the brain"),
     current_user: User = Depends(get_current_user),
 ) -> ChatHistory:
+    """
+    Add a new question to the chat.
+    """
+    # Retrieve user's OpenAI API key
     current_user.user_openai_api_key = request.headers.get("Openai-Api-Key")
+    brain = Brain(id=brain_id)
+
+    if not current_user.user_openai_api_key:
+        brain_details = brain.get_brain_details()
+        if brain_details:
+            current_user.user_openai_api_key = brain_details["openai_api_key"]
+
+    if not current_user.user_openai_api_key:
+        user_identity = get_user_identity(current_user.id)
+
+        if user_identity is not None:
+            current_user.user_openai_api_key = user_identity.openai_api_key
+
+    # Retrieve chat model (temperature, max_tokens, model)
+    if (
+        not chat_question.model
+        or not chat_question.temperature
+        or not chat_question.max_tokens
+    ):
+        # TODO: create ChatConfig class (pick config from brain or user or chat) and use it here
+        chat_question.model = chat_question.model or brain.model or "gpt-3.5-turbo-0613"
+        chat_question.temperature = chat_question.temperature or brain.temperature or 0
+        chat_question.max_tokens = chat_question.max_tokens or brain.max_tokens or 256
+
     try:
         check_user_limit(current_user)
-        llm_settings = LLMSettings()
+        LLMSettings()
 
         if not brain_id:
             brain_id = get_default_user_brain_or_create_new(current_user).id
@@ -227,14 +255,38 @@ async def create_stream_question_handler(
 ) -> StreamingResponse:
     # TODO: check if the user has access to the brain
 
+    # Retrieve user's OpenAI API key
+    current_user.user_openai_api_key = request.headers.get("Openai-Api-Key")
+    brain = Brain(id=brain_id)
+
+    if not current_user.user_openai_api_key:
+        brain_details = brain.get_brain_details()
+        if brain_details:
+            current_user.user_openai_api_key = brain_details["openai_api_key"]
+
+    if not current_user.user_openai_api_key:
+        user_identity = get_user_identity(current_user.id)
+
+        if user_identity is not None:
+            current_user.user_openai_api_key = user_identity.openai_api_key
+
+    # Retrieve chat model (temperature, max_tokens, model)
+    if (
+        not chat_question.model
+        or not chat_question.temperature
+        or not chat_question.max_tokens
+    ):
+        # TODO: create ChatConfig class (pick config from brain or user or chat) and use it here
+        chat_question.model = chat_question.model or brain.model or "gpt-3.5-turbo-0613"
+        chat_question.temperature = chat_question.temperature or brain.temperature or 0
+        chat_question.max_tokens = chat_question.max_tokens or brain.max_tokens or 256
+
     try:
-        user_openai_api_key = request.headers.get("Openai-Api-Key")
         logger.info(f"Streaming request for {chat_question.model}")
         check_user_limit(current_user)
         if not brain_id:
             brain_id = get_default_user_brain_or_create_new(current_user).id
 
-        
         gpt_answer_generator = OpenAIBrainPicking(
             chat_id=str(chat_id),
             model=chat_question.model,
