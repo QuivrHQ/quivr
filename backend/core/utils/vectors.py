@@ -2,8 +2,6 @@ from concurrent.futures import ThreadPoolExecutor
 from typing import List
 
 from langchain.embeddings.openai import OpenAIEmbeddings
-from langchain.schema import Document
-from llm.utils.summarization import llm_summerize
 from logger import get_logger
 from models.settings import BrainSettings, CommonsDep, common_dependencies
 from pydantic import BaseModel
@@ -50,17 +48,6 @@ class Neurons(BaseModel):
         return summaries.data
 
 
-def create_summary(commons: CommonsDep, document_id, content, metadata):
-    logger.info(f"Summarizing document {content[:100]}")
-    summary = llm_summerize(content)
-    logger.info(f"Summary: {summary}")
-    metadata["document_id"] = document_id
-    summary_doc_with_metadata = Document(page_content=summary, metadata=metadata)
-    sids = commons["summaries_vector_store"].add_documents([summary_doc_with_metadata])
-    if sids and len(sids) > 0:
-        commons["supabase"].table("summaries").update(
-            {"document_id": document_id}
-        ).match({"id": sids[0]}).execute()
 
 
 def error_callback(exception):
