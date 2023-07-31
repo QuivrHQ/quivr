@@ -1,111 +1,109 @@
 /* eslint-disable max-lines */
-import axios from "axios";
 import { FormEvent, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 
 import { useBrainApi } from "@/lib/api/brain/useBrainApi";
+import {
+  getChatConfigFromLocalStorage,
+  saveChatConfigInLocalStorage,
+} from "@/lib/api/chat/chat.local";
 import { useBrainConfig } from "@/lib/context/BrainConfigProvider";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
+import { ChatConfig } from "@/lib/context/ChatProvider/types";
 import { defineMaxTokens } from "@/lib/helpers/defineMexTokens";
 import { useToast } from "@/lib/hooks";
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-export const useConfigModal = () => {
-  const [isPending, setIsPending] = useState(false);
+export const useConfigModal = (chatId?: string) => {
   const { publish } = useToast();
-  const { createBrain } = useBrainContext();
-  const { setAsDefaultBrain } = useBrainApi();
-  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
+  const [isConfigModalOpen, setIsConfigModalOpen] = useState(false);
   const { config } = useBrainConfig();
-  const defaultValues = {
-    ...config,
-    name: "",
-    description: "",
-    setDefault: false,
-  };
+  const { getBrain } = useBrainApi();
+  const { currentBrain } = useBrainContext();
 
-  const { register, getValues, reset, watch, setValue } = useForm({
+  const defaultValues: ChatConfig = {};
+
+  const { register, watch, setValue } = useForm({
     defaultValues,
   });
 
-  const openAiKey = watch("openAiKey");
   const model = watch("model");
   const temperature = watch("temperature");
   const maxTokens = watch("maxTokens");
 
   useEffect(() => {
-    setValue("maxTokens", Math.min(maxTokens, defineMaxTokens(model)));
-  }, [maxTokens, model, setValue]);
+    const fetchChatConfig = async () => {
+      if (chatId === undefined) {
+        return;
+      }
 
-  const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault();
-    const { name, description, setDefault } = getValues();
+      const chatConfig = getChatConfigFromLocalStorage(chatId);
+      if (chatConfig !== undefined) {
+        setValue("model", chatConfig.model);
+        setValue("temperature", chatConfig.temperature);
+        setValue("maxTokens", chatConfig.maxTokens);
+      } else {
+        if (currentBrain === undefined) {
+          return;
+        }
 
-    if (name.trim() === "" || isPending) {
+        const relatedBrainConfig = await getBrain(currentBrain.id);
+        if (relatedBrainConfig === undefined) {
+          return;
+        }
+        setValue("model", relatedBrainConfig.model ?? config.model);
+        setValue(
+          "temperature",
+          relatedBrainConfig.temperature ?? config.temperature
+        );
+        setValue(
+          "maxTokens",
+          relatedBrainConfig.max_tokens ?? config.maxTokens
+        );
+      }
+    };
+    void fetchChatConfig();
+  }, []);
+
+  useEffect(() => {
+    if (maxTokens === undefined || model === undefined) {
       return;
     }
 
+    setValue("maxTokens", Math.min(maxTokens, defineMaxTokens(model)));
+  }, [maxTokens, model, setValue]);
+
+  const handleSubmit = (e: FormEvent) => {
+    e.preventDefault();
+    if (chatId === undefined) {
+      return;
+    }
     try {
-      setIsPending(true);
-      const createdBrainId = await createBrain({
-        name,
-        description,
-        max_tokens: maxTokens,
+      saveChatConfigInLocalStorage(chatId, {
+        maxTokens,
         model,
-        openai_api_key: openAiKey,
         temperature,
       });
 
-      if (setDefault) {
-        if (createdBrainId === undefined) {
-          publish({
-            variant: "danger",
-            text: "Error occurred while creating a brain",
-          });
-
-          return;
-        }
-        await setAsDefaultBrain(createdBrainId);
-      }
-
-      setIsShareModalOpen(false);
-      reset(defaultValues);
       publish({
         variant: "success",
-        text: "Brain created successfully",
+        text: "Chat config successfully updated",
       });
     } catch (err) {
-      if (axios.isAxiosError(err) && err.response?.status === 429) {
-        publish({
-          variant: "danger",
-          text: `${JSON.stringify(
-            (
-              err.response as {
-                data: { detail: string };
-              }
-            ).data.detail
-          )}`,
-        });
-      } else {
-        publish({
-          variant: "danger",
-          text: `${JSON.stringify(err)}`,
-        });
-      }
-    } finally {
-      setIsPending(false);
+      publish({
+        variant: "danger",
+        text: "An error occured while updating chat config",
+      });
     }
   };
 
   return {
-    isShareModalOpen,
-    setIsShareModalOpen,
+    isConfigModalOpen,
+    setIsConfigModalOpen,
     handleSubmit,
     register,
-    openAiKey,
     model,
     temperature,
     maxTokens,
-    isPending,
   };
 };
