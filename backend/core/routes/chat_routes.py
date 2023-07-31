@@ -8,7 +8,6 @@ from auth import AuthBearer, get_current_user
 from fastapi import APIRouter, Depends, Query, Request
 from fastapi.responses import StreamingResponse
 from llm.openai import OpenAIBrainPicking
-from llm.private_gpt4all import PrivateGPT4AllBrainPicking
 from models.brains import get_default_user_brain_or_create_new
 from models.chat import Chat, ChatHistory
 from models.chats import ChatQuestion
