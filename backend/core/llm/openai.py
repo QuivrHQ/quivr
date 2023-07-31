@@ -58,5 +58,6 @@ class OpenAIBrainPicking(QABaseBrainPicking):
             temperature=self.temperature,
             model=model,
             streaming=streaming,
+            verbose=True,
             callbacks=callbacks,
         )  # pyright: ignore reportPrivateUsage=none

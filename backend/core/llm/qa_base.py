@@ -1,8 +1,6 @@
 import asyncio
-import json
 from abc import abstractmethod, abstractproperty
 from typing import AsyncIterable, Awaitable
-
 from langchain.chains import ConversationalRetrievalChain, LLMChain
 from langchain.chains.question_answering import load_qa_chain
 from langchain.embeddings.openai import OpenAIEmbeddings
@@ -12,9 +10,10 @@ from models.chat import ChatHistory
 from repository.chat.format_chat_history import format_chat_history
 from repository.chat.get_chat_history import get_chat_history
 from repository.chat.update_chat_history import update_chat_history
-from repository.chat.update_message_by_id import update_message_by_id
 from supabase.client import Client, create_client
 from vectorstore.supabase import CustomSupabaseVectorStore
+from langchain.callbacks import AsyncIteratorCallbackHandler
+from langchain.chat_models import ChatOpenAI
 
 from .base import BaseBrainPicking
 from .prompts.CONDENSE_PROMPT import CONDENSE_QUESTION_PROMPT
@@ -60,13 +59,15 @@ class QABaseBrainPicking(BaseBrainPicking):
 
     @property
     def vector_store(self) -> CustomSupabaseVectorStore:
+        print("Creating vector store")
+        print("🧠🧠🧠🧠🧠🧠🧠🧠")
+        print("Brain id: ", self.brain_id)
         return CustomSupabaseVectorStore(
             self.supabase_client,
             self.embeddings,
             table_name="vectors",
             brain_id=self.brain_id,
         )
-
     @property
     def question_llm(self):
         return self._create_llm(model=self.model, streaming=False)
@@ -74,21 +75,22 @@ class QABaseBrainPicking(BaseBrainPicking):
     @property
     def doc_llm(self):
         return self._create_llm(
-            model=self.model, streaming=self.streaming, callbacks=self.callbacks
+            model=self.model, streaming=True, callbacks=self.callbacks
         )
 
     @property
     def question_generator(self) -> LLMChain:
-        return LLMChain(llm=self.question_llm, prompt=CONDENSE_QUESTION_PROMPT)
+        return LLMChain(llm=self.question_llm, prompt=CONDENSE_QUESTION_PROMPT, verbose=True)
 
     @property
     def doc_chain(self) -> LLMChain:
         return load_qa_chain(
-            llm=self.doc_llm, chain_type="stuff"
+            llm=self.doc_llm, chain_type="stuff", verbose=True
         )  # pyright: ignore reportPrivateUsage=none
 
     @property
     def qa(self) -> ConversationalRetrievalChain:
+        print("Creating QA chain")
         return ConversationalRetrievalChain(
             retriever=self.vector_store.as_retriever(),
             question_generator=self.question_generator,
@@ -170,10 +172,21 @@ class QABaseBrainPicking(BaseBrainPicking):
         :param question: The question
         :return: An async iterable which generates the answer.
         """
-
+        print("Generating stream")
         history = get_chat_history(self.chat_id)
         callback = self.callbacks[0]
-
+        print(self.callbacks)
+        callback = AsyncIteratorCallbackHandler()
+        model = ChatOpenAI(
+            streaming=True,
+            verbose=True,
+            callbacks=[callback],
+        )
+        llm = ChatOpenAI(temperature=0)
+        question_generator = LLMChain(llm=llm, prompt=CONDENSE_QUESTION_PROMPT)
+        doc_chain = load_qa_chain(model, chain_type="stuff")
+        qa = ConversationalRetrievalChain(
+            retriever=self.vector_store.as_retriever(), combine_docs_chain=doc_chain, question_generator=question_generator)
         transformed_history = []
 
         # Format the chat history into a list of tuples (human, ai)
@@ -190,14 +203,11 @@ class QABaseBrainPicking(BaseBrainPicking):
                 logger.error(f"Caught exception: {e}")
             finally:
                 event.set()
-
-        task = asyncio.create_task(
-            wrap_done(
-                self.qa._acall_chain(  # pyright: ignore reportPrivateUsage=none
-                    self.qa, question, transformed_history
-                ),
-                callback.done,  # pyright: ignore reportPrivateUsage=none
-            )
+        print("Calling chain")
+        # Begin a task that runs in the background.
+        task = asyncio.create_task(wrap_done(
+            await qa.acall({"question": question, "chat_history": transformed_history}, include_run_info=True),
+            callback.done),
         )
 
         streamed_chat_history = update_chat_history(
