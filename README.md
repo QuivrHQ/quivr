@@ -105,16 +105,18 @@ Additionally, you'll need a [Supabase](https://supabase.com/) account for:
   - [ ] Change variables in `backend/core/.env`
   - [ ] Change variables in `frontend/.env`
 
-- **Step 4**: Run the following migration scripts on the Supabase database via the web interface (SQL Editor -> `New query`)
-
-  Use the `migration.sh` script to run the migration scripts
+- **Step 4**: Use the `migration.sh` script to run the migration scripts
 
   ```bash
   chmod +x migration.sh
   ./migration.sh
   ```
 
-  Choose either create_scripts if it's your first time or migrations if you are updating your database.
+  Choose either `Create all tables` if it's your first time or `Run migrations`
+  if you are updating your database.
+
+  Alternatively you can run the script on the Supabase database via the web
+  interface (SQL Editor -> `New query` -> paste the script -> `Run`)
 
   All the scripts can be found in the [scripts](scripts/) folder
 
