@@ -244,26 +244,16 @@ async def create_stream_question_handler(
         user_openai_api_key = request.headers.get("Openai-Api-Key")
         streaming = True
         check_user_limit(current_user)
-        llm_settings = LLMSettings()
-
-        if llm_settings.private:
-            gpt_answer_generator = PrivateGPT4AllBrainPicking(
-                chat_id=str(chat_id),
-                brain_id=str(brain_id),
-                user_openai_api_key=user_openai_api_key,
-                streaming=streaming,
-                model_path=llm_settings.model_path,
-            )
-        else:
-            gpt_answer_generator = OpenAIBrainPicking(
-                chat_id=str(chat_id),
-                model=chat_question.model,
-                max_tokens=chat_question.max_tokens,
-                temperature=chat_question.temperature,
-                brain_id=str(brain_id),
-                user_openai_api_key=user_openai_api_key,  # pyright: ignore reportPrivateUsage=none
-                streaming=streaming,
-            )
+        
+        gpt_answer_generator = OpenAIBrainPicking(
+            chat_id=str(chat_id),
+            model=chat_question.model,
+            max_tokens=chat_question.max_tokens,
+            temperature=chat_question.temperature,
+            brain_id=str(brain_id),
+            user_openai_api_key=user_openai_api_key,  # pyright: ignore reportPrivateUsage=none
+            streaming=streaming,
+        )
 
         return StreamingResponse(
             gpt_answer_generator.generate_stream(  # pyright: ignore reportPrivateUsage=none
