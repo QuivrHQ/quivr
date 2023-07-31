@@ -1,9 +1,8 @@
 "use client";
 import Link from "next/link";
 import { Dispatch, HTMLAttributes, SetStateAction } from "react";
-import { MdPerson, MdSettings } from "react-icons/md";
+import { MdPerson } from "react-icons/md";
 
-import Button from "@/lib/components/ui/Button";
 import { useSupabase } from "@/lib/context/SupabaseProvider";
 import { cn } from "@/lib/utils";
 
@@ -62,15 +61,6 @@ export const NavItems = ({
             <BrainManagementButton />
             <Link aria-label="account" className="" href={"/user"}>
               <MdPerson className="text-2xl" />
-            </Link>
-            <Link href={"/config"}>
-              <Button
-                variant={"tertiary"}
-                className="focus:outline-none text-2xl"
-                aria-label="Settings"
-              >
-                <MdSettings />
-              </Button>
             </Link>
           </>
         )}
