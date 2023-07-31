@@ -12,7 +12,7 @@
 
 Quivr, your second brain, utilizes the power of GenerativeAI to store and retrieve unstructured information. Think of it as Obsidian, but turbocharged with AI capabilities.
 
-[Roadmap here](https://brain.quivr.app)
+[Roadmap here](https://brain.quivr.app/docs/roadmap)
 
 ## Key Features 🎯
 
