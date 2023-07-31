@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.0.46](https://github.com/StanGirard/quivr/compare/v0.0.45...v0.0.46) (2023-07-31)
+
+
+### Features
+
+* **aws:** increased numer of replicas to 10 ([9809ef4](https://github.com/StanGirard/quivr/commit/9809ef4119a2351b78217c73c545b7e327676135))
+* **aws:** increased size ([56f254a](https://github.com/StanGirard/quivr/commit/56f254a050fcc3b9ee073318bd566e03675658cd))
+
+
+### Bug Fixes
+
+* **frontend:** correctly display document information in explore view details ([#781](https://github.com/StanGirard/quivr/issues/781)) ([87c5e58](https://github.com/StanGirard/quivr/commit/87c5e582a2579ebb68f272cb62175dfa6f2e6dc8))
+* Toast message hidden under the footer ([#761](https://github.com/StanGirard/quivr/issues/761)) ([3e8ed46](https://github.com/StanGirard/quivr/commit/3e8ed463173659ebe599602e97c2d11191144ecb))
+* udpate migration script doc ([#793](https://github.com/StanGirard/quivr/issues/793)) ([a609c01](https://github.com/StanGirard/quivr/commit/a609c01aa8fab10e74eed64edd795c56bece1fdb))
+
 ## [0.0.45](https://github.com/StanGirard/quivr/compare/v0.0.44...v0.0.45) (2023-07-27)
 
 
