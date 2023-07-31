@@ -2,25 +2,26 @@
 import { MdCheck, MdSettings } from "react-icons/md";
 
 import Button from "@/lib/components/ui/Button";
-import Field from "@/lib/components/ui/Field";
 import { Modal } from "@/lib/components/ui/Modal";
-import { models, paidModels } from "@/lib/context/BrainConfigProvider/types";
+import { models } from "@/lib/context/BrainConfigProvider/types";
 import { defineMaxTokens } from "@/lib/helpers/defineMexTokens";
 
 import { useConfigModal } from "./hooks/useConfigModal";
 
-export const ConfigModal = (): JSX.Element => {
+export const ConfigModal = ({ chatId }: { chatId?: string }): JSX.Element => {
   const {
     handleSubmit,
-    isShareModalOpen,
-    setIsShareModalOpen,
+    isConfigModalOpen,
+    setIsConfigModalOpen,
     register,
-    openAiKey,
     temperature,
     maxTokens,
     model,
-    isPending,
-  } = useConfigModal();
+  } = useConfigModal(chatId);
+
+  if (chatId === undefined) {
+    return <div />;
+  }
 
   return (
     <Modal
@@ -35,22 +36,17 @@ export const ConfigModal = (): JSX.Element => {
       }
       title="Chat configuration"
       desc="Adjust your chat settings"
-      isOpen={isShareModalOpen}
-      setOpen={setIsShareModalOpen}
+      isOpen={isConfigModalOpen}
+      setOpen={setIsConfigModalOpen}
       CloseTrigger={<div />}
     >
       <form
-        onSubmit={(e) => void handleSubmit(e)}
+        onSubmit={(e) => {
+          void handleSubmit(e);
+          setIsConfigModalOpen(false);
+        }}
         className="mt-10 flex flex-col items-center gap-2"
       >
-        <Field
-          label="OpenAI API Key"
-          placeholder="sk-xxx"
-          autoComplete="off"
-          className="flex-1"
-          {...register("openAiKey")}
-        />
-
         <fieldset className="w-full flex flex-col">
           <label className="flex-1 text-sm" htmlFor="model">
             Model
@@ -60,13 +56,11 @@ export const ConfigModal = (): JSX.Element => {
             {...register("model")}
             className="px-5 py-2 dark:bg-gray-700 bg-gray-200 rounded-md"
           >
-            {(openAiKey !== undefined ? paidModels : models).map(
-              (availableModel) => (
-                <option value={availableModel} key={availableModel}>
-                  {availableModel}
-                </option>
-              )
-            )}
+            {models.map((availableModel) => (
+              <option value={availableModel} key={availableModel}>
+                {availableModel}
+              </option>
+            ))}
           </select>
         </fieldset>
 
@@ -91,13 +85,13 @@ export const ConfigModal = (): JSX.Element => {
           <input
             type="range"
             min="10"
-            max={defineMaxTokens(model)}
+            max={defineMaxTokens(model ?? "gpt-3.5-turbo-0613")}
             value={maxTokens}
             {...register("maxTokens")}
           />
         </fieldset>
 
-        <Button isLoading={isPending} className="mt-12 self-end" type="submit">
+        <Button className="mt-12 self-end" type="submit">
           Save
           <MdCheck className="text-xl" />
         </Button>
