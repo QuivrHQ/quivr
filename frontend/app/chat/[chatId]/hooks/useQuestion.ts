@@ -79,7 +79,7 @@ export const useQuestion = (): UseChatService => {
       Accept: "text/event-stream",
     };
     const body = JSON.stringify(chatQuestion);
-
+    console.log("Calling API...");
     try {
       const response = await fetchInstance.post(
         `/chat/${chatId}/question/stream?brain_id=${currentBrain.id}`,

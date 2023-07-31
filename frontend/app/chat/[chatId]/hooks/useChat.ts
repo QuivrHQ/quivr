@@ -9,8 +9,10 @@ import { useChatContext } from "@/lib/context/ChatProvider/hooks/useChatContext"
 import { useToast } from "@/lib/hooks";
 import { useEventTracking } from "@/services/analytics/useEventTracking";
 
-import { useQuestion } from "./useQuestion";
 import { ChatQuestion } from "../types";
+import { useQuestion } from "./useQuestion";
+
+
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const useChat = () => {
@@ -68,11 +70,9 @@ export const useChat = () => {
 
       void track("QUESTION_ASKED");
 
-      if (chatQuestion.model === "gpt-3.5-turbo") {
-        await addStreamQuestion(currentChatId, chatQuestion);
-      } else {
-        await addQuestionToModel(currentChatId, chatQuestion);
-      }
+      
+      await addStreamQuestion(currentChatId, chatQuestion);
+      
 
       callback?.();
     } catch (error) {

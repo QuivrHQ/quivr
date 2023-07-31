@@ -3,6 +3,7 @@ import time
 from http.client import HTTPException
 from typing import List
 from uuid import UUID
+from venv import logger
 
 from auth import AuthBearer, get_current_user
 from fastapi import APIRouter, Depends, Query, Request
@@ -18,9 +19,6 @@ from repository.chat.get_chat_by_id import get_chat_by_id
 from repository.chat.get_chat_history import get_chat_history
 from repository.chat.get_user_chats import get_user_chats
 from repository.chat.update_chat import ChatUpdatableProperties, update_chat
-from utils.constants import (
-    streaming_compatible_models,
-)
 
 chat_router = APIRouter()
 
@@ -228,22 +226,14 @@ async def create_stream_question_handler(
     current_user: User = Depends(get_current_user),
 ) -> StreamingResponse:
     # TODO: check if the user has access to the brain
-    if not brain_id:
-        brain_id = get_default_user_brain_or_create_new(current_user).id
-
-    if chat_question.model not in streaming_compatible_models:
-        # Forward the request to the none streaming endpoint
-        return await create_question_handler(
-            request,
-            chat_question,
-            chat_id,
-            current_user,  # pyright: ignore reportPrivateUsage=none
-        )
 
     try:
         user_openai_api_key = request.headers.get("Openai-Api-Key")
-        streaming = True
+        logger.info(f"Streaming request for {chat_question.model}")
         check_user_limit(current_user)
+        if not brain_id:
+            brain_id = get_default_user_brain_or_create_new(current_user).id
+
         
         gpt_answer_generator = OpenAIBrainPicking(
             chat_id=str(chat_id),
@@ -251,10 +241,11 @@ async def create_stream_question_handler(
             max_tokens=chat_question.max_tokens,
             temperature=chat_question.temperature,
             brain_id=str(brain_id),
-            user_openai_api_key=user_openai_api_key,  # pyright: ignore reportPrivateUsage=none
-            streaming=streaming,
+            user_openai_api_key=current_user.user_openai_api_key,  # pyright: ignore reportPrivateUsage=none
+            streaming=True,
         )
 
+        print("streaming")
         return StreamingResponse(
             gpt_answer_generator.generate_stream(  # pyright: ignore reportPrivateUsage=none
                 chat_question.question
