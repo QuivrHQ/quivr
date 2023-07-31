@@ -60,7 +60,7 @@ export const Toast = ({
             );
           })}
         </AnimatePresence>
-        <ToastPrimitive.Viewport className="fixed flex-col bottom-0 left-0 right-0 p-5 flex items-end gap-2 outline-none pointer-events-none" />
+        <ToastPrimitive.Viewport className="fixed flex-col bottom-0 left-0 right-0 p-5 flex items-end gap-2 outline-none pointer-events-none z-20" />
       </ToastContext.Provider>
     </ToastPrimitive.Provider>
   );
