@@ -37,6 +37,14 @@ Quivr, your second brain, utilizes the power of GenerativeAI to store and retrie
 
 https://github.com/StanGirard/quivr/assets/19614572/a6463b73-76c7-4bc0-978d-70562dca71f5
 
+## Disclaimer ⚠️
+
+For a little while, Quivr will be only compatible with OpenAI API. 
+
+If you want to use a Local LLM please refer to [v0.0.46](https://github.com/StanGirard/quivr/releases/tag/v0.0.46).
+
+This is due to us preparing a big feature and needing to clean the code a bit.
+
 ## Getting Started 🚀
 
 Follow these instructions to get a copy of the project up and running on your local machine for development and testing purposes.
