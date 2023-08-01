@@ -1,9 +1,30 @@
+/* eslint-disable max-lines */
 import { fireEvent, render } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
+
+import { BrainProvider } from "@/lib/context";
+import { BrainConfigProvider } from "@/lib/context/BrainConfigProvider";
 
 import { ChatInput } from "../index";
 
 const addQuestionMock = vi.fn((...params: unknown[]) => ({ params }));
+
+vi.mock("@/lib/hooks", async () => {
+  const actual = await vi.importActual<typeof import("@/lib/hooks")>(
+    "@/lib/hooks"
+  );
+
+  return {
+    ...actual,
+    useAxios: () => ({
+      axiosInstance: {
+        get: vi.fn(() => ({
+          data: {},
+        })),
+      },
+    }),
+  };
+});
 
 vi.mock("@/app/chat/[chatId]/hooks/useChat", () => ({
   useChat: () => ({
@@ -12,14 +33,28 @@ vi.mock("@/app/chat/[chatId]/hooks/useChat", () => ({
   }),
 }));
 
-afterEach(() => {
-  addQuestionMock.mockClear();
-});
+const mockUseSupabase = vi.fn(() => ({
+  session: {},
+}));
+
+vi.mock("@/lib/context/SupabaseProvider", () => ({
+  useSupabase: () => mockUseSupabase(),
+}));
 
 describe("ChatInput", () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
   it("should render correctly", () => {
     // Rendering the ChatInput component
-    const { getByTestId } = render(<ChatInput />);
+    const { getByTestId } = render(
+      <BrainConfigProvider>
+        <BrainProvider>
+          <ChatInput />
+        </BrainProvider>
+      </BrainConfigProvider>
+    );
 
     const chatInputForm = getByTestId("chat-input-form");
     expect(chatInputForm).toBeDefined();
@@ -30,15 +65,18 @@ describe("ChatInput", () => {
     const submitButton = getByTestId("submit-button");
     expect(submitButton).toBeDefined();
 
-    const configButton = getByTestId("config-button");
-    expect(configButton).toBeDefined();
-
     const micButton = getByTestId("mic-button");
     expect(micButton).toBeDefined();
   });
 
   it("should not call addQuestion on form submit when message is empty", () => {
-    const { getByTestId } = render(<ChatInput />);
+    const { getByTestId } = render(
+      <BrainConfigProvider>
+        <BrainProvider>
+          <ChatInput />
+        </BrainProvider>
+      </BrainConfigProvider>
+    );
     const chatInputForm = getByTestId("chat-input-form");
     fireEvent.submit(chatInputForm);
 
@@ -47,7 +85,13 @@ describe("ChatInput", () => {
   });
 
   it("should call addQuestion once on form submit when message is not empty", () => {
-    const { getByTestId } = render(<ChatInput />);
+    const { getByTestId } = render(
+      <BrainConfigProvider>
+        <BrainProvider>
+          <ChatInput />
+        </BrainProvider>
+      </BrainConfigProvider>
+    );
     const chatInput = getByTestId("chat-input");
     fireEvent.change(chatInput, { target: { value: "Test question" } });
     const chatInputForm = getByTestId("chat-input-form");
@@ -65,7 +109,13 @@ describe("ChatInput", () => {
     // Mocking the addQuestion function
 
     // Rendering the ChatInput component with the mock function
-    const { getByTestId } = render(<ChatInput />);
+    const { getByTestId } = render(
+      <BrainConfigProvider>
+        <BrainProvider>
+          <ChatInput />
+        </BrainProvider>
+      </BrainConfigProvider>
+    );
     const chatInput = getByTestId("chat-input");
 
     fireEvent.change(chatInput, { target: { value: "Another test question" } });
@@ -80,7 +130,13 @@ describe("ChatInput", () => {
   });
 
   it('should not submit a question when "Enter" key is pressed with shift', () => {
-    const { getByTestId } = render(<ChatInput />);
+    const { getByTestId } = render(
+      <BrainConfigProvider>
+        <BrainProvider>
+          <ChatInput />
+        </BrainProvider>
+      </BrainConfigProvider>
+    );
 
     const inputElement = getByTestId("chat-input");
 

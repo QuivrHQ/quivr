@@ -4,12 +4,12 @@ import Button from "@/lib/components/ui/Button";
 
 import { useChat } from "@/app/chat/[chatId]/hooks/useChat";
 import { useState } from "react";
-import { ConfigButton } from "./components/ConfigButton";
+import { ConfigModal } from "./components/ConfigModal";
 import { MicButton } from "./components/MicButton/MicButton";
 
 export const ChatInput = (): JSX.Element => {
-  const [message, setMessage] = useState<string>(""); // for optimistic updates
-  const { addQuestion, generatingAnswer } = useChat();
+  const [message, setMessage] = useState<string>("");
+  const { addQuestion, generatingAnswer, chatId } = useChat();
 
   const submitQuestion = () => {
     if (message.length === 0) return;
@@ -52,7 +52,7 @@ export const ChatInput = (): JSX.Element => {
       </Button>
       <div className="flex items-center">
         <MicButton setMessage={setMessage} />
-        <ConfigButton />
+        <ConfigModal chatId={chatId} />
       </div>
     </form>
   );

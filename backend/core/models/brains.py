@@ -2,10 +2,11 @@ from typing import Any, List, Optional
 from uuid import UUID
 
 from logger import get_logger
-from models.settings import BrainRateLimiting, CommonsDep, common_dependencies
-from models.users import User
 from pydantic import BaseModel
 from utils.vectors import get_unique_files_from_vector_ids
+
+from models.settings import BrainRateLimiting, CommonsDep, common_dependencies
+from models.users import User
 
 logger = get_logger(__name__)
 
@@ -111,7 +112,9 @@ class Brain(BaseModel):
             .filter("brain_id", "eq", self.id)
             .execute()
         )
-        return response.data
+        if response.data == []:
+            return None
+        return response.data[0]
 
     def delete_brain(self, user_id):
         results = (
