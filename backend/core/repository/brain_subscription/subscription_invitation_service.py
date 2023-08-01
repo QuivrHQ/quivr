@@ -3,8 +3,7 @@ from typing import Optional
 from logger import get_logger
 from models.brains_subscription_invitations import BrainSubscription
 from models.settings import CommonsDep, common_dependencies
-
-from backend.core.utils.db_commands import (
+from utils.db_commands import (
     delete_data_in_table,
     insert_data_in_table,
     select_data_in_table,
