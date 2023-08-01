@@ -1,4 +1,4 @@
-from typing import Annotated
+from typing import Annotated, TypedDict
 
 from fastapi import Depends
 from langchain.embeddings.openai import OpenAIEmbeddings
@@ -26,7 +26,14 @@ class LLMSettings(BaseSettings):
     model_path: str = "./local_models/ggml-gpt4all-j-v1.3-groovy.bin"
 
 
-def common_dependencies() -> dict:
+class CommonDependencies(TypedDict):
+    supabase: Client
+    embeddings: OpenAIEmbeddings
+    documents_vector_store: SupabaseVectorStore
+    summaries_vector_store: SupabaseVectorStore
+
+
+def common_dependencies() -> CommonDependencies:
     settings = BrainSettings()  # pyright: ignore reportPrivateUsage=none
     embeddings = OpenAIEmbeddings(
         openai_api_key=settings.openai_api_key
