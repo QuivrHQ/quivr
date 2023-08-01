@@ -2,13 +2,33 @@ name: Backend Tests
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
     paths:
       - 'backend/core/**'
   pull_request:
-    branches: [ main ] 
+    branches: [main]
     paths:
-      - 'backend/core/**'  
+      - 'backend/core/**'
+  workflow_dispatch:
+    inputs:
+      logLevel:
+        description: 'Log level'
+        required: true
+        default: 'warning'
+        type: choice
+        options:
+        - info
+        - warning
+        - debug
+      tags:
+        description: 'Test scenario tags'
+        required: false
+        type: boolean
+      environment:
+        description: 'Environment to run tests against'
+        type: environment
+        required: false
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -18,7 +38,7 @@ jobs:
     environment: preview
     strategy:
       matrix:
-        python-version: [ "3.11"]
+        python-version: ["3.11"]
 
     steps:
       - uses: actions/checkout@v3
@@ -26,7 +46,7 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
-          cache: 'pip'
+          cache: "pip"
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
@@ -37,13 +57,14 @@ jobs:
         env:
           SUPABASE_URL: ${{secrets.SUPABASE_URL}}
           SUPABASE_SERVICE_KEY: ${{secrets.SUPABASE_SERVICE_KEY}}
+          PG_DATABASE_URL: ${{secrets.PG_DATABASE_URL}}
           OPENAI_API_KEY: ${{secrets.OPENAI_API_KEY}}
           ANTHROPIC_API_KEY: ${{secrets.ANTHROPIC_API_KEY}}
           JWT_SECRET_KEY: ${{secrets.JWT_SECRET_KEY}}
-          CI_TEST_API_KEY: ${{secrets.CI_TEST_API_KEY}} 
+          CI_TEST_API_KEY: ${{secrets.CI_TEST_API_KEY}}
         run: |
           python -m pytest tests/
-        
+
       - name: Static type checking with pyright
         run: |
           pyright

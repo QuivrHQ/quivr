@@ -27,7 +27,7 @@ def create_chat(user_id: UUID, chat_data: CreateChatProperties) -> Chat:
         "user_id": str(user_id),
         "chat_name": chat_data.name,
     }
-    insert_response = commons["supabase"].table("chats").insert(new_chat).execute()
+    insert_response = commons["db"].create_chat(new_chat)
     logger.info(f"Insert response {insert_response.data}")
 
     return insert_response.data[0]

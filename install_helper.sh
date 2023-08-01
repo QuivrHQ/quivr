@@ -47,6 +47,12 @@ if grep -q "SUPABASE_SERVICE_KEY=<change-me>" backend/core/.env; then
     replace_in_file backend/core/.env "SUPABASE_SERVICE_KEY=.*" "SUPABASE_SERVICE_KEY=${SUPABASE_SERVICE_KEY}"
 fi
 
+if grep -q "PG_DATABASE_URL=<change-me>" backend/.env; then
+    echo "PG_DATABASE_URL can be found in your Postgres provider Settings > API."
+    PG_DATABASE_URL=$(gum input --placeholder "Enter PG_DATABASE_URL for backend")
+    replace_in_file backend/.env "PG_DATABASE_URL=.*" "PG_DATABASE_URL=${PG_DATABASE_URL}"
+fi
+
 if grep -q "OPENAI_API_KEY=<change-me>" backend/core/.env; then
     echo "OPENAI_API_KEY is the API key from OpenAI, if you are using OpenAI services."
     OPENAI_API_KEY=$(gum input --placeholder "Enter OPENAI_API_KEY for backend/core")

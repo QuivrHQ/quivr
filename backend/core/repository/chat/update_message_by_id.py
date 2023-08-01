@@ -28,11 +28,8 @@ def update_message_by_id(
 
     if updates:
         updated_message = (
-            commons["supabase"]
-            .table("chat_history")
-            .update(updates)
-            .match({"message_id": message_id})
-            .execute()
+            commons["db"]
+            .update_message_by_id(message_id, updates)
         ).data[0]
         logger.info(f"Message {message_id} updated")
     else:
