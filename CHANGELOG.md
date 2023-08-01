@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.0.47](https://github.com/StanGirard/quivr/compare/v0.0.46...v0.0.47) (2023-08-01)
+
+
+### Features
+
+* add user level open ai key management ([#805](https://github.com/StanGirard/quivr/issues/805)) ([7532b55](https://github.com/StanGirard/quivr/commit/7532b558c74962e5916b951235e8578cc8e882a2))
+* **chat:** added streaming ([#808](https://github.com/StanGirard/quivr/issues/808)) ([3166d08](https://github.com/StanGirard/quivr/commit/3166d089ee82730882c26454bd110a3dfae067c9))
+* **llm:** removing all llms to prepare for genoss ([#804](https://github.com/StanGirard/quivr/issues/804)) ([db40f3c](https://github.com/StanGirard/quivr/commit/db40f3cccd596f4337823e0306e66224d5e1c8c9))
+
 ## [0.0.46](https://github.com/StanGirard/quivr/compare/v0.0.45...v0.0.46) (2023-07-31)
 
 
