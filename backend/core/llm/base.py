@@ -152,7 +152,8 @@ class BaseBrainPicking(BaseModel):
             This function should also call: _create_qa, get_chat_history and format_chat_history.
             It should also update the chat_history in the DB.
             """
-
+        
+        
         async def generate_stream(self, question: str) -> AsyncIterable:
             """
             Generate a streaming answer to a given question using QA Chain.
