@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.0.49](https://github.com/StanGirard/quivr/compare/v0.0.48...v0.0.49) (2023-08-01)
+
+
+### Features
+
+* add chat config modal ([#807](https://github.com/StanGirard/quivr/issues/807)) ([d018ab6](https://github.com/StanGirard/quivr/commit/d018ab6a9334b45b86e0c7fed3a552f5cb202523))
+
+
+### Bug Fixes
+
+* bugs ([#818](https://github.com/StanGirard/quivr/issues/818)) ([edcbb30](https://github.com/StanGirard/quivr/commit/edcbb30e97535013b61d5a94bb4204d030cba2f2))
+
 ## [0.0.48](https://github.com/StanGirard/quivr/compare/v0.0.47...v0.0.48) (2023-08-01)
 
 
