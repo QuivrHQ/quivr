@@ -58,15 +58,21 @@ export const useSettingsTab = ({ brainId }: UseSettingsTabProps) => {
           return;
         }
 
-        if (brainKey === "max_tokens") {
-          if (brain["max_tokens"] !== undefined) {
-            setValue("maxTokens", brain["max_tokens"]);
-          }
-        } else {
-          // @ts-expect-error bad type inference from typescript
-          // eslint-disable-next-line
-          setValue(key, brain[key]);
+        if (brainKey === "max_tokens" && brain["max_tokens"] !== undefined) {
+          setValue("maxTokens", brain["max_tokens"]);
+          continue;
         }
+
+        if (
+          brainKey === "openai_api_key" &&
+          brain["openai_api_key"] !== undefined
+        ) {
+          setValue("openAiKey", brain["openai_api_key"]);
+          continue;
+        }
+        // @ts-expect-error bad type inference from typescript
+        // eslint-disable-next-line
+        setValue(key, brain[key]);
       }
     };
     void fetchBrain();
@@ -131,7 +137,17 @@ export const useSettingsTab = ({ brainId }: UseSettingsTabProps) => {
     try {
       setIsUpdating(true);
 
-      await updateBrain(brainId, getValues());
+      const {
+        maxTokens: max_tokens,
+        openAiKey: openai_api_key,
+        ...otherConfigs
+      } = getValues();
+
+      await updateBrain(brainId, {
+        ...otherConfigs,
+        max_tokens,
+        openai_api_key,
+      });
 
       publish({
         variant: "success",
