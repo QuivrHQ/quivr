@@ -46,7 +46,7 @@ class OpenAIBrainPicking(QABaseBrainPicking):
             openai_api_key=self.openai_api_key
         )  # pyright: ignore reportPrivateUsage=none
 
-    def _create_llm(self, model, streaming=False, callbacks=None) -> BaseLLM:
+    def _create_llm(self, model, temperature=0, streaming=False, callbacks=None) -> BaseLLM:
         """
         Determine the language model to be used.
         :param model: Language model name to be used.
@@ -55,9 +55,10 @@ class OpenAIBrainPicking(QABaseBrainPicking):
         :return: Language model instance
         """
         return ChatOpenAI(
-            temperature=self.temperature,
+            temperature=temperature,
             model=model,
             streaming=streaming,
             verbose=True,
             callbacks=callbacks,
+            openai_api_key=self.openai_api_key,
         )  # pyright: ignore reportPrivateUsage=none

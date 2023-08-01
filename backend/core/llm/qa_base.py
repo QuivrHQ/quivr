@@ -13,7 +13,6 @@ from repository.chat.get_chat_history import get_chat_history
 from repository.chat.update_chat_history import update_chat_history
 from supabase.client import Client, create_client
 from vectorstore.supabase import CustomSupabaseVectorStore
-from langchain.chat_models import ChatOpenAI
 from repository.chat.update_message_by_id import update_message_by_id
 import json
 
@@ -175,12 +174,8 @@ class QABaseBrainPicking(BaseBrainPicking):
         callback = self.callbacks[0]
         callback = AsyncIteratorCallbackHandler()
         self.callbacks = [callback]
-        model = ChatOpenAI(
-            streaming=True,
-            verbose=True,
-            callbacks=[callback],
-        )
-        llm = ChatOpenAI(temperature=0)
+        model = self._create_llm(model=self.model, streaming=True, callbacks=self.callbacks)
+        llm = self._create_llm(model=self.model,temperature=self.temperature)
         question_generator = LLMChain(llm=llm, prompt=CONDENSE_QUESTION_PROMPT)
         doc_chain = load_qa_chain(model, chain_type="stuff")
         qa = ConversationalRetrievalChain(
