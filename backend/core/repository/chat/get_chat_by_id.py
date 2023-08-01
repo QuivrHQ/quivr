@@ -1,13 +1,12 @@
 from models.chat import Chat
-from models.settings import common_dependencies
+from models.settings import get_supabase_client
 
 
 def get_chat_by_id(chat_id: str) -> Chat:
-    commons = common_dependencies()
+    supabase_client = get_supabase_client()
 
     response = (
-        commons["supabase"]
-        .from_("chats")
+        supabase_client.from_("chats")
         .select("*")
         .filter("chat_id", "eq", chat_id)
         .execute()

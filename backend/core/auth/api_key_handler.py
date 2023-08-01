@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from fastapi import HTTPException
-from models.settings import common_dependencies
+from models.settings import get_supabase_client
 from models.users import User
 from pydantic import DateError
 
@@ -12,10 +12,9 @@ async def verify_api_key(
     try:
         # Use UTC time to avoid timezone issues
         current_date = datetime.utcnow().date()
-        commons = common_dependencies()
+        supabase_client = get_supabase_client()
         result = (
-            commons["supabase"]
-            .table("api_keys")
+            supabase_client.table("api_keys")
             .select("api_key", "creation_time")
             .filter("api_key", "eq", api_key)
             .filter("is_active", "eq", True)
@@ -39,12 +38,11 @@ async def verify_api_key(
 async def get_user_from_api_key(
     api_key: str,
 ) -> User:
-    commons = common_dependencies()
+    supabase_client = get_supabase_client()
 
     # Lookup the user_id from the api_keys table
     user_id_data = (
-        commons["supabase"]
-        .table("api_keys")
+        supabase_client.table("api_keys")
         .select("user_id")
         .filter("api_key", "eq", api_key)
         .execute()
@@ -57,8 +55,7 @@ async def get_user_from_api_key(
 
     # Lookup the email from the users table. Todo: remove and use user_id for credentials
     user_email_data = (
-        commons["supabase"]
-        .table("users")
+        supabase_client.table("users")
         .select("email")
         .filter("user_id", "eq", user_id)
         .execute()

@@ -2,14 +2,13 @@ from typing import List  # For type hinting
 
 from fastapi import HTTPException
 from models.chat import ChatHistory
-from models.settings import common_dependencies
+from models.settings import get_supabase_client
 
 
 def update_chat_history(chat_id: str, user_message: str, assistant: str) -> ChatHistory:
-    commons = common_dependencies()
+    supabase_client = get_supabase_client()
     response: List[ChatHistory] = (
-        commons["supabase"]
-        .table("chat_history")
+        supabase_client.table("chat_history")
         .insert(
             {
                 "chat_id": str(chat_id),

@@ -3,7 +3,7 @@ from typing import Optional
 
 from logger import get_logger
 from models.chat import Chat
-from models.settings import common_dependencies
+from models.settings import get_supabase_client
 
 logger = get_logger(__name__)
 
@@ -17,7 +17,7 @@ class ChatUpdatableProperties:
 
 
 def update_chat(chat_id, chat_data: ChatUpdatableProperties) -> Chat:
-    commons = common_dependencies()
+    supabase_client = get_supabase_client()
 
     if not chat_id:
         logger.error("No chat_id provided")
@@ -32,8 +32,7 @@ def update_chat(chat_id, chat_data: ChatUpdatableProperties) -> Chat:
 
     if updates:
         updated_chat = (
-            commons["supabase"]
-            .table("chats")
+            supabase_client.table("chats")
             .update(updates)
             .match({"chat_id": chat_id})
             .execute()

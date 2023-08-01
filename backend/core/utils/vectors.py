@@ -3,7 +3,7 @@ from typing import List
 
 from langchain.embeddings.openai import OpenAIEmbeddings
 from logger import get_logger
-from models.settings import BrainSettings, CommonsDep, common_dependencies
+from models.settings import BrainSettings, CommonsDep, get_supabase_client
 from pydantic import BaseModel
 
 logger = get_logger(__name__)
@@ -48,19 +48,17 @@ class Neurons(BaseModel):
         return summaries.data
 
 
-
-
 def error_callback(exception):
     print("An exception occurred:", exception)
 
 
 def process_batch(batch_ids: List[str]):
-    commons = common_dependencies()
-    supabase = commons["supabase"]
+    supabase_client = get_supabase_client()
+
     try:
         if len(batch_ids) == 1:
             return (
-                supabase.table("vectors")
+                supabase_client.table("vectors")
                 .select(
                     "name:metadata->>file_name, size:metadata->>file_size",
                     count="exact",
@@ -70,7 +68,7 @@ def process_batch(batch_ids: List[str]):
             ).data
         else:
             return (
-                supabase.table("vectors")
+                supabase_client.table("vectors")
                 .select(
                     "name:metadata->>file_name, size:metadata->>file_size",
                     count="exact",

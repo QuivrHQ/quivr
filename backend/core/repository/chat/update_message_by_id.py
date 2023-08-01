@@ -1,6 +1,6 @@
 from logger import get_logger
 from models.chat import ChatHistory
-from models.settings import common_dependencies
+from models.settings import get_supabase_client
 
 logger = get_logger(__name__)
 
@@ -10,7 +10,7 @@ def update_message_by_id(
     user_message: str = None,  # pyright: ignore reportPrivateUsage=none
     assistant: str = None,  # pyright: ignore reportPrivateUsage=none
 ) -> ChatHistory:
-    commons = common_dependencies()
+    supabase_client = get_supabase_client()
 
     if not message_id:
         logger.error("No message_id provided")
@@ -28,8 +28,7 @@ def update_message_by_id(
 
     if updates:
         updated_message = (
-            commons["supabase"]
-            .table("chat_history")
+            supabase_client.table("chat_history")
             .update(updates)
             .match({"message_id": message_id})
             .execute()

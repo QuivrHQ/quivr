@@ -1,14 +1,13 @@
 from typing import List
 
 from models.chat import Chat
-from models.settings import common_dependencies
+from models.settings import get_supabase_client
 
 
 def get_user_chats(user_id: str) -> List[Chat]:
-    commons = common_dependencies()
+    supabase_client = get_supabase_client()
     response = (
-        commons["supabase"]
-        .from_("chats")
+        supabase_client.from_("chats")
         .select("chat_id,user_id,creation_time,chat_name")
         .filter("user_id", "eq", user_id)
         .execute()

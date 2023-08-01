@@ -2,11 +2,11 @@ from typing import Any, List, Optional
 from uuid import UUID
 
 from logger import get_logger
-from pydantic import BaseModel
-from utils.vectors import get_unique_files_from_vector_ids
-
-from models.settings import BrainRateLimiting, CommonsDep, common_dependencies
+from models.settings import BrainRateLimiting, common_dependencies, get_supabase_client
 from models.users import User
+from pydantic import BaseModel
+from supabase.client import Client
+from utils.vectors import get_unique_files_from_vector_ids
 
 logger = get_logger(__name__)
 
@@ -27,8 +27,8 @@ class Brain(BaseModel):
         arbitrary_types_allowed = True
 
     @property
-    def commons(self) -> CommonsDep:
-        return common_dependencies()
+    def supabase_client(self) -> Client:
+        return get_supabase_client()
 
     @property
     def brain_size(self):
@@ -54,8 +54,7 @@ class Brain(BaseModel):
     # TODO: move this to a brand new BrainService
     def get_brain_users(self):
         response = (
-            self.commons["supabase"]
-            .table("brains_users")
+            self.supabase_client.table("brains_users")
             .select("id:brain_id, *")
             .filter("brain_id", "eq", self.id)
             .execute()
@@ -65,22 +64,20 @@ class Brain(BaseModel):
     # TODO: move this to a brand new BrainService
     def delete_user_from_brain(self, user_id):
         results = (
-            self.commons["supabase"]
-            .table("brains_users")
+            self.supabase_client.table("brains_users")
             .select("*")
             .match({"brain_id": self.id, "user_id": user_id})
             .execute()
         )
 
         if len(results.data) != 0:
-            self.commons["supabase"].table("brains_users").delete().match(
+            self.supabase_client.table("brains_users").delete().match(
                 {"brain_id": self.id, "user_id": user_id}
             ).execute()
 
     def get_user_brains(self, user_id):
         response = (
-            self.commons["supabase"]
-            .from_("brains_users")
+            self.supabase_client.from_("brains_users")
             .select("id:brain_id, rights, brains (id: brain_id, name)")
             .filter("user_id", "eq", user_id)
             .execute()
@@ -93,8 +90,7 @@ class Brain(BaseModel):
 
     def get_brain_for_user(self, user_id):
         response = (
-            self.commons["supabase"]
-            .from_("brains_users")
+            self.supabase_client.from_("brains_users")
             .select("id:brain_id, rights, brains (id: brain_id, name)")
             .filter("user_id", "eq", user_id)
             .filter("brain_id", "eq", self.id)
@@ -106,8 +102,7 @@ class Brain(BaseModel):
 
     def get_brain_details(self):
         response = (
-            self.commons["supabase"]
-            .from_("brains")
+            self.supabase_client.from_("brains")
             .select("id:brain_id, name, *")
             .filter("brain_id", "eq", self.id)
             .execute()
@@ -118,8 +113,7 @@ class Brain(BaseModel):
 
     def delete_brain(self, user_id):
         results = (
-            self.commons["supabase"]
-            .table("brains_users")
+            self.supabase_client.table("brains_users")
             .select("*")
             .match({"brain_id": self.id, "user_id": user_id, "rights": "Owner"})
             .execute()
@@ -128,34 +122,29 @@ class Brain(BaseModel):
             return {"message": "You are not the owner of this brain."}
         else:
             results = (
-                self.commons["supabase"]
-                .table("brains_vectors")
+                self.supabase_client.table("brains_vectors")
                 .delete()
                 .match({"brain_id": self.id})
                 .execute()
             )
 
             results = (
-                self.commons["supabase"]
-                .table("brains_users")
+                self.supabase_client.table("brains_users")
                 .delete()
                 .match({"brain_id": self.id})
                 .execute()
             )
 
             results = (
-                self.commons["supabase"]
-                .table("brains")
+                self.supabase_client.table("brains")
                 .delete()
                 .match({"brain_id": self.id})
                 .execute()
             )
 
     def create_brain(self):
-        commons = common_dependencies()
         response = (
-            commons["supabase"]
-            .table("brains")
+            self.supabase_client.table("brains")
             .insert(
                 {
                     "name": self.name,
@@ -174,10 +163,8 @@ class Brain(BaseModel):
         return response.data
 
     def create_brain_user(self, user_id: UUID, rights, default_brain: bool):
-        commons = common_dependencies()
         response = (
-            commons["supabase"]
-            .table("brains_users")
+            self.supabase_client.table("brains_users")
             .insert(
                 {
                     "brain_id": str(self.id),
@@ -195,18 +182,17 @@ class Brain(BaseModel):
         old_default_brain = get_default_user_brain(user)
 
         if old_default_brain is not None:
-            self.commons["supabase"].table("brains_users").update(
+            self.supabase_client.table("brains_users").update(
                 {"default_brain": False}
             ).match({"brain_id": old_default_brain["id"], "user_id": user.id}).execute()
 
-        self.commons["supabase"].table("brains_users").update(
+        self.supabase_client.table("brains_users").update(
             {"default_brain": True}
         ).match({"brain_id": self.id, "user_id": user.id}).execute()
 
     def create_brain_vector(self, vector_id, file_sha1):
         response = (
-            self.commons["supabase"]
-            .table("brains_vectors")
+            self.supabase_client.table("brains_vectors")
             .insert(
                 {
                     "brain_id": str(self.id),
@@ -221,8 +207,7 @@ class Brain(BaseModel):
     def get_vector_ids_from_file_sha1(self, file_sha1: str):
         # move to vectors class
         vectorsResponse = (
-            self.commons["supabase"]
-            .table("vectors")
+            self.supabase_client.table("vectors")
             .select("id")
             .filter("metadata->>file_sha1", "eq", file_sha1)
             .execute()
@@ -230,7 +215,7 @@ class Brain(BaseModel):
         return vectorsResponse.data
 
     def update_brain_fields(self):
-        self.commons["supabase"].table("brains").update(
+        self.supabase_client.table("brains").update(
             {
                 "name": self.name,
                 "description": self.description,
@@ -248,8 +233,7 @@ class Brain(BaseModel):
         """
 
         response = (
-            self.commons["supabase"]
-            .from_("brains_vectors")
+            self.supabase_client.from_("brains_vectors")
             .select("vector_id")
             .filter("brain_id", "eq", self.id)
             .execute()
@@ -267,8 +251,7 @@ class Brain(BaseModel):
     def delete_file_from_brain(self, file_name: str):
         # First, get the vector_ids associated with the file_name
         vector_response = (
-            self.commons["supabase"]
-            .table("vectors")
+            self.supabase_client.table("vectors")
             .select("id")
             .filter("metadata->>file_name", "eq", file_name)
             .execute()
@@ -277,14 +260,13 @@ class Brain(BaseModel):
 
         # For each vector_id, delete the corresponding entry from the 'brains_vectors' table
         for vector_id in vector_ids:
-            self.commons["supabase"].table("brains_vectors").delete().filter(
+            self.supabase_client.table("brains_vectors").delete().filter(
                 "vector_id", "eq", vector_id
             ).filter("brain_id", "eq", self.id).execute()
 
             # Check if the vector is still associated with any other brains
             associated_brains_response = (
-                self.commons["supabase"]
-                .table("brains_vectors")
+                self.supabase_client.table("brains_vectors")
                 .select("brain_id")
                 .filter("vector_id", "eq", vector_id)
                 .execute()
@@ -295,7 +277,7 @@ class Brain(BaseModel):
 
             # If the vector is not associated with any other brains, delete it from 'vectors' table
             if not associated_brains:
-                self.commons["supabase"].table("vectors").delete().filter(
+                self.supabase_client.table("vectors").delete().filter(
                     "id", "eq", vector_id
                 ).execute()
 
@@ -303,10 +285,9 @@ class Brain(BaseModel):
 
 
 def get_default_user_brain(user: User):
-    commons = common_dependencies()
+    supabase_client = get_supabase_client()
     response = (
-        commons["supabase"]
-        .from_("brains_users")
+        supabase_client.from_("brains_users")
         .select("brain_id")
         .filter("user_id", "eq", user.id)
         .filter("default_brain", "eq", True)
@@ -319,8 +300,7 @@ def get_default_user_brain(user: User):
 
     if default_brain_id:
         brain_response = (
-            commons["supabase"]
-            .from_("brains")
+            supabase_client.from_("brains")
             .select("id:brain_id, name, *")
             .filter("brain_id", "eq", default_brain_id)
             .execute()
@@ -338,4 +318,6 @@ def get_default_user_brain_or_create_new(user: User) -> Brain:
         brain = Brain.create()
         brain.create_brain()
         brain.create_brain_user(user.id, "Owner", True)
+        return brain
+        return brain
         return brain

@@ -3,7 +3,7 @@ from uuid import UUID
 
 from logger import get_logger
 from models.chat import Chat
-from models.settings import common_dependencies
+from models.settings import get_supabase_client
 
 logger = get_logger(__name__)
 
@@ -17,7 +17,7 @@ class CreateChatProperties:
 
 
 def create_chat(user_id: UUID, chat_data: CreateChatProperties) -> Chat:
-    commons = common_dependencies()
+    supabase_client = get_supabase_client()
 
     # Chat is created upon the user's first question asked
     logger.info(f"New chat entry in chats table for user {user_id}")
@@ -27,7 +27,7 @@ def create_chat(user_id: UUID, chat_data: CreateChatProperties) -> Chat:
         "user_id": str(user_id),
         "chat_name": chat_data.name,
     }
-    insert_response = commons["supabase"].table("chats").insert(new_chat).execute()
+    insert_response = supabase_client.table("chats").insert(new_chat).execute()
     logger.info(f"Insert response {insert_response.data}")
 
     return insert_response.data[0]

@@ -2,9 +2,8 @@ from typing import Optional
 from uuid import UUID
 
 from logger import get_logger
+from models.settings import get_supabase_client
 from pydantic import BaseModel
-
-from models.settings import common_dependencies
 
 logger = get_logger(__name__)
 
@@ -23,12 +22,11 @@ class User(BaseModel):
         Args:
             date (str): Date of the request
         """
-        commons = common_dependencies()
+        supabase_client = get_supabase_client()
         logger.info(f"New user entry in db document for user {self.email}")
 
         return (
-            commons["supabase"]
-            .table("users")
+            supabase_client.table("users")
             .insert(
                 {
                     "user_id": self.id,
@@ -44,10 +42,9 @@ class User(BaseModel):
         """
         Fetch the user request stats from the database
         """
-        commons = common_dependencies()
+        supabase_client = get_supabase_client()
         requests_stats = (
-            commons["supabase"]
-            .from_("users")
+            supabase_client.from_("users")
             .select("*")
             .filter("user_id", "eq", self.id)
             .execute()
@@ -58,10 +55,9 @@ class User(BaseModel):
         """
         Fetch the user request count from the database
         """
-        commons = common_dependencies()
+        supabase_client = get_supabase_client()
         response = (
-            commons["supabase"]
-            .from_("users")
+            supabase_client.from_("users")
             .select("*")
             .filter("user_id", "eq", self.id)
             .filter("date", "eq", date)
@@ -75,10 +71,10 @@ class User(BaseModel):
         """
         Increment the user request count in the database
         """
-        commons = common_dependencies()
+        supabase_client = get_supabase_client()
         requests_count = self.fetch_user_requests_count(date) + 1
         logger.info(f"User {self.email} request count updated to {requests_count}")
-        commons["supabase"].table("users").update(
-            {"requests_count": requests_count}
-        ).match({"user_id": self.id, "date": date}).execute()
+        supabase_client.table("users").update({"requests_count": requests_count}).match(
+            {"user_id": self.id, "date": date}
+        ).execute()
         self.requests_count = requests_count

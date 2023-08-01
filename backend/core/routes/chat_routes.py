@@ -12,7 +12,7 @@ from llm.openai import OpenAIBrainPicking
 from models.brains import Brain, get_default_user_brain_or_create_new
 from models.chat import Chat, ChatHistory
 from models.chats import ChatQuestion
-from models.settings import LLMSettings, common_dependencies
+from models.settings import LLMSettings, get_supabase_client
 from models.users import User
 from repository.chat.create_chat import CreateChatProperties, create_chat
 from repository.chat.get_chat_by_id import get_chat_by_id
@@ -20,6 +20,7 @@ from repository.chat.get_chat_history import get_chat_history
 from repository.chat.get_user_chats import get_user_chats
 from repository.chat.update_chat import ChatUpdatableProperties, update_chat
 from repository.user_identity.get_user_identity import get_user_identity
+from supabase.client import Client
 
 chat_router = APIRouter()
 
@@ -39,45 +40,19 @@ class NullableUUID(UUID):
             return None
 
 
-def get_chat_details(commons, chat_id):
-    response = (
-        commons["supabase"]
-        .from_("chats")
-        .select("*")
-        .filter("chat_id", "eq", chat_id)
-        .execute()
-    )
-    return response.data
-
-
-def delete_chat_from_db(commons, chat_id):
+def delete_chat_from_db(supabase_client: Client, chat_id: str):
     try:
-        commons["supabase"].table("chat_history").delete().match(
+        supabase_client.table("chat_history").delete().match(
             {"chat_id": chat_id}
         ).execute()
     except Exception as e:
         print(e)
         pass
     try:
-        commons["supabase"].table("chats").delete().match(
-            {"chat_id": chat_id}
-        ).execute()
+        supabase_client.table("chats").delete().match({"chat_id": chat_id}).execute()
     except Exception as e:
         print(e)
         pass
-
-
-def fetch_user_stats(commons, user, date):
-    response = (
-        commons["supabase"]
-        .from_("users")
-        .select("*")
-        .filter("email", "eq", user.email)
-        .filter("date", "eq", date)
-        .execute()
-    )
-    userItem = next(iter(response.data or []), {"requests_count": 0})
-    return userItem
 
 
 def check_user_limit(
@@ -121,8 +96,8 @@ async def delete_chat(chat_id: UUID):
     """
     Delete a specific chat by chat ID.
     """
-    commons = common_dependencies()
-    delete_chat_from_db(commons, chat_id)
+    supabase_client = get_supabase_client()
+    delete_chat_from_db(supabase_client, chat_id)
     return {"message": f"{chat_id}  has been deleted."}
 
 

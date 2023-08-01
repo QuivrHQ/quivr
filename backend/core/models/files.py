@@ -7,7 +7,7 @@ from fastapi import UploadFile
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from logger import get_logger
 from models.brains import Brain
-from models.settings import CommonsDep, common_dependencies
+from models.settings import CommonsDep, get_supabase_client
 from pydantic import BaseModel
 from utils.file import compute_sha1_from_file
 
@@ -95,10 +95,9 @@ class File(BaseModel):
         that are associated with the file in the vectors table
         """
 
-        commons = common_dependencies()
+        supabase_client = get_supabase_client()
         response = (
-            commons["supabase"]
-            .table("vectors")
+            supabase_client.table("vectors")
             .select("id")
             .filter("metadata->>file_sha1", "eq", self.file_sha1)
             .execute()
@@ -132,12 +131,11 @@ class File(BaseModel):
         Args:
             brain_id (str): Brain id
         """
-        commons = common_dependencies()
+        supabase_client = get_supabase_client()
         self.set_file_vectors_ids()
         # Check if file exists in that brain
         response = (
-            commons["supabase"]
-            .table("brains_vectors")
+            supabase_client.table("brains_vectors")
             .select("brain_id, vector_id")
             .filter("brain_id", "eq", brain_id)
             .filter("file_sha1", "eq", self.file_sha1)
