@@ -13,7 +13,7 @@ import { useToast } from "@/lib/hooks";
 export const useAddBrainModal = () => {
   const [isPending, setIsPending] = useState(false);
   const { publish } = useToast();
-  const { createBrain } = useBrainContext();
+  const { createBrain, setActiveBrain } = useBrainContext();
   const { setAsDefaultBrain } = useBrainApi();
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const { config } = useBrainConfig();
@@ -56,15 +56,21 @@ export const useAddBrainModal = () => {
         temperature,
       });
 
-      if (setDefault) {
-        if (createdBrainId === undefined) {
-          publish({
-            variant: "danger",
-            text: "Error occurred while creating a brain",
-          });
+      if (createdBrainId === undefined) {
+        publish({
+          variant: "danger",
+          text: "Error occurred while creating a brain",
+        });
 
-          return;
-        }
+        return;
+      }
+
+      setActiveBrain({
+        id: createdBrainId,
+        name,
+      });
+
+      if (setDefault) {
         await setAsDefaultBrain(createdBrainId);
       }
 

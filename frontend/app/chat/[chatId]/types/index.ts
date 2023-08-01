@@ -1,10 +1,10 @@
 import { UUID } from "crypto";
 
 export type ChatQuestion = {
-  model: string;
+  model?: string;
   question?: string;
-  temperature: number;
-  max_tokens: number;
+  temperature?: number;
+  max_tokens?: number;
 };
 export type ChatHistory = {
   chat_id: string;

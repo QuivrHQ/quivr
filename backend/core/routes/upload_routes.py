@@ -62,7 +62,9 @@ async def upload_file(
     else:
         openai_api_key = request.headers.get("Openai-Api-Key", None)
         if openai_api_key is None:
-            openai_api_key = brain.get_brain_details()["openai_api_key"]
+            brain_details = brain.get_brain_details()
+            if brain_details:
+                openai_api_key = brain_details["openai_api_key"]
 
         if openai_api_key is None:
             openai_api_key = get_user_identity(current_user.id).openai_api_key
