@@ -8,7 +8,6 @@ import { useForm } from "react-hook-form";
 import { useBrainApi } from "@/lib/api/brain/useBrainApi";
 import { useBrainConfig } from "@/lib/context/BrainConfigProvider";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
-import { useBrainProvider } from "@/lib/context/BrainProvider/hooks/useBrainProvider";
 import { Brain } from "@/lib/context/BrainProvider/types";
 import { defineMaxTokens } from "@/lib/helpers/defineMexTokens";
 import { useToast } from "@/lib/hooks";
@@ -25,7 +24,8 @@ export const useSettingsTab = ({ brainId }: UseSettingsTabProps) => {
   const formRef = useRef<HTMLFormElement>(null);
   const { setAsDefaultBrain, getBrain, updateBrain } = useBrainApi();
   const { config } = useBrainConfig();
-  const { fetchAllBrains, fetchDefaultBrain } = useBrainContext();
+  const { fetchAllBrains, fetchDefaultBrain, defaultBrainId } =
+    useBrainContext();
 
   const defaultValues = {
     ...config,
@@ -176,7 +176,6 @@ export const useSettingsTab = ({ brainId }: UseSettingsTabProps) => {
       setIsUpdating(false);
     }
   };
-  const { defaultBrainId } = useBrainProvider();
   const isDefaultBrain = defaultBrainId === brainId;
 
   useEffect(() => {
