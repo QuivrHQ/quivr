@@ -7,6 +7,7 @@ from models.brains import Brain
 from models.files import File
 from models.settings import common_dependencies
 from models.users import User
+from repository.user_identity.get_user_identity import get_user_identity
 from utils.file import convert_bytes, get_file_size
 from utils.processors import filter_file
 
@@ -59,12 +60,19 @@ async def upload_file(
             "type": "error",
         }
     else:
+        openai_api_key = request.headers.get("Openai-Api-Key", None)
+        if openai_api_key is None:
+            openai_api_key = brain.get_brain_details()["openai_api_key"]
+
+        if openai_api_key is None:
+            openai_api_key = get_user_identity(current_user.id).openai_api_key
+
         message = await filter_file(
             commons,
             file,
             enable_summarization,
             brain_id=brain_id,
-            openai_api_key=request.headers.get("Openai-Api-Key", None),
+            openai_api_key=openai_api_key,
         )
 
     return message

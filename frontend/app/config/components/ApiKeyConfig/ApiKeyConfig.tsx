@@ -5,7 +5,12 @@ import Button from "@/lib/components/ui/Button";
 import { useApiKeyConfig } from "./hooks/useApiKeyConfig";
 
 export const ApiKeyConfig = (): JSX.Element => {
-  const { apiKey, handleCopyClick, handleCreateClick } = useApiKeyConfig();
+  const {
+    apiKey,
+    handleCopyClick,
+
+    handleCreateClick,
+  } = useApiKeyConfig();
 
   return (
     <>

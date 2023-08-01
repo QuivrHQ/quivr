@@ -22,8 +22,11 @@ describe("ApiKeyConfig", () => {
   });
 
   it("should render ApiConfig Component", () => {
-    const { getByText } = render(<ApiKeyConfig />);
+    const { getByText, getByTestId } = render(<ApiKeyConfig />);
     expect(getByText("API Key Config")).toBeDefined();
+    expect(getByText("OpenAI Key")).toBeDefined();
+    expect(getByTestId("open-ai-api-key")).toBeDefined();
+    expect(getByTestId("save-open-ai-api-key")).toBeDefined();
   });
 
   it("renders 'Create New Key' button when apiKey is empty", () => {
