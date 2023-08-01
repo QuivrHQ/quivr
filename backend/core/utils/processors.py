@@ -73,7 +73,7 @@ async def filter_file(
                 file=file,
                 enable_summarization=enable_summarization,
                 brain_id=brain_id,
-                openai_api_key=openai_api_key,
+                user_openai_api_key=openai_api_key,
             )
             return create_response(
                 f"✅ {file.file.filename} has been uploaded to brain {brain_id}.",  # pyright: ignore reportPrivateUsage=none
