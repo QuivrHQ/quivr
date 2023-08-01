@@ -12,7 +12,7 @@
 
 Quivr, your second brain, utilizes the power of GenerativeAI to store and retrieve unstructured information. Think of it as Obsidian, but turbocharged with AI capabilities.
 
-[Roadmap here](https://brain.quivr.app)
+[Roadmap here](https://brain.quivr.app/docs/roadmap)
 
 ## Key Features 🎯
 
@@ -36,6 +36,14 @@ Quivr, your second brain, utilizes the power of GenerativeAI to store and retrie
 ## Demo Highlights 🎥
 
 https://github.com/StanGirard/quivr/assets/19614572/a6463b73-76c7-4bc0-978d-70562dca71f5
+
+## Disclaimer ⚠️
+
+For a little while, Quivr will be only compatible with OpenAI API. 
+
+If you want to use a Local LLM please refer to [v0.0.46](https://github.com/StanGirard/quivr/releases/tag/v0.0.46).
+
+This is due to us preparing a big feature and needing to clean the code a bit.
 
 ## Getting Started 🚀
 
@@ -105,16 +113,18 @@ Additionally, you'll need a [Supabase](https://supabase.com/) account for:
   - [ ] Change variables in `backend/core/.env`
   - [ ] Change variables in `frontend/.env`
 
-- **Step 4**: Run the following migration scripts on the Supabase database via the web interface (SQL Editor -> `New query`)
-
-  Use the `migration.sh` script to run the migration scripts
+- **Step 4**: Use the `migration.sh` script to run the migration scripts
 
   ```bash
   chmod +x migration.sh
   ./migration.sh
   ```
 
-  Choose either create_scripts if it's your first time or migrations if you are updating your database.
+  Choose either `Create all tables` if it's your first time or `Run migrations`
+  if you are updating your database.
+
+  Alternatively you can run the script on the Supabase database via the web
+  interface (SQL Editor -> `New query` -> paste the script -> `Run`)
 
   All the scripts can be found in the [scripts](scripts/) folder
 

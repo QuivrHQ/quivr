@@ -3,14 +3,13 @@ import time
 from http.client import HTTPException
 from typing import List
 from uuid import UUID
+from venv import logger
 
 from auth import AuthBearer, get_current_user
 from fastapi import APIRouter, Depends, Query, Request
 from fastapi.responses import StreamingResponse
 from llm.openai import OpenAIBrainPicking
-from llm.openai_functions import OpenAIFunctionsBrainPicking
-from llm.private_gpt4all import PrivateGPT4AllBrainPicking
-from models.brains import get_default_user_brain_or_create_new
+from models.brains import Brain, get_default_user_brain_or_create_new
 from models.chat import Chat, ChatHistory
 from models.chats import ChatQuestion
 from models.settings import LLMSettings, common_dependencies
@@ -20,16 +19,12 @@ from repository.chat.get_chat_by_id import get_chat_by_id
 from repository.chat.get_chat_history import get_chat_history
 from repository.chat.get_user_chats import get_user_chats
 from repository.chat.update_chat import ChatUpdatableProperties, update_chat
-from utils.constants import (
-    openai_function_compatible_models,
-    streaming_compatible_models,
-)
+from repository.user_identity.get_user_identity import get_user_identity
 
 chat_router = APIRouter()
 
 
 class NullableUUID(UUID):
-
     @classmethod
     def __get_validators__(cls):
         yield cls.validate
@@ -170,42 +165,50 @@ async def create_question_handler(
     | None = Query(..., description="The ID of the brain"),
     current_user: User = Depends(get_current_user),
 ) -> ChatHistory:
+    """
+    Add a new question to the chat.
+    """
+    # Retrieve user's OpenAI API key
     current_user.user_openai_api_key = request.headers.get("Openai-Api-Key")
+    brain = Brain(id=brain_id)
+
+    if not current_user.user_openai_api_key:
+        brain_details = brain.get_brain_details()
+        if brain_details:
+            current_user.user_openai_api_key = brain_details["openai_api_key"]
+
+    if not current_user.user_openai_api_key:
+        user_identity = get_user_identity(current_user.id)
+
+        if user_identity is not None:
+            current_user.user_openai_api_key = user_identity.openai_api_key
+
+    # Retrieve chat model (temperature, max_tokens, model)
+    if (
+        not chat_question.model
+        or not chat_question.temperature
+        or not chat_question.max_tokens
+    ):
+        # TODO: create ChatConfig class (pick config from brain or user or chat) and use it here
+        chat_question.model = chat_question.model or brain.model or "gpt-3.5-turbo-0613"
+        chat_question.temperature = chat_question.temperature or brain.temperature or 0
+        chat_question.max_tokens = chat_question.max_tokens or brain.max_tokens or 256
+
     try:
         check_user_limit(current_user)
-        llm_settings = LLMSettings()
+        LLMSettings()
 
         if not brain_id:
             brain_id = get_default_user_brain_or_create_new(current_user).id
 
-        if llm_settings.private:
-            gpt_answer_generator = PrivateGPT4AllBrainPicking(
-                chat_id=str(chat_id),
-                brain_id=str(brain_id),
-                user_openai_api_key=current_user.user_openai_api_key,
-                streaming=False,
-                model_path=llm_settings.model_path,
-            )
-
-        elif chat_question.model in openai_function_compatible_models:
-            gpt_answer_generator = OpenAIFunctionsBrainPicking(
-                model=chat_question.model,
-                chat_id=str(chat_id),
-                temperature=chat_question.temperature,
-                max_tokens=chat_question.max_tokens,
-                brain_id=str(brain_id),
-                user_openai_api_key=current_user.user_openai_api_key,  # pyright: ignore reportPrivateUsage=none
-            )
-
-        else:
-            gpt_answer_generator = OpenAIBrainPicking(
-                chat_id=str(chat_id),
-                model=chat_question.model,
-                max_tokens=chat_question.max_tokens,
-                temperature=chat_question.temperature,
-                brain_id=str(brain_id),
-                user_openai_api_key=current_user.user_openai_api_key,  # pyright: ignore reportPrivateUsage=none
-            )
+        gpt_answer_generator = OpenAIBrainPicking(
+            chat_id=str(chat_id),
+            model=chat_question.model,
+            max_tokens=chat_question.max_tokens,
+            temperature=chat_question.temperature,
+            brain_id=str(brain_id),
+            user_openai_api_key=current_user.user_openai_api_key,  # pyright: ignore reportPrivateUsage=none
+        )
 
         chat_answer = gpt_answer_generator.generate_answer(  # pyright: ignore reportPrivateUsage=none
             chat_question.question
@@ -236,43 +239,50 @@ async def create_stream_question_handler(
     current_user: User = Depends(get_current_user),
 ) -> StreamingResponse:
     # TODO: check if the user has access to the brain
-    if not brain_id:
-        brain_id = get_default_user_brain_or_create_new(current_user).id
 
-    if chat_question.model not in streaming_compatible_models:
-        # Forward the request to the none streaming endpoint
-        return await create_question_handler(
-            request,
-            chat_question,
-            chat_id,
-            current_user,  # pyright: ignore reportPrivateUsage=none
-        )
+    # Retrieve user's OpenAI API key
+    current_user.user_openai_api_key = request.headers.get("Openai-Api-Key")
+    brain = Brain(id=brain_id)
+
+    if not current_user.user_openai_api_key:
+        brain_details = brain.get_brain_details()
+        if brain_details:
+            current_user.user_openai_api_key = brain_details["openai_api_key"]
+
+    if not current_user.user_openai_api_key:
+        user_identity = get_user_identity(current_user.id)
+
+        if user_identity is not None:
+            current_user.user_openai_api_key = user_identity.openai_api_key
+
+    # Retrieve chat model (temperature, max_tokens, model)
+    if (
+        not chat_question.model
+        or not chat_question.temperature
+        or not chat_question.max_tokens
+    ):
+        # TODO: create ChatConfig class (pick config from brain or user or chat) and use it here
+        chat_question.model = chat_question.model or brain.model or "gpt-3.5-turbo-0613"
+        chat_question.temperature = chat_question.temperature or brain.temperature or 0
+        chat_question.max_tokens = chat_question.max_tokens or brain.max_tokens or 256
 
     try:
-        user_openai_api_key = request.headers.get("Openai-Api-Key")
-        streaming = True
+        logger.info(f"Streaming request for {chat_question.model}")
         check_user_limit(current_user)
-        llm_settings = LLMSettings()
+        if not brain_id:
+            brain_id = get_default_user_brain_or_create_new(current_user).id
 
-        if llm_settings.private:
-            gpt_answer_generator = PrivateGPT4AllBrainPicking(
-                chat_id=str(chat_id),
-                brain_id=str(brain_id),
-                user_openai_api_key=user_openai_api_key,
-                streaming=streaming,
-                model_path=llm_settings.model_path,
-            )
-        else:
-            gpt_answer_generator = OpenAIBrainPicking(
-                chat_id=str(chat_id),
-                model=chat_question.model,
-                max_tokens=chat_question.max_tokens,
-                temperature=chat_question.temperature,
-                brain_id=str(brain_id),
-                user_openai_api_key=user_openai_api_key,  # pyright: ignore reportPrivateUsage=none
-                streaming=streaming,
-            )
+        gpt_answer_generator = OpenAIBrainPicking(
+            chat_id=str(chat_id),
+            model=chat_question.model,
+            max_tokens=chat_question.max_tokens,
+            temperature=chat_question.temperature,
+            brain_id=str(brain_id),
+            user_openai_api_key=current_user.user_openai_api_key,  # pyright: ignore reportPrivateUsage=none
+            streaming=True,
+        )
 
+        print("streaming")
         return StreamingResponse(
             gpt_answer_generator.generate_stream(  # pyright: ignore reportPrivateUsage=none
                 chat_question.question

@@ -3,8 +3,8 @@ import { AxiosError } from "axios";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
+import { getChatConfigFromLocalStorage } from "@/lib/api/chat/chat.local";
 import { useChatApi } from "@/lib/api/chat/useChatApi";
-import { useBrainConfig } from "@/lib/context/BrainConfigProvider/hooks/useBrainConfig";
 import { useChatContext } from "@/lib/context/ChatProvider/hooks/useChatContext";
 import { useToast } from "@/lib/hooks";
 import { useEventTracking } from "@/services/analytics/useEventTracking";
@@ -20,14 +20,12 @@ export const useChat = () => {
     params?.chatId as string | undefined
   );
   const [generatingAnswer, setGeneratingAnswer] = useState(false);
-  const {
-    config: { maxTokens, model, temperature },
-  } = useBrainConfig();
+
   const { history, setHistory } = useChatContext();
   const { publish } = useToast();
   const { createChat, getHistory } = useChatApi();
 
-  const { addStreamQuestion, addQuestion: addQuestionToModel } = useQuestion();
+  const { addStreamQuestion } = useQuestion();
 
   useEffect(() => {
     const fetchHistory = async () => {
@@ -46,13 +44,6 @@ export const useChat = () => {
   }, [chatId, setHistory]);
 
   const addQuestion = async (question: string, callback?: () => void) => {
-    const chatQuestion: ChatQuestion = {
-      model,
-      question,
-      temperature,
-      max_tokens: maxTokens,
-    };
-
     try {
       setGeneratingAnswer(true);
 
@@ -67,12 +58,16 @@ export const useChat = () => {
       }
 
       void track("QUESTION_ASKED");
+      const chatConfig = getChatConfigFromLocalStorage(currentChatId);
 
-      if (chatQuestion.model === "gpt-3.5-turbo") {
-        await addStreamQuestion(currentChatId, chatQuestion);
-      } else {
-        await addQuestionToModel(currentChatId, chatQuestion);
-      }
+      const chatQuestion: ChatQuestion = {
+        model: chatConfig?.model,
+        question,
+        temperature: chatConfig?.temperature,
+        max_tokens: chatConfig?.maxTokens,
+      };
+
+      await addStreamQuestion(currentChatId, chatQuestion);
 
       callback?.();
     } catch (error) {
@@ -100,5 +95,6 @@ export const useChat = () => {
     history,
     addQuestion,
     generatingAnswer,
+    chatId,
   };
 };

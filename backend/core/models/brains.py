@@ -84,7 +84,16 @@ class Brain(BaseModel):
         return self.commons["db"].get_brain_for_user(user_id, self.id)
 
     def get_brain_details(self):
-        return self.commons["db"].get_brain_details(self.id)
+        response = (
+            self.commons["supabase"]
+            .from_("brains")
+            .select("id:brain_id, name, *")
+            .filter("brain_id", "eq", self.id)
+            .execute()
+        )
+        if response.data == []:
+            return None
+        return response.data[0]
 
     def delete_brain(self, user_id):
         results = self.commons["db"].delete_brain_user_by_id(user_id, self.id)

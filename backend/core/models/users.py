@@ -2,23 +2,29 @@ from typing import Optional
 from uuid import UUID
 
 from logger import get_logger
+
 from models.settings import common_dependencies, CommonsDep
+
 from pydantic import BaseModel
+
+from models.settings import common_dependencies
 
 logger = get_logger(__name__)
 
 
+# [TODO] Rename the user table and its references to 'user_usage'
 class User(BaseModel):
     id: UUID
     email: Optional[str]
     user_openai_api_key: Optional[str] = None
     requests_count: int = 0
-
+      
     @property
     def commons(self) -> CommonsDep:
         return common_dependencies()
 
     # [TODO] Rename the user table and its references to 'user_usage'
+
     def create_user(self, date):
         """
         Create a new user entry in the database

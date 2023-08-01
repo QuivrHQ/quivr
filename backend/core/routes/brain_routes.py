@@ -73,14 +73,15 @@ async def get_brain_endpoint(
     history, which includes the brain messages exchanged in the brain.
     """
     brain = Brain(id=brain_id)
-    brains = brain.get_brain_details()
-    if len(brains) > 0:
-        return brains[0]
-    else:
-        return HTTPException(
+
+    brain_details = brain.get_brain_details()
+    if brain_details is None:
+        raise HTTPException(
             status_code=404,
-            detail="Brain not found",
+            detail="Brain details not found",
         )
+
+    return brain_details
 
 
 # create new brain

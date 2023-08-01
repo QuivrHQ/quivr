@@ -5,7 +5,13 @@ from auth import AuthBearer, get_current_user
 from fastapi import APIRouter, Depends, Request
 from models.brains import Brain, get_default_user_brain
 from models.settings import BrainRateLimiting
+from models.user_identity import UserIdentity
 from models.users import User
+from repository.user_identity.get_user_identity import get_user_identity
+from repository.user_identity.update_user_identity import (
+    UserIdentityUpdatableProperties,
+    update_user_identity,
+)
 
 user_router = APIRouter()
 
@@ -56,3 +62,32 @@ async def get_user_endpoint(
         "requests_stats": requests_stats,
         "date": date,
     }
+
+
+@user_router.put(
+    "/user/identity",
+    dependencies=[Depends(AuthBearer())],
+    tags=["User"],
+)
+def update_user_identity_route(
+    user_identity_updatable_properties: UserIdentityUpdatableProperties,
+    current_user: User = Depends(get_current_user),
+) -> UserIdentity:
+    """
+    Update user identity.
+    """
+    return update_user_identity(current_user.id, user_identity_updatable_properties)
+
+
+@user_router.get(
+    "/user/identity",
+    dependencies=[Depends(AuthBearer())],
+    tags=["User"],
+)
+def get_user_identity_route(
+    current_user: User = Depends(get_current_user),
+) -> UserIdentity:
+    """
+    Get user identity.
+    """
+    return get_user_identity(current_user.id)

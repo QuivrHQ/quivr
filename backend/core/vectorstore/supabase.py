@@ -24,11 +24,12 @@ class CustomSupabaseVectorStore(SupabaseVectorStore):
     def similarity_search(
         self,
         query: str,
-        table: str = "match_vectors",
         k: int = 6,
+        table: str = "match_vectors",
         threshold: float = 0.5,
         **kwargs: Any
     ) -> List[Document]:
+       
         vectors = self._embedding.embed_documents([query])
         query_embedding = vectors[0]
         res = self._client.rpc(
