@@ -40,28 +40,17 @@ class NullableUUID(UUID):
 
 
 def get_chat_details(commons, chat_id):
-    response = (
-        commons["supabase"]
-        .from_("chats")
-        .select("*")
-        .filter("chat_id", "eq", chat_id)
-        .execute()
-    )
-    return response.data
+    return commons["db"].get_chat_details(chat_id)
 
 
 def delete_chat_from_db(commons, chat_id):
     try:
-        commons["supabase"].table("chat_history").delete().match(
-            {"chat_id": chat_id}
-        ).execute()
+        commons["db"].delete_chat_history(chat_id)
     except Exception as e:
         print(e)
         pass
     try:
-        commons["supabase"].table("chats").delete().match(
-            {"chat_id": chat_id}
-        ).execute()
+        commons["db"].delete_chat(chat_id)
     except Exception as e:
         print(e)
         pass
@@ -69,12 +58,8 @@ def delete_chat_from_db(commons, chat_id):
 
 def fetch_user_stats(commons, user, date):
     response = (
-        commons["supabase"]
-        .from_("users")
-        .select("*")
-        .filter("email", "eq", user.email)
-        .filter("date", "eq", date)
-        .execute()
+        commons["db"]
+        .get_user_stats(user.email, date)
     )
     userItem = next(iter(response.data or []), {"requests_count": 0})
     return userItem

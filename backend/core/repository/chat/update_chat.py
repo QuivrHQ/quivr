@@ -32,11 +32,8 @@ def update_chat(chat_id, chat_data: ChatUpdatableProperties) -> Chat:
 
     if updates:
         updated_chat = (
-            commons["supabase"]
-            .table("chats")
-            .update(updates)
-            .match({"chat_id": chat_id})
-            .execute()
+            commons["db"]
+            .update_chat(chat_id, updates)
         ).data[0]
         logger.info(f"Chat {chat_id} updated")
     else:
