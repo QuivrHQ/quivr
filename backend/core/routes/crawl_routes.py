@@ -8,7 +8,6 @@ from crawl.crawler import CrawlWebsite
 from fastapi import APIRouter, Depends, Query, Request, UploadFile
 from models.brains import Brain
 from models.files import File
-from models.settings import common_dependencies
 from models.users import User
 from parsers.github import process_github
 from utils.file import convert_bytes
@@ -31,8 +30,6 @@ async def crawl_endpoint(
 
     # [TODO] check if the user is the owner/editor of the brain
     brain = Brain(id=brain_id)
-
-    commons = common_dependencies()
 
     if request.headers.get("Openai-Api-Key"):
         brain.max_brain_size = os.getenv(
@@ -66,19 +63,17 @@ async def crawl_endpoint(
             file = File(file=uploadFile)
             #  check remaining free space here !!
             message = await filter_file(
-                commons,
-                file,
-                enable_summarization,
-                brain.id,
+                file=file,
+                enable_summarization=enable_summarization,
+                brain_id=brain.id,
                 openai_api_key=request.headers.get("Openai-Api-Key", None),
             )
             return message
         else:
             #  check remaining free space here !!
             message = await process_github(
-                commons,
-                crawl_website.url,
-                "false",
-                brain_id,
+                repo=crawl_website.url,
+                enable_summarization="false",
+                brain_id=brain_id,
                 user_openai_api_key=request.headers.get("Openai-Api-Key", None),
             )

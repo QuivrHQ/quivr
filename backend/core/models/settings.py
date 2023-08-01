@@ -1,6 +1,5 @@
-from typing import Annotated, TypedDict
+from typing import TypedDict
 
-from fastapi import Depends
 from langchain.embeddings.openai import OpenAIEmbeddings
 from pydantic import BaseSettings
 from supabase.client import Client, create_client
@@ -42,27 +41,20 @@ def get_supabase_client() -> Client:
     return supabase_client
 
 
-def common_dependencies() -> CommonDependencies:
+def get_embeddings() -> OpenAIEmbeddings:
     settings = BrainSettings()  # pyright: ignore reportPrivateUsage=none
     embeddings = OpenAIEmbeddings(
         openai_api_key=settings.openai_api_key
     )  # pyright: ignore reportPrivateUsage=none
-    supabase_client: Client = create_client(
-        settings.supabase_url, settings.supabase_service_key
-    )
+
+    return embeddings
+
+
+def get_documents_vector_store() -> SupabaseVectorStore:
+    supabase_client = get_supabase_client()
+    embeddings = get_embeddings()
     documents_vector_store = SupabaseVectorStore(
         supabase_client, embeddings, table_name="vectors"
     )
-    summaries_vector_store = SupabaseVectorStore(
-        supabase_client, embeddings, table_name="summaries"
-    )
 
-    return {
-        "supabase": supabase_client,
-        "embeddings": embeddings,
-        "documents_vector_store": documents_vector_store,
-        "summaries_vector_store": summaries_vector_store,  # delete
-    }
-
-
-CommonsDep = Annotated[dict, Depends(common_dependencies)]
+    return documents_vector_store

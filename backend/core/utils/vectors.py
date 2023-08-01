@@ -3,25 +3,27 @@ from typing import List
 
 from langchain.embeddings.openai import OpenAIEmbeddings
 from logger import get_logger
-from models.settings import BrainSettings, CommonsDep, get_supabase_client
+from models.settings import (
+    get_documents_vector_store,
+    get_embeddings,
+    get_supabase_client,
+)
 from pydantic import BaseModel
 
 logger = get_logger(__name__)
 
 
 class Neurons(BaseModel):
-    commons: CommonsDep
-    settings = BrainSettings()  # pyright: ignore reportPrivateUsage=none
-
     def create_vector(self, doc, user_openai_api_key=None):
+        documents_vector_store = get_documents_vector_store()
         logger.info("Creating vector for document")
         logger.info(f"Document: {doc}")
         if user_openai_api_key:
-            self.commons["documents_vector_store"]._embedding = OpenAIEmbeddings(
+            documents_vector_store._embedding = OpenAIEmbeddings(
                 openai_api_key=user_openai_api_key
             )  # pyright: ignore reportPrivateUsage=none
         try:
-            sids = self.commons["documents_vector_store"].add_documents([doc])
+            sids = documents_vector_store.add_documents([doc])
             if sids and len(sids) > 0:
                 return sids
 
@@ -29,22 +31,20 @@ class Neurons(BaseModel):
             logger.error(f"Error creating vector for document {e}")
 
     def create_embedding(self, content):
-        return self.commons["embeddings"].embed_query(content)
+        embeddings = get_embeddings()
+        return embeddings.embed_query(content)
 
     def similarity_search(self, query, table="match_summaries", top_k=5, threshold=0.5):
         query_embedding = self.create_embedding(query)
-        summaries = (
-            self.commons["supabase"]
-            .rpc(
-                table,
-                {
-                    "query_embedding": query_embedding,
-                    "match_count": top_k,
-                    "match_threshold": threshold,
-                },
-            )
-            .execute()
-        )
+        supabase_client = get_supabase_client()
+        summaries = supabase_client.rpc(
+            table,
+            {
+                "query_embedding": query_embedding,
+                "match_count": top_k,
+                "match_threshold": threshold,
+            },
+        ).execute()
         return summaries.data
 
 

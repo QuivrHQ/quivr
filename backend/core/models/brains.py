@@ -2,7 +2,7 @@ from typing import Any, List, Optional
 from uuid import UUID
 
 from logger import get_logger
-from models.settings import BrainRateLimiting, common_dependencies, get_supabase_client
+from models.settings import BrainRateLimiting, get_supabase_client
 from models.users import User
 from pydantic import BaseModel
 from supabase.client import Client
@@ -46,7 +46,7 @@ class Brain(BaseModel):
 
     @classmethod
     def create(cls, *args, **kwargs):
-        commons = common_dependencies()
+        commons = {"supabase": get_supabase_client()}
         return cls(
             commons=commons, *args, **kwargs  # pyright: ignore reportPrivateUsage=none
         )  # pyright: ignore reportPrivateUsage=none
@@ -318,6 +318,5 @@ def get_default_user_brain_or_create_new(user: User) -> Brain:
         brain = Brain.create()
         brain.create_brain()
         brain.create_brain_user(user.id, "Owner", True)
-        return brain
         return brain
         return brain

@@ -7,7 +7,7 @@ from fastapi import UploadFile
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from logger import get_logger
 from models.brains import Brain
-from models.settings import CommonsDep, get_supabase_client
+from models.settings import get_supabase_client
 from pydantic import BaseModel
 from utils.file import compute_sha1_from_file
 
@@ -26,7 +26,6 @@ class File(BaseModel):
     chunk_size: int = 500
     chunk_overlap: int = 0
     documents: Optional[Any] = None
-    _commons: Optional[CommonsDep] = None
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)

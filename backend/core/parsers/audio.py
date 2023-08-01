@@ -6,12 +6,11 @@ import openai
 from langchain.schema import Document
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from models.files import File
-from models.settings import CommonsDep
+from models.settings import get_documents_vector_store
 from utils.file import compute_sha1_from_content
 
 
 async def process_audio(
-    commons: CommonsDep,  # pyright: ignore reportPrivateUsage=none
     file: File,
     enable_summarization: bool,
     user,
@@ -78,7 +77,8 @@ async def process_audio(
             for text in texts
         ]
 
-        commons.documents_vector_store.add_documents(  # pyright: ignore reportPrivateUsage=none
+        documents_vector_store = get_documents_vector_store()
+        documents_vector_store.add_documents(  # pyright: ignore reportPrivateUsage=none
             docs_with_metadata
         )
 
