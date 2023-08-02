@@ -1,6 +1,6 @@
 from langchain.prompts.prompt import PromptTemplate
 
-_template = """Given the following conversation and a follow up question, rephrase the follow up question to be a standalone question, in its original language. include it in the standalone question.
+_template = """Given the following conversation and a follow up question, rephrase the follow up question to be a standalone question, in its original language. include the follow up instructions in the standalone question.
 
 Chat History:
 {chat_history}
