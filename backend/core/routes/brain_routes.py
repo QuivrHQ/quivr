@@ -8,8 +8,10 @@ from models.brains import (
     get_default_user_brain,
     get_default_user_brain_or_create_new,
 )
-from models.settings import BrainRateLimiting
+from models.settings import BrainRateLimiting, common_dependencies
 from models.users import User
+from repository.prompt.delete_prompt_py_id import delete_prompt_by_id
+from repository.prompt.get_prompt_by_id import get_prompt_by_id
 
 from routes.authorizations.brain_authorization import RoleEnum, has_brain_authorization
 
@@ -149,7 +151,20 @@ async def update_brain_endpoint(
     Update an existing brain with new brain configuration
     """
     input_brain.id = brain_id
-    print("brain", input_brain)
+
+    # Remove prompt if it is private and no longer used by brain
+    if input_brain.prompt_id is None:
+        existing_brain = common_dependencies()["db"].get_brain_details(brain_id)
+        if existing_brain is None:
+            raise HTTPException(
+                status_code=404,
+                detail="Brain not found",
+            )
+        prompt_id = existing_brain["prompt_id"]
+        if prompt_id is not None:
+            prompt = get_prompt_by_id(prompt_id)
+            if prompt is not None and prompt.status == "private":
+                delete_prompt_by_id(prompt_id)
 
     input_brain.update_brain_fields()
     return {"message": f"Brain {brain_id} has been updated."}
