@@ -15,15 +15,4 @@ def get_prompt_by_id(prompt_id: UUID) -> Prompt | None:
         Prompt: The prompt
     """
     commons = common_dependencies()
-
-    response = (
-        commons["supabase"]
-        .from_("prompts")
-        .select("*")
-        .filter("id", "eq", prompt_id)
-        .execute()
-    ).data
-
-    if response == []:
-        return None
-    return Prompt(**response[0])
+    return commons["db"].get_prompt_by_id(prompt_id)
