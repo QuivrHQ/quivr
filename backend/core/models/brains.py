@@ -22,6 +22,7 @@ class Brain(BaseModel):
     openai_api_key: Optional[str] = None
     files: List[Any] = []
     max_brain_size = BrainRateLimiting().max_brain_size
+    prompt_id: Optional[UUID] = None
 
     class Config:
         arbitrary_types_allowed = True
@@ -111,7 +112,12 @@ class Brain(BaseModel):
         return response.data
 
     def create_brain_user(self, user_id: UUID, rights, default_brain):
-        response = self.commons["db"].create_brain_user(user_id=user_id, brain_id=self.id, rights=rights, default_brain=default_brain)
+        response = self.commons["db"].create_brain_user(
+            user_id=user_id,
+            brain_id=self.id,
+            rights=rights,
+            default_brain=default_brain,
+        )
         self.id = response.data[0]["brain_id"]
         return response.data
 
@@ -134,7 +140,9 @@ class Brain(BaseModel):
         return self.commons["db"].get_vector_ids_from_file_sha1(file_sha1)
 
     def update_brain_fields(self):
-        return self.commons["db"].update_brain_fields(brain_id=self.id, brain_name=self.name)
+        return self.commons["db"].update_brain_fields(
+            brain_id=self.id, brain_name=self.name
+        )
 
     def update_brain_with_file(self, file_sha1: str):
         # not  used
