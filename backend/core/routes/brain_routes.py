@@ -54,7 +54,6 @@ async def get_default_brain_endpoint(current_user: User = Depends(get_current_us
     return {"id": brain.id, "name": brain.name, "rights": "Owner"}
 
 
-# get one brain - Currently not used in FE
 @brain_router.get(
     "/brains/{brain_id}/",
     dependencies=[Depends(AuthBearer()), Depends(has_brain_authorization())],
