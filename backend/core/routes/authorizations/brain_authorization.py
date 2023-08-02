@@ -1,17 +1,12 @@
-from enum import Enum
 from typing import List, Optional, Union
 from uuid import UUID
 
 from auth.auth_bearer import get_current_user
 from fastapi import Depends, HTTPException, status
-from models.brains import Brain
 from models.users import User
+from repository.brain.get_brain_for_user import get_brain_for_user
 
-
-class RoleEnum(str, Enum):
-    Viewer = "Viewer"
-    Editor = "Editor"
-    Owner = "Owner"
+from routes.authorizations.types import RoleEnum
 
 
 def has_brain_authorization(
@@ -53,8 +48,7 @@ def validate_brain_authorization(
             detail="Missing required role",
         )
 
-    brain = Brain(id=brain_id)
-    user_brain = brain.get_brain_for_user(user_id)
+    user_brain = get_brain_for_user(user_id, brain_id)
     if user_brain is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -66,7 +60,7 @@ def validate_brain_authorization(
         required_roles = [required_roles]
 
     # Check if the user has at least one of the required roles
-    if user_brain.get("rights") not in required_roles:
+    if user_brain.rights not in required_roles:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="You don't have the required role(s) for this brain",

@@ -7,6 +7,9 @@ from models.brains import Brain
 from models.brains_subscription_invitations import BrainSubscription
 from models.users import User
 from pydantic import BaseModel
+from repository.brain.create_brain_user import create_brain_user
+from repository.brain.get_brain_details import get_brain_details
+from repository.brain.get_brain_for_user import get_brain_for_user
 from repository.brain.update_user_rights import update_brain_user_rights
 from repository.brain_subscription.resend_invitation_email import (
     resend_invitation_email,
@@ -121,14 +124,14 @@ async def remove_user_subscription(
     brain = Brain(
         id=brain_id,
     )
-    user_brain = brain.get_brain_for_user(current_user.id)
+    user_brain = get_brain_for_user(current_user.id, brain_id)
     if user_brain is None:
         raise HTTPException(
             status_code=403,
             detail="You don't have permission for this brain",
         )
 
-    if user_brain.get("rights") != "Owner":
+    if user_brain.rights != "Owner":
         brain.delete_user_from_brain(current_user.id)
     else:
         brain_users = brain.get_brain_users()
@@ -170,8 +173,7 @@ def get_user_invitation(brain_id: UUID, current_user: User = Depends(get_current
             detail="You have not been invited to this brain",
         )
 
-    brain = Brain(id=brain_id)
-    brain_details = brain.get_brain_details()
+    brain_details = get_brain_details(brain_id)
 
     if brain_details is None:
         raise HTTPException(
@@ -179,7 +181,7 @@ def get_user_invitation(brain_id: UUID, current_user: User = Depends(get_current
             detail="Brain not found while trying to get invitation",
         )
 
-    return {"name": brain_details["name"], "rights": invitation["rights"]}
+    return {"name": brain_details.name, "rights": invitation["rights"]}
 
 
 @subscription_router.post(
@@ -208,9 +210,11 @@ async def accept_invitation(
         raise HTTPException(status_code=404, detail="Invitation not found")
 
     try:
-        brain = Brain(id=brain_id)
-        brain.create_brain_user(
-            user_id=current_user.id, rights=invitation["rights"], default_brain=False
+        create_brain_user(
+            user_id=current_user.id,
+            brain_id=brain_id,
+            rights=invitation["rights"],
+            is_default_brain=False,
         )
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"Error adding user to brain: {e}")
@@ -299,8 +303,8 @@ def update_brain_subscription(
             )
 
     # check if user is not an editor trying to update an owner right which is not allowed
-    current_invitation = brain.get_brain_for_user(user_id)
-    if current_invitation is not None and current_invitation.get("rights") == "Owner":
+    current_invitation = get_brain_for_user(user_id, brain_id)
+    if current_invitation is not None and current_invitation.rights == "Owner":
         try:
             validate_brain_authorization(
                 brain_id,
