@@ -74,7 +74,7 @@ class BaseBrainPicking(BaseModel):
 
         # the below methods define the names, arguments and return types for the most useful functions for the child classes. These should be overwritten if they are used.
         @abstractmethod
-        def _create_llm(self, model, streaming=False, callbacks=None) -> LLM:
+        def _create_llm(self, model, temperature=0, streaming=False, callbacks=None) -> LLM:
             """
             Determine and construct the language model.
             :param model: Language model name to be used.

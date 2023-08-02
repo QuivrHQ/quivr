@@ -171,15 +171,27 @@ class QABaseBrainPicking(BaseBrainPicking):
         :return: An async iterable which generates the answer.
         """
         history = get_chat_history(self.chat_id)
-        callback = self.callbacks[0]
         callback = AsyncIteratorCallbackHandler()
         self.callbacks = [callback]
-        model = self._create_llm(model=self.model, streaming=True, callbacks=self.callbacks)
-        llm = self._create_llm(model=self.model,temperature=self.temperature)
-        question_generator = LLMChain(llm=llm, prompt=CONDENSE_QUESTION_PROMPT)
-        doc_chain = load_qa_chain(model, chain_type="stuff")
+
+        # The Model used to answer the question with the context
+        answering_llm = self._create_llm(model=self.model, streaming=True, callbacks=self.callbacks,temperature=self.temperature)
+
+        
+        # The Model used to create the standalone Question
+        # Temperature = 0 means no randomness
+        standalone_question_llm = self._create_llm(model=self.model)
+
+        # The Chain that generates the standalone question
+        standalone_question_generator = LLMChain(llm=standalone_question_llm, prompt=CONDENSE_QUESTION_PROMPT)
+
+        # The Chain that generates the answer to the question
+        doc_chain = load_qa_chain(answering_llm, chain_type="stuff")
+
+        # The Chain that combines the question and answer
         qa = ConversationalRetrievalChain(
-            retriever=self.vector_store.as_retriever(), combine_docs_chain=doc_chain, question_generator=question_generator)
+            retriever=self.vector_store.as_retriever(), combine_docs_chain=doc_chain, question_generator=standalone_question_generator)
+        
         transformed_history = []
 
         # Format the chat history into a list of tuples (human, ai)

@@ -12,12 +12,17 @@ class Brain(Repository):
 
     def get_user_brains(self, user_id):
         response = (
-            self.db.from_("brains_users")
-            .select("id:brain_id, brains (id: brain_id, name)")
+            self.db
+            .from_("brains_users")
+            .select("id:brain_id, rights, brains (id: brain_id, name)")
             .filter("user_id", "eq", user_id)
             .execute()
         )
-        return [item["brains"] for item in response.data]
+        user_brains = []
+        for item in response.data:
+            user_brains.append(item["brains"])
+            user_brains[-1]["rights"] = item["rights"]
+        return user_brains
 
     def get_brain_for_user(self, user_id, brain_id):
         response = (
