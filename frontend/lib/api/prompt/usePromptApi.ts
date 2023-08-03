@@ -4,6 +4,7 @@ import {
   createPrompt,
   CreatePromptProps,
   getPrompt,
+  getPublicPrompts,
   PromptUpdatableProperties,
   updatePrompt,
 } from "./prompt";
@@ -18,5 +19,6 @@ export const usePromptApi = () => {
     getPrompt: async (promptId: string) => getPrompt(promptId, axiosInstance),
     updatePrompt: async (promptId: string, prompt: PromptUpdatableProperties) =>
       updatePrompt(promptId, prompt, axiosInstance),
+    getPublicPrompts: async () => await getPublicPrompts(axiosInstance),
   };
 };

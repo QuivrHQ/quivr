@@ -123,6 +123,21 @@ export const useAddBrainModal = () => {
     }
   };
 
+  const pickPublicPrompt = ({
+    title,
+    content,
+  }: {
+    title: string;
+    content: string;
+  }): void => {
+    setValue("prompt.title", title, {
+      shouldDirty: true,
+    });
+    setValue("prompt.content", content, {
+      shouldDirty: true,
+    });
+  };
+
   return {
     isShareModalOpen,
     setIsShareModalOpen,
@@ -133,5 +148,6 @@ export const useAddBrainModal = () => {
     temperature,
     maxTokens,
     isPending,
+    pickPublicPrompt,
   };
 };

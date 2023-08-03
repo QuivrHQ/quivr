@@ -1,5 +1,5 @@
 import { renderHook } from "@testing-library/react";
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { CreatePromptProps, PromptUpdatableProperties } from "../prompt";
 import { usePromptApi } from "../usePromptApi";
@@ -19,6 +19,10 @@ vi.mock("@/lib/hooks", () => ({
 }));
 
 describe("usePromptApi", () => {
+  afterEach(() => {
+    vi.resetAllMocks();
+  });
+
   it("should call createPrompt with the correct parameters", async () => {
     const prompt: CreatePromptProps = {
       title: "Test Prompt",
@@ -66,5 +70,18 @@ describe("usePromptApi", () => {
 
     expect(axiosPutMock).toHaveBeenCalledTimes(1);
     expect(axiosPutMock).toHaveBeenCalledWith(`/prompts/${promptId}`, prompt);
+  });
+  it("should call getPublicPrompts with the correct parameters", async () => {
+    axiosGetMock.mockReturnValue({ data: [] });
+    const {
+      result: {
+        current: { getPublicPrompts },
+      },
+    } = renderHook(() => usePromptApi());
+
+    await getPublicPrompts();
+
+    expect(axiosGetMock).toHaveBeenCalledTimes(1);
+    expect(axiosGetMock).toHaveBeenCalledWith("/prompts");
   });
 });
