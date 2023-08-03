@@ -80,7 +80,7 @@ class Chats(Repository):
         return response
 
     def delete_chat(self, chat_id):
-        self.db.table("chat_history").delete().match({"chat_id": chat_id}).execute()
+        self.db.table("chats").delete().match({"chat_id": chat_id}).execute()
 
     def delete_chat_history(self, chat_id):
         self.db.table("chat_history").delete().match({"chat_id": chat_id}).execute()
