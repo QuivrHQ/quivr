@@ -1,12 +1,11 @@
 import os
 import time
-from http.client import HTTPException
 from typing import List
 from uuid import UUID
 from venv import logger
 
 from auth import AuthBearer, get_current_user
-from fastapi import APIRouter, Depends, Query, Request
+from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from fastapi.responses import StreamingResponse
 from llm.openai import OpenAIBrainPicking
 from models.brains import Brain
@@ -126,7 +125,7 @@ async def update_chat_metadata_handler(
     """
 
     chat = get_chat_by_id(chat_id)  # pyright: ignore reportPrivateUsage=none
-    if current_user.id != chat.user_id:
+    if str(current_user.id) != chat.user_id:
         raise HTTPException(
             status_code=403,  # pyright: ignore reportPrivateUsage=none
             detail="You should be the owner of the chat to update it.",  # pyright: ignore reportPrivateUsage=none
