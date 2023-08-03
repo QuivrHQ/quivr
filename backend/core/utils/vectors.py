@@ -3,7 +3,12 @@ from typing import List
 
 from langchain.embeddings.openai import OpenAIEmbeddings
 from logger import get_logger
-from models.settings import BrainSettings, CommonsDep, common_dependencies
+from models.settings import (
+    BrainSettings,
+    CommonsDep,
+    common_dependencies,
+    get_documents_vector_store,
+)
 from pydantic import BaseModel
 
 logger = get_logger(__name__)
@@ -14,14 +19,15 @@ class Neurons(BaseModel):
     settings = BrainSettings()  # pyright: ignore reportPrivateUsage=none
 
     def create_vector(self, doc, user_openai_api_key=None):
+        documents_vector_store = get_documents_vector_store()
         logger.info("Creating vector for document")
         logger.info(f"Document: {doc}")
         if user_openai_api_key:
-            self.commons["documents_vector_store"]._embedding = OpenAIEmbeddings(
+            documents_vector_store._embedding = OpenAIEmbeddings(
                 openai_api_key=user_openai_api_key
             )  # pyright: ignore reportPrivateUsage=none
         try:
-            sids = self.commons["documents_vector_store"].add_documents([doc])
+            sids = documents_vector_store.add_documents([doc])
             if sids and len(sids) > 0:
                 return sids
 
@@ -33,7 +39,9 @@ class Neurons(BaseModel):
 
     def similarity_search(self, query, table="match_summaries", top_k=5, threshold=0.5):
         query_embedding = self.create_embedding(query)
-        summaries = self.commons["db"].similarity_search(query_embedding, table, top_k, threshold)
+        summaries = self.commons["db"].similarity_search(
+            query_embedding, table, top_k, threshold
+        )
         return summaries.data
 
 

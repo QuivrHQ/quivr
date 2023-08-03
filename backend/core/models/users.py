@@ -2,12 +2,8 @@ from typing import Optional
 from uuid import UUID
 
 from logger import get_logger
-
-from models.settings import common_dependencies, CommonsDep
-
+from models.settings import CommonsDep, common_dependencies
 from pydantic import BaseModel
-
-from models.settings import common_dependencies
 
 logger = get_logger(__name__)
 
@@ -18,7 +14,7 @@ class User(BaseModel):
     email: Optional[str]
     user_openai_api_key: Optional[str] = None
     requests_count: int = 0
-      
+
     @property
     def commons(self) -> CommonsDep:
         return common_dependencies()
@@ -49,10 +45,10 @@ class User(BaseModel):
         Increment the user request count in the database
         """
         response = self.commons["db"].fetch_user_requests_count(self.id, date)
-        
+
         userItem = next(iter(response.data or []), {"requests_count": 0})
         requests_count = userItem["requests_count"] + 1
         logger.info(f"User {self.email} request count updated to {requests_count}")
         self.commons["db"].update_user_request_count(self.id, requests_count, date)
-        
+
         self.requests_count = requests_count
