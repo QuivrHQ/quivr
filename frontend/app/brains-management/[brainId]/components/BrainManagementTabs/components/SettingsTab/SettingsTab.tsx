@@ -6,7 +6,7 @@ import { FaSpinner } from "react-icons/fa";
 import Button from "@/lib/components/ui/Button";
 import { Divider } from "@/lib/components/ui/Divider";
 import Field from "@/lib/components/ui/Field";
-import { TextArea } from "@/lib/components/ui/TextField";
+import { TextArea } from "@/lib/components/ui/TextArea";
 import { models, paidModels } from "@/lib/context/BrainConfigProvider/types";
 import { defineMaxTokens } from "@/lib/helpers/defineMexTokens";
 
