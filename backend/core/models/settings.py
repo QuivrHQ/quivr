@@ -1,4 +1,4 @@
-from typing import Annotated
+from typing import Annotated, TypedDict
 
 from fastapi import Depends
 from langchain.embeddings.openai import OpenAIEmbeddings
@@ -28,7 +28,14 @@ class LLMSettings(BaseSettings):
     model_path: str = "./local_models/ggml-gpt4all-j-v1.3-groovy.bin"
 
 
-def common_dependencies() -> dict:
+class CommonDependencies(TypedDict):
+    supabase: Client
+    db: SupabaseDB
+    embeddings: OpenAIEmbeddings
+    documents_vector_store: SupabaseVectorStore
+
+
+def common_dependencies() -> CommonDependencies:
     settings = BrainSettings()  # pyright: ignore reportPrivateUsage=none
     embeddings = OpenAIEmbeddings(
         openai_api_key=settings.openai_api_key
@@ -39,9 +46,6 @@ def common_dependencies() -> dict:
     documents_vector_store = SupabaseVectorStore(
         supabase_client, embeddings, table_name="vectors"
     )
-    summaries_vector_store = SupabaseVectorStore(
-        supabase_client, embeddings, table_name="summaries"
-    )
 
     db = None
     db = SupabaseDB(supabase_client)
@@ -51,7 +55,6 @@ def common_dependencies() -> dict:
         "db": db,
         "embeddings": embeddings,
         "documents_vector_store": documents_vector_store,
-        "summaries_vector_store": summaries_vector_store,
     }
 
 
