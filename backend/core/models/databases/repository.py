@@ -2,10 +2,12 @@ from abc import ABC, abstractmethod
 from datetime import datetime
 from uuid import UUID
 
+from models.brain_entity import BrainEntity
+
 
 class Repository(ABC):
     @abstractmethod
-    def get_user_brains(self, user_id: str):
+    def get_user_brains(self, user_id: str) -> list[BrainEntity]:
         pass
 
     @abstractmethod
@@ -29,7 +31,7 @@ class Repository(ABC):
         pass
 
     @abstractmethod
-    def create_brain(self, name: str):
+    def create_brain(self, brain: str):
         pass
 
     @abstractmethod
@@ -47,10 +49,6 @@ class Repository(ABC):
         pass
 
     @abstractmethod
-    def update_brain_fields(self, brain_id: UUID, brain_name: str):
-        pass
-
-    @abstractmethod
     def get_brain_vector_ids(self, brain_id: UUID):
         pass
 
@@ -59,7 +57,7 @@ class Repository(ABC):
         pass
 
     @abstractmethod
-    def get_default_user_brain_id(self, user_id: UUID):
+    def get_default_user_brain_id(self, user_id: UUID) -> UUID:
         pass
 
     @abstractmethod
