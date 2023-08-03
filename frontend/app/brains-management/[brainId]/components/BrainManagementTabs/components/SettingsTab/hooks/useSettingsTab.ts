@@ -264,6 +264,10 @@ export const useSettingsTab = ({ brainId }: UseSettingsTabProps) => {
           ...otherConfigs,
           max_tokens,
           openai_api_key,
+          prompt_id:
+            otherConfigs["prompt_id"] !== ""
+              ? otherConfigs["prompt_id"]
+              : undefined,
         });
       }
 
