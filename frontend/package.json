@@ -20,6 +20,7 @@
     "@emotion/styled": "^11.11.0",
     "@growthbook/growthbook-react": "^0.17.0",
     "@june-so/analytics-next": "^2.0.0",
+    "@radix-ui/react-accordion": "^1.1.2",
     "@radix-ui/react-dialog": "^1.0.3",
     "@radix-ui/react-popover": "^1.0.6",
     "@radix-ui/react-select": "^1.2.2",

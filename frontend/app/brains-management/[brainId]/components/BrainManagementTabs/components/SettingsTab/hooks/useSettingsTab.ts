@@ -299,6 +299,17 @@ export const useSettingsTab = ({ brainId }: UseSettingsTabProps) => {
     }
   };
 
+  const pickPublicPrompt = ({
+    title,
+    content,
+  }: {
+    title: string;
+    content: string;
+  }): void => {
+    setValue("prompt.title", title);
+    setValue("prompt.content", content);
+  };
+
   return {
     handleSubmit,
     register,
@@ -313,5 +324,6 @@ export const useSettingsTab = ({ brainId }: UseSettingsTabProps) => {
     formRef,
     promptId,
     removeBrainPrompt,
+    pickPublicPrompt,
   };
 };
