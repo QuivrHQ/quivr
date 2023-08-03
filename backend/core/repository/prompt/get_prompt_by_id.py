@@ -1,7 +1,7 @@
 from uuid import UUID
 
 from models.prompt import Prompt
-from models.settings import common_dependencies
+from models.settings import get_supabase_db
 
 
 def get_prompt_by_id(prompt_id: UUID) -> Prompt | None:
@@ -14,5 +14,5 @@ def get_prompt_by_id(prompt_id: UUID) -> Prompt | None:
     Returns:
         Prompt: The prompt
     """
-    commons = common_dependencies()
-    return commons["db"].get_prompt_by_id(prompt_id)
+    supabase_db = get_supabase_db()
+    return supabase_db.get_prompt_by_id(prompt_id)

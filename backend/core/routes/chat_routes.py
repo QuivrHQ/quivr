@@ -11,7 +11,8 @@ from llm.openai import OpenAIBrainPicking
 from models.brains import Brain
 from models.chat import Chat, ChatHistory
 from models.chats import ChatQuestion
-from models.settings import LLMSettings, common_dependencies
+from models.databases.supabase.supabase import SupabaseDB
+from models.settings import LLMSettings, get_supabase_db
 from models.users import User
 from repository.brain.get_brain_details import get_brain_details
 from repository.brain.get_default_user_brain_or_create_new import (
@@ -42,27 +43,17 @@ class NullableUUID(UUID):
             return None
 
 
-def get_chat_details(commons, chat_id):
-    return commons["db"].get_chat_details(chat_id)
-
-
-def delete_chat_from_db(commons, chat_id):
+def delete_chat_from_db(supabase_db: SupabaseDB, chat_id):
     try:
-        commons["db"].delete_chat_history(chat_id)
+        supabase_db.delete_chat_history(chat_id)
     except Exception as e:
         print(e)
         pass
     try:
-        commons["db"].delete_chat(chat_id)
+        supabase_db.delete_chat(chat_id)
     except Exception as e:
         print(e)
         pass
-
-
-def fetch_user_stats(commons, user, date):
-    response = commons["db"].get_user_stats(user.email, date)
-    userItem = next(iter(response.data or []), {"requests_count": 0})
-    return userItem
 
 
 def check_user_limit(
@@ -106,8 +97,8 @@ async def delete_chat(chat_id: UUID):
     """
     Delete a specific chat by chat ID.
     """
-    commons = common_dependencies()
-    delete_chat_from_db(commons, chat_id)
+    supabase_db = get_supabase_db()
+    delete_chat_from_db(supabase_db=supabase_db, chat_id=chat_id)
     return {"message": f"{chat_id}  has been deleted."}
 
 

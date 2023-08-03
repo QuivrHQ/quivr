@@ -1,7 +1,7 @@
 from uuid import UUID
 
 from models.databases.supabase.prompts import DeletePromptResponse
-from models.settings import common_dependencies
+from models.settings import get_supabase_db
 
 
 def delete_prompt_by_id(prompt_id: UUID) -> DeletePromptResponse:
@@ -13,5 +13,5 @@ def delete_prompt_by_id(prompt_id: UUID) -> DeletePromptResponse:
     Returns:
         Prompt: The prompt
     """
-    commons = common_dependencies()
-    return commons["db"].delete_prompt_by_id(prompt_id)
+    supabase_db = get_supabase_db()
+    return supabase_db.delete_prompt_by_id(prompt_id)

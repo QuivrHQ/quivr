@@ -1,9 +1,9 @@
 from models.databases.supabase.prompts import CreatePromptProperties
 from models.prompt import Prompt
-from models.settings import common_dependencies
+from models.settings import get_supabase_db
 
 
 def create_prompt(prompt: CreatePromptProperties) -> Prompt:
-    commons = common_dependencies()
+    supabase_db = get_supabase_db()
 
-    return commons["db"].create_prompt(prompt)
+    return supabase_db.create_prompt(prompt)

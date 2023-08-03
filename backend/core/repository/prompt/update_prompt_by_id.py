@@ -2,11 +2,11 @@ from uuid import UUID
 
 from models.databases.supabase.prompts import PromptUpdatableProperties
 from models.prompt import Prompt
-from models.settings import common_dependencies
+from models.settings import get_supabase_db
 
 
 def update_prompt_by_id(prompt_id: UUID, prompt: PromptUpdatableProperties) -> Prompt:
     """Update a prompt by id"""
-    commons = common_dependencies()
+    supabase_db = get_supabase_db()
 
-    return commons["db"].update_prompt_by_id(prompt_id, prompt)
+    return supabase_db.update_prompt_by_id(prompt_id, prompt)

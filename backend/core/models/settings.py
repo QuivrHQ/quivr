@@ -1,6 +1,3 @@
-from typing import Annotated, TypedDict
-
-from fastapi import Depends
 from langchain.embeddings.openai import OpenAIEmbeddings
 from models.databases.supabase.supabase import SupabaseDB
 from pydantic import BaseSettings
@@ -28,34 +25,34 @@ class LLMSettings(BaseSettings):
     model_path: str = "./local_models/ggml-gpt4all-j-v1.3-groovy.bin"
 
 
-class CommonDependencies(TypedDict):
-    supabase: Client
-    db: SupabaseDB
-    embeddings: OpenAIEmbeddings
-    documents_vector_store: SupabaseVectorStore
+def get_supabase_client() -> Client:
+    settings = BrainSettings()  # pyright: ignore reportPrivateUsage=none
+    supabase_client: Client = create_client(
+        settings.supabase_url, settings.supabase_service_key
+    )
+    return supabase_client
 
 
-def common_dependencies() -> CommonDependencies:
+def get_supabase_db() -> SupabaseDB:
+    supabase_client = get_supabase_client()
+    return SupabaseDB(supabase_client)
+
+
+def get_embeddings() -> OpenAIEmbeddings:
     settings = BrainSettings()  # pyright: ignore reportPrivateUsage=none
     embeddings = OpenAIEmbeddings(
         openai_api_key=settings.openai_api_key
     )  # pyright: ignore reportPrivateUsage=none
+    return embeddings
+
+
+def get_documents_vector_store() -> SupabaseVectorStore:
+    settings = BrainSettings()  # pyright: ignore reportPrivateUsage=none
+    embeddings = get_embeddings()
     supabase_client: Client = create_client(
         settings.supabase_url, settings.supabase_service_key
     )
     documents_vector_store = SupabaseVectorStore(
         supabase_client, embeddings, table_name="vectors"
     )
-
-    db = None
-    db = SupabaseDB(supabase_client)
-
-    return {
-        "supabase": supabase_client,
-        "db": db,
-        "embeddings": embeddings,
-        "documents_vector_store": documents_vector_store,
-    }
-
-
-CommonsDep = Annotated[dict, Depends(common_dependencies)]
+    return documents_vector_store

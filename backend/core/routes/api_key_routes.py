@@ -6,7 +6,7 @@ from asyncpg.exceptions import UniqueViolationError
 from auth import AuthBearer, get_current_user
 from fastapi import APIRouter, Depends
 from logger import get_logger
-from models.settings import CommonsDep
+from models.settings import get_supabase_db
 from models.users import User
 from pydantic import BaseModel
 
@@ -32,9 +32,7 @@ api_key_router = APIRouter()
     dependencies=[Depends(AuthBearer())],
     tags=["API Key"],
 )
-async def create_api_key(
-    commons: CommonsDep, current_user: User = Depends(get_current_user)
-):
+async def create_api_key(current_user: User = Depends(get_current_user)):
     """
     Create new API key for the current user.
 
@@ -48,11 +46,12 @@ async def create_api_key(
     new_key_id = uuid4()
     new_api_key = token_hex(16)
     api_key_inserted = False
+    supabase_db = get_supabase_db()
 
     while not api_key_inserted:
         try:
             # Attempt to insert new API key into database
-            commons["db"].create_api_key(new_key_id, new_api_key, current_user.id)
+            supabase_db.create_api_key(new_key_id, new_api_key, current_user.id)
             api_key_inserted = True
 
         except UniqueViolationError:
@@ -69,9 +68,7 @@ async def create_api_key(
 @api_key_router.delete(
     "/api-key/{key_id}", dependencies=[Depends(AuthBearer())], tags=["API Key"]
 )
-async def delete_api_key(
-    key_id: str, commons: CommonsDep, current_user: User = Depends(get_current_user)
-):
+async def delete_api_key(key_id: str, current_user: User = Depends(get_current_user)):
     """
     Delete (deactivate) an API key for the current user.
 
@@ -81,8 +78,8 @@ async def delete_api_key(
     as inactive in the database.
 
     """
-
-    commons["db"].delete_api_key(key_id, current_user.id)
+    supabase_db = get_supabase_db()
+    supabase_db.delete_api_key(key_id, current_user.id)
 
     return {"message": "API key deleted."}
 
@@ -93,9 +90,7 @@ async def delete_api_key(
     dependencies=[Depends(AuthBearer())],
     tags=["API Key"],
 )
-async def get_api_keys(
-    commons: CommonsDep, current_user: User = Depends(get_current_user)
-):
+async def get_api_keys(current_user: User = Depends(get_current_user)):
     """
     Get all active API keys for the current user.
 
@@ -105,6 +100,6 @@ async def get_api_keys(
     This endpoint retrieves all the active API keys associated with the current user. It returns a list of API key objects
     containing the key ID and creation time for each API key.
     """
-
-    response = commons["db"].get_user_api_keys(current_user.id)
+    supabase_db = get_supabase_db()
+    response = supabase_db.get_user_api_keys(current_user.id)
     return response.data

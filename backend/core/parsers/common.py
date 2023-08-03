@@ -3,12 +3,10 @@ import time
 from langchain.schema import Document
 from models.brains import Brain
 from models.files import File
-from models.settings import CommonsDep
 from utils.vectors import Neurons
 
 
 async def process_file(
-    commons: CommonsDep,
     file: File,
     loader_class,
     enable_summarization,
@@ -31,7 +29,7 @@ async def process_file(
         }
         doc_with_metadata = Document(page_content=doc.page_content, metadata=metadata)
 
-        neurons = Neurons(commons=commons)
+        neurons = Neurons()
         created_vector = neurons.create_vector(doc_with_metadata, user_openai_api_key)
         # add_usage(stats_db, "embedding", "audio", metadata={"file_name": file_meta_name,"file_type": ".txt", "chunk_size": chunk_size, "chunk_overlap": chunk_overlap})
 
