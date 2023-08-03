@@ -1,3 +1,5 @@
+import { UUID } from "crypto";
+
 export type BrainConfig = {
   model: Model;
   temperature: number;
@@ -8,6 +10,7 @@ export type BrainConfig = {
   anthropicKey?: string;
   supabaseUrl?: string;
   supabaseKey?: string;
+  prompt_id?: UUID;
 };
 
 type OptionalConfig = { [K in keyof BrainConfig]?: BrainConfig[K] | undefined };
