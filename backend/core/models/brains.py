@@ -2,10 +2,12 @@ from typing import Any, List, Optional
 from uuid import UUID
 
 from logger import get_logger
+from models.settings import BrainRateLimiting, common_dependencies
 from pydantic import BaseModel
+from supabase.client import Client
 from utils.vectors import get_unique_files_from_vector_ids
 
-from models.settings import BrainRateLimiting, CommonsDep, common_dependencies
+from backend.core.models.settings import CommonsDep, get_supabase_client
 
 logger = get_logger(__name__)
 
@@ -27,6 +29,10 @@ class Brain(BaseModel):
         arbitrary_types_allowed = True
 
     @property
+    def supabase_client(self) -> Client:
+        return get_supabase_client()
+
+    @property
     def commons(self) -> CommonsDep:
         return common_dependencies()
 
@@ -46,7 +52,7 @@ class Brain(BaseModel):
 
     @classmethod
     def create(cls, *args, **kwargs):
-        commons = common_dependencies()
+        commons = {"supabase": get_supabase_client()}
         return cls(
             commons=commons, *args, **kwargs  # pyright: ignore reportPrivateUsage=none
         )  # pyright: ignore reportPrivateUsage=none
@@ -54,8 +60,7 @@ class Brain(BaseModel):
     # TODO: move this to a brand new BrainService
     def get_brain_users(self):
         response = (
-            self.commons["supabase"]
-            .table("brains_users")
+            self.supabase_client.table("brains_users")
             .select("id:brain_id, *")
             .filter("brain_id", "eq", self.id)
             .execute()
@@ -65,15 +70,14 @@ class Brain(BaseModel):
     # TODO: move this to a brand new BrainService
     def delete_user_from_brain(self, user_id):
         results = (
-            self.commons["supabase"]
-            .table("brains_users")
+            self.supabase_client.table("brains_users")
             .select("*")
             .match({"brain_id": self.id, "user_id": user_id})
             .execute()
         )
 
         if len(results.data) != 0:
-            self.commons["supabase"].table("brains_users").delete().match(
+            self.supabase_client.table("brains_users").delete().match(
                 {"brain_id": self.id, "user_id": user_id}
             ).execute()
 

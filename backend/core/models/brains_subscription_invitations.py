@@ -2,8 +2,9 @@ from uuid import UUID
 
 from logger import get_logger
 from pydantic import BaseModel
+from supabase.client import Client
 
-from models.settings import CommonsDep, common_dependencies
+from backend.core.models.settings import get_supabase_client
 
 logger = get_logger(__name__)
 
@@ -17,14 +18,13 @@ class BrainSubscription(BaseModel):
         arbitrary_types_allowed = True
 
     @property
-    def commons(self) -> CommonsDep:
-        return common_dependencies()
+    def supabase_client(self) -> Client:
+        return get_supabase_client()
 
     def create_subscription_invitation(self):
         logger.info("Creating subscription invitation")
         response = (
-            self.commons["supabase"]
-            .table("brain_subscription_invitations")
+            self.supabase_client.table("brain_subscription_invitations")
             .insert(
                 {
                     "brain_id": str(self.brain_id),
@@ -39,8 +39,7 @@ class BrainSubscription(BaseModel):
     def update_subscription_invitation(self):
         logger.info("Updating subscription invitation")
         response = (
-            self.commons["supabase"]
-            .table("brain_subscription_invitations")
+            self.supabase_client.table("brain_subscription_invitations")
             .update({"rights": self.rights})
             .eq("brain_id", str(self.brain_id))
             .eq("email", self.email)
@@ -50,8 +49,7 @@ class BrainSubscription(BaseModel):
 
     def create_or_update_subscription_invitation(self):
         response = (
-            self.commons["supabase"]
-            .table("brain_subscription_invitations")
+            self.supabase_client.table("brain_subscription_invitations")
             .select("*")
             .eq("brain_id", str(self.brain_id))
             .eq("email", self.email)
