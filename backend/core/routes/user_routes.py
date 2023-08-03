@@ -19,11 +19,6 @@ user_router = APIRouter()
 MAX_BRAIN_SIZE_WITH_OWN_KEY = int(os.getenv("MAX_BRAIN_SIZE_WITH_KEY", 209715200))
 
 
-def get_unique_documents(vectors):
-    # Convert each dictionary to a tuple of items, then to a set to remove duplicates, and then back to a dictionary
-    return [dict(t) for t in set(tuple(d.items()) for d in vectors)]
-
-
 @user_router.get("/user", dependencies=[Depends(AuthBearer())], tags=["User"])
 async def get_user_endpoint(
     request: Request, current_user: User = Depends(get_current_user)
