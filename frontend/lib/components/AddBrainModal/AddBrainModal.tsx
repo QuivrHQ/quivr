@@ -8,7 +8,8 @@ import { models, paidModels } from "@/lib/context/BrainConfigProvider/types";
 import { defineMaxTokens } from "@/lib/helpers/defineMexTokens";
 
 import { useAddBrainModal } from "./hooks/useAddBrainModal";
-import { TextArea } from "../ui/TextField";
+import { Divider } from "../ui/Divider";
+import { TextArea } from "../ui/TextArea";
 
 export const AddBrainModal = (): JSX.Element => {
   const {
@@ -38,7 +39,10 @@ export const AddBrainModal = (): JSX.Element => {
       CloseTrigger={<div />}
     >
       <form
-        onSubmit={(e) => void handleSubmit(e)}
+        onSubmit={(e) => {
+          e.preventDefault();
+          void handleSubmit();
+        }}
         className="my-10 flex flex-col items-center gap-2"
       >
         <Field
@@ -111,6 +115,21 @@ export const AddBrainModal = (): JSX.Element => {
             {...register("maxTokens")}
           />
         </fieldset>
+        <Divider text="Custom prompt" />
+        <Field
+          label="Prompt title"
+          placeholder="My awesome prompt name"
+          autoComplete="off"
+          className="flex-1"
+          {...register("prompt.title")}
+        />
+        <TextArea
+          label="Prompt content"
+          placeholder="As an AI, your..."
+          autoComplete="off"
+          className="flex-1"
+          {...register("prompt.content")}
+        />
         <div className="flex flex-row justify-start w-full mt-4">
           <label className="flex items-center">
             <span className="mr-2 text-gray-700">Set as default brain</span>

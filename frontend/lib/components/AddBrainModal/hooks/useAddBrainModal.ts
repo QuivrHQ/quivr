@@ -1,9 +1,10 @@
 /* eslint-disable max-lines */
 import axios from "axios";
-import { FormEvent, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 
 import { useBrainApi } from "@/lib/api/brain/useBrainApi";
+import { usePromptApi } from "@/lib/api/prompt/usePromptApi";
 import { useBrainConfig } from "@/lib/context/BrainConfigProvider";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 import { defineMaxTokens } from "@/lib/helpers/defineMexTokens";
@@ -15,6 +16,7 @@ export const useAddBrainModal = () => {
   const { publish } = useToast();
   const { createBrain, setActiveBrain } = useBrainContext();
   const { setAsDefaultBrain } = useBrainApi();
+  const { createPrompt } = usePromptApi();
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const { config } = useBrainConfig();
   const defaultValues = {
@@ -22,6 +24,10 @@ export const useAddBrainModal = () => {
     name: "",
     description: "",
     setDefault: false,
+    prompt: {
+      title: "",
+      content: "",
+    },
   };
 
   const { register, getValues, reset, watch, setValue } = useForm({
@@ -37,8 +43,17 @@ export const useAddBrainModal = () => {
     setValue("maxTokens", Math.min(maxTokens, defineMaxTokens(model)));
   }, [maxTokens, model, setValue]);
 
-  const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault();
+  const getCreatingBrainPromptId = async (): Promise<string | undefined> => {
+    const { prompt } = getValues();
+
+    if (prompt.title.trim() !== "" && prompt.content.trim() !== "") {
+      return (await createPrompt(prompt)).id;
+    }
+
+    return undefined;
+  };
+
+  const handleSubmit = async () => {
     const { name, description, setDefault } = getValues();
 
     if (name.trim() === "" || isPending) {
@@ -47,6 +62,9 @@ export const useAddBrainModal = () => {
 
     try {
       setIsPending(true);
+
+      const prompt_id = await getCreatingBrainPromptId();
+
       const createdBrainId = await createBrain({
         name,
         description,
@@ -54,6 +72,7 @@ export const useAddBrainModal = () => {
         model,
         openai_api_key: openAiKey,
         temperature,
+        prompt_id,
       });
 
       if (createdBrainId === undefined) {
@@ -92,12 +111,13 @@ export const useAddBrainModal = () => {
             ).data.detail
           )}`,
         });
-      } else {
-        publish({
-          variant: "danger",
-          text: `${JSON.stringify(err)}`,
-        });
+
+        return;
       }
+      publish({
+        variant: "danger",
+        text: `${JSON.stringify(err)}`,
+      });
     } finally {
       setIsPending(false);
     }

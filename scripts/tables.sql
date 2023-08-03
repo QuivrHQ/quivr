@@ -126,6 +126,15 @@ CREATE TABLE IF NOT EXISTS api_keys(
     is_active BOOLEAN DEFAULT true
 );
 
+--- Create prompts table
+CREATE TABLE IF NOT EXISTS prompts (
+    id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+    title VARCHAR(255),
+    content TEXT,
+    status VARCHAR(255) DEFAULT 'private'
+);
+
+--- Create brains table
 CREATE TABLE IF NOT EXISTS brains (
   brain_id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   name TEXT NOT NULL,
@@ -173,15 +182,6 @@ CREATE TABLE IF NOT EXISTS brain_subscription_invitations (
 CREATE TABLE IF NOT EXISTS user_identity (
   user_id UUID PRIMARY KEY,
   openai_api_key VARCHAR(255)
-);
-
-
---- Create prompts table
-CREATE TABLE IF NOT EXISTS prompts (
-    id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
-    title VARCHAR(255),
-    content TEXT,
-    status VARCHAR(255) DEFAULT 'private'
 );
 
 
