@@ -11,6 +11,8 @@ from models.settings import (
 )
 from pydantic import BaseModel
 
+from backend.core.models.settings import get_embeddings
+
 logger = get_logger(__name__)
 
 
@@ -35,7 +37,8 @@ class Neurons(BaseModel):
             logger.error(f"Error creating vector for document {e}")
 
     def create_embedding(self, content):
-        return self.commons["embeddings"].embed_query(content)
+        embeddings = get_embeddings()
+        return embeddings.embed_query(content)
 
     def similarity_search(self, query, table="match_summaries", top_k=5, threshold=0.5):
         query_embedding = self.create_embedding(query)

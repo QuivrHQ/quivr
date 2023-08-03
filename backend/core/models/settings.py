@@ -35,11 +35,17 @@ class CommonDependencies(TypedDict):
     documents_vector_store: SupabaseVectorStore
 
 
-def get_documents_vector_store() -> SupabaseVectorStore:
+def get_embeddings() -> OpenAIEmbeddings:
     settings = BrainSettings()  # pyright: ignore reportPrivateUsage=none
     embeddings = OpenAIEmbeddings(
         openai_api_key=settings.openai_api_key
     )  # pyright: ignore reportPrivateUsage=none
+    return embeddings
+
+
+def get_documents_vector_store() -> SupabaseVectorStore:
+    settings = BrainSettings()  # pyright: ignore reportPrivateUsage=none
+    embeddings = get_embeddings()
     supabase_client: Client = create_client(
         settings.supabase_url, settings.supabase_service_key
     )
