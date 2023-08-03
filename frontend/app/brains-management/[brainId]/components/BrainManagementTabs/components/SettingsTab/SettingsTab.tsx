@@ -130,7 +130,7 @@ export const SettingsTab = ({ brainId }: SettingsTabProps): JSX.Element => {
           {...register("maxTokens")}
         />
       </fieldset>
-      <Divider text="prompt" />
+      <Divider text="Custom prompt" />
       <PublicPrompts onSelect={pickPublicPrompt} />
       <Field
         label="Prompt title"

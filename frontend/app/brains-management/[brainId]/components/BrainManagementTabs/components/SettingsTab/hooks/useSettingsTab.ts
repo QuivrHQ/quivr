@@ -257,8 +257,6 @@ export const useSettingsTab = ({ brainId }: UseSettingsTabProps) => {
             promptHandler(),
           ]);
         }
-
-        return;
       } else {
         await updateBrain(brainId, {
           ...otherConfigs,
@@ -306,8 +304,12 @@ export const useSettingsTab = ({ brainId }: UseSettingsTabProps) => {
     title: string;
     content: string;
   }): void => {
-    setValue("prompt.title", title);
-    setValue("prompt.content", content);
+    setValue("prompt.title", title, {
+      shouldDirty: true,
+    });
+    setValue("prompt.content", content, {
+      shouldDirty: true,
+    });
   };
 
   return {

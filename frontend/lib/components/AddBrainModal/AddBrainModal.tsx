@@ -1,6 +1,7 @@
 /* eslint-disable max-lines */
 import { MdAdd } from "react-icons/md";
 
+import { PublicPrompts } from "@/app/brains-management/[brainId]/components/BrainManagementTabs/components/SettingsTab/components/PublicPrompts";
 import Button from "@/lib/components/ui/Button";
 import Field from "@/lib/components/ui/Field";
 import { Modal } from "@/lib/components/ui/Modal";
@@ -22,6 +23,7 @@ export const AddBrainModal = (): JSX.Element => {
     maxTokens,
     model,
     isPending,
+    pickPublicPrompt,
   } = useAddBrainModal();
 
   return (
@@ -116,6 +118,7 @@ export const AddBrainModal = (): JSX.Element => {
           />
         </fieldset>
         <Divider text="Custom prompt" />
+        <PublicPrompts onSelect={pickPublicPrompt} />
         <Field
           label="Prompt title"
           placeholder="My awesome prompt name"
