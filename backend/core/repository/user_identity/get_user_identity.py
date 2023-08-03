@@ -1,9 +1,8 @@
 from uuid import UUID
 
+from models.settings import get_supabase_client
 from models.user_identity import UserIdentity
 from repository.user_identity.create_user_identity import create_user_identity
-
-from backend.core.models.settings import get_supabase_client
 
 
 def get_user_identity(user_id: UUID) -> UserIdentity:

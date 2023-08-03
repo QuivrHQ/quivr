@@ -1,9 +1,9 @@
 from models.brain_entity import BrainEntity
 from models.databases.supabase.brains import CreateBrainProperties
-from models.settings import common_dependencies
+from models.settings import get_supabase_db
 
 
 def create_brain(brain: CreateBrainProperties) -> BrainEntity:
-    commons = common_dependencies()
+    supabase_db = get_supabase_db()
 
-    return commons["db"].create_brain(brain.dict(exclude_unset=True))
+    return supabase_db.create_brain(brain.dict(exclude_unset=True))

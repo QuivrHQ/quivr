@@ -1,10 +1,9 @@
 from uuid import UUID
 
 from logger import get_logger
+from models.settings import get_supabase_client
 from pydantic import BaseModel
 from supabase.client import Client
-
-from backend.core.models.settings import get_supabase_client
 
 logger = get_logger(__name__)
 

@@ -1,6 +1,5 @@
+from models.settings import get_supabase_client
 from models.user_identity import UserIdentity
-
-from backend.core.models.settings import get_supabase_client
 
 
 def create_user_identity(user_identity: UserIdentity) -> UserIdentity:

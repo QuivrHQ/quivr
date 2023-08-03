@@ -2,9 +2,7 @@ from typing import Optional
 
 from logger import get_logger
 from models.brains_subscription_invitations import BrainSubscription
-from models.settings import CommonsDep
-
-from backend.core.models.settings import get_supabase_client
+from models.settings import CommonsDep, get_supabase_client
 
 logger = get_logger(__name__)
 

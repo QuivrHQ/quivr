@@ -1,12 +1,12 @@
-from typing import List  # For type hinting
+from typing import List
 
 from models.chat import ChatHistory
-from models.settings import common_dependencies
+from models.settings import get_supabase_db  # For type hinting
 
 
 def get_chat_history(chat_id: str) -> List[ChatHistory]:
-    commons = common_dependencies()
-    history: List[ChatHistory] = commons["db"].get_chat_history(chat_id).data
+    supabase_db = get_supabase_db()
+    history: List[ChatHistory] = supabase_db.get_chat_history(chat_id).data
     if history is None:
         return []
     else:

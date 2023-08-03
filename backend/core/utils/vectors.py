@@ -6,12 +6,11 @@ from logger import get_logger
 from models.settings import (
     BrainSettings,
     CommonsDep,
-    common_dependencies,
     get_documents_vector_store,
+    get_embeddings,
+    get_supabase_db,
 )
 from pydantic import BaseModel
-
-from backend.core.models.settings import get_embeddings
 
 logger = get_logger(__name__)
 
@@ -42,7 +41,8 @@ class Neurons(BaseModel):
 
     def similarity_search(self, query, table="match_summaries", top_k=5, threshold=0.5):
         query_embedding = self.create_embedding(query)
-        summaries = self.commons["db"].similarity_search(
+        supabase_db = get_supabase_db()
+        summaries = supabase_db.similarity_search(
             query_embedding, table, top_k, threshold
         )
         return summaries.data
@@ -53,13 +53,13 @@ def error_callback(exception):
 
 
 def process_batch(batch_ids: List[str]):
-    commons = common_dependencies()
-    db = commons["db"]
+    supabase_db = get_supabase_db()
+
     try:
         if len(batch_ids) == 1:
-            return (db.get_vectors_by_batch(batch_ids[0])).data
+            return (supabase_db.get_vectors_by_batch(batch_ids[0])).data
         else:
-            return (db.get_vectors_in_batch(batch_ids)).data
+            return (supabase_db.get_vectors_in_batch(batch_ids)).data
     except Exception as e:
         logger.error("Error retrieving batched vectors", e)
 

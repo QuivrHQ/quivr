@@ -1,7 +1,6 @@
 from uuid import UUID
 
-
-from backend.core.models.settings import get_supabase_client
+from models.settings import get_supabase_client
 
 
 def get_user_id_by_user_email(email: str) -> UUID:

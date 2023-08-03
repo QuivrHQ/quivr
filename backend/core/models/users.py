@@ -2,7 +2,8 @@ from typing import Optional
 from uuid import UUID
 
 from logger import get_logger
-from models.settings import CommonsDep, common_dependencies
+from models.databases.supabase.supabase import SupabaseDB
+from models.settings import get_supabase_db
 from pydantic import BaseModel
 
 logger = get_logger(__name__)
@@ -16,8 +17,8 @@ class User(BaseModel):
     requests_count: int = 0
 
     @property
-    def commons(self) -> CommonsDep:
-        return common_dependencies()
+    def supabase_db(self) -> SupabaseDB:
+        return get_supabase_db()
 
     # [TODO] Rename the user table and its references to 'user_usage'
 
@@ -30,13 +31,13 @@ class User(BaseModel):
         """
         logger.info(f"New user entry in db document for user {self.email}")
 
-        return self.commons["db"].create_user(self.id, self.email, date)
+        return self.supabase_db.create_user(self.id, self.email, date)
 
     def get_user_request_stats(self):
         """
         Fetch the user request stats from the database
         """
-        request = self.commons["db"].get_user_request_stats(self.id)
+        request = self.supabase_db.get_user_request_stats(self.id)
 
         return request.data
 
@@ -44,11 +45,11 @@ class User(BaseModel):
         """
         Increment the user request count in the database
         """
-        response = self.commons["db"].fetch_user_requests_count(self.id, date)
+        response = self.supabase_db.fetch_user_requests_count(self.id, date)
 
         userItem = next(iter(response.data or []), {"requests_count": 0})
         requests_count = userItem["requests_count"] + 1
         logger.info(f"User {self.email} request count updated to {requests_count}")
-        self.commons["db"].update_user_request_count(self.id, requests_count, date)
+        self.supabase_db.update_user_request_count(self.id, requests_count, date)
 
         self.requests_count = requests_count

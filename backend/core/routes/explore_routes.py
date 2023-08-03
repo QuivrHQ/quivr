@@ -3,9 +3,8 @@ from uuid import UUID
 from auth import AuthBearer, get_current_user
 from fastapi import APIRouter, Depends, Query
 from models.brains import Brain
-from models.settings import common_dependencies
+from models.settings import get_supabase_db
 from models.users import User
-
 from routes.authorizations.brain_authorization import (
     RoleEnum,
     has_brain_authorization,
@@ -64,8 +63,8 @@ async def download_endpoint(
     """
     # check if user has the right to get the file: add brain_id to the query
 
-    commons = common_dependencies()
-    response = commons["db"].get_vectors_by_file_name(file_name)
+    supabase_db = get_supabase_db()
+    response = supabase_db.get_vectors_by_file_name(file_name)
     documents = response.data
 
     if len(documents) == 0:
