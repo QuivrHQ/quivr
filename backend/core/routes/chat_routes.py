@@ -1,12 +1,11 @@
 import os
 import time
-from http.client import HTTPException
 from typing import List
 from uuid import UUID
 from venv import logger
 
 from auth import AuthBearer, get_current_user
-from fastapi import APIRouter, Depends, Query, Request
+from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from fastapi.responses import StreamingResponse
 from llm.openai import OpenAIBrainPicking
 from models.brains import Brain, get_default_user_brain_or_create_new
