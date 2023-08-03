@@ -1,10 +1,10 @@
 from uuid import UUID
 
-from models.prompt import Prompt
+from models.databases.supabase.prompts import DeletePromptResponse
 from models.settings import common_dependencies
 
 
-def delete_prompt_by_id(prompt_id: UUID) -> Prompt | None:
+def delete_prompt_by_id(prompt_id: UUID) -> DeletePromptResponse:
     """
     Delete a prompt by id
     Args:
