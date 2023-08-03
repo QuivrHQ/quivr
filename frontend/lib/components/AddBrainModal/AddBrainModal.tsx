@@ -115,7 +115,7 @@ export const AddBrainModal = (): JSX.Element => {
             {...register("maxTokens")}
           />
         </fieldset>
-        <Divider text="prompt" />
+        <Divider text="Custom prompt" />
         <Field
           label="Prompt title"
           placeholder="My awesome prompt name"

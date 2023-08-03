@@ -29,6 +29,8 @@ export const SettingsTab = ({ brainId }: SettingsTabProps): JSX.Element => {
     isUpdating,
     isDefaultBrain,
     formRef,
+    promptId,
+    removeBrainPrompt,
   } = useSettingsTab({ brainId });
 
   return (
@@ -126,6 +128,26 @@ export const SettingsTab = ({ brainId }: SettingsTabProps): JSX.Element => {
           {...register("maxTokens")}
         />
       </fieldset>
+      <Divider text="prompt" />
+      <Field
+        label="Prompt title"
+        placeholder="My awesome prompt name"
+        autoComplete="off"
+        className="flex-1"
+        {...register("prompt.title")}
+      />
+      <TextArea
+        label="Prompt content"
+        placeholder="As an AI, your..."
+        autoComplete="off"
+        className="flex-1"
+        {...register("prompt.content")}
+      />
+      {promptId !== "" && (
+        <Button disabled={isUpdating} onClick={() => void removeBrainPrompt()}>
+          Remove prompt
+        </Button>
+      )}
       <div className="flex flex-row justify-end flex-1 w-full mt-8">
         {isUpdating && <FaSpinner className="animate-spin" />}
         {isUpdating && (

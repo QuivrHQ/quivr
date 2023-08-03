@@ -1,5 +1,3 @@
-import { UUID } from "crypto";
-
 import { BrainRoleType } from "@/lib/components/NavBar/components/NavItems/components/BrainsDropDown/components/BrainActions/types";
 
 export type SubscriptionUpdatableProperties = {
@@ -14,7 +12,7 @@ export type CreateBrainInput = {
   temperature?: number;
   max_tokens?: number;
   openai_api_key?: string;
-  prompt_id?: UUID;
+  prompt_id?: string | null;
 };
 
 export type UpdateBrainInput = Partial<CreateBrainInput>;

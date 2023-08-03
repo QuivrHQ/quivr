@@ -1,7 +1,5 @@
-import { UUID } from "crypto";
-
 export type Prompt = {
-  id: UUID;
+  id: string;
   title: string;
   content: string;
 };

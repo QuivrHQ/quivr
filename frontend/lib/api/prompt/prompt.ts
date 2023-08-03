@@ -17,7 +17,7 @@ export const createPrompt = async (
 export const getPrompt = async (
   promptId: string,
   axiosInstance: AxiosInstance
-): Promise<Prompt> => {
+): Promise<Prompt | undefined> => {
   return (await axiosInstance.get<Prompt>(`/prompts/${promptId}`)).data;
 };
 
