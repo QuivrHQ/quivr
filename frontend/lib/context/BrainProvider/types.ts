@@ -16,7 +16,7 @@ export type Brain = {
   temperature?: number;
   openai_api_key?: string;
   description?: string;
-  prompt_id: UUID | null;
+  prompt_id?: string | null;
 };
 
 export type MinimalBrainForUser = {

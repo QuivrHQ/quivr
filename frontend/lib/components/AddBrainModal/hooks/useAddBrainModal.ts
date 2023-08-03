@@ -1,6 +1,5 @@
 /* eslint-disable max-lines */
 import axios from "axios";
-import { UUID } from "crypto";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 
@@ -44,7 +43,7 @@ export const useAddBrainModal = () => {
     setValue("maxTokens", Math.min(maxTokens, defineMaxTokens(model)));
   }, [maxTokens, model, setValue]);
 
-  const getCreatingBrainPromptId = async (): Promise<UUID | undefined> => {
+  const getCreatingBrainPromptId = async (): Promise<string | undefined> => {
     const { prompt } = getValues();
 
     if (prompt.title.trim() !== "" && prompt.content.trim() !== "") {

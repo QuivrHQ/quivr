@@ -113,7 +113,6 @@ export const useSettingsTab = ({ brainId }: UseSettingsTabProps) => {
   }, [formRef.current]);
 
   const fetchPrompt = async () => {
-    console.log({ promptId });
     if (promptId === "") {
       return;
     }
@@ -223,8 +222,8 @@ export const useSettingsTab = ({ brainId }: UseSettingsTabProps) => {
       } = getValues();
 
       if (
-        (prompt.content === "" && prompt.title !== "") ||
-        (prompt.content !== "" && prompt.title === "")
+        dirtyFields["prompt"] &&
+        (prompt.content === "" || prompt.title === "")
       ) {
         publish({
           variant: "warning",
@@ -234,28 +233,38 @@ export const useSettingsTab = ({ brainId }: UseSettingsTabProps) => {
         return;
       }
 
-      if (promptId === "") {
-        otherConfigs["prompt_id"] = (
-          await createPrompt({
-            title: prompt.title,
-            content: prompt.content,
-          })
-        ).id;
+      if (dirtyFields["prompt"]) {
+        if (promptId === "") {
+          otherConfigs["prompt_id"] = (
+            await createPrompt({
+              title: prompt.title,
+              content: prompt.content,
+            })
+          ).id;
+          await updateBrain(brainId, {
+            ...otherConfigs,
+            max_tokens,
+            openai_api_key,
+          });
+          void fetchBrain();
+        } else {
+          await Promise.all([
+            updateBrain(brainId, {
+              ...otherConfigs,
+              max_tokens,
+              openai_api_key,
+            }),
+            promptHandler(),
+          ]);
+        }
+
+        return;
+      } else {
         await updateBrain(brainId, {
           ...otherConfigs,
           max_tokens,
           openai_api_key,
         });
-        void fetchBrain();
-      } else {
-        await Promise.all([
-          updateBrain(brainId, {
-            ...otherConfigs,
-            max_tokens,
-            openai_api_key,
-          }),
-          promptHandler(),
-        ]);
       }
 
       publish({
