@@ -3,15 +3,31 @@ from uuid import UUID
 from auth import AuthBearer, get_current_user
 from fastapi import APIRouter, Depends, HTTPException
 from logger import get_logger
-from models.brains import (
-    Brain,
-    get_default_user_brain,
-    get_default_user_brain_or_create_new,
+from models.databases.supabase.brains import (
+    BrainUpdatableProperties,
+    CreateBrainProperties,
 )
 from models.settings import BrainRateLimiting
 from models.users import User
+from repository.brain.create_brain import create_brain
+from repository.brain.create_brain_user import create_brain_user
+from repository.brain.get_brain_details import get_brain_details
+from repository.brain.get_default_user_brain import get_user_default_brain
+from repository.brain.get_default_user_brain_or_create_new import (
+    get_default_user_brain_or_create_new,
+)
+from repository.brain.get_user_brains import get_user_brains
+from repository.brain.set_as_default_brain_for_user import (
+    set_as_default_brain_for_user,
+)
+from repository.brain.update_brain import update_brain_by_id
+from repository.prompt.delete_prompt_py_id import delete_prompt_by_id
+from repository.prompt.get_prompt_by_id import get_prompt_by_id
 
-from routes.authorizations.brain_authorization import RoleEnum, has_brain_authorization
+from routes.authorizations.brain_authorization import (
+    has_brain_authorization,
+)
+from routes.authorizations.types import RoleEnum
 
 logger = get_logger(__name__)
 
@@ -30,8 +46,7 @@ async def brain_endpoint(current_user: User = Depends(get_current_user)):
     This endpoint retrieves all the brains associated with the current authenticated user. It returns a list of brains objects
     containing the brain ID and brain name for each brain.
     """
-    brain = Brain()
-    brains = brain.get_user_brains(current_user.id)
+    brains = get_user_brains(current_user.id)
     return {"brains": brains}
 
 
@@ -51,10 +66,9 @@ async def get_default_brain_endpoint(current_user: User = Depends(get_current_us
     """
 
     brain = get_default_user_brain_or_create_new(current_user)
-    return {"id": brain.id, "name": brain.name, "rights": "Owner"}
+    return {"id": brain.brain_id, "name": brain.name, "rights": "Owner"}
 
 
-# get one brain - Currently not used in FE
 @brain_router.get(
     "/brains/{brain_id}/",
     dependencies=[Depends(AuthBearer()), Depends(has_brain_authorization())],
@@ -72,9 +86,8 @@ async def get_brain_endpoint(
     This endpoint retrieves the details of a specific brain identified by the provided brain ID. It returns the brain ID and its
     history, which includes the brain messages exchanged in the brain.
     """
-    brain = Brain(id=brain_id)
 
-    brain_details = brain.get_brain_details()
+    brain_details = get_brain_details(brain_id)
     if brain_details is None:
         raise HTTPException(
             status_code=404,
@@ -87,7 +100,7 @@ async def get_brain_endpoint(
 # create new brain
 @brain_router.post("/brains/", dependencies=[Depends(AuthBearer())], tags=["Brain"])
 async def create_brain_endpoint(
-    brain: Brain,
+    brain: CreateBrainProperties,
     current_user: User = Depends(get_current_user),
 ):
     """
@@ -100,7 +113,7 @@ async def create_brain_endpoint(
     In the brains table & in the brains_users table and put the creator user as 'Owner'
     """
 
-    user_brains = brain.get_user_brains(current_user.id)
+    user_brains = get_user_brains(current_user.id)
     max_brain_per_user = BrainRateLimiting().max_brain_per_user
 
     if len(user_brains) >= max_brain_per_user:
@@ -109,23 +122,31 @@ async def create_brain_endpoint(
             detail=f"Maximum number of brains reached ({max_brain_per_user}).",
         )
 
-    brain.create_brain()  # pyright: ignore reportPrivateUsage=none
-    default_brain = get_default_user_brain(current_user)
+    new_brain = create_brain(
+        brain,
+    )
+    default_brain = get_user_default_brain(current_user.id)
     if default_brain:
         logger.info(f"Default brain already exists for user {current_user.id}")
-        brain.create_brain_user(  # pyright: ignore reportPrivateUsage=none
-            user_id=current_user.id, rights="Owner", default_brain=False
+        create_brain_user(
+            user_id=current_user.id,
+            brain_id=new_brain.brain_id,
+            rights=RoleEnum.Owner,
+            is_default_brain=False,
         )
     else:
         logger.info(
             f"Default brain does not exist for user {current_user.id}. It will be created."
         )
-        brain.create_brain_user(  # pyright: ignore reportPrivateUsage=none
-            user_id=current_user.id, rights="Owner", default_brain=True
+        create_brain_user(
+            user_id=current_user.id,
+            brain_id=new_brain.brain_id,
+            rights=RoleEnum.Owner,
+            is_default_brain=True,
         )
 
     return {
-        "id": brain.id,  # pyright: ignore reportPrivateUsage=none
+        "id": new_brain.brain_id,
         "name": brain.name,
         "rights": "Owner",
     }
@@ -144,15 +165,28 @@ async def create_brain_endpoint(
 )
 async def update_brain_endpoint(
     brain_id: UUID,
-    input_brain: Brain,
+    input_brain: BrainUpdatableProperties,
 ):
     """
     Update an existing brain with new brain configuration
     """
-    input_brain.id = brain_id
-    print("brain", input_brain)
 
-    input_brain.update_brain_fields()
+    # Remove prompt if it is private and no longer used by brain
+    if input_brain.prompt_id is None:
+        existing_brain = get_brain_details(brain_id)
+        if existing_brain is None:
+            raise HTTPException(
+                status_code=404,
+                detail="Brain not found",
+            )
+        prompt_id = existing_brain.prompt_id
+        if prompt_id is not None:
+            prompt = get_prompt_by_id(prompt_id)
+            if prompt is not None and prompt.status == "private":
+                delete_prompt_by_id(prompt_id)
+
+    update_brain_by_id(brain_id, input_brain)
+
     return {"message": f"Brain {brain_id} has been updated."}
 
 
@@ -174,8 +208,7 @@ async def set_as_default_brain_endpoint(
     """
     Set a brain as default for the current user.
     """
-    brain = Brain(id=brain_id)
 
-    brain.set_as_default_brain_for_user(user)
+    set_as_default_brain_for_user(user.id, brain_id)
 
     return {"message": f"Brain {brain_id} has been set as default brain."}

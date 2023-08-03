@@ -9,11 +9,15 @@ from auth import AuthBearer, get_current_user
 from fastapi import APIRouter, Depends, Query, Request
 from fastapi.responses import StreamingResponse
 from llm.openai import OpenAIBrainPicking
-from models.brains import Brain, get_default_user_brain_or_create_new
+from models.brains import Brain
 from models.chat import Chat, ChatHistory
 from models.chats import ChatQuestion
 from models.settings import LLMSettings, common_dependencies
 from models.users import User
+from repository.brain.get_brain_details import get_brain_details
+from repository.brain.get_default_user_brain_or_create_new import (
+    get_default_user_brain_or_create_new,
+)
 from repository.chat.create_chat import CreateChatProperties, create_chat
 from repository.chat.get_chat_by_id import get_chat_by_id
 from repository.chat.get_chat_history import get_chat_history
@@ -57,10 +61,7 @@ def delete_chat_from_db(commons, chat_id):
 
 
 def fetch_user_stats(commons, user, date):
-    response = (
-        commons["db"]
-        .get_user_stats(user.email, date)
-    )
+    response = commons["db"].get_user_stats(user.email, date)
     userItem = next(iter(response.data or []), {"requests_count": 0})
     return userItem
 
@@ -173,9 +174,10 @@ async def create_question_handler(
     brain = Brain(id=brain_id)
 
     if not current_user.user_openai_api_key:
-        brain_details = brain.get_brain_details()
-        if brain_details:
-            current_user.user_openai_api_key = brain_details["openai_api_key"]
+        if brain_id:
+            brain_details = get_brain_details(brain_id)
+            if brain_details:
+                current_user.user_openai_api_key = brain_details.openai_api_key
 
     if not current_user.user_openai_api_key:
         user_identity = get_user_identity(current_user.id)
@@ -199,7 +201,7 @@ async def create_question_handler(
         LLMSettings()
 
         if not brain_id:
-            brain_id = get_default_user_brain_or_create_new(current_user).id
+            brain_id = get_default_user_brain_or_create_new(current_user).brain_id
 
         gpt_answer_generator = OpenAIBrainPicking(
             chat_id=str(chat_id),
@@ -244,10 +246,10 @@ async def create_stream_question_handler(
     current_user.user_openai_api_key = request.headers.get("Openai-Api-Key")
     brain = Brain(id=brain_id)
 
-    if not current_user.user_openai_api_key:
-        brain_details = brain.get_brain_details()
+    if not current_user.user_openai_api_key and brain_id:
+        brain_details = get_brain_details(brain_id)
         if brain_details:
-            current_user.user_openai_api_key = brain_details["openai_api_key"]
+            current_user.user_openai_api_key = brain_details.openai_api_key
 
     if not current_user.user_openai_api_key:
         user_identity = get_user_identity(current_user.id)
@@ -270,7 +272,7 @@ async def create_stream_question_handler(
         logger.info(f"Streaming request for {chat_question.model}")
         check_user_limit(current_user)
         if not brain_id:
-            brain_id = get_default_user_brain_or_create_new(current_user).id
+            brain_id = get_default_user_brain_or_create_new(current_user).brain_id
 
         gpt_answer_generator = OpenAIBrainPicking(
             chat_id=str(chat_id),

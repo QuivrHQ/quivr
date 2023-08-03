@@ -134,8 +134,10 @@ CREATE TABLE IF NOT EXISTS brains (
   model TEXT,
   max_tokens INT,
   temperature FLOAT,
-  openai_api_key TEXT
+  openai_api_key TEXT,
+  prompt_id UUID REFERENCES prompts(id)
 );
+
 
 -- Create brains X users table
 CREATE TABLE IF NOT EXISTS brains_users (
@@ -210,7 +212,7 @@ CREATE TABLE IF NOT EXISTS migrations (
 );
 
 INSERT INTO migrations (name) 
-SELECT '20230701180101_add_prompts_table'
+SELECT '20230802120700_add_prompt_id_to_brain'
 WHERE NOT EXISTS (
-    SELECT 1 FROM migrations WHERE name = '20230701180101_add_prompts_table'
+    SELECT 1 FROM migrations WHERE name = '20230802120700_add_prompt_id_to_brain'
 );

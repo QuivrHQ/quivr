@@ -3,7 +3,7 @@ from uuid import UUID
 
 from fastapi import HTTPException
 from models.databases.repository import Repository
-from models.prompt import Prompt
+from models.prompt import Prompt, PromptStatusEnum
 from pydantic import BaseModel
 
 
@@ -12,7 +12,7 @@ class CreatePromptProperties(BaseModel):
 
     title: str
     content: str
-    status: str = "private"
+    status: PromptStatusEnum = PromptStatusEnum.private
 
 
 class PromptUpdatableProperties(BaseModel):
@@ -20,7 +20,14 @@ class PromptUpdatableProperties(BaseModel):
 
     title: Optional[str]
     content: Optional[str]
-    status: Optional[str]
+    status: Optional[PromptStatusEnum]
+
+
+class DeletePromptResponse(BaseModel):
+    """Response when deleting a prompt"""
+
+    status: str = "delete"
+    prompt_id: UUID
 
 
 class Prompts(Repository):
@@ -28,20 +35,22 @@ class Prompts(Repository):
         self.db = supabase_client
 
     def create_prompt(self, prompt: CreatePromptProperties) -> Prompt:
-        """Create a prompt by id"""
+        """
+        Create a prompt
+        """
 
         response = (self.db.from_("prompts").insert(prompt.dict()).execute()).data
 
         return Prompt(**response[0])
 
-    def delete_prompt_by_id(self, prompt_id: UUID) -> Prompt | None:
+    def delete_prompt_by_id(self, prompt_id: UUID) -> DeletePromptResponse:
         """
         Delete a prompt by id
         Args:
             prompt_id (UUID): The id of the prompt
 
         Returns:
-            Prompt: The prompt
+        A dictionary containing the status of the delete and prompt_id of the deleted prompt
         """
         response = (
             self.db.from_("prompts")
@@ -50,9 +59,11 @@ class Prompts(Repository):
             .execute()
             .data
         )
+
         if response == []:
             raise HTTPException(404, "Prompt not found")
-        return Prompt(**response[0])
+
+        return DeletePromptResponse(status="deleted", prompt_id=prompt_id)
 
     def get_prompt_by_id(self, prompt_id: UUID) -> Prompt | None:
         """
