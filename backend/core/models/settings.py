@@ -1,6 +1,3 @@
-from typing import Annotated, TypedDict
-
-from fastapi import Depends
 from langchain.embeddings.openai import OpenAIEmbeddings
 from models.databases.supabase.supabase import SupabaseDB
 from pydantic import BaseSettings
@@ -26,13 +23,6 @@ class BrainSettings(BaseSettings):
 class LLMSettings(BaseSettings):
     private: bool = False
     model_path: str = "./local_models/ggml-gpt4all-j-v1.3-groovy.bin"
-
-
-class CommonDependencies(TypedDict):
-    supabase: Client
-    db: SupabaseDB
-    embeddings: OpenAIEmbeddings
-    documents_vector_store: SupabaseVectorStore
 
 
 def get_supabase_client() -> Client:
@@ -66,29 +56,3 @@ def get_documents_vector_store() -> SupabaseVectorStore:
         supabase_client, embeddings, table_name="vectors"
     )
     return documents_vector_store
-
-
-def common_dependencies() -> CommonDependencies:
-    settings = BrainSettings()  # pyright: ignore reportPrivateUsage=none
-    embeddings = OpenAIEmbeddings(
-        openai_api_key=settings.openai_api_key
-    )  # pyright: ignore reportPrivateUsage=none
-    supabase_client: Client = create_client(
-        settings.supabase_url, settings.supabase_service_key
-    )
-    documents_vector_store = SupabaseVectorStore(
-        supabase_client, embeddings, table_name="vectors"
-    )
-
-    db = None
-    db = SupabaseDB(supabase_client)
-
-    return {
-        "supabase": supabase_client,
-        "db": db,
-        "embeddings": embeddings,
-        "documents_vector_store": documents_vector_store,
-    }
-
-
-CommonsDep = Annotated[dict, Depends(common_dependencies)]

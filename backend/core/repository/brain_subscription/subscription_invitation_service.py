@@ -1,14 +1,12 @@
-from typing import Optional
-
 from logger import get_logger
 from models.brains_subscription_invitations import BrainSubscription
-from models.settings import CommonsDep, get_supabase_client
+from models.settings import get_supabase_client
 
 logger = get_logger(__name__)
 
 
 class SubscriptionInvitationService:
-    def __init__(self, commons: Optional[CommonsDep] = None):
+    def __init__(self):
         self.supabase_client = get_supabase_client()
 
     def create_subscription_invitation(self, brain_subscription: BrainSubscription):

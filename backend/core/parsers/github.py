@@ -6,13 +6,11 @@ from langchain.schema import Document
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from models.brains import Brain
 from models.files import File
-from models.settings import CommonsDep
 from utils.file import compute_sha1_from_content
 from utils.vectors import Neurons
 
 
 async def process_github(
-    commons: CommonsDep,  # pyright: ignore reportPrivateUsage=none
     repo,
     enable_summarization,
     brain_id,
@@ -70,7 +68,7 @@ async def process_github(
 
         if not file_exists:
             print(f"Creating entry for file {file.file_sha1} in vectors...")
-            neurons = Neurons(commons=commons)
+            neurons = Neurons()
             created_vector = neurons.create_vector(
                 doc_with_metadata, user_openai_api_key
             )

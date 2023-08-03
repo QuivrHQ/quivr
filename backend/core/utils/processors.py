@@ -1,6 +1,5 @@
 from models.brains import Brain
 from models.files import File
-from models.settings import CommonsDep
 from parsers.audio import process_audio
 from parsers.csv import process_csv
 from parsers.docx import process_docx
@@ -40,7 +39,6 @@ def create_response(message, type):
 
 
 async def filter_file(
-    commons: CommonsDep,
     file: File,
     enable_summarization: bool,
     brain_id,
@@ -72,7 +70,10 @@ async def filter_file(
     if file.file_extension in file_processors:
         try:
             await file_processors[file.file_extension](
-                commons, file, enable_summarization, brain_id, openai_api_key
+                file=file,
+                enable_summarization=enable_summarization,
+                brain_id=brain_id,
+                user_openai_api_key=openai_api_key,
             )
             return create_response(
                 f"✅ {file.file.filename} has been uploaded to brain {brain_id}.",  # pyright: ignore reportPrivateUsage=none

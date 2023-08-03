@@ -3,22 +3,13 @@ from typing import List
 
 from langchain.embeddings.openai import OpenAIEmbeddings
 from logger import get_logger
-from models.settings import (
-    BrainSettings,
-    CommonsDep,
-    get_documents_vector_store,
-    get_embeddings,
-    get_supabase_db,
-)
+from models.settings import get_documents_vector_store, get_embeddings, get_supabase_db
 from pydantic import BaseModel
 
 logger = get_logger(__name__)
 
 
 class Neurons(BaseModel):
-    commons: CommonsDep
-    settings = BrainSettings()  # pyright: ignore reportPrivateUsage=none
-
     def create_vector(self, doc, user_openai_api_key=None):
         documents_vector_store = get_documents_vector_store()
         logger.info("Creating vector for document")
