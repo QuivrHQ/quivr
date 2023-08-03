@@ -32,3 +32,9 @@ export const updatePrompt = async (
 ): Promise<Prompt> => {
   return (await axiosInstance.put<Prompt>(`/prompts/${promptId}`, prompt)).data;
 };
+
+export const getPublicPrompts = async (
+  axiosInstance: AxiosInstance
+): Promise<Prompt[]> => {
+  return (await axiosInstance.get<Prompt[]>("/prompts")).data;
+};

@@ -10,6 +10,7 @@ import { TextArea } from "@/lib/components/ui/TextArea";
 import { models, paidModels } from "@/lib/context/BrainConfigProvider/types";
 import { defineMaxTokens } from "@/lib/helpers/defineMexTokens";
 
+import { PublicPrompts } from "./components/PublicPrompts";
 import { useSettingsTab } from "./hooks/useSettingsTab";
 
 type SettingsTabProps = {
@@ -30,6 +31,7 @@ export const SettingsTab = ({ brainId }: SettingsTabProps): JSX.Element => {
     isDefaultBrain,
     formRef,
     promptId,
+    pickPublicPrompt,
     removeBrainPrompt,
   } = useSettingsTab({ brainId });
 
@@ -128,7 +130,8 @@ export const SettingsTab = ({ brainId }: SettingsTabProps): JSX.Element => {
           {...register("maxTokens")}
         />
       </fieldset>
-      <Divider text="prompt" />
+      <Divider text="Custom prompt" />
+      <PublicPrompts onSelect={pickPublicPrompt} />
       <Field
         label="Prompt title"
         placeholder="My awesome prompt name"

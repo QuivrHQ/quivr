@@ -257,13 +257,15 @@ export const useSettingsTab = ({ brainId }: UseSettingsTabProps) => {
             promptHandler(),
           ]);
         }
-
-        return;
       } else {
         await updateBrain(brainId, {
           ...otherConfigs,
           max_tokens,
           openai_api_key,
+          prompt_id:
+            otherConfigs["prompt_id"] !== ""
+              ? otherConfigs["prompt_id"]
+              : undefined,
         });
       }
 
@@ -295,6 +297,21 @@ export const useSettingsTab = ({ brainId }: UseSettingsTabProps) => {
     }
   };
 
+  const pickPublicPrompt = ({
+    title,
+    content,
+  }: {
+    title: string;
+    content: string;
+  }): void => {
+    setValue("prompt.title", title, {
+      shouldDirty: true,
+    });
+    setValue("prompt.content", content, {
+      shouldDirty: true,
+    });
+  };
+
   return {
     handleSubmit,
     register,
@@ -309,5 +326,6 @@ export const useSettingsTab = ({ brainId }: UseSettingsTabProps) => {
     formRef,
     promptId,
     removeBrainPrompt,
+    pickPublicPrompt,
   };
 };
