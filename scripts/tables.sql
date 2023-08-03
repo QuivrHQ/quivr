@@ -173,6 +173,16 @@ CREATE TABLE IF NOT EXISTS user_identity (
   openai_api_key VARCHAR(255)
 );
 
+
+--- Create prompts table
+CREATE TABLE IF NOT EXISTS prompts (
+    id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+    title VARCHAR(255),
+    content TEXT,
+    status VARCHAR(255) DEFAULT 'private'
+);
+
+
 CREATE OR REPLACE FUNCTION public.get_user_email_by_user_id(user_id uuid)
 RETURNS TABLE (email text)
 SECURITY definer
@@ -200,7 +210,7 @@ CREATE TABLE IF NOT EXISTS migrations (
 );
 
 INSERT INTO migrations (name) 
-SELECT '20230731172400_add_user_identity_table'
+SELECT '20230701180101_add_prompts_table'
 WHERE NOT EXISTS (
-    SELECT 1 FROM migrations WHERE name = '20230731172400_add_user_identity_table'
+    SELECT 1 FROM migrations WHERE name = '20230701180101_add_prompts_table'
 );
