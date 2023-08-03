@@ -1,14 +1,13 @@
 from uuid import UUID
 
 from models.brain_entity import BrainEntity
-from models.settings import common_dependencies
+from models.settings import get_supabase_client
 
 
 def get_brain_details(brain_id: UUID) -> BrainEntity | None:
-    commons = common_dependencies()
+    supabase_client = get_supabase_client()
     response = (
-        commons["supabase"]
-        .from_("brains")
+        supabase_client.from_("brains")
         .select("*")
         .filter("brain_id", "eq", brain_id)
         .execute()

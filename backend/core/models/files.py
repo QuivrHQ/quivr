@@ -7,7 +7,8 @@ from fastapi import UploadFile
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from logger import get_logger
 from models.brains import Brain
-from models.settings import CommonsDep, common_dependencies
+from models.databases.supabase.supabase import SupabaseDB
+from models.settings import get_supabase_db
 from pydantic import BaseModel
 from utils.file import compute_sha1_from_file
 
@@ -26,11 +27,11 @@ class File(BaseModel):
     chunk_size: int = 500
     chunk_overlap: int = 0
     documents: Optional[Any] = None
-    _commons: Optional[CommonsDep] = None
 
     @property
-    def commons(self) -> CommonsDep:
-        return common_dependencies()
+    @property
+    def supabase_db(self) -> SupabaseDB:
+        return get_supabase_db()
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -98,7 +99,9 @@ class File(BaseModel):
         Set the vectors_ids property with the ids of the vectors
         that are associated with the file in the vectors table
         """
-        self.vectors_ids = self.commons["db"].get_vectors_by_file_sha1(self.file_sha1).data
+        self.vectors_ids = self.supabase_db.get_vectors_by_file_sha1(
+            self.file_sha1
+        ).data
 
     def file_already_exists(self):
         """
@@ -126,7 +129,9 @@ class File(BaseModel):
         Args:
             brain_id (str): Brain id
         """
-        response = self.commons["db"].get_brain_vectors_by_brain_id_and_file_sha1(brain_id, self.file_sha1)
+        response = self.supabase_db.get_brain_vectors_by_brain_id_and_file_sha1(
+            brain_id, self.file_sha1
+        )
 
         print("response.data", response.data)
         if len(response.data) == 0:

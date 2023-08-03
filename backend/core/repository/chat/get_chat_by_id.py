@@ -1,12 +1,9 @@
 from models.chat import Chat
-from models.settings import common_dependencies
+from models.settings import get_supabase_db
 
 
 def get_chat_by_id(chat_id: str) -> Chat:
-    commons = common_dependencies()
+    supabase_db = get_supabase_db()
 
-    response = (
-        commons["db"]
-        .get_chat_by_id(chat_id)
-    )
+    response = supabase_db.get_chat_by_id(chat_id)
     return Chat(response.data[0])
