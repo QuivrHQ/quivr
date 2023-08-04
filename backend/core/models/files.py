@@ -29,7 +29,6 @@ class File(BaseModel):
     documents: Optional[Any] = None
 
     @property
-    @property
     def supabase_db(self) -> SupabaseDB:
         return get_supabase_db()
 
