@@ -57,6 +57,7 @@ async def get_user_endpoint(
         "max_requests_number": max_requests_number,
         "requests_stats": requests_stats,
         "date": date,
+        "id": current_user.id,
     }
 
 

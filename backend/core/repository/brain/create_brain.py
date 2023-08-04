@@ -6,4 +6,4 @@ from models.settings import get_supabase_db
 def create_brain(brain: CreateBrainProperties) -> BrainEntity:
     supabase_db = get_supabase_db()
 
-    return supabase_db.create_brain(brain.dict(exclude_unset=True))
+    return supabase_db.create_brain(brain)

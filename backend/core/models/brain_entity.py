@@ -16,6 +16,17 @@ class BrainEntity(BaseModel):
     status: Optional[str]
     prompt_id: Optional[UUID]
 
+    @property
+    def id(self) -> UUID:
+        return self.brain_id
+
+    def dict(self, **kwargs):
+        data = super().dict(
+            **kwargs,
+        )
+        data["id"] = self.id
+        return data
+
 
 class MinimalBrainEntity(BaseModel):
     id: UUID
