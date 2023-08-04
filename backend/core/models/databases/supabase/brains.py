@@ -48,9 +48,8 @@ class Brain(Repository):
         self.db = supabase_client
 
     def create_brain(self, brain: CreateBrainProperties):
-        return BrainEntity(
-            **((self.db.table("brains").insert(brain)).execute()).data[0]
-        )
+        response = (self.db.table("brains").insert(brain.dict())).execute()
+        return BrainEntity(**response.data[0])
 
     def get_user_brains(self, user_id) -> list[MinimalBrainEntity]:
         response = (

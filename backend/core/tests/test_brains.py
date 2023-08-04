@@ -213,4 +213,4 @@ def test_set_as_default_brain_endpoint(client, api_key):
 
     default_brain = get_user_default_brain(user_id)
     assert default_brain is not None
-    assert default_brain.brain_id == brain_id
+    assert str(default_brain.brain_id) == str(brain_id)

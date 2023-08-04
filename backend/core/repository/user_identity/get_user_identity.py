@@ -10,7 +10,7 @@ def get_user_identity(user_id: UUID) -> UserIdentity:
     response = (
         supabase_client.from_("user_identity")
         .select("*")
-        .filter("user_id", "eq", user_id)
+        .filter("user_id", "eq", str(user_id))
         .execute()
     )
 
