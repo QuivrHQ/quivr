@@ -9,8 +9,6 @@ export const defineMaxTokens = (model: Model | PaidModels): number => {
       return 2000;
     case "gpt-4":
       return 1000;
-    case "gpt-4-0613":
-      return 100;
     default:
       return 250;
   }

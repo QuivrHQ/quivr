@@ -85,7 +85,7 @@ export const ConfigModal = ({ chatId }: { chatId?: string }): JSX.Element => {
           <input
             type="range"
             min="10"
-            max={defineMaxTokens(model ?? "gpt-3.5-turbo-0613")}
+            max={defineMaxTokens(model ?? "gpt-3.5-turbo")}
             value={maxTokens}
             {...register("maxTokens")}
           />
