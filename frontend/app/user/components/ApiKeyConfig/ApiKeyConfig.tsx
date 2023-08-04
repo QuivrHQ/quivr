@@ -57,7 +57,7 @@ export const ApiKeyConfig = (): JSX.Element => {
             Your api key will be saved in our data. We will not use it for any
             other purpose. However,{" "}
             <strong>
-              we {"don't"} have not implemented any encryption logic yet
+              we have not implemented any encryption logic yet
             </strong>
           </span>
         </div>
