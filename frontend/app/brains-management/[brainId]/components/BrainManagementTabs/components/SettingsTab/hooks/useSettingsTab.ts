@@ -315,7 +315,7 @@ export const useSettingsTab = ({ brainId }: UseSettingsTabProps) => {
   return {
     handleSubmit,
     register,
-    openAiKey,
+    openAiKey: openAiKey === "" ? undefined : openAiKey,
     model,
     temperature,
     maxTokens,
