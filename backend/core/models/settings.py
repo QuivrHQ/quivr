@@ -15,7 +15,7 @@ class BrainSettings(BaseSettings):
     anthropic_api_key: str
     supabase_url: str
     supabase_service_key: str
-    pg_database_url: str
+    pg_database_url: str = "not implemented"
     resend_api_key: str = "null"
     resend_email_address: str = "brain@mail.quivr.app"
 
