@@ -8,7 +8,7 @@ import { Divider } from "@/lib/components/ui/Divider";
 import Field from "@/lib/components/ui/Field";
 import { TextArea } from "@/lib/components/ui/TextArea";
 import { models, paidModels } from "@/lib/context/BrainConfigProvider/types";
-import { defineMaxTokens } from "@/lib/helpers/defineMexTokens";
+import { defineMaxTokens } from "@/lib/helpers/defineMaxTokens";
 
 import { PublicPrompts } from "./components/PublicPrompts";
 import { useSettingsTab } from "./hooks/useSettingsTab";

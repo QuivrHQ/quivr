@@ -6,7 +6,7 @@ import Button from "@/lib/components/ui/Button";
 import Field from "@/lib/components/ui/Field";
 import { Modal } from "@/lib/components/ui/Modal";
 import { models, paidModels } from "@/lib/context/BrainConfigProvider/types";
-import { defineMaxTokens } from "@/lib/helpers/defineMexTokens";
+import { defineMaxTokens } from "@/lib/helpers/defineMaxTokens";
 
 import { useAddBrainModal } from "./hooks/useAddBrainModal";
 import { Divider } from "../ui/Divider";
