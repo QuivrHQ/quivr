@@ -59,7 +59,7 @@ export const PeopleTab = ({ brainId }: ShareBrainModalProps): JSX.Element => {
                 <MdLink size="20" color="gray" />
               </div>
               <div className="flex flex-row flex-1 items-center justify-center">
-                <span className="color-gray">
+                <span className="text-sm text-gray-700 dark:text-gray-200 w-full bg-gray-50 dark:bg-gray-900 px-4 py-2">
                   Click to copy link to share your brain
                 </span>
               </div>
