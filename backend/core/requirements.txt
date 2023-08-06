@@ -3,7 +3,7 @@ langchain==0.0.247
 Markdown==3.4.3
 openai==0.27.6
 pdf2image==1.16.3
-pypdf==3.8.1
+pypdf==3.9.0
 StrEnum==0.4.10
 supabase==1.0.3
 tiktoken==0.4.0
