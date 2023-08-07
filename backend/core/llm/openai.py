@@ -1,6 +1,4 @@
-from langchain.chat_models import ChatOpenAI
 from langchain.embeddings.openai import OpenAIEmbeddings
-from langchain.llms.base import BaseLLM
 from llm.qa_base import QABaseBrainPicking
 from logger import get_logger
 
@@ -46,19 +44,4 @@ class OpenAIBrainPicking(QABaseBrainPicking):
             openai_api_key=self.openai_api_key
         )  # pyright: ignore reportPrivateUsage=none
 
-    def _create_llm(self, model, temperature=0, streaming=False, callbacks=None) -> BaseLLM:
-        """
-        Determine the language model to be used.
-        :param model: Language model name to be used.
-        :param streaming: Whether to enable streaming of the model
-        :param callbacks: Callbacks to be used for streaming
-        :return: Language model instance
-        """
-        return ChatOpenAI(
-            temperature=temperature,
-            model=model,
-            streaming=streaming,
-            verbose=True,
-            callbacks=callbacks,
-            openai_api_key=self.openai_api_key,
-        )  # pyright: ignore reportPrivateUsage=none
+    
