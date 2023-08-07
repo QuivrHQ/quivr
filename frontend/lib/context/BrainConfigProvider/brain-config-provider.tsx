@@ -15,7 +15,7 @@ export const BrainConfigContext = createContext<
 >(undefined);
 
 const defaultBrainConfig: BrainConfig = {
-  model: "gpt-3.5-turbo-0613",
+  model: "gpt-3.5-turbo",
   temperature: 0,
   maxTokens: 256,
   keepLocal: true,

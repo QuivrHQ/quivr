@@ -13,7 +13,7 @@ class CreateBrainProperties(BaseModel):
     name: Optional[str] = "Default brain"
     description: Optional[str] = "This is a description"
     status: Optional[str] = "private"
-    model: Optional[str] = "gpt-3.5-turbo-0613"
+    model: Optional[str] = "gpt-3.5-turbo"
     temperature: Optional[float] = 0.0
     max_tokens: Optional[int] = 256
     openai_api_key: Optional[str] = None
