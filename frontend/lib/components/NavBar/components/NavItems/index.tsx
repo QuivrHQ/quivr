@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link";
 import { Dispatch, HTMLAttributes, SetStateAction } from "react";
+import { useTranslation } from "react-i18next";
 import { MdPerson } from "react-icons/md";
 
 import { useSupabase } from "@/lib/context/SupabaseProvider";
@@ -24,6 +25,7 @@ export const NavItems = ({
 }: NavItemsProps): JSX.Element => {
   const { session } = useSupabase();
   const isUserLoggedIn = session?.user !== undefined;
+  const {t} = useTranslation();
 
   return (
     <ul
@@ -36,13 +38,13 @@ export const NavItems = ({
       {isUserLoggedIn ? (
         <>
           <NavLink setOpen={setOpen} to="/upload">
-            Upload
+            {t("Upload")}
           </NavLink>
           <NavLink setOpen={setOpen} to="/chat">
-            Chat
+            {t("Chat")}
           </NavLink>
           <NavLink setOpen={setOpen} to="/explore">
-            Explore
+            {t("Explore")}
           </NavLink>
         </>
       ) : (
