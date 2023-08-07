@@ -1,0 +1,21 @@
+{
+    "searchBrain": "Search for a brain",
+    "brainCreated": "Brain created successfully",
+    "newBrain": "Add New Brain",
+    "newBrainTitle": "Add New Brain",
+    "newBrainSubtitle": "Create a new space for your data",
+    "brainName": "Enter a brain name",
+    "brainNamePlaceholder": "E.g. History notes",
+    "shareBrain": "Share brain {{name}}",
+    "shareBrainUsers": "Users with access",
+    "copiedToClipboard": "Copied to clipboard",
+    "usersInvited": "Users successfully invited",
+    "errorSendingInvitation": "An error occurred while sending invitations",
+    "brainUndefined": "Brain is undefined",
+    "noBrainUsers": "No brainUsers",
+    "errorFetchingBrainUsers": "An error occurred while fetching brain users",
+    "userRoleUpdated": "Updated {{email}} to {{newRole}}",
+    "userRoleUpdateFailed": "Failed updating {{email}} to {{newRole}} ",
+    "userRemoved": "Removed {{email}} from brain",
+    "userRemoveFailed": "Failed to remove {{email}} from brain"
+}

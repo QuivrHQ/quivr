@@ -1,0 +1,21 @@
+{
+    "searchBrain": "Buscar un cerebro",
+    "brainCreated": "Cerebro creado correctamente",
+    "newBrain": "Agregar nuevo cerebro",
+    "newBrainTitle": "Agregar nuevo cerebro",
+    "newBrainSubtitle": "Crea un nuevo espacio para tus datos",
+    "brainName": "Ingresa un nombre para el cerebro",
+    "brainNamePlaceholder": "Ejemplo: Anotaciones de historia",
+    "shareBrain": "Compartir cerebro {{name}}",
+    "shareBrainUsers": "Usuarios con acceso",
+    "copiedToClipboard": "Copiado al portapeles",
+    "usersInvited": "Usuarios invitados correctamente",
+    "errorSendingInvitation": "Un error ocurrió al enviar invitaciones",
+    "brainUndefined": "Cerebro no definido",
+    "noBrainUsers": "Sin usuarios del cerebro",
+    "errorFetchingBrainUsers": "Error al obtener usuarios del cerebro",
+    "userRoleUpdated": "Actualizado {{email}} a {{newRole}}",
+    "userRoleUpdateFailed": "Error actualizado {{email}} a {{newRole}} ",
+    "userRemoved": "Eliminado {{email}} del cerebro",
+    "userRemoveFailed": "Error al eliminar {{email}} del cerebro"
+}
