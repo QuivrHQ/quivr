@@ -7,7 +7,7 @@ import { NavBar } from "@/lib/components/NavBar";
 import { TrackingWrapper } from "@/lib/components/TrackingWrapper";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 import { useSupabase } from "@/lib/context/SupabaseProvider";
-import './config/components/LocaleConfig/i18next.config'
+import '../lib/config/LocaleConfig/i18next.config'
 
 // This wrapper is used to make effect calls at a high level in app rendering.
 export const App = ({ children }: PropsWithChildren): JSX.Element => {

@@ -1,5 +1,7 @@
 "use client";
 import Link from "next/link";
+import { Suspense } from "react";
+import { useTranslation } from "react-i18next";
 
 import { BrainRoleType } from "@/lib/components/NavBar/components/NavItems/components/BrainsDropDown/components/BrainActions/types";
 import Button from "@/lib/components/ui/Button";
@@ -13,13 +15,11 @@ import { Crawler } from "./components/Crawler";
 import { FileUploader } from "./components/FileUploader";
 
 const requiredRolesForUpload: BrainRoleType[] = ["Editor", "Owner"];
-import { useTranslation } from "react-i18next";
-import { Suspense } from "react";
 
 const UploadPage = (): JSX.Element => {
   const { currentBrain } = useBrainContext();
   const { session } = useSupabase();
-  const {t, i18n} = useTranslation(["translation","upload"]);
+  const { t } = useTranslation(["translation","upload"]);
 
   if (session === null) {
     redirectToLogin();
@@ -54,7 +54,8 @@ const UploadPage = (): JSX.Element => {
       </div>
     );
   }
-  function Upload() {
+
+  const Upload = () => {
     return (
       <main className="pt-10">
         <PageHeading
