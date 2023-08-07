@@ -1,0 +1,13 @@
+{
+    "title": "Inscription",
+    "subtitle": "Créez votre compte",
+    "email": "Email",
+    "password": "Mot de passe",
+    "loginButton": "Connexion",
+    "signUpButton": "S'inscrire",
+    "or": "ou",
+    "login": "Déjà inscrit ? Connectez-vous",
+    "googleLogin": "Connexion avec Google",
+    "errorSignUp": "Erreur lors de l'inscription : {{errorMessage}}",
+    "mailSended": "Email de confirmation envoyé, veuillez vérifier votre email"
+}

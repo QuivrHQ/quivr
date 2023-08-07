@@ -22,6 +22,18 @@ import translation_es from "../../../public/locales/es/translation.json";
 import updatePassword_es from "../../../public/locales/es/updatePassword.json";
 import upload_es from "../../../public/locales/es/upload.json";
 import user_es from "../../../public/locales/es/user.json";
+// import all namespaces French
+import brain_fr from "../../../public/locales/fr/brain.json";
+import chat_fr from "../../../public/locales/fr/chat.json";
+import config_fr from "../../../public/locales/fr/config.json";
+import explore_fr from "../../../public/locales/fr/explore.json";
+import login_fr from "../../../public/locales/fr/login.json";
+import logout_fr from "../../../public/locales/fr/logout.json";
+import signUp_fr from "../../../public/locales/fr/signUp.json";
+import translation_fr from "../../../public/locales/fr/translation.json";
+import updatePassword_fr from "../../../public/locales/fr/updatePassword.json";
+import upload_fr from "../../../public/locales/fr/upload.json";
+import user_fr from "../../../public/locales/fr/user.json";
 
 export const defaultNS = "translation";
 export const resources = {
@@ -50,5 +62,18 @@ export const resources = {
     updatePassword: updatePassword_es,
     upload: upload_es,
     user: user_es
+  },
+  fr: {
+    brain: brain_fr,
+    chat: chat_fr,
+    config: config_fr,
+    explore: explore_fr,
+    login: login_fr,
+    logout: logout_fr,
+    signUp: signUp_fr,
+    translation: translation_fr,
+    updatePassword: updatePassword_fr,
+    upload: upload_fr,
+    user: user_fr
   }
 } as const;
