@@ -1,0 +1,10 @@
+{
+    "toastDismiss" : "cerrar",
+    "email": "Correo electrónico",
+    "password": "Contraseña",
+    "or": "o",
+    "loginButton": "Iniciar sesión",
+    "signUpButton": "Registrarse",
+    "logoutButton": "Cerrar sesión",
+    "updateButton": "Actualizar"
+}

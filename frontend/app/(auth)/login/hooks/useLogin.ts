@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 import { useSupabase } from "@/lib/context/SupabaseProvider";
 import { useToast } from "@/lib/hooks";
@@ -14,6 +15,8 @@ export const useLogin = () => {
   const { supabase, session } = useSupabase();
 
   const { track } = useEventTracking();
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const {t, i18n} = useTranslation(["login"]);
 
   const handleLogin = async () => {
     setIsPending(true);
@@ -21,16 +24,17 @@ export const useLogin = () => {
       email: email,
       password: password,
     });
-
     if (error) {
+      console.log(error.message)
       publish({
         variant: "danger",
-        text: error.message,
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-call
+        text: t(error.message.replaceAll(' ',''),{ ns: 'login' })
       });
     } else {
       publish({
         variant: "success",
-        text: "Successfully logged in",
+        text: t("loginSuccess",{ ns: 'login' })
       });
     }
     setIsPending(false);
