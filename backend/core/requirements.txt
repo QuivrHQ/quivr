@@ -14,7 +14,7 @@ python-multipart==0.0.6
 uvicorn==0.22.0
 pypandoc==1.11
 docx2txt==0.8
-guidance==0.0.53
+guidance==0.0.64
 python-jose==3.3.0
 google_cloud_aiplatform==1.25.0
 transformers==4.30.1
