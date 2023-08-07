@@ -95,7 +95,7 @@ export const useQuestion = (): UseChatService => {
       );
 
       if (response.body === null) {
-        throw new Error(t("responseBodyIsNull",{ns:'chat'}));
+        throw new Error(t("resposeBodyNull",{ns:'chat'}));
       }
 
       console.log(t("receivedResponse"), response);

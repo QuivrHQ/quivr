@@ -13,7 +13,7 @@ export const useSignUp = () => {
   const [isPending, setIsPending] = useState(false);
   const { track } = useEventTracking();
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const {t, i18n} = useTranslation(["signUp"]);
+  const { t } = useTranslation(["signUp"]);
 
   const { publish } = useToast();
   const handleSignUp = async () => {
@@ -28,12 +28,12 @@ export const useSignUp = () => {
       console.error("Error signing up:", error.message);
       publish({
         variant: "danger",
-        text: t("errorSignUp",{ errorMessage: error.message, ns: 'login' }),
+        text: t("errorSignUp",{ errorMessage: error.message}),
       });
     } else {
       publish({
         variant: "success",
-        text: t("mailSended",{ ns: 'login' })
+        text: t("mailSended")
       });
     }
     setIsPending(false);

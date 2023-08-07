@@ -10,5 +10,6 @@
     "recoveryMailSended": "Recovery mail will be sent if email recognized",
     "Invalidlogincredentials" : "Invalid login credentials",
     "password.updated": "Password updated successfully!",
-    "new_password": "New Password"
+    "new_password": "New Password",
+    "Failedtofetch": "Failed to Failed"
 }
