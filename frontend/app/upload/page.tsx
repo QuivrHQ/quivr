@@ -13,10 +13,13 @@ import { Crawler } from "./components/Crawler";
 import { FileUploader } from "./components/FileUploader";
 
 const requiredRolesForUpload: BrainRoleType[] = ["Editor", "Owner"];
+import { useTranslation } from "react-i18next";
+import { Suspense } from "react";
 
 const UploadPage = (): JSX.Element => {
   const { currentBrain } = useBrainContext();
   const { session } = useSupabase();
+  const {t, i18n} = useTranslation(["translation","upload"]);
 
   if (session === null) {
     redirectToLogin();
@@ -51,24 +54,32 @@ const UploadPage = (): JSX.Element => {
       </div>
     );
   }
+  function Upload() {
+    return (
+      <main className="pt-10">
+        <PageHeading
+          title={t("title",{"ns":"upload"})}
+          subtitle={t("subtitle",{"ns":"upload"})}
+        />
+        <FileUploader />
+        <Divider text={t("or")} className="m-5" />
+        <Crawler />
+        <div className="flex flex-col items-center justify-center gap-5 mt-5">
+          <Link href={"/chat"}>
+            <Button variant={"secondary"} className="py-3">
+              {t("chatButton")}
+            </Button>
+          </Link>
+        </div>
+      </main>
+    ); 
+  }
 
   return (
-    <main className="pt-10">
-      <PageHeading
-        title={`Upload Knowledge to ${currentBrain.name}`}
-        subtitle="Text, document, spreadsheet, presentation, audio, video, and URLs supported"
-      />
-      <FileUploader />
-      <Divider text="or" className="m-5" />
-      <Crawler />
-      <div className="flex flex-col items-center justify-center gap-5 mt-5">
-        <Link href={"/chat"}>
-          <Button variant={"secondary"} className="py-3">
-            Chat
-          </Button>
-        </Link>
-      </div>
-    </main>
+    <Suspense fallback="Loading...">
+      <Upload />
+    </Suspense>
+    
   );
 };
 

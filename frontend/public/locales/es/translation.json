@@ -6,5 +6,9 @@
     "loginButton": "Iniciar sesión",
     "signUpButton": "Registrarse",
     "logoutButton": "Cerrar sesión",
-    "updateButton": "Actualizar"
+    "updateButton": "Actualizar",
+    "uploadButton": "Subir",
+    "uploadingButton": "Subiendo...",
+    "crawlButton": "Rastrear",
+    "chatButton": "Chatear"
 }

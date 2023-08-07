@@ -1,5 +1,7 @@
+/* eslint-disable */
 "use client";
 import { AnimatePresence } from "framer-motion";
+import { useTranslation } from "react-i18next";
 
 import Button from "@/lib/components/ui/Button";
 import Card from "@/lib/components/ui/Card";
@@ -19,6 +21,9 @@ export const FileUploader = (): JSX.Element => {
     setFiles,
   } = useFileUploader();
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const {t, i18n} = useTranslation(["translation","upload"]);
+
   return (
     <section
       {...getRootProps()}
@@ -30,13 +35,13 @@ export const FileUploader = (): JSX.Element => {
             <input {...getInputProps()} />
             <div className="text-center p-6 max-w-sm w-full flex flex-col gap-5 items-center">
               {isDragActive ? (
-                <p className="text-blue-600">Drop the files here...</p>
+                <p className="text-blue-600">{t("drop",{"ns":"upload"})}</p>
               ) : (
                 <button
                   onClick={open}
                   className="opacity-50 h-full cursor-pointer hover:opacity-100 hover:underline transition-opacity"
                 >
-                  Drag and drop files here, or click to browse
+                  {t("dragAndDrop",{"ns":"upload"})}
                 </button>
               )}
             </div>
@@ -63,9 +68,11 @@ export const FileUploader = (): JSX.Element => {
       </div>
       <div className="flex flex-col items-center justify-center">
         <Button isLoading={isPending} onClick={() => void uploadAllFiles()}>
-          {isPending ? "Uploading..." : "Upload"}
+          {isPending ? t("uploadingButton") : t("uploadButton")}
         </Button>
       </div>
     </section>
   );
+
+  
 };
