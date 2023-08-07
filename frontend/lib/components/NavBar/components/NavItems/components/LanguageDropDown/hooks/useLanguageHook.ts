@@ -23,6 +23,10 @@ export const useLanguageHook = (): {
       {
         id: "es",
         name: 'Español'
+      },
+      {
+        id: "fr",
+        name: 'Français'
       }
     ];
     

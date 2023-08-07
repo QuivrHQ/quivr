@@ -1,0 +1,19 @@
+{
+    "title": "Discuter avec {{brain}}",
+    "subtitle": "Parlez à un modèle linguistique de vos données téléchargées",
+    "limit_reached": "Vous avez atteint la limite de requêtes, veuillez réessayer plus tard",
+    "error_occurred": "Une erreur s'est produite lors de l'obtention de la réponse",
+    "noCurrentBrain": "Pas de cerveau actuel",
+    "errorParsingData": "Erreur lors de l'analyse des données",
+    "resposeBodyNull": "Le corps de la réponse est nul",
+    "receivedResponse": "Réponse reçue. Commence à gérer le flux...",
+    "errorCallingAPI": "Erreur lors de l'appel à l'API",
+    "ask": "Posez une question ou décrivez une tâche.",
+    "begin_conversation_placeholder": "Commencez la conversation ici...",
+    "thinking": "Réflexion...",
+    "chat": "Chat",
+    "errorFetching": "Erreur lors de la récupération de vos chats",
+    "chatDeleted": "Chat supprimé avec succès. Id : {{id}}",
+    "errorDeleting": "Erreur lors de la suppression du chat : {{error}}",
+    "chatNameUpdated": "Nom du chat mis à jour"
+}
