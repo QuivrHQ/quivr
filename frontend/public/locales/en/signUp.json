@@ -1,0 +1,13 @@
+{
+    "title": "Sign Up",
+    "subtitle": "Create your account",
+    "email": "Email",
+    "password": "Password",
+    "loginButton": "Login",
+    "signUpButton": "Sign up",
+    "or": "or",
+    "login": "Already registered? Sign in",
+    "googleLogin": "Login with Google",
+    "errorSignUp": "Error signing up: {{errorMessage}}",
+    "mailSended": "Confirmation Email sent, please check your email"
+}

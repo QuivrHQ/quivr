@@ -1,0 +1,10 @@
+{
+    "toastDismiss" : "dismiss",
+    "email": "Email",
+    "password": "Password",
+    "or": "or",
+    "loginButton": "Login",
+    "signUpButton": "Sign up",
+    "logoutButton": "Logout",
+    "updateButton": "Update"
+}
