@@ -8,7 +8,7 @@ import { useBrainApi } from "@/lib/api/brain/useBrainApi";
 import { usePromptApi } from "@/lib/api/prompt/usePromptApi";
 import { useBrainConfig } from "@/lib/context/BrainConfigProvider";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
-import { defineMaxTokens } from "@/lib/helpers/defineMexTokens";
+import { defineMaxTokens } from "@/lib/helpers/defineMaxTokens";
 import { useToast } from "@/lib/hooks";
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
@@ -145,7 +145,7 @@ export const useAddBrainModal = () => {
     setIsShareModalOpen,
     handleSubmit,
     register,
-    openAiKey,
+    openAiKey: openAiKey === "" ? undefined : openAiKey,
     model,
     temperature,
     maxTokens,

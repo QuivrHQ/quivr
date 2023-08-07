@@ -7,8 +7,11 @@ import { PublicPrompts } from "@/app/brains-management/[brainId]/components/Brai
 import Button from "@/lib/components/ui/Button";
 import Field from "@/lib/components/ui/Field";
 import { Modal } from "@/lib/components/ui/Modal";
-import { models, paidModels } from "@/lib/context/BrainConfigProvider/types";
-import { defineMaxTokens } from "@/lib/helpers/defineMexTokens";
+import {
+  freeModels,
+  paidModels,
+} from "@/lib/context/BrainConfigProvider/types";
+import { defineMaxTokens } from "@/lib/helpers/defineMaxTokens";
 
 import { useAddBrainModal } from "./hooks/useAddBrainModal";
 import { Divider } from "../ui/Divider";
@@ -84,7 +87,7 @@ export const AddBrainModal = (): JSX.Element => {
             {...register("model")}
             className="px-5 py-2 dark:bg-gray-700 bg-gray-200 rounded-md"
           >
-            {(openAiKey !== undefined ? paidModels : models).map(
+            {(openAiKey !== undefined ? paidModels : freeModels).map(
               (availableModel) => (
                 <option value={availableModel} key={availableModel}>
                   {availableModel}

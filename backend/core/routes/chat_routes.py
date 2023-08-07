@@ -182,7 +182,7 @@ async def create_question_handler(
         or not chat_question.max_tokens
     ):
         # TODO: create ChatConfig class (pick config from brain or user or chat) and use it here
-        chat_question.model = chat_question.model or brain.model or "gpt-3.5-turbo-0613"
+        chat_question.model = chat_question.model or brain.model or "gpt-3.5-turbo"
         chat_question.temperature = chat_question.temperature or brain.temperature or 0
         chat_question.max_tokens = chat_question.max_tokens or brain.max_tokens or 256
 
@@ -254,7 +254,7 @@ async def create_stream_question_handler(
         or not chat_question.max_tokens
     ):
         # TODO: create ChatConfig class (pick config from brain or user or chat) and use it here
-        chat_question.model = chat_question.model or brain.model or "gpt-3.5-turbo-0613"
+        chat_question.model = chat_question.model or brain.model or "gpt-3.5-turbo"
         chat_question.temperature = chat_question.temperature or brain.temperature or 0
         chat_question.max_tokens = chat_question.max_tokens or brain.max_tokens or 256
 

@@ -10,8 +10,11 @@ import Button from "@/lib/components/ui/Button";
 import { Divider } from "@/lib/components/ui/Divider";
 import Field from "@/lib/components/ui/Field";
 import { TextArea } from "@/lib/components/ui/TextArea";
-import { models, paidModels } from "@/lib/context/BrainConfigProvider/types";
-import { defineMaxTokens } from "@/lib/helpers/defineMexTokens";
+import {
+  freeModels,
+  paidModels,
+} from "@/lib/context/BrainConfigProvider/types";
+import { defineMaxTokens } from "@/lib/helpers/defineMaxTokens";
 
 import { PublicPrompts } from "./components/PublicPrompts/PublicPrompts";
 import { useSettingsTab } from "./hooks/useSettingsTab";
@@ -99,7 +102,7 @@ export const SettingsTab = ({ brainId }: SettingsTabProps): JSX.Element => {
           {...register("model")}
           className="px-5 py-2 dark:bg-gray-700 bg-gray-200 rounded-md"
         >
-          {(openAiKey !== undefined ? paidModels : models).map(
+          {(openAiKey !== undefined ? paidModels : freeModels).map(
             (availableModel) => (
               <option value={availableModel} key={availableModel}>
                 {availableModel}
