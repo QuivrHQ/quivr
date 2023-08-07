@@ -1,4 +1,5 @@
 {
+    "lang": "es-ES",
     "toastDismiss" : "cerrar",
     "email": "Correo electrónico",
     "password": "Contraseña",
@@ -10,13 +11,14 @@
     "uploadButton": "Subir",
     "uploadingButton": "Subiendo...",
     "crawlButton": "Rastrear",
-    "chatButton": "Chatear",
+    "chatButton": "Conversar",
     "deleteButton": "Borrar",
     "deleteForeverButton": "Borrar para siempre",
     "doneButton": "Listo",
     "resetButton": "Restaurar",
+    "newChatButton": "Nueva conversación",
     "Upload": "Subir",
-    "Chat": "Chatear",
+    "Chat": "Conversar",
     "Explore": "Explorar",
     "loading": "Cargando...",
     "comingSoon": "Próximamente"

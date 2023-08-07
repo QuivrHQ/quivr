@@ -1,0 +1,19 @@
+{
+    "title": "Conversa con {{brain}}",
+    "subtitle": "Habla con un modelo de lenguaje acerca de tus datos subidos",
+    "limit_reached": "Has alcanzado el límite de peticiones, intente de nuevo más tarde",
+    "error_occurred": "Error al obtener respuesta",
+    "noCurrentBrain": "Sin cerebro seleccionado",
+    "errorParsingData": "Error al transformar datos",
+    "resposeBodyNull": "Cuerpo de respuesta vacío",
+    "receivedResponse": "Respuesta recibida. Iniciando gestión de stream...",
+    "errorCallingAPI": "Error al llamar a la API",
+    "ask": "Has una pregunta o describe un tarea.",
+    "begin_conversation_placeholder": "Inicia la conversación aquí...",
+    "thinking": "Pensando...",
+    "chat": "Conversar",
+    "errorFetching": "Error al obtener tus chats",
+    "chatDeleted": "Chat borrado correstamente. Id: {{id}}",
+    "errorDeleting": "Error al borrar chat: {{error}}",
+    "chatNameUpdated": "Nombre de chat actualizado"
+}
