@@ -10,5 +10,12 @@
     "uploadButton": "Upload",
     "uploadingButton": "Uploading...",
     "crawlButton": "Crawl",
-    "chatButton": "Chat"
+    "chatButton": "Chat",
+    "deleteButton": "Delete",
+    "deleteForeverButton": "Delete forever",
+    "doneButton": "Done",
+    "Upload": "Upload",
+    "Chat": "Chat",
+    "Explore": "Explore",
+    "loading": "Loading..."
 }

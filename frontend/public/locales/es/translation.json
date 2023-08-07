@@ -10,5 +10,12 @@
     "uploadButton": "Subir",
     "uploadingButton": "Subiendo...",
     "crawlButton": "Rastrear",
-    "chatButton": "Chatear"
+    "chatButton": "Chatear",
+    "deleteButton": "Borrar",
+    "deleteForeverButton": "Borrar para siempre",
+    "doneButton": "Listo",
+    "Upload": "Subir",
+    "Chat": "Chatear",
+    "Explore": "Explorar",
+    "loading": "Cargando..."
 }

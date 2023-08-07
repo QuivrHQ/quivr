@@ -1,5 +1,6 @@
 import { UUID } from "crypto";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 import { useBrainApi } from "@/lib/api/brain/useBrainApi";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
@@ -15,13 +16,14 @@ export const useExplore = () => {
   const { axiosInstance } = useAxios();
   const { currentBrainId } = useBrainContext();
   const { getBrainDocuments } = useBrainApi();
+  const {t} = useTranslation(["translation","explore"]);
 
   useEffect(() => {
     const fetchDocuments = async (brainId: UUID | null) => {
       setIsPending(true);
       try {
         if (brainId === null) {
-          throw new Error("Brain id not found");
+          throw new Error(t("noBrain",{"ns":"explore"}));
         }
         const brainDocuments = await getBrainDocuments(brainId);
         setDocuments(brainDocuments);
