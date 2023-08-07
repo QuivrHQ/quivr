@@ -1,4 +1,5 @@
 {
+    "lang": "en-US",
     "toastDismiss" : "dismiss",
     "email": "Email",
     "password": "Password",
@@ -15,6 +16,7 @@
     "deleteForeverButton": "Delete forever",
     "doneButton": "Done",
     "resetButton": "Reset",
+    "newChatButton": "New Chat",
     "Upload": "Upload",
     "Chat": "Chat",
     "Explore": "Explore",
