@@ -2,8 +2,6 @@ from abc import abstractmethod
 from typing import AsyncIterable, List
 
 from langchain.callbacks.streaming_aiter import AsyncIteratorCallbackHandler
-from langchain.chains import ConversationalRetrievalChain, LLMChain
-from langchain.llms.base import LLM
 from logger import get_logger
 from models.settings import BrainSettings  # Importing settings related to the 'brain'
 from pydantic import BaseModel  # For data validation and settings management
@@ -74,75 +72,6 @@ class BaseBrainPicking(BaseModel):
 
         # the below methods define the names, arguments and return types for the most useful functions for the child classes. These should be overwritten if they are used.
         @abstractmethod
-        def _create_llm(self, model, temperature=0, streaming=False, callbacks=None) -> LLM:
-            """
-            Determine and construct the language model.
-            :param model: Language model name to be used.
-            :return: Language model instance
-
-            This method should take into account the following:
-            - Whether the model is streaming compatible
-            - Whether the model is private
-            - Whether the model should use an openai api key and use the _determine_api_key method
-            """
-
-        @abstractmethod
-        def _create_question_chain(self, model) -> LLMChain:
-            """
-            Determine and construct the question chain.
-            :param model: Language model name to be used.
-            :return: Question chain instance
-
-            This method should take into account the following:
-            - Which prompt to use (normally CONDENSE_QUESTION_PROMPT)
-            """
-
-        @abstractmethod
-        def _create_doc_chain(self, model) -> LLMChain:
-            """
-            Determine and construct the document chain.
-            :param model Language model name to be used.
-            :return: Document chain instance
-
-            This method should take into account the following:
-            - chain_type (normally "stuff")
-            - Whether the model is streaming compatible and/or streaming is set (determine_streaming).
-            """
-
-        @abstractmethod
-        def _create_qa(
-            self, question_chain, document_chain
-        ) -> ConversationalRetrievalChain:
-            """
-            Constructs a conversational retrieval chain .
-            :param question_chain
-            :param document_chain
-            :return: ConversationalRetrievalChain instance
-            """
-
-        @abstractmethod
-        def _call_chain(self, chain, question, history) -> str:
-            """
-            Call a chain with a given question and history.
-            :param chain: The chain eg QA (ConversationalRetrievalChain)
-            :param question: The user prompt
-            :param history: The chat history from DB
-            :return: The answer.
-            """
-
-        async def _acall_chain(self, chain, question, history) -> str:
-            """
-            Call a chain with a given question and history.
-            :param chain: The chain eg qa (ConversationalRetrievalChain)
-            :param question: The user prompt
-            :param history: The chat history from DB
-            :return: The answer.
-            """
-            raise NotImplementedError(
-                "Async generation not implemented for this BrainPicking Class."
-            )
-
-        @abstractmethod
         def generate_answer(self, question: str) -> str:
             """
             Generate an answer to a given question using QA Chain.
@@ -153,7 +82,7 @@ class BaseBrainPicking(BaseModel):
             It should also update the chat_history in the DB.
             """
         
-        
+        @abstractmethod
         async def generate_stream(self, question: str) -> AsyncIterable:
             """
             Generate a streaming answer to a given question using QA Chain.
