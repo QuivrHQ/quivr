@@ -1,4 +1,5 @@
 /* eslint-disable max-lines */
+import { useTranslation } from "react-i18next";
 import { MdAdd } from "react-icons/md";
 
 import { PublicPrompts } from "@/app/brains-management/[brainId]/components/BrainManagementTabs/components/SettingsTab/components/PublicPrompts";
@@ -13,6 +14,7 @@ import { Divider } from "../ui/Divider";
 import { TextArea } from "../ui/TextArea";
 
 export const AddBrainModal = (): JSX.Element => {
+  const { t } = useTranslation(["brain"]);
   const {
     handleSubmit,
     isShareModalOpen,
@@ -30,7 +32,7 @@ export const AddBrainModal = (): JSX.Element => {
     <Modal
       Trigger={
         <Button variant={"secondary"}>
-          Add New Brain
+          {t("newBrain")}
           <MdAdd className="text-xl" />
         </Button>
       }

@@ -16,7 +16,7 @@ export const useLogin = () => {
 
   const { track } = useEventTracking();
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const {t, i18n} = useTranslation(["login"]);
+  const { t } = useTranslation(["login"]);
 
   const handleLogin = async () => {
     setIsPending(true);
@@ -26,11 +26,23 @@ export const useLogin = () => {
     });
     if (error) {
       console.log(error.message)
-      publish({
-        variant: "danger",
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-call
-        text: t(error.message.replaceAll(' ',''),{ ns: 'login' })
-      });
+      if (error.message.includes("Failed")) {
+        publish({
+          variant: "danger",
+          text: t("Failedtofetch",{ ns: 'login' })
+        });
+      } else if (error.message.includes("Invalid")) {
+        publish({
+          variant: "danger",
+          text: t("Invalidlogincredentials",{ ns: 'login' })
+        });
+      } else {
+        publish({
+          variant: "danger",
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-call
+          text: error.message
+        });
+      }
     } else {
       publish({
         variant: "success",

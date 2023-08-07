@@ -1,5 +1,6 @@
 import * as Accordion from "@radix-ui/react-accordion";
 import { ChangeEvent, useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 import { usePromptApi } from "@/lib/api/prompt/usePromptApi";
 import { Prompt } from "@/lib/types/Prompt";
@@ -11,6 +12,7 @@ type PublicPromptsProps = {
 export const PublicPrompts = ({
   onSelect,
 }: PublicPromptsProps): JSX.Element => {
+  const { t } = useTranslation(["config"]);
   const [publicPrompts, setPublicPrompts] = useState<Prompt[]>([]);
 
   const { getPublicPrompts } = usePromptApi();
@@ -38,7 +40,7 @@ export const PublicPrompts = ({
   return (
     <Accordion.Root className="AccordionRoot" type="single" collapsible>
       <Accordion.Item className="AccordionItem" value="item-1">
-        <Accordion.Trigger>Pick in public prompts</Accordion.Trigger>
+        <Accordion.Trigger>{t("publicPrompts", {ns:"config",defaultMessage:"Pick in public prompts"})}</Accordion.Trigger>
         <Accordion.Content>
           <select
             onChange={handleChange}

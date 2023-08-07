@@ -51,15 +51,12 @@ export const RequestsPerDayChart = ({
       }}
       {...props}
     >
-      {/* @ts-expect-error Server Component */}
       <VictoryAxis
         tickFormat={(tick) => {
           return `${tick.split("/")[0]}/${tick.split("/")[1]}`;
         }}
       />
-      {/* @ts-expect-error Server Component */}
       <VictoryAxis dependentAxis />
-      {/* @ts-expect-error Server Component */}
       <VictoryLine data={data} x="date" y="requests_count" />
     </VictoryChart>
   );

@@ -23,5 +23,8 @@
     "Chat": "Conversar",
     "Explore": "Explorar",
     "loading": "Cargando...",
-    "comingSoon": "Próximamente"
+    "comingSoon": "Próximamente",
+    "Viewer": "Espectador",
+    "Editor": "Editor",
+    "Owner": "Propietario"
 }

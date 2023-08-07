@@ -104,7 +104,7 @@ export const useShareBrain = (brainId: string) => {
       } else {
         publish({
           variant: "danger",
-          text: t('errorSendindInvitation')
+          text: t("errorSendingInvitation")
         });
       }
     } finally {

@@ -10,5 +10,6 @@
     "recoveryMailSended": "El correo de recuperación será enviado si el email es reconocido",
     "Invalidlogincredentials" : "Credenciales inválidas",
     "password.updated": "¡Contraseña actualizada!",
-    "new_password": "Nueva contraseña"
+    "new_password": "Nueva contraseña",
+    "Failedtofetch": "Error al obtener datos"
 }

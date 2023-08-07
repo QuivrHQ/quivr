@@ -1,3 +1,4 @@
+/* eslint-disable */
 "use client";
 import { useTranslation } from "react-i18next";
 import {
@@ -21,7 +22,6 @@ const BrainSpaceChart = ({
 
   return (
     <>
-      {/* @ts-expect-error Server Component */}
       <VictoryPie
         data={[
           { x: t("Used", {ns: "user"}), y: current_brain_size },
