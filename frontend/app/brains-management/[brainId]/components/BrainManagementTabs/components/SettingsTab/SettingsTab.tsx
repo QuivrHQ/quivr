@@ -10,7 +10,7 @@ import { TextArea } from "@/lib/components/ui/TextArea";
 import { models, paidModels } from "@/lib/context/BrainConfigProvider/types";
 import { defineMaxTokens } from "@/lib/helpers/defineMexTokens";
 
-import { PublicPrompts } from "./components/PublicPrompts";
+import { PublicPrompts } from "./components/PublicPrompts/PublicPrompts";
 import { useSettingsTab } from "./hooks/useSettingsTab";
 
 type SettingsTabProps = {
