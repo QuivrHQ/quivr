@@ -1,5 +1,25 @@
 # Changelog
 
+## [0.0.52](https://github.com/StanGirard/quivr/compare/v0.0.51...v0.0.52) (2023-08-07)
+
+
+### Features
+
+* add custom prompt fields on brain setting pages ([#837](https://github.com/StanGirard/quivr/issues/837)) ([99a3fa9](https://github.com/StanGirard/quivr/commit/99a3fa9b296520a71028194e21bc808a2ec208a0))
+* add public prompts picker ([#841](https://github.com/StanGirard/quivr/issues/841)) ([b3fb8fc](https://github.com/StanGirard/quivr/commit/b3fb8fc3bc2d71a72e73b4f0aa30c84255a77fc0))
+* remove private prompts on related brain delete ([#842](https://github.com/StanGirard/quivr/issues/842)) ([4c15fe2](https://github.com/StanGirard/quivr/commit/4c15fe2bfde7a2fdc59c299ef668f1ba0cd8ffa8))
+
+
+### Bug Fixes
+
+* **pg-database:** by default variable is not implemented ([#848](https://github.com/StanGirard/quivr/issues/848)) ([69e2c28](https://github.com/StanGirard/quivr/commit/69e2c289e5a6e4cfd6b7187a3c4fda5c538d5d35))
+* remove typo ([#853](https://github.com/StanGirard/quivr/issues/853)) ([5496e9d](https://github.com/StanGirard/quivr/commit/5496e9d738a1f80f11b6c8fa8606960abcbcd06d))
+
+
+### Performance Improvements
+
+* **deps:** removed ([#873](https://github.com/StanGirard/quivr/issues/873)) ([10d4d65](https://github.com/StanGirard/quivr/commit/10d4d65c1e203aaae1069395ed5066fbfc9c7715))
+
 ## [0.0.51](https://github.com/StanGirard/quivr/compare/v0.0.50...v0.0.51) (2023-08-03)
 
 
