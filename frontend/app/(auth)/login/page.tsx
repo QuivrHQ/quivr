@@ -19,7 +19,7 @@ import { Suspense } from "react";
 function Main() {
   const { handleLogin, setEmail, setPassword, email, isPending, password } =
     useLogin();
-  const {t, i18n} = useTranslation(["translation","login"]);
+  const { t } = useTranslation(["translation","login"]);
   return (
     <main>
       <section className="w-full min-h-[80vh] h-full outline-none flex flex-col gap-5 items-center justify-center p-6">
