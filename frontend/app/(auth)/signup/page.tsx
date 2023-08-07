@@ -12,7 +12,7 @@ import { useTranslation } from "react-i18next";
 export default function SignUp() {
   const { handleSignUp, isPending, email, password, setEmail, setPassword } =
     useSignUp();
-  const {t, i18n} = useTranslation(["translation","signUp"]);
+  const {t} = useTranslation(["translation","signUp"]);
   return (
     <main data-testid="sign-up-page">
       <section className="min-h-[80vh] w-full h-full outline-none flex flex-col gap-5 items-center justify-center p-6">

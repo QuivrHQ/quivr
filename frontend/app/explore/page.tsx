@@ -1,6 +1,7 @@
 "use client";
 import { AnimatePresence, motion } from "framer-motion";
 import Link from "next/link";
+import { useTranslation } from "react-i18next";
 
 import Button from "@/lib/components/ui/Button";
 import Spinner from "@/lib/components/ui/Spinner";
@@ -10,7 +11,6 @@ import { redirectToLogin } from "@/lib/router/redirectToLogin";
 
 import DocumentItem from "./DocumentItem";
 import { useExplore } from "./hooks/useExplore";
-import { useTranslation } from "react-i18next";
 
 const ExplorePage = (): JSX.Element => {
   const {t} = useTranslation(["translation","explore"]);

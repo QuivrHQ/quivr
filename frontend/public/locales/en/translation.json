@@ -14,8 +14,10 @@
     "deleteButton": "Delete",
     "deleteForeverButton": "Delete forever",
     "doneButton": "Done",
+    "resetButton": "Reset",
     "Upload": "Upload",
     "Chat": "Chat",
     "Explore": "Explore",
-    "loading": "Loading..."
+    "loading": "Loading...",
+    "comingSoon": "Coming soon"
 }

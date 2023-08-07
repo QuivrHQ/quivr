@@ -14,8 +14,10 @@
     "deleteButton": "Borrar",
     "deleteForeverButton": "Borrar para siempre",
     "doneButton": "Listo",
+    "resetButton": "Restaurar",
     "Upload": "Subir",
     "Chat": "Chatear",
     "Explore": "Explorar",
-    "loading": "Cargando..."
+    "loading": "Cargando...",
+    "comingSoon": "Próximamente"
 }
