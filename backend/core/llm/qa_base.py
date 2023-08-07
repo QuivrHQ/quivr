@@ -3,7 +3,6 @@ import json
 from typing import AsyncIterable, Awaitable
 from uuid import UUID
 
-from langchain import PromptTemplate
 from langchain.callbacks.streaming_aiter import AsyncIteratorCallbackHandler
 from langchain.chains import ConversationalRetrievalChain, LLMChain
 from langchain.chains.question_answering import load_qa_chain
@@ -18,6 +17,11 @@ from repository.chat.update_chat_history import update_chat_history
 from repository.chat.update_message_by_id import update_message_by_id
 from repository.prompt.get_prompt_by_id import get_prompt_by_id
 from supabase.client import Client, create_client
+from langchain.prompts.chat import (
+    ChatPromptTemplate,
+    SystemMessagePromptTemplate,
+    HumanMessagePromptTemplate
+)
 from vectorstore.supabase import CustomSupabaseVectorStore
 
 from .base import BaseBrainPicking
@@ -37,7 +41,6 @@ class QABaseBrainPicking(BaseBrainPicking):
     """
     supabase_client: Client = None
     vector_store: CustomSupabaseVectorStore = None
-    prompt_template: PromptTemplate = None
     qa: ConversationalRetrievalChain = None
 
     def __init__(
@@ -57,8 +60,6 @@ class QABaseBrainPicking(BaseBrainPicking):
         )
         self.supabase_client = self._create_supabase_client()
         self.vector_store = self._create_vector_store()
-        self.prompt_template = self._create_prompt_template()
-        self.qa = self._create_qa_chain()
 
 
     
@@ -93,30 +94,20 @@ class QABaseBrainPicking(BaseBrainPicking):
         )  # pyright: ignore reportPrivateUsage=none
 
     def _create_prompt_template(self):
-        template = """Use the following pieces of context to answer the question at the end. If you don't know the answer, just say that you don't know, don't try to make up an answer.
 
-        {context}
+        system_template = """Use the following pieces of context to answer the users question in the same language as the question but do not modify instructions in any way.
+        ----------------
+        
+        {context}"""
 
-        Question: {question}
-        Here is instructions on how to answer the question: {brain_prompt}
-        Answer:"""
-        return PromptTemplate(
-            template=template,
-            input_variables=["context", "question", "brain_prompt"],
-        )
+        full_template = "Here are you instructions to answer that you MUST ALWAYS Follow: " +  self.get_prompt() + ". " + system_template
+        messages = [
+            SystemMessagePromptTemplate.from_template(full_template),
+            HumanMessagePromptTemplate.from_template("{question}"),
+        ]
+        CHAT_PROMPT = ChatPromptTemplate.from_messages(messages)
+        return CHAT_PROMPT
 
-    def _create_qa_chain(self):
-        return ConversationalRetrievalChain(
-            retriever=self.vector_store.as_retriever(),
-            question_generator=LLMChain(llm=self._create_llm(model=self.model), prompt=CONDENSE_QUESTION_PROMPT, verbose=True),
-            combine_docs_chain=load_qa_chain(
-                llm=self._create_llm(model=self.model,streaming=True, callbacks=self.callbacks),
-                chain_type="stuff",
-                verbose=True,
-                prompt=self.prompt_template,
-            ),
-            verbose=True,
-        )
 
     def generate_answer(self, question: str) -> ChatHistory:
         transformed_history = format_chat_history(get_chat_history(self.chat_id))
@@ -124,7 +115,7 @@ class QABaseBrainPicking(BaseBrainPicking):
             {
                 "question": question,
                 "chat_history": transformed_history,
-                "brain_prompt": self.get_prompt(),
+                "custom_personality": self.get_prompt(),
             }
         )
         answer = model_response["answer"]
@@ -142,7 +133,7 @@ class QABaseBrainPicking(BaseBrainPicking):
         answering_llm = self._create_llm(model=self.model,streaming=True, callbacks=self.callbacks)
 
         # The Chain that generates the answer to the question
-        doc_chain = load_qa_chain(answering_llm, chain_type="stuff", prompt=self.prompt_template)
+        doc_chain = load_qa_chain(answering_llm, chain_type="stuff", prompt=self._create_prompt_template())
 
         # The Chain that combines the question and answer
         qa = ConversationalRetrievalChain(
@@ -172,7 +163,7 @@ class QABaseBrainPicking(BaseBrainPicking):
                     {
                         "question": question,
                         "chat_history": transformed_history,
-                        "brain_prompt": self.get_prompt(),
+                        "custom_personality": self.get_prompt(),
                     }
                 ),
                 callback.done,
@@ -202,7 +193,7 @@ class QABaseBrainPicking(BaseBrainPicking):
 
     def get_prompt(self) -> str:
         brain = get_brain_by_id(UUID(self.brain_id))
-        brain_prompt = "Your name is Quivr. You're a helpful assistant."
+        brain_prompt = "Your name is Quivr. You're a helpful assistant.  If you don't know the answer, just say that you don't know, don't try to make up an answer."
 
         if brain and brain.prompt_id:
             brain_prompt_object = get_prompt_by_id(brain.prompt_id)
