@@ -1,0 +1,15 @@
+{
+    "title": "Login",
+    "subtitle": "Welcome back",
+    "signup": "Don't have an account? Sign up",
+    "forgottenPassword": "Password forgotten",
+    "googleLogin": "Login with Google",
+    "magicLink": "Send Magic Link",
+    "loginSuccess": "Successfully logged in",
+    "errorMailMissed": "Please enter your email address",
+    "recoveryMailSended": "Recovery mail will be sent if email recognized",
+    "Invalidlogincredentials" : "Invalid login credentials",
+    "password.updated": "Password updated successfully!",
+    "new_password": "New Password",
+    "Failedtofetch": "Failed to Failed"
+}

@@ -39,7 +39,7 @@ vi.mock("@/lib/context/BrainConfigProvider/brain-config-provider", () => ({
 
 describe("Chat page", () => {
   it("should render chat page correctly", () => {
-    const { getByTestId, getByText } = render(
+    const { getByTestId } = render(
       <SupabaseProviderMock>
         <BrainConfigProviderMock>
           <BrainProviderMock>
@@ -53,9 +53,7 @@ describe("Chat page", () => {
     expect(getByTestId("chat-messages")).toBeDefined();
     expect(getByTestId("chat-input")).toBeDefined();
 
-    expect(getByText("Chat with")).toBeDefined();
-    expect(
-      getByText("Talk to a language model about your uploaded data")
-    ).toBeDefined();
+    expect(getByTestId("page-heading-title")).toBeDefined();
+    expect(getByTestId("page-heading-subtitle")).toBeDefined();
   });
 });

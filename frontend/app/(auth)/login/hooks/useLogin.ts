@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 import { useSupabase } from "@/lib/context/SupabaseProvider";
 import { useToast } from "@/lib/hooks";
@@ -14,6 +15,8 @@ export const useLogin = () => {
   const { supabase, session } = useSupabase();
 
   const { track } = useEventTracking();
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { t } = useTranslation(["login"]);
 
   const handleLogin = async () => {
     setIsPending(true);
@@ -21,16 +24,29 @@ export const useLogin = () => {
       email: email,
       password: password,
     });
-
     if (error) {
-      publish({
-        variant: "danger",
-        text: error.message,
-      });
+      console.log(error.message)
+      if (error.message.includes("Failed")) {
+        publish({
+          variant: "danger",
+          text: t("Failedtofetch",{ ns: 'login' })
+        });
+      } else if (error.message.includes("Invalid")) {
+        publish({
+          variant: "danger",
+          text: t("Invalidlogincredentials",{ ns: 'login' })
+        });
+      } else {
+        publish({
+          variant: "danger",
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-call
+          text: error.message
+        });
+      }
     } else {
       publish({
         variant: "success",
-        text: "Successfully logged in",
+        text: t("loginSuccess",{ ns: 'login' })
       });
     }
     setIsPending(false);

@@ -3,6 +3,7 @@
 import * as ToastPrimitive from "@radix-ui/react-toast";
 import { AnimatePresence, motion } from "framer-motion";
 import { ReactNode } from "react";
+import { useTranslation } from "react-i18next";
 
 import { cn } from "@/lib/utils";
 
@@ -18,6 +19,7 @@ export const Toast = ({
   children?: ReactNode;
 } & ToastPrimitive.ToastProviderProps): JSX.Element => {
   const { publish, toasts, toggleToast } = useToastBuilder();
+  const {t, i18n} = useTranslation();
 
   return (
     <ToastPrimitive.Provider {...toastProviderProps}>
@@ -52,7 +54,7 @@ export const Toast = ({
                   </ToastPrimitive.Description>
                   <ToastPrimitive.Close asChild>
                     <Button variant={"tertiary"} className="text-white">
-                      Dismiss
+                      {t("toastDismiss")}
                     </Button>
                   </ToastPrimitive.Close>
                 </motion.div>

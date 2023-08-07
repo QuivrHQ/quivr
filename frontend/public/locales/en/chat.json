@@ -1,0 +1,19 @@
+{
+    "title": "Chat with {{brain}}",
+    "subtitle": "Talk to a language model about your uploaded data",
+    "limit_reached": "You have reached the limit of requests, please try again later",
+    "error_occurred": "Error occurred while getting answer",
+    "noCurrentBrain": "No current brain",
+    "errorParsingData": "Error parsing data",
+    "resposeBodyNull": "Responde body is null",
+    "receivedResponse": "Received response. Starting to handle stream...",
+    "errorCallingAPI": "Error calling the API",
+    "ask": "Ask a question, or describe a task.",
+    "begin_conversation_placeholder": "Begin conversation here...",
+    "thinking": "Thinking...",
+    "chat": "Chat",
+    "errorFetching": "Error occurred while fetching your chats",
+    "chatDeleted": "Chat sucessfully deleted. Id: {{id}}",
+    "errorDeleting": "Error deleting chat: {{error}}",
+    "chatNameUpdated": "Chat name updated"
+}

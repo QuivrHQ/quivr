@@ -50,15 +50,17 @@ export const ApiKeyConfig = (): JSX.Element => {
         )}
       </div>
 
-      <Divider text="OpenAI Key" className="mt-4 mb-4" />
+      <Divider
+        data-testid="open-ai-key-divider"
+        text="OpenAI Key"
+        className="mt-4 mb-4"
+      />
       <div className="flex mb-4 justify-center items-center mt-5">
         <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative max-w-md">
           <span className="block sm:inline">
             Your api key will be saved in our data. We will not use it for any
             other purpose. However,{" "}
-            <strong>
-              we have not implemented any encryption logic yet
-            </strong>
+            <strong>we have not implemented any encryption logic yet</strong>
           </span>
         </div>
       </div>
@@ -73,7 +75,7 @@ export const ApiKeyConfig = (): JSX.Element => {
           placeholder="Open AI Key"
           className="w-full"
           value={openAiApiKey ?? ""}
-          data-testid="open-ai-api-key"
+          data-testid="open-ai-api-key-input"
           onChange={(e) => setOpenAiApiKey(e.target.value)}
         />
         <div className="mt-4 flex flex-row justify-between">
