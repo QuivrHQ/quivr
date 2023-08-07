@@ -17,6 +17,8 @@
     "doneButton": "Done",
     "resetButton": "Reset",
     "newChatButton": "New Chat",
+    "createButton": "Create",
+    "shareButton": "Share",
     "Upload": "Upload",
     "Chat": "Chat",
     "Explore": "Explore",

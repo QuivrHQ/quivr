@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from 'react-i18next'
 import { FaBrain } from "react-icons/fa";
 import { MdCheck } from "react-icons/md";
 
@@ -13,6 +14,7 @@ export const BrainsDropDown = (): JSX.Element => {
   const [searchQuery, setSearchQuery] = useState("");
   const { allBrains, isFetchingBrains, setActiveBrain, currentBrain } =
     useBrainContext();
+  const { t } = useTranslation(['translation','brain']);
 
   return (
     <>
@@ -33,7 +35,7 @@ export const BrainsDropDown = (): JSX.Element => {
           <div>
             <Field
               name="brainsearch"
-              placeholder="Search for a brain"
+              placeholder= {t('searchBrain',{ns:'brain'})}
               autoFocus
               autoComplete="off"
               value={searchQuery}
@@ -43,7 +45,7 @@ export const BrainsDropDown = (): JSX.Element => {
               {/* List of brains */}
               {isFetchingBrains && (
                 <div className="flex items-center justify-center h-full">
-                  <p className="text-gray-500">Loading...</p>
+                  <p className="text-gray-500">{t('loading')}</p>
                 </div>
               )}
               {allBrains.map((brain) => {

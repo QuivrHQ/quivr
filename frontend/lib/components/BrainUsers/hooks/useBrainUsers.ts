@@ -1,5 +1,6 @@
 /* eslint-disable max-lines */
 import { useEffect, useState } from "react";
+import { useTranslation } from 'react-i18next'
 
 import { Subscription } from "@/lib/api/brain/brain";
 import { useBrainApi } from "@/lib/api/brain/useBrainApi";
@@ -14,6 +15,7 @@ export const useBrainUsers = (brainId: string) => {
   const { publish } = useToast();
   const { getBrainUsers } = useBrainApi();
   const { session } = useSupabase();
+  const { t } = useTranslation(['brain']);
 
   const fetchBrainUsers = async () => {
     // Optimistic update
@@ -24,7 +26,7 @@ export const useBrainUsers = (brainId: string) => {
     } catch {
       publish({
         variant: "danger",
-        text: "An error occurred while fetching brain users",
+        text: t('errorFetchingBrainUsers',{ns:'brain'})
       });
     } finally {
       setFetchingBrainUsers(false);
