@@ -12,7 +12,7 @@ export const LanguageDropDown = (): JSX.Element => {
   return (
     <>
       {/* Add the brain icon and dropdown */}
-      <div className="relative ml-auto px-4 py-2">
+      <div className="focus:outline-none text-3xl">
         <Popover
           Trigger={
             <button
