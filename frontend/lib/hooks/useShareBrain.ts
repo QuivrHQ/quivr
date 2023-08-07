@@ -1,6 +1,7 @@
 /* eslint-disable max-lines */
 import axios, { AxiosResponse } from "axios";
 import { useState } from "react";
+import { useTranslation } from 'react-i18next';
 
 import { Subscription } from "@/lib/api/brain/brain";
 import { useBrainApi } from "@/lib/api/brain/useBrainApi";
@@ -22,6 +23,7 @@ export const useShareBrain = (brainId: string) => {
   const [roleAssignations, setRoleAssignation] = useState<
     BrainRoleAssignation[]
   >([generateBrainAssignation()]);
+  const { t } = useTranslation(['brain']);
 
   const baseUrl = window.location.origin;
   const brainShareLink = `${baseUrl}/invitation/${brainId}`;
@@ -38,7 +40,7 @@ export const useShareBrain = (brainId: string) => {
     await navigator.clipboard.writeText(brainShareLink);
     publish({
       variant: "success",
-      text: "Copied to clipboard",
+      text: t('copiedToClipboard',{ns: 'brain'}),
     });
   };
 
@@ -84,7 +86,7 @@ export const useShareBrain = (brainId: string) => {
 
       publish({
         variant: "success",
-        text: "Users successfully invited",
+        text: t("usersInvited", { ns: "brain" }),
       });
 
       setIsShareModalOpen(false);
@@ -102,7 +104,7 @@ export const useShareBrain = (brainId: string) => {
       } else {
         publish({
           variant: "danger",
-          text: "An error occurred while sending invitations",
+          text: t("errorSendingInvitation")
         });
       }
     } finally {

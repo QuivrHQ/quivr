@@ -29,7 +29,7 @@ def test_create_brain(client, api_key):
     payload = {
         "name": random_brain_name,
         "status": "public",
-        "model": "gpt-3.5-turbo-0613",
+        "model": "gpt-3.5-turbo",
         "temperature": 0,
         "max_tokens": 256,
         "file_sha1": "",
@@ -173,7 +173,7 @@ def test_set_as_default_brain_endpoint(client, api_key):
     payload = {
         "name": random_brain_name,
         "status": "public",
-        "model": "gpt-3.5-turbo-0613",
+        "model": "gpt-3.5-turbo",
         "temperature": 0,
         "max_tokens": 256,
     }

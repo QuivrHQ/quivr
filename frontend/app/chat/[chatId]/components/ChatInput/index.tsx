@@ -1,6 +1,7 @@
 /* eslint-disable */
 "use client";
 import Button from "@/lib/components/ui/Button";
+import { useTranslation } from "react-i18next";
 
 import { useChat } from "@/app/chat/[chatId]/hooks/useChat";
 import { useState } from "react";
@@ -10,6 +11,7 @@ import { MicButton } from "./components/MicButton/MicButton";
 export const ChatInput = (): JSX.Element => {
   const [message, setMessage] = useState<string>("");
   const { addQuestion, generatingAnswer, chatId } = useChat();
+  const { t } = useTranslation(['chat']);
 
   const submitQuestion = () => {
     if (message.length === 0) return;
@@ -39,7 +41,7 @@ export const ChatInput = (): JSX.Element => {
           }
         }}
         className="w-full p-2 border border-gray-300 dark:border-gray-500 outline-none rounded dark:bg-gray-800"
-        placeholder="Begin conversation here..."
+        placeholder= {t('begin_conversation_placeholder')}
         data-testid="chat-input"
       />
       <Button
@@ -48,7 +50,7 @@ export const ChatInput = (): JSX.Element => {
         isLoading={generatingAnswer}
         data-testid="submit-button"
       >
-        {generatingAnswer ? "Thinking..." : "Chat"}
+        {generatingAnswer ? t('thinking',{ns:'chat'}) : t('chat',{ns:'chat'})}
       </Button>
       <div className="flex items-center">
         <MicButton setMessage={setMessage} />

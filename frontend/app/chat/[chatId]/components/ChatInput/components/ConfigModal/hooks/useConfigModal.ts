@@ -10,7 +10,7 @@ import {
 import { useBrainConfig } from "@/lib/context/BrainConfigProvider";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 import { ChatConfig } from "@/lib/context/ChatProvider/types";
-import { defineMaxTokens } from "@/lib/helpers/defineMexTokens";
+import { defineMaxTokens } from "@/lib/helpers/defineMaxTokens";
 import { useToast } from "@/lib/hooks";
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types

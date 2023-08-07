@@ -1,0 +1,15 @@
+{
+    "title":"Subir conocimiento",
+    "subtitle":"Texto, documento, hojas de cálculo, presentación, audio, video y URLs admitidos",
+    "drop":"Suelte los archivos aquí...",
+    "dragAndDrop":"Arrastre y suelte archivos aquí o click para buscar",
+    "webSite": "Ingrese la URL del sitio web",
+    "success": "Archivo subido correctamente",
+    "error": "Error al subir archivo: {{message}}",
+    "maxSizeError": "Tamaño de archivo excedido",
+    "alreadyAdded": "{{fileName}} ya fue agregado",
+    "addFiles": "Por favor, agregar archivos a subir",
+    "selectBrain": "Por favor, seleccione o cree un cerebro antes de subir un archivo",
+    "invalidUrl": "URL inválido",
+    "crawlFailed": "Error al rastrear sitio web: {{message}}"
+}

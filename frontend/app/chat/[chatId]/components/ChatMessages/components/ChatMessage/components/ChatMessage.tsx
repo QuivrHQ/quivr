@@ -31,13 +31,15 @@ export const ChatMessage = forwardRef(
           className={cn(
             "capitalize  text-xs bg-sky-200 rounded-xl p-1 px-2 mb-2 w-fit  dark:bg-sky-700"
           )}
+          data-testid="chat-message-speaker"
         >
           {speaker}
         </span>
-
-        <ReactMarkdown className="prose dark:prose-invert ml-[6px]  mt-1">
-          {text}
-        </ReactMarkdown>
+        <div data-testid="chat-message-text">
+          <ReactMarkdown className="prose dark:prose-invert ml-[6px]  mt-1">
+            {text}
+          </ReactMarkdown>
+        </div>
       </div>
     );
   }

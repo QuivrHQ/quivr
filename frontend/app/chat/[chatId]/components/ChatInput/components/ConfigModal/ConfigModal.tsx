@@ -3,8 +3,8 @@ import { MdCheck, MdSettings } from "react-icons/md";
 
 import Button from "@/lib/components/ui/Button";
 import { Modal } from "@/lib/components/ui/Modal";
-import { models } from "@/lib/context/BrainConfigProvider/types";
-import { defineMaxTokens } from "@/lib/helpers/defineMexTokens";
+import { freeModels } from "@/lib/context/BrainConfigProvider/types";
+import { defineMaxTokens } from "@/lib/helpers/defineMaxTokens";
 
 import { useConfigModal } from "./hooks/useConfigModal";
 
@@ -56,7 +56,7 @@ export const ConfigModal = ({ chatId }: { chatId?: string }): JSX.Element => {
             {...register("model")}
             className="px-5 py-2 dark:bg-gray-700 bg-gray-200 rounded-md"
           >
-            {models.map((availableModel) => (
+            {freeModels.map((availableModel) => (
               <option value={availableModel} key={availableModel}>
                 {availableModel}
               </option>
@@ -85,7 +85,7 @@ export const ConfigModal = ({ chatId }: { chatId?: string }): JSX.Element => {
           <input
             type="range"
             min="10"
-            max={defineMaxTokens(model ?? "gpt-3.5-turbo-0613")}
+            max={defineMaxTokens(model ?? "gpt-3.5-turbo")}
             value={maxTokens}
             {...register("maxTokens")}
           />

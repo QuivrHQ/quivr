@@ -1,4 +1,6 @@
+"use client";
 import { ReactNode } from "react";
+import { useTranslation } from "react-i18next";
 import {
   GiArtificialIntelligence,
   GiBrain,
@@ -11,42 +13,44 @@ import {
 import Card from "@/lib/components/ui/Card";
 
 const Features = (): JSX.Element => {
+  const { t } = useTranslation();
+
   return (
     <section className="my-20 text-center flex flex-col items-center justify-center gap-10">
       <div>
-        <h1 className="text-5xl font-bold ">Features</h1>
+        <h1 className="text-5xl font-bold ">{t("features")}</h1>
         {/* <h2 className="opacity-50">Change the way you take notes</h2> */}
       </div>
       <div className="flex flex-wrap gap-5 justify-center">
         <Feature
           icon={<GiBrain className="text-7xl w-full" />}
-          title="Two brains is better than one"
-          desc="Quivr is your second brain in the cloud, designed to easily store and retrieve unstructured information."
+          title={t("two_brains_title")}
+          desc={t("two_brains_desc")}
         />
         <Feature
           icon={<GiDatabase className="text-7xl w-full" />}
-          title="Store any kind of data"
-          desc="Quivr can handle almost any type of data you throw at it. Text, images, code snippets, we've got you covered."
+          title={t("any_kind_of_data_title")}
+          desc={t("any_kind_of_data_desc")}
         />
         <Feature
           icon={<GiArtificialIntelligence className="text-7xl w-full" />}
-          title="Get a Fast and Consistent Brain"
-          desc="Quivr is your second brain in the cloud, designed to easily store and retrieve unstructured information."
+          title={t("fast_and_accurate_title")} 
+          desc={t("fast_and_accurate_desc")}
         />
         <Feature
           icon={<GiFastArrow className="text-7xl w-full" />}
-          title="Fast and Efficient"
-          desc="Designed with speed and efficiency at its core. Quivr ensures rapid access to your data."
+          title={t("fast_and_efficient_title")}
+          desc={t("fast_and_efficient_desc")}
         />
         <Feature
           icon={<GiLockedDoor className="text-7xl w-full" />}
-          title="Secure"
-          desc="Your data, your control. Always."
+          title={t("secure_title")}
+          desc={t("secure_desc")}
         />
         <Feature
           icon={<GiOpenBook className="text-7xl w-full" />}
-          title="Open source"
-          desc="Freedom is beautiful, so is Quivr. Open source and free to use."
+          title={t("open_source_title")}
+          desc={t("open_source_desc")}
         />
       </div>
     </section>

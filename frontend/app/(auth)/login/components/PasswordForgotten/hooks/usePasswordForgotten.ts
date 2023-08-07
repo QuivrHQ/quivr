@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 
 import { useSupabase } from "@/lib/context/SupabaseProvider";
 import { useToast } from "@/lib/hooks";
@@ -14,6 +15,8 @@ export const usePasswordForgotten = ({
 }: UsePasswordForgottenProps) => {
   const [isPending, setIsPending] = useState(false);
   const { supabase } = useSupabase();
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const {t, i18n} = useTranslation(["login"]);
 
   const { publish } = useToast();
 
@@ -21,7 +24,7 @@ export const usePasswordForgotten = ({
     if (email === "") {
       publish({
         variant: "danger",
-        text: "Please enter your email address",
+        text: t("errorMailMissed",{ ns: 'login' })
       });
 
       return;
@@ -41,7 +44,7 @@ export const usePasswordForgotten = ({
     } else {
       publish({
         variant: "success",
-        text: "Recovery mail will be sent if email recognized",
+        text: t("recoveryMailSended",{ ns: 'login' })
       });
 
       setEmail("");

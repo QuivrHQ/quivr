@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 
 import { useSupabase } from "@/lib/context/SupabaseProvider";
 import { useToast } from "@/lib/hooks/useToast";
@@ -11,6 +12,8 @@ export const useSignUp = () => {
   const [password, setPassword] = useState("");
   const [isPending, setIsPending] = useState(false);
   const { track } = useEventTracking();
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { t } = useTranslation(["signUp"]);
 
   const { publish } = useToast();
   const handleSignUp = async () => {
@@ -25,12 +28,12 @@ export const useSignUp = () => {
       console.error("Error signing up:", error.message);
       publish({
         variant: "danger",
-        text: `Error signing up: ${error.message}`,
+        text: t("errorSignUp",{ errorMessage: error.message}),
       });
     } else {
       publish({
         variant: "success",
-        text: "Confirmation Email sent, please check your email",
+        text: t("mailSended")
       });
     }
     setIsPending(false);

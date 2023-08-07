@@ -1,5 +1,6 @@
 /* eslint-disable */
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 import { isSpeechRecognitionSupported } from "@/lib/helpers/isSpeechRecognitionSupported";
 
@@ -10,6 +11,7 @@ type useSpeechProps = {
 export const useSpeech = ({ setMessage }: useSpeechProps) => {
   const [isListening, setIsListening] = useState(false);
   const [speechSupported, setSpeechSupported] = useState(false);
+  const { t } = useTranslation();
 
   useEffect(() => {
     if (isSpeechRecognitionSupported()) {
@@ -21,7 +23,7 @@ export const useSpeech = ({ setMessage }: useSpeechProps) => {
 
       mic.continuous = true;
       mic.interimResults = false;
-      mic.lang = "en-US";
+      mic.lang = t("lang");
 
       mic.onstart = () => {
         console.log("Mics on");
