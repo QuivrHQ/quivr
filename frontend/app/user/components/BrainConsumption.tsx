@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { GiBrain } from "react-icons/gi";
 
 import { UserStats } from "../../../lib/types/User";
@@ -5,6 +6,7 @@ import { UserStats } from "../../../lib/types/User";
 export const BrainConsumption = (userStats: UserStats): JSX.Element => {
   const { current_brain_size, max_brain_size } = userStats;
   const brainFilling = current_brain_size / max_brain_size;
+  const { t } = useTranslation(["translation","user"]);
 
   const backgroundIcon = (
     <GiBrain
@@ -40,7 +42,7 @@ export const BrainConsumption = (userStats: UserStats): JSX.Element => {
           {/* Percentage of brain space left */}
           {(100 - brainFilling * 100).toFixed(2)}%{" "}
         </span>
-        <span className="text-sm opacity-50">Empty</span>
+        <span className="text-sm opacity-50">{t("empty", {ns: "user"})}</span>
       </div>
     </div>
   );

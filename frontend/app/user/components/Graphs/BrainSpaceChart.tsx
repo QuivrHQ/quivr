@@ -1,4 +1,5 @@
 "use client";
+import { useTranslation } from "react-i18next";
 import {
   VictoryContainer,
   VictoryPie,
@@ -16,13 +17,15 @@ const BrainSpaceChart = ({
   max_brain_size,
   ...props
 }: BrainSpaceChartProps): JSX.Element => {
+  const { t } = useTranslation(["translation","user"]);
+
   return (
     <>
       {/* @ts-expect-error Server Component */}
       <VictoryPie
         data={[
-          { x: "Used", y: current_brain_size },
-          { x: "Unused", y: max_brain_size - current_brain_size },
+          { x: t("Used", {ns: "user"}), y: current_brain_size },
+          { x: t("Unused", {ns: "user"}), y: max_brain_size - current_brain_size },
         ]}
         containerComponent={
           <VictoryContainer
