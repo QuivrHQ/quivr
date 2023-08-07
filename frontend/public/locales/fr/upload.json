@@ -1,0 +1,15 @@
+{
+    "title": "Télécharger des connaissances",
+    "subtitle": "Texte, document, feuille de calcul, présentation, audio, vidéo et URL pris en charge",
+    "drop": "Déposez les fichiers ici...",
+    "dragAndDrop": "Glissez et déposez les fichiers ici, ou cliquez pour parcourir",
+    "webSite": "Insérer l'URL du site web",
+    "success": "Fichier téléchargé avec succès",
+    "error": "Échec du téléchargement du fichier : {{message}}",
+    "maxSizeError": "Fichier trop volumineux",
+    "alreadyAdded": "{{fileName}} a déjà été ajouté",
+    "addFiles": "Veuillez ajouter des fichiers à télécharger",
+    "selectBrain": "Veuillez sélectionner ou créer un cerveau pour télécharger un fichier",
+    "invalidUrl": "URL invalide",
+    "crawlFailed": "Échec de l'exploration du site web : {{message}}"
+}

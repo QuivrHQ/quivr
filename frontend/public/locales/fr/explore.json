@@ -1,0 +1,14 @@
+{
+    "title": "Explorez les données téléchargées",
+    "subtitle": "Visualisez ou supprimez les données stockées utilisées par votre cerveau",
+    "empty": "Oh non, votre cerveau est vide.",
+    "noBrain": "ID du cerveau introuvable",
+    "sessionNotFound": "Session utilisateur introuvable",
+    "deleted": "{{fileName}} supprimé du cerveau {{brain}}",
+    "errorDeleting": "Erreur lors de la suppression de {{fileName}}",
+    "view": "Voir",
+    "chunkNumber": "Nombre de fragments : {{quantity}}",
+    "notAvailable": "Non disponible",
+    "deleteConfirmTitle": "Confirmer",
+    "deleteConfirmText": "Voulez-vous vraiment supprimer ?"
+}
