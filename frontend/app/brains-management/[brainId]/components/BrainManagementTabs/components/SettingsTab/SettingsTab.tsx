@@ -85,7 +85,7 @@ export const SettingsTab = ({ brainId }: SettingsTabProps): JSX.Element => {
       <Divider text={t("modelSection", { ns: "config" })} />
       <Field
         label={t("openAiKeyLabel", { ns: "config" })}
-        placeholder="sk-xxx"
+        placeholder={t("openAiKeyPlaceholder", { ns: "config" })}
         autoComplete="off"
         className="flex-1"
         {...register("openAiKey")}

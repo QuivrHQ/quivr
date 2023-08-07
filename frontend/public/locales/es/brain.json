@@ -25,5 +25,6 @@
     "userRemoved": "Eliminado {{email}} del cerebro",
     "userRemoveFailed": "Error al eliminar {{email}} del cerebro",
     "defaultBrain": "Cerebro por defecto",
-    "setDefaultBrain": "Asignar cerebro por defecto"
+    "setDefaultBrain": "Asignar cerebro por defecto",
+    "errorCreatingBrain": "Error al crear cerebro"
 }

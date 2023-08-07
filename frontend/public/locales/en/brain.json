@@ -25,5 +25,6 @@
     "userRemoved": "Removed {{email}} from brain",
     "userRemoveFailed": "Failed to remove {{email}} from brain",
     "defaultBrain": "Default Brain",
-    "setDefaultBrain": "Set as default brain"
+    "setDefaultBrain": "Set as default brain",
+    "errorCreatingBrain": "Error occurred while creating a brain"
 }

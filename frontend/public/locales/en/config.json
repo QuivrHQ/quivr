@@ -6,6 +6,7 @@
     "knowledge": "Knowledge",
     "modelSection": "Model config",
     "openAiKeyLabel": "Open AI Key",
+    "openAiKeyPlaceholder": "sk-xxx",
     "modelLabel": "Model",
     "anthropicKeyPlaceholder":"Anthropic API Key",
     "anthropicKeyLabel":"Anthropic API Key",
