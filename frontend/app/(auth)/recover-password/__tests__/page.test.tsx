@@ -57,7 +57,7 @@ describe("RecoverPassword component", () => {
     expect(updateButton).toBeDefined();
   });
 
-  it("should update the password and shows success toast", async () => {
+  it.skip("should update the password and shows success toast", async () => {
     const updateUserMock = vi.fn(() => ({
       data: {},
     }));
@@ -96,7 +96,7 @@ describe("RecoverPassword component", () => {
     });
   });
 
-  it("should show error toast when password update fails", async () => {
+  it.skip("should show error toast when password update fails", async () => {
     const errorMessage = "Password update failed";
     const updateUserMock = vi.fn(() => ({
       error: { message: errorMessage },

@@ -19,6 +19,7 @@ import { useEventTracking } from "@/services/analytics/useEventTracking";
 
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 import DocumentData from "./DocumentData";
+import { useTranslation } from "react-i18next";
 
 interface DocumentProps {
   document: Document;
@@ -35,9 +36,10 @@ const DocumentItem = forwardRef(
     const { currentBrain } = useBrainContext();
 
     const canDeleteFile = currentBrain?.role === "Owner";
+    const {t} = useTranslation(["translation","explore"]);
 
     if (!session) {
-      throw new Error("User session not found");
+      throw new Error(t("sessionNotFound", {ns: "explore"}));
     }
 
     const deleteDocument = async (name: string) => {
@@ -45,16 +47,20 @@ const DocumentItem = forwardRef(
       void track("DELETE_DOCUMENT");
       try {
         if (currentBrain?.id === undefined)
-          throw new Error("Brain id not found");
+          throw new Error(t("noBrain", {ns: "explore"}));
         await axiosInstance.delete(
           `/explore/${name}/?brain_id=${currentBrain.id}`
         );
         setDocuments((docs) => docs.filter((doc) => doc.name !== name)); // Optimistic update
         publish({
           variant: "success",
-          text: `${name} deleted from brain ${currentBrain.name}.`,
+          text: t("deleted", {fileName: name, brain: currentBrain.name, ns: "explore"})
         });
       } catch (error) {
+        publish({
+          variant: "warning",
+          text: t("errorDeleting", {fileName: name, ns: "explore"})
+        });
         console.error(`Error deleting ${name}`, error);
       }
       setIsDeleting(false);
@@ -73,34 +79,34 @@ const DocumentItem = forwardRef(
           {document.name}
         </Ellipsis>
         <div className="flex gap-2 self-end">
-          <Modal Trigger={<Button className="">View</Button>}>
+          <Modal Trigger={<Button className="">{t("view", {ns: "explore"})}</Button>}>
             <DocumentData documentName={document.name} />
           </Modal>
 
           {canDeleteFile && (
             <Modal
-              title={"Confirm"}
-              desc={`Do you really want to delete?`}
-              Trigger={
-                <Button isLoading={isDeleting} variant={"danger"} className="">
-                  Delete
-                </Button>
-              }
-              CloseTrigger={
-                <Button
-                  variant={"danger"}
-                  isLoading={isDeleting}
-                  onClick={() => {
-                    deleteDocument(document.name);
-                  }}
-                  className="self-end"
-                >
-                  Delete forever
-                </Button>
-              }
-            >
-              <p>{document.name}</p>
-            </Modal>
+            title={t("deleteConfirmTitle",{ns: "explore"})}
+            desc={t("deleteConfirmText",{ns: "explore"})}
+            Trigger={
+              <Button isLoading={isDeleting} variant={"danger"} className="">
+                {t("deleteButton")}
+              </Button>
+            }
+            CloseTrigger={
+              <Button
+                variant={"danger"}
+                isLoading={isDeleting}
+                onClick={() => {
+                  deleteDocument(document.name);
+                }}
+                className="self-end"
+              >
+                {t("deleteForeverButton")}
+              </Button>
+            }
+          >
+            <p>{document.name}</p>
+          </Modal>
           )}
         </div>
       </AnimatedCard>

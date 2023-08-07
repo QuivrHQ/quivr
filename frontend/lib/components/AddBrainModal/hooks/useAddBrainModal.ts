@@ -2,6 +2,7 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
+import { useTranslation } from "react-i18next";
 
 import { useBrainApi } from "@/lib/api/brain/useBrainApi";
 import { usePromptApi } from "@/lib/api/prompt/usePromptApi";
@@ -12,6 +13,7 @@ import { useToast } from "@/lib/hooks";
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const useAddBrainModal = () => {
+  const { t } = useTranslation(["translation", "brain", "config"]);
   const [isPending, setIsPending] = useState(false);
   const { publish } = useToast();
   const { createBrain, setActiveBrain } = useBrainContext();
@@ -78,7 +80,7 @@ export const useAddBrainModal = () => {
       if (createdBrainId === undefined) {
         publish({
           variant: "danger",
-          text: "Error occurred while creating a brain",
+          text: t("errorCreatingBrain",{ns:"brain"})
         });
 
         return;
@@ -97,7 +99,7 @@ export const useAddBrainModal = () => {
       reset(defaultValues);
       publish({
         variant: "success",
-        text: "Brain created successfully",
+        text: t("brainCreated",{ns:"brain"})
       });
     } catch (err) {
       if (axios.isAxiosError(err) && err.response?.status === 429) {

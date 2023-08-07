@@ -1,0 +1,15 @@
+{
+    "title": "Iniciar sesión",
+    "subtitle": "Un gusto tenerte de vuelta",
+    "signup": "¿No tienes una cuenta? Registrate aquí",
+    "forgottenPassword": "Olvidé mi contraseña",
+    "googleLogin": "Iniciar con Google",
+    "magicLink": "Enviar Enlace Mágico",
+    "loginSuccess": "Sesión iniciada correctamente",
+    "errorMailMissed": "Por favor ingresa tu dirección de email",
+    "recoveryMailSended": "El correo de recuperación será enviado si el email es reconocido",
+    "Invalidlogincredentials" : "Credenciales inválidas",
+    "password.updated": "¡Contraseña actualizada!",
+    "new_password": "Nueva contraseña",
+    "Failedtofetch": "Error al obtener datos"
+}

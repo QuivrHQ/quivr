@@ -1,0 +1,14 @@
+{
+    "title": "Explora datos subidos",
+    "subtitle": "Ver o borrar datos guardados usados por tu cerebro",
+    "empty": "¡Oh No!, Tu Cerebro está vacío",
+    "noBrain": "Id de Cerebro no encontrado",
+    "sessionNotFound": "Sesión no encontrada",
+    "deleted": "{{fileName}} borrado del cerebro {{brain}}",
+    "errorDeleting": "Error borrando {{fileName}}",
+    "view": "Ver",
+    "chunkNumber": "No. de partes: {{quantity}}",
+    "notAvailable": "No disponible",
+    "deleteConfirmTitle": "Confirmar",
+    "deleteConfirmText": "¿Realmente quieres eliminar?"
+}

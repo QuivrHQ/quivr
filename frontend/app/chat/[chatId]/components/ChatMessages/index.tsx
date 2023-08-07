@@ -1,4 +1,5 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 
 import Card from "@/lib/components/ui/Card";
 import { useChatContext } from "@/lib/context";
@@ -9,6 +10,7 @@ import { useChatMessages } from "./hooks/useChatMessages";
 export const ChatMessages = (): JSX.Element => {
   const { chatListRef } = useChatMessages();
   const { history } = useChatContext();
+  const { t } = useTranslation(["chat"]);
 
   return (
     <Card
@@ -18,8 +20,11 @@ export const ChatMessages = (): JSX.Element => {
     >
       <div className="flex-1">
         {history.length === 0 ? (
-          <div className="text-center opacity-50">
-            Ask a question, or describe a task.
+          <div
+            data-testid="empty-history-message"
+            className="text-center opacity-50"
+          >
+            {t("ask", { ns: "chat" })}
           </div>
         ) : (
           history.map(({ assistant, message_id, user_message }) => (

@@ -2,6 +2,7 @@
 "use client";
 
 import { UUID } from "crypto";
+import { useTranslation } from "react-i18next";
 import { ImUserPlus } from "react-icons/im";
 import { MdContentPaste, MdShare } from "react-icons/md";
 
@@ -33,6 +34,7 @@ export const ShareBrain = ({
     isShareModalOpen,
     canAddNewRow,
   } = useShareBrain(brainId);
+  const { t } = useTranslation(["translation", "brain"]);
 
   return (
     <Modal
@@ -47,7 +49,7 @@ export const ShareBrain = ({
         </Button>
       }
       CloseTrigger={<div />}
-      title={`Share brain ${name}`}
+      title={t("shareBrain", { brain: name, ns: "brain" })}
       isOpen={isShareModalOpen}
       setOpen={setIsShareModalOpen}
     >
@@ -98,12 +100,14 @@ export const ShareBrain = ({
             disabled={roleAssignations.length === 0}
             type="submit"
           >
-            Share
+            {t("shareButton")}
           </Button>
         </div>
       </form>
       <div className="bg-gray-100 h-0.5 mb-5 border-gray-200 dark:border-gray-700" />
-      <p className="text-lg font-bold">Users with access</p>
+      <p className="text-lg font-bold">
+        {t("shareBrainUsers", { ns: "brain" })}
+      </p>
       <BrainUsers brainId={brainId} />
     </Modal>
   );

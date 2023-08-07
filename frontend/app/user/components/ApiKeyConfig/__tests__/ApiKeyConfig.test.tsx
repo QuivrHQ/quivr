@@ -22,10 +22,10 @@ describe("ApiKeyConfig", () => {
   });
 
   it("should render ApiConfig Component", () => {
-    const { getByText, getByTestId } = render(<ApiKeyConfig />);
-    expect(getByText("API Key Config")).toBeDefined();
-    expect(getByText("OpenAI Key")).toBeDefined();
-    expect(getByTestId("open-ai-api-key")).toBeDefined();
+    const { getByTestId } = render(<ApiKeyConfig />);
+    expect(getByTestId("create-new-key")).toBeDefined();
+    expect(getByTestId("open-ai-key-divider")).toBeDefined();
+    expect(getByTestId("open-ai-api-key-input")).toBeDefined();
     expect(getByTestId("save-open-ai-api-key")).toBeDefined();
   });
 

@@ -1,0 +1,9 @@
+{
+    "title": "Uso del cerebro de {{user}}",
+    "fetching": "Obteniendo tus datos...",
+    "requestsCount": "Peticiones de hoy: {{count}}",
+    "brainSize": "Espacio sobrante en cerebro",
+    "empty": "Vacío",
+    "Used": "Usado",
+    "Unused": "Sin usar"
+}

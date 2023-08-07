@@ -7,6 +7,8 @@ import { NavBar } from "@/lib/components/NavBar";
 import { TrackingWrapper } from "@/lib/components/TrackingWrapper";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 import { useSupabase } from "@/lib/context/SupabaseProvider";
+import '../lib/config/LocaleConfig/i18n'
+import { UpdateMetadata } from "@/lib/helpers/updateMetadata";
 
 // This wrapper is used to make effect calls at a high level in app rendering.
 export const App = ({ children }: PropsWithChildren): JSX.Element => {
@@ -24,6 +26,7 @@ export const App = ({ children }: PropsWithChildren): JSX.Element => {
       <NavBar />
       <div className="flex-1">{children}</div>
       <Footer />
+      <UpdateMetadata />
     </>
   );
 };
