@@ -6,5 +6,9 @@
     "loginButton": "Login",
     "signUpButton": "Sign up",
     "logoutButton": "Logout",
-    "updateButton": "Update"
+    "updateButton": "Update",
+    "uploadButton": "Upload",
+    "uploadingButton": "Uploading...",
+    "crawlButton": "Crawl",
+    "chatButton": "Chat"
 }
