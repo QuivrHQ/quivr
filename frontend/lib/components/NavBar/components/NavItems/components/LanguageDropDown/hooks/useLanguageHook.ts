@@ -14,7 +14,6 @@ export const useLanguageHook = (): {
   const { i18n } = useTranslation();
   const [allLanguages, setAllLanguages] = useState<Language[]>([]);
   const [currentLanguage, setCurrentLanguage] = useState<Language | null>(null);
-
   useEffect(() => {
     const languages = [
       { 
@@ -29,7 +28,7 @@ export const useLanguageHook = (): {
     
     setAllLanguages(languages);
 
-    // Intenta obtener el idioma del localStorage
+    // get language from localStorage
     const savedLanguage = localStorage.getItem('selectedLanguage');
     
     if (savedLanguage != null) {
@@ -42,7 +41,7 @@ export const useLanguageHook = (): {
       }
     }
 
-    // Si no se encontró un idioma guardado o no es válido, establece el idioma predeterminado
+    // Set language to default if no language found in localStorage
     setCurrentLanguage(languages[0]);
     localStorage.setItem('selectedLanguage', languages[0].id);
   }, [i18n]);
