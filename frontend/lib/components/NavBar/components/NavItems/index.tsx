@@ -10,6 +10,7 @@ import { AuthButtons } from "./components/AuthButtons";
 import { BrainManagementButton } from "./components/BrainManagementButton";
 import { BrainsDropDown } from "./components/BrainsDropDown";
 import { DarkModeToggle } from "./components/DarkModeToggle";
+import { LanguageDropDown } from "./components/LanguageDropDown";
 import { NavLink } from "./components/NavLink";
 
 interface NavItemsProps extends HTMLAttributes<HTMLUListElement> {
@@ -65,7 +66,7 @@ export const NavItems = ({
           </>
         )}
         {!isUserLoggedIn && <AuthButtons />}
-
+        <LanguageDropDown />
         <DarkModeToggle />
       </div>
     </ul>
