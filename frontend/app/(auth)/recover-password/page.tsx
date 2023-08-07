@@ -10,8 +10,8 @@ import { useSupabase } from "@/lib/context/SupabaseProvider";
 import { useToast } from "@/lib/hooks/useToast";
 import { redirectToLogin } from "@/lib/router/redirectToLogin";
 import { useEventTracking } from "@/services/analytics/useEventTracking";
-import { useTranslation } from "react-i18next";
 import { Suspense } from "react";
+import { useTranslation } from "react-i18next";
 
 export default function RecoverPassword() {
   const { supabase, session } = useSupabase();
@@ -19,7 +19,7 @@ export default function RecoverPassword() {
   const [isPending, setIsPending] = useState(false);
   const { track } = useEventTracking();
 
-  const {t, i18n} = useTranslation(["translation","updatePassword"]);
+  const { t } = useTranslation(["translation", "updatePassword"]);
 
   const { publish } = useToast();
 
@@ -30,7 +30,7 @@ export default function RecoverPassword() {
       const { error } = await supabase.auth.updateUser({
         password: password,
       });
-  
+
       if (error) {
         console.error("Error while resetting password:", error.message);
         publish({
@@ -40,20 +40,20 @@ export default function RecoverPassword() {
       } else {
         publish({
           variant: "success",
-          text: t("passwordUpdated",{ns: "updatePassword"})
+          text: t("passwordUpdated", { ns: "updatePassword" }),
         });
       }
       setIsPending(false);
     };
-  
+
     if (session?.user === undefined) {
       redirectToLogin();
     }
-  
+
     return (
       <main>
         <section className="min-h-[80vh] w-full h-full outline-none flex flex-col gap-5 items-center justify-center p-6">
-          <PageHeading title={t("title",{ns: "updatePassword"})} />
+          <PageHeading title={t("title", { ns: "updatePassword" })} />
           <Card className="max-w-md w-full p-5 sm:p-10 text-left">
             <form
               onSubmit={(e) => {
@@ -68,7 +68,7 @@ export default function RecoverPassword() {
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder= {t("newPassword",{ns: "updatePassword"})}
+                placeholder={t("newPassword", { ns: "updatePassword" })}
                 data-testid="password-field"
               />
               <div className="flex flex-col items-center justify-center mt-2 gap-2">
@@ -88,6 +88,4 @@ export default function RecoverPassword() {
       <ChangePassword />
     </Suspense>
   );
-
-  
 }

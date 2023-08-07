@@ -4,8 +4,8 @@ import { useEffect, useState } from "react";
 import { useAxios } from "@/lib/hooks";
 
 import { useEventTracking } from "@/services/analytics/useEventTracking";
-import { useSupabase } from "../../../lib/context/SupabaseProvider";
 import { useTranslation } from "react-i18next";
+import { useSupabase } from "../../../lib/context/SupabaseProvider";
 
 interface DocumentDataProps {
   documentName: string;
@@ -49,10 +49,17 @@ const DocumentData = ({ documentName }: DocumentDataProps): JSX.Element => {
   function Data() {
     return (
       <div className="prose dark:prose-invert">
-        <h1 className="text-bold text-3xl break-words">{documentName}</h1>
+        <h1
+          data-testid="document-name"
+          className="text-bold text-3xl break-words"
+        >
+          {documentName}
+        </h1>
         {documents.length > 0 ? (
           <>
-            <p>{t("chunkNumber", { quantity: documents.length, ns: "explore" })}</p>
+            <p>
+              {t("chunkNumber", { quantity: documents.length, ns: "explore" })}
+            </p>
             <div className="flex flex-col">
               {Object.entries(documents[0]).map(([key, value]) => {
                 if (value && typeof value === "object") return;
@@ -77,11 +84,10 @@ const DocumentData = ({ documentName }: DocumentDataProps): JSX.Element => {
   }
 
   if (loading) {
-    return <div>{t("loading")}</div>
+    return <div>{t("loading")}</div>;
   } else {
-    return <Data />
+    return <Data />;
   }
-  
 };
 
 export default DocumentData;

@@ -57,7 +57,10 @@ export const Modal = ({
                     exit={{ opacity: 0, y: "40%" }}
                     className="w-[90vw] my-auto flex flex-col h-fit max-w-2xl rounded-xl bg-white dark:bg-black border border-black/10 dark:border-white/25 p-10 shadow-xl dark:shadow-primary/50 focus:outline-none cursor-auto"
                   >
-                    <Dialog.Title className="m-0 text-2xl font-bold">
+                    <Dialog.Title
+                      className="m-0 text-2xl font-bold"
+                      data-testid="modal-title"
+                    >
                       {title}
                     </Dialog.Title>
                     <Dialog.Description className="opacity-50">

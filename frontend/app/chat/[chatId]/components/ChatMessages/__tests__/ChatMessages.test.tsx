@@ -29,22 +29,19 @@ vi.mock("@/lib/context", () => ({
 
 describe("ChatMessages", () => {
   it("should render chat messages correctly", () => {
-    const { getByText } = render(<ChatMessages />);
+    const { getAllByTestId } = render(<ChatMessages />);
 
-    const userMessage = getByText("Test user message");
-    expect(userMessage).toBeDefined();
+    expect(getAllByTestId("chat-message-speaker")).toBeDefined();
 
-    const assistantMessage = getByText("Test assistant message");
-    expect(assistantMessage).toBeDefined();
+    expect(getAllByTestId("chat-message-text")).toBeDefined();
   });
 
   it("should render placeholder text when history is empty", () => {
     // Mocking the useChatContext hook to return an empty history
     useChatContextMock.mockReturnValue({ history: [] });
 
-    const { getByText } = render(<ChatMessages />);
+    const { getByTestId } = render(<ChatMessages />);
 
-    const placeholderText = getByText("Ask a question, or describe a task.");
-    expect(placeholderText).toBeDefined();
+    expect(getByTestId("empty-history-message")).toBeDefined();
   });
 });

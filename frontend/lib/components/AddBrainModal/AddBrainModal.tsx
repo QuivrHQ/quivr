@@ -33,12 +33,12 @@ export const AddBrainModal = (): JSX.Element => {
     <Modal
       Trigger={
         <Button variant={"secondary"}>
-          {t("newBrain", {ns: "brain"})}
+          {t("newBrain", { ns: "brain" })}
           <MdAdd className="text-xl" />
         </Button>
       }
-      title={t("newBrainTitle",{ns:"brain"})}
-      desc={t("newBrainSubtitle",{ns:"brain"})}
+      title={t("newBrainTitle", { ns: "brain" })}
+      desc={t("newBrainSubtitle", { ns: "brain" })}
       isOpen={isShareModalOpen}
       setOpen={setIsShareModalOpen}
       CloseTrigger={<div />}
@@ -51,7 +51,7 @@ export const AddBrainModal = (): JSX.Element => {
         className="my-10 flex flex-col items-center gap-2"
       >
         <Field
-          label= { t("brainName", { ns: "brain" })}
+          label={t("brainName", { ns: "brain" })}
           autoFocus
           placeholder={t("brainNamePlaceholder", { ns: "brain" })}
           autoComplete="off"
@@ -77,7 +77,7 @@ export const AddBrainModal = (): JSX.Element => {
 
         <fieldset className="w-full flex flex-col">
           <label className="flex-1 text-sm" htmlFor="model">
-          {t("modelLabel", { ns: "config" })}
+            {t("modelLabel", { ns: "config" })}
           </label>
           <select
             id="model"
@@ -138,7 +138,9 @@ export const AddBrainModal = (): JSX.Element => {
         />
         <div className="flex flex-row justify-start w-full mt-4">
           <label className="flex items-center">
-            <span className="mr-2 text-gray-700">{t("setDefaultBrain", { ns: "brain" })}</span>
+            <span className="mr-2 text-gray-700">
+              {t("setDefaultBrain", { ns: "brain" })}
+            </span>
             <input
               type="checkbox"
               {...register("setDefault")}
