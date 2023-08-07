@@ -7,7 +7,7 @@ import { NavBar } from "@/lib/components/NavBar";
 import { TrackingWrapper } from "@/lib/components/TrackingWrapper";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 import { useSupabase } from "@/lib/context/SupabaseProvider";
-
+import { isAdmin } from "@/lib/utils"
 // This wrapper is used to make effect calls at a high level in app rendering.
 export const App = ({ children }: PropsWithChildren): JSX.Element => {
   const { fetchAllBrains, fetchAndSetActiveBrain } = useBrainContext();
@@ -21,9 +21,9 @@ export const App = ({ children }: PropsWithChildren): JSX.Element => {
   return (
     <>
       <TrackingWrapper />
-      <NavBar />
+      {isAdmin() && <NavBar />}
       <div className="flex-1">{children}</div>
-      <Footer />
+      {/* isAdmin() && <Footer /> */}
     </>
   );
 };
