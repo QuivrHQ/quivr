@@ -31,7 +31,7 @@ export const ShortCuts = (): JSX.Element => {
   ];
 
   return (
-    <div className="flex-1 flex flex-col mt-32 w-full shadow-md dark:shadow-primary/25 hover:shadow-xl transition-shadow rounded-xl overflow-hidden bg-white dark:bg-black border border-black/10 dark:border-white/25 p-4 pt-10">
+    <>
       <div className="flex items-center justify-center">
         <MdKeyboardCommandKey className="text-4xl mr-2" />
         <span className="font-bold text-2xl">{t("keyboard_shortcuts")}</span>
@@ -43,6 +43,6 @@ export const ShortCuts = (): JSX.Element => {
           ))}
         </div>
       </div>
-    </div>
+    </>
   );
 };
