@@ -2,7 +2,7 @@
 
 import { useTranslation } from "react-i18next";
 
-import { ShortCuts } from "./components";
+import { ActionsBar, ShortCuts } from "./components";
 
 const SelectedChatPage = (): JSX.Element => {
   const { t } = useTranslation(["chat"]);
@@ -21,8 +21,12 @@ const SelectedChatPage = (): JSX.Element => {
             {t("empty_brain_title_suffix")}
           </h1>
         </div>
-
-        <ShortCuts />
+        <div className="flex-1 flex flex-col mt-8 w-full shadow-md dark:shadow-primary/25 hover:shadow-xl transition-shadow rounded-xl overflow-hidden bg-white dark:bg-black border border-black/10 dark:border-white/25 p-12 pt-10">
+          <div className="flex flex-1 flex-col">
+            <ShortCuts />
+          </div>
+          <ActionsBar />
+        </div>
       </section>
     </main>
   );
