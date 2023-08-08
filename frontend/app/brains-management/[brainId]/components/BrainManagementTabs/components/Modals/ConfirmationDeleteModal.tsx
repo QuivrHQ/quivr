@@ -1,10 +1,7 @@
+import { useTranslation } from "react-i18next";
+
 import Button from "@/lib/components/ui/Button";
 import { Modal } from "@/lib/components/ui/Modal";
-
-const CONFIRMATION_DELETE_QUESTION =
-  "Are you sure you want to delete this brain? This action cannot be undone.";
-const CONFIRMATION_DELETE_BUTTON = "Confirm Delete";
-const CONFIRMATION_DELETE_RETURN_BUTTON = "Return";
 
 type ConfirmationDeleteModalProps = {
   isOpen: boolean;
@@ -17,15 +14,17 @@ const ConfirmationDeleteModal = ({
   setOpen,
   onDelete,
 }: ConfirmationDeleteModalProps): JSX.Element => {
+  const { t } = useTranslation(["delete_brain"]);
+
   return (
     <Modal
-      desc={CONFIRMATION_DELETE_QUESTION}
+      desc={t("deleteConfirmQuestion")}
       isOpen={isOpen}
       setOpen={setOpen}
       Trigger={<div />}
       CloseTrigger={
         <Button className="self-end" data-testid="return-button">
-          {CONFIRMATION_DELETE_RETURN_BUTTON}
+          {t("returnButton")}
         </Button>
       }
     >
@@ -36,7 +35,7 @@ const ConfirmationDeleteModal = ({
             className="px-4 py-2 bg-red-500 text-white rounded-md"
             onClick={onDelete}
           >
-            {CONFIRMATION_DELETE_BUTTON}
+            {t("deleteConfirmYes")}
           </Button>
         </div>
       </div>

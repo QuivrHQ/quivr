@@ -1,0 +1,6 @@
+{
+    "deleteButton": "Supprimer le cerveau",
+    "deleteConfirmQuestion": "Êtes-vous sûr de vouloir supprimer le cerveau? Cette action est irréversible!",
+    "deleteConfirmYes": "Oui, supprimer",
+    "returnButton": "Retour"
+}

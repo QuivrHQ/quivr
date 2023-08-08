@@ -9,7 +9,7 @@ import { SettingsTab } from "./components/SettingsTab/SettingsTab";
 import { useBrainManagementTabs } from "./hooks/useBrainManagementTabs";
 
 export const BrainManagementTabs = (): JSX.Element => {
-  const { t } = useTranslation(["translation", "config"]);
+  const { t } = useTranslation(["translation", "config", "delete_brain"]);
   const {
     selectedTab,
     setSelectedTab,
@@ -68,7 +68,7 @@ export const BrainManagementTabs = (): JSX.Element => {
           className="px-20 py-2 bg-red-500 text-white rounded-md"
           onClick={() => setIsDeleteModalOpen(true)}
         >
-          Delete Brain
+          {t("deleteButton", { ns: "delete_brain" })}
         </Button>
       </div>
       <ConfirmationDeleteModal
