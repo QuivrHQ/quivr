@@ -1,5 +1,8 @@
 {
     "title": "Chat with {{brain}}",
+    "brain":"brain",
+    "keyboard_shortcuts": "Keyboard shortcuts",
+    "brains":"brains",
     "subtitle": "Talk to a language model about your uploaded data",
     "limit_reached": "You have reached the limit of requests, please try again later",
     "error_occurred": "Error occurred while getting answer",
@@ -15,5 +18,17 @@
     "errorFetching": "Error occurred while fetching your chats",
     "chatDeleted": "Chat sucessfully deleted. Id: {{id}}",
     "errorDeleting": "Error deleting chat: {{error}}",
-    "chatNameUpdated": "Chat name updated"
+    "chatNameUpdated": "Chat name updated",
+    "shortcut_select_brain": "@: Select a brain to talk",
+    "shortcut_select_file": "/: Select a file to talk to",
+    "shortcut_choose_prompt": "#: Choose a specific prompt",
+    "shortcut_create_brain": "@+: Create a new brain",
+    "shortcut_feed_brain": "/+: Feed a brain with knowledge",
+    "shortcut_create_prompt": "#+: Create a new custom prompt",
+    "shortcut_manage_brains": "CMDB: Manage your brains",
+    "shortcut_go_to_user_page": "CMDU: Go to user page",
+    "shortcut_go_to_shortcuts": "CMDK: Go to shortcuts",
+    "empty_brain_title_intro": "Chat with your",
+    "empty_brain_title_prefix": "Upload files in a",
+    "empty_brain_title_suffix": "and chat with them"
 }

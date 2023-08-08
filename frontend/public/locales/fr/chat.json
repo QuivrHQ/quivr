@@ -1,5 +1,8 @@
 {
     "title": "Discuter avec {{brain}}",
+    "knowledge": "connaissances",
+    "keyboard_shortcuts": "Raccourcis clavier",
+    "brains": "cerveaux",
     "subtitle": "Parlez à un modèle linguistique de vos données téléchargées",
     "limit_reached": "Vous avez atteint la limite de requêtes, veuillez réessayer plus tard",
     "error_occurred": "Une erreur s'est produite lors de l'obtention de la réponse",
@@ -15,5 +18,17 @@
     "errorFetching": "Erreur lors de la récupération de vos chats",
     "chatDeleted": "Chat supprimé avec succès. Id : {{id}}",
     "errorDeleting": "Erreur lors de la suppression du chat : {{error}}",
-    "chatNameUpdated": "Nom du chat mis à jour"
+    "chatNameUpdated": "Nom du chat mis à jour",
+    "shortcut_select_brain": "@: Sélectionner un cerveau pour discuter",
+    "shortcut_select_file": "/: Sélectionner un fichier pour discuter",
+    "shortcut_choose_prompt": "#: Choisir une directive spécifique",
+    "shortcut_create_brain": "@+: Créer un nouveau cerveau",
+    "shortcut_feed_brain": "/+: Alimenter un cerveau avec des connaissances",
+    "shortcut_create_prompt": "#+: Créer une nouvelle directive personnalisée",
+    "shortcut_manage_brains": "CMDB: Gérer vos cerveaux",
+    "shortcut_go_to_user_page": "CMDU: Accéder à la page utilisateur",
+    "shortcut_go_to_shortcuts": "CMDK: Accéder aux raccourcis",
+     "empty_brain_title_intro": "Discutez avec vos",
+    "empty_brain_title_prefix": "Téléchargez des fichiers dans un",
+    "empty_brain_title_suffix": "et discutez avec eux"
 }
