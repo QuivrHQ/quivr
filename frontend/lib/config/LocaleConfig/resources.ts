@@ -2,6 +2,7 @@
 import brain_en from "../../../public/locales/en/brain.json";
 import chat_en from "../../../public/locales/en/chat.json";
 import config_en from "../../../public/locales/en/config.json";
+import delete_brain_en from "../../../public/locales/en/deleteBrain.json";
 import explore_en from "../../../public/locales/en/explore.json";
 import login_en from "../../../public/locales/en/login.json";
 import logout_en from "../../../public/locales/en/logout.json";
@@ -14,6 +15,7 @@ import user_en from "../../../public/locales/en/user.json";
 import brain_es from "../../../public/locales/es/brain.json";
 import chat_es from "../../../public/locales/es/chat.json";
 import config_es from "../../../public/locales/es/config.json";
+import delete_brain_es from "../../../public/locales/es/deleteBrain.json";
 import explore_es from "../../../public/locales/es/explore.json";
 import login_es from "../../../public/locales/es/login.json";
 import logout_es from "../../../public/locales/es/logout.json";
@@ -26,6 +28,7 @@ import user_es from "../../../public/locales/es/user.json";
 import brain_fr from "../../../public/locales/fr/brain.json";
 import chat_fr from "../../../public/locales/fr/chat.json";
 import config_fr from "../../../public/locales/fr/config.json";
+import delete_brain_fr from "../../../public/locales/fr/deleteBrain.json";
 import explore_fr from "../../../public/locales/fr/explore.json";
 import login_fr from "../../../public/locales/fr/login.json";
 import logout_fr from "../../../public/locales/fr/logout.json";
@@ -49,6 +52,7 @@ export const resources = {
     updatePassword: updatePassword_en,
     upload: upload_en,
     user: user_en,
+    delete_brain: delete_brain_en,
   },
   es: {
     brain: brain_es,
@@ -61,7 +65,8 @@ export const resources = {
     translation: translation_es,
     updatePassword: updatePassword_es,
     upload: upload_es,
-    user: user_es
+    user: user_es,
+    delete_brain: delete_brain_es,
   },
   fr: {
     brain: brain_fr,
@@ -74,6 +79,7 @@ export const resources = {
     translation: translation_fr,
     updatePassword: updatePassword_fr,
     upload: upload_fr,
-    user: user_fr
-  }
+    user: user_fr,
+    delete_brain: delete_brain_fr,
+  },
 } as const;
