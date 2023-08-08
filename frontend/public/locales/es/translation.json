@@ -1,7 +1,7 @@
 {
     "lang": "es-ES",
     "title": "Quivr - Tu segundo cerebro con IA generativa",
-    "title.short": "Get a Second Brain with",
+    "title.short": "Obtén un Segundo Cerebro con",
     "description": "Quivr es tu segundo cerebro en la nube, diseñado para facilitar el almacenamiento y obtención de información inestructurada.",
     "getStarted": "Empezar a usar",
     "features": "Características",
@@ -14,7 +14,7 @@
     "fast_and_efficient_title": "Rápido y eficiente",
     "fast_and_efficient_desc": "Diseñado con velocidad y eficiciencia como base. Quivr asegura rápido acceso a tus datos.",
     "secure_title": "Seguro",
-    "secure_desc": "Tus controlas tus datos. Siempre.",
+    "secure_desc": "Tú controlas tus datos. Siempre.",
     "open_source_title": "Open source",
     "open_source_desc": "La libertad es hermosa, al igual que Quivr. Código abierto y de uso gratuito.",
     "toastDismiss" : "cerrar",
