@@ -63,7 +63,10 @@ export const Modal = ({
                     >
                       {title}
                     </Dialog.Title>
-                    <Dialog.Description className="opacity-50">
+                    <Dialog.Description
+                      className="opacity-50"
+                      data-testid="modal-description"
+                    >
                       {desc}
                     </Dialog.Description>
                     {children}

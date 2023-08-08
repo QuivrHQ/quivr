@@ -24,7 +24,7 @@ const ConfirmationDeleteModal = ({
       setOpen={setOpen}
       Trigger={<div />}
       CloseTrigger={
-        <Button className="self-end">
+        <Button className="self-end" data-testid="return-button">
           {CONFIRMATION_DELETE_RETURN_BUTTON}
         </Button>
       }
@@ -32,6 +32,7 @@ const ConfirmationDeleteModal = ({
       <div>
         <div className="flex justify-center mt-6">
           <Button
+            data-testid="delete-brain"
             className="px-4 py-2 bg-red-500 text-white rounded-md"
             onClick={onDelete}
           >
