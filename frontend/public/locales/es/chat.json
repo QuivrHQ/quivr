@@ -1,5 +1,8 @@
 {
     "title": "Conversa con {{brain}}",
+    "knowledge": "conocimiento",
+    "keyboard_shortcuts": "Atajos de teclado",
+    "brains": "cerebros",
     "subtitle": "Habla con un modelo de lenguaje acerca de tus datos subidos",
     "limit_reached": "Has alcanzado el límite de peticiones, intente de nuevo más tarde",
     "error_occurred": "Error al obtener respuesta",
@@ -15,5 +18,17 @@
     "errorFetching": "Error al obtener tus chats",
     "chatDeleted": "Chat borrado correstamente. Id: {{id}}",
     "errorDeleting": "Error al borrar chat: {{error}}",
-    "chatNameUpdated": "Nombre de chat actualizado"
+    "chatNameUpdated": "Nombre de chat actualizado",
+    "shortcut_select_brain": "@: Seleccionar un cerebro para hablar",
+    "shortcut_select_file": "/: Seleccionar un archivo para hablar",
+    "shortcut_choose_prompt": "#: Elegir una instrucción específica",
+    "shortcut_create_brain": "@+: Crear un nuevo cerebro",
+    "shortcut_feed_brain": "/+: Alimentar un cerebro con conocimiento",
+    "shortcut_create_prompt": "#+: Crear una nueva instrucción personalizada",
+    "shortcut_manage_brains": "CMDB: Administrar tus cerebros",
+    "shortcut_go_to_user_page": "CMDU: Ir a la página de usuario",
+    "shortcut_go_to_shortcuts": "CMDK: Ir a los atajos",
+    "empty_brain_title_intro": "Chatea con tus",
+    "empty_brain_title_prefix": "Carga archivos en un",
+    "empty_brain_title_suffix": "y chatea con ellos"
 }
