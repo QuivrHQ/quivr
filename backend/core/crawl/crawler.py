@@ -15,10 +15,14 @@ class CrawlWebsite(BaseModel):
     max_time: int = 60
 
     def _crawl(self, url):
-        response = requests.get(url)
-        if response.status_code == 200:
-            return response.text
-        else:
+        try: 
+            response = requests.get(url)
+            if response.status_code == 200:
+                return response.text
+            else:
+                return None
+        except Exception as e:
+            print(e)
             return None
 
     def process(self):
