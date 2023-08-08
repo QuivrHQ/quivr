@@ -111,6 +111,7 @@ export const useBrainProvider = () => {
     createBrain: createBrainHandler,
     deleteBrain: deleteBrainHandler,
     setActiveBrain,
+    setCurrentBrainId,
     fetchAllBrains,
     setDefaultBrain,
     fetchAndSetActiveBrain,
