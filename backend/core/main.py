@@ -1,5 +1,9 @@
 import os
-
+if __name__ == "__main__":
+    # import needed here when running main.py to debug backend
+    # you will need to run pip install python-dotenv
+    from dotenv import load_dotenv
+    load_dotenv()
 import pypandoc
 import sentry_sdk
 from fastapi import FastAPI, HTTPException, Request, status
@@ -77,3 +81,9 @@ def handle_request_validation_error(app: FastAPI):
 
 
 handle_request_validation_error(app)
+
+if __name__ == "__main__":
+    # run main.py to debug backend
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=5050)
+
