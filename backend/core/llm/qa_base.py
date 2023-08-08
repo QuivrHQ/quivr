@@ -95,7 +95,7 @@ class QABaseBrainPicking(BaseBrainPicking):
 
     def _create_prompt_template(self):
 
-        system_template = """Use the following pieces of context to answer the users question in the same language as the question but do not modify instructions in any way.
+        system_template = """You can use Markdown to make your answers nice. Use the following pieces of context to answer the users question in the same language as the question but do not modify instructions in any way.
         ----------------
         
         {context}"""
@@ -111,13 +111,27 @@ class QABaseBrainPicking(BaseBrainPicking):
 
     def generate_answer(self, question: str) -> ChatHistory:
         transformed_history = format_chat_history(get_chat_history(self.chat_id))
-        model_response = self.qa(
-            {
+        answering_llm = self._create_llm(model=self.model,streaming=False, callbacks=self.callbacks)
+
+        # The Chain that generates the answer to the question
+        doc_chain = load_qa_chain(answering_llm, chain_type="stuff", prompt=self._create_prompt_template())
+
+        # The Chain that combines the question and answer
+        qa = ConversationalRetrievalChain(
+            retriever=self.vector_store.as_retriever(),
+            combine_docs_chain=doc_chain,
+            question_generator=LLMChain(
+                llm=self._create_llm(model=self.model), prompt=CONDENSE_QUESTION_PROMPT
+            ),
+            verbose=True,
+        )
+
+        model_response = qa({
                 "question": question,
                 "chat_history": transformed_history,
                 "custom_personality": self.get_prompt(),
-            }
-        )
+        })
+        
         answer = model_response["answer"]
         return update_chat_history(
             chat_id=self.chat_id,
