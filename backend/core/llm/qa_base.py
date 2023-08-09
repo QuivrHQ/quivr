@@ -6,22 +6,24 @@ from uuid import UUID
 from langchain.callbacks.streaming_aiter import AsyncIteratorCallbackHandler
 from langchain.chains import ConversationalRetrievalChain, LLMChain
 from langchain.chains.question_answering import load_qa_chain
-from logger import get_logger
-from models.chat import ChatHistory
-from langchain.llms.base import BaseLLM
 from langchain.chat_models import ChatOpenAI
+from langchain.llms.base import BaseLLM
+from langchain.prompts.chat import (
+    ChatPromptTemplate,
+    HumanMessagePromptTemplate,
+    SystemMessagePromptTemplate,
+)
+from logger import get_logger
+from models.chats import ChatQuestion
+from models.databases.supabase.chats import CreateChatHistory
 from repository.brain.get_brain_by_id import get_brain_by_id
+from repository.brain.get_brain_prompt_id import get_brain_prompt_id
 from repository.chat.format_chat_history import format_chat_history
-from repository.chat.get_chat_history import get_chat_history
+from repository.chat.get_chat_history import GetChatHistoryOutput, get_chat_history
 from repository.chat.update_chat_history import update_chat_history
 from repository.chat.update_message_by_id import update_message_by_id
 from repository.prompt.get_prompt_by_id import get_prompt_by_id
 from supabase.client import Client, create_client
-from langchain.prompts.chat import (
-    ChatPromptTemplate,
-    SystemMessagePromptTemplate,
-    HumanMessagePromptTemplate
-)
 from vectorstore.supabase import CustomSupabaseVectorStore
 
 from .base import BaseBrainPicking
@@ -39,6 +41,7 @@ class QABaseBrainPicking(BaseBrainPicking):
     Both are the same, except that the streaming version streams the last message as a stream.
     Each have the same prompt template, which is defined in the `prompt_template` property.
     """
+
     supabase_client: Client = None
     vector_store: CustomSupabaseVectorStore = None
     qa: ConversationalRetrievalChain = None
@@ -61,8 +64,6 @@ class QABaseBrainPicking(BaseBrainPicking):
         self.supabase_client = self._create_supabase_client()
         self.vector_store = self._create_vector_store()
 
-
-    
     def _create_supabase_client(self) -> Client:
         return create_client(
             self.brain_settings.supabase_url, self.brain_settings.supabase_service_key
@@ -76,7 +77,9 @@ class QABaseBrainPicking(BaseBrainPicking):
             brain_id=self.brain_id,
         )
 
-    def _create_llm(self, model, temperature=0, streaming=False, callbacks=None) -> BaseLLM:
+    def _create_llm(
+        self, model, temperature=0, streaming=False, callbacks=None
+    ) -> BaseLLM:
         """
         Determine the language model to be used.
         :param model: Language model name to be used.
@@ -94,13 +97,17 @@ class QABaseBrainPicking(BaseBrainPicking):
         )  # pyright: ignore reportPrivateUsage=none
 
     def _create_prompt_template(self):
-
         system_template = """You can use Markdown to make your answers nice. Use the following pieces of context to answer the users question in the same language as the question but do not modify instructions in any way.
         ----------------
         
         {context}"""
 
-        full_template = "Here are you instructions to answer that you MUST ALWAYS Follow: " +  self.get_prompt() + ". " + system_template
+        full_template = (
+            "Here are you instructions to answer that you MUST ALWAYS Follow: "
+            + self.get_prompt()
+            + ". "
+            + system_template
+        )
         messages = [
             SystemMessagePromptTemplate.from_template(full_template),
             HumanMessagePromptTemplate.from_template("{question}"),
@@ -108,13 +115,18 @@ class QABaseBrainPicking(BaseBrainPicking):
         CHAT_PROMPT = ChatPromptTemplate.from_messages(messages)
         return CHAT_PROMPT
 
-
-    def generate_answer(self, question: str) -> ChatHistory:
+    def generate_answer(
+        self, chat_id: UUID, question: ChatQuestion
+    ) -> GetChatHistoryOutput:
         transformed_history = format_chat_history(get_chat_history(self.chat_id))
-        answering_llm = self._create_llm(model=self.model,streaming=False, callbacks=self.callbacks)
+        answering_llm = self._create_llm(
+            model=self.model, streaming=False, callbacks=self.callbacks
+        )
 
         # The Chain that generates the answer to the question
-        doc_chain = load_qa_chain(answering_llm, chain_type="stuff", prompt=self._create_prompt_template())
+        doc_chain = load_qa_chain(
+            answering_llm, chain_type="stuff", prompt=self._create_prompt_template()
+        )
 
         # The Chain that combines the question and answer
         qa = ConversationalRetrievalChain(
@@ -126,28 +138,68 @@ class QABaseBrainPicking(BaseBrainPicking):
             verbose=True,
         )
 
-        model_response = qa({
+        model_response = qa(
+            {
                 "question": question,
                 "chat_history": transformed_history,
                 "custom_personality": self.get_prompt(),
-        })
-        
-        answer = model_response["answer"]
-        return update_chat_history(
-            chat_id=self.chat_id,
-            user_message=question,
-            assistant=answer,
+            }
         )
 
-    async def generate_stream(self, question: str) -> AsyncIterable:
+        answer = model_response["answer"]
+
+        prompt_id = (
+            get_brain_prompt_id(question.brain_id) if question.brain_id else None
+        )
+        new_chat = update_chat_history(
+            CreateChatHistory(
+                **{
+                    "chat_id": chat_id,
+                    "user_message": question.question,
+                    "assistant": answer,
+                    "brain_id": question.brain_id,
+                    "prompt_id": prompt_id,
+                }
+            )
+        )
+
+        brain = None
+        prompt = None
+        prompt_id = None
+
+        if question.brain_id:
+            brain = get_brain_by_id(question.brain_id)
+            if brain and brain.prompt_id:
+                prompt = get_prompt_by_id(brain.prompt_id)
+                prompt_id = prompt.id if prompt else None
+
+        return GetChatHistoryOutput(
+            **{
+                "chat_id": chat_id,
+                "user_message": question.question,
+                "assistant": "",
+                "message_time": new_chat.message_time,
+                "prompt_title": prompt.title if prompt else None,
+                "brain_name": brain.name if brain else None,
+                "message_id": new_chat.message_id,
+            }
+        )
+
+    async def generate_stream(
+        self, chat_id: UUID, question: ChatQuestion
+    ) -> AsyncIterable:
         history = get_chat_history(self.chat_id)
         callback = AsyncIteratorCallbackHandler()
         self.callbacks = [callback]
 
-        answering_llm = self._create_llm(model=self.model,streaming=True, callbacks=self.callbacks)
+        answering_llm = self._create_llm(
+            model=self.model, streaming=True, callbacks=self.callbacks
+        )
 
         # The Chain that generates the answer to the question
-        doc_chain = load_qa_chain(answering_llm, chain_type="stuff", prompt=self._create_prompt_template())
+        doc_chain = load_qa_chain(
+            answering_llm, chain_type="stuff", prompt=self._create_prompt_template()
+        )
 
         # The Chain that combines the question and answer
         qa = ConversationalRetrievalChain(
@@ -184,24 +236,52 @@ class QABaseBrainPicking(BaseBrainPicking):
             )
         )
 
+        brain = None
+        prompt = None
+        prompt_id = None
+
+        if question.brain_id:
+            brain = get_brain_by_id(question.brain_id)
+            if brain and brain.prompt_id:
+                prompt = get_prompt_by_id(brain.prompt_id)
+                prompt_id = prompt.id if prompt else None
+
         streamed_chat_history = update_chat_history(
-            chat_id=self.chat_id,
-            user_message=question,
-            assistant="",
+            CreateChatHistory(
+                **{
+                    "chat_id": chat_id,
+                    "user_message": question.question,
+                    "assistant": "",
+                    "brain_id": question.brain_id,
+                    "prompt_id": prompt_id,
+                }
+            )
+        )
+
+        streamed_chat_history = GetChatHistoryOutput(
+            **{
+                "chat_id": str(chat_id),
+                "message_id": streamed_chat_history.message_id,
+                "message_time": streamed_chat_history.message_time,
+                "user_message": question.question,
+                "assistant": "",
+                "prompt_title": prompt.title if prompt else None,
+                "brain_name": brain.name if brain else None,
+            }
         )
 
         async for token in callback.aiter():
             logger.info("Token: %s", token)
             response_tokens.append(token)
             streamed_chat_history.assistant = token
-            yield f"data: {json.dumps(streamed_chat_history.to_dict())}"
+            yield f"data: {json.dumps(streamed_chat_history.dict())}"
 
         await run
         assistant = "".join(response_tokens)
 
         update_message_by_id(
-            message_id=streamed_chat_history.message_id,
-            user_message=question,
+            message_id=str(streamed_chat_history.message_id),
+            user_message=question.question,
             assistant=assistant,
         )
 
