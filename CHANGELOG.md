@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.0.54](https://github.com/StanGirard/quivr/compare/v0.0.53...v0.0.54) (2023-08-08)
+
+
+### Features
+
+* add new chat bar ([#896](https://github.com/StanGirard/quivr/issues/896)) ([69a73f5](https://github.com/StanGirard/quivr/commit/69a73f5d5ae58dca9c23c0d8751f8c7326c84f4c))
+* add new chat page ([#890](https://github.com/StanGirard/quivr/issues/890)) ([c43e0c0](https://github.com/StanGirard/quivr/commit/c43e0c01c4ddcf0d97b9bb89784ff004fb7a0a79))
+* deleting brains on brain manager page ([#893](https://github.com/StanGirard/quivr/issues/893)) ([71e142b](https://github.com/StanGirard/quivr/commit/71e142ba3c164e5f14959cd1fd5de38531779034))
+
+
+### Bug Fixes
+
+* **es:** spanish translations ([#895](https://github.com/StanGirard/quivr/issues/895)) ([69d0893](https://github.com/StanGirard/quivr/commit/69d08937de1540cf39a6462b4583b2c4c908d0af))
+* **sentry:** some unhandled errors ([#894](https://github.com/StanGirard/quivr/issues/894)) ([9ba7241](https://github.com/StanGirard/quivr/commit/9ba724168eacf4b074ad062f2a58b637597335ba))
+
 ## [0.0.53](https://github.com/StanGirard/quivr/compare/v0.0.52...v0.0.53) (2023-08-07)
 
 
