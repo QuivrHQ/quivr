@@ -23,7 +23,9 @@ CREATE TABLE IF NOT EXISTS chat_history (
     user_message TEXT,
     assistant TEXT,
     message_time TIMESTAMP DEFAULT current_timestamp,
-    PRIMARY KEY (chat_id, message_id)
+    PRIMARY KEY (chat_id, message_id),
+    prompt_id UUID,
+    brain_id UUID,
 );
 
 -- Create vector extension
@@ -212,7 +214,7 @@ CREATE TABLE IF NOT EXISTS migrations (
 );
 
 INSERT INTO migrations (name) 
-SELECT '20230802120700_add_prompt_id_to_brain'
+SELECT '20230809154300_add_prompt_id_brain_id_to_chat_history_table'
 WHERE NOT EXISTS (
-    SELECT 1 FROM migrations WHERE name = '20230802120700_add_prompt_id_to_brain'
+    SELECT 1 FROM migrations WHERE name = '20230809154300_add_prompt_id_brain_id_to_chat_history_table'
 );
