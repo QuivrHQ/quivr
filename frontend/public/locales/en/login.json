@@ -11,5 +11,5 @@
     "Invalidlogincredentials" : "Invalid login credentials",
     "password.updated": "Password updated successfully!",
     "new_password": "New Password",
-    "Failedtofetch": "Failed to Failed"
+    "Failedtofetch": "Failed to fetch data"
 }

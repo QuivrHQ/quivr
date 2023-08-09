@@ -11,5 +11,8 @@
     "addFiles": "Por favor, agregar archivos a subir",
     "selectBrain": "Por favor, seleccione o cree un cerebro antes de subir un archivo",
     "invalidUrl": "URL inválido",
-    "crawlFailed": "Error al rastrear sitio web: {{message}}"
+    "crawlFailed": "Error al rastrear sitio web: {{message}}",
+    "ohNo": "¡Oh no!",
+    "selectBrainFirst": "Primero debes seleccionar un cerebro. 🧠💡🥲",
+    "missingNecessaryRole": "No tienes el rol necesario para cargar contenido en el cerebro seleccionado. 🧠💡🥲"
 }
