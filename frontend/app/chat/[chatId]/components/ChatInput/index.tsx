@@ -1,17 +1,19 @@
 "use client";
 import { useTranslation } from "react-i18next";
 
-import { useChat } from "@/app/chat/[chatId]/hooks/useChat";
 import Button from "@/lib/components/ui/Button";
+import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 
 import { ConfigModal } from "./components/ConfigModal";
 import { MicButton } from "./components/MicButton/MicButton";
 import { useChatInput } from "./hooks/useChatInput";
+import { MentionItem } from "../ActionsBar/components";
 
 export const ChatInput = (): JSX.Element => {
-  const { message, setMessage, submitQuestion } = useChatInput();
-  const { generatingAnswer, chatId } = useChat();
+  const { message, setMessage, submitQuestion, chatId, generatingAnswer } =
+    useChatInput();
   const { t } = useTranslation(["chat"]);
+  const { currentBrain, setCurrentBrainId } = useBrainContext();
 
   return (
     <form
@@ -20,8 +22,16 @@ export const ChatInput = (): JSX.Element => {
         e.preventDefault();
         submitQuestion();
       }}
-      className="sticky bottom-0 p-5 bg-white dark:bg-black rounded-t-md border border-black/10 dark:border-white/25 border-b-0 w-full max-w-3xl flex items-center justify-center gap-2 z-20"
+      className="sticky flex items-star bottom-0 bg-white dark:bg-black w-full flex justify-center gap-2 z-20"
     >
+      {currentBrain !== undefined && (
+        <MentionItem
+          text={currentBrain.name}
+          onRemove={() => setCurrentBrainId(null)}
+          prefix="@"
+        />
+      )}
+
       <textarea
         autoFocus
         value={message}
@@ -33,9 +43,10 @@ export const ChatInput = (): JSX.Element => {
             submitQuestion();
           }
         }}
-        className="w-full p-2 border border-gray-300 dark:border-gray-500 outline-none rounded dark:bg-gray-800"
+        className="w-full p-2 pt-0 dark:border-gray-500 outline-none rounded dark:bg-gray-800 focus:outline-none focus:border-none"
         placeholder={t("begin_conversation_placeholder")}
         data-testid="chat-input"
+        rows={1}
       />
       <Button
         className="px-3 py-2 sm:px-4 sm:py-2"

@@ -20,7 +20,7 @@ export const ChatMessage = forwardRef(
       <div
         ref={ref as Ref<HTMLDivElement>}
         className={cn(
-          "py-3 px-3 md:px-6 w-full dark:border-white/25 flex flex-col max-w-4xl overflow-hidden scroll-pb-32",
+          "py-3 px-3 md:px-6 w-full dark:border-white/25 flex flex-col overflow-hidden scroll-pb-32",
           speaker === "user"
             ? ""
             : "bg-gray-200 dark:bg-gray-800 bg-opacity-60 py-8"

@@ -1,7 +1,7 @@
 /* eslint-disable max-lines */
 import { AxiosError } from "axios";
 import { useParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { getChatConfigFromLocalStorage } from "@/lib/api/chat/chat.local";
@@ -22,28 +22,12 @@ export const useChat = () => {
   );
   const [generatingAnswer, setGeneratingAnswer] = useState(false);
 
-  const { history, setHistory } = useChatContext();
+  const { history } = useChatContext();
   const { publish } = useToast();
-  const { createChat, getHistory } = useChatApi();
+  const { createChat } = useChatApi();
 
   const { addStreamQuestion } = useQuestion();
-  const { t } = useTranslation(['chat']);
-
-  useEffect(() => {
-    const fetchHistory = async () => {
-      const currentChatId = chatId;
-      if (currentChatId === undefined) {
-        return;
-      }
-
-      const chatHistory = await getHistory(currentChatId);
-
-      if (chatId === currentChatId && chatHistory.length > 0) {
-        setHistory(chatHistory);
-      }
-    };
-    void fetchHistory();
-  }, [chatId, setHistory]);
+  const { t } = useTranslation(["chat"]);
 
   const addQuestion = async (question: string, callback?: () => void) => {
     try {
@@ -78,7 +62,7 @@ export const useChat = () => {
       if ((error as AxiosError).response?.status === 429) {
         publish({
           variant: "danger",
-          text: t('limit_reached',{ns: 'chat'}),
+          text: t("limit_reached", { ns: "chat" }),
         });
 
         return;
@@ -86,7 +70,7 @@ export const useChat = () => {
 
       publish({
         variant: "danger",
-        text: t('error_occurred',{ns: 'chat'}),
+        text: t("error_occurred", { ns: "chat" }),
       });
     } finally {
       setGeneratingAnswer(false);
