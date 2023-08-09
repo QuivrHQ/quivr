@@ -26,7 +26,7 @@ export const ChatMessages = (): JSX.Element => {
           {t("ask", { ns: "chat" })}
         </div>
       ) : (
-        <div>
+        <div className="flex flex-col gap-3">
           {history.map(({ assistant, message_id, user_message }) => (
             <React.Fragment key={message_id}>
               <ChatMessage
