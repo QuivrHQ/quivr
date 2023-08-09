@@ -11,5 +11,8 @@
     "addFiles": "Veuillez ajouter des fichiers à télécharger",
     "selectBrain": "Veuillez sélectionner ou créer un cerveau pour télécharger un fichier",
     "invalidUrl": "URL invalide",
-    "crawlFailed": "Échec de l'exploration du site web : {{message}}"
+    "crawlFailed": "Échec de l'exploration du site web : {{message}}",
+    "ohNo": "Oh non !",
+    "selectBrainFirst": "Vous devez d'abord sélectionner un cerveau. 🧠💡🥲",
+    "missingNecessaryRole": "Vous n'avez pas le rôle nécessaire pour télécharger du contenu dans le cerveau sélectionné. 🧠💡🥲"
 }

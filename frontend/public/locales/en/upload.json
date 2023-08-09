@@ -11,5 +11,8 @@
     "addFiles": "Please, add files to upload",
     "selectBrain": "Please, select or create a brain to upload a file",
     "invalidUrl": "Invalid URL",
-    "crawlFailed": "Failed to crawl website: {{message}}"
+    "crawlFailed": "Failed to crawl website: {{message}}",
+    "ohNo": "Oh no!",
+    "selectBrainFirst": "You need to select a brain first. 🧠💡🥲",
+    "missingNecessaryRole": "You don't have the necessary role to upload content to the selected brain. 🧠💡🥲"
 }
