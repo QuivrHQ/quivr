@@ -267,9 +267,9 @@ async def create_stream_question_handler(
 
         gpt_answer_generator = OpenAIBrainPicking(
             chat_id=str(chat_id),
-            model=(brain_details or chat_question).model,
-            max_tokens=(brain_details or chat_question).max_tokens,
-            temperature=(brain_details or chat_question).temperature,
+            model=(brain_details or chat_question).model if current_user.user_openai_api_key else "gpt-3.5-turbo",
+            max_tokens=(brain_details or chat_question).max_tokens if current_user.user_openai_api_key else 0,
+            temperature=(brain_details or chat_question).temperature if current_user.user_openai_api_key else 256,
             brain_id=str(brain_id),
             user_openai_api_key=current_user.user_openai_api_key,  # pyright: ignore reportPrivateUsage=none
             streaming=True,
