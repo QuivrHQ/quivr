@@ -1,4 +1,5 @@
 "use client";
+import { useFeature } from "@growthbook/growthbook-react";
 import { useTranslation } from "react-i18next";
 
 import Button from "@/lib/components/ui/Button";
@@ -14,6 +15,7 @@ export const ChatInput = (): JSX.Element => {
     useChatInput();
   const { t } = useTranslation(["chat"]);
   const { currentBrain, setCurrentBrainId } = useBrainContext();
+  const shouldUseNewUX = useFeature("new-ux").on;
 
   return (
     <form
@@ -44,7 +46,11 @@ export const ChatInput = (): JSX.Element => {
           }
         }}
         className="w-full p-2 pt-0 dark:border-gray-500 outline-none rounded dark:bg-gray-800 focus:outline-none focus:border-none"
-        placeholder={t("begin_conversation_placeholder")}
+        placeholder={
+          shouldUseNewUX
+            ? t("actions_bar_placeholder")
+            : t("begin_conversation_placeholder")
+        }
         data-testid="chat-input"
         rows={1}
       />
