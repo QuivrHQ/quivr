@@ -4,12 +4,16 @@ import ReactMarkdown from "react-markdown";
 
 import { cn } from "@/lib/utils";
 
-const prompt = "prompt";
-const brainName = "brain";
+type ChatMessageProps = {
+  speaker: string;
+  text: string;
+  brainName?: string;
+  promptName?: string;
+};
 
 export const ChatMessage = React.forwardRef(
   (
-    { speaker, text }: { speaker: string; text: string },
+    { speaker, text, brainName, promptName }: ChatMessageProps,
     ref: React.Ref<HTMLDivElement>
   ) => {
     const isNewUxOn = useFeature("new-ux").on;
@@ -43,7 +47,7 @@ export const ChatMessage = React.forwardRef(
               data-testid="brain-prompt-tags"
               className="text-gray-400 mb-1"
             >
-              @{brainName} #{prompt}
+              @{brainName ?? "-"} #{promptName ?? "-"}
             </span>
           )}
           <div data-testid="chat-message-text">
