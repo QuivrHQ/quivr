@@ -12,7 +12,7 @@ const SelectedChatPage = (): JSX.Element => {
       <section className="flex flex-col flex-1 items-center w-full h-full min-h-[70vh]">
         <div className="flex flex-col items-center justify-center px-5">
           <h1 className="text-3xl font-bold text-center">
-            {t("empty_brain_title_intro")}{" "}
+            {t("chat_title_intro")}{" "}
             <span className="text-purple-500">{t("brains")}</span>
             {" !! "}
             <br />
