@@ -1,5 +1,7 @@
 "use client";
 
+import { useTranslation } from "react-i18next";
+
 import Button from "@/lib/components/ui/Button";
 import PageHeading from "@/lib/components/ui/PageHeading";
 import Spinner from "@/lib/components/ui/Spinner";
@@ -9,6 +11,7 @@ import { redirectToLogin } from "@/lib/router/redirectToLogin";
 import { useInvitation } from "./hooks/useInvitation";
 
 const InvitationPage = (): JSX.Element => {
+  const { t } = useTranslation('invitation');
   const {
     handleAccept,
     isProcessingRequest,
@@ -37,13 +40,13 @@ const InvitationPage = (): JSX.Element => {
   return (
     <main className="pt-10">
       <PageHeading
-        title={`Welcome to ${brainName}!`}
-        subtitle={`You have been invited to join this brain as a ${role} and start exploring. Do you accept this exciting journey?`}
+        title={t("wellcome",{brain: brainName, ns: "invitation"})}
+        subtitle={t("invitationMessage",{role: role, ns: "invitation"})}
       />
       {isProcessingRequest ? (
         <div className="flex flex-col items-center justify-center mt-5">
           <Spinner />
-          <p className="text-center">Processing your request...</p>
+          <p className="text-center">{t("processingRequest",{ns: "invitation"})}</p>
         </div>
       ) : (
         <div className="flex flex-col items-center justify-center gap-5 mt-5">
@@ -52,14 +55,14 @@ const InvitationPage = (): JSX.Element => {
             variant={"secondary"}
             className="py-3"
           >
-            Yes, count me in!
+            {t("accept",{ns: "invitation"})}
           </Button>
           <Button
             onClick={() => void handleDecline()}
             variant={"danger"}
             className="py-3"
           >
-            No, thank you.
+            {t("reject",{ns: "invitation"})}
           </Button>
         </div>
       )}
