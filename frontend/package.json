@@ -62,7 +62,6 @@
     "react-hook-form": "^7.44.3",
     "react-i18next": "^13.0.3",
     "react-markdown": "^8.0.7",
-    "react-mentions": "^4.4.10",
     "react-use": "^17.4.0",
     "rehype-highlight": "^6.0.0",
     "sharp": "^0.32.4",
