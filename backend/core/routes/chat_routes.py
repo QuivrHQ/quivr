@@ -9,6 +9,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from fastapi.responses import StreamingResponse
 from llm.openai import OpenAIBrainPicking
 from models.brains import Brain
+from models.brain_entity import BrainEntity
 from models.chat import Chat, ChatHistory
 from models.chats import ChatQuestion
 from models.databases.supabase.supabase import SupabaseDB
@@ -235,7 +236,7 @@ async def create_stream_question_handler(
     # Retrieve user's OpenAI API key
     current_user.user_openai_api_key = request.headers.get("Openai-Api-Key")
     brain = Brain(id=brain_id)
-
+    brain_details: BrainEntity = None
     if not current_user.user_openai_api_key and brain_id:
         brain_details = get_brain_details(brain_id)
         if brain_details:
@@ -250,7 +251,7 @@ async def create_stream_question_handler(
     # Retrieve chat model (temperature, max_tokens, model)
     if (
         not chat_question.model
-        or not chat_question.temperature
+        or chat_question.temperature is None
         or not chat_question.max_tokens
     ):
         # TODO: create ChatConfig class (pick config from brain or user or chat) and use it here
@@ -266,9 +267,9 @@ async def create_stream_question_handler(
 
         gpt_answer_generator = OpenAIBrainPicking(
             chat_id=str(chat_id),
-            model=chat_question.model,
-            max_tokens=chat_question.max_tokens,
-            temperature=chat_question.temperature,
+            model=(brain_details or chat_question).model,
+            max_tokens=(brain_details or chat_question).max_tokens,
+            temperature=(brain_details or chat_question).temperature,
             brain_id=str(brain_id),
             user_openai_api_key=current_user.user_openai_api_key,  # pyright: ignore reportPrivateUsage=none
             streaming=True,
