@@ -4,6 +4,7 @@ import axios, { AxiosResponse } from "axios";
 import { UUID } from "crypto";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 import { useSubscriptionApi } from "@/lib/api/subscription/useSubscriptionApi";
 import { BrainRoleType } from "@/lib/components/NavBar/components/NavItems/components/BrainsDropDown/components/BrainActions/types";
@@ -13,8 +14,9 @@ import { useEventTracking } from "@/services/analytics/useEventTracking";
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const useInvitation = () => {
+  const { t } = useTranslation(["brain","invitation"]);
   const params = useParams();
-  const brainId = params?.brainId as UUID | undefined;
+  const brainId = params.brainId as UUID | undefined;
   const [isLoading, setIsLoading] = useState(false);
   const [brainName, setBrainName] = useState<string>("");
   const [role, setRole] = useState<BrainRoleType | undefined>();
@@ -26,7 +28,7 @@ export const useInvitation = () => {
     useSubscriptionApi();
 
   if (brainId === undefined) {
-    throw new Error("Brain ID is undefined");
+    throw new Error(t("brainUndefined",{ns:"brain"}));
   }
 
   const { fetchAllBrains, setActiveBrain } = useBrainContext();
@@ -44,12 +46,12 @@ export const useInvitation = () => {
         if (axios.isAxiosError(error) && error.response?.status === 404) {
           publish({
             variant: "warning",
-            text: "This invitation is not valid.",
+            text: t("invitationNotFound",{ns:"invitation"}),
           });
         } else {
           publish({
             variant: "danger",
-            text: "An unknown error occurred while checking the invitaiton",
+            text: t("errorCheckingInvitation",{ns:"invitation"})
           });
         }
         router.push("/");
@@ -63,13 +65,13 @@ export const useInvitation = () => {
   const handleAccept = async () => {
     setIsProcessingRequest(true);
     try {
-      const response = await acceptInvitation(brainId);
+      await acceptInvitation(brainId);
       void track("INVITATION_ACCEPTED");
 
       await fetchAllBrains();
       publish({
         variant: "success",
-        text: JSON.stringify(response.message),
+        text: t("accept",{ns:"invitation"}),
       });
       setActiveBrain({ id: brainId, name: brainName });
     } catch (error) {
@@ -86,7 +88,7 @@ export const useInvitation = () => {
         console.error("Error calling the API:", error);
         publish({
           variant: "danger",
-          text: "An unknown error occurred while accepting the invitaiton",
+          text: t("errorAccepting",{ns:"invitation"})
         });
       }
     } finally {
@@ -98,10 +100,10 @@ export const useInvitation = () => {
   const handleDecline = async () => {
     setIsProcessingRequest(true);
     try {
-      const response = await declineInvitation(brainId);
+      await declineInvitation(brainId);
       publish({
         variant: "success",
-        text: JSON.stringify(response.message),
+        text: t("declined",{ns:"invitation"})
       });
       void track("INVITATION_DECLINED");
     } catch (error) {
@@ -117,7 +119,7 @@ export const useInvitation = () => {
       } else {
         publish({
           variant: "danger",
-          text: "An unknown error occurred while declining the invitation",
+          text: t("errorDeclining",{ns:"invitation"})
         });
       }
     } finally {
