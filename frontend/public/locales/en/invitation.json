@@ -1,0 +1,13 @@
+{
+    "wellcome": "Welcome to {{brain}}!",
+    "invitationMessage": "You have been invited to join this brain as a {{role}} and start exploring. Do you accept this exciting journey?",
+    "processingRequest": "Processing your request...",
+    "accept": "Yes, count me in!",
+    "reject": "No, thank you.",
+    "invitationNotFound": "This invitation is not valid.",
+    "errorCheckingInvitation": "An unknown error occurred while checking the invitation",
+    "accepted": "Invitation accepted",
+    "errorAccepting": "An unknown error occurred while accepting the invitation",
+    "declined": "Invitation declined",
+    "errorDeclining": "An unknown error occurred while declining the invitation"
+}

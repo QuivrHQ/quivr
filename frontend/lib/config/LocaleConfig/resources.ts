@@ -5,6 +5,7 @@ import chat_en from "../../../public/locales/en/chat.json";
 import config_en from "../../../public/locales/en/config.json";
 import delete_brain_en from "../../../public/locales/en/deleteBrain.json";
 import explore_en from "../../../public/locales/en/explore.json";
+import invitation_en from "../../../public/locales/en/invitation.json";
 import login_en from "../../../public/locales/en/login.json";
 import logout_en from "../../../public/locales/en/logout.json";
 import signUp_en from "../../../public/locales/en/signUp.json";
@@ -18,6 +19,7 @@ import chat_es from "../../../public/locales/es/chat.json";
 import config_es from "../../../public/locales/es/config.json";
 import delete_brain_es from "../../../public/locales/es/deleteBrain.json";
 import explore_es from "../../../public/locales/es/explore.json";
+import invitation_es from "../../../public/locales/es/invitation.json";
 import login_es from "../../../public/locales/es/login.json";
 import logout_es from "../../../public/locales/es/logout.json";
 import signUp_es from "../../../public/locales/es/signUp.json";
@@ -31,6 +33,7 @@ import chat_fr from "../../../public/locales/fr/chat.json";
 import config_fr from "../../../public/locales/fr/config.json";
 import delete_brain_fr from "../../../public/locales/fr/deleteBrain.json";
 import explore_fr from "../../../public/locales/fr/explore.json";
+import invitation_fr from "../../../public/locales/fr/invitation.json";
 import login_fr from "../../../public/locales/fr/login.json";
 import logout_fr from "../../../public/locales/fr/logout.json";
 import signUp_fr from "../../../public/locales/fr/signUp.json";
@@ -44,6 +47,7 @@ import chat_ru from "../../../public/locales/ru/chat.json";
 import config_ru from "../../../public/locales/ru/config.json";
 import delete_brain_ru from "../../../public/locales/ru/deleteBrain.json";
 import explore_ru from "../../../public/locales/ru/explore.json";
+import invitation_ru from "../../../public/locales/ru/invitation.json";
 import login_ru from "../../../public/locales/ru/login.json";
 import logout_ru from "../../../public/locales/ru/logout.json";
 import signUp_ru from "../../../public/locales/ru/signUp.json";
@@ -59,6 +63,7 @@ export const resources = {
     chat: chat_en,
     config: config_en,
     explore: explore_en,
+    invitation: invitation_en,
     login: login_en,
     logout: logout_en,
     signUp: signUp_en,
@@ -73,6 +78,7 @@ export const resources = {
     chat: chat_es,
     config: config_es,
     explore: explore_es,
+    invitation: invitation_es,
     login: login_es,
     logout: logout_es,
     signUp: signUp_es,
@@ -87,6 +93,7 @@ export const resources = {
     chat: chat_fr,
     config: config_fr,
     explore: explore_fr,
+    invitation: invitation_fr,
     login: login_fr,
     logout: logout_fr,
     signUp: signUp_fr,
@@ -101,6 +108,7 @@ export const resources = {
     chat: chat_ru,
     config: config_ru,
     explore: explore_ru,
+    invitation: invitation_ru,
     login: login_ru,
     logout: logout_ru,
     signUp: signUp_ru,
