@@ -14,9 +14,9 @@ import { useEventTracking } from "@/services/analytics/useEventTracking";
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const useInvitation = () => {
-  const { t } = useTranslation(["brain","invitation"]);
+  const { t } = useTranslation(["brain", "invitation"]);
   const params = useParams();
-  const brainId = params.brainId as UUID | undefined;
+  const brainId = params?.brainId as UUID | undefined;
   const [isLoading, setIsLoading] = useState(false);
   const [brainName, setBrainName] = useState<string>("");
   const [role, setRole] = useState<BrainRoleType | undefined>();
@@ -28,7 +28,7 @@ export const useInvitation = () => {
     useSubscriptionApi();
 
   if (brainId === undefined) {
-    throw new Error(t("brainUndefined",{ns:"brain"}));
+    throw new Error(t("brainUndefined", { ns: "brain" }));
   }
 
   const { fetchAllBrains, setActiveBrain } = useBrainContext();
@@ -46,12 +46,12 @@ export const useInvitation = () => {
         if (axios.isAxiosError(error) && error.response?.status === 404) {
           publish({
             variant: "warning",
-            text: t("invitationNotFound",{ns:"invitation"}),
+            text: t("invitationNotFound", { ns: "invitation" }),
           });
         } else {
           publish({
             variant: "danger",
-            text: t("errorCheckingInvitation",{ns:"invitation"})
+            text: t("errorCheckingInvitation", { ns: "invitation" }),
           });
         }
         router.push("/");
@@ -71,7 +71,7 @@ export const useInvitation = () => {
       await fetchAllBrains();
       publish({
         variant: "success",
-        text: t("accept",{ns:"invitation"}),
+        text: t("accept", { ns: "invitation" }),
       });
       setActiveBrain({ id: brainId, name: brainName });
     } catch (error) {
@@ -88,7 +88,7 @@ export const useInvitation = () => {
         console.error("Error calling the API:", error);
         publish({
           variant: "danger",
-          text: t("errorAccepting",{ns:"invitation"})
+          text: t("errorAccepting", { ns: "invitation" }),
         });
       }
     } finally {
@@ -103,7 +103,7 @@ export const useInvitation = () => {
       await declineInvitation(brainId);
       publish({
         variant: "success",
-        text: t("declined",{ns:"invitation"})
+        text: t("declined", { ns: "invitation" }),
       });
       void track("INVITATION_DECLINED");
     } catch (error) {
@@ -119,7 +119,7 @@ export const useInvitation = () => {
       } else {
         publish({
           variant: "danger",
-          text: t("errorDeclining",{ns:"invitation"})
+          text: t("errorDeclining", { ns: "invitation" }),
         });
       }
     } finally {
