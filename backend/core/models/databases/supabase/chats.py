@@ -1,4 +1,16 @@
+from typing import Optional
+from uuid import UUID
+
 from models.databases.repository import Repository
+from pydantic import BaseModel
+
+
+class CreateChatHistory(BaseModel):
+    chat_id: UUID
+    user_message: str
+    assistant: str
+    prompt_id: Optional[UUID]
+    brain_id: Optional[UUID]
 
 
 class Chats(Repository):
@@ -38,14 +50,20 @@ class Chats(Repository):
         )
         return response
 
-    def update_chat_history(self, chat_id: str, user_message: str, assistant: str):
+    def update_chat_history(self, chat_history: CreateChatHistory):
         response = (
             self.db.table("chat_history")
             .insert(
                 {
-                    "chat_id": str(chat_id),
-                    "user_message": user_message,
-                    "assistant": assistant,
+                    "chat_id": str(chat_history.chat_id),
+                    "user_message": chat_history.user_message,
+                    "assistant": chat_history.assistant,
+                    "prompt_id": str(chat_history.prompt_id)
+                    if chat_history.prompt_id
+                    else None,
+                    "brain_id": str(chat_history.brain_id)
+                    if chat_history.brain_id
+                    else None,
                 }
             )
             .execute()

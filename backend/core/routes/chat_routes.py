@@ -21,7 +21,7 @@ from repository.brain.get_default_user_brain_or_create_new import (
 )
 from repository.chat.create_chat import CreateChatProperties, create_chat
 from repository.chat.get_chat_by_id import get_chat_by_id
-from repository.chat.get_chat_history import get_chat_history
+from repository.chat.get_chat_history import GetChatHistoryOutput, get_chat_history
 from repository.chat.get_user_chats import get_user_chats
 from repository.chat.update_chat import ChatUpdatableProperties, update_chat
 from repository.user_identity.get_user_identity import get_user_identity
@@ -86,7 +86,7 @@ async def get_chats(current_user: User = Depends(get_current_user)):
     This endpoint retrieves all the chats associated with the current authenticated user. It returns a list of chat objects
     containing the chat ID and chat name for each chat.
     """
-    chats = get_user_chats(current_user.id)  # pyright: ignore reportPrivateUsage=none
+    chats = get_user_chats(str(current_user.id))
     return {"chats": chats}
 
 
@@ -156,7 +156,7 @@ async def create_question_handler(
     | UUID
     | None = Query(..., description="The ID of the brain"),
     current_user: User = Depends(get_current_user),
-) -> ChatHistory:
+) -> GetChatHistoryOutput:
     """
     Add a new question to the chat.
     """
@@ -164,11 +164,10 @@ async def create_question_handler(
     current_user.user_openai_api_key = request.headers.get("Openai-Api-Key")
     brain = Brain(id=brain_id)
 
-    if not current_user.user_openai_api_key:
-        if brain_id:
-            brain_details = get_brain_details(brain_id)
-            if brain_details:
-                current_user.user_openai_api_key = brain_details.openai_api_key
+    if not current_user.user_openai_api_key and brain_id:
+        brain_details = get_brain_details(brain_id)
+        if brain_details:
+            current_user.user_openai_api_key = brain_details.openai_api_key
 
     if not current_user.user_openai_api_key:
         user_identity = get_user_identity(current_user.id)
@@ -203,9 +202,7 @@ async def create_question_handler(
             user_openai_api_key=current_user.user_openai_api_key,  # pyright: ignore reportPrivateUsage=none
         )
 
-        chat_answer = gpt_answer_generator.generate_answer(  # pyright: ignore reportPrivateUsage=none
-            chat_question.question
-        )
+        chat_answer = gpt_answer_generator.generate_answer(chat_id, chat_question)
 
         return chat_answer
     except HTTPException as e:
@@ -277,9 +274,7 @@ async def create_stream_question_handler(
 
         print("streaming")
         return StreamingResponse(
-            gpt_answer_generator.generate_stream(  # pyright: ignore reportPrivateUsage=none
-                chat_question.question
-            ),
+            gpt_answer_generator.generate_stream(chat_id, chat_question),
             media_type="text/event-stream",
         )
 
@@ -293,6 +288,6 @@ async def create_stream_question_handler(
 )
 async def get_chat_history_handler(
     chat_id: UUID,
-) -> List[ChatHistory]:
+) -> List[GetChatHistoryOutput]:
     # TODO: RBAC with current_user
-    return get_chat_history(chat_id)  # pyright: ignore reportPrivateUsage=none
+    return get_chat_history(str(chat_id))

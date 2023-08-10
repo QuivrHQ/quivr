@@ -7,36 +7,40 @@ export type Language = {
 };
 
 export const useLanguageHook = (): {
-    change: (newLanguage: Language) => void;
-    allLanguages: Language[];
-    currentLanguage: Language | null;
-  } => {
+  change: (newLanguage: Language) => void;
+  allLanguages: Language[];
+  currentLanguage: Language | null;
+} => {
   const { i18n } = useTranslation();
   const [allLanguages, setAllLanguages] = useState<Language[]>([]);
   const [currentLanguage, setCurrentLanguage] = useState<Language | null>(null);
   useEffect(() => {
     const languages = [
-      { 
+      {
         id: "en",
-        name: 'English'
+        name: "English",
       },
       {
         id: "es",
-        name: 'Español'
+        name: "Español",
       },
       {
         id: "fr",
-        name: 'Français'
-      }
+        name: "Français",
+      },
+      {
+        id: "ru",
+        name: "Русский",
+      },
     ];
-    
+
     setAllLanguages(languages);
 
     // get language from localStorage
-    const savedLanguage = localStorage.getItem('selectedLanguage');
-    
+    const savedLanguage = localStorage.getItem("selectedLanguage");
+
     if (savedLanguage != null) {
-      const foundLanguage = languages.find(lang => lang.id === savedLanguage);
+      const foundLanguage = languages.find((lang) => lang.id === savedLanguage);
       if (foundLanguage) {
         setCurrentLanguage(foundLanguage);
         void i18n.changeLanguage(foundLanguage.id);
@@ -47,18 +51,18 @@ export const useLanguageHook = (): {
 
     // Set language to default if no language found in localStorage
     setCurrentLanguage(languages[0]);
-    localStorage.setItem('selectedLanguage', languages[0].id);
+    localStorage.setItem("selectedLanguage", languages[0].id);
   }, [i18n]);
 
   const change = (newLanguage: Language) => {
     setCurrentLanguage(newLanguage);
-    localStorage.setItem('selectedLanguage', newLanguage.id);
+    localStorage.setItem("selectedLanguage", newLanguage.id);
     void i18n.changeLanguage(newLanguage.id);
   };
 
   return {
     change,
     allLanguages,
-    currentLanguage
+    currentLanguage,
   };
 };
