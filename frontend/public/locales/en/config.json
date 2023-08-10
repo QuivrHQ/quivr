@@ -23,6 +23,7 @@
     "supabaseKeyLabel": "Supabase key",
     "keepInLocal": "Keep in local",
     "customPromptSection": "Custom prompt",
+    "selectQuivrPersonalityBtn": "Select a Quivr Personality",
     "promptName": "Prompt title",
     "promptNamePlaceholder": "My awesome prompt name",
     "promptContent": "Prompt content",
