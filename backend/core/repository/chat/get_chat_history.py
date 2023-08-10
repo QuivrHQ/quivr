@@ -20,7 +20,7 @@ class GetChatHistoryOutput(BaseModel):
 
     def dict(self, *args, **kwargs):
         chat_history = super().dict(*args, **kwargs)
-        chat_history["chat_id"] = str(chat_history.get("prompt_id"))
+        chat_history["chat_id"] = str(chat_history.get("chat_id"))
         chat_history["message_id"] = str(chat_history.get("message_id"))
 
         return chat_history
