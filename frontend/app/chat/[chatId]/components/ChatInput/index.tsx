@@ -5,10 +5,11 @@ import { useTranslation } from "react-i18next";
 import Button from "@/lib/components/ui/Button";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 
+import { ChatBar } from "./components/ChatInputV2/ChatBar";
+import { ConfigurationProvider } from "./components/ChatInputV2/ConfigurationProvider";
 import { ConfigModal } from "./components/ConfigModal";
 import { MicButton } from "./components/MicButton/MicButton";
 import { useChatInput } from "./hooks/useChatInput";
-import { MentionItem } from "../ActionsBar/components";
 
 export const ChatInput = (): JSX.Element => {
   const { message, setMessage, submitQuestion, chatId, generatingAnswer } =
@@ -26,34 +27,12 @@ export const ChatInput = (): JSX.Element => {
       }}
       className="sticky flex items-star bottom-0 bg-white dark:bg-black w-full flex justify-center gap-2 z-20"
     >
-      {currentBrain !== undefined && (
-        <MentionItem
-          text={currentBrain.name}
-          onRemove={() => setCurrentBrainId(null)}
-          prefix="@"
-        />
-      )}
+      <div className="flex flex-col items-center">
+        <ConfigurationProvider>
+          <ChatBar />
+        </ConfigurationProvider>
+      </div>
 
-      <textarea
-        autoFocus
-        value={message}
-        required
-        onChange={(e) => setMessage(e.target.value)}
-        onKeyDown={(e) => {
-          if (e.key === "Enter" && !e.shiftKey) {
-            e.preventDefault(); // Prevents the newline from being entered in the textarea
-            submitQuestion();
-          }
-        }}
-        className="w-full p-2 pt-0 dark:border-gray-500 outline-none rounded dark:bg-gray-800 focus:outline-none focus:border-none"
-        placeholder={
-          shouldUseNewUX
-            ? t("actions_bar_placeholder")
-            : t("begin_conversation_placeholder")
-        }
-        data-testid="chat-input"
-        rows={1}
-      />
       <Button
         className="px-3 py-2 sm:px-4 sm:py-2"
         type="submit"
