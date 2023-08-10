@@ -1,0 +1,13 @@
+{
+    "title": "Cadastro",
+    "subtitle": "Crie sua conta",
+    "email": "Email",
+    "password": "Senha",
+    "loginButton": "Login",
+    "signUpButton": "Cadastre-se",
+    "or": "ou",
+    "login": "Já possui cadastro? Faça login",
+    "googleLogin": "Entrar com o Google",
+    "errorSignUp": "Erro ao se cadastrar: {{errorMessage}}",
+    "mailSended": "Email de confirmação enviado, por favor verifique seu email"
+}

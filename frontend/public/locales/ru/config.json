@@ -23,6 +23,7 @@
     "supabaseKeyLabel": "Ключ Supabase",
     "keepInLocal": "Сохранить локально",
     "customPromptSection": "Пользовательский запрос",
+    "selectQuivrPersonalityBtn": "Select a Quivr Personality",
     "promptName": "Название запроса",
     "promptNamePlaceholder": "Название моего потрясающего запроса",
     "promptContent": "Содержание запроса",
