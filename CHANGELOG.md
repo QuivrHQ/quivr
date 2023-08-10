@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.0.55](https://github.com/StanGirard/quivr/compare/v0.0.54...v0.0.55) (2023-08-10)
+
+
+### Features
+
+* **chatMessages:** add brain_id and prompt_id columns  ([#912](https://github.com/StanGirard/quivr/issues/912)) ([6e77732](https://github.com/StanGirard/quivr/commit/6e777327aaee7b9f35b20dcd00814f4acbaf448e))
+* **invitation:** add translations ([#909](https://github.com/StanGirard/quivr/issues/909)) ([1360ce8](https://github.com/StanGirard/quivr/commit/1360ce801d8958defa5dd29a481e2e66ac6ae9ac))
+* Russian language translation ([#903](https://github.com/StanGirard/quivr/issues/903)) ([672eec0](https://github.com/StanGirard/quivr/commit/672eec08bc7113e3f4c32a29ae86b2b879262d30))
+
 ## [0.0.54](https://github.com/StanGirard/quivr/compare/v0.0.53...v0.0.54) (2023-08-08)
 
 
