@@ -140,7 +140,7 @@ class QABaseBrainPicking(BaseBrainPicking):
 
         model_response = qa(
             {
-                "question": question,
+                "question": question.question,
                 "chat_history": transformed_history,
                 "custom_personality": self.get_prompt(),
             }
@@ -227,7 +227,7 @@ class QABaseBrainPicking(BaseBrainPicking):
             wrap_done(
                 qa.acall(
                     {
-                        "question": question,
+                        "question": question.question,
                         "chat_history": transformed_history,
                         "custom_personality": self.get_prompt(),
                     }
