@@ -1,32 +1,20 @@
 "use client";
 
-import { useTranslation } from "react-i18next";
- 
-import PageHeading from "@/lib/components/ui/PageHeading";
-import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
-import { ChatProvider } from "@/lib/context/ChatProvider";
-
-import { ChatInput, ChatMessages } from "./components";
+import { ActionsBar } from "./components/ActionsBar";
+import { ChatHeader } from "./components/ChatHeader";
+import { ChatDialog } from "./components/Dialog";
 
 const SelectedChatPage = (): JSX.Element => {
-  const { currentBrain } = useBrainContext();
-  const { t } = useTranslation(['chat']);
-
   return (
     <main className="flex flex-col w-full pt-10" data-testid="chat-page">
       <section className="flex flex-col flex-1 items-center w-full h-full min-h-[70vh]">
-        <PageHeading
-          title={t('title',{ brain: currentBrain?.name, ns: 'chat'})}
-          subtitle= {t('subtitle',{ ns: 'chat'})}
-        />
-        <ChatProvider>
-          <div className="relative w-full flex flex-col flex-1 items-center">
-            <div className="flex-1 w-full flex flex-col items-center">
-              <ChatMessages />
-            </div>
-            <ChatInput />
+        <ChatHeader />
+        <div className="flex-1 flex flex-col mt-8 w-full shadow-md dark:shadow-primary/25 hover:shadow-xl transition-shadow rounded-xl overflow-hidden bg-white dark:bg-black border border-black/10 dark:border-white/25 p-12 pt-10 max-h-[80vh]">
+          <div className="flex flex-1 flex-col overflow-scroll">
+            <ChatDialog />
           </div>
-        </ChatProvider>
+          <ActionsBar />
+        </div>
       </section>
     </main>
   );

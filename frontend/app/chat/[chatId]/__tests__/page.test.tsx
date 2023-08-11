@@ -40,20 +40,18 @@ vi.mock("@/lib/context/BrainConfigProvider/brain-config-provider", () => ({
 describe("Chat page", () => {
   it("should render chat page correctly", () => {
     const { getByTestId } = render(
-      <SupabaseProviderMock>
-        <BrainConfigProviderMock>
-          <BrainProviderMock>
-            <SelectedChatPage />,
-          </BrainProviderMock>
-        </BrainConfigProviderMock>
-      </SupabaseProviderMock>
+      <ChatProviderMock>
+        <SupabaseProviderMock>
+          <BrainConfigProviderMock>
+            <BrainProviderMock>
+              <SelectedChatPage />,
+            </BrainProviderMock>
+          </BrainConfigProviderMock>
+        </SupabaseProviderMock>
+      </ChatProviderMock>
     );
 
     expect(getByTestId("chat-page")).toBeDefined();
-    expect(getByTestId("chat-messages")).toBeDefined();
     expect(getByTestId("chat-input")).toBeDefined();
-
-    expect(getByTestId("page-heading-title")).toBeDefined();
-    expect(getByTestId("page-heading-subtitle")).toBeDefined();
   });
 });

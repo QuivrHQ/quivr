@@ -28,7 +28,7 @@
     "shortcut_manage_brains": "CMDB: Gérer vos cerveaux",
     "shortcut_go_to_user_page": "CMDU: Accéder à la page utilisateur",
     "shortcut_go_to_shortcuts": "CMDK: Accéder aux raccourcis",
-     "empty_brain_title_intro": "Discutez avec vos",
+     "chat_title_intro": "Discutez avec vos",
     "empty_brain_title_prefix": "Téléchargez des fichiers dans un",
     "empty_brain_title_suffix": "et discutez avec eux",
     "actions_bar_placeholder": "Posez une question à @brains ou /files et choisissez votre #invite"

@@ -1,5 +1,11 @@
+/* eslint-disable max-lines */
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
+
+import {
+  ChatContextMock,
+  ChatProviderMock,
+} from "@/lib/context/ChatProvider/mocks/ChatProviderMock";
 
 import * as useChatsListModule from "../hooks/useChatsList";
 import { ChatsList } from "../index";
@@ -39,6 +45,9 @@ vi.mock("@/lib/hooks", async () => {
     }),
   };
 });
+vi.mock("@/lib/context/ChatProvider/ChatProvider", () => ({
+  ChatContext: ChatContextMock,
+}));
 
 describe("ChatsList", () => {
   afterEach(() => {
@@ -46,7 +55,11 @@ describe("ChatsList", () => {
   });
 
   it("should render correctly", () => {
-    const { getByTestId } = render(<ChatsList />);
+    const { getByTestId } = render(
+      <ChatProviderMock>
+        <ChatsList />
+      </ChatProviderMock>
+    );
     const chatsList = getByTestId("chats-list");
     expect(chatsList).toBeDefined();
 
@@ -58,7 +71,11 @@ describe("ChatsList", () => {
   });
 
   it("renders the chats list with correct number of items", () => {
-    render(<ChatsList />);
+    render(
+      <ChatProviderMock>
+        <ChatsList />
+      </ChatProviderMock>
+    );
     const chatItems = screen.getAllByTestId("chats-list-item");
     expect(chatItems).toHaveLength(2);
   });
@@ -69,7 +86,13 @@ describe("ChatsList", () => {
       setOpen: setOpenMock,
     });
 
-    await act(() => render(<ChatsList />));
+    await act(() =>
+      render(
+        <ChatProviderMock>
+          (<ChatsList />)
+        </ChatProviderMock>
+      )
+    );
 
     const toggleButton = screen.getByTestId("chats-list-toggle");
 
@@ -84,7 +107,13 @@ describe("ChatsList", () => {
         getChats: () => getChatsMock(),
       }),
     }));
-    await act(() => render(<ChatsList />));
+    await act(() =>
+      render(
+        <ChatProviderMock>
+          <ChatsList />
+        </ChatProviderMock>
+      )
+    );
 
     expect(getChatsMock).toHaveBeenCalledTimes(1);
   });

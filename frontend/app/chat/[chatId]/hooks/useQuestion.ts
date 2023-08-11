@@ -2,7 +2,6 @@
 
 import { useTranslation } from "react-i18next";
 
-import { useChatApi } from "@/lib/api/chat/useChatApi";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 import { useChatContext } from "@/lib/context/ChatProvider/hooks/useChatContext";
 import { useFetch } from "@/lib/hooks";
@@ -10,7 +9,6 @@ import { useFetch } from "@/lib/hooks";
 import { ChatHistory, ChatQuestion } from "../types";
 
 interface UseChatService {
-  addQuestion: (chatId: string, chatQuestion: ChatQuestion) => Promise<void>;
   addStreamQuestion: (
     chatId: string,
     chatQuestion: ChatQuestion
@@ -19,27 +17,10 @@ interface UseChatService {
 
 export const useQuestion = (): UseChatService => {
   const { fetchInstance } = useFetch();
-  const { updateHistory, updateStreamingHistory } = useChatContext();
+  const { updateStreamingHistory } = useChatContext();
   const { currentBrain } = useBrainContext();
-  const { addQuestion } = useChatApi();
-  const { t } = useTranslation(['chat']);
 
-  const addQuestionHandler = async (
-    chatId: string,
-    chatQuestion: ChatQuestion
-  ): Promise<void> => {
-    if (currentBrain?.id === undefined) {
-      throw new Error(t("noCurrentBrain",{ns:'chat'}));
-    }
-
-    const response = await addQuestion({
-      chatId,
-      brainId: currentBrain.id,
-      chatQuestion,
-    });
-
-    updateHistory(response);
-  };
+  const { t } = useTranslation(["chat"]);
 
   const handleStream = async (
     reader: ReadableStreamDefaultReader<Uint8Array>
@@ -64,7 +45,7 @@ export const useQuestion = (): UseChatService => {
           const parsedData = JSON.parse(data) as ChatHistory;
           updateStreamingHistory(parsedData);
         } catch (error) {
-          console.error(t("errorParsingData",{ns:'chat'}), error);
+          console.error(t("errorParsingData", { ns: "chat" }), error);
         }
       });
 
@@ -79,7 +60,7 @@ export const useQuestion = (): UseChatService => {
     chatQuestion: ChatQuestion
   ): Promise<void> => {
     if (currentBrain?.id === undefined) {
-      throw new Error(t("noCurrentBrain",{ns:'chat'}));
+      throw new Error(t("noCurrentBrain", { ns: "chat" }));
     }
     const headers = {
       "Content-Type": "application/json",
@@ -95,18 +76,17 @@ export const useQuestion = (): UseChatService => {
       );
 
       if (response.body === null) {
-        throw new Error(t("resposeBodyNull",{ns:'chat'}));
+        throw new Error(t("resposeBodyNull", { ns: "chat" }));
       }
 
       console.log(t("receivedResponse"), response);
       await handleStream(response.body.getReader());
     } catch (error) {
-      console.error(t("errorCallingAPI",{ns:"chat"}), error);
+      console.error(t("errorCallingAPI", { ns: "chat" }), error);
     }
   };
 
   return {
-    addQuestion: addQuestionHandler,
     addStreamQuestion,
   };
 };
