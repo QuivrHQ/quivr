@@ -73,7 +73,6 @@
   "devDependencies": {
     "@tailwindcss/typography": "^0.5.9",
     "@testing-library/react": "^14.0.0",
-    "@types/next": "^9.0.0",
     "@vitejs/plugin-react": "^4.0.1",
     "dotenv": "^16.3.1",
     "husky": "^8.0.3",

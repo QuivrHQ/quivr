@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable max-lines */
 // import all namespaces English
 import brain_en from "../../../public/locales/en/brain.json";
@@ -41,6 +42,20 @@ import translation_fr from "../../../public/locales/fr/translation.json";
 import updatePassword_fr from "../../../public/locales/fr/updatePassword.json";
 import upload_fr from "../../../public/locales/fr/upload.json";
 import user_fr from "../../../public/locales/fr/user.json";
+// import all namespaces Portuguese
+import brain_ptbr from "../../../public/locales/pt-br/brain.json";
+import chat_ptbr from "../../../public/locales/pt-br/chat.json";
+import config_ptbr from "../../../public/locales/pt-br/config.json";
+import delete_brain_ptbr from "../../../public/locales/pt-br/deleteBrain.json";
+import explore_ptbr from "../../../public/locales/pt-br/explore.json";
+import invitation_ptbr from "../../../public/locales/pt-br/invitation.json";
+import login_ptbr from "../../../public/locales/pt-br/login.json";
+import logout_ptbr from "../../../public/locales/pt-br/logout.json";
+import signUp_ptbr from "../../../public/locales/pt-br/signUp.json";
+import translation_ptbr from "../../../public/locales/pt-br/translation.json";
+import updatePassword_ptbr from "../../../public/locales/pt-br/updatePassword.json";
+import upload_ptbr from "../../../public/locales/pt-br/upload.json";
+import user_ptbr from "../../../public/locales/pt-br/user.json";
 // import all namespaces Russian
 import brain_ru from "../../../public/locales/ru/brain.json";
 import chat_ru from "../../../public/locales/ru/chat.json";
@@ -102,6 +117,21 @@ export const resources = {
     upload: upload_fr,
     user: user_fr,
     delete_brain: delete_brain_fr,
+  },
+  pt: {
+    brain: brain_ptbr,
+    chat: chat_ptbr,
+    config: config_ptbr,
+    explore: explore_ptbr,
+    invitation: invitation_ptbr,
+    login: login_ptbr,
+    logout: logout_ptbr,
+    signUp: signUp_ptbr,
+    translation: translation_ptbr,
+    updatePassword: updatePassword_ptbr,
+    upload: upload_ptbr,
+    user: user_ptbr,
+    delete_brain: delete_brain_ptbr,
   },
   ru: {
     brain: brain_ru,

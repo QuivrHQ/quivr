@@ -1,0 +1,13 @@
+{
+    "wellcome": "Bem-vindo(a) ao {{brain}}!",
+    "invitationMessage": "Você foi convidado(a) a se juntar a este cérebro como {{role}} e começar a explorar. Você aceita esta jornada emocionante?",
+    "processingRequest": "Processando o seu pedido...",
+    "accept": "Sim, estou dentro!",
+    "reject": "Não, obrigado(a).",
+    "invitationNotFound": "Este convite não é válido.",
+    "errorCheckingInvitation": "Ocorreu um erro desconhecido ao verificar o convite",
+    "accepted": "Convite aceito",
+    "errorAccepting": "Ocorreu um erro desconhecido ao aceitar o convite",
+    "declined": "Convite recusado",
+    "errorDeclining": "Ocorreu um erro desconhecido ao recusar o convite"
+}
