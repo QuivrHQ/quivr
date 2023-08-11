@@ -5,6 +5,7 @@ export type ChatQuestion = {
   question?: string;
   temperature?: number;
   max_tokens?: number;
+  brain_id?: string;
 };
 export type ChatHistory = {
   chat_id: string;
@@ -12,6 +13,8 @@ export type ChatHistory = {
   user_message: string;
   assistant: string;
   message_time: string;
+  prompt_title?: string;
+  brain_name?: string;
 };
 
 export type ChatEntity = {

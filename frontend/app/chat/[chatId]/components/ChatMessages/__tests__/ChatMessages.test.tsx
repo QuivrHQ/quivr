@@ -27,11 +27,17 @@ vi.mock("@/lib/context", () => ({
   useChatContext: () => useChatContextMock(),
 }));
 
+vi.mock("@growthbook/growthbook-react", () => ({
+  useFeature: () => ({
+    on: true,
+  }),
+}));
+
 describe("ChatMessages", () => {
   it("should render chat messages correctly", () => {
     const { getAllByTestId } = render(<ChatMessages />);
 
-    expect(getAllByTestId("chat-message-speaker")).toBeDefined();
+    expect(getAllByTestId("brain-prompt-tags")).toBeDefined();
 
     expect(getAllByTestId("chat-message-text")).toBeDefined();
   });

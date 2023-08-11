@@ -28,7 +28,7 @@
     "shortcut_manage_brains": "CMDB: Administrar tus cerebros",
     "shortcut_go_to_user_page": "CMDU: Ir a la página de usuario",
     "shortcut_go_to_shortcuts": "CMDK: Ir a los atajos",
-    "empty_brain_title_intro": "Chatea con tus",
+    "chat_title_intro": "Chatea con tus",
     "empty_brain_title_prefix": "Carga archivos en un",
     "empty_brain_title_suffix": "y chatea con ellos",
     "actions_bar_placeholder": "Haz una pregunta a @brains o /files y elige tu #indicación"

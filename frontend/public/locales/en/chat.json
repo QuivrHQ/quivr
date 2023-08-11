@@ -28,7 +28,7 @@
     "shortcut_manage_brains": "CMDB: Manage your brains",
     "shortcut_go_to_user_page": "CMDU: Go to user page",
     "shortcut_go_to_shortcuts": "CMDK: Go to shortcuts",
-    "empty_brain_title_intro": "Chat with your",
+    "chat_title_intro": "Chat with your",
     "empty_brain_title_prefix": "Upload files in a",
     "empty_brain_title_suffix": "and chat with them",
     "actions_bar_placeholder": "Ask a question to @brains or /files and choose your #prompt"
