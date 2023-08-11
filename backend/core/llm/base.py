@@ -26,16 +26,16 @@ class BaseBrainPicking(BaseModel):
     max_tokens: int = 256
     user_openai_api_key: str = None  # pyright: ignore reportPrivateUsage=none
     user_openai_api_base: str = None  # pyright: ignore reportPrivateUsage=none
-    user_openai_api_version: str = None  # pyright: ignore reportPrivateUsage=none
-    user_openai_gpt_deployment_id: str = None  # pyright: ignore reportPrivateUsage=none
-    user_openai_embedding_deployment_id: str = None  # pyright: ignore reportPrivateUsage=none
+    user_azure_api_version: str = None  # pyright: ignore reportPrivateUsage=none
+    user_azure_gpt_deployment_id: str = None  # pyright: ignore reportPrivateUsage=none
+    user_azure_embedding_deployment_id: str = None  # pyright: ignore reportPrivateUsage=none
     streaming: bool = False
 
     openai_api_key: str = None  # pyright: ignore reportPrivateUsage=none
     openai_api_base: str = None  # pyright: ignore reportPrivateUsage=none
-    openai_api_version: str = None  # pyright: ignore reportPrivateUsage=none
-    openai_gpt_deployment_id: str = None  # pyright: ignore reportPrivateUsage=none
-    openai_embedding_deployment_id: str = None  # pyright: ignore reportPrivateUsage=none
+    azure_api_version: str = None  # pyright: ignore reportPrivateUsage=none
+    azure_gpt_deployment_id: str = None  # pyright: ignore reportPrivateUsage=none
+    azure_embedding_deployment_id: str = None  # pyright: ignore reportPrivateUsage=none
     openai_api_type: str = "open_ai"
     callbacks: List[
         AsyncIteratorCallbackHandler
@@ -74,18 +74,18 @@ class BaseBrainPicking(BaseModel):
         )  # pyright: ignore reportPrivateUsage=none
 
         self.openai_api_base = self._determine_api_key(self.brain_settings.openai_api_base, self.user_openai_api_base)
-        self.openai_api_version = self._determine_api_key(self.brain_settings.openai_api_version, self.user_openai_api_version)
+        self.azure_api_version = self._determine_api_key(self.brain_settings.azure_api_version, self.user_azure_api_version)
 
-        self.openai_gpt_deployment_id = self._determine_api_key(
-            self.brain_settings.openai_gpt_deployment_id,
-            self.user_openai_gpt_deployment_id,
+        self.azure_gpt_deployment_id = self._determine_api_key(
+            self.brain_settings.azure_gpt_deployment_id,
+            self.user_azure_gpt_deployment_id,
         )
-        self.openai_embedding_deployment_id = self._determine_api_key(
-            self.brain_settings.openai_embedding_deployment_id,
-            self.user_openai_embedding_deployment_id,
+        self.azure_embedding_deployment_id = self._determine_api_key(
+            self.brain_settings.azure_embedding_deployment_id,
+            self.user_azure_embedding_deployment_id,
         )
         self.openai_api_type = (
-            "azure" if self.openai_gpt_deployment_id else self.openai_api_type
+            "azure" if self.azure_gpt_deployment_id else self.openai_api_type
         )
 
     class Config:

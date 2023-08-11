@@ -43,8 +43,9 @@ class OpenAIBrainPicking(QABaseBrainPicking):
         return OpenAIEmbeddings(
             openai_api_key=self.openai_api_key,
             openai_api_base=self.openai_api_base,
-            deployment=self.openai_embedding_deployment_id,
+            deployment=self.azure_embedding_deployment_id,
             openai_api_type=self.openai_api_type,
+            openai_api_version=self.azure_api_version,
         )  # pyright: ignore reportPrivateUsage=none
 
     
