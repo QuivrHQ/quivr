@@ -23,6 +23,7 @@
     "supabaseKeyLabel": "Clave de Supabase",
     "keepInLocal": "Mantener localmente",
     "customPromptSection": "Indicadores personalizados",
+    "selectQuivrPersonalityBtn": "Select a Quivr Personality",
     "promptName": "Título del indicador",
     "promptNamePlaceholder": "El nombre de mi súper indicador",
     "promptContent": "Contenido del indicador",

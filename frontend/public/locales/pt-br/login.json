@@ -1,0 +1,15 @@
+{
+    "title": "Login",
+    "subtitle": "Bem-vindo de volta",
+    "signup": "Não tem uma conta? Cadastre-se",
+    "forgottenPassword": "Esqueci a senha",
+    "googleLogin": "Entrar com o Google",
+    "magicLink": "Enviar Link Mágico",
+    "loginSuccess": "Login realizado com sucesso",
+    "errorMailMissed": "Por favor, insira seu endereço de email",
+    "recoveryMailSended": "Um email de recuperação será enviado se o email for reconhecido",
+    "Invalidlogincredentials": "Credenciais de login inválidas",
+    "password.updated": "Senha atualizada com sucesso!",
+    "new_password": "Nova Senha",
+    "Failedtofetch": "Falha ao buscar os dados"
+}

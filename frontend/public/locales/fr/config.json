@@ -23,6 +23,7 @@
     "supabaseKeyLabel": "Clé Supabase",
     "keepInLocal": "Garder en local",
     "customPromptSection": "Invite personnalisée",
+    "selectQuivrPersonalityBtn": "Select a Quivr Personality",
     "promptName": "Titre de l'invite",
     "promptNamePlaceholder": "Mon super nom d'invite",
     "promptContent": "Contenu de l'invite",

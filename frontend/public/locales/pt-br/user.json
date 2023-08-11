@@ -1,0 +1,9 @@
+{
+    "title": "Uso do Cérebro de {{user}}",
+    "fetching": "Buscando seus dados...",
+    "requestsCount": "Requisições de Hoje: {{count}}",
+    "brainSize": "Tamanho Restante do Cérebro",
+    "empty": "Vazio",
+    "Used": "Usado",
+    "Unused": "Não Usado"
+}

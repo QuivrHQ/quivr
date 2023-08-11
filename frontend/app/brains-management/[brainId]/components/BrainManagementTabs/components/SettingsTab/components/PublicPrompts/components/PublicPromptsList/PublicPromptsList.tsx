@@ -1,4 +1,5 @@
 import { ChangeEvent } from "react";
+import { useTranslation } from "react-i18next";
 
 import { Prompt } from "@/lib/types/Prompt";
 
@@ -15,6 +16,7 @@ export const PublicPromptsList = ({
   onChange,
   onSelect,
 }: PublicPromptsListProps): JSX.Element => {
+  const { t } = useTranslation(["translation", "brain", "config"]); // Get the t function from the hook
   const {
     handleOptionClick,
     isOpen,
@@ -33,7 +35,7 @@ export const PublicPromptsList = ({
         type="button"
         className="px-4 py-2 w-full text-gray-700 bg-white border rounded-md focus:outline-none focus:border-blue-500"
       >
-        {selectedOption ? selectedOption.title : "Select a Quivr Personality"}
+        {selectedOption ? selectedOption.title : t("selectQuivrPersonalityBtn", { ns: "config" })}
       </button>
       {isOpen && (
         <div className="absolute top-10 w-full bg-white border rounded-md shadow-lg">
