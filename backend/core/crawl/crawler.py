@@ -3,6 +3,7 @@ import re
 import tempfile
 import unicodedata
 
+from urllib.parse import  urljoin
 import requests
 from pydantic import BaseModel
 
@@ -10,7 +11,7 @@ from pydantic import BaseModel
 class CrawlWebsite(BaseModel):
     url: str
     js: bool = False
-    depth: int = 1
+    depth: int = int(os.getenv("CRAWL_DEPTH","1"))
     max_pages: int = 100
     max_time: int = 60
 
@@ -26,19 +27,43 @@ class CrawlWebsite(BaseModel):
             return None
 
     def process(self):
-        content = self._crawl(self.url)
+        visited_list=[]
+        self._process_level(self.url, 0, visited_list)
+        return visited_list
 
+    def _process_level(self, url, level_depth, visited_list):
+        content = self._crawl(url)
+        if content is None:
+            return
+        
+        
         # Create a file
-        file_name = slugify(self.url) + ".html"
+        file_name = slugify(url) + ".html"
         temp_file_path = os.path.join(tempfile.gettempdir(), file_name)
         with open(temp_file_path, "w") as temp_file:
             temp_file.write(content)  # pyright: ignore reportPrivateUsage=none
             # Process the file
 
         if content:
-            return temp_file_path, file_name
-        else:
-            return None
+            visited_list.append((temp_file_path, file_name))
+            from bs4 import BeautifulSoup
+            soup = BeautifulSoup(content, 'html5lib')
+            links = soup.findAll('a')
+            if level_depth < self.depth:
+                for a in links:
+                    if not a.has_attr('href'):
+                        continue
+                    new_url = a['href']
+                    file_name = slugify(new_url) + ".html"
+                    already_visited = False
+                    for (fpath,fname) in visited_list:
+                        if fname == file_name :
+                            already_visited = True
+                            break
+                    if not already_visited:
+                        self._process_level(urljoin(url,new_url),level_depth + 1,visited_list)
+
+
 
     def checkGithub(self):
         if "github.com" in self.url:

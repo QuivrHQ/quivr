@@ -24,3 +24,5 @@ pyright==1.1.316
 resend==0.5.1
 psycopg2-binary==2.9.6
 sqlalchemy==2.0.19
+html5lib==1.1
+bs4==0.0.1
