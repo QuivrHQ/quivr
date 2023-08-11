@@ -28,7 +28,7 @@
     "shortcut_manage_brains": "CMDB: Управление вашими мозгами",
     "shortcut_go_to_user_page": "CMDU: Перейти на страницу пользователя",
     "shortcut_go_to_shortcuts": "CMDK: Перейти к ярлыкам",
-    "empty_brain_title_intro": "Чат с вашими",
+    "chat_title_intro": "Чат с вашими",
     "empty_brain_title_prefix": "Загрузите файлы в",
     "empty_brain_title_suffix": "и общайтесь с ними",
     "actions_bar_placeholder": "Задайте вопрос @brains или /files и выберите ваш #prompt"
