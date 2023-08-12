@@ -59,3 +59,4 @@ backend/core/local_models/*
 ## scripts
 .migration_info
 package-lock.json
+frontend/yarn.lock
