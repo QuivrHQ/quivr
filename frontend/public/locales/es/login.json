@@ -1,15 +1,15 @@
 {
-    "title": "Iniciar sesión",
-    "subtitle": "Un gusto tenerte de vuelta",
-    "signup": "¿No tienes una cuenta? Registrate aquí",
+    "errorMailMissed": "Por favor ingresa tu dirección de email",
+    "Failedtofetch": "Error al obtener datos",
     "forgottenPassword": "Olvidé mi contraseña",
     "googleLogin": "Iniciar con Google",
-    "magicLink": "Enviar Enlace Mágico",
+    "Invalidlogincredentials": "Credenciales inválidas",
     "loginSuccess": "Sesión iniciada correctamente",
-    "errorMailMissed": "Por favor ingresa tu dirección de email",
-    "recoveryMailSended": "El correo de recuperación será enviado si el email es reconocido",
-    "Invalidlogincredentials" : "Credenciales inválidas",
-    "password.updated": "¡Contraseña actualizada!",
+    "magicLink": "Enviar Enlace Mágico",
     "new_password": "Nueva contraseña",
-    "Failedtofetch": "Error al obtener datos"
+    "password.updated": "¡Contraseña actualizada!",
+    "recoveryMailSended": "El correo de recuperación será enviado si el email es reconocido",
+    "signup": "¿No tienes una cuenta? Registrate aquí",
+    "subtitle": "Un gusto tenerte de vuelta",
+    "title": "Iniciar sesión"
 }
