@@ -1,13 +1,13 @@
 {
-    "title": "Registrarse",
-    "subtitle": "Crea tu cuenta",
     "email": "Correo electrónico",
-    "password": "Contraseña",
-    "loginButton": "Iniciar sesión",
-    "signUpButton": "Registrarse",
-    "or": "o",
-    "login": "¿Ya tienes una cuenta? Inicia sesión",
-    "googleLogin": "Iniciar con Google",
     "errorSignUp": "Error al registrarse: {{errorMessage}}",
-    "mailSended": "Correo de confirmación enviado, por favor verifica tu buzón"
+    "googleLogin": "Iniciar con Google",
+    "login": "¿Ya tienes una cuenta? Inicia sesión",
+    "loginButton": "Iniciar sesión",
+    "mailSended": "Correo de confirmación enviado, por favor verifica tu buzón",
+    "or": "o",
+    "password": "Contraseña",
+    "signUpButton": "Registrarse",
+    "subtitle": "Crea tu cuenta",
+    "title": "Registrarse"
 }
