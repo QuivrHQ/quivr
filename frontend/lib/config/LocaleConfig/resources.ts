@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable max-lines */
 // import all namespaces English
 import brain_en from "../../../public/locales/en/brain.json";
@@ -71,8 +70,34 @@ import updatePassword_ru from "../../../public/locales/ru/updatePassword.json";
 import upload_ru from "../../../public/locales/ru/upload.json";
 import user_ru from "../../../public/locales/ru/user.json";
 
+type BrainTranslations = typeof import("../../../public/locales/en/brain.json");
+//type all translations
+export type Translations = {
+  brain: BrainTranslations;
+  chat: typeof import("../../../public/locales/en/chat.json");
+  config: typeof import("../../../public/locales/en/config.json");
+  delete_brain: typeof import("../../../public/locales/en/deleteBrain.json");
+  explore: typeof import("../../../public/locales/en/explore.json");
+  invitation: typeof import("../../../public/locales/en/invitation.json");
+  login: typeof import("../../../public/locales/en/login.json");
+  logout: typeof import("../../../public/locales/en/logout.json");
+  signUp: typeof import("../../../public/locales/en/signUp.json");
+  translation: typeof import("../../../public/locales/en/translation.json");
+  updatePassword: typeof import("../../../public/locales/en/updatePassword.json");
+  upload: typeof import("../../../public/locales/en/upload.json");
+  user: typeof import("../../../public/locales/en/user.json");
+};
+
+enum SupportedLanguages {
+  en = "en",
+  es = "es",
+  fr = "fr",
+  ptbr = "ptbr",
+  ru = "ru",
+}
+
 export const defaultNS = "translation";
-export const resources = {
+export const resources: Record<SupportedLanguages, Translations> = {
   en: {
     brain: brain_en,
     chat: chat_en,
@@ -118,7 +143,7 @@ export const resources = {
     user: user_fr,
     delete_brain: delete_brain_fr,
   },
-  pt: {
+  ptbr: {
     brain: brain_ptbr,
     chat: chat_ptbr,
     config: config_ptbr,
