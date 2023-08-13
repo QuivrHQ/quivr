@@ -46,7 +46,7 @@ export const SettingsTab = ({ brainId }: SettingsTabProps): JSX.Element => {
     <form
       onSubmit={(e) => {
         e.preventDefault();
-        void handleSubmit();
+        void handleSubmit(true);
       }}
       className="my-10 mb-0 flex flex-col items-center gap-2"
       ref={formRef}
@@ -101,6 +101,9 @@ export const SettingsTab = ({ brainId }: SettingsTabProps): JSX.Element => {
           id="model"
           {...register("model")}
           className="px-5 py-2 dark:bg-gray-700 bg-gray-200 rounded-md"
+          onChange={() => {
+            void handleSubmit(false); // Trigger form submission
+          }}
         >
           {(openAiKey !== undefined ? paidModels : freeModels).map(
             (availableModel) => (

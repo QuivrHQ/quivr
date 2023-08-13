@@ -110,7 +110,7 @@ export const useSettingsTab = ({ brainId }: UseSettingsTabProps) => {
     const handleKeyPress = (event: KeyboardEvent) => {
       if (event.key === "Enter") {
         event.preventDefault();
-        void handleSubmit();
+        void handleSubmit(true);
       }
     };
 
@@ -203,10 +203,9 @@ export const useSettingsTab = ({ brainId }: UseSettingsTabProps) => {
     }
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (checkDirty:boolean) => {
     const hasChanges = Object.keys(dirtyFields).length > 0;
-
-    if (!hasChanges) {
+    if (!hasChanges && checkDirty) {
       return;
     }
     const { name: isNameDirty } = dirtyFields;
