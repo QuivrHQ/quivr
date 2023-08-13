@@ -90,6 +90,13 @@ export const useSettingsTab = ({ brainId }: UseSettingsTabProps) => {
       // eslint-disable-next-line
       if (Boolean(brain[key])) setValue(key, brain[key]);
     }
+
+    setTimeout(() => {
+      if (brain.model !== undefined) {
+        setValue("model", brain.model);
+      }
+    },50);
+    
   };
   useEffect(() => {
     void fetchBrain();
