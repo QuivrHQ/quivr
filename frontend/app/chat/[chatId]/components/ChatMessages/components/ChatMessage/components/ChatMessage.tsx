@@ -30,7 +30,7 @@ export const ChatMessage = React.forwardRef(
     const containerWrapperClasses = cn(
       "flex flex-col",
 
-      isUserSpeaker ? "items-start " : "items-end"
+      isUserSpeaker ? "items-end" : "items-start"
     );
 
     const markdownClasses = cn(
