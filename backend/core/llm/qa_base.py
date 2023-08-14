@@ -177,7 +177,7 @@ class QABaseBrainPicking(BaseBrainPicking):
             **{
                 "chat_id": chat_id,
                 "user_message": question.question,
-                "assistant": "",
+                "assistant": answer,
                 "message_time": new_chat.message_time,
                 "prompt_title": prompt.title if prompt else None,
                 "brain_name": brain.name if brain else None,
