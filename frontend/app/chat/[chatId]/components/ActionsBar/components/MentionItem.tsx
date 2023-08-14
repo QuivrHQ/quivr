@@ -12,7 +12,7 @@ export const MentionItem = ({
   onRemove,
 }: MentionItemProps): JSX.Element => {
   return (
-    <div className="relative">
+    <div className="relative inline-block w-fit-content">
       <div className="flex items-center bg-gray-300 mr-2 text-gray-600 rounded-2xl py-1 px-2">
         <span className="flex-grow">{`${prefix}${text}`}</span>
         <MdRemoveCircleOutline

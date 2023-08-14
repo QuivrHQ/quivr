@@ -1,22 +1,18 @@
 "use client";
-import { useFeature } from "@growthbook/growthbook-react";
 import { useTranslation } from "react-i18next";
 
 import Button from "@/lib/components/ui/Button";
-import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 
-import { ChatBar } from "./components/ChatInputV2/ChatBar";
-import { ConfigurationProvider } from "./components/ChatInputV2/ConfigurationProvider";
+import { ChatBar } from "./components/ChatBar/ChatBar";
+import { ConfigurationProvider } from "./components/ChatBar/ConfigurationProvider/ConfigurationProvider";
 import { ConfigModal } from "./components/ConfigModal";
 import { MicButton } from "./components/MicButton/MicButton";
 import { useChatInput } from "./hooks/useChatInput";
 
 export const ChatInput = (): JSX.Element => {
-  const { message, setMessage, submitQuestion, chatId, generatingAnswer } =
+  const { setMessage, submitQuestion, chatId, generatingAnswer } =
     useChatInput();
   const { t } = useTranslation(["chat"]);
-  const { currentBrain, setCurrentBrainId } = useBrainContext();
-  const shouldUseNewUX = useFeature("new-ux").on;
 
   return (
     <form
@@ -27,7 +23,7 @@ export const ChatInput = (): JSX.Element => {
       }}
       className="sticky flex items-star bottom-0 bg-white dark:bg-black w-full flex justify-center gap-2 z-20"
     >
-      <div className="flex flex-col items-center">
+      <div className="flex flex-1 flex-col items-center">
         <ConfigurationProvider>
           <ChatBar />
         </ConfigurationProvider>

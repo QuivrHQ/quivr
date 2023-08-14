@@ -1,4 +1,6 @@
+/* eslint-disable max-lines */
 "use client";
+import { useFeature } from "@growthbook/growthbook-react";
 import { AutoFocusPlugin } from "@lexical/react/LexicalAutoFocusPlugin";
 import { LexicalComposer } from "@lexical/react/LexicalComposer";
 import { ContentEditable } from "@lexical/react/LexicalContentEditable";
@@ -6,122 +8,28 @@ import LexicalErrorBoundary from "@lexical/react/LexicalErrorBoundary";
 import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin";
 import { OnChangePlugin } from "@lexical/react/LexicalOnChangePlugin";
 import { PlainTextPlugin } from "@lexical/react/LexicalPlainTextPlugin";
-import { $getRoot } from "lexical";
+import { $getRoot, EditorState } from "lexical";
 import {
-  BeautifulMentionsMenuItemProps,
-  BeautifulMentionsMenuProps,
   BeautifulMentionsPlugin,
   ZeroWidthPlugin,
 } from "lexical-beautiful-mentions";
-import { forwardRef, useCallback, useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 
-import Button from "@/lib/components/ui/Button";
 import { cn } from "@/lib/utils";
 
-import { useConfiguration } from "./ConfigurationProvider";
+import { useConfiguration } from "./ConfigurationProvider/hooks/useConfiguration";
+import { Placeholder } from "./components/Placeholder";
 import { editorConfig } from "./editorConfig";
 import { getDebugTextContent } from "./getDebugTextContent";
-
-const MenuItem = forwardRef<HTMLLIElement, BeautifulMentionsMenuItemProps>(
-  ({ selected, itemValue, label, ...props }, ref) => (
-    <li
-      ref={ref}
-      className={cn(
-        "m-0 flex min-w-[150px] shrink-0 cursor-pointer flex-row content-center whitespace-nowrap border-0 px-2.5 py-2 leading-4 text-slate-950 outline-none first:mt-1.5 last:mb-1.5 dark:text-slate-300",
-        selected ? "bg-gray-100 dark:bg-gray-700" : "bg-white dark:bg-gray-900"
-      )}
-      {...props}
-    >
-      <div>
-        {label}
-        <Button
-          onClick={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            alert("delete");
-          }}
-        >
-          Delete
-        </Button>
-      </div>
-    </li>
-  )
-);
-
-const Menu = forwardRef<any, BeautifulMentionsMenuProps>(
-  ({ open, loading, ...other }, ref) => {
-    if (loading) {
-      return (
-        <div
-          ref={ref}
-          className="mt-6 whitespace-nowrap rounded-lg bg-white p-2.5 text-slate-950 shadow-lg shadow-gray-900 dark:bg-gray-900 dark:text-slate-300"
-        >
-          Loading...
-        </div>
-      );
-    }
-
-    return (
-      <ul
-        ref={ref}
-        style={{
-          scrollbarWidth: "none",
-          msOverflowStyle: "none",
-        }}
-        className="m-0 mt-6 list-none overflow-scroll overflow-y-scroll rounded-lg bg-white p-0 shadow-lg shadow-gray-900 dark:bg-gray-900"
-        {...other}
-      />
-    );
-  }
-);
-
-export default Menu;
-
-const mentionItems = {
-  "@": ["Anton", "Boris", "Catherine", "Dmitri", "Elena", "Felix", "Gina"],
-};
-
-const Placeholder = () => {
-  const { combobox } = useConfiguration();
-
-  return (
-    <div
-      className={cn(
-        "pointer-events-none absolute inline-block select-none overflow-hidden overflow-ellipsis text-gray-500 dark:text-gray-400",
-        combobox && "left-[14px] top-[18px]",
-        !combobox && "left-3 top-4"
-      )}
-    >
-      Enter some plain text...
-    </div>
-  );
-};
-
-const queryMentions = async (
-  trigger: string,
-  queryString: string,
-  asynchronous: boolean
-) => {
-  const items = mentionItems[trigger];
-  if (!items) {
-    return [];
-  }
-  if (asynchronous) {
-    await new Promise((resolve) => setTimeout(resolve, 500));
-  }
-
-  return items.filter((item) => {
-    const value = typeof item === "string" ? item : item.value;
-
-    return value.toLowerCase().includes(queryString.toLowerCase());
-  });
-};
+import { Trigger, mentionItems, queryMentions } from "./helpers/queryMentions";
 
 export const ChatBar = (): JSX.Element => {
   const comboboxAnchor = useRef<HTMLDivElement>(null);
   const [menuOrComboboxOpen, setMenuOrComboboxOpen] = useState(false);
   const [comboboxItemSelected, setComboboxItemSelected] = useState(false);
   const [value, setValue] = useState<string>();
+
+  const shouldUseNewUX = useFeature("new-ux").on;
 
   const {
     asynchronous,
@@ -142,11 +50,8 @@ export const ChatBar = (): JSX.Element => {
     });
   }, []);
 
-  const handleSearch = useCallback(
-    (trigger: string, queryString: string) =>
-      queryMentions(trigger, queryString, asynchronous),
-    [asynchronous]
-  );
+  const handleSearch = (trigger: Trigger, queryString: string) =>
+    queryMentions(trigger, queryString);
 
   const handleMenuOrComboboxOpen = useCallback(() => {
     setMenuOrComboboxOpen(true);
@@ -171,11 +76,9 @@ export const ChatBar = (): JSX.Element => {
         flex: 1,
       }}
     >
-      hello
       <LexicalComposer
         initialConfig={editorConfig(Object.keys(mentionItems), initialValue)}
       >
-        hello
         {!combobox && (
           <BeautifulMentionsPlugin
             onSearch={handleSearch}

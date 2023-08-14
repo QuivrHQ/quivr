@@ -1,41 +1,44 @@
 import { InitialConfigType } from "@lexical/react/LexicalComposer";
-import { $createParagraphNode, $getRoot, ParagraphNode } from "lexical";
+import { $createParagraphNode, $getRoot } from "lexical";
 import {
   $convertToMentionNodes,
   BeautifulMentionNode,
   ZeroWidthNode,
 } from "lexical-beautiful-mentions";
 
-import ShowcaseTheme from "./theme";
-
-export const defaultInitialValue =
-  "Hey @John, the task is #urgent and due:tomorrow";
+import { MentionItem } from "../../../ActionsBar/components";
+import { theme } from "./helpers/theme";
 
 function setEditorState(initialValue: string, triggers: string[]) {
   return () => {
     const root = $getRoot();
     if (root.getFirstChild() === null) {
       const paragraph = $createParagraphNode();
+      console.log({
+        initialValue,
+        triggers,
+      });
       paragraph.append(...$convertToMentionNodes(initialValue, triggers));
       root.append(paragraph);
     }
   };
 }
 
-export class CustomMention extends ParagraphNode {
+class CustomMention extends BeautifulMentionNode {
   static getType() {
-    return "custom-paragraph";
+    return "custom-mention";
   }
 
-  static clone(node) {
-    return new CustomParagraphNode(node.__key);
-  }
+  decorate() {
+    const textContent = this.getTextContent();
 
-  createDOM(config) {
-    const dom = super.createDOM(config);
-    dom.style = "background: green";
+    const onRemove = () => {
+      alert("Hello");
+    };
 
-    return dom;
+    console.log({ textContent });
+
+    return <MentionItem text={textContent} onRemove={onRemove} prefix={""} />;
   }
 }
 
@@ -44,7 +47,7 @@ export const editorConfig = (
   initialValue: string
 ): InitialConfigType => ({
   namespace: "",
-  theme: ShowcaseTheme,
+  theme,
   onError(error: any) {
     throw error;
   },
@@ -53,11 +56,11 @@ export const editorConfig = (
     BeautifulMentionNode,
     ZeroWidthNode,
     CustomMention,
-    /*{
+    {
       replace: BeautifulMentionNode,
-      with: (node: ParagraphNode) => {
-        return new CustomMention();
+      with: (node: BeautifulMentionNode) => {
+        return new CustomMention(node.__trigger, node.__value, node.__data);
       },
-    },*/
+    },
   ],
 });

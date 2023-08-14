@@ -1,16 +1,9 @@
 "use client"; // prettier-ignore
 import { sanitize } from "dompurify";
 import { BeautifulMentionsPluginProps } from "lexical-beautiful-mentions";
-import {
-  createContext,
-  PropsWithChildren,
-  useCallback,
-  useContext,
-  useState,
-} from "react";
+import { createContext, PropsWithChildren, useCallback, useState } from "react";
 
-import { defaultInitialValue } from "./editorConfig";
-import { useQueryParams } from "./useQueryParams";
+import { useQueryParams } from "./hooks/useQueryParams";
 
 interface Configuration
   extends Pick<
@@ -33,7 +26,9 @@ interface Configuration
   setShowMentionsOnDelete: (showMentionsOnDelete: boolean) => void;
 }
 
-const ConfigurationCtx = createContext<Configuration>(undefined);
+export const ConfigurationContext = createContext<Configuration | undefined>(
+  undefined
+);
 
 const creatableMap = {
   "@": 'Add user "{{name}}"',
@@ -67,8 +62,7 @@ export const ConfigurationProvider = ({ children }: PropsWithChildren) => {
   const focusParam = getQueryParam("focus");
   const valueParam = getQueryParam("value");
   const hasValue = hasQueryParams("value");
-  const initialValue =
-    sanitize(valueParam) || (hasValue ? "" : defaultInitialValue);
+  const initialValue = sanitize(valueParam) || (hasValue ?? "");
   const autoFocus: "rootStart" | "rootEnd" | "none" =
     focusParam === "start"
       ? "rootStart"
@@ -133,7 +127,7 @@ export const ConfigurationProvider = ({ children }: PropsWithChildren) => {
   );
 
   return (
-    <ConfigurationCtx.Provider
+    <ConfigurationContext.Provider
       value={{
         initialValue,
         autoFocus,
@@ -155,17 +149,6 @@ export const ConfigurationProvider = ({ children }: PropsWithChildren) => {
       }}
     >
       {children}
-    </ConfigurationCtx.Provider>
+    </ConfigurationContext.Provider>
   );
 };
-
-export function useConfiguration() {
-  const context = useContext(ConfigurationCtx);
-  if (context === undefined) {
-    throw new Error(
-      "useConfiguration must be used within a ConfigurationProvider"
-    );
-  }
-
-  return context;
-}
