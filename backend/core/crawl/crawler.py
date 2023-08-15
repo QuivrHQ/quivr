@@ -25,17 +25,23 @@ class CrawlWebsite(BaseModel):
                 return None
         except Exception as e:
             print(e)
-            return None
+            raise
 
     def extract_content(self, url):
         article = Article(url)
-        article.download()
-        article.parse()
+        try:
+            article.download()
+            article.parse()
+        except Exception as e:
+            print(f'Error downloading or parsing article: {e}')
+            return None
         return article.text
 
-    def _process_recursive(self, url, depth):
-        if depth == 0:
+    def _process_recursive(self, url, depth, visited_urls):
+        if depth == 0 or url in visited_urls:
             return ""
+
+        visited_urls.add(url)
 
         content = self.extract_content(url)
         raw_html = self._crawl(url)
@@ -49,13 +55,14 @@ class CrawlWebsite(BaseModel):
             full_url = urljoin(url, link)
             # Ensure we're staying on the same domain
             if self.url in full_url:
-                content += self._process_recursive(full_url, depth-1)
+                content += self._process_recursive(full_url, depth-1, visited_urls)
 
         return content
 
     def process(self):
         # Extract and combine content recursively
-        extracted_content = self._process_recursive(self.url, self.depth)
+        visited_urls = set()
+        extracted_content = self._process_recursive(self.url, self.depth, visited_urls)
 
         # Create a file
         file_name = slugify(self.url) + ".txt"
@@ -66,10 +73,7 @@ class CrawlWebsite(BaseModel):
         return temp_file_path, file_name
 
     def checkGithub(self):
-        if "github.com" in self.url:
-            return True
-        else:
-            return False
+        return 'github.com' in self.url
 
 def slugify(text):
     text = unicodedata.normalize("NFKD", text).encode("ascii", "ignore").decode("utf-8")
