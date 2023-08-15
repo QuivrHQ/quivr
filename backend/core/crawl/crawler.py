@@ -2,11 +2,12 @@ import os
 import re
 import tempfile
 import unicodedata
+from urllib.parse import urljoin
 
-from urllib.parse import  urljoin
 import requests
 from pydantic import BaseModel
-
+from newspaper import Article
+from bs4 import BeautifulSoup
 
 class CrawlWebsite(BaseModel):
     url: str
@@ -24,53 +25,55 @@ class CrawlWebsite(BaseModel):
                 return None
         except Exception as e:
             print(e)
+            raise
+
+    def extract_content(self, url):
+        article = Article(url)
+        try:
+            article.download()
+            article.parse()
+        except Exception as e:
+            print(f'Error downloading or parsing article: {e}')
             return None
+        return article.text
+
+    def _process_recursive(self, url, depth, visited_urls):
+        if depth == 0 or url in visited_urls:
+            return ""
+
+        visited_urls.add(url)
+
+        content = self.extract_content(url)
+        raw_html = self._crawl(url)
+
+        if not raw_html:
+            return content
+
+        soup = BeautifulSoup(raw_html, 'html.parser')
+        links = [a['href'] for a in soup.find_all('a', href=True)]
+        for link in links:
+            full_url = urljoin(url, link)
+            # Ensure we're staying on the same domain
+            if self.url in full_url:
+                content += self._process_recursive(full_url, depth-1, visited_urls)
+
+        return content
 
     def process(self):
-        visited_list=[]
-        self._process_level(self.url, 0, visited_list)
-        return visited_list
+        # Extract and combine content recursively
+        visited_urls = set()
+        extracted_content = self._process_recursive(self.url, self.depth, visited_urls)
 
-    def _process_level(self, url, level_depth, visited_list):
-        content = self._crawl(url)
-        if content is None:
-            return
-        
-        
         # Create a file
-        file_name = slugify(url) + ".html"
+        file_name = slugify(self.url) + ".txt"
         temp_file_path = os.path.join(tempfile.gettempdir(), file_name)
         with open(temp_file_path, "w") as temp_file:
-            temp_file.write(content)  # pyright: ignore reportPrivateUsage=none
-            # Process the file
+            temp_file.write(extracted_content)
 
-        if content:
-            visited_list.append((temp_file_path, file_name))
-            from bs4 import BeautifulSoup
-            soup = BeautifulSoup(content, 'html5lib')
-            links = soup.findAll('a')
-            if level_depth < self.depth:
-                for a in links:
-                    if not a.has_attr('href'):
-                        continue
-                    new_url = a['href']
-                    file_name = slugify(new_url) + ".html"
-                    already_visited = False
-                    for (fpath,fname) in visited_list:
-                        if fname == file_name :
-                            already_visited = True
-                            break
-                    if not already_visited:
-                        self._process_level(urljoin(url,new_url),level_depth + 1,visited_list)
-
-
+        return temp_file_path, file_name
 
     def checkGithub(self):
-        if "github.com" in self.url:
-            return True
-        else:
-            return False
-
+        return 'github.com' in self.url
 
 def slugify(text):
     text = unicodedata.normalize("NFKD", text).encode("ascii", "ignore").decode("utf-8")
