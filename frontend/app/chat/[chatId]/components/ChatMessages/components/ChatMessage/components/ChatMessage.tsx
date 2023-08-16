@@ -35,7 +35,7 @@ export const ChatMessage = React.forwardRef(
 
     const markdownClasses = cn(
       "prose",
-      isUserSpeaker ? "dark:prose-invert" : "dark:prose"
+      "dark:prose-invert"
     );
 
     return (
