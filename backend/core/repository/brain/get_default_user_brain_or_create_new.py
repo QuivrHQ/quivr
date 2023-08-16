@@ -1,10 +1,12 @@
-from models.brain_entity import BrainEntity
 from models.databases.supabase.brains import CreateBrainProperties
-from models.users import User
-from repository.brain.create_brain import create_brain
-from repository.brain.create_brain_user import create_brain_user
-from repository.brain.get_default_user_brain import get_user_default_brain
+from models import BrainEntity, User
 from routes.authorizations.types import RoleEnum
+
+from repository.brain import (
+    create_brain,
+    create_brain_user,
+    get_user_default_brain
+)
 
 
 def get_default_user_brain_or_create_new(user: User) -> BrainEntity:

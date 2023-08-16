@@ -2,8 +2,7 @@ from dataclasses import dataclass
 from uuid import UUID
 
 from logger import get_logger
-from models.chat import Chat
-from models.settings import get_supabase_db
+from models import Chat, get_supabase_db
 
 logger = get_logger(__name__)
 

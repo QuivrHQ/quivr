@@ -1,6 +1,5 @@
-from models.brain_entity import BrainEntity
 from models.databases.supabase.brains import CreateBrainProperties
-from models.settings import get_supabase_db
+from models import BrainEntity, get_supabase_db
 
 
 def create_brain(brain: CreateBrainProperties) -> BrainEntity:

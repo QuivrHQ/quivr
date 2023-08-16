@@ -1,9 +1,8 @@
 from typing import List
 
 from fastapi import HTTPException
-from models.chat import ChatHistory
 from models.databases.supabase.chats import CreateChatHistory
-from models.settings import get_supabase_db
+from models import ChatHistory, get_supabase_db
 
 
 def update_chat_history(chat_history: CreateChatHistory) -> ChatHistory:

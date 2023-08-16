@@ -1,7 +1,6 @@
 from uuid import UUID
 
-from models.prompt import Prompt
-from models.settings import get_supabase_db
+from models import Prompt, get_supabase_db
 
 
 def get_prompt_by_id(prompt_id: UUID) -> Prompt | None:

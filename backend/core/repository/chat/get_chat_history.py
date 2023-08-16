@@ -1,12 +1,11 @@
 from typing import List, Optional
 from uuid import UUID
 
-from models.chat import ChatHistory
-from models.settings import get_supabase_db  # For type hinting
+from models import ChatHistory, get_supabase_db
 from pydantic import BaseModel
 
-from repository.brain.get_brain_by_id import get_brain_by_id
-from repository.prompt.get_prompt_by_id import get_prompt_by_id
+from repository.brain import get_brain_by_id
+from repository.prompt import get_prompt_by_id
 
 
 class GetChatHistoryOutput(BaseModel):

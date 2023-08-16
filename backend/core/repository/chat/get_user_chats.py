@@ -1,7 +1,6 @@
 from typing import List
 
-from models.chat import Chat
-from models.settings import get_supabase_db
+from models import Chat, get_supabase_db
 
 
 def get_user_chats(user_id: str) -> List[Chat]:

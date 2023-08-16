@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from repository.brain.get_brain_by_id import get_brain_by_id
+from repository.brain import get_brain_by_id
 
 
 def get_brain_prompt_id(brain_id: UUID) -> UUID | None:

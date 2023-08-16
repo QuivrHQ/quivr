@@ -1,6 +1,5 @@
 from logger import get_logger
-from models.chat import ChatHistory
-from models.settings import get_supabase_db
+from models import ChatHistory, get_supabase_db
 
 logger = get_logger(__name__)
 
