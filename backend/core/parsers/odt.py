@@ -1,5 +1,5 @@
 from langchain.document_loaders import PyMuPDFLoader
-from models.files import File
+from models import File
 
 from .common import process_file
 

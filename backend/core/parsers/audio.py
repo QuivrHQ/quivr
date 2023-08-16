@@ -5,8 +5,8 @@ import time
 import openai
 from langchain.schema import Document
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-from models.files import File
-from models.settings import get_documents_vector_store
+
+from models import File, get_documents_vector_store
 from utils.file import compute_sha1_from_content
 
 
