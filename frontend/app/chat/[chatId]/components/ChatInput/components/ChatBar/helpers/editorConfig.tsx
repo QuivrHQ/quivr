@@ -6,8 +6,8 @@ import {
   ZeroWidthNode,
 } from "lexical-beautiful-mentions";
 
-import { MentionItem } from "../../../ActionsBar/components";
-import { theme } from "./helpers/theme";
+import { MentionItem } from "../../../../ActionsBar/components";
+import { theme } from "./theme";
 
 function setEditorState(initialValue: string, triggers: string[]) {
   return () => {

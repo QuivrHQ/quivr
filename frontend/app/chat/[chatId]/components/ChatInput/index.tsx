@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import Button from "@/lib/components/ui/Button";
 
 import { ChatBar } from "./components/ChatBar/ChatBar";
-import { ConfigurationProvider } from "./components/ChatBar/ConfigurationProvider/ConfigurationProvider";
+import { ConfigurationProvider } from "./components/ChatBar/helpers/ConfigurationProvider/ConfigurationProvider";
 import { ConfigModal } from "./components/ConfigModal";
 import { MicButton } from "./components/MicButton/MicButton";
 import { useChatInput } from "./hooks/useChatInput";

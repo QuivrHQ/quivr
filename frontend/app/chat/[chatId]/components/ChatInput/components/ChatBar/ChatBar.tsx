@@ -1,6 +1,5 @@
 /* eslint-disable max-lines */
 "use client";
-import { useFeature } from "@growthbook/growthbook-react";
 import { AutoFocusPlugin } from "@lexical/react/LexicalAutoFocusPlugin";
 import { LexicalComposer } from "@lexical/react/LexicalComposer";
 import { ContentEditable } from "@lexical/react/LexicalContentEditable";
@@ -8,63 +7,38 @@ import LexicalErrorBoundary from "@lexical/react/LexicalErrorBoundary";
 import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin";
 import { OnChangePlugin } from "@lexical/react/LexicalOnChangePlugin";
 import { PlainTextPlugin } from "@lexical/react/LexicalPlainTextPlugin";
-import { $getRoot, EditorState } from "lexical";
 import {
   BeautifulMentionsPlugin,
   ZeroWidthPlugin,
 } from "lexical-beautiful-mentions";
-import { useCallback, useRef, useState } from "react";
 
 import { cn } from "@/lib/utils";
 
-import { useConfiguration } from "./ConfigurationProvider/hooks/useConfiguration";
+import { Menu } from "./components/Menu";
+import { MenuItem } from "./components/MenuItem";
 import { Placeholder } from "./components/Placeholder";
-import { editorConfig } from "./editorConfig";
-import { getDebugTextContent } from "./getDebugTextContent";
-import { Trigger, mentionItems, queryMentions } from "./helpers/queryMentions";
+import { useConfiguration } from "./helpers/ConfigurationProvider/hooks/useConfiguration";
+import { editorConfig } from "./helpers/editorConfig";
+import { useChatBar } from "./hooks/useChatBar";
 
 export const ChatBar = (): JSX.Element => {
-  const comboboxAnchor = useRef<HTMLDivElement>(null);
-  const [menuOrComboboxOpen, setMenuOrComboboxOpen] = useState(false);
-  const [comboboxItemSelected, setComboboxItemSelected] = useState(false);
-  const [value, setValue] = useState<string>();
-
-  const shouldUseNewUX = useFeature("new-ux").on;
-
   const {
-    asynchronous,
+    initialValue,
     autoFocus,
     allowSpaces,
-    creatable,
-    insertOnBlur,
-    combobox,
+    asynchronous,
     mentionEnclosure,
+    insertOnBlur,
     showMentionsOnDelete,
   } = useConfiguration();
 
-  const handleChange = useCallback((editorState: EditorState) => {
-    editorState.read(() => {
-      const root = $getRoot();
-      const content = getDebugTextContent(root);
-      setValue(content);
-    });
-  }, []);
-
-  const handleSearch = (trigger: Trigger, queryString: string) =>
-    queryMentions(trigger, queryString);
-
-  const handleMenuOrComboboxOpen = useCallback(() => {
-    setMenuOrComboboxOpen(true);
-  }, []);
-
-  const handleMenuOrComboboxClose = useCallback(() => {
-    setMenuOrComboboxOpen(false);
-  }, []);
-
-  const handleComboboxItemSelect = useCallback((label: string | null) => {
-    setComboboxItemSelected(label !== null);
-  }, []);
-  const { initialValue } = useConfiguration();
+  const {
+    handleChange,
+    handleMenuOrComboboxClose,
+    handleMenuOrComboboxOpen,
+    handleSearch,
+    mentionItems,
+  } = useChatBar();
 
   return (
     <div
@@ -79,41 +53,20 @@ export const ChatBar = (): JSX.Element => {
       <LexicalComposer
         initialConfig={editorConfig(Object.keys(mentionItems), initialValue)}
       >
-        {!combobox && (
-          <BeautifulMentionsPlugin
-            onSearch={handleSearch}
-            searchDelay={asynchronous ? 250 : 0}
-            triggers={Object.keys(mentionItems)}
-            mentionEnclosure={mentionEnclosure}
-            allowSpaces={allowSpaces}
-            creatable={creatable}
-            insertOnBlur={insertOnBlur}
-            showMentionsOnDelete={showMentionsOnDelete}
-            menuComponent={Menu}
-            menuItemComponent={MenuItem}
-            onMenuOpen={handleMenuOrComboboxOpen}
-            onMenuClose={handleMenuOrComboboxClose}
-          />
-        )}
-        {combobox && (
-          <BeautifulMentionsPlugin
-            onSearch={handleSearch}
-            searchDelay={asynchronous ? 250 : 0}
-            triggers={Object.keys(mentionItems)}
-            mentionEnclosure={mentionEnclosure}
-            allowSpaces={allowSpaces}
-            creatable={creatable}
-            showMentionsOnDelete={showMentionsOnDelete}
-            combobox
-            comboboxAnchor={comboboxAnchor.current}
-            comboboxAnchorClassName="shadow-lg shadow-gray-900 rounded"
-            comboboxComponent={Combobox}
-            comboboxItemComponent={ComboboxItem}
-            onComboboxOpen={handleMenuOrComboboxOpen}
-            onComboboxClose={handleMenuOrComboboxClose}
-            onComboboxFocusChange={handleComboboxItemSelect}
-          />
-        )}
+        <BeautifulMentionsPlugin
+          onSearch={handleSearch}
+          searchDelay={asynchronous ? 250 : 0}
+          triggers={Object.keys(mentionItems)}
+          mentionEnclosure={mentionEnclosure}
+          allowSpaces={allowSpaces}
+          insertOnBlur={insertOnBlur}
+          showMentionsOnDelete={showMentionsOnDelete}
+          menuComponent={Menu}
+          menuItemComponent={MenuItem}
+          onMenuOpen={handleMenuOrComboboxOpen}
+          onMenuClose={handleMenuOrComboboxClose}
+        />
+
         <PlainTextPlugin
           contentEditable={
             <ContentEditable
@@ -128,9 +81,7 @@ export const ChatBar = (): JSX.Element => {
         />
         <OnChangePlugin onChange={handleChange} />
         <HistoryPlugin />
-        {autoFocus !== "none" && (
-          <AutoFocusPlugin defaultSelection={autoFocus} />
-        )}
+        <AutoFocusPlugin defaultSelection={autoFocus} />
         <ZeroWidthPlugin />
       </LexicalComposer>
     </div>

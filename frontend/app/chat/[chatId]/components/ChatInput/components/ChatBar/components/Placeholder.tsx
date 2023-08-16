@@ -3,9 +3,9 @@ import { useTranslation } from "react-i18next";
 
 import { cn } from "@/lib/utils";
 
-import { useConfiguration } from "./ConfigurationProvider";
+import { useConfiguration } from "../helpers/ConfigurationProvider/hooks/useConfiguration";
 
-export const Placeholder = () => {
+export const Placeholder = (): JSX.Element => {
   const { combobox } = useConfiguration();
   const { t } = useTranslation(["chat"]);
 
