@@ -4,7 +4,7 @@ from typing import List
 from langchain.embeddings.openai import OpenAIEmbeddings
 from pydantic import BaseModel
 from logger import get_logger
-from models import get_documents_vector_store, get_embeddings, get_supabase_db
+from models.settings import get_documents_vector_store, get_embeddings, get_supabase_db
 
 logger = get_logger(__name__)
 
