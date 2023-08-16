@@ -23,7 +23,6 @@ from repository.prompt.delete_prompt_py_id import delete_prompt_by_id
 from repository.prompt.get_prompt_by_id import get_prompt_by_id
 from repository.user.get_user_email_by_user_id import get_user_email_by_user_id
 from repository.user.get_user_id_by_user_email import get_user_id_by_user_email
-
 from routes.authorizations.brain_authorization import (
     RoleEnum,
     has_brain_authorization,
@@ -148,14 +147,16 @@ async def remove_user_subscription(
 
         if len(brain_other_owners) == 0:
             # Delete its prompt if it's private
-            deleting_brain = get_brain_by_id(brain_id)
-            if deleting_brain and deleting_brain.prompt_id:
-                deleting_brain_prompt = get_prompt_by_id(deleting_brain.prompt_id)
-                if deleting_brain_prompt is not None and (
-                    deleting_brain_prompt.status == PromptStatusEnum.private
-                ):
-                    delete_prompt_by_id(deleting_brain.prompt_id)
-            brain.delete_brain(current_user.id)
+            brain_to_delete = get_brain_by_id(brain_id)
+            if brain_to_delete:
+                brain.delete_brain(current_user.id)
+                if brain_to_delete.prompt_id:
+                    brain_to_delete_prompt = get_prompt_by_id(brain_to_delete.prompt_id)
+                    if brain_to_delete_prompt is not None and (
+                        brain_to_delete_prompt.status == PromptStatusEnum.private
+                    ):
+                        delete_prompt_by_id(brain_to_delete.prompt_id)
+
         else:
             brain.delete_user_from_brain(current_user.id)
 
