@@ -31,5 +31,6 @@
     "chat_title_intro": "Chat with your",
     "empty_brain_title_prefix": "Upload files in a",
     "empty_brain_title_suffix": "and chat with them",
-    "actions_bar_placeholder": "Ask a question to @brains or /files and choose your #prompt"
+    "actions_bar_placeholder": "Ask a question to @brains or /files and choose your #prompt",
+    "missing_brain": "Please select a brain to chat with"
 }

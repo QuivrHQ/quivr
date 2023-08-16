@@ -32,5 +32,6 @@
   "shortcut_select_file": "/: Sélectionner un fichier pour discuter",
   "subtitle": "Parlez à un modèle linguistique de vos données téléchargées",
   "thinking": "Réflexion...",
-  "title": "Discuter avec {{brain}}"
+  "title": "Discuter avec {{brain}}",
+  "missing_brain": "Veuillez selectionner un cerveau pour discuter"
 }

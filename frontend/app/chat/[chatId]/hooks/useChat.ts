@@ -45,6 +45,15 @@ export const useChat = () => {
         setChatId(currentChatId);
       }
 
+      if (currentBrain?.id === undefined) {
+        publish({
+          variant: "danger",
+          text: t("missing_brain"),
+        });
+
+        return;
+      }
+
       void track("QUESTION_ASKED");
       const chatConfig = getChatConfigFromLocalStorage(currentChatId);
 
@@ -53,7 +62,7 @@ export const useChat = () => {
         question,
         temperature: chatConfig?.temperature,
         max_tokens: chatConfig?.maxTokens,
-        brain_id: currentBrain?.id,
+        brain_id: currentBrain.id,
       };
 
       await addStreamQuestion(currentChatId, chatQuestion);
