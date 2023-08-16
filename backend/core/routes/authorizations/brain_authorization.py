@@ -3,8 +3,8 @@ from uuid import UUID
 
 from auth.auth_bearer import get_current_user
 from fastapi import Depends, HTTPException, status
-from models.users import User
-from repository.brain.get_brain_for_user import get_brain_for_user
+from models import User
+from repository.brain import get_brain_for_user
 
 from routes.authorizations.types import RoleEnum
 

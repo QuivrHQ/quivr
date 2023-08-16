@@ -8,23 +8,33 @@ from auth import AuthBearer, get_current_user
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from fastapi.responses import StreamingResponse
 from llm.openai import OpenAIBrainPicking
-from models.brains import Brain
-from models.brain_entity import BrainEntity
-from models.chat import Chat, ChatHistory
-from models.chats import ChatQuestion
 from models.databases.supabase.supabase import SupabaseDB
-from models.settings import LLMSettings, get_supabase_db
-from models.users import User
-from repository.brain.get_brain_details import get_brain_details
-from repository.brain.get_default_user_brain_or_create_new import (
+from models import (
+    User,
+    Chat,
+    Brain,
+    BrainEntity,
+    LLMSettings,
+    ChatQuestion,
+    get_supabase_db,
+)
+
+from repository.brain import (
+    get_brain_details,
     get_default_user_brain_or_create_new,
 )
-from repository.chat.create_chat import CreateChatProperties, create_chat
-from repository.chat.get_chat_by_id import get_chat_by_id
-from repository.chat.get_chat_history import GetChatHistoryOutput, get_chat_history
-from repository.chat.get_user_chats import get_user_chats
-from repository.chat.update_chat import ChatUpdatableProperties, update_chat
-from repository.user_identity.get_user_identity import get_user_identity
+
+from repository.chat import (
+    create_chat,
+    update_chat,
+    get_user_chats,
+    get_chat_by_id,
+    get_chat_history,
+    CreateChatProperties,
+    GetChatHistoryOutput,
+    ChatUpdatableProperties,
+)
+from repository.user_identity import get_user_identity
 
 chat_router = APIRouter()
 
