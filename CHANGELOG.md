@@ -1,5 +1,22 @@
 # Changelog
 
+## [0.0.57](https://github.com/StanGirard/quivr/compare/v0.0.56...v0.0.57) (2023-08-16)
+
+
+### Features
+
+* add brain missing message ([#958](https://github.com/StanGirard/quivr/issues/958)) ([f99f81d](https://github.com/StanGirard/quivr/commit/f99f81d10f9c768af00e38249763a252f8db16e3))
+* change messages position ([#946](https://github.com/StanGirard/quivr/issues/946)) ([9235a84](https://github.com/StanGirard/quivr/commit/9235a848d12b96af346cc2cbb1ac50dc2f67b20c))
+* update chat ui ([#907](https://github.com/StanGirard/quivr/issues/907)) ([80be40a](https://github.com/StanGirard/quivr/commit/80be40ad34d07b646d48d2aa0405a92b3de308d7))
+
+
+### Bug Fixes
+
+* **chat routes:** use brain model, temp, and token ([#902](https://github.com/StanGirard/quivr/issues/902)) ([59ddfb4](https://github.com/StanGirard/quivr/commit/59ddfb48823b56239fe7fc95133274a3bedf49da))
+* **chatMessages:** Fix error on answering question ([#953](https://github.com/StanGirard/quivr/issues/953)) ([1fef9b0](https://github.com/StanGirard/quivr/commit/1fef9b078379c8991f6029c34ac10d4cbdc5a44d))
+* **crawler:** using newspaper and fixed recursive by merging content ([#955](https://github.com/StanGirard/quivr/issues/955)) ([d7c5c79](https://github.com/StanGirard/quivr/commit/d7c5c79043827b2b0949f6fd6c508c4617dcf498))
+* **translations:** pr portuguese translations ([#933](https://github.com/StanGirard/quivr/issues/933)) ([d80178a](https://github.com/StanGirard/quivr/commit/d80178a84802c35b2c13d3eef4d0438fd067da92))
+
 ## [0.0.56](https://github.com/StanGirard/quivr/compare/v0.0.55...v0.0.56) (2023-08-10)
 
 
