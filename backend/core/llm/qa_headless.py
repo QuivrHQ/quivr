@@ -3,13 +3,13 @@ import json
 from uuid import UUID
 
 from langchain.callbacks.streaming_aiter import AsyncIteratorCallbackHandler
-from langchain.chains import LLMChain
 from langchain.chat_models import ChatOpenAI
 from langchain.llms.base import BaseLLM
 from langchain.prompts.chat import (
     ChatPromptTemplate,
     HumanMessagePromptTemplate,
 )
+from repository.chat.format_chat_history import format_history_to_openai_mesages
 from logger import get_logger
 from models.chats import ChatQuestion
 from models.databases.supabase.chats import CreateChatHistory
@@ -18,13 +18,13 @@ from repository.chat.get_chat_history import GetChatHistoryOutput, get_chat_hist
 from repository.chat.update_chat_history import update_chat_history
 from repository.chat.update_message_by_id import update_message_by_id
 
-from .prompts.CONDENSE_PROMPT import CONDENSE_QUESTION_PROMPT
 
 from pydantic import BaseModel
 
 from typing import AsyncIterable, Awaitable, List
 
 logger = get_logger(__name__)
+SYSTEM_MESSAGE = "Your name is Quivr. You're a helpful assistant.  If you don't know the answer, just say that you don't know, don't try to make up an answer."
 
 
 class HeadlessQA(BaseModel):
@@ -100,20 +100,12 @@ class HeadlessQA(BaseModel):
         self, chat_id: UUID, question: ChatQuestion
     ) -> GetChatHistoryOutput:
         transformed_history = format_chat_history(get_chat_history(self.chat_id))
+        messages = format_history_to_openai_mesages(transformed_history, SYSTEM_MESSAGE, question.question)
         answering_llm = self._create_llm(
             model=self.model, streaming=False, callbacks=self.callbacks
         )
-
-        llm = LLMChain(llm=answering_llm, prompt=CONDENSE_QUESTION_PROMPT)
-
-        model_response = llm(
-            {
-                "question": question,
-                "chat_history": transformed_history,
-            }
-        )
-
-        answer = model_response["answer"]
+        model_prediction = answering_llm.predict_messages(messages)  # pyright: ignore reportPrivateUsage=none
+        answer = model_prediction.content
 
         new_chat = update_chat_history(
             CreateChatHistory(
@@ -131,7 +123,7 @@ class HeadlessQA(BaseModel):
             **{
                 "chat_id": chat_id,
                 "user_message": question.question,
-                "assistant": "",
+                "assistant": answer,
                 "message_time": new_chat.message_time,
                 "prompt_title": None,
                 "brain_name": None,

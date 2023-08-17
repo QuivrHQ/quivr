@@ -7,6 +7,7 @@ from venv import logger
 from auth import AuthBearer, get_current_user
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from fastapi.responses import StreamingResponse
+from llm.qa_headless import HeadlessQA
 from llm.openai import OpenAIBrainPicking
 from models.brains import Brain
 from models.brain_entity import BrainEntity
@@ -190,17 +191,26 @@ async def create_question_handler(
         check_user_limit(current_user)
         LLMSettings()
 
-        if not brain_id:
-            brain_id = get_default_user_brain_or_create_new(current_user).brain_id
-
-        gpt_answer_generator = OpenAIBrainPicking(
-            chat_id=str(chat_id),
-            model=chat_question.model,
-            max_tokens=chat_question.max_tokens,
-            temperature=chat_question.temperature,
-            brain_id=str(brain_id),
-            user_openai_api_key=current_user.user_openai_api_key,  # pyright: ignore reportPrivateUsage=none
-        )
+        # if not brain_id:
+        #     brain_id = get_default_user_brain_or_create_new(current_user).brain_id
+        gpt_answer_generator: HeadlessQA | OpenAIBrainPicking
+        if brain_id:
+            gpt_answer_generator = OpenAIBrainPicking(
+                chat_id=str(chat_id),
+                model=chat_question.model,
+                max_tokens=chat_question.max_tokens,
+                temperature=chat_question.temperature,
+                brain_id=str(brain_id),
+                user_openai_api_key=current_user.user_openai_api_key,  # pyright: ignore reportPrivateUsage=none
+            )
+        else:
+            gpt_answer_generator = HeadlessQA(
+                model=chat_question.model,
+                temperature=chat_question.temperature,
+                max_tokens=chat_question.max_tokens,
+                user_openai_api_key=current_user.user_openai_api_key,  # pyright: ignore reportPrivateUsage=none
+                chat_id=str(chat_id),
+            )
 
         chat_answer = gpt_answer_generator.generate_answer(chat_id, chat_question)
 
