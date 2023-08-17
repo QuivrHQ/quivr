@@ -6,8 +6,8 @@ from .chats import ChatQuestion, ChatMessage
 from .files import File
 from .prompt import Prompt, PromptStatusEnum
 
-from user_identity import UserIdentity
-from users import User
+from .user_identity import UserIdentity
+from .users import User
 from .settings import (
     get_supabase_db,
     get_supabase_client,
