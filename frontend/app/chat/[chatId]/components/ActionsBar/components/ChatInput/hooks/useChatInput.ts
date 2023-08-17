@@ -1,18 +1,19 @@
 import { useState } from "react";
 
-import { useChat } from "../../../hooks/useChat";
+import { useChat } from "@/app/chat/[chatId]/hooks/useChat";
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const useChatInput = () => {
   const [message, setMessage] = useState<string>("");
   const { addQuestion, generatingAnswer, chatId } = useChat();
 
-  const submitQuestion = () => {
-    if (message.length === 0) {
+  const submitQuestion = (currentMessage?: string) => {
+    const messageToSubmit = currentMessage ?? message;
+    if (messageToSubmit.length === 0) {
       return;
     }
     if (!generatingAnswer) {
-      void addQuestion(message, () => setMessage(""));
+      void addQuestion(messageToSubmit, () => setMessage(""));
     }
   };
 
