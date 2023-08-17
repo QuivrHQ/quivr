@@ -119,6 +119,7 @@ class QABaseBrainPicking(BaseBrainPicking):
         self, chat_id: UUID, question: ChatQuestion
     ) -> GetChatHistoryOutput:
         transformed_history = format_chat_history(get_chat_history(self.chat_id))
+        print("Transformerd history is", transformed_history)
         answering_llm = self._create_llm(
             model=self.model, streaming=False, callbacks=self.callbacks
         )
@@ -189,6 +190,7 @@ class QABaseBrainPicking(BaseBrainPicking):
         self, chat_id: UUID, question: ChatQuestion
     ) -> AsyncIterable:
         history = get_chat_history(self.chat_id)
+        print("History is ", history)
         callback = AsyncIteratorCallbackHandler()
         self.callbacks = [callback]
 
@@ -269,7 +271,7 @@ class QABaseBrainPicking(BaseBrainPicking):
                 "brain_name": brain.name if brain else None,
             }
         )
-
+        print("Streamed Chat History",streamed_chat_history)
         async for token in callback.aiter():
             logger.info("Token: %s", token)
             response_tokens.append(token)
