@@ -7,6 +7,11 @@ from langchain.prompts.chat import (
     ChatPromptTemplate,
     HumanMessagePromptTemplate,
 )
+from models.databases.supabase.chats import CreateChatHistory
+from repository.chat.format_chat_history import format_chat_history
+from repository.chat.get_chat_history import get_chat_history
+from repository.chat.update_chat_history import update_chat_history
+from repository.chat.format_chat_history import format_history_to_openai_mesages
 from logger import get_logger
 from models.chats import ChatQuestion
 from repository.chat.get_chat_history import GetChatHistoryOutput
@@ -92,8 +97,37 @@ class HeadlessQA(BaseModel):
     def generate_answer(
         self, chat_id: UUID, question: ChatQuestion
     ) -> GetChatHistoryOutput:
-        # TODO
-        return
+        transformed_history = format_chat_history(get_chat_history(self.chat_id))
+        messages = format_history_to_openai_mesages(transformed_history, SYSTEM_MESSAGE, question.question)
+        answering_llm = self._create_llm(
+            model=self.model, streaming=False, callbacks=self.callbacks
+        )
+        model_prediction = answering_llm.predict_messages(messages)  # pyright: ignore reportPrivateUsage=none
+        answer = model_prediction.content
+
+        new_chat = update_chat_history(
+            CreateChatHistory(
+                **{
+                    "chat_id": chat_id,
+                    "user_message": question.question,
+                    "assistant": answer,
+                    "brain_id": None,
+                    "prompt_id": None,
+                }
+            )
+        )
+
+        return GetChatHistoryOutput(
+            **{
+                "chat_id": chat_id,
+                "user_message": question.question,
+                "assistant": answer,
+                "message_time": new_chat.message_time,
+                "prompt_title": None,
+                "brain_name": None,
+                "message_id": new_chat.message_id,
+            }
+        )
 
     async def generate_stream(
         self, chat_id: UUID, question: ChatQuestion
