@@ -271,7 +271,7 @@ class QABaseBrainPicking(BaseBrainPicking):
                 "brain_name": brain.name if brain else None,
             }
         )
-        print("Streamed Chat History",streamed_chat_history)
+        print("Streamed Chat History ",streamed_chat_history)
         async for token in callback.aiter():
             logger.info("Token: %s", token)
             response_tokens.append(token)
