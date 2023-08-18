@@ -1,5 +1,5 @@
 -- Create users table
-CREATE TABLE IF NOT EXISTS users(
+CREATE TABLE IF NOT EXISTS user_daily_usage(
     user_id UUID REFERENCES auth.users (id),
     email TEXT,
     date TEXT,
@@ -215,7 +215,7 @@ CREATE TABLE IF NOT EXISTS migrations (
 );
 
 INSERT INTO migrations (name) 
-SELECT '20230809154300_add_prompt_id_brain_id_to_chat_history_table'
+SELECT '202308181004030_rename_users_table'
 WHERE NOT EXISTS (
-    SELECT 1 FROM migrations WHERE name = '20230809154300_add_prompt_id_brain_id_to_chat_history_table'
+    SELECT 1 FROM migrations WHERE name = '202308181004030_rename_users_table'
 );
