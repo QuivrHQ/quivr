@@ -3,8 +3,8 @@ name: Deploy Backend to Preview ECS
 on:
   push:
     branches: [ "main" ]
-    paths:
-      - 'backend/core/**'
+    # paths:
+    #   - 'backend/core/**'
 
 env:
   AWS_REGION: eu-west-3
@@ -45,7 +45,7 @@ jobs:
       run: |
         docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG ./core/
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-        echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
+        echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> "$GITHUB_OUTPUT"
 
   deploy:
     needs: build_and_push
