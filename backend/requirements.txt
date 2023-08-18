@@ -28,3 +28,4 @@ html5lib==1.1
 bs4==0.0.1
 newspaper3k
 xlrd==1.0.0
+openai-whisper

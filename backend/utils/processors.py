@@ -13,6 +13,7 @@ from parsers.powerpoint import process_powerpoint
 from parsers.txt import process_txt
 from parsers.xlsx import process_xlsx
 from parsers.code_python import process_python
+from parsers.wisper import process_wisper
 
 file_processors = {
     ".txt": process_txt,
@@ -22,7 +23,7 @@ file_processors = {
     ".m4a": process_audio,
     ".mp3": process_audio,
     ".webm": process_audio,
-    ".mp4": process_audio,
+    ".mp4": process_wisper,
     ".mpga": process_audio,
     ".wav": process_audio,
     ".mpeg": process_audio,
