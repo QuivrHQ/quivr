@@ -7,6 +7,7 @@ from langchain.callbacks.streaming_aiter import AsyncIteratorCallbackHandler
 from langchain.chains import ConversationalRetrievalChain, LLMChain
 from langchain.chains.question_answering import load_qa_chain
 from langchain.chat_models import ChatOpenAI
+from langchain.embeddings.base import Embeddings
 from langchain.llms.base import BaseLLM
 from langchain.prompts.chat import (
     ChatPromptTemplate,
@@ -42,9 +43,10 @@ class QABaseBrainPicking(BaseBrainPicking):
     Each have the same prompt template, which is defined in the `prompt_template` property.
     """
 
-    supabase_client: Client = None
-    vector_store: CustomSupabaseVectorStore = None
-    qa: ConversationalRetrievalChain = None
+    supabase_client: Client
+    vector_store: CustomSupabaseVectorStore
+    qa: ConversationalRetrievalChain
+    embeddings: Embeddings
 
     def __init__(
         self,
@@ -53,7 +55,7 @@ class QABaseBrainPicking(BaseBrainPicking):
         chat_id: str,
         streaming: bool = False,
         **kwargs,
-    ) -> "QABaseBrainPicking":
+    ):
         super().__init__(
             model=model,
             brain_id=brain_id,
