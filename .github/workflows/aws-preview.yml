@@ -19,7 +19,7 @@ jobs:
     environment: production
     defaults:
       run:
-        working-directory: ./backend/core/
+        working-directory: ./backend/
 
     steps:
     - name: Checkout
@@ -36,14 +36,15 @@ jobs:
       id: login-ecr
       uses: aws-actions/amazon-ecr-login@v1
     
-    - name: Set up QEMU
-      uses: docker/setup-qemu-action@v2
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v2
     
     - name: Create Docker Cacha Storage Backend
       run: |
         docker buildx create --use --driver=docker-container
+    - name: See the file in the runner
+      run: |
+        ls -la
     - name: Build, tag, and push image to Amazon ECR
       id: build-image
       uses: docker/build-push-action@v4
@@ -51,7 +52,7 @@ jobs:
         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         IMAGE_TAG: ${{ github.sha }}
       with:
-        context: .
+        context: ./core
         push: true
         tags: ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }}, ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:latest
         cache-from: type=gha
