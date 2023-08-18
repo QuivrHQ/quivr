@@ -29,7 +29,7 @@ export const useChat = () => {
   const { createChat } = useChatApi();
 
   const { addStreamQuestion } = useQuestion();
-  const { t } = useTranslation(['chat']);
+  const { t } = useTranslation(["chat"]);
 
   const addQuestion = async (question: string, callback?: () => void) => {
     try {
@@ -43,6 +43,7 @@ export const useChat = () => {
         const chat = await createChat(chatName);
         currentChatId = chat.chat_id;
         setChatId(currentChatId);
+        //TODO: update chat list here
       }
 
       void track('QUESTION_ASKED');
