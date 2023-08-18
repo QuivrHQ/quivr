@@ -10,7 +10,7 @@ from fastapi.responses import StreamingResponse
 from llm.openai import OpenAIBrainPicking
 from models.brains import Brain
 from models.brain_entity import BrainEntity
-from models.chat import Chat, ChatHistory
+from models.chat import Chat
 from models.chats import ChatQuestion
 from models.databases.supabase.supabase import SupabaseDB
 from models.settings import LLMSettings, get_supabase_db
@@ -62,7 +62,7 @@ def check_user_limit(
 ):
     if user.user_openai_api_key is None:
         date = time.strftime("%Y%m%d")
-        max_requests_number = int(os.getenv("MAX_REQUESTS_NUMBER", 1000))
+        max_requests_number = int(os.getenv("MAX_REQUESTS_NUMBER", 1))
 
         user.increment_user_request_count(date)
         if int(user.requests_count) >= int(max_requests_number):

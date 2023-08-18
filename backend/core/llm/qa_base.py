@@ -91,7 +91,7 @@ class QABaseBrainPicking(BaseBrainPicking):
             temperature=temperature,
             model=model,
             streaming=streaming,
-            verbose=True,
+            verbose=False,
             callbacks=callbacks,
             openai_api_key=self.openai_api_key,
         )  # pyright: ignore reportPrivateUsage=none
@@ -135,7 +135,7 @@ class QABaseBrainPicking(BaseBrainPicking):
             question_generator=LLMChain(
                 llm=self._create_llm(model=self.model), prompt=CONDENSE_QUESTION_PROMPT
             ),
-            verbose=True,
+            verbose=False,
         )
 
         model_response = qa(
@@ -208,7 +208,7 @@ class QABaseBrainPicking(BaseBrainPicking):
             question_generator=LLMChain(
                 llm=self._create_llm(model=self.model), prompt=CONDENSE_QUESTION_PROMPT
             ),
-            verbose=True,
+            verbose=False,
         )
 
         transformed_history = format_chat_history(history)
