@@ -58,7 +58,7 @@ jobs:
       with:
         context: ./backend/core/
         push: true
-        tags: ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }}, ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:latest, ghcr.io/quivr/quivr:${{ env.IMAGE_TAG }}, ghcr.io/quivr/quivr:latest
+        tags: ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }}, ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:latest, ghcr.io/stangirard/quivr:${{ env.IMAGE_TAG }}, ghcr.io/stangirard/quivr:latest
         cache-from: type=gha
         cache-to: type=gha,mode=max
       
