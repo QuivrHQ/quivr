@@ -3,9 +3,8 @@ from uuid import UUID
 
 from auth.auth_bearer import get_current_user
 from fastapi import Depends, HTTPException, status
-from models import User
+from models import UserIdentity
 from repository.brain import get_brain_for_user
-
 from routes.authorizations.types import RoleEnum
 
 
@@ -18,7 +17,9 @@ def has_brain_authorization(
     return: A wrapper function that checks the authorization
     """
 
-    async def wrapper(brain_id: UUID, current_user: User = Depends(get_current_user)):
+    async def wrapper(
+        brain_id: UUID, current_user: UserIdentity = Depends(get_current_user)
+    ):
         nonlocal required_roles
         if isinstance(required_roles, str):
             required_roles = [required_roles]  # Convert single role to a list

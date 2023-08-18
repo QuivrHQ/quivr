@@ -1,5 +1,4 @@
 from .files import File
-from .users import User
 from .brains import Brain
 from .chat import Chat, ChatHistory
 from .user_identity import UserIdentity
