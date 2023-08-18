@@ -2,9 +2,8 @@ name: Deploy to Amazon ECS
 
 on:  
   push:
-    branches: [ "main" ]
-    # tags:
-    #   - 'v*'
+    tags:
+      - 'v*'
 
 env:
   AWS_REGION: eu-west-3
@@ -99,10 +98,10 @@ jobs:
         container-name: ${{ matrix.container }}
         image: ${{env.ECR_REGISTRY}}/${{ env.ECR_REPOSITORY }}:${{ github.sha }}
 
-    # - name: Deploy Amazon ECS task definition for ${{ matrix.name }}
-    #   uses: aws-actions/amazon-ecs-deploy-task-definition@v1
-    #   with:
-    #     task-definition: ${{ steps.task-def.outputs.task-definition }}
-    #     service: ${{ matrix.service }}
-    #     cluster: ${{ env.ECS_CLUSTER }}
-    #     wait-for-service-stability: true
+    - name: Deploy Amazon ECS task definition for ${{ matrix.name }}
+      uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+      with:
+        task-definition: ${{ steps.task-def.outputs.task-definition }}
+        service: ${{ matrix.service }}
+        cluster: ${{ env.ECS_CLUSTER }}
+        wait-for-service-stability: true
