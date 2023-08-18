@@ -7,30 +7,20 @@ on:
       - 'backend/core/**'
 
 env:
-  AWS_REGION: eu-west-3                 # set this to your preferred AWS region, e.g. us-west-1
-  ECR_REPOSITORY: quivr   # set this to your Amazon ECR repository name
-  ECS_SERVICE: quivr-preview                # set this to your Amazon ECS service name
-  ECS_SERVICE_CHAT: preview-service-chat                # set this to your Amazon ECS service name
-  ECS_CLUSTER: quivr                 # set this to your Amazon ECS cluster name
-  ECS_TASK_DEFINITION: .aws/task_definition_preview.json # set this to the path to your Amazon ECS task definition
-  ECS_TASK_DEFINITION_CHAT: .aws/task_definition_preview_chat.json # set this to the path to your Amazon ECS task definition
-                                               # file, e.g. .aws/task-definition.json
-  CONTAINER_NAME: quivr           # set this to the name of the container in the
-                                               # containerDefinitions section of your task definition
-  CONTAINER_NAME_CHAT: quivr-chat           # set this to the name of the container in the
-                                               # containerDefinitions section of your task definition
-
-permissions:
-  contents: read
+  AWS_REGION: eu-west-3
+  ECR_REPOSITORY: quivr
+  ECS_CLUSTER: quivr
 
 jobs:
-  deploy:
-    name: Deploy
+  build_and_push:
+    name: Build and Push Docker Image
     runs-on: ubuntu-latest
+    environment: production
     defaults:
       run:
         working-directory: ./backend/
-    environment: production
+    outputs:
+      image: ${{ steps.build-image.outputs.image }}
 
     steps:
     - name: Checkout
@@ -53,40 +43,52 @@ jobs:
         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         IMAGE_TAG: ${{ github.sha }}
       run: |
-        # Build a docker container and
-        # push it to ECR so that it can
-        # be deployed to ECS.
         docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG ./core/
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-        echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
+        echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
 
-    - name: Fill in the new image ID in the Amazon ECS task definition
+  deploy:
+    needs: build_and_push
+    runs-on: ubuntu-latest
+    environment: production
+    strategy:
+      matrix:
+        include:
+          - name: "quivr"
+            service: "quivr-preview"
+            task_definition: ".aws/task_definition_preview.json"
+            container: "quivr"
+          - name: "quivr-chat"
+            service: "preview-service-chat"
+            task_definition: ".aws/task_definition_preview_chat.json"
+            container: "quivr-chat"
+          - name: "quivr-upload"
+            service: "preview-service-upload"
+            task_definition: ".aws/task_definition_preview_upload.json"
+            container: "quivr-upload"
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+      
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v2
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ env.AWS_REGION }}
+    - name: Fill in the new image ID in the Amazon ECS task definition for ${{ matrix.name }}
       id: task-def
       uses: aws-actions/amazon-ecs-render-task-definition@v1
       with:
-        task-definition: ${{ env.ECS_TASK_DEFINITION }}
-        container-name: ${{ env.CONTAINER_NAME }}
-        image: ${{ steps.build-image.outputs.image }}
-    
-    - name: Fill in the new image ID in the Amazon ECS task definition
-      id: task-def-chat
-      uses: aws-actions/amazon-ecs-render-task-definition@v1
-      with:
-        task-definition: ${{ env.ECS_TASK_DEFINITION_CHAT }}
-        container-name: ${{ env.CONTAINER_NAME_CHAT }}
-        image: ${{ steps.build-image.outputs.image }}
+        task-definition: ${{ matrix.task_definition }}
+        container-name: ${{ matrix.container }}
+        image: ${{ needs.build_and_push.outputs.image }}
 
-    - name: Deploy Amazon ECS task definition
+    - name: Deploy Amazon ECS task definition for ${{ matrix.name }}
       uses: aws-actions/amazon-ecs-deploy-task-definition@v1
       with:
         task-definition: ${{ steps.task-def.outputs.task-definition }}
-        service: ${{ env.ECS_SERVICE }}
-        cluster: ${{ env.ECS_CLUSTER }}
-        wait-for-service-stability: false
-    - name: Deploy Amazon ECS task definition Chat
-      uses: aws-actions/amazon-ecs-deploy-task-definition@v1
-      with:
-        task-definition: ${{ steps.task-def-chat.outputs.task-definition }}
-        service: ${{ env.ECS_SERVICE_CHAT }}
+        service: ${{ matrix.service }}
         cluster: ${{ env.ECS_CLUSTER }}
         wait-for-service-stability: false
