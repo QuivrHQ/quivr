@@ -2,29 +2,20 @@ name: Deploy to Amazon ECS
 
 on:  
   push:
-    tags:
-      - 'v*'
+    branches: [ "main" ]
+    # tags:
+    #   - 'v*'
 
 env:
-  AWS_REGION: eu-west-3                 # set this to your preferred AWS region, e.g. us-west-1
-  ECR_REPOSITORY: quivr   # set this to your Amazon ECR repository name
-  ECS_SERVICE: quivr-backend                # set this to your Amazon ECS service name
-  ECS_CLUSTER: quivr                 # set this to your Amazon ECS cluster name
-  ECS_TASK_DEFINITION: .aws/task_definition.json # set this to the path to your Amazon ECS task definition
-                                               # file, e.g. .aws/task-definition.json
-  CONTAINER_NAME: quivr           # set this to the name of the container in the
-                                               # containerDefinitions section of your task definition
-
-permissions:
-  contents: read
+  AWS_REGION: eu-west-3
+  ECR_REPOSITORY: quivr
+  ECR_REGISTRY: 253053805092.dkr.ecr.eu-west-3.amazonaws.com
+  ECS_CLUSTER: quivr
 
 jobs:
-  deploy:
-    name: Deploy
+  build_and_push:
+    name: Build and Push Docker Image
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./backend/
     environment: production
 
     steps:
@@ -41,32 +32,77 @@ jobs:
     - name: Login to Amazon ECR
       id: login-ecr
       uses: aws-actions/amazon-ecr-login@v1
-
+    
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
+    
+    - name: Create Docker Cacha Storage Backend
+      run: |
+        docker buildx create --use --driver=docker-container
+    - name: See the file in the runner
+      run: |
+        ls -la
     - name: Build, tag, and push image to Amazon ECR
       id: build-image
+      uses: docker/build-push-action@v4
       env:
         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         IMAGE_TAG: ${{ github.sha }}
-      run: |
-        # Build a docker container and
-        # push it to ECR so that it can
-        # be deployed to ECS.
-        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG ./core/
-        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-        echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
+      with:
+        context: ./backend/core/
+        push: true
+        tags: ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }}, ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:latest
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+      
+  deploy:
+    needs: build_and_push
+    runs-on: ubuntu-latest
+    environment: production
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: "quivr"
+            service: "quivr-backend"
+            task_definition: ".aws/task_definition.json"
+            container: "quivr"
+          - name: "quivr-chat"
+            service: "prod-service-chat"
+            task_definition: ".aws/task_definition_prod_chat.json"
+            container: "quivr-chat"
+          - name: "quivr-upload"
+            service: "prod-service-upload"
+            task_definition: ".aws/task_definition_prod_upload.json"
+            container: "quivr-upload"
+          - name: "quivr-crawl"
+            service: "prod-service-crawl"
+            task_definition: ".aws/task_definition_prod_crawl.json"
+            container: "quivr-crawl"
 
-    - name: Fill in the new image ID in the Amazon ECS task definition
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+      
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v2
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ env.AWS_REGION }}
+
+    - name: Fill in the new image ID in the Amazon ECS task definition for ${{ matrix.name }}
       id: task-def
       uses: aws-actions/amazon-ecs-render-task-definition@v1
       with:
-        task-definition: ${{ env.ECS_TASK_DEFINITION }}
-        container-name: ${{ env.CONTAINER_NAME }}
-        image: ${{ steps.build-image.outputs.image }}
+        task-definition: ${{ matrix.task_definition }}
+        container-name: ${{ matrix.container }}
+        image: ${{env.ECR_REGISTRY}}/${{ env.ECR_REPOSITORY }}:${{ github.sha }}
 
-    - name: Deploy Amazon ECS task definition
-      uses: aws-actions/amazon-ecs-deploy-task-definition@v1
-      with:
-        task-definition: ${{ steps.task-def.outputs.task-definition }}
-        service: ${{ env.ECS_SERVICE }}
-        cluster: ${{ env.ECS_CLUSTER }}
-        wait-for-service-stability: true
+    # - name: Deploy Amazon ECS task definition for ${{ matrix.name }}
+    #   uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+    #   with:
+    #     task-definition: ${{ steps.task-def.outputs.task-definition }}
+    #     service: ${{ matrix.service }}
+    #     cluster: ${{ env.ECS_CLUSTER }}
+    #     wait-for-service-stability: true

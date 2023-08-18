@@ -3,8 +3,8 @@ name: Deploy Backend to Preview ECS
 on:
   push:
     branches: [ "main" ]
-    # paths:
-    #   - 'backend/core/**'
+    paths:
+      - 'backend/core/**'
 
 env:
   AWS_REGION: eu-west-3
