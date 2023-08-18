@@ -45,7 +45,7 @@ jobs:
       run: |
         docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG ./core/
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-        echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> "$GITHUB_OUTPUT"
+        echo "image=$ECR_REPOSITORY:$IMAGE_TAG" >> "$GITHUB_OUTPUT"
 
   deploy:
     needs: build_and_push
@@ -77,13 +77,17 @@ jobs:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: ${{ env.AWS_REGION }}
+    - name: Login to Amazon ECR
+      id: login-ecr-bis
+      uses: aws-actions/amazon-ecr-login@v1
+
     - name: Fill in the new image ID in the Amazon ECS task definition for ${{ matrix.name }}
       id: task-def
       uses: aws-actions/amazon-ecs-render-task-definition@v1
       with:
         task-definition: ${{ matrix.task_definition }}
         container-name: ${{ matrix.container }}
-        image: ${{ needs.build_and_push.outputs.image }}
+        image: ${{ steps.login-ecr-bis.outputs.registry }}${{ needs.build_and_push.outputs.image }}
 
     - name: Deploy Amazon ECS task definition for ${{ matrix.name }}
       uses: aws-actions/amazon-ecs-deploy-task-definition@v1
