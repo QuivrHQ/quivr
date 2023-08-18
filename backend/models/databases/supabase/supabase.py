@@ -6,7 +6,7 @@ from models.databases.supabase import (
     Chats,
     File,
     Prompts,
-    User,
+    UserDailyUsage,
     Vector,
 )
 
@@ -14,12 +14,19 @@ logger = get_logger(__name__)
 
 
 class SupabaseDB(
-    Brain, User, File, BrainSubscription, ApiKeyHandler, Chats, Vector, Prompts
+    Brain,
+    UserDailyUsage,
+    File,
+    BrainSubscription,
+    ApiKeyHandler,
+    Chats,
+    Vector,
+    Prompts,
 ):
     def __init__(self, supabase_client):
         self.db = supabase_client
         Brain.__init__(self, supabase_client)
-        User.__init__(self, supabase_client)
+        UserDailyUsage.__init__(self, supabase_client)
         File.__init__(self, supabase_client)
         BrainSubscription.__init__(self, supabase_client)
         ApiKeyHandler.__init__(self, supabase_client)
