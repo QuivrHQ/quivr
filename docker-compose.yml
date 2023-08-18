@@ -32,7 +32,7 @@ services:
       context: backend/core
       dockerfile: Dockerfile
     container_name: backend-core
-    command: uvicorn core:app --host 0.0.0.0 --port 5050
+    command: uvicorn main:app --host 0.0.0.0 --port 5050
     restart: always
     volumes:
       - ./backend/core/:/code/

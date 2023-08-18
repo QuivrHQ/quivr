@@ -17,4 +17,4 @@ RUN pip install --no-cache-dir -r /app/requirements.txt --timeout 100
 COPY . /app
 
 # Start the Uvicorn server on port 5051
-CMD ["uvicorn", "core:app", "--host", "0.0.0.0", "--port", "5051"]
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "5051"]
