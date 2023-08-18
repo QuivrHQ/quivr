@@ -9,6 +9,7 @@ on:
 env:
   AWS_REGION: eu-west-3
   ECR_REPOSITORY: quivr
+  ECR_REGISTRY: 253053805092.dkr.ecr.eu-west-3.amazonaws.com
   ECS_CLUSTER: quivr
 
 jobs:
@@ -85,7 +86,7 @@ jobs:
       with:
         task-definition: ${{ matrix.task_definition }}
         container-name: ${{ matrix.container }}
-        image: ${{ needs.build_and_push.outputs.image }}
+        image: ${{env.ECR_REGISTRY}}/${{ needs.build_and_push.outputs.image }}
 
     - name: Deploy Amazon ECS task definition for ${{ matrix.name }}
       uses: aws-actions/amazon-ecs-deploy-task-definition@v1
