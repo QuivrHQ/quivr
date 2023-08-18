@@ -10,7 +10,8 @@ WORKDIR /code
 # Copy just the requirements first
 COPY ./requirements.txt .
 
-# Increase timeout might not be necessary but is retdooriginal
+
+# Increase timeout might not be necessary but is retained as in original
 RUN pip install --no-cache-dir -r requirements.txt --timeout 100
 
 # Copy the rest of the application
