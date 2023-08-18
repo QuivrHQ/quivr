@@ -17,9 +17,6 @@ jobs:
     name: Build and Push Docker Image
     runs-on: ubuntu-latest
     environment: production
-    defaults:
-      run:
-        working-directory: ./backend/core/
 
     steps:
     - name: Checkout
@@ -52,6 +49,7 @@ jobs:
         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         IMAGE_TAG: ${{ github.sha }}
       with:
+        context: ./backend/core/
         push: true
         tags: ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }}, ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:latest
         cache-from: type=gha
