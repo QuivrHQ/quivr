@@ -11,14 +11,17 @@ env:
   ECR_REPOSITORY: quivr   # set this to your Amazon ECR repository name
   ECS_SERVICE: quivr-preview                # set this to your Amazon ECS service name
   ECS_SERVICE_CHAT: preview-service-chat                # set this to your Amazon ECS service name
+  ECS_SERVICE_UPLOAD: preview-service-upload                # set this to your Amazon ECS service name
   ECS_CLUSTER: quivr                 # set this to your Amazon ECS cluster name
   ECS_TASK_DEFINITION: .aws/task_definition_preview.json # set this to the path to your Amazon ECS task definition
   ECS_TASK_DEFINITION_CHAT: .aws/task_definition_preview_chat.json # set this to the path to your Amazon ECS task definition
                                                # file, e.g. .aws/task-definition.json
-  CONTAINER_NAME: quivr           # set this to the name of the container in the
-                                               # containerDefinitions section of your task definition
-  CONTAINER_NAME_CHAT: quivr-chat           # set this to the name of the container in the
-                                               # containerDefinitions section of your task definition
+  ECS_TASK_DEFINITION_UPLOAD: .aws/task_definition_preview_upload.json # set this to the path to your Amazon ECS task definition
+                                               # file, e.g. .aws/task-definition.json
+  CONTAINER_NAME: quivr
+  CONTAINER_NAME_CHAT: quivr-chat
+  CONTAINER_NAME_UPLOAD: quivr-upload
+
 
 permissions:
   contents: read
@@ -75,6 +78,14 @@ jobs:
         task-definition: ${{ env.ECS_TASK_DEFINITION_CHAT }}
         container-name: ${{ env.CONTAINER_NAME_CHAT }}
         image: ${{ steps.build-image.outputs.image }}
+    
+    - name: Fill in the new image ID in the Amazon ECS task definition
+      id: task-def-upload
+      uses: aws-actions/amazon-ecs-render-task-definition@v1
+      with:
+        task-definition: ${{ env.ECS_TASK_DEFINITION_UPLOAD }}
+        container-name: ${{ env.CONTAINER_NAME_UPLOAD }}
+        image: ${{ steps.build-image.outputs.image }}
 
     - name: Deploy Amazon ECS task definition
       uses: aws-actions/amazon-ecs-deploy-task-definition@v1
@@ -88,5 +99,12 @@ jobs:
       with:
         task-definition: ${{ steps.task-def-chat.outputs.task-definition }}
         service: ${{ env.ECS_SERVICE_CHAT }}
+        cluster: ${{ env.ECS_CLUSTER }}
+        wait-for-service-stability: false
+    - name: Deploy Amazon ECS task definition Upload
+      uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+      with:
+        task-definition: ${{ steps.task-def-upload.outputs.task-definition }}
+        service: ${{ env.ECS_SERVICE_UPLOAD }}
         cluster: ${{ env.ECS_CLUSTER }}
         wait-for-service-stability: false
