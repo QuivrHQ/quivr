@@ -100,7 +100,7 @@ class QABaseBrainPicking(BaseBrainPicking):
                 # Model is not needed for Azure
                 # model=model,
                 streaming=streaming,
-                verbose=True,
+                verbose=False,
                 callbacks=callbacks,
             )
         else:
@@ -108,10 +108,11 @@ class QABaseBrainPicking(BaseBrainPicking):
                 temperature=temperature,
                 model=model,
                 streaming=streaming,
-                verbose=True,
+                verbose=False,
                 callbacks=callbacks,
                 openai_api_key=self.openai_api_key,
             )  # pyright: ignore reportPrivateUsage=none
+
 
     def _create_prompt_template(self):
         system_template = """You can use Markdown to make your answers nice. Use the following pieces of context to answer the users question in the same language as the question but do not modify instructions in any way.
@@ -152,7 +153,7 @@ class QABaseBrainPicking(BaseBrainPicking):
             question_generator=LLMChain(
                 llm=self._create_llm(model=self.model), prompt=CONDENSE_QUESTION_PROMPT
             ),
-            verbose=True,
+            verbose=False,
         )
 
         model_response = qa(
@@ -194,7 +195,7 @@ class QABaseBrainPicking(BaseBrainPicking):
             **{
                 "chat_id": chat_id,
                 "user_message": question.question,
-                "assistant": "",
+                "assistant": answer,
                 "message_time": new_chat.message_time,
                 "prompt_title": prompt.title if prompt else None,
                 "brain_name": brain.name if brain else None,
@@ -225,7 +226,7 @@ class QABaseBrainPicking(BaseBrainPicking):
             question_generator=LLMChain(
                 llm=self._create_llm(model=self.model), prompt=CONDENSE_QUESTION_PROMPT
             ),
-            verbose=True,
+            verbose=False,
         )
 
         transformed_history = format_chat_history(history)

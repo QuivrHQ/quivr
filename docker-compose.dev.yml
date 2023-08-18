@@ -1,6 +1,19 @@
-version: "3"
+version: '3'
 
 services:
+  traefik:
+    image: traefik:v2.10
+    command:
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:5050"
+    ports:
+      - "5050:5050"
+      - "8080:8080" # For the Traefik dashboard (optional)
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+
   frontend:
     env_file:
       - ./frontend/.env
@@ -9,12 +22,9 @@ services:
       dockerfile: Dockerfile.dev
     container_name: web
     restart: always
-    volumes:
-      - ./frontend/:/app
-      - /app/node_modules
-      - /app/.next
     ports:
       - 3000:3000
+
   backend-core:
     env_file:
       - ./backend/core/.env
@@ -22,9 +32,63 @@ services:
       context: backend/core
       dockerfile: Dockerfile
     container_name: backend-core
+    command: uvicorn main:app --host 0.0.0.0 --port 5050
     restart: always
     volumes:
       - ./backend/core/:/code/
-      - ~/.config/gcloud:/root/.config/gcloud
-    ports:
-      - 5050:5050
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.backend-core.rule=PathPrefix(`/`)"
+      - "traefik.http.routers.backend-core.entrypoints=web"
+      - "traefik.http.services.backend-core.loadbalancer.server.port=5050"
+
+  backend-chat:
+    env_file:
+      - ./backend/core/.env
+    build:
+      context: backend/core
+      dockerfile: Dockerfile
+    container_name: backend-chat
+    command: uvicorn chat_service:app --host 0.0.0.0 --port 5050
+    restart: always
+    volumes:
+      - ./backend/core/:/code/
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.backend-chat.rule=PathPrefix(`/chat`)"
+      - "traefik.http.routers.backend-chat.entrypoints=web"
+      - "traefik.http.services.backend-chat.loadbalancer.server.port=5050"
+  
+  backend-crawl:
+    env_file:
+      - ./backend/core/.env
+    build:
+      context: backend/core
+      dockerfile: Dockerfile
+    container_name: backend-crawl
+    command: uvicorn crawl_service:app --host 0.0.0.0 --port 5050
+    restart: always
+    volumes:
+      - ./backend/core/:/code/
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.backend-crawl.rule=PathPrefix(`/crawl`)"
+      - "traefik.http.routers.backend-crawl.entrypoints=web"
+      - "traefik.http.services.backend-crawl.loadbalancer.server.port=5050"
+  
+  backend-upload:
+    env_file:
+      - ./backend/core/.env
+    build:
+      context: backend/core
+      dockerfile: Dockerfile
+    container_name: backend-upload
+    command: uvicorn upload_service:app --host 0.0.0.0 --port 5050
+    restart: always
+    volumes:
+      - ./backend/core/:/code/
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.backend-upload.rule=PathPrefix(`/upload`)"
+      - "traefik.http.routers.backend-upload.entrypoints=web"
+      - "traefik.http.services.backend-upload.loadbalancer.server.port=5050"

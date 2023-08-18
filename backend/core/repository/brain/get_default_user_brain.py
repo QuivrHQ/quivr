@@ -12,7 +12,7 @@ def get_user_default_brain(user_id: UUID) -> BrainEntity | None:
     supabase_db = get_supabase_db()
     brain_id = supabase_db.get_default_user_brain_id(user_id)
 
-    logger.info("Default brain response:", brain_id)
+    logger.info(f"Default brain response: {brain_id}")
 
     if brain_id is None:
         return None
