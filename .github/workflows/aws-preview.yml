@@ -20,8 +20,6 @@ jobs:
     defaults:
       run:
         working-directory: ./backend/
-    outputs:
-      image: ${{ steps.build-image.outputs.image }}
 
     steps:
     - name: Checkout
@@ -37,17 +35,28 @@ jobs:
     - name: Login to Amazon ECR
       id: login-ecr
       uses: aws-actions/amazon-ecr-login@v1
-
+    
+    - name: Set up QEMU
+      uses: docker/setup-qemu-action@v2
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
+    
+    - name: Create Docker Cacha Storage Backend
+      run: |
+        docker buildx create --use --driver=docker-container
     - name: Build, tag, and push image to Amazon ECR
       id: build-image
+      uses: docker/build-push-action@v4
       env:
         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         IMAGE_TAG: ${{ github.sha }}
-      run: |
-        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG ./core/
-        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-        echo "image=$ECR_REPOSITORY:$IMAGE_TAG" >> "$GITHUB_OUTPUT"
-
+      with:
+        context: ./core/
+        push: true
+        tags: ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }}, ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:latest
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+      
   deploy:
     needs: build_and_push
     runs-on: ubuntu-latest
@@ -86,7 +95,7 @@ jobs:
       with:
         task-definition: ${{ matrix.task_definition }}
         container-name: ${{ matrix.container }}
-        image: ${{env.ECR_REGISTRY}}/${{ needs.build_and_push.outputs.image }}
+        image: ${{env.ECR_REGISTRY}}/${{ env.ECR_REPOSITORY }}:${{ github.sha }}
 
     - name: Deploy Amazon ECS task definition for ${{ matrix.name }}
       uses: aws-actions/amazon-ecs-deploy-task-definition@v1
