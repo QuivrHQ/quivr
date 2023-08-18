@@ -52,6 +52,7 @@ jobs:
     runs-on: ubuntu-latest
     environment: production
     strategy:
+      fail-fast: false
       matrix:
         include:
           - name: "quivr"
@@ -77,9 +78,6 @@ jobs:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: ${{ env.AWS_REGION }}
-    - name: Login to Amazon ECR
-      id: login-ecr-bis
-      uses: aws-actions/amazon-ecr-login@v1
 
     - name: Fill in the new image ID in the Amazon ECS task definition for ${{ matrix.name }}
       id: task-def
@@ -87,7 +85,7 @@ jobs:
       with:
         task-definition: ${{ matrix.task_definition }}
         container-name: ${{ matrix.container }}
-        image: ${{ steps.login-ecr-bis.outputs.registry }}${{ needs.build_and_push.outputs.image }}
+        image: ${{ needs.build_and_push.outputs.image }}
 
     - name: Deploy Amazon ECS task definition for ${{ matrix.name }}
       uses: aws-actions/amazon-ecs-deploy-task-definition@v1
@@ -95,4 +93,4 @@ jobs:
         task-definition: ${{ steps.task-def.outputs.task-definition }}
         service: ${{ matrix.service }}
         cluster: ${{ env.ECS_CLUSTER }}
-        wait-for-service-stability: false
+        wait-for-service-stability: true
