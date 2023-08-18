@@ -19,7 +19,7 @@ jobs:
     environment: production
     defaults:
       run:
-        working-directory: ./backend/
+        working-directory: ./backend/core/
 
     steps:
     - name: Checkout
