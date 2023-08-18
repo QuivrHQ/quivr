@@ -40,6 +40,7 @@ async def startup_event():
     if not os.path.exists(pypandoc.get_pandoc_path()):
         pypandoc.download_pandoc()
 
+
 app.include_router(brain_router)
 app.include_router(chat_router)
 app.include_router(crawl_router)

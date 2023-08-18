@@ -2,13 +2,14 @@
 FROM python:3.11-slim-bullseye
 
 # Install GEOS library and clean up in one step
-RUN apt-get update && apt-get install -y libgeos-dev pandoc && \
+RUN apt-get update && apt-get install -y libgeos-dev pandoc binutils && \
     rm -rf /var/lib/apt/lists/* && apt-get clean
 
 WORKDIR /code
 
 # Copy just the requirements first
 COPY ./requirements.txt .
+
 
 # Increase timeout might not be necessary but is retained as in original
 RUN pip install --no-cache-dir -r requirements.txt --timeout 100
