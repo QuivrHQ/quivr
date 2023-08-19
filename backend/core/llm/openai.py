@@ -43,3 +43,5 @@ class OpenAIBrainPicking(QABaseBrainPicking):
         return OpenAIEmbeddings(
             openai_api_key=self.openai_api_key
         )  # pyright: ignore reportPrivateUsage=none
+
+    

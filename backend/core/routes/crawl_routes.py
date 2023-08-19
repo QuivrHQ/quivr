@@ -32,7 +32,9 @@ async def crawl_endpoint(
     brain = Brain(id=brain_id)
 
     if request.headers.get("Openai-Api-Key"):
-        brain.max_brain_size = int(os.getenv("MAX_BRAIN_SIZE_WITH_KEY", 209715200))
+        brain.max_brain_size = os.getenv(
+            "MAX_BRAIN_SIZE_WITH_KEY", 209715200
+        )  # pyright: ignore reportPrivateUsage=none
 
     file_size = 1000000
     remaining_free_space = brain.remaining_brain_size
