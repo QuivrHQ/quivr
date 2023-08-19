@@ -27,15 +27,15 @@ services:
 
   backend-core:
     env_file:
-      - ./backend/core/.env
+      - ./backend/.env
     build:
-      context: backend/core
+      context: backend
       dockerfile: Dockerfile
     container_name: backend-core
     command: uvicorn main:app --host 0.0.0.0 --port 5050
     restart: always
     volumes:
-      - ./backend/core/:/code/
+      - ./backend/:/code/
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.backend-core.rule=PathPrefix(`/`)"
@@ -44,15 +44,15 @@ services:
 
   backend-chat:
     env_file:
-      - ./backend/core/.env
+      - ./backend/.env
     build:
-      context: backend/core
+      context: backend
       dockerfile: Dockerfile
     container_name: backend-chat
     command: uvicorn chat_service:app --host 0.0.0.0 --port 5050
     restart: always
     volumes:
-      - ./backend/core/:/code/
+      - ./backend/:/code/
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.backend-chat.rule=PathPrefix(`/chat`)"
@@ -61,15 +61,15 @@ services:
   
   backend-crawl:
     env_file:
-      - ./backend/core/.env
+      - ./backend/.env
     build:
-      context: backend/core
+      context: backend
       dockerfile: Dockerfile
     container_name: backend-crawl
     command: uvicorn crawl_service:app --host 0.0.0.0 --port 5050
     restart: always
     volumes:
-      - ./backend/core/:/code/
+      - ./backend/:/code/
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.backend-crawl.rule=PathPrefix(`/crawl`)"
@@ -78,15 +78,15 @@ services:
   
   backend-upload:
     env_file:
-      - ./backend/core/.env
+      - ./backend/.env
     build:
-      context: backend/core
+      context: backend
       dockerfile: Dockerfile
     container_name: backend-upload
     command: uvicorn upload_service:app --host 0.0.0.0 --port 5050
     restart: always
     volumes:
-      - ./backend/core/:/code/
+      - ./backend/:/code/
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.backend-upload.rule=PathPrefix(`/upload`)"
