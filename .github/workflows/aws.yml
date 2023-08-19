@@ -55,7 +55,7 @@ jobs:
         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         IMAGE_TAG: ${{ github.sha }}
       with:
-        context: ./backend/core/
+        context: ./backend/
         push: true
         tags: ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }}, ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ github.ref_name}},  ghcr.io/stangirard/quivr:${{ github.ref_name}}
         cache-from: type=gha

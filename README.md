@@ -95,11 +95,11 @@ Additionally, you'll need a [Supabase](https://supabase.com/) account for:
 - **Step 2 - Bis**: Copy the `.XXXXX_env` files
 
   ```bash
-  cp .backend_env.example backend/core/.env
+  cp .backend_env.example backend/.env
   cp .frontend_env.example frontend/.env
   ```
 
-- **Step 3**: Update the `backend/core/.env` and `frontend/.env` file
+- **Step 3**: Update the `backend/.env` and `frontend/.env` file
 
   > _Your `supabase_service_key` can be found in your Supabase dashboard under Project Settings -> API. Use the `anon` `public` key found in the `Project API keys` section._
 
@@ -107,9 +107,9 @@ Additionally, you'll need a [Supabase](https://supabase.com/) account for:
 
   > _The `NEXT_PUBLIC_BACKEND_URL` is set to localhost:5050 for the docker. Update it if you are running the backend on a different machine._
 
-  > _To activate vertexAI with PaLM from GCP follow the instructions [here](https://python.langchain.com/en/latest/modules/models/llms/integrations/google_vertex_ai_palm.html) and update `backend/core/.env`- It is an advanced feature, please be expert in GCP before trying to use it_
+  > _To activate vertexAI with PaLM from GCP follow the instructions [here](https://python.langchain.com/en/latest/modules/models/llms/integrations/google_vertex_ai_palm.html) and update `backend/.env`- It is an advanced feature, please be expert in GCP before trying to use it_
 
-  - [ ] Change variables in `backend/core/.env`
+  - [ ] Change variables in `backend/.env`
   - [ ] Change variables in `frontend/.env`
 
 - **Step 4**: Use the `migration.sh` script to run the migration scripts
