@@ -7,10 +7,10 @@ from venv import logger
 from auth import AuthBearer, get_current_user
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from fastapi.responses import StreamingResponse
-from llm.openai import OpenAIBrainPicking
 from llm.qa_headless import HeadlessQA
-from models.brain_entity import BrainEntity
+from llm.openai import OpenAIBrainPicking
 from models.brains import Brain
+from models.brain_entity import BrainEntity
 from models.chat import Chat
 from models.chats import ChatQuestion
 from models.databases.supabase.supabase import SupabaseDB
@@ -60,7 +60,7 @@ def check_user_limit(
 ):
     if user.user_openai_api_key is None:
         date = time.strftime("%Y%m%d")
-        max_requests_number = int(os.getenv("MAX_REQUESTS_NUMBER", 1000))
+        max_requests_number = int(os.getenv("MAX_REQUESTS_NUMBER", 1))
 
         user.increment_user_request_count(date)
         if int(user.requests_count) >= int(max_requests_number):
@@ -238,7 +238,7 @@ async def create_stream_question_handler(
     # Retrieve user's OpenAI API key
     current_user.user_openai_api_key = request.headers.get("Openai-Api-Key")
     brain = Brain(id=brain_id)
-    brain_details: BrainEntity | None = None
+    brain_details: BrainEntity = None
     if not current_user.user_openai_api_key and brain_id:
         brain_details = get_brain_details(brain_id)
         if brain_details:
@@ -268,30 +268,18 @@ async def create_stream_question_handler(
         if brain_id:
             gpt_answer_generator = OpenAIBrainPicking(
                 chat_id=str(chat_id),
-                model=(brain_details or chat_question).model
-                if current_user.user_openai_api_key
-                else "gpt-3.5-turbo",
-                max_tokens=(brain_details or chat_question).max_tokens
-                if current_user.user_openai_api_key
-                else 0,
-                temperature=(brain_details or chat_question).temperature
-                if current_user.user_openai_api_key
-                else 256,
+                model=(brain_details or chat_question).model if current_user.user_openai_api_key else "gpt-3.5-turbo",
+                max_tokens=(brain_details or chat_question).max_tokens if current_user.user_openai_api_key else 0,
+                temperature=(brain_details or chat_question).temperature if current_user.user_openai_api_key else 256,
                 brain_id=str(brain_id),
                 user_openai_api_key=current_user.user_openai_api_key,  # pyright: ignore reportPrivateUsage=none
                 streaming=True,
             )
         else:
             gpt_answer_generator = HeadlessQA(
-                model=chat_question.model
-                if current_user.user_openai_api_key
-                else "gpt-3.5-turbo",
-                temperature=chat_question.temperature
-                if current_user.user_openai_api_key
-                else 256,
-                max_tokens=chat_question.max_tokens
-                if current_user.user_openai_api_key
-                else 0,
+                model=chat_question.model if current_user.user_openai_api_key else "gpt-3.5-turbo",
+                temperature=chat_question.temperature if current_user.user_openai_api_key else 256,
+                max_tokens=chat_question.max_tokens if current_user.user_openai_api_key else 0,
                 user_openai_api_key=current_user.user_openai_api_key,  # pyright: ignore reportPrivateUsage=none
                 chat_id=str(chat_id),
                 streaming=True,
