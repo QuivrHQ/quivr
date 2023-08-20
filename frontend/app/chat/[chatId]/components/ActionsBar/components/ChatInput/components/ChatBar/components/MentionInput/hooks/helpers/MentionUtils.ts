@@ -5,7 +5,7 @@ import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainConte
 
 type MentionUtilsProps = {
   editorState: EditorState;
-  setEditorState: React.Dispatch<React.SetStateAction<EditorState>>;
+  setEditorState: (editorState: EditorState) => void;
 };
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types

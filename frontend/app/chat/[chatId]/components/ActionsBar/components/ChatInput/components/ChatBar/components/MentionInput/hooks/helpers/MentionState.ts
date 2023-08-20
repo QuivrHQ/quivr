@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 import { EditorState, Modifier } from "draft-js";
 import { useEffect, useState } from "react";
 
@@ -9,7 +10,7 @@ import { mapMinimalBrainToMentionData } from "../../utils/mapMinimalBrainToMenti
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const useMentionState = () => {
   const { allBrains, currentBrainId } = useBrainContext();
-  const [editorState, setEditorState] = useState(() =>
+  const [editorState, legacySetEditorState] = useState(() =>
     EditorState.createEmpty()
   );
 
@@ -20,6 +21,16 @@ export const useMentionState = () => {
   const [suggestions, setSuggestions] = useState(
     mapMinimalBrainToMentionData(mentionItems["@"])
   );
+
+  const setEditorState = (newState: EditorState) => {
+    const currentSelection = newState.getSelection();
+    const stateWithContentAndSelection = EditorState.forceSelection(
+      newState,
+      currentSelection
+    );
+
+    legacySetEditorState(stateWithContentAndSelection);
+  };
 
   useEffect(() => {
     setMentionItems({

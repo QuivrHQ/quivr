@@ -32,7 +32,6 @@ export const MentionInput = ({ onSubmit }: MentionInputProps): ReactElement => {
       const contentState = editorState.getCurrentContent();
       const rawText = contentState.getPlainText();
       onSubmit(rawText);
-      // empty the editor content by keep
       setEditorState(EditorState.createEmpty());
 
       return "submit";

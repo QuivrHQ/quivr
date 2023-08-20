@@ -9,10 +9,10 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 
+import { mapMinimalBrainToMentionData } from "../utils/mapMinimalBrainToMentionData";
 import { useMentionPlugin } from "./helpers/MentionPlugin";
 import { useMentionState } from "./helpers/MentionState";
 import { useMentionUtils } from "./helpers/MentionUtils";
-import { mapMinimalBrainToMentionData } from "../utils/mapMinimalBrainToMentionData";
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const useMentionInput = () => {
