@@ -10,15 +10,17 @@ from langchain.prompts.chat import (
     ChatPromptTemplate,
     HumanMessagePromptTemplate,
 )
-from repository.chat.update_message_by_id import update_message_by_id
 from models.databases.supabase.chats import CreateChatHistory
-from repository.chat.format_chat_history import format_chat_history
-from repository.chat.get_chat_history import get_chat_history
-from repository.chat.update_chat_history import update_chat_history
-from repository.chat.format_chat_history import format_history_to_openai_mesages
+from repository.chat import (
+    update_message_by_id,
+    format_chat_history,
+    get_chat_history,
+    update_chat_history,
+    format_history_to_openai_mesages,
+    GetChatHistoryOutput,
+)
 from logger import get_logger
-from models.chats import ChatQuestion
-from repository.chat.get_chat_history import GetChatHistoryOutput
+from models import ChatQuestion
 
 
 from pydantic import BaseModel

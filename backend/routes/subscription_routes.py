@@ -3,26 +3,21 @@ from uuid import UUID
 
 from auth.auth_bearer import AuthBearer, get_current_user
 from fastapi import APIRouter, Depends, HTTPException
-from models.brains import Brain
-from models.brains_subscription_invitations import BrainSubscription
-from models.prompt import PromptStatusEnum
-from models.users import User
+from models import User, BrainSubscription, Brain, PromptStatusEnum
 from pydantic import BaseModel
-from repository.brain.create_brain_user import create_brain_user
-from repository.brain.get_brain_by_id import get_brain_by_id
-from repository.brain.get_brain_details import get_brain_details
-from repository.brain.get_brain_for_user import get_brain_for_user
-from repository.brain.update_user_rights import update_brain_user_rights
-from repository.brain_subscription.resend_invitation_email import (
+from repository.brain import (
+    get_brain_by_id,
+    create_brain_user,
+    get_brain_details,
+    get_brain_for_user,
+    update_brain_user_rights,
+)
+from repository.brain_subscription import (
+    SubscriptionInvitationService,
     resend_invitation_email,
 )
-from repository.brain_subscription.subscription_invitation_service import (
-    SubscriptionInvitationService,
-)
-from repository.prompt.delete_prompt_py_id import delete_prompt_by_id
-from repository.prompt.get_prompt_by_id import get_prompt_by_id
-from repository.user.get_user_email_by_user_id import get_user_email_by_user_id
-from repository.user.get_user_id_by_user_email import get_user_id_by_user_email
+from repository.prompt import delete_prompt_by_id, get_prompt_by_id
+from repository.user import get_user_id_by_user_email, get_user_email_by_user_id
 from routes.authorizations.brain_authorization import (
     RoleEnum,
     has_brain_authorization,

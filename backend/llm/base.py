@@ -3,7 +3,7 @@ from typing import AsyncIterable, List
 
 from langchain.callbacks.streaming_aiter import AsyncIteratorCallbackHandler
 from logger import get_logger
-from models.settings import BrainSettings  # Importing settings related to the 'brain'
+from models import BrainSettings  # Importing settings related to the 'brain'
 from pydantic import BaseModel  # For data validation and settings management
 
 logger = get_logger(__name__)

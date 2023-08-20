@@ -1,8 +1,7 @@
 import time
 
 from langchain.schema import Document
-from models.brains import Brain
-from models.files import File
+from models import Brain, File
 from utils.vectors import Neurons
 
 

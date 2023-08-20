@@ -5,7 +5,7 @@ secondbrain/
 toto.txt
 *.ipynb
 log.txt
-
+backend/venv
 
 
 
