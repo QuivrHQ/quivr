@@ -33,6 +33,8 @@ app.include_router(misc_router)
 
 
 
+
+
 @app.exception_handler(HTTPException)
 async def http_exception_handler(_, exc):
     return JSONResponse(

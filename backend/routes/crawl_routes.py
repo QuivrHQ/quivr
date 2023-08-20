@@ -16,6 +16,11 @@ from utils.processors import filter_file
 crawl_router = APIRouter()
 
 
+@crawl_router.get("/crawl/healthz", tags=["Health"])
+async def healthz():
+    return {"status": "ok"}
+
+
 @crawl_router.post("/crawl", dependencies=[Depends(AuthBearer())], tags=["Crawl"])
 async def crawl_endpoint(
     request: Request,
