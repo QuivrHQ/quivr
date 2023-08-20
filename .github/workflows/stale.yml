@@ -1,7 +1,7 @@
 name: 'Close stale issues and PRs'
 on:
   schedule:
-    - cron: '0 */1 * * *'
+    - cron: '0 */4 * * *'
 
 permissions:
     contents: write # only for delete-branch option
@@ -18,6 +18,7 @@ jobs:
           exempt-draft-pr: true
           days-before-stale: 30
           days-before-close: 5
+          operations-per-run: 60
           exempt-milestones: true
           stale-issue-message: "Thanks for your contributions, we'll be closing this issue as it has gone stale. Feel free to reopen if you'd like to continue the discussion."
           stale-pr-message: "Thanks for your contributions, we'll be closing this PR as it has gone stale. Feel free to reopen if you'd like to continue the discussion."
