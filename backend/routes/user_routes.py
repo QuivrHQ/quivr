@@ -3,9 +3,7 @@ import time
 
 from auth import AuthBearer, get_current_user
 from fastapi import APIRouter, Depends, Request
-
 from models import User, Brain, BrainRateLimiting, UserIdentity
-
 from repository.brain import get_user_default_brain
 from repository.user_identity import (
     UserIdentityUpdatableProperties,

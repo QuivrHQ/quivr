@@ -15,7 +15,6 @@ from repository.brain import (
 from repository.brain_subscription import (
     SubscriptionInvitationService,
     resend_invitation_email,
-    SubscriptionInvitationService
 )
 from repository.prompt import delete_prompt_by_id, get_prompt_by_id
 from repository.user import get_user_id_by_user_email, get_user_email_by_user_id

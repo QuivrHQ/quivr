@@ -3,7 +3,6 @@ from uuid import UUID
 
 from auth import AuthBearer, get_current_user
 from fastapi import APIRouter, Depends, Query, Request, UploadFile
-
 from models import User, File, Brain
 from repository.brain import get_brain_details
 from repository.user_identity import get_user_identity
@@ -15,6 +14,11 @@ from utils.file import convert_bytes, get_file_size
 from utils.processors import filter_file
 
 upload_router = APIRouter()
+
+
+@upload_router.get("/upload/healthz", tags=["Health"])
+async def healthz():
+    return {"status": "ok"}
 
 
 @upload_router.post("/upload", dependencies=[Depends(AuthBearer())], tags=["Upload"])
