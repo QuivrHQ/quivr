@@ -12,8 +12,8 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from logger import get_logger
 from middlewares.cors import add_cors_middleware
-from routes.misc_routes import misc_router
 from routes.chat_routes import chat_router
+from routes.misc_routes import misc_router
 
 logger = get_logger(__name__)
 
@@ -44,7 +44,7 @@ async def http_exception_handler(_, exc):
 def handle_request_validation_error(app: FastAPI):
     @app.exception_handler(RequestValidationError)
     async def validation_exception_handler(
-            request: Request, exc: RequestValidationError
+        request: Request, exc: RequestValidationError
     ):
         exc_str = f"{exc}".replace("\n", " ").replace("   ", " ")
         logger.error(request, exc_str)

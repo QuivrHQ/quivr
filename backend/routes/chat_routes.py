@@ -256,7 +256,7 @@ async def create_stream_question_handler(
     # Retrieve user's OpenAI API key
     current_user.user_openai_api_key = request.headers.get("Openai-Api-Key")
     brain = Brain(id=brain_id)
-    brain_details: BrainEntity = None
+    brain_details: BrainEntity | None = None
     if not current_user.user_openai_api_key and brain_id:
         brain_details = get_brain_details(brain_id)
         if brain_details:

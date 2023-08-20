@@ -1,4 +1,5 @@
 from datetime import datetime
+from uuid import UUID
 
 from fastapi import HTTPException
 from models.settings import get_supabase_db
@@ -13,7 +14,7 @@ async def verify_api_key(
         # Use UTC time to avoid timezone issues
         current_date = datetime.utcnow().date()
         supabase_db = get_supabase_db()
-        result = supabase_db.get_active_api_key(api_key)
+        result = supabase_db.get_active_api_key(UUID(api_key))
 
         if result.data is not None and len(result.data) > 0:
             api_key_creation_date = datetime.strptime(
@@ -36,7 +37,7 @@ async def get_user_from_api_key(
     supabase_db = get_supabase_db()
 
     # Lookup the user_id from the api_keys table
-    user_id_data = supabase_db.get_user_id_by_api_key(api_key)
+    user_id_data = supabase_db.get_user_id_by_api_key(UUID(api_key))
 
     if not user_id_data.data:
         raise HTTPException(status_code=400, detail="Invalid API key.")
