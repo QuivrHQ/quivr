@@ -1,6 +1,6 @@
 import asyncio
 import json
-from typing import AsyncIterable, Awaitable
+from typing import AsyncIterable, Awaitable, Optional
 from uuid import UUID
 from logger import get_logger
 
@@ -47,9 +47,9 @@ class QABaseBrainPicking(BaseBrainPicking):
     Each have the same prompt template, which is defined in the `prompt_template` property.
     """
 
-    supabase_client: Client = None
-    vector_store: CustomSupabaseVectorStore = None
-    qa: ConversationalRetrievalChain = None
+    supabase_client: Optional[Client] = None
+    vector_store: Optional[CustomSupabaseVectorStore] = None
+    qa: Optional[ConversationalRetrievalChain] = None
 
     def __init__(
         self,
@@ -58,7 +58,7 @@ class QABaseBrainPicking(BaseBrainPicking):
         chat_id: str,
         streaming: bool = False,
         **kwargs,
-    ) -> "QABaseBrainPicking":
+    ):
         super().__init__(
             model=model,
             brain_id=brain_id,
