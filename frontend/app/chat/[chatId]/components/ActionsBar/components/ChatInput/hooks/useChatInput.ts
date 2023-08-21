@@ -7,13 +7,9 @@ export const useChatInput = () => {
   const [message, setMessage] = useState<string>("");
   const { addQuestion, generatingAnswer, chatId } = useChat();
 
-  const submitQuestion = (currentMessage?: string) => {
-    const messageToSubmit = currentMessage ?? message;
-    if (messageToSubmit.length === 0) {
-      return;
-    }
+  const submitQuestion = () => {
     if (!generatingAnswer) {
-      void addQuestion(messageToSubmit, () => setMessage(""));
+      void addQuestion(message, () => setMessage(""));
     }
   };
 

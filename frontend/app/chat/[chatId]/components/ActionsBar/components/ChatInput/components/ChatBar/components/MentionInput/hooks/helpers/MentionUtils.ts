@@ -1,6 +1,7 @@
-import { MentionData } from "@draft-js-plugins/mention";
-import { EditorState, Modifier } from "draft-js";
+import { addMention, MentionData } from "@draft-js-plugins/mention";
+import { EditorState } from "draft-js";
 
+import { MentionTriggerType } from "@/app/chat/[chatId]/components/ActionsBar/types";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 
 type MentionUtilsProps = {
@@ -36,35 +37,19 @@ export const useMentionUtils = (props: MentionUtilsProps) => {
 
   const insertMention = (
     mention: MentionData,
-    mentionWithSpace = " "
+    trigger: MentionTriggerType,
+    customEditorState?: EditorState
   ): EditorState => {
-    const contentState = editorState.getCurrentContent();
-    const selectionState = editorState.getSelection();
-
-    const stateWithEntity = contentState.createEntity("mention", "IMMUTABLE", {
+    const editorStateWithMention = addMention(
+      customEditorState ?? editorState,
       mention,
-    });
-    const entityKey = stateWithEntity.getLastCreatedEntityKey();
-
-    const newContentState = Modifier.insertText(
-      contentState,
-      selectionState,
-      mentionWithSpace,
-      undefined,
-      entityKey
+      trigger,
+      trigger,
+      "MUTABLE"
     );
 
-    const newSelection = selectionState.merge({
-      anchorOffset: selectionState.getStartOffset() + mentionWithSpace.length,
-      focusOffset: selectionState.getStartOffset() + mentionWithSpace.length,
-    });
-
-    const newEditorState = EditorState.forceSelection(
-      EditorState.push(editorState, newContentState, "insert-characters"),
-      newSelection
-    );
-
-    return newEditorState;
+    setEditorState(editorStateWithMention);
+    return editorStateWithMention;
   };
 
   return {

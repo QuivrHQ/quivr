@@ -3,9 +3,21 @@
 import { MentionInput } from "./components";
 
 type ChatBarProps = {
-  onSubmit: (text?: string) => void;
+  onSubmit: () => void;
+  setMessage: (text: string) => void;
+  message: string;
 };
 
-export const ChatBar = ({ onSubmit }: ChatBarProps): JSX.Element => {
-  return <MentionInput onSubmit={onSubmit} />;
+export const ChatBar = ({
+  onSubmit,
+  setMessage,
+  message,
+}: ChatBarProps): JSX.Element => {
+  return (
+    <MentionInput
+      message={message}
+      setMessage={setMessage}
+      onSubmit={onSubmit}
+    />
+  );
 };

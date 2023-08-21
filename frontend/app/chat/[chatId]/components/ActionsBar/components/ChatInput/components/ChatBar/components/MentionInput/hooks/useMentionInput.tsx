@@ -14,8 +14,12 @@ import { useMentionPlugin } from "./helpers/MentionPlugin";
 import { useMentionState } from "./helpers/MentionState";
 import { useMentionUtils } from "./helpers/MentionUtils";
 
+type UseMentionInputProps = {
+  message: string;
+};
+
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-export const useMentionInput = () => {
+export const useMentionInput = ({ message }: UseMentionInputProps) => {
   const { allBrains, currentBrainId, setCurrentBrainId } = useBrainContext();
 
   const {
@@ -51,20 +55,36 @@ export const useMentionInput = () => {
     setCurrentBrainId(mention.id as UUID);
   };
 
-  const onSearchChange = useCallback(
-    ({ trigger, value }: { trigger: string; value: string }) => {
-      setSuggestions(
-        defaultSuggestionsFilter(
-          value,
-          currentBrainId !== null
-            ? []
-            : mapMinimalBrainToMentionData(mentionItems["@"]),
-          trigger
-        )
-      );
-    },
-    [mentionItems, currentBrainId]
-  );
+  const onSearchChange = ({
+    trigger,
+    value,
+  }: {
+    trigger: string;
+    value: string;
+  }) => {
+    if (currentBrainId !== null) {
+      setSuggestions([]);
+
+      return;
+    }
+    setSuggestions(
+      defaultSuggestionsFilter(
+        value,
+        mapMinimalBrainToMentionData(mentionItems["@"]),
+        trigger
+      )
+    );
+  };
+
+  const insertCurrentBrainAsMention = (): void => {
+    const mention = mentionItems["@"].find(
+      (item) => item.id === currentBrainId
+    );
+
+    if (mention !== undefined) {
+      insertMention(mention, "@");
+    }
+  };
 
   useEffect(() => {
     setSuggestions(mapMinimalBrainToMentionData(mentionItems["@"]));
@@ -83,29 +103,27 @@ export const useMentionInput = () => {
   }, [allBrains]);
 
   useEffect(() => {
-    if (selectedBrainAddedOnload) {
+    if (
+      selectedBrainAddedOnload ||
+      mentionItems["@"].length === 0 ||
+      currentBrainId === null
+    ) {
       return;
     }
 
-    if (currentBrainId === null || mentionItems["@"].length === 0) {
-      return;
-    }
-
-    const mention = mentionItems["@"].find(
-      (item) => item.id === currentBrainId
-    );
-
-    if (mention === undefined) {
-      return;
-    }
-
-    insertMention({
-      id: currentBrainId,
-      name: mention.name,
-    });
+    insertCurrentBrainAsMention();
 
     setSelectedBrainAddedOnload(true);
   }, [currentBrainId, mentionItems]);
+
+  useEffect(() => {
+    const contentState = editorState.getCurrentContent();
+    const plainText = contentState.getPlainText();
+
+    if (plainText === "" && currentBrainId !== null) {
+      insertCurrentBrainAsMention();
+    }
+  }, [editorState]);
 
   return {
     mentionInputRef,
@@ -118,5 +136,8 @@ export const useMentionInput = () => {
     onAddMention,
     setEditorState,
     editorState,
+    insertCurrentBrainAsMention,
+    mentionItems,
+    insertMention,
   };
 };

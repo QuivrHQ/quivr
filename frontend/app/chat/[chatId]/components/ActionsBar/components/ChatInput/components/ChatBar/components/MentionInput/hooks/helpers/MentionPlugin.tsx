@@ -1,6 +1,7 @@
 import createMentionPlugin from "@draft-js-plugins/mention";
 import { useMemo } from "react";
 
+import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 import { BrainMentionItem } from "../../../BrainMentionItem";
 
 interface MentionPluginProps {
@@ -10,24 +11,30 @@ interface MentionPluginProps {
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const useMentionPlugin = (props: MentionPluginProps) => {
   const { removeMention } = props;
+  const { setCurrentBrainId } = useBrainContext();
 
   const { MentionSuggestions, plugins } = useMemo(() => {
     const mentionPlugin = createMentionPlugin({
       mentionComponent: ({ entityKey, mention: { name } }) => (
         <BrainMentionItem
           text={name}
-          onRemove={() => removeMention(entityKey)}
+          onRemove={() => {
+            setCurrentBrainId(null);
+            removeMention(entityKey);
+          }}
         />
       ),
-
       popperOptions: {
         placement: "top-end",
       },
     });
-    const { MentionSuggestions: coreMentionSuggestions } = mentionPlugin;
-    const corePlugins = [mentionPlugin];
+    const { MentionSuggestions: LegacyMentionSuggestions } = mentionPlugin;
+    const legacyPlugins = [mentionPlugin];
 
-    return { plugins: corePlugins, MentionSuggestions: coreMentionSuggestions };
+    return {
+      plugins: legacyPlugins,
+      MentionSuggestions: LegacyMentionSuggestions,
+    };
   }, []);
 
   return { MentionSuggestions, plugins };

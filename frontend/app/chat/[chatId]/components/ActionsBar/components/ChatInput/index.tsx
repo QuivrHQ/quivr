@@ -9,7 +9,7 @@ import { MicButton } from "./components/MicButton/MicButton";
 import { useChatInput } from "./hooks/useChatInput";
 
 export const ChatInput = (): JSX.Element => {
-  const { setMessage, submitQuestion, chatId, generatingAnswer } =
+  const { setMessage, submitQuestion, chatId, generatingAnswer, message } =
     useChatInput();
   const { t } = useTranslation(["chat"]);
 
@@ -23,7 +23,11 @@ export const ChatInput = (): JSX.Element => {
       className="sticky flex items-star bottom-0 bg-white dark:bg-black w-full flex justify-center gap-2 z-20"
     >
       <div className="flex flex-1 flex-col items-center">
-        <ChatBar onSubmit={submitQuestion} />
+        <ChatBar
+          message={message}
+          setMessage={setMessage}
+          onSubmit={submitQuestion}
+        />
       </div>
 
       <div className="flex flex-row items-end">

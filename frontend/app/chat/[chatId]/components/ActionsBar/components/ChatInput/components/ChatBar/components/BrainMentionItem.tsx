@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import { MdRemoveCircleOutline } from "react-icons/md";
 
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
@@ -13,12 +12,6 @@ export const BrainMentionItem = ({
   onRemove,
 }: MentionItemProps): JSX.Element => {
   const { setCurrentBrainId } = useBrainContext();
-
-  useEffect(() => {
-    return () => {
-      setCurrentBrainId(null);
-    };
-  }, []);
 
   return (
     <div className="relative inline-block w-fit-content">

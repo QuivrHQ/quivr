@@ -41,7 +41,10 @@ export const ShareBrain = ({
       Trigger={
         <Button
           className="group-hover:visible invisible hover:text-red-500 transition-[colors,opacity] p-1"
-          onClick={() => void 0}
+          onClick={(event) => {
+            event.preventDefault();
+            event.stopPropagation();
+          }}
           variant={"tertiary"}
           data-testId="share-brain-button"
         >
