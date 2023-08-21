@@ -21,6 +21,7 @@
   "noCurrentBrain": "Pas de cerveau actuel",
   "receivedResponse": "Réponse reçue. Commence à gérer le flux...",
   "resposeBodyNull": "Le corps de la réponse est nul",
+  "tooManyRequests": "Vous avez dépassé le nombre de requêtes par jour. Pour continuer à discuter, veuillez entrer une clé d'API OpenAI dans votre profil ou dans le cerveau utilisé.",
   "shortcut_choose_prompt": "#: Choisir une directive spécifique",
   "shortcut_create_brain": "@+: Créer un nouveau cerveau",
   "shortcut_create_prompt": "#+: Créer une nouvelle directive personnalisée",
