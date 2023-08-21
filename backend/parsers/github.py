@@ -4,8 +4,7 @@ import time
 from langchain.document_loaders import GitLoader
 from langchain.schema import Document
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-from models.brains import Brain
-from models.files import File
+from models import Brain, File
 from utils.file import compute_sha1_from_content
 from utils.vectors import Neurons
 

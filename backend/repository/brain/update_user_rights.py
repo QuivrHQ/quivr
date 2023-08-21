@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from models.settings import get_supabase_client
+from models import get_supabase_client
 
 
 def update_brain_user_rights(brain_id: UUID, user_id: UUID, rights: str) -> None:

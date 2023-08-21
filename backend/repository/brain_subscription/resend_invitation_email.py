@@ -1,10 +1,9 @@
 import resend
 from logger import get_logger
-from models.brains_subscription_invitations import BrainSubscription
-from models.settings import BrainSettings
+from models import BrainSubscription, BrainSettings
 
-from repository.brain.get_brain_details import get_brain_details
-from repository.brain_subscription.get_brain_url import get_brain_url
+from repository.brain import get_brain_details
+from repository.brain_subscription import get_brain_url
 
 logger = get_logger(__name__)
 

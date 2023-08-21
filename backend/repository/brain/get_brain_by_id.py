@@ -1,7 +1,6 @@
 from uuid import UUID
 
-from models.brain_entity import BrainEntity
-from models.settings import get_supabase_db
+from models import BrainEntity, get_supabase_db
 
 
 def get_brain_by_id(brain_id: UUID) -> BrainEntity | None:

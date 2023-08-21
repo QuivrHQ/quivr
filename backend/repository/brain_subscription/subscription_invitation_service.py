@@ -1,6 +1,5 @@
 from logger import get_logger
-from models.brains_subscription_invitations import BrainSubscription
-from models.settings import get_supabase_client
+from models import BrainSubscription, get_supabase_client
 
 logger = get_logger(__name__)
 

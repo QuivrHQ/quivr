@@ -1,9 +1,8 @@
 from uuid import UUID
 
 from logger import get_logger
-from models.brain_entity import BrainEntity
-from models.settings import get_supabase_db
-from repository.brain.get_brain_by_id import get_brain_by_id
+from models import BrainEntity, get_supabase_db
+from repository.brain import get_brain_by_id
 
 logger = get_logger(__name__)
 

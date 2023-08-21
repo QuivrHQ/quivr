@@ -6,6 +6,9 @@ toto.txt
 *.ipynb
 log.txt
 
+backend/venv
+backend/.env
+
 
 
 

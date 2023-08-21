@@ -1,10 +1,9 @@
 from typing import Optional
 from uuid import UUID
 
-from models.settings import get_supabase_client
-from models.user_identity import UserIdentity
+from models import get_supabase_client, UserIdentity
 from pydantic import BaseModel
-from repository.user_identity.create_user_identity import create_user_identity
+from repository.user_identity import create_user_identity
 
 
 class UserIdentityUpdatableProperties(BaseModel):

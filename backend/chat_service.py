@@ -1,8 +1,10 @@
 import os
+
 if __name__ == "__main__":
     # import needed here when running main.py to debug backend
     # you will need to run pip install python-dotenv
     from dotenv import load_dotenv
+
     load_dotenv()
 import sentry_sdk
 from fastapi import FastAPI, HTTPException, Request, status
@@ -26,13 +28,8 @@ app = FastAPI()
 
 add_cors_middleware(app)
 
-
-
 app.include_router(chat_router)
 app.include_router(misc_router)
-
-
-
 
 
 @app.exception_handler(HTTPException)
@@ -47,7 +44,7 @@ async def http_exception_handler(_, exc):
 def handle_request_validation_error(app: FastAPI):
     @app.exception_handler(RequestValidationError)
     async def validation_exception_handler(
-        request: Request, exc: RequestValidationError
+            request: Request, exc: RequestValidationError
     ):
         exc_str = f"{exc}".replace("\n", " ").replace("   ", " ")
         logger.error(request, exc_str)
@@ -66,5 +63,5 @@ handle_request_validation_error(app)
 if __name__ == "__main__":
     # run main.py to debug backend
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=5050)
 
+    uvicorn.run(app, host="0.0.0.0", port=5050)

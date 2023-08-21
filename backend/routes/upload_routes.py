@@ -3,11 +3,9 @@ from uuid import UUID
 
 from auth import AuthBearer, get_current_user
 from fastapi import APIRouter, Depends, Query, Request, UploadFile
-from models.brains import Brain
-from models.files import File
-from models.users import User
-from repository.brain.get_brain_details import get_brain_details
-from repository.user_identity.get_user_identity import get_user_identity
+from models import User, File, Brain
+from repository.brain import get_brain_details
+from repository.user_identity import get_user_identity
 from routes.authorizations.brain_authorization import (
     RoleEnum,
     validate_brain_authorization,

@@ -7,22 +7,20 @@ from models.databases.supabase.brains import (
     BrainUpdatableProperties,
     CreateBrainProperties,
 )
-from models.settings import BrainRateLimiting
-from models.users import User
-from repository.brain.create_brain import create_brain
-from repository.brain.create_brain_user import create_brain_user
-from repository.brain.get_brain_details import get_brain_details
-from repository.brain.get_default_user_brain import get_user_default_brain
-from repository.brain.get_default_user_brain_or_create_new import (
+from models import BrainRateLimiting, User
+
+from repository.brain import (
+    create_brain,
+    get_user_brains,
+    get_brain_details,
+    create_brain_user,
+    update_brain_by_id,
+    get_user_default_brain,
+    set_as_default_brain_for_user,
     get_default_user_brain_or_create_new,
 )
-from repository.brain.get_user_brains import get_user_brains
-from repository.brain.set_as_default_brain_for_user import (
-    set_as_default_brain_for_user,
-)
-from repository.brain.update_brain import update_brain_by_id
-from repository.prompt.delete_prompt_py_id import delete_prompt_by_id
-from repository.prompt.get_prompt_by_id import get_prompt_by_id
+
+from repository.prompt import get_prompt_by_id, delete_prompt_by_id
 
 from routes.authorizations.brain_authorization import (
     has_brain_authorization,

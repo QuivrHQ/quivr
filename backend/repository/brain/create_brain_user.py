@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from models.settings import get_supabase_db
+from models import get_supabase_db
 from routes.authorizations.types import RoleEnum
 
 

@@ -1,7 +1,6 @@
 from uuid import UUID
 
-from models.brain_entity import MinimalBrainEntity
-from models.settings import get_supabase_db
+from models import MinimalBrainEntity, get_supabase_db
 
 
 def get_brain_for_user(user_id: UUID, brain_id: UUID) -> MinimalBrainEntity:

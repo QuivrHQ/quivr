@@ -1,6 +1,5 @@
 from models.databases.supabase.prompts import CreatePromptProperties
-from models.prompt import Prompt
-from models.settings import get_supabase_db
+from models import Prompt, get_supabase_db
 
 
 def create_prompt(prompt: CreatePromptProperties) -> Prompt:

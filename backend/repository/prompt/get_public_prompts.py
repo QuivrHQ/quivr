@@ -1,5 +1,4 @@
-from models.prompt import Prompt
-from models.settings import get_supabase_db
+from models import Prompt, get_supabase_db
 
 
 def get_public_prompts() -> list[Prompt]:

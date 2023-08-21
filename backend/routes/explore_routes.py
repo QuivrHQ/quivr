@@ -2,9 +2,7 @@ from uuid import UUID
 
 from auth import AuthBearer, get_current_user
 from fastapi import APIRouter, Depends, Query
-from models.brains import Brain
-from models.settings import get_supabase_db
-from models.users import User
+from models import User, get_supabase_db, Brain
 from routes.authorizations.brain_authorization import (
     RoleEnum,
     has_brain_authorization,
