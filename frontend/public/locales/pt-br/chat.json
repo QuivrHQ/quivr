@@ -34,5 +34,6 @@
   "subtitle": "Converse com um modelo de linguagem sobre seus dados enviados",
   "thinking": "Pensando...",
   "title": "Converse com {{brain}}",
-  "missing_brain": "Cérebro não encontrado"
+  "missing_brain": "Cérebro não encontrado",
+  "new_brain": "Criar novo cérebro"
 }
