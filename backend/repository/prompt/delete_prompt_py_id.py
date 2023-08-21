@@ -1,7 +1,7 @@
 from uuid import UUID
 
 from models.databases.supabase.prompts import DeletePromptResponse
-from models.settings import get_supabase_db
+from models import get_supabase_db
 
 
 def delete_prompt_by_id(prompt_id: UUID) -> DeletePromptResponse:

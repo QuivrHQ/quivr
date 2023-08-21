@@ -2,7 +2,9 @@ import asyncio
 import json
 from typing import AsyncIterable, Awaitable
 from uuid import UUID
+from logger import get_logger
 
+from supabase.client import Client, create_client
 from langchain.callbacks.streaming_aiter import AsyncIteratorCallbackHandler
 from langchain.chains import ConversationalRetrievalChain, LLMChain
 from langchain.chains.question_answering import load_qa_chain
@@ -13,16 +15,19 @@ from langchain.prompts.chat import (
     HumanMessagePromptTemplate,
     SystemMessagePromptTemplate,
 )
+
 from logger import get_logger
-from models.chats import ChatQuestion
+from models import ChatQuestion
 from models.databases.supabase.chats import CreateChatHistory
-from repository.brain.get_brain_by_id import get_brain_by_id
-from repository.brain.get_brain_prompt_id import get_brain_prompt_id
-from repository.chat.format_chat_history import format_chat_history
-from repository.chat.get_chat_history import GetChatHistoryOutput, get_chat_history
-from repository.chat.update_chat_history import update_chat_history
-from repository.chat.update_message_by_id import update_message_by_id
-from repository.prompt.get_prompt_by_id import get_prompt_by_id
+from repository.brain import get_brain_by_id, get_brain_prompt_id
+from repository.chat import (
+    get_chat_history,
+    update_chat_history,
+    format_chat_history,
+    GetChatHistoryOutput,
+    update_message_by_id,
+)
+from repository.prompt import get_prompt_by_id
 from supabase.client import Client, create_client
 from vectorstore.supabase import CustomSupabaseVectorStore
 

@@ -1,8 +1,7 @@
 from uuid import UUID
 
-from models.brain_entity import BrainEntity
 from models.databases.supabase.brains import BrainUpdatableProperties
-from models.settings import get_supabase_db
+from models import BrainEntity, get_supabase_db
 
 
 def update_brain_by_id(brain_id: UUID, brain: BrainUpdatableProperties) -> BrainEntity:

@@ -6,9 +6,12 @@ from asyncpg.exceptions import UniqueViolationError
 from auth import AuthBearer, get_current_user
 from fastapi import APIRouter, Depends
 from logger import get_logger
-from models.settings import get_supabase_db
-from models.users import User
+
+from models import get_supabase_db, User
+
 from pydantic import BaseModel
+
+from models import get_supabase_db, User
 
 logger = get_logger(__name__)
 

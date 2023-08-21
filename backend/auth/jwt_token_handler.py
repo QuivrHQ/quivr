@@ -4,7 +4,7 @@ from typing import Optional
 
 from jose import jwt
 from jose.exceptions import JWTError
-from models.users import User
+from models import User
 
 SECRET_KEY = os.environ.get("JWT_SECRET_KEY")
 ALGORITHM = "HS256"

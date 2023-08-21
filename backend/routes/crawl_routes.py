@@ -6,9 +6,7 @@ from uuid import UUID
 from auth import AuthBearer, get_current_user
 from crawl.crawler import CrawlWebsite
 from fastapi import APIRouter, Depends, Query, Request, UploadFile
-from models.brains import Brain
-from models.files import File
-from models.users import User
+from models import User, Brain, File
 from parsers.github import process_github
 from utils.file import convert_bytes
 from utils.processors import filter_file

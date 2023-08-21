@@ -3,15 +3,12 @@ import time
 
 from auth import AuthBearer, get_current_user
 from fastapi import APIRouter, Depends, Request
-from models.brains import Brain
-from models.settings import BrainRateLimiting
-from models.user_identity import UserIdentity
-from models.users import User
-from repository.brain.get_default_user_brain import get_user_default_brain
-from repository.user_identity.get_user_identity import get_user_identity
-from repository.user_identity.update_user_identity import (
+from models import User, Brain, BrainRateLimiting, UserIdentity
+from repository.brain import get_user_default_brain
+from repository.user_identity import (
     UserIdentityUpdatableProperties,
     update_user_identity,
+    get_user_identity,
 )
 
 user_router = APIRouter()
