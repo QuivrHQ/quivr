@@ -5,15 +5,15 @@ import {
   MentionData,
 } from "@draft-js-plugins/mention";
 import { UUID } from "crypto";
+import { EditorState, getDefaultKeyBinding } from "draft-js";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 
-import { EditorState, getDefaultKeyBinding } from "draft-js";
-import { mapMinimalBrainToMentionData } from "../utils/mapMinimalBrainToMentionData";
 import { useMentionPlugin } from "./helpers/MentionPlugin";
 import { useMentionState } from "./helpers/MentionState";
 import { useMentionUtils } from "./helpers/MentionUtils";
+import { mapMinimalBrainToMentionData } from "../utils/mapMinimalBrainToMentionData";
 
 import "@draft-js-plugins/mention/lib/plugin.css";
 import "draft-js/dist/Draft.css";
@@ -107,13 +107,11 @@ export const useMentionInput = ({
           (item) => item.name === mention.content
         );
         if (correspondingMention !== undefined) {
-          if (mention.trigger === "@") {
-            newEditorState = insertMention(
-              correspondingMention,
-              mention.trigger,
-              newEditorState
-            );
-          }
+          newEditorState = insertMention(
+            correspondingMention,
+            mention.trigger,
+            newEditorState
+          );
         }
       }
     });
@@ -123,6 +121,7 @@ export const useMentionInput = ({
   const keyBindingFn = (e: React.KeyboardEvent<HTMLDivElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
       onSubmit();
+
       return "submit";
     }
 

@@ -2,6 +2,7 @@ import createMentionPlugin from "@draft-js-plugins/mention";
 import { useMemo } from "react";
 
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
+
 import { BrainMentionItem } from "../../../BrainMentionItem";
 
 interface MentionPluginProps {

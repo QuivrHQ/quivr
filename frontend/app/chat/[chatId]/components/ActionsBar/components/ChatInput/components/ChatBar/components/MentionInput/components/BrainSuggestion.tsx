@@ -1,7 +1,3 @@
-import { UUID } from "crypto";
-
-import { ShareBrain } from "@/lib/components/ShareBrain";
-
 type BrainSuggestionProps = {
   content: string;
   id: string;
@@ -10,6 +6,9 @@ export const BrainSuggestion = ({
   content,
   id,
 }: BrainSuggestionProps): JSX.Element => {
+  //TODO: use this id for ShareBrain component
+  console.log({ id });
+
   return (
     <div className="relative flex group items-center">
       <div
@@ -18,9 +17,6 @@ export const BrainSuggestion = ({
         }
       >
         <span className="flex-1">{content}</span>
-      </div>
-      <div className="absolute right-0 flex flex-row">
-        <ShareBrain brainId={id as UUID} name={content} />
       </div>
     </div>
   );

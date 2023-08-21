@@ -1,15 +1,15 @@
 import { EditorState } from "draft-js";
 import { useEffect, useState } from "react";
 
+import { MentionTriggerType } from "@/app/chat/[chatId]/components/ActionsBar/types";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 
-import { MentionTriggerType } from "@/app/chat/[chatId]/components/ActionsBar/types";
 import { MentionInputMentionsType, TriggerMap } from "../../../../types";
 import { mapMinimalBrainToMentionData } from "../../utils/mapMinimalBrainToMentionData";
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const useMentionState = () => {
-  const { allBrains, currentBrainId } = useBrainContext();
+  const { allBrains } = useBrainContext();
   const [editorState, legacySetEditorState] = useState(() =>
     EditorState.createEmpty()
   );
@@ -52,6 +52,7 @@ export const useMentionState = () => {
         });
       }
     });
+
     return mentionTexts;
   };
 
@@ -68,6 +69,7 @@ export const useMentionState = () => {
         });
       }
     });
+
     return plainText;
   };
 

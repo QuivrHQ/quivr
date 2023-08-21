@@ -49,6 +49,7 @@ export const useMentionUtils = (props: MentionUtilsProps) => {
     );
 
     setEditorState(editorStateWithMention);
+
     return editorStateWithMention;
   };
 

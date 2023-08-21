@@ -5,10 +5,9 @@ import Field from "@/lib/components/ui/Field";
 import { Select } from "@/lib/components/ui/Select";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 
-import { BrainRoleType } from "../../../NavBar/components/NavItems/components/BrainsDropDown/components/BrainActions/types";
 import { RemoveAccessIcon } from "./components/RemoveAccessIcon";
 import { useBrainUser } from "./hooks/useBrainUser";
-
+import { BrainRoleType } from "../../../NavBar/components/NavItems/components/BrainsDropDown/components/BrainActions/types";
 type BrainUserProps = {
   email: string;
   role: BrainRoleType;

@@ -40,7 +40,7 @@ export const MentionInput = ({
   const { t } = useTranslation(["chat"]);
 
   return (
-    <div className="w-full">
+    <div className="w-full" data-testid="chat-input">
       <Editor
         editorKey={"editor"}
         editorState={editorState}
@@ -70,6 +70,7 @@ export const MentionInput = ({
           );
         }}
         onAddMention={onAddMention}
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         entryComponent={({ mention, className, ...otherProps }) => (
           <div {...otherProps}>
             <BrainSuggestion id={mention.id as string} content={mention.name} />

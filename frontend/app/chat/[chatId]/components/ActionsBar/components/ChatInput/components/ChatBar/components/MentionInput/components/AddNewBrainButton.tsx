@@ -1,7 +1,7 @@
 import Link from "next/link";
+import { useTranslation } from "react-i18next";
 
 import Button from "@/lib/components/ui/Button";
-import { useTranslation } from "react-i18next";
 
 export const AddNewBrainButton = (): JSX.Element => {
   const { t } = useTranslation(["chat"]);
