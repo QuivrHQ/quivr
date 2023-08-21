@@ -1,5 +1,6 @@
 from concurrent.futures import ThreadPoolExecutor
 from typing import List
+from uuid import UUID
 
 from langchain.embeddings.openai import OpenAIEmbeddings
 from pydantic import BaseModel
@@ -48,7 +49,7 @@ def process_batch(batch_ids: List[str]):
 
     try:
         if len(batch_ids) == 1:
-            return (supabase_db.get_vectors_by_batch(batch_ids[0])).data
+            return (supabase_db.get_vectors_by_batch(UUID(batch_ids[0]))).data
         else:
             return (supabase_db.get_vectors_in_batch(batch_ids)).data
     except Exception as e:

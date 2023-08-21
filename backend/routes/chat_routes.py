@@ -73,7 +73,7 @@ def check_user_limit(
 ):
     if user.user_openai_api_key is None:
         date = time.strftime("%Y%m%d")
-        max_requests_number = int(os.getenv("MAX_REQUESTS_NUMBER", 1))
+        max_requests_number = int(os.getenv("MAX_REQUESTS_NUMBER", 1000))
 
         user.increment_user_request_count(date)
         if int(user.requests_count) >= int(max_requests_number):
@@ -256,7 +256,7 @@ async def create_stream_question_handler(
     # Retrieve user's OpenAI API key
     current_user.user_openai_api_key = request.headers.get("Openai-Api-Key")
     brain = Brain(id=brain_id)
-    brain_details: BrainEntity = None
+    brain_details: BrainEntity | None = None
     if not current_user.user_openai_api_key and brain_id:
         brain_details = get_brain_details(brain_id)
         if brain_details:
