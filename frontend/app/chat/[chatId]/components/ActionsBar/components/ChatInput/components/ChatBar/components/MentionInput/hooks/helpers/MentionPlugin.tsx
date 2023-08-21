@@ -25,9 +25,24 @@ export const useMentionPlugin = (props: MentionPluginProps) => {
           }}
         />
       ),
-      mentionPrefix: "@",
       popperOptions: {
         placement: "top-end",
+        modifiers: [
+          {
+            name: "customStyle", // Custom modifier for applying styles
+            enabled: true,
+            phase: "beforeWrite",
+            fn: ({ state }) => {
+              state.styles.popper = {
+                ...state.styles.popper,
+                minWidth: "auto",
+                backgroundColor: "transparent",
+                padding: "0",
+                marginBottom: "5",
+              };
+            },
+          },
+        ],
       },
     });
     const { MentionSuggestions: LegacyMentionSuggestions } = mentionPlugin;

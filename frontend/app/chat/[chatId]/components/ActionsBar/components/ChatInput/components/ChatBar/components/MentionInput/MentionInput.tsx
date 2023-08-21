@@ -5,8 +5,8 @@ import { useTranslation } from "react-i18next";
 import "@draft-js-plugins/mention/lib/plugin.css";
 import "draft-js/dist/Draft.css";
 
-import { AddNewBrainButton } from "./components";
-import { BrainSuggestion } from "./components/BrainSuggestion";
+import { SuggestionRow } from "./components/SuggestionRow";
+import { SuggestionsContainer } from "./components/SuggestionsContainer";
 import { useMentionInput } from "./hooks/useMentionInput";
 
 type MentionInputProps = {
@@ -49,33 +49,15 @@ export const MentionInput = ({
         ref={mentionInputRef}
         placeholder={t("actions_bar_placeholder")}
         keyBindingFn={keyBindingFn}
-        onBlur={() => mentionInputRef.current?.blur()}
       />
       <MentionSuggestions
         open={open}
         onOpenChange={onOpenChange}
         suggestions={suggestions}
         onSearchChange={onSearchChange}
-        popoverContainer={({ children }) => {
-          return (
-            <div
-              style={{
-                maxWidth: "max-content",
-              }}
-              className="bg-white dark:bg-black border border-black/10 dark:border-white/25 rounded-md shadow-md overflow-y-auto"
-            >
-              {children}
-              <AddNewBrainButton />
-            </div>
-          );
-        }}
+        popoverContainer={SuggestionsContainer}
         onAddMention={onAddMention}
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        entryComponent={({ mention, className, ...otherProps }) => (
-          <div {...otherProps}>
-            <BrainSuggestion id={mention.id as string} content={mention.name} />
-          </div>
-        )}
+        entryComponent={SuggestionRow}
       />
     </div>
   );
