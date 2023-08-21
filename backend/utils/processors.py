@@ -12,6 +12,7 @@ from parsers.pdf import process_pdf
 from parsers.powerpoint import process_powerpoint
 from parsers.txt import process_txt
 from parsers.xlsx import process_xlsx
+from parsers.code_python import process_python
 
 file_processors = {
     ".txt": process_txt,
@@ -34,6 +35,7 @@ file_processors = {
     ".xls": process_xlsx,
     ".epub": process_epub,
     ".ipynb": process_ipnyb,
+    ".py": process_python,
 }
 
 
