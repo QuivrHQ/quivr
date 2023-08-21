@@ -7,7 +7,7 @@ pypdf==3.9.0
 StrEnum==0.4.15
 supabase==1.0.3
 tiktoken==0.4.0
-unstructured==0.6.5
+unstructured==0.6.7
 fastapi==0.95.2
 python-multipart==0.0.6
 uvicorn==0.22.0
@@ -27,3 +27,4 @@ sqlalchemy==2.0.19
 html5lib==1.1
 bs4==0.0.1
 newspaper3k
+xlrd==1.0.0
