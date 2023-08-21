@@ -18,14 +18,14 @@ import { RequestsPerDayChart } from "./Graphs/RequestsPerDayChart";
 export const UserStatistics = (userStats: UserStats): JSX.Element => {
   const { email, current_brain_size, max_brain_size, date, requests_stats } =
     userStats;
-  const { t } = useTranslation(["translation","user"]);
+  const { t } = useTranslation(["translation", "user"]);
 
   return (
     <>
       <div className="flex flex-col sm:flex-row sm:items-center py-10 gap-5">
         <div className="flex-1 flex flex-col">
           <h1 className="text-4xl font-semibold">
-            {t("title", { user: email.split("@")[0], ns: "user"})}
+            {t("title", { user: email.split("@")[0], ns: "user" })}
           </h1>
           <p className="opacity-50">{email}</p>
           <Link className="mt-2" href={"/logout"}>
@@ -42,7 +42,10 @@ export const UserStatistics = (userStats: UserStats): JSX.Element => {
           <div>
             <h1 className="text-2xl font-semibold">
               {/* The last element corresponds to today's request_count */}
-              {t("requestsCount",{ count: requests_stats.at(-1)?.requests_count, ns: "user"})}
+              {t("requestsCount", {
+                count: requests_stats.at(-1)?.daily_requests_count,
+                ns: "user",
+              })}
             </h1>
             <DateComponent date={date} />
           </div>
@@ -53,7 +56,9 @@ export const UserStatistics = (userStats: UserStats): JSX.Element => {
 
         <UserStatisticsCard>
           <div>
-            <h1 className="text-2xl font-semibold">{t("brainSize",{ns: "user"})}</h1>
+            <h1 className="text-2xl font-semibold">
+              {t("brainSize", { ns: "user" })}
+            </h1>
             <p>
               {/* How much brain space is left */}
               {prettyBytes(max_brain_size - current_brain_size, {

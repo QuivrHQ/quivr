@@ -12,7 +12,7 @@ import {
 
 type RequestStat = {
   date: string;
-  requests_count: number;
+  daily_requests_count: number;
   user_id: string;
 };
 
@@ -31,7 +31,7 @@ export const RequestsPerDayChart = ({
 
       return {
         date: format(date, "MM/dd/yyyy"),
-        requests_count: stat ? stat.requests_count : 0,
+        daily_requests_count: stat ? stat.daily_requests_count : 0,
       };
     })
     .reverse();
@@ -57,7 +57,7 @@ export const RequestsPerDayChart = ({
         }}
       />
       <VictoryAxis dependentAxis />
-      <VictoryLine data={data} x="date" y="requests_count" />
+      <VictoryLine data={data} x="date" y="daily_requests_count" />
     </VictoryChart>
   );
 };

@@ -5,7 +5,7 @@ from auth.api_key_handler import get_user_from_api_key, verify_api_key
 from auth.jwt_token_handler import decode_access_token, verify_token
 from fastapi import Depends, HTTPException, Request
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
-from models import User
+from models import UserIdentity
 
 
 class AuthBearer(HTTPBearer):
@@ -36,7 +36,7 @@ class AuthBearer(HTTPBearer):
     async def authenticate(
         self,
         token: str,
-    ) -> User:
+    ) -> UserIdentity:
         if os.environ.get("AUTHENTICATE") == "false":
             return self.get_test_user()
         elif verify_token(token):
@@ -50,11 +50,11 @@ class AuthBearer(HTTPBearer):
         else:
             raise HTTPException(status_code=401, detail="Invalid token or api key.")
 
-    def get_test_user(self) -> User:
-        return User(
+    def get_test_user(self) -> UserIdentity:
+        return UserIdentity(
             email="test@example.com", id="XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX"  # type: ignore
         )  # replace with test user information
 
 
-def get_current_user(user: User = Depends(AuthBearer())) -> User:
+def get_current_user(user: UserIdentity = Depends(AuthBearer())) -> UserIdentity:
     return user

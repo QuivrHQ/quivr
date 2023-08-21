@@ -65,19 +65,25 @@ class Repository(ABC):
         pass
 
     @abstractmethod
-    def create_user(self, user_id: UUID, user_email: str, date: datetime):
+    def create_user_daily_usage(self, user_id: UUID, user_email: str, date: datetime):
         pass
 
     @abstractmethod
-    def get_user_request_stats(self, user_id: UUID):
+    def get_user_usage(self, user_id: UUID):
         pass
 
     @abstractmethod
-    def fetch_user_requests_count(self, user_id: UUID, date: str):
+    def get_user_requests_count_for_day(self, user_id: UUID, date: datetime):
         pass
 
     @abstractmethod
-    def update_user_request_count(self, date: str):
+    def update_user_request_count(self, user_id: UUID, date: str):
+        pass
+
+    @abstractmethod
+    def increment_user_request_count(
+        self, user_id: UUID, date: str, current_request_count
+    ):
         pass
 
     @abstractmethod
@@ -126,10 +132,6 @@ class Repository(ABC):
 
     @abstractmethod
     def get_user_id_by_api_key(self, api_key: UUID):
-        pass
-
-    @abstractmethod
-    def get_user_stats(self, user_email: str, date: datetime):
         pass
 
     @abstractmethod

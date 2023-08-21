@@ -3,7 +3,7 @@ from uuid import UUID
 
 from auth import AuthBearer, get_current_user
 from fastapi import APIRouter, Depends, Query, Request, UploadFile
-from models import User, File, Brain
+from models import Brain, File, UserIdentity
 from repository.brain import get_brain_details
 from repository.user_identity import get_user_identity
 from routes.authorizations.brain_authorization import (
@@ -27,7 +27,7 @@ async def upload_file(
     uploadFile: UploadFile,
     brain_id: UUID = Query(..., description="The ID of the brain"),
     enable_summarization: bool = False,
-    current_user: User = Depends(get_current_user),
+    current_user: UserIdentity = Depends(get_current_user),
 ):
     """
     Upload a file to the user's storage.
@@ -57,7 +57,7 @@ async def upload_file(
     file = File(file=uploadFile)
     if remaining_free_space - file_size < 0:
         message = {
-            "message": f"❌ User's brain will exceed maximum capacity with this upload. Maximum file allowed is : {convert_bytes(remaining_free_space)}",
+            "message": f"❌ UserIdentity's brain will exceed maximum capacity with this upload. Maximum file allowed is : {convert_bytes(remaining_free_space)}",
             "type": "error",
         }
     else:

@@ -1,5 +1,7 @@
-from models.databases.repository import Repository
 from datetime import datetime
+from uuid import UUID
+
+from models.databases.repository import Repository
 
 
 class ApiKeyHandler(Repository):
@@ -26,7 +28,7 @@ class ApiKeyHandler(Repository):
         )
         return response
 
-    def delete_api_key(self, key_id, user_id):
+    def delete_api_key(self, key_id: str, user_id: UUID):
         return (
             self.db.table("api_keys")
             .update(
@@ -39,7 +41,7 @@ class ApiKeyHandler(Repository):
             .execute()
         )
 
-    def get_active_api_key(self, api_key):
+    def get_active_api_key(self, api_key: str):
         response = (
             self.db.table("api_keys")
             .select("api_key", "creation_time")
@@ -49,7 +51,7 @@ class ApiKeyHandler(Repository):
         )
         return response
 
-    def get_user_id_by_api_key(self, api_key):
+    def get_user_id_by_api_key(self, api_key: str):
         response = (
             self.db.table("api_keys")
             .select("user_id")
@@ -58,7 +60,7 @@ class ApiKeyHandler(Repository):
         )
         return response
 
-    def get_user_api_keys(self, user_id):
+    def get_user_api_keys(self, user_id: UUID):
         response = (
             self.db.table("api_keys")
             .select("key_id, creation_time")

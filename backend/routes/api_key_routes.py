@@ -6,12 +6,8 @@ from asyncpg.exceptions import UniqueViolationError
 from auth import AuthBearer, get_current_user
 from fastapi import APIRouter, Depends
 from logger import get_logger
-
-from models import get_supabase_db, User
-
+from models import UserIdentity, get_supabase_db
 from pydantic import BaseModel
-
-from models import get_supabase_db, User
 
 logger = get_logger(__name__)
 
@@ -35,7 +31,7 @@ api_key_router = APIRouter()
     dependencies=[Depends(AuthBearer())],
     tags=["API Key"],
 )
-async def create_api_key(current_user: User = Depends(get_current_user)):
+async def create_api_key(current_user: UserIdentity = Depends(get_current_user)):
     """
     Create new API key for the current user.
 
@@ -71,7 +67,9 @@ async def create_api_key(current_user: User = Depends(get_current_user)):
 @api_key_router.delete(
     "/api-key/{key_id}", dependencies=[Depends(AuthBearer())], tags=["API Key"]
 )
-async def delete_api_key(key_id: str, current_user: User = Depends(get_current_user)):
+async def delete_api_key(
+    key_id: str, current_user: UserIdentity = Depends(get_current_user)
+):
     """
     Delete (deactivate) an API key for the current user.
 
@@ -93,7 +91,7 @@ async def delete_api_key(key_id: str, current_user: User = Depends(get_current_u
     dependencies=[Depends(AuthBearer())],
     tags=["API Key"],
 )
-async def get_api_keys(current_user: User = Depends(get_current_user)):
+async def get_api_keys(current_user: UserIdentity = Depends(get_current_user)):
     """
     Get all active API keys for the current user.
 

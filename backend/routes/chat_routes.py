@@ -14,14 +14,10 @@ from models import (
     BrainEntity,
     Chat,
     ChatQuestion,
-    LLMSettings,
-    User,
+    UserIdentity,
+    UserUsage,
     get_supabase_db,
 )
-from models.brain_entity import BrainEntity
-from models.brains import Brain
-from models.chat import Chat
-from models.chats import ChatQuestion
 from models.databases.supabase.supabase import SupabaseDB
 from repository.brain import get_brain_details
 from repository.chat import (
@@ -67,15 +63,19 @@ def delete_chat_from_db(supabase_db: SupabaseDB, chat_id):
         pass
 
 
-def check_user_limit(
-    user: User,
+def check_user_requests_limit(
+    user: UserIdentity,
 ):
-    if user.user_openai_api_key is None:
-        date = time.strftime("%Y%m%d")
-        max_requests_number = int(os.getenv("MAX_REQUESTS_NUMBER", 1000))
+    userDailyUsage = UserUsage(
+        id=user.id, email=user.email, openai_api_key=user.openai_api_key
+    )
 
-        user.increment_user_request_count(date)
-        if int(user.requests_count) >= int(max_requests_number):
+    date = time.strftime("%Y%m%d")
+    userDailyUsage.handle_increment_user_request_count(date)
+
+    if user.openai_api_key is None:
+        max_requests_number = int(os.getenv("MAX_REQUESTS_NUMBER", 1))
+        if int(userDailyUsage.daily_requests_count) >= int(max_requests_number):
             raise HTTPException(
                 status_code=429,  # pyright: ignore reportPrivateUsage=none
                 detail="You have reached the maximum number of requests for today.",  # pyright: ignore reportPrivateUsage=none
@@ -91,7 +91,7 @@ async def healthz():
 
 # get all chats
 @chat_router.get("/chat", dependencies=[Depends(AuthBearer())], tags=["Chat"])
-async def get_chats(current_user: User = Depends(get_current_user)):
+async def get_chats(current_user: UserIdentity = Depends(get_current_user)):
     """
     Retrieve all chats for the current user.
 
@@ -125,7 +125,7 @@ async def delete_chat(chat_id: UUID):
 async def update_chat_metadata_handler(
     chat_data: ChatUpdatableProperties,
     chat_id: UUID,
-    current_user: User = Depends(get_current_user),
+    current_user: UserIdentity = Depends(get_current_user),
 ) -> Chat:
     """
     Update chat attributes
@@ -144,7 +144,7 @@ async def update_chat_metadata_handler(
 @chat_router.post("/chat", dependencies=[Depends(AuthBearer())], tags=["Chat"])
 async def create_chat_handler(
     chat_data: CreateChatProperties,
-    current_user: User = Depends(get_current_user),
+    current_user: UserIdentity = Depends(get_current_user),
 ):
     """
     Create a new chat with initial chat messages.
@@ -170,25 +170,25 @@ async def create_question_handler(
     brain_id: NullableUUID
     | UUID
     | None = Query(..., description="The ID of the brain"),
-    current_user: User = Depends(get_current_user),
+    current_user: UserIdentity = Depends(get_current_user),
 ) -> GetChatHistoryOutput:
     """
     Add a new question to the chat.
     """
     # Retrieve user's OpenAI API key
-    current_user.user_openai_api_key = request.headers.get("Openai-Api-Key")
+    current_user.openai_api_key = request.headers.get("Openai-Api-Key")
     brain = Brain(id=brain_id)
 
-    if not current_user.user_openai_api_key and brain_id:
+    if not current_user.openai_api_key and brain_id:
         brain_details = get_brain_details(brain_id)
         if brain_details:
-            current_user.user_openai_api_key = brain_details.openai_api_key
+            current_user.openai_api_key = brain_details.openai_api_key
 
-    if not current_user.user_openai_api_key:
+    if not current_user.openai_api_key:
         user_identity = get_user_identity(current_user.id)
 
         if user_identity is not None:
-            current_user.user_openai_api_key = user_identity.openai_api_key
+            current_user.openai_api_key = user_identity.openai_api_key
 
     # Retrieve chat model (temperature, max_tokens, model)
     if (
@@ -202,8 +202,7 @@ async def create_question_handler(
         chat_question.max_tokens = chat_question.max_tokens or brain.max_tokens or 256
 
     try:
-        check_user_limit(current_user)
-        LLMSettings()
+        check_user_requests_limit(current_user)
 
         gpt_answer_generator: HeadlessQA | OpenAIBrainPicking
         if brain_id:
@@ -213,14 +212,14 @@ async def create_question_handler(
                 max_tokens=chat_question.max_tokens,
                 temperature=chat_question.temperature,
                 brain_id=str(brain_id),
-                user_openai_api_key=current_user.user_openai_api_key,  # pyright: ignore reportPrivateUsage=none
+                user_openai_api_key=current_user.openai_api_key,  # pyright: ignore reportPrivateUsage=none
             )
         else:
             gpt_answer_generator = HeadlessQA(
                 model=chat_question.model,
                 temperature=chat_question.temperature,
                 max_tokens=chat_question.max_tokens,
-                user_openai_api_key=current_user.user_openai_api_key,  # pyright: ignore reportPrivateUsage=none
+                user_openai_api_key=current_user.openai_api_key,  # pyright: ignore reportPrivateUsage=none
                 chat_id=str(chat_id),
             )
 
@@ -248,24 +247,24 @@ async def create_stream_question_handler(
     brain_id: NullableUUID
     | UUID
     | None = Query(..., description="The ID of the brain"),
-    current_user: User = Depends(get_current_user),
+    current_user: UserIdentity = Depends(get_current_user),
 ) -> StreamingResponse:
     # TODO: check if the user has access to the brain
 
     # Retrieve user's OpenAI API key
-    current_user.user_openai_api_key = request.headers.get("Openai-Api-Key")
+    current_user.openai_api_key = request.headers.get("Openai-Api-Key")
     brain = Brain(id=brain_id)
     brain_details: BrainEntity | None = None
-    if not current_user.user_openai_api_key and brain_id:
+    if not current_user.openai_api_key and brain_id:
         brain_details = get_brain_details(brain_id)
         if brain_details:
-            current_user.user_openai_api_key = brain_details.openai_api_key
+            current_user.openai_api_key = brain_details.openai_api_key
 
-    if not current_user.user_openai_api_key:
+    if not current_user.openai_api_key:
         user_identity = get_user_identity(current_user.id)
 
         if user_identity is not None:
-            current_user.user_openai_api_key = user_identity.openai_api_key
+            current_user.openai_api_key = user_identity.openai_api_key
 
     # Retrieve chat model (temperature, max_tokens, model)
     if (
@@ -280,36 +279,36 @@ async def create_stream_question_handler(
 
     try:
         logger.info(f"Streaming request for {chat_question.model}")
-        check_user_limit(current_user)
+        check_user_requests_limit(current_user)
         gpt_answer_generator: HeadlessQA | OpenAIBrainPicking
         if brain_id:
             gpt_answer_generator = OpenAIBrainPicking(
                 chat_id=str(chat_id),
                 model=(brain_details or chat_question).model
-                if current_user.user_openai_api_key
+                if current_user.openai_api_key
                 else "gpt-3.5-turbo",
                 max_tokens=(brain_details or chat_question).max_tokens
-                if current_user.user_openai_api_key
+                if current_user.openai_api_key
                 else 0,
                 temperature=(brain_details or chat_question).temperature
-                if current_user.user_openai_api_key
+                if current_user.openai_api_key
                 else 256,
                 brain_id=str(brain_id),
-                user_openai_api_key=current_user.user_openai_api_key,  # pyright: ignore reportPrivateUsage=none
+                user_openai_api_key=current_user.openai_api_key,  # pyright: ignore reportPrivateUsage=none
                 streaming=True,
             )
         else:
             gpt_answer_generator = HeadlessQA(
                 model=chat_question.model
-                if current_user.user_openai_api_key
+                if current_user.openai_api_key
                 else "gpt-3.5-turbo",
                 temperature=chat_question.temperature
-                if current_user.user_openai_api_key
+                if current_user.openai_api_key
                 else 256,
                 max_tokens=chat_question.max_tokens
-                if current_user.user_openai_api_key
+                if current_user.openai_api_key
                 else 0,
-                user_openai_api_key=current_user.user_openai_api_key,  # pyright: ignore reportPrivateUsage=none
+                user_openai_api_key=current_user.openai_api_key,  # pyright: ignore reportPrivateUsage=none
                 chat_id=str(chat_id),
                 streaming=True,
             )
