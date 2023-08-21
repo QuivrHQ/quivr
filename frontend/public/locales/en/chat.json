@@ -12,7 +12,7 @@
     "receivedResponse": "Received response. Starting to handle stream...",
     "errorCallingAPI": "Error calling the API",
     "ask": "Ask a question, or describe a task.",
-    "begin_conversation_placeholder": "Begin conversation here, @ to select a brain or / to select a file",
+    "begin_conversation_placeholder": "Begin conversation here, @ to select a brain...",
     "thinking": "Thinking...",
     "chat": "Chat",
     "errorFetching": "Error occurred while fetching your chats",
