@@ -3,7 +3,7 @@ CREATE TABLE IF NOT EXISTS user_daily_usage(
     user_id UUID REFERENCES auth.users (id),
     email TEXT,
     date TEXT,
-    requests_count INT,
+    daily_requests_count INT,
     PRIMARY KEY (user_id, date)
 );
 

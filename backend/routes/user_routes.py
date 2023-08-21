@@ -3,7 +3,7 @@ import time
 
 from auth import AuthBearer, get_current_user
 from fastapi import APIRouter, Depends, Request
-from models import Brain, BrainRateLimiting, UserDailyUsage, UserIdentity
+from models import Brain, BrainRateLimiting, UserIdentity, UserUsage
 from repository.brain import get_user_default_brain
 from repository.user_identity.get_user_identity import get_user_identity
 from repository.user_identity.update_user_properties import (
@@ -40,7 +40,7 @@ async def get_user_endpoint(
     date = time.strftime("%Y%m%d")
     max_requests_number = os.getenv("MAX_REQUESTS_NUMBER")
 
-    userDailyUsage = UserDailyUsage(id=current_user.id)
+    userDailyUsage = UserUsage(id=current_user.id)
     requests_stats = userDailyUsage.get_user_usage()
     default_brain = get_user_default_brain(current_user.id)
 

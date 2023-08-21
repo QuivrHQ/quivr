@@ -14,8 +14,8 @@ from models import (
     BrainEntity,
     Chat,
     ChatQuestion,
-    UserDailyUsage,
     UserIdentity,
+    UserUsage,
     get_supabase_db,
 )
 from models.databases.supabase.supabase import SupabaseDB
@@ -66,7 +66,7 @@ def delete_chat_from_db(supabase_db: SupabaseDB, chat_id):
 def check_user_requests_limit(
     user: UserIdentity,
 ):
-    userDailyUsage = UserDailyUsage(
+    userDailyUsage = UserUsage(
         id=user.id, email=user.email, openai_api_key=user.openai_api_key
     )
 
@@ -75,7 +75,7 @@ def check_user_requests_limit(
 
     if user.openai_api_key is None:
         max_requests_number = int(os.getenv("MAX_REQUESTS_NUMBER", 1))
-        if int(userDailyUsage.requests_count) >= int(max_requests_number):
+        if int(userDailyUsage.daily_requests_count) >= int(max_requests_number):
             raise HTTPException(
                 status_code=429,  # pyright: ignore reportPrivateUsage=none
                 detail="You have reached the maximum number of requests for today.",  # pyright: ignore reportPrivateUsage=none

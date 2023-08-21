@@ -1,11 +1,11 @@
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 -- Create users table
-CREATE TABLE IF NOT EXISTS users(
+CREATE TABLE IF NOT EXISTS user_daily_usage(
     user_id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
     email TEXT,
     date TEXT,
-    requests_count INT
+    daily_requests_count INT
 );
 
 -- Create chats table

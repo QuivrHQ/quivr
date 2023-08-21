@@ -4,7 +4,7 @@ create table if not exists
     user_id uuid references auth.users (id),
     email text,
     date text,
-    requests_count int,
+    daily_requests_count int,
     primary key (user_id, date)
   );
 

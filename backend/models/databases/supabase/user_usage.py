@@ -7,7 +7,7 @@ from models.databases.repository import Repository
 logger = get_logger(__name__)
 
 
-class UserDailyUsage(Repository):
+class UserUsage(Repository):
     def __init__(self, supabase_client):
         self.db = supabase_client
 
@@ -19,7 +19,7 @@ class UserDailyUsage(Repository):
                     "user_id": str(user_id),
                     "email": user_email,
                     "date": date,
-                    "requests_count": 1,
+                    "daily_requests_count": 1,
                 }
             )
             .execute()
@@ -43,14 +43,14 @@ class UserDailyUsage(Repository):
         """
         response = (
             self.db.from_("user_daily_usage")
-            .select("requests_count")
+            .select("daily_requests_count")
             .filter("user_id", "eq", user_id)
             .filter("date", "eq", date)
             .execute()
         ).data
 
         if response and len(response) > 0:
-            return response[0]["requests_count"]
+            return response[0]["daily_requests_count"]
         return None
 
     def increment_user_request_count(self, user_id, date, current_requests_count: int):
@@ -59,13 +59,13 @@ class UserDailyUsage(Repository):
         """
 
         self.update_user_request_count(
-            user_id, requests_count=current_requests_count + 1, date=date
+            user_id, daily_requests_count=current_requests_count + 1, date=date
         )
 
-    def update_user_request_count(self, user_id, requests_count, date):
+    def update_user_request_count(self, user_id, daily_requests_count, date):
         response = (
             self.db.table("user_daily_usage")
-            .update({"requests_count": requests_count})
+            .update({"daily_requests_count": daily_requests_count})
             .match({"user_id": user_id, "date": date})
             .execute()
         )

@@ -6,8 +6,8 @@ from models.user_identity import UserIdentity
 logger = get_logger(__name__)
 
 
-class UserDailyUsage(UserIdentity):
-    requests_count: int = 0
+class UserUsage(UserIdentity):
+    daily_requests_count: int = 0
 
     def __init__(self, **data):
         super().__init__(**data)
@@ -38,7 +38,7 @@ class UserDailyUsage(UserIdentity):
             self.supabase_db.create_user_daily_usage(
                 user_id=self.id, date=date, user_email=self.email
             )
-            self.requests_count = 1
+            self.daily_requests_count = 1
             return
 
         self.supabase_db.increment_user_request_count(
@@ -47,7 +47,7 @@ class UserDailyUsage(UserIdentity):
             current_requests_count=current_requests_count,
         )
 
-        self.requests_count = current_requests_count
+        self.daily_requests_count = current_requests_count
 
         logger.info(
             f"User {self.email} request count updated to {current_requests_count}"
