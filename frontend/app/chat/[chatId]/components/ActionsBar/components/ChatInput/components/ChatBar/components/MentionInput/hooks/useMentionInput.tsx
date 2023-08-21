@@ -126,6 +126,10 @@ export const useMentionInput = ({
       return "submit";
     }
 
+    if (e.key === "ArrowUp" || e.key === "ArrowDown") {
+      return undefined;
+    }
+
     return getDefaultKeyBinding(e);
   };
 

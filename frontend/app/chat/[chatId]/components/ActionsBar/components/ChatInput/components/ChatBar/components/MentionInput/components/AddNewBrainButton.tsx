@@ -14,7 +14,9 @@ export const AddNewBrainButton = (): JSX.Element => {
         event.stopPropagation();
       }}
     >
-      <Button variant={"tertiary"}>{t("new_brain")}</Button>
+      <Button className="px-5 py-2 text-sm" variant={"tertiary"}>
+        {t("new_brain")}
+      </Button>
     </Link>
   );
 };

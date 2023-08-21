@@ -40,12 +40,7 @@ export const MentionInput = ({
   const { t } = useTranslation(["chat"]);
 
   return (
-    <div
-      className="w-full"
-      onClick={() => {
-        mentionInputRef.current?.focus();
-      }}
-    >
+    <div className="w-full">
       <Editor
         editorKey={"editor"}
         editorState={editorState}
@@ -54,6 +49,7 @@ export const MentionInput = ({
         ref={mentionInputRef}
         placeholder={t("actions_bar_placeholder")}
         keyBindingFn={keyBindingFn}
+        onBlur={() => mentionInputRef.current?.blur()}
       />
       <MentionSuggestions
         open={open}
@@ -62,14 +58,19 @@ export const MentionInput = ({
         onSearchChange={onSearchChange}
         popoverContainer={({ children }) => {
           return (
-            <div className="z-50 bg-white dark:bg-black border border-black/10 dark:border-white/25 rounded-md shadow-md overflow-y-auto min-w-32">
+            <div
+              style={{
+                maxWidth: "max-content",
+              }}
+              className="bg-white dark:bg-black border border-black/10 dark:border-white/25 rounded-md shadow-md overflow-y-auto"
+            >
               {children}
               <AddNewBrainButton />
             </div>
           );
         }}
         onAddMention={onAddMention}
-        entryComponent={({ mention, ...otherProps }) => (
+        entryComponent={({ mention, className, ...otherProps }) => (
           <div {...otherProps}>
             <BrainSuggestion id={mention.id as string} content={mention.name} />
           </div>
