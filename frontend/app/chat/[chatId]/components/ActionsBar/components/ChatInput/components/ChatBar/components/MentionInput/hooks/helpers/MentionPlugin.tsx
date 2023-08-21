@@ -24,6 +24,7 @@ export const useMentionPlugin = (props: MentionPluginProps) => {
           }}
         />
       ),
+      mentionPrefix: "@",
       popperOptions: {
         placement: "top-end",
       },

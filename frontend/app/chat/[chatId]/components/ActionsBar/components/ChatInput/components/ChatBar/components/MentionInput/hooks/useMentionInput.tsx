@@ -9,17 +9,27 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 
+import { EditorState, getDefaultKeyBinding } from "draft-js";
 import { mapMinimalBrainToMentionData } from "../utils/mapMinimalBrainToMentionData";
 import { useMentionPlugin } from "./helpers/MentionPlugin";
 import { useMentionState } from "./helpers/MentionState";
 import { useMentionUtils } from "./helpers/MentionUtils";
 
+import "@draft-js-plugins/mention/lib/plugin.css";
+import "draft-js/dist/Draft.css";
+
 type UseMentionInputProps = {
   message: string;
+  onSubmit: () => void;
+  setMessage: (text: string) => void;
 };
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-export const useMentionInput = ({ message }: UseMentionInputProps) => {
+export const useMentionInput = ({
+  message,
+  onSubmit,
+  setMessage,
+}: UseMentionInputProps) => {
   const { allBrains, currentBrainId, setCurrentBrainId } = useBrainContext();
 
   const {
@@ -29,6 +39,8 @@ export const useMentionInput = ({ message }: UseMentionInputProps) => {
     mentionItems,
     setSuggestions,
     suggestions,
+    getEditorCurrentMentions,
+    getEditorTextWithoutMentions,
   } = useMentionState();
 
   const { removeMention, insertMention } = useMentionUtils({
@@ -86,6 +98,49 @@ export const useMentionInput = ({ message }: UseMentionInputProps) => {
     }
   };
 
+  const resetEditorContent = () => {
+    const currentMentions = getEditorCurrentMentions();
+    let newEditorState = EditorState.createEmpty();
+    currentMentions.forEach((mention) => {
+      if (mention.trigger === "@") {
+        const correspondingMention = mentionItems["@"].find(
+          (item) => item.name === mention.content
+        );
+        if (correspondingMention !== undefined) {
+          if (mention.trigger === "@") {
+            newEditorState = insertMention(
+              correspondingMention,
+              mention.trigger,
+              newEditorState
+            );
+          }
+        }
+      }
+    });
+    setEditorState(newEditorState);
+  };
+
+  const keyBindingFn = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      onSubmit();
+      return "submit";
+    }
+
+    return getDefaultKeyBinding(e);
+  };
+
+  const handleEditorChange = (newEditorState: EditorState) => {
+    setEditorState(newEditorState);
+    const currentMessage = getEditorTextWithoutMentions(newEditorState);
+    setMessage(currentMessage);
+  };
+
+  useEffect(() => {
+    if (message === "") {
+      resetEditorContent();
+    }
+  }, [message]);
+
   useEffect(() => {
     setSuggestions(mapMinimalBrainToMentionData(mentionItems["@"]));
   }, [mentionItems]);
@@ -134,10 +189,9 @@ export const useMentionInput = ({ message }: UseMentionInputProps) => {
     open,
     suggestions,
     onAddMention,
-    setEditorState,
     editorState,
     insertCurrentBrainAsMention,
-    mentionItems,
-    insertMention,
+    handleEditorChange,
+    keyBindingFn,
   };
 };

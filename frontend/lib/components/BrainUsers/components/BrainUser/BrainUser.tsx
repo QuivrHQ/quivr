@@ -1,4 +1,3 @@
-/* eslint-disable max-lines */
 import { useTranslation } from "react-i18next";
 
 import { availableRoles } from "@/lib/components/ShareBrain/types";
@@ -6,9 +5,9 @@ import Field from "@/lib/components/ui/Field";
 import { Select } from "@/lib/components/ui/Select";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 
+import { BrainRoleType } from "../../../NavBar/components/NavItems/components/BrainsDropDown/components/BrainActions/types";
 import { RemoveAccessIcon } from "./components/RemoveAccessIcon";
 import { useBrainUser } from "./hooks/useBrainUser";
-import { BrainRoleType } from "../../../NavBar/components/NavItems/components/BrainsDropDown/components/BrainActions/types";
 
 type BrainUserProps = {
   email: string;

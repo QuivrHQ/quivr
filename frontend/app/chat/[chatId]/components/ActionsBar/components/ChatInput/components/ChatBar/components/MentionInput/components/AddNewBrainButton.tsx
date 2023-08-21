@@ -10,6 +10,6 @@ export const AddNewBrainButton = (): JSX.Element => (
       event.stopPropagation();
     }}
   >
-    <Button variant={"tertiary"}>Add new brain</Button>
+    <Button variant={"tertiary"}>Create new brain</Button>
   </Link>
 );
