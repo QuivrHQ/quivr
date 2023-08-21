@@ -25,6 +25,7 @@ export const useMentionPlugin = (props: MentionPluginProps) => {
           }}
         />
       ),
+
       popperOptions: {
         placement: "top-end",
         modifiers: [
