@@ -3,12 +3,12 @@ import time
 
 from auth import AuthBearer, get_current_user
 from fastapi import APIRouter, Depends, Request
-from models import User, Brain, BrainRateLimiting, UserIdentity
+from models import Brain, BrainRateLimiting, UserIdentity, UserUsage
 from repository.brain import get_user_default_brain
-from repository.user_identity import (
-    UserIdentityUpdatableProperties,
-    update_user_identity,
-    get_user_identity,
+from repository.user_identity.get_user_identity import get_user_identity
+from repository.user_identity.update_user_properties import (
+    UserUpdatableProperties,
+    update_user_properties,
 )
 
 user_router = APIRouter()
@@ -18,7 +18,7 @@ MAX_BRAIN_SIZE_WITH_OWN_KEY = int(os.getenv("MAX_BRAIN_SIZE_WITH_KEY", 209715200
 
 @user_router.get("/user", dependencies=[Depends(AuthBearer())], tags=["User"])
 async def get_user_endpoint(
-    request: Request, current_user: User = Depends(get_current_user)
+    request: Request, current_user: UserIdentity = Depends(get_current_user)
 ):
     """
     Get user information and statistics.
@@ -39,7 +39,9 @@ async def get_user_endpoint(
 
     date = time.strftime("%Y%m%d")
     max_requests_number = os.getenv("MAX_REQUESTS_NUMBER")
-    requests_stats = current_user.get_user_request_stats()
+
+    userDailyUsage = UserUsage(id=current_user.id)
+    requests_stats = userDailyUsage.get_user_usage()
     default_brain = get_user_default_brain(current_user.id)
 
     if default_brain:
@@ -64,13 +66,13 @@ async def get_user_endpoint(
     tags=["User"],
 )
 def update_user_identity_route(
-    user_identity_updatable_properties: UserIdentityUpdatableProperties,
-    current_user: User = Depends(get_current_user),
+    user_identity_updatable_properties: UserUpdatableProperties,
+    current_user: UserIdentity = Depends(get_current_user),
 ) -> UserIdentity:
     """
     Update user identity.
     """
-    return update_user_identity(current_user.id, user_identity_updatable_properties)
+    return update_user_properties(current_user.id, user_identity_updatable_properties)
 
 
 @user_router.get(
@@ -79,7 +81,7 @@ def update_user_identity_route(
     tags=["User"],
 )
 def get_user_identity_route(
-    current_user: User = Depends(get_current_user),
+    current_user: UserIdentity = Depends(get_current_user),
 ) -> UserIdentity:
     """
     Get user identity.

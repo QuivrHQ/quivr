@@ -2,7 +2,7 @@ from uuid import UUID
 
 from auth import AuthBearer, get_current_user
 from fastapi import APIRouter, Depends, Query
-from models import User, get_supabase_db, Brain
+from models import Brain, UserIdentity, get_supabase_db
 from routes.authorizations.brain_authorization import (
     RoleEnum,
     has_brain_authorization,
@@ -36,7 +36,7 @@ async def explore_endpoint(
 )
 async def delete_endpoint(
     file_name: str,
-    current_user: User = Depends(get_current_user),
+    current_user: UserIdentity = Depends(get_current_user),
     brain_id: UUID = Query(..., description="The ID of the brain"),
 ):
     """
@@ -54,7 +54,7 @@ async def delete_endpoint(
     "/explore/{file_name}/", dependencies=[Depends(AuthBearer())], tags=["Explore"]
 )
 async def download_endpoint(
-    file_name: str, current_user: User = Depends(get_current_user)
+    file_name: str, current_user: UserIdentity = Depends(get_current_user)
 ):
     """
     Download a specific user file by file name.

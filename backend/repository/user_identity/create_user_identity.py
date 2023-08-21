@@ -1,12 +1,23 @@
-from models import get_supabase_client, UserIdentity
+from typing import Optional
+from uuid import UUID
+
+from models import UserIdentity, get_supabase_client
 
 
-def create_user_identity(user_identity: UserIdentity) -> UserIdentity:
+def create_user_identity(id: UUID, openai_api_key: Optional[str]) -> UserIdentity:
     supabase_client = get_supabase_client()
-    user_identity_dict = user_identity.dict()
-    user_identity_dict["user_id"] = str(user_identity.user_id)
-    response = (
-        supabase_client.from_("user_identity").insert(user_identity_dict).execute()
-    )
 
-    return UserIdentity(**response.data[0])
+    response = (
+        supabase_client.from_("user_identity")
+        .insert(
+            {
+                "user_id": str(id),
+                "openai_api_key": openai_api_key,
+            }
+        )
+        .execute()
+    )
+    user_identity = response.data[0]
+    return UserIdentity(
+        id=user_identity.user_id, openai_api_key=user_identity.openai_api_key
+    )

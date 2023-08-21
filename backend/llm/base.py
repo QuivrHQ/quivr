@@ -44,6 +44,7 @@ class BaseBrainPicking(BaseModel):
     def _determine_streaming(self, model: str, streaming: bool) -> bool:
         """If the model name allows for streaming and streaming is declared, set streaming to True."""
         return streaming
+
     def _determine_callback_array(
         self, streaming
     ) -> List[AsyncIteratorCallbackHandler]:  # pyright: ignore reportPrivateUsage=none
@@ -83,7 +84,7 @@ class BaseBrainPicking(BaseModel):
             This function should also call: _create_qa, get_chat_history and format_chat_history.
             It should also update the chat_history in the DB.
             """
-        
+
         @abstractmethod
         async def generate_stream(self, question: str) -> AsyncIterable:
             """

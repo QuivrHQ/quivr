@@ -5,5 +5,6 @@ from pydantic import BaseModel
 
 
 class UserIdentity(BaseModel):
-    user_id: UUID
+    id: UUID
+    email: Optional[str] = None
     openai_api_key: Optional[str] = None

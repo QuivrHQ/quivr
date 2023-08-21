@@ -6,7 +6,7 @@ from uuid import UUID
 from auth import AuthBearer, get_current_user
 from crawl.crawler import CrawlWebsite
 from fastapi import APIRouter, Depends, Query, Request, UploadFile
-from models import User, Brain, File
+from models import Brain, File, UserIdentity
 from parsers.github import process_github
 from utils.file import convert_bytes
 from utils.processors import filter_file
@@ -25,7 +25,7 @@ async def crawl_endpoint(
     crawl_website: CrawlWebsite,
     brain_id: UUID = Query(..., description="The ID of the brain"),
     enable_summarization: bool = False,
-    current_user: User = Depends(get_current_user),
+    current_user: UserIdentity = Depends(get_current_user),
 ):
     """
     Crawl a website and process the crawled data.
@@ -34,6 +34,7 @@ async def crawl_endpoint(
     # [TODO] check if the user is the owner/editor of the brain
     brain = Brain(id=brain_id)
 
+    # [TODO] rate limiting of user for crawl
     if request.headers.get("Openai-Api-Key"):
         brain.max_brain_size = int(os.getenv("MAX_BRAIN_SIZE_WITH_KEY", 209715200))
 
@@ -42,7 +43,7 @@ async def crawl_endpoint(
 
     if remaining_free_space - file_size < 0:
         message = {
-            "message": f"❌ User's brain will exceed maximum capacity with this upload. Maximum file allowed is : {convert_bytes(remaining_free_space)}",
+            "message": f"❌ UserIdentity's brain will exceed maximum capacity with this upload. Maximum file allowed is : {convert_bytes(remaining_free_space)}",
             "type": "error",
         }
     else:

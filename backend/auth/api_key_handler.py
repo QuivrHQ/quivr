@@ -3,7 +3,7 @@ from uuid import UUID
 
 from fastapi import HTTPException
 from models.settings import get_supabase_db
-from models.users import User
+from models.user_identity import UserIdentity
 from pydantic import DateError
 
 
@@ -33,7 +33,7 @@ async def verify_api_key(
 
 async def get_user_from_api_key(
     api_key: str,
-) -> User:
+) -> UserIdentity:
     supabase_db = get_supabase_db()
 
     # Lookup the user_id from the api_keys table
@@ -45,7 +45,6 @@ async def get_user_from_api_key(
     user_id = user_id_data.data[0]["user_id"]
 
     # Lookup the email from the users table. Todo: remove and use user_id for credentials
-    user_email_data = supabase_db.get_user_email(user_id)
-    email = user_email_data.data[0]["email"] if user_email_data.data else None
+    email = supabase_db.get_user_email(user_id)
 
-    return User(email=email, id=user_id)
+    return UserIdentity(email=email, id=user_id)
