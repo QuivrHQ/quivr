@@ -1,4 +1,4 @@
-import { BrainRoleType } from "../../../types";
+import { BrainRoleType } from "../../NavBar/components/NavItems/components/BrainsDropDown/components/BrainActions/types";
 
 export type SelectOptionsProps = {
   label: string;

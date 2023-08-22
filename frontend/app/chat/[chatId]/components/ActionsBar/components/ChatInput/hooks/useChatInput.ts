@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import { useChat } from "../../../hooks/useChat";
+import { useChat } from "@/app/chat/[chatId]/hooks/useChat";
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const useChatInput = () => {
@@ -8,9 +8,6 @@ export const useChatInput = () => {
   const { addQuestion, generatingAnswer, chatId } = useChat();
 
   const submitQuestion = () => {
-    if (message.length === 0) {
-      return;
-    }
     if (!generatingAnswer) {
       void addQuestion(message, () => setMessage(""));
     }

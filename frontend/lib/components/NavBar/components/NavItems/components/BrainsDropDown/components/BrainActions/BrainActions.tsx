@@ -1,6 +1,7 @@
+import { ShareBrain } from "@/lib/components/ShareBrain";
 import { MinimalBrainForUser } from "@/lib/context/BrainProvider/types";
 
-import { DeleteBrain, ShareBrain } from "./components";
+import { DeleteBrain } from "./components";
 import { BrainRoleType } from "./types";
 
 type BrainActionsProps = {

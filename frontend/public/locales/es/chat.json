@@ -1,7 +1,6 @@
 {
-  "actions_bar_placeholder": "Haz una pregunta a @brains o /files y elige tu #indicación",
+  "actions_bar_placeholder": "Haz una pregunta a @brains",
   "ask": "Has una pregunta o describe un tarea.",
-  "begin_conversation_placeholder": "Inicia la conversación aquí...",
   "brain": "cerebro",
   "brains": "cerebros",
   "chat": "Conversar",
@@ -34,5 +33,6 @@
   "subtitle": "Habla con un modelo de lenguaje acerca de tus datos subidos",
   "thinking": "Pensando...",
   "title": "Conversa con {{brain}}",
-  "missing_brain": "No hay cerebro seleccionado"
+  "missing_brain": "No hay cerebro seleccionado",
+  "new_brain": "Crear nuevo cerebro"
 }
