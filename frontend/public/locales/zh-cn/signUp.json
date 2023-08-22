@@ -1,0 +1,13 @@
+{
+    "title": "注册",
+    "subtitle": "创建您的帐户",
+    "email": "Email",
+    "password": "Password",
+    "loginButton": "登录",
+    "signUpButton": "注册",
+    "or": "或",
+    "login": "已经注册？登录",
+    "googleLogin": "使用Google登录",
+    "errorSignUp": "注册时出错： {{errorMessage}}",
+    "mailSended": "确认邮件已发送，请检查您的邮箱"
+}
