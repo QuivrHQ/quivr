@@ -1,4 +1,3 @@
-/* eslint-disable */
 "use client";
 import { AnimatePresence } from "framer-motion";
 import { useTranslation } from "react-i18next";
@@ -21,8 +20,7 @@ export const FileUploader = (): JSX.Element => {
     setFiles,
   } = useFileUploader();
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const {t, i18n} = useTranslation(["translation","upload"]);
+  const { t } = useTranslation(["translation", "upload"]);
 
   return (
     <section
@@ -35,13 +33,13 @@ export const FileUploader = (): JSX.Element => {
             <input {...getInputProps()} />
             <div className="text-center p-6 max-w-sm w-full flex flex-col gap-5 items-center">
               {isDragActive ? (
-                <p className="text-blue-600">{t("drop",{"ns":"upload"})}</p>
+                <p className="text-blue-600">{t("drop", { ns: "upload" })}</p>
               ) : (
                 <button
                   onClick={open}
                   className="opacity-50 h-full cursor-pointer hover:opacity-100 hover:underline transition-opacity"
                 >
-                  {t("dragAndDrop",{"ns":"upload"})}
+                  {t("dragAndDrop", { ns: "upload" })}
                 </button>
               )}
             </div>
@@ -73,6 +71,4 @@ export const FileUploader = (): JSX.Element => {
       </div>
     </section>
   );
-
-  
 };
