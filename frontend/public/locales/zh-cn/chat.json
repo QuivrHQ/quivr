@@ -29,7 +29,7 @@
     "shortcut_manage_brains": "CMDB: 管理你的大脑",
     "shortcut_go_to_user_page": "CMDU: 进入用户页面",
     "shortcut_go_to_shortcuts": "CMDK: 前往快捷方式",
-    "chat_title_intro": "与您的聊天",
+    "chat_title_intro": "来聊天吧，通过你的",
     "empty_brain_title_prefix": "上传文件到",
     "empty_brain_title_suffix": "和他们聊天",
     "actions_bar_placeholder": "向 @brains 或 /files 提问，并选择您的 #prompt",
