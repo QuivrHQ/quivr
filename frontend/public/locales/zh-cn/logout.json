@@ -1,0 +1,8 @@
+{
+    "title": "注销",
+    "subtitle": "下次见",
+    "areYouSure": "是否确实要注销？",
+    "cancel": "返回",
+    "error": "注销时出错 {{errorMessage}}",
+    "loggedOut": "注销成功"
+}
