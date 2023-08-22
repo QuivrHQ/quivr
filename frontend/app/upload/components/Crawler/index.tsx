@@ -1,4 +1,3 @@
-/* eslint-disable */
 "use client";
 import { Suspense } from "react";
 import { useTranslation } from "react-i18next";
@@ -14,10 +13,10 @@ export const Crawler = (): JSX.Element => {
   const { urlInputRef, isCrawling, crawlWebsite } = useCrawler();
   const { currentBrain } = useBrainContext();
 
-  const {t, i18n} = useTranslation(["translation","upload"]);
+  const { t } = useTranslation(["translation", "upload"]);
 
-  function Crawler() {
-    return (
+  return (
+    <Suspense fallback={"Loading..."}>
       <div className="w-full">
         <div className="flex justify-center gap-5 px-6">
           <div className="max-w-xl w-full">
@@ -28,7 +27,7 @@ export const Crawler = (): JSX.Element => {
                     name="crawlurl"
                     ref={urlInputRef}
                     type="text"
-                    placeholder={t("webSite",{ ns: "upload"})}
+                    placeholder={t("webSite", { ns: "upload" })}
                     className="w-full"
                   />
                 </div>
@@ -45,13 +44,6 @@ export const Crawler = (): JSX.Element => {
           </div>
         </div>
       </div>
-    );
-  }
-
-  return (
-    <Suspense fallback = {"Loading..."}>
-      <Crawler />
     </Suspense>
-  )
-  
+  );
 };
