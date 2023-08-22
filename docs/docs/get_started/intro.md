@@ -117,7 +117,6 @@ docker compose -f docker-compose.yml up --build
 - **Step 6**: Navigate to `localhost:3000` in your browser
 
 - **Step 7**: Want to contribute to the project?
-- **Step 7**: Want to contribute to the project?
 
 ```
 docker compose -f docker-compose.dev.yml up --build
