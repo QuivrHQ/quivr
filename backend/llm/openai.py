@@ -1,6 +1,10 @@
+from typing import Optional
+from uuid import UUID
+
 from langchain.embeddings.openai import OpenAIEmbeddings
-from llm.qa_base import QABaseBrainPicking
 from logger import get_logger
+
+from llm.qa_base import QABaseBrainPicking
 
 logger = get_logger(__name__)
 
@@ -22,6 +26,7 @@ class OpenAIBrainPicking(QABaseBrainPicking):
         chat_id: str,
         max_tokens: int,
         user_openai_api_key: str,
+        prompt_id: Optional[UUID],
         streaming: bool = False,
     ) -> "OpenAIBrainPicking":  # pyright: ignore reportPrivateUsage=none
         """
@@ -36,6 +41,7 @@ class OpenAIBrainPicking(QABaseBrainPicking):
             temperature=temperature,
             user_openai_api_key=user_openai_api_key,
             streaming=streaming,
+            prompt_id=prompt_id,
         )
 
     @property

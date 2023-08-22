@@ -1,2 +1,1 @@
-export * from "./MentionItem";
-export * from "./MentionsInput";
+export * from "./ChatInput";

@@ -1,4 +1,4 @@
-import { ChatInput } from "../ChatInput";
+import { ChatInput } from "./components";
 
 export const ActionsBar = (): JSX.Element => {
   return (
