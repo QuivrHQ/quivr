@@ -32,7 +32,7 @@ services:
       context: backend
       dockerfile: Dockerfile
     container_name: backend-core
-    command: uvicorn main:app --host 0.0.0.0 --port 5050
+    command: uvicorn main:app --reload --host 0.0.0.0 --port 5050
     restart: always
     volumes:
       - ./backend/:/code/
@@ -49,7 +49,7 @@ services:
       context: backend
       dockerfile: Dockerfile
     container_name: backend-chat
-    command: uvicorn chat_service:app --host 0.0.0.0 --port 5050
+    command: uvicorn --reload chat_service:app --host 0.0.0.0 --port 5050
     restart: always
     volumes:
       - ./backend/:/code/
@@ -66,7 +66,7 @@ services:
       context: backend
       dockerfile: Dockerfile
     container_name: backend-crawl
-    command: uvicorn crawl_service:app --host 0.0.0.0 --port 5050
+    command: uvicorn --reload crawl_service:app --host 0.0.0.0 --port 5050
     restart: always
     volumes:
       - ./backend/:/code/
@@ -83,7 +83,7 @@ services:
       context: backend
       dockerfile: Dockerfile
     container_name: backend-upload
-    command: uvicorn upload_service:app --host 0.0.0.0 --port 5050
+    command: uvicorn --reload upload_service:app --host 0.0.0.0 --port 5050
     restart: always
     volumes:
       - ./backend/:/code/
