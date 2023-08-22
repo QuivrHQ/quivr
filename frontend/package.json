@@ -16,6 +16,8 @@
     "format-fix": "prettier --write ."
   },
   "dependencies": {
+    "@draft-js-plugins/editor": "^4.1.4",
+    "@draft-js-plugins/mention": "^5.2.2",
     "@emotion/react": "^11.11.0",
     "@emotion/styled": "^11.11.0",
     "@growthbook/growthbook-react": "^0.17.0",
@@ -33,6 +35,7 @@
     "@supabase/auth-ui-shared": "^0.1.6",
     "@supabase/supabase-js": "^2.22.0",
     "@types/dom-speech-recognition": "^0.0.1",
+    "@types/draft-js": "^0.11.12",
     "@types/node": "20.1.7",
     "@types/react": "18",
     "@types/react-dom": "18",
@@ -44,6 +47,7 @@
     "class-variance-authority": "^0.7.0",
     "clsx": "^1.2.1",
     "date-fns": "^2.30.0",
+    "draft-js": "^0.11.7",
     "encoding": "^0.1.13",
     "eslint": "^8.41.0",
     "eslint-config-next": "13.4.2",

@@ -1,17 +1,17 @@
 /* eslint-disable max-lines */
 import axios, { AxiosResponse } from "axios";
 import { useState } from "react";
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from "react-i18next";
 
 import { Subscription } from "@/lib/api/brain/brain";
 import { useBrainApi } from "@/lib/api/brain/useBrainApi";
 import { useToast } from "@/lib/hooks";
 
-import { generateBrainAssignation } from "../components/NavBar/components/NavItems/components/BrainsDropDown/components/BrainActions/components/ShareBrain/utils/generateBrainAssignation";
 import {
   BrainRoleAssignation,
   BrainRoleType,
 } from "../components/NavBar/components/NavItems/components/BrainsDropDown/components/BrainActions/types";
+import { generateBrainAssignation } from "../components/ShareBrain/utils/generateBrainAssignation";
 import { useBrainContext } from "../context/BrainProvider/hooks/useBrainContext";
 
 const requiredAccessToShareBrain: BrainRoleType[] = ["Owner", "Editor"];
@@ -23,7 +23,7 @@ export const useShareBrain = (brainId: string) => {
   const [roleAssignations, setRoleAssignation] = useState<
     BrainRoleAssignation[]
   >([generateBrainAssignation()]);
-  const { t } = useTranslation(['brain']);
+  const { t } = useTranslation(["brain"]);
 
   const baseUrl = window.location.origin;
   const brainShareLink = `${baseUrl}/invitation/${brainId}`;
@@ -40,7 +40,7 @@ export const useShareBrain = (brainId: string) => {
     await navigator.clipboard.writeText(brainShareLink);
     publish({
       variant: "success",
-      text: t('copiedToClipboard',{ns: 'brain'}),
+      text: t("copiedToClipboard", { ns: "brain" }),
     });
   };
 
@@ -104,7 +104,7 @@ export const useShareBrain = (brainId: string) => {
       } else {
         publish({
           variant: "danger",
-          text: t("errorSendingInvitation")
+          text: t("errorSendingInvitation"),
         });
       }
     } finally {
