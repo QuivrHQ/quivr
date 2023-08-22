@@ -6,11 +6,11 @@ import Field from "@/lib/components/ui/Field";
 import { Select } from "@/lib/components/ui/Select";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 
-import { userRoleToAssignableRoles } from "./NavBar/components/NavItems/components/BrainsDropDown/components/BrainActions/components/ShareBrain/types";
 import {
   BrainRoleAssignation,
   BrainRoleType,
 } from "./NavBar/components/NavItems/components/BrainsDropDown/components/BrainActions/types";
+import { userRoleToAssignableRoles } from "./ShareBrain/types";
 
 type UserToInviteProps = {
   onChange: (newRole: BrainRoleAssignation) => void;
@@ -43,10 +43,10 @@ export const UserToInvite = ({
   }
 
   const assignableRoles = userRoleToAssignableRoles[currentBrain.role];
-  const translatedOptions = assignableRoles.map(role => ({
+  const translatedOptions = assignableRoles.map((role) => ({
     value: role.value,
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-    label: t(role.value)
+    label: t(role.value),
   }));
 
   return (

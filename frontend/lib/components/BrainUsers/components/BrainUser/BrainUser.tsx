@@ -1,15 +1,13 @@
-/* eslint-disable max-lines */
-import { useTranslation } from 'react-i18next'
+import { useTranslation } from "react-i18next";
 
+import { availableRoles } from "@/lib/components/ShareBrain/types";
 import Field from "@/lib/components/ui/Field";
 import { Select } from "@/lib/components/ui/Select";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 
 import { RemoveAccessIcon } from "./components/RemoveAccessIcon";
 import { useBrainUser } from "./hooks/useBrainUser";
-import { availableRoles } from "../../../NavBar/components/NavItems/components/BrainsDropDown/components/BrainActions/components/ShareBrain/types";
 import { BrainRoleType } from "../../../NavBar/components/NavItems/components/BrainsDropDown/components/BrainActions/types";
-
 type BrainUserProps = {
   email: string;
   role: BrainRoleType;
@@ -54,7 +52,7 @@ export const BrainUser = ({
           name="email"
           required
           type="email"
-          placeholder= {t('email')}
+          placeholder={t("email")}
           value={email}
           data-testid="role-assignation-email-input"
           readOnly

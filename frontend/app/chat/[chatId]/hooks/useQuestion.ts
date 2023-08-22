@@ -1,12 +1,9 @@
-/* eslint-disable max-lines */
-
 import axios from "axios";
 import { useTranslation } from "react-i18next";
 
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 import { useChatContext } from "@/lib/context/ChatProvider/hooks/useChatContext";
-import { useFetch } from "@/lib/hooks";
-import { useToast } from "@/lib/hooks/useToast";
+import { useFetch, useToast } from "@/lib/hooks";
 
 import { ChatHistory, ChatQuestion } from "../types";
 

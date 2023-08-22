@@ -1,7 +1,6 @@
 {
-  "actions_bar_placeholder": "Posez une question à @brains ou /files et choisissez votre #invite",
+  "actions_bar_placeholder": "Posez une question à @brains",
   "ask": "Posez une question ou décrivez une tâche.",
-  "begin_conversation_placeholder": "Commencez la conversation ici...",
   "brain": "cerveau",
   "brains": "cerveaux",
   "chat": "Chat",
@@ -34,5 +33,6 @@
   "subtitle": "Parlez à un modèle linguistique de vos données téléchargées",
   "thinking": "Réflexion...",
   "title": "Discuter avec {{brain}}",
-  "missing_brain": "Veuillez selectionner un cerveau pour discuter"
+  "missing_brain": "Veuillez selectionner un cerveau pour discuter",
+  "new_brain": "Créer un nouveau cerveau"
 }
