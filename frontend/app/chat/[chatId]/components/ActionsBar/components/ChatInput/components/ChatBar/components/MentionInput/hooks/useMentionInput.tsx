@@ -13,10 +13,9 @@ import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainConte
 import { useMentionPlugin } from "./helpers/MentionPlugin";
 import { useMentionState } from "./helpers/MentionState";
 import { useMentionUtils } from "./helpers/MentionUtils";
-import { mapMinimalBrainToMentionData } from "../utils/mapMinimalBrainToMentionData";
-
 import "@draft-js-plugins/mention/lib/plugin.css";
 import "draft-js/dist/Draft.css";
+import { mapMinimalBrainToMentionData } from "../utils/mapMinimalBrainToMentionData";
 
 type UseMentionInputProps = {
   message: string;
@@ -30,7 +29,13 @@ export const useMentionInput = ({
   onSubmit,
   setMessage,
 }: UseMentionInputProps) => {
-  const { allBrains, currentBrainId, setCurrentBrainId } = useBrainContext();
+  const {
+    allBrains,
+    currentBrainId,
+    currentPromptId,
+    setCurrentBrainId,
+    setCurrentPromptId,
+  } = useBrainContext();
 
   const {
     editorState,
@@ -41,6 +46,7 @@ export const useMentionInput = ({
     suggestions,
     getEditorCurrentMentions,
     getEditorTextWithoutMentions,
+    publicPrompts,
   } = useMentionState();
 
   const { removeMention, insertMention } = useMentionUtils({
@@ -64,7 +70,13 @@ export const useMentionInput = ({
   }, []);
 
   const onAddMention = (mention: MentionData) => {
-    setCurrentBrainId(mention.id as UUID);
+    if (mention.trigger === "#") {
+      setCurrentPromptId(mention.id as UUID);
+    }
+
+    if (mention.trigger === "@") {
+      setCurrentBrainId(mention.id as UUID);
+    }
   };
 
   const onSearchChange = ({
@@ -74,18 +86,18 @@ export const useMentionInput = ({
     trigger: string;
     value: string;
   }) => {
-    if (currentBrainId !== null) {
+    if (currentBrainId !== null && trigger === "@") {
       setSuggestions([]);
 
       return;
     }
-    setSuggestions(
-      defaultSuggestionsFilter(
-        value,
-        mapMinimalBrainToMentionData(mentionItems["@"]),
-        trigger
-      )
-    );
+    if (currentPromptId !== null && trigger === "#") {
+      setSuggestions([]);
+
+      return;
+    }
+
+    setSuggestions(defaultSuggestionsFilter(value, mentionItems, trigger));
   };
 
   const insertCurrentBrainAsMention = (): void => {
@@ -94,7 +106,16 @@ export const useMentionInput = ({
     );
 
     if (mention !== undefined) {
-      insertMention(mention, "@");
+      insertMention(mention);
+    }
+  };
+  const insertCurrentPromptAsMention = (): void => {
+    const mention = mentionItems["#"].find(
+      (item) => item.id === currentPromptId
+    );
+
+    if (mention !== undefined) {
+      insertMention(mention);
     }
   };
 
@@ -102,17 +123,11 @@ export const useMentionInput = ({
     const currentMentions = getEditorCurrentMentions();
     let newEditorState = EditorState.createEmpty();
     currentMentions.forEach((mention) => {
-      if (mention.trigger === "@") {
-        const correspondingMention = mentionItems["@"].find(
-          (item) => item.name === mention.content
-        );
-        if (correspondingMention !== undefined) {
-          newEditorState = insertMention(
-            correspondingMention,
-            mention.trigger,
-            newEditorState
-          );
-        }
+      const correspondingMention = mentionItems[mention.trigger].find(
+        (item) => item.name === mention.content
+      );
+      if (correspondingMention !== undefined) {
+        newEditorState = insertMention(correspondingMention, newEditorState);
       }
     });
     setEditorState(newEditorState);
@@ -145,18 +160,9 @@ export const useMentionInput = ({
   }, [message]);
 
   useEffect(() => {
-    setSuggestions(mapMinimalBrainToMentionData(mentionItems["@"]));
-  }, [mentionItems]);
-
-  useEffect(() => {
     setMentionItems({
       ...mentionItems,
-      "@": [
-        ...allBrains.map((brain) => ({
-          ...brain,
-          value: brain.name,
-        })),
-      ],
+      "@": allBrains.map(mapMinimalBrainToMentionData),
     });
   }, [allBrains]);
 
@@ -178,8 +184,13 @@ export const useMentionInput = ({
     const contentState = editorState.getCurrentContent();
     const plainText = contentState.getPlainText();
 
-    if (plainText === "" && currentBrainId !== null) {
-      insertCurrentBrainAsMention();
+    if (plainText === "") {
+      if (currentBrainId !== null) {
+        insertCurrentBrainAsMention();
+      }
+      if (currentPromptId !== null) {
+        insertCurrentPromptAsMention();
+      }
     }
   }, [editorState]);
 
@@ -196,5 +207,6 @@ export const useMentionInput = ({
     insertCurrentBrainAsMention,
     handleEditorChange,
     keyBindingFn,
+    publicPrompts,
   };
 };

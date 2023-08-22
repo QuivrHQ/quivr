@@ -1,10 +1,12 @@
-import { MinimalBrainForUser } from "@/lib/context/BrainProvider/types";
+import { MentionData } from "@draft-js-plugins/mention";
 
 import { MentionTriggerType } from "../../../../types";
 
-export type MentionInputMentionsType = {
-  "@": MinimalBrainForUser[];
-};
+export type MentionInputMentionsType = Record<
+  MentionTriggerType,
+  MentionData[]
+>;
+
 export type TriggerMap = {
   trigger: MentionTriggerType;
   content: string;

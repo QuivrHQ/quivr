@@ -1,9 +1,10 @@
 import createMentionPlugin from "@draft-js-plugins/mention";
 import { useMemo } from "react";
 
+import { MentionTriggerType } from "@/app/chat/[chatId]/components/ActionsBar/types";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 
-import { BrainMentionItem } from "../../../BrainMentionItem";
+import { MentionItem } from "../../../MentionItem";
 
 interface MentionPluginProps {
   removeMention: (entityKeyToRemove: string) => void;
@@ -12,20 +13,26 @@ interface MentionPluginProps {
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const useMentionPlugin = (props: MentionPluginProps) => {
   const { removeMention } = props;
-  const { setCurrentBrainId } = useBrainContext();
+  const { setCurrentBrainId, setCurrentPromptId } = useBrainContext();
 
   const { MentionSuggestions, plugins } = useMemo(() => {
     const mentionPlugin = createMentionPlugin({
-      mentionComponent: ({ entityKey, mention: { name } }) => (
-        <BrainMentionItem
+      mentionComponent: ({ entityKey, mention: { name, trigger } }) => (
+        <MentionItem
           text={name}
           onRemove={() => {
-            setCurrentBrainId(null);
+            if (trigger === "@") {
+              setCurrentBrainId(null);
+            }
+            if (trigger === "#") {
+              setCurrentPromptId(null);
+            }
             removeMention(entityKey);
           }}
+          trigger={trigger as MentionTriggerType}
         />
       ),
-
+      mentionTrigger: ["@", "#"],
       popperOptions: {
         placement: "top-end",
         modifiers: [
