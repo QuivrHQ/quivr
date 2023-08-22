@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.0.60](https://github.com/StanGirard/quivr/compare/v0.0.59...v0.0.60) (2023-08-22)
+
+
+### Features
+
+* **chat:** add brain selection through mention input ([#969](https://github.com/StanGirard/quivr/issues/969)) ([8e94f22](https://github.com/StanGirard/quivr/commit/8e94f22782dd2255e8125fbb4b3718413ad4701e))
+
+
+### Bug Fixes
+
+* remove conflicts ([#998](https://github.com/StanGirard/quivr/issues/998)) ([f61b70a](https://github.com/StanGirard/quivr/commit/f61b70a34f6d24e6f343d31cc4aa63265bb1c218))
+* update backend tests ([#992](https://github.com/StanGirard/quivr/issues/992)) ([5a3a6fe](https://github.com/StanGirard/quivr/commit/5a3a6fe370756783a204f2a62007f6cb23c7b202))
+
 ## [0.0.59](https://github.com/StanGirard/quivr/compare/v0.0.58...v0.0.59) (2023-08-20)
 
 
