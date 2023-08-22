@@ -5,13 +5,12 @@ import { useCallback, useState } from "react";
 import { FileRejection, useDropzone } from "react-dropzone";
 import { useTranslation } from "react-i18next";
 
+import { useUploadApi } from "@/lib/api/upload/useUploadApi";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 import { useSupabase } from "@/lib/context/SupabaseProvider";
 import { useAxios, useToast } from "@/lib/hooks";
 import { redirectToLogin } from "@/lib/router/redirectToLogin";
 import { useEventTracking } from "@/services/analytics/useEventTracking";
-
-import { uploadFile } from "./uploadFIle";
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const useFileUploader = () => {
@@ -20,7 +19,7 @@ export const useFileUploader = () => {
   const { publish } = useToast();
   const [files, setFiles] = useState<File[]>([]);
   const { session } = useSupabase();
-
+  const { uploadFile } = useUploadApi();
   const { currentBrain } = useBrainContext();
   const { axiosInstance } = useAxios();
 
@@ -36,7 +35,7 @@ export const useFileUploader = () => {
       formData.append("uploadFile", file);
       try {
         void track("FILE_UPLOADED");
-        const response = await uploadFile({ brainId, formData }, axiosInstance);
+        const response = await uploadFile({ brainId, formData });
         publish({
           variant: response.data.type,
           text:
