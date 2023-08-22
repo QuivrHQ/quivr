@@ -213,6 +213,7 @@ async def create_question_handler(
                 temperature=chat_question.temperature,
                 brain_id=str(brain_id),
                 user_openai_api_key=current_user.openai_api_key,  # pyright: ignore reportPrivateUsage=none
+                prompt_id=chat_question.prompt_id,
             )
         else:
             gpt_answer_generator = HeadlessQA(
@@ -221,6 +222,7 @@ async def create_question_handler(
                 max_tokens=chat_question.max_tokens,
                 user_openai_api_key=current_user.openai_api_key,  # pyright: ignore reportPrivateUsage=none
                 chat_id=str(chat_id),
+                prompt_id=chat_question.prompt_id,
             )
 
         chat_answer = gpt_answer_generator.generate_answer(chat_id, chat_question)
@@ -296,6 +298,7 @@ async def create_stream_question_handler(
                 brain_id=str(brain_id),
                 user_openai_api_key=current_user.openai_api_key,  # pyright: ignore reportPrivateUsage=none
                 streaming=True,
+                prompt_id=chat_question.prompt_id,
             )
         else:
             gpt_answer_generator = HeadlessQA(
@@ -311,6 +314,7 @@ async def create_stream_question_handler(
                 user_openai_api_key=current_user.openai_api_key,  # pyright: ignore reportPrivateUsage=none
                 chat_id=str(chat_id),
                 streaming=True,
+                prompt_id=chat_question.prompt_id,
             )
 
         print("streaming")

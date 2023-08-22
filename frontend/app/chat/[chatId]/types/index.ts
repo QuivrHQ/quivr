@@ -6,6 +6,7 @@ export type ChatQuestion = {
   temperature?: number;
   max_tokens?: number;
   brain_id?: string;
+  prompt_id?: string;
 };
 export type ChatHistory = {
   chat_id: string;
