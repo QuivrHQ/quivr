@@ -29,12 +29,16 @@ export const useLanguageHook = (): {
         name: "Français",
       },
       {
-        id: "pt",
+        id: "ptbr",
         name: "Português",
       },
       {
         id: "ru",
         name: "Русский",
+      },
+      {
+        id: "zh_cn",
+        name: "简体中文",
       },
     ];
 
