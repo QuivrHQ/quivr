@@ -215,7 +215,8 @@ CREATE TABLE IF NOT EXISTS migrations (
 );
 
 INSERT INTO migrations (name) 
-SELECT '202308181004030_rename_users_table'
+SELECT '202308217004800_add_public_prompts_examples'
 WHERE NOT EXISTS (
-    SELECT 1 FROM migrations WHERE name = '202308181004030_rename_users_table'
+    SELECT 1 FROM migrations WHERE name = '202308217004800_add_public_prompts_examples'
 );
+
