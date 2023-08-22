@@ -81,7 +81,7 @@ class UserUsage(Repository):
             .select("email")
             .filter("user_id", "eq", user_id)
             .execute()
-        )
+        ).data
 
         if response and len(response) > 0:
             return response[0]["email"]
