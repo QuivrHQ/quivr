@@ -4,6 +4,7 @@ import { EditorState } from "draft-js";
 import { MentionTriggerType } from "@/app/chat/[chatId]/components/ActionsBar/types";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 
+import { getEditorMentions } from "./getEditorMentions";
 import { isMention } from "../../utils/isMention";
 
 type MentionUtilsProps = {
@@ -41,10 +42,35 @@ export const useMentionUtils = (props: MentionUtilsProps) => {
     mention: MentionData,
     customEditorState?: EditorState
   ): EditorState => {
-    const trigger = mention.trigger as MentionTriggerType;
+    console.log({
+      customEditorState,
+    });
+    console.log({
+      customEditorStateText: customEditorState
+        ?.getCurrentContent()
+        .getPlainText(),
+    });
+    const usedEditorState = customEditorState ?? editorState;
+    console.log({
+      usedEditorStateText: usedEditorState.getCurrentContent().getPlainText(),
+    });
 
+    const usedEditorStateMentions = getEditorMentions(usedEditorState);
+    console.log({ usedEditorStateMentions });
+    if (
+      usedEditorStateMentions.find(
+        (editorMention) => editorMention.id === mention.id
+      ) !== undefined
+    ) {
+      return usedEditorState;
+    }
+
+    const trigger = mention.trigger as MentionTriggerType;
+    console.log({
+      usedEditorContent: usedEditorState.getCurrentContent().getPlainText(),
+    });
     const editorStateWithMention = addMention(
-      customEditorState ?? editorState,
+      usedEditorState,
       mention,
       trigger,
       trigger,
@@ -52,6 +78,11 @@ export const useMentionUtils = (props: MentionUtilsProps) => {
     );
 
     setEditorState(editorStateWithMention);
+    console.log({
+      editorContentAfterInsert: editorStateWithMention
+        .getCurrentContent()
+        .getPlainText(),
+    });
 
     return editorStateWithMention;
   };

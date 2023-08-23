@@ -5,7 +5,7 @@ import {
   MentionData,
 } from "@draft-js-plugins/mention";
 import { UUID } from "crypto";
-import { EditorState, getDefaultKeyBinding } from "draft-js";
+import { ContentState, EditorState, getDefaultKeyBinding } from "draft-js";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { MentionTriggerType } from "@/app/chat/[chatId]/components/ActionsBar/types";
@@ -14,10 +14,11 @@ import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainConte
 import "@draft-js-plugins/mention/lib/plugin.css";
 import "draft-js/dist/Draft.css";
 
-
 import { useMentionPlugin } from "./helpers/MentionPlugin";
 import { useMentionState } from "./helpers/MentionState";
 import { useMentionUtils } from "./helpers/MentionUtils";
+import { getEditorMentions } from "./helpers/getEditorMentions";
+import { getEditorTextWithoutMentions } from "./helpers/getEditorTextWithoutMentions";
 import { mapMinimalBrainToMentionData } from "../utils/mapMinimalBrainToMentionData";
 
 type UseMentionInputProps = {
@@ -47,8 +48,6 @@ export const useMentionInput = ({
     mentionItems,
     setSuggestions,
     suggestions,
-    getEditorCurrentMentions,
-    getEditorTextWithoutMentions,
     publicPrompts,
   } = useMentionState();
 
@@ -110,31 +109,47 @@ export const useMentionInput = ({
     );
 
     if (mention !== undefined) {
-      insertMention(mention);
-    }
-  };
-  const insertCurrentPromptAsMention = (): void => {
-    const mention = mentionItems["#"].find(
-      (item) => item.id === currentPromptId
-    );
-
-    if (mention !== undefined) {
-      insertMention(mention);
+      const isMentionAlreadyAdded = getEditorMentions(editorState).find(
+        (editorMention) => editorMention.id === currentBrainId
+      );
+      if (!isMentionAlreadyAdded) {
+        insertMention(mention);
+      }
     }
   };
 
   const resetEditorContent = () => {
-    const currentMentions = getEditorCurrentMentions();
-    let newEditorState = EditorState.createEmpty();
+    console.log("----------------------");
+
+    let newEditorState = EditorState.push(
+      editorState,
+      ContentState.createFromText(""),
+      "remove-range"
+    );
+
+    console.log({
+      newEditorMentionsFecthed: getEditorMentions(newEditorState),
+    });
+
+    const contentState = newEditorState.getCurrentContent();
+    const allEntities = contentState.getAllEntities();
+    console.log("All entities:", allEntities); // Should output an empty array
+
+    const currentMentions = getEditorMentions(newEditorState);
+
     currentMentions.forEach((mention) => {
       const correspondingMention = mentionItems[
         mention.trigger as MentionTriggerType
       ].find((item) => item.name === mention.name);
 
       if (correspondingMention !== undefined) {
+        console.log("inserting", {
+          newEditorState: newEditorState.getCurrentContent().getPlainText(),
+        });
         newEditorState = insertMention(correspondingMention, newEditorState);
       }
     });
+    console.log("----------------------");
 
     setEditorState(newEditorState);
   };
@@ -156,7 +171,9 @@ export const useMentionInput = ({
   const handleEditorChange = (newEditorState: EditorState) => {
     setEditorState(newEditorState);
     const currentMessage = getEditorTextWithoutMentions(newEditorState);
-    setMessage(currentMessage);
+    if (currentMessage !== "") {
+      setMessage(currentMessage);
+    }
   };
 
   useEffect(() => {
@@ -186,20 +203,6 @@ export const useMentionInput = ({
     setSelectedBrainAddedOnload(true);
   }, [currentBrainId, mentionItems]);
 
-  useEffect(() => {
-    const contentState = editorState.getCurrentContent();
-    const plainText = contentState.getPlainText();
-
-    if (plainText === "") {
-      if (currentBrainId !== null) {
-        insertCurrentBrainAsMention();
-      }
-      if (currentPromptId !== null) {
-        insertCurrentPromptAsMention();
-      }
-    }
-  }, [editorState]);
-
   return {
     mentionInputRef,
     plugins,
@@ -211,7 +214,6 @@ export const useMentionInput = ({
     suggestions,
     onAddMention,
     editorState,
-    insertCurrentBrainAsMention,
     handleEditorChange,
     keyBindingFn,
     publicPrompts,
