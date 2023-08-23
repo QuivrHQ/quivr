@@ -57,8 +57,8 @@ const UploadPage = (): JSX.Element => {
     );
   }
 
-  const Upload = () => {
-    return (
+  return (
+    <Suspense fallback="Loading...">
       <main className="pt-10">
         <PageHeading
           title={t("title", { ns: "upload" })}
@@ -75,12 +75,6 @@ const UploadPage = (): JSX.Element => {
           </Link>
         </div>
       </main>
-    );
-  };
-
-  return (
-    <Suspense fallback="Loading...">
-      <Upload />
     </Suspense>
   );
 };
