@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.0.61](https://github.com/StanGirard/quivr/compare/v0.0.60...v0.0.61) (2023-08-23)
+
+
+### Features
+
+* add brain prompt overwritting from chat ([#1012](https://github.com/StanGirard/quivr/issues/1012)) ([b967c2d](https://github.com/StanGirard/quivr/commit/b967c2d2d60b93f9142fe2afd04fb9422adcc2be))
+* **backend:** adds python code parsing ([#1003](https://github.com/StanGirard/quivr/issues/1003)) ([a626b84](https://github.com/StanGirard/quivr/commit/a626b84b96c7b40904960e039f72ff042148a240))
+* **prompts:** add public prompts to SQL db ([#1014](https://github.com/StanGirard/quivr/issues/1014)) ([4b1f4b1](https://github.com/StanGirard/quivr/commit/4b1f4b141287d109794aa6015f83deb3882ac5cb))
+* **translation:** Added Simplified Chinese translation，Fix pt-br not working ([#1011](https://github.com/StanGirard/quivr/issues/1011)) ([e328ab8](https://github.com/StanGirard/quivr/commit/e328ab81b30f2dd3dae7287e0351fdacd1c18133))
+
+
+### Bug Fixes
+
+* **Analytics:** no tags tracking for upload & crawl ([#1024](https://github.com/StanGirard/quivr/issues/1024)) ([2b74ebc](https://github.com/StanGirard/quivr/commit/2b74ebc1f099c4d12705d458fefad94120af9208))
+
 ## [0.0.60](https://github.com/StanGirard/quivr/compare/v0.0.59...v0.0.60) (2023-08-22)
 
 
