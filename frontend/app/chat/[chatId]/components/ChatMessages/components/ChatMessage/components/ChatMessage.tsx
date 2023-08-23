@@ -36,9 +36,14 @@ export const ChatMessage = React.forwardRef(
       <div className={containerWrapperClasses}>
         {" "}
         <div ref={ref} className={containerClasses}>
-          <span data-testid="brain-prompt-tags" className="text-gray-400 mb-1">
-            @{brainName ?? "-"} #{promptName ?? "-"}
-          </span>
+          <div className="w-full">
+            <span
+              data-testid="brain-prompt-tags"
+              className="text-gray-400 mb-1 text-xs"
+            >
+              @{brainName ?? "-"} #{promptName ?? "-"}
+            </span>
+          </div>
           <div data-testid="chat-message-text">
             <ReactMarkdown className={markdownClasses}>{text}</ReactMarkdown>
           </div>
