@@ -8,7 +8,7 @@ import { useTranslation } from "react-i18next";
 import { useUploadApi } from "@/lib/api/upload/useUploadApi";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 import { useSupabase } from "@/lib/context/SupabaseProvider";
-import { useAxios, useToast } from "@/lib/hooks";
+import { useToast } from "@/lib/hooks";
 import { redirectToLogin } from "@/lib/router/redirectToLogin";
 import { useEventTracking } from "@/services/analytics/useEventTracking";
 
@@ -21,7 +21,6 @@ export const useFileUploader = () => {
   const { session } = useSupabase();
   const { uploadFile } = useUploadApi();
   const { currentBrain } = useBrainContext();
-  const { axiosInstance } = useAxios();
 
   if (session === null) {
     redirectToLogin();
@@ -63,7 +62,7 @@ export const useFileUploader = () => {
         }
       }
     },
-    [axiosInstance, publish, t, track]
+    [session.access_token]
   );
 
   const onDrop = (acceptedFiles: File[], fileRejections: FileRejection[]) => {

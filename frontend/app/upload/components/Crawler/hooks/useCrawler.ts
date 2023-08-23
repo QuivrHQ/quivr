@@ -79,7 +79,7 @@ export const useCrawler = () => {
         setCrawling(false);
       }
     },
-    [publish, crawlWebsiteUrl, t, track]
+    [session.access_token]
   );
 
   return {
