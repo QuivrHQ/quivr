@@ -8,13 +8,16 @@ import { UUID } from "crypto";
 import { EditorState, getDefaultKeyBinding } from "draft-js";
 import { useCallback, useEffect, useRef, useState } from "react";
 
+import { MentionTriggerType } from "@/app/chat/[chatId]/components/ActionsBar/types";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
+
+import "@draft-js-plugins/mention/lib/plugin.css";
+import "draft-js/dist/Draft.css";
+
 
 import { useMentionPlugin } from "./helpers/MentionPlugin";
 import { useMentionState } from "./helpers/MentionState";
 import { useMentionUtils } from "./helpers/MentionUtils";
-import "@draft-js-plugins/mention/lib/plugin.css";
-import "draft-js/dist/Draft.css";
 import { mapMinimalBrainToMentionData } from "../utils/mapMinimalBrainToMentionData";
 
 type UseMentionInputProps = {
@@ -54,9 +57,10 @@ export const useMentionInput = ({
     setEditorState,
   });
 
-  const { MentionSuggestions, plugins } = useMentionPlugin({
-    removeMention,
-  });
+  const { BrainMentionSuggestions, PromptMentionSuggestions, plugins } =
+    useMentionPlugin({
+      removeMention,
+    });
 
   const mentionInputRef = useRef<Editor>(null);
 
@@ -123,13 +127,15 @@ export const useMentionInput = ({
     const currentMentions = getEditorCurrentMentions();
     let newEditorState = EditorState.createEmpty();
     currentMentions.forEach((mention) => {
-      const correspondingMention = mentionItems[mention.trigger].find(
-        (item) => item.name === mention.content
-      );
+      const correspondingMention = mentionItems[
+        mention.trigger as MentionTriggerType
+      ].find((item) => item.name === mention.name);
+
       if (correspondingMention !== undefined) {
         newEditorState = insertMention(correspondingMention, newEditorState);
       }
     });
+
     setEditorState(newEditorState);
   };
 
@@ -197,7 +203,8 @@ export const useMentionInput = ({
   return {
     mentionInputRef,
     plugins,
-    MentionSuggestions,
+    BrainMentionSuggestions,
+    PromptMentionSuggestions,
     onOpenChange,
     onSearchChange,
     open,

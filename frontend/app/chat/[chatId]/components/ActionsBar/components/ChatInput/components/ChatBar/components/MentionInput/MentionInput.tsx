@@ -21,7 +21,8 @@ export const MentionInput = ({
 }: MentionInputProps): ReactElement => {
   const {
     mentionInputRef,
-    MentionSuggestions,
+    BrainMentionSuggestions,
+    PromptMentionSuggestions,
     keyBindingFn,
     editorState,
     onOpenChange,
@@ -50,7 +51,16 @@ export const MentionInput = ({
         placeholder={t("actions_bar_placeholder")}
         keyBindingFn={keyBindingFn}
       />
-      <MentionSuggestions
+      <BrainMentionSuggestions
+        open={open}
+        onOpenChange={onOpenChange}
+        suggestions={suggestions}
+        onSearchChange={onSearchChange}
+        popoverContainer={SuggestionsContainer}
+        onAddMention={onAddMention}
+        entryComponent={SuggestionRow}
+      />
+      <PromptMentionSuggestions
         open={open}
         onOpenChange={onOpenChange}
         suggestions={suggestions}

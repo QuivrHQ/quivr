@@ -1,21 +1,15 @@
 import { addMention, MentionData } from "@draft-js-plugins/mention";
 import { EditorState } from "draft-js";
 
-import {
-  mentionTriggers,
-  MentionTriggerType,
-} from "@/app/chat/[chatId]/components/ActionsBar/types";
+import { MentionTriggerType } from "@/app/chat/[chatId]/components/ActionsBar/types";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
+
+import { isMention } from "../../utils/isMention";
 
 type MentionUtilsProps = {
   editorState: EditorState;
   setEditorState: (editorState: EditorState) => void;
 };
-
-const mentionsTags = [
-  "mention",
-  ...mentionTriggers.map((trigger) => `${trigger}mention`),
-];
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const useMentionUtils = (props: MentionUtilsProps) => {
@@ -26,7 +20,7 @@ export const useMentionUtils = (props: MentionUtilsProps) => {
     const contentState = editorState.getCurrentContent();
     const entity = contentState.getEntity(entityKeyToRemove);
 
-    if (mentionsTags.includes(entity.getType())) {
+    if (isMention(entity.getType())) {
       const newContentState = contentState.replaceEntityData(
         entityKeyToRemove,
         {}
@@ -52,7 +46,7 @@ export const useMentionUtils = (props: MentionUtilsProps) => {
     const editorStateWithMention = addMention(
       customEditorState ?? editorState,
       mention,
-      "",
+      trigger,
       trigger,
       "MUTABLE"
     );

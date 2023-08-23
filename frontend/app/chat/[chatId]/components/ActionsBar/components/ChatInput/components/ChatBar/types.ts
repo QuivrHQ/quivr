@@ -6,8 +6,3 @@ export type MentionInputMentionsType = Record<
   MentionTriggerType,
   MentionData[]
 >;
-
-export type TriggerMap = {
-  trigger: MentionTriggerType;
-  content: string;
-};

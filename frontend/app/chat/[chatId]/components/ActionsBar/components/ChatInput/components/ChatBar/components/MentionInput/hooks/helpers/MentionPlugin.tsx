@@ -15,52 +15,85 @@ export const useMentionPlugin = (props: MentionPluginProps) => {
   const { removeMention } = props;
   const { setCurrentBrainId, setCurrentPromptId } = useBrainContext();
 
-  const { MentionSuggestions, plugins } = useMemo(() => {
-    const mentionPlugin = createMentionPlugin({
-      mentionComponent: ({ entityKey, mention: { name, trigger } }) => (
-        <MentionItem
-          text={name}
-          onRemove={() => {
-            if (trigger === "@") {
+  const { BrainMentionSuggestions, PromptMentionSuggestions, plugins } =
+    useMemo(() => {
+      const brainMentionPlugin = createMentionPlugin({
+        mentionComponent: ({ entityKey, mention: { name, trigger } }) => (
+          <MentionItem
+            text={name}
+            onRemove={() => {
               setCurrentBrainId(null);
-            }
-            if (trigger === "#") {
-              setCurrentPromptId(null);
-            }
-            removeMention(entityKey);
-          }}
-          trigger={trigger as MentionTriggerType}
-        />
-      ),
-      mentionTrigger: ["@", "#"],
-      popperOptions: {
-        placement: "top-end",
-        modifiers: [
-          {
-            name: "customStyle", // Custom modifier for applying styles
-            enabled: true,
-            phase: "beforeWrite",
-            fn: ({ state }) => {
-              state.styles.popper = {
-                ...state.styles.popper,
-                minWidth: "auto",
-                backgroundColor: "transparent",
-                padding: "0",
-                marginBottom: "5",
-              };
+              removeMention(entityKey);
+            }}
+            trigger={trigger as MentionTriggerType}
+          />
+        ),
+        mentionPrefix: "@",
+        popperOptions: {
+          placement: "top-end",
+          modifiers: [
+            {
+              name: "customStyle", // Custom modifier for applying styles
+              enabled: true,
+              phase: "beforeWrite",
+              fn: ({ state }) => {
+                state.styles.popper = {
+                  ...state.styles.popper,
+                  minWidth: "auto",
+                  backgroundColor: "transparent",
+                  padding: "0",
+                  marginBottom: "5",
+                };
+              },
             },
-          },
-        ],
-      },
-    });
-    const { MentionSuggestions: LegacyMentionSuggestions } = mentionPlugin;
-    const legacyPlugins = [mentionPlugin];
+          ],
+        },
+      });
+      const promptMentionPlugin = createMentionPlugin({
+        mentionComponent: ({ entityKey, mention: { name, trigger } }) => (
+          <MentionItem
+            text={name}
+            onRemove={() => {
+              setCurrentPromptId(null);
+              removeMention(entityKey);
+            }}
+            trigger={trigger as MentionTriggerType}
+          />
+        ),
+        mentionPrefix: "#",
+        mentionTrigger: ["#"],
+        popperOptions: {
+          placement: "top-end",
+          modifiers: [
+            {
+              name: "customStyle", // Custom modifier for applying styles
+              enabled: true,
+              phase: "beforeWrite",
+              fn: ({ state }) => {
+                state.styles.popper = {
+                  ...state.styles.popper,
+                  minWidth: "auto",
+                  backgroundColor: "transparent",
+                  padding: "0",
+                  marginBottom: "5",
+                };
+              },
+            },
+          ],
+        },
+      });
+      const { MentionSuggestions: LegacyBrainMentionSuggestions } =
+        brainMentionPlugin;
+      const { MentionSuggestions: LegacyPromptMentionSuggestions } =
+        promptMentionPlugin;
+      const legacyPlugins = [brainMentionPlugin, promptMentionPlugin];
 
-    return {
-      plugins: legacyPlugins,
-      MentionSuggestions: LegacyMentionSuggestions,
-    };
-  }, []);
+      return {
+        plugins: legacyPlugins,
+        BrainMentionSuggestions: LegacyBrainMentionSuggestions,
+        PromptMentionSuggestions: LegacyPromptMentionSuggestions,
+      };
+    }, []);
 
-  return { MentionSuggestions, plugins };
+  return { BrainMentionSuggestions, PromptMentionSuggestions, plugins };
 };

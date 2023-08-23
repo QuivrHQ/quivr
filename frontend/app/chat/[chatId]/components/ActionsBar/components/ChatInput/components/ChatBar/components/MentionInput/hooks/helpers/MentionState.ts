@@ -9,7 +9,8 @@ import {
 } from "@/app/chat/[chatId]/components/ActionsBar/types";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 
-import { MentionInputMentionsType, TriggerMap } from "../../../../types";
+import { MentionInputMentionsType } from "../../../../types";
+import { isMention } from "../../utils/isMention";
 import { mapMinimalBrainToMentionData } from "../../utils/mapMinimalBrainToMentionData";
 import { mapPromptToMentionData } from "../../utils/mapPromptToMentionData";
 
@@ -38,21 +39,18 @@ export const useMentionState = () => {
     legacySetEditorState(stateWithContentAndSelection);
   };
 
-  const getEditorCurrentMentions = (): TriggerMap[] => {
+  const getEditorCurrentMentions = (): MentionData[] => {
     const contentState = editorState.getCurrentContent();
-    const plainText = contentState.getPlainText();
+    const blockMap = contentState.getAllEntities();
 
-    const mentionTexts: TriggerMap[] = [];
+    const mentionTexts: MentionData[] = [];
 
-    mentionTriggers.forEach((trigger) => {
-      mentionItems[trigger].forEach((item) => {
-        if (plainText.includes(item.name)) {
-          mentionTexts.push({
-            trigger: trigger,
-            content: item.name,
-          });
-        }
-      });
+    blockMap.forEach((contentBlock) => {
+      if (isMention(contentBlock?.getType())) {
+        mentionTexts.push(
+          (contentBlock?.getData() as { mention: MentionData }).mention
+        );
+      }
     });
 
     return mentionTexts;
@@ -63,6 +61,7 @@ export const useMentionState = () => {
   ): string => {
     const contentState = editorCurrentState.getCurrentContent();
     let plainText = contentState.getPlainText();
+
     (Object.keys(mentionItems) as MentionTriggerType[]).forEach((trigger) => {
       if (mentionTriggers.includes(trigger)) {
         mentionItems[trigger].forEach((item) => {
