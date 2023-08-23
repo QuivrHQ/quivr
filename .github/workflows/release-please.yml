@@ -16,6 +16,7 @@ jobs:
       - uses: google-github-actions/release-please-action@v3
         with:
           release-type: node
+          changelog-notes-type: github
           package-name: release-please-action
           bump-patch-for-minor-pre-major: true
           token: ${{ secrets.RELEASE_PLEASE_TOKEN }}
