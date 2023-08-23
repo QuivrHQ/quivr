@@ -92,7 +92,7 @@ export const useConfigModal = (chatId?: string) => {
     } catch (err) {
       publish({
         variant: "danger",
-        text: "An error occured while updating chat config",
+        text: "An error occurred while updating chat config",
       });
     }
   };
