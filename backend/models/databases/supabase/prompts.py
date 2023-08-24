@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, List
 from uuid import UUID
 
 from fastapi import HTTPException
@@ -84,7 +84,7 @@ class Prompts(Repository):
             return None
         return Prompt(**response[0])
 
-    def get_public_prompts(self) -> list[Prompt]:
+    def get_public_prompts(self) -> List[Prompt]:
         """
         List all public prompts
         """
