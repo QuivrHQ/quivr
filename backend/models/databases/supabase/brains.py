@@ -175,7 +175,7 @@ class Brain(Repository):
 
     def update_brain_by_id(
         self, brain_id: UUID, brain: BrainUpdatableProperties
-    ) -> BrainEntity | None:
+    ) -> Optional[BrainEntity]:
         update_brain_response = (
             self.db.table("brains")
             .update(brain.dict(exclude_unset=True))
