@@ -3,7 +3,7 @@ from uuid import UUID
 from models import Prompt, get_supabase_db
 
 
-def get_prompt_by_id(prompt_id: UUID) -> Prompt | None:
+def get_prompt_by_id(prompt_id: UUID) -> Prompt:
     """
     Get a prompt by its id
 
