@@ -60,7 +60,7 @@ export const useInvitation = () => {
       }
     };
     void checkInvitationValidity();
-  }, [brainId]);
+  }, [brainId, getInvitation, publish, router, t]);
 
   const handleAccept = async () => {
     setIsProcessingRequest(true);

@@ -66,7 +66,7 @@ export const useBrainProvider = () => {
     } finally {
       setIsFetchingBrains(false);
     }
-  }, []);
+  }, [getBrains]);
 
   const setActiveBrain = useCallback(
     ({ id, name }: { id: UUID; name: string }) => {
@@ -75,7 +75,7 @@ export const useBrainProvider = () => {
       setCurrentBrainId(id);
       void track("CHANGE_BRAIN");
     },
-    []
+    [track]
   );
 
   const setDefaultBrain = useCallback(async () => {
@@ -86,7 +86,7 @@ export const useBrainProvider = () => {
     } else {
       console.warn("No brains found");
     }
-  }, [setActiveBrain]);
+  }, [getDefaultBrain, setActiveBrain]);
 
   const fetchAndSetActiveBrain = useCallback(async () => {
     const storedBrain = getBrainFromLocalStorage();
