@@ -5,14 +5,12 @@ import { useEffect, useState } from "react";
 const juneApiKey = process.env.NEXT_PUBLIC_JUNE_API_KEY;
 
 export const useJune = (): AnalyticsBrowser | undefined => {
-  debugger;
   const [analytics, setAnalytics] = useState<AnalyticsBrowser | undefined>(
     undefined
   );
 
   useEffect(() => {
     const loadAnalytics = () => {
-      debugger;
       if (juneApiKey === undefined) {
         console.log("No June API key found");
 
