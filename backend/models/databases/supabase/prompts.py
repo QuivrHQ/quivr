@@ -65,7 +65,7 @@ class Prompts(Repository):
 
         return DeletePromptResponse(status="deleted", prompt_id=prompt_id)
 
-    def get_prompt_by_id(self, prompt_id: UUID) -> Prompt | None:
+    def get_prompt_by_id(self, prompt_id: UUID) -> Prompt:
         """
         Get a prompt by its id
 
