@@ -242,7 +242,7 @@ class Brain(Repository):
 
         return {"message": f"File {file_name} in brain {brain_id} has been deleted."}
 
-    def get_default_user_brain_id(self, user_id: UUID) -> UUID | None:
+    def get_default_user_brain_id(self, user_id: UUID) -> UUID:
         response = (
             (
                 self.db.from_("brains_users")
