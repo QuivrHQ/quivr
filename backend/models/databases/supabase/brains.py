@@ -70,7 +70,7 @@ class Brain(Repository):
             user_brains[-1].rights = item["rights"]
         return user_brains
 
-    def get_brain_for_user(self, user_id, brain_id) -> MinimalBrainEntity | None:
+    def get_brain_for_user(self, user_id, brain_id) -> Optional[MinimalBrainEntity]:
         response = (
             self.db.from_("brains_users")
             .select("id:brain_id, rights, brains (id: brain_id, name)")
