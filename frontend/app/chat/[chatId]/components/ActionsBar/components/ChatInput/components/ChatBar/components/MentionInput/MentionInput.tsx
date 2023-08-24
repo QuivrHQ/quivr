@@ -1,12 +1,16 @@
 import Editor from "@draft-js-plugins/editor";
-import { ReactElement } from "react";
+import { PopoverProps } from "@draft-js-plugins/mention/lib/MentionSuggestions/Popover";
+import { ComponentType, ReactElement } from "react";
 import { useTranslation } from "react-i18next";
 
 import "@draft-js-plugins/mention/lib/plugin.css";
 import "draft-js/dist/Draft.css";
 
+import { MentionTriggerType } from "@/app/chat/[chatId]/components/ActionsBar/types";
+
+import { BrainSuggestionsContainer } from "./components/BrainSuggestionsContainer";
+import { PromptSuggestionsContainer } from "./components/PromptSuggestionsContainer";
 import { SuggestionRow } from "./components/SuggestionRow";
-import { SuggestionsContainer } from "./components/SuggestionsContainer";
 import { useMentionInput } from "./hooks/useMentionInput";
 
 type MentionInputProps = {
@@ -14,6 +18,15 @@ type MentionInputProps = {
   setMessage: (text: string) => void;
   message: string;
 };
+
+const triggerToSuggestionsContainer: Record<
+  MentionTriggerType,
+  ComponentType<PopoverProps>
+> = {
+  "@": BrainSuggestionsContainer,
+  "#": PromptSuggestionsContainer,
+};
+
 export const MentionInput = ({
   onSubmit,
   setMessage,
@@ -31,6 +44,7 @@ export const MentionInput = ({
     suggestions,
     onAddMention,
     handleEditorChange,
+    currentTrigger,
   } = useMentionInput({
     message,
     onSubmit,
@@ -55,7 +69,7 @@ export const MentionInput = ({
         onOpenChange={onOpenChange}
         suggestions={suggestions}
         onSearchChange={onSearchChange}
-        popoverContainer={SuggestionsContainer}
+        popoverContainer={triggerToSuggestionsContainer[currentTrigger]}
         onAddMention={onAddMention}
         entryComponent={SuggestionRow}
       />

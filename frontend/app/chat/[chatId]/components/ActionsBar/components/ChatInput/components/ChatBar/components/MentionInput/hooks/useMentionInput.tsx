@@ -8,6 +8,7 @@ import { UUID } from "crypto";
 import { EditorState, getDefaultKeyBinding } from "draft-js";
 import { useCallback, useEffect, useRef, useState } from "react";
 
+import { MentionTriggerType } from "@/app/chat/[chatId]/components/ActionsBar/types";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 
 import "@draft-js-plugins/mention/lib/plugin.css";
@@ -51,6 +52,8 @@ export const useMentionInput = ({
     setEditorState,
   });
 
+  const [currentTrigger, setCurrentTrigger] = useState<MentionTriggerType>("@");
+
   const { MentionSuggestions, plugins } = useMentionPlugin();
 
   const mentionInputRef = useRef<Editor>(null);
@@ -80,7 +83,7 @@ export const useMentionInput = ({
     trigger,
     value,
   }: {
-    trigger: string;
+    trigger: MentionTriggerType;
     value: string;
   }) => {
     if (currentBrainId !== null && trigger === "@") {
@@ -93,6 +96,8 @@ export const useMentionInput = ({
 
       return;
     }
+
+    setCurrentTrigger(trigger);
 
     setSuggestions(defaultSuggestionsFilter(value, mentionItems, trigger));
   };
@@ -146,5 +151,6 @@ export const useMentionInput = ({
     handleEditorChange,
     keyBindingFn,
     publicPrompts,
+    currentTrigger,
   };
 };

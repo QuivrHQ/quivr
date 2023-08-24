@@ -36,10 +36,9 @@ export const ShareBrain = ({ brainId }: ShareBrainModalProps): JSX.Element => {
     canAddNewRow,
   } = useShareBrain(brainId);
 
-  const { allBrains } = useBrainContext();
-
   const { t } = useTranslation(["translation", "brain"]);
 
+  const { allBrains } = useBrainContext();
   const correspondingBrain = allBrains.find((brain) => brain.id === brainId);
 
   if (
