@@ -7,7 +7,7 @@ from repository.brain import get_brain_by_id
 logger = get_logger(__name__)
 
 
-def get_user_default_brain(user_id: UUID) -> BrainEntity | None:
+def get_user_default_brain(user_id: UUID) -> BrainEntity:
     supabase_db = get_supabase_db()
     brain_id = supabase_db.get_default_user_brain_id(user_id)
 

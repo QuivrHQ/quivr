@@ -3,7 +3,7 @@ from uuid import UUID
 from models import BrainEntity, get_supabase_client
 
 
-def get_brain_details(brain_id: UUID) -> BrainEntity | None:
+def get_brain_details(brain_id: UUID) -> BrainEntity:
     supabase_client = get_supabase_client()
     response = (
         supabase_client.table("brains")
