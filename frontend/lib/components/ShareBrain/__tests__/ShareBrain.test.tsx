@@ -38,6 +38,13 @@ vi.mock("@/lib/context/BrainProvider/hooks/useBrainContext", async () => {
     ...actual,
     useBrainContext: () => ({
       ...actual.useBrainContext(),
+      allBrains: [
+        {
+          id: "cf9bb422-b1b6-4fd7-abc1-01bd395d2318",
+          name: "test",
+          role: "Owner",
+        },
+      ],
       currentBrain: {
         role: "Editor",
       },
@@ -69,10 +76,7 @@ describe("ShareBrain", () => {
       <SupabaseProviderMock>
         <BrainConfigProviderMock>
           <BrainProviderMock>
-            <ShareBrain
-              name="test"
-              brainId="cf9bb422-b1b6-4fd7-abc1-01bd395d2318"
-            />
+            <ShareBrain brainId="cf9bb422-b1b6-4fd7-abc1-01bd395d2318" />
           </BrainProviderMock>
         </BrainConfigProviderMock>
       </SupabaseProviderMock>
@@ -87,10 +91,7 @@ describe("ShareBrain", () => {
       <SupabaseProviderMock>
         <BrainProviderMock>
           <BrainConfigProviderMock>
-            <ShareBrain
-              name="test"
-              brainId="cf9bb422-b1b6-4fd7-abc1-01bd395d2318"
-            />
+            <ShareBrain brainId="cf9bb422-b1b6-4fd7-abc1-01bd395d2318" />
           </BrainConfigProviderMock>
         </BrainProviderMock>
       </SupabaseProviderMock>
@@ -105,10 +106,7 @@ describe("ShareBrain", () => {
       <SupabaseProviderMock>
         <BrainConfigProviderMock>
           <BrainProviderMock>
-            <ShareBrain
-              name="test"
-              brainId="cf9bb422-b1b6-4fd7-abc1-01bd395d2318"
-            />
+            <ShareBrain brainId="cf9bb422-b1b6-4fd7-abc1-01bd395d2318" />
           </BrainProviderMock>
         </BrainConfigProviderMock>
       </SupabaseProviderMock>
