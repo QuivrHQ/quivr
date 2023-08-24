@@ -256,7 +256,7 @@ class Brain(Repository):
             return None
         return UUID(response[0].get("brain_id"))
 
-    def get_brain_by_id(self, brain_id: UUID) -> BrainEntity | None:
+    def get_brain_by_id(self, brain_id: UUID) -> Optional[BrainEntity]:
         response = (
             self.db.from_("brains")
             .select("id:brain_id, name, *")
