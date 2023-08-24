@@ -49,11 +49,19 @@ export const ChatsListItem = ({ chat }: ChatsListItemProps): JSX.Element => {
           {chat.chat_id}
         </div>
       </Link>
-      <div className="opacity-0 group-hover:opacity-100 flex items-center justify-center hover:text-red-700 bg-gradient-to-l from-white dark:from-black to-transparent z-10 transition-opacity">
-        <button className="p-0" type="button" onClick={handleEditNameClick}>
+      <div className="opacity-0 group-hover:opacity-100 flex items-center justify-center bg-gradient-to-l from-white dark:from-black to-transparent z-10 transition-opacity">
+        <button
+          className="p-0 hover:text-blue-700"
+          type="button"
+          onClick={handleEditNameClick}
+        >
           {editingName ? <FiSave /> : <FiEdit />}
         </button>
-        <button className="p-5" type="button" onClick={() => void deleteChat()}>
+        <button
+          className="p-5 hover:text-red-700"
+          type="button"
+          onClick={() => void deleteChat()}
+        >
           <FiTrash2 />
         </button>
       </div>
