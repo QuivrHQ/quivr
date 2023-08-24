@@ -63,7 +63,7 @@ export const useFileUploader = () => {
         }
       }
     },
-    [session.access_token]
+    [publish, t, track, uploadFile]
   );
 
   const onDrop = (acceptedFiles: File[], fileRejections: FileRejection[]) => {

@@ -33,7 +33,6 @@ export const useCrawler = () => {
 
       if (url === null || !isValidUrl(url)) {
         console.log("Invalid URL");
-        debugger;
         void track("URL_INVALID");
 
         publish({
@@ -83,7 +82,7 @@ export const useCrawler = () => {
         setCrawling(false);
       }
     },
-    [session.access_token]
+    [crawlWebsiteUrl, publish, t, track]
   );
 
   return {
