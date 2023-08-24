@@ -45,9 +45,6 @@ export const ChatsListItem = ({ chat }: ChatsListItemProps): JSX.Element => {
             name={chatName}
           />
         </div>
-        <div className="grid-cols-2 text-xs opacity-50 whitespace-nowrap">
-          {chat.chat_id}
-        </div>
       </Link>
       <div className="opacity-0 group-hover:opacity-100 flex items-center justify-center bg-gradient-to-l from-white dark:from-black to-transparent z-10 transition-opacity">
         <button
