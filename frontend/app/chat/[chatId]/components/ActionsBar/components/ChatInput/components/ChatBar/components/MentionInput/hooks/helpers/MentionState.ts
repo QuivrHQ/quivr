@@ -13,9 +13,7 @@ import { mapPromptToMentionData } from "../../utils/mapPromptToMentionData";
 export const useMentionState = () => {
   const { allBrains, publicPrompts } = useBrainContext();
 
-  const [editorState, legacySetEditorState] = useState(
-    EditorState.createEmpty()
-  );
+  const [editorState, setEditorState] = useState(EditorState.createEmpty());
 
   const [mentionItems, setMentionItems] = useState<MentionInputMentionsType>({
     "@": allBrains.map(mapMinimalBrainToMentionData),
@@ -23,18 +21,6 @@ export const useMentionState = () => {
   });
 
   const [suggestions, setSuggestions] = useState<MentionData[]>([]);
-
-  const setEditorState = (newState: EditorState) => {
-    const currentSelection = newState.getSelection();
-    const stateWithContentAndSelection = EditorState.forceSelection(
-      newState,
-      currentSelection
-    );
-    console.log({
-      stateWithContentAndSelection,
-    });
-    legacySetEditorState(stateWithContentAndSelection);
-  };
 
   useEffect(() => {
     setMentionItems({

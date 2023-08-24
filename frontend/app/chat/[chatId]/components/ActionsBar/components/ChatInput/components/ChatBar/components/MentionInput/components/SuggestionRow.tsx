@@ -10,5 +10,14 @@ export const SuggestionRow = ({
 }: EntryComponentProps): JSX.Element => (
   <div {...otherProps}>
     <BrainSuggestion id={mention.id as string} content={mention.name} />
+    <button
+      onClick={() => {
+        console.log("helloo");
+        alert("test");
+      }}
+    >
+      {" "}
+      test
+    </button>
   </div>
 );

@@ -13,6 +13,15 @@ export const SuggestionsContainer = ({
       className="bg-white dark:bg-black border border-black/10 dark:border-white/25 rounded-md shadow-md overflow-y-auto"
     >
       {children}
+      <button
+        style={{ height: 30 }}
+        onClick={() => {
+          console.log("hellooo");
+          alert("Hello");
+        }}
+      >
+        Add new prompt
+      </button>
     </div>
   </Popover>
 );
