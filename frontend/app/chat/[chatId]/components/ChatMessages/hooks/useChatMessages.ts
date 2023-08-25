@@ -1,3 +1,4 @@
+import _debounce from "lodash/debounce";
 import { useCallback, useEffect, useRef } from "react";
 
 import { useChat } from "@/app/chat/[chatId]/hooks/useChat";
@@ -10,15 +11,17 @@ export const useChatMessages = () => {
   const chatListRef = useRef<HTMLDivElement | null>(null);
   const { history } = useChat();
 
-  const scrollToBottom = useCallback(() => {
-    if (chatListRef.current) {
-      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-      chatListRef.current.scrollTo?.({
-        top: chatListRef.current.scrollHeight,
-        behavior: "smooth",
-      });
-    }
-  }, []);
+  const scrollToBottom = useCallback(
+    _debounce(() => {
+      if (chatListRef.current) {
+        chatListRef.current.scrollTo({
+          top: chatListRef.current.scrollHeight,
+          behavior: "auto",
+        });
+      }
+    }, 100),
+    []
+  );
 
   useEffect(() => {
     const computeCardHeight = () => {

@@ -4,19 +4,22 @@ import { useTranslation } from "react-i18next";
 import { useChatContext } from "@/lib/context";
 
 import { ChatMessage } from "./components/ChatMessage/components/ChatMessage";
+import { useChatMessages } from "./hooks/useChatMessages";
 
 export const ChatMessages = (): JSX.Element => {
   const { history } = useChatContext();
   const { t } = useTranslation(["chat"]);
+  const { chatListRef } = useChatMessages();
 
   return (
     <div
       style={{
         display: "flex",
         flexDirection: "column",
-        flex: 1, // Allow the component to grow within its flex container
-        overflowY: "auto", // Enable vertical scrolling when content overflows
+        flex: 1,
+        overflowY: "auto",
       }}
+      ref={chatListRef}
     >
       {history.length === 0 ? (
         <div
