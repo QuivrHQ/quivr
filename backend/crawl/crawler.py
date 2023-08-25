@@ -56,7 +56,7 @@ class CrawlWebsite(BaseModel):
             full_url = urljoin(url, link)
             # Ensure we're staying on the same domain
             if self.url in full_url:
-                content += self._process_recursive(full_url, depth - 1, visited_urls)
+                content += self._process_recursive(full_url, depth - 1, visited_urls)  # type: ignore
 
         return content
 
@@ -69,7 +69,7 @@ class CrawlWebsite(BaseModel):
         file_name = slugify(self.url) + ".txt"
         temp_file_path = os.path.join(tempfile.gettempdir(), file_name)
         with open(temp_file_path, "w") as temp_file:
-            temp_file.write(extracted_content)
+            temp_file.write(extracted_content)  # type: ignore
 
         return temp_file_path, file_name
 

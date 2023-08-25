@@ -19,5 +19,5 @@ def create_user_identity(id: UUID, openai_api_key: Optional[str]) -> UserIdentit
     )
     user_identity = response.data[0]
     return UserIdentity(
-        id=user_identity.user_id, openai_api_key=user_identity.openai_api_key
+        id=user_identity.user_id, openai_api_key=user_identity.openai_api_key  # type: ignore
     )
