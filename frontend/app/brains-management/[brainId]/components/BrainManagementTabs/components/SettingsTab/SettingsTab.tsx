@@ -15,6 +15,7 @@ import {
   paidModels,
 } from "@/lib/context/BrainConfigProvider/types";
 import { defineMaxTokens } from "@/lib/helpers/defineMaxTokens";
+import { SaveButton } from "@/shared/SaveButton";
 
 import { PublicPrompts } from "./components/PublicPrompts/PublicPrompts";
 import { useSettingsTab } from "./hooks/useSettingsTab";
@@ -54,7 +55,7 @@ export const SettingsTab = ({ brainId }: SettingsTabProps): JSX.Element => {
       <div className="flex flex-row flex-1 justify-between w-full">
         <div>
           <Field
-            label={ t("brainName", { ns: "brain" })}
+            label={t("brainName", { ns: "brain" })}
             placeholder={t("brainNamePlaceholder", { ns: "brain" })}
             autoComplete="off"
             className="flex-1"
@@ -140,6 +141,9 @@ export const SettingsTab = ({ brainId }: SettingsTabProps): JSX.Element => {
           {...register("maxTokens")}
         />
       </fieldset>
+      <div className="flex w-full justify-end py-4">
+        <SaveButton handleSubmit={handleSubmit} />
+      </div>
       <Divider text={t("customPromptSection", { ns: "config" })} />
       <PublicPrompts onSelect={pickPublicPrompt} />
       <Field
@@ -156,6 +160,9 @@ export const SettingsTab = ({ brainId }: SettingsTabProps): JSX.Element => {
         className="flex-1"
         {...register("prompt.content")}
       />
+      <div className="flex w-full justify-end py-4">
+        <SaveButton handleSubmit={handleSubmit} />
+      </div>
       {promptId !== "" && (
         <Button disabled={isUpdating} onClick={() => void removeBrainPrompt()}>
           {t("removePrompt", { ns: "config" })}
