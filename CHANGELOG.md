@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.0.62 (2023-08-25)
+
+## What's Changed
+* feat: Remove chat id from chat list by @ChloeMouret in https://github.com/StanGirard/quivr/pull/1031
+* fix(analytics): june debug for real by @gozineb in https://github.com/StanGirard/quivr/pull/1033
+
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.61...v0.0.62
+
 ## [0.0.61](https://github.com/StanGirard/quivr/compare/v0.0.60...v0.0.61) (2023-08-23)
 
 
