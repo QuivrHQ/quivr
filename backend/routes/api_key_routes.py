@@ -1,6 +1,6 @@
 from secrets import token_hex
 from typing import List
-from uuid import UUID, uuid4
+from uuid import uuid4
 
 from asyncpg.exceptions import UniqueViolationError
 from auth import AuthBearer, get_current_user
@@ -80,7 +80,7 @@ async def delete_api_key(
 
     """
     supabase_db = get_supabase_db()
-    supabase_db.delete_api_key(UUID(key_id), current_user.id)
+    supabase_db.delete_api_key(key_id, current_user.id)
 
     return {"message": "API key deleted."}
 

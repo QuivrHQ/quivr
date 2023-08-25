@@ -288,13 +288,13 @@ async def create_stream_question_handler(
                 chat_id=str(chat_id),
                 model=(brain_details or chat_question).model
                 if current_user.openai_api_key
-                else "gpt-3.5-turbo",
+                else "gpt-3.5-turbo",  # type: ignore
                 max_tokens=(brain_details or chat_question).max_tokens
                 if current_user.openai_api_key
-                else 0,
+                else 0,  # type: ignore
                 temperature=(brain_details or chat_question).temperature
                 if current_user.openai_api_key
-                else 256,
+                else 256,  # type: ignore
                 brain_id=str(brain_id),
                 user_openai_api_key=current_user.openai_api_key,  # pyright: ignore reportPrivateUsage=none
                 streaming=True,

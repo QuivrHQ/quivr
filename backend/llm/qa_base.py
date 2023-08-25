@@ -87,8 +87,8 @@ class QABaseBrainPicking(BaseBrainPicking):
 
     def _create_vector_store(self) -> CustomSupabaseVectorStore:
         return CustomSupabaseVectorStore(
-            self.supabase_client,
-            self.embeddings,
+            self.supabase_client,  # type: ignore
+            self.embeddings,  # type: ignore
             table_name="vectors",
             brain_id=self.brain_id,
         )
@@ -150,7 +150,7 @@ class QABaseBrainPicking(BaseBrainPicking):
 
         # The Chain that combines the question and answer
         qa = ConversationalRetrievalChain(
-            retriever=self.vector_store.as_retriever(),
+            retriever=self.vector_store.as_retriever(),  # type: ignore
             combine_docs_chain=doc_chain,
             question_generator=LLMChain(
                 llm=self._create_llm(model=self.model), prompt=CONDENSE_QUESTION_PROMPT
@@ -168,7 +168,7 @@ class QABaseBrainPicking(BaseBrainPicking):
                 "chat_history": transformed_history,
                 "custom_personality": prompt_content,
             }
-        )
+        )  # type: ignore
 
         answer = model_response["answer"]
 
@@ -221,7 +221,7 @@ class QABaseBrainPicking(BaseBrainPicking):
 
         # The Chain that combines the question and answer
         qa = ConversationalRetrievalChain(
-            retriever=self.vector_store.as_retriever(),
+            retriever=self.vector_store.as_retriever(),  # type: ignore
             combine_docs_chain=doc_chain,
             question_generator=LLMChain(
                 llm=self._create_llm(model=self.model), prompt=CONDENSE_QUESTION_PROMPT
