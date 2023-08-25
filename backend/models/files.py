@@ -6,11 +6,12 @@ from uuid import UUID
 from fastapi import UploadFile
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from logger import get_logger
+from pydantic import BaseModel
+from utils.file import compute_sha1_from_file
+
 from models.brains import Brain
 from models.databases.supabase.supabase import SupabaseDB
 from models.settings import get_supabase_db
-from pydantic import BaseModel
-from utils.file import compute_sha1_from_file
 
 logger = get_logger(__name__)
 
@@ -129,7 +130,7 @@ class File(BaseModel):
             brain_id (str): Brain id
         """
         response = self.supabase_db.get_brain_vectors_by_brain_id_and_file_sha1(
-            brain_id, self.file_sha1
+            brain_id, self.file_sha1  # type: ignore
         )
 
         print("response.data", response.data)

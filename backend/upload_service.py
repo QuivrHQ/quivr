@@ -1,11 +1,13 @@
 import os
+
 if __name__ == "__main__":
     # import needed here when running main.py to debug backend
     # you will need to run pip install python-dotenv
-    from dotenv import load_dotenv
+    from dotenv import load_dotenv  # type: ignore
+
     load_dotenv()
-import sentry_sdk
 import pypandoc
+import sentry_sdk
 from fastapi import FastAPI, HTTPException, Request, status
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
@@ -25,18 +27,18 @@ if sentry_dsn:
 
 app = FastAPI()
 
+
 @app.on_event("startup")
 async def startup_event():
     if not os.path.exists(pypandoc.get_pandoc_path()):
         pypandoc.download_pandoc()
 
-add_cors_middleware(app)
 
+add_cors_middleware(app)
 
 
 app.include_router(upload_router)
 app.include_router(misc_router)
-
 
 
 @app.exception_handler(HTTPException)
@@ -70,5 +72,5 @@ handle_request_validation_error(app)
 if __name__ == "__main__":
     # run main.py to debug backend
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=5050)
 
+    uvicorn.run(app, host="0.0.0.0", port=5050)

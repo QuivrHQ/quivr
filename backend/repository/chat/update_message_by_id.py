@@ -26,7 +26,7 @@ def update_message_by_id(
     updated_message = None
 
     if updates:
-        updated_message = (supabase_db.update_message_by_id(message_id, updates)).data[
+        updated_message = (supabase_db.update_message_by_id(message_id, updates)).data[  # type: ignore
             0
         ]
         logger.info(f"Message {message_id} updated")

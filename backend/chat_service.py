@@ -3,7 +3,7 @@ import os
 if __name__ == "__main__":
     # import needed here when running main.py to debug backend
     # you will need to run pip install python-dotenv
-    from dotenv import load_dotenv
+    from dotenv import load_dotenv  # type: ignore
 
     load_dotenv()
 import sentry_sdk

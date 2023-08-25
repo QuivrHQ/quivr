@@ -4,6 +4,7 @@ from uuid import UUID
 from models.settings import get_supabase_client
 from models.user_identity import UserIdentity
 from pydantic import BaseModel
+
 from repository.user_identity.create_user_identity import create_user_identity
 
 
@@ -19,7 +20,7 @@ def update_user_properties(
     response = (
         supabase_client.from_("user_identity")
         .update(user_identity_updatable_properties.__dict__)
-        .filter("user_id", "eq", user_id)
+        .filter("user_id", "eq", user_id)  # type: ignore
         .execute()
     )
 
