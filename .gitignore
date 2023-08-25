@@ -8,7 +8,7 @@ log.txt
 
 backend/venv
 backend/.env
-
+backend/*.deb
 
 
 
