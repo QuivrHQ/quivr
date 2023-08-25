@@ -1,6 +1,5 @@
 "use client";
 import Link from "next/link";
-import { Suspense } from "react";
 import { useTranslation } from "react-i18next";
 
 import { BrainRoleType } from "@/lib/components/NavBar/components/NavItems/components/BrainsDropDown/components/BrainActions/types";
@@ -58,24 +57,22 @@ const UploadPage = (): JSX.Element => {
   }
 
   return (
-    <Suspense fallback="Loading...">
-      <main className="pt-10">
-        <PageHeading
-          title={t("title", { ns: "upload" })}
-          subtitle={t("subtitle", { ns: "upload" })}
-        />
-        <FileUploader />
-        <Divider text={t("or")} className="m-5" />
-        <Crawler />
-        <div className="flex flex-col items-center justify-center gap-5 mt-5">
-          <Link href={"/chat"}>
-            <Button variant={"secondary"} className="py-3">
-              {t("chatButton")}
-            </Button>
-          </Link>
-        </div>
-      </main>
-    </Suspense>
+    <main className="pt-10">
+      <PageHeading
+        title={t("title", { ns: "upload" })}
+        subtitle={t("subtitle", { ns: "upload" })}
+      />
+      <FileUploader />
+      <Divider text={t("or")} className="m-5" />
+      <Crawler />
+      <div className="flex flex-col items-center justify-center gap-5 mt-5">
+        <Link href={"/chat"}>
+          <Button variant={"secondary"} className="py-3">
+            {t("chatButton")}
+          </Button>
+        </Link>
+      </div>
+    </main>
   );
 };
 

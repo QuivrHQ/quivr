@@ -1,4 +1,5 @@
 /* eslint-disable max-lines */
+
 import axios from "axios";
 import { UUID } from "crypto";
 import { useCallback, useState } from "react";
@@ -62,7 +63,7 @@ export const useFileUploader = () => {
         }
       }
     },
-    [session.access_token]
+    [publish, t, track, uploadFile]
   );
 
   const onDrop = (acceptedFiles: File[], fileRejections: FileRejection[]) => {

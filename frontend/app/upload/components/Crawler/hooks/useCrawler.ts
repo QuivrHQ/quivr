@@ -1,3 +1,4 @@
+"use client";
 import { UUID } from "crypto";
 import { useCallback, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -31,6 +32,7 @@ export const useCrawler = () => {
       const url = urlInputRef.current ? urlInputRef.current.value : null;
 
       if (url === null || !isValidUrl(url)) {
+        console.log("Invalid URL");
         void track("URL_INVALID");
 
         publish({
@@ -52,6 +54,7 @@ export const useCrawler = () => {
 
       setCrawling(true);
 
+      console.log("Tracking URL_CRAWLED");
       void track("URL_CRAWLED");
 
       try {
@@ -79,7 +82,7 @@ export const useCrawler = () => {
         setCrawling(false);
       }
     },
-    [session.access_token]
+    [crawlWebsiteUrl, publish, t, track]
   );
 
   return {
