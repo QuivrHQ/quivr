@@ -220,7 +220,7 @@ async def create_question_handler(
                 model=chat_question.model,
                 temperature=chat_question.temperature,
                 max_tokens=chat_question.max_tokens,
-                user_openai_api_key=current_user.openai_api_key,  # pyright: ignore reportPrivateUsage=none
+                user_openai_api_key=current_user.openai_api_key,
                 chat_id=str(chat_id),
                 prompt_id=chat_question.prompt_id,
             )
