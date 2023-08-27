@@ -43,6 +43,10 @@ class BrainUpdatableProperties(BaseModel):
         return brain_dict
 
 
+class BrainQuestionRequest(BaseModel):
+    question: str
+
+
 class Brain(Repository):
     def __init__(self, supabase_client):
         self.db = supabase_client
