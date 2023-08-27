@@ -4,20 +4,16 @@ from auth import AuthBearer, get_current_user
 from fastapi import APIRouter, Depends, HTTPException
 from logger import get_logger
 from models import BrainRateLimiting, UserIdentity
-from models.databases.supabase.brains import (
-    BrainUpdatableProperties,
-    CreateBrainProperties,
-)
-from repository.brain import (
-    create_brain,
-    create_brain_user,
-    get_brain_details,
-    get_default_user_brain_or_create_new,
-    get_user_brains,
-    get_user_default_brain,
-    set_as_default_brain_for_user,
-    update_brain_by_id,
-)
+from models.databases.supabase.brains import (BrainQuestionRequest,
+                                              BrainUpdatableProperties,
+                                              CreateBrainProperties)
+from repository.brain import (create_brain, create_brain_user,
+                              get_brain_details,
+                              get_default_user_brain_or_create_new,
+                              get_question_context_from_brain, get_user_brains,
+                              get_user_default_brain,
+                              set_as_default_brain_for_user,
+                              update_brain_by_id)
 from repository.prompt import delete_prompt_by_id, get_prompt_by_id
 from routes.authorizations.brain_authorization import has_brain_authorization
 from routes.authorizations.types import RoleEnum
@@ -207,3 +203,26 @@ async def set_as_default_brain_endpoint(
     set_as_default_brain_for_user(user.id, brain_id)
 
     return {"message": f"Brain {brain_id} has been set as default brain."}
+
+
+@brain_router.post(
+    "/brains/{brain_id}/question_context",
+    dependencies=[
+        Depends(
+            AuthBearer(),
+        ),
+        Depends(has_brain_authorization()),
+    ],
+    tags=["Brain"],
+)
+async def get_question_context_from_brain_endpoint(
+    brain_id: UUID,
+    request: BrainQuestionRequest,
+):
+    """
+    Get question context from brain
+    """
+
+    context = get_question_context_from_brain(brain_id, request.question)
+
+    return {"context": context}
