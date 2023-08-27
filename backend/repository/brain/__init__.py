@@ -10,3 +10,4 @@ from .update_user_rights import update_brain_user_rights
 from .get_default_user_brain import get_user_default_brain
 from .set_as_default_brain_for_user import set_as_default_brain_for_user
 from .get_default_user_brain_or_create_new import get_default_user_brain_or_create_new
+from .get_question_context_from_brain import get_question_context_from_brain
