@@ -7,7 +7,7 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { useSubscriptionApi } from "@/lib/api/subscription/useSubscriptionApi";
-import { BrainRoleType } from "@/lib/components/NavBar/components/NavItems/components/BrainsDropDown/components/BrainActions/types";
+import { BrainRoleType } from "@/lib/components/BrainUsers/types";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 import { useToast } from "@/lib/hooks";
 import { useEventTracking } from "@/services/analytics/useEventTracking";

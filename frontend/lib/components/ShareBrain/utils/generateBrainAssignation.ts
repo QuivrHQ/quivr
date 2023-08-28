@@ -1,4 +1,4 @@
-import { BrainRoleAssignation } from "../../NavBar/components/NavItems/components/BrainsDropDown/components/BrainActions/types";
+import { BrainRoleAssignation } from "../../BrainUsers/types";
 
 export const generateBrainAssignation = (): BrainRoleAssignation => {
   return {

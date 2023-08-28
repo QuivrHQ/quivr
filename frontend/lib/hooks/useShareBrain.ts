@@ -10,7 +10,7 @@ import { useToast } from "@/lib/hooks";
 import {
   BrainRoleAssignation,
   BrainRoleType,
-} from "../components/NavBar/components/NavItems/components/BrainsDropDown/components/BrainActions/types";
+} from "../components/BrainUsers/types";
 import { generateBrainAssignation } from "../components/ShareBrain/utils/generateBrainAssignation";
 import { useBrainContext } from "../context/BrainProvider/hooks/useBrainContext";
 

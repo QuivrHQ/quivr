@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { useTranslation } from "react-i18next";
 
-import { BrainRoleType } from "@/lib/components/NavBar/components/NavItems/components/BrainsDropDown/components/BrainActions/types";
+import { BrainRoleType } from "@/lib/components/BrainUsers/types";
 import Button from "@/lib/components/ui/Button";
 import { Divider } from "@/lib/components/ui/Divider";
 import PageHeading from "@/lib/components/ui/PageHeading";

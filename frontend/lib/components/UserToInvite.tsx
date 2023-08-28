@@ -6,10 +6,7 @@ import Field from "@/lib/components/ui/Field";
 import { Select } from "@/lib/components/ui/Select";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 
-import {
-  BrainRoleAssignation,
-  BrainRoleType,
-} from "./NavBar/components/NavItems/components/BrainsDropDown/components/BrainActions/types";
+import { BrainRoleAssignation, BrainRoleType } from "./BrainUsers/types";
 import { userRoleToAssignableRoles } from "./ShareBrain/types";
 
 type UserToInviteProps = {
