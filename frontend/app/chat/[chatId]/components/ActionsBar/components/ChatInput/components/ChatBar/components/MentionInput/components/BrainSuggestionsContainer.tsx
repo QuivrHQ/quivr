@@ -1,7 +1,7 @@
 import { Popover } from "@draft-js-plugins/mention";
 import { PopoverProps } from "@draft-js-plugins/mention/lib/MentionSuggestions/Popover";
 
-import { AddNewBrainButton } from "./AddNewBrainButton";
+import { AddBrainModal } from "@/lib/components/AddBrainModal";
 
 export const BrainSuggestionsContainer = ({
   children,
@@ -15,7 +15,7 @@ export const BrainSuggestionsContainer = ({
       className="bg-white dark:bg-black border border-black/10 dark:border-white/25 rounded-md shadow-md overflow-y-auto"
     >
       {children}
-      <AddNewBrainButton />
+      <AddBrainModal />
     </div>
   </Popover>
 );

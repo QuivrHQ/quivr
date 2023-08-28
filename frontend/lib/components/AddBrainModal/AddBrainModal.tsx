@@ -35,7 +35,11 @@ export const AddBrainModal = (): JSX.Element => {
   return (
     <Modal
       Trigger={
-        <Button variant={"secondary"}>
+        <Button
+          onClick={() => void 0}
+          variant={"tertiary"}
+          className="border-0"
+        >
           {t("newBrain", { ns: "brain" })}
           <MdAdd className="text-xl" />
         </Button>
