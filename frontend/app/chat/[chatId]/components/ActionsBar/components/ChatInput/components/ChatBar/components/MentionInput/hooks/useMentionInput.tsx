@@ -127,10 +127,21 @@ export const useMentionInput = ({
       return getDefaultKeyBinding(e);
     }
 
-    if (
-      (e.key === "Backspace" || e.key === "Delete") &&
-      getEditorText(editorState) === ""
-    ) {
+    if (e.key === "Backspace" || e.key === "Delete") {
+      if (!(getEditorText(editorState) === "")) {
+        return getDefaultKeyBinding(e);
+      }
+      if (currentPromptId !== null) {
+        setCurrentPromptId(null);
+
+        return "backspace";
+      }
+      if (currentBrainId !== null) {
+        setCurrentBrainId(null);
+
+        return "backspace";
+      }
+
       return "backspace";
     }
 
