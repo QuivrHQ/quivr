@@ -8,7 +8,10 @@ import { UUID } from "crypto";
 import { EditorState, getDefaultKeyBinding } from "draft-js";
 import { useCallback, useEffect, useRef, useState } from "react";
 
-import { MentionTriggerType } from "@/app/chat/[chatId]/components/ActionsBar/types";
+import {
+  mentionTriggers,
+  MentionTriggerType,
+} from "@/app/chat/[chatId]/components/ActionsBar/types";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 
 import "@draft-js-plugins/mention/lib/plugin.css";
@@ -60,10 +63,6 @@ export const useMentionInput = ({
 
   const [open, setOpen] = useState(false);
 
-  const onOpenChange = useCallback((_open: boolean) => {
-    setOpen(_open);
-  }, []);
-
   const onAddMention = (mention: MentionData) => {
     if (mention.trigger === "#") {
       setCurrentPromptId(mention.id as UUID);
@@ -86,18 +85,32 @@ export const useMentionInput = ({
     trigger: MentionTriggerType;
     value: string;
   }) => {
-    if (currentBrainId !== null && trigger === "@") {
-      setSuggestions([]);
-
-      return;
-    }
-    if (currentPromptId !== null && trigger === "#") {
-      setSuggestions([]);
-
-      return;
-    }
-
     setCurrentTrigger(trigger);
+    if (trigger === "@") {
+      if (currentBrainId !== null) {
+        setSuggestions([]);
+
+        return;
+      }
+
+      if (value === "") {
+        setSuggestions(mentionItems["@"]);
+
+        return;
+      }
+    }
+    if (trigger === "#") {
+      if (currentPromptId !== null) {
+        setSuggestions([]);
+
+        return;
+      }
+      if (value === "") {
+        setSuggestions(mentionItems["#"]);
+
+        return;
+      }
+    }
 
     setSuggestions(defaultSuggestionsFilter(value, mentionItems, trigger));
   };
@@ -107,6 +120,12 @@ export const useMentionInput = ({
   }, [setEditorState]);
 
   const keyBindingFn = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    if (mentionTriggers.includes(e.key as MentionTriggerType)) {
+      setOpen(true);
+
+      return getDefaultKeyBinding(e);
+    }
+
     if (e.key === "Enter" && !e.shiftKey) {
       onSubmit();
 
@@ -142,7 +161,6 @@ export const useMentionInput = ({
     mentionInputRef,
     plugins,
     MentionSuggestions,
-    onOpenChange,
     onSearchChange,
     open,
     suggestions,
@@ -152,5 +170,6 @@ export const useMentionInput = ({
     keyBindingFn,
     publicPrompts,
     currentTrigger,
+    setOpen,
   };
 };
