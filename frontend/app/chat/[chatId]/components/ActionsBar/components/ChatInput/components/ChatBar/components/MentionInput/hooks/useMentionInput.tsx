@@ -119,11 +119,19 @@ export const useMentionInput = ({
     setEditorState(EditorState.createEmpty());
   }, [setEditorState]);
 
+  // eslint-disable-next-line complexity
   const keyBindingFn = (e: React.KeyboardEvent<HTMLDivElement>) => {
     if (mentionTriggers.includes(e.key as MentionTriggerType)) {
       setOpen(true);
 
       return getDefaultKeyBinding(e);
+    }
+
+    if (
+      (e.key === "Backspace" || e.key === "Delete") &&
+      getEditorText(editorState) === ""
+    ) {
+      return "backspace";
     }
 
     if (e.key === "Enter" && !e.shiftKey) {
