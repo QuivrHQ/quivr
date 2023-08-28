@@ -1,5 +1,22 @@
 # Changelog
 
+## 0.0.63 (2023-08-27)
+
+## What's Changed
+* fix(dockerfile): backend Dockerfile exit code 1 by @pat266 in https://github.com/StanGirard/quivr/pull/1032
+* test(backend): skip failing tests by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1036
+* feat(messagesList): auto scroll on new message by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1040
+* test: unskip `qa_headless.py` linter tests by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1041
+* feat: add 2 save buttons on Brain management tab by @ChloeMouret in https://github.com/StanGirard/quivr/pull/1039
+* feat(brain): add endpoint to return context to question by @ZongZiWang in https://github.com/StanGirard/quivr/pull/1044
+* fix: English grammar translation.json by @elie222 in https://github.com/StanGirard/quivr/pull/1046
+
+## New Contributors
+* @pat266 made their first contribution in https://github.com/StanGirard/quivr/pull/1032
+* @elie222 made their first contribution in https://github.com/StanGirard/quivr/pull/1046
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.62...v0.0.63
+
 ## 0.0.62 (2023-08-25)
 
 ## What's Changed
