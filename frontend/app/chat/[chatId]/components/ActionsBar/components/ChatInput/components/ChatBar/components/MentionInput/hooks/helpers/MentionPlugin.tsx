@@ -21,7 +21,9 @@ export const useMentionPlugin = () => {
                 minWidth: "auto",
                 backgroundColor: "transparent",
                 padding: "0",
-                marginBottom: "5",
+                // We are adding a bottom margin to the suggestions container since it is overlapping with mention remove icon
+                // Please, do not remove!
+                marginBottom: "20px",
               };
             },
           },
