@@ -1,4 +1,3 @@
-import { useFeature } from "@growthbook/growthbook-react";
 import React from "react";
 import ReactMarkdown from "react-markdown";
 
@@ -16,8 +15,6 @@ export const ChatMessage = React.forwardRef(
     { speaker, text, brainName, promptName }: ChatMessageProps,
     ref: React.Ref<HTMLDivElement>
   ) => {
-    const isNewUxOn = useFeature("new-ux").on;
-
     const isUserSpeaker = speaker === "user";
     const containerClasses = cn(
       "py-3 px-5 w-fit ",
@@ -39,14 +36,14 @@ export const ChatMessage = React.forwardRef(
       <div className={containerWrapperClasses}>
         {" "}
         <div ref={ref} className={containerClasses}>
-          {isNewUxOn && (
+          <div className="w-full">
             <span
               data-testid="brain-prompt-tags"
-              className="text-gray-400 mb-1"
+              className="text-gray-400 mb-1 text-xs"
             >
               @{brainName ?? "-"} #{promptName ?? "-"}
             </span>
-          )}
+          </div>
           <div data-testid="chat-message-text">
             <ReactMarkdown className={markdownClasses}>{text}</ReactMarkdown>
           </div>

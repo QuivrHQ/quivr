@@ -2,6 +2,7 @@
 "use client";
 
 import { UUID } from "crypto";
+import { Fragment } from "react";
 import { useTranslation } from "react-i18next";
 import { ImUserPlus } from "react-icons/im";
 import { MdContentPaste, MdShare } from "react-icons/md";
@@ -10,17 +11,17 @@ import { BrainUsers } from "@/lib/components/BrainUsers/BrainUsers";
 import { UserToInvite } from "@/lib/components/UserToInvite";
 import Button from "@/lib/components/ui/Button";
 import { Modal } from "@/lib/components/ui/Modal";
+import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 import { useShareBrain } from "@/lib/hooks/useShareBrain";
+
+import { BrainRoleType } from "../NavBar/components/NavItems/components/BrainsDropDown/components/BrainActions/types";
 
 type ShareBrainModalProps = {
   brainId: UUID;
-  name: string;
 };
+const requiredAccessToShareBrain: BrainRoleType[] = ["Owner", "Editor"];
 
-export const ShareBrain = ({
-  brainId,
-  name,
-}: ShareBrainModalProps): JSX.Element => {
+export const ShareBrain = ({ brainId }: ShareBrainModalProps): JSX.Element => {
   const {
     roleAssignations,
     brainShareLink,
@@ -34,7 +35,18 @@ export const ShareBrain = ({
     isShareModalOpen,
     canAddNewRow,
   } = useShareBrain(brainId);
+
   const { t } = useTranslation(["translation", "brain"]);
+
+  const { allBrains } = useBrainContext();
+  const correspondingBrain = allBrains.find((brain) => brain.id === brainId);
+
+  if (
+    correspondingBrain === undefined ||
+    !requiredAccessToShareBrain.includes(correspondingBrain.role)
+  ) {
+    return <Fragment />;
+  }
 
   return (
     <Modal
@@ -49,7 +61,7 @@ export const ShareBrain = ({
         </Button>
       }
       CloseTrigger={<div />}
-      title={t("shareBrain", { name, ns: "brain" })}
+      title={t("shareBrain", { name: correspondingBrain.name, ns: "brain" })}
       isOpen={isShareModalOpen}
       setOpen={setIsShareModalOpen}
     >

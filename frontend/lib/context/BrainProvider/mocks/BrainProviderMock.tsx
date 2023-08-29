@@ -13,6 +13,7 @@ export const BrainProviderMock = ({
     <BrainContextMock.Provider
       value={{
         allBrains: [],
+        publicPrompts:[],
         currentBrain: undefined,
         //@ts-ignore we are not using the functions in tests
         createBrain: () => void 0,

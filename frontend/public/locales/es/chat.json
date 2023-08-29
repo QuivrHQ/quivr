@@ -34,5 +34,5 @@
   "thinking": "Pensando...",
   "title": "Conversa con {{brain}}",
   "missing_brain": "No hay cerebro seleccionado",
-  "new_brain": "Crear nuevo cerebro"
+  "new_prompt": "Crear nueva instrucción"
 }

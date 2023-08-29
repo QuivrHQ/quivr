@@ -34,5 +34,5 @@
   "empty_brain_title_suffix": "和他们聊天",
   "actions_bar_placeholder": "向 @brains 或 /files 提问，并选择您的 #prompt",
   "missing_brain": "请选择一个大脑进行聊天",
-  "new_brain": "新大脑"
+  "new_prompt": "新提示"
 }

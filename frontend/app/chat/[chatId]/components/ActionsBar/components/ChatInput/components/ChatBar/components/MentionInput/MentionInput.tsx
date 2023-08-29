@@ -1,12 +1,16 @@
 import Editor from "@draft-js-plugins/editor";
-import { ReactElement } from "react";
+import { PopoverProps } from "@draft-js-plugins/mention/lib/MentionSuggestions/Popover";
+import { ComponentType, ReactElement } from "react";
 import { useTranslation } from "react-i18next";
 
 import "@draft-js-plugins/mention/lib/plugin.css";
 import "draft-js/dist/Draft.css";
 
+import { MentionTriggerType } from "@/app/chat/[chatId]/components/ActionsBar/types";
+
+import { BrainSuggestionsContainer } from "./components/BrainSuggestionsContainer";
+import { PromptSuggestionsContainer } from "./components/PromptSuggestionsContainer";
 import { SuggestionRow } from "./components/SuggestionRow";
-import { SuggestionsContainer } from "./components/SuggestionsContainer";
 import { useMentionInput } from "./hooks/useMentionInput";
 
 type MentionInputProps = {
@@ -14,6 +18,15 @@ type MentionInputProps = {
   setMessage: (text: string) => void;
   message: string;
 };
+
+const triggerToSuggestionsContainer: Record<
+  MentionTriggerType,
+  ComponentType<PopoverProps>
+> = {
+  "@": BrainSuggestionsContainer,
+  "#": PromptSuggestionsContainer,
+};
+
 export const MentionInput = ({
   onSubmit,
   setMessage,
@@ -24,13 +37,14 @@ export const MentionInput = ({
     MentionSuggestions,
     keyBindingFn,
     editorState,
-    onOpenChange,
+    setOpen,
     onSearchChange,
     open,
     plugins,
     suggestions,
     onAddMention,
     handleEditorChange,
+    currentTrigger,
   } = useMentionInput({
     message,
     onSubmit,
@@ -50,15 +64,24 @@ export const MentionInput = ({
         placeholder={t("actions_bar_placeholder")}
         keyBindingFn={keyBindingFn}
       />
-      <MentionSuggestions
-        open={open}
-        onOpenChange={onOpenChange}
-        suggestions={suggestions}
-        onSearchChange={onSearchChange}
-        popoverContainer={SuggestionsContainer}
-        onAddMention={onAddMention}
-        entryComponent={SuggestionRow}
-      />
+      <div
+        style={{
+          // `open` should be directly passed to the MentionSuggestions component.
+          // However, it is not working as expected since we are not able to click on button in custom suggestion renderer.
+          // So, we are using this hack to make it work.
+          visibility: open ? "visible" : "hidden",
+        }}
+      >
+        <MentionSuggestions
+          open
+          onOpenChange={setOpen}
+          suggestions={suggestions}
+          onSearchChange={onSearchChange}
+          popoverContainer={triggerToSuggestionsContainer[currentTrigger]}
+          onAddMention={onAddMention}
+          entryComponent={SuggestionRow}
+        />
+      </div>
     </div>
   );
 };
