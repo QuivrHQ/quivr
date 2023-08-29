@@ -9,7 +9,10 @@ export const useEventTracking = () => {
   const analytics = useJune();
   const { session } = useSupabase();
 
-  const track = async (event: string): Promise<void> => {
+  const track = async (
+    event: string,
+    properties?: Record<string, unknown>
+  ): Promise<void> => {
     console.log("Event to track", event);
     if (analytics === undefined) {
       console.log("No analytics found");
@@ -17,7 +20,7 @@ export const useEventTracking = () => {
       return;
     }
     await analytics.identify(session?.user.id, { email: session?.user.email });
-    await analytics.track(event);
+    await analytics.track(event, properties);
   };
 
   return {

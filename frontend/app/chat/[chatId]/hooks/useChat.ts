@@ -24,7 +24,7 @@ export const useChat = () => {
   const [generatingAnswer, setGeneratingAnswer] = useState(false);
 
   const { history } = useChatContext();
-  const { currentBrain, currentPromptId } = useBrainContext();
+  const { currentBrain, currentPromptId, currentBrainId } = useBrainContext();
   const { publish } = useToast();
   const { createChat } = useChatApi();
 
@@ -55,7 +55,11 @@ export const useChat = () => {
         //TODO: update chat list here
       }
 
-      void track("QUESTION_ASKED");
+      void track("QUESTION_ASKED", {
+        brainId: currentBrainId,
+        promptId: currentPromptId,
+      });
+
       const chatConfig = getChatConfigFromLocalStorage(currentChatId);
 
       const chatQuestion: ChatQuestion = {
