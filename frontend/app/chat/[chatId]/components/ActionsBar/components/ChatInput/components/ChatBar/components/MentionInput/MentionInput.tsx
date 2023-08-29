@@ -69,7 +69,7 @@ export const MentionInput = ({
           // `open` should be directly passed to the MentionSuggestions component.
           // However, it is not working as expected since we are not able to click on button in custom suggestion renderer.
           // So, we are using this hack to make it work.
-          visibility: open ? "visible" : "hidden",
+          opacity: open ? 1 : 0,
         }}
       >
         <MentionSuggestions

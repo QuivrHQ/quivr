@@ -14,7 +14,7 @@ import { Modal } from "@/lib/components/ui/Modal";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 import { useShareBrain } from "@/lib/hooks/useShareBrain";
 
-import { BrainRoleType } from "../NavBar/components/NavItems/components/BrainsDropDown/components/BrainActions/types";
+import { BrainRoleType } from "../BrainUsers/types";
 
 type ShareBrainModalProps = {
   brainId: UUID;

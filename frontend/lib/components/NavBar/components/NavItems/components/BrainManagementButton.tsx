@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { MdSettings } from "react-icons/md";
+import { FaBrain } from "react-icons/fa";
 
 import Button from "@/lib/components/ui/Button";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
@@ -14,7 +14,7 @@ export const BrainManagementButton = (): JSX.Element => {
         className="focus:outline-none text-2xl"
         aria-label="Settings"
       >
-        <MdSettings />
+        <FaBrain className="w-6 h-6" />
       </Button>
     </Link>
   );
