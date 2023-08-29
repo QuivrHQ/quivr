@@ -13,9 +13,9 @@ import {
   MentionTriggerType,
 } from "@/app/chat/[chatId]/components/ActionsBar/types";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
-
 import "@draft-js-plugins/mention/lib/plugin.css";
 import "draft-js/dist/Draft.css";
+import { useJune } from "@/services/analytics/useJune";
 
 import { useMentionPlugin } from "./helpers/MentionPlugin";
 import { useMentionState } from "./helpers/MentionState";
@@ -41,6 +41,7 @@ export const useMentionInput = ({
     setCurrentPromptId,
   } = useBrainContext();
 
+  const analytics = useJune();
   const {
     editorState,
     setEditorState,
@@ -65,10 +66,12 @@ export const useMentionInput = ({
 
   const onAddMention = (mention: MentionData) => {
     if (mention.trigger === "#") {
+      void analytics?.track("CHANGE_PROMPT");
       setCurrentPromptId(mention.id as UUID);
     }
 
     if (mention.trigger === "@") {
+      void analytics?.track("CHANGE_BRAIN");
       setCurrentBrainId(mention.id as UUID);
     }
 

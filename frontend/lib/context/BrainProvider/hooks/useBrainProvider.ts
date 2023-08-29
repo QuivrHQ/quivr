@@ -81,9 +81,8 @@ export const useBrainProvider = () => {
       const newActiveBrain = { id, name };
       saveBrainInLocalStorage(newActiveBrain);
       setCurrentBrainId(id);
-      void track("CHANGE_BRAIN");
     },
-    [track]
+    []
   );
 
   const setDefaultBrain = useCallback(async () => {
