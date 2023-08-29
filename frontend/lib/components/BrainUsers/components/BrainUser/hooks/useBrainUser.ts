@@ -1,13 +1,12 @@
-import axios, { AxiosResponse } from "axios";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { useBrainApi } from "@/lib/api/brain/useBrainApi";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
+import { getAxiosErrorParams } from "@/lib/helpers/getAxiosErrorParams";
 import { useToast } from "@/lib/hooks";
 
 import { BrainRoleType } from "../../../types";
-
 type UseBrainUserProps = {
   fetchBrainUsers: () => Promise<void>;
   role: BrainRoleType;
@@ -43,16 +42,11 @@ export const useBrainUser = ({
       });
       void fetchBrainUsers();
     } catch (e) {
-      if (axios.isAxiosError(e) && e.response?.status === 403) {
+      const axiosError = getAxiosErrorParams(e);
+      if (axiosError !== undefined && axiosError.status === 403) {
         publish({
           variant: "danger",
-          text: `${JSON.stringify(
-            (
-              e.response as {
-                data: { detail: string };
-              }
-            ).data.detail
-          )}`,
+          text: axiosError.message,
         });
       } else {
         publish({
@@ -66,7 +60,6 @@ export const useBrainUser = ({
       }
     }
   };
-
   const removeUserAccess = async () => {
     setIsRemovingAccess(true);
     try {
@@ -79,14 +72,11 @@ export const useBrainUser = ({
       });
       void fetchBrainUsers();
     } catch (e) {
-      if (axios.isAxiosError(e) && e.response?.data !== undefined) {
+      const axiosError = getAxiosErrorParams(e);
+      if (axiosError !== undefined) {
         publish({
           variant: "danger",
-          text: (
-            e.response as AxiosResponse<{
-              detail: string;
-            }>
-          ).data.detail,
+          text: axiosError.message,
         });
       } else {
         publish({
