@@ -1,3 +1,3 @@
-export type MentionType = { id: string; display: string };
+export const mentionTriggers = ["@", "#"] as const;
 
-export type MentionTriggerType = "@" | "#";
+export type MentionTriggerType = (typeof mentionTriggers)[number];

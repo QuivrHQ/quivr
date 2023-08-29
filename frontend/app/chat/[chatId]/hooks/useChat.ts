@@ -24,7 +24,7 @@ export const useChat = () => {
   const [generatingAnswer, setGeneratingAnswer] = useState(false);
 
   const { history } = useChatContext();
-  const { currentBrain } = useBrainContext();
+  const { currentBrain, currentPromptId } = useBrainContext();
   const { publish } = useToast();
   const { createChat } = useChatApi();
 
@@ -64,6 +64,7 @@ export const useChat = () => {
         temperature: chatConfig?.temperature,
         max_tokens: chatConfig?.maxTokens,
         brain_id: currentBrain?.id,
+        prompt_id: currentPromptId ?? undefined,
       };
 
       await addStreamQuestion(currentChatId, chatQuestion);

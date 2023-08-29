@@ -8,26 +8,23 @@ export const ShortCuts = (): JSX.Element => {
 
   const shortcuts = [
     {
-      content: [
-        t("shortcut_select_brain"),
-        t("shortcut_select_file"),
-        t("shortcut_choose_prompt"),
-      ],
+      content: [t("shortcut_select_brain"), t("shortcut_choose_prompt")],
     },
-    {
-      content: [
-        t("shortcut_create_brain"),
-        t("shortcut_feed_brain"),
-        t("shortcut_create_prompt"),
-      ],
-    },
-    {
-      content: [
-        t("shortcut_manage_brains"),
-        t("shortcut_go_to_user_page"),
-        t("shortcut_go_to_shortcuts"),
-      ],
-    },
+    // {
+    //   content: [
+    //     t("shortcut_select_file"),
+    //     t("shortcut_create_brain"),
+    //     t("shortcut_feed_brain"),
+    //     t("shortcut_create_prompt"),
+    //   ],
+    // },
+    // {
+    //   content: [
+    //     t("shortcut_manage_brains"),
+    //     t("shortcut_go_to_user_page"),
+    //     t("shortcut_go_to_shortcuts"),
+    //   ],
+    // },
   ];
 
   return (

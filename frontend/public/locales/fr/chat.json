@@ -34,5 +34,5 @@
   "thinking": "Réflexion...",
   "title": "Discuter avec {{brain}}",
   "missing_brain": "Veuillez selectionner un cerveau pour discuter",
-  "new_brain": "Créer un nouveau cerveau"
+  "new_prompt": "Créer un nouveau prompt"
 }

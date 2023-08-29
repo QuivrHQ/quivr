@@ -33,5 +33,5 @@
   "empty_brain_title_suffix": "and chat with them",
   "actions_bar_placeholder": "Ask a question to @brains or /files and choose your #prompt",
   "missing_brain": "Please select a brain to chat with",
-  "new_brain": "Create new brain"
+  "new_prompt": "Create new prompt"
 }

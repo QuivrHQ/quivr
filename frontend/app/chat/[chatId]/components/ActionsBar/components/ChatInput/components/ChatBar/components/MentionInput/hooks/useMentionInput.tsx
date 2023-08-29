@@ -8,15 +8,19 @@ import { UUID } from "crypto";
 import { EditorState, getDefaultKeyBinding } from "draft-js";
 import { useCallback, useEffect, useRef, useState } from "react";
 
+import {
+  mentionTriggers,
+  MentionTriggerType,
+} from "@/app/chat/[chatId]/components/ActionsBar/types";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
+
+import "@draft-js-plugins/mention/lib/plugin.css";
+import "draft-js/dist/Draft.css";
 
 import { useMentionPlugin } from "./helpers/MentionPlugin";
 import { useMentionState } from "./helpers/MentionState";
 import { useMentionUtils } from "./helpers/MentionUtils";
-import { mapMinimalBrainToMentionData } from "../utils/mapMinimalBrainToMentionData";
-
-import "@draft-js-plugins/mention/lib/plugin.css";
-import "draft-js/dist/Draft.css";
+import { getEditorText } from "./helpers/getEditorText";
 
 type UseMentionInputProps = {
   message: string;
@@ -30,95 +34,106 @@ export const useMentionInput = ({
   onSubmit,
   setMessage,
 }: UseMentionInputProps) => {
-  const { allBrains, currentBrainId, setCurrentBrainId } = useBrainContext();
+  const {
+    currentBrainId,
+    currentPromptId,
+    setCurrentBrainId,
+    setCurrentPromptId,
+  } = useBrainContext();
 
   const {
     editorState,
     setEditorState,
-    setMentionItems,
     mentionItems,
     setSuggestions,
     suggestions,
-    getEditorCurrentMentions,
-    getEditorTextWithoutMentions,
+    publicPrompts,
   } = useMentionState();
 
-  const { removeMention, insertMention } = useMentionUtils({
+  const { removeEntity } = useMentionUtils({
     editorState,
     setEditorState,
   });
 
-  const { MentionSuggestions, plugins } = useMentionPlugin({
-    removeMention,
-  });
+  const [currentTrigger, setCurrentTrigger] = useState<MentionTriggerType>("@");
+
+  const { MentionSuggestions, plugins } = useMentionPlugin();
 
   const mentionInputRef = useRef<Editor>(null);
 
-  const [selectedBrainAddedOnload, setSelectedBrainAddedOnload] =
-    useState(false);
-
   const [open, setOpen] = useState(false);
 
-  const onOpenChange = useCallback((_open: boolean) => {
-    setOpen(_open);
-  }, []);
-
   const onAddMention = (mention: MentionData) => {
-    setCurrentBrainId(mention.id as UUID);
+    if (mention.trigger === "#") {
+      setCurrentPromptId(mention.id as UUID);
+    }
+
+    if (mention.trigger === "@") {
+      setCurrentBrainId(mention.id as UUID);
+    }
+
+    const lastEntityKey = editorState
+      .getCurrentContent()
+      .getLastCreatedEntityKey();
+    removeEntity(lastEntityKey);
   };
 
   const onSearchChange = ({
     trigger,
     value,
   }: {
-    trigger: string;
+    trigger: MentionTriggerType;
     value: string;
   }) => {
-    if (currentBrainId !== null) {
-      setSuggestions([]);
+    setCurrentTrigger(trigger);
+    if (trigger === "@") {
+      if (currentBrainId !== null) {
+        setSuggestions([]);
 
-      return;
-    }
-    setSuggestions(
-      defaultSuggestionsFilter(
-        value,
-        mapMinimalBrainToMentionData(mentionItems["@"]),
-        trigger
-      )
-    );
-  };
-
-  const insertCurrentBrainAsMention = (): void => {
-    const mention = mentionItems["@"].find(
-      (item) => item.id === currentBrainId
-    );
-
-    if (mention !== undefined) {
-      insertMention(mention, "@");
-    }
-  };
-
-  const resetEditorContent = () => {
-    const currentMentions = getEditorCurrentMentions();
-    let newEditorState = EditorState.createEmpty();
-    currentMentions.forEach((mention) => {
-      if (mention.trigger === "@") {
-        const correspondingMention = mentionItems["@"].find(
-          (item) => item.name === mention.content
-        );
-        if (correspondingMention !== undefined) {
-          newEditorState = insertMention(
-            correspondingMention,
-            mention.trigger,
-            newEditorState
-          );
-        }
+        return;
       }
-    });
-    setEditorState(newEditorState);
+
+      if (value === "") {
+        setSuggestions(mentionItems["@"]);
+
+        return;
+      }
+    }
+    if (trigger === "#") {
+      if (currentPromptId !== null) {
+        setSuggestions([]);
+
+        return;
+      }
+      if (value === "") {
+        setSuggestions(mentionItems["#"]);
+
+        return;
+      }
+    }
+
+    setSuggestions(defaultSuggestionsFilter(value, mentionItems, trigger));
   };
 
+  const resetEditorContent = useCallback(() => {
+    setEditorState(EditorState.createEmpty());
+  }, [setEditorState]);
+
+  // eslint-disable-next-line complexity
   const keyBindingFn = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    if (mentionTriggers.includes(e.key as MentionTriggerType)) {
+      setOpen(true);
+
+      return getDefaultKeyBinding(e);
+    }
+
+    if (
+      (e.key === "Backspace" || e.key === "Delete") &&
+      getEditorText(editorState) === ""
+    ) {
+      return "backspace";
+    }
+
     if (e.key === "Enter" && !e.shiftKey) {
       onSubmit();
 
@@ -134,67 +149,35 @@ export const useMentionInput = ({
 
   const handleEditorChange = (newEditorState: EditorState) => {
     setEditorState(newEditorState);
-    const currentMessage = getEditorTextWithoutMentions(newEditorState);
-    setMessage(currentMessage);
   };
+
+  useEffect(() => {
+    const currentMessage = getEditorText(editorState);
+
+    if (currentMessage !== "") {
+      setMessage(currentMessage);
+    }
+  }, [editorState, setMessage]);
 
   useEffect(() => {
     if (message === "") {
       resetEditorContent();
     }
-  }, [message]);
-
-  useEffect(() => {
-    setSuggestions(mapMinimalBrainToMentionData(mentionItems["@"]));
-  }, [mentionItems]);
-
-  useEffect(() => {
-    setMentionItems({
-      ...mentionItems,
-      "@": [
-        ...allBrains.map((brain) => ({
-          ...brain,
-          value: brain.name,
-        })),
-      ],
-    });
-  }, [allBrains]);
-
-  useEffect(() => {
-    if (
-      selectedBrainAddedOnload ||
-      mentionItems["@"].length === 0 ||
-      currentBrainId === null
-    ) {
-      return;
-    }
-
-    insertCurrentBrainAsMention();
-
-    setSelectedBrainAddedOnload(true);
-  }, [currentBrainId, mentionItems]);
-
-  useEffect(() => {
-    const contentState = editorState.getCurrentContent();
-    const plainText = contentState.getPlainText();
-
-    if (plainText === "" && currentBrainId !== null) {
-      insertCurrentBrainAsMention();
-    }
-  }, [editorState]);
+  }, [message, resetEditorContent]);
 
   return {
     mentionInputRef,
     plugins,
     MentionSuggestions,
-    onOpenChange,
     onSearchChange,
     open,
     suggestions,
     onAddMention,
     editorState,
-    insertCurrentBrainAsMention,
     handleEditorChange,
     keyBindingFn,
+    publicPrompts,
+    currentTrigger,
+    setOpen,
   };
 };

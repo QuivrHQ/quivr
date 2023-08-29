@@ -1,14 +1,32 @@
 import { EntryComponentProps } from "@draft-js-plugins/mention/lib/MentionSuggestions/Entry/Entry";
+import { UUID } from "crypto";
+
+import { MentionTriggerType } from "@/app/chat/[chatId]/components/ActionsBar/types";
+import { ShareBrain } from "@/lib/components/ShareBrain";
 
 import { BrainSuggestion } from "./BrainSuggestion";
+import { PromptSuggestion } from "./PromptSuggestion";
 
 export const SuggestionRow = ({
   mention,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  className,
   ...otherProps
-}: EntryComponentProps): JSX.Element => (
-  <div {...otherProps}>
-    <BrainSuggestion id={mention.id as string} content={mention.name} />
-  </div>
-);
+}: EntryComponentProps): JSX.Element => {
+  if ((mention.trigger as MentionTriggerType) === "@") {
+    return (
+      <div {...otherProps}>
+        <div className="relative flex group px-4">
+          <BrainSuggestion content={mention.name} />
+          <div className="absolute right-0 flex flex-row">
+            <ShareBrain brainId={mention.id as UUID} />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div {...otherProps}>
+      <PromptSuggestion content={mention.name} />
+    </div>
+  );
+};
