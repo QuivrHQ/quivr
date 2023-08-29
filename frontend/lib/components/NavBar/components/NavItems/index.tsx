@@ -9,7 +9,6 @@ import { cn } from "@/lib/utils";
 
 import { AuthButtons } from "./components/AuthButtons";
 import { BrainManagementButton } from "./components/BrainManagementButton";
-import { BrainsDropDown } from "./components/BrainsDropDown";
 import { DarkModeToggle } from "./components/DarkModeToggle";
 import { LanguageDropDown } from "./components/LanguageDropDown";
 import { NavLink } from "./components/NavLink";
@@ -25,7 +24,7 @@ export const NavItems = ({
 }: NavItemsProps): JSX.Element => {
   const { session } = useSupabase();
   const isUserLoggedIn = session?.user !== undefined;
-  const {t} = useTranslation();
+  const { t } = useTranslation();
 
   return (
     <ul
@@ -60,7 +59,6 @@ export const NavItems = ({
       <div className="flex sm:flex-1 sm:justify-end flex-col items-center justify-center sm:flex-row gap-5 sm:gap-2">
         {isUserLoggedIn && (
           <>
-            <BrainsDropDown />
             <BrainManagementButton />
             <Link aria-label="account" className="" href={"/user"}>
               <MdPerson className="text-2xl" />

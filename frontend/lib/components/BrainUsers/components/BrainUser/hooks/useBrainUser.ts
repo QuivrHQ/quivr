@@ -1,13 +1,12 @@
-import axios, { AxiosResponse } from "axios";
 import { useState } from "react";
-import { useTranslation } from 'react-i18next'
+import { useTranslation } from "react-i18next";
 
 import { useBrainApi } from "@/lib/api/brain/useBrainApi";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
+import { getAxiosErrorParams } from "@/lib/helpers/getAxiosErrorParams";
 import { useToast } from "@/lib/hooks";
 
-import { BrainRoleType } from "../../../../NavBar/components/NavItems/components/BrainsDropDown/components/BrainActions/types";
-
+import { BrainRoleType } from "../../../types";
 type UseBrainUserProps = {
   fetchBrainUsers: () => Promise<void>;
   role: BrainRoleType;
@@ -26,61 +25,63 @@ export const useBrainUser = ({
   const [selectedRole, setSelectedRole] = useState<BrainRoleType>(role);
   const [isRemovingAccess, setIsRemovingAccess] = useState(false);
   const { currentBrain } = useBrainContext();
-  const { t } = useTranslation(['translation','brain']);
+  const { t } = useTranslation(["translation", "brain"]);
   const updateSelectedRole = async (newRole: BrainRoleType) => {
     setSelectedRole(newRole);
     try {
       await updateBrainAccess(brainId, email, {
         role: newRole,
       });
-      publish({ variant: "success", text: t('userRoleUpdated', { email: email, role: newRole, ns: 'brain' }) });
+      publish({
+        variant: "success",
+        text: t("userRoleUpdated", {
+          email: email,
+          role: newRole,
+          ns: "brain",
+        }),
+      });
       void fetchBrainUsers();
     } catch (e) {
-      if (axios.isAxiosError(e) && e.response?.status === 403) {
+      const axiosError = getAxiosErrorParams(e);
+      if (axiosError !== undefined && axiosError.status === 403) {
         publish({
           variant: "danger",
-          text: `${JSON.stringify(
-            (
-              e.response as {
-                data: { detail: string };
-              }
-            ).data.detail
-          )}`,
+          text: axiosError.message,
         });
       } else {
         publish({
           variant: "danger",
-          text: t('userRoleUpdateFailed', { email: email, role: newRole, ns: 'brain' })
+          text: t("userRoleUpdateFailed", {
+            email: email,
+            role: newRole,
+            ns: "brain",
+          }),
         });
       }
     }
   };
-
   const removeUserAccess = async () => {
     setIsRemovingAccess(true);
     try {
       await updateBrainAccess(brainId, email, {
         role: null,
       });
-      publish({ 
-        variant: "success", 
-        text: t('userRemoved', { email: email, ns: 'brain' })
+      publish({
+        variant: "success",
+        text: t("userRemoved", { email: email, ns: "brain" }),
       });
       void fetchBrainUsers();
     } catch (e) {
-      if (axios.isAxiosError(e) && e.response?.data !== undefined) {
+      const axiosError = getAxiosErrorParams(e);
+      if (axiosError !== undefined) {
         publish({
           variant: "danger",
-          text: (
-            e.response as AxiosResponse<{
-              detail: string;
-            }>
-          ).data.detail,
+          text: axiosError.message,
         });
       } else {
         publish({
           variant: "danger",
-          text: t('userRemoveFailed', { email: email, ns: 'brain' })
+          text: t("userRemoveFailed", { email: email, ns: "brain" }),
         });
       }
     } finally {
@@ -94,6 +95,6 @@ export const useBrainUser = ({
     removeUserAccess,
     updateSelectedRole,
     selectedRole,
-    canRemoveAccess
+    canRemoveAccess,
   };
 };

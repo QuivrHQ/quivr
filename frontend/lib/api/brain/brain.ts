@@ -1,7 +1,7 @@
 /* eslint-disable max-lines */
 import { AxiosInstance } from "axios";
 
-import { BrainRoleType } from "@/lib/components/NavBar/components/NavItems/components/BrainsDropDown/components/BrainActions/types";
+import { BrainRoleType } from "@/lib/components/BrainUsers/types";
 import {
   BackendMinimalBrainForUser,
   Brain,
