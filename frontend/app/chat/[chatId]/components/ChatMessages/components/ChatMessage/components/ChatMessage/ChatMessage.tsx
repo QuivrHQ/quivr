@@ -3,11 +3,14 @@ import ReactMarkdown from "react-markdown";
 
 import { cn } from "@/lib/utils";
 
+import { QuestionBrain } from "./components/QuestionBrain";
+import { QuestionPrompt } from "./components/QuestionPrompt";
+
 type ChatMessageProps = {
   speaker: string;
   text: string;
-  brainName?: string;
-  promptName?: string;
+  brainName?: string | null;
+  promptName?: string | null;
 };
 
 export const ChatMessage = React.forwardRef(
@@ -36,13 +39,9 @@ export const ChatMessage = React.forwardRef(
       <div className={containerWrapperClasses}>
         {" "}
         <div ref={ref} className={containerClasses}>
-          <div className="w-full">
-            <span
-              data-testid="brain-prompt-tags"
-              className="text-gray-400 mb-1 text-xs"
-            >
-              @{brainName ?? "-"} #{promptName ?? "-"}
-            </span>
+          <div className="w-full gap-1 flex">
+            <QuestionBrain brainName={brainName} />
+            <QuestionPrompt promptName={promptName} />
           </div>
           <div data-testid="chat-message-text">
             <ReactMarkdown className={markdownClasses}>{text}</ReactMarkdown>
