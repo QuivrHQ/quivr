@@ -12,7 +12,7 @@ def get_question_context_from_brain(brain_id: UUID, question: str) -> str:
         supabase_client,
         embeddings,
         table_name="vectors",
-        brain_id=brain_id,
+        brain_id=str(brain_id),
     )
     documents = vector_store.similarity_search(question)
 
