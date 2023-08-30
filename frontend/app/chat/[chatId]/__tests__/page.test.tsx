@@ -25,6 +25,11 @@ vi.mock("@/lib/context/ChatProvider/ChatProvider", () => ({
   ChatProvider: ChatProviderMock,
 }));
 
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({ replace: vi.fn() }),
+  useParams: () => ({ chatId: "1" }),
+}));
+
 vi.mock("@/lib/context/SupabaseProvider/supabase-provider", () => ({
   SupabaseContext: SupabaseContextMock,
 }));
