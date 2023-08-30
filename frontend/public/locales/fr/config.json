@@ -46,5 +46,7 @@
   "supabaseURLPlaceHolder": "URL Supabase",
   "temperature": "Température",
   "title": "Configuration",
-  "updatingBrainSettings": "Mise à jour des paramètres du cerveau..."
+  "updatingBrainSettings": "Mise à jour des paramètres du cerveau...",
+  "incorrectApiKey": "Clé API incorrecte",
+  "invalidApiKeyError": "Clé API invalide"
 }

@@ -1,6 +1,8 @@
 /* eslint-disable max-lines */
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 
+import { validateOpenAIKey } from "@/app/brains-management/[brainId]/components/BrainManagementTabs/components/SettingsTab/utils/validateOpenAIKey";
 import { useAuthApi } from "@/lib/api/auth/useAuthApi";
 import { useUserApi } from "@/lib/api/user/useUserApi";
 import { UserIdentity } from "@/lib/api/user/user";
@@ -20,6 +22,7 @@ export const useApiKeyConfig = () => {
   const { createApiKey } = useAuthApi();
   const { publish } = useToast();
   const [userIdentity, setUserIdentity] = useState<UserIdentity>();
+  const { t } = useTranslation(["config"]);
 
   const fetchUserIdentity = async () => {
     setUserIdentity(await getUserIdentity());
@@ -56,6 +59,24 @@ export const useApiKeyConfig = () => {
   const changeOpenAiApiKey = async () => {
     try {
       setChangeOpenAiApiKeyRequestPending(true);
+
+      if (
+        openAiApiKey !== undefined &&
+        openAiApiKey !== null &&
+        !(await validateOpenAIKey(
+          openAiApiKey,
+          {
+            badApiKeyError: t("incorrectApiKey", { ns: "config" }),
+            invalidApiKeyError: t("invalidApiKeyError", { ns: "config" }),
+          },
+          publish
+        ))
+      ) {
+        setChangeOpenAiApiKeyRequestPending(false);
+
+        return;
+      }
+
       await updateUserIdentity({
         openai_api_key: openAiApiKey,
       });
