@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 
 import { useChatContext } from "@/lib/context";
 
-import { ChatMessage } from "./components/ChatMessage/components/ChatMessage";
+import { ChatMessage } from "./components";
 import { useChatMessages } from "./hooks/useChatMessages";
 
 export const ChatMessages = (): JSX.Element => {
