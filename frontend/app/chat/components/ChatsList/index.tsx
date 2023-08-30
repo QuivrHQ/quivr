@@ -42,7 +42,7 @@ export const ChatsList = (): JSX.Element => {
           className={cn("overflow-hidden flex flex-col flex-1")}
           data-testid="chats-list"
         >
-          <div className="flex flex-col flex-1">
+          <div className="flex flex-col flex-1 h-full">
             <NewChatButton />
             <div
               data-testid="chats-list-items"
