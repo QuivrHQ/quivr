@@ -1,15 +1,12 @@
 import os
 import tempfile
 import whisper
-import openai
 import time
 from langchain.schema import Document
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from models.files import File
 from models.settings import get_documents_vector_store
 from utils.file import compute_sha1_from_content
-from .common import process_file
-from langchain.document_loaders import TextLoader
 
 
 async def process_wisper(
@@ -78,13 +75,7 @@ async def process_wisper(
         ]
 
         documents_vector_store.add_documents(docs_with_metadata)
-        process_file(
-            file=result,
-            loader_class=TextLoader,
-            enable_summarization=enable_summarization,
-            brain_id=brain_id,
-            user_openai_api_key=user_openai_api_key,
-        )
+
     finally:
         if temp_filename and os.path.exists(temp_filename):
             os.remove(temp_filename)
