@@ -1,6 +1,9 @@
 from logger import get_logger
 from models import BrainSubscription, get_supabase_client
 
+from repository.brain import get_brain_for_user
+from repository.user.get_user_id_by_user_email import get_user_id_by_user_email
+
 logger = get_logger(__name__)
 
 
@@ -35,8 +38,13 @@ class SubscriptionInvitationService:
         return response.data
 
     def create_or_update_subscription_invitation(
-        self, brain_subscription: BrainSubscription
-    ):
+        self,
+        brain_subscription: BrainSubscription,
+    ) -> bool:
+        """
+        Creates a subscription invitation if it does not exist, otherwise updates it.
+        Returns True if the invitation was created or updated and False if user already has access.
+        """
         response = (
             self.supabase_client.table("brain_subscription_invitations")
             .select("*")
@@ -46,11 +54,18 @@ class SubscriptionInvitationService:
         )
 
         if response.data:
-            response = self.update_subscription_invitation(brain_subscription)
+            self.update_subscription_invitation(brain_subscription)
+            return True
         else:
-            response = self.create_subscription_invitation(brain_subscription)
+            user_id = get_user_id_by_user_email(brain_subscription.email)
+            brain_id = brain_subscription.brain_id
+            brain_user = get_brain_for_user(user_id, brain_id)
 
-        return response
+            if brain_user is None:
+                self.create_subscription_invitation(brain_subscription)
+                return True
+
+        return False
 
     def fetch_invitation(self, subscription: BrainSubscription):
         logger.info("Fetching subscription invitation")
