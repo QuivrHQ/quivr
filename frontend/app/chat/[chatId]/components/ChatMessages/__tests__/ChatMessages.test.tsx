@@ -18,6 +18,8 @@ const useChatContextMock = vi.fn(() => ({
       assistant: "Test assistant message",
       message_id: "123",
       user_message: "Test user message",
+      prompt_title: "Test prompt name",
+      brain_name: "Test brain name",
     },
   ],
 }));
@@ -37,7 +39,8 @@ describe("ChatMessages", () => {
   it("should render chat messages correctly", () => {
     const { getAllByTestId } = render(<ChatMessages />);
 
-    expect(getAllByTestId("brain-prompt-tags")).toBeDefined();
+    expect(getAllByTestId("brain-tags")).toBeDefined();
+    expect(getAllByTestId("prompt-tags")).toBeDefined();
 
     expect(getAllByTestId("chat-message-text")).toBeDefined();
   });
