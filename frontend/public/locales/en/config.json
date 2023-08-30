@@ -46,5 +46,7 @@
     "roleRequired": "You don't have the necessary role to access this tab 🧠💡🥲.",
     "requireAccess": "Please require access from the owner.",
     "ohno": "Oh no!",
-    "noUser": "No user"
-}
+    "noUser": "No user",
+    "incorrectApiKey": "Incorrect API Key",
+    "invalidApiKeyError": "Invalid API Key"
+}   

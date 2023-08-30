@@ -46,5 +46,7 @@
     "roleRequired": "您没有访问此选项卡所需的权限 🧠💡🥲.",
     "requireAccess": "请向所有者申请访问权限.",
     "ohno": "哎呀!",
-    "noUser": "没有用户"
+    "noUser": "没有用户",
+    "incorrectApiKey": "无效的API密钥",
+    "invalidApiKeyError": "无效的API密钥"
 }

@@ -46,5 +46,7 @@
     "roleRequired": "Você não possui a função necessária para acessar esta aba 🧠💡🥲.",
     "requireAccess": "Por favor, solicite acesso ao proprietário.",
     "ohno": "Oh, não!",
-    "noUser": "Nenhum usuário"
+    "noUser": "Nenhum usuário",
+    "incorrectApiKey": "Chave de API incorreta",
+    "invalidApiKeyError": "Chave de API inválida"
 }
