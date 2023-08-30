@@ -19,7 +19,7 @@ export const Toast = ({
   children?: ReactNode;
 } & ToastPrimitive.ToastProviderProps): JSX.Element => {
   const { publish, toasts, toggleToast } = useToastBuilder();
-  const {t, i18n} = useTranslation();
+  const { t } = useTranslation();
 
   return (
     <ToastPrimitive.Provider {...toastProviderProps}>
@@ -62,7 +62,7 @@ export const Toast = ({
             );
           })}
         </AnimatePresence>
-        <ToastPrimitive.Viewport className="fixed flex-col bottom-0 left-0 right-0 p-5 flex items-end gap-2 outline-none pointer-events-none z-20" />
+        <ToastPrimitive.Viewport className="fixed flex-col bottom-0 left-0 right-0 p-5 flex items-end gap-2 outline-none pointer-events-none z-[99999]" />
       </ToastContext.Provider>
     </ToastPrimitive.Provider>
   );
