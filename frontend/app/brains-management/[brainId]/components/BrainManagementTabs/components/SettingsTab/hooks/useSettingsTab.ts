@@ -14,6 +14,8 @@ import { Brain } from "@/lib/context/BrainProvider/types";
 import { defineMaxTokens } from "@/lib/helpers/defineMaxTokens";
 import { useToast } from "@/lib/hooks";
 
+import { validateOpenAIKey } from "../utils/validateOpenAIKey";
+
 type UseSettingsTabProps = {
   brainId: UUID;
 };
@@ -95,8 +97,7 @@ export const useSettingsTab = ({ brainId }: UseSettingsTabProps) => {
       if (brain.model !== undefined) {
         setValue("model", brain.model);
       }
-    },50);
-    
+    }, 50);
   };
   useEffect(() => {
     void fetchBrain();
@@ -142,7 +143,7 @@ export const useSettingsTab = ({ brainId }: UseSettingsTabProps) => {
       await setAsDefaultBrain(brainId);
       publish({
         variant: "success",
-        text: t("defaultBrainSet",{ns:"config"}),
+        text: t("defaultBrainSet", { ns: "config" }),
       });
       void fetchAllBrains();
       void fetchDefaultBrain();
@@ -180,12 +181,12 @@ export const useSettingsTab = ({ brainId }: UseSettingsTabProps) => {
       void fetchBrain();
       publish({
         variant: "success",
-        text: t("promptRemoved",{ns:"config"}),
+        text: t("promptRemoved", { ns: "config" }),
       });
     } catch (err) {
       publish({
         variant: "danger",
-        text: t("errorRemovingPrompt",{ns:"config"}),
+        text: t("errorRemovingPrompt", { ns: "config" }),
       });
     } finally {
       setIsUpdating(false);
@@ -203,31 +204,39 @@ export const useSettingsTab = ({ brainId }: UseSettingsTabProps) => {
     }
   };
 
-  const handleSubmit = async (checkDirty:boolean) => {
+  const handleSubmit = async (checkDirty: boolean) => {
     const hasChanges = Object.keys(dirtyFields).length > 0;
     if (!hasChanges && checkDirty) {
       return;
     }
     const { name: isNameDirty } = dirtyFields;
-    const { name } = getValues();
+    const { name, openAiKey: openai_api_key } = getValues();
     if (isNameDirty !== undefined && isNameDirty && name.trim() === "") {
       publish({
         variant: "danger",
-        text: t("nameRequired",{ns:"config"}),
+        text: t("nameRequired", { ns: "config" }),
       });
 
       return;
     }
 
+    if (
+      openai_api_key !== undefined &&
+      !(await validateOpenAIKey(
+        openai_api_key,
+        {
+          badApiKeyError: t("incorrectApiKey", { ns: "config" }),
+          invalidApiKeyError: t("invalidApiKeyError", { ns: "config" }),
+        },
+        publish
+      ))
+    ) {
+      return;
+    }
+
     try {
       setIsUpdating(true);
-
-      const {
-        maxTokens: max_tokens,
-        openAiKey: openai_api_key,
-        prompt,
-        ...otherConfigs
-      } = getValues();
+      const { maxTokens: max_tokens, prompt, ...otherConfigs } = getValues();
 
       if (
         dirtyFields["prompt"] &&
@@ -235,7 +244,7 @@ export const useSettingsTab = ({ brainId }: UseSettingsTabProps) => {
       ) {
         publish({
           variant: "warning",
-          text: t("promptFieldsRequired",{ns:"config"}),
+          text: t("promptFieldsRequired", { ns: "config" }),
         });
 
         return;
@@ -279,7 +288,7 @@ export const useSettingsTab = ({ brainId }: UseSettingsTabProps) => {
 
       publish({
         variant: "success",
-        text: t("brainUpdated",{ns:"config"}),
+        text: t("brainUpdated", { ns: "config" }),
       });
       void fetchAllBrains();
     } catch (err) {
@@ -318,7 +327,7 @@ export const useSettingsTab = ({ brainId }: UseSettingsTabProps) => {
     setValue("prompt.content", content, {
       shouldDirty: true,
     });
-  }; 
+  };
 
   return {
     handleSubmit,
