@@ -32,7 +32,7 @@
   "chat_title_intro": "来聊天吧，通过你的",
   "empty_brain_title_prefix": "上传文件到",
   "empty_brain_title_suffix": "和他们聊天",
-  "actions_bar_placeholder": "向 @brains 或 /files 提问，并选择您的 #prompt",
+  "actions_bar_placeholder": "向@大脑提问，选择您的#提示",
   "missing_brain": "请选择一个大脑进行聊天",
   "new_prompt": "新提示"
 }
