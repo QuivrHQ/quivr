@@ -63,6 +63,7 @@ export const AddBrainModal = (): JSX.Element => {
           placeholder={t("brainNamePlaceholder", { ns: "brain" })}
           autoComplete="off"
           className="flex-1"
+          required
           {...register("name")}
         />
 

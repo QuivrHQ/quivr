@@ -209,9 +209,9 @@ export const useSettingsTab = ({ brainId }: UseSettingsTabProps) => {
     if (!hasChanges && checkDirty) {
       return;
     }
-    const { name: isNameDirty } = dirtyFields;
     const { name, openAiKey: openai_api_key } = getValues();
-    if (isNameDirty !== undefined && isNameDirty && name.trim() === "") {
+
+    if (name.trim() === "") {
       publish({
         variant: "danger",
         text: t("nameRequired", { ns: "config" }),
@@ -222,6 +222,7 @@ export const useSettingsTab = ({ brainId }: UseSettingsTabProps) => {
 
     if (
       openai_api_key !== undefined &&
+      openai_api_key !== "" &&
       !(await validateOpenAIKey(
         openai_api_key,
         {
