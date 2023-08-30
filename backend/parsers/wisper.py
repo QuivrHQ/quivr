@@ -8,6 +8,8 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 from models.files import File
 from models.settings import get_documents_vector_store
 from utils.file import compute_sha1_from_content
+from .common import process_file
+from langchain.document_loaders import TextLoader
 
 
 async def process_wisper(
@@ -20,13 +22,9 @@ async def process_wisper(
     temp_filename = None
     file_sha = ""
     dateshort = time.strftime("%Y%m%d-%H%M%S")
-    file_meta_name = f"audiotranscript_{dateshort}.txt"
+    file_meta_name = f"txt/audiotranscript_{dateshort}.txt"
     documents_vector_store = get_documents_vector_store()
     model = whisper.load_model("base")
-    # use this for whisper
-    os.environ.get("OPENAI_API_KEY")
-    if user_openai_api_key:
-        pass
 
     try:
         upload_file = file.file
@@ -80,7 +78,13 @@ async def process_wisper(
         ]
 
         documents_vector_store.add_documents(docs_with_metadata)
-
+        process_file(
+            file=result,
+            loader_class=TextLoader,
+            enable_summarization=enable_summarization,
+            brain_id=brain_id,
+            user_openai_api_key=user_openai_api_key,
+        )
     finally:
         if temp_filename and os.path.exists(temp_filename):
             os.remove(temp_filename)
