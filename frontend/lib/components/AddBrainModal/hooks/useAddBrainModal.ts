@@ -59,6 +59,11 @@ export const useAddBrainModal = () => {
     const { name, description, setDefault } = getValues();
 
     if (name.trim() === "" || isPending) {
+      publish({
+        variant: "danger",
+        text: t("nameRequired", { ns: "config" }),
+      });
+
       return;
     }
 
@@ -80,7 +85,7 @@ export const useAddBrainModal = () => {
       if (createdBrainId === undefined) {
         publish({
           variant: "danger",
-          text: t("errorCreatingBrain",{ns:"brain"})
+          text: t("errorCreatingBrain", { ns: "brain" }),
         });
 
         return;
@@ -99,7 +104,7 @@ export const useAddBrainModal = () => {
       reset(defaultValues);
       publish({
         variant: "success",
-        text: t("brainCreated",{ns:"brain"})
+        text: t("brainCreated", { ns: "brain" }),
       });
     } catch (err) {
       if (axios.isAxiosError(err) && err.response?.status === 429) {
