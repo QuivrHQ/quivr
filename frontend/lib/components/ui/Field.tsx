@@ -18,12 +18,16 @@ interface FieldProps
 }
 
 const Field = forwardRef(
-  ({ label, className, name, ...props }: FieldProps, forwardedRef) => {
+  (
+    { label, className, name, required = false, ...props }: FieldProps,
+    forwardedRef
+  ) => {
     return (
       <fieldset className={cn("flex flex-col w-full", className)} name={name}>
         {label && (
           <label htmlFor={name} className="text-sm">
             {label}
+            {required && <span>*</span>}
           </label>
         )}
         <input
