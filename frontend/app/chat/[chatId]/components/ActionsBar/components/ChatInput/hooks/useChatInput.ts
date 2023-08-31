@@ -6,6 +6,7 @@ import { useChat } from "@/app/chat/[chatId]/hooks/useChat";
 export const useChatInput = () => {
   const [message, setMessage] = useState<string>("");
   const { addQuestion, generatingAnswer, chatId } = useChat();
+  const [isUploading, setIsUploading] = useState(false);
 
   const submitQuestion = () => {
     if (!generatingAnswer) {
@@ -19,5 +20,7 @@ export const useChatInput = () => {
     submitQuestion,
     generatingAnswer,
     chatId,
+    isUploading,
+    setIsUploading,
   };
 };
