@@ -5,11 +5,14 @@ import { useState } from "react";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 
 import { BrainManagementTab } from "../types";
+import { getTargetedTab } from "../utils/getTargetedTab";
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const useBrainManagementTabs = () => {
-  const [selectedTab, setSelectedTab] =
-    useState<BrainManagementTab>("settings");
+  const [selectedTab, setSelectedTab] = useState<BrainManagementTab>(
+    getTargetedTab() ?? "settings"
+  );
+
   const { deleteBrain, setCurrentBrainId } = useBrainContext();
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const router = useRouter();
