@@ -58,8 +58,11 @@ class SubscriptionInvitationService:
             return True
         else:
             user_id = get_user_id_by_user_email(brain_subscription.email)
-            brain_id = brain_subscription.brain_id
-            brain_user = get_brain_for_user(user_id, brain_id)
+            brain_user = None
+
+            if user_id is not None:
+                brain_id = brain_subscription.brain_id
+                brain_user = get_brain_for_user(user_id, brain_id)
 
             if brain_user is None:
                 self.create_subscription_invitation(brain_subscription)

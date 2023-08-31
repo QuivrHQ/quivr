@@ -80,6 +80,7 @@ export const MentionInput = ({
           popoverContainer={triggerToSuggestionsContainer[currentTrigger]}
           onAddMention={onAddMention}
           entryComponent={SuggestionRow}
+          renderEmptyPopup
         />
       </div>
     </div>
