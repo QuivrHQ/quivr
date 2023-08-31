@@ -1,4 +1,5 @@
 "use client";
+import { useFeature } from "@growthbook/growthbook-react";
 import { useTranslation } from "react-i18next";
 import { MdAddCircle, MdSend } from "react-icons/md";
 
@@ -20,6 +21,7 @@ export const ChatInput = (): JSX.Element => {
     setIsUploading,
   } = useChatInput();
   const { t } = useTranslation(["chat"]);
+  const shouldDisplayUploadButton = true || useFeature("ux-upload").on;
 
   return (
     <form
@@ -30,17 +32,19 @@ export const ChatInput = (): JSX.Element => {
       }}
       className="sticky flex items-star bottom-0 bg-white dark:bg-black w-full flex justify-center gap-2 z-20"
     >
-      <div className="flex items-start">
-        <Button
-          className="p-0"
-          variant={"tertiary"}
-          data-testid="upload-button"
-          type="button"
-          onClick={() => setIsUploading(true)}
-        >
-          <MdAddCircle className="text-3xl" />
-        </Button>
-      </div>
+      {shouldDisplayUploadButton && (
+        <div className="flex items-start">
+          <Button
+            className="p-0"
+            variant={"tertiary"}
+            data-testid="upload-button"
+            type="button"
+            onClick={() => setIsUploading(true)}
+          >
+            <MdAddCircle className="text-3xl" />
+          </Button>
+        </div>
+      )}
 
       <div className="flex flex-1 flex-col items-center">
         {isUploading ? (
@@ -58,12 +62,7 @@ export const ChatInput = (): JSX.Element => {
         {isUploading ? (
           <div className="flex items-center">
             <Button variant="tertiary" onClick={() => setIsUploading(false)}>
-              {/* rotate the icon to 90° */}
-              <MdSend
-                className="text-3xl 
-              transform rotate-270
-              "
-              />
+              <MdSend className="text-3xl transform -rotate-90" />
             </Button>
           </div>
         ) : (
