@@ -23,6 +23,7 @@ class BrainSettings(BaseSettings):
 class LLMSettings(BaseSettings):
     private: bool = False
     model_path: str = "./local_models/ggml-gpt4all-j-v1.3-groovy.bin"
+    wisper_local: bool = True
 
 
 def get_supabase_client() -> Client:

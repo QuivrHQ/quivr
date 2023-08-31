@@ -21,7 +21,7 @@ file_processors = {
     ".md": process_markdown,
     ".markdown": process_markdown,
     ".m4a": process_audio,
-    ".mp3": process_audio,
+    ".mp3": process_wisper,
     ".webm": process_audio,
     ".mp4": process_wisper,
     ".mpga": process_audio,
@@ -52,7 +52,7 @@ async def filter_file(
 ):
     await file.compute_file_sha1()
 
-    # print("file sha1", file.file_sha1)
+    print("file sha1", file.file_sha1)
     file_exists = file.file_already_exists()
     file_exists_in_brain = file.file_already_exists_in_brain(brain_id)
 
