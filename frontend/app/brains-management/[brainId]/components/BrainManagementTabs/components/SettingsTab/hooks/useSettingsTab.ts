@@ -80,11 +80,8 @@ export const useSettingsTab = ({ brainId }: UseSettingsTabProps) => {
         continue;
       }
 
-      if (
-        brainKey === "openai_api_key" &&
-        brain["openai_api_key"] !== undefined
-      ) {
-        setValue("openAiKey", brain["openai_api_key"]);
+      if (brainKey === "openai_api_key") {
+        setValue("openAiKey", brain["openai_api_key"] ?? "");
         continue;
       }
 
@@ -333,7 +330,7 @@ export const useSettingsTab = ({ brainId }: UseSettingsTabProps) => {
   return {
     handleSubmit,
     register,
-    openAiKey: openAiKey === "" ? undefined : openAiKey,
+    openAiKey,
     model,
     temperature,
     maxTokens,
