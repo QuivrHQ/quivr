@@ -52,7 +52,7 @@ async def filter_file(
 ):
     await file.compute_file_sha1()
 
-    print("file sha1", file.file_sha1)
+    # print("file sha1", file.file_sha1)
     file_exists = file.file_already_exists()
     file_exists_in_brain = file.file_already_exists_in_brain(brain_id)
 

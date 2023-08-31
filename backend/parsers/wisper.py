@@ -4,10 +4,10 @@ import whisper
 import time
 from langchain.schema import Document
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-from models.files import File
+from models import Brain, File
 from models.settings import get_documents_vector_store
 from utils.file import compute_sha1_from_content
-
+from utils.vectors import Neurons
 
 async def process_wisper(
     file: File,
@@ -74,7 +74,15 @@ async def process_wisper(
             for text in texts
         ]
 
-        documents_vector_store.add_documents(docs_with_metadata)
+        # documents_vector_store.add_documents(docs_with_metadata)
+        for doc in docs_with_metadata:  # pyright: ignore reportPrivateUsage=none
+            neurons = Neurons()
+            created_vector = neurons.create_vector(doc, user_openai_api_key)
+
+            created_vector_id = created_vector[0]  # pyright: ignore reportPrivateUsage=none
+
+            brain = Brain(id=brain_id)
+            brain.create_brain_vector(created_vector_id, file.file_sha1)
 
     finally:
         if temp_filename and os.path.exists(temp_filename):
