@@ -67,6 +67,7 @@ async def process_wisper(
                     "chunk_size": chunk_size,
                     "chunk_overlap": chunk_overlap,
                     "date": dateshort,
+                    "summarization": "true" if enable_summarization else "false",
                 },
             )
             for text in texts
