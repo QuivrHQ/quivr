@@ -5,7 +5,6 @@ import Button from "@/lib/components/ui/Button";
 
 import { ChatBar } from "./components/ChatBar/ChatBar";
 import { ConfigModal } from "./components/ConfigModal";
-import { MicButton } from "./components/MicButton/MicButton";
 import { useChatInput } from "./hooks/useChatInput";
 
 export const ChatInput = (): JSX.Element => {
@@ -42,7 +41,6 @@ export const ChatInput = (): JSX.Element => {
             : t("chat", { ns: "chat" })}
         </Button>
         <div className="flex items-center">
-          <MicButton setMessage={setMessage} />
           <ConfigModal chatId={chatId} />
         </div>
       </div>
