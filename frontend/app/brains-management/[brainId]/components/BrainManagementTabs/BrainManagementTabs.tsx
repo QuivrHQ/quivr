@@ -26,7 +26,7 @@ export const BrainManagementTabs = (): JSX.Element => {
   return (
     <Root
       className="shadow-md min-h-[50%] dark:shadow-primary/25 hover:shadow-xl transition-shadow rounded-xl overflow-hidden bg-white dark:bg-black border border-black/10 dark:border-white/25 p-4 pt-10"
-      defaultValue="settings"
+      value={selectedTab}
     >
       <List
         className="flex justify-between"
