@@ -19,5 +19,5 @@ export const ChatName = ({
     );
   }
 
-  return <p>{name}</p>;
+  return <span className="max-w-[150px] truncate">{name}</span>;
 };
