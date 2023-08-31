@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.0.65 (2023-08-31)
+
+## What's Changed
+* feat: make chatlist scrollable by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1064
+* feat(newBrain): update data validation logic and add * on required fields by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1065
+* feat(shareBrain): prevent re inviting users with access by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1063
+* feat(chatMessage): update attributes display by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1067
+* fix: fix minor bugs  by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1070
+* feat: remove mic button by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1075
+* feat: truncate long chat name by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1076
+
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.64...v0.0.65
+
 ## 0.0.64 (2023-08-30)
 
 ## What's Changed
