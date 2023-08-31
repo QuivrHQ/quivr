@@ -13,13 +13,12 @@ import {
   MentionTriggerType,
 } from "@/app/chat/[chatId]/components/ActionsBar/types";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
+import { useJune } from "@/services/analytics/useJune";
 import "@draft-js-plugins/mention/lib/plugin.css";
 import "draft-js/dist/Draft.css";
-import { useJune } from "@/services/analytics/useJune";
 
 import { useMentionPlugin } from "./helpers/MentionPlugin";
 import { useMentionState } from "./helpers/MentionState";
-import { useMentionUtils } from "./helpers/MentionUtils";
 import { getEditorText } from "./helpers/getEditorText";
 
 type UseMentionInputProps = {
@@ -51,119 +50,127 @@ export const useMentionInput = ({
     publicPrompts,
   } = useMentionState();
 
-  const { removeEntity } = useMentionUtils({
-    editorState,
-    setEditorState,
-  });
+  const { MentionSuggestions, plugins } = useMentionPlugin();
 
   const [currentTrigger, setCurrentTrigger] = useState<MentionTriggerType>("@");
-
-  const { MentionSuggestions, plugins } = useMentionPlugin();
 
   const mentionInputRef = useRef<Editor>(null);
 
   const [open, setOpen] = useState(false);
 
-  const onAddMention = (mention: MentionData) => {
-    if (mention.trigger === "#") {
-      void analytics?.track("CHANGE_PROMPT");
-      setCurrentPromptId(mention.id as UUID);
-    }
-
-    if (mention.trigger === "@") {
-      void analytics?.track("CHANGE_BRAIN");
-      setCurrentBrainId(mention.id as UUID);
-    }
-
-    const lastEntityKey = editorState
-      .getCurrentContent()
-      .getLastCreatedEntityKey();
-    removeEntity(lastEntityKey);
-  };
-
-  const onSearchChange = ({
-    trigger,
-    value,
-  }: {
-    trigger: MentionTriggerType;
-    value: string;
-  }) => {
-    setCurrentTrigger(trigger);
-    if (trigger === "@") {
-      if (currentBrainId !== null) {
-        setSuggestions([]);
-
-        return;
+  const onAddMention = useCallback(
+    (mention: MentionData) => {
+      if (mention.trigger === "#") {
+        void analytics?.track("CHANGE_PROMPT");
+        setCurrentPromptId(mention.id as UUID);
       }
 
-      if (value === "") {
-        setSuggestions(mentionItems["@"]);
-
-        return;
+      if (mention.trigger === "@") {
+        void analytics?.track("CHANGE_BRAIN");
+        setCurrentBrainId(mention.id as UUID);
       }
-    }
-    if (trigger === "#") {
-      if (currentPromptId !== null) {
-        setSuggestions([]);
+    },
+    [analytics, setCurrentBrainId, setCurrentPromptId]
+  );
 
-        return;
+  const onSearchChange = useCallback(
+    ({ trigger, value }: { trigger: MentionTriggerType; value: string }) => {
+      setCurrentTrigger(trigger);
+      if (trigger === "@") {
+        if (currentBrainId !== null) {
+          setSuggestions([]);
+
+          return;
+        }
+
+        if (value === "") {
+          setSuggestions(mentionItems["@"]);
+
+          return;
+        }
       }
-      if (value === "") {
-        setSuggestions(mentionItems["#"]);
+      if (trigger === "#") {
+        if (currentPromptId !== null) {
+          setSuggestions([]);
 
-        return;
+          return;
+        }
+        if (value === "") {
+          setSuggestions(mentionItems["#"]);
+
+          return;
+        }
       }
-    }
 
-    setSuggestions(defaultSuggestionsFilter(value, mentionItems, trigger));
-  };
+      setSuggestions(defaultSuggestionsFilter(value, mentionItems, trigger));
+    },
+    [currentBrainId, currentPromptId, mentionItems, setSuggestions]
+  );
 
   const resetEditorContent = useCallback(() => {
     setEditorState(EditorState.createEmpty());
   }, [setEditorState]);
 
-  // eslint-disable-next-line complexity
-  const keyBindingFn = (e: React.KeyboardEvent<HTMLDivElement>) => {
-    if (mentionTriggers.includes(e.key as MentionTriggerType)) {
-      setOpen(true);
+  const keyBindingFn = useCallback(
+    // eslint-disable-next-line complexity
+    (e: React.KeyboardEvent<HTMLDivElement>) => {
+      console.log({
+        editorContent: getEditorText(editorState),
+      });
+      if (mentionTriggers.includes(e.key as MentionTriggerType)) {
+        setOpen(true);
 
-      return getDefaultKeyBinding(e);
-    }
-
-    if (e.key === "Backspace" || e.key === "Delete") {
-      if (!(getEditorText(editorState) === "")) {
         return getDefaultKeyBinding(e);
       }
-      if (currentPromptId !== null) {
-        setCurrentPromptId(null);
+
+      if (e.key === "Backspace" || e.key === "Delete") {
+        const editorContent = getEditorText(editorState);
+
+        if (editorContent !== "") {
+          return getDefaultKeyBinding(e);
+        }
+        if (currentPromptId !== null) {
+          setCurrentPromptId(null);
+
+          return "backspace";
+        }
+        if (currentBrainId !== null) {
+          setCurrentBrainId(null);
+
+          return "backspace";
+        }
 
         return "backspace";
       }
-      if (currentBrainId !== null) {
-        setCurrentBrainId(null);
 
-        return "backspace";
+      if (e.key === "Enter" && !e.shiftKey) {
+        onSubmit();
+
+        return "submit";
       }
 
-      return "backspace";
-    }
+      if (e.key === "ArrowUp" || e.key === "ArrowDown") {
+        return undefined;
+      }
 
-    if (e.key === "Enter" && !e.shiftKey) {
-      onSubmit();
+      return getDefaultKeyBinding(e);
+    },
+    [
+      currentBrainId,
+      currentPromptId,
+      editorState,
+      onSubmit,
+      setCurrentBrainId,
+      setCurrentPromptId,
+    ]
+  );
 
-      return "submit";
-    }
-
-    if (e.key === "ArrowUp" || e.key === "ArrowDown") {
-      return undefined;
-    }
-
-    return getDefaultKeyBinding(e);
-  };
-
-  const handleEditorChange = (newEditorState: EditorState) => {
-    setEditorState(newEditorState);
-  };
+  const handleEditorChange = useCallback(
+    (newEditorState: EditorState) => {
+      setEditorState(newEditorState);
+    },
+    [setEditorState]
+  );
 
   useEffect(() => {
     const currentMessage = getEditorText(editorState);

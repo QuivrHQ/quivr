@@ -302,6 +302,13 @@ def update_brain_subscription(
         )
 
     user_id = get_user_id_by_user_email(user_email)
+
+    if user_id is None:
+        raise HTTPException(
+            status_code=404,
+            detail="User not found",
+        )
+
     brain = Brain(
         id=brain_id,
     )

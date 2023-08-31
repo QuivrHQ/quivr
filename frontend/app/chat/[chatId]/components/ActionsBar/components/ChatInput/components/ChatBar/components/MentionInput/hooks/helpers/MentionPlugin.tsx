@@ -6,8 +6,8 @@ export const useMentionPlugin = () => {
   const { MentionSuggestions, plugins } = useMemo(() => {
     const mentionPlugin = createMentionPlugin({
       mentionComponent: () => <span />,
-
       mentionTrigger: ["@", "#"],
+      mentionPrefix: "@#",
       popperOptions: {
         placement: "top-end",
         modifiers: [
@@ -30,6 +30,7 @@ export const useMentionPlugin = () => {
         ],
       },
     });
+
     const { MentionSuggestions: LegacyMentionSuggestions } = mentionPlugin;
     const legacyPlugins = [mentionPlugin];
 
