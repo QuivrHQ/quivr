@@ -18,7 +18,7 @@ async def process_wisper(
     temp_filename = None
     file_sha = ""
     dateshort = time.strftime("%Y%m%d-%H%M%S")
-    file_meta_name = f"txt/audiotranscript_{file.file.filename}_{dateshort}.txt"
+    file_meta_name = f"audiotranscript_{file.file.filename}_{dateshort}.txt"
     model = whisper.load_model("base")
 
     try:
