@@ -1,6 +1,6 @@
 import { UUID } from "crypto";
 import { useParams, useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 
@@ -9,9 +9,15 @@ import { getTargetedTab } from "../utils/getTargetedTab";
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const useBrainManagementTabs = () => {
-  const [selectedTab, setSelectedTab] = useState<BrainManagementTab>(
-    getTargetedTab() ?? "settings"
-  );
+  const [selectedTab, setSelectedTab] =
+    useState<BrainManagementTab>("settings");
+
+  useEffect(() => {
+    const targetedTab = getTargetedTab();
+    if (targetedTab !== undefined) {
+      setSelectedTab(targetedTab);
+    }
+  }, []);
 
   const { deleteBrain, setCurrentBrainId } = useBrainContext();
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
