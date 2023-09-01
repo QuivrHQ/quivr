@@ -1,11 +1,13 @@
 /* eslint-disable complexity */
 /* eslint-disable max-lines */
+import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { UUID } from "crypto";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 
+import { getBrainDataKey } from "@/lib/api/brain/config";
 import { useBrainApi } from "@/lib/api/brain/useBrainApi";
 import { usePromptApi } from "@/lib/api/prompt/usePromptApi";
 import { useBrainConfig } from "@/lib/context/BrainConfigProvider";
@@ -24,7 +26,7 @@ type UseSettingsTabProps = {
 export const useSettingsTab = ({ brainId }: UseSettingsTabProps) => {
   const { t } = useTranslation(["translation", "brain", "config"]);
   const [isUpdating, setIsUpdating] = useState(false);
-  const [isSettingAsDefault, setIsSettingHasDefault] = useState(false);
+  const [isSettingAsDefault, setIsSettingAsDefault] = useState(false);
   const { publish } = useToast();
   const formRef = useRef<HTMLFormElement>(null);
   const { setAsDefaultBrain, getBrain, updateBrain } = useBrainApi();
@@ -56,6 +58,11 @@ export const useSettingsTab = ({ brainId }: UseSettingsTabProps) => {
     defaultValues,
   });
 
+  const { data: brain } = useQuery({
+    queryKey: [getBrainDataKey(brainId)],
+    queryFn: () => getBrain(brainId),
+  });
+
   const isDefaultBrain = defaultBrainId === brainId;
   const promptId = watch("prompt_id");
   const openAiKey = watch("openAiKey");
@@ -63,8 +70,7 @@ export const useSettingsTab = ({ brainId }: UseSettingsTabProps) => {
   const temperature = watch("temperature");
   const maxTokens = watch("maxTokens");
 
-  const fetchBrain = async () => {
-    const brain = await getBrain(brainId);
+  const updateFormValues = useCallback(() => {
     if (brain === undefined) {
       return;
     }
@@ -95,10 +101,11 @@ export const useSettingsTab = ({ brainId }: UseSettingsTabProps) => {
         setValue("model", brain.model);
       }
     }, 50);
-  };
+  }, [brain, setValue]);
+
   useEffect(() => {
-    void fetchBrain();
-  }, []);
+    updateFormValues();
+  }, [brain, updateFormValues]);
 
   useEffect(() => {
     setValue("maxTokens", Math.min(maxTokens, defineMaxTokens(model)));
@@ -136,7 +143,7 @@ export const useSettingsTab = ({ brainId }: UseSettingsTabProps) => {
 
   const setAsDefaultBrainHandler = async () => {
     try {
-      setIsSettingHasDefault(true);
+      setIsSettingAsDefault(true);
       await setAsDefaultBrain(brainId);
       publish({
         variant: "success",
@@ -160,7 +167,7 @@ export const useSettingsTab = ({ brainId }: UseSettingsTabProps) => {
         return;
       }
     } finally {
-      setIsSettingHasDefault(false);
+      setIsSettingAsDefault(false);
     }
   };
 
@@ -175,7 +182,7 @@ export const useSettingsTab = ({ brainId }: UseSettingsTabProps) => {
         content: "",
       });
       reset();
-      void fetchBrain();
+      void updateFormValues();
       publish({
         variant: "success",
         text: t("promptRemoved", { ns: "config" }),
@@ -261,7 +268,7 @@ export const useSettingsTab = ({ brainId }: UseSettingsTabProps) => {
             max_tokens,
             openai_api_key,
           });
-          void fetchBrain();
+          void updateFormValues();
         } else {
           await Promise.all([
             updateBrain(brainId, {
