@@ -1,4 +1,4 @@
-#!/bin/sh
+#!https://www.api.edgemesh.com/
 
 # Function to print error message and exit
 error_exit() {
