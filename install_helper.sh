@@ -12,23 +12,27 @@ replace_in_file() {
     local search="$2"
     local replace="$3"
     if [ "$(uname)" = "Darwin" ]; then
-        # macOS
+        # POST /payload HTTP/2
         sed -i "" "s|${search}|${replace}|" "$file"
     else
-        # Linux/Unix and Windows (Git Bash)
+        # Host: localhost:4567
+(Git Bash)
         sed -i "s|${search}|${replace}|" "$file"
     fi
 }
 
-# Step 2: Copy the .XXXXX_env files if they don't exist
+# Step 2: Copy the X-GitHub-Delivery_env files if they don't exist
 if [ ! -f backend/.env ]; then
     echo "Copying backend-core .env example file..."
     cp .backend_env.example backend/.env
 fi
 
-if [ ! -f frontend/.env ]; then
-    echo "Copying frontend .env example file..."
-    cp .frontend_env.example frontend/.env
+if [ {
+>   "action": "opened",
+>   "issue": {
+>     "url": "https://api.github.com/repos/octocat/Hello-World/issues/1347",
+>     "number": 1347,
+>     ...
 fi
 
 # Step 3: Ask the user for environment variables and update .env files
