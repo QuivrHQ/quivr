@@ -1,3 +1,8 @@
+---
+sidebar_position: 2
+title: Using Quivr fully locally
+---
+
 # Using Quivr fully locally
 
 ## Headers
@@ -17,6 +22,7 @@ The guide was put together in collaboration with members of the Quivr Discord, *
 This worked for me, but I sometimes got strange results (the output contains repeating answers/questions). Maybe because `stopping_criteria=stopping_criteria` must be uncommented in `transformers.pipeline`. Will update this page as I continue learning.
 
 <a name="database"/>
+
 ## Local Supabase
 
 Instead of relying on a remote Supabase instance, we have to set it up locally. Follow the instructions on https://supabase.com/docs/guides/self-hosting/docker.
@@ -27,6 +33,7 @@ Troubleshooting:
   * http://localhost:8000/project/default/auth/users
 
 <a name="embeddings"/>
+
 ## Local embeddings
 
 First, let's get local embeddings to work with GPT4All. Instead of relying on OpenAI for generating embeddings of both the prompt and the documents we upload, we will use a local LLM for this.
@@ -154,6 +161,7 @@ This can be remedied by using local embeddings for document embeddings. In backe
 ```
 
 <a name="llm"/>
+
 ## Local LLM
 
 The final step is to use a local model from HuggingFace for inference. (The HF token is optional, only required for certain models on HF.)
