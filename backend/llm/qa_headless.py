@@ -5,7 +5,7 @@ from uuid import UUID
 
 from langchain.callbacks.streaming_aiter import AsyncIteratorCallbackHandler
 from langchain.chains import LLMChain
-from langchain.chat_models import ChatOpenAI
+from langchain.chat_models import ChatLiteLLM
 from langchain.chat_models.base import BaseChatModel
 from langchain.prompts.chat import (
     ChatPromptTemplate,
@@ -91,7 +91,7 @@ class HeadlessQA(BaseModel):
         :param callbacks: Callbacks to be used for streaming
         :return: Language model instance
         """
-        return ChatOpenAI(
+        return ChatLiteLLM(
             temperature=temperature,
             model=model,
             streaming=streaming,

@@ -6,7 +6,7 @@ from uuid import UUID
 from langchain.callbacks.streaming_aiter import AsyncIteratorCallbackHandler
 from langchain.chains import ConversationalRetrievalChain, LLMChain
 from langchain.chains.question_answering import load_qa_chain
-from langchain.chat_models import ChatOpenAI
+from langchain.chat_models import ChatLiteLLM
 from langchain.llms.base import BaseLLM
 from langchain.prompts.chat import (
     ChatPromptTemplate,
@@ -103,7 +103,7 @@ class QABaseBrainPicking(BaseBrainPicking):
         :param callbacks: Callbacks to be used for streaming
         :return: Language model instance
         """
-        return ChatOpenAI(
+        return ChatLiteLLM(
             temperature=temperature,
             model=model,
             streaming=streaming,
