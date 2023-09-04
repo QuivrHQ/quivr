@@ -1,7 +1,6 @@
 import os
 from models.brains import Brain
 from models.files import File
-from parsers.audio import process_audio
 from parsers.csv import process_csv
 from parsers.docx import process_docx
 from parsers.epub import process_epub
@@ -14,7 +13,7 @@ from parsers.powerpoint import process_powerpoint
 from parsers.txt import process_txt
 from parsers.xlsx import process_xlsx
 from parsers.code_python import process_python
-from parsers.wisper import process_wisper
+from parsers.whisper import process_whisper
 
 wisper_local = os.environ.get("WISPER_LOCAL")
 
@@ -23,13 +22,13 @@ file_processors = {
     ".csv": process_csv,
     ".md": process_markdown,
     ".markdown": process_markdown,
-    ".m4a": process_wisper if wisper_local else process_audio,
-    ".mp3": process_wisper if wisper_local else process_audio,
-    ".webm": process_wisper if wisper_local else process_audio,
-    ".mp4": process_wisper if wisper_local else process_audio,
-    ".mpga": process_wisper if wisper_local else process_audio,
-    ".wav": process_wisper if wisper_local else process_audio,
-    ".mpeg": process_wisper if wisper_local else process_audio,
+    ".m4a": process_whisper,
+    ".mp3": process_whisper,
+    ".webm": process_whisper,
+    ".mp4": process_whisper,
+    ".mpga": process_whisper,
+    ".wav": process_whisper,
+    ".mpeg": process_whisper,
     ".pdf": process_pdf,
     ".html": process_html,
     ".pptx": process_powerpoint,
