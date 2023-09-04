@@ -34,5 +34,6 @@
   "thinking": "Réflexion...",
   "title": "Discuter avec {{brain}}",
   "missing_brain": "Veuillez selectionner un cerveau pour discuter",
-  "new_prompt": "Créer un nouveau prompt"
+  "new_prompt": "Créer un nouveau prompt",
+  "feed_brain_placeholder" : "Choisissez le @cerveau que vous souhaitez nourrir avec ces fichiers"
 }
