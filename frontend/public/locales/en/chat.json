@@ -33,5 +33,6 @@
   "empty_brain_title_suffix": "and chat with them",
   "actions_bar_placeholder": "Ask a question to a @brain and choose your #prompt",
   "missing_brain": "Please select a brain to chat with",
-  "new_prompt": "Create new prompt"
+  "new_prompt": "Create new prompt",
+  "feed_brain_placeholder":"Choose which @brain you want to feed with these files"
 }

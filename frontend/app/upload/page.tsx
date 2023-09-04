@@ -2,7 +2,6 @@
 import Link from "next/link";
 import { useTranslation } from "react-i18next";
 
-import { BrainRoleType } from "@/lib/components/BrainUsers/types";
 import Button from "@/lib/components/ui/Button";
 import { Divider } from "@/lib/components/ui/Divider";
 import PageHeading from "@/lib/components/ui/PageHeading";
@@ -12,8 +11,7 @@ import { redirectToLogin } from "@/lib/router/redirectToLogin";
 
 import { Crawler } from "./components/Crawler";
 import { FileUploader } from "./components/FileUploader";
-
-const requiredRolesForUpload: BrainRoleType[] = ["Editor", "Owner"];
+import { requiredRolesForUpload } from "./config";
 
 const UploadPage = (): JSX.Element => {
   const { currentBrain } = useBrainContext();
