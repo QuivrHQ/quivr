@@ -1,5 +1,22 @@
 # Changelog
 
+## 0.0.66 (2023-09-04)
+
+## What's Changed
+* fix(prod):  add url api.openai to CSP headers by @gozineb in https://github.com/StanGirard/quivr/pull/1077
+* feat: change share brain button logic by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1078
+* fix(brainsSettings): handle nullish value from api call by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1080
+* fix: update hash routing logic by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1082
+* fix: fix hash redirection by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1085
+* feat: add tanstack query and optimistic fetch on brains settings page by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1087
+* docs: writeup for running quivr fully locally by @mvda in https://github.com/StanGirard/quivr/pull/1096
+* fix: prevent submit on share button click by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1098
+
+## New Contributors
+* @mvda made their first contribution in https://github.com/StanGirard/quivr/pull/1096
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.65...v0.0.66
+
 ## 0.0.65 (2023-08-31)
 
 ## What's Changed
