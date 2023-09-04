@@ -34,5 +34,6 @@
   "thinking": "Pensando...",
   "title": "Converse com {{brain}}",
   "missing_brain": "Cérebro não encontrado",
-  "new_prompt": "Criar novo prompt"
+  "new_prompt": "Criar novo prompt",
+  "feed_brain_placeholder" : "Escolha qual @cérebro você deseja alimentar com esses arquivos"
 }

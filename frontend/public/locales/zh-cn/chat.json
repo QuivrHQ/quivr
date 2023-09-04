@@ -34,5 +34,6 @@
   "empty_brain_title_suffix": "和他们聊天",
   "actions_bar_placeholder": "向@大脑提问，选择您的#提示",
   "missing_brain": "请选择一个大脑进行聊天",
-  "new_prompt": "新提示"
+  "new_prompt": "新提示",
+  "feed_brain_placeholder" : "选择要用这些文件喂养的 @大脑"
 }
