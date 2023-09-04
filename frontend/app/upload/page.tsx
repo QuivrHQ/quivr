@@ -3,14 +3,12 @@ import Link from "next/link";
 import { useTranslation } from "react-i18next";
 
 import Button from "@/lib/components/ui/Button";
-import { Divider } from "@/lib/components/ui/Divider";
 import PageHeading from "@/lib/components/ui/PageHeading";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 import { useSupabase } from "@/lib/context/SupabaseProvider";
 import { redirectToLogin } from "@/lib/router/redirectToLogin";
 
-import { Crawler } from "./components/Crawler";
-import { FileUploader } from "./components/FileUploader";
+import { Feed } from "./components/Feed/Feed";
 import { requiredRolesForUpload } from "./config";
 
 const UploadPage = (): JSX.Element => {
@@ -60,9 +58,7 @@ const UploadPage = (): JSX.Element => {
         title={t("title", { ns: "upload" })}
         subtitle={t("subtitle", { ns: "upload" })}
       />
-      <FileUploader />
-      <Divider text={t("or")} className="m-5" />
-      <Crawler />
+      <Feed />
       <div className="flex flex-col items-center justify-center gap-5 mt-5">
         <Link href={"/chat"}>
           <Button variant={"secondary"} className="py-3">
