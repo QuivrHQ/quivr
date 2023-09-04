@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import { MdAddCircle, MdSend } from "react-icons/md";
 
 import Button from "@/lib/components/ui/Button";
+import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 
 import { ChatBar } from "./components/ChatBar/ChatBar";
 import { ConfigModal } from "./components/ConfigModal";
@@ -21,7 +22,8 @@ export const ChatInput = (): JSX.Element => {
     setIsUploading,
   } = useChatInput();
   const { t } = useTranslation(["chat"]);
-  const shouldDisplayUploadButton = true || useFeature("ux-upload").on;
+  const shouldDisplayUploadButton = useFeature("ux-upload").on;
+  const { currentBrainId } = useBrainContext();
 
   return (
     <form
@@ -32,7 +34,7 @@ export const ChatInput = (): JSX.Element => {
       }}
       className="sticky flex items-star bottom-0 bg-white dark:bg-black w-full flex justify-center gap-2 z-20"
     >
-      {shouldDisplayUploadButton && (
+      {!isUploading && shouldDisplayUploadButton && (
         <div className="flex items-start">
           <Button
             className="p-0"
@@ -61,7 +63,11 @@ export const ChatInput = (): JSX.Element => {
       <div className="flex flex-row items-end">
         {isUploading ? (
           <div className="flex items-center">
-            <Button variant="tertiary" onClick={() => setIsUploading(false)}>
+            <Button
+              disabled={currentBrainId === null}
+              variant="tertiary"
+              onClick={() => setIsUploading(false)}
+            >
               <MdSend className="text-3xl transform -rotate-90" />
             </Button>
           </div>
