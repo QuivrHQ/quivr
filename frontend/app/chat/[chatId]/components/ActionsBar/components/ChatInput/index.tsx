@@ -11,16 +11,17 @@ import { ConfigModal } from "./components/ConfigModal";
 import { FeedBrainInput } from "./components/FeedBrainInput";
 import { useChatInput } from "./hooks/useChatInput";
 
-export const ChatInput = (): JSX.Element => {
-  const {
-    setMessage,
-    submitQuestion,
-    chatId,
-    generatingAnswer,
-    message,
-    isUploading,
-    setIsUploading,
-  } = useChatInput();
+type ChatInputProps = {
+  isUploading: boolean;
+  setIsUploading: (isUploading: boolean) => void;
+};
+
+export const ChatInput = ({
+  isUploading,
+  setIsUploading,
+}: ChatInputProps): JSX.Element => {
+  const { setMessage, submitQuestion, chatId, generatingAnswer, message } =
+    useChatInput();
   const { t } = useTranslation(["chat"]);
   const shouldDisplayUploadButton = useFeature("ux-upload").on;
   const { currentBrainId } = useBrainContext();
