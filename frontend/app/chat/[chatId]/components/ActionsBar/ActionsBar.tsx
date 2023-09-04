@@ -1,6 +1,4 @@
-import { Feed } from "@/app/upload/components";
-
-import { ChatInput } from "./components";
+import { ChatInput, Feed } from "./components";
 import { useActionBar } from "./hooks/useActionBar";
 
 export const ActionsBar = (): JSX.Element => {
