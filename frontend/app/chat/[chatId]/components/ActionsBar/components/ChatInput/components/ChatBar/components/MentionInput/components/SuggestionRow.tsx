@@ -26,6 +26,7 @@ export const SuggestionRow = ({
               }
               variant={"tertiary"}
               data-testId="share-brain-button"
+              type="button"
             >
               <MdShare className="text-xl" />
             </Button>
