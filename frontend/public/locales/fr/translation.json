@@ -27,7 +27,6 @@
   "updateButton": "Mettre à jour",
   "uploadButton": "Télécharger",
   "uploadingButton": "Téléchargement...",
-  "crawlButton": "Explorer",
   "chatButton": "Chat",
   "deleteButton": "Supprimer",
   "deleteForeverButton": "Supprimer définitivement",
@@ -44,5 +43,7 @@
   "Viewer": "Visualiseur",
   "Editor": "Éditeur",
   "Owner": "Propriétaire",
-  "saveButton": "Sauvegarder"
+  "saveButton": "Sauvegarder",
+  "invalidUrl": "URL invalide",
+  "crawlButton": "Crawler"
 }

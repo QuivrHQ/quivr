@@ -27,7 +27,6 @@
   "updateButton": "Update",
   "uploadButton": "Upload",
   "uploadingButton": "Uploading...",
-  "crawlButton": "Crawl",
   "chatButton": "Chat",
   "deleteButton": "Delete",
   "deleteForeverButton": "Delete forever",
@@ -44,5 +43,7 @@
   "Viewer": "Viewer",
   "Editor": "Editor",
   "Owner": "Owner",
-  "saveButton": "Save"
+  "saveButton": "Save",
+  "invalidUrl": "Invalid URL",
+  "crawlButton": "Crawl"
 }
