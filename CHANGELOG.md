@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.0.67 (2023-09-05)
+
+## What's Changed
+* feat: add FeedBrainInput component by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1101
+* feat: add <Feed /> component in chat page by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1103
+* 🚑 fix feature flags -> add it back to context by @gozineb in https://github.com/StanGirard/quivr/pull/1106
+
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.66...v0.0.67
+
 ## 0.0.66 (2023-09-04)
 
 ## What's Changed
