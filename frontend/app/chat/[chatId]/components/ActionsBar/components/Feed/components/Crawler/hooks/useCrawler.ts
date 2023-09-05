@@ -24,7 +24,7 @@ export const useCrawler = ({ addContent }: UseCrawlerProps) => {
   const { session } = useSupabase();
   const { publish } = useToast();
   const { track } = useEventTracking();
-
+  const { t } = useTranslation(["translation", "upload"]);
   const [urlToCrawl, setUrlToCrawl] = useState<string>("");
 
   const { crawlWebsiteUrl } = useCrawlApi();
@@ -36,14 +36,21 @@ export const useCrawler = ({ addContent }: UseCrawlerProps) => {
     if (urlToCrawl === "") {
       return;
     }
+    if (!isValidUrl(urlToCrawl)) {
+      publish({
+        variant: "danger",
+        text: t("invalidUrl"),
+      });
+
+      return;
+    }
+
     addContent({
       source: "crawl",
       url: urlToCrawl,
     });
     setUrlToCrawl("");
   };
-
-  const { t } = useTranslation(["translation", "upload"]);
 
   const crawlWebsite = useCallback(
     async (brainId: UUID | undefined) => {

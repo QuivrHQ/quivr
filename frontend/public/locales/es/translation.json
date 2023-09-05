@@ -43,5 +43,6 @@
   "uploadButton": "Subir",
   "uploadingButton": "Subiendo...",
   "Viewer": "Espectador",
-  "saveButton": "Guardar"
+  "saveButton": "Guardar",
+  "invalidUrl": "URL inválida"
 }

@@ -43,5 +43,6 @@
   "Viewer": "Просмотр",
   "Editor": "Редактор",
   "Owner": "Владелец",
-  "saveButton": "Сохранить"
+  "saveButton": "Сохранить",
+  "invalidUrl": "Неверный URL"
 }

@@ -43,5 +43,6 @@
   "Viewer": "Visualizador",
   "Editor": "Editor",
   "Owner": "Proprietário",
-  "saveButton": "Salvar"
+  "saveButton": "Salvar",
+  "invalidUrl": "URL inválida"
 }
