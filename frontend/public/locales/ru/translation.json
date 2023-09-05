@@ -27,7 +27,6 @@
   "updateButton": "Обновить",
   "uploadButton": "Загрузить",
   "uploadingButton": "Загрузка...",
-  "crawlButton": "Извлечь информацию",
   "chatButton": "Чат",
   "deleteButton": "Удалить",
   "deleteForeverButton": "Удалить навсегда",
@@ -44,5 +43,7 @@
   "Viewer": "Просмотр",
   "Editor": "Редактор",
   "Owner": "Владелец",
-  "saveButton": "Сохранить"
+  "saveButton": "Сохранить",
+  "invalidUrl": "Неверный URL",
+  "crawlButton": "Поиск"
 }
