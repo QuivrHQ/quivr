@@ -35,7 +35,7 @@ export const useCrawler = ({ addContent }: UseCrawlerProps) => {
       void track("URL_INVALID");
       publish({
         variant: "danger",
-        text: t("invalidUrl"),
+        text: t("invalidUrl", { ns: "upload" }),
       });
 
       return;
