@@ -7,14 +7,14 @@ import { Divider } from "@/lib/components/ui/Divider";
 import { FeedItems } from "./components";
 import { Crawler } from "./components/Crawler";
 import { FileUploader } from "./components/FileUploader";
-import { useFeed } from "./hooks/useFeed";
+import { useKnowledgeToFeed } from "./hooks/useKnowledgeToFeed";
 
 type FeedProps = {
   onClose: () => void;
 };
-export const Feed = ({ onClose }: FeedProps): JSX.Element => {
+export const KnowledgeToFeed = ({ onClose }: FeedProps): JSX.Element => {
   const { t } = useTranslation(["translation"]);
-  const { addContent, contents, removeContent } = useFeed();
+  const { addContent, contents, removeContent } = useKnowledgeToFeed();
 
   return (
     <div className="flex flex-col w-full table relative pb-5">

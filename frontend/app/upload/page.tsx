@@ -11,7 +11,7 @@ import { redirectToLogin } from "@/lib/router/redirectToLogin";
 
 import { Crawler } from "./Crawler";
 import { requiredRolesForUpload } from "./config";
-import { FileUploader } from "../chat/[chatId]/components/ActionsBar/components/Feed/components";
+import { FileUploader } from "../chat/[chatId]/components/ActionsBar/components/KnowledgeToFeed/components";
 
 const UploadPage = (): JSX.Element => {
   const { currentBrain } = useBrainContext();

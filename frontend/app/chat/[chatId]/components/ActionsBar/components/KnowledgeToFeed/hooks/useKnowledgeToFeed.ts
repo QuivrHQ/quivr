@@ -3,7 +3,7 @@ import { useState } from "react";
 import { FeedItemType } from "../types";
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-export const useFeed = () => {
+export const useKnowledgeToFeed = () => {
   const [contents, setContents] = useState<FeedItemType[]>([]);
 
   const addContent = (content: FeedItemType) => {
