@@ -4,6 +4,7 @@ import { MdClose } from "react-icons/md";
 import Button from "@/lib/components/ui/Button";
 import { Divider } from "@/lib/components/ui/Divider";
 
+import { FeedItems } from "./components";
 import { Crawler } from "./components/Crawler";
 import { FileUploader } from "./components/FileUploader";
 import { useFeed } from "./hooks/useFeed";
@@ -13,7 +14,7 @@ type FeedProps = {
 };
 export const Feed = ({ onClose }: FeedProps): JSX.Element => {
   const { t } = useTranslation(["translation"]);
-  const { addContent } = useFeed();
+  const { addContent, contents } = useFeed();
 
   return (
     <div className="flex flex-col w-full relative">
@@ -27,6 +28,7 @@ export const Feed = ({ onClose }: FeedProps): JSX.Element => {
       <FileUploader />
       <Divider text={t("or")} className="m-5" />
       <Crawler addContent={addContent} />
+      <FeedItems contents={contents} />
     </div>
   );
 };
