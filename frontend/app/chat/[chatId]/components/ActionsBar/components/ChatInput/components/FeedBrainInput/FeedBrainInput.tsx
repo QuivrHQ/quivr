@@ -13,17 +13,19 @@ export const FeedBrainInput = (): JSX.Element => {
 
   return (
     <div className="flex flex-row flex-1 w-full item-start">
-      {currentBrain !== undefined && (
-        <MentionItem
-          text={currentBrain.name}
-          onRemove={() => {
-            setCurrentBrainId(null);
-          }}
-          trigger={"@"}
-        />
-      )}
       <div className="flex-1">
-        <BrainSelector />
+        <div className="mt-3">
+          {currentBrain !== undefined && (
+            <MentionItem
+              text={currentBrain.name}
+              onRemove={() => {
+                setCurrentBrainId(null);
+              }}
+              trigger={"@"}
+            />
+          )}
+          <BrainSelector />
+        </div>
       </div>
     </div>
   );
