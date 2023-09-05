@@ -2,6 +2,7 @@ import { Fragment } from "react";
 import { IoMdCloseCircle } from "react-icons/io";
 import { MdLink } from "react-icons/md";
 
+import { UrlDisplay } from "./components";
 import { FeedItemType } from "../../types";
 
 type FeedItemsProps = {
@@ -30,7 +31,7 @@ export const FeedItems = ({
           />
           <div className="flex items-center">
             <MdLink className="mr-2 text-2xl" />
-            <span>{item.url}</span>
+            <UrlDisplay url={item.url} />
           </div>
         </div>
       ))}
