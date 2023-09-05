@@ -4,6 +4,7 @@ import { Inter } from "next/font/google";
 import { cookies, headers } from "next/headers";
 
 import { ToastProvider } from "@/lib/components/ui/Toast";
+import { FeatureFlagsProvider } from "@/lib/context";
 import { BrainConfigProvider } from "@/lib/context/BrainConfigProvider";
 import { BrainProvider } from "@/lib/context/BrainProvider";
 import { SupabaseProvider } from "@/lib/context/SupabaseProvider";
@@ -38,18 +39,20 @@ const RootLayout = async ({
       <body
         className={`bg-white text-black min-h-screen flex flex-col dark:bg-black dark:text-white w-full ${inter.className}`}
       >
-        <ToastProvider>
-          <SupabaseProvider session={session}>
-            <BrainConfigProvider>
-              <BrainProvider>
-                <App>
-                  <div className="flex-1">{children}</div>
-                </App>
-              </BrainProvider>
-            </BrainConfigProvider>
-          </SupabaseProvider>
-        </ToastProvider>
-        <Analytics />
+        <FeatureFlagsProvider>
+          <ToastProvider>
+            <SupabaseProvider session={session}>
+              <BrainConfigProvider>
+                <BrainProvider>
+                  <App>
+                    <div className="flex-1">{children}</div>
+                  </App>
+                </BrainProvider>
+              </BrainConfigProvider>
+            </SupabaseProvider>
+          </ToastProvider>
+          <Analytics />
+        </FeatureFlagsProvider>
       </body>
     </html>
   );
