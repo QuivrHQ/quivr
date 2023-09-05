@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next";
 import { useSupabase } from "@/lib/context/SupabaseProvider";
 import { useToast } from "@/lib/hooks";
 import { redirectToLogin } from "@/lib/router/redirectToLogin";
+import { useEventTracking } from "@/services/analytics/useEventTracking";
 
 import { FeedItemType } from "../../../types";
 import { isValidUrl } from "../helpers/isValidUrl";
@@ -20,6 +21,7 @@ export const useCrawler = ({ addContent }: UseCrawlerProps) => {
   const { publish } = useToast();
   const { t } = useTranslation(["translation", "upload"]);
   const [urlToCrawl, setUrlToCrawl] = useState<string>("");
+  const { track } = useEventTracking();
 
   if (session === null) {
     redirectToLogin();
@@ -30,6 +32,7 @@ export const useCrawler = ({ addContent }: UseCrawlerProps) => {
       return;
     }
     if (!isValidUrl(urlToCrawl)) {
+      void track("URL_INVALID");
       publish({
         variant: "danger",
         text: t("invalidUrl"),
@@ -37,7 +40,7 @@ export const useCrawler = ({ addContent }: UseCrawlerProps) => {
 
       return;
     }
-
+    void track("URL_CRAWLED");
     addContent({
       source: "crawl",
       url: urlToCrawl,
