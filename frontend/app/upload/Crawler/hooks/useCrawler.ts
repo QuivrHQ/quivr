@@ -3,7 +3,7 @@ import { UUID } from "crypto";
 import { useCallback, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 
-import { isValidUrl } from "@/app/chat/[chatId]/components/ActionsBar/components/KnowledgeToFeed/components/Crawler/helpers/isValidUrl";
+import { isValidUrl } from "@/app/chat/[chatId]/components/ActionsBar/components/KnowledgeToFeedCard/components/Crawler/helpers/isValidUrl";
 import { useCrawlApi } from "@/lib/api/crawl/useCrawlApi";
 import { useSupabase } from "@/lib/context/SupabaseProvider";
 import { useToast } from "@/lib/hooks";

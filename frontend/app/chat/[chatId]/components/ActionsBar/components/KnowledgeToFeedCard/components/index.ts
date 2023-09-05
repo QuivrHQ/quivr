@@ -1,3 +1,3 @@
 export * from "./Crawler";
-export * from "./FeedItems";
 export * from "./FileUploader";
+export * from "./KnowledgeToFeedItems";

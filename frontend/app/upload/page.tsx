@@ -9,9 +9,9 @@ import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainConte
 import { useSupabase } from "@/lib/context/SupabaseProvider";
 import { redirectToLogin } from "@/lib/router/redirectToLogin";
 
+import { FileUploader } from "../chat/[chatId]/components/ActionsBar/components/KnowledgeToFeedCard/components";
 import { Crawler } from "./Crawler";
 import { requiredRolesForUpload } from "./config";
-import { FileUploader } from "../chat/[chatId]/components/ActionsBar/components/KnowledgeToFeed/components";
 
 const UploadPage = (): JSX.Element => {
   const { currentBrain } = useBrainContext();

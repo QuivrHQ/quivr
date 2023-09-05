@@ -7,11 +7,11 @@ import { useToast } from "@/lib/hooks";
 import { redirectToLogin } from "@/lib/router/redirectToLogin";
 import { useEventTracking } from "@/services/analytics/useEventTracking";
 
-import { FeedItemType } from "../../../types";
+import { KnowledgeToFeed } from "../../../types";
 import { isValidUrl } from "../helpers/isValidUrl";
 
 type UseCrawlerProps = {
-  addContent: (content: FeedItemType) => void;
+  addContent: (content: KnowledgeToFeed) => void;
 };
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types

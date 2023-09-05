@@ -4,15 +4,17 @@ import { MdClose } from "react-icons/md";
 import Button from "@/lib/components/ui/Button";
 import { Divider } from "@/lib/components/ui/Divider";
 
-import { FeedItems } from "./components";
+import { KnowledgeToFeedItems } from "./components";
 import { Crawler } from "./components/Crawler";
 import { FileUploader } from "./components/FileUploader";
 import { useKnowledgeToFeed } from "./hooks/useKnowledgeToFeed";
 
-type FeedProps = {
+type KnowledgeToFeedCardProps = {
   onClose: () => void;
 };
-export const KnowledgeToFeed = ({ onClose }: FeedProps): JSX.Element => {
+export const KnowledgeToFeedCard = ({
+  onClose,
+}: KnowledgeToFeedCardProps): JSX.Element => {
   const { t } = useTranslation(["translation"]);
   const { addContent, contents, removeContent } = useKnowledgeToFeed();
 
@@ -28,7 +30,7 @@ export const KnowledgeToFeed = ({ onClose }: FeedProps): JSX.Element => {
       <FileUploader />
       <Divider text={t("or")} className="m-5" />
       <Crawler addContent={addContent} />
-      <FeedItems contents={contents} removeContent={removeContent} />
+      <KnowledgeToFeedItems contents={contents} removeContent={removeContent} />
     </div>
   );
 };

@@ -3,17 +3,17 @@ import { IoMdCloseCircle } from "react-icons/io";
 import { MdLink } from "react-icons/md";
 
 import { UrlDisplay } from "./components";
-import { FeedItemType } from "../../types";
+import { KnowledgeToFeed } from "../../types";
 
-type FeedItemsProps = {
-  contents: FeedItemType[];
+type KnowledgeToFeedItemsProps = {
+  contents: KnowledgeToFeed[];
   removeContent: (index: number) => void;
 };
 
-export const FeedItems = ({
+export const KnowledgeToFeedItems = ({
   contents,
   removeContent,
-}: FeedItemsProps): JSX.Element => {
+}: KnowledgeToFeedItemsProps): JSX.Element => {
   if (contents.length === 0) {
     return <Fragment />;
   }

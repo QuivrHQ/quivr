@@ -6,10 +6,10 @@ import Button from "@/lib/components/ui/Button";
 import Field from "@/lib/components/ui/Field";
 
 import { useCrawler } from "./hooks/useCrawler";
-import { FeedItemType } from "../../types";
+import { KnowledgeToFeed } from "../../types";
 
 type CrawlerProps = {
-  addContent: (content: FeedItemType) => void;
+  addContent: (content: KnowledgeToFeed) => void;
 };
 
 export const Crawler = ({ addContent }: CrawlerProps): JSX.Element => {
