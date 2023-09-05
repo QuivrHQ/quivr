@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 "use client";
 import { UUID } from "crypto";
 import { useCallback, useRef, useState } from "react";
@@ -9,10 +10,15 @@ import { useToast } from "@/lib/hooks";
 import { redirectToLogin } from "@/lib/router/redirectToLogin";
 import { useEventTracking } from "@/services/analytics/useEventTracking";
 
+import { FeedItemType } from "../../../types";
 import { isValidUrl } from "../helpers/isValidUrl";
 
+type UseCrawlerProps = {
+  addContent: (content: FeedItemType) => void;
+};
+
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-export const useCrawler = () => {
+export const useCrawler = ({ addContent }: UseCrawlerProps) => {
   const [isCrawling, setCrawling] = useState(false);
   const urlInputRef = useRef<HTMLInputElement | null>(null);
   const { session } = useSupabase();
@@ -25,6 +31,17 @@ export const useCrawler = () => {
   if (session === null) {
     redirectToLogin();
   }
+
+  const handleSubmit = () => {
+    if (urlToCrawl === "") {
+      return;
+    }
+    addContent({
+      source: "crawl",
+      url: urlToCrawl,
+    });
+    setUrlToCrawl("");
+  };
 
   const { t } = useTranslation(["translation", "upload"]);
 
@@ -93,5 +110,6 @@ export const useCrawler = () => {
     crawlWebsite,
     urlToCrawl,
     setUrlToCrawl,
+    handleSubmit,
   };
 };

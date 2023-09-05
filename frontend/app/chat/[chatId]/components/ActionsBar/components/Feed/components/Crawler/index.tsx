@@ -13,22 +13,21 @@ type CrawlerProps = {
 };
 
 export const Crawler = ({ addContent }: CrawlerProps): JSX.Element => {
-  const { urlInputRef, urlToCrawl, setUrlToCrawl } = useCrawler();
+  const { urlInputRef, urlToCrawl, handleSubmit, setUrlToCrawl } = useCrawler({
+    addContent,
+  });
   const { t } = useTranslation(["translation", "upload"]);
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    addContent({
-      source: "crawl",
-      url: urlToCrawl,
-    });
-    setUrlToCrawl("");
-  };
 
   return (
     <div className="w-full flex justify-center items-center">
       <div className="max-w-xl w-full">
-        <form onSubmit={handleSubmit} className="w-full">
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            handleSubmit();
+          }}
+          className="w-full"
+        >
           <Field
             name="crawlurl"
             ref={urlInputRef}

@@ -5,9 +5,9 @@ export const ActionsBar = (): JSX.Element => {
   const { isUploading, setIsUploading } = useActionBar();
 
   return (
-    <div className={isUploading ? "h-full" : ""}>
+    <div className={isUploading ? "h-full flex flex-col flex-auto" : ""}>
       {isUploading && (
-        <div className="shadow-md dark:shadow-primary/25 hover:shadow-xl transition-shadow rounded-xl bg-white dark:bg-black border border-black/10 dark:border-white/25 p-6">
+        <div className="flex flex-1 overflow-y-scroll shadow-md dark:shadow-primary/25 hover:shadow-xl transition-shadow rounded-xl bg-white dark:bg-black border border-black/10 dark:border-white/25 p-6">
           <Feed onClose={() => setIsUploading(false)} />
         </div>
       )}

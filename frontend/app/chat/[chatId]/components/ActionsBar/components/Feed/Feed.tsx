@@ -14,10 +14,10 @@ type FeedProps = {
 };
 export const Feed = ({ onClose }: FeedProps): JSX.Element => {
   const { t } = useTranslation(["translation"]);
-  const { addContent, contents } = useFeed();
+  const { addContent, contents, removeContent } = useFeed();
 
   return (
-    <div className="flex flex-col w-full relative">
+    <div className="flex flex-col w-full table relative pb-5">
       <div className="absolute right-2 top-1">
         <Button variant={"tertiary"} onClick={onClose}>
           <span>
@@ -28,7 +28,7 @@ export const Feed = ({ onClose }: FeedProps): JSX.Element => {
       <FileUploader />
       <Divider text={t("or")} className="m-5" />
       <Crawler addContent={addContent} />
-      <FeedItems contents={contents} />
+      <FeedItems contents={contents} removeContent={removeContent} />
     </div>
   );
 };
