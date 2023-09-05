@@ -2,34 +2,48 @@
 import { useTranslation } from "react-i18next";
 import { MdSend } from "react-icons/md";
 
+import Button from "@/lib/components/ui/Button";
 import Field from "@/lib/components/ui/Field";
 
 import { useCrawler } from "./hooks/useCrawler";
+import { FeedItemType } from "../../types";
 
-export const Crawler = (): JSX.Element => {
-  const { urlInputRef } = useCrawler();
+type CrawlerProps = {
+  addContent: (content: FeedItemType) => void;
+};
 
+export const Crawler = ({ addContent }: CrawlerProps): JSX.Element => {
+  const { urlInputRef, urlToCrawl, setUrlToCrawl } = useCrawler();
   const { t } = useTranslation(["translation", "upload"]);
 
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    addContent({
+      source: "crawl",
+      url: urlToCrawl,
+    });
+    setUrlToCrawl("");
+  };
+
   return (
-    <div className="w-full">
-      <div className="flex justify-center gap-5 px-6">
-        <div className="max-w-xl w-full">
-          <div className="flex-col justify-center gap-5">
-            <div className="h-32 flex gap-5 justify-center items-center px-5">
-              <div className="text-center max-w-sm w-full flex flex-col gap-5 items-center">
-                <Field
-                  name="crawlurl"
-                  ref={urlInputRef}
-                  type="text"
-                  placeholder={t("webSite", { ns: "upload" })}
-                  className="w-full"
-                  icon={<MdSend />}
-                />
-              </div>
-            </div>
-          </div>
-        </div>
+    <div className="w-full flex justify-center items-center">
+      <div className="max-w-xl w-full">
+        <form onSubmit={handleSubmit} className="w-full">
+          <Field
+            name="crawlurl"
+            ref={urlInputRef}
+            type="text"
+            placeholder={t("webSite", { ns: "upload" })}
+            className="w-full"
+            value={urlToCrawl}
+            onChange={(e) => setUrlToCrawl(e.target.value)}
+            icon={
+              <Button variant={"tertiary"}>
+                <MdSend />
+              </Button>
+            }
+          />
+        </form>
       </div>
     </div>
   );

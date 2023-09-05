@@ -19,6 +19,8 @@ export const useCrawler = () => {
   const { publish } = useToast();
   const { track } = useEventTracking();
 
+  const [urlToCrawl, setUrlToCrawl] = useState<string>("");
+
   const { crawlWebsiteUrl } = useCrawlApi();
   if (session === null) {
     redirectToLogin();
@@ -89,5 +91,7 @@ export const useCrawler = () => {
     isCrawling,
     urlInputRef,
     crawlWebsite,
+    urlToCrawl,
+    setUrlToCrawl,
   };
 };

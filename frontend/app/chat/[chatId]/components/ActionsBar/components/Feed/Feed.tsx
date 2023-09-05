@@ -6,12 +6,14 @@ import { Divider } from "@/lib/components/ui/Divider";
 
 import { Crawler } from "./components/Crawler";
 import { FileUploader } from "./components/FileUploader";
+import { useFeed } from "./hooks/useFeed";
 
 type FeedProps = {
   onClose: () => void;
 };
 export const Feed = ({ onClose }: FeedProps): JSX.Element => {
   const { t } = useTranslation(["translation"]);
+  const { addContent } = useFeed();
 
   return (
     <div className="flex flex-col w-full relative">
@@ -24,7 +26,7 @@ export const Feed = ({ onClose }: FeedProps): JSX.Element => {
       </div>
       <FileUploader />
       <Divider text={t("or")} className="m-5" />
-      <Crawler />
+      <Crawler addContent={addContent} />
     </div>
   );
 };
