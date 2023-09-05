@@ -44,5 +44,6 @@
   "uploadingButton": "Subiendo...",
   "Viewer": "Espectador",
   "saveButton": "Guardar",
-  "invalidUrl": "URL inválida"
+  "invalidUrl": "URL inválida",
+  "crawlButton": "Rastrear"
 }

@@ -44,5 +44,6 @@
   "Editor": "编辑",
   "Owner": "作者",
   "saveButton": "保存",
-  "invalidUrl": "无效的URL"
+  "invalidUrl": "无效的URL",
+  "crawlButton": "爬取"
 }

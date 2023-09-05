@@ -44,5 +44,6 @@
   "Editor": "Редактор",
   "Owner": "Владелец",
   "saveButton": "Сохранить",
-  "invalidUrl": "Неверный URL"
+  "invalidUrl": "Неверный URL",
+  "crawlButton": "Поиск"
 }

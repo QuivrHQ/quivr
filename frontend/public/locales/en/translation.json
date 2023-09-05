@@ -44,5 +44,6 @@
   "Editor": "Editor",
   "Owner": "Owner",
   "saveButton": "Save",
-  "invalidUrl": "Invalid URL"
+  "invalidUrl": "Invalid URL",
+  "crawlButton": "Crawl"
 }
