@@ -14,7 +14,7 @@ type FeedProps = {
 };
 export const KnowledgeToFeed = ({ onClose }: FeedProps): JSX.Element => {
   const { t } = useTranslation(["translation"]);
-  const { addContent, contents, removeContent } = useKnowledgeToFeed();
+  const { addContent, contents, removeContent, files } = useKnowledgeToFeed();
 
   return (
     <div className="flex flex-col w-full table relative pb-5">
@@ -25,7 +25,7 @@ export const KnowledgeToFeed = ({ onClose }: FeedProps): JSX.Element => {
           </span>
         </Button>
       </div>
-      <FileUploader />
+      <FileUploader addContent={addContent} files={files} />
       <Divider text={t("or")} className="m-5" />
       <Crawler addContent={addContent} />
       <FeedItems contents={contents} removeContent={removeContent} />

@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import { FeedItemType } from "../types";
+import { FeedItemType, FeedItemUploadType } from "../types";
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const useKnowledgeToFeed = () => {
@@ -13,10 +13,15 @@ export const useKnowledgeToFeed = () => {
     setContents((prevContents) => prevContents.filter((_, i) => i !== index));
   };
 
+  const files: File[] = (
+    contents.filter((c) => c.source === "upload") as FeedItemUploadType[]
+  ).map((c) => c.file);
+
   return {
     addContent,
     contents,
     setContents,
     removeContent,
+    files,
   };
 };

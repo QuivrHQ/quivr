@@ -1,6 +1,13 @@
 export type FeedItemSource = "crawl" | "upload";
 
-export type FeedItemType = {
-  source: FeedItemSource;
+type FeedItemCrawlType = {
+  source: "crawl";
   url: string;
 };
+
+export type FeedItemUploadType = {
+  source: "upload";
+  file: File;
+};
+
+export type FeedItemType = FeedItemCrawlType | FeedItemUploadType;

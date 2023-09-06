@@ -1,70 +1,32 @@
 /* eslint-disable max-lines */
 
-import axios from "axios";
-import { UUID } from "crypto";
-import { useCallback, useState } from "react";
 import { FileRejection, useDropzone } from "react-dropzone";
 import { useTranslation } from "react-i18next";
 
-import { useUploadApi } from "@/lib/api/upload/useUploadApi";
-import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 import { useSupabase } from "@/lib/context/SupabaseProvider";
 import { useToast } from "@/lib/hooks";
 import { redirectToLogin } from "@/lib/router/redirectToLogin";
-import { useEventTracking } from "@/services/analytics/useEventTracking";
+
+import { FeedItemType } from "../../../types";
+
+type UseFileUploaderProps = {
+  addContent: (content: FeedItemType) => void;
+  files: File[];
+};
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-export const useFileUploader = () => {
-  const { track } = useEventTracking();
-  const [isPending, setIsPending] = useState(false);
+export const useFileUploader = ({
+  addContent,
+  files,
+}: UseFileUploaderProps) => {
   const { publish } = useToast();
-  const [files, setFiles] = useState<File[]>([]);
   const { session } = useSupabase();
-  const { uploadFile } = useUploadApi();
-  const { currentBrain } = useBrainContext();
 
   if (session === null) {
     redirectToLogin();
   }
 
   const { t } = useTranslation(["upload"]);
-
-  const upload = useCallback(
-    async (file: File, brainId: UUID) => {
-      const formData = new FormData();
-      formData.append("uploadFile", file);
-      try {
-        void track("FILE_UPLOADED");
-        const response = await uploadFile({ brainId, formData });
-        publish({
-          variant: response.data.type,
-          text:
-            response.data.type === "success"
-              ? t("success", { ns: "upload" })
-              : t("error", { message: response.data.message, ns: "upload" }),
-        });
-      } catch (e: unknown) {
-        if (axios.isAxiosError(e) && e.response?.status === 403) {
-          publish({
-            variant: "danger",
-            text: `${JSON.stringify(
-              (
-                e.response as {
-                  data: { detail: string };
-                }
-              ).data.detail
-            )}`,
-          });
-        } else {
-          publish({
-            variant: "danger",
-            text: t("error", { message: e, ns: "upload" }),
-          });
-        }
-      }
-    },
-    [publish, t, track, uploadFile]
-  );
 
   const onDrop = (acceptedFiles: File[], fileRejections: FileRejection[]) => {
     if (fileRejections.length > 0) {
@@ -94,32 +56,13 @@ export const useFileUploader = () => {
           text: t("alreadyAdded", { fileName: file.name, ns: "upload" }),
         });
         acceptedFiles.splice(i, 1);
+      } else {
+        addContent({
+          source: "upload",
+          file: file,
+        });
       }
     }
-    // eslint-disable-next-line @typescript-eslint/no-shadow
-    setFiles((files) => [...files, ...acceptedFiles]);
-  };
-
-  const uploadAllFiles = async () => {
-    if (files.length === 0) {
-      publish({
-        text: t("addFiles", { ns: "upload" }),
-        variant: "warning",
-      });
-
-      return;
-    }
-    setIsPending(true);
-    if (currentBrain?.id !== undefined) {
-      await Promise.all(files.map((file) => upload(file, currentBrain.id)));
-      setFiles([]);
-    } else {
-      publish({
-        text: t("selectBrain", { ns: "upload" }),
-        variant: "warning",
-      });
-    }
-    setIsPending(false);
   };
 
   const { getInputProps, getRootProps, isDragActive, open } = useDropzone({
@@ -153,13 +96,9 @@ export const useFileUploader = () => {
   });
 
   return {
-    isPending,
     getInputProps,
     getRootProps,
     isDragActive,
     open,
-    uploadAllFiles,
-    files,
-    setFiles,
   };
 };
