@@ -219,3 +219,19 @@ class Repository(ABC):
     @abstractmethod
     def get_public_prompts(self):
         pass
+
+    @abstractmethod
+    def add_notification(self, notification):
+        pass
+
+    @abstractmethod
+    def update_notification_by_id(self, id: UUID):
+        pass
+
+    @abstractmethod
+    def remove_notification_by_id(self, id: UUID):
+        pass
+
+    @abstractmethod
+    def get_notifications_by_chat_id(self, chat_id: UUID):
+        pass

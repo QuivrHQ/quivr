@@ -17,3 +17,9 @@ class Notification(BaseModel):
     message: Optional[str]
     action: str
     status: StatusEnum
+
+    def dict(self, *args, **kwargs):
+        notification_dict = super().dict(*args, **kwargs)
+        if notification_dict.get("chat_id"):
+            notification_dict["chat_id"] = str(notification_dict.get("chat_id"))
+        return notification_dict
