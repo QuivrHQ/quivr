@@ -7,7 +7,7 @@ import { useSupabase } from "@/lib/context/SupabaseProvider";
 import { useToast } from "@/lib/hooks";
 import { redirectToLogin } from "@/lib/router/redirectToLogin";
 
-import { FeedItemType } from "../../../types";
+import { FeedItemType } from "../../../../../types";
 import { SupportedFileExtensionsWithDot } from "../types";
 
 type UseFileUploaderProps = {

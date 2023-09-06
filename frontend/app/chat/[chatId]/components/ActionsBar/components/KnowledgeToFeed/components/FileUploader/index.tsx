@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import Card from "@/lib/components/ui/Card";
 
 import { useFileUploader } from "./hooks/useFileUploader";
-import { FeedItemType } from "../../types";
+import { FeedItemType } from "../../../../types";
 
 type FileUploaderProps = {
   addContent: (content: FeedItemType) => void;

@@ -2,7 +2,7 @@ import { Fragment } from "react";
 
 import { CrawlFeedItem } from "./components/CrawlFeedItem";
 import { FileFeedItem } from "./components/FileFeedItem/FileFeedItem";
-import { FeedItemType } from "../../types";
+import { FeedItemType } from "../../../../types";
 
 type FeedItemsProps = {
   contents: FeedItemType[];
