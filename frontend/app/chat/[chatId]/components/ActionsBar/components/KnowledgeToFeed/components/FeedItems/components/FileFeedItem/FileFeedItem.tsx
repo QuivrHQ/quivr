@@ -1,7 +1,7 @@
 import { IoMdCloseCircle } from "react-icons/io";
-import { MdLink } from "react-icons/md";
 
-import { FeedTitleDisplayer } from "./FeedTitleDisplayer";
+import { getFileIcon } from "./helpers/getFileIcon";
+import { FeedTitleDisplayer } from "../FeedTitleDisplayer";
 
 type FileFeedItemProps = {
   file: File;
@@ -12,6 +12,8 @@ export const FileFeedItem = ({
   file,
   onRemove,
 }: FileFeedItemProps): JSX.Element => {
+  const icon = getFileIcon(file.name);
+
   return (
     <div className="relative bg-gray-100 p-4 rounded-lg shadow-sm">
       <IoMdCloseCircle
@@ -19,8 +21,7 @@ export const FileFeedItem = ({
         onClick={onRemove}
       />
       <div className="flex items-center">
-        <MdLink className="mr-2 text-2xl" />
-
+        {icon}
         <FeedTitleDisplayer title={file.name} truncate />
       </div>
     </div>

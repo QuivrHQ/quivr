@@ -8,6 +8,7 @@ import { useToast } from "@/lib/hooks";
 import { redirectToLogin } from "@/lib/router/redirectToLogin";
 
 import { FeedItemType } from "../../../types";
+import { SupportedFileExtensionsWithDot } from "../types";
 
 type UseFileUploaderProps = {
   addContent: (content: FeedItemType) => void;
@@ -65,34 +66,37 @@ export const useFileUploader = ({
     }
   };
 
+  const accept: Record<string, SupportedFileExtensionsWithDot[]> = {
+    "text/plain": [".txt"],
+    "text/csv": [".csv"],
+    "text/markdown": [".md", ".markdown"],
+    "audio/x-m4a": [".m4a"],
+    "audio/mpeg": [".mp3", ".mpga", ".mpeg"],
+    "audio/webm": [".webm"],
+    "video/mp4": [".mp4"],
+    "audio/wav": [".wav"],
+    "application/pdf": [".pdf"],
+    "text/html": [".html"],
+    "application/vnd.openxmlformats-officedocument.presentationml.presentation":
+      [".pptx"],
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document": [
+      ".docx",
+    ],
+    "application/vnd.oasis.opendocument.text": [".odt"],
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": [
+      ".xlsx",
+      ".xls",
+    ],
+    "application/epub+zip": [".epub"],
+    "application/x-ipynb+json": [".ipynb"],
+    "text/x-python": [".py"],
+  };
+
   const { getInputProps, getRootProps, isDragActive, open } = useDropzone({
     onDrop,
     noClick: true,
     maxSize: 100000000, // 1 MB
-    accept: {
-      "text/plain": [".txt"],
-      "text/csv": [".csv"],
-      "text/markdown": [".md", ".markdown"],
-      "audio/x-m4a": [".m4a"],
-      "audio/mpeg": [".mp3", ".mpga", ".mpeg"],
-      "audio/webm": [".webm"],
-      "video/mp4": [".mp4"],
-      "audio/wav": [".wav"],
-      "application/pdf": [".pdf"],
-      "text/html": [".html"],
-      "application/vnd.openxmlformats-officedocument.presentationml.presentation":
-        [".pptx"],
-      "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
-        [".docx"],
-      "application/vnd.oasis.opendocument.text": [".odt"],
-      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": [
-        ".xlsx",
-        ".xls",
-      ],
-      "application/epub+zip": [".epub"],
-      "application/x-ipynb+json": [".ipynb"],
-      "text/x-python": [".py"],
-    },
+    accept,
   });
 
   return {
