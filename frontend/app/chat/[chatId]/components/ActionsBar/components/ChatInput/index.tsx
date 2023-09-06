@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 "use client";
 import { useTranslation } from "react-i18next";
 import { MdAddCircle, MdSend } from "react-icons/md";
@@ -14,12 +15,14 @@ type ChatInputProps = {
   shouldDisplayUploadCard: boolean;
   feedBrain: () => void;
   setShouldDisplayUploadCard: (shouldDisplayUploadCard: boolean) => void;
+  hasContentToFeedBrain: boolean;
 };
 
 export const ChatInput = ({
   shouldDisplayUploadCard,
   feedBrain,
   setShouldDisplayUploadCard,
+  hasContentToFeedBrain,
 }: ChatInputProps): JSX.Element => {
   const { setMessage, submitQuestion, chatId, generatingAnswer, message } =
     useChatInput();
@@ -65,9 +68,12 @@ export const ChatInput = ({
         {shouldDisplayUploadCard ? (
           <div className="flex items-center">
             <Button
-              disabled={currentBrainId === null}
+              disabled={currentBrainId === null || !hasContentToFeedBrain}
               variant="tertiary"
-              onClick={feedBrain}
+              onClick={() => {
+                setShouldDisplayUploadCard(false);
+                feedBrain();
+              }}
               type="button"
             >
               <MdSend className="text-3xl transform -rotate-90" />
