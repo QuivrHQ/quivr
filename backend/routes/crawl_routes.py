@@ -7,7 +7,16 @@ from auth import AuthBearer, get_current_user
 from crawl.crawler import CrawlWebsite
 from fastapi import APIRouter, Depends, Query, Request, UploadFile
 from models import Brain, File, UserIdentity
+from models.databases.supabase.notifications import (
+    CreateNotificationProperties,
+    NotificationUpdatableProperties,
+)
+from models.notifications import NotificationsStatusEnum
 from parsers.github import process_github
+from repository.notification.add_notification import add_notification
+from repository.notification.update_notification import (
+    update_notification_by_id,
+)
 from utils.file import convert_bytes
 from utils.processors import filter_file
 
@@ -47,6 +56,12 @@ async def crawl_endpoint(
             "type": "error",
         }
     else:
+        crawl_notification = add_notification(
+            CreateNotificationProperties(
+                chat_id=current_user.id,
+                action="CRAWL",
+            )
+        )
         if not crawl_website.checkGithub():
             (
                 file_path,
@@ -73,9 +88,15 @@ async def crawl_endpoint(
             return message
         else:
             #  check remaining free space here !!
-            message = await process_github(
+            await process_github(
                 repo=crawl_website.url,
                 enable_summarization="false",
                 brain_id=brain_id,
                 user_openai_api_key=request.headers.get("Openai-Api-Key", None),
+            )
+            update_notification_by_id(
+                crawl_notification.id,
+                NotificationUpdatableProperties(
+                    status=NotificationsStatusEnum.Done, message=""
+                ),
             )

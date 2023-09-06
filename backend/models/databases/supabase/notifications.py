@@ -3,18 +3,17 @@ from uuid import UUID
 
 from fastapi import HTTPException
 from models.databases.repository import Repository
+from models.notifications import Notification, NotificationsStatusEnum
 from pydantic import BaseModel
-
-from backend.models.notifications import Notification, StatusEnum
 
 
 class CreateNotificationProperties(BaseModel):
     """Properties that can be received on notification creation"""
 
     chat_id: Optional[UUID]
-    message: Optional[str]
+    message: Optional[str] = None
     action: str
-    status: StatusEnum = StatusEnum.Pending
+    status: NotificationsStatusEnum = NotificationsStatusEnum.Pending
 
 
 class DeleteNotificationResponse(BaseModel):
@@ -22,6 +21,13 @@ class DeleteNotificationResponse(BaseModel):
 
     status: str = "delete"
     notification_id: UUID
+
+
+class NotificationUpdatableProperties(BaseModel):
+    """Properties that can be received on notification update"""
+
+    message: Optional[str]
+    status: Optional[NotificationsStatusEnum] = NotificationsStatusEnum.Done
 
 
 class Notifications(Repository):
@@ -40,7 +46,7 @@ class Notifications(Repository):
         return Notification(**response[0])
 
     def update_notification_by_id(
-        self, notification_id: UUID, notification: Notification
+        self, notification_id: UUID, notification: NotificationUpdatableProperties
     ) -> Notification:
         """Update a notification by id"""
         response = (

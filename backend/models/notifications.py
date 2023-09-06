@@ -5,7 +5,7 @@ from uuid import UUID
 from pydantic import BaseModel
 
 
-class StatusEnum(str, Enum):
+class NotificationsStatusEnum(str, Enum):
     Pending = "Pending"
     Done = "Done"
 
@@ -16,7 +16,7 @@ class Notification(BaseModel):
     chat_id: Optional[UUID]
     message: Optional[str]
     action: str
-    status: StatusEnum
+    status: NotificationsStatusEnum
 
     def dict(self, *args, **kwargs):
         notification_dict = super().dict(*args, **kwargs)
