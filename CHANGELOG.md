@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.0.68 (2023-09-06)
+
+## What's Changed
+* feat(liteLLM): Add support for Azure OpenAI, Palm, Claude-2, Llama2, CodeLlama (100+LLMs)  by @ishaan-jaff in https://github.com/StanGirard/quivr/pull/1097
+* feat(crawler): add multiple urls support by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1112
+* fix(csp): add growthbook to csp headers by @gozineb in https://github.com/StanGirard/quivr/pull/1117
+
+## New Contributors
+* @ishaan-jaff made their first contribution in https://github.com/StanGirard/quivr/pull/1097
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.67...v0.0.68
+
 ## 0.0.67 (2023-09-05)
 
 ## What's Changed
