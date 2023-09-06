@@ -6,6 +6,7 @@ import { useTranslation } from "react-i18next";
 import { useSupabase } from "@/lib/context/SupabaseProvider";
 import { useToast } from "@/lib/hooks";
 import { redirectToLogin } from "@/lib/router/redirectToLogin";
+import { useEventTracking } from "@/services/analytics/useEventTracking";
 
 import { FeedItemType } from "../../../../../types";
 import { SupportedFileExtensionsWithDot } from "../types";
@@ -22,6 +23,7 @@ export const useFileUploader = ({
 }: UseFileUploaderProps) => {
   const { publish } = useToast();
   const { session } = useSupabase();
+  const { track } = useEventTracking();
 
   if (session === null) {
     redirectToLogin();
@@ -46,8 +48,8 @@ export const useFileUploader = ({
       return;
     }
 
-    for (let i = 0; i < acceptedFiles.length; i++) {
-      const file = acceptedFiles[i];
+    for (const element of acceptedFiles) {
+      const file = element;
       const isAlreadyInFiles =
         files.filter((f) => f.name === file.name && f.size === file.size)
           .length > 0;
@@ -56,8 +58,8 @@ export const useFileUploader = ({
           variant: "warning",
           text: t("alreadyAdded", { fileName: file.name, ns: "upload" }),
         });
-        acceptedFiles.splice(i, 1);
       } else {
+        void track("FILE_UPLOADED");
         addContent({
           source: "upload",
           file: file,
