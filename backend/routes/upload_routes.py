@@ -73,7 +73,6 @@ async def upload_file(
     else:
         upload_notification = add_notification(
             CreateNotificationProperties(
-                chat_id=current_user.id,
                 action="UPLOAD",
             )
         )
@@ -95,7 +94,7 @@ async def upload_file(
         update_notification_by_id(
             upload_notification.id,
             NotificationUpdatableProperties(
-                status=NotificationsStatusEnum.Done, message=""
+                status=NotificationsStatusEnum.Done, message=str(message)
             ),
         )
 

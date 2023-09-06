@@ -58,7 +58,6 @@ async def crawl_endpoint(
     else:
         crawl_notification = add_notification(
             CreateNotificationProperties(
-                chat_id=current_user.id,
                 action="CRAWL",
             )
         )
@@ -85,18 +84,18 @@ async def crawl_endpoint(
                 brain_id=brain.id,
                 openai_api_key=request.headers.get("Openai-Api-Key", None),
             )
-            return message
         else:
             #  check remaining free space here !!
-            await process_github(
+            message = await process_github(
                 repo=crawl_website.url,
                 enable_summarization="false",
                 brain_id=brain_id,
                 user_openai_api_key=request.headers.get("Openai-Api-Key", None),
             )
-            update_notification_by_id(
-                crawl_notification.id,
-                NotificationUpdatableProperties(
-                    status=NotificationsStatusEnum.Done, message=""
-                ),
-            )
+        update_notification_by_id(
+            crawl_notification.id,
+            NotificationUpdatableProperties(
+                status=NotificationsStatusEnum.Done, message=str(message)
+            ),
+        )
+    return message
