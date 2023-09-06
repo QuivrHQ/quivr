@@ -1,5 +1,4 @@
 "use client";
-import { useFeature } from "@growthbook/growthbook-react";
 import { useTranslation } from "react-i18next";
 import { MdAddCircle, MdSend } from "react-icons/md";
 
@@ -25,7 +24,6 @@ export const ChatInput = ({
   const { setMessage, submitQuestion, chatId, generatingAnswer, message } =
     useChatInput();
   const { t } = useTranslation(["chat"]);
-  const shouldDisplayUploadButton = useFeature("ux-upload").on;
   const { currentBrainId } = useBrainContext();
 
   return (
@@ -37,7 +35,7 @@ export const ChatInput = ({
       }}
       className="sticky flex items-star bottom-0 bg-white dark:bg-black w-full flex justify-center gap-2 z-20"
     >
-      {!shouldDisplayUploadCard && shouldDisplayUploadButton && (
+      {!shouldDisplayUploadCard && (
         <div className="flex items-start">
           <Button
             className="p-0"
