@@ -68,7 +68,17 @@ export const useFileUploader = () => {
 
   const onDrop = (acceptedFiles: File[], fileRejections: FileRejection[]) => {
     if (fileRejections.length > 0) {
-      publish({ variant: "danger", text: t("maxSizeError", { ns: "upload" }) });
+      const firstRejection = fileRejections[0];
+
+      if (firstRejection.errors[0].code === "file-invalid-type") {
+        const errorMessage = t("invalidFileType");
+        publish({ variant: "danger", text: errorMessage });
+      } else {
+        publish({
+          variant: "danger",
+          text: t("maxSizeError", { ns: "upload" }),
+        });
+      }
 
       return;
     }
@@ -116,6 +126,30 @@ export const useFileUploader = () => {
     onDrop,
     noClick: true,
     maxSize: 100000000, // 1 MB
+    accept: {
+      "text/plain": [".txt"],
+      "text/csv": [".csv"],
+      "text/markdown": [".md", ".markdown"],
+      "audio/x-m4a": [".m4a"],
+      "audio/mpeg": [".mp3", ".mpga", ".mpeg"],
+      "audio/webm": [".webm"],
+      "video/mp4": [".mp4"],
+      "audio/wav": [".wav"],
+      "application/pdf": [".pdf"],
+      "text/html": [".html"],
+      "application/vnd.openxmlformats-officedocument.presentationml.presentation":
+        [".pptx"],
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
+        [".docx"],
+      "application/vnd.oasis.opendocument.text": [".odt"],
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": [
+        ".xlsx",
+        ".xls",
+      ],
+      "application/epub+zip": [".epub"],
+      "application/x-ipynb+json": [".ipynb"],
+      "text/x-python": [".py"],
+    },
   });
 
   return {
