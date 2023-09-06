@@ -1,6 +1,7 @@
 import { useState } from "react";
 
 import { enhanceUrlDisplay } from "./utils/enhanceUrlDisplay";
+import { removeFileExtension } from "./utils/removeFileExtension";
 
 type FeedTitleDisplayerProps = {
   title: string;
@@ -21,7 +22,9 @@ export const FeedTitleDisplayer = ({
     return (
       <div className="overflow-hidden">
         <span className="cursor-pointer" onClick={toggleShowFullUrl}>
-          <p className={showFullUrl ? "" : "truncate"}>{title}</p>
+          <p className={showFullUrl ? "" : "truncate"}>
+            {removeFileExtension(title)}
+          </p>
         </span>
       </div>
     );
