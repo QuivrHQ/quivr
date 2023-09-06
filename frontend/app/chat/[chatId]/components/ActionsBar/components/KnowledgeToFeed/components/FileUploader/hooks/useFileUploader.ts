@@ -36,8 +36,7 @@ export const useFileUploader = ({
       const firstRejection = fileRejections[0];
 
       if (firstRejection.errors[0].code === "file-invalid-type") {
-        const errorMessage = t("invalidFileType");
-        publish({ variant: "danger", text: errorMessage });
+        publish({ variant: "danger", text: t("invalidFileType") });
       } else {
         publish({
           variant: "danger",
@@ -48,8 +47,7 @@ export const useFileUploader = ({
       return;
     }
 
-    for (const element of acceptedFiles) {
-      const file = element;
+    for (const file of acceptedFiles) {
       const isAlreadyInFiles =
         files.filter((f) => f.name === file.name && f.size === file.size)
           .length > 0;

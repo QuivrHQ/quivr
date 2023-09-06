@@ -71,8 +71,7 @@ export const useFileUploader = () => {
       const firstRejection = fileRejections[0];
 
       if (firstRejection.errors[0].code === "file-invalid-type") {
-        const errorMessage = t("invalidFileType");
-        publish({ variant: "danger", text: errorMessage });
+        publish({ variant: "danger", text: t("invalidFileType") });
       } else {
         publish({
           variant: "danger",
