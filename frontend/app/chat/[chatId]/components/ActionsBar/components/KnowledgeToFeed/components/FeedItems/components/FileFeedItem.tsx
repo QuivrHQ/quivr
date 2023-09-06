@@ -1,7 +1,7 @@
 import { IoMdCloseCircle } from "react-icons/io";
 import { MdLink } from "react-icons/md";
 
-import { UrlDisplay } from "./UrlDisplay";
+import { FeedTitleDisplayer } from "./FeedTitleDisplayer";
 
 type FileFeedItemProps = {
   file: File;
@@ -20,7 +20,8 @@ export const FileFeedItem = ({
       />
       <div className="flex items-center">
         <MdLink className="mr-2 text-2xl" />
-        <UrlDisplay url={file.name} />
+
+        <FeedTitleDisplayer title={file.name} truncate />
       </div>
     </div>
   );

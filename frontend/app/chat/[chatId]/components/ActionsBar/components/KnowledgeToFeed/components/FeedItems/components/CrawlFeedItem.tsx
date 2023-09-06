@@ -1,7 +1,7 @@
 import { IoMdCloseCircle } from "react-icons/io";
 import { MdLink } from "react-icons/md";
 
-import { UrlDisplay } from "./UrlDisplay";
+import { FeedTitleDisplayer } from "./FeedTitleDisplayer";
 
 type CrawlFeedItemProps = {
   url: string;
@@ -19,7 +19,7 @@ export const CrawlFeedItem = ({
       />
       <div className="flex items-center">
         <MdLink className="mr-2 text-2xl" />
-        <UrlDisplay url={url} />
+        <FeedTitleDisplayer title={url} />
       </div>
     </div>
   );
