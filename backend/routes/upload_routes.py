@@ -4,14 +4,24 @@ from uuid import UUID
 from auth import AuthBearer, get_current_user
 from fastapi import APIRouter, Depends, Query, Request, UploadFile
 from models import Brain, File, UserIdentity
+from models.databases.supabase.notifications import (
+    CreateNotificationProperties,
+    NotificationUpdatableProperties,
+)
+from models.notifications import NotificationsStatusEnum
 from repository.brain import get_brain_details
+from repository.notification.add_notification import add_notification
+from repository.notification.update_notification import (
+    update_notification_by_id,
+)
 from repository.user_identity import get_user_identity
+from utils.file import convert_bytes, get_file_size
+from utils.processors import filter_file
+
 from routes.authorizations.brain_authorization import (
     RoleEnum,
     validate_brain_authorization,
 )
-from utils.file import convert_bytes, get_file_size
-from utils.processors import filter_file
 
 upload_router = APIRouter()
 
@@ -61,6 +71,11 @@ async def upload_file(
             "type": "error",
         }
     else:
+        upload_notification = add_notification(
+            CreateNotificationProperties(
+                action="UPLOAD",
+            )
+        )
         openai_api_key = request.headers.get("Openai-Api-Key", None)
         if openai_api_key is None:
             brain_details = get_brain_details(brain_id)
@@ -75,6 +90,12 @@ async def upload_file(
             enable_summarization=enable_summarization,
             brain_id=brain_id,
             openai_api_key=openai_api_key,
+        )
+        update_notification_by_id(
+            upload_notification.id,
+            NotificationUpdatableProperties(
+                status=NotificationsStatusEnum.Done, message=str(message)
+            ),
         )
 
     return message
