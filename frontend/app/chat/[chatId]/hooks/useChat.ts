@@ -23,7 +23,7 @@ export const useChat = () => {
   );
   const [generatingAnswer, setGeneratingAnswer] = useState(false);
   const router = useRouter();
-  const { history } = useChatContext();
+  const { messages } = useChatContext();
   const { currentBrain, currentPromptId, currentBrainId } = useBrainContext();
   const { publish } = useToast();
   const { createChat } = useChatApi();
@@ -103,7 +103,7 @@ export const useChat = () => {
   };
 
   return {
-    history,
+    history: messages,
     addQuestion,
     generatingAnswer,
     chatId,

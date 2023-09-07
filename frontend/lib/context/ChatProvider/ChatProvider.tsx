@@ -15,14 +15,14 @@ export const ChatProvider = ({
 }: {
   children: JSX.Element | JSX.Element[];
 }): JSX.Element => {
-  const [history, setHistory] = useState<ChatHistory[]>([]);
+  const [messages, setMessages] = useState<ChatHistory[]>([]);
 
   const addToHistory = (message: ChatHistory) => {
-    setHistory((prevHistory) => [...prevHistory, message]);
+    setMessages((prevHistory) => [...prevHistory, message]);
   };
 
   const updateStreamingHistory = (streamedChat: ChatHistory): void => {
-    setHistory((prevHistory: ChatHistory[]) => {
+    setMessages((prevHistory: ChatHistory[]) => {
       const updatedHistory = prevHistory.find(
         (item) => item.message_id === streamedChat.message_id
       )
@@ -38,7 +38,7 @@ export const ChatProvider = ({
   };
 
   const updateHistory = (chat: ChatHistory): void => {
-    setHistory((prevHistory: ChatHistory[]) => {
+    setMessages((prevHistory: ChatHistory[]) => {
       const updatedHistory = prevHistory.find(
         (item) => item.message_id === chat.message_id
       )
@@ -56,8 +56,8 @@ export const ChatProvider = ({
   return (
     <ChatContext.Provider
       value={{
-        history,
-        setHistory,
+        messages,
+        setMessages,
         addToHistory,
         updateHistory,
         updateStreamingHistory,

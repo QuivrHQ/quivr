@@ -8,7 +8,7 @@ import { getMessagesFromChatHistory } from "../utils/getMessagesFromChatHistory"
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const useSelectedChatPage = () => {
-  const { setHistory } = useChatContext();
+  const { setMessages } = useChatContext();
   const { getHistory } = useChatApi();
 
   const params = useParams();
@@ -17,7 +17,7 @@ export const useSelectedChatPage = () => {
   useEffect(() => {
     const fetchHistory = async () => {
       if (chatId === undefined) {
-        setHistory([]);
+        setMessages([]);
 
         return;
       }
@@ -25,9 +25,9 @@ export const useSelectedChatPage = () => {
       const chatHistory = await getHistory(chatId);
 
       if (chatHistory.length > 0) {
-        setHistory(getMessagesFromChatHistory(chatHistory));
+        setMessages(getMessagesFromChatHistory(chatHistory));
       }
     };
     void fetchHistory();
-  }, [chatId, setHistory]);
+  }, [chatId, setMessages]);
 };

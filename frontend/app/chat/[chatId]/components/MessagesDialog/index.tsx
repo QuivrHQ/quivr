@@ -7,7 +7,7 @@ import { ChatMessage } from "./components";
 import { useMessagesDialog } from "./hooks/useMessagesDialog";
 
 export const MessagesDialog = (): JSX.Element => {
-  const { history } = useChatContext();
+  const { messages: history } = useChatContext();
   const { t } = useTranslation(["chat"]);
   const { chatListRef } = useMessagesDialog();
 
