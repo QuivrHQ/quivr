@@ -1,5 +1,5 @@
+/* eslint-disable max-lines */
 "use client";
-import { useFeature } from "@growthbook/growthbook-react";
 import { useTranslation } from "react-i18next";
 import { MdAddCircle, MdSend } from "react-icons/md";
 
@@ -15,17 +15,18 @@ type ChatInputProps = {
   shouldDisplayUploadCard: boolean;
   feedBrain: () => void;
   setShouldDisplayUploadCard: (shouldDisplayUploadCard: boolean) => void;
+  hasContentToFeedBrain: boolean;
 };
 
 export const ChatInput = ({
   shouldDisplayUploadCard,
   feedBrain,
   setShouldDisplayUploadCard,
+  hasContentToFeedBrain,
 }: ChatInputProps): JSX.Element => {
   const { setMessage, submitQuestion, chatId, generatingAnswer, message } =
     useChatInput();
   const { t } = useTranslation(["chat"]);
-  const shouldDisplayUploadButton = useFeature("ux-upload").on;
   const { currentBrainId } = useBrainContext();
 
   return (
@@ -37,7 +38,7 @@ export const ChatInput = ({
       }}
       className="sticky flex items-star bottom-0 bg-white dark:bg-black w-full flex justify-center gap-2 z-20"
     >
-      {!shouldDisplayUploadCard && shouldDisplayUploadButton && (
+      {!shouldDisplayUploadCard && (
         <div className="flex items-start">
           <Button
             className="p-0"
@@ -67,9 +68,12 @@ export const ChatInput = ({
         {shouldDisplayUploadCard ? (
           <div className="flex items-center">
             <Button
-              disabled={currentBrainId === null}
+              disabled={currentBrainId === null || !hasContentToFeedBrain}
               variant="tertiary"
-              onClick={feedBrain}
+              onClick={() => {
+                setShouldDisplayUploadCard(false);
+                feedBrain();
+              }}
               type="button"
             >
               <MdSend className="text-3xl transform -rotate-90" />

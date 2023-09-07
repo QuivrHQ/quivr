@@ -48,7 +48,6 @@ export const useKnowledgeUploader = () => {
           variant: "danger",
           text: t("crawlFailed", {
             message: JSON.stringify(error),
-            ns: "upload",
           }),
         });
       }
@@ -80,7 +79,7 @@ export const useKnowledgeUploader = () => {
         } else {
           publish({
             variant: "danger",
-            text: t("error", { message: e, ns: "upload" }),
+            text: t("error", { message: e }),
           });
         }
       }
@@ -106,11 +105,22 @@ export const useKnowledgeUploader = () => {
       return;
     }
     try {
-      await Promise.all([
-        ...files.map((file) => uploadFileHandler(file, currentBrainId)),
-        ...urls.map((url) => crawlWebsiteHandler(url, currentBrainId)),
-      ]);
-    } catch (e: unknown) {
+      const uploadPromises = files.map((file) =>
+        uploadFileHandler(file, currentBrainId)
+      );
+      const crawlPromises = urls.map((url) =>
+        crawlWebsiteHandler(url, currentBrainId)
+      );
+
+      await Promise.all([...uploadPromises, ...crawlPromises]);
+
+      setContents([]);
+
+      publish({
+        variant: "success",
+        text: t("knowledgeUploaded"),
+      });
+    } catch (e) {
       publish({
         variant: "danger",
         text: JSON.stringify(e),
