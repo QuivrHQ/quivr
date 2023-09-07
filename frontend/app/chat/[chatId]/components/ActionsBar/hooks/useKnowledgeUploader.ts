@@ -1,9 +1,11 @@
 /* eslint-disable max-lines */
 import axios from "axios";
 import { UUID } from "crypto";
+import { useParams } from "next/navigation";
 import { useCallback, useState } from "react";
 import { useTranslation } from "react-i18next";
 
+import { useChatApi } from "@/lib/api/chat/useChatApi";
 import { useCrawlApi } from "@/lib/api/crawl/useCrawlApi";
 import { useUploadApi } from "@/lib/api/upload/useUploadApi";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
@@ -18,6 +20,10 @@ export const useKnowledgeUploader = () => {
   const { uploadFile } = useUploadApi();
   const { t } = useTranslation(["upload"]);
   const { crawlWebsiteUrl } = useCrawlApi();
+  const { createChat } = useChatApi();
+
+  const params = useParams();
+  const chatId = params?.chatId as UUID | undefined;
 
   const { currentBrainId } = useBrainContext();
   const addContent = (content: FeedItemType) => {
@@ -28,7 +34,7 @@ export const useKnowledgeUploader = () => {
   };
 
   const crawlWebsiteHandler = useCallback(
-    async (url: string, brainId: UUID) => {
+    async (url: string, brainId: UUID, chat_id: UUID) => {
       // Configure parameters
       const config = {
         url: url,
@@ -42,6 +48,7 @@ export const useKnowledgeUploader = () => {
         await crawlWebsiteUrl({
           brainId,
           config,
+          chat_id,
         });
       } catch (error: unknown) {
         publish({
@@ -56,13 +63,14 @@ export const useKnowledgeUploader = () => {
   );
 
   const uploadFileHandler = useCallback(
-    async (file: File, brainId: UUID) => {
+    async (file: File, brainId: UUID, chat_id: UUID) => {
       const formData = new FormData();
       formData.append("uploadFile", file);
       try {
         await uploadFile({
-          brainId: brainId,
+          brainId,
           formData,
+          chat_id,
         });
       } catch (e: unknown) {
         if (axios.isAxiosError(e) && e.response?.status === 403) {
@@ -104,12 +112,14 @@ export const useKnowledgeUploader = () => {
 
       return;
     }
+
     try {
+      const currentChatId = chatId ?? (await createChat("New Chat")).chat_id;
       const uploadPromises = files.map((file) =>
-        uploadFileHandler(file, currentBrainId)
+        uploadFileHandler(file, currentBrainId, currentChatId)
       );
       const crawlPromises = urls.map((url) =>
-        crawlWebsiteHandler(url, currentBrainId)
+        crawlWebsiteHandler(url, currentBrainId, currentChatId)
       );
 
       await Promise.all([...uploadPromises, ...crawlPromises]);
