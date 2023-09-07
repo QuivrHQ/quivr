@@ -151,6 +151,18 @@ CREATE TABLE IF NOT EXISTS chat_history (
     brain_id UUID REFERENCES brains(brain_id)
 );
 
+-- Create notification table
+
+CREATE TABLE IF NOT EXISTS notifications (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  datetime TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  chat_id UUID REFERENCES chats(chat_id),
+  message TEXT,
+  action VARCHAR(255) NOT NULL,
+  status VARCHAR(255) NOT NULL
+);
+
+
 -- Create brains X users table
 CREATE TABLE IF NOT EXISTS brains_users (
   brain_id UUID,
@@ -215,8 +227,8 @@ CREATE TABLE IF NOT EXISTS migrations (
 );
 
 INSERT INTO migrations (name) 
-SELECT '202308217004800_add_public_prompts_examples'
+SELECT '20230906151400_add_notifications_table'
 WHERE NOT EXISTS (
-    SELECT 1 FROM migrations WHERE name = '202308217004800_add_public_prompts_examples'
+    SELECT 1 FROM migrations WHERE name = '20230906151400_add_notifications_table'
 );
 
