@@ -21,7 +21,7 @@ async def process_whisper(
     file_meta_name = f"audiotranscript_{file.file.filename}_{dateshort}.txt"
     model = whisper.load_model("base")
     # get if to use whisper from local or from openAi
-    if os.environ.get("WHISPER_LOCAL") == True:
+    if os.environ.get("WHISPER_LOCAL") == 'True':
         print("Running process on local")
         docs_with_metadata = await local_whisper(
             file,
