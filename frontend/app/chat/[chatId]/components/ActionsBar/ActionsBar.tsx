@@ -29,6 +29,7 @@ export const ActionsBar = (): JSX.Element => {
           shouldDisplayUploadCard={shouldDisplayUploadCard}
           setShouldDisplayUploadCard={setShouldDisplayUploadCard}
           feedBrain={() => void feedBrain()}
+          hasContentToFeedBrain={contents.length > 0}
         />
       </div>
     </div>

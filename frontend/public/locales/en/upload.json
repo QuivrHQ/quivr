@@ -15,5 +15,6 @@
     "ohNo": "Oh no!",
     "selectBrainFirst": "You need to select a brain first. 🧠💡🥲",
     "missingNecessaryRole": "You don't have the necessary role to upload content to the selected brain. 🧠💡🥲",
-    "invalidFileType": "Invalid file type"
+    "invalidFileType": "Invalid file type",
+    "knowledgeUploaded": "Knowledge uploaded"
 }
