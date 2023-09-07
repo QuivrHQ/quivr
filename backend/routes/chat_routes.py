@@ -26,9 +26,12 @@ from repository.chat import (
     GetChatHistoryOutput,
     create_chat,
     get_chat_by_id,
-    get_chat_history,
     get_user_chats,
     update_chat,
+)
+from repository.chat.get_chat_history_with_notifications import (
+    ChatItem,
+    get_chat_history_with_notifications,
 )
 from repository.user_identity import get_user_identity
 
@@ -333,6 +336,6 @@ async def create_stream_question_handler(
 )
 async def get_chat_history_handler(
     chat_id: UUID,
-) -> List[GetChatHistoryOutput]:
+) -> List[ChatItem]:
     # TODO: RBAC with current_user
-    return get_chat_history(str(chat_id))
+    return get_chat_history_with_notifications(chat_id)

@@ -102,9 +102,11 @@ class Notifications(Repository):
         Returns:
             list[Notification]: The notifications
         """
-        return (
+        notifications = (
             self.db.from_("notifications")
             .select("*")
             .filter("chat_id", "eq", chat_id)
             .execute()
         ).data
+
+        return [Notification(**notification) for notification in notifications]
