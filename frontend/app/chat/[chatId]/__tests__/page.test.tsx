@@ -42,6 +42,12 @@ vi.mock("@/lib/context/BrainConfigProvider/brain-config-provider", () => ({
   BrainConfigContext: BrainConfigContextMock,
 }));
 
+vi.mock("@/lib/api/chat/useChatApi", () => ({
+  useChatApi: () => ({
+    getHistory: () => [],
+  }),
+}));
+
 describe("Chat page", () => {
   it("should render chat page correctly", () => {
     const { getByTestId } = render(
