@@ -4,6 +4,8 @@ import { useEffect } from "react";
 import { useChatApi } from "@/lib/api/chat/useChatApi";
 import { useChatContext } from "@/lib/context";
 
+import { getMessagesFromChatHistory } from "../utils/getMessagesFromChatHistory";
+
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const useSelectedChatPage = () => {
   const { setHistory } = useChatContext();
@@ -23,7 +25,7 @@ export const useSelectedChatPage = () => {
       const chatHistory = await getHistory(chatId);
 
       if (chatHistory.length > 0) {
-        setHistory(chatHistory);
+        setHistory(getMessagesFromChatHistory(chatHistory));
       }
     };
     void fetchHistory();

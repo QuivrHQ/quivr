@@ -3,6 +3,7 @@ import { AxiosInstance } from "axios";
 import {
   ChatEntity,
   ChatHistory,
+  ChatItem,
   ChatQuestion,
 } from "@/app/chat/[chatId]/types";
 
@@ -55,8 +56,8 @@ export const addQuestion = async (
 export const getHistory = async (
   chatId: string,
   axiosInstance: AxiosInstance
-): Promise<ChatHistory[]> =>
-  (await axiosInstance.get<ChatHistory[]>(`/chat/${chatId}/history`)).data;
+): Promise<ChatItem[]> =>
+  (await axiosInstance.get<ChatItem[]>(`/chat/${chatId}/history`)).data;
 
 export type ChatUpdatableProperties = {
   chat_name?: string;
