@@ -12,13 +12,15 @@ import { FeedBrainInput } from "./components/FeedBrainInput";
 import { useChatInput } from "./hooks/useChatInput";
 
 type ChatInputProps = {
-  isUploading: boolean;
-  setIsUploading: (isUploading: boolean) => void;
+  shouldDisplayUploadCard: boolean;
+  feedBrain: () => void;
+  setShouldDisplayUploadCard: (shouldDisplayUploadCard: boolean) => void;
 };
 
 export const ChatInput = ({
-  isUploading,
-  setIsUploading,
+  shouldDisplayUploadCard,
+  feedBrain,
+  setShouldDisplayUploadCard,
 }: ChatInputProps): JSX.Element => {
   const { setMessage, submitQuestion, chatId, generatingAnswer, message } =
     useChatInput();
@@ -35,14 +37,14 @@ export const ChatInput = ({
       }}
       className="sticky flex items-star bottom-0 bg-white dark:bg-black w-full flex justify-center gap-2 z-20"
     >
-      {!isUploading && shouldDisplayUploadButton && (
+      {!shouldDisplayUploadCard && shouldDisplayUploadButton && (
         <div className="flex items-start">
           <Button
             className="p-0"
             variant={"tertiary"}
             data-testid="upload-button"
             type="button"
-            onClick={() => setIsUploading(true)}
+            onClick={() => setShouldDisplayUploadCard(true)}
           >
             <MdAddCircle className="text-3xl" />
           </Button>
@@ -50,7 +52,7 @@ export const ChatInput = ({
       )}
 
       <div className="flex flex-1 flex-col items-center">
-        {isUploading ? (
+        {shouldDisplayUploadCard ? (
           <FeedBrainInput />
         ) : (
           <ChatBar
@@ -62,12 +64,13 @@ export const ChatInput = ({
       </div>
 
       <div className="flex flex-row items-end">
-        {isUploading ? (
+        {shouldDisplayUploadCard ? (
           <div className="flex items-center">
             <Button
               disabled={currentBrainId === null}
               variant="tertiary"
-              onClick={() => setIsUploading(false)}
+              onClick={feedBrain}
+              type="button"
             >
               <MdSend className="text-3xl transform -rotate-90" />
             </Button>

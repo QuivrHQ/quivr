@@ -1,23 +1,24 @@
 "use client";
+import { AnimatePresence } from "framer-motion";
 import { useTranslation } from "react-i18next";
 
+import Button from "@/lib/components/ui/Button";
 import Card from "@/lib/components/ui/Card";
 
+import FileComponent from "./components/FileComponent";
 import { useFileUploader } from "./hooks/useFileUploader";
-import { FeedItemType } from "../../../../types";
 
-type FileUploaderProps = {
-  addContent: (content: FeedItemType) => void;
-  files: File[];
-};
-export const FileUploader = ({
-  addContent,
-  files,
-}: FileUploaderProps): JSX.Element => {
-  const { getInputProps, getRootProps, isDragActive, open } = useFileUploader({
-    addContent,
+export const FileUploader = (): JSX.Element => {
+  const {
+    getInputProps,
+    getRootProps,
+    isDragActive,
+    isPending,
+    open,
+    uploadAllFiles,
     files,
-  });
+    setFiles,
+  } = useFileUploader();
 
   const { t } = useTranslation(["translation", "upload"]);
 
@@ -44,6 +45,29 @@ export const FileUploader = ({
             </div>
           </Card>
         </div>
+
+        {files.length > 0 && (
+          <div className="flex-1 w-full">
+            <Card className="h-52 py-3 overflow-y-auto">
+              {files.length > 0 ? (
+                <AnimatePresence mode="popLayout">
+                  {files.map((file) => (
+                    <FileComponent
+                      key={`${file.name} ${file.size}`}
+                      file={file}
+                      setFiles={setFiles}
+                    />
+                  ))}
+                </AnimatePresence>
+              ) : null}
+            </Card>
+          </div>
+        )}
+      </div>
+      <div className="flex flex-col items-center justify-center">
+        <Button isLoading={isPending} onClick={() => void uploadAllFiles()}>
+          {isPending ? t("uploadingButton") : t("uploadButton")}
+        </Button>
       </div>
     </section>
   );
