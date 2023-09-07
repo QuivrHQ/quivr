@@ -14,5 +14,6 @@
     "subtitle": "Texto, documento, hojas de cálculo, presentación, audio, video y URLs admitidos",
     "success": "Archivo subido correctamente",
     "title": "Subir conocimiento",
-    "webSite": "Ingrese la URL del sitio web"
+    "webSite": "Ingrese la URL del sitio web",
+    "invalidFileType": "Tipo de archivo no permitido"
 }
