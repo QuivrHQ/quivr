@@ -36,6 +36,7 @@ async def upload_file(
     request: Request,
     uploadFile: UploadFile,
     brain_id: UUID = Query(..., description="The ID of the brain"),
+    chat_id: UUID = Query(..., description="The ID of the chat"),
     enable_summarization: bool = False,
     current_user: UserIdentity = Depends(get_current_user),
 ):
@@ -71,11 +72,15 @@ async def upload_file(
             "type": "error",
         }
     else:
-        upload_notification = add_notification(
-            CreateNotificationProperties(
-                action="UPLOAD",
+        upload_notification = None
+        if chat_id:
+            upload_notification = add_notification(
+                CreateNotificationProperties(
+                    action="UPLOAD",
+                    chat_id=chat_id,
+                    status=NotificationsStatusEnum.Pending,
+                )
             )
-        )
         openai_api_key = request.headers.get("Openai-Api-Key", None)
         if openai_api_key is None:
             brain_details = get_brain_details(brain_id)
@@ -91,11 +96,13 @@ async def upload_file(
             brain_id=brain_id,
             openai_api_key=openai_api_key,
         )
-        update_notification_by_id(
-            upload_notification.id,
-            NotificationUpdatableProperties(
-                status=NotificationsStatusEnum.Done, message=str(message)
-            ),
-        )
+
+        if upload_notification:
+            update_notification_by_id(
+                upload_notification.id,
+                NotificationUpdatableProperties(
+                    status=NotificationsStatusEnum.Done, message=str(message)
+                ),
+            )
 
     return message

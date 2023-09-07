@@ -33,6 +33,7 @@ async def crawl_endpoint(
     request: Request,
     crawl_website: CrawlWebsite,
     brain_id: UUID = Query(..., description="The ID of the brain"),
+    chat_id: UUID = Query(..., description="The ID of the chat"),
     enable_summarization: bool = False,
     current_user: UserIdentity = Depends(get_current_user),
 ):
@@ -56,11 +57,15 @@ async def crawl_endpoint(
             "type": "error",
         }
     else:
-        crawl_notification = add_notification(
-            CreateNotificationProperties(
-                action="CRAWL",
+        crawl_notification = None
+        if chat_id:
+            crawl_notification = add_notification(
+                CreateNotificationProperties(
+                    action="CRAWL",
+                    chat_id=chat_id,
+                    status=NotificationsStatusEnum.Pending,
+                )
             )
-        )
         if not crawl_website.checkGithub():
             (
                 file_path,
@@ -92,10 +97,11 @@ async def crawl_endpoint(
                 brain_id=brain_id,
                 user_openai_api_key=request.headers.get("Openai-Api-Key", None),
             )
-        update_notification_by_id(
-            crawl_notification.id,
-            NotificationUpdatableProperties(
-                status=NotificationsStatusEnum.Done, message=str(message)
-            ),
-        )
+        if crawl_notification:
+            update_notification_by_id(
+                crawl_notification.id,
+                NotificationUpdatableProperties(
+                    status=NotificationsStatusEnum.Done, message=str(message)
+                ),
+            )
     return message

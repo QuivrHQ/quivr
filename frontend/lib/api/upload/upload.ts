@@ -10,10 +10,14 @@ export type UploadResponse = {
 export type UploadInputProps = {
   brainId: UUID;
   formData: FormData;
+  chat_id?: UUID;
 };
 
 export const uploadFile = async (
   props: UploadInputProps,
   axiosInstance: AxiosInstance
 ): Promise<UploadResponse> =>
-  axiosInstance.post(`/upload?brain_id=${props.brainId}`, props.formData);
+  axiosInstance.post(
+    `/upload?brain_id=${props.brainId}&chat_id=${props.chat_id ?? ""}`,
+    props.formData
+  );

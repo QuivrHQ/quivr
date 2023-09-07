@@ -93,6 +93,19 @@ class Notifications(Repository):
             status="deleted", notification_id=notification_id
         )
 
+    def remove_notifications_by_chat_id(self, chat_id: UUID) -> None:
+        """
+        Remove all notifications for a chat
+        Args:
+            chat_id (UUID): The id of the chat
+        """
+        (
+            self.db.from_("notifications")
+            .delete()
+            .filter("chat_id", "eq", chat_id)
+            .execute()
+        ).data
+
     def get_notifications_by_chat_id(self, chat_id: UUID) -> list[Notification]:
         """
         Get all notifications for a chat
@@ -102,9 +115,11 @@ class Notifications(Repository):
         Returns:
             list[Notification]: The notifications
         """
-        return (
+        notifications = (
             self.db.from_("notifications")
             .select("*")
             .filter("chat_id", "eq", chat_id)
             .execute()
         ).data
+
+        return [Notification(**notification) for notification in notifications]

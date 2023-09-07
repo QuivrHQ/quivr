@@ -233,5 +233,9 @@ class Repository(ABC):
         pass
 
     @abstractmethod
+    def remove_notifications_by_chat_id(self, chat_id: UUID):
+        pass
+
+    @abstractmethod
     def get_notifications_by_chat_id(self, chat_id: UUID):
         pass

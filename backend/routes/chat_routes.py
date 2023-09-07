@@ -7,6 +7,9 @@ from venv import logger
 from auth import AuthBearer, get_current_user
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from fastapi.responses import StreamingResponse
+from repository.notification.remove_chat_notifications import (
+    remove_chat_notifications,
+)
 from llm.openai import OpenAIBrainPicking
 from llm.qa_headless import HeadlessQA
 from models import (
@@ -26,9 +29,12 @@ from repository.chat import (
     GetChatHistoryOutput,
     create_chat,
     get_chat_by_id,
-    get_chat_history,
     get_user_chats,
     update_chat,
+)
+from repository.chat.get_chat_history_with_notifications import (
+    ChatItem,
+    get_chat_history_with_notifications,
 )
 from repository.user_identity import get_user_identity
 
@@ -114,6 +120,8 @@ async def delete_chat(chat_id: UUID):
     Delete a specific chat by chat ID.
     """
     supabase_db = get_supabase_db()
+    remove_chat_notifications(chat_id)
+
     delete_chat_from_db(supabase_db=supabase_db, chat_id=chat_id)
     return {"message": f"{chat_id}  has been deleted."}
 
@@ -333,6 +341,6 @@ async def create_stream_question_handler(
 )
 async def get_chat_history_handler(
     chat_id: UUID,
-) -> List[GetChatHistoryOutput]:
+) -> List[ChatItem]:
     # TODO: RBAC with current_user
-    return get_chat_history(str(chat_id))
+    return get_chat_history_with_notifications(chat_id)
