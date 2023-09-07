@@ -18,6 +18,22 @@ export type ChatHistory = {
   brain_name?: string;
 };
 
+type HistoryItemType = "MESSAGE" | "NOTIFICATION";
+
+type Notification = {
+  id: string;
+  datetime: string;
+  chat_id?: string | null;
+  message?: string | null;
+  action: string;
+  status: string;
+};
+
+export type ChatItem = {
+  item_type: HistoryItemType;
+  body: ChatHistory | Notification;
+};
+
 export type ChatEntity = {
   chat_id: UUID;
   user_id: string;
