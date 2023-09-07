@@ -7,6 +7,9 @@ from venv import logger
 from auth import AuthBearer, get_current_user
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from fastapi.responses import StreamingResponse
+from repository.notification.remove_chat_notifications import (
+    remove_chat_notifications,
+)
 from llm.openai import OpenAIBrainPicking
 from llm.qa_headless import HeadlessQA
 from models import (
@@ -117,6 +120,8 @@ async def delete_chat(chat_id: UUID):
     Delete a specific chat by chat ID.
     """
     supabase_db = get_supabase_db()
+    remove_chat_notifications(chat_id)
+
     delete_chat_from_db(supabase_db=supabase_db, chat_id=chat_id)
     return {"message": f"{chat_id}  has been deleted."}
 
