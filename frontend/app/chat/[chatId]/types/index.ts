@@ -18,7 +18,7 @@ export type ChatHistory = {
   brain_name?: string;
 };
 
-type HistoryItemType = "MESSAGE" | "NOTIFICATION";
+type NotificationStatus = "Pending" | "Done";
 
 type Notification = {
   id: string;
@@ -26,13 +26,18 @@ type Notification = {
   chat_id?: string | null;
   message?: string | null;
   action: string;
-  status: string;
+  status: NotificationStatus;
 };
 
-export type ChatItem = {
-  item_type: HistoryItemType;
-  body: ChatHistory | Notification;
-};
+export type ChatItem =
+  | {
+      item_type: "MESSAGE";
+      body: ChatHistory;
+    }
+  | {
+      item_type: "NOTIFICATION";
+      body: Notification;
+    };
 
 export type ChatEntity = {
   chat_id: UUID;
