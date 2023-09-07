@@ -1,7 +1,7 @@
 import { render } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
-import { ChatMessages } from "../index";
+import { MessagesDialog } from "..";
 
 // Mocking the useChatMessages hook
 vi.mock("../hooks/useChatMessages", () => ({
@@ -37,7 +37,7 @@ vi.mock("@growthbook/growthbook-react", () => ({
 
 describe("ChatMessages", () => {
   it("should render chat messages correctly", () => {
-    const { getAllByTestId } = render(<ChatMessages />);
+    const { getAllByTestId } = render(<MessagesDialog />);
 
     expect(getAllByTestId("brain-tags")).toBeDefined();
     expect(getAllByTestId("prompt-tags")).toBeDefined();
@@ -49,7 +49,7 @@ describe("ChatMessages", () => {
     // Mocking the useChatContext hook to return an empty history
     useChatContextMock.mockReturnValue({ history: [] });
 
-    const { getByTestId } = render(<ChatMessages />);
+    const { getByTestId } = render(<MessagesDialog />);
 
     expect(getByTestId("empty-history-message")).toBeDefined();
   });

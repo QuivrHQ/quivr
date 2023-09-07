@@ -4,12 +4,12 @@ import { useTranslation } from "react-i18next";
 import { useChatContext } from "@/lib/context";
 
 import { ChatMessage } from "./components";
-import { useChatMessages } from "./hooks/useChatMessages";
+import { useMessagesDialog } from "./hooks/useMessagesDialog";
 
-export const ChatMessages = (): JSX.Element => {
+export const MessagesDialog = (): JSX.Element => {
   const { history } = useChatContext();
   const { t } = useTranslation(["chat"]);
-  const { chatListRef } = useChatMessages();
+  const { chatListRef } = useMessagesDialog();
 
   return (
     <div

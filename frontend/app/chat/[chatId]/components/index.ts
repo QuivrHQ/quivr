@@ -1,1 +1,1 @@
-export * from "./ChatMessages";
+export * from "./MessagesDialog";

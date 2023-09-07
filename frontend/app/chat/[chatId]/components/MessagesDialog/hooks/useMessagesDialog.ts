@@ -7,7 +7,7 @@ import { useChat } from "@/app/chat/[chatId]/hooks/useChat";
 const chatInputHeightEstimation = 100;
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-export const useChatMessages = () => {
+export const useMessagesDialog = () => {
   const chatListRef = useRef<HTMLDivElement | null>(null);
   const { history } = useChat();
 
