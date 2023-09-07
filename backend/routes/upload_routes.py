@@ -78,6 +78,7 @@ async def upload_file(
                 CreateNotificationProperties(
                     action="UPLOAD",
                     chat_id=chat_id,
+                    status=NotificationsStatusEnum.Pending,
                 )
             )
         openai_api_key = request.headers.get("Openai-Api-Key", None)

@@ -63,6 +63,7 @@ async def crawl_endpoint(
                 CreateNotificationProperties(
                     action="CRAWL",
                     chat_id=chat_id,
+                    status=NotificationsStatusEnum.Pending,
                 )
             )
         if not crawl_website.checkGithub():
