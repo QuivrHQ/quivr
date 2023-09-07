@@ -111,7 +111,7 @@ All the scripts can be found in the [scripts](https://github.com/stangirard/quiv
 - **Step 5**: Launch the app
 
 ```bash
-docker compose -f docker-compose.yml up --build
+docker compose up --build
 ```
 
 - **Step 6**: Navigate to `localhost:3000` in your browser
