@@ -35,5 +35,6 @@
   "title": "Conversa con {{brain}}",
   "missing_brain": "No hay cerebro seleccionado",
   "new_prompt": "Crear nueva instrucción",
-  "feed_brain_placeholder" : "Elige cuál @cerebro quieres alimentar con estos archivos"
+  "feed_brain_placeholder" : "Elige cuál @cerebro quieres alimentar con estos archivos",
+  "filesUploading": "Subiendo archivos..."
 }
