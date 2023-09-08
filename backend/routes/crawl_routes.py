@@ -1,6 +1,7 @@
 import os
 import shutil
 from tempfile import SpooledTemporaryFile
+from typing import Optional
 from uuid import UUID
 
 from auth import AuthBearer, get_current_user
@@ -33,7 +34,7 @@ async def crawl_endpoint(
     request: Request,
     crawl_website: CrawlWebsite,
     brain_id: UUID = Query(..., description="The ID of the brain"),
-    chat_id: UUID = Query(..., description="The ID of the chat"),
+    chat_id: Optional[UUID] = Query(None, description="The ID of the chat"),
     enable_summarization: bool = False,
     current_user: UserIdentity = Depends(get_current_user),
 ):
