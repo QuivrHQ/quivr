@@ -2,7 +2,7 @@
 
 import { createContext, useState } from "react";
 
-import { ChatHistory } from "@/app/chat/[chatId]/types";
+import { ChatHistory, Notification } from "@/app/chat/[chatId]/types";
 
 import { ChatContextProps } from "./types";
 
@@ -16,6 +16,7 @@ export const ChatProvider = ({
   children: JSX.Element | JSX.Element[];
 }): JSX.Element => {
   const [messages, setMessages] = useState<ChatHistory[]>([]);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
 
   const addToHistory = (message: ChatHistory) => {
     setMessages((prevHistory) => [...prevHistory, message]);
@@ -61,6 +62,8 @@ export const ChatProvider = ({
         addToHistory,
         updateHistory,
         updateStreamingHistory,
+        notifications,
+        setNotifications,
       }}
     >
       {children}

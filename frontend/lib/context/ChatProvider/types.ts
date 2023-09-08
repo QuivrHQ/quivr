@@ -14,4 +14,6 @@ export type ChatContextProps = {
   addToHistory: (message: ChatHistory) => void;
   updateHistory: (chat: ChatHistory) => void;
   updateStreamingHistory: (streamedChat: ChatHistory) => void;
+  notifications: Notification[];
+  setNotifications: (notifications: Notification[]) => void;
 };

@@ -20,7 +20,7 @@ export type ChatHistory = {
 
 type NotificationStatus = "Pending" | "Done";
 
-type Notification = {
+export type Notification = {
   id: string;
   datetime: string;
   chat_id?: string | null;
