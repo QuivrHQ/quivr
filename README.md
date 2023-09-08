@@ -132,7 +132,7 @@ Additionally, you'll need a [Supabase](https://supabase.com/) account for:
 - **Step 5**: Launch the app
 
   ```bash
-  docker compose -f docker-compose.yml up --build
+  docker compose up --build
   ```
 
 - **Step 6**: Navigate to `localhost:3000` in your browser
