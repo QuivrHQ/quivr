@@ -78,6 +78,7 @@
     "victory": "^36.6.10"
   },
   "devDependencies": {
+    "@playwright/test": "^1.37.1",
     "@tailwindcss/typography": "^0.5.9",
     "@testing-library/react": "^14.0.0",
     "@vitejs/plugin-react": "^4.0.1",
