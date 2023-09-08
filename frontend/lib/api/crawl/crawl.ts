@@ -22,8 +22,12 @@ export type CrawlResponse = {
 export const crawlWebsiteUrl = async (
   props: CrawlInputProps,
   axiosInstance: AxiosInstance
-): Promise<CrawlResponse> =>
-  axiosInstance.post(
-    `/crawl?brain_id=${props.brainId}&chat_id=${props.chat_id ?? ""}`,
-    props.config
-  );
+): Promise<CrawlResponse> => {
+  let crawlUrl = `/crawl?brain_id=${props.brainId}`;
+
+  if (props.chat_id !== undefined) {
+    crawlUrl = crawlUrl.concat(`&chat_id=${props.chat_id}`);
+  }
+
+  return axiosInstance.post(crawlUrl, props.config);
+};

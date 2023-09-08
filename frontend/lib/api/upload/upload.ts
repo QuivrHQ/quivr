@@ -16,8 +16,11 @@ export type UploadInputProps = {
 export const uploadFile = async (
   props: UploadInputProps,
   axiosInstance: AxiosInstance
-): Promise<UploadResponse> =>
-  axiosInstance.post(
-    `/upload?brain_id=${props.brainId}&chat_id=${props.chat_id ?? ""}`,
-    props.formData
-  );
+): Promise<UploadResponse> => {
+  let uploadUrl = `/upload?brain_id=${props.brainId}`;
+  if (props.chat_id !== undefined) {
+    uploadUrl = uploadUrl.concat(`&chat_id=${props.chat_id}`);
+  }
+
+  return axiosInstance.post(uploadUrl, props.formData);
+};
