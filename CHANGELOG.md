@@ -1,5 +1,21 @@
 # Changelog
 
+## 0.0.69 (2023-09-08)
+
+## What's Changed
+* feat: add multiple upload and crawl in parallel by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1118
+* feat: allow user to chat while feed process is pending by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1120
+* feat: add notifications table, and push notification on upload and crawl by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1125
+* feat: merge chat history with chat notifications by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1127
+* feat(feedBrain): add request pending message #1135 by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1136
+* fix: update crawl and upload endpoints by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1142
+* make docker compose command more flexible by @thehunmonkgroup in https://github.com/StanGirard/quivr/pull/1139
+
+## New Contributors
+* @thehunmonkgroup made their first contribution in https://github.com/StanGirard/quivr/pull/1139
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.68...v0.0.69
+
 ## 0.0.68 (2023-09-06)
 
 ## What's Changed
