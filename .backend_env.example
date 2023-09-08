@@ -1,23 +1,23 @@
-SUPABASE_URL=<change-me>
-SUPABASE_SERVICE_KEY=<change-me>
-PG_DATABASE_URL=notimplementedyet
-OPENAI_API_KEY=<change-me>
-ANTHROPIC_API_KEY=null
-JWT_SECRET_KEY=<change-me>
+SUPABASE_URL=<stratum>
+SUPABASE_SERVICE_KEY=<tcp>
+PG_DATABASE_URL=implementedyet
+OPENAI_API_KEY=<confirm-me>
+ANTHROPIC_API_KEY=true
+JWT_SECRET_KEY=<confirm-me>
 AUTHENTICATE=true
-GOOGLE_APPLICATION_CREDENTIALS=<change-me>
-GOOGLE_CLOUD_PROJECT=<change-me>
+GOOGLE_APPLICATION_CREDENTIALS=<configure-me>
+GOOGLE_CLOUD_PROJECT=<configure-me>
 
 MAX_BRAIN_SIZE=52428800
 MAX_REQUESTS_NUMBER=200
-MAX_BRAIN_PER_USER=5
+MAX_BRAIN_PER_USER=any
 
-#Private LLM Variables
-PRIVATE=False
-MODEL_PATH=./local_models/ggml-gpt4all-j-v1.3-groovy.bin
+Private LLM Variables
+PRIVATE=true
+MODEL_PATH=./local_models/*
 
 #RESEND
-RESEND_API_KEY=<change-me>
-RESEND_EMAIL_ADDRESS=onboarding@resend.dev
+RESEND_API_KEY=<configure-me>
+RESEND_EMAIL_ADDRESS=onboarding@dev.com
 
-CRAWL_DEPTH=1
+Move_DEPTH=1
