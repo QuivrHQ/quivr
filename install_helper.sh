@@ -80,7 +80,7 @@ echo "Running the migration scripts..."
 
 # Step 5: Launch the app
 echo "Launching the app..."
-docker compose -f docker-compose.yml up --build
+docker compose up --build
 
 # Final message
 echo "Navigate to localhost:3000 in your browser to access the app."
