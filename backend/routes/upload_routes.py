@@ -99,10 +99,16 @@ async def upload_file(
         )
 
         if upload_notification:
+            notification_message = {
+                "status": message["type"],
+                "message": message["message"],
+                "name": file.file.filename if file.file else "",
+            }
             update_notification_by_id(
                 upload_notification.id,
                 NotificationUpdatableProperties(
-                    status=NotificationsStatusEnum.Done, message=str(message)
+                    status=NotificationsStatusEnum.Done,
+                    message=str(notification_message),
                 ),
             )
 
