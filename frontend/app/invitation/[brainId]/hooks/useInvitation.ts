@@ -10,7 +10,7 @@ import { useSubscriptionApi } from "@/lib/api/subscription/useSubscriptionApi";
 import { BrainRoleType } from "@/lib/components/BrainUsers/types";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 import { useToast } from "@/lib/hooks";
-import { useEventTracking } from "@/services/analytics/useEventTracking";
+import { useEventTracking } from "@/services/analytics/june/useEventTracking";
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const useInvitation = () => {

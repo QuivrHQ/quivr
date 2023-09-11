@@ -13,13 +13,13 @@ import {
   MentionTriggerType,
 } from "@/app/chat/[chatId]/components/ActionsBar/types";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
-import { useJune } from "@/services/analytics/useJune";
+import { useJune } from "@/services/analytics/june/useJune";
 import "@draft-js-plugins/mention/lib/plugin.css";
 import "draft-js/dist/Draft.css";
 
+import { getEditorText } from "./helpers/getEditorText";
 import { useMentionPlugin } from "./helpers/MentionPlugin";
 import { useMentionState } from "./helpers/MentionState";
-import { getEditorText } from "./helpers/getEditorText";
 
 type UseMentionInputProps = {
   message: string;

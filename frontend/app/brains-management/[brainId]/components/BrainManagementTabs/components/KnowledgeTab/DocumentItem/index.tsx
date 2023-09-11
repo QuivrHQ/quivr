@@ -17,7 +17,7 @@ import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainConte
 import { useSupabase } from "@/lib/context/SupabaseProvider";
 import { useAxios, useToast } from "@/lib/hooks";
 import { Document } from "@/lib/types/Document";
-import { useEventTracking } from "@/services/analytics/useEventTracking";
+import { useEventTracking } from "@/services/analytics/june/useEventTracking";
 
 import DocumentData from "./DocumentData";
 

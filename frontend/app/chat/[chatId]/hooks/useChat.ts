@@ -9,10 +9,10 @@ import { useChatApi } from "@/lib/api/chat/useChatApi";
 import { useChatContext } from "@/lib/context";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 import { useToast } from "@/lib/hooks";
-import { useEventTracking } from "@/services/analytics/useEventTracking";
+import { useEventTracking } from "@/services/analytics/june/useEventTracking";
 
-import { useQuestion } from "./useQuestion";
 import { ChatQuestion } from "../types";
+import { useQuestion } from "./useQuestion";
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const useChat = () => {

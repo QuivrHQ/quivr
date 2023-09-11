@@ -9,7 +9,7 @@ import { USER_IDENTITY_DATA_KEY } from "@/lib/api/user/config";
 import { useUserApi } from "@/lib/api/user/useUserApi";
 import { UserIdentity } from "@/lib/api/user/user";
 import { useToast } from "@/lib/hooks";
-import { useEventTracking } from "@/services/analytics/useEventTracking";
+import { useEventTracking } from "@/services/analytics/june/useEventTracking";
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const useApiKeyConfig = () => {
