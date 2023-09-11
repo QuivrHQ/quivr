@@ -5,11 +5,18 @@ import { useChatContext } from "@/lib/context";
 
 import { ChatMessage } from "./components";
 import { useMessagesDialog } from "./hooks/useMessagesDialog";
+import { getMergedChatHistoryWithReducedNotifications } from "./utils/getMergedChatHistoryWithReducedNotifications";
 
 export const MessagesDialog = (): JSX.Element => {
-  const { messages } = useChatContext();
+  const { messages, notifications } = useChatContext();
   const { t } = useTranslation(["chat"]);
   const { chatListRef } = useMessagesDialog();
+
+  const chatItems = getMergedChatHistoryWithReducedNotifications(
+    messages,
+    notifications
+  );
+  console.log({ chatItems });
 
   return (
     <div
