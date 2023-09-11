@@ -1,4 +1,4 @@
-resource "aws_ecs_service" "quivr-backend" {
+resource "aws_ecs_service" "this" {
   name                               = var.service_name
   cluster                            = var.cluster_id
   task_definition                    = aws_ecs_task_definition.quivr-backend.arn
@@ -31,13 +31,12 @@ resource "aws_ecs_service" "quivr-backend" {
     type = var.deployment_controller.type
   }
 
-  dynamic "load_balancer" {
-    for_each = var.load_balancers
-    content {
-      target_group_arn = load_balancer.value.target_group_arn
-      container_name   = load_balancer.value.container_name
-      container_port   = load_balancer.value.container_port
-    }
+  load_balancer {
+
+    target_group_arn = aws_lb_target_group.this.arn
+    container_name   = var.name_task
+    container_port   = var.port
+
   }
 
   network_configuration {
@@ -48,22 +47,22 @@ resource "aws_ecs_service" "quivr-backend" {
 }
 
 resource "aws_ecs_task_definition" "quivr-backend" {
-  family                   = "quivr"
+  family                   = var.name_task
   network_mode             = "awsvpc"
-  cpu                      = "256"
-  memory                   = "1024"
+  cpu                      = var.cpu
+  memory                   = var.memory
   requires_compatibilities = ["FARGATE"]
   task_role_arn            = var.task_role_arn
   execution_role_arn       = var.execution_role_arn
 
   container_definitions = jsonencode([
     {
-      name      = "quivr"
+      name      = var.name_task
       image     = var.image
-      cpu       = 256
-      memory    = 1024
+      cpu       = var.cpu
+      memory    = var.memory
       essential = true
-      command   = ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "5050"]
+      command   = var.command
       environmentFiles = [
         {
           type  = "s3"
@@ -85,7 +84,7 @@ resource "aws_ecs_task_definition" "quivr-backend" {
           hostPort      = 5050
           protocol      = "tcp"
           appProtocol   = "http"
-          name          = "quivr-5050-tcp"
+          name          = "${var.name_task}-5050-tcp"
         }
       ]
     }
@@ -97,3 +96,32 @@ resource "aws_ecs_task_definition" "quivr-backend" {
   }
   tags = {}
 }
+
+
+resource "aws_lb_target_group" "this" {
+  name                   = var.name_task
+  port                   = 80
+  protocol               = "HTTP"
+  vpc_id                 = var.vpc_id
+  connection_termination = false
+  deregistration_delay   = 300
+  health_check {
+    healthy_threshold   = 2
+    unhealthy_threshold = 5
+    timeout             = 25
+    interval            = 30
+    matcher             = "200"
+    path                = "/"
+    port                = "traffic-port"
+    protocol            = "HTTP"
+  }
+
+  stickiness {
+    enabled         = false
+    type            = "lb_cookie"
+    cookie_duration = 86400
+  }
+
+  target_type = "ip"
+}
+

@@ -11,8 +11,10 @@ module "api" {
 }
 
 module "quivr_backend" {
-  source     = "./modules/ecs_task"
-  cluster_id = module.ecs_cluster.ecs_cluster_id
+  source            = "./modules/ecs_task"
+  cluster_id        = module.ecs_cluster.ecs_cluster_id
+  vpc_id            = module.network.vpc_id
+  load_balancer_arn = module.api.lb_arn
 
 }
 

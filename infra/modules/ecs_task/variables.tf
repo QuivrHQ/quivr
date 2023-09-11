@@ -159,18 +159,10 @@ variable "deployment_controller" {
   }
 }
 
-variable "load_balancers" {
-  description = "Configuration for load balancers"
-  type = list(object({
-    target_group_arn = string
-    container_name   = string
-    container_port   = number
-  }))
-  default = [{
-    target_group_arn = "arn:aws:elasticloadbalancing:eu-west-3:253053805092:targetgroup/quivr/25488c9954b3d630"
-    container_name   = "quivr"
-    container_port   = 5050
-  }]
+variable "port" {
+  description = "The port on which the container receives traffic."
+  type        = number
+  default     = 5050
 }
 
 variable "network_configuration" {
@@ -189,4 +181,39 @@ variable "network_configuration" {
       "subnet-05f5a63610b3a7eb9",
     ]
   }
+}
+
+
+variable "cpu" {
+  description = "The number of cpu units used by the task."
+  type        = number
+  default     = 256
+}
+
+variable "memory" {
+  description = "The amount (in MiB) of memory used by the task."
+  type        = number
+  default     = 1024
+}
+
+variable "command" {
+  description = "The command that is passed to the container."
+  type        = list(string)
+  default     = ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "5050"]
+}
+
+variable "name_task" {
+  description = "The name of the task."
+  type        = string
+  default     = "quivr"
+}
+
+variable "load_balancer_arn" {
+  description = "The ARN of the load balancer."
+  type        = string
+}
+
+variable "vpc_id" {
+  description = "The VPC ID."
+  type        = string
 }
