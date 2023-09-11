@@ -7,7 +7,7 @@ import { ChatMessage } from "./components";
 import { useMessagesDialog } from "./hooks/useMessagesDialog";
 
 export const MessagesDialog = (): JSX.Element => {
-  const { messages: history } = useChatContext();
+  const { messages } = useChatContext();
   const { t } = useTranslation(["chat"]);
   const { chatListRef } = useMessagesDialog();
 
@@ -21,7 +21,7 @@ export const MessagesDialog = (): JSX.Element => {
       }}
       ref={chatListRef}
     >
-      {history.length === 0 ? (
+      {messages.length === 0 ? (
         <div
           data-testid="empty-history-message"
           className="text-center opacity-50"
@@ -30,7 +30,7 @@ export const MessagesDialog = (): JSX.Element => {
         </div>
       ) : (
         <div className="flex flex-col gap-3">
-          {history.map(
+          {messages.map(
             ({
               assistant,
               message_id,
