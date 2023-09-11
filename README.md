@@ -4,7 +4,6 @@
     <img src="./logo.png" alt="Quivr-logo" width="30%"  style="border-radius: 50%; padding-bottom: 20px"/>
 </div>
 
-
 [![Discord Follow](https://dcbadge.vercel.app/api/server/HUpRgp2HG8?style=flat)](https://discord.gg/HUpRgp2HG8)
 [![GitHub Repo stars](https://img.shields.io/github/stars/stangirard/quivr?style=social)](https://github.com/stangirard/quivr)
 [![Twitter Follow](https://img.shields.io/twitter/follow/StanGirard?style=social)](https://twitter.com/_StanGirard)
@@ -38,7 +37,7 @@ https://github.com/StanGirard/quivr/assets/19614572/a6463b73-76c7-4bc0-978d-7056
 
 ## Disclaimer ⚠️
 
-For a little while, Quivr will be only compatible with OpenAI API. 
+For a little while, Quivr will be only compatible with OpenAI API.
 
 If you want to use a Local LLM please refer to [v0.0.46](https://github.com/StanGirard/quivr/releases/tag/v0.0.46).
 
@@ -82,12 +81,14 @@ Additionally, you'll need a [Supabase](https://supabase.com/) account for:
   ```
 
 - **Step 2**: Use the install helper
+  You can use the install_helper.sh script to setup your env files and execute the migrations.
 
-  You can use the install_helper.sh script to setup your env files
+  prerequisites:
+
+  - [gum](https://github.com/charmbracelet/gum) - for the input prompt
+  - [PostgreSQL](https://www.postgresql.org/download/) - for the migration script
 
   ```bash
-  brew install gum # Windows (via Scoop) scoop install charm-gum
-
   chmod +x install_helper.sh
   ./install_helper.sh
   ```
@@ -132,7 +133,7 @@ Additionally, you'll need a [Supabase](https://supabase.com/) account for:
 - **Step 5**: Launch the app
 
   ```bash
-  docker compose up --build
+  docker-compose up --build
   ```
 
 - **Step 6**: Navigate to `localhost:3000` in your browser
@@ -140,7 +141,7 @@ Additionally, you'll need a [Supabase](https://supabase.com/) account for:
 - **Step 7**: Want to contribute to the project?
 
   ```
-  docker compose -f docker-compose.dev.yml up --build
+  docker-compose -f docker-compose.dev.yml up --build
   ```
 
 ## Contributors ✨
