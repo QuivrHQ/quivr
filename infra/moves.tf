@@ -36,3 +36,8 @@ import {
   to = module.api.aws_route53_record.validation["api.quivr.app"]
   id = "Z075975614NR7YUNW2MOK__44e3506665204f319e6c4b8b63b840f0.api.quivr.app_CNAME"
 }
+
+import {
+  to = module.api.aws_lb_listener.this
+  id = "arn:aws:elasticloadbalancing:eu-west-3:253053805092:listener/app/quivr/c449132d2c07f2ef/46281dcec6a1f197"
+}
