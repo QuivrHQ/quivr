@@ -2,36 +2,20 @@ import { useTranslation } from "react-i18next";
 
 import { useChatContext } from "@/lib/context";
 
-import { ChatItem } from "../../types";
 import { ChatMessage } from "./components";
-import { ChatNotification } from "./components/ChatNotification";
+import { ChatNotification } from "./components/ChatNotification/ChatNotification";
 import { useMessagesDialog } from "./hooks/useMessagesDialog";
+import { getMergedChatHistoryWithReducedNotifications } from "./utils/getMergedChatHistoryWithReducedNotifications";
 
 export const MessagesDialog = (): JSX.Element => {
   const { messages, notifications } = useChatContext();
   const { t } = useTranslation(["chat"]);
   const { chatListRef } = useMessagesDialog();
 
-  // const chatItems = getMergedChatHistoryWithReducedNotifications(
-  //   messages,
-  //   notifications
-  // );
-
-  const chatItems: ChatItem[] = [];
-
-  messages.forEach((message) => {
-    chatItems.push({
-      item_type: "MESSAGE",
-      body: message,
-    });
-  });
-
-  notifications.map((notification) => {
-    chatItems.push({
-      item_type: "NOTIFICATION",
-      body: notification,
-    });
-  });
+  const chatItems = getMergedChatHistoryWithReducedNotifications(
+    messages,
+    notifications
+  );
 
   console.log({ chatItems });
 
@@ -45,7 +29,7 @@ export const MessagesDialog = (): JSX.Element => {
       }}
       ref={chatListRef}
     >
-      {messages.length === 0 ? (
+      {chatItems.length === 0 ? (
         <div
           data-testid="empty-history-message"
           className="text-center opacity-50"
@@ -62,7 +46,7 @@ export const MessagesDialog = (): JSX.Element => {
               />
             ) : (
               <ChatNotification
-                key={chatItem.body.id}
+                key={chatItem.body[0].id}
                 content={chatItem.body}
               />
             )

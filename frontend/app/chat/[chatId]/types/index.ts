@@ -29,15 +29,17 @@ export type Notification = {
   status: NotificationStatus;
 };
 
-export type ChatItem =
-  | {
-      item_type: "MESSAGE";
-      body: ChatHistory;
-    }
-  | {
-      item_type: "NOTIFICATION";
-      body: Notification;
-    };
+export type ChatHistoryItem = {
+  item_type: "MESSAGE";
+  body: ChatHistory;
+};
+
+export type NotificationItem = {
+  item_type: "NOTIFICATION";
+  body: Notification;
+};
+
+export type ChatItem = ChatHistoryItem | NotificationItem;
 
 export type ChatEntity = {
   chat_id: UUID;

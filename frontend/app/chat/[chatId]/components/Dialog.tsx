@@ -4,9 +4,10 @@ import { MessagesDialog } from "./MessagesDialog";
 import { ShortCuts } from "./ShortCuts";
 
 export const ChatDialog = (): JSX.Element => {
-  const { messages } = useChatContext();
+  const { messages, notifications } = useChatContext();
 
-  const shouldDisplayShortcuts = messages.length === 0;
+  const shouldDisplayShortcuts =
+    messages.length === 0 && notifications.length === 0;
 
   if (!shouldDisplayShortcuts) {
     return <MessagesDialog />;

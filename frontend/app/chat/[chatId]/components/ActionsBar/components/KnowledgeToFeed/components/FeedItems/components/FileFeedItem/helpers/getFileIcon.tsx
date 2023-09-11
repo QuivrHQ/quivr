@@ -48,5 +48,5 @@ export const getFileIcon = (fileName: string): JSX.Element => {
 
   const Icon = fileType !== undefined ? fileTypeIcons[fileType] : FaFile;
 
-  return <Icon className="text-2xl mr-2" />;
+  return <Icon className="text-2xl" />;
 };

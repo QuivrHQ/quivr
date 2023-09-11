@@ -1,74 +1,66 @@
-/* eslint-disable complexity */
-import { ChatHistory, ChatItem, Notification } from "../../../types";
+import {
+  ChatHistory,
+  ChatHistoryItem,
+  ChatItem,
+  Notification,
+  NotificationItem,
+} from "../../../types";
+
+type ChatItemWithGroupedNotifications =
+  | ChatHistoryItem
+  | {
+      item_type: "NOTIFICATION";
+      body: Notification[];
+    };
 
 export const getMergedChatHistoryWithReducedNotifications = (
   messages: ChatHistory[],
   notifications: Notification[]
-): ChatItem[] => {
-  const mergedChatItems: ChatItem[] = [];
-  let currentNotification: Notification | null = null;
-
-  const allItems: (ChatHistory | Notification)[] = [
-    ...messages,
-    ...notifications,
+): ChatItemWithGroupedNotifications[] => {
+  const mergedChatItems: ChatItem[] = [
+    ...messages.map(
+      (message) => ({ item_type: "MESSAGE", body: message } as ChatHistoryItem)
+    ),
+    ...notifications.map(
+      (notification) =>
+        ({ item_type: "NOTIFICATION", body: notification } as NotificationItem)
+    ),
   ];
 
   // Sort all items by message_time (or datetime) in ascending order
-  allItems.sort((a, b) => {
-    const timestampA = "message_time" in a ? a.message_time : a.datetime;
-    const timestampB = "message_time" in b ? b.message_time : b.datetime;
+  mergedChatItems.sort((a, b) => {
+    const timestampA =
+      a.item_type === "MESSAGE" ? a.body.message_time : a.body.datetime;
+    const timestampB =
+      b.item_type === "MESSAGE" ? b.body.message_time : b.body.datetime;
 
     return Date.parse(timestampA) - Date.parse(timestampB);
   });
 
-  for (const item of allItems) {
-    if ("user_message" in item && "assistant" in item) {
-      // It's a chat message
-      if (currentNotification) {
-        addNotification(mergedChatItems, currentNotification);
-        currentNotification = null;
-      }
-      addChatMessage(mergedChatItems, item);
-    } else if ("action" in item && "status" in item) {
-      // It's a notification
-      if (currentNotification) {
-        mergeNotification(currentNotification, item);
+  const groupedChatHistory: ChatItemWithGroupedNotifications[] = [];
+
+  for (const item of mergedChatItems) {
+    if (item.item_type === "MESSAGE") {
+      groupedChatHistory.push(item);
+    } else {
+      const lastItemIndex = groupedChatHistory.length - 1;
+      const lastItem =
+        lastItemIndex >= 0 ? groupedChatHistory[lastItemIndex] : null;
+
+      if (
+        lastItem !== null &&
+        lastItem !== undefined &&
+        lastItem.item_type === "NOTIFICATION"
+      ) {
+        lastItem.body.push(item.body);
       } else {
-        currentNotification = item;
+        groupedChatHistory.push({
+          item_type: "NOTIFICATION",
+          body: [item.body],
+        });
       }
     }
   }
 
-  // Add the last notification if it exists
-  if (currentNotification) {
-    addNotification(mergedChatItems, currentNotification);
-  }
-
-  return mergedChatItems;
-};
-
-const addChatMessage = (mergedChatItems: ChatItem[], message: ChatHistory) => {
-  mergedChatItems.push({
-    item_type: "MESSAGE",
-    body: message,
-  });
-};
-
-const addNotification = (
-  mergedChatItems: ChatItem[],
-  notification: Notification
-) => {
-  mergedChatItems.push({
-    item_type: "NOTIFICATION",
-    body: notification,
-  });
-};
-
-const mergeNotification = (
-  existingNotification: Notification,
-  newNotification: Notification
-) => {
-  if ("message" in existingNotification) {
-    existingNotification.message += `\n${newNotification.message ?? ""}`;
-  }
+  return groupedChatHistory;
 };
