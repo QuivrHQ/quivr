@@ -1,4 +1,3 @@
-import React from "react";
 import { useTranslation } from "react-i18next";
 
 import { useChatContext } from "@/lib/context";
@@ -37,32 +36,9 @@ export const MessagesDialog = (): JSX.Element => {
         </div>
       ) : (
         <div className="flex flex-col gap-3">
-          {messages.map(
-            ({
-              assistant,
-              message_id,
-              user_message,
-              brain_name,
-              prompt_title,
-            }) => (
-              <React.Fragment key={message_id}>
-                <ChatMessage
-                  key={`user-${message_id}`}
-                  speaker={"user"}
-                  text={user_message}
-                  promptName={prompt_title}
-                  brainName={brain_name}
-                />
-                <ChatMessage
-                  key={`assistant-${message_id}`}
-                  speaker={"assistant"}
-                  text={assistant}
-                  brainName={brain_name}
-                  promptName={prompt_title}
-                />
-              </React.Fragment>
-            )
-          )}
+          {messages.map((message) => (
+            <ChatMessage key={message.message_id} content={message} />
+          ))}
         </div>
       )}
     </div>

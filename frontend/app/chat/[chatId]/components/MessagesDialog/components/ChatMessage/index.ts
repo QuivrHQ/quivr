@@ -1,1 +1,2 @@
-export * from "./components/ChatMessage/ChatMessage";
+export * from "./ChatMessage";
+export * from "./components/MessageRow/MessageRow";
