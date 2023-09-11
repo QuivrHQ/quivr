@@ -1,4 +1,4 @@
-resource "aws_route53_zone" "api" {
+resource "aws_route53_zone" "this" {
   name = var.api_domain_name
 }
 
@@ -19,4 +19,19 @@ resource "aws_lb" "this" {
   }
 }
 
+
+resource "aws_route53_record" "this" {
+  zone_id = aws_route53_zone.this.zone_id
+  name    = var.api_domain_name
+  type    = "A"
+
+  alias {
+    name                   = aws_lb.this.dns_name
+    zone_id                = aws_lb.this.zone_id
+    evaluate_target_health = true
+  }
+  lifecycle {
+    ignore_changes = [alias["name"]]
+  }
+}
 

@@ -44,6 +44,10 @@ resource "aws_ecs_service" "this" {
     security_groups  = var.network_configuration.security_groups
     assign_public_ip = var.network_configuration.assign_public_ip
   }
+
+  lifecycle {
+    ignore_changes = [task_definition]
+  }
 }
 
 resource "aws_ecs_task_definition" "quivr-backend" {
