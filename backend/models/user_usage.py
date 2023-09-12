@@ -24,6 +24,14 @@ class UserUsage(UserIdentity):
 
         return request
 
+    def get_user_settings(self):
+        """
+        Fetch the user settings from the database
+        """
+        request = self.supabase_db.get_user_settings(self.id)
+
+        return request
+
     def handle_increment_user_request_count(self, date):
         """
         Increment the user request count in the database

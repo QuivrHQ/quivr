@@ -2,12 +2,11 @@ from typing import Any, List, Optional
 from uuid import UUID
 
 from logger import get_logger
+from models.databases.supabase.supabase import SupabaseDB
+from models.settings import get_supabase_client, get_supabase_db
 from pydantic import BaseModel
 from supabase.client import Client
 from utils.vectors import get_unique_files_from_vector_ids
-
-from models.databases.supabase.supabase import SupabaseDB
-from models.settings import BrainRateLimiting, get_supabase_client, get_supabase_db
 
 logger = get_logger(__name__)
 
@@ -22,7 +21,6 @@ class Brain(BaseModel):
     max_tokens: Optional[int] = 256
     openai_api_key: Optional[str] = None
     files: List[Any] = []
-    max_brain_size = BrainRateLimiting().max_brain_size
     prompt_id: Optional[UUID] = None
 
     class Config:
@@ -42,13 +40,6 @@ class Brain(BaseModel):
         current_brain_size = sum(float(doc["size"]) for doc in self.files)
 
         return current_brain_size
-
-    @property
-    def remaining_brain_size(self):
-        return (
-            float(self.max_brain_size)  # pyright: ignore reportPrivateUsage=none
-            - self.brain_size  # pyright: ignore reportPrivateUsage=none
-        )
 
     @classmethod
     def create(cls, *args, **kwargs):

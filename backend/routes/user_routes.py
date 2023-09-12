@@ -1,9 +1,8 @@
-import os
 import time
 
 from auth import AuthBearer, get_current_user
 from fastapi import APIRouter, Depends, Request
-from models import Brain, BrainRateLimiting, UserIdentity, UserUsage
+from models import Brain, UserIdentity, UserUsage
 from repository.brain import get_user_default_brain
 from repository.user_identity.get_user_identity import get_user_identity
 from repository.user_identity.update_user_properties import (
@@ -12,8 +11,6 @@ from repository.user_identity.update_user_properties import (
 )
 
 user_router = APIRouter()
-
-MAX_BRAIN_SIZE_WITH_OWN_KEY = int(os.getenv("MAX_BRAIN_SIZE_WITH_KEY", 209715200))
 
 
 @user_router.get("/user", dependencies=[Depends(AuthBearer())], tags=["User"])
@@ -32,13 +29,16 @@ async def get_user_endpoint(
     information about the user's API usage.
     """
 
-    max_brain_size = BrainRateLimiting().max_brain_size
-
-    if request.headers.get("Openai-Api-Key"):
-        max_brain_size = MAX_BRAIN_SIZE_WITH_OWN_KEY
+    userDailyUsage = UserUsage(
+        id=current_user.id,
+        email=current_user.email,
+        openai_api_key=current_user.openai_api_key,
+    )
+    userSettings = userDailyUsage.get_user_settings()
+    max_brain_size = userSettings.get("max_brain_size", 1000000000)
 
     date = time.strftime("%Y%m%d")
-    max_requests_number = os.getenv("MAX_REQUESTS_NUMBER")
+    max_requests_number = userSettings.get("max_requests_number", 10)
 
     userDailyUsage = UserUsage(id=current_user.id)
     requests_stats = userDailyUsage.get_user_usage()
@@ -55,6 +55,7 @@ async def get_user_endpoint(
         "current_brain_size": defaul_brain_size,
         "max_requests_number": max_requests_number,
         "requests_stats": requests_stats,
+        "models": userSettings.get("models", []),
         "date": date,
         "id": current_user.id,
     }
