@@ -1,4 +1,5 @@
-import { event, initialize } from "react-ga";
+import ReactGA from "react-ga4";
+
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const useGAnalyticsEventTracker = (category: string) => {
   const ga_id = process.env.NEXT_PUBLIC_GA_ID;
@@ -7,7 +8,7 @@ export const useGAnalyticsEventTracker = (category: string) => {
     return undefined;
   }
 
-  initialize(ga_id);
+  ReactGA.initialize(ga_id);
 
   const eventTracker = ({
     action,
@@ -16,7 +17,11 @@ export const useGAnalyticsEventTracker = (category: string) => {
     action: string;
     label?: string;
   }) => {
-    event({ category, action, label });
+    ReactGA.event({
+      category,
+      action,
+      label,
+    });
   };
 
   return eventTracker;
