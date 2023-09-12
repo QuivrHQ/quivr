@@ -2,7 +2,7 @@
 
 import { createContext, useState } from "react";
 
-import { ChatHistory, Notification } from "@/app/chat/[chatId]/types";
+import { ChatMessage, Notification } from "@/app/chat/[chatId]/types";
 
 import { ChatContextProps } from "./types";
 
@@ -15,19 +15,19 @@ export const ChatProvider = ({
 }: {
   children: JSX.Element | JSX.Element[];
 }): JSX.Element => {
-  const [messages, setMessages] = useState<ChatHistory[]>([]);
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [notifications, setNotifications] = useState<Notification[]>([]);
 
-  const addToHistory = (message: ChatHistory) => {
+  const addToHistory = (message: ChatMessage) => {
     setMessages((prevHistory) => [...prevHistory, message]);
   };
 
-  const updateStreamingHistory = (streamedChat: ChatHistory): void => {
-    setMessages((prevHistory: ChatHistory[]) => {
+  const updateStreamingHistory = (streamedChat: ChatMessage): void => {
+    setMessages((prevHistory: ChatMessage[]) => {
       const updatedHistory = prevHistory.find(
         (item) => item.message_id === streamedChat.message_id
       )
-        ? prevHistory.map((item: ChatHistory) =>
+        ? prevHistory.map((item: ChatMessage) =>
             item.message_id === streamedChat.message_id
               ? { ...item, assistant: item.assistant + streamedChat.assistant }
               : item
@@ -38,12 +38,12 @@ export const ChatProvider = ({
     });
   };
 
-  const updateHistory = (chat: ChatHistory): void => {
-    setMessages((prevHistory: ChatHistory[]) => {
+  const updateHistory = (chat: ChatMessage): void => {
+    setMessages((prevHistory: ChatMessage[]) => {
       const updatedHistory = prevHistory.find(
         (item) => item.message_id === chat.message_id
       )
-        ? prevHistory.map((item: ChatHistory) =>
+        ? prevHistory.map((item: ChatMessage) =>
             item.message_id === chat.message_id
               ? { ...item, assistant: chat.assistant }
               : item

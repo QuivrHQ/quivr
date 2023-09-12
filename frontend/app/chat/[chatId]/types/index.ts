@@ -8,7 +8,7 @@ export type ChatQuestion = {
   brain_id?: string;
   prompt_id?: string;
 };
-export type ChatHistory = {
+export type ChatMessage = {
   chat_id: string;
   message_id: string;
   user_message: string;
@@ -29,9 +29,9 @@ export type Notification = {
   status: NotificationStatus;
 };
 
-export type ChatHistoryItem = {
+export type ChatMessageItem = {
   item_type: "MESSAGE";
-  body: ChatHistory;
+  body: ChatMessage;
 };
 
 export type NotificationItem = {
@@ -39,7 +39,7 @@ export type NotificationItem = {
   body: Notification;
 };
 
-export type ChatItem = ChatHistoryItem | NotificationItem;
+export type ChatItem = ChatMessageItem | NotificationItem;
 
 export type ChatEntity = {
   chat_id: UUID;

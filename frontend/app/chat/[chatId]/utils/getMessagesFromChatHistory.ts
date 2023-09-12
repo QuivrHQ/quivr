@@ -1,11 +1,11 @@
-import { ChatHistory, ChatItem } from "../types";
+import { ChatItem, ChatMessage } from "../types";
 
 export const getMessagesFromChatHistory = (
   chatHistory: ChatItem[]
-): ChatHistory[] => {
+): ChatMessage[] => {
   const messages = chatHistory
     .filter((item) => item.item_type === "MESSAGE")
-    .map((item) => item.body as ChatHistory);
+    .map((item) => item.body as ChatMessage);
 
   return messages;
 };

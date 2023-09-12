@@ -1,25 +1,25 @@
 import {
-  ChatHistory,
-  ChatHistoryItem,
   ChatItem,
+  ChatMessage,
+  ChatMessageItem,
   Notification,
   NotificationItem,
 } from "../../../types";
 
 type ChatItemWithGroupedNotifications =
-  | ChatHistoryItem
+  | ChatMessageItem
   | {
       item_type: "NOTIFICATION";
       body: Notification[];
     };
 
 export const getMergedChatHistoryWithReducedNotifications = (
-  messages: ChatHistory[],
+  messages: ChatMessage[],
   notifications: Notification[]
 ): ChatItemWithGroupedNotifications[] => {
   const mergedChatItems: ChatItem[] = [
     ...messages.map(
-      (message) => ({ item_type: "MESSAGE", body: message } as ChatHistoryItem)
+      (message) => ({ item_type: "MESSAGE", body: message } as ChatMessageItem)
     ),
     ...notifications.map(
       (notification) =>

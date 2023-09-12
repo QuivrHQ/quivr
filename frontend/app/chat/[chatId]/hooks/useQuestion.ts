@@ -5,7 +5,7 @@ import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainConte
 import { useChatContext } from "@/lib/context/ChatProvider/hooks/useChatContext";
 import { useFetch, useToast } from "@/lib/hooks";
 
-import { ChatHistory, ChatQuestion } from "../types";
+import { ChatMessage, ChatQuestion } from "../types";
 
 interface UseChatService {
   addStreamQuestion: (
@@ -42,7 +42,7 @@ export const useQuestion = (): UseChatService => {
 
       dataStrings.forEach((data) => {
         try {
-          const parsedData = JSON.parse(data) as ChatHistory;
+          const parsedData = JSON.parse(data) as ChatMessage;
           updateStreamingHistory(parsedData);
         } catch (error) {
           console.error(t("errorParsingData", { ns: "chat" }), error);

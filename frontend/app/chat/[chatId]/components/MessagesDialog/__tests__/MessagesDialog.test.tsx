@@ -42,7 +42,7 @@ vi.mock("@/lib/context", async () => {
   };
 });
 
-describe("ChatMessages", () => {
+describe("MessagesDialog", () => {
   it("should render chat messages correctly", () => {
     const { getAllByTestId } = render(<MessagesDialog />);
     expect(getAllByTestId("brain-tags")).toBeDefined();
