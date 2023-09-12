@@ -2,10 +2,6 @@ import { render } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
 import {
-  BrainConfigContextMock,
-  BrainConfigProviderMock,
-} from "@/lib/context/BrainConfigProvider/mocks/BrainConfigProviderMock";
-import {
   BrainContextMock,
   BrainProviderMock,
 } from "@/lib/context/BrainProvider/mocks/BrainProviderMock";
@@ -38,10 +34,6 @@ vi.mock("@/lib/context/BrainProvider/brain-provider", () => ({
   BrainContext: BrainContextMock,
 }));
 
-vi.mock("@/lib/context/BrainConfigProvider/brain-config-provider", () => ({
-  BrainConfigContext: BrainConfigContextMock,
-}));
-
 vi.mock("@/lib/api/chat/useChatApi", () => ({
   useChatApi: () => ({
     getHistory: () => [],
@@ -53,11 +45,9 @@ describe("Chat page", () => {
     const { getByTestId } = render(
       <ChatProviderMock>
         <SupabaseProviderMock>
-          <BrainConfigProviderMock>
-            <BrainProviderMock>
-              <SelectedChatPage />,
-            </BrainProviderMock>
-          </BrainConfigProviderMock>
+          <BrainProviderMock>
+            <SelectedChatPage />,
+          </BrainProviderMock>
         </SupabaseProviderMock>
       </ChatProviderMock>
     );

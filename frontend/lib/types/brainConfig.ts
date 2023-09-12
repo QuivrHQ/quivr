@@ -13,12 +13,8 @@ export type BrainConfig = {
   prompt_id?: UUID;
 };
 
-type OptionalConfig = { [K in keyof BrainConfig]?: BrainConfig[K] | undefined };
-
 export type BrainConfigContextType = {
   config: BrainConfig;
-  updateConfig: (config: OptionalConfig) => void;
-  resetConfig: () => void;
 };
 
 export const openAiFreeModels = ["gpt-3.5-turbo", "gpt-3.5-turbo-16k"] as const;

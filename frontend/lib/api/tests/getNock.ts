@@ -7,12 +7,6 @@ vi.mock("@/lib/context/SupabaseProvider", () => ({
   useSupabase: () => ({}),
 }));
 
-vi.mock("@/lib/context/BrainConfigProvider", () => ({
-  useBrainConfig: () => ({
-    config: {},
-  }),
-}));
-
 export const getNock = (url?: string): nock.Scope => {
   return nock(
     url ?? `${process.env.NEXT_PUBLIC_BACKEND_URL ?? DEFAULT_BACKEND_URL}`

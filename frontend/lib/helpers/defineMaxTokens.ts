@@ -1,4 +1,4 @@
-import { Model, PaidModels } from "../context/BrainConfigProvider/types";
+import { Model, PaidModels } from "../types/brainConfig";
 
 export const defineMaxTokens = (model: Model | PaidModels): number => {
   //At the moment is evaluating only models from OpenAI

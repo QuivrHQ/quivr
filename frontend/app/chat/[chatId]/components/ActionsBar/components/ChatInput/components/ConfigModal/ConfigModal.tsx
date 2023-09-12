@@ -3,8 +3,8 @@ import { MdCheck, MdSettings } from "react-icons/md";
 
 import Button from "@/lib/components/ui/Button";
 import { Modal } from "@/lib/components/ui/Modal";
-import { freeModels } from "@/lib/context/BrainConfigProvider/types";
 import { defineMaxTokens } from "@/lib/helpers/defineMaxTokens";
+import { freeModels } from "@/lib/types/brainConfig";
 
 import { useConfigModal } from "./hooks/useConfigModal";
 
