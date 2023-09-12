@@ -2,7 +2,7 @@ import { useTranslation } from "react-i18next";
 
 import { useChatContext } from "@/lib/context";
 
-import { ChatMessage } from "./components";
+import { QADisplay } from "./components";
 import { ChatNotification } from "./components/ChatNotification/ChatNotification";
 import { useMessagesDialog } from "./hooks/useMessagesDialog";
 import { getMergedChatHistoryWithReducedNotifications } from "./utils/getMergedChatHistoryWithReducedNotifications";
@@ -38,7 +38,7 @@ export const MessagesDialog = (): JSX.Element => {
         <div className="flex flex-col gap-3">
           {chatItems.map((chatItem) =>
             chatItem.item_type === "MESSAGE" ? (
-              <ChatMessage
+              <QADisplay
                 key={chatItem.body.message_id}
                 content={chatItem.body}
               />

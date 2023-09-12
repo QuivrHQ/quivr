@@ -2,10 +2,10 @@ import { ChatHistory } from "@/app/chat/[chatId]/types";
 
 import { MessageRow } from "./components";
 
-type ChatMessageProps = {
+type QADisplayProps = {
   content: ChatHistory;
 };
-export const ChatMessage = ({ content }: ChatMessageProps): JSX.Element => {
+export const QADisplay = ({ content }: QADisplayProps): JSX.Element => {
   const { assistant, message_id, user_message, brain_name, prompt_title } =
     content;
 
