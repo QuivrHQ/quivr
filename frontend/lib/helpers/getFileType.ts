@@ -1,7 +1,7 @@
 import {
   SupportedFileExtensions,
   supportedFileExtensions,
-} from "../../../../FileUploader/types";
+} from "../types/SupportedFileExtensions";
 
 export const getFileType = (
   fileName: string

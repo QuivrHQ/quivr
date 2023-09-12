@@ -2,8 +2,7 @@ import { Fragment, useState } from "react";
 import { MdLink } from "react-icons/md";
 
 import { Notification } from "@/app/chat/[chatId]/types";
-
-import { getFileIcon } from "../../../../ActionsBar/components/KnowledgeToFeed/components/FeedItems/components/FileFeedItem/helpers/getFileIcon";
+import { getFileIcon } from "@/lib/helpers/getFileIcon";
 
 type NotificationMessage = {
   message: string;
