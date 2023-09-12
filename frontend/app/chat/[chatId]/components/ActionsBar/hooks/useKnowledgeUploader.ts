@@ -1,13 +1,15 @@
 /* eslint-disable max-lines */
 import axios from "axios";
 import { UUID } from "crypto";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useCallback, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { useChatApi } from "@/lib/api/chat/useChatApi";
 import { useCrawlApi } from "@/lib/api/crawl/useCrawlApi";
+import { useNotificationApi } from "@/lib/api/notification/useNotificationApi";
 import { useUploadApi } from "@/lib/api/upload/useUploadApi";
+import { useChatContext } from "@/lib/context";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 import { useToast } from "@/lib/hooks";
 
@@ -26,16 +28,23 @@ export const useKnowledgeUploader = ({
   const { t } = useTranslation(["upload"]);
   const { crawlWebsiteUrl } = useCrawlApi();
   const { createChat } = useChatApi();
-
+  const { currentBrainId } = useBrainContext();
+  const { setNotifications } = useChatContext();
+  const { getChatNotifications } = useNotificationApi();
+  const router = useRouter();
   const params = useParams();
   const chatId = params?.chatId as UUID | undefined;
 
-  const { currentBrainId } = useBrainContext();
   const addContent = (content: FeedItemType) => {
     setContents((prevContents) => [...prevContents, content]);
   };
   const removeContent = (index: number) => {
     setContents((prevContents) => prevContents.filter((_, i) => i !== index));
+  };
+
+  const fetchNotifications = async (currentChatId: UUID): Promise<void> => {
+    const fetchedNotifications = await getChatNotifications(currentChatId);
+    setNotifications(fetchedNotifications);
   };
 
   const crawlWebsiteHandler = useCallback(
@@ -50,12 +59,12 @@ export const useKnowledgeUploader = ({
       };
 
       try {
-        setHasPendingRequests(true);
         await crawlWebsiteUrl({
           brainId,
           config,
           chat_id,
         });
+        await fetchNotifications(chat_id);
       } catch (error: unknown) {
         publish({
           variant: "danger",
@@ -63,8 +72,6 @@ export const useKnowledgeUploader = ({
             message: JSON.stringify(error),
           }),
         });
-      } finally {
-        setHasPendingRequests(false);
       }
     },
     [crawlWebsiteUrl, publish, t]
@@ -75,7 +82,6 @@ export const useKnowledgeUploader = ({
       const formData = new FormData();
       formData.append("uploadFile", file);
       try {
-        setHasPendingRequests(true);
         await uploadFile({
           brainId,
           formData,
@@ -99,8 +105,6 @@ export const useKnowledgeUploader = ({
             text: t("error", { message: e }),
           });
         }
-      } finally {
-        setHasPendingRequests(false);
       }
     },
     [publish, t, uploadFile]
@@ -125,6 +129,7 @@ export const useKnowledgeUploader = ({
     }
 
     try {
+      setHasPendingRequests(true);
       const currentChatId = chatId ?? (await createChat("New Chat")).chat_id;
       const uploadPromises = files.map((file) =>
         uploadFileHandler(file, currentBrainId, currentChatId)
@@ -137,6 +142,12 @@ export const useKnowledgeUploader = ({
 
       setContents([]);
 
+      if (chatId === undefined) {
+        void router.push(`/chat/${currentChatId}`);
+      } else {
+        await fetchNotifications(currentChatId);
+      }
+
       publish({
         variant: "success",
         text: t("knowledgeUploaded"),
@@ -146,6 +157,8 @@ export const useKnowledgeUploader = ({
         variant: "danger",
         text: JSON.stringify(e),
       });
+    } finally {
+      setHasPendingRequests(false);
     }
   };
 
