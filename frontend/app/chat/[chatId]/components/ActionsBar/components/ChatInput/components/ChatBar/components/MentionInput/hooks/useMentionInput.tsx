@@ -114,9 +114,6 @@ export const useMentionInput = ({
   const keyBindingFn = useCallback(
     // eslint-disable-next-line complexity
     (e: React.KeyboardEvent<HTMLDivElement>) => {
-      console.log({
-        editorContent: getEditorText(editorState),
-      });
       if (mentionTriggers.includes(e.key as MentionTriggerType)) {
         setOpen(true);
 

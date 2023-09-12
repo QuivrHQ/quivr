@@ -1,9 +1,9 @@
-/* eslint-disable */
 "use client";
 
 import { createContext, useEffect, useState } from "react";
 
 import { removeUndefined } from "@/lib/helpers/removeUndefined";
+
 import {
   getBrainConfigFromLocalStorage,
   saveBrainConfigInLocalStorage,
@@ -31,7 +31,7 @@ export const BrainConfigProvider = ({
   children,
 }: {
   children: React.ReactNode;
-}) => {
+}): JSX.Element => {
   const [brainConfig, setBrainConfig] =
     useState<BrainConfig>(defaultBrainConfig);
 

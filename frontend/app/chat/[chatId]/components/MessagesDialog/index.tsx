@@ -17,8 +17,6 @@ export const MessagesDialog = (): JSX.Element => {
     notifications
   );
 
-  console.log({ chatItems });
-
   return (
     <div
       style={{

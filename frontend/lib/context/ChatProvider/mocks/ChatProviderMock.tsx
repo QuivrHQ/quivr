@@ -17,6 +17,8 @@ export const ChatProviderMock = ({
         addToHistory: () => void 0,
         updateHistory: () => void 0,
         updateStreamingHistory: () => void 0,
+        notifications: [],
+        setNotifications: () => void 0,
       }}
     >
       {children}
