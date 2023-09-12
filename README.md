@@ -80,18 +80,22 @@ Additionally, you'll need a [Supabase](https://supabase.com/) account for:
   git clone git@github.com:StanGirard/Quivr.git && cd Quivr
   ```
 
-- **Step 2**: Use the install helper
+- **Step 2**: Use the install helper script to automate subsequent steps.
   You can use the install_helper.sh script to setup your env files and execute the migrations.
 
   prerequisites:
 
-  - [gum](https://github.com/charmbracelet/gum) - for the input prompt
-  - [PostgreSQL](https://www.postgresql.org/download/) - for the migration script
+  ```bash
+    brew install gum # Windows (via Scoop) scoop install charm-gum
+    brew install postgresql # Windows (via Scoop) scoop install postgresql
+  ```
 
   ```bash
   chmod +x install_helper.sh
   ./install_helper.sh
   ```
+
+  If you want to manually set up the environment, follow the steps below, otherwise skip to Step 6.
 
 - **Step 2 - Bis**: Copy the `.XXXXX_env` files
 
@@ -133,7 +137,7 @@ Additionally, you'll need a [Supabase](https://supabase.com/) account for:
 - **Step 5**: Launch the app
 
   ```bash
-  docker-compose up --build
+  docker compose up --build
   ```
 
 - **Step 6**: Navigate to `localhost:3000` in your browser
@@ -141,7 +145,7 @@ Additionally, you'll need a [Supabase](https://supabase.com/) account for:
 - **Step 7**: Want to contribute to the project?
 
   ```
-  docker-compose -f docker-compose.dev.yml up --build
+  docker compose -f docker-compose.dev.yml up --build
   ```
 
 ## Contributors ✨
