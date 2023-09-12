@@ -4,25 +4,15 @@ import { MdLink } from "react-icons/md";
 import { Notification } from "@/app/chat/[chatId]/types";
 import { getFileIcon } from "@/lib/helpers/getFileIcon";
 
-type NotificationMessage = {
-  message: string;
-  status: "warning" | "error" | "success";
-  name: string;
-};
+import { NotificationMessage, notificationStatusToIcon } from "./types";
 
-const notificationStatusToIcon = {
-  warning: "⚠️",
-  error: "❌",
-  success: "✅",
-};
-
-type NotificationProps = {
+type NotificationDisplayerProps = {
   content: Notification;
 };
 
 export const NotificationDisplayer = ({
   content,
-}: NotificationProps): JSX.Element => {
+}: NotificationDisplayerProps): JSX.Element => {
   const { message: nonParsedMessage, action } = content;
   const [isHovered, setIsHovered] = useState(false);
   if (nonParsedMessage === null || nonParsedMessage === undefined) {
