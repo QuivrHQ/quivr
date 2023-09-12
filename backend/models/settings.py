@@ -6,7 +6,6 @@ from vectorstore.supabase import SupabaseVectorStore
 
 
 class BrainRateLimiting(BaseSettings):
-    max_brain_size: int = 52428800
     max_brain_per_user: int = 5
 
 

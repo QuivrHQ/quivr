@@ -3,17 +3,23 @@ from uuid import UUID
 from auth import AuthBearer, get_current_user
 from fastapi import APIRouter, Depends, HTTPException
 from logger import get_logger
-from models import BrainRateLimiting, UserIdentity
-from models.databases.supabase.brains import (BrainQuestionRequest,
-                                              BrainUpdatableProperties,
-                                              CreateBrainProperties)
-from repository.brain import (create_brain, create_brain_user,
-                              get_brain_details,
-                              get_default_user_brain_or_create_new,
-                              get_question_context_from_brain, get_user_brains,
-                              get_user_default_brain,
-                              set_as_default_brain_for_user,
-                              update_brain_by_id)
+from models import UserIdentity, UserUsage
+from models.databases.supabase.brains import (
+    BrainQuestionRequest,
+    BrainUpdatableProperties,
+    CreateBrainProperties,
+)
+from repository.brain import (
+    create_brain,
+    create_brain_user,
+    get_brain_details,
+    get_default_user_brain_or_create_new,
+    get_question_context_from_brain,
+    get_user_brains,
+    get_user_default_brain,
+    set_as_default_brain_for_user,
+    update_brain_by_id,
+)
 from repository.prompt import delete_prompt_by_id, get_prompt_by_id
 from routes.authorizations.brain_authorization import has_brain_authorization
 from routes.authorizations.types import RoleEnum
@@ -105,12 +111,17 @@ async def create_brain_endpoint(
     """
 
     user_brains = get_user_brains(current_user.id)
-    max_brain_per_user = BrainRateLimiting().max_brain_per_user
+    userDailyUsage = UserUsage(
+        id=current_user.id,
+        email=current_user.email,
+        openai_api_key=current_user.openai_api_key,
+    )
+    userSettings = userDailyUsage.get_user_settings()
 
-    if len(user_brains) >= max_brain_per_user:
+    if len(user_brains) >= userSettings.get("max_brains", 5):
         raise HTTPException(
             status_code=429,
-            detail=f"Maximum number of brains reached ({max_brain_per_user}).",
+            detail=f"Maximum number of brains reached ({userSettings.get('max_brains', 5)}).",
         )
 
     new_brain = create_brain(
