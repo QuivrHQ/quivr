@@ -19,5 +19,6 @@ export const useActionBar = () => {
     shouldDisplayUploadCard,
     setShouldDisplayUploadCard,
     hasPendingRequests,
+    setHasPendingRequests,
   };
 };

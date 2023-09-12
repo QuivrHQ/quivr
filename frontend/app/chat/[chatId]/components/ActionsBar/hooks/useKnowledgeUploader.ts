@@ -13,8 +13,13 @@ import { useToast } from "@/lib/hooks";
 
 import { FeedItemCrawlType, FeedItemType, FeedItemUploadType } from "../types";
 
+type UseKnowledgeUploaderProps = {
+  setHasPendingRequests: (hasPendingRequests: boolean) => void;
+};
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-export const useKnowledgeUploader = () => {
+export const useKnowledgeUploader = ({
+  setHasPendingRequests,
+}: UseKnowledgeUploaderProps) => {
   const [contents, setContents] = useState<FeedItemType[]>([]);
   const { publish } = useToast();
   const { uploadFile } = useUploadApi();
@@ -45,6 +50,7 @@ export const useKnowledgeUploader = () => {
       };
 
       try {
+        setHasPendingRequests(true);
         await crawlWebsiteUrl({
           brainId,
           config,
@@ -57,6 +63,8 @@ export const useKnowledgeUploader = () => {
             message: JSON.stringify(error),
           }),
         });
+      } finally {
+        setHasPendingRequests(false);
       }
     },
     [crawlWebsiteUrl, publish, t]
@@ -67,6 +75,7 @@ export const useKnowledgeUploader = () => {
       const formData = new FormData();
       formData.append("uploadFile", file);
       try {
+        setHasPendingRequests(true);
         await uploadFile({
           brainId,
           formData,
@@ -90,6 +99,8 @@ export const useKnowledgeUploader = () => {
             text: t("error", { message: e }),
           });
         }
+      } finally {
+        setHasPendingRequests(false);
       }
     },
     [publish, t, uploadFile]
