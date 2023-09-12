@@ -92,3 +92,32 @@ services:
       - "traefik.http.routers.backend-upload.rule=PathPrefix(`/upload`)"
       - "traefik.http.routers.backend-upload.entrypoints=web"
       - "traefik.http.services.backend-upload.loadbalancer.server.port=5050"
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+    depends_on:
+      - redis
+    
+  redis:
+    image: redis:latest
+    container_name: redis
+    restart: always
+    ports:
+      - 6379:6379
+  
+  worker:
+    env_file:
+      - ./backend/.env
+    build:
+      context: backend
+      dockerfile: Dockerfile
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+    container_name: worker
+    command: celery -A celery_worker worker -l info
+    restart: always
+    volumes:
+      - ./backend/:/code/
+    depends_on:
+      - redis

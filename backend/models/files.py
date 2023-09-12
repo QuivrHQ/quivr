@@ -6,12 +6,11 @@ from uuid import UUID
 from fastapi import UploadFile
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from logger import get_logger
-from pydantic import BaseModel
-from utils.file import compute_sha1_from_file
-
 from models.brains import Brain
 from models.databases.supabase.supabase import SupabaseDB
 from models.settings import get_supabase_db
+from pydantic import BaseModel
+from utils.file import compute_sha1_from_file
 
 logger = get_logger(__name__)
 
@@ -38,9 +37,7 @@ class File(BaseModel):
 
         if self.file:
             self.file_name = self.file.filename
-            self.file_size = (
-                self.file.file._file.tell()  # pyright: ignore reportPrivateUsage=none
-            )
+            self.file_size = self.file.size  # pyright: ignore reportPrivateUsage=none
             self.file_extension = os.path.splitext(
                 self.file.filename  # pyright: ignore reportPrivateUsage=none
             )[-1].lower()
@@ -82,8 +79,6 @@ class File(BaseModel):
             loader = loader_class(tmp_file.name)
             documents = loader.load()
 
-            print("documents", documents)
-
         os.remove(tmp_file.name)
 
         text_splitter = RecursiveCharacterTextSplitter.from_tiktoken_encoder(
@@ -91,8 +86,6 @@ class File(BaseModel):
         )
 
         self.documents = text_splitter.split_documents(documents)
-
-        print(self.documents)
 
     def set_file_vectors_ids(self):
         """
@@ -108,13 +101,6 @@ class File(BaseModel):
         Check if file already exists in vectors table
         """
         self.set_file_vectors_ids()
-
-        print("file_sha1", self.file_sha1)
-        print("vectors_ids", self.vectors_ids)
-        print(
-            "len(vectors_ids)",
-            len(self.vectors_ids),  # pyright: ignore reportPrivateUsage=none
-        )
 
         # if the file does not exist in vectors then no need to go check in brains_vectors
         if len(self.vectors_ids) == 0:  # pyright: ignore reportPrivateUsage=none
@@ -133,7 +119,6 @@ class File(BaseModel):
             brain_id, self.file_sha1  # type: ignore
         )
 
-        print("response.data", response.data)
         if len(response.data) == 0:
             return False
 
@@ -143,9 +128,7 @@ class File(BaseModel):
         """
         Check if file is empty by checking if the file pointer is at the beginning of the file
         """
-        return (
-            self.file.file._file.tell() < 1  # pyright: ignore reportPrivateUsage=none
-        )
+        return self.file.size < 1  # pyright: ignore reportPrivateUsage=none
 
     def link_file_to_brain(self, brain: Brain):
         self.set_file_vectors_ids()
@@ -155,4 +138,3 @@ class File(BaseModel):
 
         for vector_id in self.vectors_ids:  # pyright: ignore reportPrivateUsage=none
             brain.create_brain_vector(vector_id["id"], self.file_sha1)
-        print(f"Successfully linked file {self.file_sha1} to brain {brain.id}")

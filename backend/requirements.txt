@@ -29,3 +29,5 @@ html5lib==1.1
 bs4==0.0.1
 newspaper3k
 xlrd==1.0.0
+celery==5.2.7
+redis==4.5.4
