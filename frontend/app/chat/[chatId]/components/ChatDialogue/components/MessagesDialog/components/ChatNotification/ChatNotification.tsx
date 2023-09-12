@@ -1,5 +1,6 @@
+import { Notification } from "@/app/chat/[chatId]/types";
+
 import { NotificationDisplayer } from "./components";
-import { Notification } from "../../../../types";
 
 type NotificationProps = {
   content: Notification[];

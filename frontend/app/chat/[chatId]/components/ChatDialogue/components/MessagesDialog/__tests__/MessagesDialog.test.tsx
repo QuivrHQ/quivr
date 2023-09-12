@@ -1,7 +1,7 @@
 import { render } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
-import { MessagesDialog } from "../index";
+import { MessagesDialogue } from "..";
 
 vi.mock("@/lib/context/SupabaseProvider", () => ({
   useSupabase: () => ({
@@ -43,7 +43,7 @@ vi.mock("@/lib/context", async () => {
 
 describe("MessagesDialog", () => {
   it("should render chat messages correctly", () => {
-    const { getAllByTestId } = render(<MessagesDialog />);
+    const { getAllByTestId } = render(<MessagesDialogue chatItems={[]} />);
     expect(getAllByTestId("brain-tags")).toBeDefined();
     expect(getAllByTestId("prompt-tags")).toBeDefined();
     expect(getAllByTestId("chat-message-text")).toBeDefined();
@@ -55,7 +55,7 @@ describe("MessagesDialog", () => {
       notifications: [],
     }));
 
-    const { getByTestId } = render(<MessagesDialog />);
+    const { getByTestId } = render(<MessagesDialogue chatItems={[]} />);
 
     expect(getByTestId("empty-history-message")).toBeDefined();
   });
