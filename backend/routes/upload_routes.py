@@ -97,6 +97,8 @@ async def upload_file(
             brain_id=brain_id,
             openai_api_key=openai_api_key,
         )
+        if not file.file:
+            raise Exception("File not found")
 
         if upload_notification:
             notification_message = {
