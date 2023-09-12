@@ -44,8 +44,6 @@ class UserUsage(Repository):
                 .execute()
             )
             if result:
-                print("User settings created")
-                print(result)
                 return self.get_user_settings(user_id)
             else:
                 raise ValueError("User settings could not be created")
