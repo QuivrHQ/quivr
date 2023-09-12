@@ -10,9 +10,12 @@ export const ActionsBar = (): JSX.Element => {
     shouldDisplayUploadCard,
     setShouldDisplayUploadCard,
     hasPendingRequests,
+    setHasPendingRequests,
   } = useActionBar();
   const { addContent, contents, feedBrain, removeContent } =
-    useKnowledgeUploader();
+    useKnowledgeUploader({
+      setHasPendingRequests,
+    });
 
   const { t } = useTranslation(["chat"]);
 
