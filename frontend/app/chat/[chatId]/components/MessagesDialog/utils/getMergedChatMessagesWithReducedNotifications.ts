@@ -13,7 +13,7 @@ type ChatItemWithGroupedNotifications =
       body: Notification[];
     };
 
-export const getMergedChatHistoryWithReducedNotifications = (
+export const getMergedChatMessagesWithReducedNotifications = (
   messages: ChatMessage[],
   notifications: Notification[]
 ): ChatItemWithGroupedNotifications[] => {
