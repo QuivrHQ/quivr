@@ -7,8 +7,8 @@ type ChatItemProps = {
 };
 export const ChatItem = ({ content }: ChatItemProps): JSX.Element => {
   if (content.item_type === "MESSAGE") {
-    return <QADisplay key={content.body.message_id} content={content.body} />;
+    return <QADisplay content={content.body} />;
   }
 
-  return <ChatNotification key={content.body[0].id} content={content.body} />;
+  return <ChatNotification content={content.body} />;
 };

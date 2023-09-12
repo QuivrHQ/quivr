@@ -1,7 +1,7 @@
 "use client";
 
 import { ActionsBar } from "./components/ActionsBar";
-import { ChatDialogue } from "./components/ChatDialogue/ChatDialogue";
+import { ChatDialogueArea } from "./components/ChatDialogueArea/ChatDialogue";
 import { ChatHeader } from "./components/ChatHeader";
 
 const SelectedChatPage = (): JSX.Element => {
@@ -11,7 +11,7 @@ const SelectedChatPage = (): JSX.Element => {
         <ChatHeader />
         <div className="flex-1 flex flex-col mt-8 w-full shadow-md dark:shadow-primary/25 hover:shadow-xl transition-shadow rounded-xl overflow-hidden bg-white dark:bg-black border border-black/10 dark:border-white/25 p-12 pt-10 max-h-[80vh]">
           <div className="flex flex-1 flex-col overflow-hidden">
-            <ChatDialogue />
+            <ChatDialogueArea />
           </div>
           <ActionsBar />
         </div>

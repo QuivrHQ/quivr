@@ -1,7 +1,7 @@
 import { useTranslation } from "react-i18next";
 
 import { ChatItem } from "./components";
-import { useMessagesDialogue } from "./hooks/useMessagesDialogue";
+import { useChatDialogue } from "./hooks/useChatDialogue";
 import { getKeyFromChatItem } from "./utils/getKeyFromChatItem";
 import { ChatItemWithGroupedNotifications } from "../../types";
 
@@ -9,11 +9,11 @@ type MessagesDialogueProps = {
   chatItems: ChatItemWithGroupedNotifications[];
 };
 
-export const MessagesDialogue = ({
+export const ChatDialogue = ({
   chatItems,
 }: MessagesDialogueProps): JSX.Element => {
   const { t } = useTranslation(["chat"]);
-  const { chatListRef } = useMessagesDialogue();
+  const { chatListRef } = useChatDialogue();
 
   return (
     <div

@@ -41,13 +41,13 @@ const compareItemsByTimestamp = (a: ChatItem, b: ChatItem): number => {
 };
 
 // Main function to get merged chat messages with reduced notifications using reduce
-export const getMergedChatMessagesWithReducedNotifications = (
+export const getMergedChatMessagesWithDoneStatusNotificationsReduced = (
   messages: ChatMessage[],
   notifications: Notification[]
 ): ChatItemWithGroupedNotifications[] => {
   const mergedChatItems = mergeChatMessagesAndNotifications(
     messages,
-    notifications
+    notifications.filter((notification) => notification.status === "Done")
   );
   mergedChatItems.sort(compareItemsByTimestamp);
 

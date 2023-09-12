@@ -1,1 +1,1 @@
-export * from "./ChatDialogue/components/MessagesDialog";
+export * from "./ChatDialogueArea/components/ChatDialogue";

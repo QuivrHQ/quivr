@@ -19,16 +19,15 @@ export const useSelectedChatPage = () => {
     const fetchHistory = async () => {
       if (chatId === undefined) {
         setMessages([]);
+        setNotifications([]);
 
         return;
       }
 
       const chatItems = await getChatItems(chatId);
 
-      if (chatItems.length > 0) {
-        setMessages(getMessagesFromChatItems(chatItems));
-        setNotifications(getNotificationsFromChatItems(chatItems));
-      }
+      setMessages(getMessagesFromChatItems(chatItems));
+      setNotifications(getNotificationsFromChatItems(chatItems));
     };
     void fetchHistory();
   }, [chatId, setMessages]);
