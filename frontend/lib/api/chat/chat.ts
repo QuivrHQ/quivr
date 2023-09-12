@@ -53,7 +53,7 @@ export const addQuestion = async (
   return response.data;
 };
 
-export const getHistory = async (
+export const getChatItems = async (
   chatId: string,
   axiosInstance: AxiosInstance
 ): Promise<ChatItem[]> =>

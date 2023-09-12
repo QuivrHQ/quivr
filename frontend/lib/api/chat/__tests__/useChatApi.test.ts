@@ -104,7 +104,7 @@ describe("useChatApi", () => {
     axiosGetMock.mockReturnValue({ data: {} });
     const {
       result: {
-        current: { getHistory },
+        current: { getChatItems: getHistory },
       },
     } = renderHook(() => useChatApi());
 

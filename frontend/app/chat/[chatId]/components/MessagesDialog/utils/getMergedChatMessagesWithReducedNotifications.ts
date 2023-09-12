@@ -37,24 +37,20 @@ export const getMergedChatMessagesWithReducedNotifications = (
     return Date.parse(timestampA) - Date.parse(timestampB);
   });
 
-  const groupedChatHistory: ChatItemWithGroupedNotifications[] = [];
+  const groupedChatItems: ChatItemWithGroupedNotifications[] = [];
 
   for (const item of mergedChatItems) {
     if (item.item_type === "MESSAGE") {
-      groupedChatHistory.push(item);
+      groupedChatItems.push(item);
     } else {
-      const lastItemIndex = groupedChatHistory.length - 1;
+      const lastItemIndex = groupedChatItems.length - 1;
       const lastItem =
-        lastItemIndex >= 0 ? groupedChatHistory[lastItemIndex] : null;
+        lastItemIndex >= 0 ? groupedChatItems[lastItemIndex] : undefined;
 
-      if (
-        lastItem !== null &&
-        lastItem !== undefined &&
-        lastItem.item_type === "NOTIFICATION"
-      ) {
+      if (lastItem !== undefined && lastItem.item_type === "NOTIFICATION") {
         lastItem.body.push(item.body);
       } else {
-        groupedChatHistory.push({
+        groupedChatItems.push({
           item_type: "NOTIFICATION",
           body: [item.body],
         });
@@ -62,5 +58,5 @@ export const getMergedChatMessagesWithReducedNotifications = (
     }
   }
 
-  return groupedChatHistory;
+  return groupedChatItems;
 };
