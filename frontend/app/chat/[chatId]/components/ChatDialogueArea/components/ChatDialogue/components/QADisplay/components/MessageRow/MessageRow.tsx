@@ -6,16 +6,16 @@ import { cn } from "@/lib/utils";
 import { QuestionBrain } from "./components/QuestionBrain";
 import { QuestionPrompt } from "./components/QuestionPrompt";
 
-type ChatMessageProps = {
+type MessageRowProps = {
   speaker: string;
   text: string;
   brainName?: string | null;
   promptName?: string | null;
 };
 
-export const ChatMessage = React.forwardRef(
+export const MessageRow = React.forwardRef(
   (
-    { speaker, text, brainName, promptName }: ChatMessageProps,
+    { speaker, text, brainName, promptName }: MessageRowProps,
     ref: React.Ref<HTMLDivElement>
   ) => {
     const isUserSpeaker = speaker === "user";
@@ -52,4 +52,4 @@ export const ChatMessage = React.forwardRef(
   }
 );
 
-ChatMessage.displayName = "ChatMessage";
+MessageRow.displayName = "MessageRow";

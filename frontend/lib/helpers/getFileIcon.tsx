@@ -17,7 +17,7 @@ import { LiaFileVideo } from "react-icons/lia";
 import { IconType } from "react-icons/lib";
 
 import { getFileType } from "./getFileType";
-import { SupportedFileExtensions } from "../../../../FileUploader/types";
+import { SupportedFileExtensions } from "../types/SupportedFileExtensions";
 
 const fileTypeIcons: Record<SupportedFileExtensions, IconType> = {
   pdf: BsFiletypePdf,
@@ -48,5 +48,5 @@ export const getFileIcon = (fileName: string): JSX.Element => {
 
   const Icon = fileType !== undefined ? fileTypeIcons[fileType] : FaFile;
 
-  return <Icon className="text-2xl mr-2" />;
+  return <Icon className="text-2xl" />;
 };

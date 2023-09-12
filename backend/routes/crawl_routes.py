@@ -99,10 +99,16 @@ async def crawl_endpoint(
                 user_openai_api_key=request.headers.get("Openai-Api-Key", None),
             )
         if crawl_notification:
+            notification_message = {
+                "status": message["type"],
+                "message": message["message"],
+                "name": crawl_website.url,
+            }
             update_notification_by_id(
                 crawl_notification.id,
                 NotificationUpdatableProperties(
-                    status=NotificationsStatusEnum.Done, message=str(message)
+                    status=NotificationsStatusEnum.Done,
+                    message=str(notification_message),
                 ),
             )
     return message

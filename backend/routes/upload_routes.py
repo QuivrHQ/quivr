@@ -97,12 +97,20 @@ async def upload_file(
             brain_id=brain_id,
             openai_api_key=openai_api_key,
         )
+        if not file.file:
+            raise Exception("File not found")
 
         if upload_notification:
+            notification_message = {
+                "status": message["type"],
+                "message": message["message"],
+                "name": file.file.filename if file.file else "",
+            }
             update_notification_by_id(
                 upload_notification.id,
                 NotificationUpdatableProperties(
-                    status=NotificationsStatusEnum.Done, message=str(message)
+                    status=NotificationsStatusEnum.Done,
+                    message=str(notification_message),
                 ),
             )
 

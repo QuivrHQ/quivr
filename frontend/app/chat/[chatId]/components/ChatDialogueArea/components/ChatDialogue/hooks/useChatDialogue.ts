@@ -7,9 +7,9 @@ import { useChat } from "@/app/chat/[chatId]/hooks/useChat";
 const chatInputHeightEstimation = 100;
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-export const useChatMessages = () => {
+export const useChatDialogue = () => {
   const chatListRef = useRef<HTMLDivElement | null>(null);
-  const { history } = useChat();
+  const { messages } = useChat();
 
   const scrollToBottom = useCallback(
     _debounce(() => {
@@ -43,7 +43,7 @@ export const useChatMessages = () => {
 
   useEffect(() => {
     scrollToBottom();
-  }, [history, scrollToBottom]);
+  }, [messages, scrollToBottom]);
 
   return {
     chatListRef,

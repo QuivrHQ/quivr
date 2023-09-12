@@ -1,4 +1,4 @@
-import { ChatHistory } from "@/app/chat/[chatId]/types";
+import { ChatMessage, Notification } from "@/app/chat/[chatId]/types";
 
 import { Model } from "../BrainConfigProvider/types";
 
@@ -9,9 +9,11 @@ export type ChatConfig = {
 };
 
 export type ChatContextProps = {
-  history: ChatHistory[];
-  setHistory: (history: ChatHistory[]) => void;
-  addToHistory: (message: ChatHistory) => void;
-  updateHistory: (chat: ChatHistory) => void;
-  updateStreamingHistory: (streamedChat: ChatHistory) => void;
+  messages: ChatMessage[];
+  setMessages: (history: ChatMessage[]) => void;
+  addToHistory: (message: ChatMessage) => void;
+  updateHistory: (chat: ChatMessage) => void;
+  updateStreamingHistory: (streamedChat: ChatMessage) => void;
+  notifications: Notification[];
+  setNotifications: (notifications: Notification[]) => void;
 };

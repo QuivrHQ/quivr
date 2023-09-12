@@ -1,35 +1,20 @@
-import { useParams } from "next/navigation";
-import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
-
-import { useChatApi } from "@/lib/api/chat/useChatApi";
 
 import { ChatInput, KnowledgeToFeed } from "./components";
 import { useActionBar } from "./hooks/useActionBar";
 import { useKnowledgeUploader } from "./hooks/useKnowledgeUploader";
-import { checkIfHasPendingRequest } from "./utils/checkIfHasPendingRequest";
 
 export const ActionsBar = (): JSX.Element => {
-  const { shouldDisplayUploadCard, setShouldDisplayUploadCard } =
-    useActionBar();
+  const {
+    shouldDisplayUploadCard,
+    setShouldDisplayUploadCard,
+    hasPendingRequests,
+  } = useActionBar();
   const { addContent, contents, feedBrain, removeContent } =
     useKnowledgeUploader();
-  const { getHistory } = useChatApi();
-  const { t } = useTranslation(["chat"]);
-  const [hasPendingRequests, setHasPendingRequests] = useState(false);
-  const params = useParams();
 
-  useEffect(() => {
-    const updateNotificationsStatus = async () => {
-      const chatId = params?.chatId as string | undefined;
-      if (chatId !== undefined) {
-        const history = await getHistory(chatId);
-        setHasPendingRequests(checkIfHasPendingRequest(history));
-      }
-    };
-    void updateNotificationsStatus();
-  }, [getHistory, params?.chatId]);
+  const { t } = useTranslation(["chat"]);
 
   return (
     <>

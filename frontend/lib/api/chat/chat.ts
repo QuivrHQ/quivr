@@ -2,8 +2,8 @@ import { AxiosInstance } from "axios";
 
 import {
   ChatEntity,
-  ChatHistory,
   ChatItem,
+  ChatMessage,
   ChatQuestion,
 } from "@/app/chat/[chatId]/types";
 
@@ -44,8 +44,8 @@ export type AddQuestionParams = {
 export const addQuestion = async (
   { chatId, chatQuestion, brainId }: AddQuestionParams,
   axiosInstance: AxiosInstance
-): Promise<ChatHistory> => {
-  const response = await axiosInstance.post<ChatHistory>(
+): Promise<ChatMessage> => {
+  const response = await axiosInstance.post<ChatMessage>(
     `/chat/${chatId}/question?brain_id=${brainId}`,
     chatQuestion
   );
@@ -53,7 +53,7 @@ export const addQuestion = async (
   return response.data;
 };
 
-export const getHistory = async (
+export const getChatItems = async (
   chatId: string,
   axiosInstance: AxiosInstance
 ): Promise<ChatItem[]> =>

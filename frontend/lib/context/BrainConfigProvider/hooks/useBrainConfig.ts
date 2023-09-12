@@ -1,8 +1,8 @@
-/* eslint-disable */
 import { useContext } from "react";
 
-import { BrainConfigContext } from "../brain-config-provider";
+import { BrainConfigContext } from "@/lib/context/BrainConfigProvider/brain-config-provider";
 
+// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const useBrainConfig = () => {
   const context = useContext(BrainConfigContext);
 
