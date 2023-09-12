@@ -1,8 +1,6 @@
 import { render } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
-import { BrainConfigProvider } from "@/lib/context/BrainConfigProvider";
-
 import DocumentData from "../DocumentData";
 
 const useSupabaseMock = vi.fn(() => ({
@@ -63,9 +61,7 @@ describe("DocumentData", () => {
   it.skip("should render document data", () => {
     const documentName = "Test document";
     const { getByTestId } = render(
-      <BrainConfigProvider>
-        <DocumentData documentName={documentName} />
-      </BrainConfigProvider>
+      <DocumentData documentName={documentName} />
     );
 
     expect(getByTestId("document-name")).toBeDefined();

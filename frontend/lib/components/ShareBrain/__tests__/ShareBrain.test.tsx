@@ -3,10 +3,6 @@ import { fireEvent, render } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import {
-  BrainConfigContextMock,
-  BrainConfigProviderMock,
-} from "@/lib/context/BrainConfigProvider/mocks/BrainConfigProviderMock";
-import {
   BrainContextMock,
   BrainProviderMock,
 } from "@/lib/context/BrainProvider/mocks/BrainProviderMock";
@@ -19,10 +15,6 @@ import { ShareBrain } from "../ShareBrain";
 
 vi.mock("@/lib/context/SupabaseProvider/supabase-provider", () => ({
   SupabaseContext: SupabaseContextMock,
-}));
-
-vi.mock("@/lib/context/BrainConfigProvider/brain-config-provider", () => ({
-  BrainConfigContext: BrainConfigContextMock,
 }));
 
 vi.mock("@/lib/context/BrainProvider/brain-provider", () => ({
@@ -74,11 +66,9 @@ describe("ShareBrain", () => {
   it("should render ShareBrain component properly", () => {
     const { getByTestId } = render(
       <SupabaseProviderMock>
-        <BrainConfigProviderMock>
-          <BrainProviderMock>
-            <ShareBrain brainId="cf9bb422-b1b6-4fd7-abc1-01bd395d2318" />
-          </BrainProviderMock>
-        </BrainConfigProviderMock>
+        <BrainProviderMock>
+          <ShareBrain brainId="cf9bb422-b1b6-4fd7-abc1-01bd395d2318" />
+        </BrainProviderMock>
       </SupabaseProviderMock>
     );
     const shareButton = getByTestId("share-brain-button");
@@ -90,9 +80,7 @@ describe("ShareBrain", () => {
       // Todo: add a custom render function that wraps the component with the providers
       <SupabaseProviderMock>
         <BrainProviderMock>
-          <BrainConfigProviderMock>
-            <ShareBrain brainId="cf9bb422-b1b6-4fd7-abc1-01bd395d2318" />
-          </BrainConfigProviderMock>
+          <ShareBrain brainId="cf9bb422-b1b6-4fd7-abc1-01bd395d2318" />
         </BrainProviderMock>
       </SupabaseProviderMock>
     );
@@ -104,11 +92,9 @@ describe("ShareBrain", () => {
   it('shoud add new user row when "Add new user" button is clicked and only where there is no empty field', async () => {
     const { getByTestId, findAllByTestId } = render(
       <SupabaseProviderMock>
-        <BrainConfigProviderMock>
-          <BrainProviderMock>
-            <ShareBrain brainId="cf9bb422-b1b6-4fd7-abc1-01bd395d2318" />
-          </BrainProviderMock>
-        </BrainConfigProviderMock>
+        <BrainProviderMock>
+          <ShareBrain brainId="cf9bb422-b1b6-4fd7-abc1-01bd395d2318" />
+        </BrainProviderMock>
       </SupabaseProviderMock>
     );
     const shareButton = getByTestId("share-brain-button");

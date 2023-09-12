@@ -1,6 +1,6 @@
 import { ChatMessage, Notification } from "@/app/chat/[chatId]/types";
 
-import { Model } from "../BrainConfigProvider/types";
+import { Model } from "../../types/brainConfig";
 
 export type ChatConfig = {
   model?: Model;

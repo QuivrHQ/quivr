@@ -7,11 +7,8 @@ import { PublicPrompts } from "@/app/brains-management/[brainId]/components/Brai
 import Button from "@/lib/components/ui/Button";
 import Field from "@/lib/components/ui/Field";
 import { Modal } from "@/lib/components/ui/Modal";
-import {
-  freeModels,
-  paidModels,
-} from "@/lib/context/BrainConfigProvider/types";
 import { defineMaxTokens } from "@/lib/helpers/defineMaxTokens";
+import { freeModels, paidModels } from "@/lib/types/brainConfig";
 
 import { useAddBrainModal } from "./hooks/useAddBrainModal";
 import { Divider } from "../ui/Divider";

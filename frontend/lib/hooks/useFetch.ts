@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 
 import { useSupabase } from "@/lib/context/SupabaseProvider";
 
-import { useBrainConfig } from "../context/BrainConfigProvider/hooks/useBrainConfig";
+import { defaultBrainConfig } from "../config/defaultBrainConfig";
 
 interface FetchInstance {
   get: (url: string, headers?: HeadersInit) => Promise<Response>;
@@ -30,9 +30,7 @@ const fetchInstance: FetchInstance = {
 
 export const useFetch = (): { fetchInstance: FetchInstance } => {
   const { session } = useSupabase();
-  const {
-    config: { backendUrl: configBackendUrl, openAiKey },
-  } = useBrainConfig();
+  const { backendUrl: configBackendUrl, openAiKey } = defaultBrainConfig;
 
   const [instance, setInstance] = useState(fetchInstance);
 

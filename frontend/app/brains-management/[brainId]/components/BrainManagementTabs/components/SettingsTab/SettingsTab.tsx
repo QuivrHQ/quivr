@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable max-lines */
 
 import { UUID } from "crypto";
@@ -10,11 +8,8 @@ import Button from "@/lib/components/ui/Button";
 import { Divider } from "@/lib/components/ui/Divider";
 import Field from "@/lib/components/ui/Field";
 import { TextArea } from "@/lib/components/ui/TextArea";
-import {
-  freeModels,
-  paidModels,
-} from "@/lib/context/BrainConfigProvider/types";
 import { defineMaxTokens } from "@/lib/helpers/defineMaxTokens";
+import { freeModels, paidModels } from "@/lib/types/brainConfig";
 import { SaveButton } from "@/shared/SaveButton";
 
 import { PublicPrompts } from "./components/PublicPrompts/PublicPrompts";

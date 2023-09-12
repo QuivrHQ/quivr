@@ -6,7 +6,7 @@ import { useTranslation } from "react-i18next";
 
 import { useBrainApi } from "@/lib/api/brain/useBrainApi";
 import { usePromptApi } from "@/lib/api/prompt/usePromptApi";
-import { useBrainConfig } from "@/lib/context/BrainConfigProvider";
+import { defaultBrainConfig } from "@/lib/config/defaultBrainConfig";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 import { defineMaxTokens } from "@/lib/helpers/defineMaxTokens";
 import { useToast } from "@/lib/hooks";
@@ -20,9 +20,9 @@ export const useAddBrainModal = () => {
   const { setAsDefaultBrain } = useBrainApi();
   const { createPrompt } = usePromptApi();
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
-  const { config } = useBrainConfig();
+
   const defaultValues = {
-    ...config,
+    ...defaultBrainConfig,
     name: "",
     description: "",
     setDefault: false,

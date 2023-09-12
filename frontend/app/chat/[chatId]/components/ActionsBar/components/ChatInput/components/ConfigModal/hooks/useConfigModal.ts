@@ -7,7 +7,7 @@ import {
   getChatConfigFromLocalStorage,
   saveChatConfigInLocalStorage,
 } from "@/lib/api/chat/chat.local";
-import { useBrainConfig } from "@/lib/context/BrainConfigProvider";
+import { defaultBrainConfig } from "@/lib/config/defaultBrainConfig";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 import { ChatConfig } from "@/lib/context/ChatProvider/types";
 import { defineMaxTokens } from "@/lib/helpers/defineMaxTokens";
@@ -17,7 +17,6 @@ import { useToast } from "@/lib/hooks";
 export const useConfigModal = (chatId?: string) => {
   const { publish } = useToast();
   const [isConfigModalOpen, setIsConfigModalOpen] = useState(false);
-  const { config } = useBrainConfig();
   const { getBrain } = useBrainApi();
   const { currentBrain } = useBrainContext();
 
@@ -51,14 +50,14 @@ export const useConfigModal = (chatId?: string) => {
         if (relatedBrainConfig === undefined) {
           return;
         }
-        setValue("model", relatedBrainConfig.model ?? config.model);
+        setValue("model", relatedBrainConfig.model ?? defaultBrainConfig.model);
         setValue(
           "temperature",
-          relatedBrainConfig.temperature ?? config.temperature
+          relatedBrainConfig.temperature ?? defaultBrainConfig.temperature
         );
         setValue(
           "maxTokens",
-          relatedBrainConfig.max_tokens ?? config.maxTokens
+          relatedBrainConfig.max_tokens ?? defaultBrainConfig.maxTokens
         );
       }
     };

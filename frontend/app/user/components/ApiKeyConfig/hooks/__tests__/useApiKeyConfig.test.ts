@@ -46,12 +46,6 @@ vi.mock("@/lib/hooks", async () => {
   };
 });
 
-vi.mock("@/lib/context/BrainConfigProvider", () => ({
-  useBrainConfig: () => ({
-    config: {},
-  }),
-}));
-
 describe("useApiKeyConfig", () => {
   afterEach(() => {
     vi.restoreAllMocks();
