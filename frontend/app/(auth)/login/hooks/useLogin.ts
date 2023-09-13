@@ -25,28 +25,28 @@ export const useLogin = () => {
       password: password,
     });
     if (error) {
-      console.log(error.message)
+      console.log(error.message);
       if (error.message.includes("Failed")) {
         publish({
           variant: "danger",
-          text: t("Failedtofetch",{ ns: 'login' })
+          text: t("Failedtofetch", { ns: "login" }),
         });
       } else if (error.message.includes("Invalid")) {
         publish({
           variant: "danger",
-          text: t("Invalidlogincredentials",{ ns: 'login' })
+          text: t("Invalidlogincredentials", { ns: "login" }),
         });
       } else {
         publish({
           variant: "danger",
           // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-call
-          text: error.message
+          text: error.message,
         });
       }
     } else {
       publish({
         variant: "success",
-        text: t("loginSuccess",{ ns: 'login' })
+        text: t("loginSuccess", { ns: "login" }),
       });
     }
     setIsPending(false);
