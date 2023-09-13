@@ -12,6 +12,7 @@ from models.databases.supabase.notifications import (
 )
 from models.notifications import NotificationsStatusEnum
 from repository.brain import get_brain_details
+from repository.files.upload_file import upload_file_storage
 from repository.notification.add_notification import add_notification
 from repository.notification.update_notification import update_notification_by_id
 from repository.user_identity import get_user_identity
@@ -80,6 +81,9 @@ async def upload_file(
         openai_api_key = get_user_identity(current_user.id).openai_api_key
 
     file_content = await uploadFile.read()
+
+    res = upload_file_storage(file_content, uploadFile.filename)
+    print(res)
     process_file_and_notify.delay(
         file=base64.b64encode(file_content),
         file_name=uploadFile.filename,
