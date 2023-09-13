@@ -1,5 +1,5 @@
 import { renderHook } from "@testing-library/react";
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { useUserApi } from "../useUserApi";
 import { UserIdentityUpdatableProperties } from "../user";
@@ -17,6 +17,9 @@ vi.mock("@/lib/hooks", () => ({
 }));
 
 describe("useUserApi", () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
   it("should call updateUserIdentity with the correct parameters", async () => {
     const {
       result: {
@@ -44,5 +47,16 @@ describe("useUserApi", () => {
 
     expect(axiosGetMock).toHaveBeenCalledTimes(1);
     expect(axiosGetMock).toHaveBeenCalledWith(`/user/identity`);
+  });
+  it("should call getUser with the correct parameters", async () => {
+    const {
+      result: {
+        current: { getUser },
+      },
+    } = renderHook(() => useUserApi());
+    await getUser();
+
+    expect(axiosGetMock).toHaveBeenCalledTimes(1);
+    expect(axiosGetMock).toHaveBeenCalledWith(`/user`);
   });
 });
