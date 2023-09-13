@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.0.70 (2023-09-12)
+
+## What's Changed
+* feat: add notifications components by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1148
+* feat: add polling for pending notifications by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1152
+* fix(selectedBrain): prevent picking brainId from local storage by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1154
+* feat: update isValidUrl function by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1155
+
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.69...v0.0.70
+
 ## 0.0.69 (2023-09-08)
 
 ## What's Changed
