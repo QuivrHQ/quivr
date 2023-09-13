@@ -47,3 +47,20 @@ services:
       - ./backend/:/code/
     depends_on:
       - redis
+    
+  flower:
+    env_file:
+      - ./backend/.env
+    build:
+      context: backend
+      dockerfile: Dockerfile
+    container_name: flower
+    command: celery -A celery_worker flower -l info --port=5555
+    restart: always
+    volumes:
+      - ./backend/:/code/
+    depends_on:
+      - redis
+      - worker
+    ports:
+      - 5555:5555
