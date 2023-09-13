@@ -9,7 +9,6 @@ import { Divider } from "@/lib/components/ui/Divider";
 import Field from "@/lib/components/ui/Field";
 import { TextArea } from "@/lib/components/ui/TextArea";
 import { defineMaxTokens } from "@/lib/helpers/defineMaxTokens";
-import { freeModels, paidModels } from "@/lib/types/brainConfig";
 import { SaveButton } from "@/shared/SaveButton";
 
 import { PublicPrompts } from "./components/PublicPrompts/PublicPrompts";
@@ -24,7 +23,7 @@ export const SettingsTab = ({ brainId }: SettingsTabProps): JSX.Element => {
   const {
     handleSubmit,
     register,
-    openAiKey,
+
     temperature,
     maxTokens,
     model,
@@ -36,6 +35,7 @@ export const SettingsTab = ({ brainId }: SettingsTabProps): JSX.Element => {
     promptId,
     pickPublicPrompt,
     removeBrainPrompt,
+    accessibleModels,
   } = useSettingsTab({ brainId });
 
   return (
@@ -102,13 +102,11 @@ export const SettingsTab = ({ brainId }: SettingsTabProps): JSX.Element => {
             void handleSubmit(false); // Trigger form submission
           }}
         >
-          {(openAiKey !== undefined ? paidModels : freeModels).map(
-            (availableModel) => (
-              <option value={availableModel} key={availableModel}>
-                {availableModel}
-              </option>
-            )
-          )}
+          {accessibleModels.map((availableModel) => (
+            <option value={availableModel} key={availableModel}>
+              {availableModel}
+            </option>
+          ))}
         </select>
       </fieldset>
       <fieldset className="w-full flex mt-4">

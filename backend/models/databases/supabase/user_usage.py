@@ -25,6 +25,32 @@ class UserUsage(Repository):
             .execute()
         )
 
+    def get_user_settings(self, user_id):
+        """
+        Fetch the user settings from the database
+        """
+        response = (
+            self.db.from_("user_settings")
+            .select("*")
+            .filter("user_id", "eq", str(user_id))
+            .execute()
+        ).data
+
+        if len(response) == 0:
+            # Create the user settings
+            result = (
+                self.db.table("user_settings")
+                .insert({"user_id": str(user_id)})
+                .execute()
+            )
+            if result:
+                return self.get_user_settings(user_id)
+            else:
+                raise ValueError("User settings could not be created")
+        if response and len(response) > 0:
+            return response[0]
+        return None
+
     def get_user_usage(self, user_id):
         """
         Fetch the user request stats from the database

@@ -226,9 +226,16 @@ CREATE TABLE IF NOT EXISTS migrations (
   executed_at TIMESTAMPTZ DEFAULT current_timestamp
 );
 
-INSERT INTO migrations (name) 
-SELECT '20230906151400_add_notifications_table'
-WHERE NOT EXISTS (
-    SELECT 1 FROM migrations WHERE name = '20230906151400_add_notifications_table'
+CREATE TABLE IF NOT EXISTS user_settings (
+  user_id UUID PRIMARY KEY,
+  models JSONB DEFAULT '["gpt-3.5-turbo"]'::jsonb,
+  max_requests_number INT DEFAULT 50,
+  max_brains INT DEFAULT 5,
+  max_brain_size INT DEFAULT 1000000
 );
 
+INSERT INTO migrations (name) 
+SELECT '202309127004032_add_user_limits'
+WHERE NOT EXISTS (
+    SELECT 1 FROM migrations WHERE name = '202309127004032_add_user_limits'
+);

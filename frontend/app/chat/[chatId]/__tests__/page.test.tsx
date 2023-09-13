@@ -39,6 +39,18 @@ vi.mock("@/lib/api/chat/useChatApi", () => ({
     getHistory: () => [],
   }),
 }));
+vi.mock("@tanstack/react-query", async () => {
+  const actual = await vi.importActual<typeof import("@tanstack/react-query")>(
+    "@tanstack/react-query"
+  );
+
+  return {
+    ...actual,
+    useQuery: () => ({
+      data: {},
+    }),
+  };
+});
 
 describe("Chat page", () => {
   it("should render chat page correctly", () => {

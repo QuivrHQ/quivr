@@ -1,9 +1,11 @@
 /* eslint-disable max-lines */
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { validateOpenAIKey } from "@/app/brains-management/[brainId]/components/BrainManagementTabs/components/SettingsTab/utils/validateOpenAIKey";
 import { useAuthApi } from "@/lib/api/auth/useAuthApi";
+import { USER_IDENTITY_DATA_KEY } from "@/lib/api/user/config";
 import { useUserApi } from "@/lib/api/user/useUserApi";
 import { UserIdentity } from "@/lib/api/user/user";
 import { useToast } from "@/lib/hooks";
@@ -23,13 +25,17 @@ export const useApiKeyConfig = () => {
   const { publish } = useToast();
   const [userIdentity, setUserIdentity] = useState<UserIdentity>();
   const { t } = useTranslation(["config"]);
+  const queryClient = useQueryClient();
+  const { data: userData } = useQuery({
+    queryKey: [USER_IDENTITY_DATA_KEY],
+    queryFn: getUserIdentity,
+  });
 
-  const fetchUserIdentity = async () => {
-    setUserIdentity(await getUserIdentity());
-  };
   useEffect(() => {
-    void fetchUserIdentity();
-  }, []);
+    if (userData !== undefined) {
+      setUserIdentity(userData);
+    }
+  }, [userData]);
 
   const handleCreateClick = async () => {
     try {
@@ -80,7 +86,10 @@ export const useApiKeyConfig = () => {
       await updateUserIdentity({
         openai_api_key: openAiApiKey,
       });
-      void fetchUserIdentity();
+      void queryClient.invalidateQueries({
+        queryKey: [USER_IDENTITY_DATA_KEY],
+      });
+
       publish({
         variant: "success",
         text: "OpenAI API Key updated",
@@ -104,7 +113,9 @@ export const useApiKeyConfig = () => {
         text: "OpenAI API Key removed",
       });
 
-      void fetchUserIdentity();
+      void queryClient.invalidateQueries({
+        queryKey: [USER_IDENTITY_DATA_KEY],
+      });
     } catch (error) {
       console.error(error);
     } finally {

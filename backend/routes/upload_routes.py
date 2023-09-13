@@ -1,10 +1,9 @@
-import os
 from typing import Optional
 from uuid import UUID
 
 from auth import AuthBearer, get_current_user
 from fastapi import APIRouter, Depends, Query, Request, UploadFile
-from models import Brain, File, UserIdentity
+from models import Brain, File, UserIdentity, UserUsage
 from models.databases.supabase.notifications import (
     CreateNotificationProperties,
     NotificationUpdatableProperties,
@@ -12,17 +11,14 @@ from models.databases.supabase.notifications import (
 from models.notifications import NotificationsStatusEnum
 from repository.brain import get_brain_details
 from repository.notification.add_notification import add_notification
-from repository.notification.update_notification import (
-    update_notification_by_id,
-)
+from repository.notification.update_notification import update_notification_by_id
 from repository.user_identity import get_user_identity
-from utils.file import convert_bytes, get_file_size
-from utils.processors import filter_file
-
 from routes.authorizations.brain_authorization import (
     RoleEnum,
     validate_brain_authorization,
 )
+from utils.file import convert_bytes, get_file_size
+from utils.processors import filter_file
 
 upload_router = APIRouter()
 
@@ -58,11 +54,17 @@ async def upload_file(
     )
 
     brain = Brain(id=brain_id)
+    userDailyUsage = UserUsage(
+        id=current_user.id,
+        email=current_user.email,
+        openai_api_key=current_user.openai_api_key,
+    )
+    userSettings = userDailyUsage.get_user_settings()
 
     if request.headers.get("Openai-Api-Key"):
-        brain.max_brain_size = int(os.getenv("MAX_BRAIN_SIZE_WITH_KEY", 209715200))
+        brain.max_brain_size = userSettings.get("max_brain_size", 1000000000)
 
-    remaining_free_space = brain.remaining_brain_size
+    remaining_free_space = userSettings.get("max_brain_size", 1000000000)
 
     file_size = get_file_size(uploadFile)
 

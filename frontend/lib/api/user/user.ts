@@ -1,6 +1,8 @@
 import { AxiosInstance } from "axios";
 import { UUID } from "crypto";
 
+import { UserStats } from "@/lib/types/User";
+
 export type UserIdentityUpdatableProperties = {
   openai_api_key?: string | null;
 };
@@ -23,3 +25,7 @@ export const getUserIdentity = async (
 
   return data;
 };
+
+export const getUser = async (
+  axiosInstance: AxiosInstance
+): Promise<UserStats> => (await axiosInstance.get<UserStats>("/user")).data;

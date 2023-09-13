@@ -1,4 +1,5 @@
 /* eslint-disable max-lines */
+import { useQuery } from "@tanstack/react-query";
 import { FormEvent, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 
@@ -7,10 +8,13 @@ import {
   getChatConfigFromLocalStorage,
   saveChatConfigInLocalStorage,
 } from "@/lib/api/chat/chat.local";
+import { USER_DATA_KEY, USER_IDENTITY_DATA_KEY } from "@/lib/api/user/config";
+import { useUserApi } from "@/lib/api/user/useUserApi";
 import { defaultBrainConfig } from "@/lib/config/defaultBrainConfig";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 import { ChatConfig } from "@/lib/context/ChatProvider/types";
 import { defineMaxTokens } from "@/lib/helpers/defineMaxTokens";
+import { getAccessibleModels } from "@/lib/helpers/getAccessibleModels";
 import { useToast } from "@/lib/hooks";
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
@@ -19,6 +23,16 @@ export const useConfigModal = (chatId?: string) => {
   const [isConfigModalOpen, setIsConfigModalOpen] = useState(false);
   const { getBrain } = useBrainApi();
   const { currentBrain } = useBrainContext();
+  const { getUser, getUserIdentity } = useUserApi();
+
+  const { data: userData } = useQuery({
+    queryKey: [USER_DATA_KEY],
+    queryFn: getUser,
+  });
+  const { data: userIdentityData } = useQuery({
+    queryKey: [USER_IDENTITY_DATA_KEY],
+    queryFn: getUserIdentity,
+  });
 
   const defaultValues: ChatConfig = {};
 
@@ -29,6 +43,11 @@ export const useConfigModal = (chatId?: string) => {
   const model = watch("model");
   const temperature = watch("temperature");
   const maxTokens = watch("maxTokens");
+
+  const accessibleModels = getAccessibleModels({
+    openAiKey: userIdentityData?.openai_api_key,
+    userData,
+  });
 
   useEffect(() => {
     const fetchChatConfig = async () => {
@@ -104,5 +123,6 @@ export const useConfigModal = (chatId?: string) => {
     model,
     temperature,
     maxTokens,
+    accessibleModels,
   };
 };
