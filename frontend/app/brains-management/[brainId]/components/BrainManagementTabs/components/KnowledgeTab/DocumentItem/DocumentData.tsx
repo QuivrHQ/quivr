@@ -5,7 +5,7 @@ import { useAxios } from "@/lib/hooks";
 
 import { useEventTracking } from "@/services/analytics/useEventTracking";
 import { useTranslation } from "react-i18next";
-import { useSupabase } from "../../../lib/context/SupabaseProvider";
+import { useSupabase } from "../../../../../../../../lib/context/SupabaseProvider";
 
 interface DocumentDataProps {
   documentName: string;
