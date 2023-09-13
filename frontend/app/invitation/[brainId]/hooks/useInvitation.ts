@@ -124,7 +124,7 @@ export const useInvitation = () => {
       }
     } finally {
       setIsProcessingRequest(false);
-      void router.push("/upload");
+      void router.push("/chat");
     }
   };
 

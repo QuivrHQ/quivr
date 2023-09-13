@@ -58,7 +58,7 @@ export const useLogin = () => {
 
       const previousPage = sessionStorage.getItem("previous-page");
       if (previousPage === null) {
-        redirect("/upload");
+        redirect("/chat");
       } else {
         sessionStorage.removeItem("previous-page");
         redirect(previousPage);

@@ -5,7 +5,7 @@ import Hero from "./Hero";
 
 const HomePage = (): JSX.Element => {
   if (process.env.NEXT_PUBLIC_ENV === "local") {
-    redirect("/upload");
+    redirect("/chat");
   }
 
   return (
