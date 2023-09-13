@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 import { act, renderHook } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
@@ -46,6 +47,21 @@ vi.mock("@/lib/hooks", async () => {
   };
 });
 
+vi.mock("@tanstack/react-query", async () => {
+  const actual = await vi.importActual<typeof import("@tanstack/react-query")>(
+    "@tanstack/react-query"
+  );
+
+  return {
+    ...actual,
+    useQuery: () => ({
+      data: {},
+    }),
+    useQueryClient: () => ({
+      invalidateQueries: vi.fn(),
+    }),
+  };
+});
 describe("useApiKeyConfig", () => {
   afterEach(() => {
     vi.restoreAllMocks();
