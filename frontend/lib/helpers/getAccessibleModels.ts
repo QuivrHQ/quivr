@@ -2,7 +2,7 @@ import { UserStats } from "@/lib/types/User";
 import { freeModels, paidModels } from "@/lib/types/brainConfig";
 
 type GetAccessibleModelsInput = {
-  openAiKey?: string;
+  openAiKey?: string | null;
   userData?: UserStats;
 };
 export const getAccessibleModels = ({
@@ -12,7 +12,7 @@ export const getAccessibleModels = ({
   if (userData?.models !== undefined) {
     return userData.models;
   }
-  if (openAiKey !== undefined) {
+  if (openAiKey !== undefined && openAiKey !== null) {
     return paidModels as unknown as string[];
   }
 

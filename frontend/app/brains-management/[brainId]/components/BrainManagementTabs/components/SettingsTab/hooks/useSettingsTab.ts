@@ -16,9 +16,9 @@ import { defaultBrainConfig } from "@/lib/config/defaultBrainConfig";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 import { Brain } from "@/lib/context/BrainProvider/types";
 import { defineMaxTokens } from "@/lib/helpers/defineMaxTokens";
+import { getAccessibleModels } from "@/lib/helpers/getAccessibleModels";
 import { useToast } from "@/lib/hooks";
 
-import { getAccessibleModels } from "../utils/getAccessibleModels";
 import { validateOpenAIKey } from "../utils/validateOpenAIKey";
 
 type UseSettingsTabProps = {
