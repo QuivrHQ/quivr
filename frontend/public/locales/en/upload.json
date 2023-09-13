@@ -5,7 +5,7 @@
     "dragAndDrop":"Drag and drop files here, or click to browse",
     "webSite": "Insert website URL",
     "success": "File uploaded successfully",
-    "error": "Failed to upload file: {{message}}",
+    "uploadFailed": "Failed to upload file: {{message}}",
     "maxSizeError": "File too big",
     "alreadyAdded": "{{fileName}} was already added",
     "addFiles": "Please, add files to upload",

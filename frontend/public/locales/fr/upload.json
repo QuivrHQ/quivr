@@ -5,7 +5,7 @@
     "dragAndDrop": "Glissez et déposez les fichiers ici, ou cliquez pour parcourir",
     "webSite": "Insérer l'URL du site web",
     "success": "Fichier téléchargé avec succès",
-    "error": "Échec du téléchargement du fichier : {{message}}",
+    "uploadFailed": "Échec du téléchargement du fichier : {{message}}",
     "maxSizeError": "Fichier trop volumineux",
     "alreadyAdded": "{{fileName}} a déjà été ajouté",
     "addFiles": "Veuillez ajouter des fichiers à télécharger",

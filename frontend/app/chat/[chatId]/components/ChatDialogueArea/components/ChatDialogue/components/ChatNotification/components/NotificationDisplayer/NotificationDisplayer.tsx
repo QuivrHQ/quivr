@@ -22,6 +22,11 @@ export const NotificationDisplayer = ({
   const { message, status, name } = JSON.parse(
     nonParsedMessage.replace(/'/g, '"')
   ) as NotificationMessage;
+  console.log({
+    message,
+    status,
+    name,
+  });
 
   return (
     <>

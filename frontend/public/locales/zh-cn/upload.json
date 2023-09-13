@@ -5,7 +5,7 @@
     "dragAndDrop": "将文件拖放到此处，或单击浏览",
     "webSite": "插入网站URL",
     "success": "文件上传成功",
-    "error": "上传文件失败：{{message}}",
+    "uploadFailed": "上传文件失败：{{message}}",
     "maxSizeError": "文件太大",
     "alreadyAdded": "已添加 {{filename}}",
     "addFiles": "请添加要上传的文件",
