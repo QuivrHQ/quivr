@@ -1,4 +1,3 @@
-import base64
 from typing import Optional
 from uuid import UUID
 
@@ -81,12 +80,12 @@ async def upload_file(
         openai_api_key = get_user_identity(current_user.id).openai_api_key
 
     file_content = await uploadFile.read()
+    # filename_with_brain_id = str(brain_id) + "/" + str(uploadFile.filename)
+    filename_with_brain_id = str(brain_id) + "/" + str(uploadFile.filename)
 
-    res = upload_file_storage(file_content, uploadFile.filename)
-    print(res)
+    upload_file_storage(file_content, filename_with_brain_id)
     process_file_and_notify.delay(
-        file=base64.b64encode(file_content),
-        file_name=uploadFile.filename,
+        file_name=filename_with_brain_id,
         enable_summarization=enable_summarization,
         brain_id=brain_id,
         openai_api_key=openai_api_key,

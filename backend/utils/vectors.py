@@ -3,9 +3,9 @@ from typing import List
 from uuid import UUID
 
 from langchain.embeddings.openai import OpenAIEmbeddings
-from pydantic import BaseModel
 from logger import get_logger
 from models.settings import get_documents_vector_store, get_embeddings, get_supabase_db
+from pydantic import BaseModel
 
 logger = get_logger(__name__)
 
@@ -76,6 +76,5 @@ def get_unique_files_from_vector_ids(vectors_ids: List[str]):
         vectors_responses = [future.result() for future in futures]
 
     documents = [item for sublist in vectors_responses for item in sublist]
-    print("document", documents)
     unique_files = [dict(t) for t in set(tuple(d.items()) for d in documents)]
     return unique_files

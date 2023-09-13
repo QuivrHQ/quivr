@@ -4,6 +4,8 @@ from uuid import UUID
 from logger import get_logger
 from models.databases.supabase.supabase import SupabaseDB
 from models.settings import get_supabase_client, get_supabase_db
+from models.databases.supabase.supabase import SupabaseDB
+from models.settings import BrainRateLimiting, get_supabase_client, get_supabase_db
 from pydantic import BaseModel
 from supabase.client import Client
 from utils.vectors import get_unique_files_from_vector_ids
@@ -105,4 +107,6 @@ class Brain(BaseModel):
         return self.files
 
     def delete_file_from_brain(self, file_name: str):
+        file_name_with_brain_id = f"{self.id}/{file_name}"
+        self.supabase_client.storage.from_("quivr").remove([file_name_with_brain_id])
         return self.supabase_db.delete_file_from_brain(self.id, file_name)  # type: ignore
