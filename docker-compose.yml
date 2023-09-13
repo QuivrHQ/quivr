@@ -62,6 +62,9 @@ services:
   backend-crawl:
     env_file:
       - ./backend/.env
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
     build:
       context: backend
       dockerfile: Dockerfile
