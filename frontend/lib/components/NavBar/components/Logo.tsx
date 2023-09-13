@@ -3,7 +3,7 @@ import Link from "next/link";
 
 export const Logo = (): JSX.Element => {
   return (
-    <Link href={"/"} className="flex items-center gap-4">
+    <Link href={"/chat"} className="flex items-center gap-4">
       <Image
         className="rounded-full"
         src={"/logo.png"}

@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 
-import { requiredRolesForUpload } from "@/app/upload/config";
+import { requiredRolesForUpload } from "@/lib/config/upload";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types

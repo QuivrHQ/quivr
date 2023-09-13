@@ -1,8 +1,8 @@
-import { redirect } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { useSupabase } from "@/lib/context/SupabaseProvider";
+import { redirectToPreviousPageOrChatPage } from "@/lib/helpers/redirectToPreviousPageOrChatPage";
 import { useToast } from "@/lib/hooks";
 import { useEventTracking } from "@/services/analytics/useEventTracking";
 
@@ -25,28 +25,28 @@ export const useLogin = () => {
       password: password,
     });
     if (error) {
-      console.log(error.message)
+      console.log(error.message);
       if (error.message.includes("Failed")) {
         publish({
           variant: "danger",
-          text: t("Failedtofetch",{ ns: 'login' })
+          text: t("Failedtofetch", { ns: "login" }),
         });
       } else if (error.message.includes("Invalid")) {
         publish({
           variant: "danger",
-          text: t("Invalidlogincredentials",{ ns: 'login' })
+          text: t("Invalidlogincredentials", { ns: "login" }),
         });
       } else {
         publish({
           variant: "danger",
           // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-call
-          text: error.message
+          text: error.message,
         });
       }
     } else {
       publish({
         variant: "success",
-        text: t("loginSuccess",{ ns: 'login' })
+        text: t("loginSuccess", { ns: "login" }),
       });
     }
     setIsPending(false);
@@ -55,14 +55,7 @@ export const useLogin = () => {
   useEffect(() => {
     if (session?.user !== undefined) {
       void track("SIGNED_IN");
-
-      const previousPage = sessionStorage.getItem("previous-page");
-      if (previousPage === null) {
-        redirect("/upload");
-      } else {
-        sessionStorage.removeItem("previous-page");
-        redirect(previousPage);
-      }
+      redirectToPreviousPageOrChatPage();
     }
   }, [session?.user]);
 
