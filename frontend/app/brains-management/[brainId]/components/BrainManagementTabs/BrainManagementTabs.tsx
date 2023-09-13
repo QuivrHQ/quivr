@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 
 import Button from "@/lib/components/ui/Button";
 
-import { BrainTabTrigger, PeopleTab } from "./components";
+import { BrainTabTrigger, KnowledgeTab, PeopleTab } from "./components";
 import ConfirmationDeleteModal from "./components/Modals/ConfirmationDeleteModal";
 import { SettingsTab } from "./components/SettingsTab/SettingsTab";
 import { useBrainManagementTabs } from "./hooks/useBrainManagementTabs";
@@ -60,7 +60,7 @@ export const BrainManagementTabs = (): JSX.Element => {
           <PeopleTab brainId={brainId} />
         </Content>
         <Content value="knowledge">
-          <p>{t("comingSoon")}</p>
+          <KnowledgeTab brainId={brainId} />
         </Content>
       </div>
       <div className="flex justify-center">
