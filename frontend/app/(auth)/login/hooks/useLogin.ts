@@ -1,8 +1,8 @@
-import { redirect } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { useSupabase } from "@/lib/context/SupabaseProvider";
+import { redirectToPreviousPageOrChatPage } from "@/lib/helpers/redirectToPreviousPageOrChatPage";
 import { useToast } from "@/lib/hooks";
 import { useEventTracking } from "@/services/analytics/useEventTracking";
 
@@ -55,14 +55,7 @@ export const useLogin = () => {
   useEffect(() => {
     if (session?.user !== undefined) {
       void track("SIGNED_IN");
-
-      const previousPage = sessionStorage.getItem("previous-page");
-      if (previousPage === null) {
-        redirect("/chat");
-      } else {
-        sessionStorage.removeItem("previous-page");
-        redirect(previousPage);
-      }
+      redirectToPreviousPageOrChatPage();
     }
   }, [session?.user]);
 
