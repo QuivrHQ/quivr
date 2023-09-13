@@ -99,6 +99,7 @@ def process_crawl_and_notify(
             )
         )
     else:
+        loop = asyncio.get_event_loop()
         message = loop.run_until_complete(
             process_github(
                 repo=crawl_website.url,
