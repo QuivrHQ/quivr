@@ -4,8 +4,6 @@ from uuid import UUID
 from logger import get_logger
 from models.databases.supabase.supabase import SupabaseDB
 from models.settings import get_supabase_client, get_supabase_db
-from models.databases.supabase.supabase import SupabaseDB
-from models.settings import BrainRateLimiting, get_supabase_client, get_supabase_db
 from pydantic import BaseModel
 from supabase.client import Client
 from utils.vectors import get_unique_files_from_vector_ids
