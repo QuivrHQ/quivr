@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.0.71 (2023-09-14)
+
+## What's Changed
+* feat: the good user management by @StanGirard in https://github.com/StanGirard/quivr/pull/1158
+* feat: add knowledge tab on brains settings page by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1163
+* feat: update header and improve ux by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1164
+* feat: submit upload on Enter by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1160
+* feat: make error messages more clear by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1166
+
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.70...v0.0.71
+
 ## 0.0.70 (2023-09-12)
 
 ## What's Changed
