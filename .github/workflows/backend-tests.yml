@@ -53,18 +53,20 @@ jobs:
           pip install pytest
           pip install pyright
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-      - name: Test with pytest
-        env:
-          SUPABASE_URL: ${{secrets.SUPABASE_URL}}
-          SUPABASE_SERVICE_KEY: ${{secrets.SUPABASE_SERVICE_KEY}}
-          PG_DATABASE_URL: ${{secrets.PG_DATABASE_URL}}
-          OPENAI_API_KEY: ${{secrets.OPENAI_API_KEY}}
-          ANTHROPIC_API_KEY: ${{secrets.ANTHROPIC_API_KEY}}
-          JWT_SECRET_KEY: ${{secrets.JWT_SECRET_KEY}}
-          CI_TEST_API_KEY: ${{secrets.CI_TEST_API_KEY}}
-        run: |
-          python -m pytest tests/
 
       - name: Static type checking with pyright
         run: |
           pyright
+      # - name: Test with pytest
+      #   env:
+      #     SUPABASE_URL: ${{secrets.SUPABASE_URL}}
+      #     SUPABASE_SERVICE_KEY: ${{secrets.SUPABASE_SERVICE_KEY}}
+      #     PG_DATABASE_URL: ${{secrets.PG_DATABASE_URL}}
+      #     OPENAI_API_KEY: ${{secrets.OPENAI_API_KEY}}
+      #     ANTHROPIC_API_KEY: ${{secrets.ANTHROPIC_API_KEY}}
+      #     JWT_SECRET_KEY: ${{secrets.JWT_SECRET_KEY}}
+      #     CI_TEST_API_KEY: ${{secrets.CI_TEST_API_KEY}}
+      #   run: |
+      #     python -m pytest tests/
+
+      

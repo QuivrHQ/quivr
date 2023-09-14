@@ -76,16 +76,8 @@ jobs:
             container: "quivr"
           - name: "quivr-chat"
             service: "preview-service-chat"
-            task_definition: ".aws/task_definition_preview_chat.json"
+            task_definition: ".aws/task_definition_preview_worker.json"
             container: "quivr-chat"
-          - name: "quivr-upload"
-            service: "preview-service-upload"
-            task_definition: ".aws/task_definition_preview_upload.json"
-            container: "quivr-upload"
-          - name: "quivr-crawl"
-            service: "preview-service-crawl"
-            task_definition: ".aws/task_definition_preview_crawl.json"
-            container: "quivr-crawl"
 
     steps:
     - name: Checkout

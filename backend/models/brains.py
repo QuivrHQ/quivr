@@ -105,4 +105,6 @@ class Brain(BaseModel):
         return self.files
 
     def delete_file_from_brain(self, file_name: str):
+        file_name_with_brain_id = f"{self.id}/{file_name}"
+        self.supabase_client.storage.from_("quivr").remove([file_name_with_brain_id])
         return self.supabase_db.delete_file_from_brain(self.id, file_name)  # type: ignore
