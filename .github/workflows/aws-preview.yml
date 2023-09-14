@@ -75,7 +75,7 @@ jobs:
             task_definition: ".aws/task_definition_preview.json"
             container: "quivr"
           - name: "quivr-chat"
-            service: "preview-service-chat"
+            service: "preview-worker"
             task_definition: ".aws/task_definition_preview_worker.json"
             container: "quivr-chat"
 
