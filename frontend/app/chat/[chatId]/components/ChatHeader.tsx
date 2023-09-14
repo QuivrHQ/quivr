@@ -8,16 +8,17 @@ export const ChatHeader = (): JSX.Element => {
 
   if (messages.length !== 0) {
     return (
-      <h1 className="text-3xl font-bold text-center">
+      <h1 className="hidden lg:block text-3xl font-bold text-center">
         {t("chat_title_intro")}{" "}
         <span className="text-purple-500">{t("brains")}</span>
       </h1>
     );
   }
-
+    
   return (
-    <h1 className="text-3xl font-bold text-center">
+    <h1 className="hidden lg:block text-3xl font-bold text-center">
       {t("chat_title_intro")}{" "}
+      
       <span className="text-purple-500">{t("brains")}</span>
       {" !! "}
       <br />

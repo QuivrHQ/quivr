@@ -20,7 +20,7 @@ export const ChatBar = ({
     useBrainContext();
 
   return (
-    <div className="flex flex-row flex-1 w-full item-start">
+    <div className="flex flex-row flex-1 w-full item-start overflow-y-auto max-h-[10em] whitespace-pre-wrap">
       {currentBrain !== undefined && (
         <MentionItem
           text={currentBrain.name}

@@ -7,6 +7,10 @@ services:
     build:
       context: frontend
       dockerfile: Dockerfile.dev
+    volumes:
+      - ./frontend/:/app
+      - /app/node_modules
+      - /app/.next
     container_name: web
     restart: always
     ports:
