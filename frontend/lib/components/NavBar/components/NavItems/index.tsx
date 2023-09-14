@@ -42,7 +42,7 @@ export const NavItems = ({
           </NavLink>
         </>
       )}
-      <div className="flex sm:flex-1 sm:justify-end flex-col items-center justify-center sm:flex-row gap-5 sm:gap-2">
+      <div className="flex sm:flex-1 sm:justify-end flex-row items-center justify-center sm:flex-row gap-5 sm:gap-2">
         {isUserLoggedIn && (
           <>
             <BrainManagementButton />
