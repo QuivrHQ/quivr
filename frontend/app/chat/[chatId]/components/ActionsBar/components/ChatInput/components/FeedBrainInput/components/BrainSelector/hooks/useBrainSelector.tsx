@@ -18,8 +18,12 @@ import { useMentionPlugin } from "./helpers/MentionPlugin";
 import { useMentionState } from "./helpers/MentionState";
 import { MentionTriggerType } from "../types";
 
+type UseBrainSelectorProps = {
+  onSubmit: () => void;
+};
+
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-export const useBrainSelector = () => {
+export const useBrainSelector = ({ onSubmit }: UseBrainSelectorProps) => {
   const {
     currentBrainId,
     currentPromptId,
@@ -105,6 +109,12 @@ export const useBrainSelector = () => {
         }
 
         return "backspace";
+      }
+
+      if (e.key === "Enter" && !e.shiftKey) {
+        onSubmit();
+
+        return "submit";
       }
 
       if (e.key === "ArrowUp" || e.key === "ArrowDown") {

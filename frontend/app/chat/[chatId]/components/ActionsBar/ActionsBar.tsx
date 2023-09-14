@@ -15,6 +15,7 @@ export const ActionsBar = (): JSX.Element => {
   const { addContent, contents, feedBrain, removeContent } =
     useKnowledgeUploader({
       setHasPendingRequests,
+      setShouldDisplayUploadCard,
     });
 
   const { t } = useTranslation(["chat"]);

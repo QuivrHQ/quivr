@@ -17,10 +17,12 @@ import { FeedItemCrawlType, FeedItemType, FeedItemUploadType } from "../types";
 
 type UseKnowledgeUploaderProps = {
   setHasPendingRequests: (hasPendingRequests: boolean) => void;
+  setShouldDisplayUploadCard: (shouldDisplayUploadCard: boolean) => void;
 };
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const useKnowledgeUploader = ({
   setHasPendingRequests,
+  setShouldDisplayUploadCard,
 }: UseKnowledgeUploaderProps) => {
   const [contents, setContents] = useState<FeedItemType[]>([]);
   const { publish } = useToast();
@@ -128,7 +130,16 @@ export const useKnowledgeUploader = ({
       return;
     }
 
+    if (contents.length === 0) {
+      publish({
+        variant: "danger",
+        text: t("addFiles"),
+      });
+
+      return;
+    }
     try {
+      setShouldDisplayUploadCard(false);
       setHasPendingRequests(true);
       const currentChatId = chatId ?? (await createChat("New Chat")).chat_id;
       const uploadPromises = files.map((file) =>
