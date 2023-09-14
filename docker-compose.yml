@@ -6,7 +6,7 @@ services:
       - ./frontend/.env
     build:
       context: frontend
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.dev
     container_name: web
     restart: always
     ports:
