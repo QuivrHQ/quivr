@@ -24,6 +24,7 @@ services:
       - ./backend/:/code/
     depends_on:
       - redis
+      - worker
     ports:
       - 5050:5050
     
@@ -43,10 +44,11 @@ services:
     container_name: worker
     command: celery -A celery_worker worker -l info
     restart: always
-    volumes:
-      - ./backend/:/code/
     depends_on:
       - redis
+    volumes:
+      - ./backend/:/code/
+    
     
   flower:
     env_file:

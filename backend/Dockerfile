@@ -4,6 +4,8 @@ FROM python:3.11-slim-bullseye
 # Install GEOS library, Rust, and other dependencies, then clean up
 RUN apt-get update && apt-get install -y \
     libgeos-dev \
+    libcurl4-openssl-dev \
+    libssl-dev \
     pandoc \
     binutils \
     curl \

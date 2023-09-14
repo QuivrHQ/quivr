@@ -13,11 +13,32 @@ from parsers.github import process_github
 from repository.notification.update_notification import update_notification_by_id
 from utils.processors import filter_file
 
-celery = Celery(__name__)
-celery.conf.broker_url = os.environ.get("CELERY_BROKER_URL", "redis://localhost:6379")
-celery.conf.result_backend = os.environ.get(
-    "CELERY_RESULT_BACKEND", "redis://localhost:6379"
-)
+CELERY_BROKER_URL = os.getenv("CELERY_BROKER_URL", "")
+
+if CELERY_BROKER_URL.startswith("sqs"):
+    broker_transport_options = {
+        "quivr-preview.fifo": {
+            "my-q": {
+                "url": CELERY_BROKER_URL,
+            }
+        }
+    }
+    celery = Celery(
+        __name__,
+        broker=CELERY_BROKER_URL,
+        task_serializer="json",
+        broker_transport_options=broker_transport_options,
+    )
+    celery.conf.task_default_queue = "quivr-preview.fifo"
+elif CELERY_BROKER_URL.startswith("redis"):
+    celery = Celery(
+        __name__,
+        broker=CELERY_BROKER_URL,
+        backend=CELERY_BROKER_URL,
+        task_serializer="json",
+    )
+else:
+    raise ValueError(f"Unsupported broker URL: {CELERY_BROKER_URL}")
 
 
 @celery.task(name="process_file_and_notify")
