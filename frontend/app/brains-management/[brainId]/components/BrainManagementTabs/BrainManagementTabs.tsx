@@ -25,11 +25,11 @@ export const BrainManagementTabs = (): JSX.Element => {
 
   return (
     <Root
-      className="shadow-md min-h-[50%] dark:shadow-primary/25 hover:shadow-xl transition-shadow rounded-xl overflow-hidden bg-white dark:bg-black border border-black/10 dark:border-white/25 p-4 pt-10"
+      className="flex flex-col w-full h-full shadow-md dark:shadow-primary/25 hover:shadow-xl transition-shadow rounded-xl overflow-hidden bg-white dark:bg-black border border-black/10 dark:border-white/25 p-4 md:p-10"
       value={selectedTab}
     >
       <List
-        className="flex justify-between"
+        className="flex flex-col md:flex-row justify-between space-y-2 md:space-y-0 mb-4"
         aria-label={t("subtitle", { ns: "config" })}
       >
         <BrainTabTrigger
@@ -52,7 +52,7 @@ export const BrainManagementTabs = (): JSX.Element => {
         />
       </List>
 
-      <div className="p-20 pt-5">
+      <div className="flex-1 p-4 md:p-20">
         <Content value="settings">
           <SettingsTab brainId={brainId} />
         </Content>
@@ -63,14 +63,16 @@ export const BrainManagementTabs = (): JSX.Element => {
           <KnowledgeTab brainId={brainId} />
         </Content>
       </div>
-      <div className="flex justify-center">
+
+      <div className="flex justify-center mt-4">
         <Button
-          className="px-20 py-2 bg-red-500 text-white rounded-md"
+          className="px-8 md:px-20 py-2 bg-red-500 text-white rounded-md"
           onClick={() => setIsDeleteModalOpen(true)}
         >
           {t("deleteButton", { ns: "delete_brain" })}
         </Button>
       </div>
+
       <ConfirmationDeleteModal
         isOpen={isDeleteModalOpen}
         setOpen={setIsDeleteModalOpen}
@@ -79,3 +81,5 @@ export const BrainManagementTabs = (): JSX.Element => {
     </Root>
   );
 };
+
+export default BrainManagementTabs;
