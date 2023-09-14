@@ -14,10 +14,11 @@ from repository.notification.update_notification import update_notification_by_i
 from utils.processors import filter_file
 
 CELERY_BROKER_URL = os.getenv("CELERY_BROKER_URL", "")
+CELERY_BROKER_QUEUE_URL = os.getenv("CELERY_BROKER_QUEUE_URL", "")
 
 if CELERY_BROKER_URL.startswith("sqs"):
     broker_transport_options = {
-        "quivr-preview.fifo": {
+        CELERY_BROKER_QUEUE_URL: {
             "my-q": {
                 "url": CELERY_BROKER_URL,
             }
@@ -29,7 +30,7 @@ if CELERY_BROKER_URL.startswith("sqs"):
         task_serializer="json",
         broker_transport_options=broker_transport_options,
     )
-    celery.conf.task_default_queue = "quivr-preview.fifo"
+    celery.conf.task_default_queue = CELERY_BROKER_QUEUE_URL
 elif CELERY_BROKER_URL.startswith("redis"):
     celery = Celery(
         __name__,
