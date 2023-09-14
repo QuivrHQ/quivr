@@ -4,9 +4,9 @@ import { useChatContext } from "@/lib/context";
 
 export const ChatHeader = (): JSX.Element => {
   const { t } = useTranslation(["chat"]);
-  const { history } = useChatContext();
+  const { messages } = useChatContext();
 
-  if (history.length !== 0) {
+  if (messages.length !== 0) {
     return (
       <h1 className="text-3xl font-bold text-center">
         {t("chat_title_intro")}{" "}

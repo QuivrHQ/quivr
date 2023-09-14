@@ -1,5 +1,28 @@
 # Changelog
 
+## 0.0.71 (2023-09-14)
+
+## What's Changed
+* feat: the good user management by @StanGirard in https://github.com/StanGirard/quivr/pull/1158
+* feat: add knowledge tab on brains settings page by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1163
+* feat: update header and improve ux by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1164
+* feat: submit upload on Enter by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1160
+* feat: make error messages more clear by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1166
+
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.70...v0.0.71
+
+## 0.0.70 (2023-09-12)
+
+## What's Changed
+* feat: add notifications components by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1148
+* feat: add polling for pending notifications by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1152
+* fix(selectedBrain): prevent picking brainId from local storage by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1154
+* feat: update isValidUrl function by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1155
+
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.69...v0.0.70
+
 ## 0.0.69 (2023-09-08)
 
 ## What's Changed

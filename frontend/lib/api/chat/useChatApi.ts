@@ -6,8 +6,8 @@ import {
   ChatUpdatableProperties,
   createChat,
   deleteChat,
+  getChatItems,
   getChats,
-  getHistory,
   updateChat,
 } from "./chat";
 
@@ -22,7 +22,7 @@ export const useChatApi = () => {
     deleteChat: async (chatId: string) => deleteChat(chatId, axiosInstance),
     addQuestion: async (props: AddQuestionParams) =>
       addQuestion(props, axiosInstance),
-    getHistory: async (chatId: string) => getHistory(chatId, axiosInstance),
+    getChatItems: async (chatId: string) => getChatItems(chatId, axiosInstance),
     updateChat: async (chatId: string, props: ChatUpdatableProperties) =>
       updateChat(chatId, props, axiosInstance),
   };

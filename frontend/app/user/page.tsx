@@ -4,45 +4,34 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import Spinner from "@/lib/components/ui/Spinner";
-import { useAxios } from "@/lib/hooks";
 import { UserStats } from "@/lib/types/User";
 
+import { USER_DATA_KEY } from "@/lib/api/user/config";
+import { useUserApi } from "@/lib/api/user/useUserApi";
 import { useSupabase } from "@/lib/context/SupabaseProvider";
 import { redirectToLogin } from "@/lib/router/redirectToLogin";
+import { useQuery } from "@tanstack/react-query";
 import { UserStatistics } from "./components/UserStatistics";
 
 const UserPage = (): JSX.Element => {
   const [userStats, setUserStats] = useState<UserStats>();
   const { session } = useSupabase();
-  const { axiosInstance } = useAxios();
-  const { t } = useTranslation(["translation","user"]);
+  const { t } = useTranslation(["translation", "user"]);
+  const { getUser } = useUserApi();
 
+  const { data: userData } = useQuery({
+    queryKey: [USER_DATA_KEY],
+    queryFn: getUser,
+  });
+
+  useEffect(() => {
+    if (userData !== undefined) {
+      setUserStats(userData);
+    }
+  }, [userData]);
   if (session === null) {
     redirectToLogin();
   }
-
-  useEffect(() => {
-    const fetchUserStats = async () => {
-      try {
-        console.log(
-          `Fetching user stats from ${process.env.NEXT_PUBLIC_BACKEND_URL}/user`
-        );
-        const response = await axiosInstance.get<UserStats>(
-          `${process.env.NEXT_PUBLIC_BACKEND_URL}/user`,
-          {
-            headers: {
-              Authorization: `Bearer ${session.access_token}`,
-            },
-          }
-        );
-        setUserStats(response.data);
-      } catch (error) {
-        console.error("Error fetching user stats", error);
-        setUserStats(undefined);
-      }
-    };
-    fetchUserStats();
-  }, [session.access_token]);
 
   return (
     <main className="w-full flex flex-col pt-10">
@@ -54,7 +43,7 @@ const UserPage = (): JSX.Element => {
             </>
           ) : (
             <div className="flex items-center justify-center">
-              <span>{t("fetching", {ns: "user"})}</span>
+              <span>{t("fetching", { ns: "user" })}</span>
               <Spinner />
             </div>
           )}

@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable max-lines */
 
 import { UUID } from "crypto";
@@ -10,10 +8,6 @@ import Button from "@/lib/components/ui/Button";
 import { Divider } from "@/lib/components/ui/Divider";
 import Field from "@/lib/components/ui/Field";
 import { TextArea } from "@/lib/components/ui/TextArea";
-import {
-  freeModels,
-  paidModels,
-} from "@/lib/context/BrainConfigProvider/types";
 import { defineMaxTokens } from "@/lib/helpers/defineMaxTokens";
 import { SaveButton } from "@/shared/SaveButton";
 
@@ -29,7 +23,7 @@ export const SettingsTab = ({ brainId }: SettingsTabProps): JSX.Element => {
   const {
     handleSubmit,
     register,
-    openAiKey,
+
     temperature,
     maxTokens,
     model,
@@ -41,6 +35,7 @@ export const SettingsTab = ({ brainId }: SettingsTabProps): JSX.Element => {
     promptId,
     pickPublicPrompt,
     removeBrainPrompt,
+    accessibleModels,
   } = useSettingsTab({ brainId });
 
   return (
@@ -107,13 +102,11 @@ export const SettingsTab = ({ brainId }: SettingsTabProps): JSX.Element => {
             void handleSubmit(false); // Trigger form submission
           }}
         >
-          {(openAiKey !== undefined ? paidModels : freeModels).map(
-            (availableModel) => (
-              <option value={availableModel} key={availableModel}>
-                {availableModel}
-              </option>
-            )
-          )}
+          {accessibleModels.map((availableModel) => (
+            <option value={availableModel} key={availableModel}>
+              {availableModel}
+            </option>
+          ))}
         </select>
       </fieldset>
       <fieldset className="w-full flex mt-4">

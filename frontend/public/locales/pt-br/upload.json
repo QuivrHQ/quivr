@@ -5,7 +5,7 @@
     "dragAndDrop": "Arraste e solte os arquivos aqui, ou clique para procurar",
     "webSite": "Insira o URL do site",
     "success": "Arquivo enviado com sucesso",
-    "error": "Falha ao enviar arquivo: {{message}}",
+    "uploadFailed": "Falha ao enviar arquivo: {{message}}",
     "maxSizeError": "Arquivo muito grande",
     "alreadyAdded": "{{fileName}} já foi adicionado",
     "addFiles": "Por favor, adicione arquivos para enviar",

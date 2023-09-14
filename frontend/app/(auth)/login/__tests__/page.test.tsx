@@ -31,7 +31,7 @@ describe("Login component", () => {
   it("redirects to /upload if user is already signed in and is not coming from another page", () => {
     render(<Login />);
     expect(mockRedirect).toHaveBeenCalledTimes(1);
-    expect(mockRedirect).toHaveBeenCalledWith("/upload");
+    expect(mockRedirect).toHaveBeenCalledWith("/chat");
   });
 
   it('redirects to "/previous-page" if user is already signed in and previous page is set', () => {

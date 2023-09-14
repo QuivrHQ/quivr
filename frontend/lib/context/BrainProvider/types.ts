@@ -4,7 +4,7 @@ import { BrainRoleType } from "@/lib/components/BrainUsers/types";
 import { Document } from "@/lib/types/Document";
 
 import { useBrainProvider } from "./hooks/useBrainProvider";
-import { Model } from "../BrainConfigProvider/types";
+import { Model } from "../../types/brainConfig";
 
 export type Brain = {
   id: UUID;

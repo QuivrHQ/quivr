@@ -1,25 +1,15 @@
-import os
-import shutil
-from tempfile import SpooledTemporaryFile
 from typing import Optional
 from uuid import UUID
 
 from auth import AuthBearer, get_current_user
+from celery_worker import process_crawl_and_notify
 from crawl.crawler import CrawlWebsite
-from fastapi import APIRouter, Depends, Query, Request, UploadFile
-from models import Brain, File, UserIdentity
-from models.databases.supabase.notifications import (
-    CreateNotificationProperties,
-    NotificationUpdatableProperties,
-)
+from fastapi import APIRouter, Depends, Query, Request
+from models import Brain, UserIdentity, UserUsage
+from models.databases.supabase.notifications import CreateNotificationProperties
 from models.notifications import NotificationsStatusEnum
-from parsers.github import process_github
 from repository.notification.add_notification import add_notification
-from repository.notification.update_notification import (
-    update_notification_by_id,
-)
 from utils.file import convert_bytes
-from utils.processors import filter_file
 
 crawl_router = APIRouter()
 
@@ -45,12 +35,19 @@ async def crawl_endpoint(
     # [TODO] check if the user is the owner/editor of the brain
     brain = Brain(id=brain_id)
 
+    userDailyUsage = UserUsage(
+        id=current_user.id,
+        email=current_user.email,
+        openai_api_key=current_user.openai_api_key,
+    )
+    userSettings = userDailyUsage.get_user_settings()
+
     # [TODO] rate limiting of user for crawl
     if request.headers.get("Openai-Api-Key"):
-        brain.max_brain_size = int(os.getenv("MAX_BRAIN_SIZE_WITH_KEY", 209715200))
+        brain.max_brain_size = userSettings.get("max_brain_size", 1000000000)
 
     file_size = 1000000
-    remaining_free_space = brain.remaining_brain_size
+    remaining_free_space = userSettings.get("max_brain_size", 1000000000)
 
     if remaining_free_space - file_size < 0:
         message = {
@@ -67,42 +64,13 @@ async def crawl_endpoint(
                     status=NotificationsStatusEnum.Pending,
                 )
             )
-        if not crawl_website.checkGithub():
-            (
-                file_path,
-                file_name,
-            ) = crawl_website.process()  # pyright: ignore reportPrivateUsage=none
-            # Create a SpooledTemporaryFile from the file_path
-            spooled_file = SpooledTemporaryFile()
-            with open(file_path, "rb") as f:
-                shutil.copyfileobj(f, spooled_file)
+        process_crawl_and_notify.delay(
+            crawl_website_url=crawl_website.url,
+            enable_summarization=enable_summarization,
+            brain_id=brain_id,
+            openai_api_key=request.headers.get("Openai-Api-Key", None),
+            notification_id=crawl_notification.id,
+        )
 
-            # Pass the SpooledTemporaryFile to UploadFile
-            uploadFile = UploadFile(
-                file=spooled_file,  # pyright: ignore reportPrivateUsage=none
-                filename=file_name,
-            )
-            file = File(file=uploadFile)
-            #  check remaining free space here !!
-            message = await filter_file(
-                file=file,
-                enable_summarization=enable_summarization,
-                brain_id=brain.id,
-                openai_api_key=request.headers.get("Openai-Api-Key", None),
-            )
-        else:
-            #  check remaining free space here !!
-            message = await process_github(
-                repo=crawl_website.url,
-                enable_summarization="false",
-                brain_id=brain_id,
-                user_openai_api_key=request.headers.get("Openai-Api-Key", None),
-            )
-        if crawl_notification:
-            update_notification_by_id(
-                crawl_notification.id,
-                NotificationUpdatableProperties(
-                    status=NotificationsStatusEnum.Done, message=str(message)
-                ),
-            )
+        return {"message": "Crawl processing has started."}
     return message

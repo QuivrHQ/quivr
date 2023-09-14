@@ -11,4 +11,5 @@ export interface UserStats {
   max_requests_number: number;
   requests_stats: RequestStat[];
   date: string;
+  models: string[];
 }

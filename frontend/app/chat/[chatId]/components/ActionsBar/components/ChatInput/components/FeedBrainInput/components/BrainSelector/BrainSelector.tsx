@@ -11,7 +11,13 @@ import { BrainSuggestionsContainer } from "./components";
 import { SuggestionRow } from "./components/SuggestionRow";
 import { useBrainSelector } from "./hooks/useBrainSelector";
 
-export const BrainSelector = (): ReactElement => {
+type BrainSelectorProps = {
+  onSubmit: () => void;
+};
+
+export const BrainSelector = ({
+  onSubmit,
+}: BrainSelectorProps): ReactElement => {
   const {
     mentionInputRef,
     MentionSuggestions,
@@ -24,7 +30,9 @@ export const BrainSelector = (): ReactElement => {
     plugins,
     suggestions,
     handleEditorChange,
-  } = useBrainSelector();
+  } = useBrainSelector({
+    onSubmit,
+  });
   const { currentBrainId } = useBrainContext();
 
   const { t } = useTranslation(["chat"]);
@@ -41,7 +49,6 @@ export const BrainSelector = (): ReactElement => {
         ref={mentionInputRef}
         placeholder={hasBrainSelected ? "" : t("feed_brain_placeholder")}
         keyBindingFn={keyBindingFn}
-        readOnly={hasBrainSelected}
       />
       <div
         style={{

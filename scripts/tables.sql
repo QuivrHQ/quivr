@@ -226,9 +226,31 @@ CREATE TABLE IF NOT EXISTS migrations (
   executed_at TIMESTAMPTZ DEFAULT current_timestamp
 );
 
-INSERT INTO migrations (name) 
-SELECT '20230906151400_add_notifications_table'
-WHERE NOT EXISTS (
-    SELECT 1 FROM migrations WHERE name = '20230906151400_add_notifications_table'
+CREATE TABLE IF NOT EXISTS user_settings (
+  user_id UUID PRIMARY KEY,
+  models JSONB DEFAULT '["gpt-3.5-turbo"]'::jsonb,
+  max_requests_number INT DEFAULT 50,
+  max_brains INT DEFAULT 5,
+  max_brain_size INT DEFAULT 1000000
 );
+
+insert into
+  storage.buckets (id, name)
+values
+  ('quivr', 'quivr')
+
+CREATE POLICY "Access Quivr Storage 1jccrwz_0" ON storage.objects FOR INSERT TO anon WITH CHECK (bucket_id = 'quivr');
+
+CREATE POLICY "Access Quivr Storage 1jccrwz_1" ON storage.objects FOR SELECT TO anon USING (bucket_id = 'quivr');
+
+CREATE POLICY "Access Quivr Storage 1jccrwz_2" ON storage.objects FOR UPDATE TO anon USING (bucket_id = 'quivr');
+
+CREATE POLICY "Access Quivr Storage 1jccrwz_3" ON storage.objects FOR DELETE TO anon USING (bucket_id = 'quivr');
+
+INSERT INTO migrations (name) 
+SELECT '20230913110420_add_storage_bucket'
+WHERE NOT EXISTS (
+    SELECT 1 FROM migrations WHERE name = '20230913110420_add_storage_bucket'
+);
+
 

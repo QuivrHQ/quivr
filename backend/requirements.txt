@@ -3,6 +3,7 @@ langchain==0.0.281
 litellm==0.1.531
 Markdown==3.4.4
 openai==0.27.8
+GitPython==3.1.36
 pdf2image==1.16.3
 pypdf==3.9.0
 StrEnum==0.4.15
@@ -26,6 +27,13 @@ resend==0.5.1
 psycopg2-binary==2.9.6
 sqlalchemy==2.0.19
 html5lib==1.1
-bs4==0.0.1
+beautifulsoup4
 newspaper3k
 xlrd==1.0.0
+celery==5.2.7
+redis==4.5.4
+flower
+boto3==1.28.46
+botocore==1.31.46
+celery[sqs]
+

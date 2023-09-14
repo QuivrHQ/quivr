@@ -12,11 +12,13 @@ export const ChatProviderMock = ({
   return (
     <ChatContextMock.Provider
       value={{
-        history: [],
-        setHistory: () => void 0,
+        messages: [],
+        setMessages: () => void 0,
         addToHistory: () => void 0,
         updateHistory: () => void 0,
         updateStreamingHistory: () => void 0,
+        notifications: [],
+        setNotifications: () => void 0,
       }}
     >
       {children}

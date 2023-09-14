@@ -10,10 +10,13 @@ import { useTranslation } from "react-i18next";
 import { getBrainDataKey } from "@/lib/api/brain/config";
 import { useBrainApi } from "@/lib/api/brain/useBrainApi";
 import { usePromptApi } from "@/lib/api/prompt/usePromptApi";
-import { useBrainConfig } from "@/lib/context/BrainConfigProvider";
+import { USER_DATA_KEY } from "@/lib/api/user/config";
+import { useUserApi } from "@/lib/api/user/useUserApi";
+import { defaultBrainConfig } from "@/lib/config/defaultBrainConfig";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 import { Brain } from "@/lib/context/BrainProvider/types";
 import { defineMaxTokens } from "@/lib/helpers/defineMaxTokens";
+import { getAccessibleModels } from "@/lib/helpers/getAccessibleModels";
 import { useToast } from "@/lib/hooks";
 
 import { validateOpenAIKey } from "../utils/validateOpenAIKey";
@@ -30,13 +33,18 @@ export const useSettingsTab = ({ brainId }: UseSettingsTabProps) => {
   const { publish } = useToast();
   const formRef = useRef<HTMLFormElement>(null);
   const { setAsDefaultBrain, getBrain, updateBrain } = useBrainApi();
-  const { config } = useBrainConfig();
   const { fetchAllBrains, fetchDefaultBrain, defaultBrainId } =
     useBrainContext();
   const { getPrompt, updatePrompt, createPrompt } = usePromptApi();
+  const { getUser } = useUserApi();
+
+  const { data: userData } = useQuery({
+    queryKey: [USER_DATA_KEY],
+    queryFn: getUser,
+  });
 
   const defaultValues = {
-    ...config,
+    ...defaultBrainConfig,
     name: "",
     description: "",
     setDefault: false,
@@ -69,6 +77,11 @@ export const useSettingsTab = ({ brainId }: UseSettingsTabProps) => {
   const model = watch("model");
   const temperature = watch("temperature");
   const maxTokens = watch("maxTokens");
+
+  const accessibleModels = getAccessibleModels({
+    openAiKey,
+    userData,
+  });
 
   const updateFormValues = useCallback(() => {
     if (brain === undefined) {
@@ -337,7 +350,7 @@ export const useSettingsTab = ({ brainId }: UseSettingsTabProps) => {
   return {
     handleSubmit,
     register,
-    openAiKey,
+
     model,
     temperature,
     maxTokens,
@@ -349,5 +362,6 @@ export const useSettingsTab = ({ brainId }: UseSettingsTabProps) => {
     promptId,
     removeBrainPrompt,
     pickPublicPrompt,
+    accessibleModels,
   };
 };

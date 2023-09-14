@@ -4,7 +4,7 @@
     "crawlFailed": "Error al rastrear sitio web: {{message}}",
     "dragAndDrop": "Arrastre y suelte archivos aquí o click para buscar",
     "drop": "Suelte los archivos aquí...",
-    "error": "Error al subir archivo: {{message}}",
+    "uploadFailed": "Error al subir archivo: {{message}}",
     "invalidUrl": "URL inválido",
     "maxSizeError": "Tamaño de archivo excedido",
     "missingNecessaryRole": "No tienes el rol necesario para cargar contenido en el cerebro seleccionado. 🧠💡🥲",

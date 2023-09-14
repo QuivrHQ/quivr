@@ -1,4 +1,5 @@
 /* eslint-disable max-lines */
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
@@ -11,6 +12,7 @@ import * as useChatsListModule from "../hooks/useChatsList";
 import { ChatsList } from "../index";
 
 const getChatsMock = vi.fn(() => []);
+const queryClient = new QueryClient();
 
 const setOpenMock = vi.fn();
 
@@ -56,9 +58,11 @@ describe("ChatsList", () => {
 
   it("should render correctly", () => {
     const { getByTestId } = render(
-      <ChatProviderMock>
-        <ChatsList />
-      </ChatProviderMock>
+      <QueryClientProvider client={queryClient}>
+        <ChatProviderMock>
+          <ChatsList />
+        </ChatProviderMock>
+      </QueryClientProvider>
     );
     const chatsList = getByTestId("chats-list");
     expect(chatsList).toBeDefined();
@@ -72,9 +76,11 @@ describe("ChatsList", () => {
 
   it("renders the chats list with correct number of items", () => {
     render(
-      <ChatProviderMock>
-        <ChatsList />
-      </ChatProviderMock>
+      <QueryClientProvider client={queryClient}>
+        <ChatProviderMock>
+          <ChatsList />
+        </ChatProviderMock>
+      </QueryClientProvider>
     );
     const chatItems = screen.getAllByTestId("chats-list-item");
     expect(chatItems).toHaveLength(2);
@@ -88,9 +94,11 @@ describe("ChatsList", () => {
 
     await act(() =>
       render(
-        <ChatProviderMock>
-          (<ChatsList />)
-        </ChatProviderMock>
+        <QueryClientProvider client={queryClient}>
+          <ChatProviderMock>
+            (<ChatsList />)
+          </ChatProviderMock>
+        </QueryClientProvider>
       )
     );
 
@@ -109,9 +117,11 @@ describe("ChatsList", () => {
     }));
     await act(() =>
       render(
-        <ChatProviderMock>
-          <ChatsList />
-        </ChatProviderMock>
+        <QueryClientProvider client={queryClient}>
+          <ChatProviderMock>
+            <ChatsList />
+          </ChatProviderMock>
+        </QueryClientProvider>
       )
     );
 

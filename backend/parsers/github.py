@@ -31,7 +31,6 @@ async def process_github(
     )
 
     documents = text_splitter.split_documents(documents)
-    print(documents[:1])
 
     for doc in documents:
         if doc.metadata["file_type"] in [
@@ -66,13 +65,10 @@ async def process_github(
         file_exists = file.file_already_exists()
 
         if not file_exists:
-            print(f"Creating entry for file {file.file_sha1} in vectors...")
             neurons = Neurons()
             created_vector = neurons.create_vector(
                 doc_with_metadata, user_openai_api_key
             )
-            print("Created vector sids ", created_vector)
-            print("Created vector for ", doc.metadata["file_name"])
 
         file_exists_in_brain = file.file_already_exists_in_brain(brain_id)
 

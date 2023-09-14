@@ -54,7 +54,7 @@ export const ChatInput = ({
 
       <div className="flex flex-1 flex-col items-center">
         {shouldDisplayUploadCard ? (
-          <FeedBrainInput />
+          <FeedBrainInput onSubmit={feedBrain} />
         ) : (
           <ChatBar
             message={message}
@@ -70,10 +70,7 @@ export const ChatInput = ({
             <Button
               disabled={currentBrainId === null || !hasContentToFeedBrain}
               variant="tertiary"
-              onClick={() => {
-                setShouldDisplayUploadCard(false);
-                feedBrain();
-              }}
+              onClick={feedBrain}
               type="button"
             >
               <MdSend className="text-3xl transform -rotate-90" />

@@ -1,36 +1,52 @@
 /* eslint-disable max-lines */
-import axios from "axios";
 import { UUID } from "crypto";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useCallback, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { useChatApi } from "@/lib/api/chat/useChatApi";
 import { useCrawlApi } from "@/lib/api/crawl/useCrawlApi";
+import { useNotificationApi } from "@/lib/api/notification/useNotificationApi";
 import { useUploadApi } from "@/lib/api/upload/useUploadApi";
+import { useChatContext } from "@/lib/context";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
+import { getAxiosErrorParams } from "@/lib/helpers/getAxiosErrorParams";
 import { useToast } from "@/lib/hooks";
 
 import { FeedItemCrawlType, FeedItemType, FeedItemUploadType } from "../types";
 
+type UseKnowledgeUploaderProps = {
+  setHasPendingRequests: (hasPendingRequests: boolean) => void;
+  setShouldDisplayUploadCard: (shouldDisplayUploadCard: boolean) => void;
+};
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-export const useKnowledgeUploader = () => {
+export const useKnowledgeUploader = ({
+  setHasPendingRequests,
+  setShouldDisplayUploadCard,
+}: UseKnowledgeUploaderProps) => {
   const [contents, setContents] = useState<FeedItemType[]>([]);
   const { publish } = useToast();
   const { uploadFile } = useUploadApi();
   const { t } = useTranslation(["upload"]);
   const { crawlWebsiteUrl } = useCrawlApi();
   const { createChat } = useChatApi();
-
+  const { currentBrainId } = useBrainContext();
+  const { setNotifications } = useChatContext();
+  const { getChatNotifications } = useNotificationApi();
+  const router = useRouter();
   const params = useParams();
   const chatId = params?.chatId as UUID | undefined;
 
-  const { currentBrainId } = useBrainContext();
   const addContent = (content: FeedItemType) => {
     setContents((prevContents) => [...prevContents, content]);
   };
   const removeContent = (index: number) => {
     setContents((prevContents) => prevContents.filter((_, i) => i !== index));
+  };
+
+  const fetchNotifications = async (currentChatId: UUID): Promise<void> => {
+    const fetchedNotifications = await getChatNotifications(currentChatId);
+    setNotifications(fetchedNotifications);
   };
 
   const crawlWebsiteHandler = useCallback(
@@ -50,13 +66,24 @@ export const useKnowledgeUploader = () => {
           config,
           chat_id,
         });
+        await fetchNotifications(chat_id);
       } catch (error: unknown) {
-        publish({
-          variant: "danger",
-          text: t("crawlFailed", {
-            message: JSON.stringify(error),
-          }),
-        });
+        const errorParams = getAxiosErrorParams(error);
+        if (errorParams !== undefined) {
+          publish({
+            variant: "danger",
+            text: t("crawlFailed", {
+              message: JSON.stringify(errorParams.message),
+            }),
+          });
+        } else {
+          publish({
+            variant: "danger",
+            text: t("crawlFailed", {
+              message: JSON.stringify(error),
+            }),
+          });
+        }
       }
     },
     [crawlWebsiteUrl, publish, t]
@@ -73,21 +100,20 @@ export const useKnowledgeUploader = () => {
           chat_id,
         });
       } catch (e: unknown) {
-        if (axios.isAxiosError(e) && e.response?.status === 403) {
+        const errorParams = getAxiosErrorParams(e);
+        if (errorParams !== undefined) {
           publish({
             variant: "danger",
-            text: `${JSON.stringify(
-              (
-                e.response as {
-                  data: { detail: string };
-                }
-              ).data.detail
-            )}`,
+            text: t("uploadFailed", {
+              message: JSON.stringify(errorParams.message),
+            }),
           });
         } else {
           publish({
             variant: "danger",
-            text: t("error", { message: e }),
+            text: t("uploadFailed", {
+              message: JSON.stringify(e),
+            }),
           });
         }
       }
@@ -113,7 +139,17 @@ export const useKnowledgeUploader = () => {
       return;
     }
 
+    if (contents.length === 0) {
+      publish({
+        variant: "danger",
+        text: t("addFiles"),
+      });
+
+      return;
+    }
     try {
+      setShouldDisplayUploadCard(false);
+      setHasPendingRequests(true);
       const currentChatId = chatId ?? (await createChat("New Chat")).chat_id;
       const uploadPromises = files.map((file) =>
         uploadFileHandler(file, currentBrainId, currentChatId)
@@ -126,6 +162,12 @@ export const useKnowledgeUploader = () => {
 
       setContents([]);
 
+      if (chatId === undefined) {
+        void router.push(`/chat/${currentChatId}`);
+      } else {
+        await fetchNotifications(currentChatId);
+      }
+
       publish({
         variant: "success",
         text: t("knowledgeUploaded"),
@@ -135,6 +177,8 @@ export const useKnowledgeUploader = () => {
         variant: "danger",
         text: JSON.stringify(e),
       });
+    } finally {
+      setHasPendingRequests(false);
     }
   };
 

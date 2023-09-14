@@ -3,8 +3,8 @@ import { MentionData } from "@draft-js-plugins/mention";
 import { EditorState } from "draft-js";
 import { useEffect, useMemo, useState } from "react";
 
-import { requiredRolesForUpload } from "@/app/upload/config";
 import { mapMinimalBrainToMentionData } from "@/lib/components/MentionInput";
+import { requiredRolesForUpload } from "@/lib/config/upload";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 
 import { MentionInputMentionsType } from "../../types";

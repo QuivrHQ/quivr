@@ -1,4 +1,3 @@
-import os
 import time
 from typing import List
 from uuid import UUID
@@ -7,9 +6,6 @@ from venv import logger
 from auth import AuthBearer, get_current_user
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from fastapi.responses import StreamingResponse
-from repository.notification.remove_chat_notifications import (
-    remove_chat_notifications,
-)
 from llm.openai import OpenAIBrainPicking
 from llm.qa_headless import HeadlessQA
 from models import (
@@ -36,6 +32,7 @@ from repository.chat.get_chat_history_with_notifications import (
     ChatItem,
     get_chat_history_with_notifications,
 )
+from repository.notification.remove_chat_notifications import remove_chat_notifications
 from repository.user_identity import get_user_identity
 
 chat_router = APIRouter()
@@ -76,11 +73,13 @@ def check_user_requests_limit(
         id=user.id, email=user.email, openai_api_key=user.openai_api_key
     )
 
+    userSettings = userDailyUsage.get_user_settings()
+
     date = time.strftime("%Y%m%d")
     userDailyUsage.handle_increment_user_request_count(date)
 
     if user.openai_api_key is None:
-        max_requests_number = int(os.getenv("MAX_REQUESTS_NUMBER", 1))
+        max_requests_number = userSettings.get("max_requests_number", 0)
         if int(userDailyUsage.daily_requests_count) >= int(max_requests_number):
             raise HTTPException(
                 status_code=429,  # pyright: ignore reportPrivateUsage=none

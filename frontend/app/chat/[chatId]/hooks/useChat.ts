@@ -6,8 +6,8 @@ import { useTranslation } from "react-i18next";
 
 import { getChatConfigFromLocalStorage } from "@/lib/api/chat/chat.local";
 import { useChatApi } from "@/lib/api/chat/useChatApi";
+import { useChatContext } from "@/lib/context";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
-import { useChatContext } from "@/lib/context/ChatProvider/hooks/useChatContext";
 import { useToast } from "@/lib/hooks";
 import { useEventTracking } from "@/services/analytics/useEventTracking";
 
@@ -17,13 +17,14 @@ import { ChatQuestion } from "../types";
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const useChat = () => {
   const { track } = useEventTracking();
+
   const params = useParams();
   const [chatId, setChatId] = useState<string | undefined>(
     params?.chatId as string | undefined
   );
   const [generatingAnswer, setGeneratingAnswer] = useState(false);
   const router = useRouter();
-  const { history } = useChatContext();
+  const { messages } = useChatContext();
   const { currentBrain, currentPromptId, currentBrainId } = useBrainContext();
   const { publish } = useToast();
   const { createChat } = useChatApi();
@@ -103,7 +104,7 @@ export const useChat = () => {
   };
 
   return {
-    history,
+    messages,
     addQuestion,
     generatingAnswer,
     chatId,

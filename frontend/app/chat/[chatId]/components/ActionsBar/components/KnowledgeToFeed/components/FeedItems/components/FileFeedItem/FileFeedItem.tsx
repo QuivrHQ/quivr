@@ -1,6 +1,7 @@
 import { IoMdCloseCircle } from "react-icons/io";
 
-import { getFileIcon } from "./helpers/getFileIcon";
+import { getFileIcon } from "@/lib/helpers/getFileIcon";
+
 import { FeedTitleDisplayer } from "../FeedTitleDisplayer";
 
 type FileFeedItemProps = {
@@ -20,7 +21,7 @@ export const FileFeedItem = ({
         className="absolute top-2 right-2 cursor-pointer text-gray-400 text-2xl"
         onClick={onRemove}
       />
-      <div className="flex items-center">
+      <div className="flex items-center gap-1">
         {icon}
         <FeedTitleDisplayer title={file.name} truncate />
       </div>
