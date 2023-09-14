@@ -1,5 +1,4 @@
 /* eslint-disable max-lines */
-import axios from "axios";
 import { UUID } from "crypto";
 import { useParams, useRouter } from "next/navigation";
 import { useCallback, useState } from "react";
@@ -11,6 +10,7 @@ import { useNotificationApi } from "@/lib/api/notification/useNotificationApi";
 import { useUploadApi } from "@/lib/api/upload/useUploadApi";
 import { useChatContext } from "@/lib/context";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
+import { getAxiosErrorParams } from "@/lib/helpers/getAxiosErrorParams";
 import { useToast } from "@/lib/hooks";
 
 import { FeedItemCrawlType, FeedItemType, FeedItemUploadType } from "../types";
@@ -68,12 +68,22 @@ export const useKnowledgeUploader = ({
         });
         await fetchNotifications(chat_id);
       } catch (error: unknown) {
-        publish({
-          variant: "danger",
-          text: t("crawlFailed", {
-            message: JSON.stringify(error),
-          }),
-        });
+        const errorParams = getAxiosErrorParams(error);
+        if (errorParams !== undefined) {
+          publish({
+            variant: "danger",
+            text: t("crawlFailed", {
+              message: JSON.stringify(errorParams.message),
+            }),
+          });
+        } else {
+          publish({
+            variant: "danger",
+            text: t("crawlFailed", {
+              message: JSON.stringify(error),
+            }),
+          });
+        }
       }
     },
     [crawlWebsiteUrl, publish, t]
@@ -90,21 +100,20 @@ export const useKnowledgeUploader = ({
           chat_id,
         });
       } catch (e: unknown) {
-        if (axios.isAxiosError(e) && e.response?.status === 403) {
+        const errorParams = getAxiosErrorParams(e);
+        if (errorParams !== undefined) {
           publish({
             variant: "danger",
-            text: `${JSON.stringify(
-              (
-                e.response as {
-                  data: { detail: string };
-                }
-              ).data.detail
-            )}`,
+            text: t("uploadFailed", {
+              message: JSON.stringify(errorParams.message),
+            }),
           });
         } else {
           publish({
             variant: "danger",
-            text: t("error", { message: e }),
+            text: t("uploadFailed", {
+              message: JSON.stringify(e),
+            }),
           });
         }
       }
