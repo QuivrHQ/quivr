@@ -16,3 +16,8 @@ class Knowledge(BaseModel):
 
 
 # compute sha1 from content
+
+
+class BrainKnowledge(BaseModel):
+    brain_id: UUID
+    knowledge_id: UUID
