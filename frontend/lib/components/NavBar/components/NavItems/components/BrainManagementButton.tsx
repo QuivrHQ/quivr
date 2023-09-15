@@ -13,6 +13,7 @@ export const BrainManagementButton = (): JSX.Element => {
         variant={"tertiary"}
         className="focus:outline-none text-2xl"
         aria-label="Settings"
+        data-testid="brain-management-button"
       >
         <FaBrain className="w-6 h-6" />
       </Button>
