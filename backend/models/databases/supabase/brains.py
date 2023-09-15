@@ -172,7 +172,7 @@ class Brain(Repository):
         vectorsResponse = (
             self.db.table("vectors")
             .select("id")
-            .filter("metadata->>file_sha1", "eq", file_sha1)
+            .filter("file_sha1", "eq", file_sha1)
             .execute()
         )
         return vectorsResponse.data

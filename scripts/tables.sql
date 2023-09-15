@@ -24,6 +24,7 @@ CREATE EXTENSION IF NOT EXISTS vector;
 CREATE TABLE IF NOT EXISTS vectors (
     id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
     content TEXT,
+    file_sha1 TEXT,
     metadata JSONB,
     embedding VECTOR(1536)
 );
@@ -248,9 +249,9 @@ CREATE POLICY "Access Quivr Storage 1jccrwz_2" ON storage.objects FOR UPDATE TO 
 CREATE POLICY "Access Quivr Storage 1jccrwz_3" ON storage.objects FOR DELETE TO anon USING (bucket_id = 'quivr');
 
 INSERT INTO migrations (name) 
-SELECT '20230913110420_add_storage_bucket'
+SELECT '202309157004032_add_sha1_column'
 WHERE NOT EXISTS (
-    SELECT 1 FROM migrations WHERE name = '20230913110420_add_storage_bucket'
+    SELECT 1 FROM migrations WHERE name = '202309157004032_add_sha1_column'
 );
 
 
