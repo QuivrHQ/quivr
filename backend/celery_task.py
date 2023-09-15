@@ -1,6 +1,7 @@
 from celery import shared_task
 from models.brains import Brain
 from models.settings import get_supabase_db
+
 from repository.files.upload_file import DocumentSerializable
 from utils.vectors import Neurons
 
@@ -15,6 +16,7 @@ def create_embedding_for_document(
     # add_usage(stats_db, "embedding", "audio", metadata={"file_name": file_meta_name,"file_type": ".txt", "chunk_size": chunk_size, "chunk_overlap": chunk_overlap})
     database = get_supabase_db()
     database.set_file_sha_from_metadata(file_sha1)
+
 
     created_vector_id = created_vector[0]  # pyright: ignore reportPrivateUsage=none
 

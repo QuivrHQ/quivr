@@ -94,7 +94,7 @@ class QABaseBrainPicking(BaseBrainPicking):
         )
 
     def _create_llm(
-        self, model, temperature=0, streaming=False, callbacks=None
+        self, model, temperature=0, streaming=False, callbacks=None, max_tokens=256
     ) -> BaseLLM:
         """
         Determine the language model to be used.
@@ -105,11 +105,12 @@ class QABaseBrainPicking(BaseBrainPicking):
         """
         return ChatLiteLLM(
             temperature=temperature,
+            max_tokens=max_tokens,
             model=model,
             streaming=streaming,
             verbose=False,
             callbacks=callbacks,
-            openai_api_key=self.openai_api_key,
+            openai_api_key=self.openai_api_key
         )  # pyright: ignore reportPrivateUsage=none
 
     def _create_prompt_template(self):
@@ -211,7 +212,7 @@ class QABaseBrainPicking(BaseBrainPicking):
         self.callbacks = [callback]
 
         answering_llm = self._create_llm(
-            model=self.model, streaming=True, callbacks=self.callbacks
+            model=self.model, streaming=True, callbacks=self.callbacks, max_tokens=self.max_tokens
         )
 
         # The Chain that generates the answer to the question
