@@ -1,4 +1,4 @@
-/* eslint-disable max-lines */
+/* eslint-disable */
 "use client";
 import { useTranslation } from "react-i18next";
 import { MdAddCircle, MdSend } from "react-icons/md";
@@ -24,10 +24,11 @@ export const ChatInput = ({
   setShouldDisplayUploadCard,
   hasContentToFeedBrain,
 }: ChatInputProps): JSX.Element => {
-  const { setMessage, submitQuestion, chatId, generatingAnswer, message } =
-    useChatInput();
+  const { setMessage, submitQuestion, chatId, generatingAnswer, message } = useChatInput();
   const { t } = useTranslation(["chat"]);
   const { currentBrainId } = useBrainContext();
+
+  const isEmptyMessage = !message || message.trim() === '';
 
   return (
     <form
@@ -36,20 +37,18 @@ export const ChatInput = ({
         e.preventDefault();
         submitQuestion();
       }}
-      className="sticky flex items-star bottom-0 bg-white dark:bg-black w-full flex justify-center gap-2 z-20"
+      className="sticky bottom-0 bg-white dark:bg-black w-full flex items-center gap-2 z-20 p-2"
     >
       {!shouldDisplayUploadCard && (
-        <div className="flex items-start">
-          <Button
-            className="p-0"
-            variant={"tertiary"}
-            data-testid="upload-button"
-            type="button"
-            onClick={() => setShouldDisplayUploadCard(true)}
-          >
-            <MdAddCircle className="text-3xl" />
-          </Button>
-        </div>
+        <Button
+          className="p-0"
+          variant={"tertiary"}
+          data-testid="upload-button"
+          type="button"
+          onClick={() => setShouldDisplayUploadCard(true)}
+        >
+          <MdAddCircle className="text-3xl" />
+        </Button>
       )}
 
       <div className="flex flex-1 flex-col items-center">
@@ -66,29 +65,33 @@ export const ChatInput = ({
 
       <div className="flex flex-row items-end">
         {shouldDisplayUploadCard ? (
-          <div className="flex items-center">
-            <Button
-              disabled={currentBrainId === null || !hasContentToFeedBrain}
-              variant="tertiary"
-              onClick={feedBrain}
-              type="button"
-            >
-              <MdSend className="text-3xl transform -rotate-90" />
-            </Button>
-          </div>
+          <Button
+            disabled={currentBrainId === null || !hasContentToFeedBrain}
+            variant="tertiary"
+            onClick={feedBrain}
+            type="button"
+          >
+            <MdSend className="text-3xl transform -rotate-90" />
+          </Button>
         ) : (
           <>
-            <Button
-              className="px-3 py-2 sm:px-4 sm:py-2"
-              type="submit"
-              isLoading={generatingAnswer}
-              data-testid="submit-button"
-            >
-              {generatingAnswer
-                ? t("thinking", { ns: "chat" })
-                : t("chat", { ns: "chat" })}
-            </Button>
-            <div className="flex items-center">
+            {isEmptyMessage ? (
+              <div className="md:hidden flex items-center">
+                <ConfigModal chatId={chatId} />
+              </div>
+            ) : (
+              <Button
+                className="px-3 py-2 sm:px-4 sm:py-2"
+                type="submit"
+                isLoading={generatingAnswer}
+                data-testid="submit-button"
+              >
+                {generatingAnswer
+                  ? t("thinking", { ns: "chat" })
+                  : t("chat", { ns: "chat" })}
+              </Button>
+            )}
+            <div className="hidden md:flex items-center">
               <ConfigModal chatId={chatId} />
             </div>
           </>

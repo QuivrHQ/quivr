@@ -1,5 +1,22 @@
 # Changelog
 
+## 0.0.74 (2023-09-14)
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.73...v0.0.74
+
+## 0.0.73 (2023-09-14)
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.72...v0.0.73
+
+## 0.0.72 (2023-09-14)
+
+## What's Changed
+* feat(file-system): added queue and filesystem by @StanGirard in https://github.com/StanGirard/quivr/pull/1159
+* fix(migration): removed by @StanGirard in https://github.com/StanGirard/quivr/pull/1170
+
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.71...v0.0.72
+
 ## 0.0.71 (2023-09-14)
 
 ## What's Changed

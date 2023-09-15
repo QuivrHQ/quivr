@@ -6,7 +6,7 @@ from models.databases.repository import Repository
 
 class ApiKeyHandler(Repository):
     def __init__(self, supabase_client):
-        self.db = supabase_client
+        self.db = supabase_client  # type: ignore
 
     def create_api_key(self, new_key_id, new_api_key, user_id):
         response = (

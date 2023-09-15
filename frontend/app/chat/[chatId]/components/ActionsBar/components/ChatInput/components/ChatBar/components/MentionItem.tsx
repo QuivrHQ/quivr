@@ -18,7 +18,7 @@ export const MentionItem = ({
       <div className="flex items-center bg-gray-300 mr-2 text-gray-600 rounded-2xl py-1 px-2">
         <span className="flex-grow">{`${trigger ?? ""}${text}`}</span>
         <MdRemoveCircleOutline
-          className="cursor-pointer absolute top-[-10px] right-[5px]"
+          className="cursor-pointer absolute top-0 right-0 mt-0 mr-0"
           onClick={onRemove}
         />
       </div>

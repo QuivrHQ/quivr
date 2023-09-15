@@ -17,4 +17,5 @@ def upload_file_storage(file, file_identifier: str) -> Response:
         return response
     except Exception as e:
         logger.error(e)
+        print(e)
         return response

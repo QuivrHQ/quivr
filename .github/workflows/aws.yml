@@ -74,17 +74,10 @@ jobs:
             task_definition: ".aws/task_definition.json"
             container: "quivr"
           - name: "quivr-chat"
-            service: "prod-service-chat"
-            task_definition: ".aws/task_definition_prod_chat.json"
+            service: "prod-worker"
+            task_definition: ".aws/task_definition_prod_worker.json"
             container: "quivr-chat"
-          - name: "quivr-upload"
-            service: "prod-service-upload"
-            task_definition: ".aws/task_definition_prod_upload.json"
-            container: "quivr-upload"
-          - name: "quivr-crawl"
-            service: "prod-service-crawl"
-            task_definition: ".aws/task_definition_prod_crawl.json"
-            container: "quivr-crawl"
+        
 
     steps:
     - name: Checkout

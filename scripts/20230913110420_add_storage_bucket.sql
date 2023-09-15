@@ -1,7 +1,7 @@
 insert into
   storage.buckets (id, name)
 values
-  ('quivr', 'quivr')
+  ('quivr', 'quivr');
 
 CREATE POLICY "Access Quivr Storage 1jccrwz_0" ON storage.objects FOR INSERT TO anon WITH CHECK (bucket_id = 'quivr');
 
