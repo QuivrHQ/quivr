@@ -23,7 +23,18 @@ class Vector(Repository):
         response = (
             self.db.table("vectors")
             .select("id")
-            .filter("metadata->>file_sha1", "eq", file_sha1)
+            .filter("file_sha1", "eq", file_sha1)
+            .execute()
+        )
+
+        return response
+
+    def set_file_sha_from_metadata(self, file_sha1):
+        # It looks at the file that have a file_sha1 in the metadata that is corresponding but an empty file_sha1 column and set it
+        response = (
+            self.db.table("vectors")
+            .update({"file_sha1": file_sha1})
+            .match({"metadata->>file_sha1": file_sha1})
             .execute()
         )
 
