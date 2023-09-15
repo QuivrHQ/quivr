@@ -2,9 +2,8 @@ from typing import Optional
 from uuid import UUID
 
 from langchain.embeddings.openai import OpenAIEmbeddings
-from logger import get_logger
-
 from llm.qa_base import QABaseBrainPicking
+from logger import get_logger
 
 logger = get_logger(__name__)
 
@@ -16,7 +15,7 @@ class OpenAIBrainPicking(QABaseBrainPicking):
     """
 
     # Default class attributes
-    model: str = "gpt-3.5-turbo"
+    model: str
 
     def __init__(
         self,
