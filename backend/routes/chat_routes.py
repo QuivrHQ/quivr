@@ -185,6 +185,15 @@ async def create_question_handler(
     # Retrieve user's OpenAI API key
     current_user.openai_api_key = request.headers.get("Openai-Api-Key")
     brain = Brain(id=brain_id)
+    brain_details: BrainEntity | None = None
+
+    userDailyUsage = UserUsage(
+        id=current_user.id,
+        email=current_user.email,
+        openai_api_key=current_user.openai_api_key,
+    )
+    userSettings = userDailyUsage.get_user_settings()
+    is_model_ok = (brain_details or chat_question).model in userSettings.models  # type: ignore
 
     if not current_user.openai_api_key and brain_id:
         brain_details = get_brain_details(brain_id)
@@ -210,12 +219,12 @@ async def create_question_handler(
 
     try:
         check_user_requests_limit(current_user)
-
+        is_model_ok = (brain_details or chat_question).model in userSettings.get("models", ["gpt-3.5-turbo"])  # type: ignore
         gpt_answer_generator: HeadlessQA | OpenAIBrainPicking
         if brain_id:
             gpt_answer_generator = OpenAIBrainPicking(
                 chat_id=str(chat_id),
-                model=chat_question.model,
+                model=chat_question.model if is_model_ok else "gpt-3.5-turbo",  # type: ignore
                 max_tokens=chat_question.max_tokens,
                 temperature=chat_question.temperature,
                 brain_id=str(brain_id),
@@ -224,7 +233,7 @@ async def create_question_handler(
             )
         else:
             gpt_answer_generator = HeadlessQA(
-                model=chat_question.model,
+                model=chat_question.model if is_model_ok else "gpt-3.5-turbo",  # type: ignore
                 temperature=chat_question.temperature,
                 max_tokens=chat_question.max_tokens,
                 user_openai_api_key=current_user.openai_api_key,
@@ -298,7 +307,8 @@ async def create_stream_question_handler(
         check_user_requests_limit(current_user)
         gpt_answer_generator: HeadlessQA | OpenAIBrainPicking
         # TODO check if model is in the list of models available for the user
-        is_model_ok = (brain_details or chat_question).model in userSettings.models  # type: ignore
+        print(userSettings.get("models", ["gpt-3.5-turbo"]))  # type: ignore
+        is_model_ok = (brain_details or chat_question).model in userSettings.get("models", ["gpt-3.5-turbo"])  # type: ignore
         if brain_id:
             gpt_answer_generator = OpenAIBrainPicking(
                 chat_id=str(chat_id),
