@@ -122,7 +122,7 @@ class Notifications(Repository):
             self.db.from_("notifications")
             .select("*")
             .filter("chat_id", "eq", chat_id)
-            .filter("datetime", "lt", five_minutes_ago)
+            .filter("datetime", "ge", five_minutes_ago)
             .execute()
         ).data
 
