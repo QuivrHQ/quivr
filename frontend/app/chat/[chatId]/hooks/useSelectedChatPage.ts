@@ -40,7 +40,7 @@ export const useSelectedChatPage = () => {
 
       if (hasAPendingNotification) {
         //30 seconds
-        return 30_000;
+        return 2_000;
       }
 
       return false;
