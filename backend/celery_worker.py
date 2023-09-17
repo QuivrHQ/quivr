@@ -28,6 +28,8 @@ if CELERY_BROKER_URL.startswith("sqs"):
         __name__,
         broker=CELERY_BROKER_URL,
         task_serializer="json",
+        task_concurrency=4,
+        worker_prefetch_multiplier=1,
         broker_transport_options=broker_transport_options,
     )
     celery.conf.task_default_queue = CELEBRY_BROKER_QUEUE_NAME
@@ -36,6 +38,8 @@ elif CELERY_BROKER_URL.startswith("redis"):
         __name__,
         broker=CELERY_BROKER_URL,
         backend=CELERY_BROKER_URL,
+        task_concurrency=4,
+        worker_prefetch_multiplier=1,
         task_serializer="json",
     )
 else:

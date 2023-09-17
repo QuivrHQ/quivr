@@ -31,4 +31,4 @@ RUN pip install --no-cache-dir -r requirements.txt --timeout 200
 # Copy the rest of the application
 COPY . .
 
-CMD ["uvicorn", "main:app", "--reload", "--host", "0.0.0.0", "--port", "5050"]
+CMD ["uvicorn", "main:app", "--reload", "--host", "0.0.0.0", "--port", "5050", "--workers", "6"]
