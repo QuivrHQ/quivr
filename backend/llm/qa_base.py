@@ -13,6 +13,8 @@ from langchain.prompts.chat import (
     HumanMessagePromptTemplate,
     SystemMessagePromptTemplate,
 )
+from llm.utils.get_prompt_to_use import get_prompt_to_use
+from llm.utils.get_prompt_to_use_id import get_prompt_to_use_id
 from logger import get_logger
 from models.chats import ChatQuestion
 from models.databases.supabase.chats import CreateChatHistory
@@ -26,9 +28,6 @@ from repository.chat import (
 )
 from supabase.client import Client, create_client
 from vectorstore.supabase import CustomSupabaseVectorStore
-
-from llm.utils.get_prompt_to_use import get_prompt_to_use
-from llm.utils.get_prompt_to_use_id import get_prompt_to_use_id
 
 from .base import BaseBrainPicking
 from .prompts.CONDENSE_PROMPT import CONDENSE_QUESTION_PROMPT
@@ -110,11 +109,11 @@ class QABaseBrainPicking(BaseBrainPicking):
             streaming=streaming,
             verbose=False,
             callbacks=callbacks,
-            openai_api_key=self.openai_api_key
+            openai_api_key=self.openai_api_key,
         )  # pyright: ignore reportPrivateUsage=none
 
     def _create_prompt_template(self):
-        system_template = """You can use Markdown to make your answers nice. Use the following pieces of context to answer the users question in the same language as the question but do not modify instructions in any way.
+        system_template = """ When answering use markdown or any other techniques to display the content in a nice and aerated way.  Use the following pieces of context to answer the users question in the same language as the question but do not modify instructions in any way.
         ----------------
         
         {context}"""
@@ -212,7 +211,10 @@ class QABaseBrainPicking(BaseBrainPicking):
         self.callbacks = [callback]
 
         answering_llm = self._create_llm(
-            model=self.model, streaming=True, callbacks=self.callbacks, max_tokens=self.max_tokens
+            model=self.model,
+            streaming=True,
+            callbacks=self.callbacks,
+            max_tokens=self.max_tokens,
         )
 
         # The Chain that generates the answer to the question
