@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useState } from "react";
+import { FaCheckCircle, FaCopy } from "react-icons/fa";
 import ReactMarkdown from "react-markdown";
 
 import { cn } from "@/lib/utils";
@@ -19,17 +20,26 @@ export const MessageRow = React.forwardRef(
     ref: React.Ref<HTMLDivElement>
   ) => {
     const isUserSpeaker = speaker === "user";
+    const [isCopied, setIsCopied] = useState(false);
+
+    const handleCopy = () => {
+      navigator.clipboard.writeText(text).then(
+        () => setIsCopied(true),
+        (err) => console.error('Failed to copy!', err)
+      );
+      setTimeout(() => setIsCopied(false), 2000);  // Reset after 2 seconds
+    };
+
     const containerClasses = cn(
-      "py-3 px-5 w-fit ",
+      "py-3 px-5 w-fit",
       isUserSpeaker
-        ? "bg-gray-100 bg-opacity-60 items-start "
+        ? "bg-gray-100 bg-opacity-60 items-start"
         : "bg-purple-100 bg-opacity-60 items-end",
       "dark:bg-gray-800 rounded-3xl flex flex-col overflow-hidden scroll-pb-32"
     );
 
     const containerWrapperClasses = cn(
       "flex flex-col",
-
       isUserSpeaker ? "items-end" : "items-start"
     );
 
@@ -37,11 +47,21 @@ export const MessageRow = React.forwardRef(
 
     return (
       <div className={containerWrapperClasses}>
-        {" "}
         <div ref={ref} className={containerClasses}>
-          <div className="w-full gap-1 flex">
-            <QuestionBrain brainName={brainName} />
-            <QuestionPrompt promptName={promptName} />
+          <div className="w-full gap-1 flex justify-between">
+            <div className="flex">
+              <QuestionBrain brainName={brainName} />
+              <QuestionPrompt promptName={promptName} />
+            </div>
+            {!isUserSpeaker && (
+              <button
+                className="text-gray-500 hover:text-gray-700 transition"
+                onClick={handleCopy}
+                title={isCopied ? "Copied!" : "Copy to clipboard"}
+              >
+                {isCopied ? <FaCheckCircle /> : <FaCopy />}
+              </button>
+            )}
           </div>
           <div data-testid="chat-message-text">
             <ReactMarkdown className={markdownClasses}>{text}</ReactMarkdown>
