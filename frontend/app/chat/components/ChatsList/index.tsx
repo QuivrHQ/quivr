@@ -21,6 +21,7 @@ import { useSelectedChatPage } from "../../[chatId]/hooks/useSelectedChatPage";
 
 export const ChatsList = (): JSX.Element => {
   const { allChats } = useChatsContext();
+
   const { open, setOpen } = useChatsList();
   useSelectedChatPage();
 
