@@ -29,6 +29,7 @@ BEGIN
         SET 
             max_brains = 30,
             max_brain_size = 100000000,
+
             models = NEW.models
         WHERE user_id = NEW.user_id;
     END IF;

@@ -36,6 +36,7 @@ export const AddBrainModal = (): JSX.Element => {
           onClick={() => void 0}
           variant={"tertiary"}
           className="border-0"
+          data-testid="add-brain-button"
         >
           {t("newBrain", { ns: "brain" })}
           <MdAdd className="text-xl" />
@@ -61,6 +62,7 @@ export const AddBrainModal = (): JSX.Element => {
           autoComplete="off"
           className="flex-1"
           required
+          data-testid="brain-name"
           {...register("name")}
         />
 
@@ -152,7 +154,12 @@ export const AddBrainModal = (): JSX.Element => {
           </label>
         </div>
 
-        <Button isLoading={isPending} className="mt-12 self-end" type="submit">
+        <Button
+          isLoading={isPending}
+          className="mt-12 self-end"
+          type="submit"
+          data-testid="create-brain-submit-button"
+        >
           {t("createButton")}
           <MdAdd className="text-xl" />
         </Button>

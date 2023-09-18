@@ -1,6 +1,12 @@
 /* eslint-disable */
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@radix-ui/react-tooltip";
 import { cva, type VariantProps } from "class-variance-authority";
-import { ButtonHTMLAttributes, forwardRef, LegacyRef } from "react";
+import { ButtonHTMLAttributes, LegacyRef, forwardRef } from "react";
 import { FaSpinner } from "react-icons/fa";
 
 import { cn } from "@/lib/utils";
@@ -34,6 +40,7 @@ export interface ButtonProps
   extends ButtonHTMLAttributes<HTMLButtonElement>,
     VariantProps<typeof ButtonVariants> {
   isLoading?: boolean;
+  tooltip?: string;
 }
 
 const Button = forwardRef(
@@ -44,11 +51,12 @@ const Button = forwardRef(
       variant,
       brightness,
       isLoading,
+      tooltip,
       ...props
     }: ButtonProps,
     forwardedRef
   ): JSX.Element => {
-    return (
+    const buttonElement = (
       <button
         className={cn(ButtonVariants({ variant, brightness, className }))}
         disabled={isLoading}
@@ -58,6 +66,21 @@ const Button = forwardRef(
         {children} {isLoading && <FaSpinner className="animate-spin" />}
       </button>
     );
+
+    if (tooltip !== undefined) {
+      return (
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger>{buttonElement}</TooltipTrigger>
+            <TooltipContent className="bg-gray-100 rounded-md p-1">
+              {tooltip}
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      );
+    }
+
+    return buttonElement;
   }
 );
 

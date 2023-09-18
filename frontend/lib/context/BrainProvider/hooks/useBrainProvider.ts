@@ -7,7 +7,7 @@ import { useBrainApi } from "@/lib/api/brain/useBrainApi";
 import { usePromptApi } from "@/lib/api/prompt/usePromptApi";
 import { useToast } from "@/lib/hooks";
 import { Prompt } from "@/lib/types/Prompt";
-import { useEventTracking } from "@/services/analytics/useEventTracking";
+import { useEventTracking } from "@/services/analytics/june/useEventTracking";
 
 import {
   getBrainFromLocalStorage,

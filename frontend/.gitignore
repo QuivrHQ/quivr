@@ -36,3 +36,6 @@ next-env.d.ts
 
 # Sentry Auth Token
 .sentryclirc
+/test-results/
+/playwright-report/
+/playwright/.cache/

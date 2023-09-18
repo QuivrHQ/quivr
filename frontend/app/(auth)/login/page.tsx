@@ -8,22 +8,24 @@ import { Divider } from "@/lib/components/ui/Divider";
 import Field from "@/lib/components/ui/Field";
 import PageHeading from "@/lib/components/ui/PageHeading";
 
+import { Suspense } from "react";
+import { useTranslation } from "react-i18next";
 import { GoogleLoginButton } from "./components/GoogleLogin";
 import { MagicLinkLogin } from "./components/MagicLinkLogin";
 import { PasswordForgotten } from "./components/PasswordForgotten";
 import { useLogin } from "./hooks/useLogin";
-import { useTranslation } from "react-i18next";
-import { Suspense } from "react";
-
 
 function Main() {
   const { handleLogin, setEmail, setPassword, email, isPending, password } =
     useLogin();
-  const { t } = useTranslation(["translation","login"]);
+  const { t } = useTranslation(["translation", "login"]);
   return (
     <main>
       <section className="w-full min-h-[80vh] h-full outline-none flex flex-col gap-5 items-center justify-center p-6">
-        <PageHeading title={t("title",{ ns: 'login' })} subtitle={t("subtitle",{ ns: 'login' })} />
+        <PageHeading
+          title={t("title", { ns: "login" })}
+          subtitle={t("subtitle", { ns: "login" })}
+        />
         <Card className="max-w-md w-full p-5 sm:p-10 text-left">
           <form
             data-testid="sign-in-form"
@@ -51,12 +53,16 @@ function Main() {
             />
 
             <div className="flex flex-col items-center justify-center mt-2 gap-2">
-              <Button type="submit" isLoading={isPending}>
+              <Button
+                data-testid="submit-login"
+                type="submit"
+                isLoading={isPending}
+              >
                 {t("loginButton")}
               </Button>
               <PasswordForgotten setEmail={setEmail} email={email} />
 
-              <Link href="/signup">{t("signup",{ ns: 'login' })}</Link>
+              <Link href="/signup">{t("signup", { ns: "login" })}</Link>
             </div>
 
             <Divider text={t("or")} />
@@ -69,7 +75,7 @@ function Main() {
         </Card>
       </section>
     </main>
-  )
+  );
 }
 
 export default function Login() {
@@ -77,6 +83,5 @@ export default function Login() {
     <Suspense fallback="Loading...">
       <Main />
     </Suspense>
-    
   );
 }
