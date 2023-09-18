@@ -1,6 +1,6 @@
 /* eslint-disable max-lines */
 import { UUID } from "crypto";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 
 import { CreateBrainInput } from "@/lib/api/brain/types";
 import { useBrainApi } from "@/lib/api/brain/useBrainApi";
@@ -9,13 +9,7 @@ import { useToast } from "@/lib/hooks";
 import { Prompt } from "@/lib/types/Prompt";
 import { useEventTracking } from "@/services/analytics/june/useEventTracking";
 
-import {
-  getBrainFromLocalStorage,
-  saveBrainInLocalStorage,
-} from "../helpers/brainLocalStorage";
 import { MinimalBrainForUser } from "../types";
-
-// CAUTION: This hook should be use in BrainProvider only. You may be need `useBrainContext` instead.
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const useBrainProvider = () => {
@@ -36,33 +30,41 @@ export const useBrainProvider = () => {
     (prompt) => prompt.id === currentPromptId
   );
   const currentBrain = allBrains.find((brain) => brain.id === currentBrainId);
-  const createBrainHandler = async (
-    brain: CreateBrainInput
-  ): Promise<UUID | undefined> => {
-    const createdBrain = await createBrain(brain);
-    try {
-      setAllBrains((prevBrains) => [...prevBrains, createdBrain]);
-      saveBrainInLocalStorage(createdBrain);
-      void track("BRAIN_CREATED");
 
-      return createdBrain.id;
-    } catch {
+  const createBrainHandler = useCallback(
+    async (brain: CreateBrainInput): Promise<UUID | undefined> => {
+      const createdBrain = await createBrain(brain);
+      try {
+        setAllBrains((prevBrains) => [...prevBrains, createdBrain]);
+        setCurrentBrainId(createdBrain.id);
+
+        void track("BRAIN_CREATED");
+
+        return createdBrain.id;
+      } catch {
+        publish({
+          variant: "danger",
+          text: "Error occurred while creating a brain",
+        });
+      }
+    },
+    [createBrain, publish, track]
+  );
+
+  const deleteBrainHandler = useCallback(
+    async (id: UUID) => {
+      await deleteBrain(id);
+      setAllBrains((prevBrains) =>
+        prevBrains.filter((brain) => brain.id !== id)
+      );
+      void track("DELETE_BRAIN");
       publish({
-        variant: "danger",
-        text: "Error occurred while creating a brain",
+        variant: "success",
+        text: "Brain deleted",
       });
-    }
-  };
-
-  const deleteBrainHandler = async (id: UUID) => {
-    await deleteBrain(id);
-    setAllBrains((prevBrains) => prevBrains.filter((brain) => brain.id !== id));
-    void track("DELETE_BRAIN");
-    publish({
-      variant: "success",
-      text: "Brain deleted",
-    });
-  };
+    },
+    [deleteBrain, publish, track]
+  );
 
   const fetchAllBrains = useCallback(async () => {
     setIsFetchingBrains(true);
@@ -76,64 +78,41 @@ export const useBrainProvider = () => {
     }
   }, [getBrains]);
 
-  const setActiveBrain = useCallback(
-    ({ id, name }: { id: UUID; name: string }) => {
-      const newActiveBrain = { id, name };
-      saveBrainInLocalStorage(newActiveBrain);
-      setCurrentBrainId(id);
-    },
-    []
-  );
-
-  const setDefaultBrain = useCallback(async () => {
+  const fetchDefaultBrain = useCallback(async () => {
     const userDefaultBrain = await getDefaultBrain();
     if (userDefaultBrain !== undefined) {
-      saveBrainInLocalStorage(userDefaultBrain);
-      setActiveBrain(userDefaultBrain);
-    } else {
-      console.warn("No brains found");
+      setDefaultBrainId(userDefaultBrain.id);
     }
-  }, [getDefaultBrain, setActiveBrain]);
-
-  const fetchAndSetActiveBrain = useCallback(async () => {
-    const storedBrain = getBrainFromLocalStorage();
-    if (storedBrain?.id !== undefined) {
-      setActiveBrain({ ...storedBrain });
-    } else {
-      await setDefaultBrain();
+    if (currentBrainId === null && userDefaultBrain !== undefined) {
+      setCurrentBrainId(userDefaultBrain.id);
     }
-  }, [setDefaultBrain, setActiveBrain]);
+  }, [currentBrainId, getDefaultBrain]);
 
-  const fetchDefaultBrain = async () => {
-    setDefaultBrainId((await getDefaultBrain())?.id);
-  };
-
-  const fetchPublicPrompts = async () => {
+  const fetchPublicPrompts = useCallback(async () => {
     setPublicPrompts(await getPublicPrompts());
-  };
-
-  useEffect(() => {
-    void fetchDefaultBrain();
-  }, []);
+  }, [getPublicPrompts]);
 
   return {
+    allBrains,
+    fetchAllBrains,
+    isFetchingBrains,
+
     currentBrain,
     currentBrainId,
-    allBrains,
-    createBrain: createBrainHandler,
-    deleteBrain: deleteBrainHandler,
-    setActiveBrain,
     setCurrentBrainId,
-    fetchAllBrains,
-    setDefaultBrain,
-    fetchAndSetActiveBrain,
-    isFetchingBrains,
+
     defaultBrainId,
     fetchDefaultBrain,
+
     fetchPublicPrompts,
     publicPrompts,
     currentPrompt,
+
     setCurrentPromptId,
     currentPromptId,
+
+    createBrain: createBrainHandler,
+
+    deleteBrain: deleteBrainHandler,
   };
 };
