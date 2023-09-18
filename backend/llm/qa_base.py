@@ -156,6 +156,7 @@ class QABaseBrainPicking(BaseBrainPicking):
                 llm=self._create_llm(model=self.model), prompt=CONDENSE_QUESTION_PROMPT
             ),
             verbose=False,
+            rephrase_question=False,
         )
 
         prompt_content = (
@@ -230,6 +231,7 @@ class QABaseBrainPicking(BaseBrainPicking):
                 llm=self._create_llm(model=self.model), prompt=CONDENSE_QUESTION_PROMPT
             ),
             verbose=False,
+            rephrase_question=False,
         )
 
         transformed_history = format_chat_history(history)
