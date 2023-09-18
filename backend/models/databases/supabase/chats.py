@@ -46,6 +46,7 @@ class Chats(Repository):
             self.db.from_("chats")
             .select("chat_id,user_id,creation_time,chat_name")
             .filter("user_id", "eq", user_id)
+            .order("creation_time", desc=False)
             .execute()
         )
         return response
