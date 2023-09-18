@@ -9,6 +9,7 @@
     "lint": "next lint",
     "lint-fix": "eslint --fix .",
     "test-unit": "vitest run",
+    "test-e2e": "npx playwright test",
     "test-type": "tsc --noEmit --emitDeclarationOnly false",
     "test": "yarn test-type",
     "precommit": "yarn lint && yarn test",
@@ -78,6 +79,7 @@
     "victory": "^36.6.10"
   },
   "devDependencies": {
+    "@playwright/test": "^1.38.0",
     "@tailwindcss/typography": "^0.5.9",
     "@testing-library/react": "^14.0.0",
     "@vitejs/plugin-react": "^4.0.1",
