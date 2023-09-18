@@ -15,6 +15,5 @@
     "ohNo": "Oh, não!",
     "selectBrainFirst": "Você precisa selecionar um cérebro primeiro. 🧠💡🥲",
     "missingNecessaryRole": "Você não possui a função necessária para enviar conteúdo para o cérebro selecionado. 🧠💡🥲",
-    "invalidFileType": "Tipo de arquivo inválido",
-    "knowledgeUploaded": "Conhecimento enviado"
+    "invalidFileType": "Tipo de arquivo inválido"
 }
