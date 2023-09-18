@@ -28,7 +28,8 @@ BEGIN
         UPDATE user_settings
         SET 
             max_brains = 30,
-            max_brain_size = 10000000,
+            max_brain_size = 100000000,
+
             models = NEW.models
         WHERE user_id = NEW.user_id;
     END IF;
