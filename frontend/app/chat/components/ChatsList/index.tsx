@@ -1,52 +1,23 @@
-/* eslint-disable  */
+/* eslint-disable complexity */
 "use client";
 import { motion, MotionConfig } from "framer-motion";
 import { MdChevronRight } from "react-icons/md";
 
 import { useChatsContext } from "@/lib/context/ChatsProvider/hooks/useChatsContext";
-import { cn } from "@/lib/utils";
+import { cn, isToday, isWithinLast30Days, isWithinLast7Days, isYesterday } from "@/lib/utils";
 
-import { useSelectedChatPage } from "../../[chatId]/hooks/useSelectedChatPage";
 import { ChatsListItem } from "./components/ChatsListItem";
 import { MiniFooter } from "./components/ChatsListItem/components/MiniFooter";
 import { NewChatButton } from "./components/NewChatButton";
 import { useChatsList } from "./hooks/useChatsList";
+import { useSelectedChatPage } from "../../[chatId]/hooks/useSelectedChatPage";
 
 export const ChatsList = (): JSX.Element => {
   const { allChats } = useChatsContext();
   const { open, setOpen } = useChatsList();
   useSelectedChatPage();
 
-  // Utility functions for chat categorization
-  const isToday = (date: Date) => {
-    const today = new Date();
-
-    return date.toDateString() === today.toDateString();
-  };
-  
-  const isYesterday = (date: Date) => {
-    const yesterday = new Date();
-    yesterday.setDate(yesterday.getDate() - 1);
-
-    return date.toDateString() === yesterday.toDateString();
-  };
-
-  const isWithinLast7Days = (date: Date) => {
-    const today = new Date();
-    const weekAgo = new Date();
-    weekAgo.setDate(weekAgo.getDate() - 7);
-
-    return date > weekAgo && !isToday(date) && !isYesterday(date);
-  };
-
-  const isWithinLast30Days = (date: Date) => {
-    const today = new Date();
-    const monthAgo = new Date();
-    monthAgo.setDate(monthAgo.getDate() - 30);
-
-    return date > monthAgo && !isToday(date) && !isYesterday(date) && !isWithinLast7Days(date);
-  };
-
+ 
   // Filtering chats into different groups
   const todayChats = allChats.filter(chat => isToday(new Date(chat.creation_time)));
   const yesterdayChats = allChats.filter(chat => isYesterday(new Date(chat.creation_time)));
