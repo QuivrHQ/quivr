@@ -1,10 +1,8 @@
 "use client";
 import { UUID } from "crypto";
 import { AnimatePresence, motion } from "framer-motion";
-import Link from "next/link";
 import { useTranslation } from "react-i18next";
 
-import Button from "@/lib/components/ui/Button";
 import Spinner from "@/lib/components/ui/Spinner";
 
 import DocumentItem from "./DocumentItem";
@@ -45,9 +43,9 @@ export const KnowledgeTab = ({ brainId }: KnowledgeTabProps): JSX.Element => {
             ) : (
               <div className="flex flex-col items-center justify-center mt-10 gap-1">
                 <p className="text-center">{t("empty", { ns: "explore" })}</p>
-                <Link href="/upload">
-                  <Button>{t("uploadButton")}</Button>
-                </Link>
+                <p className="text-center">
+                  {t("feed_brain_instructions", { ns: "explore" })}
+                </p>
               </div>
             )}
           </motion.div>
