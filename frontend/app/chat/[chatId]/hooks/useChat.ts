@@ -11,8 +11,8 @@ import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainConte
 import { useToast } from "@/lib/hooks";
 import { useEventTracking } from "@/services/analytics/june/useEventTracking";
 
-import { ChatQuestion } from "../types";
 import { useQuestion } from "./useQuestion";
+import { ChatQuestion } from "../types";
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const useChat = () => {

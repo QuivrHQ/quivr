@@ -31,7 +31,9 @@ export const useApiKeyConfig = () => {
     queryKey: [USER_IDENTITY_DATA_KEY],
     queryFn: getUserIdentity,
   });
-  const gaEventTracker = useGAnalyticsEventTracker("QUIVR_API_KEY");
+  const { eventTracker: gaEventTracker } = useGAnalyticsEventTracker({
+    category: "QUIVR_API_KEY",
+  });
 
   useEffect(() => {
     if (userData !== undefined) {

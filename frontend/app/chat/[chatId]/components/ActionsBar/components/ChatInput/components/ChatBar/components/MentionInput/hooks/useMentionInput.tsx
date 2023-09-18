@@ -17,9 +17,9 @@ import { useJune } from "@/services/analytics/june/useJune";
 import "@draft-js-plugins/mention/lib/plugin.css";
 import "draft-js/dist/Draft.css";
 
-import { getEditorText } from "./helpers/getEditorText";
 import { useMentionPlugin } from "./helpers/MentionPlugin";
 import { useMentionState } from "./helpers/MentionState";
+import { getEditorText } from "./helpers/getEditorText";
 
 type UseMentionInputProps = {
   message: string;

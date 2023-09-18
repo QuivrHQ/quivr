@@ -1,11 +1,15 @@
 import ReactGA from "react-ga4";
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-export const useGAnalyticsEventTracker = (category: string) => {
+export const useGAnalyticsEventTracker = ({
+  category,
+}: {
+  category: string;
+}) => {
   const ga_id = process.env.NEXT_PUBLIC_GA_ID;
 
   if (ga_id === undefined) {
-    return undefined;
+    return { eventTracker: undefined };
   }
 
   ReactGA.initialize(ga_id);
@@ -24,5 +28,5 @@ export const useGAnalyticsEventTracker = (category: string) => {
     });
   };
 
-  return eventTracker;
+  return { eventTracker };
 };
