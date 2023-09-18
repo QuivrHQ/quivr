@@ -21,9 +21,8 @@ export const useGAnalyticsEventTracker = ({
     action: string;
     label?: string;
   }) => {
-    ReactGA.event({
+    ReactGA.event(action, {
       category,
-      action,
       label,
     });
   };
