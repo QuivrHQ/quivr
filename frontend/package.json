@@ -67,6 +67,7 @@
     "react": "18",
     "react-dom": "18",
     "react-dropzone": "^14.2.3",
+    "react-ga4": "^2.1.0",
     "react-hook-form": "^7.44.3",
     "react-i18next": "^13.0.3",
     "react-markdown": "^8.0.7",

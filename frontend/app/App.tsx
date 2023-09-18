@@ -8,7 +8,7 @@ import { NavBar } from "@/lib/components/NavBar";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 import { useSupabase } from "@/lib/context/SupabaseProvider";
 import { UpdateMetadata } from "@/lib/helpers/updateMetadata";
-import { usePageTracking } from "@/services/analytics/usePageTracking";
+import { usePageTracking } from "@/services/analytics/june/usePageTracking";
 import "../lib/config/LocaleConfig/i18n";
 
 const queryClient = new QueryClient();

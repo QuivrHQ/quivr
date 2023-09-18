@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 
 import { useSupabase } from "@/lib/context/SupabaseProvider";
 import { useToast } from "@/lib/hooks/useToast";
-import { useEventTracking } from "@/services/analytics/useEventTracking";
+import { useEventTracking } from "@/services/analytics/june/useEventTracking";
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const useSignUp = () => {
@@ -28,12 +28,12 @@ export const useSignUp = () => {
       console.error("Error signing up:", error.message);
       publish({
         variant: "danger",
-        text: t("errorSignUp",{ errorMessage: error.message}),
+        text: t("errorSignUp", { errorMessage: error.message }),
       });
     } else {
       publish({
         variant: "success",
-        text: t("mailSended")
+        text: t("mailSended"),
       });
     }
     setIsPending(false);

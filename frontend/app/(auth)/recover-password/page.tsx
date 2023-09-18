@@ -9,7 +9,7 @@ import PageHeading from "@/lib/components/ui/PageHeading";
 import { useSupabase } from "@/lib/context/SupabaseProvider";
 import { useToast } from "@/lib/hooks/useToast";
 import { redirectToLogin } from "@/lib/router/redirectToLogin";
-import { useEventTracking } from "@/services/analytics/useEventTracking";
+import { useEventTracking } from "@/services/analytics/june/useEventTracking";
 import { Suspense } from "react";
 import { useTranslation } from "react-i18next";
 
