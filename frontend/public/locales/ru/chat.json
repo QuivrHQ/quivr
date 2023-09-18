@@ -36,5 +36,7 @@
   "missing_brain": "Мозг не найден",
   "new_prompt": "Создать новый запрос",
   "feed_brain_placeholder" : "Выберите, какой @мозг вы хотите питать этими файлами",
-  "filesUploading": "Загрузка файлов..."
+  "filesUploading": "Загрузка файлов...",
+  "add_content_card_button_tooltip": "Добавить контент в мозг"
+
 }
