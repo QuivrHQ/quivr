@@ -177,6 +177,7 @@ async def create_question_handler(
     brain_id: NullableUUID
     | UUID
     | None = Query(..., description="The ID of the brain"),
+    chain_type: str | None = "stuff",
     current_user: UserIdentity = Depends(get_current_user),
 ) -> GetChatHistoryOutput:
     """
@@ -241,7 +242,9 @@ async def create_question_handler(
                 prompt_id=chat_question.prompt_id,
             )
 
-        chat_answer = gpt_answer_generator.generate_answer(chat_id, chat_question)
+        chat_answer = gpt_answer_generator.generate_answer(
+            chat_id, chat_question, chain_type=chain_type
+        )
 
         return chat_answer
     except HTTPException as e:
@@ -265,6 +268,7 @@ async def create_stream_question_handler(
     brain_id: NullableUUID
     | UUID
     | None = Query(..., description="The ID of the brain"),
+    chain_type: str | None = "stuff",
     current_user: UserIdentity = Depends(get_current_user),
 ) -> StreamingResponse:
     # TODO: check if the user has access to the brain
@@ -335,7 +339,9 @@ async def create_stream_question_handler(
 
         print("streaming")
         return StreamingResponse(
-            gpt_answer_generator.generate_stream(chat_id, chat_question),
+            gpt_answer_generator.generate_stream(
+                chat_id, chat_question, chain_type=chain_type
+            ),
             media_type="text/event-stream",
         )
 

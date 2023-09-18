@@ -137,6 +137,7 @@ CREATE TABLE IF NOT EXISTS brains (
   temperature FLOAT,
   openai_api_key TEXT,
   prompt_id UUID REFERENCES prompts(id)
+  retriever_algorithm TEXT
 );
 
 
@@ -249,9 +250,9 @@ CREATE POLICY "Access Quivr Storage 1jccrwz_2" ON storage.objects FOR UPDATE TO 
 CREATE POLICY "Access Quivr Storage 1jccrwz_3" ON storage.objects FOR DELETE TO anon USING (bucket_id = 'quivr');
 
 INSERT INTO migrations (name) 
-SELECT '202309157004032_add_sha1_column'
+SELECT '202309189504032_add_retrieval_algorithm'
 WHERE NOT EXISTS (
-    SELECT 1 FROM migrations WHERE name = '202309157004032_add_sha1_column'
+    SELECT 1 FROM migrations WHERE name = '202309189504032_add_retrieval_algorithm'
 );
 
 

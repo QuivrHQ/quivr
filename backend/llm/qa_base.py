@@ -136,7 +136,7 @@ class QABaseBrainPicking(BaseBrainPicking):
         return CHAT_PROMPT
 
     def generate_answer(
-        self, chat_id: UUID, question: ChatQuestion
+        self, chat_id: UUID, question: ChatQuestion, chain_type: str | None = "stuff"
     ) -> GetChatHistoryOutput:
         transformed_history = format_chat_history(get_chat_history(self.chat_id))
         answering_llm = self._create_llm(
@@ -145,7 +145,9 @@ class QABaseBrainPicking(BaseBrainPicking):
 
         # The Chain that generates the answer to the question
         doc_chain = load_qa_chain(
-            answering_llm, chain_type="stuff", prompt=self._create_prompt_template()
+            answering_llm,
+            chain_type=str(chain_type),
+            prompt=self._create_prompt_template(),
         )
 
         # The Chain that combines the question and answer
@@ -204,7 +206,7 @@ class QABaseBrainPicking(BaseBrainPicking):
         )
 
     async def generate_stream(
-        self, chat_id: UUID, question: ChatQuestion
+        self, chat_id: UUID, question: ChatQuestion, chain_type: str | None = "stuff"
     ) -> AsyncIterable:
         history = get_chat_history(self.chat_id)
         callback = AsyncIteratorCallbackHandler()
@@ -219,7 +221,9 @@ class QABaseBrainPicking(BaseBrainPicking):
 
         # The Chain that generates the answer to the question
         doc_chain = load_qa_chain(
-            answering_llm, chain_type="stuff", prompt=self._create_prompt_template()
+            answering_llm,
+            chain_type=str(chain_type),
+            prompt=self._create_prompt_template(),
         )
 
         # The Chain that combines the question and answer
