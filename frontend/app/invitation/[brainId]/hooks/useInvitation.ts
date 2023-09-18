@@ -31,7 +31,7 @@ export const useInvitation = () => {
     throw new Error(t("brainUndefined", { ns: "brain" }));
   }
 
-  const { fetchAllBrains, setActiveBrain } = useBrainContext();
+  const { fetchAllBrains, setCurrentBrainId } = useBrainContext();
   const router = useRouter();
 
   useEffect(() => {
@@ -73,7 +73,7 @@ export const useInvitation = () => {
         variant: "success",
         text: t("accept", { ns: "invitation" }),
       });
-      setActiveBrain({ id: brainId, name: brainName });
+      setCurrentBrainId(brainId);
     } catch (error) {
       if (axios.isAxiosError(error) && error.response?.data !== undefined) {
         publish({

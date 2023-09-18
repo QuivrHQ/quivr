@@ -49,6 +49,7 @@ else:
 @celery.task(name="process_file_and_notify")
 def process_file_and_notify(
     file_name: str,
+    file_original_name: str,
     enable_summarization,
     brain_id,
     openai_api_key,
@@ -77,6 +78,7 @@ def process_file_and_notify(
                 enable_summarization=enable_summarization,
                 brain_id=brain_id,
                 openai_api_key=openai_api_key,
+                original_file_name=file_original_name,
             )
         )
 
@@ -129,6 +131,7 @@ def process_crawl_and_notify(
                 enable_summarization=enable_summarization,
                 brain_id=brain_id,
                 openai_api_key=openai_api_key,
+                original_file_name=crawl_website_url,
             )
         )
     else:

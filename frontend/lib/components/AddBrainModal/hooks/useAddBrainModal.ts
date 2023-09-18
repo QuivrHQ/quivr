@@ -15,21 +15,17 @@ import { getAccessibleModels } from "@/lib/helpers/getAccessibleModels";
 import { useToast } from "@/lib/hooks";
 import { useQuery } from "@tanstack/react-query";
 
-
-
-
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const useAddBrainModal = () => {
   const { t } = useTranslation(["translation", "brain", "config"]);
   const [isPending, setIsPending] = useState(false);
   const { publish } = useToast();
-  const { createBrain, setActiveBrain } = useBrainContext();
+  const { createBrain, setCurrentBrainId } = useBrainContext();
   const { setAsDefaultBrain } = useBrainApi();
   const { createPrompt } = usePromptApi();
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
 
   const { getUser } = useUserApi();
-
 
   const { data: userData } = useQuery({
     queryKey: [USER_DATA_KEY],
@@ -45,10 +41,6 @@ export const useAddBrainModal = () => {
       content: "",
     },
   };
-
-  
-
-  
 
   const { register, getValues, reset, watch, setValue } = useForm({
     defaultValues,
@@ -114,10 +106,7 @@ export const useAddBrainModal = () => {
         return;
       }
 
-      setActiveBrain({
-        id: createdBrainId,
-        name,
-      });
+      setCurrentBrainId(createdBrainId);
 
       if (setDefault) {
         await setAsDefaultBrain(createdBrainId);

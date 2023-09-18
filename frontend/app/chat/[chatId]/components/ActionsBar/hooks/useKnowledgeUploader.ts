@@ -167,11 +167,6 @@ export const useKnowledgeUploader = ({
       } else {
         await fetchNotifications(currentChatId);
       }
-
-      publish({
-        variant: "success",
-        text: t("knowledgeUploaded"),
-      });
     } catch (e) {
       publish({
         variant: "danger",

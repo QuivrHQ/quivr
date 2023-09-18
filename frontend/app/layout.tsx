@@ -7,7 +7,6 @@ import { ToastProvider } from "@/lib/components/ui/Toast";
 import { FeatureFlagsProvider } from "@/lib/context";
 import { BrainProvider } from "@/lib/context/BrainProvider";
 import { SupabaseProvider } from "@/lib/context/SupabaseProvider";
-import { GoogleAnalytics } from "@/services/analytics/google/googleAnalytics";
 
 import { App } from "./App";
 import "./globals.css";
@@ -50,7 +49,6 @@ const RootLayout = async ({
             </SupabaseProvider>
           </ToastProvider>
           <VercelAnalytics />
-          <GoogleAnalytics />
         </FeatureFlagsProvider>
       </body>
     </html>

@@ -10,5 +10,8 @@
     "chunkNumber": "Número de partes: {{quantity}}",
     "notAvailable": "Indisponível",
     "deleteConfirmTitle": "Confirmar",
-    "deleteConfirmText": "Você realmente deseja excluir?"
+    "deleteConfirmText": "Você realmente deseja excluir?",
+    "feed_brain_instructions": "Para adicionar conhecimento a um cérebro, vá para a página de chat e clique no botão de adição à esquerda da entrada de chat."
+
+
 }

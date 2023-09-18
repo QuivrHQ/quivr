@@ -36,6 +36,6 @@
   "missing_brain": "Veuillez selectionner un cerveau pour discuter",
   "new_prompt": "Créer un nouveau prompt",
   "feed_brain_placeholder" : "Choisissez le @cerveau que vous souhaitez nourrir avec ces fichiers",
-  "filesUploading": "Téléchargement des fichiers...",
-  "add_content_card_button_tooltip": "Ajouter du contenu à un cerveau"
+  "feedingBrain": "Vos nouvelles connaissances sont en cours de traitement. Vous pouvez continuer à discuter en attendant !",
+  "add_content_card_button_tooltip": "Ajouter des connaissances à un cerveau"
 }

@@ -27,9 +27,18 @@ vi.mock("next/navigation", async () => {
 vi.mock("@/lib/context/ChatsProvider/hooks/useChatsContext", () => ({
   useChatsContext: () => ({
     allChats: [
-      { chat_id: 1, name: "Chat 1" },
-      { chat_id: 2, name: "Chat 2" },
+      {
+        chat_id: 1,
+        name: "Chat 1",
+        creation_time: new Date().toISOString(),
+      },
+      {
+        chat_id: 2,
+        name: "Chat 2",
+        creation_time: new Date().toISOString(),
+      },
     ],
+
     deleteChat: vi.fn(),
     setAllChats: vi.fn(),
   }),

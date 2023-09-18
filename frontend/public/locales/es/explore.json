@@ -10,5 +10,6 @@
     "sessionNotFound": "Sesión no encontrada",
     "subtitle": "Ver o borrar datos guardados usados por tu cerebro",
     "title": "Explora datos subidos",
-    "view": "Ver"
+    "view": "Ver",
+    "feed_brain_instructions": "Para agregar conocimiento a un cerebro, ve a la página de chat y haz clic en el botón de más a la izquierda del campo de chat."
 }
