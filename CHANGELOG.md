@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.0.77 (2023-09-19)
+
+## What's Changed
+* feat(memory): optimisation by @StanGirard in https://github.com/StanGirard/quivr/pull/1214
+
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.76...v0.0.77
+
 ## 0.0.76 (2023-09-19)
 
 ## What's Changed
