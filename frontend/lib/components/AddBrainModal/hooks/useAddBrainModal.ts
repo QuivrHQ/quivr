@@ -13,6 +13,7 @@ import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainConte
 import { defineMaxTokens } from "@/lib/helpers/defineMaxTokens";
 import { getAccessibleModels } from "@/lib/helpers/getAccessibleModels";
 import { useToast } from "@/lib/hooks";
+import { BrainStatus } from "@/lib/types/brainConfig";
 import { useQuery } from "@tanstack/react-query";
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
@@ -27,6 +28,19 @@ export const useAddBrainModal = () => {
 
   const { getUser } = useUserApi();
 
+  const brainStatusOptions: {
+    label: string;
+    value: BrainStatus;
+  }[] = [
+    {
+      label: t("private_brain_label", { ns: "brain" }),
+      value: "private",
+    },
+    {
+      label: t("private_brain_label", { ns: "brain" }),
+      value: "public",
+    },
+  ];
   const { data: userData } = useQuery({
     queryKey: [USER_DATA_KEY],
     queryFn: getUser,
@@ -50,11 +64,16 @@ export const useAddBrainModal = () => {
   const model = watch("model");
   const temperature = watch("temperature");
   const maxTokens = watch("maxTokens");
+  const status = watch("status");
 
   const accessibleModels = getAccessibleModels({
     openAiKey,
     userData,
   });
+
+  useEffect(() => {
+    console.log({ status });
+  }, [status]);
 
   useEffect(() => {
     setValue("maxTokens", Math.min(maxTokens, defineMaxTokens(model)));
@@ -157,17 +176,25 @@ export const useAddBrainModal = () => {
     });
   };
 
+  const onRadioChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setValue("status", e.target.value as BrainStatus, {
+      shouldDirty: true,
+    });
+  };
+
   return {
     isShareModalOpen,
     setIsShareModalOpen,
     handleSubmit,
     register,
-    openAiKey: openAiKey === "" ? undefined : openAiKey,
     model,
     temperature,
     maxTokens,
     isPending,
     accessibleModels,
     pickPublicPrompt,
+    brainStatusOptions,
+    onRadioChange,
+    status,
   };
 };

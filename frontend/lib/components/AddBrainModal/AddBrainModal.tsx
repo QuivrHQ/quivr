@@ -10,6 +10,7 @@ import { Modal } from "@/lib/components/ui/Modal";
 import { defineMaxTokens } from "@/lib/helpers/defineMaxTokens";
 
 import { Divider } from "../ui/Divider";
+import { Radio } from "../ui/Radio";
 import { TextArea } from "../ui/TextArea";
 import { useAddBrainModal } from "./hooks/useAddBrainModal";
 
@@ -20,13 +21,15 @@ export const AddBrainModal = (): JSX.Element => {
     isShareModalOpen,
     setIsShareModalOpen,
     register,
-    openAiKey,
     temperature,
     maxTokens,
     model,
     isPending,
     pickPublicPrompt,
+    onRadioChange,
     accessibleModels,
+    brainStatusOptions,
+    status,
   } = useAddBrainModal();
 
   return (
@@ -73,7 +76,17 @@ export const AddBrainModal = (): JSX.Element => {
           className="flex-1 m-3"
           {...register("description")}
         />
-
+        <fieldset className="w-full flex flex-col">
+          <Radio
+            items={brainStatusOptions}
+            label={t("brain_status_label", { ns: "brain" })}
+            value={status}
+            className="flex-1 justify-between w-[50%]"
+            {...register("status", {
+              onChange: (e) => onRadioChange(e),
+            })}
+          />
+        </fieldset>
         <Field
           label={t("openAiKeyLabel", { ns: "config" })}
           placeholder={t("openAiKeyPlaceholder", { ns: "config" })}
@@ -92,10 +105,10 @@ export const AddBrainModal = (): JSX.Element => {
             className="px-5 py-2 dark:bg-gray-700 bg-gray-200 rounded-md"
           >
             {accessibleModels.map((availableModel) => (
-            <option value={availableModel} key={availableModel}>
-              {availableModel}
-            </option>
-          ))}
+              <option value={availableModel} key={availableModel}>
+                {availableModel}
+              </option>
+            ))}
           </select>
         </fieldset>
 
