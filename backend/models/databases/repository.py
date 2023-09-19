@@ -241,22 +241,6 @@ class Repository(ABC):
         pass
 
     @abstractmethod
-    def insert_brain_knowledge(self, brain_knowledge):
-        pass
-
-    @abstractmethod
-    def remove_brain_knowledge_by_brain_id(self, brain_id: UUID):
-        pass
-
-    @abstractmethod
-    def remove_brain_knowledge_by_knowledge_id(self, knowledge_id: UUID):
-        pass
-
-    @abstractmethod
-    def get_brain_knowledge_by_brain_id(self, brain_id: UUID):
-        pass
-
-    @abstractmethod
     def insert_knowledge(self, brain_id: UUID):
         pass
 
