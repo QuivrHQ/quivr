@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.0.76 (2023-09-19)
+
+## What's Changed
+* chore(theodo): added trigger function for theodo by @StanGirard in https://github.com/StanGirard/quivr/pull/1195
+* feat: add tooltip on upload card toggle button by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1197
+* feat(analytics): add google analytics by @gozineb in https://github.com/StanGirard/quivr/pull/1147
+* Feat/theodo gpt4 by @StanGirard in https://github.com/StanGirard/quivr/pull/1198
+* fix(chats): now in order and with a little bonus ;) by @StanGirard in https://github.com/StanGirard/quivr/pull/1200
+* fix: fix some bugs by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1201
+* feat(question): now not rephrasing question when passed to answering llm by @StanGirard in https://github.com/StanGirard/quivr/pull/1202
+
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.75...v0.0.76
+
 ## 0.0.75 (2023-09-18)
 
 ## What's Changed
