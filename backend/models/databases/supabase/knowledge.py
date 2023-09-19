@@ -8,8 +8,6 @@ from pydantic import BaseModel
 
 
 class CreateKnowledgeProperties(BaseModel):
-    """Properties that can be received on notification creation"""
-
     brain_id: UUID
     file_name: Optional[str] = None
     url: Optional[str] = None
@@ -22,8 +20,6 @@ class CreateKnowledgeProperties(BaseModel):
 
 
 class DeleteKnowledgeResponse(BaseModel):
-    """Response when deleting a prompt"""
-
     status: str = "delete"
     knowledge_id: UUID
 
@@ -70,7 +66,7 @@ class Knowledges(Repository):
 
     def get_knowledge_by_id(self, knowledge_id: UUID) -> Knowledge:
         """
-        Get all the knowledge from a brain
+        Get a knowledge by its id
         Args:
             brain_id (UUID): The id of the brain
         """

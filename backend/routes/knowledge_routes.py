@@ -17,14 +17,14 @@ logger = get_logger(__name__)
 
 
 @knowledge_router.get(
-    "/knowledge/", dependencies=[Depends(AuthBearer())], tags=["Explore"]
+    "/knowledge/", dependencies=[Depends(AuthBearer())], tags=["Knowledge"]
 )
 async def list_knowledge_in_brain_endpoint(
     brain_id: UUID = Query(..., description="The ID of the brain"),
     current_user: UserIdentity = Depends(get_current_user),
 ):
     """
-    Retrieve and explore unique user data vectors.
+    Retrieve and list all the knowledge in a brain.
     """
 
     validate_brain_authorization(brain_id=brain_id, user_id=current_user.id)
@@ -34,7 +34,7 @@ async def list_knowledge_in_brain_endpoint(
     files = list_files_from_storage(str(brain_id))
     logger.info("List of files from storage", files)
 
-    # TO DO: Store url + files in knowledge -> retrieve from table url + file_name
+    # TO DO: Retrieve from Knowledge table instead of storage or vectors
     unique_data = brain.get_unique_brain_files()
 
     print("UNIQUE DATA", unique_data)
@@ -49,7 +49,7 @@ async def list_knowledge_in_brain_endpoint(
         Depends(AuthBearer()),
         Depends(has_brain_authorization(RoleEnum.Owner)),
     ],
-    tags=["Explore"],
+    tags=["Knowledge"],
 )
 async def delete_endpoint(
     file_name: str,
@@ -73,7 +73,7 @@ async def delete_endpoint(
 @knowledge_router.get(
     "/explore/{file_name}/signed_download_url",
     dependencies=[Depends(AuthBearer())],
-    tags=["Explore"],
+    tags=["Knowledge"],
 )
 async def generate_signed_url_endpoint(
     file_name: str, current_user: UserIdentity = Depends(get_current_user)

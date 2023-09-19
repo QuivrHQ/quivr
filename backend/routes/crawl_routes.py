@@ -7,8 +7,8 @@ from crawl.crawler import CrawlWebsite
 from fastapi import APIRouter, Depends, Query, Request
 from logger import get_logger
 from models import Brain, UserIdentity, UserUsage
+from models.databases.supabase.knowledge import CreateKnowledgeProperties
 from models.databases.supabase.notifications import CreateNotificationProperties
-from models.knowledge import Knowledge
 from models.notifications import NotificationsStatusEnum
 from repository.knowledge.add_knowledge import add_knowledge
 from repository.notification.add_notification import add_notification
@@ -69,13 +69,13 @@ async def crawl_endpoint(
                 )
             )
 
-        knowledge = Knowledge(
+        knowledge_to_add = CreateKnowledgeProperties(
             brain_id=brain_id,
             url=crawl_website.url,
             extension="html",
         )
 
-        added_knowledge = add_knowledge(knowledge)
+        added_knowledge = add_knowledge(knowledge_to_add)
         logger.info(f"Knowledge {added_knowledge} added successfully")
 
         process_crawl_and_notify.delay(

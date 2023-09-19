@@ -7,8 +7,8 @@ from celery_worker import process_file_and_notify
 from fastapi import APIRouter, Depends, HTTPException, Query, Request, UploadFile
 from logger import get_logger
 from models import Brain, UserIdentity, UserUsage
+from models.databases.supabase.knowledge import CreateKnowledgeProperties
 from models.databases.supabase.notifications import CreateNotificationProperties
-from models.knowledge import Knowledge
 from models.notifications import NotificationsStatusEnum
 from repository.brain import get_brain_details
 from repository.files.upload_file import upload_file_storage
@@ -97,7 +97,7 @@ async def upload_file(
                 status_code=500, detail="Failed to upload file to storage."
             )
 
-    knowledge = Knowledge(
+    knowledge_to_add = CreateKnowledgeProperties(
         brain_id=brain_id,
         file_name=uploadFile.filename,
         extension=os.path.splitext(
@@ -105,7 +105,7 @@ async def upload_file(
         )[-1].lower(),
     )
 
-    added_knowledge = add_knowledge(knowledge)
+    added_knowledge = add_knowledge(knowledge_to_add)
     logger.info(f"Knowledge {added_knowledge} added successfully")
 
     process_file_and_notify.delay(

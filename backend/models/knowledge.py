@@ -5,8 +5,8 @@ from pydantic import BaseModel
 
 
 class Knowledge(BaseModel):
-    id: Optional[UUID] = None
-    brain_id: Optional[UUID] = None
+    id: UUID
+    brain_id: UUID
     file_name: Optional[str] = None
     url: Optional[str] = None
     extension: str = "txt"

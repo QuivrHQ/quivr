@@ -249,5 +249,5 @@ class Repository(ABC):
         pass
 
     @abstractmethod
-    def get_knowledge_by_id(self, brain_id: UUID):
+    def get_knowledge_by_id(self, knowledge_id: UUID):
         pass
