@@ -26,5 +26,8 @@
     "userRoleUpdated": "Actualizado {{email}} a {{newRole}}",
     "userRoleUpdateFailed": "Error actualizado {{email}} a {{newRole}} ",
     "usersInvited": "Usuarios invitados correctamente",
-    "usersWithAccess": "Usuarios con acceso"
+    "usersWithAccess": "Usuarios con acceso",
+    "private_brain_label": "Privado",
+    "public_brain_label": "Público",
+    "brain_status_label": "Estado"
 }

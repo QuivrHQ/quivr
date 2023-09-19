@@ -26,5 +26,8 @@
     "userRemoveFailed": "Remoção do e-mail {{email}} do cérebro falhou",
     "defaultBrain": "Cérebro padrão",
     "setDefaultBrain": "Defina como o cérebro padrão",
-    "errorCreatingBrain": "Um erro aconteceu ao criar o cérebro"
+    "errorCreatingBrain": "Um erro aconteceu ao criar o cérebro",
+    "private_brain_label": "Privado",
+    "public_brain_label": "Público",
+    "brain_status_label": "Status"
 }

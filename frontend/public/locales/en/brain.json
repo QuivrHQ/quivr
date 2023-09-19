@@ -26,5 +26,8 @@
     "userRemoveFailed": "Failed to remove {{email}} from brain",
     "defaultBrain": "Default Brain",
     "setDefaultBrain": "Set as default brain",
-    "errorCreatingBrain": "Error occurred while creating a brain"
+    "errorCreatingBrain": "Error occurred while creating a brain",
+    "private_brain_label": "Private",
+    "public_brain_label": "Public",
+    "brain_status_label":"Access"
 }

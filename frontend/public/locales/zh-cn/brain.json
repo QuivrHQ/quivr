@@ -26,5 +26,8 @@
     "userRemoveFailed": "无法从大脑中删除 {{email}}",
     "defaultBrain": "默认大脑",
     "setDefaultBrain": "设置为默认大脑",
-    "errorCreatingBrain": "创建大脑时发生错误"
+    "errorCreatingBrain": "创建大脑时发生错误",
+    "private_brain_label": "私有",
+    "public_brain_label": "公开",
+    "brain_status_label": "状态"
 }

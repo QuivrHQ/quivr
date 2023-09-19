@@ -26,5 +26,8 @@
     "userRemoveFailed": "Не удалось удалить {{email}} из мозга",
     "defaultBrain": "Мозг по умолчанию",
     "setDefaultBrain": "Установить как мозг по умолчанию",
-    "errorCreatingBrain": "Произошла ошибка при создании мозга"
+    "errorCreatingBrain": "Произошла ошибка при создании мозга",
+    "private_brain_label": "Приватный",
+    "public_brain_label": "Публичный",
+    "brain_status_label": "Статус"
 }
