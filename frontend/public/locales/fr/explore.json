@@ -10,5 +10,6 @@
     "chunkNumber": "Nombre de fragments : {{quantity}}",
     "notAvailable": "Non disponible",
     "deleteConfirmTitle": "Confirmer",
-    "deleteConfirmText": "Voulez-vous vraiment supprimer ?"
+    "deleteConfirmText": "Voulez-vous vraiment supprimer ?",
+    "feed_brain_instructions": "Pour ajouter des connaissances à un cerveau, allez sur la page de chat, puis cliquez sur le bouton plus à gauche de la zone de chat."
 }

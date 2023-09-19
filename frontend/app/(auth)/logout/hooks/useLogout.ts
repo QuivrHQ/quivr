@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 
 import { useSupabase } from "@/lib/context/SupabaseProvider";
 import { useToast } from "@/lib/hooks";
-import { useEventTracking } from "@/services/analytics/useEventTracking";
+import { useEventTracking } from "@/services/analytics/june/useEventTracking";
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const useLogout = () => {
@@ -13,7 +13,7 @@ export const useLogout = () => {
   const { track } = useEventTracking();
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const {t, i18n} = useTranslation(["translation","logout"]);
+  const { t, i18n } = useTranslation(["translation", "logout"]);
 
   const { publish } = useToast();
   const router = useRouter();
@@ -28,12 +28,12 @@ export const useLogout = () => {
       console.error("Error logging out:", error.message);
       publish({
         variant: "danger",
-        text: t("error", { errorMessage: error.message, ns: "logout"}),
+        text: t("error", { errorMessage: error.message, ns: "logout" }),
       });
     } else {
       publish({
         variant: "success",
-        text: t("loggedOut", {ns : "logout"})
+        text: t("loggedOut", { ns: "logout" }),
       });
       router.replace("/");
     }

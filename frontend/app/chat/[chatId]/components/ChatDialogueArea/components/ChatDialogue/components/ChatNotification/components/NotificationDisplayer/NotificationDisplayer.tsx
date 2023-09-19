@@ -15,6 +15,7 @@ export const NotificationDisplayer = ({
 }: NotificationDisplayerProps): JSX.Element => {
   const { message: nonParsedMessage, action } = content;
   const [isHovered, setIsHovered] = useState(false);
+
   if (nonParsedMessage === null || nonParsedMessage === undefined) {
     return <Fragment />;
   }
@@ -22,32 +23,32 @@ export const NotificationDisplayer = ({
   const { message, status, name } = JSON.parse(
     nonParsedMessage.replace(/'/g, '"')
   ) as NotificationMessage;
-  console.log({
-    message,
-    status,
-    name,
-  });
 
   return (
-    <>
-      <div
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
-        className="flex flex-row flex-1 gap-1 p-3 rounded-md items-center"
-      >
-        <span className="text-gray-400 mb-1 text-2xl">
-          {notificationStatusToIcon[status]}
-        </span>
-        <div className=" flex flex-row rounded-md bg-white p-3 flex-1">
-          <div className="flex flex-row items-center gap-1">
-            <div className="bg-gray-200 p-1 rounded-md items-center justify-center flex">
-              {action === "CRAWL" ? <MdLink /> : getFileIcon(name)}
-            </div>
-            <span className="text-md flex flex-1">{name}</span>
+    <div
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      className="relative flex flex-row p-2 gap-1 rounded-sm items-center hover:bg-gray-100 transition duration-300 cursor-pointer"
+    >
+      <span className="text-gray-400 text-2xl">
+        {notificationStatusToIcon[status]}
+      </span>
+      <div className="flex flex-row bg-white p-2 rounded-sm ml-2">
+        <div className="flex flex-row items-center gap-1">
+          <div className="bg-gray-100 p-1 rounded-sm items-center justify-center flex">
+            {action === "CRAWL" ? <MdLink size={16} /> : getFileIcon(name)}
           </div>
+          <span className="text-sm text-gray-600">{name}</span>
         </div>
       </div>
-      <div>{isHovered ? <div>{message}</div> : <div></div>}</div>
-    </>
+      {isHovered && (
+        <div 
+          className="absolute bg-white p-2 rounded-sm border border-gray-100 shadow-sm transition-transform transform translate-y-1 translate-x-1/4 z-10"
+          style={{ bottom: '-10px', right: '10px' }}
+        >
+          {message}
+        </div>
+      )}
+    </div>
   );
 };

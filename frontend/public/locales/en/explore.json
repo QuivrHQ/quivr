@@ -10,5 +10,6 @@
     "chunkNumber": "No. of chunks: {{quantity}}",
     "notAvailable": "Not Available",
     "deleteConfirmTitle": "Confirm",
-    "deleteConfirmText": "Do you really want to delete?"
+    "deleteConfirmText": "Do you really want to delete?",
+    "feed_brain_instructions":"To add knowledge to a brain, go to chat page then click on plus button on the left of the chat input"
 }

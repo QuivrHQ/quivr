@@ -28,6 +28,8 @@ if CELERY_BROKER_URL.startswith("sqs"):
         __name__,
         broker=CELERY_BROKER_URL,
         task_serializer="json",
+        task_concurrency=4,
+        worker_prefetch_multiplier=1,
         broker_transport_options=broker_transport_options,
     )
     celery.conf.task_default_queue = CELEBRY_BROKER_QUEUE_NAME
@@ -36,6 +38,8 @@ elif CELERY_BROKER_URL.startswith("redis"):
         __name__,
         broker=CELERY_BROKER_URL,
         backend=CELERY_BROKER_URL,
+        task_concurrency=4,
+        worker_prefetch_multiplier=1,
         task_serializer="json",
     )
 else:
@@ -45,6 +49,7 @@ else:
 @celery.task(name="process_file_and_notify")
 def process_file_and_notify(
     file_name: str,
+    file_original_name: str,
     enable_summarization,
     brain_id,
     openai_api_key,
@@ -73,6 +78,7 @@ def process_file_and_notify(
                 enable_summarization=enable_summarization,
                 brain_id=brain_id,
                 openai_api_key=openai_api_key,
+                original_file_name=file_original_name,
             )
         )
 
@@ -125,6 +131,7 @@ def process_crawl_and_notify(
                 enable_summarization=enable_summarization,
                 brain_id=brain_id,
                 openai_api_key=openai_api_key,
+                original_file_name=crawl_website_url,
             )
         )
     else:

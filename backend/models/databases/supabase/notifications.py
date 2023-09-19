@@ -1,3 +1,4 @@
+from datetime import datetime, timedelta
 from typing import Optional
 from uuid import UUID
 
@@ -115,10 +116,15 @@ class Notifications(Repository):
         Returns:
             list[Notification]: The notifications
         """
+        five_minutes_ago = (datetime.now() - timedelta(minutes=5)).strftime(
+            "%Y-%m-%d %H:%M:%S.%f"
+        )
+
         notifications = (
             self.db.from_("notifications")
             .select("*")
             .filter("chat_id", "eq", chat_id)
+            .filter("datetime", "gt", five_minutes_ago)
             .execute()
         ).data
 

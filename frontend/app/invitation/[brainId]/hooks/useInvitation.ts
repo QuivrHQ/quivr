@@ -10,7 +10,7 @@ import { useSubscriptionApi } from "@/lib/api/subscription/useSubscriptionApi";
 import { BrainRoleType } from "@/lib/components/BrainUsers/types";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 import { useToast } from "@/lib/hooks";
-import { useEventTracking } from "@/services/analytics/useEventTracking";
+import { useEventTracking } from "@/services/analytics/june/useEventTracking";
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const useInvitation = () => {
@@ -31,7 +31,7 @@ export const useInvitation = () => {
     throw new Error(t("brainUndefined", { ns: "brain" }));
   }
 
-  const { fetchAllBrains, setActiveBrain } = useBrainContext();
+  const { fetchAllBrains, setCurrentBrainId } = useBrainContext();
   const router = useRouter();
 
   useEffect(() => {
@@ -73,7 +73,7 @@ export const useInvitation = () => {
         variant: "success",
         text: t("accept", { ns: "invitation" }),
       });
-      setActiveBrain({ id: brainId, name: brainName });
+      setCurrentBrainId(brainId);
     } catch (error) {
       if (axios.isAxiosError(error) && error.response?.data !== undefined) {
         publish({

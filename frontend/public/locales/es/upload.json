@@ -15,6 +15,5 @@
     "success": "Archivo subido correctamente",
     "title": "Subir conocimiento",
     "webSite": "Ingrese la URL del sitio web",
-    "invalidFileType": "Tipo de archivo no permitido",
-    "knowledgeUploaded": "Conocimiento subido"
+    "invalidFileType": "Tipo de archivo no permitido"
 }

@@ -7,7 +7,7 @@ import { useSupabase } from "@/lib/context/SupabaseProvider";
 import { useToast } from "@/lib/hooks";
 import { redirectToLogin } from "@/lib/router/redirectToLogin";
 import { SupportedFileExtensionsWithDot } from "@/lib/types/SupportedFileExtensions";
-import { useEventTracking } from "@/services/analytics/useEventTracking";
+import { useEventTracking } from "@/services/analytics/june/useEventTracking";
 
 import { FeedItemType } from "../../../../../types";
 

@@ -19,7 +19,7 @@ vi.mock("@/lib/context/SupabaseProvider", () => ({
   useSupabase: () => mockUseSupabase(),
 }));
 
-vi.mock("@/services/analytics/useEventTracking", () => ({
+vi.mock("@/services/analytics/june/useEventTracking", () => ({
   useEventTracking: () => ({ track: vi.fn() }),
 }));
 

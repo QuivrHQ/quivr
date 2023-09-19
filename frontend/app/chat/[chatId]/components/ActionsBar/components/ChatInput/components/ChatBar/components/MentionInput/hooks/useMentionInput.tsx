@@ -13,7 +13,7 @@ import {
   MentionTriggerType,
 } from "@/app/chat/[chatId]/components/ActionsBar/types";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
-import { useJune } from "@/services/analytics/useJune";
+import { useJune } from "@/services/analytics/june/useJune";
 import "@draft-js-plugins/mention/lib/plugin.css";
 import "draft-js/dist/Draft.css";
 

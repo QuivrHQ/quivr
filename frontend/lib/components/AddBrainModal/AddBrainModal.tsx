@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable max-lines */
+/* eslint-disable */
 import { useTranslation } from "react-i18next";
 import { MdAdd } from "react-icons/md";
 
@@ -8,11 +8,10 @@ import Button from "@/lib/components/ui/Button";
 import Field from "@/lib/components/ui/Field";
 import { Modal } from "@/lib/components/ui/Modal";
 import { defineMaxTokens } from "@/lib/helpers/defineMaxTokens";
-import { freeModels, paidModels } from "@/lib/types/brainConfig";
 
-import { useAddBrainModal } from "./hooks/useAddBrainModal";
 import { Divider } from "../ui/Divider";
 import { TextArea } from "../ui/TextArea";
+import { useAddBrainModal } from "./hooks/useAddBrainModal";
 
 export const AddBrainModal = (): JSX.Element => {
   const { t } = useTranslation(["translation", "brain", "config"]);
@@ -27,6 +26,7 @@ export const AddBrainModal = (): JSX.Element => {
     model,
     isPending,
     pickPublicPrompt,
+    accessibleModels,
   } = useAddBrainModal();
 
   return (
@@ -36,6 +36,7 @@ export const AddBrainModal = (): JSX.Element => {
           onClick={() => void 0}
           variant={"tertiary"}
           className="border-0"
+          data-testid="add-brain-button"
         >
           {t("newBrain", { ns: "brain" })}
           <MdAdd className="text-xl" />
@@ -61,6 +62,7 @@ export const AddBrainModal = (): JSX.Element => {
           autoComplete="off"
           className="flex-1"
           required
+          data-testid="brain-name"
           {...register("name")}
         />
 
@@ -89,13 +91,11 @@ export const AddBrainModal = (): JSX.Element => {
             {...register("model")}
             className="px-5 py-2 dark:bg-gray-700 bg-gray-200 rounded-md"
           >
-            {(openAiKey !== undefined ? paidModels : freeModels).map(
-              (availableModel) => (
-                <option value={availableModel} key={availableModel}>
-                  {availableModel}
-                </option>
-              )
-            )}
+            {accessibleModels.map((availableModel) => (
+            <option value={availableModel} key={availableModel}>
+              {availableModel}
+            </option>
+          ))}
           </select>
         </fieldset>
 
@@ -154,7 +154,12 @@ export const AddBrainModal = (): JSX.Element => {
           </label>
         </div>
 
-        <Button isLoading={isPending} className="mt-12 self-end" type="submit">
+        <Button
+          isLoading={isPending}
+          className="mt-12 self-end"
+          type="submit"
+          data-testid="create-brain-submit-button"
+        >
           {t("createButton")}
           <MdAdd className="text-xl" />
         </Button>

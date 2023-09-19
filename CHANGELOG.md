@@ -1,5 +1,41 @@
 # Changelog
 
+## 0.0.76 (2023-09-19)
+
+## What's Changed
+* chore(theodo): added trigger function for theodo by @StanGirard in https://github.com/StanGirard/quivr/pull/1195
+* feat: add tooltip on upload card toggle button by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1197
+* feat(analytics): add google analytics by @gozineb in https://github.com/StanGirard/quivr/pull/1147
+* Feat/theodo gpt4 by @StanGirard in https://github.com/StanGirard/quivr/pull/1198
+* fix(chats): now in order and with a little bonus ;) by @StanGirard in https://github.com/StanGirard/quivr/pull/1200
+* fix: fix some bugs by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1201
+* feat(question): now not rephrasing question when passed to answering llm by @StanGirard in https://github.com/StanGirard/quivr/pull/1202
+
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.75...v0.0.76
+
+## 0.0.75 (2023-09-18)
+
+## What's Changed
+* feat(frontend): responsiveness by @StanGirard in https://github.com/StanGirard/quivr/pull/1174
+* feat(upload): changed to task by @StanGirard in https://github.com/StanGirard/quivr/pull/1178
+* fix(qa_base): asign max_token to llm by @B0rrA in https://github.com/StanGirard/quivr/pull/1179
+* feat(perf): increased perf embedding and search for files by @StanGirard in https://github.com/StanGirard/quivr/pull/1182
+* fix(usersettings): Fix bugs with user settings in the back always gpt-3.5-turbo by @StanGirard in https://github.com/StanGirard/quivr/pull/1183
+* feat(notificatins): higher refresh rate by @StanGirard in https://github.com/StanGirard/quivr/pull/1184
+* style(notifications): improve the messages for the notifications by @StanGirard in https://github.com/StanGirard/quivr/pull/1185
+* fix(notifications): dead notifications that are still present long after by @StanGirard in https://github.com/StanGirard/quivr/pull/1186
+* fix(notifications): greater than 5 minutes ago not less by @StanGirard in https://github.com/StanGirard/quivr/pull/1187
+* feat(aws): improved size by @StanGirard in https://github.com/StanGirard/quivr/pull/1188
+* feat(concurrency): added concurrency for increased performance by @StanGirard in https://github.com/StanGirard/quivr/pull/1189
+* feat(prompt): improved answer readability with markdown and aerataed by @StanGirard in https://github.com/StanGirard/quivr/pull/1190
+* fix(notification): information now displayed on the right by @StanGirard in https://github.com/StanGirard/quivr/pull/1191
+* feat(chat): added copy feature to message by @StanGirard in https://github.com/StanGirard/quivr/pull/1192
+* feat(e2e): add playright config and createBrain e2e test by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1177
+
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.74...v0.0.75
+
 ## 0.0.74 (2023-09-14)
 
 **Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.73...v0.0.74

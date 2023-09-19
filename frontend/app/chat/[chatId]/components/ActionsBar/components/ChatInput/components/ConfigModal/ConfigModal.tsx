@@ -40,13 +40,7 @@ export const ConfigModal = ({ chatId }: { chatId?: string }): JSX.Element => {
       setOpen={setIsConfigModalOpen}
       CloseTrigger={<div />}
     >
-      <form
-        onSubmit={(e) => {
-          void handleSubmit(e);
-          setIsConfigModalOpen(false);
-        }}
-        className="mt-10 flex flex-col items-center gap-2"
-      >
+      <form className="mt-10 flex flex-col items-center gap-2">
         <fieldset className="w-full flex flex-col">
           <label className="flex-1 text-sm" htmlFor="model">
             Model
@@ -91,7 +85,14 @@ export const ConfigModal = ({ chatId }: { chatId?: string }): JSX.Element => {
           />
         </fieldset>
 
-        <Button className="mt-12 self-end" type="submit">
+        <Button
+          className="mt-12 self-end"
+          type="button"
+          onClick={() => {
+            handleSubmit();
+            setIsConfigModalOpen(false);
+          }}
+        >
           Save
           <MdCheck className="text-xl" />
         </Button>

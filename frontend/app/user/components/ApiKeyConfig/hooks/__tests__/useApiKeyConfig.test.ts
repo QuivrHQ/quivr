@@ -24,7 +24,7 @@ const useEventTrackingMock = vi.fn(() => ({
 vi.mock("@/lib/api/auth/useAuthApi", () => ({
   useAuthApi: () => useAuthApiMock(),
 }));
-vi.mock("@/services/analytics/useEventTracking", () => ({
+vi.mock("@/services/analytics/june/useEventTracking", () => ({
   useEventTracking: () => useEventTrackingMock(),
 }));
 vi.mock("@/lib/context/SupabaseProvider", () => ({

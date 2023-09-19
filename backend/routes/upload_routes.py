@@ -4,23 +4,21 @@ from uuid import UUID
 from auth import AuthBearer, get_current_user
 from celery_worker import process_file_and_notify
 from fastapi import APIRouter, Depends, Query, Request, UploadFile
-from models import Brain, File, UserIdentity, UserUsage
+from models import Brain, UserIdentity, UserUsage
 from models.databases.supabase.notifications import (
     CreateNotificationProperties,
-    NotificationUpdatableProperties,
 )
 from models.notifications import NotificationsStatusEnum
 from repository.brain import get_brain_details
 from repository.files.upload_file import upload_file_storage
 from repository.notification.add_notification import add_notification
-from repository.notification.update_notification import update_notification_by_id
 from repository.user_identity import get_user_identity
+from utils.file import convert_bytes, get_file_size
+
 from routes.authorizations.brain_authorization import (
     RoleEnum,
     validate_brain_authorization,
 )
-from utils.file import convert_bytes, get_file_size
-from utils.processors import filter_file
 
 upload_router = APIRouter()
 
@@ -86,6 +84,7 @@ async def upload_file(
     upload_file_storage(file_content, filename_with_brain_id)
     process_file_and_notify.delay(
         file_name=filename_with_brain_id,
+        file_original_name=uploadFile.filename,
         enable_summarization=enable_summarization,
         brain_id=brain_id,
         openai_api_key=openai_api_key,

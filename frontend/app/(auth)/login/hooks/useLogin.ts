@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { useSupabase } from "@/lib/context/SupabaseProvider";
 import { redirectToPreviousPageOrChatPage } from "@/lib/helpers/redirectToPreviousPageOrChatPage";
 import { useToast } from "@/lib/hooks";
-import { useEventTracking } from "@/services/analytics/useEventTracking";
+import { useEventTracking } from "@/services/analytics/june/useEventTracking";
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const useLogin = () => {

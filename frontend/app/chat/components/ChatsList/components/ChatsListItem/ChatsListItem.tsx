@@ -25,7 +25,7 @@ export const ChatsListItem = ({ chat }: ChatsListItemProps): JSX.Element => {
   return (
     <div
       className={cn(
-        "w-full border-b border-black/10 dark:border-white/25 last:border-none relative group flex overflow-x-hidden hover:bg-gray-100 dark:hover:bg-gray-800",
+        "w-full relative group flex overflow-x-hidden hover:bg-gray-100 dark:hover:bg-gray-800",
         selected
           ? "bg-gray-100 dark:bg-gray-800 text-primary dark:text-white"
           : ""

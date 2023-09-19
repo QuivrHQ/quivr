@@ -13,7 +13,7 @@ class CreateBrainProperties(BaseModel):
     name: Optional[str] = "Default brain"
     description: Optional[str] = "This is a description"
     status: Optional[str] = "private"
-    model: Optional[str] = "gpt-3.5-turbo"
+    model: Optional[str]
     temperature: Optional[float] = 0.0
     max_tokens: Optional[int] = 256
     openai_api_key: Optional[str] = None
@@ -172,7 +172,7 @@ class Brain(Repository):
         vectorsResponse = (
             self.db.table("vectors")
             .select("id")
-            .filter("metadata->>file_sha1", "eq", file_sha1)
+            .filter("file_sha1", "eq", file_sha1)
             .execute()
         )
         return vectorsResponse.data

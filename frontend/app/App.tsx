@@ -8,14 +8,14 @@ import { NavBar } from "@/lib/components/NavBar";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 import { useSupabase } from "@/lib/context/SupabaseProvider";
 import { UpdateMetadata } from "@/lib/helpers/updateMetadata";
-import { usePageTracking } from "@/services/analytics/usePageTracking";
+import { usePageTracking } from "@/services/analytics/june/usePageTracking";
 import "../lib/config/LocaleConfig/i18n";
 
 const queryClient = new QueryClient();
 
 // This wrapper is used to make effect calls at a high level in app rendering.
 export const App = ({ children }: PropsWithChildren): JSX.Element => {
-  const { fetchAllBrains, fetchAndSetActiveBrain, fetchPublicPrompts } =
+  const { fetchAllBrains, fetchDefaultBrain, fetchPublicPrompts } =
     useBrainContext();
   const { session } = useSupabase();
 
@@ -23,9 +23,9 @@ export const App = ({ children }: PropsWithChildren): JSX.Element => {
 
   useEffect(() => {
     void fetchAllBrains();
-    void fetchAndSetActiveBrain();
+    void fetchDefaultBrain();
     void fetchPublicPrompts();
-  }, [session?.user]);
+  }, [session?.user.id]);
 
   return (
     <QueryClientProvider client={queryClient}>
