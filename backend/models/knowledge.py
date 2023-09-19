@@ -6,18 +6,7 @@ from pydantic import BaseModel
 
 class Knowledge(BaseModel):
     id: Optional[UUID] = None
-    name: Optional[str] = None
-    file_id: Optional[UUID] = None
+    brain_id: Optional[UUID] = None
+    file_name: Optional[str] = None
     url: Optional[str] = None
-    content_sha1: Optional[str] = None
-    owner_id: Optional[UUID] = None
-    summary: Optional[str] = None
     extension: str = "txt"
-
-
-# compute sha1 from content
-
-
-class BrainKnowledge(BaseModel):
-    brain_id: UUID
-    knowledge_id: UUID

@@ -16,7 +16,7 @@ class Brain(BaseModel):
     name: Optional[str] = "Default brain"
     description: Optional[str] = "This is a description"
     status: Optional[str] = "private"
-    model: Optional[str]
+    model: Optional[str] = None
     temperature: Optional[float] = 0.0
     max_tokens: Optional[int] = 256
     openai_api_key: Optional[str] = None

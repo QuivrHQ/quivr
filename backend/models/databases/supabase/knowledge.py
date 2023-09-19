@@ -10,19 +10,14 @@ from pydantic import BaseModel
 class CreateKnowledgeProperties(BaseModel):
     """Properties that can be received on notification creation"""
 
-    name: Optional[str] = None
-    file_id: Optional[UUID] = None
+    brain_id: UUID
+    file_name: Optional[str] = None
     url: Optional[str] = None
-    content_sha1: Optional[str] = None
-    owner_id: Optional[UUID] = None
-    summary: Optional[str] = None
     extension: str = "txt"
 
     def dict(self, *args, **kwargs):
         knowledge_dict = super().dict(*args, **kwargs)
-        knowledge_dict["owner_id"] = str(knowledge_dict.get("owner_id"))
-        if knowledge_dict.get("file_id"):
-            knowledge_dict["file_id"] = str(knowledge_dict.get("file_id"))
+        knowledge_dict["brain_id"] = str(knowledge_dict.get("brain_id"))
         return knowledge_dict
 
 
