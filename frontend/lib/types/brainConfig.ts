@@ -11,6 +11,7 @@ export type BrainConfig = {
   supabaseUrl?: string;
   supabaseKey?: string;
   prompt_id?: UUID;
+  retrieval_algorithm?: string;
 };
 
 export type BrainConfigContextType = {

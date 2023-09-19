@@ -35,6 +35,7 @@ class BrainUpdatableProperties(BaseModel):
     openai_api_key: Optional[str]
     status: Optional[str]
     prompt_id: Optional[UUID]
+    retrieval_algorithm: Optional[str]
 
     def dict(self, *args, **kwargs):
         brain_dict = super().dict(*args, **kwargs)

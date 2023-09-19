@@ -7,6 +7,7 @@
     "brainUndefined": "Cerebro no definido",
     "copiedToClipboard": "Copiado al portapeles",
     "defaultBrain": "Cerebro por defecto",
+    "docRetrievalAlgorithm": "Algoritmo de recuperación de documentos",
     "errorCreatingBrain": "Error al crear cerebro",
     "errorFetchingBrainUsers": "Error al obtener usuarios del cerebro",
     "errorSendingInvitation": "Un error ocurrió al enviar invitaciones",

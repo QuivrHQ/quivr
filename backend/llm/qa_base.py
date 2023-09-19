@@ -3,8 +3,16 @@ import json
 from typing import AsyncIterable, Awaitable, Optional
 from uuid import UUID
 
+from langchain import PromptTemplate
 from langchain.callbacks.streaming_aiter import AsyncIteratorCallbackHandler
-from langchain.chains import ConversationalRetrievalChain, LLMChain
+from langchain.chains import (
+    ConversationalRetrievalChain,
+    LLMChain,
+    MapReduceDocumentsChain,
+    ReduceDocumentsChain,
+    StuffDocumentsChain,
+)
+from langchain.chains.combine_documents.base import BaseCombineDocumentsChain
 from langchain.chains.question_answering import load_qa_chain
 from langchain.chat_models import ChatLiteLLM
 from langchain.llms.base import BaseLLM
@@ -34,6 +42,46 @@ from .prompts.CONDENSE_PROMPT import CONDENSE_QUESTION_PROMPT
 
 logger = get_logger(__name__)
 QUIVR_DEFAULT_PROMPT = "Your name is Quivr. You're a helpful assistant.  If you don't know the answer, just say that you don't know, don't try to make up an answer."
+
+
+def load_chain_by_type(
+    chain_type: str, llm_streaming: BaseLLM, non_streaming_llm: BaseLLM, prompt=None
+) -> BaseCombineDocumentsChain:
+    """
+    Load the appropriate chain based on the chain type.
+    :param chain_type: The chain type ("stuff" or "map_reduce").
+    :param llm: The language model.
+    :param prompt: The prompt template.
+    :return: The appropriate chain.
+    """
+    if chain_type == "stuff":
+        return load_qa_chain(llm_streaming, chain_type=chain_type, prompt=prompt)
+    elif chain_type == "map_reduce":
+        document_prompt = PromptTemplate(
+            input_variables=["page_content"], template="{page_content}"
+        )
+        document_variable_name = "context"
+        prompt_template = PromptTemplate.from_template(
+            "Summarize this content: {context}"
+        )
+        llm_chain = LLMChain(llm=non_streaming_llm, prompt=prompt_template)
+        llm_streaming_chain = LLMChain(llm=llm_streaming, prompt=prompt)
+
+        combine_documents_chain = StuffDocumentsChain(
+            llm_chain=llm_streaming_chain,
+            document_prompt=document_prompt,
+            document_variable_name=document_variable_name,
+        )
+        reduce_documents_chain = ReduceDocumentsChain(
+            combine_documents_chain=combine_documents_chain
+        )
+        return MapReduceDocumentsChain(
+            llm_chain=llm_chain,
+            reduce_documents_chain=reduce_documents_chain,
+            document_variable_name=document_variable_name,
+        )
+    else:
+        raise ValueError(f"Unknown chain type: {chain_type}")
 
 
 class QABaseBrainPicking(BaseBrainPicking):
@@ -144,21 +192,23 @@ class QABaseBrainPicking(BaseBrainPicking):
         )
 
         # The Chain that generates the answer to the question
-        doc_chain = load_qa_chain(
-            answering_llm,
-            chain_type=str(chain_type),
-            prompt=self._create_prompt_template(),
-        )
+        doc_chain = load_chain_by_type(
+            chain_type, answering_llm, self._create_prompt_template()
+        )  # pyright: ignore
 
         # The Chain that combines the question and answer
-        qa = ConversationalRetrievalChain(
-            retriever=self.vector_store.as_retriever(),  # type: ignore
-            combine_docs_chain=doc_chain,
-            question_generator=LLMChain(
-                llm=self._create_llm(model=self.model), prompt=CONDENSE_QUESTION_PROMPT
-            ),
-            verbose=False,
-        )
+        if chain_type == "stuff":
+            qa = ConversationalRetrievalChain(
+                retriever=self.vector_store.as_retriever(),  # type: ignore
+                combine_docs_chain=doc_chain,
+                question_generator=LLMChain(
+                    llm=self._create_llm(model=self.model),
+                    prompt=CONDENSE_QUESTION_PROMPT,
+                ),
+                verbose=False,
+            )
+        else:
+            qa = doc_chain
 
         prompt_content = (
             self.prompt_to_use.content if self.prompt_to_use else QUIVR_DEFAULT_PROMPT
@@ -219,11 +269,16 @@ class QABaseBrainPicking(BaseBrainPicking):
             max_tokens=self.max_tokens,
         )
 
+        reduce_llm = self._create_llm(
+            model=self.model,
+            streaming=False,
+            callbacks=self.callbacks,
+            max_tokens=self.max_tokens,
+        )
+
         # The Chain that generates the answer to the question
-        doc_chain = load_qa_chain(
-            answering_llm,
-            chain_type=str(chain_type),
-            prompt=self._create_prompt_template(),
+        doc_chain = load_chain_by_type(
+            chain_type, answering_llm, reduce_llm, self._create_prompt_template()
         )
 
         # The Chain that combines the question and answer

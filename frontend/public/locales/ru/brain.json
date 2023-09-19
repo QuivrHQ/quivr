@@ -25,6 +25,7 @@
     "userRemoved": "{{email}} удален из мозга",
     "userRemoveFailed": "Не удалось удалить {{email}} из мозга",
     "defaultBrain": "Мозг по умолчанию",
+    "docRetrievalAlgorithm": "Алгоритм извлечения документов",
     "setDefaultBrain": "Установить как мозг по умолчанию",
     "errorCreatingBrain": "Произошла ошибка при создании мозга"
 }

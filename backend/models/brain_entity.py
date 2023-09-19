@@ -15,6 +15,7 @@ class BrainEntity(BaseModel):
     openai_api_key: Optional[str]
     status: Optional[str]
     prompt_id: Optional[UUID]
+    retrieval_algorithm: Optional[str]
 
     @property
     def id(self) -> UUID:

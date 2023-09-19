@@ -17,6 +17,7 @@ export type Brain = {
   openai_api_key?: string;
   description?: string;
   prompt_id?: string | null;
+  retrieval_algorithm?: string;
 };
 
 export type MinimalBrainForUser = {

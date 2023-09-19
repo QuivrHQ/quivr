@@ -53,6 +53,7 @@ export const useSettingsTab = ({ brainId }: UseSettingsTabProps) => {
       title: "",
       content: "",
     },
+    retrieval_algorithm: "stuff",
   };
 
   const {
@@ -77,6 +78,7 @@ export const useSettingsTab = ({ brainId }: UseSettingsTabProps) => {
   const model = watch("model");
   const temperature = watch("temperature");
   const maxTokens = watch("maxTokens");
+  const retrieval_algorithm = watch("retrieval_algorithm");
 
   const accessibleModels = getAccessibleModels({
     openAiKey,
@@ -353,6 +355,7 @@ export const useSettingsTab = ({ brainId }: UseSettingsTabProps) => {
 
     model,
     temperature,
+    retrieval_algorithm,
     maxTokens,
     isUpdating,
     setAsDefaultBrainHandler,

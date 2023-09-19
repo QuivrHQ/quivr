@@ -25,6 +25,7 @@
     "userRemoved": "从大脑中删除了 {{email}}",
     "userRemoveFailed": "无法从大脑中删除 {{email}}",
     "defaultBrain": "默认大脑",
+    "docRetrievalAlgorithm": "文档检索算法",
     "setDefaultBrain": "设置为默认大脑",
     "errorCreatingBrain": "创建大脑时发生错误"
 }

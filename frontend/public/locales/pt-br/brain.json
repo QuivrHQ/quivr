@@ -25,6 +25,7 @@
     "userRemoved": "O e-mail {{email}} foi removido do cérebro",
     "userRemoveFailed": "Remoção do e-mail {{email}} do cérebro falhou",
     "defaultBrain": "Cérebro padrão",
+    "docRetrievalAlgorithm": "Algoritmo de recuperação de documentos",
     "setDefaultBrain": "Defina como o cérebro padrão",
     "errorCreatingBrain": "Um erro aconteceu ao criar o cérebro"
 }

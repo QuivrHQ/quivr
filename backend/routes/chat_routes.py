@@ -177,7 +177,6 @@ async def create_question_handler(
     brain_id: NullableUUID
     | UUID
     | None = Query(..., description="The ID of the brain"),
-    chain_type: str | None = "stuff",
     current_user: UserIdentity = Depends(get_current_user),
 ) -> GetChatHistoryOutput:
     """
@@ -196,8 +195,10 @@ async def create_question_handler(
     userSettings = userDailyUsage.get_user_settings()
     is_model_ok = (brain_details or chat_question).model in userSettings.models  # type: ignore
 
-    if not current_user.openai_api_key and brain_id:
+    if brain_id:
         brain_details = get_brain_details(brain_id)
+
+    if not current_user.openai_api_key and brain_id:
         if brain_details:
             current_user.openai_api_key = brain_details.openai_api_key
 
@@ -243,7 +244,7 @@ async def create_question_handler(
             )
 
         chat_answer = gpt_answer_generator.generate_answer(
-            chat_id, chat_question, chain_type=chain_type
+            chat_id, chat_question, chain_type=brain_details.retrieval_algorithm  # type: ignore
         )
 
         return chat_answer
@@ -268,7 +269,6 @@ async def create_stream_question_handler(
     brain_id: NullableUUID
     | UUID
     | None = Query(..., description="The ID of the brain"),
-    chain_type: str | None = "stuff",
     current_user: UserIdentity = Depends(get_current_user),
 ) -> StreamingResponse:
     # TODO: check if the user has access to the brain
@@ -282,6 +282,10 @@ async def create_stream_question_handler(
         email=current_user.email,
         openai_api_key=current_user.openai_api_key,
     )
+
+    if brain_id:
+        print("brain_id", brain_id)
+        brain_details = get_brain_details(brain_id)
 
     userSettings = userDailyUsage.get_user_settings()
     if not current_user.openai_api_key and brain_id:
@@ -340,7 +344,7 @@ async def create_stream_question_handler(
         print("streaming")
         return StreamingResponse(
             gpt_answer_generator.generate_stream(
-                chat_id, chat_question, chain_type=chain_type
+                chat_id, chat_question, chain_type=brain_details.retrieval_algorithm  # type: ignore
             ),
             media_type="text/event-stream",
         )

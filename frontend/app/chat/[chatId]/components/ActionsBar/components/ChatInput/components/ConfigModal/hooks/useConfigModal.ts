@@ -1,4 +1,5 @@
-/* eslint-disable max-lines */
+/* eslint-disable complexity */
+/* eslint-disable max-lines  */
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -60,6 +61,7 @@ export const useConfigModal = (chatId?: string) => {
         setValue("model", chatConfig.model);
         setValue("temperature", chatConfig.temperature);
         setValue("maxTokens", chatConfig.maxTokens);
+        setValue("retrieval_algorithm", "stuff");
       } else {
         if (currentBrain === undefined) {
           return;
@@ -78,6 +80,11 @@ export const useConfigModal = (chatId?: string) => {
           "maxTokens",
           relatedBrainConfig.max_tokens ?? defaultBrainConfig.maxTokens
         );
+        setValue(
+          "retrieval_algorithm",
+          relatedBrainConfig.retrieval_algorithm ??
+            defaultBrainConfig.retrieval_algorithm
+        )
       }
     };
     void fetchChatConfig();

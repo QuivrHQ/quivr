@@ -2,7 +2,7 @@ DO $$
 BEGIN
     -- Check if file_sha1 column does not exist
     alter table public.brains
-    add column retriever_algorithm text;
+    add column retrieval_algorithm text;
 END $$;
 
 

@@ -137,7 +137,7 @@ CREATE TABLE IF NOT EXISTS brains (
   temperature FLOAT,
   openai_api_key TEXT,
   prompt_id UUID REFERENCES prompts(id)
-  retriever_algorithm TEXT
+  retrieval_algorithm TEXT
 );
 
 

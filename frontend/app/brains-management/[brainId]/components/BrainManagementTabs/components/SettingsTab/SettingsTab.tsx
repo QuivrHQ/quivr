@@ -135,6 +135,19 @@ export const SettingsTab = ({ brainId }: SettingsTabProps): JSX.Element => {
           {...register("maxTokens")}
         />
       </fieldset>
+      <fieldset className="w-full flex mt-4">
+        <label className="flex-1" htmlFor="docRetrieval">
+          {t("docRetrievalAlgorithm", { ns: "brain" })}
+        </label>
+        <select
+          id="docRetrieval"
+          {...register("retrieval_algorithm")}
+          defaultValue="stuff" 
+        >
+          <option value="stuff">Fast/Good</option>
+          <option value="map_reduce">Slow/Excellent</option>
+        </select>
+      </fieldset>
       <div className="flex w-full justify-end py-4">
         <SaveButton handleSubmit={handleSubmit} />
       </div>

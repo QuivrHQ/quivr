@@ -11,4 +11,5 @@ export const defaultBrainConfig: BrainConfig = {
   supabaseKey: undefined,
   supabaseUrl: undefined,
   prompt_id: undefined,
+  retrieval_algorithm: "stuff",
 };
