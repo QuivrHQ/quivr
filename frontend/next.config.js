@@ -1,4 +1,7 @@
 const nextConfig = {
+  images: {
+    domains: ["www.quivr.app"]
+  },
   // eslint-disable-next-line prefer-arrow/prefer-arrow-functions
   async headers() {
     if (process.env.NEXT_PUBLIC_ENV === "prod") {
