@@ -2,6 +2,7 @@ name: Epic [Only for Quivr Team]
 description: Use this form for epics.
 title: "[Epic]: "
 labels: ["epic"]
+projects: ["stangirard/5"]
 body:
   - type: markdown
     attributes:
