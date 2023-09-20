@@ -1,8 +1,11 @@
 "use client";
 import { motion, MotionConfig } from "framer-motion";
+import Link from "next/link";
+import { useTranslation } from "react-i18next";
 import { MdChevronRight } from "react-icons/md";
 
 import { AddBrainModal } from "@/lib/components/AddBrainModal/AddBrainModal";
+import Button from "@/lib/components/ui/Button";
 import { cn } from "@/lib/utils";
 
 import { BrainListItem } from "./BrainListItem";
@@ -12,6 +15,8 @@ import { useBrainsList } from "../hooks/useBrainsList";
 export const BrainsList = (): JSX.Element => {
   const { open, setOpen, searchQuery, setSearchQuery, brains } =
     useBrainsList();
+
+  const { t } = useTranslation("brain");
 
   return (
     <MotionConfig transition={{ massq: 1, damping: 10 }}>
@@ -53,7 +58,18 @@ export const BrainsList = (): JSX.Element => {
               ))}
             </div>
             <div className="m-2 mb flex flex-col">
-              <AddBrainModal />
+              <Link
+                href="/brains-management/library"
+                className="flex flex-row flex-1"
+              >
+                <Button
+                  type="button"
+                  className="bg-purple-600 text-white py-2 mb-2 flex flex-row flex-1"
+                >
+                  {t("brain_library_button_label")}
+                </Button>
+              </Link>
+              <AddBrainModal triggerClassName="border-solid border-2 border-gray-300" />
             </div>
           </div>
         </motion.div>
