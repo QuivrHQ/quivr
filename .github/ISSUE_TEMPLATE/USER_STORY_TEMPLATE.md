@@ -1,29 +1,82 @@
----
-name: User story
-about: Use this template for user stories.
+name: User story [Only Quivr Team]
+description: Use this form for user stories.
 title: "[Epic]: User story"
-labels: user story
----
+labels: ["user story"]
+body:
 
-# Epic
+- type: markdown
+    attributes:
+      value: |
+        **Epic**
 
-Include the issue that represents the epic.
+        Include the issue that represents the epic.
 
-# Functional
+- type: input
+    id: epic-link
+    attributes:
+      label: Link to the Epic
+      placeholder: Paste the link to the related epic here...
+    validations:
+      required: true
 
-Please explain in detail the functionality.
-Please also include relevant motivation and context.
+- type: markdown
+    attributes:
+      value: |
+        **Functional**
 
-## Schema
+        Detail the functionality and provide context and motivation.
 
-### Tech
+- type: textarea
+    id: functionality-detail
+    attributes:
+      label: Explain the Functionality
+      placeholder: Detail the user story functionality here...
+    validations:
+      required: true
 
-- [] To-do
+- type: markdown
+    attributes:
+      value: |
+        **Schema**
 
-### Tests
+- type: markdown
+    attributes:
+      value: |
+        ### Tech
 
-- [] it ...
+- type: checkboxes
+    id: tech-todo
+    attributes:
+      label: Tech To-dos
+      options:
+        - label: To-do Item 1
+        - label: To-do Item 2
+        # Add more to-dos as needed
 
-### Validation Checks
+- type: markdown
+    attributes:
+      value: |
+        ### Tests
 
-- [] it ...
+- type: checkboxes
+    id: tests
+    attributes:
+      label: Test Cases
+      options:
+        - label: it should ...
+        - label: it can ...
+        # Add more test cases as needed
+  
+- type: markdown
+    attributes:
+      value: |
+        ### Validation Checks
+
+- type: checkboxes
+    id: validation-checks
+    attributes:
+      label: Validation Checks
+      options:
+        - label: it should validate ...
+        - label: it shouldn't allow ...
+        # Add more validation checks as needed

@@ -1,5 +1,5 @@
 ---
-name: Epic
+name: [Only Quivr Team] Epic 
 about: Use this template for epics.
 title: "[Epic]"
 labels: epic
@@ -39,3 +39,102 @@ Did you make any ADR for this feature that should be shared and validated?
 Are there functional dependencies? Are there métier dependencies? Are there internal teams that need to be consulted/need to validate
 
 ## What can the feature potentially break?
+
+name: [Only Quivr Team] Epic
+description: Use this form for epics.
+title: "[Epic]: "
+labels: ["epic"]
+body:
+
+- type: markdown
+    attributes:
+      value: |
+        **The Why**
+
+        Explain the reasons for this epic.
+
+- type: textarea
+    id: why-value
+    attributes:
+      label: Why do we need this functionality?
+      description: What's the value? For whom?
+      placeholder: Detail the reasons here...
+    validations:
+      required: true
+
+- type: markdown
+    attributes:
+      value: |
+        **The What**
+
+- type: textarea
+    id: developing
+    attributes:
+      label: What are we developing?
+      description: What’s the expected behaviour? How should it look like?
+      placeholder: Describe the functionality or feature here...
+    validations:
+      required: true
+
+- type: textarea
+    id: validation-criteria
+    attributes:
+      label: What are the validation criteria to validate this feature?
+      description: Testing criteria, edge cases, error behavior, etc.
+      placeholder: Detail the validation criteria here...
+    validations:
+      required: true
+
+- type: textarea
+    id: out-of-scope
+    attributes:
+      label: What's out of scope for this feature?
+      placeholder: Detail what's not covered by this epic...
+    validations:
+      required: true
+
+- type: checkboxes
+    id: feature-flagged
+    attributes:
+      label: Should this feature be feature flagged?
+      options:
+        - label: Yes
+        - label: No
+
+- type: markdown
+    attributes:
+      value: |
+        **The How**
+
+- type: textarea
+    id: code-strategy
+    attributes:
+      label: How are we going to code this feature?
+      description: Technical strategy, impacts, consequences, etc.
+      placeholder: Describe the technical approach here...
+    validations:
+      required: true
+
+- type: textarea
+    id: technical-decisions
+    attributes:
+      label: Are there any technical decisions made that should be shared?
+      placeholder: Detail the decisions here...
+    validations:
+      required: true
+
+- type: textarea
+    id: blockers
+    attributes:
+      label: What is preventing us from delivering this feature?
+      placeholder: Detail any dependencies, issues, or blockers here...
+    validations:
+      required: true
+
+- type: textarea
+    id: potential-breaks
+    attributes:
+      label: What can the feature potentially break?
+      placeholder: Detail any potential side effects or issues here...
+    validations:
+      required: true
