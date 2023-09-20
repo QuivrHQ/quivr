@@ -3,7 +3,7 @@ import { BrainConfig } from "../types/brainConfig";
 export const defaultBrainConfig: BrainConfig = {
   model: "gpt-3.5-turbo",
   temperature: 0,
-  maxTokens: 256,
+  maxTokens: 500,
   keepLocal: true,
   anthropicKey: undefined,
   backendUrl: undefined,
