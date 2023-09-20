@@ -2,7 +2,6 @@ name: User story [Only for Quivr Team]
 description: Use this form for user stories.
 title: "[Epic]: User story"
 labels: ["user story"]
-projects: ["stangirard/5"]
 body:
   - type: markdown
     attributes:
