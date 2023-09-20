@@ -251,3 +251,7 @@ class Repository(ABC):
     @abstractmethod
     def get_knowledge_by_id(self, knowledge_id: UUID):
         pass
+
+    @abstractmethod
+    def get_all_knowledge_in_brain(self, brain_id: UUID):
+        pass
