@@ -9,6 +9,7 @@ import {
   getBrains,
   getBrainUsers,
   getDefaultBrain,
+  getPublicBrains,
   setAsDefaultBrain,
   Subscription,
   updateBrain,
@@ -48,5 +49,6 @@ export const useBrainApi = () => {
       setAsDefaultBrain(brainId, axiosInstance),
     updateBrain: async (brainId: string, brain: UpdateBrainInput) =>
       updateBrain(brainId, brain, axiosInstance),
+    getPublicBrains: async () => getPublicBrains(axiosInstance),
   };
 };

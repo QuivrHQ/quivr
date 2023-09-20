@@ -4,6 +4,7 @@ from auth import AuthBearer, get_current_user
 from fastapi import APIRouter, Depends, HTTPException
 from logger import get_logger
 from models import UserIdentity, UserUsage
+from models.brain_entity import PublicBrain
 from models.databases.supabase.brains import (
     BrainQuestionRequest,
     BrainUpdatableProperties,
@@ -20,6 +21,7 @@ from repository.brain import (
     set_as_default_brain_for_user,
     update_brain_by_id,
 )
+from repository.brain.get_public_brains import get_public_brains
 from repository.prompt import delete_prompt_by_id, get_prompt_by_id
 
 from routes.authorizations.brain_authorization import has_brain_authorization
@@ -46,6 +48,16 @@ async def brain_endpoint(
     """
     brains = get_user_brains(current_user.id)
     return {"brains": brains}
+
+
+@brain_router.get(
+    "/brains/public", dependencies=[Depends(AuthBearer())], tags=["Brain"]
+)
+async def public_brains_endpoint() -> list[PublicBrain]:
+    """
+    Retrieve all Quivr public brains
+    """
+    return get_public_brains()
 
 
 # get default brain
