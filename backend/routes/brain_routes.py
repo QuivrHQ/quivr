@@ -21,6 +21,7 @@ from repository.brain import (
     update_brain_by_id,
 )
 from repository.prompt import delete_prompt_by_id, get_prompt_by_id
+
 from routes.authorizations.brain_authorization import has_brain_authorization
 from routes.authorizations.types import RoleEnum
 
@@ -31,7 +32,9 @@ brain_router = APIRouter()
 
 # get all brains
 @brain_router.get("/brains/", dependencies=[Depends(AuthBearer())], tags=["Brain"])
-async def brain_endpoint(current_user: UserIdentity = Depends(get_current_user)):
+async def brain_endpoint(
+    current_user: UserIdentity = Depends(get_current_user),
+):
     """
     Retrieve all brains for the current user.
 

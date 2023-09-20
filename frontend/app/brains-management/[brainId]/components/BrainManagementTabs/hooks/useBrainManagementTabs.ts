@@ -1,7 +1,10 @@
+import { useQuery } from "@tanstack/react-query";
 import { UUID } from "crypto";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
+import { getBrainDataKey } from "@/lib/api/brain/config";
+import { useBrainApi } from "@/lib/api/brain/useBrainApi";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 
 import { BrainManagementTab } from "../types";
@@ -18,6 +21,7 @@ export const useBrainManagementTabs = () => {
       setSelectedTab(targetedTab);
     }
   }, []);
+  const { getBrain } = useBrainApi();
 
   const { deleteBrain, setCurrentBrainId } = useBrainContext();
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -26,6 +30,12 @@ export const useBrainManagementTabs = () => {
   const params = useParams();
 
   const brainId = params?.brainId as UUID | undefined;
+
+  const { data: brain } = useQuery({
+    queryKey: [getBrainDataKey(brainId!)],
+    queryFn: () => getBrain(brainId!),
+    enabled: brainId !== undefined,
+  });
 
   const handleDeleteBrain = () => {
     if (brainId === undefined) {
@@ -44,5 +54,6 @@ export const useBrainManagementTabs = () => {
     handleDeleteBrain,
     isDeleteModalOpen,
     setIsDeleteModalOpen,
+    brain,
   };
 };
