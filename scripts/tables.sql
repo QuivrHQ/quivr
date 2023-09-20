@@ -235,6 +235,26 @@ CREATE TABLE IF NOT EXISTS user_settings (
   max_brain_size INT DEFAULT 1000000
 );
 
+-- knowledge table
+CREATE TABLE IF NOT EXISTS knowledge (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  file_name TEXT,
+  url TEXT,
+  brain_id UUID NOT NULL REFERENCES brains(brain_id),
+  extension TEXT NOT NULL,
+  CHECK ((file_name IS NOT NULL AND url IS NULL) OR (file_name IS NULL AND url IS NOT NULL))
+);
+
+
+-- knowledge_vectors table
+CREATE TABLE IF NOT EXISTS knowledge_vectors (
+  knowledge_id UUID NOT NULL REFERENCES knowledge(id),
+  vector_id UUID NOT NULL REFERENCES vectors(id),
+  embedding_model TEXT NOT NULL,
+  PRIMARY KEY (knowledge_id, vector_id, embedding_model)
+);
+
+
 insert into
   storage.buckets (id, name)
 values
@@ -249,9 +269,9 @@ CREATE POLICY "Access Quivr Storage 1jccrwz_2" ON storage.objects FOR UPDATE TO 
 CREATE POLICY "Access Quivr Storage 1jccrwz_3" ON storage.objects FOR DELETE TO anon USING (bucket_id = 'quivr');
 
 INSERT INTO migrations (name) 
-SELECT '202309157004032_add_sha1_column'
+SELECT '202309151054032_add_knowledge_tables'
 WHERE NOT EXISTS (
-    SELECT 1 FROM migrations WHERE name = '202309157004032_add_sha1_column'
+    SELECT 1 FROM migrations WHERE name = '202309151054032_add_knowledge_tables'
 );
 
 

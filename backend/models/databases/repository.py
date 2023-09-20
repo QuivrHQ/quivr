@@ -239,3 +239,15 @@ class Repository(ABC):
     @abstractmethod
     def get_notifications_by_chat_id(self, chat_id: UUID):
         pass
+
+    @abstractmethod
+    def insert_knowledge(self, brain_id: UUID):
+        pass
+
+    @abstractmethod
+    def remove_knowledge_by_id(self, knowledge_id: UUID):
+        pass
+
+    @abstractmethod
+    def get_knowledge_by_id(self, knowledge_id: UUID):
+        pass
