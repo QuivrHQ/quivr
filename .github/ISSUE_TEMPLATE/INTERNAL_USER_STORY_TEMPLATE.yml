@@ -43,39 +43,41 @@ body:
       value: |
         ### Tech
 
-  - type: checkboxes
-    id: tech-todo
+  - type: markdown
+    attributes:
+      value: |
+        ### Tech To-dos
+
+  - type: textarea
+    id: tech-todos
     attributes:
       label: Tech To-dos
-      options:
-        - label: To-do Item 1
-        - label: To-do Item 2
-        # Add more to-dos as needed
+      placeholder: Detail the tech to-dos here...
+    validations:
+      required: true
 
   - type: markdown
     attributes:
       value: |
         ### Tests
 
-  - type: checkboxes
+  - type: textarea
     id: tests
     attributes:
-      label: Test Cases
-      options:
-        - label: it should ...
-        - label: it can ...
-        # Add more test cases as needed
+      label: Tests
+      placeholder: Detail the tests here...
+    validations:
+      required: true
 
   - type: markdown
     attributes:
       value: |
         ### Validation Checks
 
-  - type: checkboxes
+  - type: textarea
     id: validation-checks
     attributes:
       label: Validation Checks
-      options:
-        - label: it should validate ...
-        - label: it shouldn't allow ...
-        # Add more validation checks as needed
+      placeholder: Detail the validation checks here...
+    validations:
+      required: true
