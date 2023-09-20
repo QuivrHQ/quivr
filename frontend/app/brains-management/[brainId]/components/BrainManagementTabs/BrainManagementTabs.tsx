@@ -52,7 +52,7 @@ export const BrainManagementTabs = (): JSX.Element => {
         />
       </List>
 
-      <div className="flex-1 p-4 md:p-20">
+      <div className="flex-1 p-4 md:p-20 md:pt-0">
         <Content value="settings">
           <SettingsTab brainId={brainId} />
         </Content>

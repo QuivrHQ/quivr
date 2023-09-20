@@ -350,7 +350,7 @@ export const useSettingsTab = ({ brainId }: UseSettingsTabProps) => {
   return {
     handleSubmit,
     register,
-
+    brain,
     model,
     temperature,
     maxTokens,

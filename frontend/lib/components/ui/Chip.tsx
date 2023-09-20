@@ -11,7 +11,7 @@ export const Chip = ({
   return (
     <span
       className={cn(
-        "ml-3 px-2 bg-gray-400 text-black rounded-xl text-sm flex items-center justify-center",
+        "px-2 bg-gray-400 text-black rounded-xl text-sm flex items-center justify-center",
         className
       )}
       {...restProps}
