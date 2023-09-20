@@ -14,4 +14,7 @@ i18n.use(initReactI18next).init({
   defaultNS,
   resources,
   debug: process.env.NEXT_PUBLIC_ENV !== "prod",
+  interpolation: {
+    escapeValue: false,
+  },
 });
