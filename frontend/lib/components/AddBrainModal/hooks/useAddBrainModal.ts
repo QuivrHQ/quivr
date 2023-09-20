@@ -25,7 +25,10 @@ export const useAddBrainModal = () => {
   const { setAsDefaultBrain } = useBrainApi();
   const { createPrompt } = usePromptApi();
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
-
+  const [
+    isPublicAccessConfirmationModalOpened,
+    setIsPublicAccessConfirmationModalOpened,
+  ] = useState(false);
   const { getUser } = useUserApi();
 
   const brainStatusOptions: {
@@ -37,14 +40,16 @@ export const useAddBrainModal = () => {
       value: "private",
     },
     {
-      label: t("private_brain_label", { ns: "brain" }),
+      label: t("public_brain_label", { ns: "brain" }),
       value: "public",
     },
   ];
+
   const { data: userData } = useQuery({
     queryKey: [USER_DATA_KEY],
     queryFn: getUser,
   });
+
   const defaultValues = {
     ...defaultBrainConfig,
     name: "",
@@ -72,7 +77,9 @@ export const useAddBrainModal = () => {
   });
 
   useEffect(() => {
-    console.log({ status });
+    if (status === "public") {
+      setIsPublicAccessConfirmationModalOpened(true);
+    }
   }, [status]);
 
   useEffect(() => {
@@ -114,6 +121,7 @@ export const useAddBrainModal = () => {
         openai_api_key: openAiKey,
         temperature,
         prompt_id,
+        status,
       });
 
       if (createdBrainId === undefined) {
@@ -176,10 +184,15 @@ export const useAddBrainModal = () => {
     });
   };
 
-  const onRadioChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setValue("status", e.target.value as BrainStatus, {
+  const onConfirmPublicAccess = () => {
+    setIsPublicAccessConfirmationModalOpened(false);
+  };
+
+  const onCancelPublicAccess = () => {
+    setValue("status", "private", {
       shouldDirty: true,
     });
+    setIsPublicAccessConfirmationModalOpened(false);
   };
 
   return {
@@ -194,7 +207,9 @@ export const useAddBrainModal = () => {
     accessibleModels,
     pickPublicPrompt,
     brainStatusOptions,
-    onRadioChange,
     status,
+    isPublicAccessConfirmationModalOpened,
+    onConfirmPublicAccess,
+    onCancelPublicAccess,
   };
 };
