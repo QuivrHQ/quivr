@@ -84,10 +84,9 @@ import updatePassword_zh_cn from "../../../public/locales/zh-cn/updatePassword.j
 import upload_zh_cn from "../../../public/locales/zh-cn/upload.json";
 import user_zh_cn from "../../../public/locales/zh-cn/user.json";
 
-type BrainTranslations = typeof import("../../../public/locales/en/brain.json");
 //type all translations
 export type Translations = {
-  brain: BrainTranslations;
+  brain: typeof import("../../../public/locales/en/brain.json");
   chat: typeof import("../../../public/locales/en/chat.json");
   config: typeof import("../../../public/locales/en/config.json");
   delete_brain: typeof import("../../../public/locales/en/deleteBrain.json");

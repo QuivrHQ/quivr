@@ -1,17 +1,19 @@
 import Link from "next/link";
+import { useTranslation } from "react-i18next";
 import { FaBrain } from "react-icons/fa";
 
+import { Chip } from "@/lib/components/ui/Chip";
 import { MinimalBrainForUser } from "@/lib/context/BrainProvider/types";
 import { cn } from "@/lib/utils";
 
 import { useBrainListItem } from "./hooks/useBrainListItem";
 
-interface BrainsListItemProps {
+type BrainsListItemProps = {
   brain: MinimalBrainForUser;
-}
-
+};
 export const BrainListItem = ({ brain }: BrainsListItemProps): JSX.Element => {
   const { selected } = useBrainListItem(brain);
+  const { t } = useTranslation("brain");
 
   return (
     <div
@@ -29,15 +31,20 @@ export const BrainListItem = ({ brain }: BrainsListItemProps): JSX.Element => {
         href={`/brains-management/${brain.id}`}
         key={brain.id}
       >
-        <div className="flex items-center gap-2">
-          <FaBrain className="text-xl" />
-          <p>{brain.name}</p>
+        <div className="flex flex-row flex-1">
+          <div className="flex items-center gap-2">
+            <FaBrain className="text-xl" />
+            <p>{brain.name}</p>
+          </div>
+          {brain.status === "public" && (
+            <Chip className="ml-3">{t("public_brain_label")}</Chip>
+          )}
         </div>
       </Link>
 
       <div
         aria-hidden
-        className="not-sr-only absolute left-1/2 top-0 bottom-0 right-0 bg-gradient-to-r from-transparent to-white dark:to-black pointer-events-none"
+        className="not-sr-only absolute left-1/2 top-0 bottom-0 right-0 bg-gradient-to-r dark:to-black pointer-events-none"
       ></div>
     </div>
   );

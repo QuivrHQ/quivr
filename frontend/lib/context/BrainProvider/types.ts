@@ -6,7 +6,7 @@ import { Document } from "@/lib/types/Document";
 import { useBrainProvider } from "./hooks/useBrainProvider";
 import { Model } from "../../types/brainConfig";
 
-type BrainAccessStatus = "private" | "public";
+export type BrainAccessStatus = "private" | "public";
 
 export type Brain = {
   id: UUID;
