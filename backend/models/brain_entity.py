@@ -39,3 +39,4 @@ class PublicBrain(BaseModel):
     id: UUID
     name: str
     description: Optional[str]
+    number_of_subscribers: int = 0

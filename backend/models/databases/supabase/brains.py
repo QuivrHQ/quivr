@@ -84,13 +84,13 @@ class Brain(Repository):
         )
         public_brains: list[PublicBrain] = []
         for item in response.data:
-            public_brains.append(
-                PublicBrain(
-                    id=item["id"],
-                    name=item["name"],
-                    description=item["description"],
-                )
+            brain = PublicBrain(
+                id=item["id"],
+                name=item["name"],
+                description=item["description"],
             )
+            brain.number_of_subscribers = self.get_brain_subscribers_count(brain.id)
+            public_brains.append(brain)
         return public_brains
 
     def get_brain_for_user(self, user_id, brain_id) -> MinimalBrainEntity | None:
@@ -292,3 +292,16 @@ class Brain(Repository):
             return None
 
         return BrainEntity(**response[0])
+
+    def get_brain_subscribers_count(self, brain_id: UUID) -> int:
+        response = (
+            self.db.from_("brains_users")
+            .select(
+                "count",
+            )
+            .filter("brain_id", "eq", str(brain_id))
+            .execute()
+        ).data
+        if len(response) == 0:
+            raise ValueError(f"Brain with id {brain_id} does not exist.")
+        return response[0]["count"]

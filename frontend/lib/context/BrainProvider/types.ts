@@ -37,6 +37,7 @@ export type PublicBrain = {
   id: UUID;
   name: string;
   description?: string;
+  number_of_subscribers: number;
 };
 
 export type BrainContextType = ReturnType<typeof useBrainProvider>;
