@@ -36,10 +36,14 @@ export const useBrainsList = () => {
       return;
     }
 
-    if (currentBrainId !== null) {
+    if (
+      currentBrainId !== null &&
+      pathname !== null &&
+      !pathname.includes("library")
+    ) {
       redirect(`/brains-management/${currentBrainId}`);
     }
-  }, [currentBrainId]);
+  }, [brainId, currentBrainId, pathname]);
 
   return {
     open,
