@@ -1,4 +1,4 @@
-name: [Only Quivr Team] Epic
+name: Epic [Only for Quivr Team]
 description: Use this form for epics.
 title: "[Epic]: "
 labels: ["epic"]
@@ -6,9 +6,9 @@ body:
   - type: markdown
     attributes:
       value: |
-          **The Why**
+        **The Why**
 
-          Explain the reasons for this epic.
+        Explain the reasons for this epic.
 
   - type: textarea
     id: why-value
@@ -55,13 +55,13 @@ body:
     attributes:
       label: Should this feature be feature flagged?
       options:
-          - label: Yes
-          - label: No
+        - label: Yes
+        - label: No
 
   - type: markdown
     attributes:
       value: |
-          **The How**
+        **The How**
 
   - type: textarea
     id: code-strategy
