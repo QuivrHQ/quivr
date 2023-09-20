@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.0.78 (2023-09-20)
+
+## What's Changed
+* feat: add public brain creation by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1218
+* feat: get files from storage by @gozineb in https://github.com/StanGirard/quivr/pull/1205
+
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.77...v0.0.78
+
 ## 0.0.77 (2023-09-19)
 
 ## What's Changed
