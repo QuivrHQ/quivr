@@ -55,8 +55,8 @@ body:
     attributes:
       label: Should this feature be feature flagged?
       options:
-        - label: Yes
-        - label: No
+        - label: Feature Flagged
+          required: false
 
   - type: markdown
     attributes:
