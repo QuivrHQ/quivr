@@ -1,4 +1,5 @@
 import { BrainRoleType } from "@/lib/components/BrainUsers/types";
+import { BrainStatus } from "@/lib/types/brainConfig";
 
 export type SubscriptionUpdatableProperties = {
   role: BrainRoleType | null;
@@ -7,7 +8,7 @@ export type SubscriptionUpdatableProperties = {
 export type CreateBrainInput = {
   name: string;
   description?: string;
-  status?: string;
+  status?: BrainStatus;
   model?: string;
   temperature?: number;
   max_tokens?: number;

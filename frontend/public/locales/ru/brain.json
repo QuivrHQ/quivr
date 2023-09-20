@@ -26,5 +26,12 @@
     "userRemoveFailed": "Не удалось удалить {{email}} из мозга",
     "defaultBrain": "Мозг по умолчанию",
     "setDefaultBrain": "Установить как мозг по умолчанию",
-    "errorCreatingBrain": "Произошла ошибка при создании мозга"
+    "errorCreatingBrain": "Произошла ошибка при создании мозга",
+    "private_brain_label": "Приватный",
+    "public_brain_label": "Публичный",
+    "brain_status_label": "Статус",
+    "set_brain_status_to_public_modal_title": "Вы уверены, что хотите установить это как <span class='text-purple-800'>Публичный</span>?<br/><br/>",
+    "set_brain_status_to_public_modal_description": "Каждый пользователь Quivr сможет:<br/>- Подписаться на ваш мозг в 'библиотеке мозгов'.<br/>- Использовать этот мозг и проверить настройки подсказок и модели.<br/><br/>У них не будет доступа к вашим загруженным файлам и разделу 'люди'.",
+    "confirm_set_brain_status_to_public": "Да, установить как публичный",
+    "cancel_set_brain_status_to_public": "Нет, оставить приватным"
 }

@@ -26,5 +26,12 @@
     "userRemoveFailed": "无法从大脑中删除 {{email}}",
     "defaultBrain": "默认大脑",
     "setDefaultBrain": "设置为默认大脑",
-    "errorCreatingBrain": "创建大脑时发生错误"
+    "errorCreatingBrain": "创建大脑时发生错误",
+    "private_brain_label": "私有",
+    "public_brain_label": "公开",
+    "brain_status_label": "状态",
+    "set_brain_status_to_public_modal_title": "您确定要将此设置为<span class='text-purple-800'>公共</span>吗？<br/><br/>",
+    "set_brain_status_to_public_modal_description": "每个 Quivr 用户将能够：<br/>- 在 '大脑库' 中订阅您的大脑。<br/>- 使用此大脑并检查提示和模型配置。<br/><br/>他们将无法访问您上传的文件和人员部分。",
+    "confirm_set_brain_status_to_public": "是的，设为公共",
+    "cancel_set_brain_status_to_public": "不，保持私密"
 }

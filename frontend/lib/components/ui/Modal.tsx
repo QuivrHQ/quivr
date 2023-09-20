@@ -11,7 +11,7 @@ type CommonModalProps = {
   title?: string;
   desc?: string;
   children?: ReactNode;
-  Trigger: ReactNode;
+  Trigger?: ReactNode;
   CloseTrigger?: ReactNode;
   isOpen?: undefined;
   setOpen?: undefined;
@@ -38,7 +38,9 @@ export const Modal = ({
 
   return (
     <Dialog.Root onOpenChange={customSetOpen ?? setOpen}>
-      <Dialog.Trigger asChild>{Trigger}</Dialog.Trigger>
+      {Trigger !== undefined && (
+        <Dialog.Trigger asChild>{Trigger}</Dialog.Trigger>
+      )}
       <AnimatePresence>
         {customIsOpen ?? isOpen ? (
           <Dialog.Portal forceMount>
@@ -48,7 +50,6 @@ export const Modal = ({
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                // transition={{ duration: 0.4, ease: "easeInOut" }}
               >
                 <Dialog.Content asChild forceMount>
                   <motion.div

@@ -26,5 +26,12 @@
     "userRoleUpdated": "Mis à jour {{email}} en {{newRole}}",
     "userRoleUpdateFailed": "Échec de la mise à jour de {{email}} en {{newRole}}",
     "usersInvited": "Utilisateurs invités avec succès",
-    "usersWithAccess": "Utilisateurs ayant accès"
+    "usersWithAccess": "Utilisateurs ayant accès",
+    "private_brain_label": "Privé",
+    "public_brain_label": "Public",
+    "brain_status_label": "Statut",
+    "set_brain_status_to_public_modal_title": "Êtes-vous sûr de vouloir définir ceci comme <span class='text-purple-800'>Public</span>?<br/><br/>",
+    "set_brain_status_to_public_modal_description": "Chaque utilisateur de Quivr pourra :<br/>- S'abonner à votre cerveau dans la 'bibliothèque des cerveaux'.<br/>- Utiliser ce cerveau et vérifier les configurations de prompts et de modèles.<br/><br/>Ils n'auront pas accès à vos fichiers téléchargés et à la section des personnes.",
+    "confirm_set_brain_status_to_public": "Oui, définir comme public",
+    "cancel_set_brain_status_to_public": "Non, le garder privé"
 }
