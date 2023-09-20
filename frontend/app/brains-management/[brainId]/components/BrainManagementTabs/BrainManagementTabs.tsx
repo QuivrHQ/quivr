@@ -17,7 +17,10 @@ export const BrainManagementTabs = (): JSX.Element => {
     handleDeleteBrain,
     isDeleteModalOpen,
     setIsDeleteModalOpen,
+    brain,
   } = useBrainManagementTabs();
+
+  const isPubliclyAccessible = brain?.status === "public";
 
   if (brainId === undefined) {
     return <div />;
@@ -38,18 +41,22 @@ export const BrainManagementTabs = (): JSX.Element => {
           value="settings"
           onChange={setSelectedTab}
         />
-        <BrainTabTrigger
-          selected={selectedTab === "people"}
-          label={t("people", { ns: "config" })}
-          value="people"
-          onChange={setSelectedTab}
-        />
-        <BrainTabTrigger
-          selected={selectedTab === "knowledge"}
-          label={t("knowledge", { ns: "config" })}
-          value="knowledge"
-          onChange={setSelectedTab}
-        />
+        {!isPubliclyAccessible && (
+          <>
+            <BrainTabTrigger
+              selected={selectedTab === "people"}
+              label={t("people", { ns: "config" })}
+              value="people"
+              onChange={setSelectedTab}
+            />
+            <BrainTabTrigger
+              selected={selectedTab === "knowledge"}
+              label={t("knowledge", { ns: "config" })}
+              value="knowledge"
+              onChange={setSelectedTab}
+            />
+          </>
+        )}
       </List>
 
       <div className="flex-1 p-4 md:p-20 md:pt-0">
@@ -66,6 +73,7 @@ export const BrainManagementTabs = (): JSX.Element => {
 
       <div className="flex justify-center mt-4">
         <Button
+          disabled={isPubliclyAccessible}
           className="px-8 md:px-20 py-2 bg-red-500 text-white rounded-md"
           onClick={() => setIsDeleteModalOpen(true)}
         >

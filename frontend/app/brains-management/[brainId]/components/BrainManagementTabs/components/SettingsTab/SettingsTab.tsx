@@ -39,6 +39,8 @@ export const SettingsTab = ({ brainId }: SettingsTabProps): JSX.Element => {
     brain,
   } = useSettingsTab({ brainId });
 
+  const isPubliclyAccessible = brain?.status === "public";
+
   return (
     <form
       onSubmit={(e) => {
@@ -56,13 +58,14 @@ export const SettingsTab = ({ brainId }: SettingsTabProps): JSX.Element => {
             autoComplete="off"
             className="flex-1"
             required
+            disabled={isPubliclyAccessible}
             {...register("name")}
           />
         </div>
 
         <div className="mt-4">
           <div className="flex flex-1 items-center flex-col">
-            {brain?.status === "public" && (
+            {isPubliclyAccessible && (
               <Chip className="mb-3 bg-purple-600 text-white w-full">
                 {t("brain:public_brain_label")}
               </Chip>
@@ -77,6 +80,7 @@ export const SettingsTab = ({ brainId }: SettingsTabProps): JSX.Element => {
                 isLoading={isSettingAsDefault}
                 onClick={() => void setAsDefaultBrainHandler()}
                 type="button"
+                disabled={isPubliclyAccessible}
               >
                 {t("setDefaultBrain", { ns: "brain" })}
               </Button>
@@ -89,6 +93,7 @@ export const SettingsTab = ({ brainId }: SettingsTabProps): JSX.Element => {
         placeholder={t("brainDescriptionPlaceholder", { ns: "brain" })}
         autoComplete="off"
         className="flex-1 m-3"
+        disabled={isPubliclyAccessible}
         {...register("description")}
       />
       <Divider text={t("modelSection", { ns: "config" })} />
@@ -97,6 +102,7 @@ export const SettingsTab = ({ brainId }: SettingsTabProps): JSX.Element => {
         placeholder={t("openAiKeyPlaceholder", { ns: "config" })}
         autoComplete="off"
         className="flex-1"
+        disabled={isPubliclyAccessible}
         {...register("openAiKey")}
       />
       <fieldset className="w-full flex flex-col mt-2">
@@ -105,6 +111,7 @@ export const SettingsTab = ({ brainId }: SettingsTabProps): JSX.Element => {
         </label>
         <select
           id="model"
+          disabled={isPubliclyAccessible}
           {...register("model")}
           className="px-5 py-2 dark:bg-gray-700 bg-gray-200 rounded-md"
           onChange={() => {
@@ -129,6 +136,7 @@ export const SettingsTab = ({ brainId }: SettingsTabProps): JSX.Element => {
           max="1"
           step="0.01"
           value={temperature}
+          disabled={isPubliclyAccessible}
           {...register("temperature")}
         />
       </fieldset>
@@ -141,19 +149,24 @@ export const SettingsTab = ({ brainId }: SettingsTabProps): JSX.Element => {
           min="10"
           max={defineMaxTokens(model)}
           value={maxTokens}
+          disabled={isPubliclyAccessible}
           {...register("maxTokens")}
         />
       </fieldset>
       <div className="flex w-full justify-end py-4">
-        <SaveButton handleSubmit={handleSubmit} />
+        <SaveButton
+          disabled={isPubliclyAccessible}
+          handleSubmit={handleSubmit}
+        />
       </div>
       <Divider text={t("customPromptSection", { ns: "config" })} />
-      <PublicPrompts onSelect={pickPublicPrompt} />
+      {!isPubliclyAccessible && <PublicPrompts onSelect={pickPublicPrompt} />}
       <Field
         label={t("promptName", { ns: "config" })}
         placeholder={t("promptNamePlaceholder", { ns: "config" })}
         autoComplete="off"
         className="flex-1"
+        disabled={isPubliclyAccessible}
         {...register("prompt.title")}
       />
       <TextArea
@@ -161,13 +174,20 @@ export const SettingsTab = ({ brainId }: SettingsTabProps): JSX.Element => {
         placeholder={t("promptContentPlaceholder", { ns: "config" })}
         autoComplete="off"
         className="flex-1"
+        disabled={isPubliclyAccessible}
         {...register("prompt.content")}
       />
       <div className="flex w-full justify-end py-4">
-        <SaveButton handleSubmit={handleSubmit} />
+        <SaveButton
+          disabled={isPubliclyAccessible}
+          handleSubmit={handleSubmit}
+        />
       </div>
       {promptId !== "" && (
-        <Button disabled={isUpdating} onClick={() => void removeBrainPrompt()}>
+        <Button
+          disabled={isUpdating || isPubliclyAccessible}
+          onClick={() => void removeBrainPrompt()}
+        >
           {t("removePrompt", { ns: "config" })}
         </Button>
       )}
