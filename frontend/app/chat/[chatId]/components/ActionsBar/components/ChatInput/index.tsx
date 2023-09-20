@@ -1,7 +1,8 @@
 /* eslint-disable */
 "use client";
 import { useTranslation } from "react-i18next";
-import { MdCloudUpload, MdSend } from "react-icons/md";
+import { MdSend } from "react-icons/md";
+import { PiPaperclipFill } from "react-icons/pi";
 
 import Button from "@/lib/components/ui/Button";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
@@ -49,7 +50,7 @@ export const ChatInput = ({
           onClick={() => setShouldDisplayUploadCard(true)}
           tooltip={t("add_content_card_button_tooltip")}
         >
-          <MdCloudUpload className="text-3xl" />
+          <PiPaperclipFill className="text-3xl" />
         </Button>
       )}
 
