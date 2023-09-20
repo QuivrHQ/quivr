@@ -20,6 +20,11 @@ const KnowledgeItem = ({
 
   const knowledge_name = knowledge.file_name ?? knowledge.url;
 
+  // TODO: Add the two types to avoid this. Knowledge = UploadedKnowledge | CrawledKnowledge
+  if (knowledge_name === undefined) {
+    return <></>;
+  }
+
   return (
     <tr key={knowledge.id}>
       <td className="px-6 py-4 whitespace-nowrap">
@@ -31,7 +36,9 @@ const KnowledgeItem = ({
         </div>
       </td>
       <td className="px-6 py-4 whitespace-nowrap">
-        <div className="text-sm text-gray-900">{knowledge_name}</div>
+        <div className="text-sm text-gray-900">
+          <p className={"max-w-[400px] truncate"}>{knowledge_name}</p>
+        </div>
       </td>
       <td className="px-6 py-4 whitespace-nowrap">
         <div className="text-sm text-gray-900">Toto</div>
