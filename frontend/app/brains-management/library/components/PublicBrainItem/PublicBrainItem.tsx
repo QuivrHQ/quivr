@@ -6,6 +6,7 @@ import { Modal } from "@/lib/components/ui/Modal";
 import { PublicBrain } from "@/lib/context/BrainProvider/types";
 
 import { usePublicBrainItem } from "./hooks/usePublicBrainItem";
+import { formatDate } from "./utils/formatDate";
 
 type PublicBrainItemProps = {
   brain: PublicBrain;
@@ -55,7 +56,10 @@ export const PublicBrainItem = ({
         <p className="mb-10">{brain.description ?? ""}</p>
 
         <p className="font-bold mb-5">
-          <span>{t("public_brain_last_update_label")}:</span>
+          <span>
+            <span className="mr-2">{t("public_brain_last_update_label")}:</span>
+            {formatDate(brain.last_update)}
+          </span>
         </p>
         <div className="flex flex-1 justify-end">{subscribeButton}</div>
       </div>

@@ -41,3 +41,4 @@ class PublicBrain(BaseModel):
     name: str
     description: Optional[str]
     number_of_subscribers: int = 0
+    last_update: str
