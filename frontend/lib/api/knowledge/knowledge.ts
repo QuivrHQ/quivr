@@ -21,13 +21,24 @@ export const getAllKnowledge = async (
 };
 
 export type DeleteKnowledgeInputProps = {
-  brain_id: UUID;
-  knowledge_id: UUID;
+  brainId: UUID;
+  knowledgeId: UUID;
 };
 
 export const deleteKnowledge = async (
-  { knowledge_id, brain_id }: DeleteKnowledgeInputProps,
+  { knowledgeId, brainId }: DeleteKnowledgeInputProps,
   axiosInstance: AxiosInstance
 ): Promise<void> => {
-  await axiosInstance.delete(`/knowledge/${knowledge_id}?brain_id=${brain_id}`);
+  await axiosInstance.delete(`/knowledge/${knowledgeId}?brain_id=${brainId}`);
+};
+
+export const generateSignedUrlKnowledge = async (
+  { knowledgeId }: { knowledgeId: UUID },
+  axiosInstance: AxiosInstance
+): Promise<string> => {
+  const response = await axiosInstance.get<{
+    signedURL: string;
+  }>(`/knowledge/${knowledgeId}/signed_download_url`);
+
+  return response.data.signedURL;
 };

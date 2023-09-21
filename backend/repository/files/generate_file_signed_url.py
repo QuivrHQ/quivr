@@ -13,7 +13,12 @@ def generate_file_signed_url(path):
 
     try:
         response = supabase_client.storage.from_("quivr").create_signed_url(
-            path, SIGNED_URL_EXPIRATION_PERIOD_IN_SECONDS
+            path,
+            SIGNED_URL_EXPIRATION_PERIOD_IN_SECONDS,
+            options={
+                "download": True,
+                "transform": None,
+            },
         )
         logger.info("RESPONSE SIGNED URL", response)
         return response

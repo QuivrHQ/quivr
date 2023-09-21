@@ -3,7 +3,7 @@ from uuid import UUID
 from auth import AuthBearer, get_current_user
 from fastapi import APIRouter, Depends, Query
 from logger import get_logger
-from models import Brain, UserIdentity, get_supabase_db
+from models import Brain, UserIdentity
 from repository.files.delete_file import delete_file_from_storage
 from repository.files.generate_file_signed_url import generate_file_signed_url
 from repository.knowledge.get_all_knowledge import get_all_knowledge
@@ -32,18 +32,11 @@ async def list_knowledge_in_brain_endpoint(
 
     validate_brain_authorization(brain_id=brain_id, user_id=current_user.id)
 
-    brain = Brain(id=brain_id)
-
     # files = list_files_from_storage(str(brain_id))
     # logger.info("List of files from storage", files)
 
     knowledges = get_all_knowledge(brain_id)
     logger.info("List of knowledge from knowledge table", knowledges)
-    # TO DO: Retrieve from Knowledge table instead of storage or vectors
-    unique_data = brain.get_unique_brain_files()
-
-    print("UNIQUE DATA", unique_data)
-    unique_data.sort(key=lambda x: int(x["size"]), reverse=True)
 
     return {"knowledges": knowledges}
 
@@ -86,40 +79,30 @@ async def delete_endpoint(
 
 
 @knowledge_router.get(
-    "/explore/{file_name}/signed_download_url",
+    "/knowledge/{knowledge_id}/signed_download_url",
     dependencies=[Depends(AuthBearer())],
     tags=["Knowledge"],
 )
 async def generate_signed_url_endpoint(
-    file_name: str, current_user: UserIdentity = Depends(get_current_user)
+    knowledge_id: UUID,
+    current_user: UserIdentity = Depends(get_current_user),
 ):
     """
     Generate a signed url to download the file from storage.
     """
     # check if user has the right to get the file: add brain_id to the query
 
-    supabase_db = get_supabase_db()
-    response = supabase_db.get_vectors_by_file_name(file_name)
-    documents = response.data
+    knowledge = get_knowledge(knowledge_id)
 
-    if len(documents) == 0:
-        return {"documents": []}
+    validate_brain_authorization(brain_id=knowledge.brain_id, user_id=current_user.id)
 
-    related_brain_id = (
-        documents[0]["brains_vectors"][0]["brain_id"]
-        if len(documents[0]["brains_vectors"]) != 0
-        else None
-    )
-    if related_brain_id is None:
-        raise Exception(f"File {file_name} has no brain_id associated with it")
+    if knowledge.file_name == None:
+        raise Exception(f"Knowledge {knowledge_id} has no file_name associated with it")
 
-    file_path_in_storage = f"{related_brain_id}/{file_name}"
+    file_path_in_storage = f"{knowledge.brain_id}/{knowledge.file_name}"
 
-    print("FILE PATH IN STORAGE", file_path_in_storage)
     file_signed_url = generate_file_signed_url(file_path_in_storage)
 
-    print("FILE SIGNED URL", file_signed_url)
-
-    validate_brain_authorization(brain_id=related_brain_id, user_id=current_user.id)
+    logger.info("FILE SIGNED URL", file_signed_url)
 
     return file_signed_url

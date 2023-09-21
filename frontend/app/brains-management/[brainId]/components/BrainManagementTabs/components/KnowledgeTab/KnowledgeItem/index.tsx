@@ -3,6 +3,7 @@
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 import { Knowledge } from "@/lib/types/Knowledge";
 
+import { DownloadUploadedKnowledge } from "./DownloadUploadedKnowledge";
 import { useKnowledgeItem } from "./useKnowledgeItem";
 
 const KnowledgeItem = ({
@@ -43,13 +44,10 @@ const KnowledgeItem = ({
       <td className="px-6 py-4 whitespace-nowrap">
         <div className="text-sm text-gray-900">Toto</div>
       </td>
+      <td className="px-6 py-4 whitespace-nowrap">
+        <DownloadUploadedKnowledge knowledge={knowledge} />
+      </td>
       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-        {/* <button
-            className="text-indigo-600 hover:text-indigo-900 mr-4"
-            onClick={() => onDownload(knowledge.id)}
-          >
-            Download
-          </button> */}
         {canDeleteFile && (
           <button
             className="text-red-600 hover:text-red-900"

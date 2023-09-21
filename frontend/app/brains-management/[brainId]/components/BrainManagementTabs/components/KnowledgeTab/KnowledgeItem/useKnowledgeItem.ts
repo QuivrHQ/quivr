@@ -28,8 +28,8 @@ export const useKnowledgeItem = () => {
         throw new Error(t("noBrain", { ns: "explore" }));
       }
       await deleteKnowledge({
-        brain_id: currentBrain.id,
-        knowledge_id: knowledge.id,
+        brainId: currentBrain.id,
+        knowledgeId: knowledge.id,
       });
       setAllKnowledge((knowledges) =>
         knowledges.filter((k) => k.id !== knowledge.id)

@@ -1,8 +1,11 @@
+import { UUID } from "crypto";
+
 import { useAxios } from "@/lib/hooks";
 
 import {
   deleteKnowledge,
   DeleteKnowledgeInputProps,
+  generateSignedUrlKnowledge,
   getAllKnowledge,
   GetAllKnowledgeInputProps,
 } from "./knowledge";
@@ -16,5 +19,7 @@ export const useKnowledgeApi = () => {
       getAllKnowledge(props, axiosInstance),
     deleteKnowledge: async (props: DeleteKnowledgeInputProps) =>
       deleteKnowledge(props, axiosInstance),
+    generateSignedUrlKnowledge: async (props: { knowledgeId: UUID }) =>
+      generateSignedUrlKnowledge(props, axiosInstance),
   };
 };
