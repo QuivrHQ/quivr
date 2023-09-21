@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 
 import { PUBLIC_BRAINS_KEY } from "@/lib/api/brain/config";
 import { useBrainApi } from "@/lib/api/brain/useBrainApi";
-import { Brain } from "@/lib/context/BrainProvider/types";
+import { PublicBrain } from "@/lib/context/BrainProvider/types";
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const useBrainsLibrary = () => {
@@ -14,9 +14,9 @@ export const useBrainsLibrary = () => {
     queryFn: getPublicBrains,
   });
 
-  const [displayingPublicBrains, setDisplayingPublicBrains] = useState<Brain[]>(
-    []
-  );
+  const [displayingPublicBrains, setDisplayingPublicBrains] = useState<
+    PublicBrain[]
+  >([]);
 
   useEffect(() => {
     setDisplayingPublicBrains(publicBrains);

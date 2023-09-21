@@ -36,5 +36,7 @@
     "cancel_set_brain_status_to_public": "不，保持私密",
     "brain_library_button_label": "大脑库",
     "public_brains_search_bar_placeholder": "搜索公共大脑",
-    "public_brain_subscribe_button_label": "订阅"
+    "public_brain_subscribe_button_label": "订阅",
+    "public_brain_subscription_success_message": "Вы успешно подписались на мозг",
+    "public_brain_last_update_label": "Последнее обновление"
 }

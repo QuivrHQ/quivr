@@ -3,19 +3,35 @@ import { MdAdd } from "react-icons/md";
 
 import Button from "@/lib/components/ui/Button";
 import { Modal } from "@/lib/components/ui/Modal";
-import { Brain } from "@/lib/context/BrainProvider/types";
+import { PublicBrain } from "@/lib/context/BrainProvider/types";
+
+import { usePublicBrainItem } from "./hooks/usePublicBrainItem";
 
 type PublicBrainItemProps = {
-  brain: Brain;
+  brain: PublicBrain;
 };
 
 export const PublicBrainItem = ({
   brain,
 }: PublicBrainItemProps): JSX.Element => {
+  const { handleSubscribeToBrain, subscriptionRequestPending } =
+    usePublicBrainItem({
+      brainId: brain.id,
+    });
+
   const { t } = useTranslation("brain");
 
   const subscribeButton = (
-    <Button className="bg-purple-600 text-white p-0 px-3 rounded-xl border-0 w-content mt-3">
+    <Button
+      onClick={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        void handleSubscribeToBrain();
+      }}
+      disabled={subscriptionRequestPending}
+      isLoading={subscriptionRequestPending}
+      className="bg-purple-600 text-white p-0 px-3 rounded-xl border-0 w-content mt-3"
+    >
       {t("public_brain_subscribe_button_label")}
       <MdAdd className="text-md" />
     </Button>
@@ -39,7 +55,7 @@ export const PublicBrainItem = ({
         <p className="mb-10">{brain.description ?? ""}</p>
 
         <p className="font-bold mb-5">
-          <span>Last update:</span>
+          <span>{t("public_brain_last_update_label")}:</span>
         </p>
         <div className="flex flex-1 justify-end">{subscribeButton}</div>
       </div>

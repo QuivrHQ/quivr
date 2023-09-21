@@ -36,5 +36,7 @@
     "cancel_set_brain_status_to_public": "Não, mantê-lo privado",
     "brain_library_button_label": "Biblioteca de cérebros",
     "public_brains_search_bar_placeholder": "Pesquisar cérebros públicos",
-    "public_brain_subscribe_button_label": "Inscrever-se"
+    "public_brain_subscribe_button_label": "Inscrever-se",
+    "public_brain_subscription_success_message": "Você se inscreveu com sucesso no cérebro",
+    "public_brain_last_update_label": "Última atualização"
 }

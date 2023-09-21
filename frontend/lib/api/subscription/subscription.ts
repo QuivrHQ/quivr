@@ -54,3 +54,16 @@ export const getInvitation = async (
     role: invitation.rights,
   };
 };
+
+export const subscribeToBrain = async (
+  brainId: UUID,
+  axiosInstance: AxiosInstance
+): Promise<{ message: string }> => {
+  const subscribedToBrain = (
+    await axiosInstance.post<{ message: string }>(
+      `/brains/${brainId}/subscribe`
+    )
+  ).data;
+
+  return subscribedToBrain;
+};
