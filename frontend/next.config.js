@@ -1,6 +1,6 @@
 const nextConfig = {
   images: {
-    domains: ["www.quivr.app"]
+    domains: ["www.quivr.app", "quivr-cms.s3.eu-west-3.amazonaws.com"]
   },
   // eslint-disable-next-line prefer-arrow/prefer-arrow-functions
   async headers() {
@@ -21,7 +21,7 @@ const ContentSecurityPolicy = `
   default-src 'self' https://fonts.googleapis.com ${process.env.NEXT_PUBLIC_SUPABASE_URL} https://api.june.so https://www.quivr.app/; 
   connect-src 'self' ${process.env.NEXT_PUBLIC_SUPABASE_URL} ${process.env.NEXT_PUBLIC_BACKEND_URL} https://api.june.so https://api.openai.com https://cdn.growthbook.io https://vitals.vercel-insights.com/v1/vitals;
   img-src 'self' data:;
-  media-src 'self' https://user-images.githubusercontent.com;
+  media-src 'self' https://user-images.githubusercontent.com https://www.quivr.app/ https://quivr-cms.s3.eu-west-3.amazonaws.com;
   script-src 'unsafe-inline' 'unsafe-eval' https://va.vercel-scripts.com/  https://www.quivr.app/ https://www.google-analytics.com/;
   frame-ancestors 'none';
   style-src 'unsafe-inline' https://www.quivr.app/;
