@@ -17,7 +17,7 @@ type BlogPost = {
 
 export const getStaticPaths: GetStaticPaths = async () => {
   try {
-    const response = await fetch("http://localhost:1337/api/blogs");
+    const response = await fetch("https://cms.quivr.app/api/blogs");
     if (!response.ok) {
       throw new Error('Network response was not ok');  // Handle non-200 responses
     }
@@ -42,7 +42,7 @@ export const getStaticPaths: GetStaticPaths = async () => {
 
 export const getStaticProps = async (context: { params: { id: string } }) => {
   try {
-    const response = await fetch(`http://localhost:1337/api/blogs/${context.params.id}`);
+    const response = await fetch(`https://cms.quivr.app/api/blogs/${context.params.id}`);
     console.log(response)
     const data: { data: BlogPost } = await response.json();
     

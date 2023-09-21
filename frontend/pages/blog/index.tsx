@@ -20,7 +20,7 @@ type BlogPost = {
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const getStaticProps = async () => {
   try {
-    const resulting = await fetch("http://localhost:1337/api/blogs");
+    const resulting = await fetch("https://cms.quivr.app/api/blogs");
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const data: { data: BlogPost[] } = await resulting.json();
 
