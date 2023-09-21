@@ -8,8 +8,8 @@ import { FeatureFlagsProvider } from "@/lib/context";
 import { BrainProvider } from "@/lib/context/BrainProvider";
 import { SupabaseProvider } from "@/lib/context/SupabaseProvider";
 
+import "@/globals.css";
 import { App } from "./App";
-import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"] });
 
