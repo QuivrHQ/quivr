@@ -9,16 +9,19 @@ import { Chip } from "@/lib/components/ui/Chip";
 import { Divider } from "@/lib/components/ui/Divider";
 import Field from "@/lib/components/ui/Field";
 import { TextArea } from "@/lib/components/ui/TextArea";
+import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 import { defineMaxTokens } from "@/lib/helpers/defineMaxTokens";
 import { SaveButton } from "@/shared/SaveButton";
 
 import { PublicPrompts } from "./components/PublicPrompts/PublicPrompts";
 import { useSettingsTab } from "./hooks/useSettingsTab";
+import { isUserBrainOwner } from "../../utils/isUserBrainOwner";
 
 type SettingsTabProps = {
   brainId: UUID;
 };
 
+// eslint-disable-next-line complexity
 export const SettingsTab = ({ brainId }: SettingsTabProps): JSX.Element => {
   const { t } = useTranslation(["translation", "brain", "config"]);
   const {
@@ -38,8 +41,16 @@ export const SettingsTab = ({ brainId }: SettingsTabProps): JSX.Element => {
     accessibleModels,
     brain,
   } = useSettingsTab({ brainId });
+  const { allBrains } = useBrainContext();
 
-  const isPubliclyAccessible = brain?.status === "public";
+  const isCurrentUserBrainOwner = isUserBrainOwner({
+    brainId,
+    userAccessibleBrains: allBrains,
+  });
+
+  const isPublicBrain = brain?.status === "public";
+
+  const hasEditRights = !isPublicBrain || isCurrentUserBrainOwner;
 
   return (
     <form
@@ -58,14 +69,14 @@ export const SettingsTab = ({ brainId }: SettingsTabProps): JSX.Element => {
             autoComplete="off"
             className="flex-1"
             required
-            disabled={isPubliclyAccessible}
+            disabled={!hasEditRights}
             {...register("name")}
           />
         </div>
 
         <div className="mt-4">
           <div className="flex flex-1 items-center flex-col">
-            {isPubliclyAccessible && (
+            {isPublicBrain && (
               <Chip className="mb-3 bg-purple-600 text-white w-full">
                 {t("brain:public_brain_label")}
               </Chip>
@@ -80,7 +91,7 @@ export const SettingsTab = ({ brainId }: SettingsTabProps): JSX.Element => {
                 isLoading={isSettingAsDefault}
                 onClick={() => void setAsDefaultBrainHandler()}
                 type="button"
-                disabled={isPubliclyAccessible}
+                disabled={!hasEditRights}
               >
                 {t("setDefaultBrain", { ns: "brain" })}
               </Button>
@@ -93,7 +104,7 @@ export const SettingsTab = ({ brainId }: SettingsTabProps): JSX.Element => {
         placeholder={t("brainDescriptionPlaceholder", { ns: "brain" })}
         autoComplete="off"
         className="flex-1 m-3"
-        disabled={isPubliclyAccessible}
+        disabled={!hasEditRights}
         {...register("description")}
       />
       <Divider text={t("modelSection", { ns: "config" })} />
@@ -102,7 +113,7 @@ export const SettingsTab = ({ brainId }: SettingsTabProps): JSX.Element => {
         placeholder={t("openAiKeyPlaceholder", { ns: "config" })}
         autoComplete="off"
         className="flex-1"
-        disabled={isPubliclyAccessible}
+        disabled={!hasEditRights}
         {...register("openAiKey")}
       />
       <fieldset className="w-full flex flex-col mt-2">
@@ -111,7 +122,7 @@ export const SettingsTab = ({ brainId }: SettingsTabProps): JSX.Element => {
         </label>
         <select
           id="model"
-          disabled={isPubliclyAccessible}
+          disabled={!hasEditRights}
           {...register("model")}
           className="px-5 py-2 dark:bg-gray-700 bg-gray-200 rounded-md"
           onChange={() => {
@@ -136,7 +147,7 @@ export const SettingsTab = ({ brainId }: SettingsTabProps): JSX.Element => {
           max="1"
           step="0.01"
           value={temperature}
-          disabled={isPubliclyAccessible}
+          disabled={!hasEditRights}
           {...register("temperature")}
         />
       </fieldset>
@@ -149,24 +160,21 @@ export const SettingsTab = ({ brainId }: SettingsTabProps): JSX.Element => {
           min="10"
           max={defineMaxTokens(model)}
           value={maxTokens}
-          disabled={isPubliclyAccessible}
+          disabled={!hasEditRights}
           {...register("maxTokens")}
         />
       </fieldset>
       <div className="flex w-full justify-end py-4">
-        <SaveButton
-          disabled={isPubliclyAccessible}
-          handleSubmit={handleSubmit}
-        />
+        <SaveButton disabled={!hasEditRights} handleSubmit={handleSubmit} />
       </div>
       <Divider text={t("customPromptSection", { ns: "config" })} />
-      {!isPubliclyAccessible && <PublicPrompts onSelect={pickPublicPrompt} />}
+      {hasEditRights && <PublicPrompts onSelect={pickPublicPrompt} />}
       <Field
         label={t("promptName", { ns: "config" })}
         placeholder={t("promptNamePlaceholder", { ns: "config" })}
         autoComplete="off"
         className="flex-1"
-        disabled={isPubliclyAccessible}
+        disabled={!hasEditRights}
         {...register("prompt.title")}
       />
       <TextArea
@@ -174,18 +182,15 @@ export const SettingsTab = ({ brainId }: SettingsTabProps): JSX.Element => {
         placeholder={t("promptContentPlaceholder", { ns: "config" })}
         autoComplete="off"
         className="flex-1"
-        disabled={isPubliclyAccessible}
+        disabled={!hasEditRights}
         {...register("prompt.content")}
       />
       <div className="flex w-full justify-end py-4">
-        <SaveButton
-          disabled={isPubliclyAccessible}
-          handleSubmit={handleSubmit}
-        />
+        <SaveButton disabled={!hasEditRights} handleSubmit={handleSubmit} />
       </div>
       {promptId !== "" && (
         <Button
-          disabled={isUpdating || isPubliclyAccessible}
+          disabled={isUpdating || !hasEditRights}
           onClick={() => void removeBrainPrompt()}
         >
           {t("removePrompt", { ns: "config" })}

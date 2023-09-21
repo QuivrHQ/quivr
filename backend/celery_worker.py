@@ -10,6 +10,9 @@ from models.files import File
 from models.notifications import NotificationsStatusEnum
 from models.settings import get_supabase_client
 from parsers.github import process_github
+from repository.brain.update_brain_last_update_time import (
+    update_brain_last_update_time,
+)
 from repository.notification.update_notification import update_notification_by_id
 from utils.processors import filter_file
 
@@ -98,6 +101,8 @@ def process_file_and_notify(
                     message=str(notification_message),
                 ),
             )
+        update_brain_last_update_time(brain_id)
+
         return True
 
 
@@ -158,4 +163,5 @@ def process_crawl_and_notify(
                 message=str(notification_message),
             ),
         )
+    update_brain_last_update_time(brain_id)
     return True

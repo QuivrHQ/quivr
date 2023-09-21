@@ -94,6 +94,11 @@ class Brain(Repository):
             public_brains.append(brain)
         return public_brains
 
+    def update_brain_last_update_time(self, brain_id: UUID) -> None:
+        self.db.table("brains").update({"last_update": "now()"}).match(
+            {"brain_id": brain_id}
+        ).execute()
+
     def get_brain_for_user(self, user_id, brain_id) -> MinimalBrainEntity | None:
         response = (
             self.db.from_("brains_users")
