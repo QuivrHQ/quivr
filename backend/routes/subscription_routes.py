@@ -361,3 +361,45 @@ def update_brain_subscription(
         update_brain_user_rights(brain_id, user_id, subscription.rights)
 
     return {"message": "Brain subscription updated successfully"}
+
+
+@subscription_router.post(
+    "/brains/{brain_id}/subscribe",
+    tags=["Subscription"],
+)
+async def subscribe_to_brain_handler(
+    brain_id: UUID, current_user: UserIdentity = Depends(get_current_user)
+):
+    """
+    Subscribe to a public brain
+    """
+    if not current_user.email:
+        raise HTTPException(status_code=400, detail="UserIdentity email is not defined")
+
+    brain = get_brain_by_id(brain_id)
+
+    if brain is None:
+        raise HTTPException(status_code=404, detail="Brain not found")
+    if brain.status != "public":
+        raise HTTPException(
+            status_code=403,
+            detail="You cannot subscribe to this brain without invitation",
+        )
+    # check if user is already subscribed to brain
+    user_brain = get_brain_for_user(current_user.id, brain_id)
+    if user_brain is not None:
+        raise HTTPException(
+            status_code=403,
+            detail="You are already subscribed to this brain",
+        )
+    try:
+        create_brain_user(
+            user_id=current_user.id,
+            brain_id=brain_id,
+            rights=RoleEnum.Viewer,
+            is_default_brain=False,
+        )
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Error adding user to brain: {e}")
+
+    return {"message": "You have successfully subscribed to the brain"}
