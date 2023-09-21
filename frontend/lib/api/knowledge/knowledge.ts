@@ -7,17 +7,43 @@ export type GetAllKnowledgeInputProps = {
   brainId: UUID;
 };
 
+interface BEKnowledge {
+  id: UUID;
+  brain_id: UUID;
+  file_name: string | null;
+  url: string | null;
+  extension: string;
+}
+
 export const getAllKnowledge = async (
   { brainId }: GetAllKnowledgeInputProps,
   axiosInstance: AxiosInstance
 ): Promise<Knowledge[]> => {
   const response = await axiosInstance.get<{
-    knowledges: Knowledge[];
+    knowledges: BEKnowledge[];
   }>(`/knowledge?brain_id=${brainId}`);
 
   console.log("response.data", response.data);
 
-  return response.data.knowledges;
+  return response.data.knowledges.map((knowledge) => {
+    if (knowledge.file_name !== null) {
+      return {
+        id: knowledge.id,
+        brainId: knowledge.brain_id,
+        fileName: knowledge.file_name,
+        extension: knowledge.extension,
+      };
+    } else if (knowledge.url !== null) {
+      return {
+        id: knowledge.id,
+        brainId: knowledge.brain_id,
+        url: knowledge.url,
+        extension: "URL",
+      };
+    } else {
+      throw new Error(`Invalid knowledge ${knowledge.id}`);
+    }
+  });
 };
 
 export type DeleteKnowledgeInputProps = {

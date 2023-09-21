@@ -1,10 +1,23 @@
 import { UUID } from "crypto";
 
-export interface Knowledge {
+export type Knowledge = UploadedKnowledge | CrawledKnowledge;
+
+export interface UploadedKnowledge {
   id: UUID;
-  brain_id: UUID;
-  file_name?: string;
-  url?: string;
+  brainId: UUID;
+  fileName: string;
   extension: string;
-  // date: Date;
 }
+
+export interface CrawledKnowledge {
+  id: UUID;
+  brainId: UUID;
+  url: string;
+  extension: string;
+}
+
+export const isUploadedKnowledge = (
+  knowledge: Knowledge
+): knowledge is UploadedKnowledge => {
+  return "fileName" in knowledge && !("url" in knowledge);
+};

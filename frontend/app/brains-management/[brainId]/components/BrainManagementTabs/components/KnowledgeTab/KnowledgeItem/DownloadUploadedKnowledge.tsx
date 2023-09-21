@@ -2,12 +2,13 @@ import axios from "axios";
 import { BsFillCloudArrowDownFill } from "react-icons/bs";
 
 import { useKnowledgeApi } from "@/lib/api/knowledge/useKnowledgeApi";
-import { Knowledge } from "@/lib/types/Knowledge";
+import { getFileIcon } from "@/lib/helpers/getFileIcon";
+import { UploadedKnowledge } from "@/lib/types/Knowledge";
 
 export const DownloadUploadedKnowledge = ({
   knowledge,
 }: {
-  knowledge: Knowledge;
+  knowledge: UploadedKnowledge;
 }): JSX.Element => {
   const { generateSignedUrlKnowledge } = useKnowledgeApi();
 
@@ -26,7 +27,7 @@ export const DownloadUploadedKnowledge = ({
 
       const a = document.createElement("a");
       a.href = blobUrl;
-      a.download = knowledge.file_name ?? "toto.pdf";
+      a.download = knowledge.fileName;
       document.body.appendChild(a);
       a.click();
 
@@ -37,8 +38,12 @@ export const DownloadUploadedKnowledge = ({
   };
 
   return (
-    <a onClick={() => void downloadFile()}>
-      <BsFillCloudArrowDownFill fontSize="large" />
+    <a
+      onClick={() => void downloadFile()}
+      style={{ display: "flex", flexDirection: "column", alignItems: "center" }}
+    >
+      {getFileIcon(knowledge.fileName)}
+      <BsFillCloudArrowDownFill fontSize="small" />
     </a>
   );
 };
