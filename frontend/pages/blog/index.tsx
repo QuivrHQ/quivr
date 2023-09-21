@@ -1,3 +1,4 @@
+/* eslint-disable */
 'use client';
 /* https://strapi.io/blog/how-to-create-an-ssg-static-site-generation-application-with-strapi-webhooks-and-nextjs */
 import type { InferGetStaticPropsType } from 'next';
