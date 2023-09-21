@@ -269,9 +269,9 @@ CREATE POLICY "Access Quivr Storage 1jccrwz_2" ON storage.objects FOR UPDATE TO 
 CREATE POLICY "Access Quivr Storage 1jccrwz_3" ON storage.objects FOR DELETE TO anon USING (bucket_id = 'quivr');
 
 INSERT INTO migrations (name) 
-SELECT '202309151054032_add_knowledge_tables'
+SELECT '20230921160000_add_last_update_field_to_brain'
 WHERE NOT EXISTS (
-    SELECT 1 FROM migrations WHERE name = '202309151054032_add_knowledge_tables'
+    SELECT 1 FROM migrations WHERE name = '20230921160000_add_last_update_field_to_brain'
 );
 
 
