@@ -9,6 +9,7 @@ import Button from "@/lib/components/ui/Button";
 import Field from "@/lib/components/ui/Field";
 import { Modal } from "@/lib/components/ui/Modal";
 import { defineMaxTokens } from "@/lib/helpers/defineMaxTokens";
+import { cn } from "@/lib/utils";
 
 import { PublicAccessConfirmationModal } from "./components/PublicAccessConfirmationModal";
 import { useAddBrainModal } from "./hooks/useAddBrainModal";
@@ -16,7 +17,13 @@ import { Divider } from "../ui/Divider";
 import { Radio } from "../ui/Radio";
 import { TextArea } from "../ui/TextArea";
 
-export const AddBrainModal = (): JSX.Element => {
+type AddBrainModalProps = {
+  triggerClassName?: string;
+};
+
+export const AddBrainModal = ({
+  triggerClassName,
+}: AddBrainModalProps): JSX.Element => {
   const { t } = useTranslation(["translation", "brain", "config"]);
   const {
     handleSubmit,
@@ -43,7 +50,7 @@ export const AddBrainModal = (): JSX.Element => {
           <Button
             onClick={() => void 0}
             variant={"tertiary"}
-            className="border-0"
+            className={cn("border-0", triggerClassName)}
             data-testid="add-brain-button"
           >
             {t("newBrain", { ns: "brain" })}

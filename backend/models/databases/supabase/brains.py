@@ -2,7 +2,7 @@ from typing import Optional
 from uuid import UUID
 
 from logger import get_logger
-from models.brain_entity import BrainEntity, MinimalBrainEntity
+from models.brain_entity import BrainEntity, MinimalBrainEntity, PublicBrain
 from models.databases.repository import Repository
 from pydantic import BaseModel
 
@@ -74,6 +74,24 @@ class Brain(Repository):
             )
             user_brains[-1].rights = item["rights"]
         return user_brains
+
+    def get_public_brains(self) -> list[PublicBrain]:
+        response = (
+            self.db.from_("brains")
+            .select("id:brain_id, name, description")
+            .filter("status", "eq", "public")
+            .execute()
+        )
+        public_brains: list[PublicBrain] = []
+        for item in response.data:
+            brain = PublicBrain(
+                id=item["id"],
+                name=item["name"],
+                description=item["description"],
+            )
+            brain.number_of_subscribers = self.get_brain_subscribers_count(brain.id)
+            public_brains.append(brain)
+        return public_brains
 
     def get_brain_for_user(self, user_id, brain_id) -> MinimalBrainEntity | None:
         response = (
@@ -274,3 +292,16 @@ class Brain(Repository):
             return None
 
         return BrainEntity(**response[0])
+
+    def get_brain_subscribers_count(self, brain_id: UUID) -> int:
+        response = (
+            self.db.from_("brains_users")
+            .select(
+                "count",
+            )
+            .filter("brain_id", "eq", str(brain_id))
+            .execute()
+        ).data
+        if len(response) == 0:
+            raise ValueError(f"Brain with id {brain_id} does not exist.")
+        return response[0]["count"]

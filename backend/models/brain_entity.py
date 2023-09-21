@@ -33,3 +33,10 @@ class MinimalBrainEntity(BaseModel):
     name: str
     rights: RoleEnum
     status: str
+
+
+class PublicBrain(BaseModel):
+    id: UUID
+    name: str
+    description: Optional[str]
+    number_of_subscribers: int = 0

@@ -15,11 +15,20 @@ interface FieldProps
   label?: string;
   name: string;
   icon?: React.ReactNode;
+  inputClassName?: string;
 }
 
 const Field = forwardRef(
   (
-    { label, className, name, required = false, icon, ...props }: FieldProps,
+    {
+      label,
+      className,
+      name,
+      inputClassName,
+      required = false,
+      icon,
+      ...props
+    }: FieldProps,
     forwardedRef
   ) => {
     return (
@@ -33,7 +42,10 @@ const Field = forwardRef(
         <div className="relative">
           <input
             ref={forwardedRef as RefObject<HTMLInputElement>}
-            className={`w-full bg-gray-50 dark:bg-gray-900 px-4 py-2 border rounded-md border-black/10 dark:border-white/25`}
+            className={cn(
+              `w-full bg-gray-50 dark:bg-gray-900 px-4 py-2 border rounded-md border-black/10 dark:border-white/25`,
+              inputClassName
+            )}
             name={name}
             id={name}
             {...props}

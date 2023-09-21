@@ -33,5 +33,8 @@
     "set_brain_status_to_public_modal_title": "Вы уверены, что хотите установить это как <span class='text-purple-800'>Публичный</span>?<br/><br/>",
     "set_brain_status_to_public_modal_description": "Каждый пользователь Quivr сможет:<br/>- Подписаться на ваш мозг в 'библиотеке мозгов'.<br/>- Использовать этот мозг и проверить настройки подсказок и модели.<br/><br/>У них не будет доступа к вашим загруженным файлам и разделу 'люди'.",
     "confirm_set_brain_status_to_public": "Да, установить как публичный",
-    "cancel_set_brain_status_to_public": "Нет, оставить приватным"
+    "cancel_set_brain_status_to_public": "Нет, оставить приватным",
+    "brain_library_button_label": "Библиотека мозгов",
+    "public_brains_search_bar_placeholder": "Поиск общественных мозгов",
+    "public_brain_subscribe_button_label": "Подписаться"
 }

@@ -33,5 +33,8 @@
     "set_brain_status_to_public_modal_title": "Are you sure you want to set this as <span class='text-purple-800'>Public</span>?<br/><br/>",
     "set_brain_status_to_public_modal_description": "Every Quivr user will be able to:<br/>- Subscribe to your brain in the 'brains library'.<br/>- Use this brain and check the prompt and model configurations.<br/><br/>They won't have access to your uploaded files and people section.",
     "confirm_set_brain_status_to_public": "Yes, set as public",
-    "cancel_set_brain_status_to_public": "No, keep it private"
+    "cancel_set_brain_status_to_public": "No, keep it private",
+    "brain_library_button_label":"Brains library",
+    "public_brains_search_bar_placeholder":"Search public brains",
+    "public_brain_subscribe_button_label":"Subscribe"
 }

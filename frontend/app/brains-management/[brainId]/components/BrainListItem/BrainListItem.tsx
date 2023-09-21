@@ -31,7 +31,7 @@ export const BrainListItem = ({ brain }: BrainsListItemProps): JSX.Element => {
         href={`/brains-management/${brain.id}`}
         key={brain.id}
       >
-        <div className="flex flex-row flex-1">
+        <div className="flex flex-row flex-1 w-max">
           <div className="flex items-center gap-2">
             <FaBrain className="text-xl" />
             <p>{brain.name}</p>

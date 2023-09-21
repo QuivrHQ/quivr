@@ -33,5 +33,8 @@
     "set_brain_status_to_public_modal_title": "Tem certeza de que deseja definir isso como <span class='text-purple-800'>Público</span>?<br/><br/>",
     "set_brain_status_to_public_modal_description": "Cada usuário do Quivr poderá:<br/>- Se inscrever em seu cérebro na 'biblioteca de cérebros'.<br/>- Usar este cérebro e verificar as configurações de prompts e modelos.<br/><br/>Eles não terão acesso aos seus arquivos enviados e à seção de pessoas.",
     "confirm_set_brain_status_to_public": "Sim, definir como público",
-    "cancel_set_brain_status_to_public": "Não, mantê-lo privado"
+    "cancel_set_brain_status_to_public": "Não, mantê-lo privado",
+    "brain_library_button_label": "Biblioteca de cérebros",
+    "public_brains_search_bar_placeholder": "Pesquisar cérebros públicos",
+    "public_brain_subscribe_button_label": "Inscrever-se"
 }
