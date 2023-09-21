@@ -16,7 +16,8 @@
     "@strapi/provider-upload-aws-s3": "^4.13.7",
     "@strapi/strapi": "4.13.7",
     "better-sqlite3": "8.6.0",
-    "pg": "^8.11.3"
+    "pg": "^8.11.3",
+    "strapi-provider-email-resend": "^1.0.4"
   },
   "author": {
     "name": "A Strapi developer"
