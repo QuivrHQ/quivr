@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 
 import Field from "@/lib/components/ui/Field";
 
-import { PublicBrainItem } from "./components/PublicBrainItem";
+import { PublicBrainItem } from "./components/PublicBrainItem/PublicBrainItem";
 import { useBrainsLibrary } from "./hooks/useBrainsLibrary";
 
 const BrainsLibrary = (): JSX.Element => {
