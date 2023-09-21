@@ -12,7 +12,6 @@ def create_embedding_for_document(
     neurons = Neurons()
     doc = DocumentSerializable.from_json(doc_with_metadata)
     created_vector = neurons.create_vector(doc, user_openai_api_key)
-    # add_usage(stats_db, "embedding", "audio", metadata={"file_name": file_meta_name,"file_type": ".txt", "chunk_size": chunk_size, "chunk_overlap": chunk_overlap})
     database = get_supabase_db()
     database.set_file_sha_from_metadata(file_sha1)
 
