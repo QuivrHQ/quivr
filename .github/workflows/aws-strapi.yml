@@ -1,0 +1,103 @@
+name: Deploy Strapi
+
+on:
+  push:
+    branches: [ "main" ]
+    paths:
+      - 'cms/**'
+
+env:
+  AWS_REGION: eu-west-3
+  ECR_REPOSITORY: quivr-strapi
+  ECR_REGISTRY: 253053805092.dkr.ecr.eu-west-3.amazonaws.com
+  ECS_CLUSTER: quivr
+
+jobs:
+  build_and_push:
+    name: Build and Push Docker Image
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v2
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ env.AWS_REGION }}
+
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v1
+    
+    - name: Login to GitHub Container Registry
+      uses: docker/login-action@v2
+      with:
+        registry: ghcr.io
+        username: ${{ github.repository_owner }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+    
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
+    
+    - name: Create Docker Cacha Storage Backend
+      run: |
+        docker buildx create --use --driver=docker-container
+    - name: See the file in the runner
+      run: |
+        ls -la
+    - name: Build, tag, and push image to Amazon ECR
+      id: build-image
+      uses: docker/build-push-action@v4
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        IMAGE_TAG: ${{ github.sha }}
+      with:
+        context: ./cms/quivr/
+        push: true
+        tags: ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }}, ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:latest, ghcr.io/stangirard/quivr:latest
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+      
+  deploy:
+    needs: build_and_push
+    runs-on: ubuntu-latest
+    environment: production
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: "strapi"
+            service: "strapi"
+            task_definition: ".aws/task_definition_strapi.json"
+            container: "strapi"
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+      
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v2
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ env.AWS_REGION }}
+
+    - name: Fill in the new image ID in the Amazon ECS task definition for ${{ matrix.name }}
+      id: task-def
+      uses: aws-actions/amazon-ecs-render-task-definition@v1
+      with:
+        task-definition: ${{ matrix.task_definition }}
+        container-name: ${{ matrix.container }}
+        image: ${{env.ECR_REGISTRY}}/${{ env.ECR_REPOSITORY }}:${{ github.sha }}
+
+    - name: Deploy Amazon ECS task definition for ${{ matrix.name }}
+      uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+      with:
+        task-definition: ${{ steps.task-def.outputs.task-definition }}
+        service: ${{ matrix.service }}
+        cluster: ${{ env.ECS_CLUSTER }}
+        wait-for-service-stability: true
