@@ -1,5 +1,7 @@
 "use client";
 
+import { MdDelete } from "react-icons/md";
+
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 import { Knowledge } from "@/lib/types/Knowledge";
 
@@ -25,7 +27,7 @@ export const DeleteKnowledge = ({
           className="text-red-600 hover:text-red-900"
           onClick={() => void onDeleteKnowledge(knowledge)}
         >
-          Delete
+          <MdDelete size="20" />
         </button>
       )}
     </>
