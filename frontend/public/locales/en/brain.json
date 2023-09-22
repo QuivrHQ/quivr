@@ -38,5 +38,6 @@
     "public_brains_search_bar_placeholder":"Search public brains",
     "public_brain_subscribe_button_label":"Subscribe",
     "public_brain_subscription_success_message":"You have successfully subscribed to the brain",
-    "public_brain_last_update_label":"Last update"
+    "public_brain_last_update_label":"Last update",
+    "public_brain_already_subscribed_button_label":"Subscribed"
 }

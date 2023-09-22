@@ -15,7 +15,7 @@ import { SaveButton } from "@/shared/SaveButton";
 
 import { PublicPrompts } from "./components/PublicPrompts/PublicPrompts";
 import { useSettingsTab } from "./hooks/useSettingsTab";
-import { isUserBrainOwner } from "../../utils/isUserBrainOwner";
+import { getBrainPermissions } from "../../utils/getBrainPermissions";
 
 type SettingsTabProps = {
   brainId: UUID;
@@ -39,18 +39,13 @@ export const SettingsTab = ({ brainId }: SettingsTabProps): JSX.Element => {
     pickPublicPrompt,
     removeBrainPrompt,
     accessibleModels,
-    brain,
   } = useSettingsTab({ brainId });
   const { allBrains } = useBrainContext();
 
-  const isCurrentUserBrainOwner = isUserBrainOwner({
+  const { hasEditRights, isPublicBrain } = getBrainPermissions({
     brainId,
     userAccessibleBrains: allBrains,
   });
-
-  const isPublicBrain = brain?.status === "public";
-
-  const hasEditRights = !isPublicBrain || isCurrentUserBrainOwner;
 
   return (
     <form
