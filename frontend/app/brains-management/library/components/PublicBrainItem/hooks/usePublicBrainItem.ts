@@ -17,7 +17,7 @@ export const usePublicBrainItem = ({ brainId }: UseSubscribeToBrainProps) => {
   const [subscriptionRequestPending, setSubscriptionRequestPending] =
     useState(false);
   const { publish } = useToast();
-  const { allBrains } = useBrainContext();
+  const { allBrains, fetchAllBrains } = useBrainContext();
 
   const isUserSubscribedToBrain =
     allBrains.find((brain) => brain.id === brainId) !== undefined;
@@ -26,7 +26,9 @@ export const usePublicBrainItem = ({ brainId }: UseSubscribeToBrainProps) => {
   const handleSubscribeToBrain = async () => {
     try {
       setSubscriptionRequestPending(true);
+
       await subscribeToBrain(brainId);
+      await fetchAllBrains();
       publish({
         text: t("public_brain_subscription_success_message"),
         variant: "success",
