@@ -22,7 +22,7 @@ export const useKnowledgeItem = () => {
   const onDeleteKnowledge = async (knowledge: Knowledge) => {
     setIsDeleting(true);
     void track("DELETE_DOCUMENT");
-    const knowledge_name = knowledge.file_name ?? knowledge.url;
+    const knowledge_name = 'fileName' in knowledge ? knowledge.fileName : knowledge.url;
     try {
       if (currentBrain?.id === undefined) {
         throw new Error(t("noBrain", { ns: "explore" }));
@@ -47,7 +47,7 @@ export const useKnowledgeItem = () => {
         variant: "warning",
         text: t("errorDeleting", { fileName: knowledge_name, ns: "explore" }),
       });
-      console.error(`Error deleting ${knowledge_name ?? ""}`, error);
+      console.error("Error deleting", error);
     }
     setIsDeleting(false);
   };
