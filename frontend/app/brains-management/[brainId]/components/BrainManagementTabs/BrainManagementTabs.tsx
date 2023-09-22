@@ -9,7 +9,7 @@ import { BrainTabTrigger, KnowledgeTab, PeopleTab } from "./components";
 import ConfirmationDeleteModal from "./components/Modals/ConfirmationDeleteModal";
 import { SettingsTab } from "./components/SettingsTab/SettingsTab";
 import { useBrainManagementTabs } from "./hooks/useBrainManagementTabs";
-import { isUserBrainOwner } from "./utils/isUserBrainOwner";
+import { getBrainPermissions } from "./utils/getBrainPermissions";
 
 export const BrainManagementTabs = (): JSX.Element => {
   const { t } = useTranslation(["translation", "config", "delete_brain"]);
@@ -20,7 +20,6 @@ export const BrainManagementTabs = (): JSX.Element => {
     handleDeleteBrain,
     isDeleteModalOpen,
     setIsDeleteModalOpen,
-    brain,
   } = useBrainManagementTabs();
   const { allBrains } = useBrainContext();
 
@@ -28,14 +27,10 @@ export const BrainManagementTabs = (): JSX.Element => {
     return <div />;
   }
 
-  const isCurrentUserBrainOwner = isUserBrainOwner({
+  const { hasEditRights, isOwnedByCurrentUser } = getBrainPermissions({
     brainId,
     userAccessibleBrains: allBrains,
   });
-
-  const isPublicBrain = brain?.status === "public";
-
-  const hasEditRights = !isPublicBrain || isCurrentUserBrainOwner;
 
   return (
     <Root
@@ -84,7 +79,7 @@ export const BrainManagementTabs = (): JSX.Element => {
 
       <div className="flex justify-center mt-4">
         <Button
-          disabled={!isCurrentUserBrainOwner}
+          disabled={!isOwnedByCurrentUser}
           className="px-8 md:px-20 py-2 bg-red-500 text-white rounded-md"
           onClick={() => setIsDeleteModalOpen(true)}
         >
