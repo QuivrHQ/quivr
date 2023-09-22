@@ -32,9 +32,6 @@ async def list_knowledge_in_brain_endpoint(
 
     validate_brain_authorization(brain_id=brain_id, user_id=current_user.id)
 
-    # files = list_files_from_storage(str(brain_id))
-    # logger.info("List of files from storage", files)
-
     knowledges = get_all_knowledge(brain_id)
     logger.info("List of knowledge from knowledge table", knowledges)
 
@@ -64,9 +61,8 @@ async def delete_endpoint(
 
     knowledge = get_knowledge(knowledge_id)
     file_name = knowledge.file_name if knowledge.file_name else knowledge.url
-    message = remove_knowledge(knowledge_id)
+    remove_knowledge(knowledge_id)
 
-    print("MESSAGE to remove", message)
     if knowledge.file_name:
         delete_file_from_storage(f"{brain_id}/{knowledge.file_name}")
         brain.delete_file_from_brain(knowledge.file_name)
@@ -90,7 +86,6 @@ async def generate_signed_url_endpoint(
     """
     Generate a signed url to download the file from storage.
     """
-    # check if user has the right to get the file: add brain_id to the query
 
     knowledge = get_knowledge(knowledge_id)
 
@@ -102,7 +97,5 @@ async def generate_signed_url_endpoint(
     file_path_in_storage = f"{knowledge.brain_id}/{knowledge.file_name}"
 
     file_signed_url = generate_file_signed_url(file_path_in_storage)
-
-    logger.info("FILE SIGNED URL", file_signed_url)
 
     return file_signed_url

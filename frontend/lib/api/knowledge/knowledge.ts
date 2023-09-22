@@ -23,8 +23,6 @@ export const getAllKnowledge = async (
     knowledges: BEKnowledge[];
   }>(`/knowledge?brain_id=${brainId}`);
 
-  console.log("response.data", response.data);
-
   return response.data.knowledges.map((knowledge) => {
     if (knowledge.file_name !== null) {
       return {

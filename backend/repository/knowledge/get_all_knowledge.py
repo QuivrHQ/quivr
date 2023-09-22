@@ -11,5 +11,4 @@ def get_all_knowledge(brain_id: UUID):
 
     knowledges = supabase_db.get_all_knowledge_in_brain(brain_id)
 
-    logger.info(f"AllTheKnowledge of the word { knowledges} added successfully")
     return knowledges

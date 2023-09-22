@@ -81,7 +81,7 @@ class Knowledges(Repository):
 
     def get_all_knowledge_in_brain(self, brain_id: UUID) -> List[Knowledge]:
         """
-        Get a knowledge by its id
+        Get all the knowledge in a brain
         Args:
             brain_id (UUID): The id of the brain
         """
@@ -91,7 +91,5 @@ class Knowledges(Repository):
             .filter("brain_id", "eq", str(brain_id))
             .execute()
         ).data
-
-        print("ALL KNOWLEDGE", all_knowledge)
 
         return all_knowledge

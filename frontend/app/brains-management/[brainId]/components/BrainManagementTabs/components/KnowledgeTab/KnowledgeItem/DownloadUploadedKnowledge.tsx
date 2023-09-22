@@ -22,7 +22,6 @@ export const DownloadUploadedKnowledge = ({
         responseType: "blob",
       });
 
-      console.log("MU URL", download_url);
       const blobUrl = window.URL.createObjectURL(new Blob([response.data]));
 
       const a = document.createElement("a");

@@ -14,7 +14,7 @@ export const CrawledKnowledgeItem = ({
   return (
     <tr key={knowledge.id}>
       <td className="px-6 py-4 whitespace-nowrap">
-        <a href={knowledge.url} target="_blank">
+        <a href={knowledge.url} target="_blank" rel="noopener noreferrer">
           <MdLink size="20" color="gray" />
         </a>
       </td>

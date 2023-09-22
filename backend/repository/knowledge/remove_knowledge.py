@@ -11,6 +11,6 @@ def remove_knowledge(knowledge_id: UUID):
 
     message = supabase_db.remove_knowledge_by_id(knowledge_id)
 
-    logger.info(f"Knowledge { knowledge_id} removed successfully")
-    logger.info(f"Message: { message}")
+    logger.info(f"Knowledge { knowledge_id} removed successfully from table")
+
     return message
