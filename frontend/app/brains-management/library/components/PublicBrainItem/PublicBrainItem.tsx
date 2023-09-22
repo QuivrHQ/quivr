@@ -15,10 +15,13 @@ type PublicBrainItemProps = {
 export const PublicBrainItem = ({
   brain,
 }: PublicBrainItemProps): JSX.Element => {
-  const { handleSubscribeToBrain, subscriptionRequestPending } =
-    usePublicBrainItem({
-      brainId: brain.id,
-    });
+  const {
+    handleSubscribeToBrain,
+    isUserSubscribedToBrain,
+    subscriptionRequestPending,
+  } = usePublicBrainItem({
+    brainId: brain.id,
+  });
 
   const { t } = useTranslation("brain");
 
@@ -29,12 +32,14 @@ export const PublicBrainItem = ({
         e.stopPropagation();
         void handleSubscribeToBrain();
       }}
-      disabled={subscriptionRequestPending}
+      disabled={isUserSubscribedToBrain || subscriptionRequestPending}
       isLoading={subscriptionRequestPending}
       className="bg-purple-600 text-white p-0 px-3 rounded-xl border-0 w-content mt-3"
     >
-      {t("public_brain_subscribe_button_label")}
-      <MdAdd className="text-md" />
+      {isUserSubscribedToBrain
+        ? t("public_brain_already_subscribed_button_label")
+        : t("public_brain_subscribe_button_label")}
+      {!isUserSubscribedToBrain && <MdAdd className="text-md" />}
     </Button>
   );
 

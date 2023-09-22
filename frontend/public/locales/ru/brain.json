@@ -38,5 +38,6 @@
     "public_brains_search_bar_placeholder": "Поиск общественных мозгов",
     "public_brain_subscribe_button_label": "Подписаться",
     "public_brain_subscription_success_message": "Вы успешно подписались на мозг",
-    "public_brain_last_update_label": "Последнее обновление"
+    "public_brain_last_update_label": "Последнее обновление",
+    "public_brain_already_subscribed_button_label": "Вы уже подписаны"
 }

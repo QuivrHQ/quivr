@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { useSubscriptionApi } from "@/lib/api/subscription/useSubscriptionApi";
+import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 import { getAxiosErrorParams } from "@/lib/helpers/getAxiosErrorParams";
 import { useToast } from "@/lib/hooks";
 
@@ -16,6 +17,10 @@ export const usePublicBrainItem = ({ brainId }: UseSubscribeToBrainProps) => {
   const [subscriptionRequestPending, setSubscriptionRequestPending] =
     useState(false);
   const { publish } = useToast();
+  const { allBrains } = useBrainContext();
+
+  const isUserSubscribedToBrain =
+    allBrains.find((brain) => brain.id === brainId) !== undefined;
 
   const { t } = useTranslation("brain");
   const handleSubscribeToBrain = async () => {
@@ -48,5 +53,6 @@ export const usePublicBrainItem = ({ brainId }: UseSubscribeToBrainProps) => {
   return {
     handleSubscribeToBrain,
     subscriptionRequestPending,
+    isUserSubscribedToBrain,
   };
 };

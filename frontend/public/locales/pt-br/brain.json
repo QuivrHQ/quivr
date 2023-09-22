@@ -38,5 +38,6 @@
     "public_brains_search_bar_placeholder": "Pesquisar cérebros públicos",
     "public_brain_subscribe_button_label": "Inscrever-se",
     "public_brain_subscription_success_message": "Você se inscreveu com sucesso no cérebro",
-    "public_brain_last_update_label": "Última atualização"
+    "public_brain_last_update_label": "Última atualização",
+    "public_brain_already_subscribed_button_label": "Inscrito"
 }
