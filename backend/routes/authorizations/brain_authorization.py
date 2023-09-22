@@ -5,6 +5,8 @@ from auth.auth_bearer import get_current_user
 from fastapi import Depends, HTTPException, status
 from models import UserIdentity
 from repository.brain import get_brain_for_user
+from repository.brain.get_brain_details import get_brain_details
+
 from routes.authorizations.types import RoleEnum
 
 
@@ -42,6 +44,11 @@ def validate_brain_authorization(
     param: required_roles: The role(s) required to access the brain
     return: None
     """
+
+    brain = get_brain_details(brain_id)
+
+    if brain and brain.status == "public":
+        return
 
     if required_roles is None:
         raise HTTPException(

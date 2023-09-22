@@ -15,6 +15,7 @@ class BrainEntity(BaseModel):
     openai_api_key: Optional[str]
     status: Optional[str]
     prompt_id: Optional[UUID]
+    last_update: str
 
     @property
     def id(self) -> UUID:
@@ -40,3 +41,4 @@ class PublicBrain(BaseModel):
     name: str
     description: Optional[str]
     number_of_subscribers: int = 0
+    last_update: str

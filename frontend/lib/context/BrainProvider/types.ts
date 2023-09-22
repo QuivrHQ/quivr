@@ -38,6 +38,7 @@ export type PublicBrain = {
   name: string;
   description?: string;
   number_of_subscribers: number;
+  last_update: string;
 };
 
 export type BrainContextType = ReturnType<typeof useBrainProvider>;

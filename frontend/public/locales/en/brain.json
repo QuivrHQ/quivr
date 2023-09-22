@@ -36,5 +36,7 @@
     "cancel_set_brain_status_to_public": "No, keep it private",
     "brain_library_button_label":"Brains library",
     "public_brains_search_bar_placeholder":"Search public brains",
-    "public_brain_subscribe_button_label":"Subscribe"
+    "public_brain_subscribe_button_label":"Subscribe",
+    "public_brain_subscription_success_message":"You have successfully subscribed to the brain",
+    "public_brain_last_update_label":"Last update"
 }
