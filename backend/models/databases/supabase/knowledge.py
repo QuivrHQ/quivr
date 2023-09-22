@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import List, Optional
 from uuid import UUID
 
 from fastapi import HTTPException
@@ -36,7 +36,7 @@ class Knowledges(Repository):
         return Knowledge(**response[0])
 
     def remove_knowledge_by_id(
-        # todo: remove brain
+        # todo: update remove brain endpoints to first delete the knowledge
         self,
         knowledge_id: UUID,
     ) -> DeleteKnowledgeResponse:
@@ -73,8 +73,23 @@ class Knowledges(Repository):
         knowledge = (
             self.db.from_("knowledge")
             .select("*")
-            .filter("knowledge_id", "eq", str(knowledge_id))
+            .filter("id", "eq", str(knowledge_id))
             .execute()
         ).data
 
         return Knowledge(**knowledge[0])
+
+    def get_all_knowledge_in_brain(self, brain_id: UUID) -> List[Knowledge]:
+        """
+        Get all the knowledge in a brain
+        Args:
+            brain_id (UUID): The id of the brain
+        """
+        all_knowledge = (
+            self.db.from_("knowledge")
+            .select("*")
+            .filter("brain_id", "eq", str(brain_id))
+            .execute()
+        ).data
+
+        return all_knowledge
