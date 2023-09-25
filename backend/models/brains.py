@@ -76,7 +76,7 @@ class Brain(BaseModel):
     def delete_brain(self, user_id):
         results = self.supabase_db.delete_brain_user_by_id(user_id, self.id)  # type: ignore
 
-        if len(results.data) == 0:
+        if len(results) == 0:
             return {"message": "You are not the owner of this brain."}
         else:
             self.supabase_db.delete_brain_vector(self.id)  # type: ignore

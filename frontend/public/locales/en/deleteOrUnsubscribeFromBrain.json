@@ -4,6 +4,8 @@
     "deleteConfirmYes": "Yes, delete this brain",
     "returnButton": "Return",
     "unsubscribeButton": "Unsubscribe from brain",
-    "unsubscribeConfirmQuestion": "Are you sure you want to unsubscribe from this brain? This action cannot be undone.",
-    "unsubscribeConfirmYes": "Yes, unsubscribe from this brain"
+    "unsubscribeConfirmQuestion": "Are you sure you want to unsubscribe from this brain?",
+    "unsubscribeConfirmYes": "Yes, unsubscribe from this brain",
+    "successfully_deleted": "Brain successfully deleted.",
+    "successfully_unsubscribed": "You have successfully unsubscribed from this brain."
 }

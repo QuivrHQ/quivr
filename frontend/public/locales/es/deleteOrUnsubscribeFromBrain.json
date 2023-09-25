@@ -4,6 +4,8 @@
     "deleteConfirmYes": "Sí, borrar el cerebro",
     "returnButton": "Vuelta",
     "unsubscribeButton": "Cancelar suscripción del cerebro",
-    "unsubscribeConfirmQuestion": "¿Estás seguro de que deseas cancelar la suscripción de este cerebro? Esta acción no se puede deshacer.",
-    "unsubscribeConfirmYes": "Sí, cancelar la suscripción de este cerebro"
+    "unsubscribeConfirmQuestion": "¿Estás seguro de que quieres darte de baja de este cerebro?",
+    "unsubscribeConfirmYes": "Sí, cancelar la suscripción de este cerebro",
+    "successfully_deleted": "Cerebro eliminado con éxito.",
+    "successfully_unsubscribed": "Te has desinscrito con éxito de este cerebro."
 }

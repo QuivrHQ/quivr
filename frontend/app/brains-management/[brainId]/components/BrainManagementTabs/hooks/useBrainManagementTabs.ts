@@ -1,10 +1,13 @@
 import { UUID } from "crypto";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 
+import { useSubscriptionApi } from "@/lib/api/subscription/useSubscriptionApi";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
+import { useToast } from "@/lib/hooks";
+import { useEventTracking } from "@/services/analytics/june/useEventTracking";
 
-import { useBrainFetcher } from "./useBrainFetcher";
 import { BrainManagementTab } from "../types";
 import { getBrainPermissions } from "../utils/getBrainPermissions";
 import { getTargetedTab } from "../utils/getTargetedTab";
@@ -14,6 +17,10 @@ export const useBrainManagementTabs = () => {
   const [selectedTab, setSelectedTab] =
     useState<BrainManagementTab>("settings");
   const { allBrains } = useBrainContext();
+  const [
+    isDeleteOrUnsubscribeRequestPending,
+    setIsDeleteOrUnsubscribeRequestPending,
+  ] = useState(false);
 
   useEffect(() => {
     const targetedTab = getTargetedTab();
@@ -22,6 +29,10 @@ export const useBrainManagementTabs = () => {
     }
   }, []);
 
+  const { track } = useEventTracking();
+  const { publish } = useToast();
+
+  const { unsubscribeFromBrain } = useSubscriptionApi();
   const { deleteBrain, setCurrentBrainId, fetchAllBrains } = useBrainContext();
   const [
     isDeleteOrUnsubscribeModalOpened,
@@ -30,34 +41,45 @@ export const useBrainManagementTabs = () => {
   const router = useRouter();
 
   const params = useParams();
-
+  const { t } = useTranslation(["delete_or_unsubscribe_from_brain"]);
   const brainId = params?.brainId as UUID | undefined;
   const { hasEditRights, isOwnedByCurrentUser } = getBrainPermissions({
     brainId,
     userAccessibleBrains: allBrains,
   });
 
-  const { brain } = useBrainFetcher({
-    brainId,
-  });
-
-  const handleUnsubscribeOrDeleteBrain = () => {
+  const handleUnSubscription = async () => {
     if (brainId === undefined) {
       return;
     }
+    await unsubscribeFromBrain(brainId);
+
+    void track("UNSUBSCRIBE_FROM_BRAIN");
+    publish({
+      variant: "success",
+      text: t("successfully_unsubscribed"),
+    });
+  };
+
+  const handleUnsubscribeOrDeleteBrain = async () => {
+    if (brainId === undefined) {
+      return;
+    }
+    setIsDeleteOrUnsubscribeRequestPending(true);
     try {
       if (!isOwnedByCurrentUser) {
-        alert("unscribed");
-
-        return;
+        await handleUnSubscription();
+      } else {
+        await deleteBrain(brainId);
       }
-      void deleteBrain(brainId);
       setCurrentBrainId(null);
-      router.push("/brains-management");
       setIsDeleteOrUnsubscribeModalOpened(false);
       void fetchAllBrains();
+      router.push("/brains-management");
     } catch (error) {
       console.error("Error deleting brain: ", error);
+    } finally {
+      setIsDeleteOrUnsubscribeRequestPending(false);
     }
   };
 
@@ -68,8 +90,8 @@ export const useBrainManagementTabs = () => {
     handleUnsubscribeOrDeleteBrain,
     isDeleteOrUnsubscribeModalOpened,
     setIsDeleteOrUnsubscribeModalOpened,
-    brain,
     hasEditRights,
     isOwnedByCurrentUser,
+    isDeleteOrUnsubscribeRequestPending,
   };
 };

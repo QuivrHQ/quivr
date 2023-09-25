@@ -8,6 +8,7 @@ type DeleteOrUnsubscribeConfirmationModalProps = {
   setOpen: (isOpen: boolean) => void;
   onConfirm: () => void;
   isOwnedByCurrentUser: boolean;
+  isDeleteOrUnsubscribeRequestPending: boolean;
 };
 
 export const DeleteOrUnsubscribeConfirmationModal = ({
@@ -15,6 +16,7 @@ export const DeleteOrUnsubscribeConfirmationModal = ({
   setOpen,
   onConfirm,
   isOwnedByCurrentUser,
+  isDeleteOrUnsubscribeRequestPending,
 }: DeleteOrUnsubscribeConfirmationModalProps): JSX.Element => {
   const { t } = useTranslation(["delete_or_unsubscribe_from_brain"]);
 
@@ -40,6 +42,7 @@ export const DeleteOrUnsubscribeConfirmationModal = ({
             data-testid="delete-brain"
             className="px-4 py-2 bg-red-500 text-white rounded-md"
             onClick={onConfirm}
+            isLoading={isDeleteOrUnsubscribeRequestPending}
           >
             {isOwnedByCurrentUser
               ? t("deleteConfirmYes")

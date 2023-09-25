@@ -127,13 +127,15 @@ class Brain(Repository):
         )
         return response.data
 
-    def delete_brain_user_by_id(self, user_id: UUID, brain_id: UUID):
+    def delete_brain_user_by_id(
+        self,
+        user_id: UUID,
+        brain_id: UUID,
+    ):
         results = (
             self.db.table("brains_users")
-            .select("*")
-            .match(
-                {"brain_id": str(brain_id), "user_id": str(user_id), "rights": "Owner"}
-            )
+            .delete()
+            .match({"brain_id": str(brain_id), "user_id": str(user_id)})
             .execute()
         )
         return results.data

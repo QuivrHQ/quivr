@@ -24,6 +24,7 @@ export const BrainManagementTabs = (): JSX.Element => {
     setIsDeleteOrUnsubscribeModalOpened,
     hasEditRights,
     isOwnedByCurrentUser,
+    isDeleteOrUnsubscribeRequestPending,
   } = useBrainManagementTabs();
 
   if (brainId === undefined) {
@@ -98,8 +99,11 @@ export const BrainManagementTabs = (): JSX.Element => {
       <DeleteOrUnsubscribeConfirmationModal
         isOpen={isDeleteOrUnsubscribeModalOpened}
         setOpen={setIsDeleteOrUnsubscribeModalOpened}
-        onConfirm={handleUnsubscribeOrDeleteBrain}
+        onConfirm={() => void handleUnsubscribeOrDeleteBrain()}
         isOwnedByCurrentUser={isOwnedByCurrentUser}
+        isDeleteOrUnsubscribeRequestPending={
+          isDeleteOrUnsubscribeRequestPending
+        }
       />
     </Root>
   );

@@ -435,6 +435,6 @@ async def unsubscribe_from_brain_handler(
             status_code=403,
             detail="You are not subscribed to this brain",
         )
-    delete_brain_user(current_user.id, brain_id)
+    delete_brain_user(user_id=current_user.id, brain_id=brain_id)
 
     return {"message": "You have successfully unsubscribed from the brain"}

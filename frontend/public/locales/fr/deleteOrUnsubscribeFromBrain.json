@@ -4,6 +4,8 @@
     "deleteConfirmYes": "Oui, supprimer",
     "returnButton": "Retour",
     "unsubscribeButton": "Se désabonner du cerveau",
-    "unsubscribeConfirmQuestion": "Êtes-vous sûr de vouloir vous désabonner de ce cerveau ? Cette action ne peut pas être annulée.",
-    "unsubscribeConfirmYes": "Oui, se désabonner de ce cerveau"
+    "unsubscribeConfirmQuestion": "Êtes-vous sûr de vouloir vous désabonner de ce cerveau ?",
+    "unsubscribeConfirmYes": "Oui, se désabonner de ce cerveau",
+    "successfully_deleted": "Cerveau supprimé avec succès.",
+    "successfully_unsubscribed": "Vous vous êtes désabonné avec succès de ce cerveau."
 }
