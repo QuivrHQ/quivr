@@ -1,9 +1,9 @@
 import { render } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import ConfirmationDeleteModal from "../ConfirmationDeleteModal";
+import { DeleteOrUnsubscribeConfirmationModal } from "../DeleteOrUnsubscribeConfirmationModal";
 
-describe("ConfirmationDeleteModal", () => {
+describe("DeleteOrUnsubscribeConfirmationModal", () => {
   const isOpen = true;
   const setOpen = vi.fn();
   const onDelete = vi.fn();
@@ -14,10 +14,10 @@ describe("ConfirmationDeleteModal", () => {
 
   it("should render delete modal", () => {
     const { getByTestId } = render(
-      <ConfirmationDeleteModal
+      <DeleteOrUnsubscribeConfirmationModal
         isOpen={isOpen}
         setOpen={setOpen}
-        onDelete={onDelete}
+        onConfirm={onDelete}
       />
     );
     expect(getByTestId("modal-description")).toBeDefined();
@@ -27,10 +27,10 @@ describe("ConfirmationDeleteModal", () => {
 
   it("should call onDelete when delete-brain is clicked", () => {
     const { getByTestId } = render(
-      <ConfirmationDeleteModal
+      <DeleteOrUnsubscribeConfirmationModal
         isOpen={isOpen}
         setOpen={setOpen}
-        onDelete={onDelete}
+        onConfirm={onDelete}
       />
     );
 
