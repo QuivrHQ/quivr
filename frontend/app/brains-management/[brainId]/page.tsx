@@ -16,7 +16,7 @@ const BrainsManagement = (): JSX.Element => {
     return (
       <div className="flex justify-center mt-5 w-full">
         <div className="bg-blue-100 border border-blue-400 text-blue-700 px-4 py-3 rounded relative max-w-md h-fit">
-          <p>{ t("selectBrain") }</p>
+          <p>{t("selectBrain")}</p>
         </div>
       </div>
     );
