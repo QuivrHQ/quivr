@@ -23,7 +23,7 @@ class Repository(ABC):
         pass
 
     @abstractmethod
-    def delete_brain_user(self, brain_id: str):
+    def delete_brain_users(self, brain_id: str):
         pass
 
     @abstractmethod

@@ -2,11 +2,12 @@ from typing import Any, List, Optional
 from uuid import UUID
 
 from logger import get_logger
-from models.databases.supabase.supabase import SupabaseDB
-from models.settings import get_supabase_client, get_supabase_db
 from pydantic import BaseModel
 from supabase.client import Client
 from utils.vectors import get_unique_files_from_vector_ids
+
+from models.databases.supabase.supabase import SupabaseDB
+from models.settings import get_supabase_client, get_supabase_db
 
 logger = get_logger(__name__)
 
@@ -79,7 +80,7 @@ class Brain(BaseModel):
             return {"message": "You are not the owner of this brain."}
         else:
             self.supabase_db.delete_brain_vector(self.id)  # type: ignore
-            self.supabase_db.delete_brain_user(self.id)  # type: ignore
+            self.supabase_db.delete_brain_users(self.id)  # type: ignore
             self.supabase_db.delete_brain(self.id)  # type: ignore
 
     def create_brain_vector(self, vector_id, file_sha1):
