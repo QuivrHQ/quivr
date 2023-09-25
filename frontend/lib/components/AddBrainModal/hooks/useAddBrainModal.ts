@@ -63,7 +63,14 @@ export const useAddBrainModal = () => {
     },
   };
 
-  const { register, getValues, reset, watch, setValue } = useForm({
+  const {
+    register,
+    getValues,
+    reset,
+    watch,
+    setValue,
+    formState: { dirtyFields },
+  } = useForm({
     defaultValues,
   });
 
@@ -79,7 +86,7 @@ export const useAddBrainModal = () => {
   });
 
   useEffect(() => {
-    if (status === "public") {
+    if (status === "public" && dirtyFields.status) {
       setIsPublicAccessConfirmationModalOpened(true);
     }
   }, [status]);
