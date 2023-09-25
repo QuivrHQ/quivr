@@ -33,14 +33,26 @@ export const useBrainProvider = () => {
   );
   const currentBrain = allBrains.find((brain) => brain.id === currentBrainId);
 
+  const fetchAllBrains = useCallback(async () => {
+    setIsFetchingBrains(true);
+    try {
+      const brains = await getBrains();
+      setAllBrains(brains);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsFetchingBrains(false);
+    }
+  }, [getBrains]);
+
   const createBrainHandler = useCallback(
     async (brain: CreateBrainInput): Promise<UUID | undefined> => {
       const createdBrain = await createBrain(brain);
       try {
-        setAllBrains((prevBrains) => [...prevBrains, createdBrain]);
         setCurrentBrainId(createdBrain.id);
 
         void track("BRAIN_CREATED");
+        void fetchAllBrains();
 
         return createdBrain.id;
       } catch {
@@ -50,7 +62,7 @@ export const useBrainProvider = () => {
         });
       }
     },
-    [createBrain, publish, track]
+    [createBrain, fetchAllBrains, publish, track]
   );
 
   const deleteBrainHandler = useCallback(
@@ -67,18 +79,6 @@ export const useBrainProvider = () => {
     },
     [deleteBrain, publish, track]
   );
-
-  const fetchAllBrains = useCallback(async () => {
-    setIsFetchingBrains(true);
-    try {
-      const brains = await getBrains();
-      setAllBrains(brains);
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setIsFetchingBrains(false);
-    }
-  }, [getBrains]);
 
   const fetchDefaultBrain = useCallback(async () => {
     const userDefaultBrain = await getDefaultBrain();
