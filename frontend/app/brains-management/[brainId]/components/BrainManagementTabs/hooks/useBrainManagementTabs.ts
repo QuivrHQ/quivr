@@ -1,19 +1,26 @@
-import { useQuery } from "@tanstack/react-query";
 import { UUID } from "crypto";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 
-import { getBrainDataKey } from "@/lib/api/brain/config";
-import { useBrainApi } from "@/lib/api/brain/useBrainApi";
+import { useSubscriptionApi } from "@/lib/api/subscription/useSubscriptionApi";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
+import { useToast } from "@/lib/hooks";
+import { useEventTracking } from "@/services/analytics/june/useEventTracking";
 
 import { BrainManagementTab } from "../types";
+import { getBrainPermissions } from "../utils/getBrainPermissions";
 import { getTargetedTab } from "../utils/getTargetedTab";
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const useBrainManagementTabs = () => {
   const [selectedTab, setSelectedTab] =
     useState<BrainManagementTab>("settings");
+  const { allBrains } = useBrainContext();
+  const [
+    isDeleteOrUnsubscribeRequestPending,
+    setIsDeleteOrUnsubscribeRequestPending,
+  ] = useState(false);
 
   useEffect(() => {
     const targetedTab = getTargetedTab();
@@ -21,39 +28,70 @@ export const useBrainManagementTabs = () => {
       setSelectedTab(targetedTab);
     }
   }, []);
-  const { getBrain } = useBrainApi();
 
-  const { deleteBrain, setCurrentBrainId } = useBrainContext();
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const { track } = useEventTracking();
+  const { publish } = useToast();
+
+  const { unsubscribeFromBrain } = useSubscriptionApi();
+  const { deleteBrain, setCurrentBrainId, fetchAllBrains } = useBrainContext();
+  const [
+    isDeleteOrUnsubscribeModalOpened,
+    setIsDeleteOrUnsubscribeModalOpened,
+  ] = useState(false);
   const router = useRouter();
 
   const params = useParams();
-
+  const { t } = useTranslation(["delete_or_unsubscribe_from_brain"]);
   const brainId = params?.brainId as UUID | undefined;
-
-  const { data: brain } = useQuery({
-    queryKey: [getBrainDataKey(brainId!)],
-    queryFn: () => getBrain(brainId!),
-    enabled: brainId !== undefined,
+  const { hasEditRights, isOwnedByCurrentUser } = getBrainPermissions({
+    brainId,
+    userAccessibleBrains: allBrains,
   });
 
-  const handleDeleteBrain = () => {
+  const handleUnSubscription = async () => {
     if (brainId === undefined) {
       return;
     }
-    void deleteBrain(brainId);
-    setCurrentBrainId(null);
-    router.push("/brains-management");
-    setIsDeleteModalOpen(false);
+    await unsubscribeFromBrain(brainId);
+
+    void track("UNSUBSCRIBE_FROM_BRAIN");
+    publish({
+      variant: "success",
+      text: t("successfully_unsubscribed"),
+    });
+  };
+
+  const handleUnsubscribeOrDeleteBrain = async () => {
+    if (brainId === undefined) {
+      return;
+    }
+    setIsDeleteOrUnsubscribeRequestPending(true);
+    try {
+      if (!isOwnedByCurrentUser) {
+        await handleUnSubscription();
+      } else {
+        await deleteBrain(brainId);
+      }
+      setCurrentBrainId(null);
+      setIsDeleteOrUnsubscribeModalOpened(false);
+      void fetchAllBrains();
+      router.push("/brains-management");
+    } catch (error) {
+      console.error("Error deleting brain: ", error);
+    } finally {
+      setIsDeleteOrUnsubscribeRequestPending(false);
+    }
   };
 
   return {
     selectedTab,
     setSelectedTab,
     brainId,
-    handleDeleteBrain,
-    isDeleteModalOpen,
-    setIsDeleteModalOpen,
-    brain,
+    handleUnsubscribeOrDeleteBrain,
+    isDeleteOrUnsubscribeModalOpened,
+    setIsDeleteOrUnsubscribeModalOpened,
+    hasEditRights,
+    isOwnedByCurrentUser,
+    isDeleteOrUnsubscribeRequestPending,
   };
 };

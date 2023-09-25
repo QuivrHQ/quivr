@@ -1,0 +1,11 @@
+{
+    "deleteButton": "Borrar el cerebro",
+    "deleteConfirmQuestion": "¿Estás seguro de que quieres borrar el cerebro? No podrás recuperarlo.",
+    "deleteConfirmYes": "Sí, borrar el cerebro",
+    "returnButton": "Vuelta",
+    "unsubscribeButton": "Cancelar suscripción del cerebro",
+    "unsubscribeConfirmQuestion": "¿Estás seguro de que quieres darte de baja de este cerebro?",
+    "unsubscribeConfirmYes": "Sí, cancelar la suscripción de este cerebro",
+    "successfully_deleted": "Cerebro eliminado con éxito.",
+    "successfully_unsubscribed": "Te has desinscrito con éxito de este cerebro."
+}

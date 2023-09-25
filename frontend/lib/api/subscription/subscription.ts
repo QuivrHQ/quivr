@@ -67,3 +67,13 @@ export const subscribeToBrain = async (
 
   return subscribedToBrain;
 };
+
+export const unsubscribeFromBrain = async (
+  brainId: UUID,
+  axiosInstance: AxiosInstance
+): Promise<{ message: string }> =>
+  (
+    await axiosInstance.post<{ message: string }>(
+      `/brains/${brainId}/unsubscribe`
+    )
+  ).data;

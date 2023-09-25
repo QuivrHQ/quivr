@@ -7,7 +7,6 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 
-import { getBrainDataKey } from "@/lib/api/brain/config";
 import { useBrainApi } from "@/lib/api/brain/useBrainApi";
 import { usePromptApi } from "@/lib/api/prompt/usePromptApi";
 import { USER_DATA_KEY } from "@/lib/api/user/config";
@@ -19,6 +18,7 @@ import { defineMaxTokens } from "@/lib/helpers/defineMaxTokens";
 import { getAccessibleModels } from "@/lib/helpers/getAccessibleModels";
 import { useToast } from "@/lib/hooks";
 
+import { useBrainFetcher } from "../../../hooks/useBrainFetcher";
 import { validateOpenAIKey } from "../utils/validateOpenAIKey";
 
 type UseSettingsTabProps = {
@@ -32,7 +32,7 @@ export const useSettingsTab = ({ brainId }: UseSettingsTabProps) => {
   const [isSettingAsDefault, setIsSettingAsDefault] = useState(false);
   const { publish } = useToast();
   const formRef = useRef<HTMLFormElement>(null);
-  const { setAsDefaultBrain, getBrain, updateBrain } = useBrainApi();
+  const { setAsDefaultBrain, updateBrain } = useBrainApi();
   const { fetchAllBrains, fetchDefaultBrain, defaultBrainId } =
     useBrainContext();
   const { getPrompt, updatePrompt, createPrompt } = usePromptApi();
@@ -65,10 +65,8 @@ export const useSettingsTab = ({ brainId }: UseSettingsTabProps) => {
   } = useForm({
     defaultValues,
   });
-
-  const { data: brain } = useQuery({
-    queryKey: [getBrainDataKey(brainId)],
-    queryFn: () => getBrain(brainId),
+  const { brain } = useBrainFetcher({
+    brainId,
   });
 
   const isDefaultBrain = defaultBrainId === brainId;

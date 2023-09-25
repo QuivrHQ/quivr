@@ -1,0 +1,11 @@
+{
+    "deleteButton": "Удалить мозг",
+    "deleteConfirmQuestion": "Вы уверены, что хотите удалить этот мозг? Это действие нельзя отменить.",
+    "deleteConfirmYes": "Да, удалить этот мозг",
+    "returnButton": "Вернуться",
+    "unsubscribeButton": "Отписаться от мозга",
+    "unsubscribeConfirmQuestion": "Вы уверены, что хотите отписаться от этого мозга?",
+    "unsubscribeConfirmYes": "Да, отписаться от этого сознания",
+    "successfully_deleted": "Мозг успешно удален.",
+    "successfully_unsubscribed": "Вы успешно отписались от этого мозга."
+}

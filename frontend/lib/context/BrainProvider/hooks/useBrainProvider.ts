@@ -1,6 +1,7 @@
 /* eslint-disable max-lines */
 import { UUID } from "crypto";
 import { useCallback, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 import { CreateBrainInput } from "@/lib/api/brain/types";
 import { useBrainApi } from "@/lib/api/brain/useBrainApi";
@@ -18,6 +19,7 @@ export const useBrainProvider = () => {
   const { createBrain, deleteBrain, getBrains, getDefaultBrain } =
     useBrainApi();
   const { getPublicPrompts } = usePromptApi();
+  const { t } = useTranslation(["delete_or_unsubscribe_from_brain"]);
 
   const [allBrains, setAllBrains] = useState<MinimalBrainForUser[]>([]);
   const [currentBrainId, setCurrentBrainId] = useState<null | UUID>(null);
@@ -60,7 +62,7 @@ export const useBrainProvider = () => {
       void track("DELETE_BRAIN");
       publish({
         variant: "success",
-        text: "Brain deleted",
+        text: t("successfully_deleted"),
       });
     },
     [deleteBrain, publish, track]

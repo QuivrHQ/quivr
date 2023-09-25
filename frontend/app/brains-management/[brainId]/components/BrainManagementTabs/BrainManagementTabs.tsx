@@ -3,34 +3,33 @@ import { Content, List, Root } from "@radix-ui/react-tabs";
 import { useTranslation } from "react-i18next";
 
 import Button from "@/lib/components/ui/Button";
-import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 
 import { BrainTabTrigger, KnowledgeTab, PeopleTab } from "./components";
-import ConfirmationDeleteModal from "./components/Modals/ConfirmationDeleteModal";
+import { DeleteOrUnsubscribeConfirmationModal } from "./components/Modals/DeleteOrUnsubscribeConfirmationModal";
 import { SettingsTab } from "./components/SettingsTab/SettingsTab";
 import { useBrainManagementTabs } from "./hooks/useBrainManagementTabs";
-import { getBrainPermissions } from "./utils/getBrainPermissions";
 
 export const BrainManagementTabs = (): JSX.Element => {
-  const { t } = useTranslation(["translation", "config", "delete_brain"]);
+  const { t } = useTranslation([
+    "translation",
+    "config",
+    "delete_or_unsubscribe_from_brain",
+  ]);
   const {
     selectedTab,
     setSelectedTab,
     brainId,
-    handleDeleteBrain,
-    isDeleteModalOpen,
-    setIsDeleteModalOpen,
+    handleUnsubscribeOrDeleteBrain,
+    isDeleteOrUnsubscribeModalOpened,
+    setIsDeleteOrUnsubscribeModalOpened,
+    hasEditRights,
+    isOwnedByCurrentUser,
+    isDeleteOrUnsubscribeRequestPending,
   } = useBrainManagementTabs();
-  const { allBrains } = useBrainContext();
 
   if (brainId === undefined) {
     return <div />;
   }
-
-  const { hasEditRights, isOwnedByCurrentUser } = getBrainPermissions({
-    brainId,
-    userAccessibleBrains: allBrains,
-  });
 
   return (
     <Root
@@ -78,19 +77,33 @@ export const BrainManagementTabs = (): JSX.Element => {
       </div>
 
       <div className="flex justify-center mt-4">
-        <Button
-          disabled={!isOwnedByCurrentUser}
-          className="px-8 md:px-20 py-2 bg-red-500 text-white rounded-md"
-          onClick={() => setIsDeleteModalOpen(true)}
-        >
-          {t("deleteButton", { ns: "delete_brain" })}
-        </Button>
+        {isOwnedByCurrentUser ? (
+          <Button
+            className="px-8 md:px-20 py-2 bg-red-500 text-white rounded-md"
+            onClick={() => setIsDeleteOrUnsubscribeModalOpened(true)}
+          >
+            {t("deleteButton", { ns: "delete_or_unsubscribe_from_brain" })}
+          </Button>
+        ) : (
+          <Button
+            className="px-8 md:px-20 py-2 bg-red-500 text-white rounded-md"
+            onClick={() => setIsDeleteOrUnsubscribeModalOpened(true)}
+          >
+            {t("unsubscribeButton", {
+              ns: "delete_or_unsubscribe_from_brain",
+            })}
+          </Button>
+        )}
       </div>
 
-      <ConfirmationDeleteModal
-        isOpen={isDeleteModalOpen}
-        setOpen={setIsDeleteModalOpen}
-        onDelete={handleDeleteBrain}
+      <DeleteOrUnsubscribeConfirmationModal
+        isOpen={isDeleteOrUnsubscribeModalOpened}
+        setOpen={setIsDeleteOrUnsubscribeModalOpened}
+        onConfirm={() => void handleUnsubscribeOrDeleteBrain()}
+        isOwnedByCurrentUser={isOwnedByCurrentUser}
+        isDeleteOrUnsubscribeRequestPending={
+          isDeleteOrUnsubscribeRequestPending
+        }
       />
     </Root>
   );

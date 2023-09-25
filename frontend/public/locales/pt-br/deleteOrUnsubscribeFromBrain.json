@@ -1,0 +1,11 @@
+{
+    "deleteButton": "Excluir Cérebro",
+    "deleteConfirmQuestion": "Você tem certeza de que deseja excluir este cérebro? Essa ação não pode ser desfeita.",
+    "deleteConfirmYes": "Sim, excluir este cérebro",
+    "returnButton": "Retornar",
+    "unsubscribeButton": "Cancelar inscrição do cérebro",
+    "unsubscribeConfirmQuestion": "Você tem certeza de que deseja cancelar a inscrição deste cérebro?",
+    "unsubscribeConfirmYes": "Sim, cancelar a inscrição deste cérebro",
+    "successfully_deleted": "Cérebro excluído com sucesso.",
+    "successfully_unsubscribed": "Você se desinscreveu com sucesso deste cérebro."
+}
