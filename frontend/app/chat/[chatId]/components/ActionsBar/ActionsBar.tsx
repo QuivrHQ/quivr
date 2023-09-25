@@ -32,13 +32,9 @@ export const ActionsBar = (): JSX.Element => {
         </div>
       )}
 
-      <div
-        className={
-          shouldDisplayUploadCard ? "h-full flex flex-col flex-auto" : ""
-        }
-      >
+      <div className="">
         {shouldDisplayUploadCard && (
-          <div className="flex flex-1 overflow-y-scroll shadow-md dark:shadow-primary/25 hover:shadow-xl transition-shadow rounded-xl bg-white dark:bg-black border border-black/10 dark:border-white/25 p-4 md:p-6">
+          <div className="flex flex-1 overflow-y-auto shadow-md dark:shadow-primary/25 hover:shadow-xl transition-shadow rounded-xl bg-white dark:bg-black border border-black/10 dark:border-white/25 p-4 md:p-6">
             <KnowledgeToFeed
               onClose={() => setShouldDisplayUploadCard(false)}
               contents={contents}
@@ -47,7 +43,7 @@ export const ActionsBar = (): JSX.Element => {
             />
           </div>
         )}
-        <div className="flex mt-1 flex-col w-full shadow-md dark:shadow-primary/25 hover:shadow-xl transition-shadow rounded-xl bg-white dark:bg-black border border-black/10 dark:border-white/25 p-4 md:p-6">
+        <div className="flex mt-1 flex-col w-full shadow-md dark:shadow-primary/25 hover:shadow-xl transition-shadow rounded-xl bg-white dark:bg-black border border-black/10 dark:border-white/25 md:mb-4 lg:mb-[-20px] p-2">
           <ChatInput
             shouldDisplayUploadCard={shouldDisplayUploadCard}
             setShouldDisplayUploadCard={setShouldDisplayUploadCard}
