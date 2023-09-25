@@ -35,6 +35,9 @@ from repository.chat.get_chat_history_with_notifications import (
 from repository.notification.remove_chat_notifications import remove_chat_notifications
 from repository.user_identity import get_user_identity
 
+from routes.authorizations.brain_authorization import has_brain_authorization
+from routes.authorizations.types import RoleEnum
+
 chat_router = APIRouter()
 
 
@@ -167,6 +170,9 @@ async def create_chat_handler(
         Depends(
             AuthBearer(),
         ),
+        Depends(
+            has_brain_authorization([RoleEnum.Viewer, RoleEnum.Owner, RoleEnum.Editor])
+        ),
     ],
     tags=["Chat"],
 )
@@ -254,6 +260,9 @@ async def create_question_handler(
     dependencies=[
         Depends(
             AuthBearer(),
+        ),
+        Depends(
+            has_brain_authorization([RoleEnum.Viewer, RoleEnum.Owner, RoleEnum.Editor])
         ),
     ],
     tags=["Chat"],

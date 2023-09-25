@@ -59,7 +59,7 @@ def validate_brain_authorization(
     user_brain = get_brain_for_user(user_id, brain_id)
     if user_brain is None:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
+            status_code=status.HTTP_403_FORBIDDEN,
             detail="You don't have permission for this brain",
         )
 
