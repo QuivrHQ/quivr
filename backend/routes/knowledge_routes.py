@@ -20,7 +20,7 @@ logger = get_logger(__name__)
 
 
 @knowledge_router.get(
-    "/knowledge/", dependencies=[Depends(AuthBearer())], tags=["Knowledge"]
+    "/knowledge", dependencies=[Depends(AuthBearer())], tags=["Knowledge"]
 )
 async def list_knowledge_in_brain_endpoint(
     brain_id: UUID = Query(..., description="The ID of the brain"),
@@ -39,7 +39,7 @@ async def list_knowledge_in_brain_endpoint(
 
 
 @knowledge_router.delete(
-    "/knowledge/{knowledge_id}/",
+    "/knowledge/{knowledge_id}",
     dependencies=[
         Depends(AuthBearer()),
         Depends(has_brain_authorization(RoleEnum.Owner)),
