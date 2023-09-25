@@ -1,0 +1,9 @@
+{
+    "deleteButton": "Supprimer le cerveau",
+    "deleteConfirmQuestion": "Êtes-vous sûr de vouloir supprimer le cerveau? Cette action est irréversible!",
+    "deleteConfirmYes": "Oui, supprimer",
+    "returnButton": "Retour",
+    "unsubscribeButton": "Se désabonner du cerveau",
+    "unsubscribeConfirmQuestion": "Êtes-vous sûr de vouloir vous désabonner de ce cerveau ? Cette action ne peut pas être annulée.",
+    "unsubscribeConfirmYes": "Oui, se désabonner de ce cerveau"
+}

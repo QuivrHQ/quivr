@@ -1,0 +1,9 @@
+{
+    "deleteButton": "Delete Brain",
+    "deleteConfirmQuestion": "Are you sure you want to delete this brain? This action cannot be undone.",
+    "deleteConfirmYes": "Yes, delete this brain",
+    "returnButton": "Return",
+    "unsubscribeButton": "Unsubscribe from brain",
+    "unsubscribeConfirmQuestion": "Are you sure you want to unsubscribe from this brain? This action cannot be undone.",
+    "unsubscribeConfirmYes": "Yes, unsubscribe from this brain"
+}
