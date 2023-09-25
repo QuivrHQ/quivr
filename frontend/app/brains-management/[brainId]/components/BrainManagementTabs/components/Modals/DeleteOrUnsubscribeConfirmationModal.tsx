@@ -3,22 +3,28 @@ import { useTranslation } from "react-i18next";
 import Button from "@/lib/components/ui/Button";
 import { Modal } from "@/lib/components/ui/Modal";
 
-type ConfirmationDeleteModalProps = {
+type DeleteOrUnsubscribeConfirmationModalProps = {
   isOpen: boolean;
   setOpen: (isOpen: boolean) => void;
-  onDelete: () => void;
+  onConfirm: () => void;
+  isOwnedByCurrentUser: boolean;
 };
 
-const ConfirmationDeleteModal = ({
+export const DeleteOrUnsubscribeConfirmationModal = ({
   isOpen,
   setOpen,
-  onDelete,
-}: ConfirmationDeleteModalProps): JSX.Element => {
-  const { t } = useTranslation(["delete_brain"]);
+  onConfirm,
+  isOwnedByCurrentUser,
+}: DeleteOrUnsubscribeConfirmationModalProps): JSX.Element => {
+  const { t } = useTranslation(["delete_or_unsubscribe_from_brain"]);
 
   return (
     <Modal
-      desc={t("deleteConfirmQuestion")}
+      desc={
+        isOwnedByCurrentUser
+          ? t("deleteConfirmQuestion")
+          : t("unsubscribeConfirmQuestion")
+      }
       isOpen={isOpen}
       setOpen={setOpen}
       Trigger={<div />}
@@ -33,14 +39,14 @@ const ConfirmationDeleteModal = ({
           <Button
             data-testid="delete-brain"
             className="px-4 py-2 bg-red-500 text-white rounded-md"
-            onClick={onDelete}
+            onClick={onConfirm}
           >
-            {t("deleteConfirmYes")}
+            {isOwnedByCurrentUser
+              ? t("deleteConfirmYes")
+              : t("unsubscribeButton")}
           </Button>
         </div>
       </div>
     </Modal>
   );
 };
-
-export default ConfirmationDeleteModal;
