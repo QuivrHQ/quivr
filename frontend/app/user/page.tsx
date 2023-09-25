@@ -38,12 +38,9 @@ const UserPage = (): JSX.Element => {
   return (
     <main className="w-full flex flex-col pt-10">
       <section className="flex flex-col justify-center items-center flex-1 gap-5 h-full">
-        <div className="flex gap-5">
-          <h1 className="text-4xl font-semibold">Settings: </h1>
-          <div className="flex sm:flex-1 sm:justify-end flex-row items-center justify-center sm:flex-row gap-5 sm:gap-2">
-            <LanguageDropDown />
-            <DarkModeToggle />
-          </div>
+        <div className="flex sm:flex-1 sm:justify-end flex-row items-center justify-center sm:flex-row gap-5 sm:gap-2">
+          <LanguageDropDown />
+          <DarkModeToggle />
         </div>
         <div className="p-5 max-w-3xl w-full min-h-full flex-1 mb-24">
           {userStats ? (
