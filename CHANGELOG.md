@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.0.82 (2023-09-26)
+
+## What's Changed
+* fix(RBAC): skip validation for unplug by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1264
+
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.81...v0.0.82
+
 ## 0.0.81 (2023-09-26)
 
 ## What's Changed
