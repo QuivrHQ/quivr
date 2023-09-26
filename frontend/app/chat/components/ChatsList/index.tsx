@@ -2,15 +2,14 @@
 /* eslint-disable complexity */
 "use client";
 import { motion, MotionConfig } from "framer-motion";
-import Link from "next/link";
-import { MdChevronRight, MdPerson } from "react-icons/md";
+import { MdChevronRight } from "react-icons/md";
 
-import { BrainManagementButton } from "@/lib/components/NavBar/components/NavItems/components/BrainManagementButton";
 import { useChatsContext } from "@/lib/context/ChatsProvider/hooks/useChatsContext";
 import { cn } from "@/lib/utils";
 
 import { ChatsListItem } from "./components/ChatsListItem";
 import { MiniFooter } from "./components/ChatsListItem/components/MiniFooter";
+import { SidebarActions } from "./components/ChatsListItem/components/SidebarActions";
 import { NewChatButton } from "./components/NewChatButton";
 import { useChatsList } from "./hooks/useChatsList";
 import {
@@ -108,14 +107,7 @@ export const ChatsList = (): JSX.Element => {
                 <ChatsListItem key={chat.chat_id} chat={chat} />
               ))}
             </div>
-            <div className="bg-white dark:bg-black border-t dark:border-white/10 mt-auto py-4">
-              <div className="max-w-screen-xl mx-auto flex justify-center items-center gap-4 flex-col">
-                <BrainManagementButton />
-                <Link aria-label="account" className="" href={"/user"}>
-                  <MdPerson className="text-2xl" />
-                </Link>
-              </div>
-            </div>
+            <SidebarActions />
             <MiniFooter />
           </div>
         </motion.div>
