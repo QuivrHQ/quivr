@@ -195,6 +195,13 @@ async def create_question_handler(
         )
 
     # Retrieve user's OpenAI API key
+    if brain_id:
+        validate_brain_authorization(
+            brain_id=brain_id,
+            user_id=current_user.id,
+            required_roles=[RoleEnum.Viewer, RoleEnum.Editor, RoleEnum.Owner],
+        )
+
     current_user.openai_api_key = request.headers.get("Openai-Api-Key")
     brain = Brain(id=brain_id)
     brain_details: BrainEntity | None = None

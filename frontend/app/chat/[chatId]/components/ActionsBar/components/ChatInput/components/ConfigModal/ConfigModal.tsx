@@ -7,7 +7,7 @@ import { defineMaxTokens } from "@/lib/helpers/defineMaxTokens";
 
 import { useConfigModal } from "./hooks/useConfigModal";
 
-export const ConfigModal = ({ chatId }: { chatId?: string }): JSX.Element => {
+export const ConfigModal = (): JSX.Element => {
   const {
     handleSubmit,
     isConfigModalOpen,
@@ -17,11 +17,7 @@ export const ConfigModal = ({ chatId }: { chatId?: string }): JSX.Element => {
     maxTokens,
     model,
     accessibleModels,
-  } = useConfigModal(chatId);
-
-  if (chatId === undefined) {
-    return <div />;
-  }
+  } = useConfigModal();
 
   return (
     <Modal
@@ -79,7 +75,7 @@ export const ConfigModal = ({ chatId }: { chatId?: string }): JSX.Element => {
           <input
             type="range"
             min="10"
-            max={defineMaxTokens(model ?? "gpt-3.5-turbo")}
+            max={defineMaxTokens(model)}
             value={maxTokens}
             {...register("maxTokens")}
           />

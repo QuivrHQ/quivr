@@ -42,6 +42,22 @@ vi.mock("@/lib/api/chat/useChatApi", () => ({
     getHistory: () => [],
   }),
 }));
+
+vi.mock("@/lib/hooks", async () => {
+  const actual = await vi.importActual<typeof import("@/lib/hooks")>(
+    "@/lib/hooks"
+  );
+
+  return {
+    ...actual,
+    useAxios: () => ({
+      axiosInstance: {
+        get: vi.fn(() => ({ data: [] })),
+      },
+    }),
+  };
+});
+
 vi.mock("@tanstack/react-query", async () => {
   const actual = await vi.importActual<typeof import("@tanstack/react-query")>(
     "@tanstack/react-query"

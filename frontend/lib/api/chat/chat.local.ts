@@ -1,16 +1,11 @@
 import { ChatConfig } from "@/lib/context/ChatProvider/types";
-
-export const saveChatConfigInLocalStorage = (
-  chatId: string,
-  chatConfig: ChatConfig
-): void => {
-  localStorage.setItem(`chat-config-${chatId}`, JSON.stringify(chatConfig));
+const chatConfigLocalStorageKey = "chat-config";
+export const saveChatsConfigInLocalStorage = (chatConfig: ChatConfig): void => {
+  localStorage.setItem(chatConfigLocalStorageKey, JSON.stringify(chatConfig));
 };
 
-export const getChatConfigFromLocalStorage = (
-  chatId: string
-): ChatConfig | undefined => {
-  const config = localStorage.getItem(`chat-config-${chatId}`);
+export const getChatsConfigFromLocalStorage = (): ChatConfig | undefined => {
+  const config = localStorage.getItem(chatConfigLocalStorageKey);
 
   if (config === null) {
     return undefined;
