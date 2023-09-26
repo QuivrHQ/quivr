@@ -8,6 +8,8 @@ import { UserStats } from "@/lib/types/User";
 
 import { USER_DATA_KEY } from "@/lib/api/user/config";
 import { useUserApi } from "@/lib/api/user/useUserApi";
+import { DarkModeToggle } from "@/lib/components/NavBar/components/NavItems/components/DarkModeToggle";
+import { LanguageDropDown } from "@/lib/components/NavBar/components/NavItems/components/LanguageDropDown";
 import { useSupabase } from "@/lib/context/SupabaseProvider";
 import { redirectToLogin } from "@/lib/router/redirectToLogin";
 import { useQuery } from "@tanstack/react-query";
@@ -36,6 +38,10 @@ const UserPage = (): JSX.Element => {
   return (
     <main className="w-full flex flex-col pt-10">
       <section className="flex flex-col justify-center items-center flex-1 gap-5 h-full">
+        <div className="flex sm:flex-1 sm:justify-end flex-row items-center justify-center sm:flex-row gap-5 sm:gap-2">
+          <LanguageDropDown />
+          <DarkModeToggle />
+        </div>
         <div className="p-5 max-w-3xl w-full min-h-full flex-1 mb-24">
           {userStats ? (
             <>

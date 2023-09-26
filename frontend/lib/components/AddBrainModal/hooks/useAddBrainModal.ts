@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 
+import { PUBLIC_BRAINS_KEY } from "@/lib/api/brain/config";
 import { useBrainApi } from "@/lib/api/brain/useBrainApi";
 import { usePromptApi } from "@/lib/api/prompt/usePromptApi";
 import { USER_DATA_KEY } from "@/lib/api/user/config";
@@ -14,7 +15,7 @@ import { defineMaxTokens } from "@/lib/helpers/defineMaxTokens";
 import { getAccessibleModels } from "@/lib/helpers/getAccessibleModels";
 import { useToast } from "@/lib/hooks";
 import { BrainStatus } from "@/lib/types/brainConfig";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const useAddBrainModal = () => {
@@ -30,6 +31,7 @@ export const useAddBrainModal = () => {
     setIsPublicAccessConfirmationModalOpened,
   ] = useState(false);
   const { getUser } = useUserApi();
+  const queryClient = useQueryClient();
 
   const brainStatusOptions: {
     label: string;
@@ -61,7 +63,14 @@ export const useAddBrainModal = () => {
     },
   };
 
-  const { register, getValues, reset, watch, setValue } = useForm({
+  const {
+    register,
+    getValues,
+    reset,
+    watch,
+    setValue,
+    formState: { dirtyFields },
+  } = useForm({
     defaultValues,
   });
 
@@ -77,7 +86,7 @@ export const useAddBrainModal = () => {
   });
 
   useEffect(() => {
-    if (status === "public") {
+    if (status === "public" && dirtyFields.status) {
       setIsPublicAccessConfirmationModalOpened(true);
     }
   }, [status]);
@@ -144,6 +153,9 @@ export const useAddBrainModal = () => {
       publish({
         variant: "success",
         text: t("brainCreated", { ns: "brain" }),
+      });
+      void queryClient.invalidateQueries({
+        queryKey: [PUBLIC_BRAINS_KEY],
       });
     } catch (err) {
       if (axios.isAxiosError(err) && err.response?.status === 429) {

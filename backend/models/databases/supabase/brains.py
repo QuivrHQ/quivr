@@ -160,6 +160,17 @@ class Brain(Repository):
 
         return results
 
+    def delete_brain_subscribers(self, brain_id: UUID):
+        results = (
+            self.db.table("brains_users")
+            .delete()
+            .match({"brain_id": str(brain_id)})
+            .match({"rights": "Viewer"})
+            .execute()
+        ).data
+
+        return results
+
     def delete_brain(self, brain_id: str):
         results = (
             self.db.table("brains").delete().match({"brain_id": brain_id}).execute()

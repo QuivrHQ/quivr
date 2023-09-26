@@ -1,24 +1,21 @@
 /* eslint-disable complexity */
 /* eslint-disable max-lines */
-import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { UUID } from "crypto";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 
 import { useBrainApi } from "@/lib/api/brain/useBrainApi";
 import { usePromptApi } from "@/lib/api/prompt/usePromptApi";
-import { USER_DATA_KEY } from "@/lib/api/user/config";
-import { useUserApi } from "@/lib/api/user/useUserApi";
-import { defaultBrainConfig } from "@/lib/config/defaultBrainConfig";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 import { Brain } from "@/lib/context/BrainProvider/types";
 import { defineMaxTokens } from "@/lib/helpers/defineMaxTokens";
 import { getAccessibleModels } from "@/lib/helpers/getAccessibleModels";
 import { useToast } from "@/lib/hooks";
+import { useUserData } from "@/lib/hooks/useUserData";
+import { BrainStatus } from "@/lib/types/brainConfig";
 
-import { useBrainFetcher } from "../../../hooks/useBrainFetcher";
+import { useBrainFormState } from "./useBrainFormState";
 import { validateOpenAIKey } from "../utils/validateOpenAIKey";
 
 type UseSettingsTabProps = {
@@ -33,48 +30,41 @@ export const useSettingsTab = ({ brainId }: UseSettingsTabProps) => {
   const { publish } = useToast();
   const formRef = useRef<HTMLFormElement>(null);
   const { setAsDefaultBrain, updateBrain } = useBrainApi();
-  const { fetchAllBrains, fetchDefaultBrain, defaultBrainId } =
-    useBrainContext();
+  const { fetchAllBrains, fetchDefaultBrain } = useBrainContext();
   const { getPrompt, updatePrompt, createPrompt } = usePromptApi();
-  const { getUser } = useUserApi();
-
-  const { data: userData } = useQuery({
-    queryKey: [USER_DATA_KEY],
-    queryFn: getUser,
-  });
-
-  const defaultValues = {
-    ...defaultBrainConfig,
-    name: "",
-    description: "",
-    setDefault: false,
-    prompt_id: "",
-    prompt: {
-      title: "",
-      content: "",
-    },
-  };
+  const { userData } = useUserData();
 
   const {
-    register,
+    brain,
+    dirtyFields,
     getValues,
-    watch,
-    setValue,
+    maxTokens,
+    promptId,
+    register,
     reset,
-    formState: { dirtyFields },
-  } = useForm({
-    defaultValues,
-  });
-  const { brain } = useBrainFetcher({
+    setValue,
+    openAiKey,
+    model,
+    temperature,
+    status,
+    isDefaultBrain,
+  } = useBrainFormState({
     brainId,
   });
 
-  const isDefaultBrain = defaultBrainId === brainId;
-  const promptId = watch("prompt_id");
-  const openAiKey = watch("openAiKey");
-  const model = watch("model");
-  const temperature = watch("temperature");
-  const maxTokens = watch("maxTokens");
+  const brainStatusOptions: {
+    label: string;
+    value: BrainStatus;
+  }[] = [
+    {
+      label: t("private_brain_label", { ns: "brain" }),
+      value: "private",
+    },
+    {
+      label: t("public_brain_label", { ns: "brain" }),
+      value: "public",
+    },
+  ];
 
   const accessibleModels = getAccessibleModels({
     openAiKey,
@@ -138,7 +128,7 @@ export const useSettingsTab = ({ brainId }: UseSettingsTabProps) => {
   }, [formRef.current]);
 
   const fetchPrompt = async () => {
-    if (promptId === "") {
+    if (promptId === "" || promptId === undefined) {
       return;
     }
 
@@ -211,7 +201,7 @@ export const useSettingsTab = ({ brainId }: UseSettingsTabProps) => {
   const promptHandler = async () => {
     const { prompt } = getValues();
 
-    if (dirtyFields["prompt"]) {
+    if (dirtyFields["prompt"] && promptId !== undefined) {
       await updatePrompt(promptId, {
         title: prompt.title,
         content: prompt.content,
@@ -348,18 +338,22 @@ export const useSettingsTab = ({ brainId }: UseSettingsTabProps) => {
   return {
     handleSubmit,
     register,
+    removeBrainPrompt,
+    pickPublicPrompt,
+    setAsDefaultBrainHandler,
+    setValue,
     brain,
     model,
     temperature,
     maxTokens,
     isUpdating,
-    setAsDefaultBrainHandler,
     isSettingAsDefault,
     isDefaultBrain,
     formRef,
     promptId,
-    removeBrainPrompt,
-    pickPublicPrompt,
     accessibleModels,
+    brainStatusOptions,
+    status,
+    dirtyFields,
   };
 };

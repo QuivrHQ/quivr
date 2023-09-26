@@ -1,3 +1,4 @@
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { render } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
@@ -15,6 +16,8 @@ import {
 } from "@/lib/context/SupabaseProvider/mocks/SupabaseProviderMock";
 
 import SelectedChatPage from "../page";
+
+const queryClient = new QueryClient();
 
 vi.mock("@/lib/context/ChatProvider/ChatProvider", () => ({
   ChatContext: ChatContextMock,
@@ -55,13 +58,15 @@ vi.mock("@tanstack/react-query", async () => {
 describe("Chat page", () => {
   it("should render chat page correctly", () => {
     const { getByTestId } = render(
-      <ChatProviderMock>
-        <SupabaseProviderMock>
-          <BrainProviderMock>
-            <SelectedChatPage />,
-          </BrainProviderMock>
-        </SupabaseProviderMock>
-      </ChatProviderMock>
+      <QueryClientProvider client={queryClient}>
+        <ChatProviderMock>
+          <SupabaseProviderMock>
+            <BrainProviderMock>
+              <SelectedChatPage />,
+            </BrainProviderMock>
+          </SupabaseProviderMock>
+        </ChatProviderMock>
+      </QueryClientProvider>
     );
 
     expect(getByTestId("chat-page")).toBeDefined();
