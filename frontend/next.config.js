@@ -23,7 +23,7 @@ const ContentSecurityPolicy = `
   img-src 'self' data:;
   media-src 'self' https://user-images.githubusercontent.com https://www.quivr.app/ https://quivr-cms.s3.eu-west-3.amazonaws.com;
   script-src 'unsafe-inline' 'unsafe-eval' https://va.vercel-scripts.com/  https://www.quivr.app/ https://www.google-analytics.com/;
-  frame-ancestors 'none';a
+  frame-ancestors 'none';
   style-src 'unsafe-inline' https://www.quivr.app/;
 `;
 
