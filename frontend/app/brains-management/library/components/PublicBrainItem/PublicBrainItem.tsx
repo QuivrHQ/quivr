@@ -45,6 +45,11 @@ export const PublicBrainItem = ({
     </Button>
   );
 
+  const isBrainDescriptionEmpty = brain.description === "";
+  const brainDescription = isBrainDescriptionEmpty
+    ? t("empty_brain_description")
+    : brain.description;
+
   return (
     <Modal
       isOpen={isSubscriptionModalOpened}
@@ -56,8 +61,12 @@ export const PublicBrainItem = ({
             <p className="font-bold mb-5 text-xl line-clamp-1">{brain.name}</p>
           </div>
           <div className="flex-1">
-            <p className="line-clamp-1 text-center px-5">
-              {brain.description ?? ""}
+            <p
+              className={`line-clamp-1 text-center px-5 ${
+                isBrainDescriptionEmpty && "text-gray-400"
+              }`}
+            >
+              {brainDescription}
             </p>
           </div>
           {subscribeButton}
@@ -66,7 +75,9 @@ export const PublicBrainItem = ({
     >
       <div>
         <p className="text-2xl font-bold text-center mb-10">{brain.name}</p>
-        <p className="mb-10">{brain.description ?? ""}</p>
+        <p className={`mb-10 ${isBrainDescriptionEmpty && "text-gray-400"}`}>
+          {brainDescription}
+        </p>
 
         <p className="font-bold mb-5">
           <span>
