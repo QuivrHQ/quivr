@@ -25,7 +25,7 @@ export const ChatInput = ({
   setShouldDisplayUploadCard,
   hasContentToFeedBrain,
 }: ChatInputProps): JSX.Element => {
-  const { setMessage, submitQuestion, chatId, generatingAnswer, message } =
+  const { setMessage, submitQuestion, generatingAnswer, message } =
     useChatInput();
   const { t } = useTranslation(["chat"]);
   const { currentBrainId } = useBrainContext();
@@ -80,7 +80,7 @@ export const ChatInput = ({
           <>
             {isEmptyMessage ? (
               <div className="md:hidden flex items-center">
-                <ConfigModal chatId={chatId} />
+                <ConfigModal />
               </div>
             ) : (
               <Button
@@ -95,7 +95,7 @@ export const ChatInput = ({
               </Button>
             )}
             <div className="hidden md:flex items-center">
-              <ConfigModal chatId={chatId} />
+              <ConfigModal />
             </div>
           </>
         )}
