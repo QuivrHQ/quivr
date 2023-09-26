@@ -1,4 +1,4 @@
-import { BrainManagementButton } from "@/lib/components/NavBar/components/NavItems/components/BrainManagementButton";
+import { BrainManagementButton } from "@/app/chat/components/ChatsList/components/ChatsListItem/components/BrainManagementButton";
 
 import { UserButton } from "./UserButton";
 

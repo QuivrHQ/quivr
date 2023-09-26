@@ -6,10 +6,10 @@ import { useTranslation } from "react-i18next";
 import Spinner from "@/lib/components/ui/Spinner";
 import { UserStats } from "@/lib/types/User";
 
+import { DarkModeToggle } from "@/app/user/components/DarkModeToggle";
+import { LanguageDropDown } from "@/app/user/components/LanguageDropDown";
 import { USER_DATA_KEY } from "@/lib/api/user/config";
 import { useUserApi } from "@/lib/api/user/useUserApi";
-import { DarkModeToggle } from "@/lib/components/NavBar/components/NavItems/components/DarkModeToggle";
-import { LanguageDropDown } from "@/lib/components/NavBar/components/NavItems/components/LanguageDropDown";
 import { useSupabase } from "@/lib/context/SupabaseProvider";
 import { redirectToLogin } from "@/lib/router/redirectToLogin";
 import { useQuery } from "@tanstack/react-query";
