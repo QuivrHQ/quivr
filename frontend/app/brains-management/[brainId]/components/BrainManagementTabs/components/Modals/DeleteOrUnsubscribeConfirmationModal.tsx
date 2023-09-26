@@ -34,7 +34,11 @@ export const DeleteOrUnsubscribeConfirmationModal = ({
     >
       <div>
         <div className="flex flex-row justify-between items-center mt-10">
-          <Button className="self-end" data-testid="return-button">
+          <Button
+            onClick={() => setOpen(false)}
+            className="self-end"
+            data-testid="return-button"
+          >
             {t("returnButton")}
           </Button>
           <Button

@@ -1,3 +1,5 @@
+/*eslint max-lines: ["error", 200 ]*/
+
 "use client";
 import * as Dialog from "@radix-ui/react-dialog";
 import { AnimatePresence, motion } from "framer-motion";
@@ -37,7 +39,10 @@ export const Modal = ({
   const { t } = useTranslation(["translation"]);
 
   return (
-    <Dialog.Root onOpenChange={customSetOpen ?? setOpen}>
+    <Dialog.Root
+      open={customIsOpen ?? isOpen}
+      onOpenChange={customSetOpen ?? setOpen}
+    >
       {Trigger !== undefined && (
         <Dialog.Trigger asChild>{Trigger}</Dialog.Trigger>
       )}
