@@ -12,7 +12,7 @@ export const UserButton = (): JSX.Element => {
     <Link aria-label="account" className={sidebarLinkStyle} href={"/user"}>
       <MdPerson className="text-4xl" />
       <span className="text-ellipsis overflow-hidden">
-        {session?.user.email}
+        {session?.user.email ?? ""}
       </span>
     </Link>
   );
