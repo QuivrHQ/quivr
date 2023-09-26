@@ -39,5 +39,9 @@
     "public_brain_subscribe_button_label": "订阅",
     "public_brain_subscription_success_message": "Вы успешно подписались на мозг",
     "public_brain_last_update_label": "Последнее обновление",
-    "public_brain_already_subscribed_button_label": "已订阅"
+    "public_brain_already_subscribed_button_label": "已订阅",
+    "set_brain_status_to_private_modal_title": "您确定要将此设置为<span class='text-purple-800'>私有</span>吗？<br/><br/>",
+    "set_brain_status_to_private_modal_description": "Quivr的用户将无法再使用此大脑，并且不会在大脑库中看到它。",
+    "confirm_set_brain_status_to_private": "是的，设为私有",
+    "cancel_set_brain_status_to_private": "不，保持为公开"
 }

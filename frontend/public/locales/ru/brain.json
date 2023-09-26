@@ -39,5 +39,9 @@
     "public_brain_subscribe_button_label": "Подписаться",
     "public_brain_subscription_success_message": "Вы успешно подписались на мозг",
     "public_brain_last_update_label": "Последнее обновление",
-    "public_brain_already_subscribed_button_label": "Вы уже подписаны"
+    "public_brain_already_subscribed_button_label": "Вы уже подписаны",
+    "set_brain_status_to_private_modal_title": "Вы уверены, что хотите установить это как <span class='text-purple-800'>Частное</span>?<br/><br/>",
+    "set_brain_status_to_private_modal_description": "Пользователи Quivr больше не смогут использовать этот мозг, и они не увидят его в библиотеке мозгов.",
+    "confirm_set_brain_status_to_private": "Да, установить как частное",
+    "cancel_set_brain_status_to_private": "Нет, оставить общедоступным"
 }

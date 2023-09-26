@@ -39,5 +39,9 @@
     "public_brain_subscribe_button_label": "Suscribirse",
     "public_brain_subscription_success_message": "Te has suscrito con éxito al cerebro",
     "public_brain_last_update_label": "Última actualización",
-    "public_brain_already_subscribed_button_label": "Ya suscrito"
+    "public_brain_already_subscribed_button_label": "Ya suscrito",
+    "set_brain_status_to_private_modal_title": "¿Estás seguro de que quieres establecer esto como <span class='text-purple-800'>Privado</span>?<br/><br/>",
+    "set_brain_status_to_private_modal_description": "Los usuarios de Quivr ya no podrán utilizar este cerebro y no lo verán en la biblioteca de cerebros.",
+    "confirm_set_brain_status_to_private": "Sí, establecer como privado",
+    "cancel_set_brain_status_to_private": "No, mantenerlo público"
 }

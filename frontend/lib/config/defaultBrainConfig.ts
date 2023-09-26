@@ -12,4 +12,11 @@ export const defaultBrainConfig: BrainConfig = {
   supabaseUrl: undefined,
   prompt_id: undefined,
   status: "private",
+  prompt: {
+    title: "",
+    content: "",
+  },
+  name: "",
+  description: "",
+  setDefault: false,
 };

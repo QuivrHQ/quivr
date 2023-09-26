@@ -1,5 +1,3 @@
-import { UUID } from "crypto";
-
 export const brainStatuses = ["private", "public"] as const;
 
 export type BrainStatus = (typeof brainStatuses)[number];
@@ -14,8 +12,15 @@ export type BrainConfig = {
   anthropicKey?: string;
   supabaseUrl?: string;
   supabaseKey?: string;
-  prompt_id?: UUID;
+  prompt_id?: string;
   status: BrainStatus;
+  prompt: {
+    title: string;
+    content: string;
+  };
+  name: string;
+  description: string;
+  setDefault: boolean;
 };
 
 export type BrainConfigContextType = {
