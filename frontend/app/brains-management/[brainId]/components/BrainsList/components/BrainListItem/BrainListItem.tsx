@@ -41,11 +41,6 @@ export const BrainListItem = ({ brain }: BrainsListItemProps): JSX.Element => {
           )}
         </div>
       </Link>
-
-      <div
-        aria-hidden
-        className="not-sr-only absolute left-1/2 top-0 bottom-0 right-0 bg-gradient-to-r dark:to-black pointer-events-none"
-      ></div>
     </div>
   );
 };
