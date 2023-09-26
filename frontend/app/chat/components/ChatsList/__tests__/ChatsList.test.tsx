@@ -4,6 +4,10 @@ import { act, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import {
+  BrainContextMock,
+  BrainProviderMock,
+} from "@/lib/context/BrainProvider/mocks/BrainProviderMock";
+import {
   ChatContextMock,
   ChatProviderMock,
 } from "@/lib/context/ChatProvider/mocks/ChatProviderMock";
@@ -59,6 +63,9 @@ vi.mock("@/lib/hooks", async () => {
 vi.mock("@/lib/context/ChatProvider/ChatProvider", () => ({
   ChatContext: ChatContextMock,
 }));
+vi.mock("@/lib/context/BrainProvider/brain-provider", () => ({
+  BrainContext: BrainContextMock,
+}));
 
 describe("ChatsList", () => {
   afterEach(() => {
@@ -69,7 +76,9 @@ describe("ChatsList", () => {
     const { getByTestId } = render(
       <QueryClientProvider client={queryClient}>
         <ChatProviderMock>
-          <ChatsList />
+          <BrainProviderMock>
+            <ChatsList />
+          </BrainProviderMock>
         </ChatProviderMock>
       </QueryClientProvider>
     );
@@ -87,7 +96,9 @@ describe("ChatsList", () => {
     render(
       <QueryClientProvider client={queryClient}>
         <ChatProviderMock>
-          <ChatsList />
+          <BrainProviderMock>
+            <ChatsList />
+          </BrainProviderMock>
         </ChatProviderMock>
       </QueryClientProvider>
     );
@@ -105,7 +116,9 @@ describe("ChatsList", () => {
       render(
         <QueryClientProvider client={queryClient}>
           <ChatProviderMock>
-            (<ChatsList />)
+            <BrainProviderMock>
+              <ChatsList />
+            </BrainProviderMock>
           </ChatProviderMock>
         </QueryClientProvider>
       )
@@ -124,11 +137,14 @@ describe("ChatsList", () => {
         getChats: () => getChatsMock(),
       }),
     }));
+
     await act(() =>
       render(
         <QueryClientProvider client={queryClient}>
           <ChatProviderMock>
-            <ChatsList />
+            <BrainProviderMock>
+              <ChatsList />
+            </BrainProviderMock>
           </ChatProviderMock>
         </QueryClientProvider>
       )
