@@ -8,7 +8,6 @@ import { useChatsContext } from "@/lib/context/ChatsProvider/hooks/useChatsConte
 import { cn } from "@/lib/utils";
 
 import { ChatsListItem } from "./components/ChatsListItem";
-import { MiniFooter } from "./components/ChatsListItem/components/MiniFooter";
 import { SidebarActions } from "./components/ChatsListItem/components/SidebarActions";
 import { NewChatButton } from "./components/NewChatButton";
 import { useChatsList } from "./hooks/useChatsList";
@@ -108,7 +107,6 @@ export const ChatsList = (): JSX.Element => {
               ))}
             </div>
             <SidebarActions />
-            <MiniFooter />
           </div>
         </motion.div>
         <button
