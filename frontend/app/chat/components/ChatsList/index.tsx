@@ -8,7 +8,7 @@ import { useChatsContext } from "@/lib/context/ChatsProvider/hooks/useChatsConte
 import { cn } from "@/lib/utils";
 
 import { ChatsListItem } from "./components/ChatsListItem";
-import { MiniFooter } from "./components/ChatsListItem/components/MiniFooter";
+import { SidebarActions } from "./components/ChatsListItem/components/SidebarActions";
 import { NewChatButton } from "./components/NewChatButton";
 import { useChatsList } from "./hooks/useChatsList";
 import {
@@ -61,7 +61,7 @@ export const ChatsList = (): JSX.Element => {
               ? "10px 10px 16px rgba(0, 0, 0, 0)"
               : "10px 10px 16px rgba(0, 0, 0, 0.5)",
           }}
-          className={cn("overflow-hidden flex flex-col flex-1")}
+          className={cn("overflow-hidden flex flex-col flex-1 max-w-xs")}
           data-testid="chats-list"
         >
           <div className="flex flex-col flex-1 h-full">
@@ -106,7 +106,7 @@ export const ChatsList = (): JSX.Element => {
                 <ChatsListItem key={chat.chat_id} chat={chat} />
               ))}
             </div>
-            <MiniFooter />
+            <SidebarActions />
           </div>
         </motion.div>
         <button
@@ -115,6 +115,8 @@ export const ChatsList = (): JSX.Element => {
           }}
           className="absolute left-full top-16 text-3xl bg-black dark:bg-white text-white dark:text-black rounded-r-full p-3 pl-1"
           data-testid="chats-list-toggle"
+          title="Toggle Chats List"
+          type="button"
         >
           <motion.div
             whileTap={{ scale: 0.9 }}

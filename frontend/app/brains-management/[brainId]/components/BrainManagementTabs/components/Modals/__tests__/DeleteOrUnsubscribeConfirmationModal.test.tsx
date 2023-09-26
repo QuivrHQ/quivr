@@ -18,6 +18,8 @@ describe("DeleteOrUnsubscribeConfirmationModal", () => {
         isOpen={isOpen}
         setOpen={setOpen}
         onConfirm={onDelete}
+        isOwnedByCurrentUser={true}
+        isDeleteOrUnsubscribeRequestPending={false}
       />
     );
     expect(getByTestId("modal-description")).toBeDefined();
@@ -31,6 +33,8 @@ describe("DeleteOrUnsubscribeConfirmationModal", () => {
         isOpen={isOpen}
         setOpen={setOpen}
         onConfirm={onDelete}
+        isOwnedByCurrentUser={true}
+        isDeleteOrUnsubscribeRequestPending={false}
       />
     );
 
