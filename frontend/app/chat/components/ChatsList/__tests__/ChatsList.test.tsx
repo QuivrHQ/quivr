@@ -11,6 +11,10 @@ import {
   ChatContextMock,
   ChatProviderMock,
 } from "@/lib/context/ChatProvider/mocks/ChatProviderMock";
+import { SupabaseContextMock } from "@/lib/context/SupabaseProvider/mocks/SupabaseProviderMock";
+vi.mock("@/lib/context/SupabaseProvider/supabase-provider", () => ({
+  SupabaseContext: SupabaseContextMock,
+}));
 
 import * as useChatsListModule from "../hooks/useChatsList";
 import { ChatsList } from "../index";
@@ -65,6 +69,16 @@ vi.mock("@/lib/context/ChatProvider/ChatProvider", () => ({
 }));
 vi.mock("@/lib/context/BrainProvider/brain-provider", () => ({
   BrainContext: BrainContextMock,
+}));
+
+const mockUseSupabase = vi.fn(() => ({
+  session: {
+    user: { email: "email@domain.com" },
+  },
+}));
+
+vi.mock("@/lib/context/SupabaseProvider", () => ({
+  useSupabase: () => mockUseSupabase(),
 }));
 
 describe("ChatsList", () => {
