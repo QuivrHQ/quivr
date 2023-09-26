@@ -3,8 +3,7 @@ import { MdCheck } from "react-icons/md";
 
 import Popover from "@/lib/components/ui/Popover";
 
-import { useLanguageHook } from "../LanguageDropDown/hooks/useLanguageHook";
-
+import { useLanguageHook } from "./hooks/useLanguageHook";
 
 export const LanguageDropDown = (): JSX.Element => {
   const { allLanguages, currentLanguage, change } = useLanguageHook();

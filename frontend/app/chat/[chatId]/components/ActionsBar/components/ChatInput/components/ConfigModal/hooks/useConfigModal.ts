@@ -1,28 +1,27 @@
 /* eslint-disable max-lines */
 import { useQuery } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 
 import { useBrainApi } from "@/lib/api/brain/useBrainApi";
 import {
-  getChatConfigFromLocalStorage,
-  saveChatConfigInLocalStorage,
+  getChatsConfigFromLocalStorage,
+  saveChatsConfigInLocalStorage,
 } from "@/lib/api/chat/chat.local";
 import { USER_DATA_KEY, USER_IDENTITY_DATA_KEY } from "@/lib/api/user/config";
 import { useUserApi } from "@/lib/api/user/useUserApi";
 import { defaultBrainConfig } from "@/lib/config/defaultBrainConfig";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 import { ChatConfig } from "@/lib/context/ChatProvider/types";
-import { defineMaxTokens } from "@/lib/helpers/defineMaxTokens";
 import { getAccessibleModels } from "@/lib/helpers/getAccessibleModels";
 import { useToast } from "@/lib/hooks";
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-export const useConfigModal = (chatId?: string) => {
+export const useConfigModal = () => {
   const { publish } = useToast();
   const [isConfigModalOpen, setIsConfigModalOpen] = useState(false);
   const { getBrain } = useBrainApi();
-  const { currentBrain } = useBrainContext();
+  const { currentBrainId } = useBrainContext();
   const { getUser, getUserIdentity } = useUserApi();
 
   const { data: userData } = useQuery({
@@ -34,10 +33,12 @@ export const useConfigModal = (chatId?: string) => {
     queryFn: getUserIdentity,
   });
 
-  const defaultValues: ChatConfig = {};
-
-  const { register, watch, setValue } = useForm({
-    defaultValues,
+  const { register, watch, setValue } = useForm<ChatConfig>({
+    defaultValues: {
+      model: defaultBrainConfig.model,
+      temperature: defaultBrainConfig.temperature,
+      maxTokens: defaultBrainConfig.maxTokens,
+    },
   });
 
   const model = watch("model");
@@ -49,54 +50,40 @@ export const useConfigModal = (chatId?: string) => {
     userData,
   });
 
-  useEffect(() => {
-    const fetchChatConfig = async () => {
-      if (chatId === undefined) {
+  const fetchChatConfig = useCallback(async () => {
+    const chatConfig = getChatsConfigFromLocalStorage();
+    if (chatConfig !== undefined) {
+      setValue("model", chatConfig.model);
+      setValue("temperature", chatConfig.temperature);
+      setValue("maxTokens", chatConfig.maxTokens);
+    } else {
+      if (currentBrainId === null) {
         return;
       }
+      const relatedBrainConfig = await getBrain(currentBrainId);
 
-      const chatConfig = getChatConfigFromLocalStorage(chatId);
-      if (chatConfig !== undefined) {
-        setValue("model", chatConfig.model);
-        setValue("temperature", chatConfig.temperature);
-        setValue("maxTokens", chatConfig.maxTokens);
-      } else {
-        if (currentBrain === undefined) {
-          return;
-        }
-
-        const relatedBrainConfig = await getBrain(currentBrain.id);
-        if (relatedBrainConfig === undefined) {
-          return;
-        }
-        setValue("model", relatedBrainConfig.model ?? defaultBrainConfig.model);
-        setValue(
-          "temperature",
-          relatedBrainConfig.temperature ?? defaultBrainConfig.temperature
-        );
-        setValue(
-          "maxTokens",
-          relatedBrainConfig.max_tokens ?? defaultBrainConfig.maxTokens
-        );
+      if (relatedBrainConfig === undefined) {
+        return;
       }
-    };
-    void fetchChatConfig();
+      setValue("model", relatedBrainConfig.model ?? defaultBrainConfig.model);
+      setValue(
+        "temperature",
+        relatedBrainConfig.temperature ?? defaultBrainConfig.temperature
+      );
+      setValue(
+        "maxTokens",
+        relatedBrainConfig.max_tokens ?? defaultBrainConfig.maxTokens
+      );
+    }
   }, []);
 
   useEffect(() => {
-    if (maxTokens === undefined || model === undefined) {
-      return;
-    }
+    void fetchChatConfig();
+  }, [fetchChatConfig]);
 
-    setValue("maxTokens", Math.min(maxTokens, defineMaxTokens(model)));
-  }, [maxTokens, model, setValue]);
-
-  const handleSubmit = () => {
-    if (chatId === undefined) {
-      return;
-    }
+  const handleSubmit = useCallback(() => {
     try {
-      saveChatConfigInLocalStorage(chatId, {
+      saveChatsConfigInLocalStorage({
         maxTokens,
         model,
         temperature,
@@ -112,7 +99,7 @@ export const useConfigModal = (chatId?: string) => {
         text: "An error occurred while updating chat config",
       });
     }
-  };
+  }, [maxTokens, model, publish, temperature]);
 
   return {
     isConfigModalOpen,
