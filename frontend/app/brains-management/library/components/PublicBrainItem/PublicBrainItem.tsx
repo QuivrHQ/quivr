@@ -19,6 +19,8 @@ export const PublicBrainItem = ({
     handleSubscribeToBrain,
     isUserSubscribedToBrain,
     subscriptionRequestPending,
+    isSubscriptionModalOpened,
+    setIsSubscriptionModalOpened,
   } = usePublicBrainItem({
     brainId: brain.id,
   });
@@ -45,6 +47,8 @@ export const PublicBrainItem = ({
 
   return (
     <Modal
+      isOpen={isSubscriptionModalOpened}
+      setOpen={setIsSubscriptionModalOpened}
       CloseTrigger={<div />}
       Trigger={
         <div className="flex p-5 justify-center items-center flex-col flex-1 w-full h-full shadow-md dark:shadow-primary/25 hover:shadow-xl transition-shadow rounded-xl overflow-hidden bg-white dark:bg-black border border-black/10 dark:border-white/25 md:p-5 cursor-pointer">

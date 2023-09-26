@@ -19,6 +19,9 @@ export const usePublicBrainItem = ({ brainId }: UseSubscribeToBrainProps) => {
   const { publish } = useToast();
   const { allBrains, fetchAllBrains } = useBrainContext();
 
+  const [isSubscriptionModalOpened, setIsSubscriptionModalOpened] =
+    useState(false);
+
   const isUserSubscribedToBrain =
     allBrains.find((brain) => brain.id === brainId) !== undefined;
 
@@ -28,6 +31,7 @@ export const usePublicBrainItem = ({ brainId }: UseSubscribeToBrainProps) => {
       setSubscriptionRequestPending(true);
 
       await subscribeToBrain(brainId);
+      setIsSubscriptionModalOpened(false);
       await fetchAllBrains();
       publish({
         text: t("public_brain_subscription_success_message"),
@@ -56,5 +60,7 @@ export const usePublicBrainItem = ({ brainId }: UseSubscribeToBrainProps) => {
     handleSubscribeToBrain,
     subscriptionRequestPending,
     isUserSubscribedToBrain,
+    setIsSubscriptionModalOpened,
+    isSubscriptionModalOpened,
   };
 };
