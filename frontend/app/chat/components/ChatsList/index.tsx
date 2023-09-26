@@ -9,7 +9,6 @@ import { BrainManagementButton } from "@/lib/components/NavBar/components/NavIte
 import { useChatsContext } from "@/lib/context/ChatsProvider/hooks/useChatsContext";
 import { cn } from "@/lib/utils";
 
-import { useSelectedChatPage } from "../../[chatId]/hooks/useSelectedChatPage";
 import { ChatsListItem } from "./components/ChatsListItem";
 import { MiniFooter } from "./components/ChatsListItem/components/MiniFooter";
 import { NewChatButton } from "./components/NewChatButton";
@@ -20,6 +19,7 @@ import {
   isWithinLast7Days,
   isYesterday,
 } from "./utils";
+import { useSelectedChatPage } from "../../[chatId]/hooks/useSelectedChatPage";
 
 export const ChatsList = (): JSX.Element => {
   const { allChats } = useChatsContext();
@@ -125,6 +125,8 @@ export const ChatsList = (): JSX.Element => {
           }}
           className="absolute left-full top-16 text-3xl bg-black dark:bg-white text-white dark:text-black rounded-r-full p-3 pl-1"
           data-testid="chats-list-toggle"
+          title="Toggle Chats List"
+          type="button"
         >
           <motion.div
             whileTap={{ scale: 0.9 }}
