@@ -64,7 +64,7 @@ export const BrainManagementTabs = (): JSX.Element => {
         )}
       </List>
 
-      <div className="flex-1 p-4 md:p-20 md:pt-0">
+      <div className="flex-1 md:pt-0 pb-0">
         <Content value="settings">
           <SettingsTab brainId={brainId} />
         </Content>
@@ -76,7 +76,7 @@ export const BrainManagementTabs = (): JSX.Element => {
         </Content>
       </div>
 
-      <div className="flex justify-center mt-4">
+      <div className="flex justify-center">
         {isOwnedByCurrentUser ? (
           <Button
             className="px-8 md:px-20 py-2 bg-red-500 text-white rounded-md"
