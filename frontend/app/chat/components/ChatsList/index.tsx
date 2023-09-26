@@ -61,7 +61,7 @@ export const ChatsList = (): JSX.Element => {
               ? "10px 10px 16px rgba(0, 0, 0, 0)"
               : "10px 10px 16px rgba(0, 0, 0, 0.5)",
           }}
-          className={cn("overflow-hidden flex flex-col flex-1")}
+          className={cn("overflow-hidden flex flex-col flex-1 max-w-xs")}
           data-testid="chats-list"
         >
           <div className="flex flex-col flex-1 h-full">
