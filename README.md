@@ -4,7 +4,6 @@
     <img src="./logo.png" alt="Quivr-logo" width="30%"  style="border-radius: 50%; padding-bottom: 20px"/>
 </div>
 
-
 [![Discord Follow](https://dcbadge.vercel.app/api/server/HUpRgp2HG8?style=flat)](https://discord.gg/HUpRgp2HG8)
 [![GitHub Repo stars](https://img.shields.io/github/stars/stangirard/quivr?style=social)](https://github.com/stangirard/quivr)
 [![Twitter Follow](https://img.shields.io/twitter/follow/StanGirard?style=social)](https://twitter.com/_StanGirard)
@@ -38,7 +37,7 @@ https://github.com/StanGirard/quivr/assets/19614572/a6463b73-76c7-4bc0-978d-7056
 
 ## Disclaimer ⚠️
 
-For a little while, Quivr will be only compatible with OpenAI API. 
+For a little while, Quivr will be only compatible with OpenAI API.
 
 If you want to use a Local LLM please refer to [v0.0.46](https://github.com/StanGirard/quivr/releases/tag/v0.0.46).
 
@@ -81,16 +80,22 @@ Additionally, you'll need a [Supabase](https://supabase.com/) account for:
   git clone git@github.com:StanGirard/Quivr.git && cd Quivr
   ```
 
-- **Step 2**: Use the install helper
+- **Step 2**: Use the install helper script to automate subsequent steps.
+  You can use the install_helper.sh script to setup your env files and execute the migrations.
 
-  You can use the install_helper.sh script to setup your env files
+  prerequisites:
 
   ```bash
-  brew install gum # Windows (via Scoop) scoop install charm-gum
+    brew install gum # Windows (via Scoop) scoop install charm-gum
+    brew install postgresql # Windows (via Scoop) scoop install postgresql
+  ```
 
+  ```bash
   chmod +x install_helper.sh
   ./install_helper.sh
   ```
+
+  If you want to manually set up the environment, follow the steps below, otherwise skip to Step 6.
 
 - **Step 2 - Bis**: Copy the `.XXXXX_env` files
 

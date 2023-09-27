@@ -76,11 +76,11 @@ fi
 
 # Step 4: Run the migration scripts (this is supposed to be done manually as per the instructions)
 echo "Running the migration scripts..."
-./migration.sh
+./migration.sh || error_exit "Error running migration scripts."
 
 # Step 5: Launch the app
 echo "Launching the app..."
-docker compose up --build
+docker compose up --build || error_exit "Error running docker compose."
 
 # Final message
 echo "Navigate to localhost:3000 in your browser to access the app."

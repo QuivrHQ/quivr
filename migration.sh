@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Exit script immediately on first error.
+set -e 
+
 # Function to run SQL file
 run_sql_file() {
     local file="$1"
