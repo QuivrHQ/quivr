@@ -1,45 +1,60 @@
+import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { MdClose } from "react-icons/md";
 
+import { AddBrainModal } from "@/lib/components/AddBrainModal";
+import { KnowledgeToFeedInput } from "@/lib/components/KnowledgeToFeedInput";
 import Button from "@/lib/components/ui/Button";
-import { Divider } from "@/lib/components/ui/Divider";
+import { Select } from "@/lib/components/ui/Select";
+import { requiredRolesForUpload } from "@/lib/config/upload";
+import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 
-import { FeedItems } from "./components";
-import { Crawler } from "./components/Crawler";
-import { FileUploader } from "./components/FileUploader";
-import { FeedItemType, FeedItemUploadType } from "../../types";
+import { formatMinimalBrainsToSelectComponentInput } from "./utils/formatMinimalBrainsToSelectComponentInput";
 
-type FeedProps = {
-  onClose: () => void;
-  contents: FeedItemType[];
-  addContent: (content: FeedItemType) => void;
-  removeContent: (index: number) => void;
+type KnowledgeToFeedProps = {
+  closeFeedInput: () => void;
+  dispatchHasPendingRequests?: () => void;
 };
 export const KnowledgeToFeed = ({
-  onClose,
-  contents,
-  addContent,
-  removeContent,
-}: FeedProps): JSX.Element => {
-  const { t } = useTranslation(["translation"]);
+  closeFeedInput,
+  dispatchHasPendingRequests,
+}: KnowledgeToFeedProps): JSX.Element => {
+  const { allBrains, currentBrainId, setCurrentBrainId } = useBrainContext();
 
-  const files: File[] = (
-    contents.filter((c) => c.source === "upload") as FeedItemUploadType[]
-  ).map((c) => c.file);
+  const { t } = useTranslation(["upload"]);
+
+  const brainsWithUploadRights = useMemo(
+    () =>
+      allBrains.filter((brain) => requiredRolesForUpload.includes(brain.role)),
+    [allBrains]
+  );
 
   return (
     <div className="flex-col w-full relative">
-      <div className="absolute right-2 top-1">
-        <Button variant={"tertiary"} onClick={onClose}>
+      <div className="flex flex-1 justify-between">
+        <AddBrainModal />
+        <Button variant={"tertiary"} onClick={closeFeedInput}>
           <span>
             <MdClose className="text-3xl" />
           </span>
         </Button>
       </div>
-      <FileUploader addContent={addContent} files={files} />
-      <Divider text={t("or")} className="m-5" />
-      <Crawler addContent={addContent} />
-      <FeedItems contents={contents} removeContent={removeContent} />
+      <div className="flex justify-center">
+        <Select
+          label={t("selected_brain_select_label")}
+          options={formatMinimalBrainsToSelectComponentInput(
+            brainsWithUploadRights
+          )}
+          value={currentBrainId ?? undefined}
+          onChange={(newSelectedBrainId) =>
+            setCurrentBrainId(newSelectedBrainId)
+          }
+        />
+      </div>
+      <KnowledgeToFeedInput
+        dispatchHasPendingRequests={dispatchHasPendingRequests}
+        closeFeedInput={closeFeedInput}
+      />
     </div>
   );
 };

@@ -3,7 +3,7 @@ import { BsCheckCircleFill } from "react-icons/bs";
 
 import Popover from "@/lib/components/ui/Popover";
 
-type SelectOptionProps<T> = {
+export type SelectOptionProps<T> = {
   label: string;
   value: T;
 };

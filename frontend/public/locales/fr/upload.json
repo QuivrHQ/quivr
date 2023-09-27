@@ -2,7 +2,6 @@
     "title": "Télécharger des connaissances",
     "subtitle": "Texte, document, feuille de calcul, présentation, audio, vidéo et URL pris en charge",
     "drop": "Déposez les fichiers ici...",
-    "dragAndDrop": "Glissez et déposez les fichiers ici, ou cliquez pour parcourir",
     "webSite": "Insérer l'URL du site web",
     "success": "Fichier téléchargé avec succès",
     "uploadFailed": "Échec du téléchargement du fichier : {{message}}",
@@ -15,5 +14,7 @@
     "ohNo": "Oh non !",
     "selectBrainFirst": "Vous devez d'abord sélectionner un cerveau. 🧠💡🥲",
     "missingNecessaryRole": "Vous n'avez pas le rôle nécessaire pour télécharger du contenu dans le cerveau sélectionné. 🧠💡🥲",
-    "invalidFileType": "Type de fichier invalide"
+    "invalidFileType": "Type de fichier invalide",
+    "feed_form_submit_button":"Envoyer à mon cerveau",
+    "selected_brain_select_label": "Cerveau sélectionné"
 }

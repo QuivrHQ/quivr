@@ -9,7 +9,7 @@ import { redirectToLogin } from "@/lib/router/redirectToLogin";
 import { SupportedFileExtensionsWithDot } from "@/lib/types/SupportedFileExtensions";
 import { useEventTracking } from "@/services/analytics/june/useEventTracking";
 
-import { FeedItemType } from "../../../../../types";
+import { FeedItemType } from "../../../../../../app/chat/[chatId]/components/ActionsBar/types";
 
 type UseFileUploaderProps = {
   addContent: (content: FeedItemType) => void;

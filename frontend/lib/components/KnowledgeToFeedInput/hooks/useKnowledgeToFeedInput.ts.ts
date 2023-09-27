@@ -13,17 +13,21 @@ import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainConte
 import { getAxiosErrorParams } from "@/lib/helpers/getAxiosErrorParams";
 import { useToast } from "@/lib/hooks";
 
-import { FeedItemCrawlType, FeedItemType, FeedItemUploadType } from "../types";
+import {
+  FeedItemCrawlType,
+  FeedItemType,
+  FeedItemUploadType,
+} from "../../../../app/chat/[chatId]/components/ActionsBar/types";
 
-type UseKnowledgeUploaderProps = {
-  setHasPendingRequests: (hasPendingRequests: boolean) => void;
-  setShouldDisplayUploadCard: (shouldDisplayUploadCard: boolean) => void;
+type UseKnowledgeToFeedInput = {
+  dispatchHasPendingRequests?: () => void;
+  closeFeedInput?: () => void;
 };
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-export const useKnowledgeUploader = ({
-  setHasPendingRequests,
-  setShouldDisplayUploadCard,
-}: UseKnowledgeUploaderProps) => {
+export const useKnowledgeToFeedInput = ({
+  dispatchHasPendingRequests,
+  closeFeedInput,
+}: UseKnowledgeToFeedInput) => {
   const [contents, setContents] = useState<FeedItemType[]>([]);
   const { publish } = useToast();
   const { uploadFile } = useUploadApi();
@@ -36,6 +40,7 @@ export const useKnowledgeUploader = ({
   const router = useRouter();
   const params = useParams();
   const chatId = params?.chatId as UUID | undefined;
+  const [hasPendingRequests, setHasPendingRequests] = useState(false);
 
   const addContent = (content: FeedItemType) => {
     setContents((prevContents) => [...prevContents, content]);
@@ -148,7 +153,8 @@ export const useKnowledgeUploader = ({
       return;
     }
     try {
-      setShouldDisplayUploadCard(false);
+      dispatchHasPendingRequests?.();
+      closeFeedInput?.();
       setHasPendingRequests(true);
       const currentChatId = chatId ?? (await createChat("New Chat")).chat_id;
       const uploadPromises = files.map((file) =>
@@ -182,5 +188,7 @@ export const useKnowledgeUploader = ({
     contents,
     removeContent,
     feedBrain,
+    hasPendingRequests,
+    setHasPendingRequests,
   };
 };

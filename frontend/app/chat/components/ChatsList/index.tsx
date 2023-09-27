@@ -10,6 +10,7 @@ import { cn } from "@/lib/utils";
 import { ChatsListItem } from "./components/ChatsListItem";
 import { SidebarActions } from "./components/ChatsListItem/components/SidebarActions";
 import { NewChatButton } from "./components/NewChatButton";
+import { useChatNotificationsSync } from "./hooks/useChatNotificationsSync";
 import { useChatsList } from "./hooks/useChatsList";
 import {
   isToday,
@@ -17,13 +18,12 @@ import {
   isWithinLast7Days,
   isYesterday,
 } from "./utils";
-import { useSelectedChatPage } from "../../[chatId]/hooks/useSelectedChatPage";
 
 export const ChatsList = (): JSX.Element => {
   const { allChats } = useChatsContext();
 
   const { open, setOpen } = useChatsList();
-  useSelectedChatPage();
+  useChatNotificationsSync();
 
   const todayChats = allChats.filter((chat) =>
     isToday(new Date(chat.creation_time))

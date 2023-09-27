@@ -7,7 +7,7 @@ import { useToast } from "@/lib/hooks";
 import { redirectToLogin } from "@/lib/router/redirectToLogin";
 import { useEventTracking } from "@/services/analytics/june/useEventTracking";
 
-import { FeedItemType } from "../../../../../types";
+import { FeedItemType } from "../../../../../../app/chat/[chatId]/components/ActionsBar/types";
 import { isValidUrl } from "../helpers/isValidUrl";
 
 type UseCrawlerProps = {
