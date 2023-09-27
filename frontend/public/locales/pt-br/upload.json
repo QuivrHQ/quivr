@@ -2,7 +2,6 @@
     "title": "Upload Conhecimento",
     "subtitle": "Texto, documento, planilha, apresentação, áudio, vídeo e URLs suportados",
     "drop": "Solte os arquivos aqui...",
-    "dragAndDrop": "Arraste e solte os arquivos aqui, ou clique para procurar",
     "webSite": "Insira o URL do site",
     "success": "Arquivo enviado com sucesso",
     "uploadFailed": "Falha ao enviar arquivo: {{message}}",
@@ -15,5 +14,7 @@
     "ohNo": "Oh, não!",
     "selectBrainFirst": "Você precisa selecionar um cérebro primeiro. 🧠💡🥲",
     "missingNecessaryRole": "Você não possui a função necessária para enviar conteúdo para o cérebro selecionado. 🧠💡🥲",
-    "invalidFileType": "Tipo de arquivo inválido"
+    "invalidFileType": "Tipo de arquivo inválido",
+    "feed_form_submit_button": "Enviar para o meu cérebro",
+    "selected_brain_select_label": "Cérebro selecionado"
 }

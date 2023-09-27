@@ -2,7 +2,6 @@
     "title": "上传知识",
     "subtitle": "支持文本、文档、电子表格、演示文稿、音频、视频和URL",
     "drop": "将文件拖放到这里...",
-    "dragAndDrop": "将文件拖放到此处，或单击浏览",
     "webSite": "插入网站URL",
     "success": "文件上传成功",
     "uploadFailed": "上传文件失败：{{message}}",
@@ -15,5 +14,7 @@
     "ohNo": "不好了!",
     "selectBrainFirst": "你需要先选择一个大脑。 🧠💡🥲",
     "missingNecessaryRole": "您没有所选大脑的上传权限。 🧠💡🥲",
-    "invalidFileType": "文件类型不受支持"
+    "invalidFileType": "文件类型不受支持",
+    "feed_form_submit_button":"发送到我的大脑",
+    "selected_brain_select_label": "已选择的大脑"
 }

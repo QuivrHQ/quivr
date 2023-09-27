@@ -2,7 +2,6 @@
     "title": "Upload Knowledge",
     "subtitle": "Text, document, spreadsheet, presentation, audio, video, and URLs supported",
     "drop": "Drop the files here...",
-    "dragAndDrop": "Drag and drop files here, or click to browse \n (pdf, csv, Doc, Word, Txt, XIs)",
     "webSite": "Insert website URL",
     "success": "File uploaded successfully",
     "uploadFailed": "Failed to upload file: {{message}}",
@@ -15,5 +14,7 @@
     "ohNo": "Oh no!",
     "selectBrainFirst": "You need to select a brain first. 🧠💡🥲",
     "missingNecessaryRole": "You don't have the necessary role to upload content to the selected brain. 🧠💡🥲",
-    "invalidFileType": "Invalid file type"
+    "invalidFileType": "Invalid file type",
+    "feed_form_submit_button":"Send to my brain",
+    "selected_brain_select_label":"Brain selected"
 }
