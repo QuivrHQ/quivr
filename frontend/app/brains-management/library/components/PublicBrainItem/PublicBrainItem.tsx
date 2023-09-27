@@ -19,6 +19,8 @@ export const PublicBrainItem = ({
     handleSubscribeToBrain,
     isUserSubscribedToBrain,
     subscriptionRequestPending,
+    isSubscriptionModalOpened,
+    setIsSubscriptionModalOpened,
   } = usePublicBrainItem({
     brainId: brain.id,
   });
@@ -43,22 +45,39 @@ export const PublicBrainItem = ({
     </Button>
   );
 
+  const isBrainDescriptionEmpty = brain.description === "";
+  const brainDescription = isBrainDescriptionEmpty
+    ? t("empty_brain_description")
+    : brain.description;
+
   return (
     <Modal
+      isOpen={isSubscriptionModalOpened}
+      setOpen={setIsSubscriptionModalOpened}
       CloseTrigger={<div />}
       Trigger={
-        <div className="flex justify-center items-center flex-col w-full h-full shadow-md dark:shadow-primary/25 hover:shadow-xl transition-shadow rounded-xl overflow-hidden bg-white dark:bg-black border border-black/10 dark:border-white/25 md:p-5 cursor-pointer">
-          <p className="font-bold mb-5 text-xl">{brain.name}</p>
-          <p className="line-clamp-2 text-center px-5">
-            {brain.description ?? ""}
-          </p>
+        <div className="flex p-5 justify-center items-center flex-col flex-1 w-full h-full shadow-md dark:shadow-primary/25 hover:shadow-xl transition-shadow rounded-xl overflow-hidden bg-white dark:bg-black border border-black/10 dark:border-white/25 md:p-5 cursor-pointer">
+          <div>
+            <p className="font-bold mb-5 text-xl line-clamp-1">{brain.name}</p>
+          </div>
+          <div className="flex-1">
+            <p
+              className={`line-clamp-1 text-center px-5 ${
+                isBrainDescriptionEmpty && "text-gray-400"
+              }`}
+            >
+              {brainDescription}
+            </p>
+          </div>
           {subscribeButton}
         </div>
       }
     >
       <div>
         <p className="text-2xl font-bold text-center mb-10">{brain.name}</p>
-        <p className="mb-10">{brain.description ?? ""}</p>
+        <p className={`mb-10 ${isBrainDescriptionEmpty && "text-gray-400"}`}>
+          {brainDescription}
+        </p>
 
         <p className="font-bold mb-5">
           <span>

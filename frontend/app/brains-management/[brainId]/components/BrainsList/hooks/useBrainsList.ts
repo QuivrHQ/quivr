@@ -5,12 +5,12 @@ import { useEffect, useState } from "react";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 import { useDevice } from "@/lib/hooks/useDevice";
 
-import { sortBrainsByName } from "../utils/sortByName";
+import { sortBrainsByName } from "../../../utils/sortByName";
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const useBrainsList = () => {
   const { isMobile } = useDevice();
-  const [open, setOpen] = useState(!isMobile);
+  const [opened, setOpened] = useState(!isMobile);
   const [searchQuery, setSearchQuery] = useState("");
   const { allBrains } = useBrainContext();
   const { currentBrainId } = useBrainContext();
@@ -20,8 +20,10 @@ export const useBrainsList = () => {
 
   const pathname = usePathname();
 
+  const isOnBrainsLibraryPage = pathname?.includes("/library") ?? false;
+
   useEffect(() => {
-    setOpen(!isMobile);
+    setOpened(!isMobile);
   }, [isMobile, pathname]);
 
   const brains = allBrains.filter((brain) => {
@@ -39,17 +41,18 @@ export const useBrainsList = () => {
     if (
       currentBrainId !== null &&
       pathname !== null &&
-      !pathname.includes("library")
+      !isOnBrainsLibraryPage
     ) {
       redirect(`/brains-management/${currentBrainId}`);
     }
-  }, [brainId, currentBrainId, pathname]);
+  }, [brainId, currentBrainId, pathname, isOnBrainsLibraryPage]);
 
   return {
-    open,
-    setOpen,
+    opened,
+    setOpened,
     searchQuery,
     setSearchQuery,
     brains: sortBrainsByName(brains),
+    isOnBrainsLibraryPage,
   };
 };

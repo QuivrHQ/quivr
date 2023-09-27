@@ -35,6 +35,7 @@
     "confirm_set_brain_status_to_public": "Yes, set as public",
     "cancel_set_brain_status_to_public": "No, keep it private",
     "brain_library_button_label":"Brains library",
+    "brain_management_button_label":"Brains management",
     "public_brains_search_bar_placeholder":"Search public brains",
     "public_brain_subscribe_button_label":"Subscribe",
     "public_brain_subscription_success_message":"You have successfully subscribed to the brain",
@@ -43,6 +44,6 @@
     "set_brain_status_to_private_modal_title":"Are you sure you want to set this as <span class='text-purple-800'>Private</span>?<br/><br/>",
     "set_brain_status_to_private_modal_description":"Every Quivr users won't be able to use this brain anymore and they won't see it in the brain library.",
     "confirm_set_brain_status_to_private":"Yes, set as private",
-    "cancel_set_brain_status_to_private":"No, keep it public"    
-
+    "cancel_set_brain_status_to_private":"No, keep it public",
+    "empty_brain_description":"No description"
 }

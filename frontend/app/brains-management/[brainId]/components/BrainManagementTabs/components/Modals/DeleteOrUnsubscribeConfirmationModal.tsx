@@ -30,17 +30,20 @@ export const DeleteOrUnsubscribeConfirmationModal = ({
       isOpen={isOpen}
       setOpen={setOpen}
       Trigger={<div />}
-      CloseTrigger={
-        <Button className="self-end" data-testid="return-button">
-          {t("returnButton")}
-        </Button>
-      }
+      CloseTrigger={<div />}
     >
       <div>
-        <div className="flex justify-center mt-6">
+        <div className="flex flex-row justify-between items-center mt-10">
+          <Button
+            onClick={() => setOpen(false)}
+            className="self-end"
+            data-testid="return-button"
+          >
+            {t("returnButton")}
+          </Button>
           <Button
             data-testid="delete-brain"
-            className="px-4 py-2 bg-red-500 text-white rounded-md"
+            className="px-4 bg-red-500 text-white rounded-md"
             onClick={onConfirm}
             isLoading={isDeleteOrUnsubscribeRequestPending}
           >

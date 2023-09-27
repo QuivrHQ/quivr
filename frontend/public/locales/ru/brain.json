@@ -43,5 +43,7 @@
     "set_brain_status_to_private_modal_title": "Вы уверены, что хотите установить это как <span class='text-purple-800'>Частное</span>?<br/><br/>",
     "set_brain_status_to_private_modal_description": "Пользователи Quivr больше не смогут использовать этот мозг, и они не увидят его в библиотеке мозгов.",
     "confirm_set_brain_status_to_private": "Да, установить как частное",
-    "cancel_set_brain_status_to_private": "Нет, оставить общедоступным"
+    "cancel_set_brain_status_to_private": "Нет, оставить общедоступным",
+    "brain_management_button_label": "Управление мозгом",
+    "empty_brain_description": "Нет описания"
 }

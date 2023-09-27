@@ -43,5 +43,7 @@
     "set_brain_status_to_private_modal_title": "¿Estás seguro de que quieres establecer esto como <span class='text-purple-800'>Privado</span>?<br/><br/>",
     "set_brain_status_to_private_modal_description": "Los usuarios de Quivr ya no podrán utilizar este cerebro y no lo verán en la biblioteca de cerebros.",
     "confirm_set_brain_status_to_private": "Sí, establecer como privado",
-    "cancel_set_brain_status_to_private": "No, mantenerlo público"
+    "cancel_set_brain_status_to_private": "No, mantenerlo público",
+    "brain_management_button_label": "Gestionar cerebro",
+    "empty_brain_description":"Sin descripción"
 }

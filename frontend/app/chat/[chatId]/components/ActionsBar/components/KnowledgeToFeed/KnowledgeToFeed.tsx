@@ -4,10 +4,10 @@ import { MdClose } from "react-icons/md";
 import Button from "@/lib/components/ui/Button";
 import { Divider } from "@/lib/components/ui/Divider";
 
-import { FeedItemType, FeedItemUploadType } from "../../types";
 import { FeedItems } from "./components";
 import { Crawler } from "./components/Crawler";
 import { FileUploader } from "./components/FileUploader";
+import { FeedItemType, FeedItemUploadType } from "../../types";
 
 type FeedProps = {
   onClose: () => void;

@@ -13,20 +13,20 @@ const BrainsLibrary = (): JSX.Element => {
   const { t } = useTranslation("brain");
 
   return (
-    <div className="flex flex-1 flex-col items-center m-20 border-2 border-gray-100 border-solid rounded-xl">
+    <div className="flex flex-1 flex-col items-center m-5 md:m-20 border-2 border-gray-100 border-solid rounded-xl">
       <div className="flex">
         <Field
           value={searchBarText}
           onChange={(e) => setSearchBarText(e.target.value)}
           name="search"
-          inputClassName="w-max lg:min-w-[300px] md:min-w-[200px]  min-w-[100px]  mt-10 rounded-3xl bg-white"
+          inputClassName="w-max lg:min-w-[300px] md:min-w-[200px]  min-w-[100px]  mt-10 rounded-3xl bg-white lg:mb-5"
           placeholder={t("public_brains_search_bar_placeholder")}
         />
       </div>
 
       <div className="flex flex-wrap justify-stretch w-full">
         {displayingPublicBrains.map((brain) => (
-          <div key={brain.id} className="lg:w-1/3 md:w-1/2 w-1 md:p-5">
+          <div key={brain.id} className="lg:w-1/3 md:w-1/2 md:p-5 p-5 w-full">
             <PublicBrainItem brain={brain} />
           </div>
         ))}

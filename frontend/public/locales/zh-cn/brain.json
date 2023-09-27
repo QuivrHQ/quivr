@@ -43,5 +43,7 @@
     "set_brain_status_to_private_modal_title": "您确定要将此设置为<span class='text-purple-800'>私有</span>吗？<br/><br/>",
     "set_brain_status_to_private_modal_description": "Quivr的用户将无法再使用此大脑，并且不会在大脑库中看到它。",
     "confirm_set_brain_status_to_private": "是的，设为私有",
-    "cancel_set_brain_status_to_private": "不，保持为公开"
+    "cancel_set_brain_status_to_private": "不，保持为公开",
+    "brain_management_button_label": "管理",
+    "empty_brain_description": "无描述"
 }

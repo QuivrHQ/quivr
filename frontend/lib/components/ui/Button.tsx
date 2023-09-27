@@ -21,7 +21,7 @@ const ButtonVariants = cva(
         tertiary:
           "text-black dark:text-white bg-transparent py-2 px-4 disabled:opacity-25",
         secondary:
-          "border border-black dark:border-white bg-white dark:bg-black text-black dark:text-white focus:bg-black dark:focus:bg-white hover:bg-black dark:hover:bg-white hover:text-white dark:hover:text-black focus:text-white dark:focus:text-black transition-colors py-2 px-4 shadow-none",
+          "border border-black dark:border-white bg-white dark:bg-black text-black dark:text-white focus:bg-black dark:focus:bg-white hover:bg-black dark:hover:bg-white hover:text-white dark:hover:text-black focus:text-white dark:focus:text-black transition-colors shadow-none",
         danger:
           "border border-red-500 hover:bg-red-500 hover:text-white transition-colors",
       },

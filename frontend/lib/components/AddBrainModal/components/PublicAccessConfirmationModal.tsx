@@ -29,7 +29,7 @@ export const PublicAccessConfirmationModal = ({
           __html: t("set_brain_status_to_public_modal_description"),
         }}
       />
-      <div className="flex flex-row justify-between pt-10 px-10">
+      <div className="flex flex-row justify-between pt-10 px-10 items-center">
         <Button type="button" onClick={onConfirm} variant="secondary">
           {t("confirm_set_brain_status_to_public")}
         </Button>
