@@ -38,7 +38,7 @@ export const KnowledgeToFeedInput = ({
       <div className="flex justify-center mt-5">
         <Button
           disabled={contents.length === 0}
-          className="rounded-xl"
+          className="rounded-xl bg-purple-600 border-white"
           onClick={() => void feedBrain()}
         >
           {t("feed_form_submit_button", { ns: "upload" })}
