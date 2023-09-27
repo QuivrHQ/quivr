@@ -1,6 +1,6 @@
-import { BrainManagementButton } from "@/app/chat/components/ChatsList/components/ChatsListItem/components/BrainManagementButton";
+import { BrainManagementButton } from "@/app/chat/components/ChatsList/components/SidebarFooter/components/BrainManagementButton";
 
-import { UserButton } from "./UserButton";
+import { UserButton } from "./components/UserButton";
 
 export const SidebarActions = (): JSX.Element => {
   return (
