@@ -9,6 +9,7 @@ import { cn } from "@/lib/utils";
 
 import { ChatsListItem } from "./components/ChatsListItem";
 import { SidebarActions } from "./components/ChatsListItem/components/SidebarActions";
+import { SidebarHeader } from "./components/ChatsListItem/components/SidebarHeader";
 import { NewChatButton } from "./components/NewChatButton";
 import { useChatNotificationsSync } from "./hooks/useChatNotificationsSync";
 import { useChatsList } from "./hooks/useChatsList";
@@ -65,7 +66,10 @@ export const ChatsList = (): JSX.Element => {
           data-testid="chats-list"
         >
           <div className="flex flex-col flex-1 h-full">
-            <NewChatButton />
+            <SidebarHeader />
+            <div className="pt-2">
+              <NewChatButton />
+            </div>
             <div
               data-testid="chats-list-items"
               className="flex-1 overflow-auto scrollbar h-full"
