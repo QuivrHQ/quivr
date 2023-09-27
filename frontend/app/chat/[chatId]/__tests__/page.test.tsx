@@ -10,6 +10,7 @@ import {
   ChatContextMock,
   ChatProviderMock,
 } from "@/lib/context/ChatProvider/mocks/ChatProviderMock";
+import { KnowledgeProvider } from "@/lib/context/KnowledgeProvider";
 import {
   SupabaseContextMock,
   SupabaseProviderMock,
@@ -74,15 +75,17 @@ vi.mock("@tanstack/react-query", async () => {
 describe("Chat page", () => {
   it("should render chat page correctly", () => {
     const { getByTestId } = render(
-      <QueryClientProvider client={queryClient}>
-        <ChatProviderMock>
-          <SupabaseProviderMock>
-            <BrainProviderMock>
-              <SelectedChatPage />,
-            </BrainProviderMock>
-          </SupabaseProviderMock>
-        </ChatProviderMock>
-      </QueryClientProvider>
+      <KnowledgeProvider>
+        <QueryClientProvider client={queryClient}>
+          <ChatProviderMock>
+            <SupabaseProviderMock>
+              <BrainProviderMock>
+                <SelectedChatPage />,
+              </BrainProviderMock>
+            </SupabaseProviderMock>
+          </ChatProviderMock>
+        </QueryClientProvider>
+      </KnowledgeProvider>
     );
 
     expect(getByTestId("chat-page")).toBeDefined();
