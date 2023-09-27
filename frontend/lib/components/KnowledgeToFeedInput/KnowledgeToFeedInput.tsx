@@ -7,7 +7,7 @@ import { FeedItems } from "./components";
 import { Crawler } from "./components/Crawler";
 import { FileUploader } from "./components/FileUploader";
 import { useKnowledgeToFeedInput } from "./hooks/useKnowledgeToFeedInput.ts";
-import { FeedItemUploadType } from "../../../../types";
+import { FeedItemUploadType } from "../../../app/chat/[chatId]/components/ActionsBar/types";
 
 type KnowledgeToFeedInputProps = {
   dispatchHasPendingRequests?: () => void;

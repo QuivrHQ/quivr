@@ -5,7 +5,7 @@ import { MdSend } from "react-icons/md";
 import Button from "@/lib/components/ui/Button";
 import Field from "@/lib/components/ui/Field";
 
-import { FeedItemType } from "../../../../../../types";
+import { FeedItemType } from "../../../../../app/chat/[chatId]/components/ActionsBar/types";
 import { useCrawler } from "./hooks/useCrawler";
 
 type CrawlerProps = {

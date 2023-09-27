@@ -17,7 +17,7 @@ import {
   FeedItemCrawlType,
   FeedItemType,
   FeedItemUploadType,
-} from "../../../../../types";
+} from "../../../../app/chat/[chatId]/components/ActionsBar/types";
 
 type UseKnowledgeToFeedInput = {
   dispatchHasPendingRequests?: () => void;
