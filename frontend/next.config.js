@@ -1,6 +1,10 @@
 const nextConfig = {
   images: {
-    domains: ["www.quivr.app", "quivr-cms.s3.eu-west-3.amazonaws.com"]
+    domains: [
+      "www.quivr.app",
+      "quivr-cms.s3.eu-west-3.amazonaws.com",
+      "www.gravatar.com",
+    ],
   },
   // eslint-disable-next-line prefer-arrow/prefer-arrow-functions
   async headers() {
