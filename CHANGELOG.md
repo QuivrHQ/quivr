@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.0.83 (2023-09-27)
+
+## What's Changed
+* feat(nav): 🚚 Move Brain and User buttons to the sidebar in the chat by @matthieujacq in https://github.com/StanGirard/quivr/pull/1262
+* feat: save last chat config and make it default one by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1266
+* style: improve upload ux by @Rahil2507 in https://github.com/StanGirard/quivr/pull/1259
+* fix(docs): add prerequisites section in step 2 by @JvSdv in https://github.com/StanGirard/quivr/pull/1149
+* style: improve ui by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1263
+
+## New Contributors
+* @Rahil2507 made their first contribution in https://github.com/StanGirard/quivr/pull/1259
+* @JvSdv made their first contribution in https://github.com/StanGirard/quivr/pull/1149
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.82...v0.0.83
+
 ## 0.0.82 (2023-09-26)
 
 ## What's Changed
