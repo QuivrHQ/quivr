@@ -1,10 +1,11 @@
 "use client";
 import { useTranslation } from "react-i18next";
+import { IoCloudUploadOutline } from "react-icons/io5";
 
 import Card from "@/lib/components/ui/Card";
 
-import { useFileUploader } from "./hooks/useFileUploader";
 import { FeedItemType } from "../../../../types";
+import { useFileUploader } from "./hooks/useFileUploader";
 
 type FileUploaderProps = {
   addContent: (content: FeedItemType) => void;
@@ -28,7 +29,8 @@ export const FileUploader = ({
     >
       <div className="flex flex-col sm:flex-row max-w-3xl w-full items-center gap-5">
         <div className="flex-1 w-full">
-          <Card className="h-52 flex justify-center items-center">
+          <Card className="h-24 flex justify-center items-center">
+            <IoCloudUploadOutline className="relative right-16 text-5xl" />
             <input {...getInputProps()} />
             <div className="text-center p-6 max-w-sm w-full flex flex-col gap-5 items-center">
               {isDragActive ? (

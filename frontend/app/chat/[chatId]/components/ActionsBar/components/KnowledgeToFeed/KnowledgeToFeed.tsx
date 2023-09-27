@@ -4,10 +4,10 @@ import { MdClose } from "react-icons/md";
 import Button from "@/lib/components/ui/Button";
 import { Divider } from "@/lib/components/ui/Divider";
 
+import { FeedItemType, FeedItemUploadType } from "../../types";
 import { FeedItems } from "./components";
 import { Crawler } from "./components/Crawler";
 import { FileUploader } from "./components/FileUploader";
-import { FeedItemType, FeedItemUploadType } from "../../types";
 
 type FeedProps = {
   onClose: () => void;
@@ -28,7 +28,7 @@ export const KnowledgeToFeed = ({
   ).map((c) => c.file);
 
   return (
-    <div className="flex flex-col w-full table relative pb-5">
+    <div className="flex-col w-full relative">
       <div className="absolute right-2 top-1">
         <Button variant={"tertiary"} onClick={onClose}>
           <span>
