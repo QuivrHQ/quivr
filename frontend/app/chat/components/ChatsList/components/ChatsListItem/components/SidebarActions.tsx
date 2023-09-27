@@ -4,8 +4,8 @@ import { UserButton } from "./UserButton";
 
 export const SidebarActions = (): JSX.Element => {
   return (
-    <div className="bg-white dark:bg-black border-t dark:border-white/10 mt-auto py-4">
-      <div className="max-w-screen-xl mx-auto flex justify-center items-center gap-4 flex-col p-5">
+    <div className="bg-gray-50 dark:bg-gray-900 border-t dark:border-white/10 mt-auto p-2">
+      <div className="max-w-screen-xl flex justify-center items-center flex-col">
         <BrainManagementButton />
         <UserButton />
       </div>
