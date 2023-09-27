@@ -5,20 +5,9 @@ import { IoCloudUploadOutline } from "react-icons/io5";
 import Card from "@/lib/components/ui/Card";
 
 import { useFileUploader } from "./hooks/useFileUploader";
-import { FeedItemType } from "../../../../../app/chat/[chatId]/components/ActionsBar/types";
 
-type FileUploaderProps = {
-  addContent: (content: FeedItemType) => void;
-  files: File[];
-};
-export const FileUploader = ({
-  addContent,
-  files,
-}: FileUploaderProps): JSX.Element => {
-  const { getInputProps, getRootProps, isDragActive, open } = useFileUploader({
-    addContent,
-    files,
-  });
+export const FileUploader = (): JSX.Element => {
+  const { getInputProps, getRootProps, isDragActive, open } = useFileUploader();
 
   const { t } = useTranslation(["translation", "upload"]);
 

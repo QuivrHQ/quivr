@@ -3,24 +3,23 @@
 import { FileRejection, useDropzone } from "react-dropzone";
 import { useTranslation } from "react-i18next";
 
+import { useKnowledgeContext } from "@/lib/context/KnowledgeProvider/hooks/useKnowledgeContext";
 import { useSupabase } from "@/lib/context/SupabaseProvider";
 import { useToast } from "@/lib/hooks";
 import { redirectToLogin } from "@/lib/router/redirectToLogin";
-import { SupportedFileExtensionsWithDot } from "@/lib/types/SupportedFileExtensions";
 import { useEventTracking } from "@/services/analytics/june/useEventTracking";
 
-import { FeedItemType } from "../../../../../../app/chat/[chatId]/components/ActionsBar/types";
-
-type UseFileUploaderProps = {
-  addContent: (content: FeedItemType) => void;
-  files: File[];
-};
+import { FeedItemUploadType } from "../../../../../../app/chat/[chatId]/components/ActionsBar/types";
+import { acceptedFormats } from "../helpers/acceptedFormats";
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-export const useFileUploader = ({
-  addContent,
-  files,
-}: UseFileUploaderProps) => {
+export const useFileUploader = () => {
+  const { knowledgeToFeed, addKnowledgeToFeed } = useKnowledgeContext();
+
+  const files: File[] = (
+    knowledgeToFeed.filter((c) => c.source === "upload") as FeedItemUploadType[]
+  ).map((c) => c.file);
+
   const { publish } = useToast();
   const { session } = useSupabase();
   const { track } = useEventTracking();
@@ -58,7 +57,7 @@ export const useFileUploader = ({
         });
       } else {
         void track("FILE_UPLOADED");
-        addContent({
+        addKnowledgeToFeed({
           source: "upload",
           file: file,
         });
@@ -66,37 +65,11 @@ export const useFileUploader = ({
     }
   };
 
-  const accept: Record<string, SupportedFileExtensionsWithDot[]> = {
-    "text/plain": [".txt"],
-    "text/csv": [".csv"],
-    "text/markdown": [".md", ".markdown"],
-    "audio/x-m4a": [".m4a"],
-    "audio/mpeg": [".mp3", ".mpga", ".mpeg"],
-    "audio/webm": [".webm"],
-    "video/mp4": [".mp4"],
-    "audio/wav": [".wav"],
-    "application/pdf": [".pdf"],
-    "text/html": [".html"],
-    "application/vnd.openxmlformats-officedocument.presentationml.presentation":
-      [".pptx"],
-    "application/vnd.openxmlformats-officedocument.wordprocessingml.document": [
-      ".docx",
-    ],
-    "application/vnd.oasis.opendocument.text": [".odt"],
-    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": [
-      ".xlsx",
-      ".xls",
-    ],
-    "application/epub+zip": [".epub"],
-    "application/x-ipynb+json": [".ipynb"],
-    "text/x-python": [".py"],
-  };
-
   const { getInputProps, getRootProps, isDragActive, open } = useDropzone({
     onDrop,
     noClick: true,
     maxSize: 100000000, // 1 MB
-    accept,
+    accept: acceptedFormats,
   });
 
   return {
