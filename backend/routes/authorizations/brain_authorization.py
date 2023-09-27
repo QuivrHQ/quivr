@@ -5,6 +5,8 @@ from auth.auth_bearer import get_current_user
 from fastapi import Depends, HTTPException, status
 from models import UserIdentity
 from repository.brain import get_brain_for_user
+from repository.brain.get_brain_details import get_brain_details
+
 from routes.authorizations.types import RoleEnum
 
 
@@ -43,6 +45,11 @@ def validate_brain_authorization(
     return: None
     """
 
+    brain = get_brain_details(brain_id)
+
+    if brain and brain.status == "public":
+        return
+
     if required_roles is None:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -52,7 +59,7 @@ def validate_brain_authorization(
     user_brain = get_brain_for_user(user_id, brain_id)
     if user_brain is None:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
+            status_code=status.HTTP_403_FORBIDDEN,
             detail="You don't have permission for this brain",
         )
 

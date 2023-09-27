@@ -1,6 +1,7 @@
 /* eslint-disable max-lines */
 import { UUID } from "crypto";
 import { useCallback, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 import { CreateBrainInput } from "@/lib/api/brain/types";
 import { useBrainApi } from "@/lib/api/brain/useBrainApi";
@@ -18,6 +19,7 @@ export const useBrainProvider = () => {
   const { createBrain, deleteBrain, getBrains, getDefaultBrain } =
     useBrainApi();
   const { getPublicPrompts } = usePromptApi();
+  const { t } = useTranslation(["delete_or_unsubscribe_from_brain"]);
 
   const [allBrains, setAllBrains] = useState<MinimalBrainForUser[]>([]);
   const [currentBrainId, setCurrentBrainId] = useState<null | UUID>(null);
@@ -31,41 +33,6 @@ export const useBrainProvider = () => {
   );
   const currentBrain = allBrains.find((brain) => brain.id === currentBrainId);
 
-  const createBrainHandler = useCallback(
-    async (brain: CreateBrainInput): Promise<UUID | undefined> => {
-      const createdBrain = await createBrain(brain);
-      try {
-        setAllBrains((prevBrains) => [...prevBrains, createdBrain]);
-        setCurrentBrainId(createdBrain.id);
-
-        void track("BRAIN_CREATED");
-
-        return createdBrain.id;
-      } catch {
-        publish({
-          variant: "danger",
-          text: "Error occurred while creating a brain",
-        });
-      }
-    },
-    [createBrain, publish, track]
-  );
-
-  const deleteBrainHandler = useCallback(
-    async (id: UUID) => {
-      await deleteBrain(id);
-      setAllBrains((prevBrains) =>
-        prevBrains.filter((brain) => brain.id !== id)
-      );
-      void track("DELETE_BRAIN");
-      publish({
-        variant: "success",
-        text: "Brain deleted",
-      });
-    },
-    [deleteBrain, publish, track]
-  );
-
   const fetchAllBrains = useCallback(async () => {
     setIsFetchingBrains(true);
     try {
@@ -77,6 +44,41 @@ export const useBrainProvider = () => {
       setIsFetchingBrains(false);
     }
   }, [getBrains]);
+
+  const createBrainHandler = useCallback(
+    async (brain: CreateBrainInput): Promise<UUID | undefined> => {
+      const createdBrain = await createBrain(brain);
+      try {
+        setCurrentBrainId(createdBrain.id);
+
+        void track("BRAIN_CREATED");
+        void fetchAllBrains();
+
+        return createdBrain.id;
+      } catch {
+        publish({
+          variant: "danger",
+          text: "Error occurred while creating a brain",
+        });
+      }
+    },
+    [createBrain, fetchAllBrains, publish, track]
+  );
+
+  const deleteBrainHandler = useCallback(
+    async (id: UUID) => {
+      await deleteBrain(id);
+      setAllBrains((prevBrains) =>
+        prevBrains.filter((brain) => brain.id !== id)
+      );
+      void track("DELETE_BRAIN");
+      publish({
+        variant: "success",
+        text: t("successfully_deleted"),
+      });
+    },
+    [deleteBrain, publish, track]
+  );
 
   const fetchDefaultBrain = useCallback(async () => {
     const userDefaultBrain = await getDefaultBrain();

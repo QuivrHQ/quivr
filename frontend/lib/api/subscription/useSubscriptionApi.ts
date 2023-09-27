@@ -6,6 +6,8 @@ import {
   acceptInvitation,
   declineInvitation,
   getInvitation,
+  subscribeToBrain,
+  unsubscribeFromBrain,
 } from "./subscription";
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
@@ -19,5 +21,9 @@ export const useSubscriptionApi = () => {
       declineInvitation(brainId, axiosInstance),
     getInvitation: async (brainId: UUID) =>
       getInvitation(brainId, axiosInstance),
+    subscribeToBrain: async (brainId: UUID) =>
+      subscribeToBrain(brainId, axiosInstance),
+    unsubscribeFromBrain: async (brainId: UUID) =>
+      unsubscribeFromBrain(brainId, axiosInstance),
   };
 };

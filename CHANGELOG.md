@@ -1,5 +1,69 @@
 # Changelog
 
+## 0.0.82 (2023-09-26)
+
+## What's Changed
+* fix(RBAC): skip validation for unplug by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1264
+
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.81...v0.0.82
+
+## 0.0.81 (2023-09-26)
+
+## What's Changed
+* feat: activate public brain subscription by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1241
+* feat(publicBrain): disable subscribe button when already subscribed and refetch brains list by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1246
+* feat: knowledge tab list by @gozineb in https://github.com/StanGirard/quivr/pull/1222
+* fix(preview): fixed a few bugs unchecked by @StanGirard in https://github.com/StanGirard/quivr/pull/1247
+* feat: add last_update field to brain table by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1252
+* fix: urls to avoid 307 by @gozineb in https://github.com/StanGirard/quivr/pull/1253
+* feat: allow user to unsubscribe from a brain by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1254
+* feat(user): 🚚 Move language and theme buttons to the User page by @matthieujacq in https://github.com/StanGirard/quivr/pull/1256
+* Update next.config.js by @riccardolinares in https://github.com/StanGirard/quivr/pull/1251
+* feat: allow setting public brain status to private by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1258
+
+## New Contributors
+* @matthieujacq made their first contribution in https://github.com/StanGirard/quivr/pull/1256
+* @riccardolinares made their first contribution in https://github.com/StanGirard/quivr/pull/1251
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.80...v0.0.81
+
+## 0.0.80 (2023-09-21)
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.79...v0.0.80
+
+## 0.0.79 (2023-09-21)
+
+## What's Changed
+* fix(gpt-3.5-instruct): bug and new version of node by @StanGirard in https://github.com/StanGirard/quivr/pull/1228
+* feat: display brain status on settings page by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1221
+* feat(upload): changed icons by @StanGirard in https://github.com/StanGirard/quivr/pull/1233
+* Feat/paperclip by @StanGirard in https://github.com/StanGirard/quivr/pull/1234
+* fix(brain_size): increased size by @StanGirard in https://github.com/StanGirard/quivr/pull/1235
+* feat(strapi): added first draft by @StanGirard in https://github.com/StanGirard/quivr/pull/1237
+* feat: add public brain page by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1230
+* feat: count public brains number of subscribers by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1236
+
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.78...v0.0.79
+
+## 0.0.78 (2023-09-20)
+
+## What's Changed
+* feat: add public brain creation by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1218
+* feat: get files from storage by @gozineb in https://github.com/StanGirard/quivr/pull/1205
+
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.77...v0.0.78
+
+## 0.0.77 (2023-09-19)
+
+## What's Changed
+* feat(memory): optimisation by @StanGirard in https://github.com/StanGirard/quivr/pull/1214
+
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.76...v0.0.77
+
 ## 0.0.76 (2023-09-19)
 
 ## What's Changed

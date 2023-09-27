@@ -4,6 +4,7 @@ from auth import AuthBearer, get_current_user
 from fastapi import APIRouter, Depends, HTTPException
 from logger import get_logger
 from models import UserIdentity, UserUsage
+from models.brain_entity import PublicBrain
 from models.databases.supabase.brains import (
     BrainQuestionRequest,
     BrainUpdatableProperties,
@@ -20,7 +21,10 @@ from repository.brain import (
     set_as_default_brain_for_user,
     update_brain_by_id,
 )
+from repository.brain.delete_brain_users import delete_brain_users
+from repository.brain.get_public_brains import get_public_brains
 from repository.prompt import delete_prompt_by_id, get_prompt_by_id
+
 from routes.authorizations.brain_authorization import has_brain_authorization
 from routes.authorizations.types import RoleEnum
 
@@ -31,7 +35,9 @@ brain_router = APIRouter()
 
 # get all brains
 @brain_router.get("/brains/", dependencies=[Depends(AuthBearer())], tags=["Brain"])
-async def brain_endpoint(current_user: UserIdentity = Depends(get_current_user)):
+async def brain_endpoint(
+    current_user: UserIdentity = Depends(get_current_user),
+):
     """
     Retrieve all brains for the current user.
 
@@ -43,6 +49,16 @@ async def brain_endpoint(current_user: UserIdentity = Depends(get_current_user))
     """
     brains = get_user_brains(current_user.id)
     return {"brains": brains}
+
+
+@brain_router.get(
+    "/brains/public", dependencies=[Depends(AuthBearer())], tags=["Brain"]
+)
+async def public_brains_endpoint() -> list[PublicBrain]:
+    """
+    Retrieve all Quivr public brains
+    """
+    return get_public_brains()
 
 
 # get default brain
@@ -167,27 +183,31 @@ async def create_brain_endpoint(
 )
 async def update_brain_endpoint(
     brain_id: UUID,
-    input_brain: BrainUpdatableProperties,
+    brain_to_update: BrainUpdatableProperties,
 ):
     """
     Update an existing brain with new brain configuration
     """
 
     # Remove prompt if it is private and no longer used by brain
-    if input_brain.prompt_id is None:
-        existing_brain = get_brain_details(brain_id)
-        if existing_brain is None:
-            raise HTTPException(
-                status_code=404,
-                detail="Brain not found",
-            )
+    existing_brain = get_brain_details(brain_id)
+    if existing_brain is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Brain not found",
+        )
+
+    if brain_to_update.prompt_id is None:
         prompt_id = existing_brain.prompt_id
         if prompt_id is not None:
             prompt = get_prompt_by_id(prompt_id)
             if prompt is not None and prompt.status == "private":
                 delete_prompt_by_id(prompt_id)
 
-    update_brain_by_id(brain_id, input_brain)
+    if brain_to_update.status == "private" and existing_brain.status == "public":
+        delete_brain_users(brain_id)
+
+    update_brain_by_id(brain_id, brain_to_update)
 
     return {"message": f"Brain {brain_id} has been updated."}
 

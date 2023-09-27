@@ -1,7 +1,6 @@
 import json
 from multiprocessing import get_logger
 
-from httpx import Response
 from langchain.pydantic_v1 import Field
 from langchain.schema import Document
 from models import get_supabase_client
@@ -10,7 +9,7 @@ from supabase.client import Client
 logger = get_logger()
 
 
-def upload_file_storage(file, file_identifier: str) -> Response:
+def upload_file_storage(file, file_identifier: str):
     supabase_client: Client = get_supabase_client()
     # res = supabase_client.storage.create_bucket("quivr")
     response = None
@@ -20,8 +19,7 @@ def upload_file_storage(file, file_identifier: str) -> Response:
         return response
     except Exception as e:
         logger.error(e)
-        print(e)
-        return response
+        raise e
 
 
 class DocumentSerializable(Document):

@@ -1,4 +1,3 @@
-/* eslint-disable */
 "use client";
 
 import { createContext, useState } from "react";
@@ -15,7 +14,11 @@ export const ChatsContext = createContext<ChatsContextType | undefined>(
   undefined
 );
 
-export const ChatsProvider = ({ children }: { children: React.ReactNode }) => {
+export const ChatsProvider = ({
+  children,
+}: {
+  children: React.ReactNode;
+}): JSX.Element => {
   const [allChats, setAllChats] = useState<ChatEntity[]>([]);
 
   return (

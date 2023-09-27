@@ -1,34 +1,21 @@
-/* eslint-disable */
 "use client";
-import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
+import { DarkModeToggle } from "@/app/user/components/DarkModeToggle";
+import { LanguageDropDown } from "@/app/user/components/LanguageDropDown";
 import Spinner from "@/lib/components/ui/Spinner";
-import { UserStats } from "@/lib/types/User";
-
-import { USER_DATA_KEY } from "@/lib/api/user/config";
-import { useUserApi } from "@/lib/api/user/useUserApi";
 import { useSupabase } from "@/lib/context/SupabaseProvider";
+import { useUserData } from "@/lib/hooks/useUserData";
 import { redirectToLogin } from "@/lib/router/redirectToLogin";
-import { useQuery } from "@tanstack/react-query";
+
 import { UserStatistics } from "./components/UserStatistics";
 
 const UserPage = (): JSX.Element => {
-  const [userStats, setUserStats] = useState<UserStats>();
   const { session } = useSupabase();
   const { t } = useTranslation(["translation", "user"]);
-  const { getUser } = useUserApi();
 
-  const { data: userData } = useQuery({
-    queryKey: [USER_DATA_KEY],
-    queryFn: getUser,
-  });
+  const { userData: userStats } = useUserData();
 
-  useEffect(() => {
-    if (userData !== undefined) {
-      setUserStats(userData);
-    }
-  }, [userData]);
   if (session === null) {
     redirectToLogin();
   }
@@ -36,6 +23,10 @@ const UserPage = (): JSX.Element => {
   return (
     <main className="w-full flex flex-col pt-10">
       <section className="flex flex-col justify-center items-center flex-1 gap-5 h-full">
+        <div className="flex sm:flex-1 sm:justify-end flex-row items-center justify-center sm:flex-row gap-5 sm:gap-2">
+          <LanguageDropDown />
+          <DarkModeToggle />
+        </div>
         <div className="p-5 max-w-3xl w-full min-h-full flex-1 mb-24">
           {userStats ? (
             <>

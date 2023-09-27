@@ -2,7 +2,7 @@
     "title": "Upload Knowledge",
     "subtitle": "Text, document, spreadsheet, presentation, audio, video, and URLs supported",
     "drop": "Drop the files here...",
-    "dragAndDrop": "Drag and drop files here, or click to browse",
+    "dragAndDrop": "Drag and drop files here, or click to browse \n (pdf, csv, Doc, Word, Txt, XIs)",
     "webSite": "Insert website URL",
     "success": "File uploaded successfully",
     "uploadFailed": "Failed to upload file: {{message}}",

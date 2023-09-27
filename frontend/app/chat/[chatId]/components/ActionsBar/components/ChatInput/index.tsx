@@ -1,7 +1,8 @@
 /* eslint-disable */
 "use client";
 import { useTranslation } from "react-i18next";
-import { MdAddCircle, MdSend } from "react-icons/md";
+import { MdSend } from "react-icons/md";
+import { PiPaperclipFill } from "react-icons/pi";
 
 import Button from "@/lib/components/ui/Button";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
@@ -24,7 +25,7 @@ export const ChatInput = ({
   setShouldDisplayUploadCard,
   hasContentToFeedBrain,
 }: ChatInputProps): JSX.Element => {
-  const { setMessage, submitQuestion, chatId, generatingAnswer, message } =
+  const { setMessage, submitQuestion, generatingAnswer, message } =
     useChatInput();
   const { t } = useTranslation(["chat"]);
   const { currentBrainId } = useBrainContext();
@@ -49,7 +50,7 @@ export const ChatInput = ({
           onClick={() => setShouldDisplayUploadCard(true)}
           tooltip={t("add_content_card_button_tooltip")}
         >
-          <MdAddCircle className="text-3xl" />
+          <PiPaperclipFill className="text-3xl" />
         </Button>
       )}
 
@@ -79,7 +80,7 @@ export const ChatInput = ({
           <>
             {isEmptyMessage ? (
               <div className="md:hidden flex items-center">
-                <ConfigModal chatId={chatId} />
+                <ConfigModal />
               </div>
             ) : (
               <Button
@@ -94,7 +95,7 @@ export const ChatInput = ({
               </Button>
             )}
             <div className="hidden md:flex items-center">
-              <ConfigModal chatId={chatId} />
+              <ConfigModal />
             </div>
           </>
         )}

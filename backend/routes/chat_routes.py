@@ -35,6 +35,11 @@ from repository.chat.get_chat_history_with_notifications import (
 from repository.notification.remove_chat_notifications import remove_chat_notifications
 from repository.user_identity import get_user_identity
 
+from routes.authorizations.brain_authorization import (
+    validate_brain_authorization,
+)
+from routes.authorizations.types import RoleEnum
+
 chat_router = APIRouter()
 
 
@@ -182,7 +187,21 @@ async def create_question_handler(
     """
     Add a new question to the chat.
     """
+    if brain_id:
+        validate_brain_authorization(
+            brain_id=brain_id,
+            user_id=current_user.id,
+            required_roles=[RoleEnum.Viewer, RoleEnum.Editor, RoleEnum.Owner],
+        )
+
     # Retrieve user's OpenAI API key
+    if brain_id:
+        validate_brain_authorization(
+            brain_id=brain_id,
+            user_id=current_user.id,
+            required_roles=[RoleEnum.Viewer, RoleEnum.Editor, RoleEnum.Owner],
+        )
+
     current_user.openai_api_key = request.headers.get("Openai-Api-Key")
     brain = Brain(id=brain_id)
     brain_details: BrainEntity | None = None
@@ -267,7 +286,12 @@ async def create_stream_question_handler(
     | None = Query(..., description="The ID of the brain"),
     current_user: UserIdentity = Depends(get_current_user),
 ) -> StreamingResponse:
-    # TODO: check if the user has access to the brain
+    if brain_id:
+        validate_brain_authorization(
+            brain_id=brain_id,
+            user_id=current_user.id,
+            required_roles=[RoleEnum.Viewer, RoleEnum.Editor, RoleEnum.Owner],
+        )
 
     # Retrieve user's OpenAI API key
     current_user.openai_api_key = request.headers.get("Openai-Api-Key")
