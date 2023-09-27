@@ -3,14 +3,16 @@ import { AiOutlineLoading3Quarters } from "react-icons/ai";
 
 import { ChatInput, KnowledgeToFeed } from "./components";
 import { useActionBar } from "./hooks/useActionBar";
+type ActionBarProps = {
+  setShouldDisplayUploadCard: (shouldDisplay: boolean) => void;
+  shouldDisplayUploadCard: boolean;
+};
 
-export const ActionsBar = (): JSX.Element => {
-  const {
-    shouldDisplayUploadCard,
-    setShouldDisplayUploadCard,
-    hasPendingRequests,
-    setHasPendingRequests,
-  } = useActionBar();
+export const ActionsBar = ({
+  setShouldDisplayUploadCard,
+  shouldDisplayUploadCard,
+}: ActionBarProps): JSX.Element => {
+  const { hasPendingRequests, setHasPendingRequests } = useActionBar();
 
   const { t } = useTranslation(["chat"]);
 

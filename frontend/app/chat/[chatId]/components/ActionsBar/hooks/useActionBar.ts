@@ -6,8 +6,6 @@ import { checkIfHasPendingRequest } from "../utils/checkIfHasPendingRequest";
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const useActionBar = () => {
-  const [shouldDisplayUploadCard, setShouldDisplayUploadCard] = useState(false);
-
   const [hasPendingRequests, setHasPendingRequests] = useState(false);
   const { notifications } = useChatContext();
 
@@ -16,8 +14,6 @@ export const useActionBar = () => {
   }, [notifications]);
 
   return {
-    shouldDisplayUploadCard,
-    setShouldDisplayUploadCard,
     hasPendingRequests,
     setHasPendingRequests,
   };
