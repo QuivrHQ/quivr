@@ -1,4 +1,3 @@
-/* eslint-disable */
 "use client";
 import { useTranslation } from "react-i18next";
 import { PiPaperclipFill } from "react-icons/pi";
