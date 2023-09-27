@@ -51,7 +51,7 @@ export const ChatsList = (): JSX.Element => {
             setOpen(false);
           }
         }}
-        className="flex flex-col lg:sticky fixed top-16 left-0 bottom-0 lg:h-[90vh] overflow-visible z-30 border-r border-black/10 dark:border-white/25 bg-white dark:bg-black"
+        className="flex flex-col lg:sticky fixed top-0 left-0 bottom-0 lg:h-[100vh] overflow-visible z-30 border-r border-black/10 dark:border-white/25 bg-white dark:bg-black"
       >
         <motion.div
           animate={{
