@@ -1,19 +1,15 @@
-/* eslint-disable max-lines */
-
 import { FileRejection, useDropzone } from "react-dropzone";
 import { useTranslation } from "react-i18next";
 
-import { useKnowledgeContext } from "@/lib/context/KnowledgeProvider/hooks/useKnowledgeContext";
-import { useSupabase } from "@/lib/context/SupabaseProvider";
-import { useToast } from "@/lib/hooks";
-import { redirectToLogin } from "@/lib/router/redirectToLogin";
+import { FeedItemUploadType } from "@/app/chat/[chatId]/components/ActionsBar/types";
 import { useEventTracking } from "@/services/analytics/june/useEventTracking";
 
-import { FeedItemUploadType } from "../../../../../../app/chat/[chatId]/components/ActionsBar/types";
+import { useToast } from "./useToast";
+import { useKnowledgeContext } from "../context/KnowledgeProvider/hooks/useKnowledgeContext";
 import { acceptedFormats } from "../helpers/acceptedFormats";
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-export const useFileUploader = () => {
+export const useCustomDropzone = () => {
   const { knowledgeToFeed, addKnowledgeToFeed } = useKnowledgeContext();
 
   const files: File[] = (
@@ -21,12 +17,7 @@ export const useFileUploader = () => {
   ).map((c) => c.file);
 
   const { publish } = useToast();
-  const { session } = useSupabase();
   const { track } = useEventTracking();
-
-  if (session === null) {
-    redirectToLogin();
-  }
 
   const { t } = useTranslation(["upload"]);
 

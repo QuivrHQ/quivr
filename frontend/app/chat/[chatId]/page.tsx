@@ -1,5 +1,7 @@
 "use client";
 
+import { useCustomDropzone } from "@/lib/hooks/useDropzone";
+
 import { ActionsBar } from "./components/ActionsBar";
 import { ChatDialogueArea } from "./components/ChatDialogueArea/ChatDialogue";
 import { ChatHeader } from "./components/ChatHeader";
@@ -8,11 +10,13 @@ import { useSelectedChatPage } from "./hooks/useSelectedChatPage";
 const SelectedChatPage = (): JSX.Element => {
   const { setShouldDisplayUploadCard, shouldDisplayUploadCard } =
     useSelectedChatPage();
+  const { getRootProps } = useCustomDropzone();
 
   return (
     <main
       className="flex flex-col w-full h-[calc(100vh-61px)] overflow-hidden"
       data-testid="chat-page"
+      {...getRootProps()}
     >
       <section className="flex flex-col flex-1 items-center w-full h-full overflow-y-auto">
         <ChatHeader />
