@@ -2,7 +2,6 @@
     "addFiles": "Por favor, agregar archivos a subir",
     "alreadyAdded": "{{fileName}} ya fue agregado",
     "crawlFailed": "Error al rastrear sitio web: {{message}}",
-    "dragAndDrop": "Arrastre y suelte archivos aquí o click para buscar",
     "drop": "Suelte los archivos aquí...",
     "uploadFailed": "Error al subir archivo: {{message}}",
     "invalidUrl": "URL inválido",
@@ -15,5 +14,7 @@
     "success": "Archivo subido correctamente",
     "title": "Subir conocimiento",
     "webSite": "Ingrese la URL del sitio web",
-    "invalidFileType": "Tipo de archivo no permitido"
+    "invalidFileType": "Tipo de archivo no permitido",
+    "feed_form_submit_button": "Enviar a mi cerebro",
+    "selected_brain_select_label": "Cerebro seleccionado"
 }

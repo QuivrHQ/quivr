@@ -6,7 +6,7 @@ import Button from "@/lib/components/ui/Button";
 import Field from "@/lib/components/ui/Field";
 
 import { useCrawler } from "./hooks/useCrawler";
-import { FeedItemType } from "../../../../types";
+import { FeedItemType } from "../../../../../app/chat/[chatId]/components/ActionsBar/types";
 
 type CrawlerProps = {
   addContent: (content: FeedItemType) => void;

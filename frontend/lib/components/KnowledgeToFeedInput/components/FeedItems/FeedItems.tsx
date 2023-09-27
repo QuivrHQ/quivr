@@ -2,7 +2,7 @@ import { Fragment } from "react";
 
 import { CrawlFeedItem } from "./components/CrawlFeedItem";
 import { FileFeedItem } from "./components/FileFeedItem/FileFeedItem";
-import { FeedItemType } from "../../../../types";
+import { FeedItemType } from "../../../../../app/chat/[chatId]/components/ActionsBar/types";
 
 type FeedItemsProps = {
   contents: FeedItemType[];
@@ -18,7 +18,7 @@ export const FeedItems = ({
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4 mt-1 bg-white p-6">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mt-1 bg-white p-6 overflow-scroll">
       {contents.map((item, index) =>
         item.source === "crawl" ? (
           <CrawlFeedItem
