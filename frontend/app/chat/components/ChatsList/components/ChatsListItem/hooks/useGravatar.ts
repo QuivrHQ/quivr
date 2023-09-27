@@ -7,7 +7,7 @@ import { useSupabase } from "@/lib/context/SupabaseProvider";
 // The most basic image request URL looks like this:
 // https://www.gravatar.com/avatar/HASH
 
-const computeGravatarUrl = (email = "") => {
+const computeGravatarUrl = (email?: string) => {
   const hash = createHash("md5")
     .update(typeof email === "string" ? email.trim().toLowerCase() : "")
     .digest("hex");
