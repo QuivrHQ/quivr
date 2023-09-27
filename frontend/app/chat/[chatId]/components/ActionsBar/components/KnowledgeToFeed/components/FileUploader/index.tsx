@@ -4,8 +4,8 @@ import { IoCloudUploadOutline } from "react-icons/io5";
 
 import Card from "@/lib/components/ui/Card";
 
-import { FeedItemType } from "../../../../types";
 import { useFileUploader } from "./hooks/useFileUploader";
+import { FeedItemType } from "../../../../types";
 
 type FileUploaderProps = {
   addContent: (content: FeedItemType) => void;
