@@ -21,6 +21,7 @@
   "email": "Email",
   "password": "Senha",
   "or": "ou",
+  "and": "e",
   "loginButton": "Entrar",
   "signUpButton": "Cadastre-se",
   "logoutButton": "Sair",

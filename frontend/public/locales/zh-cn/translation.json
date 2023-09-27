@@ -21,6 +21,7 @@
   "email": "Email",
   "password": "密码",
   "or": "或",
+  "and": "和",
   "loginButton": "登录",
   "signUpButton": "注册",
   "logoutButton": "注销",

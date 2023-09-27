@@ -25,12 +25,12 @@ export const FileUploader = ({
   return (
     <section
       {...getRootProps()}
-      className="w-full outline-none flex flex-col gap-10 items-center justify-center px-6 py-3"
+      className="w-full outline-none flex flex-col gap-10 items-center justify-center px-0"
     >
-      <div className="flex flex-col sm:flex-row max-w-3xl w-full items-center gap-5 mt-5 cursor-pointer">
+      <div className="flex flex-col sm:flex-row max-w-3xl w-full items-center gap-5 cursor-pointer">
         <div className="flex-1 w-full">
           <Card
-            className="h-24 flex justify-center items-center"
+            className="h-20 flex justify-center items-center"
             onClick={open}
           >
             <IoCloudUploadOutline className="text-5xl" />

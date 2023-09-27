@@ -2,6 +2,7 @@
 import { BsCheckCircleFill } from "react-icons/bs";
 
 import Popover from "@/lib/components/ui/Popover";
+import { cn } from "@/lib/utils";
 
 export type SelectOptionProps<T> = {
   label: string;
@@ -14,6 +15,8 @@ type SelectProps<T> = {
   onChange: (option: T) => void;
   label?: string;
   readOnly?: boolean;
+  className?: string;
+  emptyLabel?: string;
 };
 
 const selectedStyle = "rounded-lg bg-black text-white";
@@ -24,6 +27,8 @@ export const Select = <T extends string | number>({
   value,
   label,
   readOnly = false,
+  className,
+  emptyLabel,
 }: SelectProps<T>): JSX.Element => {
   const selectedValueLabel = options.find(
     (option) => option.value === value
@@ -31,11 +36,11 @@ export const Select = <T extends string | number>({
 
   if (readOnly) {
     return (
-      <div>
+      <div className={cn("gap-2", className)}>
         {label !== undefined && (
           <label
             id="listbox-label"
-            className="block text-sm font-medium leading-6 text-gray-900 mb-2"
+            className="block text-sm font-medium leading-6 text-gray-900"
           >
             {label}
           </label>
@@ -49,7 +54,7 @@ export const Select = <T extends string | number>({
           >
             <span className="flex items-center">
               <span className="mx-4 block truncate">
-                {selectedValueLabel ?? label ?? "Select"}
+                {selectedValueLabel ?? emptyLabel ?? "-"}
               </span>
             </span>
           </button>
@@ -59,11 +64,11 @@ export const Select = <T extends string | number>({
   }
 
   return (
-    <div>
+    <div className={cn("gap-2", className)}>
       {label !== undefined && (
         <label
           id="listbox-label"
-          className="block text-sm font-medium leading-6 text-gray-900 mb-2"
+          className="block text-sm font-medium leading-6 text-gray-900"
         >
           {label}
         </label>
@@ -78,7 +83,7 @@ export const Select = <T extends string | number>({
             >
               <span className="flex items-center">
                 <span className="ml-3 block truncate">
-                  {selectedValueLabel ?? label ?? "Select"}
+                  {selectedValueLabel ?? emptyLabel ?? "-"}
                 </span>
               </span>
               <span className="pointer-events-none absolute inset-y-0 right-0 ml-3 flex items-center pr-2">

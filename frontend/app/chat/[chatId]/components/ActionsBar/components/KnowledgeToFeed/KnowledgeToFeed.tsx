@@ -49,6 +49,7 @@ export const KnowledgeToFeed = ({
           onChange={(newSelectedBrainId) =>
             setCurrentBrainId(newSelectedBrainId)
           }
+          className="flex flex-row items-center"
         />
       </div>
       <KnowledgeToFeedInput

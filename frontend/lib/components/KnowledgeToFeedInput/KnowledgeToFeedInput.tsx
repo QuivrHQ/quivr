@@ -1,7 +1,6 @@
 import { useTranslation } from "react-i18next";
 
 import Button from "@/lib/components/ui/Button";
-import { Divider } from "@/lib/components/ui/Divider";
 
 import { FeedItems } from "./components";
 import { Crawler } from "./components/Crawler";
@@ -31,10 +30,16 @@ export const KnowledgeToFeedInput = ({
 
   return (
     <>
-      <FileUploader addContent={addContent} files={files} />
-      <Divider text={t("or", { ns: "translation" })} className="m-5" />
-      <Crawler addContent={addContent} />
-      <FeedItems contents={contents} removeContent={removeContent} />
+      <div className="flex flex-row gap-10 justify-between px-20 items-center mt-5">
+        <FileUploader addContent={addContent} files={files} />
+        <span className="whitespace-nowrap	">
+          {`${t("and", { ns: "translation" })} / ${t("or", {
+            ns: "translation",
+          })}`}
+        </span>
+        <Crawler addContent={addContent} />
+        <FeedItems contents={contents} removeContent={removeContent} />
+      </div>
       <div className="flex justify-center mt-5">
         <Button
           disabled={contents.length === 0}
