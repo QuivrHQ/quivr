@@ -27,7 +27,7 @@ export const FileUploader = ({
       {...getRootProps()}
       className="w-full outline-none flex flex-col gap-10 items-center justify-center px-6 py-3"
     >
-      <div className="flex flex-col sm:flex-row max-w-3xl w-full items-center gap-5 mt-5">
+      <div className="flex flex-col sm:flex-row max-w-3xl w-full items-center gap-5 mt-5 cursor-pointer">
         <div className="flex-1 w-full">
           <Card
             className="h-24 flex justify-center items-center"
