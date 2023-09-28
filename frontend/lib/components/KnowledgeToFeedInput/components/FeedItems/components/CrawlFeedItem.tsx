@@ -19,7 +19,7 @@ export const CrawlFeedItem = ({
           <MdLink className="mr-2 text-2xl" />
         </div>
         <div className="flex flex-1">
-          <FeedTitleDisplayer title={url} />
+          <FeedTitleDisplayer title={url} isUrl />
         </div>
       </div>
       <div>

@@ -21,7 +21,7 @@ export const FileFeedItem = ({
       <div className="flex flex-1 overflow-hidden items-center gap-1">
         <div>{icon}</div>
         <div className="flex flex-1">
-          <FeedTitleDisplayer title={file.name} truncate />
+          <FeedTitleDisplayer title={file.name} />
         </div>
       </div>
       <div>
