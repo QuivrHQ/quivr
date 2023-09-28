@@ -16,5 +16,5 @@
     "missingNecessaryRole": "您没有所选大脑的上传权限。 🧠💡🥲",
     "invalidFileType": "文件类型不受支持",
     "feed_form_submit_button":"发送到我的大脑",
-    "selected_brain_select_label": "已选择的大脑"
+    "selected_brain_select_label": "选择一个大脑"
 }

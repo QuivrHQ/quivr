@@ -47,10 +47,10 @@ export const KnowledgeToFeed = ({
       </div>
       <div className="flex justify-center">
         <Select
-          label={t("selected_brain_select_label")}
           options={formatMinimalBrainsToSelectComponentInput(
             brainsWithUploadRights
           )}
+          emptyLabel={t("selected_brain_select_label")}
           value={currentBrainId ?? undefined}
           onChange={(newSelectedBrainId) =>
             setCurrentBrainId(newSelectedBrainId)
