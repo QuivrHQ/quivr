@@ -107,19 +107,7 @@ export const useKnowledgeToFeedInput = () => {
 export const useFeedBrainInChat = ({
   dispatchHasPendingRequests,
   closeFeedInput,
-  uploadFileHandler,
-  crawlWebsiteHandler,
 }: {
-  uploadFileHandler?: (
-    file: File,
-    brainId: UUID,
-    chat_id: UUID
-  ) => Promise<void>;
-  crawlWebsiteHandler?: (
-    url: string,
-    brainId: UUID,
-    chat_id: UUID
-  ) => Promise<void>;
   dispatchHasPendingRequests?: () => void;
   closeFeedInput?: () => void;
 }) => {
@@ -141,6 +129,8 @@ export const useFeedBrainInChat = ({
     const fetchedNotifications = await getChatNotifications(currentChatId);
     setNotifications(fetchedNotifications);
   };
+
+  const { crawlWebsiteHandler, uploadFileHandler } = useKnowledgeToFeedInput();
 
   const files: File[] = (
     knowledgeToFeed.filter((c) => c.source === "upload") as FeedItemUploadType[]
@@ -203,6 +193,5 @@ export const useFeedBrainInChat = ({
   return {
     feedBrain,
     hasPendingRequests,
-    setHasPendingRequests,
   };
 };

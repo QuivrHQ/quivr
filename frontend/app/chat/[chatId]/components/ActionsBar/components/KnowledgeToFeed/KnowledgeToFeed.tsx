@@ -4,6 +4,7 @@ import { MdClose } from "react-icons/md";
 
 import { AddBrainModal } from "@/lib/components/AddBrainModal";
 import { KnowledgeToFeedInput } from "@/lib/components/KnowledgeToFeedInput";
+import { useFeedBrainInChat } from "@/lib/components/KnowledgeToFeedInput/hooks/useKnowledgeToFeedInput.ts";
 import Button from "@/lib/components/ui/Button";
 import { Select } from "@/lib/components/ui/Select";
 import { requiredRolesForUpload } from "@/lib/config/upload";
@@ -29,6 +30,11 @@ export const KnowledgeToFeed = ({
     [allBrains]
   );
 
+  const { feedBrain } = useFeedBrainInChat({
+    dispatchHasPendingRequests,
+    closeFeedInput,
+  });
+
   return (
     <div className="flex-col w-full relative">
       <div className="flex flex-1 justify-between">
@@ -52,10 +58,7 @@ export const KnowledgeToFeed = ({
           className="flex flex-row items-center"
         />
       </div>
-      <KnowledgeToFeedInput
-        dispatchHasPendingRequests={dispatchHasPendingRequests}
-        closeFeedInput={closeFeedInput}
-      />
+      <KnowledgeToFeedInput feedBrain={() => void feedBrain()} />
     </div>
   );
 };

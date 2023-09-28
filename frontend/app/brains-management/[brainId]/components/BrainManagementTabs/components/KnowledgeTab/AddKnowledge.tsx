@@ -1,18 +1,16 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useTranslation } from "react-i18next";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
 
 import { KnowledgeToFeedInput } from "@/lib/components/KnowledgeToFeedInput";
+import { useFeedBrainInChat } from "@/lib/components/KnowledgeToFeedInput/hooks/useKnowledgeToFeedInput.ts";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 
 import { useKnowledge } from "./hooks/useKnowledge";
 
 export const AddKnowledge = (): JSX.Element => {
-  const { t } = useTranslation(["knowledge"]);
-
-  const [shouldDiplayModal, setShouldDisplayModal] = useState(false);
+  const [shouldDisplayModal, setShouldDisplayModal] = useState(false);
   const [hasPendingRequests, setHasPendingRequests] = useState(false);
   const { currentBrain } = useBrainContext();
   const { invalidateKnowledgeDataKey } = useKnowledge({
@@ -24,6 +22,11 @@ export const AddKnowledge = (): JSX.Element => {
       invalidateKnowledgeDataKey();
     }
   }, [hasPendingRequests, invalidateKnowledgeDataKey]);
+
+  const { feedBrain } = useFeedBrainInChat({
+    dispatchHasPendingRequests: () => setHasPendingRequests(true),
+    closeFeedInput: () => setShouldDisplayModal(false),
+  });
 
   return (
     <>
@@ -40,11 +43,8 @@ export const AddKnowledge = (): JSX.Element => {
           <AiOutlineLoading3Quarters className="animate-spin text-2xl md:text-3xl self-center" />
         </div>
       )}
-      {shouldDiplayModal && (
-        <KnowledgeToFeedInput
-          closeFeedInput={() => setShouldDisplayModal(false)}
-          dispatchHasPendingRequests={() => setHasPendingRequests(true)}
-        />
+      {shouldDisplayModal && (
+        <KnowledgeToFeedInput feedBrain={() => void feedBrain()} />
       )}
     </>
   );
