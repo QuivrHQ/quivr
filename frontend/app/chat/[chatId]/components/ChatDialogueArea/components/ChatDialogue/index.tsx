@@ -22,6 +22,7 @@ export const ChatDialogue = ({
         flexDirection: "column",
         flex: 1,
         overflowY: "auto",
+        marginBottom: 10,
       }}
       ref={chatListRef}
     >
