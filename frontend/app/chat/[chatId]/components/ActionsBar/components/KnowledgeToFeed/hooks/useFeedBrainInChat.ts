@@ -16,14 +16,13 @@ import { FeedItemCrawlType, FeedItemUploadType } from "../../../types";
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const useFeedBrainInChat = ({
   dispatchHasPendingRequests,
-  closeFeedInput,
 }: {
-  dispatchHasPendingRequests?: () => void;
-  closeFeedInput?: () => void;
+  dispatchHasPendingRequests: () => void;
 }) => {
   const { publish } = useToast();
   const { t } = useTranslation(["upload"]);
   const router = useRouter();
+  const { setShouldDisplayUploadCard } = useKnowledgeToFeedContext();
 
   const { currentBrainId } = useBrainContext();
   const { setKnowledgeToFeed, knowledgeToFeed } = useKnowledgeToFeedContext();
@@ -62,8 +61,8 @@ export const useFeedBrainInChat = ({
       return;
     }
     try {
-      dispatchHasPendingRequests?.();
-      closeFeedInput?.();
+      dispatchHasPendingRequests();
+      setShouldDisplayUploadCard(false);
       setHasPendingRequests(true);
       const currentChatId = chatId ?? (await createChat("New Chat")).chat_id;
       const uploadPromises = files.map((file) =>

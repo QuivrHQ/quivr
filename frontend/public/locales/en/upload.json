@@ -6,7 +6,7 @@
     "success": "File uploaded successfully",
     "uploadFailed": "Failed to upload file: {{message}}",
     "maxSizeError": "File too big",
-    "alreadyAdded": "{{fileName}} was already added",
+    "alreadyAdded": "{{fileName}} was already added but not sent to your brain",
     "addFiles": "Please, add files to upload",
     "selectBrain": "Please, select or create a brain to upload a file",
     "invalidUrl": "Invalid URL",

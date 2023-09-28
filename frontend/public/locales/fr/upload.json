@@ -6,7 +6,7 @@
     "success": "Fichier téléchargé avec succès",
     "uploadFailed": "Échec du téléchargement du fichier : {{message}}",
     "maxSizeError": "Fichier trop volumineux",
-    "alreadyAdded": "{{fileName}} a déjà été ajouté",
+    "alreadyAdded": "{{fileName}} a déjà été ajouté mais n'a pas été envoyé à votre cerveau.",
     "addFiles": "Veuillez ajouter des fichiers à télécharger",
     "selectBrain": "Veuillez sélectionner ou créer un cerveau pour télécharger un fichier",
     "invalidUrl": "URL invalide",

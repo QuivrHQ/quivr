@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { PiPaperclipFill } from "react-icons/pi";
 
 import Button from "@/lib/components/ui/Button";
+import { useKnowledgeToFeedContext } from "@/lib/context/KnowledgeToFeedProvider/hooks/useKnowledgeToFeedContext";
 
 import { ChatBar } from "./components/ChatBar/ChatBar";
 import { ConfigModal } from "./components/ConfigModal";
@@ -10,16 +11,16 @@ import { useChatInput } from "./hooks/useChatInput";
 
 type ChatInputProps = {
   shouldDisplayUploadCard: boolean;
-  setShouldDisplayUploadCard: (shouldDisplayUploadCard: boolean) => void;
 };
 
 export const ChatInput = ({
   shouldDisplayUploadCard,
-  setShouldDisplayUploadCard,
 }: ChatInputProps): JSX.Element => {
   const { setMessage, submitQuestion, generatingAnswer, message } =
     useChatInput();
   const { t } = useTranslation(["chat"]);
+
+  const { setShouldDisplayUploadCard } = useKnowledgeToFeedContext();
 
   return (
     <form

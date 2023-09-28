@@ -1,16 +1,15 @@
 "use client";
 
+import { useKnowledgeToFeedContext } from "@/lib/context/KnowledgeToFeedProvider/hooks/useKnowledgeToFeedContext";
 import { useCustomDropzone } from "@/lib/hooks/useDropzone";
 
 import { ActionsBar } from "./components/ActionsBar";
 import { ChatDialogueArea } from "./components/ChatDialogueArea/ChatDialogue";
 import { ChatHeader } from "./components/ChatHeader";
-import { useSelectedChatPage } from "./hooks/useSelectedChatPage";
 
 const SelectedChatPage = (): JSX.Element => {
-  const { setShouldDisplayUploadCard, shouldDisplayUploadCard } =
-    useSelectedChatPage();
   const { getRootProps } = useCustomDropzone();
+  const { shouldDisplayUploadCard } = useKnowledgeToFeedContext();
 
   return (
     <main
@@ -28,10 +27,7 @@ const SelectedChatPage = (): JSX.Element => {
           <div className="flex flex-1 flex-col overflow-y-auto">
             <ChatDialogueArea />
           </div>
-          <ActionsBar
-            setShouldDisplayUploadCard={setShouldDisplayUploadCard}
-            shouldDisplayUploadCard={shouldDisplayUploadCard}
-          />
+          <ActionsBar />
         </div>
       </section>
     </main>

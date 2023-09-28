@@ -6,7 +6,7 @@
     "success": "文件上传成功",
     "uploadFailed": "上传文件失败：{{message}}",
     "maxSizeError": "文件太大",
-    "alreadyAdded": "已添加 {{filename}}",
+    "alreadyAdded":  "{{fileName}} 已经添加，但尚未发送到您的大脑。",
     "addFiles": "请添加要上传的文件",
     "selectBrain": "请选择或创建一个大脑来上传文件。",
     "invalidUrl": "无效的URL",
