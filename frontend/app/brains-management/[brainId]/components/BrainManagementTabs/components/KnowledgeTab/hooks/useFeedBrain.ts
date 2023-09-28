@@ -1,5 +1,3 @@
-import { UUID } from "crypto";
-import { useParams } from "next/navigation";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -28,9 +26,7 @@ export const useFeedBrain = ({
   const { setKnowledgeToFeed, knowledgeToFeed } = useKnowledgeContext();
   const [hasPendingRequests, setHasPendingRequests] = useState(false);
 
-  const { createChat } = useChatApi();
-  const params = useParams();
-  const chatId = params?.chatId as UUID | undefined;
+  const { createChat, deleteChat } = useChatApi();
 
   const { crawlWebsiteHandler, uploadFileHandler } = useKnowledgeToFeedInput();
 
@@ -61,11 +57,13 @@ export const useFeedBrain = ({
       return;
     }
 
+    //TODO: Modify backend archi to avoid creating a chat for each feed action
+    const currentChatId = (await createChat("New Chat")).chat_id;
+
     try {
       dispatchHasPendingRequests?.();
       closeFeedInput?.();
       setHasPendingRequests(true);
-      const currentChatId = chatId ?? (await createChat("New Chat")).chat_id;
       const uploadPromises = files.map((file) =>
         uploadFileHandler(file, currentBrainId, currentChatId)
       );
@@ -83,6 +81,7 @@ export const useFeedBrain = ({
       });
     } finally {
       setHasPendingRequests(false);
+      await deleteChat(currentChatId);
     }
   };
 
