@@ -1,28 +1,20 @@
 import { useTranslation } from "react-i18next";
 
 import Button from "@/lib/components/ui/Button";
-import { useKnowledgeContext } from "@/lib/context/KnowledgeProvider/hooks/useKnowledgeContext";
+import { useKnowledgeToFeedContext } from "@/lib/context/KnowledgeToFeedProvider/hooks/useKnowledgeToFeedContext";
 
 import { FeedItems } from "./components";
 import { Crawler } from "./components/Crawler";
 import { FileUploader } from "./components/FileUploader";
-import { useKnowledgeToFeedInput } from "./hooks/useKnowledgeToFeedInput.ts";
-
-type KnowledgeToFeedInputProps = {
-  dispatchHasPendingRequests?: () => void;
-  closeFeedInput?: () => void;
-};
 
 export const KnowledgeToFeedInput = ({
-  dispatchHasPendingRequests,
-  closeFeedInput,
-}: KnowledgeToFeedInputProps): JSX.Element => {
+  feedBrain,
+}: {
+  feedBrain: () => void;
+}): JSX.Element => {
   const { t } = useTranslation(["translation", "upload"]);
-  const { feedBrain } = useKnowledgeToFeedInput({
-    dispatchHasPendingRequests,
-    closeFeedInput,
-  });
-  const { knowledgeToFeed } = useKnowledgeContext();
+
+  const { knowledgeToFeed } = useKnowledgeToFeedContext();
 
   return (
     <div className="px-20">

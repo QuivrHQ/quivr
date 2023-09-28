@@ -4,13 +4,14 @@ import { useTranslation } from "react-i18next";
 import { FeedItemUploadType } from "@/app/chat/[chatId]/components/ActionsBar/types";
 import { useEventTracking } from "@/services/analytics/june/useEventTracking";
 
+
 import { useToast } from "./useToast";
-import { useKnowledgeContext } from "../context/KnowledgeProvider/hooks/useKnowledgeContext";
+import { useKnowledgeToFeedContext } from "../context/KnowledgeToFeedProvider/hooks/useKnowledgeToFeedContext";
 import { acceptedFormats } from "../helpers/acceptedFormats";
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const useCustomDropzone = () => {
-  const { knowledgeToFeed, addKnowledgeToFeed } = useKnowledgeContext();
+  const { knowledgeToFeed, addKnowledgeToFeed } = useKnowledgeToFeedContext();
 
   const files: File[] = (
     knowledgeToFeed.filter((c) => c.source === "upload") as FeedItemUploadType[]

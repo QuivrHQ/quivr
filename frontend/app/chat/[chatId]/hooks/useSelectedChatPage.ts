@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 
-import { useKnowledgeContext } from "@/lib/context/KnowledgeProvider/hooks/useKnowledgeContext";
+import { useKnowledgeToFeedContext } from "@/lib/context/KnowledgeToFeedProvider/hooks/useKnowledgeToFeedContext";
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const useSelectedChatPage = () => {
   const [shouldDisplayUploadCard, setShouldDisplayUploadCard] = useState(false);
-  const { knowledgeToFeed } = useKnowledgeContext();
+  const { knowledgeToFeed } = useKnowledgeToFeedContext();
 
   useEffect(() => {
     if (knowledgeToFeed.length > 0 && !shouldDisplayUploadCard) {

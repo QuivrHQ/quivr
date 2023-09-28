@@ -9,6 +9,7 @@ import { Select } from "@/lib/components/ui/Select";
 import { requiredRolesForUpload } from "@/lib/config/upload";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 
+import { useFeedBrainInChat } from "./hooks/useFeedBrainInChat";
 import { formatMinimalBrainsToSelectComponentInput } from "./utils/formatMinimalBrainsToSelectComponentInput";
 
 type KnowledgeToFeedProps = {
@@ -28,6 +29,11 @@ export const KnowledgeToFeed = ({
       allBrains.filter((brain) => requiredRolesForUpload.includes(brain.role)),
     [allBrains]
   );
+
+  const { feedBrain } = useFeedBrainInChat({
+    dispatchHasPendingRequests,
+    closeFeedInput,
+  });
 
   return (
     <div className="flex-col w-full relative">
@@ -52,10 +58,7 @@ export const KnowledgeToFeed = ({
           className="flex flex-row items-center"
         />
       </div>
-      <KnowledgeToFeedInput
-        dispatchHasPendingRequests={dispatchHasPendingRequests}
-        closeFeedInput={closeFeedInput}
-      />
+      <KnowledgeToFeedInput feedBrain={() => void feedBrain()} />
     </div>
   );
 };
