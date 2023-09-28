@@ -10,11 +10,11 @@ import { useChatNotificationsSync } from "./hooks/useChatNotificationsSync";
 import { useChatsList } from "./hooks/useChatsList";
 
 export const ChatsList = (): JSX.Element => {
-  const { open, setOpen } = useChatsList();
+  useChatsList();
   useChatNotificationsSync();
 
   return (
-    <Sidebar open={open} setOpen={setOpen}>
+    <Sidebar>
       <div className="flex flex-col flex-1 h-full">
         <SidebarHeader />
         <div className="pt-2">
