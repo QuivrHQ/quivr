@@ -7,6 +7,8 @@ import { SidebarHeader } from "@/lib/components/Sidebar/components/SidebarHeader
 import { useDevice } from "@/lib/hooks/useDevice";
 import { cn } from "@/lib/utils";
 
+import { SidebarFooter } from "./components/SidebarFooter/SidebarFooter";
+
 type SidebarProps = {
   children: React.ReactNode;
 };
@@ -61,6 +63,7 @@ export const Sidebar = ({ children }: SidebarProps): JSX.Element => {
         >
           <SidebarHeader setOpen={setOpen} />
           {children}
+          <SidebarFooter />
         </motion.div>
       </motion.div>
     </MotionConfig>

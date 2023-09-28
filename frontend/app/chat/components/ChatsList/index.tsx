@@ -4,7 +4,6 @@ import { Sidebar } from "@/lib/components/Sidebar/Sidebar";
 
 import { ChatHistory } from "./components/ChatHistory";
 import { NewChatButton } from "./components/NewChatButton";
-import { SidebarActions } from "./components/SidebarFooter/SidebarActions";
 import { useChatNotificationsSync } from "./hooks/useChatNotificationsSync";
 import { useChatsList } from "./hooks/useChatsList";
 
@@ -19,7 +18,6 @@ export const ChatsList = (): JSX.Element => {
           <NewChatButton />
         </div>
         <ChatHistory />
-        <SidebarActions />
       </div>
     </Sidebar>
   );
