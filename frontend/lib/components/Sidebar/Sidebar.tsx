@@ -11,9 +11,13 @@ import { SidebarFooter } from "./components/SidebarFooter/SidebarFooter";
 
 type SidebarProps = {
   children: React.ReactNode;
+  showFooter: boolean;
 };
 
-export const Sidebar = ({ children }: SidebarProps): JSX.Element => {
+export const Sidebar = ({
+  children,
+  showFooter,
+}: SidebarProps): JSX.Element => {
   const { isMobile } = useDevice();
   const pathname = usePathname();
   const [open, setOpen] = useState(!isMobile);
@@ -63,7 +67,7 @@ export const Sidebar = ({ children }: SidebarProps): JSX.Element => {
         >
           <SidebarHeader setOpen={setOpen} />
           {children}
-          <SidebarFooter />
+          {showFooter && <SidebarFooter />}
         </motion.div>
       </motion.div>
     </MotionConfig>

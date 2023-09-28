@@ -3,14 +3,11 @@ import { redirect, useParams, usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
-import { useDevice } from "@/lib/hooks/useDevice";
 
 import { sortBrainsByName } from "../../../utils/sortByName";
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const useBrainsList = () => {
-  const { isMobile } = useDevice();
-  const [opened, setOpened] = useState(!isMobile);
   const [searchQuery, setSearchQuery] = useState("");
   const { allBrains } = useBrainContext();
   const { currentBrainId } = useBrainContext();
@@ -21,10 +18,6 @@ export const useBrainsList = () => {
   const pathname = usePathname();
 
   const isOnBrainsLibraryPage = pathname?.includes("/library") ?? false;
-
-  useEffect(() => {
-    setOpened(!isMobile);
-  }, [isMobile, pathname]);
 
   const brains = allBrains.filter((brain) => {
     const query = searchQuery.toLowerCase();
@@ -48,8 +41,6 @@ export const useBrainsList = () => {
   }, [brainId, currentBrainId, pathname, isOnBrainsLibraryPage]);
 
   return {
-    opened,
-    setOpened,
     searchQuery,
     setSearchQuery,
     brains: sortBrainsByName(brains),
