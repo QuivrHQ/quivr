@@ -1,10 +1,11 @@
 CREATE OR REPLACE FUNCTION update_max_brains_theodo() RETURNS TRIGGER AS $$
 DECLARE
     userEmail TEXT;
+    allowedDomains TEXT[] := ARRAY['%@theodo.fr', '%@theodo.com', '%@theodo.co.uk', '%@bam.tech', '%@padok.fr', '%@sicara.fr', '%@hokla.com', '%@sipios.com'];
 BEGIN
     SELECT email INTO userEmail FROM auth.users WHERE id = NEW.user_id;
 
-    IF userEmail LIKE '%@theodo.fr' THEN
+    IF userEmail LIKE ANY(allowedDomains) THEN
         -- Ensure the models column is initialized as an array if null
         IF NEW.models IS NULL THEN
             NEW.models := '[]'::jsonb;
@@ -38,7 +39,6 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
-
 REVOKE ALL ON FUNCTION update_max_brains_theodo() FROM PUBLIC;
 
 DROP TRIGGER IF EXISTS update_max_brains_theodo_trigger ON user_settings;
@@ -47,4 +47,3 @@ CREATE TRIGGER update_max_brains_theodo_trigger
 AFTER INSERT ON user_settings 
 FOR EACH ROW 
 EXECUTE FUNCTION update_max_brains_theodo();
-
