@@ -41,7 +41,7 @@ export const Sidebar = ({ children }: SidebarProps): JSX.Element => {
           <button
             title="Open Sidebar"
             type="button"
-            className="absolute p-3 text-2xl bg-red top-5 -right-20"
+            className="absolute p-3 text-2xl bg-red top-5 -right-20 hover:text-primary dark:hover:text-gray-200 transition-colors"
             onClick={() => setOpen(true)}
           >
             <LuPanelLeftOpen />

@@ -14,7 +14,7 @@ export const SidebarHeader = ({ setOpen }: SidebarProps): JSX.Element => {
         <Logo />
         <button
           title="Close Sidebar"
-          className="p-3 text-2xl bg:white dark:bg-black text-black dark:text-white"
+          className="p-3 text-2xl bg:white dark:bg-black text-black dark:text-white hover:text-primary dark:hover:text-gray-200 transition-colors"
           type="button"
           onClick={() => setOpen(false)}
         >
