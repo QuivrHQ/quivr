@@ -2,7 +2,7 @@
 import { useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 
-import { useKnowledgeContext } from "@/lib/context/KnowledgeProvider/hooks/useKnowledgeContext";
+import { useKnowledgeToFeedContext } from "@/lib/context/KnowledgeToFeedProvider/hooks/useKnowledgeToFeedContext";
 import { useSupabase } from "@/lib/context/SupabaseProvider";
 import { useToast } from "@/lib/hooks";
 import { redirectToLogin } from "@/lib/router/redirectToLogin";
@@ -12,7 +12,7 @@ import { isValidUrl } from "../helpers/isValidUrl";
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const useCrawler = () => {
-  const { addKnowledgeToFeed } = useKnowledgeContext();
+  const { addKnowledgeToFeed } = useKnowledgeToFeedContext();
   const urlInputRef = useRef<HTMLInputElement | null>(null);
   const { session } = useSupabase();
   const { publish } = useToast();

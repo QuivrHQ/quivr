@@ -8,7 +8,7 @@ import {
 import { useChatApi } from "@/lib/api/chat/useChatApi";
 import { useKnowledgeToFeedInput } from "@/lib/components/KnowledgeToFeedInput/hooks/useKnowledgeToFeedInput.ts";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
-import { useKnowledgeContext } from "@/lib/context/KnowledgeProvider/hooks/useKnowledgeContext";
+import { useKnowledgeToFeedContext } from "@/lib/context/KnowledgeToFeedProvider/hooks/useKnowledgeToFeedContext";
 import { useToast } from "@/lib/hooks";
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
@@ -23,7 +23,7 @@ export const useFeedBrain = ({
   const { t } = useTranslation(["upload"]);
 
   const { currentBrainId } = useBrainContext();
-  const { setKnowledgeToFeed, knowledgeToFeed } = useKnowledgeContext();
+  const { setKnowledgeToFeed, knowledgeToFeed } = useKnowledgeToFeedContext();
   const [hasPendingRequests, setHasPendingRequests] = useState(false);
 
   const { createChat, deleteChat } = useChatApi();

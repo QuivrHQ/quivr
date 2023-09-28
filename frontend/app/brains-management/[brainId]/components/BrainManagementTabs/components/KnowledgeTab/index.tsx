@@ -4,7 +4,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
 
 import Spinner from "@/lib/components/ui/Spinner";
-import { KnowledgeProvider } from "@/lib/context";
+import { KnowledgeToFeedProvider } from "@/lib/context";
 
 import { AddKnowledge } from "./AddKnowledge";
 import { KnowledgeTable } from "./KnowledgeTable";
@@ -20,7 +20,7 @@ export const KnowledgeTab = ({ brainId }: KnowledgeTabProps): JSX.Element => {
   });
 
   return (
-    <KnowledgeProvider>
+    <KnowledgeToFeedProvider>
       <main>
         <section className="w-full outline-none pt-10 flex flex-col gap-5 items-center justify-center p-6">
           <div className="flex flex-col items-center justify-center">
@@ -50,6 +50,6 @@ export const KnowledgeTab = ({ brainId }: KnowledgeTabProps): JSX.Element => {
           )}
         </section>
       </main>
-    </KnowledgeProvider>
+    </KnowledgeToFeedProvider>
   );
 };

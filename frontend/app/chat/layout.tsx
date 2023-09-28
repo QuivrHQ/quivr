@@ -1,7 +1,7 @@
 "use client";
 import { ReactNode } from "react";
 
-import { ChatProvider, KnowledgeProvider } from "@/lib/context";
+import { ChatProvider, KnowledgeToFeedProvider } from "@/lib/context";
 import { ChatsProvider } from "@/lib/context/ChatsProvider/chats-provider";
 import { useSupabase } from "@/lib/context/SupabaseProvider";
 import { redirectToLogin } from "@/lib/router/redirectToLogin";
@@ -20,7 +20,7 @@ const Layout = ({ children }: LayoutProps): JSX.Element => {
   }
 
   return (
-    <KnowledgeProvider>
+    <KnowledgeToFeedProvider>
       <ChatsProvider>
         <ChatProvider>
           <div className="relative h-full w-full flex justify-stretch items-stretch">
@@ -29,7 +29,7 @@ const Layout = ({ children }: LayoutProps): JSX.Element => {
           </div>
         </ChatProvider>
       </ChatsProvider>
-    </KnowledgeProvider>
+    </KnowledgeToFeedProvider>
   );
 };
 

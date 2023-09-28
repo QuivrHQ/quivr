@@ -4,12 +4,12 @@ import { MdClose } from "react-icons/md";
 
 import { AddBrainModal } from "@/lib/components/AddBrainModal";
 import { KnowledgeToFeedInput } from "@/lib/components/KnowledgeToFeedInput";
-import { useFeedBrainInChat } from "@/lib/components/KnowledgeToFeedInput/hooks/useKnowledgeToFeedInput.ts";
 import Button from "@/lib/components/ui/Button";
 import { Select } from "@/lib/components/ui/Select";
 import { requiredRolesForUpload } from "@/lib/config/upload";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 
+import { useFeedBrainInChat } from "./hooks/useFeedBrainInChat";
 import { formatMinimalBrainsToSelectComponentInput } from "./utils/formatMinimalBrainsToSelectComponentInput";
 
 type KnowledgeToFeedProps = {

@@ -1,12 +1,13 @@
 import { Fragment } from "react";
 
-import { useKnowledgeContext } from "@/lib/context/KnowledgeProvider/hooks/useKnowledgeContext";
+import { useKnowledgeToFeedContext } from "@/lib/context/KnowledgeToFeedProvider/hooks/useKnowledgeToFeedContext";
 
 import { CrawlFeedItem } from "./components/CrawlFeedItem";
 import { FileFeedItem } from "./components/FileFeedItem/FileFeedItem";
 
 export const FeedItems = (): JSX.Element => {
-  const { knowledgeToFeed, removeKnowledgeToFeed } = useKnowledgeContext();
+  const { knowledgeToFeed, removeKnowledgeToFeed } =
+    useKnowledgeToFeedContext();
   if (knowledgeToFeed.length === 0) {
     return <Fragment />;
   }

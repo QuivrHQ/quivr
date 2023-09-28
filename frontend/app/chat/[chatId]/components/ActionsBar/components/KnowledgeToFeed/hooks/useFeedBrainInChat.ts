@@ -8,7 +8,7 @@ import { useNotificationApi } from "@/lib/api/notification/useNotificationApi";
 import { useKnowledgeToFeedInput } from "@/lib/components/KnowledgeToFeedInput/hooks/useKnowledgeToFeedInput.ts";
 import { useChatContext } from "@/lib/context";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
-import { useKnowledgeContext } from "@/lib/context/KnowledgeProvider/hooks/useKnowledgeContext";
+import { useKnowledgeToFeedContext } from "@/lib/context/KnowledgeToFeedProvider/hooks/useKnowledgeToFeedContext";
 import { useToast } from "@/lib/hooks";
 
 import { FeedItemCrawlType, FeedItemUploadType } from "../../../types";
@@ -26,7 +26,7 @@ export const useFeedBrainInChat = ({
   const router = useRouter();
 
   const { currentBrainId } = useBrainContext();
-  const { setKnowledgeToFeed, knowledgeToFeed } = useKnowledgeContext();
+  const { setKnowledgeToFeed, knowledgeToFeed } = useKnowledgeToFeedContext();
   const [hasPendingRequests, setHasPendingRequests] = useState(false);
   const { createChat } = useChatApi();
   const params = useParams();
