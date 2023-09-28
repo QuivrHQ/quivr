@@ -24,7 +24,7 @@ export const Sidebar = ({
 
   useEffect(() => {
     setOpen(!isMobile);
-  }, [isMobile, pathname, setOpen]);
+  }, [isMobile, pathname]);
 
   return (
     <MotionConfig transition={{ mass: 1, damping: 10 }}>
@@ -53,10 +53,10 @@ export const Sidebar = ({
         )}
         <motion.div
           initial={{
-            width: open ? "fit-content" : "0px",
+            width: open ? "18rem" : "0px",
           }}
           animate={{
-            width: open ? "fit-content" : "0px",
+            width: open ? "18rem" : "0px",
             opacity: open ? 1 : 0.5,
             boxShadow: open
               ? "10px 10px 16px rgba(0, 0, 0, 0)"
