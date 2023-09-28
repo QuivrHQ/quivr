@@ -19,32 +19,12 @@ import {
   FeedItemUploadType,
 } from "../../../../app/chat/[chatId]/components/ActionsBar/types";
 
-type UseKnowledgeToFeedInput = {
-  dispatchHasPendingRequests?: () => void;
-  closeFeedInput?: () => void;
-};
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-export const useKnowledgeToFeedInput = ({
-  dispatchHasPendingRequests,
-  closeFeedInput,
-}: UseKnowledgeToFeedInput) => {
+export const useKnowledgeToFeedInput = () => {
   const { publish } = useToast();
   const { uploadFile } = useUploadApi();
   const { t } = useTranslation(["upload"]);
   const { crawlWebsiteUrl } = useCrawlApi();
-  const { createChat } = useChatApi();
-  const { currentBrainId } = useBrainContext();
-  const { setNotifications } = useChatContext();
-  const { getChatNotifications } = useNotificationApi();
-  const router = useRouter();
-  const params = useParams();
-  const chatId = params?.chatId as UUID | undefined;
-  const [hasPendingRequests, setHasPendingRequests] = useState(false);
-  const { setKnowledgeToFeed, knowledgeToFeed } = useKnowledgeContext();
-  const fetchNotifications = async (currentChatId: UUID): Promise<void> => {
-    const fetchedNotifications = await getChatNotifications(currentChatId);
-    setNotifications(fetchedNotifications);
-  };
 
   const crawlWebsiteHandler = useCallback(
     async (url: string, brainId: UUID, chat_id: UUID) => {
@@ -63,7 +43,6 @@ export const useKnowledgeToFeedInput = ({
           config,
           chat_id,
         });
-        await fetchNotifications(chat_id);
       } catch (error: unknown) {
         const errorParams = getAxiosErrorParams(error);
         if (errorParams !== undefined) {
@@ -118,6 +97,51 @@ export const useKnowledgeToFeedInput = ({
     [publish, t, uploadFile]
   );
 
+  return {
+    crawlWebsiteHandler,
+    uploadFileHandler,
+  };
+};
+
+// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+export const useFeedBrainInChat = ({
+  dispatchHasPendingRequests,
+  closeFeedInput,
+  uploadFileHandler,
+  crawlWebsiteHandler,
+}: {
+  uploadFileHandler?: (
+    file: File,
+    brainId: UUID,
+    chat_id: UUID
+  ) => Promise<void>;
+  crawlWebsiteHandler?: (
+    url: string,
+    brainId: UUID,
+    chat_id: UUID
+  ) => Promise<void>;
+  dispatchHasPendingRequests?: () => void;
+  closeFeedInput?: () => void;
+}) => {
+  const { publish } = useToast();
+  const { t } = useTranslation(["upload"]);
+  const router = useRouter();
+
+  const { currentBrainId } = useBrainContext();
+  const { setKnowledgeToFeed, knowledgeToFeed } = useKnowledgeContext();
+  const [hasPendingRequests, setHasPendingRequests] = useState(false);
+
+  const { createChat } = useChatApi();
+  const params = useParams();
+  const chatId = params?.chatId as UUID | undefined;
+
+  const { setNotifications } = useChatContext();
+  const { getChatNotifications } = useNotificationApi();
+  const fetchNotifications = async (currentChatId: UUID): Promise<void> => {
+    const fetchedNotifications = await getChatNotifications(currentChatId);
+    setNotifications(fetchedNotifications);
+  };
+
   const files: File[] = (
     knowledgeToFeed.filter((c) => c.source === "upload") as FeedItemUploadType[]
   ).map((c) => c.file);
@@ -144,6 +168,7 @@ export const useKnowledgeToFeedInput = ({
 
       return;
     }
+
     try {
       dispatchHasPendingRequests?.();
       closeFeedInput?.();

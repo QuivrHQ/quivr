@@ -6,7 +6,10 @@ import { useKnowledgeContext } from "@/lib/context/KnowledgeProvider/hooks/useKn
 import { FeedItems } from "./components";
 import { Crawler } from "./components/Crawler";
 import { FileUploader } from "./components/FileUploader";
-import { useKnowledgeToFeedInput } from "./hooks/useKnowledgeToFeedInput.ts";
+import {
+  useFeedBrainInChat,
+  useKnowledgeToFeedInput,
+} from "./hooks/useKnowledgeToFeedInput.ts";
 
 type KnowledgeToFeedInputProps = {
   dispatchHasPendingRequests?: () => void;
@@ -18,9 +21,12 @@ export const KnowledgeToFeedInput = ({
   closeFeedInput,
 }: KnowledgeToFeedInputProps): JSX.Element => {
   const { t } = useTranslation(["translation", "upload"]);
-  const { feedBrain } = useKnowledgeToFeedInput({
+  const { crawlWebsiteHandler, uploadFileHandler } = useKnowledgeToFeedInput();
+  const { feedBrain } = useFeedBrainInChat({
     dispatchHasPendingRequests,
     closeFeedInput,
+    uploadFileHandler,
+    crawlWebsiteHandler,
   });
   const { knowledgeToFeed } = useKnowledgeContext();
 
