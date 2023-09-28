@@ -10,12 +10,12 @@ import { useNotificationApi } from "@/lib/api/notification/useNotificationApi";
 import { useUploadApi } from "@/lib/api/upload/useUploadApi";
 import { useChatContext } from "@/lib/context";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
+import { useKnowledgeContext } from "@/lib/context/KnowledgeProvider/hooks/useKnowledgeContext";
 import { getAxiosErrorParams } from "@/lib/helpers/getAxiosErrorParams";
 import { useToast } from "@/lib/hooks";
 
 import {
   FeedItemCrawlType,
-  FeedItemType,
   FeedItemUploadType,
 } from "../../../../app/chat/[chatId]/components/ActionsBar/types";
 
@@ -28,7 +28,6 @@ export const useKnowledgeToFeedInput = ({
   dispatchHasPendingRequests,
   closeFeedInput,
 }: UseKnowledgeToFeedInput) => {
-  const [contents, setContents] = useState<FeedItemType[]>([]);
   const { publish } = useToast();
   const { uploadFile } = useUploadApi();
   const { t } = useTranslation(["upload"]);
@@ -41,14 +40,7 @@ export const useKnowledgeToFeedInput = ({
   const params = useParams();
   const chatId = params?.chatId as UUID | undefined;
   const [hasPendingRequests, setHasPendingRequests] = useState(false);
-
-  const addContent = (content: FeedItemType) => {
-    setContents((prevContents) => [...prevContents, content]);
-  };
-  const removeContent = (index: number) => {
-    setContents((prevContents) => prevContents.filter((_, i) => i !== index));
-  };
-
+  const { setKnowledgeToFeed, knowledgeToFeed } = useKnowledgeContext();
   const fetchNotifications = async (currentChatId: UUID): Promise<void> => {
     const fetchedNotifications = await getChatNotifications(currentChatId);
     setNotifications(fetchedNotifications);
@@ -127,11 +119,11 @@ export const useKnowledgeToFeedInput = ({
   );
 
   const files: File[] = (
-    contents.filter((c) => c.source === "upload") as FeedItemUploadType[]
+    knowledgeToFeed.filter((c) => c.source === "upload") as FeedItemUploadType[]
   ).map((c) => c.file);
 
   const urls: string[] = (
-    contents.filter((c) => c.source === "crawl") as FeedItemCrawlType[]
+    knowledgeToFeed.filter((c) => c.source === "crawl") as FeedItemCrawlType[]
   ).map((c) => c.url);
 
   const feedBrain = async (): Promise<void> => {
@@ -144,7 +136,7 @@ export const useKnowledgeToFeedInput = ({
       return;
     }
 
-    if (contents.length === 0) {
+    if (knowledgeToFeed.length === 0) {
       publish({
         variant: "danger",
         text: t("addFiles"),
@@ -166,7 +158,7 @@ export const useKnowledgeToFeedInput = ({
 
       await Promise.all([...uploadPromises, ...crawlPromises]);
 
-      setContents([]);
+      setKnowledgeToFeed([]);
 
       if (chatId === undefined) {
         void router.push(`/chat/${currentChatId}`);
@@ -184,9 +176,6 @@ export const useKnowledgeToFeedInput = ({
   };
 
   return {
-    addContent,
-    contents,
-    removeContent,
     feedBrain,
     hasPendingRequests,
     setHasPendingRequests,

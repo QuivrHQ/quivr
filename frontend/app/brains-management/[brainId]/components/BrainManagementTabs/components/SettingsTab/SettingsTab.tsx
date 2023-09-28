@@ -98,15 +98,16 @@ export const SettingsTab = ({ brainId }: SettingsTabProps): JSX.Element => {
                   {t("defaultBrain", { ns: "brain" })}
                 </div>
               ) : (
-                <Button
-                  variant={"secondary"}
-                  isLoading={isSettingAsDefault}
-                  onClick={() => void setAsDefaultBrainHandler()}
-                  type="button"
-                  disabled={!hasEditRights}
-                >
-                  {t("setDefaultBrain", { ns: "brain" })}
-                </Button>
+                hasEditRights && (
+                  <Button
+                    variant={"secondary"}
+                    isLoading={isSettingAsDefault}
+                    onClick={() => void setAsDefaultBrainHandler()}
+                    type="button"
+                  >
+                    {t("setDefaultBrain", { ns: "brain" })}
+                  </Button>
+                )
               )}
             </div>
           </div>
@@ -187,9 +188,11 @@ export const SettingsTab = ({ brainId }: SettingsTabProps): JSX.Element => {
             {...register("maxTokens")}
           />
         </fieldset>
-        <div className="flex w-full justify-end py-4">
-          <SaveButton disabled={!hasEditRights} handleSubmit={handleSubmit} />
-        </div>
+        {hasEditRights && (
+          <div className="flex w-full justify-end py-4">
+            <SaveButton handleSubmit={handleSubmit} />
+          </div>
+        )}
         <Divider text={t("customPromptSection", { ns: "config" })} />
         {hasEditRights && <PublicPrompts onSelect={pickPublicPrompt} />}
         <Field
@@ -208,12 +211,14 @@ export const SettingsTab = ({ brainId }: SettingsTabProps): JSX.Element => {
           disabled={!hasEditRights}
           {...register("prompt.content")}
         />
-        <div className="flex w-full justify-end py-4">
-          <SaveButton disabled={!hasEditRights} handleSubmit={handleSubmit} />
-        </div>
-        {promptId !== "" && (
+        {hasEditRights && (
+          <div className="flex w-full justify-end py-4">
+            <SaveButton handleSubmit={handleSubmit} />
+          </div>
+        )}
+        {hasEditRights && promptId !== "" && (
           <Button
-            disabled={isUpdating || !hasEditRights}
+            disabled={isUpdating}
             onClick={() => void removeBrainPrompt()}
           >
             {t("removePrompt", { ns: "config" })}

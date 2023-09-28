@@ -39,8 +39,7 @@ export const useChatNotificationsSync = () => {
       );
 
       if (hasAPendingNotification) {
-        //30 seconds
-        return 2_000;
+        return 2_000; // in ms
       }
 
       return false;

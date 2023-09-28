@@ -3,34 +3,26 @@ import { useTranslation } from "react-i18next";
 import { IoCloudUploadOutline } from "react-icons/io5";
 
 import Card from "@/lib/components/ui/Card";
+import { useSupabase } from "@/lib/context/SupabaseProvider";
+import { useCustomDropzone } from "@/lib/hooks/useDropzone";
+import { redirectToLogin } from "@/lib/router/redirectToLogin";
 
-import { useFileUploader } from "./hooks/useFileUploader";
-import { FeedItemType } from "../../../../../app/chat/[chatId]/components/ActionsBar/types";
+export const FileUploader = (): JSX.Element => {
+  const { session } = useSupabase();
+  const { getInputProps, isDragActive, open } = useCustomDropzone();
 
-type FileUploaderProps = {
-  addContent: (content: FeedItemType) => void;
-  files: File[];
-};
-export const FileUploader = ({
-  addContent,
-  files,
-}: FileUploaderProps): JSX.Element => {
-  const { getInputProps, getRootProps, isDragActive, open } = useFileUploader({
-    addContent,
-    files,
-  });
+  if (session === null) {
+    redirectToLogin();
+  }
 
   const { t } = useTranslation(["translation", "upload"]);
 
   return (
-    <section
-      {...getRootProps()}
-      className="w-full outline-none flex flex-col gap-10 items-center justify-center px-6 py-3"
-    >
-      <div className="flex flex-col sm:flex-row max-w-3xl w-full items-center gap-5 mt-5 cursor-pointer">
+    <section className="w-full outline-none flex flex-col gap-10 items-center justify-center px-0">
+      <div className="flex flex-col sm:flex-row max-w-3xl w-full items-center gap-5 cursor-pointer">
         <div className="flex-1 w-full">
           <Card
-            className="h-24 flex justify-center items-center"
+            className="h-20 flex justify-center items-center"
             onClick={open}
           >
             <IoCloudUploadOutline className="text-5xl" />

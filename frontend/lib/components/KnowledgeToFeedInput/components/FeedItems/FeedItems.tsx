@@ -1,36 +1,30 @@
 import { Fragment } from "react";
 
+import { useKnowledgeContext } from "@/lib/context/KnowledgeProvider/hooks/useKnowledgeContext";
+
 import { CrawlFeedItem } from "./components/CrawlFeedItem";
 import { FileFeedItem } from "./components/FileFeedItem/FileFeedItem";
-import { FeedItemType } from "../../../../../app/chat/[chatId]/components/ActionsBar/types";
 
-type FeedItemsProps = {
-  contents: FeedItemType[];
-  removeContent: (index: number) => void;
-};
-
-export const FeedItems = ({
-  contents,
-  removeContent,
-}: FeedItemsProps): JSX.Element => {
-  if (contents.length === 0) {
+export const FeedItems = (): JSX.Element => {
+  const { knowledgeToFeed, removeKnowledgeToFeed } = useKnowledgeContext();
+  if (knowledgeToFeed.length === 0) {
     return <Fragment />;
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mt-1 bg-white p-6 overflow-scroll">
-      {contents.map((item, index) =>
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mt-1 bg-white py-6 overflow-scroll">
+      {knowledgeToFeed.map((item, index) =>
         item.source === "crawl" ? (
           <CrawlFeedItem
             key={item.url}
             url={item.url}
-            onRemove={() => removeContent(index)}
+            onRemove={() => removeKnowledgeToFeed(index)}
           />
         ) : (
           <FileFeedItem
             key={item.file.name}
             file={item.file}
-            onRemove={() => removeContent(index)}
+            onRemove={() => removeKnowledgeToFeed(index)}
           />
         )
       )}
