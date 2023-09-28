@@ -88,7 +88,7 @@ export const SettingsTab = ({ brainId }: SettingsTabProps): JSX.Element => {
           <div className="mt-4">
             <div className="flex flex-1 items-center flex-col">
               {isPublicBrain && !isOwnedByCurrentUser && (
-                <Chip className="mb-3 bg-purple-600 text-white w-full">
+                <Chip className="mb-3 bg-primary text-white w-full">
                   {t("brain:public_brain_label")}
                 </Chip>
               )}
