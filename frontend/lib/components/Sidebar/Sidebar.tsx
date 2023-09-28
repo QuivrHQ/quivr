@@ -33,7 +33,7 @@ export const Sidebar = ({ children }: SidebarProps): JSX.Element => {
             setOpen(false);
           }
         }}
-        className="flex flex-col lg:sticky fixed top-0 left-0 bottom-0 lg:h-[100vh] overflow-visible z-30 border-r border-black/10 dark:border-white/25 bg-white dark:bg-black"
+        className="flex flex-col fixed sm:sticky top-0 left-0 h-[100vh] overflow-visible z-30 border-r border-black/10 dark:border-white/25 bg-white dark:bg-black"
       >
         {!open && (
           <button
@@ -46,7 +46,9 @@ export const Sidebar = ({ children }: SidebarProps): JSX.Element => {
           </button>
         )}
         <motion.div
-          initial={{ display: open ? "flex" : "none" }}
+          initial={{
+            width: open ? "fit-content" : "0px",
+          }}
           animate={{
             width: open ? "fit-content" : "0px",
             opacity: open ? 1 : 0.5,

@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 
-const MOBILE_MAX_WIDTH = 576;
+// Max width for mobile device: 640px
+// Match small min-width media query in tailwind
+const MOBILE_MAX_WIDTH = 640;
 
 export const useDevice = (): { isMobile: boolean } => {
-  const [isMobile, setIsMobile] = useState(
-    window.innerWidth < MOBILE_MAX_WIDTH
-  );
+  const [isMobile, setIsMobile] = useState(true);
 
   useEffect(() => {
     const handleResize = () => {
