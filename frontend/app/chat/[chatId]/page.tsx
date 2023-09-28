@@ -21,7 +21,7 @@ const SelectedChatPage = (): JSX.Element => {
         <ChatHeader />
         <div
           className={`flex-1 flex flex-col mt-4 md:mt-8 w-full shadow-md dark:shadow-primary/25 hover:shadow-xl transition-shadow rounded-xl overflow-hidden dark:bg-black border border-black/10 dark:border-white/25 p-2 md:p-12 pt-4 md:pt-10   ${
-            shouldDisplayUploadCard ? "bg-gray-100" : "bg-white"
+            shouldDisplayUploadCard ? "bg-chat-bg-gray" : "bg-white"
           }`}
         >
           <div className="flex flex-1 flex-col overflow-y-auto">
