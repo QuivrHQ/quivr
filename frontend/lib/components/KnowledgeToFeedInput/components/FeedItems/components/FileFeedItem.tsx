@@ -18,7 +18,7 @@ export const FileFeedItem = ({
 
   return (
     <StyledFeedItemDiv>
-      <div className="flex flex-1 overflow-auto items-center gap-1">
+      <div className="flex flex-1 overflow-hidden items-center gap-1">
         <div>{icon}</div>
         <div className="flex flex-1">
           <FeedTitleDisplayer title={file.name} truncate />

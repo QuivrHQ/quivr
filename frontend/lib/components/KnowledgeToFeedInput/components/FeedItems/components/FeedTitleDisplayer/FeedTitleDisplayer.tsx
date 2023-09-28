@@ -1,5 +1,7 @@
 import { useState } from "react";
 
+import { cn } from "@/lib/utils";
+
 import { enhanceUrlDisplay } from "./utils/enhanceUrlDisplay";
 import { removeFileExtension } from "./utils/removeFileExtension";
 
@@ -20,21 +22,25 @@ export const FeedTitleDisplayer = ({
 
   if (truncate) {
     return (
-      <div className="overflow-hidden">
-        <span className="cursor-pointer" onClick={toggleShowFullUrl}>
-          <p className={showFullUrl ? "" : "truncate"}>
-            {removeFileExtension(title)}
-          </p>
-        </span>
+      <div>
+        <p
+          onClick={toggleShowFullUrl}
+          className={cn("cursor-pointer", showFullUrl ? "" : "line-clamp-1")}
+        >
+          {removeFileExtension(title)}
+        </p>
       </div>
     );
   }
 
   return (
     <div>
-      <span className="cursor-pointer" onClick={toggleShowFullUrl}>
+      <p
+        className={cn("cursor-pointer", `${showFullUrl ? "" : "line-clamp-1"}`)}
+        onClick={toggleShowFullUrl}
+      >
         {showFullUrl ? title : enhanceUrlDisplay(title)}
-      </span>
+      </p>
     </div>
   );
 };

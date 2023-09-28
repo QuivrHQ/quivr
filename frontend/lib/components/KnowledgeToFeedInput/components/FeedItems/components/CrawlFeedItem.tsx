@@ -14,7 +14,7 @@ export const CrawlFeedItem = ({
 }: CrawlFeedItemProps): JSX.Element => {
   return (
     <StyledFeedItemDiv>
-      <div className="flex flex-1 items-center">
+      <div className="flex flex-1 overflow-hidden items-center gap-1">
         <div>
           <MdLink className="mr-2 text-2xl" />
         </div>
@@ -22,10 +22,12 @@ export const CrawlFeedItem = ({
           <FeedTitleDisplayer title={url} />
         </div>
       </div>
-      <IoMdCloseCircle
-        className="cursor-pointer text-gray-400 text-lg"
-        onClick={onRemove}
-      />
+      <div>
+        <IoMdCloseCircle
+          className="cursor-pointer text-gray-400 text-lg"
+          onClick={onRemove}
+        />
+      </div>
     </StyledFeedItemDiv>
   );
 };
