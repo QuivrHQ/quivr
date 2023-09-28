@@ -4,29 +4,30 @@ import { useEffect, useState } from "react";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
 
 import { KnowledgeToFeedInput } from "@/lib/components/KnowledgeToFeedInput";
-import { useFeedBrainInChat } from "@/lib/components/KnowledgeToFeedInput/hooks/useKnowledgeToFeedInput.ts";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 
+import { useFeedBrain } from "./hooks/useFeedBrain";
 import { useKnowledge } from "./hooks/useKnowledge";
 
 export const AddKnowledge = (): JSX.Element => {
   const [shouldDisplayModal, setShouldDisplayModal] = useState(false);
-  const [hasPendingRequests, setHasPendingRequests] = useState(false);
   const { currentBrain } = useBrainContext();
   const { invalidateKnowledgeDataKey } = useKnowledge({
     brainId: currentBrain?.id,
   });
+
+  const { feedBrain, hasPendingRequests, setHasPendingRequests } = useFeedBrain(
+    {
+      dispatchHasPendingRequests: () => setHasPendingRequests(true),
+      closeFeedInput: () => setShouldDisplayModal(false),
+    }
+  );
 
   useEffect(() => {
     if (!hasPendingRequests) {
       invalidateKnowledgeDataKey();
     }
   }, [hasPendingRequests, invalidateKnowledgeDataKey]);
-
-  const { feedBrain } = useFeedBrainInChat({
-    dispatchHasPendingRequests: () => setHasPendingRequests(true),
-    closeFeedInput: () => setShouldDisplayModal(false),
-  });
 
   return (
     <>
