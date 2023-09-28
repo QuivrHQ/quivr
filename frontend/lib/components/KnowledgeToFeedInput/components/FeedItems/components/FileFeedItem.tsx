@@ -2,8 +2,8 @@ import { IoMdCloseCircle } from "react-icons/io";
 
 import { getFileIcon } from "@/lib/helpers/getFileIcon";
 
-import { StyledFeedItemDiv } from "../../styles/StyledFeedItemDiv";
-import { FeedTitleDisplayer } from "../FeedTitleDisplayer";
+import { FeedTitleDisplayer } from "./FeedTitleDisplayer";
+import { StyledFeedItemDiv } from "../styles/StyledFeedItemDiv";
 
 type FileFeedItemProps = {
   file: File;
@@ -19,13 +19,17 @@ export const FileFeedItem = ({
   return (
     <StyledFeedItemDiv>
       <div className="flex flex-1 overflow-auto items-center gap-1">
-        {icon}
-        <FeedTitleDisplayer title={file.name} truncate />
+        <div>{icon}</div>
+        <div className="flex flex-1">
+          <FeedTitleDisplayer title={file.name} truncate />
+        </div>
       </div>
-      <IoMdCloseCircle
-        className="cursor-pointer text-gray-400 text-lg"
-        onClick={onRemove}
-      />
+      <div>
+        <IoMdCloseCircle
+          className="cursor-pointer text-gray-400 text-lg"
+          onClick={onRemove}
+        />
+      </div>
     </StyledFeedItemDiv>
   );
 };

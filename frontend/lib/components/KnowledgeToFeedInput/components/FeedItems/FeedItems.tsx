@@ -3,7 +3,7 @@ import { Fragment } from "react";
 import { useKnowledgeToFeedContext } from "@/lib/context/KnowledgeToFeedProvider/hooks/useKnowledgeToFeedContext";
 
 import { CrawlFeedItem } from "./components/CrawlFeedItem";
-import { FileFeedItem } from "./components/FileFeedItem/FileFeedItem";
+import { FileFeedItem } from "./components/FileFeedItem";
 
 export const FeedItems = (): JSX.Element => {
   const { knowledgeToFeed, removeKnowledgeToFeed } =

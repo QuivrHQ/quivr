@@ -15,8 +15,12 @@ export const CrawlFeedItem = ({
   return (
     <StyledFeedItemDiv>
       <div className="flex flex-1 items-center">
-        <MdLink className="mr-2 text-2xl" />
-        <FeedTitleDisplayer title={url} />
+        <div>
+          <MdLink className="mr-2 text-2xl" />
+        </div>
+        <div className="flex flex-1">
+          <FeedTitleDisplayer title={url} />
+        </div>
       </div>
       <IoMdCloseCircle
         className="cursor-pointer text-gray-400 text-lg"
