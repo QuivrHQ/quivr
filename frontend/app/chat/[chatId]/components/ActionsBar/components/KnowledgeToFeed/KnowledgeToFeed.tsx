@@ -23,7 +23,7 @@ export const KnowledgeToFeed = ({
 
   const { t } = useTranslation(["upload"]);
 
-  const { setShouldDisplayUploadCard } = useKnowledgeToFeedContext();
+  const { setShouldDisplayFeedCard } = useKnowledgeToFeedContext();
 
   const brainsWithUploadRights = useMemo(
     () =>
@@ -41,7 +41,7 @@ export const KnowledgeToFeed = ({
         <AddBrainModal />
         <Button
           variant={"tertiary"}
-          onClick={() => setShouldDisplayUploadCard(false)}
+          onClick={() => setShouldDisplayFeedCard(false)}
         >
           <span>
             <MdClose className="text-3xl" />

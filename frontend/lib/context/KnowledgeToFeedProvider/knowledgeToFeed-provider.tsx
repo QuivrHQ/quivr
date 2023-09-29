@@ -7,8 +7,8 @@ import { FeedItemType } from "@/app/chat/[chatId]/components/ActionsBar/types";
 type KnowledgeToFeedContextType = {
   knowledgeToFeed: FeedItemType[];
   setKnowledgeToFeed: React.Dispatch<React.SetStateAction<FeedItemType[]>>;
-  shouldDisplayUploadCard: boolean;
-  setShouldDisplayUploadCard: React.Dispatch<React.SetStateAction<boolean>>;
+  shouldDisplayFeedCard: boolean;
+  setShouldDisplayFeedCard: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 export const KnowledgeToFeedContext = createContext<
@@ -21,15 +21,15 @@ export const KnowledgeToFeedProvider = ({
   children: React.ReactNode;
 }): JSX.Element => {
   const [knowledgeToFeed, setKnowledgeToFeed] = useState<FeedItemType[]>([]);
-  const [shouldDisplayUploadCard, setShouldDisplayUploadCard] = useState(false);
+  const [shouldDisplayFeedCard, setShouldDisplayFeedCard] = useState(false);
 
   return (
     <KnowledgeToFeedContext.Provider
       value={{
         knowledgeToFeed,
         setKnowledgeToFeed,
-        shouldDisplayUploadCard,
-        setShouldDisplayUploadCard,
+        shouldDisplayFeedCard,
+        setShouldDisplayFeedCard,
       }}
     >
       {children}

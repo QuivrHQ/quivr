@@ -11,7 +11,7 @@ const chatInputHeightEstimation = 100;
 export const useChatDialogue = () => {
   const chatListRef = useRef<HTMLDivElement | null>(null);
   const { messages } = useChat();
-  const { shouldDisplayUploadCard } = useKnowledgeToFeedContext();
+  const { shouldDisplayFeedCard } = useKnowledgeToFeedContext();
 
   const scrollToBottom = useCallback(
     _debounce(() => {
@@ -45,7 +45,7 @@ export const useChatDialogue = () => {
 
   useEffect(() => {
     scrollToBottom();
-  }, [messages, scrollToBottom, shouldDisplayUploadCard]);
+  }, [messages, scrollToBottom, shouldDisplayFeedCard]);
 
   return {
     chatListRef,

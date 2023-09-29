@@ -10,17 +10,17 @@ import { ConfigModal } from "./components/ConfigModal";
 import { useChatInput } from "./hooks/useChatInput";
 
 type ChatInputProps = {
-  shouldDisplayUploadCard: boolean;
+  shouldDisplayFeedCard: boolean;
 };
 
 export const ChatInput = ({
-  shouldDisplayUploadCard,
+  shouldDisplayFeedCard,
 }: ChatInputProps): JSX.Element => {
   const { setMessage, submitQuestion, generatingAnswer, message } =
     useChatInput();
   const { t } = useTranslation(["chat"]);
 
-  const { setShouldDisplayUploadCard } = useKnowledgeToFeedContext();
+  const { setShouldDisplayFeedCard } = useKnowledgeToFeedContext();
 
   return (
     <form
@@ -31,13 +31,13 @@ export const ChatInput = ({
       }}
       className="sticky bottom-0 bg-white dark:bg-black w-full flex items-center gap-2 z-20 p-2"
     >
-      {!shouldDisplayUploadCard && (
+      {!shouldDisplayFeedCard && (
         <Button
           className="p-0"
           variant={"tertiary"}
           data-testid="upload-button"
           type="button"
-          onClick={() => setShouldDisplayUploadCard(true)}
+          onClick={() => setShouldDisplayFeedCard(true)}
           tooltip={t("add_content_card_button_tooltip")}
         >
           <PiPaperclipFill className="text-3xl" />

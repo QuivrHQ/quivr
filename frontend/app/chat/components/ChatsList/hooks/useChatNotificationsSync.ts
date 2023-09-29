@@ -16,7 +16,7 @@ export const useChatNotificationsSync = () => {
   const { setMessages, setNotifications, notifications } = useChatContext();
   const { getChatItems } = useChatApi();
   const { getChatNotifications } = useNotificationApi();
-  const { setShouldDisplayUploadCard } = useKnowledgeToFeedContext();
+  const { setShouldDisplayFeedCard } = useKnowledgeToFeedContext();
   const params = useParams();
 
   const chatId = params?.chatId as string | undefined;
@@ -56,7 +56,7 @@ export const useChatNotificationsSync = () => {
   }, [fetchedNotifications]);
 
   useEffect(() => {
-    setShouldDisplayUploadCard(false);
+    setShouldDisplayFeedCard(false);
     const fetchHistory = async () => {
       if (chatId === undefined) {
         setMessages([]);

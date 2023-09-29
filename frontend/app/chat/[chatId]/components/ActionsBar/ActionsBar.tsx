@@ -11,7 +11,7 @@ export const ActionsBar = (): JSX.Element => {
   const { hasPendingRequests, setHasPendingRequests } = useActionBar();
 
   const { t } = useTranslation(["chat"]);
-  const { shouldDisplayUploadCard } = useKnowledgeToFeedContext();
+  const { shouldDisplayFeedCard } = useKnowledgeToFeedContext();
 
   return (
     <>
@@ -25,7 +25,7 @@ export const ActionsBar = (): JSX.Element => {
       )}
 
       <div>
-        {shouldDisplayUploadCard && (
+        {shouldDisplayFeedCard && (
           <AnimatePresence>
             <motion.div
               key="slide"
@@ -41,9 +41,9 @@ export const ActionsBar = (): JSX.Element => {
             </motion.div>
           </AnimatePresence>
         )}
-        {!shouldDisplayUploadCard && (
+        {!shouldDisplayFeedCard && (
           <div className="flex mt-1 flex-col w-full shadow-md dark:shadow-primary/25 hover:shadow-xl transition-shadow rounded-xl bg-white dark:bg-black border border-black/10 dark:border-white/25 md:mb-4 lg:mb-[-20px] p-2">
-            <ChatInput shouldDisplayUploadCard={shouldDisplayUploadCard} />
+            <ChatInput shouldDisplayFeedCard={shouldDisplayFeedCard} />
           </div>
         )}
       </div>

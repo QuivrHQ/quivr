@@ -22,7 +22,7 @@ export const useFeedBrainInChat = ({
   const { publish } = useToast();
   const { t } = useTranslation(["upload"]);
   const router = useRouter();
-  const { setShouldDisplayUploadCard } = useKnowledgeToFeedContext();
+  const { setShouldDisplayFeedCard } = useKnowledgeToFeedContext();
 
   const { currentBrainId } = useBrainContext();
   const { setKnowledgeToFeed, knowledgeToFeed } = useKnowledgeToFeedContext();
@@ -62,7 +62,7 @@ export const useFeedBrainInChat = ({
     }
     try {
       dispatchHasPendingRequests();
-      setShouldDisplayUploadCard(false);
+      setShouldDisplayFeedCard(false);
       setHasPendingRequests(true);
       const currentChatId = chatId ?? (await createChat("New Chat")).chat_id;
       const uploadPromises = files.map((file) =>

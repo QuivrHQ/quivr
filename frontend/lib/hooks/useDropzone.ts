@@ -10,7 +10,7 @@ import { acceptedFormats } from "../helpers/acceptedFormats";
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const useCustomDropzone = () => {
-  const { knowledgeToFeed, addKnowledgeToFeed, setShouldDisplayUploadCard } =
+  const { knowledgeToFeed, addKnowledgeToFeed, setShouldDisplayFeedCard } =
     useKnowledgeToFeedContext();
 
   const files: File[] = (
@@ -23,7 +23,7 @@ export const useCustomDropzone = () => {
   const { t } = useTranslation(["upload"]);
 
   const onDrop = (acceptedFiles: File[], fileRejections: FileRejection[]) => {
-    setShouldDisplayUploadCard(true);
+    setShouldDisplayFeedCard(true);
     if (fileRejections.length > 0) {
       const firstRejection = fileRejections[0];
 
