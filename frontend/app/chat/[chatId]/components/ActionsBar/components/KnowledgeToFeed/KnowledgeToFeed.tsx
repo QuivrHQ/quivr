@@ -8,21 +8,22 @@ import Button from "@/lib/components/ui/Button";
 import { Select } from "@/lib/components/ui/Select";
 import { requiredRolesForUpload } from "@/lib/config/upload";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
+import { useKnowledgeToFeedContext } from "@/lib/context/KnowledgeToFeedProvider/hooks/useKnowledgeToFeedContext";
 
 import { useFeedBrainInChat } from "./hooks/useFeedBrainInChat";
 import { formatMinimalBrainsToSelectComponentInput } from "./utils/formatMinimalBrainsToSelectComponentInput";
 
 type KnowledgeToFeedProps = {
-  closeFeedInput: () => void;
-  dispatchHasPendingRequests?: () => void;
+  dispatchHasPendingRequests: () => void;
 };
 export const KnowledgeToFeed = ({
-  closeFeedInput,
   dispatchHasPendingRequests,
 }: KnowledgeToFeedProps): JSX.Element => {
   const { allBrains, currentBrainId, setCurrentBrainId } = useBrainContext();
 
   const { t } = useTranslation(["upload"]);
+
+  const { setShouldDisplayFeedCard } = useKnowledgeToFeedContext();
 
   const brainsWithUploadRights = useMemo(
     () =>
@@ -32,14 +33,16 @@ export const KnowledgeToFeed = ({
 
   const { feedBrain } = useFeedBrainInChat({
     dispatchHasPendingRequests,
-    closeFeedInput,
   });
 
   return (
     <div className="flex-col w-full relative">
       <div className="flex flex-1 justify-between">
         <AddBrainModal />
-        <Button variant={"tertiary"} onClick={closeFeedInput}>
+        <Button
+          variant={"tertiary"}
+          onClick={() => setShouldDisplayFeedCard(false)}
+        >
           <span>
             <MdClose className="text-3xl" />
           </span>
@@ -47,10 +50,10 @@ export const KnowledgeToFeed = ({
       </div>
       <div className="flex justify-center">
         <Select
-          label={t("selected_brain_select_label")}
           options={formatMinimalBrainsToSelectComponentInput(
             brainsWithUploadRights
           )}
+          emptyLabel={t("selected_brain_select_label")}
           value={currentBrainId ?? undefined}
           onChange={(newSelectedBrainId) =>
             setCurrentBrainId(newSelectedBrainId)

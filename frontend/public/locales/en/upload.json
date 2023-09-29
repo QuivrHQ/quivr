@@ -6,7 +6,7 @@
     "success": "File uploaded successfully",
     "uploadFailed": "Failed to upload file: {{message}}",
     "maxSizeError": "File too big",
-    "alreadyAdded": "{{fileName}} was already added",
+    "alreadyAdded": "{{fileName}} was already added but not sent to your brain",
     "addFiles": "Please, add files to upload",
     "selectBrain": "Please, select or create a brain to upload a file",
     "invalidUrl": "Invalid URL",
@@ -16,5 +16,5 @@
     "missingNecessaryRole": "You don't have the necessary role to upload content to the selected brain. 🧠💡🥲",
     "invalidFileType": "Invalid file type",
     "feed_form_submit_button":"Send to my brain",
-    "selected_brain_select_label":"Brain selected"
+    "selected_brain_select_label":"Select a brain"
 }

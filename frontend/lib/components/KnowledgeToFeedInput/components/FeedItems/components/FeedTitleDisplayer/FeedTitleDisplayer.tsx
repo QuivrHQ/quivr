@@ -1,40 +1,24 @@
-import { useState } from "react";
+import Tooltip from "@/lib/components/ui/Tooltip";
 
 import { enhanceUrlDisplay } from "./utils/enhanceUrlDisplay";
 import { removeFileExtension } from "./utils/removeFileExtension";
 
 type FeedTitleDisplayerProps = {
   title: string;
-  truncate?: boolean;
+  isUrl?: boolean;
 };
 
 export const FeedTitleDisplayer = ({
   title,
-  truncate = false,
+  isUrl = false,
 }: FeedTitleDisplayerProps): JSX.Element => {
-  const [showFullUrl, setShowFullUrl] = useState(false);
-
-  const toggleShowFullUrl = () => {
-    setShowFullUrl(!showFullUrl);
-  };
-
-  if (truncate) {
-    return (
-      <div className="overflow-hidden">
-        <span className="cursor-pointer" onClick={toggleShowFullUrl}>
-          <p className={showFullUrl ? "" : "truncate"}>
-            {removeFileExtension(title)}
-          </p>
-        </span>
-      </div>
-    );
-  }
-
   return (
     <div>
-      <span className="cursor-pointer" onClick={toggleShowFullUrl}>
-        {showFullUrl ? title : enhanceUrlDisplay(title)}
-      </span>
+      <Tooltip tooltip={title}>
+        <p className={`line-clamp-1 tooltip-${title}`}>
+          {isUrl ? enhanceUrlDisplay(title) : removeFileExtension(title)}
+        </p>
+      </Tooltip>
     </div>
   );
 };

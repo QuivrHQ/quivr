@@ -44,6 +44,7 @@ const Field = forwardRef(
             ref={forwardedRef as RefObject<HTMLInputElement>}
             className={cn(
               `w-full bg-gray-50 dark:bg-gray-900 px-4 py-2 border rounded-md border-black/10 dark:border-white/25`,
+              icon !== undefined ? "pr-12" : "",
               inputClassName
             )}
             name={name}

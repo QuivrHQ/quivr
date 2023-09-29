@@ -17,6 +17,9 @@ module.exports = {
       colors: {
         black: "#00121F",
         primary: "#4F46E5",
+        "chat-bg-gray": "#D9D9D9",
+        "msg-gray": "#9B9B9B",
+        "msg-purple": "#E0DDFC",
       },
     },
   },

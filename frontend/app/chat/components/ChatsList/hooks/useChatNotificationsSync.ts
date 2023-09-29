@@ -5,6 +5,7 @@ import { useEffect } from "react";
 import { useChatApi } from "@/lib/api/chat/useChatApi";
 import { useNotificationApi } from "@/lib/api/notification/useNotificationApi";
 import { useChatContext } from "@/lib/context";
+import { useKnowledgeToFeedContext } from "@/lib/context/KnowledgeToFeedProvider/hooks/useKnowledgeToFeedContext";
 
 import { getChatNotificationsQueryKey } from "../../../[chatId]/utils/getChatNotificationsQueryKey";
 import { getMessagesFromChatItems } from "../../../[chatId]/utils/getMessagesFromChatItems";
@@ -15,6 +16,7 @@ export const useChatNotificationsSync = () => {
   const { setMessages, setNotifications, notifications } = useChatContext();
   const { getChatItems } = useChatApi();
   const { getChatNotifications } = useNotificationApi();
+  const { setShouldDisplayFeedCard } = useKnowledgeToFeedContext();
   const params = useParams();
 
   const chatId = params?.chatId as string | undefined;
@@ -54,6 +56,7 @@ export const useChatNotificationsSync = () => {
   }, [fetchedNotifications]);
 
   useEffect(() => {
+    setShouldDisplayFeedCard(false);
     const fetchHistory = async () => {
       if (chatId === undefined) {
         setMessages([]);

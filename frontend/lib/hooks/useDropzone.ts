@@ -4,14 +4,14 @@ import { useTranslation } from "react-i18next";
 import { FeedItemUploadType } from "@/app/chat/[chatId]/components/ActionsBar/types";
 import { useEventTracking } from "@/services/analytics/june/useEventTracking";
 
-
 import { useToast } from "./useToast";
 import { useKnowledgeToFeedContext } from "../context/KnowledgeToFeedProvider/hooks/useKnowledgeToFeedContext";
 import { acceptedFormats } from "../helpers/acceptedFormats";
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const useCustomDropzone = () => {
-  const { knowledgeToFeed, addKnowledgeToFeed } = useKnowledgeToFeedContext();
+  const { knowledgeToFeed, addKnowledgeToFeed, setShouldDisplayFeedCard } =
+    useKnowledgeToFeedContext();
 
   const files: File[] = (
     knowledgeToFeed.filter((c) => c.source === "upload") as FeedItemUploadType[]
@@ -23,6 +23,7 @@ export const useCustomDropzone = () => {
   const { t } = useTranslation(["upload"]);
 
   const onDrop = (acceptedFiles: File[], fileRejections: FileRejection[]) => {
+    setShouldDisplayFeedCard(true);
     if (fileRejections.length > 0) {
       const firstRejection = fileRejections[0];
 

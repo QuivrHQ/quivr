@@ -11,7 +11,9 @@ import {
   ChatContextMock,
   ChatProviderMock,
 } from "@/lib/context/ChatProvider/mocks/ChatProviderMock";
+import { KnowledgeToFeedProvider } from "@/lib/context/KnowledgeToFeedProvider";
 import { SupabaseContextMock } from "@/lib/context/SupabaseProvider/mocks/SupabaseProviderMock";
+
 vi.mock("@/lib/context/SupabaseProvider/supabase-provider", () => ({
   SupabaseContext: SupabaseContextMock,
 }));
@@ -89,11 +91,13 @@ describe("ChatsList", () => {
   it("should render correctly", () => {
     const { getByTestId } = render(
       <QueryClientProvider client={queryClient}>
-        <ChatProviderMock>
-          <BrainProviderMock>
-            <ChatsList />
-          </BrainProviderMock>
-        </ChatProviderMock>
+        <KnowledgeToFeedProvider>
+          <ChatProviderMock>
+            <BrainProviderMock>
+              <ChatsList />
+            </BrainProviderMock>
+          </ChatProviderMock>
+        </KnowledgeToFeedProvider>
       </QueryClientProvider>
     );
     const chatsList = getByTestId("chats-list");
@@ -109,11 +113,13 @@ describe("ChatsList", () => {
   it("renders the chats list with correct number of items", () => {
     render(
       <QueryClientProvider client={queryClient}>
-        <ChatProviderMock>
-          <BrainProviderMock>
-            <ChatsList />
-          </BrainProviderMock>
-        </ChatProviderMock>
+        <KnowledgeToFeedProvider>
+          <ChatProviderMock>
+            <BrainProviderMock>
+              <ChatsList />
+            </BrainProviderMock>
+          </ChatProviderMock>
+        </KnowledgeToFeedProvider>
       </QueryClientProvider>
     );
     const chatItems = screen.getAllByTestId("chats-list-item");
@@ -129,11 +135,13 @@ describe("ChatsList", () => {
     await act(() =>
       render(
         <QueryClientProvider client={queryClient}>
-          <ChatProviderMock>
-            <BrainProviderMock>
-              <ChatsList />
-            </BrainProviderMock>
-          </ChatProviderMock>
+          <KnowledgeToFeedProvider>
+            <ChatProviderMock>
+              <BrainProviderMock>
+                <ChatsList />
+              </BrainProviderMock>
+            </ChatProviderMock>
+          </KnowledgeToFeedProvider>
         </QueryClientProvider>
       )
     );
@@ -155,11 +163,13 @@ describe("ChatsList", () => {
     await act(() =>
       render(
         <QueryClientProvider client={queryClient}>
-          <ChatProviderMock>
-            <BrainProviderMock>
-              <ChatsList />
-            </BrainProviderMock>
-          </ChatProviderMock>
+          <KnowledgeToFeedProvider>
+            <ChatProviderMock>
+              <BrainProviderMock>
+                <ChatsList />
+              </BrainProviderMock>
+            </ChatProviderMock>
+          </KnowledgeToFeedProvider>
         </QueryClientProvider>
       )
     );

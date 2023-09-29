@@ -1,25 +1,27 @@
 import { IoMdCloseCircle } from "react-icons/io";
-import { MdLink } from "react-icons/md";
+
+import { getFileIcon } from "@/lib/helpers/getFileIcon";
 
 import { FeedTitleDisplayer } from "./FeedTitleDisplayer";
 import { StyledFeedItemDiv } from "../styles/StyledFeedItemDiv";
 
-type CrawlFeedItemProps = {
-  url: string;
+type FileFeedItemProps = {
+  file: File;
   onRemove: () => void;
 };
-export const CrawlFeedItem = ({
-  url,
+
+export const FileFeedItem = ({
+  file,
   onRemove,
-}: CrawlFeedItemProps): JSX.Element => {
+}: FileFeedItemProps): JSX.Element => {
+  const icon = getFileIcon(file.name);
+
   return (
     <StyledFeedItemDiv>
       <div className="flex flex-1 overflow-hidden items-center gap-1">
-        <div>
-          <MdLink className="mr-2 text-2xl" />
-        </div>
+        <div>{icon}</div>
         <div className="flex flex-1">
-          <FeedTitleDisplayer title={url} isUrl />
+          <FeedTitleDisplayer title={file.name} />
         </div>
       </div>
       <div>
