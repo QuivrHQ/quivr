@@ -46,6 +46,7 @@ export const Sidebar = ({
             title="Open Sidebar"
             type="button"
             className="absolute p-3 text-2xl bg-red top-5 -right-20 hover:text-primary dark:hover:text-gray-200 transition-colors"
+            data-testid="open-sidebar-button"
             onClick={() => setOpen(true)}
           >
             <LuPanelLeftOpen />

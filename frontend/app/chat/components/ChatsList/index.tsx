@@ -13,7 +13,7 @@ export const ChatsList = (): JSX.Element => {
 
   return (
     <Sidebar showFooter={true}>
-      <div className="flex flex-col flex-1 h-full">
+      <div className="flex flex-col flex-1 h-full" data-testid="chats-list">
         <div className="pt-2">
           <NewChatButton />
         </div>

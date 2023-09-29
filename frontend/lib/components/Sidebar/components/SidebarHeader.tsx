@@ -16,6 +16,7 @@ export const SidebarHeader = ({ setOpen }: SidebarProps): JSX.Element => {
           title="Close Sidebar"
           className="p-3 text-2xl bg:white dark:bg-black text-black dark:text-white hover:text-primary dark:hover:text-gray-200 transition-colors"
           type="button"
+          data-testid="close-sidebar-button"
           onClick={() => setOpen(false)}
         >
           <LuPanelLeft />
