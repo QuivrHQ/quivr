@@ -45,5 +45,6 @@
     "confirm_set_brain_status_to_private": "Sim, definir como privado",
     "cancel_set_brain_status_to_private": "Não, mantê-lo público",
     "brain_management_button_label": "Gerenciamento de cérebros",
-    "empty_brain_description":"Sem descrição"
+    "empty_brain_description":"Sem descrição",
+    "myBrains": "Meus cérebros"
 }
