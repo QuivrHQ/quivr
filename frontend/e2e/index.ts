@@ -6,6 +6,6 @@ import { uploadTests } from "./tests/upload";
 
 test.describe(createBrainTests);
 
-test.describe.skip(uploadTests);
+test.describe(uploadTests);
 
 test.describe.skip(chatTests);

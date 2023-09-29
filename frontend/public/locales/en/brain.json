@@ -45,5 +45,6 @@
     "set_brain_status_to_private_modal_description":"Every Quivr users won't be able to use this brain anymore and they won't see it in the brain library.",
     "confirm_set_brain_status_to_private":"Yes, set as private",
     "cancel_set_brain_status_to_private":"No, keep it public",
-    "empty_brain_description":"No description"
+    "empty_brain_description":"No description",
+    "myBrains":"My Brains"
 }

@@ -36,7 +36,7 @@ export const KnowledgeToFeed = ({
   });
 
   return (
-    <div className="flex-col w-full relative">
+    <div className="flex-col w-full relative" data-testid="feed-card">
       <div className="flex flex-1 justify-between">
         <AddBrainModal />
         <Button

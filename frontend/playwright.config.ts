@@ -23,5 +23,6 @@ export default defineConfig({
       process.env.NODE_ENV === "production"
         ? "yarn run build && yarn run start -p 3003"
         : "yarn run dev -p 3003",
+    url: process.env.NEXT_PUBLIC_E2E_URL,
   },
 });
