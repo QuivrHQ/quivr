@@ -38,7 +38,7 @@ async def get_user_endpoint(
     max_brain_size = userSettings.get("max_brain_size", 1000000000)
 
     date = time.strftime("%Y%m%d")
-    max_requests_number = userSettings.get("max_requests_number", 10)
+    daily_chat_credit = userSettings.get("daily_chat_credit", 10)
 
     userDailyUsage = UserUsage(id=current_user.id)
     requests_stats = userDailyUsage.get_user_usage()
@@ -53,7 +53,7 @@ async def get_user_endpoint(
         "email": current_user.email,
         "max_brain_size": max_brain_size,
         "current_brain_size": defaul_brain_size,
-        "max_requests_number": max_requests_number,
+        "daily_chat_credit": daily_chat_credit,
         "requests_stats": requests_stats,
         "models": userSettings.get("models", []),
         "date": date,
