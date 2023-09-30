@@ -231,8 +231,8 @@ CREATE TABLE IF NOT EXISTS migrations (
 CREATE TABLE IF NOT EXISTS user_settings (
   user_id UUID PRIMARY KEY,
   models JSONB DEFAULT '["gpt-3.5-turbo"]'::jsonb,
-  max_requests_number INT DEFAULT 50,
-  max_brains INT DEFAULT 5,
+  daily_chat_credit INT DEFAULT 20,
+  max_brains INT DEFAULT 3,
   max_brain_size INT DEFAULT 10000000
 );
 
@@ -270,9 +270,9 @@ CREATE POLICY "Access Quivr Storage 1jccrwz_2" ON storage.objects FOR UPDATE TO 
 CREATE POLICY "Access Quivr Storage 1jccrwz_3" ON storage.objects FOR DELETE TO anon USING (bucket_id = 'quivr');
 
 INSERT INTO migrations (name) 
-SELECT '20230921160000_add_last_update_field_to_brain'
+SELECT '202309307004032_change_user_settings'
 WHERE NOT EXISTS (
-    SELECT 1 FROM migrations WHERE name = '20230921160000_add_last_update_field_to_brain'
+    SELECT 1 FROM migrations WHERE name = '202309307004032_change_user_settings'
 );
 
 

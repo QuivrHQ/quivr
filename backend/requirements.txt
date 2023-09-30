@@ -1,6 +1,6 @@
 pymupdf==1.22.3
-langchain==0.0.281
-litellm==0.1.714
+langchain==0.0.304
+litellm==0.1.794
 Markdown==3.4.4
 openai==0.27.8
 GitPython==3.1.36

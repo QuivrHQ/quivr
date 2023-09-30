@@ -88,7 +88,7 @@ class HeadlessQA(BaseModel):
         :return: Language model instance
         """
         return ChatLiteLLM(
-            temperature=temperature,
+            temperature=0.1,
             model=model,
             streaming=streaming,
             verbose=True,
@@ -161,7 +161,9 @@ class HeadlessQA(BaseModel):
             transformed_history, prompt_content, question.question
         )
         answering_llm = self._create_llm(
-            model=self.model, streaming=True, callbacks=self.callbacks
+            model=self.model,
+            streaming=True,
+            callbacks=self.callbacks,
         )
 
         CHAT_PROMPT = ChatPromptTemplate.from_messages(messages)
