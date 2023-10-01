@@ -48,5 +48,6 @@
   "title": "Configuration",
   "updatingBrainSettings": "Mise à jour des paramètres du cerveau...",
   "incorrectApiKey": "Clé API incorrecte",
-  "invalidApiKeyError": "Clé API invalide"
+  "invalidApiKeyError": "Clé API invalide",
+  "apiKey": "Clé API"
 }

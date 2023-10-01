@@ -48,5 +48,6 @@
     "ohno": "哎呀!",
     "noUser": "没有用户",
     "incorrectApiKey": "无效的API密钥",
-    "invalidApiKeyError": "无效的API密钥"
+    "invalidApiKeyError": "无效的API密钥",
+    "apiKey": "API密钥"
 }
