@@ -48,6 +48,7 @@ export const useSettingsTab = ({ brainId }: UseSettingsTabProps) => {
     temperature,
     status,
     isDefaultBrain,
+    resetField,
   } = useBrainFormState({
     brainId,
   });
@@ -355,5 +356,6 @@ export const useSettingsTab = ({ brainId }: UseSettingsTabProps) => {
     brainStatusOptions,
     status,
     dirtyFields,
+    resetField,
   };
 };

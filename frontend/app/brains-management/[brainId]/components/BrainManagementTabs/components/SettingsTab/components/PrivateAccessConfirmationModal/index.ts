@@ -1,1 +1,1 @@
-export * from "./PrivateAccessConfirmationModal";
+export * from "./AccessConfirmationModal";
