@@ -21,6 +21,7 @@ export const useBrainFormState = ({ brainId }: UseBrainFormStateProps) => {
     watch,
     setValue,
     reset,
+    resetField,
     formState: { dirtyFields },
   } = useForm<BrainConfig>({
     defaultValues: { ...defaultBrainConfig, status: undefined },
@@ -51,5 +52,6 @@ export const useBrainFormState = ({ brainId }: UseBrainFormStateProps) => {
     getValues,
     setValue,
     reset,
+    resetField,
   };
 };
