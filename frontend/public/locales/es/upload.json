@@ -1,6 +1,6 @@
 {
     "addFiles": "Por favor, agregar archivos a subir",
-    "alreadyAdded": "{{fileName}} ya fue agregado",
+    "alreadyAdded": "Ya se agregó {{fileName}} pero no se envió a tu cerebro.",
     "crawlFailed": "Error al rastrear sitio web: {{message}}",
     "drop": "Suelte los archivos aquí...",
     "uploadFailed": "Error al subir archivo: {{message}}",
@@ -16,5 +16,5 @@
     "webSite": "Ingrese la URL del sitio web",
     "invalidFileType": "Tipo de archivo no permitido",
     "feed_form_submit_button": "Enviar a mi cerebro",
-    "selected_brain_select_label": "Cerebro seleccionado"
+    "selected_brain_select_label": "Seleccionar un cerebro"
 }

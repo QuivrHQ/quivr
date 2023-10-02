@@ -21,6 +21,7 @@
   "email": "Email",
   "password": "Mot de passe",
   "or": "ou",
+  "and": "et",
   "loginButton": "Connexion",
   "signUpButton": "S'inscrire",
   "logoutButton": "Déconnexion",

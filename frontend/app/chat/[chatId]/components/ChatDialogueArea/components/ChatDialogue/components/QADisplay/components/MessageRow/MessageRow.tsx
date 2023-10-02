@@ -25,16 +25,16 @@ export const MessageRow = React.forwardRef(
     const handleCopy = () => {
       navigator.clipboard.writeText(text).then(
         () => setIsCopied(true),
-        (err) => console.error('Failed to copy!', err)
+        (err) => console.error("Failed to copy!", err)
       );
-      setTimeout(() => setIsCopied(false), 2000);  // Reset after 2 seconds
+      setTimeout(() => setIsCopied(false), 2000); // Reset after 2 seconds
     };
 
     const containerClasses = cn(
       "py-3 px-5 w-fit",
       isUserSpeaker
-        ? "bg-gray-100 bg-opacity-60 items-start"
-        : "bg-purple-100 bg-opacity-60 items-end",
+        ? "bg-msg-gray bg-opacity-60 items-start"
+        : "bg-msg-purple bg-opacity-60 items-end",
       "dark:bg-gray-800 rounded-3xl flex flex-col overflow-hidden scroll-pb-32"
     );
 

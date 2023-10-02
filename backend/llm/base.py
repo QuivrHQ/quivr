@@ -4,9 +4,7 @@ from typing import AsyncIterable, List
 from langchain.callbacks.streaming_aiter import AsyncIteratorCallbackHandler
 from logger import get_logger
 from models import BrainSettings  # Importing settings related to the 'brain'
-
 from pydantic import BaseModel  # For data validation and settings management
-from models import BrainSettings  # Importing settings related to the 'brain'
 
 logger = get_logger(__name__)
 
@@ -22,7 +20,7 @@ class BaseBrainPicking(BaseModel):
 
     # Default class attributes
     model: str = None  # pyright: ignore reportPrivateUsage=none
-    temperature: float = 0.0
+    temperature: float = 0.1
     chat_id: str = None  # pyright: ignore reportPrivateUsage=none
     brain_id: str = None  # pyright: ignore reportPrivateUsage=none
     max_tokens: int = 256

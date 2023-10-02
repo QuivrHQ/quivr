@@ -21,6 +21,7 @@
   "email": "Email",
   "password": "Пароль",
   "or": "или",
+  "and": "и",
   "loginButton": "Войти",
   "signUpButton": "Зарегистрироваться",
   "logoutButton": "Выйти",

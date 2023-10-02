@@ -6,16 +6,9 @@ import Button from "@/lib/components/ui/Button";
 import Field from "@/lib/components/ui/Field";
 
 import { useCrawler } from "./hooks/useCrawler";
-import { FeedItemType } from "../../../../../app/chat/[chatId]/components/ActionsBar/types";
 
-type CrawlerProps = {
-  addContent: (content: FeedItemType) => void;
-};
-
-export const Crawler = ({ addContent }: CrawlerProps): JSX.Element => {
-  const { urlInputRef, urlToCrawl, handleSubmit, setUrlToCrawl } = useCrawler({
-    addContent,
-  });
+export const Crawler = (): JSX.Element => {
+  const { urlInputRef, urlToCrawl, handleSubmit, setUrlToCrawl } = useCrawler();
   const { t } = useTranslation(["translation", "upload"]);
 
   return (
@@ -32,12 +25,13 @@ export const Crawler = ({ addContent }: CrawlerProps): JSX.Element => {
             name="crawlurl"
             ref={urlInputRef}
             type="text"
+            data-testid="urlToCrawlInput"
             placeholder={t("webSite", { ns: "upload" })}
             className="w-full"
             value={urlToCrawl}
             onChange={(e) => setUrlToCrawl(e.target.value)}
             icon={
-              <Button variant={"tertiary"}>
+              <Button data-testid="urlToCrawlInputSubmit" variant={"tertiary"}>
                 <MdSend />
               </Button>
             }

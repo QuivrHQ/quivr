@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.0.84 (2023-09-28)
+
+## What's Changed
+* feat: 👤 Implement gravatar by @matthieujacq in https://github.com/StanGirard/quivr/pull/1268
+* feat: improve knowledge feed process ux by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1274
+* fix: 🔒️ add gravatar.com to the content security policy by @matthieujacq in https://github.com/StanGirard/quivr/pull/1273
+* feat(chatPage): update ui add new feed component by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1275
+* feat: knowledge tab add button by @gozineb in https://github.com/StanGirard/quivr/pull/1277
+* fix(brains): get brains on local by @B0rrA in https://github.com/StanGirard/quivr/pull/1272
+
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.83...v0.0.84
+
 ## 0.0.83 (2023-09-27)
 
 ## What's Changed

@@ -6,7 +6,7 @@
     "success": "Fichier téléchargé avec succès",
     "uploadFailed": "Échec du téléchargement du fichier : {{message}}",
     "maxSizeError": "Fichier trop volumineux",
-    "alreadyAdded": "{{fileName}} a déjà été ajouté",
+    "alreadyAdded": "{{fileName}} a déjà été ajouté mais n'a pas été envoyé à votre cerveau.",
     "addFiles": "Veuillez ajouter des fichiers à télécharger",
     "selectBrain": "Veuillez sélectionner ou créer un cerveau pour télécharger un fichier",
     "invalidUrl": "URL invalide",
@@ -16,5 +16,5 @@
     "missingNecessaryRole": "Vous n'avez pas le rôle nécessaire pour télécharger du contenu dans le cerveau sélectionné. 🧠💡🥲",
     "invalidFileType": "Type de fichier invalide",
     "feed_form_submit_button":"Envoyer à mon cerveau",
-    "selected_brain_select_label": "Cerveau sélectionné"
+    "selected_brain_select_label": "Sélectionnez un cerveau"
 }

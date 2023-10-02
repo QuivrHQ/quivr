@@ -4,22 +4,23 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
 
 import Spinner from "@/lib/components/ui/Spinner";
-import { KnowledgeProvider } from "@/lib/context";
+import { KnowledgeToFeedProvider } from "@/lib/context";
 
+import { AddKnowledge } from "./AddKnowledge";
 import { KnowledgeTable } from "./KnowledgeTable";
-import { useKnowledgeTab } from "./hooks/useKnowledgeTab";
+import { useKnowledge } from "./hooks/useKnowledge";
 
 type KnowledgeTabProps = {
   brainId: UUID;
 };
 export const KnowledgeTab = ({ brainId }: KnowledgeTabProps): JSX.Element => {
   const { t } = useTranslation(["translation", "explore"]);
-  const { isPending, allKnowledge } = useKnowledgeTab({
+  const { isPending, allKnowledge } = useKnowledge({
     brainId,
   });
 
   return (
-    <KnowledgeProvider>
+    <KnowledgeToFeedProvider>
       <main>
         <section className="w-full outline-none pt-10 flex flex-col gap-5 items-center justify-center p-6">
           <div className="flex flex-col items-center justify-center">
@@ -28,6 +29,7 @@ export const KnowledgeTab = ({ brainId }: KnowledgeTabProps): JSX.Element => {
             </h1>
             <h2 className="opacity-50">{t("subtitle", { ns: "explore" })}</h2>
           </div>
+          <AddKnowledge />
           {isPending ? (
             <Spinner />
           ) : (
@@ -48,6 +50,6 @@ export const KnowledgeTab = ({ brainId }: KnowledgeTabProps): JSX.Element => {
           )}
         </section>
       </main>
-    </KnowledgeProvider>
+    </KnowledgeToFeedProvider>
   );
 };

@@ -10,7 +10,7 @@ export const StyledFeedItemDiv = ({
   <div
     {...propsWithoutClassname}
     className={cn(
-      "bg-gray-100 p-4 flex flex-row items-center  py-2 rounded-lg shadow-sm ",
+      "bg-gray-100 p-4 flex flex-row items-center py-2 rounded-lg shadow-sm",
       className
     )}
   />

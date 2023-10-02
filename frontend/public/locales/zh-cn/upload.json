@@ -6,7 +6,7 @@
     "success": "文件上传成功",
     "uploadFailed": "上传文件失败：{{message}}",
     "maxSizeError": "文件太大",
-    "alreadyAdded": "已添加 {{filename}}",
+    "alreadyAdded":  "{{fileName}} 已经添加，但尚未发送到您的大脑。",
     "addFiles": "请添加要上传的文件",
     "selectBrain": "请选择或创建一个大脑来上传文件。",
     "invalidUrl": "无效的URL",
@@ -16,5 +16,5 @@
     "missingNecessaryRole": "您没有所选大脑的上传权限。 🧠💡🥲",
     "invalidFileType": "文件类型不受支持",
     "feed_form_submit_button":"发送到我的大脑",
-    "selected_brain_select_label": "已选择的大脑"
+    "selected_brain_select_label": "选择一个大脑"
 }

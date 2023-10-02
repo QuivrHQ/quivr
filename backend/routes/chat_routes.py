@@ -34,10 +34,7 @@ from repository.chat.get_chat_history_with_notifications import (
 )
 from repository.notification.remove_chat_notifications import remove_chat_notifications
 from repository.user_identity import get_user_identity
-
-from routes.authorizations.brain_authorization import (
-    validate_brain_authorization,
-)
+from routes.authorizations.brain_authorization import validate_brain_authorization
 from routes.authorizations.types import RoleEnum
 
 chat_router = APIRouter()
@@ -84,8 +81,8 @@ def check_user_requests_limit(
     userDailyUsage.handle_increment_user_request_count(date)
 
     if user.openai_api_key is None:
-        max_requests_number = userSettings.get("max_requests_number", 0)
-        if int(userDailyUsage.daily_requests_count) >= int(max_requests_number):
+        daily_chat_credit = userSettings.get("daily_chat_credit", 0)
+        if int(userDailyUsage.daily_requests_count) >= int(daily_chat_credit):
             raise HTTPException(
                 status_code=429,  # pyright: ignore reportPrivateUsage=none
                 detail="You have reached the maximum number of requests for today.",  # pyright: ignore reportPrivateUsage=none
@@ -233,7 +230,9 @@ async def create_question_handler(
     ):
         # TODO: create ChatConfig class (pick config from brain or user or chat) and use it here
         chat_question.model = chat_question.model or brain.model or "gpt-3.5-turbo"
-        chat_question.temperature = chat_question.temperature or brain.temperature or 0
+        chat_question.temperature = (
+            chat_question.temperature or brain.temperature or 0.1
+        )
         chat_question.max_tokens = chat_question.max_tokens or brain.max_tokens or 256
 
     try:

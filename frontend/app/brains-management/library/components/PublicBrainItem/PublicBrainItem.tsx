@@ -36,7 +36,7 @@ export const PublicBrainItem = ({
       }}
       disabled={isUserSubscribedToBrain || subscriptionRequestPending}
       isLoading={subscriptionRequestPending}
-      className="bg-purple-600 text-white p-0 px-3 rounded-xl border-0 w-content mt-3"
+      className="bg-primary text-white p-0 px-3 rounded-xl border-0 w-content mt-3"
     >
       {isUserSubscribedToBrain
         ? t("public_brain_already_subscribed_button_label")

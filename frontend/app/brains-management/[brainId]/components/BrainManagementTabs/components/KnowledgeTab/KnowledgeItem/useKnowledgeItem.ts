@@ -4,10 +4,11 @@ import { useTranslation } from "react-i18next";
 
 import { useKnowledgeApi } from "@/lib/api/knowledge/useKnowledgeApi";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
-import { useKnowledgeContext } from "@/lib/context/KnowledgeProvider/hooks/useKnowledgeContext";
 import { useToast } from "@/lib/hooks";
 import { Knowledge } from "@/lib/types/Knowledge";
 import { useEventTracking } from "@/services/analytics/june/useEventTracking";
+
+import { useKnowledge } from "../hooks/useKnowledge";
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const useKnowledgeItem = () => {
@@ -16,13 +17,18 @@ export const useKnowledgeItem = () => {
   const { publish } = useToast();
   const { track } = useEventTracking();
   const { currentBrain } = useBrainContext();
-  const { setAllKnowledge } = useKnowledgeContext();
+
+  const { invalidateKnowledgeDataKey } = useKnowledge({
+    brainId: currentBrain?.id,
+  });
+
   const { t } = useTranslation(["translation", "explore"]);
 
   const onDeleteKnowledge = async (knowledge: Knowledge) => {
     setIsDeleting(true);
     void track("DELETE_DOCUMENT");
-    const knowledge_name = 'fileName' in knowledge ? knowledge.fileName : knowledge.url;
+    const knowledge_name =
+      "fileName" in knowledge ? knowledge.fileName : knowledge.url;
     try {
       if (currentBrain?.id === undefined) {
         throw new Error(t("noBrain", { ns: "explore" }));
@@ -31,9 +37,9 @@ export const useKnowledgeItem = () => {
         brainId: currentBrain.id,
         knowledgeId: knowledge.id,
       });
-      setAllKnowledge((knowledges) =>
-        knowledges.filter((k) => k.id !== knowledge.id)
-      ); // Optimistic update
+
+      invalidateKnowledgeDataKey();
+
       publish({
         variant: "success",
         text: t("deleted", {

@@ -6,7 +6,7 @@
     "success": "Arquivo enviado com sucesso",
     "uploadFailed": "Falha ao enviar arquivo: {{message}}",
     "maxSizeError": "Arquivo muito grande",
-    "alreadyAdded": "{{fileName}} já foi adicionado",
+    "alreadyAdded": "{{fileName}} já foi adicionado, mas não foi enviado para o seu cérebro.",
     "addFiles": "Por favor, adicione arquivos para enviar",
     "selectBrain": "Por favor, selecione ou crie um cérebro para enviar um arquivo",
     "invalidUrl": "URL inválido",
@@ -16,5 +16,5 @@
     "missingNecessaryRole": "Você não possui a função necessária para enviar conteúdo para o cérebro selecionado. 🧠💡🥲",
     "invalidFileType": "Tipo de arquivo inválido",
     "feed_form_submit_button": "Enviar para o meu cérebro",
-    "selected_brain_select_label": "Cérebro selecionado"
+    "selected_brain_select_label": "Selecione um cérebro"
 }
