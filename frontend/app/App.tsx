@@ -22,10 +22,12 @@ export const App = ({ children }: PropsWithChildren): JSX.Element => {
   usePageTracking();
 
   useEffect(() => {
-    void fetchAllBrains();
-    void fetchDefaultBrain();
-    void fetchPublicPrompts();
-  }, [session?.user.id]);
+    if (session?.user) {
+      void fetchAllBrains();
+      void fetchDefaultBrain();
+      void fetchPublicPrompts();
+    }
+  }, [session]);
 
   return (
     <QueryClientProvider client={queryClient}>
