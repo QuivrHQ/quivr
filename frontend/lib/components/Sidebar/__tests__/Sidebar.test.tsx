@@ -1,8 +1,27 @@
 /* eslint-disable max-lines */
-import { act, render, screen } from "@testing-library/react";
+import {
+  act,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { Sidebar } from "@/lib/components/Sidebar/Sidebar";
+import { useDevice } from "@/lib/hooks/useDevice";
+
+vi.mock("@/lib/hooks/useDevice");
+
+const renderSidebar = async () => {
+  await act(() =>
+    render(
+      <Sidebar showFooter={false}>
+        <div data-testid="sidebar-test-content">📦</div>
+      </Sidebar>
+    )
+  );
+};
 
 describe("Sidebar", () => {
   afterEach(() => {
@@ -10,41 +29,21 @@ describe("Sidebar", () => {
   });
 
   it("is rendered by default on desktop", async () => {
-    vi.mock("@/lib/hooks/useDevice", () => ({
-      useDevice: () => ({ isMobile: false }),
-    }));
+    vi.mocked(useDevice).mockReturnValue({ isMobile: false });
 
-    await act(() =>
-      render(
-        <Sidebar showFooter={false}>
-          <div data-testid="sidebar-test-content">📦</div>
-        </Sidebar>
-      )
-    );
+    await renderSidebar();
 
     const closeSidebarButton = screen.queryByTestId("close-sidebar-button");
     expect(closeSidebarButton).toBeVisible();
-
-    // FIXME: this is not working
-    // const openSidebarButton = screen.queryByTestId("open-sidebar-button");
-    // expect(openSidebarButton).not.toBeVisible();
 
     const sidebarContent = screen.getByTestId("sidebar-test-content");
     expect(sidebarContent).toBeVisible();
   });
 
   it("is hidden by default on mobile", async () => {
-    vi.mock("@/lib/hooks/useDevice", () => ({
-      useDevice: () => ({ isMobile: true }),
-    }));
+    vi.mocked(useDevice).mockReturnValue({ isMobile: true });
 
-    await act(() =>
-      render(
-        <Sidebar showFooter={false}>
-          <div data-testid="sidebar-test-content">📦</div>
-        </Sidebar>
-      )
-    );
+    await renderSidebar();
 
     const closeSidebarButton = screen.queryByTestId("close-sidebar-button");
     expect(closeSidebarButton).not.toBeVisible();
@@ -55,5 +54,26 @@ describe("Sidebar", () => {
     expect(sidebarContent).not.toBeVisible();
   });
 
-  // TODO: test open/close buttons
+  it("shows and hide content when the open and close buttons are clicked", async () => {
+    vi.mocked(useDevice).mockReturnValue({ isMobile: true });
+
+    await renderSidebar();
+
+    const openSidebarButton = screen.getByTestId("open-sidebar-button");
+    expect(openSidebarButton).toBeVisible();
+
+    const sidebarContent = screen.queryByTestId("sidebar-test-content");
+    expect(sidebarContent).not.toBeVisible();
+
+    fireEvent.click(openSidebarButton);
+
+    await waitFor(() => expect(sidebarContent).toBeVisible());
+
+    const closeSidebarButton = screen.getByTestId("close-sidebar-button");
+    expect(closeSidebarButton);
+
+    fireEvent.click(closeSidebarButton);
+
+    await waitFor(() => expect(sidebarContent).not.toBeVisible());
+  });
 });
