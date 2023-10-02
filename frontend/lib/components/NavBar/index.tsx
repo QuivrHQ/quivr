@@ -12,7 +12,9 @@ export const NavBar = (): JSX.Element => {
 
   return (
     <>
-      {path === null || path.startsWith("/chat") ? (
+      {path === null ||
+      path.startsWith("/chat") ||
+      path.startsWith("/brains-management") ? (
         <></>
       ) : (
         <Header>

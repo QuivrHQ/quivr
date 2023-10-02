@@ -2,7 +2,7 @@ import Link from "next/link";
 import { useTranslation } from "react-i18next";
 import { FaBrain } from "react-icons/fa";
 
-import { sidebarLinkStyle } from "@/app/chat/components/ChatsList/components/ChatsListItem/styles/SidebarLinkStyle";
+import { sidebarLinkStyle } from "@/lib/components/Sidebar/components/SidebarFooter/styles/SidebarLinkStyle";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 
 export const BrainManagementButton = (): JSX.Element => {
