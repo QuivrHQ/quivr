@@ -1,7 +1,11 @@
 import { useEffect, useState } from "react";
 
+type UseStreamTextProps = {
+  text: string;
+  enabled?: boolean;
+};
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-export const useStreamText = (text: string, enabled = true) => {
+export const useStreamText = ({ text, enabled = true }: UseStreamTextProps) => {
   const [streamingText, setStreamingText] = useState<string>("");
   const [currentIndex, setCurrentIndex] = useState(0);
 
