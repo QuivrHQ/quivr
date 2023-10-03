@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.0.87 (2023-10-03)
+
+## What's Changed
+* feat: ↕️ maximize brains management page by @matthieujacq in https://github.com/StanGirard/quivr/pull/1308
+* refactor: ♻️ ContentSecurityPolicy as an object by @matthieujacq in https://github.com/StanGirard/quivr/pull/1312
+* fix: replace next/image's layout deprecated attribute by @matthieujacq in https://github.com/StanGirard/quivr/pull/1313
+* fix: remove undesired outlines around divs by @matthieujacq in https://github.com/StanGirard/quivr/pull/1316
+* feat(onboarding): add step 2 by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1314
+* feat(onboarding): add questions suggestions layout by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1318
+
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.86...v0.0.87
+
 ## 0.0.86 (2023-10-03)
 
 ## What's Changed
