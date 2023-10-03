@@ -1,5 +1,26 @@
 # Changelog
 
+## 0.0.86 (2023-10-03)
+
+## What's Changed
+* fix(script): added percent before list of emails by @StanGirard in https://github.com/StanGirard/quivr/pull/1284
+* feat: improve app ux by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1281
+* test: add e2e for crawling by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1288
+* feat(user_settings): increased by @StanGirard in https://github.com/StanGirard/quivr/pull/1291
+* fix: prevent fetch when user is not logged in by @nguernse in https://github.com/StanGirard/quivr/pull/1293
+* fix(Select): fix JSX typo by @nguernse in https://github.com/StanGirard/quivr/pull/1292
+* feat: ✨ responsive sidebar by @matthieujacq in https://github.com/StanGirard/quivr/pull/1279
+* fix: 🐛 Sidebar content should not hide the sidebar footer by @matthieujacq in https://github.com/StanGirard/quivr/pull/1298
+* feat: allow users to turn private brain to public by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1300
+* feat: add onboarding first step by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1303
+* feat: update chat list on new chat first message by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1305
+* feat: ↕️ Maximise chat window by @matthieujacq in https://github.com/StanGirard/quivr/pull/1301
+
+## New Contributors
+* @nguernse made their first contribution in https://github.com/StanGirard/quivr/pull/1293
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.85...v0.0.86
+
 ## 0.0.84 (2023-09-28)
 
 ## What's Changed
