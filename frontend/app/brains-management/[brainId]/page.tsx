@@ -22,11 +22,7 @@ const BrainsManagement = (): JSX.Element => {
     );
   }
 
-  return (
-    <main className="flex flex-col w-full lg:pt-20 lg:px-20 lg:mb-10 sm:pt-4 sm:px-4 sm=mb-2">
-      <BrainManagementTabs />
-    </main>
-  );
+  return <BrainManagementTabs />;
 };
 
 export default BrainsManagement;
