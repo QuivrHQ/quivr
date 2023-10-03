@@ -15,6 +15,10 @@ a {
   @apply hover:text-primary dark:hover:text-gray-200 transition-colors;
 }
 
+div:focus {
+  @apply outline-none;
+}
+
 @layer utilities {
   .scrollbar::-webkit-scrollbar {
     @apply w-2 h-2;
