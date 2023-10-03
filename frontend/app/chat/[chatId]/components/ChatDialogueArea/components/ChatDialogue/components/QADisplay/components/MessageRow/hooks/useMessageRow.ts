@@ -25,7 +25,7 @@ export const useMessageRow = ({ speaker, text }: UseMessageRowProps) => {
 
   const containerClasses = cn(
     "py-3 px-5 w-fit",
-    isUserSpeaker ? "bg-msg-gray bg-opacity-60" : "bg-msg-purple bg-opacity-60",
+    isUserSpeaker ? "bg-msg-gray bg-opacity-10" : "bg-msg-purple bg-opacity-40",
     "dark:bg-gray-800 rounded-3xl flex flex-col overflow-hidden scroll-pb-32"
   );
 
