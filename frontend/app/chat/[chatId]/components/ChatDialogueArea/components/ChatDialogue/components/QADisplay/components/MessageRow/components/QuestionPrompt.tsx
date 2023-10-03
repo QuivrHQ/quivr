@@ -11,7 +11,10 @@ export const QuestionPrompt = ({
   }
 
   return (
-    <span data-testid="prompt-tags" className="text-gray-400 mb-1 text-xs">
+    <span
+      data-testid="prompt-tags"
+      className="text-msg-header-gray mb-1 text-xs"
+    >
       #{promptName}
     </span>
   );
