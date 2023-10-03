@@ -59,13 +59,13 @@ const ContentSecurityPolicy = {
 
 const cspString = Object.entries(ContentSecurityPolicy)
   .map(([key, values]) => `${key} ${values.join(" ")};`)
-  .join("\n");
+  .join(" ");
 
 // Define headers
 const securityHeaders = [
   {
     key: "Content-Security-Policy",
-    value: cspString.replace(/\n/g, ""),
+    value: cspString,
   },
   {
     key: "Referrer-Policy",
