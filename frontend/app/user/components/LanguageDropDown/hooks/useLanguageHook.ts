@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 
 import { useEventTracking } from "@/services/analytics/june/useEventTracking";
 
-const languages = {
+export const languages = {
   en: {
     label: "English",
   },
