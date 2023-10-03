@@ -41,7 +41,7 @@ export const RequestsPerDayChart = ({
       theme={VictoryTheme.material}
       containerComponent={
         <VictoryContainer
-          className="bg-white rounded-md w-full h-full"
+          className="bg-white dark:bg-black rounded-md w-full h-full"
           responsive={true}
         />
       }
