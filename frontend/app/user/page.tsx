@@ -11,8 +11,7 @@ import { redirectToLogin } from "@/lib/router/redirectToLogin";
 import { UserStatistics } from "./components";
 import { ApiKeyConfig } from "./components/ApiKeyConfig";
 import { useLanguageHook } from "./components/LanguageDropDown/hooks/useLanguageHook";
-/* eslint-disable-next-line sort-imports */
-import { useTheme, type Theme } from "./components/ThemeSelect/hooks/useTheme";
+import ThemeSelect from "./components/ThemeSelect/ThemeSelect";
 
 const UserPage = (): JSX.Element => {
   const { session } = useSupabase();
@@ -21,7 +20,6 @@ const UserPage = (): JSX.Element => {
     redirectToLogin();
   }
 
-  const { theme, setTheme } = useTheme();
   const { allLanguages, currentLanguage, change } = useLanguageHook();
   const { user } = session;
   const { t } = useTranslation(["translation", "user", "config"]);
@@ -81,24 +79,7 @@ const UserPage = (): JSX.Element => {
             </select>
           </fieldset>
 
-          <fieldset name="theme" className="mb-2">
-            <label
-              className="block text-slate-700 dark:text-slate-300 mb-2"
-              htmlFor="theme"
-            >
-              {t("themeSelect")}
-            </label>
-            <select
-              name="theme"
-              id="theme"
-              value={theme}
-              onChange={(e) => setTheme(e.target.value as Theme)}
-              className="bg-slate-50 focus:outline-none focus-visible:ring-none border rounded dark:bg-black dark:text-white p-2 w-full md:w-1/2 lg:w-1/3"
-            >
-              <option value="dark">Dark</option>
-              <option value="light">Light</option>
-            </select>
-          </fieldset>
+          <ThemeSelect />
         </CardBody>
       </Card>
 

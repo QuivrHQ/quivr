@@ -1,7 +1,10 @@
 import { useEffect, useLayoutEffect, useState } from "react";
 
-export type Theme = "dark" | "light";
+export type Theme = "dark" | "light" | "system";
 
+/**
+ * @todo implement "system" theme
+ */
 export const useTheme = (): {
   isDark: boolean;
   isLight: boolean;
