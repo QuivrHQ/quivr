@@ -32,7 +32,7 @@ export const App = ({ children }: PropsWithChildren): JSX.Element => {
   return (
     <QueryClientProvider client={queryClient}>
       <NavBar />
-      <div className="flex-1">{children}</div>
+      {children}
       <Footer />
       <UpdateMetadata />
     </QueryClientProvider>

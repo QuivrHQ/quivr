@@ -43,7 +43,7 @@ const RootLayout = async ({
             <SupabaseProvider session={session}>
               <BrainProvider>
                 <App>
-                  <div className="flex-1">{children}</div>
+                  {children}
                 </App>
               </BrainProvider>
             </SupabaseProvider>
