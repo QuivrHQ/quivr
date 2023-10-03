@@ -11,8 +11,8 @@ const SelectedChatPage = (): JSX.Element => {
   const { shouldDisplayFeedCard } = useKnowledgeToFeedContext();
 
   return (
-    <main
-      className={`flex flex-col flex-1 items-stretch justify-stretch w-full h-[100vh] overflow-hidden ${
+    <div
+      className={`flex flex-col flex-1 items-center justify-stretch w-full h-[100vh] overflow-hidden ${
         shouldDisplayFeedCard ? "bg-chat-bg-gray" : "bg-white"
       } dark:bg-black transition-colors ease-out duration-500`}
       data-testid="chat-page"
@@ -26,7 +26,7 @@ const SelectedChatPage = (): JSX.Element => {
           </div>
           <ActionsBar />
         </div>
-    </main>
+    </div>
   );
 };
 
