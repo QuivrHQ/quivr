@@ -9,20 +9,20 @@ import { NavItems } from "./components/NavItems";
 
 export const NavBar = (): JSX.Element => {
   const path = usePathname();
+  const pageHasSidebar =
+    path === null ||
+    path.startsWith("/chat") ||
+    path.startsWith("/brains-management");
+
+  if (pageHasSidebar) {
+    return <></>;
+  }
 
   return (
-    <>
-      {path === null ||
-      path.startsWith("/chat") ||
-      path.startsWith("/brains-management") ? (
-        <></>
-      ) : (
-        <Header>
-          <Logo />
-          <NavItems className="hidden sm:flex" />
-          <MobileMenu />
-        </Header>
-      )}
-    </>
+    <Header>
+      <Logo />
+      <NavItems className="hidden sm:flex" />
+      <MobileMenu />
+    </Header>
   );
 };
