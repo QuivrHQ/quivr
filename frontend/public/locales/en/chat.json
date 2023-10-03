@@ -35,7 +35,9 @@
   "feedingBrain": "Your newly added knowledge is being processed, you can keep chatting in the meantime !",
   "add_content_card_button_tooltip": "Add knowledge to a brain",
   "onboarding": {
-    "step_1_message_1": "Hi 👋🏻 Want to discover Quivr ? 😇",
-    "step_1_message_2": "Step 1: Download “Quivr documentation”"
+    "download_message_1": "Hi 👋🏻 Want to discover Quivr ? 😇",
+    "download_message_2": "Step 1: Download “Quivr documentation”",
+    "upload_message_1":"Congratulations on your first step 🥳",
+    "upload_message_2":"Step 2: Now Drag and drop it on the chat or in the 📎"
   }
 }
