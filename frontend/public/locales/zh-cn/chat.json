@@ -37,5 +37,9 @@
   "new_prompt": "新提示",
   "feed_brain_placeholder" : "选择要用这些文件喂养的 @大脑",
   "feedingBrain": "您新添加的知识正在处理中，同时您可以继续聊天！",
-  "add_content_card_button_tooltip": "向大脑添加知识"
+  "add_content_card_button_tooltip": "向大脑添加知识",
+  "onboarding":{
+    "step_1_message_1": "你好 👋🏻 想要发现 Quivr 吗？ 😇",
+    "step_1_message_2": "步骤 1：下载“Quivr 文档”"
+  }
 }

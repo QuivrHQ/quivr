@@ -1,7 +1,13 @@
+import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import { useTranslation } from "react-i18next";
 
 import { ChatItem } from "./components";
+import { Onboarding } from "./components/Onboarding/Onboarding";
 import { useChatDialogue } from "./hooks/useChatDialogue";
+import {
+  chatDialogueContainerClassName,
+  chatItemContainerClassName,
+} from "./styles";
 import { getKeyFromChatItem } from "./utils/getKeyFromChatItem";
 import { ChatItemWithGroupedNotifications } from "../../types";
 
@@ -15,17 +21,23 @@ export const ChatDialogue = ({
   const { t } = useTranslation(["chat"]);
   const { chatListRef } = useChatDialogue();
 
+  const shouldDisplayOnboarding = useFeatureIsOn("onboarding");
+
+  if (shouldDisplayOnboarding) {
+    return (
+      <div className={chatDialogueContainerClassName} ref={chatListRef}>
+        <Onboarding />
+        <div className={chatItemContainerClassName}>
+          {chatItems.map((chatItem) => (
+            <ChatItem key={getKeyFromChatItem(chatItem)} content={chatItem} />
+          ))}
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        flex: 1,
-        overflowY: "auto",
-        marginBottom: 10,
-      }}
-      ref={chatListRef}
-    >
+    <div className={chatDialogueContainerClassName} ref={chatListRef}>
       {chatItems.length === 0 ? (
         <div
           data-testid="empty-history-message"
@@ -34,7 +46,7 @@ export const ChatDialogue = ({
           {t("ask", { ns: "chat" })}
         </div>
       ) : (
-        <div className="flex flex-col gap-3">
+        <div className={chatItemContainerClassName}>
           {chatItems.map((chatItem) => (
             <ChatItem key={getKeyFromChatItem(chatItem)} content={chatItem} />
           ))}
