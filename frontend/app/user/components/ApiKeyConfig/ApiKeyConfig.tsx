@@ -1,10 +1,12 @@
 /* eslint-disable max-lines */
 "use client";
 
+import { useTranslation } from "react-i18next";
 import { FaCopy, FaInfoCircle } from "react-icons/fa";
 
 import Button from "@/lib/components/ui/Button";
 import Field from "@/lib/components/ui/Field";
+import copyToClipboard from "@/lib/helpers/copyToClipboard";
 
 import { useApiKeyConfig } from "./hooks/useApiKeyConfig";
 
@@ -21,10 +23,11 @@ export const ApiKeyConfig = (): JSX.Element => {
     removeOpenAiApiKey,
     hasOpenAiApiKey,
   } = useApiKeyConfig();
+  const { t } = useTranslation(["config"]);
 
   return (
     <>
-      <h3 className="font-semibold mb-2">Quivr API Key</h3>
+      <h3 className="font-semibold mb-2">Quivr {t("apiKey")}</h3>
 
       <div>
         {apiKey === "" ? (
@@ -48,7 +51,7 @@ export const ApiKeyConfig = (): JSX.Element => {
       <hr className="my-8" />
 
       <div>
-        <h3 className="font-semibold mb-2">OpenAI API Key</h3>
+        <h3 className="font-semibold mb-2">OpenAI {t("apiKey")}</h3>
         <form
           className="mb-4"
           onSubmit={(event) => {
@@ -56,14 +59,25 @@ export const ApiKeyConfig = (): JSX.Element => {
             void changeOpenAiApiKey();
           }}
         >
-          <Field
-            name="openAiApiKey"
-            placeholder="Open AI Key"
-            className="w-full"
-            value={openAiApiKey ?? ""}
-            data-testid="open-ai-api-key-input"
-            onChange={(e) => setOpenAiApiKey(e.target.value)}
-          />
+          <div className="flex items-center space-x-2">
+            <Field
+              name="openAiApiKey"
+              placeholder="Open AI Key"
+              className="w-full"
+              value={openAiApiKey ?? ""}
+              data-testid="open-ai-api-key-input"
+              onChange={(e) => setOpenAiApiKey(e.target.value)}
+            />
+            <button
+              hidden={!hasOpenAiApiKey}
+              data-testid="copy-openai-api-key-button"
+              onClick={() => void copyToClipboard(openAiApiKey)}
+              type="button"
+            >
+              <FaCopy />
+            </button>
+          </div>
+
           <div className="mt-4 flex flex-row justify-between">
             {hasOpenAiApiKey && (
               <Button
@@ -85,7 +99,7 @@ export const ApiKeyConfig = (): JSX.Element => {
           </div>
         </form>
 
-        <div className="flex space-x-2 bg-sky-100 border border-sky-200  px-4 py-3 rounded relative max-w-md">
+        <div className="flex space-x-2 bg-sky-100 dark:bg-gray-900 border border-sky-200 dark:border-gray-700  px-4 py-3 rounded relative max-w-md">
           <div className="text-xl font-semibold text-sky-600">
             <FaInfoCircle />
           </div>

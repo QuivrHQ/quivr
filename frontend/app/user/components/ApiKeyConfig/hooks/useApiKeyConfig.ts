@@ -8,6 +8,7 @@ import { useAuthApi } from "@/lib/api/auth/useAuthApi";
 import { USER_IDENTITY_DATA_KEY } from "@/lib/api/user/config";
 import { useUserApi } from "@/lib/api/user/useUserApi";
 import { UserIdentity } from "@/lib/api/user/user";
+import copyToClipboard from "@/lib/helpers/copyToClipboard";
 import { useToast } from "@/lib/hooks";
 import { useGAnalyticsEventTracker } from "@/services/analytics/google/useGAnalyticsEventTracker";
 import { useEventTracking } from "@/services/analytics/june/useEventTracking";
@@ -52,19 +53,11 @@ export const useApiKeyConfig = () => {
     }
   };
 
-  const copyToClipboard = async (text: string) => {
-    try {
+  const handleCopyClick = () => {
+    if (apiKey !== "") {
       void track("COPY_API_KEY");
       gaEventTracker?.({ action: "COPY_API_KEY" });
 
-      await navigator.clipboard.writeText(text);
-    } catch (err) {
-      console.error("Failed to copy:", err);
-    }
-  };
-
-  const handleCopyClick = () => {
-    if (apiKey !== "") {
       void copyToClipboard(apiKey);
     }
   };
