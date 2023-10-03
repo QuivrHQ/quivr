@@ -1,49 +1,35 @@
-import React, { useState } from "react";
-import { FaCheckCircle, FaCopy } from "react-icons/fa";
-import ReactMarkdown from "react-markdown";
+import React from "react";
 
-import { cn } from "@/lib/utils";
-
+import { CopyButton } from "./components/CopyButton";
+import { MessageContent } from "./components/MessageContent";
 import { QuestionBrain } from "./components/QuestionBrain";
 import { QuestionPrompt } from "./components/QuestionPrompt";
+import { useMessageRow } from "./hooks/useMessageRow";
 
 type MessageRowProps = {
-  speaker: string;
-  text: string;
+  speaker: "user" | "assistant";
+  text?: string;
   brainName?: string | null;
   promptName?: string | null;
+  children?: React.ReactNode;
 };
 
 export const MessageRow = React.forwardRef(
   (
-    { speaker, text, brainName, promptName }: MessageRowProps,
+    { speaker, text, brainName, promptName, children }: MessageRowProps,
     ref: React.Ref<HTMLDivElement>
   ) => {
-    const isUserSpeaker = speaker === "user";
-    const [isCopied, setIsCopied] = useState(false);
-
-    const handleCopy = () => {
-      navigator.clipboard.writeText(text).then(
-        () => setIsCopied(true),
-        (err) => console.error("Failed to copy!", err)
-      );
-      setTimeout(() => setIsCopied(false), 2000); // Reset after 2 seconds
-    };
-
-    const containerClasses = cn(
-      "py-3 px-5 w-fit",
-      isUserSpeaker
-        ? "bg-msg-gray bg-opacity-60 items-start"
-        : "bg-msg-purple bg-opacity-60 items-end",
-      "dark:bg-gray-800 rounded-3xl flex flex-col overflow-hidden scroll-pb-32"
-    );
-
-    const containerWrapperClasses = cn(
-      "flex flex-col",
-      isUserSpeaker ? "items-end" : "items-start"
-    );
-
-    const markdownClasses = cn("prose", "dark:prose-invert");
+    const {
+      containerClasses,
+      containerWrapperClasses,
+      handleCopy,
+      isCopied,
+      isUserSpeaker,
+      markdownClasses,
+    } = useMessageRow({
+      speaker,
+      text,
+    });
 
     return (
       <div className={containerWrapperClasses}>
@@ -53,19 +39,16 @@ export const MessageRow = React.forwardRef(
               <QuestionBrain brainName={brainName} />
               <QuestionPrompt promptName={promptName} />
             </div>
-            {!isUserSpeaker && (
-              <button
-                className="text-gray-500 hover:text-gray-700 transition"
-                onClick={handleCopy}
-                title={isCopied ? "Copied!" : "Copy to clipboard"}
-              >
-                {isCopied ? <FaCheckCircle /> : <FaCopy />}
-              </button>
+            {!isUserSpeaker && text !== undefined && (
+              <CopyButton handleCopy={handleCopy} isCopied={isCopied} />
             )}
           </div>
-          <div data-testid="chat-message-text">
-            <ReactMarkdown className={markdownClasses}>{text}</ReactMarkdown>
-          </div>
+          {children ?? (
+            <MessageContent
+              text={text ?? ""}
+              markdownClasses={markdownClasses}
+            />
+          )}
         </div>
       </div>
     );
