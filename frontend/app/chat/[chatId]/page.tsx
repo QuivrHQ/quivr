@@ -19,7 +19,7 @@ const SelectedChatPage = (): JSX.Element => {
       {...getRootProps()}
     >
         <div
-          className={`flex flex-col flex-1 w-full max-w-5xl h-full dark:shadow-primary/25 overflow-hidden p-2 md:p-12 pt-4 md:pt-10`}
+          className={`flex flex-col flex-1 w-full max-w-5xl h-full dark:shadow-primary/25 overflow-hidden p-2 sm:p-4 md:p-6 lg:p-8`}
         >
           <div className="flex flex-1 flex-col overflow-y-auto">
             <ChatDialogueArea />
