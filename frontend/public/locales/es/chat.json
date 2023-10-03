@@ -35,7 +35,9 @@
   "feedingBrain": "Su conocimiento recién agregado se está procesando, ¡puede seguir chateando mientras tanto!",
   "add_content_card_button_tooltip": "Agregar conocimiento a un cerebro",
   "onboarding":{
-    "step_1_message_1": "Hola 👋🏻 ¿Quieres descubrir Quivr? 😇",
-    "step_1_message_2": "Paso 1: Descargar la documentación de “Quivr”"
+    "download_message_1": "Hola 👋🏻 ¿Quieres descubrir Quivr? 😇",
+    "download_message_2": "Paso 1: Descargar la documentación de “Quivr”",
+    "upload_message_1": "¡Felicidades por tu primer paso 🥳!",
+    "upload_message_2": "Paso 2: Ahora, arrástralo y suéltalo en el chat o en el 📎"
   }
 }

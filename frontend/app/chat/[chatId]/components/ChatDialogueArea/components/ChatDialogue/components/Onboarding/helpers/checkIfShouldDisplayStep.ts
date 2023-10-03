@@ -1,13 +1,13 @@
-import { OnboardingProgress, OnboardingState } from "../../types";
+import { OnboardingState } from "../../types";
 
-const onboardingStepToState: Record<OnboardingProgress, OnboardingState[]> = {
-  STEP_1: ["DOWNLOAD"],
-  STEP_2: ["UPLOAD"],
+const onboardingStepToState: Record<OnboardingState, OnboardingState[]> = {
+  DOWNLOAD: ["DOWNLOAD", "UPLOAD"],
+  UPLOAD: ["UPLOAD"],
 };
 
 type CheckIfShouldDisplayStepProps = {
   currentStep: OnboardingState;
-  step: OnboardingProgress;
+  step: OnboardingState;
 };
 
 export const checkIfShouldDisplayStep = ({
