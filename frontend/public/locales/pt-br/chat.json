@@ -37,5 +37,9 @@
   "new_prompt": "Criar novo prompt",
   "feed_brain_placeholder" : "Escolha qual @cérebro você deseja alimentar com esses arquivos",
   "feedingBrain": "Seu conhecimento recém-adicionado está sendo processado, você pode continuar conversando enquanto isso!",
-  "add_content_card_button_tooltip": "Adicionar conhecimento a um cérebro"
+  "add_content_card_button_tooltip": "Adicionar conhecimento a um cérebro",
+  "onboarding":{
+    "step_1_message_1": "Oi 👋🏻 Quer descobrir o Quivr? 😇",
+    "step_1_message_2": "Passo 1: Baixe a documentação do 'Quivr'"
+  }
 }
