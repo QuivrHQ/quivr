@@ -1,10 +1,12 @@
 /* eslint-disable max-lines */
+import { useQueryClient } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import { useParams, useRouter } from "next/navigation";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { getChatsConfigFromLocalStorage } from "@/lib/api/chat/chat.local";
+import { CHATS_DATA_KEY } from "@/lib/api/chat/config";
 import { useChatApi } from "@/lib/api/chat/useChatApi";
 import { useChatContext } from "@/lib/context";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
@@ -17,6 +19,7 @@ import { ChatQuestion } from "../types";
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const useChat = () => {
   const { track } = useEventTracking();
+  const queryClient = useQueryClient();
 
   const params = useParams();
   const [chatId, setChatId] = useState<string | undefined>(
@@ -56,7 +59,9 @@ export const useChat = () => {
         currentChatId = chat.chat_id;
         setChatId(currentChatId);
         shouldUpdateUrl = true;
-        //TODO: update chat list here
+        void queryClient.invalidateQueries({
+          queryKey: [CHATS_DATA_KEY],
+        });
       }
 
       void track("QUESTION_ASKED", {
