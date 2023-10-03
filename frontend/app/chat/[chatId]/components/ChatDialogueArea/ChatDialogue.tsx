@@ -1,3 +1,5 @@
+import { useFeatureIsOn } from "@growthbook/growthbook-react";
+
 import { useChatContext } from "@/lib/context";
 
 import { ChatDialogue } from "./components/ChatDialogue";
@@ -11,8 +13,10 @@ export const ChatDialogueArea = (): JSX.Element => {
     messages,
     notifications
   );
+  const shouldDisplayOnboarding = useFeatureIsOn("onboarding");
 
-  const shouldDisplayShortcuts = chatItems.length === 0;
+  const shouldDisplayShortcuts =
+    chatItems.length === 0 && !shouldDisplayOnboarding;
 
   if (!shouldDisplayShortcuts) {
     return <ChatDialogue chatItems={chatItems} />;
