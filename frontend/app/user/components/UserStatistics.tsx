@@ -1,92 +1,90 @@
-/* eslint-disable */
 "use client";
-import Link from "next/link";
 import prettyBytes from "pretty-bytes";
-import { HTMLAttributes } from "react";
 import { useTranslation } from "react-i18next";
 
-import Button from "@/lib/components/ui/Button";
+import Card, { CardBody, CardHeader } from "@/lib/components/ui/Card";
+import Spinner from "@/lib/components/ui/Spinner";
+import { useUserData } from "@/lib/hooks/useUserData";
 import { UserStats } from "@/lib/types/User";
-import { cn } from "@/lib/utils";
 
-import { ApiKeyConfig } from "./ApiKeyConfig";
 import { BrainConsumption } from "./BrainConsumption";
 import { DateComponent } from "./Date";
 import BrainSpaceChart from "./Graphs/BrainSpaceChart";
 import { RequestsPerDayChart } from "./Graphs/RequestsPerDayChart";
 
-export const UserStatistics = (userStats: UserStats): JSX.Element => {
-  const { email, current_brain_size, max_brain_size, date, requests_stats } =
-    userStats;
-  const { t } = useTranslation(["translation", "user"]);
+export const formatBrainSizeUsage = (
+  currentBrainSize: number,
+  maxBrainSize: number
+): string => {
+  const sizeInUse = prettyBytes(maxBrainSize - currentBrainSize, {
+    binary: true,
+  });
+
+  const totalSize = prettyBytes(maxBrainSize - 0, { binary: true });
+
+  return `${sizeInUse} / ${totalSize}`;
+};
+
+export const UserStatistics = (): JSX.Element => {
+  const { userData }: { userData?: UserStats } = useUserData();
+  const { t } = useTranslation(["user"]);
+
+  if (!userData) {
+    return (
+      <div className="flex items-center justify-center">
+        <span>{t("fetching", { ns: "user" })}</span>
+        <Spinner />
+      </div>
+    );
+  }
+
+  const { current_brain_size, max_brain_size, date, requests_stats } = userData;
 
   return (
-    <>
-      <div className="flex flex-col sm:flex-row sm:items-center py-10 gap-5">
-        <div className="flex-1 flex flex-col">
-          <h1 className="text-4xl font-semibold">
-            {t("title", { user: email.split("@")[0], ns: "user" })}
-          </h1>
-          <p className="opacity-50">{email}</p>
-          <Link className="mt-2" href={"/logout"}>
-            <Button className="px-3 py-2" variant={"danger"}>
-              {t("logoutButton")}
-            </Button>
-          </Link>
-        </div>
+    <div className="flex flex-col md:flex-row gap-2 w-full">
+      <Card className="shadow-none hover:shadow-none w-full md:w-1/4 md:self-start">
+        <CardHeader className="border-b-0">
+          <h3 className="font-semibold">{t("brainUsage")}</h3>
+        </CardHeader>
+        <CardBody className="flex justify-center items-center">
+          <BrainConsumption {...userData} />
+        </CardBody>
+      </Card>
 
-        <BrainConsumption {...userStats} />
-      </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-        <UserStatisticsCard className="">
-          <div>
-            <h1 className="text-2xl font-semibold">
+      <div className="w-full md:w-3/4 flex flex-col md:flex-row gap-2">
+        <Card className="shadow-none hover:shadow-none w-full md:w-1/2">
+          <CardHeader className="border-b-0">
+            <h3 className="font-semibold">
               {/* The last element corresponds to today's request_count */}
               {t("requestsCount", {
                 count: requests_stats.at(-1)?.daily_requests_count,
-                ns: "user",
               })}
-            </h1>
-            <DateComponent date={date} />
-          </div>
-          <div className="">
-            <RequestsPerDayChart {...userStats} />
-          </div>
-        </UserStatisticsCard>
-
-        <UserStatisticsCard>
-          <div>
-            <h1 className="text-2xl font-semibold">
-              {t("brainSize", { ns: "user" })}
-            </h1>
-            <p>
-              {/* How much brain space is left */}
-              {prettyBytes(max_brain_size - current_brain_size, {
-                binary: true,
-              })}
-              /{prettyBytes(max_brain_size - 0, { binary: true })}
+            </h3>
+            <p className="text-slate-500 font-light text-sm">
+              <DateComponent date={date} />
             </p>
-          </div>
-          <div className="">
+          </CardHeader>
+
+          <CardBody>
+            <RequestsPerDayChart {...userData} />
+          </CardBody>
+        </Card>
+
+        <Card className="shadow-none hover:shadow-none w-full md:w-1/2">
+          <CardHeader className="border-b-0">
+            <h3 className="font-semibold">{t("brainSize")}</h3>
+            <p className="text-slate-500 font-light text-sm">
+              {formatBrainSizeUsage(current_brain_size, max_brain_size)}
+            </p>
+          </CardHeader>
+          <CardBody>
             <BrainSpaceChart
               current_brain_size={current_brain_size}
               max_brain_size={max_brain_size}
             />
-          </div>
-        </UserStatisticsCard>
+          </CardBody>
+        </Card>
       </div>
-      <ApiKeyConfig />
-    </>
-  );
-};
-
-const UserStatisticsCard = ({
-  children,
-  className,
-}: HTMLAttributes<HTMLDivElement>) => {
-  return (
-    <div className={cn("w-full h-full flex flex-col gap-5", className)}>
-      {children}
     </div>
   );
 };
