@@ -1,17 +1,15 @@
 import { Fragment } from "react";
 import { useTranslation } from "react-i18next";
 
+import { useOnboardingContext } from "@/lib/hooks/useOnboardingContext";
+
 import { MessageRow } from "../../QADisplay";
-import { OnboardingState } from "../../types";
 import { checkIfShouldDisplayStep } from "../helpers/checkIfShouldDisplayStep";
 import { useStreamText } from "../hooks/useStreamText";
 import { stepsContainerStyle } from "../styles";
 
-type Step1Props = {
-  currentStep: OnboardingState;
-};
-
-export const Step2 = ({ currentStep }: Step1Props): JSX.Element => {
+export const Step2 = (): JSX.Element => {
+  const { currentStep } = useOnboardingContext();
   const shouldStepBeDisplayed = checkIfShouldDisplayStep({
     currentStep,
     step: "UPLOAD",

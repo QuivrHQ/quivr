@@ -1,4 +1,4 @@
-import { OnboardingState } from "../../types";
+import { OnboardingState } from "@/lib/context/OnboardingContext/types";
 
 const onboardingStepToState: Record<OnboardingState, OnboardingState[]> = {
   DOWNLOAD: ["DOWNLOAD", "UPLOAD"],

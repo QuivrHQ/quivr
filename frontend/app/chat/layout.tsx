@@ -3,6 +3,7 @@ import { ReactNode } from "react";
 
 import { ChatProvider, KnowledgeToFeedProvider } from "@/lib/context";
 import { ChatsProvider } from "@/lib/context/ChatsProvider/chats-provider";
+import { OnboardingContextProvider } from "@/lib/context/OnboardingContext/knowledgeToFeed-provider";
 import { useSupabase } from "@/lib/context/SupabaseProvider";
 import { redirectToLogin } from "@/lib/router/redirectToLogin";
 
@@ -23,10 +24,12 @@ const Layout = ({ children }: LayoutProps): JSX.Element => {
     <KnowledgeToFeedProvider>
       <ChatsProvider>
         <ChatProvider>
-          <div className="relative h-full w-full flex justify-stretch items-stretch">
-            <ChatsList />
-            {children}
-          </div>
+          <OnboardingContextProvider>
+            <div className="relative h-full w-full flex justify-stretch items-stretch">
+              <ChatsList />
+              {children}
+            </div>
+          </OnboardingContextProvider>
         </ChatProvider>
       </ChatsProvider>
     </KnowledgeToFeedProvider>

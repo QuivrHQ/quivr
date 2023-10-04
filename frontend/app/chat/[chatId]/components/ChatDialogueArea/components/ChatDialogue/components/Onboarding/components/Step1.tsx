@@ -4,22 +4,15 @@ import { useTranslation } from "react-i18next";
 import { RiDownloadLine } from "react-icons/ri";
 
 import Button from "@/lib/components/ui/Button";
+import { useOnboardingContext } from "@/lib/hooks/useOnboardingContext";
 
 import { MessageRow } from "../../QADisplay";
-import { OnboardingState } from "../../types";
 import { checkIfShouldDisplayStep } from "../helpers/checkIfShouldDisplayStep";
 import { useStreamText } from "../hooks/useStreamText";
 import { stepsContainerStyle } from "../styles";
 
-type Step1Props = {
-  currentStep: OnboardingState;
-  changeStateTo: (state: OnboardingState) => void;
-};
-
-export const Step1 = ({
-  currentStep,
-  changeStateTo,
-}: Step1Props): JSX.Element => {
+export const Step1 = (): JSX.Element => {
+  const { currentStep, setCurrentStep } = useOnboardingContext();
   const shouldStepBeDisplayed = checkIfShouldDisplayStep({
     currentStep,
     step: "DOWNLOAD",
@@ -56,7 +49,7 @@ export const Step1 = ({
               download
               target="_blank"
               referrerPolicy="no-referrer"
-              onClick={() => changeStateTo("UPLOAD")}
+              onClick={() => setCurrentStep("UPLOAD")}
             >
               <Button className="bg-black p-2 ml-2 rounded-full inline-flex">
                 <RiDownloadLine />
