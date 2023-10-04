@@ -1,1 +1,1 @@
-export type OnboardingState = "DOWNLOAD" | "UPLOAD";
+export type OnboardingState = "DOWNLOAD" | "UPLOAD" | "UPLOADED";
