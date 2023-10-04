@@ -255,3 +255,11 @@ class Repository(ABC):
     @abstractmethod
     def get_all_knowledge_in_brain(self, brain_id: UUID):
         pass
+
+    @abstractmethod
+    def get_user_onboarding(self, user_id: UUID):
+        pass
+
+    @abstractmethod
+    def update_user_onboarding(self, user_id: UUID, onboarding):
+        pass
