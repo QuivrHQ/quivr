@@ -24,7 +24,7 @@ const UserPage = (): JSX.Element => {
   const { t } = useTranslation(["translation", "user", "config"]);
 
   return (
-    <main className="py-10 px-5">
+    <main className="container lg:w-2/3 mx-auto py-10 px-5">
       <Card className="mb-5 shadow-sm hover:shadow-none">
         <CardHeader>
           <h2 className="font-bold text-xl">
