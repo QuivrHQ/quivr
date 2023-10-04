@@ -39,7 +39,7 @@ export const Sidebar = ({
             setOpen(false);
           }
         }}
-        className="flex flex-col fixed sm:sticky top-0 left-0 h-[100vh] overflow-visible z-30 border-r border-black/10 dark:border-white/25 bg-white dark:bg-black"
+        className="flex flex-col fixed sm:sticky top-0 left-0 h-fill-available overflow-visible z-30 border-r border-black/10 dark:border-white/25 bg-white dark:bg-black"
       >
         {!open && (
           <button
