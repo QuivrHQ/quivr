@@ -41,6 +41,8 @@
     "upload_message_2": "Étape 2 : Maintenant, faites glisser et déposez-le dans le chat ou dans 📎",
     "how_to_use_quivr": "Comment utiliser Quivr",
     "what_is_quivr": "Qu'est-ce que Quivr ?",
-    "what_is_brain": "Qu'est-ce qu'un cerveau ?"
+    "what_is_brain": "Qu'est-ce qu'un cerveau ?",
+    "last_step":"Dernière étape 🥳", 
+    "ask_question_to_file":"Posez une question à votre fichier. Ex : 'De quoi parlez-vous ?'"
   }
 }

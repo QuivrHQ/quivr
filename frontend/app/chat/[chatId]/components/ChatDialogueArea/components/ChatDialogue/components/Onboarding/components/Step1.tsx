@@ -4,26 +4,24 @@ import { useTranslation } from "react-i18next";
 import { RiDownloadLine } from "react-icons/ri";
 
 import Button from "@/lib/components/ui/Button";
+import { OnboardingState } from "@/lib/context/OnboardingContext/types";
+import { useOnboardingContext } from "@/lib/hooks/useOnboardingContext";
 
 import { MessageRow } from "../../QADisplay";
-import { OnboardingState } from "../../types";
 import { checkIfShouldDisplayStep } from "../helpers/checkIfShouldDisplayStep";
 import { useStreamText } from "../hooks/useStreamText";
 import { stepsContainerStyle } from "../styles";
 
-type Step1Props = {
-  currentStep: OnboardingState;
-  changeStateTo: (state: OnboardingState) => void;
-};
+const stepId: OnboardingState = "DOWNLOAD";
 
-export const Step1 = ({
-  currentStep,
-  changeStateTo,
-}: Step1Props): JSX.Element => {
+export const Step1 = (): JSX.Element => {
+  const { currentStep, setCurrentStep } = useOnboardingContext();
   const shouldStepBeDisplayed = checkIfShouldDisplayStep({
     currentStep,
-    step: "DOWNLOAD",
+    step: stepId,
   });
+
+  const shouldStreamMessage = currentStep === stepId;
 
   const { t } = useTranslation(["chat"]);
   const firstMessage = t("onboarding.download_message_1");
@@ -33,11 +31,13 @@ export const Step1 = ({
     useStreamText({
       text: firstMessage,
       enabled: shouldStepBeDisplayed,
+      shouldStream: shouldStreamMessage,
     });
   const { streamingText: firstMessageStrem, isDone: isStep1Done } =
     useStreamText({
       text: secondMessageStream,
       enabled: isAssistantDone && shouldStepBeDisplayed,
+      shouldStream: shouldStreamMessage,
     });
 
   if (!shouldStepBeDisplayed) {
@@ -56,7 +56,7 @@ export const Step1 = ({
               download
               target="_blank"
               referrerPolicy="no-referrer"
-              onClick={() => changeStateTo("UPLOAD")}
+              onClick={() => setCurrentStep("UPLOAD")}
             >
               <Button className="bg-black p-2 ml-2 rounded-full inline-flex">
                 <RiDownloadLine />

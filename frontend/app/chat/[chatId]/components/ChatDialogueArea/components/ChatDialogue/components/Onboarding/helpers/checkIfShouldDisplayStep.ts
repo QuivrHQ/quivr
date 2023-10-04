@@ -1,8 +1,9 @@
-import { OnboardingState } from "../../types";
+import { OnboardingState } from "@/lib/context/OnboardingContext/types";
 
-const onboardingStepToState: Record<OnboardingState, OnboardingState[]> = {
-  DOWNLOAD: ["DOWNLOAD", "UPLOAD"],
-  UPLOAD: ["UPLOAD"],
+const requiredStateForDisplaying: Record<OnboardingState, OnboardingState[]> = {
+  DOWNLOAD: ["DOWNLOAD", "UPLOAD", "UPLOADED"],
+  UPLOAD: ["UPLOAD", "UPLOADED"],
+  UPLOADED: ["UPLOADED"],
 };
 
 type CheckIfShouldDisplayStepProps = {
@@ -14,5 +15,5 @@ export const checkIfShouldDisplayStep = ({
   currentStep,
   step,
 }: CheckIfShouldDisplayStepProps): boolean => {
-  return onboardingStepToState[step].includes(currentStep);
+  return requiredStateForDisplaying[step].includes(currentStep);
 };
