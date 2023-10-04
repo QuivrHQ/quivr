@@ -34,7 +34,8 @@
   "feed_brain_placeholder": "Choisissez le @cerveau que vous souhaitez nourrir avec ces fichiers",
   "feedingBrain": "Vos nouvelles connaissances sont en cours de traitement. Vous pouvez continuer à discuter en attendant !",
   "add_content_card_button_tooltip": "Ajouter des connaissances à un cerveau",
-  "onboarding":{
+  "back_to_chat": "Retour au chat",
+  "onboarding": {
     "download_message_1": "Salut 👋🏻 Envie de découvrir Quivr ? 😇",
     "download_message_2": "Étape 1 : Téléchargez la documentation de “Quivr”",
     "upload_message_1": "Félicitations pour votre première étape 🥳!",
