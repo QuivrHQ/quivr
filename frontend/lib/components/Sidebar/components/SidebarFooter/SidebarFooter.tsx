@@ -2,12 +2,18 @@ import { BrainManagementButton } from "@/lib/components/Sidebar/components/Sideb
 
 import { UserButton } from "./components/UserButton";
 
-export const SidebarFooter = (): JSX.Element => {
+export type SidebarFooterButtons = "myBrains" | "user";
+
+type SidebarFooterProps = {
+  showButtons: SidebarFooterButtons[];
+};
+
+export const SidebarFooter = ({showButtons}: SidebarFooterProps): JSX.Element => {
   return (
     <div className="bg-gray-50 dark:bg-gray-900 border-t dark:border-white/10 mt-auto p-2">
       <div className="max-w-screen-xl flex justify-center items-center flex-col">
-        <BrainManagementButton />
-        <UserButton />
+        {showButtons.includes('myBrains') && <BrainManagementButton />}
+        {showButtons.includes('user') && <UserButton />}
       </div>
     </div>
   );

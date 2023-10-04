@@ -14,48 +14,49 @@ export const BrainsList = (): JSX.Element => {
   const { searchQuery, setSearchQuery, brains, isOnBrainsLibraryPage } =
     useBrainsList();
 
-  const { t } = useTranslation("brain");
+  const { t } = useTranslation(["brain", "chat"]);
 
   return (
-    <Sidebar showFooter={false}>
-      <div className="flex flex-col flex-1">
+    <Sidebar showButtons={["user"]}>
+      <div className="flex flex-col p-2 gap-2">
+        <Link href="/chat">
+          <Button type="button" className="bg-primary text-white py-2 w-full">
+            {t("chat:back_to_chat")}
+          </Button>
+        </Link>
+        <AddBrainModal triggerClassName="border-solid border-2 border-gray-300" />
+      </div>
+      <div className="px-2 pt-2 pb-4">
         <BrainSearchBar
           searchQuery={searchQuery}
           setSearchQuery={setSearchQuery}
         />
-        <div
-          data-testid="brains-list-items"
-          className="flex-1 overflow-auto scrollbar h-full"
-        >
-          {brains.map((brain) => (
-            <BrainListItem brain={brain} key={brain.id} />
-          ))}
-        </div>
-        <div className="m-2 mb flex flex-col">
-          {isOnBrainsLibraryPage ? (
-            <Link href="/brains-management" className="flex flex-row flex-1">
-              <Button
-                type="button"
-                className="bg-primary text-white py-2 mb-2 flex flex-row flex-1"
-              >
-                {t("brain_management_button_label")}
-              </Button>
-            </Link>
-          ) : (
-            <Link
-              href="/brains-management/library"
-              className="flex flex-row flex-1"
+      </div>
+      <div
+        data-testid="brains-list-items"
+        className="flex-1 overflow-auto scrollbar h-full min-h-[50px]"
+      >
+        {brains.map((brain) => (
+          <BrainListItem brain={brain} key={brain.id} />
+        ))}
+      </div>
+      <div className="p-2 mb flex flex-col">
+        {isOnBrainsLibraryPage ? (
+          <Link href="/brains-management" className="flex flex-row flex-1">
+            <Button
+              type="button"
+              className="bg-primary text-white py-2 mb-2 flex flex-row flex-1"
             >
-              <Button
-                type="button"
-                className="bg-primary text-white py-2 mb-2 flex flex-row flex-1"
-              >
-                {t("brain_library_button_label")}
-              </Button>
-            </Link>
-          )}
-          <AddBrainModal triggerClassName="border-solid border-2 border-gray-300" />
-        </div>
+              {t("brain:brain_management_button_label")}
+            </Button>
+          </Link>
+        ) : (
+          <Link href="/brains-management/library">
+            <Button type="button" className="bg-primary text-white py-2 w-full">
+              {t("brain_library_button_label")}
+            </Button>
+          </Link>
+        )}
       </div>
     </Sidebar>
   );

@@ -12,7 +12,7 @@ export const ChatsList = (): JSX.Element => {
   useChatNotificationsSync();
 
   return (
-    <Sidebar showFooter={true}>
+    <Sidebar showButtons={["myBrains", "user"]}>
       <div className="flex flex-col flex-1 h-full" data-testid="chats-list">
         <div className="pt-2">
           <NewChatButton />

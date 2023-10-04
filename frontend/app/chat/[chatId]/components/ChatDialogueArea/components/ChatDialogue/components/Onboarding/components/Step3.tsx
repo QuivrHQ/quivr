@@ -9,9 +9,9 @@ import { checkIfShouldDisplayStep } from "../helpers/checkIfShouldDisplayStep";
 import { useStreamText } from "../hooks/useStreamText";
 import { stepsContainerStyle } from "../styles";
 
-const stepId: OnboardingState = "UPLOAD";
+const stepId: OnboardingState = "UPLOADED";
 
-export const Step2 = (): JSX.Element => {
+export const Step3 = (): JSX.Element => {
   const { currentStep } = useOnboardingContext();
   const shouldStepBeDisplayed = checkIfShouldDisplayStep({
     currentStep,
@@ -19,9 +19,8 @@ export const Step2 = (): JSX.Element => {
   });
 
   const { t } = useTranslation(["chat"]);
-  const firstMessage = t("onboarding.upload_message_1");
-  const secondMessageStream = t("onboarding.upload_message_2");
-
+  const firstMessage = t("onboarding.last_step");
+  const secondMessageStream = t("onboarding.ask_question_to_file");
   const shouldStreamMessage = currentStep === stepId;
 
   const { streamingText: streamingAssistantMessage, isDone: isAssistantDone } =
