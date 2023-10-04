@@ -46,5 +46,7 @@
   "Owner": "Владелец",
   "saveButton": "Сохранить",
   "invalidUrl": "Неверный URL",
-  "crawlButton": "Поиск"
+  "crawlButton": "Поиск",
+  "themeSelect": "Тема интерфейса",
+  "languageSelect": "предпочтительный язык"
 }
