@@ -7,12 +7,14 @@ import { SidebarHeader } from "@/lib/components/Sidebar/components/SidebarHeader
 import { useDevice } from "@/lib/hooks/useDevice";
 import { cn } from "@/lib/utils";
 
-import { SidebarFooter, SidebarFooterButtons } from "./components/SidebarFooter/SidebarFooter";
-
+import {
+  SidebarFooter,
+  SidebarFooterButtons,
+} from "./components/SidebarFooter/SidebarFooter";
 
 type SidebarProps = {
   children: React.ReactNode;
-  showButtons: SidebarFooterButtons[];
+  showButtons?: SidebarFooterButtons[];
 };
 
 export const Sidebar = ({
@@ -69,7 +71,7 @@ export const Sidebar = ({
         >
           <SidebarHeader setOpen={setOpen} />
           <div className="overflow-auto flex flex-col flex-1">{children}</div>
-          <SidebarFooter showButtons={showButtons} />
+          {showButtons && <SidebarFooter showButtons={showButtons} />}
         </motion.div>
       </motion.div>
     </MotionConfig>

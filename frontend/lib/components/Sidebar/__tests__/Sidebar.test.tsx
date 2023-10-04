@@ -16,7 +16,7 @@ vi.mock("@/lib/hooks/useDevice");
 const renderSidebar = async () => {
   await act(() =>
     render(
-      <Sidebar showButtons={[]}>
+      <Sidebar>
         <div data-testid="sidebar-test-content">📦</div>
       </Sidebar>
     )
