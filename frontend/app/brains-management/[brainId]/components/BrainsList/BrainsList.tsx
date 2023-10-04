@@ -17,7 +17,7 @@ export const BrainsList = (): JSX.Element => {
   const { t } = useTranslation("brain");
 
   return (
-    <Sidebar showFooter={false}>
+    <Sidebar showButtons={['user']}>
       <div className="flex flex-col flex-1">
         <BrainSearchBar
           searchQuery={searchQuery}

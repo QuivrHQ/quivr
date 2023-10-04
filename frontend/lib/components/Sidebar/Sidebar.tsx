@@ -7,16 +7,17 @@ import { SidebarHeader } from "@/lib/components/Sidebar/components/SidebarHeader
 import { useDevice } from "@/lib/hooks/useDevice";
 import { cn } from "@/lib/utils";
 
-import { SidebarFooter } from "./components/SidebarFooter/SidebarFooter";
+import { SidebarFooter, SidebarFooterButtons } from "./components/SidebarFooter/SidebarFooter";
+
 
 type SidebarProps = {
   children: React.ReactNode;
-  showFooter: boolean;
+  showButtons: SidebarFooterButtons[];
 };
 
 export const Sidebar = ({
   children,
-  showFooter,
+  showButtons,
 }: SidebarProps): JSX.Element => {
   const { isMobile } = useDevice();
   const pathname = usePathname();
@@ -68,7 +69,7 @@ export const Sidebar = ({
         >
           <SidebarHeader setOpen={setOpen} />
           <div className="overflow-auto flex flex-col flex-1">{children}</div>
-          {showFooter && <SidebarFooter />}
+          <SidebarFooter showButtons={showButtons} />
         </motion.div>
       </motion.div>
     </MotionConfig>
