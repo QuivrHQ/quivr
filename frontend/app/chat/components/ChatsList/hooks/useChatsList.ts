@@ -18,7 +18,8 @@ export const useChatsList = () => {
   const fetchAllChats = async () => {
     try {
       const response = await getChats();
-      setAllChats(response.reverse());
+
+      return response.reverse();
     } catch (error) {
       console.error(error);
       publish({

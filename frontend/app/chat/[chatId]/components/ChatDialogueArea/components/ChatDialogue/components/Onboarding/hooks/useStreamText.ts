@@ -3,9 +3,14 @@ import { useEffect, useState } from "react";
 type UseStreamTextProps = {
   text: string;
   enabled?: boolean;
+  shouldStream?: boolean;
 };
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-export const useStreamText = ({ text, enabled = true }: UseStreamTextProps) => {
+export const useStreamText = ({
+  text,
+  enabled = true,
+  shouldStream = true,
+}: UseStreamTextProps) => {
   const [streamingText, setStreamingText] = useState<string>("");
   const [currentIndex, setCurrentIndex] = useState(0);
 
@@ -14,6 +19,13 @@ export const useStreamText = ({ text, enabled = true }: UseStreamTextProps) => {
   useEffect(() => {
     if (!enabled) {
       setStreamingText("");
+
+      return;
+    }
+
+    if (!shouldStream) {
+      setStreamingText(text);
+      setCurrentIndex(text.length);
 
       return;
     }
@@ -30,7 +42,7 @@ export const useStreamText = ({ text, enabled = true }: UseStreamTextProps) => {
     return () => {
       clearInterval(messageInterval);
     };
-  }, [text, currentIndex, enabled]);
+  }, [text, currentIndex, enabled, shouldStream]);
 
   return { streamingText, isDone };
 };
