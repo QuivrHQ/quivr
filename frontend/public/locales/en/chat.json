@@ -34,15 +34,16 @@
   "feed_brain_placeholder": "Choose which @brain you want to feed with these files",
   "feedingBrain": "Your newly added knowledge is being processed, you can keep chatting in the meantime !",
   "add_content_card_button_tooltip": "Add knowledge to a brain",
+  "back_to_chat": "Back to chat",
   "onboarding": {
     "download_message_1": "Hi 👋🏻 Want to discover Quivr ? 😇",
     "download_message_2": "Step 1: Download “Quivr documentation”",
-    "upload_message_1":"Congratulations on your first step 🥳",
-    "upload_message_2":"Step 2: Now Drag and drop it on the chat or in the 📎",
+    "upload_message_1": "Congratulations on your first step 🥳",
+    "upload_message_2": "Step 2: Now Drag and drop it on the chat or in the 📎",
     "how_to_use_quivr": "How to user Quivr",
-    "what_is_quivr":"What is Quivr ?",
+    "what_is_quivr": "What is Quivr ?",
     "what_is_brain": "What is a brain ?",
-    "last_step":"Last step 🥳",
-    "ask_question_to_file":"Ask a question to your file. Ex : 'What are you talking about ?'"
+    "last_step": "Last step 🥳",
+    "ask_question_to_file": "Ask a question to your file. Ex : 'What are you talking about ?'"
   }
 }

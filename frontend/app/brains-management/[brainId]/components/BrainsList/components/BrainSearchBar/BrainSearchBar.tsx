@@ -14,15 +14,13 @@ export const BrainSearchBar = ({
   const { t } = useTranslation(["brain"]);
 
   return (
-    <div className="m-2">
-      <Field
-        name="brainsearch"
-        placeholder={t("searchBrain")}
-        autoFocus
-        autoComplete="off"
-        value={searchQuery}
-        onChange={(e) => setSearchQuery(e.target.value)}
-      />
-    </div>
+    <Field
+      name="brainsearch"
+      placeholder={t("searchBrain")}
+      autoFocus
+      autoComplete="off"
+      value={searchQuery}
+      onChange={(e) => setSearchQuery(e.target.value)}
+    />
   );
 };

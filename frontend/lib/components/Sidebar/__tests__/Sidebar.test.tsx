@@ -16,7 +16,7 @@ vi.mock("@/lib/hooks/useDevice");
 const renderSidebar = async () => {
   await act(() =>
     render(
-      <Sidebar showFooter={false}>
+      <Sidebar>
         <div data-testid="sidebar-test-content">📦</div>
       </Sidebar>
     )
@@ -73,7 +73,6 @@ describe("Sidebar", () => {
     expect(closeSidebarButton);
 
     fireEvent.click(closeSidebarButton);
-
     await waitFor(() => expect(sidebarContent).not.toBeVisible());
   });
 });
