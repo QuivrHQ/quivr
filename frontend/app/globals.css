@@ -41,4 +41,10 @@ div:focus {
     /* background: #000; */
     @apply bg-gray-500;
   }
+
+  .h-fill-available {
+    /* fixes the h-[100vh] issue on mobile */
+    /* like height: -webkit-fill-available; but for any device (android and iphone) */
+    @apply h-[100vh] supports-[height:100cqh]:h-[100cqh] supports-[height:100svh]:h-[100svh];
+  }
 }

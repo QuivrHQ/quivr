@@ -12,7 +12,7 @@ const SelectedChatPage = (): JSX.Element => {
 
   return (
     <div
-      className={`flex flex-col flex-1 items-center justify-stretch w-full h-[100vh] overflow-hidden ${
+      className={`flex flex-col flex-1 items-center justify-stretch w-full h-fill-available overflow-hidden ${
         shouldDisplayFeedCard ? "bg-chat-bg-gray" : "bg-white"
       } dark:bg-black transition-colors ease-out duration-500`}
       data-testid="chat-page"
