@@ -16,6 +16,7 @@ export const UserButton = (): JSX.Element => {
         <Image
           alt="gravatar"
           fill={true}
+          sizes="32px"
           src={gravatarUrl}
           className="rounded-xl"
         />
