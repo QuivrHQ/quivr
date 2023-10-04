@@ -1,3 +1,5 @@
+/*eslint max-lines: ["error", 200 ]*/
+
 import { UUID } from "crypto";
 import { useParams, useRouter } from "next/navigation";
 import { useState } from "react";
@@ -10,6 +12,7 @@ import { useChatContext } from "@/lib/context";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 import { useKnowledgeToFeedContext } from "@/lib/context/KnowledgeToFeedProvider/hooks/useKnowledgeToFeedContext";
 import { useToast } from "@/lib/hooks";
+import { useOnboardingContext } from "@/lib/hooks/useOnboardingContext";
 
 import { FeedItemCrawlType, FeedItemUploadType } from "../../../types";
 
@@ -23,7 +26,7 @@ export const useFeedBrainInChat = ({
   const { t } = useTranslation(["upload"]);
   const router = useRouter();
   const { setShouldDisplayFeedCard } = useKnowledgeToFeedContext();
-
+  const { setCurrentStep } = useOnboardingContext();
   const { currentBrainId } = useBrainContext();
   const { setKnowledgeToFeed, knowledgeToFeed } = useKnowledgeToFeedContext();
   const [hasPendingRequests, setHasPendingRequests] = useState(false);
@@ -61,6 +64,7 @@ export const useFeedBrainInChat = ({
       return;
     }
     try {
+      setCurrentStep("UPLOADED");
       dispatchHasPendingRequests();
       setShouldDisplayFeedCard(false);
       setHasPendingRequests(true);
