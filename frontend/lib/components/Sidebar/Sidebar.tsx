@@ -30,7 +30,7 @@ export const Sidebar = ({
   }, [isMobile, pathname]);
 
   return (
-    <MotionConfig transition={{ mass: 1, damping: 10 }}>
+    <MotionConfig transition={{ mass: 1, damping: 10, duration: 0.2 }}>
       <motion.div
         drag="x"
         dragConstraints={{ right: 0, left: 0 }}

@@ -73,9 +73,6 @@ describe("Sidebar", () => {
     expect(closeSidebarButton);
 
     fireEvent.click(closeSidebarButton);
-
-    await waitFor(() => expect(sidebarContent).not.toBeVisible(), {
-      timeout: 1000,
-    });
+    await waitFor(() => expect(sidebarContent).not.toBeVisible());
   });
 });
