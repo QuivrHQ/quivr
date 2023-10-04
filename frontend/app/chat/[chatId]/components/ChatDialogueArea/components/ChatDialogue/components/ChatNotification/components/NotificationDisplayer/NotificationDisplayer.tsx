@@ -20,9 +20,19 @@ export const NotificationDisplayer = ({
     return <Fragment />;
   }
 
-  const { message, status, name } = JSON.parse(
-    nonParsedMessage.replace(/'/g, '"')
-  ) as NotificationMessage;
+  let message, status, name;
+
+  try {
+    const parsedMessage = JSON.parse(
+      nonParsedMessage.replace(/'/g, '"')
+    ) as NotificationMessage;
+
+    message = parsedMessage.message;
+    status = parsedMessage.status;
+    name = parsedMessage.name;
+  } catch (error) {
+    return <Fragment />;
+  }
 
   return (
     <div
@@ -42,9 +52,9 @@ export const NotificationDisplayer = ({
         </div>
       </div>
       {isHovered && (
-        <div 
+        <div
           className="absolute bg-white p-2 rounded-sm border border-gray-100 shadow-sm transition-transform transform translate-y-1 translate-x-1/4 z-10"
-          style={{ bottom: '-10px', right: '10px' }}
+          style={{ bottom: "-10px", right: "10px" }}
         >
           {message}
         </div>
