@@ -18,12 +18,17 @@ const nextConfig = {
   },
 };
 
-const ContentSecurityPolicyLocal = {
+const ContentSecurityPolicy = {
   "default-src": [
     "'self'",
     "https://fonts.googleapis.com",
     process.env.NEXT_PUBLIC_SUPABASE_URL,
     "https://api.june.so",
+    {
+      prod: "https://www.quivr.app/",
+      preview: "https://preview.quivr.app/",
+      local: ["http://localhost:3000", "http://localhost:3001"],
+    },
   ],
   "connect-src": [
     "'self'",
@@ -38,106 +43,45 @@ const ContentSecurityPolicyLocal = {
   "media-src": [
     "'self'",
     "https://user-images.githubusercontent.com",
-    "http://localhost:3000",
-    "http://localhost:3001",
+    "https://www.quivr.app/",
     "https://quivr-cms.s3.eu-west-3.amazonaws.com",
   ],
   "script-src": [
     "'unsafe-inline'",
     "'unsafe-eval'",
     "https://va.vercel-scripts.com/",
-    "http://localhost:3000",
-    "http://localhost:3001",
+    {
+      prod: "https://www.quivr.app/",
+      preview: "https://preview.quivr.app/",
+      local: ["http://localhost:3000", "http://localhost:3001"],
+    },
     "https://www.google-analytics.com/",
   ],
   "frame-ancestors": ["'none'"],
   "style-src": [
     "'unsafe-inline'",
-    "http://localhost:3000",
-    "http://localhost:3001",
+    {
+      prod: "https://www.quivr.app/",
+      preview: "https://preview.quivr.app/",
+      local: ["http://localhost:3000", "http://localhost:3001"],
+    },
   ],
 };
 
-const ContentSecurityPolicyPreview = {
-  "default-src": [
-    "'self'",
-    "https://fonts.googleapis.com",
-    process.env.NEXT_PUBLIC_SUPABASE_URL,
-    "https://api.june.so",
-    "https://preview.quivr.app/",
-  ],
-  "connect-src": [
-    "'self'",
-    process.env.NEXT_PUBLIC_SUPABASE_URL,
-    process.env.NEXT_PUBLIC_BACKEND_URL,
-    "https://api.june.so",
-    "https://api.openai.com",
-    "https://cdn.growthbook.io",
-    "https://vitals.vercel-insights.com/v1/vitals",
-  ],
-  "img-src": ["'self'", "https://www.gravatar.com", "data:"],
-  "media-src": [
-    "'self'",
-    "https://user-images.githubusercontent.com",
-    "https://preview.quivr.app/",
-    "https://quivr-cms.s3.eu-west-3.amazonaws.com",
-  ],
-  "script-src": [
-    "'unsafe-inline'",
-    "'unsafe-eval'",
-    "https://va.vercel-scripts.com/",
-    "https://preview.quivr.app/",
-    "https://www.google-analytics.com/",
-  ],
-  "frame-ancestors": ["'none'"],
-  "style-src": ["'unsafe-inline'", "https://preview.quivr.app/"],
-};
+// Resolve environment-specific CSP values
+for (const directive of Object.values(ContentSecurityPolicy)) {
+  for (const [index, resource] of directive.entries()) {
+    if (typeof resource === "string") {
+      continue;
+    }
+    directive[index] = resource[process.env.NEXT_PUBLIC_ENV];
+    if (Array.isArray(directive[index])) {
+      directive[index] = directive[index].join(" ");
+    }
+  }
+}
 
-const ContentSecurityPolicyProd = {
-  "default-src": [
-    "'self'",
-    "https://fonts.googleapis.com",
-    process.env.NEXT_PUBLIC_SUPABASE_URL,
-    "https://api.june.so",
-    "https://www.quivr.app/",
-  ],
-  "connect-src": [
-    "'self'",
-    process.env.NEXT_PUBLIC_SUPABASE_URL,
-    process.env.NEXT_PUBLIC_BACKEND_URL,
-    "https://api.june.so",
-    "https://api.openai.com",
-    "https://cdn.growthbook.io",
-    "https://vitals.vercel-insights.com/v1/vitals",
-  ],
-  "img-src": ["'self'", "https://www.gravatar.com", "data:"],
-  "media-src": [
-    "'self'",
-    "https://user-images.githubusercontent.com",
-    "https://www.quivr.app/",
-    "https://quivr-cms.s3.eu-west-3.amazonaws.com",
-  ],
-  "script-src": [
-    "'unsafe-inline'",
-    "'unsafe-eval'",
-    "https://va.vercel-scripts.com/",
-    "https://www.quivr.app/",
-    "https://www.google-analytics.com/",
-  ],
-  "frame-ancestors": ["'none'"],
-  "style-src": ["'unsafe-inline'", "https://www.quivr.app/"],
-};
-
-const EnvToCSP = {
-  local: ContentSecurityPolicyLocal,
-  preview: ContentSecurityPolicyPreview,
-  prod: ContentSecurityPolicyProd,
-};
-
-const ContentSecurityPolicy = process.env.NEXT_PUBLIC_ENV
-  ? EnvToCSP[process.env.NEXT_PUBLIC_ENV]
-  : {};
-
+// Build CSP string
 const cspString = Object.entries(ContentSecurityPolicy)
   .map(([key, values]) => `${key} ${values.join(" ")};`)
   .join(" ");
