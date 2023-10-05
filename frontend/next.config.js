@@ -38,7 +38,7 @@ const ContentSecurityPolicyLocal = {
   "media-src": [
     "'self'",
     "https://user-images.githubusercontent.com",
-    "http://localhost:3001",
+    "http://localhost:3000",
     "http://localhost:3001",
     "https://quivr-cms.s3.eu-west-3.amazonaws.com",
   ],
@@ -46,12 +46,16 @@ const ContentSecurityPolicyLocal = {
     "'unsafe-inline'",
     "'unsafe-eval'",
     "https://va.vercel-scripts.com/",
-    "http://localhost:3001",
+    "http://localhost:3000",
     "http://localhost:3001",
     "https://www.google-analytics.com/",
   ],
   "frame-ancestors": ["'none'"],
-  "style-src": ["'unsafe-inline'", "http://localhost:3001"],
+  "style-src": [
+    "'unsafe-inline'",
+    "http://localhost:3000",
+    "http://localhost:3001",
+  ],
 };
 
 const ContentSecurityPolicyPreview = {
@@ -60,7 +64,7 @@ const ContentSecurityPolicyPreview = {
     "https://fonts.googleapis.com",
     process.env.NEXT_PUBLIC_SUPABASE_URL,
     "https://api.june.so",
-    "https://www.quivr.app/",
+    "https://preview.quivr.app/",
   ],
   "connect-src": [
     "'self'",
@@ -75,18 +79,18 @@ const ContentSecurityPolicyPreview = {
   "media-src": [
     "'self'",
     "https://user-images.githubusercontent.com",
-    "https://www.quivr.app/",
+    "https://preview.quivr.app/",
     "https://quivr-cms.s3.eu-west-3.amazonaws.com",
   ],
   "script-src": [
     "'unsafe-inline'",
     "'unsafe-eval'",
     "https://va.vercel-scripts.com/",
-    "https://www.quivr.app/",
+    "https://preview.quivr.app/",
     "https://www.google-analytics.com/",
   ],
   "frame-ancestors": ["'none'"],
-  "style-src": ["'unsafe-inline'", "https://www.quivr.app/"],
+  "style-src": ["'unsafe-inline'", "https://preview.quivr.app/"],
 };
 
 const ContentSecurityPolicyProd = {
