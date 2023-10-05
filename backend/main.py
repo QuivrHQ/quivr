@@ -21,6 +21,7 @@ from routes.explore_routes import explore_router
 from routes.knowledge_routes import knowledge_router
 from routes.misc_routes import misc_router
 from routes.notification_routes import notification_router
+from routes.onboarding_routes import onboarding_router
 from routes.prompt_routes import prompt_router
 from routes.subscription_routes import subscription_router
 from routes.upload_routes import upload_router
@@ -49,8 +50,10 @@ async def startup_event():
 app.include_router(brain_router)
 app.include_router(chat_router)
 app.include_router(crawl_router)
+app.include_router(onboarding_router)
 app.include_router(explore_router)
 app.include_router(misc_router)
+
 app.include_router(upload_router)
 app.include_router(user_router)
 app.include_router(api_key_router)
