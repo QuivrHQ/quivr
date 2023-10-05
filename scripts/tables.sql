@@ -230,7 +230,7 @@ CREATE TABLE IF NOT EXISTS migrations (
 
 CREATE TABLE IF NOT EXISTS user_settings (
   user_id UUID PRIMARY KEY,
-  models JSONB DEFAULT '["gpt-3.5-turbo"]'::jsonb,
+  models JSONB DEFAULT '["gpt-3.5-turbo","huggingface/mistralai/Mistral-7B-Instruct-v0.1"]'::jsonb,
   daily_chat_credit INT DEFAULT 20,
   max_brains INT DEFAULT 3,
   max_brain_size INT DEFAULT 10000000
@@ -256,6 +256,15 @@ CREATE TABLE IF NOT EXISTS knowledge_vectors (
 );
 
 
+-- Create the onboarding table
+CREATE TABLE IF NOT EXISTS onboardings (
+  user_id UUID NOT NULL REFERENCES auth.users (id),
+  onboarding_b1 BOOLEAN NOT NULL DEFAULT false,
+  onboarding_b2 BOOLEAN NOT NULL DEFAULT false,
+  onboarding_b3 BOOLEAN NOT NULL DEFAULT false,
+  PRIMARY KEY (user_id)
+)
+
 insert into
   storage.buckets (id, name)
 values
@@ -270,9 +279,9 @@ CREATE POLICY "Access Quivr Storage 1jccrwz_2" ON storage.objects FOR UPDATE TO 
 CREATE POLICY "Access Quivr Storage 1jccrwz_3" ON storage.objects FOR DELETE TO anon USING (bucket_id = 'quivr');
 
 INSERT INTO migrations (name) 
-SELECT '202309307004032_change_user_settings'
+SELECT '20231004150000_add_onboarding_table'
 WHERE NOT EXISTS (
-    SELECT 1 FROM migrations WHERE name = '202309307004032_change_user_settings'
+    SELECT 1 FROM migrations WHERE name = '20231004150000_add_onboarding_table'
 );
 
 
