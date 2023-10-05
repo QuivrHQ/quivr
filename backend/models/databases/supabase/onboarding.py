@@ -34,7 +34,7 @@ class Onboarding(Repository):
         Get user onboarding information by user_id
         """
         onboarding_data = (
-            self.db.from_("onboarding")
+            self.db.from_("onboardings")
             .select("user_id", "onboarding_b1", "onboarding_b2", "onboarding_b3")
             .filter("user_id", "eq", user_id)
             .limit(1)
@@ -51,7 +51,7 @@ class Onboarding(Repository):
     ) -> GetOnboardingResponse:
         """Update user onboarding information by user_id"""
         response = (
-            self.db.from_("onboarding")
+            self.db.from_("onboardings")
             .update(onboarding.dict())
             .match({"user_id": user_id})
             .execute()
