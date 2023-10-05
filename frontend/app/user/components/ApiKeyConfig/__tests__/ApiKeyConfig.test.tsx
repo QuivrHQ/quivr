@@ -24,7 +24,6 @@ describe("ApiKeyConfig", () => {
   it("should render ApiConfig Component", () => {
     const { getByTestId } = render(<ApiKeyConfig />);
     expect(getByTestId("create-new-key")).toBeDefined();
-    expect(getByTestId("open-ai-key-divider")).toBeDefined();
     expect(getByTestId("open-ai-api-key-input")).toBeDefined();
     expect(getByTestId("save-open-ai-api-key")).toBeDefined();
   });

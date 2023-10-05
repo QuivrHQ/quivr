@@ -48,5 +48,6 @@
   "ohno": "О нет!",
   "noUser": "Пользователь не найден",
   "incorrectApiKey": "Неверный ключ API",
-  "invalidApiKeyError": "Недействительный ключ API"
+  "invalidApiKeyError": "Недействительный ключ API",
+  "apiKey": "ключ API"
 }

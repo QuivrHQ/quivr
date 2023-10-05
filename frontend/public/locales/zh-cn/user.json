@@ -5,5 +5,6 @@
     "brainSize": "剩余脑容量",
     "empty": "空",
     "Used": "已使用",
-    "Unused": "未使用"
+    "Unused": "未使用",
+    "brainUsage": "大脑使用"
 }

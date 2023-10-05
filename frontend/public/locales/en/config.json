@@ -48,5 +48,6 @@
     "ohno": "Oh no!",
     "noUser": "No user",
     "incorrectApiKey": "Incorrect API Key",
-    "invalidApiKeyError": "Invalid API Key"
+    "invalidApiKeyError": "Invalid API Key",
+    "apiKey": "API Key"
 }   

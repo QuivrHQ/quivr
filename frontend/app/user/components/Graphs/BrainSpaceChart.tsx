@@ -18,18 +18,21 @@ const BrainSpaceChart = ({
   max_brain_size,
   ...props
 }: BrainSpaceChartProps): JSX.Element => {
-  const { t } = useTranslation(["translation","user"]);
+  const { t } = useTranslation(["translation", "user"]);
 
   return (
     <>
       <VictoryPie
         data={[
-          { x: t("Used", {ns: "user"}), y: current_brain_size },
-          { x: t("Unused", {ns: "user"}), y: max_brain_size - current_brain_size },
+          { x: t("Used", { ns: "user" }), y: current_brain_size },
+          {
+            x: t("Unused", { ns: "user" }),
+            y: max_brain_size - current_brain_size,
+          },
         ]}
         containerComponent={
           <VictoryContainer
-            className="bg-white rounded-md w-full h-full"
+            className="bg-white dark:bg-black rounded-md w-full h-full"
             responsive={true}
           />
         }

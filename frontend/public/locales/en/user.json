@@ -5,5 +5,6 @@
     "brainSize": "Remaining Brain size",
     "empty": "Empty",
     "Used": "Used",
-    "Unused": "Unused"
+    "Unused": "Unused",
+    "brainUsage": "Brain Usage"
 }

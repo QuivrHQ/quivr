@@ -46,5 +46,7 @@
   "Viewer": "Espectador",
   "saveButton": "Guardar",
   "invalidUrl": "URL inválida",
-  "crawlButton": "Rastrear"
+  "crawlButton": "Rastrear",
+  "themeSelect": "Tema de interfaz",
+  "languageSelect": "Idioma preferido"
 }

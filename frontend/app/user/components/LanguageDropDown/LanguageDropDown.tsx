@@ -25,12 +25,9 @@ export const LanguageDropDown = (): JSX.Element => {
         >
           <div>
             <div className="overflow-auto scrollbar flex flex-col h-48 mt-5">
-              {allLanguages.map((lang) => {
+              {Object.keys(allLanguages).map((lang) => {
                 return (
-                  <div
-                    key={lang.id}
-                    className="relative flex group items-center"
-                  >
+                  <div key={lang} className="relative flex group items-center">
                     <button
                       type="button"
                       className={`flex flex-1 items-center gap-2 w-full text-left px-4 py-2 text-sm leading-5 text-gray-900 dark:text-gray-300 group-hover:bg-gray-100 dark:group-hover:bg-gray-700 group-focus:bg-gray-100 dark:group-focus:bg-gray-700 group-focus:outline-none transition-colors`}
@@ -48,7 +45,7 @@ export const LanguageDropDown = (): JSX.Element => {
                           height={32}
                         />
                       </span>
-                      <span className="flex-1">{lang.name}</span>
+                      <span className="flex-1">{allLanguages[lang].label}</span>
                     </button>
                   </div>
                 );

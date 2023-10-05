@@ -46,5 +46,7 @@
   "Owner": "作者",
   "saveButton": "保存",
   "invalidUrl": "无效的URL",
-  "crawlButton": "爬取"
+  "crawlButton": "爬取",
+  "themeSelect": "介面主題",
+  "languageSelect": "首選語言"
 }
