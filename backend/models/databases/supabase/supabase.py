@@ -7,6 +7,7 @@ from models.databases.supabase import (
     File,
     Knowledges,
     Notifications,
+    Onboarding,
     Prompts,
     UserUsage,
     Vector,
@@ -23,6 +24,7 @@ class SupabaseDB(
     ApiKeyHandler,
     Chats,
     Vector,
+    Onboarding,
     Prompts,
     Notifications,
     Knowledges,
@@ -39,3 +41,4 @@ class SupabaseDB(
         Prompts.__init__(self, supabase_client)
         Notifications.__init__(self, supabase_client)
         Knowledges.__init__(self, supabase_client)
+        Onboarding.__init__(self, supabase_client)
