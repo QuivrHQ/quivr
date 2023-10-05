@@ -36,14 +36,13 @@
   "add_content_card_button_tooltip": "Add knowledge to a brain",
   "back_to_chat": "Back to chat",
   "onboarding": {
-    "download_message_1": "Hi 👋🏻 Want to discover Quivr ? 😇",
-    "download_message_2": "Step 1: Download “Quivr documentation”",
-    "upload_message_1": "Congratulations on your first step 🥳",
-    "upload_message_2": "Step 2: Now Drag and drop it on the chat or in the 📎",
+    "title": "Hi 👋🏻 Want to discover Quivr ? 😇",
+    "step_1_1": "1. Drap and drop file on the chat or in the 📎.",
+    "step_1_2": "Don't have a file ? Download 'Quivr documentation'",
+    "step_2": "2. Start chatting with your file",
+    "step_3": "3. Enjoy !",
     "how_to_use_quivr": "How to use Quivr ?",
     "what_is_quivr": "What is Quivr ?",
-    "what_is_brain": "What is a brain ?",
-    "last_step": "Last step 🥳",
-    "ask_question_to_file": "Ask a question to your file. Ex : 'What are you talking about ?'"
+    "what_is_brain": "What is a brain ?"
   }
 }
