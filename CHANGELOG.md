@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.0.88 (2023-10-05)
+
+## What's Changed
+* fix: wrap parsing with try catch statements by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1321
+* fix: 🐛 ↕️ 📱height now matches mobile height by @matthieujacq in https://github.com/StanGirard/quivr/pull/1323
+* feat: add onboarding step 3 by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1324
+* feat: restructure the sidebar of the brains management page by @matthieujacq in https://github.com/StanGirard/quivr/pull/1325
+* feat: add onboarding table by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1327
+* feat: update onboarding controller and fix typo by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1333
+
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.87...v0.0.88
+
 ## 0.0.87 (2023-10-03)
 
 ## What's Changed
