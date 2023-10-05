@@ -36,14 +36,13 @@
   "add_content_card_button_tooltip": "Agregar conocimiento a un cerebro",
   "back_to_chat": "Volver al chat",
   "onboarding": {
-    "download_message_1": "Hola 👋🏻 ¿Quieres descubrir Quivr? 😇",
-    "download_message_2": "Paso 1: Descargar la documentación de “Quivr”",
-    "upload_message_1": "¡Felicidades por tu primer paso 🥳!",
-    "upload_message_2": "Paso 2: Ahora, arrástralo y suéltalo en el chat o en el 📎",
+    "title": "¡Hola 👋🏻 ¿Quieres descubrir Quivr? 😇",
+    "step_1_1": "1. Arrastra y suelta el archivo en el chat o en el 📎.",
+    "step_1_2": "¿No tienes un archivo? Descarga 'Documentación de Quivr'",
+    "step_2": "2. Comienza a chatear con tu archivo",
+    "step_3": "3. ¡Disfruta!",
     "how_to_use_quivr": "¿Cómo usar Quivr?",
     "what_is_quivr": "¿Qué es Quivr?",
-    "what_is_brain": "¿Qué es un cerebro?",
-    "last_step":"Último paso 🥳",
-    "ask_question_to_file":"Haz una pregunta a tu archivo. Ej: '¿De qué estás hablando?'"
+    "what_is_brain": "¿Qué es un cerebro?"
   }
 }
