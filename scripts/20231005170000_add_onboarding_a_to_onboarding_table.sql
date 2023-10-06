@@ -2,7 +2,7 @@
 DO $$
 BEGIN
     IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'onboardings' AND column_name = 'onboarding_a') THEN
-        ALTER TABLE onboardings ADD COLUMN onboarding_a BOOLEAN NOT NULL DEFAULT FALSE;
+        ALTER TABLE onboardings ADD COLUMN onboarding_a BOOLEAN NOT NULL DEFAULT true; 
     END IF;
 END $$;
 
