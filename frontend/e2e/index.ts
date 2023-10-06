@@ -8,4 +8,4 @@ test.describe(createBrainTests);
 
 test.describe(crawlTests);
 
-test.describe.skip(chatTests);
+test.describe(chatTests);
