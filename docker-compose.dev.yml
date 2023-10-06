@@ -1,4 +1,4 @@
-version: '3'
+version: "3"
 
 services:
   frontend:
@@ -22,6 +22,8 @@ services:
     build:
       context: backend
       dockerfile: Dockerfile
+      args:
+        - DEV_MODE=true
     container_name: backend-core
     restart: always
     volumes:
@@ -31,14 +33,15 @@ services:
       - worker
     ports:
       - 5050:5050
-    
+      - 5678:5678 # debug port
+
   redis:
     image: redis:latest
     container_name: redis
     restart: always
     ports:
       - 6379:6379
-  
+
   worker:
     env_file:
       - ./backend/.env
@@ -52,8 +55,7 @@ services:
       - redis
     volumes:
       - ./backend/:/code/
-    
-    
+
   flower:
     env_file:
       - ./backend/.env
