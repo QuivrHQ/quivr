@@ -264,7 +264,7 @@ CREATE TABLE IF NOT EXISTS onboardings (
   onboarding_b2 BOOLEAN NOT NULL DEFAULT true,
   onboarding_b3 BOOLEAN NOT NULL DEFAULT true,
   PRIMARY KEY (user_id)
-)
+);
 
 insert into
   storage.buckets (id, name)
