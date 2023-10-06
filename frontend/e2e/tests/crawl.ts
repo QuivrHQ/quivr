@@ -2,7 +2,7 @@ import { test } from "@playwright/test";
 
 import { login } from "../utils/login";
 
-export const uploadTests = (): void => {
+export const crawlTests = (): void => {
   test("it should be able to add url to crawl", async ({ page }) => {
     await login(page);
     await page.getByTestId("upload-button").click();
