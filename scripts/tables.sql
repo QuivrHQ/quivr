@@ -259,9 +259,10 @@ CREATE TABLE IF NOT EXISTS knowledge_vectors (
 -- Create the onboarding table
 CREATE TABLE IF NOT EXISTS onboardings (
   user_id UUID NOT NULL REFERENCES auth.users (id),
-  onboarding_b1 BOOLEAN NOT NULL DEFAULT false,
-  onboarding_b2 BOOLEAN NOT NULL DEFAULT false,
-  onboarding_b3 BOOLEAN NOT NULL DEFAULT false,
+  onboarding_a BOOLEAN NOT NULL DEFAULT true,
+  onboarding_b1 BOOLEAN NOT NULL DEFAULT true,
+  onboarding_b2 BOOLEAN NOT NULL DEFAULT true,
+  onboarding_b3 BOOLEAN NOT NULL DEFAULT true,
   PRIMARY KEY (user_id)
 )
 
@@ -279,9 +280,9 @@ CREATE POLICY "Access Quivr Storage 1jccrwz_2" ON storage.objects FOR UPDATE TO 
 CREATE POLICY "Access Quivr Storage 1jccrwz_3" ON storage.objects FOR DELETE TO anon USING (bucket_id = 'quivr');
 
 INSERT INTO migrations (name) 
-SELECT '20231004150000_add_onboarding_table'
+SELECT '20231005170000_add_onboarding_a_to_onboarding_table'
 WHERE NOT EXISTS (
-    SELECT 1 FROM migrations WHERE name = '20231004150000_add_onboarding_table'
+    SELECT 1 FROM migrations WHERE name = '20231005170000_add_onboarding_a_to_onboarding_table'
 );
 
 

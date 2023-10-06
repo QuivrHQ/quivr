@@ -1,7 +1,7 @@
 from uuid import UUID
 
 from models.databases.supabase.onboarding import (
-    GetOnboardingResponse,
+    OnboardingStates,
     OnboardingUpdatableProperties,
 )
 from models.settings import get_supabase_db
@@ -9,7 +9,7 @@ from models.settings import get_supabase_db
 
 def update_user_onboarding(
     user_id: UUID, onboarding: OnboardingUpdatableProperties
-) -> GetOnboardingResponse:
+) -> OnboardingStates:
     """Update user onboarding information by user_id"""
 
     supabase_db = get_supabase_db()

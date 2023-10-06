@@ -4,7 +4,7 @@ from auth import (
 )
 from fastapi import APIRouter, Depends
 from models.databases.supabase.onboarding import (
-    GetOnboardingResponse,
+    OnboardingStates,
     OnboardingUpdatableProperties,
 )
 from models.user_identity import UserIdentity
@@ -21,7 +21,7 @@ onboarding_router = APIRouter()
 )
 async def get_user_onboarding_handler(
     current_user: UserIdentity = Depends(get_current_user),
-) -> GetOnboardingResponse | None:
+) -> OnboardingStates | None:
     """
     Get user onboarding information for the current user
     """
@@ -37,7 +37,7 @@ async def get_user_onboarding_handler(
 async def update_user_onboarding_handler(
     onboarding: OnboardingUpdatableProperties,
     current_user: UserIdentity = Depends(get_current_user),
-) -> GetOnboardingResponse:
+) -> OnboardingStates:
     """
     Update user onboarding information for the current user
     """
