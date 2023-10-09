@@ -41,7 +41,7 @@ export const ChatInput = ({
             <Button
               className="p-0"
               variant={"tertiary"}
-              data-testid="upload-button"
+              data-testid="feed-button"
               type="button"
               onClick={() => setShouldDisplayFeedCard(true)}
               tooltip={t("add_content_card_button_tooltip")}

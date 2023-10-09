@@ -1,11 +1,11 @@
 import { test } from "@playwright/test";
 
 import { chatTests } from "./tests/chat";
+import { crawlTests } from "./tests/crawl";
 import { createBrainTests } from "./tests/createBrain";
-import { uploadTests } from "./tests/upload";
 
 test.describe(createBrainTests);
 
-test.describe(uploadTests);
+test.describe(crawlTests);
 
-test.describe.skip(chatTests);
+test.describe(chatTests);

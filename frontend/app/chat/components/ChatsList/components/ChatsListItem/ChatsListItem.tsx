@@ -58,6 +58,7 @@ export const ChatsListItem = ({ chat }: ChatsListItemProps): JSX.Element => {
           className="p-5 hover:text-red-700"
           type="button"
           onClick={() => void deleteChat()}
+          data-testid="delete-chat-button"
         >
           <FiTrash2 />
         </button>
