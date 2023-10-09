@@ -1,15 +1,19 @@
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
 
 import { ONBOARDING_DATA_KEY } from "@/lib/api/onboarding/config";
 import { useOnboardingApi } from "@/lib/api/onboarding/useOnboardingApi";
 
+import { Onboarding } from "../types/Onboarding";
+
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const useOnboarding = () => {
-  const shouldDisplayOnboarding = useFeatureIsOn("onboarding");
+  const isOnboardingFeatureActivated = useFeatureIsOn("onboarding");
   const { getOnboarding } = useOnboardingApi();
   const params = useParams();
+  const { updateOnboarding } = useOnboardingApi();
+  const queryClient = useQueryClient();
 
   const chatId = params?.chatId as string | undefined;
 
@@ -18,13 +22,25 @@ export const useOnboarding = () => {
     queryKey: [ONBOARDING_DATA_KEY],
   });
 
-  const shouldDisplayOnboardingA =
-    shouldDisplayOnboarding &&
+  const updateOnboardingHandler = async (
+    newOnboardingStatus: Partial<Onboarding>
+  ) => {
+    await updateOnboarding(newOnboardingStatus);
+    await queryClient.invalidateQueries({ queryKey: [ONBOARDING_DATA_KEY] });
+  };
+
+  const shouldDisplayWelcomeChat =
+    isOnboardingFeatureActivated && onboarding?.onboarding_a === true;
+
+  const shouldDisplayOnboardingAInstructions =
+    isOnboardingFeatureActivated &&
     chatId === undefined &&
-    onboarding?.onboarding_a === true;
+    shouldDisplayWelcomeChat;
 
   return {
     onboarding,
-    shouldDisplayOnboardingA,
+    shouldDisplayOnboardingAInstructions,
+    shouldDisplayWelcomeChat,
+    updateOnboarding: updateOnboardingHandler,
   };
 };

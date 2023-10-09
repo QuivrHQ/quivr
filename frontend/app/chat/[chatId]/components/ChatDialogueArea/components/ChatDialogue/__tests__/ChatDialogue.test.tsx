@@ -1,3 +1,4 @@
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { render } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
@@ -19,6 +20,7 @@ vi.mock("../hooks/useChatDialogue", () => ({
     chatListRef: vi.fn(),
   })),
 }));
+const queryClient = new QueryClient();
 
 describe("ChatDialogue", () => {
   it("should render chat messages correctly", () => {
@@ -37,14 +39,22 @@ describe("ChatDialogue", () => {
       messages,
       []
     );
-    const { getAllByTestId } = render(<ChatDialogue chatItems={chatItems} />);
+    const { getAllByTestId } = render(
+      <QueryClientProvider client={queryClient}>
+        <ChatDialogue chatItems={chatItems} />
+      </QueryClientProvider>
+    );
     expect(getAllByTestId("brain-tags")).toBeDefined();
     expect(getAllByTestId("prompt-tags")).toBeDefined();
     expect(getAllByTestId("chat-message-text")).toBeDefined();
   });
 
   it("should render placeholder text when history is empty", () => {
-    const { getByTestId } = render(<ChatDialogue chatItems={[]} />);
+    const { getByTestId } = render(
+      <QueryClientProvider client={queryClient}>
+        <ChatDialogue chatItems={[]} />
+      </QueryClientProvider>
+    );
 
     expect(getByTestId("empty-history-message")).toBeDefined();
   });
