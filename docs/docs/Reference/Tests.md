@@ -15,9 +15,18 @@ title: Testing Strategies
     - Chat related functions
 
 How:
+
 - Pytest
 
-# Frontend
+### 🐛 Debugging the backend
+
+The backend is running in a docker container. To debug the backend, you can attach a debugger to the container. The debugger server runs on port `5678`. The backend is started in dev mode with `make dev`.
+
+#### Debug with VSCode
+
+The configuration for this is already set up in the `launch.json` file in the `.vscode` folder. After you started the project in dev mode with `make dev` you can run a debugging session using the `Python: Remote attach` configuration.
+
+## Frontend
 
 - Functional tests
   - Good rendering of components
@@ -26,5 +35,6 @@ How:
   - User can interact with the component
 
 How:
+
 - Vitest
 - RTL (React Testing Library)

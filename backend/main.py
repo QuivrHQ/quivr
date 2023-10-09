@@ -29,6 +29,12 @@ from routes.user_routes import user_router
 
 logger = get_logger(__name__)
 
+if (os.getenv("DEV_MODE") == "true"):
+    import debugpy
+    logger.debug("👨‍💻 Running in dev mode")
+    debugpy.listen(("0.0.0.0", 5678))
+
+
 sentry_dsn = os.getenv("SENTRY_DSN")
 if sentry_dsn:
     sentry_sdk.init(
