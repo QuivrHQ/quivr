@@ -24,11 +24,7 @@ const ContentSecurityPolicy = {
     "https://fonts.googleapis.com",
     process.env.NEXT_PUBLIC_SUPABASE_URL,
     "https://api.june.so",
-    {
-      prod: "https://www.quivr.app/",
-      preview: "https://preview.quivr.app/",
-      local: ["http://localhost:3000", "http://localhost:3001"],
-    },
+    process.env.NEXT_PUBLIC_FRONTEND_URL,
   ],
   "connect-src": [
     "'self'",
@@ -43,43 +39,19 @@ const ContentSecurityPolicy = {
   "media-src": [
     "'self'",
     "https://user-images.githubusercontent.com",
-    "https://www.quivr.app/",
+    process.env.NEXT_PUBLIC_FRONTEND_URL,
     "https://quivr-cms.s3.eu-west-3.amazonaws.com",
   ],
   "script-src": [
     "'unsafe-inline'",
     "'unsafe-eval'",
     "https://va.vercel-scripts.com/",
-    {
-      prod: "https://www.quivr.app/",
-      preview: "https://preview.quivr.app/",
-      local: ["http://localhost:3000", "http://localhost:3001"],
-    },
+    process.env.NEXT_PUBLIC_FRONTEND_URL,
     "https://www.google-analytics.com/",
   ],
   "frame-ancestors": ["'none'"],
-  "style-src": [
-    "'unsafe-inline'",
-    {
-      prod: "https://www.quivr.app/",
-      preview: "https://preview.quivr.app/",
-      local: ["http://localhost:3000", "http://localhost:3001"],
-    },
-  ],
+  "style-src": ["'unsafe-inline'", process.env.NEXT_PUBLIC_FRONTEND_URL],
 };
-
-// Resolve environment-specific CSP values
-for (const directive of Object.values(ContentSecurityPolicy)) {
-  for (const [index, resource] of directive.entries()) {
-    if (typeof resource === "string") {
-      continue;
-    }
-    directive[index] = resource[process.env.NEXT_PUBLIC_ENV];
-    if (Array.isArray(directive[index])) {
-      directive[index] = directive[index].join(" ");
-    }
-  }
-}
 
 // Build CSP string
 const cspString = Object.entries(ContentSecurityPolicy)
