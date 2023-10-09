@@ -209,7 +209,7 @@ async def create_question_handler(
         openai_api_key=current_user.openai_api_key,
     )
     userSettings = userDailyUsage.get_user_settings()
-    is_model_ok = (brain_details or chat_question).model in userSettings.models  # type: ignore
+    is_model_ok = (brain_details or chat_question).model in userSettings.get("models", ["gpt-3.5-turbo"])  # type: ignore
 
     if not current_user.openai_api_key and brain_id:
         brain_details = get_brain_details(brain_id)
