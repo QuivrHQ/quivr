@@ -1,1 +1,1 @@
-export * from "./OnboardingQuestions";
+export * from "./OnboardingQuestion";
