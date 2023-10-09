@@ -1,4 +1,3 @@
-/* eslint-disable */
 "use client";
 
 import { useTranslation } from "react-i18next";
@@ -20,7 +19,7 @@ export const MagicLinkLogin = ({
     email,
     setEmail,
   });
-  const {t, i18n} = useTranslation(["login"]);
+  const { t } = useTranslation(["login"]);
 
   return (
     <Button
@@ -29,7 +28,7 @@ export const MagicLinkLogin = ({
       onClick={() => void handleMagicLinkLogin()}
       isLoading={isPending}
     >
-      {t("magicLink",{ ns: 'login' })}
+      {t("magicLink", { ns: "login" })}
     </Button>
   );
 };

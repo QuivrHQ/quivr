@@ -1,7 +1,7 @@
 import { fireEvent, render } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
-import SignUp from "../page";
+import { SignUp } from "../page";
 
 const mockHandleSignUp = vi.fn(() => ({}));
 

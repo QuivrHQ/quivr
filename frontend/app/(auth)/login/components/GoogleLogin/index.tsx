@@ -1,22 +1,22 @@
-/* eslint-disable */
+import { useTranslation } from "react-i18next";
+
 import Button from "@/lib/components/ui/Button";
 
 import { useGoogleLogin } from "./hooks/useGoogleLogin";
-import { useTranslation } from "react-i18next";
 
-export const GoogleLoginButton = () => {
+export const GoogleLoginButton = (): JSX.Element => {
   const { isPending, signInWithGoogle } = useGoogleLogin();
-  const {t, i18n} = useTranslation(["login"]);
+  const { t } = useTranslation(["login"]);
 
   return (
     <Button
-      onClick={signInWithGoogle}
+      onClick={() => void signInWithGoogle()}
       isLoading={isPending}
       variant={"danger"}
       type="button"
       data-testid="google-login-button"
     >
-      {t("googleLogin",{ ns: 'login' })}
+      {t("googleLogin", { ns: "login" })}
     </Button>
   );
 };
