@@ -1,5 +1,23 @@
 # Changelog
 
+## 0.0.89 (2023-10-09)
+
+## What's Changed
+* feat: enable CSP in all environments (local/preview/prod) by @matthieujacq in https://github.com/StanGirard/quivr/pull/1334
+* feat: enhance user page UI by @nguernse in https://github.com/StanGirard/quivr/pull/1319
+* feat: update onboarding steps  by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1337
+* feat: add onboarding_a column to onboarding table by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1340
+* fix(question): fixed with user_settings by @StanGirard in https://github.com/StanGirard/quivr/pull/1349
+* FIX tables.sql - missing ; breaks SQL queries. by @stanrb in https://github.com/StanGirard/quivr/pull/1348
+* feat: ⚙️🐞 configure debugger for the backend by @matthieujacq in https://github.com/StanGirard/quivr/pull/1345
+* test: add chat e2e tests by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1344
+* feat: configure CSP for self-hosting and multiple ports in dev mode by @matthieujacq in https://github.com/StanGirard/quivr/pull/1364
+
+## New Contributors
+* @stanrb made their first contribution in https://github.com/StanGirard/quivr/pull/1348
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.88...v0.0.89
+
 ## 0.0.88 (2023-10-05)
 
 ## What's Changed
