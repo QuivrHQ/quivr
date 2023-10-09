@@ -27,7 +27,7 @@ const ContentSecurityPolicy = {
     {
       prod: "https://www.quivr.app/",
       preview: "https://preview.quivr.app/",
-      local: ["http://localhost:3000", "http://localhost:3001"],
+      local: "http://localhost:*",
     },
   ],
   "connect-src": [
@@ -53,7 +53,7 @@ const ContentSecurityPolicy = {
     {
       prod: "https://www.quivr.app/",
       preview: "https://preview.quivr.app/",
-      local: ["http://localhost:3000", "http://localhost:3001"],
+      local: "http://localhost:*",
     },
     "https://www.google-analytics.com/",
   ],
@@ -63,7 +63,7 @@ const ContentSecurityPolicy = {
     {
       prod: "https://www.quivr.app/",
       preview: "https://preview.quivr.app/",
-      local: ["http://localhost:3000", "http://localhost:3001"],
+      local: "http://localhost:*",
     },
   ],
 };
