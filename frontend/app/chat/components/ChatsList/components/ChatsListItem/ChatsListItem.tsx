@@ -10,9 +10,15 @@ import { useChatsListItem } from "./hooks/useChatsListItem";
 
 interface ChatsListItemProps {
   chat: ChatEntity;
+  editable?: boolean;
+  onDelete?: () => void;
 }
 
-export const ChatsListItem = ({ chat }: ChatsListItemProps): JSX.Element => {
+export const ChatsListItem = ({
+  chat,
+  editable = true,
+  onDelete,
+}: ChatsListItemProps): JSX.Element => {
   const {
     setChatName,
     deleteChat,
@@ -47,17 +53,19 @@ export const ChatsListItem = ({ chat }: ChatsListItemProps): JSX.Element => {
         </div>
       </Link>
       <div className="opacity-0 group-hover:opacity-100 flex items-center justify-center bg-gradient-to-l from-white dark:from-black to-transparent z-10 transition-opacity">
-        <button
-          className="p-0 hover:text-blue-700"
-          type="button"
-          onClick={handleEditNameClick}
-        >
-          {editingName ? <FiSave /> : <FiEdit />}
-        </button>
+        {editable && (
+          <button
+            className="p-0 hover:text-blue-700"
+            type="button"
+            onClick={handleEditNameClick}
+          >
+            {editingName ? <FiSave /> : <FiEdit />}
+          </button>
+        )}
         <button
           className="p-5 hover:text-red-700"
           type="button"
-          onClick={() => void deleteChat()}
+          onClick={onDelete ?? (() => void deleteChat())}
           data-testid="delete-chat-button"
         >
           <FiTrash2 />

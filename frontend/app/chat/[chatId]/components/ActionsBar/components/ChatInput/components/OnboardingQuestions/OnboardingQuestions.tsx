@@ -1,20 +1,17 @@
-import { useTranslation } from "react-i18next";
-
 import { OnboardingQuestion } from "./components";
+import { QuestionId } from "./types";
 
 export const OnboardingQuestions = (): JSX.Element => {
-  const { t } = useTranslation(["chat"]);
-
-  const onboardingQuestions = [
-    t("onboarding.how_to_use_quivr"),
-    t("onboarding.what_is_quivr"),
-    t("onboarding.what_is_brain"),
+  const onboardingQuestions: QuestionId[] = [
+    "onboarding_b1",
+    "onboarding_b2",
+    "onboarding_b3",
   ];
 
   return (
     <div className="flex flex-row flex-1 gap-4 mb-4">
       {onboardingQuestions.map((question) => (
-        <OnboardingQuestion key={question} question={question} />
+        <OnboardingQuestion key={question} questionId={question} />
       ))}
     </div>
   );
