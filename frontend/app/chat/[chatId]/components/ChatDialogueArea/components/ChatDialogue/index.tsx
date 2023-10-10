@@ -1,5 +1,6 @@
-import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import { useTranslation } from "react-i18next";
+
+import { useOnboarding } from "@/lib/hooks/useOnboarding";
 
 import { ChatItem } from "./components";
 import { Onboarding } from "./components/Onboarding/Onboarding";
@@ -21,9 +22,9 @@ export const ChatDialogue = ({
   const { t } = useTranslation(["chat"]);
   const { chatListRef } = useChatDialogue();
 
-  const shouldDisplayOnboarding = useFeatureIsOn("onboarding");
+  const { shouldDisplayOnboardingAInstructions } = useOnboarding();
 
-  if (shouldDisplayOnboarding) {
+  if (shouldDisplayOnboardingAInstructions) {
     return (
       <div className={chatDialogueContainerClassName} ref={chatListRef}>
         <Onboarding />
