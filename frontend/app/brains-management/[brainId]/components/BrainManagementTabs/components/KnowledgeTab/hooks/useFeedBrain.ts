@@ -1,15 +1,14 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
-import {
-  FeedItemCrawlType,
-  FeedItemUploadType,
-} from "@/app/chat/[chatId]/components/ActionsBar/types";
 import { useChatApi } from "@/lib/api/chat/useChatApi";
 import { useKnowledgeToFeedInput } from "@/lib/components/KnowledgeToFeedInput/hooks/useKnowledgeToFeedInput.ts";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 import { useKnowledgeToFeedContext } from "@/lib/context/KnowledgeToFeedProvider/hooks/useKnowledgeToFeedContext";
 import { useToast } from "@/lib/hooks";
+import { useOnboarding } from "@/lib/hooks/useOnboarding";
+
+import { useKnowledgeToFeed } from "./useKnowledgeToFeed";
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const useFeedBrain = ({
@@ -20,8 +19,9 @@ export const useFeedBrain = ({
   closeFeedInput?: () => void;
 }) => {
   const { publish } = useToast();
+  const { files, urls } = useKnowledgeToFeed();
   const { t } = useTranslation(["upload"]);
-
+  const { updateOnboarding, onboarding } = useOnboarding();
   const { currentBrainId } = useBrainContext();
   const { setKnowledgeToFeed, knowledgeToFeed } = useKnowledgeToFeedContext();
   const [hasPendingRequests, setHasPendingRequests] = useState(false);
@@ -29,14 +29,6 @@ export const useFeedBrain = ({
   const { createChat, deleteChat } = useChatApi();
 
   const { crawlWebsiteHandler, uploadFileHandler } = useKnowledgeToFeedInput();
-
-  const files: File[] = (
-    knowledgeToFeed.filter((c) => c.source === "upload") as FeedItemUploadType[]
-  ).map((c) => c.file);
-
-  const urls: string[] = (
-    knowledgeToFeed.filter((c) => c.source === "crawl") as FeedItemCrawlType[]
-  ).map((c) => c.url);
 
   const feedBrain = async (): Promise<void> => {
     if (currentBrainId === null) {
@@ -71,7 +63,19 @@ export const useFeedBrain = ({
         crawlWebsiteHandler(url, currentBrainId, currentChatId)
       );
 
-      await Promise.all([...uploadPromises, ...crawlPromises]);
+      const updateOnboardingPromise = async () => {
+        if (onboarding.onboarding_a) {
+          await updateOnboarding({
+            onboarding_a: false,
+          });
+        }
+      };
+
+      await Promise.all([
+        ...uploadPromises,
+        ...crawlPromises,
+        updateOnboardingPromise(),
+      ]);
 
       setKnowledgeToFeed([]);
     } catch (e) {
