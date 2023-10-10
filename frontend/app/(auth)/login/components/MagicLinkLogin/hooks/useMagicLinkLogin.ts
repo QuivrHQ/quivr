@@ -8,11 +8,13 @@ type UseMagicLinkLoginProps = {
 import { useSupabase } from "@/lib/context/SupabaseProvider";
 import { useToast } from "@/lib/hooks";
 
-// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const useMagicLinkLogin = ({
   email,
   setEmail,
-}: UseMagicLinkLoginProps) => {
+}: UseMagicLinkLoginProps): {
+  handleMagicLinkLogin: () => Promise<void>;
+  isPending: boolean;
+} => {
   const { supabase } = useSupabase();
   const [isPending, setIsPending] = useState(false);
 

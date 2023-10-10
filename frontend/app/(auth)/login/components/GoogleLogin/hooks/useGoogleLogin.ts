@@ -1,10 +1,12 @@
-/* eslint-disable */
 import { useState } from "react";
 
 import { useSupabase } from "@/lib/context/SupabaseProvider";
 import { useToast } from "@/lib/hooks/useToast";
 
-export const useGoogleLogin = () => {
+export const useGoogleLogin = (): {
+  signInWithGoogle: () => Promise<void>;
+  isPending: boolean;
+} => {
   const { supabase } = useSupabase();
 
   const { publish } = useToast();
@@ -12,6 +14,7 @@ export const useGoogleLogin = () => {
   const [isPending, setIsPending] = useState(false);
 
   const signInWithGoogle = async () => {
+    setIsPending(true);
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
