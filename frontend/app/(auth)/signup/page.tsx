@@ -9,7 +9,7 @@ import PageHeading from "@/lib/components/ui/PageHeading";
 
 import { useSignUp } from "./hooks/useSignUp";
 
-export const SignUp = (): JSX.Element => {
+const SignUp = (): JSX.Element => {
   const { handleSignUp, isPending, email, password, setEmail, setPassword } =
     useSignUp();
   const { t } = useTranslation(["translation", "signUp"]);
@@ -60,3 +60,5 @@ export const SignUp = (): JSX.Element => {
     </main>
   );
 };
+
+export default SignUp;

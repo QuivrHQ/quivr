@@ -1,6 +1,7 @@
-/* eslint-disable */
 "use client";
 import Link from "next/link";
+import { Suspense } from "react";
+import { useTranslation } from "react-i18next";
 
 import Button from "@/lib/components/ui/Button";
 import Card from "@/lib/components/ui/Card";
@@ -8,17 +9,16 @@ import { Divider } from "@/lib/components/ui/Divider";
 import Field from "@/lib/components/ui/Field";
 import PageHeading from "@/lib/components/ui/PageHeading";
 
-import { Suspense } from "react";
-import { useTranslation } from "react-i18next";
 import { GoogleLoginButton } from "./components/GoogleLogin";
 import { MagicLinkLogin } from "./components/MagicLinkLogin";
 import { PasswordForgotten } from "./components/PasswordForgotten";
 import { useLogin } from "./hooks/useLogin";
 
-function Main() {
+const Main = (): JSX.Element => {
   const { handleLogin, setEmail, setPassword, email, isPending, password } =
     useLogin();
   const { t } = useTranslation(["translation", "login"]);
+
   return (
     <main>
       <section className="w-full min-h-[80vh] h-full outline-none flex flex-col gap-5 items-center justify-center p-6">
@@ -31,7 +31,7 @@ function Main() {
             data-testid="sign-in-form"
             onSubmit={(e) => {
               e.preventDefault();
-              handleLogin();
+              void handleLogin();
             }}
             className="flex flex-col gap-2"
           >
@@ -76,12 +76,14 @@ function Main() {
       </section>
     </main>
   );
-}
+};
 
-export default function Login() {
+const Login = (): JSX.Element => {
   return (
     <Suspense fallback="Loading...">
       <Main />
     </Suspense>
   );
-}
+};
+
+export default Login;
