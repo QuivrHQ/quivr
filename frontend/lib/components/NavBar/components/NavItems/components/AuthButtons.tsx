@@ -6,7 +6,6 @@ import Button from "@/lib/components/ui/Button";
 
 export const AuthButtons = (): JSX.Element => {
   const pathname = usePathname();
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { t } = useTranslation();
 
   if (pathname === "/signup") {
