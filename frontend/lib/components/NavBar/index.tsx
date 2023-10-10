@@ -1,5 +1,6 @@
 "use client";
 
+import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import { usePathname } from "next/navigation";
 
 import { Header } from "./components/Header";
@@ -14,7 +15,10 @@ export const NavBar = (): JSX.Element => {
     path.startsWith("/chat") ||
     path.startsWith("/brains-management");
 
-  if (pageHasSidebar) {
+  const isNewHomePageActivated = useFeatureIsOn("new-homepage-activated");
+  const isNewHomePage = path === "/" && isNewHomePageActivated;
+
+  if (pageHasSidebar || isNewHomePage) {
     return <></>;
   }
 

@@ -1,4 +1,5 @@
 "use client";
+import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import { useEffect } from "react";
 
 import { useSupabase } from "@/lib/context/SupabaseProvider";
@@ -16,12 +17,22 @@ const HomePage = (): JSX.Element => {
     }
   }, [session?.user]);
 
-  return (
-    <main data-testid="home-page">
-      <Hero />
-      <Features />
-    </main>
-  );
+  const isNewHomePage = useFeatureIsOn("new-homepage-activated");
+
+  if (isNewHomePage) {
+    return (
+      <main data-testid="home-page">
+        <h1>New homepage is enabled!</h1>
+      </main>
+    );
+  } else {
+    return (
+      <main data-testid="home-page">
+        <Hero />
+        <Features />
+      </main>
+    );
+  }
 };
 
 export default HomePage;
