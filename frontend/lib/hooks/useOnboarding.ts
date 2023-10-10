@@ -17,7 +17,14 @@ export const useOnboarding = () => {
 
   const chatId = params?.chatId as string | undefined;
 
-  const { data: onboarding } = useQuery({
+  const {
+    data: onboarding = {
+      onboarding_a: false,
+      onboarding_b1: false,
+      onboarding_b2: false,
+      onboarding_b3: false,
+    },
+  } = useQuery({
     queryFn: getOnboarding,
     queryKey: [ONBOARDING_DATA_KEY],
   });
@@ -30,7 +37,7 @@ export const useOnboarding = () => {
   };
 
   const shouldDisplayWelcomeChat =
-    isOnboardingFeatureActivated && onboarding?.onboarding_a === true;
+    isOnboardingFeatureActivated && onboarding.onboarding_a;
 
   const shouldDisplayOnboardingAInstructions =
     isOnboardingFeatureActivated &&
