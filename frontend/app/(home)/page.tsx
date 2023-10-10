@@ -7,6 +7,7 @@ import { redirectToPreviousPageOrChatPage } from "@/lib/helpers/redirectToPrevio
 
 import Features from "./Features";
 import Hero from "./Hero";
+import { HomeHeader } from "./components";
 
 const HomePage = (): JSX.Element => {
   const { session } = useSupabase();
@@ -21,9 +22,15 @@ const HomePage = (): JSX.Element => {
 
   if (isNewHomePage) {
     return (
-      <main data-testid="home-page">
-        <h1>New homepage is enabled!</h1>
-      </main>
+      <>
+        <main data-testid="home-page relative">
+          <div className="fixed bg-gradient-to-b from-[#6300FF] to-[#D07DF9] w-screen h-[50vh] z-[-1]"></div>
+          <HomeHeader />
+          <div className="mx-auto my-5 p-5 w-min-content bg-yellow-100 rounded-lg">
+            🚧 New homepage in progress 🚧
+          </div>
+        </main>
+      </>
     );
   } else {
     return (
