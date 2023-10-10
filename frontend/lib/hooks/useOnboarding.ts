@@ -17,17 +17,17 @@ export const useOnboarding = () => {
 
   const chatId = params?.chatId as string | undefined;
 
-  const {
-    data: onboarding = {
-      onboarding_a: false,
-      onboarding_b1: false,
-      onboarding_b2: false,
-      onboarding_b3: false,
-    },
-  } = useQuery({
+  const { data } = useQuery({
     queryFn: getOnboarding,
     queryKey: [ONBOARDING_DATA_KEY],
   });
+
+  const onboarding: Onboarding = data ?? {
+    onboarding_a: false,
+    onboarding_b1: false,
+    onboarding_b2: false,
+    onboarding_b3: false,
+  };
 
   const updateOnboardingHandler = async (
     newOnboardingStatus: Partial<Onboarding>
