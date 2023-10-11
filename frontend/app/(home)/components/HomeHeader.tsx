@@ -1,19 +1,22 @@
 import * as Popover from "@radix-ui/react-popover";
 import Link from "next/link";
+import { useTranslation } from "react-i18next";
 import { AiFillStar } from "react-icons/ai";
 import { LuChevronRight, LuMenu, LuX } from "react-icons/lu";
 
 import { QuivrLogo } from "./QuivrLogo";
 
 export const HomeHeader = (): JSX.Element => {
+  const { t } = useTranslation("home");
+
   const navItems = [
     {
       href: "https://github.com/StanGirard/quivr",
-      label: "Star us on GitHub",
+      label: t("star_us"),
       leftIcon: <AiFillStar size={16} className="hidden md:inline" />,
     },
-    { href: "/signup", label: "Sign up" },
-    { href: "/login", label: "Sign in" },
+    { href: "/signup", label: t("sign_up") },
+    { href: "/login", label: t("sign_in") },
   ];
 
   const navLinks = navItems.map(({ href, label, leftIcon }) => (
