@@ -43,7 +43,12 @@
     "step_3": "3. Наслаждайтесь!",
     "how_to_use_quivr": "Как использовать Quivr?",
     "what_is_quivr": "Что такое Quivr?",
-    "what_is_brain": "Что такое мозг?"
+    "what_is_brain": "Что такое мозг?",
+    "answer":{
+      "how_to_use_quivr": "Проверьте документацию на https://brain.quivr.app/docs/get_started/intro.html",
+      "what_is_quivr": "Quivr - полезный ассистент.",
+      "what_is_brain": "Мозг содержит знания."
+    }
   },
   "welcome": "Добро пожаловать"
 }

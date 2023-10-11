@@ -1,6 +1,9 @@
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
-import { useChat } from "@/app/chat/[chatId]/hooks/useChat";
+import { useStreamText } from "@/app/chat/[chatId]/components/ChatDialogueArea/components/ChatDialogue/components/Onboarding/hooks/useStreamText";
+import { ChatMessage } from "@/app/chat/[chatId]/types";
+import { useChatContext } from "@/lib/context";
 import { useOnboarding } from "@/lib/hooks/useOnboarding";
 import { useOnboardingTracker } from "@/lib/hooks/useOnboardingTracker";
 
@@ -12,19 +15,35 @@ export const useOnboardingQuestion = (questionId: QuestionId) => {
   const { updateOnboarding } = useOnboarding();
   const { t } = useTranslation("chat");
   const { trackOnboardingEvent } = useOnboardingTracker();
+  const [isAnswerRequested, setIsAnswerRequested] = useState(false);
 
   const onboardingStep = questionIdToTradPath[questionId];
-
   const question = t(`onboarding.${onboardingStep}`);
+  const { updateStreamingHistory } = useChatContext();
 
-  const { addQuestion } = useChat();
+  const { lastStream } = useStreamText({
+    text: t(`onboarding.answer.${onboardingStep}`),
+    enabled: isAnswerRequested,
+  });
+
+  useEffect(() => {
+    if (isAnswerRequested) {
+      const chatMessage: ChatMessage = {
+        chat_id: questionId,
+        message_id: questionId,
+        user_message: question,
+        assistant: lastStream,
+        message_time: Date.now().toLocaleString(),
+        brain_name: "Quivr",
+      };
+      void updateStreamingHistory(chatMessage);
+    }
+  }, [isAnswerRequested, question, questionId, lastStream]);
 
   const handleSuggestionClick = async () => {
     trackOnboardingEvent(onboardingStep);
-    await Promise.all([
-      addQuestion(question),
-      updateOnboarding({ [questionId]: false }),
-    ]);
+    setIsAnswerRequested(true);
+    await updateOnboarding({ [questionId]: false });
   };
 
   return {

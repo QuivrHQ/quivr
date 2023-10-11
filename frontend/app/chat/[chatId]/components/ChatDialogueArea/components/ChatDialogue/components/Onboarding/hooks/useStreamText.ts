@@ -12,9 +12,11 @@ export const useStreamText = ({
   shouldStream = true,
 }: UseStreamTextProps) => {
   const [streamingText, setStreamingText] = useState<string>("");
-  const [currentIndex, setCurrentIndex] = useState(0);
+  const [lastStreamIndex, setLastStreamIndex] = useState(0);
 
-  const isDone = currentIndex === text.length;
+  const isDone = lastStreamIndex === text.length;
+
+  const lastStream = !isDone ? text[lastStreamIndex] : "";
 
   useEffect(() => {
     if (!enabled) {
@@ -25,15 +27,17 @@ export const useStreamText = ({
 
     if (!shouldStream) {
       setStreamingText(text);
-      setCurrentIndex(text.length);
+      setLastStreamIndex(text.length);
 
       return;
     }
 
     const messageInterval = setInterval(() => {
-      if (currentIndex < text.length) {
-        setStreamingText((prevText) => prevText + (text[currentIndex] ?? ""));
-        setCurrentIndex((prevIndex) => prevIndex + 1);
+      if (lastStreamIndex < text.length) {
+        setStreamingText(
+          (prevText) => prevText + (text[lastStreamIndex] ?? "")
+        );
+        setLastStreamIndex((prevIndex) => prevIndex + 1);
       } else {
         clearInterval(messageInterval);
       }
@@ -42,7 +46,7 @@ export const useStreamText = ({
     return () => {
       clearInterval(messageInterval);
     };
-  }, [text, currentIndex, enabled, shouldStream]);
+  }, [text, lastStreamIndex, enabled, shouldStream]);
 
-  return { streamingText, isDone };
+  return { streamingText, isDone, lastStream };
 };

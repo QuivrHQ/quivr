@@ -44,7 +44,12 @@
     "step_3": "3. 尽情享受！",
     "how_to_use_quivr": "如何使用Quivr？",
     "what_is_quivr": "什么是Quivr？",
-    "what_is_brain": "什么是大脑？"
+    "what_is_brain": "什么是大脑？",
+    "answer":{
+      "how_to_use_quivr": "查看文档https://brain.quivr.app/docs/get_started/intro.html",
+      "what_is_quivr": "Quivr是一个有用的助手。",
+      "what_is_brain": "大脑包含知识。"
+    }
   },
   "welcome": "欢迎来到"
 }
