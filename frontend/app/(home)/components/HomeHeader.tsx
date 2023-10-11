@@ -50,41 +50,39 @@ export const HomeHeader = (): JSX.Element => {
             <Popover.Content
               style={{
                 minWidth: "max-content",
-                width: "calc(100vw - 2rem)",
                 backgroundColor: "white",
                 borderRadius: "0.75rem",
                 paddingTop: "0.5rem",
                 paddingInline: "1rem",
                 paddingBottom: "1.5rem",
-                display: "flex",
-                flexDirection: "column",
-                gap: "1rem",
                 marginRight: "1rem",
                 marginTop: "-1rem",
               }}
             >
-              <div className="flex justify-between items-center">
-                <div className="flex gap-2 items-center">
-                  <QuivrLogo size={64} color="primary" />
-                  <div className="text-lg font-medium text-primary cursor-default ">
-                    Quivr
+              <div className="flex flex-col gap-4 min-w-max w-[calc(100vw-4rem)] sm:w-[300px]">
+                <div className="flex justify-between items-center">
+                  <div className="flex gap-2 items-center">
+                    <QuivrLogo size={64} color="primary" />
+                    <div className="text-lg font-medium text-primary cursor-default ">
+                      Quivr
+                    </div>
                   </div>
+                  <Popover.Close>
+                    <button
+                      title="close"
+                      type="button"
+                      className="hover:text-primary p-2"
+                    >
+                      <LuX size={24} />
+                    </button>
+                  </Popover.Close>
                 </div>
-                <Popover.Close>
-                  <button
-                    title="close"
-                    type="button"
-                    className="hover:text-primary p-2"
-                  >
-                    <LuX size={24} />
-                  </button>
-                </Popover.Close>
+                <nav>
+                  <ul className="flex flex-col bg-[#F5F8FF] rounded-xl p-2">
+                    {navLinks}
+                  </ul>
+                </nav>
               </div>
-              <nav>
-                <ul className="flex flex-col bg-[#F5F8FF] rounded-xl p-2">
-                  {navLinks}
-                </ul>
-              </nav>
             </Popover.Content>
           </Popover.Root>
         </div>
