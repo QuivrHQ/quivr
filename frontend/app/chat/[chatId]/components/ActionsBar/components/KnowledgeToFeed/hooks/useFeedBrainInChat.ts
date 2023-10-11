@@ -1,10 +1,12 @@
 /*eslint max-lines: ["error", 200 ]*/
 
+import { useQueryClient } from "@tanstack/react-query";
 import { UUID } from "crypto";
 import { useParams, useRouter } from "next/navigation";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
+import { CHATS_DATA_KEY } from "@/lib/api/chat/config";
 import { useChatApi } from "@/lib/api/chat/useChatApi";
 import { useNotificationApi } from "@/lib/api/notification/useNotificationApi";
 import { useKnowledgeToFeedInput } from "@/lib/components/KnowledgeToFeedInput/hooks/useKnowledgeToFeedInput.ts";
@@ -12,6 +14,7 @@ import { useChatContext } from "@/lib/context";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 import { useKnowledgeToFeedContext } from "@/lib/context/KnowledgeToFeedProvider/hooks/useKnowledgeToFeedContext";
 import { useToast } from "@/lib/hooks";
+import { useOnboarding } from "@/lib/hooks/useOnboarding";
 
 import { FeedItemCrawlType, FeedItemUploadType } from "../../../types";
 
@@ -22,8 +25,10 @@ export const useFeedBrainInChat = ({
   dispatchHasPendingRequests: () => void;
 }) => {
   const { publish } = useToast();
+  const queryClient = useQueryClient();
   const { t } = useTranslation(["upload"]);
   const router = useRouter();
+  const { updateOnboarding, onboarding } = useOnboarding();
   const { setShouldDisplayFeedCard } = useKnowledgeToFeedContext();
   const { currentBrainId } = useBrainContext();
   const { setKnowledgeToFeed, knowledgeToFeed } = useKnowledgeToFeedContext();
@@ -73,11 +78,26 @@ export const useFeedBrainInChat = ({
         crawlWebsiteHandler(url, currentBrainId, currentChatId)
       );
 
-      await Promise.all([...uploadPromises, ...crawlPromises]);
+      const updateOnboardingPromise = async () => {
+        if (onboarding.onboarding_a) {
+          await updateOnboarding({
+            onboarding_a: false,
+          });
+        }
+      };
+
+      await Promise.all([
+        ...uploadPromises,
+        ...crawlPromises,
+        updateOnboardingPromise(),
+      ]);
 
       setKnowledgeToFeed([]);
 
       if (chatId === undefined) {
+        void queryClient.invalidateQueries({
+          queryKey: [CHATS_DATA_KEY],
+        });
         void router.push(`/chat/${currentChatId}`);
       } else {
         await fetchNotifications(currentChatId);

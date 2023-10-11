@@ -9,7 +9,7 @@ from models.databases.supabase.onboarding import (
 )
 from models.user_identity import UserIdentity
 from repository.onboarding.get_user_onboarding import get_user_onboarding
-from repository.onboarding.udpate_user_onboarding import update_user_onboarding
+from repository.onboarding.update_user_onboarding import update_user_onboarding
 
 onboarding_router = APIRouter()
 
