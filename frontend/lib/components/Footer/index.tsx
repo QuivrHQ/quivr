@@ -1,12 +1,19 @@
 "use client";
+import { useFeatureIsOn } from "@growthbook/growthbook-react";
+import { usePathname } from "next/navigation";
+
 import { DISCORD_URL, GITHUB_URL, TWITTER_URL } from "@/lib/config/CONSTANTS";
 import { useSupabase } from "@/lib/context/SupabaseProvider";
 
 const Footer = (): JSX.Element => {
   const { session } = useSupabase();
 
-  if (session?.user !== undefined) {
-    return <div />;
+  const path = usePathname();
+  const isNewHomePageActivated = useFeatureIsOn("new-homepage-activated");
+  const isNewHomePage = path === "/" && isNewHomePageActivated;
+
+  if (session?.user !== undefined || isNewHomePage) {
+    return <></>;
   }
 
   return (
