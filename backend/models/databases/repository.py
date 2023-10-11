@@ -263,3 +263,7 @@ class Repository(ABC):
     @abstractmethod
     def update_user_onboarding(self, user_id: UUID, onboarding):
         pass
+
+    @abstractmethod
+    def remove_user_onboarding(self, user_id: UUID):
+        pass
