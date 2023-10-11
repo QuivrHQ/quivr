@@ -11,6 +11,8 @@ import { useChatApi } from "@/lib/api/chat/useChatApi";
 import { useChatContext } from "@/lib/context";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 import { useToast } from "@/lib/hooks";
+import { useOnboarding } from "@/lib/hooks/useOnboarding";
+import { useOnboardingTracker } from "@/lib/hooks/useOnboardingTracker";
 import { useEventTracking } from "@/services/analytics/june/useEventTracking";
 
 import { useQuestion } from "./useQuestion";
@@ -25,6 +27,8 @@ export const useChat = () => {
   const [chatId, setChatId] = useState<string | undefined>(
     params?.chatId as string | undefined
   );
+  const { isOnboarding } = useOnboarding();
+  const { trackOnboardingEvent } = useOnboardingTracker();
   const [generatingAnswer, setGeneratingAnswer] = useState(false);
   const router = useRouter();
   const { messages } = useChatContext();
@@ -64,10 +68,17 @@ export const useChat = () => {
         });
       }
 
-      void track("QUESTION_ASKED", {
-        brainId: currentBrainId,
-        promptId: currentPromptId,
-      });
+      if (isOnboarding) {
+        void trackOnboardingEvent("QUESTION_ASKED", {
+          brainId: currentBrainId,
+          promptId: currentPromptId,
+        });
+      } else {
+        void track("QUESTION_ASKED", {
+          brainId: currentBrainId,
+          promptId: currentPromptId,
+        });
+      }
 
       const chatConfig = getChatsConfigFromLocalStorage();
 
