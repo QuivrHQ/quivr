@@ -76,3 +76,19 @@ class Onboarding(Repository):
             raise HTTPException(404, "User onboarding not updated")
 
         return OnboardingStates(**response[0])
+
+    def remove_user_onboarding(self, user_id: UUID) -> OnboardingStates | None:
+        """
+        Remove user onboarding information by user_id
+        """
+        onboarding_data = (
+            self.db.from_("onboardings")
+            .delete()
+            .match({"user_id": str(user_id)})
+            .execute()
+        ).data
+
+        if onboarding_data == []:
+            return None
+
+        return OnboardingStates(**onboarding_data[0])

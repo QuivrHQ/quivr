@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.0.90 (2023-10-11)
+
+## What's Changed
+* feat: add Welcome chat by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1365
+* feat: handle suggestion click by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1368
+* refactor: Enable linting on login+signup page and hooks by @matthieujacq in https://github.com/StanGirard/quivr/pull/1369
+* feat: finish onboarding step on first upload or crawl by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1373
+* feat: add create_user_onboarding_function by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1383
+* feat: remove user onboarding on complete by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1387
+
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.89...v0.0.90
+
 ## 0.0.89 (2023-10-09)
 
 ## What's Changed
