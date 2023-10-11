@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next";
 import { RiDownloadLine } from "react-icons/ri";
 
 import Button from "@/lib/components/ui/Button";
+import { useOnboardingTracker } from "@/lib/hooks/useOnboardingTracker";
 
 import { useStreamText } from "./hooks/useStreamText";
 import { stepsContainerStyle } from "./styles";
@@ -19,6 +20,8 @@ export const Onboarding = (): JSX.Element => {
   const step3 = t("onboarding.step_3");
 
   const shouldStepBeDisplayed = useFeatureIsOn("onboarding");
+
+  const { trackOnboardingEvent } = useOnboardingTracker();
 
   const { streamingText: titleStream, isDone: isTitleDisplayed } =
     useStreamText({
@@ -36,12 +39,11 @@ export const Onboarding = (): JSX.Element => {
       enabled: isStep1Done,
     });
 
-  const { streamingText: secondStepStrem, isDone: isStep2Done } = useStreamText(
-    {
+  const { streamingText: secondStepStream, isDone: isStep2Done } =
+    useStreamText({
       text: step2,
       enabled: isStep1DetailsDone,
-    }
-  );
+    });
   const { streamingText: thirdStepStream } = useStreamText({
     text: step3,
     enabled: isStep2Done,
@@ -62,10 +64,13 @@ export const Onboarding = (): JSX.Element => {
               {firstStepDetailsStream}
               {isStep1DetailsDone && (
                 <Link
-                  href="/documents/doc.pdf"
+                  href="/documents/quivr_documentation.pdf"
                   download
                   target="_blank"
                   referrerPolicy="no-referrer"
+                  onClick={() => {
+                    trackOnboardingEvent("QUIVR_DOCUMENTATION_DOWNLOADED");
+                  }}
                 >
                   <Button className="bg-black p-2 ml-2 rounded-full inline-flex">
                     <RiDownloadLine />
@@ -74,7 +79,7 @@ export const Onboarding = (): JSX.Element => {
               )}
             </div>
           </div>
-          <p>{secondStepStrem}</p>
+          <p>{secondStepStream}</p>
           <p>{thirdStepStream}</p>
         </div>
       </MessageRow>
