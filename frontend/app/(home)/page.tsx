@@ -23,13 +23,15 @@ const HomePage = (): JSX.Element => {
   if (isNewHomePage) {
     return (
       <>
-        <main data-testid="home-page relative">
+        <div data-testid="home-page">
           <div className="fixed bg-gradient-to-b from-[#6300FF] to-[#D07DF9] w-screen h-[50vh] z-[-1]"></div>
           <HomeHeader />
-          <div className="mx-auto my-5 p-5 w-min-content bg-yellow-100 rounded-lg">
-            🚧 New homepage in progress 🚧
-          </div>
-        </main>
+          <main>
+            <div className="mx-auto my-5 p-5 w-min-content bg-yellow-100 rounded-lg">
+              🚧 New homepage in progress 🚧
+            </div>
+          </main>
+        </div>
       </>
     );
   } else {

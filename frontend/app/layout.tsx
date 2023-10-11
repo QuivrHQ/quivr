@@ -42,9 +42,7 @@ const RootLayout = async ({
           <ToastProvider>
             <SupabaseProvider session={session}>
               <BrainProvider>
-                <App>
-                  {children}
-                </App>
+                <App>{children}</App>
               </BrainProvider>
             </SupabaseProvider>
           </ToastProvider>

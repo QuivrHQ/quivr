@@ -1,7 +1,8 @@
 import * as Popover from "@radix-ui/react-popover";
-import Image from "next/image";
 import Link from "next/link";
 import { LuMenu, LuX } from "react-icons/lu";
+
+import { QuivrLogo } from "./QuivrLogo";
 
 export const HomeHeader = (): JSX.Element => {
   const navItems = [
@@ -20,14 +21,9 @@ export const HomeHeader = (): JSX.Element => {
 
   return (
     <>
-      <header className="w-screen flex justify-between items-center p-5">
+      <header className="w-screen flex justify-between items-center p-5 min-w-max">
         <div className="text-white text-3xl flex gap-2 items-center">
-          <Image
-            width={64}
-            height={64}
-            src="/logo-transparent-bg.png"
-            alt="logo"
-          />
+          <QuivrLogo size={64} />
           <div className="cursor-default">Quivr</div>
         </div>
         <Popover.Root>
@@ -48,6 +44,7 @@ export const HomeHeader = (): JSX.Element => {
               padding: "1rem",
             }}
           >
+            <QuivrLogo size={64} color="primary" />
             <Popover.Close>
               <button title="close" type="button">
                 <LuX width="16" height="16" />
