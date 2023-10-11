@@ -1,5 +1,5 @@
 import time
-from typing import List
+from typing import List, Optional
 from uuid import UUID
 from venv import logger
 
@@ -17,6 +17,7 @@ from models import (
     UserUsage,
     get_supabase_db,
 )
+from models.databases.supabase.chats import QuestionAndAnswer
 from models.databases.supabase.supabase import SupabaseDB
 from repository.brain import get_brain_details
 from repository.chat import (
@@ -28,12 +29,14 @@ from repository.chat import (
     get_user_chats,
     update_chat,
 )
+from repository.chat.add_question_and_answer import add_question_and_answer
 from repository.chat.get_chat_history_with_notifications import (
     ChatItem,
     get_chat_history_with_notifications,
 )
 from repository.notification.remove_chat_notifications import remove_chat_notifications
 from repository.user_identity import get_user_identity
+
 from routes.authorizations.brain_authorization import validate_brain_authorization
 from routes.authorizations.types import RoleEnum
 
@@ -375,3 +378,18 @@ async def get_chat_history_handler(
 ) -> List[ChatItem]:
     # TODO: RBAC with current_user
     return get_chat_history_with_notifications(chat_id)
+
+
+@chat_router.post(
+    "/chat/{chat_id}/question/answer",
+    dependencies=[Depends(AuthBearer())],
+    tags=["Chat"],
+)
+async def add_question_and_answer_handler(
+    chat_id: UUID,
+    question_and_answer: QuestionAndAnswer,
+) -> Optional[Chat]:
+    """
+    Add a new question and anwser to the chat.
+    """
+    return add_question_and_answer(chat_id, question_and_answer)
