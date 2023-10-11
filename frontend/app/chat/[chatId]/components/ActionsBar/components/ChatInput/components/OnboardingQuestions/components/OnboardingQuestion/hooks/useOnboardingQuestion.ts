@@ -2,6 +2,7 @@ import { useTranslation } from "react-i18next";
 
 import { useChat } from "@/app/chat/[chatId]/hooks/useChat";
 import { useOnboarding } from "@/lib/hooks/useOnboarding";
+import { useOnboardingTracker } from "@/lib/hooks/useOnboardingTracker";
 
 import { QuestionId } from "../../../types";
 import { questionIdToTradPath } from "../utils";
@@ -10,6 +11,7 @@ import { questionIdToTradPath } from "../utils";
 export const useOnboardingQuestion = (questionId: QuestionId) => {
   const { updateOnboarding } = useOnboarding();
   const { t } = useTranslation("chat");
+  const { trackOnboardingEvent } = useOnboardingTracker();
 
   const onboardingStep = questionIdToTradPath[questionId];
 
@@ -18,6 +20,7 @@ export const useOnboardingQuestion = (questionId: QuestionId) => {
   const { addQuestion } = useChat();
 
   const handleSuggestionClick = async () => {
+    trackOnboardingEvent(onboardingStep);
     await Promise.all([
       addQuestion(question),
       updateOnboarding({ [questionId]: false }),

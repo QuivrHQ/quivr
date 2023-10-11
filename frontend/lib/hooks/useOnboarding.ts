@@ -29,6 +29,8 @@ export const useOnboarding = () => {
     onboarding_b3: false,
   };
 
+  const isOnboarding = Object.values(onboarding).some((value) => value);
+
   const updateOnboardingHandler = async (
     newOnboardingStatus: Partial<Onboarding>
   ) => {
@@ -49,5 +51,6 @@ export const useOnboarding = () => {
     shouldDisplayOnboardingAInstructions,
     shouldDisplayWelcomeChat,
     updateOnboarding: updateOnboardingHandler,
+    isOnboarding,
   };
 };
