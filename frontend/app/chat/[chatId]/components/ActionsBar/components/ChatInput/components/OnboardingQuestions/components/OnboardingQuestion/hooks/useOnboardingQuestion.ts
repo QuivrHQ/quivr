@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
-import { useStreamText } from "@/app/chat/[chatId]/components/ChatDialogueArea/components/ChatDialogue/components/Onboarding/hooks/useStreamText";
 import { ChatMessage } from "@/app/chat/[chatId]/types";
 import { useChatContext } from "@/lib/context";
 import { useOnboarding } from "@/lib/hooks/useOnboarding";
 import { useOnboardingTracker } from "@/lib/hooks/useOnboardingTracker";
+import { useStreamText } from "@/lib/hooks/useStreamText";
 
 import { QuestionId } from "../../../types";
 import { questionIdToTradPath } from "../utils";

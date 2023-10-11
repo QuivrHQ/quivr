@@ -6,8 +6,8 @@ import { RiDownloadLine } from "react-icons/ri";
 
 import Button from "@/lib/components/ui/Button";
 import { useOnboardingTracker } from "@/lib/hooks/useOnboardingTracker";
+import { useStreamText } from "@/lib/hooks/useStreamText";
 
-import { useStreamText } from "./hooks/useStreamText";
 import { stepsContainerStyle } from "./styles";
 import { MessageRow } from "../QADisplay";
 
