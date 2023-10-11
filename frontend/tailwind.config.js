@@ -21,6 +21,7 @@ module.exports = {
         "msg-gray": "#9B9B9B",
         "msg-header-gray": "#8F8F8F",
         "msg-purple": "#E0DDFC",
+        "onboarding-yellow-bg": "#F6EFDE",
       },
     },
   },
