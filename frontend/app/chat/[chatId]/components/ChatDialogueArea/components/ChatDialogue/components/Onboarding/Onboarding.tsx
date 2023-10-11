@@ -62,7 +62,7 @@ export const Onboarding = (): JSX.Element => {
               {firstStepDetailsStream}
               {isStep1DetailsDone && (
                 <Link
-                  href="/documents/doc.pdf"
+                  href="/documents/quivr_documentation.pdf"
                   download
                   target="_blank"
                   referrerPolicy="no-referrer"
