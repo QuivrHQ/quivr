@@ -47,4 +47,13 @@ div:focus {
     /* like height: -webkit-fill-available; but for any device (android and iphone) */
     @apply h-[100vh] supports-[height:100cqh]:h-[100cqh] supports-[height:100svh]:h-[100svh];
   }
+
+  .bg-slanted-upwards {
+    clip-path: polygon(
+      0 0,
+      100% 0,
+      100% max(100px, calc(100% - 100vw * tan(30deg))),
+      0 100%
+    );
+  }
 }

@@ -24,7 +24,7 @@ const HomePage = (): JSX.Element => {
     return (
       <>
         <div data-testid="home-page">
-          <div className="fixed bg-gradient-to-b from-[#6300FF] to-[#D07DF9] w-screen h-[50vh] z-[-1]"></div>
+          <div className="fixed bg-gradient-to-b from-[#6300FF] to-[#D07DF9] bg-slanted-upwards w-screen h-[50vh] z-[-1]"></div>
           <HomeHeader />
           <main>
             <div className="mx-auto my-5 p-5 w-min-content bg-yellow-100 rounded-lg">
