@@ -1,6 +1,10 @@
 import { useAxios } from "@/lib/hooks";
 
 import {
+  addQuestionAndAnswer,
+  QuestionAndAnwser,
+} from "./addQuestionAndAnswer";
+import {
   addQuestion,
   AddQuestionParams,
   ChatUpdatableProperties,
@@ -25,5 +29,9 @@ export const useChatApi = () => {
     getChatItems: async (chatId: string) => getChatItems(chatId, axiosInstance),
     updateChat: async (chatId: string, props: ChatUpdatableProperties) =>
       updateChat(chatId, props, axiosInstance),
+    addQuestionAndAnswer: async (
+      chatId: string,
+      questionAndAnswer: QuestionAndAnwser
+    ) => addQuestionAndAnswer(chatId, questionAndAnswer, axiosInstance),
   };
 };

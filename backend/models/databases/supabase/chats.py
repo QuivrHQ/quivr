@@ -1,6 +1,7 @@
 from typing import Optional
 from uuid import UUID
 
+from models.chat import Chat
 from models.databases.repository import Repository
 from pydantic import BaseModel
 
@@ -11,6 +12,11 @@ class CreateChatHistory(BaseModel):
     assistant: str
     prompt_id: Optional[UUID]
     brain_id: Optional[UUID]
+
+
+class QuestionAndAnswer(BaseModel):
+    question: str
+    answer: str
 
 
 class Chats(Repository):
@@ -29,6 +35,25 @@ class Chats(Repository):
             .execute()
         )
         return response
+
+    def add_question_and_answer(
+        self, chat_id: UUID, question_and_answer: QuestionAndAnswer
+    ) -> Optional[Chat]:
+        response = (
+            self.db.table("chat_history")
+            .insert(
+                {
+                    "chat_id": str(chat_id),
+                    "user_message": question_and_answer.question,
+                    "assistant": question_and_answer.answer,
+                }
+            )
+            .execute()
+        ).data
+        if len(response) > 0:
+            response = Chat(response[0])
+
+        return None
 
     def get_chat_history(self, chat_id: str):
         reponse = (
