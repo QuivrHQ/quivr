@@ -1,3 +1,4 @@
+from datetime import datetime, timedelta
 from typing import Optional
 from uuid import UUID
 
@@ -92,3 +93,21 @@ class Onboarding(Repository):
             return None
 
         return OnboardingStates(**onboarding_data[0])
+
+    def remove_onboarding_more_than_x_days(self, days: int):
+        """
+        Remove onboarding if it is older than x days
+        """
+        onboarding_data = (
+            self.db.from_("onboardings")
+            .delete()
+            .lt(
+                "creation_time",
+                (datetime.now() - timedelta(days=days)).strftime(
+                    "%Y-%m-%d %H:%M:%S.%f"
+                ),
+            )
+            .execute()
+        ).data
+
+        return onboarding_data
