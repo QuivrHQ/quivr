@@ -23,7 +23,7 @@ export const HomeHeader = (): JSX.Element => {
     <li key={label}>
       <Link
         href={href}
-        className="flex justify-between items-center hover:text-primary p-2 md:text-white md:hover:text-gray-200 gap-1"
+        className="flex justify-between items-center hover:text-primary p-2 md:text-white md:hover:text-slate-200 gap-1"
       >
         {leftIcon}
         {label}

@@ -29,8 +29,9 @@ const HomePage = (): JSX.Element => {
             <div className="bg-gradient-to-b from-[#6300FF] to-[#D07DF9] bg-slanted-upwards w-screen h-[50vh] z-[-1]"></div>
           </div>
           <HomeHeader />
-          <main className="max-w-4xl">
-            <section className="flex flex-col md:flex-row items-center">
+
+          <main className="flex flex-col items-center">
+            <section className="flex flex-col md:flex-row items-center max-w-4xl pb-4">
               <div>
                 <h1 className="text-4xl font-bold">
                   Get a second brain with Quivr
@@ -50,49 +51,66 @@ const HomePage = (): JSX.Element => {
                 </div>
               </div>
             </section>
-            <section>
-              <h2 className="text-2xl text-center">Demo vidéo</h2>
-              <div className="w-[80vw] md:w-[400px] h-[80vw] md:h-[400px] bg-slate-200 rounded flex items-center justify-center">
-                🍿 Vidéo
-              </div>
-            </section>
-            <section>
-              <h2 className="text-2xl text-center">Experience it now</h2>
-              <div className="w-[80vw] md:w-[400px] h-[80vw] md:h-[400px] bg-slate-200 rounded flex items-center justify-center">
-                <div>
-                  <p className="text-center">📦 Content</p>
-                  <p>Check our exemple on using quivr</p>
-                  <h3>Research and studies</h3>
-                  <p>Quivr is your indispensable companion.</p>
-                  <h3>Legal research</h3>
-                  <p>Your ultimate digital ally in the field</p>
-                  <h3>Sales</h3>
-                  <p>Placeholder</p>
-                  <h3>Consulting</h3>
-                  <p>Placeholder</p>
-                  <button>Try free demo</button>
+
+            <div className="bg-[#FCFAF6] w-screen hidden md:flex justify-center py-4">
+              <section className="flex flex-col items-center max-w-4xl">
+                <h2 className="text-2xl text-center">Demo vidéo</h2>
+                <div className="w-[80vw] md:w-[400px] h-[80vw] md:h-[400px] bg-slate-200 rounded flex items-center justify-center">
+                  🍿 Vidéo
                 </div>
-              </div>
-            </section>
-            <section>
+              </section>
+            </div>
+
+            <div className="bg-[#362469] w-screen flex justify-center py-4">
+              <section className="flex flex-col items-center max-w-4xl">
+                <h2 className="text-2xl text-center text-white">
+                  Experience it now
+                </h2>
+                <div className="w-[80vw] md:w-[400px] h-[80vw] md:h-[400px] bg-slate-200 rounded flex items-center justify-center">
+                  <div>
+                    <p className="text-center">📦 Content</p>
+                    <p>Check our exemple on using quivr</p>
+                    <h3>Research and studies</h3>
+                    <p>Quivr is your indispensable companion.</p>
+                    <h3>Legal research</h3>
+                    <p>Your ultimate digital ally in the field</p>
+                    <h3>Sales</h3>
+                    <p>Placeholder</p>
+                    <h3>Consulting</h3>
+                    <p>Placeholder</p>
+                    <button>Try free demo</button>
+                  </div>
+                </div>
+              </section>
+            </div>
+
+            <section className="flex flex-col items-center max-w-4xl py-4">
               <div className="w-[80vw] md:w-[400px] h-[80vw] md:h-[400px] bg-slate-200 rounded flex items-center justify-center mt-5">
                 🛡️ Security and privacy
               </div>
             </section>
-            <section>
-              <h2 className="text-2xl text-center">
-                What people say about Quivr
-              </h2>
-              <div className="w-[80vw] md:w-[400px] h-[80vw] md:h-[400px] bg-slate-200 rounded flex items-center justify-center">
-                💬 Testimonials
-              </div>
-            </section>
-            <section>
-              <h2 className="text-2xl text-center">Get started today</h2>
-              <div className="w-[80vw] md:w-[400px] h-[80vw] md:h-[400px] bg-slate-200 rounded flex items-center justify-center">
-                ⬇️ Footer
-              </div>
-            </section>
+
+            <div className="bg-[#FCFAF6] w-screen flex justify-center py-4">
+              <section className="flex flex-col items-center max-w-4xl">
+                <h2 className="text-2xl text-center">
+                  What people say about Quivr
+                </h2>
+                <div className="w-[80vw] md:w-[400px] h-[80vw] md:h-[400px] bg-slate-200 rounded flex items-center justify-center">
+                  💬 Testimonials
+                </div>
+              </section>
+            </div>
+
+            <div className="bg-gradient-to-b to-[#6300FF] from-[#D07DF9] w-screen flex justify-center py-4">
+              <section className="flex flex-col items-center max-w-4xl">
+                <h2 className="text-2xl text-center text-white">
+                  Get started today
+                </h2>
+                <div className="w-[80vw] md:w-[400px] h-[80vw] md:h-[400px] bg-slate-200 rounded flex items-center justify-center">
+                  ⬇️ Footer
+                </div>
+              </section>
+            </div>
           </main>
         </div>
       </>
