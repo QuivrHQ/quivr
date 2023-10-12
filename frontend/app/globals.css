@@ -52,7 +52,7 @@ div:focus {
     clip-path: polygon(
       0 0,
       100% 0,
-      100% max(100px, calc(100% - 100vw * tan(30deg))),
+      100% max(100px, calc(100% - 100vw * tan(15deg))),
       0 100%
     );
   }
