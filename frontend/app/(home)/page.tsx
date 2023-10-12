@@ -30,7 +30,7 @@ const HomePage = (): JSX.Element => {
           </div>
           <HomeHeader />
 
-          <main className="flex flex-col items-center">
+          <main className="relative flex flex-col items-center">
             <section className="flex flex-col md:flex-row items-center max-w-4xl pb-4">
               <div>
                 <h1 className="text-4xl font-bold">
@@ -53,7 +53,7 @@ const HomePage = (): JSX.Element => {
             </section>
 
             <div className="bg-[#FCFAF6] w-screen hidden md:flex justify-center py-4">
-              <section className="flex flex-col items-center max-w-4xl">
+              <section className="flex flex-col items-center max-w-4xl z-[2]">
                 <h2 className="text-2xl text-center">Demo vidéo</h2>
                 <div className="w-[80vw] md:w-[400px] h-[80vw] md:h-[400px] bg-slate-200 rounded flex items-center justify-center">
                   🍿 Vidéo
@@ -61,8 +61,14 @@ const HomePage = (): JSX.Element => {
               </section>
             </div>
 
+            <div className="overflow-visible h-0 z-[1]">
+              <div className="relative bg-white md:bg-[#FCFAF6] triangle-downward-to-bottom-right w-screen h-[calc(100vw*tan(6deg))] z-[1] top-[calc(-100vw*tan(6deg)+4rem)]"></div>
+            </div>
+            <div className="overflow-visible h-0 z-[1]">
+              <div className="relative bg-[#362469] triangle-upward-to-bottom-right w-screen h-[calc(100vw*tan(6deg))] z-[1] top-[calc(-100vw*tan(6deg)+4rem)]"></div>
+            </div>
             <div className="bg-[#362469] w-screen flex justify-center py-4">
-              <section className="flex flex-col items-center max-w-4xl">
+              <section className="flex flex-col items-center max-w-4xl z-[2]">
                 <h2 className="text-2xl text-center text-white">
                   Experience it now
                 </h2>

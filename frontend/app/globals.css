@@ -52,8 +52,20 @@ div:focus {
     clip-path: polygon(
       0 0,
       100% 0,
-      100% max(70px, calc(100% - 100vw * tan(15deg))),
+      100% max(70px, calc(100% - 100vw * tan(12deg))),
       0 100%
     );
+  }
+  .triangle-downward-to-bottom-right {
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 0 0);
+  }
+  .triangle-upward-to-bottom-right {
+    clip-path: polygon(0 0, 100% 100%, 0 100%, 0 0);
+  }
+  .triangle-downward-to-top-right {
+    clip-path: polygon(0 0, 100% 0, 0 100%, 0 0);
+  }
+  .triangle-upward-to-top-right {
+    clip-path: polygon(0 100%, 100% 0, 100% 100%, 0 100%);
   }
 }
