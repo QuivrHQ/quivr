@@ -283,6 +283,7 @@ CREATE TABLE IF NOT EXISTS onboardings (
   onboarding_b1 BOOLEAN NOT NULL DEFAULT true,
   onboarding_b2 BOOLEAN NOT NULL DEFAULT true,
   onboarding_b3 BOOLEAN NOT NULL DEFAULT true,
+  creation_time TIMESTAMP DEFAULT current_timestamp,
   PRIMARY KEY (user_id)
 );
 
@@ -300,9 +301,9 @@ CREATE POLICY "Access Quivr Storage 1jccrwz_2" ON storage.objects FOR UPDATE TO 
 CREATE POLICY "Access Quivr Storage 1jccrwz_3" ON storage.objects FOR DELETE TO anon USING (bucket_id = 'quivr');
 
 INSERT INTO migrations (name) 
-SELECT '20231010120000_add_create_user_onboarding_function'
+SELECT '20231012150000_add_creation_time_to_onboardings_table'
 WHERE NOT EXISTS (
-    SELECT 1 FROM migrations WHERE name = '20231010120000_add_create_user_onboarding_function'
+    SELECT 1 FROM migrations WHERE name = '20231012150000_add_creation_time_to_onboardings_table'
 );
 
 
