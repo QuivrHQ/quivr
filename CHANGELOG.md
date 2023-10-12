@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.0.91 (2023-10-12)
+
+## What's Changed
+* feat: track onboarding events by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1388
+* fix(user identity): User identity dict has no attribute user_id and open_api_key by @HamzaKhalidDhillon in https://github.com/StanGirard/quivr/pull/1351
+* feat: new homepage header by @matthieujacq in https://github.com/StanGirard/quivr/pull/1382
+* feat(onboarding): add suggested questions answer by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1390
+
+## New Contributors
+* @HamzaKhalidDhillon made their first contribution in https://github.com/StanGirard/quivr/pull/1351
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.90...v0.0.91
+
 ## 0.0.90 (2023-10-11)
 
 ## What's Changed
