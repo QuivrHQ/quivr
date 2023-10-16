@@ -131,4 +131,24 @@ describe("useChatApi", () => {
       chat_name: chatName,
     });
   });
+
+  it("should call addQuestionAndAnswer with the correct parameters", async () => {
+    const chatId = "test-chat-id";
+    const question = "test-question";
+    const answer = "test-answer";
+    axiosPostMock.mockReturnValue({ data: {} });
+    const {
+      result: {
+        current: { addQuestionAndAnswer },
+      },
+    } = renderHook(() => useChatApi());
+
+    await addQuestionAndAnswer(chatId, { question, answer });
+
+    expect(axiosPostMock).toHaveBeenCalledTimes(1);
+    expect(axiosPostMock).toHaveBeenCalledWith(
+      `/chat/${chatId}/question/answer`,
+      { question, answer }
+    );
+  });
 });

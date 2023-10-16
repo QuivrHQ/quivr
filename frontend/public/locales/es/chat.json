@@ -43,7 +43,12 @@
     "step_3": "3. ¡Disfruta!",
     "how_to_use_quivr": "¿Cómo usar Quivr?",
     "what_is_quivr": "¿Qué es Quivr?",
-    "what_is_brain": "¿Qué es un cerebro?"
+    "what_is_brain": "¿Qué es un cerebro?",
+    "answer":{
+      "how_to_use_quivr": "Consulta la documentación en https://brain.quivr.app/docs/get_started/intro.html",
+      "what_is_quivr": "Quivr es un asistente útil.",
+      "what_is_brain": "Un cerebro contiene conocimiento."
+    }
   },
   "welcome": "Bienvenido"
 }

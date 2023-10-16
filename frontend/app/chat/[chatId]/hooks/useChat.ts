@@ -10,6 +10,7 @@ import { CHATS_DATA_KEY } from "@/lib/api/chat/config";
 import { useChatApi } from "@/lib/api/chat/useChatApi";
 import { useChatContext } from "@/lib/context";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
+import { getChatNameFromQuestion } from "@/lib/helpers/getChatNameFromQuestion";
 import { useToast } from "@/lib/hooks";
 import { useOnboarding } from "@/lib/hooks/useOnboarding";
 import { useOnboardingTracker } from "@/lib/hooks/useOnboardingTracker";
@@ -58,8 +59,7 @@ export const useChat = () => {
 
       //if chatId is not set, create a new chat. Chat name is from the first question
       if (currentChatId === undefined) {
-        const chatName = question.split(" ").slice(0, 3).join(" ");
-        const chat = await createChat(chatName);
+        const chat = await createChat(getChatNameFromQuestion(question));
         currentChatId = chat.chat_id;
         setChatId(currentChatId);
         shouldUpdateUrl = true;
