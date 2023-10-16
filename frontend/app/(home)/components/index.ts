@@ -1,2 +1,2 @@
-export * from "./HomeHeader";
-export * from "./QuivrLogo";
+export * from "./HomeHeader/HomeHeader";
+export * from "./HomeSection/HomeSection";

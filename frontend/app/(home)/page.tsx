@@ -7,8 +7,7 @@ import { redirectToPreviousPageOrChatPage } from "@/lib/helpers/redirectToPrevio
 
 import Features from "./Features";
 import Hero from "./Hero";
-import { HomeHeader } from "./components";
-import { HomeSection } from "./components/HomeSection/HomeSection";
+import { HomeHeader, HomeSection } from "./components";
 
 /* eslint-disable max-lines */
 const HomePage = (): JSX.Element => {
@@ -25,10 +24,7 @@ const HomePage = (): JSX.Element => {
   if (isNewHomePage) {
     return (
       <>
-        <div data-testid="home-page">
-          <div className="relative overflow-visible h-0 z-[-1]">
-            <div className="bg-gradient-to-b from-[#6300FF] to-[#D07DF9] bg-slanted-upwards w-screen h-[30rem] z-[-1]"></div>
-          </div>
+        <div data-testid="home-page" className="relative">
           <HomeHeader />
 
           <main className="relative flex flex-col items-center">
