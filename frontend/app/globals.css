@@ -56,16 +56,39 @@ div:focus {
       0 100%
     );
   }
-  .triangle-downward-to-bottom-right {
-    clip-path: polygon(0 0, 100% 0, 100% 100%, 0 0);
+
+  .pb-slant {
+    padding-bottom: calc(50vw * tan(6deg));
   }
-  .triangle-upward-to-bottom-right {
-    clip-path: polygon(0 0, 100% 100%, 0 100%, 0 0);
+
+  .mt-slant {
+    margin-top: calc(-100vw * tan(6deg));
   }
-  .triangle-downward-to-top-right {
-    clip-path: polygon(0 0, 100% 0, 0 100%, 0 0);
+
+  .section-slanted-downwards {
+    transform: skew(0, 6deg) translateY(calc(50vw / -12));
+    padding-bottom: calc(100vw * tan(6deg));
+
+    & > * {
+      transform: skew(0, -6deg) translateY(calc(50vw / 12));
+      margin-top: calc(-50vw * tan(6deg));
+    }
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
-  .triangle-upward-to-top-right {
-    clip-path: polygon(0 100%, 100% 0, 100% 100%, 0 100%);
+
+  .section-slanted-upwards {
+    transform: skew(0, -6deg) translateY(calc(50vw * tan(6deg)));
+
+    & > * {
+      transform: skew(0, 6deg) translateY(calc(-50vw * tan(6deg)));
+      margin-top: calc(50vw * tan(6deg));
+    }
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 }

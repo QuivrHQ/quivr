@@ -26,7 +26,7 @@ const HomePage = (): JSX.Element => {
       <>
         <div data-testid="home-page">
           <div className="relative overflow-visible h-0 z-[-1]">
-            <div className="bg-gradient-to-b from-[#6300FF] to-[#D07DF9] bg-slanted-upwards w-screen h-[50vh] z-[-1]"></div>
+            <div className="bg-gradient-to-b from-[#6300FF] to-[#D07DF9] bg-slanted-upwards w-screen h-[30rem] z-[-1]"></div>
           </div>
           <HomeHeader />
 
@@ -52,7 +52,7 @@ const HomePage = (): JSX.Element => {
               </div>
             </section>
 
-            <div className="bg-[#FCFAF6] w-screen hidden md:flex justify-center py-4">
+            <div className="bg-[#FCFAF6] w-screen hidden md:flex justify-center py-4 pb-slant">
               <section className="flex flex-col items-center max-w-6xl z-[2]">
                 <h2 className="text-2xl text-center">Demo vidéo</h2>
                 <div className="w-[80vw] md:w-[400px] h-[80vw] md:h-[400px] bg-slate-200 rounded flex items-center justify-center">
@@ -61,14 +61,8 @@ const HomePage = (): JSX.Element => {
               </section>
             </div>
 
-            <div className="overflow-visible h-0 z-[1]">
-              <div className="relative bg-white md:bg-[#FCFAF6] triangle-downward-to-bottom-right w-screen h-[calc(100vw*tan(6deg))] z-[1] top-[calc(-100vw*tan(6deg)+4rem)]"></div>
-            </div>
-            <div className="overflow-visible h-0 z-[1]">
-              <div className="relative bg-[#362469] triangle-upward-to-bottom-right w-screen h-[calc(100vw*tan(6deg))] z-[1] top-[calc(-100vw*tan(6deg)+4rem)]"></div>
-            </div>
-            <div className="bg-[#362469] w-screen flex justify-center py-4">
-              <section className="flex flex-col items-center max-w-6xl z-[2]">
+            <div className="bg-[#362469] w-screen flex justify-center section-slanted-downwards">
+              <section className="flex flex-col items-center max-w-6xl z-[2] py-8">
                 <h2 className="text-2xl text-center text-white">
                   Experience it now
                 </h2>
@@ -90,14 +84,16 @@ const HomePage = (): JSX.Element => {
               </section>
             </div>
 
-            <section className="flex flex-col items-center max-w-6xl py-4">
-              <div className="w-[80vw] md:w-[400px] h-[80vw] md:h-[400px] bg-slate-200 rounded flex items-center justify-center mt-5">
-                🛡️ Security and privacy
-              </div>
-            </section>
+            <div className="w-screen flex justify-center py-4 mt-slant z-[2] bg-white">
+              <section className="flex flex-col items-center max-w-6xl py-4">
+                <div className="w-[80vw] md:w-[400px] h-[80vw] md:h-[400px] bg-slate-200 rounded flex items-center justify-center mt-5">
+                  🛡️ Security and privacy
+                </div>
+              </section>
+            </div>
 
-            <div className="bg-[#FCFAF6] w-screen flex justify-center py-4">
-              <section className="flex flex-col items-center max-w-6xl">
+            <div className="bg-[#FCFAF6] w-screen flex justify-center section-slanted-upwards">
+              <section className="flex flex-col items-center max-w-6xl py-8">
                 <h2 className="text-2xl text-center">
                   What people say about Quivr
                 </h2>
@@ -107,7 +103,7 @@ const HomePage = (): JSX.Element => {
               </section>
             </div>
 
-            <div className="bg-gradient-to-b to-[#6300FF] from-[#D07DF9] w-screen flex justify-center py-4">
+            <div className="bg-gradient-to-b to-[#6300FF] from-[#D07DF9] w-screen flex justify-center py-4 z-[2]">
               <section className="flex flex-col items-center max-w-6xl">
                 <h2 className="text-2xl text-center text-white">
                   Get started today
