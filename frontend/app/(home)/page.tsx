@@ -8,6 +8,7 @@ import { redirectToPreviousPageOrChatPage } from "@/lib/helpers/redirectToPrevio
 import Features from "./Features";
 import Hero from "./Hero";
 import { HomeHeader } from "./components";
+import { HomeSection } from "./components/HomeSection/HomeSection";
 
 /* eslint-disable max-lines */
 const HomePage = (): JSX.Element => {
@@ -52,67 +53,64 @@ const HomePage = (): JSX.Element => {
               </div>
             </section>
 
-            <div className="bg-[#FCFAF6] w-screen hidden md:flex justify-center py-4 pb-slant">
-              <section className="flex flex-col items-center max-w-6xl z-[2]">
-                <h2 className="text-2xl text-center">Demo vidéo</h2>
-                <div className="w-[80vw] md:w-[400px] h-[80vw] md:h-[400px] bg-slate-200 rounded flex items-center justify-center">
-                  🍿 Vidéo
-                </div>
-              </section>
-            </div>
+            <HomeSection
+              bg="bg-[#FCFAF6]"
+              slantAfter="down"
+              hiddenOnMobile={true}
+            >
+              <h2 className="text-2xl text-center">Demo vidéo</h2>
+              <div className="w-[80vw] md:w-[400px] h-[80vw] md:h-[400px] bg-slate-200 rounded flex items-center justify-center">
+                🍿 Vidéo
+              </div>
+            </HomeSection>
 
-            <div className="bg-[#362469] w-screen flex justify-center section-slanted-downwards">
-              <section className="flex flex-col items-center max-w-6xl z-[2] py-8">
-                <h2 className="text-2xl text-center text-white">
-                  Experience it now
-                </h2>
-                <div className="w-[80vw] md:w-[400px] h-[80vw] md:h-[400px] bg-slate-200 rounded flex items-center justify-center">
-                  <div>
-                    <p className="text-center">📦 Content</p>
-                    <p>Check our exemple on using quivr</p>
-                    <h3>Research and studies</h3>
-                    <p>Quivr is your indispensable companion.</p>
-                    <h3>Legal research</h3>
-                    <p>Your ultimate digital ally in the field</p>
-                    <h3>Sales</h3>
-                    <p>Placeholder</p>
-                    <h3>Consulting</h3>
-                    <p>Placeholder</p>
-                    <button>Try free demo</button>
-                  </div>
+            <HomeSection bg="bg-[#362469]" slantCurrent="down">
+              <h2 className="text-2xl text-center text-white">
+                Experience it now
+              </h2>
+              <div className="w-[80vw] md:w-[400px] h-[80vw] md:h-[400px] bg-slate-200 rounded flex items-center justify-center">
+                <div>
+                  <p className="text-center">📦 Content</p>
+                  <p>Check our exemple on using quivr</p>
+                  <h3>Research and studies</h3>
+                  <p>Quivr is your indispensable companion.</p>
+                  <h3>Legal research</h3>
+                  <p>Your ultimate digital ally in the field</p>
+                  <h3>Sales</h3>
+                  <p>Placeholder</p>
+                  <h3>Consulting</h3>
+                  <p>Placeholder</p>
+                  <button>Try free demo</button>
                 </div>
-              </section>
-            </div>
+              </div>
+            </HomeSection>
 
-            <div className="w-screen flex justify-center py-4 mt-slant z-[2] bg-white">
-              <section className="flex flex-col items-center max-w-6xl py-4">
-                <div className="w-[80vw] md:w-[400px] h-[80vw] md:h-[400px] bg-slate-200 rounded flex items-center justify-center mt-5">
-                  🛡️ Security and privacy
-                </div>
-              </section>
-            </div>
+            <HomeSection bg="bg-white" slantBefore="down" slantAfter="up">
+              <div className="w-[80vw] md:w-[400px] h-[80vw] md:h-[400px] bg-slate-200 rounded flex items-center justify-center mt-5">
+                🛡️ Security and privacy
+              </div>
+            </HomeSection>
 
-            <div className="bg-[#FCFAF6] w-screen flex justify-center section-slanted-upwards">
-              <section className="flex flex-col items-center max-w-6xl py-8">
-                <h2 className="text-2xl text-center">
-                  What people say about Quivr
-                </h2>
-                <div className="w-[80vw] md:w-[400px] h-[80vw] md:h-[400px] bg-slate-200 rounded flex items-center justify-center">
-                  💬 Testimonials
-                </div>
-              </section>
-            </div>
+            <HomeSection bg="bg-[#FCFAF6]" slantCurrent="up">
+              <h2 className="text-2xl text-center">
+                What people say about Quivr
+              </h2>
+              <div className="w-[80vw] md:w-[400px] h-[80vw] md:h-[400px] bg-slate-200 rounded flex items-center justify-center">
+                💬 Testimonials
+              </div>
+            </HomeSection>
 
-            <div className="bg-gradient-to-b to-[#6300FF] from-[#D07DF9] w-screen flex justify-center py-4 z-[2]">
-              <section className="flex flex-col items-center max-w-6xl">
-                <h2 className="text-2xl text-center text-white">
-                  Get started today
-                </h2>
-                <div className="w-[80vw] md:w-[400px] h-[80vw] md:h-[400px] bg-slate-200 rounded flex items-center justify-center">
-                  ⬇️ Footer
-                </div>
-              </section>
-            </div>
+            <HomeSection
+              bg="bg-gradient-to-b from-[#6300FF] to-[#D07DF9]"
+              slantBefore="up"
+            >
+              <h2 className="text-2xl text-center text-white">
+                Get started today
+              </h2>
+              <div className="w-[80vw] md:w-[400px] h-[80vw] md:h-[400px] bg-slate-200 rounded flex items-center justify-center">
+                ⬇️ Footer
+              </div>
+            </HomeSection>
           </main>
         </div>
       </>
