@@ -17,6 +17,7 @@ import {
   SecuritySection,
   TestimonialsSection,
 } from "./components";
+import { UseCases } from "./components/UseCases/UseCases";
 
 const HomePage = (): JSX.Element => {
   const { session } = useSupabase();
@@ -73,6 +74,7 @@ const HomePage = (): JSX.Element => {
   } else {
     return (
       <main data-testid="home-page">
+        <UseCases />
         <Hero />
         <Features />
       </main>
