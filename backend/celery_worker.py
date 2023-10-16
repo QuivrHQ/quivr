@@ -3,6 +3,7 @@ import io
 import os
 
 from celery import Celery
+from celery.schedules import crontab
 from crawl.crawler import CrawlWebsite
 from fastapi import UploadFile
 from models.databases.supabase.notifications import NotificationUpdatableProperties
@@ -14,10 +15,14 @@ from repository.brain.update_brain_last_update_time import (
     update_brain_last_update_time,
 )
 from repository.notification.update_notification import update_notification_by_id
+from repository.onboarding.remove_onboarding_more_than_x_days import (
+    remove_onboarding_more_than_x_days,
+)
 from utils.processors import filter_file
 
 CELERY_BROKER_URL = os.getenv("CELERY_BROKER_URL", "")
 CELEBRY_BROKER_QUEUE_NAME = os.getenv("CELEBRY_BROKER_QUEUE_NAME", "quivr")
+
 
 if CELERY_BROKER_URL.startswith("sqs"):
     broker_transport_options = {
@@ -165,3 +170,16 @@ def process_crawl_and_notify(
         )
     update_brain_last_update_time(brain_id)
     return True
+
+
+@celery.task
+def remove_onboarding_more_than_x_days_task():
+    remove_onboarding_more_than_x_days(7)
+
+
+celery.conf.beat_schedule = {
+    "remove_onboarding_more_than_x_days_task": {
+        "task": f"{__name__}.remove_onboarding_more_than_x_days_task",
+        "schedule": crontab(minute="0", hour="0"),
+    },
+}

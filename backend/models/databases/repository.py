@@ -271,3 +271,7 @@ class Repository(ABC):
     @abstractmethod
     def remove_user_onboarding(self, user_id: UUID):
         pass
+
+    @abstractmethod
+    def remove_onboarding_more_than_x_days(self, days: int):
+        pass
