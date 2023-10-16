@@ -33,7 +33,7 @@ export const HomeHeader = (): JSX.Element => {
   ));
 
   return (
-    <header className="w-screen flex justify-between items-center p-5 min-w-max md:max-w-4xl m-auto">
+    <header className="w-screen flex justify-between items-center p-5 min-w-max md:max-w-6xl m-auto">
       <div className="text-white text-3xl flex gap-2 items-center">
         <QuivrLogo size={64} />
         <div className="cursor-default">Quivr</div>
