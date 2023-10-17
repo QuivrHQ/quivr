@@ -9,7 +9,6 @@ import Features from "./Features";
 import Hero from "./Hero";
 import {
   DemoSection,
-  ExampleSection,
   FooterSection,
   HomeHeader,
   HomeSection,
@@ -17,6 +16,7 @@ import {
   SecuritySection,
   TestimonialsSection,
 } from "./components";
+import { UseCases } from "./components/UseCases/UseCases";
 
 const HomePage = (): JSX.Element => {
   const { session } = useSupabase();
@@ -35,7 +35,7 @@ const HomePage = (): JSX.Element => {
         <div data-testid="home-page" className="relative">
           <HomeHeader />
 
-          <main className="relative flex flex-col items-center z-[-1]">
+          <main className="relative flex flex-col items-center">
             <HomeSection bg="transparent">
               <IntroSection />
             </HomeSection>
@@ -49,7 +49,7 @@ const HomePage = (): JSX.Element => {
             </HomeSection>
 
             <HomeSection bg="bg-[#362469]" slantCurrent="down">
-              <ExampleSection />
+              <UseCases />
             </HomeSection>
 
             <HomeSection bg="bg-white" slantBefore="down" slantAfter="up">
