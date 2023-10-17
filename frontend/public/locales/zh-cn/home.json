@@ -11,5 +11,9 @@
     "subtitle": "上传所有文件并开始与它们交流。",
     "try_demo": "试用免费演示",
     "contact_sales": "联系销售团队"
+  },
+  "demo": {
+    "title": "演示视频",
+    "start_now": "立即开始"
   }
 }

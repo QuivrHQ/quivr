@@ -11,5 +11,9 @@
     "subtitle": "Upload all your files and start talking with them.",
     "try_demo": "Try free demo",
     "contact_sales": "Contact sales team"
+  },
+  "demo": {
+    "title": "Demo video",
+    "start_now": "Start now"
   }
 }
