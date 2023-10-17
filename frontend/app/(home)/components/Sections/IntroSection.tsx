@@ -9,7 +9,7 @@ export const IntroSection = (): JSX.Element => {
 
   return (
     <>
-      <div className="flex flex-col lg:flex-row items-center justify-center md:justify-start gap-10 lg:h-[calc(100vh-300px)] mb-[calc(50vw*tan(6deg))] md:mb-0">
+      <div className="flex flex-col lg:flex-row items-center justify-center md:justify-start gap-10 lg:h-[calc(100vh-250px)] mb-[calc(50vw*tan(6deg))] md:mb-0">
         <div className="w-[80vw] lg:w-[60%] lg:shrink-0 flex flex-col justify-center gap-20">
           <div>
             <h1 className="text-5xl leading-[4rem] sm:text-7xl sm:leading-[6rem] font-bold text-black block max-w-2xl">
