@@ -18,7 +18,7 @@ export const IntroSection = (): JSX.Element => {
               Upload all your files and start talking with them.
             </p>
           </div>
-          <div className="flex">
+          <div className="flex flex-col items-start sm:flex-row sm:items-center gap-5">
             <Link href="/signup">
               <Button className="text-white bg-black rounded-full">
                 Try free demo <LuChevronRight size={24} />
