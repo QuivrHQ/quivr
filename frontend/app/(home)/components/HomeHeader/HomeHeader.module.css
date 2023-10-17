@@ -1,0 +1,8 @@
+.bg-slanted-upwards {
+  clip-path: polygon(
+    0 0,
+    100% 0,
+    100% max(70px, calc(100% - 100vw * tan(12deg))),
+    0 100%
+  );
+}

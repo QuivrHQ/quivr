@@ -1,0 +1,36 @@
+/* Fixes padding and margins due to slanted sibling sections */
+.slant-before-is-up {
+  z-index: 2;
+}
+.slant-before-is-down {
+  z-index: 2;
+  margin-top: calc(-100vw * tan(6deg));
+}
+.slant-after-is-down {
+  padding-bottom: calc(50vw * tan(6deg));
+}
+
+.section-slanted-downwards {
+  transform: skew(0, 6deg) translateY(calc(50vw / -12));
+  padding-bottom: calc(100vw * tan(6deg));
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.section-slanted-downwards > * {
+  transform: skew(0, -6deg) translateY(calc(50vw / 12));
+  margin-top: calc(-50vw * tan(6deg));
+}
+
+.section-slanted-upwards {
+  transform: skew(0, -6deg) translateY(calc(50vw * tan(6deg)));
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.section-slanted-upwards > * {
+  transform: skew(0, 6deg) translateY(calc(-50vw * tan(6deg)));
+  margin-top: calc(50vw * tan(6deg));
+}

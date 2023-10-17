@@ -7,7 +7,16 @@ import { redirectToPreviousPageOrChatPage } from "@/lib/helpers/redirectToPrevio
 
 import Features from "./Features";
 import Hero from "./Hero";
-import { HomeHeader } from "./components";
+import {
+  DemoSection,
+  ExampleSection,
+  FooterSection,
+  HomeHeader,
+  HomeSection,
+  IntroSection,
+  SecuritySection,
+  TestimonialsSection,
+} from "./components";
 
 const HomePage = (): JSX.Element => {
   const { session } = useSupabase();
@@ -23,13 +32,40 @@ const HomePage = (): JSX.Element => {
   if (isNewHomePage) {
     return (
       <>
-        <div data-testid="home-page">
-          <div className="fixed bg-gradient-to-b from-[#6300FF] to-[#D07DF9] w-screen h-[50vh] z-[-1]"></div>
+        <div data-testid="home-page" className="relative">
           <HomeHeader />
-          <main>
-            <div className="mx-auto my-5 p-5 w-min-content bg-yellow-100 rounded-lg">
-              🚧 New homepage in progress 🚧
-            </div>
+
+          <main className="relative flex flex-col items-center z-[-1]">
+            <HomeSection bg="transparent">
+              <IntroSection />
+            </HomeSection>
+
+            <HomeSection
+              bg="bg-[#FCFAF6]"
+              slantAfter="down"
+              hiddenOnMobile={true}
+            >
+              <DemoSection />
+            </HomeSection>
+
+            <HomeSection bg="bg-[#362469]" slantCurrent="down">
+              <ExampleSection />
+            </HomeSection>
+
+            <HomeSection bg="bg-white" slantBefore="down" slantAfter="up">
+              <SecuritySection />
+            </HomeSection>
+
+            <HomeSection bg="bg-[#FCFAF6]" slantCurrent="up">
+              <TestimonialsSection />
+            </HomeSection>
+
+            <HomeSection
+              bg="bg-gradient-to-b from-[#7A27FD] to-[#D07DF9]"
+              slantBefore="up"
+            >
+              <FooterSection />
+            </HomeSection>
           </main>
         </div>
       </>
