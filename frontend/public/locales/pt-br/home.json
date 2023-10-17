@@ -1,5 +1,9 @@
 {
   "sign_in": "Entrar",
   "sign_up": "Cadastrar",
-  "star_us": "Nos avalie no Github"
+  "star_us": "Nos avalie no Github",
+  "useCases": {
+    "title": "Experimente agora.",
+    "subtitle": "Confira nosso exemplo de uso do Quivr."
+  }
 }

@@ -11,8 +11,6 @@ backend/venv
 backend/.env
 backend/*.deb
 
-
-
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
 # dependencies
@@ -59,7 +57,7 @@ backend/core/application_default_credentials.json
 #local models
 backend/core/local_models/*
 
-
 ## scripts
 .migration_info
 package-lock.json
+backend/celerybeat-schedule
