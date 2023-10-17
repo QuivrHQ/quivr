@@ -5,5 +5,11 @@
   "useCases": {
     "title": "Expérimentez-le maintenant.",
     "subtitle": "Consultez notre exemple d'utilisation de Quivr."
+  },
+  "intro": {
+    "title": "Obtenez un deuxième cerveau avec",
+    "subtitle": "Téléchargez tous vos fichiers et commencez à discuter avec eux.",
+    "try_demo": "Essayez la démo gratuite",
+    "contact_sales": "Contactez l'équipe commerciale"
   }
 }

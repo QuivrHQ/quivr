@@ -32,42 +32,40 @@ const HomePage = (): JSX.Element => {
   if (isNewHomePage) {
     return (
       <>
-        <div data-testid="home-page" className="relative">
-          <HomeHeader />
+        <HomeHeader />
 
-          <main className="relative flex flex-col items-center">
-            <HomeSection bg="transparent">
-              <IntroSection />
-            </HomeSection>
+        <main className="relative flex flex-col items-center">
+          <HomeSection bg="transparent">
+            <IntroSection />
+          </HomeSection>
 
-            <HomeSection
-              bg="bg-[#FCFAF6]"
-              slantAfter="down"
-              hiddenOnMobile={true}
-            >
-              <DemoSection />
-            </HomeSection>
+          <HomeSection
+            bg="bg-[#FCFAF6]"
+            slantAfter="down"
+            hiddenOnMobile={true}
+          >
+            <DemoSection />
+          </HomeSection>
 
-            <HomeSection bg="bg-[#362469]" slantCurrent="down">
-              <UseCases />
-            </HomeSection>
+          <HomeSection bg="bg-[#362469]" slantCurrent="down">
+            <UseCases />
+          </HomeSection>
 
-            <HomeSection bg="bg-white" slantBefore="down" slantAfter="up">
-              <SecuritySection />
-            </HomeSection>
+          <HomeSection bg="bg-white" slantBefore="down" slantAfter="up">
+            <SecuritySection />
+          </HomeSection>
 
-            <HomeSection bg="bg-[#FCFAF6]" slantCurrent="up">
-              <TestimonialsSection />
-            </HomeSection>
+          <HomeSection bg="bg-[#FCFAF6]" slantCurrent="up">
+            <TestimonialsSection />
+          </HomeSection>
 
-            <HomeSection
-              bg="bg-gradient-to-b from-[#7A27FD] to-[#D07DF9]"
-              slantBefore="up"
-            >
-              <FooterSection />
-            </HomeSection>
-          </main>
-        </div>
+          <HomeSection
+            bg="bg-gradient-to-b from-[#7A27FD] to-[#D07DF9]"
+            slantBefore="up"
+          >
+            <FooterSection />
+          </HomeSection>
+        </main>
       </>
     );
   } else {

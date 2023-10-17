@@ -35,6 +35,7 @@ export const PopoverMenuMobile = ({
             paddingBottom: "1.5rem",
             marginRight: "1rem",
             marginTop: "-1rem",
+            boxShadow: "0 0 0.5rem rgba(0, 0, 0, 0.1)",
           }}
         >
           <div className="flex flex-col gap-4 min-w-max w-[calc(100vw-4rem)] sm:w-[300px]">

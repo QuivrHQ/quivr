@@ -5,5 +5,11 @@
   "useCases": {
     "title": "立刻体验。",
     "subtitle": "查看我们使用 Quivr 的示例。"
+  },
+  "intro": {
+    "title": "通过获取第二个大脑",
+    "subtitle": "上传所有文件并开始与它们交流。",
+    "try_demo": "试用免费演示",
+    "contact_sales": "联系销售团队"
   }
 }
