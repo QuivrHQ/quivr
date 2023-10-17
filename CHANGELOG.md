@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.0.93 (2023-10-17)
+
+## What's Changed
+* feat: add use cases to homepage by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1415
+* feat: Homepage screen 1 content by @matthieujacq in https://github.com/StanGirard/quivr/pull/1414
+
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.92...v0.0.93
+
 ## 0.0.92 (2023-10-17)
 
 ## What's Changed
