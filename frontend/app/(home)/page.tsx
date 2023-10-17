@@ -61,7 +61,7 @@ const HomePage = (): JSX.Element => {
             </HomeSection>
 
             <HomeSection
-              bg="bg-gradient-to-b from-[#6300FF] to-[#D07DF9]"
+              bg="bg-gradient-to-b from-[#7A27FD] to-[#D07DF9]"
               slantBefore="up"
             >
               <FooterSection />
