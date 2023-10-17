@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.0.92 (2023-10-17)
+
+## What's Changed
+* feat: add a cron to remove onboarding more than 7 days by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1397
+* feat:  🖼️ new homepage background by @matthieujacq in https://github.com/StanGirard/quivr/pull/1395
+
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.91...v0.0.92
+
 ## 0.0.91 (2023-10-12)
 
 ## What's Changed
