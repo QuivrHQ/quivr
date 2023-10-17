@@ -2,8 +2,14 @@
   "sign_in": "Sign in",
   "sign_up": "Sign up",
   "star_us": "Star us on Github",
-  "useCases":{
+  "useCases": {
     "title": "Experience it now.",
     "subtitle": "Check our example on using Quivr"
+  },
+  "intro": {
+    "title": "Get a second Brain with",
+    "subtitle": "Upload all your files and start talking with them.",
+    "try_demo": "Try free demo",
+    "contact_sales": "Contact sales team"
   }
 }
