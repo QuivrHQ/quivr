@@ -35,7 +35,7 @@ const HomePage = (): JSX.Element => {
         <div data-testid="home-page" className="relative">
           <HomeHeader />
 
-          <main className="relative flex flex-col items-center">
+          <main className="relative flex flex-col items-center z-[-1]">
             <HomeSection bg="transparent">
               <IntroSection />
             </HomeSection>
