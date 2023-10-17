@@ -44,7 +44,7 @@ export const HomeHeader = (): JSX.Element => {
         <div className="hidden md:flex">
           <ul className="flex gap-4 items-center">{navLinks}</ul>
         </div>
-        <div className="md:hidden z-[1]">
+        <div className="md:hidden z-10">
           <PopoverMenuMobile navLinks={navLinks} />
         </div>
       </header>
