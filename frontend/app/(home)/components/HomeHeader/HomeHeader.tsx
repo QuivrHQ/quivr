@@ -3,9 +3,9 @@ import { useTranslation } from "react-i18next";
 import { AiFillStar } from "react-icons/ai";
 import { LuChevronRight } from "react-icons/lu";
 
-import { HomeHeaderBackground } from "./HomeHeaderBackground";
-import { PopoverMenuMobile } from "./PopoverMenuMobile";
-import { QuivrLogo } from "./QuivrLogo";
+import { HomeHeaderBackground } from "./components/HomeHeaderBackground";
+import { PopoverMenuMobile } from "./components/PopoverMenuMobile";
+import { QuivrLogo } from "./components/QuivrLogo";
 
 export const HomeHeader = (): JSX.Element => {
   const { t } = useTranslation("home");

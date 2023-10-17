@@ -1,4 +1,4 @@
-import styles from "./HomeHeader.module.css";
+import styles from "../HomeHeader.module.css";
 
 export const HomeHeaderBackground = (): JSX.Element => {
   return (
