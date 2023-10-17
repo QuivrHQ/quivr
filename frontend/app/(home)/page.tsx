@@ -9,7 +9,6 @@ import Features from "./Features";
 import Hero from "./Hero";
 import {
   DemoSection,
-  ExampleSection,
   FooterSection,
   HomeHeader,
   HomeSection,
@@ -36,7 +35,7 @@ const HomePage = (): JSX.Element => {
         <div data-testid="home-page" className="relative">
           <HomeHeader />
 
-          <main className="relative flex flex-col items-center z-[-1]">
+          <main className="relative flex flex-col items-center">
             <HomeSection bg="transparent">
               <IntroSection />
             </HomeSection>
@@ -50,7 +49,7 @@ const HomePage = (): JSX.Element => {
             </HomeSection>
 
             <HomeSection bg="bg-[#362469]" slantCurrent="down">
-              <ExampleSection />
+              <UseCases />
             </HomeSection>
 
             <HomeSection bg="bg-white" slantBefore="down" slantAfter="up">
@@ -74,7 +73,6 @@ const HomePage = (): JSX.Element => {
   } else {
     return (
       <main data-testid="home-page">
-        <UseCases />
         <Hero />
         <Features />
       </main>

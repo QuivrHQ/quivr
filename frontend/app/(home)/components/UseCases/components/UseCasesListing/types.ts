@@ -1,9 +1,9 @@
-export type CaseType = {
+export type UseCase = {
   id: string;
   name: string;
   description: string;
   discussions: {
-    user: string;
-    quivr: string;
+    question: string;
+    answer: string;
   }[];
 };

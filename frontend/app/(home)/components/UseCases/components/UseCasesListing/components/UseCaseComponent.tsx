@@ -1,26 +1,28 @@
 import { Fragment } from "react";
 import { PiPaperclipFill } from "react-icons/pi";
 
-import { CaseType } from "../types";
+import { UseCase } from "../types";
 
-type CaseProps = {
-  discussions: CaseType["discussions"];
+type UseCaseComponentProps = {
+  discussions: UseCase["discussions"];
 };
 
-export const Case = ({ discussions }: CaseProps): JSX.Element => {
+export const UseCaseComponent = ({
+  discussions,
+}: UseCaseComponentProps): JSX.Element => {
   return (
     <div className="flex flex-col gap-2 text-black">
       {discussions.map((d) => (
-        <Fragment key={d.user}>
+        <Fragment key={d.question}>
           <div className="flex justify-end">
-            <div className=" flex justify-end bg-[#9B9B9B] bg-opacity-10 p-4 rounded-xl">
-              <p>{d.user}</p>
+            <div className="bg-[#9B9B9B] max-w-[75%] bg-opacity-10 p-4 rounded-xl">
+              <p>{d.question}</p>
             </div>
           </div>
           <div className="flex">
-            <div className="bg-[#E0DDFC] w-[75%] rounded-xl p-4">
+            <div className="bg-[#E0DDFC] max-w-[75%] rounded-xl p-4">
               <span className="text-[#8F8F8F] text-xs">@Quivr</span>
-              <p>{d.quivr}</p>
+              <p>{d.answer}</p>
             </div>
           </div>
         </Fragment>

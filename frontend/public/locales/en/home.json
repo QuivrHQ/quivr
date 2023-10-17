@@ -1,5 +1,9 @@
 {
   "sign_in": "Sign in",
   "sign_up": "Sign up",
-  "star_us": "Star us on Github"
+  "star_us": "Star us on Github",
+  "useCases":{
+    "title": "Experience it now.",
+    "subtitle": "Check our example on using Quivr"
+  }
 }

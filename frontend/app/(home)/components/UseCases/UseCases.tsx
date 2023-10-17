@@ -1,15 +1,19 @@
-import { CasesList } from "./components/CasesList/CasesList";
+import { useTranslation } from "react-i18next";
+
+import { UseCasesListing } from "./components/UseCasesListing/UseCasesListing";
 
 export const UseCases = (): JSX.Element => {
+  const { t } = useTranslation("home");
+
   return (
-    <section className="p-4 bg-purple-800 text-white">
+    <div className="p-4 text-white">
       <div className="mb-3">
         <h2 className="text-center text-3xl font-semibold mb-2">
-          Experience it now.
+          {t("useCases.title")}
         </h2>
-        <p className="text-center text-lg">Check our example on using Quivr</p>
+        <p className="text-center text-lg">{t("useCases.subtitle")}</p>
       </div>
-      <CasesList />
-    </section>
+      <UseCasesListing />
+    </div>
   );
 };
