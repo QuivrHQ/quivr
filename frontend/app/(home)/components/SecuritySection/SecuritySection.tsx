@@ -1,8 +1,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { BsChevronRight } from "react-icons/bs";
-import { LuShieldCheck } from "react-icons/lu";
+import { LuChevronRight, LuShieldCheck } from "react-icons/lu";
 
 import {
   Accordion,
@@ -29,7 +28,7 @@ export const SecuritySection = (): JSX.Element => {
 
   return (
     <>
-      <div className="flex flex-1 w-full mb-10">
+      <div className="flex flex-1 w-full mb-10 p-6">
         <div className="hidden md:flex flex-1  items-center justify-center">
           <LuShieldCheck className="text-[150px]" />
         </div>
@@ -49,11 +48,11 @@ export const SecuritySection = (): JSX.Element => {
           </Accordion>
         </div>
       </div>
-      <div className="flex justify-end w-full">
+      <div className="flex md:justify-end w-full">
         <Link href="/signup">
           <Button className="rounded-full">
             {t("cta")}
-            <BsChevronRight size={24} />
+            <LuChevronRight size={24} />
           </Button>
         </Link>
       </div>

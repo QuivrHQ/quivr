@@ -29,10 +29,8 @@ export const UseCasesListing = (): JSX.Element => {
   }
 
   return (
-    <div className="flex grid grid-cols-6 gap-10 flex flex-column items-start">
-      <div
-        className={"col-span-6 md:col-span-2 flex flex-col gap-3 col-span-6"}
-      >
+    <div className="grid grid-cols-6 md:gap-10 flex-column items-start ">
+      <div className={"col-span-6 md:col-span-2 flex flex-col gap-3"}>
         {cases.map((c) => (
           <div
             key={c.id}
@@ -50,7 +48,7 @@ export const UseCasesListing = (): JSX.Element => {
       </div>
 
       {selectedCase !== undefined && (
-        <div className="hidden md:block col-span-4 bg-white rounded-xl p-6 px-10 m-6">
+        <div className="hidden md:block col-span-4 bg-white rounded-xl md:p-6 px-10 m-6">
           <LuPanelLeft className="text-black text-xl" />
           <UseCaseComponent discussions={selectedCase.discussions} />
         </div>
