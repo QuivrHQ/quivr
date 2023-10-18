@@ -16,7 +16,14 @@
     "title": "Demo video",
     "start_now": "Start now"
   },
-  "security":{
+  "security": {
     "cta": "Get started today "
+  },
+  "footer": {
+    "title": "Get started today",
+    "description_1": "Your personal assistant that acts as your Second Brain.",
+    "description_2": "Simply upload your files and ask questions to it.",
+    "start_using": "Start using Quivr",
+    "contact_sales": "Contact sales team"
   }
 }
