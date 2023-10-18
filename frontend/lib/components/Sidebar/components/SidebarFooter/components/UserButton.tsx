@@ -1,6 +1,6 @@
-import Image from "next/image";
 import Link from "next/link";
 
+import { Avatar } from "@/lib/components/ui/Avatar";
 import { useSupabase } from "@/lib/context/SupabaseProvider";
 
 import { useGravatar } from "../../../../../hooks/useGravatar";
@@ -12,15 +12,7 @@ export const UserButton = (): JSX.Element => {
 
   return (
     <Link aria-label="account" className={sidebarLinkStyle} href={"/user"}>
-      <div className="relative w-8 h-8">
-        <Image
-          alt="gravatar"
-          fill={true}
-          sizes="32px"
-          src={gravatarUrl}
-          className="rounded-xl"
-        />
-      </div>
+      <Avatar url={gravatarUrl} alt="user-gravatar" />
       <span className="text-ellipsis overflow-hidden">
         {session?.user.email ?? ""}
       </span>
