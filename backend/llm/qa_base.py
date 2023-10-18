@@ -7,6 +7,7 @@ from langchain.callbacks.streaming_aiter import AsyncIteratorCallbackHandler
 from langchain.chains import ConversationalRetrievalChain, LLMChain
 from langchain.chains.question_answering import load_qa_chain
 from langchain.chat_models import ChatLiteLLM
+from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.llms.base import BaseLLM
 from langchain.prompts.chat import (
     ChatPromptTemplate,
@@ -89,6 +90,12 @@ class QABaseBrainPicking(BaseModel):
             return [
                 AsyncIteratorCallbackHandler()  # pyright: ignore reportPrivateUsage=none
             ]
+
+    @property
+    def embeddings(self) -> OpenAIEmbeddings:
+        return OpenAIEmbeddings(
+            openai_api_key=self.openai_api_key
+        )  # pyright: ignore reportPrivateUsage=none
 
     supabase_client: Optional[Client] = None
     vector_store: Optional[CustomSupabaseVectorStore] = None
