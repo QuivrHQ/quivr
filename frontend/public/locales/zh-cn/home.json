@@ -16,7 +16,14 @@
     "title": "演示视频",
     "start_now": "立即开始"
   },
-  "security":{
+  "security": {
     "cta": "立即开始"
+  },
+  "footer": {
+    "title": "今日开始",
+    "description_1": "您的个人助手，充当您的第二大脑。",
+    "description_2": "只需上传您的文件并向其提问。",
+    "start_using": "开始使用Quivr",
+    "contact_sales": "联系销售团队"
   }
 }

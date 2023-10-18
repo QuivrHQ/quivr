@@ -16,7 +16,14 @@
     "title": "Vidéo de démonstration",
     "start_now": "Commencer maintenant"
   },
-  "security":{
+  "security": {
     "cta": "Commencez dès aujourd'hui"
+  },
+  "footer": {
+    "title": "Commencez aujourd'hui",
+    "description_1": "Votre assistant personnel qui agit comme votre Deuxième Cerveau.",
+    "description_2": "Il vous suffit de télécharger vos fichiers et de lui poser des questions.",
+    "start_using": "Commencez à utiliser Quivr",
+    "contact_sales": "Contacter l'équipe commerciale"
   }
 }
