@@ -25,5 +25,8 @@
     "description_2": "Simply upload your files and ask questions to it.",
     "start_using": "Start using Quivr",
     "contact_sales": "Contact sales team"
+  },
+  "testimonials":{
+    "title": "What people say about"
   }
 }
