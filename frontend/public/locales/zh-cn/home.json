@@ -25,5 +25,8 @@
     "description_2": "只需上传您的文件并向其提问。",
     "start_using": "开始使用Quivr",
     "contact_sales": "联系销售团队"
+  },
+  "testimonials":{ 
+    "title": "人们对此的评价" 
   }
 }

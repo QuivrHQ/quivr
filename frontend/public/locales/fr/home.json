@@ -25,5 +25,8 @@
     "description_2": "Il vous suffit de télécharger vos fichiers et de lui poser des questions.",
     "start_using": "Commencez à utiliser Quivr",
     "contact_sales": "Contacter l'équipe commerciale"
+  },
+  "testimonials":{ 
+    "title": "Ce que les gens disent à propos de" 
   }
 }
