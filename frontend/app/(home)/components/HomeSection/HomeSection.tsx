@@ -1,3 +1,5 @@
+import { cn } from "@/lib/utils";
+
 import styles from "./HomeSection.module.css";
 
 type HomeSectionProps = {
@@ -7,6 +9,7 @@ type HomeSectionProps = {
   slantAfter?: "up" | "down" | "none";
   hiddenOnMobile?: boolean;
   children: React.ReactNode;
+  className?: string;
 };
 
 export const HomeSection = ({
@@ -15,6 +18,7 @@ export const HomeSection = ({
   slantBefore = "none",
   slantAfter = "none",
   hiddenOnMobile = false,
+  className,
   children,
 }: HomeSectionProps): JSX.Element => {
   const slantBeforeFix = styles[`slant-before-is-${slantBefore}`] ?? "";
@@ -26,9 +30,12 @@ export const HomeSection = ({
 
   return (
     <div
-      className={`${bg} w-screen ${flex} ${slantBeforeFix} ${slantAfterFix} ${slant}`}
+      className={cn(
+        `${bg} w-screen ${flex} ${slantBeforeFix} ${slantAfterFix} ${slant}`,
+        className
+      )}
     >
-      <section className="flex flex-col items-center max-w-6xl z-[2] py-8">
+      <section className="flex flex-col items-center w-full max-w-6xl z-[2] py-8">
         {children}
       </section>
     </div>
