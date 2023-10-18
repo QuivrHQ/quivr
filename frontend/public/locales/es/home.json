@@ -11,5 +11,9 @@
     "subtitle": "Sube todos tus archivos y comienza a hablar con ellos.",
     "try_demo": "Prueba la demostración gratuita",
     "contact_sales": "Contacta al equipo de ventas"
+  },
+  "demo": {
+    "title": "Video de demostración",
+    "start_now": "Comenzar ahora"
   }
 }
