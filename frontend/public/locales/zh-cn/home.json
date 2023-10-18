@@ -15,5 +15,8 @@
   "demo": {
     "title": "演示视频",
     "start_now": "立即开始"
+  },
+  "security":{
+    "cta": "立即开始"
   }
 }

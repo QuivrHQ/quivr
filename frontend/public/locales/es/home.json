@@ -15,5 +15,8 @@
   "demo": {
     "title": "Video de demostración",
     "start_now": "Comenzar ahora"
+  },
+  "security":{
+    "cta": "Comienza hoy"
   }
 }

@@ -28,7 +28,7 @@ export const HomeSection = ({
     <div
       className={`${bg} w-screen ${flex} ${slantBeforeFix} ${slantAfterFix} ${slant}`}
     >
-      <section className="flex flex-col items-center max-w-6xl z-[2] py-8">
+      <section className="flex flex-col items-center w-full max-w-6xl z-[2] py-8">
         {children}
       </section>
     </div>
