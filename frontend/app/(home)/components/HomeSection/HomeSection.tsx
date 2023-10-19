@@ -7,6 +7,7 @@ type HomeSectionProps = {
   slantCurrent?: "up" | "down" | "none";
   slantBefore?: "up" | "down" | "none";
   slantAfter?: "up" | "down" | "none";
+  gradient?: string;
   hiddenOnMobile?: boolean;
   children: React.ReactNode;
   className?: string;
@@ -17,6 +18,7 @@ export const HomeSection = ({
   slantCurrent = "none",
   slantBefore = "none",
   slantAfter = "none",
+  gradient,
   hiddenOnMobile = false,
   className,
   children,
@@ -38,6 +40,11 @@ export const HomeSection = ({
       <section className="flex flex-col items-center w-full max-w-6xl z-[2] py-8">
         {children}
       </section>
+      {gradient !== undefined ? (
+        <div
+          className={`absolute w-screen bottom-[calc(100vw*tan(6deg))] left-0 h-[30%] ${gradient}`}
+        />
+      ) : null}
     </div>
   );
 };
