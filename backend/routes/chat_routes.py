@@ -6,7 +6,7 @@ from venv import logger
 from auth import AuthBearer, get_current_user
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from fastapi.responses import StreamingResponse
-from llm.openai import OpenAIBrainPicking
+from llm.qa_base import QABaseBrainPicking
 from llm.qa_headless import HeadlessQA
 from models import (
     Brain,
@@ -36,7 +36,6 @@ from repository.chat.get_chat_history_with_notifications import (
 )
 from repository.notification.remove_chat_notifications import remove_chat_notifications
 from repository.user_identity import get_user_identity
-
 from routes.authorizations.brain_authorization import validate_brain_authorization
 from routes.authorizations.types import RoleEnum
 
@@ -241,9 +240,9 @@ async def create_question_handler(
     try:
         check_user_requests_limit(current_user)
         is_model_ok = (brain_details or chat_question).model in userSettings.get("models", ["gpt-3.5-turbo"])  # type: ignore
-        gpt_answer_generator: HeadlessQA | OpenAIBrainPicking
+        gpt_answer_generator: HeadlessQA | QABaseBrainPicking
         if brain_id:
-            gpt_answer_generator = OpenAIBrainPicking(
+            gpt_answer_generator = QABaseBrainPicking(
                 chat_id=str(chat_id),
                 model=chat_question.model if is_model_ok else "gpt-3.5-turbo",  # type: ignore
                 max_tokens=chat_question.max_tokens,
@@ -331,14 +330,14 @@ async def create_stream_question_handler(
     try:
         logger.info(f"Streaming request for {chat_question.model}")
         check_user_requests_limit(current_user)
-        gpt_answer_generator: HeadlessQA | OpenAIBrainPicking
+        gpt_answer_generator: HeadlessQA | QABaseBrainPicking
         # TODO check if model is in the list of models available for the user
 
         print(userSettings.get("models", ["gpt-3.5-turbo"]))  # type: ignore
         is_model_ok = (brain_details or chat_question).model in userSettings.get("models", ["gpt-3.5-turbo"])  # type: ignore
 
         if brain_id:
-            gpt_answer_generator = OpenAIBrainPicking(
+            gpt_answer_generator = QABaseBrainPicking(
                 chat_id=str(chat_id),
                 model=(brain_details or chat_question).model if is_model_ok else "gpt-3.5-turbo",  # type: ignore
                 max_tokens=(brain_details or chat_question).max_tokens,  # type: ignore

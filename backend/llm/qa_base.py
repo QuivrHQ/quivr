@@ -1,12 +1,13 @@
 import asyncio
 import json
-from typing import AsyncIterable, Awaitable, Optional
+from typing import AsyncIterable, Awaitable, List, Optional
 from uuid import UUID
 
 from langchain.callbacks.streaming_aiter import AsyncIteratorCallbackHandler
 from langchain.chains import ConversationalRetrievalChain, LLMChain
 from langchain.chains.question_answering import load_qa_chain
 from langchain.chat_models import ChatLiteLLM
+from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.llms.base import BaseLLM
 from langchain.prompts.chat import (
     ChatPromptTemplate,
@@ -16,8 +17,10 @@ from langchain.prompts.chat import (
 from llm.utils.get_prompt_to_use import get_prompt_to_use
 from llm.utils.get_prompt_to_use_id import get_prompt_to_use_id
 from logger import get_logger
+from models import BrainSettings  # Importing settings related to the 'brain'
 from models.chats import ChatQuestion
 from models.databases.supabase.chats import CreateChatHistory
+from pydantic import BaseModel
 from repository.brain import get_brain_by_id
 from repository.chat import (
     GetChatHistoryOutput,
@@ -29,14 +32,13 @@ from repository.chat import (
 from supabase.client import Client, create_client
 from vectorstore.supabase import CustomSupabaseVectorStore
 
-from .base import BaseBrainPicking
 from .prompts.CONDENSE_PROMPT import CONDENSE_QUESTION_PROMPT
 
 logger = get_logger(__name__)
 QUIVR_DEFAULT_PROMPT = "Your name is Quivr. You're a helpful assistant.  If you don't know the answer, just say that you don't know, don't try to make up an answer."
 
 
-class QABaseBrainPicking(BaseBrainPicking):
+class QABaseBrainPicking(BaseModel):
     """
     Main class for the Brain Picking functionality.
     It allows to initialize a Chat model, generate questions and retrieve answers using ConversationalRetrievalChain.
@@ -45,6 +47,55 @@ class QABaseBrainPicking(BaseBrainPicking):
     Both are the same, except that the streaming version streams the last message as a stream.
     Each have the same prompt template, which is defined in the `prompt_template` property.
     """
+
+    class Config:
+        """Configuration of the Pydantic Object"""
+
+        # Allowing arbitrary types for class validation
+        arbitrary_types_allowed = True
+
+    # Instantiate settings
+    brain_settings = BrainSettings()  # type: ignore other parameters are optional
+
+    # Default class attributes
+    model: str = None  # pyright: ignore reportPrivateUsage=none
+    temperature: float = 0.1
+    chat_id: str = None  # pyright: ignore reportPrivateUsage=none
+    brain_id: str = None  # pyright: ignore reportPrivateUsage=none
+    max_tokens: int = 256
+    user_openai_api_key: str = None  # pyright: ignore reportPrivateUsage=none
+    streaming: bool = False
+
+    openai_api_key: str = None  # pyright: ignore reportPrivateUsage=none
+    callbacks: List[
+        AsyncIteratorCallbackHandler
+    ] = None  # pyright: ignore reportPrivateUsage=none
+
+    def _determine_api_key(self, openai_api_key, user_openai_api_key):
+        """If user provided an API key, use it."""
+        if user_openai_api_key is not None:
+            return user_openai_api_key
+        else:
+            return openai_api_key
+
+    def _determine_streaming(self, model: str, streaming: bool) -> bool:
+        """If the model name allows for streaming and streaming is declared, set streaming to True."""
+        return streaming
+
+    def _determine_callback_array(
+        self, streaming
+    ) -> List[AsyncIteratorCallbackHandler]:  # pyright: ignore reportPrivateUsage=none
+        """If streaming is set, set the AsyncIteratorCallbackHandler as the only callback."""
+        if streaming:
+            return [
+                AsyncIteratorCallbackHandler()  # pyright: ignore reportPrivateUsage=none
+            ]
+
+    @property
+    def embeddings(self) -> OpenAIEmbeddings:
+        return OpenAIEmbeddings(
+            openai_api_key=self.openai_api_key
+        )  # pyright: ignore reportPrivateUsage=none
 
     supabase_client: Optional[Client] = None
     vector_store: Optional[CustomSupabaseVectorStore] = None
