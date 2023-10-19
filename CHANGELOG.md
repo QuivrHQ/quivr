@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.0.94 (2023-10-19)
+
+## What's Changed
+* feat: Homepage demo section by @matthieujacq in https://github.com/StanGirard/quivr/pull/1420
+* feat: add security section by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1423
+* feat: HomePage new footer by @matthieujacq in https://github.com/StanGirard/quivr/pull/1425
+* feat: add testimonials section by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1427
+* refactor(backend): cleaning dead and unused code by @StanGirard in https://github.com/StanGirard/quivr/pull/1432
+
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.93...v0.0.94
+
 ## 0.0.93 (2023-10-17)
 
 ## What's Changed
