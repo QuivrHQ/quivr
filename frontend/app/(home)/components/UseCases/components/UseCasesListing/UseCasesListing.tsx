@@ -1,26 +1,35 @@
+import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { LuPanelLeft } from "react-icons/lu";
 
+import { USE_CASES_DATA_KEY } from "@/lib/api/cms/config";
+import { useCmsApi } from "@/lib/api/cms/useCmsApi";
 import Spinner from "@/lib/components/ui/Spinner";
 import { useDevice } from "@/lib/hooks/useDevice";
 import { cn } from "@/lib/utils";
 
 import { UseCaseComponent } from "./components/UseCaseComponent";
-import { casesExamples } from "./data/cases";
-import { UseCase } from "./types";
 
 export const UseCasesListing = (): JSX.Element => {
-  const [cases, setCases] = useState<UseCase[]>([]);
-  const [selectedCaseId, setSelectedCaseId] = useState<string>();
-  const selectedCase = cases.find((c) => c.id === selectedCaseId);
+  const { getUseCases } = useCmsApi();
+
+  const { data: cases = [], isLoading } = useQuery({
+    queryKey: [USE_CASES_DATA_KEY],
+    queryFn: getUseCases,
+  });
+
   const { isMobile } = useDevice();
+  const [selectedCaseId, setSelectedCaseId] = useState<string>();
+
+  const selectedCase = cases.find((c) => c.id === selectedCaseId);
 
   useEffect(() => {
-    setCases(casesExamples);
-    setSelectedCaseId("1");
-  }, []);
+    if (cases.length > 0) {
+      setSelectedCaseId(cases[0].id);
+    }
+  }, [cases]);
 
-  if (selectedCaseId === undefined) {
+  if (isLoading || selectedCaseId === undefined) {
     return (
       <div className="flex justify-center">
         <Spinner />
