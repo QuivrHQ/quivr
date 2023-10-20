@@ -3,6 +3,6 @@ export type Testimonial = {
   url: string;
   jobTitle: string;
   content: string;
-  user: string;
+  name: string;
   profilePicture?: string;
 };

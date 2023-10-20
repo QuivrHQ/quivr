@@ -13,3 +13,5 @@ NEXT_PUBLIC_GA_ID=<ignore-me-or-change-me>
 NEXT_PUBLIC_E2E_URL=http://localhost:3003
 NEXT_PUBLIC_E2E_EMAIL=<ignore-me-or-change-me>
 NEXT_PUBLIC_E2E_PASSWORD=<ignore-me-or-change-me>
+
+NEXT_PUBLIC_CMS_URL=https://cms.quivr.app

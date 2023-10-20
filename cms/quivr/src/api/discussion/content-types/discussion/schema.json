@@ -1,10 +1,10 @@
 {
   "kind": "collectionType",
-  "collectionName": "use_cases",
+  "collectionName": "discussions",
   "info": {
-    "singularName": "use-case",
-    "pluralName": "use-cases",
-    "displayName": "Use Case",
+    "singularName": "discussion",
+    "pluralName": "discussions",
+    "displayName": "Discussion",
     "description": ""
   },
   "options": {
@@ -16,29 +16,29 @@
     }
   },
   "attributes": {
-    "name": {
-      "type": "string",
-      "required": true,
+    "Question": {
       "pluginOptions": {
         "i18n": {
           "localized": true
         }
-      }
-    },
-    "description": {
+      },
       "type": "string",
-      "required": true,
+      "required": true
+    },
+    "Answer": {
       "pluginOptions": {
         "i18n": {
           "localized": true
         }
-      }
+      },
+      "type": "text",
+      "required": true
     },
-    "discussions": {
+    "use_case": {
       "type": "relation",
-      "relation": "oneToMany",
-      "target": "api::discussion.discussion",
-      "mappedBy": "use_case"
+      "relation": "manyToOne",
+      "target": "api::use-case.use-case",
+      "inversedBy": "discussions"
     }
   }
 }

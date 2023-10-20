@@ -1,7 +1,7 @@
 import { Fragment } from "react";
 import { PiPaperclipFill } from "react-icons/pi";
 
-import { UseCase } from "../types";
+import { UseCase } from "@/lib/types/UseCase";
 
 type UseCaseComponentProps = {
   discussions: UseCase["discussions"];
