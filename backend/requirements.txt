@@ -7,7 +7,7 @@ GitPython==3.1.36
 pdf2image==1.16.3
 pypdf==3.9.0
 StrEnum==0.4.15
-supabase==1.0.3
+supabase==1.1.0
 tiktoken==0.4.0
 unstructured==0.6.7
 fastapi==0.95.2

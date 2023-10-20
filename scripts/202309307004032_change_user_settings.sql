@@ -1,25 +1,41 @@
-DO $$
-BEGIN
-    -- Check if the column max_requests_number exists
-    IF EXISTS (
-        SELECT 1 
-        FROM information_schema.columns 
-        WHERE table_name='user_settings' AND column_name='max_requests_number'
-    ) THEN
-        -- Rename the column
-        ALTER TABLE user_settings RENAME COLUMN max_requests_number TO daily_chat_credit;
-    END IF;
-    
-    -- Modify default values
-    ALTER TABLE user_settings ALTER COLUMN daily_chat_credit SET DEFAULT 20;
-    ALTER TABLE user_settings ALTER COLUMN max_brains SET DEFAULT 3;
-END $$;
+create extension if not exists wrappers;
 
--- Update migrations table
-INSERT INTO migrations (name) 
-SELECT '202309307004032_change_user_settings'
-WHERE NOT EXISTS (
-    SELECT 1 FROM migrations WHERE name = '202309307004032_change_user_settings'
+create foreign data wrapper stripe_wrapper
+  handler stripe_fdw_handler
+  validator stripe_fdw_validator;
+
+create table users (
+  id uuid references auth.users not null primary key,
+  email text
 );
 
-COMMIT;
+create foreign table public.customers (
+  id text,
+  email text,
+  name text,
+  description text,
+  created timestamp,
+  attrs jsonb
+)
+  server stripe_server
+  options (
+    object 'customers',
+    rowid_column 'id'
+  );
+
+create or replace function public.handle_new_user() 
+returns trigger as $$
+begin
+  insert into public.users (id, email)
+  values (new.id, new.email);
+  return new;
+end;
+$$ language plpgsql security definer;
+
+-- trigger the function every time a user is created
+create trigger on_auth_user_created
+  after insert on auth.users
+  for each row execute procedure public.handle_new_user();
+
+
+

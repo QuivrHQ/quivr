@@ -1,3 +1,4 @@
+import os
 from datetime import datetime
 from uuid import UUID
 
@@ -25,31 +26,65 @@ class UserUsage(Repository):
             .execute()
         )
 
+    def check_if_is_premium_user(self, user_id: UUID):
+        """
+        Check if the user is a premium user
+        """
+        user_email_customer = (
+            self.db.from_("users")
+            .select("*")
+            .filter("id", "eq", str(user_id))
+            .execute()
+        )
+
+        matching_customers = (
+            self.db.table("customers")
+            .select("email")
+            .filter("email", "eq", user_email_customer.email)
+            .execute()
+        ).data
+
+        return len(matching_customers) > 0
+
     def get_user_settings(self, user_id):
         """
         Fetch the user settings from the database
         """
-        response = (
+
+        user_settings_response = (
             self.db.from_("user_settings")
             .select("*")
             .filter("user_id", "eq", str(user_id))
             .execute()
         ).data
 
-        if len(response) == 0:
+        if len(user_settings_response) == 0:
             # Create the user settings
-            result = (
+            user_settings_response = (
                 self.db.table("user_settings")
                 .insert({"user_id": str(user_id)})
                 .execute()
+            ).data
+
+        if len(user_settings_response) == 0:
+            raise ValueError("User settings could not be created")
+
+        user_settings = user_settings_response[0]
+
+        is_premium_user = self.check_if_is_premium_user(user_id)
+
+        if is_premium_user:
+            user_settings["max_brains"] = int(
+                os.environ.get("PREMIUM_MAX_BRAIN_NUMBER", 30)
             )
-            if result:
-                return self.get_user_settings(user_id)
-            else:
-                raise ValueError("User settings could not be created")
-        if response and len(response) > 0:
-            return response[0]
-        return None
+            user_settings["max_brain_size"] = int(
+                os.environ.get("PREMIUM_MAX_BRAIN_SIZE", 10000000)
+            )
+            user_settings["daily_chat_credit"] = int(
+                os.environ.get("PREMIUM_DAILY_CHAT_CREDIT", 100)
+            )
+
+        return user_settings
 
     def get_user_usage(self, user_id):
         """
