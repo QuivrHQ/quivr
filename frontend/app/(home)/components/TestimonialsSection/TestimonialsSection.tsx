@@ -1,20 +1,27 @@
-import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 
+import { TESTIMONIALS_DATA_KEY } from "@/lib/api/cms/config";
+import { useCmsApi } from "@/lib/api/cms/useCmsApi";
+import Spinner from "@/lib/components/ui/Spinner";
+
 import { TestimonialCard } from "./components/TestimonialCard";
-import { testimonialsExamples } from "./data/testimonialsExamples";
-import { Testimonial } from "./types";
 
 export const TestimonialsSection = (): JSX.Element => {
   const { t } = useTranslation("home", {
     keyPrefix: "testimonials",
   });
 
-  const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
+  const { getTestimonials } = useCmsApi();
 
-  useEffect(() => {
-    setTestimonials(testimonialsExamples);
-  }, []);
+  const { data: testimonials, isLoading } = useQuery({
+    queryKey: [TESTIMONIALS_DATA_KEY],
+    queryFn: getTestimonials,
+  });
+
+  if (isLoading || !testimonials) {
+    return <Spinner />;
+  }
 
   return (
     <>

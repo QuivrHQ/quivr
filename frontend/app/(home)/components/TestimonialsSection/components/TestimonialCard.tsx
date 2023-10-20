@@ -1,14 +1,14 @@
 import Link from "next/link";
 
 import { Avatar } from "@/lib/components/ui/Avatar";
+import { Testimonial } from "@/lib/types/testimonial";
 
-import { Testimonial } from "../types";
 import { socialMediaToIcon } from "../utils/socialMediaToIcon";
 
 export const TestimonialCard = ({
   socialMedia,
   url,
-  user,
+  name,
   jobTitle,
   content,
   profilePicture,
@@ -31,12 +31,12 @@ export const TestimonialCard = ({
         <div className="flex mt-3 flex-1 items-center">
           <Avatar
             url={profilePicture ?? "https://www.gravatar.com/avatar?d=mp"}
-            alt={`${user}-profile`}
+            alt={`${name}-profile`}
             imgClassName={"rounded-full"}
             className="w-10 h-10"
           />
           <div className="flex-1 ml-3">
-            <p className="font-semibold">{user}</p>
+            <p className="font-semibold">{name}</p>
             <p className="text-sm">{jobTitle}</p>
           </div>
         </div>
