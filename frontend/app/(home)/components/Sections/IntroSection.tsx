@@ -27,9 +27,11 @@ export const IntroSection = (): JSX.Element => {
                 {t("try_demo")} <LuChevronRight size={24} />
               </Button>
             </Link>
-            <Button variant="tertiary" className="font-semibold">
-              {t("contact_sales")} <LuChevronRight size={24} />
-            </Button>
+            <Link href="/contact">
+              <Button variant="tertiary" className="font-semibold">
+                {t("contact_sales")} <LuChevronRight size={24} />
+              </Button>
+            </Link>
           </div>
         </div>
         <div className="w-[80vw] lg:w-[calc(50vw)] lg:shrink-0 lg:max-h-[calc(80vh-100px)] rounded flex items-center justify-center lg:justify-start">

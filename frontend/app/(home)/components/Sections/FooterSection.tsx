@@ -23,9 +23,11 @@ export const FooterSection = (): JSX.Element => {
             <LuChevronRight size={24} />
           </Button>
         </Link>
-        <Button variant="tertiary">
-          {t("contact_sales")} <LuChevronRight size={24} />
-        </Button>
+        <Link href="/contact">
+          <Button variant="tertiary">
+            {t("contact_sales")} <LuChevronRight size={24} />
+          </Button>
+        </Link>
       </div>
       <ul className="flex gap-10 mt-5 mb-10 text-black">
         <li>
