@@ -31,6 +31,7 @@ const ContentSecurityPolicy = {
     "'self'",
     process.env.NEXT_PUBLIC_SUPABASE_URL,
     process.env.NEXT_PUBLIC_BACKEND_URL,
+    process.env.NEXT_PUBLIC_CMS_URL,
     "https://api.june.so",
     "https://api.openai.com",
     "https://cdn.growthbook.io",
