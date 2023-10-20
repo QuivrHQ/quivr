@@ -16,6 +16,7 @@ import {
   SecuritySection,
   TestimonialsSection,
 } from "./components";
+import { HomeHeaderBackground } from "./components/HomeHeader/components/HomeHeaderBackground";
 import { UseCases } from "./components/UseCases/UseCases";
 
 const HomePage = (): JSX.Element => {
@@ -32,6 +33,7 @@ const HomePage = (): JSX.Element => {
   if (isNewHomePage) {
     return (
       <>
+        <HomeHeaderBackground />
         <HomeHeader />
 
         <main className="relative flex flex-col items-center">

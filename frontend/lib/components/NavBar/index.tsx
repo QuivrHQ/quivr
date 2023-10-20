@@ -17,8 +17,9 @@ export const NavBar = (): JSX.Element => {
 
   const isNewHomePageActivated = useFeatureIsOn("new-homepage-activated");
   const isNewHomePage = path === "/" && isNewHomePageActivated;
+  const isContactPage = path === "/contact";
 
-  if (pageHasSidebar || isNewHomePage) {
+  if (pageHasSidebar || isNewHomePage || isContactPage) {
     return <></>;
   }
 

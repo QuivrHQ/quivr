@@ -16,16 +16,18 @@ export const FooterSection = (): JSX.Element => {
       <p>
         {t("description_1")} <br /> {t("description_2")}{" "}
       </p>
-      <div className="flex items-center">
+      <div className="flex items-center justify-center gap-5 flex-wrap">
         <Link href="/signup">
           <Button className=" rounded-full">
             {t("start_using")}
             <LuChevronRight size={24} />
           </Button>
         </Link>
-        <Button variant="tertiary">
-          {t("contact_sales")} <LuChevronRight size={24} />
-        </Button>
+        <Link href="/contact">
+          <Button variant="tertiary">
+            {t("contact_sales")} <LuChevronRight size={24} />
+          </Button>
+        </Link>
       </div>
       <ul className="flex gap-10 mt-5 mb-10 text-black">
         <li>

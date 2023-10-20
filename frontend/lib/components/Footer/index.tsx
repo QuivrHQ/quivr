@@ -11,8 +11,9 @@ const Footer = (): JSX.Element => {
   const path = usePathname();
   const isNewHomePageActivated = useFeatureIsOn("new-homepage-activated");
   const isNewHomePage = path === "/" && isNewHomePageActivated;
+  const isContactPage = path === "/contact";
 
-  if (session?.user !== undefined || isNewHomePage) {
+  if (session?.user !== undefined || isNewHomePage || isContactPage) {
     return <></>;
   }
 
