@@ -16,7 +16,7 @@ export const FooterSection = (): JSX.Element => {
       <p>
         {t("description_1")} <br /> {t("description_2")}{" "}
       </p>
-      <div className="flex items-center">
+      <div className="flex items-center justify-center gap-5 flex-wrap">
         <Link href="/signup">
           <Button className=" rounded-full">
             {t("start_using")}
