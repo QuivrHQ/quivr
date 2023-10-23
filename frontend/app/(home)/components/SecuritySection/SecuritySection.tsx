@@ -1,8 +1,10 @@
+import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
-import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { LuChevronRight, LuShieldCheck } from "react-icons/lu";
 
+import { SECURITY_QUESTIONS_DATA_KEY } from "@/lib/api/cms/config";
+import { useCmsApi } from "@/lib/api/cms/useCmsApi";
 import {
   Accordion,
   AccordionContent,
@@ -10,21 +12,23 @@ import {
   AccordionTrigger,
 } from "@/lib/components/ui/Accordion";
 import Button from "@/lib/components/ui/Button";
-
-import { securityQuestionsExamples } from "./data/securityQuestions";
-import { SecurityQuestion } from "./types";
+import Spinner from "@/lib/components/ui/Spinner";
 
 export const SecuritySection = (): JSX.Element => {
   const { t } = useTranslation("home", {
     keyPrefix: "security",
   });
-  const [securityQuestions, setSecurityQuestions] = useState<
-    SecurityQuestion[]
-  >([]);
 
-  useEffect(() => {
-    setSecurityQuestions(securityQuestionsExamples);
-  }, []);
+  const { getSecurityQuestions } = useCmsApi();
+
+  const { data: securityQuestions = [] } = useQuery({
+    queryKey: [SECURITY_QUESTIONS_DATA_KEY],
+    queryFn: getSecurityQuestions,
+  });
+
+  if (securityQuestions.length === 0) {
+    return <Spinner />;
+  }
 
   return (
     <>

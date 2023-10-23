@@ -3,6 +3,7 @@ import axios from "axios";
 import { DEFAULT_CMS_URL } from "@/lib/config/CONSTANTS";
 
 import { getDemoVideoUrl } from "./demoVideo";
+import { getSecurityQuestions } from "./securityQuestion";
 import { getTestimonials } from "./testimonials";
 import { getUseCases } from "./useCases";
 
@@ -16,5 +17,6 @@ export const useCmsApi = () => {
     getTestimonials: () => getTestimonials(axiosInstance),
     getUseCases: () => getUseCases(axiosInstance),
     getDemoVideoUrl: () => getDemoVideoUrl(axiosInstance),
+    getSecurityQuestions: () => getSecurityQuestions(axiosInstance),
   };
 };
