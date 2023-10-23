@@ -18,11 +18,16 @@ class BrainSettings(BaseSettings):
     resend_api_key: str = "null"
     resend_email_address: str = "brain@mail.quivr.app"
 
+class ContactsSettings(BaseSettings):
+    resend_contact_sales_from: str = "null"
+    resend_contact_sales_to: str = "null"
 
 class LLMSettings(BaseSettings):
     private: bool = False
     model_path: str = "./local_models/ggml-gpt4all-j-v1.3-groovy.bin"
 
+class ResendSettings(BaseSettings):
+    resend_api_key: str = "null"
 
 def get_supabase_client() -> Client:
     settings = BrainSettings()  # pyright: ignore reportPrivateUsage=none
