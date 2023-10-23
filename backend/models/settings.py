@@ -18,6 +18,10 @@ class BrainSettings(BaseSettings):
     resend_api_key: str = "null"
     resend_email_address: str = "brain@mail.quivr.app"
 
+class ContactsSettings(BaseSettings):
+    resend_api_key: str = "null"
+    resend_contact_sales_from: str = "null"
+    resend_contact_sales_to: str = "null"
 
 class LLMSettings(BaseSettings):
     private: bool = False

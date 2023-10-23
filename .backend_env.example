@@ -17,5 +17,7 @@ MODEL_PATH=./local_models/ggml-gpt4all-j-v1.3-groovy.bin
 #RESEND
 RESEND_API_KEY=<change-me>
 RESEND_EMAIL_ADDRESS=onboarding@resend.dev
+RESEND_CONTACT_SALES_FROM=contact_sales@resend.dev
+RESEND_CONTACT_SALES_TO=<change-me>
 
 CRAWL_DEPTH=1
