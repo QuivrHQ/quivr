@@ -1,0 +1,23 @@
+{
+  "kind": "singleType",
+  "collectionName": "demo_videos",
+  "info": {
+    "singularName": "demo-video",
+    "pluralName": "demo-videos",
+    "displayName": "Demo-Video"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "Video": {
+      "allowedTypes": [
+        "videos"
+      ],
+      "type": "media",
+      "multiple": false,
+      "required": true
+    }
+  }
+}
