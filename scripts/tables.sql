@@ -381,9 +381,9 @@ CREATE POLICY "Access Quivr Storage 1jccrwz_2" ON storage.objects FOR UPDATE TO 
 CREATE POLICY "Access Quivr Storage 1jccrwz_3" ON storage.objects FOR DELETE TO anon USING (bucket_id = 'quivr');
 
 INSERT INTO migrations (name) 
-SELECT '20231023140000_add_stripe_wrapper'
+SELECT '20231023160000_copy_auth_users_to_public_users'
 WHERE NOT EXISTS (
-    SELECT 1 FROM migrations WHERE name = '20231023140000_add_stripe_wrapper'
+    SELECT 1 FROM migrations WHERE name = '20231023160000_copy_auth_users_to_public_users'
 );
 
 
