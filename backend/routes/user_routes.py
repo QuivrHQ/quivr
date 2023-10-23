@@ -29,19 +29,19 @@ async def get_user_endpoint(
     information about the user's API usage.
     """
 
-    userDailyUsage = UserUsage(
+    user_daily_usage = UserUsage(
         id=current_user.id,
         email=current_user.email,
         openai_api_key=current_user.openai_api_key,
     )
-    userSettings = userDailyUsage.get_user_settings()
-    max_brain_size = userSettings.get("max_brain_size", 1000000000)
+    user_settings = user_daily_usage.get_user_settings()
+    max_brain_size = user_settings.get("max_brain_size", 1000000000)
 
     date = time.strftime("%Y%m%d")
-    daily_chat_credit = userSettings.get("daily_chat_credit", 10)
+    daily_chat_credit = user_settings.get("daily_chat_credit", 10)
 
-    userDailyUsage = UserUsage(id=current_user.id)
-    requests_stats = userDailyUsage.get_user_usage()
+    user_daily_usage = UserUsage(id=current_user.id)
+    requests_stats = user_daily_usage.get_user_usage()
     default_brain = get_user_default_brain(current_user.id)
 
     if default_brain:
@@ -55,9 +55,10 @@ async def get_user_endpoint(
         "current_brain_size": defaul_brain_size,
         "daily_chat_credit": daily_chat_credit,
         "requests_stats": requests_stats,
-        "models": userSettings.get("models", []),
+        "models": user_settings.get("models", []),
         "date": date,
         "id": current_user.id,
+        "is_premium": user_settings["is_premium"],
     }
 
 

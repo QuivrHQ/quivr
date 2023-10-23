@@ -30,19 +30,27 @@ class UserUsage(Repository):
         """
         Check if the user is a premium user
         """
-        user_email_customer = (
-            self.db.from_("users")
-            .select("*")
-            .filter("id", "eq", str(user_id))
-            .execute()
-        )
+        try:
+            user_email_customer = (
+                self.db.from_("users")
+                .select("*")
+                .filter("id", "eq", str(user_id))
+                .execute()
+            ).data
 
-        matching_customers = (
-            self.db.table("customers")
-            .select("email")
-            .filter("email", "eq", user_email_customer.email)
-            .execute()
-        ).data
+            if len(user_email_customer) == 0:
+                return False
+
+            matching_customers = (
+                self.db.table("customers")
+                .select("email")
+                .filter("email", "eq", user_email_customer[0]["email"])
+                .execute()
+            ).data
+        except Exception as e:
+            logger.error("Error while checking if user is a premium user")
+            logger.error(e)
+            return False
 
         return len(matching_customers) > 0
 
@@ -70,10 +78,11 @@ class UserUsage(Repository):
             raise ValueError("User settings could not be created")
 
         user_settings = user_settings_response[0]
-
+        user_settings["is_premium"] = False
         is_premium_user = self.check_if_is_premium_user(user_id)
 
         if is_premium_user:
+            user_settings["is_premium"] = True
             user_settings["max_brains"] = int(
                 os.environ.get("PREMIUM_MAX_BRAIN_NUMBER", 30)
             )
