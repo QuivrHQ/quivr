@@ -41,6 +41,7 @@ type BlogPostAttributes = {
   createdAt: string;
   updatedAt: string;
   publishedAt: string;
+  slug: string;
   seo: SeoAttributes;
 };
 
@@ -56,7 +57,7 @@ export const getStaticPaths: GetStaticPaths = async () => {
       throw new Error('Network response was not ok');
     }
     const data: { data: BlogPost[] } = await response.json();
-    const paths = data.data.map(post => ({ params: { id: post.id.toString() } }));
+    const paths = data.data.map(post => ({ params: { slug: post.attributes.slug } }));
 
     return {
       paths,
@@ -71,14 +72,21 @@ export const getStaticPaths: GetStaticPaths = async () => {
   }
 };
 
-export const getStaticProps = async (context: { params: { id: string } }) => {
+export const getStaticProps = async (context: { params: { slug: string } }) => {
   try {
-    const response = await fetch(`https://cms.quivr.app/api/blogs/${context.params.id}?populate=seo,seo.metaImage`);
-    const data: { data: BlogPost } = await response.json();
+    const response = await fetch(`https://cms.quivr.app/api/blogs?slug=${context.params.slug}&populate=seo,seo.metaImage`);
+    const data: { data: BlogPost[] } = await response.json();
+
+    // Find the blog post with the exact slug match
+    const blogPost = data.data.find(post => post.attributes.slug === context.params.slug);
+
+    if (!blogPost) {
+      throw new Error('No blog post found for the provided slug');
+    }
 
     return {
       props: {
-        post: data.data,
+        post: blogPost,
       },
     };
   } catch (error) {
@@ -107,10 +115,11 @@ const BlogPostDetail = ({ post }: InferGetStaticPropsType<typeof getStaticProps>
       <header className="bg-white text-zinc-900 py-4 border-b">
         <div className="container mx-auto px-4 md:px-6">
           <nav className="flex items-center justify-between">
-            <div className="text-2xl font-bold">Quivr - Blog</div>
+            <Link href="/blog">
+              <div className="text-2xl font-bold cursor-pointer">Quivr</div>
+            </Link>
             <div className="space-x-4">
               <Link className="text-zinc-900 hover:text-zinc-700" href="https://quivr.app">Try Quivr</Link>
-              <Link className="text-zinc-900 hover:text-zinc-700" href="/blog">Blog</Link>
             </div>
           </nav>
         </div>
