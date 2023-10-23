@@ -33,7 +33,7 @@ export const HomeSection = ({
   return (
     <div
       className={cn(
-        `${bg} w-screen ${flex} ${slantBeforeFix} ${slantAfterFix} ${slant}`,
+        `${bg} w-screen ${flex} ${slantBeforeFix} ${slantAfterFix} ${slant} overflow-hidden`,
         className
       )}
     >
