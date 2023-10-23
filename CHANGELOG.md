@@ -1,5 +1,23 @@
 # Changelog
 
+## 0.0.95 (2023-10-23)
+
+## What's Changed
+* feat: homepage first section by @matthieujacq in https://github.com/StanGirard/quivr/pull/1439
+* fix: show a flat gradient in the UseCase section by @matthieujacq in https://github.com/StanGirard/quivr/pull/1440
+* style: update testimonials display by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1441
+* feat: fetch homepage data from CMS by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1452
+* feat: contact sales page (front layout) by @matthieujacq in https://github.com/StanGirard/quivr/pull/1451
+* Fix: Improved Text Visibility in Dark Mode in OnboardingQuestion Component by @Dev-Dz27 in https://github.com/StanGirard/quivr/pull/1456
+* feat(cms): added single video demo by @StanGirard in https://github.com/StanGirard/quivr/pull/1459
+* feat: fetch demo video from CMS by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1461
+* feat: Contact form component by @matthieujacq in https://github.com/StanGirard/quivr/pull/1453
+
+## New Contributors
+* @Dev-Dz27 made their first contribution in https://github.com/StanGirard/quivr/pull/1456
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.94...v0.0.95
+
 ## 0.0.94 (2023-10-19)
 
 ## What's Changed
