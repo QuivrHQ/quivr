@@ -1,9 +1,9 @@
-import resend
 from logger import get_logger
 from models import BrainSubscription, BrainSettings
 
 from repository.brain import get_brain_details
 from repository.brain_subscription import get_brain_url
+from utils.send_email import send_email
 
 logger = get_logger(__name__)
 
@@ -14,7 +14,6 @@ def resend_invitation_email(
     origin: str = "https://www.quivr.app",
 ):
     brains_settings = BrainSettings()  # pyright: ignore reportPrivateUsage=none
-    resend.api_key = brains_settings.resend_api_key
 
     brain_url = get_brain_url(origin, brain_subscription.brain_id)
 
@@ -29,7 +28,7 @@ def resend_invitation_email(
     """
 
     try:
-        r = resend.Emails.send(
+        r = send_email(
             {
                 "from": brains_settings.resend_email_address,
                 "to": brain_subscription.email,
