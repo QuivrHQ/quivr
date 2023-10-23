@@ -10,6 +10,7 @@ log.txt
 backend/venv
 backend/.env
 backend/*.deb
+backend/.python-version
 
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
