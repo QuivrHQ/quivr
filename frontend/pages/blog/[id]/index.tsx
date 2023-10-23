@@ -1,5 +1,4 @@
 /* eslint-disable */
-import Button from "@/lib/components/ui/Button";
 import type { GetStaticPaths, InferGetStaticPropsType } from 'next';
 import Head from "next/head";
 import Image from "next/image";
@@ -9,6 +8,7 @@ type SeoAttributes = {
   id: number;
   metaTitle: string;
   metaDescription: string;
+  metaImage: string;
   keywords: string;
   metaRobots: string | null;
   structuredData: string | null;
@@ -17,9 +17,7 @@ type SeoAttributes = {
 };
 
 type BlogPostAttributes = {
-  imageUrl: string; // Assuming that the imageUrl is extracted from the HTML content
   title: string; // Assuming title is extracted from the first few words of the article
-  description: string; // Brief summary, assuming it's not provided by the API
   Article: string;
   createdAt: string;
   updatedAt: string;
@@ -80,7 +78,7 @@ export const getStaticProps = async (context: { params: { id: string } }) => {
 };
 
 const BlogPostDetail = ({ post }: InferGetStaticPropsType<typeof getStaticProps>) => {
-  const { metaTitle, metaDescription, keywords, canonicalURL } = post.attributes.seo;
+  const { metaTitle, metaDescription, keywords, canonicalURL, metaImage } = post.attributes.seo;
 
   return (
     <div className="px-4 py-6 md:px-6 lg:py-16 md:py-12 bg-white dark:bg-black">
@@ -93,27 +91,26 @@ const BlogPostDetail = ({ post }: InferGetStaticPropsType<typeof getStaticProps>
       <article className="prose prose-zinc mx-auto dark:prose-invert">
         <div className="space-y-2 not-prose">
           <h1 className="text-4xl font-extrabold tracking-tight lg:text-5xl lg:leading-[3.5rem] text-black dark:text-white">
-            {post.attributes.title}
+            {metaTitle}
           </h1>
           <p className="text-zinc-500 dark:text-zinc-400">Posted on {post.attributes.publishedAt}</p>
         </div>
         <p className="text-black dark:text-white">
-          {post.attributes.description}
+          {metaDescription}
         </p>
         <figure>
           {/* Assuming you'd extract the image URL from the Article content */}
           <Image
-            src={post.attributes.imageUrl}
-            alt={post.attributes.title}
+            src={metaImage}
+            alt={metaTitle}
             className="aspect-video overflow-hidden rounded-lg object-cover"
             width={1250}
             height={340}
           />
-          <figcaption className="text-black dark:text-white">{post.attributes.title}</figcaption>
+          <figcaption className="text-black dark:text-white">{metaTitle}</figcaption>
         </figure>
         {/* Insert the HTML content directly */}
         <div dangerouslySetInnerHTML={{ __html: post.attributes.Article }}></div>
-        <Button>Read more</Button> 
       </article>
     </div>
   );

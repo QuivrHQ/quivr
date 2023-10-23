@@ -28,6 +28,7 @@ export interface SharedSeo extends Schema.Component {
   info: {
     displayName: 'seo';
     icon: 'search';
+    description: '';
   };
   attributes: {
     metaTitle: Attribute.String &
@@ -41,7 +42,7 @@ export interface SharedSeo extends Schema.Component {
         minLength: 50;
         maxLength: 160;
       }>;
-    metaImage: Attribute.Media;
+    metaImage: Attribute.Media & Attribute.Required;
     metaSocial: Attribute.Component<'shared.meta-social', true>;
     keywords: Attribute.Text;
     metaRobots: Attribute.String;
