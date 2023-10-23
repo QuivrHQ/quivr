@@ -1,19 +1,23 @@
 import React, { useState } from "react";
+import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { LuChevronRight } from "react-icons/lu";
 
 import Button from "@/lib/components/ui/Button";
 
 export const ContactForm = (): JSX.Element => {
-  const [email, setEmail] = useState<string>("");
-  const [message, setMessage] = useState<string>("");
   const [submitted, setSubmitted] = useState<boolean>(false);
   const { t } = useTranslation("contact", { keyPrefix: "form" });
 
-  const handleSubmit = (ev: React.FormEvent) => {
-    ev.preventDefault();
+  const { register, handleSubmit, formState } = useForm({
+    defaultValues: { email: "", message: "" },
+  });
+
+  const emailPattern = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
+
+  const onSubmit: SubmitHandler<FieldValues> = (data) => {
     setSubmitted(true);
-    console.log("submitting", email, message);
+    console.log("submitting", data.email, data.message);
   };
 
   if (submitted) {
@@ -26,7 +30,10 @@ export const ContactForm = (): JSX.Element => {
   }
 
   return (
-    <form className="flex flex-col gap-5 justify-stretch w-full">
+    <form
+      className="flex flex-col gap-5 justify-stretch w-full"
+      onSubmit={() => void handleSubmit(onSubmit)()}
+    >
       <fieldset className="grid grid-cols-1 sm:grid-cols-3 gap-2 w-full gap-y-5">
         <label className="font-bold" htmlFor="email">
           {t("email")}
@@ -34,31 +41,30 @@ export const ContactForm = (): JSX.Element => {
         </label>
         <input
           type="email"
-          id="email"
-          value={email}
-          onChange={(ev) => setEmail(ev.target.value)}
+          {...register("email", {
+            pattern: emailPattern,
+            required: true,
+          })}
           placeholder="jane@example.com"
           className="col-span-2 bg-[#FCFAF6] rounded-md p-2"
-          required
         />
         <label className="font-bold" htmlFor="message">
           {t("question")}
           <sup>*</sup>:
         </label>
         <textarea
-          id="message"
-          value={message}
+          {...register("message", {
+            required: true,
+          })}
           rows={3}
-          onChange={(ev) => setMessage(ev.target.value)}
           placeholder={t("placeholder_question")}
           className="col-span-2 bg-[#FCFAF6] rounded-md p-2"
-          required
         ></textarea>
       </fieldset>
 
       <Button
-        onClick={handleSubmit}
         className="self-end rounded-full bg-primary flex items-center justify-center gap-2 border-none hover:bg-primary/90"
+        disabled={!formState.isValid}
       >
         {t("submit")}
         <LuChevronRight size={24} />
