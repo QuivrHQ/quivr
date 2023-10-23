@@ -1,4 +1,10 @@
 module.exports = ({ env }) => ({
+  ckeditor: {
+    enabled: true,
+  },
+  seo: {
+    enabled: true,
+  },
     upload: {
       config: {
         provider: 'aws-s3',

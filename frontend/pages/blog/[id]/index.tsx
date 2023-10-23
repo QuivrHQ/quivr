@@ -1,19 +1,37 @@
 /* eslint-disable */
+import Button from "@/lib/components/ui/Button";
 import type { GetStaticPaths, InferGetStaticPropsType } from 'next';
 import Head from "next/head";
 import Image from "next/image";
 
+
+type SeoAttributes = {
+  id: number;
+  metaTitle: string;
+  metaDescription: string;
+  keywords: string;
+  metaRobots: string | null;
+  structuredData: string | null;
+  metaViewport: string | null;
+  canonicalURL: string | null;
+};
+
 type BlogPostAttributes = {
-  imageUrl: string;
-  title: string;
-  description: string;
-  draft: string;
+  imageUrl: string; // Assuming that the imageUrl is extracted from the HTML content
+  title: string; // Assuming title is extracted from the first few words of the article
+  description: string; // Brief summary, assuming it's not provided by the API
+  Article: string;
+  createdAt: string;
+  updatedAt: string;
+  publishedAt: string;
+  seo: SeoAttributes;
 };
 
 type BlogPost = {
-  id: string;
+  id: number;
   attributes: BlogPostAttributes;
 };
+
 
 export const getStaticPaths: GetStaticPaths = async () => {
   try {
@@ -42,7 +60,7 @@ export const getStaticPaths: GetStaticPaths = async () => {
 
 export const getStaticProps = async (context: { params: { id: string } }) => {
   try {
-    const response = await fetch(`https://cms.quivr.app/api/blogs/${context.params.id}`);
+    const response = await fetch(`https://cms.quivr.app/api/blogs/${context.params.id}?populate=seo`);
     console.log(response)
     const data: { data: BlogPost } = await response.json();
     
@@ -62,26 +80,42 @@ export const getStaticProps = async (context: { params: { id: string } }) => {
 };
 
 const BlogPostDetail = ({ post }: InferGetStaticPropsType<typeof getStaticProps>) => {
+  const { metaTitle, metaDescription, keywords, canonicalURL } = post.attributes.seo;
+
   return (
-    <main className="bg-gray-100 min-h-screen p-8">
+    <div className="px-4 py-6 md:px-6 lg:py-16 md:py-12 bg-white dark:bg-black">
       <Head>
-        <title>{post.attributes.title}</title>
-        <meta name="description" content={post.attributes.description} />
+        <title>{metaTitle}</title>
+        <meta name="description" content={metaDescription} />
+        <meta name="keywords" content={keywords} />
+        {canonicalURL && <link rel="canonical" href={canonicalURL} />}
       </Head>
-      <div className="max-w-screen-xl mx-auto">
-        <div className="bg-white p-8 rounded-lg shadow-md">
+      <article className="prose prose-zinc mx-auto dark:prose-invert">
+        <div className="space-y-2 not-prose">
+          <h1 className="text-4xl font-extrabold tracking-tight lg:text-5xl lg:leading-[3.5rem] text-black dark:text-white">
+            {post.attributes.title}
+          </h1>
+          <p className="text-zinc-500 dark:text-zinc-400">Posted on {post.attributes.publishedAt}</p>
+        </div>
+        <p className="text-black dark:text-white">
+          {post.attributes.description}
+        </p>
+        <figure>
+          {/* Assuming you'd extract the image URL from the Article content */}
           <Image
             src={post.attributes.imageUrl}
-            alt="blog-post-detail"
-            className="w-full rounded-t-lg object-cover h-56"
-            width={1000}
-            height={500}
+            alt={post.attributes.title}
+            className="aspect-video overflow-hidden rounded-lg object-cover"
+            width={1250}
+            height={340}
           />
-          <h1 className="text-4xl font-bold my-6">{post.attributes.title}</h1>
-          <p className="text-gray-700 whitespace-pre-line">{post.attributes.draft}</p>
-        </div>
-      </div>
-    </main>
+          <figcaption className="text-black dark:text-white">{post.attributes.title}</figcaption>
+        </figure>
+        {/* Insert the HTML content directly */}
+        <div dangerouslySetInnerHTML={{ __html: post.attributes.Article }}></div>
+        <Button>Read more</Button> 
+      </article>
+    </div>
   );
 }
 

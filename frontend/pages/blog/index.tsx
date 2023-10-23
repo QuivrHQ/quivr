@@ -22,7 +22,7 @@ type BlogPost = {
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const getStaticProps = async () => {
   try {
-    const resulting = await fetch("https://cms.quivr.app/api/blogs");
+    const resulting = await fetch("https://cms.quivr.app/api/blogs?populate=seo");
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const data: { data: BlogPost[] } = await resulting.json();
 
@@ -43,68 +43,50 @@ export const getStaticProps = async () => {
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 const Blog = ({ result }: InferGetStaticPropsType<typeof getStaticProps>) => {
   return (
-    <main className="bg-white min-h-screen p-8 text-gray-900">
+    <section className="w-full">
       <Head>
         <title>Quivr - Blog</title>
         <meta name="description" content="Quivr.app - Your Generative AI second brain builder's blog" />
       </Head>
-      <div className="mx-auto container">
-        <h1 className="text-6xl font-extrabold mb-16 text-center tracking-tight text-black">Blog Posts</h1>
-        <div className="grid gap-16 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-          {result.map((post, index) => {
-            if (index === 0) {
-              // Special layout for the first post
-              return (
-                <Link
-                  href={`/blog/${post.id}`}
-                  key={post.id}
-                  className="col-span-full block p-8 bg-white border-2 border-gray-300 rounded-lg shadow-md hover:border-black hover:shadow-xl transform hover:scale-105 transition-transform duration-200 flex"
-                >
-                  <div className="flex-1 pr-8">
-                    <h2 className="text-4xl font-bold mb-4 group-hover:text-black transition-colors duration-200">{post.attributes.title}</h2>
-                    <p className="text-gray-600 line-clamp-3">{post.attributes.description}</p>
-                  </div>
-                  <div className="flex-none">
-                    <Image
-                      src={`${post.attributes.imageUrl}`}
-                      alt="blog-post"
-                      width={400}
-                      height={400}
-                      className="rounded-lg object-cover"
-                    />
-                  </div>
-                </Link>
-              );
-            } else {
-              // Standard layout for the rest of the posts
-              return (
-                <Link
-                  href={`/blog/${post.id}`}
-                  key={post.id}
-                  className="block p-8 bg-white border-2 border-gray-300 rounded-lg shadow-md hover:border-black hover:shadow-xl transform hover:scale-105 transition-transform duration-200"
-                >
-                  <div className="mb-6">
-                    <Image
-                      src={`${post.attributes.imageUrl}`}
-                      alt="blog-post"
-                      width={300}
-                      height={300}
-                      className="w-full rounded-lg object-cover"
-                    />
-                  </div>
-                  <h2 className="text-3xl font-bold mb-4 group-hover:text-black transition-colors duration-200">{post.attributes.title}</h2>
-                  <p className="text-gray-600 line-clamp-3">{post.attributes.description}</p>
-                </Link>
-              );
-            }
-          })}
+      
+      <header className="bg-white text-zinc-900 py-4 border-b">
+        <div className="container mx-auto px-4 md:px-6">
+          <nav className="flex items-center justify-between">
+            <div className="text-2xl font-bold">Quivr - Blog</div>
+            <div className="space-x-4">
+              <Link className="text-zinc-900 hover:text-zinc-700" href="#">Home</Link>
+              <Link className="text-zinc-900 hover:text-zinc-700" href="#">Posts</Link>
+            </div>
+          </nav>
         </div>
-      </div>
-    </main>
+      </header>
+
+      <main className="container mx-auto px-4 md:px-6 py-8">
+
+        <section className="mb-8">
+          <h2 className="text-2xl font-bold mb-4">Latest Posts</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {result.slice(1).map(post => (
+              <div key={post.id}>
+                <Image
+                  src={`${post.attributes.imageUrl}`}
+                  alt="Blog Post Image"
+                  width={600}
+                  height={400}
+                  className="w-full rounded-lg object-cover"
+                />
+                <h3 className="text-xl font-bold mb-2 mt-4">{post.attributes.title}</h3>
+                <p className="text-zinc-500">{post.attributes.description}</p>
+                <Link className="text-blue-500 hover:text-blue-700 mt-4" href={`/blog/${post.id}`}>
+                  Read More
+                </Link>
+              </div>
+            ))}
+          </div>
+        </section>
+      </main>
+    </section>
   );
 }
-
-
-
 
 export default Blog;

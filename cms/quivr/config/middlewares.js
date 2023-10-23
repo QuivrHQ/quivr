@@ -13,6 +13,7 @@ module.exports = [
             'blob:',
             'dl.airtable.com',
             'quivr-cms.s3.eu-west-3.amazonaws.com',
+            '*.strapi.io',
           ],
           'media-src': [
             "'self'",
@@ -20,6 +21,7 @@ module.exports = [
             'blob:',
             'dl.airtable.com',
             'quivr-cms.s3.eu-west-3.amazonaws.com',
+            '*.strapi.io',
           ],
           upgradeInsecureRequests: null,
         },
