@@ -12,4 +12,5 @@ export interface UserStats {
   requests_stats: RequestStat[];
   date: string;
   models: string[];
+  is_premium: boolean;
 }
