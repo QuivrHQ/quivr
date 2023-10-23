@@ -29,7 +29,7 @@ const ContactSalesPage = (): JSX.Element => {
           {t("speak_to")}{" "}
           <span className="text-primary">{t("sales_team")}</span>
         </h1>
-        <Card className="flex flex-col items-center my-2 p-10 w-full max-w-xl">
+        <Card className="flex flex-col items-center mt-5 mb-10 p-10 w-full max-w-xl">
           <ContactForm />
         </Card>
         <HomeSection bg="bg-[#FCFAF6]">

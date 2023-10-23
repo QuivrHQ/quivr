@@ -13,6 +13,8 @@ export const ContactForm = (): JSX.Element => {
     defaultValues: { email: "", message: "" },
   });
 
+  const emailPattern = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
+
   const onSubmit: SubmitHandler<FieldValues> = (data) => {
     setSubmitted(true);
     console.log("submitting", data.email, data.message);
@@ -40,7 +42,7 @@ export const ContactForm = (): JSX.Element => {
         <input
           type="email"
           {...register("email", {
-            pattern: /\S+@\S+\.\S+/,
+            pattern: emailPattern,
             required: true,
           })}
           placeholder="jane@example.com"
