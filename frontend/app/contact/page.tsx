@@ -1,6 +1,7 @@
 "use client";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import { redirect } from "next/navigation";
+import { useTranslation } from "react-i18next";
 
 import Card from "@/lib/components/ui/Card";
 
@@ -14,6 +15,7 @@ import {
 
 const ContactSalesPage = (): JSX.Element => {
   const isNewHomePage = useFeatureIsOn("new-homepage-activated");
+  const { t } = useTranslation("contact");
   if (!isNewHomePage) {
     redirect("/");
   }
@@ -24,7 +26,8 @@ const ContactSalesPage = (): JSX.Element => {
 
       <main className="relative flex flex-col items-center px-10">
         <h1 className="text-4xl font-semibold my-10 text-center">
-          Speak to our <span className="text-primary">Sales team</span>
+          {t("speak_to")}{" "}
+          <span className="text-primary">{t("sales_team")}</span>
         </h1>
         <Card className="flex flex-col items-center my-2 p-10 w-full max-w-xl">
           <ContactForm />

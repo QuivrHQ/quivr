@@ -1,0 +1,12 @@
+{
+  "speak_to": "与我们的",
+  "sales_team": "销售团队联系",
+  "form": {
+    "email": "工作电子邮件",
+    "question": "问题",
+    "submit": "联系我们",
+    "placeholder_question": "我们如何帮助您？",
+    "thank_you": "谢谢！",
+    "thank_you_text": "我们会尽快回复您。"
+  }
+}
