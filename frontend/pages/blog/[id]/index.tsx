@@ -1,14 +1,33 @@
 /* eslint-disable */
+'use client';
 import type { GetStaticPaths, InferGetStaticPropsType } from 'next';
-import Head from "next/head";
+import Head from 'next/head';
 import Image from "next/image";
+import Link from 'next/link';
+import { useEffect, useState } from 'react';
+
+import "@/globals.css";
 
 
 type SeoAttributes = {
   id: number;
   metaTitle: string;
   metaDescription: string;
-  metaImage: string;
+  metaImage: {
+    id: number;
+    data: {
+      attributes: {
+        formats: {
+          large: {
+            url: string;
+          };
+          medium: {
+            url: string;
+          };
+        };
+      };
+    };
+  };
   keywords: string;
   metaRobots: string | null;
   structuredData: string | null;
@@ -30,38 +49,32 @@ type BlogPost = {
   attributes: BlogPostAttributes;
 };
 
-
 export const getStaticPaths: GetStaticPaths = async () => {
   try {
     const response = await fetch("https://cms.quivr.app/api/blogs");
     if (!response.ok) {
-      throw new Error('Network response was not ok');  // Handle non-200 responses
+      throw new Error('Network response was not ok');
     }
     const data: { data: BlogPost[] } = await response.json();
     const paths = data.data.map(post => ({ params: { id: post.id.toString() } }));
-    
+
     return {
       paths,
-      fallback: false,  // Use "true" to enable ISR (Incremental Static Regeneration) or "blocking" for server-side rendering fallback
+      fallback: false,
     };
   } catch (error) {
     console.error("Error fetching blog paths:", error);
     return {
-      paths: [],  // Return empty array if there's an error
-      fallback: false,  // Use "true" to enable ISR or "blocking" for server-side rendering fallback
+      paths: [],
+      fallback: false,
     };
   }
 };
 
-
-
-
 export const getStaticProps = async (context: { params: { id: string } }) => {
   try {
-    const response = await fetch(`https://cms.quivr.app/api/blogs/${context.params.id}?populate=seo`);
-    console.log(response)
+    const response = await fetch(`https://cms.quivr.app/api/blogs/${context.params.id}?populate=seo,seo.metaImage`);
     const data: { data: BlogPost } = await response.json();
-    
 
     return {
       props: {
@@ -70,7 +83,6 @@ export const getStaticProps = async (context: { params: { id: string } }) => {
     };
   } catch (error) {
     console.error("Error fetching blog post:", error);
-
     return {
       notFound: true,
     };
@@ -78,41 +90,60 @@ export const getStaticProps = async (context: { params: { id: string } }) => {
 };
 
 const BlogPostDetail = ({ post }: InferGetStaticPropsType<typeof getStaticProps>) => {
-  const { metaTitle, metaDescription, keywords, canonicalURL, metaImage } = post.attributes.seo;
+  const { metaTitle, metaDescription, keywords, canonicalURL } = post.attributes.seo;
+
+  // Extract different image formats
+  const { large, medium } = post.attributes.seo.metaImage.data.attributes.formats;
+
+  const [imageUrl, setImageUrl] = useState(medium.url);
+
+  useEffect(() => {
+    // Determine which image URL to use once the component has mounted on the client side
+    setImageUrl(window.innerWidth > 768 ? large.url : medium.url);
+  }, []);
 
   return (
-    <div className="px-4 py-6 md:px-6 lg:py-16 md:py-12 bg-white dark:bg-black">
-      <Head>
-        <title>{metaTitle}</title>
-        <meta name="description" content={metaDescription} />
-        <meta name="keywords" content={keywords} />
-        {canonicalURL && <link rel="canonical" href={canonicalURL} />}
-      </Head>
-      <article className="prose prose-zinc mx-auto dark:prose-invert">
-        <div className="space-y-2 not-prose">
-          <h1 className="text-4xl font-extrabold tracking-tight lg:text-5xl lg:leading-[3.5rem] text-black dark:text-white">
-            {metaTitle}
-          </h1>
-          <p className="text-zinc-500 dark:text-zinc-400">Posted on {post.attributes.publishedAt}</p>
+    <section className="w-full">
+      <header className="bg-white text-zinc-900 py-4 border-b">
+        <div className="container mx-auto px-4 md:px-6">
+          <nav className="flex items-center justify-between">
+            <div className="text-2xl font-bold">Quivr - Blog</div>
+            <div className="space-x-4">
+              <Link className="text-zinc-900 hover:text-zinc-700" href="https://quivr.app">Try Quivr</Link>
+              <Link className="text-zinc-900 hover:text-zinc-700" href="/blog">Blog</Link>
+            </div>
+          </nav>
         </div>
-        <p className="text-black dark:text-white">
-          {metaDescription}
-        </p>
-        <figure>
-          {/* Assuming you'd extract the image URL from the Article content */}
+      </header>
+      <div className="px-4 py-6 md:px-6 lg:py-16 md:py-12 bg-white dark:bg-black">
+        <Head>
+          <title>{metaTitle}</title>
+          <meta name="description" content={metaDescription} />
+          <meta name="keywords" content={keywords} />
+          {canonicalURL && <link rel="canonical" href={canonicalURL} />}
+        </Head>
+
+        <article className="prose prose-zinc mx-auto dark:prose-invert">
+          <div className="space-y-2 not-prose">
+            <h1 className="text-4xl font-extrabold tracking-tight lg:text-5xl lg:leading-[3.5rem] text-black dark:text-white">
+              {metaTitle}
+            </h1>
+            <p className="text-zinc-500 dark:text-zinc-400">Posted on {post.attributes.publishedAt}</p>
+          </div>
+          <p className="text-black dark:text-white">
+            {metaDescription}
+          </p>
           <Image
-            src={metaImage}
+            src={imageUrl}
             alt={metaTitle}
             className="aspect-video overflow-hidden rounded-lg object-cover"
             width={1250}
             height={340}
           />
-          <figcaption className="text-black dark:text-white">{metaTitle}</figcaption>
-        </figure>
-        {/* Insert the HTML content directly */}
-        <div dangerouslySetInnerHTML={{ __html: post.attributes.Article }}></div>
-      </article>
-    </div>
+          <div className="text-black dark:text-white" dangerouslySetInnerHTML={{ __html: post.attributes.Article }}></div>
+        </article>
+      </div>
+    </section>
   );
 }
 

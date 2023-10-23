@@ -698,6 +698,7 @@ export interface ApiBlogBlog extends Schema.CollectionType {
         }
       >;
     seo: Attribute.Component<'shared.seo'>;
+    slug: Attribute.String & Attribute.Required & Attribute.Unique;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;
