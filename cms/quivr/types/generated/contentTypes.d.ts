@@ -23,7 +23,6 @@ export interface AdminPermission extends Schema.CollectionType {
       Attribute.SetMinMaxLength<{
         minLength: 1;
       }>;
-    actionParameters: Attribute.JSON & Attribute.DefaultTo<{}>;
     subject: Attribute.String &
       Attribute.SetMinMaxLength<{
         minLength: 1;
@@ -702,6 +701,36 @@ export interface ApiBlogBlog extends Schema.CollectionType {
   };
 }
 
+export interface ApiDemoVideoDemoVideo extends Schema.SingleType {
+  collectionName: 'demo_videos';
+  info: {
+    singularName: 'demo-video';
+    pluralName: 'demo-videos';
+    displayName: 'Demo-Video';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    Video: Attribute.Media & Attribute.Required;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    publishedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'api::demo-video.demo-video',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<
+      'api::demo-video.demo-video',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+  };
+}
+
 export interface ApiDiscussionDiscussion extends Schema.CollectionType {
   collectionName: 'discussions';
   info: {
@@ -903,7 +932,7 @@ export interface ApiUseCaseUseCase extends Schema.CollectionType {
   };
 }
 
-declare module '@strapi/types' {
+declare module '@strapi/strapi' {
   export module Shared {
     export interface ContentTypes {
       'admin::permission': AdminPermission;
@@ -920,6 +949,7 @@ declare module '@strapi/types' {
       'plugin::users-permissions.role': PluginUsersPermissionsRole;
       'plugin::users-permissions.user': PluginUsersPermissionsUser;
       'api::blog.blog': ApiBlogBlog;
+      'api::demo-video.demo-video': ApiDemoVideoDemoVideo;
       'api::discussion.discussion': ApiDiscussionDiscussion;
       'api::testimonial.testimonial': ApiTestimonialTestimonial;
       'api::use-case.use-case': ApiUseCaseUseCase;
