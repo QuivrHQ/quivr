@@ -2,13 +2,10 @@ import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import { useTranslation } from "react-i18next";
 import { FiUser } from "react-icons/fi";
 
-import { Modal } from "@/lib/components/ui/Modal";
+import { StripePricingModal } from "@/lib/components/Stripe";
 import { useUserData } from "@/lib/hooks/useUserData";
 
 import { sidebarLinkStyle } from "../styles/SidebarLinkStyle";
-
-const PRICING_TABLE_ID = process.env.NEXT_PUBLIC_STRIPE_PRICING_TABLE_ID;
-const PUBLISHABLE_KEY = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
 
 export const UpgradeToPlus = (): JSX.Element => {
   const { userData } = useUserData();
@@ -21,7 +18,7 @@ export const UpgradeToPlus = (): JSX.Element => {
   }
 
   return (
-    <Modal
+    <StripePricingModal
       Trigger={
         <button type="button" className={sidebarLinkStyle}>
           <FiUser className="w-8 h-8" />
@@ -33,13 +30,6 @@ export const UpgradeToPlus = (): JSX.Element => {
           </span>
         </button>
       }
-      CloseTrigger={<div />}
-    >
-      <script async src="https://js.stripe.com/v3/pricing-table.js"></script>
-      <stripe-pricing-table
-        pricing-table-id={PRICING_TABLE_ID}
-        publishable-key={PUBLISHABLE_KEY}
-      ></stripe-pricing-table>
-    </Modal>
+    />
   );
 };
