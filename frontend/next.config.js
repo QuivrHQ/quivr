@@ -37,7 +37,12 @@ const ContentSecurityPolicy = {
     "https://cdn.growthbook.io",
     "https://vitals.vercel-insights.com/v1/vitals",
   ],
-  "img-src": ["'self'", "https://www.gravatar.com","https://quivr-cms.s3.eu-west-3.amazonaws.com", "data:"],
+  "img-src": [
+    "'self'",
+    "https://www.gravatar.com",
+    "https://quivr-cms.s3.eu-west-3.amazonaws.com",
+    "data:",
+  ],
   "media-src": [
     "'self'",
     "https://user-images.githubusercontent.com",
@@ -50,7 +55,9 @@ const ContentSecurityPolicy = {
     "https://va.vercel-scripts.com/",
     process.env.NEXT_PUBLIC_FRONTEND_URL,
     "https://www.google-analytics.com/",
+    "https://js.stripe.com",
   ],
+  "frame-src": ["https://js.stripe.com"],
   "frame-ancestors": ["'none'"],
   "style-src": ["'unsafe-inline'", process.env.NEXT_PUBLIC_FRONTEND_URL],
 };

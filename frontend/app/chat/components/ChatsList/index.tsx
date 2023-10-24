@@ -15,7 +15,7 @@ export const ChatsList = (): JSX.Element => {
   const { shouldDisplayWelcomeChat } = useOnboarding();
 
   return (
-    <Sidebar showButtons={["myBrains", "user"]}>
+    <Sidebar showButtons={["myBrains", "user", "upgradeToPlus"]}>
       <div className="flex flex-col flex-1 h-full" data-testid="chats-list">
         <div className="pt-2">
           <NewChatButton />

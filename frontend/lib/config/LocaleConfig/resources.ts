@@ -11,6 +11,7 @@ import invitation_en from "../../../public/locales/en/invitation.json";
 import knowlegde_en from "../../../public/locales/en/knowledge.json";
 import login_en from "../../../public/locales/en/login.json";
 import logout_en from "../../../public/locales/en/logout.json";
+import monetization_en from "../../../public/locales/en/monetization.json";
 import signUp_en from "../../../public/locales/en/signUp.json";
 import translation_en from "../../../public/locales/en/translation.json";
 import updatePassword_en from "../../../public/locales/en/updatePassword.json";
@@ -28,6 +29,7 @@ import invitation_es from "../../../public/locales/es/invitation.json";
 import knowlegde_es from "../../../public/locales/es/knowledge.json";
 import login_es from "../../../public/locales/es/login.json";
 import logout_es from "../../../public/locales/es/logout.json";
+import monetization_es from "../../../public/locales/es/monetization.json";
 import signUp_es from "../../../public/locales/es/signUp.json";
 import translation_es from "../../../public/locales/es/translation.json";
 import updatePassword_es from "../../../public/locales/es/updatePassword.json";
@@ -45,6 +47,7 @@ import invitation_fr from "../../../public/locales/fr/invitation.json";
 import knowlegde_fr from "../../../public/locales/fr/knowledge.json";
 import login_fr from "../../../public/locales/fr/login.json";
 import logout_fr from "../../../public/locales/fr/logout.json";
+import monetization_fr from "../../../public/locales/fr/monetization.json";
 import signUp_fr from "../../../public/locales/fr/signUp.json";
 import translation_fr from "../../../public/locales/fr/translation.json";
 import updatePassword_fr from "../../../public/locales/fr/updatePassword.json";
@@ -62,6 +65,7 @@ import invitation_ptbr from "../../../public/locales/pt-br/invitation.json";
 import knowlegde_ptbr from "../../../public/locales/pt-br/knowledge.json";
 import login_ptbr from "../../../public/locales/pt-br/login.json";
 import logout_ptbr from "../../../public/locales/pt-br/logout.json";
+import monetization_ptbr from "../../../public/locales/pt-br/monetization.json";
 import signUp_ptbr from "../../../public/locales/pt-br/signUp.json";
 import translation_ptbr from "../../../public/locales/pt-br/translation.json";
 import updatePassword_ptbr from "../../../public/locales/pt-br/updatePassword.json";
@@ -79,6 +83,7 @@ import invitation_ru from "../../../public/locales/ru/invitation.json";
 import knowlegde_ru from "../../../public/locales/ru/knowledge.json";
 import login_ru from "../../../public/locales/ru/login.json";
 import logout_ru from "../../../public/locales/ru/logout.json";
+import monetization_ru from "../../../public/locales/ru/monetization.json";
 import signUp_ru from "../../../public/locales/ru/signUp.json";
 import translation_ru from "../../../public/locales/ru/translation.json";
 import updatePassword_ru from "../../../public/locales/ru/updatePassword.json";
@@ -96,6 +101,7 @@ import invitation_zh_cn from "../../../public/locales/zh-cn/invitation.json";
 import knowlegde_zh_cn from "../../../public/locales/zh-cn/knowledge.json";
 import login_zh_cn from "../../../public/locales/zh-cn/login.json";
 import logout_zh_cn from "../../../public/locales/zh-cn/logout.json";
+import monetization_zh_cn from "../../../public/locales/zh-cn/monetization.json";
 import signUp_zh_cn from "../../../public/locales/zh-cn/signUp.json";
 import translation_zh_cn from "../../../public/locales/zh-cn/translation.json";
 import updatePassword_zh_cn from "../../../public/locales/zh-cn/updatePassword.json";
@@ -114,6 +120,7 @@ export type Translations = {
   invitation: typeof import("../../../public/locales/en/invitation.json");
   login: typeof import("../../../public/locales/en/login.json");
   logout: typeof import("../../../public/locales/en/logout.json");
+  monetization: typeof import("../../../public/locales/en/monetization.json");
   signUp: typeof import("../../../public/locales/en/signUp.json");
   translation: typeof import("../../../public/locales/en/translation.json");
   updatePassword: typeof import("../../../public/locales/en/updatePassword.json");
@@ -143,6 +150,7 @@ export const resources: Record<SupportedLanguages, Translations> = {
     invitation: invitation_en,
     login: login_en,
     logout: logout_en,
+    monetization: monetization_en,
     signUp: signUp_en,
     translation: translation_en,
     updatePassword: updatePassword_en,
@@ -161,6 +169,7 @@ export const resources: Record<SupportedLanguages, Translations> = {
     invitation: invitation_es,
     login: login_es,
     logout: logout_es,
+    monetization: monetization_es,
     signUp: signUp_es,
     translation: translation_es,
     updatePassword: updatePassword_es,
@@ -179,6 +188,7 @@ export const resources: Record<SupportedLanguages, Translations> = {
     invitation: invitation_fr,
     login: login_fr,
     logout: logout_fr,
+    monetization: monetization_fr,
     signUp: signUp_fr,
     translation: translation_fr,
     updatePassword: updatePassword_fr,
@@ -197,6 +207,7 @@ export const resources: Record<SupportedLanguages, Translations> = {
     invitation: invitation_ptbr,
     login: login_ptbr,
     logout: logout_ptbr,
+    monetization: monetization_ptbr,
     signUp: signUp_ptbr,
     translation: translation_ptbr,
     updatePassword: updatePassword_ptbr,
@@ -215,6 +226,7 @@ export const resources: Record<SupportedLanguages, Translations> = {
     invitation: invitation_ru,
     login: login_ru,
     logout: logout_ru,
+    monetization: monetization_ru,
     signUp: signUp_ru,
     translation: translation_ru,
     updatePassword: updatePassword_ru,
@@ -233,6 +245,7 @@ export const resources: Record<SupportedLanguages, Translations> = {
     invitation: invitation_zh_cn,
     login: login_zh_cn,
     logout: logout_zh_cn,
+    monetization: monetization_zh_cn,
     signUp: signUp_zh_cn,
     translation: translation_zh_cn,
     updatePassword: updatePassword_zh_cn,
