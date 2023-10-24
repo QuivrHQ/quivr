@@ -5,10 +5,13 @@ import { LuChevronRight } from "react-icons/lu";
 
 import Button from "@/lib/components/ui/Button";
 
+import { useHomepageTracking } from "../../hooks/useHomepageTracking";
+
 export const IntroSection = (): JSX.Element => {
   const { t } = useTranslation("home", { keyPrefix: "intro" });
   const laptopImage = "/Homepage/laptop-demo.png";
   const smartphoneImage = "/Homepage/smartphone-demo.png";
+  const { onLinkClick } = useHomepageTracking();
 
   return (
     <>
@@ -22,12 +25,30 @@ export const IntroSection = (): JSX.Element => {
             <p className="text-xl">{t("subtitle")}</p>
           </div>
           <div className="flex flex-col items-start sm:flex-row sm:items-center gap-5">
-            <Link href="/signup">
+            <Link
+              href="/signup"
+              onClick={(event) =>
+                onLinkClick({
+                  href: "/signup",
+                  label: "SIGN_UP",
+                  event,
+                })
+              }
+            >
               <Button className="text-white bg-black rounded-full">
                 {t("try_demo")} <LuChevronRight size={24} />
               </Button>
             </Link>
-            <Link href="/contact">
+            <Link
+              href="/contact"
+              onClick={(event) => {
+                onLinkClick({
+                  href: "/contact",
+                  label: "CONTACT_SALES",
+                  event,
+                });
+              }}
+            >
               <Button variant="tertiary" className="font-semibold">
                 {t("contact_sales")} <LuChevronRight size={24} />
               </Button>
