@@ -3,6 +3,7 @@ import Link from "next/link";
 import { useTranslation } from "react-i18next";
 import { LuChevronRight } from "react-icons/lu";
 
+import { useHomepageTracking } from "@/app/(home)/hooks/useHomepageTracking";
 import { DEMO_VIDEO_DATA_KEY } from "@/lib/api/cms/config";
 import { useCmsApi } from "@/lib/api/cms/useCmsApi";
 import Button from "@/lib/components/ui/Button";
@@ -13,7 +14,7 @@ import { VideoPlayer } from "./components/VideoPlayer";
 export const DemoSection = (): JSX.Element => {
   const { t } = useTranslation("home", { keyPrefix: "demo" });
   const { getDemoVideoUrl } = useCmsApi();
-
+  const { onLinkClick } = useHomepageTracking();
   const { data: demoVideoUrl } = useQuery({
     queryKey: [DEMO_VIDEO_DATA_KEY],
     queryFn: getDemoVideoUrl,
@@ -29,7 +30,16 @@ export const DemoSection = (): JSX.Element => {
           <Spinner />
         )}
       </div>
-      <Link href="/signup">
+      <Link
+        href="/signup"
+        onClick={(event) => {
+          onLinkClick({
+            href: "/signup",
+            label: "SIGN_UP",
+            event,
+          });
+        }}
+      >
         <Button className="mt-2 rounded-full">
           {t("start_now")} <LuChevronRight size={24} />
         </Button>
