@@ -1,42 +1,23 @@
-import { useMutation } from "@tanstack/react-query";
-import React, { useState } from "react";
+import React from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { LuChevronRight } from "react-icons/lu";
 
 import Button from "@/lib/components/ui/Button";
 import Spinner from "@/lib/components/ui/Spinner";
-import { useAxios } from "@/lib/hooks";
-import { useToast } from "@/lib/hooks/useToast";
 
-interface ContactSalesDto {
-  customer_email: string;
-  content: string;
-}
+import { usePostContactSales } from "../hooks/usePostContactSales";
 
 const emailPattern = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
 
 export const ContactForm = (): JSX.Element => {
   const { t } = useTranslation("contact", { keyPrefix: "form" });
-  const { axiosInstance } = useAxios();
-  const toast = useToast();
 
   const { register, handleSubmit, formState } = useForm({
     defaultValues: { email: "", message: "" },
   });
 
-  const postEmail = useMutation({
-    mutationKey: ["contactSales"],
-    mutationFn: async (data: ContactSalesDto) => {
-      await axiosInstance.post("/contact", data);
-    },
-    onError: () => {
-      toast.publish({
-        text: "There was an error sending your message. Please try again later.",
-        variant: "danger",
-      });
-    },
-  });
+  const postEmail = usePostContactSales();
 
   const onSubmit: SubmitHandler<{ email: string; message: string }> = (
     data,
@@ -47,7 +28,6 @@ export const ContactForm = (): JSX.Element => {
       customer_email: data.email,
       content: data.message,
     });
-    console.log("submitting", data.email, data.message);
   };
 
   if (postEmail.isSuccess) {
