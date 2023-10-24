@@ -42,7 +42,7 @@ export const UseCasesListing = (): JSX.Element => {
     onButtonClick({
       label: `USE_CASES_${id}`,
     });
-    if (!isMobile) {
+    if (isMobile) {
       return;
     }
     setSelectedCaseId(id);
