@@ -26,13 +26,13 @@ export const useHomeHeader = ({ color }: UseHomeHeaderProps) => {
       newTab: true,
       className: "underline",
     },
-    { href: "/blog", label: t("blog"), rightIcon: null, newTab: true },
     {
       href: "https://github.com/StanGirard/quivr",
       label: t("star_us"),
       leftIcon: <AiFillStar size={16} className="hidden md:inline" />,
       rightIcon: null,
     },
+    { href: "/blog", label: t("blog"), rightIcon: null, newTab: true },
     { href: "/signup", label: t("sign_up") },
     { href: "/login", label: t("sign_in") },
   ];
