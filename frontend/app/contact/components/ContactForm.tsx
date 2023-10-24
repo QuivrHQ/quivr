@@ -1,22 +1,50 @@
+import { useMutation } from "@tanstack/react-query";
 import React, { useState } from "react";
-import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
+import { SubmitHandler, useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { LuChevronRight } from "react-icons/lu";
 
 import Button from "@/lib/components/ui/Button";
+import { useAxios } from "@/lib/hooks";
+
+interface ContactSalesDto {
+  customer_email: string;
+  content: string;
+}
+
+const emailPattern = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
 
 export const ContactForm = (): JSX.Element => {
   const [submitted, setSubmitted] = useState<boolean>(false);
   const { t } = useTranslation("contact", { keyPrefix: "form" });
+  const { axiosInstance } = useAxios();
 
   const { register, handleSubmit, formState } = useForm({
     defaultValues: { email: "", message: "" },
   });
 
-  const emailPattern = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
+  const postEmail = useMutation({
+    mutationKey: ["contactSales"],
+    mutationFn: async (data: ContactSalesDto) => {
+      await axiosInstance.post("/contact", data);
+    },
+    onError: (error) => {
+      console.error("🐛 error", error);
+    },
+    onSuccess: () => {
+      setSubmitted(true);
+    },
+  });
 
-  const onSubmit: SubmitHandler<FieldValues> = (data) => {
-    setSubmitted(true);
+  const onSubmit: SubmitHandler<{ email: string; message: string }> = (
+    data,
+    event
+  ) => {
+    event?.preventDefault();
+    postEmail.mutate({
+      customer_email: data.email,
+      content: data.message,
+    });
     console.log("submitting", data.email, data.message);
   };
 
@@ -32,7 +60,7 @@ export const ContactForm = (): JSX.Element => {
   return (
     <form
       className="flex flex-col gap-5 justify-stretch w-full"
-      onSubmit={() => void handleSubmit(onSubmit)()}
+      onSubmit={(event) => void handleSubmit(onSubmit)(event)}
     >
       <fieldset className="grid grid-cols-1 sm:grid-cols-3 gap-2 w-full gap-y-5">
         <label className="font-bold" htmlFor="email">
