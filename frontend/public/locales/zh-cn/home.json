@@ -2,6 +2,8 @@
   "sign_in": "登录",
   "sign_up": "注册",
   "star_us": "在Github上给我们加星",
+  "blog": "博客",
+  "sponsored_by": "赞助商",
   "useCases": {
     "title": "立刻体验。",
     "subtitle": "查看我们使用 Quivr 的示例。"
