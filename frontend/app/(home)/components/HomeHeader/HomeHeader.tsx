@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 
 import { PopoverMenuMobile } from "./components/PopoverMenuMobile";
 import { QuivrLogo } from "./components/QuivrLogo";
+import { NavbarItem } from "./types";
 
 type HomeNavProps = {
   color?: "white" | "black";
@@ -19,21 +20,24 @@ export const HomeHeader = ({ color = "white" }: HomeNavProps): JSX.Element => {
     black: "text-black",
   };
 
-  const navItems = [
+  const navItems: NavbarItem[] = [
+    { href: "/blog", label: t("blog"), rightIcon: null, newTab: true },
     {
       href: "https://github.com/StanGirard/quivr",
       label: t("star_us"),
       leftIcon: <AiFillStar size={16} className="hidden md:inline" />,
+      rightIcon: null,
     },
     { href: "/signup", label: t("sign_up") },
     { href: "/login", label: t("sign_in") },
   ];
 
   const navLinks = (device: "mobile" | "desktop") =>
-    navItems.map(({ href, label, leftIcon }) => (
+    navItems.map(({ href, label, leftIcon, rightIcon, newTab = false }) => (
       <li key={label}>
         <Link
           href={href}
+          {...(newTab && { target: "_blank", rel: "noopener noreferrer" })}
           className={cn(
             "flex justify-between items-center hover:text-primary p-2 gap-1",
             device === "desktop" ? linkStyle[color] : null
@@ -41,7 +45,7 @@ export const HomeHeader = ({ color = "white" }: HomeNavProps): JSX.Element => {
         >
           {leftIcon}
           {label}
-          <LuChevronRight size={16} className={leftIcon ? "md:hidden" : ""} />
+          {rightIcon !== null && (rightIcon ?? <LuChevronRight size={16} />)}
         </Link>
       </li>
     ));
