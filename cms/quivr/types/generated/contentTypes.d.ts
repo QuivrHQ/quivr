@@ -823,7 +823,7 @@ export interface ApiSecurityQuestionSecurityQuestion
           localized: true;
         };
       }>;
-    answer: Attribute.String &
+    answer: Attribute.Text &
       Attribute.SetPluginOptions<{
         i18n: {
           localized: true;
