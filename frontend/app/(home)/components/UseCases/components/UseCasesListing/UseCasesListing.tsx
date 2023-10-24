@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { LuPanelLeft } from "react-icons/lu";
 
+import { useHomepageTracking } from "@/app/(home)/hooks/useHomepageTracking";
 import { USE_CASES_DATA_KEY } from "@/lib/api/cms/config";
 import { useCmsApi } from "@/lib/api/cms/useCmsApi";
 import Spinner from "@/lib/components/ui/Spinner";
@@ -12,7 +13,7 @@ import { UseCaseComponent } from "./components/UseCaseComponent";
 
 export const UseCasesListing = (): JSX.Element => {
   const { getUseCases } = useCmsApi();
-
+  const { onButtonClick } = useHomepageTracking();
   const { data: cases = [], isLoading } = useQuery({
     queryKey: [USE_CASES_DATA_KEY],
     queryFn: getUseCases,
@@ -37,13 +38,23 @@ export const UseCasesListing = (): JSX.Element => {
     );
   }
 
+  const handleUseCaseClick = (id: string) => {
+    onButtonClick({
+      label: `USE_CASES_${id}`,
+    });
+    if (!isMobile) {
+      return;
+    }
+    setSelectedCaseId(id);
+  };
+
   return (
     <div className="grid grid-cols-6 md:gap-10 flex-column items-start ">
       <div className={"col-span-6 md:col-span-2 flex flex-col gap-3"}>
         {cases.map((c) => (
           <div
             key={c.id}
-            onClick={() => !isMobile && setSelectedCaseId(c.id)}
+            onClick={() => handleUseCaseClick(c.id)}
             className={cn(
               "p-6 rounded-lg cursor-pointer",
               selectedCaseId === c.id &&

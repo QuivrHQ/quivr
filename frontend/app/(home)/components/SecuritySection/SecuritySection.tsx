@@ -14,10 +14,13 @@ import {
 import Button from "@/lib/components/ui/Button";
 import Spinner from "@/lib/components/ui/Spinner";
 
+import { useHomepageTracking } from "../../hooks/useHomepageTracking";
+
 export const SecuritySection = (): JSX.Element => {
   const { t } = useTranslation("home", {
     keyPrefix: "security",
   });
+  const { onLinkClick } = useHomepageTracking();
 
   const { getSecurityQuestions } = useCmsApi();
 
@@ -53,7 +56,16 @@ export const SecuritySection = (): JSX.Element => {
         </div>
       </div>
       <div className="flex md:justify-end w-full">
-        <Link href="/signup">
+        <Link
+          href="/signup"
+          onClick={(event) => {
+            onLinkClick({
+              href: "/signup",
+              label: "SIGN_UP",
+              event,
+            });
+          }}
+        >
           <Button className="rounded-full">
             {t("cta")}
             <LuChevronRight size={24} />
