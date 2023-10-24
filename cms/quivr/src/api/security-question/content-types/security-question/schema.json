@@ -30,7 +30,7 @@
           "localized": true
         }
       },
-      "type": "string"
+      "type": "text"
     }
   }
 }
