@@ -5,6 +5,9 @@ import { useUserData } from "@/lib/hooks/useUserData";
 
 import { sidebarLinkStyle } from "../styles/SidebarLinkStyle";
 
+const PRICING_TABLE_ID = process.env.NEXT_PUBLIC_STRIPE_PRICING_TABLE_ID;
+const PUBLISHABLE_KEY = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
+
 export const UpgradeToPlus = (): JSX.Element => {
   const { userData } = useUserData();
   const is_premium = userData?.is_premium;
@@ -28,8 +31,8 @@ export const UpgradeToPlus = (): JSX.Element => {
     >
       <script async src="https://js.stripe.com/v3/pricing-table.js"></script>
       <stripe-pricing-table
-        pricing-table-id="prctbl_1O2xpHJglvQxkJ1HboraWtTU"
-        publishable-key="pk_test_51NtDTIJglvQxkJ1HgOBKicXBZ9Ug9pIhOZz3Lkask6q5JPZRoRW49nmwW6Q7wjWHJgc89HbruUP7GJ0d5DlQYOQ200MkvXpFnV"
+        pricing-table-id={PRICING_TABLE_ID}
+        publishable-key={PUBLISHABLE_KEY}
       ></stripe-pricing-table>
     </Modal>
   );
