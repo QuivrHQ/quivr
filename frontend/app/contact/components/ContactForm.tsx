@@ -1,26 +1,36 @@
-import React, { useState } from "react";
-import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
+import React from "react";
+import { SubmitHandler, useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { LuChevronRight } from "react-icons/lu";
 
 import Button from "@/lib/components/ui/Button";
+import Spinner from "@/lib/components/ui/Spinner";
+
+import { usePostContactSales } from "../hooks/usePostContactSales";
+
+const emailPattern = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
 
 export const ContactForm = (): JSX.Element => {
-  const [submitted, setSubmitted] = useState<boolean>(false);
   const { t } = useTranslation("contact", { keyPrefix: "form" });
 
   const { register, handleSubmit, formState } = useForm({
     defaultValues: { email: "", message: "" },
   });
 
-  const emailPattern = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
+  const postEmail = usePostContactSales();
 
-  const onSubmit: SubmitHandler<FieldValues> = (data) => {
-    setSubmitted(true);
-    console.log("submitting", data.email, data.message);
+  const onSubmit: SubmitHandler<{ email: string; message: string }> = (
+    data,
+    event
+  ) => {
+    event?.preventDefault();
+    postEmail.mutate({
+      customer_email: data.email,
+      content: data.message,
+    });
   };
 
-  if (submitted) {
+  if (postEmail.isSuccess) {
     return (
       <div className="flex flex-col items-center justify-center gap-5">
         <h2 className="text-2xl font-bold">{t("thank_you")}</h2>
@@ -29,10 +39,14 @@ export const ContactForm = (): JSX.Element => {
     );
   }
 
+  if (postEmail.isLoading) {
+    return <Spinner />;
+  }
+
   return (
     <form
       className="flex flex-col gap-5 justify-stretch w-full"
-      onSubmit={() => void handleSubmit(onSubmit)()}
+      onSubmit={(event) => void handleSubmit(onSubmit)(event)}
     >
       <fieldset className="grid grid-cols-1 sm:grid-cols-3 gap-2 w-full gap-y-5">
         <label className="font-bold" htmlFor="email">
