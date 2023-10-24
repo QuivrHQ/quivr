@@ -26,7 +26,11 @@ export const UpgradeToPlus = (): JSX.Element => {
       }
       CloseTrigger={<div />}
     >
-      🚀
+      <script async src="https://js.stripe.com/v3/pricing-table.js"></script>
+      <stripe-pricing-table
+        pricing-table-id="prctbl_1O2xpHJglvQxkJ1HboraWtTU"
+        publishable-key="pk_test_51NtDTIJglvQxkJ1HgOBKicXBZ9Ug9pIhOZz3Lkask6q5JPZRoRW49nmwW6Q7wjWHJgc89HbruUP7GJ0d5DlQYOQ200MkvXpFnV"
+      ></stripe-pricing-table>
     </Modal>
   );
 };
