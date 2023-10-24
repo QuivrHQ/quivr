@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next";
 import { LuChevronRight } from "react-icons/lu";
 
 import Button from "@/lib/components/ui/Button";
+import Spinner from "@/lib/components/ui/Spinner";
 import { useAxios } from "@/lib/hooks";
 
 interface ContactSalesDto {
@@ -15,7 +16,6 @@ interface ContactSalesDto {
 const emailPattern = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
 
 export const ContactForm = (): JSX.Element => {
-  const [submitted, setSubmitted] = useState<boolean>(false);
   const { t } = useTranslation("contact", { keyPrefix: "form" });
   const { axiosInstance } = useAxios();
 
@@ -31,9 +31,6 @@ export const ContactForm = (): JSX.Element => {
     onError: (error) => {
       console.error("🐛 error", error);
     },
-    onSuccess: () => {
-      setSubmitted(true);
-    },
   });
 
   const onSubmit: SubmitHandler<{ email: string; message: string }> = (
@@ -48,13 +45,17 @@ export const ContactForm = (): JSX.Element => {
     console.log("submitting", data.email, data.message);
   };
 
-  if (submitted) {
+  if (postEmail.isSuccess) {
     return (
       <div className="flex flex-col items-center justify-center gap-5">
         <h2 className="text-2xl font-bold">{t("thank_you")}</h2>
         <p className="text-center text-zinc-400">{t("thank_you_text")}</p>
       </div>
     );
+  }
+
+  if (postEmail.isLoading) {
+    return <Spinner />;
   }
 
   return (
