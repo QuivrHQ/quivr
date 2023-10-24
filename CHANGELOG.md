@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.0.97 (2023-10-24)
+
+## What's Changed
+* feat(cms): update content type by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1477
+* feat: upgrade to plus button by @matthieujacq in https://github.com/StanGirard/quivr/pull/1482
+* feat: 🎸 sitemap by @StanGirard in https://github.com/StanGirard/quivr/pull/1483
+
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.96...v0.0.97
+
 ## 0.0.96 (2023-10-24)
 
 ## What's Changed
