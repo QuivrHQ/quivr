@@ -7,6 +7,7 @@
     "submit": "Contato",
     "placeholder_question": "Como podemos ajudar?",
     "thank_you": "Obrigado!",
-    "thank_you_text": "Entraremos em contato o mais rápido possível."
+    "thank_you_text": "Entraremos em contato o mais rápido possível.",
+    "sending_mail_error": "Ocorreu um erro ao enviar sua mensagem. Por favor, tente novamente mais tarde."
   }
 }

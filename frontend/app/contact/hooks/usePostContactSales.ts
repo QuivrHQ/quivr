@@ -1,4 +1,5 @@
 import { useMutation, UseMutationResult } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 
 import { useAxios } from "@/lib/hooks";
 import { useToast } from "@/lib/hooks/useToast";
@@ -15,6 +16,7 @@ export const usePostContactSales = (): UseMutationResult<
 > => {
   const { axiosInstance } = useAxios();
   const toast = useToast();
+  const { t } = useTranslation("contact", { keyPrefix: "form" });
 
   return useMutation({
     mutationKey: ["contactSales"],
@@ -23,7 +25,7 @@ export const usePostContactSales = (): UseMutationResult<
     },
     onError: () => {
       toast.publish({
-        text: "There was an error sending your message. Please try again later.",
+        text: t("sending_mail_error"),
         variant: "danger",
       });
     },
