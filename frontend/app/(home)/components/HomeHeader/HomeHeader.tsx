@@ -21,34 +21,44 @@ export const HomeHeader = ({ color = "white" }: HomeNavProps): JSX.Element => {
   };
 
   const navItems: NavbarItem[] = [
-    { href: "/blog", label: t("blog"), rightIcon: null, newTab: true },
+    {
+      href: "https://theodo.co.uk",
+      label: `${t("sponsored_by")} Theodo`,
+      rightIcon: null,
+      newTab: true,
+      className: "underline",
+    },
     {
       href: "https://github.com/StanGirard/quivr",
       label: t("star_us"),
       leftIcon: <AiFillStar size={16} className="hidden md:inline" />,
       rightIcon: null,
     },
+    { href: "/blog", label: t("blog"), rightIcon: null, newTab: true },
     { href: "/signup", label: t("sign_up") },
     { href: "/login", label: t("sign_in") },
   ];
 
   const navLinks = (device: "mobile" | "desktop") =>
-    navItems.map(({ href, label, leftIcon, rightIcon, newTab = false }) => (
-      <li key={label}>
-        <Link
-          href={href}
-          {...(newTab && { target: "_blank", rel: "noopener noreferrer" })}
-          className={cn(
-            "flex justify-between items-center hover:text-primary p-2 gap-1",
-            device === "desktop" ? linkStyle[color] : null
-          )}
-        >
-          {leftIcon}
-          {label}
-          {rightIcon !== null && (rightIcon ?? <LuChevronRight size={16} />)}
-        </Link>
-      </li>
-    ));
+    navItems.map(
+      ({ href, label, leftIcon, rightIcon, newTab = false, className }) => (
+        <li key={label}>
+          <Link
+            href={href}
+            {...(newTab && { target: "_blank", rel: "noopener noreferrer" })}
+            className={cn(
+              "flex justify-between items-center hover:text-primary p-2 gap-1",
+              device === "desktop" ? linkStyle[color] : null,
+              className
+            )}
+          >
+            {leftIcon}
+            {label}
+            {rightIcon !== null && (rightIcon ?? <LuChevronRight size={16} />)}
+          </Link>
+        </li>
+      )
+    );
 
   return (
     <header className="w-screen flex justify-between items-center p-5 min-w-max md:max-w-6xl m-auto">

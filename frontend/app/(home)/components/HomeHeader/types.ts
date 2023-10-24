@@ -4,4 +4,5 @@ export type NavbarItem = {
   leftIcon?: React.ReactNode;
   rightIcon?: React.ReactNode | null;
   newTab?: boolean;
+  className?: string;
 };
