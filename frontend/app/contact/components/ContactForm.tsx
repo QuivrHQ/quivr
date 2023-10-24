@@ -7,6 +7,7 @@ import { LuChevronRight } from "react-icons/lu";
 import Button from "@/lib/components/ui/Button";
 import Spinner from "@/lib/components/ui/Spinner";
 import { useAxios } from "@/lib/hooks";
+import { useToast } from "@/lib/hooks/useToast";
 
 interface ContactSalesDto {
   customer_email: string;
@@ -18,6 +19,7 @@ const emailPattern = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
 export const ContactForm = (): JSX.Element => {
   const { t } = useTranslation("contact", { keyPrefix: "form" });
   const { axiosInstance } = useAxios();
+  const toast = useToast();
 
   const { register, handleSubmit, formState } = useForm({
     defaultValues: { email: "", message: "" },
@@ -28,8 +30,11 @@ export const ContactForm = (): JSX.Element => {
     mutationFn: async (data: ContactSalesDto) => {
       await axiosInstance.post("/contact", data);
     },
-    onError: (error) => {
-      console.error("🐛 error", error);
+    onError: () => {
+      toast.publish({
+        text: "There was an error sending your message. Please try again later.",
+        variant: "danger",
+      });
     },
   });
 
