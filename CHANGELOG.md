@@ -1,5 +1,21 @@
 # Changelog
 
+## 0.0.96 (2023-10-24)
+
+## What's Changed
+* feat: validate email and required question with react-hook-form by @matthieujacq in https://github.com/StanGirard/quivr/pull/1463
+* feat: fetch security questions from CMS by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1464
+* feat:  POST on /contact to contact quivr team by email by @matthieujacq in https://github.com/StanGirard/quivr/pull/1466
+* feat: setup premium feature backend by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1467
+* feat: add sponsor and blog links by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1472
+* feat: contact sales submission by @matthieujacq in https://github.com/StanGirard/quivr/pull/1473
+* feat(homepage): add analytics by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1474
+* fix: make use cases clickable by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1475
+* fix: update blog link position by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1476
+
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.95...v0.0.96
+
 ## 0.0.95 (2023-10-23)
 
 ## What's Changed
