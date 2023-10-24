@@ -7,8 +7,11 @@ import { RiTwitterXLine } from "react-icons/ri";
 import Button from "@/lib/components/ui/Button";
 import { GITHUB_URL, LINKEDIN_URL, TWITTER_URL } from "@/lib/config/CONSTANTS";
 
+import { useHomepageTracking } from "../../hooks/useHomepageTracking";
+
 export const FooterSection = (): JSX.Element => {
   const { t } = useTranslation("home", { keyPrefix: "footer" });
+  const { onLinkClick } = useHomepageTracking();
 
   return (
     <div className="flex flex-col items-center gap-10 text-white text-center text-lg">
@@ -17,13 +20,31 @@ export const FooterSection = (): JSX.Element => {
         {t("description_1")} <br /> {t("description_2")}{" "}
       </p>
       <div className="flex items-center justify-center gap-5 flex-wrap">
-        <Link href="/signup">
+        <Link
+          href="/signup"
+          onClick={(event) => {
+            onLinkClick({
+              href: "/signup",
+              label: "SIGN_UP",
+              event,
+            });
+          }}
+        >
           <Button className=" rounded-full">
             {t("start_using")}
             <LuChevronRight size={24} />
           </Button>
         </Link>
-        <Link href="/contact">
+        <Link
+          href="/contact"
+          onClick={(event) => {
+            onLinkClick({
+              href: "/contact",
+              label: "CONTACT",
+              event,
+            });
+          }}
+        >
           <Button variant="tertiary">
             {t("contact_sales")} <LuChevronRight size={24} />
           </Button>
