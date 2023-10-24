@@ -22,7 +22,12 @@ export const useHomepageTracking = () => {
     router.push(href);
   };
 
+  const onButtonClick = ({ label }: { label: string }) => {
+    void track(`HOMEPAGE-${label}`);
+  };
+
   return {
     onLinkClick,
+    onButtonClick,
   };
 };

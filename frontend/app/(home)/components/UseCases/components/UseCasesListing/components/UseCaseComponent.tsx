@@ -27,7 +27,7 @@ export const UseCaseComponent = ({
           </div>
         </Fragment>
       ))}
-      <div className="flex mt-1 flex-col w-full shadow-md dark:shadow-primary/25 hover:shadow-xl transition-shadow rounded-xl bg-white dark:bg-black border border-black/10 dark:border-white/25 p-4 mt-10">
+      <div className="flex flex-col w-full shadow-md dark:shadow-primary/25 hover:shadow-xl transition-shadow rounded-xl bg-white dark:bg-black border border-black/10 dark:border-white/25 p-4 mt-10">
         <div className="flex items-center">
           <PiPaperclipFill className="text-3xl" />
           <span className="text-[#BFBFBF]">@Einstein</span>
