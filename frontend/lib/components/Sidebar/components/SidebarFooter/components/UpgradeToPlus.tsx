@@ -1,3 +1,4 @@
+import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import { FiUser } from "react-icons/fi";
 
 import { Modal } from "@/lib/components/ui/Modal";
@@ -11,8 +12,9 @@ const PUBLISHABLE_KEY = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
 export const UpgradeToPlus = (): JSX.Element => {
   const { userData } = useUserData();
   const is_premium = userData?.is_premium;
+  const featureIsOn = useFeatureIsOn("monetization");
 
-  if (is_premium === true) {
+  if (!featureIsOn || is_premium === true) {
     return <></>;
   }
 
