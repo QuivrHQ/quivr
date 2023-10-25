@@ -186,14 +186,7 @@ async def create_question_handler(
     """
     Add a new question to the chat.
     """
-    if brain_id:
-        validate_brain_authorization(
-            brain_id=brain_id,
-            user_id=current_user.id,
-            required_roles=[RoleEnum.Viewer, RoleEnum.Editor, RoleEnum.Owner],
-        )
 
-    # Retrieve user's OpenAI API key
     if brain_id:
         validate_brain_authorization(
             brain_id=brain_id,
