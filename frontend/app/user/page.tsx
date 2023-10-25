@@ -15,10 +15,12 @@ import { ApiKeyConfig } from "./components/ApiKeyConfig";
 import LanguageSelect from "./components/LanguageDropDown/LanguageSelect";
 import ThemeSelect from "./components/ThemeSelect/ThemeSelect";
 
+const MANAGE_PLAN_URL = process.env.NEXT_PUBLIC_STRIPE_MANAGE_PLAN_URL;
+
 const UserPage = (): JSX.Element => {
   const { session } = useSupabase();
   const { userData } = useUserData();
-  const is_premium = userData?.is_premium;
+  const is_premium = userData?.is_premium ?? false;
 
   if (!session) {
     redirectToLogin();
@@ -52,7 +54,13 @@ const UserPage = (): JSX.Element => {
               </Button>
             </Link>
           </div>
-          {is_premium === true ? null : (
+          {is_premium ? (
+            <a href={MANAGE_PLAN_URL} target="_blank" rel="noopener">
+              <Button className="w-full">
+                {t("monetization:manage_plan")}
+              </Button>
+            </a>
+          ) : (
             <StripePricingModal
               Trigger={<Button>{t("monetization:upgrade")}</Button>}
             />
