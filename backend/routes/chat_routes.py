@@ -39,6 +39,8 @@ from repository.user_identity import get_user_identity
 from routes.authorizations.brain_authorization import validate_brain_authorization
 from routes.authorizations.types import RoleEnum
 
+from backend.routes.chat.factory import get_chat_strategy
+
 chat_router = APIRouter()
 
 
@@ -187,12 +189,9 @@ async def create_question_handler(
     Add a new question to the chat.
     """
 
-    if brain_id:
-        validate_brain_authorization(
-            brain_id=brain_id,
-            user_id=current_user.id,
-            required_roles=[RoleEnum.Viewer, RoleEnum.Editor, RoleEnum.Owner],
-        )
+    chat_instance = get_chat_strategy(brain_id)
+
+    chat_instance.validate_authorization(user_id=current_user.id, brain_id=brain_id)
 
     current_user.openai_api_key = request.headers.get("Openai-Api-Key")
     brain = Brain(id=brain_id)
