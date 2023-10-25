@@ -23,12 +23,12 @@ export const UpgradeToPlus = (): JSX.Element => {
         <SidebarFooterButton
           icon={<FiUser className="w-8 h-8" />}
           label={
-            <>
-              {t("upgrade")}{" "}
-              <span className="rounded bg-primary/50 py-1 px-3 text-xs">
+            <div className="flex justify-between items-center w-full">
+              {t("upgrade")}
+              <span className="rounded bg-primary/30 py-1 px-3 text-xs">
                 {t("new")}
               </span>
-            </>
+            </div>
           }
         />
       }
