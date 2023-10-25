@@ -17,7 +17,7 @@ export const BrainsList = (): JSX.Element => {
   const { t } = useTranslation(["brain", "chat"]);
 
   return (
-    <Sidebar showButtons={["user", "upgradeToPlus"]}>
+    <Sidebar showButtons={["upgradeToPlus", "user"]}>
       <div className="flex flex-col p-2 gap-2">
         <Link href="/chat">
           <Button type="button" className="bg-primary text-white py-2 w-full">

@@ -3,9 +3,11 @@
 import Link from "next/link";
 import { useTranslation } from "react-i18next";
 
+import { StripePricingModal } from "@/lib/components/Stripe";
 import Button from "@/lib/components/ui/Button";
 import Card, { CardBody, CardHeader } from "@/lib/components/ui/Card";
 import { useSupabase } from "@/lib/context/SupabaseProvider";
+import { useUserData } from "@/lib/hooks/useUserData";
 import { redirectToLogin } from "@/lib/router/redirectToLogin";
 
 import { UserStatistics } from "./components";
@@ -15,13 +17,20 @@ import ThemeSelect from "./components/ThemeSelect/ThemeSelect";
 
 const UserPage = (): JSX.Element => {
   const { session } = useSupabase();
+  const { userData } = useUserData();
+  const is_premium = userData?.is_premium;
 
   if (!session) {
     redirectToLogin();
   }
 
   const { user } = session;
-  const { t } = useTranslation(["translation", "user", "config"]);
+  const { t } = useTranslation([
+    "translation",
+    "user",
+    "config",
+    "monetization",
+  ]);
 
   return (
     <main className="container lg:w-2/3 mx-auto py-10 px-5">
@@ -32,18 +41,22 @@ const UserPage = (): JSX.Element => {
           </h2>
         </CardHeader>
 
-        <CardBody>
-          <p className="mb-3">
-            <strong>{t("email")}:</strong> <span>{user.email}</span>
-          </p>
-
-          <div className="inline-block">
+        <CardBody className="flex flex-col items-stretch max-w-max gap-2">
+          <div className="flex gap-5 items-center">
+            <p>
+              <strong>{t("email")}:</strong> <span>{user.email}</span>
+            </p>
             <Link href={"/logout"}>
               <Button className="px-3 py-2" variant="secondary">
                 {t("logoutButton")}
               </Button>
             </Link>
           </div>
+          {is_premium === true ? null : (
+            <StripePricingModal
+              Trigger={<Button>{t("monetization:upgrade")}</Button>}
+            />
+          )}
         </CardBody>
       </Card>
 
