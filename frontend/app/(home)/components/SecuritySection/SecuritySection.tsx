@@ -57,10 +57,10 @@ export const SecuritySection = (): JSX.Element => {
       </div>
       <div className="flex md:justify-end w-full">
         <Link
-          href="/signup"
+          href="/login"
           onClick={(event) => {
             onLinkClick({
-              href: "/signup",
+              href: "/login",
               label: "SIGN_UP",
               event,
             });

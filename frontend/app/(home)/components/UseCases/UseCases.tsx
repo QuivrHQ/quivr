@@ -22,10 +22,10 @@ export const UseCases = (): JSX.Element => {
       <UseCasesListing />
       <div className="mt-10 flex md:justify-center">
         <Link
-          href="/signup"
+          href="/login"
           onClick={(event) => {
             onLinkClick({
-              href: "/signup",
+              href: "/login",
               label: "SIGN_UP",
               event,
             });
