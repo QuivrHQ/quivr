@@ -1,12 +1,13 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
+
+import { useSupabase } from "@/lib/context/SupabaseProvider";
+import { useToast } from "@/lib/hooks";
 
 type UseMagicLinkLoginProps = {
   email: string;
   setEmail: (email: string) => void;
 };
-
-import { useSupabase } from "@/lib/context/SupabaseProvider";
-import { useToast } from "@/lib/hooks";
 
 export const useMagicLinkLogin = ({
   email,
@@ -17,14 +18,14 @@ export const useMagicLinkLogin = ({
 } => {
   const { supabase } = useSupabase();
   const [isPending, setIsPending] = useState(false);
-
+  const { t } = useTranslation("login");
   const { publish } = useToast();
 
   const handleMagicLinkLogin = async () => {
     if (email === "") {
       publish({
         variant: "danger",
-        text: "Please enter your email address",
+        text: t("errorMailMissed"),
       });
 
       return;

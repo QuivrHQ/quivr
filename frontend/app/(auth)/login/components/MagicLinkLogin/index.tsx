@@ -24,11 +24,11 @@ export const MagicLinkLogin = ({
   return (
     <Button
       type="button"
-      variant={"tertiary"}
       onClick={() => void handleMagicLinkLogin()}
       isLoading={isPending}
+      className="bg-black text-white py-2 font-normal"
     >
-      {t("magicLink", { ns: "login" })}
+      {t("magicLink")}
     </Button>
   );
 };

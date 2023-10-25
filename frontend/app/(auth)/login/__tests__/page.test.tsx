@@ -19,13 +19,17 @@ vi.mock("@/lib/context/SupabaseProvider", () => ({
   useSupabase: () => mockUseSupabase(),
 }));
 
+vi.mock("@/lib/assets/QuivrLogo", () => ({
+  QuivrLogo: () => <div>LOGO</div>,
+}));
+
 vi.mock("@/services/analytics/june/useEventTracking", () => ({
   useEventTracking: () => ({ track: vi.fn() }),
 }));
 
 describe("Login component", () => {
   afterEach(() => {
-    vi.clearAllMocks();
+    vi.restoreAllMocks();
   });
 
   it("redirects to /upload if user is already signed in and is not coming from another page", () => {
@@ -68,7 +72,7 @@ describe("Login component", () => {
       session: { user: undefined },
     });
     const { getByTestId } = render(<Login />);
-    const signInForm = getByTestId("sign-in-form");
+    const signInForm = getByTestId("sign-in-card");
     expect(signInForm).toBeDefined();
   });
 });
