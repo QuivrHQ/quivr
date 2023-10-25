@@ -5,7 +5,7 @@ import { FiUser } from "react-icons/fi";
 import { StripePricingModal } from "@/lib/components/Stripe";
 import { useUserData } from "@/lib/hooks/useUserData";
 
-import { sidebarLinkStyle } from "../styles/SidebarLinkStyle";
+import { SidebarFooterButton } from "./SidebarFooterButton";
 
 export const UpgradeToPlus = (): JSX.Element => {
   const { userData } = useUserData();
@@ -20,15 +20,17 @@ export const UpgradeToPlus = (): JSX.Element => {
   return (
     <StripePricingModal
       Trigger={
-        <button type="button" className={sidebarLinkStyle}>
-          <FiUser className="w-8 h-8" />
-          <span>
-            {t("upgrade")}{" "}
-            <span className="rounded bg-primary/50 py-1 px-3 text-xs">
-              {t("new")}
-            </span>
-          </span>
-        </button>
+        <SidebarFooterButton
+          icon={<FiUser className="w-8 h-8" />}
+          label={
+            <>
+              {t("upgrade")}{" "}
+              <span className="rounded bg-primary/50 py-1 px-3 text-xs">
+                {t("new")}
+              </span>
+            </>
+          }
+        />
       }
     />
   );
