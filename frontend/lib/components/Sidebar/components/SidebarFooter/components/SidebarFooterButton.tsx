@@ -1,5 +1,4 @@
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
 
 type SidebarFooterButtonProps = {
   icon: JSX.Element;
@@ -21,12 +20,6 @@ export const SidebarFooterButton = ({
       void router.push(href);
     };
   }
-
-  useEffect(() => {
-    if (href !== undefined) {
-      void router.prefetch(href);
-    }
-  }, [href, router]);
 
   return (
     <button
