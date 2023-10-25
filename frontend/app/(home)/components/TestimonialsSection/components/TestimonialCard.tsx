@@ -31,7 +31,6 @@ export const TestimonialCard = ({
         <div className="flex mt-3 flex-1 items-center">
           <Avatar
             url={profilePicture ?? "https://www.gravatar.com/avatar?d=mp"}
-            alt={`${name}-profile`}
             imgClassName={"rounded-full"}
             className="w-10 h-10"
           />
