@@ -141,4 +141,4 @@ Got a pull request? Open it, and we'll review it as soon as possible. Check out 
 
 ## License 📄
 
-This project is licensed under the Apache 2.0 License - see the [LICENSE.md](https://github.com/StanGirard/quivr/LICENSE.md) file for details
+This project is licensed under the Apache 2.0 License - see the [LICENSE.md](https://github.com/StanGirard/quivr/blob/main/LICENSE) file for details
