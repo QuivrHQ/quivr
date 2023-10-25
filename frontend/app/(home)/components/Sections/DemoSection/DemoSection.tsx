@@ -35,7 +35,7 @@ export const DemoSection = (): JSX.Element => {
         onClick={(event) => {
           onLinkClick({
             href: "/login",
-            label: "SIGN_UP",
+            label: "SIGN_IN",
             event,
           });
         }}
