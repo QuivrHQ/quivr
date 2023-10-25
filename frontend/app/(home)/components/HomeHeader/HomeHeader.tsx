@@ -1,9 +1,9 @@
 import Link from "next/link";
 
+import { QuivrLogo } from "@/lib/assets/QuivrLogo";
 import { cn } from "@/lib/utils";
 
 import { PopoverMenuMobile } from "./components/PopoverMenuMobile";
-import { QuivrLogo } from "./components/QuivrLogo";
 import { useHomeHeader } from "./hooks/useHomeHeader";
 import { linkStyle } from "./styles";
 

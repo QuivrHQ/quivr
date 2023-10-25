@@ -10,8 +10,14 @@ const Footer = (): JSX.Element => {
   const path = usePathname();
   const isHomePage = path === "/";
   const isContactPage = path === "/contact";
+  const isLoginPage = path === "/login";
 
-  if (session?.user !== undefined || isHomePage || isContactPage) {
+  if (
+    session?.user !== undefined ||
+    isHomePage ||
+    isContactPage ||
+    isLoginPage
+  ) {
     return <></>;
   }
 

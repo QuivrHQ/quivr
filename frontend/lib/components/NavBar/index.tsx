@@ -16,8 +16,9 @@ export const NavBar = (): JSX.Element => {
 
   const isHomePage = path === "/";
   const isContactPage = path === "/contact";
+  const isLoginPage = path === "/login";
 
-  if (pageHasSidebar || isHomePage || isContactPage) {
+  if (pageHasSidebar || isHomePage || isContactPage || isLoginPage) {
     return <></>;
   }
 
