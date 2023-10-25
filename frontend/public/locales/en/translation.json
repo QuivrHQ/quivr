@@ -4,7 +4,6 @@
   "description": "Quivr is your second brain in the cloud, designed to easily store and retrieve unstructured information.",
   "toastDismiss": "dismiss",
   "email": "Email",
-  "password": "Password",
   "or": "or",
   "and": "and",
   "loginButton": "Login",
