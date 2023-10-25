@@ -30,7 +30,10 @@ const HomePage = (): JSX.Element => {
       <HomeHeaderBackground />
       <HomeHeader />
 
-      <main className="relative flex flex-col items-center">
+      <main
+        className="relative flex flex-col items-center"
+        data-testid="home-page"
+      >
         <HomeSection bg="transparent">
           <IntroSection />
         </HomeSection>
