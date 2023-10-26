@@ -1,4 +1,3 @@
-import time
 from typing import List, Optional
 from uuid import UUID
 from venv import logger
@@ -18,7 +17,6 @@ from models import (
     get_supabase_db,
 )
 from models.databases.supabase.chats import QuestionAndAnswer
-from models.databases.supabase.supabase import SupabaseDB
 from repository.brain import get_brain_details
 from repository.chat import (
     ChatUpdatableProperties,
@@ -38,61 +36,14 @@ from repository.notification.remove_chat_notifications import remove_chat_notifi
 from repository.user_identity import get_user_identity
 from routes.authorizations.brain_authorization import validate_brain_authorization
 from routes.authorizations.types import RoleEnum
-
-from backend.routes.chat.factory import get_chat_strategy
+from routes.chat.factory import get_chat_strategy
+from routes.chat.utils import (
+    NullableUUID,
+    check_user_requests_limit,
+    delete_chat_from_db,
+)
 
 chat_router = APIRouter()
-
-
-class NullableUUID(UUID):
-    @classmethod
-    def __get_validators__(cls):
-        yield cls.validate
-
-    @classmethod
-    def validate(cls, v) -> UUID | None:
-        if v == "":
-            return None
-        try:
-            return UUID(v)
-        except ValueError:
-            return None
-
-
-def delete_chat_from_db(supabase_db: SupabaseDB, chat_id):
-    try:
-        supabase_db.delete_chat_history(chat_id)
-    except Exception as e:
-        print(e)
-        pass
-    try:
-        supabase_db.delete_chat(chat_id)
-    except Exception as e:
-        print(e)
-        pass
-
-
-def check_user_requests_limit(
-    user: UserIdentity,
-):
-    userDailyUsage = UserUsage(
-        id=user.id, email=user.email, openai_api_key=user.openai_api_key
-    )
-
-    userSettings = userDailyUsage.get_user_settings()
-
-    date = time.strftime("%Y%m%d")
-    userDailyUsage.handle_increment_user_request_count(date)
-
-    if user.openai_api_key is None:
-        daily_chat_credit = userSettings.get("daily_chat_credit", 0)
-        if int(userDailyUsage.daily_requests_count) >= int(daily_chat_credit):
-            raise HTTPException(
-                status_code=429,  # pyright: ignore reportPrivateUsage=none
-                detail="You have reached the maximum number of requests for today.",  # pyright: ignore reportPrivateUsage=none
-            )
-    else:
-        pass
 
 
 @chat_router.get("/chat/healthz", tags=["Health"])
@@ -285,6 +236,9 @@ async def create_stream_question_handler(
             user_id=current_user.id,
             required_roles=[RoleEnum.Viewer, RoleEnum.Editor, RoleEnum.Owner],
         )
+
+    chat_instance = get_chat_strategy(brain_id)
+    chat_instance.validate_authorization(user_id=current_user.id, brain_id=brain_id)
 
     # Retrieve user's OpenAI API key
     current_user.openai_api_key = request.headers.get("Openai-Api-Key")

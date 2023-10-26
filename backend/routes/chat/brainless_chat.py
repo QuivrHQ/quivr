@@ -1,4 +1,4 @@
-from backend.routes.chat.interface import ChatInterface
+from routes.chat.interface import ChatInterface
 
 
 class BrainlessChat(ChatInterface):
