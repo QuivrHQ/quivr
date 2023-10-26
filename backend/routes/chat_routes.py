@@ -34,8 +34,6 @@ from repository.chat.get_chat_history_with_notifications import (
 )
 from repository.notification.remove_chat_notifications import remove_chat_notifications
 from repository.user_identity import get_user_identity
-from routes.authorizations.brain_authorization import validate_brain_authorization
-from routes.authorizations.types import RoleEnum
 from routes.chat.factory import get_chat_strategy
 from routes.chat.utils import (
     NullableUUID,
@@ -184,25 +182,15 @@ async def create_question_handler(
         check_user_requests_limit(current_user)
         is_model_ok = (brain_details or chat_question).model in userSettings.get("models", ["gpt-3.5-turbo"])  # type: ignore
         gpt_answer_generator: HeadlessQA | QABaseBrainPicking
-        if brain_id:
-            gpt_answer_generator = chat_instance.get_answer_generator(
-                chat_id=str(chat_id),
-                model=chat_question.model if is_model_ok else "gpt-3.5-turbo",  # type: ignore
-                max_tokens=chat_question.max_tokens,
-                temperature=chat_question.temperature,
-                brain_id=str(brain_id),
-                user_openai_api_key=current_user.openai_api_key,  # pyright: ignore reportPrivateUsage=none
-                prompt_id=chat_question.prompt_id,
-            )
-        else:
-            gpt_answer_generator = chat_instance.get_answer_generator(
-                model=chat_question.model if is_model_ok else "gpt-3.5-turbo",  # type: ignore
-                temperature=chat_question.temperature,
-                max_tokens=chat_question.max_tokens,
-                user_openai_api_key=current_user.openai_api_key,
-                chat_id=str(chat_id),
-                prompt_id=chat_question.prompt_id,
-            )
+        gpt_answer_generator = chat_instance.get_answer_generator(
+            chat_id=str(chat_id),
+            model=chat_question.model if is_model_ok else "gpt-3.5-turbo",  # type: ignore
+            max_tokens=chat_question.max_tokens,
+            temperature=chat_question.temperature,
+            brain_id=str(brain_id),
+            user_openai_api_key=current_user.openai_api_key,  # pyright: ignore reportPrivateUsage=none
+            prompt_id=chat_question.prompt_id,
+        )
 
         chat_answer = gpt_answer_generator.generate_answer(chat_id, chat_question)
 
@@ -230,13 +218,6 @@ async def create_stream_question_handler(
     | None = Query(..., description="The ID of the brain"),
     current_user: UserIdentity = Depends(get_current_user),
 ) -> StreamingResponse:
-    if brain_id:
-        validate_brain_authorization(
-            brain_id=brain_id,
-            user_id=current_user.id,
-            required_roles=[RoleEnum.Viewer, RoleEnum.Editor, RoleEnum.Owner],
-        )
-
     chat_instance = get_chat_strategy(brain_id)
     chat_instance.validate_authorization(user_id=current_user.id, brain_id=brain_id)
 
@@ -282,28 +263,16 @@ async def create_stream_question_handler(
         print(userSettings.get("models", ["gpt-3.5-turbo"]))  # type: ignore
         is_model_ok = (brain_details or chat_question).model in userSettings.get("models", ["gpt-3.5-turbo"])  # type: ignore
 
-        if brain_id:
-            gpt_answer_generator = chat_instance.get_answer_generator(
-                chat_id=str(chat_id),
-                model=(brain_details or chat_question).model if is_model_ok else "gpt-3.5-turbo",  # type: ignore
-                max_tokens=(brain_details or chat_question).max_tokens,  # type: ignore
-                temperature=(brain_details or chat_question).temperature,  # type: ignore
-                user_openai_api_key=current_user.openai_api_key,  # pyright: ignore reportPrivateUsage=none
-                streaming=True,
-                prompt_id=chat_question.prompt_id,
-                brain_id=str(brain_id),
-            )
-        else:
-            gpt_answer_generator = chat_instance.get_answer_generator(
-                chat_id=str(chat_id),
-                model=chat_question.model if is_model_ok else "gpt-3.5-turbo",  # type: ignore
-                max_tokens=chat_question.max_tokens,
-                temperature=chat_question.temperature,
-                user_openai_api_key=current_user.openai_api_key,  # pyright: ignore reportPrivateUsage=none
-                streaming=True,
-                prompt_id=chat_question.prompt_id,
-                brain_id=str(brain_id),
-            )
+        gpt_answer_generator = chat_instance.get_answer_generator(
+            chat_id=str(chat_id),
+            model=(brain_details or chat_question).model if is_model_ok else "gpt-3.5-turbo",  # type: ignore
+            max_tokens=(brain_details or chat_question).max_tokens,  # type: ignore
+            temperature=(brain_details or chat_question).temperature,  # type: ignore
+            user_openai_api_key=current_user.openai_api_key,  # pyright: ignore reportPrivateUsage=none
+            streaming=True,
+            prompt_id=chat_question.prompt_id,
+            brain_id=str(brain_id),
+        )
 
         print("streaming")
         return StreamingResponse(
