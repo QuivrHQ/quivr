@@ -32,6 +32,8 @@ export const useMagicLinkLogin = () => {
         variant: "danger",
         text: t("errorMailMissed"),
       });
+
+      return;
     }
 
     const { error } = await supabase.auth.signInWithOtp({
@@ -49,11 +51,6 @@ export const useMagicLinkLogin = () => {
 
       throw error; // this error is caught by react-hook-form
     }
-
-    publish({
-      variant: "success",
-      text: "Magic link sent successfully if email recognized",
-    });
 
     setValue("email", "");
   });

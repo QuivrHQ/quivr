@@ -20,13 +20,24 @@ export const MagicLinkLogin = (): JSX.Element => {
 
   if (isSubmitSuccessful) {
     return (
-      <>
-        <p>{t("check_your_email", { ns: "login" })} </p>
+      <div className="text-center flex flex-col gap-4">
         <p>
-          {t("cant_find", { ns: "login" })}{" "}
-          <Button onClick={() => void reset()}>{t("try_again")}</Button>
+          {t("check_your_email.part1", { ns: "login" })}{" "}
+          <span className="font-semibold">
+            {t("check_your_email.magic_link", { ns: "login" })}
+          </span>{" "}
+          {t("check_your_email.part2", { ns: "login" })}
         </p>
-      </>
+        <div>
+          <span>{t("cant_find", { ns: "login" })}</span>{" "}
+          <span
+            className="cursor-pointer underline"
+            onClick={() => void reset()}
+          >
+            {t("try_again")}
+          </span>
+        </div>
+      </div>
     );
   }
 

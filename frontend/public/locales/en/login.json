@@ -7,5 +7,9 @@
     "email":"Email address",
     "cant_find":"Can't find it ?",
     "try_again":"Try again",
-    "check_your_email":"We just sent you a Magic link, check your emails and follow the steps."
+    "check_your_email":{
+        "part1":"We just sent you a ",
+        "magic_link":"Magic link",
+        "part2":", check your emails and follow the steps."
+    }
 }
