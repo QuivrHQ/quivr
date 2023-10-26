@@ -3,7 +3,6 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { PropsWithChildren, useEffect } from "react";
 
-import { NavBar } from "@/lib/components/NavBar";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 import { useSupabase } from "@/lib/context/SupabaseProvider";
 import { UpdateMetadata } from "@/lib/helpers/updateMetadata";
@@ -30,7 +29,6 @@ export const App = ({ children }: PropsWithChildren): JSX.Element => {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <NavBar />
       {children}
       <UpdateMetadata />
     </QueryClientProvider>

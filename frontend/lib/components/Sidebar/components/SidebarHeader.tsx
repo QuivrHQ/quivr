@@ -1,7 +1,7 @@
 import { Dispatch, SetStateAction } from "react";
 import { LuPanelLeft } from "react-icons/lu";
 
-import { Logo } from "@/lib/components/NavBar/components/Logo";
+import { Logo } from "@/lib/components/Logo/Logo";
 
 type SidebarProps = {
   setOpen: Dispatch<SetStateAction<boolean>>;
