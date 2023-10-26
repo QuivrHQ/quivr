@@ -1,5 +1,5 @@
 import { act, renderHook } from "@testing-library/react";
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { useMagicLinkLogin } from "../useMagicLinkLogin";
 
@@ -12,32 +12,40 @@ const mockUseSupabase = () => ({
     },
   },
 });
+const email = "user@quivr.app";
+const watchMock = vi.fn(() => email);
+vi.mock("react-hook-form", async () => {
+  const actual = await vi.importActual<typeof import("react-hook-form")>(
+    "react-hook-form"
+  );
+
+  return {
+    ...actual,
+    useForm: () => ({
+      ...actual.useForm(),
+      watch: watchMock,
+    }),
+  };
+});
 
 vi.mock("@/lib/context/SupabaseProvider", () => ({
   useSupabase: () => mockUseSupabase(),
 }));
-const setEmail = vi.fn();
 
 describe("useMagicLinkLogin", () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
   it("should not call signInWithOtp if email is empty", async () => {
-    const { result } = renderHook(() =>
-      useMagicLinkLogin({
-        email: "",
-        setEmail,
-      })
-    );
+    watchMock.mockReturnValueOnce("");
+    const { result } = renderHook(() => useMagicLinkLogin());
     await act(() => result.current.handleMagicLinkLogin());
     expect(mockSignInWithOtp).toHaveBeenCalledTimes(0);
   });
 
   it("should call signInWithOtp with proper arguments", async () => {
-    const email = "user@quivr.app";
-    const { result } = renderHook(() =>
-      useMagicLinkLogin({
-        email,
-        setEmail,
-      })
-    );
+    const { result } = renderHook(() => useMagicLinkLogin());
     await result.current.handleMagicLinkLogin();
     expect(mockSignInWithOtp).toHaveBeenCalledTimes(1);
     expect(mockSignInWithOtp).toHaveBeenCalledWith({

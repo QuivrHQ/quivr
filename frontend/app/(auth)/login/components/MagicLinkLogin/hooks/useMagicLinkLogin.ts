@@ -1,27 +1,32 @@
-import { useState } from "react";
+import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 
 import { useSupabase } from "@/lib/context/SupabaseProvider";
 import { useToast } from "@/lib/hooks";
 
-type UseMagicLinkLoginProps = {
-  email: string;
-  setEmail: (email: string) => void;
-};
-
-export const useMagicLinkLogin = ({
-  email,
-  setEmail,
-}: UseMagicLinkLoginProps): {
-  handleMagicLinkLogin: () => Promise<void>;
-  isPending: boolean;
-} => {
+// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+export const useMagicLinkLogin = () => {
   const { supabase } = useSupabase();
-  const [isPending, setIsPending] = useState(false);
   const { t } = useTranslation("login");
   const { publish } = useToast();
 
-  const handleMagicLinkLogin = async () => {
+  const {
+    register,
+    watch,
+    setValue,
+    formState: { isSubmitSuccessful, isSubmitting },
+    handleSubmit,
+    reset,
+  } = useForm<{ email: string }>({
+    defaultValues: {
+      email: "",
+    },
+  });
+
+  const email = watch("email");
+
+  const handleMagicLinkLogin = handleSubmit(async (_, ev) => {
+    ev?.preventDefault();
     if (email === "") {
       publish({
         variant: "danger",
@@ -30,8 +35,6 @@ export const useMagicLinkLogin = ({
 
       return;
     }
-
-    setIsPending(true);
 
     const { error } = await supabase.auth.signInWithOtp({
       email,
@@ -45,16 +48,19 @@ export const useMagicLinkLogin = ({
         variant: "danger",
         text: error.message,
       });
-    } else {
-      publish({
-        variant: "success",
-        text: "Magic link sent successfully if email recognized",
-      });
 
-      setEmail("");
+      throw error; // this error is caught by react-hook-form
     }
-    setIsPending(false);
-  };
 
-  return { handleMagicLinkLogin, isPending };
+    setValue("email", "");
+  });
+
+  return {
+    handleMagicLinkLogin,
+    isSubmitting,
+    register,
+    handleSubmit,
+    isSubmitSuccessful,
+    reset,
+  };
 };

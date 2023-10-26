@@ -1,8 +1,15 @@
 {
-"googleLogin": "Continuar com o Google",
-"magicLink": "Continuar com o e-mail",
-"errorMailMissed": "Por favor, insira seu endereço de e-mail",
-"talk_to": "Converse com",
-"restriction_message": "Usuários não pagos têm acesso a uma demonstração gratuita e limitada do Quivr",
-"email":"Email address"
+    "googleLogin": "Continuar com o Google",
+    "magicLink": "Continuar com o e-mail",
+    "errorMailMissed": "Por favor, insira seu endereço de e-mail",
+    "talk_to": "Converse com",
+    "restriction_message": "Usuários não pagos têm acesso a uma demonstração gratuita e limitada do Quivr",
+    "email":"Email address",
+    "cant_find":"Não consegue encontrar?", 
+    "try_again":"Tente novamente", 
+    "check_your_email":{ 
+        "part1":"Acabamos de enviar um ", 
+        "magic_link":"link mágico", 
+        "part2":" para você, verifique seus emails e siga as instruções."
+    }
 }
