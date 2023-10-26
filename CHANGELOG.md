@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.0.98 (2023-10-26)
+
+## What's Changed
+* feat: upgrade button in user settings by @matthieujacq in https://github.com/StanGirard/quivr/pull/1484
+* fix: failing build (removed avatar alt prop) by @matthieujacq in https://github.com/StanGirard/quivr/pull/1487
+* Fixed license link in intro.md by @Eric013 in https://github.com/StanGirard/quivr/pull/1486
+* feat: manage plan by @matthieujacq in https://github.com/StanGirard/quivr/pull/1488
+* feat: remove feature flags for homepage by @matthieujacq in https://github.com/StanGirard/quivr/pull/1493
+* feat: add new signin/login page by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1492
+
+## New Contributors
+* @Eric013 made their first contribution in https://github.com/StanGirard/quivr/pull/1486
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.97...v0.0.98
+
 ## 0.0.97 (2023-10-24)
 
 ## What's Changed
