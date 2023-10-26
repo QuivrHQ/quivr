@@ -1,4 +1,3 @@
-import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
 
@@ -9,7 +8,6 @@ import { Onboarding } from "../types/Onboarding";
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const useOnboarding = () => {
-  const isOnboardingFeatureActivated = useFeatureIsOn("onboarding");
   const { getOnboarding } = useOnboardingApi();
   const params = useParams();
   const { updateOnboarding } = useOnboardingApi();
@@ -38,13 +36,10 @@ export const useOnboarding = () => {
     await queryClient.invalidateQueries({ queryKey: [ONBOARDING_DATA_KEY] });
   };
 
-  const shouldDisplayWelcomeChat =
-    isOnboardingFeatureActivated && onboarding.onboarding_a;
+  const shouldDisplayWelcomeChat = onboarding.onboarding_a;
 
   const shouldDisplayOnboardingAInstructions =
-    isOnboardingFeatureActivated &&
-    chatId === undefined &&
-    shouldDisplayWelcomeChat;
+    chatId === undefined && shouldDisplayWelcomeChat;
 
   return {
     onboarding,

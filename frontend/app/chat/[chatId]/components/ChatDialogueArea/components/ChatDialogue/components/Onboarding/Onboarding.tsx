@@ -1,6 +1,4 @@
-import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import Link from "next/link";
-import { Fragment } from "react";
 import { useTranslation } from "react-i18next";
 import { RiDownloadLine } from "react-icons/ri";
 
@@ -18,8 +16,6 @@ export const Onboarding = (): JSX.Element => {
   const step1Details = t("onboarding.step_1_2");
   const step2 = t("onboarding.step_2");
   const step3 = t("onboarding.step_3");
-
-  const shouldStepBeDisplayed = useFeatureIsOn("onboarding");
 
   const { trackOnboardingEvent } = useOnboardingTracker();
 
@@ -48,10 +44,6 @@ export const Onboarding = (): JSX.Element => {
     text: step3,
     enabled: isStep2Done,
   });
-
-  if (!shouldStepBeDisplayed) {
-    return <Fragment />;
-  }
 
   return (
     <div className="flex flex-col gap-2 mb-3">
