@@ -1,3 +1,4 @@
+from llm.qa_base import QABaseBrainPicking
 from routes.authorizations.brain_authorization import validate_brain_authorization
 from routes.authorizations.types import RoleEnum
 from routes.chat.interface import ChatInterface
@@ -11,3 +12,25 @@ class BrainfulChat(ChatInterface):
                 user_id=user_id,
                 required_roles=[RoleEnum.Viewer, RoleEnum.Editor, RoleEnum.Owner],
             )
+
+    def get_answer_generator(
+        self,
+        brain_id,
+        chat_id,
+        model,
+        max_tokens,
+        temperature,
+        user_openai_api_key,
+        streaming,
+        prompt_id,
+    ):
+        return QABaseBrainPicking(
+            chat_id=chat_id,
+            model=model,
+            max_tokens=max_tokens,
+            temperature=temperature,
+            brain_id=brain_id,
+            user_openai_api_key=user_openai_api_key,
+            streaming=streaming,
+            prompt_id=prompt_id,
+        )

@@ -185,7 +185,7 @@ async def create_question_handler(
         is_model_ok = (brain_details or chat_question).model in userSettings.get("models", ["gpt-3.5-turbo"])  # type: ignore
         gpt_answer_generator: HeadlessQA | QABaseBrainPicking
         if brain_id:
-            gpt_answer_generator = QABaseBrainPicking(
+            gpt_answer_generator = chat_instance.get_answer_generator(
                 chat_id=str(chat_id),
                 model=chat_question.model if is_model_ok else "gpt-3.5-turbo",  # type: ignore
                 max_tokens=chat_question.max_tokens,
@@ -195,7 +195,7 @@ async def create_question_handler(
                 prompt_id=chat_question.prompt_id,
             )
         else:
-            gpt_answer_generator = HeadlessQA(
+            gpt_answer_generator = chat_instance.get_answer_generator(
                 model=chat_question.model if is_model_ok else "gpt-3.5-turbo",  # type: ignore
                 temperature=chat_question.temperature,
                 max_tokens=chat_question.max_tokens,
@@ -283,25 +283,26 @@ async def create_stream_question_handler(
         is_model_ok = (brain_details or chat_question).model in userSettings.get("models", ["gpt-3.5-turbo"])  # type: ignore
 
         if brain_id:
-            gpt_answer_generator = QABaseBrainPicking(
+            gpt_answer_generator = chat_instance.get_answer_generator(
                 chat_id=str(chat_id),
                 model=(brain_details or chat_question).model if is_model_ok else "gpt-3.5-turbo",  # type: ignore
                 max_tokens=(brain_details or chat_question).max_tokens,  # type: ignore
                 temperature=(brain_details or chat_question).temperature,  # type: ignore
-                brain_id=str(brain_id),
                 user_openai_api_key=current_user.openai_api_key,  # pyright: ignore reportPrivateUsage=none
                 streaming=True,
                 prompt_id=chat_question.prompt_id,
+                brain_id=str(brain_id),
             )
         else:
-            gpt_answer_generator = HeadlessQA(
-                model=chat_question.model if is_model_ok else "gpt-3.5-turbo",  # type: ignore
-                temperature=chat_question.temperature,
-                max_tokens=chat_question.max_tokens,
-                user_openai_api_key=current_user.openai_api_key,  # pyright: ignore reportPrivateUsage=none
+            gpt_answer_generator = chat_instance.get_answer_generator(
                 chat_id=str(chat_id),
+                model=chat_question.model if is_model_ok else "gpt-3.5-turbo",  # type: ignore
+                max_tokens=chat_question.max_tokens,
+                temperature=chat_question.temperature,
+                user_openai_api_key=current_user.openai_api_key,  # pyright: ignore reportPrivateUsage=none
                 streaming=True,
                 prompt_id=chat_question.prompt_id,
+                brain_id=str(brain_id),
             )
 
         print("streaming")
