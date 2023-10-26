@@ -260,7 +260,6 @@ async def create_stream_question_handler(
         gpt_answer_generator: HeadlessQA | QABaseBrainPicking
         # TODO check if model is in the list of models available for the user
 
-        print(userSettings.get("models", ["gpt-3.5-turbo"]))  # type: ignore
         is_model_ok = (brain_details or chat_question).model in userSettings.get("models", ["gpt-3.5-turbo"])  # type: ignore
 
         gpt_answer_generator = chat_instance.get_answer_generator(
@@ -274,7 +273,6 @@ async def create_stream_question_handler(
             brain_id=str(brain_id),
         )
 
-        print("streaming")
         return StreamingResponse(
             gpt_answer_generator.generate_stream(chat_id, chat_question),
             media_type="text/event-stream",
