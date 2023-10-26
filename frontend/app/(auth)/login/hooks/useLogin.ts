@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
 import { useSupabase } from "@/lib/context/SupabaseProvider";
 import { redirectToPreviousPageOrChatPage } from "@/lib/helpers/redirectToPreviousPageOrChatPage";
@@ -6,8 +6,6 @@ import { useEventTracking } from "@/services/analytics/june/useEventTracking";
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const useLogin = () => {
-  const [email, setEmail] = useState("");
-
   const { session } = useSupabase();
 
   const { track } = useEventTracking();
@@ -18,9 +16,4 @@ export const useLogin = () => {
       redirectToPreviousPageOrChatPage();
     }
   }, [session?.user]);
-
-  return {
-    setEmail,
-    email,
-  };
 };

@@ -1,14 +1,12 @@
-import React from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { LuChevronRight } from "react-icons/lu";
 
 import Button from "@/lib/components/ui/Button";
 import Spinner from "@/lib/components/ui/Spinner";
+import { emailPattern } from "@/lib/config/patterns";
 
 import { usePostContactSales } from "../hooks/usePostContactSales";
-
-const emailPattern = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
 
 export const ContactForm = (): JSX.Element => {
   const { t } = useTranslation("contact", { keyPrefix: "form" });

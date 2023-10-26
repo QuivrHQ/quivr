@@ -5,14 +5,14 @@ import { useTranslation } from "react-i18next";
 
 import { QuivrLogo } from "@/lib/assets/QuivrLogo";
 import { Divider } from "@/lib/components/ui/Divider";
-import Field from "@/lib/components/ui/Field";
 
 import { GoogleLoginButton } from "./components/GoogleLogin";
 import { MagicLinkLogin } from "./components/MagicLinkLogin";
 import { useLogin } from "./hooks/useLogin";
 
 const Main = (): JSX.Element => {
-  const { setEmail, email } = useLogin();
+  useLogin();
+
   const { t } = useTranslation(["translation", "login"]);
 
   return (
@@ -27,16 +27,7 @@ const Main = (): JSX.Element => {
             <span className="text-primary">Quivr</span>
           </p>
           <div className="mt-5 flex flex-col">
-            <Field
-              name="email"
-              type="email"
-              placeholder={t("email")}
-              onChange={(e) => setEmail(e.target.value)}
-              value={email}
-              label="Email"
-              inputClassName="py-1 mt-1 mb-3"
-            />
-            <MagicLinkLogin email={email} setEmail={setEmail} />
+            <MagicLinkLogin />
             <Divider text={t("or")} className="my-3 uppercase" />
             <GoogleLoginButton />
           </div>
