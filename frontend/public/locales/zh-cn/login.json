@@ -1,15 +1,8 @@
 {
-    "title": "登录",
-    "subtitle": "欢迎回来",
-    "signup": "没有账户吗？注册",
-    "forgottenPassword": "忘记密码",
-    "googleLogin": "使用Google登录",
-    "magicLink": "Send Magic Link",
-    "loginSuccess": "登录成功",
-    "errorMailMissed": "请输入您的电子邮件地址",
-    "recoveryMailSended": "如果电子邮件被识别，将发送恢复邮件",
-    "Invalidlogincredentials": "无效的登录凭据",
-    "password.updated": "密码更新成功!",
-    "new_password": "新密码",
-    "Failedtofetch": "获取数据失败"
+"googleLogin": "使用Google继续",
+"magicLink": "使用电子邮件继续",
+"errorMailMissed": "请输入您的电子邮件地址",
+"talk_to": "与之交谈",
+"restriction_message": "未付费用户可以访问 Quivr 的免费和有限演示",
+"email":"电子邮件地址"
 }

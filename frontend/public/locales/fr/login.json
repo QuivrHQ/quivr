@@ -1,15 +1,8 @@
 {
-    "title": "Connexion",
-    "subtitle": "Bienvenue",
-    "signup": "Vous n'avez pas de compte ? Inscrivez-vous",
-    "forgottenPassword": "Mot de passe oublié",
-    "googleLogin": "Connexion avec Google",
-    "magicLink": "Envoyer le lien magique",
-    "loginSuccess": "Connexion réussie",
-    "errorMailMissed": "Veuillez entrer votre adresse e-mail",
-    "recoveryMailSended": "Un mail de récupération sera envoyé si l'email est reconnu",
-    "Invalidlogincredentials": "Identifiants de connexion invalides",
-    "password.updated": "Mot de passe mis à jour avec succès !",
-    "new_password": "Nouveau mot de passe",
-    "Failedtofetch": "Échec de la récupération"
+"googleLogin": "Continuer avec Google",
+"magicLink": "Continuer avec e-mail",
+"errorMailMissed": "Veuillez saisir votre adresse e-mail",
+"talk_to": "Parler à",
+"restriction_message": "Les utilisateurs non payants ont accès à une démonstration gratuite et limitée de Quivr",
+"email":"Adresse e-mail"
 }

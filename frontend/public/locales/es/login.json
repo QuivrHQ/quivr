@@ -1,15 +1,8 @@
 {
-    "errorMailMissed": "Por favor ingresa tu dirección de email",
-    "Failedtofetch": "Error al obtener datos",
-    "forgottenPassword": "Olvidé mi contraseña",
-    "googleLogin": "Iniciar con Google",
-    "Invalidlogincredentials": "Credenciales inválidas",
-    "loginSuccess": "Sesión iniciada correctamente",
-    "magicLink": "Enviar Enlace Mágico",
-    "new_password": "Nueva contraseña",
-    "password.updated": "¡Contraseña actualizada!",
-    "recoveryMailSended": "El correo de recuperación será enviado si el email es reconocido",
-    "signup": "¿No tienes una cuenta? Registrate aquí",
-    "subtitle": "Un gusto tenerte de vuelta",
-    "title": "Iniciar sesión"
+"googleLogin": "Continuar con Google",
+"magicLink": "Continuar con correo electrónico",
+"errorMailMissed": "Por favor, ingrese su dirección de correo electrónico",
+"talk_to": "Hablar con",
+"restriction_message": "Los usuarios no pagos tienen acceso a una demostración gratuita y limitada de Quivr",
+"email":"Dirección de correo electrónico"
 }

@@ -21,11 +21,11 @@ export const FooterSection = (): JSX.Element => {
       </p>
       <div className="flex items-center justify-center gap-5 flex-wrap">
         <Link
-          href="/signup"
+          href="/login"
           onClick={(event) => {
             onLinkClick({
-              href: "/signup",
-              label: "SIGN_UP",
+              href: "/login",
+              label: "SIGN_IN",
               event,
             });
           }}

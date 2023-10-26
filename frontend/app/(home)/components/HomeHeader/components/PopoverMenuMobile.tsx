@@ -1,9 +1,8 @@
 import * as Popover from "@radix-ui/react-popover";
 import { LuMenu, LuX } from "react-icons/lu";
 
+import { QuivrLogo } from "@/lib/assets/QuivrLogo";
 import { cn } from "@/lib/utils";
-
-import { QuivrLogo } from "./QuivrLogo";
 
 type PopoverMenuMobileProps = {
   navLinks: JSX.Element[];

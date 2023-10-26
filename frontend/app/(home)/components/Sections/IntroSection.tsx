@@ -26,11 +26,11 @@ export const IntroSection = (): JSX.Element => {
           </div>
           <div className="flex flex-col items-start sm:flex-row sm:items-center gap-5">
             <Link
-              href="/signup"
+              href="/login"
               onClick={(event) =>
                 onLinkClick({
-                  href: "/signup",
-                  label: "SIGN_UP",
+                  href: "/login",
+                  label: "SIGN_IN",
                   event,
                 })
               }

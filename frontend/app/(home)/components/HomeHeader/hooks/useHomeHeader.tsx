@@ -33,7 +33,7 @@ export const useHomeHeader = ({ color }: UseHomeHeaderProps) => {
       rightIcon: null,
     },
     { href: "/blog", label: t("blog"), rightIcon: null, newTab: true },
-    { href: "/signup", label: t("sign_up") },
+    { href: "/login", label: t("sign_up") },
     { href: "/login", label: t("sign_in") },
   ];
 

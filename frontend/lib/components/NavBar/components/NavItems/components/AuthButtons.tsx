@@ -8,7 +8,7 @@ export const AuthButtons = (): JSX.Element => {
   const pathname = usePathname();
   const { t } = useTranslation();
 
-  if (pathname === "/signup") {
+  if (pathname === "/login") {
     return (
       <Link href={"/login"}>
         <Button variant={"secondary"}>{t("loginButton")}</Button>
@@ -17,7 +17,7 @@ export const AuthButtons = (): JSX.Element => {
   }
   if (pathname === "/login") {
     return (
-      <Link href={"/signup"}>
+      <Link href={"/login"}>
         <Button variant={"secondary"}>{t("signUpButton")}</Button>
       </Link>
     );

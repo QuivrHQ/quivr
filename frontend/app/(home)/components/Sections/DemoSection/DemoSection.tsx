@@ -31,11 +31,11 @@ export const DemoSection = (): JSX.Element => {
         )}
       </div>
       <Link
-        href="/signup"
+        href="/login"
         onClick={(event) => {
           onLinkClick({
-            href: "/signup",
-            label: "SIGN_UP",
+            href: "/login",
+            label: "SIGN_IN",
             event,
           });
         }}
