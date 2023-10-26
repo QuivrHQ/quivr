@@ -42,7 +42,7 @@ export const HomeSection = ({
       </section>
       {gradient !== undefined ? (
         <div
-          className={`absolute w-screen bottom-[calc(100vw*tan(6deg))] left-0 h-[30%] ${gradient}`}
+          className={`absolute w-screen bottom-[calc(100vw*tan(6deg)-1px)] left-0 h-[30%] ${gradient}`}
         />
       ) : null}
     </div>
