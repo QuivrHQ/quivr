@@ -25,7 +25,7 @@ export const ChatInput = ({
 
   return (
     <>
-      {<OnboardingQuestions />}
+      <OnboardingQuestions />
       <div className="flex mt-1 flex-col w-full shadow-md dark:shadow-primary/25 hover:shadow-xl transition-shadow rounded-xl bg-white dark:bg-black border border-black/10 dark:border-white/25 p-2">
         <form
           data-testid="chat-input-form"
