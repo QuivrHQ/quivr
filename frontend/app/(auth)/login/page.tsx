@@ -30,7 +30,7 @@ const Main = (): JSX.Element => {
             <Field
               name="email"
               type="email"
-              placeholder={"Email address"}
+              placeholder={t("email")}
               onChange={(e) => setEmail(e.target.value)}
               value={email}
               label="Email"

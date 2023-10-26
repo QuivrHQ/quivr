@@ -3,5 +3,6 @@
 "magicLink": "Continuar con correo electrónico",
 "errorMailMissed": "Por favor, ingrese su dirección de correo electrónico",
 "talk_to": "Hablar con",
-"restriction_message": "Los usuarios no pagos tienen acceso a una demostración gratuita y limitada de Quivr"
+"restriction_message": "Los usuarios no pagos tienen acceso a una demostración gratuita y limitada de Quivr",
+"email":"Dirección de correo electrónico"
 }
