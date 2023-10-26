@@ -17,7 +17,6 @@ from models import (
     get_supabase_db,
 )
 from models.databases.supabase.chats import QuestionAndAnswer
-from repository.brain import get_brain_details
 from repository.chat import (
     ChatUpdatableProperties,
     CreateChatProperties,
@@ -33,7 +32,6 @@ from repository.chat.get_chat_history_with_notifications import (
     get_chat_history_with_notifications,
 )
 from repository.notification.remove_chat_notifications import remove_chat_notifications
-from repository.user_identity import get_user_identity
 from routes.chat.factory import get_chat_strategy
 from routes.chat.utils import (
     NullableUUID,
@@ -154,17 +152,10 @@ async def create_question_handler(
     userSettings = userDailyUsage.get_user_settings()
     is_model_ok = (brain_details or chat_question).model in userSettings.get("models", ["gpt-3.5-turbo"])  # type: ignore
 
-    if not current_user.openai_api_key and brain_id:
-        brain_details = get_brain_details(brain_id)
-        if brain_details:
-            current_user.openai_api_key = brain_details.openai_api_key
-
     if not current_user.openai_api_key:
-        user_identity = get_user_identity(current_user.id)
-
-        if user_identity is not None:
-            current_user.openai_api_key = user_identity.openai_api_key
-
+        current_user.openai_api_key = chat_instance.get_openai_api_key(
+            brain_id=brain_id, user_id=current_user.id
+        )
     # Retrieve chat model (temperature, max_tokens, model)
     if (
         not chat_question.model
@@ -232,16 +223,11 @@ async def create_stream_question_handler(
     )
 
     userSettings = userDailyUsage.get_user_settings()
-    if not current_user.openai_api_key and brain_id:
-        brain_details = get_brain_details(brain_id)
-        if brain_details:
-            current_user.openai_api_key = brain_details.openai_api_key
 
     if not current_user.openai_api_key:
-        user_identity = get_user_identity(current_user.id)
-
-        if user_identity is not None:
-            current_user.openai_api_key = user_identity.openai_api_key
+        current_user.openai_api_key = chat_instance.get_openai_api_key(
+            brain_id=brain_id, user_id=current_user.id
+        )
 
     # Retrieve chat model (temperature, max_tokens, model)
     if (
