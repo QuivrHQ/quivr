@@ -18,7 +18,7 @@ Quivr, your second brain, utilizes the power of GenerativeAI to store and retrie
 - **Generative AI**: Quivr employs advanced AI to assist you in generating and retrieving information.
 - **Fast and Efficient**: Designed with speed and efficiency at its core. Quivr ensures rapid access to your data.
 - **Secure**: Your data, your control. Always.
-- **OS Compatible**: Ubuntu 22 or upper.
+- **OS Compatible**: Ubuntu 22 or newer.
 - **File Compatibility**:
   - Text
   - Markdown
@@ -108,14 +108,14 @@ Additionally, you'll need a [Supabase](https://supabase.com/) account for:
 
   > _Your `supabase_service_key` can be found in your Supabase dashboard under Project Settings -> API. Use the `anon` `public` key found in the `Project API keys` section._
 
-  > _Your `JWT_SECRET_KEY`can be found in your supabase settings under Project Settings -> API -> JWT Settings -> JWT Secret_
+  > _Your `JWT_SECRET_KEY` can be found in your supabase settings under Project Settings -> API -> JWT Settings -> JWT Secret_
 
   > _The `NEXT_PUBLIC_BACKEND_URL` is set to localhost:5050 for the docker. Update it if you are running the backend on a different machine._
 
   > _To activate vertexAI with PaLM from GCP follow the instructions [here](https://python.langchain.com/en/latest/modules/models/llms/integrations/google_vertex_ai_palm.html) and update `backend/.env`- It is an advanced feature, please be expert in GCP before trying to use it_
 
-  - [ ] Change variables in `backend/.env`
-  - [ ] Change variables in `frontend/.env`
+  - Change variables in `backend/.env`
+  - Change variables in `frontend/.env`
 
 - **Step 4**: Use the `migration.sh` script to run the migration scripts
 
