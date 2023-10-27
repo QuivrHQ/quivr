@@ -18,7 +18,7 @@ Quivr, your second brain, utilizes the power of GenerativeAI to store and retrie
 - **Generative AI**: Quivr employs advanced AI to assist you in generating and retrieving information.
 - **Fast and Efficient**: Designed with speed and efficiency at its core. Quivr ensures rapid access to your data.
 - **Secure**: Your data, your control. Always.
-- **OS Compatible**: Ubuntu 22 or upper.
+- **OS Compatible**: Ubuntu 22 or newer.
 - **File Compatibility**:
   - Text
   - Markdown
@@ -114,8 +114,8 @@ Additionally, you'll need a [Supabase](https://supabase.com/) account for:
 
   > _To activate vertexAI with PaLM from GCP follow the instructions [here](https://python.langchain.com/en/latest/modules/models/llms/integrations/google_vertex_ai_palm.html) and update `backend/.env`- It is an advanced feature, please be expert in GCP before trying to use it_
 
-      - Change variables in `backend/.env`
-      - Change variables in `frontend/.env`
+  - Change variables in `backend/.env`
+  - Change variables in `frontend/.env`
 
 - **Step 4**: Use the `migration.sh` script to run the migration scripts
 
