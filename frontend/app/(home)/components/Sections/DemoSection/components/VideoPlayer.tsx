@@ -14,10 +14,11 @@ export const VideoPlayer = ({ videoSrc }: VideoPlayerProps): JSX.Element => {
       if (!videoElement) {
         return;
       }
-
       const videoRect = videoElement.getBoundingClientRect();
       const isVideoVisible =
-        videoRect.top >= 0 && videoRect.bottom <= window.innerHeight;
+        videoRect.top >= 0 &&
+        videoRect.bottom <= window.innerHeight &&
+        videoElement.checkVisibility();
 
       if (isVideoVisible && videoElement.paused) {
         void videoElement.play();
