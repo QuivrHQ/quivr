@@ -4,9 +4,13 @@ import { useTranslation } from "react-i18next";
 
 import Button from "@/lib/components/ui/Button";
 
-import { BrainTabTrigger, KnowledgeTab, PeopleTab } from "./components";
+import {
+  BrainTabTrigger,
+  KnowledgeTab,
+  PeopleTab,
+  SettingsTab,
+} from "./components";
 import { DeleteOrUnsubscribeConfirmationModal } from "./components/Modals/DeleteOrUnsubscribeConfirmationModal";
-import { SettingsTab } from "./components/SettingsTab/SettingsTab";
 import { useBrainManagementTabs } from "./hooks/useBrainManagementTabs";
 
 export const BrainManagementTabs = (): JSX.Element => {
