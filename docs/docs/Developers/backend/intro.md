@@ -31,5 +31,5 @@ Authorization: Bearer {api_key}
 
 Replace `{api_key}` with the generated API key obtained from the frontend
 
-You can find more information in the [Authentication](/docs/backend/api/getting_started) section of the documentation.
+You can find more information in the [Authentication](/docs/Developers/backend/api/getting_started) section of the documentation.
 
