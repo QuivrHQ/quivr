@@ -1,5 +1,7 @@
 import os
 
+from utils import handle_request_validation_error
+
 if __name__ == "__main__":
     # import needed here when running main.py to debug backend
     # you will need to run pip install python-dotenv
@@ -7,8 +9,7 @@ if __name__ == "__main__":
 
     load_dotenv()
 import sentry_sdk
-from fastapi import FastAPI, HTTPException, Request, status
-from fastapi.exceptions import RequestValidationError
+from fastapi import FastAPI, HTTPException
 from fastapi.responses import JSONResponse
 from logger import get_logger
 from middlewares.cors import add_cors_middleware
@@ -38,24 +39,6 @@ async def http_exception_handler(_, exc):
         status_code=exc.status_code,
         content={"detail": exc.detail},
     )
-
-
-# log more details about validation errors (422)
-def handle_request_validation_error(app: FastAPI):
-    @app.exception_handler(RequestValidationError)
-    async def validation_exception_handler(
-        request: Request, exc: RequestValidationError
-    ):
-        exc_str = f"{exc}".replace("\n", " ").replace("   ", " ")
-        logger.error(request, exc_str)
-        content = {
-            "status_code": status.HTTP_422_UNPROCESSABLE_ENTITY,
-            "message": exc_str,
-            "data": None,
-        }
-        return JSONResponse(
-            content=content, status_code=status.HTTP_422_UNPROCESSABLE_ENTITY
-        )
 
 
 handle_request_validation_error(app)

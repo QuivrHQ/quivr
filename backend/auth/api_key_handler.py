@@ -20,7 +20,6 @@ async def verify_api_key(
                 result.data[0]["creation_time"], "%Y-%m-%dT%H:%M:%S"
             ).date()
 
-            # Check if the API key was created in the month of the current date
             if (api_key_creation_date.month == current_date.month) and (
                 api_key_creation_date.year == current_date.year
             ):
@@ -35,7 +34,6 @@ async def get_user_from_api_key(
 ) -> UserIdentity:
     supabase_db = get_supabase_db()
 
-    # Lookup the user_id from the api_keys table
     user_id_data = supabase_db.get_user_id_by_api_key(api_key)
 
     if not user_id_data.data:
@@ -43,7 +41,6 @@ async def get_user_from_api_key(
 
     user_id = user_id_data.data[0]["user_id"]
 
-    # Lookup the email from the users table. Todo: remove and use user_id for credentials
     email = supabase_db.get_user_email(user_id)
 
     return UserIdentity(email=email, id=user_id)
