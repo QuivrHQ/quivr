@@ -9,7 +9,7 @@ import { PublicBrain } from "@/lib/context/BrainProvider/types";
 export const useBrainsLibrary = () => {
   const [searchBarText, setSearchBarText] = useState("");
   const { getPublicBrains } = useBrainApi();
-  const { data: publicBrains = [] } = useQuery({
+  const { data: publicBrains = [], isLoading } = useQuery({
     queryKey: [PUBLIC_BRAINS_KEY],
     queryFn: getPublicBrains,
   });
@@ -39,5 +39,6 @@ export const useBrainsLibrary = () => {
     displayingPublicBrains,
     searchBarText,
     setSearchBarText,
+    isLoading,
   };
 };

@@ -1,7 +1,12 @@
 import { FaSpinner } from "react-icons/fa";
 
-const Spinner = (): JSX.Element => {
-  return <FaSpinner className="animate-spin m-5" />;
+import { cn } from "@/lib/utils";
+
+type SpinnerProps = {
+  className?: string;
+};
+const Spinner = ({ className }: SpinnerProps): JSX.Element => {
+  return <FaSpinner className={cn("animate-spin m-5", className)} />;
 };
 
 export default Spinner;
