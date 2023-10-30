@@ -3,12 +3,13 @@
 import { useTranslation } from "react-i18next";
 
 import Field from "@/lib/components/ui/Field";
+import Spinner from "@/lib/components/ui/Spinner";
 
 import { PublicBrainItem } from "./components/PublicBrainItem/PublicBrainItem";
 import { useBrainsLibrary } from "./hooks/useBrainsLibrary";
 
 const BrainsLibrary = (): JSX.Element => {
-  const { displayingPublicBrains, searchBarText, setSearchBarText } =
+  const { displayingPublicBrains, searchBarText, setSearchBarText, isLoading } =
     useBrainsLibrary();
   const { t } = useTranslation("brain");
 
@@ -23,6 +24,11 @@ const BrainsLibrary = (): JSX.Element => {
           placeholder={t("public_brains_search_bar_placeholder")}
         />
       </div>
+      {isLoading && (
+        <div className="flex justify-center items-center flex-1">
+          <Spinner className="text-4xl" />
+        </div>
+      )}
 
       <div className="flex flex-wrap justify-stretch w-full">
         {displayingPublicBrains.map((brain) => (

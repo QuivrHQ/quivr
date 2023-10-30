@@ -10,6 +10,7 @@ import { redirectToLogin } from "@/lib/router/redirectToLogin";
 import { StripePricingOrManageButton, UserStatistics } from "./components";
 import { ApiKeyConfig } from "./components/ApiKeyConfig";
 import LanguageSelect from "./components/LanguageDropDown/LanguageSelect";
+import { LogoutModal } from "./components/LogoutCard/LogoutModal";
 import ThemeSelect from "./components/ThemeSelect/ThemeSelect";
 
 const UserPage = (): JSX.Element => {
@@ -42,11 +43,8 @@ const UserPage = (): JSX.Element => {
               <p>
                 <strong>{t("email")}:</strong> <span>{user.email}</span>
               </p>
-              <Link href={"/logout"}>
-                <Button className="px-3 py-2" variant="secondary">
-                  {t("logoutButton")}
-                </Button>
-              </Link>
+
+              <LogoutModal />
             </div>
             <StripePricingOrManageButton />
           </CardBody>
