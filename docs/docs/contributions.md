@@ -1,21 +1,31 @@
+---
+sidebar_position: 4
+title: 🆘 Contributing
+---
 # Contributing to Quivr
 
 Thanks for your interest in contributing to Quivr! Here you'll find guidelines for contributing and steps on how you can contribute.
 
 ## Table of Contents
 
-- [Community](#community)
-- [Roadmap](#roadmap-and-issues)
-- [How to Contribute](#how-to-contribute)
-  - [Reporting Bugs](#reporting-bugs)
-  - [Feature Requests](#feature-requests)
-  - [Code Contributions](#code-contributions)
-- [Submission Guidelines](#submission-guidelines)
-- [Coding Rules](#coding-rules)
-  - [Frontend Guidelines](#frontend-guidelines)
-  - [Backend Guidelines](#backend-guidelines)
-- [Making a Pull Request](#making-a-pull-request)
-- [Contact](#contact)
+- [Contributing to Quivr](#contributing-to-quivr)
+  - [Table of Contents](#table-of-contents)
+  - [Community](#community)
+  - [Roadmap and Issues](#roadmap-and-issues)
+  - [How to Contribute](#how-to-contribute)
+    - [Reporting Bugs](#reporting-bugs)
+    - [Feature Requests](#feature-requests)
+    - [Code Contributions](#code-contributions)
+  - [Submission Guidelines](#submission-guidelines)
+  - [Coding Rules](#coding-rules)
+    - [Frontend Guidelines](#frontend-guidelines)
+      - [Coding Conventions](#coding-conventions)
+      - [Testing](#testing)
+    - [Backend Guidelines](#backend-guidelines)
+      - [Coding Conventions](#coding-conventions-1)
+      - [Testing](#testing-1)
+  - [Making a Pull Request](#making-a-pull-request)
+  - [Contact](#contact)
 
 ## Community
 

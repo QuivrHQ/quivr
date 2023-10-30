@@ -4,7 +4,7 @@ sidebar_position: 1
 
 # Introduction to Chains
 
-Quivr uses a framework called [Langchain](https://python.langchain.com/docs/get_started/introduction.html) for the majority of the interaction with the Large Language Models (LLMs).
+Quivr uses a framework called [Langchain](https://python.langchain.com/docs/introduction.html) for the majority of the interaction with the Large Language Models (LLMs).
 
 Langchain provides functionality to connect multiple components such as LLMs, document retrievers, and other components together to form a "chain" of components.
 
