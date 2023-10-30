@@ -1,33 +1,18 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
 
 import { KnowledgeToFeedInput } from "@/lib/components/KnowledgeToFeedInput";
-import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 
-import { useFeedBrain } from "./hooks/useFeedBrain";
-import { useKnowledge } from "./hooks/useKnowledge";
+import { useAddKnowledge } from "./hooks/useAddKnowledge";
 
 export const AddKnowledge = (): JSX.Element => {
-  const [shouldDisplayModal, setShouldDisplayModal] = useState(false);
-  const { currentBrain } = useBrainContext();
-  const { invalidateKnowledgeDataKey } = useKnowledge({
-    brainId: currentBrain?.id,
-  });
-
-  const { feedBrain, hasPendingRequests, setHasPendingRequests } = useFeedBrain(
-    {
-      dispatchHasPendingRequests: () => setHasPendingRequests(true),
-      closeFeedInput: () => setShouldDisplayModal(false),
-    }
-  );
-
-  useEffect(() => {
-    if (!hasPendingRequests) {
-      invalidateKnowledgeDataKey();
-    }
-  }, [hasPendingRequests, invalidateKnowledgeDataKey]);
+  const {
+    setShouldDisplayModal,
+    shouldDisplayModal,
+    hasPendingRequests,
+    feedBrain,
+  } = useAddKnowledge();
 
   return (
     <>

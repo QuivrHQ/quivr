@@ -6,7 +6,7 @@ import { useTranslation } from "react-i18next";
 import Spinner from "@/lib/components/ui/Spinner";
 import { KnowledgeToFeedProvider } from "@/lib/context";
 
-import { AddKnowledge } from "./AddKnowledge";
+import { AddKnowledge } from "./components/AddKnowledge/AddKnowledge";
 import { KnowledgeTable } from "./components/KnowledgeTable";
 import { useKnowledge } from "./hooks/useKnowledge";
 
