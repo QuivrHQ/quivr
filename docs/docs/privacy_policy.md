@@ -1,6 +1,6 @@
 ---
 sidebar_position: 6
-title: Privacy Policy
+title: 👀 Privacy Policy
 ---
 
 ## Privacy Policy for Quivr

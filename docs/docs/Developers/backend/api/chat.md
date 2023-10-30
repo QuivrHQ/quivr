@@ -43,7 +43,7 @@ Users can create multiple chat sessions, each with its own set of chat messages.
    - Description: This endpoint allows adding a new question to a chat. It generates an answer for the question using different models based on the provided model type.
 
    Models like gpt-4-0613 and gpt-3.5-turbo-0613 use a custom OpenAI function-based answer generator.
-   ![Function based answer generator](../../../static/img/answer_schema.png)
+   ![Function based answer generator](../../../../static/img/answer_schema.png)
 
 6. **Get the chat history:**
    - HTTP method: GET
