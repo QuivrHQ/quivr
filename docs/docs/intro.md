@@ -3,32 +3,71 @@ sidebar_position: 1
 title: 🚀 Welcome to Quivr
 ---
 
-# Intro
 
-Quivr, your second brain, utilizes the power of GenerativeAI to store and retrieve unstructured information. Think of it as Obsidian, but turbocharged with AI capabilities.
+## Welcome to Quivr 🧠
 
-## Key Features 🎯
+[Quivr](https://quivr.app) is your **Second Brain** that can acts as your **personal assistant**. 
 
-- **Universal Data Acceptance**: Quivr can handle almost any type of data you throw at it. Text, images, code snippets, we've got you covered.
-- **Generative AI**: Quivr employs advanced AI to assist you in generating and retrieving information.
-- **Fast and Efficient**: Designed with speed and efficiency at its core. Quivr ensures rapid access to your data.
-- **Secure**: Your data, your control. Always.
-- **File Compatibility**:
-  - Text
-  - Markdown
-  - PDF
-  - Powerpoint
-  - Excel
-  - Word
-  - Audio
-  - Video
-- **Open Source**: Freedom is beautiful, so is Quivr. Open source and free to use.
+It can:
+- **Answer questions** to the **files** that you uploaded
+- **Interact** with the **applications** that you connected to Quivr (Soon 🚀)
 
-## Demo Highlights 🎥
+:::info
+**Our goal **is to make Quivr the **best open-source personal assistant** that is powered by your knowledge and your applications 🔥
+It will remain open-source
+:::
 
-### **Demo**:
+## What does it do ? 
 
-<video width="640" height="480" controls>
-  <source src="https://github.com/StanGirard/quivr/assets/19614572/a6463b73-76c7-4bc0-978d-70562dca71f5" type="video/mp4"/>
-  Your browser does not support the video tag.
-</video>
+> A video equals a thousand words
+
+<div style={{ textAlign: 'center' }}>
+  <video width="640" height="480" controls>
+    <source src="https://quivr-cms.s3.eu-west-3.amazonaws.com/singlestore_demo_quivr_232893659c.mp4" type="video/mp4"/>
+    Your browser does not support the video tag.
+  </video>
+</div>
+
+
+## How to get started ? 👀
+
+:::tip
+It takes less than **5 seconds** to get started with Quivr. You can even use your Google account to sign up.
+:::
+
+- Create an account on [Quivr](https://quivr.app)
+- Upload your files
+- Ask questions to Quivr
+  
+
+<div style={{ textAlign: 'center' }}>
+  <img src="/img/homepage.png" alt="Quivr home page" style={{ width: '60%' }} />
+</div>
+
+## How can you leverage Quivr ? 🚀
+
+You can use Quivr to:
+- **Search** information in your files
+- **Cross-search** information from your files
+- **Store** all your knowledge in one place
+- **Share** your knowledge with your team by leveraging the **collaboration** features
+
+## Features 🤗
+
+### Public & Private Brains
+
+You can create **public** and **private** brains.
+
+- **Public** brains are **searchable** by everyone on Quivr
+- **Private** brains are **only searchable** by you
+
+You can share your brains with a set of people by using their emails. This means that you can **collaborate** with your team on a brain without making it public.
+
+### Ask Questions
+
+You can **ask questions** to Quivr. Quivr will **answer** your questions by leveraging the **knowledge** that you uploaded to Quivr.
+
+### Custom Personality 
+
+You can **customize** the personality of Quivr by changing the **prompt** of your brain. You could tell your brain to always answer with a **funny** or **serious** tone or act like a **robot** or a **human**.
+
