@@ -7,7 +7,7 @@ import Spinner from "@/lib/components/ui/Spinner";
 import { KnowledgeToFeedProvider } from "@/lib/context";
 
 import { AddKnowledge } from "./AddKnowledge";
-import { KnowledgeTable } from "./KnowledgeTable";
+import { KnowledgeTable } from "./components/KnowledgeTable";
 import { useKnowledge } from "./hooks/useKnowledge";
 
 type KnowledgeTabProps = {
