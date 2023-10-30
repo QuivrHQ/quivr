@@ -3,6 +3,7 @@ sidebar_position: 1
 title: 🚀 Welcome to Quivr
 ---
 
+
 ## Welcome to Quivr 🧠
 
 [Quivr](https://quivr.app) is your **Second Brain** that can acts as your **personal assistant**. 
@@ -69,11 +70,4 @@ You can **ask questions** to Quivr. Quivr will **answer** your questions by leve
 ### Custom Personality 
 
 You can **customize** the personality of Quivr by changing the **prompt** of your brain. You could tell your brain to always answer with a **funny** or **serious** tone or act like a **robot** or a **human**.
-
-
-
-
-
-
-
 
