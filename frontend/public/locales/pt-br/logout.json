@@ -2,7 +2,7 @@
     "title": "Sair",
     "subtitle": "Até a próxima vez",
     "areYouSure": "Você tem certeza de que deseja sair?",
-    "cancel": "Voltar",
+    "cancel": "Cancelar",
     "error": "Erro ao fazer logout {{errorMessage}}",
     "loggedOut": "Saiu com sucesso"
 }

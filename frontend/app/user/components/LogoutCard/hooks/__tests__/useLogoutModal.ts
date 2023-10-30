@@ -1,7 +1,7 @@
 import { act, renderHook } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
-import { useLogout } from "../useLogout";
+import { useLogoutModal } from "../useLogoutModal";
 
 const mockSignOut = vi.fn(() => ({ error: null }));
 
@@ -28,9 +28,9 @@ Object.defineProperty(window, "localStorage", {
   },
 });
 
-describe("useLogout", () => {
+describe("useLogoutModal", () => {
   it("should call signOut", async () => {
-    const { result } = renderHook(() => useLogout());
+    const { result } = renderHook(() => useLogoutModal());
 
     await act(() => result.current.handleLogout());
 

@@ -7,19 +7,20 @@ import { useToast } from "@/lib/hooks";
 import { useEventTracking } from "@/services/analytics/june/useEventTracking";
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-export const useLogout = () => {
+export const useLogoutModal = () => {
   const { supabase } = useSupabase();
-  const [isPending, setIsPending] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [isLogoutModalOpened, setIsLogoutModalOpened] = useState(false);
   const { track } = useEventTracking();
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { t, i18n } = useTranslation(["translation", "logout"]);
+  const { t } = useTranslation(["translation", "logout"]);
 
   const { publish } = useToast();
   const router = useRouter();
 
   const handleLogout = async () => {
-    setIsPending(true);
+    setIsLoggingOut(true);
     const { error } = await supabase.auth.signOut();
     void track("LOGOUT");
     localStorage.clear();
@@ -37,11 +38,13 @@ export const useLogout = () => {
       });
       router.replace("/");
     }
-    setIsPending(false);
+    setIsLoggingOut(false);
   };
 
   return {
     handleLogout,
-    isPending,
+    isLoggingOut,
+    isLogoutModalOpened,
+    setIsLogoutModalOpened,
   };
 };
