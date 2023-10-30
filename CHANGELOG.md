@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.0.100 (2023-10-30)
+
+## What's Changed
+* refactor: fix bad smells by @gozineb in https://github.com/StanGirard/quivr/pull/1399
+* refactor:  chat_routes  by @gozineb in https://github.com/StanGirard/quivr/pull/1512
+* feat: improve ux by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1522
+* feat(docs): reworked the website by @StanGirard in https://github.com/StanGirard/quivr/pull/1523
+* Feat/docs rework by @StanGirard in https://github.com/StanGirard/quivr/pull/1525
+
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.99...v0.0.100
+
 ## 0.0.99 (2023-10-27)
 
 ## What's Changed
