@@ -1,10 +1,13 @@
 ---
-sidebar_position: 4
-title: 🆘 Contributing
+sidebar_position: 1
+title: 🆘 Guidelines
 ---
+
 # Contributing to Quivr
 
 Thanks for your interest in contributing to Quivr! Here you'll find guidelines for contributing and steps on how you can contribute.
+
+### Repo: [Quivr Github](https://github.com/stanGirard/quivr)
 
 ## Table of Contents
 
