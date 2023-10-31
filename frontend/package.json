@@ -37,7 +37,7 @@
     "@supabase/auth-ui-react": "^0.4.2",
     "@supabase/auth-ui-shared": "^0.1.6",
     "@supabase/supabase-js": "^2.22.0",
-    "@tanstack/react-query": "^4.33.0",
+    "@tanstack/react-query": "^5.4.3",
     "@testing-library/user-event": "^14.5.1",
     "@types/dom-speech-recognition": "^0.0.1",
     "@types/draft-js": "^0.11.12",
