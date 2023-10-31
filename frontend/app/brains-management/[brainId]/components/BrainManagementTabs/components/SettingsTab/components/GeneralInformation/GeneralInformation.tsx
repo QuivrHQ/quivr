@@ -40,7 +40,7 @@ export const GeneralInformation = (
 
   return (
     <>
-      <div className="flex flex-row flex-1 justify-between w-full items-end">
+      <div className="grid grid-cols-1 md:grid-cols-2 justify-between w-full items-end">
         <div>
           <Field
             label={t("brainName", { ns: "brain" })}
@@ -54,29 +54,30 @@ export const GeneralInformation = (
         </div>
 
         <div className="mt-4">
-          <div className="flex flex-1 items-center flex-col">
+          <div className="flex flex-1 items-end flex-col">
             {isPublicBrain && !isOwnedByCurrentUser && (
               <Chip className="mb-3 bg-primary text-white w-full">
                 {t("brain:public_brain_label")}
               </Chip>
             )}
-
-            {isDefaultBrain ? (
-              <div className="border rounded-lg border-dashed border-black dark:border-white bg-white dark:bg-black text-black dark:text-white focus:bg-black dark:focus:bg-white dark dark focus:text-white dark:focus:text-black transition-colors py-2 px-4 shadow-none">
-                {t("defaultBrain", { ns: "brain" })}
-              </div>
-            ) : (
-              hasEditRights && (
-                <Button
-                  variant={"secondary"}
-                  isLoading={isSettingAsDefault}
-                  onClick={() => void setAsDefaultBrainHandler()}
-                  type="button"
-                >
-                  {t("setDefaultBrain", { ns: "brain" })}
-                </Button>
-              )
-            )}
+            <div>
+              {isDefaultBrain ? (
+                <div className="border rounded-lg border-dashed border-black dark:border-white bg-white dark:bg-black text-black dark:text-white focus:bg-black dark:focus:bg-white dark dark focus:text-white dark:focus:text-black transition-colors py-2 px-4 shadow-none">
+                  {t("defaultBrain", { ns: "brain" })}
+                </div>
+              ) : (
+                hasEditRights && (
+                  <Button
+                    variant={"secondary"}
+                    isLoading={isSettingAsDefault}
+                    onClick={() => void setAsDefaultBrainHandler()}
+                    type="button"
+                  >
+                    {t("setDefaultBrain", { ns: "brain" })}
+                  </Button>
+                )
+              )}
+            </div>
           </div>
         </div>
       </div>
