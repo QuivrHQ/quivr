@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.0.101 (2023-10-31)
+
+## What's Changed
+* chore: update tanstack query dep by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1528
+* fix: update mutation pending flag by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1530
+
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.100...v0.0.101
+
 ## 0.0.100 (2023-10-30)
 
 ## What's Changed
