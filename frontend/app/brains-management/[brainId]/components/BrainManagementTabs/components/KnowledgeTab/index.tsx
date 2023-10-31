@@ -12,7 +12,7 @@ type KnowledgeTabProps = {
   brainId: UUID;
 };
 export const KnowledgeTab = ({ brainId }: KnowledgeTabProps): JSX.Element => {
-  const { t } = useTranslation(["translation", "explore"]);
+  const { t } = useTranslation(["translation", "explore", "config"]);
 
   return (
     <KnowledgeToFeedProvider>
@@ -24,9 +24,13 @@ export const KnowledgeTab = ({ brainId }: KnowledgeTabProps): JSX.Element => {
             </h1>
             <h2 className="opacity-50">{t("subtitle", { ns: "explore" })}</h2>
           </div>
-          <Divider text={"Upload"} />
+          <Divider text={t("Upload")} />
           <AddKnowledge />
-          <Divider text={"Sources"} />
+          <Divider
+            text={t("knowledge", {
+              ns: "config",
+            })}
+          />
           <AddedKnowledge brainId={brainId} />
         </section>
       </main>

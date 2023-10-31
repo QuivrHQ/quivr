@@ -37,7 +37,7 @@ export const AddedKnowledge = ({
   }
 
   return (
-    <motion.div layout className="w-full max-w-xl flex flex-col gap-5">
+    <motion.div layout className="w-full flex flex-col gap-5">
       <AnimatePresence mode="popLayout">
         <KnowledgeTable knowledgeList={allKnowledge} />
       </AnimatePresence>
