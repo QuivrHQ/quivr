@@ -72,11 +72,6 @@ const config = {
         },
         items: [
           {
-            href: '/docs/roadmap',
-            label: 'Roadmap',
-            position: 'left',
-          },
-          {
             href: 'https://quivr.app',
             position: 'right',
             label: 'Try me now',

@@ -30,3 +30,31 @@ Authorization: Bearer {api_key}
 Replace `{api_key}` with the generated API key obtained from the frontend
 
 You can find more information in the [Authentication](/docs/Developers/useQuivr/get_your_api_key) section of the documentation.
+
+
+## Architectural Schema 
+
+
+<div style={{ textAlign: 'center' }}>
+  <img src="/img/architectural-high-level.png" alt="Quivr architecture" style={{ width: '60%' }} />
+</div>
+
+### Load Balancer
+
+The role of the load balancer is to catch the incoming traffic and redirect to the corresponding server. It is also responsible for the SSL termination.
+
+### Container Service
+
+The role of this service is to manage the replicas of all the services. It hold the information about the number of replicas of each service and the corresponding server.
+
+### Queue
+
+The role of the queue it to store "tasks" that are long to run and that can be run asynchronously. In our case we use it to embed the files and to index them as it can take a lot of time. 
+
+### Celery Worker
+
+The role of the celery worker is to run the tasks that are stored in the queue. It is a distributed task queue that can run tasks asynchronously.
+
+### Supabase
+
+Supabase is used to do the authentication and to store the users information. It is a great open-source alternative to Firebase. It is currently used as a database, an authentication service, a vector store and a file store.
