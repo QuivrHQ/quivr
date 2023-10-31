@@ -3,20 +3,20 @@
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import { MdDelete } from "react-icons/md";
 
-import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
+import { useUrlBrain } from "@/lib/hooks/useBrainIdFromUrl";
 import { Knowledge } from "@/lib/types/Knowledge";
 
-import { useKnowledgeItem } from "./useKnowledgeItem";
+import { useKnowledgeItem } from "../hooks/useKnowledgeItem";
+
 export const DeleteKnowledge = ({
   knowledge,
 }: {
   knowledge: Knowledge;
 }): JSX.Element => {
   const { isDeleting, onDeleteKnowledge } = useKnowledgeItem();
+  const { brain } = useUrlBrain();
 
-  const { currentBrain } = useBrainContext();
-
-  const canDeleteFile = currentBrain?.role === "Owner";
+  const canDeleteFile = brain?.role === "Owner";
 
   if (!canDeleteFile) {
     return <></>;
@@ -25,10 +25,7 @@ export const DeleteKnowledge = ({
   return isDeleting ? (
     <AiOutlineLoading3Quarters />
   ) : (
-    <button
-      className="text-red-600 hover:text-red-900"
-      onClick={() => void onDeleteKnowledge(knowledge)}
-    >
+    <button onClick={() => void onDeleteKnowledge(knowledge)}>
       <MdDelete size="20" />
     </button>
   );

@@ -2,9 +2,9 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { useChatApi } from "@/lib/api/chat/useChatApi";
-import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 import { useKnowledgeToFeedContext } from "@/lib/context/KnowledgeToFeedProvider/hooks/useKnowledgeToFeedContext";
 import { useToast } from "@/lib/hooks";
+import { useUrlBrain } from "@/lib/hooks/useBrainIdFromUrl";
 
 import { useFeedBrainHandler } from "./useFeedBrainHandler";
 
@@ -18,14 +18,14 @@ export const useFeedBrain = ({
 }) => {
   const { publish } = useToast();
   const { t } = useTranslation(["upload"]);
-  const { currentBrainId } = useBrainContext();
+  const { brainId } = useUrlBrain();
   const { setKnowledgeToFeed, knowledgeToFeed } = useKnowledgeToFeedContext();
   const [hasPendingRequests, setHasPendingRequests] = useState(false);
   const { handleFeedBrain } = useFeedBrainHandler();
   const { createChat, deleteChat } = useChatApi();
 
   const feedBrain = async (): Promise<void> => {
-    if (currentBrainId === null) {
+    if (brainId === undefined) {
       publish({
         variant: "danger",
         text: t("selectBrainFirst"),
@@ -51,7 +51,7 @@ export const useFeedBrain = ({
       closeFeedInput?.();
       setHasPendingRequests(true);
       await handleFeedBrain({
-        brainId: currentBrainId,
+        brainId,
         chatId: currentChatId,
       });
 

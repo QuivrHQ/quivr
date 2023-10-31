@@ -1,16 +1,19 @@
 import axios from "axios";
-import { BsFillCloudArrowDownFill } from "react-icons/bs";
+import { HiOutlineDownload } from "react-icons/hi";
 
 import { useKnowledgeApi } from "@/lib/api/knowledge/useKnowledgeApi";
-import { getFileIcon } from "@/lib/helpers/getFileIcon";
-import { UploadedKnowledge } from "@/lib/types/Knowledge";
+import { isUploadedKnowledge, Knowledge } from "@/lib/types/Knowledge";
 
 export const DownloadUploadedKnowledge = ({
   knowledge,
 }: {
-  knowledge: UploadedKnowledge;
+  knowledge: Knowledge;
 }): JSX.Element => {
   const { generateSignedUrlKnowledge } = useKnowledgeApi();
+
+  if (!isUploadedKnowledge(knowledge)) {
+    return <div />;
+  }
 
   const downloadFile = async () => {
     const download_url = await generateSignedUrlKnowledge({
@@ -37,12 +40,8 @@ export const DownloadUploadedKnowledge = ({
   };
 
   return (
-    <a
-      onClick={() => void downloadFile()}
-      style={{ display: "flex", flexDirection: "column", alignItems: "center" }}
-    >
-      {getFileIcon(knowledge.fileName)}
-      <BsFillCloudArrowDownFill fontSize="small" />
+    <a onClick={() => void downloadFile()} className="cursor-pointer">
+      <HiOutlineDownload fontSize="small" size={20} />
     </a>
   );
 };

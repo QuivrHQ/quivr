@@ -3,12 +3,12 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { useKnowledgeApi } from "@/lib/api/knowledge/useKnowledgeApi";
-import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 import { useToast } from "@/lib/hooks";
+import { useUrlBrain } from "@/lib/hooks/useBrainIdFromUrl";
 import { Knowledge } from "@/lib/types/Knowledge";
 import { useEventTracking } from "@/services/analytics/june/useEventTracking";
 
-import { useKnowledge } from "../hooks/useKnowledge";
+import { useKnowledge } from "../../../../../hooks/useKnowledge";
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const useKnowledgeItem = () => {
@@ -16,10 +16,9 @@ export const useKnowledgeItem = () => {
   const [isDeleting, setIsDeleting] = useState(false);
   const { publish } = useToast();
   const { track } = useEventTracking();
-  const { currentBrain } = useBrainContext();
-
+  const { brainId, brain } = useUrlBrain();
   const { invalidateKnowledgeDataKey } = useKnowledge({
-    brainId: currentBrain?.id,
+    brainId,
   });
 
   const { t } = useTranslation(["translation", "explore"]);
@@ -30,11 +29,11 @@ export const useKnowledgeItem = () => {
     const knowledge_name =
       "fileName" in knowledge ? knowledge.fileName : knowledge.url;
     try {
-      if (currentBrain?.id === undefined) {
+      if (brainId === undefined) {
         throw new Error(t("noBrain", { ns: "explore" }));
       }
       await deleteKnowledge({
-        brainId: currentBrain.id,
+        brainId,
         knowledgeId: knowledge.id,
       });
 
@@ -44,7 +43,7 @@ export const useKnowledgeItem = () => {
         variant: "success",
         text: t("deleted", {
           fileName: knowledge_name,
-          brain: currentBrain.name,
+          brain: brain?.name,
           ns: "explore",
         }),
       });

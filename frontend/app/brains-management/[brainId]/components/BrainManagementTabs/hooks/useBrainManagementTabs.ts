@@ -43,6 +43,7 @@ export const useBrainManagementTabs = () => {
   const params = useParams();
   const { t } = useTranslation(["delete_or_unsubscribe_from_brain"]);
   const brainId = params?.brainId as UUID | undefined;
+
   const { hasEditRights, isOwnedByCurrentUser } = getBrainPermissions({
     brainId,
     userAccessibleBrains: allBrains,
