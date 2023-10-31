@@ -7,7 +7,3 @@ To use the Quivr API, you need to get an API key. You can get one by following t
 
 1. Go to [user settings page](https://www.quivr.app/user)
 2. Generate a new API key by clicking on the "Create new Key" button
-
-### Endpoint
-
-Quivr API endpoint is `https://api.quivr.app`

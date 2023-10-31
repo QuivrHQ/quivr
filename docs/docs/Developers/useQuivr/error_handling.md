@@ -1,8 +1,7 @@
 ---
-sidebar_position: 3
+sidebar_position: 5
+title: 😩 Error Handling
 ---
-
-# Error Handling
 
 **URL**: https://api.quivr.app/chat
 

@@ -1,6 +1,6 @@
 ---
-sidebar_position: 2
-title: Using Quivr fully locally
+sidebar_position: 3
+title: 📍 Run Quivr fully locally
 ---
 
 # Using Quivr fully locally
@@ -8,16 +8,18 @@ title: Using Quivr fully locally
 ## Headers
 
 The following is a guide to set up everything for using Quivr locally:
-##### Table of Contents  
-* [Database](#database)
-* [Embeddings](#embeddings)
-* [LLM for inference](#llm)
+
+##### Table of Contents
+
+- [Database](#database)
+- [Embeddings](#embeddings)
+- [LLM for inference](#llm)
 
 It is a first, working setup, but a lot of work has to be done to e.g. find the appropriate settings for the model.
 
 Importantly, this will currently only work on tag v0.0.46.
 
-The guide was put together in collaboration with members of the Quivr Discord, **Using Quivr fully locally** thread. That is a good place to discuss it. 
+The guide was put together in collaboration with members of the Quivr Discord, **Using Quivr fully locally** thread. That is a good place to discuss it.
 
 This worked for me, but I sometimes got strange results (the output contains repeating answers/questions). Maybe because `stopping_criteria=stopping_criteria` must be uncommented in `transformers.pipeline`. Will update this page as I continue learning.
 
@@ -28,9 +30,10 @@ This worked for me, but I sometimes got strange results (the output contains rep
 Instead of relying on a remote Supabase instance, we have to set it up locally. Follow the instructions on https://supabase.com/docs/guides/self-hosting/docker.
 
 Troubleshooting:
-* If the Quivr backend container cannot reach Supabase on port 8000, change the Quivr backend container to use the host network.
-* If email service does not work, add a user using the supabase web ui, and check "Auto Confirm User?".
-  * http://localhost:8000/project/default/auth/users
+
+- If the Quivr backend container cannot reach Supabase on port 8000, change the Quivr backend container to use the host network.
+- If email service does not work, add a user using the supabase web ui, and check "Auto Confirm User?".
+  - http://localhost:8000/project/default/auth/users
 
 <a name="embeddings"/>
 
@@ -39,16 +42,19 @@ Troubleshooting:
 First, let's get local embeddings to work with GPT4All. Instead of relying on OpenAI for generating embeddings of both the prompt and the documents we upload, we will use a local LLM for this.
 
 Remove any existing data from the postgres database:
-* `supabase/docker $ docker compose down -v`
-* `supabase/docker $ rm -rf volumes/db/data/`
-* `supabase/docker $ docker compose up -d`
+
+- `supabase/docker $ docker compose down -v`
+- `supabase/docker $ rm -rf volumes/db/data/`
+- `supabase/docker $ docker compose up -d`
 
 Change the vector dimensions in the necessary Quivr SQL files:
-* Replace all occurrences of 1536 by 768, in Quivr's `scripts\tables.sql`
-* Run tables.sql in the Supabase web ui SQL editor: http://localhost:8000
+
+- Replace all occurrences of 1536 by 768, in Quivr's `scripts\tables.sql`
+- Run tables.sql in the Supabase web ui SQL editor: http://localhost:8000
 
 Change the Quivr code to use local LLM (GPT4All) and local embeddings:
-* add code to `backend\core\llm\private_gpt4all.py`
+
+- add code to `backend\core\llm\private_gpt4all.py`
 
 ```python
     from langchain.embeddings import HuggingFaceEmbeddings
@@ -73,18 +79,19 @@ Update Quivr `backend/core/.env`'s Private LLM Variables:
 ```
 
 Download GPT4All model:
-* `$ cd backend/core/local_models/`
-* `wget https://gpt4all.io/models/ggml-gpt4all-j-v1.3-groovy.bin`
+
+- `$ cd backend/core/local_models/`
+- `wget https://gpt4all.io/models/ggml-gpt4all-j-v1.3-groovy.bin`
 
 Ensure the Quivr backend docker container has CUDA and the GPT4All package:
 
 ```
     FROM pytorch/pytorch:2.0.1-cuda11.7-cudnn8-devel
     #FROM python:3.11-bullseye
-    
+
     ARG DEBIAN_FRONTEND=noninteractive
     ENV DEBIAN_FRONTEND=noninteractive
-    
+
     RUN pip install gpt4all
 ```
 
@@ -112,9 +119,9 @@ $ curl -s -L https://nvidia.github.io/nvidia-docker/$distribution/nvidia-docker.
 $ sudo apt-get update
 
 $ sudo apt-get install -y nvidia-container-toolkit
-    
+
 $ nvidia-ctk --version
-    
+
 $ sudo systemctl restart docker
 ```
 
@@ -170,7 +177,7 @@ Update the Quivr backend dockerfile:
 
 ```
     ENV HUGGINGFACEHUB_API_TOKEN=hf_XXX
-    
+
     RUN pip install accelerate
 ```
 
@@ -186,10 +193,10 @@ Update the `private_gpt4all.py` file as follows:
     from langchain.llms import HuggingFacePipeline
     from langchain.embeddings import HuggingFaceEmbeddings
     ...
-    
-    model_id = "stabilityai/StableBeluga-13B"    
+
+    model_id = "stabilityai/StableBeluga-13B"
     ...
-    
+
     def _create_llm(
         self,
         model,
@@ -213,7 +220,7 @@ Update the `private_gpt4all.py` file as follows:
         logger.info("--- model path %s",model_path)
 
         model_id = "stabilityai/StableBeluga-13B"
-        
+
         llm = transformers.AutoModelForCausalLM.from_pretrained(
             model_id,
             use_cache=True,
