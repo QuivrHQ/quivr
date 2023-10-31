@@ -8,7 +8,7 @@ import { useToast } from "@/lib/hooks";
 import { Knowledge } from "@/lib/types/Knowledge";
 import { useEventTracking } from "@/services/analytics/june/useEventTracking";
 
-import { useKnowledge } from "../../hooks/useKnowledge";
+import { useKnowledge } from "../../../../hooks/useKnowledge";
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const useKnowledgeItem = () => {

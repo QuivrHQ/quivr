@@ -1,6 +1,6 @@
 import { Knowledge } from "@/lib/types/Knowledge";
 
-import KnowledgeItem from "./KnowledgeItem";
+import KnowledgeItem from "./components/KnowledgeItem";
 
 interface KnowledgeTableProps {
   knowledgeList: Knowledge[];

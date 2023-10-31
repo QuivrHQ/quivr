@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 
-import { useFeedBrain } from "../../../hooks/useFeedBrain";
+import { useFeedBrain } from "./useFeedBrain";
 import { useKnowledge } from "../../../hooks/useKnowledge";
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
