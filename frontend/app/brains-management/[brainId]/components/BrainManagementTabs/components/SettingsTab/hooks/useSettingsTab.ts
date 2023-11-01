@@ -258,7 +258,7 @@ export const useSettingsTab = ({ brainId }: UseSettingsTabProps) => {
       }
 
       if (dirtyFields["prompt"]) {
-        if (promptId === "") {
+        if (promptId === "" || promptId === undefined) {
           otherConfigs["prompt_id"] = (
             await createPrompt({
               title: prompt.title,
