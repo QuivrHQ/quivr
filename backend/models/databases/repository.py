@@ -209,6 +209,10 @@ class Repository(ABC):
         pass
 
     @abstractmethod
+    def create_shared_chat(self, new_shared_chat):
+        pass
+
+    @abstractmethod
     def get_prompt_by_id(self, prompt_id: UUID):
         pass
 

@@ -5,6 +5,7 @@ from .chat import Chat, ChatHistory
 from .chats import ChatMessage, ChatQuestion
 from .files import File
 from .prompt import Prompt, PromptStatusEnum
+from .shared_chat import SharedChat
 from .settings import (BrainRateLimiting, BrainSettings, ContactsSettings,
                        LLMSettings, ResendSettings, get_embeddings,
                        get_documents_vector_store, get_embeddings,
