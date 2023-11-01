@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.0.102 (2023-11-01)
+
+## What's Changed
+* docs: update Quivr doc by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1531
+* docs: ✏️ search by @StanGirard in https://github.com/StanGirard/quivr/pull/1535
+* feat(brainSettings): rework knowledge tab by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1534
+* docs: ✏️ schema by @StanGirard in https://github.com/StanGirard/quivr/pull/1537
+* feat: 🎸 max-token by @StanGirard in https://github.com/StanGirard/quivr/pull/1538
+
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.101...v0.0.102
+
 ## 0.0.101 (2023-10-31)
 
 ## What's Changed
