@@ -1,5 +1,55 @@
 # Changelog
 
+## 0.0.102 (2023-11-01)
+
+## What's Changed
+* docs: update Quivr doc by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1531
+* docs: ✏️ search by @StanGirard in https://github.com/StanGirard/quivr/pull/1535
+* feat(brainSettings): rework knowledge tab by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1534
+* docs: ✏️ schema by @StanGirard in https://github.com/StanGirard/quivr/pull/1537
+* feat: 🎸 max-token by @StanGirard in https://github.com/StanGirard/quivr/pull/1538
+
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.101...v0.0.102
+
+## 0.0.101 (2023-10-31)
+
+## What's Changed
+* chore: update tanstack query dep by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1528
+* fix: update mutation pending flag by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1530
+
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.100...v0.0.101
+
+## 0.0.100 (2023-10-30)
+
+## What's Changed
+* refactor: fix bad smells by @gozineb in https://github.com/StanGirard/quivr/pull/1399
+* refactor:  chat_routes  by @gozineb in https://github.com/StanGirard/quivr/pull/1512
+* feat: improve ux by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1522
+* feat(docs): reworked the website by @StanGirard in https://github.com/StanGirard/quivr/pull/1523
+* Feat/docs rework by @StanGirard in https://github.com/StanGirard/quivr/pull/1525
+
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.99...v0.0.100
+
+## 0.0.99 (2023-10-27)
+
+## What's Changed
+* fix: minor fixes by @gozineb in https://github.com/StanGirard/quivr/pull/1499
+* feat: remove onboarding's feature flag by @matthieujacq in https://github.com/StanGirard/quivr/pull/1501
+* feat: update form content on magic link auth request by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1502
+* feat: remove legacy header and footer by @matthieujacq in https://github.com/StanGirard/quivr/pull/1509
+* fix: black horizontal line sometimes appearing below section by @matthieujacq in https://github.com/StanGirard/quivr/pull/1510
+* Improve readme.md by @ankur0904 in https://github.com/StanGirard/quivr/pull/1511
+* refactor(settings tab): extract components by @gozineb in https://github.com/StanGirard/quivr/pull/1335
+* fix: hidden video playing automatically on iphone by @matthieujacq in https://github.com/StanGirard/quivr/pull/1514
+
+## New Contributors
+* @ankur0904 made their first contribution in https://github.com/StanGirard/quivr/pull/1511
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.98...v0.0.99
+
 ## 0.0.98 (2023-10-26)
 
 ## What's Changed

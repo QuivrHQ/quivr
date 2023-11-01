@@ -44,7 +44,7 @@ export const ChatInput = ({
               onClick={() => setShouldDisplayFeedCard(true)}
               tooltip={t("add_content_card_button_tooltip")}
             >
-              <PiPaperclipFill className="text-3xl" />
+              <PiPaperclipFill size={38} />
             </Button>
           )}
 

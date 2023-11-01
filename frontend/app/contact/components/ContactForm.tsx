@@ -37,7 +37,7 @@ export const ContactForm = (): JSX.Element => {
     );
   }
 
-  if (postEmail.isLoading) {
+  if (postEmail.isPending) {
     return <Spinner />;
   }
 

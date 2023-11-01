@@ -44,11 +44,11 @@
     "how_to_use_quivr": "How to use Quivr ?",
     "what_is_quivr": "What is Quivr ?",
     "what_is_brain": "What is a brain ?",
-    "answer":{
-      "how_to_use_quivr": "Check the documentation https://brain.quivr.app/docs/get_started/intro.html",
+    "answer": {
+      "how_to_use_quivr": "Check the documentation https://brain.quivr.app/docs/intro.html",
       "what_is_quivr": "Quivr is a helpful assistant.",
       "what_is_brain": "A brain contains knowledge"
     }
   },
-  "welcome":"Welcome"
+  "welcome": "Welcome"
 }

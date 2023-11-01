@@ -1,0 +1,8 @@
+{
+  "label": "🔗 Use Quivr Backend",
+  "position": 2,
+  "link": {
+    "type": "generated-index",
+    "description": "Quivr is 100% API driven, so you can use it with any frontend framework or language."
+  }
+}

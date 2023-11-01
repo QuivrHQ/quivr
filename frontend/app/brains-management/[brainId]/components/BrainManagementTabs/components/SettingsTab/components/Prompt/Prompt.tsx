@@ -1,43 +1,31 @@
-import { UUID } from "crypto";
-import { UseFormRegister } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 
 import Button from "@/lib/components/ui/Button";
 import Field from "@/lib/components/ui/Field";
 import { TextArea } from "@/lib/components/ui/TextArea";
-import { BrainConfig } from "@/lib/types/brainConfig";
 import { SaveButton } from "@/shared/SaveButton";
 
+import { usePrompt, UsePromptProps } from "../../hooks/usePrompt";
 import { PublicPrompts } from "../PublicPrompts";
 
 type PromptProps = {
-  brainId: UUID;
-  pickPublicPrompt: ({
-    title,
-    content,
-  }: {
-    title: string;
-    content: string;
-  }) => void;
-  removeBrainPrompt: () => Promise<void>;
-  isUpdating: boolean;
-  handleSubmit: (checkDirty: boolean) => Promise<void>;
-  register: UseFormRegister<BrainConfig>;
-  promptId?: string;
+  usePromptProps: UsePromptProps;
+  isUpdatingBrain: boolean;
   hasEditRights: boolean;
 };
 
 export const Prompt = (props: PromptProps): JSX.Element => {
   const { t } = useTranslation(["translation", "brain", "config"]);
+  const { isUpdatingBrain, hasEditRights, usePromptProps } = props;
+
   const {
     pickPublicPrompt,
-    removeBrainPrompt,
-    isUpdating,
-    handleSubmit,
     register,
-    hasEditRights,
+    submitPrompt,
     promptId,
-  } = props;
+    isRemovingPrompt,
+    removeBrainPrompt,
+  } = usePrompt(usePromptProps);
 
   return (
     <>
@@ -60,11 +48,14 @@ export const Prompt = (props: PromptProps): JSX.Element => {
       />
       {hasEditRights && (
         <div className="flex w-full justify-end py-4">
-          <SaveButton handleSubmit={handleSubmit} />
+          <SaveButton handleSubmit={submitPrompt} />
         </div>
       )}
       {hasEditRights && promptId !== "" && (
-        <Button disabled={isUpdating} onClick={() => void removeBrainPrompt()}>
+        <Button
+          disabled={isUpdatingBrain || isRemovingPrompt}
+          onClick={() => void removeBrainPrompt()}
+        >
           {t("removePrompt", { ns: "config" })}
         </Button>
       )}

@@ -1,23 +1,18 @@
 "use client";
 import { UUID } from "crypto";
-import { AnimatePresence, motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
 
-import Spinner from "@/lib/components/ui/Spinner";
+import { Divider } from "@/lib/components/ui/Divider";
 import { KnowledgeToFeedProvider } from "@/lib/context";
 
-import { AddKnowledge } from "./AddKnowledge";
-import { KnowledgeTable } from "./KnowledgeTable";
-import { useKnowledge } from "./hooks/useKnowledge";
+import { AddKnowledge } from "./components/AddKnowledge/AddKnowledge";
+import { AddedKnowledge } from "./components/AddedKnowledge/AddedKnowledge";
 
 type KnowledgeTabProps = {
   brainId: UUID;
 };
 export const KnowledgeTab = ({ brainId }: KnowledgeTabProps): JSX.Element => {
-  const { t } = useTranslation(["translation", "explore"]);
-  const { isPending, allKnowledge } = useKnowledge({
-    brainId,
-  });
+  const { t } = useTranslation(["translation", "explore", "config"]);
 
   return (
     <KnowledgeToFeedProvider>
@@ -29,25 +24,14 @@ export const KnowledgeTab = ({ brainId }: KnowledgeTabProps): JSX.Element => {
             </h1>
             <h2 className="opacity-50">{t("subtitle", { ns: "explore" })}</h2>
           </div>
+          <Divider text={t("Upload")} />
           <AddKnowledge />
-          {isPending ? (
-            <Spinner />
-          ) : (
-            <motion.div layout className="w-full max-w-xl flex flex-col gap-5">
-              {allKnowledge.length !== 0 ? (
-                <AnimatePresence mode="popLayout">
-                  <KnowledgeTable knowledgeList={allKnowledge} />
-                </AnimatePresence>
-              ) : (
-                <div className="flex flex-col items-center justify-center mt-10 gap-1">
-                  <p className="text-center">{t("empty", { ns: "explore" })}</p>
-                  <p className="text-center">
-                    {t("feed_brain_instructions", { ns: "explore" })}
-                  </p>
-                </div>
-              )}
-            </motion.div>
-          )}
+          <Divider
+            text={t("knowledge", {
+              ns: "config",
+            })}
+          />
+          <AddedKnowledge brainId={brainId} />
         </section>
       </main>
     </KnowledgeToFeedProvider>
