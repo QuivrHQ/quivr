@@ -167,7 +167,7 @@ async def create_question_handler(
         chat_question.temperature = (
             chat_question.temperature or brain.temperature or 0.1
         )
-        chat_question.max_tokens = chat_question.max_tokens or brain.max_tokens or 256
+        chat_question.max_tokens = chat_question.max_tokens or brain.max_tokens or 512
 
     try:
         check_user_requests_limit(current_user)

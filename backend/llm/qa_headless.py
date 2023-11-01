@@ -31,7 +31,7 @@ SYSTEM_MESSAGE = "Your name is Quivr. You're a helpful assistant. If you don't k
 class HeadlessQA(BaseModel):
     model: str
     temperature: float = 0.0
-    max_tokens: int = 256
+    max_tokens: int = 2000
     user_openai_api_key: Optional[str] = None
     openai_api_key: Optional[str] = None
     streaming: bool = False
