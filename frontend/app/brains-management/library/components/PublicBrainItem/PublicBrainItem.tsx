@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import { MdAdd } from "react-icons/md";
+import { MdAdd, MdLink } from "react-icons/md";
 
 import Button from "@/lib/components/ui/Button";
 import { Modal } from "@/lib/components/ui/Modal";
@@ -21,6 +21,7 @@ export const PublicBrainItem = ({
     subscriptionRequestPending,
     isSubscriptionModalOpened,
     setIsSubscriptionModalOpened,
+    handleCopyBrainLink,
   } = usePublicBrainItem({
     brainId: brain.id,
   });
@@ -78,14 +79,21 @@ export const PublicBrainItem = ({
         <p className={`mb-10 ${isBrainDescriptionEmpty && "text-gray-400"}`}>
           {brainDescription}
         </p>
-
         <p className="font-bold mb-5">
           <span>
             <span className="mr-2">{t("public_brain_last_update_label")}:</span>
             {formatDate(brain.last_update)}
           </span>
         </p>
-        <div className="flex flex-1 justify-end">{subscribeButton}</div>
+        <div className="flex flex-1 justify-between items-center">
+          <Button
+            onClick={() => void handleCopyBrainLink()}
+            className="p-1 bg-white border-solid border border-gray-300 rounded-md hover:bg-gray-100"
+          >
+            <MdLink size="20" color="gray" />
+          </Button>
+          {subscribeButton}
+        </div>
       </div>
     </Modal>
   );
