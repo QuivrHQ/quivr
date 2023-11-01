@@ -1,4 +1,4 @@
-/* eslint max-lines:["error", 125] */
+/* eslint max-lines:["error", 135] */
 
 import { UUID } from "crypto";
 import { useTranslation } from "react-i18next";
@@ -12,6 +12,7 @@ import { AccessConfirmationModal } from "./components/PrivateAccessConfirmationM
 import { useAccessConfirmationModal } from "./components/PrivateAccessConfirmationModal/hooks/useAccessConfirmationModal";
 import { useSettingsTab } from "./hooks/useSettingsTab";
 import { getBrainPermissions } from "../../utils/getBrainPermissions";
+
 
 type SettingsTabProps = {
   brainId: UUID;
@@ -37,10 +38,25 @@ export const SettingsTab = ({ brainId }: SettingsTabProps): JSX.Element => {
     setValue,
     dirtyFields,
     resetField,
-    pickPublicPrompt,
+    setIsUpdating,
     promptId,
-    removeBrainPrompt,
+    getValues,
+    reset,
+    updateFormValues,
   } = useSettingsTab({ brainId });
+
+  const promptProps = {
+    brainId,
+    getValues,
+    promptId,
+    register,
+    reset,
+    setValue,
+    resetField,
+    updateFormValues,
+    dirtyFields,
+    setIsUpdating,
+  };
 
   const { onCancel, isAccessModalOpened, closeModal } =
     useAccessConfirmationModal({
@@ -91,13 +107,8 @@ export const SettingsTab = ({ brainId }: SettingsTabProps): JSX.Element => {
         />
         <Divider text={t("customPromptSection", { ns: "config" })} />
         <Prompt
-          brainId={brainId}
-          handleSubmit={handleSubmit}
-          isUpdating={isUpdating}
-          pickPublicPrompt={pickPublicPrompt}
-          removeBrainPrompt={removeBrainPrompt}
-          promptId={promptId}
-          register={register}
+          usePromptProps={promptProps}
+          isUpdatingBrain={isUpdating}
           hasEditRights={hasEditRights}
         />
         <div className="flex flex-row justify-end flex-1 w-full mt-8">

@@ -61,7 +61,6 @@ export const usePrompt = (props: UsePromptProps) => {
   const [currentPromptId, setCurrentPromptId] = useState<string | undefined>(
     promptId
   );
-  console.log("DIRTY FIELDS", dirtyFields);
 
   const fetchPrompt = async () => {
     if (currentPromptId === "" || currentPromptId === undefined) {
@@ -128,7 +127,7 @@ export const usePrompt = (props: UsePromptProps) => {
     if (!dirtyFields["prompt"]) {
       return;
     }
-    console.log("PROMPT", prompt);
+
     if (prompt.content === "" || prompt.title === "") {
       publish({
         variant: "warning",
@@ -139,9 +138,7 @@ export const usePrompt = (props: UsePromptProps) => {
     }
 
     try {
-      console.log("PROMPTID", promptId);
       if (promptId === "" || promptId === undefined) {
-        console.log("CREATING PROMPT");
         otherConfigs["prompt_id"] = (
           await createPrompt({
             title: prompt.title,
