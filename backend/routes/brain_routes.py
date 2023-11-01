@@ -128,6 +128,8 @@ async def update_existing_brain(
     if existing_brain is None:
         raise HTTPException(status_code=404, detail="Brain not found")
 
+    update_brain_by_id(brain_id, brain_update_data)
+
     if brain_update_data.prompt_id is None and existing_brain.prompt_id:
         prompt = get_prompt_by_id(existing_brain.prompt_id)
         if prompt and prompt.status == "private":
@@ -136,7 +138,6 @@ async def update_existing_brain(
     if brain_update_data.status == "private" and existing_brain.status == "public":
         delete_brain_users(brain_id)
 
-    update_brain_by_id(brain_id, brain_update_data)
     return {"message": f"Brain {brain_id} has been updated."}
 
 

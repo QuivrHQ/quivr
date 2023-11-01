@@ -6,7 +6,6 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { useBrainApi } from "@/lib/api/brain/useBrainApi";
-import { usePromptApi } from "@/lib/api/prompt/usePromptApi";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 import { Brain } from "@/lib/context/BrainProvider/types";
 import { defineMaxTokens } from "@/lib/helpers/defineMaxTokens";
@@ -16,7 +15,8 @@ import { useUserData } from "@/lib/hooks/useUserData";
 import { BrainStatus } from "@/lib/types/brainConfig";
 
 import { useBrainFormState } from "./useBrainFormState";
-import { validateOpenAIKey } from "../utils/validateOpenAIKey";
+import { checkBrainName } from "../utils/checkBrainName";
+import { checkOpenAiKey } from "../utils/checkOpenAiKey";
 
 type UseSettingsTabProps = {
   brainId: UUID;
@@ -31,7 +31,6 @@ export const useSettingsTab = ({ brainId }: UseSettingsTabProps) => {
   const formRef = useRef<HTMLFormElement>(null);
   const { setAsDefaultBrain, updateBrain } = useBrainApi();
   const { fetchAllBrains, fetchDefaultBrain } = useBrainContext();
-  const { getPrompt, updatePrompt, createPrompt } = usePromptApi();
   const { userData } = useUserData();
 
   const {
@@ -128,21 +127,6 @@ export const useSettingsTab = ({ brainId }: UseSettingsTabProps) => {
     };
   }, [formRef.current]);
 
-  const fetchPrompt = async () => {
-    if (promptId === "" || promptId === undefined) {
-      return;
-    }
-
-    const prompt = await getPrompt(promptId);
-    if (prompt === undefined) {
-      return;
-    }
-    setValue("prompt", prompt);
-  };
-  useEffect(() => {
-    void fetchPrompt();
-  }, [promptId]);
-
   const setAsDefaultBrainHandler = async () => {
     try {
       setIsSettingAsDefault(true);
@@ -173,43 +157,6 @@ export const useSettingsTab = ({ brainId }: UseSettingsTabProps) => {
     }
   };
 
-  const removeBrainPrompt = async () => {
-    try {
-      setIsUpdating(true);
-      await updateBrain(brainId, {
-        prompt_id: null,
-      });
-      setValue("prompt", {
-        title: "",
-        content: "",
-      });
-      reset();
-      void updateFormValues();
-      publish({
-        variant: "success",
-        text: t("promptRemoved", { ns: "config" }),
-      });
-    } catch (err) {
-      publish({
-        variant: "danger",
-        text: t("errorRemovingPrompt", { ns: "config" }),
-      });
-    } finally {
-      setIsUpdating(false);
-    }
-  };
-
-  const promptHandler = async () => {
-    const { prompt } = getValues();
-
-    if (dirtyFields["prompt"] && promptId !== undefined) {
-      await updatePrompt(promptId, {
-        title: prompt.title,
-        content: prompt.content,
-      });
-    }
-  };
-
   const handleSubmit = async (checkDirty: boolean) => {
     const hasChanges = Object.keys(dirtyFields).length > 0;
     if (!hasChanges && checkDirty) {
@@ -217,81 +164,22 @@ export const useSettingsTab = ({ brainId }: UseSettingsTabProps) => {
     }
     const { name, openAiKey: openai_api_key } = getValues();
 
-    if (name.trim() === "") {
-      publish({
-        variant: "danger",
-        text: t("nameRequired", { ns: "config" }),
-      });
-
-      return;
-    }
-
-    if (
-      openai_api_key !== undefined &&
-      openai_api_key !== "" &&
-      !(await validateOpenAIKey(
-        openai_api_key,
-        {
-          badApiKeyError: t("incorrectApiKey", { ns: "config" }),
-          invalidApiKeyError: t("invalidApiKeyError", { ns: "config" }),
-        },
-        publish
-      ))
-    ) {
-      return;
-    }
+    checkBrainName(name, publish, t);
+    await checkOpenAiKey(openai_api_key, publish, t);
 
     try {
       setIsUpdating(true);
-      const { maxTokens: max_tokens, prompt, ...otherConfigs } = getValues();
+      const { maxTokens: max_tokens, ...otherConfigs } = getValues();
 
-      if (
-        dirtyFields["prompt"] &&
-        (prompt.content === "" || prompt.title === "")
-      ) {
-        publish({
-          variant: "warning",
-          text: t("promptFieldsRequired", { ns: "config" }),
-        });
-
-        return;
-      }
-
-      if (dirtyFields["prompt"]) {
-        if (promptId === "" || promptId === undefined) {
-          otherConfigs["prompt_id"] = (
-            await createPrompt({
-              title: prompt.title,
-              content: prompt.content,
-            })
-          ).id;
-          await updateBrain(brainId, {
-            ...otherConfigs,
-            max_tokens,
-            openai_api_key,
-          });
-          void updateFormValues();
-        } else {
-          await Promise.all([
-            updateBrain(brainId, {
-              ...otherConfigs,
-              max_tokens,
-              openai_api_key,
-            }),
-            promptHandler(),
-          ]);
-        }
-      } else {
-        await updateBrain(brainId, {
-          ...otherConfigs,
-          max_tokens,
-          openai_api_key,
-          prompt_id:
-            otherConfigs["prompt_id"] !== ""
-              ? otherConfigs["prompt_id"]
-              : undefined,
-        });
-      }
+      await updateBrain(brainId, {
+        ...otherConfigs,
+        max_tokens,
+        openai_api_key,
+        prompt_id:
+          otherConfigs["prompt_id"] !== ""
+            ? otherConfigs["prompt_id"]
+            : undefined,
+      });
 
       publish({
         variant: "success",
@@ -321,26 +209,9 @@ export const useSettingsTab = ({ brainId }: UseSettingsTabProps) => {
     }
   };
 
-  const pickPublicPrompt = ({
-    title,
-    content,
-  }: {
-    title: string;
-    content: string;
-  }): void => {
-    setValue("prompt.title", title, {
-      shouldDirty: true,
-    });
-    setValue("prompt.content", content, {
-      shouldDirty: true,
-    });
-  };
-
   return {
     handleSubmit,
     register,
-    removeBrainPrompt,
-    pickPublicPrompt,
     setAsDefaultBrainHandler,
     setValue,
     brain,
@@ -357,5 +228,9 @@ export const useSettingsTab = ({ brainId }: UseSettingsTabProps) => {
     status,
     dirtyFields,
     resetField,
+    updateFormValues,
+    reset,
+    getValues,
+    setIsUpdating,
   };
 };
