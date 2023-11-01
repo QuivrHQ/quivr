@@ -15,8 +15,8 @@ import { useToast } from "@/lib/hooks";
 import { useUserData } from "@/lib/hooks/useUserData";
 import { BrainStatus } from "@/lib/types/brainConfig";
 
-import { useBrainFormState } from "./useBrainFormState";
 import { validateOpenAIKey } from "../utils/validateOpenAIKey";
+import { useBrainFormState } from "./useBrainFormState";
 
 type UseSettingsTabProps = {
   brainId: UUID;
