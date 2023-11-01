@@ -7,10 +7,18 @@ CREATE TABLE IF NOT EXISTS shared_chats (
 );
 
 -- Insert migration record if it doesn't exist
-INSERT INTO migrations (name) 
-SELECT '20231101100500_add_shared_chats_table'
-WHERE NOT EXISTS (
-    SELECT 1 FROM migrations WHERE name = '20231101100500_add_shared_chats_table'
-);
+INSERT INTO
+  migrations (name)
+SELECT
+  '20231101100500_add_shared_chats_table'
+WHERE
+  NOT EXISTS (
+    SELECT
+      1
+    FROM
+      migrations
+    WHERE
+      name = '20231101100500_add_shared_chats_table'
+  );
 
 COMMIT;
