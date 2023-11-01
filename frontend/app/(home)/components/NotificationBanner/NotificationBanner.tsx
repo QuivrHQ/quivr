@@ -1,6 +1,7 @@
 import { Fragment } from "react";
 import { MdClose } from "react-icons/md";
 import ReactMarkdown from "react-markdown";
+import rehypeRaw from "rehype-raw";
 
 import Button from "@/lib/components/ui/Button";
 
@@ -24,7 +25,14 @@ export const NotificationBanner = (): JSX.Element => {
         ...notificationBanner.style,
       }}
     >
-      <ReactMarkdown>{notificationBanner.text}</ReactMarkdown>
+      <ReactMarkdown
+        rehypePlugins={[
+          //@ts-expect-error bad typing from rehype-raw
+          rehypeRaw,
+        ]}
+      >
+        {notificationBanner.text}
+      </ReactMarkdown>
       {Boolean(notificationBanner.dismissible) && (
         <Button
           variant="tertiary"
