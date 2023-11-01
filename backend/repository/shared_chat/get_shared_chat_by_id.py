@@ -3,7 +3,7 @@ from uuid import UUID
 from models import get_supabase_client
 
 
-def get_shared_chat_by_shared_chat_id(shared_chat_id: UUID) -> str:
+def get_shared_chat_by_id(shared_chat_id: UUID) -> str:
     supabase_client = get_supabase_client()
     response = (
         supabase_client.from_("shared_chats")

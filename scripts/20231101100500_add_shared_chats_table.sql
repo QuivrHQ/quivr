@@ -2,8 +2,8 @@ BEGIN;
 
 -- Create shared_chats table if it doesn't exist
 CREATE TABLE IF NOT EXISTS shared_chats (
-  id UUID PRIMARY KEY,
-  chat_id UUID default NULL
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  chat_id UUID
 );
 
 -- Insert migration record if it doesn't exist

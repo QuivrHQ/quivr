@@ -1,3 +1,5 @@
+from models.databases.supabase.shared_chats import SharedChats
+from models.shared_chat import SharedChat
 from logger import get_logger
 from models.databases.supabase import (
     ApiKeyHandler,
@@ -26,6 +28,7 @@ class SupabaseDB(
     Vector,
     Onboarding,
     Prompts,
+    SharedChats,
     Notifications,
     Knowledges,
 ):
