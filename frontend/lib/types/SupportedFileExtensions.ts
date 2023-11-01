@@ -1,3 +1,4 @@
+/* eslint-disable */
 export const supportedFileExtensions = [
   "txt",
   "csv",
@@ -20,6 +21,7 @@ export const supportedFileExtensions = [
   "epub",
   "ipynb",
   "py",
+  "telegram",
 ] as const;
 
 export type SupportedFileExtensions = (typeof supportedFileExtensions)[number];

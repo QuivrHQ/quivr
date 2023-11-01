@@ -41,6 +41,7 @@ const fileTypeIcons: Record<SupportedFileExtensions, IconType> = {
   epub: FaFile,
   ipynb: BsFiletypePy,
   py: BsFiletypePy,
+  telegram: BsFiletypeDocx,
 };
 
 export const getFileIcon = (fileName: string): JSX.Element => {

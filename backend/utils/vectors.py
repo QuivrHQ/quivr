@@ -31,7 +31,9 @@ class Neurons(BaseModel):
         embeddings = get_embeddings()
         return embeddings.embed_query(content)
 
-    def similarity_search(self, query, table="match_summaries", top_k=5, threshold=0.5):
+    def similarity_search(
+        self, query, table="match_summaries", top_k=20, threshold=0.5
+    ):
         query_embedding = self.create_embedding(query)
         supabase_db = get_supabase_db()
         summaries = supabase_db.similarity_search(
