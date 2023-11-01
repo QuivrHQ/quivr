@@ -180,6 +180,7 @@ async def create_question_handler(
             temperature=chat_question.temperature,
             brain_id=str(brain_id),
             user_openai_api_key=current_user.openai_api_key,  # pyright: ignore reportPrivateUsage=none
+            streaming=False,
             prompt_id=chat_question.prompt_id,
         )
 
