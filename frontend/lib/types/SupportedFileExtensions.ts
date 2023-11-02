@@ -1,4 +1,3 @@
-/* eslint-disable */
 export const supportedFileExtensions = [
   "txt",
   "csv",
