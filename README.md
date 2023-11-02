@@ -118,7 +118,7 @@ Additionally, you'll need a [Supabase](https://supabase.com/) account for:
   Choose either `Create all tables` if it's your first time or `Run migrations`
   if you are updating your database.
 
-  Alternatively you can run the script on the Supabase database via the web
+  Alternatively, you can run the script on the Supabase database via the web
   interface (SQL Editor -> `New query` -> paste the script -> `Run`)
 
   All the scripts can be found in the [scripts](scripts/) folder
@@ -148,7 +148,7 @@ Thanks go to these wonderful people:
 
 ## Contribute 🤝
 
-Got a pull request? Open it, and we'll review it as soon as possible. Check out our project board [here](https://github.com/users/StanGirard/projects/5) to see what we're currently focused on, and feel free to bring your fresh ideas to the table!
+Did you get a pull request? Open it, and we'll review it as soon as possible. Check out our project board [here](https://github.com/users/StanGirard/projects/5) to see what we're currently focused on, and feel free to bring your fresh ideas to the table!
 
 - [Open Issues](https://github.com/StanGirard/quivr/issues)
 - [Open Pull Requests](https://github.com/StanGirard/quivr/pulls)
@@ -158,7 +158,7 @@ Got a pull request? Open it, and we'll review it as soon as possible. Check out 
 
 ## Sponsors ❤️
 
-This project could not be possible without the support of our sponsors. Thank you for your support!
+This project would not be possible without the support of our sponsors. Thank you for your support!
 
 <a href="https://www.theodo.fr/">
   <img src="https://avatars.githubusercontent.com/u/332041?s=200&v=4" alt="Theodo" style="padding: 10px" width="70px">
