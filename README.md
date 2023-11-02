@@ -141,16 +141,6 @@ Thanks go to these wonderful people:
 <img src="https://contrib.rocks/image?repo=stangirard/quivr" />
 </a>
 
-## Contribute 🤝
-
-Did you get a pull request? Open it, and we'll review it as soon as possible. Check out our project board [here](https://github.com/users/StanGirard/projects/5) to see what we're currently focused on, and feel free to bring your fresh ideas to the table!
-
-- [Open Issues](https://github.com/StanGirard/quivr/issues)
-- [Open Pull Requests](https://github.com/StanGirard/quivr/pulls)
-- [Good First Issues](https://github.com/StanGirard/quivr/issues?q=is%3Aopen+is%3Aissue+label%3A%22good+first+issue%22)
-- [Frontend Issues](https://github.com/StanGirard/quivr/issues?q=is%3Aopen+is%3Aissue+label%3Afrontend)
-- [Backend Issues](https://github.com/StanGirard/quivr/issues?q=is%3Aopen+is%3Aissue+label%3Abackend)
-
 ## Sponsors ❤️
 
 This project would not be possible without the support of our sponsors. Thank you for your support!
