@@ -157,7 +157,7 @@ This can be remedied by using local embeddings for document embeddings. In backe
         model_kwargs={'device': 'cuda'},
         encode_kwargs={'normalize_embeddings': False}
         )  # pyright: ignore reportPrivateUsage=none
-        logger.info('||| creating emedding')
+        logger.info('||| creating embedding')
         try:
             sids = self.commons["documents_vector_store"].add_documents([doc])
             if sids and len(sids) > 0:
