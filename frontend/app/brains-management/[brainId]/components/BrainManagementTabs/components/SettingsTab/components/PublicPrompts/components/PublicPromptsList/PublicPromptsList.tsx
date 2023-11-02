@@ -38,11 +38,11 @@ export const PublicPromptsList = ({
         {selectedOption ? selectedOption.title : t("selectQuivrPersonalityBtn", { ns: "config" })}
       </button>
       {isOpen && (
-        <div className="absolute top-10 w-full bg-white border rounded-md shadow-lg">
+        <div className="absolute top-10 w-full bg-white border rounded-md shadow-lg z-10">
           {options.map((option) => (
             <div
               key={option.id}
-              className="px-4 py-2 cursor-pointer hover:bg-gray-100"
+              className="px-4 py-2 cursor-pointer hover:bg-gray-100 text-gray-700"
               onClick={() => handleOptionClick(option)}
             >
               {option.title}
