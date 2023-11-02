@@ -38,7 +38,7 @@ export const PublicPromptsList = ({
         {selectedOption ? selectedOption.title : t("selectQuivrPersonalityBtn", { ns: "config" })}
       </button>
       {isOpen && (
-        <div className="absolute top-10 w-full bg-white border rounded-md shadow-lg">
+        <div className="absolute top-10 w-full bg-white border rounded-md shadow-lg z-10">
           {options.map((option) => (
             <div
               key={option.id}
