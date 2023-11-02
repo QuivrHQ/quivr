@@ -12,6 +12,8 @@ export const acceptedFormats: Record<string, SupportedFileExtensionsWithDot[]> =
     "audio/wav": [".wav"],
     "application/pdf": [".pdf"],
     "text/html": [".html"],
+    "text/telegram": [".telegram"],
+
     "application/vnd.openxmlformats-officedocument.presentationml.presentation":
       [".pptx"],
     "application/vnd.openxmlformats-officedocument.wordprocessingml.document": [

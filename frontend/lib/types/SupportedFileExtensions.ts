@@ -20,6 +20,7 @@ export const supportedFileExtensions = [
   "epub",
   "ipynb",
   "py",
+  "telegram",
 ] as const;
 
 export type SupportedFileExtensions = (typeof supportedFileExtensions)[number];

@@ -35,13 +35,6 @@ Quivr, your second brain, utilizes the power of GenerativeAI to store and retrie
 
 https://github.com/StanGirard/quivr/assets/19614572/a6463b73-76c7-4bc0-978d-70562dca71f5
 
-## Disclaimer ⚠️
-
-For a little while, Quivr will be only compatible with OpenAI API.
-
-If you want to use a Local LLM please refer to [v0.0.46](https://github.com/StanGirard/quivr/releases/tag/v0.0.46).
-
-This is due to us preparing a big feature and needing to clean the code a bit.
 
 ## Getting Started 🚀
 
@@ -112,8 +105,6 @@ Additionally, you'll need a [Supabase](https://supabase.com/) account for:
 
   > _The `NEXT_PUBLIC_BACKEND_URL` is set to localhost:5050 for the docker. Update it if you are running the backend on a different machine._
 
-  > _To activate vertexAI with PaLM from GCP follow the instructions [here](https://python.langchain.com/en/latest/modules/models/llms/integrations/google_vertex_ai_palm.html) and update `backend/.env`- It is an advanced feature, please be expert in GCP before trying to use it_
-
   - Change variables in `backend/.env`
   - Change variables in `frontend/.env`
 
@@ -127,7 +118,7 @@ Additionally, you'll need a [Supabase](https://supabase.com/) account for:
   Choose either `Create all tables` if it's your first time or `Run migrations`
   if you are updating your database.
 
-  Alternatively you can run the script on the Supabase database via the web
+  Alternatively, you can run the script on the Supabase database via the web
   interface (SQL Editor -> `New query` -> paste the script -> `Run`)
 
   All the scripts can be found in the [scripts](scripts/) folder
@@ -157,7 +148,7 @@ Thanks go to these wonderful people:
 
 ## Contribute 🤝
 
-Got a pull request? Open it, and we'll review it as soon as possible. Check out our project board [here](https://github.com/users/StanGirard/projects/5) to see what we're currently focused on, and feel free to bring your fresh ideas to the table!
+Did you get a pull request? Open it, and we'll review it as soon as possible. Check out our project board [here](https://github.com/users/StanGirard/projects/5) to see what we're currently focused on, and feel free to bring your fresh ideas to the table!
 
 - [Open Issues](https://github.com/StanGirard/quivr/issues)
 - [Open Pull Requests](https://github.com/StanGirard/quivr/pulls)
@@ -167,7 +158,7 @@ Got a pull request? Open it, and we'll review it as soon as possible. Check out 
 
 ## Sponsors ❤️
 
-This project could not be possible without the support of our sponsors. Thank you for your support!
+This project would not be possible without the support of our sponsors. Thank you for your support!
 
 <a href="https://www.theodo.fr/">
   <img src="https://avatars.githubusercontent.com/u/332041?s=200&v=4" alt="Theodo" style="padding: 10px" width="70px">
