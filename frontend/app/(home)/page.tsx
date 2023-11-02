@@ -14,7 +14,6 @@ import {
   TestimonialsSection,
 } from "./components";
 import { HomeHeaderBackground } from "./components/HomeHeader/components/HomeHeaderBackground";
-import { NotificationBanner } from "./components/NotificationBanner/NotificationBanner";
 import { UseCases } from "./components/UseCases/UseCases";
 
 const HomePage = (): JSX.Element => {
@@ -28,7 +27,6 @@ const HomePage = (): JSX.Element => {
 
   return (
     <>
-      <NotificationBanner />
       <HomeHeaderBackground />
       <HomeHeader />
 
