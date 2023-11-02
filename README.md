@@ -50,7 +50,7 @@ Additionally, you'll need a [Supabase](https://supabase.com/) account for:
 - Supabase Project API key
 - Supabase Project URL
 
-### Installation Steps 💽
+### Installation Steps
 
 - **Step 0**: If needed, the installation is explained on Youtube [here](https://youtu.be/rC-s4QdfY80)
 
