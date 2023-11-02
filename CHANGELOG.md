@@ -1,5 +1,23 @@
 # Changelog
 
+## 0.0.103 (2023-11-02)
+
+## What's Changed
+* feat: allow to share a public brain link by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1541
+* fix: prompt update in brains management settings tab by @gozineb in https://github.com/StanGirard/quivr/pull/1543
+* refactor: extract prompt from settings by @gozineb in https://github.com/StanGirard/quivr/pull/1546
+* feat: 🎸 telegram by @StanGirard in https://github.com/StanGirard/quivr/pull/1555
+* feat: 🎸 telegram by @StanGirard in https://github.com/StanGirard/quivr/pull/1559
+* docs: update run_fully_local.md by @eltociear in https://github.com/StanGirard/quivr/pull/1556
+* docs: grammatical errors in README.md by @HimanshuMahto in https://github.com/StanGirard/quivr/pull/1536
+* fix: missing or inaccurate zh-cn translations by @jerryshang in https://github.com/StanGirard/quivr/pull/1558
+
+## New Contributors
+* @HimanshuMahto made their first contribution in https://github.com/StanGirard/quivr/pull/1536
+* @jerryshang made their first contribution in https://github.com/StanGirard/quivr/pull/1558
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.102...v0.0.103
+
 ## 0.0.102 (2023-11-01)
 
 ## What's Changed
