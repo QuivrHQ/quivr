@@ -31,11 +31,6 @@ Quivr, your second brain, utilizes the power of GenerativeAI to store and retrie
   - Video
 - **Open Source**: Freedom is beautiful, and so is Quivr. Open source and free to use.
 
-## Demo Highlights 🎥
-
-https://github.com/StanGirard/quivr/assets/19614572/a6463b73-76c7-4bc0-978d-70562dca71f5
-
-
 ## Getting Started 🚀
 
 Follow these instructions to get a copy of the project up and running on your local machine for development and testing purposes.
