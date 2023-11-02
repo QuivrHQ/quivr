@@ -37,7 +37,7 @@ Follow these instructions to get a copy of the project up and running on your lo
 
 You can find everything on the [documentation](https://brain.quivr.app/).
 
-### Prerequisites 📋
+### Prerequisites
 
 Ensure you have the following installed:
 
