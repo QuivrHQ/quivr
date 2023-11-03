@@ -19,3 +19,5 @@ NEXT_PUBLIC_CMS_URL=https://cms.quivr.app
 NEXT_PUBLIC_STRIPE_PRICING_TABLE_ID=<ignore-me-or-change-me>
 NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=<ignore-me-or-change-me>
 NEXT_PUBLIC_STRIPE_MANAGE_PLAN_URL=<ignore-me-or-change-me>
+
+NEXT_PUBLIC_AUTH_MODES=magic_link,password,google_sso

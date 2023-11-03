@@ -1,18 +1,28 @@
 "use client";
 import Link from "next/link";
 import { Suspense } from "react";
+import { FormProvider, useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 
 import { QuivrLogo } from "@/lib/assets/QuivrLogo";
 import { Divider } from "@/lib/components/ui/Divider";
+import { useAuthModes } from "@/lib/hooks/useAuthModes";
 
+import { EmailLogin } from "./components/EmailLogin";
 import { GoogleLoginButton } from "./components/GoogleLogin";
-import { MagicLinkLogin } from "./components/MagicLinkLogin";
 import { useLogin } from "./hooks/useLogin";
+import { EmailAuthContextType } from "./types";
 
 const Main = (): JSX.Element => {
   useLogin();
+  const { googleSso, password, magicLink } = useAuthModes();
 
+  const methods = useForm<EmailAuthContextType>({
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+  });
   const { t } = useTranslation(["translation", "login"]);
 
   return (
@@ -27,9 +37,13 @@ const Main = (): JSX.Element => {
             <span className="text-primary">Quivr</span>
           </p>
           <div className="mt-5 flex flex-col">
-            <MagicLinkLogin />
-            <Divider text={t("or")} className="my-3 uppercase" />
-            <GoogleLoginButton />
+            <FormProvider {...methods}>
+              <EmailLogin />
+            </FormProvider>
+            {googleSso && (password || magicLink) && (
+              <Divider text={t("or")} className="my-3 uppercase" />
+            )}
+            {googleSso && <GoogleLoginButton />}
           </div>
           <p className="text-[10px] text-center">
             {t("restriction_message", { ns: "login" })}
