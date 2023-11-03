@@ -7,6 +7,7 @@ import "@draft-js-plugins/mention/lib/plugin.css";
 import "draft-js/dist/Draft.css";
 
 import { MentionTriggerType } from "@/app/chat/[chatId]/components/ActionsBar/types";
+import { useSecurity } from "@/services/useSecurity/useSecurity";
 
 import { BrainSuggestionsContainer } from "./components/BrainSuggestionsContainer";
 import { PromptSuggestionsContainer } from "./components/PromptSuggestionsContainer";
@@ -50,8 +51,9 @@ export const MentionInput = ({
     onSubmit,
     setMessage,
   });
+  const { isStudioMember } = useSecurity();
 
-  const { t } = useTranslation(["chat"]);
+  const { t } = useTranslation(["chat", "vaccineTruth"]);
 
   return (
     <div className="w-full" data-testid="chat-input">
@@ -61,7 +63,11 @@ export const MentionInput = ({
         onChange={handleEditorChange}
         plugins={plugins}
         ref={mentionInputRef}
-        placeholder={t("actions_bar_placeholder")}
+        placeholder={
+          isStudioMember
+            ? t("actions_bar_placeholder", { ns: "chat" })
+            : t("talkToAI", { ns: "vaccineTruth" })
+        }
         keyBindingFn={keyBindingFn}
       />
       <div

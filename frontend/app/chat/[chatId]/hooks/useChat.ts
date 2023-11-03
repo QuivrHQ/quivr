@@ -16,8 +16,9 @@ import { useOnboarding } from "@/lib/hooks/useOnboarding";
 import { useOnboardingTracker } from "@/lib/hooks/useOnboardingTracker";
 import { useEventTracking } from "@/services/analytics/june/useEventTracking";
 
-import { useQuestion } from "./useQuestion";
 import { ChatQuestion } from "../types";
+// eslint-disable-next-line import/order
+import { useQuestion } from "./useQuestion";
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const useChat = () => {
