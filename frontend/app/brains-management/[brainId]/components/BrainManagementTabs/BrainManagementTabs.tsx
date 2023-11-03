@@ -38,7 +38,7 @@ export const BrainManagementTabs = (): JSX.Element => {
   return (
     <div className="flex justify-center w-full">
       <Root
-        className="flex flex-col w-full h-full overflow-hidden bg-white dark:bg-black p-4 md:p-10 max-w-5xl"
+        className="flex flex-col w-full h-full overflow-scroll bg-white dark:bg-black p-4 md:p-10 max-w-5xl"
         value={selectedTab}
       >
         <List
