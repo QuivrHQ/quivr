@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { ShareModal } from "@/app/chat/components/ShareChat/ShareModal";
 import { useOnboarding } from "@/lib/hooks/useOnboarding";
 
+// eslint-disable-next-line import/order
 import { ChatItemWithGroupedNotifications } from "../../types";
 import { ChatItem } from "./components";
 import { Onboarding } from "./components/Onboarding/Onboarding";
