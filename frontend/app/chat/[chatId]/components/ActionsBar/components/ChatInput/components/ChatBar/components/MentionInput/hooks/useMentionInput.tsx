@@ -18,6 +18,7 @@ import { useSecurity } from "@/services/useSecurity/useSecurity";
 import "@draft-js-plugins/mention/lib/plugin.css";
 import "draft-js/dist/Draft.css";
 
+// eslint-disable-next-line import/order
 import { getEditorText } from "./helpers/getEditorText";
 import { useMentionPlugin } from "./helpers/MentionPlugin";
 import { useMentionState } from "./helpers/MentionState";
