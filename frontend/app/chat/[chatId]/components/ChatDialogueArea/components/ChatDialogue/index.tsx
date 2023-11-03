@@ -1,7 +1,9 @@
 import { useTranslation } from "react-i18next";
 
+import { ShareModal } from "@/app/chat/components/ShareChat/ShareModal";
 import { useOnboarding } from "@/lib/hooks/useOnboarding";
 
+import { ChatItemWithGroupedNotifications } from "../../types";
 import { ChatItem } from "./components";
 import { Onboarding } from "./components/Onboarding/Onboarding";
 import { useChatDialogue } from "./hooks/useChatDialogue";
@@ -10,7 +12,6 @@ import {
   chatItemContainerClassName,
 } from "./styles";
 import { getKeyFromChatItem } from "./utils/getKeyFromChatItem";
-import { ChatItemWithGroupedNotifications } from "../../types";
 
 type MessagesDialogueProps = {
   chatItems: ChatItemWithGroupedNotifications[];
@@ -47,10 +48,16 @@ export const ChatDialogue = ({
           {t("ask", { ns: "chat" })}
         </div>
       ) : (
-        <div className={chatItemContainerClassName}>
-          {chatItems.map((chatItem) => (
-            <ChatItem key={getKeyFromChatItem(chatItem)} content={chatItem} />
-          ))}
+        <div>
+          <div className="flex justify-end mb-2">
+            <ShareModal />
+          </div>
+
+          <div className={chatItemContainerClassName}>
+            {chatItems.map((chatItem) => (
+              <ChatItem key={getKeyFromChatItem(chatItem)} content={chatItem} />
+            ))}
+          </div>
         </div>
       )}
     </div>

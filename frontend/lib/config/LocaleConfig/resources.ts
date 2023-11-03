@@ -15,6 +15,7 @@ import monetization_en from "../../../public/locales/en/monetization.json";
 import translation_en from "../../../public/locales/en/translation.json";
 import upload_en from "../../../public/locales/en/upload.json";
 import user_en from "../../../public/locales/en/user.json";
+import vaccineTruth_en from "../../../public/locales/en/vaccineTruth.json";
 // import all namespaces Spanish
 import brain_es from "../../../public/locales/es/brain.json";
 import chat_es from "../../../public/locales/es/chat.json";
@@ -31,6 +32,7 @@ import monetization_es from "../../../public/locales/es/monetization.json";
 import translation_es from "../../../public/locales/es/translation.json";
 import upload_es from "../../../public/locales/es/upload.json";
 import user_es from "../../../public/locales/es/user.json";
+import vaccineTruth_es from "../../../public/locales/es/vaccineTruth.json";
 // import all namespaces French
 import brain_fr from "../../../public/locales/fr/brain.json";
 import chat_fr from "../../../public/locales/fr/chat.json";
@@ -47,6 +49,7 @@ import monetization_fr from "../../../public/locales/fr/monetization.json";
 import translation_fr from "../../../public/locales/fr/translation.json";
 import upload_fr from "../../../public/locales/fr/upload.json";
 import user_fr from "../../../public/locales/fr/user.json";
+import vaccineTruth_fr from "../../../public/locales/fr/vaccineTruth.json";
 // import all namespaces Portuguese
 import brain_ptbr from "../../../public/locales/pt-br/brain.json";
 import chat_ptbr from "../../../public/locales/pt-br/chat.json";
@@ -63,6 +66,7 @@ import monetization_ptbr from "../../../public/locales/pt-br/monetization.json";
 import translation_ptbr from "../../../public/locales/pt-br/translation.json";
 import upload_ptbr from "../../../public/locales/pt-br/upload.json";
 import user_ptbr from "../../../public/locales/pt-br/user.json";
+import vaccineTruth_ptbr from "../../../public/locales/pt-br/vaccineTruth.json";
 // import all namespaces Russian
 import brain_ru from "../../../public/locales/ru/brain.json";
 import chat_ru from "../../../public/locales/ru/chat.json";
@@ -79,6 +83,7 @@ import monetization_ru from "../../../public/locales/ru/monetization.json";
 import translation_ru from "../../../public/locales/ru/translation.json";
 import upload_ru from "../../../public/locales/ru/upload.json";
 import user_ru from "../../../public/locales/ru/user.json";
+import vaccineTruth_ru from "../../../public/locales/ru/vaccineTruth.json";
 // import all namespaces Simplified Chinese
 import brain_zh_cn from "../../../public/locales/zh-cn/brain.json";
 import chat_zh_cn from "../../../public/locales/zh-cn/chat.json";
@@ -95,6 +100,7 @@ import monetization_zh_cn from "../../../public/locales/zh-cn/monetization.json"
 import translation_zh_cn from "../../../public/locales/zh-cn/translation.json";
 import upload_zh_cn from "../../../public/locales/zh-cn/upload.json";
 import user_zh_cn from "../../../public/locales/zh-cn/user.json";
+import vaccineTruth_zh_cn from "../../../public/locales/zh-cn/vaccineTruth.json";
 
 //type all translations
 export type Translations = {
@@ -113,6 +119,7 @@ export type Translations = {
   upload: typeof import("../../../public/locales/en/upload.json");
   user: typeof import("../../../public/locales/en/user.json");
   knowledge: typeof import("../../../public/locales/en/knowledge.json");
+  vaccineTruth: typeof import("../../../public/locales/en/vaccineTruth.json");
 };
 
 enum SupportedLanguages {
@@ -142,6 +149,7 @@ export const resources: Record<SupportedLanguages, Translations> = {
     user: user_en,
     delete_or_unsubscribe_from_brain: delete_brain_en,
     knowledge: knowlegde_en,
+    vaccineTruth: vaccineTruth_en,
   },
   es: {
     brain: brain_es,
@@ -159,6 +167,7 @@ export const resources: Record<SupportedLanguages, Translations> = {
     user: user_es,
     delete_or_unsubscribe_from_brain: delete_brain_es,
     knowledge: knowlegde_es,
+    vaccineTruth: vaccineTruth_es,
   },
   fr: {
     brain: brain_fr,
@@ -176,6 +185,7 @@ export const resources: Record<SupportedLanguages, Translations> = {
     user: user_fr,
     delete_or_unsubscribe_from_brain: delete_brain_fr,
     knowledge: knowlegde_fr,
+    vaccineTruth: vaccineTruth_fr,
   },
   ptbr: {
     brain: brain_ptbr,
@@ -193,6 +203,7 @@ export const resources: Record<SupportedLanguages, Translations> = {
     user: user_ptbr,
     delete_or_unsubscribe_from_brain: delete_brain_ptbr,
     knowledge: knowlegde_ptbr,
+    vaccineTruth: vaccineTruth_ptbr,
   },
   ru: {
     brain: brain_ru,
@@ -210,6 +221,7 @@ export const resources: Record<SupportedLanguages, Translations> = {
     user: user_ru,
     delete_or_unsubscribe_from_brain: delete_brain_ru,
     knowledge: knowlegde_ru,
+    vaccineTruth: vaccineTruth_ru,
   },
   zh_cn: {
     brain: brain_zh_cn,
@@ -227,5 +239,6 @@ export const resources: Record<SupportedLanguages, Translations> = {
     user: user_zh_cn,
     delete_or_unsubscribe_from_brain: delete_brain_zh_cn,
     knowledge: knowlegde_zh_cn,
+    vaccineTruth: vaccineTruth_zh_cn,
   },
 } as const;
