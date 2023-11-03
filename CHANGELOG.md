@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.0.104 (2023-11-03)
+
+## What's Changed
+* feat: 🎸 docs by @StanGirard in https://github.com/StanGirard/quivr/pull/1561
+* style(prompts): update public prompts dropdown styling by @St-Bloom in https://github.com/StanGirard/quivr/pull/1563
+* feat: add remote notification config by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1547
+* fix: fix button bad children error by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1564
+* style: fix hidden contents by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1577
+
+## New Contributors
+* @St-Bloom made their first contribution in https://github.com/StanGirard/quivr/pull/1563
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.103...v0.0.104
+
 ## 0.0.103 (2023-11-02)
 
 ## What's Changed
