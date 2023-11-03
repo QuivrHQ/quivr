@@ -14,7 +14,7 @@ const BrainsLibrary = (): JSX.Element => {
   const { t } = useTranslation("brain");
 
   return (
-    <div className="flex flex-1 flex-col items-center">
+    <div className="flex flex-1 flex-col items-center overflow-scroll">
       <div className="flex">
         <Field
           value={searchBarText}
