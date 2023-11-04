@@ -12,7 +12,7 @@ services:
       - /app/node_modules
       - /app/.next
     container_name: web
-    restart: always
+    restart: unless-stopped
     ports:
       - 3000:3000
 
@@ -25,7 +25,7 @@ services:
       args:
         - DEV_MODE=true
     container_name: backend-core
-    restart: always
+    restart: unless-stopped
     volumes:
       - ./backend/:/code/
     depends_on:
@@ -38,7 +38,7 @@ services:
   redis:
     image: redis:latest
     container_name: redis
-    restart: always
+    restart: unless-stopped
     ports:
       - 6379:6379
 
@@ -50,7 +50,7 @@ services:
       dockerfile: Dockerfile
     container_name: worker
     command: celery -A celery_worker worker -l info
-    restart: always
+    restart: unless-stopped
     depends_on:
       - redis
     volumes:
@@ -64,7 +64,7 @@ services:
       dockerfile: Dockerfile
     container_name: flower
     command: celery -A celery_worker flower -l info --port=5555
-    restart: always
+    restart: unless-stopped
     volumes:
       - ./backend/:/code/
     depends_on:
