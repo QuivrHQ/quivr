@@ -62,7 +62,7 @@ else
             echo "Running migration $file"
             run_sql_file "scripts/$file"
             # And record it as having been run
-            PGPASSWORD=${DB_PASSWORD} psql -h "${DB_HOST}" -p "${DB_PORT}" -d "${DB_NAME}" -U "${DB_USER}" -c "INSERT INTO migrations (id) VALUES ('${MIGRATION_ID}');"
+            PGPASSWORD=${DB_PASSWORD} psql -h "${DB_HOST}" -p "${DB_PORT}" -d "${DB_NAME}" -U "${DB_USER}" -c "INSERT INTO migrations (name) VALUES ('${MIGRATION_ID}');"
         fi
     done
 fi
