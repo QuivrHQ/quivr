@@ -1,6 +1,6 @@
 ---
 sidebar_position: 1
-title: 🔐 Get your API key
+title: Get your API key
 ---
 
 To use the Quivr API, you need to get an API key. You can get one by following these steps:

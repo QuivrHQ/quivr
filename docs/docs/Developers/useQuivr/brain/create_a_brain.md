@@ -1,6 +1,6 @@
 ---
 sidebar_position: 1
-title: 🆕 Create a brain
+title: Create a brain
 ---
 
 To create a brain, you need to make a POST request to the `/brains/` endpoint. This endpoint requires authentication, and you need to provide the following parameters in the request body:

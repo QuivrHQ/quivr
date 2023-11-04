@@ -1,6 +1,6 @@
 ---
 sidebar_position: 1
-title: 🕺 Getting started
+title: Getting started
 ---
 
 ## How to get started ? 👀
