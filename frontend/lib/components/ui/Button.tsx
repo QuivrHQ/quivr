@@ -6,7 +6,7 @@ import {
   TooltipTrigger,
 } from "@radix-ui/react-tooltip";
 import { cva, type VariantProps } from "class-variance-authority";
-import { ButtonHTMLAttributes, LegacyRef, forwardRef } from "react";
+import { ButtonHTMLAttributes, Ref, RefAttributes, forwardRef } from "react";
 import { FaSpinner } from "react-icons/fa";
 
 import { cn } from "@/lib/utils";
@@ -56,22 +56,25 @@ const Button = forwardRef(
     }: ButtonProps,
     forwardedRef
   ): JSX.Element => {
-    const buttonElement = (
-      <button
-        className={cn(ButtonVariants({ variant, brightness, className }))}
-        disabled={isLoading}
-        {...props}
-        ref={forwardedRef as LegacyRef<HTMLButtonElement>}
-      >
+    const buttonProps: ButtonProps & RefAttributes<HTMLButtonElement> = {
+      className: cn(ButtonVariants({ variant, brightness, className })),
+      disabled: isLoading,
+      ...props,
+      ref: forwardedRef as Ref<HTMLButtonElement> | undefined,
+    };
+
+    const buttonChildren = (
+      <>
         {children} {isLoading && <FaSpinner className="animate-spin" />}
-      </button>
+      </>
     );
+    const buttonElement = <button {...buttonProps}>buttonChildren</button>;
 
     if (tooltip !== undefined) {
       return (
         <TooltipProvider>
           <Tooltip>
-            <TooltipTrigger>{buttonElement}</TooltipTrigger>
+            <TooltipTrigger {...buttonProps}>{buttonChildren}</TooltipTrigger>
             <TooltipContent className="bg-gray-100 rounded-md p-1">
               {tooltip}
             </TooltipContent>
@@ -80,9 +83,8 @@ const Button = forwardRef(
       );
     }
 
-    return buttonElement;
+    return <button {...buttonProps}>{buttonChildren}</button>;
   }
 );
 
-Button.displayName = "Button";
 export default Button;

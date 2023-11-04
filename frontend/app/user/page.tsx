@@ -84,7 +84,6 @@ const UserPage = (): JSX.Element => {
             <ApiKeyConfig />
           </CardBody>
         </Card>
-        L
       </main>
     </>
   );
