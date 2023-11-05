@@ -6,7 +6,7 @@ import { useChatApi } from "@/lib/api/chat/useChatApi";
 import { useToast } from "@/lib/hooks";
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-export const useShareChat = () => {
+export const useSharedChat = () => {
   const pathname = usePathname();
   const [isCopied, setIsCopied] = useState(false);
   const [isShareChatModalOpen, setIsShareChatModalOpen] = useState(false);

@@ -1,3 +1,5 @@
+"use client";
+
 import SharedChatPage from "./chat/[sharedCode]/page";
 
 export const metadata = {

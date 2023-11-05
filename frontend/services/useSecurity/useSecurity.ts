@@ -7,7 +7,7 @@ import { useSupabase } from "@/lib/context/SupabaseProvider";
 
 export const useSecurity = (): {
   isStudioMember: boolean;
-  isPageAccessOk: boolean;
+  isRouteAccessible: boolean;
 } => {
   const [isStudioMember, setIsStudioMember] = useState<boolean>(false);
 
@@ -15,7 +15,7 @@ export const useSecurity = (): {
   const path = usePathname();
 
   const securityPages = ["/login", "/chat", "/share", "/user"];
-  const isPageAccessOk =
+  const isRouteAccessible =
     path === "/" ||
     securityPages.some((page: string) => path?.startsWith(page));
 
@@ -26,5 +26,5 @@ export const useSecurity = (): {
     }
   }, [session?.user.email]);
 
-  return { isStudioMember, isPageAccessOk };
+  return { isStudioMember, isRouteAccessible };
 };

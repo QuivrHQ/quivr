@@ -7,8 +7,8 @@ import Button from "@/lib/components/ui/Button";
 import { Modal } from "@/lib/components/ui/Modal";
 
 // eslint-disable-next-line import/order
-import { SharePlatform } from "./SharePlatform";
-import { useShareChat } from "./hooks/useShareChat";
+import { ShareButtons } from "./ShareButtons";
+import { useSharedChat } from "./hooks/useSharedChat";
 
 export const ShareModal = (): JSX.Element => {
   const {
@@ -18,7 +18,7 @@ export const ShareModal = (): JSX.Element => {
     setIsShareChatModalOpen,
     isGeneratingShareId,
     chatShareURL,
-  } = useShareChat();
+  } = useSharedChat();
   const { t } = useTranslation(["vaccineTruth"]);
 
   return (
@@ -50,7 +50,7 @@ export const ShareModal = (): JSX.Element => {
           <div>
             <div>
               <div className="mb-2 text-xs sm:text-sm">{t("chatShareTo")}</div>
-              <SharePlatform chatShareURL={chatShareURL} />
+              <ShareButtons chatShareURL={chatShareURL} />
             </div>
           </div>
         </div>

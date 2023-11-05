@@ -15,9 +15,9 @@ const queryClient = new QueryClient();
 
 // This wrapper is used to make effect calls at a high level in app rendering.
 export const App = ({ children }: PropsWithChildren): JSX.Element => {
-  const { isStudioMember, isPageAccessOk } = useSecurity();
+  const { isStudioMember, isRouteAccessible } = useSecurity();
 
-  if (!isStudioMember && !isPageAccessOk) {
+  if (!isStudioMember && !isRouteAccessible) {
     redirectToChat();
   }
 

@@ -15,7 +15,7 @@ import {
   WhatsappShareButton,
 } from "next-share";
 
-export const SharePlatform = ({
+export const ShareButtons = ({
   chatShareURL,
 }: {
   chatShareURL: string;

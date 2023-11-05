@@ -9,7 +9,7 @@ import { useChatContext } from "@/lib/context";
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const useSharedChatItems = () => {
   const { setMessages, setNotifications } = useChatContext();
-  const { getShareChatItems } = useChatApi();
+  const { getSharedChatItems } = useChatApi();
 
   const params = useParams();
 
@@ -24,7 +24,7 @@ export const useSharedChatItems = () => {
         return;
       }
 
-      const chatItems = await getShareChatItems(sharedCode);
+      const chatItems = await getSharedChatItems(sharedCode);
 
       setMessages(getMessagesFromChatItems(chatItems));
       setNotifications(getNotificationsFromChatItems(chatItems));
