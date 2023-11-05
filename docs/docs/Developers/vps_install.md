@@ -51,8 +51,8 @@ Add the following lines, making sure to replace the placeholders with your infor
 
 ```
 EMAIL=your-email@example.com
-DOMAIN_NAME=quivr.yourdomain.com
-API_DOMAIN_NAME=api.quivr.yourdomain.com
+DOMAIN_NAME=yourdomain.com
+API_DOMAIN_NAME=api.yourdomain.com
 ```
 
 Don't forget to save your changes (`Ctrl+X`, then `Y`, and `Enter`).
