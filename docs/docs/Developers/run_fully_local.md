@@ -1,6 +1,6 @@
 ---
 sidebar_position: 4
-title: 📍 Run Quivr fully locally
+title: Run Quivr fully locally
 ---
 
 # Using Quivr fully locally

@@ -1,6 +1,6 @@
 ---
 sidebar_position: 2
-title: ❓ How to use the API
+title: How to use the API
 ---
 
 **URL**: https://api.quivr.app
