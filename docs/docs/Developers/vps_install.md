@@ -72,8 +72,8 @@ The `docker-compose.local.yml` file includes **Traefik**, which automagically ha
 ### Step 5: Verify Installation
 Once everything is up and running, give yourself a pat on the back and verify that the services are accessible:
 
-- Visit `https://quivr.yourdomain.com`
-- And `https://api.quivr.yourdomain.com`
+- Visit `https://yourdomain.com`
+- And `https://api.yourdomain.com`
 
 You should be greeted by your new Quivr setup, all shiny and secure!
 
