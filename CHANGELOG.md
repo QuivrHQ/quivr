@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.0.106 (2023-11-06)
+
+## What's Changed
+* feat: 🎸 sources by @StanGirard in https://github.com/StanGirard/quivr/pull/1591
+
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.105...v0.0.106
+
 ## 0.0.105 (2023-11-06)
 
 ## What's Changed
