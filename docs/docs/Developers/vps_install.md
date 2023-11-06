@@ -13,7 +13,6 @@ Welcome to the installation guide for Quivr, your go-to open-source project . Th
   - [Step-by-Step Installation](#step-by-step-installation)
     - [Step 1: Clone Quivr Repository](#step-1-clone-quivr-repository)
     - [Step 2: Create `.env` File](#step-2-create-env-file)
-
     - [Step 3: Configure `.env` Files for Backend and Frontend](#step-3-configure-env-files-for-backend-and-frontend)
     - [Step 4: Launch Quivr with Docker Compose](#step-4-launch-quivr-with-docker-compose)
     - [Step 5: Verify Installation](#step-5-verify-installation)
@@ -25,11 +24,11 @@ Before diving into the installation process, please ensure you have the followin
 - An **Ubuntu 22.04 server** with at least **20 GB of free disk space**.
 - **Docker** installed. If you haven't done this yet, no worries! Follow the official [Docker Installation Guide for Ubuntu](https://docs.docker.com/engine/install/ubuntu/).
 - **DNS records** configured to point to your server. You will need records for the following:
-  - `flower.api.<yourdomain>`
-  - `api.<yourdomain>`
-  - `<yourdomain>`
+  - `flower.api.yourdomain`
+  - `api.yourdomain`
+  - `yourdomain`
 
-> Replace `<yourdomain>` with your actual domain name throughout this guide. This domain also could be a subdomain like bot.<yourdomain>.com. In this case in your DNS configuration make sure that bot.<yourdomain.com> is also pointing to the IP address of your server, like you did with "flower.api" and "api".
+> Replace `<yourdomain>` with your actual domain name throughout this guide. This domain also could be a subdomain like `bot.<yourdomain>.com`. In this case in your DNS configuration make sure that `bot.<yourdomain.com>` is also pointing to the IP address of your server, like you did with "flower.api" and "api".
 
 ## Step-by-Step Installation
 
@@ -55,7 +54,7 @@ EMAIL=your-email@example.com
 DOMAIN_NAME=yourdomain.com
 API_DOMAIN_NAME=api.yourdomain.com
 ```
-note: in this file if you used a subdomain, DOMAIN_NAME would be bot.<yourdomain.com> and API_DOMAIN_NAME would be api.<yourdomain.com>
+note: in this file if you used a subdomain, DOMAIN_NAME would be `bot.<yourdomain.com>` and API_DOMAIN_NAME would be `api.<yourdomain.com>`
 
 Don't forget to save your changes (`Ctrl+X`, then `Y`, and `Enter`).
 
