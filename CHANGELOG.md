@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.0.105 (2023-11-06)
+
+## What's Changed
+* feat: make auth mode configurable by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1579
+* Fix #1290 issue running migrations by @charlesbrandt in https://github.com/StanGirard/quivr/pull/1585
+* Use 'unless-stopped' instead of 'always' for development by @charlesbrandt in https://github.com/StanGirard/quivr/pull/1586
+* feat: 🎸 vps by @StanGirard in https://github.com/StanGirard/quivr/pull/1587
+* Update vps_install.md for subdomain by @jbeltran73-2 in https://github.com/StanGirard/quivr/pull/1589
+
+## New Contributors
+* @charlesbrandt made their first contribution in https://github.com/StanGirard/quivr/pull/1585
+* @jbeltran73-2 made their first contribution in https://github.com/StanGirard/quivr/pull/1589
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.104...v0.0.105
+
 ## 0.0.104 (2023-11-03)
 
 ## What's Changed
