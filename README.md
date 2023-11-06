@@ -8,28 +8,19 @@
 [![GitHub Repo stars](https://img.shields.io/github/stars/stangirard/quivr?style=social)](https://github.com/stangirard/quivr)
 [![Twitter Follow](https://img.shields.io/twitter/follow/StanGirard?style=social)](https://twitter.com/_StanGirard)
 
-Quivr, your second brain, utilizes the power of GenerativeAI to store and retrieve unstructured information. Think of it as Obsidian, but turbocharged with AI capabilities.
+Quivr, your second brain, utilizes the power of GenerativeAI to be your personal assistant ! Think of it as Obsidian, but turbocharged with AI capabilities.
 
 [Roadmap here](https://brain.quivr.app/docs/roadmap)
 
 ## Key Features 🎯
 
-- **Universal Data Acceptance**: Quivr can handle almost any type of data you throw at it. Text, images, code snippets, we've got you covered.
-- **Generative AI**: Quivr employs advanced AI to assist you in generating and retrieving information.
 - **Fast and Efficient**: Designed with speed and efficiency at its core. Quivr ensures rapid access to your data.
 - **Secure**: Your data, your control. Always.
 - **OS Compatible**: Ubuntu 22 or newer.
-- **File Compatibility**:
-  - Text
-  - Markdown
-  - PDF
-  - Powerpoint
-  - Excel (Not Yet)
-  - CSV
-  - Word
-  - Audio
-  - Video
+- **File Compatibility**: Text, Markdown, PDF, Powerpoint, Excel, CSV, Word, Audio, Video
 - **Open Source**: Freedom is beautiful, and so is Quivr. Open source and free to use.
+- **Public/Private**: Share your brains with your users via a public link, or keep them private. 
+- **Marketplace**: Share your brains with the world, or use other people's brains to boost your productivity.
 
 ## Demo Highlights 🎥
 
