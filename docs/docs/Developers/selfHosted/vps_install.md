@@ -1,4 +1,5 @@
 ---
+sidebar_position: 1
 title: Install on your Server
 ---
 
@@ -7,6 +8,7 @@ title: Install on your Server
 Welcome to the installation guide for Quivr, your go-to open-source project . This tutorial will walk you through the process of setting up Quivr on an Ubuntu 22.04 server with Docker and Traefik, ensuring a secure HTTPS connection for your domains.
 
 ## Table of Contents
+
 - [Quivr Installation Guide on Ubuntu 22 Server](#quivr-installation-guide-on-ubuntu-22-server)
   - [Table of Contents](#table-of-contents)
   - [Prerequisites](#prerequisites)
@@ -19,6 +21,7 @@ Welcome to the installation guide for Quivr, your go-to open-source project . Th
   - [Additional Information](#additional-information)
 
 ## Prerequisites
+
 Before diving into the installation process, please ensure you have the following ready:
 
 - An **Ubuntu 22.04 server** with at least **20 GB of free disk space**.
@@ -33,6 +36,7 @@ Before diving into the installation process, please ensure you have the followin
 ## Step-by-Step Installation
 
 ### Step 1: Clone Quivr Repository
+
 Let's get started by cloning the Quivr repository onto your server. Open your terminal and run:
 
 ```bash
@@ -41,6 +45,7 @@ cd quivr
 ```
 
 ### Step 2: Create `.env` File
+
 Now, let's set up your environment variables. In the root directory of the Quivr project, create a `.env` file:
 
 ```bash
@@ -54,14 +59,17 @@ EMAIL=your-email@example.com
 DOMAIN_NAME=yourdomain.com
 API_DOMAIN_NAME=api.yourdomain.com
 ```
+
 note: in this file if you used a subdomain, DOMAIN_NAME would be `bot.<yourdomain.com>` and API_DOMAIN_NAME would be `api.<yourdomain.com>`
 
 Don't forget to save your changes (`Ctrl+X`, then `Y`, and `Enter`).
 
 ### Step 3: Configure `.env` Files for Backend and Frontend
+
 Next, configure the `backend/.env` and `frontend/.env` files as per the Quivr documentation. You'll fill in various settings specific to your setup.
 
 ### Step 4: Launch Quivr with Docker Compose
+
 With your `.env` files ready, it's time to start up Quivr using Docker Compose. This step is exciting because it's when things come to life!
 
 ```bash
@@ -71,9 +79,10 @@ docker-compose -f docker-compose.local.yml up
 The `docker-compose.local.yml` file includes **Traefik**, which automagically handles HTTPS certificates for you.
 
 ### Step 5: Verify Installation
+
 Once everything is up and running, give yourself a pat on the back and verify that the services are accessible:
 
-- Visit `https://yourdomain.com`  or `https://bot.yourdomain.com`
+- Visit `https://yourdomain.com` or `https://bot.yourdomain.com`
 - And `https://api.yourdomain.com`
 
 You should be greeted by your new Quivr setup, all shiny and secure!
