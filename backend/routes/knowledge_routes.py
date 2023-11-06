@@ -9,6 +9,7 @@ from repository.files.generate_file_signed_url import generate_file_signed_url
 from repository.knowledge.get_all_knowledge import get_all_knowledge
 from repository.knowledge.get_knowledge import get_knowledge
 from repository.knowledge.remove_knowledge import remove_knowledge
+
 from routes.authorizations.brain_authorization import (
     RoleEnum,
     has_brain_authorization,
