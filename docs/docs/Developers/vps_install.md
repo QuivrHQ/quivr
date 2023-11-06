@@ -13,6 +13,7 @@ Welcome to the installation guide for Quivr, your go-to open-source project . Th
   - [Step-by-Step Installation](#step-by-step-installation)
     - [Step 1: Clone Quivr Repository](#step-1-clone-quivr-repository)
     - [Step 2: Create `.env` File](#step-2-create-env-file)
+
     - [Step 3: Configure `.env` Files for Backend and Frontend](#step-3-configure-env-files-for-backend-and-frontend)
     - [Step 4: Launch Quivr with Docker Compose](#step-4-launch-quivr-with-docker-compose)
     - [Step 5: Verify Installation](#step-5-verify-installation)
@@ -28,7 +29,7 @@ Before diving into the installation process, please ensure you have the followin
   - `api.<yourdomain>`
   - `<yourdomain>`
 
-> Replace `<yourdomain>` with your actual domain name throughout this guide.
+> Replace `<yourdomain>` with your actual domain name throughout this guide. This domain also could be a subdomain like bot.<yourdomain>.com. In this case in your DNS configuration make sure that bot.<yourdomain.com> is also pointing to the IP address of your server, like you did with "flower.api" and "api".
 
 ## Step-by-Step Installation
 
@@ -54,6 +55,7 @@ EMAIL=your-email@example.com
 DOMAIN_NAME=yourdomain.com
 API_DOMAIN_NAME=api.yourdomain.com
 ```
+note: in this file if you used a subdomain, DOMAIN_NAME would be bot.<yourdomain.com> and API_DOMAIN_NAME would be api.<yourdomain.com>
 
 Don't forget to save your changes (`Ctrl+X`, then `Y`, and `Enter`).
 
@@ -72,7 +74,7 @@ The `docker-compose.local.yml` file includes **Traefik**, which automagically ha
 ### Step 5: Verify Installation
 Once everything is up and running, give yourself a pat on the back and verify that the services are accessible:
 
-- Visit `https://yourdomain.com`
+- Visit `https://yourdomain.com`  or `https://bot.yourdomain.com`
 - And `https://api.yourdomain.com`
 
 You should be greeted by your new Quivr setup, all shiny and secure!
