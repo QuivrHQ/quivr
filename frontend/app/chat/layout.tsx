@@ -24,7 +24,7 @@ const Layout = ({ children }: LayoutProps): JSX.Element => {
       <ChatsProvider>
         <ChatProvider>
           <NotificationBanner />
-          <div className="relative h-full w-full flex justify-stretch items-stretch">
+          <div className="relative h-full w-full flex justify-stretch items-stretch overflow-auto">
             <ChatsList />
             {children}
           </div>

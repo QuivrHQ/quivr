@@ -47,11 +47,12 @@ export const ModelSelection = (props: ModelSelectionProps): JSX.Element => {
         <select
           id="model"
           disabled={!hasEditRights}
-          {...register("model")}
+          {...register("model", {
+            onChange: () => {
+              void handleSubmit(false);
+            },
+          })}
           className="px-5 py-2 dark:bg-gray-700 bg-gray-200 rounded-md"
-          onChange={() => {
-            void handleSubmit(false); // Trigger form submission
-          }}
         >
           {accessibleModels.map((availableModel) => (
             <option value={availableModel} key={availableModel}>

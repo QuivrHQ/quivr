@@ -3,8 +3,6 @@ sidebar_position: 2
 title: Install Quivr
 ---
 
-Sure, here's an improved version of your markdown document:
-
 # Prerequisites 📋
 
 Before you begin, make sure you have the following tools and accounts installed and set up:

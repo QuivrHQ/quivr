@@ -208,6 +208,7 @@ class QABaseBrainPicking(BaseModel):
             ),
             verbose=False,
             rephrase_question=False,
+            return_source_documents=True,
         )
 
         prompt_content = (
@@ -283,6 +284,7 @@ class QABaseBrainPicking(BaseModel):
             ),
             verbose=False,
             rephrase_question=False,
+            return_source_documents=True,
         )
 
         transformed_history = format_chat_history(history)
@@ -291,9 +293,10 @@ class QABaseBrainPicking(BaseModel):
 
         async def wrap_done(fn: Awaitable, event: asyncio.Event):
             try:
-                await fn
+                return await fn
             except Exception as e:
                 logger.error(f"Caught exception: {e}")
+                return None  # Or some sentinel value that indicates failure
             finally:
                 event.set()
 
@@ -342,17 +345,47 @@ class QABaseBrainPicking(BaseModel):
             }
         )
 
-        async for token in callback.aiter():
-            logger.info("Token: %s", token)
-            response_tokens.append(token)
-            streamed_chat_history.assistant = token
-            yield f"data: {json.dumps(streamed_chat_history.dict())}"
+        try:
+            async for token in callback.aiter():
+                logger.debug("Token: %s", token)
+                response_tokens.append(token)
+                streamed_chat_history.assistant = token
+                yield f"data: {json.dumps(streamed_chat_history.dict())}"
+        except Exception as e:
+            logger.error("Error during streaming tokens: %s", e)
+        sources_string = ""
+        try:
+            result = await run
+            source_documents = result.get("source_documents", [])
+            ## Deduplicate source documents
+            source_documents = list(
+                {doc.metadata["file_name"]: doc for doc in source_documents}.values()
+            )
 
-        await run
+            if source_documents:
+                # Formatting the source documents using Markdown without new lines for each source
+                sources_string = "\n\n**Sources:** " + ", ".join(
+                    f"{doc.metadata.get('file_name', 'Unnamed Document')}"
+                    for doc in source_documents
+                )
+                streamed_chat_history.assistant += sources_string
+                yield f"data: {json.dumps(streamed_chat_history.dict())}"
+            else:
+                logger.info(
+                    "No source documents found or source_documents is not a list."
+                )
+        except Exception as e:
+            logger.error("Error processing source documents: %s", e)
+
+        # Combine all response tokens to form the final assistant message
         assistant = "".join(response_tokens)
+        assistant += sources_string
 
-        update_message_by_id(
-            message_id=str(streamed_chat_history.message_id),
-            user_message=question.question,
-            assistant=assistant,
-        )
+        try:
+            update_message_by_id(
+                message_id=str(streamed_chat_history.message_id),
+                user_message=question.question,
+                assistant=assistant,
+            )
+        except Exception as e:
+            logger.error("Error updating message by ID: %s", e)

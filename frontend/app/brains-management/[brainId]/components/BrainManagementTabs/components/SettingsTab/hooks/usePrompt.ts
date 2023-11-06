@@ -62,6 +62,10 @@ export const usePrompt = (props: UsePromptProps) => {
     promptId
   );
 
+  useEffect(() => {
+    setCurrentPromptId(promptId);
+  }, [promptId]);
+
   const fetchPrompt = async () => {
     if (currentPromptId === "" || currentPromptId === undefined) {
       return;

@@ -92,4 +92,23 @@ class Knowledges(Repository):
             .execute()
         ).data
 
-        return all_knowledge
+        return [Knowledge(**knowledge) for knowledge in all_knowledge]
+
+    def remove_brain_all_knowledge(self, brain_id: UUID) -> None:
+        """
+        Remove all knowledge in a brain
+        Args:
+            brain_id (UUID): The id of the brain
+        """
+        all_knowledge = self.get_all_knowledge_in_brain(brain_id)
+        knowledge_to_delete_list = []
+
+        for knowledge in all_knowledge:
+            if knowledge.file_name:
+                knowledge_to_delete_list.append(f"{brain_id}/{knowledge.file_name}")
+
+        self.db.storage.from_("quivr").remove(knowledge_to_delete_list)
+
+        self.db.from_("knowledge").delete().filter(
+            "brain_id", "eq", str(brain_id)
+        ).execute()
