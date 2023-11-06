@@ -86,7 +86,6 @@ export const GeneralInformation = (
           <Radio
             items={brainStatusOptions}
             label={t("brain_status_label", { ns: "brain" })}
-            value={status}
             className="flex-1 justify-between w-[50%]"
             {...register("status")}
           />
