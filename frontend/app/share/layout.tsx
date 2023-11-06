@@ -1,4 +1,5 @@
 "use client";
+
 import { ReactNode } from "react";
 
 import { ChatProvider, KnowledgeToFeedProvider } from "@/lib/context";

@@ -3,20 +3,13 @@
 import Link from "next/link";
 import { useTranslation } from "react-i18next";
 
-import { getMergedChatMessagesWithDoneStatusNotificationsReduced } from "@/app/chat/[chatId]/components/ChatDialogueArea/utils/getMergedChatMessagesWithDoneStatusNotificationsReduced";
 import { DisplayChatMessageArea } from "@/lib/components/DisplayChatMessageArea";
-import { useChatContext } from "@/lib/context";
+import Spinner from "@/lib/components/ui/Spinner";
 
 import { useSharedChatItems } from "../../components/hooks/useSharedChatItems";
 const SharedChatPage = (): JSX.Element => {
   const { t } = useTranslation(["vaccineTruth"]);
-  useSharedChatItems();
-
-  const { messages, notifications } = useChatContext();
-  const chatItems = getMergedChatMessagesWithDoneStatusNotificationsReduced(
-    messages,
-    notifications
-  );
+  const { isLoading } = useSharedChatItems();
 
   return (
     <div
@@ -30,7 +23,13 @@ const SharedChatPage = (): JSX.Element => {
         className={`flex flex-col flex-1 w-full h-full dark:shadow-primary/25 overflow-hidden `}
       >
         <div className="flex flex-1 flex-col overflow-y-auto ">
-          <DisplayChatMessageArea chatItems={chatItems} />
+          {isLoading ? (
+            <div className="h-full flex justify-center items-center">
+              <Spinner />
+            </div>
+          ) : (
+            <DisplayChatMessageArea />
+          )}
         </div>
       </div>
       <div className="fixed bottom-1 justify-center w-full bg-gradient-to-b from-transparent to-slate-300 flex">

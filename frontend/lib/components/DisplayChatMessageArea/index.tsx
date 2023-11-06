@@ -6,20 +6,15 @@ import {
   chatItemContainerClassName,
 } from "@/app/chat/[chatId]/components/ChatDialogueArea//components/ChatDialogue/styles";
 import { getKeyFromChatItem } from "@/app/chat/[chatId]/components/ChatDialogueArea/components/ChatDialogue/utils/getKeyFromChatItem";
-import { ChatItemWithGroupedNotifications } from "@/app/chat/[chatId]/components/ChatDialogueArea/types";
+import { useChatContext } from "@/lib/context";
 
-type MessagesDialogueProps = {
-  chatItems: ChatItemWithGroupedNotifications[];
-};
-
-export const DisplayChatMessageArea = ({
-  chatItems,
-}: MessagesDialogueProps): JSX.Element => {
+export const DisplayChatMessageArea = (): JSX.Element => {
   const { t } = useTranslation(["chat"]);
+  const { sharedChatItems } = useChatContext();
 
   return (
     <div className={chatDialogueContainerClassName}>
-      {chatItems.length === 0 ? (
+      {sharedChatItems.length === 0 ? (
         <div
           data-testid="empty-history-message"
           className="text-center opacity-50"
@@ -29,7 +24,7 @@ export const DisplayChatMessageArea = ({
       ) : (
         <div>
           <div className={chatItemContainerClassName}>
-            {chatItems.map((chatItem) => (
+            {sharedChatItems.map((chatItem) => (
               <ChatItem key={getKeyFromChatItem(chatItem)} content={chatItem} />
             ))}
           </div>
