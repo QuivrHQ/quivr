@@ -357,6 +357,11 @@ class QABaseBrainPicking(BaseModel):
         try:
             result = await run
             source_documents = result.get("source_documents", [])
+            ## Deduplicate source documents
+            source_documents = list(
+                {doc.metadata["file_name"]: doc for doc in source_documents}.values()
+            )
+
             if source_documents:
                 # Formatting the source documents using Markdown without new lines for each source
                 sources_string = "\n\n**Sources:** " + ", ".join(
