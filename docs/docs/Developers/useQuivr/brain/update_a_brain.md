@@ -1,6 +1,6 @@
 ---
 sidebar_position: 2
-title: ✍️ Update a Brain
+title: Update a Brain
 ---
 
 To update a brain, you need to make a PUT request to the following endpoint:

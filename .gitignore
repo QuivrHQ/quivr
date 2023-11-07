@@ -64,3 +64,5 @@ package-lock.json
 backend/celerybeat-schedule
 frontend/public/robots.txt
 frontend/public/sitemap*
+
+pyfiles/*

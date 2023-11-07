@@ -4,7 +4,9 @@ import { CopyButton } from "./components/CopyButton";
 import { MessageContent } from "./components/MessageContent";
 import { QuestionBrain } from "./components/QuestionBrain";
 import { QuestionPrompt } from "./components/QuestionPrompt";
+import { SourcesButton } from './components/SourcesButton'; // Import the new component
 import { useMessageRow } from "./hooks/useMessageRow";
+
 
 type MessageRowProps = {
   speaker: "user" | "assistant";
@@ -31,21 +33,39 @@ export const MessageRow = React.forwardRef(
       text,
     });
 
+    let messageContent = text ?? "";
+    let sourcesContent = "";
+
+    const sourcesIndex = messageContent.lastIndexOf("**Sources:**");
+    const hasSources = sourcesIndex !== -1;
+    
+    if (hasSources) {
+      sourcesContent = messageContent.substring(sourcesIndex + "**Sources:**".length).trim();
+      messageContent = messageContent.substring(0, sourcesIndex).trim();
+    }
+
     return (
       <div className={containerWrapperClasses}>
         <div ref={ref} className={containerClasses}>
-          <div className="w-full gap-1 flex justify-between">
+          <div className="flex justify-between items-start w-full">
+            {/* Left section for the question and prompt */}
             <div className="flex">
               <QuestionBrain brainName={brainName} />
               <QuestionPrompt promptName={promptName} />
             </div>
-            {!isUserSpeaker && text !== undefined && (
-              <CopyButton handleCopy={handleCopy} isCopied={isCopied} />
-            )}
+            {/* Right section for buttons */}
+            <div className="flex items-center gap-2">
+              {!isUserSpeaker && (
+                <>
+                  {hasSources && <SourcesButton sources={sourcesContent} />}
+                  <CopyButton handleCopy={handleCopy} isCopied={isCopied} />
+                </>
+              )}
+            </div>
           </div>
           {children ?? (
             <MessageContent
-              text={text ?? ""}
+              text={messageContent}
               markdownClasses={markdownClasses}
             />
           )}
@@ -54,5 +74,5 @@ export const MessageRow = React.forwardRef(
     );
   }
 );
-
+    
 MessageRow.displayName = "MessageRow";

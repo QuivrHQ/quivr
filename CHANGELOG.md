@@ -1,5 +1,42 @@
 # Changelog
 
+## 0.0.106 (2023-11-06)
+
+## What's Changed
+* feat: 🎸 sources by @StanGirard in https://github.com/StanGirard/quivr/pull/1591
+
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.105...v0.0.106
+
+## 0.0.105 (2023-11-06)
+
+## What's Changed
+* feat: make auth mode configurable by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1579
+* Fix #1290 issue running migrations by @charlesbrandt in https://github.com/StanGirard/quivr/pull/1585
+* Use 'unless-stopped' instead of 'always' for development by @charlesbrandt in https://github.com/StanGirard/quivr/pull/1586
+* feat: 🎸 vps by @StanGirard in https://github.com/StanGirard/quivr/pull/1587
+* Update vps_install.md for subdomain by @jbeltran73-2 in https://github.com/StanGirard/quivr/pull/1589
+
+## New Contributors
+* @charlesbrandt made their first contribution in https://github.com/StanGirard/quivr/pull/1585
+* @jbeltran73-2 made their first contribution in https://github.com/StanGirard/quivr/pull/1589
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.104...v0.0.105
+
+## 0.0.104 (2023-11-03)
+
+## What's Changed
+* feat: 🎸 docs by @StanGirard in https://github.com/StanGirard/quivr/pull/1561
+* style(prompts): update public prompts dropdown styling by @St-Bloom in https://github.com/StanGirard/quivr/pull/1563
+* feat: add remote notification config by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1547
+* fix: fix button bad children error by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1564
+* style: fix hidden contents by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1577
+
+## New Contributors
+* @St-Bloom made their first contribution in https://github.com/StanGirard/quivr/pull/1563
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.103...v0.0.104
+
 ## 0.0.103 (2023-11-02)
 
 ## What's Changed

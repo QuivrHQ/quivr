@@ -1,6 +1,6 @@
 ---
 sidebar_position: 7
-title: 🧪 Testing Strategies
+title: Testing Strategies
 ---
 
 ## Backend

@@ -98,7 +98,7 @@ export const useSettingsTab = ({ brainId }: UseSettingsTabProps) => {
     }
 
     setTimeout(() => {
-      if (brain.model !== undefined) {
+      if (brain.model !== undefined && brain.model !== null) {
         setValue("model", brain.model);
       }
     }, 50);
