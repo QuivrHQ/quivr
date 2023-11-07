@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.0.107 (2023-11-06)
+
+## What's Changed
+* fix: allow to change model bro brain settings tab by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1590
+* fix: fix notification banner display when too much items in chat list by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1593
+* docs: add auth modes config by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1595
+* fix: allow users to delete brains by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1596
+* feat: 🎸 source documents by @StanGirard in https://github.com/StanGirard/quivr/pull/1598
+
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.106...v0.0.107
+
 ## 0.0.106 (2023-11-06)
 
 ## What's Changed
