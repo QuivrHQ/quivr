@@ -13,10 +13,10 @@ export type Brain = {
   name: string;
   documents?: Document[];
   status?: BrainAccessStatus;
-  model?: Model;
+  model?: Model | null;
   max_tokens?: number;
   temperature?: number;
-  openai_api_key?: string;
+  openai_api_key?: string | null;
   description?: string;
   prompt_id?: string | null;
 };

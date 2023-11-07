@@ -1,9 +1,7 @@
 ---
 sidebar_position: 2
-title: 🧑‍💻 Install Quivr
+title: Install Quivr
 ---
-
-Sure, here's an improved version of your markdown document:
 
 # Prerequisites 📋
 

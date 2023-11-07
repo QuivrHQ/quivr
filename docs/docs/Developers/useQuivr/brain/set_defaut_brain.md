@@ -1,6 +1,6 @@
 ---
 sidebar_position: 3
-title: 🫵 Set a Default Brain
+title: Set a Default Brain
 ---
 
 To set a brain as the default for the current user, you need to make a POST request to the following endpoint:

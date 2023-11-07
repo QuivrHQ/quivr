@@ -36,7 +36,7 @@ const RootLayout = async ({
   return (
     <html lang="en">
       <body
-        className={`bg-white text-black min-h-screen flex flex-col dark:bg-black dark:text-white w-full ${inter.className}`}
+        className={`bg-white text-black h-screen flex flex-col dark:bg-black dark:text-white w-full ${inter.className}`}
       >
         <FeatureFlagsProvider>
           <ToastProvider>

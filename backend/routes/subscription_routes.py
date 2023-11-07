@@ -17,6 +17,9 @@ from repository.brain_subscription import (
     SubscriptionInvitationService,
     resend_invitation_email,
 )
+from repository.knowledge.remove_brain_all_knowledge import (
+    remove_brain_all_knowledge,
+)
 from repository.prompt import delete_prompt_by_id, get_prompt_by_id
 from repository.user import get_user_email_by_user_id, get_user_id_by_user_email
 
@@ -128,6 +131,14 @@ async def remove_user_subscription(
     """
     Remove a user's subscription to a brain
     """
+    targeted_brain = get_brain_by_id(brain_id)
+
+    if targeted_brain is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Brain not found while trying to delete",
+        )
+
     brain = Brain(
         id=brain_id,
     )
@@ -151,15 +162,15 @@ async def remove_user_subscription(
 
         if len(brain_other_owners) == 0:
             # Delete its prompt if it's private
-            brain_to_delete = get_brain_by_id(brain_id)
-            if brain_to_delete:
-                brain.delete_brain(current_user.id)
-                if brain_to_delete.prompt_id:
-                    brain_to_delete_prompt = get_prompt_by_id(brain_to_delete.prompt_id)
-                    if brain_to_delete_prompt is not None and (
-                        brain_to_delete_prompt.status == PromptStatusEnum.private
-                    ):
-                        delete_prompt_by_id(brain_to_delete.prompt_id)
+
+            remove_brain_all_knowledge(brain_id)
+            brain.delete_brain(current_user.id)
+            if targeted_brain.prompt_id:
+                brain_to_delete_prompt = get_prompt_by_id(targeted_brain.prompt_id)
+                if brain_to_delete_prompt is not None and (
+                    brain_to_delete_prompt.status == PromptStatusEnum.private
+                ):
+                    delete_prompt_by_id(targeted_brain.prompt_id)
 
         else:
             brain.delete_user_from_brain(current_user.id)

@@ -1,0 +1,23 @@
+---
+sidebar_position: 3
+title: Authentication
+---
+
+# Authentication Methods
+
+Quivr offers three authentication methods when self-hosting. You can choose which authentication methods you want to offer to your users from these three options:
+
+1. **Email/Password Authentication**
+2. **Google Authentication**
+3. **Magic Link Authentication**
+
+To enable one or more of these methods, you need to configure the following environment variables in your `.env` file:
+
+```bash
+# Authentication Configuration
+NEXT_PUBLIC_AUTH_MODES=magic_link,google_sso,password
+```
+
+Since each of these methods uses Supabase, you should configure your Supabase instance to support the chosen methods.
+
+Please refer to the [Supabase documentation](https://supabase.com/docs/guides/auth) for more information on how to configure each authentication method.
