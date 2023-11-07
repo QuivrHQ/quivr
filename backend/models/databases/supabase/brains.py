@@ -2,7 +2,7 @@ from typing import Optional
 from uuid import UUID
 
 from logger import get_logger
-from models.brain_entity import BrainEntity, MinimalBrainEntity, PublicBrain
+from models.brain_entity import BrainEntity, BrainType, MinimalBrainEntity, PublicBrain
 from models.databases.repository import Repository
 from pydantic import BaseModel
 
@@ -18,6 +18,7 @@ class CreateBrainProperties(BaseModel):
     max_tokens: Optional[int] = 256
     openai_api_key: Optional[str] = None
     prompt_id: Optional[UUID] = None
+    brain_type: Optional[BrainType] = BrainType.DOC
 
     def dict(self, *args, **kwargs):
         brain_dict = super().dict(*args, **kwargs)
