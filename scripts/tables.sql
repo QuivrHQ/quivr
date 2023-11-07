@@ -201,6 +201,15 @@ CREATE TABLE IF NOT EXISTS user_identity (
   openai_api_key VARCHAR(255)
 );
 
+-- Create the new table with 6 columns
+CREATE TABLE IF NOT EXISTS api_brain_definition (
+    brain_id UUID REFERENCES brains(brain_id),
+    method VARCHAR(255) CHECK (method IN ('GET', 'POST', 'PUT', 'DELETE')),
+    url VARCHAR(255),
+    params JSON,
+    search_params JSON,
+    secrets JSON
+);
 
 CREATE OR REPLACE FUNCTION public.get_user_email_by_user_id(user_id uuid)
 RETURNS TABLE (email text)
@@ -381,9 +390,9 @@ CREATE POLICY "Access Quivr Storage 1jccrwz_2" ON storage.objects FOR UPDATE TO 
 CREATE POLICY "Access Quivr Storage 1jccrwz_3" ON storage.objects FOR DELETE TO anon USING (bucket_id = 'quivr');
 
 INSERT INTO migrations (name) 
-SELECT '20231023160000_copy_auth_users_to_public_users'
+SELECT '2023110607100000_add_api_brain_definition_table'
 WHERE NOT EXISTS (
-    SELECT 1 FROM migrations WHERE name = '20231023160000_copy_auth_users_to_public_users'
+    SELECT 1 FROM migrations WHERE name = '2023110607100000_add_api_brain_definition_table'
 );
 
 

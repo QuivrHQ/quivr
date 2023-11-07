@@ -1,5 +1,6 @@
 from logger import get_logger
 from models.databases.supabase import (
+    ApiBrainDefinitions,
     ApiKeyHandler,
     Brain,
     BrainSubscription,
@@ -28,6 +29,7 @@ class SupabaseDB(
     Prompts,
     Notifications,
     Knowledges,
+    ApiBrainDefinitions,
 ):
     def __init__(self, supabase_client):
         self.db = supabase_client
@@ -42,3 +44,4 @@ class SupabaseDB(
         Notifications.__init__(self, supabase_client)
         Knowledges.__init__(self, supabase_client)
         Onboarding.__init__(self, supabase_client)
+        ApiBrainDefinitions.__init__(self, supabase_client)
