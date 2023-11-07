@@ -1,9 +1,11 @@
+from llm.api_brain_qa import APIBrainQA
 from llm.qa_base import QABaseBrainPicking
+from models.brain_entity import BrainType
+from repository.brain import get_brain_details
+from repository.brain.get_brain_by_id import get_brain_by_id
 from routes.authorizations.brain_authorization import validate_brain_authorization
 from routes.authorizations.types import RoleEnum
 from routes.chat.interface import ChatInterface
-
-from repository.brain import get_brain_details
 
 
 class BrainfulChat(ChatInterface):
@@ -31,7 +33,23 @@ class BrainfulChat(ChatInterface):
         streaming,
         prompt_id,
     ):
-        return QABaseBrainPicking(
+        brain = get_brain_by_id(brain_id)
+
+        if not brain:
+            raise Exception("No brain found")
+
+        if brain.brain_type == BrainType.DOC:
+            return QABaseBrainPicking(
+                chat_id=chat_id,
+                model=model,
+                max_tokens=max_tokens,
+                temperature=temperature,
+                brain_id=brain_id,
+                user_openai_api_key=user_openai_api_key,
+                streaming=streaming,
+                prompt_id=prompt_id,
+            )
+        return APIBrainQA(
             chat_id=chat_id,
             model=model,
             max_tokens=max_tokens,
