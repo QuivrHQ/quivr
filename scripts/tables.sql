@@ -126,6 +126,14 @@ CREATE TABLE IF NOT EXISTS prompts (
     status VARCHAR(255) DEFAULT 'private'
 );
 
+DO $$ 
+BEGIN 
+IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'brain_type_enum') THEN
+  -- Create the ENUM type 'brain_type' if it doesn't exist
+  CREATE TYPE brain_type_enum AS ENUM ('doc', 'api');
+END IF;
+END $$;
+
 --- Create brains table
 CREATE TABLE IF NOT EXISTS brains (
   brain_id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
@@ -137,7 +145,8 @@ CREATE TABLE IF NOT EXISTS brains (
   temperature FLOAT,
   openai_api_key TEXT,
   prompt_id UUID REFERENCES prompts(id),
-  last_update TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  last_update TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  brain_type brain_type_enum DEFAULT 'doc'
 );
 
 
@@ -390,9 +399,9 @@ CREATE POLICY "Access Quivr Storage 1jccrwz_2" ON storage.objects FOR UPDATE TO 
 CREATE POLICY "Access Quivr Storage 1jccrwz_3" ON storage.objects FOR DELETE TO anon USING (bucket_id = 'quivr');
 
 INSERT INTO migrations (name) 
-SELECT '2023110607100000_add_api_brain_definition_table'
+SELECT '20231106110000_add_field_brain_type_to_brain_table'
 WHERE NOT EXISTS (
-    SELECT 1 FROM migrations WHERE name = '2023110607100000_add_api_brain_definition_table'
+    SELECT 1 FROM migrations WHERE name = '20231106110000_add_field_brain_type_to_brain_table'
 );
 
 
