@@ -7,6 +7,15 @@ from routes.authorizations.brain_authorization import validate_brain_authorizati
 from routes.authorizations.types import RoleEnum
 from routes.chat.interface import ChatInterface
 
+models_supporting_function_calls = [
+    "gpt-4",
+    "gpt-4-1106-preview",
+    "gpt-4-0613",
+    "gpt-3.5-turbo",
+    "gpt-3.5-turbo-1106",
+    "gpt-3.5-turbo-0613",
+]
+
 
 class BrainfulChat(ChatInterface):
     def validate_authorization(self, user_id, brain_id):
@@ -39,7 +48,10 @@ class BrainfulChat(ChatInterface):
         if not brain:
             raise Exception("No brain found")
 
-        if brain.brain_type == BrainType.DOC:
+        if (
+            brain.brain_type == BrainType.DOC
+            or model not in models_supporting_function_calls
+        ):
             return QABaseBrainPicking(
                 chat_id=chat_id,
                 model=model,
