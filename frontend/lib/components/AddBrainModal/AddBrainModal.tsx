@@ -39,8 +39,10 @@ export const AddBrainModal = ({
     brainStatusOptions,
     status,
     isPublicAccessConfirmationModalOpened,
+    knowledgeSourceOptions,
     onCancelPublicAccess,
     onConfirmPublicAccess,
+    knowledgeSource,
   } = useAddBrainModal();
 
   return (
@@ -95,6 +97,15 @@ export const AddBrainModal = ({
               value={status}
               className="flex-1 justify-between w-[50%]"
               {...register("status")}
+            />
+          </fieldset>
+          <fieldset className="w-full flex flex-col">
+            <Radio
+              items={knowledgeSourceOptions}
+              label={t("knowledge_source_label", { ns: "brain" })}
+              value={knowledgeSource}
+              className="flex-1 justify-between w-[50%]"
+              {...register("knowledgeSource")}
             />
           </fieldset>
           <Field

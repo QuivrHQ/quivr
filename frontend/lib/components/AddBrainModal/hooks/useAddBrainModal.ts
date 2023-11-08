@@ -1,4 +1,5 @@
-/* eslint-disable */
+/* eslint-disable max-lines */
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -14,8 +15,7 @@ import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainConte
 import { defineMaxTokens } from "@/lib/helpers/defineMaxTokens";
 import { getAccessibleModels } from "@/lib/helpers/getAccessibleModels";
 import { useToast } from "@/lib/hooks";
-import { BrainStatus } from "@/lib/types/brainConfig";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { BrainStatus, KnowledgeSource } from "@/lib/types/brainConfig";
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const useAddBrainModal = () => {
@@ -44,6 +44,20 @@ export const useAddBrainModal = () => {
     {
       label: t("public_brain_label", { ns: "brain" }),
       value: "public",
+    },
+  ];
+
+  const knowledgeSourceOptions: {
+    label: string;
+    value: KnowledgeSource;
+  }[] = [
+    {
+      label: t("knowledge_source_doc", { ns: "brain" }),
+      value: "doc",
+    },
+    {
+      label: t("knowledge_source_api", { ns: "brain" }),
+      value: "api",
     },
   ];
 
@@ -79,6 +93,7 @@ export const useAddBrainModal = () => {
   const temperature = watch("temperature");
   const maxTokens = watch("maxTokens");
   const status = watch("status");
+  const knowledgeSource = watch("knowledgeSource");
 
   const accessibleModels = getAccessibleModels({
     openAiKey,
@@ -86,10 +101,10 @@ export const useAddBrainModal = () => {
   });
 
   useEffect(() => {
-    if (status === "public" && dirtyFields.status) {
+    if (status === "public" && dirtyFields.status === true) {
       setIsPublicAccessConfirmationModalOpened(true);
     }
-  }, [status]);
+  }, [dirtyFields.status, status]);
 
   useEffect(() => {
     setValue("maxTokens", Math.min(maxTokens, defineMaxTokens(model)));
@@ -223,5 +238,7 @@ export const useAddBrainModal = () => {
     isPublicAccessConfirmationModalOpened,
     onConfirmPublicAccess,
     onCancelPublicAccess,
+    knowledgeSourceOptions,
+    knowledgeSource,
   };
 };
