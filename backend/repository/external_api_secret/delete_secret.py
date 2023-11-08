@@ -1,7 +1,8 @@
 from uuid import UUID
 
 from models import get_supabase_client
-from utils import build_secret_unique_name
+
+from repository.external_api_secret.utils import build_secret_unique_name
 
 
 def delete_secret(user_id: UUID, brain_id: UUID, secret_name: str) -> bool:
