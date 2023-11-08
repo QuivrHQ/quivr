@@ -1,4 +1,5 @@
 import json
+from typing import Optional
 from uuid import UUID
 
 from langchain.schema import FunctionMessage
@@ -15,12 +16,35 @@ from repository.chat.update_chat_history import update_chat_history
 from repository.chat.update_message_by_id import update_message_by_id
 
 from llm.qa_base import QABaseBrainPicking
+from llm.utils.call_brain_api import call_brain_api
 from llm.utils.get_api_brain_definition_as_json_schema import (
     get_api_brain_definition_as_json_schema,
 )
 
 
 class APIBrainQA(QABaseBrainPicking):
+    user_id: UUID
+
+    def __init__(
+        self,
+        model: str,
+        brain_id: str,
+        chat_id: str,
+        user_id: UUID,
+        streaming: bool = False,
+        prompt_id: Optional[UUID] = None,
+        **kwargs,
+    ):
+        super().__init__(
+            model=model,
+            brain_id=brain_id,
+            chat_id=chat_id,
+            streaming=streaming,
+            prompt_id=prompt_id,
+            **kwargs,
+        )
+        self.user_id = user_id
+
     async def generate_stream(self, chat_id: UUID, question: ChatQuestion):
         if not question.brain_id:
             raise Exception("No brain id provided")
@@ -47,19 +71,14 @@ class APIBrainQA(QABaseBrainPicking):
         )
 
         if response.choices[0].finish_reason == "function_call":
-            function_result = response.choices[0].text
-            messages.append(
-                FunctionMessage(
-                    name=brain.name,
-                    content=str(
-                        {
-                            "role": "function",
-                            "name": brain.name,
-                            "content": function_result,
-                        }
-                    ),
-                )
+            arguments = json.load(
+                response.choices[0].message["function_call"]["arguments"]
             )
+
+            content = call_brain_api(
+                brain_id=question.brain_id, user_id=self.user_id, arguments=arguments
+            )
+            messages.append(FunctionMessage(name=brain.name, content=content))
 
             response = completion(
                 model=self.model,

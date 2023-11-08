@@ -8,11 +8,17 @@ class ApiBrainDefinitionSchemaProperty(BaseModel):
     description: str
     enum: list
     name: str
+    required: bool
 
 
 class ApiBrainDefinitionSchema(BaseModel):
     properties: list[ApiBrainDefinitionSchemaProperty]
     required: list[str]
+
+
+class ApiBrainDefinitionSecret(BaseModel):
+    name: str
+    type: str
 
 
 class ApiBrainDefinition(BaseModel):
@@ -21,4 +27,4 @@ class ApiBrainDefinition(BaseModel):
     url: str
     params: ApiBrainDefinitionSchema
     search_params: ApiBrainDefinitionSchema
-    secrets: ApiBrainDefinitionSchema
+    secrets: list[ApiBrainDefinitionSecret]

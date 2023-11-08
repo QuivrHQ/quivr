@@ -5,7 +5,9 @@ from utils import build_secret_unique_name
 
 
 def read_secret(
-    user_id: UUID, brain_id: UUID, secret_name: str, secret_value
+    user_id: UUID,
+    brain_id: UUID,
+    secret_name: str,
 ) -> UUID | None:
     supabase_client = get_supabase_client()
     response = supabase_client.rpc(

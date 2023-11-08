@@ -32,6 +32,7 @@ class BrainfulChat(ChatInterface):
         user_openai_api_key,
         streaming,
         prompt_id,
+        user_id,
     ):
         brain = get_brain_by_id(brain_id)
 
@@ -58,4 +59,5 @@ class BrainfulChat(ChatInterface):
             user_openai_api_key=user_openai_api_key,
             streaming=streaming,
             prompt_id=prompt_id,
+            user_id=user_id,
         )
