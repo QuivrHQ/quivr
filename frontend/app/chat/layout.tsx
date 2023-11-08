@@ -6,7 +6,7 @@ import { ChatsProvider } from "@/lib/context/ChatsProvider/chats-provider";
 import { useSupabase } from "@/lib/context/SupabaseProvider";
 import { redirectToLogin } from "@/lib/router/redirectToLogin";
 
-import { ChatsList, NotificationBanner } from "./components";
+import { ChatsList } from "./components";
 
 interface LayoutProps {
   children?: ReactNode;
@@ -23,7 +23,7 @@ const Layout = ({ children }: LayoutProps): JSX.Element => {
     <KnowledgeToFeedProvider>
       <ChatsProvider>
         <ChatProvider>
-          <NotificationBanner />
+          {/* <NotificationBanner /> */}
           <div className="relative h-full w-full flex justify-stretch items-stretch overflow-auto">
             <ChatsList />
             {children}

@@ -18,4 +18,6 @@ export type ChatContextProps = {
   notifications: Notification[];
   setNotifications: (notifications: Notification[]) => void;
   sharedChatItems: ChatItemWithGroupedNotifications[];
+  setIsLoadingHistoryChatItems: (isLoading: boolean) => void;
+  isLoadingHistoryChatItems: boolean;
 };

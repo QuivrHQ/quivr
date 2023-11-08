@@ -1,6 +1,8 @@
 import { useTranslation } from "react-i18next";
 
 import { ShareModal } from "@/app/chat/components/ShareChat/ShareModal";
+import Spinner from "@/lib/components/ui/Spinner";
+import { useChatContext } from "@/lib/context";
 import { useOnboarding } from "@/lib/hooks/useOnboarding";
 
 // eslint-disable-next-line import/order
@@ -23,7 +25,7 @@ export const ChatDialogue = ({
 }: MessagesDialogueProps): JSX.Element => {
   const { t } = useTranslation(["chat"]);
   const { chatListRef } = useChatDialogue();
-
+  const { isLoadingHistoryChatItems } = useChatContext();
   const { shouldDisplayOnboardingAInstructions } = useOnboarding();
 
   if (shouldDisplayOnboardingAInstructions) {
@@ -41,14 +43,21 @@ export const ChatDialogue = ({
 
   return (
     <div className={chatDialogueContainerClassName} ref={chatListRef}>
-      {chatItems.length === 0 ? (
+      {isLoadingHistoryChatItems && (
+        <div className="h-full w-full flex justify-center items-center">
+          <Spinner />
+        </div>
+      )}
+      {!isLoadingHistoryChatItems && chatItems.length === 0 && (
         <div
           data-testid="empty-history-message"
           className="text-center opacity-50"
         >
           {t("ask", { ns: "chat" })}
         </div>
-      ) : (
+      )}
+
+      {!isLoadingHistoryChatItems && chatItems.length > 0 && (
         <div>
           <div className="flex justify-end mb-2">
             <ShareModal />

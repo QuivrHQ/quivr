@@ -16,6 +16,8 @@ export const ChatProvider = ({
 }: {
   children: JSX.Element | JSX.Element[];
 }): JSX.Element => {
+  const [isLoadingHistoryChatItems, setIsLoadingHistoryChatItems] =
+    useState<boolean>(false);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [sharedChatItems, setSharedChatItems] = useState<
@@ -79,6 +81,8 @@ export const ChatProvider = ({
         notifications,
         setNotifications,
         sharedChatItems,
+        setIsLoadingHistoryChatItems,
+        isLoadingHistoryChatItems,
       }}
     >
       {children}

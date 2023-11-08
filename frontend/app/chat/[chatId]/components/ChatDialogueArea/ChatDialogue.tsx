@@ -23,13 +23,10 @@ export const ChatDialogueArea = (): JSX.Element => {
   if (!shouldDisplayShortcuts) {
     return (
       <div className="flex flex-col flex-1 overflow-y-auto mb-2">
-        <div>
-          <Disclaimer />
-        </div>
         <ChatDialogue chatItems={chatItems} />
       </div>
     );
   }
 
-  return isStudioMember ? <ShortCuts /> : <></>;
+  return isStudioMember ? <ShortCuts /> : <Disclaimer />;
 };

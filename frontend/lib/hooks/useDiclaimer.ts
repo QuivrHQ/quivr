@@ -6,9 +6,10 @@ import { useEffect, useState } from "react";
 export const useDiclaimer = () => {
   const [visibleDisclaimer, setVisibleDisclaimer] = useState<boolean>(true);
 
-  const WEEK_TIME = 7 * 24 * 3600 * 1000;
+  // const WEEK_TIME = 7 * 24 * 3600 * 1000;
+  const WEEK_TIME = 3000;
 
-  const close_disclaimer_time = localStorage.getItem("close_disclaimer_time");
+  let close_disclaimer_time: string | null = "";
 
   const handleCloseDisclaimer = () => {
     setVisibleDisclaimer(false);
@@ -18,6 +19,7 @@ export const useDiclaimer = () => {
   };
 
   useEffect(() => {
+    close_disclaimer_time = localStorage.getItem("close_disclaimer_time");
     checkDiclaimerVisible();
   }, []);
 

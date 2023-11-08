@@ -19,6 +19,9 @@ export const ChatProviderMock = ({
         updateStreamingHistory: () => void 0,
         notifications: [],
         setNotifications: () => void 0,
+        sharedChatItems:[],
+        setIsLoadingHistoryChatItems:() => void 0,
+        isLoadingHistoryChatItems:false,
       }}
     >
       {children}
