@@ -1,3 +1,4 @@
+from fastapi import HTTPException
 from llm.api_brain_qa import APIBrainQA
 from llm.qa_base import QABaseBrainPicking
 from models.brain_entity import BrainType
@@ -46,7 +47,7 @@ class BrainfulChat(ChatInterface):
         brain = get_brain_by_id(brain_id)
 
         if not brain:
-            raise Exception("No brain found")
+            raise HTTPException(status_code=404, detail="Brain not found")
 
         if (
             brain.brain_type == BrainType.DOC
@@ -62,6 +63,7 @@ class BrainfulChat(ChatInterface):
                 streaming=streaming,
                 prompt_id=prompt_id,
             )
+
         return APIBrainQA(
             chat_id=chat_id,
             model=model,

@@ -21,5 +21,6 @@ class ChatInterface(ABC):
         user_openai_api_key,
         streaming,
         prompt_id,
+        user_id,
     ):
         pass

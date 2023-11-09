@@ -173,7 +173,6 @@ async def create_question_handler(
     try:
         check_user_requests_limit(current_user)
         is_model_ok = (brain_details or chat_question).model in userSettings.get("models", ["gpt-3.5-turbo"])  # type: ignore
-        gpt_answer_generator: HeadlessQA | QABaseBrainPicking
         gpt_answer_generator = chat_instance.get_answer_generator(
             chat_id=str(chat_id),
             model=chat_question.model if is_model_ok else "gpt-3.5-turbo",  # type: ignore

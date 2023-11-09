@@ -10,9 +10,6 @@ from repository.api_brain_definition.get_api_brain_definition import (
 
 
 def get_api_brain_definition_as_json_schema(brain: BrainEntity):
-    if not brain:
-        raise HTTPException(status_code=404, detail="Brain not found")
-
     api_brain_definition = get_api_brain_definition(brain.id)
     if not api_brain_definition:
         raise HTTPException(

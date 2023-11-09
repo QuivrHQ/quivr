@@ -2,9 +2,13 @@ from enum import Enum
 from typing import Optional
 from uuid import UUID
 
-from models.ApiBrainDefinition import ApiBrainDefinition
+from models.ApiBrainDefinition import (
+    ApiBrainDefinition,
+    ApiBrainDefinitionSchema,
+    ApiBrainDefinitionSecret,
+)
 from models.databases.repository import Repository
-from pydantic import BaseModel
+from pydantic import BaseModel, Extra
 
 
 class ApiMethod(str, Enum):
@@ -14,13 +18,12 @@ class ApiMethod(str, Enum):
     DELETE = "DELETE"
 
 
-class CreateApiBrainDefinition(BaseModel):
-    brain_id: UUID
+class CreateApiBrainDefinition(BaseModel, extra=Extra.forbid):
     method: ApiMethod
     url: str
-    params: dict
-    search_params: dict
-    secrets: dict
+    params: Optional[ApiBrainDefinitionSchema] = ApiBrainDefinitionSchema()
+    search_params: ApiBrainDefinitionSchema = ApiBrainDefinitionSchema()
+    secrets: Optional[list[ApiBrainDefinitionSecret]] = []
 
 
 class ApiBrainDefinitions(Repository):
@@ -40,10 +43,12 @@ class ApiBrainDefinitions(Repository):
         return ApiBrainDefinition(**response.data[0])
 
     def add_api_brain_definition(
-        self, brain_id: UUID, config: CreateApiBrainDefinition
+        self, brain_id: UUID, api_brain_definition: CreateApiBrainDefinition
     ) -> Optional[ApiBrainDefinition]:
-        response = self.db.table("api_brain_definition").insert(
-            [{"brain_id": str(brain_id), **config.dict()}]
+        response = (
+            self.db.table("api_brain_definition")
+            .insert([{"brain_id": str(brain_id), **api_brain_definition.dict()}])
+            .execute()
         )
         if len(response.data) == 0:
             return None
