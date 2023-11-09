@@ -11,12 +11,13 @@ import { useToast } from "@/lib/hooks";
 export const useChatsList = () => {
   const { t } = useTranslation(["chat"]);
 
-  const { setAllChats } = useChatsContext();
+  const { setAllChats, setIsLoadingAllChats } = useChatsContext();
   const { publish } = useToast();
   const { getChats } = useChatApi();
 
   const fetchAllChats = async () => {
     try {
+      setIsLoadingAllChats(true);
       const response = await getChats();
 
       return response.reverse();
@@ -26,6 +27,8 @@ export const useChatsList = () => {
         variant: "danger",
         text: t("errorFetching", { ns: "chat" }),
       });
+    } finally {
+      setIsLoadingAllChats(false);
     }
   };
 

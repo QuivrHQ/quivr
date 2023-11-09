@@ -68,13 +68,13 @@ export const useChatNotificationsSync = () => {
       if (chatId === undefined) {
         setMessages([]);
         setNotifications([]);
+        setIsLoadingHistoryChatItems(false);
 
         return;
       }
       try {
         setIsLoadingHistoryChatItems(true);
         const chatItems = await getChatItems(chatId);
-
         setMessages(getMessagesFromChatItems(chatItems));
         setNotifications(getNotificationsFromChatItems(chatItems));
       } catch (e) {

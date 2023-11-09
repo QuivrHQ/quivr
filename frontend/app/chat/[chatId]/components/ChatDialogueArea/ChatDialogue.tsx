@@ -1,6 +1,7 @@
+import { useParams } from "next/navigation";
+
 import { Disclaimer } from "@/lib/components/Disclaimer";
 import { useChatContext } from "@/lib/context";
-import { useOnboarding } from "@/lib/hooks/useOnboarding";
 import { useSecurity } from "@/services/useSecurity/useSecurity";
 
 import { ChatDialogue } from "./components/ChatDialogue";
@@ -9,16 +10,18 @@ import { getMergedChatMessagesWithDoneStatusNotificationsReduced } from "./utils
 
 export const ChatDialogueArea = (): JSX.Element => {
   const { isStudioMember } = useSecurity();
+  const params = useParams();
 
-  const { messages, notifications } = useChatContext();
+  const { messages, notifications, isLoadingHistoryChatItems } =
+    useChatContext();
 
   const chatItems = getMergedChatMessagesWithDoneStatusNotificationsReduced(
     messages,
     notifications
   );
-  const { isOnboarding } = useOnboarding();
 
-  const shouldDisplayShortcuts = chatItems.length === 0 && !isOnboarding;
+  // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
+  const shouldDisplayShortcuts = !isLoadingHistoryChatItems && !params?.chatId;
 
   if (!shouldDisplayShortcuts) {
     return (

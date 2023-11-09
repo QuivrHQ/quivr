@@ -3,12 +3,10 @@ import { useTranslation } from "react-i18next";
 import { ShareModal } from "@/app/chat/components/ShareChat/ShareModal";
 import Spinner from "@/lib/components/ui/Spinner";
 import { useChatContext } from "@/lib/context";
-import { useOnboarding } from "@/lib/hooks/useOnboarding";
 
 // eslint-disable-next-line import/order
 import { ChatItemWithGroupedNotifications } from "../../types";
 import { ChatItem } from "./components";
-import { Onboarding } from "./components/Onboarding/Onboarding";
 import { useChatDialogue } from "./hooks/useChatDialogue";
 import {
   chatDialogueContainerClassName,
@@ -26,20 +24,6 @@ export const ChatDialogue = ({
   const { t } = useTranslation(["chat"]);
   const { chatListRef } = useChatDialogue();
   const { isLoadingHistoryChatItems } = useChatContext();
-  const { shouldDisplayOnboardingAInstructions } = useOnboarding();
-
-  if (shouldDisplayOnboardingAInstructions) {
-    return (
-      <div className={chatDialogueContainerClassName} ref={chatListRef}>
-        <Onboarding />
-        <div className={chatItemContainerClassName}>
-          {chatItems.map((chatItem) => (
-            <ChatItem key={getKeyFromChatItem(chatItem)} content={chatItem} />
-          ))}
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className={chatDialogueContainerClassName} ref={chatListRef}>
