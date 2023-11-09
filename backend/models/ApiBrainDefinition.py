@@ -1,19 +1,26 @@
+from enum import Enum
+from typing import Optional
 from uuid import UUID
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Extra
 
 
-class ApiBrainDefinitionSchemaProperty(BaseModel):
+class ApiBrainDefinitionSchemaProperty(BaseModel, extra=Extra.forbid):
     type: str
     description: str
-    enum: list
+    enum: Optional[list]
     name: str
-    required: bool
+
+    def dict(self, **kwargs):
+        result = super().dict(**kwargs)
+        if "enum" in result and result["enum"] is None:
+            del result["enum"]
+        return result
 
 
-class ApiBrainDefinitionSchema(BaseModel):
-    properties: list[ApiBrainDefinitionSchemaProperty]
-    required: list[str]
+class ApiBrainDefinitionSchema(BaseModel, extra=Extra.forbid):
+    properties: list[ApiBrainDefinitionSchemaProperty] = []
+    required: list[str] = []
 
 
 class ApiBrainDefinitionSecret(BaseModel):
@@ -21,9 +28,16 @@ class ApiBrainDefinitionSecret(BaseModel):
     type: str
 
 
-class ApiBrainDefinition(BaseModel):
+class ApiBrainAllowedMethods(str, Enum):
+    GET = "GET"
+    POST = "POST"
+    PUT = "PUT"
+    DELETE = "DELETE"
+
+
+class ApiBrainDefinition(BaseModel, extra=Extra.forbid):
     brain_id: UUID
-    method: str
+    method: ApiBrainAllowedMethods
     url: str
     params: ApiBrainDefinitionSchema
     search_params: ApiBrainDefinitionSchema

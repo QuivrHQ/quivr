@@ -4,12 +4,15 @@ from uuid import UUID
 from logger import get_logger
 from models.brain_entity import BrainEntity, BrainType, MinimalBrainEntity, PublicBrain
 from models.databases.repository import Repository
-from pydantic import BaseModel
+from models.databases.supabase.api_brain_definition import (
+    CreateApiBrainDefinition,
+)
+from pydantic import BaseModel, Extra
 
 logger = get_logger(__name__)
 
 
-class CreateBrainProperties(BaseModel):
+class CreateBrainProperties(BaseModel, extra=Extra.forbid):
     name: Optional[str] = "Default brain"
     description: Optional[str] = "This is a description"
     status: Optional[str] = "private"
@@ -19,6 +22,8 @@ class CreateBrainProperties(BaseModel):
     openai_api_key: Optional[str] = None
     prompt_id: Optional[UUID] = None
     brain_type: Optional[BrainType] = BrainType.DOC
+    brain_definition: Optional[CreateApiBrainDefinition]
+    brain_secrets_values: dict = {}
 
     def dict(self, *args, **kwargs):
         brain_dict = super().dict(*args, **kwargs)
@@ -53,7 +58,12 @@ class Brain(Repository):
         self.db = supabase_client
 
     def create_brain(self, brain: CreateBrainProperties):
-        response = (self.db.table("brains").insert(brain.dict())).execute()
+        response = (
+            self.db.table("brains").insert(
+                brain.dict(exclude={"brain_definition", "brain_secrets_values"})
+            )
+        ).execute()
+
         return BrainEntity(**response.data[0])
 
     def get_user_brains(self, user_id) -> list[MinimalBrainEntity]:

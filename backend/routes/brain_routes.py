@@ -24,6 +24,7 @@ from repository.brain import (
     update_brain_by_id,
 )
 from repository.prompt import delete_prompt_by_id, get_prompt_by_id
+
 from routes.authorizations.brain_authorization import has_brain_authorization
 from routes.authorizations.types import RoleEnum
 
@@ -91,7 +92,10 @@ async def create_new_brain(
             detail=f"Maximum number of brains reached ({user_settings.get('max_brains', 5)}).",
         )
 
-    new_brain = create_brain(brain)
+    new_brain = create_brain(
+        brain,
+        user_id=current_user.id,
+    )
     if get_user_default_brain(current_user.id):
         logger.info(f"Default brain already exists for user {current_user.id}")
         create_brain_user(

@@ -2,16 +2,12 @@ import json
 from typing import Optional
 from uuid import UUID
 
-from langchain.schema import FunctionMessage
+from fastapi import HTTPException
 from litellm import completion
 from models.chats import ChatQuestion
 from models.databases.supabase.chats import CreateChatHistory
 from repository.brain.get_brain_by_id import get_brain_by_id
-from repository.chat.format_chat_history import (
-    format_chat_history,
-    format_history_to_openai_mesages,
-)
-from repository.chat.get_chat_history import get_chat_history
+from repository.chat.get_chat_history import GetChatHistoryOutput, get_chat_history
 from repository.chat.update_chat_history import update_chat_history
 from repository.chat.update_message_by_id import update_message_by_id
 
@@ -22,7 +18,9 @@ from llm.utils.get_api_brain_definition_as_json_schema import (
 )
 
 
-class APIBrainQA(QABaseBrainPicking):
+class APIBrainQA(
+    QABaseBrainPicking,
+):
     user_id: UUID
 
     def __init__(
@@ -30,11 +28,14 @@ class APIBrainQA(QABaseBrainPicking):
         model: str,
         brain_id: str,
         chat_id: str,
-        user_id: UUID,
         streaming: bool = False,
         prompt_id: Optional[UUID] = None,
         **kwargs,
     ):
+        user_id = kwargs.get("user_id")
+        if not user_id:
+            raise HTTPException(status_code=400, detail="Cannot find user id")
+
         super().__init__(
             model=model,
             brain_id=brain_id,
@@ -45,48 +46,100 @@ class APIBrainQA(QABaseBrainPicking):
         )
         self.user_id = user_id
 
-    async def generate_stream(self, chat_id: UUID, question: ChatQuestion):
-        if not question.brain_id:
-            raise Exception("No brain id provided")
-
-        history = get_chat_history(self.chat_id)
-        prompt_content = self.prompt_to_use.content if self.prompt_to_use else ""
-        brain = get_brain_by_id(question.brain_id)
-        if not brain:
-            raise Exception("No brain found")
-
-        messages = format_history_to_openai_mesages(
-            format_chat_history(history),
-            prompt_content,
-            question.question,
-        )
-
+    async def make_completion(
+        self,
+        messages,
+        functions,
+        brain_id: UUID,
+    ):
         response = completion(
             model=self.model,
             temperature=self.temperature,
             max_tokens=self.max_tokens,
             messages=messages,
-            functions=[get_api_brain_definition_as_json_schema(brain)],
+            functions=functions,
             stream=True,
+            function_call="auto",
         )
 
-        if response.choices[0].finish_reason == "function_call":
-            arguments = json.load(
-                response.choices[0].message["function_call"]["arguments"]
+        function_call = {
+            "name": None,
+            "arguments": "",
+        }
+        for chunk in response:
+            finish_reason = chunk.choices[0].finish_reason
+
+            if finish_reason == "stop":
+                break
+
+            if "function_call" in chunk.choices[0].delta:
+                if "name" in chunk.choices[0].delta["function_call"]:
+                    function_call["name"] = chunk.choices[0].delta["function_call"][
+                        "name"
+                    ]
+                if "arguments" in chunk.choices[0].delta["function_call"]:
+                    function_call["arguments"] += chunk.choices[0].delta[
+                        "function_call"
+                    ]["arguments"]
+
+            elif finish_reason == "function_call":
+                try:
+                    arguments = json.loads(function_call["arguments"])
+                except Exception:
+                    arguments = {}
+
+                api_call_response = call_brain_api(
+                    brain_id=brain_id,
+                    user_id=self.user_id,
+                    arguments=arguments,
+                )
+
+                messages.append(
+                    {
+                        "role": "function",
+                        "name": function_call["name"],
+                        "content": api_call_response,
+                    }
+                )
+                async for value in self.make_completion(
+                    messages=messages,
+                    functions=functions,
+                    brain_id=brain_id,
+                ):
+                    yield value
+
+            else:
+                content = chunk.choices[0].delta.content
+                yield content
+
+    async def generate_stream(self, chat_id: UUID, question: ChatQuestion):
+        if not question.brain_id:
+            raise HTTPException(
+                status_code=400, detail="No brain id provided in the question"
             )
 
-            content = call_brain_api(
-                brain_id=question.brain_id, user_id=self.user_id, arguments=arguments
-            )
-            messages.append(FunctionMessage(name=brain.name, content=content))
+        brain = get_brain_by_id(question.brain_id)
 
-            response = completion(
-                model=self.model,
-                temperature=self.temperature,
-                max_tokens=self.max_tokens,
-                messages=messages,
-                stream=True,
-            )
+        if not brain:
+            raise HTTPException(status_code=404, detail="Brain not found")
+
+        prompt_content = "You'are a helpful assistant which can call APIs. Feel free to call the API when you need to. Don't force APIs call, do it when necessary. If it seems like you should call the API and there are missing parameters, ask user for them."
+
+        if self.prompt_to_use:
+            prompt_content += self.prompt_to_use.content
+
+        messages = [{"role": "system", "content": prompt_content}]
+
+        history = get_chat_history(self.chat_id)
+
+        for message in history:
+            formatted_message = [
+                {"role": "user", "content": message.user_message},
+                {"role": "assistant", "content": message.assistant},
+            ]
+            messages.extend(formatted_message)
+
+        messages.append({"role": "user", "content": question.question})
 
         streamed_chat_history = update_chat_history(
             CreateChatHistory(
@@ -99,7 +152,7 @@ class APIBrainQA(QABaseBrainPicking):
                 }
             )
         )
-        streamed_chat_history = get_chat_history.GetChatHistoryOutput(
+        streamed_chat_history = GetChatHistoryOutput(
             **{
                 "chat_id": str(chat_id),
                 "message_id": streamed_chat_history.message_id,
@@ -112,13 +165,14 @@ class APIBrainQA(QABaseBrainPicking):
                 "brain_name": brain.name if brain else None,
             }
         )
-
         response_tokens = []
-
-        for chunk in response:
-            new_token = chunk["choices"][0]["delta"]
-            streamed_chat_history.assistant = new_token
-            response_tokens.append(new_token)
+        async for value in self.make_completion(
+            messages=messages,
+            functions=[get_api_brain_definition_as_json_schema(brain)],
+            brain_id=question.brain_id,
+        ):
+            streamed_chat_history.assistant = value
+            response_tokens.append(value)
             yield f"data: {json.dumps(streamed_chat_history.dict())}"
 
         update_message_by_id(
