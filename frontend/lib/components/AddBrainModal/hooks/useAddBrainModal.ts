@@ -2,7 +2,7 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
+import { useFormContext } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 
 import { PUBLIC_BRAINS_KEY } from "@/lib/api/brain/config";
@@ -15,7 +15,11 @@ import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainConte
 import { defineMaxTokens } from "@/lib/helpers/defineMaxTokens";
 import { getAccessibleModels } from "@/lib/helpers/getAccessibleModels";
 import { useToast } from "@/lib/hooks";
-import { BrainStatus, KnowledgeSource } from "@/lib/types/brainConfig";
+import {
+  BrainConfig,
+  BrainStatus,
+  KnowledgeSource,
+} from "@/lib/types/brainConfig";
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const useAddBrainModal = () => {
@@ -84,9 +88,7 @@ export const useAddBrainModal = () => {
     watch,
     setValue,
     formState: { dirtyFields },
-  } = useForm({
-    defaultValues,
-  });
+  } = useFormContext<BrainConfig>();
 
   const openAiKey = watch("openAiKey");
   const model = watch("model");
@@ -226,7 +228,6 @@ export const useAddBrainModal = () => {
     isShareModalOpen,
     setIsShareModalOpen,
     handleSubmit,
-    register,
     model,
     temperature,
     maxTokens,
@@ -240,5 +241,6 @@ export const useAddBrainModal = () => {
     onCancelPublicAccess,
     knowledgeSourceOptions,
     knowledgeSource,
+    register,
   };
 };
