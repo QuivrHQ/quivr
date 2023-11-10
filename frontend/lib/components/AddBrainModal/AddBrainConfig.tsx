@@ -1,5 +1,6 @@
 /* eslint-disable max-lines */
 
+import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import { useTranslation } from "react-i18next";
 import { MdAdd } from "react-icons/md";
 
@@ -24,6 +25,8 @@ export const AddBrainConfig = ({
   triggerClassName,
 }: AddBrainModalProps): JSX.Element => {
   const { t } = useTranslation(["translation", "brain", "config"]);
+
+  const brainApiIsOn = useFeatureIsOn("brain-api");
 
   const {
     isShareModalOpen,
@@ -98,15 +101,17 @@ export const AddBrainConfig = ({
             {...register("status")}
           />
         </fieldset>
-        <fieldset className="w-full flex flex-col">
-          <Radio
-            items={knowledgeSourceOptions}
-            label={t("knowledge_source_label", { ns: "brain" })}
-            value={knowledgeSource}
-            className="flex-1 justify-between w-[50%]"
-            {...register("knowledgeSource")}
-          />
-        </fieldset>
+        {brainApiIsOn && (
+          <fieldset className="w-full flex flex-col">
+            <Radio
+              items={knowledgeSourceOptions}
+              label={t("knowledge_source_label", { ns: "brain" })}
+              value={knowledgeSource}
+              className="flex-1 justify-between w-[50%]"
+              {...register("knowledgeSource")}
+            />
+          </fieldset>
+        )}
         <Field
           label={t("openAiKeyLabel", { ns: "config" })}
           placeholder={t("openAiKeyPlaceholder", { ns: "config" })}
