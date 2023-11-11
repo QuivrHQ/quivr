@@ -1,7 +1,6 @@
 from llm.qa_headless import HeadlessQA
-from routes.chat.interface import ChatInterface
-
 from repository.user_identity import get_user_identity
+from routes.chat.interface import ChatInterface
 
 
 class BrainlessChat(ChatInterface):
@@ -24,6 +23,7 @@ class BrainlessChat(ChatInterface):
         user_openai_api_key,
         streaming,
         prompt_id,
+        user_id,
     ):
         return HeadlessQA(
             chat_id=chat_id,

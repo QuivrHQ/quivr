@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.0.108 (2023-11-07)
+
+## What's Changed
+* feat: add api_brain_definition table by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1601
+* feat: add brain_type column to brain table by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1603
+* feat: supabase vault by @gozineb in https://github.com/StanGirard/quivr/pull/1605
+
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.107...v0.0.108
+
 ## 0.0.107 (2023-11-06)
 
 ## What's Changed
