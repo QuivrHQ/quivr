@@ -68,7 +68,7 @@ jobs:
             task_definition: ".aws/task_definition_preview.json"
             container: "sr-vt"
           - name: "sr-vt-chat"
-            service: "preview-worker"
+            service: "sr-vt-preview-chat"
             task_definition: ".aws/task_definition_preview_worker.json"
             container: "sr-vt-chat"
 
