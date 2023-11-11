@@ -9,7 +9,7 @@ on:
 env:
   AWS_REGION: us-west-1
   ECR_REPOSITORY: sr-vt-repo
-  ECR_REGISTRY: 134903263179.dkr.ecr.us-west-1.amazonaws.com
+  ECR_REGISTRY: 155722108667.dkr.ecr.us-west-1.amazonaws.com
   ECS_CLUSTER: sr-vt-prev-cluster
 
 jobs:
