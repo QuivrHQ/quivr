@@ -7,7 +7,7 @@ on:
       - 'backend/**'
 
 env:
-  AWS_REGION: us-east-2
+  AWS_REGION: us-west-1
   ECR_REPOSITORY: sr-vr-repo
   ECR_REGISTRY: 134903263179.dkr.ecr.us-east-2.amazonaws.com
   ECS_CLUSTER: sr-vr-prev-cluster
