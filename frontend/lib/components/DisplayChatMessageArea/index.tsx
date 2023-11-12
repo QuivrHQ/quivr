@@ -32,10 +32,6 @@ export const DisplayChatMessageArea = (): JSX.Element => {
       setChatItems(mergedChatItems);
     }
   }, [messages, notifications]);
-  // const chatItems = getMergedChatMessagesWithDoneStatusNotificationsReduced(
-  //   messages,
-  //   notifications
-  // );
 
   return (
     <div className={chatDialogueContainerClassName}>
