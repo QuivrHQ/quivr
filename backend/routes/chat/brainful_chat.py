@@ -1,9 +1,21 @@
+from fastapi import HTTPException
+from llm.api_brain_qa import APIBrainQA
 from llm.qa_base import QABaseBrainPicking
+from models.brain_entity import BrainType
+from repository.brain import get_brain_details
+from repository.brain.get_brain_by_id import get_brain_by_id
 from routes.authorizations.brain_authorization import validate_brain_authorization
 from routes.authorizations.types import RoleEnum
 from routes.chat.interface import ChatInterface
 
-from repository.brain import get_brain_details
+models_supporting_function_calls = [
+    "gpt-4",
+    "gpt-4-1106-preview",
+    "gpt-4-0613",
+    "gpt-3.5-turbo",
+    "gpt-3.5-turbo-1106",
+    "gpt-3.5-turbo-0613",
+]
 
 
 class BrainfulChat(ChatInterface):
@@ -30,8 +42,29 @@ class BrainfulChat(ChatInterface):
         user_openai_api_key,
         streaming,
         prompt_id,
+        user_id,
     ):
-        return QABaseBrainPicking(
+        brain = get_brain_by_id(brain_id)
+
+        if not brain:
+            raise HTTPException(status_code=404, detail="Brain not found")
+
+        if (
+            brain.brain_type == BrainType.DOC
+            or model not in models_supporting_function_calls
+        ):
+            return QABaseBrainPicking(
+                chat_id=chat_id,
+                model=model,
+                max_tokens=max_tokens,
+                temperature=temperature,
+                brain_id=brain_id,
+                user_openai_api_key=user_openai_api_key,
+                streaming=streaming,
+                prompt_id=prompt_id,
+            )
+
+        return APIBrainQA(
             chat_id=chat_id,
             model=model,
             max_tokens=max_tokens,
@@ -40,4 +73,5 @@ class BrainfulChat(ChatInterface):
             user_openai_api_key=user_openai_api_key,
             streaming=streaming,
             prompt_id=prompt_id,
+            user_id=user_id,
         )

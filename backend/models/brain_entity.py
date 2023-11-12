@@ -1,8 +1,14 @@
+from enum import Enum
 from typing import Optional
 from uuid import UUID
 
 from pydantic import BaseModel
 from routes.authorizations.types import RoleEnum
+
+
+class BrainType(str, Enum):
+    DOC = "doc"
+    API = "api"
 
 
 class BrainEntity(BaseModel):
@@ -16,6 +22,7 @@ class BrainEntity(BaseModel):
     status: Optional[str]
     prompt_id: Optional[UUID]
     last_update: str
+    brain_type: BrainType
 
     @property
     def id(self) -> UUID:

@@ -29,7 +29,7 @@ def get_shared_chat_identity_route(shared_chat_id: UUID) -> List[ChatItem]:
     return get_chat_history_with_notifications(chat_id)
 
 
-@shared_chat_router.post("/shared/chat/")
+@shared_chat_router.post("/shared/chat")
 async def create_shared_chat_route(
     createSharedChatProps: CreateSharedChatProperties,
     # current_user: UserIdentity = Depends(get_current_user),

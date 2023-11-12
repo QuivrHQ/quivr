@@ -7,10 +7,10 @@ on:
       - 'backend/**'
 
 env:
-  AWS_REGION: us-east-2
-  ECR_REPOSITORY: vaccine-truth
-  ECR_REGISTRY: 134903263179.dkr.ecr.us-east-2.amazonaws.com
-  ECS_CLUSTER: vaccine-truth
+  AWS_REGION: us-west-1
+  ECR_REPOSITORY: sr-vt-repo
+  ECR_REGISTRY: 155722108667.dkr.ecr.us-west-1.amazonaws.com
+  ECS_CLUSTER: sr-vt-prev-cluster
 
 jobs:
   build_and_push:
@@ -33,13 +33,6 @@ jobs:
       id: login-ecr
       uses: aws-actions/amazon-ecr-login@v1
     
-    - name: Login to GitHub Container Registry
-      uses: docker/login-action@v2
-      with:
-        registry: ghcr.io
-        username: ${{ github.repository_owner }}
-        password: ${{ secrets.GITHUB_TOKEN }}
-    
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v2
     
@@ -58,7 +51,7 @@ jobs:
       with:
         context: ./backend/
         push: true
-        tags: ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }}, ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:latest, ghcr.io/stangirard/vaccine-truth:latest
+        tags: ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }}, ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:latest
         cache-from: type=gha
         cache-to: type=gha,mode=max
       
@@ -70,14 +63,14 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - name: "vaccine-truth"
-            service: "vaccine-truth-preview"
+          - name: "sr-vt"
+            service: "sr-vt-preview"
             task_definition: ".aws/task_definition_preview.json"
-            container: "vaccine-truth"
-          - name: "vaccine-truth-chat"
-            service: "preview-worker"
+            container: "sr-vt"
+          - name: "sr-vt-chat"
+            service: "sr-vt-preview-chat"
             task_definition: ".aws/task_definition_preview_worker.json"
-            container: "vaccine-truth-chat"
+            container: "sr-vt-chat"
 
     steps:
     - name: Checkout

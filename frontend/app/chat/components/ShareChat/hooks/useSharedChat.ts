@@ -26,8 +26,7 @@ export const useSharedChat = () => {
       // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
       if (res.id) {
         const BASE_URL = `${location.origin}`;
-        const shareURL = `${BASE_URL}/share/chat/${res.id}`;
-        console.log(shareURL, "shareURL");
+        const shareURL = `${BASE_URL}/shared/chat/${res.id}`;
         setChatShareURL(shareURL);
       }
     } catch (e) {

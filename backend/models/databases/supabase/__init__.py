@@ -10,3 +10,5 @@ from models.databases.supabase.prompts import Prompts
 from models.databases.supabase.shared_chats import SharedChats
 from models.databases.supabase.user_usage import UserUsage
 from models.databases.supabase.vectors import Vector
+
+from models.databases.supabase.api_brain_definition import ApiBrainDefinitions
