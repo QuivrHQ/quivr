@@ -1,11 +1,12 @@
 "use client";
+
 import { RedirectType } from "next/dist/client/components/redirect";
 import { redirect } from "next/navigation";
 
-type RedirectToLogin = (type?: RedirectType) => never;
+type redirectToChat = (type?: RedirectType) => never;
 
-export const redirectToLogin: RedirectToLogin = (type?: RedirectType) => {
+export const redirectToChat: redirectToChat = (type?: RedirectType) => {
   sessionStorage.setItem("previous-page", window.location.pathname);
 
-  redirect("/login", type);
+  redirect("/chat", type);
 };

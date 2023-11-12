@@ -1,6 +1,7 @@
 "use client";
 
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
+import { useSecurity } from "@/services/useSecurity/useSecurity";
 
 import { MentionInput } from "./components";
 import { MentionItem } from "./components/MentionItem";
@@ -16,12 +17,14 @@ export const ChatBar = ({
   setMessage,
   message,
 }: ChatBarProps): JSX.Element => {
+  const { isStudioMember } = useSecurity();
+
   const { currentBrain, setCurrentBrainId, currentPrompt, setCurrentPromptId } =
     useBrainContext();
 
   return (
     <div className="flex flex-row flex-1 w-full item-start overflow-y-auto max-h-[10em] whitespace-pre-wrap">
-      {currentBrain !== undefined && (
+      {isStudioMember && currentBrain !== undefined && (
         <MentionItem
           text={currentBrain.name}
           onRemove={() => {
@@ -30,7 +33,7 @@ export const ChatBar = ({
           trigger={"@"}
         />
       )}
-      {currentPrompt !== undefined && (
+      {isStudioMember && currentPrompt !== undefined && (
         <MentionItem
           text={currentPrompt.title}
           onRemove={() => {

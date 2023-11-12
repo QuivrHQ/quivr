@@ -2,8 +2,10 @@
 import { useTranslation } from "react-i18next";
 import { PiPaperclipFill } from "react-icons/pi";
 
+import { useChat } from "@/app/chat/[chatId]/hooks/useChat";
 import Button from "@/lib/components/ui/Button";
 import { useKnowledgeToFeedContext } from "@/lib/context/KnowledgeToFeedProvider/hooks/useKnowledgeToFeedContext";
+import { useSecurity } from "@/services/useSecurity/useSecurity";
 
 import { OnboardingQuestions } from "./components";
 import { ChatBar } from "./components/ChatBar/ChatBar";
@@ -17,8 +19,10 @@ type ChatInputProps = {
 export const ChatInput = ({
   shouldDisplayFeedCard,
 }: ChatInputProps): JSX.Element => {
-  const { setMessage, submitQuestion, generatingAnswer, message } =
-    useChatInput();
+  const { isStudioMember } = useSecurity();
+
+  const { generatingAnswer } = useChat();
+  const { setMessage, submitQuestion, message } = useChatInput();
   const { t } = useTranslation(["chat"]);
 
   const { setShouldDisplayFeedCard } = useKnowledgeToFeedContext();
@@ -35,7 +39,7 @@ export const ChatInput = ({
           }}
           className="sticky bottom-0 bg-white dark:bg-black w-full flex items-center gap-2 z-20 p-2"
         >
-          {!shouldDisplayFeedCard && (
+          {isStudioMember && !shouldDisplayFeedCard && (
             <Button
               className="p-0"
               variant={"tertiary"}
@@ -68,7 +72,7 @@ export const ChatInput = ({
                 : t("chat", { ns: "chat" })}
             </Button>
             <div className="hidden md:flex items-center">
-              <ConfigModal />
+              {isStudioMember && <ConfigModal />}
             </div>
           </div>
         </form>

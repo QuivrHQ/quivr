@@ -14,12 +14,14 @@ import {
 } from "@/app/chat/[chatId]/components/ActionsBar/types";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 import { useJune } from "@/services/analytics/june/useJune";
+import { useSecurity } from "@/services/useSecurity/useSecurity";
 import "@draft-js-plugins/mention/lib/plugin.css";
 import "draft-js/dist/Draft.css";
 
+// eslint-disable-next-line import/order
+import { getEditorText } from "./helpers/getEditorText";
 import { useMentionPlugin } from "./helpers/MentionPlugin";
 import { useMentionState } from "./helpers/MentionState";
-import { getEditorText } from "./helpers/getEditorText";
 
 type UseMentionInputProps = {
   message: string;
@@ -33,6 +35,8 @@ export const useMentionInput = ({
   onSubmit,
   setMessage,
 }: UseMentionInputProps) => {
+  const { isStudioMember } = useSecurity();
+
   const {
     currentBrainId,
     currentPromptId,
@@ -60,17 +64,17 @@ export const useMentionInput = ({
 
   const onAddMention = useCallback(
     (mention: MentionData) => {
-      if (mention.trigger === "#") {
+      if (mention.trigger === "#" && isStudioMember) {
         void analytics?.track("CHANGE_PROMPT");
         setCurrentPromptId(mention.id as UUID);
       }
 
-      if (mention.trigger === "@") {
+      if (mention.trigger === "@" && isStudioMember) {
         void analytics?.track("CHANGE_BRAIN");
         setCurrentBrainId(mention.id as UUID);
       }
     },
-    [analytics, setCurrentBrainId, setCurrentPromptId]
+    [analytics, setCurrentBrainId, setCurrentPromptId, isStudioMember]
   );
 
   const onSearchChange = useCallback(
@@ -115,7 +119,7 @@ export const useMentionInput = ({
     // eslint-disable-next-line complexity
     (e: React.KeyboardEvent<HTMLDivElement>) => {
       if (mentionTriggers.includes(e.key as MentionTriggerType)) {
-        setOpen(true);
+        isStudioMember && setOpen(true);
 
         return getDefaultKeyBinding(e);
       }

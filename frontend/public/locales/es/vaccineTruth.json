@@ -1,0 +1,24 @@
+{
+  "disclaimer": "Descargo de responsabilidad",
+  "disclaimerContent": "Hemos compilado una base de datos completa basada en la información veraz sobre las vacunas publicada en Internet. ¡Solo realizamos preguntas y respuestas basadas en el contenido mencionado en la información pública y no somos legalmente responsables del contenido!",
+  "talkToAI": "conversación con Vaccinetruth.ai",
+  "chatShareTitle": "Configuración de compartir chat",
+  "chatShareDesc": "selecciona tu plataforma para compartir",
+  "chatShareCopyURL": "Copiar URL compartida de chat",
+  "chatShareTo": "Compartir a",
+  "onboarding": {
+    "title": "¡Hola 👋🏻 ¿Quieres descubrir Quivr? 😇",
+    "step_1_1": "1. Arrastra y suelta el archivo en el chat o en el 📎.",
+    "step_1_2": "¿No tienes un archivo? Descarga 'Documentación de Quivr'",
+    "step_2": "2. Comienza a chatear con tu archivo",
+    "step_3": "3. ¡Disfruta!",
+    "virus_origin": "The origin of the virus?",
+    "vaccine_effect": "Can the vaccine be injected? Are vaccines harmful?",
+    "vaccine_antidote": "Is there a vaccine detox program?",
+    "answer": {
+      "virus_origin": "Wuhan P4 Virus Research Institute.",
+      "vaccine_effect": "You can't get vaccinated, the vaccine is poisonous.",
+      "vaccine_antidote": "Yes, please use artemisinin derivatives to detoxify according to the treatment course."
+    }
+  }
+}
