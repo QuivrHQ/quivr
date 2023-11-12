@@ -1,3 +1,6 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { ChatItem } from "@/app/chat/[chatId]/components/ChatDialogueArea//components/ChatDialogue/components/ChatItem";
@@ -7,15 +10,32 @@ import {
 } from "@/app/chat/[chatId]/components/ChatDialogueArea//components/ChatDialogue/styles";
 import { getKeyFromChatItem } from "@/app/chat/[chatId]/components/ChatDialogueArea/components/ChatDialogue/utils/getKeyFromChatItem";
 import { ChatItemWithGroupedNotifications } from "@/app/chat/[chatId]/components/ChatDialogueArea/types";
-
-type MessagesDialogueProps = {
-  chatItems: ChatItemWithGroupedNotifications[];
-};
-
-export const DisplayChatMessageArea = ({
-  chatItems,
-}: MessagesDialogueProps): JSX.Element => {
+import { getMergedChatMessagesWithDoneStatusNotificationsReduced } from "@/app/chat/[chatId]/components/ChatDialogueArea/utils/getMergedChatMessagesWithDoneStatusNotificationsReduced";
+import { useSharedChatItems } from "@/app/shared/components/hooks/useSharedChatItems";
+import { useChatContext } from "@/lib/context";
+export const DisplayChatMessageArea = (): JSX.Element => {
   const { t } = useTranslation(["chat"]);
+  useSharedChatItems();
+  const { messages, notifications } = useChatContext();
+
+  const [chatItems, setChatItems] = useState<
+    ChatItemWithGroupedNotifications[]
+  >([]);
+
+  useEffect(() => {
+    if (notifications.length > 0 || messages.length > 0) {
+      const mergedChatItems =
+        getMergedChatMessagesWithDoneStatusNotificationsReduced(
+          messages,
+          notifications
+        );
+      setChatItems(mergedChatItems);
+    }
+  }, [messages, notifications]);
+  // const chatItems = getMergedChatMessagesWithDoneStatusNotificationsReduced(
+  //   messages,
+  //   notifications
+  // );
 
   return (
     <div className={chatDialogueContainerClassName}>

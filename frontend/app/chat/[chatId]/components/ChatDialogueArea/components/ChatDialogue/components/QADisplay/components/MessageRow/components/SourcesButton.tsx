@@ -1,6 +1,8 @@
-import { useEffect, useRef, useState } from 'react';
-import ReactDOM from 'react-dom';
-import { FaQuestionCircle } from 'react-icons/fa';
+"use client";
+
+import { useEffect, useRef, useState } from "react";
+import ReactDOM from "react-dom";
+import { FaQuestionCircle } from "react-icons/fa";
 
 type SourcesButtonProps = {
   sources: string;
@@ -24,18 +26,20 @@ export const SourcesButton = ({ sources }: SourcesButtonProps): JSX.Element => {
   };
 
   useEffect(() => {
-    window.addEventListener('scroll', updatePopupPosition);
+    window.addEventListener("scroll", updatePopupPosition);
 
     // Remove the event listener when the component is unmounted
     return () => {
-      window.removeEventListener('scroll', updatePopupPosition);
+      window.removeEventListener("scroll", updatePopupPosition);
     };
   }, []);
 
   const sourcesList = (
     <ul className="list-disc list-inside">
-      {sources.split(', ').map((source, index) => (
-        <li key={index} className="truncate">{source.trim()}</li>
+      {sources.split(", ").map((source, index) => (
+        <li key={index} className="truncate">
+          {source.trim()}
+        </li>
       ))}
     </ul>
   );
@@ -54,14 +58,20 @@ export const SourcesButton = ({ sources }: SourcesButtonProps): JSX.Element => {
       >
         <FaQuestionCircle />
       </button>
-      {showSources && ReactDOM.createPortal(
-        <div className="absolute z-50 min-w-max p-2 bg-white shadow-lg rounded-md border border-gray-200"
-             style={{ top: `${popupPosition.top}px`, left: `${popupPosition.left}px` }}>
-          {/* Display the sources list here */}
-          {sourcesList}
-        </div>,
-        document.body // Render the popup to the body element
-      )}
+      {showSources &&
+        ReactDOM.createPortal(
+          <div
+            className="absolute z-50 min-w-max p-2 bg-white shadow-lg rounded-md border border-gray-200"
+            style={{
+              top: `${popupPosition.top}px`,
+              left: `${popupPosition.left}px`,
+            }}
+          >
+            {/* Display the sources list here */}
+            {sourcesList}
+          </div>,
+          document.body // Render the popup to the body element
+        )}
     </div>
   );
 };
