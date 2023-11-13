@@ -25,6 +25,7 @@ const ContentSecurityPolicy = {
     "https://fonts.googleapis.com",
     process.env.NEXT_PUBLIC_SUPABASE_URL,
     "https://api.june.so",
+    "http://localhost:*",
     process.env.NEXT_PUBLIC_FRONTEND_URL,
   ],
   "connect-src": [
@@ -46,6 +47,7 @@ const ContentSecurityPolicy = {
   "media-src": [
     "'self'",
     "https://user-images.githubusercontent.com",
+    "http://localhost:*",
     process.env.NEXT_PUBLIC_FRONTEND_URL,
     "https://quivr-cms.s3.eu-west-3.amazonaws.com",
   ],
@@ -53,13 +55,18 @@ const ContentSecurityPolicy = {
     "'unsafe-inline'",
     "'unsafe-eval'",
     "https://va.vercel-scripts.com/",
+    "http://localhost:*",
     process.env.NEXT_PUBLIC_FRONTEND_URL,
     "https://www.google-analytics.com/",
     "https://js.stripe.com",
   ],
   "frame-src": ["https://js.stripe.com"],
   "frame-ancestors": ["'none'"],
-  "style-src": ["'unsafe-inline'", process.env.NEXT_PUBLIC_FRONTEND_URL],
+  "style-src": [
+    "'unsafe-inline'",
+    "http://localhost:*",
+    process.env.NEXT_PUBLIC_FRONTEND_URL
+  ],
 };
 
 // Build CSP string
