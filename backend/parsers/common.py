@@ -34,4 +34,4 @@ async def process_file(
             brain_id, doc_with_metadata.to_json(), user_openai_api_key, file.file_sha1
         )
 
-    return
+    return "Hello World!"
