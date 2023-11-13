@@ -49,3 +49,10 @@ class PublicBrain(BaseModel):
     description: Optional[str]
     number_of_subscribers: int = 0
     last_update: str
+
+
+class BrainUser(BaseModel):
+    id: UUID
+    user_id: UUID
+    rights: RoleEnum
+    default_brain: bool = False

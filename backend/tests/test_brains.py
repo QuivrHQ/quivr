@@ -32,7 +32,7 @@ def test_create_brain(client, api_key):
         "model": "gpt-3.5-turbo",
         "temperature": 0,
         "max_tokens": 256,
-        "file_sha1": "",
+        "brain_type": "doc",
     }
 
     # Making a POST request to the /brains/ endpoint
