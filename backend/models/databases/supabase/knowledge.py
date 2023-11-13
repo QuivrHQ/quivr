@@ -107,7 +107,8 @@ class Knowledges(Repository):
             if knowledge.file_name:
                 knowledge_to_delete_list.append(f"{brain_id}/{knowledge.file_name}")
 
-        self.db.storage.from_("quivr").remove(knowledge_to_delete_list)
+        if knowledge_to_delete_list:
+            self.db.storage.from_("quivr").remove(knowledge_to_delete_list)
 
         self.db.from_("knowledge").delete().filter(
             "brain_id", "eq", str(brain_id)
