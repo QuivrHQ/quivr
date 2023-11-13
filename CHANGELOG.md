@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.0.110 (2023-11-13)
+
+## What's Changed
+* fix: add user id while creating default brain by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1616
+
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.109...v0.0.110
+
 ## 0.0.109 (2023-11-13)
 
 ## What's Changed
