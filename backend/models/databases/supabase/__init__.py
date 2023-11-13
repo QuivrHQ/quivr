@@ -9,3 +9,5 @@ from models.databases.supabase.onboarding import Onboarding
 from models.databases.supabase.prompts import Prompts
 from models.databases.supabase.user_usage import UserUsage
 from models.databases.supabase.vectors import Vector
+
+from models.databases.supabase.api_brain_definition import ApiBrainDefinitions

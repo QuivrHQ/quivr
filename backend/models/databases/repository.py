@@ -253,6 +253,10 @@ class Repository(ABC):
         pass
 
     @abstractmethod
+    def remove_brain_all_knowledge(self, brain_id: UUID):
+        pass
+
+    @abstractmethod
     def get_knowledge_by_id(self, knowledge_id: UUID):
         pass
 
@@ -274,4 +278,16 @@ class Repository(ABC):
 
     @abstractmethod
     def remove_onboarding_more_than_x_days(self, days: int):
+        pass
+
+    @abstractmethod
+    def get_api_brain_definition(self, brain_id: UUID):
+        pass
+
+    @abstractmethod
+    def add_api_brain_definition(self, brain_id: UUID, config):
+        pass
+
+    @abstractmethod
+    def delete_api_brain_definition(self, brain_id: UUID):
         pass

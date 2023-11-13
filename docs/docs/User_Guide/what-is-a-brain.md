@@ -1,6 +1,6 @@
 ---
 sidebar_position: 2
-title: 🧠 Concept of Brain
+title: Concept of Brain
 ---
 
 :::info

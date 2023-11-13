@@ -799,6 +799,81 @@ export interface ApiDiscussionDiscussion extends Schema.CollectionType {
   };
 }
 
+export interface ApiNotificationBannerNotificationBanner
+  extends Schema.SingleType {
+  collectionName: 'notification_banners';
+  info: {
+    singularName: 'notification-banner';
+    pluralName: 'notification-banners';
+    displayName: 'Notification banner';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  pluginOptions: {
+    i18n: {
+      localized: true;
+    };
+  };
+  attributes: {
+    notification_id: Attribute.UID &
+      Attribute.Required &
+      Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }>;
+    text: Attribute.RichText &
+      Attribute.Required &
+      Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }>;
+    dismissible: Attribute.Boolean &
+      Attribute.SetPluginOptions<{
+        i18n: {
+          localized: false;
+        };
+      }> &
+      Attribute.DefaultTo<true>;
+    isSticky: Attribute.Boolean &
+      Attribute.SetPluginOptions<{
+        i18n: {
+          localized: false;
+        };
+      }> &
+      Attribute.DefaultTo<true>;
+    style: Attribute.JSON &
+      Attribute.SetPluginOptions<{
+        i18n: {
+          localized: false;
+        };
+      }>;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    publishedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'api::notification-banner.notification-banner',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<
+      'api::notification-banner.notification-banner',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    localizations: Attribute.Relation<
+      'api::notification-banner.notification-banner',
+      'oneToMany',
+      'api::notification-banner.notification-banner'
+    >;
+    locale: Attribute.String;
+  };
+}
+
 export interface ApiSecurityQuestionSecurityQuestion
   extends Schema.CollectionType {
   collectionName: 'security_questions';
@@ -1013,6 +1088,7 @@ declare module '@strapi/types' {
       'api::blog.blog': ApiBlogBlog;
       'api::demo-video.demo-video': ApiDemoVideoDemoVideo;
       'api::discussion.discussion': ApiDiscussionDiscussion;
+      'api::notification-banner.notification-banner': ApiNotificationBannerNotificationBanner;
       'api::security-question.security-question': ApiSecurityQuestionSecurityQuestion;
       'api::testimonial.testimonial': ApiTestimonialTestimonial;
       'api::use-case.use-case': ApiUseCaseUseCase;

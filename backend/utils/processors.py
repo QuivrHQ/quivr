@@ -11,6 +11,7 @@ from parsers.notebook import process_ipnyb
 from parsers.odt import process_odt
 from parsers.pdf import process_pdf
 from parsers.powerpoint import process_powerpoint
+from parsers.telegram import process_telegram
 from parsers.txt import process_txt
 from parsers.xlsx import process_xlsx
 from repository.brain.get_brain_by_id import get_brain_by_id
@@ -20,6 +21,7 @@ file_processors = {
     ".csv": process_csv,
     ".md": process_markdown,
     ".markdown": process_markdown,
+    ".telegram": process_telegram,
     ".m4a": process_audio,
     ".mp3": process_audio,
     ".webm": process_audio,

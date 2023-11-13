@@ -1,6 +1,6 @@
 ---
 sidebar_position: 1
-title: 🆘 Guidelines
+title: Guidelines
 ---
 
 # Contributing to Quivr
@@ -12,6 +12,7 @@ Thanks for your interest in contributing to Quivr! Here you'll find guidelines f
 ## Table of Contents
 
 - [Contributing to Quivr](#contributing-to-quivr)
+    - [Repo: Quivr Github](#repo-quivr-github)
   - [Table of Contents](#table-of-contents)
   - [Community](#community)
   - [Roadmap and Issues](#roadmap-and-issues)

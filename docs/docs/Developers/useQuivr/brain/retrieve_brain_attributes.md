@@ -1,6 +1,6 @@
 ---
 sidebar_position: 4
-title: 🧠 Get a Brain
+title: Get a Brain
 ---
 
 To get a brain, you need to make a GET request to the following endpoints.

@@ -1,6 +1,6 @@
 ---
 sidebar_position: 4
-title: 🤖 Chat system
+title: Chat system
 ---
 
 **URL**: https://api.quivr.app/chat

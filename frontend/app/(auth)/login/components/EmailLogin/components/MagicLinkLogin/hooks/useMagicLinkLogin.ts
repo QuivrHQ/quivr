@@ -1,32 +1,21 @@
-import { useForm } from "react-hook-form";
+import { useFormContext } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 
+import { EmailAuthContextType } from "@/app/(auth)/login/types";
 import { useSupabase } from "@/lib/context/SupabaseProvider";
 import { useToast } from "@/lib/hooks";
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const useMagicLinkLogin = () => {
   const { supabase } = useSupabase();
+  const { watch, setValue } = useFormContext<EmailAuthContextType>();
+
   const { t } = useTranslation("login");
   const { publish } = useToast();
 
-  const {
-    register,
-    watch,
-    setValue,
-    formState: { isSubmitSuccessful, isSubmitting },
-    handleSubmit,
-    reset,
-  } = useForm<{ email: string }>({
-    defaultValues: {
-      email: "",
-    },
-  });
-
   const email = watch("email");
 
-  const handleMagicLinkLogin = handleSubmit(async (_, ev) => {
-    ev?.preventDefault();
+  const handleMagicLinkLogin = async () => {
     if (email === "") {
       publish({
         variant: "danger",
@@ -35,7 +24,7 @@ export const useMagicLinkLogin = () => {
 
       return;
     }
-
+    setValue("isMagicLinkSubmitting", true);
     const { error } = await supabase.auth.signInWithOtp({
       email,
       options: {
@@ -43,6 +32,8 @@ export const useMagicLinkLogin = () => {
         // emailRedirectTo: "http://34.32.20.109:3000/", // current domain name. for eg localhost:3000, localhost:3001, https://...
       },
     });
+    setValue("isMagicLinkSubmitting", false);
+    setValue("isMagicLinkSubmitted", true);
 
     if (error) {
       publish({
@@ -50,18 +41,11 @@ export const useMagicLinkLogin = () => {
         text: error.message,
       });
 
-      throw error; // this error is caught by react-hook-form
+      throw error;
     }
-
-    setValue("email", "");
-  });
+  };
 
   return {
     handleMagicLinkLogin,
-    isSubmitting,
-    register,
-    handleSubmit,
-    isSubmitSuccessful,
-    reset,
   };
 };

@@ -1,5 +1,7 @@
 {
+    "password": "Password",
     "googleLogin": "Continue with Google",
+    "errorPasswordMissed": "Please enter your password",
     "magicLink": "Continue with email",
     "errorMailMissed": "Please enter your email address",
     "talk_to": "Talk to",
@@ -11,5 +13,6 @@
         "part1":"We just sent you a ",
         "magic_link":"Magic link",
         "part2":", check your emails and follow the steps."
-    }
+    },
+    "login": "Login"
 }
