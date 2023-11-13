@@ -18,6 +18,7 @@ def verify_env_variables():
         "SUPABASE_SERVICE_KEY",
         "OPENAI_API_KEY",
         "JWT_SECRET_KEY",
+        "CELERY_BROKER_URL",
     ]
     missing_vars = [var for var in required_vars if not os.getenv(var)]
 
