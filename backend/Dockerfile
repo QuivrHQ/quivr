@@ -1,10 +1,10 @@
-# Using a slim version for a smaller base image
-FROM python:3.11-slim-bullseye
+# First stage: Build environment
+FROM python:3.11-slim-bullseye as builder
 
 ARG DEV_MODE
 ENV DEV_MODE=$DEV_MODE
 
-# Install GEOS library, Rust, and other dependencies, then clean up
+# Install GEOS library, Rust, and other build-time dependencies
 RUN apt-get update && apt-get install -y \
     libgeos-dev \
     libcurl4-openssl-dev \
@@ -20,18 +20,42 @@ RUN apt-get update && apt-get install -y \
 # Add Rust binaries to the PATH
 ENV PATH="/root/.cargo/bin:${PATH}"
 
+# Create a virtual environment and activate it
+RUN python -m venv /venv
+ENV PATH="/venv/bin:$PATH"
+
 WORKDIR /code
 
 # Copy just the requirements first
 COPY ./requirements.txt .
 
-# Upgrade pip
-RUN pip install --upgrade pip
+# Upgrade pip and install requirements
+RUN pip install --upgrade pip && \
+    pip install --no-cache-dir -r requirements.txt --timeout 200
 
-# Increase timeout to wait for the new installation
-RUN pip install --no-cache-dir -r requirements.txt --timeout 200
-
+# Install development tools if in DEV_MODE
 RUN if [ "$DEV_MODE" = "true" ]; then pip install --no-cache debugpy --timeout 200; fi
+
+
+
+FROM python:3.11-slim-bullseye as runtime
+
+ARG DEV_MODE
+ENV DEV_MODE=$DEV_MODE
+
+# Create and activate the virtual environment
+ENV PATH="/venv/bin:$PATH"
+
+# Install runtime dependencies
+RUN apt-get update && apt-get install -y \
+    pandoc \
+    binutils && \
+    rm -rf /var/lib/apt/lists/* && apt-get clean
+
+WORKDIR /code
+
+# Copy the virtual environment from the builder stage
+COPY --from=builder /venv /venv
 
 # Copy the rest of the application
 COPY . .
