@@ -2,7 +2,6 @@ version: "3"
 
 services:
   frontend:
-    image: backend-base
     env_file:
       - ./frontend/.env
     build:
