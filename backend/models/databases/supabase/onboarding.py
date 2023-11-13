@@ -92,6 +92,24 @@ class Onboarding(Repository):
 
         return OnboardingStates(**onboarding_data[0])
 
+    def create_user_onboarding(self, user_id: UUID) -> OnboardingStates:
+        """
+        Create user onboarding information by user_id
+        """
+        onboarding_data = (
+            self.db.from_("onboardings")
+            .insert(
+                [
+                    {
+                        "user_id": str(user_id),
+                    }
+                ]
+            )
+            .execute()
+        ).data
+
+        return OnboardingStates(**onboarding_data[0])
+
     def remove_onboarding_more_than_x_days(self, days: int):
         """
         Remove onboarding if it is older than x days
