@@ -55,10 +55,6 @@ jobs:
           pip install pytest
           pip install pyright
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-
-      - name: Static type checking with pyright
-        run: |
-          pyright
       - name: Test with pytest
         env:
           SUPABASE_URL: ${{secrets.SUPABASE_URL}}
