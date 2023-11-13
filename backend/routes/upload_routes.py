@@ -51,9 +51,9 @@ async def upload_file(
     userSettings = userDailyUsage.get_user_settings()
 
     if request.headers.get("Openai-Api-Key"):
-        brain.max_brain_size = userSettings.get("max_brain_size", 1000000000)
+        brain.max_brain_size = userSettings.get("max_brain_size", 100000000000)
 
-    remaining_free_space = userSettings.get("max_brain_size", 1000000000)
+    remaining_free_space = userSettings.get("max_brain_size", 100000000000)
 
     file_size = get_file_size(uploadFile)
     if remaining_free_space - file_size < 0:
