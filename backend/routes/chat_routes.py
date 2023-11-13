@@ -114,84 +114,6 @@ async def create_chat_handler(
     return create_chat(user_id=current_user.id, chat_data=chat_data)
 
 
-# add new question to chat
-@chat_router.post(
-    "/chat/{chat_id}/question",
-    dependencies=[
-        Depends(
-            AuthBearer(),
-        ),
-    ],
-    tags=["Chat"],
-)
-async def create_question_handler(
-    request: Request,
-    chat_question: ChatQuestion,
-    chat_id: UUID,
-    brain_id: NullableUUID
-    | UUID
-    | None = Query(..., description="The ID of the brain"),
-    current_user: UserIdentity = Depends(get_current_user),
-) -> GetChatHistoryOutput:
-    """
-    Add a new question to the chat.
-    """
-
-    chat_instance = get_chat_strategy(brain_id)
-
-    chat_instance.validate_authorization(user_id=current_user.id, brain_id=brain_id)
-
-    current_user.openai_api_key = request.headers.get("Openai-Api-Key")
-    brain = Brain(id=brain_id)
-    brain_details: BrainEntity | None = None
-
-    userDailyUsage = UserUsage(
-        id=current_user.id,
-        email=current_user.email,
-        openai_api_key=current_user.openai_api_key,
-    )
-    userSettings = userDailyUsage.get_user_settings()
-    is_model_ok = (brain_details or chat_question).model in userSettings.get("models", ["gpt-3.5-turbo"])  # type: ignore
-
-    if not current_user.openai_api_key:
-        current_user.openai_api_key = chat_instance.get_openai_api_key(
-            brain_id=brain_id, user_id=current_user.id
-        )
-    # Retrieve chat model (temperature, max_tokens, model)
-    if (
-        not chat_question.model
-        or not chat_question.temperature
-        or not chat_question.max_tokens
-    ):
-        # TODO: create ChatConfig class (pick config from brain or user or chat) and use it here
-        chat_question.model = chat_question.model or brain.model or "gpt-3.5-turbo"
-        chat_question.temperature = (
-            chat_question.temperature or brain.temperature or 0.1
-        )
-        chat_question.max_tokens = chat_question.max_tokens or brain.max_tokens or 512
-
-    try:
-        check_user_requests_limit(current_user)
-        is_model_ok = (brain_details or chat_question).model in userSettings.get("models", ["gpt-3.5-turbo"])  # type: ignore
-        gpt_answer_generator = chat_instance.get_answer_generator(
-            chat_id=str(chat_id),
-            model=chat_question.model if is_model_ok else "gpt-3.5-turbo",  # type: ignore
-            max_tokens=chat_question.max_tokens,
-            temperature=chat_question.temperature,
-            brain_id=str(brain_id),
-            user_openai_api_key=current_user.openai_api_key,  # pyright: ignore reportPrivateUsage=none
-            streaming=False,
-            prompt_id=chat_question.prompt_id,
-            user_id=current_user.id,
-        )
-
-        chat_answer = gpt_answer_generator.generate_answer(chat_id, chat_question)
-
-        return chat_answer
-    except HTTPException as e:
-        raise e
-
-
 # stream new question response from chat
 @chat_router.post(
     "/chat/{chat_id}/question/stream",
@@ -206,11 +128,9 @@ async def create_stream_question_handler(
     request: Request,
     chat_question: ChatQuestion,
     chat_id: UUID,
-    brain_id: NullableUUID
-    | UUID
-    | None = Query(..., description="The ID of the brain"),
     current_user: UserIdentity = Depends(get_current_user),
 ) -> StreamingResponse:
+    brain_id: UUID = UUID("a92ac149-d9cb-4be9-a77b-022e8c140738")
     chat_instance = get_chat_strategy(brain_id)
     chat_instance.validate_authorization(user_id=current_user.id, brain_id=brain_id)
 
