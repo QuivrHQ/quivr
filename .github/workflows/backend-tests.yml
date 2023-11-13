@@ -55,7 +55,15 @@ jobs:
           pip install pytest
           pip install pyright
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-      - name: Test with pytest
+      - name: Run pytest
+        uses: pavelzw/pytest-action@v2
+        with:
+          verbose: true
+          emoji: true
+          job-summary: true
+          custom-arguments: '-q'
+          click-to-expand: true
+          report-title: 'Test Report'
         env:
           SUPABASE_URL: ${{secrets.SUPABASE_URL}}
           SUPABASE_SERVICE_KEY: ${{secrets.SUPABASE_SERVICE_KEY}}
@@ -64,7 +72,5 @@ jobs:
           JWT_SECRET_KEY: ${{secrets.JWT_SECRET_KEY}}
           CI_TEST_API_KEY: ${{secrets.CI_TEST_API_KEY}}
           CELERY_BROKER_URL: ${{secrets.CELERY_BROKER_URL}}
-        run: |
-          python -m pytest tests/
 
       
