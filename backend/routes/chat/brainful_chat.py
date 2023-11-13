@@ -36,7 +36,6 @@ class BrainfulChat(ChatInterface):
         self,
         brain_id,
         chat_id,
-        model,
         max_tokens,
         temperature,
         user_openai_api_key,
@@ -45,6 +44,7 @@ class BrainfulChat(ChatInterface):
         user_id,
     ):
         brain = get_brain_by_id(brain_id)
+        model = "gpt-3.5-turbo-1106"
 
         if not brain:
             raise HTTPException(status_code=404, detail="Brain not found")
