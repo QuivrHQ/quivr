@@ -101,68 +101,68 @@ def test_retrieve_one_brain(client, api_key):
     assert "name" in brain
 
 
-# def test_delete_all_brains(client, api_key):
-#     # First, retrieve all brains for the current user
-#     response = client.get(
-#         "/brains/",
-#         headers={"Authorization": "Bearer " + api_key},
-#     )
+def test_delete_all_brains(client, api_key):
+    # First, retrieve all brains for the current user
+    response = client.get(
+        "/brains/",
+        headers={"Authorization": "Bearer " + api_key},
+    )
 
-#     # Assert that the response status code is 200 (HTTP OK)
-#     assert response.status_code == 200
+    # Assert that the response status code is 200 (HTTP OK)
+    assert response.status_code == 200
 
-#     response_data = response.json()
+    response_data = response.json()
 
-#     # Loop through each brain and send a DELETE request
-#     for brain in response_data["brains"]:
-#         brain_id = brain["id"]
+    # Loop through each brain and send a DELETE request
+    for brain in response_data["brains"]:
+        brain_id = brain["id"]
 
-#         # Send a DELETE request to delete the specific brain
-#         delete_response = client.delete(
-#             f"/brains/{brain_id}/subscription",
-#             headers={"Authorization": "Bearer " + api_key},
-#         )
+        # Send a DELETE request to delete the specific brain
+        delete_response = client.delete(
+            f"/brains/{brain_id}/subscription",
+            headers={"Authorization": "Bearer " + api_key},
+        )
 
-#         # Assert that the DELETE response status code is 200 (HTTP OK)
-#         assert delete_response.status_code == 200
+        # Assert that the DELETE response status code is 200 (HTTP OK)
+        assert delete_response.status_code == 200
 
-#     # Finally, retrieve all brains for the current user
-#     response = client.get(
-#         "/brains/",
-#         headers={"Authorization": "Bearer " + api_key},
-#     )
+    # Finally, retrieve all brains for the current user
+    response = client.get(
+        "/brains/",
+        headers={"Authorization": "Bearer " + api_key},
+    )
 
-#     # Assert that the response status code is 200 (HTTP OK)
-#     assert response.status_code == 200
-#     response_data = response.json()
-#     assert len(response_data["brains"]) == 0
+    # Assert that the response status code is 200 (HTTP OK)
+    assert response.status_code == 200
+    response_data = response.json()
+    assert len(response_data["brains"]) == 0
 
 
-# def test_delete_all_brains_and_get_default_brain(client, api_key):
-#     # First create a new brain
-#     test_create_brain(client, api_key)
+def test_delete_all_brains_and_get_default_brain(client, api_key):
+    # First create a new brain
+    test_create_brain(client, api_key)
 
-#     # Now, retrieve all brains for the current user
-#     response = client.get(
-#         "/brains/",
-#         headers={"Authorization": "Bearer " + api_key},
-#     )
+    # Now, retrieve all brains for the current user
+    response = client.get(
+        "/brains/",
+        headers={"Authorization": "Bearer " + api_key},
+    )
 
-#     # Assert that the response status code is 200 (HTTP OK)
-#     assert response.status_code == 200
-#     assert len(response.json()["brains"]) > 0
+    # Assert that the response status code is 200 (HTTP OK)
+    assert response.status_code == 200
+    assert len(response.json()["brains"]) > 0
 
-#     test_delete_all_brains(client, api_key)
+    test_delete_all_brains(client, api_key)
 
-#     # Get the default brain, it should create one if it doesn't exist
-#     response = client.get(
-#         "/brains/default/",
-#         headers={"Authorization": "Bearer " + api_key},
-#     )
+    # Get the default brain, it should create one if it doesn't exist
+    response = client.get(
+        "/brains/default/",
+        headers={"Authorization": "Bearer " + api_key},
+    )
 
-#     # Assert that the response status code is 200 (HTTP OK)
-#     assert response.status_code == 200
-#     assert response.json()["name"] == "Default brain"
+    # Assert that the response status code is 200 (HTTP OK)
+    assert response.status_code == 200
+    assert response.json()["name"] == "Default brain"
 
 
 def test_set_as_default_brain_endpoint(client, api_key):
