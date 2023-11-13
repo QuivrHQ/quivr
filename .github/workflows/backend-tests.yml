@@ -61,8 +61,7 @@ jobs:
           verbose: true
           emoji: true
           job-summary: true
-          custom-arguments: '-q'
-          click-to-expand: true
+          click-to-expand: false
           report-title: 'Test Report'
         env:
           SUPABASE_URL: ${{secrets.SUPABASE_URL}}
