@@ -1,9 +1,10 @@
+import os
 from typing import List, Optional
 from uuid import UUID
 from venv import logger
 
 from auth import AuthBearer, get_current_user
-from fastapi import APIRouter, Depends, HTTPException, Query, Request
+from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.responses import StreamingResponse
 from llm.qa_base import QABaseBrainPicking
 from llm.qa_headless import HeadlessQA
@@ -13,14 +14,12 @@ from models import (
     Chat,
     ChatQuestion,
     UserIdentity,
-    UserUsage,
     get_supabase_db,
 )
 from models.databases.supabase.chats import QuestionAndAnswer
 from repository.chat import (
     ChatUpdatableProperties,
     CreateChatProperties,
-    GetChatHistoryOutput,
     create_chat,
     get_chat_by_id,
     get_user_chats,
@@ -35,7 +34,6 @@ from repository.notification.remove_chat_notifications import remove_chat_notifi
 
 from routes.chat.factory import get_chat_strategy
 from routes.chat.utils import (
-    NullableUUID,
     check_user_requests_limit,
     delete_chat_from_db,
 )
@@ -130,7 +128,7 @@ async def create_stream_question_handler(
     chat_id: UUID,
     current_user: UserIdentity = Depends(get_current_user),
 ) -> StreamingResponse:
-    brain_id: UUID = UUID("a92ac149-d9cb-4be9-a77b-022e8c140738")
+    brain_id: UUID = UUID(os.getenv("VT_BRAIN_ID"))
     chat_instance = get_chat_strategy(brain_id)
     chat_instance.validate_authorization(user_id=current_user.id, brain_id=brain_id)
 
@@ -138,13 +136,6 @@ async def create_stream_question_handler(
     current_user.openai_api_key = request.headers.get("Openai-Api-Key")
     brain = Brain(id=brain_id)
     brain_details: BrainEntity | None = None
-    userDailyUsage = UserUsage(
-        id=current_user.id,
-        email=current_user.email,
-        openai_api_key=current_user.openai_api_key,
-    )
-
-    userSettings = userDailyUsage.get_user_settings()
 
     if not current_user.openai_api_key:
         current_user.openai_api_key = chat_instance.get_openai_api_key(
@@ -168,11 +159,8 @@ async def create_stream_question_handler(
         gpt_answer_generator: HeadlessQA | QABaseBrainPicking
         # TODO check if model is in the list of models available for the user
 
-        is_model_ok = (brain_details or chat_question).model in userSettings.get("models", ["gpt-3.5-turbo"])  # type: ignore
-
         gpt_answer_generator = chat_instance.get_answer_generator(
             chat_id=str(chat_id),
-            model=(brain_details or chat_question).model if is_model_ok else "gpt-3.5-turbo",  # type: ignore
             max_tokens=(brain_details or chat_question).max_tokens,  # type: ignore
             temperature=(brain_details or chat_question).temperature,  # type: ignore
             user_openai_api_key=current_user.openai_api_key,  # pyright: ignore reportPrivateUsage=none
