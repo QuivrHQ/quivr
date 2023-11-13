@@ -2,7 +2,13 @@ from typing import Optional
 from uuid import UUID
 
 from logger import get_logger
-from models.brain_entity import BrainEntity, BrainType, MinimalBrainEntity, PublicBrain
+from models.brain_entity import (
+    BrainEntity,
+    BrainType,
+    BrainUser,
+    MinimalBrainEntity,
+    PublicBrain,
+)
 from models.databases.repository import Repository
 from models.databases.supabase.api_brain_definition import (
     CreateApiBrainDefinition,
@@ -337,3 +343,13 @@ class Brain(Repository):
         if len(response) == 0:
             raise ValueError(f"Brain with id {brain_id} does not exist.")
         return response[0]["count"]
+
+    def get_brain_users(self, brain_id: UUID) -> list[BrainUser]:
+        response = (
+            self.db.table("brains_users")
+            .select("id:brain_id, *")
+            .filter("brain_id", "eq", str(brain_id))
+            .execute()
+        )
+
+        return [BrainUser(**item) for item in response.data]
