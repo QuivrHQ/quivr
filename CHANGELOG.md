@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.0.109 (2023-11-13)
+
+## What's Changed
+* feat: add APIBrainQA  by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1606
+* feat: allow users to chat with apis by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1612
+* feat(docker): use multi-stage Docker builds for smaller images by @shidenkai0 in https://github.com/StanGirard/quivr/pull/1614
+
+## New Contributors
+* @shidenkai0 made their first contribution in https://github.com/StanGirard/quivr/pull/1614
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.108...v0.0.109
+
 ## 0.0.108 (2023-11-07)
 
 ## What's Changed
