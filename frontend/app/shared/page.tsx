@@ -6,8 +6,7 @@ export const metadata = {
     title: "vaccinetruth",
     images: [
       {
-        // url: "https://vaccinetruth.ai/vt-logo.png",
-        url: "https://vaccinetruth.ai/twitter.svg",
+        url: "https://vaccinetruth.ai/vt-logo.png",
         width: 800,
         height: 600,
       },
