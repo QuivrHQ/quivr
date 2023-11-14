@@ -5,7 +5,9 @@ from fastapi import APIRouter, Depends, HTTPException
 from middlewares.auth.auth_bearer import AuthBearer, get_current_user
 from models import BrainSubscription, PromptStatusEnum
 from modules.user.userIdentity.entity.user_identity import UserIdentity
-from modules.user.userIdentity.repository import get_user_id_by_user_email
+from modules.user.userIdentity.service.get_user_id_by_user_email import (
+    get_user_id_by_email,
+)
 from pydantic import BaseModel
 from repository.brain import (
     create_brain_user,
@@ -289,7 +291,7 @@ def update_brain_subscription(
             detail="You can't change your own permissions",
         )
 
-    user_id = get_user_id_by_user_email(user_email)
+    user_id = get_user_id_by_email(user_email)
 
     if user_id is None:
         raise HTTPException(
