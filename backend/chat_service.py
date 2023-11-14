@@ -1,6 +1,8 @@
 import os
 
-from utils import handle_request_validation_error
+from packages.utils.handle_request_validation_error import (
+    handle_request_validation_error,
+)
 
 if __name__ == "__main__":
     # import needed here when running main.py to debug backend
