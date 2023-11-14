@@ -1,5 +1,5 @@
-from loaders.telegram import TelegramChatFileLoader
 from models import File
+from packages.files.loaders.telegram import TelegramChatFileLoader
 
 from .common import process_file
 
