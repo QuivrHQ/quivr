@@ -1,9 +1,8 @@
 from logger import get_logger
-from models import BrainSubscription, BrainSettings
-
+from models import BrainSettings, BrainSubscription
+from packages.emails.send_email import send_email
 from repository.brain import get_brain_details
 from repository.brain_subscription import get_brain_url
-from utils.send_email import send_email
 
 logger = get_logger(__name__)
 

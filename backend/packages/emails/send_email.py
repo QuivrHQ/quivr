@@ -1,6 +1,8 @@
-import resend
 from typing import Dict
+
+import resend
 from models import ResendSettings
+
 
 def send_email(params: Dict):
     settings = ResendSettings()
