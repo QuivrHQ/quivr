@@ -5,9 +5,8 @@ import time
 import openai
 from langchain.schema import Document
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-
 from models import File, get_documents_vector_store
-from utils.file import compute_sha1_from_content
+from packages.files.file import compute_sha1_from_content
 
 
 async def process_audio(

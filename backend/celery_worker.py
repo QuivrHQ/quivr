@@ -10,15 +10,13 @@ from models.databases.supabase.notifications import NotificationUpdatablePropert
 from models.files import File
 from models.notifications import NotificationsStatusEnum
 from models.settings import get_supabase_client
-from parsers.github import process_github
-from repository.brain.update_brain_last_update_time import (
-    update_brain_last_update_time,
-)
+from packages.files.parsers.github import process_github
+from packages.files.processors import filter_file
+from repository.brain.update_brain_last_update_time import update_brain_last_update_time
 from repository.notification.update_notification import update_notification_by_id
 from repository.onboarding.remove_onboarding_more_than_x_days import (
     remove_onboarding_more_than_x_days,
 )
-from utils.processors import filter_file
 
 CELERY_BROKER_URL = os.getenv("CELERY_BROKER_URL", "")
 CELEBRY_BROKER_QUEUE_NAME = os.getenv("CELEBRY_BROKER_QUEUE_NAME", "quivr")
