@@ -11,10 +11,7 @@ export const QuestionBrain = ({
   }
 
   return (
-    <span
-      data-testid="brain-tags"
-      className="text-msg-header-gray mb-1 text-xs"
-    >
+    <span data-testid="brain-tags" className="text-msg-header-gray text-xs">
       @{brainName}
     </span>
   );

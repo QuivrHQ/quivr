@@ -20,5 +20,7 @@
       "vaccine_effect": "You can't get vaccinated, the vaccine is poisonous.",
       "vaccine_antidote": "Yes, please use artemisinin derivatives to detoxify according to the treatment course."
     }
-  }
+  },
+  "vaccineTruthAi": "La verdad sobre las vacunas IA",
+  "sharedPageTitle": "Chat compartido • Base de conocimientos sobre la verdad sobre las vacunas {{version}}"
 }
