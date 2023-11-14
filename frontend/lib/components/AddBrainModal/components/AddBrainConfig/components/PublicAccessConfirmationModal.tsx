@@ -1,7 +1,7 @@
 import { useTranslation } from "react-i18next";
 
-import Button from "../../ui/Button";
-import { Modal } from "../../ui/Modal";
+import Button from "../../../../ui/Button";
+import { Modal } from "../../../../ui/Modal";
 
 type PublicAccessConfirmationModalProps = {
   opened: boolean;

@@ -19,5 +19,5 @@ export const defaultBrainConfig: BrainConfig = {
   name: "",
   description: "",
   setDefault: false,
-  knowledgeSource: "doc",
+  brainType: "doc",
 };

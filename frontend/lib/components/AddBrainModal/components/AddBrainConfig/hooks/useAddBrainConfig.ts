@@ -15,15 +15,11 @@ import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainConte
 import { defineMaxTokens } from "@/lib/helpers/defineMaxTokens";
 import { getAccessibleModels } from "@/lib/helpers/getAccessibleModels";
 import { useToast } from "@/lib/hooks";
-import {
-  BrainConfig,
-  BrainStatus,
-  KnowledgeSource,
-} from "@/lib/types/brainConfig";
+import { BrainConfig } from "@/lib/types/brainConfig";
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-export const useAddBrainModal = () => {
-  const { t } = useTranslation(["translation", "brain", "config"]);
+export const useAddBrainConfig = () => {
+  const { t } = useTranslation(["brain", "config"]);
   const [isPending, setIsPending] = useState(false);
   const { publish } = useToast();
   const { createBrain, setCurrentBrainId } = useBrainContext();
@@ -36,34 +32,6 @@ export const useAddBrainModal = () => {
   ] = useState(false);
   const { getUser } = useUserApi();
   const queryClient = useQueryClient();
-
-  const brainStatusOptions: {
-    label: string;
-    value: BrainStatus;
-  }[] = [
-    {
-      label: t("private_brain_label", { ns: "brain" }),
-      value: "private",
-    },
-    {
-      label: t("public_brain_label", { ns: "brain" }),
-      value: "public",
-    },
-  ];
-
-  const knowledgeSourceOptions: {
-    label: string;
-    value: KnowledgeSource;
-  }[] = [
-    {
-      label: t("knowledge_source_doc", { ns: "brain" }),
-      value: "doc",
-    },
-    {
-      label: t("knowledge_source_api", { ns: "brain" }),
-      value: "api",
-    },
-  ];
 
   const { data: userData } = useQuery({
     queryKey: [USER_DATA_KEY],
@@ -95,7 +63,7 @@ export const useAddBrainModal = () => {
   const temperature = watch("temperature");
   const maxTokens = watch("maxTokens");
   const status = watch("status");
-  const knowledgeSource = watch("knowledgeSource");
+  const brainType = watch("brainType");
 
   const accessibleModels = getAccessibleModels({
     openAiKey,
@@ -148,6 +116,7 @@ export const useAddBrainModal = () => {
         temperature,
         prompt_id,
         status,
+        brain_type: brainType,
       });
 
       if (createdBrainId === undefined) {
@@ -234,13 +203,11 @@ export const useAddBrainModal = () => {
     isPending,
     accessibleModels,
     pickPublicPrompt,
-    brainStatusOptions,
     status,
     isPublicAccessConfirmationModalOpened,
     onConfirmPublicAccess,
     onCancelPublicAccess,
-    knowledgeSourceOptions,
-    knowledgeSource,
+    brainType,
     register,
   };
 };
