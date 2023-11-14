@@ -2,7 +2,8 @@ import time
 
 from fastapi import APIRouter, Depends, Request
 from middlewares.auth import AuthBearer, get_current_user
-from models import Brain, UserIdentity, UserUsage
+from models import Brain, UserUsage
+from modules.user.userIdentity.entity.user_identity import UserIdentity
 from repository.brain import get_user_default_brain
 from repository.user_identity.get_user_identity import get_user_identity
 from repository.user_identity.update_user_properties import (
