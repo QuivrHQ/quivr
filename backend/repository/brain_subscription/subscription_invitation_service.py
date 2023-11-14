@@ -1,8 +1,7 @@
 from logger import get_logger
 from models import BrainSubscription, get_supabase_client
-
+from modules.user.userIdentity.repository import get_user_id_by_user_email
 from repository.brain import get_brain_for_user
-from repository.user.get_user_id_by_user_email import get_user_id_by_user_email
 
 logger = get_logger(__name__)
 

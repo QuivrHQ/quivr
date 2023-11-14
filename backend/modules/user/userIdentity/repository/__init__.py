@@ -1,3 +1,4 @@
 from .get_user_identity import get_user_identity
 from .create_user_identity import create_user_identity
 from .update_user_properties import update_user_properties, UserUpdatableProperties
+from .get_user_id_by_user_email import get_user_id_by_user_email
