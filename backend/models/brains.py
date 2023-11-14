@@ -2,12 +2,11 @@ from typing import Any, List, Optional
 from uuid import UUID
 
 from logger import get_logger
-from pydantic import BaseModel
-from supabase.client import Client
-from utils.vectors import get_unique_files_from_vector_ids
-
 from models.databases.supabase.supabase import SupabaseDB
 from models.settings import get_supabase_client, get_supabase_db
+from packages.embeddings.vectors import get_unique_files_from_vector_ids
+from pydantic import BaseModel
+from supabase.client import Client
 
 logger = get_logger(__name__)
 

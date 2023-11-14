@@ -3,9 +3,9 @@ from typing import List
 from uuid import uuid4
 
 from asyncpg.exceptions import UniqueViolationError
-from auth import AuthBearer, get_current_user
 from fastapi import APIRouter, Depends
 from logger import get_logger
+from middlewares.auth import AuthBearer, get_current_user
 from models import UserIdentity, get_supabase_db
 from pydantic import BaseModel
 

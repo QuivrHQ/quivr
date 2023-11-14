@@ -3,15 +3,10 @@ from typing import List, Union
 from uuid import UUID
 
 from models.notifications import Notification
+from packages.utils import parse_message_time
 from pydantic import BaseModel
-from utils.parse_message_time import (
-    parse_message_time,
-)
-
 from repository.chat.get_chat_history import GetChatHistoryOutput, get_chat_history
-from repository.notification.get_chat_notifications import (
-    get_chat_notifications,
-)
+from repository.notification.get_chat_notifications import get_chat_notifications
 
 
 class ChatItemType(Enum):

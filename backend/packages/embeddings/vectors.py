@@ -10,6 +10,7 @@ from pydantic import BaseModel
 logger = get_logger(__name__)
 
 
+# TODO: Create interface for embeddings and implement it for Supabase and OpenAI (current Quivr)
 class Neurons(BaseModel):
     def create_vector(self, doc, user_openai_api_key=None):
         documents_vector_store = get_documents_vector_store()
@@ -31,14 +32,6 @@ class Neurons(BaseModel):
         embeddings = get_embeddings()
         return embeddings.embed_query(content)
 
-    def similarity_search(self, query, table="match_summaries", top_k=6, threshold=0.5):
-        query_embedding = self.create_embedding(query)
-        supabase_db = get_supabase_db()
-        summaries = supabase_db.similarity_search(
-            query_embedding, table, top_k, threshold
-        )
-        return summaries.data
-
 
 def error_callback(exception):
     print("An exception occurred:", exception)
@@ -56,6 +49,7 @@ def process_batch(batch_ids: List[str]):
         logger.error("Error retrieving batched vectors", e)
 
 
+# TODO: move to Knowledge class
 def get_unique_files_from_vector_ids(vectors_ids: List[str]):
     # Move into Vectors class
     """
