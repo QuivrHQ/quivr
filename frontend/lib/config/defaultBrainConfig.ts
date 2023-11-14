@@ -19,4 +19,5 @@ export const defaultBrainConfig: BrainConfig = {
   name: "",
   description: "",
   setDefault: false,
+  brainType: "doc",
 };

@@ -2,6 +2,10 @@ export const brainStatuses = ["private", "public"] as const;
 
 export type BrainStatus = (typeof brainStatuses)[number];
 
+export const brainTypes = ["doc", "api"] as const;
+
+export type BrainType = (typeof brainTypes)[number];
+
 export type BrainConfig = {
   model: Model;
   temperature: number;
@@ -14,6 +18,7 @@ export type BrainConfig = {
   supabaseKey?: string;
   prompt_id?: string;
   status: BrainStatus;
+  brainType: BrainType;
   prompt: {
     title: string;
     content: string;

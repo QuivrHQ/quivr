@@ -1,5 +1,5 @@
 import { BrainRoleType } from "@/lib/components/BrainUsers/types";
-import { BrainStatus } from "@/lib/types/brainConfig";
+import { BrainStatus, BrainType } from "@/lib/types/brainConfig";
 
 export type SubscriptionUpdatableProperties = {
   role: BrainRoleType | null;
@@ -14,6 +14,7 @@ export type CreateBrainInput = {
   max_tokens?: number;
   openai_api_key?: string;
   prompt_id?: string | null;
+  brain_type?: BrainType;
 };
 
 export type UpdateBrainInput = Partial<CreateBrainInput>;
