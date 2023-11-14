@@ -3,7 +3,7 @@ import { useForm, useFormContext, useWatch } from "react-hook-form";
 
 import { ApiBrainDefinitionSchema } from "@/lib/api/brain/types";
 
-import { defaultApiDefinitionRow } from "../config";
+import { defaultParamDefinitionRow } from "../config";
 import { ParameterDefinition } from "../types";
 import { mapApiBrainDefinitionSchemaToParameterDefinition } from "../utils/mapApiBrainDefinitionSchemaToParameterDefinition";
 import { mapParameterDefinitionToApiBrainDefinitionSchema } from "../utils/mapParameterDefinitionToApiBrainDefinitionSchema";
@@ -26,7 +26,7 @@ export const useParamsDefinition = ({ name }: UseParamsDefinitionProps) => {
       [name]:
         existingProperties.length > 0
           ? existingProperties
-          : [defaultApiDefinitionRow],
+          : [defaultParamDefinitionRow],
     },
   });
 

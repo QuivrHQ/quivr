@@ -1,6 +1,6 @@
 import { ParameterDefinition } from "./types";
 
-export const defaultApiDefinitionRow: ParameterDefinition = {
+export const defaultParamDefinitionRow: ParameterDefinition = {
   name: "",
   type: "string",
   required: false,

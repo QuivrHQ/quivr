@@ -5,7 +5,7 @@ import { MdAdd } from "react-icons/md";
 import Button from "@/lib/components/ui/Button";
 
 import { ParamDefinitionRow } from "./components/ParamDefinitionRow";
-import { defaultApiDefinitionRow } from "./config";
+import { defaultParamDefinitionRow } from "./config";
 import { useParamsDefinition } from "./hooks/useParamsDefinition";
 
 interface ParamsDefinitionProps {
@@ -50,7 +50,7 @@ export const ParamsDefinition = ({
         <Button
           type="button"
           onClick={() => {
-            append(defaultApiDefinitionRow);
+            append(defaultParamDefinitionRow);
           }}
           className="p-2"
           variant={"secondary"}
