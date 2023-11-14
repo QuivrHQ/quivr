@@ -1,8 +1,10 @@
 import { BrainRoleType } from "@/lib/components/BrainUsers/types";
 import { BrainStatus, BrainType, Model } from "@/lib/types/brainConfig";
 
+export type ApiBrainDefinitionSchemaPropertyType = "string" | "number";
+
 export type ApiBrainDefinitionSchemaProperty = {
-  type: string;
+  type: ApiBrainDefinitionSchemaPropertyType;
   description: string;
   name: string;
 };
@@ -19,9 +21,9 @@ export type SubscriptionUpdatableProperties = {
   role: BrainRoleType | null;
 };
 
-export type ApiBrianDefinitionSecret = {
+export type ApiBrainDefinitionSecret = {
   name: string;
-  type: string;
+  type: ApiBrainDefinitionSchemaPropertyType;
 };
 
 export type ApiBrainDefinition = {
@@ -29,7 +31,7 @@ export type ApiBrainDefinition = {
   url: string;
   searchParams: ApiBrainDefinitionSchema;
   params: ApiBrainDefinitionSchema;
-  secrets: ApiBrianDefinitionSecret;
+  secrets?: ApiBrainDefinitionSecret[];
 };
 
 export type CreateBrainInput = {

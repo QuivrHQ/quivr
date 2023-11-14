@@ -6,6 +6,7 @@ import { allowedRequestMethods, CreateBrainInput } from "@/lib/api/brain/types";
 
 import { BrainDefinitionTabTrigger } from "./components/BrainDefinitionTabTrigger";
 import { ParamsDefinition } from "./components/ParamsDefinition/ParamsDefinition";
+import { SecretsDefinition } from "./components/SecretsDefinition/SecretsDefinition";
 import { useApiRequestDefinition } from "./hooks/useApiRequestDefinition";
 
 export const ApiRequestDefinition = (): JSX.Element => {
@@ -74,10 +75,10 @@ export const ApiRequestDefinition = (): JSX.Element => {
             <ParamsDefinition name="brain_definition.params" />
           </Content>
           <Content value="searchParams">
-            <ParamsDefinition name="searchParams" />
+            <ParamsDefinition name="brain_definition.searchParams" />
           </Content>
           <Content value="secrets">
-            <div />
+            <SecretsDefinition />
           </Content>
         </div>
       </Root>

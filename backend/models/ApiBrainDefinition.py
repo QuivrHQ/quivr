@@ -23,7 +23,7 @@ class ApiBrainDefinitionSchema(BaseModel, extra=Extra.forbid):
     required: list[str] = []
 
 
-class ApiBrainDefinitionSecret(BaseModel):
+class ApiBrainDefinitionSecret(BaseModel, extra=Extra.forbid):
     name: str
     type: str
 

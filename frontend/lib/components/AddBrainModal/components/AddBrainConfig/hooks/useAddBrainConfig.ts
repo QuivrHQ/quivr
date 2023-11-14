@@ -82,7 +82,13 @@ export const useAddBrainConfig = () => {
   };
 
   const handleSubmit = async () => {
-    const { name, description, setDefault, brain_definition } = getValues();
+    const {
+      name,
+      description,
+      setDefault,
+      brain_definition,
+      brain_secrets_values,
+    } = getValues();
 
     if (name.trim() === "" || isPending) {
       publish({
@@ -108,7 +114,8 @@ export const useAddBrainConfig = () => {
         prompt_id,
         status,
         brain_type: brainType,
-        brain_definition: brain_definition,
+        brain_definition,
+        brain_secrets_values,
       });
 
       if (createdBrainId === undefined) {

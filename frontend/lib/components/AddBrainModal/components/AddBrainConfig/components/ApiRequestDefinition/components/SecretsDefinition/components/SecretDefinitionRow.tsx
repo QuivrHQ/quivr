@@ -3,25 +3,24 @@ import { useTranslation } from "react-i18next";
 import { MdCancel } from "react-icons/md";
 
 import { paramsNameStyle } from "../../styles";
-import { ParameterDefinition } from "../types";
+import { brainSecretsSchemaDefinitionKeyInForm } from "../config";
+import { SecretDefinition } from "../types";
 
-type ParamControl = {
-  [name: string]: ParameterDefinition[];
+type SecretControl = {
+  [name: string]: SecretDefinition[];
 };
 
-type ParamDefinitionRowProps = {
-  register: UseFormRegister<ParamControl>;
+type SecretDefinitionRowProps = {
+  register: UseFormRegister<SecretControl>;
   index: number;
   remove: (index: number) => void;
-  name: string;
 };
 
-export const ParamDefinitionRow = ({
+export const SecretDefinitionRow = ({
   index,
   remove,
   register,
-  name,
-}: ParamDefinitionRowProps): JSX.Element => {
+}: SecretDefinitionRowProps): JSX.Element => {
   const { t } = useTranslation(["brain"]);
 
   return (
@@ -29,10 +28,10 @@ export const ParamDefinitionRow = ({
       <div className={paramsNameStyle}>
         <input
           type="text"
-          className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 dark:bg-gray-800 dark:text-gray-100 rounded-md w-full"
+          className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block shadow-sm sm:text-sm border-gray-300 dark:bg-gray-800 dark:text-gray-100 rounded-md w-full"
           placeholder={t("api_brain.name")}
           {...register(
-            `${name}.properties[${index}].name` as `${typeof name}.${number}.name`
+            `${brainSecretsSchemaDefinitionKeyInForm}[${index}].name`
           )}
         />
       </div>
@@ -43,7 +42,7 @@ export const ParamDefinitionRow = ({
           className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 dark:bg-gray-800 dark:text-gray-100 rounded-md"
           placeholder={t("api_brain.description")}
           {...register(
-            `${name}.properties[${index}].description` as `${typeof name}.${number}.description`
+            `${brainSecretsSchemaDefinitionKeyInForm}[${index}].description`
           )}
         />
       </div>
@@ -52,18 +51,21 @@ export const ParamDefinitionRow = ({
           id={`type-${index}`}
           className="mt-1 block w-full py-2 px-3 border border-gray-300 dark:bg-gray-800 dark:text-gray-100 bg-white dark:border-gray-800 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
           {...register(
-            `${name}.properties[${index}].type` as `${typeof name}.${number}.type`
+            `${brainSecretsSchemaDefinitionKeyInForm}[${index}].type`
           )}
         >
           <option value="string">string</option>
           <option value="number">number</option>
         </select>
       </div>
-      <div className="flex-1 justify-center flex">
+      <div className={paramsNameStyle}>
         <input
-          type="checkbox"
-          className="form-checkbox h-5 w-5 text-indigo-600 rounded focus:ring-2 focus:ring-indigo-400"
-          {...register(`${name}.required[${index}]`)}
+          type="text"
+          className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 dark:bg-gray-800 dark:text-gray-100 rounded-md w-full"
+          placeholder={t("api_brain.value")}
+          {...register(
+            `${brainSecretsSchemaDefinitionKeyInForm}[${index}].value`
+          )}
         />
       </div>
 
