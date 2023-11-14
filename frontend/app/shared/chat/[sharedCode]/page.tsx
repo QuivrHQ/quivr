@@ -1,6 +1,23 @@
+import type { Metadata } from "next";
+
 import { DisplayChatMessageArea } from "@/lib/components/DisplayChatMessageArea";
 
 import TalkToVT from "../../components/TalkToVT";
+
+export const metadata: Metadata = {
+  title: "vaccinetruth.ai",
+  openGraph: {
+    title: "vaccinetruth",
+    images: [
+      {
+        url: "https://vaccinetruth.ai/vt-logo.png",
+        width: 800,
+        height: 600,
+      },
+    ],
+  },
+};
+
 const SharedChatPage = (): JSX.Element => {
   return (
     <div
