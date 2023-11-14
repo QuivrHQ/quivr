@@ -55,6 +55,7 @@
     "description": "描述",
     "type": "类型",
     "required": "必填",
-    "addRow": "添加行"
+    "addRow": "添加行",
+    "value": "值"
   }
 }

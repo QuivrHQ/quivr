@@ -55,6 +55,7 @@
     "description": "Description",
     "type": "Type",
     "required": "Requis",
-    "addRow": "Ajouter une ligne"
+    "addRow": "Ajouter une ligne",
+    "value": "Valeur"
   }
 }

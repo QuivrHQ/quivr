@@ -55,6 +55,7 @@
     "description": "Descripción",
     "type": "Tipo",
     "required": "Requerido",
-    "addRow": "Agregar fila"
+    "addRow": "Agregar fila",
+    "value": "Valor"
   }
 }

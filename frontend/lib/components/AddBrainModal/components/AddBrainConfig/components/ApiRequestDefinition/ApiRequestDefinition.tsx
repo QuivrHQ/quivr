@@ -1,6 +1,7 @@
 import { Content, List, Root } from "@radix-ui/react-tabs";
 import { Fragment } from "react";
 import { useFormContext } from "react-hook-form";
+import { useTranslation } from "react-i18next";
 
 import { allowedRequestMethods, CreateBrainInput } from "@/lib/api/brain/types";
 
@@ -11,6 +12,7 @@ import { useApiRequestDefinition } from "./hooks/useApiRequestDefinition";
 
 export const ApiRequestDefinition = (): JSX.Element => {
   const { selectedTab, setSelectedTab } = useApiRequestDefinition();
+  const { t } = useTranslation(["external_api_definition"]);
 
   const { watch, register } = useFormContext<CreateBrainInput>();
 
@@ -47,25 +49,25 @@ export const ApiRequestDefinition = (): JSX.Element => {
         />
       </div>
       <Root
-        className="flex flex-col w-full h-full overflow-scroll bg-white dark:bg-black p-4 md:p-10 max-w-5xl"
+        className="flex flex-col w-full h-full overflow-scroll bg-white dark:bg-black py-4 md:py-10 max-w-5xl"
         value={selectedTab}
       >
         <List className="flex flex-col md:flex-row justify-between space-y-2 md:space-y-0 mb-4">
           <BrainDefinitionTabTrigger
             value="params"
-            label="Params"
+            label={t("params", { ns: "external_api_definition" })}
             selected={selectedTab === "params"}
             onChange={setSelectedTab}
           />
           <BrainDefinitionTabTrigger
             value="searchParams"
-            label="Search Params"
+            label={t("searchParams", { ns: "external_api_definition" })}
             selected={selectedTab === "searchParams"}
             onChange={setSelectedTab}
           />
           <BrainDefinitionTabTrigger
             value="secrets"
-            label="Secrets"
+            label={t("secrets", { ns: "external_api_definition" })}
             selected={selectedTab === "secrets"}
             onChange={setSelectedTab}
           />

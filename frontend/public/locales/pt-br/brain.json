@@ -55,6 +55,7 @@
     "description": "Description",
     "type": "Type",
     "required": "Required",
-    "addRow": "Add row"
+    "addRow": "Add row",
+    "value": "Value"
   }
 }
