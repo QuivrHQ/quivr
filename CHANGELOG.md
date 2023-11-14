@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.0.111 (2023-11-14)
+
+## What's Changed
+* ci: 🎡 tests by @StanGirard in https://github.com/StanGirard/quivr/pull/1615
+* fix: update delete brain logic by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1619
+* test(added): misc prompt onboarding by @StanGirard in https://github.com/StanGirard/quivr/pull/1622
+* feat: remove api brain secrets and schemas on delete by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1621
+* test(all): added by @StanGirard in https://github.com/StanGirard/quivr/pull/1624
+* refactor: create "files" package by @gozineb in https://github.com/StanGirard/quivr/pull/1626
+* feat: api definition in brain creation modal by @gozineb in https://github.com/StanGirard/quivr/pull/1613
+
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.110...v0.0.111
+
 ## 0.0.110 (2023-11-13)
 
 ## What's Changed
