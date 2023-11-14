@@ -6,10 +6,11 @@ from celery_worker import process_file_and_notify
 from fastapi import APIRouter, Depends, HTTPException, Query, Request, UploadFile
 from logger import get_logger
 from middlewares.auth import AuthBearer, get_current_user
-from models import Brain, UserIdentity, UserUsage
+from models import Brain, UserUsage
 from models.databases.supabase.knowledge import CreateKnowledgeProperties
 from models.databases.supabase.notifications import CreateNotificationProperties
 from models.notifications import NotificationsStatusEnum
+from modules.user.userIdentity.entity.user_identity import UserIdentity
 from packages.files.file import convert_bytes, get_file_size
 from repository.brain import get_brain_details
 from repository.files.upload_file import upload_file_storage

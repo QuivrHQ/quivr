@@ -1,7 +1,8 @@
 from multiprocessing import get_logger
 from uuid import UUID
 
-from models import get_supabase_client, UserIdentity
+from models import get_supabase_client
+from modules.user.userIdentity.entity.user_identity import UserIdentity
 from repository.user_identity.create_user_identity import create_user_identity
 
 logger = get_logger()

@@ -3,7 +3,8 @@ from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException
 from middlewares.auth.auth_bearer import AuthBearer, get_current_user
-from models import BrainSubscription, PromptStatusEnum, UserIdentity
+from models import BrainSubscription, PromptStatusEnum
+from modules.user.userIdentity.entity.user_identity import UserIdentity
 from pydantic import BaseModel
 from repository.brain import (
     create_brain_user,
