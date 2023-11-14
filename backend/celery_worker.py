@@ -4,12 +4,12 @@ import os
 
 from celery import Celery
 from celery.schedules import crontab
-from crawl.crawler import CrawlWebsite
 from fastapi import UploadFile
 from models.databases.supabase.notifications import NotificationUpdatableProperties
 from models.files import File
 from models.notifications import NotificationsStatusEnum
 from models.settings import get_supabase_client
+from packages.files.crawl.crawler import CrawlWebsite
 from packages.files.parsers.github import process_github
 from packages.files.processors import filter_file
 from repository.brain.update_brain_last_update_time import update_brain_last_update_time
