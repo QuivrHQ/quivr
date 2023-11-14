@@ -1,8 +1,8 @@
-from auth import (
-    AuthBearer,
-    get_current_user,  # Assuming you have a get_current_user function
-)
 from fastapi import APIRouter, Depends
+from middlewares.auth import (
+    get_current_user,
+)  # Assuming you have a get_current_user function
+from middlewares.auth import AuthBearer
 from models.databases.supabase.onboarding import (
     OnboardingStates,
     OnboardingUpdatableProperties,

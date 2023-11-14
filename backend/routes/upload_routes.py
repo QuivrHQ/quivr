@@ -2,10 +2,10 @@ import os
 from typing import Optional
 from uuid import UUID
 
-from auth import AuthBearer, get_current_user
 from celery_worker import process_file_and_notify
 from fastapi import APIRouter, Depends, HTTPException, Query, Request, UploadFile
 from logger import get_logger
+from middlewares.auth import AuthBearer, get_current_user
 from models import Brain, UserIdentity, UserUsage
 from models.databases.supabase.knowledge import CreateKnowledgeProperties
 from models.databases.supabase.notifications import CreateNotificationProperties

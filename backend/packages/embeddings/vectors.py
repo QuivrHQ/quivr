@@ -32,14 +32,6 @@ class Neurons(BaseModel):
         embeddings = get_embeddings()
         return embeddings.embed_query(content)
 
-    def similarity_search(self, query, table="match_summaries", top_k=6, threshold=0.5):
-        query_embedding = self.create_embedding(query)
-        supabase_db = get_supabase_db()
-        summaries = supabase_db.similarity_search(
-            query_embedding, table, top_k, threshold
-        )
-        return summaries.data
-
 
 def error_callback(exception):
     print("An exception occurred:", exception)

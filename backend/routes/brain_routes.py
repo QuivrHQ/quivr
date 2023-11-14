@@ -1,8 +1,8 @@
 from uuid import UUID
 
-from auth import AuthBearer, get_current_user
 from fastapi import APIRouter, Depends, HTTPException
 from logger import get_logger
+from middlewares.auth.auth_bearer import AuthBearer, get_current_user
 from models import UserIdentity, UserUsage
 from models.brain_entity import PublicBrain
 from models.databases.supabase.brains import (
@@ -24,7 +24,6 @@ from repository.brain import (
     update_brain_by_id,
 )
 from repository.prompt import delete_prompt_by_id, get_prompt_by_id
-
 from routes.authorizations.brain_authorization import has_brain_authorization
 from routes.authorizations.types import RoleEnum
 

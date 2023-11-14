@@ -1,8 +1,8 @@
 from typing import List
 from uuid import UUID
 
-from auth.auth_bearer import AuthBearer, get_current_user
 from fastapi import APIRouter, Depends, HTTPException
+from middlewares.auth.auth_bearer import AuthBearer, get_current_user
 from models import BrainSubscription, PromptStatusEnum, UserIdentity
 from pydantic import BaseModel
 from repository.brain import (
@@ -21,7 +21,6 @@ from repository.brain_subscription import (
 )
 from repository.prompt import delete_prompt_by_id, get_prompt_by_id
 from repository.user import get_user_id_by_user_email
-
 from routes.authorizations.brain_authorization import (
     RoleEnum,
     has_brain_authorization,
