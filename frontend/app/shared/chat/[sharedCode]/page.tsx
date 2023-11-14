@@ -11,8 +11,8 @@ export const metadata: Metadata = {
     images: [
       {
         url: "https://vaccinetruth.ai/vt-logo.png",
-        width: 800,
-        height: 600,
+        width: 256,
+        height: 256,
       },
     ],
   },
