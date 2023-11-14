@@ -1,20 +1,20 @@
 from models.brains import Brain
-from models.files import File
-from parsers.audio import process_audio
-from parsers.code_python import process_python
-from parsers.csv import process_csv
-from parsers.docx import process_docx
-from parsers.epub import process_epub
-from parsers.html import process_html
-from parsers.markdown import process_markdown
-from parsers.notebook import process_ipnyb
-from parsers.odt import process_odt
-from parsers.pdf import process_pdf
-from parsers.powerpoint import process_powerpoint
-from parsers.telegram import process_telegram
-from parsers.txt import process_txt
-from parsers.xlsx import process_xlsx
 from repository.brain.get_brain_by_id import get_brain_by_id
+
+from .parsers.audio import process_audio
+from .parsers.code_python import process_python
+from .parsers.csv import process_csv
+from .parsers.docx import process_docx
+from .parsers.epub import process_epub
+from .parsers.html import process_html
+from .parsers.markdown import process_markdown
+from .parsers.notebook import process_ipnyb
+from .parsers.odt import process_odt
+from .parsers.pdf import process_pdf
+from .parsers.powerpoint import process_powerpoint
+from .parsers.telegram import process_telegram
+from .parsers.txt import process_txt
+from .parsers.xlsx import process_xlsx
 
 file_processors = {
     ".txt": process_txt,
@@ -46,8 +46,9 @@ def create_response(message, type):
     return {"message": message, "type": type}
 
 
+# TODO: Move filter_file to a file service to avoid circular imports from models/files.py for File class
 async def filter_file(
-    file: File,
+    file,
     enable_summarization: bool,
     brain_id,
     openai_api_key,

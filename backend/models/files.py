@@ -9,8 +9,8 @@ from logger import get_logger
 from models.brains import Brain
 from models.databases.supabase.supabase import SupabaseDB
 from models.settings import get_supabase_db
+from packages.files.file import compute_sha1_from_file
 from pydantic import BaseModel
-from utils.file import compute_sha1_from_file
 
 logger = get_logger(__name__)
 

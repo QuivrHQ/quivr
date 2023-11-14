@@ -10,9 +10,9 @@ from models import Brain, UserIdentity, UserUsage
 from models.databases.supabase.knowledge import CreateKnowledgeProperties
 from models.databases.supabase.notifications import CreateNotificationProperties
 from models.notifications import NotificationsStatusEnum
+from packages.files.file import convert_bytes
 from repository.knowledge.add_knowledge import add_knowledge
 from repository.notification.add_notification import add_notification
-from utils.file import convert_bytes
 
 logger = get_logger(__name__)
 crawl_router = APIRouter()
