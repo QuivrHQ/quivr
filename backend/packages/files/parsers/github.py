@@ -5,8 +5,8 @@ from langchain.document_loaders import GitLoader
 from langchain.schema import Document
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from models import Brain, File
+from packages.embeddings.vectors import Neurons
 from packages.files.file import compute_sha1_from_content
-from utils.vectors import Neurons
 
 
 async def process_github(
