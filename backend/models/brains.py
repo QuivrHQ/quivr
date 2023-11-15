@@ -49,40 +49,6 @@ class Brain(BaseModel):
             commons=commons, *args, **kwargs  # pyright: ignore reportPrivateUsage=none
         )  # pyright: ignore reportPrivateUsage=none
 
-    # TODO: move this to a brand new BrainService
-    def get_brain_users(self):
-        response = (
-            self.supabase_client.table("brains_users")
-            .select("id:brain_id, *")
-            .filter("brain_id", "eq", self.id)  # type: ignore
-            .execute()
-        )
-        return response.data
-
-    # TODO: move this to a brand new BrainService
-    def delete_user_from_brain(self, user_id):
-        results = (
-            self.supabase_client.table("brains_users")
-            .select("*")
-            .match({"brain_id": self.id, "user_id": user_id})
-            .execute()
-        )
-
-        if len(results.data) != 0:
-            self.supabase_client.table("brains_users").delete().match(
-                {"brain_id": self.id, "user_id": user_id}
-            ).execute()
-
-    def delete_brain(self, user_id):
-        results = self.supabase_db.delete_brain_user_by_id(user_id, self.id)  # type: ignore
-
-        if len(results) == 0:
-            return {"message": "You are not the owner of this brain."}
-        else:
-            self.supabase_db.delete_brain_vector(self.id)  # type: ignore
-            self.supabase_db.delete_brain_users(self.id)  # type: ignore
-            self.supabase_db.delete_brain(self.id)  # type: ignore
-
     def create_brain_vector(self, vector_id, file_sha1):
         return self.supabase_db.create_brain_vector(self.id, vector_id, file_sha1)  # type: ignore
 

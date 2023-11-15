@@ -1,7 +1,32 @@
-import { DisplayChatMessageArea } from "@/lib/components/DisplayChatMessageArea";
+import type { Metadata, ResolvingMetadata } from 'next';
 
-import { SharedPageTitle } from "../../components/SharedPageTitle";
-import TalkToVT from "../../components/TalkToVT";
+import { DisplayChatMessageArea } from '@/lib/components/DisplayChatMessageArea';
+
+import { SharedPageTitle } from '../../components/SharedPageTitle';
+import TalkToVT from '../../components/TalkToVT';
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type Props = { params: { lng: string } };
+export const generateMetadata = async (
+  { params: { lng = 'en' } }: Props,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  parent?: ResolvingMetadata
+): Promise<Metadata> => {
+  return {
+    title: `vaccinetruth.ai`,
+    description: `vaccinetruth.ai`,
+    openGraph: {
+      images: [
+        {
+          url: 'https://vaccinetruth.ai/vt-logo-256.png',
+          width: 256,
+          height: 256,
+        },
+      ],
+      locale: lng,
+    },
+  };
+};
 
 const SharedChatPage = (): JSX.Element => {
   return (

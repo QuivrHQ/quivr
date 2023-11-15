@@ -17,7 +17,6 @@ class BrainlessChat(ChatInterface):
         self,
         brain_id,
         chat_id,
-        model,
         max_tokens,
         temperature,
         user_openai_api_key,
@@ -25,6 +24,8 @@ class BrainlessChat(ChatInterface):
         prompt_id,
         user_id,
     ):
+        model = "gpt-3.5-turbo-1106"
+
         return HeadlessQA(
             chat_id=chat_id,
             model=model,

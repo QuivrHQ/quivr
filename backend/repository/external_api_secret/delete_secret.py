@@ -10,7 +10,7 @@ def delete_secret(user_id: UUID, brain_id: UUID, secret_name: str) -> bool:
     response = supabase_client.rpc(
         "delete_secret",
         {
-            "name": build_secret_unique_name(
+            "secret_name": build_secret_unique_name(
                 user_id=user_id, brain_id=brain_id, secret_name=secret_name
             ),
         },

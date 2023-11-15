@@ -7,7 +7,12 @@ def test_get_user_info(client, api_key):
 
     # Assert that the response contains the expected fields
     user_info = response.json()
+    print(user_info)
     assert "email" in user_info
     assert "max_brain_size" in user_info
     assert "current_brain_size" in user_info
     assert "date" in user_info
+    assert "is_premium" in user_info
+    assert "models" in user_info
+    assert "requests_stats" in user_info
+    assert "id" in user_info

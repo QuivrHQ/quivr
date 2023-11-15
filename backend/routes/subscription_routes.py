@@ -3,7 +3,7 @@ from uuid import UUID
 
 from auth.auth_bearer import AuthBearer, get_current_user
 from fastapi import APIRouter, Depends, HTTPException
-from models import Brain, BrainSubscription, PromptStatusEnum, UserIdentity
+from models import BrainSubscription, PromptStatusEnum, UserIdentity
 from pydantic import BaseModel
 from repository.brain import (
     create_brain_user,
@@ -12,16 +12,15 @@ from repository.brain import (
     get_brain_for_user,
     update_brain_user_rights,
 )
+from repository.brain.delete_brain import delete_brain
 from repository.brain.delete_brain_user import delete_brain_user
+from repository.brain.get_brain_users import get_brain_users
 from repository.brain_subscription import (
     SubscriptionInvitationService,
     resend_invitation_email,
 )
-from repository.knowledge.remove_brain_all_knowledge import (
-    remove_brain_all_knowledge,
-)
 from repository.prompt import delete_prompt_by_id, get_prompt_by_id
-from repository.user import get_user_email_by_user_id, get_user_id_by_user_email
+from repository.user import get_user_id_by_user_email
 
 from routes.authorizations.brain_authorization import (
     RoleEnum,
@@ -99,29 +98,6 @@ def invite_users_to_brain(
         Depends(has_brain_authorization([RoleEnum.Owner, RoleEnum.Editor])),
     ],
 )
-def get_brain_users(
-    brain_id: UUID,
-):
-    """
-    Get all users for a brain
-    """
-    brain = Brain(
-        id=brain_id,
-    )
-    brain_users = brain.get_brain_users()
-
-    brain_access_list = []
-
-    for brain_user in brain_users:
-        brain_access = {}
-        # TODO: find a way to fetch user email concurrently
-        brain_access["email"] = get_user_email_by_user_id(brain_user["user_id"])
-        brain_access["rights"] = brain_user["rights"]
-        brain_access_list.append(brain_access)
-
-    return brain_access_list
-
-
 @subscription_router.delete(
     "/brains/{brain_id}/subscription",
 )
@@ -139,9 +115,6 @@ async def remove_user_subscription(
             detail="Brain not found while trying to delete",
         )
 
-    brain = Brain(
-        id=brain_id,
-    )
     user_brain = get_brain_for_user(current_user.id, brain_id)
     if user_brain is None:
         raise HTTPException(
@@ -150,21 +123,21 @@ async def remove_user_subscription(
         )
 
     if user_brain.rights != "Owner":
-        brain.delete_user_from_brain(current_user.id)
+        delete_brain_user(current_user.id, brain_id)
     else:
-        brain_users = brain.get_brain_users()
+        brain_users = get_brain_users(
+            brain_id=brain_id,
+        )
         brain_other_owners = [
             brain
             for brain in brain_users
-            if brain["rights"] == "Owner"
-            and str(brain["user_id"]) != str(current_user.id)
+            if brain.rights == "Owner" and str(brain.user_id) != str(current_user.id)
         ]
 
         if len(brain_other_owners) == 0:
-            # Delete its prompt if it's private
-
-            remove_brain_all_knowledge(brain_id)
-            brain.delete_brain(current_user.id)
+            delete_brain(
+                brain_id=brain_id,
+            )
             if targeted_brain.prompt_id:
                 brain_to_delete_prompt = get_prompt_by_id(targeted_brain.prompt_id)
                 if brain_to_delete_prompt is not None and (
@@ -173,7 +146,10 @@ async def remove_user_subscription(
                     delete_prompt_by_id(targeted_brain.prompt_id)
 
         else:
-            brain.delete_user_from_brain(current_user.id)
+            delete_brain_user(
+                current_user.id,
+                brain_id,
+            )
 
     return {"message": f"Subscription removed successfully from brain {brain_id}"}
 
@@ -321,10 +297,6 @@ def update_brain_subscription(
             detail="User not found",
         )
 
-    brain = Brain(
-        id=brain_id,
-    )
-
     # check if user is an editor but trying to give high level permissions
     if subscription.rights == "Owner":
         try:
@@ -363,7 +335,7 @@ def update_brain_subscription(
                 current_user.id,
                 RoleEnum.Owner,
             )
-            brain.delete_user_from_brain(user_id)
+            delete_brain_user(user_id, brain_id)
         except HTTPException:
             raise HTTPException(
                 status_code=403,
