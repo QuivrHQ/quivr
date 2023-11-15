@@ -11,6 +11,7 @@ import { Radio } from "@/lib/components/ui/Radio";
 import { TextArea } from "@/lib/components/ui/TextArea";
 import { BrainConfig } from "@/lib/types/brainConfig";
 
+import { ApiBrainDefinition } from "./components/ApiBrainDefinition";
 import { useGeneralInformation } from "./hooks/useGeneralInformation";
 
 type GeneralInformationProps = {
@@ -100,7 +101,7 @@ export const GeneralInformation = (
           {...register("brain_type", { disabled: true })}
         />
       </div>
-
+      <ApiBrainDefinition />
       <TextArea
         label={t("brainDescription", { ns: "brain" })}
         placeholder={t("brainDescriptionPlaceholder", { ns: "brain" })}

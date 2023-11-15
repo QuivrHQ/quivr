@@ -1,5 +1,6 @@
 import { UUID } from "crypto";
 
+import { ApiBrainDefinition } from "@/lib/api/brain/types";
 import { BrainRoleType } from "@/lib/components/BrainUsers/types";
 import { Document } from "@/lib/types/Document";
 
@@ -20,6 +21,7 @@ export type Brain = {
   description?: string;
   prompt_id?: string | null;
   brain_type?: BrainType;
+  brain_definition?: ApiBrainDefinition;
 };
 
 export type MinimalBrainForUser = {
