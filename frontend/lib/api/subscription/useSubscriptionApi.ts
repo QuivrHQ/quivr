@@ -21,8 +21,8 @@ export const useSubscriptionApi = () => {
       declineInvitation(brainId, axiosInstance),
     getInvitation: async (brainId: UUID) =>
       getInvitation(brainId, axiosInstance),
-    subscribeToBrain: async (brainId: UUID) =>
-      subscribeToBrain(brainId, axiosInstance),
+    subscribeToBrain: async (brainId: UUID, secrets?: Record<string, string>) =>
+      subscribeToBrain(brainId, axiosInstance, secrets),
     unsubscribeFromBrain: async (brainId: UUID) =>
       unsubscribeFromBrain(brainId, axiosInstance),
   };

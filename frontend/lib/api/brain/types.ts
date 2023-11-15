@@ -24,6 +24,7 @@ export type SubscriptionUpdatableProperties = {
 export type ApiBrainDefinitionSecret = {
   name: string;
   type: ApiBrainDefinitionSchemaPropertyType;
+  description: string;
 };
 
 export type ApiBrainDefinition = {

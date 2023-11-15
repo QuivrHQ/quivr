@@ -52,6 +52,8 @@ class PublicBrain(BaseModel):
     description: Optional[str]
     number_of_subscribers: int = 0
     last_update: str
+    brain_type: BrainType
+    brain_definition: Optional[ApiBrainDefinition]
 
 
 class BrainUser(BaseModel):
