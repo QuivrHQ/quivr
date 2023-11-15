@@ -2,7 +2,7 @@ from datetime import datetime
 
 from fastapi import HTTPException
 from models.settings import get_supabase_db
-from models.user_identity import UserIdentity
+from modules.user.entity.user_identity import UserIdentity
 from pydantic import DateError
 
 

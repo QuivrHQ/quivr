@@ -5,7 +5,7 @@ from fastapi import Depends, HTTPException, Request
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from middlewares.auth.api_key_handler import get_user_from_api_key, verify_api_key
 from middlewares.auth.jwt_token_handler import decode_access_token, verify_token
-from models import UserIdentity
+from modules.user.entity.user_identity import UserIdentity
 
 
 class AuthBearer(HTTPBearer):

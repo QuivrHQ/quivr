@@ -5,10 +5,11 @@ from celery_worker import process_crawl_and_notify
 from fastapi import APIRouter, Depends, Query, Request
 from logger import get_logger
 from middlewares.auth import AuthBearer, get_current_user
-from models import Brain, UserIdentity, UserUsage
+from models import Brain, UserUsage
 from models.databases.supabase.knowledge import CreateKnowledgeProperties
 from models.databases.supabase.notifications import CreateNotificationProperties
 from models.notifications import NotificationsStatusEnum
+from modules.user.entity.user_identity import UserIdentity
 from packages.files.crawl.crawler import CrawlWebsite
 from packages.files.file import convert_bytes
 from repository.knowledge.add_knowledge import add_knowledge

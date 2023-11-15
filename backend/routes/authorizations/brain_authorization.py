@@ -3,7 +3,7 @@ from uuid import UUID
 
 from fastapi import Depends, HTTPException, status
 from middlewares.auth.auth_bearer import get_current_user
-from models import UserIdentity
+from modules.user.entity.user_identity import UserIdentity
 from repository.brain import get_brain_for_user
 from repository.brain.get_brain_details import get_brain_details
 from routes.authorizations.types import RoleEnum

@@ -10,9 +10,9 @@ CREATE TABLE IF NOT EXISTS api_brain_definition (
 
 -- Insert migration record if it doesn't exist
 INSERT INTO migrations (name) 
-SELECT '2023110607100000_add_api_brain_definition_table'
+SELECT '20231106071000_add_api_brain_definition_table'
 WHERE NOT EXISTS (
-    SELECT 1 FROM migrations WHERE name = '2023110607100000_add_api_brain_definition_table'
+    SELECT 1 FROM migrations WHERE name = '20231106071000_add_api_brain_definition_table'
 );
 
 COMMIT;

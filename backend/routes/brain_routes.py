@@ -3,13 +3,14 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException
 from logger import get_logger
 from middlewares.auth.auth_bearer import AuthBearer, get_current_user
-from models import UserIdentity, UserUsage
+from models import UserUsage
 from models.brain_entity import PublicBrain
 from models.databases.supabase.brains import (
     BrainQuestionRequest,
     BrainUpdatableProperties,
     CreateBrainProperties,
 )
+from modules.user.entity.user_identity import UserIdentity
 from repository.brain import (
     create_brain,
     create_brain_user,

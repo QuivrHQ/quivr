@@ -14,6 +14,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.responses import JSONResponse
 from logger import get_logger
 from middlewares.cors import add_cors_middleware
+from modules.user.controller.user_controller import user_router
 from routes.api_key_routes import api_key_router
 from routes.brain_routes import brain_router
 from routes.chat_routes import chat_router
@@ -27,7 +28,6 @@ from routes.onboarding_routes import onboarding_router
 from routes.prompt_routes import prompt_router
 from routes.subscription_routes import subscription_router
 from routes.upload_routes import upload_router
-from routes.user_routes import user_router
 
 logger = get_logger(__name__)
 
