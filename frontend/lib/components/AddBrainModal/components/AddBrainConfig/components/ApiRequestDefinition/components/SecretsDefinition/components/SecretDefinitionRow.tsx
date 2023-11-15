@@ -28,7 +28,7 @@ export const SecretDefinitionRow = ({
       <div className={paramsNameStyle}>
         <input
           type="text"
-          className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block shadow-sm sm:text-sm border-gray-300 dark:bg-gray-800 dark:text-gray-100 rounded-md w-full"
+          className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block shadow-sm sm:text-sm border-gray-300 dark:bg-gray-800 dark:text-gray-100 rounded-md w-full outline-none"
           placeholder={t("api_brain.name")}
           {...register(
             `${brainSecretsSchemaDefinitionKeyInForm}[${index}].name`
@@ -39,7 +39,7 @@ export const SecretDefinitionRow = ({
         <input
           type="text"
           id={`description-${index}`}
-          className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 dark:bg-gray-800 dark:text-gray-100 rounded-md"
+          className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 dark:bg-gray-800 dark:text-gray-100 rounded-md outline-none"
           placeholder={t("api_brain.description")}
           {...register(
             `${brainSecretsSchemaDefinitionKeyInForm}[${index}].description`
@@ -61,7 +61,7 @@ export const SecretDefinitionRow = ({
       <div className={paramsNameStyle}>
         <input
           type="text"
-          className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 dark:bg-gray-800 dark:text-gray-100 rounded-md w-full"
+          className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 dark:bg-gray-800 dark:text-gray-100 rounded-md outline-none"
           placeholder={t("api_brain.value")}
           {...register(
             `${brainSecretsSchemaDefinitionKeyInForm}[${index}].value`

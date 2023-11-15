@@ -29,7 +29,7 @@ export type ApiBrainDefinitionSecret = {
 export type ApiBrainDefinition = {
   method: AllowedRequestMethod;
   url: string;
-  searchParams: ApiBrainDefinitionSchema;
+  search_params: ApiBrainDefinitionSchema;
   params: ApiBrainDefinitionSchema;
   secrets?: ApiBrainDefinitionSecret[];
 };

@@ -29,7 +29,7 @@ export const ParamDefinitionRow = ({
       <div className={paramsNameStyle}>
         <input
           type="text"
-          className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 dark:bg-gray-800 dark:text-gray-100 rounded-md w-full"
+          className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block shadow-sm sm:text-sm border-gray-300 dark:bg-gray-800 dark:text-gray-100 rounded-md w-full outline-none"
           placeholder={t("api_brain.name")}
           {...register(
             `${name}.properties[${index}].name` as `${typeof name}.${number}.name`
@@ -40,7 +40,7 @@ export const ParamDefinitionRow = ({
         <input
           type="text"
           id={`description-${index}`}
-          className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 dark:bg-gray-800 dark:text-gray-100 rounded-md"
+          className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 dark:bg-gray-800 dark:text-gray-100 rounded-md outline-none"
           placeholder={t("api_brain.description")}
           {...register(
             `${name}.properties[${index}].description` as `${typeof name}.${number}.description`
@@ -62,7 +62,7 @@ export const ParamDefinitionRow = ({
       <div className="flex-1 justify-center flex">
         <input
           type="checkbox"
-          className="form-checkbox h-5 w-5 text-indigo-600 rounded focus:ring-2 focus:ring-indigo-400"
+          className="form-checkbox h-5 w-5 text-indigo-600 rounded focus:ring-2 focus:ring-indigo-400 outline-none"
           {...register(`${name}.required[${index}]`)}
         />
       </div>

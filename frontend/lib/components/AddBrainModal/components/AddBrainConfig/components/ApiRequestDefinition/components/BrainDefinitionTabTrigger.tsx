@@ -17,7 +17,7 @@ export const BrainDefinitionTabTrigger = ({
 }: BrainDefinitionTabTriggerProps): JSX.Element => {
   return (
     <Trigger
-      className={`flex-1 pb-4 border-gray-500 text-md align-center mb-3 ${
+      className={`flex-1 pb-2 border-gray-500 text-md align-center mb-0 ${
         selected ? "font-medium border-b-2" : ""
       }`}
       value={value}

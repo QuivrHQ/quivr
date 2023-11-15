@@ -52,32 +52,38 @@ export const ApiRequestDefinition = (): JSX.Element => {
         className="flex flex-col w-full h-full overflow-scroll bg-white dark:bg-black py-4 md:py-10 max-w-5xl"
         value={selectedTab}
       >
-        <List className="flex flex-col md:flex-row justify-between space-y-2 md:space-y-0 mb-4">
+        <List className="flex flex-col md:flex-row justify-between space-y-2 md:space-y-0">
           <BrainDefinitionTabTrigger
             value="params"
-            label={t("params", { ns: "external_api_definition" })}
+            label={t("params")}
             selected={selectedTab === "params"}
             onChange={setSelectedTab}
           />
           <BrainDefinitionTabTrigger
             value="searchParams"
-            label={t("searchParams", { ns: "external_api_definition" })}
+            label={t("searchParams")}
             selected={selectedTab === "searchParams"}
             onChange={setSelectedTab}
           />
           <BrainDefinitionTabTrigger
             value="secrets"
-            label={t("secrets", { ns: "external_api_definition" })}
+            label={t("secrets")}
             selected={selectedTab === "secrets"}
             onChange={setSelectedTab}
           />
         </List>
         <div className="flex-1 md:pt-0 pb-0">
           <Content value="params">
-            <ParamsDefinition name="brain_definition.params" />
+            <ParamsDefinition
+              description={t("paramsTabDescription")}
+              name="brain_definition.params"
+            />
           </Content>
           <Content value="searchParams">
-            <ParamsDefinition name="brain_definition.searchParams" />
+            <ParamsDefinition
+              description={t("searchParamsTabDescription")}
+              name="brain_definition.search_params"
+            />
           </Content>
           <Content value="secrets">
             <SecretsDefinition />

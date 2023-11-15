@@ -1,21 +1,25 @@
 import { useFieldArray } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { MdAdd } from "react-icons/md";
+import { TiInfoOutline } from "react-icons/ti";
 
 import Button from "@/lib/components/ui/Button";
 
 import { ParamDefinitionRow } from "./components/ParamDefinitionRow";
 import { defaultParamDefinitionRow } from "./config";
 import { useParamsDefinition } from "./hooks/useParamsDefinition";
+import { tabDescriptionStyle } from "../../styles";
 
-interface ParamsDefinitionProps {
+type ParamsDefinitionProps = {
   name: string;
-}
+  description: string;
+};
 
 const paramsNameStyle = "flex flex-1 justify-center";
 
 export const ParamsDefinition = ({
   name,
+  description,
 }: ParamsDefinitionProps): JSX.Element => {
   const { t } = useTranslation(["brain"]);
   const { control, register } = useParamsDefinition({
@@ -29,6 +33,11 @@ export const ParamsDefinition = ({
 
   return (
     <div>
+      <div className={tabDescriptionStyle}>
+        <TiInfoOutline size={30} />
+        <p className="ml-5">{description}</p>
+      </div>
+
       <div className="flex flex-1 font-medium">
         <div className="flex flex-1">
           <div className={paramsNameStyle}>{t("api_brain.name")}</div>
