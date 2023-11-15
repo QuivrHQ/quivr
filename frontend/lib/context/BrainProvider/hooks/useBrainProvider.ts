@@ -51,7 +51,10 @@ export const useBrainProvider = () => {
       try {
         setCurrentBrainId(createdBrain.id);
 
-        void track("BRAIN_CREATED");
+        void track("BRAIN_CREATED", {
+          brainType: brain.brain_type,
+        });
+
         void fetchAllBrains();
 
         return createdBrain.id;
