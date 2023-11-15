@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.0.113 (2023-11-14)
+
+## What's Changed
+* refactor: packages folder be 2 by @gozineb in https://github.com/StanGirard/quivr/pull/1628
+
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.112...v0.0.113
+
 ## 0.0.112 (2023-11-14)
 
 **Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.111...v0.0.112
