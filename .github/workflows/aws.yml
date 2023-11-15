@@ -6,10 +6,10 @@ on:
       - 'v*'
 
 env:
-  AWS_REGION: eu-west-3
-  ECR_REPOSITORY: quivr
-  ECR_REGISTRY: 253053805092.dkr.ecr.eu-west-3.amazonaws.com
-  ECS_CLUSTER: quivr
+  AWS_REGION: us-west-1
+  ECR_REPOSITORY: sr-vt-prod-repo
+  ECR_REGISTRY: 155722108667.dkr.ecr.us-west-1.amazonaws.com
+  ECS_CLUSTER: sr-vt-prod-cluster
 
 jobs:
   build_and_push:
@@ -57,6 +57,8 @@ jobs:
       with:
         context: ./backend/
         push: true
+        platforms: linux/amd64,linux/arm64
+        # tags: ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }}, ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ github.ref_name}}
         tags: ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }}, ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ github.ref_name}},  ghcr.io/stangirard/quivr:${{ github.ref_name}}
         cache-from: type=gha
         cache-to: type=gha,mode=max
@@ -69,14 +71,14 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - name: "quivr"
-            service: "quivr-backend"
+          - name: "quivr-api"
+            service: "sr-vt-prod-api"
             task_definition: ".aws/task_definition.json"
-            container: "quivr"
-          - name: "quivr-chat"
-            service: "prod-worker"
+            container: "sr-vt-prod-api"
+          - name: "quivr-worker"
+            service: "sr-vt-prod-worker"
             task_definition: ".aws/task_definition_prod_worker.json"
-            container: "quivr-chat"
+            container: "sr-vt-prod-worker"
         
 
     steps:
