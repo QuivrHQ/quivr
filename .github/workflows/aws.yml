@@ -71,16 +71,15 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - name: "quivr-api"
+          - name: "sr-vt-prod-api"
             service: "sr-vt-prod-api"
             task_definition: ".aws/task_definition.json"
             container: "sr-vt-prod-api"
-          - name: "quivr-worker"
+          - name: "sr-vt-prod-worker"
             service: "sr-vt-prod-worker"
             task_definition: ".aws/task_definition_prod_worker.json"
             container: "sr-vt-prod-worker"
         
-
     steps:
     - name: Checkout
       uses: actions/checkout@v3
