@@ -6,6 +6,8 @@ export const brainTypes = ["doc", "api"] as const;
 
 export type BrainType = (typeof brainTypes)[number];
 
+export type Model = (typeof freeModels)[number];
+
 export type BrainConfig = {
   model: Model;
   temperature: number;
@@ -57,5 +59,3 @@ export const freeModels = [
 export const paidModels = [...openAiPaidModels] as const;
 
 export type PaidModels = (typeof paidModels)[number];
-
-export type Model = (typeof freeModels)[number];

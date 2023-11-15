@@ -49,5 +49,13 @@
   "myBrains": "我的大脑",
   "knowledge_source_doc": "文档",
   "knowledge_source_api": "API",
-  "knowledge_source_label": "知识来源"
+  "knowledge_source_label": "知识来源",
+  "api_brain":{
+    "name": "名称",
+    "description": "描述",
+    "type": "类型",
+    "required": "必填",
+    "addRow": "添加行",
+    "value": "值"
+  }
 }

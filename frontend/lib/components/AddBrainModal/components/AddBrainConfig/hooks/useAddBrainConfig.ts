@@ -10,12 +10,12 @@ import { useBrainApi } from "@/lib/api/brain/useBrainApi";
 import { usePromptApi } from "@/lib/api/prompt/usePromptApi";
 import { USER_DATA_KEY } from "@/lib/api/user/config";
 import { useUserApi } from "@/lib/api/user/useUserApi";
-import { defaultBrainConfig } from "@/lib/config/defaultBrainConfig";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 import { defineMaxTokens } from "@/lib/helpers/defineMaxTokens";
 import { getAccessibleModels } from "@/lib/helpers/getAccessibleModels";
 import { useToast } from "@/lib/hooks";
-import { BrainConfig } from "@/lib/types/brainConfig";
+
+import { CreateBrainProps } from "../types";
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const useAddBrainConfig = () => {
@@ -38,17 +38,6 @@ export const useAddBrainConfig = () => {
     queryFn: getUser,
   });
 
-  const defaultValues = {
-    ...defaultBrainConfig,
-    name: "",
-    description: "",
-    setDefault: false,
-    prompt: {
-      title: "",
-      content: "",
-    },
-  };
-
   const {
     register,
     getValues,
@@ -56,14 +45,14 @@ export const useAddBrainConfig = () => {
     watch,
     setValue,
     formState: { dirtyFields },
-  } = useFormContext<BrainConfig>();
+  } = useFormContext<CreateBrainProps>();
 
-  const openAiKey = watch("openAiKey");
+  const openAiKey = watch("openai_api_key");
   const model = watch("model");
   const temperature = watch("temperature");
-  const maxTokens = watch("maxTokens");
+  const maxTokens = watch("max_tokens");
   const status = watch("status");
-  const brainType = watch("brainType");
+  const brainType = watch("brain_type");
 
   const accessibleModels = getAccessibleModels({
     openAiKey,
@@ -77,7 +66,9 @@ export const useAddBrainConfig = () => {
   }, [dirtyFields.status, status]);
 
   useEffect(() => {
-    setValue("maxTokens", Math.min(maxTokens, defineMaxTokens(model)));
+    if (maxTokens !== undefined && model !== undefined) {
+      setValue("max_tokens", Math.min(maxTokens, defineMaxTokens(model)));
+    }
   }, [maxTokens, model, setValue]);
 
   const getCreatingBrainPromptId = async (): Promise<string | undefined> => {
@@ -91,7 +82,13 @@ export const useAddBrainConfig = () => {
   };
 
   const handleSubmit = async () => {
-    const { name, description, setDefault } = getValues();
+    const {
+      name,
+      description,
+      setDefault,
+      brain_definition,
+      brain_secrets_values,
+    } = getValues();
 
     if (name.trim() === "" || isPending) {
       publish({
@@ -117,6 +114,8 @@ export const useAddBrainConfig = () => {
         prompt_id,
         status,
         brain_type: brainType,
+        brain_definition,
+        brain_secrets_values,
       });
 
       if (createdBrainId === undefined) {
@@ -135,7 +134,7 @@ export const useAddBrainConfig = () => {
       }
 
       setIsShareModalOpen(false);
-      reset(defaultValues);
+      reset();
       publish({
         variant: "success",
         text: t("brainCreated", { ns: "brain" }),

@@ -49,5 +49,13 @@
   "myBrains": "Meus cérebros",
   "knowledge_source_doc": "Documentos",
   "knowledge_source_api": "API",
-  "knowledge_source_label": "Fonte de conhecimento"
+  "knowledge_source_label": "Fonte de conhecimento",
+  "api_brain":{
+    "name": "Name",
+    "description": "Description",
+    "type": "Type",
+    "required": "Required",
+    "addRow": "Add row",
+    "value": "Value"
+  }
 }

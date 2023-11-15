@@ -49,5 +49,13 @@
   "myBrains": "Мои мозги",
   "knowledge_source_doc": "Документы",
   "knowledge_source_api": "API",
-  "knowledge_source_label": "Источник знаний"
+  "knowledge_source_label": "Источник знаний",
+  "api_brain":{
+    "name": "Название",
+    "description": "Описание",
+    "type": "Тип",
+    "required": "Обязательно",
+    "addRow": "Добавить строку",
+    "value": "Значение"
+  }
 }

@@ -11,6 +11,7 @@ import { Modal } from "@/lib/components/ui/Modal";
 import { defineMaxTokens } from "@/lib/helpers/defineMaxTokens";
 import { cn } from "@/lib/utils";
 
+import { ApiRequestDefinition } from "./components/ApiRequestDefinition";
 import { PublicAccessConfirmationModal } from "./components/PublicAccessConfirmationModal";
 import { useAddBrainConfig } from "./hooks/useAddBrainConfig";
 import { useAddBrainConfigLabels } from "./hooks/useAddBrainConfigLabels";
@@ -105,22 +106,25 @@ export const AddBrainConfig = ({
             />
           </fieldset>
           {brainApiIsOn && (
-            <fieldset className="w-full flex flex-col">
-              <Radio
-                items={knowledgeSourceOptions}
-                label={t("knowledge_source_label", { ns: "brain" })}
-                value={brainType}
-                className="flex-1 justify-between w-[50%]"
-                {...register("brainType")}
-              />
-            </fieldset>
+            <>
+              <fieldset className="w-full flex flex-col">
+                <Radio
+                  items={knowledgeSourceOptions}
+                  label={t("knowledge_source_label", { ns: "brain" })}
+                  value={brainType}
+                  className="flex-1 justify-between w-[50%]"
+                  {...register("brain_type")}
+                />
+              </fieldset>
+              <ApiRequestDefinition />
+            </>
           )}
           <Field
             label={t("openAiKeyLabel", { ns: "config" })}
             placeholder={t("openAiKeyPlaceholder", { ns: "config" })}
             autoComplete="off"
             className="flex-1"
-            {...register("openAiKey")}
+            {...register("openai_api_key")}
           />
 
           <fieldset className="w-full flex flex-col">
@@ -163,7 +167,7 @@ export const AddBrainConfig = ({
               min="10"
               max={defineMaxTokens(model)}
               value={maxTokens}
-              {...register("maxTokens")}
+              {...register("max_tokens")}
             />
           </fieldset>
           <Divider text={t("customPromptSection", { ns: "config" })} />

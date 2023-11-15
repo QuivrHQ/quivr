@@ -6,5 +6,9 @@
   "params": "Params",
   "key": "Key",
   "type": "Type (string or number)",
-  "description": "Description"
+  "description": "Description",
+  "secrets": "Secrets",
+  "paramsTabDescription": "Ces valeurs sont envoyées sous forme de corps de requête.",
+  "searchParamsTabDescription": "Ces valeurs sont envoyées sous forme de chaîne de requête.",
+  "secretsTabDescription": "Ces valeurs sont envoyées sous forme de clés d'en-tête."
 }
