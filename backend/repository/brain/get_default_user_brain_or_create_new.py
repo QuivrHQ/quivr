@@ -1,6 +1,6 @@
 from models import BrainEntity
 from models.databases.supabase.brains import CreateBrainProperties
-from modules.user.userIdentity.entity.user_identity import UserIdentity
+from modules.user.entity.user_identity import UserIdentity
 from repository.brain import create_brain, create_brain_user, get_user_default_brain
 from routes.authorizations.types import RoleEnum
 

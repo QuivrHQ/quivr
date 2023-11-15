@@ -7,7 +7,7 @@ from models.databases.supabase.onboarding import (
     OnboardingStates,
     OnboardingUpdatableProperties,
 )
-from modules.user.userIdentity.entity.user_identity import UserIdentity
+from modules.user.entity.user_identity import UserIdentity
 from repository.onboarding.get_user_onboarding import get_user_onboarding
 from repository.onboarding.update_user_onboarding import update_user_onboarding
 

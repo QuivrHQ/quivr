@@ -10,13 +10,13 @@ from models import Brain, UserUsage
 from models.databases.supabase.knowledge import CreateKnowledgeProperties
 from models.databases.supabase.notifications import CreateNotificationProperties
 from models.notifications import NotificationsStatusEnum
-from modules.user.userIdentity.entity.user_identity import UserIdentity
+from modules.user.entity.user_identity import UserIdentity
+from modules.user.repository import get_user_identity
 from packages.files.file import convert_bytes, get_file_size
 from repository.brain import get_brain_details
 from repository.files.upload_file import upload_file_storage
 from repository.knowledge.add_knowledge import add_knowledge
 from repository.notification.add_notification import add_notification
-from repository.user_identity import get_user_identity
 from routes.authorizations.brain_authorization import (
     RoleEnum,
     validate_brain_authorization,

@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, Query
 from logger import get_logger
 from middlewares.auth import AuthBearer, get_current_user
 from models import Brain
-from modules.user.userIdentity.entity.user_identity import UserIdentity
+from modules.user.entity.user_identity import UserIdentity
 from repository.files.delete_file import delete_file_from_storage
 from repository.files.generate_file_signed_url import generate_file_signed_url
 from repository.knowledge.get_all_knowledge import get_all_knowledge

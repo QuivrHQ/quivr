@@ -9,7 +9,7 @@ from models import Brain, UserUsage
 from models.databases.supabase.knowledge import CreateKnowledgeProperties
 from models.databases.supabase.notifications import CreateNotificationProperties
 from models.notifications import NotificationsStatusEnum
-from modules.user.userIdentity.entity.user_identity import UserIdentity
+from modules.user.entity.user_identity import UserIdentity
 from packages.files.crawl.crawler import CrawlWebsite
 from packages.files.file import convert_bytes
 from repository.knowledge.add_knowledge import add_knowledge

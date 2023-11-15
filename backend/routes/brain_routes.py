@@ -10,7 +10,7 @@ from models.databases.supabase.brains import (
     BrainUpdatableProperties,
     CreateBrainProperties,
 )
-from modules.user.userIdentity.entity.user_identity import UserIdentity
+from modules.user.entity.user_identity import UserIdentity
 from repository.brain import (
     create_brain,
     create_brain_user,

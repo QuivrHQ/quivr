@@ -4,7 +4,7 @@ from uuid import UUID
 from fastapi import HTTPException
 from models import UserUsage
 from models.databases.supabase.supabase import SupabaseDB
-from modules.user.userIdentity.entity.user_identity import UserIdentity
+from modules.user.entity.user_identity import UserIdentity
 
 
 class NullableUUID(UUID):

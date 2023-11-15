@@ -2,8 +2,8 @@ from typing import Optional
 from uuid import UUID
 
 from models.settings import get_supabase_client
-from modules.user.userIdentity.entity.user_identity import UserIdentity
-from modules.user.userIdentity.repository import create_user_identity
+from modules.user.entity.user_identity import UserIdentity
+from modules.user.repository import create_user_identity
 from pydantic import BaseModel
 
 

@@ -9,7 +9,7 @@ from llm.qa_headless import HeadlessQA
 from middlewares.auth import AuthBearer, get_current_user
 from models import Brain, BrainEntity, Chat, ChatQuestion, UserUsage, get_supabase_db
 from models.databases.supabase.chats import QuestionAndAnswer
-from modules.user.userIdentity.entity.user_identity import UserIdentity
+from modules.user.entity.user_identity import UserIdentity
 from repository.chat import (
     ChatUpdatableProperties,
     CreateChatProperties,
