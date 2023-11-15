@@ -20,7 +20,7 @@ export type BrainConfig = {
   supabaseKey?: string;
   prompt_id?: string;
   status: BrainStatus;
-  brainType: BrainType;
+  brain_type: BrainType;
   prompt: {
     title: string;
     content: string;
