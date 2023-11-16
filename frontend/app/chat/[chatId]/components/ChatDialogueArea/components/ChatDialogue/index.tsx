@@ -1,4 +1,5 @@
 import { useTranslation } from "react-i18next";
+// import { BsArrowDown } from "react-icons/bs";
 
 import { ShareModal } from "@/app/chat/components/ShareChat/ShareModal";
 import Spinner from "@/lib/components/ui/Spinner";
@@ -54,6 +55,15 @@ export const ChatDialogue = ({
           </div>
         </div>
       )}
+
+      {/* {visibleScrollBottonIcon && (
+        <button
+          className="absolute z-20 right-1/2 bottom-16"
+          onClick={() => scrollToBottom()}
+        >
+          <BsArrowDown />
+        </button>
+      )} */}
     </div>
   );
 };
