@@ -1,4 +1,4 @@
-import { DetailedHTMLProps, forwardRef, InputHTMLAttributes } from "react";
+import { forwardRef } from "react";
 
 import { cn } from "@/lib/utils";
 
@@ -7,11 +7,7 @@ type RadioItem = {
   label: string;
 };
 
-interface RadioProps
-  extends DetailedHTMLProps<
-    InputHTMLAttributes<HTMLInputElement>,
-    HTMLInputElement
-  > {
+interface RadioProps {
   name: string;
   items: RadioItem[];
   label?: string;
@@ -19,7 +15,7 @@ interface RadioProps
 }
 
 export const Radio = forwardRef<HTMLInputElement, RadioProps>(
-  ({ items, label, className, value, ...props }, ref) => (
+  ({ items, label, className, ...props }, ref) => (
     <div className={cn("flex flex-col", className)}>
       {label !== undefined && (
         <label className="text-sm font-medium leading-6 mb-2">{label}</label>
@@ -32,7 +28,6 @@ export const Radio = forwardRef<HTMLInputElement, RadioProps>(
               type="radio"
               className="form-radio h-4 w-4 text-indigo-600 border-indigo-600"
               value={item.value}
-              checked={value === item.value}
               {...props}
             />
             <label className="ml-2" htmlFor={item.value}>

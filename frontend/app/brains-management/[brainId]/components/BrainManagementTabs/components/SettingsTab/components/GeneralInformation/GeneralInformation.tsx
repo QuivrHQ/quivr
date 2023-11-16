@@ -1,7 +1,6 @@
 /* eslint max-lines:["error", 150] */
 // TODO: useFormContext to avoid passing too many props
 
-import { UseFormRegister } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 
 import Button from "@/lib/components/ui/Button";
@@ -9,13 +8,12 @@ import { Chip } from "@/lib/components/ui/Chip";
 import Field from "@/lib/components/ui/Field";
 import { Radio } from "@/lib/components/ui/Radio";
 import { TextArea } from "@/lib/components/ui/TextArea";
-import { BrainConfig } from "@/lib/types/brainConfig";
 
 import { ApiBrainDefinition } from "./components/ApiBrainDefinition";
 import { useGeneralInformation } from "./hooks/useGeneralInformation";
+import { useBrainFormState } from "../../hooks/useBrainFormState";
 
 type GeneralInformationProps = {
-  register: UseFormRegister<BrainConfig>;
   hasEditRights: boolean;
   isPublicBrain: boolean;
   isOwnedByCurrentUser: boolean;
@@ -29,7 +27,6 @@ export const GeneralInformation = (
 ): JSX.Element => {
   const { t } = useTranslation(["translation", "brain", "config"]);
   const {
-    register,
     hasEditRights,
     isPublicBrain,
     isOwnedByCurrentUser,
@@ -37,6 +34,8 @@ export const GeneralInformation = (
     isSettingAsDefault,
     setAsDefaultBrainHandler,
   } = props;
+  const { register } = useBrainFormState();
+
   const { brainStatusOptions, brainTypeOptions } = useGeneralInformation();
 
   return (
