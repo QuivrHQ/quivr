@@ -1,12 +1,12 @@
 from uuid import UUID
 
-from auth import AuthBearer
 from fastapi import APIRouter, Depends
+from middlewares.auth import AuthBearer
+from models import Prompt
 from models.databases.supabase.prompts import (
     CreatePromptProperties,
     PromptUpdatableProperties,
 )
-from models import Prompt
 from repository.prompt import (
     create_prompt,
     get_prompt_by_id,

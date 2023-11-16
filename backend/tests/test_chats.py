@@ -114,3 +114,19 @@ def test_create_chat_and_talk_with_no_brain(client, api_key):
         "/chat/" + chat_id, headers={"Authorization": "Bearer " + api_key}
     )
     assert delete_response.status_code == 200
+
+
+# Test delete all chats for a user
+def test_delete_all_chats(client, api_key):
+    chats = client.get("/chat", headers={"Authorization": "Bearer " + api_key})
+    assert chats.status_code == 200
+    chats_data = chats.json()
+    for chat in chats_data["chats"]:
+        # e.g., assert that each chat object contains 'chat_id' and 'chat_name'
+        assert "chat_id" in chat
+        assert "chat_name" in chat
+        chat_id = chat["chat_id"]
+        delete_response = client.delete(
+            "/chat/" + chat_id, headers={"Authorization": "Bearer " + api_key}
+        )
+        assert delete_response.status_code == 200

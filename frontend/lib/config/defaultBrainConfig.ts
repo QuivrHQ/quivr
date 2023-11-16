@@ -1,4 +1,17 @@
+import { CreateBrainInput } from "../api/brain/types";
 import { BrainConfig } from "../types/brainConfig";
+
+export const addBrainDefaultValues: CreateBrainInput = {
+  model: "gpt-3.5-turbo",
+  temperature: 0,
+  max_tokens: 500,
+  openai_api_key: undefined,
+  prompt_id: undefined,
+  status: "private",
+  name: "",
+  description: "",
+  brain_type: "doc",
+};
 
 export const defaultBrainConfig: BrainConfig = {
   model: "gpt-3.5-turbo",
@@ -19,4 +32,5 @@ export const defaultBrainConfig: BrainConfig = {
   name: "",
   description: "",
   setDefault: false,
+  brain_type: "doc",
 };

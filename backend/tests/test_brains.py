@@ -32,7 +32,7 @@ def test_create_brain(client, api_key):
         "model": "gpt-3.5-turbo",
         "temperature": 0,
         "max_tokens": 256,
-        "file_sha1": "",
+        "brain_type": "doc",
     }
 
     # Making a POST request to the /brains/ endpoint
@@ -214,3 +214,63 @@ def test_set_as_default_brain_endpoint(client, api_key):
     default_brain = get_user_default_brain(user_id)
     assert default_brain is not None
     assert str(default_brain.brain_id) == str(brain_id)
+
+
+def create_public_brain_retrieve_and_then_delete(client, api_key):
+    # Generate a random name for the brain
+    random_brain_name = "".join(
+        random.choices(string.ascii_letters + string.digits, k=10)
+    )
+
+    # Set up the request payload
+    payload = {
+        "name": random_brain_name,
+        "status": "public",
+        "model": "gpt-3.5-turbo",
+        "temperature": 0,
+        "max_tokens": 256,
+        "brain_type": "doc",
+    }
+
+    # Making a POST request to the /brains/ endpoint
+    response = client.post(
+        "/brains/",
+        json=payload,
+        headers={"Authorization": "Bearer " + api_key},
+    )
+
+    # Assert that the response status code is 200 (HTTP OK)
+    assert response.status_code == 200
+
+    # Optionally, assert on specific fields in the response
+    response_data = response.json()
+    # e.g., assert that the response contains a 'brain_id' field
+    assert "id" in response_data
+    assert "name" in response_data
+
+    # Optionally, assert that the returned 'name' matches the one sent in the request
+    assert response_data["name"] == payload["name"]
+
+    # Now, retrieve all brains for the current user
+    response = client.get(
+        "/brains/public",
+        headers={"Authorization": "Bearer " + api_key},
+    )
+
+    # Assert that the response status code is 200 (HTTP OK)
+    assert response.status_code == 200
+    assert len(response.json()["brains"]) > 0
+
+    # Check brain is in public list
+    brain_id = response_data["id"]
+    public_brains = response.json()["brains"]
+    assert brain_id in [brain["id"] for brain in public_brains]
+
+    # Delete the brain
+    response = client.delete(
+        f"/brains/{brain_id}/subscription",
+        headers={"Authorization": "Bearer " + api_key},
+    )
+
+    # Assert that the DELETE response status code is 200 (HTTP OK)
+    assert response.status_code == 200

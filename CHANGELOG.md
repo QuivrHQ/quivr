@@ -1,5 +1,43 @@
 # Changelog
 
+## 0.0.114 (2023-11-16)
+
+## What's Changed
+* feat: add api brain creation frontend by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1631
+* refactor: add modules folder by @gozineb in https://github.com/StanGirard/quivr/pull/1633
+* feat: update settings tab add api brain definition by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1635
+* feat: add public api brain subscription by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1636
+* fix: delete brain on users click in brains management by @gozineb in https://github.com/StanGirard/quivr/pull/1638
+
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.113...v0.0.114
+
+## 0.0.113 (2023-11-14)
+
+## What's Changed
+* refactor: packages folder be 2 by @gozineb in https://github.com/StanGirard/quivr/pull/1628
+
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.112...v0.0.113
+
+## 0.0.112 (2023-11-14)
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.111...v0.0.112
+
+## 0.0.111 (2023-11-14)
+
+## What's Changed
+* ci: 🎡 tests by @StanGirard in https://github.com/StanGirard/quivr/pull/1615
+* fix: update delete brain logic by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1619
+* test(added): misc prompt onboarding by @StanGirard in https://github.com/StanGirard/quivr/pull/1622
+* feat: remove api brain secrets and schemas on delete by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1621
+* test(all): added by @StanGirard in https://github.com/StanGirard/quivr/pull/1624
+* refactor: create "files" package by @gozineb in https://github.com/StanGirard/quivr/pull/1626
+* feat: api definition in brain creation modal by @gozineb in https://github.com/StanGirard/quivr/pull/1613
+
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.110...v0.0.111
+
 ## 0.0.110 (2023-11-13)
 
 ## What's Changed

@@ -2,21 +2,14 @@ from typing import List, Optional
 from uuid import UUID
 from venv import logger
 
-from auth import AuthBearer, get_current_user
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from fastapi.responses import StreamingResponse
 from llm.qa_base import QABaseBrainPicking
 from llm.qa_headless import HeadlessQA
-from models import (
-    Brain,
-    BrainEntity,
-    Chat,
-    ChatQuestion,
-    UserIdentity,
-    UserUsage,
-    get_supabase_db,
-)
+from middlewares.auth import AuthBearer, get_current_user
+from models import Brain, BrainEntity, Chat, ChatQuestion, UserUsage, get_supabase_db
 from models.databases.supabase.chats import QuestionAndAnswer
+from modules.user.entity.user_identity import UserIdentity
 from repository.chat import (
     ChatUpdatableProperties,
     CreateChatProperties,
@@ -32,7 +25,6 @@ from repository.chat.get_chat_history_with_notifications import (
     get_chat_history_with_notifications,
 )
 from repository.notification.remove_chat_notifications import remove_chat_notifications
-
 from routes.chat.factory import get_chat_strategy
 from routes.chat.utils import (
     NullableUUID,

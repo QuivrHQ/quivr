@@ -1,6 +1,8 @@
 import { Model, PaidModels } from "../types/brainConfig";
 
-export const defineMaxTokens = (model: Model | PaidModels): number => {
+export const defineMaxTokens = (
+  model: Model | PaidModels | undefined
+): number => {
   //At the moment is evaluating only models from OpenAI
   switch (model) {
     case "gpt-3.5-turbo":

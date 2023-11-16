@@ -1,16 +1,18 @@
 from fastapi import APIRouter
 from logger import get_logger
 from models import ContactsSettings
+from packages.emails.send_email import send_email
 from pydantic import BaseModel
 
-from utils.send_email import send_email
 
 class ContactMessage(BaseModel):
     customer_email: str
     content: str
 
+
 router = APIRouter()
 logger = get_logger(__name__)
+
 
 def resend_contact_sales_email(customer_email: str, content: str):
     settings = ContactsSettings()
@@ -27,7 +29,9 @@ def resend_contact_sales_email(customer_email: str, content: str):
         "reply_to": customer_email,
         "html": body,
     }
-    send_email(params)
+
+    return send_email(params)
+
 
 @router.post("/contact")
 def post_contact(message: ContactMessage):

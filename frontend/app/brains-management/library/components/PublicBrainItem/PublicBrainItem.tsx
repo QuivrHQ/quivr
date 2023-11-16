@@ -5,6 +5,7 @@ import Button from "@/lib/components/ui/Button";
 import { Modal } from "@/lib/components/ui/Modal";
 import { PublicBrain } from "@/lib/context/BrainProvider/types";
 
+import { SecretsDefinitionFields } from "./components/SecretsDefinitionFields";
 import { usePublicBrainItem } from "./hooks/usePublicBrainItem";
 import { formatDate } from "./utils/formatDate";
 
@@ -16,14 +17,15 @@ export const PublicBrainItem = ({
   brain,
 }: PublicBrainItemProps): JSX.Element => {
   const {
-    handleSubscribeToBrain,
     isUserSubscribedToBrain,
     subscriptionRequestPending,
     isSubscriptionModalOpened,
     setIsSubscriptionModalOpened,
     handleCopyBrainLink,
+    handleBrainSubscription,
+    register,
   } = usePublicBrainItem({
-    brainId: brain.id,
+    brain,
   });
 
   const { t } = useTranslation("brain");
@@ -33,7 +35,7 @@ export const PublicBrainItem = ({
       onClick={(e) => {
         e.preventDefault();
         e.stopPropagation();
-        void handleSubscribeToBrain();
+        void handleBrainSubscription();
       }}
       disabled={isUserSubscribedToBrain || subscriptionRequestPending}
       isLoading={subscriptionRequestPending}
@@ -85,6 +87,10 @@ export const PublicBrainItem = ({
             {formatDate(brain.last_update)}
           </span>
         </p>
+        <SecretsDefinitionFields
+          register={register}
+          secrets={brain.brain_definition?.secrets}
+        />
         <div className="flex flex-1 justify-between items-center">
           <Button
             onClick={() => void handleCopyBrainLink()}

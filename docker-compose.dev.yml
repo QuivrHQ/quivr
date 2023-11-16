@@ -17,6 +17,7 @@ services:
       - 3000:3000
 
   backend-core:
+    image: backend-base
     env_file:
       - ./backend/.env
     build:
@@ -43,6 +44,7 @@ services:
       - 6379:6379
 
   worker:
+    image: backend-base
     env_file:
       - ./backend/.env
     build:
@@ -57,6 +59,7 @@ services:
       - ./backend/:/code/
 
   flower:
+    image: backend-base
     env_file:
       - ./backend/.env
     build:

@@ -1,10 +1,16 @@
 from typing import List
 from uuid import UUID
 
-from auth.auth_bearer import AuthBearer, get_current_user
 from fastapi import APIRouter, Depends, HTTPException
-from models import Brain, BrainSubscription, PromptStatusEnum, UserIdentity
+from middlewares.auth.auth_bearer import AuthBearer, get_current_user
+from models import BrainSubscription, PromptStatusEnum
+from modules.user.entity.user_identity import UserIdentity
+from modules.user.service import get_user_email_by_user_id
+from modules.user.service.get_user_id_by_email import get_user_id_by_email
 from pydantic import BaseModel
+from repository.api_brain_definition.get_api_brain_definition import (
+    get_api_brain_definition,
+)
 from repository.brain import (
     create_brain_user,
     get_brain_by_id,
@@ -12,16 +18,15 @@ from repository.brain import (
     get_brain_for_user,
     update_brain_user_rights,
 )
+from repository.brain.delete_brain import delete_brain
 from repository.brain.delete_brain_user import delete_brain_user
+from repository.brain.get_brain_users import get_brain_users
 from repository.brain_subscription import (
     SubscriptionInvitationService,
     resend_invitation_email,
 )
-from repository.knowledge.remove_brain_all_knowledge import (
-    remove_brain_all_knowledge,
-)
+from repository.external_api_secret.create_secret import create_secret
 from repository.prompt import delete_prompt_by_id, get_prompt_by_id
-from repository.user import get_user_email_by_user_id, get_user_id_by_user_email
 
 from routes.authorizations.brain_authorization import (
     RoleEnum,
@@ -99,24 +104,24 @@ def invite_users_to_brain(
         Depends(has_brain_authorization([RoleEnum.Owner, RoleEnum.Editor])),
     ],
 )
-def get_brain_users(
+def get_users_with_brain_access(
     brain_id: UUID,
 ):
     """
     Get all users for a brain
     """
-    brain = Brain(
-        id=brain_id,
+
+    brain_users = get_brain_users(
+        brain_id=brain_id,
     )
-    brain_users = brain.get_brain_users()
 
     brain_access_list = []
 
     for brain_user in brain_users:
         brain_access = {}
         # TODO: find a way to fetch user email concurrently
-        brain_access["email"] = get_user_email_by_user_id(brain_user["user_id"])
-        brain_access["rights"] = brain_user["rights"]
+        brain_access["email"] = get_user_email_by_user_id(brain_user.user_id)
+        brain_access["rights"] = brain_user.rights
         brain_access_list.append(brain_access)
 
     return brain_access_list
@@ -139,9 +144,6 @@ async def remove_user_subscription(
             detail="Brain not found while trying to delete",
         )
 
-    brain = Brain(
-        id=brain_id,
-    )
     user_brain = get_brain_for_user(current_user.id, brain_id)
     if user_brain is None:
         raise HTTPException(
@@ -150,21 +152,21 @@ async def remove_user_subscription(
         )
 
     if user_brain.rights != "Owner":
-        brain.delete_user_from_brain(current_user.id)
+        delete_brain_user(current_user.id, brain_id)
     else:
-        brain_users = brain.get_brain_users()
+        brain_users = get_brain_users(
+            brain_id=brain_id,
+        )
         brain_other_owners = [
             brain
             for brain in brain_users
-            if brain["rights"] == "Owner"
-            and str(brain["user_id"]) != str(current_user.id)
+            if brain.rights == "Owner" and str(brain.user_id) != str(current_user.id)
         ]
 
         if len(brain_other_owners) == 0:
-            # Delete its prompt if it's private
-
-            remove_brain_all_knowledge(brain_id)
-            brain.delete_brain(current_user.id)
+            delete_brain(
+                brain_id=brain_id,
+            )
             if targeted_brain.prompt_id:
                 brain_to_delete_prompt = get_prompt_by_id(targeted_brain.prompt_id)
                 if brain_to_delete_prompt is not None and (
@@ -173,7 +175,10 @@ async def remove_user_subscription(
                     delete_prompt_by_id(targeted_brain.prompt_id)
 
         else:
-            brain.delete_user_from_brain(current_user.id)
+            delete_brain_user(
+                current_user.id,
+                brain_id,
+            )
 
     return {"message": f"Subscription removed successfully from brain {brain_id}"}
 
@@ -313,17 +318,13 @@ def update_brain_subscription(
             detail="You can't change your own permissions",
         )
 
-    user_id = get_user_id_by_user_email(user_email)
+    user_id = get_user_id_by_email(user_email)
 
     if user_id is None:
         raise HTTPException(
             status_code=404,
             detail="User not found",
         )
-
-    brain = Brain(
-        id=brain_id,
-    )
 
     # check if user is an editor but trying to give high level permissions
     if subscription.rights == "Owner":
@@ -363,7 +364,7 @@ def update_brain_subscription(
                 current_user.id,
                 RoleEnum.Owner,
             )
-            brain.delete_user_from_brain(user_id)
+            delete_brain_user(user_id, brain_id)
         except HTTPException:
             raise HTTPException(
                 status_code=403,
@@ -380,7 +381,9 @@ def update_brain_subscription(
     tags=["Subscription"],
 )
 async def subscribe_to_brain_handler(
-    brain_id: UUID, current_user: UserIdentity = Depends(get_current_user)
+    brain_id: UUID,
+    secrets: dict = {},
+    current_user: UserIdentity = Depends(get_current_user),
 ):
     """
     Subscribe to a public brain
@@ -404,6 +407,25 @@ async def subscribe_to_brain_handler(
             status_code=403,
             detail="You are already subscribed to this brain",
         )
+    if brain.brain_type == "api":
+        brain_definition = get_api_brain_definition(brain_id)
+        brain_secrets = brain_definition.secrets if brain_definition != None else []
+
+        for secret in brain_secrets:
+            if not secrets[secret.name]:
+                raise HTTPException(
+                    status_code=400,
+                    detail=f"Please provide the secret {secret}",
+                )
+
+        for secret in brain_secrets:
+            create_secret(
+                user_id=current_user.id,
+                brain_id=brain_id,
+                secret_name=secret.name,
+                secret_value=secrets[secret.name],
+            )
+
     try:
         create_brain_user(
             user_id=current_user.id,

@@ -66,3 +66,7 @@ frontend/public/robots.txt
 frontend/public/sitemap*
 
 pyfiles/*
+backend/bin/*
+backend/lib/*
+backend/pyvenv.cfg
+backend/share/*

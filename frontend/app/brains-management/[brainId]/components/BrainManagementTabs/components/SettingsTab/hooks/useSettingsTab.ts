@@ -12,7 +12,6 @@ import { defineMaxTokens } from "@/lib/helpers/defineMaxTokens";
 import { getAccessibleModels } from "@/lib/helpers/getAccessibleModels";
 import { useToast } from "@/lib/hooks";
 import { useUserData } from "@/lib/hooks/useUserData";
-import { BrainStatus } from "@/lib/types/brainConfig";
 
 import { useBrainFormState } from "./useBrainFormState";
 import { checkBrainName } from "../utils/checkBrainName";
@@ -51,20 +50,6 @@ export const useSettingsTab = ({ brainId }: UseSettingsTabProps) => {
   } = useBrainFormState({
     brainId,
   });
-
-  const brainStatusOptions: {
-    label: string;
-    value: BrainStatus;
-  }[] = [
-    {
-      label: t("private_brain_label", { ns: "brain" }),
-      value: "private",
-    },
-    {
-      label: t("public_brain_label", { ns: "brain" }),
-      value: "public",
-    },
-  ];
 
   const accessibleModels = getAccessibleModels({
     openAiKey,
@@ -224,7 +209,6 @@ export const useSettingsTab = ({ brainId }: UseSettingsTabProps) => {
     formRef,
     promptId,
     accessibleModels,
-    brainStatusOptions,
     status,
     dirtyFields,
     resetField,

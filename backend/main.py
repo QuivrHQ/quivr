@@ -1,6 +1,6 @@
 import os
 
-from utils import handle_request_validation_error
+from packages.utils import handle_request_validation_error
 
 if __name__ == "__main__":
     # import needed here when running main.py to debug backend
@@ -14,9 +14,11 @@ from fastapi import FastAPI, HTTPException
 from fastapi.responses import JSONResponse
 from logger import get_logger
 from middlewares.cors import add_cors_middleware
+from modules.user.controller.user_controller import user_router
 from routes.api_key_routes import api_key_router
 from routes.brain_routes import brain_router
 from routes.chat_routes import chat_router
+from routes.contact_routes import router as contact_router
 from routes.crawl_routes import crawl_router
 from routes.explore_routes import explore_router
 from routes.knowledge_routes import knowledge_router
@@ -26,8 +28,6 @@ from routes.onboarding_routes import onboarding_router
 from routes.prompt_routes import prompt_router
 from routes.subscription_routes import subscription_router
 from routes.upload_routes import upload_router
-from routes.user_routes import user_router
-from routes.contact_routes import router as contact_router
 
 logger = get_logger(__name__)
 
