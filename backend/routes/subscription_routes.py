@@ -5,6 +5,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from middlewares.auth.auth_bearer import AuthBearer, get_current_user
 from models import BrainSubscription, PromptStatusEnum
 from modules.user.entity.user_identity import UserIdentity
+from modules.user.service import get_user_email_by_user_id
 from modules.user.service.get_user_id_by_email import get_user_id_by_email
 from pydantic import BaseModel
 from repository.api_brain_definition.get_api_brain_definition import (
@@ -103,6 +104,29 @@ def invite_users_to_brain(
         Depends(has_brain_authorization([RoleEnum.Owner, RoleEnum.Editor])),
     ],
 )
+def get_users_with_brain_access(
+    brain_id: UUID,
+):
+    """
+    Get all users for a brain
+    """
+
+    brain_users = get_brain_users(
+        brain_id=brain_id,
+    )
+
+    brain_access_list = []
+
+    for brain_user in brain_users:
+        brain_access = {}
+        # TODO: find a way to fetch user email concurrently
+        brain_access["email"] = get_user_email_by_user_id(brain_user.user_id)
+        brain_access["rights"] = brain_user.rights
+        brain_access_list.append(brain_access)
+
+    return brain_access_list
+
+
 @subscription_router.delete(
     "/brains/{brain_id}/subscription",
 )
