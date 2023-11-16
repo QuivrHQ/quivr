@@ -7,6 +7,9 @@ from models import BrainSubscription, PromptStatusEnum
 from modules.user.entity.user_identity import UserIdentity
 from modules.user.service.get_user_id_by_email import get_user_id_by_email
 from pydantic import BaseModel
+from repository.api_brain_definition.get_api_brain_definition import (
+    get_api_brain_definition,
+)
 from repository.brain import (
     create_brain_user,
     get_brain_by_id,
@@ -21,7 +24,9 @@ from repository.brain_subscription import (
     SubscriptionInvitationService,
     resend_invitation_email,
 )
+from repository.external_api_secret.create_secret import create_secret
 from repository.prompt import delete_prompt_by_id, get_prompt_by_id
+
 from routes.authorizations.brain_authorization import (
     RoleEnum,
     has_brain_authorization,
@@ -352,7 +357,9 @@ def update_brain_subscription(
     tags=["Subscription"],
 )
 async def subscribe_to_brain_handler(
-    brain_id: UUID, current_user: UserIdentity = Depends(get_current_user)
+    brain_id: UUID,
+    secrets: dict = {},
+    current_user: UserIdentity = Depends(get_current_user),
 ):
     """
     Subscribe to a public brain
@@ -376,6 +383,25 @@ async def subscribe_to_brain_handler(
             status_code=403,
             detail="You are already subscribed to this brain",
         )
+    if brain.brain_type == "api":
+        brain_definition = get_api_brain_definition(brain_id)
+        brain_secrets = brain_definition.secrets if brain_definition != None else []
+
+        for secret in brain_secrets:
+            if not secrets[secret.name]:
+                raise HTTPException(
+                    status_code=400,
+                    detail=f"Please provide the secret {secret}",
+                )
+
+        for secret in brain_secrets:
+            create_secret(
+                user_id=current_user.id,
+                brain_id=brain_id,
+                secret_name=secret.name,
+                secret_value=secrets[secret.name],
+            )
+
     try:
         create_brain_user(
             user_id=current_user.id,
