@@ -7,12 +7,21 @@ import { KnowledgeToFeedProvider } from "@/lib/context";
 
 import { AddKnowledge } from "./components/AddKnowledge/AddKnowledge";
 import { AddedKnowledge } from "./components/AddedKnowledge/AddedKnowledge";
+import { NoAccess } from "../NoAccess";
 
 type KnowledgeTabProps = {
   brainId: UUID;
+  hasEditRights: boolean;
 };
-export const KnowledgeTab = ({ brainId }: KnowledgeTabProps): JSX.Element => {
+export const KnowledgeTab = ({
+  brainId,
+  hasEditRights,
+}: KnowledgeTabProps): JSX.Element => {
   const { t } = useTranslation(["translation", "explore", "config"]);
+
+  if (!hasEditRights) {
+    return <NoAccess />;
+  }
 
   return (
     <KnowledgeToFeedProvider>
