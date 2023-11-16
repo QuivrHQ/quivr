@@ -1,4 +1,3 @@
-/* eslint-disable max-lines */
 "use client";
 
 import { UUID } from "crypto";
@@ -11,12 +10,18 @@ import { UserToInvite } from "@/lib/components/UserToInvite";
 import Button from "@/lib/components/ui/Button";
 import { useShareBrain } from "@/lib/hooks/useShareBrain";
 
+import { NoAccess } from "../NoAccess";
+
 type ShareBrainModalProps = {
   brainId: UUID;
+  hasEditRights: boolean;
 };
 
-export const PeopleTab = ({ brainId }: ShareBrainModalProps): JSX.Element => {
-  const { t } = useTranslation(["translation","config","brain"]);
+export const PeopleTab = ({
+  brainId,
+  hasEditRights,
+}: ShareBrainModalProps): JSX.Element => {
+  const { t } = useTranslation(["translation", "config", "brain"]);
   const {
     roleAssignations,
     handleCopyInvitationLink,
@@ -26,21 +31,10 @@ export const PeopleTab = ({ brainId }: ShareBrainModalProps): JSX.Element => {
     addNewRoleAssignationRole,
     sendingInvitation,
     canAddNewRow,
-    hasShareBrainRights,
   } = useShareBrain(brainId);
 
-  if (!hasShareBrainRights) {
-    return (
-      <div className="flex justify-center items-center mt-5">
-        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative max-w-md">
-          <strong className="font-bold mr-1">{t("ohno",{ns:"config"})}</strong>
-          <span className="block sm:inline">
-            {t("roleRequired",{ns:"config"})}
-          </span>
-          <p>{t("requireAccess",{ns:"config"})}</p>
-        </div>
-      </div>
-    );
+  if (!hasEditRights) {
+    return <NoAccess />;
   }
 
   return (
@@ -62,7 +56,7 @@ export const PeopleTab = ({ brainId }: ShareBrainModalProps): JSX.Element => {
               </div>
               <div className="flex flex-row flex-1 items-center justify-center">
                 <span className="text-sm text-gray-700 dark:text-gray-200 w-full bg-gray-50 dark:bg-gray-900 px-4 py-2">
-                  {t("shareBrainLink",{ns:"brain"})}
+                  {t("shareBrainLink", { ns: "brain" })}
                 </span>
               </div>
               <Button type="button">
@@ -72,7 +66,9 @@ export const PeopleTab = ({ brainId }: ShareBrainModalProps): JSX.Element => {
           </div>
 
           <div className="bg-gray-100 h-0.5 my-10 border-gray-200 dark:border-gray-700" />
-          <p className="text-lg font-bold">{t("inviteUsers",{ns:"brain"})}</p>
+          <p className="text-lg font-bold">
+            {t("inviteUsers", { ns: "brain" })}
+          </p>
 
           {roleAssignations.map((roleAssignation, index) => (
             <UserToInvite
@@ -98,12 +94,14 @@ export const PeopleTab = ({ brainId }: ShareBrainModalProps): JSX.Element => {
             disabled={roleAssignations.length === 0}
             type="submit"
           >
-            {t("shareButton",{ns:"translation"})}
+            {t("shareButton", { ns: "translation" })}
           </Button>
         </div>
       </form>
       <div className="bg-gray-100 h-0.5 my-10 border-gray-200 dark:border-gray-700" />
-      <p className="text-lg font-bold">{t("usersWithAccess",{ns:"brain"})}</p>
+      <p className="text-lg font-bold">
+        {t("usersWithAccess", { ns: "brain" })}
+      </p>
       <BrainUsers brainId={brainId} />
     </>
   );
