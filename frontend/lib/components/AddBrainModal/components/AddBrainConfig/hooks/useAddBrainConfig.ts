@@ -202,11 +202,9 @@ export const useAddBrainConfig = () => {
     isPending,
     accessibleModels,
     pickPublicPrompt,
-    status,
     isPublicAccessConfirmationModalOpened,
     onConfirmPublicAccess,
     onCancelPublicAccess,
-    brainType,
     register,
   };
 };
