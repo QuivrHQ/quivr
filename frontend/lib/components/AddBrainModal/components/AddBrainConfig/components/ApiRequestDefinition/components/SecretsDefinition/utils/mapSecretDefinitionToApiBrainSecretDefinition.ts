@@ -12,9 +12,9 @@ export const mapSecretDefinitionToApiBrainSecretsDefinitionsAndValue = (
 ): ApiBrainSecretsDefinitionsAndValues => {
   const secrets: ApiBrainDefinitionSecret[] = secretDefinitions.map(
     (secretDefinition) => {
-      const { name, type } = secretDefinition;
+      const { name, type, description } = secretDefinition;
 
-      return { name, type };
+      return { name, type, description };
     }
   );
 

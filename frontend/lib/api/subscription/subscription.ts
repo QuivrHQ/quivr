@@ -54,14 +54,17 @@ export const getInvitation = async (
     role: invitation.rights,
   };
 };
+type ApiBrainSecrets = Record<string, string>;
 
 export const subscribeToBrain = async (
   brainId: UUID,
-  axiosInstance: AxiosInstance
+  axiosInstance: AxiosInstance,
+  secrets?: ApiBrainSecrets
 ): Promise<{ message: string }> => {
   const subscribedToBrain = (
     await axiosInstance.post<{ message: string }>(
-      `/brains/${brainId}/subscribe`
+      `/brains/${brainId}/subscribe`,
+      secrets
     )
   ).data;
 
