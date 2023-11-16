@@ -14,28 +14,33 @@ type UseParamsDefinitionProps = {
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const useParamsDefinition = ({ name }: UseParamsDefinitionProps) => {
-  const { watch, register } = useFormContext();
-  const existingParams = watch(name) as ApiBrainDefinitionSchema;
-  const existingProperties =
-    mapApiBrainDefinitionSchemaToParameterDefinition(existingParams);
+  const { getValues: getContextValues } = useFormContext<{
+    [name: string]: ApiBrainDefinitionSchema;
+  }>();
 
-  const { control } = useForm<{
+  const { setValue } = useFormContext();
+
+  const { control, register } = useForm<{
     [name: string]: ParameterDefinition[];
   }>({
     defaultValues: {
-      [name]:
-        existingProperties.length > 0
-          ? existingProperties
-          : [defaultParamDefinitionRow],
+      [name]: [defaultParamDefinitionRow],
     },
   });
+
+  useEffect(() => {
+    const existingDefinition = getContextValues(name);
+
+    setValue(
+      name,
+      mapApiBrainDefinitionSchemaToParameterDefinition(existingDefinition)
+    );
+  }, [name, getContextValues, setValue]);
 
   const params = useWatch({
     control,
     name,
   });
-
-  const { setValue } = useFormContext();
 
   useEffect(() => {
     const paramsWithValues = params.filter(

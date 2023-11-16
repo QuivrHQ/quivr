@@ -32,7 +32,7 @@ export const ParamDefinitionRow = ({
           className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block shadow-sm sm:text-sm border-gray-300 dark:bg-gray-800 dark:text-gray-100 rounded-md w-full outline-none"
           placeholder={t("api_brain.name")}
           {...register(
-            `${name}.properties[${index}].name` as `${typeof name}.${number}.name`
+            `${name}[${index}].name` as `${typeof name}.${number}.name`
           )}
         />
       </div>
@@ -43,7 +43,7 @@ export const ParamDefinitionRow = ({
           className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 dark:bg-gray-800 dark:text-gray-100 rounded-md outline-none"
           placeholder={t("api_brain.description")}
           {...register(
-            `${name}.properties[${index}].description` as `${typeof name}.${number}.description`
+            `${name}[${index}].description` as `${typeof name}.${number}.description`
           )}
         />
       </div>
@@ -52,7 +52,7 @@ export const ParamDefinitionRow = ({
           id={`type-${index}`}
           className="mt-1 block w-full py-2 px-3 border border-gray-300 dark:bg-gray-800 dark:text-gray-100 bg-white dark:border-gray-800 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
           {...register(
-            `${name}.properties[${index}].type` as `${typeof name}.${number}.type`
+            `${name}[${index}].type` as `${typeof name}.${number}.type`
           )}
         >
           <option value="string">string</option>
@@ -63,7 +63,7 @@ export const ParamDefinitionRow = ({
         <input
           type="checkbox"
           className="form-checkbox h-5 w-5 text-indigo-600 rounded focus:ring-2 focus:ring-indigo-400 outline-none"
-          {...register(`${name}.required[${index}]`)}
+          {...register(`${name}[${index}].required`)}
         />
       </div>
 
