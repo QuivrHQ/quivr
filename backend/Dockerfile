@@ -13,6 +13,8 @@ RUN apt-get update && apt-get install -y \
     binutils \
     curl \
     git \
+    poppler-utils \
+    tesseract-ocr \
     build-essential && \
     curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y && \
     rm -rf /var/lib/apt/lists/* && apt-get clean
@@ -49,6 +51,8 @@ ENV PATH="/venv/bin:$PATH"
 # Install runtime dependencies
 RUN apt-get update && apt-get install -y \
     pandoc \
+    poppler-utils \
+    tesseract-ocr \
     binutils && \
     rm -rf /var/lib/apt/lists/* && apt-get clean
 
