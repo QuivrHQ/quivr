@@ -22,15 +22,18 @@ export const useBrainFetcher = ({ brainId }: UseBrainFetcherProps) => {
 
       return await getBrain(brainId);
     } catch (error) {
+      console.log("error", error);
       router.push("/brains-management");
     }
   };
 
+  console.log("brainId", brainId);
   const { data: brain } = useQuery({
     queryKey: [getBrainDataKey(brainId!)],
     queryFn: fetchBrain,
     enabled: brainId !== undefined,
   });
+  console.log("QUERY DATA", brain);
 
   return {
     brain,
