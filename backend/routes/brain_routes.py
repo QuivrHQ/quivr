@@ -62,7 +62,14 @@ async def retrieve_default_brain(
 
 @brain_router.get(
     "/brains/{brain_id}/",
-    dependencies=[Depends(AuthBearer()), Depends(has_brain_authorization())],
+    dependencies=[
+        Depends(AuthBearer()),
+        Depends(
+            has_brain_authorization(
+                required_roles=[RoleEnum.Owner, RoleEnum.Editor, RoleEnum.Viewer]
+            )
+        ),
+    ],
     tags=["Brain"],
 )
 async def retrieve_brain_by_id(brain_id: UUID):
