@@ -42,6 +42,7 @@ vi.mock("@tanstack/react-query", async () => {
 
   vi.mock("next/navigation", () => ({
     useRouter: () => ({ replace: vi.fn() }),
+    useParams: () => ({}),
   }));
 
   return {

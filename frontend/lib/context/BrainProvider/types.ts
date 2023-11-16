@@ -1,10 +1,11 @@
 import { UUID } from "crypto";
 
+import { ApiBrainDefinition } from "@/lib/api/brain/types";
 import { BrainRoleType } from "@/lib/components/BrainUsers/types";
 import { Document } from "@/lib/types/Document";
 
 import { useBrainProvider } from "./hooks/useBrainProvider";
-import { Model } from "../../types/brainConfig";
+import { BrainType, Model } from "../../types/brainConfig";
 
 export type BrainAccessStatus = "private" | "public";
 
@@ -19,6 +20,8 @@ export type Brain = {
   openai_api_key?: string | null;
   description?: string;
   prompt_id?: string | null;
+  brain_type?: BrainType;
+  brain_definition?: ApiBrainDefinition;
 };
 
 export type MinimalBrainForUser = {

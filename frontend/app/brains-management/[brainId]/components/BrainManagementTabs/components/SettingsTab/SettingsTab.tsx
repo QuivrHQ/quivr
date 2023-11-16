@@ -13,7 +13,6 @@ import { useAccessConfirmationModal } from "./components/PrivateAccessConfirmati
 import { useSettingsTab } from "./hooks/useSettingsTab";
 import { getBrainPermissions } from "../../utils/getBrainPermissions";
 
-
 type SettingsTabProps = {
   brainId: UUID;
 };
@@ -33,7 +32,6 @@ export const SettingsTab = ({ brainId }: SettingsTabProps): JSX.Element => {
     isDefaultBrain,
     formRef,
     accessibleModels,
-    brainStatusOptions,
     status,
     setValue,
     dirtyFields,
@@ -85,7 +83,6 @@ export const SettingsTab = ({ brainId }: SettingsTabProps): JSX.Element => {
         ref={formRef}
       >
         <GeneralInformation
-          brainStatusOptions={brainStatusOptions}
           hasEditRights={hasEditRights}
           isDefaultBrain={isDefaultBrain}
           isOwnedByCurrentUser={isOwnedByCurrentUser}

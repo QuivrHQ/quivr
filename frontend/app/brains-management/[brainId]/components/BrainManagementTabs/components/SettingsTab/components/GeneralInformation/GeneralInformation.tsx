@@ -1,4 +1,6 @@
-/* eslint max-lines:["error", 110] */
+/* eslint max-lines:["error", 150] */
+// TODO: useFormContext to avoid passing too many props
+
 import { UseFormRegister } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 
@@ -9,6 +11,9 @@ import { Radio } from "@/lib/components/ui/Radio";
 import { TextArea } from "@/lib/components/ui/TextArea";
 import { BrainConfig } from "@/lib/types/brainConfig";
 
+import { ApiBrainDefinition } from "./components/ApiBrainDefinition";
+import { useGeneralInformation } from "./hooks/useGeneralInformation";
+
 type GeneralInformationProps = {
   register: UseFormRegister<BrainConfig>;
   hasEditRights: boolean;
@@ -17,10 +22,6 @@ type GeneralInformationProps = {
   isDefaultBrain: boolean;
   isSettingAsDefault: boolean;
   setAsDefaultBrainHandler: () => Promise<void>;
-  brainStatusOptions: {
-    label: string;
-    value: "private" | "public";
-  }[];
 };
 
 export const GeneralInformation = (
@@ -35,8 +36,8 @@ export const GeneralInformation = (
     isDefaultBrain,
     isSettingAsDefault,
     setAsDefaultBrainHandler,
-    brainStatusOptions,
   } = props;
+  const { brainStatusOptions, brainTypeOptions } = useGeneralInformation();
 
   return (
     <>
@@ -91,6 +92,16 @@ export const GeneralInformation = (
           />
         </div>
       )}
+
+      <div className="w-full mt-4">
+        <Radio
+          items={brainTypeOptions}
+          label={t("knowledge_source_label", { ns: "brain" })}
+          className="flex-1 justify-between w-[50%]"
+          {...register("brain_type", { disabled: true })}
+        />
+      </div>
+      <ApiBrainDefinition />
       <TextArea
         label={t("brainDescription", { ns: "brain" })}
         placeholder={t("brainDescriptionPlaceholder", { ns: "brain" })}
