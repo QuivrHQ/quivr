@@ -8,7 +8,7 @@ export const useDiclaimer = () => {
 
   const WEEK_TIME = 7 * 24 * 3600 * 1000;
 
-  const close_disclaimer_time = localStorage.getItem("close_disclaimer_time");
+  let close_disclaimer_time: string | null = "";
 
   const handleCloseDisclaimer = () => {
     setVisibleDisclaimer(false);
@@ -18,6 +18,7 @@ export const useDiclaimer = () => {
   };
 
   useEffect(() => {
+    close_disclaimer_time = localStorage.getItem("close_disclaimer_time");
     checkDiclaimerVisible();
   }, []);
 

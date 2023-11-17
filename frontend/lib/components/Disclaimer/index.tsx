@@ -14,7 +14,7 @@ export const Disclaimer = (): JSX.Element => {
       <div
         className={`${
           visibleDisclaimer ? "block" : "hidden"
-        } rounded-3xl mb-4 relative isolate flex items-center gap-x-6 overflow-hidden bg-gray-50 px-6 py-2.5 sm:px-3.5 sm:before:flex-1`}
+        } sm:mt-0 mt-10 rounded-3xl mb-4 relative isolate flex items-center gap-x-6 overflow-hidden bg-gray-50 px-6 py-2.5 sm:px-3.5 sm:before:flex-1`}
       >
         <div
           className="absolute left-[max(-7rem,calc(50%-52rem))] top-1/2 -z-10 -translate-y-1/2 transform-gpu blur-2xl"

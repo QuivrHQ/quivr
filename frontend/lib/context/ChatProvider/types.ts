@@ -1,3 +1,4 @@
+import { ChatItemWithGroupedNotifications } from "@/app/chat/[chatId]/components/ChatDialogueArea/types";
 import { ChatMessage, Notification } from "@/app/chat/[chatId]/types";
 
 import { Model } from "../../types/brainConfig";
@@ -16,4 +17,7 @@ export type ChatContextProps = {
   updateStreamingHistory: (streamedChat: ChatMessage) => void;
   notifications: Notification[];
   setNotifications: (notifications: Notification[]) => void;
+  sharedChatItems: ChatItemWithGroupedNotifications[];
+  setIsLoadingHistoryChatItems: (isLoading: boolean) => void;
+  isLoadingHistoryChatItems: boolean;
 };

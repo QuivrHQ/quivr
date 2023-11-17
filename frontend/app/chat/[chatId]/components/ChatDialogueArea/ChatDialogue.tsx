@@ -1,35 +1,36 @@
-import { Disclaimer } from "@/lib/components/Disclaimer";
+import { useParams } from "next/navigation";
+
 import { useChatContext } from "@/lib/context";
-import { useOnboarding } from "@/lib/hooks/useOnboarding";
 import { useSecurity } from "@/services/useSecurity/useSecurity";
 
+// eslint-disable-next-line import/order
+import { ChatGuide } from "../ChatGuide";
 import { ChatDialogue } from "./components/ChatDialogue";
 import { ShortCuts } from "./components/ShortCuts";
 import { getMergedChatMessagesWithDoneStatusNotificationsReduced } from "./utils/getMergedChatMessagesWithDoneStatusNotificationsReduced";
 
 export const ChatDialogueArea = (): JSX.Element => {
   const { isStudioMember } = useSecurity();
+  const params = useParams();
 
-  const { messages, notifications } = useChatContext();
+  const { messages, notifications, isLoadingHistoryChatItems } =
+    useChatContext();
 
   const chatItems = getMergedChatMessagesWithDoneStatusNotificationsReduced(
     messages,
     notifications
   );
-  const { isOnboarding } = useOnboarding();
 
-  const shouldDisplayShortcuts = chatItems.length === 0 && !isOnboarding;
+  // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
+  const shouldDisplayShortcuts = !isLoadingHistoryChatItems && !params?.chatId;
 
   if (!shouldDisplayShortcuts) {
     return (
       <div className="flex flex-col flex-1 overflow-y-auto mb-2">
-        <div>
-          <Disclaimer />
-        </div>
         <ChatDialogue chatItems={chatItems} />
       </div>
     );
   }
 
-  return isStudioMember ? <ShortCuts /> : <></>;
+  return isStudioMember ? <ShortCuts /> : <ChatGuide />;
 };

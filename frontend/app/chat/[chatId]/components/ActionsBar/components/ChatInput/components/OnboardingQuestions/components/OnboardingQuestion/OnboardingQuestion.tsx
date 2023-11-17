@@ -34,10 +34,10 @@ export const OnboardingQuestion = ({
 
   return (
     <Button
+      className="sm:px-6 sm:py-3"
       variant={"secondary"}
       isLoading={generatingAnswer}
       onClick={() => void generateBoardingChat()}
-      // className={` cursor-pointer shadow-md dark:shadow-primary/25 hover:shadow-xl transition-shadow bg-onboarding-yellow-bg px-3 py-1 rounded-xl border-black/10 dark:border-white/25 dark:text-black`}
     >
       {question}
     </Button>
