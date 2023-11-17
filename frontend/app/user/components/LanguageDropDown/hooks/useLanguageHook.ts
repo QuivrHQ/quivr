@@ -1,24 +1,25 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
+import { getBrowserLang } from "@/lib/api/chat/utils";
 import { useEventTracking } from "@/services/analytics/june/useEventTracking";
 
 export const languages = {
   en: {
     label: "English",
   },
-  es: {
-    label: "Español",
-  },
-  fr: {
-    label: "Français",
-  },
-  ptbr: {
-    label: "Português",
-  },
-  ru: {
-    label: "Русский",
-  },
+  // es: {
+  //   label: "Español",
+  // },
+  // fr: {
+  //   label: "Français",
+  // },
+  // ptbr: {
+  //   label: "Português",
+  // },
+  // ru: {
+  //   label: "Русский",
+  // },
   zh_cn: {
     label: "简体中文",
   },
@@ -44,7 +45,8 @@ export const useLanguageHook = (): {
     setAllLanguages(languages);
 
     // get language from localStorage
-    const savedLanguage = localStorage.getItem("selectedLanguage") ?? "en";
+    const savedLanguage =
+      localStorage.getItem("selectedLanguage") ?? getBrowserLang();
 
     setCurrentLanguage(savedLanguage);
     void i18n.changeLanguage(savedLanguage);

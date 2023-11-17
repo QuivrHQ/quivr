@@ -1,8 +1,11 @@
 "use client";
 import Image from "next/image";
+import { useTranslation } from "react-i18next";
 
 import { Disclaimer } from "@/lib/components/Disclaimer";
 export const ChatGuide = (): JSX.Element => {
+  const { t } = useTranslation(["vaccineTruth"]);
+
   return (
     <div className="flex flex-col justify-center items-center h-full">
       <Disclaimer />
@@ -15,8 +18,8 @@ export const ChatGuide = (): JSX.Element => {
           width={100}
         ></Image>
 
-        <div className="font-bold mb-2">Vaccine Truth AI ChatBot</div>
-        <div className="text-xs text-slate-500">I am a chat bot</div>
+        <div className="font-bold mb-2">{t("emptyChatTitle")}</div>
+        <div className="text-xs text-slate-500">{t("emptyChatSubTitle")}</div>
       </div>
     </div>
   );

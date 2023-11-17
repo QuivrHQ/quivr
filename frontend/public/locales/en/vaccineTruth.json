@@ -22,5 +22,7 @@
     }
   },
   "vaccineTruthAi": "Vaccine Truth AI",
-  "sharedPageTitle": "Shared Chat • Vaccine truth knowledge base {{version}}"
+  "sharedPageTitle": "Shared Chat • Vaccine Truth AI",
+  "emptyChatTitle": "Vaccine Truth AI ChatBot",
+  "emptyChatSubTitle": "I am a chat bot"
 }

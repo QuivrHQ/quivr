@@ -22,5 +22,8 @@
     }
   },
   "vaccineTruthAi": "Правда о вакцинах ИИ",
-  "sharedPageTitle": "Общий чат • База знаний о вакцинах {{version}}"
+
+  "sharedPageTitle": "Общий чат • ИИ «Правда о вакцинах»",
+  "emptyChatTitle": "Чат-бот «Правда о вакцинах»",
+  "emptyChatSubTitle": "Я чат-бот"
 }

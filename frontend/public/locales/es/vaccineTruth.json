@@ -22,5 +22,7 @@
     }
   },
   "vaccineTruthAi": "La verdad sobre las vacunas IA",
-  "sharedPageTitle": "Chat compartido • Base de conocimientos sobre la verdad sobre las vacunas {{version}}"
+  "sharedPageTitle": "Chat compartido • Vaccine Truth AI",
+  "emptyChatTitle": "ChatBot de IA sobre la verdad de la vacuna",
+  "emptyChatSubTitle": "soy un chatbot"
 }

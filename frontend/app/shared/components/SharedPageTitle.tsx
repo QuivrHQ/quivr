@@ -7,7 +7,7 @@ export const SharedPageTitle = (): JSX.Element => {
 
   return (
     <div className="py-4 text-center border-b border-solid w-full text-xs sm:text-sm">
-      {t("sharedPageTitle", { version: "1.0.1" })}
+      {t("sharedPageTitle")}
     </div>
   );
 };

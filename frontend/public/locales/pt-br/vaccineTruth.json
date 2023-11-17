@@ -22,5 +22,7 @@
     }
   },
   "vaccineTruthAi": "Verdade da Vacina AI",
-  "sharedPageTitle": "Bate-papo compartilhado • Base de conhecimento sobre a verdade sobre vacinas {{version}}"
+  "sharedPageTitle": "Bate-papo compartilhado • Vaccine Truth AI",
+  "emptyChatTitle": "Vacina Verdade AI ChatBot",
+  "emptyChatSubTitle": "Eu sou um bot de bate-papo"
 }

@@ -62,7 +62,7 @@ export const MessageRow = React.forwardRef(
                 ></Image>
               )}
               {/* Left section for the question and prompt */}
-              <div className="flex ">
+              <div className="flex hidden">
                 <QuestionBrain brainName={brainName} />
                 <QuestionPrompt promptName={promptName} />
               </div>
