@@ -27,6 +27,7 @@ export const BrainManagementTabs = (): JSX.Element => {
     isDeleteOrUnsubscribeModalOpened,
     setIsDeleteOrUnsubscribeModalOpened,
     hasEditRights,
+    isPublicBrain,
     isOwnedByCurrentUser,
     isDeleteOrUnsubscribeRequestPending,
   } = useBrainManagementTabs();
@@ -51,7 +52,7 @@ export const BrainManagementTabs = (): JSX.Element => {
             value="settings"
             onChange={setSelectedTab}
           />
-          {hasEditRights && (
+          {(!isPublicBrain || hasEditRights) && (
             <>
               <BrainTabTrigger
                 selected={selectedTab === "people"}
@@ -74,10 +75,10 @@ export const BrainManagementTabs = (): JSX.Element => {
             <SettingsTab brainId={brainId} />
           </Content>
           <Content value="people">
-            <PeopleTab brainId={brainId} />
+            <PeopleTab brainId={brainId} hasEditRights={hasEditRights} />
           </Content>
           <Content value="knowledge">
-            <KnowledgeTab brainId={brainId} />
+            <KnowledgeTab brainId={brainId} hasEditRights={hasEditRights} />
           </Content>
         </div>
 
