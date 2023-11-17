@@ -2,7 +2,8 @@ import { UUID } from "crypto";
 
 import { MinimalBrainForUser } from "@/lib/context/BrainProvider/types";
 
-import { isUserBrainOwner } from "./isUserBrainOwner";
+import { isUserBrainOwner } from "./isUserBrainEditor";
+import { isUserBrainEditor } from "./isUserBrainOwner";
 
 type GetBrainPermissionsProps = {
   brainId?: UUID;
@@ -22,11 +23,16 @@ export const getBrainPermissions = ({
     userAccessibleBrains,
   });
 
+  const userHasBrainEditorRights = isUserBrainEditor({
+    brainId,
+    userAccessibleBrains,
+  });
+
   const isPublicBrain =
     userAccessibleBrains.find((brain) => brain.id === brainId)?.status ===
     "public";
 
-  const hasEditRights = !isPublicBrain || isOwnedByCurrentUser;
+  const hasEditRights = isOwnedByCurrentUser || userHasBrainEditorRights;
 
   return { isPublicBrain, hasEditRights, isOwnedByCurrentUser };
 };
