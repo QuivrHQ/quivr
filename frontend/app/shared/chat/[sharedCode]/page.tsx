@@ -2,7 +2,7 @@ import axios from "axios";
 import type { Metadata, ResolvingMetadata } from "next";
 
 import { getSharedChatItems } from "@/lib/api/chat/chat";
-import { getQuestion } from "@/lib/api/shared/util";
+import { getFirstChatMessageItem } from "@/lib/api/shared/util";
 import { DisplayChatMessageArea } from "@/lib/components/DisplayChatMessageArea";
 import { DEFAULT_BACKEND_URL } from "@/lib/config/CONSTANTS";
 
@@ -20,11 +20,15 @@ export const generateMetadata = async (
   });
   const res = await getSharedChatItems(sharedCode, axiosInstance);
 
-  const description = getQuestion(res);
+  const chatMessageItem = getFirstChatMessageItem(res);
 
   return {
     title: `vaccinetruth.ai`,
-    description: `${description}`,
+    description: `${
+      chatMessageItem.length > 0
+        ? chatMessageItem[0].body.user_message
+        : "vaccinetruth.ai"
+    }`,
     openGraph: {
       images: [
         {
