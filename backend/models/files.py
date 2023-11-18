@@ -24,7 +24,7 @@ class File(BaseModel):
     vectors_ids: Optional[list] = []
     file_extension: Optional[str] = ""
     content: Optional[Any] = None
-    chunk_size: int = 500
+    chunk_size: int = 2000
     chunk_overlap: int = 0
     documents: Optional[Any] = None
 
