@@ -2,6 +2,7 @@ test:
 	pytest -s backend/tests
 
 dev:
+	docker compose -f docker-compose.dev.yml build backend-core
 	docker compose -f docker-compose.dev.yml up --build
 
 prod:

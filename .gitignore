@@ -70,3 +70,4 @@ backend/bin/*
 backend/lib/*
 backend/pyvenv.cfg
 backend/share/*
+backend/slim.report.json

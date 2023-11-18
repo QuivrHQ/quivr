@@ -8,7 +8,6 @@ if __name__ == "__main__":
     from dotenv import load_dotenv  # type: ignore
 
     load_dotenv()
-import pypandoc
 import sentry_sdk
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import JSONResponse
@@ -50,10 +49,10 @@ app = FastAPI()
 add_cors_middleware(app)
 
 
-@app.on_event("startup")
-async def startup_event():
-    if not os.path.exists(pypandoc.get_pandoc_path()):
-        pypandoc.download_pandoc()
+# @app.on_event("startup")
+# async def startup_event():
+#     if not os.path.exists(pypandoc.get_pandoc_path()):
+#         pypandoc.download_pandoc()
 
 
 app.include_router(brain_router)
