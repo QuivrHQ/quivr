@@ -22,7 +22,7 @@ services:
       - ./backend/.env
     build:
       context: backend
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.dev
       args:
         - DEV_MODE=true
     container_name: backend-core
@@ -49,7 +49,7 @@ services:
       - ./backend/.env
     build:
       context: backend
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.dev
     container_name: worker
     command: celery -A celery_worker worker -l info
     restart: unless-stopped
@@ -64,7 +64,7 @@ services:
       - ./backend/.env
     build:
       context: backend
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.dev
     container_name: flower
     command: celery -A celery_worker flower -l info --port=5555
     restart: unless-stopped
