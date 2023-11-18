@@ -1,4 +1,5 @@
 import * as Popover from "@radix-ui/react-popover";
+import { useTranslation } from "react-i18next";
 import { LuMenu, LuX } from "react-icons/lu";
 
 import { QuivrLogo } from "@/lib/assets/QuivrLogo";
@@ -13,6 +14,8 @@ export const PopoverMenuMobile = ({
   navLinks,
   color = "white",
 }: PopoverMenuMobileProps): JSX.Element => {
+  const { t } = useTranslation(["vaccineTruth"]);
+
   return (
     <>
       <Popover.Root>
@@ -47,7 +50,7 @@ export const PopoverMenuMobile = ({
               <div className="flex gap-2 items-center">
                 <QuivrLogo size={64} color="primary" />
                 <div className="text-lg font-medium text-primary cursor-default ">
-                  Quivr
+                  {t("vaccineTruthAi")}
                 </div>
               </div>
               <Popover.Close>

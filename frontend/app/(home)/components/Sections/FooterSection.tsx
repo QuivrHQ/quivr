@@ -1,11 +1,12 @@
+import Image from "next/image";
 import Link from "next/link";
 import { useTranslation } from "react-i18next";
-import { FaGithub, FaLinkedin } from "react-icons/fa";
+import { FaGithub } from "react-icons/fa";
 import { LuChevronRight } from "react-icons/lu";
 import { RiTwitterXLine } from "react-icons/ri";
 
 import Button from "@/lib/components/ui/Button";
-import { GITHUB_URL, LINKEDIN_URL, TWITTER_URL } from "@/lib/config/CONSTANTS";
+import { GETTR_URL, GITHUB_URL, TWITTER_URL } from "@/lib/config/CONSTANTS";
 
 import { useHomepageTracking } from "../../hooks/useHomepageTracking";
 
@@ -52,15 +53,15 @@ export const FooterSection = (): JSX.Element => {
       </div>
       <ul className="flex gap-10 mt-5 mb-10 text-black">
         <li>
-          <a
-            href={LINKEDIN_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="Quivr LinkedIn"
-            className="hover:text-black"
-          >
-            <FaLinkedin size={52} />
-          </a>
+          <Link href={GETTR_URL} target="_blank">
+            <Image
+              src={"/gettr.svg"}
+              height={24}
+              width={24}
+              alt={"gettr icon"}
+              className="hover:text-black w-12 h-12"
+            ></Image>
+          </Link>
         </li>
         <li>
           <a

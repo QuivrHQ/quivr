@@ -2,16 +2,12 @@
 import { useEffect } from "react";
 
 import { useSupabase } from "@/lib/context/SupabaseProvider";
-import { redirectToPreviousPageOrChatPage } from "@/lib/helpers/redirectToPreviousPageOrChatPage";
 
 import {
-  DemoSection,
   FooterSection,
   HomeHeader,
   HomeSection,
   IntroSection,
-  SecuritySection,
-  TestimonialsSection,
 } from "./components";
 import { HomeHeaderBackground } from "./components/HomeHeader/components/HomeHeaderBackground";
 import { UseCases } from "./components/UseCases/UseCases";
@@ -21,7 +17,7 @@ const HomePage = (): JSX.Element => {
 
   useEffect(() => {
     if (session?.user !== undefined) {
-      redirectToPreviousPageOrChatPage();
+      // redirectToPreviousPageOrChatPage();
     }
   }, [session?.user]);
 
@@ -38,9 +34,9 @@ const HomePage = (): JSX.Element => {
           <IntroSection />
         </HomeSection>
 
-        <HomeSection bg="bg-[#FCFAF6]" slantAfter="down" hiddenOnMobile={true}>
+        {/* <HomeSection bg="bg-[#FCFAF6]" slantAfter="down" hiddenOnMobile={true}>
           <DemoSection />
-        </HomeSection>
+        </HomeSection> */}
 
         <HomeSection
           bg="bg-[#362469]"
@@ -51,13 +47,13 @@ const HomePage = (): JSX.Element => {
           <div />
         </HomeSection>
 
-        <HomeSection bg="bg-white" slantBefore="down" slantAfter="up">
+        {/* <HomeSection bg="bg-white" slantBefore="down" slantAfter="up">
           <SecuritySection />
-        </HomeSection>
+        </HomeSection> */}
 
-        <HomeSection bg="bg-[#FCFAF6]" slantCurrent="up">
+        {/* <HomeSection bg="bg-[#FCFAF6]" slantCurrent="up">
           <TestimonialsSection />
-        </HomeSection>
+        </HomeSection> */}
 
         <HomeSection
           bg="bg-gradient-to-b from-[#D07DF9] to-[#7A27FD]"

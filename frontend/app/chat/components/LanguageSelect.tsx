@@ -11,11 +11,11 @@ import {
 } from "@/app/user/components/LanguageDropDown/hooks/useLanguageHook";
 import { cn } from "@/lib/utils";
 
-export const Language = (): JSX.Element => {
+export const LanguageSelect = (): JSX.Element => {
   const { allLanguages, currentLanguage, change } = useLanguageHook();
 
   return (
-    <div className={`absolute z-10 right-1 top-0 w-28 sm:w-32`}>
+    <div className={`py-2 mx-4`}>
       <Listbox
         value={currentLanguage}
         onChange={(e) => {
