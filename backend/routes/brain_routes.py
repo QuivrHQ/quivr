@@ -1,15 +1,16 @@
 from uuid import UUID
 
-from auth import AuthBearer, get_current_user
 from fastapi import APIRouter, Depends, HTTPException
 from logger import get_logger
-from models import UserIdentity, UserUsage
+from middlewares.auth.auth_bearer import AuthBearer, get_current_user
+from models import UserUsage
 from models.brain_entity import PublicBrain
 from models.databases.supabase.brains import (
     BrainQuestionRequest,
     BrainUpdatableProperties,
     CreateBrainProperties,
 )
+from modules.user.entity.user_identity import UserIdentity
 from repository.brain import (
     create_brain,
     create_brain_user,
@@ -24,7 +25,6 @@ from repository.brain import (
     update_brain_by_id,
 )
 from repository.prompt import delete_prompt_by_id, get_prompt_by_id
-
 from routes.authorizations.brain_authorization import has_brain_authorization
 from routes.authorizations.types import RoleEnum
 
@@ -62,7 +62,14 @@ async def retrieve_default_brain(
 
 @brain_router.get(
     "/brains/{brain_id}/",
-    dependencies=[Depends(AuthBearer()), Depends(has_brain_authorization())],
+    dependencies=[
+        Depends(AuthBearer()),
+        Depends(
+            has_brain_authorization(
+                required_roles=[RoleEnum.Owner, RoleEnum.Editor, RoleEnum.Viewer]
+            )
+        ),
+    ],
     tags=["Brain"],
 )
 async def retrieve_brain_by_id(brain_id: UUID):

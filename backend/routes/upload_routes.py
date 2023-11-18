@@ -2,24 +2,25 @@ import os
 from typing import Optional
 from uuid import UUID
 
-from auth import AuthBearer, get_current_user
 from celery_worker import process_file_and_notify
 from fastapi import APIRouter, Depends, HTTPException, Query, Request, UploadFile
 from logger import get_logger
-from models import Brain, UserIdentity, UserUsage
+from middlewares.auth import AuthBearer, get_current_user
+from models import Brain, UserUsage
 from models.databases.supabase.knowledge import CreateKnowledgeProperties
 from models.databases.supabase.notifications import CreateNotificationProperties
 from models.notifications import NotificationsStatusEnum
+from modules.user.entity.user_identity import UserIdentity
+from modules.user.repository import get_user_identity
+from packages.files.file import convert_bytes, get_file_size
 from repository.brain import get_brain_details
 from repository.files.upload_file import upload_file_storage
 from repository.knowledge.add_knowledge import add_knowledge
 from repository.notification.add_notification import add_notification
-from repository.user_identity import get_user_identity
 from routes.authorizations.brain_authorization import (
     RoleEnum,
     validate_brain_authorization,
 )
-from utils.file import convert_bytes, get_file_size
 
 logger = get_logger(__name__)
 upload_router = APIRouter()

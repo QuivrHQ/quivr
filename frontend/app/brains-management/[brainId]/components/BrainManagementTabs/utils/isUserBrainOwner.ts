@@ -6,7 +6,7 @@ type IsUserBrainOwnerProps = {
   userAccessibleBrains: MinimalBrainForUser[];
   brainId?: UUID;
 };
-export const isUserBrainOwner = ({
+export const isUserBrainEditor = ({
   brainId,
   userAccessibleBrains,
 }: IsUserBrainOwnerProps): boolean => {
@@ -15,5 +15,5 @@ export const isUserBrainOwner = ({
     return false;
   }
 
-  return brain.role === "Owner";
+  return brain.role === "Editor";
 };

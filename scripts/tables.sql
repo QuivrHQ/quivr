@@ -229,7 +229,6 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-
 CREATE OR REPLACE FUNCTION public.get_user_id_by_user_email(user_email text)
 RETURNS TABLE (user_id uuid)
 SECURITY DEFINER
@@ -445,7 +444,7 @@ $$;
 
 
 INSERT INTO migrations (name) 
-SELECT '20231107104700_setup_vault'
+SELECT '20231116102600_add_get_user_email_by_user_id'
 WHERE NOT EXISTS (
-    SELECT 1 FROM migrations WHERE name = '20231107104700_setup_vault'
+    SELECT 1 FROM migrations WHERE name = '20231116102600_add_get_user_email_by_user_id'
 );

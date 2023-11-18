@@ -46,5 +46,16 @@
   "cancel_set_brain_status_to_private": "不，保持公开",
   "brain_management_button_label": "管理",
   "empty_brain_description": "无描述",
-  "myBrains": "我的大脑"
+  "myBrains": "我的大脑",
+  "knowledge_source_doc": "文档",
+  "knowledge_source_api": "API",
+  "knowledge_source_label": "知识来源",
+  "api_brain":{
+    "name": "名称",
+    "description": "描述",
+    "type": "类型",
+    "required": "必填",
+    "addRow": "添加行",
+    "value": "值"
+  }
 }

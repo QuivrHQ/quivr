@@ -2,14 +2,14 @@ import { useTranslation } from "react-i18next";
 
 import Button from "@/lib/components/ui/Button";
 import { Modal } from "@/lib/components/ui/Modal";
-import { BrainAccessStatus } from "@/lib/context/BrainProvider/types";
+
+import { useBrainFormState } from "../../hooks/useBrainFormState";
 
 type AccessConfirmationModalProps = {
   opened: boolean;
   onClose: () => void;
   onConfirm: () => void;
   onCancel: () => void;
-  selectedStatus: BrainAccessStatus;
 };
 
 export const AccessConfirmationModal = ({
@@ -17,9 +17,9 @@ export const AccessConfirmationModal = ({
   onClose,
   onConfirm,
   onCancel,
-  selectedStatus,
 }: AccessConfirmationModalProps): JSX.Element => {
   const { t } = useTranslation(["brain"]);
+  const { status: selectedStatus } = useBrainFormState();
 
   const isPrivateStatus = selectedStatus === "private";
 

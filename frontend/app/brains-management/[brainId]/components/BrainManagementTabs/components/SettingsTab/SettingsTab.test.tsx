@@ -35,19 +35,23 @@ vi.mock("@/lib/api/brain/useBrainApi", () => ({
   }),
 }));
 
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({ replace: vi.fn() }),
+  useParams: () => ({}),
+}));
+
 vi.mock("@tanstack/react-query", async () => {
   const actual = await vi.importActual<typeof import("@tanstack/react-query")>(
     "@tanstack/react-query"
   );
 
-  vi.mock("next/navigation", () => ({
-    useRouter: () => ({ replace: vi.fn() }),
-  }));
-
   return {
     ...actual,
     useQuery: () => ({
       data: {},
+    }),
+    useQueryClient: () => ({
+      invalidateQueries: vi.fn(),
     }),
   };
 });
@@ -82,13 +86,10 @@ describe("Settings tab in brains-management", () => {
       </SupabaseProviderMock>
     );
 
-    expect(
-      screen.getByRole("button", { name: "setDefaultBrain" })
-    ).toBeVisible();
+    expect(screen.getByText("defaultBrain")).toBeVisible();
     expect(screen.getByText("brainName")).toBeVisible();
     expect(screen.getByLabelText("brainDescription")).toBeVisible();
 
     expect(screen.getByLabelText("promptName")).toBeVisible();
   });
 });
-2;

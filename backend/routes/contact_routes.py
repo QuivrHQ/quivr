@@ -1,9 +1,8 @@
 from fastapi import APIRouter
 from logger import get_logger
 from models import ContactsSettings
+from packages.emails.send_email import send_email
 from pydantic import BaseModel
-
-from utils.send_email import send_email
 
 
 class ContactMessage(BaseModel):

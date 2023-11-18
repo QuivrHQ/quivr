@@ -1,8 +1,8 @@
 from celery import shared_task
 from models.brains import Brain
 from models.settings import get_supabase_db
+from packages.embeddings.vectors import Neurons
 from repository.files.upload_file import DocumentSerializable
-from utils.vectors import Neurons
 
 
 @shared_task

@@ -1,10 +1,8 @@
 from uuid import UUID
 
-from auth import AuthBearer
 from fastapi import APIRouter, Depends
-from repository.notification.get_chat_notifications import (
-    get_chat_notifications,
-)
+from middlewares.auth import AuthBearer
+from repository.notification.get_chat_notifications import get_chat_notifications
 
 notification_router = APIRouter()
 

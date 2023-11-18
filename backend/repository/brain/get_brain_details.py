@@ -1,6 +1,11 @@
 from uuid import UUID
 
 from models import BrainEntity, get_supabase_client
+from models.brain_entity import BrainType
+
+from repository.api_brain_definition.get_api_brain_definition import (
+    get_api_brain_definition,
+)
 
 
 def get_brain_details(brain_id: UUID) -> BrainEntity | None:
@@ -13,4 +18,10 @@ def get_brain_details(brain_id: UUID) -> BrainEntity | None:
     )
     if response.data == []:
         return None
-    return BrainEntity(**response.data[0])
+    brain = BrainEntity(**response.data[0])
+
+    if brain.brain_type == BrainType.API:
+        brain_definition = get_api_brain_definition(brain_id)
+        brain.brain_definition = brain_definition
+
+    return brain

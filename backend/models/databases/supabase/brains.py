@@ -95,17 +95,20 @@ class Brain(Repository):
     def get_public_brains(self) -> list[PublicBrain]:
         response = (
             self.db.from_("brains")
-            .select("id:brain_id, name, description, last_update")
+            .select("id:brain_id, name, description, last_update, brain_type")
             .filter("status", "eq", "public")
             .execute()
         )
         public_brains: list[PublicBrain] = []
+
         for item in response.data:
             brain = PublicBrain(
                 id=item["id"],
                 name=item["name"],
                 description=item["description"],
                 last_update=item["last_update"],
+                brain_type=item["brain_type"],
+                brain_definition=self.get_api_brain_definition(item["id"]),
             )
             brain.number_of_subscribers = self.get_brain_subscribers_count(brain.id)
             public_brains.append(brain)
