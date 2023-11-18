@@ -1,39 +1,17 @@
 /* eslint-disable max-lines */
 import axios from "axios";
-import { UUID } from "crypto";
 import { useEffect, useState } from "react";
-import {
-  UseFormGetValues,
-  UseFormRegister,
-  UseFormReset,
-  UseFormResetField,
-  UseFormSetValue,
-} from "react-hook-form";
 import { useTranslation } from "react-i18next";
 
 import { useBrainApi } from "@/lib/api/brain/useBrainApi";
 import { usePromptApi } from "@/lib/api/prompt/usePromptApi";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 import { useToast } from "@/lib/hooks";
-import { BrainConfig } from "@/lib/types/brainConfig";
 
-type DirtyFields<T> = {
-  [K in keyof T]?: T[K] extends object
-    ? DirtyFields<T[K]>
-    : boolean | undefined;
-};
+import { useBrainFormState } from "./useBrainFormState";
 
 export type UsePromptProps = {
-  brainId: UUID;
-  getValues: UseFormGetValues<BrainConfig>;
-  promptId: string | undefined;
-  register: UseFormRegister<BrainConfig>;
-  reset: UseFormReset<BrainConfig>;
-  setValue: UseFormSetValue<BrainConfig>;
   setIsUpdating: (isUpdating: boolean) => void;
-  resetField: UseFormResetField<BrainConfig>;
-  updateFormValues: () => void;
-  dirtyFields: DirtyFields<BrainConfig>;
 };
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
@@ -44,19 +22,19 @@ export const usePrompt = (props: UsePromptProps) => {
   const { getPrompt, updatePrompt, createPrompt } = usePromptApi();
   const [isRemovingPrompt, setIsRemovingPrompt] = useState(false);
   const { fetchAllBrains } = useBrainContext();
-
   const {
-    brainId,
     dirtyFields,
     getValues,
-    promptId,
     register,
     reset,
     setValue,
     resetField,
-    updateFormValues,
-    setIsUpdating,
-  } = props;
+    promptId,
+    refetchBrain,
+    brainId,
+  } = useBrainFormState();
+
+  const { setIsUpdating } = props;
 
   const [currentPromptId, setCurrentPromptId] = useState<string | undefined>(
     promptId
@@ -82,6 +60,9 @@ export const usePrompt = (props: UsePromptProps) => {
   }, [currentPromptId]);
 
   const removeBrainPrompt = async () => {
+    if (brainId === undefined) {
+      return;
+    }
     try {
       setIsRemovingPrompt(true);
       await updateBrain(brainId, {
@@ -92,7 +73,7 @@ export const usePrompt = (props: UsePromptProps) => {
         content: "",
       });
       reset();
-      void updateFormValues();
+      refetchBrain();
       publish({
         variant: "success",
         text: t("promptRemoved", { ns: "config" }),
@@ -141,6 +122,10 @@ export const usePrompt = (props: UsePromptProps) => {
       return;
     }
 
+    if (brainId === undefined) {
+      return;
+    }
+
     try {
       if (promptId === "" || promptId === undefined) {
         otherConfigs["prompt_id"] = (
@@ -149,13 +134,13 @@ export const usePrompt = (props: UsePromptProps) => {
             content: prompt.content,
           })
         ).id;
-        console.log("OTHER CONFIGS", otherConfigs);
+
         await updateBrain(brainId, {
           ...otherConfigs,
           max_tokens,
           openai_api_key,
         });
-        void updateFormValues();
+        refetchBrain();
       } else {
         await Promise.all([
           updateBrain(brainId, {

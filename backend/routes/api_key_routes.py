@@ -3,10 +3,11 @@ from typing import List
 from uuid import uuid4
 
 from asyncpg.exceptions import UniqueViolationError
-from auth import AuthBearer, get_current_user
 from fastapi import APIRouter, Depends
 from logger import get_logger
-from models import UserIdentity, get_supabase_db
+from middlewares.auth import AuthBearer, get_current_user
+from models import get_supabase_db
+from modules.user.entity.user_identity import UserIdentity
 from pydantic import BaseModel
 
 logger = get_logger(__name__)

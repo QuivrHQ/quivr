@@ -1,5 +1,5 @@
 from llm.qa_headless import HeadlessQA
-from repository.user_identity import get_user_identity
+from modules.user.repository import get_user_identity
 from routes.chat.interface import ChatInterface
 
 

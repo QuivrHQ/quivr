@@ -1,8 +1,9 @@
 from uuid import UUID
 
-from auth import AuthBearer, get_current_user
 from fastapi import APIRouter, Depends, Query
-from models import Brain, UserIdentity, get_supabase_db
+from middlewares.auth import AuthBearer, get_current_user
+from models import Brain, get_supabase_db
+from modules.user.entity.user_identity import UserIdentity
 from routes.authorizations.brain_authorization import (
     RoleEnum,
     has_brain_authorization,

@@ -1,21 +1,11 @@
 import { useEffect, useState } from "react";
-import { UseFormResetField } from "react-hook-form";
 
-import { BrainConfig, BrainStatus } from "@/lib/types/brainConfig";
-
-type UseAccessConfirmationModalProps = {
-  status: BrainStatus;
-  setValue: (name: "status", value: "private" | "public") => void;
-  isStatusDirty: boolean;
-  resetField: UseFormResetField<BrainConfig>;
-};
+import { useBrainFormState } from "../../../hooks/useBrainFormState";
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-export const useAccessConfirmationModal = ({
-  status,
-  isStatusDirty,
-  resetField,
-}: UseAccessConfirmationModalProps) => {
+export const useAccessConfirmationModal = () => {
+  const { dirtyFields, resetField, status } = useBrainFormState();
+  const isStatusDirty = Boolean(dirtyFields.status);
   const [isAccessModalOpened, setIsAccessModalOpened] = useState(false);
 
   useEffect(() => {

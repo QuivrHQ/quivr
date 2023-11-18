@@ -5,6 +5,8 @@ from uuid import UUID
 from pydantic import BaseModel
 from routes.authorizations.types import RoleEnum
 
+from models.ApiBrainDefinition import ApiBrainDefinition
+
 
 class BrainType(str, Enum):
     DOC = "doc"
@@ -23,6 +25,7 @@ class BrainEntity(BaseModel):
     prompt_id: Optional[UUID]
     last_update: str
     brain_type: BrainType
+    brain_definition: Optional[ApiBrainDefinition]
 
     @property
     def id(self) -> UUID:
@@ -49,6 +52,8 @@ class PublicBrain(BaseModel):
     description: Optional[str]
     number_of_subscribers: int = 0
     last_update: str
+    brain_type: BrainType
+    brain_definition: Optional[ApiBrainDefinition]
 
 
 class BrainUser(BaseModel):

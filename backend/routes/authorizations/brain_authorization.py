@@ -1,12 +1,11 @@
 from typing import List, Optional, Union
 from uuid import UUID
 
-from auth.auth_bearer import get_current_user
 from fastapi import Depends, HTTPException, status
-from models import UserIdentity
+from middlewares.auth.auth_bearer import get_current_user
+from modules.user.entity.user_identity import UserIdentity
 from repository.brain import get_brain_for_user
 from repository.brain.get_brain_details import get_brain_details
-
 from routes.authorizations.types import RoleEnum
 
 

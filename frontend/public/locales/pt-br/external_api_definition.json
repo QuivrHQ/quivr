@@ -1,0 +1,14 @@
+{
+  "method_label": "Method",
+  "url_placeholder": "URL",
+  "searchParams": "Search Params",
+  "headers": "Headers",
+  "params": "Params",
+  "key": "Key",
+  "type": "Type (string or number)",
+  "description": "Description",
+  "secrets": "Secrets",
+  "paramsTabDescription": "Estes valores são enviados como corpo da solicitação.",
+  "searchParamsTabDescription": "Estes valores são enviados como string de consulta.",
+  "secretsTabDescription": "Estes valores são enviados como chaves de cabeçalho"
+}
