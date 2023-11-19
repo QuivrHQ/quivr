@@ -2,6 +2,7 @@ version: "3"
 
 services:
   frontend:
+    image: frontend-dev
     env_file:
       - ./frontend/.env
     build:
