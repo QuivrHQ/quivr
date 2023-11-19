@@ -30,7 +30,6 @@ async def crawl_endpoint(
     crawl_website: CrawlWebsite,
     brain_id: UUID = Query(..., description="The ID of the brain"),
     chat_id: Optional[UUID] = Query(None, description="The ID of the chat"),
-    enable_summarization: bool = False,
     current_user: UserIdentity = Depends(get_current_user),
 ):
     """
@@ -43,7 +42,6 @@ async def crawl_endpoint(
     userDailyUsage = UserUsage(
         id=current_user.id,
         email=current_user.email,
-        openai_api_key=current_user.openai_api_key,
     )
     userSettings = userDailyUsage.get_user_settings()
 
@@ -81,9 +79,7 @@ async def crawl_endpoint(
 
         process_crawl_and_notify.delay(
             crawl_website_url=crawl_website.url,
-            enable_summarization=enable_summarization,
             brain_id=brain_id,
-            openai_api_key=request.headers.get("Openai-Api-Key", None),
             notification_id=crawl_notification.id,
         )
 

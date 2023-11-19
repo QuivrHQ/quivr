@@ -20,7 +20,6 @@ class BrainlessChat(ChatInterface):
         model,
         max_tokens,
         temperature,
-        user_openai_api_key,
         streaming,
         prompt_id,
         user_id,
@@ -30,7 +29,6 @@ class BrainlessChat(ChatInterface):
             model=model,
             max_tokens=max_tokens,
             temperature=temperature,
-            user_openai_api_key=user_openai_api_key,
             streaming=streaming,
             prompt_id=prompt_id,
         )

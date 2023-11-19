@@ -89,7 +89,6 @@ async def create_new_brain(
     user_usage = UserUsage(
         id=current_user.id,
         email=current_user.email,
-        openai_api_key=current_user.openai_api_key,
     )
     user_settings = user_usage.get_user_settings()
 

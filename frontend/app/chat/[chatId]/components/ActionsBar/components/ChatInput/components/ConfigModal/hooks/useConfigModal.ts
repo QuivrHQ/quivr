@@ -8,7 +8,7 @@ import {
   getChatsConfigFromLocalStorage,
   saveChatsConfigInLocalStorage,
 } from "@/lib/api/chat/chat.local";
-import { USER_DATA_KEY, USER_IDENTITY_DATA_KEY } from "@/lib/api/user/config";
+import { USER_DATA_KEY } from "@/lib/api/user/config";
 import { useUserApi } from "@/lib/api/user/useUserApi";
 import { defaultBrainConfig } from "@/lib/config/defaultBrainConfig";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
@@ -22,16 +22,13 @@ export const useConfigModal = () => {
   const [isConfigModalOpen, setIsConfigModalOpen] = useState(false);
   const { getBrain } = useBrainApi();
   const { currentBrainId } = useBrainContext();
-  const { getUser, getUserIdentity } = useUserApi();
+  const { getUser } = useUserApi();
 
   const { data: userData } = useQuery({
     queryKey: [USER_DATA_KEY],
     queryFn: getUser,
   });
-  const { data: userIdentityData } = useQuery({
-    queryKey: [USER_IDENTITY_DATA_KEY],
-    queryFn: getUserIdentity,
-  });
+ 
 
   const { register, watch, setValue } = useForm<ChatConfig>({
     defaultValues: {
@@ -46,7 +43,6 @@ export const useConfigModal = () => {
   const maxTokens = watch("maxTokens");
 
   const accessibleModels = getAccessibleModels({
-    openAiKey: userIdentityData?.openai_api_key,
     userData,
   });
 

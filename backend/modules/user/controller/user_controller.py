@@ -33,7 +33,6 @@ async def get_user_endpoint(
     user_daily_usage = UserUsage(
         id=current_user.id,
         email=current_user.email,
-        openai_api_key=current_user.openai_api_key,
     )
     user_settings = user_daily_usage.get_user_settings()
     max_brain_size = user_settings.get("max_brain_size", 1000000000)

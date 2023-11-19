@@ -11,9 +11,7 @@ from models.databases.supabase.knowledge import CreateKnowledgeProperties
 from models.databases.supabase.notifications import CreateNotificationProperties
 from models.notifications import NotificationsStatusEnum
 from modules.user.entity.user_identity import UserIdentity
-from modules.user.repository import get_user_identity
 from packages.files.file import convert_bytes, get_file_size
-from repository.brain import get_brain_details
 from repository.files.upload_file import upload_file_storage
 from repository.knowledge.add_knowledge import add_knowledge
 from repository.notification.add_notification import add_notification
@@ -37,7 +35,6 @@ async def upload_file(
     uploadFile: UploadFile,
     brain_id: UUID = Query(..., description="The ID of the brain"),
     chat_id: Optional[UUID] = Query(None, description="The ID of the chat"),
-    enable_summarization: bool = False,
     current_user: UserIdentity = Depends(get_current_user),
 ):
     validate_brain_authorization(
@@ -47,7 +44,6 @@ async def upload_file(
     userDailyUsage = UserUsage(
         id=current_user.id,
         email=current_user.email,
-        openai_api_key=current_user.openai_api_key,
     )
     userSettings = userDailyUsage.get_user_settings()
 
@@ -72,13 +68,6 @@ async def upload_file(
                 status=NotificationsStatusEnum.Pending,
             )
         )
-    openai_api_key = request.headers.get("Openai-Api-Key", None)
-    if openai_api_key is None:
-        brain_details = get_brain_details(brain_id)
-        if brain_details:
-            openai_api_key = brain_details.openai_api_key
-    if openai_api_key is None:
-        openai_api_key = get_user_identity(current_user.id).openai_api_key
 
     file_content = await uploadFile.read()
     filename_with_brain_id = str(brain_id) + "/" + str(uploadFile.filename)
@@ -112,9 +101,7 @@ async def upload_file(
     process_file_and_notify.delay(
         file_name=filename_with_brain_id,
         file_original_name=uploadFile.filename,
-        enable_summarization=enable_summarization,
         brain_id=brain_id,
-        openai_api_key=openai_api_key,
         notification_id=upload_notification.id if upload_notification else None,
     )
     return {"message": "File processing has started."}

@@ -18,7 +18,6 @@ class ChatInterface(ABC):
         model,
         max_tokens,
         temperature,
-        user_openai_api_key,
         streaming,
         prompt_id,
         user_id,

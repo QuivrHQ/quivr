@@ -69,7 +69,6 @@ describe("useBrainApi", () => {
       model: "gpt-3.5-turbo",
       temperature: 0.0,
       max_tokens: 256,
-      openai_api_key: "123",
     };
 
     await createBrain(brain);
@@ -220,7 +219,6 @@ describe("useBrainApi", () => {
       model: "gpt-3.5-turbo",
       temperature: 0.0,
       max_tokens: 256,
-      openai_api_key: "123",
     };
     await updateBrain(brainId, brain);
     expect(axiosPutMock).toHaveBeenCalledTimes(1);

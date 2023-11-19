@@ -34,7 +34,7 @@
   "set_brain_status_to_public_modal_description": "Every Quivr user will be able to:<br/>- Subscribe to your brain in the 'brains library'.<br/>- Use this brain and check the prompt and model configurations.<br/><br/>They won't have access to your uploaded files and people section.",
   "confirm_set_brain_status_to_public": "Yes, set as public",
   "cancel_set_brain_status_to_public": "No, keep it private",
-  "brain_library_button_label": "Brains library",
+  "brain_library_button_label": "Explore",
   "brain_management_button_label": "Brains management",
   "public_brains_search_bar_placeholder": "Search public brains",
   "public_brain_subscribe_button_label": "Subscribe",
@@ -48,9 +48,9 @@
   "empty_brain_description": "No description",
   "myBrains": "My Brains",
   "knowledge_source_doc": "Documents",
-  "knowledge_source_api": "API",
+  "knowledge_source_api": "App (Through API)",
   "knowledge_source_label": "Knowledge source",
-  "api_brain":{
+  "api_brain": {
     "name": "Name",
     "description": "Description",
     "type": "Type",

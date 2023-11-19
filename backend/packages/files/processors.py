@@ -49,9 +49,7 @@ def create_response(message, type):
 # TODO: Move filter_file to a file service to avoid circular imports from models/files.py for File class
 async def filter_file(
     file,
-    enable_summarization: bool,
     brain_id,
-    openai_api_key,
     original_file_name=None,
 ):
     await file.compute_file_sha1()
@@ -85,9 +83,7 @@ async def filter_file(
         try:
             await file_processors[file.file_extension](
                 file=file,
-                enable_summarization=enable_summarization,
                 brain_id=brain_id,
-                user_openai_api_key=openai_api_key,
             )
             return create_response(
                 f"✅ {using_file_name} has been uploaded to brain {brain.name}.",  # pyright: ignore reportPrivateUsage=none
