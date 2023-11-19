@@ -2,7 +2,6 @@ from fastapi import HTTPException
 from llm.api_brain_qa import APIBrainQA
 from llm.qa_base import QABaseBrainPicking
 from models.brain_entity import BrainType
-from repository.brain import get_brain_details
 from repository.brain.get_brain_by_id import get_brain_by_id
 from routes.authorizations.brain_authorization import validate_brain_authorization
 from routes.authorizations.types import RoleEnum
@@ -26,11 +25,6 @@ class BrainfulChat(ChatInterface):
                 user_id=user_id,
                 required_roles=[RoleEnum.Viewer, RoleEnum.Editor, RoleEnum.Owner],
             )
-
-    def get_openai_api_key(self, brain_id, user_id):
-        brain_details = get_brain_details(brain_id)
-        if brain_details:
-            return brain_details.openai_api_key
 
     def get_answer_generator(
         self,

@@ -45,10 +45,6 @@ async def crawl_endpoint(
     )
     userSettings = userDailyUsage.get_user_settings()
 
-    # [TODO] rate limiting of user for crawl
-    if request.headers.get("Openai-Api-Key"):
-        brain.max_brain_size = userSettings.get("max_brain_size", 1000000000)
-
     file_size = 1000000
     remaining_free_space = userSettings.get("max_brain_size", 1000000000)
 

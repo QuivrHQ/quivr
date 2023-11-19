@@ -199,7 +199,6 @@ async def create_stream_question_handler(
     chat_instance = get_chat_strategy(brain_id)
     chat_instance.validate_authorization(user_id=current_user.id, brain_id=brain_id)
 
-    # Retrieve user's OpenAI API key
     brain = Brain(id=brain_id)
     brain_details: BrainEntity | None = None
     userDailyUsage = UserUsage(
