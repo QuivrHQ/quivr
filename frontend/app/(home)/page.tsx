@@ -2,7 +2,7 @@
 import { useEffect } from "react";
 
 import { useSupabase } from "@/lib/context/SupabaseProvider";
-import { redirectToPreviousPageOrChatPage } from "@/lib/helpers/redirectToPreviousPageOrChatPage";
+// import { redirectToPreviousPageOrChatPage } from "@/lib/helpers/redirectToPreviousPageOrChatPage";
 
 import {
   FooterSection,
@@ -17,7 +17,7 @@ const HomePage = (): JSX.Element => {
 
   useEffect(() => {
     if (session?.user !== undefined) {
-      redirectToPreviousPageOrChatPage();
+      // redirectToPreviousPageOrChatPage();
     }
   }, [session?.user]);
 
@@ -56,7 +56,7 @@ const HomePage = (): JSX.Element => {
         </HomeSection> */}
 
         <HomeSection
-          bg="bg-gradient-to-b from-[#D07DF9] to-[#7A27FD]"
+          bg="bg-gradient-to-b from-sky-700 to-sky-200"
           slantBefore="up"
         >
           <FooterSection />
