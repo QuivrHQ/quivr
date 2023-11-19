@@ -54,10 +54,7 @@ export const useBrainFormState = () => {
         continue;
       }
 
-      if (brainKey === "openai_api_key") {
-        setValue("openAiKey", brain["openai_api_key"] ?? "");
-        continue;
-      }
+     
 
       // @ts-expect-error bad type inference from typescript
       // eslint-disable-next-line

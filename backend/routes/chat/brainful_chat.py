@@ -39,7 +39,6 @@ class BrainfulChat(ChatInterface):
         model,
         max_tokens,
         temperature,
-        user_openai_api_key,
         streaming,
         prompt_id,
         user_id,
@@ -59,7 +58,6 @@ class BrainfulChat(ChatInterface):
                 max_tokens=max_tokens,
                 temperature=temperature,
                 brain_id=brain_id,
-                user_openai_api_key=user_openai_api_key,
                 streaming=streaming,
                 prompt_id=prompt_id,
             )
@@ -70,7 +68,6 @@ class BrainfulChat(ChatInterface):
             max_tokens=max_tokens,
             temperature=temperature,
             brain_id=brain_id,
-            user_openai_api_key=user_openai_api_key,
             streaming=streaming,
             prompt_id=prompt_id,
             user_id=user_id,

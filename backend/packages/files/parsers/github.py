@@ -11,9 +11,7 @@ from packages.files.file import compute_sha1_from_content
 
 async def process_github(
     repo,
-    enable_summarization,
     brain_id,
-    user_openai_api_key,
 ):
     random_dir_name = os.urandom(16).hex()
     dateshort = time.strftime("%Y%m%d")
@@ -54,7 +52,6 @@ async def process_github(
             "chunk_size": chunk_size,
             "chunk_overlap": chunk_overlap,
             "date": dateshort,
-            "summarization": "true" if enable_summarization else "false",
         }
         doc_with_metadata = Document(page_content=doc.page_content, metadata=metadata)
 
@@ -66,9 +63,7 @@ async def process_github(
 
         if not file_exists:
             neurons = Neurons()
-            created_vector = neurons.create_vector(
-                doc_with_metadata, user_openai_api_key
-            )
+            created_vector = neurons.create_vector(doc_with_metadata)
 
         file_exists_in_brain = file.file_already_exists_in_brain(brain_id)
 

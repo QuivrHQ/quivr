@@ -25,7 +25,6 @@ class CreateBrainProperties(BaseModel, extra=Extra.forbid):
     model: Optional[str]
     temperature: Optional[float] = 0.0
     max_tokens: Optional[int] = 256
-    openai_api_key: Optional[str] = None
     prompt_id: Optional[UUID] = None
     brain_type: Optional[BrainType] = BrainType.DOC
     brain_definition: Optional[CreateApiBrainDefinition]
@@ -44,7 +43,6 @@ class BrainUpdatableProperties(BaseModel):
     temperature: Optional[float]
     model: Optional[str]
     max_tokens: Optional[int]
-    openai_api_key: Optional[str]
     status: Optional[str]
     prompt_id: Optional[UUID]
 

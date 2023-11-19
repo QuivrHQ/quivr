@@ -13,7 +13,6 @@ import { useUserData } from "@/lib/hooks/useUserData";
 
 import { useBrainFormState } from "./useBrainFormState";
 import { checkBrainName } from "../utils/checkBrainName";
-import { checkOpenAiKey } from "../utils/checkOpenAiKey";
 
 type UseSettingsTabProps = {
   brainId: UUID;
@@ -99,10 +98,9 @@ export const useSettingsTab = ({ brainId }: UseSettingsTabProps) => {
     if (!hasChanges && checkDirty) {
       return;
     }
-    const { name, openAiKey: openai_api_key } = getValues();
+    const { name} = getValues();
 
     checkBrainName(name, publish, t);
-    await checkOpenAiKey(openai_api_key, publish, t);
 
     try {
       setIsUpdating(true);
@@ -111,7 +109,6 @@ export const useSettingsTab = ({ brainId }: UseSettingsTabProps) => {
       await updateBrain(brainId, {
         ...otherConfigs,
         max_tokens,
-        openai_api_key,
         prompt_id:
           otherConfigs["prompt_id"] !== ""
             ? otherConfigs["prompt_id"]

@@ -48,7 +48,7 @@
   "empty_brain_description": "No description",
   "myBrains": "My Brains",
   "knowledge_source_doc": "Documents",
-  "knowledge_source_api": "API",
+  "knowledge_source_api": "App (Through API)",
   "knowledge_source_label": "Knowledge source",
   "api_brain": {
     "name": "Name",

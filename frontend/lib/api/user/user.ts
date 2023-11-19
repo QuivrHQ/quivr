@@ -8,7 +8,6 @@ export type UserIdentityUpdatableProperties = {
 };
 
 export type UserIdentity = {
-  openai_api_key?: string | null;
   user_id: UUID;
 };
 

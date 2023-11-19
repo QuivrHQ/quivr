@@ -17,7 +17,6 @@ export type Brain = {
   model?: Model | null;
   max_tokens?: number;
   temperature?: number;
-  openai_api_key?: string | null;
   description?: string;
   prompt_id?: string | null;
   brain_type?: BrainType;

@@ -20,7 +20,6 @@ class BrainEntity(BaseModel):
     temperature: Optional[float]
     model: Optional[str]
     max_tokens: Optional[int]
-    openai_api_key: Optional[str]
     status: Optional[str]
     prompt_id: Optional[UUID]
     last_update: str

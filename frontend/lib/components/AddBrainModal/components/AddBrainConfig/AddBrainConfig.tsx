@@ -115,13 +115,7 @@ export const AddBrainConfig = ({
               <ApiRequestDefinition />
             </>
           )}
-          <Field
-            label={t("openAiKeyLabel", { ns: "config" })}
-            placeholder={t("openAiKeyPlaceholder", { ns: "config" })}
-            autoComplete="off"
-            className="flex-1"
-            {...register("openai_api_key")}
-          />
+          
 
           <fieldset className="w-full flex flex-col">
             <label className="flex-1 text-sm" htmlFor="model">

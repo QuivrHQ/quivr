@@ -8,9 +8,7 @@ from repository.files.upload_file import DocumentSerializable
 async def process_file(
     file: File,
     loader_class,
-    enable_summarization,
     brain_id,
-    user_openai_api_key,
 ):
     dateshort = time.strftime("%Y%m%d")
 
@@ -24,14 +22,13 @@ async def process_file(
             "chunk_size": file.chunk_size,
             "chunk_overlap": file.chunk_overlap,
             "date": dateshort,
-            "summarization": "true" if enable_summarization else "false",
         }
         doc_with_metadata = DocumentSerializable(
             page_content=doc.page_content, metadata=metadata
         )
 
         create_embedding_for_document.delay(
-            brain_id, doc_with_metadata.to_json(), user_openai_api_key, file.file_sha1
+            brain_id, doc_with_metadata.to_json(), file.file_sha1
         )
 
     return "Hello World!"
