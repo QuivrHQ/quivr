@@ -2,7 +2,6 @@
 import { useTranslation } from "react-i18next";
 import { PiPaperclipFill } from "react-icons/pi";
 
-import { useChat } from "@/app/chat/[chatId]/hooks/useChat";
 import Button from "@/lib/components/ui/Button";
 import { useKnowledgeToFeedContext } from "@/lib/context/KnowledgeToFeedProvider/hooks/useKnowledgeToFeedContext";
 import { useSecurity } from "@/services/useSecurity/useSecurity";
@@ -21,8 +20,8 @@ export const ChatInput = ({
 }: ChatInputProps): JSX.Element => {
   const { isStudioMember } = useSecurity();
 
-  const { generatingAnswer } = useChat();
-  const { setMessage, submitQuestion, message } = useChatInput();
+  const { setMessage, submitQuestion, message, generatingAnswer } =
+    useChatInput();
   const { t } = useTranslation(["chat"]);
 
   const { setShouldDisplayFeedCard } = useKnowledgeToFeedContext();

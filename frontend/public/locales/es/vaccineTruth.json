@@ -24,5 +24,7 @@
   "vaccineTruthAi": "La verdad sobre las vacunas IA",
   "sharedPageTitle": "Chat compartido • Vaccine Truth AI",
   "emptyChatTitle": "ChatBot de IA sobre la verdad de la vacuna",
-  "emptyChatSubTitle": "soy un chatbot"
+  "emptyChatSubTitle": "soy un chatbot",
+  "recommended": "Recomendado",
+  "buildByStayRealStudio": "Built By Stay Real Studio"
 }

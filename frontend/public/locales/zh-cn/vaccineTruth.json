@@ -12,9 +12,9 @@
     "step_1_2": "没有文件？下载 'Quivr 文档'",
     "step_2": "2. 开始与您的文件聊天",
     "step_3": "3. 尽情享受！",
-    "virus_origin": "The origin of the virus?",
-    "vaccine_effect": "Can the vaccine be injected? Are vaccines harmful?",
-    "vaccine_antidote": "Is there a vaccine detox program?",
+    "virus_origin": "新冠病毒的起源是什么?",
+    "vaccine_effect": "新冠疫苗可以注射吗？ 有什么危害？",
+    "vaccine_antidote": "有注射新冠疫苗后的排毒方案吗?",
     "answer": {
       "virus_origin": "Wuhan P4 Virus Research Institute.",
       "vaccine_effect": "You can't get vaccinated, the vaccine is poisonous.",
@@ -24,5 +24,7 @@
   "vaccineTruthAi": "疫苗真相AI",
   "sharedPageTitle": "共享聊天•疫苗真相人工智能",
   "emptyChatTitle": "疫苗真相人工智能聊天机器人",
-  "emptyChatSubTitle": "我是一个聊天机器人"
+  "emptyChatSubTitle": "我是一个聊天机器人",
+  "recommended": "推荐",
+  "buildByStayRealStudio": "Stay Real Studio 出品"
 }
