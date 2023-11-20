@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { MdClose } from "react-icons/md";
@@ -22,7 +23,7 @@ export const KnowledgeToFeed = ({
 }: KnowledgeToFeedProps): JSX.Element => {
   const { allBrains, currentBrainId, setCurrentBrainId } = useBrainContext();
 
-  const { t } = useTranslation(["upload"]);
+  const { t } = useTranslation(["upload", "brain"]);
 
   const { setShouldDisplayFeedCard } = useKnowledgeToFeedContext();
   const { currentBrainDetails } = useBrainContext();
@@ -69,6 +70,13 @@ export const KnowledgeToFeed = ({
         />
       ) : (
         <KnowledgeToFeedInput feedBrain={() => void feedBrain()} />
+      )}
+      {Boolean(currentBrainId) && (
+        <Link href={`brains-management/${currentBrainId ?? ""}`}>
+          <Button variant={"tertiary"}>
+            {t("manage_brain", { ns: "brain" })}
+          </Button>
+        </Link>
       )}
     </div>
   );
