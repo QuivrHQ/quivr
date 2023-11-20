@@ -57,5 +57,9 @@
     "required": "Required",
     "addRow": "Add row",
     "value": "Value"
-  }
+  },
+  "update_secrets_message":"Enter your secret. This information is  required to identify you when calling the API",
+  "update_secrets_button":"Update secrets",
+  "secrets_updated":"Secrets updated",
+  "secrets_update_error":"Error while updating secrets"
 }

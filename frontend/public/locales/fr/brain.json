@@ -57,5 +57,9 @@
     "required": "Requis",
     "addRow": "Ajouter une ligne",
     "value": "Valeur"
-  }
+  },
+  "update_secrets_message": "Entrez votre mot de passe. Ces informations sont nécessaires pour vous identifier lors de l'appel de l'API",
+  "update_secrets_button": "Mettre à jour les secrets",
+  "secrets_updated": "Secrets mis à jour",
+  "secrets_update_error": "Erreur lors de la mise à jour des secrets"
 }
