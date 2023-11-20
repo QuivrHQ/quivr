@@ -2,6 +2,7 @@ import * as Popover from "@radix-ui/react-popover";
 import { useTranslation } from "react-i18next";
 import { LuMenu, LuX } from "react-icons/lu";
 
+import { LanguageSelect } from "@/app/chat/components/LanguageSelect";
 import { QuivrLogo } from "@/lib/assets/QuivrLogo";
 import { cn } from "@/lib/utils";
 
@@ -65,6 +66,9 @@ export const PopoverMenuMobile = ({
             </div>
             <nav>
               <ul className="flex flex-col bg-[#F5F8FF] rounded-xl p-2">
+                <li>
+                  <LanguageSelect />
+                </li>
                 {navLinks}
               </ul>
             </nav>

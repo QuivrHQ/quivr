@@ -13,7 +13,7 @@ export const LanguageSelect = (): JSX.Element => {
   const { allLanguages, currentLanguage, change } = useLanguageHook();
 
   return (
-    <div className={`mx-4`}>
+    <div className={`mr-4 ml-2`}>
       <Listbox
         value={currentLanguage}
         onChange={(e) => {
@@ -22,8 +22,8 @@ export const LanguageSelect = (): JSX.Element => {
       >
         {({ open }) => (
           <>
-            <div className="relative w-full">
-              <Listbox.Button className="hover:text-slate-400 cursor-pointer hover:bg-slate-50 text-xs relative w-full cursor-default rounded-md bg-white py-1.5 px-3 text-left text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6">
+            <div className="relative">
+              <Listbox.Button className="hover:text-slate-400 cursor-pointer hover:bg-slate-50 text-xs relative cursor-default rounded-md bg-white py-1.5 px-3 text-left text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300  sm:text-sm sm:leading-6">
                 <IoLanguage className="" />
               </Listbox.Button>
 
