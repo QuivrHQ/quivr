@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { useTranslation } from "react-i18next";
 
+import { LanguageSelect } from "@/app/chat/components/LanguageSelect";
 import { QuivrLogo } from "@/lib/assets/QuivrLogo";
 import { cn } from "@/lib/utils";
 
@@ -29,7 +30,8 @@ export const HomeHeader = ({ color = "white" }: HomeNavProps): JSX.Element => {
         <QuivrLogo size={64} color={color} />
         <div>{t("vaccineTruthAi")}</div>
       </Link>
-      <div className="hidden md:flex">
+      <div className="hidden sm:flex sm:items-center">
+        <LanguageSelect />
         <ul className="flex gap-4 items-center">{navLinks("desktop")}</ul>
       </div>
       <div className="md:hidden z-10">
