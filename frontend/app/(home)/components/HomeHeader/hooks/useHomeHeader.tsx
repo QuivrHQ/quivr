@@ -15,7 +15,7 @@ type UseHomeHeaderProps = {
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const useHomeHeader = ({ color }: UseHomeHeaderProps) => {
-  const { t } = useTranslation("home");
+  const { t } = useTranslation(["home", "vaccineTruth"]);
   const { onLinkClick } = useHomepageTracking();
 
   const navItems: NavbarItem[] = [
@@ -25,8 +25,13 @@ export const useHomeHeader = ({ color }: UseHomeHeaderProps) => {
       leftIcon: <AiFillStar size={16} className="hidden md:inline" />,
       rightIcon: null,
     },
-    { href: "/login", label: t("sign_up") },
-    { href: "/login", label: t("sign_in") },
+    { href: "/login", label: t("sign_up", { ns: "home" }) },
+    { href: "/login", label: t("sign_in", { ns: "home" }) },
+    {
+      href: "https://www.stayreal.studio/",
+      label: t("buildByStayRealStudio", { ns: "vaccineTruth" }),
+      rightIcon: null,
+    },
   ];
 
   const navLinks = (device: "mobile" | "desktop") =>
