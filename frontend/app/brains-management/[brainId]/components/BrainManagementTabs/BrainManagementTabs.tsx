@@ -6,11 +6,12 @@ import Button from "@/lib/components/ui/Button";
 
 import {
   BrainTabTrigger,
-  KnowledgeTab,
+  KnowledgeOrSecretsTab,
   PeopleTab,
   SettingsTab,
 } from "./components";
 import { DeleteOrUnsubscribeConfirmationModal } from "./components/Modals/DeleteOrUnsubscribeConfirmationModal";
+import { useBrainFetcher } from "./hooks/useBrainFetcher";
 import { useBrainManagementTabs } from "./hooks/useBrainManagementTabs";
 
 export const BrainManagementTabs = (): JSX.Element => {
@@ -18,6 +19,7 @@ export const BrainManagementTabs = (): JSX.Element => {
     "translation",
     "config",
     "delete_or_unsubscribe_from_brain",
+    "external_api_definition",
   ]);
   const {
     selectedTab,
@@ -31,6 +33,14 @@ export const BrainManagementTabs = (): JSX.Element => {
     isOwnedByCurrentUser,
     isDeleteOrUnsubscribeRequestPending,
   } = useBrainManagementTabs();
+  const { brain } = useBrainFetcher({
+    brainId,
+  });
+
+  const knowledgeOrSecretsTabLabel =
+    brain?.brain_type === "doc"
+      ? t("knowledge", { ns: "config" })
+      : t("secrets", { ns: "external_api_definition" });
 
   if (brainId === undefined) {
     return <div />;
@@ -61,9 +71,9 @@ export const BrainManagementTabs = (): JSX.Element => {
                 onChange={setSelectedTab}
               />
               <BrainTabTrigger
-                selected={selectedTab === "knowledge"}
-                label={t("knowledge", { ns: "config" })}
-                value="knowledge"
+                selected={selectedTab === "knowledgeOrSecrets"}
+                label={knowledgeOrSecretsTabLabel}
+                value="knowledgeOrSecrets"
                 onChange={setSelectedTab}
               />
             </>
@@ -77,8 +87,11 @@ export const BrainManagementTabs = (): JSX.Element => {
           <Content value="people">
             <PeopleTab brainId={brainId} hasEditRights={hasEditRights} />
           </Content>
-          <Content value="knowledge">
-            <KnowledgeTab brainId={brainId} hasEditRights={hasEditRights} />
+          <Content value="knowledgeOrSecrets">
+            <KnowledgeOrSecretsTab
+              brainId={brainId}
+              hasEditRights={hasEditRights}
+            />
           </Content>
         </div>
 

@@ -2,25 +2,33 @@
 import { UUID } from "crypto";
 import { useTranslation } from "react-i18next";
 
+import { ApiBrainSecretsInputs } from "@/lib/components/ApiBrainSecretsInputs/ApiBrainSecretsInputs";
 import { Divider } from "@/lib/components/ui/Divider";
 import { KnowledgeToFeedProvider } from "@/lib/context";
 
 import { AddKnowledge } from "./components/AddKnowledge/AddKnowledge";
 import { AddedKnowledge } from "./components/AddedKnowledge/AddedKnowledge";
+import { useBrainFetcher } from "../../hooks/useBrainFetcher";
 import { NoAccess } from "../NoAccess";
 
-type KnowledgeTabProps = {
+type KnowledgeOrSecretsTabProps = {
   brainId: UUID;
   hasEditRights: boolean;
 };
-export const KnowledgeTab = ({
+export const KnowledgeOrSecretsTab = ({
   brainId,
   hasEditRights,
-}: KnowledgeTabProps): JSX.Element => {
+}: KnowledgeOrSecretsTabProps): JSX.Element => {
   const { t } = useTranslation(["translation", "explore", "config"]);
-
+  const { brain } = useBrainFetcher({
+    brainId,
+  });
   if (!hasEditRights) {
     return <NoAccess />;
+  }
+
+  if (brain?.brain_type === "api") {
+    return <ApiBrainSecretsInputs brainId={brainId} />;
   }
 
   return (

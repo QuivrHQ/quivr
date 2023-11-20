@@ -19,10 +19,11 @@ export const ApiBrainSecretsInputs = ({
   const { brain } = useBrainFetcher({
     brainId,
   });
-  const { register, updateSecrets, isPending } = useApiBrainSecretsInputs({
-    brainId,
-    onUpdate,
-  });
+  const { register, updateSecrets, isPending, isUpdateButtonDisabled } =
+    useApiBrainSecretsInputs({
+      brainId,
+      onUpdate,
+    });
   const { t } = useTranslation(["brain"]);
 
   const secrets = brain?.brain_definition?.secrets;
@@ -61,7 +62,9 @@ export const ApiBrainSecretsInputs = ({
           ))}
         </div>
         <div className="mt-4 flex justify-end">
-          <Button isLoading={isPending}>{t("update_secrets_button")}</Button>
+          <Button disabled={isUpdateButtonDisabled} isLoading={isPending}>
+            {t("update_secrets_button")}
+          </Button>
         </div>
       </div>
     </form>
