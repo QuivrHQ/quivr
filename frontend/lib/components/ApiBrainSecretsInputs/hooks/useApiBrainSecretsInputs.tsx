@@ -1,10 +1,13 @@
 import { useMutation } from "@tanstack/react-query";
 import { UUID } from "crypto";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 
 import { useBrainApi } from "@/lib/api/brain/useBrainApi";
 import { useToast } from "@/lib/hooks";
+
+import { getNonEmptyValuesFromDict } from "../utils/getNonEmptyValuesFromDict";
 
 type UseApiBrainSecretsInputsProps = {
   brainId: UUID;
@@ -17,23 +20,21 @@ export const useApiBrainSecretsInputs = ({
   onUpdate,
 }: UseApiBrainSecretsInputsProps) => {
   const { t } = useTranslation(["brain"]);
-  const { register, getValues } = useForm<Record<string, string>>();
+  const { register, watch } = useForm<Record<string, string>>();
   const { updateBrainSecrets } = useBrainApi();
   const { publish } = useToast();
 
-  const updateSecretsHandler = async () => {
-    const values = getValues();
-    const nonEmptyValues = Object.entries(values).reduce(
-      (acc, [key, value]) => {
-        if (value !== "") {
-          acc[key] = value;
-        }
+  const values = watch();
 
-        return acc;
-      },
-      {} as Record<string, string>
-    );
-    await updateBrainSecrets(brainId, nonEmptyValues);
+  const [isUpdateButtonDisabled, setIsUpdateButtonDisabled] = useState(false);
+
+  useEffect(() => {
+    const nonEmptyValues = getNonEmptyValuesFromDict(values);
+    setIsUpdateButtonDisabled(Object.keys(nonEmptyValues).length === 0);
+  }, [values]);
+
+  const updateSecretsHandler = async () => {
+    await updateBrainSecrets(brainId, getNonEmptyValuesFromDict(values));
     onUpdate?.();
   };
 
@@ -51,5 +52,6 @@ export const useApiBrainSecretsInputs = ({
     register,
     updateSecrets,
     isPending,
+    isUpdateButtonDisabled,
   };
 };
