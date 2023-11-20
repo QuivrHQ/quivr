@@ -5,7 +5,7 @@ import { TbWorld } from "react-icons/tb";
 
 import { BrainType } from "@/lib/types/brainConfig";
 type GetBrainIconFromBrainTypeOptions = {
-  brainIconSize?: number;
+  iconSize?: number;
   ApiBrainIcon?: IconType;
   DocBrainIcon?: IconType;
 };
@@ -14,7 +14,7 @@ export const getBrainIconFromBrainType = (
   brainType?: BrainType,
   options?: GetBrainIconFromBrainTypeOptions
 ): JSX.Element => {
-  const iconSize = options?.brainIconSize ?? 38;
+  const iconSize = options?.iconSize ?? 38;
 
   const ApiBrainIcon = options?.ApiBrainIcon ?? TbWorld;
   const DocBrainIcon = options?.DocBrainIcon ?? PiPaperclipFill;

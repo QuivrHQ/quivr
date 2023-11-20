@@ -35,7 +35,7 @@ export const BrainListItem = ({ brain }: BrainsListItemProps): JSX.Element => {
         <div className="flex flex-row flex-1 w-max">
           <div className="flex items-center gap-2">
             {getBrainIconFromBrainType(brain.brain_type, {
-              brainIconSize: 24,
+              iconSize: 24,
               DocBrainIcon: CgFileDocument,
             })}
             <p>{brain.name}</p>
