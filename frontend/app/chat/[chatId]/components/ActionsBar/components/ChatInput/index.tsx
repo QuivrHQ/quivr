@@ -1,26 +1,28 @@
 "use client";
 import { useTranslation } from "react-i18next";
-import { PiPaperclipFill } from "react-icons/pi";
 
 import Button from "@/lib/components/ui/Button";
+import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 import { useKnowledgeToFeedContext } from "@/lib/context/KnowledgeToFeedProvider/hooks/useKnowledgeToFeedContext";
 
 import { OnboardingQuestions } from "./components";
 import { ChatBar } from "./components/ChatBar/ChatBar";
 import { ConfigModal } from "./components/ConfigModal";
 import { useChatInput } from "./hooks/useChatInput";
+import { getKnowledgeCardIconFromBrainType } from "./utils/getKnowledgeCardIconFromBrainType";
 
 type ChatInputProps = {
-  shouldDisplayFeedCard: boolean;
+  shouldDisplayFeedOrSecretsCard: boolean;
 };
 
 export const ChatInput = ({
-  shouldDisplayFeedCard,
+  shouldDisplayFeedOrSecretsCard,
 }: ChatInputProps): JSX.Element => {
   const { setMessage, submitQuestion, generatingAnswer, message } =
     useChatInput();
-  const { t } = useTranslation(["chat"]);
 
+  const { t } = useTranslation(["chat"]);
+  const { currentBrainDetails } = useBrainContext();
   const { setShouldDisplayFeedCard } = useKnowledgeToFeedContext();
 
   return (
@@ -35,7 +37,7 @@ export const ChatInput = ({
           }}
           className="sticky bottom-0 bg-white dark:bg-black w-full flex items-center gap-2 z-20 p-2"
         >
-          {!shouldDisplayFeedCard && (
+          {!shouldDisplayFeedOrSecretsCard && (
             <Button
               className="p-0"
               variant={"tertiary"}
@@ -44,7 +46,9 @@ export const ChatInput = ({
               onClick={() => setShouldDisplayFeedCard(true)}
               tooltip={t("add_content_card_button_tooltip")}
             >
-              <PiPaperclipFill size={38} />
+              {getKnowledgeCardIconFromBrainType(
+                currentBrainDetails?.brain_type
+              )}
             </Button>
           )}
 
