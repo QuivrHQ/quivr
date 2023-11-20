@@ -9,7 +9,7 @@ import { OnboardingQuestions } from "./components";
 import { ChatBar } from "./components/ChatBar/ChatBar";
 import { ConfigModal } from "./components/ConfigModal";
 import { useChatInput } from "./hooks/useChatInput";
-import { getKnowledgeCardIconFromBrainType } from "./utils/getKnowledgeCardIconFromBrainType";
+import { getBrainIconFromBrainType } from "../../../../../../../lib/helpers/getBrainIconFromBrainType";
 
 type ChatInputProps = {
   shouldDisplayFeedOrSecretsCard: boolean;
@@ -46,9 +46,7 @@ export const ChatInput = ({
               onClick={() => setShouldDisplayFeedCard(true)}
               tooltip={t("add_content_card_button_tooltip")}
             >
-              {getKnowledgeCardIconFromBrainType(
-                currentBrainDetails?.brain_type
-              )}
+              {getBrainIconFromBrainType(currentBrainDetails?.brain_type)}
             </Button>
           )}
 

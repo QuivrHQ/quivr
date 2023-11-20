@@ -1,9 +1,10 @@
 import Link from "next/link";
 import { useTranslation } from "react-i18next";
-import { FaBrain } from "react-icons/fa";
+import { CgFileDocument } from "react-icons/cg";
 
 import { Chip } from "@/lib/components/ui/Chip";
 import { MinimalBrainForUser } from "@/lib/context/BrainProvider/types";
+import { getBrainIconFromBrainType } from "@/lib/helpers/getBrainIconFromBrainType";
 import { cn } from "@/lib/utils";
 
 import { useBrainListItem } from "./hooks/useBrainListItem";
@@ -33,7 +34,10 @@ export const BrainListItem = ({ brain }: BrainsListItemProps): JSX.Element => {
       >
         <div className="flex flex-row flex-1 w-max">
           <div className="flex items-center gap-2">
-            <FaBrain className="text-xl" />
+            {getBrainIconFromBrainType(brain.brain_type, {
+              iconSize: 24,
+              DocBrainIcon: CgFileDocument,
+            })}
             <p>{brain.name}</p>
           </div>
           {brain.status === "public" && (

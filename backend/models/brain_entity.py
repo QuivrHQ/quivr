@@ -43,6 +43,7 @@ class MinimalBrainEntity(BaseModel):
     name: str
     rights: RoleEnum
     status: str
+    brain_type: BrainType
 
 
 class PublicBrain(BaseModel):
