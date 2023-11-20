@@ -21,8 +21,8 @@ export const ChatInput = ({
 }: ChatInputProps): JSX.Element => {
   const { isStudioMember } = useSecurity();
 
-  const { generatingAnswer } = useChat();
-  const { setMessage, submitQuestion, message } = useChatInput();
+  const { setMessage, submitQuestion, message, generatingAnswer } =
+    useChatInput();
   const { t } = useTranslation(["chat"]);
 
   const { setShouldDisplayFeedCard } = useKnowledgeToFeedContext();
