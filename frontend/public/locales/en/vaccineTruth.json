@@ -12,9 +12,9 @@
     "step_1_2": "Don't have a file ? Download 'Quivr documentation'",
     "step_2": "2. Start chatting with your file",
     "step_3": "3. Enjoy !",
-    "virus_origin": "The origin of the virus?",
-    "vaccine_effect": "Can the vaccine be injected? Are vaccines harmful?",
-    "vaccine_antidote": "Is there a vaccine detox program?",
+    "virus_origin": "Where is the origin of the Covid-19 virus?",
+    "vaccine_effect": "What vaccine injuries were discussed in the US Congress hearing?",
+    "vaccine_antidote": "What Miles Guo says about Covid-19 virus and vaccine.",
     "answer": {
       "virus_origin": "Wuhan P4 Virus Research Institute.",
       "vaccine_effect": "You can't get vaccinated, the vaccine is poisonous.",
