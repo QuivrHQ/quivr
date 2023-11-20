@@ -9,16 +9,19 @@ import Button from "../ui/Button";
 
 type ApiBrainSecretsInputsProps = {
   brainId: UUID;
+  onUpdate?: () => void;
 };
 
 export const ApiBrainSecretsInputs = ({
   brainId,
+  onUpdate,
 }: ApiBrainSecretsInputsProps): JSX.Element => {
   const { brain } = useBrainFetcher({
     brainId,
   });
-  const { register, updateSecrets } = useApiBrainSecretsInputs({
+  const { register, updateSecrets, isPending } = useApiBrainSecretsInputs({
     brainId,
+    onUpdate,
   });
   const { t } = useTranslation(["brain"]);
 
@@ -58,9 +61,7 @@ export const ApiBrainSecretsInputs = ({
           ))}
         </div>
         <div className="mt-4 flex justify-end">
-          <Button>
-            <span>{t("update_secrets_button")}</span>
-          </Button>
+          <Button isLoading={isPending}>{t("update_secrets_button")}</Button>
         </div>
       </div>
     </form>

@@ -63,7 +63,10 @@ export const KnowledgeToFeed = ({
         />
       </div>
       {currentBrainDetails?.brain_type === "api" ? (
-        <ApiBrainSecretsInputs brainId={currentBrainDetails.id} />
+        <ApiBrainSecretsInputs
+          brainId={currentBrainDetails.id}
+          onUpdate={() => setShouldDisplayFeedCard(false)}
+        />
       ) : (
         <KnowledgeToFeedInput feedBrain={() => void feedBrain()} />
       )}
