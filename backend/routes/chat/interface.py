@@ -7,10 +7,6 @@ class ChatInterface(ABC):
         pass
 
     @abstractmethod
-    def get_openai_api_key(self, brain_id, user_id):
-        pass
-
-    @abstractmethod
     def get_answer_generator(
         self,
         brain_id,

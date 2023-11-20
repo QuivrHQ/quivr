@@ -65,7 +65,6 @@ class QABaseBrainPicking(BaseModel):
     max_tokens: int = 256
     streaming: bool = False
 
-    openai_api_key: str = None  # pyright: ignore reportPrivateUsage=none
     callbacks: List[
         AsyncIteratorCallbackHandler
     ] = None  # pyright: ignore reportPrivateUsage=none
@@ -85,9 +84,7 @@ class QABaseBrainPicking(BaseModel):
 
     @property
     def embeddings(self) -> OpenAIEmbeddings:
-        return OpenAIEmbeddings(
-            openai_api_key=self.openai_api_key
-        )  # pyright: ignore reportPrivateUsage=none
+        return OpenAIEmbeddings()  # pyright: ignore reportPrivateUsage=none
 
     supabase_client: Optional[Client] = None
     vector_store: Optional[CustomSupabaseVectorStore] = None
@@ -152,7 +149,6 @@ class QABaseBrainPicking(BaseModel):
             streaming=streaming,
             verbose=False,
             callbacks=callbacks,
-            openai_api_key=self.openai_api_key,
         )  # pyright: ignore reportPrivateUsage=none
 
     def _create_prompt_template(self):

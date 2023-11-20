@@ -6,7 +6,7 @@ from .chats import ChatMessage, ChatQuestion
 from .files import File
 from .prompt import Prompt, PromptStatusEnum
 from .settings import (BrainRateLimiting, BrainSettings, ContactsSettings,
-                       LLMSettings, ResendSettings, get_embeddings,
+                       ResendSettings, get_embeddings,
                        get_documents_vector_store, get_embeddings,
                        get_supabase_client, get_supabase_db)
 from .user_usage import UserUsage

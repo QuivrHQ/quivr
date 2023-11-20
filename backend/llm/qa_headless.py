@@ -32,7 +32,6 @@ class HeadlessQA(BaseModel):
     model: str
     temperature: float = 0.0
     max_tokens: int = 2000
-    openai_api_key: Optional[str] = None
     streaming: bool = False
     chat_id: str
     callbacks: Optional[List[AsyncIteratorCallbackHandler]] = None
@@ -80,7 +79,6 @@ class HeadlessQA(BaseModel):
             streaming=streaming,
             verbose=True,
             callbacks=callbacks,
-            openai_api_key=self.openai_api_key,
         )
 
     def _create_prompt_template(self):
