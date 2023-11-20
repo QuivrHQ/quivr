@@ -4,6 +4,8 @@ import { useEffect } from "react";
 import { useSupabase } from "@/lib/context/SupabaseProvider";
 // import { redirectToPreviousPageOrChatPage } from "@/lib/helpers/redirectToPreviousPageOrChatPage";
 
+import { redirectToPreviousPageOrChatPage } from "@/lib/helpers/redirectToPreviousPageOrChatPage";
+
 import {
   FooterSection,
   HomeHeader,
@@ -17,7 +19,7 @@ const HomePage = (): JSX.Element => {
 
   useEffect(() => {
     if (session?.user !== undefined) {
-      // redirectToPreviousPageOrChatPage();
+      redirectToPreviousPageOrChatPage();
     }
   }, [session?.user]);
 
