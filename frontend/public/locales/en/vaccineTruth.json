@@ -1,7 +1,7 @@
 {
   "disclaimer": "Disclaimer",
-  "disclaimerContent": "We have compiled a complete database based on the vaccine truth information published on the Internet. We only conduct questions and answers based on the content mentioned in the public information and are not legally responsible for the content!",
-  "talkToAI": "conversation to Vaccinetruth.ai",
+  "disclaimerContent": "Current knowledgebase includes limited public information from our most reliable sources, such as Miles Guo, NFSC, Doctors in special hearing on Covid-19 vaccine injuries. AI answers questions based on information/data from these sources. So we cannot be responsilbe for the final generated content. We are working on knowledgebase visualization, so soon knowledgebase content will/can be audited publicly.",
+  "talkToAI": "Talk to vaccinetruth.ai",
   "chatShareTitle": "Chat Share configuration",
   "chatShareDesc": "select your share platform",
   "chatShareCopyURL": "Copy Chat Share URL",
@@ -23,8 +23,8 @@
   },
   "vaccineTruthAi": "Vaccine Truth AI",
   "sharedPageTitle": "Shared Chat • Vaccine Truth AI",
-  "emptyChatTitle": "Vaccine Truth AI ChatBot",
-  "emptyChatSubTitle": "I am a chat bot",
+  "emptyChatTitle": "Start chatting",
+  "emptyChatSubTitle": "don't forget to share if you like the answer.",
   "recommended": "Recommended",
-  "buildByStayRealStudio": "Built by Stay Real"
+  "buildByStayRealStudio": "Built by Stay Real Studio"
 }

@@ -20,9 +20,9 @@ export const IntroSection = (): JSX.Element => {
           <div>
             <h1 className="text-3xl leading-[4rem] sm:text-[3.2rem] sm:leading-[5rem] font-bold text-black block max-w-2xl">
               {t("intro.title", { ns: "home" })}
-              <span className="text-sky-900 ml-4">
+              {/* <span className="text-cyan-900 ml-4">
                 {t("vaccineTruthAi", { ns: "vaccineTruth" })}
-              </span>
+              </span> */}
             </h1>
             <br />
           </div>
