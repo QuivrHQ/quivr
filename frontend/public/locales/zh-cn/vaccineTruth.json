@@ -1,7 +1,7 @@
 {
   "disclaimer": "免责声明",
-  "disclaimerContent": "我们根据互联网上公开的疫苗真相信息，整理了一份完整的资料库，我们只根据该公开信息提及的内容进行问题问答，对内容不负法律责任！",
-  "talkToAI": "与 Vaccinetruth.ai 的对话",
+  "disclaimerContent": "目前的知识库仅包含来自我们最可靠来源的有限公共信息，例如郭文贵先生、新中国联邦/爆料革命、美国关于Covid-19疫苗伤害特别听证会, 及少数公信度较高的医生。AI根据这些来源的信息/数据回答问题, 所以我们无法对最终生成的问题准确负责。因此我们也在致力于知识库信息可视化，知识库内容可以被公众审核。",
+  "talkToAI": "马上体验 vaccinetruth.ai",
   "chatShareTitle": "聊天分享配置",
   "chatShareDesc": "选择您的分享平台",
   "chatShareCopyURL": "复制聊天分享 URL",
@@ -23,8 +23,8 @@
   },
   "vaccineTruthAi": "疫苗真相AI",
   "sharedPageTitle": "共享聊天•疫苗真相人工智能",
-  "emptyChatTitle": "疫苗真相人工智能聊天机器人",
-  "emptyChatSubTitle": "我是一个聊天机器人",
+  "emptyChatTitle": "点击/输入问题, 开始对话",
+  "emptyChatSubTitle": "如果你找到了真相. 别忘记分享对话",
   "recommended": "推荐",
   "buildByStayRealStudio": "Stay Real Studio 出品"
 }

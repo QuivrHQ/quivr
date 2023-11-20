@@ -30,7 +30,7 @@ const Main = (): JSX.Element => {
       <main className="h-full flex flex-col items-center justify-center">
         <section className="w-full md:w-1/2 lg:w-1/3 flex flex-col gap-2">
           <Link href="/" className="flex justify-center">
-            <QuivrLogo size={80} color="black" />
+            <QuivrLogo size={80} />
           </Link>
           <p className="text-center text-2xl font-medium">
             {t("talk_to", { ns: "login" })}{" "}

@@ -1,7 +1,7 @@
 {
   "sign_in": "Sign in",
   "sign_up": "Sign up",
-  "star_us": "Star us on Github",
+  "star_us": "Open Source at Github",
   "blog": "Blog",
   "sponsored_by": "Sponsored by",
   "useCases": {
@@ -9,7 +9,7 @@
     "subtitle": "Check our example on using Quivr"
   },
   "intro": {
-    "title": "Get a Second Brain with",
+    "title": "Your AI source of the Covid-19 vaccine truth",
     "subtitle": "Upload all your files and start talking with them.",
     "try_demo": "Try free demo",
     "contact_sales": "Contact sales team"
@@ -22,8 +22,8 @@
     "cta": "Get started today "
   },
   "footer": {
-    "title": "Get started today",
-    "description_1": "Your personal assistant that acts as your Second Brain.",
+    "title": "Conntect with us",
+    "description_1": "Your AI source of the Covid-19 vaccine truth.",
     "description_2": "Simply upload your files and ask questions to it.",
     "start_using": "Start using Quivr",
     "contact_sales": "Contact sales team"
