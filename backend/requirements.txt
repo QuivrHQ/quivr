@@ -20,7 +20,7 @@ asyncpg==0.27.0
 flake8==6.0.0
 flake8-black==0.3.6
 sentry-sdk==1.26.0
-pyright==1.1.316
+pyright==1.1.336
 resend==0.5.1
 html5lib==1.1
 beautifulsoup4
