@@ -234,4 +234,21 @@ describe("useBrainApi", () => {
     expect(axiosGetMock).toHaveBeenCalledTimes(1);
     expect(axiosGetMock).toHaveBeenCalledWith(`/brains/public`);
   });
+  it("should call updateBrainSecrets with correct parameters", async () => {
+    const {
+      result: {
+        current: { updateBrainSecrets },
+      },
+    } = renderHook(() => useBrainApi());
+    const brainId = "123";
+    const secrets = {
+      key: "value",
+    };
+    await updateBrainSecrets(brainId, secrets);
+    expect(axiosPutMock).toHaveBeenCalledTimes(1);
+    expect(axiosPutMock).toHaveBeenCalledWith(
+      `/brains/${brainId}/secrets`,
+      secrets
+    );
+  });
 });

@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { MdClose } from "react-icons/md";
 
 import { AddBrainModal } from "@/lib/components/AddBrainModal";
+import { ApiBrainSecretsInputs } from "@/lib/components/ApiBrainSecretsInputs/ApiBrainSecretsInputs";
 import { KnowledgeToFeedInput } from "@/lib/components/KnowledgeToFeedInput";
 import Button from "@/lib/components/ui/Button";
 import { Select } from "@/lib/components/ui/Select";
@@ -24,7 +25,7 @@ export const KnowledgeToFeed = ({
   const { t } = useTranslation(["upload"]);
 
   const { setShouldDisplayFeedCard } = useKnowledgeToFeedContext();
-
+  const { currentBrainDetails } = useBrainContext();
   const brainsWithUploadRights = useMemo(
     () =>
       allBrains.filter((brain) => requiredRolesForUpload.includes(brain.role)),
@@ -61,7 +62,14 @@ export const KnowledgeToFeed = ({
           className="flex flex-row items-center"
         />
       </div>
-      <KnowledgeToFeedInput feedBrain={() => void feedBrain()} />
+      {currentBrainDetails?.brain_type === "api" ? (
+        <ApiBrainSecretsInputs
+          brainId={currentBrainDetails.id}
+          onUpdate={() => setShouldDisplayFeedCard(false)}
+        />
+      ) : (
+        <KnowledgeToFeedInput feedBrain={() => void feedBrain()} />
+      )}
     </div>
   );
 };

@@ -14,6 +14,7 @@ import {
   Subscription,
   updateBrain,
   updateBrainAccess,
+  updateBrainSecrets,
 } from "./brain";
 import {
   CreateBrainInput,
@@ -50,5 +51,9 @@ export const useBrainApi = () => {
     updateBrain: async (brainId: string, brain: UpdateBrainInput) =>
       updateBrain(brainId, brain, axiosInstance),
     getPublicBrains: async () => getPublicBrains(axiosInstance),
+    updateBrainSecrets: async (
+      brainId: string,
+      secrets: Record<string, string>
+    ) => updateBrainSecrets(brainId, secrets, axiosInstance),
   };
 };

@@ -57,5 +57,9 @@
     "required": "必填",
     "addRow": "添加行",
     "value": "值"
-  }
+  },
+  "update_secrets_message": "输入您的秘密。在调用API时，此信息是必需的以识别您",
+  "update_secrets_button": "更新秘密",
+  "secrets_updated": "秘密已更新",
+  "secrets_update_error": "更新秘密时出错"
 }

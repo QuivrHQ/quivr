@@ -1,3 +1,4 @@
+from typing import Dict
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException
@@ -24,7 +25,10 @@ from repository.brain import (
     set_as_default_brain_for_user,
     update_brain_by_id,
 )
+from repository.brain.get_brain_for_user import get_brain_for_user
+from repository.external_api_secret.update_secret import update_secret
 from repository.prompt import delete_prompt_by_id, get_prompt_by_id
+
 from routes.authorizations.brain_authorization import has_brain_authorization
 from routes.authorizations.types import RoleEnum
 
@@ -147,6 +151,67 @@ async def update_existing_brain(
 
     if brain_update_data.status == "private" and existing_brain.status == "public":
         delete_brain_users(brain_id)
+
+    return {"message": f"Brain {brain_id} has been updated."}
+
+
+@brain_router.put(
+    "/brains/{brain_id}/secrets",
+    dependencies=[
+        Depends(AuthBearer()),
+    ],
+    tags=["Brain"],
+)
+async def update_existing_brain_secrets(
+    brain_id: UUID,
+    secrets: Dict[str, str],
+    current_user: UserIdentity = Depends(get_current_user),
+):
+    """Update an existing brain's secrets."""
+
+    existing_brain = get_brain_details(brain_id)
+
+    if existing_brain is None:
+        raise HTTPException(status_code=404, detail="Brain not found")
+
+    if (
+        existing_brain.brain_definition is None
+        or existing_brain.brain_definition.secrets is None
+    ):
+        raise HTTPException(
+            status_code=400,
+            detail="This brain does not support secrets.",
+        )
+
+    is_brain_user = (
+        get_brain_for_user(
+            user_id=current_user.id,
+            brain_id=brain_id,
+        )
+        is not None
+    )
+
+    if not is_brain_user:
+        raise HTTPException(
+            status_code=403,
+            detail="You are not authorized to update this brain.",
+        )
+
+    secrets_names = [secret.name for secret in existing_brain.brain_definition.secrets]
+
+    for key, value in secrets.items():
+        if key not in secrets_names:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Secret {key} is not a valid secret.",
+            )
+        if value:
+            update_secret(
+                user_id=current_user.id,
+                brain_id=brain_id,
+                secret_name=key,
+                secret_value=value,
+            )
 
     return {"message": f"Brain {brain_id} has been updated."}
 
