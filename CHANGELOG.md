@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.0.115 (2023-11-20)
+
+## What's Changed
+* fix(apiBrain): fix default type selection by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1642
+* fix: allow user to set a brain as public after creation by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1646
+* fix(brainManagement): fix shared brain access issue by @gozineb in https://github.com/StanGirard/quivr/pull/1641
+* feat: 🎸 docker reduced size by 2 by @StanGirard in https://github.com/StanGirard/quivr/pull/1653
+* feat: 🎸 docker by @StanGirard in https://github.com/StanGirard/quivr/pull/1656
+* feat: 🎸 marketplace by @StanGirard in https://github.com/StanGirard/quivr/pull/1657
+* feat: 🎸 openai by @StanGirard in https://github.com/StanGirard/quivr/pull/1658
+
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.114...v0.0.115
+
 ## 0.0.114 (2023-11-16)
 
 ## What's Changed
