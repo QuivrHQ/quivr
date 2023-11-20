@@ -11,7 +11,7 @@ import {
   IntroSection,
 } from "./components";
 import { HomeHeaderBackground } from "./components/HomeHeader/components/HomeHeaderBackground";
-import { UseCases } from "./components/UseCases/UseCases";
+
 const HomePage = (): JSX.Element => {
   const { session } = useSupabase();
 
@@ -38,14 +38,14 @@ const HomePage = (): JSX.Element => {
           <DemoSection />
         </HomeSection> */}
 
-        <HomeSection
+        {/* <HomeSection
           bg="bg-[#362469]"
-          // slantCurrent="down"
+
           gradient="bg-gradient-to-t bg-gradient-to-t from-white to-[#362469]"
         >
           <UseCases />
           <div />
-        </HomeSection>
+        </HomeSection> */}
 
         {/* <HomeSection bg="bg-white" slantBefore="down" slantAfter="up">
           <SecuritySection />
