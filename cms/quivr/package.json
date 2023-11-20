@@ -11,7 +11,7 @@
   },
   "devDependencies": {},
   "dependencies": {
-    "@ckeditor/strapi-plugin-ckeditor": "^0.0.9",
+    "@ckeditor/strapi-plugin-ckeditor": "^0.0.10",
     "@strapi/plugin-i18n": "4.14.3",
     "@strapi/plugin-seo": "^1.9.6",
     "@strapi/plugin-users-permissions": "4.14.3",
