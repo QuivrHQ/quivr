@@ -61,5 +61,6 @@
   "update_secrets_message": "Введите свой пароль. Эта информация необходима для идентификации вас при вызове API",
   "update_secrets_button": "Обновить секреты",
   "secrets_updated": "Секреты обновлены",
-  "secrets_update_error": "Ошибка при обновлении секретов"
+  "secrets_update_error": "Ошибка при обновлении секретов",
+  "manage_brain": "Управление мозгом"
 }
