@@ -19,9 +19,8 @@ def get_user_identity(user_id: UUID) -> UserIdentity:
     )
 
     if len(response.data) == 0:
-        return create_user_identity(user_id, openai_api_key=None)
+        return create_user_identity(user_id)
 
     user_identity = response.data[0]
-    openai_api_key = user_identity["openai_api_key"]
 
-    return UserIdentity(id=user_id, openai_api_key=openai_api_key)
+    return UserIdentity(id=user_id)

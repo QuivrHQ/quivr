@@ -21,8 +21,6 @@ services:
       dockerfile: Dockerfile
     container_name: backend-core
     restart: always
-    volumes:
-      - ./backend/:/code/
     depends_on:
       - redis
       - worker
@@ -49,8 +47,6 @@ services:
     restart: always
     depends_on:
       - redis
-    volumes:
-      - ./backend/:/code/
 
   beat:
     image: backend-base
@@ -64,8 +60,6 @@ services:
     restart: always
     depends_on:
       - redis
-    volumes:
-      - ./backend/:/code/
 
   flower:
     image: backend-base
@@ -77,8 +71,6 @@ services:
     container_name: flower
     command: celery -A celery_worker flower -l info --port=5555
     restart: always
-    volumes:
-      - ./backend/:/code/
     depends_on:
       - redis
       - worker

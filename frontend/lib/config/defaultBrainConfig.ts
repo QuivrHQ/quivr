@@ -5,7 +5,6 @@ export const addBrainDefaultValues: CreateBrainInput = {
   model: "gpt-3.5-turbo",
   temperature: 0,
   max_tokens: 500,
-  openai_api_key: undefined,
   prompt_id: undefined,
   status: "private",
   name: "",

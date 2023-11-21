@@ -1,5 +1,6 @@
 /* eslint-disable max-lines */
 const nextConfig = {
+  output: 'standalone',
   images: {
     domains: [
       "www.quivr.app",

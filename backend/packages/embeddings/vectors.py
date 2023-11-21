@@ -2,7 +2,6 @@ from concurrent.futures import ThreadPoolExecutor
 from typing import List
 from uuid import UUID
 
-from langchain.embeddings.openai import OpenAIEmbeddings
 from logger import get_logger
 from models.settings import get_documents_vector_store, get_embeddings, get_supabase_db
 from pydantic import BaseModel
@@ -12,14 +11,11 @@ logger = get_logger(__name__)
 
 # TODO: Create interface for embeddings and implement it for Supabase and OpenAI (current Quivr)
 class Neurons(BaseModel):
-    def create_vector(self, doc, user_openai_api_key=None):
+    def create_vector(self, doc):
         documents_vector_store = get_documents_vector_store()
         logger.info("Creating vector for document")
         logger.info(f"Document: {doc}")
-        if user_openai_api_key:
-            documents_vector_store._embedding = OpenAIEmbeddings(
-                openai_api_key=user_openai_api_key
-            )  # pyright: ignore reportPrivateUsage=none
+
         try:
             sids = documents_vector_store.add_documents([doc])
             if sids and len(sids) > 0:

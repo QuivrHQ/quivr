@@ -42,7 +42,6 @@ export type CreateBrainInput = {
   model?: Model;
   temperature?: number;
   max_tokens?: number;
-  openai_api_key?: string;
   prompt_id?: string | null;
   brain_type?: BrainType;
   brain_definition?: ApiBrainDefinition;

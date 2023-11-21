@@ -143,3 +143,11 @@ export const getPublicBrains = async (
 ): Promise<PublicBrain[]> => {
   return (await axiosInstance.get<PublicBrain[]>(`/brains/public`)).data;
 };
+
+export const updateBrainSecrets = async (
+  brainId: string,
+  secrets: Record<string, string>,
+  axiosInstance: AxiosInstance
+): Promise<void> => {
+  await axiosInstance.put(`/brains/${brainId}/secrets`, secrets);
+};

@@ -2,10 +2,11 @@ import { Fragment } from "react";
 
 import { BrainManagementButton } from "@/lib/components/Sidebar/components/SidebarFooter/components/BrainManagementButton";
 
+import { MarketPlaceButton } from "./components/MarketplaceButton";
 import { UpgradeToPlus } from "./components/UpgradeToPlus";
 import { UserButton } from "./components/UserButton";
 
-export type SidebarFooterButtons = "myBrains" | "user" | "upgradeToPlus";
+export type SidebarFooterButtons = "myBrains" | "user" | "upgradeToPlus" | "marketplace";
 
 type SidebarFooterProps = {
   showButtons: SidebarFooterButtons[];
@@ -16,6 +17,7 @@ export const SidebarFooter = ({
 }: SidebarFooterProps): JSX.Element => {
   const buttons = {
     myBrains: <BrainManagementButton />,
+    marketplace: <MarketPlaceButton />,
     upgradeToPlus: <UpgradeToPlus />,
     user: <UserButton />,
   };

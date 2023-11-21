@@ -1,4 +1,3 @@
-from typing import Optional
 from uuid import UUID
 
 from models.settings import get_supabase_client
@@ -8,7 +7,8 @@ from pydantic import BaseModel
 
 
 class UserUpdatableProperties(BaseModel):
-    openai_api_key: Optional[str]
+    # Nothing for now
+    empty: bool = True
 
 
 def update_user_properties(
@@ -25,10 +25,10 @@ def update_user_properties(
 
     if len(response.data) == 0:
         return create_user_identity(
-            user_id, openai_api_key=user_identity_updatable_properties.openai_api_key
+            user_id
         )
 
     user_identity = response.data[0]
-    openai_api_key = user_identity["openai_api_key"]
 
-    return UserIdentity(id=user_id, openai_api_key=openai_api_key)
+
+    return UserIdentity(id=user_id)

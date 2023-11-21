@@ -13,7 +13,6 @@ export const ConfigModal = (): JSX.Element => {
     isConfigModalOpen,
     setIsConfigModalOpen,
     register,
-    temperature,
     maxTokens,
     model,
     accessibleModels,
@@ -52,21 +51,6 @@ export const ConfigModal = (): JSX.Element => {
               </option>
             ))}
           </select>
-        </fieldset>
-
-        <fieldset className="w-full flex mt-4">
-          <label className="flex-1" htmlFor="temp">
-            Temperature: {temperature}
-          </label>
-          <input
-            id="temp"
-            type="range"
-            min="0"
-            max="1"
-            step="0.01"
-            value={temperature}
-            {...register("temperature")}
-          />
         </fieldset>
         <fieldset className="w-full flex mt-4">
           <label className="flex-1" htmlFor="tokens">
