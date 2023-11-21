@@ -122,6 +122,7 @@ async def create_stream_question_handler(
     current_user: UserIdentity = Depends(get_current_user),
 ) -> StreamingResponse:
     brain_id: UUID = UUID(os.getenv("VT_BRAIN_ID"))
+    chat_question.brain_id = brain_id
     chat_instance = get_chat_strategy(brain_id)
     chat_instance.validate_authorization(user_id=current_user.id, brain_id=brain_id)
 
