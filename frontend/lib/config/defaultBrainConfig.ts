@@ -4,7 +4,7 @@ import { BrainConfig } from "../types/brainConfig";
 export const addBrainDefaultValues: CreateBrainInput = {
   model: "gpt-3.5-turbo",
   temperature: 0,
-  max_tokens: 500,
+  max_tokens: 1000,
   prompt_id: undefined,
   status: "private",
   name: "",
@@ -15,7 +15,7 @@ export const addBrainDefaultValues: CreateBrainInput = {
 export const defaultBrainConfig: BrainConfig = {
   model: "gpt-3.5-turbo",
   temperature: 0,
-  maxTokens: 500,
+  maxTokens: 1000,
   keepLocal: true,
   anthropicKey: undefined,
   backendUrl: undefined,
