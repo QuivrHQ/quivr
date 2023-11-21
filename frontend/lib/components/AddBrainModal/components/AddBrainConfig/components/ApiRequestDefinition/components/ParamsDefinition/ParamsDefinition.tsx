@@ -11,7 +11,7 @@ import { useParamsDefinition } from "./hooks/useParamsDefinition";
 import { tabDescriptionStyle } from "../../styles";
 
 type ParamsDefinitionProps = {
-  name: string;
+  name: "search_params" | "params";
   description: string;
 };
 

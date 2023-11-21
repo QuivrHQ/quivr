@@ -76,13 +76,13 @@ export const ApiRequestDefinition = (): JSX.Element => {
           <Content value="params">
             <ParamsDefinition
               description={t("paramsTabDescription")}
-              name="brain_definition.params"
+              name="params"
             />
           </Content>
           <Content value="searchParams">
             <ParamsDefinition
               description={t("searchParamsTabDescription")}
-              name="brain_definition.search_params"
+              name="search_params"
             />
           </Content>
           <Content value="secrets">
