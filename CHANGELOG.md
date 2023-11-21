@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.0.116 (2023-11-21)
+
+## What's Changed
+* feat: update brain modal in chat input  by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1668
+* feat(apiBrain): add api brain secrets field in knowledge tab by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1669
+* feat(apiBrain): improve ux by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1672
+* feat(feedBrain): add manage button by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1674
+
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.115...v0.0.116
+
 ## 0.0.115 (2023-11-20)
 
 ## What's Changed
