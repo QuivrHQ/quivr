@@ -7,5 +7,5 @@ export const defaultSecretDefinitionRow: SecretDefinition = {
   description: "",
 };
 
-export const brainSecretsSchemaDefinitionKeyInForm = "brain_definition.secrets";
+export const brainSecretsSchemaDefinitionKeyInForm = "secrets";
 export const brainSecretsValueKeyInForm = "brain_secrets_values";
