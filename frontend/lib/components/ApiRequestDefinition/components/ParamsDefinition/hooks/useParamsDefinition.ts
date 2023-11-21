@@ -1,10 +1,10 @@
 import { useEffect } from "react";
 import { useForm, useFormContext, useWatch } from "react-hook-form";
 
-import { useParamsDefinitionDefaultValues } from "./useParamsDefinitionDefaultValues";
-import { CreateBrainProps } from "../../../../../types";
+import { CreateBrainProps } from "../../../../AddBrainModal/components/AddBrainConfig/types";
 import { ParameterDefinition } from "../types";
 import { mapParameterDefinitionToApiBrainDefinitionSchema } from "../utils/mapParameterDefinitionToApiBrainDefinitionSchema";
+import { useParamsDefinitionDefaultValues } from "./useParamsDefinitionDefaultValues";
 
 type UseParamsDefinitionProps = {
   name: "search_params" | "params";

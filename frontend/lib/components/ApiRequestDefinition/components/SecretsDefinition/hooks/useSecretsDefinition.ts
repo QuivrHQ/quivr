@@ -1,14 +1,14 @@
 import { useEffect } from "react";
 import { useForm, useFormContext, useWatch } from "react-hook-form";
 
-import { useSecretsDefinitionDefaultValues } from "./useSecretsDefinitionDefaultValues";
-import { CreateBrainProps } from "../../../../../types";
+import { CreateBrainProps } from "../../../../AddBrainModal/components/AddBrainConfig/types";
 import {
   brainSecretsSchemaDefinitionKeyInForm,
   brainSecretsValueKeyInForm,
 } from "../config";
 import { SecretDefinition } from "../types";
 import { mapSecretDefinitionToApiBrainSecretsDefinitionsAndValue } from "../utils/mapSecretDefinitionToApiBrainSecretDefinition";
+import { useSecretsDefinitionDefaultValues } from "./useSecretsDefinitionDefaultValues";
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const useSecretsDefinition = () => {

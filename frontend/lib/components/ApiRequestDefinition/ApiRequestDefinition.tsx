@@ -15,7 +15,6 @@ export const ApiRequestDefinition = (): JSX.Element => {
   const { t } = useTranslation(["external_api_definition"]);
 
   const { watch, register } = useFormContext<CreateBrainInput>();
-
   const brainType = watch("brain_type");
 
   if (brainType !== "api") {

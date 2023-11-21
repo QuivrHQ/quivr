@@ -11,13 +11,13 @@ import { Modal } from "@/lib/components/ui/Modal";
 import { defineMaxTokens } from "@/lib/helpers/defineMaxTokens";
 import { cn } from "@/lib/utils";
 
-import { ApiRequestDefinition } from "./components/ApiRequestDefinition";
-import { PublicAccessConfirmationModal } from "./components/PublicAccessConfirmationModal";
-import { useAddBrainConfig } from "./hooks/useAddBrainConfig";
-import { useAddBrainConfigLabels } from "./hooks/useAddBrainConfigLabels";
+import { ApiRequestDefinition } from "../../../ApiRequestDefinition";
 import { Divider } from "../../../ui/Divider";
 import { Radio } from "../../../ui/Radio";
 import { TextArea } from "../../../ui/TextArea";
+import { PublicAccessConfirmationModal } from "./components/PublicAccessConfirmationModal";
+import { useAddBrainConfig } from "./hooks/useAddBrainConfig";
+import { useAddBrainConfigLabels } from "./hooks/useAddBrainConfigLabels";
 
 type AddBrainConfigProps = {
   triggerClassName?: string;
@@ -114,7 +114,6 @@ export const AddBrainConfig = ({
               <ApiRequestDefinition />
             </>
           )}
-          
 
           <fieldset className="w-full flex flex-col">
             <label className="flex-1 text-sm" htmlFor="model">
