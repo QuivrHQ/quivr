@@ -30,6 +30,12 @@ def get_api_call_response_as_text(
             headers=headers or None,
             data=json.dumps(params) or None,
         )
+        logger.debug("🔥🔥🔥🔥🔥")
+        logger.debug(f"API call response: {response.text}")
+        logger.debug(f'API call search params: {search_params}')
+        logger.debug(f"API call response status code: {response.status_code}")
+        logger.debug(f"API call url with search params: {api_url_with_search_params}")
+        logger.debug(f"API call headers: {headers}")
         return response.text
     except Exception as e:
         logger.error(f"Error calling API: {e}")
