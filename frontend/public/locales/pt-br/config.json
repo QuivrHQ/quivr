@@ -40,6 +40,7 @@
     "updatingBrainSettings": "Atualizando configurações do cérebro...",
     "defaultBrainSet": "Cérebro definido como padrão com sucesso",
     "nameRequired": "O nome é obrigatório",
+    "descriptionRequired": "A descrição é obrigatória",
     "promptFieldsRequired": "Título e conteúdo do prompt são obrigatórios",
     "brainUpdated": "Cérebro atualizado com sucesso",
     "publicPrompts": "Escolher em prompts públicos",

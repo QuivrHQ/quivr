@@ -40,6 +40,7 @@
   "updatingBrainSettings": "更新大脑设置中…",
   "defaultBrainSet": "大脑已成功设置为默认值。",
   "nameRequired": "名称为必填项",
+  "descriptionRequired": "描述为必填项",
   "promptFieldsRequired": "提示标题和内容为必填项",
   "brainUpdated": "大脑更新成功",
   "publicPrompts": "在公共提示中选择",

@@ -40,6 +40,7 @@
     "updatingBrainSettings": "Updating brain settings...",
     "defaultBrainSet": "Brain set as default successfully",
     "nameRequired": "Name is required",
+    "descriptionRequired": "Description is required",
     "promptFieldsRequired": "Prompt title and content are required",
     "brainUpdated": "Brain updated successfully",
     "publicPrompts": "Pick in public prompts",
