@@ -79,6 +79,7 @@ export const useAddBrainConfig = () => {
     return undefined;
   };
 
+  // eslint-disable-next-line complexity
   const handleSubmit = async () => {
     const {
       name,
@@ -92,6 +93,15 @@ export const useAddBrainConfig = () => {
       publish({
         variant: "danger",
         text: t("nameRequired", { ns: "config" }),
+      });
+
+      return;
+    }
+
+    if (description.trim() === "") {
+      publish({
+        variant: "danger",
+        text: t("descriptionRequired", { ns: "config" }),
       });
 
       return;

@@ -40,7 +40,7 @@ export type ApiBrainDefinition = {
 
 export type CreateBrainInput = {
   name: string;
-  description?: string;
+  description: string;
   status?: BrainStatus;
   model?: Model;
   temperature?: number;

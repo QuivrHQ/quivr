@@ -12,7 +12,8 @@ import { useToast } from "@/lib/hooks";
 import { useUserData } from "@/lib/hooks/useUserData";
 
 import { useBrainFormState } from "./useBrainFormState";
-import { checkBrainName } from "../utils/checkBrainName";
+import { isBrainDescriptionValid } from "../utils/isBrainDescriptionValid";
+import { isBrainNameValid } from "../utils/isBrainNameValid";
 
 type UseSettingsTabProps = {
   brainId: UUID;
@@ -87,9 +88,14 @@ export const useSettingsTab = ({ brainId }: UseSettingsTabProps) => {
   };
 
   const handleSubmit = async () => {
-    const { name } = getValues();
+    const { name, description } = getValues();
 
-    checkBrainName(name, publish, t);
+    if (
+      !isBrainNameValid(name, publish, t) ||
+      !isBrainDescriptionValid(description, publish, t)
+    ) {
+      return;
+    }
 
     try {
       setIsUpdating(true);
