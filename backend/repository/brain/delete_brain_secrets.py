@@ -9,7 +9,7 @@ from repository.api_brain_definition.get_api_brain_definition import (
 from repository.external_api_secret import delete_secret
 
 
-def delete_brain_secrets(brain_id: UUID) -> None:
+def delete_brain_secrets_values(brain_id: UUID) -> None:
     supabase_db = get_supabase_db()
 
     brain_definition = get_api_brain_definition(brain_id=brain_id)
