@@ -2,8 +2,6 @@ import { useEffect, useState } from "react";
 
 import { useSupabase } from "@/lib/context/SupabaseProvider";
 
-import { defaultBrainConfig } from "../config/defaultBrainConfig";
-
 interface FetchInstance {
   get: (url: string, headers?: HeadersInit) => Promise<Response>;
   post: (
@@ -30,12 +28,11 @@ const fetchInstance: FetchInstance = {
 
 export const useFetch = (): { fetchInstance: FetchInstance } => {
   const { session } = useSupabase();
-  const { backendUrl: configBackendUrl, openAiKey } = defaultBrainConfig;
 
   const [instance, setInstance] = useState(fetchInstance);
 
   const baseURL = `${process.env.NEXT_PUBLIC_BACKEND_URL ?? ""}`;
-  const backendUrl = configBackendUrl ?? baseURL;
+  const backendUrl = baseURL;
 
   useEffect(() => {
     setInstance({
@@ -43,29 +40,25 @@ export const useFetch = (): { fetchInstance: FetchInstance } => {
       get: async (url, headers) =>
         fetchInstance.get(`${backendUrl}${url}`, {
           Authorization: `Bearer ${session?.access_token ?? ""}`,
-          "Openai-Api-Key": openAiKey ?? "",
           ...headers,
         }),
       post: async (url, body, headers) =>
         fetchInstance.post(`${backendUrl}${url}`, body, {
           Authorization: `Bearer ${session?.access_token ?? ""}`,
-          "Openai-Api-Key": openAiKey ?? "",
           ...headers,
         }),
       put: async (url, body, headers) =>
         fetchInstance.put(`${backendUrl}${url}`, body, {
           Authorization: `Bearer ${session?.access_token ?? ""}`,
-          "Openai-Api-Key": openAiKey ?? "",
           ...headers,
         }),
       delete: async (url, headers) =>
         fetchInstance.delete(`${backendUrl}${url}`, {
           Authorization: `Bearer ${session?.access_token ?? ""}`,
-          "Openai-Api-Key": openAiKey ?? "",
           ...headers,
         }),
     });
-  }, [session, backendUrl, openAiKey]);
+  }, [session, backendUrl]);
 
   return { fetchInstance: instance };
 };

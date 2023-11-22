@@ -3,20 +3,22 @@ import { Fragment } from "react";
 import { useFormContext } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 
-import { allowedRequestMethods, CreateBrainInput } from "@/lib/api/brain/types";
+import { allowedRequestMethods } from "@/lib/api/brain/types";
 
 import { BrainDefinitionTabTrigger } from "./components/BrainDefinitionTabTrigger";
 import { ParamsDefinition } from "./components/ParamsDefinition/ParamsDefinition";
 import { SecretsDefinition } from "./components/SecretsDefinition/SecretsDefinition";
 import { useApiRequestDefinition } from "./hooks/useApiRequestDefinition";
+import { ApiDefinitionContextType } from "./types";
 
 export const ApiRequestDefinition = (): JSX.Element => {
   const { selectedTab, setSelectedTab } = useApiRequestDefinition();
   const { t } = useTranslation(["external_api_definition"]);
 
-  const { watch, register } = useFormContext<CreateBrainInput>();
+  const { watch, register } = useFormContext<ApiDefinitionContextType>();
 
   const brainType = watch("brain_type");
+  const readOnly = watch("isApiDefinitionReadOnly") ?? false;
 
   if (brainType !== "api") {
     return <Fragment />;
@@ -33,6 +35,7 @@ export const ApiRequestDefinition = (): JSX.Element => {
         <select
           className="block w-32 px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
           defaultValue="GET"
+          disabled={readOnly}
           {...register("brain_definition.method")}
         >
           {allowedMethodsOptions.map(({ label, value }) => (
@@ -45,6 +48,7 @@ export const ApiRequestDefinition = (): JSX.Element => {
         <input
           className="flex-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
           placeholder="https://api.example.com/resource"
+          disabled={readOnly}
           {...register("brain_definition.url", { required: true })}
         />
       </div>

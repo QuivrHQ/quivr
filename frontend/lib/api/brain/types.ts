@@ -1,3 +1,5 @@
+import { UUID } from "crypto";
+
 import { BrainRoleType } from "@/lib/components/BrainUsers/types";
 import { BrainStatus, BrainType, Model } from "@/lib/types/brainConfig";
 
@@ -28,6 +30,7 @@ export type ApiBrainDefinitionSecret = {
 };
 
 export type ApiBrainDefinition = {
+  brain_id: UUID;
   method: AllowedRequestMethod;
   url: string;
   search_params: ApiBrainDefinitionSchema;
@@ -44,7 +47,7 @@ export type CreateBrainInput = {
   max_tokens?: number;
   prompt_id?: string | null;
   brain_type?: BrainType;
-  brain_definition?: ApiBrainDefinition;
+  brain_definition?: Omit<ApiBrainDefinition, "brain_id">;
   brain_secrets_values?: Record<string, string>;
 };
 

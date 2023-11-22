@@ -2,6 +2,7 @@ from typing import Optional
 from uuid import UUID
 
 from logger import get_logger
+from models.ApiBrainDefinition import ApiBrainDefinition
 from models.brain_entity import (
     BrainEntity,
     BrainType,
@@ -45,6 +46,7 @@ class BrainUpdatableProperties(BaseModel):
     max_tokens: Optional[int]
     status: Optional[str]
     prompt_id: Optional[UUID]
+    brain_definition: Optional[ApiBrainDefinition]
 
     def dict(self, *args, **kwargs):
         brain_dict = super().dict(*args, **kwargs)

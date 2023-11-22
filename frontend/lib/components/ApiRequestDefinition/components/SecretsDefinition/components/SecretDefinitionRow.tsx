@@ -1,28 +1,31 @@
-import { UseFormRegister } from "react-hook-form";
+import { useFormContext, UseFormRegister } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { MdCancel } from "react-icons/md";
 
+import { ApiDefinitionContextType } from "../../../types";
 import { paramsNameStyle } from "../../styles";
-import { ParameterDefinition } from "../types";
+import { brainSecretsSchemaDefinitionKeyInForm } from "../config";
+import { SecretDefinition } from "../types";
 
-type ParamControl = {
-  [name: string]: ParameterDefinition[];
+type SecretControl = {
+  [brainSecretsSchemaDefinitionKeyInForm]: SecretDefinition[];
 };
 
-type ParamDefinitionRowProps = {
-  register: UseFormRegister<ParamControl>;
+type SecretDefinitionRowProps = {
+  register: UseFormRegister<SecretControl>;
   index: number;
   remove: (index: number) => void;
-  name: string;
 };
 
-export const ParamDefinitionRow = ({
+export const SecretDefinitionRow = ({
   index,
   remove,
   register,
-  name,
-}: ParamDefinitionRowProps): JSX.Element => {
+}: SecretDefinitionRowProps): JSX.Element => {
   const { t } = useTranslation(["brain"]);
+  const { watch } = useFormContext<ApiDefinitionContextType>();
+  const isApiDefinitionReadOnly = watch("isApiDefinitionReadOnly") ?? false;
+  const isUpdatingApiDefinition = watch("isUpdatingApiDefinition") ?? false;
 
   return (
     <div className="flex flex-1 justify-between items-center py-4 border-b border-gray-300 relative gap-2">
@@ -31,8 +34,9 @@ export const ParamDefinitionRow = ({
           type="text"
           className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block shadow-sm sm:text-sm border-gray-300 dark:bg-gray-800 dark:text-gray-100 rounded-md w-full outline-none"
           placeholder={t("api_brain.name")}
+          disabled={isApiDefinitionReadOnly}
           {...register(
-            `${name}[${index}].name` as `${typeof name}.${number}.name`
+            `${brainSecretsSchemaDefinitionKeyInForm}.${index}.name`
           )}
         />
       </div>
@@ -42,8 +46,9 @@ export const ParamDefinitionRow = ({
           id={`description-${index}`}
           className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 dark:bg-gray-800 dark:text-gray-100 rounded-md outline-none"
           placeholder={t("api_brain.description")}
+          disabled={isApiDefinitionReadOnly}
           {...register(
-            `${name}[${index}].description` as `${typeof name}.${number}.description`
+            `${brainSecretsSchemaDefinitionKeyInForm}.${index}.description`
           )}
         />
       </div>
@@ -51,25 +56,32 @@ export const ParamDefinitionRow = ({
         <select
           id={`type-${index}`}
           className="mt-1 block w-full py-2 px-3 border border-gray-300 dark:bg-gray-800 dark:text-gray-100 bg-white dark:border-gray-800 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+          disabled={isApiDefinitionReadOnly}
           {...register(
-            `${name}[${index}].type` as `${typeof name}.${number}.type`
+            `${brainSecretsSchemaDefinitionKeyInForm}.${index}.type`
           )}
         >
           <option value="string">string</option>
           <option value="number">number</option>
         </select>
       </div>
-      <div className="flex-1 justify-center flex">
-        <input
-          type="checkbox"
-          className="form-checkbox h-5 w-5 text-indigo-600 rounded focus:ring-2 focus:ring-indigo-400 outline-none"
-          {...register(`${name}[${index}].required`)}
-        />
-      </div>
+      {!isUpdatingApiDefinition && (
+        <div className={paramsNameStyle}>
+          <input
+            type="text"
+            className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 dark:bg-gray-800 dark:text-gray-100 rounded-md outline-none"
+            placeholder={t("api_brain.value")}
+            {...register(
+              `${brainSecretsSchemaDefinitionKeyInForm}.${index}.value`
+            )}
+          />
+        </div>
+      )}
 
       <button
         type="button"
         onClick={() => remove(index)}
+        disabled={isApiDefinitionReadOnly}
         className="absolute right-0 text-red-500 bg-transparent border-none cursor-pointer"
       >
         <MdCancel />

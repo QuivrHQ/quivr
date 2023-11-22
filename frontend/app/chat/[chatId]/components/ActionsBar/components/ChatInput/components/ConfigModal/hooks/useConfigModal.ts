@@ -10,7 +10,11 @@ import {
 } from "@/lib/api/chat/chat.local";
 import { USER_DATA_KEY } from "@/lib/api/user/config";
 import { useUserApi } from "@/lib/api/user/useUserApi";
-import { defaultBrainConfig } from "@/lib/config/defaultBrainConfig";
+import {
+  defaultMaxTokens,
+  defaultModel,
+  defaultTemperature,
+} from "@/lib/config/defaultBrainConfig";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 import { ChatConfig } from "@/lib/context/ChatProvider/types";
 import { getAccessibleModels } from "@/lib/helpers/getAccessibleModels";
@@ -28,13 +32,12 @@ export const useConfigModal = () => {
     queryKey: [USER_DATA_KEY],
     queryFn: getUser,
   });
- 
 
   const { register, watch, setValue } = useForm<ChatConfig>({
     defaultValues: {
-      model: defaultBrainConfig.model,
-      temperature: defaultBrainConfig.temperature,
-      maxTokens: defaultBrainConfig.maxTokens,
+      model: "gpt-3.5-turbo-16k",
+      temperature: 0,
+      maxTokens: 3000,
     },
   });
 
@@ -61,15 +64,12 @@ export const useConfigModal = () => {
       if (relatedBrainConfig === undefined) {
         return;
       }
-      setValue("model", relatedBrainConfig.model ?? defaultBrainConfig.model);
+      setValue("model", relatedBrainConfig.model ?? defaultModel);
       setValue(
         "temperature",
-        relatedBrainConfig.temperature ?? defaultBrainConfig.temperature
+        relatedBrainConfig.temperature ?? defaultTemperature
       );
-      setValue(
-        "maxTokens",
-        relatedBrainConfig.max_tokens ?? defaultBrainConfig.maxTokens
-      );
+      setValue("maxTokens", relatedBrainConfig.max_tokens ?? defaultMaxTokens);
     }
   }, []);
 

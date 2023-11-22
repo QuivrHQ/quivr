@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { useForm, useFormContext, useWatch } from "react-hook-form";
 
 import { useParamsDefinitionDefaultValues } from "./useParamsDefinitionDefaultValues";
-import { CreateBrainProps } from "../../../../../types";
+import { ApiDefinitionContextType } from "../../../types";
 import { ParameterDefinition } from "../types";
 import { mapParameterDefinitionToApiBrainDefinitionSchema } from "../utils/mapParameterDefinitionToApiBrainDefinitionSchema";
 
@@ -14,7 +14,8 @@ type UseParamsDefinitionProps = {
 export const useParamsDefinition = ({ name }: UseParamsDefinitionProps) => {
   const dataKey = `brain_definition.${name}` as const;
 
-  const { setValue: setContextValue } = useFormContext<CreateBrainProps>();
+  const { setValue: setContextValue, watch: watchContextValue } =
+    useFormContext<ApiDefinitionContextType>();
 
   const { defaultValues } = useParamsDefinitionDefaultValues({
     dataKey,
@@ -27,6 +28,9 @@ export const useParamsDefinition = ({ name }: UseParamsDefinitionProps) => {
       [name]: defaultValues,
     },
   });
+
+  const isApiDefinitionReadOnly =
+    watchContextValue("isApiDefinitionReadOnly") ?? false;
 
   const params = useWatch({
     control,
@@ -47,5 +51,6 @@ export const useParamsDefinition = ({ name }: UseParamsDefinitionProps) => {
   return {
     control,
     register,
+    isApiDefinitionReadOnly,
   };
 };

@@ -29,15 +29,8 @@ export const useSettingsTab = ({ brainId }: UseSettingsTabProps) => {
   const { fetchAllBrains, fetchDefaultBrain } = useBrainContext();
   const { userData } = useUserData();
 
-  const {
-    dirtyFields,
-    getValues,
-    maxTokens,
-    setValue,
-    openAiKey,
-    model,
-    isDefaultBrain,
-  } = useBrainFormState();
+  const { getValues, maxTokens, setValue, openAiKey, model, isDefaultBrain } =
+    useBrainFormState();
 
   const accessibleModels = getAccessibleModels({
     openAiKey,
@@ -52,7 +45,7 @@ export const useSettingsTab = ({ brainId }: UseSettingsTabProps) => {
     const handleKeyPress = (event: KeyboardEvent) => {
       if (event.key === "Enter") {
         event.preventDefault();
-        void handleSubmit(true);
+        void handleSubmit();
       }
     };
 
@@ -93,12 +86,8 @@ export const useSettingsTab = ({ brainId }: UseSettingsTabProps) => {
     }
   };
 
-  const handleSubmit = async (checkDirty: boolean) => {
-    const hasChanges = Object.keys(dirtyFields).length > 0;
-    if (!hasChanges && checkDirty) {
-      return;
-    }
-    const { name} = getValues();
+  const handleSubmit = async () => {
+    const { name } = getValues();
 
     checkBrainName(name, publish, t);
 

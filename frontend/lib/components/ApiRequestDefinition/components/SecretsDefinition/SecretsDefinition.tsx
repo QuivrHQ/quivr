@@ -18,7 +18,12 @@ const paramsNameStyle = "flex flex-1 justify-center";
 export const SecretsDefinition = (): JSX.Element => {
   const { t } = useTranslation(["brain", "external_api_definition"]);
 
-  const { control, register } = useSecretsDefinition();
+  const {
+    control,
+    register,
+    isApiDefinitionReadOnly,
+    isUpdatingApiDefinition,
+  } = useSecretsDefinition();
 
   const { fields, append, remove } = useFieldArray({
     control,
@@ -38,7 +43,9 @@ export const SecretsDefinition = (): JSX.Element => {
           <div className={paramsNameStyle}>{t("api_brain.name")}</div>
           <div className={paramsNameStyle}>{t("api_brain.description")}</div>
           <div className={paramsNameStyle}>{t("api_brain.type")}</div>
-          <div className={paramsNameStyle}>{t("api_brain.value")}</div>
+          {!isUpdatingApiDefinition && (
+            <div className={paramsNameStyle}>{t("api_brain.value")}</div>
+          )}
         </div>
       </div>
       {fields.map((field, index) => (
@@ -56,6 +63,7 @@ export const SecretsDefinition = (): JSX.Element => {
             append(defaultSecretDefinitionRow);
           }}
           className="p-2"
+          disabled={isApiDefinitionReadOnly}
           variant={"secondary"}
         >
           <MdAdd size={20} /> {t("api_brain.addRow")}

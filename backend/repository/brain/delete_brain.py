@@ -8,7 +8,7 @@ from repository.api_brain_definition.delete_api_brain_definition import (
     delete_api_brain_definition,
 )
 from repository.brain import get_brain_by_id
-from repository.brain.delete_brain_secrets import delete_brain_secrets
+from repository.brain.delete_brain_secrets import delete_brain_secrets_values
 from repository.knowledge.remove_brain_all_knowledge import (
     remove_brain_all_knowledge,
 )
@@ -22,7 +22,7 @@ def delete_brain(brain_id: UUID) -> dict[str, str]:
         raise HTTPException(status_code=404, detail="Brain not found.")
 
     if brain_to_delete.brain_type == BrainType.API:
-        delete_brain_secrets(
+        delete_brain_secrets_values(
             brain_id=brain_id,
         )
         delete_api_brain_definition(brain_id=brain_id)
