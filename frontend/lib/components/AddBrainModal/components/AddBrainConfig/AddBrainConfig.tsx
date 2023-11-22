@@ -33,7 +33,6 @@ export const AddBrainConfig = ({
   const {
     isShareModalOpen,
     setIsShareModalOpen,
-    temperature,
     maxTokens,
     model,
     isPending,
