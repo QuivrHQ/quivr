@@ -109,8 +109,12 @@ class APIBrainQA(
                     yield value
 
             else:
-                content = chunk.choices[0].delta.content
-                yield content
+                if hasattr(chunk.choices[0], 'delta') and chunk.choices[0].delta and hasattr(chunk.choices[0].delta, 'content'):
+                    content = chunk.choices[0].delta.content
+                    yield content
+                else: # pragma: no cover
+                    yield "**Response too long, truncating...**"
+                    break
 
     async def generate_stream(self, chat_id: UUID, question: ChatQuestion):
         if not question.brain_id:

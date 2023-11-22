@@ -61,5 +61,6 @@
   "update_secrets_message": "Ingrese su contraseña. Esta información es necesaria para identificarlo al llamar a la API",
   "update_secrets_button": "Actualizar secretos",
   "secrets_updated": "Secretos actualizados",
-  "secrets_update_error": "Error al actualizar secretos"
+  "secrets_update_error": "Error al actualizar secretos",
+  "manage_brain": "Gestionar cerebro"
 }

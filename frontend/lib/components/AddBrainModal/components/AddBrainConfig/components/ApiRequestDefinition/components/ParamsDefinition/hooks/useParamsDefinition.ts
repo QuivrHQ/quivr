@@ -1,41 +1,32 @@
 import { useEffect } from "react";
 import { useForm, useFormContext, useWatch } from "react-hook-form";
 
-import { ApiBrainDefinitionSchema } from "@/lib/api/brain/types";
-
-import { defaultParamDefinitionRow } from "../config";
+import { useParamsDefinitionDefaultValues } from "./useParamsDefinitionDefaultValues";
+import { CreateBrainProps } from "../../../../../types";
 import { ParameterDefinition } from "../types";
-import { mapApiBrainDefinitionSchemaToParameterDefinition } from "../utils/mapApiBrainDefinitionSchemaToParameterDefinition";
 import { mapParameterDefinitionToApiBrainDefinitionSchema } from "../utils/mapParameterDefinitionToApiBrainDefinitionSchema";
 
 type UseParamsDefinitionProps = {
-  name: string;
+  name: "search_params" | "params";
 };
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const useParamsDefinition = ({ name }: UseParamsDefinitionProps) => {
-  const { getValues: getContextValues } = useFormContext<{
-    [name: string]: ApiBrainDefinitionSchema;
-  }>();
+  const dataKey = `brain_definition.${name}` as const;
 
-  const { setValue } = useFormContext();
+  const { setValue: setContextValue } = useFormContext<CreateBrainProps>();
+
+  const { defaultValues } = useParamsDefinitionDefaultValues({
+    dataKey,
+  });
 
   const { control, register } = useForm<{
     [name: string]: ParameterDefinition[];
   }>({
     defaultValues: {
-      [name]: [defaultParamDefinitionRow],
+      [name]: defaultValues,
     },
   });
-
-  useEffect(() => {
-    const existingDefinition = getContextValues(name);
-
-    setValue(
-      name,
-      mapApiBrainDefinitionSchemaToParameterDefinition(existingDefinition)
-    );
-  }, [name, getContextValues, setValue]);
 
   const params = useWatch({
     control,
@@ -47,11 +38,11 @@ export const useParamsDefinition = ({ name }: UseParamsDefinitionProps) => {
       (param) => param.name !== "" && param.description !== ""
     );
 
-    setValue(
-      name,
+    setContextValue(
+      dataKey,
       mapParameterDefinitionToApiBrainDefinitionSchema(paramsWithValues)
     );
-  }, [params, name, setValue]);
+  }, [params, name, setContextValue, dataKey]);
 
   return {
     control,

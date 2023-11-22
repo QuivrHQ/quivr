@@ -1,5 +1,7 @@
 import { ApiBrainDefinitionSchemaPropertyType } from "@/lib/api/brain/types";
 
+import { brainSecretsSchemaDefinitionKeyInForm } from "./config";
+
 export type SecretDefinition = {
   name: string;
   type: ApiBrainDefinitionSchemaPropertyType;
@@ -8,5 +10,5 @@ export type SecretDefinition = {
 };
 
 export type SecretRelatedFields = {
-  [name: string]: SecretDefinition[];
+  [brainSecretsSchemaDefinitionKeyInForm]: SecretDefinition[];
 };
