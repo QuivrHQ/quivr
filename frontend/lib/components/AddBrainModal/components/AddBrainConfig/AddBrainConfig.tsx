@@ -1,6 +1,5 @@
 /* eslint-disable max-lines */
 
-import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import { useTranslation } from "react-i18next";
 import { MdAdd } from "react-icons/md";
 
@@ -27,8 +26,6 @@ export const AddBrainConfig = ({
   triggerClassName,
 }: AddBrainConfigProps): JSX.Element => {
   const { t } = useTranslation(["translation", "brain", "config"]);
-
-  const brainApiIsOn = useFeatureIsOn("brain-api");
 
   const {
     isShareModalOpen,
@@ -101,7 +98,7 @@ export const AddBrainConfig = ({
               {...register("status")}
             />
           </fieldset>
-          {brainApiIsOn && (
+          
             <>
               <fieldset className="w-full flex flex-col">
                 <Radio
@@ -113,7 +110,7 @@ export const AddBrainConfig = ({
               </fieldset>
               <ApiRequestDefinition />
             </>
-          )}
+          
 
           <fieldset className="w-full flex flex-col">
             <label className="flex-1 text-sm" htmlFor="model">
