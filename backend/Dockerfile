@@ -13,6 +13,8 @@ RUN apt-get clean && apt-get update && apt-get install -y \
     pandoc \
     curl \
     git \
+    poppler-utils \
+    tesseract-ocr \
     build-essential && \
     rm -rf /var/lib/apt/lists/* && apt-get clean
 
