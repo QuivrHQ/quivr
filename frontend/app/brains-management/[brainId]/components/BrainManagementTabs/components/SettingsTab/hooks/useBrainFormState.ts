@@ -23,7 +23,7 @@ export const useBrainFormState = () => {
     setValue,
     reset,
     resetField,
-    formState: { dirtyFields },
+    formState: { defaultValues, dirtyFields },
   } = useFormContext<BrainConfig>();
 
   const { brain, refetchBrain } = useBrainFetcher({
@@ -54,8 +54,6 @@ export const useBrainFormState = () => {
         continue;
       }
 
-     
-
       // @ts-expect-error bad type inference from typescript
       // eslint-disable-next-line
       if (Boolean(brain[key])) setValue(key, brain[key]);
@@ -81,6 +79,7 @@ export const useBrainFormState = () => {
     isDefaultBrain,
     promptId,
     openAiKey,
+    defaultValues,
     dirtyFields,
     status,
     register,

@@ -22,7 +22,7 @@ export const ParamsDefinition = ({
   description,
 }: ParamsDefinitionProps): JSX.Element => {
   const { t } = useTranslation(["brain"]);
-  const { control, register } = useParamsDefinition({
+  const { control, register, isApiDefinitionReadOnly } = useParamsDefinition({
     name,
   });
 
@@ -61,6 +61,7 @@ export const ParamsDefinition = ({
           onClick={() => {
             append(defaultParamDefinitionRow);
           }}
+          disabled={isApiDefinitionReadOnly}
           className="p-2"
           variant={"secondary"}
         >

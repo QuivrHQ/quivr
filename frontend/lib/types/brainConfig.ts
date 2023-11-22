@@ -1,3 +1,7 @@
+import { UUID } from "crypto";
+
+import { ApiBrainDefinition } from "../api/brain/types";
+
 export const brainStatuses = ["private", "public"] as const;
 
 export type BrainStatus = (typeof brainStatuses)[number];
@@ -8,7 +12,9 @@ export type BrainType = (typeof brainTypes)[number];
 
 export type Model = (typeof freeModels)[number];
 
+// TODO: update this type to match the backend (antropic, openai and some other keys should be removed)
 export type BrainConfig = {
+  id: UUID;
   model: Model;
   temperature: number;
   maxTokens: number;
@@ -27,11 +33,8 @@ export type BrainConfig = {
   };
   name: string;
   description: string;
-  setDefault: boolean;
-};
-
-export type BrainConfigContextType = {
-  config: BrainConfig;
+} & {
+  brain_definition?: ApiBrainDefinition;
 };
 
 export const openAiFreeModels = ["gpt-3.5-turbo","gpt-3.5-turbo-1106", "gpt-3.5-turbo-16k"] as const;
