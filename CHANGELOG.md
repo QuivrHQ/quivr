@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.0.117 (2023-11-22)
+
+## What's Changed
+* fix: 🐛 api by @StanGirard in https://github.com/StanGirard/quivr/pull/1676
+* fix: persist api brain creation data on tab change by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1680
+* feat: 🎸 tokens by @StanGirard in https://github.com/StanGirard/quivr/pull/1678
+* feat: allow updating api brain definition by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1682
+* feat: make brain description required by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1684
+
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.116...v0.0.117
+
 ## 0.0.116 (2023-11-21)
 
 ## What's Changed
