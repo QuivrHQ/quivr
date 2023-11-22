@@ -12,7 +12,8 @@ import { useToast } from "@/lib/hooks";
 import { useUserData } from "@/lib/hooks/useUserData";
 
 import { useBrainFormState } from "./useBrainFormState";
-import { checkBrainName } from "../utils/checkBrainName";
+import { isBrainDescriptionValid } from "../utils/isBrainDescriptionValid";
+import { isBrainNameValid } from "../utils/isBrainNameValid";
 
 type UseSettingsTabProps = {
   brainId: UUID;
@@ -29,15 +30,8 @@ export const useSettingsTab = ({ brainId }: UseSettingsTabProps) => {
   const { fetchAllBrains, fetchDefaultBrain } = useBrainContext();
   const { userData } = useUserData();
 
-  const {
-    dirtyFields,
-    getValues,
-    maxTokens,
-    setValue,
-    openAiKey,
-    model,
-    isDefaultBrain,
-  } = useBrainFormState();
+  const { getValues, maxTokens, setValue, openAiKey, model, isDefaultBrain } =
+    useBrainFormState();
 
   const accessibleModels = getAccessibleModels({
     openAiKey,
@@ -52,7 +46,7 @@ export const useSettingsTab = ({ brainId }: UseSettingsTabProps) => {
     const handleKeyPress = (event: KeyboardEvent) => {
       if (event.key === "Enter") {
         event.preventDefault();
-        void handleSubmit(true);
+        void handleSubmit();
       }
     };
 
@@ -93,14 +87,15 @@ export const useSettingsTab = ({ brainId }: UseSettingsTabProps) => {
     }
   };
 
-  const handleSubmit = async (checkDirty: boolean) => {
-    const hasChanges = Object.keys(dirtyFields).length > 0;
-    if (!hasChanges && checkDirty) {
+  const handleSubmit = async () => {
+    const { name, description } = getValues();
+
+    if (
+      !isBrainNameValid(name, publish, t) ||
+      !isBrainDescriptionValid(description, publish, t)
+    ) {
       return;
     }
-    const { name} = getValues();
-
-    checkBrainName(name, publish, t);
 
     try {
       setIsUpdating(true);

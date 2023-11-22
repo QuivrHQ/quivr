@@ -26,7 +26,9 @@ from repository.brain import (
     update_brain_by_id,
 )
 from repository.brain.get_brain_for_user import get_brain_for_user
-from repository.external_api_secret.update_secret import update_secret
+from repository.external_api_secret.update_secret_value import (
+    update_secret_value,
+)
 from repository.prompt import delete_prompt_by_id, get_prompt_by_id
 
 from routes.authorizations.brain_authorization import has_brain_authorization
@@ -156,7 +158,7 @@ async def update_existing_brain(
 
 
 @brain_router.put(
-    "/brains/{brain_id}/secrets",
+    "/brains/{brain_id}/secrets-values",
     dependencies=[
         Depends(AuthBearer()),
     ],
@@ -206,7 +208,7 @@ async def update_existing_brain_secrets(
                 detail=f"Secret {key} is not a valid secret.",
             )
         if value:
-            update_secret(
+            update_secret_value(
                 user_id=current_user.id,
                 brain_id=brain_id,
                 secret_name=key,

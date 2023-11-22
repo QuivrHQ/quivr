@@ -149,5 +149,5 @@ export const updateBrainSecrets = async (
   secrets: Record<string, string>,
   axiosInstance: AxiosInstance
 ): Promise<void> => {
-  await axiosInstance.put(`/brains/${brainId}/secrets`, secrets);
+  await axiosInstance.put(`/brains/${brainId}/secrets-values`, secrets);
 };

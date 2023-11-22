@@ -4,7 +4,7 @@ from repository.external_api_secret.create_secret import create_secret
 from repository.external_api_secret.delete_secret import delete_secret
 
 
-def update_secret(
+def update_secret_value(
     user_id: UUID,
     brain_id: UUID,
     secret_name: str,

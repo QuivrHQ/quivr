@@ -247,7 +247,7 @@ describe("useBrainApi", () => {
     await updateBrainSecrets(brainId, secrets);
     expect(axiosPutMock).toHaveBeenCalledTimes(1);
     expect(axiosPutMock).toHaveBeenCalledWith(
-      `/brains/${brainId}/secrets`,
+      `/brains/${brainId}/secrets-values`,
       secrets
     );
   });

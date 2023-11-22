@@ -11,10 +11,10 @@ import { Modal } from "@/lib/components/ui/Modal";
 import { defineMaxTokens } from "@/lib/helpers/defineMaxTokens";
 import { cn } from "@/lib/utils";
 
-import { ApiRequestDefinition } from "./components/ApiRequestDefinition";
 import { PublicAccessConfirmationModal } from "./components/PublicAccessConfirmationModal";
 import { useAddBrainConfig } from "./hooks/useAddBrainConfig";
 import { useAddBrainConfigLabels } from "./hooks/useAddBrainConfigLabels";
+import { ApiRequestDefinition } from "../../../ApiRequestDefinition";
 import { Divider } from "../../../ui/Divider";
 import { Radio } from "../../../ui/Radio";
 import { TextArea } from "../../../ui/TextArea";
@@ -33,7 +33,6 @@ export const AddBrainConfig = ({
   const {
     isShareModalOpen,
     setIsShareModalOpen,
-    temperature,
     maxTokens,
     model,
     isPending,
@@ -115,7 +114,6 @@ export const AddBrainConfig = ({
               <ApiRequestDefinition />
             </>
           )}
-          
 
           <fieldset className="w-full flex flex-col">
             <label className="flex-1 text-sm" htmlFor="model">
@@ -134,20 +132,7 @@ export const AddBrainConfig = ({
             </select>
           </fieldset>
 
-          <fieldset className="w-full flex mt-4">
-            <label className="flex-1" htmlFor="temp">
-              {t("temperature", { ns: "config" })}: {temperature}
-            </label>
-            <input
-              id="temp"
-              type="range"
-              min="0"
-              max="1"
-              step="0.01"
-              value={temperature}
-              {...register("temperature")}
-            />
-          </fieldset>
+          
           <fieldset className="w-full flex mt-4">
             <label className="flex-1" htmlFor="tokens">
               {t("maxTokens", { ns: "config" })}: {maxTokens}
