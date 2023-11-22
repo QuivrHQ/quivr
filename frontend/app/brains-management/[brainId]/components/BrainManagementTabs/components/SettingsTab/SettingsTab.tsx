@@ -6,9 +6,8 @@ import { useTranslation } from "react-i18next";
 import { FaSpinner } from "react-icons/fa";
 
 import { Divider } from "@/lib/components/ui/Divider";
-import { defaultBrainConfig } from "@/lib/config/defaultBrainConfig";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
-import { BrainConfig } from "@/lib/types/brainConfig";
+import { Brain } from "@/lib/context/BrainProvider/types";
 
 import { GeneralInformation, ModelSelection, Prompt } from "./components";
 import { AccessConfirmationModal } from "./components/PrivateAccessConfirmationModal/AccessConfirmationModal";
@@ -103,9 +102,7 @@ export const SettingsTabContent = ({
 };
 
 export const SettingsTab = ({ brainId }: SettingsTabProps): JSX.Element => {
-  const methods = useForm<BrainConfig>({
-    defaultValues: defaultBrainConfig,
-  });
+  const methods = useForm<Brain>();
 
   return (
     <FormProvider {...methods}>
