@@ -7,11 +7,13 @@ export const defineMaxTokens = (
   switch (model) {
     case "gpt-3.5-turbo":
       return 1000;
+    case "gpt-3.5-turbo-1106":
+      return 1000;
     case "gpt-3.5-turbo-16k":
       return 4000;
     case "gpt-4":
       return 4000;
     default:
-      return 500;
+      return 1000;
   }
 };
