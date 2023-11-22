@@ -35,6 +35,7 @@ export const useLanguageHook = (): {
   change: (newLanguage: string) => void;
   allLanguages: Language;
   currentLanguage: string | undefined;
+  handleToggleLanguage: () => void;
 } => {
   const { i18n } = useTranslation();
   const [allLanguages, setAllLanguages] = useState<Language>({});
@@ -59,9 +60,20 @@ export const useLanguageHook = (): {
     void i18n.changeLanguage(newLanguage);
   };
 
+  const handleToggleLanguage = () => {
+    const savedLanguage =
+      localStorage.getItem("selectedLanguage") ?? getBrowserLang();
+    if (savedLanguage === "zh_cn") {
+      change("en");
+    } else {
+      change("zh_cn");
+    }
+  };
+
   return {
     change,
     allLanguages,
     currentLanguage,
+    handleToggleLanguage,
   };
 };
