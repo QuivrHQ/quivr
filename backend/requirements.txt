@@ -35,4 +35,4 @@ celery[sqs]
 python-dotenv
 pytest-mock
 pytest-celery
-
+pytesseract==0.3.10

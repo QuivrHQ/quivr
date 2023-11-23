@@ -7,6 +7,7 @@ const nextConfig = {
       "quivr-cms.s3.eu-west-3.amazonaws.com",
       "www.gravatar.com",
       "media.licdn.com",
+      "*",
     ],
   },
   // eslint-disable-next-line prefer-arrow/prefer-arrow-functions
@@ -43,6 +44,7 @@ const ContentSecurityPolicy = {
     "https://www.gravatar.com",
     "https://quivr-cms.s3.eu-west-3.amazonaws.com",
     "data:",
+    "*",
   ],
   "media-src": [
     "'self'",
