@@ -1,18 +1,19 @@
-import { UUID } from "crypto";
-import { useForm } from "react-hook-form";
+/* eslint-disable complexity */
 
-import { defaultBrainConfig } from "@/lib/config/defaultBrainConfig";
+import { useCallback, useEffect } from "react";
+import { useFormContext } from "react-hook-form";
+
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
+import { Brain } from "@/lib/context/BrainProvider/types";
+import { useUrlBrain } from "@/lib/hooks/useBrainIdFromUrl";
 import { BrainConfig } from "@/lib/types/brainConfig";
 
 import { useBrainFetcher } from "../../../hooks/useBrainFetcher";
 
-type UseBrainFormStateProps = {
-  brainId: UUID;
-};
-
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-export const useBrainFormState = ({ brainId }: UseBrainFormStateProps) => {
+export const useBrainFormState = () => {
+  const { brainId } = useUrlBrain();
+
   const { defaultBrainId } = useBrainContext();
 
   const {
@@ -23,10 +24,9 @@ export const useBrainFormState = ({ brainId }: UseBrainFormStateProps) => {
     reset,
     resetField,
     formState: { dirtyFields },
-  } = useForm<BrainConfig>({
-    defaultValues: { ...defaultBrainConfig, status: undefined },
-  });
-  const { brain } = useBrainFetcher({
+  } = useFormContext<BrainConfig>();
+
+  const { brain, refetchBrain } = useBrainFetcher({
     brainId,
   });
 
@@ -38,8 +38,46 @@ export const useBrainFormState = ({ brainId }: UseBrainFormStateProps) => {
   const maxTokens = watch("maxTokens");
   const status = watch("status");
 
+  const updateFormValues = useCallback(() => {
+    if (brain === undefined) {
+      return;
+    }
+
+    for (const key in brain) {
+      const brainKey = key as keyof Brain;
+      if (!(key in brain)) {
+        return;
+      }
+
+      if (brainKey === "max_tokens" && brain["max_tokens"] !== undefined) {
+        setValue("maxTokens", brain["max_tokens"]);
+        continue;
+      }
+
+      if (brainKey === "openai_api_key") {
+        setValue("openAiKey", brain["openai_api_key"] ?? "");
+        continue;
+      }
+
+      // @ts-expect-error bad type inference from typescript
+      // eslint-disable-next-line
+      if (Boolean(brain[key])) setValue(key, brain[key]);
+    }
+
+    setTimeout(() => {
+      if (brain.model !== undefined && brain.model !== null) {
+        setValue("model", brain.model);
+      }
+    }, 50);
+  }, [brain, setValue]);
+
+  useEffect(() => {
+    updateFormValues();
+  }, [brain, updateFormValues]);
+
   return {
     brain,
+    brainId,
     model,
     temperature,
     maxTokens,
@@ -53,5 +91,6 @@ export const useBrainFormState = ({ brainId }: UseBrainFormStateProps) => {
     setValue,
     reset,
     resetField,
+    refetchBrain,
   };
 };
