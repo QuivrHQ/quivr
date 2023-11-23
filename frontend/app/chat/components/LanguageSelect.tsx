@@ -15,7 +15,7 @@ import { cn } from "@/lib/utils";
 export const LanguageSelect = ({
   isSelect,
 }: {
-  isSelect?: boolean;
+  isSelect: boolean;
 }): JSX.Element => {
   const { allLanguages, currentLanguage, change, handleToggleLanguage } =
     useLanguageHook();
@@ -106,6 +106,7 @@ export const LanguageSelect = ({
       {!isSelect && (
         <div>
           <button
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-return
             onClick={() => handleToggleLanguage()}
             className="text-white hover:text-slate-200 cursor-pointer  text-xs  bg-transparent py-1.5 px-3 text-left   sm:text-sm sm:leading-6"
           >
