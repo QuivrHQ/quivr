@@ -2,6 +2,7 @@ from typing import Optional
 from uuid import UUID
 
 from logger import get_logger
+from models.ApiBrainDefinition import ApiBrainDefinition
 from models.brain_entity import (
     BrainEntity,
     BrainType,
@@ -25,7 +26,6 @@ class CreateBrainProperties(BaseModel, extra=Extra.forbid):
     model: Optional[str]
     temperature: Optional[float] = 0.0
     max_tokens: Optional[int] = 256
-    openai_api_key: Optional[str] = None
     prompt_id: Optional[UUID] = None
     brain_type: Optional[BrainType] = BrainType.DOC
     brain_definition: Optional[CreateApiBrainDefinition]
@@ -44,9 +44,9 @@ class BrainUpdatableProperties(BaseModel):
     temperature: Optional[float]
     model: Optional[str]
     max_tokens: Optional[int]
-    openai_api_key: Optional[str]
     status: Optional[str]
     prompt_id: Optional[UUID]
+    brain_definition: Optional[ApiBrainDefinition]
 
     def dict(self, *args, **kwargs):
         brain_dict = super().dict(*args, **kwargs)
@@ -75,7 +75,7 @@ class Brain(Repository):
     def get_user_brains(self, user_id) -> list[MinimalBrainEntity]:
         response = (
             self.db.from_("brains_users")
-            .select("id:brain_id, rights, brains (brain_id, name, status)")
+            .select("id:brain_id, rights, brains (brain_id, name, status, brain_type)")
             .filter("user_id", "eq", user_id)
             .execute()
         )
@@ -87,6 +87,7 @@ class Brain(Repository):
                     name=item["brains"]["name"],
                     rights=item["rights"],
                     status=item["brains"]["status"],
+                    brain_type=item["brains"]["brain_type"],
                 )
             )
             user_brains[-1].rights = item["rights"]
@@ -122,7 +123,9 @@ class Brain(Repository):
     def get_brain_for_user(self, user_id, brain_id) -> MinimalBrainEntity | None:
         response = (
             self.db.from_("brains_users")
-            .select("id:brain_id, rights, brains (id: brain_id, status, name)")
+            .select(
+                "id:brain_id, rights, brains (id: brain_id, status, name, brain_type)"
+            )
             .filter("user_id", "eq", user_id)
             .filter("brain_id", "eq", brain_id)
             .execute()
@@ -136,6 +139,7 @@ class Brain(Repository):
             name=brain_data["brains"]["name"],
             rights=brain_data["rights"],
             status=brain_data["brains"]["status"],
+            brain_type=brain_data["brains"]["brain_type"],
         )
 
     def get_brain_details(self, brain_id):

@@ -19,7 +19,6 @@ class Brain(BaseModel):
     model: Optional[str] = None
     temperature: Optional[float] = 0.0
     max_tokens: Optional[int] = 256
-    openai_api_key: Optional[str] = None
     files: List[Any] = []
     prompt_id: Optional[UUID] = None
 

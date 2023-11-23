@@ -40,6 +40,7 @@
   "updatingBrainSettings": "Обновление настроек мозга...",
   "defaultBrainSet": "Мозг успешно установлен по умолчанию",
   "nameRequired": "Имя обязательно",
+  "descriptionRequired": "Описание обязательно",
   "promptFieldsRequired": "Название и содержание запроса обязательны",
   "brainUpdated": "Мозг успешно обновлен",
   "publicPrompts": "Выбрать из публичных запросов",

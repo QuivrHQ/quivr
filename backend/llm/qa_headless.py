@@ -32,19 +32,10 @@ class HeadlessQA(BaseModel):
     model: str
     temperature: float = 0.0
     max_tokens: int = 2000
-    user_openai_api_key: Optional[str] = None
-    openai_api_key: Optional[str] = None
     streaming: bool = False
     chat_id: str
     callbacks: Optional[List[AsyncIteratorCallbackHandler]] = None
     prompt_id: Optional[UUID] = None
-
-    def _determine_api_key(self, openai_api_key, user_openai_api_key):
-        """If user provided an API key, use it."""
-        if user_openai_api_key is not None:
-            return user_openai_api_key
-        else:
-            return openai_api_key
 
     def _determine_streaming(self, streaming: bool) -> bool:
         """If the model name allows for streaming and streaming is declared, set streaming to True."""
@@ -61,11 +52,6 @@ class HeadlessQA(BaseModel):
 
     def __init__(self, **data):
         super().__init__(**data)
-        print("in HeadlessQA")
-
-        self.openai_api_key = self._determine_api_key(
-            self.openai_api_key, self.user_openai_api_key
-        )
         self.streaming = self._determine_streaming(self.streaming)
         self.callbacks = self._determine_callback_array(self.streaming)
 
@@ -93,7 +79,6 @@ class HeadlessQA(BaseModel):
             streaming=streaming,
             verbose=True,
             callbacks=callbacks,
-            openai_api_key=self.openai_api_key,
         )
 
     def _create_prompt_template(self):

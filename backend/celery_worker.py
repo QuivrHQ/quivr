@@ -56,9 +56,7 @@ else:
 def process_file_and_notify(
     file_name: str,
     file_original_name: str,
-    enable_summarization,
     brain_id,
-    openai_api_key,
     notification_id=None,
 ):
     supabase_client = get_supabase_client()
@@ -81,9 +79,7 @@ def process_file_and_notify(
         message = loop.run_until_complete(
             filter_file(
                 file=file_instance,
-                enable_summarization=enable_summarization,
                 brain_id=brain_id,
-                openai_api_key=openai_api_key,
                 original_file_name=file_original_name,
             )
         )
@@ -112,9 +108,7 @@ def process_file_and_notify(
 @celery.task(name="process_crawl_and_notify")
 def process_crawl_and_notify(
     crawl_website_url,
-    enable_summarization,
     brain_id,
-    openai_api_key,
     notification_id=None,
 ):
     crawl_website = CrawlWebsite(url=crawl_website_url)
@@ -136,9 +130,7 @@ def process_crawl_and_notify(
         message = loop.run_until_complete(
             filter_file(
                 file=file_instance,
-                enable_summarization=enable_summarization,
                 brain_id=brain_id,
-                openai_api_key=openai_api_key,
                 original_file_name=crawl_website_url,
             )
         )
@@ -147,9 +139,7 @@ def process_crawl_and_notify(
         message = loop.run_until_complete(
             process_github(
                 repo=crawl_website.url,
-                enable_summarization="false",
                 brain_id=brain_id,
-                user_openai_api_key=openai_api_key,
             )
         )
 

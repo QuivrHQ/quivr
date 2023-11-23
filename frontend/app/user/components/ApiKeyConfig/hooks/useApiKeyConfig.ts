@@ -1,9 +1,7 @@
 /* eslint-disable max-lines */
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
-import { useTranslation } from "react-i18next";
 
-import { validateOpenAIKey } from "@/app/brains-management/[brainId]/components/BrainManagementTabs/components/SettingsTab/utils/validateOpenAIKey";
 import { useAuthApi } from "@/lib/api/auth/useAuthApi";
 import { USER_IDENTITY_DATA_KEY } from "@/lib/api/user/config";
 import { useUserApi } from "@/lib/api/user/useUserApi";
@@ -26,7 +24,6 @@ export const useApiKeyConfig = () => {
   const { createApiKey } = useAuthApi();
   const { publish } = useToast();
   const [userIdentity, setUserIdentity] = useState<UserIdentity>();
-  const { t } = useTranslation(["config"]);
   const queryClient = useQueryClient();
   const { data: userData } = useQuery({
     queryKey: [USER_IDENTITY_DATA_KEY],
@@ -66,25 +63,9 @@ export const useApiKeyConfig = () => {
     try {
       setChangeOpenAiApiKeyRequestPending(true);
 
-      if (
-        openAiApiKey !== undefined &&
-        openAiApiKey !== null &&
-        !(await validateOpenAIKey(
-          openAiApiKey,
-          {
-            badApiKeyError: t("incorrectApiKey", { ns: "config" }),
-            invalidApiKeyError: t("invalidApiKeyError", { ns: "config" }),
-          },
-          publish
-        ))
-      ) {
-        setChangeOpenAiApiKeyRequestPending(false);
-
-        return;
-      }
+      
 
       await updateUserIdentity({
-        openai_api_key: openAiApiKey,
       });
       void queryClient.invalidateQueries({
         queryKey: [USER_IDENTITY_DATA_KEY],
@@ -105,7 +86,6 @@ export const useApiKeyConfig = () => {
     try {
       setChangeOpenAiApiKeyRequestPending(true);
       await updateUserIdentity({
-        openai_api_key: null,
       });
 
       publish({
@@ -123,16 +103,7 @@ export const useApiKeyConfig = () => {
     }
   };
 
-  useEffect(() => {
-    if (userIdentity?.openai_api_key !== undefined) {
-      setOpenAiApiKey(userIdentity.openai_api_key);
-    }
-  }, [userIdentity]);
 
-  const hasOpenAiApiKey =
-    userIdentity?.openai_api_key !== null &&
-    userIdentity?.openai_api_key !== undefined &&
-    userIdentity.openai_api_key !== "";
 
   return {
     handleCreateClick,
@@ -144,6 +115,5 @@ export const useApiKeyConfig = () => {
     changeOpenAiApiKeyRequestPending,
     userIdentity,
     removeOpenAiApiKey,
-    hasOpenAiApiKey,
   };
 };

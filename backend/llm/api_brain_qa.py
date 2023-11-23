@@ -55,7 +55,7 @@ class APIBrainQA(
         response = completion(
             model=self.model,
             temperature=self.temperature,
-            max_tokens=self.max_tokens,
+            max_tokens=2000,
             messages=messages,
             functions=functions,
             stream=True,
@@ -109,8 +109,12 @@ class APIBrainQA(
                     yield value
 
             else:
-                content = chunk.choices[0].delta.content
-                yield content
+                if hasattr(chunk.choices[0], 'delta') and chunk.choices[0].delta and hasattr(chunk.choices[0].delta, 'content'):
+                    content = chunk.choices[0].delta.content
+                    yield content
+                else: # pragma: no cover
+                    yield "**...**"
+                    break
 
     async def generate_stream(self, chat_id: UUID, question: ChatQuestion):
         if not question.brain_id:

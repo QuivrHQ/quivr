@@ -54,6 +54,19 @@ class ApiBrainDefinitions(Repository):
             return None
         return ApiBrainDefinition(**response.data[0])
 
+    def update_api_brain_definition(
+        self, brain_id: UUID, api_brain_definition: ApiBrainDefinition
+    ) -> Optional[ApiBrainDefinition]:
+        response = (
+            self.db.table("api_brain_definition")
+            .update(api_brain_definition.dict(exclude={"brain_id"}))
+            .filter("brain_id", "eq", str(brain_id))
+            .execute()
+        )
+        if len(response.data) == 0:
+            return None
+        return ApiBrainDefinition(**response.data[0])
+
     def delete_api_brain_definition(self, brain_id: UUID) -> None:
         self.db.table("api_brain_definition").delete().filter(
             "brain_id", "eq", str(brain_id)

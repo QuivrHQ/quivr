@@ -5,7 +5,6 @@ import { cookies, headers } from "next/headers";
 
 import { ToastProvider } from "@/lib/components/ui/Toast";
 import { FeatureFlagsProvider } from "@/lib/context";
-import { BrainProvider } from "@/lib/context/BrainProvider";
 import { SupabaseProvider } from "@/lib/context/SupabaseProvider";
 
 import { App } from "./App";
@@ -41,9 +40,7 @@ const RootLayout = async ({
         <FeatureFlagsProvider>
           <ToastProvider>
             <SupabaseProvider session={session}>
-              <BrainProvider>
-                <App>{children}</App>
-              </BrainProvider>
+              <App>{children}</App>
             </SupabaseProvider>
           </ToastProvider>
           <VercelAnalytics />

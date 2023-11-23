@@ -1,5 +1,42 @@
 # Changelog
 
+## 0.0.117 (2023-11-22)
+
+## What's Changed
+* fix: 🐛 api by @StanGirard in https://github.com/StanGirard/quivr/pull/1676
+* fix: persist api brain creation data on tab change by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1680
+* feat: 🎸 tokens by @StanGirard in https://github.com/StanGirard/quivr/pull/1678
+* feat: allow updating api brain definition by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1682
+* feat: make brain description required by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1684
+
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.116...v0.0.117
+
+## 0.0.116 (2023-11-21)
+
+## What's Changed
+* feat: update brain modal in chat input  by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1668
+* feat(apiBrain): add api brain secrets field in knowledge tab by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1669
+* feat(apiBrain): improve ux by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1672
+* feat(feedBrain): add manage button by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1674
+
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.115...v0.0.116
+
+## 0.0.115 (2023-11-20)
+
+## What's Changed
+* fix(apiBrain): fix default type selection by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1642
+* fix: allow user to set a brain as public after creation by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1646
+* fix(brainManagement): fix shared brain access issue by @gozineb in https://github.com/StanGirard/quivr/pull/1641
+* feat: 🎸 docker reduced size by 2 by @StanGirard in https://github.com/StanGirard/quivr/pull/1653
+* feat: 🎸 docker by @StanGirard in https://github.com/StanGirard/quivr/pull/1656
+* feat: 🎸 marketplace by @StanGirard in https://github.com/StanGirard/quivr/pull/1657
+* feat: 🎸 openai by @StanGirard in https://github.com/StanGirard/quivr/pull/1658
+
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.114...v0.0.115
+
 ## 0.0.114 (2023-11-16)
 
 ## What's Changed

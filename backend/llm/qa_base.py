@@ -63,20 +63,11 @@ class QABaseBrainPicking(BaseModel):
     chat_id: str = None  # pyright: ignore reportPrivateUsage=none
     brain_id: str = None  # pyright: ignore reportPrivateUsage=none
     max_tokens: int = 256
-    user_openai_api_key: str = None  # pyright: ignore reportPrivateUsage=none
     streaming: bool = False
 
-    openai_api_key: str = None  # pyright: ignore reportPrivateUsage=none
     callbacks: List[
         AsyncIteratorCallbackHandler
     ] = None  # pyright: ignore reportPrivateUsage=none
-
-    def _determine_api_key(self, openai_api_key, user_openai_api_key):
-        """If user provided an API key, use it."""
-        if user_openai_api_key is not None:
-            return user_openai_api_key
-        else:
-            return openai_api_key
 
     def _determine_streaming(self, model: str, streaming: bool) -> bool:
         """If the model name allows for streaming and streaming is declared, set streaming to True."""
@@ -93,9 +84,7 @@ class QABaseBrainPicking(BaseModel):
 
     @property
     def embeddings(self) -> OpenAIEmbeddings:
-        return OpenAIEmbeddings(
-            openai_api_key=self.openai_api_key
-        )  # pyright: ignore reportPrivateUsage=none
+        return OpenAIEmbeddings()  # pyright: ignore reportPrivateUsage=none
 
     supabase_client: Optional[Client] = None
     vector_store: Optional[CustomSupabaseVectorStore] = None
@@ -160,7 +149,6 @@ class QABaseBrainPicking(BaseModel):
             streaming=streaming,
             verbose=False,
             callbacks=callbacks,
-            openai_api_key=self.openai_api_key,
         )  # pyright: ignore reportPrivateUsage=none
 
     def _create_prompt_template(self):

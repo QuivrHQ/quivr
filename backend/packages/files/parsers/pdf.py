@@ -6,11 +6,9 @@ from .common import process_file
 
 # TODO(pg): different mode can be used to UnstructuredPDFLoader like "paged"
 # => check the docs!
-def process_pdf(file: File, enable_summarization, brain_id, user_openai_api_key):
+def process_pdf(file: File, brain_id):
     return process_file(
         file=file,
         loader_class=UnstructuredPDFLoader,
-        enable_summarization=enable_summarization,
         brain_id=brain_id,
-        user_openai_api_key=user_openai_api_key,
     )
