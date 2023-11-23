@@ -3,6 +3,7 @@ FROM python:3.11-slim-bullseye
 
 ARG DEV_MODE
 ENV DEV_MODE=$DEV_MODE
+ENV PYTHONUNBUFFERED=1
 
 # Install GEOS library, Rust, and other dependencies, then clean up
 RUN apt-get update && apt-get install -y \
