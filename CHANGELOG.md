@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.0.118 (2023-11-22)
+
+## What's Changed
+* docs: add api based brains by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1685
+* Adds pytesseract, tesseract and poopler-utils by @MeTaNoV in https://github.com/StanGirard/quivr/pull/1648
+
+## New Contributors
+* @MeTaNoV made their first contribution in https://github.com/StanGirard/quivr/pull/1648
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.117...v0.0.118
+
 ## 0.0.117 (2023-11-22)
 
 ## What's Changed
