@@ -1,0 +1,1 @@
+from .inputs import OnboardingUpdatableProperties

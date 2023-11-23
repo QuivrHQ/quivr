@@ -3,10 +3,8 @@ from middlewares.auth import (  # Assuming you have a get_current_user function
     AuthBearer,
     get_current_user,
 )
-from models.databases.supabase.onboarding import (
-    OnboardingStates,
-    OnboardingUpdatableProperties,
-)
+from modules.onboarding.dto.inputs import OnboardingUpdatableProperties
+from modules.onboarding.entity.onboarding import OnboardingStates
 from modules.user.entity.user_identity import UserIdentity
 from repository.onboarding.get_user_onboarding import get_user_onboarding
 from repository.onboarding.update_user_onboarding import update_user_onboarding
