@@ -55,7 +55,7 @@ class APIBrainQA(
         response = completion(
             model=self.model,
             temperature=self.temperature,
-            max_tokens=2000,
+            max_tokens=self.max_tokens,
             messages=messages,
             functions=functions,
             stream=True,
@@ -109,10 +109,14 @@ class APIBrainQA(
                     yield value
 
             else:
-                if hasattr(chunk.choices[0], 'delta') and chunk.choices[0].delta and hasattr(chunk.choices[0].delta, 'content'):
+                if (
+                    hasattr(chunk.choices[0], "delta")
+                    and chunk.choices[0].delta
+                    and hasattr(chunk.choices[0].delta, "content")
+                ):
                     content = chunk.choices[0].delta.content
                     yield content
-                else: # pragma: no cover
+                else:  # pragma: no cover
                     yield "**...**"
                     break
 
