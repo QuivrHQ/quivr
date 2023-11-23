@@ -70,3 +70,7 @@ backend/bin/*
 backend/lib/*
 backend/pyvenv.cfg
 backend/share/*
+
+## some PDFs
+backend/Building_Codes/**
+tmp-file-*
