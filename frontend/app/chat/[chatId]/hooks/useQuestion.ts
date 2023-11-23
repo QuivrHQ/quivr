@@ -3,8 +3,9 @@ import { useTranslation } from "react-i18next";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 import { useFetch, useToast } from "@/lib/hooks";
 
-import { useHandleStream } from "./useHandleStream";
 import { ChatQuestion } from "../types";
+// eslint-disable-next-line import/order
+import { useHandleStream } from "./useHandleStream";
 
 interface UseChatService {
   addStreamQuestion: (
@@ -52,7 +53,7 @@ export const useQuestion = (): UseChatService => {
 
     try {
       const response = await fetchInstance.post(
-        `/chat/${chatId}/question/stream?brain_id=${currentBrain?.id ?? ""}`,
+        `chat/${chatId}/question/stream?brain_id=${currentBrain?.id ?? ""}`,
         body,
         headers
       );

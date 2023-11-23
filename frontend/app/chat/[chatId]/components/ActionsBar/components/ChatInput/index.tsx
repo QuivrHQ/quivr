@@ -2,11 +2,11 @@
 import { useTranslation } from "react-i18next";
 import { PiPaperclipFill } from "react-icons/pi";
 
+import { QuestionList } from "@/app/chat/components/QuestionList";
 import Button from "@/lib/components/ui/Button";
 import { useKnowledgeToFeedContext } from "@/lib/context/KnowledgeToFeedProvider/hooks/useKnowledgeToFeedContext";
 import { useSecurity } from "@/services/useSecurity/useSecurity";
 
-import { OnboardingQuestions } from "./components";
 import { ChatBar } from "./components/ChatBar/ChatBar";
 import { ConfigModal } from "./components/ConfigModal";
 import { useChatInput } from "./hooks/useChatInput";
@@ -28,7 +28,7 @@ export const ChatInput = ({
 
   return (
     <>
-      <OnboardingQuestions />
+      <QuestionList />
       <div className="flex mt-1 flex-col w-full shadow-md dark:shadow-primary/25 hover:shadow-xl transition-shadow rounded-xl bg-white dark:bg-black border border-black/10 dark:border-white/25 p-2">
         <form
           data-testid="chat-input-form"
