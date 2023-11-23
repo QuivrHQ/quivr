@@ -3,7 +3,9 @@ from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException
 from middlewares.auth.auth_bearer import AuthBearer, get_current_user
-from models import BrainSubscription, PromptStatusEnum
+from models import BrainSubscription
+from modules.prompt.entity.prompt import PromptStatusEnum
+from modules.prompt.service.prompt_service import PromptService
 from modules.user.entity.user_identity import UserIdentity
 from modules.user.service import get_user_email_by_user_id
 from modules.user.service.get_user_id_by_email import get_user_id_by_email
@@ -26,8 +28,6 @@ from repository.brain_subscription import (
     resend_invitation_email,
 )
 from repository.external_api_secret.create_secret import create_secret
-from repository.prompt import delete_prompt_by_id, get_prompt_by_id
-
 from routes.authorizations.brain_authorization import (
     RoleEnum,
     has_brain_authorization,
@@ -37,6 +37,8 @@ from routes.headers.get_origin_header import get_origin_header
 
 subscription_router = APIRouter()
 subscription_service = SubscriptionInvitationService()
+
+prompt_service = PromptService()
 
 
 @subscription_router.post(
@@ -168,11 +170,13 @@ async def remove_user_subscription(
                 brain_id=brain_id,
             )
             if targeted_brain.prompt_id:
-                brain_to_delete_prompt = get_prompt_by_id(targeted_brain.prompt_id)
+                brain_to_delete_prompt = prompt_service.get_prompt_by_id(
+                    targeted_brain.prompt_id
+                )
                 if brain_to_delete_prompt is not None and (
                     brain_to_delete_prompt.status == PromptStatusEnum.private
                 ):
-                    delete_prompt_by_id(targeted_brain.prompt_id)
+                    prompt_service.delete_prompt_by_id(targeted_brain.prompt_id)
 
         else:
             delete_brain_user(

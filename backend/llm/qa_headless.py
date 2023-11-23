@@ -13,7 +13,7 @@ from llm.utils.get_prompt_to_use_id import get_prompt_to_use_id
 from logger import get_logger
 from models.chats import ChatQuestion
 from models.databases.supabase.chats import CreateChatHistory
-from models.prompt import Prompt
+from modules.prompt.entity.prompt import Prompt
 from pydantic import BaseModel
 from repository.chat import (
     GetChatHistoryOutput,
