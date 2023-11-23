@@ -34,7 +34,7 @@ async def list_knowledge_in_brain_endpoint(
     validate_brain_authorization(brain_id=brain_id, user_id=current_user.id)
 
     knowledges = get_all_knowledge(brain_id)
-    logger.info("List of knowledge from knowledge table", knowledges)
+    logger.info(f"List of knowledge from knowledge table: {knowledges}")
 
     return {"knowledges": knowledges}
 
