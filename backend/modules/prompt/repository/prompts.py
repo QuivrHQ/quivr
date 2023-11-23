@@ -1,40 +1,16 @@
-from typing import Optional
-from uuid import UUID
-
 from fastapi import HTTPException
-from models.databases.repository import Repository
-from models.prompt import Prompt, PromptStatusEnum
-from pydantic import BaseModel
+from modules.prompt.entity.prompt import Prompt
+from modules.prompt.repository.prompts_interface import (
+    DeletePromptResponse,
+    PromptsInterface,
+)
 
 
-class CreatePromptProperties(BaseModel):
-    """Properties that can be received on prompt creation"""
-
-    title: str
-    content: str
-    status: PromptStatusEnum = PromptStatusEnum.private
-
-
-class PromptUpdatableProperties(BaseModel):
-    """Properties that can be received on prompt update"""
-
-    title: Optional[str]
-    content: Optional[str]
-    status: Optional[PromptStatusEnum]
-
-
-class DeletePromptResponse(BaseModel):
-    """Response when deleting a prompt"""
-
-    status: str = "delete"
-    prompt_id: UUID
-
-
-class Prompts(Repository):
+class Prompts(PromptsInterface):
     def __init__(self, supabase_client):
         self.db = supabase_client
 
-    def create_prompt(self, prompt: CreatePromptProperties) -> Prompt:
+    def create_prompt(self, prompt):
         """
         Create a prompt
         """
@@ -43,7 +19,7 @@ class Prompts(Repository):
 
         return Prompt(**response[0])
 
-    def delete_prompt_by_id(self, prompt_id: UUID) -> DeletePromptResponse:
+    def delete_prompt_by_id(self, prompt_id):
         """
         Delete a prompt by id
         Args:
@@ -65,7 +41,7 @@ class Prompts(Repository):
 
         return DeletePromptResponse(status="deleted", prompt_id=prompt_id)
 
-    def get_prompt_by_id(self, prompt_id: UUID) -> Prompt | None:
+    def get_prompt_by_id(self, prompt_id):
         """
         Get a prompt by its id
 
@@ -84,7 +60,7 @@ class Prompts(Repository):
             return None
         return Prompt(**response[0])
 
-    def get_public_prompts(self) -> list[Prompt]:
+    def get_public_prompts(self):
         """
         List all public prompts
         """
@@ -96,9 +72,7 @@ class Prompts(Repository):
             .execute()
         ).data
 
-    def update_prompt_by_id(
-        self, prompt_id: UUID, prompt: PromptUpdatableProperties
-    ) -> Prompt:
+    def update_prompt_by_id(self, prompt_id, prompt):
         """Update a prompt by id"""
 
         response = (

@@ -2,19 +2,16 @@ from uuid import UUID
 
 from fastapi import APIRouter, Depends
 from middlewares.auth import AuthBearer
-from models import Prompt
-from models.databases.supabase.prompts import (
+from modules.prompt.entity.prompt import (
     CreatePromptProperties,
+    Prompt,
     PromptUpdatableProperties,
 )
-from repository.prompt import (
-    create_prompt,
-    get_prompt_by_id,
-    get_public_prompts,
-    update_prompt_by_id,
-)
+from modules.prompt.service import PromptService
 
 prompt_router = APIRouter()
+
+promptService = PromptService()
 
 
 @prompt_router.get("/prompts", dependencies=[Depends(AuthBearer())], tags=["Prompt"])
@@ -22,8 +19,7 @@ async def get_prompts() -> list[Prompt]:
     """
     Retrieve all public prompt
     """
-
-    return get_public_prompts()
+    return promptService.get_public_prompts()
 
 
 @prompt_router.get(
@@ -34,7 +30,7 @@ async def get_prompt(prompt_id: UUID) -> Prompt | None:
     Retrieve a prompt by its id
     """
 
-    return get_prompt_by_id(prompt_id)
+    return promptService.get_prompt_by_id(prompt_id)
 
 
 @prompt_router.put(
@@ -47,7 +43,7 @@ async def update_prompt(
     Update a prompt by its id
     """
 
-    return update_prompt_by_id(prompt_id, prompt)
+    return promptService.update_prompt_by_id(prompt_id, prompt)
 
 
 @prompt_router.post("/prompts", dependencies=[Depends(AuthBearer())], tags=["Prompt"])
@@ -56,4 +52,4 @@ async def create_prompt_route(prompt: CreatePromptProperties) -> Prompt | None:
     Create a prompt by its id
     """
 
-    return create_prompt(prompt)
+    return promptService.create_prompt(prompt)
