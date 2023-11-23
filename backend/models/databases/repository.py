@@ -205,26 +205,6 @@ class Repository(ABC):
         pass
 
     @abstractmethod
-    def create_prompt(self, new_prompt):
-        pass
-
-    @abstractmethod
-    def get_prompt_by_id(self, prompt_id: UUID):
-        pass
-
-    @abstractmethod
-    def delete_prompt_by_id(self, prompt_id: UUID):
-        pass
-
-    @abstractmethod
-    def update_prompt_by_id(self, prompt_id: UUID, updates):
-        pass
-
-    @abstractmethod
-    def get_public_prompts(self):
-        pass
-
-    @abstractmethod
     def add_notification(self, notification):
         pass
 
