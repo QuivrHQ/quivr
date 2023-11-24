@@ -12,8 +12,8 @@ from models.databases.supabase.notifications import CreateNotificationProperties
 from models.notifications import NotificationsStatusEnum
 from modules.user.entity.user_identity import UserIdentity
 from packages.files.file import convert_bytes, get_file_size
-from repository.files.upload_file import upload_file_storage
 from repository.knowledge.add_knowledge import add_knowledge
+from repository.files.upload_file import upload_file_storage
 from repository.notification.add_notification import add_notification
 
 from routes.authorizations.brain_authorization import (
@@ -65,8 +65,8 @@ async def upload_file(
             )
         )
 
-    file_content = await upload_file.read()
-    filename_with_brain_id = str(brain_id) + "/" + str(upload_file.filename)
+    file_content = await uploadFile.read()
+    filename_with_brain_id = str(brain_id) + "/" + str(uploadFile.filename)
 
     try:
         file_in_storage = upload_file_storage(file_content, filename_with_brain_id)
@@ -76,18 +76,18 @@ async def upload_file(
         if "The resource already exists" in str(e):
             raise HTTPException(
                 status_code=403,
-                detail=f"File {upload_file.filename} already exists in storage.",
+                detail=f"File {uploadFile.filename} already exists in storage.",
             )
         else:
             raise HTTPException(
-                status_code=500, detail="Failed to upload file to storage."
+                status_code=500, detail=f"Failed to upload file to storage. {e}"
             )
 
     knowledge_to_add = CreateKnowledgeProperties(
         brain_id=brain_id,
-        file_name=upload_file.filename,
+        file_name=uploadFile.filename,
         extension=os.path.splitext(
-            upload_file.filename  # pyright: ignore reportPrivateUsage=none
+            uploadFile.filename  # pyright: ignore reportPrivateUsage=none
         )[-1].lower(),
     )
 
@@ -96,7 +96,7 @@ async def upload_file(
 
     process_file_and_notify.delay(
         file_name=filename_with_brain_id,
-        file_original_name=upload_file.filename,
+        file_original_name=uploadFile.filename,
         brain_id=brain_id,
         notification_id=upload_notification.id if upload_notification else None,
     )
