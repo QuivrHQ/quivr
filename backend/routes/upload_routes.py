@@ -6,7 +6,7 @@ from celery_worker import process_file_and_notify
 from fastapi import APIRouter, Depends, HTTPException, Query, Request, UploadFile
 from logger import get_logger
 from middlewares.auth import AuthBearer, get_current_user
-from models import Brain, UserUsage
+from models import UserUsage
 from models.databases.supabase.knowledge import CreateKnowledgeProperties
 from models.databases.supabase.notifications import CreateNotificationProperties
 from models.notifications import NotificationsStatusEnum
@@ -15,6 +15,7 @@ from packages.files.file import convert_bytes, get_file_size
 from repository.files.upload_file import upload_file_storage
 from repository.knowledge.add_knowledge import add_knowledge
 from repository.notification.add_notification import add_notification
+
 from routes.authorizations.brain_authorization import (
     RoleEnum,
     validate_brain_authorization,
@@ -40,22 +41,20 @@ async def upload_file(
     validate_brain_authorization(
         brain_id, current_user.id, [RoleEnum.Editor, RoleEnum.Owner]
     )
-    brain = Brain(id=brain_id)
-    userDailyUsage = UserUsage(
+
+    user_daily_usage = UserUsage(
         id=current_user.id,
         email=current_user.email,
     )
-    userSettings = userDailyUsage.get_user_settings()
 
-    remaining_free_space = userSettings.get("max_brain_size", 1000000000)
+    user_settings = user_daily_usage.get_user_settings()
+
+    remaining_free_space = user_settings.get("max_brain_size", 1000000000)
 
     file_size = get_file_size(uploadFile)
     if remaining_free_space - file_size < 0:
-        message = {
-            "message": f"❌ UserIdentity's brain will exceed maximum capacity with this upload. Maximum file allowed is : {convert_bytes(remaining_free_space)}",
-            "type": "error",
-        }
-        return message
+        message = f"Brain will exceed maximum capacity. Maximum file allowed is : {convert_bytes(remaining_free_space)}"
+        raise HTTPException(status_code=403, detail=message)
     upload_notification = None
     if chat_id:
         upload_notification = add_notification(
@@ -66,18 +65,18 @@ async def upload_file(
             )
         )
 
-    file_content = await uploadFile.read()
-    filename_with_brain_id = str(brain_id) + "/" + str(uploadFile.filename)
+    file_content = await upload_file.read()
+    filename_with_brain_id = str(brain_id) + "/" + str(upload_file.filename)
 
     try:
-        fileInStorage = upload_file_storage(file_content, filename_with_brain_id)
-        logger.info(f"File {fileInStorage} uploaded successfully")
+        file_in_storage = upload_file_storage(file_content, filename_with_brain_id)
+        logger.info(f"File {file_in_storage} uploaded successfully")
 
     except Exception as e:
         if "The resource already exists" in str(e):
             raise HTTPException(
                 status_code=403,
-                detail=f"File {uploadFile.filename} already exists in storage.",
+                detail=f"File {upload_file.filename} already exists in storage.",
             )
         else:
             raise HTTPException(
@@ -86,9 +85,9 @@ async def upload_file(
 
     knowledge_to_add = CreateKnowledgeProperties(
         brain_id=brain_id,
-        file_name=uploadFile.filename,
+        file_name=upload_file.filename,
         extension=os.path.splitext(
-            uploadFile.filename  # pyright: ignore reportPrivateUsage=none
+            upload_file.filename  # pyright: ignore reportPrivateUsage=none
         )[-1].lower(),
     )
 
@@ -97,7 +96,7 @@ async def upload_file(
 
     process_file_and_notify.delay(
         file_name=filename_with_brain_id,
-        file_original_name=uploadFile.filename,
+        file_original_name=upload_file.filename,
         brain_id=brain_id,
         notification_id=upload_notification.id if upload_notification else None,
     )

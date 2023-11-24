@@ -68,7 +68,6 @@ def process_file_and_notify(
         f.seek(0)
         file_content = f.read()
 
-        # file_object = io.BytesIO(file_content)
         upload_file = UploadFile(
             file=f, filename=file_name.split("/")[-1], size=len(file_content)
         )
