@@ -31,7 +31,7 @@ def resend_invitation_email(
             {
                 "from": brains_settings.resend_email_address,
                 "to": brain_subscription.email,
-                "subject": "Quivr - Brain Shared With You",
+                "subject": "SpringerAI - Brain Shared With You",
                 "html": html_body,
             }
         )

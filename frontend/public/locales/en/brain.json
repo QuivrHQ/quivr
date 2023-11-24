@@ -31,7 +31,7 @@
   "public_brain_label": "Public",
   "brain_status_label": "Access",
   "set_brain_status_to_public_modal_title": "Are you sure you want to set this as <span class='text-primary'>Public</span>?<br/><br/>",
-  "set_brain_status_to_public_modal_description": "Every Quivr user will be able to:<br/>- Subscribe to your brain in the 'brains library'.<br/>- Use this brain and check the prompt and model configurations.<br/><br/>They won't have access to your uploaded files and people section.",
+  "set_brain_status_to_public_modal_description": "Every SpringerAI user will be able to:<br/>- Subscribe to your brain in the 'brains library'.<br/>- Use this brain and check the prompt and model configurations.<br/><br/>They won't have access to your uploaded files and people section.",
   "confirm_set_brain_status_to_public": "Yes, set as public",
   "cancel_set_brain_status_to_public": "No, keep it private",
   "brain_library_button_label": "Explore",
@@ -42,7 +42,7 @@
   "public_brain_last_update_label": "Last update",
   "public_brain_already_subscribed_button_label": "Subscribed",
   "set_brain_status_to_private_modal_title": "Are you sure you want to set this as <span class='text-primary'>Private</span>?<br/><br/>",
-  "set_brain_status_to_private_modal_description": "Every Quivr users won't be able to use this brain anymore and they won't see it in the brain library.",
+  "set_brain_status_to_private_modal_description": "Every SpringerAI users won't be able to use this brain anymore and they won't see it in the brain library.",
   "confirm_set_brain_status_to_private": "Yes, set as private",
   "cancel_set_brain_status_to_private": "No, keep it public",
   "empty_brain_description": "No description",
@@ -58,9 +58,9 @@
     "addRow": "Add row",
     "value": "Value"
   },
-  "update_secrets_message":"Enter your secret. This information is  required to identify you when calling the API",
-  "update_secrets_button":"Update secrets",
-  "secrets_updated":"Secrets updated",
-  "secrets_update_error":"Error while updating secrets",
+  "update_secrets_message": "Enter your secret. This information is  required to identify you when calling the API",
+  "update_secrets_button": "Update secrets",
+  "secrets_updated": "Secrets updated",
+  "secrets_update_error": "Error while updating secrets",
   "manage_brain": "Manage brain"
 }

@@ -1,7 +1,6 @@
 import time
 from uuid import UUID
 
-from fastapi import HTTPException
 from models import UserUsage
 from models.databases.supabase.supabase import SupabaseDB
 from modules.user.entity.user_identity import UserIdentity
@@ -46,10 +45,12 @@ def check_user_requests_limit(
     userDailyUsage.handle_increment_user_request_count(date)
 
     daily_chat_credit = userSettings.get("daily_chat_credit", 0)
-    if int(userDailyUsage.daily_requests_count) >= int(daily_chat_credit):
-        raise HTTPException(
-            status_code=429,  # pyright: ignore reportPrivateUsage=none
-            detail="You have reached the maximum number of requests for today.",  # pyright: ignore reportPrivateUsage=none
-        )
-    else:
-        pass
+    print("HEEEEERRRRRRRRRREEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE")
+    pass
+    # if int(userDailyUsage.daily_requests_count) >= int(daily_chat_credit):
+    #     raise HTTPException(
+    #         status_code=429,  # pyright: ignore reportPrivateUsage=none
+    #         detail="You have reached the maximum number of requests for today.",  # pyright: ignore reportPrivateUsage=none
+    #     )
+    # else:
+    #     pass

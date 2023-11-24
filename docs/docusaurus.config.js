@@ -5,7 +5,7 @@
 
 /** @type {import('@docusaurus/types').Config} */
 const config = {
-  title: 'Quivr 🧠',
+  title: 'SpringerAI 🧠',
   tagline: 'Your Generative AI second brain',
   favicon: 'img/quivr-logo.ico',
 
@@ -63,9 +63,9 @@ const config = {
       // Replace with your project's social card
       image: 'img/logo.png',
       navbar: {
-        title: 'Quivr',
+        title: 'SpringerAI',
         logo: {
-          alt: 'Quivr logo',
+          alt: 'SpringerAI logo',
           src: 'img/logo.png',
         },
         items: [
@@ -75,7 +75,7 @@ const config = {
             label: 'Try me now',
           },
           {
-            href: 'https://github.com/stangirard/Quivr',
+            href: 'https://github.com/stangirard/SpringerAI',
             label: 'Star us on GitHub',
             position: 'right',
           },
@@ -115,12 +115,12 @@ const config = {
               },
               {
                 label: 'GitHub',
-                href: 'https://github.com/stangirard/Quivr',
+                href: 'https://github.com/stangirard/SpringerAI',
               },
             ],
           },
         ],
-        copyright: `Copyright © ${new Date().getFullYear()} Quivr`,
+        copyright: `Copyright © ${new Date().getFullYear()} SpringerAI`,
       },
       algolia: {
         // The application ID provided by Algolia

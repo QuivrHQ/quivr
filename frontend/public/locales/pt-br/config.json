@@ -23,7 +23,7 @@
     "supabaseKeyLabel": "Chave do Supabase",
     "keepInLocal": "Manter localmente",
     "customPromptSection": "Prompt personalizado",
-    "selectQuivrPersonalityBtn": "Selecione uma personalidade Quivr",
+    "selectSpringerAIPersonalityBtn": "Selecione uma personalidade SpringerAI",
     "promptName": "Título do Prompt",
     "promptNamePlaceholder": "Nome incrível para meu prompt",
     "promptContent": "Conteúdo do Prompt",

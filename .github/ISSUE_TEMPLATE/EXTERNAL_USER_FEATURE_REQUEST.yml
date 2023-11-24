@@ -1,12 +1,12 @@
 name: Feature Request 🚀
-description: Submit a proposal/request for a new Quivr feature.
+description: Submit a proposal/request for a new SpringerAI feature.
 title: "[Feature]: "
 labels: ["enhancement"]
 body:
   - type: markdown
     attributes:
       value: |
-        Thanks for making Quivr better!
+        Thanks for making SpringerAI better!
   - type: textarea
     id: the-feature
     attributes:

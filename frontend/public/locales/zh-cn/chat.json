@@ -37,17 +37,17 @@
   "add_content_card_button_tooltip": "向大脑添加知识",
   "back_to_chat": "返回聊天",
   "onboarding": {
-    "title": "嗨 👋🏻 想要探索 Quivr？😇",
+    "title": "嗨 👋🏻 想要探索 SpringerAI？😇",
     "step_1_1": "1. 在聊天框或 📎 上拖放文件。",
-    "step_1_2": "没有文件？下载 “Quivr 文档”",
+    "step_1_2": "没有文件？下载 “SpringerAI 文档”",
     "step_2": "2. 开始与您的文件聊天。",
     "step_3": "3. 尽情享受！",
-    "how_to_use_quivr": "如何使用 Quivr？",
-    "what_is_quivr": "什么是 Quivr？",
+    "how_to_use_quivr": "如何使用 SpringerAI？",
+    "what_is_quivr": "什么是 SpringerAI？",
     "what_is_brain": "什么是大脑？",
     "answer": {
       "how_to_use_quivr": "查看文档 https://brain.quivr.app/docs/intro.html",
-      "what_is_quivr": "Quivr 是一个有用的助手。",
+      "what_is_quivr": "SpringerAI 是一个有用的助手。",
       "what_is_brain": "大脑包含知识。"
     }
   },

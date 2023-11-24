@@ -1,8 +1,8 @@
 {
-  "label": "Chat to Quivr with ...",
+  "label": "Chat to SpringerAI with ...",
   "position": 3,
   "link": {
     "type": "generated-index",
-    "description": "Connect Quivr to anything"
+    "description": "Connect SpringerAI to anything"
   }
 }

@@ -36,17 +36,17 @@
   "add_content_card_button_tooltip": "Add knowledge to a brain",
   "back_to_chat": "Back to chat",
   "onboarding": {
-    "title": "Hi 👋🏻 Want to discover Quivr ? 😇",
+    "title": "Hi 👋🏻 Want to discover SpringerAI ? 😇",
     "step_1_1": "1. Drag and drop file on the chat or in the 📎.",
-    "step_1_2": "Don't have a file ? Download 'Quivr documentation'",
+    "step_1_2": "Don't have a file ? Download 'SpringerAI documentation'",
     "step_2": "2. Start chatting with your file",
     "step_3": "3. Enjoy !",
-    "how_to_use_quivr": "How to use Quivr ?",
-    "what_is_quivr": "What is Quivr ?",
+    "how_to_use_quivr": "How to use SpringerAI ?",
+    "what_is_quivr": "What is SpringerAI ?",
     "what_is_brain": "What is a brain ?",
     "answer": {
       "how_to_use_quivr": "Check the documentation https://brain.quivr.app/docs/intro.html",
-      "what_is_quivr": "Quivr is a helpful assistant.",
+      "what_is_quivr": "SpringerAIgerAI is a helpful assistant.",
       "what_is_brain": "A brain contains knowledge"
     }
   },

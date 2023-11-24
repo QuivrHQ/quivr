@@ -23,7 +23,7 @@
     "supabaseKeyLabel": "Supabase key",
     "keepInLocal": "Keep in local",
     "customPromptSection": "Custom prompt",
-    "selectQuivrPersonalityBtn": "Select a Quivr Personality",
+    "selectSpringerAIPersonalityBtn": "Select a SpringerAI Personality",
     "promptName": "Prompt title",
     "promptNamePlaceholder": "My awesome prompt name",
     "promptContent": "Prompt content",

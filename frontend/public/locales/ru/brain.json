@@ -31,7 +31,7 @@
   "public_brain_label": "Публичный",
   "brain_status_label": "Статус",
   "set_brain_status_to_public_modal_title": "Вы уверены, что хотите установить это как <span class='text-primary'>Публичный</span>?<br/><br/>",
-  "set_brain_status_to_public_modal_description": "Каждый пользователь Quivr сможет:<br/>- Подписаться на ваш мозг в 'библиотеке мозгов'.<br/>- Использовать этот мозг и проверить настройки подсказок и модели.<br/><br/>У них не будет доступа к вашим загруженным файлам и разделу 'люди'.",
+  "set_brain_status_to_public_modal_description": "Каждый пользователь SpringerAI сможет:<br/>- Подписаться на ваш мозг в 'библиотеке мозгов'.<br/>- Использовать этот мозг и проверить настройки подсказок и модели.<br/><br/>У них не будет доступа к вашим загруженным файлам и разделу 'люди'.",
   "confirm_set_brain_status_to_public": "Да, установить как публичный",
   "cancel_set_brain_status_to_public": "Нет, оставить приватным",
   "brain_library_button_label": "Библиотека мозгов",
@@ -41,7 +41,7 @@
   "public_brain_last_update_label": "Последнее обновление",
   "public_brain_already_subscribed_button_label": "Вы уже подписаны",
   "set_brain_status_to_private_modal_title": "Вы уверены, что хотите установить это как <span class='text-primary'>Частное</span>?<br/><br/>",
-  "set_brain_status_to_private_modal_description": "Пользователи Quivr больше не смогут использовать этот мозг, и они не увидят его в библиотеке мозгов.",
+  "set_brain_status_to_private_modal_description": "Пользователи SpringerAI больше не смогут использовать этот мозг, и они не увидят его в библиотеке мозгов.",
   "confirm_set_brain_status_to_private": "Да, установить как частное",
   "cancel_set_brain_status_to_private": "Нет, оставить общедоступным",
   "brain_management_button_label": "Управление мозгом",
@@ -50,7 +50,7 @@
   "knowledge_source_doc": "Документы",
   "knowledge_source_api": "API",
   "knowledge_source_label": "Источник знаний",
-  "api_brain":{
+  "api_brain": {
     "name": "Название",
     "description": "Описание",
     "type": "Тип",

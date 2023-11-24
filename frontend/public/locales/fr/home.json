@@ -6,7 +6,7 @@
   "sponsored_by": "Sponsorisé par",
   "useCases": {
     "title": "Expérimentez-le maintenant.",
-    "subtitle": "Consultez notre exemple d'utilisation de Quivr."
+    "subtitle": "Consultez notre exemple d'utilisation de SpringerAI."
   },
   "intro": {
     "title": "Obtenez un deuxième cerveau avec",
@@ -25,10 +25,10 @@
     "title": "Commencez aujourd'hui",
     "description_1": "Votre assistant personnel qui agit comme votre Deuxième Cerveau.",
     "description_2": "Il vous suffit de télécharger vos fichiers et de lui poser des questions.",
-    "start_using": "Commencez à utiliser Quivr",
+    "start_using": "Commencez à utiliser SpringerAI",
     "contact_sales": "Contacter l'équipe commerciale"
   },
-  "testimonials":{ 
-    "title": "Ce que les gens disent à propos de" 
+  "testimonials": {
+    "title": "Ce que les gens disent à propos de"
   }
 }

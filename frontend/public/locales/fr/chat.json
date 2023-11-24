@@ -36,17 +36,17 @@
   "add_content_card_button_tooltip": "Ajouter des connaissances à un cerveau",
   "back_to_chat": "Retour au chat",
   "onboarding": {
-    "title": "Salut 👋🏻 Envie de découvrir Quivr ? 😇",
+    "title": "Salut 👋🏻 Envie de découvrir SpringerAI ? 😇",
     "step_1_1": "1. Glissez-déposez un fichier dans le chat ou dans la 📎.",
-    "step_1_2": "Pas de fichier ? Téléchargez 'Documentation Quivr'",
+    "step_1_2": "Pas de fichier ? Téléchargez 'Documentation SpringerAI'",
     "step_2": "2. Commencez à discuter avec votre fichier",
     "step_3": "3. Profitez !",
-    "how_to_use_quivr": "Comment utiliser Quivr ?",
-    "what_is_quivr": "Qu'est-ce que Quivr ?",
+    "how_to_use_quivr": "Comment utiliser SpringerAI ?",
+    "what_is_quivr": "Qu'est-ce que SpringerAI ?",
     "what_is_brain": "Qu'est-ce qu'un cerveau ?",
     "answer": {
       "how_to_use_quivr": "Consultez la documentation sur https://brain.quivr.app/docs/intro.html",
-      "what_is_quivr": "Quivr est un assistant utile.",
+      "what_is_quivr": "SpringerAI est un assistant utile.",
       "what_is_brain": "Un cerveau contient des connaissances."
     }
   },

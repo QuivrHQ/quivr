@@ -47,7 +47,7 @@ export const PopoverMenuMobile = ({
               <div className="flex gap-2 items-center">
                 <QuivrLogo size={64} color="primary" />
                 <div className="text-lg font-medium text-primary cursor-default ">
-                  Quivr
+                  SpringerAI
                 </div>
               </div>
               <Popover.Close>

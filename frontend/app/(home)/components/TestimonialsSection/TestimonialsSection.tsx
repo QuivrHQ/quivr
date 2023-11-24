@@ -26,7 +26,7 @@ export const TestimonialsSection = (): JSX.Element => {
   return (
     <>
       <p className="text-4xl font-semibold my-10">
-        {t("title")} <span className="text-primary">Quivr</span>{" "}
+        {t("title")} <span className="text-primary">SpringerAI</span>{" "}
       </p>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-10 mb-5 items-stretch p-4">
         {testimonials.map((testimonial) => (

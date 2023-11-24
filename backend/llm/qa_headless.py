@@ -25,7 +25,7 @@ from repository.chat import (
 )
 
 logger = get_logger(__name__)
-SYSTEM_MESSAGE = "Your name is Quivr. You're a helpful assistant. If you don't know the answer, just say that you don't know, don't try to make up an answer.When answering use markdown or any other techniques to display the content in a nice and aerated way."
+SYSTEM_MESSAGE = "Your name is SpringerAI. You're a helpful assistant. If you don't know the answer, just say that you don't know, don't try to make up an answer.When answering use markdown or any other techniques to display the content in a nice and aerated way."
 
 
 class HeadlessQA(BaseModel):

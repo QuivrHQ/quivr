@@ -50,7 +50,7 @@ async def retrieve_all_brains_for_user(
     "/brains/public", dependencies=[Depends(AuthBearer())], tags=["Brain"]
 )
 async def retrieve_public_brains() -> list[PublicBrain]:
-    """Retrieve all Quivr public brains."""
+    """Retrieve all SpringerAI public brains."""
     return get_public_brains()
 
 

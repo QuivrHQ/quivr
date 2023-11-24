@@ -23,7 +23,7 @@
   "supabaseKeyLabel": "Supabase 密钥",
   "keepInLocal": "保留在本地",
   "customPromptSection": "自定义提示",
-  "selectQuivrPersonalityBtn": "选择 Quivr 的性格",
+  "selectSpringerAIPersonalityBtn": "选择 SpringerAI 的性格",
   "promptName": "提示标题",
   "promptNamePlaceholder": "特别棒的提示名称",
   "promptContent": "提示内容",

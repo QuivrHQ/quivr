@@ -35,7 +35,7 @@ export const PublicPromptsList = ({
         type="button"
         className="px-4 py-2 w-full text-gray-700 bg-white border rounded-md focus:outline-none focus:border-blue-500"
       >
-        {selectedOption ? selectedOption.title : t("selectQuivrPersonalityBtn", { ns: "config" })}
+        {selectedOption ? selectedOption.title : t("selectSpringerAIPersonalityBtn", { ns: "config" })}
       </button>
       {isOpen && (
         <div className="absolute top-10 w-full bg-white border rounded-md shadow-lg z-10">

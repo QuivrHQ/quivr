@@ -35,7 +35,7 @@ from vectorstore.supabase import CustomSupabaseVectorStore
 from .prompts.CONDENSE_PROMPT import CONDENSE_QUESTION_PROMPT
 
 logger = get_logger(__name__)
-QUIVR_DEFAULT_PROMPT = "Your name is Quivr. You're a helpful assistant.  If you don't know the answer, just say that you don't know, don't try to make up an answer."
+QUIVR_DEFAULT_PROMPT = "Your name is SpringerAI. You're a helpful assistant.  If you don't know the answer, just say that you don't know, don't try to make up an answer."
 
 
 class QABaseBrainPicking(BaseModel):

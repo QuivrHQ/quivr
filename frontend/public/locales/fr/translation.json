@@ -1,12 +1,11 @@
 {
   "lang": "fr-FR",
-  "title": "Quivr - Obtenez un deuxième cerveau avec l'IA générative",
-  "description": "Quivr est votre deuxième cerveau dans le nuage, conçu pour stocker et récupérer facilement des informations non structurées.",
+  "title": "SpringerAI - Obtenez un deuxième cerveau avec l'IA générative",
+  "description": "SpringerAI est votre deuxième cerveau dans le nuage, conçu pour stocker et récupérer facilement des informations non structurées.",
   "toastDismiss": "ignorer",
   "email": "Email",
   "or": "ou",
   "and": "et",
-
   "logoutButton": "Déconnexion",
   "updateButton": "Mettre à jour",
   "uploadButton": "Télécharger",

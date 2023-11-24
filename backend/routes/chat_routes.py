@@ -236,10 +236,10 @@ async def create_stream_question_handler(
 
     try:
         logger.info(f"Streaming request for {chat_question.model}")
-        check_user_requests_limit(current_user)
+        # check_user_requests_limit(current_user)
         gpt_answer_generator: HeadlessQA | QABaseBrainPicking
         # TODO check if model is in the list of models available for the user
-
+        logger.info(f"PASSSSSSS")
         is_model_ok = chat_question.model in user_settings.get("models", ["gpt-3.5-turbo"])  # type: ignore
         gpt_answer_generator = chat_instance.get_answer_generator(
             chat_id=str(chat_id),

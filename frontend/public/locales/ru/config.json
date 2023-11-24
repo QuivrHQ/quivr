@@ -23,7 +23,7 @@
   "supabaseKeyLabel": "Ключ Supabase",
   "keepInLocal": "Сохранить локально",
   "customPromptSection": "Пользовательский запрос",
-  "selectQuivrPersonalityBtn": "Выберите личность Quivr",
+  "selectSpringerAIPersonalityBtn": "Выберите личность SpringerAI",
   "promptName": "Название запроса",
   "promptNamePlaceholder": "Название моего потрясающего запроса",
   "promptContent": "Содержание запроса",
