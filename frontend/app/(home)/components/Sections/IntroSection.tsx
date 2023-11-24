@@ -16,9 +16,9 @@ export const IntroSection = (): JSX.Element => {
   return (
     <>
       <div className="flex flex-col lg:flex-row items-center justify-center md:justify-start gap-10 lg:gap-0 xl:gap-10 lg:h-[calc(100vh-250px)] mb-[calc(50vw*tan(6deg))] md:mb-0">
-        <div className="w-[80vw] lg:w-[50%] lg:shrink-0 flex flex-col justify-center gap-10 sm:gap-20 lg:gap-32 xl:gap-36">
+        <div className="w-[80vw] lg:w-[50%] lg:shrink-0 flex flex-col justify-center gap-10 sm:gap-15 lg:gap-20 xl:gap-32">
           <div>
-            <h1 className="text-2xl leading-[3rem] sm:text-[3rem] sm:leading-[4.2rem] font-bold text-black block max-w-2xl">
+            <h1 className="sm:text-lg  md:text-2xl lg:text-4xl font-bold text-black block max-w-2xl">
               {t("intro.title", { ns: "home" })}
               {/* <span className="text-cyan-900 ml-4">
                 {t("vaccineTruthAi", { ns: "vaccineTruth" })}
@@ -37,7 +37,7 @@ export const IntroSection = (): JSX.Element => {
                 })
               }
             >
-              <Button className="text-white bg-black rounded-full">
+              <Button className="text-white bg-black rounded-full px-2 py-1 sm:px-4 py-2">
                 {t("talkToAI", { ns: "vaccineTruth" })}
                 <LuChevronRight size={24} />
               </Button>
@@ -66,7 +66,7 @@ export const IntroSection = (): JSX.Element => {
             alt="Quivr on laptop"
             width={1200}
             height={1200}
-            className="hidden sm:block max-w-[calc(80vh-100px)] max-h-[calc(80vh-100px)] xl:scale-125"
+            className="hidden sm:block max-w-[calc(40vh-100px)] max-h-[calc(40vh-100px)] xl:scale-125 sm:scale-105 sm:max-w-[calc(60vh-100px)] sm:max-h-[calc(60vh-100px)]"
           />
           <Image
             src={smartphoneImage}

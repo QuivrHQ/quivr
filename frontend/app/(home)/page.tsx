@@ -27,7 +27,7 @@ const HomePage = (): JSX.Element => {
       <HomeHeader />
 
       <main
-        className="relative flex flex-col items-center"
+        className="relative flex flex-col items-center h-full"
         data-testid="home-page"
       >
         <HomeSection bg="transparent">
@@ -58,6 +58,7 @@ const HomePage = (): JSX.Element => {
         <HomeSection
           bg="bg-gradient-to-b from-sky-700 to-sky-200"
           slantBefore="up"
+          className="absolute bottom-0"
         >
           <FooterSection />
         </HomeSection>

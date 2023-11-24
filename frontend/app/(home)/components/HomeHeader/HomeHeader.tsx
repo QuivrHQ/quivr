@@ -18,11 +18,11 @@ export const HomeHeader = ({ color = "white" }: HomeNavProps): JSX.Element => {
   const { t } = useTranslation(["vaccineTruth"]);
 
   return (
-    <header className="w-screen flex justify-between items-center p-5 min-w-max md:max-w-6xl m-auto">
+    <header className="w-screen flex justify-between items-center p-3 sm:p-5 min-w-max md:max-w-6xl mx-auto ">
       <Link
         href="/"
         className={cn(
-          "text-3xl flex gap-2 items-center",
+          "text-base lg:text-3xl flex gap-2 items-center",
           linkStyle[color],
           color === "black" ? "hover:text-black" : "hover:text-white"
         )}

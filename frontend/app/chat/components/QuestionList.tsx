@@ -2,10 +2,11 @@
 
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 import { useChatInput } from "@/app/chat/[chatId]/components/ActionsBar/components/ChatInput/hooks/useChatInput";
 import { useChat } from "@/app/chat/[chatId]/hooks/useChat";
-import { useLanguageHook } from "@/app/user/components/LanguageDropDown/hooks/useLanguageHook";
+// import { useLanguageHook } from "@/app/user/components/LanguageDropDown/hooks/useLanguageHook";
 import {
   getRandomQuestion,
   QUESTION_LIST_EN,
@@ -17,10 +18,11 @@ import Button from "@/lib/components/ui/Button";
 export const QuestionList = (): JSX.Element => {
   const { addQuestion, generatingAnswer } = useChat();
   const { setMessage } = useChatInput();
-  const { currentLanguage } = useLanguageHook();
+
   const params = useParams();
   const [questions, setQuestions] = useState<string[]>([]);
   const [askingQuestion, setAskingQuestion] = useState<string>();
+  const { i18n } = useTranslation();
 
   const chatId = (params?.chatId as string | undefined) ?? "";
 
@@ -29,7 +31,7 @@ export const QuestionList = (): JSX.Element => {
       setAskingQuestion(question);
       void addQuestion(question, () => {
         const updatedQuestions = updateQuestion(
-          currentLanguage,
+          i18n.language,
           questions,
           question
         );
@@ -40,18 +42,19 @@ export const QuestionList = (): JSX.Element => {
   };
 
   useEffect(() => {
-    if (currentLanguage === "en") {
+    if (i18n.language === "en") {
       setQuestions(
         // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
-        !chatId ? QUESTION_LIST_EN : getRandomQuestion(currentLanguage, 3)
+        !chatId ? QUESTION_LIST_EN : getRandomQuestion(i18n.language, 3)
       );
-    } else {
+    } else if (i18n.language === "zh_cn") {
       setQuestions(
         // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
-        !chatId ? QUESTION_LIST_ZH_CN : getRandomQuestion(currentLanguage, 3)
+        !chatId ? QUESTION_LIST_ZH_CN : getRandomQuestion(i18n.language, 3)
       );
     }
-  }, [currentLanguage]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [i18n.language]);
 
   return (
     <div className={`flex flex-wrap`}>
