@@ -23,7 +23,7 @@ sentry_dsn = os.getenv("SENTRY_DSN")
 if sentry_dsn:
     sentry_sdk.init(
         dsn=sentry_dsn,
-        traces_sample_rate=1.0,
+         traces_sample_rate=0.1,
     )
 
 app = FastAPI()
