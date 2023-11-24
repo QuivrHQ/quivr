@@ -9,18 +9,17 @@ from models.databases.supabase.notifications import NotificationUpdatablePropert
 from models.files import File
 from models.notifications import NotificationsStatusEnum
 from models.settings import get_supabase_client
+from modules.onboarding.service.onboarding_service import OnboardingService
 from packages.files.crawl.crawler import CrawlWebsite
 from packages.files.parsers.github import process_github
 from packages.files.processors import filter_file
 from repository.brain.update_brain_last_update_time import update_brain_last_update_time
 from repository.notification.update_notification import update_notification_by_id
-from repository.onboarding.remove_onboarding_more_than_x_days import (
-    remove_onboarding_more_than_x_days,
-)
 
 CELERY_BROKER_URL = os.getenv("CELERY_BROKER_URL", "")
 CELEBRY_BROKER_QUEUE_NAME = os.getenv("CELEBRY_BROKER_QUEUE_NAME", "quivr")
 
+onboardingService = OnboardingService()
 
 if CELERY_BROKER_URL.startswith("sqs"):
     broker_transport_options = {
@@ -162,7 +161,7 @@ def process_crawl_and_notify(
 
 @celery.task
 def remove_onboarding_more_than_x_days_task():
-    remove_onboarding_more_than_x_days(7)
+    onboardingService.remove_onboarding_more_than_x_days(7)
 
 
 celery.conf.beat_schedule = {
