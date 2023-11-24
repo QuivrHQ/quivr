@@ -31,7 +31,7 @@ export const HomeHeader = ({ color = "white" }: HomeNavProps): JSX.Element => {
         <div>{t("vaccineTruthAi")}</div>
       </Link>
       <div className="hidden sm:flex sm:items-center">
-        <LanguageSelect />
+        <LanguageSelect isSelect={false} />
         <ul className="flex gap-4 items-center">{navLinks("desktop")}</ul>
       </div>
       <div className="md:hidden z-10">

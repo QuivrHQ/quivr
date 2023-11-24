@@ -67,7 +67,7 @@ export const PopoverMenuMobile = ({
             <nav>
               <ul className="flex flex-col bg-[#F5F8FF] rounded-xl p-2">
                 <li>
-                  <LanguageSelect />
+                  <LanguageSelect isSelect={false} />
                 </li>
                 {navLinks}
               </ul>
