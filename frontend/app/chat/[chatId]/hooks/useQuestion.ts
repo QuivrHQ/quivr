@@ -53,7 +53,7 @@ export const useQuestion = (): UseChatService => {
 
     try {
       const response = await fetchInstance.post(
-        `chat/${chatId}/question/stream?brain_id=${currentBrain?.id ?? ""}`,
+        `/chat/${chatId}/question/stream?brain_id=${currentBrain?.id ?? ""}`,
         body,
         headers
       );
