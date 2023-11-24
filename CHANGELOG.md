@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.0.119 (2023-11-24)
+
+## What's Changed
+* refactor: Prompt module by @gozineb in https://github.com/StanGirard/quivr/pull/1688
+* Fixes string formatting when logging knowledge table by @MeTaNoV in https://github.com/StanGirard/quivr/pull/1691
+* fix: update max token overwrite logic by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1694
+* fix: remove diacritics from filenames by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1695
+* refactor: onboarding module by @gozineb in https://github.com/StanGirard/quivr/pull/1702
+* feat: display notification when file size is too big by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1704
+* feat: add api brain steps log (backend) by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1705
+
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.118...v0.0.119
+
 ## 0.0.118 (2023-11-22)
 
 ## What's Changed
