@@ -6,7 +6,7 @@ import { ApiBrainDefinitionSecret } from "@/lib/api/brain/types";
 type SecretsDefinitionFieldsProps = {
   secrets?: ApiBrainDefinitionSecret[];
   register: UseFormRegister<{
-    secrets: Record<string, string>;
+    secrets?: Record<string, string>;
   }>;
 };
 
