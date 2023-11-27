@@ -1,8 +1,8 @@
-const removeDiacriticsFromText = (input: string): string =>
-  input.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+const removeSpecialCharacters = (input: string) =>
+  input.normalize("NFD").replace(/[^\w\s.]/g, "");
 
 export const cloneFileWithSanitizedName = (file: File): File => {
-  const sanitizedFileName = removeDiacriticsFromText(file.name);
+  const sanitizedFileName = removeSpecialCharacters(file.name);
 
   return new File([file], sanitizedFileName, { type: file.type });
 };
