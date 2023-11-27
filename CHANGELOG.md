@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.0.120 (2023-11-27)
+
+## What's Changed
+* fix: 🐛 sentry by @StanGirard in https://github.com/StanGirard/quivr/pull/1716
+
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.119...v0.0.120
+
 ## 0.0.119 (2023-11-24)
 
 ## What's Changed
