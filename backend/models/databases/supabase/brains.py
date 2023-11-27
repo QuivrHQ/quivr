@@ -96,23 +96,23 @@ class Brain(Repository):
     def get_public_brains(self) -> list[PublicBrain]:
         response = (
             self.db.from_("brains")
-            .select("id:brain_id, name, description, last_update, brain_type")
+            .select(
+                "id:brain_id, name, description, last_update, brain_type, brain_definition: api_brain_definition(*), number_of_subscribers:brains_users(count)"
+            )
             .filter("status", "eq", "public")
             .execute()
         )
         public_brains: list[PublicBrain] = []
 
         for item in response.data:
-            brain = PublicBrain(
-                id=item["id"],
-                name=item["name"],
-                description=item["description"],
-                last_update=item["last_update"],
-                brain_type=item["brain_type"],
-                brain_definition=self.get_api_brain_definition(item["id"]),
-            )
-            brain.number_of_subscribers = self.get_brain_subscribers_count(brain.id)
-            public_brains.append(brain)
+            item["number_of_subscribers"] = item["number_of_subscribers"][0]["count"]
+            if not item["brain_definition"]:
+                del item["brain_definition"]
+            else:
+                item["brain_definition"] = item["brain_definition"][0]
+                item["brain_definition"]["secrets"] = []
+
+            public_brains.append(PublicBrain(**item))
         return public_brains
 
     def update_brain_last_update_time(self, brain_id: UUID) -> None:
