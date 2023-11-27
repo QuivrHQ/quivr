@@ -108,7 +108,7 @@ export const LanguageSelect = ({
           <button
             // eslint-disable-next-line @typescript-eslint/no-unsafe-return
             onClick={() => handleToggleLanguage()}
-            className="text-white hover:text-slate-200 cursor-pointer  text-xs  bg-transparent py-1.5 px-3 text-left   sm:text-sm sm:leading-6"
+            className="text-black sm:text-white hover:text-slate-200 cursor-pointer  text-xs  bg-transparent py-1.5  sm:px-3 text-left   sm:text-sm sm:leading-6"
           >
             <IoLanguage className="" />
           </button>

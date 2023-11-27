@@ -16,16 +16,18 @@ export const FooterSection = (): JSX.Element => {
   const { onLinkClick } = useHomepageTracking();
 
   return (
-    <div className="flex flex-col items-center gap-5 text-white text-center text-lg">
-      <h2 className="text-3xl">{t("footer.title", { ns: "home" })}</h2>
-      <p>
+    <div className="flex flex-col items-center gap-2 sm:gap-5 text-white text-center text-lg ">
+      <h2 className="text-xl sm:text-3xl">
+        {t("footer.title", { ns: "home" })}
+      </h2>
+      <p className="text-xs sm:text-base">
         {t("footer.description_1", { ns: "home" })} <br />
         {/* {t("footer.description_2", { ns: "home" })} */}
       </p>
-      <div className="flex items-center justify-center gap-2 flex-wrap">
+      <div className="flex items-center justify-center gap-1 flex-wrap">
         <Link
           href="/login"
-          className="hidden"
+          className="hidden "
           onClick={(event) => {
             onLinkClick({
               href: "/login",
@@ -34,7 +36,7 @@ export const FooterSection = (): JSX.Element => {
             });
           }}
         >
-          <Button className=" rounded-full">
+          <Button className=" rounded-full ">
             {t("talkToAI", { ns: "vaccineTruth" })}
             <LuChevronRight size={24} />
           </Button>
@@ -56,7 +58,7 @@ export const FooterSection = (): JSX.Element => {
           </Button>
         </Link>
       </div>
-      <ul className="flex gap-4 mt-3 mb-6 text-black">
+      <ul className="flex gap-4 mt-3 sm:mb-6 mb-2 text-black">
         <li>
           <Link href={GETTR_URL} target="_blank">
             <Image
@@ -64,7 +66,7 @@ export const FooterSection = (): JSX.Element => {
               height={24}
               width={24}
               alt={"gettr icon"}
-              className="hover:text-black w-12 h-12"
+              className="hover:text-black w-8 h-8 "
             ></Image>
           </Link>
         </li>
@@ -74,9 +76,9 @@ export const FooterSection = (): JSX.Element => {
             target="_blank"
             rel="noopener noreferrer"
             aria-label="Quivr Twitter"
-            className="hover:text-black"
+            className="hover:text-black w-8 h-8"
           >
-            <RiTwitterXLine size={52} />
+            <RiTwitterXLine size={36} />
           </a>
         </li>
         <li>
@@ -85,9 +87,9 @@ export const FooterSection = (): JSX.Element => {
             target="_blank"
             rel="noopener noreferrer"
             aria-label="Quivr GitHub"
-            className="hover:text-black"
+            className="hover:text-black w-8 h-8"
           >
-            <FaGithub size={52} />
+            <FaGithub size={36} />
           </a>
         </li>
       </ul>
