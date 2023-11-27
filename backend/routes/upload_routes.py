@@ -15,6 +15,10 @@ from packages.files.file import convert_bytes, get_file_size
 from repository.knowledge.add_knowledge import add_knowledge
 from repository.files.upload_file import upload_file_storage
 from repository.notification.add_notification import add_notification
+from repository.notification.update_notification import update_notification_by_id
+from models.databases.supabase.notifications import NotificationUpdatableProperties
+
+
 
 from routes.authorizations.brain_authorization import (
     RoleEnum,
@@ -73,6 +77,19 @@ async def upload_file(
         logger.info(f"File {file_in_storage} uploaded successfully")
 
     except Exception as e:
+        print(e)
+        notification_message = {
+            "status": "error",
+            "message": "There was an error uploading the file. Please check the file and try again. If the issue persist, please open an issue on Github",
+            "name": uploadFile.filename if uploadFile else "Last Upload File",
+        }
+        update_notification_by_id(
+            upload_notification.id,
+            NotificationUpdatableProperties(
+                status=NotificationsStatusEnum.Done,
+                message=str(notification_message),
+            ),
+        )
         if "The resource already exists" in str(e):
             raise HTTPException(
                 status_code=403,
