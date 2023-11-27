@@ -27,6 +27,8 @@ from routes.misc_routes import misc_router
 from routes.notification_routes import notification_router
 from routes.subscription_routes import subscription_router
 from routes.upload_routes import upload_router
+from sentry_sdk.integrations.starlette import StarletteIntegration
+from sentry_sdk.integrations.fastapi import FastApiIntegration
 
 logger = get_logger(__name__)
 
@@ -41,8 +43,18 @@ sentry_dsn = os.getenv("SENTRY_DSN")
 if sentry_dsn:
     sentry_sdk.init(
         dsn=sentry_dsn,
-        traces_sample_rate=0.1,
-        profiles_sample_rate=0.1,
+         traces_sample_rate=0.1,
+         profiles_sample_rate=0.1,
+         sample_rate=0.1,
+         enable_tracing=True,
+         integrations=[
+            StarletteIntegration(
+                transaction_style="endpoint"
+            ),
+            FastApiIntegration(
+                transaction_style="endpoint"
+            ),
+        ]
     )
 
 app = FastAPI()

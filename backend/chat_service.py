@@ -20,14 +20,6 @@ from routes.misc_routes import misc_router
 
 logger = get_logger(__name__)
 
-sentry_dsn = os.getenv("SENTRY_DSN")
-if sentry_dsn:
-    sentry_sdk.init(
-        dsn=sentry_dsn,
-         traces_sample_rate=0.1,
-         profiles_sample_rate=0.1,
-    )
-
 app = FastAPI()
 
 add_cors_middleware(app)
