@@ -31,4 +31,4 @@ async def process_file(
             brain_id, doc_with_metadata.to_json(), file.file_sha1
         )
 
-    return "Hello World!"
+    return len(file.documents) 
