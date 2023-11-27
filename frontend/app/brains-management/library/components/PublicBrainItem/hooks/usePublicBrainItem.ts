@@ -25,9 +25,9 @@ export const usePublicBrainItem = ({ brain }: UseSubscribeToBrainProps) => {
   const { publish } = useToast();
   const { allBrains, fetchAllBrains } = useBrainContext();
   const { register, watch } = useForm<{
-    secrets: Record<string, string>;
+    secrets?: Record<string, string>;
   }>({});
-  const secrets = watch("secrets");
+  const secrets = watch("secrets") ?? {};
 
   const searchParams = useSearchParams();
   const urlBrainId = searchParams?.get("brainId");
@@ -80,11 +80,11 @@ export const usePublicBrainItem = ({ brain }: UseSubscribeToBrainProps) => {
   };
   const handleBrainSubscription = () => {
     const brainHasSecretsLength = brain.brain_definition?.secrets?.length ?? 0;
-    const filledSecretsLength = Object.keys(secrets).filter(
-      (key) => secrets[key].length > 0
-    ).length;
 
     if (brain.brain_type === "api") {
+      const filledSecretsLength = Object.keys(secrets).filter(
+        (key) => secrets[key].length > 0
+      ).length;
       if (
         brainHasSecretsLength > 0 &&
         filledSecretsLength !== brainHasSecretsLength

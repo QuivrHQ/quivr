@@ -245,22 +245,6 @@ class Repository(ABC):
         pass
 
     @abstractmethod
-    def get_user_onboarding(self, user_id: UUID):
-        pass
-
-    @abstractmethod
-    def update_user_onboarding(self, user_id: UUID, onboarding):
-        pass
-
-    @abstractmethod
-    def remove_user_onboarding(self, user_id: UUID):
-        pass
-
-    @abstractmethod
-    def remove_onboarding_more_than_x_days(self, days: int):
-        pass
-
-    @abstractmethod
     def get_api_brain_definition(self, brain_id: UUID):
         pass
 

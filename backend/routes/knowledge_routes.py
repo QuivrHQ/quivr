@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, HTTPException, Query
 from logger import get_logger
 from middlewares.auth import AuthBearer, get_current_user
 from models import Brain
@@ -10,6 +10,7 @@ from repository.files.generate_file_signed_url import generate_file_signed_url
 from repository.knowledge.get_all_knowledge import get_all_knowledge
 from repository.knowledge.get_knowledge import get_knowledge
 from repository.knowledge.remove_knowledge import remove_knowledge
+
 from routes.authorizations.brain_authorization import (
     RoleEnum,
     has_brain_authorization,
@@ -56,8 +57,6 @@ async def delete_endpoint(
     Delete a specific knowledge from a brain.
     """
 
-    validate_brain_authorization(brain_id=brain_id, user_id=current_user.id)
-
     brain = Brain(id=brain_id)
 
     knowledge = get_knowledge(knowledge_id)
@@ -93,7 +92,10 @@ async def generate_signed_url_endpoint(
     validate_brain_authorization(brain_id=knowledge.brain_id, user_id=current_user.id)
 
     if knowledge.file_name == None:
-        raise Exception(f"Knowledge {knowledge_id} has no file_name associated with it")
+        raise HTTPException(
+            status_code=404,
+            detail=f"Knowledge with id {knowledge_id} is not a file.",
+        )
 
     file_path_in_storage = f"{knowledge.brain_id}/{knowledge.file_name}"
 

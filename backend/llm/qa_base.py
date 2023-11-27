@@ -14,8 +14,6 @@ from langchain.prompts.chat import (
     HumanMessagePromptTemplate,
     SystemMessagePromptTemplate,
 )
-from llm.utils.get_prompt_to_use import get_prompt_to_use
-from llm.utils.get_prompt_to_use_id import get_prompt_to_use_id
 from logger import get_logger
 from models import BrainSettings  # Importing settings related to the 'brain'
 from models.chats import ChatQuestion
@@ -31,6 +29,9 @@ from repository.chat import (
 )
 from supabase.client import Client, create_client
 from vectorstore.supabase import CustomSupabaseVectorStore
+
+from llm.utils.get_prompt_to_use import get_prompt_to_use
+from llm.utils.get_prompt_to_use_id import get_prompt_to_use_id
 
 from .prompts.CONDENSE_PROMPT import CONDENSE_QUESTION_PROMPT
 
@@ -133,7 +134,7 @@ class QABaseBrainPicking(BaseModel):
         )
 
     def _create_llm(
-        self, model, temperature=0, streaming=False, callbacks=None, max_tokens=256
+        self, model, temperature=0, streaming=False, callbacks=None
     ) -> BaseLLM:
         """
         Determine the language model to be used.
@@ -144,7 +145,7 @@ class QABaseBrainPicking(BaseModel):
         """
         return ChatLiteLLM(
             temperature=temperature,
-            max_tokens=max_tokens,
+            max_tokens=self.max_tokens,
             model=model,
             streaming=streaming,
             verbose=False,
@@ -179,7 +180,9 @@ class QABaseBrainPicking(BaseModel):
     ) -> GetChatHistoryOutput:
         transformed_history = format_chat_history(get_chat_history(self.chat_id))
         answering_llm = self._create_llm(
-            model=self.model, streaming=False, callbacks=self.callbacks
+            model=self.model,
+            streaming=False,
+            callbacks=self.callbacks,
         )
 
         # The Chain that generates the answer to the question
@@ -255,7 +258,6 @@ class QABaseBrainPicking(BaseModel):
             model=self.model,
             streaming=True,
             callbacks=self.callbacks,
-            max_tokens=self.max_tokens,
         )
 
         # The Chain that generates the answer to the question
