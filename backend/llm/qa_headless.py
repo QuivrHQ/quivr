@@ -8,8 +8,6 @@ from langchain.chains import LLMChain
 from langchain.chat_models import ChatLiteLLM
 from langchain.chat_models.base import BaseChatModel
 from langchain.prompts.chat import ChatPromptTemplate, HumanMessagePromptTemplate
-from llm.utils.get_prompt_to_use import get_prompt_to_use
-from llm.utils.get_prompt_to_use_id import get_prompt_to_use_id
 from logger import get_logger
 from models.chats import ChatQuestion
 from models.databases.supabase.chats import CreateChatHistory
@@ -23,6 +21,9 @@ from repository.chat import (
     update_chat_history,
     update_message_by_id,
 )
+
+from llm.utils.get_prompt_to_use import get_prompt_to_use
+from llm.utils.get_prompt_to_use_id import get_prompt_to_use_id
 
 logger = get_logger(__name__)
 SYSTEM_MESSAGE = "Your name is Quivr. You're a helpful assistant. If you don't know the answer, just say that you don't know, don't try to make up an answer.When answering use markdown or any other techniques to display the content in a nice and aerated way."
@@ -64,7 +65,11 @@ class HeadlessQA(BaseModel):
         return get_prompt_to_use_id(None, self.prompt_id)
 
     def _create_llm(
-        self, model, temperature=0, streaming=False, callbacks=None
+        self,
+        model,
+        temperature=0,
+        streaming=False,
+        callbacks=None,
     ) -> BaseChatModel:
         """
         Determine the language model to be used.
@@ -79,6 +84,7 @@ class HeadlessQA(BaseModel):
             streaming=streaming,
             verbose=True,
             callbacks=callbacks,
+            max_tokens=self.max_tokens,
         )
 
     def _create_prompt_template(self):
@@ -100,7 +106,9 @@ class HeadlessQA(BaseModel):
             transformed_history, prompt_content, question.question
         )
         answering_llm = self._create_llm(
-            model=self.model, streaming=False, callbacks=self.callbacks
+            model=self.model,
+            streaming=False,
+            callbacks=self.callbacks,
         )
         model_prediction = answering_llm.predict_messages(messages)
         answer = model_prediction.content
