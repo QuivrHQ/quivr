@@ -5,21 +5,22 @@ import os
 from celery import Celery
 from celery.schedules import crontab
 from fastapi import UploadFile
-from models.databases.supabase.notifications import NotificationUpdatableProperties
 from models.files import File
-from models.notifications import NotificationsStatusEnum
 from models.settings import get_supabase_client
+from modules.notification.dto.inputs import NotificationUpdatableProperties
+from modules.notification.entity.notification import NotificationsStatusEnum
+from modules.notification.service.notification_service import NotificationService
 from modules.onboarding.service.onboarding_service import OnboardingService
 from packages.files.crawl.crawler import CrawlWebsite
 from packages.files.parsers.github import process_github
 from packages.files.processors import filter_file
 from repository.brain.update_brain_last_update_time import update_brain_last_update_time
-from repository.notification.update_notification import update_notification_by_id
 
 CELERY_BROKER_URL = os.getenv("CELERY_BROKER_URL", "")
 CELEBRY_BROKER_QUEUE_NAME = os.getenv("CELEBRY_BROKER_QUEUE_NAME", "quivr")
 
 onboardingService = OnboardingService()
+notification_service = NotificationService()
 
 if CELERY_BROKER_URL.startswith("sqs"):
     broker_transport_options = {
@@ -57,8 +58,8 @@ def process_file_and_notify(
     file_original_name: str,
     brain_id,
     notification_id=None,
-):  
-    try: 
+):
+    try:
         supabase_client = get_supabase_client()
         tmp_file_name = "tmp-file-" + file_name
         tmp_file_name = tmp_file_name.replace("/", "_")
@@ -92,7 +93,7 @@ def process_file_and_notify(
                     "message": message["message"],
                     "name": file_instance.file.filename if file_instance.file else "",
                 }
-                update_notification_by_id(
+                notification_service.update_notification_by_id(
                     notification_id,
                     NotificationUpdatableProperties(
                         status=NotificationsStatusEnum.Done,
@@ -108,17 +109,14 @@ def process_file_and_notify(
             "message": "There was an error uploading the file. Please check the file and try again. If the issue persist, please open an issue on Github",
             "name": file_instance.file.filename if file_instance.file else "",
         }
-        update_notification_by_id(
+        notification_service.update_notification_by_id(
             notification_id,
             NotificationUpdatableProperties(
                 status=NotificationsStatusEnum.Done,
                 message=str(notification_message),
             ),
-            )
+        )
         raise e
-
-        
-        
 
 
 @celery.task(name="process_crawl_and_notify")
@@ -165,7 +163,7 @@ def process_crawl_and_notify(
             "message": message["message"],
             "name": crawl_website_url,
         }
-        update_notification_by_id(
+        notification_service.update_notification_by_id(
             notification_id,
             NotificationUpdatableProperties(
                 status=NotificationsStatusEnum.Done,

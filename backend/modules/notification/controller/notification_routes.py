@@ -2,9 +2,10 @@ from uuid import UUID
 
 from fastapi import APIRouter, Depends
 from middlewares.auth import AuthBearer
-from repository.notification.get_chat_notifications import get_chat_notifications
+from modules.notification.service.notification_service import NotificationService
 
 notification_router = APIRouter()
+notification_service = NotificationService()
 
 
 @notification_router.get(
@@ -19,4 +20,4 @@ async def get_notifications(
     Get notifications by chat_id
     """
 
-    return get_chat_notifications(chat_id)
+    return notification_service.get_chat_notifications(chat_id)

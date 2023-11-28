@@ -1,49 +1,18 @@
 from datetime import datetime, timedelta
-from typing import Optional
-from uuid import UUID
 
 from fastapi import HTTPException
-from models.databases.repository import Repository
-from models.notifications import Notification, NotificationsStatusEnum
-from pydantic import BaseModel
+from modules.notification.dto.outputs import DeleteNotificationResponse
+from modules.notification.entity.notification import Notification
+from modules.notification.repository.notifications_interface import (
+    NotificationInterface,
+)
 
 
-class CreateNotificationProperties(BaseModel):
-    """Properties that can be received on notification creation"""
-
-    chat_id: Optional[UUID] = None
-    message: Optional[str] = None
-    action: str
-    status: NotificationsStatusEnum = NotificationsStatusEnum.Pending
-
-    def dict(self, *args, **kwargs):
-        notification_dict = super().dict(*args, **kwargs)
-        if notification_dict.get("chat_id"):
-            notification_dict["chat_id"] = str(notification_dict.get("chat_id"))
-        return notification_dict
-
-
-class DeleteNotificationResponse(BaseModel):
-    """Response when deleting a prompt"""
-
-    status: str = "delete"
-    notification_id: UUID
-
-
-class NotificationUpdatableProperties(BaseModel):
-    """Properties that can be received on notification update"""
-
-    message: Optional[str]
-    status: Optional[NotificationsStatusEnum] = NotificationsStatusEnum.Done
-
-
-class Notifications(Repository):
+class Notifications(NotificationInterface):
     def __init__(self, supabase_client):
         self.db = supabase_client
 
-    def add_notification(
-        self, notification: CreateNotificationProperties
-    ) -> Notification:
+    def add_notification(self, notification):
         """
         Add a notification
         """
@@ -53,8 +22,10 @@ class Notifications(Repository):
         return Notification(**response[0])
 
     def update_notification_by_id(
-        self, notification_id: UUID, notification: NotificationUpdatableProperties
-    ) -> Notification:
+        self,
+        notification_id,
+        notification,
+    ):
         """Update a notification by id"""
         response = (
             self.db.from_("notifications")
@@ -68,9 +39,7 @@ class Notifications(Repository):
 
         return Notification(**response[0])
 
-    def remove_notification_by_id(
-        self, notification_id: UUID
-    ) -> DeleteNotificationResponse:
+    def remove_notification_by_id(self, notification_id):
         """
         Remove a notification by id
         Args:
@@ -94,7 +63,7 @@ class Notifications(Repository):
             status="deleted", notification_id=notification_id
         )
 
-    def remove_notifications_by_chat_id(self, chat_id: UUID) -> None:
+    def remove_notifications_by_chat_id(self, chat_id):
         """
         Remove all notifications for a chat
         Args:
@@ -107,7 +76,7 @@ class Notifications(Repository):
             .execute()
         ).data
 
-    def get_notifications_by_chat_id(self, chat_id: UUID) -> list[Notification]:
+    def get_notifications_by_chat_id(self, chat_id):
         """
         Get all notifications for a chat
         Args:
