@@ -1,9 +1,13 @@
-from langchain.embeddings.openai import OpenAIEmbeddings
 from models.databases.supabase.supabase import SupabaseDB
 from pydantic import BaseSettings
 from supabase.client import Client, create_client
 from vectorstore.supabase import SupabaseVectorStore
+from langchain.embeddings.ollama import OllamaEmbeddings
+from langchain.embeddings.openai import OpenAIEmbeddings
 
+from logger import get_logger
+
+logger = get_logger(__name__)
 
 class BrainRateLimiting(BaseSettings):
     max_brain_per_user: int = 5
@@ -40,11 +44,14 @@ def get_supabase_db() -> SupabaseDB:
     return SupabaseDB(supabase_client)
 
 
-def get_embeddings() -> OpenAIEmbeddings:
+def get_embeddings():
     settings = BrainSettings()  # pyright: ignore reportPrivateUsage=none
-    embeddings = OpenAIEmbeddings(
-        openai_api_key=settings.openai_api_key
-    )  # pyright: ignore reportPrivateUsage=none
+    if settings.ollama_api_base_url:
+        embeddings = OllamaEmbeddings(
+            base_url=settings.ollama_api_base_url,
+        )  # pyright: ignore reportPrivateUsage=none
+    else:
+        embeddings = OpenAIEmbeddings()  # pyright: ignore reportPrivateUsage=none
     return embeddings
 
 
