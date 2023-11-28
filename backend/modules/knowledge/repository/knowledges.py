@@ -1,34 +1,16 @@
-from typing import List, Optional
-from uuid import UUID
-
 from fastapi import HTTPException
-from models.databases.repository import Repository
-from models.knowledge import Knowledge
-from pydantic import BaseModel
+from models.settings import get_supabase_client
+from modules.knowledge.dto.outputs import DeleteKnowledgeResponse
+from modules.knowledge.entity.knowledge import Knowledge
+from modules.knowledge.repository.knowledge_interface import KnowledgeInterface
 
 
-class CreateKnowledgeProperties(BaseModel):
-    brain_id: UUID
-    file_name: Optional[str] = None
-    url: Optional[str] = None
-    extension: str = "txt"
-
-    def dict(self, *args, **kwargs):
-        knowledge_dict = super().dict(*args, **kwargs)
-        knowledge_dict["brain_id"] = str(knowledge_dict.get("brain_id"))
-        return knowledge_dict
-
-
-class DeleteKnowledgeResponse(BaseModel):
-    status: str = "delete"
-    knowledge_id: UUID
-
-
-class Knowledges(Repository):
-    def __init__(self, supabase_client):
+class Knowledges(KnowledgeInterface):
+    def __init__(self):
+        supabase_client = get_supabase_client()
         self.db = supabase_client
 
-    def insert_knowledge(self, knowledge: CreateKnowledgeProperties) -> Knowledge:
+    def insert_knowledge(self, knowledge):
         """
         Add a knowledge
         """
@@ -38,8 +20,8 @@ class Knowledges(Repository):
     def remove_knowledge_by_id(
         # todo: update remove brain endpoints to first delete the knowledge
         self,
-        knowledge_id: UUID,
-    ) -> DeleteKnowledgeResponse:
+        knowledge_id,
+    ):
         """
         Args:
             knowledge_id (UUID): The id of the knowledge
@@ -64,7 +46,7 @@ class Knowledges(Repository):
             knowledge_id=knowledge_id,
         )
 
-    def get_knowledge_by_id(self, knowledge_id: UUID) -> Knowledge:
+    def get_knowledge_by_id(self, knowledge_id):
         """
         Get a knowledge by its id
         Args:
@@ -79,7 +61,7 @@ class Knowledges(Repository):
 
         return Knowledge(**knowledge[0])
 
-    def get_all_knowledge_in_brain(self, brain_id: UUID) -> List[Knowledge]:
+    def get_all_knowledge_in_brain(self, brain_id):
         """
         Get all the knowledge in a brain
         Args:
@@ -94,7 +76,7 @@ class Knowledges(Repository):
 
         return [Knowledge(**knowledge) for knowledge in all_knowledge]
 
-    def remove_brain_all_knowledge(self, brain_id: UUID) -> None:
+    def remove_brain_all_knowledge(self, brain_id):
         """
         Remove all knowledge in a brain
         Args:

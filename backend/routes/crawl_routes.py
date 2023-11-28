@@ -6,19 +6,20 @@ from fastapi import APIRouter, Depends, Query, Request
 from logger import get_logger
 from middlewares.auth import AuthBearer, get_current_user
 from models import Brain, UserUsage
-from models.databases.supabase.knowledge import CreateKnowledgeProperties
+from modules.knowledge.dto.inputs import CreateKnowledgeProperties
+from modules.knowledge.service.knowledge_service import KnowledgeService
 from modules.notification.dto.inputs import CreateNotificationProperties
 from modules.notification.entity.notification import NotificationsStatusEnum
 from modules.notification.service.notification_service import NotificationService
 from modules.user.entity.user_identity import UserIdentity
 from packages.files.crawl.crawler import CrawlWebsite
 from packages.files.file import convert_bytes
-from repository.knowledge.add_knowledge import add_knowledge
 
 logger = get_logger(__name__)
 crawl_router = APIRouter()
 
 notification_service = NotificationService()
+knowledge_service = KnowledgeService()
 
 
 @crawl_router.get("/crawl/healthz", tags=["Health"])
@@ -72,7 +73,7 @@ async def crawl_endpoint(
             extension="html",
         )
 
-        added_knowledge = add_knowledge(knowledge_to_add)
+        added_knowledge = knowledge_service.add_knowledge(knowledge_to_add)
         logger.info(f"Knowledge {added_knowledge} added successfully")
 
         process_crawl_and_notify.delay(
