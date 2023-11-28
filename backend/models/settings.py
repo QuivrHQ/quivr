@@ -15,6 +15,7 @@ class BrainSettings(BaseSettings):
     supabase_service_key: str
     resend_api_key: str = "null"
     resend_email_address: str = "brain@mail.quivr.app"
+    ollama_api_base_url: str = None
 
 
 class ContactsSettings(BaseSettings):

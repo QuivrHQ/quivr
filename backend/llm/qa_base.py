@@ -143,6 +143,11 @@ class QABaseBrainPicking(BaseModel):
         :param callbacks: Callbacks to be used for streaming
         :return: Language model instance
         """
+        api_base = None
+        if self.brain_settings.ollama_api_base_url and model.startswith("ollama"):
+            api_base = self.brain_settings.ollama_api_base_url
+
+
         return ChatLiteLLM(
             temperature=temperature,
             max_tokens=self.max_tokens,
@@ -150,6 +155,7 @@ class QABaseBrainPicking(BaseModel):
             streaming=streaming,
             verbose=False,
             callbacks=callbacks,
+            api_base= api_base
         )  # pyright: ignore reportPrivateUsage=none
 
     def _create_prompt_template(self):
