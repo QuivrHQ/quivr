@@ -143,7 +143,6 @@ CREATE TABLE IF NOT EXISTS brains (
   model TEXT,
   max_tokens INT,
   temperature FLOAT,
-  openai_api_key TEXT,
   prompt_id UUID REFERENCES prompts(id),
   last_update TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   brain_type brain_type_enum DEFAULT 'doc'
@@ -444,7 +443,7 @@ $$;
 
 
 INSERT INTO migrations (name) 
-SELECT '20231116102600_add_get_user_email_by_user_id'
+SELECT '20231128173900_remove_openai_api_key'
 WHERE NOT EXISTS (
-    SELECT 1 FROM migrations WHERE name = '20231116102600_add_get_user_email_by_user_id'
+    SELECT 1 FROM migrations WHERE name = '20231128173900_remove_openai_api_key'
 );
