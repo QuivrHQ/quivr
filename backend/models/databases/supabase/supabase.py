@@ -7,9 +7,6 @@ from models.databases.supabase import (
     Chats,
     File,
     Knowledges,
-    Notifications,
-    Onboarding,
-    Prompts,
     UserUsage,
     Vector,
 )
@@ -25,9 +22,6 @@ class SupabaseDB(
     ApiKeyHandler,
     Chats,
     Vector,
-    Onboarding,
-    Prompts,
-    Notifications,
     Knowledges,
     ApiBrainDefinitions,
 ):
@@ -40,8 +34,5 @@ class SupabaseDB(
         ApiKeyHandler.__init__(self, supabase_client)
         Chats.__init__(self, supabase_client)
         Vector.__init__(self, supabase_client)
-        Prompts.__init__(self, supabase_client)
-        Notifications.__init__(self, supabase_client)
         Knowledges.__init__(self, supabase_client)
-        Onboarding.__init__(self, supabase_client)
         ApiBrainDefinitions.__init__(self, supabase_client)

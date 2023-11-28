@@ -81,12 +81,17 @@ async def filter_file(
 
     if file.file_extension in file_processors:
         try:
-            await file_processors[file.file_extension](
+            result = await file_processors[file.file_extension](
                 file=file,
                 brain_id=brain_id,
             )
+            if result is None or result == 0:
+                return create_response(
+                    f"？ {using_file_name} has been uploaded to brain. There might have been an error while reading it, please make sure the file is not illformed or just an image",  # pyright: ignore reportPrivateUsage=none
+                    "warning",
+                )
             return create_response(
-                f"✅ {using_file_name} has been uploaded to brain {brain.name}.",  # pyright: ignore reportPrivateUsage=none
+                f"✅ {using_file_name} has been uploaded to brain {brain.name} in {result} chunks",  # pyright: ignore reportPrivateUsage=none
                 "success",
             )
         except Exception as e:

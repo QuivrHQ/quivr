@@ -96,23 +96,23 @@ class Brain(Repository):
     def get_public_brains(self) -> list[PublicBrain]:
         response = (
             self.db.from_("brains")
-            .select("id:brain_id, name, description, last_update, brain_type")
+            .select(
+                "id:brain_id, name, description, last_update, brain_type, brain_definition: api_brain_definition(*), number_of_subscribers:brains_users(count)"
+            )
             .filter("status", "eq", "public")
             .execute()
         )
         public_brains: list[PublicBrain] = []
 
         for item in response.data:
-            brain = PublicBrain(
-                id=item["id"],
-                name=item["name"],
-                description=item["description"],
-                last_update=item["last_update"],
-                brain_type=item["brain_type"],
-                brain_definition=self.get_api_brain_definition(item["id"]),
-            )
-            brain.number_of_subscribers = self.get_brain_subscribers_count(brain.id)
-            public_brains.append(brain)
+            item["number_of_subscribers"] = item["number_of_subscribers"][0]["count"]
+            if not item["brain_definition"]:
+                del item["brain_definition"]
+            else:
+                item["brain_definition"] = item["brain_definition"][0]
+                item["brain_definition"]["secrets"] = []
+
+            public_brains.append(PublicBrain(**item))
         return public_brains
 
     def update_brain_last_update_time(self, brain_id: UUID) -> None:
@@ -278,36 +278,39 @@ class Brain(Repository):
 
     def delete_file_from_brain(self, brain_id, file_name: str):
         # First, get the vector_ids associated with the file_name
-        vector_response = (
+        file_vectors = (
             self.db.table("vectors")
             .select("id")
             .filter("metadata->>file_name", "eq", file_name)
             .execute()
         )
-        vector_ids = [item["id"] for item in vector_response.data]
 
-        # For each vector_id, delete the corresponding entry from the 'brains_vectors' table
-        for vector_id in vector_ids:
-            self.db.table("brains_vectors").delete().filter(
-                "vector_id", "eq", vector_id
-            ).filter("brain_id", "eq", brain_id).execute()
+        file_vectors_ids = [item["id"] for item in file_vectors.data]
 
-            # Check if the vector is still associated with any other brains
-            associated_brains_response = (
-                self.db.table("brains_vectors")
-                .select("brain_id")
-                .filter("vector_id", "eq", vector_id)
-                .execute()
-            )
-            associated_brains = [
-                item["brain_id"] for item in associated_brains_response.data
-            ]
+        # remove current file vectors from brain vectors
+        self.db.table("brains_vectors").delete().filter(
+            "vector_id", "in", file_vectors_ids
+        ).filter("brain_id", "eq", brain_id).execute()
 
-            # If the vector is not associated with any other brains, delete it from 'vectors' table
-            if not associated_brains:
-                self.db.table("vectors").delete().filter(
-                    "id", "eq", vector_id
-                ).execute()
+        vectors_used_by_another_brain = (
+            self.db.table("brains_vectors")
+            .select("vector_id")
+            .filter("vector_id", "in", file_vectors_ids)
+            .filter("brain_id", "neq", brain_id)
+            .execute()
+        )
+
+        vectors_used_by_another_brain_ids = [
+            item["vector_id"] for item in vectors_used_by_another_brain.data
+        ]
+
+        vectors_no_longer_used_ids = [
+            id for id in file_vectors_ids if id not in vectors_used_by_another_brain_ids
+        ]
+
+        self.db.table("vectors").delete().filter(
+            "id", "in", vectors_no_longer_used_ids
+        ).execute()
 
         return {"message": f"File {file_name} in brain {brain_id} has been deleted."}
 

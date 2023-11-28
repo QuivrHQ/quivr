@@ -2,8 +2,10 @@ from typing import Optional
 from uuid import UUID
 
 from llm.utils.get_prompt_to_use_id import get_prompt_to_use_id
-from models.prompt import Prompt
-from repository.prompt import get_prompt_by_id
+from modules.prompt.entity.prompt import Prompt
+from modules.prompt.service import PromptService
+
+promptService = PromptService()
 
 
 def get_prompt_to_use(
@@ -13,4 +15,4 @@ def get_prompt_to_use(
     if prompt_to_use_id is None:
         return None
 
-    return get_prompt_by_id(prompt_to_use_id)
+    return promptService.get_prompt_by_id(prompt_to_use_id)
