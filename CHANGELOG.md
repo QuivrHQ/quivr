@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.0.121 (2023-11-28)
+
+## What's Changed
+* fix: update max token logic by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1725
+* fix: update public brain subscription logic by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1727
+* fix: sanitize file name by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1728
+* feat(publicBrains): use join queries for better performance by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1730
+* feat: improve delete knowledge performance by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1733
+* fix: 🐛 crawler by @StanGirard in https://github.com/StanGirard/quivr/pull/1735
+* feat: 🎸 local user by @StanGirard in https://github.com/StanGirard/quivr/pull/1736
+
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.120...v0.0.121
+
 ## 0.0.120 (2023-11-27)
 
 ## What's Changed
