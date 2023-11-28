@@ -13,13 +13,13 @@ fastapi==0.95.2
 python-multipart==0.0.6
 uvicorn==0.22.0
 pypandoc==1.11
-
 docx2txt==0.8
 python-jose==3.3.0
 asyncpg==0.27.0
 flake8==6.0.0
 flake8-black==0.3.6
-sentry-sdk==1.26.0
+sentry-sdk==1.37.1
+sentry-sdk[fastapi]==1.37.1
 pyright==1.1.316
 resend==0.5.1
 html5lib==1.1

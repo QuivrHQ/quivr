@@ -52,10 +52,12 @@ class APIBrainQA(
         functions,
         brain_id: UUID,
     ):
+        yield "🧠<Deciding what to do>🧠"
+
         response = completion(
             model=self.model,
             temperature=self.temperature,
-            max_tokens=2000,
+            max_tokens=self.max_tokens,
             messages=messages,
             functions=functions,
             stream=True,
@@ -87,12 +89,19 @@ class APIBrainQA(
                     arguments = json.loads(function_call["arguments"])
                 except Exception:
                     arguments = {}
+                yield f"🧠<Calling API with arguments {arguments} and brain id {brain_id}>🧠"
 
-                api_call_response = call_brain_api(
-                    brain_id=brain_id,
-                    user_id=self.user_id,
-                    arguments=arguments,
-                )
+                try:
+                    api_call_response = call_brain_api(
+                        brain_id=brain_id,
+                        user_id=self.user_id,
+                        arguments=arguments,
+                    )
+                except Exception as e:
+                    raise HTTPException(
+                        status_code=400,
+                        detail=f"Error while calling API: {e}",
+                    )
 
                 messages.append(
                     {
@@ -109,10 +118,14 @@ class APIBrainQA(
                     yield value
 
             else:
-                if hasattr(chunk.choices[0], 'delta') and chunk.choices[0].delta and hasattr(chunk.choices[0].delta, 'content'):
+                if (
+                    hasattr(chunk.choices[0], "delta")
+                    and chunk.choices[0].delta
+                    and hasattr(chunk.choices[0].delta, "content")
+                ):
                     content = chunk.choices[0].delta.content
                     yield content
-                else: # pragma: no cover
+                else:  # pragma: no cover
                     yield "**...**"
                     break
 
@@ -178,7 +191,11 @@ class APIBrainQA(
             streamed_chat_history.assistant = value
             response_tokens.append(value)
             yield f"data: {json.dumps(streamed_chat_history.dict())}"
-
+        response_tokens = [
+            token
+            for token in response_tokens
+            if not token.startswith("🧠<") and not token.endswith(">🧠")
+        ]
         update_message_by_id(
             message_id=str(streamed_chat_history.message_id),
             user_message=question.question,

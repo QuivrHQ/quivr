@@ -11,6 +11,7 @@ from models.databases.supabase.brains import (
     BrainUpdatableProperties,
     CreateBrainProperties,
 )
+from modules.prompt.service.prompt_service import PromptService
 from modules.user.entity.user_identity import UserIdentity
 from repository.brain import (
     create_brain,
@@ -26,16 +27,14 @@ from repository.brain import (
     update_brain_by_id,
 )
 from repository.brain.get_brain_for_user import get_brain_for_user
-from repository.external_api_secret.update_secret_value import (
-    update_secret_value,
-)
-from repository.prompt import delete_prompt_by_id, get_prompt_by_id
-
+from repository.external_api_secret.update_secret_value import update_secret_value
 from routes.authorizations.brain_authorization import has_brain_authorization
 from routes.authorizations.types import RoleEnum
 
 logger = get_logger(__name__)
 brain_router = APIRouter()
+
+prompt_service = PromptService()
 
 
 @brain_router.get("/brains/", dependencies=[Depends(AuthBearer())], tags=["Brain"])
@@ -147,9 +146,9 @@ async def update_existing_brain(
     update_brain_by_id(brain_id, brain_update_data)
 
     if brain_update_data.prompt_id is None and existing_brain.prompt_id:
-        prompt = get_prompt_by_id(existing_brain.prompt_id)
+        prompt = prompt_service.get_prompt_by_id(existing_brain.prompt_id)
         if prompt and prompt.status == "private":
-            delete_prompt_by_id(existing_brain.prompt_id)
+            prompt_service.delete_prompt_by_id(existing_brain.prompt_id)
 
     if brain_update_data.status == "private" and existing_brain.status == "public":
         delete_brain_users(brain_id)

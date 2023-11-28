@@ -7,16 +7,18 @@ from logger import get_logger
 from middlewares.auth import AuthBearer, get_current_user
 from models import Brain, UserUsage
 from models.databases.supabase.knowledge import CreateKnowledgeProperties
-from models.databases.supabase.notifications import CreateNotificationProperties
-from models.notifications import NotificationsStatusEnum
+from modules.notification.dto.inputs import CreateNotificationProperties
+from modules.notification.entity.notification import NotificationsStatusEnum
+from modules.notification.service.notification_service import NotificationService
 from modules.user.entity.user_identity import UserIdentity
 from packages.files.crawl.crawler import CrawlWebsite
 from packages.files.file import convert_bytes
 from repository.knowledge.add_knowledge import add_knowledge
-from repository.notification.add_notification import add_notification
 
 logger = get_logger(__name__)
 crawl_router = APIRouter()
+
+notification_service = NotificationService()
 
 
 @crawl_router.get("/crawl/healthz", tags=["Health"])
@@ -56,7 +58,7 @@ async def crawl_endpoint(
     else:
         crawl_notification = None
         if chat_id:
-            crawl_notification = add_notification(
+            crawl_notification = notification_service.add_notification(
                 CreateNotificationProperties(
                     action="CRAWL",
                     chat_id=chat_id,
