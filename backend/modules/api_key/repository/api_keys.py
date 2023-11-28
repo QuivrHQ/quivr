@@ -1,11 +1,13 @@
 from datetime import datetime
 from uuid import UUID
 
-from models.databases.repository import Repository
+from models.settings import get_supabase_client
+from modules.api_key.repository.api_key_interface import ApiKeysInterface
 
 
-class ApiKeyHandler(Repository):
-    def __init__(self, supabase_client):
+class ApiKeys(ApiKeysInterface):
+    def __init__(self):
+        supabase_client = get_supabase_client()
         self.db = supabase_client  # type: ignore
 
     def create_api_key(self, new_key_id, new_api_key, user_id):
@@ -60,7 +62,7 @@ class ApiKeyHandler(Repository):
         )
         return response
 
-    def get_user_api_keys(self, user_id: UUID):
+    def get_user_api_keys(self, user_id):
         response = (
             self.db.table("api_keys")
             .select("key_id, creation_time")
