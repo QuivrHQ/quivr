@@ -8,18 +8,16 @@ from logger import get_logger
 from middlewares.auth import AuthBearer, get_current_user
 from models import UserUsage
 from models.databases.supabase.knowledge import CreateKnowledgeProperties
-from models.databases.supabase.notifications import CreateNotificationProperties
-from models.notifications import NotificationsStatusEnum
+from modules.notification.dto.inputs import (
+    CreateNotificationProperties,
+    NotificationUpdatableProperties,
+)
+from modules.notification.entity.notification import NotificationsStatusEnum
+from modules.notification.service.notification_service import NotificationService
 from modules.user.entity.user_identity import UserIdentity
 from packages.files.file import convert_bytes, get_file_size
-from repository.knowledge.add_knowledge import add_knowledge
 from repository.files.upload_file import upload_file_storage
-from repository.notification.add_notification import add_notification
-from repository.notification.update_notification import update_notification_by_id
-from models.databases.supabase.notifications import NotificationUpdatableProperties
-
-
-
+from repository.knowledge.add_knowledge import add_knowledge
 from routes.authorizations.brain_authorization import (
     RoleEnum,
     validate_brain_authorization,
@@ -27,6 +25,8 @@ from routes.authorizations.brain_authorization import (
 
 logger = get_logger(__name__)
 upload_router = APIRouter()
+
+notification_service = NotificationService()
 
 
 @upload_router.get("/upload/healthz", tags=["Health"])
@@ -61,7 +61,7 @@ async def upload_file(
         raise HTTPException(status_code=403, detail=message)
     upload_notification = None
     if chat_id:
-        upload_notification = add_notification(
+        upload_notification = notification_service.add_notification(
             CreateNotificationProperties(
                 action="UPLOAD",
                 chat_id=chat_id,
@@ -83,7 +83,7 @@ async def upload_file(
             "message": "There was an error uploading the file. Please check the file and try again. If the issue persist, please open an issue on Github",
             "name": uploadFile.filename if uploadFile else "Last Upload File",
         }
-        update_notification_by_id(
+        notification_service.update_notification_by_id(
             upload_notification.id,
             NotificationUpdatableProperties(
                 status=NotificationsStatusEnum.Done,
