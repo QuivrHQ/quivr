@@ -1,8 +1,8 @@
 # pymupdf==1.22.3
-langchain==0.0.332
-litellm==0.13.2
+langchain==0.0.341
+litellm==1.7.7
 # Markdown==3.4.4
-openai==0.27.8
+openai==1.1.1
 GitPython==3.1.36
 pdf2image==1.16.3
 pypdf==3.9.0
@@ -36,3 +36,4 @@ python-dotenv
 pytest-mock
 pytest-celery
 pytesseract==0.3.10
+async_generator
