@@ -5,7 +5,6 @@ import {
   createBrain,
   deleteBrain,
   getBrain,
-  getBrainDocuments,
   getBrains,
   getBrainUsers,
   getDefaultBrain,
@@ -27,8 +26,6 @@ export const useBrainApi = () => {
   const { axiosInstance } = useAxios();
 
   return {
-    getBrainDocuments: async (brainId: string) =>
-      getBrainDocuments(brainId, axiosInstance),
     createBrain: async (brain: CreateBrainInput) =>
       createBrain(brain, axiosInstance),
     deleteBrain: async (id: string) => deleteBrain(id, axiosInstance),

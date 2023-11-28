@@ -21,7 +21,6 @@ from routes.brain_routes import brain_router
 from routes.chat_routes import chat_router
 from routes.contact_routes import router as contact_router
 from routes.crawl_routes import crawl_router
-from routes.explore_routes import explore_router
 from routes.knowledge_routes import knowledge_router
 from routes.misc_routes import misc_router
 from routes.notification_routes import notification_router
@@ -70,7 +69,6 @@ app.include_router(brain_router)
 app.include_router(chat_router)
 app.include_router(crawl_router)
 app.include_router(onboarding_router)
-app.include_router(explore_router)
 app.include_router(misc_router)
 
 app.include_router(upload_router)
