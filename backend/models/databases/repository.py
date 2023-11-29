@@ -87,10 +87,6 @@ class Repository(ABC):
         pass
 
     @abstractmethod
-    def get_user_email(self, user_id: UUID):
-        pass
-
-    @abstractmethod
     def set_file_vectors_ids(self, file_sha1: str):
         pass
 
