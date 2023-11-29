@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.0.122 (2023-11-29)
+
+## What's Changed
+* refactor: Notification module by @gozineb in https://github.com/StanGirard/quivr/pull/1740
+* refactor: remove explore route from back & front by @gozineb in https://github.com/StanGirard/quivr/pull/1741
+* feat: implement local llms by @StanGirard in https://github.com/StanGirard/quivr/pull/1745
+* refactor: knowledge module by @gozineb in https://github.com/StanGirard/quivr/pull/1743
+
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.121...v0.0.122
+
 ## 0.0.121 (2023-11-28)
 
 ## What's Changed
