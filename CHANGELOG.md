@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.0.123 (2023-11-29)
+
+## What's Changed
+* chore: downgrade versions by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1748
+* fix: revert implement local llms by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1749
+
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.122...v0.0.123
+
 ## 0.0.122 (2023-11-29)
 
 ## What's Changed
