@@ -13,6 +13,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.responses import JSONResponse
 from logger import get_logger
 from middlewares.cors import add_cors_middleware
+from modules.api_key.controller import api_key_router
 from modules.contact_support.controller import contact_router
 from modules.knowledge.controller import knowledge_router
 from modules.misc.controller import misc_router
