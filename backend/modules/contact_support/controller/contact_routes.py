@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 from logger import get_logger
-from models import ContactsSettings
+from modules.contact_support.controller.settings import ContactsSettings
 from packages.emails.send_email import send_email
 from pydantic import BaseModel
 
@@ -10,7 +10,7 @@ class ContactMessage(BaseModel):
     content: str
 
 
-router = APIRouter()
+contact_router = APIRouter()
 logger = get_logger(__name__)
 
 
