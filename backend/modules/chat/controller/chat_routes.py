@@ -10,6 +10,12 @@ from middlewares.auth import AuthBearer, get_current_user
 from models import Chat, ChatQuestion, UserUsage, get_supabase_db
 from models.databases.supabase.chats import QuestionAndAnswer
 from modules.brain.service.brain_service import BrainService
+from modules.chat.controller.chat.factory import get_chat_strategy
+from modules.chat.controller.chat.utils import (
+    NullableUUID,
+    check_user_requests_limit,
+    delete_chat_from_db,
+)
 from modules.notification.service.notification_service import NotificationService
 from modules.user.entity.user_identity import UserIdentity
 from repository.chat import (
@@ -25,12 +31,6 @@ from repository.chat.add_question_and_answer import add_question_and_answer
 from repository.chat.get_chat_history_with_notifications import (
     ChatItem,
     get_chat_history_with_notifications,
-)
-from routes.chat.factory import get_chat_strategy
-from routes.chat.utils import (
-    NullableUUID,
-    check_user_requests_limit,
-    delete_chat_from_db,
 )
 
 chat_router = APIRouter()
