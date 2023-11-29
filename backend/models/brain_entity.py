@@ -2,10 +2,9 @@ from enum import Enum
 from typing import Optional
 from uuid import UUID
 
-from pydantic import BaseModel
-from routes.authorizations.types import RoleEnum
-
 from models.ApiBrainDefinition import ApiBrainDefinition
+from modules.authorization.utils import RoleEnum
+from pydantic import BaseModel
 
 
 class BrainType(str, Enum):

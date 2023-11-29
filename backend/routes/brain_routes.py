@@ -11,6 +11,7 @@ from models.databases.supabase.brains import (
     BrainUpdatableProperties,
     CreateBrainProperties,
 )
+from modules.authorization.utils import RoleEnum, has_brain_authorization
 from modules.prompt.service.prompt_service import PromptService
 from modules.user.entity.user_identity import UserIdentity
 from repository.brain import (
@@ -28,8 +29,6 @@ from repository.brain import (
 )
 from repository.brain.get_brain_for_user import get_brain_for_user
 from repository.external_api_secret.update_secret_value import update_secret_value
-from routes.authorizations.brain_authorization import has_brain_authorization
-from routes.authorizations.types import RoleEnum
 
 logger = get_logger(__name__)
 brain_router = APIRouter()

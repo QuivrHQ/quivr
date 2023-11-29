@@ -7,6 +7,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query, Request, UploadFil
 from logger import get_logger
 from middlewares.auth import AuthBearer, get_current_user
 from models import UserUsage
+from modules.authorization.utils import RoleEnum, validate_brain_authorization
 from modules.knowledge.dto.inputs import CreateKnowledgeProperties
 from modules.knowledge.service.knowledge_service import KnowledgeService
 from modules.notification.dto.inputs import (
@@ -18,10 +19,6 @@ from modules.notification.service.notification_service import NotificationServic
 from modules.user.entity.user_identity import UserIdentity
 from packages.files.file import convert_bytes, get_file_size
 from repository.files.upload_file import upload_file_storage
-from routes.authorizations.brain_authorization import (
-    RoleEnum,
-    validate_brain_authorization,
-)
 
 logger = get_logger(__name__)
 upload_router = APIRouter()

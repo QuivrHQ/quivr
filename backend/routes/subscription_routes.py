@@ -4,6 +4,11 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException
 from middlewares.auth.auth_bearer import AuthBearer, get_current_user
 from models import BrainSubscription
+from modules.authorization.utils import (
+    RoleEnum,
+    has_brain_authorization,
+    validate_brain_authorization,
+)
 from modules.prompt.entity.prompt import PromptStatusEnum
 from modules.prompt.service.prompt_service import PromptService
 from modules.user.entity.user_identity import UserIdentity
@@ -28,11 +33,6 @@ from repository.brain_subscription import (
     resend_invitation_email,
 )
 from repository.external_api_secret.create_secret import create_secret
-from routes.authorizations.brain_authorization import (
-    RoleEnum,
-    has_brain_authorization,
-    validate_brain_authorization,
-)
 from routes.headers.get_origin_header import get_origin_header
 
 subscription_router = APIRouter()

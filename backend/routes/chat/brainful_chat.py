@@ -2,9 +2,8 @@ from fastapi import HTTPException
 from llm.api_brain_qa import APIBrainQA
 from llm.qa_base import QABaseBrainPicking
 from models.brain_entity import BrainType
+from modules.authorization.utils import RoleEnum, validate_brain_authorization
 from repository.brain.get_brain_by_id import get_brain_by_id
-from routes.authorizations.brain_authorization import validate_brain_authorization
-from routes.authorizations.types import RoleEnum
 from routes.chat.interface import ChatInterface
 
 models_supporting_function_calls = [
