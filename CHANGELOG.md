@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.0.124 (2023-11-29)
+
+## What's Changed
+* feat(chatInput): use tiptap editor by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1752
+* docs: update guidelines.md by @eltociear in https://github.com/StanGirard/quivr/pull/1755
+* Feat/local llm bug fix by @StanGirard in https://github.com/StanGirard/quivr/pull/1758
+
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.123...v0.0.124
+
 ## 0.0.123 (2023-11-29)
 
 ## What's Changed
