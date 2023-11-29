@@ -7,7 +7,8 @@ from fastapi import APIRouter, Depends, HTTPException, Query, Request, UploadFil
 from logger import get_logger
 from middlewares.auth import AuthBearer, get_current_user
 from models import UserUsage
-from models.databases.supabase.knowledge import CreateKnowledgeProperties
+from modules.knowledge.dto.inputs import CreateKnowledgeProperties
+from modules.knowledge.service.knowledge_service import KnowledgeService
 from modules.notification.dto.inputs import (
     CreateNotificationProperties,
     NotificationUpdatableProperties,
@@ -17,7 +18,6 @@ from modules.notification.service.notification_service import NotificationServic
 from modules.user.entity.user_identity import UserIdentity
 from packages.files.file import convert_bytes, get_file_size
 from repository.files.upload_file import upload_file_storage
-from repository.knowledge.add_knowledge import add_knowledge
 from routes.authorizations.brain_authorization import (
     RoleEnum,
     validate_brain_authorization,
@@ -27,6 +27,7 @@ logger = get_logger(__name__)
 upload_router = APIRouter()
 
 notification_service = NotificationService()
+knowledge_service = KnowledgeService()
 
 
 @upload_router.get("/upload/healthz", tags=["Health"])
@@ -108,7 +109,7 @@ async def upload_file(
         )[-1].lower(),
     )
 
-    added_knowledge = add_knowledge(knowledge_to_add)
+    added_knowledge = knowledge_service.add_knowledge(knowledge_to_add)
     logger.info(f"Knowledge {added_knowledge} added successfully")
 
     process_file_and_notify.delay(

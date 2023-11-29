@@ -4,13 +4,10 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from logger import get_logger
 from middlewares.auth import AuthBearer, get_current_user
 from models import Brain
+from modules.knowledge.service.knowledge_service import KnowledgeService
 from modules.user.entity.user_identity import UserIdentity
 from repository.files.delete_file import delete_file_from_storage
 from repository.files.generate_file_signed_url import generate_file_signed_url
-from repository.knowledge.get_all_knowledge import get_all_knowledge
-from repository.knowledge.get_knowledge import get_knowledge
-from repository.knowledge.remove_knowledge import remove_knowledge
-
 from routes.authorizations.brain_authorization import (
     RoleEnum,
     has_brain_authorization,
@@ -19,6 +16,8 @@ from routes.authorizations.brain_authorization import (
 
 knowledge_router = APIRouter()
 logger = get_logger(__name__)
+
+knowledge_service = KnowledgeService()
 
 
 @knowledge_router.get(
@@ -34,7 +33,7 @@ async def list_knowledge_in_brain_endpoint(
 
     validate_brain_authorization(brain_id=brain_id, user_id=current_user.id)
 
-    knowledges = get_all_knowledge(brain_id)
+    knowledges = knowledge_service.get_all_knowledge(brain_id)
     logger.info(f"List of knowledge from knowledge table: {knowledges}")
 
     return {"knowledges": knowledges}
@@ -59,9 +58,9 @@ async def delete_endpoint(
 
     brain = Brain(id=brain_id)
 
-    knowledge = get_knowledge(knowledge_id)
+    knowledge = knowledge_service.get_knowledge(knowledge_id)
     file_name = knowledge.file_name if knowledge.file_name else knowledge.url
-    remove_knowledge(knowledge_id)
+    knowledge_service.remove_knowledge(knowledge_id)
 
     if knowledge.file_name:
         delete_file_from_storage(f"{brain_id}/{knowledge.file_name}")
@@ -87,7 +86,7 @@ async def generate_signed_url_endpoint(
     Generate a signed url to download the file from storage.
     """
 
-    knowledge = get_knowledge(knowledge_id)
+    knowledge = knowledge_service.get_knowledge(knowledge_id)
 
     validate_brain_authorization(brain_id=knowledge.brain_id, user_id=current_user.id)
 

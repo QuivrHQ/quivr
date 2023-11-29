@@ -3,15 +3,14 @@ from uuid import UUID
 from fastapi import HTTPException
 from models.brain_entity import BrainType
 from models.settings import get_supabase_db
-
+from modules.knowledge.service.knowledge_service import KnowledgeService
 from repository.api_brain_definition.delete_api_brain_definition import (
     delete_api_brain_definition,
 )
 from repository.brain import get_brain_by_id
 from repository.brain.delete_brain_secrets import delete_brain_secrets_values
-from repository.knowledge.remove_brain_all_knowledge import (
-    remove_brain_all_knowledge,
-)
+
+knowledge_service = KnowledgeService()
 
 
 def delete_brain(brain_id: UUID) -> dict[str, str]:
@@ -27,7 +26,7 @@ def delete_brain(brain_id: UUID) -> dict[str, str]:
         )
         delete_api_brain_definition(brain_id=brain_id)
     else:
-        remove_brain_all_knowledge(brain_id)
+        knowledge_service.remove_brain_all_knowledge(brain_id)
 
     supabase_db.delete_brain_vector(str(brain_id))
     supabase_db.delete_brain_users(str(brain_id))
