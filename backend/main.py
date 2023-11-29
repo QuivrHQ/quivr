@@ -13,12 +13,12 @@ from fastapi import FastAPI, HTTPException
 from fastapi.responses import JSONResponse
 from logger import get_logger
 from middlewares.cors import add_cors_middleware
+from modules.api_key.controller.api_key_routes import api_key_router
 from modules.knowledge.controller.knowledge_routes import knowledge_router
 from modules.notification.controller.notification_routes import notification_router
 from modules.onboarding.controller.onboarding_routes import onboarding_router
 from modules.prompt.controller.prompt_routes import prompt_router
 from modules.user.controller.user_controller import user_router
-from routes.api_key_routes import api_key_router
 from routes.brain_routes import brain_router
 from routes.chat_routes import chat_router
 from routes.contact_routes import router as contact_router
