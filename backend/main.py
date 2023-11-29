@@ -20,12 +20,12 @@ from modules.misc.controller import misc_router
 from modules.notification.controller import notification_router
 from modules.onboarding.controller import onboarding_router
 from modules.prompt.controller import prompt_router
+from modules.upload.controller import upload_router
 from modules.user.controller import user_router
 from routes.brain_routes import brain_router
 from routes.chat_routes import chat_router
 from routes.crawl_routes import crawl_router
 from routes.subscription_routes import subscription_router
-from routes.upload_routes import upload_router
 from sentry_sdk.integrations.fastapi import FastApiIntegration
 from sentry_sdk.integrations.starlette import StarletteIntegration
 
