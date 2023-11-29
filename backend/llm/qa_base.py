@@ -7,7 +7,6 @@ from langchain.callbacks.streaming_aiter import AsyncIteratorCallbackHandler
 from langchain.chains import ConversationalRetrievalChain, LLMChain
 from langchain.chains.question_answering import load_qa_chain
 from langchain.chat_models import ChatLiteLLM
-from langchain.embeddings.ollama import OllamaEmbeddings
 from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.llms.base import BaseLLM
 from langchain.prompts.chat import (
@@ -85,13 +84,8 @@ class QABaseBrainPicking(BaseModel):
             ]
 
     @property
-    def embeddings(self):
-        if self.brain_settings.ollama_api_base_url:
-            return OllamaEmbeddings(
-                base_url=self.brain_settings.ollama_api_base_url
-            )  # pyright: ignore reportPrivateUsage=none
-        else: 
-            return OpenAIEmbeddings()
+    def embeddings(self) -> OpenAIEmbeddings:
+        return OpenAIEmbeddings()  # pyright: ignore reportPrivateUsage=none
 
     supabase_client: Optional[Client] = None
     vector_store: Optional[CustomSupabaseVectorStore] = None
@@ -149,11 +143,6 @@ class QABaseBrainPicking(BaseModel):
         :param callbacks: Callbacks to be used for streaming
         :return: Language model instance
         """
-        api_base = None
-        if self.brain_settings.ollama_api_base_url and model.startswith("ollama"):
-            api_base = self.brain_settings.ollama_api_base_url
-
-
         return ChatLiteLLM(
             temperature=temperature,
             max_tokens=self.max_tokens,
@@ -161,7 +150,6 @@ class QABaseBrainPicking(BaseModel):
             streaming=streaming,
             verbose=False,
             callbacks=callbacks,
-            api_base= api_base
         )  # pyright: ignore reportPrivateUsage=none
 
     def _create_prompt_template(self):

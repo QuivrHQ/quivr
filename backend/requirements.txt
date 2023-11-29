@@ -36,4 +36,3 @@ python-dotenv
 pytest-mock
 pytest-celery
 pytesseract==0.3.10
-async_generator

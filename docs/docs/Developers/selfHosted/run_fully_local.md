@@ -1,9 +1,9 @@
 ---
 sidebar_position: 2
-title: Run Quivr locally with Ollama
+title: Run Quivr fully locally
 ---
 
-# Using Quivr fully locally with Ollama
+# Using Quivr fully locally
 
 ## Headers
 
@@ -15,7 +15,13 @@ The following is a guide to set up everything for using Quivr locally:
 - [Embeddings](#embeddings)
 - [LLM for inference](#llm)
 
-The guide was put together in collaboration with members of the Quivr Discord, **Using Quivr fully locally** thread. That is a good place to discuss it. https://discord.com/invite/HUpRgp2HG8
+It is a first, working setup, but a lot of work has to be done to e.g. find the appropriate settings for the model.
+
+Importantly, this will currently only work on tag v0.0.46.
+
+The guide was put together in collaboration with members of the Quivr Discord, **Using Quivr fully locally** thread. That is a good place to discuss it.
+
+This worked for me, but I sometimes got strange results (the output contains repeating answers/questions). Maybe because `stopping_criteria=stopping_criteria` must be uncommented in `transformers.pipeline`. Will update this page as I continue learning.
 
 <a name="database"/>
 
@@ -31,107 +37,224 @@ Troubleshooting:
 
 <a name="embeddings"/>
 
-## Ollama
+## Local embeddings
 
-Ollama is a tool that allows you to run LLMs locally. We are using it to run Llama2, MistralAI and others locally. 
+First, let's get local embeddings to work with GPT4All. Instead of relying on OpenAI for generating embeddings of both the prompt and the documents we upload, we will use a local LLM for this.
 
-### Install Ollama
+Remove any existing data from the postgres database:
 
-Install Ollama from their [website](https://ollama.ai/).
+- `supabase/docker $ docker compose down -v`
+- `supabase/docker $ rm -rf volumes/db/data/`
+- `supabase/docker $ docker compose up -d`
 
-Then run the following command to run Ollama in the background:
+Change the vector dimensions in the necessary Quivr SQL files:
 
-```bash
-ollama run llama2
+- Replace all occurrences of 1536 by 768, in Quivr's `scripts\tables.sql`
+- Run tables.sql in the Supabase web ui SQL editor: http://localhost:8000
+
+Change the Quivr code to use local LLM (GPT4All) and local embeddings:
+
+- add code to `backend\core\llm\private_gpt4all.py`
+
+```python
+    from langchain.embeddings import HuggingFaceEmbeddings
+    ...
+    def embeddings(self) -> HuggingFaceEmbeddings:
+        emb = HuggingFaceEmbeddings(
+            model_name="sentence-transformers/all-mpnet-base-v2",
+            model_kwargs={'device': 'cuda'},
+            encode_kwargs={'normalize_embeddings': False}
+        )
+        return emb
 ```
 
-### Update Quivr to use Ollama
+Note that there may be better models out there for generating the embeddings: https://huggingface.co/spaces/mteb/leaderboard
 
-In order to have Quivr use Ollama we need to update the  tables in Supabase to support the embedding format that Ollama uses. Ollama uses by default llama 2 that produces 4096 dimensional embeddings while OpenAI API produces 1536 dimensional embeddings. 
+Update Quivr `backend/core/.env`'s Private LLM Variables:
 
-
-Go to supabase and delete your table vectors and create a new table vectors with the following schema:
-
-```sql
-CREATE TABLE IF NOT EXISTS vectors (
-    id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
-    content TEXT,
-    file_sha1 TEXT,
-    metadata JSONB,
-    embedding VECTOR(4096)
-);
-``` 
-
-Then run the following command to update the table:
-
-```sql
-CREATE OR REPLACE FUNCTION match_vectors(query_embedding VECTOR(4096), match_count INT, p_brain_id UUID)
-RETURNS TABLE(
-    id UUID,
-    brain_id UUID,
-    content TEXT,
-    metadata JSONB,
-    embedding VECTOR(4096),
-    similarity FLOAT
-) LANGUAGE plpgsql AS $$
-#variable_conflict use_column
-BEGIN
-    RETURN QUERY
-    SELECT
-        vectors.id,
-        brains_vectors.brain_id,
-        vectors.content,
-        vectors.metadata,
-        vectors.embedding,
-        1 - (vectors.embedding <=> query_embedding) AS similarity
-    FROM
-        vectors
-    INNER JOIN
-        brains_vectors ON vectors.id = brains_vectors.vector_id
-    WHERE brains_vectors.brain_id = p_brain_id
-    ORDER BY
-        vectors.embedding <=> query_embedding
-    LIMIT match_count;
-END;
-$$;
-``` 
-
-This will update the match_vectors function to use the new embedding format.
-
-
-## Add Ollama Model to Quivr
-
-Now that you have your model running locally, you need to add it to Quivr.
-
-In order to allow the user to choose between the OpenAI API and Ollama, we need to add a new model to the Quivr backend.
-
-Go to supabase and in the table `user_settings` either add by default or to your user the following value to the `models` column:
-
-```json
-[
-  "gpt-3.5-turbo-1106",
-  "ollama/llama2"
-]
+```
+    #Private LLM Variables
+    PRIVATE=True
+    MODEL_PATH=./local_models/ggml-gpt4all-j-v1.3-groovy.bin
 ```
 
-This will add the Ollama model to the list of models that the user can choose from.
+Download GPT4All model:
 
-By adding this as default, it means that all new users will have this model by default. If you want to add it to your user only, you can add it to the `models` column in the `user_settings` table. In order for the change to take effect if you put as default your need to drop the entire table with the following command:
+- `$ cd backend/core/local_models/`
+- `wget https://gpt4all.io/models/ggml-gpt4all-j-v1.3-groovy.bin`
 
-```sql
-DROP TABLE user_settings;
+Ensure the Quivr backend docker container has CUDA and the GPT4All package:
+
+```
+    FROM pytorch/pytorch:2.0.1-cuda11.7-cudnn8-devel
+    #FROM python:3.11-bullseye
+
+    ARG DEBIAN_FRONTEND=noninteractive
+    ENV DEBIAN_FRONTEND=noninteractive
+
+    RUN pip install gpt4all
 ```
 
+Modify the docker-compose yml file (for backend container). The following example is for using 2 GPUs:
 
-## Env Variables
-
-
-In order to have Quivr use Ollama we need to update the env variables.
-
-Go to `backend/.env` and add the following env variables:
-
-```bash
-OLLAMA_API_BASE_URL=http://host.docker.internal:11434
+```
+    ...
+    network_mode: host
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 2
+              capabilities: [gpu]
 ```
 
-Then go to the Quivr and you are good to go.
+Install nvidia container toolkit on the host, https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html:
+
+```
+$ wget https://nvidia.github.io/nvidia-docker/gpgkey --no-check-certificate
+$ sudo apt-key add gpgkey
+$ distribution=$(. /etc/os-release;echo $ID$VERSION_ID)
+$ curl -s -L https://nvidia.github.io/nvidia-docker/$distribution/nvidia-docker.list | sudo tee /etc/apt/sources.list.d/nvidia-docker.list
+$ sudo apt-get update
+
+$ sudo apt-get install -y nvidia-container-toolkit
+
+$ nvidia-ctk --version
+
+$ sudo systemctl restart docker
+```
+
+At this moment, if we try to upload a pdf, we get an error:
+
+```
+backend-core  | 1989-01-01 21:51:41,211 [ERROR] utils.vectors: Error creating vector for document {'code': '22000', 'details': None, 'hint': None, 'message': 'expected 768 dimensions, not 1536'}
+```
+
+This can be remedied by using local embeddings for document embeddings. In backend/core/utils/vectors.py, replace:
+
+```python
+    # def create_vector(self, doc, user_openai_api_key=None):
+    #     logger.info("Creating vector for document")
+    #     logger.info(f"Document: {doc}")
+    #     if user_openai_api_key:
+    #         self.commons["documents_vector_store"]._embedding = OpenAIEmbeddings(
+    #             openai_api_key=user_openai_api_key
+    #         )  # pyright: ignore reportPrivateUsage=none
+    #     try:
+    #         sids = self.commons["documents_vector_store"].add_documents([doc])
+    #         if sids and len(sids) > 0:
+    #             return sids
+
+    #     except Exception as e:
+    #         logger.error(f"Error creating vector for document {e}")
+
+    def create_vector(self, doc, user_openai_api_key=None):
+        logger.info("Creating vector for document")
+        logger.info(f"Document: {doc}")
+        self.commons["documents_vector_store"]._embedding = HuggingFaceEmbeddings(
+        model_name="sentence-transformers/all-mpnet-base-v2",
+        model_kwargs={'device': 'cuda'},
+        encode_kwargs={'normalize_embeddings': False}
+        )  # pyright: ignore reportPrivateUsage=none
+        logger.info('||| creating embedding')
+        try:
+            sids = self.commons["documents_vector_store"].add_documents([doc])
+            if sids and len(sids) > 0:
+                return sids
+
+        except Exception as e:
+            logger.error(f"Error creating vector for document {e}")
+```
+
+<a name="llm"/>
+
+## Local LLM
+
+The final step is to use a local model from HuggingFace for inference. (The HF token is optional, only required for certain models on HF.)
+
+Update the Quivr backend dockerfile:
+
+```
+    ENV HUGGINGFACEHUB_API_TOKEN=hf_XXX
+
+    RUN pip install accelerate
+```
+
+Update the `private_gpt4all.py` file as follows:
+
+```python
+    import langchain
+    langchain.debug = True
+    langchain.verbose = True
+
+    import os
+    import transformers
+    from langchain.llms import HuggingFacePipeline
+    from langchain.embeddings import HuggingFaceEmbeddings
+    ...
+
+    model_id = "stabilityai/StableBeluga-13B"
+    ...
+
+    def _create_llm(
+        self,
+        model,
+        streaming=False,
+        callbacks=None,
+    ) -> BaseLLM:
+        """
+        Override the _create_llm method to enforce the use of a private model.
+        :param model: Language model name to be used.
+        :param streaming: Whether to enable streaming of the model
+        :param callbacks: Callbacks to be used for streaming
+        :return: Language model instance
+        """
+
+        model_path = self.model_path
+
+        logger.info("Using private model: %s", model)
+        logger.info("Streaming is set to %s", streaming)
+        logger.info("--- model  %s",model)
+
+        logger.info("--- model path %s",model_path)
+
+        model_id = "stabilityai/StableBeluga-13B"
+
+        llm = transformers.AutoModelForCausalLM.from_pretrained(
+            model_id,
+            use_cache=True,
+            load_in_4bit=True,
+            device_map='auto',
+            #use_auth_token=hf_auth
+        )
+        logger.info('<<< transformers.AutoModelForCausalLM.from_pretrained')
+
+        llm.eval()
+        logger.info('<<< eval')
+
+        tokenizer = transformers.AutoTokenizer.from_pretrained(
+            model_id,
+            use_auth_token=hf_auth
+        )
+        logger.info('<<< transformers.AutoTokenizer.from_pretrained')
+
+        generate_text = transformers.pipeline(
+            model=llm, tokenizer=tokenizer,
+            return_full_text=True,  # langchain expects the full text
+            task='text-generation',
+            # we pass model parameters here too
+            #stopping_criteria=stopping_criteria,  # without this model rambles during chat
+            temperature=0.5,  # 'randomness' of outputs, 0.0 is the min and 1.0 the max
+            max_new_tokens=512,  # mex number of tokens to generate in the output
+            repetition_penalty=1.1  # without this output begins repeating
+        )
+        logger.info('<<< generate_text = transformers.pipeline(')
+
+        result = HuggingFacePipeline(pipeline=generate_text)
+
+        logger.info('<<< generate_text = transformers.pipeline(')
+
+        logger.info("<<< created llm HuggingFace")
+        return result
+```

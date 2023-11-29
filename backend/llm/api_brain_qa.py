@@ -3,7 +3,6 @@ from typing import Optional
 from uuid import UUID
 
 from fastapi import HTTPException
-from logger import get_logger
 from litellm import completion
 from models.chats import ChatQuestion
 from models.databases.supabase.chats import CreateChatHistory
@@ -18,7 +17,6 @@ from llm.utils.get_api_brain_definition_as_json_schema import (
     get_api_brain_definition_as_json_schema,
 )
 
-logger = get_logger(__name__)
 
 class APIBrainQA(
     QABaseBrainPicking,
@@ -55,6 +53,7 @@ class APIBrainQA(
         brain_id: UUID,
     ):
         yield "🧠<Deciding what to do>🧠"
+
         response = completion(
             model=self.model,
             temperature=self.temperature,
@@ -74,7 +73,8 @@ class APIBrainQA(
 
             if finish_reason == "stop":
                 break
-            if "function_call" in chunk.choices[0].delta and chunk.choices[0].delta["function_call"]:
+
+            if "function_call" in chunk.choices[0].delta:
                 if "name" in chunk.choices[0].delta["function_call"]:
                     function_call["name"] = chunk.choices[0].delta["function_call"][
                         "name"
@@ -86,12 +86,10 @@ class APIBrainQA(
 
             elif finish_reason == "function_call":
                 try:
-                    logger.info(f"Function call: {function_call}")
                     arguments = json.loads(function_call["arguments"])
-                    
                 except Exception:
                     arguments = {}
-                yield f"🧠<Calling {brain_id} with arguments {arguments}>🧠"
+                yield f"🧠<Calling API with arguments {arguments} and brain id {brain_id}>🧠"
 
                 try:
                     api_call_response = call_brain_api(
@@ -108,7 +106,7 @@ class APIBrainQA(
                 messages.append(
                     {
                         "role": "function",
-                        "name": str(brain_id),
+                        "name": function_call["name"],
                         "content": api_call_response,
                     }
                 )
