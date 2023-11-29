@@ -2,10 +2,10 @@ from datetime import datetime
 
 from fastapi import HTTPException
 from logger import get_logger
-from models.settings import get_supabase_db
 from modules.api_key.repository.api_key_interface import ApiKeysInterface
 from modules.api_key.repository.api_keys import ApiKeys
 from modules.user.entity.user_identity import UserIdentity
+from modules.user.service import get_user_email_by_user_id
 from pydantic import DateError
 
 logger = get_logger(__name__)
@@ -50,8 +50,10 @@ class ApiKeyService:
 
         user_id = user_id_data.data[0]["user_id"]
 
-        # TODO: Remove supabase_db and user directly UserService instead
-        supabase_db = get_supabase_db()
-        email = supabase_db.get_user_email(user_id)
+        # TODO: directly UserService instead
+        email = get_user_email_by_user_id(user_id)
+
+        if email is None:
+            raise HTTPException(status_code=400, detail="Invalid API key.")
 
         return UserIdentity(email=email, id=user_id)
