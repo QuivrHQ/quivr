@@ -7,12 +7,12 @@ title: Guidelines
 
 Thanks for your interest in contributing to Quivr! Here you'll find guidelines for contributing and steps on how you can contribute.
 
-### Repo: [Quivr Github](https://github.com/stanGirard/quivr)
+### Repo: [Quivr GitHub](https://github.com/stanGirard/quivr)
 
 ## Table of Contents
 
 - [Contributing to Quivr](#contributing-to-quivr)
-    - [Repo: Quivr Github](#repo-quivr-github)
+    - [Repo: Quivr GitHub](#repo-quivr-github)
   - [Table of Contents](#table-of-contents)
   - [Community](#community)
   - [Roadmap and Issues](#roadmap-and-issues)
