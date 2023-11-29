@@ -10,9 +10,6 @@ GOOGLE_CLOUD_PROJECT=<change-me>
 CELERY_BROKER_URL=redis://redis:6379/0
 CELEBRY_BROKER_QUEUE_NAME=quivr-preview.fifo
 
-#LOCAL
-#OLLAMA_API_BASE_URL=http://host.docker.internal:11434 # local all in one remove comment to use local llm with Ollama 
-
 
 
 #RESEND

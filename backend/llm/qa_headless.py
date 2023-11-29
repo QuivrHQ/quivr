@@ -7,7 +7,6 @@ from langchain.callbacks.streaming_aiter import AsyncIteratorCallbackHandler
 from langchain.chains import LLMChain
 from langchain.chat_models import ChatLiteLLM
 from langchain.chat_models.base import BaseChatModel
-from models import BrainSettings  # Importing settings related to the 'brain'
 from langchain.prompts.chat import ChatPromptTemplate, HumanMessagePromptTemplate
 from logger import get_logger
 from models.chats import ChatQuestion
@@ -31,7 +30,6 @@ SYSTEM_MESSAGE = "Your name is Quivr. You're a helpful assistant. If you don't k
 
 
 class HeadlessQA(BaseModel):
-    brain_settings = BrainSettings() 
     model: str
     temperature: float = 0.0
     max_tokens: int = 2000
@@ -80,18 +78,13 @@ class HeadlessQA(BaseModel):
         :param callbacks: Callbacks to be used for streaming
         :return: Language model instance
         """
-        api_base = None
-        if self.brain_settings.ollama_api_base_url and model.startswith("ollama"):
-            api_base = self.brain_settings.ollama_api_base_url
-
         return ChatLiteLLM(
-            temperature=temperature,
+            temperature=0.1,
             model=model,
             streaming=streaming,
             verbose=True,
             callbacks=callbacks,
             max_tokens=self.max_tokens,
-            api_base=api_base,
         )
 
     def _create_prompt_template(self):
