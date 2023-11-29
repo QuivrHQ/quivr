@@ -22,13 +22,15 @@ export const HomeHeader = ({ color = "white" }: HomeNavProps): JSX.Element => {
       <Link
         href="/"
         className={cn(
-          "text-base lg:text-3xl flex gap-2 items-center",
+          "text-base lg:text-xl flex gap-2 items-center",
           linkStyle[color],
           color === "black" ? "hover:text-black" : "hover:text-white"
         )}
       >
         <QuivrLogo size={64} color={color} />
-        <div>{t("vaccineTruthAi")}</div>
+        <div className="bg-clip-text text-transparent bg-gradient-to-br from-cyan-500 to-white">
+          {t("vaccineTruthAi")}
+        </div>
       </Link>
       <div className="hidden sm:flex sm:items-center">
         <LanguageSelect isSelect={false} />

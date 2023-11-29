@@ -15,8 +15,8 @@ export const IntroSection = (): JSX.Element => {
 
   return (
     <>
-      <div className="flex flex-col lg:flex-row items-center justify-center md:justify-start gap-10 lg:gap-0 xl:gap-10 lg:h-[calc(100vh-250px)] mb-[calc(50vw*tan(6deg))] md:mb-0">
-        <div className="w-[80vw] lg:w-[50%] lg:shrink-0 flex flex-col justify-center gap-10 sm:gap-15 lg:gap-20 xl:gap-32">
+      <div className="flex flex-col lg:flex-row items-center justify-center md:justify-start gap-10 lg:gap-0 xl:gap-10  mb-[calc(50vw*tan(6deg))] md:mb-0">
+        <div className="w-[80vw] lg:w-[50%] lg:shrink-0 flex flex-col justify-center gap-10 ">
           <div>
             <h1 className="sm:text-lg  md:text-2xl lg:text-4xl font-bold text-black block max-w-2xl">
               {t("intro.title", { ns: "home" })}
