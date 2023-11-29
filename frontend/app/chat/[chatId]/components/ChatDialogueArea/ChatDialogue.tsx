@@ -6,7 +6,6 @@ import { useSecurity } from "@/services/useSecurity/useSecurity";
 // eslint-disable-next-line import/order
 import { ChatGuide } from "../ChatGuide";
 import { ChatDialogue } from "./components/ChatDialogue";
-import { ShortCuts } from "./components/ShortCuts";
 import { getMergedChatMessagesWithDoneStatusNotificationsReduced } from "./utils/getMergedChatMessagesWithDoneStatusNotificationsReduced";
 
 export const ChatDialogueArea = (): JSX.Element => {
@@ -32,5 +31,5 @@ export const ChatDialogueArea = (): JSX.Element => {
     );
   }
 
-  return isStudioMember ? <ShortCuts /> : <ChatGuide />;
+  return <ChatGuide />;
 };

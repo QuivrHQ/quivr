@@ -64,9 +64,10 @@ export const IntroSection = (): JSX.Element => {
           <Image
             src={laptopImage}
             alt="Quivr on laptop"
-            width={1200}
-            height={1200}
-            className="hidden sm:block max-w-[calc(40vh-100px)] max-h-[calc(40vh-100px)] xl:scale-125 sm:scale-105 sm:max-w-[calc(60vh-100px)] sm:max-h-[calc(60vh-100px)]"
+            width={1600}
+            height={1600}
+            quality={100}
+            className="hidden sm:block max-w-[calc(40vh-100px)] max-h-[calc(40vh-100px)] xl:scale-125 sm:scale-105 sm:max-w-[calc(60vh)] sm:max-h-[calc(60vh)]"
           />
           <Image
             src={smartphoneImage}

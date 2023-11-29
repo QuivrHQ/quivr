@@ -10,16 +10,16 @@ export const Logo = (): JSX.Element => {
     <Link
       data-testid="app-logo"
       href={"/chat"}
-      className="flex items-center gap-4"
+      className="flex items-center gap-1"
     >
       <Image
         className="rounded-full"
         src={"/vt-logo.png"}
         alt="Vaccinetruth Logo"
-        width={48}
-        height={48}
+        width={32}
+        height={32}
       />
-      <h1 className="font-bold">{t("vaccineTruthAi")}</h1>
+      <h1 className="text-sm">{t("vaccineTruthAi")}</h1>
     </Link>
   );
 };
