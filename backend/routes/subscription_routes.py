@@ -4,7 +4,7 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException
 from middlewares.auth.auth_bearer import AuthBearer, get_current_user
 from models import BrainSubscription
-from modules.authorization.utils import (
+from modules.authorization.utils.brain_authorization import (
     has_brain_authorization,
     validate_brain_authorization,
 )
@@ -20,10 +20,7 @@ from pydantic import BaseModel
 from repository.api_brain_definition.get_api_brain_definition import (
     get_api_brain_definition,
 )
-from repository.brain import (
-    get_brain_details,
-    update_brain_user_rights,
-)
+from repository.brain import get_brain_details, update_brain_user_rights
 from repository.brain.get_brain_users import get_brain_users
 from repository.brain_subscription import (
     SubscriptionInvitationService,
@@ -38,6 +35,7 @@ subscription_service = SubscriptionInvitationService()
 prompt_service = PromptService()
 brain_user_service = BrainUserService()
 brain_service = BrainService()
+
 
 @subscription_router.post(
     "/brains/{brain_id}/subscription",
@@ -454,7 +452,7 @@ async def unsubscribe_from_brain_handler(
     if not current_user.email:
         raise HTTPException(status_code=400, detail="UserIdentity email is not defined")
 
-    brain = brain_service.(brain_id)
+    brain = brain_service.get_brain_by_id(brain_id)
 
     if brain is None:
         raise HTTPException(status_code=404, detail="Brain not found")

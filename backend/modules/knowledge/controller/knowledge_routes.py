@@ -3,7 +3,7 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, Query
 from logger import get_logger
 from middlewares.auth import AuthBearer, get_current_user
-from modules.authorization.utils import (
+from modules.authorization.utils.brain_authorization import (
     has_brain_authorization,
     validate_brain_authorization,
 )

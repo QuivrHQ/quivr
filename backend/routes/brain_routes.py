@@ -5,7 +5,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from logger import get_logger
 from middlewares.auth.auth_bearer import AuthBearer, get_current_user
 from models import UserUsage
-from modules.authorization.utils import has_brain_authorization
+from modules.authorization.utils.brain_authorization import has_brain_authorization
 from modules.brain.dto.inputs import (
     BrainQuestionRequest,
     BrainUpdatableProperties,
