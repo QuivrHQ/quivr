@@ -2,7 +2,7 @@ from uuid import UUID
 
 from fastapi import HTTPException
 from models import get_supabase_db
-from models.databases.supabase.brains import CreateBrainProperties
+from modules.brain.dto.inputs import CreateBrainProperties
 from modules.brain.entity.brain_entity import BrainEntity, BrainType
 from repository.api_brain_definition.add_api_brain_definition import (
     add_api_brain_definition,
