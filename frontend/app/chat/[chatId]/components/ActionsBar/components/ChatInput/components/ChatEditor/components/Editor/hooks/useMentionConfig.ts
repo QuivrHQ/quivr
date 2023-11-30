@@ -79,11 +79,13 @@ export const useMentionConfig = ({
             });
           },
           onUpdate: (props) => {
-            reactRenderer?.updateProps(props);
-
-            if (!props.clientRect) {
-              return;
-            }
+            reactRenderer?.updateProps({
+              ...props,
+              suggestionData: {
+                ...suggestionData,
+                items: props.items,
+              },
+            });
           },
           onKeyDown: (props) => {
             if (props.event.key === "Escape") {
