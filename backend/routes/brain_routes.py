@@ -12,19 +12,17 @@ from modules.brain.dto.inputs import (
     CreateBrainProperties,
 )
 from modules.brain.entity.brain_entity import PublicBrain, RoleEnum
+from modules.brain.service.brain_service import BrainService
+from modules.brain.service.brain_user_service import BrainUserService
 from modules.prompt.service.prompt_service import PromptService
 from modules.user.entity.user_identity import UserIdentity
 from repository.brain import (
-    create_brain,
     create_brain_user,
     delete_brain_users,
     get_brain_details,
-    get_default_user_brain_or_create_new,
     get_public_brains,
     get_question_context_from_brain,
     get_user_brains,
-    get_user_default_brain,
-    set_as_default_brain_for_user,
     update_brain_by_id,
 )
 from repository.brain.get_brain_for_user import get_brain_for_user
@@ -34,6 +32,8 @@ logger = get_logger(__name__)
 brain_router = APIRouter()
 
 prompt_service = PromptService()
+brain_service = BrainService()
+brain_user_service = BrainUserService()
 
 
 @brain_router.get("/brains/", dependencies=[Depends(AuthBearer())], tags=["Brain"])
@@ -60,7 +60,7 @@ async def retrieve_default_brain(
     current_user: UserIdentity = Depends(get_current_user),
 ):
     """Retrieve or create the default brain for the current user."""
-    brain = get_default_user_brain_or_create_new(current_user)
+    brain = brain_user_service.get_default_user_brain_or_create_new(current_user)
     return {"id": brain.brain_id, "name": brain.name, "rights": "Owner"}
 
 
@@ -102,11 +102,11 @@ async def create_new_brain(
             detail=f"Maximum number of brains reached ({user_settings.get('max_brains', 5)}).",
         )
 
-    new_brain = create_brain(
-        brain,
+    new_brain = brain_service.create_brain(
+        brain=brain,
         user_id=current_user.id,
     )
-    if get_user_default_brain(current_user.id):
+    if brain_user_service.get_user_default_brain(current_user.id):
         logger.info(f"Default brain already exists for user {current_user.id}")
         create_brain_user(
             user_id=current_user.id,
@@ -225,7 +225,7 @@ async def set_brain_as_default(
     brain_id: UUID, user: UserIdentity = Depends(get_current_user)
 ):
     """Set a brain as the default for the current user."""
-    set_as_default_brain_for_user(user.id, brain_id)
+    brain_user_service.set_as_default_brain_for_user(user.id, brain_id)
     return {"message": f"Brain {brain_id} has been set as default brain."}
 
 
