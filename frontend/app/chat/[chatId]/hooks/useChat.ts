@@ -91,9 +91,8 @@ export const useChat = () => {
         prompt_id: currentPromptId ?? undefined,
       };
 
-      await addStreamQuestion(currentChatId, chatQuestion);
-
       callback?.();
+      await addStreamQuestion(currentChatId, chatQuestion);
 
       if (shouldUpdateUrl) {
         router.replace(`/chat/${currentChatId}`);
