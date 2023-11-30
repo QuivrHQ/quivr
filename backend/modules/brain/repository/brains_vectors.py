@@ -68,13 +68,13 @@ class BrainsVectors(BrainsVectorsInterface):
 
         # remove current file vectors from brain vectors
         self.db.table("brains_vectors").delete().filter(
-            "vector_id", "in", file_vectors_ids
+            "vector_id", "in", f"({','.join(map(str, file_vectors_ids))})"
         ).filter("brain_id", "eq", brain_id).execute()
 
         vectors_used_by_another_brain = (
             self.db.table("brains_vectors")
             .select("vector_id")
-            .filter("vector_id", "in", file_vectors_ids)
+            .filter("vector_id", "in", f"({','.join(map(str, file_vectors_ids))})")
             .filter("brain_id", "neq", brain_id)
             .execute()
         )
@@ -88,7 +88,7 @@ class BrainsVectors(BrainsVectorsInterface):
         ]
 
         self.db.table("vectors").delete().filter(
-            "id", "in", vectors_no_longer_used_ids
+            "id", "in", f"({','.join(map(str, vectors_no_longer_used_ids))})"
         ).execute()
 
         return {"message": f"File {file_name} in brain {brain_id} has been deleted."}
