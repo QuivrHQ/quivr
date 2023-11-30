@@ -21,12 +21,10 @@ from repository.api_brain_definition.get_api_brain_definition import (
     get_api_brain_definition,
 )
 from repository.brain import (
-    create_brain_user,
     get_brain_details,
     get_brain_for_user,
     update_brain_user_rights,
 )
-from repository.brain.delete_brain import delete_brain
 from repository.brain.get_brain_users import get_brain_users
 from repository.brain_subscription import (
     SubscriptionInvitationService,
@@ -167,7 +165,7 @@ async def remove_user_subscription(
         ]
 
         if len(brain_other_owners) == 0:
-            delete_brain(
+            brain_service.delete_brain(
                 brain_id=brain_id,
             )
             if targeted_brain.prompt_id:
@@ -250,7 +248,7 @@ async def accept_invitation(
         raise HTTPException(status_code=404, detail="Invitation not found")
 
     try:
-        create_brain_user(
+        brain_user_service.create_brain_user(
             user_id=current_user.id,
             brain_id=brain_id,
             rights=invitation["rights"],
@@ -432,7 +430,7 @@ async def subscribe_to_brain_handler(
             )
 
     try:
-        create_brain_user(
+        brain_user_service.create_brain_user(
             user_id=current_user.id,
             brain_id=brain_id,
             rights=RoleEnum.Viewer,

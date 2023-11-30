@@ -3,7 +3,7 @@ from uuid import UUID
 from fastapi import HTTPException
 from logger import get_logger
 from modules.brain.entity.brain_entity import BrainType, RoleEnum
-from modules.brain.repository.brains import Brain
+from modules.brain.repository.brains import Brains
 from modules.brain.repository.interfaces.brains_users_interface import (
     BrainsUsersInterface,
 )
@@ -23,7 +23,7 @@ class BrainUserService:
     brain_user_repository: BrainsUsersInterface
 
     def __init__(self):
-        self.brain_repository = Brain()
+        self.brain_repository = Brains()
 
     def get_user_default_brain(self, user_id: UUID) -> BrainEntity | None:
         brain_id = self.brain_user_repository.get_user_default_brain_id(user_id)
@@ -86,4 +86,19 @@ class BrainUserService:
             user_id=user_id,
             brain_id=brain_id,
             default_brain=True,
+        )
+
+    def delete_brain_users(self, brain_id: UUID) -> None:
+        self.brain_user_repository.delete_brain_subscribers(
+            brain_id=brain_id,
+        )
+
+    def create_brain_user(
+        self, user_id: UUID, brain_id: UUID, rights: RoleEnum, is_default_brain: bool
+    ):
+        self.brain_user_repository.create_brain_user(
+            user_id=user_id,
+            brain_id=brain_id,
+            rights=rights,
+            default_brain=is_default_brain,
         )

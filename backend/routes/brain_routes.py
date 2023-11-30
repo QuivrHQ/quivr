@@ -17,8 +17,6 @@ from modules.brain.service.brain_user_service import BrainUserService
 from modules.prompt.service.prompt_service import PromptService
 from modules.user.entity.user_identity import UserIdentity
 from repository.brain import (
-    create_brain_user,
-    delete_brain_users,
     get_brain_details,
     get_public_brains,
     get_question_context_from_brain,
@@ -108,7 +106,7 @@ async def create_new_brain(
     )
     if brain_user_service.get_user_default_brain(current_user.id):
         logger.info(f"Default brain already exists for user {current_user.id}")
-        create_brain_user(
+        brain_user_service.create_brain_user(
             user_id=current_user.id,
             brain_id=new_brain.brain_id,
             rights=RoleEnum.Owner,
@@ -116,7 +114,7 @@ async def create_new_brain(
         )
     else:
         logger.info(f"Creating default brain for user {current_user.id}.")
-        create_brain_user(
+        brain_user_service.create_brain_user(
             user_id=current_user.id,
             brain_id=new_brain.brain_id,
             rights=RoleEnum.Owner,
@@ -150,7 +148,7 @@ async def update_existing_brain(
             prompt_service.delete_prompt_by_id(existing_brain.prompt_id)
 
     if brain_update_data.status == "private" and existing_brain.status == "public":
-        delete_brain_users(brain_id)
+        brain_user_service.delete_brain_users(brain_id)
 
     return {"message": f"Brain {brain_id} has been updated."}
 

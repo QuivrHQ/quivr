@@ -94,7 +94,6 @@ class BrainsUsers(BrainsUsersInterface):
             )
             .execute()
         )
-
         return response
 
     def get_user_default_brain_id(self, user_id: UUID) -> UUID | None:

@@ -9,7 +9,7 @@ from modules.brain.repository.interfaces.brains_interface import BrainsInterface
 logger = get_logger(__name__)
 
 
-class Brain(BrainsInterface):
+class Brains(BrainsInterface):
     def __init__(self):
         supabase_client = get_supabase_client()
         self.db = supabase_client
