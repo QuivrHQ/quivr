@@ -4,11 +4,11 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException
 from middlewares.auth.auth_bearer import AuthBearer, get_current_user
 from models import BrainSubscription
-from modules.authorization.utils.brain_authorization import (
+from modules.brain.entity.brain_entity import RoleEnum
+from modules.brain.service.brain_authorization_service import (
     has_brain_authorization,
     validate_brain_authorization,
 )
-from modules.brain.entity.brain_entity import RoleEnum
 from modules.brain.service.brain_service import BrainService
 from modules.brain.service.brain_user_service import BrainUserService
 from modules.prompt.entity.prompt import PromptStatusEnum
@@ -20,8 +20,6 @@ from pydantic import BaseModel
 from repository.api_brain_definition.get_api_brain_definition import (
     get_api_brain_definition,
 )
-from repository.brain import get_brain_details, update_brain_user_rights
-from repository.brain.get_brain_users import get_brain_users
 from repository.brain_subscription import (
     SubscriptionInvitationService,
     resend_invitation_email,
@@ -109,7 +107,7 @@ def get_users_with_brain_access(
     Get all users for a brain
     """
 
-    brain_users = get_brain_users(
+    brain_users = brain_user_service.get_brain_users(
         brain_id=brain_id,
     )
 
@@ -152,7 +150,7 @@ async def remove_user_subscription(
     if user_brain.rights != "Owner":
         brain_user_service.delete_brain_user(current_user.id, brain_id)
     else:
-        brain_users = get_brain_users(
+        brain_users = brain_user_service.get_brain_users(
             brain_id=brain_id,
         )
         brain_other_owners = [
@@ -208,7 +206,7 @@ def get_user_invitation(
             detail="You have not been invited to this brain",
         )
 
-    brain_details = get_brain_details(brain_id)
+    brain_details = brain_service.get_brain_details(brain_id)
 
     if brain_details is None:
         raise HTTPException(
@@ -371,7 +369,9 @@ def update_brain_subscription(
                 detail="You don't have the rights to remove user access",
             )
     else:
-        update_brain_user_rights(brain_id, user_id, subscription.rights)
+        brain_user_service.update_brain_user_rights(
+            brain_id, user_id, subscription.rights
+        )
 
     return {"message": "Brain subscription updated successfully"}
 

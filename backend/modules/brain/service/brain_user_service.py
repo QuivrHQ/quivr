@@ -1,9 +1,18 @@
+from typing import List
 from uuid import UUID
 
 from fastapi import HTTPException
 from logger import get_logger
-from modules.brain.entity.brain_entity import BrainEntity, BrainType, RoleEnum
+from modules.brain.entity.brain_entity import (
+    BrainEntity,
+    BrainType,
+    BrainUser,
+    MinimalUserBrainEntity,
+    RoleEnum,
+)
 from modules.brain.repository.brains import Brains
+from modules.brain.repository.brains_users import BrainsUsers
+from modules.brain.repository.interfaces.brains_interface import BrainsInterface
 from modules.brain.repository.interfaces.brains_users_interface import (
     BrainsUsersInterface,
 )
@@ -12,7 +21,6 @@ from modules.user.entity.user_identity import UserIdentity
 from repository.api_brain_definition.get_api_brain_definition import (
     get_api_brain_definition,
 )
-from repository.external_api_secret.delete_secret import delete_secret
 
 logger = get_logger(__name__)
 
@@ -20,10 +28,12 @@ brain_service = BrainService()
 
 
 class BrainUserService:
+    brain_repository: BrainsInterface
     brain_user_repository: BrainsUsersInterface
 
     def __init__(self):
         self.brain_repository = Brains()
+        self.brain_user_repository = BrainsUsers()
 
     def get_user_default_brain(self, user_id: UUID) -> BrainEntity | None:
         brain_id = self.brain_user_repository.get_user_default_brain_id(user_id)
@@ -50,7 +60,7 @@ class BrainUserService:
                 )
             secrets = brain_definition.secrets
             for secret in secrets:
-                delete_secret(
+                self.brain_repository.delete_secret(
                     user_id=user_id,
                     brain_id=brain_id,
                     secret_name=secret.name,
@@ -105,3 +115,20 @@ class BrainUserService:
 
     def get_brain_for_user(self, user_id: UUID, brain_id: UUID):
         return self.brain_user_repository.get_brain_for_user(user_id, brain_id)  # type: ignore
+
+    def get_user_brains(self, user_id: UUID) -> list[MinimalUserBrainEntity]:
+        results = self.brain_user_repository.get_user_brains(user_id)  # type: ignore
+
+        return results  # type: ignore
+
+    def get_brain_users(self, brain_id: UUID) -> List[BrainUser]:
+        return self.brain_user_repository.get_brain_users(brain_id)
+
+    def update_brain_user_rights(
+        self, brain_id: UUID, user_id: UUID, rights: str
+    ) -> None:
+        self.brain_user_repository.update_brain_user_rights(
+            brain_id=brain_id,
+            user_id=user_id,
+            rights=rights,
+        )

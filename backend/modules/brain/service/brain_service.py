@@ -3,7 +3,7 @@ from uuid import UUID
 
 from fastapi import HTTPException
 from modules.brain.dto.inputs import BrainUpdatableProperties, CreateBrainProperties
-from modules.brain.entity.brain_entity import BrainEntity, BrainType
+from modules.brain.entity.brain_entity import BrainEntity, BrainType, PublicBrain
 from modules.brain.repository.brains import Brains
 from modules.brain.repository.brains_users import BrainsUsers
 from modules.brain.repository.brains_vectors import BrainsVectors
@@ -21,10 +21,12 @@ from repository.api_brain_definition.add_api_brain_definition import (
 from repository.api_brain_definition.delete_api_brain_definition import (
     delete_api_brain_definition,
 )
+from repository.api_brain_definition.get_api_brain_definition import (
+    get_api_brain_definition,
+)
 from repository.api_brain_definition.update_api_brain_definition import (
     update_api_brain_definition,
 )
-from repository.brain.delete_brain_secrets import delete_brain_secrets_values
 from repository.external_api_secret.create_secret import create_secret
 
 knowledge_service = KnowledgeService()
@@ -82,13 +84,31 @@ class BrainService:
 
         return created_brain
 
+    def delete_brain_secrets_values(self, brain_id: UUID) -> None:
+        brain_definition = get_api_brain_definition(brain_id=brain_id)
+
+        if brain_definition is None:
+            raise HTTPException(status_code=404, detail="Brain definition not found.")
+
+        secrets = brain_definition.secrets
+
+        if len(secrets) > 0:
+            brain_users = self.brain_user_repository.get_brain_users(brain_id=brain_id)
+            for user in brain_users:
+                for secret in secrets:
+                    self.brain_repository.delete_secret(
+                        user_id=user.user_id,
+                        brain_id=brain_id,
+                        secret_name=secret.name,
+                    )
+
     def delete_brain(self, brain_id: UUID) -> dict[str, str]:
         brain_to_delete = self.get_brain_by_id(brain_id=brain_id)
         if brain_to_delete is None:
             raise HTTPException(status_code=404, detail="Brain not found.")
 
         if brain_to_delete.brain_type == BrainType.API:
-            delete_brain_secrets_values(
+            self.delete_brain_secrets_values(
                 brain_id=brain_id,
             )
             delete_api_brain_definition(brain_id=brain_id)
@@ -155,7 +175,7 @@ class BrainService:
             )
 
             if should_remove_existing_secrets_values:
-                delete_brain_secrets_values(brain_id=brain_id)
+                self.delete_brain_secrets_values(brain_id=brain_id)
 
             update_api_brain_definition(
                 brain_id,
@@ -173,3 +193,38 @@ class BrainService:
 
     def update_brain_last_update_time(self, brain_id: UUID):
         self.brain_repository.update_brain_last_update_time(brain_id)
+
+    def get_brain_details(self, brain_id: UUID) -> BrainEntity | None:
+        brain = self.brain_repository.get_brain_details(brain_id)
+        # id ?
+        if brain == None:
+            return None
+
+        if brain.brain_type == BrainType.API:
+            brain_definition = get_api_brain_definition(brain_id)
+            brain.brain_definition = brain_definition
+
+        return brain
+
+    def get_public_brains(self) -> list[PublicBrain]:
+        return self.brain_repository.get_public_brains()
+
+    def update_secret_value(
+        self,
+        user_id: UUID,
+        brain_id: UUID,
+        secret_name: str,
+        secret_value: str,
+    ) -> None:
+        """Update an existing secret."""
+        self.brain_repository.delete_secret(
+            user_id=user_id,
+            brain_id=brain_id,
+            secret_name=secret_name,
+        )
+        create_secret(
+            user_id=user_id,
+            brain_id=brain_id,
+            secret_name=secret_name,
+            secret_value=secret_value,
+        )

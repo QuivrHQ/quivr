@@ -150,3 +150,10 @@ class BrainsUsers(BrainsUsersInterface):
         self.db.table("brains_users").update({"default_brain": default_brain}).match(
             {"brain_id": brain_id, "user_id": user_id}
         ).execute()
+
+    def update_brain_user_rights(
+        self, user_id: UUID, brain_id: UUID, rights: str
+    ) -> None:
+        self.db.table("brains_users").update({"rights": rights}).match(
+            {"brain_id": brain_id, "user_id": user_id}
+        ).execute()

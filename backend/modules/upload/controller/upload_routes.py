@@ -7,8 +7,10 @@ from fastapi import APIRouter, Depends, HTTPException, Query, Request, UploadFil
 from logger import get_logger
 from middlewares.auth import AuthBearer, get_current_user
 from models import UserUsage
-from modules.authorization.utils.brain_authorization import validate_brain_authorization
 from modules.brain.entity.brain_entity import RoleEnum
+from modules.brain.service.brain_authorization_service import (
+    validate_brain_authorization,
+)
 from modules.knowledge.dto.inputs import CreateKnowledgeProperties
 from modules.knowledge.service.knowledge_service import KnowledgeService
 from modules.notification.dto.inputs import (

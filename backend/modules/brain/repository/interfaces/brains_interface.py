@@ -21,7 +21,7 @@ class BrainsInterface(ABC):
         pass
 
     @abstractmethod
-    def get_brain_details(self, brain_id: UUID):
+    def get_brain_details(self, brain_id: UUID) -> BrainEntity | None:
         """
         Get all public brains
         """
@@ -54,5 +54,12 @@ class BrainsInterface(ABC):
     def get_brain_by_id(self, brain_id: UUID) -> BrainEntity | None:
         """
         Get a brain by id
+        """
+        pass
+
+    @abstractmethod
+    def delete_secret(self, user_id: UUID, brain_id: UUID, secret_name: str) -> bool:
+        """
+        Delete a secret from a brain
         """
         pass

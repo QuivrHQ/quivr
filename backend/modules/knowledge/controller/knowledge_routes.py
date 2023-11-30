@@ -3,11 +3,11 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, Query
 from logger import get_logger
 from middlewares.auth import AuthBearer, get_current_user
-from modules.authorization.utils.brain_authorization import (
+from modules.brain.entity.brain_entity import RoleEnum
+from modules.brain.service.brain_authorization_service import (
     has_brain_authorization,
     validate_brain_authorization,
 )
-from modules.brain.entity.brain_entity import RoleEnum
 from modules.brain.service.brain_vector_service import BrainVectorService
 from modules.knowledge.service.knowledge_service import KnowledgeService
 from modules.user.entity.user_identity import UserIdentity

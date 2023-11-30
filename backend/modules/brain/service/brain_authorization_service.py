@@ -4,11 +4,12 @@ from uuid import UUID
 from fastapi import Depends, HTTPException, status
 from middlewares.auth.auth_bearer import get_current_user
 from modules.brain.entity.brain_entity import RoleEnum
+from modules.brain.service.brain_service import BrainService
 from modules.brain.service.brain_user_service import BrainUserService
 from modules.user.entity.user_identity import UserIdentity
-from repository.brain.get_brain_details import get_brain_details
 
 brain_user_service = BrainUserService()
+brain_service = BrainService()
 
 
 def has_brain_authorization(
@@ -46,7 +47,7 @@ def validate_brain_authorization(
     return: None
     """
 
-    brain = get_brain_details(brain_id)
+    brain = brain_service.get_brain_details(brain_id)
 
     if brain and brain.status == "public":
         return

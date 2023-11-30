@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from typing import List
 from uuid import UUID
 
 from modules.brain.entity.brain_entity import BrainUser, MinimalUserBrainEntity
@@ -52,7 +53,7 @@ class BrainsUsersInterface(ABC):
         pass
 
     @abstractmethod
-    def get_brain_users(self, brain_id: UUID) -> list[BrainUser]:
+    def get_brain_users(self, brain_id: UUID) -> List[BrainUser]:
         """
         Get all users for a brain
         """
@@ -78,5 +79,14 @@ class BrainsUsersInterface(ABC):
     ):
         """
         Update the default brain status for a user
+        """
+        pass
+
+    @abstractmethod
+    def update_brain_user_rights(
+        self, brain_id: UUID, user_id: UUID, rights: str
+    ) -> BrainUser:
+        """
+        Update the rights for a user in a brain
         """
         pass

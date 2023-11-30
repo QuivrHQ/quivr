@@ -5,23 +5,18 @@ from fastapi import APIRouter, Depends, HTTPException
 from logger import get_logger
 from middlewares.auth.auth_bearer import AuthBearer, get_current_user
 from models import UserUsage
-from modules.authorization.utils.brain_authorization import has_brain_authorization
 from modules.brain.dto.inputs import (
     BrainQuestionRequest,
     BrainUpdatableProperties,
     CreateBrainProperties,
 )
 from modules.brain.entity.brain_entity import PublicBrain, RoleEnum
+from modules.brain.service.brain_authorization_service import has_brain_authorization
 from modules.brain.service.brain_service import BrainService
 from modules.brain.service.brain_user_service import BrainUserService
 from modules.prompt.service.prompt_service import PromptService
 from modules.user.entity.user_identity import UserIdentity
-from repository.brain import (
-    get_brain_details,
-    get_public_brains,
-    get_question_context_from_brain,
-    get_user_brains,
-)
+from repository.brain import get_question_context_from_brain
 from repository.external_api_secret.update_secret_value import update_secret_value
 
 logger = get_logger(__name__)
@@ -37,7 +32,7 @@ async def retrieve_all_brains_for_user(
     current_user: UserIdentity = Depends(get_current_user),
 ):
     """Retrieve all brains for the current user."""
-    brains = get_user_brains(current_user.id)
+    brains = brain_user_service.get_user_brains(current_user.id)
     return {"brains": brains}
 
 
@@ -46,7 +41,7 @@ async def retrieve_all_brains_for_user(
 )
 async def retrieve_public_brains() -> list[PublicBrain]:
     """Retrieve all Quivr public brains."""
-    return get_public_brains()
+    return brain_service.get_public_brains()
 
 
 @brain_router.get(
@@ -74,7 +69,7 @@ async def retrieve_default_brain(
 )
 async def retrieve_brain_by_id(brain_id: UUID):
     """Retrieve details of a specific brain by its ID."""
-    brain_details = get_brain_details(brain_id)
+    brain_details = brain_service.get_brain_details(brain_id)
     if brain_details is None:
         raise HTTPException(status_code=404, detail="Brain details not found")
     return brain_details
@@ -85,7 +80,7 @@ async def create_new_brain(
     brain: CreateBrainProperties, current_user: UserIdentity = Depends(get_current_user)
 ):
     """Create a new brain for the user."""
-    user_brains = get_user_brains(current_user.id)
+    user_brains = brain_user_service.get_user_brains(current_user.id)
     user_usage = UserUsage(
         id=current_user.id,
         email=current_user.email,
@@ -134,7 +129,7 @@ async def update_existing_brain(
     brain_id: UUID, brain_update_data: BrainUpdatableProperties
 ):
     """Update an existing brain's configuration."""
-    existing_brain = get_brain_details(brain_id)
+    existing_brain = brain_service.get_brain_details(brain_id)
     if existing_brain is None:
         raise HTTPException(status_code=404, detail="Brain not found")
 
@@ -165,7 +160,7 @@ async def update_existing_brain_secrets(
 ):
     """Update an existing brain's secrets."""
 
-    existing_brain = get_brain_details(brain_id)
+    existing_brain = brain_service.get_brain_details(brain_id)
 
     if existing_brain is None:
         raise HTTPException(status_code=404, detail="Brain not found")
