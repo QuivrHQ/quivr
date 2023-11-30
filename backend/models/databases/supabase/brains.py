@@ -2,17 +2,15 @@ from typing import Optional
 from uuid import UUID
 
 from logger import get_logger
-from models.ApiBrainDefinition import ApiBrainDefinition
-from models.brain_entity import (
+from models.databases.repository import Repository
+from models.databases.supabase.api_brain_definition import CreateApiBrainDefinition
+from modules.brain.entity.api_brain_definition_entity import ApiBrainDefinition
+from modules.brain.entity.brain_entity import (
     BrainEntity,
     BrainType,
     BrainUser,
-    MinimalBrainEntity,
+    MinimalUserBrainEntity,
     PublicBrain,
-)
-from models.databases.repository import Repository
-from models.databases.supabase.api_brain_definition import (
-    CreateApiBrainDefinition,
 )
 from pydantic import BaseModel, Extra
 
@@ -72,17 +70,17 @@ class Brain(Repository):
 
         return BrainEntity(**response.data[0])
 
-    def get_user_brains(self, user_id) -> list[MinimalBrainEntity]:
+    def get_user_brains(self, user_id) -> list[MinimalUserBrainEntity]:
         response = (
             self.db.from_("brains_users")
             .select("id:brain_id, rights, brains (brain_id, name, status, brain_type)")
             .filter("user_id", "eq", user_id)
             .execute()
         )
-        user_brains: list[MinimalBrainEntity] = []
+        user_brains: list[MinimalUserBrainEntity] = []
         for item in response.data:
             user_brains.append(
-                MinimalBrainEntity(
+                MinimalUserBrainEntity(
                     id=item["brains"]["brain_id"],
                     name=item["brains"]["name"],
                     rights=item["rights"],
@@ -120,7 +118,7 @@ class Brain(Repository):
             {"brain_id": brain_id}
         ).execute()
 
-    def get_brain_for_user(self, user_id, brain_id) -> MinimalBrainEntity | None:
+    def get_brain_for_user(self, user_id, brain_id) -> MinimalUserBrainEntity | None:
         response = (
             self.db.from_("brains_users")
             .select(
@@ -134,7 +132,7 @@ class Brain(Repository):
             return None
         brain_data = response.data[0]
 
-        return MinimalBrainEntity(
+        return MinimalUserBrainEntity(
             id=brain_data["brains"]["id"],
             name=brain_data["brains"]["name"],
             rights=brain_data["rights"],

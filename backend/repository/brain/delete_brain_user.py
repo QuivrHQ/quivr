@@ -1,9 +1,8 @@
 from uuid import UUID
 
 from fastapi import HTTPException
-from models.brain_entity import BrainType
 from models.settings import get_supabase_db
-
+from modules.brain.entity.brain_entity import BrainType
 from repository.api_brain_definition.get_api_brain_definition import (
     get_api_brain_definition,
 )

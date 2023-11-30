@@ -1,5 +1,5 @@
 from models import get_supabase_db
-from models.brain_entity import PublicBrain
+from modules.brain.entity.brain_entity import PublicBrain
 
 
 def get_public_brains() -> list[PublicBrain]:

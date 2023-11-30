@@ -2,12 +2,11 @@ from abc import ABC, abstractmethod
 from datetime import datetime
 from uuid import UUID
 
-from models.brain_entity import BrainEntity
-
 
 class Repository(ABC):
     @abstractmethod
-    def get_user_brains(self, user_id: str) -> list[BrainEntity]:
+    # def get_user_brains(self, user_id: str) -> list[BrainEntity]:
+    def get_user_brains(self, user_id: str):
         pass
 
     @abstractmethod

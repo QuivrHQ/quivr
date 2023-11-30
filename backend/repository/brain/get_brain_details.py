@@ -1,8 +1,7 @@
 from uuid import UUID
 
-from models import BrainEntity, get_supabase_client
-from models.brain_entity import BrainType
-
+from models import get_supabase_client
+from modules.brain.entity.brain_entity import BrainEntity, BrainType
 from repository.api_brain_definition.get_api_brain_definition import (
     get_api_brain_definition,
 )

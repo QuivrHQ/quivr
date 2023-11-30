@@ -6,7 +6,6 @@ from uuid import UUID
 from fastapi import UploadFile
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from logger import get_logger
-from models.brains import Brain
 from models.databases.supabase.supabase import SupabaseDB
 from models.settings import get_supabase_db
 from packages.files.file import compute_sha1_from_file
@@ -130,7 +129,9 @@ class File(BaseModel):
         """
         return self.file.size < 1  # pyright: ignore reportPrivateUsage=none
 
-    def link_file_to_brain(self, brain: Brain):
+    # from models.brains import Brain
+    # def link_file_to_brain(self, brain: Brain):
+    def link_file_to_brain(self, brain):
         self.set_file_vectors_ids()
 
         if self.vectors_ids is None:

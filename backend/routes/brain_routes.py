@@ -5,13 +5,13 @@ from fastapi import APIRouter, Depends, HTTPException
 from logger import get_logger
 from middlewares.auth.auth_bearer import AuthBearer, get_current_user
 from models import UserUsage
-from models.brain_entity import PublicBrain
 from models.databases.supabase.brains import (
     BrainQuestionRequest,
     BrainUpdatableProperties,
     CreateBrainProperties,
 )
-from modules.authorization.utils import RoleEnum, has_brain_authorization
+from modules.authorization.utils import has_brain_authorization
+from modules.brain.entity.brain_entity import PublicBrain, RoleEnum
 from modules.prompt.service.prompt_service import PromptService
 from modules.user.entity.user_identity import UserIdentity
 from repository.brain import (

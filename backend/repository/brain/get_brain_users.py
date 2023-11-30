@@ -1,7 +1,7 @@
 from uuid import UUID
 
-from models.brain_entity import BrainUser
 from models.settings import get_supabase_db
+from modules.brain.entity.brain_entity import BrainUser
 
 
 def get_brain_users(brain_id: UUID) -> list[BrainUser]:

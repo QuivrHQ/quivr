@@ -1,5 +1,5 @@
 from fastapi import HTTPException
-from models.ApiBrainDefinition import ApiBrainDefinitionSchema
+from modules.brain.entity.api_brain_definition_entity import ApiBrainDefinitionSchema
 
 
 def extract_api_brain_definition_values_from_llm_output(

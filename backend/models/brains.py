@@ -35,6 +35,7 @@ class Brain(BaseModel):
 
     @property
     def brain_size(self):
+        # TODO: change the calculation of the brain size, calculate the size stored for the embeddings + what's in the storage
         self.get_unique_brain_files()
         current_brain_size = sum(float(doc["size"]) for doc in self.files)
 
@@ -73,13 +74,3 @@ class Brain(BaseModel):
         file_name_with_brain_id = f"{self.id}/{file_name}"
         self.supabase_client.storage.from_("quivr").remove([file_name_with_brain_id])
         return self.supabase_db.delete_file_from_brain(self.id, file_name)  # type: ignore
-
-    def get_all_knowledge_in_brain(self):
-        """
-        Retrieve unique brain data (i.e. uploaded files and crawled websites).
-        """
-
-        vector_ids = self.supabase_db.get_brain_vector_ids(self.id)  # type: ignore
-        self.files = get_unique_files_from_vector_ids(vector_ids)
-
-        return self.files

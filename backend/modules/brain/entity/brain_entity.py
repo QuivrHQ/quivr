@@ -2,8 +2,7 @@ from enum import Enum
 from typing import Optional
 from uuid import UUID
 
-from models.ApiBrainDefinition import ApiBrainDefinition
-from modules.authorization.utils import RoleEnum
+from modules.brain.entity.api_brain_definition_entity import ApiBrainDefinition
 from pydantic import BaseModel
 
 
@@ -37,14 +36,6 @@ class BrainEntity(BaseModel):
         return data
 
 
-class MinimalBrainEntity(BaseModel):
-    id: UUID
-    name: str
-    rights: RoleEnum
-    status: str
-    brain_type: BrainType
-
-
 class PublicBrain(BaseModel):
     id: UUID
     name: str
@@ -55,8 +46,22 @@ class PublicBrain(BaseModel):
     brain_definition: Optional[ApiBrainDefinition]
 
 
+class RoleEnum(str, Enum):
+    Viewer = "Viewer"
+    Editor = "Editor"
+    Owner = "Owner"
+
+
 class BrainUser(BaseModel):
     id: UUID
     user_id: UUID
     rights: RoleEnum
     default_brain: bool = False
+
+
+class MinimalUserBrainEntity(BaseModel):
+    id: UUID
+    name: str
+    rights: RoleEnum
+    status: str
+    brain_type: BrainType
