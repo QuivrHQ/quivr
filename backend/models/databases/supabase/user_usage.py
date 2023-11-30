@@ -141,18 +141,3 @@ class UserUsage(Repository):
         )
 
         return response
-
-    def get_user_email(self, user_id):
-        """
-        Fetch the user email from the database
-        """
-        response = (
-            self.db.from_("user_daily_usage")
-            .select("email")
-            .filter("user_id", "eq", user_id)
-            .execute()
-        ).data
-
-        if response and len(response) > 0:
-            return response[0]["email"]
-        return None

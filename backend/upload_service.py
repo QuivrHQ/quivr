@@ -9,13 +9,12 @@ if __name__ == "__main__":
 
     load_dotenv()
 import pypandoc
-import sentry_sdk
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import JSONResponse
 from logger import get_logger
 from middlewares.cors import add_cors_middleware
-from routes.misc_routes import misc_router
-from routes.upload_routes import upload_router
+from modules.misc.controller import misc_router
+from modules.upload.controller import upload_router
 
 logger = get_logger(__name__)
 app = FastAPI()

@@ -1,5 +1,4 @@
-from models.brains import Brain
-from repository.brain.get_brain_by_id import get_brain_by_id
+from modules.brain.service.brain_service import BrainService
 
 from .parsers.audio import process_audio
 from .parsers.code_python import process_python
@@ -46,6 +45,9 @@ def create_response(message, type):
     return {"message": message, "type": type}
 
 
+brain_service = BrainService()
+
+
 # TODO: Move filter_file to a file service to avoid circular imports from models/files.py for File class
 async def filter_file(
     file,
@@ -58,7 +60,7 @@ async def filter_file(
     file_exists_in_brain = file.file_already_exists_in_brain(brain_id)
     using_file_name = original_file_name or file.file.filename if file.file else ""
 
-    brain = get_brain_by_id(brain_id)
+    brain = brain_service.get_brain_by_id(brain_id)
     if brain is None:
         raise Exception("It seems like you're uploading knowledge to an unknown brain.")
 
@@ -73,7 +75,7 @@ async def filter_file(
             "error",  # pyright: ignore reportPrivateUsage=none
         )
     elif file_exists:
-        file.link_file_to_brain(brain=Brain(id=brain_id))
+        file.link_file_to_brain(brain_id)
         return create_response(
             f"✅ {using_file_name} has been uploaded to brain {brain.name}.",  # pyright: ignore reportPrivateUsage=none
             "success",

@@ -4,41 +4,34 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException
 from middlewares.auth.auth_bearer import AuthBearer, get_current_user
 from models import BrainSubscription
+from modules.brain.entity.brain_entity import RoleEnum
+from modules.brain.service.brain_authorization_service import (
+    has_brain_authorization,
+    validate_brain_authorization,
+)
+from modules.brain.service.brain_service import BrainService
+from modules.brain.service.brain_user_service import BrainUserService
 from modules.prompt.entity.prompt import PromptStatusEnum
 from modules.prompt.service.prompt_service import PromptService
 from modules.user.entity.user_identity import UserIdentity
-from modules.user.service import get_user_email_by_user_id
-from modules.user.service.get_user_id_by_email import get_user_id_by_email
+from modules.user.service.user_service import UserService
 from pydantic import BaseModel
 from repository.api_brain_definition.get_api_brain_definition import (
     get_api_brain_definition,
 )
-from repository.brain import (
-    create_brain_user,
-    get_brain_by_id,
-    get_brain_details,
-    get_brain_for_user,
-    update_brain_user_rights,
-)
-from repository.brain.delete_brain import delete_brain
-from repository.brain.delete_brain_user import delete_brain_user
-from repository.brain.get_brain_users import get_brain_users
 from repository.brain_subscription import (
     SubscriptionInvitationService,
     resend_invitation_email,
 )
 from repository.external_api_secret.create_secret import create_secret
-from routes.authorizations.brain_authorization import (
-    RoleEnum,
-    has_brain_authorization,
-    validate_brain_authorization,
-)
 from routes.headers.get_origin_header import get_origin_header
 
 subscription_router = APIRouter()
 subscription_service = SubscriptionInvitationService()
-
+user_service = UserService()
 prompt_service = PromptService()
+brain_user_service = BrainUserService()
+brain_service = BrainService()
 
 
 @subscription_router.post(
@@ -113,7 +106,7 @@ def get_users_with_brain_access(
     Get all users for a brain
     """
 
-    brain_users = get_brain_users(
+    brain_users = brain_user_service.get_brain_users(
         brain_id=brain_id,
     )
 
@@ -122,7 +115,9 @@ def get_users_with_brain_access(
     for brain_user in brain_users:
         brain_access = {}
         # TODO: find a way to fetch user email concurrently
-        brain_access["email"] = get_user_email_by_user_id(brain_user.user_id)
+        brain_access["email"] = user_service.get_user_email_by_user_id(
+            brain_user.user_id
+        )
         brain_access["rights"] = brain_user.rights
         brain_access_list.append(brain_access)
 
@@ -138,7 +133,7 @@ async def remove_user_subscription(
     """
     Remove a user's subscription to a brain
     """
-    targeted_brain = get_brain_by_id(brain_id)
+    targeted_brain = brain_service.get_brain_by_id(brain_id)
 
     if targeted_brain is None:
         raise HTTPException(
@@ -146,7 +141,7 @@ async def remove_user_subscription(
             detail="Brain not found while trying to delete",
         )
 
-    user_brain = get_brain_for_user(current_user.id, brain_id)
+    user_brain = brain_user_service.get_brain_for_user(current_user.id, brain_id)
     if user_brain is None:
         raise HTTPException(
             status_code=403,
@@ -154,9 +149,9 @@ async def remove_user_subscription(
         )
 
     if user_brain.rights != "Owner":
-        delete_brain_user(current_user.id, brain_id)
+        brain_user_service.delete_brain_user(current_user.id, brain_id)
     else:
-        brain_users = get_brain_users(
+        brain_users = brain_user_service.get_brain_users(
             brain_id=brain_id,
         )
         brain_other_owners = [
@@ -166,7 +161,7 @@ async def remove_user_subscription(
         ]
 
         if len(brain_other_owners) == 0:
-            delete_brain(
+            brain_service.delete_brain(
                 brain_id=brain_id,
             )
             if targeted_brain.prompt_id:
@@ -179,7 +174,7 @@ async def remove_user_subscription(
                     prompt_service.delete_prompt_by_id(targeted_brain.prompt_id)
 
         else:
-            delete_brain_user(
+            brain_user_service.delete_brain_user(
                 current_user.id,
                 brain_id,
             )
@@ -212,7 +207,7 @@ def get_user_invitation(
             detail="You have not been invited to this brain",
         )
 
-    brain_details = get_brain_details(brain_id)
+    brain_details = brain_service.get_brain_details(brain_id)
 
     if brain_details is None:
         raise HTTPException(
@@ -249,7 +244,7 @@ async def accept_invitation(
         raise HTTPException(status_code=404, detail="Invitation not found")
 
     try:
-        create_brain_user(
+        brain_user_service.create_brain_user(
             user_id=current_user.id,
             brain_id=brain_id,
             rights=invitation["rights"],
@@ -322,7 +317,7 @@ def update_brain_subscription(
             detail="You can't change your own permissions",
         )
 
-    user_id = get_user_id_by_email(user_email)
+    user_id = user_service.get_user_id_by_email(user_email)
 
     if user_id is None:
         raise HTTPException(
@@ -345,7 +340,7 @@ def update_brain_subscription(
             )
 
     # check if user is not an editor trying to update an owner right which is not allowed
-    current_invitation = get_brain_for_user(user_id, brain_id)
+    current_invitation = brain_user_service.get_brain_for_user(user_id, brain_id)
     if current_invitation is not None and current_invitation.rights == "Owner":
         try:
             validate_brain_authorization(
@@ -368,14 +363,16 @@ def update_brain_subscription(
                 current_user.id,
                 RoleEnum.Owner,
             )
-            delete_brain_user(user_id, brain_id)
+            brain_user_service.delete_brain_user(user_id, brain_id)
         except HTTPException:
             raise HTTPException(
                 status_code=403,
                 detail="You don't have the rights to remove user access",
             )
     else:
-        update_brain_user_rights(brain_id, user_id, subscription.rights)
+        brain_user_service.update_brain_user_rights(
+            brain_id, user_id, subscription.rights
+        )
 
     return {"message": "Brain subscription updated successfully"}
 
@@ -395,7 +392,7 @@ async def subscribe_to_brain_handler(
     if not current_user.email:
         raise HTTPException(status_code=400, detail="UserIdentity email is not defined")
 
-    brain = get_brain_by_id(brain_id)
+    brain = brain_service.get_brain_by_id(brain_id)
 
     if brain is None:
         raise HTTPException(status_code=404, detail="Brain not found")
@@ -405,7 +402,7 @@ async def subscribe_to_brain_handler(
             detail="You cannot subscribe to this brain without invitation",
         )
     # check if user is already subscribed to brain
-    user_brain = get_brain_for_user(current_user.id, brain_id)
+    user_brain = brain_user_service.get_brain_for_user(current_user.id, brain_id)
     if user_brain is not None:
         raise HTTPException(
             status_code=403,
@@ -431,7 +428,7 @@ async def subscribe_to_brain_handler(
             )
 
     try:
-        create_brain_user(
+        brain_user_service.create_brain_user(
             user_id=current_user.id,
             brain_id=brain_id,
             rights=RoleEnum.Viewer,
@@ -456,7 +453,7 @@ async def unsubscribe_from_brain_handler(
     if not current_user.email:
         raise HTTPException(status_code=400, detail="UserIdentity email is not defined")
 
-    brain = get_brain_by_id(brain_id)
+    brain = brain_service.get_brain_by_id(brain_id)
 
     if brain is None:
         raise HTTPException(status_code=404, detail="Brain not found")
@@ -466,12 +463,12 @@ async def unsubscribe_from_brain_handler(
             detail="You cannot subscribe to this brain without invitation",
         )
     # check if user is already subscribed to brain
-    user_brain = get_brain_for_user(current_user.id, brain_id)
+    user_brain = brain_user_service.get_brain_for_user(current_user.id, brain_id)
     if user_brain is None:
         raise HTTPException(
             status_code=403,
             detail="You are not subscribed to this brain",
         )
-    delete_brain_user(user_id=current_user.id, brain_id=brain_id)
+    brain_user_service.delete_brain_user(user_id=current_user.id, brain_id=brain_id)
 
     return {"message": "You have successfully unsubscribed from the brain"}

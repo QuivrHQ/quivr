@@ -2,11 +2,13 @@ from typing import List, Optional
 from uuid import UUID
 
 from models import ChatHistory, get_supabase_db
+from modules.brain.service.brain_service import BrainService
 from modules.prompt.service.prompt_service import PromptService
 from pydantic import BaseModel
-from repository.brain import get_brain_by_id
 
 prompt_service = PromptService()
+
+brain_service = BrainService()
 
 
 class GetChatHistoryOutput(BaseModel):
@@ -37,7 +39,7 @@ def get_chat_history(chat_id: str) -> List[GetChatHistoryOutput]:
             message = ChatHistory(message)
             brain = None
             if message.brain_id:
-                brain = get_brain_by_id(message.brain_id)
+                brain = brain_service.get_brain_by_id(message.brain_id)
 
             prompt = None
             if message.prompt_id:

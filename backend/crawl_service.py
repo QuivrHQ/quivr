@@ -1,4 +1,3 @@
-
 from packages.utils import handle_request_validation_error
 
 if __name__ == "__main__":
@@ -11,8 +10,8 @@ from fastapi import FastAPI, HTTPException
 from fastapi.responses import JSONResponse
 from logger import get_logger
 from middlewares.cors import add_cors_middleware
+from modules.misc.controller import misc_router
 from routes.crawl_routes import crawl_router
-from routes.misc_routes import misc_router
 
 logger = get_logger(__name__)
 app = FastAPI()

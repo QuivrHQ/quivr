@@ -7,6 +7,7 @@ from celery.schedules import crontab
 from fastapi import UploadFile
 from models.files import File
 from models.settings import get_supabase_client
+from modules.brain.service.brain_service import BrainService
 from modules.notification.dto.inputs import NotificationUpdatableProperties
 from modules.notification.entity.notification import NotificationsStatusEnum
 from modules.notification.service.notification_service import NotificationService
@@ -14,13 +15,13 @@ from modules.onboarding.service.onboarding_service import OnboardingService
 from packages.files.crawl.crawler import CrawlWebsite
 from packages.files.parsers.github import process_github
 from packages.files.processors import filter_file
-from repository.brain.update_brain_last_update_time import update_brain_last_update_time
 
 CELERY_BROKER_URL = os.getenv("CELERY_BROKER_URL", "")
 CELEBRY_BROKER_QUEUE_NAME = os.getenv("CELEBRY_BROKER_QUEUE_NAME", "quivr")
 
 onboardingService = OnboardingService()
 notification_service = NotificationService()
+brain_service = BrainService()
 
 if CELERY_BROKER_URL.startswith("sqs"):
     broker_transport_options = {
@@ -100,7 +101,7 @@ def process_file_and_notify(
                         message=str(notification_message),
                     ),
                 )
-            update_brain_last_update_time(brain_id)
+            brain_service.update_brain_last_update_time(brain_id)
 
             return True
     except Exception as e:

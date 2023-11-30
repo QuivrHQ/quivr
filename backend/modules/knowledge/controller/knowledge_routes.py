@@ -3,16 +3,15 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, Query
 from logger import get_logger
 from middlewares.auth import AuthBearer, get_current_user
-from models import Brain
-from modules.knowledge.service.knowledge_service import KnowledgeService
-from modules.user.entity.user_identity import UserIdentity
-from repository.files.delete_file import delete_file_from_storage
-from repository.files.generate_file_signed_url import generate_file_signed_url
-from routes.authorizations.brain_authorization import (
-    RoleEnum,
+from modules.brain.entity.brain_entity import RoleEnum
+from modules.brain.service.brain_authorization_service import (
     has_brain_authorization,
     validate_brain_authorization,
 )
+from modules.brain.service.brain_vector_service import BrainVectorService
+from modules.knowledge.service.knowledge_service import KnowledgeService
+from modules.user.entity.user_identity import UserIdentity
+from repository.files.generate_file_signed_url import generate_file_signed_url
 
 knowledge_router = APIRouter()
 logger = get_logger(__name__)
@@ -56,17 +55,15 @@ async def delete_endpoint(
     Delete a specific knowledge from a brain.
     """
 
-    brain = Brain(id=brain_id)
-
     knowledge = knowledge_service.get_knowledge(knowledge_id)
     file_name = knowledge.file_name if knowledge.file_name else knowledge.url
     knowledge_service.remove_knowledge(knowledge_id)
 
+    brain_vector_service = BrainVectorService(brain_id)
     if knowledge.file_name:
-        delete_file_from_storage(f"{brain_id}/{knowledge.file_name}")
-        brain.delete_file_from_brain(knowledge.file_name)
+        brain_vector_service.delete_file_from_brain(knowledge.file_name)
     elif knowledge.url:
-        brain.delete_file_from_brain(knowledge.url)
+        brain_vector_service.delete_file_url_from_brain(knowledge.url)
 
     return {
         "message": f"{file_name} of brain {brain_id} has been deleted by user {current_user.email}."

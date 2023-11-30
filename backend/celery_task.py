@@ -1,6 +1,6 @@
 from celery import shared_task
-from models.brains import Brain
 from models.settings import get_supabase_db
+from modules.brain.service.brain_vector_service import BrainVectorService
 from packages.embeddings.vectors import Neurons
 from repository.files.upload_file import DocumentSerializable
 
@@ -15,5 +15,5 @@ def create_embedding_for_document(brain_id, doc_with_metadata, file_sha1):
 
     created_vector_id = created_vector[0]  # pyright: ignore reportPrivateUsage=none
 
-    brain = Brain(id=brain_id)  # pyright: ignore
-    brain.create_brain_vector(created_vector_id, file_sha1)
+    brain_vector_service = BrainVectorService(brain_id)
+    brain_vector_service.create_brain_vector(created_vector_id, file_sha1)

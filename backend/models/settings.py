@@ -22,11 +22,6 @@ class BrainSettings(BaseSettings):
     ollama_api_base_url: str = None
 
 
-class ContactsSettings(BaseSettings):
-    resend_contact_sales_from: str = "null"
-    resend_contact_sales_to: str = "null"
-
-
 class ResendSettings(BaseSettings):
     resend_api_key: str = "null"
 

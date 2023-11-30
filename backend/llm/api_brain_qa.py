@@ -5,18 +5,19 @@ from uuid import UUID
 from fastapi import HTTPException
 from logger import get_logger
 from litellm import completion
-from models.chats import ChatQuestion
-from models.databases.supabase.chats import CreateChatHistory
-from repository.brain.get_brain_by_id import get_brain_by_id
-from repository.chat.get_chat_history import GetChatHistoryOutput, get_chat_history
-from repository.chat.update_chat_history import update_chat_history
-from repository.chat.update_message_by_id import update_message_by_id
-
 from llm.qa_base import QABaseBrainPicking
 from llm.utils.call_brain_api import call_brain_api
 from llm.utils.get_api_brain_definition_as_json_schema import (
     get_api_brain_definition_as_json_schema,
 )
+from models.chats import ChatQuestion
+from models.databases.supabase.chats import CreateChatHistory
+from modules.brain.service.brain_service import BrainService
+from repository.chat.get_chat_history import GetChatHistoryOutput, get_chat_history
+from repository.chat.update_chat_history import update_chat_history
+from repository.chat.update_message_by_id import update_message_by_id
+
+brain_service = BrainService()
 
 logger = get_logger(__name__)
 
@@ -141,7 +142,7 @@ class APIBrainQA(
                 status_code=400, detail="No brain id provided in the question"
             )
 
-        brain = get_brain_by_id(question.brain_id)
+        brain = brain_service.get_brain_by_id(question.brain_id)
 
         if not brain:
             raise HTTPException(status_code=404, detail="Brain not found")

@@ -4,9 +4,8 @@ import time
 from langchain.document_loaders import GitLoader
 from langchain.schema import Document
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-
-# from models import Brain, File
-# from packages.embeddings.vectors import Neurons
+from models.files import File
+from packages.embeddings.vectors import Neurons
 from packages.files.file import compute_sha1_from_content
 
 
@@ -58,24 +57,21 @@ async def process_github(
 
         print(doc_with_metadata.metadata["file_name"])
 
-        # TO FIX: Import of file and brain creates a circular dependency
-        # file = File(
-        #     file_sha1=compute_sha1_from_content(doc.page_content.encode("utf-8"))
-        # )
+        file = File(
+            file_sha1=compute_sha1_from_content(doc.page_content.encode("utf-8"))
+        )
 
-        # file_exists = file.file_already_exists()
+        file_exists = file.file_already_exists()
 
-        # if not file_exists:
-        #     neurons = Neurons()
-        #     created_vector = neurons.create_vector(doc_with_metadata)
+        if not file_exists:
+            neurons = Neurons()
+            created_vector = neurons.create_vector(doc_with_metadata)
 
-        # file_exists_in_brain = file.file_already_exists_in_brain(brain_id)
+        file_exists_in_brain = file.file_already_exists_in_brain(brain_id)
 
-        # if not file_exists_in_brain:
-        #     brain = Brain(id=brain_id)
-        #     file.link_file_to_brain(brain)
+        if not file_exists_in_brain:
+            file.link_file_to_brain(brain_id)
     return {
-        # "message": f"✅ Github with {len(documents)} files has been uploaded.",
-        "message": "Github processor is currently unavailable.",
+        "message": f"✅ Github with {len(documents)} files has been uploaded.",
         "type": "success",
     }

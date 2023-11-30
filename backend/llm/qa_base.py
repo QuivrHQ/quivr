@@ -15,12 +15,14 @@ from langchain.prompts.chat import (
     HumanMessagePromptTemplate,
     SystemMessagePromptTemplate,
 )
+from llm.utils.get_prompt_to_use import get_prompt_to_use
+from llm.utils.get_prompt_to_use_id import get_prompt_to_use_id
 from logger import get_logger
 from models import BrainSettings  # Importing settings related to the 'brain'
 from models.chats import ChatQuestion
 from models.databases.supabase.chats import CreateChatHistory
+from modules.brain.service.brain_service import BrainService
 from pydantic import BaseModel
-from repository.brain import get_brain_by_id
 from repository.chat import (
     GetChatHistoryOutput,
     format_chat_history,
@@ -31,13 +33,13 @@ from repository.chat import (
 from supabase.client import Client, create_client
 from vectorstore.supabase import CustomSupabaseVectorStore
 
-from llm.utils.get_prompt_to_use import get_prompt_to_use
-from llm.utils.get_prompt_to_use_id import get_prompt_to_use_id
-
 from .prompts.CONDENSE_PROMPT import CONDENSE_QUESTION_PROMPT
 
 logger = get_logger(__name__)
 QUIVR_DEFAULT_PROMPT = "Your name is Quivr. You're a helpful assistant.  If you don't know the answer, just say that you don't know, don't try to make up an answer."
+
+
+brain_service = BrainService()
 
 
 class QABaseBrainPicking(BaseModel):
@@ -243,7 +245,7 @@ class QABaseBrainPicking(BaseModel):
         brain = None
 
         if question.brain_id:
-            brain = get_brain_by_id(question.brain_id)
+            brain = brain_service.get_brain_by_id(question.brain_id)
 
         return GetChatHistoryOutput(
             **{
@@ -319,7 +321,7 @@ class QABaseBrainPicking(BaseModel):
         brain = None
 
         if question.brain_id:
-            brain = get_brain_by_id(question.brain_id)
+            brain = brain_service.get_brain_by_id(question.brain_id)
 
         streamed_chat_history = update_chat_history(
             CreateChatHistory(

@@ -1,7 +1,9 @@
 import random
 import string
 
-from repository.brain.get_default_user_brain import get_user_default_brain
+from modules.brain.service.brain_user_service import BrainUserService
+
+brain_user_service = BrainUserService()
 
 
 def test_retrieve_default_brain(client, api_key):
@@ -211,7 +213,7 @@ def test_set_as_default_brain_endpoint(client, api_key):
     user_info = response.json()
     user_id = user_info["id"]
 
-    default_brain = get_user_default_brain(user_id)
+    default_brain = brain_user_service.get_user_default_brain(user_id)
     assert default_brain is not None
     assert str(default_brain.brain_id) == str(brain_id)
 

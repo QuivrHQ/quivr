@@ -2,16 +2,16 @@ import time
 
 from fastapi import APIRouter, Depends, Request
 from middlewares.auth import AuthBearer, get_current_user
-from models import Brain, UserUsage
+from models import UserUsage
+from modules.brain.service.brain_user_service import BrainUserService
+from modules.brain.service.brain_vector_service import BrainVectorService
+from modules.user.dto.inputs import UserUpdatableProperties
 from modules.user.entity.user_identity import UserIdentity
-from modules.user.repository import (
-    UserUpdatableProperties,
-    get_user_identity,
-    update_user_properties,
-)
-from repository.brain import get_user_default_brain
+from modules.user.repository.users import Users
 
 user_router = APIRouter()
+brain_user_service = BrainUserService()
+user_repository = Users()
 
 
 @user_router.get("/user", dependencies=[Depends(AuthBearer())], tags=["User"])
@@ -42,10 +42,10 @@ async def get_user_endpoint(
 
     user_daily_usage = UserUsage(id=current_user.id)
     requests_stats = user_daily_usage.get_user_usage()
-    default_brain = get_user_default_brain(current_user.id)
+    default_brain = brain_user_service.get_user_default_brain(current_user.id)
 
     if default_brain:
-        defaul_brain_size = Brain(id=default_brain.brain_id).brain_size
+        defaul_brain_size = BrainVectorService(default_brain.brain_id).brain_size
     else:
         defaul_brain_size = 0
 
@@ -74,7 +74,9 @@ def update_user_identity_route(
     """
     Update user identity.
     """
-    return update_user_properties(current_user.id, user_identity_updatable_properties)
+    return user_repository.update_user_properties(
+        current_user.id, user_identity_updatable_properties
+    )
 
 
 @user_router.get(
@@ -88,4 +90,4 @@ def get_user_identity_route(
     """
     Get user identity.
     """
-    return get_user_identity(current_user.id)
+    return user_repository.get_user_identity(current_user.id)

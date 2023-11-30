@@ -5,7 +5,7 @@ from celery_worker import process_crawl_and_notify
 from fastapi import APIRouter, Depends, Query, Request
 from logger import get_logger
 from middlewares.auth import AuthBearer, get_current_user
-from models import Brain, UserUsage
+from models import UserUsage
 from modules.knowledge.dto.inputs import CreateKnowledgeProperties
 from modules.knowledge.service.knowledge_service import KnowledgeService
 from modules.notification.dto.inputs import CreateNotificationProperties
@@ -40,7 +40,6 @@ async def crawl_endpoint(
     """
 
     # [TODO] check if the user is the owner/editor of the brain
-    brain = Brain(id=brain_id)
 
     userDailyUsage = UserUsage(
         id=current_user.id,
