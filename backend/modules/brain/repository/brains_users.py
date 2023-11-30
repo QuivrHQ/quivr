@@ -144,3 +144,10 @@ class BrainsUsers(BrainsUsersInterface):
         if len(response) == 0:
             raise ValueError(f"Brain with id {brain_id} does not exist.")
         return response[0]["count"]
+
+    def update_brain_user_default_status(
+        self, user_id: UUID, brain_id: UUID, default_brain: bool
+    ):
+        self.db.table("brains_users").update({"default_brain": default_brain}).match(
+            {"brain_id": brain_id, "user_id": user_id}
+        ).execute()

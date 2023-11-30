@@ -71,3 +71,12 @@ class BrainsUsersInterface(ABC):
         Get the number of subscribers for a brain
         """
         pass
+
+    @abstractmethod
+    def update_brain_user_default_status(
+        self, user_id: UUID, brain_id: UUID, default_brain: bool
+    ):
+        """
+        Update the default brain status for a user
+        """
+        pass
