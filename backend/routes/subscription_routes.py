@@ -14,8 +14,7 @@ from modules.brain.service.brain_user_service import BrainUserService
 from modules.prompt.entity.prompt import PromptStatusEnum
 from modules.prompt.service.prompt_service import PromptService
 from modules.user.entity.user_identity import UserIdentity
-from modules.user.service import get_user_email_by_user_id
-from modules.user.service.get_user_id_by_email import get_user_id_by_email
+from modules.user.service.user_service import UserService
 from pydantic import BaseModel
 from repository.api_brain_definition.get_api_brain_definition import (
     get_api_brain_definition,
@@ -29,7 +28,7 @@ from routes.headers.get_origin_header import get_origin_header
 
 subscription_router = APIRouter()
 subscription_service = SubscriptionInvitationService()
-
+user_service = UserService()
 prompt_service = PromptService()
 brain_user_service = BrainUserService()
 brain_service = BrainService()
@@ -116,7 +115,9 @@ def get_users_with_brain_access(
     for brain_user in brain_users:
         brain_access = {}
         # TODO: find a way to fetch user email concurrently
-        brain_access["email"] = get_user_email_by_user_id(brain_user.user_id)
+        brain_access["email"] = user_service.get_user_email_by_user_id(
+            brain_user.user_id
+        )
         brain_access["rights"] = brain_user.rights
         brain_access_list.append(brain_access)
 
@@ -316,7 +317,7 @@ def update_brain_subscription(
             detail="You can't change your own permissions",
         )
 
-    user_id = get_user_id_by_email(user_email)
+    user_id = user_service.get_user_id_by_email(user_email)
 
     if user_id is None:
         raise HTTPException(

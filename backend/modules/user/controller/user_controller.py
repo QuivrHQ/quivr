@@ -5,15 +5,13 @@ from middlewares.auth import AuthBearer, get_current_user
 from models import UserUsage
 from modules.brain.service.brain_user_service import BrainUserService
 from modules.brain.service.brain_vector_service import BrainVectorService
+from modules.user.dto.inputs import UserUpdatableProperties
 from modules.user.entity.user_identity import UserIdentity
-from modules.user.repository import (
-    UserUpdatableProperties,
-    get_user_identity,
-    update_user_properties,
-)
+from modules.user.repository.users import Users
 
 user_router = APIRouter()
 brain_user_service = BrainUserService()
+user_repository = Users()
 
 
 @user_router.get("/user", dependencies=[Depends(AuthBearer())], tags=["User"])
@@ -76,7 +74,9 @@ def update_user_identity_route(
     """
     Update user identity.
     """
-    return update_user_properties(current_user.id, user_identity_updatable_properties)
+    return user_repository.update_user_properties(
+        current_user.id, user_identity_updatable_properties
+    )
 
 
 @user_router.get(
@@ -90,4 +90,4 @@ def get_user_identity_route(
     """
     Get user identity.
     """
-    return get_user_identity(current_user.id)
+    return user_repository.get_user_identity(current_user.id)
