@@ -2,7 +2,8 @@ import time
 
 from fastapi import APIRouter, Depends, Request
 from middlewares.auth import AuthBearer, get_current_user
-from models import Brain, UserUsage
+from models import UserUsage
+from modules.brain.service.brain_vector_service import BrainVectorService
 from modules.user.entity.user_identity import UserIdentity
 from modules.user.repository import (
     UserUpdatableProperties,
@@ -45,7 +46,7 @@ async def get_user_endpoint(
     default_brain = get_user_default_brain(current_user.id)
 
     if default_brain:
-        defaul_brain_size = Brain(id=default_brain.brain_id).brain_size
+        defaul_brain_size = BrainVectorService(default_brain.brain_id).brain_size
     else:
         defaul_brain_size = 0
 
