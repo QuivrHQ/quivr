@@ -1,7 +1,7 @@
 from uuid import UUID
 
 from models import get_supabase_db
-from routes.authorizations.types import RoleEnum
+from modules.brain.entity.brain_entity import RoleEnum
 
 
 def create_brain_user(

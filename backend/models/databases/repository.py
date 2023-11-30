@@ -56,7 +56,7 @@ class Repository(ABC):
         pass
 
     @abstractmethod
-    def get_default_user_brain_id(self, user_id: UUID) -> UUID:
+    def get_user_default_brain_id(self, user_id: UUID) -> UUID:
         pass
 
     @abstractmethod
