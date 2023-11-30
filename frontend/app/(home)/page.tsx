@@ -10,7 +10,6 @@ import {
   HomeSection,
   IntroSection,
 } from "./components";
-import { HomeHeaderBackground } from "./components/HomeHeader/components/HomeHeaderBackground";
 
 const HomePage = (): JSX.Element => {
   const { session } = useSupabase();
@@ -23,7 +22,7 @@ const HomePage = (): JSX.Element => {
 
   return (
     <>
-      <HomeHeaderBackground />
+      {/* <HomeHeaderBackground /> */}
       <HomeHeader />
 
       <main
