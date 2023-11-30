@@ -7,7 +7,6 @@ from modules.knowledge.service.knowledge_service import KnowledgeService
 from repository.api_brain_definition.delete_api_brain_definition import (
     delete_api_brain_definition,
 )
-from repository.brain import get_brain_by_id
 from repository.brain.delete_brain_secrets import delete_brain_secrets_values
 
 knowledge_service = KnowledgeService()

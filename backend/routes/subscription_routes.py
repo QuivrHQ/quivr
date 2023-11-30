@@ -5,10 +5,12 @@ from fastapi import APIRouter, Depends, HTTPException
 from middlewares.auth.auth_bearer import AuthBearer, get_current_user
 from models import BrainSubscription
 from modules.authorization.utils import (
-    RoleEnum,
     has_brain_authorization,
     validate_brain_authorization,
 )
+from modules.brain.entity.brain_entity import RoleEnum
+from modules.brain.service.brain_service import BrainService
+from modules.brain.service.brain_user_service import BrainUserService
 from modules.prompt.entity.prompt import PromptStatusEnum
 from modules.prompt.service.prompt_service import PromptService
 from modules.user.entity.user_identity import UserIdentity
@@ -20,13 +22,11 @@ from repository.api_brain_definition.get_api_brain_definition import (
 )
 from repository.brain import (
     create_brain_user,
-    get_brain_by_id,
     get_brain_details,
     get_brain_for_user,
     update_brain_user_rights,
 )
 from repository.brain.delete_brain import delete_brain
-from repository.brain.delete_brain_user import delete_brain_user
 from repository.brain.get_brain_users import get_brain_users
 from repository.brain_subscription import (
     SubscriptionInvitationService,
@@ -39,7 +39,8 @@ subscription_router = APIRouter()
 subscription_service = SubscriptionInvitationService()
 
 prompt_service = PromptService()
-
+brain_user_service = BrainUserService()
+brain_service = BrainService()
 
 @subscription_router.post(
     "/brains/{brain_id}/subscription",
@@ -138,7 +139,7 @@ async def remove_user_subscription(
     """
     Remove a user's subscription to a brain
     """
-    targeted_brain = get_brain_by_id(brain_id)
+    targeted_brain = brain_service.get_brain_by_id(brain_id)
 
     if targeted_brain is None:
         raise HTTPException(
@@ -154,7 +155,7 @@ async def remove_user_subscription(
         )
 
     if user_brain.rights != "Owner":
-        delete_brain_user(current_user.id, brain_id)
+        brain_user_service.delete_brain_user(current_user.id, brain_id)
     else:
         brain_users = get_brain_users(
             brain_id=brain_id,
@@ -179,7 +180,7 @@ async def remove_user_subscription(
                     prompt_service.delete_prompt_by_id(targeted_brain.prompt_id)
 
         else:
-            delete_brain_user(
+            brain_user_service.delete_brain_user(
                 current_user.id,
                 brain_id,
             )
@@ -368,7 +369,7 @@ def update_brain_subscription(
                 current_user.id,
                 RoleEnum.Owner,
             )
-            delete_brain_user(user_id, brain_id)
+            brain_user_service.delete_brain_user(user_id, brain_id)
         except HTTPException:
             raise HTTPException(
                 status_code=403,
@@ -395,7 +396,7 @@ async def subscribe_to_brain_handler(
     if not current_user.email:
         raise HTTPException(status_code=400, detail="UserIdentity email is not defined")
 
-    brain = get_brain_by_id(brain_id)
+    brain = brain_service.get_brain_by_id(brain_id)
 
     if brain is None:
         raise HTTPException(status_code=404, detail="Brain not found")
@@ -456,7 +457,7 @@ async def unsubscribe_from_brain_handler(
     if not current_user.email:
         raise HTTPException(status_code=400, detail="UserIdentity email is not defined")
 
-    brain = get_brain_by_id(brain_id)
+    brain = brain_service.(brain_id)
 
     if brain is None:
         raise HTTPException(status_code=404, detail="Brain not found")
@@ -472,6 +473,6 @@ async def unsubscribe_from_brain_handler(
             status_code=403,
             detail="You are not subscribed to this brain",
         )
-    delete_brain_user(user_id=current_user.id, brain_id=brain_id)
+    brain_user_service.delete_brain_user(user_id=current_user.id, brain_id=brain_id)
 
     return {"message": "You have successfully unsubscribed from the brain"}

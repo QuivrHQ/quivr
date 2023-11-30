@@ -9,9 +9,9 @@ from llm.qa_headless import HeadlessQA
 from middlewares.auth import AuthBearer, get_current_user
 from models import Chat, ChatQuestion, UserUsage, get_supabase_db
 from models.databases.supabase.chats import QuestionAndAnswer
+from modules.brain.service.brain_service import BrainService
 from modules.notification.service.notification_service import NotificationService
 from modules.user.entity.user_identity import UserIdentity
-from repository.brain.get_brain_by_id import get_brain_by_id
 from repository.chat import (
     ChatUpdatableProperties,
     CreateChatProperties,
@@ -36,6 +36,7 @@ from routes.chat.utils import (
 chat_router = APIRouter()
 
 notification_service = NotificationService()
+brain_service = BrainService()
 
 
 @chat_router.get("/chat/healthz", tags=["Health"])
@@ -154,7 +155,7 @@ async def create_question_handler(
         or not chat_question.max_tokens
     ):
         if brain_id:
-            brain = get_brain_by_id(brain_id)
+            brain = brain_service.get_brain_by_id(brain_id)
             if brain:
                 fallback_model = brain.model or fallback_model
                 fallback_temperature = brain.temperature or fallback_temperature
@@ -225,7 +226,7 @@ async def create_stream_question_handler(
         fallback_max_tokens = 256
 
         if brain_id:
-            brain = get_brain_by_id(brain_id)
+            brain = brain_service.get_brain_by_id(brain_id)
             if brain:
                 fallback_model = brain.model or fallback_model
                 fallback_temperature = brain.temperature or fallback_temperature

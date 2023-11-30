@@ -5,65 +5,6 @@ from uuid import UUID
 
 class Repository(ABC):
     @abstractmethod
-    # def get_user_brains(self, user_id: str) -> list[BrainEntity]:
-    def get_user_brains(self, user_id: str):
-        pass
-
-    @abstractmethod
-    def get_brain_for_user(self, user_id: str):
-        pass
-
-    @abstractmethod
-    def delete_brain_user_by_id(self, user_id: str, brain_id: str):
-        pass
-
-    @abstractmethod
-    def delete_brain_vector(self, brain_id: str):
-        pass
-
-    @abstractmethod
-    def delete_brain_users(self, brain_id: str):
-        pass
-
-    @abstractmethod
-    def delete_brain(self, brain_id: str):
-        pass
-
-    @abstractmethod
-    def create_brain(self, brain: str):
-        pass
-
-    @abstractmethod
-    def create_brain_user(
-        self, user_id: UUID, brain_id: UUID, rights: str, default_brain: bool
-    ):
-        pass
-
-    @abstractmethod
-    def create_brain_vector(self, brain_id: UUID, vector_id: UUID, file_sha1: str):
-        pass
-
-    @abstractmethod
-    def get_vector_ids_from_file_sha1(self, file_sha1: str):
-        pass
-
-    @abstractmethod
-    def get_brain_vector_ids(self, brain_id: UUID):
-        pass
-
-    @abstractmethod
-    def delete_file_from_brain(self, brain_id: UUID, file_name: str):
-        pass
-
-    @abstractmethod
-    def get_user_default_brain_id(self, user_id: UUID) -> UUID:
-        pass
-
-    @abstractmethod
-    def get_brain_by_id(self, brain_id: UUID):
-        pass
-
-    @abstractmethod
     def create_user_daily_usage(self, user_id: UUID, user_email: str, date: datetime):
         pass
 

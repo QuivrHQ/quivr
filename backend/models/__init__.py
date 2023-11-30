@@ -1,4 +1,3 @@
-from .brains import Brain
 from .brains_subscription_invitations import BrainSubscription
 from .chat import Chat, ChatHistory
 from .chats import ChatMessage, ChatQuestion

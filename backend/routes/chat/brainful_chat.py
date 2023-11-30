@@ -3,7 +3,7 @@ from llm.api_brain_qa import APIBrainQA
 from llm.qa_base import QABaseBrainPicking
 from modules.authorization.utils import validate_brain_authorization
 from modules.brain.entity.brain_entity import BrainType, RoleEnum
-from repository.brain.get_brain_by_id import get_brain_by_id
+from modules.brain.service.brain_service import BrainService
 from routes.chat.interface import ChatInterface
 
 models_supporting_function_calls = [
@@ -14,6 +14,8 @@ models_supporting_function_calls = [
     "gpt-3.5-turbo-1106",
     "gpt-3.5-turbo-0613",
 ]
+
+brain_service = BrainService()
 
 
 class BrainfulChat(ChatInterface):
@@ -36,7 +38,7 @@ class BrainfulChat(ChatInterface):
         prompt_id,
         user_id,
     ):
-        brain = get_brain_by_id(brain_id)
+        brain = brain_service.get_brain_by_id(brain_id)
 
         if not brain:
             raise HTTPException(status_code=404, detail="Brain not found")

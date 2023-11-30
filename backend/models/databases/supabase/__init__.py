@@ -1,5 +1,4 @@
 from models.databases.supabase.api_brain_definition import ApiBrainDefinitions
-from modules.brain.repository.brains import Brain
 from models.databases.supabase.brains_subscription_invitations import \
     BrainSubscription
 from models.databases.supabase.chats import Chats
