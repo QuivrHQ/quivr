@@ -33,7 +33,7 @@ def resend_contact_sales_email(customer_email: str, content: str):
     return send_email(params)
 
 
-@router.post("/contact")
+@contact_router.post("/contact")
 def post_contact(message: ContactMessage):
     try:
         resend_contact_sales_email(message.customer_email, message.content)
