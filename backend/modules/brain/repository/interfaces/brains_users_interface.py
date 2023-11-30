@@ -1,58 +1,73 @@
 from abc import ABC, abstractmethod
-from typing import List
 from uuid import UUID
 
-from modules.knowledge.dto.inputs import CreateKnowledgeProperties
-from modules.knowledge.dto.outputs import DeleteKnowledgeResponse
-from modules.knowledge.entity.knowledge import Knowledge
+from modules.brain.entity.brain_entity import BrainUser, MinimalUserBrainEntity
 
 
 class BrainsUsersInterface(ABC):
     @abstractmethod
-    def insert_knowledge(self, knowledge: CreateKnowledgeProperties) -> Knowledge:
+    def get_user_brains(self, user_id) -> list[MinimalUserBrainEntity]:
         """
-        Add a knowledge
+        Create a brain in the brains table
         """
         pass
 
     @abstractmethod
-    def remove_knowledge_by_id(
-        # todo: update remove brain endpoints to first delete the knowledge
+    def get_brain_for_user(self, user_id, brain_id) -> MinimalUserBrainEntity | None:
+        """
+        Get a brain for a user
+        """
+        pass
+
+    @abstractmethod
+    def delete_brain_user_by_id(
         self,
-        knowledge_id: UUID,
-    ) -> DeleteKnowledgeResponse:
+        user_id: UUID,
+        brain_id: UUID,
+    ):
         """
-        Args:
-            knowledge_id (UUID): The id of the knowledge
-
-        Returns:
-            str: Status message
+        Delete a user in a brain
         """
         pass
 
     @abstractmethod
-    def get_knowledge_by_id(self, knowledge_id: UUID) -> Knowledge:
+    def delete_brain_users(self, brain_id: str):
         """
-        Get a knowledge by its id
-        Args:
-            brain_id (UUID): The id of the brain
+        Delete all users for a brain
         """
         pass
 
     @abstractmethod
-    def get_all_knowledge_in_brain(self, brain_id: UUID) -> List[Knowledge]:
+    def create_brain_user(self, user_id: UUID, brain_id, rights, default_brain: bool):
         """
-        Get all the knowledge in a brain
-        Args:
-            brain_id (UUID): The id of the brain
+        Create a brain user
         """
         pass
 
     @abstractmethod
-    def remove_brain_all_knowledge(self, brain_id: UUID) -> None:
+    def get_user_default_brain_id(self, user_id: UUID) -> UUID | None:
         """
-        Remove all knowledge in a brain
-        Args:
-            brain_id (UUID): The id of the brain
+        Get the default brain id for a user
+        """
+        pass
+
+    @abstractmethod
+    def get_brain_users(self, brain_id: UUID) -> list[BrainUser]:
+        """
+        Get all users for a brain
+        """
+        pass
+
+    @abstractmethod
+    def delete_brain_subscribers(self, brain_id: UUID):
+        """
+        Delete all subscribers for a brain with Viewer rights
+        """
+        pass
+
+    @abstractmethod
+    def get_brain_subscribers_count(self, brain_id: UUID) -> int:
+        """
+        Get the number of subscribers for a brain
         """
         pass
