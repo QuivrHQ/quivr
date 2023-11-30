@@ -2,7 +2,7 @@ from typing import Optional
 from uuid import UUID
 
 from fastapi import HTTPException
-from modules.brain.dto.inputs import CreateBrainProperties
+from modules.brain.dto.inputs import BrainUpdatableProperties, CreateBrainProperties
 from modules.brain.entity.brain_entity import BrainEntity, BrainType
 from modules.brain.repository.brains import Brains
 from modules.brain.repository.brains_users import BrainsUsers
@@ -20,6 +20,9 @@ from repository.api_brain_definition.add_api_brain_definition import (
 )
 from repository.api_brain_definition.delete_api_brain_definition import (
     delete_api_brain_definition,
+)
+from repository.api_brain_definition.update_api_brain_definition import (
+    update_api_brain_definition,
 )
 from repository.brain.delete_brain_secrets import delete_brain_secrets_values
 from repository.external_api_secret.create_secret import create_secret
@@ -97,3 +100,76 @@ class BrainService:
         self.brain_repository.delete_brain(str(brain_id))  # type: ignore
 
         return {"message": "Brain deleted."}
+
+    def get_brain_prompt_id(self, brain_id: UUID) -> UUID | None:
+        brain = self.get_brain_by_id(brain_id)
+        prompt_id = brain.prompt_id if brain else None
+
+        return prompt_id
+
+    def update_brain_by_id(
+        self, brain_id: UUID, brain_new_values: BrainUpdatableProperties
+    ) -> BrainEntity:
+        """Update a prompt by id"""
+
+        existing_brain = self.brain_repository.get_brain_by_id(brain_id)
+
+        if existing_brain is None:
+            raise HTTPException(
+                status_code=404,
+                detail=f"Brain with id {brain_id} not found",
+            )
+
+        brain_update_answer = self.brain_repository.update_brain_by_id(
+            brain_id,
+            brain=BrainUpdatableProperties(
+                **brain_new_values.dict(exclude={"brain_definition"})
+            ),
+        )
+
+        if brain_update_answer is None:
+            raise HTTPException(
+                status_code=404,
+                detail=f"Brain with id {brain_id} not found",
+            )
+
+        if (
+            brain_update_answer.brain_type == BrainType.API
+            and brain_new_values.brain_definition
+        ):
+            existing_brain_secrets_definition = (
+                existing_brain.brain_definition.secrets
+                if existing_brain.brain_definition
+                else None
+            )
+            brain_new_values_secrets_definition = (
+                brain_new_values.brain_definition.secrets
+                if brain_new_values.brain_definition
+                else None
+            )
+            should_remove_existing_secrets_values = (
+                existing_brain_secrets_definition
+                and brain_new_values_secrets_definition
+                and existing_brain_secrets_definition
+                != brain_new_values_secrets_definition
+            )
+
+            if should_remove_existing_secrets_values:
+                delete_brain_secrets_values(brain_id=brain_id)
+
+            update_api_brain_definition(
+                brain_id,
+                api_brain_definition=brain_new_values.brain_definition,
+            )
+
+        if brain_update_answer is None:
+            raise HTTPException(
+                status_code=404,
+                detail=f"Brain with id {brain_id} not found",
+            )
+
+        self.brain_repository.update_brain_last_update_time(brain_id)
+        return brain_update_answer
+
+    def update_brain_last_update_time(self, brain_id: UUID):
+        self.brain_repository.update_brain_last_update_time(brain_id)

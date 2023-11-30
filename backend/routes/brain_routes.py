@@ -21,9 +21,7 @@ from repository.brain import (
     get_public_brains,
     get_question_context_from_brain,
     get_user_brains,
-    update_brain_by_id,
 )
-from repository.brain.get_brain_for_user import get_brain_for_user
 from repository.external_api_secret.update_secret_value import update_secret_value
 
 logger = get_logger(__name__)
@@ -140,7 +138,7 @@ async def update_existing_brain(
     if existing_brain is None:
         raise HTTPException(status_code=404, detail="Brain not found")
 
-    update_brain_by_id(brain_id, brain_update_data)
+    brain_service.update_brain_by_id(brain_id, brain_update_data)
 
     if brain_update_data.prompt_id is None and existing_brain.prompt_id:
         prompt = prompt_service.get_prompt_by_id(existing_brain.prompt_id)
@@ -182,7 +180,7 @@ async def update_existing_brain_secrets(
         )
 
     is_brain_user = (
-        get_brain_for_user(
+        brain_user_service.get_brain_for_user(
             user_id=current_user.id,
             brain_id=brain_id,
         )

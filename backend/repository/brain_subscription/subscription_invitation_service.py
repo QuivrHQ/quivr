@@ -1,10 +1,12 @@
 from logger import get_logger
 from models import BrainSubscription, get_supabase_client
-from repository.brain import get_brain_for_user
-
+from modules.brain.service.brain_user_service import BrainUserService
 from modules.user.service import get_user_id_by_email
 
 logger = get_logger(__name__)
+
+
+brain_user_service = BrainUserService()
 
 
 class SubscriptionInvitationService:
@@ -62,7 +64,7 @@ class SubscriptionInvitationService:
 
             if user_id is not None:
                 brain_id = brain_subscription.brain_id
-                brain_user = get_brain_for_user(user_id, brain_id)
+                brain_user = brain_user_service.get_brain_for_user(user_id, brain_id)
 
             if brain_user is None:
                 self.create_subscription_invitation(brain_subscription)

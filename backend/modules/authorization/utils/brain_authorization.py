@@ -3,10 +3,12 @@ from uuid import UUID
 
 from fastapi import Depends, HTTPException, status
 from middlewares.auth.auth_bearer import get_current_user
-from modules.authorization.utils import RoleEnum
+from modules.brain.entity.brain_entity import RoleEnum
+from modules.brain.service.brain_user_service import BrainUserService
 from modules.user.entity.user_identity import UserIdentity
-from repository.brain import get_brain_for_user
 from repository.brain.get_brain_details import get_brain_details
+
+brain_user_service = BrainUserService()
 
 
 def has_brain_authorization(
@@ -55,7 +57,7 @@ def validate_brain_authorization(
             detail="Missing required role",
         )
 
-    user_brain = get_brain_for_user(user_id, brain_id)
+    user_brain = brain_user_service.get_brain_for_user(user_id, brain_id)
     if user_brain is None:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,

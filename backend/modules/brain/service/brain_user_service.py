@@ -2,7 +2,7 @@ from uuid import UUID
 
 from fastapi import HTTPException
 from logger import get_logger
-from modules.brain.entity.brain_entity import BrainType, RoleEnum
+from modules.brain.entity.brain_entity import BrainEntity, BrainType, RoleEnum
 from modules.brain.repository.brains import Brains
 from modules.brain.repository.interfaces.brains_users_interface import (
     BrainsUsersInterface,
@@ -102,3 +102,6 @@ class BrainUserService:
             rights=rights,
             default_brain=is_default_brain,
         )
+
+    def get_brain_for_user(self, user_id: UUID, brain_id: UUID):
+        return self.brain_user_repository.get_brain_for_user(user_id, brain_id)  # type: ignore

@@ -22,7 +22,6 @@ from repository.api_brain_definition.get_api_brain_definition import (
 )
 from repository.brain import (
     get_brain_details,
-    get_brain_for_user,
     update_brain_user_rights,
 )
 from repository.brain.get_brain_users import get_brain_users
@@ -145,7 +144,7 @@ async def remove_user_subscription(
             detail="Brain not found while trying to delete",
         )
 
-    user_brain = get_brain_for_user(current_user.id, brain_id)
+    user_brain = brain_user_service.get_brain_for_user(current_user.id, brain_id)
     if user_brain is None:
         raise HTTPException(
             status_code=403,
@@ -344,7 +343,7 @@ def update_brain_subscription(
             )
 
     # check if user is not an editor trying to update an owner right which is not allowed
-    current_invitation = get_brain_for_user(user_id, brain_id)
+    current_invitation = brain_user_service.get_brain_for_user(user_id, brain_id)
     if current_invitation is not None and current_invitation.rights == "Owner":
         try:
             validate_brain_authorization(
@@ -404,7 +403,7 @@ async def subscribe_to_brain_handler(
             detail="You cannot subscribe to this brain without invitation",
         )
     # check if user is already subscribed to brain
-    user_brain = get_brain_for_user(current_user.id, brain_id)
+    user_brain = brain_user_service.get_brain_for_user(current_user.id, brain_id)
     if user_brain is not None:
         raise HTTPException(
             status_code=403,
@@ -465,7 +464,7 @@ async def unsubscribe_from_brain_handler(
             detail="You cannot subscribe to this brain without invitation",
         )
     # check if user is already subscribed to brain
-    user_brain = get_brain_for_user(current_user.id, brain_id)
+    user_brain = brain_user_service.get_brain_for_user(current_user.id, brain_id)
     if user_brain is None:
         raise HTTPException(
             status_code=403,
