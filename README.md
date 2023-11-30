@@ -126,6 +126,8 @@ Additionally, you'll need a [Supabase](https://supabase.com/) account for:
   ```
 
 - **Step 6**: Navigate to `localhost:3000` in your browser
+  
+  Once Quivr is running, you need to create an account to access the app. Go to supabase and create a new user in the `Users` section. You can then log in with your new user.
 
 - **Step 7**: Want to contribute to the project?
 
