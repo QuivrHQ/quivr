@@ -18,10 +18,6 @@ export const ChatProvider = ({
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [notifications, setNotifications] = useState<Notification[]>([]);
 
-  const addToHistory = (message: ChatMessage) => {
-    setMessages((prevHistory) => [...prevHistory, message]);
-  };
-
   const updateStreamingHistory = (streamedChat: ChatMessage): void => {
     setMessages((prevHistory: ChatMessage[]) => {
       const updatedHistory = prevHistory.find(
