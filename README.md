@@ -44,8 +44,6 @@ Ensure you have the following installed:
 
 ### 60 seconds Installation 💽
 
-- **Step 0**: If needed, the installation is explained on Youtube [here](https://youtu.be/rC-s4QdfY80)
-
 - **Step 1**: Clone the repository using **one** of these commands:
 
   - If you don't have an SSH key set up:
