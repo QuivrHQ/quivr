@@ -25,7 +25,7 @@ Quivr introduces the groundbreaking feature of integrating private Large Languag
 
 ### 4. Install Quivr
 - To set up Quivr, kindly follow the concise 3-step installation guide provided in our [readme.md](https://github.com/Quivr/README.md).
-- Important: Configure environmental variables in your backend/.env file, including the Huggingface API key for seamless integration.
+- Important: Configure environmental variables in your .env file, including the Huggingface API key for seamless integration.
 
 ### 5. Configure Your Supabase Instance
 - Within your Supabase instance, locate the user_settings table.
