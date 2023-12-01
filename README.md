@@ -114,7 +114,7 @@ You just need to update the `OPENAI_API_KEY` variable in the `.env` file. You ca
 
 - **Step 8**: Navigate to `localhost:8000` in your browser
   
-Once Quivr is running, you need to create an account to access the app. Go to [http://localhost:8000/project/default/auth/users](http://localhost:8000/project/default/auth/users) and create a new user in the `Users` section. User is `admin` and password is `admin`. You can then log in with your new user.
+Once Quivr is running, you need to create an account to access the app.  User is `admin` and password is `admin`. Go to [http://localhost:8000/project/default/auth/users](http://localhost:8000/project/default/auth/users) and create a new user in the `Users` section. You can then log in with your new user.
 
 - **Step 9**: Login to the app
 
