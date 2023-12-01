@@ -48,6 +48,15 @@ Are you there ? Good.
 
 `docker-compose up -f docker-compose.supabase.yml up --build`
 
+Dont forget to change the variables in backend/.env to match your local supabase instance:
+- SUPABASE_URL
+- SUPABASE_SERVICE_KEY
+- JWT_SECRET_KEY
+
+And in the frontend/.env:
+- NEXT_PUBLIC_SUPABASE_URL
+- NEXT_PUBLIC_SUPABASE_ANON_KEY
+
 Troubleshooting:
 
 - If the Quivr backend container cannot reach Supabase on port 8000, change the Quivr backend container to use the host network.
