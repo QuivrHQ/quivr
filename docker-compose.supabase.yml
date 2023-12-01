@@ -2,12 +2,12 @@ version: "3.8"
 
 services:
   frontend:
-    env_file:
-      - ./frontend/.env
     build:
       context: frontend
       dockerfile: Dockerfile
     container_name: web
+    env_file:
+      - ./frontend/.env
     restart: always
     ports:
       - 3000:3000
@@ -459,6 +459,8 @@ services:
       - ./volumes/db/data:/var/lib/postgresql/data:Z
       # Changes required for Analytics support
       - ./volumes/db/logs.sql:/docker-entrypoint-initdb.d/migrations/99-logs.sql:Z
+    ports:
+      - ${POSTGRES_PORT}:${POSTGRES_PORT}
 
   vector:
     container_name: supabase-vector
