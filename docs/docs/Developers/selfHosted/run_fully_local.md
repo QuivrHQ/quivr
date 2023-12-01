@@ -23,28 +23,28 @@ The guide was put together in collaboration with members of the Quivr Discord, *
 
 Instead of relying on a remote Supabase instance, we have to set it up locally. We are Following the instructions on https://supabase.com/docs/guides/self-hosting/docker with a few modifications
 
-## Go to the root of the Quivr repo
+### Go to the root of the Quivr repo
 
 Are you there ? Good.
 
-## Get the code
+### Get the code
 `git clone --depth 1 https://github.com/supabase/supabase`
 
-## Go to the docker folder
+### Go to the docker folder
 `cd supabase/docker`
 
-## Move the folder & files to the root
+### Move the folder & files to the root
 
 `mv * ../../`
 
-# Copy the fake env vars
+### Copy the fake env vars
 `cp .env.example .env`
 
-## Edit the .env file
+### Edit the .env file
 
 `Update 3000 to 3001 for the port`
 
-## Run the docker-compose
+### Run the docker-compose
 
 `docker-compose up -f docker-compose.supabase.yml up --build`
 
