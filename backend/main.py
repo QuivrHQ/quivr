@@ -50,6 +50,23 @@ if sentry_dsn:
         ],
     )
 
+telemetry_disabled = os.getenv("TELEMETRY_DISABLED", "False").lower() == "true"
+if not telemetry_disabled:
+    try:
+        logger.info("👨‍💻 You can disable TELEMETRY by addind TELEMETRY_DISABLED=True to your env variables")
+        logger.info("Telemetry is used to measure the usage of the app. No personal data is collected.")
+        import os
+        from supabase import create_client, Client
+        import uuid
+        supabase_url = os.environ.get("SUPABASE_URL", "NOT_SET")
+        supabase_client_telemetry = create_client("https://phcwncasycjransxnmbf.supabase.co","eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBoY3duY2FzeWNqcmFuc3hubWJmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MDE0NDM5NDEsImV4cCI6MjAxNzAxOTk0MX0.0MDz2ETHdQve9yVy_YI79iGsrlpLXX1ObrjmnzyVKSo")
+        ## insert in the usage table id as uuid of supabase_url
+        uuid_from_string = uuid.uuid5(uuid.NAMESPACE_DNS, supabase_url)
+        supabase_client_telemetry.table("usage").insert({"id": str(uuid_from_string)}).execute()
+    except Exception as e:
+        logger.error("Error while sending telemetry")
+    
+
 app = FastAPI()
 
 add_cors_middleware(app)
