@@ -34,8 +34,6 @@ Follow these instructions to get a copy of the project up and running on your lo
 
 You can find everything on the [documentation](https://brain.quivr.app/).
 
-Quivr can be installed offline, in order to do so, follow the instructions [here](https://brain.quivr.app/docs/Developers/selfHosted/run_fully_local). It requires some technical expertise. If you need help, feel free to join our [Discord](https://discord.gg/HUpRgp2HG8) and ask for help.
-
 ### Prerequisites 📋
 
 Ensure you have the following installed:
@@ -44,7 +42,9 @@ Ensure you have the following installed:
 - Docker Compose
 
 
-### Installation Steps 💽
+### 60 seconds Installation 💽
+
+- **Step 0**: If needed, the installation is explained on Youtube [here](https://youtu.be/rC-s4QdfY80)
 
 - **Step 1**: Clone the repository using **one** of these commands:
 
@@ -80,6 +80,17 @@ Ensure you have the following installed:
 Update **OPENAI_API_KEY** in the `.env` file.
 
 You just need to update the `OPENAI_API_KEY` variable in the `.env` file. You can get your API key [here](https://platform.openai.com/api-keys). You need to create an account first. And put your credit card information. Don't worry, you won't be charged unless you use the API. You can find more information about the pricing [here](https://openai.com/pricing/).
+
+```bash
+vim .env # or emacs or vscode or nano
+```
+
+Update **OPENAI_API_KEY** in the `.env` file.
+
+You just need to update the `OPENAI_API_KEY` variable in the `.env` file. You can get your API key [here](https://platform.openai.com/api-keys). You need to create an account first. And put your credit card information. Don't worry, you won't be charged unless you use the API. You can find more information about the pricing [here](https://openai.com/pricing/).
+
+
+Quivr can be installed offline and is compatible with [Ollama.ai](https://ollama.ai) , in order to do so, follow the instructions [here](https://brain.quivr.app/docs/Developers/selfHosted/run_fully_local). It requires some technical expertise. If you need help, feel free to join our [Discord](https://discord.gg/HUpRgp2HG8) and ask for help. The OPENAI_API_KEY is still required if you install Quivr offline but you can put whatever you want in the `.env` file.
 
 - **Step 5**: Launch the db 
 
