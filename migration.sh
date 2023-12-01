@@ -43,7 +43,7 @@ fi
 # Ask user whether to create tables or run migrations
 CHOICE=$(gum choose --header "Choose an option" "Create all tables (First Time)" "Run Migrations (After updating Quivr)")
 
-if [ "$CHOICE" == "Create all tables" ]; then
+if [ "$CHOICE" == "Create all tables (First Time)" ]; then
     # Running the tables.sql file to create tables
     run_sql_file "scripts/tables.sql"
 else
