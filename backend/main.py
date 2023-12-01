@@ -56,7 +56,7 @@ if not telemetry_disabled:
         logger.info("👨‍💻 You can disable TELEMETRY by addind TELEMETRY_DISABLED=True to your env variables")
         logger.info("Telemetry is used to measure the usage of the app. No personal data is collected.")
         import os
-        from supabase import create_client, Client
+        from supabase import create_client
         import uuid
         supabase_url = os.environ.get("SUPABASE_URL", "NOT_SET")
         supabase_client_telemetry = create_client("https://phcwncasycjransxnmbf.supabase.co","eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBoY3duY2FzeWNqcmFuc3hubWJmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MDE0NDM5NDEsImV4cCI6MjAxNzAxOTk0MX0.0MDz2ETHdQve9yVy_YI79iGsrlpLXX1ObrjmnzyVKSo")
