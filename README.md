@@ -43,15 +43,8 @@ Ensure you have the following installed:
 - Docker
 - Docker Compose
 
-Additionally, you'll need a [Supabase](https://supabase.com/) account for:
-
-- Creating a new Supabase project
-- Supabase Project API key
-- Supabase Project URL
 
 ### Installation Steps 💽
-
-- **Step 0**: If needed, the installation is explained on Youtube [here](https://youtu.be/rC-s4QdfY80)
 
 - **Step 1**: Clone the repository using **one** of these commands:
 
@@ -67,46 +60,41 @@ Additionally, you'll need a [Supabase](https://supabase.com/) account for:
   git clone git@github.com:StanGirard/Quivr.git && cd Quivr
   ```
 
-- **Step 2**: Use the install helper script to automate subsequent steps.
-  You can use the install_helper.sh script to setup your env files and execute the migrations.
-
-  prerequisites:
+- **Step 2**: Install prerequisites:
 
   ```bash
     brew install gum # Windows (via Scoop) scoop install charm-gum
     brew install postgresql # Windows (via Scoop) scoop install postgresql
   ```
 
-  ```bash
-  chmod +x install_helper.sh
-  ./install_helper.sh
-  ```
 
-  If you want to manually set up the environment, follow the steps below, otherwise skip to Step 6.
 
-- **Step 2 - Bis**: Copy the `.XXXXX_env` files
+- **Step 3**: Copy the `.env.example` files
 
   ```bash
-  cp .backend_env.example backend/.env
-  cp .frontend_env.example frontend/.env
+  cp .env.example .env
   ```
 
-- **Step 3**: Update the `backend/.env` and `frontend/.env` file
+- **Step 4**: Update the `.env` files
 
-  > _Your `supabase_service_key` can be found in your Supabase dashboard under Project Settings -> API. Use the `anon` `public` key found in the `Project API keys` section._
+Update **OPENAI_API_KEY** in the `.env` file.
 
-  > _Your `JWT_SECRET_KEY` can be found in your supabase settings under Project Settings -> API -> JWT Settings -> JWT Secret_
+You just need to update the `OPENAI_API_KEY` variable in the `.env` file. You can get your API key [here](https://platform.openai.com/api-keys). You need to create an account first. And put your credit card information. Don't worry, you won't be charged unless you use the API. You can find more information about the pricing [here](https://openai.com/pricing/).
 
-  > _The `NEXT_PUBLIC_BACKEND_URL` is set to localhost:5050 for the docker. Update it if you are running the backend on a different machine._
+- **Step 5**: Launch the db 
 
-  - Change variables in `backend/.env`
-  - Change variables in `frontend/.env`
+  ```bash
+  docker compose pull 
+  
+  docker compose up db -d
+  ```
 
-- **Step 4**: Use the `migration.sh` script to run the migration scripts
+- **Step 6**: Use the `migration.sh` script to run the migration scripts
 
   ```bash
   chmod +x migration.sh
   ./migration.sh
+  # Select  1) Create all tables
   ```
 
   Choose either `Create all tables` if it's your first time or `Run migrations`
@@ -117,23 +105,20 @@ Additionally, you'll need a [Supabase](https://supabase.com/) account for:
 
   All the scripts can be found in the [scripts](scripts/) folder
 
-  > _If you come from an old version of Quivr, run the scripts in [migration script](scripts/) to migrate your data to the new version in the order of date_
 
-- **Step 5**: Launch the app
+- **Step 7**: Launch the app
 
   ```bash
   docker compose up --build
   ```
 
-- **Step 6**: Navigate to `localhost:3000` in your browser
+- **Step 8**: Navigate to `localhost:8000` in your browser
   
-  Once Quivr is running, you need to create an account to access the app. Go to supabase and create a new user in the `Users` section. You can then log in with your new user.
+Once Quivr is running, you need to create an account to access the app.  User is `admin` and password is `admin`. Go to [http://localhost:8000/project/default/auth/users](http://localhost:8000/project/default/auth/users) and create a new user in the `Users` section. You can then log in with your new user.
 
-- **Step 7**: Want to contribute to the project?
+- **Step 9**: Login to the app
 
-  ```
-  docker compose -f docker-compose.dev.yml up --build
-  ```
+You can now sign in to the app with your new user. You can access the app at [http://localhost:3000/login](http://localhost:3000/login).
 
 ## Contributors ✨
 

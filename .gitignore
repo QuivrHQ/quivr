@@ -59,7 +59,6 @@ backend/core/application_default_credentials.json
 backend/core/local_models/*
 
 ## scripts
-.migration_info
 package-lock.json
 backend/celerybeat-schedule
 frontend/public/robots.txt
@@ -71,3 +70,5 @@ backend/lib/*
 backend/pyvenv.cfg
 backend/share/*
 backend/slim.report.json
+volumes/db/data/
+volumes/storage/stub/stub/quivr/*

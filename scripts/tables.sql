@@ -246,7 +246,7 @@ CREATE TABLE IF NOT EXISTS migrations (
 
 CREATE TABLE IF NOT EXISTS user_settings (
   user_id UUID PRIMARY KEY,
-  models JSONB DEFAULT '["gpt-3.5-turbo","gpt-4"]'::jsonb,
+  models JSONB DEFAULT '["gpt-3.5-turbo-1106","gpt-4"]'::jsonb,
   daily_chat_credit INT DEFAULT 300,
   max_brains INT DEFAULT 30,
   max_brain_size INT DEFAULT 100000000

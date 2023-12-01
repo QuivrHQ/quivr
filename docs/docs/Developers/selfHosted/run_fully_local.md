@@ -19,51 +19,6 @@ The guide was put together in collaboration with members of the Quivr Discord, *
 
 <a name="database"/>
 
-## Local Supabase
-
-Instead of relying on a remote Supabase instance, we have to set it up locally. We are Following the instructions on https://supabase.com/docs/guides/self-hosting/docker with a few modifications
-
-### Go to the root of the Quivr repo
-
-Are you there ? Good.
-
-### Get the code
-`git clone --depth 1 https://github.com/supabase/supabase`
-
-### Go to the docker folder
-`cd supabase/docker`
-
-### Move the folder & files to the root
-
-`mv * ../../`
-
-### Copy the fake env vars
-`cp .env.example .env`
-
-### Edit the .env file
-
-`Update 3000 to 3001 for the port`
-
-### Run the docker-compose
-
-`docker-compose up -f docker-compose.supabase.yml up --build`
-
-Dont forget to change the variables in backend/.env to match your local supabase instance:
-- SUPABASE_URL
-- SUPABASE_SERVICE_KEY
-- JWT_SECRET_KEY
-
-And in the frontend/.env:
-- NEXT_PUBLIC_SUPABASE_URL
-- NEXT_PUBLIC_SUPABASE_ANON_KEY
-
-Troubleshooting:
-
-- If the Quivr backend container cannot reach Supabase on port 8000, change the Quivr backend container to use the host network.
-- If email service does not work, add a user using the supabase web ui, and check "Auto Confirm User?".
-  - http://localhost:8000/project/default/auth/users
-
-<a name="embeddings"/>
 
 ## Ollama
 
@@ -162,7 +117,7 @@ DROP TABLE user_settings;
 
 In order to have Quivr use Ollama we need to update the env variables.
 
-Go to `backend/.env` and add the following env variables:
+Go to `.env` and add the following env variables:
 
 ```bash
 OLLAMA_API_BASE_URL=http://host.docker.internal:11434

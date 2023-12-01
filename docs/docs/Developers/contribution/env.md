@@ -5,7 +5,7 @@ sidebar_position: 8
 
 You have two environment files in the root of the project:
 
-One in `backend/.env` and the other in `frontend/.env`.
+The .env file is used to configure the app server. It contains the following variables:
 
 ### Backend Environment File
 
