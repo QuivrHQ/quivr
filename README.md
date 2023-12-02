@@ -81,17 +81,17 @@ Ensure you have the following installed:
   docker compose pull 
   docker compose up --build # if OPENAI 
   # docker compose -f docker-compose-ollama.yml up --build  # Only if using Ollama. You need to run `ollama run llama2` first.                
-```
+  ```
 
 - **Step 5**: Login to the app
 
-You can now sign in to the app with your new user. You can access the app at [http://localhost:3000/login](http://localhost:3000/login).
-Email: `admin@quivr.app`
-Password: `admin`
+  You can now sign in to the app with your new user. You can access the app at [http://localhost:3000/login](http://localhost:3000/login).
+  Email: `admin@quivr.app`
+  Password: `admin`
 
-You can also connect to the supabase database at [http://localhost:8080](http://localhost:8080) with the following credentials: admin/admin in order to create new users.
+  You can also connect to the supabase database at [http://localhost:8080](http://localhost:8080) with the following credentials: admin/admin in order to create new users.
 
-You can access Quivr backend API at [http://localhost:5050/](http://localhost:5050/)
+  You can access Quivr backend API at [http://localhost:5050/](http://localhost:5050/)
 
 
 ## Updating Quivr 🚀
