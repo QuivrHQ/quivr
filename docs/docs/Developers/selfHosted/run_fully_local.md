@@ -17,9 +17,6 @@ The following is a guide to set up everything for using Quivr locally:
 
 The guide was put together in collaboration with members of the Quivr Discord, **Using Quivr fully locally** thread. That is a good place to discuss it. https://discord.com/invite/HUpRgp2HG8
 
-<a name="database"/>
-
-
 ## Ollama
 
 Ollama is a tool that allows you to run LLMs locally. We are using it to run Llama2, MistralAI and others locally. 
@@ -39,9 +36,10 @@ ollama run llama2
 In order to have Quivr use Ollama we need to update the  tables in Supabase to support the embedding format that Ollama uses. Ollama uses by default llama 2 that produces 4096 dimensional embeddings while OpenAI API produces 1536 dimensional embeddings. 
 
 
-Go to supabase and delete your table vectors and create a new table vectors with the following schema:
+Go to your supabase localhost instance [http://localhost:8000](http://localhost:8000) (default password admin/admin) and delete your table `vectors` and create a new table vectors with the following schema:
 
 ```sql
+DROP TABLE IF EXISTS vectors;
 CREATE TABLE IF NOT EXISTS vectors (
     id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
     content TEXT,
@@ -117,7 +115,7 @@ DROP TABLE user_settings;
 
 In order to have Quivr use Ollama we need to update the env variables.
 
-Go to `.env` and add the following env variables:
+Go to `.env` and un comment the following env variables:
 
 ```bash
 OLLAMA_API_BASE_URL=http://host.docker.internal:11434
