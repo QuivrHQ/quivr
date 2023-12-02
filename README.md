@@ -52,13 +52,6 @@ Ensure you have the following installed:
   git clone https://github.com/StanGirard/Quivr.git && cd Quivr
   ```
 
-  - If you have an SSH key set up or want to add it ([guide here](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/adding-a-new-ssh-key-to-your-github-account))
-
-  ```bash
-  git clone git@github.com:StanGirard/Quivr.git && cd Quivr
-  ```
-
-
 - **Step 2**: Copy the `.env.example` files
 
   ```bash
@@ -76,7 +69,9 @@ Ensure you have the following installed:
   You just need to update the `OPENAI_API_KEY` variable in the `.env` file. You can get your API key [here](https://platform.openai.com/api-keys). You need to create an account first. And put your credit card information. Don't worry, you won't be charged unless you use the API. You can find more information about the pricing [here](https://openai.com/pricing/).
 
 
-  Want to use [Ollama.ai](https://ollama.ai) instead, in order to do so, follow the instructions [here](https://brain.quivr.app/docs/Developers/selfHosted/run_fully_local).
+  > Want to use [Ollama.ai](https://ollama.ai) instead?
+  > Finish installing Quivr, put a randon open_api_key in the `.env` file and
+  > follow the instructions [here](https://brain.quivr.app/docs/Developers/selfHosted/run_fully_local) to update Quivr to use Ollama AFTER you have finished installing Quivr.
 
 - **Step 4**: Launch the project
 
