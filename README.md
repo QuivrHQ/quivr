@@ -70,16 +70,18 @@ Ensure you have the following installed:
 
 
   > Want to use [Ollama.ai](https://ollama.ai) instead?
-  > Finish installing Quivr, put a randon open_api_key in the `.env` file and
-  > follow the instructions [here](https://brain.quivr.app/docs/Developers/selfHosted/run_fully_local) to update Quivr to use Ollama AFTER you have finished installing Quivr.
+  > Uncomment the following lines in the `.env` file:
+  > OLLAMA_API_BASE_URL
+  > Run the following command to start Ollama: `ollama run llama2`
+  > You can find more information about Ollama [here](https://ollama.ai/).
 
 - **Step 4**: Launch the project
 
   ```bash
   docker compose pull 
-  docker compose up --build
-  ```
-
+  docker compose up --build # if OPENAI 
+  # docker compose -f docker-compose-ollama.yml up --build  # Only if using Ollama. You need to run `ollama run llama2` first.                
+```
 
 - **Step 5**: Login to the app
 
