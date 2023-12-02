@@ -1,6 +1,6 @@
 import os
+from fastapi import FastAPI
 
-from packages.utils import handle_request_validation_error
 
 if __name__ == "__main__":
     # import needed here when running main.py to debug backend
@@ -26,6 +26,8 @@ from routes.brain_routes import brain_router
 from routes.chat_routes import chat_router
 from routes.crawl_routes import crawl_router
 from routes.subscription_routes import subscription_router
+from logger import get_logger
+from packages.utils import handle_request_validation_error
 from sentry_sdk.integrations.fastapi import FastApiIntegration
 from sentry_sdk.integrations.starlette import StarletteIntegration
 
@@ -49,6 +51,24 @@ if sentry_dsn:
             FastApiIntegration(transaction_style="endpoint"),
         ],
     )
+
+if CREATE_FIRST_USER := os.getenv("CREATE_FIRST_USER", "False").lower() == "true":
+    try:
+        from supabase import create_client
+
+        supabase_client_auth = create_client(
+            os.getenv("SUPABASE_URL"), os.getenv("SUPABASE_SERVICE_KEY")
+        )
+        res = supabase_client_auth.from_('users').select('*').eq('email', "admin@quivr.app").execute()
+        if len(res.data) == 0:
+            supabase_client_auth.auth.admin.create_user({"email": "admin@quivr.app","email_confirm": True, "password": "admin"})
+            logger.info("👨‍💻 Created first user")
+        else:
+            logger.info("👨‍💻 First user already exists")
+    except Exception as e:
+        logger.error("👨‍💻 Error while creating first user")
+        logger.error(e)
+
 
 telemetry_disabled = os.getenv("TELEMETRY_DISABLED", "False").lower() == "true"
 if not telemetry_disabled:
