@@ -2,6 +2,7 @@ version: "3.8"
 
 services:
   frontend:
+    pull_policy: never
     build:
       context: frontend
       dockerfile: Dockerfile
@@ -22,6 +23,7 @@ services:
 
   backend-core:
     image: backend-base
+    pull_policy: never
     env_file:
       - .env
     build:
@@ -54,6 +56,7 @@ services:
       - 6379:6379
 
   worker:
+    pull_policy: never
     image: backend-base
     env_file:
       - .env
@@ -68,6 +71,7 @@ services:
 
   beat:
     image: backend-base
+    pull_policy: never
     env_file:
       - .env
     build:
@@ -81,6 +85,7 @@ services:
 
   flower:
     image: backend-base
+    pull_policy: never
     env_file:
       - .env
     build:
