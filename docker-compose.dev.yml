@@ -39,12 +39,13 @@ services:
     command: 
       - "uvicorn"
       - "main:app"
+      - "--reload"
       - "--host"
       - "0.0.0.0"
       - "--port"
       - "5050"
       - "--workers"
-      - "1"
+      - "2"
     restart: always 
     depends_on:
       db:
