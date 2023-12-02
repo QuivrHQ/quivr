@@ -44,6 +44,8 @@ Ensure you have the following installed:
 
 ### 60 seconds Installation 💽
 
+You can find the installation video [here](https://www.youtube.com/watch?v=cXBa6dZJN48).
+
 - **Step 1**: Clone the repository:
 
   ```bash
@@ -92,6 +94,7 @@ Ensure you have the following installed:
   You can also connect to the supabase database at [http://localhost:8000](http://localhost:8000) with the following credentials: admin/admin in order to create new users.
 
   You can access Quivr backend API at [http://localhost:5050/](http://localhost:5050/)
+
 
 
 ## Updating Quivr 🚀
