@@ -112,8 +112,8 @@ export const LanguageSelect = ({
             className={`${
               // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
               isChatPage
-                ? "sm:text-black hover:text-primary"
-                : "sm:text-white hover:text-slate-200"
+                ? "sm:text-black hover:text-primary dark:sm:text-white dark:hover:text-slate-200"
+                : "sm:text-white hover:text-slate-200 dark:text-white"
             } text-black   cursor-pointer  text-xs  bg-transparent py-1.5  sm:px-3 text-left   sm:text-sm sm:leading-6`}
           >
             <IoLanguage className="" />

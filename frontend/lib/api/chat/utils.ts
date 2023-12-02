@@ -1,4 +1,7 @@
 export const getBrowserLang = (): string => {
+  if (typeof window === "undefined") {
+    return "en";
+  }
   const browserLang: string = navigator.language;
 
   let defaultBrowserLang = "";
