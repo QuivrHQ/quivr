@@ -171,7 +171,7 @@ def process_crawl_and_notify(
                 message=str(notification_message),
             ),
         )
-    update_brain_last_update_time(brain_id)
+    brain_service.update_brain_last_update_time(brain_id)
     return True
 
 
