@@ -89,7 +89,7 @@ Ensure you have the following installed:
   Email: `admin@quivr.app`
   Password: `admin`
 
-  You can also connect to the supabase database at [http://localhost:8080](http://localhost:8080) with the following credentials: admin/admin in order to create new users.
+  You can also connect to the supabase database at [http://localhost:8000](http://localhost:8000) with the following credentials: admin/admin in order to create new users.
 
   You can access Quivr backend API at [http://localhost:5050/](http://localhost:5050/)
 
