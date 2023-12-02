@@ -106,7 +106,7 @@ This will add the Ollama model to the list of models that the user can choose fr
 By adding this as default, it means that all new users will have this model by default. If you want to add it to your user only, you can add it to the `models` column in the `user_settings` table. In order for the change to take effect if you put as default your need to drop the entire table with the following command:
 
 ```sql
-DROP TABLE user_settings;
+DELETE TABLE user_settings;
 ```
 
 
