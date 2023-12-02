@@ -54,6 +54,9 @@ services:
     restart: always
     ports:
       - 6379:6379
+    depends_on:
+      db:
+        condition: service_healthy
 
   worker:
     pull_policy: never
@@ -68,6 +71,7 @@ services:
     restart: always
     depends_on:
       - redis
+      - db
 
   beat:
     image: backend-base

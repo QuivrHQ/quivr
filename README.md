@@ -83,6 +83,8 @@ Ensure you have the following installed:
   # docker compose -f docker-compose-ollama.yml up --build  # Only if using Ollama. You need to run `ollama run llama2` first.                
   ```
 
+  If you are a developer, you can run the project in development mode with the following command:  `docker compose -f docker-compose-dev.yml up --build`
+
 - **Step 5**: Login to the app
 
   You can now sign in to the app with your new user. You can access the app at [http://localhost:3000/login](http://localhost:3000/login).
