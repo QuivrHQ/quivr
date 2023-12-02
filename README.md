@@ -58,71 +58,65 @@ Ensure you have the following installed:
   git clone git@github.com:StanGirard/Quivr.git && cd Quivr
   ```
 
-- **Step 2**: Install prerequisites:
 
-  ```bash
-    brew install gum # Windows (via Scoop) scoop install charm-gum
-    brew install postgresql # Windows (via Scoop) scoop install postgresql
-  ```
-
-
-
-- **Step 3**: Copy the `.env.example` files
+- **Step 2**: Copy the `.env.example` files
 
   ```bash
   cp .env.example .env
   ```
 
-- **Step 4**: Update the `.env` files
+- **Step 3**: Update the `.env` files
 
-Update **OPENAI_API_KEY** in the `.env` file.
+  ```bash
+  vim .env # or emacs or vscode or nano
+  ```
 
-You just need to update the `OPENAI_API_KEY` variable in the `.env` file. You can get your API key [here](https://platform.openai.com/api-keys). You need to create an account first. And put your credit card information. Don't worry, you won't be charged unless you use the API. You can find more information about the pricing [here](https://openai.com/pricing/).
+  Update **OPENAI_API_KEY** in the `.env` file.
 
-```bash
-vim .env # or emacs or vscode or nano
-```
+  You just need to update the `OPENAI_API_KEY` variable in the `.env` file. You can get your API key [here](https://platform.openai.com/api-keys). You need to create an account first. And put your credit card information. Don't worry, you won't be charged unless you use the API. You can find more information about the pricing [here](https://openai.com/pricing/).
 
-Quivr can be installed offline and is compatible with [Ollama.ai](https://ollama.ai) , in order to do so, follow the instructions [here](https://brain.quivr.app/docs/Developers/selfHosted/run_fully_local). It requires some technical expertise. If you need help, feel free to join our [Discord](https://discord.gg/HUpRgp2HG8) and ask for help. The OPENAI_API_KEY is still required if you install Quivr offline but you can put whatever you want in the `.env` file.
 
-- **Step 5**: Launch the db 
+  Want to use [Ollama.ai](https://ollama.ai) instead, in order to do so, follow the instructions [here](https://brain.quivr.app/docs/Developers/selfHosted/run_fully_local).
+
+- **Step 4**: Launch the project
 
   ```bash
   docker compose pull 
-  
-  docker compose up db -d
+  docker compose up --build
   ```
 
-- **Step 6**: Use the `migration.sh` script to run the migration scripts
+
+- **Step 5**: Login to the app
+
+You can now sign in to the app with your new user. You can access the app at [http://localhost:3000/login](http://localhost:3000/login).
+Email: `admin@quivr.app`
+Password: `admin`
+
+You can also connect to the supabase database at [http://localhost:8080](http://localhost:8080) with the following credentials: admin/admin in order to create new users.
+
+You can access Quivr backend API at [http://localhost:5050/](http://localhost:5050/)
+
+
+## Updating Quivr 🚀
+
+- **Step 1**: Pull the latest changes
+
+  ```bash
+  git pull
+  ```
+
+- **Step 2**: Use the `migration.sh` script to run the migration scripts
 
   ```bash
   chmod +x migration.sh
   ./migration.sh
-  # Select  1) Create all tables
+  # Select  2) Run migrations
   ```
-
-  Choose either `Create all tables` if it's your first time or `Run migrations`
-  if you are updating your database.
 
   Alternatively, you can run the script on the Supabase database via the web
   interface (SQL Editor -> `New query` -> paste the script -> `Run`)
 
   All the scripts can be found in the [scripts](scripts/) folder
-
-
-- **Step 7**: Launch the app
-
-  ```bash
-  docker compose up --build
-  ```
-
-- **Step 8**: Navigate to `localhost:8000` in your browser
-  
-Once Quivr is running, you need to create an account to access the app.  User is `admin` and password is `admin`. Go to [http://localhost:8000/project/default/auth/users](http://localhost:8000/project/default/auth/users) and create a new user in the `Users` section. You can then log in with your new user.
-
-- **Step 9**: Login to the app
-
-You can now sign in to the app with your new user. You can access the app at [http://localhost:3000/login](http://localhost:3000/login).
 
 ## Contributors ✨
 

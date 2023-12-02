@@ -13,6 +13,8 @@ services:
         - NEXT_PUBLIC_CMS_URL=${NEXT_PUBLIC_CMS_URL}
         - NEXT_PUBLIC_FRONTEND_URL=${NEXT_PUBLIC_FRONTEND_URL}
     container_name: web
+    depends_on:
+      - backend-core
     restart: always
     ports:
       - 3000:3000
@@ -26,11 +28,21 @@ services:
       context: backend
       dockerfile: Dockerfile
     container_name: backend-core
-    restart: always
+    command: 
+      - "uvicorn"
+      - "main:app"
+      - "--host"
+      - "0.0.0.0"
+      - "--port"
+      - "5050"
+      - "--workers"
+      - "1"
+    restart: always 
     depends_on:
-      - redis
-      - worker
-      - beat
+      db:
+          condition: service_healthy
+      kong:
+          condition: service_healthy
     ports:
       - 5050:5050
 
@@ -463,7 +475,7 @@ services:
       - ./volumes/db/data:/var/lib/postgresql/data:Z
       # Changes required for Analytics support
       - ./volumes/db/logs.sql:/docker-entrypoint-initdb.d/migrations/99-logs.sql:Z
-      - ./volumes/db/init/data.sql:/docker-entrypoint-initdb.d/seed.sql
+      - ./scripts/tables.sql:/docker-entrypoint-initdb.d/seed.sql
 
   vector:
     container_name: supabase-vector
