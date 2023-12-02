@@ -44,9 +44,7 @@ Ensure you have the following installed:
 
 ### 60 seconds Installation 💽
 
-- **Step 1**: Clone the repository using **one** of these commands:
-
-  - If you don't have an SSH key set up:
+- **Step 1**: Clone the repository:
 
   ```bash
   git clone https://github.com/StanGirard/Quivr.git && cd Quivr
