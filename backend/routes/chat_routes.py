@@ -164,10 +164,8 @@ async def create_stream_question_handler(
         gpt_answer_generator: HeadlessQA | QABaseBrainPicking
         # TODO check if model is in the list of models available for the user
 
-        is_model_ok = chat_question.model in user_settings.get("models", ["gpt-3.5-turbo"])  # type: ignore
         gpt_answer_generator = chat_instance.get_answer_generator(
             chat_id=str(chat_id),
-            model=chat_question.model if is_model_ok else "gpt-3.5-turbo",  # type: ignore
             max_tokens=chat_question.max_tokens,
             temperature=chat_question.temperature,  # type: ignore
             streaming=True,
