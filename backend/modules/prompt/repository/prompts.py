@@ -4,10 +4,12 @@ from modules.prompt.repository.prompts_interface import (
     DeletePromptResponse,
     PromptsInterface,
 )
+from models.settings import get_supabase_client
 
 
 class Prompts(PromptsInterface):
-    def __init__(self, supabase_client):
+    def __init__(self):
+        supabase_client = get_supabase_client()
         self.db = supabase_client
 
     def create_prompt(self, prompt):

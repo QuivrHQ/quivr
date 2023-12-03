@@ -3,20 +3,23 @@ from typing import Optional
 from uuid import UUID
 
 from fastapi import HTTPException
+from logger import get_logger
 from litellm import completion
-from models.chats import ChatQuestion
-from models.databases.supabase.chats import CreateChatHistory
-from repository.brain.get_brain_by_id import get_brain_by_id
-from repository.chat.get_chat_history import GetChatHistoryOutput, get_chat_history
-from repository.chat.update_chat_history import update_chat_history
-from repository.chat.update_message_by_id import update_message_by_id
-
 from llm.qa_base import QABaseBrainPicking
 from llm.utils.call_brain_api import call_brain_api
 from llm.utils.get_api_brain_definition_as_json_schema import (
     get_api_brain_definition_as_json_schema,
 )
+from models.chats import ChatQuestion
+from models.databases.supabase.chats import CreateChatHistory
+from modules.brain.service.brain_service import BrainService
+from repository.chat.get_chat_history import GetChatHistoryOutput, get_chat_history
+from repository.chat.update_chat_history import update_chat_history
+from repository.chat.update_message_by_id import update_message_by_id
 
+brain_service = BrainService()
+
+logger = get_logger(__name__)
 
 class APIBrainQA(
     QABaseBrainPicking,
@@ -51,9 +54,14 @@ class APIBrainQA(
         messages,
         functions,
         brain_id: UUID,
-    ):
+        recursive_count = 0,
+    ):  
+        if recursive_count > 5:
+            yield "🧠<Deciding what to do>🧠"
+            yield "The assistant is having issues and took more than 5 calls to the API. Please try again later or an other instruction."
+            return
+        
         yield "🧠<Deciding what to do>🧠"
-
         response = completion(
             model=self.model,
             temperature=self.temperature,
@@ -70,26 +78,23 @@ class APIBrainQA(
         }
         for chunk in response:
             finish_reason = chunk.choices[0].finish_reason
-
             if finish_reason == "stop":
                 break
-
-            if "function_call" in chunk.choices[0].delta:
-                if "name" in chunk.choices[0].delta["function_call"]:
-                    function_call["name"] = chunk.choices[0].delta["function_call"][
-                        "name"
-                    ]
-                if "arguments" in chunk.choices[0].delta["function_call"]:
+            if "function_call" in chunk.choices[0].delta and chunk.choices[0].delta["function_call"]:
+                if chunk.choices[0].delta["function_call"].name:
+                    function_call["name"] = chunk.choices[0].delta["function_call"].name
+                if chunk.choices[0].delta["function_call"].arguments:
                     function_call["arguments"] += chunk.choices[0].delta[
                         "function_call"
-                    ]["arguments"]
+                    ].arguments
 
             elif finish_reason == "function_call":
                 try:
                     arguments = json.loads(function_call["arguments"])
+                    
                 except Exception:
                     arguments = {}
-                yield f"🧠<Calling API with arguments {arguments} and brain id {brain_id}>🧠"
+                yield f"🧠<Calling {brain_id} with arguments {arguments}>🧠"
 
                 try:
                     api_call_response = call_brain_api(
@@ -102,18 +107,20 @@ class APIBrainQA(
                         status_code=400,
                         detail=f"Error while calling API: {e}",
                     )
-
+                
+                function_name = function_call["name"]
                 messages.append(
                     {
                         "role": "function",
                         "name": function_call["name"],
-                        "content": api_call_response,
+                        "content": f"The function {function_name} was called and gave The following answer:(data from function) {api_call_response} (end of data from function). Don't call this function again unless there was an error or extremely necessary and asked specifically by the user.",
                     }
                 )
                 async for value in self.make_completion(
                     messages=messages,
                     functions=functions,
                     brain_id=brain_id,
+                    recursive_count=recursive_count + 1,
                 ):
                     yield value
 
@@ -135,12 +142,12 @@ class APIBrainQA(
                 status_code=400, detail="No brain id provided in the question"
             )
 
-        brain = get_brain_by_id(question.brain_id)
+        brain = brain_service.get_brain_by_id(question.brain_id)
 
         if not brain:
             raise HTTPException(status_code=404, detail="Brain not found")
 
-        prompt_content = "You'are a helpful assistant which can call APIs. Feel free to call the API when you need to. Don't force APIs call, do it when necessary. If it seems like you should call the API and there are missing parameters, ask user for them."
+        prompt_content = "You are a helpful assistant that can access functions to help answer questions. If there are information missing in the question, you can ask follow up questions to get more information to the user. Once all the information is available, you can call the function to get the answer."
 
         if self.prompt_to_use:
             prompt_content += self.prompt_to_use.content

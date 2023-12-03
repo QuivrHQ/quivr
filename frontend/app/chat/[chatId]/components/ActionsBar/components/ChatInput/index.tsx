@@ -4,12 +4,12 @@ import { useTranslation } from "react-i18next";
 import Button from "@/lib/components/ui/Button";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 import { useKnowledgeToFeedContext } from "@/lib/context/KnowledgeToFeedProvider/hooks/useKnowledgeToFeedContext";
+import { getBrainIconFromBrainType } from "@/lib/helpers/getBrainIconFromBrainType";
 
 import { OnboardingQuestions } from "./components";
-import { ChatBar } from "./components/ChatBar/ChatBar";
+import { ChatEditor } from "./components/ChatEditor/ChatEditor";
 import { ConfigModal } from "./components/ConfigModal";
 import { useChatInput } from "./hooks/useChatInput";
-import { getBrainIconFromBrainType } from "../../../../../../../lib/helpers/getBrainIconFromBrainType";
 
 type ChatInputProps = {
   shouldDisplayFeedOrSecretsCard: boolean;
@@ -50,8 +50,8 @@ export const ChatInput = ({
             </Button>
           )}
 
-          <div className="flex flex-1 flex-col items-center">
-            <ChatBar
+          <div className="flex flex-1">
+            <ChatEditor
               message={message}
               setMessage={setMessage}
               onSubmit={submitQuestion}

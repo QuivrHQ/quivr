@@ -1,13 +1,15 @@
 from datetime import datetime, timedelta
 
 from fastapi import HTTPException
+from models.settings import get_supabase_client
 from modules.onboarding.entity.onboarding import OnboardingStates
 
 from .onboardings_interface import OnboardingInterface
 
 
 class Onboarding(OnboardingInterface):
-    def __init__(self, supabase_client):
+    def __init__(self):
+        supabase_client = get_supabase_client()
         self.db = supabase_client
 
     def get_user_onboarding(self, user_id):

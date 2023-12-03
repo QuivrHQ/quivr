@@ -16,7 +16,7 @@ class PromptService:
 
     def __init__(self):
         supabase_client = get_supabase_client()
-        self.repository = Prompts(supabase_client)
+        self.repository = Prompts()
 
     def create_prompt(self, prompt: CreatePromptProperties) -> Prompt:
         return self.repository.create_prompt(prompt)

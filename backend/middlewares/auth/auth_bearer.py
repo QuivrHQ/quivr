@@ -3,9 +3,11 @@ from typing import Optional
 
 from fastapi import Depends, HTTPException, Request
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
-from middlewares.auth.api_key_handler import get_user_from_api_key, verify_api_key
 from middlewares.auth.jwt_token_handler import decode_access_token, verify_token
+from modules.api_key.service.api_key_service import ApiKeyService
 from modules.user.entity.user_identity import UserIdentity
+
+api_key_service = ApiKeyService()
 
 
 class AuthBearer(HTTPBearer):
@@ -41,10 +43,10 @@ class AuthBearer(HTTPBearer):
             return self.get_test_user()
         elif verify_token(token):
             return decode_access_token(token)
-        elif await verify_api_key(
+        elif await api_key_service.verify_api_key(
             token,
         ):
-            return await get_user_from_api_key(
+            return await api_key_service.get_user_from_api_key(
                 token,
             )
         else:

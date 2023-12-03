@@ -1,5 +1,58 @@
 # Changelog
 
+## 0.0.125 (2023-11-30)
+
+## What's Changed
+* fix(api): fixed issue with name function and ilmproved promtp by @StanGirard in https://github.com/StanGirard/quivr/pull/1759
+* fix: update mention suggestion filtering logic by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1763
+
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.124...v0.0.125
+
+## 0.0.124 (2023-11-29)
+
+## What's Changed
+* feat(chatInput): use tiptap editor by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1752
+* docs: update guidelines.md by @eltociear in https://github.com/StanGirard/quivr/pull/1755
+* Feat/local llm bug fix by @StanGirard in https://github.com/StanGirard/quivr/pull/1758
+
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.123...v0.0.124
+
+## 0.0.123 (2023-11-29)
+
+## What's Changed
+* chore: downgrade versions by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1748
+* fix: revert implement local llms by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1749
+
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.122...v0.0.123
+
+## 0.0.122 (2023-11-29)
+
+## What's Changed
+* refactor: Notification module by @gozineb in https://github.com/StanGirard/quivr/pull/1740
+* refactor: remove explore route from back & front by @gozineb in https://github.com/StanGirard/quivr/pull/1741
+* feat: implement local llms by @StanGirard in https://github.com/StanGirard/quivr/pull/1745
+* refactor: knowledge module by @gozineb in https://github.com/StanGirard/quivr/pull/1743
+
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.121...v0.0.122
+
+## 0.0.121 (2023-11-28)
+
+## What's Changed
+* fix: update max token logic by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1725
+* fix: update public brain subscription logic by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1727
+* fix: sanitize file name by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1728
+* feat(publicBrains): use join queries for better performance by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1730
+* feat: improve delete knowledge performance by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1733
+* fix: 🐛 crawler by @StanGirard in https://github.com/StanGirard/quivr/pull/1735
+* feat: 🎸 local user by @StanGirard in https://github.com/StanGirard/quivr/pull/1736
+
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.120...v0.0.121
+
 ## 0.0.120 (2023-11-27)
 
 ## What's Changed
