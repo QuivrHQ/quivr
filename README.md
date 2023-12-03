@@ -87,13 +87,13 @@ You can find the installation video [here](https://www.youtube.com/watch?v=cXBa6
 
 - **Step 5**: Login to the app
 
+  Connect to the supabase database at [http://localhost:8000/project/default/auth/users](http://localhost:8000/project/default/auth/users) with the following credentials: admin/admin in order to create new users. Auto-confirm the email.
+
   You can now sign in to the app with your new user. You can access the app at [http://localhost:3000/login](http://localhost:3000/login).
-  Email: `admin@quivr.app`
-  Password: `admin`
 
-  You can also connect to the supabase database at [http://localhost:8000](http://localhost:8000) with the following credentials: admin/admin in order to create new users.
+  
 
-  You can access Quivr backend API at [http://localhost:5050/](http://localhost:5050/)
+  You can access Quivr backend API at [http://localhost:5050/docs](http://localhost:5050/docs)
 
 
 
