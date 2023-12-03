@@ -112,6 +112,9 @@ $$;
 CREATE TABLE IF NOT EXISTS api_keys(
     key_id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     user_id UUID REFERENCES auth.users (id),
+    name TEXT DEFAULT 'API_KEY', 
+    days INT DEFAULT 30,
+    only_chat BOOLEAN DEFAULT false,
     api_key TEXT UNIQUE,
     creation_time TIMESTAMP DEFAULT current_timestamp,
     deleted_time TIMESTAMP,
@@ -441,9 +444,16 @@ begin
 end;
 $$;
 
+create schema if not exists extensions;
+
+create table if not exists
+  extensions.wrappers_fdw_stats ();
+
+grant all on extensions.wrappers_fdw_stats to service_role;
+
 
 INSERT INTO migrations (name) 
-SELECT '20231128173900_remove_openai_api_key'
+SELECT '20231203173900_new_api_key_format'
 WHERE NOT EXISTS (
-    SELECT 1 FROM migrations WHERE name = '20231128173900_remove_openai_api_key'
+    SELECT 1 FROM migrations WHERE name = '20231203173900_new_api_key_format'
 );
