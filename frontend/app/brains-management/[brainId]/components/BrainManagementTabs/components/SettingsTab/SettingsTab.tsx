@@ -6,16 +6,14 @@ import { useTranslation } from "react-i18next";
 import { FaSpinner } from "react-icons/fa";
 
 import { Divider } from "@/lib/components/ui/Divider";
-import { defaultBrainConfig } from "@/lib/config/defaultBrainConfig";
-import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
-import { BrainConfig } from "@/lib/types/brainConfig";
+import { Brain } from "@/lib/context/BrainProvider/types";
 
 import { GeneralInformation, ModelSelection, Prompt } from "./components";
 import { AccessConfirmationModal } from "./components/PrivateAccessConfirmationModal/AccessConfirmationModal";
 import { useAccessConfirmationModal } from "./components/PrivateAccessConfirmationModal/hooks/useAccessConfirmationModal";
+import { usePermissionsController } from "./hooks/usePermissionsController";
 import { UsePromptProps } from "./hooks/usePrompt";
 import { useSettingsTab } from "./hooks/useSettingsTab";
-import { getBrainPermissions } from "../../utils/getBrainPermissions";
 
 type SettingsTabProps = {
   brainId: UUID;
@@ -44,12 +42,9 @@ export const SettingsTabContent = ({
   const { onCancel, isAccessModalOpened, closeModal } =
     useAccessConfirmationModal();
 
-  const { allBrains } = useBrainContext();
-
   const { hasEditRights, isOwnedByCurrentUser, isPublicBrain } =
-    getBrainPermissions({
+    usePermissionsController({
       brainId,
-      userAccessibleBrains: allBrains,
     });
 
   return (
@@ -57,7 +52,7 @@ export const SettingsTabContent = ({
       <form
         onSubmit={(e) => {
           e.preventDefault();
-          void handleSubmit(true);
+          void handleSubmit();
         }}
         className="my-10 mb-0 flex flex-col items-center gap-2"
         ref={formRef}
@@ -103,9 +98,7 @@ export const SettingsTabContent = ({
 };
 
 export const SettingsTab = ({ brainId }: SettingsTabProps): JSX.Element => {
-  const methods = useForm<BrainConfig>({
-    defaultValues: defaultBrainConfig,
-  });
+  const methods = useForm<Brain>();
 
   return (
     <FormProvider {...methods}>

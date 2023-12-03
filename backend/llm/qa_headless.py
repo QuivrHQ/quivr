@@ -7,13 +7,12 @@ from langchain.callbacks.streaming_aiter import AsyncIteratorCallbackHandler
 from langchain.chains import LLMChain
 from langchain.chat_models import ChatLiteLLM
 from langchain.chat_models.base import BaseChatModel
+from models import BrainSettings  # Importing settings related to the 'brain'
 from langchain.prompts.chat import ChatPromptTemplate, HumanMessagePromptTemplate
-from llm.utils.get_prompt_to_use import get_prompt_to_use
-from llm.utils.get_prompt_to_use_id import get_prompt_to_use_id
 from logger import get_logger
 from models.chats import ChatQuestion
 from models.databases.supabase.chats import CreateChatHistory
-from models.prompt import Prompt
+from modules.prompt.entity.prompt import Prompt
 from pydantic import BaseModel
 from repository.chat import (
     GetChatHistoryOutput,
@@ -24,27 +23,22 @@ from repository.chat import (
     update_message_by_id,
 )
 
+from llm.utils.get_prompt_to_use import get_prompt_to_use
+from llm.utils.get_prompt_to_use_id import get_prompt_to_use_id
+
 logger = get_logger(__name__)
 SYSTEM_MESSAGE = "Your name is Quivr. You're a helpful assistant. If you don't know the answer, just say that you don't know, don't try to make up an answer.When answering use markdown or any other techniques to display the content in a nice and aerated way."
 
 
 class HeadlessQA(BaseModel):
+    brain_settings = BrainSettings() 
     model: str
     temperature: float = 0.0
     max_tokens: int = 2000
-    user_openai_api_key: Optional[str] = None
-    openai_api_key: Optional[str] = None
     streaming: bool = False
     chat_id: str
     callbacks: Optional[List[AsyncIteratorCallbackHandler]] = None
     prompt_id: Optional[UUID] = None
-
-    def _determine_api_key(self, openai_api_key, user_openai_api_key):
-        """If user provided an API key, use it."""
-        if user_openai_api_key is not None:
-            return user_openai_api_key
-        else:
-            return openai_api_key
 
     def _determine_streaming(self, streaming: bool) -> bool:
         """If the model name allows for streaming and streaming is declared, set streaming to True."""
@@ -61,11 +55,6 @@ class HeadlessQA(BaseModel):
 
     def __init__(self, **data):
         super().__init__(**data)
-        print("in HeadlessQA")
-
-        self.openai_api_key = self._determine_api_key(
-            self.openai_api_key, self.user_openai_api_key
-        )
         self.streaming = self._determine_streaming(self.streaming)
         self.callbacks = self._determine_callback_array(self.streaming)
 
@@ -78,7 +67,11 @@ class HeadlessQA(BaseModel):
         return get_prompt_to_use_id(None, self.prompt_id)
 
     def _create_llm(
-        self, model, temperature=0, streaming=False, callbacks=None
+        self,
+        model,
+        temperature=0,
+        streaming=False,
+        callbacks=None,
     ) -> BaseChatModel:
         """
         Determine the language model to be used.
@@ -87,13 +80,18 @@ class HeadlessQA(BaseModel):
         :param callbacks: Callbacks to be used for streaming
         :return: Language model instance
         """
+        api_base = None
+        if self.brain_settings.ollama_api_base_url and model.startswith("ollama"):
+            api_base = self.brain_settings.ollama_api_base_url
+
         return ChatLiteLLM(
-            temperature=0.1,
+            temperature=temperature,
             model=model,
             streaming=streaming,
             verbose=True,
             callbacks=callbacks,
-            openai_api_key=self.openai_api_key,
+            max_tokens=self.max_tokens,
+            api_base=api_base,
         )
 
     def _create_prompt_template(self):
@@ -115,7 +113,9 @@ class HeadlessQA(BaseModel):
             transformed_history, prompt_content, question.question
         )
         answering_llm = self._create_llm(
-            model=self.model, streaming=False, callbacks=self.callbacks
+            model=self.model,
+            streaming=False,
+            callbacks=self.callbacks,
         )
         model_prediction = answering_llm.predict_messages(messages)
         answer = model_prediction.content

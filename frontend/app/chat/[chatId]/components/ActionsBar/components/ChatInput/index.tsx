@@ -1,29 +1,31 @@
-"use client";
-import { useTranslation } from "react-i18next";
-import { PiPaperclipFill } from "react-icons/pi";
+'use client';
+import { useTranslation } from 'react-i18next';
 
-import { QuestionList } from "@/app/chat/components/QuestionList";
-import Button from "@/lib/components/ui/Button";
-import { useKnowledgeToFeedContext } from "@/lib/context/KnowledgeToFeedProvider/hooks/useKnowledgeToFeedContext";
-import { useSecurity } from "@/services/useSecurity/useSecurity";
+import { QuestionList } from '@/app/chat/components/QuestionList';
+import Button from '@/lib/components/ui/Button';
+import { useBrainContext } from '@/lib/context/BrainProvider/hooks/useBrainContext';
+import { useKnowledgeToFeedContext } from '@/lib/context/KnowledgeToFeedProvider/hooks/useKnowledgeToFeedContext';
+import { getBrainIconFromBrainType } from '@/lib/helpers/getBrainIconFromBrainType';
+import { useSecurity } from '@/services/useSecurity/useSecurity';
 
-import { ChatBar } from "./components/ChatBar/ChatBar";
-import { ConfigModal } from "./components/ConfigModal";
-import { useChatInput } from "./hooks/useChatInput";
+import { ChatEditor } from './components/ChatEditor/ChatEditor';
+import { ConfigModal } from './components/ConfigModal';
+import { useChatInput } from './hooks/useChatInput';
 
 type ChatInputProps = {
-  shouldDisplayFeedCard: boolean;
+  shouldDisplayFeedOrSecretsCard: boolean;
 };
 
 export const ChatInput = ({
-  shouldDisplayFeedCard,
+  shouldDisplayFeedOrSecretsCard,
 }: ChatInputProps): JSX.Element => {
   const { isStudioMember } = useSecurity();
 
   const { setMessage, submitQuestion, message, generatingAnswer } =
     useChatInput();
-  const { t } = useTranslation(["chat"]);
 
+  const { t } = useTranslation(['chat']);
+  const { currentBrainDetails } = useBrainContext();
   const { setShouldDisplayFeedCard } = useKnowledgeToFeedContext();
 
   return (
@@ -38,21 +40,21 @@ export const ChatInput = ({
           }}
           className="sticky bottom-0 bg-white dark:bg-black w-full flex items-center gap-2 z-20 p-2"
         >
-          {isStudioMember && !shouldDisplayFeedCard && (
+          {isStudioMember && !shouldDisplayFeedOrSecretsCard && (
             <Button
               className="p-0"
-              variant={"tertiary"}
+              variant={'tertiary'}
               data-testid="feed-button"
               type="button"
               onClick={() => setShouldDisplayFeedCard(true)}
-              tooltip={t("add_content_card_button_tooltip")}
+              tooltip={t('add_content_card_button_tooltip')}
             >
-              <PiPaperclipFill size={38} />
+              {getBrainIconFromBrainType(currentBrainDetails?.brain_type)}
             </Button>
           )}
 
-          <div className="flex flex-1 flex-col items-center">
-            <ChatBar
+          <div className="flex flex-1">
+            <ChatEditor
               message={message}
               setMessage={setMessage}
               onSubmit={submitQuestion}
@@ -67,8 +69,8 @@ export const ChatInput = ({
               data-testid="submit-button"
             >
               {generatingAnswer
-                ? t("thinking", { ns: "chat" })
-                : t("chat", { ns: "chat" })}
+                ? t('thinking', { ns: 'chat' })
+                : t('chat', { ns: 'chat' })}
             </Button>
             <div className="hidden md:flex items-center">
               {isStudioMember && <ConfigModal />}

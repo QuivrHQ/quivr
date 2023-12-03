@@ -9,7 +9,9 @@ if (SENTRY_DSN) {
     dsn: SENTRY_DSN,
 
     // Adjust this value in production, or use tracesSampler for greater control
-    tracesSampleRate: 1,
+    tracesSampleRate: 0.05,
+    sampleRate: 0.05,
+
 
     // Setting this option to true will print useful information to the console while you're setting up Sentry.
     debug: false,

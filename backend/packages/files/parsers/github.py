@@ -4,16 +4,14 @@ import time
 from langchain.document_loaders import GitLoader
 from langchain.schema import Document
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-from models import Brain, File
+from models.files import File
 from packages.embeddings.vectors import Neurons
 from packages.files.file import compute_sha1_from_content
 
 
 async def process_github(
     repo,
-    enable_summarization,
     brain_id,
-    user_openai_api_key,
 ):
     random_dir_name = os.urandom(16).hex()
     dateshort = time.strftime("%Y%m%d")
@@ -54,9 +52,10 @@ async def process_github(
             "chunk_size": chunk_size,
             "chunk_overlap": chunk_overlap,
             "date": dateshort,
-            "summarization": "true" if enable_summarization else "false",
         }
         doc_with_metadata = Document(page_content=doc.page_content, metadata=metadata)
+
+        print(doc_with_metadata.metadata["file_name"])
 
         file = File(
             file_sha1=compute_sha1_from_content(doc.page_content.encode("utf-8"))
@@ -66,15 +65,12 @@ async def process_github(
 
         if not file_exists:
             neurons = Neurons()
-            created_vector = neurons.create_vector(
-                doc_with_metadata, user_openai_api_key
-            )
+            created_vector = neurons.create_vector(doc_with_metadata)
 
         file_exists_in_brain = file.file_already_exists_in_brain(brain_id)
 
         if not file_exists_in_brain:
-            brain = Brain(id=brain_id)
-            file.link_file_to_brain(brain)
+            file.link_file_to_brain(brain_id)
     return {
         "message": f"✅ Github with {len(documents)} files has been uploaded.",
         "type": "success",

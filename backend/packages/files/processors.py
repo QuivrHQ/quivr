@@ -1,5 +1,4 @@
-from models.brains import Brain
-from repository.brain.get_brain_by_id import get_brain_by_id
+from modules.brain.service.brain_service import BrainService
 
 from .parsers.audio import process_audio
 from .parsers.code_python import process_python
@@ -46,12 +45,13 @@ def create_response(message, type):
     return {"message": message, "type": type}
 
 
+brain_service = BrainService()
+
+
 # TODO: Move filter_file to a file service to avoid circular imports from models/files.py for File class
 async def filter_file(
     file,
-    enable_summarization: bool,
     brain_id,
-    openai_api_key,
     original_file_name=None,
 ):
     await file.compute_file_sha1()
@@ -60,7 +60,7 @@ async def filter_file(
     file_exists_in_brain = file.file_already_exists_in_brain(brain_id)
     using_file_name = original_file_name or file.file.filename if file.file else ""
 
-    brain = get_brain_by_id(brain_id)
+    brain = brain_service.get_brain_by_id(brain_id)
     if brain is None:
         raise Exception("It seems like you're uploading knowledge to an unknown brain.")
 
@@ -75,7 +75,7 @@ async def filter_file(
             "error",  # pyright: ignore reportPrivateUsage=none
         )
     elif file_exists:
-        file.link_file_to_brain(brain=Brain(id=brain_id))
+        file.link_file_to_brain(brain_id)
         return create_response(
             f"✅ {using_file_name} has been uploaded to brain {brain.name}.",  # pyright: ignore reportPrivateUsage=none
             "success",
@@ -83,14 +83,17 @@ async def filter_file(
 
     if file.file_extension in file_processors:
         try:
-            await file_processors[file.file_extension](
+            result = await file_processors[file.file_extension](
                 file=file,
-                enable_summarization=enable_summarization,
                 brain_id=brain_id,
-                user_openai_api_key=openai_api_key,
             )
+            if result is None or result == 0:
+                return create_response(
+                    f"？ {using_file_name} has been uploaded to brain. There might have been an error while reading it, please make sure the file is not illformed or just an image",  # pyright: ignore reportPrivateUsage=none
+                    "warning",
+                )
             return create_response(
-                f"✅ {using_file_name} has been uploaded to brain {brain.name}.",  # pyright: ignore reportPrivateUsage=none
+                f"✅ {using_file_name} has been uploaded to brain {brain.name} in {result} chunks",  # pyright: ignore reportPrivateUsage=none
                 "success",
             )
         except Exception as e:

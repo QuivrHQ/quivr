@@ -1,7 +1,7 @@
 CREATE OR REPLACE FUNCTION update_max_brains_theodo() RETURNS TRIGGER AS $$
 DECLARE
     userEmail TEXT;
-    allowedDomains TEXT[] := ARRAY['%@theodo.fr', '%@theodo.com', '%@theodo.co.uk', '%@bam.tech', '%@padok.fr', '%@sicara.com', '%@hokla.com', '%@sipios.com'];
+    allowedDomains TEXT[] := ARRAY['%@theodo.fr', '%@theodo.com', '%@theodo.co.uk', '%@bam.tech', '%@padok.fr', '%@aleios.com', '%@sicara.com', '%@hokla.com', '%@sipios.com'];
 BEGIN
     SELECT email INTO userEmail FROM auth.users WHERE id = NEW.user_id;
 

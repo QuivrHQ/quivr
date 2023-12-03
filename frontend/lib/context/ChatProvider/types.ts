@@ -12,12 +12,11 @@ export type ChatConfig = {
 export type ChatContextProps = {
   messages: ChatMessage[];
   setMessages: (history: ChatMessage[]) => void;
-  addToHistory: (message: ChatMessage) => void;
-  updateHistory: (chat: ChatMessage) => void;
   updateStreamingHistory: (streamedChat: ChatMessage) => void;
   notifications: Notification[];
   setNotifications: (notifications: Notification[]) => void;
   sharedChatItems: ChatItemWithGroupedNotifications[];
   setIsLoadingHistoryChatItems: (isLoading: boolean) => void;
   isLoadingHistoryChatItems: boolean;
+  removeMessage: (id: string) => void;
 };

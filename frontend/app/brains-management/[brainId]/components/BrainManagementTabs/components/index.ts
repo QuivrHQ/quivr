@@ -1,4 +1,4 @@
 export * from "./BrainTabTrigger";
-export * from "./KnowledgeTab";
+export * from "./KnowledgeOrSecretsTab";
 export * from "./PeopleTab";
 export * from "./SettingsTab";

@@ -11,20 +11,13 @@ from packages.files.file import compute_sha1_from_content
 
 async def process_audio(
     file: File,
-    enable_summarization: bool,
     user,
-    user_openai_api_key,
 ):
     temp_filename = None
     file_sha = ""
     dateshort = time.strftime("%Y%m%d-%H%M%S")
     file_meta_name = f"audiotranscript_{dateshort}.txt"
     documents_vector_store = get_documents_vector_store()
-
-    # use this for whisper
-    os.environ.get("OPENAI_API_KEY")
-    if user_openai_api_key:
-        pass
 
     try:
         upload_file = file.file
