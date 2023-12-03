@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.0.126 (2023-12-03)
+
+## What's Changed
+* feat: add optimistic update on new message by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1764
+* feat: update models logic by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1767
+* refactor: to modules by @gozineb in https://github.com/StanGirard/quivr/pull/1754
+* feat(supabase): local installation made easy by @StanGirard in https://github.com/StanGirard/quivr/pull/1777
+* feat(install): it now takes 30 seconds to install Quivr by @StanGirard in https://github.com/StanGirard/quivr/pull/1780
+* feat: 🎸 install by @StanGirard in https://github.com/StanGirard/quivr/pull/1784
+* fix(url): crawling fixed by @StanGirard in https://github.com/StanGirard/quivr/pull/1785
+* docs: fix typo in name of docker compose dev file by @iMADi-ARCH in https://github.com/StanGirard/quivr/pull/1800
+
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.125...v0.0.126
+
 ## 0.0.125 (2023-11-30)
 
 ## What's Changed
