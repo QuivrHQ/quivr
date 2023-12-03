@@ -28,11 +28,14 @@ services:
       - .env
     build:
       context: backend
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.dev
     container_name: backend-core
+    healthcheck:
+      test: [ "CMD", "curl", "http://localhost:5050/healthz" ]
     command: 
       - "uvicorn"
       - "main:app"
+      - "--reload"
       - "--host"
       - "0.0.0.0"
       - "--port"
@@ -40,6 +43,8 @@ services:
       - "--workers"
       - "1"
     restart: always 
+    volumes:
+      - ./backend/:/code/
     depends_on:
       db:
           condition: service_healthy
@@ -65,7 +70,7 @@ services:
       - .env
     build:
       context: backend
-      dockerfile: Dockerfile
+      dockerfile:  Dockerfile.dev
     container_name: worker
     command: celery -A celery_worker worker -l info
     restart: always
@@ -80,7 +85,7 @@ services:
       - .env
     build:
       context: backend
-      dockerfile: Dockerfile
+      dockerfile:  Dockerfile.dev
     container_name: beat
     command: celery -A celery_worker beat -l info
     restart: always
@@ -94,7 +99,7 @@ services:
       - .env
     build:
       context: backend
-      dockerfile: Dockerfile
+      dockerfile:  Dockerfile.dev
     container_name: flower
     command: celery -A celery_worker flower -l info --port=5555
     restart: always
@@ -443,7 +448,7 @@ services:
   # Comment out everything below this point if you are using an external Postgres database
   db:
     container_name: supabase-db
-    image: supabase/postgres:15.1.0.117
+    image: supabase/postgres:15.1.0.136
     healthcheck:
       test: pg_isready -U postgres -h localhost
       interval: 5s
