@@ -19,14 +19,13 @@ Quivr, your second brain, utilizes the power of GenerativeAI to be your personal
 - **OS Compatible**: Ubuntu 22 or newer.
 - **File Compatibility**: Text, Markdown, PDF, Powerpoint, Excel, CSV, Word, Audio, Video
 - **Open Source**: Freedom is beautiful, and so is Quivr. Open source and free to use.
-- **Public/Private**: Share your brains with your users via a public link, or keep them private. 
+- **Public/Private**: Share your brains with your users via a public link, or keep them private.
 - **Marketplace**: Share your brains with the world, or use other people's brains to boost your productivity.
 - **Offline Mode**: Quivr works offline, so you can access your data anytime, anywhere.
 
 ## Demo Highlights 🎥
 
 https://github.com/StanGirard/quivr/assets/19614572/a6463b73-76c7-4bc0-978d-70562dca71f5
-
 
 ## Getting Started 🚀
 
@@ -40,7 +39,6 @@ Ensure you have the following installed:
 
 - Docker
 - Docker Compose
-
 
 ### 60 seconds Installation 💽
 
@@ -68,7 +66,6 @@ You can find the installation video [here](https://www.youtube.com/watch?v=cXBa6
 
   You just need to update the `OPENAI_API_KEY` variable in the `.env` file. You can get your API key [here](https://platform.openai.com/api-keys). You need to create an account first. And put your credit card information. Don't worry, you won't be charged unless you use the API. You can find more information about the pricing [here](https://openai.com/pricing/).
 
-
   > Want to use [Ollama.ai](https://ollama.ai) instead?
   > Uncomment the following lines in the `.env` file:
   > OLLAMA_API_BASE_URL
@@ -78,12 +75,12 @@ You can find the installation video [here](https://www.youtube.com/watch?v=cXBa6
 - **Step 4**: Launch the project
 
   ```bash
-  docker compose pull 
-  docker compose up --build # if OPENAI 
-  # docker compose -f docker-compose-ollama.yml up --build  # Only if using Ollama. You need to run `ollama run llama2` first.                
+  docker compose pull
+  docker compose up --build # if OPENAI
+  # docker compose -f docker-compose-ollama.yml up --build  # Only if using Ollama. You need to run `ollama run llama2` first.
   ```
 
-  If you are a developer, you can run the project in development mode with the following command:  `docker compose -f docker-compose-dev.yml up --build`
+  If you are a developer, you can run the project in development mode with the following command: `docker compose -f docker-compose.dev.yml up --build`
 
 - **Step 5**: Login to the app
 
@@ -91,11 +88,7 @@ You can find the installation video [here](https://www.youtube.com/watch?v=cXBa6
 
   You can now sign in to the app with your new user. You can access the app at [http://localhost:3000/login](http://localhost:3000/login).
 
-  
-
   You can access Quivr backend API at [http://localhost:5050/docs](http://localhost:5050/docs)
-
-
 
 ## Updating Quivr 🚀
 
