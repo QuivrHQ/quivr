@@ -15,7 +15,7 @@ const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
   title: "vaccinetruth.ai",
-  description: "Talk to vaccinetruth.ai,Find the truth about COVID-19 vaccines",
+  description: "Your AI source of the Covid-19 vaccine truth",
 };
 
 const RootLayout = async ({

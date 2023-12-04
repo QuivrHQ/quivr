@@ -6,7 +6,7 @@ import { LuChevronRight } from "react-icons/lu";
 import { RiTwitterXLine } from "react-icons/ri";
 
 import Button from "@/lib/components/ui/Button";
-import { GETTR_URL, GITHUB_URL, TWITTER_URL } from "@/lib/config/CONSTANTS";
+import { GITHUB_URL, LukeGettrUrl, TWITTER_URL } from "@/lib/config/CONSTANTS";
 
 import { useHomepageTracking } from "../../hooks/useHomepageTracking";
 
@@ -60,7 +60,7 @@ export const FooterSection = (): JSX.Element => {
       </div>
       <ul className="flex gap-4 mt-3 sm:mb-6 mb-2 text-black">
         <li>
-          <Link href={GETTR_URL} target="_blank">
+          <Link href={LukeGettrUrl} target="_blank">
             <Image
               src={"/gettr.svg"}
               height={24}
