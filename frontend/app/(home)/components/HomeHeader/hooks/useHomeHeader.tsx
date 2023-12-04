@@ -20,6 +20,11 @@ export const useHomeHeader = ({ color }: UseHomeHeaderProps) => {
 
   const navItems: NavbarItem[] = [
     {
+      href: "https://www.stayreal.studio/",
+      label: t("buildByStayRealStudio", { ns: "vaccineTruth" }),
+      rightIcon: null,
+    },
+    {
       href: "https://github.com/Stay-Real-Studio/vaccinetruth.ai",
       label: t("star_us"),
       leftIcon: <AiFillStar size={16} className="hidden md:inline" />,
@@ -27,11 +32,6 @@ export const useHomeHeader = ({ color }: UseHomeHeaderProps) => {
     },
     { href: "/login", label: t("sign_up", { ns: "home" }) },
     { href: "/login", label: t("sign_in", { ns: "home" }) },
-    {
-      href: "https://www.stayreal.studio/",
-      label: t("buildByStayRealStudio", { ns: "vaccineTruth" }),
-      rightIcon: null,
-    },
   ];
 
   const navLinks = (device: "mobile" | "desktop") =>

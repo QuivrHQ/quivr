@@ -1,16 +1,13 @@
 import { useParams } from "next/navigation";
 
 import { useChatContext } from "@/lib/context";
-import { useSecurity } from "@/services/useSecurity/useSecurity";
 
 // eslint-disable-next-line import/order
 import { ChatGuide } from "../ChatGuide";
 import { ChatDialogue } from "./components/ChatDialogue";
-import { ShortCuts } from "./components/ShortCuts";
 import { getMergedChatMessagesWithDoneStatusNotificationsReduced } from "./utils/getMergedChatMessagesWithDoneStatusNotificationsReduced";
 
 export const ChatDialogueArea = (): JSX.Element => {
-  const { isStudioMember } = useSecurity();
   const params = useParams();
 
   const { messages, notifications, isLoadingHistoryChatItems } =
@@ -32,5 +29,5 @@ export const ChatDialogueArea = (): JSX.Element => {
     );
   }
 
-  return isStudioMember ? <ShortCuts /> : <ChatGuide />;
+  return <ChatGuide />;
 };

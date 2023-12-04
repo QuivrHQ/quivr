@@ -14,8 +14,10 @@ import { cn } from "@/lib/utils";
 
 export const LanguageSelect = ({
   isSelect,
+  isChatPage,
 }: {
   isSelect: boolean;
+  isChatPage?: boolean;
 }): JSX.Element => {
   const { allLanguages, currentLanguage, change, handleToggleLanguage } =
     useLanguageHook();
@@ -106,9 +108,13 @@ export const LanguageSelect = ({
       {!isSelect && (
         <div>
           <button
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-return
             onClick={() => handleToggleLanguage()}
-            className="text-black sm:text-white hover:text-slate-200 cursor-pointer  text-xs  bg-transparent py-1.5  sm:px-3 text-left   sm:text-sm sm:leading-6"
+            className={`${
+              // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
+              isChatPage
+                ? "sm:text-black hover:text-primary dark:sm:text-white dark:hover:text-slate-200"
+                : "sm:text-white hover:text-slate-200 dark:text-white"
+            } text-black   cursor-pointer  text-xs  bg-transparent py-1.5  sm:px-3 text-left   sm:text-sm sm:leading-6`}
           >
             <IoLanguage className="" />
           </button>

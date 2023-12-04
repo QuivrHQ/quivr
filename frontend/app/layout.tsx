@@ -14,9 +14,8 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
-  title: "Quivr - Get a Second Brain with Generative AI",
-  description:
-    "Quivr is your second brain in the cloud, designed to easily store and retrieve unstructured information.",
+  title: "vaccinetruth.ai",
+  description: "Your AI source of the Covid-19 vaccine truth",
 };
 
 const RootLayout = async ({
