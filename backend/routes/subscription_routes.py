@@ -23,7 +23,6 @@ from repository.brain_subscription import (
     SubscriptionInvitationService,
     resend_invitation_email,
 )
-from repository.external_api_secret.create_secret import create_secret
 from routes.headers.get_origin_header import get_origin_header
 
 subscription_router = APIRouter()
@@ -420,7 +419,7 @@ async def subscribe_to_brain_handler(
                 )
 
         for secret in brain_secrets:
-            create_secret(
+            brain_service.external_api_secrets_repository.create_secret(
                 user_id=current_user.id,
                 brain_id=brain_id,
                 secret_name=secret.name,

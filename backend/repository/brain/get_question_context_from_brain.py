@@ -8,6 +8,7 @@ logger = get_logger(__name__)
 
 
 def get_question_context_from_brain(brain_id: UUID, question: str) -> str:
+    # TODO: Move to AnswerGenerator service
     supabase_client = get_supabase_client()
     embeddings = get_embeddings()
 

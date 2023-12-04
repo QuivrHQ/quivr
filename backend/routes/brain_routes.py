@@ -17,7 +17,6 @@ from modules.brain.service.brain_user_service import BrainUserService
 from modules.prompt.service.prompt_service import PromptService
 from modules.user.entity.user_identity import UserIdentity
 from repository.brain import get_question_context_from_brain
-from repository.external_api_secret.update_secret_value import update_secret_value
 
 logger = get_logger(__name__)
 brain_router = APIRouter()
@@ -197,7 +196,7 @@ async def update_existing_brain_secrets(
                 detail=f"Secret {key} is not a valid secret.",
             )
         if value:
-            update_secret_value(
+            brain_service.update_secret_value(
                 user_id=current_user.id,
                 brain_id=brain_id,
                 secret_name=key,
@@ -226,6 +225,7 @@ async def set_brain_as_default(
     tags=["Brain"],
 )
 async def get_question_context_for_brain(brain_id: UUID, request: BrainQuestionRequest):
+    # TODO: Move this endpoint to AnswerGenerator service
     """Retrieve the question context from a specific brain."""
     context = get_question_context_from_brain(brain_id, request.question)
     return {"context": context}
