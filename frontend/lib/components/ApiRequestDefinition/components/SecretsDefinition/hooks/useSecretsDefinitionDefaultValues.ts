@@ -1,6 +1,6 @@
 import { useFormContext } from "react-hook-form";
 
-import { CreateBrainProps } from "../../../../AddBrainModal/components/AddBrainConfig/types";
+import { CreateBrainProps } from "../../../../AddBrainModalOld/components/AddBrainConfig/types";
 import {
   brainSecretsValueKeyInForm,
   defaultSecretDefinitionRow,

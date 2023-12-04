@@ -98,19 +98,18 @@ export const AddBrainConfig = ({
               {...register("status")}
             />
           </fieldset>
-          
-            <>
-              <fieldset className="w-full flex flex-col">
-                <Radio
-                  items={knowledgeSourceOptions}
-                  label={t("knowledge_source_label", { ns: "brain" })}
-                  className="flex-1 justify-between w-[50%]"
-                  {...register("brain_type")}
-                />
-              </fieldset>
-              <ApiRequestDefinition />
-            </>
-          
+
+          <>
+            <fieldset className="w-full flex flex-col">
+              <Radio
+                items={knowledgeSourceOptions}
+                label={t("knowledge_source_label", { ns: "brain" })}
+                className="flex-1 justify-between w-[50%]"
+                {...register("brain_type")}
+              />
+            </fieldset>
+            <ApiRequestDefinition />
+          </>
 
           <fieldset className="w-full flex flex-col">
             <label className="flex-1 text-sm" htmlFor="model">
@@ -129,7 +128,6 @@ export const AddBrainConfig = ({
             </select>
           </fieldset>
 
-          
           <fieldset className="w-full flex mt-4">
             <label className="flex-1" htmlFor="tokens">
               {t("maxTokens", { ns: "config" })}: {maxTokens}

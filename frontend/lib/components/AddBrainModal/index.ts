@@ -1,1 +1,1 @@
-export * from "./AddBrainModal";
+export * from "../AddBrainModalOld/AddBrainModal";
