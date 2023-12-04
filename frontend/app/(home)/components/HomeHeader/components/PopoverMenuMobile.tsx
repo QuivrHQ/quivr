@@ -58,14 +58,14 @@ export const PopoverMenuMobile = ({
                 <button
                   title="close"
                   type="button"
-                  className="hover:text-primary p-2"
+                  className="hover:text-primary p-2 dark:text-black"
                 >
                   <LuX size={24} />
                 </button>
               </Popover.Close>
             </div>
             <nav>
-              <ul className="flex flex-col bg-[#F5F8FF] rounded-xl p-2">
+              <ul className="flex flex-col bg-[#F5F8FF] rounded-xl p-2 dark:bg-black">
                 <li>
                   <LanguageSelect isSelect={false} />
                 </li>

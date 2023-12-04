@@ -10,7 +10,6 @@ import {
   HomeSection,
   IntroSection,
 } from "./components";
-import { HomeHeaderBackground } from "./components/HomeHeader/components/HomeHeaderBackground";
 
 const HomePage = (): JSX.Element => {
   const { session } = useSupabase();
@@ -23,14 +22,14 @@ const HomePage = (): JSX.Element => {
 
   return (
     <>
-      <HomeHeaderBackground />
+      {/* <HomeHeaderBackground /> */}
       <HomeHeader />
 
       <main
-        className="relative flex flex-col items-center h-full"
+        className=" flex flex-col items-center h-full"
         data-testid="home-page"
       >
-        <HomeSection bg="transparent">
+        <HomeSection bg="transparent" className="flex-1">
           <IntroSection />
         </HomeSection>
 
@@ -58,7 +57,6 @@ const HomePage = (): JSX.Element => {
         <HomeSection
           bg="bg-gradient-to-b from-sky-700 to-sky-200"
           slantBefore="up"
-          className="absolute bottom-0"
         >
           <FooterSection />
         </HomeSection>
