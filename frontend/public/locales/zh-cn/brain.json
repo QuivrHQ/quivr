@@ -49,6 +49,7 @@
   "myBrains": "我的大脑",
   "knowledge_source_doc": "文档",
   "knowledge_source_api": "API",
+  "knowledge_source_chatflow":"脑网络",
   "knowledge_source_label": "知识来源",
   "api_brain":{
     "name": "名称",

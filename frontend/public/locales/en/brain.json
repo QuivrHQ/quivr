@@ -50,6 +50,7 @@
   "knowledge_source_doc": "Documents",
   "knowledge_source_api": "App (Through API)",
   "knowledge_source_label": "Knowledge source",
+  "knowledge_source_chatflow":"Brain network",
   "api_brain": {
     "name": "Name",
     "description": "Description",
