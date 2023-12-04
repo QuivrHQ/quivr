@@ -2,6 +2,7 @@ version: "3.8"
 
 services:
   frontend:
+    image: quivr-frontend-prebuilt
     pull_policy: never
     build:
       context: frontend
@@ -22,8 +23,8 @@ services:
       
 
   backend-core:
-    image: backend-base
-    pull_policy: never
+    image: stangirard/quivr-backend-prebuilt:latest
+    pull_policy: if_not_present
     env_file:
       - .env
     build:
@@ -64,8 +65,8 @@ services:
         condition: service_healthy
 
   worker:
-    pull_policy: never
-    image: backend-base
+    pull_policy: if_not_present
+    image: stangirard/quivr-backend-prebuilt:latest
     env_file:
       - .env
     build:
@@ -79,8 +80,8 @@ services:
       - db
 
   beat:
-    image: backend-base
-    pull_policy: never
+    image: stangirard/quivr-backend-prebuilt:latest
+    pull_policy: if_not_present
     env_file:
       - .env
     build:
@@ -93,8 +94,8 @@ services:
       - redis
 
   flower:
-    image: backend-base
-    pull_policy: never
+    image: stangirard/quivr-backend-prebuilt:latest
+    pull_policy: if_not_present
     env_file:
       - .env
     build:
