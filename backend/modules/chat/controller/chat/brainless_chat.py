@@ -1,5 +1,5 @@
 from llm.qa_headless import HeadlessQA
-from routes.chat.interface import ChatInterface
+from modules.chat.controller.chat.interface import ChatInterface
 
 
 class BrainlessChat(ChatInterface):

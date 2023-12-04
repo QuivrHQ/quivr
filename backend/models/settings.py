@@ -1,13 +1,13 @@
+from langchain.embeddings.ollama import OllamaEmbeddings
+from langchain.embeddings.openai import OpenAIEmbeddings
+from logger import get_logger
 from models.databases.supabase.supabase import SupabaseDB
 from pydantic import BaseSettings
 from supabase.client import Client, create_client
 from vectorstore.supabase import SupabaseVectorStore
-from langchain.embeddings.ollama import OllamaEmbeddings
-from langchain.embeddings.openai import OpenAIEmbeddings
-
-from logger import get_logger
 
 logger = get_logger(__name__)
+
 
 class BrainRateLimiting(BaseSettings):
     max_brain_per_user: int = 5

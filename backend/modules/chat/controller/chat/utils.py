@@ -3,7 +3,6 @@ from uuid import UUID
 
 from fastapi import HTTPException
 from models import UserUsage
-from models.databases.supabase.supabase import SupabaseDB
 from modules.user.entity.user_identity import UserIdentity
 
 
@@ -20,19 +19,6 @@ class NullableUUID(UUID):
             return UUID(v)
         except ValueError:
             return None
-
-
-def delete_chat_from_db(supabase_db: SupabaseDB, chat_id):
-    try:
-        supabase_db.delete_chat_history(chat_id)
-    except Exception as e:
-        print(e)
-        pass
-    try:
-        supabase_db.delete_chat(chat_id)
-    except Exception as e:
-        print(e)
-        pass
 
 
 def check_user_requests_limit(

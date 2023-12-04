@@ -55,50 +55,6 @@ class Repository(ABC):
         pass
 
     @abstractmethod
-    def create_chat(self, new_chat):
-        pass
-
-    @abstractmethod
-    def get_chat_by_id(self, chat_id: str):
-        pass
-
-    @abstractmethod
-    def get_chat_history(self, chat_id: str):
-        pass
-
-    @abstractmethod
-    def get_user_chats(self, user_id: str):
-        pass
-
-    @abstractmethod
-    def update_chat_history(self, chat_id: str, user_message: str, assistant: str):
-        pass
-
-    @abstractmethod
-    def update_chat(self, chat_id: UUID, updates):
-        pass
-
-    @abstractmethod
-    def add_question_and_answer(self, chat_id: str, question_and_answer):
-        pass
-
-    @abstractmethod
-    def update_message_by_id(self, message_id: UUID, updates):
-        pass
-
-    @abstractmethod
-    def get_chat_details(self, chat_id: UUID):
-        pass
-
-    @abstractmethod
-    def delete_chat(self, chat_id: UUID):
-        pass
-
-    @abstractmethod
-    def delete_chat_history(self, chat_id: UUID):
-        pass
-
-    @abstractmethod
     def get_vectors_by_file_name(self, file_name: str):
         pass
 

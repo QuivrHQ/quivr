@@ -1,6 +1,9 @@
-from typing import List, Optional, Tuple
+from enum import Enum
+from typing import List, Optional, Tuple, Union
 from uuid import UUID
 
+from modules.chat.dto.outputs import GetChatHistoryOutput
+from modules.notification.entity.notification import Notification
 from pydantic import BaseModel
 
 
@@ -23,3 +26,13 @@ class ChatQuestion(BaseModel):
     max_tokens: Optional[int]
     brain_id: Optional[UUID]
     prompt_id: Optional[UUID]
+
+
+class ChatItemType(Enum):
+    MESSAGE = "MESSAGE"
+    NOTIFICATION = "NOTIFICATION"
+
+
+class ChatItem(BaseModel):
+    item_type: ChatItemType
+    body: Union[GetChatHistoryOutput, Notification]
