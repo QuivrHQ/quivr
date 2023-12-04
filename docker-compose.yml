@@ -29,7 +29,7 @@ services:
       - .env
     build:
       context: backend
-      dockerfile: Dockerfile.dev
+      dockerfile: Dockerfile
     container_name: backend-core
     healthcheck:
       test: [ "CMD", "curl", "http://localhost:5050/healthz" ]
