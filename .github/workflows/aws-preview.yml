@@ -45,8 +45,9 @@ jobs:
         username: ${{ secrets.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_TOKEN }}
     
+    - uses: docker/setup-qemu-action@v3
     - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v2
+      uses: docker/setup-buildx-action@v3
     
     - name: Create Docker Cacha Storage Backend
       run: |
@@ -56,16 +57,19 @@ jobs:
         ls -la
     - name: Build, tag, and push image to Amazon ECR
       id: build-image
-      uses: docker/build-push-action@v4
+      uses: docker/build-push-action@v5
       env:
         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         IMAGE_TAG: ${{ github.sha }}
       with:
         context: ./backend/
         push: true
+        platforms: linux/amd64,linux/arm64
         tags: ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }}, ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:latest, ghcr.io/stangirard/quivr:latest, stangirard/quivr-backend-prebuilt:latest, stangirard/quivr-backend-prebuilt:${{ env.IMAGE_TAG }}
         cache-from: type=gha
         cache-to: type=gha,mode=max
+    
+    
       
   deploy:
     needs: build_and_push

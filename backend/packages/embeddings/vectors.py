@@ -47,7 +47,7 @@ def process_batch(batch_ids: List[str]):
 
 # TODO: move to Knowledge class
 def get_unique_files_from_vector_ids(vectors_ids):
-    # Move into Vectors class and rename to get_unique_vectors
+    # Move into Vectors class
     """
     Retrieve unique user data vectors.
     """
