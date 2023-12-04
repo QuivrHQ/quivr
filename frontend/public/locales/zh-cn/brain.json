@@ -63,5 +63,8 @@
   "update_secrets_button": "更新秘密",
   "secrets_updated": "秘密已更新",
   "secrets_update_error": "更新秘密时出错",
-  "manage_brain": "管理大脑"
+  "manage_brain": "管理大脑",
+  "brain_type": "脑类型",
+  "brain_params": "脑参数",
+  "brain_data": "脑数据"
 }

@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 
 import { CreateBrainProps } from "@/lib/components/AddBrainModal/types";
 
-import { StepperStep } from "../components/Stepper/types";
+import { StepperStep } from "../types";
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const useBrainCreationSteps = () => {
@@ -11,16 +11,16 @@ export const useBrainCreationSteps = () => {
 
   const steps: StepperStep[] = [
     {
-      label: "Type of brains",
-      value: t("brain_type"),
+      label: t("brain_type"),
+      value: "BRAIN_TYPE",
     },
     {
-      label: "Brain params",
-      value: t("brain_params"),
+      label: t("brain_params"),
+      value: "BRAIN_PARAMS",
     },
     {
-      label: "Brain data",
-      value: t("brain_data"),
+      label: t("brain_data"),
+      value: "KNOWLEDGE",
     },
   ];
   const { watch, setValue } = useFormContext<CreateBrainProps>();
