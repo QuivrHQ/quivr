@@ -30,7 +30,7 @@ services:
       - .env
     build:
       context: backend
-      dockerfile: Dockerfile.dev
+      dockerfile: Dockerfile
       args:
         - DEV_MODE=true
     container_name: backend-core
