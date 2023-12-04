@@ -1,0 +1,1 @@
+from .notification_routes import notification_router

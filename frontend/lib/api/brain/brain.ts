@@ -8,7 +8,6 @@ import {
   MinimalBrainForUser,
   PublicBrain,
 } from "@/lib/context/BrainProvider/types";
-import { Document } from "@/lib/types/Document";
 
 import {
   CreateBrainInput,
@@ -21,17 +20,6 @@ import {
   mapSubscriptionToBackendSubscription,
 } from "./utils/mapSubscriptionToBackendSubscription";
 import { mapSubscriptionUpdatablePropertiesToBackendSubscriptionUpdatableProperties } from "./utils/mapSubscriptionUpdatablePropertiesToBackendSubscriptionUpdatableProperties";
-
-export const getBrainDocuments = async (
-  brainId: string,
-  axiosInstance: AxiosInstance
-): Promise<Document[]> => {
-  const response = await axiosInstance.get<{ documents: Document[] }>(
-    `/explore/?brain_id=${brainId}`
-  );
-
-  return response.data.documents;
-};
 
 export const createBrain = async (
   brain: CreateBrainInput,
@@ -142,4 +130,12 @@ export const getPublicBrains = async (
   axiosInstance: AxiosInstance
 ): Promise<PublicBrain[]> => {
   return (await axiosInstance.get<PublicBrain[]>(`/brains/public`)).data;
+};
+
+export const updateBrainSecrets = async (
+  brainId: string,
+  secrets: Record<string, string>,
+  axiosInstance: AxiosInstance
+): Promise<void> => {
+  await axiosInstance.put(`/brains/${brainId}/secrets-values`, secrets);
 };

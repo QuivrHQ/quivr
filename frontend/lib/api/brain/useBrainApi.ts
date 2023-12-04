@@ -5,7 +5,6 @@ import {
   createBrain,
   deleteBrain,
   getBrain,
-  getBrainDocuments,
   getBrains,
   getBrainUsers,
   getDefaultBrain,
@@ -14,6 +13,7 @@ import {
   Subscription,
   updateBrain,
   updateBrainAccess,
+  updateBrainSecrets,
 } from "./brain";
 import {
   CreateBrainInput,
@@ -26,8 +26,6 @@ export const useBrainApi = () => {
   const { axiosInstance } = useAxios();
 
   return {
-    getBrainDocuments: async (brainId: string) =>
-      getBrainDocuments(brainId, axiosInstance),
     createBrain: async (brain: CreateBrainInput) =>
       createBrain(brain, axiosInstance),
     deleteBrain: async (id: string) => deleteBrain(id, axiosInstance),
@@ -50,5 +48,9 @@ export const useBrainApi = () => {
     updateBrain: async (brainId: string, brain: UpdateBrainInput) =>
       updateBrain(brainId, brain, axiosInstance),
     getPublicBrains: async () => getPublicBrains(axiosInstance),
+    updateBrainSecrets: async (
+      brainId: string,
+      secrets: Record<string, string>
+    ) => updateBrainSecrets(brainId, secrets, axiosInstance),
   };
 };

@@ -1,6 +1,8 @@
 def test_post_contact(client, mocker):
     # Mock the send_email function
-    mock_send_email = mocker.patch("routes.contact_routes.resend_contact_sales_email")
+    mock_send_email = mocker.patch(
+        "modules.contact_support.controller.contact_routes.resend_contact_sales_email"
+    )
 
     # Define test data
     test_data = {"customer_email": "test@example.com", "content": "Test message"}

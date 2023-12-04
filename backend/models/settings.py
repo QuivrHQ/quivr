@@ -1,9 +1,13 @@
-from langchain.embeddings.openai import OpenAIEmbeddings
 from models.databases.supabase.supabase import SupabaseDB
 from pydantic import BaseSettings
 from supabase.client import Client, create_client
 from vectorstore.supabase import SupabaseVectorStore
+from langchain.embeddings.ollama import OllamaEmbeddings
+from langchain.embeddings.openai import OpenAIEmbeddings
 
+from logger import get_logger
+
+logger = get_logger(__name__)
 
 class BrainRateLimiting(BaseSettings):
     max_brain_per_user: int = 5
@@ -11,23 +15,16 @@ class BrainRateLimiting(BaseSettings):
 
 class BrainSettings(BaseSettings):
     openai_api_key: str
-    anthropic_api_key: str
     supabase_url: str
     supabase_service_key: str
-    pg_database_url: str = "not implemented"
     resend_api_key: str = "null"
     resend_email_address: str = "brain@mail.quivr.app"
+    ollama_api_base_url: str = None
 
-class ContactsSettings(BaseSettings):
-    resend_contact_sales_from: str = "null"
-    resend_contact_sales_to: str = "null"
-
-class LLMSettings(BaseSettings):
-    private: bool = False
-    model_path: str = "./local_models/ggml-gpt4all-j-v1.3-groovy.bin"
 
 class ResendSettings(BaseSettings):
     resend_api_key: str = "null"
+
 
 def get_supabase_client() -> Client:
     settings = BrainSettings()  # pyright: ignore reportPrivateUsage=none
@@ -42,11 +39,14 @@ def get_supabase_db() -> SupabaseDB:
     return SupabaseDB(supabase_client)
 
 
-def get_embeddings() -> OpenAIEmbeddings:
+def get_embeddings():
     settings = BrainSettings()  # pyright: ignore reportPrivateUsage=none
-    embeddings = OpenAIEmbeddings(
-        openai_api_key=settings.openai_api_key
-    )  # pyright: ignore reportPrivateUsage=none
+    if settings.ollama_api_base_url:
+        embeddings = OllamaEmbeddings(
+            base_url=settings.ollama_api_base_url,
+        )  # pyright: ignore reportPrivateUsage=none
+    else:
+        embeddings = OpenAIEmbeddings()  # pyright: ignore reportPrivateUsage=none
     return embeddings
 
 

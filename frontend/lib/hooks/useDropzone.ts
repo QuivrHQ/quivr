@@ -9,6 +9,7 @@ import { useOnboardingTracker } from "./useOnboardingTracker";
 import { useToast } from "./useToast";
 import { useKnowledgeToFeedContext } from "../context/KnowledgeToFeedProvider/hooks/useKnowledgeToFeedContext";
 import { acceptedFormats } from "../helpers/acceptedFormats";
+import { cloneFileWithSanitizedName } from "../helpers/cloneFileWithSanitizedName";
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const useCustomDropzone = () => {
@@ -61,7 +62,7 @@ export const useCustomDropzone = () => {
 
         addKnowledgeToFeed({
           source: "upload",
-          file: file,
+          file: cloneFileWithSanitizedName(file),
         });
       }
     }

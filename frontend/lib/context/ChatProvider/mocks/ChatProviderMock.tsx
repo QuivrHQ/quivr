@@ -14,14 +14,13 @@ export const ChatProviderMock = ({
       value={{
         messages: [],
         setMessages: () => void 0,
-        addToHistory: () => void 0,
-        updateHistory: () => void 0,
         updateStreamingHistory: () => void 0,
         notifications: [],
         setNotifications: () => void 0,
         sharedChatItems:[],
         setIsLoadingHistoryChatItems:() => void 0,
         isLoadingHistoryChatItems:false,
+        removeMessage: () => void 0,
       }}
     >
       {children}

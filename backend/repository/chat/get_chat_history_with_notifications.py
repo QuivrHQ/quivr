@@ -2,11 +2,11 @@ from enum import Enum
 from typing import List, Union
 from uuid import UUID
 
-from models.notifications import Notification
+from modules.notification.entity.notification import Notification
+from modules.notification.service.notification_service import NotificationService
 from packages.utils import parse_message_time
 from pydantic import BaseModel
 from repository.chat.get_chat_history import GetChatHistoryOutput, get_chat_history
-from repository.notification.get_chat_notifications import get_chat_notifications
 
 
 class ChatItemType(Enum):
@@ -19,6 +19,10 @@ class ChatItem(BaseModel):
     body: Union[GetChatHistoryOutput, Notification]
 
 
+notification_service = NotificationService()
+
+
+# Move these methods to ChatService in chat module
 def merge_chat_history_and_notifications(
     chat_history: List[GetChatHistoryOutput], notifications: List[Notification]
 ) -> List[ChatItem]:
@@ -48,5 +52,5 @@ def get_chat_history_with_notifications(
     chat_id: UUID,
 ) -> List[ChatItem]:
     chat_history = get_chat_history(str(chat_id))
-    chat_notifications = get_chat_notifications(chat_id)
+    chat_notifications = notification_service.get_chat_notifications(chat_id)
     return merge_chat_history_and_notifications(chat_history, chat_notifications)

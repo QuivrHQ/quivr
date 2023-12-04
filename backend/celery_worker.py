@@ -5,22 +5,23 @@ import os
 from celery import Celery
 from celery.schedules import crontab
 from fastapi import UploadFile
-from models.databases.supabase.notifications import NotificationUpdatableProperties
 from models.files import File
-from models.notifications import NotificationsStatusEnum
 from models.settings import get_supabase_client
+from modules.brain.service.brain_service import BrainService
+from modules.notification.dto.inputs import NotificationUpdatableProperties
+from modules.notification.entity.notification import NotificationsStatusEnum
+from modules.notification.service.notification_service import NotificationService
+from modules.onboarding.service.onboarding_service import OnboardingService
 from packages.files.crawl.crawler import CrawlWebsite
 from packages.files.parsers.github import process_github
 from packages.files.processors import filter_file
-from repository.brain.update_brain_last_update_time import update_brain_last_update_time
-from repository.notification.update_notification import update_notification_by_id
-from repository.onboarding.remove_onboarding_more_than_x_days import (
-    remove_onboarding_more_than_x_days,
-)
 
 CELERY_BROKER_URL = os.getenv("CELERY_BROKER_URL", "")
 CELEBRY_BROKER_QUEUE_NAME = os.getenv("CELEBRY_BROKER_QUEUE_NAME", "quivr")
 
+onboardingService = OnboardingService()
+notification_service = NotificationService()
+brain_service = BrainService()
 
 if CELERY_BROKER_URL.startswith("sqs"):
     broker_transport_options = {
@@ -56,65 +57,73 @@ else:
 def process_file_and_notify(
     file_name: str,
     file_original_name: str,
-    enable_summarization,
     brain_id,
-    openai_api_key,
     notification_id=None,
 ):
-    supabase_client = get_supabase_client()
-    tmp_file_name = "tmp-file-" + file_name
-    tmp_file_name = tmp_file_name.replace("/", "_")
+    try:
+        supabase_client = get_supabase_client()
+        tmp_file_name = "tmp-file-" + file_name
+        tmp_file_name = tmp_file_name.replace("/", "_")
 
-    with open(tmp_file_name, "wb+") as f:
-        res = supabase_client.storage.from_("quivr").download(file_name)
-        f.write(res)
-        f.seek(0)
-        file_content = f.read()
+        with open(tmp_file_name, "wb+") as f:
+            res = supabase_client.storage.from_("quivr").download(file_name)
+            f.write(res)
+            f.seek(0)
+            file_content = f.read()
 
-        # file_object = io.BytesIO(file_content)
-        upload_file = UploadFile(
-            file=f, filename=file_name.split("/")[-1], size=len(file_content)
-        )
-
-        file_instance = File(file=upload_file)
-        loop = asyncio.get_event_loop()
-        message = loop.run_until_complete(
-            filter_file(
-                file=file_instance,
-                enable_summarization=enable_summarization,
-                brain_id=brain_id,
-                openai_api_key=openai_api_key,
-                original_file_name=file_original_name,
+            upload_file = UploadFile(
+                file=f, filename=file_name.split("/")[-1], size=len(file_content)
             )
-        )
 
-        f.close()
-        os.remove(tmp_file_name)
-
-        if notification_id:
-            notification_message = {
-                "status": message["type"],
-                "message": message["message"],
-                "name": file_instance.file.filename if file_instance.file else "",
-            }
-            update_notification_by_id(
-                notification_id,
-                NotificationUpdatableProperties(
-                    status=NotificationsStatusEnum.Done,
-                    message=str(notification_message),
-                ),
+            file_instance = File(file=upload_file)
+            loop = asyncio.get_event_loop()
+            message = loop.run_until_complete(
+                filter_file(
+                    file=file_instance,
+                    brain_id=brain_id,
+                    original_file_name=file_original_name,
+                )
             )
-        update_brain_last_update_time(brain_id)
 
-        return True
+            f.close()
+            os.remove(tmp_file_name)
+
+            if notification_id:
+                notification_message = {
+                    "status": message["type"],
+                    "message": message["message"],
+                    "name": file_instance.file.filename if file_instance.file else "",
+                }
+                notification_service.update_notification_by_id(
+                    notification_id,
+                    NotificationUpdatableProperties(
+                        status=NotificationsStatusEnum.Done,
+                        message=str(notification_message),
+                    ),
+                )
+            brain_service.update_brain_last_update_time(brain_id)
+
+            return True
+    except Exception as e:
+        notification_message = {
+            "status": "error",
+            "message": "There was an error uploading the file. Please check the file and try again. If the issue persist, please open an issue on Github",
+            "name": file_instance.file.filename if file_instance.file else "",
+        }
+        notification_service.update_notification_by_id(
+            notification_id,
+            NotificationUpdatableProperties(
+                status=NotificationsStatusEnum.Done,
+                message=str(notification_message),
+            ),
+        )
+        raise e
 
 
 @celery.task(name="process_crawl_and_notify")
 def process_crawl_and_notify(
     crawl_website_url,
-    enable_summarization,
     brain_id,
-    openai_api_key,
     notification_id=None,
 ):
     crawl_website = CrawlWebsite(url=crawl_website_url)
@@ -136,9 +145,7 @@ def process_crawl_and_notify(
         message = loop.run_until_complete(
             filter_file(
                 file=file_instance,
-                enable_summarization=enable_summarization,
                 brain_id=brain_id,
-                openai_api_key=openai_api_key,
                 original_file_name=crawl_website_url,
             )
         )
@@ -147,9 +154,7 @@ def process_crawl_and_notify(
         message = loop.run_until_complete(
             process_github(
                 repo=crawl_website.url,
-                enable_summarization="false",
                 brain_id=brain_id,
-                user_openai_api_key=openai_api_key,
             )
         )
 
@@ -159,20 +164,20 @@ def process_crawl_and_notify(
             "message": message["message"],
             "name": crawl_website_url,
         }
-        update_notification_by_id(
+        notification_service.update_notification_by_id(
             notification_id,
             NotificationUpdatableProperties(
                 status=NotificationsStatusEnum.Done,
                 message=str(notification_message),
             ),
         )
-    update_brain_last_update_time(brain_id)
+    brain_service.update_brain_last_update_time(brain_id)
     return True
 
 
 @celery.task
 def remove_onboarding_more_than_x_days_task():
-    remove_onboarding_more_than_x_days(7)
+    onboardingService.remove_onboarding_more_than_x_days(7)
 
 
 celery.conf.beat_schedule = {

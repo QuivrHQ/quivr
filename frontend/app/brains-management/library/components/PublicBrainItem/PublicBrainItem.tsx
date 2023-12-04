@@ -1,9 +1,11 @@
 import { useTranslation } from "react-i18next";
+import { CgFileDocument } from "react-icons/cg";
 import { MdAdd, MdLink } from "react-icons/md";
 
 import Button from "@/lib/components/ui/Button";
 import { Modal } from "@/lib/components/ui/Modal";
 import { PublicBrain } from "@/lib/context/BrainProvider/types";
+import { getBrainIconFromBrainType } from "@/lib/helpers/getBrainIconFromBrainType";
 
 import { SecretsDefinitionFields } from "./components/SecretsDefinitionFields";
 import { usePublicBrainItem } from "./hooks/usePublicBrainItem";
@@ -61,7 +63,15 @@ export const PublicBrainItem = ({
       Trigger={
         <div className="flex p-5 justify-center items-center flex-col flex-1 w-full h-full shadow-md dark:shadow-primary/25 hover:shadow-xl transition-shadow rounded-xl overflow-hidden bg-white dark:bg-black border border-black/10 dark:border-white/25 md:p-5 cursor-pointer">
           <div>
-            <p className="font-bold mb-5 text-xl line-clamp-1">{brain.name}</p>
+            <p className="font-bold mb-5 text-xl line-clamp-1 flex items-center">
+              <span className="mr-2">
+                {getBrainIconFromBrainType(brain.brain_type, {
+                  iconSize: 24,
+                  DocBrainIcon: CgFileDocument,
+                })}
+              </span>
+              {brain.name}
+            </p>
           </div>
           <div className="flex-1">
             <p
@@ -77,7 +87,15 @@ export const PublicBrainItem = ({
       }
     >
       <div>
-        <p className="text-2xl font-bold text-center mb-10">{brain.name}</p>
+        <p className="text-2xl font-bold text-center mb-10 flex items-center justify-center">
+          <span className="mr-2">
+            {getBrainIconFromBrainType(brain.brain_type, {
+              iconSize: 30,
+              DocBrainIcon: CgFileDocument,
+            })}
+          </span>
+          {brain.name}
+        </p>
         <p className={`mb-10 ${isBrainDescriptionEmpty && "text-gray-400"}`}>
           {brainDescription}
         </p>
