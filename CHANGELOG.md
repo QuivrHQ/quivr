@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.0.127 (2023-12-04)
+
+## What's Changed
+* feat(api-keys): added customization by @StanGirard in https://github.com/StanGirard/quivr/pull/1802
+* feat(embedding): now 100 times faster ⚡️🔥 by @StanGirard in https://github.com/StanGirard/quivr/pull/1807
+* fix: update editor state update logic by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1809
+
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.126...v0.0.127
+
 ## 0.0.126 (2023-12-03)
 
 ## What's Changed
