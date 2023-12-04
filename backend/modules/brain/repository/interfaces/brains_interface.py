@@ -56,10 +56,3 @@ class BrainsInterface(ABC):
         Get a brain by id
         """
         pass
-
-    @abstractmethod
-    def delete_secret(self, user_id: UUID, brain_id: UUID, secret_name: str) -> bool:
-        """
-        Delete a secret from a brain
-        """
-        pass

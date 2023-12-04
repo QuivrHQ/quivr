@@ -1,26 +1,11 @@
-from typing import Optional
-from uuid import UUID
-
-from models.chat import Chat
-from models.databases.repository import Repository
-from pydantic import BaseModel
+from models.settings import get_supabase_client
+from modules.chat.entity.chat import Chat
+from modules.chat.repository.chats_interface import ChatsInterface
 
 
-class CreateChatHistory(BaseModel):
-    chat_id: UUID
-    user_message: str
-    assistant: str
-    prompt_id: Optional[UUID]
-    brain_id: Optional[UUID]
-
-
-class QuestionAndAnswer(BaseModel):
-    question: str
-    answer: str
-
-
-class Chats(Repository):
-    def __init__(self, supabase_client):
+class Chats(ChatsInterface):
+    def __init__(self):
+        supabase_client = get_supabase_client()
         self.db = supabase_client
 
     def create_chat(self, new_chat):
@@ -36,9 +21,7 @@ class Chats(Repository):
         )
         return response
 
-    def add_question_and_answer(
-        self, chat_id: UUID, question_and_answer: QuestionAndAnswer
-    ) -> Optional[Chat]:
+    def add_question_and_answer(self, chat_id, question_and_answer):
         response = (
             self.db.table("chat_history")
             .insert(
@@ -66,7 +49,7 @@ class Chats(Repository):
 
         return reponse
 
-    def get_user_chats(self, user_id: str):
+    def get_user_chats(self, user_id):
         response = (
             self.db.from_("chats")
             .select("chat_id,user_id,creation_time,chat_name")
@@ -76,7 +59,7 @@ class Chats(Repository):
         )
         return response
 
-    def update_chat_history(self, chat_history: CreateChatHistory):
+    def update_chat_history(self, chat_history):
         response = (
             self.db.table("chat_history")
             .insert(
@@ -112,15 +95,6 @@ class Chats(Repository):
             .execute()
         )
 
-        return response
-
-    def get_chat_details(self, chat_id):
-        response = (
-            self.db.from_("chats")
-            .select("*")
-            .filter("chat_id", "eq", chat_id)
-            .execute()
-        )
         return response
 
     def delete_chat(self, chat_id):

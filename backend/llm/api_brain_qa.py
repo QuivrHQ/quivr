@@ -3,23 +3,24 @@ from typing import Optional
 from uuid import UUID
 
 from fastapi import HTTPException
-from logger import get_logger
 from litellm import completion
 from llm.qa_base import QABaseBrainPicking
 from llm.utils.call_brain_api import call_brain_api
 from llm.utils.get_api_brain_definition_as_json_schema import (
     get_api_brain_definition_as_json_schema,
 )
-from models.chats import ChatQuestion
-from models.databases.supabase.chats import CreateChatHistory
+from logger import get_logger
 from modules.brain.service.brain_service import BrainService
-from repository.chat.get_chat_history import GetChatHistoryOutput, get_chat_history
-from repository.chat.update_chat_history import update_chat_history
-from repository.chat.update_message_by_id import update_message_by_id
+from modules.chat.dto.chats import ChatQuestion
+from modules.chat.dto.inputs import CreateChatHistory
+from modules.chat.dto.outputs import GetChatHistoryOutput
+from modules.chat.service.chat_service import ChatService
 
 brain_service = BrainService()
+chat_service = ChatService()
 
 logger = get_logger(__name__)
+
 
 class APIBrainQA(
     QABaseBrainPicking,
@@ -54,13 +55,13 @@ class APIBrainQA(
         messages,
         functions,
         brain_id: UUID,
-        recursive_count = 0,
-    ):  
+        recursive_count=0,
+    ):
         if recursive_count > 5:
             yield "🧠<Deciding what to do>🧠"
             yield "The assistant is having issues and took more than 5 calls to the API. Please try again later or an other instruction."
             return
-        
+
         yield "🧠<Deciding what to do>🧠"
         response = completion(
             model=self.model,
@@ -80,18 +81,21 @@ class APIBrainQA(
             finish_reason = chunk.choices[0].finish_reason
             if finish_reason == "stop":
                 break
-            if "function_call" in chunk.choices[0].delta and chunk.choices[0].delta["function_call"]:
+            if (
+                "function_call" in chunk.choices[0].delta
+                and chunk.choices[0].delta["function_call"]
+            ):
                 if chunk.choices[0].delta["function_call"].name:
                     function_call["name"] = chunk.choices[0].delta["function_call"].name
                 if chunk.choices[0].delta["function_call"].arguments:
-                    function_call["arguments"] += chunk.choices[0].delta[
-                        "function_call"
-                    ].arguments
+                    function_call["arguments"] += (
+                        chunk.choices[0].delta["function_call"].arguments
+                    )
 
             elif finish_reason == "function_call":
                 try:
                     arguments = json.loads(function_call["arguments"])
-                    
+
                 except Exception:
                     arguments = {}
                 yield f"🧠<Calling {brain_id} with arguments {arguments}>🧠"
@@ -107,7 +111,7 @@ class APIBrainQA(
                         status_code=400,
                         detail=f"Error while calling API: {e}",
                     )
-                
+
                 function_name = function_call["name"]
                 messages.append(
                     {
@@ -154,7 +158,7 @@ class APIBrainQA(
 
         messages = [{"role": "system", "content": prompt_content}]
 
-        history = get_chat_history(self.chat_id)
+        history = chat_service.get_chat_history(self.chat_id)
 
         for message in history:
             formatted_message = [
@@ -165,7 +169,7 @@ class APIBrainQA(
 
         messages.append({"role": "user", "content": question.question})
 
-        streamed_chat_history = update_chat_history(
+        streamed_chat_history = chat_service.update_chat_history(
             CreateChatHistory(
                 **{
                     "chat_id": chat_id,
@@ -203,7 +207,7 @@ class APIBrainQA(
             for token in response_tokens
             if not token.startswith("🧠<") and not token.endswith(">🧠")
         ]
-        update_message_by_id(
+        chat_service.update_message_by_id(
             message_id=str(streamed_chat_history.message_id),
             user_message=question.question,
             assistant="".join(response_tokens),

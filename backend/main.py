@@ -1,6 +1,4 @@
 import os
-from fastapi import FastAPI
-
 
 if __name__ == "__main__":
     # import needed here when running main.py to debug backend
@@ -14,6 +12,7 @@ from fastapi.responses import JSONResponse
 from logger import get_logger
 from middlewares.cors import add_cors_middleware
 from modules.api_key.controller import api_key_router
+from modules.chat.controller import chat_router
 from modules.contact_support.controller import contact_router
 from modules.knowledge.controller import knowledge_router
 from modules.misc.controller import misc_router
@@ -22,12 +21,10 @@ from modules.onboarding.controller import onboarding_router
 from modules.prompt.controller import prompt_router
 from modules.upload.controller import upload_router
 from modules.user.controller import user_router
+from packages.utils import handle_request_validation_error
 from routes.brain_routes import brain_router
-from routes.chat_routes import chat_router
 from routes.crawl_routes import crawl_router
 from routes.subscription_routes import subscription_router
-from logger import get_logger
-from packages.utils import handle_request_validation_error
 from sentry_sdk.integrations.fastapi import FastApiIntegration
 from sentry_sdk.integrations.starlette import StarletteIntegration
 
@@ -85,7 +82,7 @@ if sentry_dsn:
 #         supabase_client_telemetry.table("usage").insert({"id": str(uuid_from_string)}).execute()
 #     except Exception as e:
 #         logger.error("Error while sending telemetry")
-    
+
 
 app = FastAPI()
 

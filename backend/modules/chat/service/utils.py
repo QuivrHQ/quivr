@@ -1,28 +1,21 @@
-from enum import Enum
-from typing import List, Union
-from uuid import UUID
+from typing import List
 
+from logger import get_logger
+from modules.brain.service.brain_service import BrainService
+from modules.chat.dto.chats import ChatItem, ChatItemType
+from modules.chat.dto.outputs import GetChatHistoryOutput
 from modules.notification.entity.notification import Notification
 from modules.notification.service.notification_service import NotificationService
+from modules.prompt.service.prompt_service import PromptService
 from packages.utils import parse_message_time
-from pydantic import BaseModel
-from repository.chat.get_chat_history import GetChatHistoryOutput, get_chat_history
 
+logger = get_logger(__name__)
 
-class ChatItemType(Enum):
-    MESSAGE = "MESSAGE"
-    NOTIFICATION = "NOTIFICATION"
-
-
-class ChatItem(BaseModel):
-    item_type: ChatItemType
-    body: Union[GetChatHistoryOutput, Notification]
-
-
+prompt_service = PromptService()
+brain_service = BrainService()
 notification_service = NotificationService()
 
 
-# Move these methods to ChatService in chat module
 def merge_chat_history_and_notifications(
     chat_history: List[GetChatHistoryOutput], notifications: List[Notification]
 ) -> List[ChatItem]:
@@ -46,11 +39,3 @@ def merge_chat_history_and_notifications(
         transformed_data.append(transformed_item)
 
     return transformed_data
-
-
-def get_chat_history_with_notifications(
-    chat_id: UUID,
-) -> List[ChatItem]:
-    chat_history = get_chat_history(str(chat_id))
-    chat_notifications = notification_service.get_chat_notifications(chat_id)
-    return merge_chat_history_and_notifications(chat_history, chat_notifications)

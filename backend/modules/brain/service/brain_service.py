@@ -7,12 +7,16 @@ from modules.brain.entity.brain_entity import BrainEntity, BrainType, PublicBrai
 from modules.brain.repository.brains import Brains
 from modules.brain.repository.brains_users import BrainsUsers
 from modules.brain.repository.brains_vectors import BrainsVectors
+from modules.brain.repository.external_api_secrets import ExternalApiSecrets
 from modules.brain.repository.interfaces.brains_interface import BrainsInterface
 from modules.brain.repository.interfaces.brains_users_interface import (
     BrainsUsersInterface,
 )
 from modules.brain.repository.interfaces.brains_vectors_interface import (
     BrainsVectorsInterface,
+)
+from modules.brain.repository.interfaces.external_api_secrets_interface import (
+    ExternalApiSecretsInterface,
 )
 from modules.knowledge.service.knowledge_service import KnowledgeService
 from repository.api_brain_definition.add_api_brain_definition import (
@@ -27,7 +31,6 @@ from repository.api_brain_definition.get_api_brain_definition import (
 from repository.api_brain_definition.update_api_brain_definition import (
     update_api_brain_definition,
 )
-from repository.external_api_secret.create_secret import create_secret
 
 knowledge_service = KnowledgeService()
 
@@ -36,11 +39,13 @@ class BrainService:
     brain_repository: BrainsInterface
     brain_user_repository: BrainsUsersInterface
     brain_vector_repository: BrainsVectorsInterface
+    external_api_secrets_repository: ExternalApiSecretsInterface
 
     def __init__(self):
         self.brain_repository = Brains()
         self.brain_user_repository = BrainsUsers()
         self.brain_vector = BrainsVectors()
+        self.external_api_secrets_repository = ExternalApiSecrets()
 
     def get_brain_by_id(self, brain_id: UUID):
         return self.brain_repository.get_brain_by_id(brain_id)
@@ -75,7 +80,7 @@ class BrainService:
             secrets_values = brain.brain_secrets_values
 
             for secret_name in secrets_values:
-                create_secret(
+                self.external_api_secrets_repository.create_secret(
                     user_id=user_id,
                     brain_id=created_brain.brain_id,
                     secret_name=secret_name,
@@ -96,7 +101,7 @@ class BrainService:
             brain_users = self.brain_user_repository.get_brain_users(brain_id=brain_id)
             for user in brain_users:
                 for secret in secrets:
-                    self.brain_repository.delete_secret(
+                    self.external_api_secrets_repository.delete_secret(
                         user_id=user.user_id,
                         brain_id=brain_id,
                         secret_name=secret.name,
@@ -217,12 +222,12 @@ class BrainService:
         secret_value: str,
     ) -> None:
         """Update an existing secret."""
-        self.brain_repository.delete_secret(
+        self.external_api_secrets_repository.delete_secret(
             user_id=user_id,
             brain_id=brain_id,
             secret_name=secret_name,
         )
-        create_secret(
+        self.external_api_secrets_repository.create_secret(
             user_id=user_id,
             brain_id=brain_id,
             secret_name=secret_name,

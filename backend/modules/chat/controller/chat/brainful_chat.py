@@ -6,7 +6,7 @@ from modules.brain.service.brain_authorization_service import (
     validate_brain_authorization,
 )
 from modules.brain.service.brain_service import BrainService
-from routes.chat.interface import ChatInterface
+from modules.chat.controller.chat.interface import ChatInterface
 
 models_supporting_function_calls = [
     "gpt-4",
