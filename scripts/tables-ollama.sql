@@ -112,7 +112,7 @@ $$;
 CREATE TABLE IF NOT EXISTS api_keys(
     key_id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     user_id UUID REFERENCES auth.users (id),
-    name TEXT DEFAULT "API_KEY", 
+    name TEXT DEFAULT 'API_KEY', 
     days INT DEFAULT 30,
     only_chat BOOLEAN DEFAULT false,
     api_key TEXT UNIQUE,
