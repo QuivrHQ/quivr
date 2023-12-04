@@ -1,1 +1,1 @@
-export * from "../AddBrainModalOld/AddBrainModal";
+export { AddBrainModalSelector as AddBrainModal } from "./AddBrainModalSelector";
