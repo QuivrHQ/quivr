@@ -80,6 +80,8 @@ You can find the installation video [here](https://www.youtube.com/watch?v=cXBa6
   # docker compose -f docker-compose-ollama.yml up --build  # Only if using Ollama. You need to run `ollama run llama2` first.
   ```
 
+  If you have a Mac, go to Docker Desktop > Settings > General and check that the "file sharing implementation" is set to `VirtioFS`.
+
   If you are a developer, you can run the project in development mode with the following command: `docker compose -f docker-compose.dev.yml up --build`
 
 - **Step 5**: Login to the app
