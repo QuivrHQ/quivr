@@ -63,7 +63,6 @@ export const useEditorStateUpdater = ({
         })
         .run();
     }
-    editor?.commands.focus("end");
   }, [currentBrain, currentPrompt, editor]);
 
   useEffect(() => {
