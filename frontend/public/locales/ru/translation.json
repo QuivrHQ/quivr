@@ -30,5 +30,8 @@
   "invalidUrl": "Неверный URL",
   "crawlButton": "Поиск",
   "themeSelect": "Тема интерфейса",
-  "languageSelect": "предпочтительный язык"
+  "languageSelect": "предпочтительный язык",
+  "cancel": "Отмена",
+  "next": "Далее",
+  "previous": "Назад"
 }
