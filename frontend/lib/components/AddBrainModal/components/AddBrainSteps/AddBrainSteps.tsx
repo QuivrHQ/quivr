@@ -5,6 +5,7 @@ import Button from "@/lib/components/ui/Button";
 import { Modal } from "@/lib/components/ui/Modal";
 import { cn } from "@/lib/utils";
 
+import { BrainParamsStep } from "./components/BrainParamsStep/BrainParamsStep";
 import { BrainTypeSelectionStep } from "./components/BrainTypeSelectionStep/BrainTypeSelectionStep";
 import { Stepper } from "./components/Stepper/Stepper";
 import { useAddBrainConfig } from "./hooks/useAddBrainConfig";
@@ -22,37 +23,38 @@ export const AddBrainSteps = ({
     useAddBrainConfig();
 
   return (
-    <>
-      <Modal
-        Trigger={
-          <Button
-            onClick={() => void 0}
-            variant={"tertiary"}
-            className={cn("border-0", triggerClassName)}
-            data-testid="add-brain-button"
-          >
-            {t("newBrain", { ns: "brain" })}
-            <MdAdd className="text-xl" />
-          </Button>
-        }
-        title={t("newBrainTitle", { ns: "brain" })}
-        desc={t("newBrainSubtitle", { ns: "brain" })}
-        isOpen={isBrainCreationModalOpened}
-        setOpen={setIsBrainCreationModalOpened}
-        CloseTrigger={<div />}
-      >
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-          }}
-          className="my-10 flex flex-col items-center gap-2 justify-center"
+    <Modal
+      Trigger={
+        <Button
+          onClick={() => void 0}
+          variant={"tertiary"}
+          className={cn("border-0", triggerClassName)}
+          data-testid="add-brain-button"
         >
-          <Stepper />
-          <BrainTypeSelectionStep
-            onCancelBrainCreation={() => setIsBrainCreationModalOpened(false)}
-          />
-        </form>
-      </Modal>
-    </>
+          {t("newBrain", { ns: "brain" })}
+          <MdAdd className="text-xl" />
+        </Button>
+      }
+      title={t("newBrainTitle", { ns: "brain" })}
+      desc={t("newBrainSubtitle", { ns: "brain" })}
+      isOpen={isBrainCreationModalOpened}
+      setOpen={setIsBrainCreationModalOpened}
+      CloseTrigger={<div />}
+    >
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+        }}
+        className="my-10 flex flex-col items-center gap-2 justify-center"
+      >
+        <Stepper />
+        <BrainTypeSelectionStep
+          onCancelBrainCreation={() => setIsBrainCreationModalOpened(false)}
+        />
+        <BrainParamsStep
+          onCancelBrainCreation={() => setIsBrainCreationModalOpened(false)}
+        />
+      </form>
+    </Modal>
   );
 };
