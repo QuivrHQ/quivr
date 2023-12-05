@@ -4,7 +4,6 @@ from logger import get_logger
 from models.databases.supabase import (
     ApiBrainDefinitions,
     BrainSubscription,
-    Chats,
     File,
     UserUsage,
     Vector,
@@ -17,7 +16,6 @@ class SupabaseDB(
     UserUsage,
     File,
     BrainSubscription,
-    Chats,
     Vector,
     SharedChats,
     ApiBrainDefinitions,
@@ -27,7 +25,6 @@ class SupabaseDB(
         UserUsage.__init__(self, supabase_client)
         File.__init__(self, supabase_client)
         BrainSubscription.__init__(self, supabase_client)
-        Chats.__init__(self, supabase_client)
         SharedChats.__init__(self, supabase_client)
         Vector.__init__(self, supabase_client)
         ApiBrainDefinitions.__init__(self, supabase_client)

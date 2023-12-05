@@ -49,6 +49,7 @@
   "myBrains": "Мои мозги",
   "knowledge_source_doc": "Документы",
   "knowledge_source_api": "API",
+  "knowledge_source_chatflow":"Сеть мозга",
   "knowledge_source_label": "Источник знаний",
   "api_brain":{
     "name": "Название",
@@ -62,5 +63,8 @@
   "update_secrets_button": "Обновить секреты",
   "secrets_updated": "Секреты обновлены",
   "secrets_update_error": "Ошибка при обновлении секретов",
-  "manage_brain": "Управление мозгом"
+  "manage_brain": "Управление мозгом",
+  "brain_type": "Тип мозга",
+  "brain_params": "Параметры мозга",
+  "brain_data": "Данные мозга"
 }

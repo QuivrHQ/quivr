@@ -5,7 +5,6 @@ from models.settings import get_supabase_client
 from modules.brain.dto.inputs import BrainUpdatableProperties
 from modules.brain.entity.brain_entity import BrainEntity, PublicBrain
 from modules.brain.repository.interfaces.brains_interface import BrainsInterface
-from repository.external_api_secret.utils import build_secret_unique_name
 
 logger = get_logger(__name__)
 
@@ -97,15 +96,3 @@ class Brains(BrainsInterface):
             return None
 
         return BrainEntity(**response[0])
-
-    def delete_secret(self, user_id: UUID, brain_id: UUID, secret_name: str) -> bool:
-        response = self.db.rpc(
-            "delete_secret",
-            {
-                "secret_name": build_secret_unique_name(
-                    user_id=user_id, brain_id=brain_id, secret_name=secret_name
-                ),
-            },
-        ).execute()
-
-        return response.data

@@ -45,7 +45,7 @@ export const MessageContent = ({
           <ReactMarkdown>{logs}</ReactMarkdown>
         </div>
       )}
-      <ReactMarkdown className={`text-sm text-gray-800 ${markdownClasses}`}>{cleanedText}</ReactMarkdown>
+      <ReactMarkdown className={`text-sm ${markdownClasses}`}>{cleanedText}</ReactMarkdown>
     </div>
   );
 };

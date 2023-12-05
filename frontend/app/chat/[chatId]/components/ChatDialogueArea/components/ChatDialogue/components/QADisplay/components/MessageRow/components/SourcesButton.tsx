@@ -1,8 +1,8 @@
-"use client";
-
 import { useEffect, useRef, useState } from "react";
 import ReactDOM from "react-dom";
 import { FaQuestionCircle } from "react-icons/fa";
+
+import { useEventTracking } from "@/services/analytics/june/useEventTracking";
 
 type SourcesButtonProps = {
   sources: string;
@@ -11,6 +11,7 @@ type SourcesButtonProps = {
 export const SourcesButton = ({ sources }: SourcesButtonProps): JSX.Element => {
   const [showSources, setShowSources] = useState(false);
   const [popupPosition, setPopupPosition] = useState({ top: 0, left: 0 });
+  const { track } = useEventTracking();
   // Specify the type of element the ref will be attached to
   const buttonRef = useRef<HTMLButtonElement>(null);
 
@@ -51,6 +52,7 @@ export const SourcesButton = ({ sources }: SourcesButtonProps): JSX.Element => {
         onMouseEnter={() => {
           setShowSources(true);
           updatePopupPosition();
+          void track("SOURCE_CHECKED");
         }}
         onMouseLeave={() => setShowSources(false)}
         className="text-gray-500 hover:text-gray-700 transition p-1"

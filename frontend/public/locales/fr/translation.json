@@ -6,7 +6,6 @@
   "email": "Email",
   "or": "ou",
   "and": "et",
-
   "logoutButton": "Déconnexion",
   "updateButton": "Mettre à jour",
   "uploadButton": "Télécharger",
@@ -31,5 +30,8 @@
   "invalidUrl": "URL invalide",
   "crawlButton": "Crawler",
   "themeSelect": "Thème de l'interface",
-  "languageSelect": "Langue préférée"
+  "languageSelect": "Langue préférée",
+  "cancel": "Annuler",
+  "next": "Suivant",
+  "previous": "Précédent"
 }

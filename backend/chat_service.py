@@ -12,8 +12,8 @@ from fastapi import FastAPI, HTTPException
 from fastapi.responses import JSONResponse
 from logger import get_logger
 from middlewares.cors import add_cors_middleware
+from modules.chat.controller import chat_router
 from modules.misc.controller import misc_router
-from routes.chat_routes import chat_router
 
 logger = get_logger(__name__)
 

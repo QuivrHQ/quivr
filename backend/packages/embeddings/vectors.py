@@ -11,13 +11,13 @@ logger = get_logger(__name__)
 
 # TODO: Create interface for embeddings and implement it for Supabase and OpenAI (current Quivr)
 class Neurons(BaseModel):
-    def create_vector(self, doc):
+    def create_vector(self, docs):
         documents_vector_store = get_documents_vector_store()
         logger.info("Creating vector for document")
-        logger.info(f"Document: {doc}")
+        logger.info(f"Document: {docs}")
 
         try:
-            sids = documents_vector_store.add_documents([doc])
+            sids = documents_vector_store.add_documents(docs)
             if sids and len(sids) > 0:
                 return sids
 
