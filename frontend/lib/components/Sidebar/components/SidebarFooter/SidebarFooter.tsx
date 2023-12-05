@@ -1,12 +1,17 @@
-import { Fragment } from "react";
+import { Fragment } from 'react';
 
-import { BrainManagementButton } from "@/lib/components/Sidebar/components/SidebarFooter/components/BrainManagementButton";
-import { useSecurity } from "@/services/useSecurity/useSecurity";
+import { BrainManagementButton } from '@/lib/components/Sidebar/components/SidebarFooter/components/BrainManagementButton';
+import { useSecurity } from '@/services/useSecurity/useSecurity';
 
-import { UpgradeToPlus } from "./components/UpgradeToPlus";
-import { UserButton } from "./components/UserButton";
+import { MarketPlaceButton } from './components/MarketplaceButton';
+import { UpgradeToPlus } from './components/UpgradeToPlus';
+import { UserButton } from './components/UserButton';
 
-export type SidebarFooterButtons = "myBrains" | "user" | "upgradeToPlus";
+export type SidebarFooterButtons =
+  | 'myBrains'
+  | 'user'
+  | 'upgradeToPlus'
+  | 'marketplace';
 
 type SidebarFooterProps = {
   showButtons: SidebarFooterButtons[];
@@ -19,6 +24,7 @@ export const SidebarFooter = ({
 
   const buttons = {
     myBrains: isStudioMember ? <BrainManagementButton /> : <></>,
+    marketplace: isStudioMember ? <MarketPlaceButton /> : <></>,
     upgradeToPlus: isStudioMember ? <UpgradeToPlus /> : <></>,
     user: <UserButton />,
   };

@@ -1,0 +1,40 @@
+{
+    "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+    "extends": [
+        "config:base",
+        "group:allNonMajor"
+    ],
+    "prHourlyLimit": 0,
+    "prConcurrentLimit": 15,
+    "baseBranches": [
+        "main"
+    ],
+    "packageRules": [
+        {
+            "updateTypes": [
+                "major"
+            ],
+            "addLabels": [
+                "SemVer Major"
+            ]
+        },
+        {
+            "updateTypes": [
+                "minor"
+            ],
+            "addLabels": [
+                "SemVer Minor"
+            ]
+        },
+        {
+            "updateTypes": [
+                "patch",
+                "digest",
+                "bump"
+            ],
+            "addLabels": [
+                "SemVer Patch"
+            ]
+        }
+    ]
+}

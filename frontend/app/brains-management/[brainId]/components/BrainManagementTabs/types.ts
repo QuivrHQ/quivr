@@ -1,3 +1,7 @@
-export const brainManagementTabs = ["settings", "people", "knowledge"] as const;
+export const brainManagementTabs = [
+  "settings",
+  "people",
+  "knowledgeOrSecrets",
+] as const;
 
 export type BrainManagementTab = (typeof brainManagementTabs)[number];

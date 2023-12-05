@@ -1,0 +1,10 @@
+**/__pycache__
+*/.pytest_cache
+**/__pycache__
+**/.benchmarks/
+**/.cache/
+**/.pytest_cache/
+**/.next/
+**/build/
+**/.docusaurus/
+**/node_modules/

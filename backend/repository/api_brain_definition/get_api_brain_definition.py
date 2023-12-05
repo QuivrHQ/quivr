@@ -2,7 +2,7 @@ from typing import Optional
 from uuid import UUID
 
 from models import get_supabase_db
-from models.ApiBrainDefinition import ApiBrainDefinition
+from modules.brain.entity.api_brain_definition_entity import ApiBrainDefinition
 
 
 def get_api_brain_definition(brain_id: UUID) -> Optional[ApiBrainDefinition]:

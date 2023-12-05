@@ -20,6 +20,7 @@
   "modelLabel": "Modèle",
   "modelSection": "Configuration du modèle",
   "nameRequired": "Le nom est requis",
+  "descriptionRequired": "La description est requise",
   "newAPIKey": "Créer une nouvelle clé",
   "noUser": "Pas d'utilisateur",
   "ohno": "Oh non !",

@@ -32,4 +32,3 @@ def test_get_user_identity(client, api_key):
     print(user_identity)
     assert "id" in user_identity
     assert "email" in user_identity
-    assert "openai_api_key" in user_identity

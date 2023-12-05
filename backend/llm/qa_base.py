@@ -7,6 +7,7 @@ from langchain.callbacks.streaming_aiter import AsyncIteratorCallbackHandler
 from langchain.chains import ConversationalRetrievalChain, LLMChain
 from langchain.chains.question_answering import load_qa_chain
 from langchain.chat_models import ChatLiteLLM
+from langchain.embeddings.ollama import OllamaEmbeddings
 from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.llms.base import BaseLLM
 from langchain.prompts.chat import (
@@ -20,8 +21,8 @@ from logger import get_logger
 from models import BrainSettings  # Importing settings related to the 'brain'
 from models.chats import ChatQuestion
 from models.databases.supabase.chats import CreateChatHistory
+from modules.brain.service.brain_service import BrainService
 from pydantic import BaseModel
-from repository.brain import get_brain_by_id
 from repository.chat import (
     GetChatHistoryOutput,
     format_chat_history,
@@ -36,6 +37,9 @@ from .prompts.CONDENSE_PROMPT import CONDENSE_QUESTION_PROMPT
 
 logger = get_logger(__name__)
 QUIVR_DEFAULT_PROMPT = "Your name is Quivr. You're a helpful assistant.  If you don't know the answer, just say that you don't know, don't try to make up an answer."
+
+
+brain_service = BrainService()
 
 
 class QABaseBrainPicking(BaseModel):
@@ -63,20 +67,11 @@ class QABaseBrainPicking(BaseModel):
     chat_id: str = None  # pyright: ignore reportPrivateUsage=none
     brain_id: str = None  # pyright: ignore reportPrivateUsage=none
     max_tokens: int = 256
-    user_openai_api_key: str = None  # pyright: ignore reportPrivateUsage=none
     streaming: bool = False
 
-    openai_api_key: str = None  # pyright: ignore reportPrivateUsage=none
     callbacks: List[
         AsyncIteratorCallbackHandler
     ] = None  # pyright: ignore reportPrivateUsage=none
-
-    def _determine_api_key(self, openai_api_key, user_openai_api_key):
-        """If user provided an API key, use it."""
-        if user_openai_api_key is not None:
-            return user_openai_api_key
-        else:
-            return openai_api_key
 
     def _determine_streaming(self, model: str, streaming: bool) -> bool:
         """If the model name allows for streaming and streaming is declared, set streaming to True."""
@@ -92,10 +87,13 @@ class QABaseBrainPicking(BaseModel):
             ]
 
     @property
-    def embeddings(self) -> OpenAIEmbeddings:
-        return OpenAIEmbeddings(
-            openai_api_key=self.openai_api_key
-        )  # pyright: ignore reportPrivateUsage=none
+    def embeddings(self):
+        if self.brain_settings.ollama_api_base_url:
+            return OllamaEmbeddings(
+                base_url=self.brain_settings.ollama_api_base_url
+            )  # pyright: ignore reportPrivateUsage=none
+        else: 
+            return OpenAIEmbeddings()
 
     supabase_client: Optional[Client] = None
     vector_store: Optional[CustomSupabaseVectorStore] = None
@@ -144,7 +142,7 @@ class QABaseBrainPicking(BaseModel):
         )
 
     def _create_llm(
-        self, model, temperature=0, streaming=False, callbacks=None, max_tokens=256
+        self, model, temperature=0, streaming=False, callbacks=None
     ) -> BaseLLM:
         """
         Determine the language model to be used.
@@ -153,14 +151,19 @@ class QABaseBrainPicking(BaseModel):
         :param callbacks: Callbacks to be used for streaming
         :return: Language model instance
         """
+        api_base = None
+        if self.brain_settings.ollama_api_base_url and model.startswith("ollama"):
+            api_base = self.brain_settings.ollama_api_base_url
+
+
         return ChatLiteLLM(
             temperature=temperature,
-            max_tokens=max_tokens,
+            max_tokens=self.max_tokens,
             model=model,
             streaming=streaming,
             verbose=False,
             callbacks=callbacks,
-            openai_api_key=self.openai_api_key,
+            api_base= api_base
         )  # pyright: ignore reportPrivateUsage=none
 
     def _create_prompt_template(self):
@@ -191,7 +194,9 @@ class QABaseBrainPicking(BaseModel):
     ) -> GetChatHistoryOutput:
         transformed_history = format_chat_history(get_chat_history(self.chat_id))
         answering_llm = self._create_llm(
-            model=self.model, streaming=False, callbacks=self.callbacks
+            model=self.model,
+            streaming=False,
+            callbacks=self.callbacks,
         )
 
         # The Chain that generates the answer to the question
@@ -240,7 +245,7 @@ class QABaseBrainPicking(BaseModel):
         brain = None
 
         if question.brain_id:
-            brain = get_brain_by_id(question.brain_id)
+            brain = brain_service.get_brain_by_id(question.brain_id)
 
         return GetChatHistoryOutput(
             **{
@@ -267,7 +272,6 @@ class QABaseBrainPicking(BaseModel):
             model=self.model,
             streaming=True,
             callbacks=self.callbacks,
-            max_tokens=self.max_tokens,
         )
 
         # The Chain that generates the answer to the question
@@ -317,7 +321,7 @@ class QABaseBrainPicking(BaseModel):
         brain = None
 
         if question.brain_id:
-            brain = get_brain_by_id(question.brain_id)
+            brain = brain_service.get_brain_by_id(question.brain_id)
 
         streamed_chat_history = update_chat_history(
             CreateChatHistory(

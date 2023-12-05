@@ -51,7 +51,7 @@ export const Modal = ({
           <Dialog.Portal forceMount>
             <Dialog.Overlay asChild forceMount>
               <motion.div
-                className="z-50 md:z-40 py-20 fixed inset-0 flex justify-center overflow-auto cursor-pointer bg-black/50 backdrop-blur-sm"
+                className="z-[10000] py-20 fixed inset-0 flex justify-center overflow-auto cursor-pointer bg-black/50 backdrop-blur-sm"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}

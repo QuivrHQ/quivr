@@ -5,18 +5,21 @@ from celery_worker import process_crawl_and_notify
 from fastapi import APIRouter, Depends, Query, Request
 from logger import get_logger
 from middlewares.auth import AuthBearer, get_current_user
-from models import Brain, UserUsage
-from models.databases.supabase.knowledge import CreateKnowledgeProperties
-from models.databases.supabase.notifications import CreateNotificationProperties
-from models.notifications import NotificationsStatusEnum
+from models import UserUsage
+from modules.knowledge.dto.inputs import CreateKnowledgeProperties
+from modules.knowledge.service.knowledge_service import KnowledgeService
+from modules.notification.dto.inputs import CreateNotificationProperties
+from modules.notification.entity.notification import NotificationsStatusEnum
+from modules.notification.service.notification_service import NotificationService
 from modules.user.entity.user_identity import UserIdentity
 from packages.files.crawl.crawler import CrawlWebsite
 from packages.files.file import convert_bytes
-from repository.knowledge.add_knowledge import add_knowledge
-from repository.notification.add_notification import add_notification
 
 logger = get_logger(__name__)
 crawl_router = APIRouter()
+
+notification_service = NotificationService()
+knowledge_service = KnowledgeService()
 
 
 @crawl_router.get("/crawl/healthz", tags=["Health"])
@@ -30,7 +33,6 @@ async def crawl_endpoint(
     crawl_website: CrawlWebsite,
     brain_id: UUID = Query(..., description="The ID of the brain"),
     chat_id: Optional[UUID] = Query(None, description="The ID of the chat"),
-    enable_summarization: bool = False,
     current_user: UserIdentity = Depends(get_current_user),
 ):
     """
@@ -38,18 +40,12 @@ async def crawl_endpoint(
     """
 
     # [TODO] check if the user is the owner/editor of the brain
-    brain = Brain(id=brain_id)
 
     userDailyUsage = UserUsage(
         id=current_user.id,
         email=current_user.email,
-        openai_api_key=current_user.openai_api_key,
     )
     userSettings = userDailyUsage.get_user_settings()
-
-    # [TODO] rate limiting of user for crawl
-    if request.headers.get("Openai-Api-Key"):
-        brain.max_brain_size = userSettings.get("max_brain_size", 1000000000)
 
     file_size = 1000000
     remaining_free_space = userSettings.get("max_brain_size", 1000000000)
@@ -62,7 +58,7 @@ async def crawl_endpoint(
     else:
         crawl_notification = None
         if chat_id:
-            crawl_notification = add_notification(
+            crawl_notification = notification_service.add_notification(
                 CreateNotificationProperties(
                     action="CRAWL",
                     chat_id=chat_id,
@@ -76,14 +72,12 @@ async def crawl_endpoint(
             extension="html",
         )
 
-        added_knowledge = add_knowledge(knowledge_to_add)
+        added_knowledge = knowledge_service.add_knowledge(knowledge_to_add)
         logger.info(f"Knowledge {added_knowledge} added successfully")
 
         process_crawl_and_notify.delay(
             crawl_website_url=crawl_website.url,
-            enable_summarization=enable_summarization,
             brain_id=brain_id,
-            openai_api_key=request.headers.get("Openai-Api-Key", None),
             notification_id=crawl_notification.id,
         )
 

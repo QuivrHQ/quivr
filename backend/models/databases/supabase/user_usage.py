@@ -30,6 +30,7 @@ class UserUsage(Repository):
         """
         Check if the user is a premium user
         """
+        matching_customers = None
         try:
             user_email_customer = (
                 self.db.from_("users")
@@ -48,6 +49,7 @@ class UserUsage(Repository):
                 .execute()
             ).data
         except Exception as e:
+            logger.info(matching_customers)
             logger.error("Error while checking if user is a premium user")
             logger.error(e)
             return False
@@ -141,18 +143,3 @@ class UserUsage(Repository):
         )
 
         return response
-
-    def get_user_email(self, user_id):
-        """
-        Fetch the user email from the database
-        """
-        response = (
-            self.db.from_("user_daily_usage")
-            .select("email")
-            .filter("user_id", "eq", user_id)
-            .execute()
-        ).data
-
-        if response and len(response) > 0:
-            return response[0]["email"]
-        return None
