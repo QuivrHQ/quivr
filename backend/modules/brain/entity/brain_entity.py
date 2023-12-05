@@ -2,7 +2,7 @@ from enum import Enum
 from typing import Optional
 from uuid import UUID
 
-from modules.brain.entity.api_brain_definition_entity import ApiBrainDefinition
+from modules.brain.entity.api_brain_definition_entity import ApiBrainDefinitionEntity
 from pydantic import BaseModel
 
 
@@ -23,7 +23,7 @@ class BrainEntity(BaseModel):
     prompt_id: Optional[UUID]
     last_update: str
     brain_type: BrainType
-    brain_definition: Optional[ApiBrainDefinition]
+    brain_definition: Optional[ApiBrainDefinitionEntity]
     connected_brains_ids = Optional[UUID]
 
     @property
@@ -45,7 +45,7 @@ class PublicBrain(BaseModel):
     number_of_subscribers: int = 0
     last_update: str
     brain_type: BrainType
-    brain_definition: Optional[ApiBrainDefinition]
+    brain_definition: Optional[ApiBrainDefinitionEntity]
 
 
 class RoleEnum(str, Enum):

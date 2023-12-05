@@ -3,24 +3,26 @@ from typing import Optional
 from uuid import UUID
 
 from modules.brain.dto.inputs import CreateApiBrainDefinition
-from modules.brain.entity.api_brain_definition_entity import ApiBrainDefinition
+from modules.brain.entity.api_brain_definition_entity import ApiBrainDefinitionEntity
 
 
 class ApiBrainDefinitionsInterface(ABC):
     @abstractmethod
-    def get_api_brain_definition(self, brain_id: UUID) -> Optional[ApiBrainDefinition]:
+    def get_api_brain_definition(
+        self, brain_id: UUID
+    ) -> Optional[ApiBrainDefinitionEntity]:
         pass
 
     @abstractmethod
     def add_api_brain_definition(
         self, brain_id: UUID, api_brain_definition: CreateApiBrainDefinition
-    ) -> Optional[ApiBrainDefinition]:
+    ) -> Optional[ApiBrainDefinitionEntity]:
         pass
 
     @abstractmethod
     def update_api_brain_definition(
-        self, brain_id: UUID, api_brain_definition: ApiBrainDefinition
-    ) -> Optional[ApiBrainDefinition]:
+        self, brain_id: UUID, api_brain_definition: ApiBrainDefinitionEntity
+    ) -> Optional[ApiBrainDefinitionEntity]:
         """
         Get all public brains
         """

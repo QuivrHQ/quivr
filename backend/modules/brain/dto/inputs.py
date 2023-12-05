@@ -4,7 +4,7 @@ from uuid import UUID
 from logger import get_logger
 from modules.brain.entity.api_brain_definition_entity import (
     ApiBrainAllowedMethods,
-    ApiBrainDefinition,
+    ApiBrainDefinitionEntity,
     ApiBrainDefinitionSchema,
     ApiBrainDefinitionSecret,
 )
@@ -43,7 +43,7 @@ class BrainUpdatableProperties(BaseModel):
     max_tokens: Optional[int]
     status: Optional[str]
     prompt_id: Optional[UUID]
-    brain_definition: Optional[ApiBrainDefinition]
+    brain_definition: Optional[ApiBrainDefinitionEntity]
     connected_brains_ids: Optional[list[UUID]] = []
 
     def dict(self, *args, **kwargs):
