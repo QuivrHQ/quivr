@@ -2,9 +2,14 @@ from typing import Optional
 from uuid import UUID
 
 from logger import get_logger
-from models.databases.supabase.api_brain_definition import CreateApiBrainDefinition
-from modules.brain.entity.api_brain_definition_entity import ApiBrainDefinition
+from modules.brain.entity.api_brain_definition_entity import (
+    ApiBrainAllowedMethods,
+    ApiBrainDefinition,
+    ApiBrainDefinitionSchema,
+    ApiBrainDefinitionSecret,
+)
 from modules.brain.entity.brain_entity import BrainType
+from modules.brain.repository.api_brain_definitions import CreateApiBrainDefinition
 from pydantic import BaseModel, Extra
 
 logger = get_logger(__name__)
@@ -48,3 +53,11 @@ class BrainUpdatableProperties(BaseModel):
 
 class BrainQuestionRequest(BaseModel):
     question: str
+
+
+class CreateApiBrainDefinition(BaseModel, extra=Extra.forbid):
+    method: ApiBrainAllowedMethods
+    url: str
+    params: Optional[ApiBrainDefinitionSchema] = ApiBrainDefinitionSchema()
+    search_params: ApiBrainDefinitionSchema = ApiBrainDefinitionSchema()
+    secrets: Optional[list[ApiBrainDefinitionSecret]] = []

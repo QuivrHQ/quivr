@@ -1,34 +1,15 @@
-from enum import Enum
 from typing import Optional
 from uuid import UUID
 
-from models.databases.repository import Repository
-from modules.brain.entity.api_brain_definition_entity import (
-    ApiBrainDefinition,
-    ApiBrainDefinitionSchema,
-    ApiBrainDefinitionSecret,
-)
-from pydantic import BaseModel, Extra
+from models.settings import get_supabase_client
+from modules.brain.dto.inputs import CreateApiBrainDefinition
+from modules.brain.entity.api_brain_definition_entity import ApiBrainDefinition
+from modules.brain.repository.interfaces import ApiBrainDefinitionsInterface
 
 
-class ApiMethod(str, Enum):
-    GET = "GET"
-    POST = "POST"
-    PUT = "PUT"
-    DELETE = "DELETE"
-
-
-class CreateApiBrainDefinition(BaseModel, extra=Extra.forbid):
-    method: ApiMethod
-    url: str
-    params: Optional[ApiBrainDefinitionSchema] = ApiBrainDefinitionSchema()
-    search_params: ApiBrainDefinitionSchema = ApiBrainDefinitionSchema()
-    secrets: Optional[list[ApiBrainDefinitionSecret]] = []
-
-
-class ApiBrainDefinitions(Repository):
-    def __init__(self, supabase_client):
-        self.db = supabase_client
+class ApiBrainDefinitions(ApiBrainDefinitionsInterface):
+    def __init__(self):
+        self.db = get_supabase_client()
 
     def get_api_brain_definition(self, brain_id: UUID) -> Optional[ApiBrainDefinition]:
         response = (

@@ -1,1 +1,2 @@
 from .composite_brains_connections_interface import CompositeBrainsConnectionsInterface
+from .api_brain_definitions_interface import ApiBrainDefinitionsInterface

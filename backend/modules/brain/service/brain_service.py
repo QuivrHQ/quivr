@@ -18,22 +18,13 @@ from modules.brain.repository.interfaces.brains_vectors_interface import (
 from modules.brain.repository.interfaces.external_api_secrets_interface import (
     ExternalApiSecretsInterface,
 )
+from modules.brain.service.api_brain_definition_service import ApiBrainDefinitionService
 from modules.brain.service.utils.validate_brain import validate_api_brain
 from modules.knowledge.service.knowledge_service import KnowledgeService
-from repository.api_brain_definition.add_api_brain_definition import (
-    add_api_brain_definition,
-)
-from repository.api_brain_definition.delete_api_brain_definition import (
-    delete_api_brain_definition,
-)
-from repository.api_brain_definition.get_api_brain_definition import (
-    get_api_brain_definition,
-)
-from repository.api_brain_definition.update_api_brain_definition import (
-    update_api_brain_definition,
-)
 
 knowledge_service = KnowledgeService()
+# TODO: directly user api_brain_definition repository
+api_brain_definition_service = ApiBrainDefinitionService()
 
 
 class BrainService:
@@ -75,7 +66,7 @@ class BrainService:
         created_brain = self.brain_repository.create_brain(brain)
 
         if brain.brain_definition is not None:
-            add_api_brain_definition(
+            api_brain_definition_service.add_api_brain_definition(
                 brain_id=created_brain.brain_id,
                 api_brain_definition=brain.brain_definition,
             )
@@ -93,7 +84,9 @@ class BrainService:
         return created_brain
 
     def delete_brain_secrets_values(self, brain_id: UUID) -> None:
-        brain_definition = get_api_brain_definition(brain_id=brain_id)
+        brain_definition = api_brain_definition_service.get_api_brain_definition(
+            brain_id=brain_id
+        )
 
         if brain_definition is None:
             raise HTTPException(status_code=404, detail="Brain definition not found.")
@@ -119,7 +112,7 @@ class BrainService:
             self.delete_brain_secrets_values(
                 brain_id=brain_id,
             )
-            delete_api_brain_definition(brain_id=brain_id)
+            api_brain_definition_service.delete_api_brain_definition(brain_id=brain_id)
         else:
             knowledge_service.remove_brain_all_knowledge(brain_id)
 
@@ -185,7 +178,7 @@ class BrainService:
             if should_remove_existing_secrets_values:
                 self.delete_brain_secrets_values(brain_id=brain_id)
 
-            update_api_brain_definition(
+            api_brain_definition_service.update_api_brain_definition(
                 brain_id,
                 api_brain_definition=brain_new_values.brain_definition,
             )
@@ -209,7 +202,9 @@ class BrainService:
             return None
 
         if brain.brain_type == BrainType.API:
-            brain_definition = get_api_brain_definition(brain_id)
+            brain_definition = api_brain_definition_service.get_api_brain_definition(
+                brain_id
+            )
             brain.brain_definition = brain_definition
 
         return brain
