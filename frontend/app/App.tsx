@@ -13,7 +13,7 @@ import { useSecurity } from "@/services/useSecurity/useSecurity";
 import "../lib/config/LocaleConfig/i18n";
 
 // This wrapper is used to make effect calls at a high level in app rendering.
-export const App = ({ children }: PropsWithChildren): JSX.Element => {
+const App = ({ children }: PropsWithChildren): JSX.Element => {
   const { isStudioMember, isRouteAccessible } = useSecurity();
 
   if (!isStudioMember && !isRouteAccessible) {
