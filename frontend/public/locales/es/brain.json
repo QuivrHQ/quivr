@@ -49,7 +49,7 @@
   "myBrains": "Mis cerebros",
   "knowledge_source_doc": "Documentos",
   "knowledge_source_api": "API",
-  "knowledge_source_chatflow":"Red de cerebro",
+  "knowledge_source_chatflow": "Agente",
   "knowledge_source_label": "Fuente de conocimiento",
   "api_brain":{
     "name": "Nombre",
