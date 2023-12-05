@@ -1,14 +1,15 @@
 /* eslint max-lines:["error", 150] */
+// TODO: useFormContext to avoid passing too many props
 
 import { useTranslation } from "react-i18next";
 
-import { ApiRequestDefinition } from "@/lib/components/ApiRequestDefinition";
 import Button from "@/lib/components/ui/Button";
 import { Chip } from "@/lib/components/ui/Chip";
 import Field from "@/lib/components/ui/Field";
 import { Radio } from "@/lib/components/ui/Radio";
 import { TextArea } from "@/lib/components/ui/TextArea";
 
+import { ApiBrainDefinition } from "./components/ApiBrainDefinition";
 import { useGeneralInformation } from "./hooks/useGeneralInformation";
 import { useBrainFormState } from "../../hooks/useBrainFormState";
 
@@ -96,11 +97,10 @@ export const GeneralInformation = (
           items={brainTypeOptions}
           label={t("knowledge_source_label", { ns: "brain" })}
           className="flex-1 justify-between w-[50%]"
-          disabled={true}
-          {...register("brain_type")}
+          {...register("brain_type", { disabled: true })}
         />
       </div>
-      <ApiRequestDefinition />
+      <ApiBrainDefinition />
       <TextArea
         label={t("brainDescription", { ns: "brain" })}
         placeholder={t("brainDescriptionPlaceholder", { ns: "brain" })}

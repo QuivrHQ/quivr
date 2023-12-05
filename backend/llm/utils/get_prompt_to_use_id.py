@@ -1,9 +1,7 @@
 from typing import Optional
 from uuid import UUID
 
-from modules.brain.service.brain_service import BrainService
-
-brain_service = BrainService()
+from repository.brain import get_brain_prompt_id
 
 
 def get_prompt_to_use_id(
@@ -13,9 +11,5 @@ def get_prompt_to_use_id(
         return None
 
     return (
-        prompt_id
-        if prompt_id
-        else brain_service.get_brain_prompt_id(brain_id)
-        if brain_id
-        else None
+        prompt_id if prompt_id else get_brain_prompt_id(brain_id) if brain_id else None
     )

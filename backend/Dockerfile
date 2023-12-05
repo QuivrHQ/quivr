@@ -1,21 +1,20 @@
 # Using a slim version for a smaller base image
-FROM python:3.11.6-slim-bullseye
+FROM python:3.11-slim-bullseye
 
 ARG DEV_MODE
 ENV DEV_MODE=$DEV_MODE
 
 # Install GEOS library, Rust, and other dependencies, then clean up
-RUN apt-get clean && apt-get update && apt-get install -y \
+RUN apt-get update && apt-get install -y \
     libgeos-dev \
     libcurl4-openssl-dev \
     libssl-dev \
-    binutils \
     pandoc \
+    binutils \
     curl \
     git \
-    poppler-utils \
-    tesseract-ocr \
     build-essential && \
+    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y && \
     rm -rf /var/lib/apt/lists/* && apt-get clean
 
 # Add Rust binaries to the PATH
@@ -37,6 +36,4 @@ RUN if [ "$DEV_MODE" = "true" ]; then pip install --no-cache debugpy --timeout 2
 # Copy the rest of the application
 COPY . .
 
-EXPOSE 5050
-
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "5050", "--workers", "6"]
+CMD ["uvicorn", "main:app", "--reload", "--host", "0.0.0.0", "--port", "5050", "--workers", "6"]

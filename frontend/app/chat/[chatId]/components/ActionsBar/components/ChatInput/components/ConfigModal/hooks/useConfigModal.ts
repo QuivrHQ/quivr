@@ -1,55 +1,91 @@
 /* eslint-disable max-lines */
+import { useQuery } from "@tanstack/react-query";
 import { useCallback, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 
-import { useLocalStorageChatConfig } from "@/app/chat/[chatId]/hooks/useLocalStorageChatConfig";
-import { saveChatsConfigInLocalStorage } from "@/lib/api/chat/chat.local";
+import { useBrainApi } from "@/lib/api/brain/useBrainApi";
+import {
+  getChatsConfigFromLocalStorage,
+  saveChatsConfigInLocalStorage,
+} from "@/lib/api/chat/chat.local";
+import { USER_DATA_KEY, USER_IDENTITY_DATA_KEY } from "@/lib/api/user/config";
+import { useUserApi } from "@/lib/api/user/useUserApi";
+import { defaultBrainConfig } from "@/lib/config/defaultBrainConfig";
+import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 import { ChatConfig } from "@/lib/context/ChatProvider/types";
 import { getAccessibleModels } from "@/lib/helpers/getAccessibleModels";
 import { useToast } from "@/lib/hooks";
-import { useUserData } from "@/lib/hooks/useUserData";
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const useConfigModal = () => {
   const { publish } = useToast();
   const [isConfigModalOpen, setIsConfigModalOpen] = useState(false);
-  const { chatConfig } = useLocalStorageChatConfig();
-  const { userData } = useUserData();
+  const { getBrain } = useBrainApi();
+  const { currentBrainId } = useBrainContext();
+  const { getUser, getUserIdentity } = useUserApi();
+
+  const { data: userData } = useQuery({
+    queryKey: [USER_DATA_KEY],
+    queryFn: getUser,
+  });
+  const { data: userIdentityData } = useQuery({
+    queryKey: [USER_IDENTITY_DATA_KEY],
+    queryFn: getUserIdentity,
+  });
 
   const { register, watch, setValue } = useForm<ChatConfig>({
     defaultValues: {
-      model: chatConfig.model,
-      temperature: chatConfig.temperature ?? 0,
-      maxTokens: chatConfig.maxTokens ?? 3000,
+      model: defaultBrainConfig.model,
+      temperature: defaultBrainConfig.temperature,
+      maxTokens: defaultBrainConfig.maxTokens,
     },
   });
 
   const model = watch("model");
-
   const temperature = watch("temperature");
   const maxTokens = watch("maxTokens");
 
   const accessibleModels = getAccessibleModels({
+    openAiKey: userIdentityData?.openai_api_key,
     userData,
   });
 
-  useEffect(() => {
-    if (chatConfig.model !== undefined) {
+  const fetchChatConfig = useCallback(async () => {
+    const chatConfig = getChatsConfigFromLocalStorage();
+    if (chatConfig !== undefined) {
       setValue("model", chatConfig.model);
-    }
-    if (chatConfig.temperature !== undefined) {
       setValue("temperature", chatConfig.temperature);
-    }
-    if (chatConfig.maxTokens !== undefined) {
       setValue("maxTokens", chatConfig.maxTokens);
+    } else {
+      if (currentBrainId === null) {
+        return;
+      }
+      const relatedBrainConfig = await getBrain(currentBrainId);
+
+      if (relatedBrainConfig === undefined) {
+        return;
+      }
+      setValue("model", relatedBrainConfig.model ?? defaultBrainConfig.model);
+      setValue(
+        "temperature",
+        relatedBrainConfig.temperature ?? defaultBrainConfig.temperature
+      );
+      setValue(
+        "maxTokens",
+        relatedBrainConfig.max_tokens ?? defaultBrainConfig.maxTokens
+      );
     }
-  }, [chatConfig.maxTokens, chatConfig.model, chatConfig.temperature]);
+  }, []);
+
+  useEffect(() => {
+    void fetchChatConfig();
+  }, [fetchChatConfig]);
 
   const handleSubmit = useCallback(() => {
     try {
       saveChatsConfigInLocalStorage({
         maxTokens,
-        model: model.length > 0 ? model : undefined,
+        model,
         temperature,
       });
 

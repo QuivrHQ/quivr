@@ -72,13 +72,6 @@ vi.mock("@tanstack/react-query", async () => {
   };
 });
 
-vi.mock(
-  "../components/ActionsBar/components/ChatInput/components/ChatEditor/ChatEditor",
-  () => ({
-    ChatEditor: () => <div data-testid="chat-input" />,
-  })
-);
-
 describe("Chat page", () => {
   it("should render chat page correctly", () => {
     const { getByTestId } = render(

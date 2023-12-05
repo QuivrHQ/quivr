@@ -17,6 +17,7 @@ export type Brain = {
   model?: Model | null;
   max_tokens?: number;
   temperature?: number;
+  openai_api_key?: string | null;
   description?: string;
   prompt_id?: string | null;
   brain_type?: BrainType;
@@ -28,7 +29,6 @@ export type MinimalBrainForUser = {
   name: string;
   role: BrainRoleType;
   status: BrainAccessStatus;
-  brain_type: BrainType;
 };
 
 //TODO: rename rights to role in Backend and use MinimalBrainForUser instead of BackendMinimalBrainForUser

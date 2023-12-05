@@ -143,6 +143,7 @@ CREATE TABLE IF NOT EXISTS brains (
   model TEXT,
   max_tokens INT,
   temperature FLOAT,
+  openai_api_key TEXT,
   prompt_id UUID REFERENCES prompts(id),
   last_update TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   brain_type brain_type_enum DEFAULT 'doc'
@@ -246,10 +247,10 @@ CREATE TABLE IF NOT EXISTS migrations (
 
 CREATE TABLE IF NOT EXISTS user_settings (
   user_id UUID PRIMARY KEY,
-  models JSONB DEFAULT '["gpt-3.5-turbo-1106","gpt-4"]'::jsonb,
-  daily_chat_credit INT DEFAULT 300,
-  max_brains INT DEFAULT 30,
-  max_brain_size INT DEFAULT 100000000
+  models JSONB DEFAULT '["gpt-3.5-turbo","huggingface/mistralai/Mistral-7B-Instruct-v0.1"]'::jsonb,
+  daily_chat_credit INT DEFAULT 20,
+  max_brains INT DEFAULT 3,
+  max_brain_size INT DEFAULT 10000000
 );
 
 -- knowledge table
@@ -443,7 +444,7 @@ $$;
 
 
 INSERT INTO migrations (name) 
-SELECT '20231128173900_remove_openai_api_key'
+SELECT '20231116102600_add_get_user_email_by_user_id'
 WHERE NOT EXISTS (
-    SELECT 1 FROM migrations WHERE name = '20231128173900_remove_openai_api_key'
+    SELECT 1 FROM migrations WHERE name = '20231116102600_add_get_user_email_by_user_id'
 );

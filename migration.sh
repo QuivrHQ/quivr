@@ -26,11 +26,11 @@ fi
 # If .migration_info doesn't exist or any of the variables are empty, prompt for DB info
 if $prompt_for_db_info ; then
     echo "Please enter the following database connection information that can be found in Supabase in Settings -> database:"
-    DB_HOST=$(gum input --placeholder "Host - e.g. db.<your-project>.supabase.co")
-    DB_NAME=$(gum input --placeholder "Database name: always postgres")
-    DB_PORT=$(gum input --placeholder "Port: always 5432")
-    DB_USER=$(gum input --placeholder "User: always postgres")
-    DB_PASSWORD=$(gum input --placeholder "Password: the one you used at inti" --password)
+    DB_HOST=$(gum input --placeholder "Host")
+    DB_NAME=$(gum input --placeholder "Database name")
+    DB_PORT=$(gum input --placeholder "Port")
+    DB_USER=$(gum input --placeholder "User")
+    DB_PASSWORD=$(gum input --placeholder "Password" --password)
 
     # Save the inputs in .migration_info file
     echo "DB_HOST=$DB_HOST" > .migration_info
@@ -41,9 +41,9 @@ if $prompt_for_db_info ; then
 fi
 
 # Ask user whether to create tables or run migrations
-CHOICE=$(gum choose --header "Choose an option" "Create all tables (First Time)" "Run Migrations (After updating Quivr)")
+CHOICE=$(gum choose --header "Choose an option" "Create all tables" "Run Migrations")
 
-if [ "$CHOICE" == "Create all tables (First Time)" ]; then
+if [ "$CHOICE" == "Create all tables" ]; then
     # Running the tables.sql file to create tables
     run_sql_file "scripts/tables.sql"
 else

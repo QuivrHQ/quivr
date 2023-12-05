@@ -1,5 +1,4 @@
 /* eslint-disable max-lines */
-import { useTranslation } from "react-i18next";
 import { MdCheck, MdSettings } from "react-icons/md";
 
 import Button from "@/lib/components/ui/Button";
@@ -14,11 +13,11 @@ export const ConfigModal = (): JSX.Element => {
     isConfigModalOpen,
     setIsConfigModalOpen,
     register,
+    temperature,
     maxTokens,
     model,
     accessibleModels,
   } = useConfigModal();
-  const { t } = useTranslation("config");
 
   return (
     <Modal
@@ -40,19 +39,34 @@ export const ConfigModal = (): JSX.Element => {
       <form className="mt-10 flex flex-col items-center gap-2">
         <fieldset className="w-full flex flex-col">
           <label className="flex-1 text-sm" htmlFor="model">
-            {t("modelLabel")}
+            Model
           </label>
           <select
+            id="model"
             {...register("model")}
             className="px-5 py-2 dark:bg-gray-700 bg-gray-200 rounded-md"
           >
-            <option value="">{t("modelLabel")}</option>
             {accessibleModels.map((availableModel) => (
               <option value={availableModel} key={availableModel}>
                 {availableModel}
               </option>
             ))}
           </select>
+        </fieldset>
+
+        <fieldset className="w-full flex mt-4">
+          <label className="flex-1" htmlFor="temp">
+            Temperature: {temperature}
+          </label>
+          <input
+            id="temp"
+            type="range"
+            min="0"
+            max="1"
+            step="0.01"
+            value={temperature}
+            {...register("temperature")}
+          />
         </fieldset>
         <fieldset className="w-full flex mt-4">
           <label className="flex-1" htmlFor="tokens">

@@ -22,6 +22,7 @@ const Ellipsis = ({
     originalContent.length > maxCharacters
       ? `${originalContent.slice(0, maxCharacters)}...`
       : originalContent;
+  console.log(originalContent, maxCharacters, tooltip, renderedContent);
 
   if (tooltip && originalContent !== renderedContent) {
     return (

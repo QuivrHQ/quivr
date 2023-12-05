@@ -2,14 +2,16 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
 
+import { useKnowledgeToFeedContext } from "@/lib/context/KnowledgeToFeedProvider/hooks/useKnowledgeToFeedContext";
+
 import { ChatInput, KnowledgeToFeed } from "./components";
 import { useActionBar } from "./hooks/useActionBar";
 
 export const ActionsBar = (): JSX.Element => {
-  const { hasPendingRequests, setHasPendingRequests, shouldDisplayFeedCard } =
-    useActionBar();
+  const { hasPendingRequests, setHasPendingRequests } = useActionBar();
 
   const { t } = useTranslation(["chat"]);
+  const { shouldDisplayFeedCard } = useKnowledgeToFeedContext();
 
   return (
     <>
@@ -40,7 +42,7 @@ export const ActionsBar = (): JSX.Element => {
           </AnimatePresence>
         )}
         {!shouldDisplayFeedCard && (
-          <ChatInput shouldDisplayFeedOrSecretsCard={shouldDisplayFeedCard} />
+          <ChatInput shouldDisplayFeedCard={shouldDisplayFeedCard} />
         )}
       </div>
     </>

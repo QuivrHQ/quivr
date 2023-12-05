@@ -105,6 +105,7 @@ export const usePrompt = (props: UsePromptProps) => {
     const {
       prompt,
       maxTokens: max_tokens,
+      openAiKey: openai_api_key,
       ...otherConfigs
     } = getValues();
 
@@ -137,6 +138,7 @@ export const usePrompt = (props: UsePromptProps) => {
         await updateBrain(brainId, {
           ...otherConfigs,
           max_tokens,
+          openai_api_key,
         });
         refetchBrain();
       } else {
@@ -144,6 +146,7 @@ export const usePrompt = (props: UsePromptProps) => {
           updateBrain(brainId, {
             ...otherConfigs,
             max_tokens,
+            openai_api_key,
           }),
           promptHandler(),
         ]);

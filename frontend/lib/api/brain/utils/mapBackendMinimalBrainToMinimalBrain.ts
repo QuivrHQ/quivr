@@ -10,5 +10,4 @@ export const mapBackendMinimalBrainToMinimalBrain = (
   name: backendMinimalBrain.name,
   role: backendMinimalBrain.rights,
   status: backendMinimalBrain.status,
-  brain_type: backendMinimalBrain.brain_type,
 });
