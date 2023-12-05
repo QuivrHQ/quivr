@@ -26,6 +26,7 @@ class CreateBrainProperties(BaseModel, extra=Extra.forbid):
     brain_type: Optional[BrainType] = BrainType.DOC
     brain_definition: Optional[CreateApiBrainDefinition]
     brain_secrets_values: dict = {}
+    connected_brains_ids: Optional[list[UUID]] = []
 
     def dict(self, *args, **kwargs):
         brain_dict = super().dict(*args, **kwargs)
@@ -43,6 +44,7 @@ class BrainUpdatableProperties(BaseModel):
     status: Optional[str]
     prompt_id: Optional[UUID]
     brain_definition: Optional[ApiBrainDefinition]
+    connected_brains_ids: Optional[list[UUID]] = []
 
     def dict(self, *args, **kwargs):
         brain_dict = super().dict(*args, **kwargs)

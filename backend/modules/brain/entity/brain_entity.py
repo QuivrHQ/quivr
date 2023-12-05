@@ -9,6 +9,7 @@ from pydantic import BaseModel
 class BrainType(str, Enum):
     DOC = "doc"
     API = "api"
+    COMPOSITE = "composite"
 
 
 class BrainEntity(BaseModel):
@@ -23,6 +24,7 @@ class BrainEntity(BaseModel):
     last_update: str
     brain_type: BrainType
     brain_definition: Optional[ApiBrainDefinition]
+    connected_brains_ids = Optional[UUID]
 
     @property
     def id(self) -> UUID:

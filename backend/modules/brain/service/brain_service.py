@@ -4,18 +4,18 @@ from uuid import UUID
 from fastapi import HTTPException
 from modules.brain.dto.inputs import BrainUpdatableProperties, CreateBrainProperties
 from modules.brain.entity.brain_entity import BrainEntity, BrainType, PublicBrain
-from modules.brain.repository.brains import Brains
-from modules.brain.repository.brains_users import BrainsUsers
-from modules.brain.repository.brains_vectors import BrainsVectors
-from modules.brain.repository.external_api_secrets import ExternalApiSecrets
-from modules.brain.repository.interfaces.brains_interface import BrainsInterface
-from modules.brain.repository.interfaces.brains_users_interface import (
+from modules.brain.repository import (
+    Brains,
+    BrainsUsers,
+    BrainsVectors,
+    CompositeBrainsConnections,
+    ExternalApiSecrets,
+)
+from modules.brain.repository.interfaces import (
+    BrainsInterface,
     BrainsUsersInterface,
-)
-from modules.brain.repository.interfaces.brains_vectors_interface import (
     BrainsVectorsInterface,
-)
-from modules.brain.repository.interfaces.external_api_secrets_interface import (
+    CompositeBrainsConnectionsInterface,
     ExternalApiSecretsInterface,
 )
 from modules.brain.service.api_brain_definition_service import ApiBrainDefinitionService
@@ -32,12 +32,14 @@ class BrainService:
     brain_user_repository: BrainsUsersInterface
     brain_vector_repository: BrainsVectorsInterface
     external_api_secrets_repository: ExternalApiSecretsInterface
+    composite_brains_connections_repository: CompositeBrainsConnectionsInterface
 
     def __init__(self):
         self.brain_repository = Brains()
         self.brain_user_repository = BrainsUsers()
         self.brain_vector = BrainsVectors()
         self.external_api_secrets_repository = ExternalApiSecrets()
+        self.composite_brains_connections_repository = CompositeBrainsConnections()
 
     def get_brain_by_id(self, brain_id: UUID):
         return self.brain_repository.get_brain_by_id(brain_id)
@@ -52,8 +54,10 @@ class BrainService:
 
         if brain.brain_type == BrainType.API:
             validate_api_brain(brain)
-            created_brain = self.create_brain_api(user_id, brain)
-            return created_brain
+            return self.create_brain_api(user_id, brain)
+
+        if brain.brain_type == BrainType.COMPOSITE:
+            return self.create_brain_composite(brain)
 
         created_brain = self.brain_repository.create_brain(brain)
         return created_brain
@@ -80,6 +84,21 @@ class BrainService:
                 secret_name=secret_name,
                 secret_value=secrets_values[secret_name],
             )
+
+        return created_brain
+
+    def create_brain_composite(
+        self,
+        brain: CreateBrainProperties,
+    ) -> BrainEntity:
+        created_brain = self.brain_repository.create_brain(brain)
+
+        if brain.connected_brains_ids is not None:
+            for connected_brain_id in brain.connected_brains_ids:
+                self.composite_brains_connections_repository.connect_brain(
+                    composite_brain_id=created_brain.brain_id,
+                    connected_brain_id=connected_brain_id,
+                )
 
         return created_brain
 
