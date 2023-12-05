@@ -2,13 +2,15 @@ from fastapi import HTTPException
 from llm.utils.extract_api_definition import format_api_brain_property
 from llm.utils.sanitize_function_name import sanitize_function_name
 from modules.brain.entity.brain_entity import BrainEntity
-from repository.api_brain_definition.get_api_brain_definition import (
-    get_api_brain_definition,
-)
+from modules.brain.service.api_brain_definition_service import ApiBrainDefinitionService
+
+api_brain_definition_service = ApiBrainDefinitionService()
 
 
 def get_api_brain_definition_as_json_schema(brain: BrainEntity):
-    api_brain_definition = get_api_brain_definition(brain.id)
+    api_brain_definition = api_brain_definition_service.get_api_brain_definition(
+        brain.id
+    )
     if not api_brain_definition:
         raise HTTPException(
             status_code=404, detail=f"Brain definition {brain.id} not found"

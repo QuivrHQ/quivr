@@ -163,7 +163,9 @@ class BrainService:
         brain_update_answer = self.brain_repository.update_brain_by_id(
             brain_id,
             brain=BrainUpdatableProperties(
-                **brain_new_values.dict(exclude={"brain_definition"})
+                **brain_new_values.dict(
+                    exclude={"brain_definition", "connected_brains_ids"}
+                )
             ),
         )
 

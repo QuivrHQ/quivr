@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import Optional
+from typing import List, Optional
 from uuid import UUID
 
 from modules.brain.entity.api_brain_definition_entity import ApiBrainDefinitionEntity
@@ -24,7 +24,7 @@ class BrainEntity(BaseModel):
     last_update: str
     brain_type: BrainType
     brain_definition: Optional[ApiBrainDefinitionEntity]
-    connected_brains_ids = Optional[UUID]
+    connected_brains_ids: Optional[List[UUID]]
 
     @property
     def id(self) -> UUID:

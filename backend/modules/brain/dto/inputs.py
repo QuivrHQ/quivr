@@ -9,10 +9,17 @@ from modules.brain.entity.api_brain_definition_entity import (
     ApiBrainDefinitionSecret,
 )
 from modules.brain.entity.brain_entity import BrainType
-from modules.brain.repository.api_brain_definitions import CreateApiBrainDefinition
 from pydantic import BaseModel, Extra
 
 logger = get_logger(__name__)
+
+
+class CreateApiBrainDefinition(BaseModel, extra=Extra.forbid):
+    method: ApiBrainAllowedMethods
+    url: str
+    params: Optional[ApiBrainDefinitionSchema] = ApiBrainDefinitionSchema()
+    search_params: ApiBrainDefinitionSchema = ApiBrainDefinitionSchema()
+    secrets: Optional[list[ApiBrainDefinitionSecret]] = []
 
 
 class CreateBrainProperties(BaseModel, extra=Extra.forbid):
@@ -55,11 +62,3 @@ class BrainUpdatableProperties(BaseModel):
 
 class BrainQuestionRequest(BaseModel):
     question: str
-
-
-class CreateApiBrainDefinition(BaseModel, extra=Extra.forbid):
-    method: ApiBrainAllowedMethods
-    url: str
-    params: Optional[ApiBrainDefinitionSchema] = ApiBrainDefinitionSchema()
-    search_params: ApiBrainDefinitionSchema = ApiBrainDefinitionSchema()
-    secrets: Optional[list[ApiBrainDefinitionSecret]] = []

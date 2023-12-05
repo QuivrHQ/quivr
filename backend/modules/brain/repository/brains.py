@@ -17,7 +17,13 @@ class Brains(BrainsInterface):
     def create_brain(self, brain):
         response = (
             self.db.table("brains").insert(
-                brain.dict(exclude={"brain_definition", "brain_secrets_values"})
+                brain.dict(
+                    exclude={
+                        "brain_definition",
+                        "brain_secrets_values",
+                        "connected_brains_ids",
+                    }
+                )
             )
         ).execute()
 
