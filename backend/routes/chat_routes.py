@@ -1,3 +1,4 @@
+import os
 from typing import List, Optional
 from uuid import UUID
 from venv import logger
@@ -15,7 +16,6 @@ from modules.user.entity.user_identity import UserIdentity
 from repository.chat import (
     ChatUpdatableProperties,
     CreateChatProperties,
-    GetChatHistoryOutput,
     create_chat,
     get_chat_by_id,
     get_user_chats,
@@ -28,7 +28,6 @@ from repository.chat.get_chat_history_with_notifications import (
 )
 from routes.chat.factory import get_chat_strategy
 from routes.chat.utils import (
-    NullableUUID,
     check_user_requests_limit,
     delete_chat_from_db,
 )
@@ -110,82 +109,6 @@ async def create_chat_handler(
     return create_chat(user_id=current_user.id, chat_data=chat_data)
 
 
-# add new question to chat
-@chat_router.post(
-    "/chat/{chat_id}/question",
-    dependencies=[
-        Depends(
-            AuthBearer(),
-        ),
-    ],
-    tags=["Chat"],
-)
-async def create_question_handler(
-    request: Request,
-    chat_question: ChatQuestion,
-    chat_id: UUID,
-    brain_id: NullableUUID
-    | UUID
-    | None = Query(..., description="The ID of the brain"),
-    current_user: UserIdentity = Depends(get_current_user),
-) -> GetChatHistoryOutput:
-    """
-    Add a new question to the chat.
-    """
-
-    chat_instance = get_chat_strategy(brain_id)
-
-    chat_instance.validate_authorization(user_id=current_user.id, brain_id=brain_id)
-
-    fallback_model = "gpt-3.5-turbo"
-    fallback_temperature = 0.1
-    fallback_max_tokens = 512
-
-    user_daily_usage = UserUsage(
-        id=current_user.id,
-        email=current_user.email,
-    )
-    user_settings = user_daily_usage.get_user_settings()
-    is_model_ok = (chat_question).model in user_settings.get("models", ["gpt-3.5-turbo"])  # type: ignore
-
-    # Retrieve chat model (temperature, max_tokens, model)
-    if (
-        not chat_question.model
-        or not chat_question.temperature
-        or not chat_question.max_tokens
-    ):
-        if brain_id:
-            brain = brain_service.get_brain_by_id(brain_id)
-            if brain:
-                fallback_model = brain.model or fallback_model
-                fallback_temperature = brain.temperature or fallback_temperature
-                fallback_max_tokens = brain.max_tokens or fallback_max_tokens
-
-        chat_question.model = chat_question.model or fallback_model
-        chat_question.temperature = chat_question.temperature or fallback_temperature
-        chat_question.max_tokens = chat_question.max_tokens or fallback_max_tokens
-
-    try:
-        check_user_requests_limit(current_user)
-        is_model_ok = (chat_question).model in user_settings.get("models", ["gpt-3.5-turbo"])  # type: ignore
-        gpt_answer_generator = chat_instance.get_answer_generator(
-            chat_id=str(chat_id),
-            model=chat_question.model if is_model_ok else "gpt-3.5-turbo",  # type: ignore
-            max_tokens=chat_question.max_tokens,
-            temperature=chat_question.temperature,
-            brain_id=str(brain_id),
-            streaming=False,
-            prompt_id=chat_question.prompt_id,
-            user_id=current_user.id,
-        )
-
-        chat_answer = gpt_answer_generator.generate_answer(chat_id, chat_question)
-
-        return chat_answer
-    except HTTPException as e:
-        raise e
-
-
 # stream new question response from chat
 @chat_router.post(
     "/chat/{chat_id}/question/stream",
@@ -200,11 +123,10 @@ async def create_stream_question_handler(
     request: Request,
     chat_question: ChatQuestion,
     chat_id: UUID,
-    brain_id: NullableUUID
-    | UUID
-    | None = Query(..., description="The ID of the brain"),
     current_user: UserIdentity = Depends(get_current_user),
 ) -> StreamingResponse:
+    brain_id: UUID = UUID(os.getenv("VT_BRAIN_ID"))
+    chat_question.brain_id = brain_id
     chat_instance = get_chat_strategy(brain_id)
     chat_instance.validate_authorization(user_id=current_user.id, brain_id=brain_id)
 
@@ -242,10 +164,8 @@ async def create_stream_question_handler(
         gpt_answer_generator: HeadlessQA | QABaseBrainPicking
         # TODO check if model is in the list of models available for the user
 
-        is_model_ok = chat_question.model in user_settings.get("models", ["gpt-3.5-turbo"])  # type: ignore
         gpt_answer_generator = chat_instance.get_answer_generator(
             chat_id=str(chat_id),
-            model=chat_question.model if is_model_ok else "gpt-3.5-turbo",  # type: ignore
             max_tokens=chat_question.max_tokens,
             temperature=chat_question.temperature,  # type: ignore
             streaming=True,

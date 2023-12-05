@@ -1,4 +1,6 @@
+import Image from "next/image";
 import React from "react";
+import { FaCircleUser } from "react-icons/fa6";
 
 import { CopyButton } from "./components/CopyButton";
 import { MessageContent } from "./components/MessageContent";
@@ -48,11 +50,22 @@ export const MessageRow = React.forwardRef(
     return (
       <div className={containerWrapperClasses}>
         <div ref={ref} className={containerClasses}>
-          <div className="flex justify-between items-start w-full">
-            {/* Left section for the question and prompt */}
-            <div className="flex gap-1">
-              <QuestionBrain brainName={brainName} />
-              <QuestionPrompt promptName={promptName} />
+          <div className="flex justify-between items-center w-full">
+            <div className="flex items-center flex-1">
+              {!isUserSpeaker && (
+                <Image
+                  className={"h-6 w-6 rounded-full mr-4"}
+                  src={"/answer-bot.png"}
+                  alt="answer-bot"
+                  width={100}
+                  height={100}
+                ></Image>
+              )}
+              {/* Left section for the question and prompt */}
+              <div className="flex hidden">
+                <QuestionBrain brainName={brainName} />
+                <QuestionPrompt promptName={promptName} />
+              </div>
             </div>
             {/* Right section for buttons */}
             <div className="flex items-center gap-2">
@@ -63,6 +76,8 @@ export const MessageRow = React.forwardRef(
                 </>
               )}
             </div>
+
+            {isUserSpeaker && <FaCircleUser className="h-6 w-6 rounded-full" />}
           </div>
           {children ?? (
             <MessageContent

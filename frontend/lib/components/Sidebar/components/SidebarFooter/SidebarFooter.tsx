@@ -1,12 +1,17 @@
-import { Fragment } from "react";
+import { Fragment } from 'react';
 
-import { BrainManagementButton } from "@/lib/components/Sidebar/components/SidebarFooter/components/BrainManagementButton";
+import { BrainManagementButton } from '@/lib/components/Sidebar/components/SidebarFooter/components/BrainManagementButton';
+import { useSecurity } from '@/services/useSecurity/useSecurity';
 
-import { MarketPlaceButton } from "./components/MarketplaceButton";
-import { UpgradeToPlus } from "./components/UpgradeToPlus";
-import { UserButton } from "./components/UserButton";
+import { MarketPlaceButton } from './components/MarketplaceButton';
+import { UpgradeToPlus } from './components/UpgradeToPlus';
+import { UserButton } from './components/UserButton';
 
-export type SidebarFooterButtons = "myBrains" | "user" | "upgradeToPlus" | "marketplace";
+export type SidebarFooterButtons =
+  | 'myBrains'
+  | 'user'
+  | 'upgradeToPlus'
+  | 'marketplace';
 
 type SidebarFooterProps = {
   showButtons: SidebarFooterButtons[];
@@ -15,10 +20,12 @@ type SidebarFooterProps = {
 export const SidebarFooter = ({
   showButtons,
 }: SidebarFooterProps): JSX.Element => {
+  const { isStudioMember } = useSecurity();
+
   const buttons = {
-    myBrains: <BrainManagementButton />,
-    marketplace: <MarketPlaceButton />,
-    upgradeToPlus: <UpgradeToPlus />,
+    myBrains: isStudioMember ? <BrainManagementButton /> : <></>,
+    marketplace: isStudioMember ? <MarketPlaceButton /> : <></>,
+    upgradeToPlus: isStudioMember ? <UpgradeToPlus /> : <></>,
     user: <UserButton />,
   };
 

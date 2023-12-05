@@ -25,6 +25,7 @@ from modules.user.controller import user_router
 from routes.brain_routes import brain_router
 from routes.chat_routes import chat_router
 from routes.crawl_routes import crawl_router
+from routes.shared_chat_routes import shared_chat_router
 from routes.subscription_routes import subscription_router
 from logger import get_logger
 from packages.utils import handle_request_validation_error
@@ -106,6 +107,7 @@ app.include_router(misc_router)
 
 app.include_router(upload_router)
 app.include_router(user_router)
+app.include_router(shared_chat_router)
 app.include_router(api_key_router)
 app.include_router(subscription_router)
 app.include_router(prompt_router)

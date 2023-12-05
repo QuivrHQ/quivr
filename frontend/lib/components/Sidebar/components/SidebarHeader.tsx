@@ -1,6 +1,7 @@
 import { Dispatch, SetStateAction } from "react";
 import { LuPanelLeft } from "react-icons/lu";
 
+import { LanguageSelect } from "@/app/chat/components/LanguageSelect";
 import { Logo } from "@/lib/components/Logo/Logo";
 
 type SidebarProps = {
@@ -12,6 +13,7 @@ export const SidebarHeader = ({ setOpen }: SidebarProps): JSX.Element => {
     <div className="p-2 border-b relative">
       <div className="max-w-screen-xl flex justify-between items-center pt-3 pl-3">
         <Logo />
+        <LanguageSelect isSelect={false} isChatPage={true} />
         <button
           title="Close Sidebar"
           className="p-3 text-2xl bg:white dark:bg-black text-black dark:text-white hover:text-primary dark:hover:text-gray-200 transition-colors"

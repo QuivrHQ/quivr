@@ -1,0 +1,30 @@
+{
+  "disclaimer": "Disclaimer",
+  "disclaimerContent": "Current knowledgebase includes limited public information from our most reliable sources, such as Miles Guo, NFSC, Doctors in special hearing on Covid-19 vaccine injuries. AI answers questions based on information/data from these sources. So we cannot be responsilbe for the final generated content. We are working on knowledgebase visualization, so soon knowledgebase content will/can be audited publicly.",
+  "talkToAI": "Talk to vaccinetruth.ai",
+  "chatShareTitle": "Chat Share configuration",
+  "chatShareDesc": "select your share platform",
+  "chatShareCopyURL": "Copy Chat Share URL",
+  "chatShareTo": "Share To",
+  "onboarding": {
+    "title": "Hi 👋🏻 Want to discover Quivr ? 😇",
+    "step_1_1": "1. Drap and drop file on the chat or in the 📎.",
+    "step_1_2": "Don't have a file ? Download 'Quivr documentation'",
+    "step_2": "2. Start chatting with your file",
+    "step_3": "3. Enjoy !",
+    "virus_origin": "Where is the origin of the Covid-19 virus?",
+    "vaccine_effect": "What vaccine injuries were discussed in the US Congress hearing?",
+    "vaccine_antidote": "What Miles Guo says about Covid-19 virus and vaccine.",
+    "answer": {
+      "virus_origin": "Wuhan P4 Virus Research Institute.",
+      "vaccine_effect": "You can't get vaccinated, the vaccine is poisonous.",
+      "vaccine_antidote": "Yes, please use artemisinin derivatives to detoxify according to the treatment course."
+    }
+  },
+  "vaccineTruthAi": "Vaccine Truth AI",
+  "sharedPageTitle": "Shared Chat • Vaccine Truth AI",
+  "emptyChatTitle": "Start chatting",
+  "emptyChatSubTitle": "don't forget to share if you like the answer.",
+  "recommended": "Recommended",
+  "buildByStayRealStudio": "Built by Stay Real Studio"
+}

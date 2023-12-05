@@ -47,3 +47,8 @@ export type ChatEntity = {
   creation_time: string;
   chat_name: string;
 };
+
+export type SharedChat = {
+  id: string;
+  chat_id: string;
+};
