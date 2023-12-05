@@ -18,6 +18,7 @@ from modules.brain.repository.interfaces.brains_vectors_interface import (
 from modules.brain.repository.interfaces.external_api_secrets_interface import (
     ExternalApiSecretsInterface,
 )
+from modules.brain.service.utils.validate_brain import validate_api_brain
 from modules.knowledge.service.knowledge_service import KnowledgeService
 from repository.api_brain_definition.add_api_brain_definition import (
     add_api_brain_definition,
@@ -57,35 +58,37 @@ class BrainService:
     ) -> BrainEntity:
         if brain == None:
             brain = CreateBrainProperties()  # type: ignore model and brain_definition
+
         if brain.brain_type == BrainType.API:
-            if brain.brain_definition is None:
-                raise HTTPException(
-                    status_code=404, detail="Brain definition not found"
-                )
-
-            if brain.brain_definition.url is None:
-                raise HTTPException(status_code=404, detail="Brain url not found")
-
-            if brain.brain_definition.method is None:
-                raise HTTPException(status_code=404, detail="Brain method not found")
+            validate_api_brain(brain)
+            created_brain = self.create_brain_api(user_id, brain)
+            return created_brain
 
         created_brain = self.brain_repository.create_brain(brain)
+        return created_brain
 
-        if brain.brain_type == BrainType.API and brain.brain_definition is not None:
+    def create_brain_api(
+        self,
+        user_id: UUID,
+        brain: CreateBrainProperties,
+    ) -> BrainEntity:
+        created_brain = self.brain_repository.create_brain(brain)
+
+        if brain.brain_definition is not None:
             add_api_brain_definition(
                 brain_id=created_brain.brain_id,
                 api_brain_definition=brain.brain_definition,
             )
 
-            secrets_values = brain.brain_secrets_values
+        secrets_values = brain.brain_secrets_values
 
-            for secret_name in secrets_values:
-                self.external_api_secrets_repository.create_secret(
-                    user_id=user_id,
-                    brain_id=created_brain.brain_id,
-                    secret_name=secret_name,
-                    secret_value=secrets_values[secret_name],
-                )
+        for secret_name in secrets_values:
+            self.external_api_secrets_repository.create_secret(
+                user_id=user_id,
+                brain_id=created_brain.brain_id,
+                secret_name=secret_name,
+                secret_value=secrets_values[secret_name],
+            )
 
         return created_brain
 
