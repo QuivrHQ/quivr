@@ -19,7 +19,7 @@ export const useJune = (): AnalyticsBrowser | undefined => {
       const response = AnalyticsBrowser.load({
         writeKey: juneApiKey,
       });
-      console.log("Loaded June Analytics", response);
+      // console.log("Loaded June Analytics", response);
       setAnalytics(response);
     };
     loadAnalytics();

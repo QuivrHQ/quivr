@@ -7,11 +7,19 @@ import { BrainProvider } from "@/lib/context";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 import { useSupabase } from "@/lib/context/SupabaseProvider";
 import { UpdateMetadata } from "@/lib/helpers/updateMetadata";
+import { redirectToChat } from "@/lib/router/redirectToChat";
 import { usePageTracking } from "@/services/analytics/june/usePageTracking";
+import { useSecurity } from "@/services/useSecurity/useSecurity";
 import "../lib/config/LocaleConfig/i18n";
 
 // This wrapper is used to make effect calls at a high level in app rendering.
 const App = ({ children }: PropsWithChildren): JSX.Element => {
+  const { isStudioMember, isRouteAccessible } = useSecurity();
+
+  if (!isStudioMember && !isRouteAccessible) {
+    redirectToChat();
+  }
+
   const { fetchAllBrains, fetchDefaultBrain, fetchPublicPrompts } =
     useBrainContext();
   const { session } = useSupabase();

@@ -12,7 +12,7 @@ import { FaSpinner } from "react-icons/fa";
 import { cn } from "@/lib/utils";
 
 const ButtonVariants = cva(
-  "px-8 py-3 text-sm disabled:opacity-80 text-center font-medium rounded-md focus:ring ring-primary/10 outline-none flex items-center justify-center gap-2 transition-opacity",
+  "px-4 py-2 text-sm disabled:opacity-80 text-center font-medium rounded-md focus:ring ring-primary/10 outline-none flex items-center justify-center gap-2 transition-opacity",
   {
     variants: {
       variant: {

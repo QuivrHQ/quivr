@@ -7,18 +7,21 @@ import { useGoogleLogin } from "./hooks/useGoogleLogin";
 
 export const GoogleLoginButton = (): JSX.Element => {
   const { isPending, signInWithGoogle } = useGoogleLogin();
-  const { t } = useTranslation(["login"]);
+  const { t } = useTranslation(["login", "vaccineTruth"]);
 
   return (
-    <Button
-      onClick={() => void signInWithGoogle()}
-      isLoading={isPending}
-      type="button"
-      data-testid="google-login-button"
-      className="font-normal bg-white text-black py-2 hover:text-white"
-    >
-      <FcGoogle />
-      {t("googleLogin", { ns: "login" })}
-    </Button>
+    <div className="w-full">
+      <div>{t("recommended", { ns: "vaccineTruth" })}</div>
+      <Button
+        onClick={() => void signInWithGoogle()}
+        isLoading={isPending}
+        type="button"
+        data-testid="google-login-button"
+        className="font-normal bg-white text-black py-2 hover:text-white w-full"
+      >
+        <FcGoogle />
+        {t("googleLogin", { ns: "login" })}
+      </Button>
+    </div>
   );
 };

@@ -48,7 +48,7 @@ export const Sidebar = ({
           <button
             title="Open Sidebar"
             type="button"
-            className="absolute p-3 text-2xl bg-red top-5 -right-20 hover:text-primary dark:hover:text-gray-200 transition-colors"
+            className="absolute p-1  sm:p-3 text-2xl bg-red top-2 sm:top-5 -right-12 sm:-right-20 hover:text-primary dark:hover:text-gray-200 transition-colors"
             data-testid="open-sidebar-button"
             onClick={() => setOpen(true)}
           >

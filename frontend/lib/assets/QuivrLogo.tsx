@@ -9,16 +9,16 @@ export const QuivrLogo = ({
   size,
   color = "white",
 }: QuivrLogoProps): JSX.Element => {
-  const src = color === "primary" ? "/logo-primary.svg" : "/logo-white.svg";
   const filter = color === "black" ? "invert(1)" : "none";
 
   return (
     <Image
-      src={src}
+      src={"/vt-logo.png"}
       alt="Quivr Logo"
       width={size}
       height={size}
       style={{ filter }}
+      className="rounded-full h-8 w-8"
     />
   );
 };
