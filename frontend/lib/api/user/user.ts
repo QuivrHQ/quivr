@@ -4,10 +4,11 @@ import { UUID } from "crypto";
 import { UserStats } from "@/lib/types/User";
 
 export type UserIdentityUpdatableProperties = {
-  empty?: string | null;
+  openai_api_key?: string | null;
 };
 
 export type UserIdentity = {
+  openai_api_key?: string | null;
   user_id: UUID;
 };
 

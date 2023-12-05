@@ -5,6 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
+import { getChatsConfigFromLocalStorage } from "@/lib/api/chat/chat.local";
 import { CHATS_DATA_KEY } from "@/lib/api/chat/config";
 import { useChatApi } from "@/lib/api/chat/useChatApi";
 import { useChatContext } from "@/lib/context";
@@ -15,7 +16,6 @@ import { useOnboarding } from "@/lib/hooks/useOnboarding";
 import { useOnboardingTracker } from "@/lib/hooks/useOnboardingTracker";
 import { useEventTracking } from "@/services/analytics/june/useEventTracking";
 
-import { useLocalStorageChatConfig } from "./useLocalStorageChatConfig";
 import { ChatQuestion } from "../types";
 // eslint-disable-next-line import/order
 import { useQuestion } from "./useQuestion";
@@ -37,9 +37,6 @@ export const useChat = () => {
   const { currentBrain, currentPromptId, currentBrainId } = useBrainContext();
   const { publish } = useToast();
   const { createChat } = useChatApi();
-  const {
-    chatConfig: { model, maxTokens, temperature },
-  } = useLocalStorageChatConfig();
 
   const { addStreamQuestion } = useQuestion();
   const { t } = useTranslation(["chat"]);
@@ -84,17 +81,20 @@ export const useChat = () => {
         });
       }
 
+      const chatConfig = getChatsConfigFromLocalStorage();
+
       const chatQuestion: ChatQuestion = {
-        model,
+        model: chatConfig?.model,
         question,
-        temperature: temperature,
-        max_tokens: maxTokens,
+        temperature: chatConfig?.temperature,
+        max_tokens: chatConfig?.maxTokens,
         brain_id: currentBrain?.id,
         prompt_id: currentPromptId ?? undefined,
       };
 
-      callback?.();
       await addStreamQuestion(currentChatId, chatQuestion);
+
+      callback?.();
 
       if (shouldUpdateUrl) {
         router.replace(`/chat/${currentChatId}`);

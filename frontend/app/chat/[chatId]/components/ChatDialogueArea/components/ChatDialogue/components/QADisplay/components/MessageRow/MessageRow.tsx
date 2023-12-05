@@ -6,7 +6,7 @@ import { CopyButton } from "./components/CopyButton";
 import { MessageContent } from "./components/MessageContent";
 import { QuestionBrain } from "./components/QuestionBrain";
 import { QuestionPrompt } from "./components/QuestionPrompt";
-import { SourcesButton } from "./components/SourcesButton";
+import { SourcesButton } from "./components/SourcesButton"; // Import the new component
 import { useMessageRow } from "./hooks/useMessageRow";
 
 type MessageRowProps = {

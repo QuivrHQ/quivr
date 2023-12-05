@@ -47,6 +47,7 @@ export const useAddBrainConfig = () => {
     formState: { dirtyFields },
   } = useFormContext<CreateBrainProps>();
 
+  const openAiKey = watch("openai_api_key");
   const model = watch("model");
   const temperature = watch("temperature");
   const maxTokens = watch("max_tokens");
@@ -54,6 +55,7 @@ export const useAddBrainConfig = () => {
   const brainType = watch("brain_type");
 
   const accessibleModels = getAccessibleModels({
+    openAiKey,
     userData,
   });
 
@@ -79,7 +81,6 @@ export const useAddBrainConfig = () => {
     return undefined;
   };
 
-  // eslint-disable-next-line complexity
   const handleSubmit = async () => {
     const {
       name,
@@ -98,15 +99,6 @@ export const useAddBrainConfig = () => {
       return;
     }
 
-    if (description.trim() === "") {
-      publish({
-        variant: "danger",
-        text: t("descriptionRequired", { ns: "config" }),
-      });
-
-      return;
-    }
-
     try {
       setIsPending(true);
 
@@ -117,6 +109,7 @@ export const useAddBrainConfig = () => {
         description,
         max_tokens: maxTokens,
         model,
+        openai_api_key: openAiKey,
         temperature,
         prompt_id,
         status,

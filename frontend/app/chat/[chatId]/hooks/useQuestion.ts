@@ -1,13 +1,11 @@
 import { useTranslation } from "react-i18next";
 
-import { useChatContext } from "@/lib/context";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 import { useFetch, useToast } from "@/lib/hooks";
 
 import { ChatQuestion } from "../types";
 // eslint-disable-next-line import/order
 import { useHandleStream } from "./useHandleStream";
-import { generatePlaceHolderMessage } from "../utils/generatePlaceHolderMessage";
 
 interface UseChatService {
   addStreamQuestion: (
@@ -23,7 +21,6 @@ export const useQuestion = (): UseChatService => {
   const { t } = useTranslation(["chat"]);
   const { publish } = useToast();
   const { handleStream } = useHandleStream();
-  const { removeMessage, updateStreamingHistory } = useChatContext();
 
   const handleFetchError = async (response: Response) => {
     if (response.status === 429) {
@@ -40,6 +37,8 @@ export const useQuestion = (): UseChatService => {
       variant: "danger",
       text: errorMessage.detail,
     });
+
+    return;
   };
 
   const addStreamQuestion = async (
@@ -50,13 +49,6 @@ export const useQuestion = (): UseChatService => {
       "Content-Type": "application/json",
       Accept: "text/event-stream",
     };
-
-    const placeHolderMessage = generatePlaceHolderMessage({
-      user_message: chatQuestion.question ?? "",
-      chat_id: chatId,
-    });
-    updateStreamingHistory(placeHolderMessage);
-
     const body = JSON.stringify(chatQuestion);
 
     try {
@@ -75,9 +67,7 @@ export const useQuestion = (): UseChatService => {
         throw new Error(t("resposeBodyNull", { ns: "chat" }));
       }
 
-      await handleStream(response.body.getReader(), () =>
-        removeMessage(placeHolderMessage.message_id)
-      );
+      await handleStream(response.body.getReader());
     } catch (error) {
       publish({
         variant: "danger",

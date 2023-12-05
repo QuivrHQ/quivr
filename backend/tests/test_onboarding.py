@@ -1,6 +1,4 @@
-from modules.onboarding.service.onboarding_service import OnboardingService
-
-onboardingService = OnboardingService()
+from repository.onboarding.create_user_onboarding import create_user_onboarding
 
 
 def test_remove_onboarding(client, api_key):
@@ -21,9 +19,7 @@ def test_remove_onboarding(client, api_key):
 def test_create_onboarding(client, api_key):
     response = client.get("/user", headers={"Authorization": "Bearer " + api_key})
 
-    create_user_onboarding_response = onboardingService.create_user_onboarding(
-        response.json().get("id")
-    )
+    create_user_onboarding_response = create_user_onboarding(response.json().get("id"))
     assert create_user_onboarding_response == {
         "onboarding_a": True,
         "onboarding_b1": True,
