@@ -66,5 +66,5 @@
   "manage_brain": "Управление мозгом",
   "brain_type": "Тип мозга",
   "brain_params": "Параметры мозга",
-  "brain_data": "Данные мозга"
+  "resources": "Ресурсы" 
 }

@@ -19,7 +19,7 @@ export const useBrainCreationSteps = () => {
       value: "BRAIN_PARAMS",
     },
     {
-      label: t("brain_data"),
+      label: t("resources"),
       value: "KNOWLEDGE",
     },
   ];
