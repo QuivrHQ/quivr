@@ -1,6 +1,7 @@
 import { FormProvider, useForm } from "react-hook-form";
 
 import { addBrainDefaultValues } from "@/lib/config/defaultBrainConfig";
+import { KnowledgeToFeedProvider } from "@/lib/context";
 
 import { AddBrainSteps } from "./components/AddBrainSteps/AddBrainSteps";
 import { CreateBrainProps } from "./types";
@@ -24,7 +25,9 @@ export const AddBrainModal = ({
 
   return (
     <FormProvider {...methods}>
-      <AddBrainSteps triggerClassName={triggerClassName} />
+      <KnowledgeToFeedProvider>
+        <AddBrainSteps triggerClassName={triggerClassName} />
+      </KnowledgeToFeedProvider>
     </FormProvider>
   );
 };
