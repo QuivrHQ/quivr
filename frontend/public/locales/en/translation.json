@@ -30,5 +30,8 @@
   "invalidUrl": "Invalid URL",
   "crawlButton": "Crawl",
   "themeSelect": "Interface theme",
-  "languageSelect": "Preferred language"
+  "languageSelect": "Preferred language",
+  "cancel": "Cancel",
+  "next": "Next",
+  "previous": "Previous"
 }

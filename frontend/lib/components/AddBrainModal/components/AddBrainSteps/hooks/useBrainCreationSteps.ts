@@ -3,13 +3,13 @@ import { useTranslation } from "react-i18next";
 
 import { CreateBrainProps } from "@/lib/components/AddBrainModal/types";
 
-import { StepperStep } from "../types";
+import { Step } from "../types";
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const useBrainCreationSteps = () => {
   const { t } = useTranslation("brain");
 
-  const steps: StepperStep[] = [
+  const steps: Step[] = [
     {
       label: t("brain_type"),
       value: "BRAIN_TYPE",
@@ -25,11 +25,11 @@ export const useBrainCreationSteps = () => {
   ];
   const { watch, setValue } = useFormContext<CreateBrainProps>();
   const currentStep = watch("brainCreationStep");
+  const currentStepIndex = steps.findIndex(
+    (step) => step.value === currentStep
+  );
 
   const goToNextStep = () => {
-    const currentStepIndex = steps.findIndex(
-      (step) => step.value === currentStep
-    );
     if (currentStepIndex === -1 || currentStepIndex === steps.length - 1) {
       return;
     }
@@ -39,9 +39,6 @@ export const useBrainCreationSteps = () => {
   };
 
   const goToPreviousStep = () => {
-    const currentStepIndex = steps.findIndex(
-      (step) => step.value === currentStep
-    );
     if (currentStepIndex === -1 || currentStepIndex === 0) {
       return;
     }
@@ -55,5 +52,6 @@ export const useBrainCreationSteps = () => {
     steps,
     goToNextStep,
     goToPreviousStep,
+    currentStepIndex,
   };
 };

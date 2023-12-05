@@ -1,4 +1,5 @@
 import { Fragment } from "react";
+import { useTranslation } from "react-i18next";
 import { FaArrowRight } from "react-icons/fa";
 
 import Button from "@/lib/components/ui/Button";
@@ -18,7 +19,7 @@ export const BrainTypeSelectionStep = ({
   const { knowledgeSourceOptions } = useKnowledgeSourceLabel();
   const { register } = useBrainTypeSelectionStep();
   const { goToNextStep, currentStep } = useBrainCreationSteps();
-
+  const { t } = useTranslation(["translation"]);
   if (currentStep !== "BRAIN_TYPE") {
     return <Fragment />;
   }
@@ -36,7 +37,7 @@ export const BrainTypeSelectionStep = ({
           variant="tertiary"
           onClick={onCancelBrainCreation}
         >
-          Annuler
+          {t("cancel")}
         </Button>
 
         <Button
@@ -45,7 +46,7 @@ export const BrainTypeSelectionStep = ({
           data-testid="create-brain-submit-button"
           onClick={goToNextStep}
         >
-          Suivant
+          {t("next")}
           <FaArrowRight className="text-xl" size={16} />
         </Button>
       </div>
