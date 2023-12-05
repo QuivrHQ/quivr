@@ -49,6 +49,7 @@
   "myBrains": "Meus cérebros",
   "knowledge_source_doc": "Documentos",
   "knowledge_source_api": "API",
+  "knowledge_source_chatflow":"Rede de cérebro",
   "knowledge_source_label": "Fonte de conhecimento",
   "api_brain":{
     "name": "Name",
@@ -62,5 +63,8 @@
   "update_secrets_button": "Atualizar segredos",
   "secrets_updated": "Segredos atualizados",
   "secrets_update_error": "Erro ao atualizar segredos",
-  "manage_brain": "Gerenciar cérebro"
+  "manage_brain": "Gerenciar cérebro",
+  "brain_type": "Tipo de cérebro",
+  "brain_params": "Parâmetros do cérebro",
+  "brain_data": "Dados do cérebro"
 }

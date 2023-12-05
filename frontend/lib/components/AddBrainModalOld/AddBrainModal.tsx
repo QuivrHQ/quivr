@@ -2,8 +2,8 @@ import { FormProvider, useForm } from "react-hook-form";
 
 import { addBrainDefaultValues } from "@/lib/config/defaultBrainConfig";
 
-import { AddBrainSteps } from "./components/AddBrainSteps/AddBrainSteps";
-import { CreateBrainProps } from "./types";
+import { AddBrainConfig } from "./components/AddBrainConfig/AddBrainConfig";
+import { CreateBrainProps } from "./components/AddBrainConfig/types";
 
 type AddBrainModalProps = {
   triggerClassName?: string;
@@ -14,8 +14,11 @@ export const AddBrainModal = ({
 }: AddBrainModalProps): JSX.Element => {
   const defaultValues: CreateBrainProps = {
     ...addBrainDefaultValues,
+    prompt: {
+      title: "",
+      content: "",
+    },
     setDefault: true,
-    brainCreationStep: "BRAIN_TYPE",
   };
 
   const methods = useForm<CreateBrainProps>({
@@ -24,7 +27,7 @@ export const AddBrainModal = ({
 
   return (
     <FormProvider {...methods}>
-      <AddBrainSteps triggerClassName={triggerClassName} />
+      <AddBrainConfig triggerClassName={triggerClassName} />
     </FormProvider>
   );
 };
