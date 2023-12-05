@@ -1,6 +1,6 @@
 import { BrainCreationStep } from "../../types";
 
-export type StepperStep = {
+export type Step = {
   label: string;
   value: BrainCreationStep;
 };
