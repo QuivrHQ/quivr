@@ -13,7 +13,7 @@ test_file_original_name = (
 )
 enable_summarization = False
 brain_id = "8cd2e1fd-8aa4-43d5-bd33-a24bfbdfb5ad"
-openai_api_key = "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"
+openai_api_key = ""
 
 # file_sha1 = 22b77dd61e05a6d3b64643be62b8edd71ca66cae
 
