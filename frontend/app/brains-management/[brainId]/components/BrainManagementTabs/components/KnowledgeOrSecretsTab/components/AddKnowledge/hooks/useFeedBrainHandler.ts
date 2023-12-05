@@ -1,9 +1,8 @@
 import { UUID } from "crypto";
 
 import { useKnowledgeToFeedInput } from "@/lib/components/KnowledgeToFeedInput/hooks/useKnowledgeToFeedInput.ts";
+import { useKnowledgeToFeedFilesAndUrls } from "@/lib/hooks/useKnowledgeToFeed";
 import { useOnboarding } from "@/lib/hooks/useOnboarding";
-
-import { useKnowledgeToFeed } from "./useKnowledgeToFeed";
 
 type FeedBrainProps = {
   brainId: UUID;
@@ -11,7 +10,7 @@ type FeedBrainProps = {
 };
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const useFeedBrainHandler = () => {
-  const { files, urls } = useKnowledgeToFeed();
+  const { files, urls } = useKnowledgeToFeedFilesAndUrls();
   const { crawlWebsiteHandler, uploadFileHandler } = useKnowledgeToFeedInput();
   const { updateOnboarding, onboarding } = useOnboarding();
 
