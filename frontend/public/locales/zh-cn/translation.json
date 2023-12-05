@@ -30,5 +30,8 @@
   "invalidUrl": "无效的 URL",
   "crawlButton": "爬取",
   "themeSelect": "主题",
-  "languageSelect": "首选语言"
+  "languageSelect": "首选语言",
+  "cancel": "取消",
+  "next": "下一个",
+  "previous": "上一个"
 }

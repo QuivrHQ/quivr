@@ -1,5 +1,87 @@
 # Changelog
 
+## 0.0.128 (2023-12-05)
+
+## What's Changed
+* feat: track response source usage by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1810
+* doc: add VirtioFS instruction for MacOS users by @tarek-ayed in https://github.com/StanGirard/quivr/pull/1813
+* refactor: chat for multibrains by @gozineb in https://github.com/StanGirard/quivr/pull/1812
+* feat(prebuilt): prebuild backend image for faster compilation by @StanGirard in https://github.com/StanGirard/quivr/pull/1815
+* fix: text not clear in dark mode by @Jezla in https://github.com/StanGirard/quivr/pull/1804
+* fix: celery config typo by @yonmey in https://github.com/StanGirard/quivr/pull/1776
+* feat: add brain creation steps system by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1814
+
+## New Contributors
+* @tarek-ayed made their first contribution in https://github.com/StanGirard/quivr/pull/1813
+* @Jezla made their first contribution in https://github.com/StanGirard/quivr/pull/1804
+* @yonmey made their first contribution in https://github.com/StanGirard/quivr/pull/1776
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.127...v0.0.128
+
+## 0.0.127 (2023-12-04)
+
+## What's Changed
+* feat(api-keys): added customization by @StanGirard in https://github.com/StanGirard/quivr/pull/1802
+* feat(embedding): now 100 times faster ⚡️🔥 by @StanGirard in https://github.com/StanGirard/quivr/pull/1807
+* fix: update editor state update logic by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1809
+
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.126...v0.0.127
+
+## 0.0.126 (2023-12-03)
+
+## What's Changed
+* feat: add optimistic update on new message by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1764
+* feat: update models logic by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1767
+* refactor: to modules by @gozineb in https://github.com/StanGirard/quivr/pull/1754
+* feat(supabase): local installation made easy by @StanGirard in https://github.com/StanGirard/quivr/pull/1777
+* feat(install): it now takes 30 seconds to install Quivr by @StanGirard in https://github.com/StanGirard/quivr/pull/1780
+* feat: 🎸 install by @StanGirard in https://github.com/StanGirard/quivr/pull/1784
+* fix(url): crawling fixed by @StanGirard in https://github.com/StanGirard/quivr/pull/1785
+* docs: fix typo in name of docker compose dev file by @iMADi-ARCH in https://github.com/StanGirard/quivr/pull/1800
+
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.125...v0.0.126
+
+## 0.0.125 (2023-11-30)
+
+## What's Changed
+* fix(api): fixed issue with name function and ilmproved promtp by @StanGirard in https://github.com/StanGirard/quivr/pull/1759
+* fix: update mention suggestion filtering logic by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1763
+
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.124...v0.0.125
+
+## 0.0.124 (2023-11-29)
+
+## What's Changed
+* feat(chatInput): use tiptap editor by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1752
+* docs: update guidelines.md by @eltociear in https://github.com/StanGirard/quivr/pull/1755
+* Feat/local llm bug fix by @StanGirard in https://github.com/StanGirard/quivr/pull/1758
+
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.123...v0.0.124
+
+## 0.0.123 (2023-11-29)
+
+## What's Changed
+* chore: downgrade versions by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1748
+* fix: revert implement local llms by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1749
+
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.122...v0.0.123
+
+## 0.0.122 (2023-11-29)
+
+## What's Changed
+* refactor: Notification module by @gozineb in https://github.com/StanGirard/quivr/pull/1740
+* refactor: remove explore route from back & front by @gozineb in https://github.com/StanGirard/quivr/pull/1741
+* feat: implement local llms by @StanGirard in https://github.com/StanGirard/quivr/pull/1745
+* refactor: knowledge module by @gozineb in https://github.com/StanGirard/quivr/pull/1743
+
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.121...v0.0.122
+
 ## 0.0.121 (2023-11-28)
 
 ## What's Changed

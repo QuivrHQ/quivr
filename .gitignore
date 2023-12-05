@@ -59,7 +59,6 @@ backend/core/application_default_credentials.json
 backend/core/local_models/*
 
 ## scripts
-.migration_info
 package-lock.json
 backend/celerybeat-schedule
 frontend/public/robots.txt
@@ -75,3 +74,6 @@ backend/slim.report.json
 ## some PDFs
 backend/Building_Codes/**
 tmp-file-*
+
+volumes/db/data/
+volumes/storage/stub/stub/quivr/*

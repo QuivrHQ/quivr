@@ -1,9 +1,7 @@
 from fastapi import HTTPException
-from llm.utils.extract_api_definition import (
-    format_api_brain_property,
-)
+from llm.utils.extract_api_definition import format_api_brain_property
 from llm.utils.sanitize_function_name import sanitize_function_name
-from models.brain_entity import BrainEntity
+from modules.brain.entity.brain_entity import BrainEntity
 from repository.api_brain_definition.get_api_brain_definition import (
     get_api_brain_definition,
 )

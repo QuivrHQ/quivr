@@ -1,4 +1,6 @@
-from models.ApiBrainDefinition import ApiBrainDefinitionSchemaProperty
+from modules.brain.entity.api_brain_definition_entity import (
+    ApiBrainDefinitionSchemaProperty,
+)
 
 
 def format_api_brain_property(property: ApiBrainDefinitionSchemaProperty):

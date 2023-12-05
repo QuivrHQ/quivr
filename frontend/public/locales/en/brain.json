@@ -50,6 +50,7 @@
   "knowledge_source_doc": "Documents",
   "knowledge_source_api": "App (Through API)",
   "knowledge_source_label": "Knowledge source",
+  "knowledge_source_chatflow":"Brain network",
   "api_brain": {
     "name": "Name",
     "description": "Description",
@@ -62,5 +63,8 @@
   "update_secrets_button":"Update secrets",
   "secrets_updated":"Secrets updated",
   "secrets_update_error":"Error while updating secrets",
-  "manage_brain": "Manage brain"
+  "manage_brain": "Manage brain",
+  "brain_type":"Type of brain",
+  "brain_params":"Brain params",
+  "brain_data":"Brain data"
 }

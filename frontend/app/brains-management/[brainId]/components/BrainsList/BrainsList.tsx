@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { useTranslation } from "react-i18next";
 
-import { AddBrainModal } from "@/lib/components/AddBrainModal/AddBrainModal";
+import { AddBrainModal } from "@/lib/components/AddBrainModal";
 import { Sidebar } from "@/lib/components/Sidebar/Sidebar";
 import Button from "@/lib/components/ui/Button";
 

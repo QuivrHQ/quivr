@@ -2,12 +2,12 @@ from enum import Enum
 from typing import Optional
 from uuid import UUID
 
-from models.ApiBrainDefinition import (
+from models.databases.repository import Repository
+from modules.brain.entity.api_brain_definition_entity import (
     ApiBrainDefinition,
     ApiBrainDefinitionSchema,
     ApiBrainDefinitionSecret,
 )
-from models.databases.repository import Repository
 from pydantic import BaseModel, Extra
 
 
