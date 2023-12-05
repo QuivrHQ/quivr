@@ -21,11 +21,15 @@ export const BrainKnowledgeStep = ({
   const { brainType, isSubmitButtonDisabled } = useBrainKnowledgeStep();
   const { t } = useTranslation(["translation"]);
   const { goToPreviousStep, currentStep } = useBrainCreationSteps();
-  const { createBrain } = useBrainCreationHandler();
+  const { handleCreateBrain, isBrainCreationPending } = useBrainCreationHandler(
+    {
+      closeBrainCreationModal: onCancelBrainCreation,
+    }
+  );
 
   const brainTypeToKnowledgeComponent: Record<BrainType, JSX.Element> = {
-    api: <ApiRequestDefinition />,
     doc: <KnowledgeToFeedInput />,
+    api: <ApiRequestDefinition />,
     chatflow: <div>Coming soon</div>,
   };
 
@@ -42,6 +46,7 @@ export const BrainKnowledgeStep = ({
           variant="tertiary"
           onClick={onCancelBrainCreation}
           className="text-primary"
+          disabled={isBrainCreationPending}
         >
           {t("cancel", { ns: "translation" })}
         </Button>
@@ -51,6 +56,7 @@ export const BrainKnowledgeStep = ({
             variant="secondary"
             onClick={goToPreviousStep}
             className="py-2 border-primary text-primary"
+            disabled={isBrainCreationPending}
           >
             <FaArrowLeft className="text-xl" size={16} />
             {t("previous", { ns: "translation" })}
@@ -59,8 +65,9 @@ export const BrainKnowledgeStep = ({
           <Button
             className="bg-primary text-white py-2 border-none"
             type="button"
-            onClick={createBrain}
-            disabled={isSubmitButtonDisabled}
+            onClick={() => void handleCreateBrain()}
+            disabled={isSubmitButtonDisabled || isBrainCreationPending}
+            isLoading={isBrainCreationPending}
           >
             {t("createButton", { ns: "translation" })}
           </Button>
