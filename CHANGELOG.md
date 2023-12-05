@@ -1,5 +1,23 @@
 # Changelog
 
+## 0.0.128 (2023-12-05)
+
+## What's Changed
+* feat: track response source usage by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1810
+* doc: add VirtioFS instruction for MacOS users by @tarek-ayed in https://github.com/StanGirard/quivr/pull/1813
+* refactor: chat for multibrains by @gozineb in https://github.com/StanGirard/quivr/pull/1812
+* feat(prebuilt): prebuild backend image for faster compilation by @StanGirard in https://github.com/StanGirard/quivr/pull/1815
+* fix: text not clear in dark mode by @Jezla in https://github.com/StanGirard/quivr/pull/1804
+* fix: celery config typo by @yonmey in https://github.com/StanGirard/quivr/pull/1776
+* feat: add brain creation steps system by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1814
+
+## New Contributors
+* @tarek-ayed made their first contribution in https://github.com/StanGirard/quivr/pull/1813
+* @Jezla made their first contribution in https://github.com/StanGirard/quivr/pull/1804
+* @yonmey made their first contribution in https://github.com/StanGirard/quivr/pull/1776
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.127...v0.0.128
+
 ## 0.0.127 (2023-12-04)
 
 ## What's Changed
