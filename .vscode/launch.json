@@ -19,6 +19,14 @@
                 }
             ],
             "justMyCode": true
+        },
+        {
+            "name": "Python: Debug Test Script",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/backend/test_process_file_and_notify.py",
+            "console": "integratedTerminal",
+            "justMyCode": false
         }
     ]
 }
