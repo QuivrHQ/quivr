@@ -228,6 +228,13 @@ class BrainService:
             )
             brain.brain_definition = brain_definition
 
+        if brain.brain_type == BrainType.COMPOSITE:
+            brain.connected_brains_ids = (
+                self.composite_brains_connections_repository.get_connected_brains(
+                    brain_id
+                )
+            )
+        print("BRAIN", brain)
         return brain
 
     def get_public_brains(self) -> list[PublicBrain]:

@@ -21,8 +21,8 @@ class CompositeBrainsConnections(CompositeBrainsConnectionsInterface):
             self.db.table("composite_brain_connections")
             .insert(
                 {
-                    "composite_brain_id": composite_brain_id,
-                    "connected_brain_id": connected_brain_id,
+                    "composite_brain_id": str(composite_brain_id),
+                    "connected_brain_id": str(connected_brain_id),
                 }
             )
             .execute()
