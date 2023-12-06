@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.0.129 (2023-12-06)
+
+## What's Changed
+* feat(requirements): update aws version by @StanGirard in https://github.com/StanGirard/quivr/pull/1819
+* feat: add brain creation step 2 by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1823
+* feat: composite brains db by @gozineb in https://github.com/StanGirard/quivr/pull/1826
+* feat: finalise steps based brain creation by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1825
+
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.128...v0.0.129
+
 ## 0.0.128 (2023-12-05)
 
 ## What's Changed
