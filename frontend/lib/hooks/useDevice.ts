@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 const MOBILE_MAX_WIDTH = 640;
 
 export const useDevice = (): { isMobile: boolean } => {
-  const [isMobile, setIsMobile] = useState(true);
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
     const handleResize = () => {
