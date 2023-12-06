@@ -13,6 +13,7 @@
   "shareBrainUsers": "Usuários com acesso",
   "shareBrainLink": "Clique para copiar o link de compartilhamento",
   "copiedToClipboard": "Copiado para a área de transferência",
+  "composite_brain_composition_invitation": "Conecte seu novo cérebro a outros cérebros existentes em sua biblioteca selecionando-os.",
   "inviteUsers": "Adicionar novos usuários",
   "usersInvited": "Usuários convidados com sucesso",
   "errorSendingInvitation": "Um erro ocorreu ao enviar o(s) convite(s)",
@@ -49,7 +50,7 @@
   "myBrains": "Meus cérebros",
   "knowledge_source_doc": "Documentos",
   "knowledge_source_api": "API",
-   "knowledge_source_chatflow": "Agente",
+   "knowledge_source_composite_brain": "Agente",
   "knowledge_source_label": "Fonte de conhecimento",
   "api_brain":{
     "name": "Name",

@@ -13,6 +13,7 @@
   "shareBrainUsers": "具有访问权限的用户",
   "shareBrainLink": "点击复制链接来分享大脑",
   "copiedToClipboard": "已复制到剪贴板",
+  "composite_brain_composition_invitation": "通过选择将您的新大脑连接到现有的其他大脑来进行组合。",
   "inviteUsers": "添加新用户",
   "usersInvited": "已成功邀请用户",
   "errorSendingInvitation": "发送邀请时发生错误",
@@ -49,7 +50,7 @@
   "myBrains": "我的大脑",
   "knowledge_source_doc": "文档",
   "knowledge_source_api": "API",
-  "knowledge_source_chatflow": "代理",
+  "knowledge_source_composite_brain": "代理",
   "knowledge_source_label": "知识来源",
   "api_brain":{
     "name": "名称",

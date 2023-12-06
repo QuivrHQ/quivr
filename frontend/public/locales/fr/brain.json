@@ -6,6 +6,7 @@
   "brainNamePlaceholder": "Ex. Notes d'histoire",
   "brainUndefined": "Cerveau non défini",
   "copiedToClipboard": "Copié dans le presse-papier",
+  "composite_brain_composition_invitation":"Connectez votre nouveau cerveau à d'autres cerveaux existants de votre librairie en les sélectionnant.",
   "defaultBrain": "Cerveau par défaut",
   "errorCreatingBrain": "Une erreur s'est produite lors de la création d'un cerveau",
   "errorFetchingBrainUsers": "Une erreur s'est produite lors de la récupération des utilisateurs du cerveau",
@@ -49,7 +50,7 @@
   "myBrains": "Mes cerveaux",
   "knowledge_source_doc": "Documents",
   "knowledge_source_api": "API",
-  "knowledge_source_chatflow": "Agent",
+  "knowledge_source_composite_brain": "Agent",
   "knowledge_source_label": "Source de connaissance",
   "api_brain": {
     "name": "Nom",

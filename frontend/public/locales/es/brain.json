@@ -6,6 +6,7 @@
   "brainNamePlaceholder": "Ejemplo: Anotaciones de historia",
   "brainUndefined": "Cerebro no definido",
   "copiedToClipboard": "Copiado al portapeles",
+  "composite_brain_composition_invitation": "Conecta tu nuevo cerebro a otros cerebros existentes de tu biblioteca seleccionándolos.",
   "defaultBrain": "Cerebro por defecto",
   "errorCreatingBrain": "Error al crear cerebro",
   "errorFetchingBrainUsers": "Error al obtener usuarios del cerebro",
@@ -49,7 +50,7 @@
   "myBrains": "Mis cerebros",
   "knowledge_source_doc": "Documentos",
   "knowledge_source_api": "API",
-  "knowledge_source_chatflow": "Agente",
+  "knowledge_source_composite_brain": "Agente",
   "knowledge_source_label": "Fuente de conocimiento",
   "api_brain":{
     "name": "Nombre",

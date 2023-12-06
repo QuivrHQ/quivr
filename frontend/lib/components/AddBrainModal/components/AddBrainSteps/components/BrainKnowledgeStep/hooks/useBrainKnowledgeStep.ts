@@ -7,13 +7,15 @@ export const useBrainKnowledgeStep = () => {
   const { watch } = useFormContext<CreateBrainProps>();
   const brainType = watch("brain_type");
   const url = watch("brain_definition.url");
+  const compositeBrainConnections = watch("connected_brains_ids") ?? [];
   const isApiBrain = brainType === "api";
-  const isChatflowBrain = brainType === "chatflow";
+  const isCompositeBrain = brainType === "composite";
 
   const isApiBrainDefinitionsFilled = url !== "";
 
   const isSubmitButtonDisabled =
-    isChatflowBrain || (isApiBrain && !isApiBrainDefinitionsFilled);
+    (isCompositeBrain && compositeBrainConnections.length === 0) ||
+    (isApiBrain && !isApiBrainDefinitionsFilled);
 
   return {
     brainType,

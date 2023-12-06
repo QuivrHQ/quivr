@@ -13,6 +13,7 @@
   "shareBrainUsers": "Пользователи с доступом",
   "shareBrainLink": "Нажмите, чтобы скопировать ссылку для совместного использования мозга",
   "copiedToClipboard": "Скопировано в буфер обмена",
+  "composite_brain_composition_invitation": "Подключите свой новый мозг к другим существующим мозгам из вашей библиотеки, выбрав их.",
   "inviteUsers": "Добавить новых пользователей",
   "usersInvited": "Пользователи успешно приглашены",
   "errorSendingInvitation": "Ошибка при отправке приглашений",
@@ -49,7 +50,7 @@
   "myBrains": "Мои мозги",
   "knowledge_source_doc": "Документы",
   "knowledge_source_api": "API",
-  "knowledge_source_chatflow": "Агент",
+  "knowledge_source_composite_brain": "Агент",
   "knowledge_source_label": "Источник знаний",
   "api_brain":{
     "name": "Название",

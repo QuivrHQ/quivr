@@ -49,6 +49,7 @@ export type CreateBrainInput = {
   brain_type?: BrainType;
   brain_definition?: Omit<ApiBrainDefinition, "brain_id">;
   brain_secrets_values?: Record<string, string>;
+  connected_brains_ids?: UUID[];
 };
 
 export type UpdateBrainInput = Partial<CreateBrainInput>;

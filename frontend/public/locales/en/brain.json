@@ -13,6 +13,7 @@
   "shareBrainUsers": "Users with access",
   "shareBrainLink": "Click to copy link to share your brain",
   "copiedToClipboard": "Copied to clipboard",
+  "composite_brain_composition_invitation": "Connect your new brain to other existing brains from your library by selecting them.",
   "inviteUsers": "Add new users",
   "usersInvited": "Users successfully invited",
   "errorSendingInvitation": "An error occurred while sending invitations",
@@ -50,7 +51,7 @@
   "knowledge_source_doc": "Documents",
   "knowledge_source_api": "App (Through API)",
   "knowledge_source_label": "Knowledge source",
-  "knowledge_source_chatflow":"Agent",
+  "knowledge_source_composite_brain":"Agent",
   "api_brain": {
     "name": "Name",
     "description": "Description",

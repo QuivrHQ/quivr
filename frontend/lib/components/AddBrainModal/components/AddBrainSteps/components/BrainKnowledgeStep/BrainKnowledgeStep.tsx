@@ -6,6 +6,7 @@ import { ApiRequestDefinition } from "@/lib/components/ApiRequestDefinition";
 import Button from "@/lib/components/ui/Button";
 import { BrainType } from "@/lib/types/brainConfig";
 
+import { CompositeBrainConnections } from "./components/CompositeBrainConnections/CompositeBrainConnections";
 import { KnowledgeToFeedInput } from "./components/KnowledgeToFeedInput";
 import { useBrainCreationHandler } from "./hooks/useBrainCreationHandler";
 import { useBrainKnowledgeStep } from "./hooks/useBrainKnowledgeStep";
@@ -30,7 +31,7 @@ export const BrainKnowledgeStep = ({
   const brainTypeToKnowledgeComponent: Record<BrainType, JSX.Element> = {
     doc: <KnowledgeToFeedInput />,
     api: <ApiRequestDefinition />,
-    chatflow: <div>Coming soon</div>,
+    composite: <CompositeBrainConnections />,
   };
 
   if (currentStep !== "KNOWLEDGE" || brainType === undefined) {
