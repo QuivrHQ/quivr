@@ -5,6 +5,12 @@ from uuid import UUID
 
 from langchain.callbacks.streaming_aiter import AsyncIteratorCallbackHandler
 from langchain.chains import ConversationalRetrievalChain
+from llm.qa_interface import QAInterface
+from llm.rags.quivr_rag import QuivrRAG
+from llm.rags.rag_interface import RAGInterface
+from llm.utils.format_chat_history import format_chat_history
+from llm.utils.get_prompt_to_use import get_prompt_to_use
+from llm.utils.get_prompt_to_use_id import get_prompt_to_use_id
 from logger import get_logger
 from models import BrainSettings
 from modules.brain.service.brain_service import BrainService
@@ -13,13 +19,6 @@ from modules.chat.dto.inputs import CreateChatHistory
 from modules.chat.dto.outputs import GetChatHistoryOutput
 from modules.chat.service.chat_service import ChatService
 from pydantic import BaseModel
-
-from llm.qa_interface import QAInterface
-from llm.rags.quivr_rag import QuivrRAG
-from llm.rags.rag_interface import RAGInterface
-from llm.utils.format_chat_history import format_chat_history
-from llm.utils.get_prompt_to_use import get_prompt_to_use
-from llm.utils.get_prompt_to_use_id import get_prompt_to_use_id
 
 logger = get_logger(__name__)
 QUIVR_DEFAULT_PROMPT = "Your name is Quivr. You're a helpful assistant.  If you don't know the answer, just say that you don't know, don't try to make up an answer."
@@ -89,10 +88,12 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
 
     @property
     def prompt_to_use(self):
+        # TODO: move to prompt service or instruction or something
         return get_prompt_to_use(UUID(self.brain_id), self.prompt_id)
 
     @property
     def prompt_to_use_id(self) -> Optional[UUID]:
+        # TODO: move to prompt service or instruction or something
         return get_prompt_to_use_id(UUID(self.brain_id), self.prompt_id)
 
     def generate_answer(

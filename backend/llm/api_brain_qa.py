@@ -6,19 +6,18 @@ from uuid import UUID
 import nest_asyncio
 from fastapi import HTTPException
 from litellm import completion
-from logger import get_logger
-from modules.brain.service.brain_service import BrainService
-from modules.chat.dto.chats import ChatQuestion
-from modules.chat.dto.inputs import CreateChatHistory
-from modules.chat.dto.outputs import GetChatHistoryOutput
-from modules.chat.service.chat_service import ChatService
-
 from llm.knowledge_brain_qa import KnowledgeBrainQA
 from llm.qa_interface import QAInterface
 from llm.utils.call_brain_api import call_brain_api
 from llm.utils.get_api_brain_definition_as_json_schema import (
     get_api_brain_definition_as_json_schema,
 )
+from logger import get_logger
+from modules.brain.service.brain_service import BrainService
+from modules.chat.dto.chats import ChatQuestion
+from modules.chat.dto.inputs import CreateChatHistory
+from modules.chat.dto.outputs import GetChatHistoryOutput
+from modules.chat.service.chat_service import ChatService
 
 brain_service = BrainService()
 chat_service = ChatService()
