@@ -39,7 +39,7 @@ brain_service = BrainService()
 chat_service = ChatService()
 
 
-class QABaseBrainPicking(BaseModel):
+class KnowledgeBrainQA(BaseModel):
     """
     Main class for the Brain Picking functionality.
     It allows to initialize a Chat model, generate questions and retrieve answers using ConversationalRetrievalChain.
