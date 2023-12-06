@@ -1,6 +1,8 @@
 {
   "actions_bar_placeholder": "Faça uma pergunta a um @cérebro e escolha sua #prompt",
+  "add_content_card_button_tooltip": "Adicionar conhecimento a um cérebro",
   "ask": "Faça uma pergunta ou descreva uma tarefa.",
+  "back_to_chat": "Voltar para o chat",
   "brain": "cérebro",
   "brains": "cérebros",
   "chat": "Conversa",
@@ -11,12 +13,30 @@
   "errorDeleting": "Erro ao excluir a conversa: {{error}}",
   "errorFetching": "Ocorreu um erro ao buscar suas conversas",
   "errorParsingData": "Erro ao analisar os dados",
+  "feed_brain_placeholder": "Escolha qual @cérebro você deseja alimentar com esses arquivos",
+  "feedingBrain": "Seu conhecimento recém-adicionado está sendo processado, você pode continuar conversando enquanto isso!",
   "keyboard_shortcuts": "Atalhos do teclado",
   "limit_reached": "Você atingiu o limite de solicitações, por favor, tente novamente mais tarde",
+  "missing_brain": "Cérebro não encontrado",
+  "new_prompt": "Criar novo prompt",
   "noCurrentBrain": "Nenhum cérebro selecionado",
+  "onboarding": {
+    "answer": {
+      "how_to_use_quivr": "Verifique a documentação em https://brain.quivr.app/docs/intro.html",
+      "what_is_brain": "Um cérebro é uma pasta virtual para organizar informações sobre um tópico específico. Ele pode armazenar documentos e se conectar a aplicativos ou APIs externas. Por exemplo, um cérebro 'Ciência Médica' poderia conter dados relacionados à saúde, e um cérebro 'Jurídico' poderia ter informações legais. Os cérebros podem ser tornados públicos para que outros os usem sem revelar o conteúdo, promovendo o compartilhamento de conhecimento.",
+      "what_is_quivr": "Quivr é um assistente útil. Você pode facilmente arrastar e soltar arquivos no chat ou na seção de conhecimento para interagir com eles. Não é apenas uma ferramenta de chat; você também pode se comunicar com aplicativos usando APIs.\nPara manter seu trabalho organizado, você pode criar cérebros, essencialmente pastas virtuais, e se inscrever nos cérebros de outras pessoas na seção de exploração para colaboração e compartilhamento de informações perfeitos."
+    },
+    "how_to_use_quivr": "Como usar o Quivr?",
+    "step_1_1": "1. Arraste e solte o arquivo no chat ou no 📎.",
+    "step_1_2": "Não tem um arquivo? Baixe 'Documentação do Quivr'",
+    "step_2": "2. Comece a conversar com seu arquivo",
+    "step_3": "3. Divirta-se!",
+    "title": "Oi 👋🏻 Quer descobrir o Quivr ? 😇",
+    "what_is_brain": "O que é um cérebro?",
+    "what_is_quivr": "O que é o Quivr?"
+  },
   "receivedResponse": "Resposta recebida. Iniciando o processamento do fluxo...",
   "resposeBodyNull": "O corpo da resposta está vazio",
-  "tooManyRequests": "Você excedeu o número de solicitações por dia. Para continuar conversando, insira uma chave de API da OpenAI em seu perfil ou no cérebro utilizado.",
   "shortcut_choose_prompt": "#: Escolha um prompt específico",
   "shortcut_create_brain": "@+: Crie um novo cérebro",
   "shortcut_create_prompt": "#+: Crie um novo prompt personalizado",
@@ -29,26 +49,6 @@
   "subtitle": "Converse com um modelo de linguagem sobre seus dados enviados",
   "thinking": "Pensando...",
   "title": "Converse com {{brain}}",
-  "missing_brain": "Cérebro não encontrado",
-  "new_prompt": "Criar novo prompt",
-  "feed_brain_placeholder": "Escolha qual @cérebro você deseja alimentar com esses arquivos",
-  "feedingBrain": "Seu conhecimento recém-adicionado está sendo processado, você pode continuar conversando enquanto isso!",
-  "add_content_card_button_tooltip": "Adicionar conhecimento a um cérebro",
-  "back_to_chat": "Voltar para o chat",
-  "onboarding": {
-    "title": "Oi 👋🏻 Quer descobrir o Quivr ? 😇",
-    "step_1_1": "1. Arraste e solte o arquivo no chat ou no 📎.",
-    "step_1_2": "Não tem um arquivo? Baixe 'Documentação do Quivr'",
-    "step_2": "2. Comece a conversar com seu arquivo",
-    "step_3": "3. Divirta-se!",
-    "how_to_use_quivr": "Como usar o Quivr?",
-    "what_is_quivr": "O que é o Quivr?",
-    "what_is_brain": "O que é um cérebro?",
-    "answer": {
-      "how_to_use_quivr": "Consulte a documentação em https://brain.quivr.app/docs/intro.html",
-      "what_is_quivr": "Quivr é um assistente útil.",
-      "what_is_brain": "Um cérebro contém conhecimento."
-    }
-  },
+  "tooManyRequests": "Você excedeu o número de solicitações por dia. Para continuar conversando, insira uma chave de API da OpenAI em seu perfil ou no cérebro utilizado.",
   "welcome": "Bem-vindo"
 }
