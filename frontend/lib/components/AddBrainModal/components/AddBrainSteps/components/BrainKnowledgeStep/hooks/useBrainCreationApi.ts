@@ -95,6 +95,12 @@ export const useBrainCreationApi = ({
         text: t("brainCreated", { ns: "brain" }),
       });
     },
+    onError: () => {
+      publish({
+        variant: "danger",
+        text: t("errorCreatingBrain", { ns: "brain" }),
+      });
+    },
   });
 
   return {
