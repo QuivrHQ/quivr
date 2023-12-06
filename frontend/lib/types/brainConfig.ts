@@ -6,7 +6,7 @@ export const brainStatuses = ["private", "public"] as const;
 
 export type BrainStatus = (typeof brainStatuses)[number];
 
-export const brainTypes = ["doc", "api", "chatflow"] as const;
+export const brainTypes = ["doc", "api", "composite"] as const;
 
 export type BrainType = (typeof brainTypes)[number];
 

@@ -9,7 +9,7 @@ export const useBrainKnowledgeStep = () => {
   const url = watch("brain_definition.url");
   const compositeBrainConnections = watch("connected_brains_ids") ?? [];
   const isApiBrain = brainType === "api";
-  const isChatflowBrain = brainType === "chatflow";
+  const isChatflowBrain = brainType === "composite";
 
   const isApiBrainDefinitionsFilled = url !== "";
 

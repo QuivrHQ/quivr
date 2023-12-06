@@ -25,7 +25,7 @@ export const useKnowledgeSourceLabel = () => {
   if (isAgentBrainActivated) {
     knowledgeSourceOptions.push({
       label: t("knowledge_source_chatflow", { ns: "brain" }),
-      value: "chatflow",
+      value: "composite",
     });
   }
 

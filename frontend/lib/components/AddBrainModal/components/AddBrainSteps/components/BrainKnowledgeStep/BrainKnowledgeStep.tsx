@@ -31,7 +31,7 @@ export const BrainKnowledgeStep = ({
   const brainTypeToKnowledgeComponent: Record<BrainType, JSX.Element> = {
     doc: <KnowledgeToFeedInput />,
     api: <ApiRequestDefinition />,
-    chatflow: <CompositeBrainConnections />,
+    composite: <CompositeBrainConnections />,
   };
 
   if (currentStep !== "KNOWLEDGE" || brainType === undefined) {

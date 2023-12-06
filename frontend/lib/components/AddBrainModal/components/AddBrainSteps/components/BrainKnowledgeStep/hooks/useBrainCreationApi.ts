@@ -61,7 +61,7 @@ export const useBrainCreationApi = ({
       brain_secrets_values:
         brain_type === "api" ? brain_secrets_values : undefined,
       connected_brains_ids:
-        brain_type === "chatflow" ? connected_brains_ids : undefined,
+        brain_type === "composite" ? connected_brains_ids : undefined,
     });
 
     if (createdBrainId === undefined) {
