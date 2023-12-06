@@ -9,12 +9,12 @@ export const useBrainKnowledgeStep = () => {
   const url = watch("brain_definition.url");
   const compositeBrainConnections = watch("connected_brains_ids") ?? [];
   const isApiBrain = brainType === "api";
-  const isChatflowBrain = brainType === "composite";
+  const isCompositeBrain = brainType === "composite";
 
   const isApiBrainDefinitionsFilled = url !== "";
 
   const isSubmitButtonDisabled =
-    (isChatflowBrain && compositeBrainConnections.length === 0) ||
+    (isCompositeBrain && compositeBrainConnections.length === 0) ||
     (isApiBrain && !isApiBrainDefinitionsFilled);
 
   return {

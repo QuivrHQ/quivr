@@ -6,7 +6,7 @@ import { BrainType } from "@/lib/types/brainConfig";
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const useKnowledgeSourceLabel = () => {
   const { t } = useTranslation(["translation", "brain", "config"]);
-  const isAgentBrainActivated = useFeatureIsOn("agent-brain");
+  const isCompositeBrainActivated = useFeatureIsOn("agent-brain");
 
   const knowledgeSourceOptions: {
     label: string;
@@ -22,9 +22,9 @@ export const useKnowledgeSourceLabel = () => {
     },
   ];
 
-  if (isAgentBrainActivated) {
+  if (isCompositeBrainActivated) {
     knowledgeSourceOptions.push({
-      label: t("knowledge_source_chatflow", { ns: "brain" }),
+      label: t("knowledge_source_composite_brain", { ns: "brain" }),
       value: "composite",
     });
   }

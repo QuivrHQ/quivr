@@ -50,7 +50,7 @@
   "myBrains": "Мои мозги",
   "knowledge_source_doc": "Документы",
   "knowledge_source_api": "API",
-  "knowledge_source_chatflow": "Агент",
+  "knowledge_source_composite_brain": "Агент",
   "knowledge_source_label": "Источник знаний",
   "api_brain":{
     "name": "Название",
