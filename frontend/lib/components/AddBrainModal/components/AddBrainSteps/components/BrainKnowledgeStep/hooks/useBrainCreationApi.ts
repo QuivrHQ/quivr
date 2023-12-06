@@ -49,6 +49,7 @@ export const useBrainCreationApi = ({
       brain_secrets_values,
       status,
       brain_type,
+      connected_brains_ids,
     } = getValues();
 
     const createdBrainId = await createBrainApi({
@@ -59,6 +60,8 @@ export const useBrainCreationApi = ({
       brain_definition: brain_type === "api" ? brain_definition : undefined,
       brain_secrets_values:
         brain_type === "api" ? brain_secrets_values : undefined,
+      connected_brains_ids:
+        brain_type === "chatflow" ? connected_brains_ids : undefined,
     });
 
     if (createdBrainId === undefined) {
