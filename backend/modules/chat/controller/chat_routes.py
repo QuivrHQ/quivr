@@ -4,8 +4,6 @@ from venv import logger
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from fastapi.responses import StreamingResponse
-from llm.qa_base import QABaseBrainPicking
-from llm.qa_headless import HeadlessQA
 from middlewares.auth import AuthBearer, get_current_user
 from models.user_usage import UserUsage
 from modules.brain.service.brain_service import BrainService
@@ -231,7 +229,6 @@ async def create_stream_question_handler(
     try:
         logger.info(f"Streaming request for {chat_question.model}")
         check_user_requests_limit(current_user)
-        gpt_answer_generator: HeadlessQA | QABaseBrainPicking
         # TODO check if model is in the list of models available for the user
 
         is_model_ok = chat_question.model in user_settings.get("models", ["gpt-3.5-turbo"])  # type: ignore

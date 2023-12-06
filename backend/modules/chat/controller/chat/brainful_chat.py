@@ -1,6 +1,6 @@
 from fastapi import HTTPException
 from llm.api_brain_qa import APIBrainQA
-from llm.qa_base import QABaseBrainPicking
+from llm.knowledge_brain_qa import KnowledgeBrainQA
 from modules.brain.entity.brain_entity import BrainType, RoleEnum
 from modules.brain.service.brain_authorization_service import (
     validate_brain_authorization,
@@ -49,7 +49,7 @@ class BrainfulChat(ChatInterface):
             brain.brain_type == BrainType.DOC
             or model not in models_supporting_function_calls
         ):
-            return QABaseBrainPicking(
+            return KnowledgeBrainQA(
                 chat_id=chat_id,
                 model=model,
                 max_tokens=max_tokens,

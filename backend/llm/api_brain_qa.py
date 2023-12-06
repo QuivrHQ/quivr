@@ -4,7 +4,7 @@ from uuid import UUID
 
 from fastapi import HTTPException
 from litellm import completion
-from llm.qa_base import QABaseBrainPicking
+from llm.knowledge_brain_qa import KnowledgeBrainQA
 from llm.utils.call_brain_api import call_brain_api
 from llm.utils.get_api_brain_definition_as_json_schema import (
     get_api_brain_definition_as_json_schema,
@@ -23,7 +23,7 @@ logger = get_logger(__name__)
 
 
 class APIBrainQA(
-    QABaseBrainPicking,
+    KnowledgeBrainQA,
 ):
     user_id: UUID
 

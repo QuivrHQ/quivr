@@ -218,7 +218,6 @@ class BrainService:
 
     def get_brain_details(self, brain_id: UUID) -> BrainEntity | None:
         brain = self.brain_repository.get_brain_details(brain_id)
-        # id ?
         if brain == None:
             return None
 
@@ -228,6 +227,12 @@ class BrainService:
             )
             brain.brain_definition = brain_definition
 
+        if brain.brain_type == BrainType.COMPOSITE:
+            brain.connected_brains_ids = (
+                self.composite_brains_connections_repository.get_connected_brains(
+                    brain_id
+                )
+            )
         return brain
 
     def get_public_brains(self) -> list[PublicBrain]:
