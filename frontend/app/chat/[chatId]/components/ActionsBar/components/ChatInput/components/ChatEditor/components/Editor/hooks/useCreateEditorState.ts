@@ -11,7 +11,7 @@ import { usePromptMention } from "./usePromptSuggestionsConfig";
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const useCreateEditorState = () => {
-  const { t } = useTranslation(["chat"]);
+  const { t } = useTranslation(["chat", "vaccineTruth"]);
   const { BrainMention, items } = useBrainMention();
   const { PromptMention } = usePromptMention();
 
@@ -24,7 +24,7 @@ export const useCreateEditorState = () => {
       extensions: [
         Placeholder.configure({
           showOnlyWhenEditable: true,
-          placeholder: t("actions_bar_placeholder"),
+          placeholder: t("talkToAI", { ns: "vaccineTruth" }),
         }),
         Document,
         Text,
