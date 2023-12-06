@@ -8,7 +8,7 @@ type UseKnowledgeToFeed = {
   files: File[];
   urls: string[];
 };
-export const useKnowledgeToFeed = (): UseKnowledgeToFeed => {
+export const useKnowledgeToFeedFilesAndUrls = (): UseKnowledgeToFeed => {
   const { knowledgeToFeed } = useKnowledgeToFeedContext();
 
   const files: File[] = (

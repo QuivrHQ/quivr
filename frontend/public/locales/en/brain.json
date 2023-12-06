@@ -50,7 +50,7 @@
   "knowledge_source_doc": "Documents",
   "knowledge_source_api": "App (Through API)",
   "knowledge_source_label": "Knowledge source",
-  "knowledge_source_chatflow":"Brain network",
+  "knowledge_source_chatflow":"Agent",
   "api_brain": {
     "name": "Name",
     "description": "Description",
@@ -66,5 +66,5 @@
   "manage_brain": "Manage brain",
   "brain_type":"Type of brain",
   "brain_params":"Brain params",
-  "brain_data":"Brain data"
+  "resources":"Ressource"
 }

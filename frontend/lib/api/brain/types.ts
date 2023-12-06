@@ -10,7 +10,7 @@ export type ApiBrainDefinitionSchemaProperty = {
   description: string;
   name: string;
 };
-export const allowedRequestMethods = ["GET", "POST", "PUT", "DELETE"];
+export const allowedRequestMethods = ["GET", "POST", "PUT", "DELETE"] as const;
 
 export type AllowedRequestMethod = (typeof allowedRequestMethods)[number];
 

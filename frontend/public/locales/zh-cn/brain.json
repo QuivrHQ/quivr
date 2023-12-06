@@ -49,7 +49,7 @@
   "myBrains": "我的大脑",
   "knowledge_source_doc": "文档",
   "knowledge_source_api": "API",
-  "knowledge_source_chatflow":"脑网络",
+  "knowledge_source_chatflow": "代理",
   "knowledge_source_label": "知识来源",
   "api_brain":{
     "name": "名称",
@@ -66,5 +66,5 @@
   "manage_brain": "管理大脑",
   "brain_type": "脑类型",
   "brain_params": "脑参数",
-  "brain_data": "脑数据"
+  "resources": "资源" 
 }

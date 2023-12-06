@@ -2,12 +2,12 @@ import { Fragment } from "react";
 import { useTranslation } from "react-i18next";
 import { FaArrowLeft, FaArrowRight } from "react-icons/fa";
 
-import { PublicAccessConfirmationModal } from "@/lib/components/AddBrainModalOld/components/AddBrainConfig/components/PublicAccessConfirmationModal";
 import Button from "@/lib/components/ui/Button";
 import Field from "@/lib/components/ui/Field";
 import { Radio } from "@/lib/components/ui/Radio";
 import { TextArea } from "@/lib/components/ui/TextArea";
 
+import { PublicAccessConfirmationModal } from "./components/PublicAccessConfirmationModal";
 import { useBrainParamsStep } from "./hooks/useBrainParamsStep";
 import { useBrainStatusOptions } from "./hooks/useBrainStatusOptions";
 import { usePublicAccessConfirmationModal } from "./hooks/usePublicAccessConfirmationModal";
@@ -53,6 +53,7 @@ export const BrainParamsStep = ({
         placeholder={t("brainDescriptionPlaceholder", { ns: "brain" })}
         autoComplete="off"
         className="flex-1 m-3"
+        required
         {...register("description")}
       />
       <fieldset className="w-full flex flex-col">

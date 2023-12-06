@@ -1,4 +1,3 @@
-/* eslint-disable */
 import {
   DetailedHTMLProps,
   forwardRef,
@@ -18,12 +17,16 @@ interface FieldProps
 }
 
 export const TextArea = forwardRef(
-  ({ label, className, name, ...props }: FieldProps, forwardedRef) => {
+  (
+    { label, className, name, required = false, ...props }: FieldProps,
+    forwardedRef
+  ) => {
     return (
       <fieldset className={cn("flex flex-col w-full", className)} name={name}>
-        {label && (
+        {label !== undefined && (
           <label htmlFor={name} className="text-sm">
             {label}
+            {required && <span>*</span>}
           </label>
         )}
         <textarea
@@ -37,3 +40,5 @@ export const TextArea = forwardRef(
     );
   }
 );
+
+TextArea.displayName = "TextArea";

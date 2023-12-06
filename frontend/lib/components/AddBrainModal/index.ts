@@ -1,1 +1,1 @@
-export { AddBrainModalSelector as AddBrainModal } from "./AddBrainModalSelector";
+export * from "./AddBrainModal";

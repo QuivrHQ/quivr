@@ -49,7 +49,7 @@
   "myBrains": "Mes cerveaux",
   "knowledge_source_doc": "Documents",
   "knowledge_source_api": "API",
-  "knowledge_source_chatflow":"Réseau cérébral",
+  "knowledge_source_chatflow": "Agent",
   "knowledge_source_label": "Source de connaissance",
   "api_brain": {
     "name": "Nom",
@@ -66,5 +66,5 @@
   "manage_brain": "Gérer le cerveau",
   "brain_type": "Type de cerveau",
   "brain_params": "Paramètres du cerveau",
-  "brain_data": "Données du cerveau"
+  "resources": "Ressources"
 }

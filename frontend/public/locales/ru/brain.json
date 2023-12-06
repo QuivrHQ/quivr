@@ -49,7 +49,7 @@
   "myBrains": "Мои мозги",
   "knowledge_source_doc": "Документы",
   "knowledge_source_api": "API",
-  "knowledge_source_chatflow":"Сеть мозга",
+  "knowledge_source_chatflow": "Агент",
   "knowledge_source_label": "Источник знаний",
   "api_brain":{
     "name": "Название",
@@ -66,5 +66,5 @@
   "manage_brain": "Управление мозгом",
   "brain_type": "Тип мозга",
   "brain_params": "Параметры мозга",
-  "brain_data": "Данные мозга"
+  "resources": "Ресурсы" 
 }
