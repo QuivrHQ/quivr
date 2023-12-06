@@ -79,15 +79,3 @@ class Repository(ABC):
     @abstractmethod
     def get_vectors_by_file_sha1(self, file_sha1):
         pass
-
-    @abstractmethod
-    def get_api_brain_definition(self, brain_id: UUID):
-        pass
-
-    @abstractmethod
-    def add_api_brain_definition(self, brain_id: UUID, config):
-        pass
-
-    @abstractmethod
-    def delete_api_brain_definition(self, brain_id: UUID):
-        pass

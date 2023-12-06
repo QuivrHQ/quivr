@@ -4,35 +4,27 @@ from uuid import UUID
 from fastapi import HTTPException
 from modules.brain.dto.inputs import BrainUpdatableProperties, CreateBrainProperties
 from modules.brain.entity.brain_entity import BrainEntity, BrainType, PublicBrain
-from modules.brain.repository.brains import Brains
-from modules.brain.repository.brains_users import BrainsUsers
-from modules.brain.repository.brains_vectors import BrainsVectors
-from modules.brain.repository.external_api_secrets import ExternalApiSecrets
-from modules.brain.repository.interfaces.brains_interface import BrainsInterface
-from modules.brain.repository.interfaces.brains_users_interface import (
+from modules.brain.repository import (
+    Brains,
+    BrainsUsers,
+    BrainsVectors,
+    CompositeBrainsConnections,
+    ExternalApiSecrets,
+)
+from modules.brain.repository.interfaces import (
+    BrainsInterface,
     BrainsUsersInterface,
-)
-from modules.brain.repository.interfaces.brains_vectors_interface import (
     BrainsVectorsInterface,
-)
-from modules.brain.repository.interfaces.external_api_secrets_interface import (
+    CompositeBrainsConnectionsInterface,
     ExternalApiSecretsInterface,
 )
+from modules.brain.service.api_brain_definition_service import ApiBrainDefinitionService
+from modules.brain.service.utils.validate_brain import validate_api_brain
 from modules.knowledge.service.knowledge_service import KnowledgeService
-from repository.api_brain_definition.add_api_brain_definition import (
-    add_api_brain_definition,
-)
-from repository.api_brain_definition.delete_api_brain_definition import (
-    delete_api_brain_definition,
-)
-from repository.api_brain_definition.get_api_brain_definition import (
-    get_api_brain_definition,
-)
-from repository.api_brain_definition.update_api_brain_definition import (
-    update_api_brain_definition,
-)
 
 knowledge_service = KnowledgeService()
+# TODO: directly user api_brain_definition repository
+api_brain_definition_service = ApiBrainDefinitionService()
 
 
 class BrainService:
@@ -40,12 +32,14 @@ class BrainService:
     brain_user_repository: BrainsUsersInterface
     brain_vector_repository: BrainsVectorsInterface
     external_api_secrets_repository: ExternalApiSecretsInterface
+    composite_brains_connections_repository: CompositeBrainsConnectionsInterface
 
     def __init__(self):
         self.brain_repository = Brains()
         self.brain_user_repository = BrainsUsers()
         self.brain_vector = BrainsVectors()
         self.external_api_secrets_repository = ExternalApiSecrets()
+        self.composite_brains_connections_repository = CompositeBrainsConnections()
 
     def get_brain_by_id(self, brain_id: UUID):
         return self.brain_repository.get_brain_by_id(brain_id)
@@ -57,40 +51,61 @@ class BrainService:
     ) -> BrainEntity:
         if brain == None:
             brain = CreateBrainProperties()  # type: ignore model and brain_definition
+
         if brain.brain_type == BrainType.API:
-            if brain.brain_definition is None:
-                raise HTTPException(
-                    status_code=404, detail="Brain definition not found"
-                )
+            validate_api_brain(brain)
+            return self.create_brain_api(user_id, brain)
 
-            if brain.brain_definition.url is None:
-                raise HTTPException(status_code=404, detail="Brain url not found")
-
-            if brain.brain_definition.method is None:
-                raise HTTPException(status_code=404, detail="Brain method not found")
+        if brain.brain_type == BrainType.COMPOSITE:
+            return self.create_brain_composite(brain)
 
         created_brain = self.brain_repository.create_brain(brain)
+        return created_brain
 
-        if brain.brain_type == BrainType.API and brain.brain_definition is not None:
-            add_api_brain_definition(
+    def create_brain_api(
+        self,
+        user_id: UUID,
+        brain: CreateBrainProperties,
+    ) -> BrainEntity:
+        created_brain = self.brain_repository.create_brain(brain)
+
+        if brain.brain_definition is not None:
+            api_brain_definition_service.add_api_brain_definition(
                 brain_id=created_brain.brain_id,
                 api_brain_definition=brain.brain_definition,
             )
 
-            secrets_values = brain.brain_secrets_values
+        secrets_values = brain.brain_secrets_values
 
-            for secret_name in secrets_values:
-                self.external_api_secrets_repository.create_secret(
-                    user_id=user_id,
-                    brain_id=created_brain.brain_id,
-                    secret_name=secret_name,
-                    secret_value=secrets_values[secret_name],
+        for secret_name in secrets_values:
+            self.external_api_secrets_repository.create_secret(
+                user_id=user_id,
+                brain_id=created_brain.brain_id,
+                secret_name=secret_name,
+                secret_value=secrets_values[secret_name],
+            )
+
+        return created_brain
+
+    def create_brain_composite(
+        self,
+        brain: CreateBrainProperties,
+    ) -> BrainEntity:
+        created_brain = self.brain_repository.create_brain(brain)
+
+        if brain.connected_brains_ids is not None:
+            for connected_brain_id in brain.connected_brains_ids:
+                self.composite_brains_connections_repository.connect_brain(
+                    composite_brain_id=created_brain.brain_id,
+                    connected_brain_id=connected_brain_id,
                 )
 
         return created_brain
 
     def delete_brain_secrets_values(self, brain_id: UUID) -> None:
-        brain_definition = get_api_brain_definition(brain_id=brain_id)
+        brain_definition = api_brain_definition_service.get_api_brain_definition(
+            brain_id=brain_id
+        )
 
         if brain_definition is None:
             raise HTTPException(status_code=404, detail="Brain definition not found.")
@@ -116,7 +131,7 @@ class BrainService:
             self.delete_brain_secrets_values(
                 brain_id=brain_id,
             )
-            delete_api_brain_definition(brain_id=brain_id)
+            api_brain_definition_service.delete_api_brain_definition(brain_id=brain_id)
         else:
             knowledge_service.remove_brain_all_knowledge(brain_id)
 
@@ -148,7 +163,9 @@ class BrainService:
         brain_update_answer = self.brain_repository.update_brain_by_id(
             brain_id,
             brain=BrainUpdatableProperties(
-                **brain_new_values.dict(exclude={"brain_definition"})
+                **brain_new_values.dict(
+                    exclude={"brain_definition", "connected_brains_ids"}
+                )
             ),
         )
 
@@ -182,7 +199,7 @@ class BrainService:
             if should_remove_existing_secrets_values:
                 self.delete_brain_secrets_values(brain_id=brain_id)
 
-            update_api_brain_definition(
+            api_brain_definition_service.update_api_brain_definition(
                 brain_id,
                 api_brain_definition=brain_new_values.brain_definition,
             )
@@ -206,7 +223,9 @@ class BrainService:
             return None
 
         if brain.brain_type == BrainType.API:
-            brain_definition = get_api_brain_definition(brain_id)
+            brain_definition = api_brain_definition_service.get_api_brain_definition(
+                brain_id
+            )
             brain.brain_definition = brain_definition
 
         return brain
