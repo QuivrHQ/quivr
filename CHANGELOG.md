@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.0.131 (2023-12-06)
+
+## What's Changed
+* feat: update onboarding questions answer by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1834
+* feat: composite brains get by @gozineb in https://github.com/StanGirard/quivr/pull/1837
+* feat: add Agent creation frontend by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1836
+* feat: keep sidebar opened on non mobile devices by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1840
+* feat: add brains list overflow indicator by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1842
+
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.130...v0.0.131
+
 ## 0.0.130 (2023-12-06)
 
 **Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.129...v0.0.130
