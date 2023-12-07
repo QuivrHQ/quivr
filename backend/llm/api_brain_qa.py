@@ -4,17 +4,18 @@ from uuid import UUID
 
 from fastapi import HTTPException
 from litellm import completion
-from llm.knowledge_brain_qa import KnowledgeBrainQA
-from llm.utils.call_brain_api import call_brain_api
-from llm.utils.get_api_brain_definition_as_json_schema import (
-    get_api_brain_definition_as_json_schema,
-)
 from logger import get_logger
 from modules.brain.service.brain_service import BrainService
 from modules.chat.dto.chats import ChatQuestion
 from modules.chat.dto.inputs import CreateChatHistory
 from modules.chat.dto.outputs import GetChatHistoryOutput
 from modules.chat.service.chat_service import ChatService
+
+from llm.knowledge_brain_qa import KnowledgeBrainQA
+from llm.utils.call_brain_api import call_brain_api
+from llm.utils.get_api_brain_definition_as_json_schema import (
+    get_api_brain_definition_as_json_schema,
+)
 
 brain_service = BrainService()
 chat_service = ChatService()
@@ -212,3 +213,18 @@ class APIBrainQA(
             user_message=question.question,
             assistant="".join(response_tokens),
         )
+
+    async def generate_answer(self, chat_id: UUID, question: ChatQuestion):
+        api_brain_question_answer: GetChatHistoryOutput = None
+
+        async for answer in self.generate_stream(chat_id, question):
+            answer = answer.split("data: ")[1]
+            answer_parsed: GetChatHistoryOutput = GetChatHistoryOutput(
+                **json.loads(answer)
+            )
+            if api_brain_question_answer is None:
+                api_brain_question_answer = answer_parsed
+            else:
+                api_brain_question_answer.assistant += answer_parsed.assistant
+
+        return api_brain_question_answer
