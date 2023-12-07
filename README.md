@@ -103,7 +103,7 @@ You can find the installation video [here](https://www.youtube.com/watch?v=cXBa6
 - **Step 2**: Use the `migration.sh` script to run the migration scripts
 
   ```bash
-  chmod +x migration.sh
+  chmod +x migration.sh # You need to install Gum & postgresql (brew install gum for example)
   ./migration.sh
   # Select  2) Run migrations
   ```
