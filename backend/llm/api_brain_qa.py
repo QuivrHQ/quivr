@@ -1,7 +1,9 @@
+import asyncio
 import json
 from typing import Optional
 from uuid import UUID
 
+import nest_asyncio
 from fastapi import HTTPException
 from litellm import completion
 from logger import get_logger
@@ -225,19 +227,26 @@ class APIBrainQA(
             assistant="".join(response_tokens),
         )
 
-    async def generate_answer(self, chat_id: UUID, question: ChatQuestion):
-        api_brain_question_answer: GetChatHistoryOutput = None
+    def generate_answer(self, chat_id: UUID, question: ChatQuestion):
+        async def a_generate_answer():
+            api_brain_question_answer: GetChatHistoryOutput = None
 
-        async for answer in self.generate_stream(
-            chat_id, question, should_log_steps=False
-        ):
-            answer = answer.split("data: ")[1]
-            answer_parsed: GetChatHistoryOutput = GetChatHistoryOutput(
-                **json.loads(answer)
-            )
-            if api_brain_question_answer is None:
-                api_brain_question_answer = answer_parsed
-            else:
-                api_brain_question_answer.assistant += answer_parsed.assistant
+            async for answer in self.generate_stream(
+                chat_id, question, should_log_steps=False
+            ):
+                answer = answer.split("data: ")[1]
+                answer_parsed: GetChatHistoryOutput = GetChatHistoryOutput(
+                    **json.loads(answer)
+                )
+                if api_brain_question_answer is None:
+                    api_brain_question_answer = answer_parsed
+                else:
+                    api_brain_question_answer.assistant += answer_parsed.assistant
 
-        return api_brain_question_answer
+            return api_brain_question_answer
+
+        nest_asyncio.apply()
+        loop = asyncio.get_event_loop()
+        result = loop.run_until_complete(a_generate_answer())
+
+        return result
