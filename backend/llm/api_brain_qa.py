@@ -57,13 +57,15 @@ class APIBrainQA(
         functions,
         brain_id: UUID,
         recursive_count=0,
+        should_log_steps=False,
     ):
         if recursive_count > 5:
-            yield "🧠<Deciding what to do>🧠"
             yield "The assistant is having issues and took more than 5 calls to the API. Please try again later or an other instruction."
             return
 
-        yield "🧠<Deciding what to do>🧠"
+        if should_log_steps:
+            yield "🧠<Deciding what to do>🧠"
+
         response = completion(
             model=self.model,
             temperature=self.temperature,
@@ -99,7 +101,9 @@ class APIBrainQA(
 
                 except Exception:
                     arguments = {}
-                yield f"🧠<Calling {brain_id} with arguments {arguments}>🧠"
+
+                if should_log_steps:
+                    yield f"🧠<Calling {brain_id} with arguments {arguments}>🧠"
 
                 try:
                     api_call_response = call_brain_api(
@@ -126,6 +130,7 @@ class APIBrainQA(
                     functions=functions,
                     brain_id=brain_id,
                     recursive_count=recursive_count + 1,
+                    should_log_steps=should_log_steps,
                 ):
                     yield value
 
@@ -141,7 +146,12 @@ class APIBrainQA(
                     yield "**...**"
                     break
 
-    async def generate_stream(self, chat_id: UUID, question: ChatQuestion):
+    async def generate_stream(
+        self,
+        chat_id: UUID,
+        question: ChatQuestion,
+        should_log_steps: Optional[bool] = True,
+    ):
         if not question.brain_id:
             raise HTTPException(
                 status_code=400, detail="No brain id provided in the question"
@@ -199,6 +209,7 @@ class APIBrainQA(
             messages=messages,
             functions=[get_api_brain_definition_as_json_schema(brain)],
             brain_id=question.brain_id,
+            should_log_steps=should_log_steps,
         ):
             streamed_chat_history.assistant = value
             response_tokens.append(value)
@@ -217,7 +228,9 @@ class APIBrainQA(
     async def generate_answer(self, chat_id: UUID, question: ChatQuestion):
         api_brain_question_answer: GetChatHistoryOutput = None
 
-        async for answer in self.generate_stream(chat_id, question):
+        async for answer in self.generate_stream(
+            chat_id, question, should_log_steps=False
+        ):
             answer = answer.split("data: ")[1]
             answer_parsed: GetChatHistoryOutput = GetChatHistoryOutput(
                 **json.loads(answer)
