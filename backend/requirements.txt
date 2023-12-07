@@ -5,6 +5,7 @@ litellm==1.7.7
 openai==1.1.1
 GitPython==3.1.36
 pdf2image==1.16.3
+nest_asyncio==1.5.6
 pypdf==3.9.0
 supabase==1.1.0
 tiktoken==0.4.0
