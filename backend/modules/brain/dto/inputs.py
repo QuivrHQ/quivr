@@ -2,12 +2,24 @@ from typing import Optional
 from uuid import UUID
 
 from logger import get_logger
-from models.databases.supabase.api_brain_definition import CreateApiBrainDefinition
-from modules.brain.entity.api_brain_definition_entity import ApiBrainDefinition
+from modules.brain.entity.api_brain_definition_entity import (
+    ApiBrainAllowedMethods,
+    ApiBrainDefinitionEntity,
+    ApiBrainDefinitionSchema,
+    ApiBrainDefinitionSecret,
+)
 from modules.brain.entity.brain_entity import BrainType
 from pydantic import BaseModel, Extra
 
 logger = get_logger(__name__)
+
+
+class CreateApiBrainDefinition(BaseModel, extra=Extra.forbid):
+    method: ApiBrainAllowedMethods
+    url: str
+    params: Optional[ApiBrainDefinitionSchema] = ApiBrainDefinitionSchema()
+    search_params: ApiBrainDefinitionSchema = ApiBrainDefinitionSchema()
+    secrets: Optional[list[ApiBrainDefinitionSecret]] = []
 
 
 class CreateBrainProperties(BaseModel, extra=Extra.forbid):
@@ -21,6 +33,7 @@ class CreateBrainProperties(BaseModel, extra=Extra.forbid):
     brain_type: Optional[BrainType] = BrainType.DOC
     brain_definition: Optional[CreateApiBrainDefinition]
     brain_secrets_values: dict = {}
+    connected_brains_ids: Optional[list[UUID]] = []
 
     def dict(self, *args, **kwargs):
         brain_dict = super().dict(*args, **kwargs)
@@ -37,7 +50,8 @@ class BrainUpdatableProperties(BaseModel):
     max_tokens: Optional[int]
     status: Optional[str]
     prompt_id: Optional[UUID]
-    brain_definition: Optional[ApiBrainDefinition]
+    brain_definition: Optional[ApiBrainDefinitionEntity]
+    connected_brains_ids: Optional[list[UUID]] = []
 
     def dict(self, *args, **kwargs):
         brain_dict = super().dict(*args, **kwargs)

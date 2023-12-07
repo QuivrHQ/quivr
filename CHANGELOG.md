@@ -1,5 +1,32 @@
 # Changelog
 
+## 0.0.131 (2023-12-06)
+
+## What's Changed
+* feat: update onboarding questions answer by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1834
+* feat: composite brains get by @gozineb in https://github.com/StanGirard/quivr/pull/1837
+* feat: add Agent creation frontend by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1836
+* feat: keep sidebar opened on non mobile devices by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1840
+* feat: add brains list overflow indicator by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1842
+
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.130...v0.0.131
+
+## 0.0.130 (2023-12-06)
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.129...v0.0.130
+
+## 0.0.129 (2023-12-06)
+
+## What's Changed
+* feat(requirements): update aws version by @StanGirard in https://github.com/StanGirard/quivr/pull/1819
+* feat: add brain creation step 2 by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1823
+* feat: composite brains db by @gozineb in https://github.com/StanGirard/quivr/pull/1826
+* feat: finalise steps based brain creation by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1825
+
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.128...v0.0.129
+
 ## 0.0.128 (2023-12-05)
 
 ## What's Changed

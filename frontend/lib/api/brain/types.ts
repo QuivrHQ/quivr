@@ -10,7 +10,7 @@ export type ApiBrainDefinitionSchemaProperty = {
   description: string;
   name: string;
 };
-export const allowedRequestMethods = ["GET", "POST", "PUT", "DELETE"];
+export const allowedRequestMethods = ["GET", "POST", "PUT", "DELETE"] as const;
 
 export type AllowedRequestMethod = (typeof allowedRequestMethods)[number];
 
@@ -49,6 +49,7 @@ export type CreateBrainInput = {
   brain_type?: BrainType;
   brain_definition?: Omit<ApiBrainDefinition, "brain_id">;
   brain_secrets_values?: Record<string, string>;
+  connected_brains_ids?: UUID[];
 };
 
 export type UpdateBrainInput = Partial<CreateBrainInput>;

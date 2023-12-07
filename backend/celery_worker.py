@@ -2,6 +2,7 @@ import asyncio
 import io
 import os
 
+import sentry_sdk
 from celery import Celery
 from celery.schedules import crontab
 from fastapi import UploadFile
@@ -15,6 +16,14 @@ from modules.onboarding.service.onboarding_service import OnboardingService
 from packages.files.crawl.crawler import CrawlWebsite
 from packages.files.parsers.github import process_github
 from packages.files.processors import filter_file
+
+sentry_dsn = os.getenv("SENTRY_DSN")
+if sentry_dsn:
+    sentry_sdk.init(
+        dsn=sentry_dsn,
+        sample_rate=0.1,
+        enable_tracing=True,
+    )
 
 CELERY_BROKER_URL = os.getenv("CELERY_BROKER_URL", "")
 CELERY_BROKER_QUEUE_NAME = os.getenv("CELERY_BROKER_QUEUE_NAME", "quivr")

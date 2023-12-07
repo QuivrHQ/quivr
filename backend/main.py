@@ -12,6 +12,7 @@ from fastapi.responses import JSONResponse
 from logger import get_logger
 from middlewares.cors import add_cors_middleware
 from modules.api_key.controller import api_key_router
+from modules.brain.controller import brain_router
 from modules.chat.controller import chat_router
 from modules.contact_support.controller import contact_router
 from modules.knowledge.controller import knowledge_router
@@ -22,7 +23,6 @@ from modules.prompt.controller import prompt_router
 from modules.upload.controller import upload_router
 from modules.user.controller import user_router
 from packages.utils import handle_request_validation_error
-from routes.brain_routes import brain_router
 from routes.crawl_routes import crawl_router
 from routes.subscription_routes import subscription_router
 from sentry_sdk.integrations.fastapi import FastApiIntegration

@@ -17,8 +17,6 @@ type UseMentionConfigProps = {
   suggestionData: SuggestionData;
 };
 
-const MAX_ITEMS_DISPLAYED = 15;
-
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const useMentionConfig = ({
   char,
@@ -35,11 +33,9 @@ export const useMentionConfig = ({
       allowSpaces: true,
       pluginKey: new PluginKey(mentionKey),
       items: ({ query }) =>
-        items
-          .filter((item) =>
-            item.label.toLowerCase().startsWith(query.toLowerCase())
-          )
-          .slice(0, MAX_ITEMS_DISPLAYED),
+        items.filter((item) =>
+          item.label.toLowerCase().startsWith(query.toLowerCase())
+        ),
       render: () => {
         let reactRenderer:
           | ReactRenderer<

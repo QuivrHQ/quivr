@@ -5,6 +5,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from middlewares.auth.auth_bearer import AuthBearer, get_current_user
 from models import BrainSubscription
 from modules.brain.entity.brain_entity import RoleEnum
+from modules.brain.service.api_brain_definition_service import ApiBrainDefinitionService
 from modules.brain.service.brain_authorization_service import (
     has_brain_authorization,
     validate_brain_authorization,
@@ -16,9 +17,6 @@ from modules.prompt.service.prompt_service import PromptService
 from modules.user.entity.user_identity import UserIdentity
 from modules.user.service.user_service import UserService
 from pydantic import BaseModel
-from repository.api_brain_definition.get_api_brain_definition import (
-    get_api_brain_definition,
-)
 from repository.brain_subscription import (
     SubscriptionInvitationService,
     resend_invitation_email,
@@ -31,6 +29,7 @@ user_service = UserService()
 prompt_service = PromptService()
 brain_user_service = BrainUserService()
 brain_service = BrainService()
+api_brain_definition_service = ApiBrainDefinitionService()
 
 
 @subscription_router.post(
@@ -408,7 +407,9 @@ async def subscribe_to_brain_handler(
             detail="You are already subscribed to this brain",
         )
     if brain.brain_type == "api":
-        brain_definition = get_api_brain_definition(brain_id)
+        brain_definition = api_brain_definition_service.get_api_brain_definition(
+            brain_id
+        )
         brain_secrets = brain_definition.secrets if brain_definition != None else []
 
         for secret in brain_secrets:
