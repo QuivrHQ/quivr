@@ -235,6 +235,11 @@ class BrainService:
             )
         return brain
 
+    def get_connected_brains(self, brain_id: UUID) -> list[BrainEntity]:
+        return self.composite_brains_connections_repository.get_connected_brains(
+            brain_id
+        )
+
     def get_public_brains(self) -> list[PublicBrain]:
         return self.brain_repository.get_public_brains()
 
