@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.0.134 (2023-12-11)
+
+## What's Changed
+* feat: add custom rag first abstraction layer by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1858
+* feat(payment): added modal of right size by @StanGirard in https://github.com/StanGirard/quivr/pull/1860
+
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.133...v0.0.134
+
 ## 0.0.133 (2023-12-11)
 
 **Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.132...v0.0.133
