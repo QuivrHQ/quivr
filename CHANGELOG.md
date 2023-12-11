@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.0.133 (2023-12-11)
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.132...v0.0.133
+
 ## 0.0.132 (2023-12-10)
 
 ## What's Changed
