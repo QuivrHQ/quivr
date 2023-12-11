@@ -15,9 +15,6 @@ from langchain.prompts.chat import (
     HumanMessagePromptTemplate,
     SystemMessagePromptTemplate,
 )
-from llm.utils.format_chat_history import format_chat_history
-from llm.utils.get_prompt_to_use import get_prompt_to_use
-from llm.utils.get_prompt_to_use_id import get_prompt_to_use_id
 from logger import get_logger
 from models import BrainSettings  # Importing settings related to the 'brain'
 from modules.brain.service.brain_service import BrainService
@@ -29,6 +26,11 @@ from pydantic import BaseModel
 from supabase.client import Client, create_client
 from vectorstore.supabase import CustomSupabaseVectorStore
 
+from llm.qa_interface import QAInterface
+from llm.utils.format_chat_history import format_chat_history
+from llm.utils.get_prompt_to_use import get_prompt_to_use
+from llm.utils.get_prompt_to_use_id import get_prompt_to_use_id
+
 from .prompts.CONDENSE_PROMPT import CONDENSE_QUESTION_PROMPT
 
 logger = get_logger(__name__)
@@ -39,7 +41,7 @@ brain_service = BrainService()
 chat_service = ChatService()
 
 
-class KnowledgeBrainQA(BaseModel):
+class KnowledgeBrainQA(BaseModel, QAInterface):
     """
     Main class for the Brain Picking functionality.
     It allows to initialize a Chat model, generate questions and retrieve answers using ConversationalRetrievalChain.
