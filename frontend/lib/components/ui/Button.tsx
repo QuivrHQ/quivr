@@ -68,7 +68,6 @@ const Button = forwardRef(
         {children} {isLoading && <FaSpinner className="animate-spin" />}
       </>
     );
-    const buttonElement = <button {...buttonProps}>buttonChildren</button>;
 
     if (tooltip !== undefined) {
       return (

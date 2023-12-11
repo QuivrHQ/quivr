@@ -60,7 +60,7 @@ export const ChatInput = ({
 
           <div className="flex flex-row items-end">
             <Button
-              className="px-3 py-2 sm:px-4 sm:py-2"
+              className="px-3 py-2 sm:px-4 sm:py-2 bg-primary border-0"
               type="submit"
               isLoading={generatingAnswer}
               data-testid="submit-button"
