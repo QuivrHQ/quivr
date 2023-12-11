@@ -14,6 +14,7 @@ from modules.chat.dto.outputs import GetChatHistoryOutput
 from modules.chat.service.chat_service import ChatService
 
 from llm.knowledge_brain_qa import KnowledgeBrainQA
+from llm.qa_interface import QAInterface
 from llm.utils.call_brain_api import call_brain_api
 from llm.utils.get_api_brain_definition_as_json_schema import (
     get_api_brain_definition_as_json_schema,
@@ -25,9 +26,7 @@ chat_service = ChatService()
 logger = get_logger(__name__)
 
 
-class APIBrainQA(
-    KnowledgeBrainQA,
-):
+class APIBrainQA(KnowledgeBrainQA, QAInterface):
     user_id: UUID
 
     def __init__(
