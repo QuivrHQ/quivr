@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.0.132 (2023-12-10)
+
+## What's Changed
+* feat: add generate_answer function to support non streamed response for api brain by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1847
+* fix(ollama): - update supabase-db postgres docker image version by @KonstantinosAng in https://github.com/StanGirard/quivr/pull/1853
+
+## New Contributors
+* @KonstantinosAng made their first contribution in https://github.com/StanGirard/quivr/pull/1853
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.131...v0.0.132
+
 ## 0.0.131 (2023-12-06)
 
 ## What's Changed
