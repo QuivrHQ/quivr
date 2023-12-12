@@ -72,3 +72,4 @@ backend/share/*
 backend/slim.report.json
 volumes/db/data/
 volumes/storage/stub/stub/quivr/*
+.gitmodules
