@@ -11,6 +11,7 @@ import {
 
 import { ConfigModal } from "./components/ConfigModal";
 import { NewDiscussionButton } from "./components/NewDiscussionButton";
+import { SelectedBrainTag } from "./components/SelectedBrainTag";
 
 export const ActionsModal = (): JSX.Element => {
   const [isActionsModalOpened, setIsActionsModalOpened] = useState(false);
@@ -33,8 +34,9 @@ export const ActionsModal = (): JSX.Element => {
         <PopoverContent
           align="end"
           sideOffset={15}
-          className="min-h-[200px] w-[200px]"
+          className="min-h-[200px] w-[250px]"
         >
+          <SelectedBrainTag />
           <NewDiscussionButton />
           <ConfigModal />
         </PopoverContent>
