@@ -10,6 +10,7 @@ import {
 } from "@/lib/components/ui/Popover";
 
 import { ConfigModal } from "./components/ConfigModal";
+import { NewDiscussionButton } from "./components/NewDiscussionButton";
 
 export const ActionsModal = (): JSX.Element => {
   const [isActionsModalOpened, setIsActionsModalOpened] = useState(false);
@@ -34,6 +35,7 @@ export const ActionsModal = (): JSX.Element => {
           sideOffset={15}
           className="min-h-[200px] w-[200px]"
         >
+          <NewDiscussionButton />
           <ConfigModal />
         </PopoverContent>
       </Popover>

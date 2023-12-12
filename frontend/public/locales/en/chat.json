@@ -18,6 +18,7 @@
   "keyboard_shortcuts": "Keyboard shortcuts",
   "limit_reached": "You have reached the limit of requests, please try again later",
   "missing_brain": "Please select a brain to chat with",
+  "new_discussion": "New discussion",
   "new_prompt": "Create new prompt",
   "noCurrentBrain": "No current brain",
   "onboarding": {

@@ -18,6 +18,7 @@
   "keyboard_shortcuts": "Raccourcis clavier",
   "limit_reached": "Vous avez atteint la limite de requêtes, veuillez réessayer plus tard",
   "missing_brain": "Veuillez selectionner un cerveau pour discuter",
+  "new_discussion": "Nouvelle discussion",
   "new_prompt": "Créer un nouveau prompt",
   "noCurrentBrain": "Pas de cerveau actuel",
   "onboarding": {

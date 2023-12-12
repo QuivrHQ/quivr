@@ -18,6 +18,7 @@
   "keyboard_shortcuts": "Atajos de teclado",
   "limit_reached": "Has alcanzado el límite de peticiones, intente de nuevo más tarde",
   "missing_brain": "No hay cerebro seleccionado",
+  "new_discussion": "Nueva discusión",
   "new_prompt": "Crear nueva instrucción",
   "noCurrentBrain": "Sin cerebro seleccionado",
   "onboarding": {
