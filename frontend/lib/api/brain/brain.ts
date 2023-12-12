@@ -139,3 +139,14 @@ export const updateBrainSecrets = async (
 ): Promise<void> => {
   await axiosInstance.put(`/brains/${brainId}/secrets-values`, secrets);
 };
+
+export const getDocsFromQuestion = async (
+  brainId: string,
+  question: string,
+  axiosInstance: AxiosInstance
+): Promise<string[]> => {
+  return (await axiosInstance.post<Record<"docs",string[]>>(`/brains/${brainId}/documents`, {
+    question,
+  })).data.docs;
+  }
+
