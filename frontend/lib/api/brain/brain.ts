@@ -11,6 +11,7 @@ import {
 
 import {
   CreateBrainInput,
+  ListFilesProps,
   SubscriptionUpdatableProperties,
   UpdateBrainInput,
 } from "./types";
@@ -144,8 +145,8 @@ export const getDocsFromQuestion = async (
   brainId: string,
   question: string,
   axiosInstance: AxiosInstance
-): Promise<string[]> => {
-  return (await axiosInstance.post<Record<"docs",string[]>>(`/brains/${brainId}/documents`, {
+): Promise<ListFilesProps["files"]> => {
+  return (await axiosInstance.post<Record<"docs",ListFilesProps["files"]>>(`/brains/${brainId}/documents`, {
     question,
   })).data.docs;
   }
