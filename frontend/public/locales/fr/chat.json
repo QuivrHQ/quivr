@@ -35,6 +35,7 @@
     "what_is_brain": "Qu'est-ce qu'un cerveau ?",
     "what_is_quivr": "Qu'est-ce que Quivr ?"
   },
+  "parameters": "Paramètres",
   "receivedResponse": "Réponse reçue. Commence à gérer le flux...",
   "resposeBodyNull": "Le corps de la réponse est nul",
   "shortcut_choose_prompt": "#: Choisir une directive spécifique",

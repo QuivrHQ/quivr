@@ -35,6 +35,7 @@
     "what_is_brain": "¿Qué es un cerebro?",
     "what_is_quivr": "¿Qué es Quivr?"
   },
+  "parameters": "Parámetros",
   "receivedResponse": "Respuesta recibida. Iniciando gestión de stream...",
   "resposeBodyNull": "Cuerpo de respuesta vacío",
   "shortcut_choose_prompt": "#: Elegir una instrucción específica",

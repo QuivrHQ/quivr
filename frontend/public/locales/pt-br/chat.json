@@ -35,6 +35,7 @@
     "what_is_brain": "O que é um cérebro?",
     "what_is_quivr": "O que é o Quivr?"
   },
+  "parameters": "Parâmetros",
   "receivedResponse": "Resposta recebida. Iniciando o processamento do fluxo...",
   "resposeBodyNull": "O corpo da resposta está vazio",
   "shortcut_choose_prompt": "#: Escolha um prompt específico",

@@ -18,13 +18,13 @@ export const ConfigModal = (): JSX.Element => {
     model,
     accessibleModels,
   } = useConfigModal();
-  const { t } = useTranslation("config");
+  const { t } = useTranslation(["config", "chat"]);
 
   return (
     <Modal
       Trigger={
         <Button
-          label={"Parametres"}
+          label={t("chat:parameters")}
           startIcon={<LuSettings size={18} />}
           endIcon={<LuChevronRight size={18} />}
           className="w-full"

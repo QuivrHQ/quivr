@@ -36,6 +36,7 @@
     "what_is_brain": "什么是大脑？",
     "what_is_quivr": "什么是 Quivr？"
   },
+  "parameters": "参数",
   "receivedResponse": "收到响应。开始处理流…",
   "resposeBodyNull": "响应内容为空",
   "shortcut_choose_prompt": "#: 选择一个特定的提示",

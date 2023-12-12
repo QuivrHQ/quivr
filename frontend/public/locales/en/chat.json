@@ -35,6 +35,7 @@
     "what_is_brain": "What is a brain ?",
     "what_is_quivr": "What is Quivr ?"
   },
+  "parameters": "Parameters",
   "receivedResponse": "Received response. Starting to handle stream...",
   "resposeBodyNull": "Response body is null",
   "shortcut_choose_prompt": "#: Choose a specific prompt",
