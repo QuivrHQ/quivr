@@ -6,10 +6,10 @@ from pydantic import BaseModel
 
 class GetChatHistoryOutput(BaseModel):
     chat_id: UUID
-    message_id: UUID
+    message_id: Optional[UUID]
     user_message: str
     assistant: str
-    message_time: str
+    message_time: Optional[str]
     prompt_title: Optional[str] | None
     brain_name: Optional[str] | None
 

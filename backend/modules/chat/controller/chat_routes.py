@@ -169,11 +169,12 @@ async def create_question_handler(
             user_id=current_user.id,
         )
 
-        print("HEELLOOOOO2")
-        chat_answer = gpt_answer_generator.generate_answer(chat_id, chat_question)
+        chat_answer = gpt_answer_generator.generate_answer(
+            chat_id, chat_question, save_answer=True
+        )
 
         print("chat_answer", chat_answer)
-        # return chat_answer
+        return chat_answer
     except HTTPException as e:
         raise e
 
@@ -246,7 +247,9 @@ async def create_stream_question_handler(
         )
 
         return StreamingResponse(
-            gpt_answer_generator.generate_stream(chat_id, chat_question),
+            gpt_answer_generator.generate_stream(
+                chat_id, chat_question, save_answer=True
+            ),
             media_type="text/event-stream",
         )
 

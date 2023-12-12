@@ -150,6 +150,7 @@ class APIBrainQA(KnowledgeBrainQA, QAInterface):
         self,
         chat_id: UUID,
         question: ChatQuestion,
+        save_answer: bool = True,
         should_log_steps: Optional[bool] = True,
     ):
         if not question.brain_id:
@@ -180,22 +181,36 @@ class APIBrainQA(KnowledgeBrainQA, QAInterface):
 
         messages.append({"role": "user", "content": question.question})
 
-        streamed_chat_history = chat_service.update_chat_history(
-            CreateChatHistory(
+        if save_answer:
+            streamed_chat_history = chat_service.update_chat_history(
+                CreateChatHistory(
+                    **{
+                        "chat_id": chat_id,
+                        "user_message": question.question,
+                        "assistant": "",
+                        "brain_id": question.brain_id,
+                        "prompt_id": self.prompt_to_use_id,
+                    }
+                )
+            )
+            streamed_chat_history = GetChatHistoryOutput(
                 **{
-                    "chat_id": chat_id,
+                    "chat_id": str(chat_id),
+                    "message_id": streamed_chat_history.message_id,
+                    "message_time": streamed_chat_history.message_time,
                     "user_message": question.question,
                     "assistant": "",
-                    "brain_id": question.brain_id,
-                    "prompt_id": self.prompt_to_use_id,
+                    "prompt_title": self.prompt_to_use.title
+                    if self.prompt_to_use
+                    else None,
+                    "brain_name": brain.name if brain else None,
                 }
             )
-        )
         streamed_chat_history = GetChatHistoryOutput(
             **{
                 "chat_id": str(chat_id),
-                "message_id": streamed_chat_history.message_id,
-                "message_time": streamed_chat_history.message_time,
+                "message_id": None,
+                "message_time": None,
                 "user_message": question.question,
                 "assistant": "",
                 "prompt_title": self.prompt_to_use.title
@@ -219,11 +234,12 @@ class APIBrainQA(KnowledgeBrainQA, QAInterface):
             for token in response_tokens
             if not token.startswith("🧠<") and not token.endswith(">🧠")
         ]
-        chat_service.update_message_by_id(
-            message_id=str(streamed_chat_history.message_id),
-            user_message=question.question,
-            assistant="".join(response_tokens),
-        )
+        if save_answer:
+            chat_service.update_message_by_id(
+                message_id=str(streamed_chat_history.message_id),
+                user_message=question.question,
+                assistant="".join(response_tokens),
+            )
 
     def generate_answer(self, chat_id: UUID, question: ChatQuestion):
         async def a_generate_answer():
