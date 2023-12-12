@@ -27,6 +27,7 @@ export const ConfigModal = (): JSX.Element => {
           label={"Parametres"}
           startIcon={<LuSettings size={18} />}
           endIcon={<LuChevronRight size={18} />}
+          className="w-full"
         />
       }
       title="Chat configuration"
