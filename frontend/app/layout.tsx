@@ -1,6 +1,6 @@
 import { createServerComponentSupabaseClient } from "@supabase/auth-helpers-nextjs";
 import { Analytics as VercelAnalytics } from "@vercel/analytics/react";
-import { Inter } from "next/font/google";
+import { Outfit } from "next/font/google";
 import { cookies, headers } from "next/headers";
 
 import { ToastProvider } from "@/lib/components/ui/Toast";
@@ -10,7 +10,7 @@ import { SupabaseProvider } from "@/lib/context/SupabaseProvider";
 import { App } from "./App";
 import "./globals.css";
 
-const inter = Inter({ subsets: ["latin"] });
+const inter = Outfit({ subsets: ["latin"], weight: "400" });
 
 export const metadata = {
   title: "Quivr - Get a Second Brain with Generative AI",
