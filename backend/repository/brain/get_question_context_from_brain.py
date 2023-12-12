@@ -3,6 +3,7 @@ from uuid import UUID
 from attr import dataclass
 from logger import get_logger
 from models.settings import get_embeddings, get_supabase_client
+from repository.files.generate_file_signed_url import generate_file_signed_url
 from vectorstore.supabase import CustomSupabaseVectorStore
 
 logger = get_logger(__name__)
@@ -31,12 +32,12 @@ def get_question_context_from_brain(brain_id: UUID, question: str) -> str:
     )
     documents = vector_store.similarity_search(question, k=20, threshold=0.8)
 
-    ## Create a list of DocumentAnswer objects from the documents but with no duplicates file_sha1
     answers = []
     file_sha1s = []
     for document in documents:
         if document.metadata["file_sha1"] not in file_sha1s:
             file_sha1s.append(document.metadata["file_sha1"])
+            file_path_in_storage = f"{brain_id}/{document.metadata['file_name']}"
             answers.append(
                 DocumentAnswer(
                     file_name=document.metadata["file_name"],
@@ -44,7 +45,10 @@ def get_question_context_from_brain(brain_id: UUID, question: str) -> str:
                     file_size=document.metadata["file_size"],
                     file_id=document.metadata["id"],
                     file_similarity=document.metadata["similarity"],
-                )
+                    file_url=generate_file_signed_url(file_path_in_storage).get(
+                        "signedURL", ""
+                    ),
+                ),
             )
 
     return answers
