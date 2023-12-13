@@ -9,6 +9,7 @@ import {
   PopoverTrigger,
 } from "@/lib/components/ui/Popover";
 
+import { ChangeBrainButton } from "./components/ChangeBrainButton";
 import { ConfigModal } from "./components/ConfigModal";
 import { NewDiscussionButton } from "./components/NewDiscussionButton";
 import { SelectedBrainTag } from "./components/SelectedBrainTag";
@@ -39,6 +40,7 @@ export const ActionsModal = (): JSX.Element => {
           <SelectedBrainTag />
           <NewDiscussionButton />
           <ConfigModal />
+          <ChangeBrainButton />
         </PopoverContent>
       </Popover>
     </div>

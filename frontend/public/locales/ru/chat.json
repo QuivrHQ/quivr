@@ -5,6 +5,7 @@
   "back_to_chat": "Вернуться к чату",
   "brain": "мозг",
   "brains": "мозги",
+  "change_brain": "Изменить мозг",
   "chat": "Чат",
   "chatDeleted": "Чат успешно удален. Id: {{id}}",
   "chatNameUpdated": "Имя чата обновлено",
