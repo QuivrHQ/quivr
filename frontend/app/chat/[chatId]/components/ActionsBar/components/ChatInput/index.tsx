@@ -7,8 +7,8 @@ import { useKnowledgeToFeedContext } from "@/lib/context/KnowledgeToFeedProvider
 import { getBrainIconFromBrainType } from "@/lib/helpers/getBrainIconFromBrainType";
 
 import { OnboardingQuestions } from "./components";
+import { ActionsModal } from "./components/ActionsModal/ActionsModal";
 import { ChatEditor } from "./components/ChatEditor/ChatEditor";
-import { ConfigModal } from "./components/ConfigModal";
 import { useChatInput } from "./hooks/useChatInput";
 
 type ChatInputProps = {
@@ -58,9 +58,9 @@ export const ChatInput = ({
             />
           </div>
 
-          <div className="flex flex-row items-end">
+          <div className="flex flex-row items-center gap-4">
             <Button
-              className="px-3 py-2 sm:px-4 sm:py-2"
+              className="px-3 py-2 sm:px-4 sm:py-2 bg-primary border-0"
               type="submit"
               isLoading={generatingAnswer}
               data-testid="submit-button"
@@ -69,9 +69,7 @@ export const ChatInput = ({
                 ? t("thinking", { ns: "chat" })
                 : t("chat", { ns: "chat" })}
             </Button>
-            <div className="hidden md:flex items-center">
-              <ConfigModal />
-            </div>
+            <ActionsModal />
           </div>
         </form>
       </div>

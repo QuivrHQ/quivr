@@ -1,12 +1,12 @@
-/* eslint-disable max-lines */
 import { useTranslation } from "react-i18next";
-import { MdCheck, MdSettings } from "react-icons/md";
+import { LuChevronRight, LuSettings } from "react-icons/lu";
+import { MdCheck } from "react-icons/md";
 
-import Button from "@/lib/components/ui/Button";
 import { Modal } from "@/lib/components/ui/Modal";
 import { defineMaxTokens } from "@/lib/helpers/defineMaxTokens";
 
 import { useConfigModal } from "./hooks/useConfigModal";
+import { Button } from "../Button";
 
 export const ConfigModal = (): JSX.Element => {
   const {
@@ -24,12 +24,11 @@ export const ConfigModal = (): JSX.Element => {
     <Modal
       Trigger={
         <Button
-          className="p-2 sm:px-3"
-          variant={"tertiary"}
-          data-testid="config-button"
-        >
-          <MdSettings className="text-lg sm:text-xl lg:text-2xl" />
-        </Button>
+          label={"Parametres"}
+          startIcon={<LuSettings size={18} />}
+          endIcon={<LuChevronRight size={18} />}
+          className="w-full"
+        />
       }
       title="Chat configuration"
       desc="Adjust your chat settings"
@@ -68,16 +67,16 @@ export const ConfigModal = (): JSX.Element => {
         </fieldset>
 
         <Button
-          className="mt-12 self-end"
+          className="mt-12 self-end text-white"
           type="button"
           onClick={() => {
             handleSubmit();
             setIsConfigModalOpen(false);
           }}
-        >
-          Save
-          <MdCheck className="text-xl" />
-        </Button>
+          variant={"primary"}
+          label="Save"
+          endIcon={<MdCheck className="text-xl" />}
+        />
       </form>
     </Modal>
   );
