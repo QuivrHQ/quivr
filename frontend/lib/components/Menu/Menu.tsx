@@ -12,7 +12,14 @@ import { nonProtectedPaths } from "./config";
 
 export const Menu = (): JSX.Element => {
   const pathname = usePathname() ?? "";
+
   if (nonProtectedPaths.includes(pathname)) {
+    return <></>;
+  }
+
+  const isChatPage = pathname.includes("/chat");
+
+  if (!isChatPage) {
     return <></>;
   }
 
