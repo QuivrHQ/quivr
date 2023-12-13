@@ -134,6 +134,45 @@ class CompositeBrainQA(
                 streaming=self.streaming,
                 prompt_id=self.prompt_id,
             ).generate_answer(chat_id, question)
+            brain = brain_service.get_brain_by_id(self.brain_id)
+            if save_answer:
+                new_chat = chat_service.update_chat_history(
+                    CreateChatHistory(
+                        **{
+                            "chat_id": chat_id,
+                            "user_message": question.question,
+                            "assistant": response.assistant,
+                            "brain_id": question.brain_id,
+                            "prompt_id": self.prompt_to_use_id,
+                        }
+                    )
+                )
+                return GetChatHistoryOutput(
+                    **{
+                        "chat_id": chat_id,
+                        "user_message": question.question,
+                        "assistant": response.assistant,
+                        "message_time": new_chat.message_time,
+                        "prompt_title": self.prompt_to_use.title
+                        if self.prompt_to_use
+                        else None,
+                        "brain_name": brain.name,
+                        "message_id": new_chat.message_id,
+                    }
+                )
+            return GetChatHistoryOutput(
+                **{
+                    "chat_id": chat_id,
+                    "user_message": question.question,
+                    "assistant": response.assistant,
+                    "message_time": None,
+                    "prompt_title": self.prompt_to_use.title
+                    if self.prompt_to_use
+                    else None,
+                    "brain_name": brain.name,
+                    "message_id": None,
+                }
+            )
 
         tools = []
         available_functions = {}
@@ -225,17 +264,12 @@ class CompositeBrainQA(
         tool_calls = response_message.tool_calls
 
         if tool_calls:
-            print("TOOL_CALLS", tool_calls)
             messages.append(response_message)
             for tool_call in tool_calls:
                 function_name = tool_call.function.name
-                queried_brain = connected_brains_details[function_name]
                 function_to_call = available_functions[function_name]
                 function_args = json.loads(tool_call.function.arguments)
-                print("function_args", function_args["question"])
                 question = ChatQuestion(question=function_args["question"])
-
-                yield f"🧠< Querying the brain {queried_brain.name} with the following arguments: {function_args} >🧠",
 
                 function_response = function_to_call(
                     chat_id=chat_id,
