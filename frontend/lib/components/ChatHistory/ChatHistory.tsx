@@ -1,12 +1,12 @@
+import { ChatsListItem } from "@/lib/components/ChatsListItem";
 import { useChatsContext } from "@/lib/context/ChatsProvider/hooks/useChatsContext";
 
-import { ChatsListItem } from "./ChatsListItem/ChatsListItem";
 import {
   isToday,
   isWithinLast30Days,
   isWithinLast7Days,
   isYesterday,
-} from "../utils";
+} from "./utils";
 
 export const ChatHistory = (): JSX.Element => {
   const { allChats } = useChatsContext();
