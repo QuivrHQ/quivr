@@ -1,7 +1,7 @@
+import { ChatsListItem } from "@/lib/components/ChatsListItem";
 import { useOnboardingTracker } from "@/lib/hooks/useOnboardingTracker";
 
 import { useWelcomeChat } from "./hooks/useWelcomeChat";
-import { ChatsListItem } from "../ChatsListItem";
 
 export const WelcomeChat = (): JSX.Element => {
   const { chat, handleWelcomeChatDelete } = useWelcomeChat();
