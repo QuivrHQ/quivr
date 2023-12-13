@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.0.137 (2023-12-13)
+
+## What's Changed
+* feat: add chat history to Actions modal by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1877
+* feat: allow user to control left panel from Chat input by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1880
+
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.136...v0.0.137
+
 ## 0.0.136 (2023-12-13)
 
 ## What's Changed
