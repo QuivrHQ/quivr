@@ -18,6 +18,7 @@
   "keyboard_shortcuts": "Keyboard shortcuts",
   "limit_reached": "You have reached the limit of requests, please try again later",
   "missing_brain": "Please select a brain to chat with",
+  "new_discussion": "New discussion",
   "new_prompt": "Create new prompt",
   "noCurrentBrain": "No current brain",
   "onboarding": {
@@ -35,6 +36,7 @@
     "what_is_brain": "What is a brain ?",
     "what_is_quivr": "What is Quivr ?"
   },
+  "parameters": "Parameters",
   "receivedResponse": "Received response. Starting to handle stream...",
   "resposeBodyNull": "Response body is null",
   "shortcut_choose_prompt": "#: Choose a specific prompt",

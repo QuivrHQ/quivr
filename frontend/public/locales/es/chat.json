@@ -18,6 +18,7 @@
   "keyboard_shortcuts": "Atajos de teclado",
   "limit_reached": "Has alcanzado el límite de peticiones, intente de nuevo más tarde",
   "missing_brain": "No hay cerebro seleccionado",
+  "new_discussion": "Nueva discusión",
   "new_prompt": "Crear nueva instrucción",
   "noCurrentBrain": "Sin cerebro seleccionado",
   "onboarding": {
@@ -35,6 +36,7 @@
     "what_is_brain": "¿Qué es un cerebro?",
     "what_is_quivr": "¿Qué es Quivr?"
   },
+  "parameters": "Parámetros",
   "receivedResponse": "Respuesta recibida. Iniciando gestión de stream...",
   "resposeBodyNull": "Cuerpo de respuesta vacío",
   "shortcut_choose_prompt": "#: Elegir una instrucción específica",

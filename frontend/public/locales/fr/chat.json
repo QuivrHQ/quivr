@@ -18,6 +18,7 @@
   "keyboard_shortcuts": "Raccourcis clavier",
   "limit_reached": "Vous avez atteint la limite de requêtes, veuillez réessayer plus tard",
   "missing_brain": "Veuillez selectionner un cerveau pour discuter",
+  "new_discussion": "Nouvelle discussion",
   "new_prompt": "Créer un nouveau prompt",
   "noCurrentBrain": "Pas de cerveau actuel",
   "onboarding": {
@@ -35,6 +36,7 @@
     "what_is_brain": "Qu'est-ce qu'un cerveau ?",
     "what_is_quivr": "Qu'est-ce que Quivr ?"
   },
+  "parameters": "Paramètres",
   "receivedResponse": "Réponse reçue. Commence à gérer le flux...",
   "resposeBodyNull": "Le corps de la réponse est nul",
   "shortcut_choose_prompt": "#: Choisir une directive spécifique",

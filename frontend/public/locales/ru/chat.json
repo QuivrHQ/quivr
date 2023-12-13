@@ -18,6 +18,7 @@
   "keyboard_shortcuts": "Сочетания клавиш",
   "limit_reached": "Вы достигли лимита запросов, пожалуйста, попробуйте позже",
   "missing_brain": "Мозг не найден",
+  "new_discussion": "Новое обсуждение",
   "new_prompt": "Создать новый запрос",
   "noCurrentBrain": "Нет текущего мозга",
   "onboarding": {
@@ -35,6 +36,7 @@
     "what_is_brain": "Что такое мозг?",
     "what_is_quivr": "Что такое Quivr?"
   },
+  "parameters": "Параметры",
   "receivedResponse": "Получен ответ. Начинается обработка потока...",
   "resposeBodyNull": "Пустой ответ",
   "shortcut_choose_prompt": "#: Выберите конкретный запрос",

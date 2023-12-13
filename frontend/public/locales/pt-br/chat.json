@@ -18,6 +18,7 @@
   "keyboard_shortcuts": "Atalhos do teclado",
   "limit_reached": "Você atingiu o limite de solicitações, por favor, tente novamente mais tarde",
   "missing_brain": "Cérebro não encontrado",
+  "new_discussion": "Nova discussão",
   "new_prompt": "Criar novo prompt",
   "noCurrentBrain": "Nenhum cérebro selecionado",
   "onboarding": {
@@ -35,6 +36,7 @@
     "what_is_brain": "O que é um cérebro?",
     "what_is_quivr": "O que é o Quivr?"
   },
+  "parameters": "Parâmetros",
   "receivedResponse": "Resposta recebida. Iniciando o processamento do fluxo...",
   "resposeBodyNull": "O corpo da resposta está vazio",
   "shortcut_choose_prompt": "#: Escolha um prompt específico",
