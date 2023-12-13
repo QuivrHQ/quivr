@@ -5,6 +5,7 @@
   "back_to_chat": "Voltar para o chat",
   "brain": "cérebro",
   "brains": "cérebros",
+  "change_brain": "Mudar cérebro",
   "chat": "Conversa",
   "chatDeleted": "Conversa excluída com sucesso. Id: {{id}}",
   "chatNameUpdated": "Nome da conversa atualizado",

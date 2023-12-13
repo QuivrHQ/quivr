@@ -6,6 +6,7 @@
   "begin_conversation_placeholder": "在这里开始对话…",
   "brain": "大脑",
   "brains": "大脑",
+  "change_brain": "更改大脑",
   "chat": "聊天",
   "chatDeleted": "聊天删除成功. Id: {{id}}",
   "chatNameUpdated": "聊天名称已更新",

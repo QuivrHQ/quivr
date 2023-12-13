@@ -5,6 +5,7 @@
   "back_to_chat": "Back to chat",
   "brain": "brain",
   "brains": "brains",
+  "change_brain": "Change brain",
   "chat": "Chat",
   "chatDeleted": "Chat successfully deleted. Id: {{id}}",
   "chatNameUpdated": "Chat name updated",
