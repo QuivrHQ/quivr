@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.0.136 (2023-12-13)
+
+## What's Changed
+* feat: Add @tailwindcss/forms plugin and update by @StanGirard in https://github.com/StanGirard/quivr/pull/1869
+* feat: Refactor get_question_context_for_brain endpoint by @StanGirard in https://github.com/StanGirard/quivr/pull/1872
+* feat: Add file URL to DocumentAnswer objects by @StanGirard in https://github.com/StanGirard/quivr/pull/1874
+* Update .gitignore and add .gitmodules by @StanGirard in https://github.com/StanGirard/quivr/pull/1875
+* feat: add new actions modal by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1870
+* feat: add selected brain tag and new discussion button to actions modal by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1873
+* feat: add action modal change brain button by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1876
+
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.135...v0.0.136
+
 ## 0.0.135 (2023-12-11)
 
 **Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.134...v0.0.135
