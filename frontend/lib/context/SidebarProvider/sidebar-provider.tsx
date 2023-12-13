@@ -1,4 +1,3 @@
-import { usePathname } from "next/navigation";
 import { createContext, useEffect, useState } from "react";
 
 import { useDevice } from "@/lib/hooks/useDevice";
@@ -19,11 +18,10 @@ export const SideBarProvider = ({
 }): JSX.Element => {
   const { isMobile } = useDevice();
   const [isOpened, setIsOpened] = useState(!isMobile);
-  const pathname = usePathname();
 
   useEffect(() => {
     setIsOpened(!isMobile);
-  }, [isMobile, pathname]);
+  }, [isMobile]);
 
   return (
     <SideBarContext.Provider
