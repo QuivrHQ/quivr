@@ -20,7 +20,7 @@ export const Button = forwardRef(
   ): JSX.Element => {
     return (
       <CoreButton
-        className={cn("p-2 sm:px-3 text-primary focus:ring-0 ", className)}
+        className={cn("p-2 sm:px-3 text-primary focus:ring-0", className)}
         variant={"tertiary"}
         data-testid="config-button"
         ref={forwardedRef}
