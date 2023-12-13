@@ -22,6 +22,7 @@
   "last30Days": "过去30天",
   "last7Days": "过去7天",
   "limit_reached": "您已达到请求限制，请稍后再试",
+  "menu": "菜单",
   "missing_brain": "请选择一个大脑进行聊天",
   "new_discussion": "新讨论",
   "new_prompt": "新提示",

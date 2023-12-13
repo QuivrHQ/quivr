@@ -9,6 +9,7 @@ import { getBrainIconFromBrainType } from "@/lib/helpers/getBrainIconFromBrainTy
 import { OnboardingQuestions } from "./components";
 import { ActionsModal } from "./components/ActionsModal/ActionsModal";
 import { ChatEditor } from "./components/ChatEditor/ChatEditor";
+import { MenuControlButton } from "./components/MenuControlButton";
 import { useChatInput } from "./hooks/useChatInput";
 
 type ChatInputProps = {
@@ -37,6 +38,7 @@ export const ChatInput = ({
           }}
           className="sticky bottom-0 bg-white dark:bg-black w-full flex items-center gap-2 z-20 p-2"
         >
+          <MenuControlButton />
           {!shouldDisplayFeedOrSecretsCard && (
             <Button
               className="p-0"
