@@ -10,6 +10,7 @@ import { ExplorerButton } from "./components/ExplorerButton";
 import { MenuHeader } from "./components/MenuHeader";
 import { ParametersButton } from "./components/ParametersButton";
 import { ProfileButton } from "./components/ProfileButton";
+import { UpgradeToPlus } from "./components/UpgradeToPlus";
 
 export const Menu = (): JSX.Element => {
   const pathname = usePathname() ?? "";
@@ -39,6 +40,7 @@ export const Menu = (): JSX.Element => {
               </div>
             </div>
             <div>
+              <UpgradeToPlus />
               <ProfileButton />
             </div>
           </div>

@@ -11,10 +11,10 @@ export const AnimatedDiv = ({ children }: AnimatedDivProps): JSX.Element => {
   return (
     <motion.div
       initial={{
-        width: isOpened ? "200px" : "0px",
+        width: isOpened ? "260px" : "0px",
       }}
       animate={{
-        width: isOpened ? "200px" : "0px",
+        width: isOpened ? "260px" : "0px",
         opacity: isOpened ? 1 : 0.5,
         boxShadow: isOpened
           ? "10px 10px 16px rgba(0, 0, 0, 0)"
