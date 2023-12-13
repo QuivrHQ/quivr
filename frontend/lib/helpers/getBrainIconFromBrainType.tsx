@@ -1,5 +1,5 @@
 import { IconType } from "react-icons/lib";
-import { LuBrain } from "react-icons/lu";
+import { LuBot, LuBrain } from "react-icons/lu";
 import { PiPaperclipFill } from "react-icons/pi";
 import { TbWorld } from "react-icons/tb";
 
@@ -24,6 +24,10 @@ export const getBrainIconFromBrainType = (
   }
   if (brainType === "api") {
     return <ApiBrainIcon size={iconSize} />;
+  }
+
+  if (brainType === "composite") {
+    return <LuBot size={iconSize} />;
   }
 
   return <DocBrainIcon size={iconSize} />;
