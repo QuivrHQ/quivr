@@ -26,7 +26,7 @@ export const Menu = (): JSX.Element => {
 
   return (
     <MotionConfig transition={{ mass: 1, damping: 10, duration: 0.2 }}>
-      <div className="flex flex-col fixed sm:sticky top-0 left-0 h-full overflow-visible z-30 border-r border-black/10 dark:border-white/25 bg-white dark:bg-black w-[200px]">
+      <div className="flex flex-col fixed sm:sticky top-0 left-0 h-full overflow-visible z-30 border-r border-black/10 dark:border-white/25 bg-white dark:bg-black">
         <AnimatedDiv>
           <div className="flex flex-col flex-1 p-4 gap-4">
             <MenuHeader />
