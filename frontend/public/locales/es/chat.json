@@ -16,6 +16,7 @@
   "errorParsingData": "Error al transformar datos",
   "feed_brain_placeholder": "Elige cuál @cerebro quieres alimentar con estos archivos",
   "feedingBrain": "Su conocimiento recién agregado se está procesando, ¡puede seguir chateando mientras tanto!",
+  "history": "Historia",
   "keyboard_shortcuts": "Atajos de teclado",
   "limit_reached": "Has alcanzado el límite de peticiones, intente de nuevo más tarde",
   "missing_brain": "No hay cerebro seleccionado",

@@ -17,6 +17,7 @@
   "errorParsingData": "解析数据时发生错误",
   "feed_brain_placeholder": "选择要用这些文件充实的 @大脑",
   "feedingBrain": "您新添加的知识正在处理中，不影响您继续聊天！",
+  "history": "历史",
   "keyboard_shortcuts": "键盘快捷键",
   "limit_reached": "您已达到请求限制，请稍后再试",
   "missing_brain": "请选择一个大脑进行聊天",

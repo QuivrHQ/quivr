@@ -16,6 +16,7 @@
   "errorParsingData": "Erreur lors de l'analyse des données",
   "feed_brain_placeholder": "Choisissez le @cerveau que vous souhaitez nourrir avec ces fichiers",
   "feedingBrain": "Vos nouvelles connaissances sont en cours de traitement. Vous pouvez continuer à discuter en attendant !",
+  "history": "Histoire",
   "keyboard_shortcuts": "Raccourcis clavier",
   "limit_reached": "Vous avez atteint la limite de requêtes, veuillez réessayer plus tard",
   "missing_brain": "Veuillez selectionner un cerveau pour discuter",
