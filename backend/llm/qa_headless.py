@@ -8,6 +8,13 @@ from langchain.chains import LLMChain
 from langchain.chat_models import ChatLiteLLM
 from langchain.chat_models.base import BaseChatModel
 from langchain.prompts.chat import ChatPromptTemplate, HumanMessagePromptTemplate
+from llm.qa_interface import QAInterface
+from llm.utils.format_chat_history import (
+    format_chat_history,
+    format_history_to_openai_mesages,
+)
+from llm.utils.get_prompt_to_use import get_prompt_to_use
+from llm.utils.get_prompt_to_use_id import get_prompt_to_use_id
 from logger import get_logger
 from models import BrainSettings  # Importing settings related to the 'brain'
 from modules.chat.dto.chats import ChatQuestion
@@ -16,14 +23,6 @@ from modules.chat.dto.outputs import GetChatHistoryOutput
 from modules.chat.service.chat_service import ChatService
 from modules.prompt.entity.prompt import Prompt
 from pydantic import BaseModel
-
-from llm.qa_interface import QAInterface
-from llm.utils.format_chat_history import (
-    format_chat_history,
-    format_history_to_openai_mesages,
-)
-from llm.utils.get_prompt_to_use import get_prompt_to_use
-from llm.utils.get_prompt_to_use_id import get_prompt_to_use_id
 
 logger = get_logger(__name__)
 SYSTEM_MESSAGE = "Your name is Quivr. You're a helpful assistant. If you don't know the answer, just say that you don't know, don't try to make up an answer.When answering use markdown or any other techniques to display the content in a nice and aerated way."
@@ -102,7 +101,7 @@ class HeadlessQA(BaseModel, QAInterface):
         return CHAT_PROMPT
 
     def generate_answer(
-        self, chat_id: UUID, question: ChatQuestion
+        self, chat_id: UUID, question: ChatQuestion, save_answer: bool = True
     ) -> GetChatHistoryOutput:
         # Move format_chat_history to chat service ?
         transformed_history = format_chat_history(
@@ -122,35 +121,49 @@ class HeadlessQA(BaseModel, QAInterface):
         )
         model_prediction = answering_llm.predict_messages(messages)
         answer = model_prediction.content
+        if save_answer:
+            new_chat = chat_service.update_chat_history(
+                CreateChatHistory(
+                    **{
+                        "chat_id": chat_id,
+                        "user_message": question.question,
+                        "assistant": answer,
+                        "brain_id": None,
+                        "prompt_id": self.prompt_to_use_id,
+                    }
+                )
+            )
 
-        new_chat = chat_service.update_chat_history(
-            CreateChatHistory(
+            return GetChatHistoryOutput(
                 **{
                     "chat_id": chat_id,
                     "user_message": question.question,
                     "assistant": answer,
-                    "brain_id": None,
-                    "prompt_id": self.prompt_to_use_id,
+                    "message_time": new_chat.message_time,
+                    "prompt_title": self.prompt_to_use.title
+                    if self.prompt_to_use
+                    else None,
+                    "brain_name": None,
+                    "message_id": new_chat.message_id,
                 }
             )
-        )
-
-        return GetChatHistoryOutput(
-            **{
-                "chat_id": chat_id,
-                "user_message": question.question,
-                "assistant": answer,
-                "message_time": new_chat.message_time,
-                "prompt_title": self.prompt_to_use.title
-                if self.prompt_to_use
-                else None,
-                "brain_name": None,
-                "message_id": new_chat.message_id,
-            }
-        )
+        else:
+            return GetChatHistoryOutput(
+                **{
+                    "chat_id": chat_id,
+                    "user_message": question.question,
+                    "assistant": answer,
+                    "message_time": None,
+                    "prompt_title": self.prompt_to_use.title
+                    if self.prompt_to_use
+                    else None,
+                    "brain_name": None,
+                    "message_id": None,
+                }
+            )
 
     async def generate_stream(
-        self, chat_id: UUID, question: ChatQuestion
+        self, chat_id: UUID, question: ChatQuestion, save_answer: bool = True
     ) -> AsyncIterable:
         callback = AsyncIteratorCallbackHandler()
         self.callbacks = [callback]
@@ -191,31 +204,46 @@ class HeadlessQA(BaseModel, QAInterface):
             ),
         )
 
-        streamed_chat_history = chat_service.update_chat_history(
-            CreateChatHistory(
+        if save_answer:
+            streamed_chat_history = chat_service.update_chat_history(
+                CreateChatHistory(
+                    **{
+                        "chat_id": chat_id,
+                        "user_message": question.question,
+                        "assistant": "",
+                        "brain_id": None,
+                        "prompt_id": self.prompt_to_use_id,
+                    }
+                )
+            )
+
+            streamed_chat_history = GetChatHistoryOutput(
                 **{
-                    "chat_id": chat_id,
+                    "chat_id": str(chat_id),
+                    "message_id": streamed_chat_history.message_id,
+                    "message_time": streamed_chat_history.message_time,
                     "user_message": question.question,
                     "assistant": "",
-                    "brain_id": None,
-                    "prompt_id": self.prompt_to_use_id,
+                    "prompt_title": self.prompt_to_use.title
+                    if self.prompt_to_use
+                    else None,
+                    "brain_name": None,
                 }
             )
-        )
-
-        streamed_chat_history = GetChatHistoryOutput(
-            **{
-                "chat_id": str(chat_id),
-                "message_id": streamed_chat_history.message_id,
-                "message_time": streamed_chat_history.message_time,
-                "user_message": question.question,
-                "assistant": "",
-                "prompt_title": self.prompt_to_use.title
-                if self.prompt_to_use
-                else None,
-                "brain_name": None,
-            }
-        )
+        else:
+            streamed_chat_history = GetChatHistoryOutput(
+                **{
+                    "chat_id": str(chat_id),
+                    "message_id": None,
+                    "message_time": None,
+                    "user_message": question.question,
+                    "assistant": "",
+                    "prompt_title": self.prompt_to_use.title
+                    if self.prompt_to_use
+                    else None,
+                    "brain_name": None,
+                }
+            )
 
         async for token in callback.aiter():
             logger.info("Token: %s", token)
@@ -226,11 +254,12 @@ class HeadlessQA(BaseModel, QAInterface):
         await run
         assistant = "".join(response_tokens)
 
-        chat_service.update_message_by_id(
-            message_id=str(streamed_chat_history.message_id),
-            user_message=question.question,
-            assistant=assistant,
-        )
+        if save_answer:
+            chat_service.update_message_by_id(
+                message_id=str(streamed_chat_history.message_id),
+                user_message=question.question,
+                assistant=assistant,
+            )
 
     class Config:
         arbitrary_types_allowed = True
