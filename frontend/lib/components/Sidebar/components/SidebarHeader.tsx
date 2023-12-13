@@ -1,4 +1,4 @@
-import { LuPanelLeft } from "react-icons/lu";
+import { LuPanelLeftClose } from "react-icons/lu";
 
 import { Logo } from "@/lib/components/Logo/Logo";
 import { useSideBarContext } from "@/lib/context/SidebarProvider/hooks/useSideBarContext";
@@ -17,7 +17,7 @@ export const SidebarHeader = (): JSX.Element => {
           data-testid="close-sidebar-button"
           onClick={() => setIsOpened(false)}
         >
-          <LuPanelLeft />
+          <LuPanelLeftClose />
         </button>
       </div>
     </div>

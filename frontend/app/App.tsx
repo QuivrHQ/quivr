@@ -5,6 +5,7 @@ import { PropsWithChildren, useEffect } from "react";
 
 import { BrainProvider } from "@/lib/context";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
+import { SideBarProvider } from "@/lib/context/SidebarProvider/sidebar-provider";
 import { useSupabase } from "@/lib/context/SupabaseProvider";
 import { UpdateMetadata } from "@/lib/helpers/updateMetadata";
 import { usePageTracking } from "@/services/analytics/june/usePageTracking";
@@ -40,7 +41,9 @@ const AppWithQueryClient = ({ children }: PropsWithChildren): JSX.Element => {
   return (
     <QueryClientProvider client={queryClient}>
       <BrainProvider>
-        <App>{children}</App>
+        <SideBarProvider>
+          <App>{children}</App>
+        </SideBarProvider>
       </BrainProvider>
     </QueryClientProvider>
   );
