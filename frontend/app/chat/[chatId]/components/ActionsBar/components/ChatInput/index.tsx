@@ -12,19 +12,14 @@ import { ChatEditor } from "./components/ChatEditor/ChatEditor";
 import { MenuControlButton } from "./components/MenuControlButton";
 import { useChatInput } from "./hooks/useChatInput";
 
-type ChatInputProps = {
-  shouldDisplayFeedOrSecretsCard: boolean;
-};
-
-export const ChatInput = ({
-  shouldDisplayFeedOrSecretsCard,
-}: ChatInputProps): JSX.Element => {
+export const ChatInput = (): JSX.Element => {
   const { setMessage, submitQuestion, generatingAnswer, message } =
     useChatInput();
 
   const { t } = useTranslation(["chat"]);
   const { currentBrainDetails } = useBrainContext();
-  const { setShouldDisplayFeedCard } = useKnowledgeToFeedContext();
+  const { setShouldDisplayFeedCard, shouldDisplayFeedCard } =
+    useKnowledgeToFeedContext();
 
   return (
     <>
@@ -39,7 +34,7 @@ export const ChatInput = ({
           className="sticky bottom-0 bg-white dark:bg-black w-full flex items-center gap-2 z-20 p-2"
         >
           <MenuControlButton />
-          {!shouldDisplayFeedOrSecretsCard && (
+          {!shouldDisplayFeedCard && (
             <Button
               className="p-0"
               variant={"tertiary"}
