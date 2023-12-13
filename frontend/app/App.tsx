@@ -4,6 +4,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { PropsWithChildren, useEffect } from "react";
 
 import { Menu } from "@/lib/components/Menu/Menu";
+import { NotificationBanner } from "@/lib/components/NotificationBanner";
 import { BrainProvider } from "@/lib/context";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 import { SideBarProvider } from "@/lib/context/SidebarProvider/sidebar-provider";
@@ -30,10 +31,13 @@ const App = ({ children }: PropsWithChildren): JSX.Element => {
   }, [session]);
 
   return (
-    <div className="relative h-full w-full flex justify-stretch items-stretch">
-      <Menu />
-      <div className="flex-1">{children}</div>
-      <UpdateMetadata />
+    <div className="flex flex-1 flex-col overflow-auto">
+      <NotificationBanner />
+      <div className="relative h-full w-full flex justify-stretch items-stretch overflow-auto">
+        <Menu />
+        <div className="flex-1">{children}</div>
+        <UpdateMetadata />
+      </div>
     </div>
   );
 };

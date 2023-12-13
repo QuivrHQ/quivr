@@ -1,6 +1,8 @@
 import { MotionConfig } from "framer-motion";
 import { usePathname } from "next/navigation";
 
+import { nonProtectedPaths } from "@/lib/config/routesConfig";
+
 import { AnimatedDiv } from "./components/AnimationDiv";
 import { BrainsManagementButton } from "./components/BrainsManagementButton";
 import { DiscussionButton } from "./components/DiscussionButton";
@@ -8,7 +10,6 @@ import { ExplorerButton } from "./components/ExplorerButton";
 import { MenuHeader } from "./components/MenuHeader";
 import { ParametersButton } from "./components/ParametersButton";
 import { ProfileButton } from "./components/ProfileButton";
-import { nonProtectedPaths } from "./config";
 
 export const Menu = (): JSX.Element => {
   const pathname = usePathname() ?? "";
