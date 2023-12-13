@@ -206,19 +206,20 @@ class APIBrainQA(KnowledgeBrainQA, QAInterface):
                     "brain_name": brain.name if brain else None,
                 }
             )
-        streamed_chat_history = GetChatHistoryOutput(
-            **{
-                "chat_id": str(chat_id),
-                "message_id": None,
-                "message_time": None,
-                "user_message": question.question,
-                "assistant": "",
-                "prompt_title": self.prompt_to_use.title
-                if self.prompt_to_use
-                else None,
-                "brain_name": brain.name if brain else None,
-            }
-        )
+        else:
+            streamed_chat_history = GetChatHistoryOutput(
+                **{
+                    "chat_id": str(chat_id),
+                    "message_id": None,
+                    "message_time": None,
+                    "user_message": question.question,
+                    "assistant": "",
+                    "prompt_title": self.prompt_to_use.title
+                    if self.prompt_to_use
+                    else None,
+                    "brain_name": brain.name if brain else None,
+                }
+            )
         response_tokens = []
         async for value in self.make_completion(
             messages=messages,
