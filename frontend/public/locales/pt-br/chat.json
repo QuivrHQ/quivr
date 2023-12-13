@@ -18,6 +18,8 @@
   "feedingBrain": "Seu conhecimento recém-adicionado está sendo processado, você pode continuar conversando enquanto isso!",
   "history": "História",
   "keyboard_shortcuts": "Atalhos do teclado",
+  "last30Days": "Últimos 30 dias",
+  "last7Days": "Últimos 7 dias",
   "limit_reached": "Você atingiu o limite de solicitações, por favor, tente novamente mais tarde",
   "missing_brain": "Cérebro não encontrado",
   "new_discussion": "Nova discussão",
@@ -53,6 +55,8 @@
   "subtitle": "Converse com um modelo de linguagem sobre seus dados enviados",
   "thinking": "Pensando...",
   "title": "Converse com {{brain}}",
+  "today": "Hoje",
   "tooManyRequests": "Você excedeu o número de solicitações por dia. Para continuar conversando, insira uma chave de API da OpenAI em seu perfil ou no cérebro utilizado.",
-  "welcome": "Bem-vindo"
+  "welcome": "Bem-vindo",
+  "yesterday": "Ontem"
 }
