@@ -21,6 +21,7 @@
   "last30Days": "30 derniers jours",
   "last7Days": "7 derniers jours",
   "limit_reached": "Vous avez atteint la limite de requêtes, veuillez réessayer plus tard",
+  "menu": "Menu",
   "missing_brain": "Veuillez selectionner un cerveau pour discuter",
   "new_discussion": "Nouvelle discussion",
   "new_prompt": "Créer un nouveau prompt",
