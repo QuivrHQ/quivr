@@ -9,6 +9,7 @@ import {
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { Sidebar } from "@/lib/components/Sidebar/Sidebar";
+import { SideBarProvider } from "@/lib/context/SidebarProvider/sidebar-provider";
 import { useDevice } from "@/lib/hooks/useDevice";
 
 vi.mock("@/lib/hooks/useDevice");
@@ -16,9 +17,11 @@ vi.mock("@/lib/hooks/useDevice");
 const renderSidebar = async () => {
   await act(() =>
     render(
-      <Sidebar>
-        <div data-testid="sidebar-test-content">📦</div>
-      </Sidebar>
+      <SideBarProvider>
+        <Sidebar>
+          <div data-testid="sidebar-test-content">📦</div>
+        </Sidebar>
+      </SideBarProvider>
     )
   );
 };
