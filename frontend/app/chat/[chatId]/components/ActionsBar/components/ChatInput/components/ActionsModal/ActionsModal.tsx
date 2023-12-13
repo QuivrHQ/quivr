@@ -10,6 +10,7 @@ import {
 } from "@/lib/components/ui/Popover";
 
 import { ChangeBrainButton } from "./components/ChangeBrainButton";
+import { ChatHistoryButton } from "./components/ChatHistoryButton/ChatHistoryButton";
 import { ConfigModal } from "./components/ConfigModal";
 import { NewDiscussionButton } from "./components/NewDiscussionButton";
 import { SelectedBrainTag } from "./components/SelectedBrainTag";
@@ -39,6 +40,7 @@ export const ActionsModal = (): JSX.Element => {
         >
           <SelectedBrainTag />
           <NewDiscussionButton />
+          <ChatHistoryButton />
           <ConfigModal />
           <ChangeBrainButton />
         </PopoverContent>

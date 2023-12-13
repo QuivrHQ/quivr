@@ -16,7 +16,10 @@
   "errorParsingData": "Error al transformar datos",
   "feed_brain_placeholder": "Elige cuál @cerebro quieres alimentar con estos archivos",
   "feedingBrain": "Su conocimiento recién agregado se está procesando, ¡puede seguir chateando mientras tanto!",
+  "history": "Historia",
   "keyboard_shortcuts": "Atajos de teclado",
+  "last30Days": "Últimos 30 días",
+  "last7Days": "Últimos 7 días",
   "limit_reached": "Has alcanzado el límite de peticiones, intente de nuevo más tarde",
   "missing_brain": "No hay cerebro seleccionado",
   "new_discussion": "Nueva discusión",
@@ -52,6 +55,8 @@
   "subtitle": "Habla con un modelo de lenguaje acerca de tus datos subidos",
   "thinking": "Pensando...",
   "title": "Conversa con {{brain}}",
+  "today": "Hoy",
   "tooManyRequests": "Has excedido el número de solicitudes por día. Para continuar chateando, por favor ingresa una clave de API de OpenAI en tu perfil o en el cerebro utilizado.",
-  "welcome": "Bienvenido"
+  "welcome": "Bienvenido",
+  "yesterday": "Ayer"
 }

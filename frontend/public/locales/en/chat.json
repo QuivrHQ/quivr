@@ -16,7 +16,10 @@
   "errorParsingData": "Error parsing data",
   "feed_brain_placeholder": "Choose which @brain you want to feed with these files",
   "feedingBrain": "Your newly added knowledge is being processed, you can keep chatting in the meantime !",
+  "history": "History",
   "keyboard_shortcuts": "Keyboard shortcuts",
+  "last30Days": "Previous 30 days",
+  "last7Days": "Previous 7 days",
   "limit_reached": "You have reached the limit of requests, please try again later",
   "missing_brain": "Please select a brain to chat with",
   "new_discussion": "New discussion",
@@ -52,6 +55,8 @@
   "subtitle": "Talk to a language model about your uploaded data",
   "thinking": "Thinking...",
   "title": "Chat with {{brain}}",
+  "today": "Today",
   "tooManyRequests": "You have exceeded the number of requests per day. To continue chatting, please enter an OpenAI API key in your profile or in used brain.",
-  "welcome": "Welcome"
+  "welcome": "Welcome",
+  "yesterday": "Yesterday"
 }

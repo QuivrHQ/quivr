@@ -17,7 +17,10 @@
   "errorParsingData": "解析数据时发生错误",
   "feed_brain_placeholder": "选择要用这些文件充实的 @大脑",
   "feedingBrain": "您新添加的知识正在处理中，不影响您继续聊天！",
+  "history": "历史",
   "keyboard_shortcuts": "键盘快捷键",
+  "last30Days": "过去30天",
+  "last7Days": "过去7天",
   "limit_reached": "您已达到请求限制，请稍后再试",
   "missing_brain": "请选择一个大脑进行聊天",
   "new_discussion": "新讨论",
@@ -53,6 +56,8 @@
   "subtitle": "与语言模型讨论您上传的数据",
   "thinking": "思考中…",
   "title": "与 {{brain}} 聊天",
+  "today": "今天",
   "tooManyRequests": "您已超过每天的请求次数。想要继续聊天，请在您的个人资料中或为当前大脑配置 OpenAI API 密钥。",
-  "welcome": "欢迎"
+  "welcome": "欢迎",
+  "yesterday": "昨天"
 }

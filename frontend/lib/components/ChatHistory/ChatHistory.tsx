@@ -1,15 +1,18 @@
+import { useTranslation } from "react-i18next";
+
+import { ChatsListItem } from "@/lib/components/ChatsListItem";
 import { useChatsContext } from "@/lib/context/ChatsProvider/hooks/useChatsContext";
 
-import { ChatsListItem } from "./ChatsListItem/ChatsListItem";
 import {
   isToday,
   isWithinLast30Days,
   isWithinLast7Days,
   isYesterday,
-} from "../utils";
+} from "./utils";
 
 export const ChatHistory = (): JSX.Element => {
   const { allChats } = useChatsContext();
+  const { t } = useTranslation("chat");
   const todayChats = allChats.filter((chat) =>
     isToday(new Date(chat.creation_time))
   );
@@ -30,7 +33,7 @@ export const ChatHistory = (): JSX.Element => {
     >
       {todayChats.length > 0 && (
         <div className="bg-gray-100 text-black rounded-md px-3 py-1 mt-2">
-          Today
+          {t("today")}
         </div>
       )}
       {todayChats.map((chat) => (
@@ -39,7 +42,7 @@ export const ChatHistory = (): JSX.Element => {
 
       {yesterdayChats.length > 0 && (
         <div className="bg-gray-100 text-black rounded-md px-3 py-1 mt-2">
-          Yesterday
+          {t("yesterday")}
         </div>
       )}
       {yesterdayChats.map((chat) => (
@@ -48,7 +51,7 @@ export const ChatHistory = (): JSX.Element => {
 
       {last7DaysChats.length > 0 && (
         <div className="bg-gray-100 text-black rounded-md px-3 py-1 mt-2">
-          Previous 7 Days
+          {t("last7Days")}
         </div>
       )}
       {last7DaysChats.map((chat) => (
@@ -57,7 +60,7 @@ export const ChatHistory = (): JSX.Element => {
 
       {last30DaysChats.length > 0 && (
         <div className="bg-gray-100 text-black rounded-md px-3 py-1 mt-2">
-          Previous 30 Days
+          {t("last30Days")}
         </div>
       )}
       {last30DaysChats.map((chat) => (
