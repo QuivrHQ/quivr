@@ -233,6 +233,7 @@ class CompositeBrainQA(
 
         if brain_completion_output:
             answer = brain_completion_output.response.message.content
+            new_chat = None
             if save_answer:
                 new_chat = chat_service.update_chat_history(
                     CreateChatHistory(
@@ -245,31 +246,17 @@ class CompositeBrainQA(
                         }
                     )
                 )
-                return GetChatHistoryOutput(
-                    **{
-                        "chat_id": chat_id,
-                        "user_message": question.question,
-                        "assistant": brain_completion_output.response.message.content,
-                        "message_time": new_chat.message_time,
-                        "prompt_title": self.prompt_to_use.title
-                        if self.prompt_to_use
-                        else None,
-                        "brain_name": brain.name if brain else None,
-                        "message_id": new_chat.message_id,
-                    }
-                )
-
             return GetChatHistoryOutput(
                 **{
                     "chat_id": chat_id,
                     "user_message": question.question,
-                    "assistant": answer,
-                    "message_time": None,
+                    "assistant": brain_completion_output.response.message.content,
+                    "message_time": new_chat.message_time if new_chat else None,
                     "prompt_title": self.prompt_to_use.title
                     if self.prompt_to_use
                     else None,
-                    "brain_name": None,
-                    "message_id": None,
+                    "brain_name": brain.name if brain else None,
+                    "message_id": new_chat.message_id if new_chat else None,
                 }
             )
 
