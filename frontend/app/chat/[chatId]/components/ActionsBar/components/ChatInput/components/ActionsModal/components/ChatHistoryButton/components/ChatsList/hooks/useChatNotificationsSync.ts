@@ -7,9 +7,9 @@ import { useNotificationApi } from "@/lib/api/notification/useNotificationApi";
 import { useChatContext } from "@/lib/context";
 import { useKnowledgeToFeedContext } from "@/lib/context/KnowledgeToFeedProvider/hooks/useKnowledgeToFeedContext";
 
-import { getChatNotificationsQueryKey } from "../../../[chatId]/utils/getChatNotificationsQueryKey";
-import { getMessagesFromChatItems } from "../../../[chatId]/utils/getMessagesFromChatItems";
-import { getNotificationsFromChatItems } from "../../../[chatId]/utils/getNotificationsFromChatItems";
+import { getChatNotificationsQueryKey } from "../../../../../../../../../../../utils/getChatNotificationsQueryKey";
+import { getMessagesFromChatItems } from "../../../../../../../../../../../utils/getMessagesFromChatItems";
+import { getNotificationsFromChatItems } from "../../../../../../../../../../../utils/getNotificationsFromChatItems";
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const useChatNotificationsSync = () => {

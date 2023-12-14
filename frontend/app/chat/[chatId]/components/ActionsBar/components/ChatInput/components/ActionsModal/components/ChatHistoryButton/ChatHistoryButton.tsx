@@ -1,13 +1,13 @@
 import { useTranslation } from "react-i18next";
 import { LuChevronRight, LuHistory } from "react-icons/lu";
 
-import { ChatHistory } from "@/lib/components/ChatHistory/ChatHistory";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/lib/components/ui/Popover";
 
+import { ChatsList } from "./components/ChatsList";
 import { Button } from "../Button";
 
 export const ChatHistoryButton = (): JSX.Element => {
@@ -27,7 +27,7 @@ export const ChatHistoryButton = (): JSX.Element => {
         align="center"
         className="min-h-[200px] w-[250px] max-h-[500px] overflow-auto"
       >
-        <ChatHistory />
+        <ChatsList />
       </PopoverContent>
     </Popover>
   );

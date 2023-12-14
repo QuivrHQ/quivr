@@ -102,9 +102,6 @@ describe("ChatsList", () => {
     );
     const chatsList = getByTestId("chats-list");
     expect(chatsList).toBeDefined();
-
-    const newChatButton = getByTestId("new-chat-button");
-    expect(newChatButton).toBeDefined();
   });
 
   it("renders the chats list with correct number of items", () => {
