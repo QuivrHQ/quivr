@@ -1,17 +1,24 @@
+import { usePathname } from "next/navigation";
 import { Fragment } from "react";
 import { MdClose } from "react-icons/md";
 import ReactMarkdown from "react-markdown";
 import rehypeRaw from "rehype-raw";
 
 import Button from "@/lib/components/ui/Button";
+import { nonProtectedPaths } from "@/lib/config/routesConfig";
 
 import { useNotificationBanner } from "./hooks/useNotificationBanner";
 
 export const NotificationBanner = (): JSX.Element => {
   const { notificationBanner, isDismissed, dismissNotification } =
     useNotificationBanner();
+  const pathname = usePathname() ?? "";
 
-  if (isDismissed || notificationBanner === undefined) {
+  if (
+    isDismissed ||
+    notificationBanner === undefined ||
+    nonProtectedPaths.includes(pathname)
+  ) {
     return <Fragment />;
   }
 
