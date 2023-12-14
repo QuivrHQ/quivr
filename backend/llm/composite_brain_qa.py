@@ -12,7 +12,12 @@ from modules.brain.entity.brain_entity import BrainEntity, BrainType
 from modules.brain.service.brain_service import BrainService
 from modules.chat.dto.chats import ChatQuestion
 from modules.chat.dto.inputs import CreateChatHistory
-from modules.chat.dto.outputs import GetChatHistoryOutput
+from modules.chat.dto.outputs import (
+    BrainCompletionOutput,
+    CompletionMessage,
+    CompletionResponse,
+    GetChatHistoryOutput,
+)
 from modules.chat.service.chat_service import ChatService
 
 brain_service = BrainService()
@@ -122,7 +127,10 @@ class CompositeBrainQA(
     def generate_answer(
         self, chat_id: UUID, question: ChatQuestion, save_answer: bool
     ) -> str:
+        brain = brain_service.get_brain_by_id(question.brain_id)
+
         connected_brains = brain_service.get_connected_brains(self.brain_id)
+
         if not connected_brains:
             response = HeadlessQA(
                 chat_id=chat_id,
@@ -132,7 +140,6 @@ class CompositeBrainQA(
                 streaming=self.streaming,
                 prompt_id=self.prompt_id,
             ).generate_answer(chat_id, question, save_answer=False)
-            brain = brain_service.get_brain_by_id(self.brain_id)
             if save_answer:
                 new_chat = chat_service.update_chat_history(
                     CreateChatHistory(
@@ -176,18 +183,18 @@ class CompositeBrainQA(
         available_functions = {}
 
         connected_brains_details = {}
-        for brain_id in connected_brains:
-            brain = brain_service.get_brain_by_id(brain_id)
-            if brain is None:
+        for connected_brain_id in connected_brains:
+            connected_brain = brain_service.get_brain_by_id(connected_brain_id)
+            if connected_brain is None:
                 continue
 
-            tools.append(format_brain_to_tool(brain))
+            tools.append(format_brain_to_tool(connected_brain))
 
-            available_functions[brain_id] = self.get_answer_generator_from_brain_type(
-                brain
-            )
+            available_functions[
+                connected_brain_id
+            ] = self.get_answer_generator_from_brain_type(connected_brain)
 
-            connected_brains_details[str(brain.id)] = brain
+            connected_brains_details[str(connected_brain.id)] = connected_brain
 
         CHOOSE_BRAIN_FROM_TOOLS_PROMPT = (
             "Based on the provided user content, find the most appropriate tools to answer"
@@ -209,14 +216,23 @@ class CompositeBrainQA(
 
         response = completion(
             model="gpt-3.5-turbo",
-            messages=messages,  # is History included ?
+            messages=messages,
             tools=tools,
             tool_choice="auto",
         )
 
-        if response.choices[0].finish_reason == "stop":
-            answer = response.choices[0].message
-            print("ANSWER 1", answer)
+        brain_completion_output = self.make_recursive_tool_calls(
+            messages,
+            question,
+            chat_id,
+            tools,
+            available_functions,
+            recursive_count=0,
+            last_completion_response=response.choices[0],
+        )
+
+        if brain_completion_output:
+            answer = brain_completion_output.response.message.content
             if save_answer:
                 new_chat = chat_service.update_chat_history(
                     CreateChatHistory(
@@ -229,12 +245,11 @@ class CompositeBrainQA(
                         }
                     )
                 )
-
                 return GetChatHistoryOutput(
                     **{
                         "chat_id": chat_id,
                         "user_message": question.question,
-                        "assistant": answer,
+                        "assistant": brain_completion_output.response.message.content,
                         "message_time": new_chat.message_time,
                         "prompt_title": self.prompt_to_use.title
                         if self.prompt_to_use
@@ -258,11 +273,46 @@ class CompositeBrainQA(
                 }
             )
 
-        response_message = response.choices[0].message
-        tool_calls = response_message.tool_calls
+    def make_recursive_tool_calls(
+        self,
+        messages,
+        question,
+        chat_id,
+        tools=[],
+        available_functions={},
+        recursive_count=0,
+        last_completion_response: CompletionResponse = None,
+    ):
+        if recursive_count > 5:
+            print(
+                "The assistant is having issues and took more than 5 calls to the tools. Please try again later or an other instruction."
+            )
+            return None
 
-        if tool_calls:
+        finish_reason = last_completion_response.finish_reason
+        if finish_reason == "stop":
+            messages.append(last_completion_response.message)
+            return BrainCompletionOutput(
+                **{
+                    "messages": messages,
+                    "question": question.question,
+                    "response": last_completion_response,
+                }
+            )
+
+        if finish_reason == "tool_calls":
+            response_message: CompletionMessage = last_completion_response.message
+            tool_calls = response_message.tool_calls
+
             messages.append(response_message)
+
+            if (
+                len(tool_calls) == 0
+                or tool_calls is None
+                or len(available_functions) == 0
+            ):
+                return
+
             for tool_call in tool_calls:
                 function_name = tool_call.function.name
                 function_to_call = available_functions[function_name]
@@ -271,11 +321,15 @@ class CompositeBrainQA(
                     question=function_args["question"], brain_id=function_name
                 )
 
+                print("querying brain", function_name)
+                # TODO: extract chat_id from generate_answer function of XBrainQA
                 function_response = function_to_call(
                     chat_id=chat_id,
                     question=question,
                     save_answer=False,
                 )
+
+                print("brain_answer", function_response.assistant)
 
                 messages.append(
                     {
@@ -286,7 +340,7 @@ class CompositeBrainQA(
                     }
                 )
 
-            PROMPT_2 = "If initial question can be answered by our converaation messsages, then give an answer and end the conversation."
+            PROMPT_2 = "If initial question can be answered by our conversation messages, then give an answer and end the conversation."
 
             messages.append({"role": "system", "content": PROMPT_2})
 
@@ -302,63 +356,14 @@ class CompositeBrainQA(
                 tool_choice="auto",
             )
 
-            if response_after_tools_answers.choices[0].finish_reason == "stop":
-                answer = response_after_tools_answers.choices[0].message.content
-                if save_answer:
-                    new_chat = chat_service.update_chat_history(
-                        CreateChatHistory(
-                            **{
-                                "chat_id": chat_id,
-                                "user_message": question.question,
-                                "assistant": answer,
-                                "brain_id": question.brain_id,
-                                "prompt_id": self.prompt_to_use_id,
-                            }
-                        )
-                    )
-
-                    return GetChatHistoryOutput(
-                        **{
-                            "chat_id": chat_id,
-                            "user_message": question.question,
-                            "assistant": answer,
-                            "message_time": new_chat.message_time,
-                            "prompt_title": self.prompt_to_use.title
-                            if self.prompt_to_use
-                            else None,
-                            "brain_name": brain.name if brain else None,
-                            "message_id": new_chat.message_id,
-                        }
-                    )
-                return GetChatHistoryOutput(
-                    **{
-                        "chat_id": chat_id,
-                        "user_message": question.question,
-                        "assistant": answer,
-                        "message_time": "123",
-                        "prompt_title": None,
-                        "brain_name": brain.name,
-                        "message_id": None,
-                    }
-                )
-
-            print("response_after_tools_answers", response_after_tools_answers)
-
-            if response_after_tools_answers.choices[0].finish_reason == "tool_calls":
-                if response_after_tools_answers.choices[0].message.tool_calls:
-                    # TODO: recursively call with tools (update prompt + create intermediary function )
-                    print("NEED TO LOOP OVER OTHER TOOL")
-
-            return GetChatHistoryOutput(
-                **{
-                    "chat_id": chat_id,
-                    "user_message": question.question,
-                    "assistant": response_after_tools_answers.choices[0].message,
-                    "message_time": "123",
-                    "prompt_title": None,
-                    "brain_name": brain.name,
-                    "message_id": None,
-                }
+            return self.make_recursive_tool_calls(
+                messages,
+                question,
+                chat_id,
+                tools,
+                available_functions,
+                recursive_count=recursive_count + 1,
+                last_completion_response=response_after_tools_answers.choices[0],
             )
 
     async def generate_stream(
