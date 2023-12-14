@@ -20,6 +20,7 @@ Thanks for your interest in contributing to Quivr! Here you'll find guidelines f
     - [Reporting Bugs](#reporting-bugs)
     - [Feature Requests](#feature-requests)
     - [Code Contributions](#code-contributions)
+    - [Translations](#translations)
   - [Submission Guidelines](#submission-guidelines)
   - [Coding Rules](#coding-rules)
     - [Frontend Guidelines](#frontend-guidelines)
@@ -62,7 +63,7 @@ Enhancements are also tracked as GitHub issues and use the feature request templ
 5. Push your branch to GitHub.
 6. In GitHub, submit a pull request to the original repository.
 
-### Translating
+### Translations
 
 Languages: 
 [Spanisch](https://inlang.com/editor/github.com/StanGirard/quivr?lang=en&lang=es)
