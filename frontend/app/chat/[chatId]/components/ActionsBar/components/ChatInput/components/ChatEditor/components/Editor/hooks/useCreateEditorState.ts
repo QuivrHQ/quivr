@@ -8,7 +8,6 @@ import { useTranslation } from "react-i18next";
 
 import { useBrainMention } from "./useBrainMention";
 import { usePromptMention } from "./usePromptSuggestionsConfig";
-
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const useCreateEditorState = () => {
   const { t } = useTranslation(["chat", "vaccineTruth"]);

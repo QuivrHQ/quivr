@@ -14,8 +14,8 @@ export const ChatGuide = (): JSX.Element => {
           className="rounded-full w-16 h-16 mb-4"
           src={"/vt-logo.png"}
           alt="vaccinetruth.ai logo"
-          height={100}
-          width={100}
+          height={64}
+          width={64}
         ></Image>
 
         <div className="font-bold mb-2">{t("emptyChatTitle")}</div>
