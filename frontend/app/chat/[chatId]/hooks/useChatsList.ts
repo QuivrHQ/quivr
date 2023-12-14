@@ -11,7 +11,7 @@ import { useToast } from "@/lib/hooks";
 export const useChatsList = () => {
   const { t } = useTranslation(["chat"]);
 
-  const { setAllChats } = useChatsContext();
+  const { setAllChats, setIsLoading } = useChatsContext();
   const { publish } = useToast();
   const { getChats } = useChatApi();
 
@@ -29,7 +29,7 @@ export const useChatsList = () => {
     }
   };
 
-  const { data: chats } = useQuery({
+  const { data: chats, isLoading } = useQuery({
     queryKey: [CHATS_DATA_KEY],
     queryFn: fetchAllChats,
   });
@@ -37,4 +37,8 @@ export const useChatsList = () => {
   useEffect(() => {
     setAllChats(chats ?? []);
   }, [chats]);
+
+  useEffect(() => {
+    setIsLoading(isLoading);
+  }, [isLoading]);
 };
