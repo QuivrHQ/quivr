@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.0.139 (2023-12-14)
+
+## What's Changed
+* feat: allow user to feed brain from Actions bar by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1882
+* feat: add Menu bar by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1885
+* feat: Remove unused method and update file processing by @StanGirard in https://github.com/StanGirard/quivr/pull/1890
+* fix: update chat history fetching logic by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1891
+* feat: add default feed button label by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1892
+
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.138...v0.0.139
+
 ## 0.0.138 (2023-12-13)
 
 **Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.137...v0.0.138
