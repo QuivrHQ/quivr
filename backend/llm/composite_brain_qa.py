@@ -344,6 +344,11 @@ class CompositeBrainQA(
 
             print("response_after_tools_answers", response_after_tools_answers)
 
+            if response_after_tools_answers.choices[0].finish_reason == "tool_calls":
+                if response_after_tools_answers.choices[0].message.tool_calls:
+                    # TODO: recursively call with tools (update prompt + create intermediary function )
+                    print("NEED TO LOOP OVER OTHER TOOL")
+
             return GetChatHistoryOutput(
                 **{
                     "chat_id": chat_id,
