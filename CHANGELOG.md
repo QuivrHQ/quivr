@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.0.140 (2023-12-14)
+
+## What's Changed
+* feat: Update pytest command in Makefile and add new test by @StanGirard in https://github.com/StanGirard/quivr/pull/1893
+* chore: add IDE extension for i18n handling by @NilsJacobsen in https://github.com/StanGirard/quivr/pull/1896
+* feat: add chat view new design by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1897
+
+## New Contributors
+* @NilsJacobsen made their first contribution in https://github.com/StanGirard/quivr/pull/1896
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.139...v0.0.140
+
 ## 0.0.139 (2023-12-14)
 
 ## What's Changed
