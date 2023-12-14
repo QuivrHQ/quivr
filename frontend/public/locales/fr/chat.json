@@ -1,10 +1,11 @@
 {
   "actions_bar_placeholder": "Posez une question à un @cerveau et sélectionnez un #prompt ",
-  "add_content_card_button_tooltip": "Ajouter des connaissances à un cerveau",
+  "add_document": "Ajouter un document",
   "ask": "Posez une question ou décrivez une tâche.",
   "back_to_chat": "Retour au chat",
   "brain": "cerveau",
   "brains": "cerveaux",
+  "change_brain": "Changer de cerveau",
   "chat": "Chat",
   "chatDeleted": "Chat supprimé avec succès. Id : {{id}}",
   "chatNameUpdated": "Nom du chat mis à jour",
@@ -15,9 +16,14 @@
   "errorParsingData": "Erreur lors de l'analyse des données",
   "feed_brain_placeholder": "Choisissez le @cerveau que vous souhaitez nourrir avec ces fichiers",
   "feedingBrain": "Vos nouvelles connaissances sont en cours de traitement. Vous pouvez continuer à discuter en attendant !",
+  "history": "Histoire",
   "keyboard_shortcuts": "Raccourcis clavier",
+  "last30Days": "30 derniers jours",
+  "last7Days": "7 derniers jours",
   "limit_reached": "Vous avez atteint la limite de requêtes, veuillez réessayer plus tard",
+  "menu": "Menu",
   "missing_brain": "Veuillez selectionner un cerveau pour discuter",
+  "new_discussion": "Nouvelle discussion",
   "new_prompt": "Créer un nouveau prompt",
   "noCurrentBrain": "Pas de cerveau actuel",
   "onboarding": {
@@ -35,6 +41,7 @@
     "what_is_brain": "Qu'est-ce qu'un cerveau ?",
     "what_is_quivr": "Qu'est-ce que Quivr ?"
   },
+  "parameters": "Paramètres",
   "receivedResponse": "Réponse reçue. Commence à gérer le flux...",
   "resposeBodyNull": "Le corps de la réponse est nul",
   "shortcut_choose_prompt": "#: Choisir une directive spécifique",
@@ -49,6 +56,8 @@
   "subtitle": "Parlez à un modèle linguistique de vos données téléchargées",
   "thinking": "Réflexion...",
   "title": "Discuter avec {{brain}}",
+  "today": "Aujourd'hui",
   "tooManyRequests": "Vous avez dépassé le nombre de requêtes par jour. Pour continuer à discuter, veuillez entrer une clé d'API OpenAI dans votre profil ou dans le cerveau utilisé.",
-  "welcome": "Bienvenue"
+  "welcome": "Bienvenue",
+  "yesterday": "Hier"
 }

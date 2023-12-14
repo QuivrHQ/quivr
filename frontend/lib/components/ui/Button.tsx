@@ -12,7 +12,7 @@ import { FaSpinner } from "react-icons/fa";
 import { cn } from "@/lib/utils";
 
 const ButtonVariants = cva(
-  "px-8 py-3 text-sm disabled:opacity-80 text-center font-medium rounded-md focus:ring ring-primary/10 outline-none flex items-center justify-center gap-2 transition-opacity",
+  "px-8 py-3 text-sm disabled:opacity-80 text-center font-medium rounded-md focus:ring ring-primary/10 outline-none flex items-center justify-center gap-2 transition-opacity focus:ring-0",
   {
     variants: {
       variant: {
@@ -68,7 +68,6 @@ const Button = forwardRef(
         {children} {isLoading && <FaSpinner className="animate-spin" />}
       </>
     );
-    const buttonElement = <button {...buttonProps}>buttonChildren</button>;
 
     if (tooltip !== undefined) {
       return (

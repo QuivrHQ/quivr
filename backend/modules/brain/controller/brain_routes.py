@@ -220,12 +220,14 @@ async def set_brain_as_default(
 
 
 @brain_router.post(
-    "/brains/{brain_id}/question_context",
+    "/brains/{brain_id}/documents",
     dependencies=[Depends(AuthBearer()), Depends(has_brain_authorization())],
     tags=["Brain"],
 )
-async def get_question_context_for_brain(brain_id: UUID, request: BrainQuestionRequest):
+async def get_question_context_for_brain(
+    brain_id: UUID, question: BrainQuestionRequest
+):
     # TODO: Move this endpoint to AnswerGenerator service
     """Retrieve the question context from a specific brain."""
-    context = get_question_context_from_brain(brain_id, request.question)
-    return {"context": context}
+    context = get_question_context_from_brain(brain_id, question.question)
+    return {"docs": context}

@@ -8,12 +8,6 @@ from langchain.chains import LLMChain
 from langchain.chat_models import ChatLiteLLM
 from langchain.chat_models.base import BaseChatModel
 from langchain.prompts.chat import ChatPromptTemplate, HumanMessagePromptTemplate
-from llm.utils.format_chat_history import (
-    format_chat_history,
-    format_history_to_openai_mesages,
-)
-from llm.utils.get_prompt_to_use import get_prompt_to_use
-from llm.utils.get_prompt_to_use_id import get_prompt_to_use_id
 from logger import get_logger
 from models import BrainSettings  # Importing settings related to the 'brain'
 from modules.chat.dto.chats import ChatQuestion
@@ -23,12 +17,20 @@ from modules.chat.service.chat_service import ChatService
 from modules.prompt.entity.prompt import Prompt
 from pydantic import BaseModel
 
+from llm.qa_interface import QAInterface
+from llm.utils.format_chat_history import (
+    format_chat_history,
+    format_history_to_openai_mesages,
+)
+from llm.utils.get_prompt_to_use import get_prompt_to_use
+from llm.utils.get_prompt_to_use_id import get_prompt_to_use_id
+
 logger = get_logger(__name__)
 SYSTEM_MESSAGE = "Your name is Quivr. You're a helpful assistant. If you don't know the answer, just say that you don't know, don't try to make up an answer.When answering use markdown or any other techniques to display the content in a nice and aerated way."
 chat_service = ChatService()
 
 
-class HeadlessQA(BaseModel):
+class HeadlessQA(BaseModel, QAInterface):
     brain_settings = BrainSettings()
     model: str
     temperature: float = 0.0

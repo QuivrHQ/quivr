@@ -19,6 +19,8 @@ services:
     depends_on:
       - backend-core
     restart: always
+    volumes:
+      - ./frontend/:/app/
     ports:
       - 3000:3000
       

@@ -1,10 +1,11 @@
 {
   "actions_bar_placeholder": "Faça uma pergunta a um @cérebro e escolha sua #prompt",
-  "add_content_card_button_tooltip": "Adicionar conhecimento a um cérebro",
+  "add_document": "Adicionar documento",
   "ask": "Faça uma pergunta ou descreva uma tarefa.",
   "back_to_chat": "Voltar para o chat",
   "brain": "cérebro",
   "brains": "cérebros",
+  "change_brain": "Mudar cérebro",
   "chat": "Conversa",
   "chatDeleted": "Conversa excluída com sucesso. Id: {{id}}",
   "chatNameUpdated": "Nome da conversa atualizado",
@@ -15,9 +16,14 @@
   "errorParsingData": "Erro ao analisar os dados",
   "feed_brain_placeholder": "Escolha qual @cérebro você deseja alimentar com esses arquivos",
   "feedingBrain": "Seu conhecimento recém-adicionado está sendo processado, você pode continuar conversando enquanto isso!",
+  "history": "História",
   "keyboard_shortcuts": "Atalhos do teclado",
+  "last30Days": "Últimos 30 dias",
+  "last7Days": "Últimos 7 dias",
   "limit_reached": "Você atingiu o limite de solicitações, por favor, tente novamente mais tarde",
+  "menu": "Menu",
   "missing_brain": "Cérebro não encontrado",
+  "new_discussion": "Nova discussão",
   "new_prompt": "Criar novo prompt",
   "noCurrentBrain": "Nenhum cérebro selecionado",
   "onboarding": {
@@ -35,6 +41,7 @@
     "what_is_brain": "O que é um cérebro?",
     "what_is_quivr": "O que é o Quivr?"
   },
+  "parameters": "Parâmetros",
   "receivedResponse": "Resposta recebida. Iniciando o processamento do fluxo...",
   "resposeBodyNull": "O corpo da resposta está vazio",
   "shortcut_choose_prompt": "#: Escolha um prompt específico",
@@ -49,6 +56,8 @@
   "subtitle": "Converse com um modelo de linguagem sobre seus dados enviados",
   "thinking": "Pensando...",
   "title": "Converse com {{brain}}",
+  "today": "Hoje",
   "tooManyRequests": "Você excedeu o número de solicitações por dia. Para continuar conversando, insira uma chave de API da OpenAI em seu perfil ou no cérebro utilizado.",
-  "welcome": "Bem-vindo"
+  "welcome": "Bem-vindo",
+  "yesterday": "Ontem"
 }

@@ -1,11 +1,12 @@
 {
   "actions_bar_placeholder": "向 @大脑 提问，选择您的 #提示",
-  "add_content_card_button_tooltip": "向大脑添加知识",
+  "add_document": "添加文件",
   "ask": "提一个问题，或描述一个任务。",
   "back_to_chat": "返回聊天",
   "begin_conversation_placeholder": "在这里开始对话…",
   "brain": "大脑",
   "brains": "大脑",
+  "change_brain": "更改大脑",
   "chat": "聊天",
   "chatDeleted": "聊天删除成功. Id: {{id}}",
   "chatNameUpdated": "聊天名称已更新",
@@ -16,9 +17,14 @@
   "errorParsingData": "解析数据时发生错误",
   "feed_brain_placeholder": "选择要用这些文件充实的 @大脑",
   "feedingBrain": "您新添加的知识正在处理中，不影响您继续聊天！",
+  "history": "历史",
   "keyboard_shortcuts": "键盘快捷键",
+  "last30Days": "过去30天",
+  "last7Days": "过去7天",
   "limit_reached": "您已达到请求限制，请稍后再试",
+  "menu": "菜单",
   "missing_brain": "请选择一个大脑进行聊天",
+  "new_discussion": "新讨论",
   "new_prompt": "新提示",
   "noCurrentBrain": "没有当前的大脑",
   "onboarding": {
@@ -36,6 +42,7 @@
     "what_is_brain": "什么是大脑？",
     "what_is_quivr": "什么是 Quivr？"
   },
+  "parameters": "参数",
   "receivedResponse": "收到响应。开始处理流…",
   "resposeBodyNull": "响应内容为空",
   "shortcut_choose_prompt": "#: 选择一个特定的提示",
@@ -50,6 +57,8 @@
   "subtitle": "与语言模型讨论您上传的数据",
   "thinking": "思考中…",
   "title": "与 {{brain}} 聊天",
+  "today": "今天",
   "tooManyRequests": "您已超过每天的请求次数。想要继续聊天，请在您的个人资料中或为当前大脑配置 OpenAI API 密钥。",
-  "welcome": "欢迎"
+  "welcome": "欢迎",
+  "yesterday": "昨天"
 }

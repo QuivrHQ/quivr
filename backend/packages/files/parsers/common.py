@@ -1,10 +1,13 @@
 import time
 
+from logger import get_logger
 from models import File
 from models.settings import get_supabase_db
 from modules.brain.service.brain_vector_service import BrainVectorService
 from packages.embeddings.vectors import Neurons
 from repository.files.upload_file import DocumentSerializable
+
+logger = get_logger(__name__)
 
 
 async def process_file(
@@ -39,11 +42,10 @@ async def process_file(
 
     brain_vector_service = BrainVectorService(brain_id)
     for created_vector_id in created_vector:
-        brain_vector_service.create_brain_vector(
+        result = brain_vector_service.create_brain_vector(
             created_vector_id, metadata["file_sha1"]
         )
-
-    database.set_file_sha_from_metadata(metadata["file_sha1"])
+        logger.debug(f"Brain vector created: {result}")
 
     if created_vector:
         return len(created_vector)

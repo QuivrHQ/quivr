@@ -86,10 +86,10 @@ class UserUsage(Repository):
         if is_premium_user:
             user_settings["is_premium"] = True
             user_settings["max_brains"] = int(
-                os.environ.get("PREMIUM_MAX_BRAIN_NUMBER", 30)
+                os.environ.get("PREMIUM_MAX_BRAIN_NUMBER", 12)
             )
             user_settings["max_brain_size"] = int(
-                os.environ.get("PREMIUM_MAX_BRAIN_SIZE", 10000000)
+                os.environ.get("PREMIUM_MAX_BRAIN_SIZE", 50000000)
             )
             user_settings["daily_chat_credit"] = int(
                 os.environ.get("PREMIUM_DAILY_CHAT_CREDIT", 100)

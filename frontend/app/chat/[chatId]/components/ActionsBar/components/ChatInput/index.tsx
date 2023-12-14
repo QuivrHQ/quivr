@@ -2,28 +2,18 @@
 import { useTranslation } from "react-i18next";
 
 import Button from "@/lib/components/ui/Button";
-import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
-import { useKnowledgeToFeedContext } from "@/lib/context/KnowledgeToFeedProvider/hooks/useKnowledgeToFeedContext";
-import { getBrainIconFromBrainType } from "@/lib/helpers/getBrainIconFromBrainType";
 
 import { OnboardingQuestions } from "./components";
+import { ActionsModal } from "./components/ActionsModal/ActionsModal";
 import { ChatEditor } from "./components/ChatEditor/ChatEditor";
-import { ConfigModal } from "./components/ConfigModal";
+import { MenuControlButton } from "./components/MenuControlButton";
 import { useChatInput } from "./hooks/useChatInput";
 
-type ChatInputProps = {
-  shouldDisplayFeedOrSecretsCard: boolean;
-};
-
-export const ChatInput = ({
-  shouldDisplayFeedOrSecretsCard,
-}: ChatInputProps): JSX.Element => {
+export const ChatInput = (): JSX.Element => {
   const { setMessage, submitQuestion, generatingAnswer, message } =
     useChatInput();
 
   const { t } = useTranslation(["chat"]);
-  const { currentBrainDetails } = useBrainContext();
-  const { setShouldDisplayFeedCard } = useKnowledgeToFeedContext();
 
   return (
     <>
@@ -37,18 +27,7 @@ export const ChatInput = ({
           }}
           className="sticky bottom-0 bg-white dark:bg-black w-full flex items-center gap-2 z-20 p-2"
         >
-          {!shouldDisplayFeedOrSecretsCard && (
-            <Button
-              className="p-0"
-              variant={"tertiary"}
-              data-testid="feed-button"
-              type="button"
-              onClick={() => setShouldDisplayFeedCard(true)}
-              tooltip={t("add_content_card_button_tooltip")}
-            >
-              {getBrainIconFromBrainType(currentBrainDetails?.brain_type)}
-            </Button>
-          )}
+          <MenuControlButton />
 
           <div className="flex flex-1">
             <ChatEditor
@@ -58,9 +37,9 @@ export const ChatInput = ({
             />
           </div>
 
-          <div className="flex flex-row items-end">
+          <div className="flex flex-row items-center gap-4">
             <Button
-              className="px-3 py-2 sm:px-4 sm:py-2"
+              className="px-3 py-2 sm:px-4 sm:py-2 bg-primary border-0"
               type="submit"
               isLoading={generatingAnswer}
               data-testid="submit-button"
@@ -69,9 +48,7 @@ export const ChatInput = ({
                 ? t("thinking", { ns: "chat" })
                 : t("chat", { ns: "chat" })}
             </Button>
-            <div className="hidden md:flex items-center">
-              <ConfigModal />
-            </div>
+            <ActionsModal />
           </div>
         </form>
       </div>
