@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 import { default as TiptapMention } from "@tiptap/extension-mention";
 import { PluginKey } from "@tiptap/pm/state";
 import { ReactRenderer } from "@tiptap/react";
@@ -114,15 +115,13 @@ export const useMentionConfig = ({
     name: mentionKey,
   }).configure({
     HTMLAttributes: {
-      class: `${isStudioMember ? "mention" : "mention"}`,
+      class: `mention`,
     },
     suggestion: suggestionsConfig,
     renderLabel: ({ options, node }) => {
-      if (isStudioMember) {
-        return `${options.suggestion.char ?? ""}${node.attrs.label as string}`;
-      }
-
-      return "V1.0.0";
+      return isStudioMember
+        ? `${options.suggestion.char ?? ""}${node.attrs.label as string}`
+        : "V1.0.0";
     },
   });
 
