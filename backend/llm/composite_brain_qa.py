@@ -78,13 +78,14 @@ class CompositeBrainQA(
             return self.generate_answer
         elif brain.brain_type == BrainType.API:
             return APIBrainQA(
-                brain_id=brain.id,
+                brain_id=str(brain.id),
                 chat_id=self.chat_id,
                 model=self.model,
                 max_tokens=self.max_tokens,
                 temperature=self.temperature,
                 streaming=self.streaming,
                 prompt_id=self.prompt_id,
+                user_id=str(self.user_id),
             ).generate_answer
         elif brain.brain_type == BrainType.DOC:
             return KnowledgeBrainQA(
@@ -102,13 +103,14 @@ class CompositeBrainQA(
             return self.generate_stream
         elif brain.brain_type == BrainType.API:
             return APIBrainQA(
-                brain_id=brain.id,
+                brain_id=str(brain.id),
                 chat_id=self.chat_id,
                 model=self.model,
                 max_tokens=self.max_tokens,
                 temperature=self.temperature,
                 streaming=self.streaming,
                 prompt_id=self.prompt_id,
+                user_id=str(self.user_id),
             ).generate_stream
         elif brain.brain_type == BrainType.DOC:
             return KnowledgeBrainQA(
@@ -133,7 +135,7 @@ class CompositeBrainQA(
                 temperature=self.temperature,
                 streaming=self.streaming,
                 prompt_id=self.prompt_id,
-            ).generate_answer(chat_id, question)
+            ).generate_answer(chat_id, question, save_answer=False)
             brain = brain_service.get_brain_by_id(self.brain_id)
             if save_answer:
                 new_chat = chat_service.update_chat_history(
@@ -180,7 +182,7 @@ class CompositeBrainQA(
         connected_brains_details = {}
         for brain_id in connected_brains:
             brain = brain_service.get_brain_by_id(brain_id)
-            if brain == None:
+            if brain is None:
                 continue
 
             tools.append(format_brain_to_tool(brain))
@@ -554,6 +556,9 @@ class CompositeBrainQA(
 
                     # yield f"🧠< Querying the brain {queried_brain.name} with the following arguments: {function_args} >🧠",
 
+                    print(
+                        f"🧠< Querying the brain {queried_brain.name} with the following arguments: {function_args}",
+                    )
                     function_response = function_to_call(
                         chat_id=chat_id,
                         question=question,
@@ -571,7 +576,7 @@ class CompositeBrainQA(
 
                     print("messages", messages)
 
-                PROMPT_2 = "If initial question can be answered by our conversation messages, then give an answer and end the conversation."
+                PROMPT_2 = "If the last user's question can be answered by our conversation messages since then, then give an answer and end the conversation."
                 # Otherwise, ask a new question to the assistant and choose brains you would like to ask questions."
 
                 messages.append({"role": "system", "content": PROMPT_2})
