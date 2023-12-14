@@ -9,9 +9,10 @@ import {
   isWithinLast7Days,
   isYesterday,
 } from "./utils";
+import Spinner from "../ui/Spinner";
 
 export const ChatHistory = (): JSX.Element => {
-  const { allChats } = useChatsContext();
+  const { allChats, isLoading } = useChatsContext();
   const { t } = useTranslation("chat");
   const todayChats = allChats.filter((chat) =>
     isToday(new Date(chat.creation_time))
@@ -25,6 +26,14 @@ export const ChatHistory = (): JSX.Element => {
   const last30DaysChats = allChats.filter((chat) =>
     isWithinLast30Days(new Date(chat.creation_time))
   );
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center align-center">
+        <Spinner />
+      </div>
+    );
+  }
 
   return (
     <div

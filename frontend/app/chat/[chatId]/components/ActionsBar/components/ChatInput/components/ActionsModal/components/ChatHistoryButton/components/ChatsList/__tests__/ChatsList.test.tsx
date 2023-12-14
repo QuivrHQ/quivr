@@ -1,6 +1,6 @@
 /* eslint-disable max-lines */
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { act, render, screen } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import {
@@ -21,7 +21,6 @@ vi.mock("@/lib/context/SupabaseProvider/supabase-provider", () => ({
 
 import { ChatsList } from "../index";
 
-const getChatsMock = vi.fn(() => []);
 const queryClient = new QueryClient();
 
 vi.mock("next/navigation", async () => {
@@ -120,31 +119,5 @@ describe("ChatsList", () => {
     );
     const chatItems = screen.getAllByTestId("chats-list-item");
     expect(chatItems).toHaveLength(2);
-  });
-
-  it("should call getChats when the component mounts", async () => {
-    vi.mock("@/lib/api/chat/useChatApi", () => ({
-      useChatApi: () => ({
-        getChats: () => getChatsMock(),
-      }),
-    }));
-
-    await act(() =>
-      render(
-        <QueryClientProvider client={queryClient}>
-          <KnowledgeToFeedProvider>
-            <ChatProviderMock>
-              <BrainProviderMock>
-                <SideBarProvider>
-                  <ChatsList />
-                </SideBarProvider>
-              </BrainProviderMock>
-            </ChatProviderMock>
-          </KnowledgeToFeedProvider>
-        </QueryClientProvider>
-      )
-    );
-
-    expect(getChatsMock).toHaveBeenCalledTimes(1);
   });
 });

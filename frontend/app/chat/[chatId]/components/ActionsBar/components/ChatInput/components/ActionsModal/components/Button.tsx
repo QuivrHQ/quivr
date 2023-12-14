@@ -30,7 +30,7 @@ export const Button = forwardRef(
         <div className="flex flex-row justify-between w-full items-center">
           <div className="flex flex-row gap-2 items-center">
             {startIcon}
-            <span className="hidden sm:block">{label}</span>
+            <span>{label}</span>
           </div>
           {endIcon}
         </div>

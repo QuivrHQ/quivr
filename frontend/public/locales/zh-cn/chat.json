@@ -52,7 +52,7 @@
   "shortcut_go_to_shortcuts": "CMDK: 前往快捷方式",
   "shortcut_go_to_user_page": "CMDU: 进入用户页面",
   "shortcut_manage_brains": "CMDB: 管理大脑",
-  "shortcut_select_brain": "@: 选择一个大脑进行交流",
+  "shortcut_select_brain": "@: 选择一个大脑",
   "shortcut_select_file": "/: 选择一个文件进行对话",
   "subtitle": "与语言模型讨论您上传的数据",
   "thinking": "思考中…",
