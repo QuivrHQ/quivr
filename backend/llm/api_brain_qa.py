@@ -242,12 +242,17 @@ class APIBrainQA(KnowledgeBrainQA, QAInterface):
                 assistant="".join(response_tokens),
             )
 
-    def generate_answer(self, chat_id: UUID, question: ChatQuestion):
+    def generate_answer(
+        self,
+        chat_id: UUID,
+        question: ChatQuestion,
+        save_answer: bool = True,
+    ):
         async def a_generate_answer():
             api_brain_question_answer: GetChatHistoryOutput = None
 
             async for answer in self.generate_stream(
-                chat_id, question, should_log_steps=False
+                chat_id, question, should_log_steps=False, save_answer=save_answer
             ):
                 answer = answer.split("data: ")[1]
                 answer_parsed: GetChatHistoryOutput = GetChatHistoryOutput(
