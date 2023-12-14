@@ -30,16 +30,12 @@ def format_brain_to_tool(brain):
             "parameters": {
                 "type": "object",
                 "properties": {
-                    "brain": {
-                        "type": "string",
-                        "description": "Brain details, need to check type too",
-                    },
                     "question": {
                         "type": "string",
                         "description": "Question to ask the brain",
                     },
                 },
-                "required": ["brain", "question"],
+                "required": ["question"],
             },
         },
     }
@@ -479,8 +475,6 @@ class CompositeBrainQA(
         response_tokens = []
         tool_calls_aggregate = []
         for chunk in initial_response:
-            # print("chunk", chunk)
-            # print("chunk.choices [0].delta.content", chunk.choices[0].delta.content)
             content = chunk.choices[0].delta.content
             if content is not None:
                 # Need to store it ?
