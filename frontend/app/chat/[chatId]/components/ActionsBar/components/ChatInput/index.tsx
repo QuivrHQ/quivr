@@ -2,9 +2,6 @@
 import { useTranslation } from "react-i18next";
 
 import Button from "@/lib/components/ui/Button";
-import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
-import { useKnowledgeToFeedContext } from "@/lib/context/KnowledgeToFeedProvider/hooks/useKnowledgeToFeedContext";
-import { getBrainIconFromBrainType } from "@/lib/helpers/getBrainIconFromBrainType";
 
 import { OnboardingQuestions } from "./components";
 import { ActionsModal } from "./components/ActionsModal/ActionsModal";
@@ -12,19 +9,11 @@ import { ChatEditor } from "./components/ChatEditor/ChatEditor";
 import { MenuControlButton } from "./components/MenuControlButton";
 import { useChatInput } from "./hooks/useChatInput";
 
-type ChatInputProps = {
-  shouldDisplayFeedOrSecretsCard: boolean;
-};
-
-export const ChatInput = ({
-  shouldDisplayFeedOrSecretsCard,
-}: ChatInputProps): JSX.Element => {
+export const ChatInput = (): JSX.Element => {
   const { setMessage, submitQuestion, generatingAnswer, message } =
     useChatInput();
 
   const { t } = useTranslation(["chat"]);
-  const { currentBrainDetails } = useBrainContext();
-  const { setShouldDisplayFeedCard } = useKnowledgeToFeedContext();
 
   return (
     <>
@@ -39,18 +28,6 @@ export const ChatInput = ({
           className="sticky bottom-0 bg-white dark:bg-black w-full flex items-center gap-2 z-20 p-2"
         >
           <MenuControlButton />
-          {!shouldDisplayFeedOrSecretsCard && (
-            <Button
-              className="p-0"
-              variant={"tertiary"}
-              data-testid="feed-button"
-              type="button"
-              onClick={() => setShouldDisplayFeedCard(true)}
-              tooltip={t("add_content_card_button_tooltip")}
-            >
-              {getBrainIconFromBrainType(currentBrainDetails?.brain_type)}
-            </Button>
-          )}
 
           <div className="flex flex-1">
             <ChatEditor

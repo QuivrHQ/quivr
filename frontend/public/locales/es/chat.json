@@ -1,6 +1,6 @@
 {
   "actions_bar_placeholder": "Haz una pregunta a un @cerebro y elige tu #prompt",
-  "add_content_card_button_tooltip": "Agregar conocimiento a un cerebro",
+  "add_document": "Agregar documento",
   "ask": "Has una pregunta o describe un tarea.",
   "back_to_chat": "Volver al chat",
   "brain": "cerebro",

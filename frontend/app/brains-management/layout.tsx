@@ -17,7 +17,7 @@ const Layout = ({ children }: LayoutProps): JSX.Element => {
   }
 
   return (
-    <div className="relative h-full w-full flex justify-stretch items-stretch">
+    <div className="relative h-full w-full flex justify-stretch items-stretch overflow-scroll">
       <BrainsList />
       {children}
     </div>

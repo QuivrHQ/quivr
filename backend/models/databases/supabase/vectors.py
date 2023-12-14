@@ -29,17 +29,6 @@ class Vector(Repository):
 
         return response
 
-    def set_file_sha_from_metadata(self, file_sha1):
-        # It looks at the file that have a file_sha1 in the metadata that is corresponding but an empty file_sha1 column and set it
-        response = (
-            self.db.table("vectors")
-            .update({"file_sha1": file_sha1})
-            .match({"metadata->>file_sha1": file_sha1})
-            .execute()
-        )
-
-        return response
-
     # TODO: remove duplicate similarity_search in supabase vector store
     def similarity_search(self, query_embedding, table, top_k, threshold):
         response = self.db.rpc(

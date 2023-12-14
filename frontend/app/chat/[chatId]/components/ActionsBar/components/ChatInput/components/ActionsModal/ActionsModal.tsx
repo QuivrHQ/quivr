@@ -12,6 +12,7 @@ import {
 import { ChangeBrainButton } from "./components/ChangeBrainButton";
 import { ChatHistoryButton } from "./components/ChatHistoryButton/ChatHistoryButton";
 import { ConfigModal } from "./components/ConfigModal";
+import { FeedCardTrigger } from "./components/FeedCardTrigger";
 import { NewDiscussionButton } from "./components/NewDiscussionButton";
 import { SelectedBrainTag } from "./components/SelectedBrainTag";
 
@@ -40,6 +41,7 @@ export const ActionsModal = (): JSX.Element => {
         >
           <SelectedBrainTag />
           <NewDiscussionButton />
+          <FeedCardTrigger />
           <ChatHistoryButton />
           <ConfigModal />
           <ChangeBrainButton />

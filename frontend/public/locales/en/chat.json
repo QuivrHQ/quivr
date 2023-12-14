@@ -1,6 +1,6 @@
 {
   "actions_bar_placeholder": "Ask a question to a @brain and choose your #prompt",
-  "add_content_card_button_tooltip": "Add knowledge to a brain",
+  "add_document": "Add document",
   "ask": "Ask a question, or describe a task.",
   "back_to_chat": "Back to chat",
   "brain": "brain",
