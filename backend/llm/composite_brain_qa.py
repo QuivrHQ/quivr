@@ -267,7 +267,9 @@ class CompositeBrainQA(
                 function_name = tool_call.function.name
                 function_to_call = available_functions[function_name]
                 function_args = json.loads(tool_call.function.arguments)
-                question = ChatQuestion(question=function_args["question"])
+                question = ChatQuestion(
+                    question=function_args["question"], brain_id=function_name
+                )
 
                 function_response = function_to_call(
                     chat_id=chat_id,
