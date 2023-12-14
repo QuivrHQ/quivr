@@ -39,7 +39,7 @@ def format_brain_to_tool(brain):
                         "description": "Question to ask the brain",
                     },
                 },
-                "required": ["brain_id", "question"],
+                "required": ["brain", "question"],
             },
         },
     }
@@ -552,7 +552,7 @@ class CompositeBrainQA(
                     print("function_args", function_args["question"])
                     question = ChatQuestion(question=function_args["question"])
 
-                    yield f"🧠< Querying the brain {queried_brain.name} with the following arguments: {function_args} >🧠",
+                    # yield f"🧠< Querying the brain {queried_brain.name} with the following arguments: {function_args} >🧠",
 
                     function_response = function_to_call(
                         chat_id=chat_id,
@@ -569,7 +569,9 @@ class CompositeBrainQA(
                         }
                     )
 
-                PROMPT_2 = "If initial question can be answered by our converaation messsages, then give an answer and end the conversation."
+                    print("messages", messages)
+
+                PROMPT_2 = "If initial question can be answered by our conversation messages, then give an answer and end the conversation."
                 # Otherwise, ask a new question to the assistant and choose brains you would like to ask questions."
 
                 messages.append({"role": "system", "content": PROMPT_2})
@@ -584,6 +586,7 @@ class CompositeBrainQA(
 
                 response_tokens = []
                 for chunk in response_after_tools_answers:
+                    print("chunk_response_after_tools_answers", chunk)
                     content = chunk.choices[0].delta.content
                     if content:
                         streamed_chat_history.assistant = content
