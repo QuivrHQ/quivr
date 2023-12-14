@@ -20,17 +20,34 @@ import {
 import SelectedChatPage from "../page";
 
 const queryClient = new QueryClient();
-
 vi.mock("@/lib/context/ChatProvider/ChatProvider", () => ({
   ChatContext: ChatContextMock,
   ChatProvider: ChatProviderMock,
 }));
-
+vi.mock("@/lib/context/ChatsProvider/hooks/useChatsContext", () => ({
+  useChatsContext: () => ({
+    allChats: [
+      {
+        chat_id: 1,
+        name: "Chat 1",
+        creation_time: new Date().toISOString(),
+      },
+      {
+        chat_id: 2,
+        name: "Chat 2",
+        creation_time: new Date().toISOString(),
+      },
+    ],
+    deleteChat: vi.fn(),
+    setAllChats: vi.fn(),
+    setIsLoading: vi.fn(),
+  }),
+}));
 vi.mock("next/navigation", () => ({
   useRouter: () => ({ replace: vi.fn() }),
   useParams: () => ({ chatId: "1" }),
+  usePathname: () => "/chat/1",
 }));
-
 vi.mock("@/lib/context/SupabaseProvider/supabase-provider", () => ({
   SupabaseContext: SupabaseContextMock,
 }));
@@ -38,13 +55,11 @@ vi.mock("@/lib/context/SupabaseProvider/supabase-provider", () => ({
 vi.mock("@/lib/context/BrainProvider/brain-provider", () => ({
   BrainContext: BrainContextMock,
 }));
-
 vi.mock("@/lib/api/chat/useChatApi", () => ({
   useChatApi: () => ({
     getHistory: () => [],
   }),
 }));
-
 vi.mock("@/lib/hooks", async () => {
   const actual = await vi.importActual<typeof import("@/lib/hooks")>(
     "@/lib/hooks"
@@ -59,7 +74,6 @@ vi.mock("@/lib/hooks", async () => {
     }),
   };
 });
-
 vi.mock("@tanstack/react-query", async () => {
   const actual = await vi.importActual<typeof import("@tanstack/react-query")>(
     "@tanstack/react-query"
@@ -72,7 +86,6 @@ vi.mock("@tanstack/react-query", async () => {
     }),
   };
 });
-
 vi.mock(
   "../components/ActionsBar/components/ChatInput/components/ChatEditor/ChatEditor",
   () => ({
@@ -80,6 +93,9 @@ vi.mock(
   })
 );
 
+vi.mock("../hooks/useChatNotificationsSync", () => ({
+  useChatNotificationsSync: vi.fn(),
+}));
 describe("Chat page", () => {
   it("should render chat page correctly", () => {
     const { getByTestId } = render(
