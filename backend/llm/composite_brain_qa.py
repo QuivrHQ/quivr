@@ -99,31 +99,6 @@ class CompositeBrainQA(
                 prompt_id=self.prompt_id,
             ).generate_answer
 
-    def get_stream_answer_generator_from_brain_type(self, brain: BrainEntity):
-        if brain.brain_type == BrainType.COMPOSITE:
-            return self.generate_stream
-        elif brain.brain_type == BrainType.API:
-            return APIBrainQA(
-                brain_id=str(brain.id),
-                chat_id=self.chat_id,
-                model=self.model,
-                max_tokens=self.max_tokens,
-                temperature=self.temperature,
-                streaming=self.streaming,
-                prompt_id=self.prompt_id,
-                user_id=str(self.user_id),
-            ).generate_stream
-        elif brain.brain_type == BrainType.DOC:
-            return KnowledgeBrainQA(
-                brain_id=str(brain.id),
-                chat_id=self.chat_id,
-                model=self.model,
-                max_tokens=self.max_tokens,
-                temperature=self.temperature,
-                streaming=self.streaming,
-                prompt_id=self.prompt_id,
-            ).generate_stream
-
     def generate_answer(
         self, chat_id: UUID, question: ChatQuestion, save_answer: bool
     ) -> str:
