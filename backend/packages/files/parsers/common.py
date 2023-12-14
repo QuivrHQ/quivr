@@ -47,9 +47,6 @@ async def process_file(
         )
         logger.debug(f"Brain vector created: {result}")
 
-    result_set_file_sha = database.set_file_sha_from_metadata(metadata["file_sha1"])
-    logger.debug(f"File sha1 {metadata['file_sha1']} updated: {result_set_file_sha}")
-
     if created_vector:
         return len(created_vector)
     else:
