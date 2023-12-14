@@ -545,7 +545,9 @@ class CompositeBrainQA(
                     function_to_call = available_functions[function_name]
                     function_args = json.loads(tool_call["function"]["arguments"])
                     print("function_args", function_args["question"])
-                    question = ChatQuestion(question=function_args["question"])
+                    question = ChatQuestion(
+                        question=function_args["question"], brain_id=queried_brain.id
+                    )
 
                     # yield f"🧠< Querying the brain {queried_brain.name} with the following arguments: {function_args} >🧠",
 
@@ -569,7 +571,7 @@ class CompositeBrainQA(
 
                     print("messages", messages)
 
-                PROMPT_2 = "If the last user's question can be answered by our conversation messages since then, then give an answer and end the conversation."
+                PROMPT_2 = "If the last user's question can be answered by our conversation messages since then, then give an answer and end the conversation. If you need to ask question to the user to gather more information and give a more accurate answer, then ask the question and wait for the user's answer."
                 # Otherwise, ask a new question to the assistant and choose brains you would like to ask questions."
 
                 messages.append({"role": "system", "content": PROMPT_2})
