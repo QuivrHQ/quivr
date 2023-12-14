@@ -4,6 +4,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { PropsWithChildren, useEffect } from "react";
 
 import { Menu } from "@/lib/components/Menu/Menu";
+import { useOutsideClickListener } from "@/lib/components/Menu/hooks/useOutsideClickListener";
 import { NotificationBanner } from "@/lib/components/NotificationBanner";
 import { BrainProvider } from "@/lib/context";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
@@ -18,6 +19,7 @@ import "../lib/config/LocaleConfig/i18n";
 const App = ({ children }: PropsWithChildren): JSX.Element => {
   const { fetchAllBrains, fetchDefaultBrain, fetchPublicPrompts } =
     useBrainContext();
+  const { onClickOutside } = useOutsideClickListener();
   const { session } = useSupabase();
 
   usePageTracking();
@@ -35,7 +37,9 @@ const App = ({ children }: PropsWithChildren): JSX.Element => {
       <NotificationBanner />
       <div className="relative h-full w-full flex justify-stretch items-stretch overflow-auto">
         <Menu />
-        <div className="flex-1">{children}</div>
+        <div onClick={onClickOutside} className="flex-1">
+          {children}
+        </div>
         <UpdateMetadata />
       </div>
     </div>
