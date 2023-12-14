@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 
 import { useChatContext } from "@/lib/context";
-import { useKnowledgeToFeedContext } from "@/lib/context/KnowledgeToFeedProvider/hooks/useKnowledgeToFeedContext";
 
 import { checkIfHasPendingRequest } from "../utils/checkIfHasPendingRequest";
 
@@ -10,8 +9,6 @@ export const useActionBar = () => {
   const [hasPendingRequests, setHasPendingRequests] = useState(false);
   const { notifications } = useChatContext();
 
-  const { shouldDisplayFeedCard } = useKnowledgeToFeedContext();
-
   useEffect(() => {
     setHasPendingRequests(checkIfHasPendingRequest(notifications));
   }, [notifications]);
@@ -19,6 +16,5 @@ export const useActionBar = () => {
   return {
     hasPendingRequests,
     setHasPendingRequests,
-    shouldDisplayFeedCard,
   };
 };
