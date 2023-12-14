@@ -51,7 +51,7 @@
   "shortcut_go_to_shortcuts": "CMDK: Go to shortcuts",
   "shortcut_go_to_user_page": "CMDU: Go to user page",
   "shortcut_manage_brains": "CMDB: Manage your brains",
-  "shortcut_select_brain": "@: Select a brain to talk",
+  "shortcut_select_brain": "@: Select a brain",
   "shortcut_select_file": "/: Select a file to talk to",
   "subtitle": "Talk to a language model about your uploaded data",
   "thinking": "Thinking...",

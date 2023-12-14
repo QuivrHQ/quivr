@@ -51,7 +51,7 @@
   "shortcut_go_to_shortcuts": "CMDK: Перейти к ярлыкам",
   "shortcut_go_to_user_page": "CMDU: Перейти на страницу пользователя",
   "shortcut_manage_brains": "CMDB: Управление вашими мозгами",
-  "shortcut_select_brain": "@: Выберите мозг для общения",
+  "shortcut_select_brain": "@: Выберите мозг",
   "shortcut_select_file": "/: Выберите файл для общения",
   "subtitle": "Общайтесь с языковой моделью о ваших загруженных данных",
   "thinking": "Думаю...",

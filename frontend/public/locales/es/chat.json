@@ -51,7 +51,7 @@
   "shortcut_go_to_shortcuts": "CMDK: Ir a los atajos",
   "shortcut_go_to_user_page": "CMDU: Ir a la página de usuario",
   "shortcut_manage_brains": "CMDB: Administrar tus cerebros",
-  "shortcut_select_brain": "@: Seleccionar un cerebro para hablar",
+  "shortcut_select_brain": "@: Seleccionar un cerebro",
   "shortcut_select_file": "/: Seleccionar un archivo para hablar",
   "subtitle": "Habla con un modelo de lenguaje acerca de tus datos subidos",
   "thinking": "Pensando...",

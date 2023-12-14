@@ -51,7 +51,7 @@
   "shortcut_go_to_shortcuts": "CMDA: Acesse os atalhos",
   "shortcut_go_to_user_page": "CMDU: Acesse a página do usuário",
   "shortcut_manage_brains": "CMGC: Gerencie seus cérebros",
-  "shortcut_select_brain": "@: Selecione um cérebro para conversar",
+  "shortcut_select_brain": "@: Selecione um cérebro",
   "shortcut_select_file": "/: Selecione um arquivo para conversar",
   "subtitle": "Converse com um modelo de linguagem sobre seus dados enviados",
   "thinking": "Pensando...",
