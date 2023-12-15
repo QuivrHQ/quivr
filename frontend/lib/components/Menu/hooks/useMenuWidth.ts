@@ -9,15 +9,15 @@ export const useMenuWidth = () => {
   const pathname = usePathname() ?? "";
   const { isMobile } = useDevice();
 
-  const isStaticSideBarActivated = !isMobile;
+  const rightSideBarActivated = !isMobile && pathname.includes("/chat");
 
-  const shouldAddFixedPadding = pathname.startsWith("/chat");
+  const isStaticSideBarActivated = !isMobile || !pathname.includes("/chat");
 
-  const staticMenuWidth =
-    shouldAddFixedPadding && isStaticSideBarActivated ? OPENED_MENU_WIDTH : 0;
+  const menuWidth = isStaticSideBarActivated ? OPENED_MENU_WIDTH : 0;
 
   return {
     OPENED_MENU_WIDTH,
-    staticMenuWidth,
+    menuWidth,
+    rightSideBarWidth: rightSideBarActivated ? OPENED_MENU_WIDTH : 0,
   };
 };

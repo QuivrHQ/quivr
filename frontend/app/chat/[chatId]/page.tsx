@@ -13,7 +13,7 @@ import { useChatsList } from "./hooks/useChatsList";
 const SelectedChatPage = (): JSX.Element => {
   const { getRootProps } = useCustomDropzone();
   const { shouldDisplayFeedCard } = useKnowledgeToFeedContext();
-  const { staticMenuWidth } = useMenuWidth();
+  const { rightSideBarWidth } = useMenuWidth();
 
   useChatsList();
   useChatNotificationsSync();
@@ -38,7 +38,10 @@ const SelectedChatPage = (): JSX.Element => {
           <ActionsBar />
         </div>
       </div>
-      <div className="h-full bg-highlight" style={{ width: staticMenuWidth }} />
+      <div
+        className="h-full bg-highlight"
+        style={{ width: rightSideBarWidth }}
+      />
     </div>
   );
 };
