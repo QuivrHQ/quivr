@@ -19,7 +19,7 @@ export const BrainsManagementButton = (): JSX.Element => {
         startIcon={<LuBrain />}
         endIcon={<LuChevronRight size={18} />}
         className={cn(
-          "font-extrabold w-full hover:bg-secondary py-3 capitalize",
+          "w-full hover:bg-secondary py-3 capitalize",
           isSelected ? "bg-secondary" : ""
         )}
       />
