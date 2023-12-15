@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.0.141 (2023-12-15)
+
+## What's Changed
+* feat[i18n]: Added i18n documenation to the contribution guidelines  by @NilsJacobsen in https://github.com/StanGirard/quivr/pull/1899
+* feat: Update Explore button label by @StanGirard in https://github.com/StanGirard/quivr/pull/1901
+* feat: chat with compositeBrain ( with/out streaming) by @gozineb in https://github.com/StanGirard/quivr/pull/1883
+* feat: update brains library by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1903
+
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.140...v0.0.141
+
 ## 0.0.140 (2023-12-14)
 
 ## What's Changed
