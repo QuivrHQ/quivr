@@ -16,14 +16,19 @@ import { useMenuWidth } from "./hooks/useMenuWidth";
 export const Menu = (): JSX.Element => {
   const pathname = usePathname() ?? "";
 
-  const { staticMenuWidth } = useMenuWidth();
+  const { menuWidth } = useMenuWidth();
+
   if (nonProtectedPaths.includes(pathname)) {
     return <></>;
   }
 
-  const isChatPage = pathname.includes("/chat");
+  const displayedOnPages = ["/chat", "/library"];
 
-  if (!isChatPage) {
+  const isMenuDisplayed = displayedOnPages.some((page) =>
+    pathname.includes(page)
+  );
+
+  if (!isMenuDisplayed) {
     return <></>;
   }
 
@@ -31,7 +36,7 @@ export const Menu = (): JSX.Element => {
     <MotionConfig transition={{ mass: 1, damping: 10, duration: 0.2 }}>
       <div
         className="flex flex-col fixed sm:sticky top-0 left-0 h-full overflow-visible z-30 border-r border-black/10 dark:border-white/25 bg-highlight bg-highlight"
-        style={{ width: staticMenuWidth }}
+        style={{ width: menuWidth }}
       >
         <AnimatedDiv>
           <div className="flex flex-col flex-1 p-4 gap-4">
