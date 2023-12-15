@@ -284,7 +284,7 @@ class QABaseBrainPicking(BaseModel):
             question_generator=LLMChain(
                 llm=self._create_llm(model=self.model), prompt=CONDENSE_QUESTION_PROMPT
             ),
-            verbose=False,
+            verbose=True,
             rephrase_question=False,
             return_source_documents=True,
         )

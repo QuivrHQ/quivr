@@ -57,7 +57,7 @@ class UserUsage(Repository):
         # return len(matching_customers) > 0
 
         # Disable premium user check for now, we do not have stripe integration yet.
-        return True
+        return False
 
     def get_user_settings(self, user_id):
         """
