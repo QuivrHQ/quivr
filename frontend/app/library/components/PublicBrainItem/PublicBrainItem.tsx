@@ -1,6 +1,7 @@
 import { useTranslation } from "react-i18next";
 import { CgFileDocument } from "react-icons/cg";
-import { MdAdd, MdLink } from "react-icons/md";
+import { LuPlusCircle } from "react-icons/lu";
+import { MdLink } from "react-icons/md";
 
 import Button from "@/lib/components/ui/Button";
 import { Modal } from "@/lib/components/ui/Modal";
@@ -41,15 +42,14 @@ export const PublicBrainItem = ({
       }}
       disabled={isUserSubscribedToBrain || subscriptionRequestPending}
       isLoading={subscriptionRequestPending}
-      className="bg-primary text-white p-0 px-3 rounded-xl border-0 w-content mt-3"
+      className="bg-secondary text-primary rounded-lg border-0 w-content mt-3 disabled:bg-secondary hover:bg-primary/50 disabled:hover:bg-primary/50 w-full text-md"
     >
+      {!isUserSubscribedToBrain && <LuPlusCircle className="text-md" />}
       {isUserSubscribedToBrain
         ? t("public_brain_already_subscribed_button_label")
         : t("public_brain_subscribe_button_label")}
-      {!isUserSubscribedToBrain && <MdAdd className="text-md" />}
     </Button>
   );
-
   const isBrainDescriptionEmpty = brain.description === "";
   const brainDescription = isBrainDescriptionEmpty
     ? t("empty_brain_description")
@@ -61,33 +61,34 @@ export const PublicBrainItem = ({
       setOpen={setIsSubscriptionModalOpened}
       CloseTrigger={<div />}
       Trigger={
-        <div className="flex p-5 justify-center items-center flex-col flex-1 w-full h-full shadow-md dark:shadow-primary/25 hover:shadow-xl transition-shadow rounded-xl overflow-hidden bg-white dark:bg-black border border-black/10 dark:border-white/25 md:p-5 cursor-pointer">
-          <div>
-            <p className="font-bold mb-5 text-xl line-clamp-1 flex items-center">
-              <span className="mr-2">
-                {getBrainIconFromBrainType(brain.brain_type, {
-                  iconSize: 24,
-                  DocBrainIcon: CgFileDocument,
-                })}
+        <div className="flex justify-center items-center flex-col flex-1 w-full h-full shadow-md dark:shadow-primary/25 hover:shadow-xl transition-shadow rounded-xl overflow-hidden bg-white dark:bg-black border border-black/10 dark:border-white/25 cursor-pointer pb-2">
+          <div className="w-full">
+            <div className="w-full py-2 flex gap-2 justify-center items-center bg-primary bg-opacity-40 px-2">
+              {getBrainIconFromBrainType(brain.brain_type, {
+                iconSize: 24,
+                DocBrainIcon: CgFileDocument,
+                iconClassName: "text-primary",
+              })}
+              <span className="line-clamp-1 mr-2 font-semibold text-md">
+                {brain.name}
               </span>
-              {brain.name}
-            </p>
+            </div>
           </div>
-          <div className="flex-1">
+          <div className="flex-1 py-2">
             <p
-              className={`line-clamp-1 text-center px-5 ${
+              className={`line-clamp-2 text-center px-5 ${
                 isBrainDescriptionEmpty && "text-gray-400"
               }`}
             >
               {brainDescription}
             </p>
           </div>
-          {subscribeButton}
+          <div className="w-full px-2">{subscribeButton}</div>
         </div>
       }
     >
       <div>
-        <p className="text-2xl font-bold text-center mb-10 flex items-center justify-center">
+        <p className="text-2xl font-medium text-center mb-10 flex items-center justify-center">
           <span className="mr-2">
             {getBrainIconFromBrainType(brain.brain_type, {
               iconSize: 30,
@@ -99,7 +100,7 @@ export const PublicBrainItem = ({
         <p className={`mb-10 ${isBrainDescriptionEmpty && "text-gray-400"}`}>
           {brainDescription}
         </p>
-        <p className="font-bold mb-5">
+        <p className="mb-5">
           <span>
             <span className="mr-2">{t("public_brain_last_update_label")}:</span>
             {formatDate(brain.last_update)}
@@ -116,7 +117,7 @@ export const PublicBrainItem = ({
           >
             <MdLink size="20" color="gray" />
           </Button>
-          {subscribeButton}
+          <div>{subscribeButton}</div>
         </div>
       </div>
     </Modal>
