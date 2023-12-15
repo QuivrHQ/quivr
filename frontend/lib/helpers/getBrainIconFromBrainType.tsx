@@ -8,6 +8,7 @@ type GetBrainIconFromBrainTypeOptions = {
   iconSize?: number;
   ApiBrainIcon?: IconType;
   DocBrainIcon?: IconType;
+  iconClassName?: string;
 };
 
 export const getBrainIconFromBrainType = (
@@ -20,15 +21,15 @@ export const getBrainIconFromBrainType = (
   const DocBrainIcon = options?.DocBrainIcon ?? PiPaperclipFill;
 
   if (brainType === undefined) {
-    return <LuBrain size={iconSize} />;
+    return <LuBrain size={iconSize} className={options?.iconClassName} />;
   }
   if (brainType === "api") {
-    return <ApiBrainIcon size={iconSize} />;
+    return <ApiBrainIcon size={iconSize} className={options?.iconClassName} />;
   }
 
   if (brainType === "composite") {
-    return <LuBot size={iconSize} />;
+    return <LuBot size={iconSize} className={options?.iconClassName} />;
   }
 
-  return <DocBrainIcon size={iconSize} />;
+  return <DocBrainIcon size={iconSize} className={options?.iconClassName} />;
 };

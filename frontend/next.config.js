@@ -1,6 +1,15 @@
 /* eslint-disable max-lines */
 const nextConfig = {
-  output: 'standalone',
+  output: "standalone",
+  redirects: async () => {
+    return [
+      {
+        source: "/brains-management/library",
+        destination: "/library",
+        permanent: false,
+      },
+    ];
+  },
   images: {
     domains: [
       "www.quivr.app",

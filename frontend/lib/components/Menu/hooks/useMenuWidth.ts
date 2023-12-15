@@ -1,5 +1,6 @@
 import { usePathname } from "next/navigation";
 
+import { useSideBarContext } from "@/lib/context/SidebarProvider/hooks/useSideBarContext";
 import { useDevice } from "@/lib/hooks/useDevice";
 
 const OPENED_MENU_WIDTH = 260;
@@ -7,17 +8,17 @@ const OPENED_MENU_WIDTH = 260;
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const useMenuWidth = () => {
   const pathname = usePathname() ?? "";
+  const { isOpened } = useSideBarContext();
   const { isMobile } = useDevice();
 
-  const isStaticSideBarActivated = !isMobile;
+  const shouldDisplayRightSideBar = !isMobile && pathname.includes("/chat");
 
-  const shouldAddFixedPadding = pathname.startsWith("/chat");
-
-  const staticMenuWidth =
-    shouldAddFixedPadding && isStaticSideBarActivated ? OPENED_MENU_WIDTH : 0;
+  const shouldSideBarBeSticky =
+    (!isMobile && pathname.includes("/chat")) || isOpened;
 
   return {
     OPENED_MENU_WIDTH,
-    staticMenuWidth,
+    shouldDisplayRightSideBar,
+    shouldSideBarBeSticky,
   };
 };

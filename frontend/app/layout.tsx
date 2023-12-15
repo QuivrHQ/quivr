@@ -10,7 +10,7 @@ import { SupabaseProvider } from "@/lib/context/SupabaseProvider";
 import { App } from "./App";
 import "./globals.css";
 
-const inter = Outfit({ subsets: ["latin"], weight: "400" });
+const inter = Outfit({ subsets: ["latin"] });
 
 export const metadata = {
   title: "Quivr - Get a Second Brain with Generative AI",

@@ -18,7 +18,7 @@ export const DiscussionButton = (): JSX.Element => {
         startIcon={<LuMessageSquare />}
         endIcon={<LuChevronRight size={18} />}
         className={cn(
-          "font-extrabold w-full hover:bg-secondary py-3",
+          "w-full hover:bg-secondary py-3",
           isSelected ? "bg-secondary" : ""
         )}
       />

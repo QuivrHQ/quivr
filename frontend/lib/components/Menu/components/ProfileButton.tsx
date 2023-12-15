@@ -14,7 +14,7 @@ export const ProfileButton = (): JSX.Element => {
           </div>
         }
         endIcon={<LuChevronRight size={18} />}
-        className="font-extrabold w-full hover:bg-secondary p-0"
+        className="w-full hover:bg-secondary p-0"
       />
     </Link>
   );
