@@ -12,7 +12,11 @@ class QAInterface(ABC):
 
     @abstractmethod
     def generate_answer(
-        self, chat_id: UUID, question: ChatQuestion, should, *custom_params: tuple
+        self,
+        chat_id: UUID,
+        question: ChatQuestion,
+        save_answer: bool,
+        *custom_params: tuple
     ):
         raise NotImplementedError(
             "generate_answer is an abstract method and must be implemented"
@@ -20,7 +24,11 @@ class QAInterface(ABC):
 
     @abstractmethod
     def generate_stream(
-        self, chat_id: UUID, question: ChatQuestion, *custom_params: tuple
+        self,
+        chat_id: UUID,
+        question: ChatQuestion,
+        save_answer: bool,
+        *custom_params: tuple
     ):
         raise NotImplementedError(
             "generate_stream is an abstract method and must be implemented"
