@@ -16,6 +16,7 @@ from langchain.prompts.chat import (
     SystemMessagePromptTemplate,
 )
 import litellm
+import os
 from llm.utils.format_chat_history import format_chat_history
 from llm.utils.get_prompt_to_use import get_prompt_to_use
 from llm.utils.get_prompt_to_use_id import get_prompt_to_use_id
@@ -40,6 +41,7 @@ brain_service = BrainService()
 chat_service = ChatService()
 
 litellm.set_verbose = True
+
 
 class QABaseBrainPicking(BaseModel):
     """
@@ -68,9 +70,7 @@ class QABaseBrainPicking(BaseModel):
     max_tokens: int = 256
     streaming: bool = False
 
-    callbacks: List[
-        AsyncIteratorCallbackHandler
-    ] = None  # pyright: ignore reportPrivateUsage=none
+    callbacks: List[AsyncIteratorCallbackHandler] = None  # pyright: ignore reportPrivateUsage=none
 
     def _determine_streaming(self, model: str, streaming: bool) -> bool:
         """If the model name allows for streaming and streaming is declared, set streaming to True."""
@@ -88,9 +88,7 @@ class QABaseBrainPicking(BaseModel):
     @property
     def embeddings(self):
         if self.brain_settings.ollama_api_base_url:
-            return OllamaEmbeddings(
-                base_url=self.brain_settings.ollama_api_base_url
-            )  # pyright: ignore reportPrivateUsage=none
+            return OllamaEmbeddings(base_url=self.brain_settings.ollama_api_base_url)  # pyright: ignore reportPrivateUsage=none
         else:
             return OpenAIEmbeddings()
 
@@ -153,6 +151,8 @@ class QABaseBrainPicking(BaseModel):
         api_base = None
         if self.brain_settings.ollama_api_base_url and model.startswith("ollama"):
             api_base = self.brain_settings.ollama_api_base_url
+
+        logger.debug("OpenAI API Key: %s", os.environ.get("OPENAI_API_KEY"))
 
         return ChatLiteLLM(
             temperature=temperature,
