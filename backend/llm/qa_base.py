@@ -159,7 +159,7 @@ class QABaseBrainPicking(BaseModel):
             max_tokens=self.max_tokens,
             model=model,
             streaming=streaming,
-            verbose=False,
+            verbose=True,
             callbacks=callbacks,
             api_base=api_base,
         )  # pyright: ignore reportPrivateUsage=none
