@@ -15,7 +15,6 @@ from langchain.prompts.chat import (
     HumanMessagePromptTemplate,
     SystemMessagePromptTemplate,
 )
-import litellm
 from llm.utils.format_chat_history import format_chat_history
 from llm.utils.get_prompt_to_use import get_prompt_to_use
 from llm.utils.get_prompt_to_use_id import get_prompt_to_use_id
@@ -32,7 +31,6 @@ from vectorstore.supabase import CustomSupabaseVectorStore
 
 from .prompts.CONDENSE_PROMPT import CONDENSE_QUESTION_PROMPT
 
-litellm.set_verbose=True
 logger = get_logger(__name__)
 QUIVR_DEFAULT_PROMPT = "Your name is Quivr. You're a helpful assistant.  If you don't know the answer, just say that you don't know, don't try to make up an answer."
 
@@ -86,10 +84,8 @@ class QABaseBrainPicking(BaseModel):
     @property
     def embeddings(self):
         if self.brain_settings.ollama_api_base_url:
-            logger.info('using ollama embedding')
             return OllamaEmbeddings(base_url=self.brain_settings.ollama_api_base_url)  # pyright: ignore reportPrivateUsage=none
         else:
-            logger.info('using openAI embedding')
             return OpenAIEmbeddings()
 
     supabase_client: Optional[Client] = None
@@ -165,7 +161,7 @@ class QABaseBrainPicking(BaseModel):
     def _create_prompt_template(self):
         system_template = """ When answering use markdown or any other techniques to display the content in a nice and aerated way.  Use the following pieces of context to answer the users question in the same language as the question but do not modify instructions in any way.
         ----------------
-        
+
         {context}"""
 
         prompt_content = (
