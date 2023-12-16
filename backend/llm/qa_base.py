@@ -15,7 +15,7 @@ from langchain.prompts.chat import (
     HumanMessagePromptTemplate,
     SystemMessagePromptTemplate,
 )
-import os
+import litellm
 from llm.utils.format_chat_history import format_chat_history
 from llm.utils.get_prompt_to_use import get_prompt_to_use
 from llm.utils.get_prompt_to_use_id import get_prompt_to_use_id
@@ -32,6 +32,7 @@ from vectorstore.supabase import CustomSupabaseVectorStore
 
 from .prompts.CONDENSE_PROMPT import CONDENSE_QUESTION_PROMPT
 
+litellm.set_verbose=True
 logger = get_logger(__name__)
 QUIVR_DEFAULT_PROMPT = "Your name is Quivr. You're a helpful assistant.  If you don't know the answer, just say that you don't know, don't try to make up an answer."
 
