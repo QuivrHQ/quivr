@@ -85,8 +85,10 @@ class QABaseBrainPicking(BaseModel):
     @property
     def embeddings(self):
         if self.brain_settings.ollama_api_base_url:
+            logger.info('using ollama embedding')
             return OllamaEmbeddings(base_url=self.brain_settings.ollama_api_base_url)  # pyright: ignore reportPrivateUsage=none
         else:
+            logger.info('using openAI embedding')
             return OpenAIEmbeddings()
 
     supabase_client: Optional[Client] = None
@@ -148,8 +150,6 @@ class QABaseBrainPicking(BaseModel):
         api_base = None
         if self.brain_settings.ollama_api_base_url and model.startswith("ollama"):
             api_base = self.brain_settings.ollama_api_base_url
-
-        logger.info("OpenAI API Key: %s", os.environ.get("OPENAI_API_KEY"))
 
         return ChatLiteLLM(
             temperature=temperature,
@@ -358,7 +358,7 @@ class QABaseBrainPicking(BaseModel):
         try:
             result = await run
             source_documents = result.get("source_documents", [])
-            ## Deduplicate source documents
+            # Deduplicate source documents
             source_documents = list(
                 {doc.metadata["file_name"]: doc for doc in source_documents}.values()
             )
