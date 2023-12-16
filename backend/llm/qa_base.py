@@ -15,7 +15,6 @@ from langchain.prompts.chat import (
     HumanMessagePromptTemplate,
     SystemMessagePromptTemplate,
 )
-import litellm
 import os
 from llm.utils.format_chat_history import format_chat_history
 from llm.utils.get_prompt_to_use import get_prompt_to_use
@@ -39,8 +38,6 @@ QUIVR_DEFAULT_PROMPT = "Your name is Quivr. You're a helpful assistant.  If you 
 
 brain_service = BrainService()
 chat_service = ChatService()
-
-litellm.set_verbose = True
 
 
 class QABaseBrainPicking(BaseModel):
@@ -159,7 +156,7 @@ class QABaseBrainPicking(BaseModel):
             max_tokens=self.max_tokens,
             model=model,
             streaming=streaming,
-            verbose=True,
+            verbose=False,
             callbacks=callbacks,
             api_base=api_base,
         )  # pyright: ignore reportPrivateUsage=none
