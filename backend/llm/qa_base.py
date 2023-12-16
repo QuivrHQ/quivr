@@ -152,7 +152,7 @@ class QABaseBrainPicking(BaseModel):
         if self.brain_settings.ollama_api_base_url and model.startswith("ollama"):
             api_base = self.brain_settings.ollama_api_base_url
 
-        logger.debug("OpenAI API Key: %s", os.environ.get("OPENAI_API_KEY"))
+        logger.info("OpenAI API Key: %s", os.environ.get("OPENAI_API_KEY"))
 
         return ChatLiteLLM(
             temperature=temperature,
