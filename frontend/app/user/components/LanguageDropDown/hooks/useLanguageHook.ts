@@ -61,8 +61,7 @@ export const useLanguageHook = (): {
   };
 
   const handleToggleLanguage = () => {
-    const savedLanguage =
-      localStorage.getItem("selectedLanguage") ?? getBrowserLang();
+    const savedLanguage = localStorage.getItem("selectedLanguage") ?? "en";
     if (savedLanguage === "zh_cn") {
       change("en");
     } else {

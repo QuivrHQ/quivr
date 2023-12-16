@@ -47,7 +47,7 @@
     "@tiptap/extension-placeholder": "^2.1.12",
     "@tiptap/extension-text": "^2.1.12",
     "@tiptap/pm": "^2.1.12",
-    "@tiptap/react": "^2.1.12",
+    "@tiptap/react": "^2.1.13",
     "@tiptap/starter-kit": "^2.1.12",
     "@tiptap/suggestion": "^2.1.12",
     "@types/dom-speech-recognition": "^0.0.1",

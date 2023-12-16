@@ -1,9 +1,12 @@
+/* eslint-disable max-lines */
 import { default as TiptapMention } from "@tiptap/extension-mention";
 import { PluginKey } from "@tiptap/pm/state";
 import { ReactRenderer } from "@tiptap/react";
 import { SuggestionOptions } from "@tiptap/suggestion";
 import { RefAttributes, useMemo } from "react";
 import tippy, { Instance } from "tippy.js";
+
+import { useSecurity } from "@/services/useSecurity/useSecurity";
 
 import {
   MentionList,
@@ -24,6 +27,8 @@ export const useMentionConfig = ({
   char,
   suggestionData,
 }: UseMentionConfigProps) => {
+  const { isStudioMember } = useSecurity();
+
   const mentionKey = `mention${char}`;
   const items = suggestionData.items;
 
@@ -51,7 +56,7 @@ export const useMentionConfig = ({
 
         return {
           onStart: (props) => {
-            if (!props.clientRect) {
+            if (!props.clientRect || !isStudioMember) {
               return;
             }
             reactRenderer = new ReactRenderer(MentionList, {
@@ -110,11 +115,14 @@ export const useMentionConfig = ({
     name: mentionKey,
   }).configure({
     HTMLAttributes: {
-      class: "mention",
+      class: `mention`,
     },
     suggestion: suggestionsConfig,
-    renderLabel: ({ options, node }) =>
-      `${options.suggestion.char ?? ""}${node.attrs.label as string}`,
+    renderLabel: ({ options, node }) => {
+      return isStudioMember
+        ? `${options.suggestion.char ?? ""}${node.attrs.label as string}`
+        : "V1.0.0";
+    },
   });
 
   return {
