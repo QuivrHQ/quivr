@@ -8,8 +8,8 @@ type ChatsContextType = {
   allChats: ChatEntity[];
   //set setAllChats is from the useState hook so it can take a function as params
   setAllChats: React.Dispatch<React.SetStateAction<ChatEntity[]>>;
-  setIsLoadingAllChats: React.Dispatch<React.SetStateAction<boolean>>;
-  isLoadingAllChats: boolean;
+  isLoading: boolean;
+  setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 export const ChatsContext = createContext<ChatsContextType | undefined>(
@@ -22,15 +22,15 @@ export const ChatsProvider = ({
   children: React.ReactNode;
 }): JSX.Element => {
   const [allChats, setAllChats] = useState<ChatEntity[]>([]);
-  const [isLoadingAllChats, setIsLoadingAllChats] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   return (
     <ChatsContext.Provider
       value={{
         allChats,
         setAllChats,
-        setIsLoadingAllChats,
-        isLoadingAllChats,
+        isLoading,
+        setIsLoading,
       }}
     >
       {children}

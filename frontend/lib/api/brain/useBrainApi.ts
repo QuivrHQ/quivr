@@ -8,6 +8,7 @@ import {
   getBrains,
   getBrainUsers,
   getDefaultBrain,
+  getDocsFromQuestion,
   getPublicBrains,
   setAsDefaultBrain,
   Subscription,
@@ -48,6 +49,8 @@ export const useBrainApi = () => {
     updateBrain: async (brainId: string, brain: UpdateBrainInput) =>
       updateBrain(brainId, brain, axiosInstance),
     getPublicBrains: async () => getPublicBrains(axiosInstance),
+    getDocsFromQuestion: async (brainId: string, question: string) =>
+      getDocsFromQuestion(brainId, question, axiosInstance),
     updateBrainSecrets: async (
       brainId: string,
       secrets: Record<string, string>

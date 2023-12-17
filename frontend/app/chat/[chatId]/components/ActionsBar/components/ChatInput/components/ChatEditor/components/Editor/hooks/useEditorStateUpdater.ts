@@ -19,12 +19,7 @@ export const useEditorStateUpdater = ({
 
   const setCurrentBrainAndPrompt = useCallback(() => {
     const { promptId, brainId } = getChatInputAttributesFromEditorState(editor);
-
-    if (
-      currentBrain !== undefined &&
-      currentBrain.id !== brainId &&
-      brainId === ""
-    ) {
+    if (currentBrain !== undefined && currentBrain.id !== brainId) {
       editor
         ?.chain()
         .focus()

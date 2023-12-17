@@ -17,7 +17,13 @@ class Brains(BrainsInterface):
     def create_brain(self, brain):
         response = (
             self.db.table("brains").insert(
-                brain.dict(exclude={"brain_definition", "brain_secrets_values"})
+                brain.dict(
+                    exclude={
+                        "brain_definition",
+                        "brain_secrets_values",
+                        "connected_brains_ids",
+                    }
+                )
             )
         ).execute()
 
@@ -46,9 +52,12 @@ class Brains(BrainsInterface):
         return public_brains
 
     def update_brain_last_update_time(self, brain_id):
-        self.db.table("brains").update({"last_update": "now()"}).match(
-            {"brain_id": brain_id}
-        ).execute()
+        try:
+            self.db.table("brains").update({"last_update": "now()"}).match(
+                {"brain_id": brain_id}
+            ).execute()
+        except Exception as e:
+            logger.error(e)
 
     def get_brain_details(self, brain_id):
         response = (

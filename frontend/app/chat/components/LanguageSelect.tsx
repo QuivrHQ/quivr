@@ -1,16 +1,13 @@
-"use client";
+'use client';
 
 // eslint-disable-next-line import/no-extraneous-dependencies
-import { Listbox, Transition } from "@headlessui/react";
-import { CheckIcon, ChevronUpDownIcon } from "@heroicons/react/20/solid";
-import { Fragment } from "react";
-import { IoLanguage } from "react-icons/io5";
+import { Listbox, Transition } from '@headlessui/react';
+import { CheckIcon, ChevronUpDownIcon } from '@heroicons/react/20/solid';
+import { Fragment } from 'react';
+import { IoLanguage } from 'react-icons/io5';
 
-import {
-  languages,
-  useLanguageHook,
-} from "@/app/user/components/LanguageDropDown/hooks/useLanguageHook";
-import { cn } from "@/lib/utils";
+import { languages, useLanguageHook } from '@/app/user/components/LanguageSelect/hooks/useLanguageHook';
+import { cn } from '@/lib/utils';
 
 export const LanguageSelect = ({
   isSelect,
@@ -23,7 +20,7 @@ export const LanguageSelect = ({
     useLanguageHook();
 
   return (
-    <div className={`${!isSelect ? "mr-4 ml-2" : "py-2 mx-4"}`}>
+    <div className={`${!isSelect ? 'mr-4 ml-2' : 'py-2 mx-4'}`}>
       {isSelect && (
         <Listbox
           value={currentLanguage}
@@ -39,7 +36,7 @@ export const LanguageSelect = ({
                     {Object.keys(allLanguages).length > 0 &&
                     currentLanguage !== undefined
                       ? allLanguages[currentLanguage].label
-                      : languages["en"].label}
+                      : languages['en'].label}
                   </span>
                   <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
                     <ChevronUpDownIcon
@@ -63,9 +60,9 @@ export const LanguageSelect = ({
                         className={({ active }) =>
                           cn(
                             active
-                              ? "bg-indigo-600 text-white"
-                              : "text-gray-900",
-                            "relative cursor-default select-none py-2 pl-3 pr-9 text-xs sm:text-sm"
+                              ? 'bg-indigo-600 text-white'
+                              : 'text-gray-900',
+                            'relative cursor-default select-none py-2 pl-3 pr-9 text-xs sm:text-sm'
                           )
                         }
                         value={lang}
@@ -74,8 +71,8 @@ export const LanguageSelect = ({
                           <>
                             <span
                               className={cn(
-                                selected ? "font-semibold" : "font-normal",
-                                "block truncate"
+                                selected ? 'font-semibold' : 'font-normal',
+                                'block truncate'
                               )}
                             >
                               {allLanguages[lang].label}
@@ -84,8 +81,8 @@ export const LanguageSelect = ({
                             {selected ? (
                               <span
                                 className={cn(
-                                  active ? "text-white" : "text-indigo-600",
-                                  "absolute inset-y-0 right-0 flex items-center pr-2"
+                                  active ? 'text-white' : 'text-indigo-600',
+                                  'absolute inset-y-0 right-0 flex items-center pr-2'
                                 )}
                               >
                                 <CheckIcon
@@ -112,8 +109,8 @@ export const LanguageSelect = ({
             className={`${
               // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
               isChatPage
-                ? "sm:text-black hover:text-primary dark:sm:text-white dark:hover:text-slate-200"
-                : "sm:text-white hover:text-slate-200 dark:text-white"
+                ? 'sm:text-black hover:text-primary dark:sm:text-white dark:hover:text-slate-200'
+                : 'sm:text-white hover:text-slate-200 dark:text-white'
             } text-black   cursor-pointer  text-xs  bg-transparent py-1.5  sm:px-3 text-left   sm:text-sm sm:leading-6`}
           >
             <IoLanguage className="" />

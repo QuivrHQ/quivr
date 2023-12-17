@@ -105,7 +105,7 @@ You can find the installation video [here](https://www.youtube.com/watch?v=cXBa6
 - **Step 2**: Use the `migration.sh` script to run the migration scripts
 
   ```bash
-  chmod +x migration.sh
+  chmod +x migration.sh # You need to install Gum & postgresql (brew install gum for example)
   ./migration.sh
   # Select  2) Run migrations
   ```
@@ -122,24 +122,23 @@ Thanks go to these wonderful people:
 <img src="https://contrib.rocks/image?repo=stangirard/quivr" />
 </a>
 
-## Sponsors ❤️
+## Contribute 🤝
 
-This project would not be possible without the support of our sponsors. Thank you for your support!
+Did you get a pull request? Open it, and we'll review it as soon as possible. Check out our project board [here](https://github.com/users/StanGirard/projects/5) to see what we're currently focused on, and feel free to bring your fresh ideas to the table!
+
+- [Open Issues](https://github.com/StanGirard/quivr/issues)
+- [Open Pull Requests](https://github.com/StanGirard/quivr/pulls)
+- [Good First Issues](https://github.com/StanGirard/quivr/issues?q=is%3Aopen+is%3Aissue+label%3A%22good+first+issue%22)
+- [Frontend Issues](https://github.com/StanGirard/quivr/issues?q=is%3Aopen+is%3Aissue+label%3Afrontend)
+- [Backend Issues](https://github.com/StanGirard/quivr/issues?q=is%3Aopen+is%3Aissue+label%3Abackend)
+- [Translate](https://brain.quivr.app/docs/Developers/contribution/guidelines#translations)
+
+## Partners ❤️
+
+This project would not be possible without the support of our partners. Thank you for your support!
 
 <a href="https://www.theodo.fr/">
   <img src="https://avatars.githubusercontent.com/u/332041?s=200&v=4" alt="Theodo" style="padding: 10px" width="70px">
-</a>
-<a href="https://www.padok.fr/">
-  <img src="https://avatars.githubusercontent.com/u/46325765?s=200&v=4" alt="Padok" style="padding: 10px" width="70px">
-</a>
-<a href="https://www.aleios.com/">
-  <img src="https://avatars.githubusercontent.com/u/97908131?s=200&v=4" alt="Aleios" style="padding: 10px" width="70px">
-</a>
-<a href="https://www.bam.tech/">
-  <img src="https://avatars.githubusercontent.com/u/9597329?s=200&v=4" alt="BAM" style="padding: 10px" width="70px">
-</a>
-<a href="https://www.sicara.fr/">
-  <img src="https://avatars.githubusercontent.com/u/23194788?s=200&v=4" alt="Sicara" style="padding: 10px" width="70px">
 </a>
 
 ## License 📄

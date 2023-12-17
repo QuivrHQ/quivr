@@ -133,7 +133,7 @@ DO $$
 BEGIN 
 IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'brain_type_enum') THEN
   -- Create the ENUM type 'brain_type' if it doesn't exist
-  CREATE TYPE brain_type_enum AS ENUM ('doc', 'api');
+  CREATE TYPE brain_type_enum AS ENUM ('doc', 'api', 'composite');
 END IF;
 END $$;
 
@@ -204,6 +204,14 @@ CREATE TABLE IF NOT EXISTS brain_subscription_invitations (
   rights VARCHAR(255),
   PRIMARY KEY (brain_id, email),
   FOREIGN KEY (brain_id) REFERENCES brains (brain_id)
+);
+
+-- Table for storing the relationship between brains for composite brains
+CREATE TABLE IF NOT EXISTS composite_brain_connections (
+  composite_brain_id UUID NOT NULL REFERENCES brains(brain_id),
+  connected_brain_id UUID NOT NULL REFERENCES brains(brain_id),
+  PRIMARY KEY (composite_brain_id, connected_brain_id),
+  CHECK (composite_brain_id != connected_brain_id)
 );
 
 --- Create user_identity table
@@ -453,7 +461,7 @@ grant all on extensions.wrappers_fdw_stats to service_role;
 
 
 INSERT INTO migrations (name) 
-SELECT '20231203173900_new_api_key_format'
+SELECT '20231205163000_new_table_composite_brain_connections'
 WHERE NOT EXISTS (
-    SELECT 1 FROM migrations WHERE name = '20231203173900_new_api_key_format'
+    SELECT 1 FROM migrations WHERE name = '20231205163000_new_table_composite_brain_connections'
 );

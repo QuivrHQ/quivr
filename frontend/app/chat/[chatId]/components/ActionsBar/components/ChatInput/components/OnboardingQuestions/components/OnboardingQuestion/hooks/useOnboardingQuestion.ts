@@ -27,7 +27,7 @@ export const useOnboardingQuestion = (questionId: QuestionId) => {
   const [chatId, setChatId] = useState(params?.chatId as UUID | undefined);
 
   const onboardingStep = questionIdToTradPath[questionId];
-  const question = t(`onboarding.${onboardingStep}`);
+  const question = t(`onboarding.${onboardingStep}`, {});
   const answer = t(`onboarding.answer.${onboardingStep}`);
   const { updateStreamingHistory } = useChatContext();
   const { addQuestionAndAnswer } = useChatApi();

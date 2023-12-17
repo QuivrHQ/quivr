@@ -36,7 +36,7 @@ class ApiBrainAllowedMethods(str, Enum):
     DELETE = "DELETE"
 
 
-class ApiBrainDefinition(BaseModel, extra=Extra.forbid):
+class ApiBrainDefinitionEntity(BaseModel, extra=Extra.forbid):
     brain_id: UUID
     method: ApiBrainAllowedMethods
     url: str

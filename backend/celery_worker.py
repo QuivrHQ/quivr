@@ -2,9 +2,11 @@ import asyncio
 import io
 import os
 
+import sentry_sdk
 from celery import Celery
 from celery.schedules import crontab
 from fastapi import UploadFile
+from logger import get_logger
 from models.files import File
 from models.settings import get_supabase_client
 from modules.brain.service.brain_service import BrainService
@@ -15,6 +17,16 @@ from modules.onboarding.service.onboarding_service import OnboardingService
 from packages.files.crawl.crawler import CrawlWebsite
 from packages.files.parsers.github import process_github
 from packages.files.processors import filter_file
+
+logger = get_logger(__name__)
+
+sentry_dsn = os.getenv("SENTRY_DSN")
+if sentry_dsn:
+    sentry_sdk.init(
+        dsn=sentry_dsn,
+        sample_rate=0.1,
+        enable_tracing=True,
+    )
 
 CELERY_BROKER_URL = os.getenv("CELERY_BROKER_URL", "")
 CELERY_BROKER_QUEUE_NAME = os.getenv("CELERY_BROKER_QUEUE_NAME", "quivr")
@@ -104,6 +116,9 @@ def process_file_and_notify(
             brain_service.update_brain_last_update_time(brain_id)
 
             return True
+    except TimeoutError:
+        logger.error("TimeoutError")
+
     except Exception as e:
         notification_message = {
             "status": "error",

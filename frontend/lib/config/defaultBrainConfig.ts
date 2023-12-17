@@ -10,6 +10,20 @@ export const addBrainDefaultValues: CreateBrainInput = {
   name: "",
   description: "",
   brain_type: "doc",
+  brain_definition: {
+    method: "GET",
+    url: "",
+    search_params: {
+      properties: [],
+      required: [],
+    },
+    params: {
+      properties: [],
+      required: [],
+    },
+    secrets: [],
+  },
+  connected_brains_ids: [],
 };
 
 export const defaultModel: Model = "gpt-3.5-turbo";

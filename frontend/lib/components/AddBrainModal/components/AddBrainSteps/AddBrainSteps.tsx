@@ -5,6 +5,7 @@ import Button from "@/lib/components/ui/Button";
 import { Modal } from "@/lib/components/ui/Modal";
 import { cn } from "@/lib/utils";
 
+import { BrainKnowledgeStep } from "./components/BrainKnowledgeStep/BrainKnowledgeStep";
 import { BrainParamsStep } from "./components/BrainParamsStep/BrainParamsStep";
 import { BrainTypeSelectionStep } from "./components/BrainTypeSelectionStep/BrainTypeSelectionStep";
 import { Stepper } from "./components/Stepper/Stepper";
@@ -52,6 +53,9 @@ export const AddBrainSteps = ({
           onCancelBrainCreation={() => setIsBrainCreationModalOpened(false)}
         />
         <BrainParamsStep
+          onCancelBrainCreation={() => setIsBrainCreationModalOpened(false)}
+        />
+        <BrainKnowledgeStep
           onCancelBrainCreation={() => setIsBrainCreationModalOpened(false)}
         />
       </form>
