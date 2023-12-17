@@ -2463,10 +2463,10 @@
   resolved "https://registry.yarnpkg.com/@tiptap/extension-bold/-/extension-bold-2.1.12.tgz#5dbf41105fc0fbde8adbff629312187fbebc39b0"
   integrity sha512-AZGxIxcGU1/y6V2YEbKsq6BAibL8yQrbRm6EdcBnby41vj1WziewEKswhLGmZx5IKM2r2ldxld03KlfSIlKQZg==
 
-"@tiptap/extension-bubble-menu@^2.1.12":
-  version "2.1.12"
-  resolved "https://registry.yarnpkg.com/@tiptap/extension-bubble-menu/-/extension-bubble-menu-2.1.12.tgz#4103a21a6433e58690c8f742ece39fad78dc26eb"
-  integrity sha512-gAGi21EQ4wvLmT7klgariAc2Hf+cIjaNU2NWze3ut6Ku9gUo5ZLqj1t9SKHmNf4d5JG63O8GxpErqpA7lHlRtw==
+"@tiptap/extension-bubble-menu@^2.1.13":
+  version "2.1.13"
+  resolved "https://registry.yarnpkg.com/@tiptap/extension-bubble-menu/-/extension-bubble-menu-2.1.13.tgz#884cd2e4e0c9586998baac3d0a14621b177f1859"
+  integrity sha512-Hm7e1GX3AI6lfaUmr6WqsS9MMyXIzCkhh+VQi6K8jj4Q4s8kY4KPoAyD/c3v9pZ/dieUtm2TfqrOCkbHzsJQBg==
   dependencies:
     tippy.js "^6.3.7"
 
@@ -2495,10 +2495,10 @@
   resolved "https://registry.yarnpkg.com/@tiptap/extension-dropcursor/-/extension-dropcursor-2.1.12.tgz#9da0c275291c9d47497d3db41b4d70d96366b4ff"
   integrity sha512-0tT/q8nL4NBCYPxr9T0Brck+RQbWuczm9nV0bnxgt0IiQXoRHutfPWdS7GA65PTuVRBS/3LOco30fbjFhkfz/A==
 
-"@tiptap/extension-floating-menu@^2.1.12":
-  version "2.1.12"
-  resolved "https://registry.yarnpkg.com/@tiptap/extension-floating-menu/-/extension-floating-menu-2.1.12.tgz#68a658b2b9bdd3a0fc1afc5165231838061a8fde"
-  integrity sha512-uo0ydCJNg6AWwLT6cMUJYVChfvw2PY9ZfvKRhh9YJlGfM02jS4RUG/bJBts6R37f+a5FsOvAVwg8EvqPlNND1A==
+"@tiptap/extension-floating-menu@^2.1.13":
+  version "2.1.13"
+  resolved "https://registry.yarnpkg.com/@tiptap/extension-floating-menu/-/extension-floating-menu-2.1.13.tgz#e12e6e73ee095319d4a723a9b46b8f7b1a9f4b1a"
+  integrity sha512-9Oz7pk1Nts2+EyY+rYfnREGbLzQ5UFazAvRhF6zAJdvyuDmAYm0Jp6s0GoTrpV0/dJEISoFaNpPdMJOb9EBNRw==
   dependencies:
     tippy.js "^6.3.7"
 
@@ -2591,13 +2591,13 @@
     prosemirror-transform "^1.7.0"
     prosemirror-view "^1.28.2"
 
-"@tiptap/react@^2.1.12":
-  version "2.1.12"
-  resolved "https://registry.yarnpkg.com/@tiptap/react/-/react-2.1.12.tgz#23566c7992b9642137171b282335e646922ae559"
-  integrity sha512-RMO4QmmpL7sPR7w8o1Wq0hrUe/ttHzsn5I/eWwqg1d3fGx5y9mOdfCoQ9XBtm49Xzdejy3QVzt4zYp9fX0X/xg==
+"@tiptap/react@^2.1.13":
+  version "2.1.13"
+  resolved "https://registry.yarnpkg.com/@tiptap/react/-/react-2.1.13.tgz#ec5ebaf9babc145f3329030358b3c5e36016b908"
+  integrity sha512-Dq3f8EtJnpImP3iDtJo+7bulnN9SJZRZcVVzxHXccLcC2MxtmDdlPGZjP+wxO800nd8toSIOd5734fPNf/YcfA==
   dependencies:
-    "@tiptap/extension-bubble-menu" "^2.1.12"
-    "@tiptap/extension-floating-menu" "^2.1.12"
+    "@tiptap/extension-bubble-menu" "^2.1.13"
+    "@tiptap/extension-floating-menu" "^2.1.13"
 
 "@tiptap/starter-kit@^2.1.12":
   version "2.1.12"
@@ -3836,7 +3836,7 @@ debug@4, debug@^4.0.0, debug@^4.1.0, debug@^4.1.1, debug@^4.3.2, debug@^4.3.4:
   dependencies:
     ms "2.1.2"
 
-debug@^2.2.0, debug@^2.6.9:
+debug@^2.1.3, debug@^2.2.0, debug@^2.6.9:
   version "2.6.9"
   resolved "https://registry.npmjs.org/debug/-/debug-2.6.9.tgz"
   integrity sha512-bC7ElrdJaJnPbAP+1EotYvqZsb3ecl5wi6Bfi6BJTUcNowp6cvspg0jXznRTKDjm/E7AdgFBVeAPVMNcKGsHMA==
@@ -5702,6 +5702,13 @@ jsonc-parser@^3.2.0:
   resolved "https://registry.npmjs.org/jsonc-parser/-/jsonc-parser-3.2.0.tgz"
   integrity sha512-gfFQZrcTc8CnKXp6Y4/CBT3fTc0OVuDofpre4aEeEpSBPV5X5v4+Vmx+8snU7RLPrNHPKSgLxGo9YuQzz20o+w==
 
+jsonp@^0.2.1:
+  version "0.2.1"
+  resolved "https://registry.yarnpkg.com/jsonp/-/jsonp-0.2.1.tgz#a65b4fa0f10bda719a05441ea7b94c55f3e15bae"
+  integrity sha512-pfog5gdDxPdV4eP7Kg87M8/bHgshlZ5pybl+yKxAnCZ5O7lCIn7Ixydj03wOlnDQesky2BPyA91SQ+5Y/mNwzw==
+  dependencies:
+    debug "^2.1.3"
+
 "jsx-ast-utils@^2.4.1 || ^3.0.0", jsx-ast-utils@^3.3.3:
   version "3.3.5"
   resolved "https://registry.npmjs.org/jsx-ast-utils/-/jsx-ast-utils-3.3.5.tgz"
@@ -6448,6 +6455,13 @@ new-date@^1.0.3:
   integrity sha512-0fsVvQPbo2I18DT2zVHpezmeeNYV2JaJSrseiHLc17GNOxJzUdx5mvSigPu8LtIfZSij5i1wXnXFspEs2CD6hA==
   dependencies:
     "@segment/isodate" "1.0.3"
+
+next-share@^0.27.0:
+  version "0.27.0"
+  resolved "https://registry.yarnpkg.com/next-share/-/next-share-0.27.0.tgz#fc4e9eb5e6ade268106c0fae49e78bf2fe235991"
+  integrity sha512-Fmfl4LIL61g10vtiDECVldxtNgVNd4OQgnI5vk9IJxn/WMZLdhniUtV15xz4PGpo8UuDdTHwmDT8R/CP60EQHA==
+  dependencies:
+    jsonp "^0.2.1"
 
 next-sitemap@^4.2.3:
   version "4.2.3"

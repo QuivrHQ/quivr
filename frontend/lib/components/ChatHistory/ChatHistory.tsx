@@ -1,19 +1,19 @@
-import { useTranslation } from "react-i18next";
+import { useTranslation } from 'react-i18next';
 
-import { ChatsListItem } from "@/lib/components/ChatsListItem";
-import { useChatsContext } from "@/lib/context/ChatsProvider/hooks/useChatsContext";
+import { ChatsListItem } from '@/lib/components/ChatsListItem';
+import { useChatsContext } from '@/lib/context/ChatsProvider/hooks/useChatsContext';
 
 import {
   isToday,
   isWithinLast30Days,
   isWithinLast7Days,
   isYesterday,
-} from "./utils";
-import Spinner from "../ui/Spinner";
+} from './utils';
+import Spinner from '../ui/Spinner';
 
 export const ChatHistory = (): JSX.Element => {
   const { allChats, isLoading } = useChatsContext();
-  const { t } = useTranslation("chat");
+  const { t } = useTranslation('chat');
   const todayChats = allChats.filter((chat) =>
     isToday(new Date(chat.creation_time))
   );
@@ -42,39 +42,47 @@ export const ChatHistory = (): JSX.Element => {
     >
       {todayChats.length > 0 && (
         <div className="bg-gray-100 text-black rounded-md px-3 py-1 mt-2">
-          {t("today")}
+          {t('today')}
         </div>
       )}
-      {todayChats.map((chat) => (
-        <ChatsListItem key={chat.chat_id} chat={chat} />
-      ))}
+      
+        <div
+          data-testid="chats-list-items"
+          className="flex-1 overflow-auto scrollbar h-full"
+        >
+          {todayChats.length > 0 && (
+            <div className="bg-gray-100 text-black rounded-md px-3 py-1 mt-2">
+              Today
+            </div>
+          )}
+          {todayChats.map((chat) => (
+            <ChatsListItem key={chat.chat_id} chat={chat} />
+          ))}
 
-      {yesterdayChats.length > 0 && (
-        <div className="bg-gray-100 text-black rounded-md px-3 py-1 mt-2">
-          {t("yesterday")}
-        </div>
-      )}
-      {yesterdayChats.map((chat) => (
-        <ChatsListItem key={chat.chat_id} chat={chat} />
-      ))}
+          {yesterdayChats.length > 0 && (
+            <div className="bg-gray-100 text-black rounded-md px-3 py-1 mt-2">
+              {t('yesterday')}
+            </div>
+          )}
+          {yesterdayChats.map((chat) => (
+            <ChatsListItem key={chat.chat_id} chat={chat} />
+          ))}
 
-      {last7DaysChats.length > 0 && (
-        <div className="bg-gray-100 text-black rounded-md px-3 py-1 mt-2">
-          {t("last7Days")}
-        </div>
-      )}
-      {last7DaysChats.map((chat) => (
-        <ChatsListItem key={chat.chat_id} chat={chat} />
-      ))}
+          {last7DaysChats.length > 0 && (
+            <div className="bg-gray-100 text-black rounded-md px-3 py-1 mt-2">
+              {t('last7Days')}
+            </div>
+          )}
+          {last7DaysChats.map((chat) => (
+            <ChatsListItem key={chat.chat_id} chat={chat} />
+          ))}
 
-      {last30DaysChats.length > 0 && (
-        <div className="bg-gray-100 text-black rounded-md px-3 py-1 mt-2">
-          {t("last30Days")}
+          {last30DaysChats.length > 0 && (
+            <div className="bg-gray-100 text-black rounded-md px-3 py-1 mt-2">
+              {t('last30Days')}
+            </div>
+          )}
         </div>
-      )}
-      {last30DaysChats.map((chat) => (
-        <ChatsListItem key={chat.chat_id} chat={chat} />
-      ))}
     </div>
   );
 };

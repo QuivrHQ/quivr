@@ -1,5 +1,7 @@
 "use client";
 
+import { useRef } from "react";
+
 import { useMenuWidth } from "@/lib/components/Menu/hooks/useMenuWidth";
 import { useKnowledgeToFeedContext } from "@/lib/context/KnowledgeToFeedProvider/hooks/useKnowledgeToFeedContext";
 import { useCustomDropzone } from "@/lib/hooks/useDropzone";
@@ -17,6 +19,7 @@ const SelectedChatPage = (): JSX.Element => {
 
   useChatsList();
   useChatNotificationsSync();
+  const ChatDialogueAreaRef = useRef(null);
 
   return (
     <div className="flex flex-1">
@@ -28,6 +31,7 @@ const SelectedChatPage = (): JSX.Element => {
         )}
         data-testid="chat-page"
         {...getRootProps()}
+        ref={ChatDialogueAreaRef}
       >
         <div
           className={`flex flex-col flex-1 w-full max-w-5xl h-full dark:shadow-primary/25 overflow-hidden p-2 sm:p-4 md:p-6 lg:p-8`}

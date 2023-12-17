@@ -1,4 +1,4 @@
-# Quivr - Your Second Brain, Empowered by Generative AI
+# Vaccine Truth Ai ChatBot Empowered by Quivr & Generative AI
 
 <div align="center">
     <img src="./logo.png" alt="Quivr-logo" width="30%"  style="border-radius: 50%; padding-bottom: 20px"/>
@@ -23,17 +23,13 @@ Quivr, your second brain, utilizes the power of GenerativeAI to be your personal
 - **Marketplace**: Share your brains with the world, or use other people's brains to boost your productivity.
 - **Offline Mode**: Quivr works offline, so you can access your data anytime, anywhere.
 
-## Demo Highlights 🎥
-
-https://github.com/StanGirard/quivr/assets/19614572/a6463b73-76c7-4bc0-978d-70562dca71f5
-
-## Getting Started 🚀
+## Getting Started
 
 Follow these instructions to get a copy of the project up and running on your local machine for development and testing purposes.
 
 You can find everything on the [documentation](https://brain.quivr.app/).
 
-### Prerequisites 📋
+### Prerequisites
 
 Ensure you have the following installed:
 
@@ -44,7 +40,13 @@ Ensure you have the following installed:
 
 You can find the installation video [here](https://www.youtube.com/watch?v=cXBa6dZJN48).
 
-- **Step 1**: Clone the repository:
+### Installation Steps
+
+- **Step 0**: If needed, the installation is explained on Youtube [here](https://youtu.be/rC-s4QdfY80)
+
+- **Step 1**: Clone the repository using **one** of these commands:
+
+  - If you don't have an SSH key set up:
 
   ```bash
   git clone https://github.com/StanGirard/Quivr.git && cd Quivr

@@ -4,9 +4,10 @@ import { useChatContext } from "@/lib/context";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 import { useFetch, useToast } from "@/lib/hooks";
 
-import { useHandleStream } from "./useHandleStream";
 import { ChatQuestion } from "../types";
 import { generatePlaceHolderMessage } from "../utils/generatePlaceHolderMessage";
+// eslint-disable-next-line import/order
+import { useHandleStream } from "./useHandleStream";
 
 interface UseChatService {
   addStreamQuestion: (

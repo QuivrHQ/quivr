@@ -15,9 +15,10 @@ import { useOnboarding } from "@/lib/hooks/useOnboarding";
 import { useOnboardingTracker } from "@/lib/hooks/useOnboardingTracker";
 import { useEventTracking } from "@/services/analytics/june/useEventTracking";
 
+// eslint-disable-next-line import/order
+import { ChatQuestion } from "../types";
 import { useLocalStorageChatConfig } from "./useLocalStorageChatConfig";
 import { useQuestion } from "./useQuestion";
-import { ChatQuestion } from "../types";
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const useChat = () => {
@@ -44,7 +45,7 @@ export const useChat = () => {
   const { t } = useTranslation(["chat"]);
 
   const addQuestion = async (question: string, callback?: () => void) => {
-    if (question === "") {
+    if (question.trim() === "") {
       publish({
         variant: "danger",
         text: t("ask"),

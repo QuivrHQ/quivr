@@ -55,9 +55,7 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
     streaming: bool = False
     knowledge_qa: Optional[RAGInterface]
 
-    callbacks: List[
-        AsyncIteratorCallbackHandler
-    ] = None  # pyright: ignore reportPrivateUsage=none
+    callbacks: List[AsyncIteratorCallbackHandler] = None  # pyright: ignore reportPrivateUsage=none
 
     prompt_id: Optional[UUID]
 

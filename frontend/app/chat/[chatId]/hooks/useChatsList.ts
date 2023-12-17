@@ -1,3 +1,4 @@
+"use client";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
@@ -17,6 +18,7 @@ export const useChatsList = () => {
 
   const fetchAllChats = async () => {
     try {
+      setIsLoading(true);
       const response = await getChats();
 
       return response.reverse();
@@ -26,6 +28,8 @@ export const useChatsList = () => {
         variant: "danger",
         text: t("errorFetching", { ns: "chat" }),
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 

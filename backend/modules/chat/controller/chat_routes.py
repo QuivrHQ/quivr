@@ -1,3 +1,4 @@
+import os
 from typing import List, Optional
 from uuid import UUID
 from venv import logger
@@ -191,20 +192,12 @@ async def create_stream_question_handler(
     request: Request,
     chat_question: ChatQuestion,
     chat_id: UUID,
-    brain_id: NullableUUID
-    | UUID
-    | None = Query(..., description="The ID of the brain"),
     current_user: UserIdentity = Depends(get_current_user),
 ) -> StreamingResponse:
+    brain_id: UUID = UUID(os.getenv("VT_BRAIN_ID"))
+    chat_question.brain_id = brain_id
     chat_instance = get_chat_strategy(brain_id)
     chat_instance.validate_authorization(user_id=current_user.id, brain_id=brain_id)
-
-    user_daily_usage = UserUsage(
-        id=current_user.id,
-        email=current_user.email,
-    )
-
-    user_settings = user_daily_usage.get_user_settings()
 
     # Retrieve chat model (temperature, max_tokens, model)
     if (
@@ -232,10 +225,8 @@ async def create_stream_question_handler(
         check_user_requests_limit(current_user)
         # TODO check if model is in the list of models available for the user
 
-        is_model_ok = chat_question.model in user_settings.get("models", ["gpt-3.5-turbo"])  # type: ignore
         gpt_answer_generator = chat_instance.get_answer_generator(
             chat_id=str(chat_id),
-            model=chat_question.model if is_model_ok else "gpt-3.5-turbo",  # type: ignore
             max_tokens=chat_question.max_tokens,
             temperature=chat_question.temperature,  # type: ignore
             streaming=True,

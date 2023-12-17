@@ -24,6 +24,7 @@ from modules.upload.controller import upload_router
 from modules.user.controller import user_router
 from packages.utils import handle_request_validation_error
 from routes.crawl_routes import crawl_router
+from routes.shared_chat_routes import shared_chat_router
 from routes.subscription_routes import subscription_router
 from sentry_sdk.integrations.fastapi import FastApiIntegration
 from sentry_sdk.integrations.starlette import StarletteIntegration
@@ -61,6 +62,7 @@ app.include_router(misc_router)
 
 app.include_router(upload_router)
 app.include_router(user_router)
+app.include_router(shared_chat_router)
 app.include_router(api_key_router)
 app.include_router(subscription_router)
 app.include_router(prompt_router)

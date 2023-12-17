@@ -1,0 +1,30 @@
+{
+  "disclaimer": "免责声明",
+  "disclaimerContent": "目前的知识库仅包含来自我们最可靠来源的有限公共信息，例如郭文贵先生、新中国联邦/爆料革命、美国关于Covid-19疫苗伤害特别听证会, 及少数公信度较高的医生。AI根据这些来源的信息/数据回答问题, 所以我们无法对最终生成的问题准确负责。因此我们也在致力于知识库信息可视化，知识库内容可以被公众审核。",
+  "talkToAI": "马上体验 vaccinetruth.ai",
+  "chatShareTitle": "聊天分享配置",
+  "chatShareDesc": "选择您的分享平台",
+  "chatShareCopyURL": "复制聊天分享 URL",
+  "chatShareTo": "分享到",
+  "onboarding": {
+    "title": "嗨 👋🏻 想要探索 Quivr？😇",
+    "step_1_1": "1. 在聊天框或📎上拖放文件。",
+    "step_1_2": "没有文件？下载 'Quivr 文档'",
+    "step_2": "2. 开始与您的文件聊天",
+    "step_3": "3. 尽情享受！",
+    "virus_origin": "新冠病毒的起源是哪里?",
+    "vaccine_effect": "文贵先生针对新冠病毒疫苗在什么时间点发出过警告?",
+    "vaccine_antidote": "美国疫苗伤害听证会中, 提到了哪些疫苗伤害?",
+    "answer": {
+      "virus_origin": "Wuhan P4 Virus Research Institute.",
+      "vaccine_effect": "You can't get vaccinated, the vaccine is poisonous.",
+      "vaccine_antidote": "Yes, please use artemisinin derivatives to detoxify according to the treatment course."
+    }
+  },
+  "vaccineTruthAi": "疫苗真相AI",
+  "sharedPageTitle": "共享聊天•疫苗真相人工智能",
+  "emptyChatTitle": "点击/输入问题, 开始对话",
+  "emptyChatSubTitle": "如果你找到了真相. 别忘记分享对话",
+  "recommended": "推荐",
+  "buildByStayRealStudio": "Stay Real Studio 出品"
+}

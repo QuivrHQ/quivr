@@ -18,6 +18,9 @@ export const ChatProviderMock = ({
         notifications: [],
         setNotifications: () => void 0,
         removeMessage: () => void 0,
+        sharedChatItems:[],
+        setIsLoadingHistoryChatItems:() => void 0,
+        isLoadingHistoryChatItems:false,
       }}
     >
       {children}
