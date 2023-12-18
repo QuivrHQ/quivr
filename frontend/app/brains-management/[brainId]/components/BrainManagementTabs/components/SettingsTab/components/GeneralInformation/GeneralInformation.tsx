@@ -10,6 +10,7 @@ import Field from "@/lib/components/ui/Field";
 import { Radio } from "@/lib/components/ui/Radio";
 import { TextArea } from "@/lib/components/ui/TextArea";
 
+import { BrainAccess } from "./components/BrainAccess/BrainAccess";
 import { useGeneralInformation } from "./hooks/useGeneralInformation";
 import { useBrainFormState } from "../../hooks/useBrainFormState";
 
@@ -34,9 +35,9 @@ export const GeneralInformation = (
     isSettingAsDefault,
     setAsDefaultBrainHandler,
   } = props;
-  const { register } = useBrainFormState();
+  const { register, setValue, status } = useBrainFormState();
 
-  const { brainStatusOptions, brainTypeOptions } = useGeneralInformation();
+  const { brainTypeOptions } = useGeneralInformation();
 
   return (
     <>
@@ -89,12 +90,10 @@ export const GeneralInformation = (
       />
       {isOwnedByCurrentUser && (
         <div className="w-full mt-4">
-          <Radio
-            items={brainStatusOptions}
-            label={t("brain_status_label", { ns: "brain" })}
-            className="flex-1 justify-between w-[50%]"
-            {...register("status")}
-          />
+          <span className="font-semibold">
+            {t("brain_status_label", { ns: "brain" })}
+          </span>
+          <BrainAccess status={status} setValue={setValue} />
         </div>
       )}
 
