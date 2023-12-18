@@ -52,7 +52,6 @@
   "searchBrain": "Buscar un cerebro",
   "secrets_update_error": "Error al actualizar secretos",
   "secrets_updated": "Secretos actualizados",
-  "selectBrain": "Por favor, selecciona un cerebro",
   "set_brain_status_to_private_modal_description": "Los usuarios de Quivr ya no podrán utilizar este cerebro y no lo verán en la biblioteca de cerebros.",
   "set_brain_status_to_private_modal_title": "¿Estás seguro de que quieres establecer esto como <span class='text-primary'>Privado</span>?<br/><br/>",
   "set_brain_status_to_public_modal_description": "Cada usuario de Quivr podrá:<br/>- Suscribirse a tu cerebro en la 'biblioteca de cerebros'.<br/>- Usar este cerebro y comprobar las configuraciones de las indicaciones y el modelo.<br/><br/>No tendrán acceso a tus archivos cargados ni a la sección de personas.",
