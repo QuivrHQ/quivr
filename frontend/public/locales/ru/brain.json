@@ -52,7 +52,6 @@
   "searchBrain": "Поиск мозга",
   "secrets_update_error": "Ошибка при обновлении секретов",
   "secrets_updated": "Секреты обновлены",
-  "selectBrain": "Выберите мозг, пожалуйста",
   "set_brain_status_to_private_modal_description": "Пользователи Quivr больше не смогут использовать этот мозг, и они не увидят его в библиотеке мозгов.",
   "set_brain_status_to_private_modal_title": "Вы уверены, что хотите установить это как <span class='text-primary'>Частное</span>?<br/><br/>",
   "set_brain_status_to_public_modal_description": "Каждый пользователь Quivr сможет:<br/>- Подписаться на ваш мозг в 'библиотеке мозгов'.<br/>- Использовать этот мозг и проверить настройки подсказок и модели.<br/><br/>У них не будет доступа к вашим загруженным файлам и разделу 'люди'.",
