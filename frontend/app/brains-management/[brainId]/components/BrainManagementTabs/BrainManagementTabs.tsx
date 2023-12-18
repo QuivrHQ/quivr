@@ -2,7 +2,6 @@
 import { useTranslation } from "react-i18next";
 
 import { StyledTabsTrigger } from "@/app/brains-management/components/StyledTabsTrigger";
-import Button from "@/lib/components/ui/Button";
 import Spinner from "@/lib/components/ui/Spinner";
 import { Tabs, TabsContent, TabsList } from "@/lib/components/ui/Tabs";
 
@@ -82,26 +81,6 @@ export const BrainManagementTabs = (): JSX.Element => {
             hasEditRights={hasEditRights}
           />
         </TabsContent>
-      </div>
-
-      <div className="flex justify-center">
-        {isOwnedByCurrentUser ? (
-          <Button
-            className="px-8 md:px-20 py-2 bg-red-500 text-white rounded-md"
-            onClick={() => setIsDeleteOrUnsubscribeModalOpened(true)}
-          >
-            {t("deleteButton", { ns: "delete_or_unsubscribe_from_brain" })}
-          </Button>
-        ) : (
-          <Button
-            className="px-8 md:px-20 py-2 bg-red-500 text-white rounded-md"
-            onClick={() => setIsDeleteOrUnsubscribeModalOpened(true)}
-          >
-            {t("unsubscribeButton", {
-              ns: "delete_or_unsubscribe_from_brain",
-            })}
-          </Button>
-        )}
       </div>
 
       <DeleteOrUnsubscribeConfirmationModal

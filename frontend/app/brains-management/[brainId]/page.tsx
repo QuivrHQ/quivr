@@ -7,6 +7,7 @@ import { LuBrain, LuChevronLeftCircle } from "react-icons/lu";
 import Button from "@/lib/components/ui/Button";
 
 import { BrainManagementTabs } from "./components";
+import { DeleteOrUnsubscribeButton } from "./components/DeleteOrUnsubscribeButton/DeleteOrUnsubscribeButton";
 import { useBrainManagement } from "./hooks/useBrainManagement";
 
 const BrainsManagement = (): JSX.Element => {
@@ -28,6 +29,9 @@ const BrainsManagement = (): JSX.Element => {
         <span className="text-3xl font-semibold">{brain?.name}</span>
       </div>
       <BrainManagementTabs />
+      <div className="w-full flex justify-center py-4">
+        <DeleteOrUnsubscribeButton />
+      </div>
     </div>
   );
 };
