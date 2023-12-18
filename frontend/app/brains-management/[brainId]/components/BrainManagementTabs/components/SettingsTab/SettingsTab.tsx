@@ -54,7 +54,7 @@ export const SettingsTabContent = ({
           e.preventDefault();
           void handleSubmit();
         }}
-        className="my-10 mb-0 flex flex-col items-center gap-2"
+        className="mb-10 mt-5 flex flex-col items-center gap-2"
         ref={formRef}
       >
         <GeneralInformation
@@ -65,7 +65,12 @@ export const SettingsTabContent = ({
           isSettingAsDefault={isSettingAsDefault}
           setAsDefaultBrainHandler={setAsDefaultBrainHandler}
         />
-        <Divider text={t("modelSection", { ns: "config" })} />
+        <Divider
+          textClassName="font-semibold text-black w-full mx-1"
+          separatorClassName="w-full"
+          className="w-full my-10"
+          text={t("modelSection", { ns: "config" })}
+        />
         <ModelSelection
           accessibleModels={accessibleModels}
           hasEditRights={hasEditRights}

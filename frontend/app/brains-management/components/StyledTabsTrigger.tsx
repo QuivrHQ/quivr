@@ -10,9 +10,10 @@ export const StyledTabsTrigger = forwardRef<
   <TabsTrigger
     ref={ref}
     className={cn(
-      "capitalize",
+      "capitalize font-normal",
       "data-[state=active]:shadow-none",
       "data-[state=active]:text-primary",
+      "data-[state=active]:font-semibold",
       className
     )}
     {...props}

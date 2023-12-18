@@ -5,8 +5,8 @@ import { Tabs, TabsContent, TabsList } from "@/lib/components/ui/Tabs";
 
 import { BrainSearchBar } from "./components/BrainSearchBar";
 import { BrainsList } from "./components/BrainsList";
-import { StyledTabsTrigger } from "./components/StyledTabsTrigger";
 import { useBrainsTabs } from "./hooks/useBrainsTabs";
+import { StyledTabsTrigger } from "../StyledTabsTrigger";
 
 export const BrainsTabs = (): JSX.Element => {
   const { t } = useTranslation(["brain", "translation"]);
