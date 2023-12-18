@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useTranslation } from "react-i18next";
 import { LuBrain, LuChevronLeftCircle } from "react-icons/lu";
 
@@ -13,12 +14,14 @@ const BrainsManagement = (): JSX.Element => {
   const { brain } = useBrainManagement();
 
   return (
-    <div className="flex flex-col w-full p-10 bg-highlight">
+    <div className="flex flex-col w-full p-5 lg:p-20 bg-highlight">
       <div>
-        <Button variant={"tertiary"}>
-          <LuChevronLeftCircle className="text-primary" />
-          {t("previous")}
-        </Button>
+        <Link href="/brains-management">
+          <Button variant="tertiary" className="p-0">
+            <LuChevronLeftCircle className="text-primary" />
+            {t("previous")}
+          </Button>
+        </Link>
       </div>
       <div className="w-full justify-center flex items-center gap-2">
         <LuBrain size={25} className="text-primary" />
