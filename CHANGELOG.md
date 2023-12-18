@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.0.142 (2023-12-18)
+
+## What's Changed
+* feat: add new brain management page by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1906
+* feat: update brain details page by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1910
+
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.141...v0.0.142
+
 ## 0.0.141 (2023-12-15)
 
 ## What's Changed
