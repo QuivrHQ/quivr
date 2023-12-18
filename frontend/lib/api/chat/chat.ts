@@ -5,6 +5,7 @@ import {
   ChatItem,
   ChatMessage,
   ChatQuestion,
+  SharedChat,
 } from "@/app/chat/[chatId]/types";
 
 export const createChat = async (
@@ -58,6 +59,19 @@ export const getChatItems = async (
   axiosInstance: AxiosInstance
 ): Promise<ChatItem[]> =>
   (await axiosInstance.get<ChatItem[]>(`/chat/${chatId}/history`)).data;
+
+export const getSharedChatItems = async (
+  sharedChatId: string,
+  axiosInstance: AxiosInstance
+): Promise<ChatItem[]> =>
+  (await axiosInstance.get<ChatItem[]>(`/shared/chat/${sharedChatId}`)).data;
+
+export const getShareChatId = async (
+  chatId: string,
+  axiosInstance: AxiosInstance
+): Promise<SharedChat> =>
+  (await axiosInstance.post<SharedChat>(`/shared/chat`, { chat_id: chatId }))
+    .data;
 
 export type ChatUpdatableProperties = {
   chat_name?: string;

@@ -9,7 +9,7 @@ export const OnboardingQuestions = (): JSX.Element => {
   ];
 
   return (
-    <div className="flex flex-row flex-1 gap-4 mb-4">
+    <div className="flex flex-row flex-1 gap-4 mb-4 flex-wrap">
       {onboardingQuestions.map((question) => (
         <OnboardingQuestion key={question} questionId={question} />
       ))}

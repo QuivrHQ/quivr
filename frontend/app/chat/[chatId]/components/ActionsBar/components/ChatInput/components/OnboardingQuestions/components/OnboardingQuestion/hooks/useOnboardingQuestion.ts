@@ -19,7 +19,7 @@ export const useOnboardingQuestion = (questionId: QuestionId) => {
   const router = useRouter();
   const params = useParams();
   const { updateOnboarding } = useOnboarding();
-  const { t } = useTranslation("chat");
+  const { t } = useTranslation("vaccineTruth");
   const { createChat } = useChatApi();
   const { trackOnboardingEvent } = useOnboardingTracker();
   const [isAnswerRequested, setIsAnswerRequested] = useState(false);

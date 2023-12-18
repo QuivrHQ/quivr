@@ -1,24 +1,33 @@
-import { useChatContext } from "@/lib/context";
-import { useOnboarding } from "@/lib/hooks/useOnboarding";
+import { useParams } from "next/navigation";
 
+import { useChatContext } from "@/lib/context";
+
+// eslint-disable-next-line import/order
+import { ChatGuide } from "../ChatGuide";
 import { ChatDialogue } from "./components/ChatDialogue";
-import { ShortCuts } from "./components/ShortCuts";
 import { getMergedChatMessagesWithDoneStatusNotificationsReduced } from "./utils/getMergedChatMessagesWithDoneStatusNotificationsReduced";
 
 export const ChatDialogueArea = (): JSX.Element => {
-  const { messages, notifications } = useChatContext();
+  const params = useParams();
+
+  const { messages, notifications, isLoadingHistoryChatItems } =
+    useChatContext();
 
   const chatItems = getMergedChatMessagesWithDoneStatusNotificationsReduced(
     messages,
     notifications
   );
-  const { isOnboarding } = useOnboarding();
 
-  const shouldDisplayShortcuts = chatItems.length === 0 && !isOnboarding;
+  // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
+  const shouldDisplayShortcuts = !isLoadingHistoryChatItems && !params?.chatId;
 
   if (!shouldDisplayShortcuts) {
-    return <ChatDialogue chatItems={chatItems} />;
+    return (
+      <div className="flex flex-col flex-1 overflow-y-auto mb-2">
+        <ChatDialogue chatItems={chatItems} />
+      </div>
+    );
   }
 
-  return <ShortCuts />;
+  return <ChatGuide />;
 };

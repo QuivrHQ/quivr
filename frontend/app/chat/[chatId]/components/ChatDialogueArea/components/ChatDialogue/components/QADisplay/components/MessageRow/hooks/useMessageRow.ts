@@ -1,3 +1,5 @@
+"use client";
+
 import { useState } from "react";
 
 import { cn } from "@/lib/utils";
@@ -25,8 +27,10 @@ export const useMessageRow = ({ speaker, text }: UseMessageRowProps) => {
 
   const containerClasses = cn(
     "py-3 px-5 w-fit",
-    isUserSpeaker ? "bg-msg-gray bg-opacity-10" : "bg-msg-purple bg-opacity-40",
-    "dark:bg-gray-800 rounded-3xl flex flex-col overflow-hidden scroll-pb-32"
+    isUserSpeaker
+      ? "bg-sky-200 dark:bg-neutral-400"
+      : "bg-sky-700 text-white dark:bg-gray-600",
+    "rounded-3xl flex flex-col overflow-hidden scroll-pb-32"
   );
 
   const containerWrapperClasses = cn(
@@ -34,7 +38,11 @@ export const useMessageRow = ({ speaker, text }: UseMessageRowProps) => {
     isUserSpeaker ? "items-end" : "items-start"
   );
 
-  const markdownClasses = cn("prose", "dark:prose-invert");
+  const markdownClasses = cn(
+    "prose",
+    "dark:prose-invert",
+    isUserSpeaker ? "text-green-900 dark:text-slate-300" : "text-white"
+  );
 
   return {
     isUserSpeaker,

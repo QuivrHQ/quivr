@@ -30,31 +30,34 @@ class UserUsage(Repository):
         """
         Check if the user is a premium user
         """
-        matching_customers = None
-        try:
-            user_email_customer = (
-                self.db.from_("users")
-                .select("*")
-                .filter("id", "eq", str(user_id))
-                .execute()
-            ).data
+        # matching_customers = None
+        # try:
+        #     user_email_customer = (
+        #         self.db.from_("users")
+        #         .select("*")
+        #         .filter("id", "eq", str(user_id))
+        #         .execute()
+        #     ).data
 
-            if len(user_email_customer) == 0:
-                return False
+        #     if len(user_email_customer) == 0:
+        #         return False
 
-            matching_customers = (
-                self.db.table("customers")
-                .select("email")
-                .filter("email", "eq", user_email_customer[0]["email"])
-                .execute()
-            ).data
-        except Exception as e:
-            logger.info(matching_customers)
-            logger.error("Error while checking if user is a premium user")
-            logger.error(e)
-            return False
+        #     matching_customers = (
+        #         self.db.table("customers")
+        #         .select("email")
+        #         .filter("email", "eq", user_email_customer[0]["email"])
+        #         .execute()
+        #     ).data
+        # except Exception as e:
+        #     logger.info(matching_customers)
+        #     logger.error("Error while checking if user is a premium user")
+        #     logger.error(e)
+        #     return False
 
-        return len(matching_customers) > 0
+        # return len(matching_customers) > 0
+
+        # Disable premium user check for now, we do not have stripe integration yet.
+        return False
 
     def get_user_settings(self, user_id):
         """

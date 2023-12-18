@@ -13,10 +13,10 @@ export const usePageTracking = (): void => {
   const { session } = useSupabase();
 
   useEffect(() => {
-    if (pathname !== null) {
+    if (pathname !== null && session?.user && analytics) {
       const handleRouteChange = async () => {
-        await analytics?.identify(session?.user.id);
-        await analytics?.page(pathname);
+        await analytics.identify(session.user.id);
+        await analytics.page(pathname);
       };
 
       void handleRouteChange();

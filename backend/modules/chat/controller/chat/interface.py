@@ -11,7 +11,6 @@ class ChatInterface(ABC):
         self,
         brain_id,
         chat_id,
-        model,
         max_tokens,
         temperature,
         streaming,
