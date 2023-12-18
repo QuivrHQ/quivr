@@ -10,8 +10,8 @@ import Field from "@/lib/components/ui/Field";
 import { Radio } from "@/lib/components/ui/Radio";
 import { TextArea } from "@/lib/components/ui/TextArea";
 
-import { useBrainFormState } from "../../hooks/useBrainFormState";
 import { useGeneralInformation } from "./hooks/useGeneralInformation";
+import { useBrainFormState } from "../../hooks/useBrainFormState";
 
 type GeneralInformationProps = {
   hasEditRights: boolean;
@@ -78,6 +78,15 @@ export const GeneralInformation = (
           </div>
         </div>
       </div>
+      <TextArea
+        label={t("brainDescription", { ns: "brain" })}
+        placeholder={t("brainDescriptionPlaceholder", { ns: "brain" })}
+        autoComplete="off"
+        className="flex-1 m-3"
+        inputClassName="border-0 bg-white min-h-[100px]"
+        disabled={!hasEditRights}
+        {...register("description")}
+      />
       {isOwnedByCurrentUser && (
         <div className="w-full mt-4">
           <Radio
@@ -99,15 +108,6 @@ export const GeneralInformation = (
         />
       </div>
       <ApiRequestDefinition />
-      <TextArea
-        label={t("brainDescription", { ns: "brain" })}
-        placeholder={t("brainDescriptionPlaceholder", { ns: "brain" })}
-        autoComplete="off"
-        className="flex-1 m-3"
-        inputClassName="border-0 bg-white"
-        disabled={!hasEditRights}
-        {...register("description")}
-      />
     </>
   );
 };
