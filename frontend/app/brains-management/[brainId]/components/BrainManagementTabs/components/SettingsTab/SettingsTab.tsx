@@ -65,7 +65,12 @@ export const SettingsTabContent = ({
           isSettingAsDefault={isSettingAsDefault}
           setAsDefaultBrainHandler={setAsDefaultBrainHandler}
         />
-        <Divider text={t("modelSection", { ns: "config" })} />
+        <Divider
+          textClassName="font-semibold text-black w-full mx-1"
+          separatorClassName="w-full"
+          className="w-full my-10"
+          text={t("modelSection", { ns: "config" })}
+        />
         <ModelSelection
           accessibleModels={accessibleModels}
           hasEditRights={hasEditRights}

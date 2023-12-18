@@ -17,7 +17,7 @@ const ButtonVariants = cva(
     variants: {
       variant: {
         primary:
-          "bg-black border border-black dark:border-white disabled:bg-gray-500 disabled:hover:bg-gray-500 text-white dark:bg-white dark:text-black hover:bg-gray-700 dark:hover:bg-gray-200 transition-colors",
+          "bg-primary border border-black dark:border-white disabled:bg-gray-500 disabled:hover:bg-gray-500 text-white dark:bg-white dark:text-black hover:bg-gray-700 dark:hover:bg-gray-200 transition-colors",
         tertiary:
           "text-black dark:text-white bg-transparent py-2 px-4 disabled:opacity-25",
         secondary:

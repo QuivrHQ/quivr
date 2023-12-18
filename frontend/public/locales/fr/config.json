@@ -2,6 +2,7 @@
   "accountSection": "Votre Compte",
   "anthropicKeyLabel": "Clé API Anthropic",
   "anthropicKeyPlaceholder": "Clé API Anthropic",
+  "apiKey": "Clé API",
   "backendSection": "Configuration du backend",
   "backendUrlLabel": "URL du backend",
   "backendUrlPlaceHolder": "URL du backend",
@@ -10,9 +11,12 @@
   "configSaved": "Configuration sauvegardée",
   "customPromptSection": "Invite personnalisée",
   "defaultBrainSet": "Cerveau défini par défaut avec succès",
+  "descriptionRequired": "La description est requise",
   "error.copy": "Échec de la copie",
   "error.createApiKey": "Erreur lors de la création de la clé API",
   "errorRemovingPrompt": "Erreur lors de la suppression de l'invite",
+  "incorrectApiKey": "Clé API incorrecte",
+  "invalidApiKeyError": "Clé API invalide",
   "invalidOpenAiKey": "Clé OpenAI invalide",
   "keepInLocal": "Garder en local",
   "knowledge": "Connaissances",
@@ -20,7 +24,6 @@
   "modelLabel": "Modèle",
   "modelSection": "Configuration du modèle",
   "nameRequired": "Le nom est requis",
-  "descriptionRequired": "La description est requise",
   "newAPIKey": "Créer une nouvelle clé",
   "noUser": "Pas d'utilisateur",
   "ohno": "Oh non !",
@@ -47,8 +50,5 @@
   "supabaseURLPlaceHolder": "URL Supabase",
   "temperature": "Température",
   "title": "Configuration",
-  "updatingBrainSettings": "Mise à jour des paramètres du cerveau...",
-  "incorrectApiKey": "Clé API incorrecte",
-  "invalidApiKeyError": "Clé API invalide",
-  "apiKey": "Clé API"
+  "updatingBrainSettings": "Mise à jour des paramètres du cerveau..."
 }
