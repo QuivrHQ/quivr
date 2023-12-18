@@ -54,7 +54,7 @@ export const SettingsTabContent = ({
           e.preventDefault();
           void handleSubmit();
         }}
-        className="my-10 mb-0 flex flex-col items-center gap-2"
+        className="mb-10 mt-5 flex flex-col items-center gap-2"
         ref={formRef}
       >
         <GeneralInformation
