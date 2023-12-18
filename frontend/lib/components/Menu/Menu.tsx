@@ -5,7 +5,6 @@ import { LuPanelLeftOpen } from "react-icons/lu";
 import { nonProtectedPaths } from "@/lib/config/routesConfig";
 import { useSideBarContext } from "@/lib/context/SidebarProvider/hooks/useSideBarContext";
 
-import Button from "../ui/Button";
 import { AnimatedDiv } from "./components/AnimationDiv";
 import { BrainsManagementButton } from "./components/BrainsManagementButton";
 import { DiscussionButton } from "./components/DiscussionButton";
@@ -15,6 +14,7 @@ import { ParametersButton } from "./components/ParametersButton";
 import { ProfileButton } from "./components/ProfileButton";
 import { UpgradeToPlus } from "./components/UpgradeToPlus";
 import { useMenuWidth } from "./hooks/useMenuWidth";
+import Button from "../ui/Button";
 
 export const Menu = (): JSX.Element => {
   const pathname = usePathname() ?? "";
