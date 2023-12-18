@@ -2,8 +2,9 @@ from enum import Enum
 from typing import List, Optional
 from uuid import UUID
 
-from modules.brain.entity.api_brain_definition_entity import ApiBrainDefinitionEntity
 from pydantic import BaseModel
+
+from modules.brain.entity.api_brain_definition_entity import ApiBrainDefinitionEntity
 
 
 class BrainType(str, Enum):
@@ -67,3 +68,4 @@ class MinimalUserBrainEntity(BaseModel):
     rights: RoleEnum
     status: str
     brain_type: BrainType
+    description: str
