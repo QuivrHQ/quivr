@@ -20,6 +20,7 @@ Thanks for your interest in contributing to Quivr! Here you'll find guidelines f
     - [Reporting Bugs](#reporting-bugs)
     - [Feature Requests](#feature-requests)
     - [Code Contributions](#code-contributions)
+    - [Translations](#translations)
   - [Submission Guidelines](#submission-guidelines)
   - [Coding Rules](#coding-rules)
     - [Frontend Guidelines](#frontend-guidelines)
@@ -61,6 +62,18 @@ Enhancements are also tracked as GitHub issues and use the feature request templ
 4. Commit your changes using descriptive commit messages.
 5. Push your branch to GitHub.
 6. In GitHub, submit a pull request to the original repository.
+
+### Translations
+
+Languages: 
+[Spanisch](https://inlang.com/editor/github.com/StanGirard/quivr?lang=en&lang=es)
+[French](https://inlang.com/editor/github.com/StanGirard/quivr?lang=en&lang=fr)
+[Portuguese](https://inlang.com/editor/github.com/StanGirard/quivr?lang=en&lang=pt-br)
+[Russian](https://inlang.com/editor/github.com/StanGirard/quivr?lang=en&lang=ru)
+[Chinese](https://inlang.com/editor/github.com/StanGirard/quivr?lang=en&lang=fr)
+
+- Use the Fink editor as a translator https://inlang.com/editor/github.com/StanGirard/quivr
+- Use ide extension as a developer https://inlang.com/m/r7kp499g/app-inlang-ideExtension
 
 ## Submission Guidelines
 

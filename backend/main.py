@@ -55,19 +55,11 @@ app = FastAPI()
 
 add_cors_middleware(app)
 
-
-# @app.on_event("startup")
-# async def startup_event():
-#     if not os.path.exists(pypandoc.get_pandoc_path()):
-#         pypandoc.download_pandoc()
-
-
 app.include_router(brain_router)
 app.include_router(chat_router)
 app.include_router(crawl_router)
 app.include_router(onboarding_router)
 app.include_router(misc_router)
-
 app.include_router(upload_router)
 app.include_router(user_router)
 app.include_router(messages_router)

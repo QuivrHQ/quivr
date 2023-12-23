@@ -1,5 +1,104 @@
 # Changelog
 
+## 0.0.142 (2023-12-18)
+
+## What's Changed
+* feat: add new brain management page by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1906
+* feat: update brain details page by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1910
+
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.141...v0.0.142
+
+## 0.0.141 (2023-12-15)
+
+## What's Changed
+* feat[i18n]: Added i18n documenation to the contribution guidelines  by @NilsJacobsen in https://github.com/StanGirard/quivr/pull/1899
+* feat: Update Explore button label by @StanGirard in https://github.com/StanGirard/quivr/pull/1901
+* feat: chat with compositeBrain ( with/out streaming) by @gozineb in https://github.com/StanGirard/quivr/pull/1883
+* feat: update brains library by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1903
+
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.140...v0.0.141
+
+## 0.0.140 (2023-12-14)
+
+## What's Changed
+* feat: Update pytest command in Makefile and add new test by @StanGirard in https://github.com/StanGirard/quivr/pull/1893
+* chore: add IDE extension for i18n handling by @NilsJacobsen in https://github.com/StanGirard/quivr/pull/1896
+* feat: add chat view new design by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1897
+
+## New Contributors
+* @NilsJacobsen made their first contribution in https://github.com/StanGirard/quivr/pull/1896
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.139...v0.0.140
+
+## 0.0.139 (2023-12-14)
+
+## What's Changed
+* feat: allow user to feed brain from Actions bar by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1882
+* feat: add Menu bar by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1885
+* feat: Remove unused method and update file processing by @StanGirard in https://github.com/StanGirard/quivr/pull/1890
+* fix: update chat history fetching logic by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1891
+* feat: add default feed button label by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1892
+
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.138...v0.0.139
+
+## 0.0.138 (2023-12-13)
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.137...v0.0.138
+
+## 0.0.137 (2023-12-13)
+
+## What's Changed
+* feat: add chat history to Actions modal by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1877
+* feat: allow user to control left panel from Chat input by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1880
+
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.136...v0.0.137
+
+## 0.0.136 (2023-12-13)
+
+## What's Changed
+* feat: Add @tailwindcss/forms plugin and update by @StanGirard in https://github.com/StanGirard/quivr/pull/1869
+* feat: Refactor get_question_context_for_brain endpoint by @StanGirard in https://github.com/StanGirard/quivr/pull/1872
+* feat: Add file URL to DocumentAnswer objects by @StanGirard in https://github.com/StanGirard/quivr/pull/1874
+* Update .gitignore and add .gitmodules by @StanGirard in https://github.com/StanGirard/quivr/pull/1875
+* feat: add new actions modal by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1870
+* feat: add selected brain tag and new discussion button to actions modal by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1873
+* feat: add action modal change brain button by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1876
+
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.135...v0.0.136
+
+## 0.0.135 (2023-12-11)
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.134...v0.0.135
+
+## 0.0.134 (2023-12-11)
+
+## What's Changed
+* feat: add custom rag first abstraction layer by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1858
+* feat(payment): added modal of right size by @StanGirard in https://github.com/StanGirard/quivr/pull/1860
+
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.133...v0.0.134
+
+## 0.0.133 (2023-12-11)
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.132...v0.0.133
+
+## 0.0.132 (2023-12-10)
+
+## What's Changed
+* feat: add generate_answer function to support non streamed response for api brain by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1847
+* fix(ollama): - update supabase-db postgres docker image version by @KonstantinosAng in https://github.com/StanGirard/quivr/pull/1853
+
+## New Contributors
+* @KonstantinosAng made their first contribution in https://github.com/StanGirard/quivr/pull/1853
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.131...v0.0.132
+
 ## 0.0.131 (2023-12-06)
 
 ## What's Changed

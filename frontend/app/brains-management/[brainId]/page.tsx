@@ -1,28 +1,35 @@
 "use client";
 
-import { UUID } from "crypto";
-import { useParams } from "next/navigation";
+import Link from "next/link";
 import { useTranslation } from "react-i18next";
+import { LuBrain, LuChevronLeftCircle } from "react-icons/lu";
+
+import Button from "@/lib/components/ui/Button";
 
 import { BrainManagementTabs } from "./components";
+import { useBrainManagement } from "./hooks/useBrainManagement";
 
 const BrainsManagement = (): JSX.Element => {
-  const params = useParams();
-  const { t } = useTranslation(["brain"]);
+  const { t } = useTranslation(["translation"]);
+  const { brain } = useBrainManagement();
 
-  const brainId = params?.brainId as UUID | undefined;
-
-  if (brainId === undefined) {
-    return (
-      <div className="flex justify-center mt-5 w-full">
-        <div className="bg-blue-100 border border-blue-400 text-blue-700 px-4 py-3 rounded relative max-w-md h-fit">
-          <p>{t("selectBrain")}</p>
-        </div>
+  return (
+    <div className="flex flex-col w-full p-5 lg:p-20 bg-highlight">
+      <div>
+        <Link href="/brains-management">
+          <Button variant="tertiary" className="p-0">
+            <LuChevronLeftCircle className="text-primary" />
+            {t("previous")}
+          </Button>
+        </Link>
       </div>
-    );
-  }
-
-  return <BrainManagementTabs />;
+      <div className="w-full justify-center flex items-center gap-2">
+        <LuBrain size={25} className="text-primary" />
+        <span className="text-3xl font-semibold">{brain?.name}</span>
+      </div>
+      <BrainManagementTabs />
+    </div>
+  );
 };
 
 export default BrainsManagement;

@@ -14,7 +14,11 @@ export const useUrlBrain = () => {
   const brainId = params?.brainId as UUID | undefined;
   const correspondingBrain = allBrains.find((brain) => brain.id === brainId);
 
-  const { brain: brainDetails, refetchBrain } = useBrainFetcher({
+  const {
+    brain: brainDetails,
+    refetchBrain,
+    isLoading,
+  } = useBrainFetcher({
     brainId: brainId,
   });
 
@@ -23,5 +27,6 @@ export const useUrlBrain = () => {
     brainId,
     brainDetails,
     refetchBrain,
+    isLoading,
   };
 };

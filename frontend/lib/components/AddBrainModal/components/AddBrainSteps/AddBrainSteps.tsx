@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import { MdAdd } from "react-icons/md";
+import { LuPlusCircle } from "react-icons/lu";
 
 import Button from "@/lib/components/ui/Button";
 import { Modal } from "@/lib/components/ui/Modal";
@@ -32,8 +32,8 @@ export const AddBrainSteps = ({
           className={cn("border-0", triggerClassName)}
           data-testid="add-brain-button"
         >
+          <LuPlusCircle className="text-xl" />
           {t("newBrain", { ns: "brain" })}
-          <MdAdd className="text-xl" />
         </Button>
       }
       title={t("newBrainTitle", { ns: "brain" })}

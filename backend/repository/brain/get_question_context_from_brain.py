@@ -1,10 +1,22 @@
 from uuid import UUID
 
+from attr import dataclass
 from logger import get_logger
 from models.settings import get_embeddings, get_supabase_client
+from repository.files.generate_file_signed_url import generate_file_signed_url
 from vectorstore.supabase import CustomSupabaseVectorStore
 
 logger = get_logger(__name__)
+
+
+@dataclass
+class DocumentAnswer:
+    file_name: str
+    file_sha1: str
+    file_size: int
+    file_url: str = ""
+    file_id: str = ""
+    file_similarity: float = 0.0
 
 
 def get_question_context_from_brain(brain_id: UUID, question: str) -> str:
@@ -18,16 +30,25 @@ def get_question_context_from_brain(brain_id: UUID, question: str) -> str:
         table_name="vectors",
         brain_id=str(brain_id),
     )
-    documents = vector_store.similarity_search(question)
-    ## I can't pass more than 2500 tokens to as return value in my array.  So i need to remove the docs after i reach 2000 tokens. A token equals 1.5 characters.  So 2000 tokens is 3000 characters.
-    tokens = 0
-    for doc in documents:
-        tokens += len(doc.page_content) * 1.5
-        if tokens > 3000:
-            documents.remove(doc)
-    logger.info("documents", documents)
-    logger.info("tokens", tokens)
-    logger.info("🔥🔥🔥🔥🔥🔥")
+    documents = vector_store.similarity_search(question, k=20, threshold=0.8)
 
-    # aggregate all the documents into one string
-    return "\n".join([doc.page_content for doc in documents])
+    answers = []
+    file_sha1s = []
+    for document in documents:
+        if document.metadata["file_sha1"] not in file_sha1s:
+            file_sha1s.append(document.metadata["file_sha1"])
+            file_path_in_storage = f"{brain_id}/{document.metadata['file_name']}"
+            answers.append(
+                DocumentAnswer(
+                    file_name=document.metadata["file_name"],
+                    file_sha1=document.metadata["file_sha1"],
+                    file_size=document.metadata["file_size"],
+                    file_id=document.metadata["id"],
+                    file_similarity=document.metadata["similarity"],
+                    file_url=generate_file_signed_url(file_path_in_storage).get(
+                        "signedURL", ""
+                    ),
+                ),
+            )
+
+    return answers

@@ -52,9 +52,12 @@ class Brains(BrainsInterface):
         return public_brains
 
     def update_brain_last_update_time(self, brain_id):
-        self.db.table("brains").update({"last_update": "now()"}).match(
-            {"brain_id": brain_id}
-        ).execute()
+        try:
+            self.db.table("brains").update({"last_update": "now()"}).match(
+                {"brain_id": brain_id}
+            ).execute()
+        except Exception as e:
+            logger.error(e)
 
     def get_brain_details(self, brain_id):
         response = (

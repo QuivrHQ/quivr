@@ -15,7 +15,6 @@ from modules.chat.dto.inputs import (
     CreateChatProperties,
     QuestionAndAnswer,
 )
-from modules.chat.dto.outputs import GetChatHistoryOutput
 from modules.chat.entity.chat import Chat
 from modules.chat.service.chat_service import ChatService
 from modules.notification.service.notification_service import NotificationService
@@ -118,7 +117,7 @@ async def create_question_handler(
     | UUID
     | None = Query(..., description="The ID of the brain"),
     current_user: UserIdentity = Depends(get_current_user),
-) -> GetChatHistoryOutput:
+):
     """
     Add a new question to the chat.
     """
@@ -169,7 +168,9 @@ async def create_question_handler(
             user_id=current_user.id,
         )
 
-        chat_answer = gpt_answer_generator.generate_answer(chat_id, chat_question)
+        chat_answer = gpt_answer_generator.generate_answer(
+            chat_id, chat_question, save_answer=True
+        )
 
         return chat_answer
     except HTTPException as e:
@@ -244,7 +245,9 @@ async def create_stream_question_handler(
         )
 
         return StreamingResponse(
-            gpt_answer_generator.generate_stream(chat_id, chat_question),
+            gpt_answer_generator.generate_stream(
+                chat_id, chat_question, save_answer=True
+            ),
             media_type="text/event-stream",
         )
 

@@ -23,6 +23,17 @@ export type SubscriptionUpdatableProperties = {
   role: BrainRoleType | null;
 };
 
+export type ListFilesProps = {
+  files: {
+      file_name: string;
+      file_sha1: string;
+      file_size: number;
+      file_url: string;
+      file_id: string;
+      file_similarity: number;
+  }[];
+};
+
 export type ApiBrainDefinitionSecret = {
   name: string;
   type: ApiBrainDefinitionSchemaPropertyType;
