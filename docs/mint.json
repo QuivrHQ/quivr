@@ -1,0 +1,116 @@
+{
+  "$schema": "https://mintlify.com/schema.json",
+  "name": "Quivr",
+  "favicon": "/favicon.svg",
+  "colors": {
+    "primary": "#0D9373",
+    "light": "#07C983",
+    "dark": "#0D9373",
+    "anchors": {
+      "from": "#0D9373",
+      "to": "#07C983"
+    }
+  },
+  "topbarLinks": [
+    {
+      "name": "Support",
+      "url": "mailto:stan@quivr.app"
+    }
+  ],
+  "topbarCtaButton": {
+    "name": "Try Quivr",
+    "url": "https://quivr.app"
+  },
+  "tabs": [
+    {
+      "name": "Developer Guide",
+      "url": "developers"
+    }
+  ],
+  "anchors": [
+    {
+      "name": "Documentation",
+      "icon": "book-open-cover",
+      "url": "https://docs.quivr.app"
+    },
+    {
+      "name": "Community",
+      "icon": "discord",
+      "url": "https://discord.gg/HUpRgp2HG8"
+    },
+    {
+      "name": "Blog",
+      "icon": "newspaper",
+      "url": "https://quivr.app/blog"
+    }
+  ],
+  "navigation": [
+    {
+      "group": "Get Started",
+      "pages": [
+        "intro"
+      ]
+    },
+    {
+      "group": "How to use Quivr",
+      "pages": [
+        "userGuide/intro",
+        "userGuide/what-is-a-brain",
+        "userGuide/api-based-brains"
+      ]
+    },
+    {
+      "group": "Contribute",
+      "pages": [
+        "developers/contribution/guidelines",
+        "developers/contribution/architecture",
+        "developers/contribution/install",
+        "developers/contribution/test",
+        {
+          "group": "Chains",
+          "pages": [
+            "developers/contribution/chains/qa"
+          ]
+        },
+        {
+          "group": "LLM",
+          "pages": [
+            "developers/contribution/llm/private-llm"
+          ]
+        }
+      ]
+    },
+    {
+      "group": "Self Hosting",
+      "pages": [
+        "developers/selfHosting/run_fully_local",
+        "developers/selfHosting/vps_install",
+        "developers/selfHosting/authentication"
+      ]
+    },
+    {
+      "group": "Integrating",
+      "pages": [
+        "developers/useQuivr/getting_started",
+        "developers/useQuivr/get_your_api_key",
+        "developers/useQuivr/error_handling",
+        "developers/useQuivr/chat",
+        {
+          "group": "Brains",
+          "pages": [
+            "developers/useQuivr/brain/create_a_brain",
+            "developers/useQuivr/brain/retrieve_brain_attributes",
+            "developers/useQuivr/brain/set_default_brain",
+            "developers/useQuivr/brain/update_a_brain"
+          ]
+        }
+      ]
+    }
+  ],
+  "footerSocials": {
+    "twitter": "https://twitter.com/quivr_brain",
+    "github": "https://github.com/stangirard/quivr",
+    "linkedin": "https://www.linkedin.com/company/getquivr"
+  },
+  "openapi": "https://api.quivr.app/openapi.json"
+}

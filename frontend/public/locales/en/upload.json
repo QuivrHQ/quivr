@@ -15,6 +15,6 @@
     "selectBrainFirst": "You need to select a brain first. 🧠💡🥲",
     "missingNecessaryRole": "You don't have the necessary role to upload content to the selected brain. 🧠💡🥲",
     "invalidFileType": "Invalid file type",
-    "feed_form_submit_button":"Send to my brain",
-    "selected_brain_select_label":"Select a brain"
+    "feed_form_submit_button": "Send to my brain",
+    "selected_brain_select_label": "Select a brain"
 }

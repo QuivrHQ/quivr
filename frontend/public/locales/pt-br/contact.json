@@ -1,13 +1,13 @@
 {
-  "speak_to": "Fale com o nosso",
-  "sales_team": "time de vendas",
-  "form": {
-    "email": "E-mail de trabalho",
-    "question": "Pergunta",
-    "submit": "Contato",
-    "placeholder_question": "Como podemos ajudar?",
-    "thank_you": "Obrigado!",
-    "thank_you_text": "Entraremos em contato o mais rápido possível.",
-    "sending_mail_error": "Ocorreu um erro ao enviar sua mensagem. Por favor, tente novamente mais tarde."
-  }
+    "speak_to": "Fale com o nosso",
+    "sales_team": "time de vendas",
+    "form": {
+        "email": "E-mail de trabalho",
+        "question": "Pergunta",
+        "submit": "Contato",
+        "placeholder_question": "Como podemos ajudar?",
+        "thank_you": "Obrigado!",
+        "thank_you_text": "Entraremos em contato o mais rápido possível.",
+        "sending_mail_error": "Ocorreu um erro ao enviar sua mensagem. Por favor, tente novamente mais tarde."
+    }
 }

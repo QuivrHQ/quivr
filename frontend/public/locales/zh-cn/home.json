@@ -1,34 +1,34 @@
 {
-  "sign_in": "登录",
-  "sign_up": "注册",
-  "star_us": "Github 星标我们",
-  "blog": "博客",
-  "sponsored_by": "赞助商",
-  "useCases": {
-    "title": "立刻体验",
-    "subtitle": "查看我们的示例，了解如何使用 Quivr"
-  },
-  "intro": {
-    "title": "拥有第二大脑，只需",
-    "subtitle": "上传您的所有文件，直接与它们对话。",
-    "try_demo": "免费试用演示",
-    "contact_sales": "联系销售团队"
-  },
-  "demo": {
-    "title": "演示视频",
-    "start_now": "立即开始"
-  },
-  "security": {
-    "cta": "立即开始"
-  },
-  "footer": {
-    "title": "立即开始",
-    "description_1": "您的个人助理，充当您的第二大脑",
-    "description_2": "只需上传您的文件，然后向其提问",
-    "start_using": "开始使用 Quivr",
-    "contact_sales": "联系销售团队"
-  },
-  "testimonials": {
-    "title": "用户评价"
-  }
+    "sign_in": "登录",
+    "sign_up": "注册",
+    "star_us": "Github 星标我们",
+    "blog": "博客",
+    "sponsored_by": "赞助商",
+    "useCases": {
+        "title": "立刻体验",
+        "subtitle": "查看我们的示例，了解如何使用 Quivr"
+    },
+    "intro": {
+        "title": "拥有第二大脑，只需",
+        "subtitle": "上传您的所有文件，直接与它们对话。",
+        "try_demo": "免费试用演示",
+        "contact_sales": "联系销售团队"
+    },
+    "demo": {
+        "title": "演示视频",
+        "start_now": "立即开始"
+    },
+    "security": {
+        "cta": "立即开始"
+    },
+    "footer": {
+        "title": "立即开始",
+        "description_1": "您的个人助理，充当您的第二大脑",
+        "description_2": "只需上传您的文件，然后向其提问",
+        "start_using": "开始使用 Quivr",
+        "contact_sales": "联系销售团队"
+    },
+    "testimonials": {
+        "title": "用户评价"
+    }
 }

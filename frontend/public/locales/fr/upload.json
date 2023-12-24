@@ -15,6 +15,6 @@
     "selectBrainFirst": "Vous devez d'abord sélectionner un cerveau. 🧠💡🥲",
     "missingNecessaryRole": "Vous n'avez pas le rôle nécessaire pour télécharger du contenu dans le cerveau sélectionné. 🧠💡🥲",
     "invalidFileType": "Type de fichier invalide",
-    "feed_form_submit_button":"Envoyer à mon cerveau",
+    "feed_form_submit_button": "Envoyer à mon cerveau",
     "selected_brain_select_label": "Sélectionnez un cerveau"
 }

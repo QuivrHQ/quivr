@@ -1,19 +1,18 @@
 {
-    "password": "Contraseña", 
-    "googleLogin": "Continuar con Google", 
-    "errorPasswordMissed": "Por favor ingrese su contraseña", 
-    "magicLink": "Continuar con correo electrónico", 
-    "errorMailMissed": "Por favor ingrese su dirección de correo electrónico", 
-    "talk_to": "Hablar con", 
-    "restriction_message": "Los usuarios no pagos tienen acceso a una demostración gratuita y limitada de Quivr", 
-    "email":"Dirección de correo electrónico", 
-    "cant_find":"¿No puedes encontrarlo?", 
-    "try_again":"Inténtalo de nuevo" ,
-    "check_your_email": { 
-        "part1":"Acabamos de enviarte un ", 
-        "magic_link":"enlace mágico", 
-        "part2":". Revisa tus correos electrónicos y sigue los pasos." 
+    "password": "Contraseña",
+    "googleLogin": "Continuar con Google",
+    "errorPasswordMissed": "Por favor ingrese su contraseña",
+    "magicLink": "Continuar con correo electrónico",
+    "errorMailMissed": "Por favor ingrese su dirección de correo electrónico",
+    "talk_to": "Hablar con",
+    "restriction_message": "Los usuarios no pagos tienen acceso a una demostración gratuita y limitada de Quivr",
+    "email": "Dirección de correo electrónico",
+    "cant_find": "¿No puedes encontrarlo?",
+    "try_again": "Inténtalo de nuevo",
+    "check_your_email": {
+        "part1": "Acabamos de enviarte un ",
+        "magic_link": "enlace mágico",
+        "part2": ". Revisa tus correos electrónicos y sigue los pasos."
     },
     "login": "Iniciar sesión"
 }
-
