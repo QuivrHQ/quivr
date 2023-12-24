@@ -1,14 +1,14 @@
 {
-  "method_label": "Method",
-  "url_placeholder": "URL",
-  "searchParams": "Search Params",
-  "headers": "Headers",
-  "params": "Params",
-  "key": "Key",
-  "type": "Type (string or number)",
-  "description": "Description",
-  "secrets": "Secrets",
-  "paramsTabDescription": "These values are sent as the request body.",
-  "searchParamsTabDescription": "These values are sent as the query string.",
-  "secretsTabDescription": "These values are sent as header keys"
+    "method_label": "Method",
+    "url_placeholder": "URL",
+    "searchParams": "Search Params",
+    "headers": "Headers",
+    "params": "Params",
+    "key": "Key",
+    "type": "Type (string or number)",
+    "description": "Description",
+    "secrets": "Secrets",
+    "paramsTabDescription": "These values are sent as the request body.",
+    "searchParamsTabDescription": "These values are sent as the query string.",
+    "secretsTabDescription": "These values are sent as header keys"
 }

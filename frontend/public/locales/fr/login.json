@@ -6,13 +6,13 @@
     "errorMailMissed": "Veuillez saisir votre adresse e-mail",
     "talk_to": "Parler à",
     "restriction_message": "Les utilisateurs non payants ont accès à une démonstration gratuite et limitée de Quivr",
-    "email":"Adresse e-mail",
-    "cant_find":"Vous ne le trouvez pas ?", 
-    "try_again":"Réessayez", 
-    "check_your_email": { 
-        "part1":"Nous venons de vous envoyer un ", 
-        "magic_link":"lien magique", 
-        "part2":". Vérifiez vos e-mails et suivez les étapes." 
+    "email": "Adresse e-mail",
+    "cant_find": "Vous ne le trouvez pas ?",
+    "try_again": "Réessayez",
+    "check_your_email": {
+        "part1": "Nous venons de vous envoyer un ",
+        "magic_link": "lien magique",
+        "part2": ". Vérifiez vos e-mails et suivez les étapes."
     },
     "login": "Se connecter"
 }

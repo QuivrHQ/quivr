@@ -12,8 +12,10 @@
     "customPromptSection": "Custom prompt",
     "defaultBrainSet": "Brain set as default successfully",
     "descriptionRequired": "Description is required",
-    "error.copy": "Failed to copy",
-    "error.createApiKey": "Error creating API Key",
+    "error": {
+        "copy": "Failed to copy",
+        "createApiKey": "Error creating API Key"
+    },
     "errorRemovingPrompt": "Error while removing prompt",
     "incorrectApiKey": "Incorrect API Key",
     "invalidApiKeyError": "Invalid API Key",

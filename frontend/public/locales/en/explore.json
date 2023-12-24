@@ -1,15 +1,15 @@
 {
-  "title": "Explore uploaded data",
-  "subtitle": "View, download or delete knowledge used by your brain",
-  "empty": "Oh No, Your Brain is empty.",
-  "noBrain": "Brain id not found",
-  "sessionNotFound": "User session not found",
-  "deleted": "{{fileName}} deleted from brain {{brain}}",
-  "errorDeleting": "Error deleting {{fileName}}",
-  "view": "View",
-  "chunkNumber": "No. of chunks: {{quantity}}",
-  "notAvailable": "Not Available",
-  "deleteConfirmTitle": "Confirm",
-  "deleteConfirmText": "Do you really want to delete?",
-  "feed_brain_instructions": "To add knowledge to a brain, go to chat page then click on plus button on the left of the chat input"
+    "title": "Explore uploaded data",
+    "subtitle": "View, download or delete knowledge used by your brain",
+    "empty": "Oh No, Your Brain is empty.",
+    "noBrain": "Brain id not found",
+    "sessionNotFound": "User session not found",
+    "deleted": "{{fileName}} deleted from brain {{brain}}",
+    "errorDeleting": "Error deleting {{fileName}}",
+    "view": "View",
+    "chunkNumber": "No. of chunks: {{quantity}}",
+    "notAvailable": "Not Available",
+    "deleteConfirmTitle": "Confirm",
+    "deleteConfirmText": "Do you really want to delete?",
+    "feed_brain_instructions": "To add knowledge to a brain, go to chat page then click on plus button on the left of the chat input"
 }

@@ -1,34 +1,34 @@
 {
-  "sign_in": "Se connecter",
-  "sign_up": "S'inscrire",
-  "star_us": "Étoilez-nous sur Github",
-  "blog": "Blog",
-  "sponsored_by": "Sponsorisé par",
-  "useCases": {
-    "title": "Expérimentez-le maintenant.",
-    "subtitle": "Consultez notre exemple d'utilisation de Quivr."
-  },
-  "intro": {
-    "title": "Obtenez un deuxième cerveau avec",
-    "subtitle": "Téléchargez tous vos fichiers et commencez à discuter avec eux.",
-    "try_demo": "Essayez la démo gratuite",
-    "contact_sales": "Contactez l'équipe commerciale"
-  },
-  "demo": {
-    "title": "Vidéo de démonstration",
-    "start_now": "Commencer maintenant"
-  },
-  "security": {
-    "cta": "Commencez dès aujourd'hui"
-  },
-  "footer": {
-    "title": "Commencez aujourd'hui",
-    "description_1": "Votre assistant personnel qui agit comme votre Deuxième Cerveau.",
-    "description_2": "Il vous suffit de télécharger vos fichiers et de lui poser des questions.",
-    "start_using": "Commencez à utiliser Quivr",
-    "contact_sales": "Contacter l'équipe commerciale"
-  },
-  "testimonials":{ 
-    "title": "Ce que les gens disent à propos de" 
-  }
+    "sign_in": "Se connecter",
+    "sign_up": "S'inscrire",
+    "star_us": "Étoilez-nous sur Github",
+    "blog": "Blog",
+    "sponsored_by": "Sponsorisé par",
+    "useCases": {
+        "title": "Expérimentez-le maintenant.",
+        "subtitle": "Consultez notre exemple d'utilisation de Quivr."
+    },
+    "intro": {
+        "title": "Obtenez un deuxième cerveau avec",
+        "subtitle": "Téléchargez tous vos fichiers et commencez à discuter avec eux.",
+        "try_demo": "Essayez la démo gratuite",
+        "contact_sales": "Contactez l'équipe commerciale"
+    },
+    "demo": {
+        "title": "Vidéo de démonstration",
+        "start_now": "Commencer maintenant"
+    },
+    "security": {
+        "cta": "Commencez dès aujourd'hui"
+    },
+    "footer": {
+        "title": "Commencez aujourd'hui",
+        "description_1": "Votre assistant personnel qui agit comme votre Deuxième Cerveau.",
+        "description_2": "Il vous suffit de télécharger vos fichiers et de lui poser des questions.",
+        "start_using": "Commencez à utiliser Quivr",
+        "contact_sales": "Contacter l'équipe commerciale"
+    },
+    "testimonials": {
+        "title": "Ce que les gens disent à propos de"
+    }
 }

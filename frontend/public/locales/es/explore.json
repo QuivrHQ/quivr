@@ -1,15 +1,15 @@
 {
-  "chunkNumber": "No. de partes: {{quantity}}",
-  "deleteConfirmText": "¿Realmente quieres eliminar?",
-  "deleteConfirmTitle": "Confirmar",
-  "deleted": "{{fileName}} borrado del cerebro {{brain}}",
-  "empty": "¡Oh No!, Tu Cerebro está vacío",
-  "errorDeleting": "Error borrando {{fileName}}",
-  "noBrain": "Id de Cerebro no encontrado",
-  "notAvailable": "No disponible",
-  "sessionNotFound": "Sesión no encontrada",
-  "subtitle": "Visualiza, descarga o elimina el conocimiento utilizado por tu cerebro",
-  "title": "Explora datos subidos",
-  "view": "Ver",
-  "feed_brain_instructions": "Para agregar conocimiento a un cerebro, ve a la página de chat y haz clic en el botón de más a la izquierda del campo de chat."
+    "title": "Explora datos subidos",
+    "subtitle": "Visualiza, descarga o elimina el conocimiento utilizado por tu cerebro",
+    "empty": "¡Oh No!, Tu Cerebro está vacío",
+    "noBrain": "Id de Cerebro no encontrado",
+    "sessionNotFound": "Sesión no encontrada",
+    "deleted": "{{fileName}} borrado del cerebro {{brain}}",
+    "errorDeleting": "Error borrando {{fileName}}",
+    "view": "Ver",
+    "chunkNumber": "No. de partes: {{quantity}}",
+    "notAvailable": "No disponible",
+    "deleteConfirmTitle": "Confirmar",
+    "deleteConfirmText": "¿Realmente quieres eliminar?",
+    "feed_brain_instructions": "Para agregar conocimiento a un cerebro, ve a la página de chat y haz clic en el botón de más a la izquierda del campo de chat."
 }

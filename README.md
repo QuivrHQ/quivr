@@ -10,7 +10,7 @@
 
 Quivr, your second brain, utilizes the power of GenerativeAI to be your personal assistant ! Think of it as Obsidian, but turbocharged with AI capabilities.
 
-[Roadmap here](https://brain.quivr.app/docs/roadmap)
+[Roadmap here](https://docs.quivr.app/docs/roadmap)
 
 ## Key Features 🎯
 
@@ -31,7 +31,7 @@ https://github.com/StanGirard/quivr/assets/19614572/a6463b73-76c7-4bc0-978d-7056
 
 Follow these instructions to get a copy of the project up and running on your local machine for development and testing purposes.
 
-You can find everything on the [documentation](https://brain.quivr.app/).
+You can find everything on the [documentation](https://docs.quivr.app/).
 
 ### Prerequisites 📋
 
@@ -129,7 +129,7 @@ Did you get a pull request? Open it, and we'll review it as soon as possible. Ch
 - [Good First Issues](https://github.com/StanGirard/quivr/issues?q=is%3Aopen+is%3Aissue+label%3A%22good+first+issue%22)
 - [Frontend Issues](https://github.com/StanGirard/quivr/issues?q=is%3Aopen+is%3Aissue+label%3Afrontend)
 - [Backend Issues](https://github.com/StanGirard/quivr/issues?q=is%3Aopen+is%3Aissue+label%3Abackend)
-- [Translate](https://brain.quivr.app/docs/Developers/contribution/guidelines#translations)
+- [Translate](https://docs.quivr.app/docs/Developers/contribution/guidelines#translations)
 
 ## Partners ❤️
 

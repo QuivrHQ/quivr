@@ -1,9 +1,9 @@
 {
   "python.formatting.provider": "black",
   "editor.codeActionsOnSave": {
-    "source.organizeImports": true,
-    "source.fixAll": true,
-    "source.unusedImports": true
+    "source.organizeImports": "explicit",
+    "source.fixAll": "explicit",
+    "source.unusedImports": "explicit"
   },
   "python.linting.enabled": true,
   "python.linting.flake8Enabled": true,
@@ -15,8 +15,8 @@
     "editor.defaultFormatter": "ms-python.black-formatter",
     "editor.formatOnSave": true,
     "editor.codeActionsOnSave": {
-      "source.organizeImports": true,
-      "source.fixAll": true
+      "source.organizeImports": "explicit",
+      "source.fixAll": "explicit"
     }
   },
   "[typescriptreact]": {

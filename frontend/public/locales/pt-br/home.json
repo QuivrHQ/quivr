@@ -1,34 +1,34 @@
 {
-  "sign_in": "Entrar",
-  "sign_up": "Cadastrar",
-  "star_us": "Nos avalie no Github",
-  "blog": "Blog",
-  "sponsored_by": "Patrocinado por",
-  "useCases": {
-    "title": "Experimente agora.",
-    "subtitle": "Confira nosso exemplo de uso do Quivr."
-  },
-  "intro": {
-    "title": "Obtenha um segundo cérebro com",
-    "subtitle": "Faça o upload de todos os seus arquivos e comece a conversar com eles.",
-    "try_demo": "Experimente a demonstração gratuita",
-    "contact_sales": "Entre em contato com a equipe de vendas"
-  },
-  "demo": {
-    "title": "Vídeo de demonstração",
-    "start_now": "Iniciar agora"
-  },
-  "security": {
-    "cta": "¡Comienza hoy!"
-  },
-  "footer": {
-    "title": "Comece hoje",
-    "description_1": "Seu assistente pessoal que age como seu Segundo Cérebro.",
-    "description_2": "Basta fazer upload de seus arquivos e fazer perguntas a ele.",
-    "start_using": "Comece a usar o Quivr",
-    "contact_sales": "Entre em contato com a equipe de vendas"
-  },
-  "testimonials":{ 
-    "title": "O que as pessoas dizem sobre"
-  }
+    "sign_in": "Entrar",
+    "sign_up": "Cadastrar",
+    "star_us": "Nos avalie no Github",
+    "blog": "Blog",
+    "sponsored_by": "Patrocinado por",
+    "useCases": {
+        "title": "Experimente agora.",
+        "subtitle": "Confira nosso exemplo de uso do Quivr."
+    },
+    "intro": {
+        "title": "Obtenha um segundo cérebro com",
+        "subtitle": "Faça o upload de todos os seus arquivos e comece a conversar com eles.",
+        "try_demo": "Experimente a demonstração gratuita",
+        "contact_sales": "Entre em contato com a equipe de vendas"
+    },
+    "demo": {
+        "title": "Vídeo de demonstração",
+        "start_now": "Iniciar agora"
+    },
+    "security": {
+        "cta": "¡Comienza hoy!"
+    },
+    "footer": {
+        "title": "Comece hoje",
+        "description_1": "Seu assistente pessoal que age como seu Segundo Cérebro.",
+        "description_2": "Basta fazer upload de seus arquivos e fazer perguntas a ele.",
+        "start_using": "Comece a usar o Quivr",
+        "contact_sales": "Entre em contato com a equipe de vendas"
+    },
+    "testimonials": {
+        "title": "O que as pessoas dizem sobre"
+    }
 }

@@ -1,34 +1,34 @@
 {
-  "sign_in": "Iniciar sesión",
-  "sign_up": "Registrarse",
-  "star_us": "Danos una estrella en Github",
-  "blog": "Blog",
-  "sponsored_by": "Patrocinado por",
-  "useCases": {
-    "title": "Experiméntalo ahora.",
-    "subtitle": "Comprueba nuestro ejemplo de uso de Quivr."
-  },
-  "intro": {
-    "title": "Obtén un segundo cerebro con",
-    "subtitle": "Sube todos tus archivos y comienza a hablar con ellos.",
-    "try_demo": "Prueba la demostración gratuita",
-    "contact_sales": "Contacta al equipo de ventas"
-  },
-  "demo": {
-    "title": "Video de demostración",
-    "start_now": "Comenzar ahora"
-  },
-  "security": {
-    "cta": "Comienza hoy"
-  },
-  "footer": {
-    "title": "Comienza hoy",
-    "description_1": "Tu asistente personal que actúa como tu Segundo Cerebro.",
-    "description_2": "Simplemente carga tus archivos y hazle preguntas.",
-    "start_using": "Comienza a usar Quivr",
-    "contact_sales": "Contacta al equipo de ventas"
-  },
-  "testimonials":{ 
-    "title": "Lo que la gente dice sobre"
-  }
+    "sign_in": "Iniciar sesión",
+    "sign_up": "Registrarse",
+    "star_us": "Danos una estrella en Github",
+    "blog": "Blog",
+    "sponsored_by": "Patrocinado por",
+    "useCases": {
+        "title": "Experiméntalo ahora.",
+        "subtitle": "Comprueba nuestro ejemplo de uso de Quivr."
+    },
+    "intro": {
+        "title": "Obtén un segundo cerebro con",
+        "subtitle": "Sube todos tus archivos y comienza a hablar con ellos.",
+        "try_demo": "Prueba la demostración gratuita",
+        "contact_sales": "Contacta al equipo de ventas"
+    },
+    "demo": {
+        "title": "Video de demostración",
+        "start_now": "Comenzar ahora"
+    },
+    "security": {
+        "cta": "Comienza hoy"
+    },
+    "footer": {
+        "title": "Comienza hoy",
+        "description_1": "Tu asistente personal que actúa como tu Segundo Cerebro.",
+        "description_2": "Simplemente carga tus archivos y hazle preguntas.",
+        "start_using": "Comienza a usar Quivr",
+        "contact_sales": "Contacta al equipo de ventas"
+    },
+    "testimonials": {
+        "title": "Lo que la gente dice sobre"
+    }
 }
