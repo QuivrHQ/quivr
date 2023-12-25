@@ -9,7 +9,6 @@
     "anchors": {
       "from": "#6142D4",
       "to": "#F6F4FF"
-
     }
   },
   "topbarLinks": [
@@ -29,11 +28,6 @@
     }
   ],
   "anchors": [
-    {
-      "name": "Documentation",
-      "icon": "book-open-cover",
-      "url": "https://docs.quivr.app"
-    },
     {
       "name": "Community",
       "icon": "discord",
