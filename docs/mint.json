@@ -3,12 +3,13 @@
   "name": "Quivr",
   "favicon": "/favicon.svg",
   "colors": {
-    "primary": "#0D9373",
-    "light": "#07C983",
-    "dark": "#0D9373",
+    "primary": "#6142D4",
+    "light": "#F6F4FF",
+    "dark": "#13ABBA",
     "anchors": {
-      "from": "#0D9373",
-      "to": "#07C983"
+      "from": "#6142D4",
+      "to": "#F6F4FF"
+
     }
   },
   "topbarLinks": [
@@ -46,15 +47,14 @@
   ],
   "navigation": [
     {
-      "group": "Get Started",
+      "group": "Getting Started",
       "pages": [
         "intro"
       ]
     },
     {
-      "group": "How to use Quivr",
+      "group": "Power-user",
       "pages": [
-        "userGuide/intro",
         "userGuide/what-is-a-brain",
         "userGuide/api-based-brains"
       ]
@@ -110,7 +110,13 @@
   "footerSocials": {
     "twitter": "https://twitter.com/quivr_brain",
     "github": "https://github.com/stangirard/quivr",
-    "linkedin": "https://www.linkedin.com/company/getquivr"
+    "linkedin": "https://www.linkedin.com/company/getquivr",
+    "discord": "https://discord.gg/HUpRgp2HG8"
   },
-  "openapi": "https://api.quivr.app/openapi.json"
+  "openapi": "https://api.quivr.app/openapi.json",
+  "feedback": {
+    "thumbsRating": true,
+    "raiseIssue": true,
+    "suggestEdit": true
+  }
 }
