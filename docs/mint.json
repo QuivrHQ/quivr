@@ -3,12 +3,12 @@
   "name": "Quivr",
   "favicon": "/favicon.svg",
   "colors": {
-    "primary": "#6142D4",
-    "light": "#F6F4FF",
-    "dark": "#13ABBA",
+    "primary": "#0D9373",
+    "light": "#07C983",
+    "dark": "#0D9373",
     "anchors": {
-      "from": "#6142D4",
-      "to": "#F6F4FF"
+      "from": "#0D9373",
+      "to": "#07C983"
     }
   },
   "topbarLinks": [
@@ -25,6 +25,10 @@
     {
       "name": "Developer Guide",
       "url": "developers"
+    },
+    {
+      "name": "API Reference",
+      "url": "api-reference"
     }
   ],
   "anchors": [
@@ -99,6 +103,126 @@
           ]
         }
       ]
+    },
+    {
+      "group": "API Reference",
+      "pages": [
+        {
+          "group": "Brain",
+          "pages": [
+            "api-reference/brain/retrieve-all-brains-for-user",
+            "api-reference/brain/create-new-brain",
+            "api-reference/brain/retrieve-public-brains",
+            "api-reference/brain/retrieve-default-brain",
+            "api-reference/brain/retrieve-brain-by-id",
+            "api-reference/brain/update-existing-brain",
+            "api-reference/brain/update-existing-brain-secrets",
+            "api-reference/brain/set-brain-as-default",
+            "api-reference/brain/get-question-context-for-brain",
+            "api-reference/brain/accept-invitation",
+            "api-reference/brain/decline-invitation"
+          ]
+        },
+        {
+          "group": "Health",
+          "pages": [
+            "api-reference/health/healthz",
+            "api-reference/health/healthz-1",
+            "api-reference/health/healthz-2",
+            "api-reference/health/healthz-3"
+          ]
+        },
+        {
+          "group": "Chat",
+          "pages": [
+            "api-reference/chat/get-chats",
+            "api-reference/chat/create-chat-handler",
+            "api-reference/chat/delete-chat",
+            "api-reference/chat/update-chat-metadata-handler",
+            "api-reference/chat/create-question-handler",
+            "api-reference/chat/create-stream-question-handler",
+            "api-reference/chat/get-chat-history-handler",
+            "api-reference/chat/add-question-and-answer-handler"
+          ]
+        },
+        {
+          "group": "Crawl",
+          "pages": [
+            "api-reference/crawl/crawl-endpoint"
+          ]
+        },
+        {
+          "group": "Onboarding",
+          "pages": [
+            "api-reference/onboarding/get-user-onboarding-handler",
+            "api-reference/onboarding/update-user-onboarding-handler"
+          ]
+        },
+        "api-reference/root",
+        {
+          "group": "Upload",
+          "pages": [
+            "api-reference/upload/upload-file"
+          ]
+        },
+        {
+          "group": "User",
+          "pages": [
+            "api-reference/user/get-user-endpoint",
+            "api-reference/user/get-user-identity-route",
+            "api-reference/user/update-user-identity-route"
+          ]
+        },
+        {
+          "group": "API Key",
+          "pages": [
+            "api-reference/api-key/create-api-key",
+            "api-reference/api-key/delete-api-key",
+            "api-reference/api-key/get-api-keys"
+          ]
+        },
+        {
+          "group": "BrainSubscription",
+          "pages": [
+            "api-reference/brainsubscription/get-user-invitation",
+            "api-reference/brainsubscription/invite-users-to-brain"
+          ]
+        },
+        "api-reference/update-brain-subscription",
+        "api-reference/remove-user-subscription",
+        "api-reference/get-users-with-brain-access",
+        {
+          "group": "Subscription",
+          "pages": [
+            "api-reference/subscription/subscribe-to-brain-handler",
+            "api-reference/subscription/unsubscribe-from-brain-handler"
+          ]
+        },
+        {
+          "group": "Prompt",
+          "pages": [
+            "api-reference/prompt/get-prompts",
+            "api-reference/prompt/create-prompt-route",
+            "api-reference/prompt/get-prompt",
+            "api-reference/prompt/update-prompt"
+          ]
+        },
+        {
+          "group": "Notification",
+          "pages": [
+            "api-reference/notification/get-notifications"
+          ]
+        },
+        {
+          "group": "Knowledge",
+          "pages": [
+            "api-reference/knowledge/list-knowledge-in-brain-endpoint",
+            "api-reference/knowledge/delete-endpoint",
+            "api-reference/knowledge/generate-signed-url-endpoint"
+          ]
+        },
+        "api-reference/post-contact"
+      ]
     }
   ],
   "footerSocials": {
@@ -112,5 +236,11 @@
     "thumbsRating": true,
     "raiseIssue": true,
     "suggestEdit": true
+  },
+  "api": {
+    "baseUrl": "https://api.quivr.app",
+    "auth": {
+      "method": "bearer"
+    }
   }
 }
