@@ -53,7 +53,7 @@
     {
       "group": "Power-user",
       "pages": [
-        "userGuide/what-is-a-brain",
+        "userGuide/brain",
         "userGuide/api-based-brains"
       ]
     },
