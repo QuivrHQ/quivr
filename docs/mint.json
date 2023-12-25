@@ -45,16 +45,17 @@
   ],
   "navigation": [
     {
-      "group": "Getting Started",
+      "group": "Home",
       "pages": [
-        "intro"
+        "intro",
+        "getting-started/quickstart"
       ]
     },
     {
       "group": "Power-user",
       "pages": [
-        "userGuide/brain",
-        "userGuide/api-based-brains"
+        "getting-started/brain",
+        "getting-started/api-based-brains"
       ]
     },
     {
