@@ -57,7 +57,11 @@
         {
           "group": "Use Cases",
           "pages": [
-            "home/use-cases/entreprise-gpt"
+            "home/use-cases/entreprise-gpt",
+            "home/use-cases/content-generation",
+            "home/use-cases/hr",
+            "home/use-cases/market-analysis",
+            "home/use-cases/project-management"
           ]
         }
       ]
