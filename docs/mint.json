@@ -98,7 +98,6 @@
       "group": "Self Hosting",
       "pages": [
         "developers/selfHosting/run_fully_local",
-        "developers/selfHosting/vps_install",
         "developers/selfHosting/authentication"
       ]
     },
