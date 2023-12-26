@@ -41,14 +41,25 @@
       "name": "Blog",
       "icon": "newspaper",
       "url": "https://quivr.app/blog"
+    },
+    {
+      "name": "Status",
+      "icon": "signal",
+      "url": "https://uptime.quivr.app"
     }
   ],
   "navigation": [
     {
       "group": "Home",
       "pages": [
-        "intro",
-        "getting-started/quickstart"
+        "home/intro",
+        "home/quickstart",
+        {
+          "group": "Use Cases",
+          "pages": [
+            "home/use-cases/entreprise-gpt"
+          ]
+        }
       ]
     },
     {
