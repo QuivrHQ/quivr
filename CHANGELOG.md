@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.0.144 (2023-12-27)
+
+## What's Changed
+* feat: 🎸 pricing by @StanGirard in https://github.com/StanGirard/quivr/pull/1923
+* feat(pricing): added testimonials and else by @StanGirard in https://github.com/StanGirard/quivr/pull/1925
+
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.143...v0.0.144
+
 ## 0.0.143 (2023-12-27)
 
 ## What's Changed
