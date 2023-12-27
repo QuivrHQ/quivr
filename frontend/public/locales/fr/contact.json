@@ -1,13 +1,1 @@
-{
-    "speak_to": "Parlez à notre",
-    "sales_team": "équipe de vente",
-    "form": {
-        "email": "Courriel professionnel",
-        "question": "Question",
-        "submit": "Contacter",
-        "placeholder_question": "Comment pouvons-nous vous aider ?",
-        "thank_you": "Merci !",
-        "thank_you_text": "Nous vous répondrons dès que possible.",
-        "sending_mail_error": "Une erreur s'est produite lors de l'envoi de votre message. Veuillez réessayer plus tard."
-    }
-}
+{"speak_to":"Parlez à notre","sales_team":"équipe de vente","form":{"email":"Courriel professionnel","question":"Question","submit":"Contacter","placeholder_question":"Comment pouvons-nous vous aider ?","thank_you":"Merci !","thank_you_text":"Nous vous répondrons dès que possible.","sending_mail_error":"Une erreur s'est produite lors de l'envoi de votre message. Veuillez réessayer plus tard."}}

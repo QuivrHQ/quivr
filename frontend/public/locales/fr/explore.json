@@ -1,15 +1,1 @@
-{
-    "title": "Explorez les données téléchargées",
-    "subtitle": "Visualisez, téléchargez ou supprimez les connaissances utilisées par votre cerveau",
-    "empty": "Oh non, votre cerveau est vide.",
-    "noBrain": "ID du cerveau introuvable",
-    "sessionNotFound": "Session utilisateur introuvable",
-    "deleted": "{{fileName}} supprimé du cerveau {{brain}}",
-    "errorDeleting": "Erreur lors de la suppression de {{fileName}}",
-    "view": "Voir",
-    "chunkNumber": "Nombre de fragments : {{quantity}}",
-    "notAvailable": "Non disponible",
-    "deleteConfirmTitle": "Confirmer",
-    "deleteConfirmText": "Voulez-vous vraiment supprimer ?",
-    "feed_brain_instructions": "Pour ajouter des connaissances à un cerveau, allez sur la page de chat, puis cliquez sur le bouton plus à gauche de la zone de chat."
-}
+{"title":"Explorez les données téléchargées","subtitle":"Visualisez, téléchargez ou supprimez les connaissances utilisées par votre cerveau","empty":"Oh non, votre cerveau est vide.","noBrain":"ID du cerveau introuvable","sessionNotFound":"Session utilisateur introuvable","deleted":"{{fileName}} supprimé du cerveau {{brain}}","errorDeleting":"Erreur lors de la suppression de {{fileName}}","view":"Voir","chunkNumber":"Nombre de fragments : {{quantity}}","notAvailable":"Non disponible","deleteConfirmTitle":"Confirmer","deleteConfirmText":"Voulez-vous vraiment supprimer ?","feed_brain_instructions":"Pour ajouter des connaissances à un cerveau, allez sur la page de chat, puis cliquez sur le bouton plus à gauche de la zone de chat."}

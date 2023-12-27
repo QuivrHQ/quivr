@@ -1,18 +1,1 @@
-{
-    "password": "密码",
-    "googleLogin": "使用Google登录",
-    "errorPasswordMissed": "请输入密码",
-    "magicLink": "使用电子邮件继续",
-    "errorMailMissed": "请输入您的电子邮件地址",
-    "talk_to": "与之交谈",
-    "restriction_message": "未付费用户可以访问Quivr的免费和有限演示",
-    "email": "电子邮件地址",
-    "cant_find": "找不到？",
-    "try_again": "重试",
-    "check_your_email": {
-        "part1": "我们刚刚发送了一个",
-        "magic_link": "魔法链接",
-        "part2": "，请检查您的电子邮件并按照步骤操作。"
-    },
-    "login": "登录"
-}
+{"password":"密码","googleLogin":"使用Google登录","errorPasswordMissed":"请输入密码","magicLink":"使用电子邮件继续","errorMailMissed":"请输入您的电子邮件地址","talk_to":"与之交谈","restriction_message":"未付费用户可以访问Quivr的免费和有限演示","email":"电子邮件地址","cant_find":"找不到？","try_again":"重试","check_your_email":{"part1":"我们刚刚发送了一个","magic_link":"魔法链接","part2":"，请检查您的电子邮件并按照步骤操作。"},"login":"登录"}

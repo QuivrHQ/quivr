@@ -1,13 +1,1 @@
-{
-    "wellcome": "欢迎来到 {{brain}}!",
-    "invitationMessage": "您被邀请以 {{role}} 的身份加入和探索这个大脑，是否接受邀请?",
-    "processingRequest": "正在处理您的请求…",
-    "accept": "是的，我加入！",
-    "reject": "不，谢谢。",
-    "invitationNotFound": "此邀请无效。",
-    "errorCheckingInvitation": "检查邀请时出现未知错误",
-    "accepted": "已接受邀请",
-    "errorAccepting": "接受邀请时发生未知错误",
-    "declined": "邀请已拒绝",
-    "errorDeclining": "拒绝邀请时发生未知错误"
-}
+{"wellcome":"欢迎来到 {{brain}}!","invitationMessage":"您被邀请以 {{role}} 的身份加入和探索这个大脑，是否接受邀请?","processingRequest":"正在处理您的请求…","accept":"是的，我加入！","reject":"不，谢谢。","invitationNotFound":"此邀请无效。","errorCheckingInvitation":"检查邀请时出现未知错误","accepted":"已接受邀请","errorAccepting":"接受邀请时发生未知错误","declined":"邀请已拒绝","errorDeclining":"拒绝邀请时发生未知错误"}

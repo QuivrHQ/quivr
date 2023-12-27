@@ -1,13 +1,1 @@
-{
-    "wellcome": "Bienvenido/a a {{brain}}!",
-    "invitationMessage": "Te han invitado a unirte a este cerebro como un {{role}} y empezar a explorar. ¿Aceptas este entusiasmante viaje?",
-    "processingRequest": "Procesando tu pedido...",
-    "accept": "¡Sí, cuenta conmigo!",
-    "reject": "No, gracias",
-    "invitationNotFound": "Esta invitación no es válida",
-    "errorCheckingInvitation": "Ocurrió un error durante la comprobación de la invitación",
-    "accepted": "Invitación aceptada",
-    "errorAccepting": "Ocurrió un error aceptando la invitación",
-    "declined": "Invitación rechazada",
-    "errorDeclining": "Ocurrió un error rechazando la invitación"
-}
+{"wellcome":"Bienvenido/a a {{brain}}!","invitationMessage":"Te han invitado a unirte a este cerebro como un {{role}} y empezar a explorar. ¿Aceptas este entusiasmante viaje?","processingRequest":"Procesando tu pedido...","accept":"¡Sí, cuenta conmigo!","reject":"No, gracias","invitationNotFound":"Esta invitación no es válida","errorCheckingInvitation":"Ocurrió un error durante la comprobación de la invitación","accepted":"Invitación aceptada","errorAccepting":"Ocurrió un error aceptando la invitación","declined":"Invitación rechazada","errorDeclining":"Ocurrió un error rechazando la invitación"}

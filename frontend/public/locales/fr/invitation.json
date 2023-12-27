@@ -1,13 +1,1 @@
-{
-    "wellcome": "Bienvenue sur {{brain}} !",
-    "invitationMessage": "Vous avez été invité(e) à rejoindre ce cerveau en tant que {{role}} et à commencer à explorer. Acceptez-vous ce voyage passionnant ?",
-    "processingRequest": "Traitement de votre demande en cours...",
-    "accept": "Oui, je suis partant(e) !",
-    "reject": "Non, merci",
-    "invitationNotFound": "Cette invitation n'est pas valide",
-    "errorCheckingInvitation": "Une erreur s'est produite lors de la vérification de l'invitation",
-    "accepted": "Invitation acceptée",
-    "errorAccepting": "Une erreur s'est produite lors de l'acceptation de l'invitation",
-    "declined": "Invitation refusée",
-    "errorDeclining": "Une erreur s'est produite lors du refus de l'invitation"
-}
+{"wellcome":"Bienvenue sur {{brain}} !","invitationMessage":"Vous avez été invité(e) à rejoindre ce cerveau en tant que {{role}} et à commencer à explorer. Acceptez-vous ce voyage passionnant ?","processingRequest":"Traitement de votre demande en cours...","accept":"Oui, je suis partant(e) !","reject":"Non, merci","invitationNotFound":"Cette invitation n'est pas valide","errorCheckingInvitation":"Une erreur s'est produite lors de la vérification de l'invitation","accepted":"Invitation acceptée","errorAccepting":"Une erreur s'est produite lors de l'acceptation de l'invitation","declined":"Invitation refusée","errorDeclining":"Une erreur s'est produite lors du refus de l'invitation"}

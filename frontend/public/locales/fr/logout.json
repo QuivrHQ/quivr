@@ -1,8 +1,1 @@
-{
-    "title": "Déconnexion",
-    "subtitle": "À la prochaine",
-    "areYouSure": "Êtes-vous sûr de vouloir vous déconnecter ?",
-    "cancel": "Annuler",
-    "error": "Erreur lors de la déconnexion {{errorMessage}}",
-    "loggedOut": "Déconnexion réussie"
-}
+{"title":"Déconnexion","subtitle":"À la prochaine","areYouSure":"Êtes-vous sûr de vouloir vous déconnecter ?","cancel":"Annuler","error":"Erreur lors de la déconnexion {{errorMessage}}","loggedOut":"Déconnexion réussie"}

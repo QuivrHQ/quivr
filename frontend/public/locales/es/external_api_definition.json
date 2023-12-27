@@ -1,14 +1,1 @@
-{
-    "method_label": "Method",
-    "url_placeholder": "URL",
-    "searchParams": "Search Params",
-    "headers": "Headers",
-    "params": "Params",
-    "key": "Key",
-    "type": "Type (string or number)",
-    "description": "Description",
-    "secrets": "Secretos",
-    "paramsTabDescription": "Estos valores se envían como cuerpo de la solicitud.",
-    "searchParamsTabDescription": "Estos valores se envían como cadena de consulta.",
-    "secretsTabDescription": "Estos valores se envían como claves de encabezado."
-}
+{"method_label":"Method","url_placeholder":"URL","searchParams":"Search Params","headers":"Headers","params":"Params","key":"Key","type":"Type (string or number)","description":"Description","secrets":"Secretos","paramsTabDescription":"Estos valores se envían como cuerpo de la solicitud.","searchParamsTabDescription":"Estos valores se envían como cadena de consulta.","secretsTabDescription":"Estos valores se envían como claves de encabezado."}
