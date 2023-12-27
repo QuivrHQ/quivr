@@ -74,7 +74,8 @@
         {
           "group": "Examples",
           "pages": [
-            "examples/generate-images"
+            "examples/generate-images",
+            "examples/zapier"
           ]
         }
       ]
