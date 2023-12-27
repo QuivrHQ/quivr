@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.0.143 (2023-12-27)
+
+## What's Changed
+* docs: ✏️ mintlify by @StanGirard in https://github.com/StanGirard/quivr/pull/1917
+* feat(docs): added homepage by @StanGirard in https://github.com/StanGirard/quivr/pull/1919
+* docs: ✏️ homepage by @StanGirard in https://github.com/StanGirard/quivr/pull/1922
+
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.142...v0.0.143
+
 ## 0.0.142 (2023-12-18)
 
 ## What's Changed
