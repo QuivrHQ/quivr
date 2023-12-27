@@ -33,7 +33,7 @@ export const useHomeHeader = ({ color }: UseHomeHeaderProps) => {
       rightIcon: null,
     },
     { href: "/blog", label: t("blog"), rightIcon: null, newTab: true },
-    { href: "/login", label: t("sign_up") },
+    { href: "https://docs.quivr.app", label: t("docs"), rightIcon: null, newTab: true },
     { href: "/login", label: t("sign_in") },
   ];
 

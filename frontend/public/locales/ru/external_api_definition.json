@@ -1,14 +1,1 @@
-{
-    "method_label": "Method",
-    "url_placeholder": "URL",
-    "searchParams": "Search Params",
-    "headers": "Headers",
-    "params": "Params",
-    "key": "Key",
-    "type": "Type (string or number)",
-    "description": "Description",
-    "secrets": "секреты",
-    "paramsTabDescription": "Эти значения отправляются в теле запроса.",
-    "searchParamsTabDescription": "Эти значения отправляются в виде строки запроса.",
-    "secretsTabDescription": "Эти значения отправляются в виде ключей заголовка."
-}
+{"method_label":"Method","url_placeholder":"URL","searchParams":"Search Params","headers":"Headers","params":"Params","key":"Key","type":"Type (string or number)","description":"Description","secrets":"секреты","paramsTabDescription":"Эти значения отправляются в теле запроса.","searchParamsTabDescription":"Эти значения отправляются в виде строки запроса.","secretsTabDescription":"Эти значения отправляются в виде ключей заголовка."}

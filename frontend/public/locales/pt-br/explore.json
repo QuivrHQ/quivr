@@ -1,15 +1,1 @@
-{
-    "title": "Explorar dados enviados",
-    "subtitle": "Visualize, baixe ou exclua o conhecimento usado pelo seu cérebro",
-    "empty": "Oh, não! Seu Cérebro está vazio.",
-    "noBrain": "Cérebro não encontrado",
-    "sessionNotFound": "Sessão do usuário não encontrada",
-    "deleted": "{{fileName}} excluído do cérebro {{brain}}",
-    "errorDeleting": "Erro ao excluir {{fileName}}",
-    "view": "Visualizar",
-    "chunkNumber": "Número de partes: {{quantity}}",
-    "notAvailable": "Indisponível",
-    "deleteConfirmTitle": "Confirmar",
-    "deleteConfirmText": "Você realmente deseja excluir?",
-    "feed_brain_instructions": "Para adicionar conhecimento a um cérebro, vá para a página de chat e clique no botão de adição à esquerda da entrada de chat."
-}
+{"title":"Explorar dados enviados","subtitle":"Visualize, baixe ou exclua o conhecimento usado pelo seu cérebro","empty":"Oh, não! Seu Cérebro está vazio.","noBrain":"Cérebro não encontrado","sessionNotFound":"Sessão do usuário não encontrada","deleted":"{{fileName}} excluído do cérebro {{brain}}","errorDeleting":"Erro ao excluir {{fileName}}","view":"Visualizar","chunkNumber":"Número de partes: {{quantity}}","notAvailable":"Indisponível","deleteConfirmTitle":"Confirmar","deleteConfirmText":"Você realmente deseja excluir?","feed_brain_instructions":"Para adicionar conhecimento a um cérebro, vá para a página de chat e clique no botão de adição à esquerda da entrada de chat."}

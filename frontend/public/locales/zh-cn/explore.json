@@ -1,15 +1,1 @@
-{
-    "title": "探索上传的数据",
-    "subtitle": "查看、下载或删除大脑使用的知识",
-    "empty": "哎呀，大脑空空如也。",
-    "noBrain": "没有找到相应 ID 的大脑",
-    "sessionNotFound": "未找到用户会话",
-    "deleted": "{{fileName}} 已从大脑 {{brain}} 中删除。",
-    "errorDeleting": "删除 {{fileName}} 时发生错误",
-    "view": "查看",
-    "chunkNumber": "数据块数量： {{quantity}}",
-    "notAvailable": "不可用",
-    "deleteConfirmTitle": "提交",
-    "deleteConfirmText": "您真的要删除吗?",
-    "feed_brain_instructions": "要向大脑添加知识，请转到聊天页面，然后单击聊天输入框左侧的加号按钮。"
-}
+{"title":"探索上传的数据","subtitle":"查看、下载或删除大脑使用的知识","empty":"哎呀，大脑空空如也。","noBrain":"没有找到相应 ID 的大脑","sessionNotFound":"未找到用户会话","deleted":"{{fileName}} 已从大脑 {{brain}} 中删除。","errorDeleting":"删除 {{fileName}} 时发生错误","view":"查看","chunkNumber":"数据块数量： {{quantity}}","notAvailable":"不可用","deleteConfirmTitle":"提交","deleteConfirmText":"您真的要删除吗?","feed_brain_instructions":"要向大脑添加知识，请转到聊天页面，然后单击聊天输入框左侧的加号按钮。"}
