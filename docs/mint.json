@@ -70,7 +70,13 @@
       "group": "Power-user",
       "pages": [
         "getting-started/brain",
-        "getting-started/api-based-brains"
+        "getting-started/api-based-brains",
+        {
+          "group": "Examples",
+          "pages": [
+            "examples/generate-images"
+          ]
+        }
       ]
     },
     {
