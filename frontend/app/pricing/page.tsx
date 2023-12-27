@@ -10,6 +10,7 @@ import {
   HomeSection,
   TestimonialsSection,
 } from "../(home)/components";
+import { UseCases } from "../(home)/components/UseCases/UseCases";
 
 const ContactSalesPage = (): JSX.Element => {
   const { t } = useTranslation("contact");
@@ -25,9 +26,16 @@ const ContactSalesPage = (): JSX.Element => {
         <Card className="my-auto flex flex-col h-fit mt-5 mb-10 p-10 w-full ">
           <StripePricingTable />
         </Card>
-        <HomeSection bg="bg-[#FCFAF6]">
+        <HomeSection
+          bg="bg-[#362469]"
+        >
+          <UseCases />
+          <div />
+        </HomeSection>
+        <HomeSection bg="bg-[#FCFAF6] ">
           <TestimonialsSection />
         </HomeSection>
+        
         <HomeSection bg="bg-gradient-to-b from-[#D07DF9] to-[#7A27FD]">
           <FooterSection />
         </HomeSection>
