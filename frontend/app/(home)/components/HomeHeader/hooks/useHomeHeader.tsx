@@ -20,20 +20,14 @@ export const useHomeHeader = ({ color }: UseHomeHeaderProps) => {
 
   const navItems: NavbarItem[] = [
     {
-      href: "https://theodo.co.uk",
-      label: `${t("sponsored_by")} Theodo`,
-      rightIcon: null,
-      newTab: true,
-      className: "underline",
-    },
-    {
       href: "https://github.com/StanGirard/quivr",
       label: t("star_us"),
       leftIcon: <AiFillStar size={16} className="hidden md:inline" />,
       rightIcon: null,
     },
-    { href: "/blog", label: t("blog"), rightIcon: null, newTab: true },
+    { href: "/pricing", label: t("pricing"), rightIcon: null },
     { href: "https://docs.quivr.app", label: t("docs"), rightIcon: null, newTab: true },
+    { href: "/blog", label: t("blog"), rightIcon: null, newTab: true },
     { href: "/login", label: t("sign_in") },
   ];
 
