@@ -1,1 +1,14 @@
-{"speak_to":"Speak to our","sales_team":"Sales team","form":{"email":"Work Email","question":"Question","submit":"Contact","placeholder_question":"How can we help you?","thank_you":"Thank you!","thank_you_text":"We will get back to you as soon as possible.","sending_mail_error":"There was an error sending your message. Please try again later."}}
+{
+    "speak_to": "Speak to our",
+    "sales_team": "Sales team",
+    "pricing": "Pricing",
+    "form": {
+        "email": "Work Email",
+        "question": "Question",
+        "submit": "Contact",
+        "placeholder_question": "How can we help you?",
+        "thank_you": "Thank you!",
+        "thank_you_text": "We will get back to you as soon as possible.",
+        "sending_mail_error": "There was an error sending your message. Please try again later."
+    }
+}
