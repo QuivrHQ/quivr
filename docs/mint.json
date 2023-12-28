@@ -75,7 +75,8 @@
           "group": "Examples",
           "pages": [
             "examples/generate-images",
-            "examples/zapier"
+            "examples/zapier",
+            "examples/sell-brains"
           ]
         }
       ]
