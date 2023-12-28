@@ -12,14 +12,11 @@ export const useJune = (): AnalyticsBrowser | undefined => {
   useEffect(() => {
     const loadAnalytics = () => {
       if (juneApiKey === undefined) {
-        console.log("No June API key found");
-
         return;
       }
       const response = AnalyticsBrowser.load({
         writeKey: juneApiKey,
       });
-      console.log("Loaded June Analytics", response);
       setAnalytics(response);
     };
     loadAnalytics();
