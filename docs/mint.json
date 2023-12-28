@@ -264,5 +264,11 @@
     "auth": {
       "method": "bearer"
     }
+  },
+  "analytics": {
+    "posthog": {
+      "apiKey": "phc_sctJ773vGiBZwiqwgJhixgR4e7MrUiaMGdMWXgthSfu",
+      "apiHost": "https://us.posthog.com"
+    }
   }
 }
