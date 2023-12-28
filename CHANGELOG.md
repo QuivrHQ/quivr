@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.0.146 (2023-12-28)
+
+## What's Changed
+* feat: 🎸 posthog by @StanGirard in https://github.com/StanGirard/quivr/pull/1929
+
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.145...v0.0.146
+
 ## 0.0.145 (2023-12-28)
 
 ## What's Changed
