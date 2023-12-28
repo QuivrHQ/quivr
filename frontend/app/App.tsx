@@ -22,6 +22,7 @@ if (process.env.NEXT_PUBLIC_POSTHOG_KEY != null && process.env.NEXT_PUBLIC_POSTH
     process.env.NEXT_PUBLIC_POSTHOG_KEY,
     {
       api_host: process.env.NEXT_PUBLIC_POSTHOG_HOST,
+      opt_in_site_apps: true,
     }
   );
 }
