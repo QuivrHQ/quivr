@@ -71,6 +71,7 @@
       "pages": [
         "getting-started/brain",
         "getting-started/api-based-brains",
+        "getting-started/sharing-brains",
         {
           "group": "Examples",
           "pages": [
