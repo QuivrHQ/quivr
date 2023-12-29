@@ -1,13 +1,10 @@
 "use client";
 
-import { usePostHog } from 'posthog-js/react';
+import { usePostHog } from "posthog-js/react";
 
 import { useSupabase } from "@/lib/context/SupabaseProvider";
 
-
 import { useJune } from "./useJune";
-
-
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const useEventTracking = () => {
@@ -19,9 +16,7 @@ export const useEventTracking = () => {
     event: string,
     properties?: Record<string, unknown>
   ): Promise<void> => {
-
     posthog.capture(event, properties);
-    posthog.identify(session?.user.id, { email: session?.user.email });
     if (analytics === undefined) {
       console.log("No analytics found");
 
