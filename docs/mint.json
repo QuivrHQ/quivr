@@ -83,14 +83,13 @@
       ]
     },
     {
-      "group": "Contribute",
+      "group": "Overview",
       "pages": [
-        "developers/contribution/guidelines",
-        "developers/contribution/architecture",
         "developers/contribution/install",
+        "developers/contribution/stack",
         "developers/contribution/test",
         {
-          "group": "Chains",
+          "group": "RAG",
           "pages": [
             "developers/contribution/chains/qa"
           ]
@@ -98,15 +97,16 @@
         {
           "group": "LLM",
           "pages": [
-            "developers/contribution/llm/private-llm"
+            "developers/contribution/llm/hugging-face",
+            "developers/contribution/llm/ollama"
           ]
-        }
+        },
+        "developers/contribution/guidelines"
       ]
     },
     {
       "group": "Self Hosting",
       "pages": [
-        "developers/selfHosting/run_fully_local",
         "developers/selfHosting/authentication"
       ]
     },
@@ -269,7 +269,7 @@
   },
   "analytics": {
     "posthog": {
-      "apiKey": "phc_sctJ773vGiBZwiqwgJhixgR4e7MrUiaMGdMWXgthSfu",
+      "apiKey": "phc_BqYCVB8PX7VlzNU5MjbN8sET6soqW7jQVq6PrT9pJSJ",
       "apiHost": "https://us.posthog.com"
     }
   }
