@@ -24,6 +24,7 @@ if (
   posthog.init(process.env.NEXT_PUBLIC_POSTHOG_KEY, {
     api_host: process.env.NEXT_PUBLIC_POSTHOG_HOST,
     opt_in_site_apps: true,
+    disable_session_recording: true,
   });
 }
 
@@ -42,6 +43,7 @@ const App = ({ children }: PropsWithChildren): JSX.Element => {
       void fetchDefaultBrain();
       void fetchPublicPrompts();
       posthog.identify(session.user.id, { email: session.user.email });
+      posthog.startSessionRecording();
     }
   }, [session]);
 
