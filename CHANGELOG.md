@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.0.149 (2023-12-29)
+
+## What's Changed
+* feat: 🎸 pricing by @StanGirard in https://github.com/StanGirard/quivr/pull/1935
+
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.148...v0.0.149
+
 ## 0.0.148 (2023-12-28)
 
 **Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.147...v0.0.148
