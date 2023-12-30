@@ -40,7 +40,7 @@ export const Menu = (): JSX.Element => {
   return (
     <MotionConfig transition={{ mass: 1, damping: 10, duration: 0.2 }}>
       <div
-        className="flex flex-col fixed sm:sticky top-0 left-0 h-full overflow-visible z-[1000] border-r border-black/10 dark:border-white/25 bg-highlight"
+        className="flex flex-col fixed sm:sticky top-0 left-0 h-full overflow-visible z-[1000] border-r border-black/10 dark:border-white/25 bg-black"
         style={{
           width: shouldSideBarBeSticky ? OPENED_MENU_WIDTH : 0,
         }}

@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { useSideBarContext } from "@/lib/context/SidebarProvider/hooks/useSideBarContext";
 
 import { useMenuWidth } from "../hooks/useMenuWidth";
+import {cn} from "@/lib/utils";
 
 type AnimatedDivProps = {
   children: React.ReactNode;
@@ -23,7 +24,7 @@ export const AnimatedDiv = ({ children }: AnimatedDivProps): JSX.Element => {
           ? "10px 10px 16px rgba(0, 0, 0, 0)"
           : "10px 10px 16px rgba(0, 0, 0, 0.5)",
       }}
-      className={"overflow-hidden flex flex-col flex-1 bg-white"}
+      className={"overflow-hidden flex flex-col flex-1 dark:bg-black bg-white"}
     >
       {children}
     </motion.div>
