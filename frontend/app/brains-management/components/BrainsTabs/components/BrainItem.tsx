@@ -19,7 +19,7 @@ export const BrainItem = ({ brain }: BrainItemProps): JSX.Element => {
     : brain.description;
 
   return (
-    <div className="flex justify-center items-center flex-col flex-1 w-full h-full shadow-md dark:shadow-primary/25 hover:shadow-xl transition-shadow rounded-xl overflow-hidden dark:bg-black border border-black/10 dark:border-white/25 pb-2 bg-secondary">
+    <div className="flex justify-center items-center flex-col flex-1 w-full h-full shadow-md dark:shadow-primary/25 hover:shadow-xl transition-shadow rounded-xl overflow-hidden dark:bg-black border border-black/10 dark:border-white/25 pb-2 dark:bg-accent bg-secondary">
       <div className="w-full">
         <div className="w-full py-2 flex gap-2 justify-center items-center bg-primary bg-opacity-40 px-2">
           {getBrainIconFromBrainType(brain.brain_type, {

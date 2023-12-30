@@ -18,8 +18,8 @@ export const ExplorerButton = (): JSX.Element => {
         startIcon={<LuGlobe />}
         endIcon={<LuChevronRight size={18} />}
         className={cn(
-          "w-full hover:bg-secondary py-3",
-          isSelected ? "bg-secondary" : ""
+          "w-full dark:hover:bg-accent hover:bg-secondary py-3",
+          isSelected ? "dark:bg-accent bg-secondary" : ""
         )}
       />
     </Link>
