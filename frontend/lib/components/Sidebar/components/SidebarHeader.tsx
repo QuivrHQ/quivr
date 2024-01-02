@@ -1,13 +1,11 @@
-import { Dispatch, SetStateAction } from "react";
-import { LuPanelLeft } from "react-icons/lu";
+import { LuPanelLeftClose } from "react-icons/lu";
 
 import { Logo } from "@/lib/components/Logo/Logo";
+import { useSideBarContext } from "@/lib/context/SidebarProvider/hooks/useSideBarContext";
 
-type SidebarProps = {
-  setOpen: Dispatch<SetStateAction<boolean>>;
-};
+export const SidebarHeader = (): JSX.Element => {
+  const { setIsOpened } = useSideBarContext();
 
-export const SidebarHeader = ({ setOpen }: SidebarProps): JSX.Element => {
   return (
     <div className="p-2 border-b relative">
       <div className="max-w-screen-xl flex justify-between items-center pt-3 pl-3">
@@ -17,9 +15,9 @@ export const SidebarHeader = ({ setOpen }: SidebarProps): JSX.Element => {
           className="p-3 text-2xl bg:white dark:bg-black text-black dark:text-white hover:text-primary dark:hover:text-gray-200 transition-colors"
           type="button"
           data-testid="close-sidebar-button"
-          onClick={() => setOpen(false)}
+          onClick={() => setIsOpened(false)}
         >
-          <LuPanelLeft />
+          <LuPanelLeftClose />
         </button>
       </div>
     </div>

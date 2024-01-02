@@ -15,7 +15,7 @@ export const useKnowledgeToFeedInput = () => {
   const { crawlWebsiteUrl } = useCrawlApi();
 
   const crawlWebsiteHandler = useCallback(
-    async (url: string, brainId: UUID, chat_id: UUID) => {
+    async (url: string, brainId: UUID, chat_id?: UUID) => {
       // Configure parameters
       const config = {
         url: url,
@@ -54,7 +54,7 @@ export const useKnowledgeToFeedInput = () => {
   );
 
   const uploadFileHandler = useCallback(
-    async (file: File, brainId: UUID, chat_id: UUID) => {
+    async (file: File, brainId: UUID, chat_id?: UUID) => {
       const formData = new FormData();
       formData.append("uploadFile", file);
       try {

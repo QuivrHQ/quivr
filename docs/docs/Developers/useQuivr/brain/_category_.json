@@ -1,8 +1,0 @@
-{
-  "label": "Brain",
-  "position": 3,
-  "link": {
-    "type": "generated-index",
-    "description": "A brain groups all your knowledge in a single place. You can create as many brains as you want, and each brain can have its own set of knowledge."
-  }
-}

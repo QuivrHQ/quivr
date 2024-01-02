@@ -29,6 +29,7 @@ export type MinimalBrainForUser = {
   role: BrainRoleType;
   status: BrainAccessStatus;
   brain_type: BrainType;
+  description: string;
 };
 
 //TODO: rename rights to role in Backend and use MinimalBrainForUser instead of BackendMinimalBrainForUser

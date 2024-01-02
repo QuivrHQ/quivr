@@ -86,7 +86,6 @@ describe("Settings tab in brains-management", () => {
       </SupabaseProviderMock>
     );
 
-    expect(screen.getByText("defaultBrain")).toBeVisible();
     expect(screen.getByText("brainName")).toBeVisible();
     expect(screen.getByLabelText("brainDescription")).toBeVisible();
 

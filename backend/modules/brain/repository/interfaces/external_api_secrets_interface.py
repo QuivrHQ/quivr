@@ -1,41 +1,29 @@
 from abc import ABC, abstractmethod
-from typing import List
 from uuid import UUID
 
 
-# TODO: Replace BrainsVectors with KnowledgeVectors interface instead
-class BrainsVectorsInterface(ABC):
+class ExternalApiSecretsInterface(ABC):
     @abstractmethod
-    def create_brain_vector(self, brain_id, vector_id, file_sha1):
+    def create_secret(
+        self, user_id: UUID, brain_id: UUID, secret_name: str, secret_value
+    ) -> UUID | None:
         """
-        Create a brain vector
+        Create a new secret for the API Request in given brain
         """
         pass
 
     @abstractmethod
-    def get_vector_ids_from_file_sha1(self, file_sha1: str):
+    def read_secret(
+        self, user_id: UUID, brain_id: UUID, secret_name: str
+    ) -> UUID | None:
         """
-        Get vector ids from file sha1
-        """
-        pass
-
-    @abstractmethod
-    def get_brain_vector_ids(self, brain_id) -> List[UUID]:
-        """
-        Get brain vector ids
+        Read a secret for the API Request in given brain
         """
         pass
 
     @abstractmethod
-    def delete_file_from_brain(self, brain_id, file_name: str):
+    def delete_secret(self, user_id: UUID, brain_id: UUID, secret_name: str) -> bool:
         """
-        Delete file from brain
-        """
-        pass
-
-    @abstractmethod
-    def delete_brain_vector(self, brain_id: str):
-        """
-        Delete brain vector
+        Delete a secret from a brain
         """
         pass

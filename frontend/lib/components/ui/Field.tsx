@@ -34,7 +34,7 @@ const Field = forwardRef(
     return (
       <fieldset className={cn("flex flex-col w-full", className)} name={name}>
         {label !== undefined && (
-          <label htmlFor={name} className="text-sm">
+          <label htmlFor={name} className="text-sm font-semibold mb-2">
             {label}
             {required && <span>*</span>}
           </label>

@@ -10,7 +10,7 @@ import { MdContentPaste, MdShare } from "react-icons/md";
 import { BrainUsers } from "@/lib/components/BrainUsers/BrainUsers";
 import { UserToInvite } from "@/lib/components/UserToInvite";
 import Button from "@/lib/components/ui/Button";
-import { Modal } from "@/lib/components/ui/Modal";
+import { Modal } from "@/lib/components/ui/ModalPayment";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 import { useShareBrain } from "@/lib/hooks/useShareBrain";
 

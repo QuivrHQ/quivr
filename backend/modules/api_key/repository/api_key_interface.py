@@ -7,7 +7,14 @@ from modules.api_key.entity.api_key import ApiKey
 
 class ApiKeysInterface(ABC):
     @abstractmethod
-    def create_api_key(self, new_key_id: UUID, new_api_key: str, user_id: UUID):
+    def create_api_key(
+        self,
+        new_key_id: UUID,
+        new_api_key: str,
+        user_id: UUID,
+        days: int,
+        only_chat: bool,
+    ):
         pass
 
     @abstractmethod

@@ -18,6 +18,9 @@ export const useCreateEditorState = () => {
   const editor = useEditor(
     {
       autofocus: true,
+      onFocus: () => {
+        editor?.commands.focus("end");
+      },
       extensions: [
         Placeholder.configure({
           showOnlyWhenEditable: true,

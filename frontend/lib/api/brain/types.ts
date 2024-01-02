@@ -10,7 +10,7 @@ export type ApiBrainDefinitionSchemaProperty = {
   description: string;
   name: string;
 };
-export const allowedRequestMethods = ["GET", "POST", "PUT", "DELETE"];
+export const allowedRequestMethods = ["GET", "POST", "PUT", "DELETE"] as const;
 
 export type AllowedRequestMethod = (typeof allowedRequestMethods)[number];
 
@@ -21,6 +21,17 @@ export type ApiBrainDefinitionSchema = {
 
 export type SubscriptionUpdatableProperties = {
   role: BrainRoleType | null;
+};
+
+export type ListFilesProps = {
+  files: {
+      file_name: string;
+      file_sha1: string;
+      file_size: number;
+      file_url: string;
+      file_id: string;
+      file_similarity: number;
+  }[];
 };
 
 export type ApiBrainDefinitionSecret = {
@@ -49,6 +60,7 @@ export type CreateBrainInput = {
   brain_type?: BrainType;
   brain_definition?: Omit<ApiBrainDefinition, "brain_id">;
   brain_secrets_values?: Record<string, string>;
+  connected_brains_ids?: UUID[];
 };
 
 export type UpdateBrainInput = Partial<CreateBrainInput>;

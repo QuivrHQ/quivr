@@ -27,7 +27,7 @@ export const useBrainFetcher = ({ brainId }: UseBrainFetcherProps) => {
     }
   };
 
-  const { data: brain } = useQuery({
+  const { data: brain, isLoading } = useQuery({
     queryKey: [getBrainDataKey(brainId!)],
     queryFn: fetchBrain,
     enabled: brainId !== undefined,
@@ -42,5 +42,6 @@ export const useBrainFetcher = ({ brainId }: UseBrainFetcherProps) => {
   return {
     brain,
     refetchBrain: invalidateBrainQuery,
+    isLoading,
   };
 };

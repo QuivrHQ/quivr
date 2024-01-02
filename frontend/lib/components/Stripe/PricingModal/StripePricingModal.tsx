@@ -1,5 +1,5 @@
 import { StripePricingTable } from "./components/PricingTable/PricingTable";
-import { Modal } from "../../ui/Modal";
+import { Modal } from "../../ui/ModalPayment";
 
 type StripePricingModalProps = {
   Trigger: JSX.Element;

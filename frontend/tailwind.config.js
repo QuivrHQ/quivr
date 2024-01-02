@@ -16,7 +16,12 @@ module.exports = {
       },
       colors: {
         black: "#11243E",
-        primary: "#7A27FD",
+        primary: "#6142D4",
+        secondary: "#F3ECFF",
+        tertiary: "#F6F4FF",
+        accent: "#13ABBA",
+        highlight: "#FAFAFA",
+        "accent-hover": "#008491",
         "chat-bg-gray": "#D9D9D9",
         "msg-gray": "#9B9B9B",
         "msg-header-gray": "#8F8F8F",
@@ -26,5 +31,5 @@ module.exports = {
       },
     },
   },
-  plugins: [require("@tailwindcss/typography")],
+  plugins: [require("@tailwindcss/typography"), require("@tailwindcss/forms")],
 };

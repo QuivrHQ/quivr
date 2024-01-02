@@ -25,7 +25,7 @@ export const useBrainProvider = () => {
   const [allBrains, setAllBrains] = useState<MinimalBrainForUser[]>([]);
   const [currentBrainId, setCurrentBrainId] = useState<null | UUID>(null);
   const [defaultBrainId, setDefaultBrainId] = useState<UUID>();
-  const [isFetchingBrains, setIsFetchingBrains] = useState(false);
+  const [isFetchingBrains, setIsFetchingBrains] = useState(true);
   const [publicPrompts, setPublicPrompts] = useState<Prompt[]>([]);
   const [currentPromptId, setCurrentPromptId] = useState<null | string>(null);
 

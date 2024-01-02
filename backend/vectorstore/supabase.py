@@ -43,7 +43,11 @@ class CustomSupabaseVectorStore(SupabaseVectorStore):
         match_result = [
             (
                 Document(
-                    metadata=search.get("metadata", {}),  # type: ignore
+                    metadata={
+                        **search.get("metadata", {}),
+                        "id": search.get("id", ""),
+                        "similarity": search.get("similarity", 0.0),
+                    },
                     page_content=search.get("content", ""),
                 ),
                 search.get("similarity", 0.0),

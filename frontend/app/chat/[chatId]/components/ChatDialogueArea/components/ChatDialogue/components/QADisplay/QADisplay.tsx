@@ -1,6 +1,7 @@
 import { ChatMessage } from "@/app/chat/[chatId]/types";
 
 import { MessageRow } from "./components";
+import "./styles.css";
 
 type QADisplayProps = {
   content: ChatMessage;

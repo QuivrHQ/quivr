@@ -1,6 +1,15 @@
 /* eslint-disable max-lines */
 const nextConfig = {
-  output: 'standalone',
+  output: "standalone",
+  redirects: async () => {
+    return [
+      {
+        source: "/brains-management/library",
+        destination: "/library",
+        permanent: false,
+      },
+    ];
+  },
   images: {
     domains: [
       "www.quivr.app",
@@ -27,6 +36,7 @@ const ContentSecurityPolicy = {
     "https://fonts.googleapis.com",
     process.env.NEXT_PUBLIC_SUPABASE_URL,
     "https://api.june.so",
+    "https://us.posthog.com",
     process.env.NEXT_PUBLIC_FRONTEND_URL,
   ],
   "connect-src": [
@@ -38,6 +48,7 @@ const ContentSecurityPolicy = {
     "https://api.openai.com",
     "https://cdn.growthbook.io",
     "https://vitals.vercel-insights.com/v1/vitals",
+    "https://us.posthog.com"
   ],
   "img-src": [
     "'self'",
@@ -59,8 +70,11 @@ const ContentSecurityPolicy = {
     process.env.NEXT_PUBLIC_FRONTEND_URL,
     "https://www.google-analytics.com/",
     "https://js.stripe.com",
+    "https://us.posthog.com"
   ],
-  "frame-src": ["https://js.stripe.com"],
+  "frame-src": ["https://js.stripe.com",
+    "https://us.posthog.com"
+  ],
   "frame-ancestors": ["'none'"],
   "style-src": ["'unsafe-inline'", process.env.NEXT_PUBLIC_FRONTEND_URL],
 };

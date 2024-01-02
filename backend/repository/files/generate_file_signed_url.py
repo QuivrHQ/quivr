@@ -5,7 +5,7 @@ from supabase.client import Client
 
 logger = get_logger()
 
-SIGNED_URL_EXPIRATION_PERIOD_IN_SECONDS = 600
+SIGNED_URL_EXPIRATION_PERIOD_IN_SECONDS = 3600
 
 
 def generate_file_signed_url(path):

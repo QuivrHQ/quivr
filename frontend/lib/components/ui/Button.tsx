@@ -12,12 +12,12 @@ import { FaSpinner } from "react-icons/fa";
 import { cn } from "@/lib/utils";
 
 const ButtonVariants = cva(
-  "px-8 py-3 text-sm disabled:opacity-80 text-center font-medium rounded-md focus:ring ring-primary/10 outline-none flex items-center justify-center gap-2 transition-opacity",
+  "px-8 py-3 text-sm disabled:opacity-80 text-center font-medium rounded-md focus:ring ring-primary/10 outline-none flex items-center justify-center gap-2 transition-opacity focus:ring-0",
   {
     variants: {
       variant: {
         primary:
-          "bg-black border border-black dark:border-white disabled:bg-gray-500 disabled:hover:bg-gray-500 text-white dark:bg-white dark:text-black hover:bg-gray-700 dark:hover:bg-gray-200 transition-colors",
+          "bg-primary border border-black dark:border-white disabled:bg-gray-500 disabled:hover:bg-gray-500 text-white dark:bg-white dark:text-black hover:bg-gray-700 dark:hover:bg-gray-200 transition-colors",
         tertiary:
           "text-black dark:text-white bg-transparent py-2 px-4 disabled:opacity-25",
         secondary:
@@ -68,7 +68,6 @@ const Button = forwardRef(
         {children} {isLoading && <FaSpinner className="animate-spin" />}
       </>
     );
-    const buttonElement = <button {...buttonProps}>buttonChildren</button>;
 
     if (tooltip !== undefined) {
       return (

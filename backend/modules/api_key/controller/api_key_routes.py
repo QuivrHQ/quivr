@@ -2,7 +2,6 @@ from secrets import token_hex
 from typing import List
 from uuid import uuid4
 
-from asyncpg.exceptions import UniqueViolationError
 from fastapi import APIRouter, Depends
 from logger import get_logger
 from middlewares.auth import AuthBearer, get_current_user
@@ -38,23 +37,18 @@ async def create_api_key(current_user: UserIdentity = Depends(get_current_user))
 
     new_key_id = uuid4()
     new_api_key = token_hex(16)
-    api_key_inserted = False
 
-    while not api_key_inserted:
-        try:
-            # Attempt to insert new API key into database
-            api_keys_repository.create_api_key(new_key_id, new_api_key, current_user.id)
-            api_key_inserted = True
-
-        except UniqueViolationError:
-            # Generate a new API key if the current one is already in use
-            new_api_key = token_hex(16)
-        except Exception as e:
-            logger.error(f"Error creating new API key: {e}")
-            return {"api_key": "Error creating new API key."}
+    try:
+        # Attempt to insert new API key into database
+        response = api_keys_repository.create_api_key(
+            new_key_id, new_api_key, current_user.id, "api_key", 30, False
+        )
+    except Exception as e:
+        logger.error(f"Error creating new API key: {e}")
+        return {"api_key": "Error creating new API key."}
     logger.info(f"Created new API key for user {current_user.email}.")
 
-    return {"api_key": new_api_key, "key_id": str(new_key_id)}
+    return response  # type: ignore
 
 
 @api_key_router.delete(

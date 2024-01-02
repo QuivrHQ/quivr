@@ -70,6 +70,8 @@ export const UserToInvite = ({
         onChange={setSelectedRole}
         value={selectedRole}
         options={translatedOptions}
+        popoverSide="bottom"
+        popoverClassName="w-36"
       />
     </div>
   );

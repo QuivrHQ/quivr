@@ -112,6 +112,9 @@ $$;
 CREATE TABLE IF NOT EXISTS api_keys(
     key_id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     user_id UUID REFERENCES auth.users (id),
+    name TEXT DEFAULT 'API_KEY', 
+    days INT DEFAULT 30,
+    only_chat BOOLEAN DEFAULT false,
     api_key TEXT UNIQUE,
     creation_time TIMESTAMP DEFAULT current_timestamp,
     deleted_time TIMESTAMP,
@@ -130,7 +133,7 @@ DO $$
 BEGIN 
 IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'brain_type_enum') THEN
   -- Create the ENUM type 'brain_type' if it doesn't exist
-  CREATE TYPE brain_type_enum AS ENUM ('doc', 'api');
+  CREATE TYPE brain_type_enum AS ENUM ('doc', 'api', 'composite');
 END IF;
 END $$;
 
@@ -201,6 +204,14 @@ CREATE TABLE IF NOT EXISTS brain_subscription_invitations (
   rights VARCHAR(255),
   PRIMARY KEY (brain_id, email),
   FOREIGN KEY (brain_id) REFERENCES brains (brain_id)
+);
+
+-- Table for storing the relationship between brains for composite brains
+CREATE TABLE IF NOT EXISTS composite_brain_connections (
+  composite_brain_id UUID NOT NULL REFERENCES brains(brain_id),
+  connected_brain_id UUID NOT NULL REFERENCES brains(brain_id),
+  PRIMARY KEY (composite_brain_id, connected_brain_id),
+  CHECK (composite_brain_id != connected_brain_id)
 );
 
 --- Create user_identity table
@@ -441,9 +452,16 @@ begin
 end;
 $$;
 
+create schema if not exists extensions;
+
+create table if not exists
+  extensions.wrappers_fdw_stats ();
+
+grant all on extensions.wrappers_fdw_stats to service_role;
+
 
 INSERT INTO migrations (name) 
-SELECT '20231128173900_remove_openai_api_key'
+SELECT '20231205163000_new_table_composite_brain_connections'
 WHERE NOT EXISTS (
-    SELECT 1 FROM migrations WHERE name = '20231128173900_remove_openai_api_key'
+    SELECT 1 FROM migrations WHERE name = '20231205163000_new_table_composite_brain_connections'
 );

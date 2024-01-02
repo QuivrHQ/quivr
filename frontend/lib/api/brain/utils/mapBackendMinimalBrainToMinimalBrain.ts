@@ -11,4 +11,5 @@ export const mapBackendMinimalBrainToMinimalBrain = (
   role: backendMinimalBrain.rights,
   status: backendMinimalBrain.status,
   brain_type: backendMinimalBrain.brain_type,
+  description: backendMinimalBrain.description,
 });

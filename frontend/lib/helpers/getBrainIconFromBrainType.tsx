@@ -1,5 +1,5 @@
 import { IconType } from "react-icons/lib";
-import { LuBrain } from "react-icons/lu";
+import { LuBot, LuBrain } from "react-icons/lu";
 import { PiPaperclipFill } from "react-icons/pi";
 import { TbWorld } from "react-icons/tb";
 
@@ -8,6 +8,7 @@ type GetBrainIconFromBrainTypeOptions = {
   iconSize?: number;
   ApiBrainIcon?: IconType;
   DocBrainIcon?: IconType;
+  iconClassName?: string;
 };
 
 export const getBrainIconFromBrainType = (
@@ -20,11 +21,15 @@ export const getBrainIconFromBrainType = (
   const DocBrainIcon = options?.DocBrainIcon ?? PiPaperclipFill;
 
   if (brainType === undefined) {
-    return <LuBrain size={iconSize} />;
+    return <LuBrain size={iconSize} className={options?.iconClassName} />;
   }
   if (brainType === "api") {
-    return <ApiBrainIcon size={iconSize} />;
+    return <ApiBrainIcon size={iconSize} className={options?.iconClassName} />;
   }
 
-  return <DocBrainIcon size={iconSize} />;
+  if (brainType === "composite") {
+    return <LuBot size={iconSize} className={options?.iconClassName} />;
+  }
+
+  return <DocBrainIcon size={iconSize} className={options?.iconClassName} />;
 };

@@ -5,14 +5,15 @@ from llm.utils.extract_api_brain_definition_values_from_llm_output import (
     extract_api_brain_definition_values_from_llm_output,
 )
 from llm.utils.make_api_request import get_api_call_response_as_text
-from repository.api_brain_definition.get_api_brain_definition import (
-    get_api_brain_definition,
-)
-from repository.external_api_secret.read_secret import read_secret
+from modules.brain.service.api_brain_definition_service import ApiBrainDefinitionService
+from modules.brain.service.brain_service import BrainService
+
+brain_service = BrainService()
+api_brain_definition_service = ApiBrainDefinitionService()
 
 
 def call_brain_api(brain_id: UUID, user_id: UUID, arguments: dict) -> str:
-    brain_definition = get_api_brain_definition(brain_id)
+    brain_definition = api_brain_definition_service.get_api_brain_definition(brain_id)
 
     if brain_definition is None:
         raise HTTPException(
@@ -31,7 +32,7 @@ def call_brain_api(brain_id: UUID, user_id: UUID, arguments: dict) -> str:
     secrets_values = {}
 
     for secret in secrets:
-        secret_value = read_secret(
+        secret_value = brain_service.external_api_secrets_repository.read_secret(
             user_id=user_id, brain_id=brain_id, secret_name=secret.name
         )
         secrets_values[secret.name] = secret_value

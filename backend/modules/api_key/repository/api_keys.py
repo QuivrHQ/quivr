@@ -1,7 +1,9 @@
 from datetime import datetime
+from typing import Optional
 from uuid import UUID
 
 from models.settings import get_supabase_client
+from modules.api_key.entity.api_key import ApiKey
 from modules.api_key.repository.api_key_interface import ApiKeysInterface
 
 
@@ -10,7 +12,9 @@ class ApiKeys(ApiKeysInterface):
         supabase_client = get_supabase_client()
         self.db = supabase_client  # type: ignore
 
-    def create_api_key(self, new_key_id, new_api_key, user_id):
+    def create_api_key(
+        self, new_key_id, new_api_key, user_id, name, days=30, only_chat=False
+    ) -> Optional[ApiKey]:
         response = (
             self.db.table("api_keys")
             .insert(
@@ -19,6 +23,9 @@ class ApiKeys(ApiKeysInterface):
                         "key_id": str(new_key_id),
                         "user_id": str(user_id),
                         "api_key": str(new_api_key),
+                        "name": str(name),
+                        "days": int(days),
+                        "only_chat": bool(only_chat),
                         "creation_time": datetime.utcnow().strftime(
                             "%Y-%m-%d %H:%M:%S"
                         ),
@@ -28,7 +35,9 @@ class ApiKeys(ApiKeysInterface):
             )
             .execute()
         )
-        return response
+        if len(response.data) == 0:
+            return None
+        return ApiKey(**response.data[0])
 
     def delete_api_key(self, key_id: str, user_id: UUID):
         return (
@@ -48,7 +57,7 @@ class ApiKeys(ApiKeysInterface):
             self.db.table("api_keys")
             .select("api_key", "creation_time")
             .filter("api_key", "eq", api_key)
-            .filter("is_active", "eq", True)
+            .filter("is_active", "eq", str(True))
             .execute()
         )
         return response

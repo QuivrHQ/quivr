@@ -12,28 +12,33 @@ from modules.brain.entity.brain_entity import (
 )
 from modules.brain.repository.brains import Brains
 from modules.brain.repository.brains_users import BrainsUsers
+from modules.brain.repository.external_api_secrets import ExternalApiSecrets
 from modules.brain.repository.interfaces.brains_interface import BrainsInterface
 from modules.brain.repository.interfaces.brains_users_interface import (
     BrainsUsersInterface,
 )
+from modules.brain.repository.interfaces.external_api_secrets_interface import (
+    ExternalApiSecretsInterface,
+)
+from modules.brain.service.api_brain_definition_service import ApiBrainDefinitionService
 from modules.brain.service.brain_service import BrainService
 from modules.user.entity.user_identity import UserIdentity
-from repository.api_brain_definition.get_api_brain_definition import (
-    get_api_brain_definition,
-)
 
 logger = get_logger(__name__)
 
 brain_service = BrainService()
+api_brain_definition_service = ApiBrainDefinitionService()
 
 
 class BrainUserService:
     brain_repository: BrainsInterface
     brain_user_repository: BrainsUsersInterface
+    external_api_secrets_repository: ExternalApiSecretsInterface
 
     def __init__(self):
         self.brain_repository = Brains()
         self.brain_user_repository = BrainsUsers()
+        self.external_api_secrets_repository = ExternalApiSecrets()
 
     def get_user_default_brain(self, user_id: UUID) -> BrainEntity | None:
         brain_id = self.brain_user_repository.get_user_default_brain_id(user_id)
@@ -53,14 +58,16 @@ class BrainUserService:
             raise HTTPException(status_code=404, detail="Brain not found.")
 
         if brain_to_delete_user_from.brain_type == BrainType.API:
-            brain_definition = get_api_brain_definition(brain_id=brain_id)
+            brain_definition = api_brain_definition_service.get_api_brain_definition(
+                brain_id=brain_id
+            )
             if brain_definition is None:
                 raise HTTPException(
                     status_code=404, detail="Brain definition not found."
                 )
             secrets = brain_definition.secrets
             for secret in secrets:
-                self.brain_repository.delete_secret(
+                self.external_api_secrets_repository.delete_secret(
                     user_id=user_id,
                     brain_id=brain_id,
                     secret_name=secret.name,

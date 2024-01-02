@@ -1,7 +1,13 @@
+/*eslint complexity: ["error", 10]*/
+
 /* eslint-disable max-lines */
 import { BsCheckCircleFill } from "react-icons/bs";
 
-import Popover from "@/lib/components/ui/Popover";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/lib/components/ui/Popover";
 import { cn } from "@/lib/utils";
 
 export type SelectOptionProps<T> = {
@@ -17,6 +23,8 @@ type SelectProps<T> = {
   readOnly?: boolean;
   className?: string;
   emptyLabel?: string;
+  popoverClassName?: string;
+  popoverSide?: "top" | "bottom" | "left" | "right" | undefined;
 };
 
 const selectedStyle = "rounded-lg bg-black text-white";
@@ -29,6 +37,8 @@ export const Select = <T extends string | number>({
   readOnly = false,
   className,
   emptyLabel,
+  popoverClassName,
+  popoverSide,
 }: SelectProps<T>): JSX.Element => {
   const selectedValueLabel = options.find(
     (option) => option.value === value
@@ -74,8 +84,8 @@ export const Select = <T extends string | number>({
         </label>
       )}
       <div className="relative">
-        <Popover
-          Trigger={
+        <Popover>
+          <PopoverTrigger>
             <button
               type="button"
               className="relative w-full cursor-default rounded-md bg-white py-1.5 pl-3 pr-10 text-left text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 sm:text-sm sm:leading-6"
@@ -101,30 +111,33 @@ export const Select = <T extends string | number>({
                 </svg>
               </span>
             </button>
-          }
-          CloseTrigger={<div />}
-        >
-          <ul role="listbox">
-            {options.map((option) => (
-              <li
-                className="text-gray-900 relative cursor-pointer select-none py-2"
-                id="listbox-option-0"
-                key={option.value}
-                onClick={() => onChange(option.value)}
-              >
-                <div
-                  className={`flex items-center px-3 py-2 ${
-                    value === option.value && selectedStyle
-                  }`}
+          </PopoverTrigger>
+          <PopoverContent
+            className={cn("max-h-[200px] overflow-scroll", popoverClassName)}
+            side={popoverSide ?? "top"}
+          >
+            <ul role="listbox">
+              {options.map((option) => (
+                <li
+                  className="text-gray-900 relative cursor-pointer select-none py-0"
+                  id="listbox-option-0"
+                  key={option.value}
+                  onClick={() => onChange(option.value)}
                 >
-                  <span className="font-bold block truncate mr-2">
-                    {option.label}
-                  </span>
-                  {value === option.value && <BsCheckCircleFill />}
-                </div>
-              </li>
-            ))}
-          </ul>
+                  <div
+                    className={`flex items-center px-3 py-2 ${
+                      value === option.value && selectedStyle
+                    }`}
+                  >
+                    <span className="font-bold block truncate mr-2">
+                      {option.label}
+                    </span>
+                    {value === option.value && <BsCheckCircleFill />}
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </PopoverContent>
         </Popover>
       </div>
     </div>
