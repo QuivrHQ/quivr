@@ -22,7 +22,9 @@ if (
   process.env.NEXT_PUBLIC_POSTHOG_HOST != null
 ) {
   posthog.init(process.env.NEXT_PUBLIC_POSTHOG_KEY, {
-    api_host: process.env.NEXT_PUBLIC_POSTHOG_HOST,
+    ui_host: process.env.NEXT_PUBLIC_POSTHOG_HOST,
+    // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+    api_host: `${process.env.NEXT_PUBLIC_FRONTEND_URL}/ingest`,
     opt_in_site_apps: true,
     disable_session_recording: true,
   });
