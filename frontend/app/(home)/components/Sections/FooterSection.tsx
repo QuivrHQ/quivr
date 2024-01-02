@@ -56,7 +56,7 @@ export const FooterSection = (): JSX.Element => {
             href={LINKEDIN_URL}
             target="_blank"
             rel="noopener noreferrer"
-            aria-label="Quivr LinkedIn"
+            aria-label="SpringerAI LinkedIn"
             className="hover:text-black"
           >
             <FaLinkedin size={52} />
@@ -67,7 +67,7 @@ export const FooterSection = (): JSX.Element => {
             href={TWITTER_URL}
             target="_blank"
             rel="noopener noreferrer"
-            aria-label="Quivr Twitter"
+            aria-label="SpringerAI Twitter"
             className="hover:text-black"
           >
             <RiTwitterXLine size={52} />
@@ -78,7 +78,7 @@ export const FooterSection = (): JSX.Element => {
             href={GITHUB_URL}
             target="_blank"
             rel="noopener noreferrer"
-            aria-label="Quivr GitHub"
+            aria-label="SpringerAI GitHub"
             className="hover:text-black"
           >
             <FaGithub size={52} />

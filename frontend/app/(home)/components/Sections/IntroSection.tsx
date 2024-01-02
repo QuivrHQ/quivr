@@ -19,7 +19,7 @@ export const IntroSection = (): JSX.Element => {
         <div className="w-[80vw] lg:w-[50%] lg:shrink-0 flex flex-col justify-center gap-10 sm:gap-20 lg:gap-32 xl:gap-36">
           <div>
             <h1 className="text-5xl leading-[4rem] sm:text-6xl sm:leading-[5rem] lg:text-[4.2rem] lg:leading-[6rem] font-bold text-black block max-w-2xl">
-              {t("title")} <span className="text-primary">Quivr</span>
+              {t("title")} <span className="text-primary">SpringerAI</span>
             </h1>
             <br />
             <p className="text-xl">{t("subtitle")}</p>
@@ -58,14 +58,14 @@ export const IntroSection = (): JSX.Element => {
         <div className="w-[80vw] lg:w-[calc(50vw)] lg:shrink-0 lg:max-h-[calc(80vh-100px)] rounded flex items-center justify-center lg:justify-start">
           <Image
             src={laptopImage}
-            alt="Quivr on laptop"
+            alt="SpringerAI on laptop"
             width={1200}
             height={1200}
             className="hidden sm:block max-w-[calc(80vh-100px)] max-h-[calc(80vh-100px)] xl:scale-125"
           />
           <Image
             src={smartphoneImage}
-            alt="Quivr on smartphone"
+            alt="SpringerAI on smartphone"
             width={640}
             height={640}
             className="sm:hidden"

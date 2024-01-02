@@ -9,7 +9,7 @@ from pydantic import BaseModel
 logger = get_logger(__name__)
 
 
-# TODO: Create interface for embeddings and implement it for Supabase and OpenAI (current Quivr)
+# TODO: Create interface for embeddings and implement it for Supabase and OpenAI (current SpringerAI)
 class Neurons(BaseModel):
     def create_vector(self, docs):
         documents_vector_store = get_documents_vector_store()
