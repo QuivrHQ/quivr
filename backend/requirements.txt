@@ -7,7 +7,7 @@ GitPython==3.1.36
 pdf2image==1.16.3
 nest_asyncio==1.5.6
 pypdf==3.9.0
-supabase==1.1.0
+supabase==2.3.0
 tiktoken==0.4.0
 unstructured==0.6.7
 fastapi==0.95.2
@@ -26,9 +26,9 @@ resend==0.5.1
 html5lib==1.1
 beautifulsoup4
 newspaper3k
-xlrd==1.0.0
+xlrd==2.0.1
 celery==5.2.7
-redis==4.5.4
+redis==5.0.1
 flower
 boto3==1.33.7
 botocore==1.33.7
