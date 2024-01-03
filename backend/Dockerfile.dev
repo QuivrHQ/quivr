@@ -1,5 +1,5 @@
 # Using a slim version for a smaller base image
-FROM python:3.11.6-slim-bullseye
+FROM python:3.12.1-slim-bullseye
 
 ARG DEV_MODE
 ENV DEV_MODE=$DEV_MODE
