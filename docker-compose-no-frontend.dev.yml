@@ -131,7 +131,7 @@ services:
 
   kong:
     container_name: supabase-kong
-    image: kong:2.8.1
+    image: kong:2.8.4
     restart: unless-stopped
     # https://unix.stackexchange.com/a/294837
     entrypoint: bash -c 'eval "echo \"$$(cat ~/temp.yml)\"" > ~/kong.yml && /docker-entrypoint.sh kong docker-start'
@@ -159,7 +159,7 @@ services:
 
   auth:
     container_name: supabase-auth
-    image: supabase/gotrue:v2.99.0
+    image: supabase/gotrue:v2.132.3
     depends_on:
       db:
         # Disable this if you are using an external Postgres database
@@ -239,7 +239,7 @@ services:
   realtime:
     # This container name looks inconsistent but is correct because realtime constructs tenant id by parsing the subdomain
     container_name: realtime-dev.supabase-realtime
-    image: supabase/realtime:v2.25.35
+    image: supabase/realtime:v2.25.54
     depends_on:
       db:
         # Disable this if you are using an external Postgres database
@@ -279,7 +279,7 @@ services:
 
   storage:
     container_name: supabase-storage
-    image: supabase/storage-api:v0.43.11
+    image: supabase/storage-api:v0.43.12
     depends_on:
       db:
         # Disable this if you are using an external Postgres database
@@ -322,7 +322,7 @@ services:
 
   imgproxy:
     container_name: supabase-imgproxy
-    image: darthsim/imgproxy:v3.8.0
+    image: darthsim/imgproxy:v3.21.0
     healthcheck:
       test: [ "CMD", "imgproxy", "health" ]
       timeout: 5s
@@ -338,7 +338,7 @@ services:
 
   meta:
     container_name: supabase-meta
-    image: supabase/postgres-meta:v0.68.0
+    image: supabase/postgres-meta:v0.75.0
     depends_on:
       db:
         # Disable this if you are using an external Postgres database
@@ -356,7 +356,7 @@ services:
 
   functions:
     container_name: supabase-edge-functions
-    image: supabase/edge-runtime:v1.22.4
+    image: supabase/edge-runtime:v1.30.0
     restart: unless-stopped
     depends_on:
       analytics:
@@ -378,7 +378,7 @@ services:
 
   analytics:
     container_name: supabase-analytics
-    image: supabase/logflare:1.4.0
+    image: supabase/logflare:1.5.14
     healthcheck:
       test: [ "CMD", "curl", "http://localhost:4000/health" ]
       timeout: 5s
@@ -429,7 +429,7 @@ services:
   # Comment out everything below this point if you are using an external Postgres database
   db:
     container_name: supabase-db
-    image: supabase/postgres:15.1.0.117
+    image: supabase/postgres:15.1.0.154
     healthcheck:
       test: pg_isready -U postgres -h localhost
       interval: 5s
@@ -474,7 +474,7 @@ services:
 
   vector:
     container_name: supabase-vector
-    image: timberio/vector:0.28.1-alpine
+    image: timberio/vector:0.34.2-alpine
     healthcheck:
       test:
         [
