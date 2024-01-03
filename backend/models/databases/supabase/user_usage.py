@@ -53,22 +53,31 @@ class UserUsage(Repository):
             if len(user_email_customer) == 0:
                 return False
 
+            matching_customers = (
+                self.db.table("customers")
+                .select("email,id")
+                .filter("email", "eq", user_email_customer[0]["email"])
+                .execute()
+            ).data
+
+            if len(matching_customers) == 0:
+                return False
+
+            now = datetime.now()
+
+            # Format the datetime object as a string in the appropriate format for your Supabase database
+            now_str = now.strftime("%Y-%m-%d %H:%M:%S.%f")
             subscription_still_valid = (
                 self.db.from_("subscriptions")
                 .select("*")
-                .filter("customer", "eq", user_email_customer[0]["id"])
-                .filter("current_period_end", "gte", datetime.now())
+                .filter(
+                    "customer", "eq", matching_customers[0]["id"]
+                )  # then check if current_period_end is greater than now with timestamp format
+                .filter("current_period_end", "gt", now_str)
                 .execute()
             ).data
 
             if len(subscription_still_valid) > 0:
-                matching_customers = (
-                    self.db.table("customers")
-                    .select("email")
-                    .filter("email", "eq", user_email_customer[0]["email"])
-                    .execute()
-                ).data
-
                 if len(matching_customers) > 0:
                     self.db.table("user_settings").update({"is_premium": True}).match(
                         {"user_id": str(user_id)}
