@@ -1,0 +1,58 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:base"],
+  "ignorePaths": ["node_modules", "**/node_modules/**"],
+  "commitMessagePrefix": "chore(deps): ",
+  "commitMessageTopic": "{{depName}}",
+  "commitMessageExtra": "to {{newVersion}}",
+  "dependencyDashboard": true,
+  "prConcurrentLimit": 10,
+  "rangeStrategy": "pin",
+  "vulnerabilityAlerts": {
+    "enabled": true
+  },
+  "packageRules": [
+    {
+      "matchManagers": ["pip_requirements"],
+      "matchPackagePatterns": ["*"],
+      "matchPaths": ["backend/requirements.txt"],
+      "groupName": "backend-updates",
+      "groupSlug": "backend",
+      "addLabels": ["backend"]
+    },
+    {
+      "matchManagers": ["npm"],
+      "matchPackagePatterns": ["*"],
+      "matchPaths": ["frontend/package.json"],
+      "groupName": "frontend-updates",
+      "groupSlug": "frontend",
+      "addLabels": ["frontend"]
+    },
+    {
+      "matchManagers": ["npm"],
+      "matchPackagePatterns": ["*"],
+      "matchPaths": ["cms/package.json"],
+      "groupName": "cms-updates",
+      "groupSlug": "cms",
+      "addLabels": ["cms"]
+    },
+    {
+      "matchManagers": ["dockerfile"],
+      "matchDockerfilePaths": [
+        "backend/Dockerfile",
+        "frontend/Dockerfile",
+        "cms/Dockerfile"
+      ],
+      "groupName": "backend-docker-updates",
+      "groupSlug": "backend-docker",
+      "addLabels": ["docker"]
+    },
+    {
+      "matchManagers": ["docker-compose"],
+      "matchPaths": ["docker-compose.yml"],
+      "groupName": "docker-compose-updates",
+      "groupSlug": "docker-compose",
+      "addLabels": ["docker-compose"]
+    }
+  ]
+}
