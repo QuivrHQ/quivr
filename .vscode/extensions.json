@@ -4,6 +4,7 @@
     "dbaeumer.vscode-eslint",
     "ms-python.vscode-pylance",
     "ms-pyright.pyright",
-    "inlang.vs-code-extension"
+    "inlang.vs-code-extension",
+    "denoland.vscode-deno"
   ]
 }

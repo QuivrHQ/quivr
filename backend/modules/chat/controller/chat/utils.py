@@ -35,7 +35,7 @@ def check_user_requests_limit(
     if int(userDailyUsage.daily_requests_count) >= int(daily_chat_credit):
         raise HTTPException(
             status_code=429,  # pyright: ignore reportPrivateUsage=none
-            detail="You have reached the maximum number of requests for today.",  # pyright: ignore reportPrivateUsage=none
+            detail=f"You have reached your daily chat limit of {daily_chat_credit} requests per day. Please upgrade your plan to increase your daily chat limit.",
         )
     else:
         pass

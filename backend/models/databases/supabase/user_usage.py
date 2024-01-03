@@ -32,6 +32,17 @@ class UserUsage(Repository):
         """
         matching_customers = None
         try:
+            is_premium_user = (
+                self.db.from_("user_settings")
+                .select("is_premium")
+                .filter("user_id", "eq", str(user_id))
+                .execute()
+                .data
+            )
+
+            if len(is_premium_user) > 0 and is_premium_user[0]["is_premium"]:
+                return True
+
             user_email_customer = (
                 self.db.from_("users")
                 .select("*")
@@ -42,19 +53,40 @@ class UserUsage(Repository):
             if len(user_email_customer) == 0:
                 return False
 
-            matching_customers = (
-                self.db.table("customers")
-                .select("email")
-                .filter("email", "eq", user_email_customer[0]["email"])
+            subscription_still_valid = (
+                self.db.from_("subscriptions")
+                .select("*")
+                .filter("customer", "eq", user_email_customer[0]["id"])
+                .filter("current_period_end", "gte", datetime.now())
                 .execute()
             ).data
+
+            if len(subscription_still_valid) > 0:
+                matching_customers = (
+                    self.db.table("customers")
+                    .select("email")
+                    .filter("email", "eq", user_email_customer[0]["email"])
+                    .execute()
+                ).data
+
+                if len(matching_customers) > 0:
+                    self.db.table("user_settings").update({"is_premium": True}).match(
+                        {"user_id": str(user_id)}
+                    ).execute()
+                return True
+            else:
+                self.db.table("user_settings").update({"is_premium": False}).match(
+                    {"user_id": str(user_id)}
+                ).execute()
+                return False
+
         except Exception as e:
             logger.info(matching_customers)
-            logger.error("Error while checking if user is a premium user")
+            logger.error(
+                "Error while checking if user is a premium user. Stripe needs to be configured."
+            )
             logger.error(e)
             return False
-
-        return len(matching_customers) > 0
 
     def get_user_settings(self, user_id):
         """
@@ -80,11 +112,10 @@ class UserUsage(Repository):
             raise ValueError("User settings could not be created")
 
         user_settings = user_settings_response[0]
-        user_settings["is_premium"] = False
-        is_premium_user = self.check_if_is_premium_user(user_id)
 
-        if is_premium_user:
-            user_settings["is_premium"] = True
+        check_is_premium = self.check_if_is_premium_user(user_id)
+
+        if check_is_premium:
             user_settings["max_brains"] = int(
                 os.environ.get("PREMIUM_MAX_BRAIN_NUMBER", 12)
             )
