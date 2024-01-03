@@ -15,7 +15,6 @@
     {
       "matchManagers": ["pip_requirements"],
       "matchPackagePatterns": ["*"],
-      "matchPaths": ["backend/requirements.txt"],
       "groupName": "backend-updates",
       "groupSlug": "backend",
       "addLabels": ["backend"]
@@ -23,7 +22,6 @@
     {
       "matchManagers": ["npm"],
       "matchPackagePatterns": ["*"],
-      "matchPaths": ["frontend/package.json"],
       "groupName": "frontend-updates",
       "groupSlug": "frontend",
       "addLabels": ["frontend"]
@@ -31,25 +29,19 @@
     {
       "matchManagers": ["npm"],
       "matchPackagePatterns": ["*"],
-      "matchPaths": ["cms/package.json"],
       "groupName": "cms-updates",
       "groupSlug": "cms",
       "addLabels": ["cms"]
     },
     {
       "matchManagers": ["dockerfile"],
-      "matchDockerfilePaths": [
-        "backend/Dockerfile",
-        "frontend/Dockerfile",
-        "cms/Dockerfile"
-      ],
+
       "groupName": "backend-docker-updates",
       "groupSlug": "backend-docker",
       "addLabels": ["docker"]
     },
     {
       "matchManagers": ["docker-compose"],
-      "matchPaths": ["docker-compose.yml"],
       "groupName": "docker-compose-updates",
       "groupSlug": "docker-compose",
       "addLabels": ["docker-compose"]
