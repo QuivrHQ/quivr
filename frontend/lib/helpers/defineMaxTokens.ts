@@ -13,6 +13,8 @@ export const defineMaxTokens = (
       return 4000;
     case "gpt-4":
       return 4000;
+    case "gpt-4-1106-preview":
+      return 4000;
     default:
       return 1000;
   }
