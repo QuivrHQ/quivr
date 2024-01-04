@@ -246,7 +246,7 @@ class UserUsage(Repository):
 
         if response and len(response) > 0:
             return response[0]["daily_requests_count"]
-        return None
+        return 0
 
     def increment_user_request_count(
         self, user_id, date, current_requests_count: int, number: int = 1

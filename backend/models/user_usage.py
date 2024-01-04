@@ -56,7 +56,7 @@ class UserUsage(UserIdentity):
             self.id, date
         )
 
-        if current_requests_count is None:
+        if current_requests_count == 0:
             if self.email is None:
                 raise ValueError("User Email should be defined for daily usage table")
             self.supabase_db.create_user_daily_usage(
