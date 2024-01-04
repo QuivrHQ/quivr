@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.0.159 (2024-01-04)
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.158...v0.0.159
+
 ## 0.0.158 (2024-01-04)
 
 ## What's Changed
