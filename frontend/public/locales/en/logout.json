@@ -1,8 +1,1 @@
-{
-    "title": "Logout",
-    "subtitle": "See you next time",
-    "areYouSure": "Are you sure you want to sign out ?",
-    "cancel": "Cancel",
-    "error": "Error on logout {{errorMessage}}",
-    "loggedOut": "Logged out successfully"
-}
+{"title":"Logout","subtitle":"See you next time","areYouSure":"Are you sure you want to sign out ?","cancel":"Cancel","error":"Error on logout {{errorMessage}}","loggedOut":"Logged out successfully"}

@@ -38,3 +38,4 @@ pytest-mock
 pytest-celery
 pytesseract==0.3.10
 async_generator
+posthog==3.1.0

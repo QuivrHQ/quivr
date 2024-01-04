@@ -4,12 +4,8 @@ import { ChatHistory } from "@/lib/components/ChatHistory/ChatHistory";
 import { useOnboarding } from "@/lib/hooks/useOnboarding";
 
 import { WelcomeChat } from "./components/WelcomeChat";
-import { useChatNotificationsSync } from "./hooks/useChatNotificationsSync";
-import { useChatsList } from "./hooks/useChatsList";
 
 export const ChatsList = (): JSX.Element => {
-  useChatsList();
-  useChatNotificationsSync();
   const { shouldDisplayWelcomeChat } = useOnboarding();
 
   return (

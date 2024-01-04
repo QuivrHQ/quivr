@@ -1,9 +1,0 @@
----
-sidebar_position: 5
-title: 🎯 Roadmap
----
-
-# Roadmap
-
-A personal assistant that can help you with your daily tasks, such as scheduling meetings, taking notes, and answering questions.
-![](/img/north-star-quivr.png)

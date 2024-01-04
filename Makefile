@@ -1,5 +1,5 @@
 test:
-	pytest backend/tests
+	pytest backend/
 
 dev:
 	docker compose -f docker-compose.dev.yml build backend-core

@@ -1,8 +1,10 @@
 {
-    "recommendations": [
-        "ms-pyright.pyright",
-        "dbaeumer.vscode-eslint",
-        "ms-python.vscode-pylance",
-        "ms-pyright.pyright"
-    ]
+  "recommendations": [
+    "ms-pyright.pyright",
+    "dbaeumer.vscode-eslint",
+    "ms-python.vscode-pylance",
+    "ms-pyright.pyright",
+    "inlang.vs-code-extension",
+    "denoland.vscode-deno"
+  ]
 }

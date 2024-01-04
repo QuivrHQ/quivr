@@ -1,5 +1,6 @@
 from fastapi import HTTPException
 from llm.api_brain_qa import APIBrainQA
+from llm.composite_brain_qa import CompositeBrainQA
 from llm.knowledge_brain_qa import KnowledgeBrainQA
 from modules.brain.entity.brain_entity import BrainType, RoleEnum
 from modules.brain.service.brain_authorization_service import (
@@ -12,7 +13,7 @@ models_supporting_function_calls = [
     "gpt-4",
     "gpt-4-1106-preview",
     "gpt-4-0613",
-    "gpt-3.5-turbo",
+    "gpt-3.5-turbo-1106",
     "gpt-3.5-turbo-1106",
     "gpt-3.5-turbo-0613",
 ]
@@ -57,6 +58,17 @@ class BrainfulChat(ChatInterface):
                 brain_id=brain_id,
                 streaming=streaming,
                 prompt_id=prompt_id,
+            )
+        if brain.brain_type == BrainType.COMPOSITE:
+            return CompositeBrainQA(
+                chat_id=chat_id,
+                model=model,
+                max_tokens=max_tokens,
+                temperature=temperature,
+                brain_id=brain_id,
+                streaming=streaming,
+                prompt_id=prompt_id,
+                user_id=user_id,
             )
 
         return APIBrainQA(

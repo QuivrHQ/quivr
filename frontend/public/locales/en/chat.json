@@ -51,13 +51,13 @@
   "shortcut_go_to_shortcuts": "CMDK: Go to shortcuts",
   "shortcut_go_to_user_page": "CMDU: Go to user page",
   "shortcut_manage_brains": "CMDB: Manage your brains",
-  "shortcut_select_brain": "@: Select a brain to talk",
+  "shortcut_select_brain": "@: Select a brain",
   "shortcut_select_file": "/: Select a file to talk to",
   "subtitle": "Talk to a language model about your uploaded data",
   "thinking": "Thinking...",
   "title": "Chat with {{brain}}",
   "today": "Today",
-  "tooManyRequests": "You have exceeded the number of requests per day. To continue chatting, please enter an OpenAI API key in your profile or in used brain.",
+  "tooManyRequests": "You have exceeded the number of requests per day. To continue chatting, please upgrade your account or come back tomorrow.",
   "welcome": "Welcome",
   "yesterday": "Yesterday"
 }

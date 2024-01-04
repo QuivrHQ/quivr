@@ -15,7 +15,6 @@ from modules.chat.dto.inputs import (
     CreateChatProperties,
     QuestionAndAnswer,
 )
-from modules.chat.dto.outputs import GetChatHistoryOutput
 from modules.chat.entity.chat import Chat
 from modules.chat.service.chat_service import ChatService
 from modules.notification.service.notification_service import NotificationService
@@ -118,7 +117,7 @@ async def create_question_handler(
     | UUID
     | None = Query(..., description="The ID of the brain"),
     current_user: UserIdentity = Depends(get_current_user),
-) -> GetChatHistoryOutput:
+):
     """
     Add a new question to the chat.
     """
@@ -127,7 +126,7 @@ async def create_question_handler(
 
     chat_instance.validate_authorization(user_id=current_user.id, brain_id=brain_id)
 
-    fallback_model = "gpt-3.5-turbo"
+    fallback_model = "gpt-3.5-turbo-1106"
     fallback_temperature = 0.1
     fallback_max_tokens = 512
 
@@ -136,7 +135,7 @@ async def create_question_handler(
         email=current_user.email,
     )
     user_settings = user_daily_usage.get_user_settings()
-    is_model_ok = (chat_question).model in user_settings.get("models", ["gpt-3.5-turbo"])  # type: ignore
+    is_model_ok = (chat_question).model in user_settings.get("models", ["gpt-3.5-turbo-1106"])  # type: ignore
 
     # Retrieve chat model (temperature, max_tokens, model)
     if (
@@ -156,11 +155,11 @@ async def create_question_handler(
         chat_question.max_tokens = chat_question.max_tokens or fallback_max_tokens
 
     try:
-        check_user_requests_limit(current_user)
-        is_model_ok = (chat_question).model in user_settings.get("models", ["gpt-3.5-turbo"])  # type: ignore
+        check_user_requests_limit(current_user, chat_question.model)
+        is_model_ok = (chat_question).model in user_settings.get("models", ["gpt-3.5-turbo-1106"])  # type: ignore
         gpt_answer_generator = chat_instance.get_answer_generator(
             chat_id=str(chat_id),
-            model=chat_question.model if is_model_ok else "gpt-3.5-turbo",  # type: ignore
+            model=chat_question.model if is_model_ok else "gpt-3.5-turbo-1106",  # type: ignore
             max_tokens=chat_question.max_tokens,
             temperature=chat_question.temperature,
             brain_id=str(brain_id),
@@ -169,7 +168,9 @@ async def create_question_handler(
             user_id=current_user.id,
         )
 
-        chat_answer = gpt_answer_generator.generate_answer(chat_id, chat_question)
+        chat_answer = gpt_answer_generator.generate_answer(
+            chat_id, chat_question, save_answer=True
+        )
 
         return chat_answer
     except HTTPException as e:
@@ -211,7 +212,7 @@ async def create_stream_question_handler(
         or chat_question.temperature is None
         or not chat_question.max_tokens
     ):
-        fallback_model = "gpt-3.5-turbo"
+        fallback_model = "gpt-3.5-turbo-1106"
         fallback_temperature = 0
         fallback_max_tokens = 256
 
@@ -228,13 +229,13 @@ async def create_stream_question_handler(
 
     try:
         logger.info(f"Streaming request for {chat_question.model}")
-        check_user_requests_limit(current_user)
+        check_user_requests_limit(current_user, chat_question.model)
         # TODO check if model is in the list of models available for the user
 
-        is_model_ok = chat_question.model in user_settings.get("models", ["gpt-3.5-turbo"])  # type: ignore
+        is_model_ok = chat_question.model in user_settings.get("models", ["gpt-3.5-turbo-1106"])  # type: ignore
         gpt_answer_generator = chat_instance.get_answer_generator(
             chat_id=str(chat_id),
-            model=chat_question.model if is_model_ok else "gpt-3.5-turbo",  # type: ignore
+            model=chat_question.model if is_model_ok else "gpt-3.5-turbo-1106",  # type: ignore
             max_tokens=chat_question.max_tokens,
             temperature=chat_question.temperature,  # type: ignore
             streaming=True,
@@ -244,7 +245,9 @@ async def create_stream_question_handler(
         )
 
         return StreamingResponse(
-            gpt_answer_generator.generate_stream(chat_id, chat_question),
+            gpt_answer_generator.generate_stream(
+                chat_id, chat_question, save_answer=True
+            ),
             media_type="text/event-stream",
         )
 

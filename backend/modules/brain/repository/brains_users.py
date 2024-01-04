@@ -2,6 +2,7 @@ from uuid import UUID
 
 from logger import get_logger
 from models.settings import get_supabase_client
+
 from modules.brain.entity.brain_entity import BrainUser, MinimalUserBrainEntity
 from modules.brain.repository.interfaces.brains_users_interface import (
     BrainsUsersInterface,
@@ -18,7 +19,9 @@ class BrainsUsers(BrainsUsersInterface):
     def get_user_brains(self, user_id) -> list[MinimalUserBrainEntity]:
         response = (
             self.db.from_("brains_users")
-            .select("id:brain_id, rights, brains (brain_id, name, status, brain_type)")
+            .select(
+                "id:brain_id, rights, brains (brain_id, name, status, brain_type, description)"
+            )
             .filter("user_id", "eq", user_id)
             .execute()
         )
@@ -31,6 +34,9 @@ class BrainsUsers(BrainsUsersInterface):
                     rights=item["rights"],
                     status=item["brains"]["status"],
                     brain_type=item["brains"]["brain_type"],
+                    description=item["brains"]["description"]
+                    if item["brains"]["description"] is not None
+                    else "",
                 )
             )
             user_brains[-1].rights = item["rights"]
@@ -40,7 +46,7 @@ class BrainsUsers(BrainsUsersInterface):
         response = (
             self.db.from_("brains_users")
             .select(
-                "id:brain_id, rights, brains (id: brain_id, status, name, brain_type)"
+                "id:brain_id, rights, brains (id: brain_id, status, name, brain_type, description)"
             )
             .filter("user_id", "eq", user_id)
             .filter("brain_id", "eq", brain_id)
@@ -56,6 +62,9 @@ class BrainsUsers(BrainsUsersInterface):
             rights=brain_data["rights"],
             status=brain_data["brains"]["status"],
             brain_type=brain_data["brains"]["brain_type"],
+            description=brain_data["brains"]["description"]
+            if brain_data["brains"]["description"] is not None
+            else "",
         )
 
     def delete_brain_user_by_id(

@@ -1,5 +1,172 @@
 # Changelog
 
+## 0.0.160 (2024-01-04)
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.159...v0.0.160
+
+## 0.0.159 (2024-01-04)
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.158...v0.0.159
+
+## 0.0.158 (2024-01-04)
+
+## What's Changed
+* chore(deps): pin dependencies by @renovate in https://github.com/StanGirard/quivr/pull/1975
+
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.157...v0.0.158
+
+## 0.0.157 (2024-01-04)
+
+## What's Changed
+* feat: 🎸 posthog by @StanGirard in https://github.com/StanGirard/quivr/pull/1978
+
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.156...v0.0.157
+
+## 0.0.156 (2024-01-04)
+
+## What's Changed
+* fix: 🐛 models by @StanGirard in https://github.com/StanGirard/quivr/pull/1973
+
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.155...v0.0.156
+
+## 0.0.155 (2024-01-04)
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.154...v0.0.155
+
+## 0.0.154 (2024-01-04)
+
+## What's Changed
+* feat: 🎸 models by @StanGirard in https://github.com/StanGirard/quivr/pull/1967
+
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.153...v0.0.154
+
+## 0.0.153 (2024-01-03)
+
+## What's Changed
+* chore(deps): Pin Node.js by @renovate in https://github.com/StanGirard/quivr/pull/1952
+* chore(deps): Pin dependencies by @renovate in https://github.com/StanGirard/quivr/pull/1953
+* chore(deps): Update actions/checkout action to v4 by @renovate in https://github.com/StanGirard/quivr/pull/1957
+* chore(deps): Update actions/setup-node action to v4 by @renovate in https://github.com/StanGirard/quivr/pull/1958
+* feat: 🎸 usage by @StanGirard in https://github.com/StanGirard/quivr/pull/1966
+
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.152...v0.0.153
+
+## 0.0.152 (2024-01-02)
+
+## What's Changed
+* feat: 🎸 posthog by @StanGirard in https://github.com/StanGirard/quivr/pull/1945
+
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.151...v0.0.152
+
+## 0.0.151 (2023-12-29)
+
+## What's Changed
+* feat: 🎸 posthog by @StanGirard in https://github.com/StanGirard/quivr/pull/1938
+
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.150...v0.0.151
+
+## 0.0.150 (2023-12-29)
+
+## What's Changed
+* feat: 🎸 posthog by @StanGirard in https://github.com/StanGirard/quivr/pull/1936
+
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.149...v0.0.150
+
+## 0.0.149 (2023-12-29)
+
+## What's Changed
+* feat: 🎸 pricing by @StanGirard in https://github.com/StanGirard/quivr/pull/1935
+
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.148...v0.0.149
+
+## 0.0.148 (2023-12-28)
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.147...v0.0.148
+
+## 0.0.147 (2023-12-28)
+
+## What's Changed
+* feat: 🎸 posthog by @StanGirard in https://github.com/StanGirard/quivr/pull/1931
+
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.146...v0.0.147
+
+## 0.0.146 (2023-12-28)
+
+## What's Changed
+* feat: 🎸 posthog by @StanGirard in https://github.com/StanGirard/quivr/pull/1929
+
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.145...v0.0.146
+
+## 0.0.145 (2023-12-28)
+
+## What's Changed
+* feat: 🎸 posthog by @StanGirard in https://github.com/StanGirard/quivr/pull/1927
+
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.144...v0.0.145
+
+## 0.0.144 (2023-12-27)
+
+## What's Changed
+* feat: 🎸 pricing by @StanGirard in https://github.com/StanGirard/quivr/pull/1923
+* feat(pricing): added testimonials and else by @StanGirard in https://github.com/StanGirard/quivr/pull/1925
+
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.143...v0.0.144
+
+## 0.0.143 (2023-12-27)
+
+## What's Changed
+* docs: ✏️ mintlify by @StanGirard in https://github.com/StanGirard/quivr/pull/1917
+* feat(docs): added homepage by @StanGirard in https://github.com/StanGirard/quivr/pull/1919
+* docs: ✏️ homepage by @StanGirard in https://github.com/StanGirard/quivr/pull/1922
+
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.142...v0.0.143
+
+## 0.0.142 (2023-12-18)
+
+## What's Changed
+* feat: add new brain management page by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1906
+* feat: update brain details page by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1910
+
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.141...v0.0.142
+
+## 0.0.141 (2023-12-15)
+
+## What's Changed
+* feat[i18n]: Added i18n documenation to the contribution guidelines  by @NilsJacobsen in https://github.com/StanGirard/quivr/pull/1899
+* feat: Update Explore button label by @StanGirard in https://github.com/StanGirard/quivr/pull/1901
+* feat: chat with compositeBrain ( with/out streaming) by @gozineb in https://github.com/StanGirard/quivr/pull/1883
+* feat: update brains library by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1903
+
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.140...v0.0.141
+
+## 0.0.140 (2023-12-14)
+
+## What's Changed
+* feat: Update pytest command in Makefile and add new test by @StanGirard in https://github.com/StanGirard/quivr/pull/1893
+* chore: add IDE extension for i18n handling by @NilsJacobsen in https://github.com/StanGirard/quivr/pull/1896
+* feat: add chat view new design by @mamadoudicko in https://github.com/StanGirard/quivr/pull/1897
+
+## New Contributors
+* @NilsJacobsen made their first contribution in https://github.com/StanGirard/quivr/pull/1896
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.139...v0.0.140
+
 ## 0.0.139 (2023-12-14)
 
 ## What's Changed

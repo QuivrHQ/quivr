@@ -5,6 +5,12 @@ from uuid import UUID
 
 from langchain.callbacks.streaming_aiter import AsyncIteratorCallbackHandler
 from langchain.chains import ConversationalRetrievalChain
+from llm.qa_interface import QAInterface
+from llm.rags.quivr_rag import QuivrRAG
+from llm.rags.rag_interface import RAGInterface
+from llm.utils.format_chat_history import format_chat_history
+from llm.utils.get_prompt_to_use import get_prompt_to_use
+from llm.utils.get_prompt_to_use_id import get_prompt_to_use_id
 from logger import get_logger
 from models import BrainSettings
 from modules.brain.service.brain_service import BrainService
@@ -13,13 +19,6 @@ from modules.chat.dto.inputs import CreateChatHistory
 from modules.chat.dto.outputs import GetChatHistoryOutput
 from modules.chat.service.chat_service import ChatService
 from pydantic import BaseModel
-
-from llm.qa_interface import QAInterface
-from llm.rags.quivr_rag import QuivrRAG
-from llm.rags.rag_interface import RAGInterface
-from llm.utils.format_chat_history import format_chat_history
-from llm.utils.get_prompt_to_use import get_prompt_to_use
-from llm.utils.get_prompt_to_use_id import get_prompt_to_use_id
 
 logger = get_logger(__name__)
 QUIVR_DEFAULT_PROMPT = "Your name is Quivr. You're a helpful assistant.  If you don't know the answer, just say that you don't know, don't try to make up an answer."
@@ -89,14 +88,16 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
 
     @property
     def prompt_to_use(self):
+        # TODO: move to prompt service or instruction or something
         return get_prompt_to_use(UUID(self.brain_id), self.prompt_id)
 
     @property
     def prompt_to_use_id(self) -> Optional[UUID]:
+        # TODO: move to prompt service or instruction or something
         return get_prompt_to_use_id(UUID(self.brain_id), self.prompt_id)
 
     def generate_answer(
-        self, chat_id: UUID, question: ChatQuestion
+        self, chat_id: UUID, question: ChatQuestion, save_answer: bool = True
     ) -> GetChatHistoryOutput:
         transformed_history = format_chat_history(
             chat_service.get_chat_history(self.chat_id)
@@ -128,39 +129,55 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
 
         answer = model_response["answer"]
 
-        new_chat = chat_service.update_chat_history(
-            CreateChatHistory(
-                **{
-                    "chat_id": chat_id,
-                    "user_message": question.question,
-                    "assistant": answer,
-                    "brain_id": question.brain_id,
-                    "prompt_id": self.prompt_to_use_id,
-                }
-            )
-        )
-
         brain = None
 
         if question.brain_id:
             brain = brain_service.get_brain_by_id(question.brain_id)
+
+        if save_answer:
+            # save the answer to the database or not ->  add a variable
+            new_chat = chat_service.update_chat_history(
+                CreateChatHistory(
+                    **{
+                        "chat_id": chat_id,
+                        "user_message": question.question,
+                        "assistant": answer,
+                        "brain_id": question.brain_id,
+                        "prompt_id": self.prompt_to_use_id,
+                    }
+                )
+            )
+
+            return GetChatHistoryOutput(
+                **{
+                    "chat_id": chat_id,
+                    "user_message": question.question,
+                    "assistant": answer,
+                    "message_time": new_chat.message_time,
+                    "prompt_title": self.prompt_to_use.title
+                    if self.prompt_to_use
+                    else None,
+                    "brain_name": brain.name if brain else None,
+                    "message_id": new_chat.message_id,
+                }
+            )
 
         return GetChatHistoryOutput(
             **{
                 "chat_id": chat_id,
                 "user_message": question.question,
                 "assistant": answer,
-                "message_time": new_chat.message_time,
+                "message_time": None,
                 "prompt_title": self.prompt_to_use.title
                 if self.prompt_to_use
                 else None,
-                "brain_name": brain.name if brain else None,
-                "message_id": new_chat.message_id,
+                "brain_name": None,
+                "message_id": None,
             }
         )
 
     async def generate_stream(
-        self, chat_id: UUID, question: ChatQuestion
+        self, chat_id: UUID, question: ChatQuestion, save_answer: bool = True
     ) -> AsyncIterable:
         history = chat_service.get_chat_history(self.chat_id)
         callback = AsyncIteratorCallbackHandler()
@@ -211,31 +228,46 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
         if question.brain_id:
             brain = brain_service.get_brain_by_id(question.brain_id)
 
-        streamed_chat_history = chat_service.update_chat_history(
-            CreateChatHistory(
+        if save_answer:
+            streamed_chat_history = chat_service.update_chat_history(
+                CreateChatHistory(
+                    **{
+                        "chat_id": chat_id,
+                        "user_message": question.question,
+                        "assistant": "",
+                        "brain_id": question.brain_id,
+                        "prompt_id": self.prompt_to_use_id,
+                    }
+                )
+            )
+
+            streamed_chat_history = GetChatHistoryOutput(
                 **{
-                    "chat_id": chat_id,
+                    "chat_id": str(chat_id),
+                    "message_id": streamed_chat_history.message_id,
+                    "message_time": streamed_chat_history.message_time,
                     "user_message": question.question,
                     "assistant": "",
-                    "brain_id": question.brain_id,
-                    "prompt_id": self.prompt_to_use_id,
+                    "prompt_title": self.prompt_to_use.title
+                    if self.prompt_to_use
+                    else None,
+                    "brain_name": brain.name if brain else None,
                 }
             )
-        )
-
-        streamed_chat_history = GetChatHistoryOutput(
-            **{
-                "chat_id": str(chat_id),
-                "message_id": streamed_chat_history.message_id,
-                "message_time": streamed_chat_history.message_time,
-                "user_message": question.question,
-                "assistant": "",
-                "prompt_title": self.prompt_to_use.title
-                if self.prompt_to_use
-                else None,
-                "brain_name": brain.name if brain else None,
-            }
-        )
+        else:
+            streamed_chat_history = GetChatHistoryOutput(
+                **{
+                    "chat_id": str(chat_id),
+                    "message_id": None,
+                    "message_time": None,
+                    "user_message": question.question,
+                    "assistant": "",
+                    "prompt_title": self.prompt_to_use.title
+                    if self.prompt_to_use
+                    else None,
+                    "brain_name": brain.name if brain else None,
+                }
+            )
 
         try:
             async for token in callback.aiter():
@@ -274,10 +306,11 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
         assistant += sources_string
 
         try:
-            chat_service.update_message_by_id(
-                message_id=str(streamed_chat_history.message_id),
-                user_message=question.question,
-                assistant=assistant,
-            )
+            if save_answer:
+                chat_service.update_message_by_id(
+                    message_id=str(streamed_chat_history.message_id),
+                    user_message=question.question,
+                    assistant=assistant,
+                )
         except Exception as e:
             logger.error("Error updating message by ID: %s", e)
