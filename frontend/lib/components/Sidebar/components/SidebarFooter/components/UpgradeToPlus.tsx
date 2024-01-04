@@ -1,4 +1,3 @@
-import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import { useTranslation } from "react-i18next";
 import { FiUser } from "react-icons/fi";
 
@@ -10,10 +9,9 @@ import { SidebarFooterButton } from "./SidebarFooterButton";
 export const UpgradeToPlus = (): JSX.Element => {
   const { userData } = useUserData();
   const is_premium = userData?.is_premium;
-  const featureIsOn = useFeatureIsOn("monetization");
   const { t } = useTranslation("monetization");
 
-  if (!featureIsOn || is_premium === true) {
+  if (is_premium === true) {
     return <></>;
   }
 

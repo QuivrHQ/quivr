@@ -1,4 +1,3 @@
-import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import { useTranslation } from "react-i18next";
 
 import { StripePricingModal } from "@/lib/components/Stripe";
@@ -10,11 +9,6 @@ const MANAGE_PLAN_URL = process.env.NEXT_PUBLIC_STRIPE_MANAGE_PLAN_URL;
 export const StripePricingOrManageButton = (): JSX.Element => {
   const { t } = useTranslation("monetization");
   const { userData } = useUserData();
-  const monetizationIsOn = useFeatureIsOn("monetization");
-
-  if (!monetizationIsOn) {
-    return <></>;
-  }
 
   const is_premium = userData?.is_premium ?? false;
   if (is_premium) {

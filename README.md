@@ -48,6 +48,7 @@ You can find the installation video [here](https://www.youtube.com/watch?v=cXBa6
 
   ```bash
   git clone https://github.com/StanGirard/Quivr.git && cd Quivr
+  git checkout v0.0.152 
   ```
 
 - **Step 2**: Copy the `.env.example` files
