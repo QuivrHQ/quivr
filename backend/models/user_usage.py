@@ -40,6 +40,14 @@ class UserUsage(UserIdentity):
 
         return request
 
+    def get_user_daily_usage(self, date):
+        """
+        Fetch the user daily usage from the database
+        """
+        request = self.supabase_db.get_user_requests_count_for_day(self.id, date)
+
+        return request
+
     def handle_increment_user_request_count(self, date, number=1):
         """
         Increment the user request count in the database
@@ -54,7 +62,7 @@ class UserUsage(UserIdentity):
             self.supabase_db.create_user_daily_usage(
                 user_id=self.id, date=date, user_email=self.email, number=number
             )
-            self.daily_requests_count = number
+            self.daily_requests_count = current_requests_count + number
             return
 
         self.supabase_db.increment_user_request_count(
