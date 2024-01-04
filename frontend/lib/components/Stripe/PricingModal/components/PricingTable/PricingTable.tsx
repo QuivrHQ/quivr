@@ -10,7 +10,7 @@ export const StripePricingTable = (): JSX.Element => {
           <ul className="list-none space-y-2">
             <li className="text-lg font-medium text-gray-800">🧠 3 brains</li>
             <li className="text-lg font-medium text-gray-800">
-              🙋‍♂️ 20 questions per day
+              🙋‍♂️ 20 question credits per day
             </li>
             <li className="text-lg font-medium text-gray-800">
               💾 Up to 30Mb of storage
@@ -26,7 +26,7 @@ export const StripePricingTable = (): JSX.Element => {
               🧠 Bigger & more Brains
             </li>
             <li className="text-lg font-medium text-gray-800">
-              🙋‍♂️ More daily questions
+              🙋‍♂️ More credits & access to premium models (GPT4, Mistral)
             </li>
             <li className="text-lg font-medium text-gray-800">
               🚀 Priority support
