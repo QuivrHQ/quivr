@@ -50,7 +50,7 @@ def test_create_chat_and_talk(client, api_key):
     response = client.post(
         f"/chat/{chat_id}/question?brain_id={default_brain_id}",
         json={
-            "model": "gpt-3.5-turbo",
+            "model": "gpt-3.5-turbo-1106",
             "question": "Hello, how are you?",
             "temperature": "0",
             "max_tokens": "256",
@@ -100,7 +100,7 @@ def test_create_chat_and_talk_with_no_brain(client, api_key):
     response = client.post(
         f"/chat/{chat_id}/question?brain_id=",
         json={
-            "model": "gpt-3.5-turbo",
+            "model": "gpt-3.5-turbo-1106",
             "question": "Hello, how are you?",
             "temperature": "0",
             "max_tokens": "256",

@@ -126,7 +126,7 @@ async def create_question_handler(
 
     chat_instance.validate_authorization(user_id=current_user.id, brain_id=brain_id)
 
-    fallback_model = "gpt-3.5-turbo"
+    fallback_model = "gpt-3.5-turbo-1106"
     fallback_temperature = 0.1
     fallback_max_tokens = 512
 
@@ -135,7 +135,7 @@ async def create_question_handler(
         email=current_user.email,
     )
     user_settings = user_daily_usage.get_user_settings()
-    is_model_ok = (chat_question).model in user_settings.get("models", ["gpt-3.5-turbo"])  # type: ignore
+    is_model_ok = (chat_question).model in user_settings.get("models", ["gpt-3.5-turbo-1106"])  # type: ignore
 
     # Retrieve chat model (temperature, max_tokens, model)
     if (
@@ -156,10 +156,10 @@ async def create_question_handler(
 
     try:
         check_user_requests_limit(current_user, chat_question.model)
-        is_model_ok = (chat_question).model in user_settings.get("models", ["gpt-3.5-turbo"])  # type: ignore
+        is_model_ok = (chat_question).model in user_settings.get("models", ["gpt-3.5-turbo-1106"])  # type: ignore
         gpt_answer_generator = chat_instance.get_answer_generator(
             chat_id=str(chat_id),
-            model=chat_question.model if is_model_ok else "gpt-3.5-turbo",  # type: ignore
+            model=chat_question.model if is_model_ok else "gpt-3.5-turbo-1106",  # type: ignore
             max_tokens=chat_question.max_tokens,
             temperature=chat_question.temperature,
             brain_id=str(brain_id),
@@ -212,7 +212,7 @@ async def create_stream_question_handler(
         or chat_question.temperature is None
         or not chat_question.max_tokens
     ):
-        fallback_model = "gpt-3.5-turbo"
+        fallback_model = "gpt-3.5-turbo-1106"
         fallback_temperature = 0
         fallback_max_tokens = 256
 
@@ -232,10 +232,10 @@ async def create_stream_question_handler(
         check_user_requests_limit(current_user, chat_question.model)
         # TODO check if model is in the list of models available for the user
 
-        is_model_ok = chat_question.model in user_settings.get("models", ["gpt-3.5-turbo"])  # type: ignore
+        is_model_ok = chat_question.model in user_settings.get("models", ["gpt-3.5-turbo-1106"])  # type: ignore
         gpt_answer_generator = chat_instance.get_answer_generator(
             chat_id=str(chat_id),
-            model=chat_question.model if is_model_ok else "gpt-3.5-turbo",  # type: ignore
+            model=chat_question.model if is_model_ok else "gpt-3.5-turbo-1106",  # type: ignore
             max_tokens=chat_question.max_tokens,
             temperature=chat_question.temperature,  # type: ignore
             streaming=True,
