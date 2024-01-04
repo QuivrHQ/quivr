@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.0.158 (2024-01-04)
+
+## What's Changed
+* chore(deps): pin dependencies by @renovate in https://github.com/StanGirard/quivr/pull/1975
+
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.157...v0.0.158
+
 ## 0.0.157 (2024-01-04)
 
 ## What's Changed
