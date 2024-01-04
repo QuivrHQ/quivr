@@ -43,7 +43,11 @@ export const openAiFreeModels = [
   "gpt-3.5-turbo-16k",
 ] as const;
 
-export const openAiPaidModels = [...openAiFreeModels, "gpt-4"] as const;
+export const openAiPaidModels = [
+  ...openAiFreeModels,
+  "gpt-4",
+  "gpt-4-1106-preview",
+] as const;
 
 export const anthropicModels = [
   // "claude-v1",
