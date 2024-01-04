@@ -1,6 +1,6 @@
 from logger import get_logger
 from models.databases.supabase.supabase import SupabaseDB
-from models.settings import get_supabase_db
+from models.settings import PostHogSettings, get_supabase_db
 from modules.user.entity.user_identity import UserIdentity
 
 logger = get_logger(__name__)
@@ -36,7 +36,19 @@ class UserUsage(UserIdentity):
         """
         Fetch the user settings from the database
         """
+        posthog = PostHogSettings()
         request = self.supabase_db.get_user_settings(self.id)
+        if request is not None and request.get("is_premium", False):
+            posthog.set_once_user_properties(
+                self.id, "HAS_OR_HAD_PREMIUM", {"bought_premium": "true"}
+            )
+            posthog.set_user_properties(
+                self.id, "CURRENT_PREMIUM", {"is_premium": "true"}
+            )
+        else:
+            posthog.set_user_properties(
+                self.id, "CURRENT_PREMIUM", {"is_premium": "false"}
+            )
 
         return request
 
@@ -44,7 +56,11 @@ class UserUsage(UserIdentity):
         """
         Fetch the user daily usage from the database
         """
+        posthog = PostHogSettings()
         request = self.supabase_db.get_user_requests_count_for_day(self.id, date)
+        posthog.set_user_properties(
+            self.id, "DAILY_USAGE", {"daily_chat_usage": request}
+        )
 
         return request
 
