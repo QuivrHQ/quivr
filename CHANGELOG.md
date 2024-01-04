@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.0.154 (2024-01-04)
+
+## What's Changed
+* feat: 🎸 models by @StanGirard in https://github.com/StanGirard/quivr/pull/1967
+
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.153...v0.0.154
+
 ## 0.0.153 (2024-01-03)
 
 ## What's Changed
