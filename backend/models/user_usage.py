@@ -24,6 +24,14 @@ class UserUsage(UserIdentity):
 
         return request
 
+    def get_model_settings(self):
+        """
+        Fetch the user request stats from the database
+        """
+        request = self.supabase_db.get_model_settings()
+
+        return request
+
     def get_user_settings(self):
         """
         Fetch the user settings from the database
@@ -32,7 +40,7 @@ class UserUsage(UserIdentity):
 
         return request
 
-    def handle_increment_user_request_count(self, date):
+    def handle_increment_user_request_count(self, date, number=1):
         """
         Increment the user request count in the database
         """
@@ -44,15 +52,16 @@ class UserUsage(UserIdentity):
             if self.email is None:
                 raise ValueError("User Email should be defined for daily usage table")
             self.supabase_db.create_user_daily_usage(
-                user_id=self.id, date=date, user_email=self.email
+                user_id=self.id, date=date, user_email=self.email, number=number
             )
-            self.daily_requests_count = 1
+            self.daily_requests_count = number
             return
 
         self.supabase_db.increment_user_request_count(
             user_id=self.id,
             date=date,
             current_requests_count=current_requests_count,
+            number=number,
         )
 
         self.daily_requests_count = current_requests_count

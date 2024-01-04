@@ -155,7 +155,7 @@ async def create_question_handler(
         chat_question.max_tokens = chat_question.max_tokens or fallback_max_tokens
 
     try:
-        check_user_requests_limit(current_user)
+        check_user_requests_limit(current_user, chat_question.model)
         is_model_ok = (chat_question).model in user_settings.get("models", ["gpt-3.5-turbo"])  # type: ignore
         gpt_answer_generator = chat_instance.get_answer_generator(
             chat_id=str(chat_id),
@@ -229,7 +229,7 @@ async def create_stream_question_handler(
 
     try:
         logger.info(f"Streaming request for {chat_question.model}")
-        check_user_requests_limit(current_user)
+        check_user_requests_limit(current_user, chat_question.model)
         # TODO check if model is in the list of models available for the user
 
         is_model_ok = chat_question.model in user_settings.get("models", ["gpt-3.5-turbo"])  # type: ignore
