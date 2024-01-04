@@ -40,7 +40,7 @@ class UserUsage(UserIdentity):
         request = self.supabase_db.get_user_settings(self.id)
         if request is not None and request.get("is_premium", False):
             posthog.set_once_user_properties(
-                self.id, "HAS_OR_HAD_PREMIUM", {"bought_premium": "true"}
+                self.id, "HAS_OR_HAD_PREMIUM", {"is_was_premium": "true"}
             )
             posthog.set_user_properties(
                 self.id, "CURRENT_PREMIUM", {"is_premium": "true"}
