@@ -460,6 +460,18 @@ create table if not exists
 grant all on extensions.wrappers_fdw_stats to service_role;
 
 
+CREATE TABLE public.messages (
+    message_id uuid NOT NULL DEFAULT gen_random_uuid(),
+    brain_id uuid NOT NULL,
+    user_id uuid NOT NULL,
+    content text NOT NULL,
+    created_at timestamp without time zone NOT NULL DEFAULT current_timestamp,
+    CONSTRAINT messages_pkey PRIMARY KEY (message_id),
+    CONSTRAINT messages_brain_id_fkey FOREIGN KEY (brain_id) REFERENCES public.brains (brain_id),
+    CONSTRAINT messages_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users (id)
+) TABLESPACE pg_default;
+
+
 INSERT INTO migrations (name) 
 SELECT '20231205163000_new_table_composite_brain_connections'
 WHERE NOT EXISTS (
