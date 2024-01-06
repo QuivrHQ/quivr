@@ -49,7 +49,7 @@ services:
       - 5050:5050
 
   redis:
-    image: redis:latest
+    image: redis:latest@sha256:a7cee7c8178ff9b5297cb109e6240f5072cdaaafd775ce6b586c3c704b06458e
     container_name: redis
     restart: always
     ports:
@@ -103,7 +103,7 @@ services:
 
   studio:
     container_name: supabase-studio
-    image: supabase/studio:20231123-64a766a
+    image: supabase/studio:20231123-64a766a@sha256:393669f03b739fa5f196a5a0254442d224c439acff3ebe738cb27847d5fc207d
     restart: unless-stopped
     healthcheck:
       test:
@@ -141,7 +141,7 @@ services:
 
   kong:
     container_name: supabase-kong
-    image: kong:2.8.1
+    image: kong:2.8.1@sha256:1b53405d8680a09d6f44494b7990bf7da2ea43f84a258c59717d4539abf09f6d
     restart: unless-stopped
     # https://unix.stackexchange.com/a/294837
     entrypoint: bash -c 'eval "echo \"$$(cat ~/temp.yml)\"" > ~/kong.yml && /docker-entrypoint.sh kong docker-start'
@@ -169,7 +169,7 @@ services:
 
   auth:
     container_name: supabase-auth
-    image: supabase/gotrue:v2.99.0
+    image: supabase/gotrue:v2.99.0@sha256:b503f1fac70544bb5a43d4507e6a0842dc119e4937647b1e7ade34eae7dcdbf0
     depends_on:
       db:
         # Disable this if you are using an external Postgres database
@@ -228,7 +228,7 @@ services:
 
   rest:
     container_name: supabase-rest
-    image: postgrest/postgrest:v11.2.2
+    image: postgrest/postgrest:v11.2.2@sha256:23b2dabfc7f3f1a6c11b71f2ce277191659da38ab76042a30c3c8d6c4e07b446
     depends_on:
       db:
         # Disable this if you are using an external Postgres database
@@ -249,7 +249,7 @@ services:
   realtime:
     # This container name looks inconsistent but is correct because realtime constructs tenant id by parsing the subdomain
     container_name: realtime-dev.supabase-realtime
-    image: supabase/realtime:v2.25.35
+    image: supabase/realtime:v2.25.35@sha256:634a59e298fbd012523fbc874f74a18f2ae8523b11c646a2b4052b9b943c2939
     depends_on:
       db:
         # Disable this if you are using an external Postgres database
@@ -289,7 +289,7 @@ services:
 
   storage:
     container_name: supabase-storage
-    image: supabase/storage-api:v0.43.11
+    image: supabase/storage-api:v0.43.11@sha256:2cd146f1af313019f0d03e18383e46578e7cb118bc5baa1fb7551ab56c0cb60e
     depends_on:
       db:
         # Disable this if you are using an external Postgres database
@@ -332,7 +332,7 @@ services:
 
   imgproxy:
     container_name: supabase-imgproxy
-    image: darthsim/imgproxy:v3.8.0
+    image: darthsim/imgproxy:v3.8.0@sha256:0facd355d50f3be665ebe674486f2b2e9cdaebd3f74404acd9b7fece2f661435
     healthcheck:
       test: [ "CMD", "imgproxy", "health" ]
       timeout: 5s
@@ -348,7 +348,7 @@ services:
 
   meta:
     container_name: supabase-meta
-    image: supabase/postgres-meta:v0.68.0
+    image: supabase/postgres-meta:v0.68.0@sha256:31a107dcfe9257792b49f560a5527d5fbd7128b986acad5431b269bac4d17f12
     depends_on:
       db:
         # Disable this if you are using an external Postgres database
@@ -366,7 +366,7 @@ services:
 
   functions:
     container_name: supabase-edge-functions
-    image: supabase/edge-runtime:v1.22.4
+    image: supabase/edge-runtime:v1.22.4@sha256:4e02aacd0c8fa7ab103d718e4a0ece11d7d8a9446299f523d8ac5d092fec4908
     restart: unless-stopped
     depends_on:
       analytics:
@@ -388,7 +388,7 @@ services:
 
   analytics:
     container_name: supabase-analytics
-    image: supabase/logflare:1.4.0
+    image: supabase/logflare:1.4.0@sha256:e693c787ffe1ae17b6e4e920a3cdd212416d3e1f97e1bd7cb5b67de0abbb0264
     healthcheck:
       test: [ "CMD", "curl", "http://localhost:4000/health" ]
       timeout: 5s
@@ -439,7 +439,7 @@ services:
   # Comment out everything below this point if you are using an external Postgres database
   db:
     container_name: supabase-db
-    image: supabase/postgres:15.1.0.136
+    image: supabase/postgres:15.1.0.136@sha256:fb8387fddbb6dd2fc8af512bfb721a02786e0d71ded364ed66d096574e70d81e
     healthcheck:
       test: pg_isready -U postgres -h localhost
       interval: 5s
@@ -484,7 +484,7 @@ services:
 
   vector:
     container_name: supabase-vector
-    image: timberio/vector:0.28.1-alpine
+    image: timberio/vector:0.28.1-alpine@sha256:4bc04aca94a44f04b427a490f346e7397ef7ce61fe589d718f744f7d92cb5c80
     healthcheck:
       test:
         [

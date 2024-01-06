@@ -36,10 +36,6 @@ def check_user_requests_limit(user: UserIdentity, model: str):
     for model_setting in models_price:
         if model_setting["name"] == model:
             user_choosen_model_price = model_setting["price"]
-    print(f"User {user.id} has {daily_user_count} requests for today")
-    print(f"User {user.id} has {daily_chat_credit} daily chat credit")
-    print(f"User {user.id} has {user_choosen_model_price} price for the model")
-    print(f"User {user.id} has {models_price} models price")
 
     if int(daily_user_count + user_choosen_model_price) > int(daily_chat_credit):
         raise HTTPException(

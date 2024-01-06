@@ -41,9 +41,9 @@ jobs:
         python-version: ["3.11"]
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@65d7f2d534ac1bc67fcd62888c5f4f3d2cb2b236 # v4
         with:
           python-version: ${{ matrix.python-version }}
           cache: "pip"
@@ -56,7 +56,7 @@ jobs:
           pip install pyright
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
       - name: Run pytest
-        uses: pavelzw/pytest-action@v2
+        uses: pavelzw/pytest-action@510c5e90c360a185039bea56ce8b3e7e51a16507 # v2
         with:
           verbose: true
           emoji: true

@@ -1,5 +1,37 @@
 # Changelog
 
+## 0.0.160 (2024-01-04)
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.159...v0.0.160
+
+## 0.0.159 (2024-01-04)
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.158...v0.0.159
+
+## 0.0.158 (2024-01-04)
+
+## What's Changed
+* chore(deps): pin dependencies by @renovate in https://github.com/StanGirard/quivr/pull/1975
+
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.157...v0.0.158
+
+## 0.0.157 (2024-01-04)
+
+## What's Changed
+* feat: 🎸 posthog by @StanGirard in https://github.com/StanGirard/quivr/pull/1978
+
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.156...v0.0.157
+
+## 0.0.156 (2024-01-04)
+
+## What's Changed
+* fix: 🐛 models by @StanGirard in https://github.com/StanGirard/quivr/pull/1973
+
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.155...v0.0.156
+
 ## 0.0.155 (2024-01-04)
 
 **Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.154...v0.0.155
