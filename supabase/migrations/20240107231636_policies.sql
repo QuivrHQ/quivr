@@ -1,45 +1,3 @@
-revoke delete on table "public"."documents" from "anon";
-
-revoke insert on table "public"."documents" from "anon";
-
-revoke references on table "public"."documents" from "anon";
-
-revoke select on table "public"."documents" from "anon";
-
-revoke trigger on table "public"."documents" from "anon";
-
-revoke truncate on table "public"."documents" from "anon";
-
-revoke update on table "public"."documents" from "anon";
-
-revoke delete on table "public"."documents" from "authenticated";
-
-revoke insert on table "public"."documents" from "authenticated";
-
-revoke references on table "public"."documents" from "authenticated";
-
-revoke select on table "public"."documents" from "authenticated";
-
-revoke trigger on table "public"."documents" from "authenticated";
-
-revoke truncate on table "public"."documents" from "authenticated";
-
-revoke update on table "public"."documents" from "authenticated";
-
-revoke delete on table "public"."documents" from "service_role";
-
-revoke insert on table "public"."documents" from "service_role";
-
-revoke references on table "public"."documents" from "service_role";
-
-revoke select on table "public"."documents" from "service_role";
-
-revoke trigger on table "public"."documents" from "service_role";
-
-revoke truncate on table "public"."documents" from "service_role";
-
-revoke update on table "public"."documents" from "service_role";
-
 revoke delete on table "public"."knowledge_vectors" from "anon";
 
 revoke insert on table "public"."knowledge_vectors" from "anon";
@@ -81,48 +39,6 @@ revoke trigger on table "public"."knowledge_vectors" from "service_role";
 revoke truncate on table "public"."knowledge_vectors" from "service_role";
 
 revoke update on table "public"."knowledge_vectors" from "service_role";
-
-revoke delete on table "public"."migrations" from "anon";
-
-revoke insert on table "public"."migrations" from "anon";
-
-revoke references on table "public"."migrations" from "anon";
-
-revoke select on table "public"."migrations" from "anon";
-
-revoke trigger on table "public"."migrations" from "anon";
-
-revoke truncate on table "public"."migrations" from "anon";
-
-revoke update on table "public"."migrations" from "anon";
-
-revoke delete on table "public"."migrations" from "authenticated";
-
-revoke insert on table "public"."migrations" from "authenticated";
-
-revoke references on table "public"."migrations" from "authenticated";
-
-revoke select on table "public"."migrations" from "authenticated";
-
-revoke trigger on table "public"."migrations" from "authenticated";
-
-revoke truncate on table "public"."migrations" from "authenticated";
-
-revoke update on table "public"."migrations" from "authenticated";
-
-revoke delete on table "public"."migrations" from "service_role";
-
-revoke insert on table "public"."migrations" from "service_role";
-
-revoke references on table "public"."migrations" from "service_role";
-
-revoke select on table "public"."migrations" from "service_role";
-
-revoke trigger on table "public"."migrations" from "service_role";
-
-revoke truncate on table "public"."migrations" from "service_role";
-
-revoke update on table "public"."migrations" from "service_role";
 
 revoke delete on table "public"."stats" from "anon";
 
@@ -294,11 +210,7 @@ revoke update on table "public"."vectors_old" from "service_role";
 
 alter table "public"."knowledge_vectors" drop constraint "knowledge_vectors_knowledge_id_fkey";
 
-alter table "public"."knowledge_vectors" drop constraint "knowledge_vectors_vector_id_fkey";
-
 alter table "public"."notifications" drop constraint "notifications_chat_id_fkey";
-
-alter table "public"."summaries" drop constraint "summaries_document_id_fkey";
 
 alter table "public"."api_keys" drop constraint "api_keys_user_id_fkey";
 
@@ -316,11 +228,7 @@ alter table "public"."user_daily_usage" drop constraint "user_daily_usage_user_i
 
 alter table "public"."users" drop constraint "users_id_fkey";
 
-alter table "public"."documents" drop constraint "documents_pkey";
-
 alter table "public"."knowledge_vectors" drop constraint "knowledge_vectors_pkey";
-
-alter table "public"."migrations" drop constraint "migrations_pkey";
 
 alter table "public"."stats" drop constraint "stats_pkey";
 
@@ -328,7 +236,19 @@ alter table "public"."summaries" drop constraint "summaries_pkey";
 
 alter table "public"."vectors_old" drop constraint "vectors_pkey";
 
-drop index if exists "public"."documents_pkey";
+drop table if exists "public"."documents";
+
+drop table "public"."knowledge_vectors";
+
+drop table if exists "public"."migrations";
+
+drop table "public"."stats";
+
+drop table "public"."summaries";
+
+drop table "public"."users_old";
+
+drop table "public"."vectors_old";
 
 drop index if exists "public"."knowledge_vectors_pkey";
 
@@ -339,20 +259,6 @@ drop index if exists "public"."stats_pkey";
 drop index if exists "public"."summaries_pkey";
 
 drop index if exists "public"."vectors_pkey";
-
-drop table "public"."documents";
-
-drop table "public"."knowledge_vectors";
-
-drop table "public"."migrations";
-
-drop table "public"."stats";
-
-drop table "public"."summaries";
-
-drop table "public"."users_old";
-
-drop table "public"."vectors_old";
 
 alter table "public"."api_brain_definition" enable row level security;
 
