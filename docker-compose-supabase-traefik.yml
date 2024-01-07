@@ -75,11 +75,9 @@ services:
     volumes:
       - ./backend/:/code/
     depends_on:
-      db:
-          condition: service_healthy
-      kong:
-          condition: service_healthy
-      traefik
+      - traefik
+      - db
+      - kong
 
     ports:
       - 5050:5050
@@ -97,8 +95,7 @@ services:
     ports:
       - 6379:6379
     depends_on:
-      db:
-        condition: service_healthy
+      - db
 
   worker:
     pull_policy: if_not_present
@@ -170,8 +167,7 @@ services:
       interval: 5s
       retries: 3
     depends_on:
-      analytics:
-        condition: service_healthy
+      - analytics
     environment:
       STUDIO_PG_META_URL: http://meta:8080
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
@@ -202,9 +198,8 @@ services:
       - ${KONG_HTTP_PORT}:8000/tcp
       - ${KONG_HTTPS_PORT}:8443/tcp
     depends_on:
-      analytics:
-        condition: service_healthy
-      traefik
+      - traefik
+      - analytics
     environment:
       KONG_DATABASE: "off"
       KONG_DECLARATIVE_CONFIG: /home/kong/kong.yml
