@@ -53,7 +53,7 @@ else
     
     echo "Last migration executed: $LAST_MIGRATION"
     # Iterate through the migration files
-    for file in $(ls scripts | grep -E '^[0-9]+.*\.sql$' | sort); do
+    for file in $(ls scripts.supabase | grep -E '^[0-9]+.*\.sql$' | sort); do
         MIGRATION_ID=$(basename "$file" ".sql")
         
         # Only run migrations that are newer than the last executed migration

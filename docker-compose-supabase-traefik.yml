@@ -79,6 +79,8 @@ services:
           condition: service_healthy
       kong:
           condition: service_healthy
+      traefik
+
     ports:
       - 5050:5050
     labels:
@@ -105,7 +107,7 @@ services:
       - .env
     build:
       context: backend
-      dockerfile:  Dockerfile
+      dockerfile: Dockerfile
     container_name: worker
     command: celery -A celery_worker worker -l info
     restart: always
@@ -120,7 +122,7 @@ services:
       - .env
     build:
       context: backend
-      dockerfile:  Dockerfile
+      dockerfile: Dockerfile
     container_name: beat
     command: celery -A celery_worker beat -l info
     restart: always
@@ -134,7 +136,7 @@ services:
       - .env
     build:
       context: backend
-      dockerfile:  Dockerfile
+      dockerfile: Dockerfile
     container_name: flower
     command: celery -A celery_worker flower -l info --port=5555
     restart: always
@@ -142,6 +144,7 @@ services:
       - redis
       - worker
       - beat
+      - traefik
     ports:
       - 5555:5555
     labels:
@@ -184,12 +187,16 @@ services:
       LOGFLARE_API_KEY: ${LOGFLARE_API_KEY}
       LOGFLARE_URL: http://analytics:4000
       NEXT_PUBLIC_ENABLE_LOGS: true
+      # Comment to use Big Query backend for analytics
       NEXT_ANALYTICS_BACKEND_PROVIDER: postgres
+      # Uncomment to use Big Query backend for analytics
+      # NEXT_ANALYTICS_BACKEND_PROVIDER: bigquery
 
   kong:
     container_name: supabase-kong
     image: kong:2.8.1@sha256:1b53405d8680a09d6f44494b7990bf7da2ea43f84a258c59717d4539abf09f6d
     restart: unless-stopped
+    # https://unix.stackexchange.com/a/294837
     entrypoint: bash -c 'eval "echo \"$$(cat ~/temp.yml)\"" > ~/kong.yml && /docker-entrypoint.sh kong docker-start'
     ports:
       - ${KONG_HTTP_PORT}:8000/tcp
@@ -197,9 +204,11 @@ services:
     depends_on:
       analytics:
         condition: service_healthy
+      traefik
     environment:
       KONG_DATABASE: "off"
       KONG_DECLARATIVE_CONFIG: /home/kong/kong.yml
+      # https://github.com/supabase/cli/issues/14
       KONG_DNS_ORDER: LAST,A,CNAME
       KONG_PLUGINS: request-transformer,cors,key-auth,acl,basic-auth
       KONG_NGINX_PROXY_PROXY_BUFFER_SIZE: 160k
@@ -531,7 +540,7 @@ services:
       - ./volumes/db/data:/var/lib/postgresql/data:Z
       # Changes required for Analytics support
       - ./volumes/db/logs.sql:/docker-entrypoint-initdb.d/migrations/99-logs.sql:Z
-      - ./scripts/tables.sql:/docker-entrypoint-initdb.d/seed.sql
+      - ./scripts.supabase/tables.sql:/docker-entrypoint-initdb.d/seed.sql
 
   vector:
     container_name: supabase-vector

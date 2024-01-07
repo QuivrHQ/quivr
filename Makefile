@@ -24,7 +24,7 @@ prod:
 	docker compose build backend-core
 	docker compose -f docker-compose.yml up --build
 
-prod-traefik:
+prod-supabase-traefik:
 	docker compose -f docker-compose-traefik.yml build backend-core
 	docker compose -f docker-compose-traefik.yml up --build
 
