@@ -44,11 +44,19 @@ Ensure you have the following installed:
 
 You can find the installation video [here](https://www.youtube.com/watch?v=cXBa6dZJN48).
 
+- **Step 0**: Supabase CLI
+
+  Follow the instructions [here](https://supabase.com/docs/guides/cli/getting-started) to install the Supabase CLI.
+
+  ```bash
+  supabase -v # Check that the installation worked
+  ```
+
+
 - **Step 1**: Clone the repository:
 
   ```bash
   git clone https://github.com/StanGirard/Quivr.git && cd Quivr
-  git checkout v0.0.152 
   ```
 
 - **Step 2**: Copy the `.env.example` files
@@ -67,18 +75,17 @@ You can find the installation video [here](https://www.youtube.com/watch?v=cXBa6
 
   You just need to update the `OPENAI_API_KEY` variable in the `.env` file. You can get your API key [here](https://platform.openai.com/api-keys). You need to create an account first. And put your credit card information. Don't worry, you won't be charged unless you use the API. You can find more information about the pricing [here](https://openai.com/pricing/).
 
-  > Want to use [Ollama.ai](https://ollama.ai) instead?
-  > Uncomment the following lines in the `.env` file:
-  > OLLAMA_API_BASE_URL
-  > Run the following command to start Ollama: `ollama run llama2`
-  > You can find more information about Ollama [here](https://ollama.ai/).
+  > Don't want to use OpenAI and want to use Ollama instead for a completely private experience? You can find the instructions [here](https://docs.quivr.app/developers/contribution/llm/ollama).
 
 - **Step 4**: Launch the project
 
   ```bash
+  supabase start
+  ```
+  and then 
+  ```bash
   docker compose pull
-  docker compose up --build # if OPENAI
-  # docker compose -f docker-compose-ollama.yml up --build  # Only if using Ollama. You need to run `ollama run llama2` first.
+  docker compose up
   ```
 
   If you have a Mac, go to Docker Desktop > Settings > General and check that the "file sharing implementation" is set to `VirtioFS`.
@@ -87,11 +94,11 @@ You can find the installation video [here](https://www.youtube.com/watch?v=cXBa6
 
 - **Step 5**: Login to the app
 
-  Connect to the supabase database at [http://localhost:8000/project/default/auth/users](http://localhost:8000/project/default/auth/users) with the following credentials: admin/admin in order to create new users. Auto-confirm the email.
-
-  You can now sign in to the app with your new user. You can access the app at [http://localhost:3000/login](http://localhost:3000/login).
+  You can now sign in to the app with `admin@quivr.app` & `admin`. You can access the app at [http://localhost:3000/login](http://localhost:3000/login).
 
   You can access Quivr backend API at [http://localhost:5050/docs](http://localhost:5050/docs)
+
+  You can access supabase at [http://localhost:54323](http://localhost:54323)
 
 ## Updating Quivr 🚀
 
@@ -101,18 +108,12 @@ You can find the installation video [here](https://www.youtube.com/watch?v=cXBa6
   git pull
   ```
 
-- **Step 2**: Use the `migration.sh` script to run the migration scripts
+- **Step 2**: Update the migration
 
   ```bash
-  chmod +x migration.sh # You need to install Gum & postgresql (brew install gum for example)
-  ./migration.sh
-  # Select  2) Run migrations
+  supabase migration up
   ```
 
-  Alternatively, you can run the script on the Supabase database via the web
-  interface (SQL Editor -> `New query` -> paste the script -> `Run`)
-
-  All the scripts can be found in the [scripts](scripts/) folder
 
 ## Contributors ✨
 
