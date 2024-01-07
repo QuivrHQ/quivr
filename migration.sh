@@ -45,7 +45,7 @@ CHOICE=$(gum choose --header "Choose an option" "Create all tables (First Time)"
 
 if [ "$CHOICE" == "Create all tables (First Time)" ]; then
     # Running the tables.sql file to create tables
-    run_sql_file "scripts/tables.sql"
+    run_sql_file "scripts.supabase/tables.sql"
 else
 
     # Get the last migration that was executed
@@ -60,7 +60,7 @@ else
         if [ -z "$LAST_MIGRATION" ] || [ "$MIGRATION_ID" \> "$LAST_MIGRATION" ]; then
             # Run the migration
             echo "Running migration $file"
-            run_sql_file "scripts/$file"
+            run_sql_file "scripts.supabase/$file"
             # And record it as having been run
             PGPASSWORD=${DB_PASSWORD} psql -h "${DB_HOST}" -p "${DB_PORT}" -d "${DB_NAME}" -U "${DB_USER}" -c "INSERT INTO migrations (name) VALUES ('${MIGRATION_ID}');"
         fi
