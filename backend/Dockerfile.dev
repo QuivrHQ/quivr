@@ -13,6 +13,8 @@ RUN apt-get clean && apt-get update && apt-get install -y \
     pandoc \
     curl \
     git \
+    poppler-utils \
+    tesseract-ocr \
     build-essential && \
     rm -rf /var/lib/apt/lists/* && apt-get clean
 
@@ -37,4 +39,4 @@ COPY . .
 
 EXPOSE 5050
 
-CMD ["uvicorn", "main:app","--reload", "--host", "0.0.0.0", "--port", "5050", "--workers", "6"]
+CMD ["uvicorn", "main:app", "--reload", "--host", "0.0.0.0", "--port", "5050", "--workers", "6"]
