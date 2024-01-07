@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.0.161 (2024-01-07)
+
+## What's Changed
+* feat: 🎸 policies by @StanGirard in https://github.com/StanGirard/quivr/pull/1997
+
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.160...v0.0.161
+
 ## 0.0.160 (2024-01-04)
 
 **Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.159...v0.0.160
