@@ -319,12 +319,6 @@ INSERT INTO "public"."users" ("id", "email") VALUES
 SELECT pg_catalog.setval('"auth"."refresh_tokens_id_seq"', 3, true);
 
 
---
--- Name: documents_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
---
-
-SELECT pg_catalog.setval('"public"."documents_id_seq"', 1, false);
-
 
 --
 -- Name: product_to_features_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
@@ -333,25 +327,7 @@ SELECT pg_catalog.setval('"public"."documents_id_seq"', 1, false);
 SELECT pg_catalog.setval('"public"."product_to_features_id_seq"', 1, false);
 
 
---
--- Name: stats_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
---
 
-SELECT pg_catalog.setval('"public"."stats_id_seq"', 1, false);
-
-
---
--- Name: summaries_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
---
-
-SELECT pg_catalog.setval('"public"."summaries_id_seq"', 1, false);
-
-
---
--- Name: vectors_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
---
-
-SELECT pg_catalog.setval('"public"."vectors_id_seq"', 1, false);
 
 
 --
