@@ -12,7 +12,7 @@ END $$;
 ALTER TABLE user_settings ALTER COLUMN max_brain_size SET NOT NULL;
 
 -- alter table "public"."user_settings" alter column "max_brain_size" set data type bigint using "max_brain_size"::bigint;
-ALTER TABLE user_settings ALTER COLUMN max_brain_size SET TYPE BIGINT USING max_brain_size::BIGINT;
+ALTER TABLE user_settings ALTER COLUMN max_brain_size SET DATA TYPE BIGINT USING max_brain_size::BIGINT;
 
 -- Insert migration record if it doesn't exist
 INSERT INTO migrations (name)
