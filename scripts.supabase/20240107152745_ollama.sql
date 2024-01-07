@@ -42,9 +42,9 @@ INSERT INTO public.models ("name", "price", "max_input", "max_output") VALUES
 
 -- Update migrations table
 INSERT INTO migrations (name)
-SELECT '20240103234423_models'
+SELECT '20240107152745_ollama'
 WHERE NOT EXISTS (
-    SELECT 1 FROM migrations WHERE name = '20240103234423_models'
+    SELECT 1 FROM migrations WHERE name = '20240107152745_ollama'
 );
 
 COMMIT;
