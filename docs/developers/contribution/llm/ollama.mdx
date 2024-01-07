@@ -17,6 +17,13 @@ Then run the following command to run Ollama in the background:
 ollama run llama2
 ```
 
+### Run Migrations
+
+```bash
+mv supabase/local_20240107152745_ollama.sql supabase/20240107152745_ollama.sql
+supabase db reset
+```
+
 
 ## Add Ollama Model to Quivr
 
@@ -24,7 +31,7 @@ Now that you have your model running locally, you need to add it to Quivr.
 
 In order to allow the user to choose between the  Ollama, we need to add a new model to the Quivr backend.
 
-Go to supabase and in the table `user_settings` either add by default or to your user the following value to the `models` column:
+Go to [supabase](https://localhost:54323) and in the table `user_settings` either add by default or to your user the following value to the `models` column:
 
 ```json
 [

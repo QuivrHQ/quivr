@@ -232,7 +232,8 @@ INSERT INTO "public"."chat_history" ("message_id", "chat_id", "user_message", "a
 --
 
 INSERT INTO "public"."models" ("name", "price", "max_input", "max_output") VALUES
-	('gpt-3.5-turbo-1106', 1, 2000, 1000);
+	('gpt-3.5-turbo-1106', 1, 2000, 1000),
+	('ollama/llama2', 1, 2000, 1000);
 
 
 --
