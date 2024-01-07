@@ -3,6 +3,7 @@ FROM python:3.11.6-slim-bullseye@sha256:0c1fbb294096d842ad795ee232d783cab436c90b
 
 ARG DEV_MODE
 ENV DEV_MODE=$DEV_MODE
+ENV PYTHONUNBUFFERED=1
 
 # Install GEOS library, Rust, and other dependencies, then clean up
 RUN apt-get clean && apt-get update && apt-get install -y \
@@ -13,6 +14,8 @@ RUN apt-get clean && apt-get update && apt-get install -y \
     pandoc \
     curl \
     git \
+    poppler-utils \
+    tesseract-ocr \
     build-essential && \
     rm -rf /var/lib/apt/lists/* && apt-get clean
 
@@ -37,4 +40,4 @@ COPY . .
 
 EXPOSE 5050
 
-CMD ["uvicorn", "main:app","--reload", "--host", "0.0.0.0", "--port", "5050", "--workers", "6"]
+CMD ["uvicorn", "main:app", "--reload", "--host", "0.0.0.0", "--port", "5050", "--workers", "6"]

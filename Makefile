@@ -16,9 +16,17 @@ dev-saas-back:
 dev-stan:
 	docker compose -f docker-compose-no-frontend.dev.yml up --build 
 
+dev-traefik:
+	docker compose -f docker-compose-traefik.dev.yml build backend-core
+	docker compose -f docker-compose-traefik.dev.yml up --build
+
 prod:
 	docker compose build backend-core
 	docker compose -f docker-compose.yml up --build
+
+prod-traefik:
+	docker compose -f docker-compose-traefik.yml build backend-core
+	docker compose -f docker-compose-traefik.yml up --build
 
 test-type:
 	@if command -v python3 &>/dev/null; then \

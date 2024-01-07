@@ -9,3 +9,8 @@ Old:
 quivr-backend-core   latest    056750d86247   2 minutes ago   13.4GB
 New:
 quivr-backend-core   latest    742c5d235313   15 hours ago    13.5GB
+
+# Generating ANON_KEY and SERVICE_KEY for local supabase
+
+https://supabase.com/docs/guides/self-hosting/docker#generate-api-keys
+

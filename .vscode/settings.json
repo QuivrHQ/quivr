@@ -11,6 +11,9 @@
     "./backend"
   ],
   "editor.formatOnSave": true,
+  "[sql]": {
+    "editor.formatOnSave": false,
+  },
   "[python]": {
     "editor.defaultFormatter": "ms-python.black-formatter",
     "editor.formatOnSave": true,
