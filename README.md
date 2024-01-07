@@ -80,6 +80,10 @@ You can find the installation video [here](https://www.youtube.com/watch?v=cXBa6
 - **Step 4**: Launch the project
 
   ```bash
+  supabase start
+  ```
+  and then 
+  ```bash
   docker compose pull
   docker compose up
   ```
