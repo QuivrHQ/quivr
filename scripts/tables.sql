@@ -437,12 +437,12 @@ CREATE TABLE IF NOT EXISTS public.models (
     max_output integer DEFAULT 1000
 );
 
+CREATE UNIQUE INDEX models_pkey ON public.models USING btree (name);
+
 INSERT INTO public.models ("name", "price", "max_input", "max_output") VALUES
 	('gpt-3.5-turbo-1106', 1, 2000, 1000),
   ('gpt-4', 1, 2000, 1000),
   ('gpt-4-1106-preview', 1, 2000, 1000);
-
-CREATE UNIQUE INDEX models_pkey ON public.models USING btree (name);
 
 ALTER TABLE IF EXISTS public.models ADD CONSTRAINT models_pkey PRIMARY KEY USING INDEX models_pkey;
 
