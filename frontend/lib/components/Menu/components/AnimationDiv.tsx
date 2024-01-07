@@ -3,7 +3,6 @@ import { motion } from "framer-motion";
 import { useSideBarContext } from "@/lib/context/SidebarProvider/hooks/useSideBarContext";
 
 import { useMenuWidth } from "../hooks/useMenuWidth";
-import {cn} from "@/lib/utils";
 
 type AnimatedDivProps = {
   children: React.ReactNode;
