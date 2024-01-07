@@ -42,19 +42,6 @@ describe("useBrainApi", () => {
     vi.restoreAllMocks();
   });
 
-  it("should call getBrainDocuments with the correct parameters", async () => {
-    const {
-      result: {
-        current: { getBrainDocuments },
-      },
-    } = renderHook(() => useBrainApi());
-    const brainId = "123";
-    await getBrainDocuments(brainId);
-
-    expect(axiosGetMock).toHaveBeenCalledTimes(1);
-    expect(axiosGetMock).toHaveBeenCalledWith(`/explore/?brain_id=${brainId}`);
-  });
-
   it("should call createBrain with the correct parameters", async () => {
     const {
       result: {

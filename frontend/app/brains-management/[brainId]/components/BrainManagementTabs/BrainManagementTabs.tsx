@@ -1,15 +1,12 @@
 /* eslint-disable max-lines */
-import { Content, List, Root } from "@radix-ui/react-tabs";
 import { useTranslation } from "react-i18next";
 
+import { StyledTabsTrigger } from "@/app/brains-management/components/StyledTabsTrigger";
 import Button from "@/lib/components/ui/Button";
+import Spinner from "@/lib/components/ui/Spinner";
+import { Tabs, TabsContent, TabsList } from "@/lib/components/ui/Tabs";
 
-import {
-  BrainTabTrigger,
-  KnowledgeOrSecretsTab,
-  PeopleTab,
-  SettingsTab,
-} from "./components";
+import { KnowledgeOrSecretsTab, PeopleTab, SettingsTab } from "./components";
 import { DeleteOrUnsubscribeConfirmationModal } from "./components/Modals/DeleteOrUnsubscribeConfirmationModal";
 import { useBrainFetcher } from "./hooks/useBrainFetcher";
 import { useBrainManagementTabs } from "./hooks/useBrainManagementTabs";
@@ -23,7 +20,6 @@ export const BrainManagementTabs = (): JSX.Element => {
   ]);
   const {
     selectedTab,
-    setSelectedTab,
     brainId,
     handleUnsubscribeOrDeleteBrain,
     isDeleteOrUnsubscribeModalOpened,
@@ -33,7 +29,8 @@ export const BrainManagementTabs = (): JSX.Element => {
     isOwnedByCurrentUser,
     isDeleteOrUnsubscribeRequestPending,
   } = useBrainManagementTabs();
-  const { brain } = useBrainFetcher({
+
+  const { brain, isLoading } = useBrainFetcher({
     brainId,
   });
 
@@ -46,85 +43,76 @@ export const BrainManagementTabs = (): JSX.Element => {
     return <div />;
   }
 
+  if (isLoading) {
+    return (
+      <div className="flex w-full h-full justify-center items-center">
+        <Spinner />
+      </div>
+    );
+  }
+
   return (
-    <div className="flex justify-center w-full">
-      <Root
-        className="flex flex-col w-full h-full overflow-scroll bg-white dark:bg-black p-4 md:p-10 max-w-5xl"
-        value={selectedTab}
-      >
-        <List
-          className="flex flex-col md:flex-row justify-between space-y-2 md:space-y-0 mb-4"
-          aria-label={t("subtitle", { ns: "config" })}
-        >
-          <BrainTabTrigger
-            selected={selectedTab === "settings"}
-            label={t("settings", { ns: "config" })}
-            value="settings"
-            onChange={setSelectedTab}
+    <Tabs defaultValue={selectedTab} className="flex flex-col mt-5">
+      <TabsList className="flex flex-row justify-center gap-2 border-b-2 rounded-none pb-3">
+        <StyledTabsTrigger value="settings">
+          {t("settings", { ns: "config" })}
+        </StyledTabsTrigger>
+        {(!isPublicBrain || hasEditRights) && (
+          <>
+            <StyledTabsTrigger value="people">
+              {t("people", { ns: "config" })}
+            </StyledTabsTrigger>
+            <StyledTabsTrigger value="knowledgeOrSecrets">
+              {knowledgeOrSecretsTabLabel}
+            </StyledTabsTrigger>
+          </>
+        )}
+      </TabsList>
+
+      <div className="flex-1 md:pt-0 pb-0">
+        <TabsContent value="settings">
+          <SettingsTab brainId={brainId} />
+        </TabsContent>
+        <TabsContent value="people">
+          <PeopleTab brainId={brainId} hasEditRights={hasEditRights} />
+        </TabsContent>
+        <TabsContent value="knowledgeOrSecrets">
+          <KnowledgeOrSecretsTab
+            brainId={brainId}
+            hasEditRights={hasEditRights}
           />
-          {(!isPublicBrain || hasEditRights) && (
-            <>
-              <BrainTabTrigger
-                selected={selectedTab === "people"}
-                label={t("people", { ns: "config" })}
-                value="people"
-                onChange={setSelectedTab}
-              />
-              <BrainTabTrigger
-                selected={selectedTab === "knowledgeOrSecrets"}
-                label={knowledgeOrSecretsTabLabel}
-                value="knowledgeOrSecrets"
-                onChange={setSelectedTab}
-              />
-            </>
-          )}
-        </List>
+        </TabsContent>
+      </div>
 
-        <div className="flex-1 md:pt-0 pb-0">
-          <Content value="settings">
-            <SettingsTab brainId={brainId} />
-          </Content>
-          <Content value="people">
-            <PeopleTab brainId={brainId} hasEditRights={hasEditRights} />
-          </Content>
-          <Content value="knowledgeOrSecrets">
-            <KnowledgeOrSecretsTab
-              brainId={brainId}
-              hasEditRights={hasEditRights}
-            />
-          </Content>
-        </div>
+      <div className="flex justify-center">
+        {isOwnedByCurrentUser ? (
+          <Button
+            className="px-8 md:px-20 py-2 bg-red-500 text-white rounded-md"
+            onClick={() => setIsDeleteOrUnsubscribeModalOpened(true)}
+          >
+            {t("deleteButton", { ns: "delete_or_unsubscribe_from_brain" })}
+          </Button>
+        ) : (
+          <Button
+            className="px-8 md:px-20 py-2 bg-red-500 text-white rounded-md"
+            onClick={() => setIsDeleteOrUnsubscribeModalOpened(true)}
+          >
+            {t("unsubscribeButton", {
+              ns: "delete_or_unsubscribe_from_brain",
+            })}
+          </Button>
+        )}
+      </div>
 
-        <div className="flex justify-center">
-          {isOwnedByCurrentUser ? (
-            <Button
-              className="px-8 md:px-20 py-2 bg-red-500 text-white rounded-md"
-              onClick={() => setIsDeleteOrUnsubscribeModalOpened(true)}
-            >
-              {t("deleteButton", { ns: "delete_or_unsubscribe_from_brain" })}
-            </Button>
-          ) : (
-            <Button
-              className="px-8 md:px-20 py-2 bg-red-500 text-white rounded-md"
-              onClick={() => setIsDeleteOrUnsubscribeModalOpened(true)}
-            >
-              {t("unsubscribeButton", {
-                ns: "delete_or_unsubscribe_from_brain",
-              })}
-            </Button>
-          )}
-        </div>
-
-        <DeleteOrUnsubscribeConfirmationModal
-          isOpen={isDeleteOrUnsubscribeModalOpened}
-          setOpen={setIsDeleteOrUnsubscribeModalOpened}
-          onConfirm={() => void handleUnsubscribeOrDeleteBrain()}
-          isOwnedByCurrentUser={isOwnedByCurrentUser}
-          isDeleteOrUnsubscribeRequestPending={
-            isDeleteOrUnsubscribeRequestPending
-          }
-        />
-      </Root>
-    </div>
+      <DeleteOrUnsubscribeConfirmationModal
+        isOpen={isDeleteOrUnsubscribeModalOpened}
+        setOpen={setIsDeleteOrUnsubscribeModalOpened}
+        onConfirm={() => void handleUnsubscribeOrDeleteBrain()}
+        isOwnedByCurrentUser={isOwnedByCurrentUser}
+        isDeleteOrUnsubscribeRequestPending={
+          isDeleteOrUnsubscribeRequestPending
+        }
+      />
+    </Tabs>
   );
 };

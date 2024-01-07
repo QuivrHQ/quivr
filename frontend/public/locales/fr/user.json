@@ -1,10 +1,1 @@
-{
-    "title": "Utilisation du cerveau de {{user}}",
-    "fetching": "Récupération de vos données...",
-    "requestsCount": "Requêtes d'aujourd'hui : {{count}}",
-    "brainSize": "Taille du cerveau restante",
-    "empty": "Vide",
-    "Used": "Utilisé",
-    "Unused": "Inutilisé",
-    "brainUsage": "Utilisation du cerveau"
-}
+{"title":"Utilisation du cerveau de {{user}}","fetching":"Récupération de vos données...","requestsCount":"Requêtes d'aujourd'hui : {{count}}","brainSize":"Taille du cerveau restante","empty":"Vide","Used":"Utilisé","Unused":"Inutilisé","brainUsage":"Utilisation du cerveau"}

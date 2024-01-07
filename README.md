@@ -10,7 +10,7 @@
 
 Quivr, your second brain, utilizes the power of GenerativeAI to be your personal assistant ! Think of it as Obsidian, but turbocharged with AI capabilities.
 
-[Roadmap here](https://brain.quivr.app/docs/roadmap)
+[Roadmap here](https://docs.quivr.app/docs/roadmap)
 
 ## Key Features 🎯
 
@@ -19,19 +19,19 @@ Quivr, your second brain, utilizes the power of GenerativeAI to be your personal
 - **OS Compatible**: Ubuntu 22 or newer.
 - **File Compatibility**: Text, Markdown, PDF, Powerpoint, Excel, CSV, Word, Audio, Video
 - **Open Source**: Freedom is beautiful, and so is Quivr. Open source and free to use.
-- **Public/Private**: Share your brains with your users via a public link, or keep them private. 
+- **Public/Private**: Share your brains with your users via a public link, or keep them private.
 - **Marketplace**: Share your brains with the world, or use other people's brains to boost your productivity.
+- **Offline Mode**: Quivr works offline, so you can access your data anytime, anywhere.
 
 ## Demo Highlights 🎥
 
 https://github.com/StanGirard/quivr/assets/19614572/a6463b73-76c7-4bc0-978d-70562dca71f5
 
-
 ## Getting Started 🚀
 
 Follow these instructions to get a copy of the project up and running on your local machine for development and testing purposes.
 
-You can find everything on the [documentation](https://brain.quivr.app/).
+You can find everything on the [documentation](https://docs.quivr.app/).
 
 ### Prerequisites 📋
 
@@ -40,95 +40,79 @@ Ensure you have the following installed:
 - Docker
 - Docker Compose
 
-Additionally, you'll need a [Supabase](https://supabase.com/) account for:
+### 60 seconds Installation 💽
 
-- Creating a new Supabase project
-- Supabase Project API key
-- Supabase Project URL
+You can find the installation video [here](https://www.youtube.com/watch?v=cXBa6dZJN48).
 
-### Installation Steps 💽
-
-- **Step 0**: If needed, the installation is explained on Youtube [here](https://youtu.be/rC-s4QdfY80)
-
-- **Step 1**: Clone the repository using **one** of these commands:
-
-  - If you don't have an SSH key set up:
+- **Step 1**: Clone the repository:
 
   ```bash
   git clone https://github.com/StanGirard/Quivr.git && cd Quivr
+  git checkout v0.0.152 
   ```
 
-  - If you have an SSH key set up or want to add it ([guide here](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/adding-a-new-ssh-key-to-your-github-account))
+- **Step 2**: Copy the `.env.example` files
 
   ```bash
-  git clone git@github.com:StanGirard/Quivr.git && cd Quivr
+  cp .env.example .env
   ```
 
-- **Step 2**: Use the install helper script to automate subsequent steps.
-  You can use the install_helper.sh script to setup your env files and execute the migrations.
-
-  prerequisites:
+- **Step 3**: Update the `.env` files
 
   ```bash
-    brew install gum # Windows (via Scoop) scoop install charm-gum
-    brew install postgresql # Windows (via Scoop) scoop install postgresql
+  vim .env # or emacs or vscode or nano
   ```
 
+  Update **OPENAI_API_KEY** in the `.env` file.
+
+  You just need to update the `OPENAI_API_KEY` variable in the `.env` file. You can get your API key [here](https://platform.openai.com/api-keys). You need to create an account first. And put your credit card information. Don't worry, you won't be charged unless you use the API. You can find more information about the pricing [here](https://openai.com/pricing/).
+
+  > Want to use [Ollama.ai](https://ollama.ai) instead?
+  > Uncomment the following lines in the `.env` file:
+  > OLLAMA_API_BASE_URL
+  > Run the following command to start Ollama: `ollama run llama2`
+  > You can find more information about Ollama [here](https://ollama.ai/).
+
+- **Step 4**: Launch the project
+
   ```bash
-  chmod +x install_helper.sh
-  ./install_helper.sh
+  docker compose pull
+  docker compose up --build # if OPENAI
+  # docker compose -f docker-compose-ollama.yml up --build  # Only if using Ollama. You need to run `ollama run llama2` first.
   ```
 
-  If you want to manually set up the environment, follow the steps below, otherwise skip to Step 6.
+  If you have a Mac, go to Docker Desktop > Settings > General and check that the "file sharing implementation" is set to `VirtioFS`.
 
-- **Step 2 - Bis**: Copy the `.XXXXX_env` files
+  If you are a developer, you can run the project in development mode with the following command: `docker compose -f docker-compose.dev.yml up --build`
+
+- **Step 5**: Login to the app
+
+  Connect to the supabase database at [http://localhost:8000/project/default/auth/users](http://localhost:8000/project/default/auth/users) with the following credentials: admin/admin in order to create new users. Auto-confirm the email.
+
+  You can now sign in to the app with your new user. You can access the app at [http://localhost:3000/login](http://localhost:3000/login).
+
+  You can access Quivr backend API at [http://localhost:5050/docs](http://localhost:5050/docs)
+
+## Updating Quivr 🚀
+
+- **Step 1**: Pull the latest changes
 
   ```bash
-  cp .backend_env.example backend/.env
-  cp .frontend_env.example frontend/.env
+  git pull
   ```
 
-- **Step 3**: Update the `backend/.env` and `frontend/.env` file
-
-  > _Your `supabase_service_key` can be found in your Supabase dashboard under Project Settings -> API. Use the `anon` `public` key found in the `Project API keys` section._
-
-  > _Your `JWT_SECRET_KEY` can be found in your supabase settings under Project Settings -> API -> JWT Settings -> JWT Secret_
-
-  > _The `NEXT_PUBLIC_BACKEND_URL` is set to localhost:5050 for the docker. Update it if you are running the backend on a different machine._
-
-  - Change variables in `backend/.env`
-  - Change variables in `frontend/.env`
-
-- **Step 4**: Use the `migration.sh` script to run the migration scripts
+- **Step 2**: Use the `migration.sh` script to run the migration scripts
 
   ```bash
-  chmod +x migration.sh
+  chmod +x migration.sh # You need to install Gum & postgresql (brew install gum for example)
   ./migration.sh
+  # Select  2) Run migrations
   ```
-
-  Choose either `Create all tables` if it's your first time or `Run migrations`
-  if you are updating your database.
 
   Alternatively, you can run the script on the Supabase database via the web
   interface (SQL Editor -> `New query` -> paste the script -> `Run`)
 
   All the scripts can be found in the [scripts](scripts/) folder
-
-  > _If you come from an old version of Quivr, run the scripts in [migration script](scripts/) to migrate your data to the new version in the order of date_
-
-- **Step 5**: Launch the app
-
-  ```bash
-  docker compose up --build
-  ```
-
-- **Step 6**: Navigate to `localhost:3000` in your browser
-
-- **Step 7**: Want to contribute to the project?
-
-  ```
-  docker compose -f docker-compose.dev.yml up --build
-  ```
 
 ## Contributors ✨
 
@@ -146,25 +130,14 @@ Did you get a pull request? Open it, and we'll review it as soon as possible. Ch
 - [Good First Issues](https://github.com/StanGirard/quivr/issues?q=is%3Aopen+is%3Aissue+label%3A%22good+first+issue%22)
 - [Frontend Issues](https://github.com/StanGirard/quivr/issues?q=is%3Aopen+is%3Aissue+label%3Afrontend)
 - [Backend Issues](https://github.com/StanGirard/quivr/issues?q=is%3Aopen+is%3Aissue+label%3Abackend)
+- [Translate](https://docs.quivr.app/docs/Developers/contribution/guidelines#translations)
 
-## Sponsors ❤️
+## Partners ❤️
 
-This project would not be possible without the support of our sponsors. Thank you for your support!
+This project would not be possible without the support of our partners. Thank you for your support!
 
 <a href="https://www.theodo.fr/">
   <img src="https://avatars.githubusercontent.com/u/332041?s=200&v=4" alt="Theodo" style="padding: 10px" width="70px">
-</a>
-<a href="https://www.padok.fr/">
-  <img src="https://avatars.githubusercontent.com/u/46325765?s=200&v=4" alt="Padok" style="padding: 10px" width="70px">
-</a>
-<a href="https://www.aleios.com/">
-  <img src="https://avatars.githubusercontent.com/u/97908131?s=200&v=4" alt="Aleios" style="padding: 10px" width="70px">
-</a>
-<a href="https://www.bam.tech/">
-  <img src="https://avatars.githubusercontent.com/u/9597329?s=200&v=4" alt="BAM" style="padding: 10px" width="70px">
-</a>
-<a href="https://www.sicara.fr/">
-  <img src="https://avatars.githubusercontent.com/u/23194788?s=200&v=4" alt="Sicara" style="padding: 10px" width="70px">
 </a>
 
 ## License 📄

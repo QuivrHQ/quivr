@@ -1,10 +1,1 @@
-{
-    "title": "{{user}}'s Brain Usage",
-    "fetching": "Fetching your data...",
-    "requestsCount": "Today's Requests: {{count}}",
-    "brainSize": "Remaining Brain size",
-    "empty": "Empty",
-    "Used": "Used",
-    "Unused": "Unused",
-    "brainUsage": "Brain Usage"
-}
+{"title":"{{user}}'s Brain Usage","fetching":"Fetching your data...","requestsCount":"Today's Requests: {{count}}","brainSize":"Remaining Brain size","empty":"Empty","Used":"Used","Unused":"Unused","brainUsage":"Brain Usage"}

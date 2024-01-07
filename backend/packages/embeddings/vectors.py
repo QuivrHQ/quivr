@@ -11,13 +11,13 @@ logger = get_logger(__name__)
 
 # TODO: Create interface for embeddings and implement it for Supabase and OpenAI (current Quivr)
 class Neurons(BaseModel):
-    def create_vector(self, doc):
+    def create_vector(self, docs):
         documents_vector_store = get_documents_vector_store()
         logger.info("Creating vector for document")
-        logger.info(f"Document: {doc}")
+        logger.info(f"Document: {docs}")
 
         try:
-            sids = documents_vector_store.add_documents([doc])
+            sids = documents_vector_store.add_documents(docs)
             if sids and len(sids) > 0:
                 return sids
 
@@ -46,7 +46,7 @@ def process_batch(batch_ids: List[str]):
 
 
 # TODO: move to Knowledge class
-def get_unique_files_from_vector_ids(vectors_ids: List[str]):
+def get_unique_files_from_vector_ids(vectors_ids):
     # Move into Vectors class
     """
     Retrieve unique user data vectors.
