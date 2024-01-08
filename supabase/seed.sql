@@ -232,7 +232,8 @@ INSERT INTO "public"."chat_history" ("message_id", "chat_id", "user_message", "a
 --
 
 INSERT INTO "public"."models" ("name", "price", "max_input", "max_output") VALUES
-	('gpt-3.5-turbo-1106', 1, 2000, 1000);
+	('gpt-3.5-turbo-1106', 1, 2000, 1000),
+	('ollama/llama2', 1, 2000, 1000);
 
 
 --
@@ -318,12 +319,6 @@ INSERT INTO "public"."users" ("id", "email") VALUES
 SELECT pg_catalog.setval('"auth"."refresh_tokens_id_seq"', 3, true);
 
 
---
--- Name: documents_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
---
-
-SELECT pg_catalog.setval('"public"."documents_id_seq"', 1, false);
-
 
 --
 -- Name: product_to_features_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
@@ -332,25 +327,7 @@ SELECT pg_catalog.setval('"public"."documents_id_seq"', 1, false);
 SELECT pg_catalog.setval('"public"."product_to_features_id_seq"', 1, false);
 
 
---
--- Name: stats_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
---
 
-SELECT pg_catalog.setval('"public"."stats_id_seq"', 1, false);
-
-
---
--- Name: summaries_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
---
-
-SELECT pg_catalog.setval('"public"."summaries_id_seq"', 1, false);
-
-
---
--- Name: vectors_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
---
-
-SELECT pg_catalog.setval('"public"."vectors_id_seq"', 1, false);
 
 
 --
