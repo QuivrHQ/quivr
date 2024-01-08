@@ -388,47 +388,19 @@ ALTER TABLE public.product_to_features ADD CONSTRAINT product_to_features_max_br
 -- alter table "public"."product_to_features" validate constraint "product_to_features_max_brains_check";
 ALTER TABLE public.product_to_features VALIDATE CONSTRAINT product_to_features_max_brains_check;
 
-grant delete on table "public"."product_to_features" to "anon";
+-- grant delete on table "public"."product_to_features" to "supabase_admin";
 
-grant insert on table "public"."product_to_features" to "anon";
+-- grant insert on table "public"."product_to_features" to "supabase_admin";
 
-grant references on table "public"."product_to_features" to "anon";
+-- grant references on table "public"."product_to_features" to "supabase_admin";
 
-grant select on table "public"."product_to_features" to "anon";
+-- grant select on table "public"."product_to_features" to "supabase_admin";
 
-grant trigger on table "public"."product_to_features" to "anon";
+-- grant trigger on table "public"."product_to_features" to "supabase_admin";
 
-grant truncate on table "public"."product_to_features" to "anon";
+-- grant truncate on table "public"."product_to_features" to "supabase_admin";
 
-grant update on table "public"."product_to_features" to "anon";
-
-grant delete on table "public"."product_to_features" to "authenticated";
-
-grant insert on table "public"."product_to_features" to "authenticated";
-
-grant references on table "public"."product_to_features" to "authenticated";
-
-grant select on table "public"."product_to_features" to "authenticated";
-
-grant trigger on table "public"."product_to_features" to "authenticated";
-
-grant truncate on table "public"."product_to_features" to "authenticated";
-
-grant update on table "public"."product_to_features" to "authenticated";
-
-grant delete on table "public"."product_to_features" to "service_role";
-
-grant insert on table "public"."product_to_features" to "service_role";
-
-grant references on table "public"."product_to_features" to "service_role";
-
-grant select on table "public"."product_to_features" to "service_role";
-
-grant trigger on table "public"."product_to_features" to "service_role";
-
-grant truncate on table "public"."product_to_features" to "service_role";
-
-grant update on table "public"."product_to_features" to "service_role";
+-- grant update on table "public"."product_to_features" to "supabase_admin";
 
 CREATE TABLE IF NOT EXISTS public.models (
     name text NOT NULL,
@@ -446,47 +418,19 @@ INSERT INTO public.models ("name", "price", "max_input", "max_output") VALUES
 
 ALTER TABLE IF EXISTS public.models ADD CONSTRAINT models_pkey PRIMARY KEY USING INDEX models_pkey;
 
-grant delete on table "public"."models" to "anon";
+-- grant delete on table "public"."models" to "supabase_admin";
 
-grant insert on table "public"."models" to "anon";
+-- grant insert on table "public"."models" to "supabase_admin";
 
-grant references on table "public"."models" to "anon";
+-- grant references on table "public"."models" to "supabase_admin";
 
-grant select on table "public"."models" to "anon";
+-- grant select on table "public"."models" to "supabase_admin";
 
-grant trigger on table "public"."models" to "anon";
+-- grant trigger on table "public"."models" to "supabase_admin";
 
-grant truncate on table "public"."models" to "anon";
+-- grant truncate on table "public"."models" to "supabase_admin";
 
-grant update on table "public"."models" to "anon";
-
-grant delete on table "public"."models" to "authenticated";
-
-grant insert on table "public"."models" to "authenticated";
-
-grant references on table "public"."models" to "authenticated";
-
-grant select on table "public"."models" to "authenticated";
-
-grant trigger on table "public"."models" to "authenticated";
-
-grant truncate on table "public"."models" to "authenticated";
-
-grant update on table "public"."models" to "authenticated";
-
-grant delete on table "public"."models" to "service_role";
-
-grant insert on table "public"."models" to "service_role";
-
-grant references on table "public"."models" to "service_role";
-
-grant select on table "public"."models" to "service_role";
-
-grant trigger on table "public"."models" to "service_role";
-
-grant truncate on table "public"."models" to "service_role";
-
-grant update on table "public"."models" to "service_role";
+-- grant update on table "public"."models" to "supabase_admin";
 
 -- Create or replace function 'public.handle_new_user' 
 CREATE OR REPLACE FUNCTION public.handle_new_user() 
@@ -575,7 +519,7 @@ grant all on extensions.wrappers_fdw_stats to service_role;
 
 
 INSERT INTO migrations (name)
-SELECT '20240107152745_ollama'
+SELECT '20240107231636_policies'
 WHERE NOT EXISTS (
-    SELECT 1 FROM migrations WHERE name = '20240107152745_ollama'
+    SELECT 1 FROM migrations WHERE name = '20240107231636_policies'
 );
