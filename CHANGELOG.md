@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.0.162 (2024-01-13)
+
+## What's Changed
+* fix(frontend): remove right panel and reduce chat section width by @Zewed in https://github.com/StanGirard/quivr/pull/2012
+
+## New Contributors
+* @Zewed made their first contribution in https://github.com/StanGirard/quivr/pull/2012
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.161...v0.0.162
+
 ## 0.0.161 (2024-01-07)
 
 ## What's Changed
