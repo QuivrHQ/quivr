@@ -20,8 +20,6 @@ export const Menu = (): JSX.Element => {
 
   const { setIsOpened } = useSideBarContext();
 
-  const OPENED_MENU_WIDTH = 260
-
   if (nonProtectedPaths.includes(pathname)) {
     return <></>;
   }
