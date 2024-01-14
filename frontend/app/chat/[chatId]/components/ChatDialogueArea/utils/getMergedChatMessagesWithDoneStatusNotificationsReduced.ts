@@ -36,9 +36,10 @@ const compareItemsByTimestamp = (a: ChatItem, b: ChatItem): number => {
     ? new Date(a.body.message_time).getTime()
     : new Date(a.body.datetime).getTime();
 
-    const timestampB = b.item_type === "MESSAGE"
-      ? new Date(b.body.message_time).getTime()
-      : new Date(b.body.datetime).getTime();
+  const timestampB = b.item_type === "MESSAGE"
+    ? new Date(b.body.message_time).getTime()
+    : new Date(b.body.datetime).getTime();
+
   return timestampA - timestampB
 };
 
