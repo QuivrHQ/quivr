@@ -1,3 +1,5 @@
+@use '@/styles/spacings';
+
 .accordion_trigger {
     display: flex;
     flex: 1 1 0%; 
@@ -5,7 +7,7 @@
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
-    padding-block: 16px;
+    padding-block: spacings.$spacing05;
     transition: all 0.3s;
   
     &[data-state="open"] > svg {
