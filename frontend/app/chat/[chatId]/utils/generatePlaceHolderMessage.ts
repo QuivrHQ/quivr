@@ -10,7 +10,7 @@ export const generatePlaceHolderMessage = ({
   chat_id,
 }: GeneratePlaceHolderMessageProps): ChatMessage => {
   const message_id = new Date().getTime().toString();
-  const message_time = new Date().toISOString();
+  const message_time = new Date();
   const assistant = "";
 
   return {

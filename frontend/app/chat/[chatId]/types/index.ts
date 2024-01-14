@@ -13,7 +13,7 @@ export type ChatMessage = {
   message_id: string;
   user_message: string;
   assistant: string;
-  message_time: string;
+  message_time: Date;
   prompt_title?: string;
   brain_name?: string;
 };
@@ -22,7 +22,7 @@ type NotificationStatus = "Pending" | "Done";
 
 export type Notification = {
   id: string;
-  datetime: string;
+  datetime: Date;
   chat_id?: string | null;
   message?: string | null;
   action: string;
