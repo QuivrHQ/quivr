@@ -103,6 +103,7 @@ class QuivrRAG(BaseModel, RAGInterface):
             self.embeddings,
             table_name="vectors",
             brain_id=self.brain_id,
+            number_docs=6,
         )
 
     def _create_llm(

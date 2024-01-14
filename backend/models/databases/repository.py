@@ -59,9 +59,7 @@ class Repository(ABC):
         pass
 
     @abstractmethod
-    def similarity_search(
-        self, query_embedding, table: str, top_k: int, threshold: float
-    ):
+    def similarity_search(self, query_embedding, table: str, k: int, threshold: float):
         pass
 
     @abstractmethod
