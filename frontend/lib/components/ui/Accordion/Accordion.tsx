@@ -5,6 +5,7 @@ import * as React from "react";
 import { LuChevronDown } from "react-icons/lu";
 
 import { cn } from "@/lib/utils";
+import './Accordion.scss'
 
 const Accordion = AccordionPrimitive.Root;
 
@@ -23,10 +24,7 @@ const AccordionTrigger = React.forwardRef<
   <AccordionPrimitive.Header className="flex">
     <AccordionPrimitive.Trigger
       ref={ref}
-      className={cn(
-        "flex flex-1 items-center justify-between py-4 transition-all [&[data-state=open]>svg]:rotate-180",
-        className
-      )}
+      className="accordion_trigger"
       {...props}
     >
       {children}

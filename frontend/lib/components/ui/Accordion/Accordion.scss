@@ -1,0 +1,14 @@
+.accordion_trigger {
+    display: flex;
+    flex: 1 1 0%; 
+    width: 100%;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding-block: 16px;
+    transition: all 0.3s;
+  
+    &[data-state="open"] > svg {
+      transform: rotate(180deg);
+    }
+}
