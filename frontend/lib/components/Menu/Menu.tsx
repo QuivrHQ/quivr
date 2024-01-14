@@ -13,7 +13,6 @@ import { MenuHeader } from "./components/MenuHeader";
 import { ParametersButton } from "./components/ParametersButton";
 import { ProfileButton } from "./components/ProfileButton";
 import { UpgradeToPlus } from "./components/UpgradeToPlus";
-import { useMenuWidth } from "./hooks/useMenuWidth";
 import Button from "../ui/Button";
 
 export const Menu = (): JSX.Element => {
@@ -21,7 +20,7 @@ export const Menu = (): JSX.Element => {
 
   const { setIsOpened } = useSideBarContext();
 
-  const { shouldSideBarBeSticky, OPENED_MENU_WIDTH } = useMenuWidth();
+  const OPENED_MENU_WIDTH = 260
 
   if (nonProtectedPaths.includes(pathname)) {
     return <></>;
@@ -41,9 +40,6 @@ export const Menu = (): JSX.Element => {
     <MotionConfig transition={{ mass: 1, damping: 10, duration: 0.2 }}>
       <div
         className="flex flex-col fixed sm:sticky top-0 left-0 h-full overflow-visible z-[1000] border-r border-black/10 dark:border-white/25 bg-highlight"
-        style={{
-          width: shouldSideBarBeSticky ? OPENED_MENU_WIDTH : 0,
-        }}
       >
         <AnimatedDiv>
           <div className="flex flex-col flex-1 p-4 gap-4 h-full">
