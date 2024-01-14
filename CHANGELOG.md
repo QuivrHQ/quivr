@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.0.163 (2024-01-14)
+
+## What's Changed
+* fix(frontend): left panel is not closing  by @Zewed in https://github.com/StanGirard/quivr/pull/2014
+* fix:  csp by @StanGirard in https://github.com/StanGirard/quivr/pull/2016
+
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.162...v0.0.163
+
 ## 0.0.162 (2024-01-13)
 
 ## What's Changed
