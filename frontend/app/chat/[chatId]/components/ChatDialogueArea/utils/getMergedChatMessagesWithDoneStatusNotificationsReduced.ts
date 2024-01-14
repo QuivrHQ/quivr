@@ -32,7 +32,14 @@ const mergeChatMessagesAndNotifications = (
 
 // Function to compare two items by timestamp (message_time or datetime)
 const compareItemsByTimestamp = (a: ChatItem, b: ChatItem): number => {
-  return new Date(a.body.datetime).getTime() - new Date(b.body.datetime).getTime();
+  const timestampA = a.item_type === "MESSAGE"
+    ? new Date(a.body.message_time).getTime()
+    : new Date(a.body.datetime).getTime();
+
+    const timestampB = b.item_type === "MESSAGE"
+      ? new Date(b.body.message_time).getTime()
+      : new Date(b.body.datetime).getTime();
+  return timestampA - timestampB
 };
 
 // Main function to get merged chat messages with reduced notifications using reduce

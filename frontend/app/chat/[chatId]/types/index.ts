@@ -13,7 +13,7 @@ export type ChatMessage = {
   message_id: string;
   user_message: string;
   assistant: string;
-  datetime: Date;
+  message_time: Date;
   prompt_title?: string;
   brain_name?: string;
 };

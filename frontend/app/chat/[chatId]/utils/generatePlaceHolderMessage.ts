@@ -11,7 +11,7 @@ export const generatePlaceHolderMessage = ({
 }: GeneratePlaceHolderMessageProps): ChatMessage => {
   return {
     message_id: new Date().getTime().toString(),
-    datetime: new Date(),
+    message_time: new Date(),
     assistant: '',
     chat_id,
     user_message,
