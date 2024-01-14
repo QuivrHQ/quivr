@@ -14,3 +14,23 @@
       transform: rotate(180deg);
     }
 }
+
+.chevron {
+    width: 2rem; 
+    height: 2rem; 
+    transition-property: transform;
+    transition: all 0.3s;
+}
+
+.accordion_content {
+    overflow: hidden; 
+    font-size: 14px;
+    line-height: 20px; 
+    font-weight: 300; 
+    transition: all 0.3s;
+
+    .content_text {
+        padding-top: 0; 
+        padding-bottom: spacings.$spacing05; 
+    }
+}
