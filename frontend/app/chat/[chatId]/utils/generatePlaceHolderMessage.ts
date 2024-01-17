@@ -12,7 +12,7 @@ export const generatePlaceHolderMessage = ({
   return {
     message_id: new Date().getTime().toString(),
     message_time: new Date(new Date().setDate(new Date().getDate() + 1)).toISOString(),
-    assistant: '',
+    assistant: 'Thinking..',
     chat_id,
     user_message,
   };
