@@ -1,6 +1,6 @@
 "use client";
 
-import { SearchBar } from "@/lib/components/ui/SearchBar";
+import { SearchBar } from "@/lib/components/ui/SearchBar/SearchBar";
 import "./page.scss"
 
 const Search = (): JSX.Element => {
