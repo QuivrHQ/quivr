@@ -1,13 +1,14 @@
-from typing import Any, List
+from typing import Any, Dict, List, Optional
 
 from langchain.docstore.document import Document
 from langchain.embeddings.base import Embeddings
 from langchain.vectorstores import SupabaseVectorStore
+
 from supabase.client import Client
 
 
 class CustomSupabaseVectorStore(SupabaseVectorStore):
-    """A custom vector store that uses the match_vectors table instead of the vectors table."""
+    """A custom vector store using Supabase for vector similarity searches."""
 
     brain_id: str = "none"
 
@@ -15,7 +16,7 @@ class CustomSupabaseVectorStore(SupabaseVectorStore):
         self,
         client: Client,
         embedding: Embeddings,
-        table_name: str,
+        table_name: str = "match_vectors",
         brain_id: str = "none",
     ):
         super().__init__(client, embedding, table_name)
@@ -25,37 +26,23 @@ class CustomSupabaseVectorStore(SupabaseVectorStore):
         self,
         query: str,
         k: int = 6,
-        table: str = "match_vectors",
         threshold: float = 0.5,
+        filter: Optional[Dict[str, Any]] = None,
+        postgrest_filter: Optional[str] = None,
         **kwargs: Any
     ) -> List[Document]:
-        vectors = self._embedding.embed_documents([query])
-        query_embedding = vectors[0]
-        res = self._client.rpc(
-            table,
-            {
-                "query_embedding": query_embedding,
-                "match_count": k,
-                "p_brain_id": str(self.brain_id),
-            },
-        ).execute()
+        # Perform the similarity search using the base class method
+        # score_threshold is passed as a part of kwargs
+        results_with_scores = super().similarity_search(
+            query,
+            k=k,
+            filter=filter,
+            postgrest_filter=postgrest_filter,
+            score_threshold=threshold,
+            **kwargs
+        )
 
-        match_result = [
-            (
-                Document(
-                    metadata={
-                        **search.get("metadata", {}),
-                        "id": search.get("id", ""),
-                        "similarity": search.get("similarity", 0.0),
-                    },
-                    page_content=search.get("content", ""),
-                ),
-                search.get("similarity", 0.0),
-            )
-            for search in res.data
-            if search.get("content")
-        ]
-
-        documents = [doc for doc, _ in match_result]
+        # Extract only the documents, assuming results are tuples of (Document, similarity_score)
+        documents = [doc for doc, score in results_with_scores]
 
         return documents
