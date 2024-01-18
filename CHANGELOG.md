@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.0.165 (2024-01-17)
+
+## What's Changed
+* fix(frontend): wrong placeholder message date by @Zewed in https://github.com/StanGirard/quivr/pull/2023
+
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.164...v0.0.165
+
 ## 0.0.164 (2024-01-14)
 
 **Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.163...v0.0.164
