@@ -1,12 +1,12 @@
 "use client";
 
 import { SearchBar } from "@/lib/components/ui/SearchBar/SearchBar";
-import "./page.scss"
+import styles from "./page.module.scss"
 
 const Search = (): JSX.Element => {
     return (
-        <div className="search_page_container">
-            <div className="search_bar_wrapper">
+        <div className={styles.search_page_container}>
+            <div className={styles.search_bar_container}>
                 <SearchBar />
             </div>
         </div>

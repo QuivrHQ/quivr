@@ -1,0 +1,8 @@
+@use '@/styles/Colors.scss';
+@use '@/styles/Spacings.scss';
+
+.search_bar_wrapper {
+    background-color: Colors.$white;
+    padding: Spacings.$spacing05;
+    border-radius: 12px;
+}
