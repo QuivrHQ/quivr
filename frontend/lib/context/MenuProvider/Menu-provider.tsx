@@ -17,10 +17,12 @@ export const MenuProvider = ({
   children: React.ReactNode;
 }): JSX.Element => {
   const { isMobile } = useDevice();
-  const [isOpened, setIsOpened] = useState(!isMobile);
+  const [isOpened, setIsOpened] = useState(false);
 
   useEffect(() => {
-    setIsOpened(!isMobile);
+    if (typeof window !== 'undefined') {
+      setIsOpened(!isMobile && window.location.pathname !== "/search");
+    }
   }, [isMobile]);
 
   return (
