@@ -21,7 +21,7 @@ const SelectedChatPage = (): JSX.Element => {
             <div
                 className={cn(
                     "flex flex-col flex-1 items-center justify-stretch w-full h-full overflow-hidden",
-                    shouldDisplayFeedCard ? "bg-chat-bg-gray" : "bg-tertiary",
+                    shouldDisplayFeedCard ? "bg-chat-bg-gray" : "bg-ivory",
                     "dark:bg-black transition-colors ease-out duration-500"
                 )}
                 data-testid="chat-page"
