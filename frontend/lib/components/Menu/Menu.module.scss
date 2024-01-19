@@ -1,0 +1,16 @@
+@use '@/styles/Colors';
+@use '@/styles/Spacings';
+@use '@/styles/Zindex';
+
+.menu_control_button_wrapper {
+    background-color: transparent;
+    position: absolute;
+    top: Spacings.$spacing05;
+    left: Spacings.$spacing05;
+    transition: margin-left 0.2s ease-in-out;
+    z-index: Zindex.$overlay;
+
+    &.shifted {
+        margin-left: 260px;
+    }
+}

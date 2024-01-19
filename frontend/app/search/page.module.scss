@@ -8,33 +8,21 @@
     background-color: Colors.$ivory;
     width: 100%;
     height: 100%;
-
-    .hamburger {
-        position: absolute;
-        top: Spacings.$spacing05;
-        left: Spacings.$spacing05;
-        width: IconSizes.$big;
-        height: IconSizes.$big;
-        cursor: pointer;
-
-        &:hover {
-            color: Colors.$accent
-        }
-    }
+    display: flex;
+    justify-content: center;
+    align-items: center;
 
     .main_container {
         display: flex;
         flex-direction: column;
         row-gap: Spacings.$spacing05;
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        width: 50%;
+        position: relative;
+        width: 50vw;
+        margin-inline: auto;
 
         @media (max-width: ScreenSizes.$small) {
             width: 100%;
-            padding-inline: Spacings.$spacing05;
+            margin-inline: Spacings.$spacing07;
         }
 
         .quivr_logo_wrapper {
