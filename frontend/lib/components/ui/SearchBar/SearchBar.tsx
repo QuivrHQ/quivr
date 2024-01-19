@@ -4,7 +4,7 @@ import { LuSearch } from "react-icons/lu";
 import styles from './SearchBar.module.scss'
 
 export const SearchBar = (): JSX.Element => {
-    const [inputValue, setInputValue]: [string, Dispatch<SetStateAction<string>>] = useState('');
+    const [inputValue, setInputValue]: [string, Dispatch<SetStateAction<string>>] = useState<string>('');
 
     const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
         setInputValue(event.target.value);
@@ -19,7 +19,9 @@ export const SearchBar = (): JSX.Element => {
     const submit = () => {
         console.info('submit')
     }
-    
+
+    /* eslint-disable @typescript-eslint/restrict-template-expressions */
+
     return (
         <div className={styles.search_bar_wrapper}>
             <input
@@ -30,7 +32,9 @@ export const SearchBar = (): JSX.Element => {
                 onChange={handleChange}
                 onKeyDown={handleEnter}
             />
-            <LuSearch className={`${styles.search_icon} ${!inputValue && styles.disabled}`} onClick={submit}/>
+            <LuSearch
+                className={`${styles.search_icon} ${!inputValue ? styles.disabled : ''}`}
+                onClick={submit} />
         </div>
     )
 }
