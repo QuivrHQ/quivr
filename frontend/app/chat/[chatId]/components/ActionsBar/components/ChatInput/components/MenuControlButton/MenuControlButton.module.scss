@@ -1,12 +1,10 @@
 @use '@/styles/Colors';
 @use '@/styles/IconSizes';
 @use '@/styles/Spacings';
-@use '@/styles/ZIndex';
 
 .menu_icon {
     width: IconSizes.$medium;
     height: IconSizes.$medium;
-    z-index: ZIndex.$overlay;
     cursor: pointer;
 
     &:hover {

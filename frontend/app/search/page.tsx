@@ -16,11 +16,9 @@ const Search = (): JSX.Element => {
                         <span className={styles.quivr_text_primary}>Quivr</span>
                     </div>
                 </div>
-                <div className={styles.search_bar_container}>
-                    <SearchBar />
-                </div>
+                <SearchBar />
             </div>
-        </div>
+        </div >
     );
 };
 
