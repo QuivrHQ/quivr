@@ -2,10 +2,10 @@
 
 import { GiHamburgerMenu } from "react-icons/gi";
 
+import { QuivrLogo } from "@/lib/assets/QuivrLogo";
 import { SearchBar } from "@/lib/components/ui/SearchBar/SearchBar";
 
 import styles from "./page.module.scss"
-import { QuivrLogo } from "@/lib/assets/QuivrLogo";
 
 const Search = (): JSX.Element => {
     return (
