@@ -2,10 +2,10 @@ import { useTranslation } from "react-i18next";
 import { LuPanelLeftClose, LuPanelRightClose } from "react-icons/lu";
 
 import Button from "@/lib/components/ui/Button";
-import { useSideBarContext } from "@/lib/context/SidebarProvider/hooks/useSideBarContext";
+import { useMenuContext } from "@/lib/context/MenuProvider/hooks/useMenuContext";
 
 export const MenuControlButton = (): JSX.Element => {
-  const { isOpened, setIsOpened } = useSideBarContext();
+  const { isOpened, setIsOpened } = useMenuContext();
   const Icon = isOpened ? LuPanelLeftClose : LuPanelRightClose;
   const { t } = useTranslation("chat");
 

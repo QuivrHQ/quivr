@@ -2,16 +2,16 @@ import { createContext, useEffect, useState } from "react";
 
 import { useDevice } from "@/lib/hooks/useDevice";
 
-type SideBarContextType = {
+type MenuContextType = {
   isOpened: boolean;
   setIsOpened: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
-export const SideBarContext = createContext<SideBarContextType | undefined>(
+export const MenuContext = createContext<MenuContextType | undefined>(
   undefined
 );
 
-export const SideBarProvider = ({
+export const MenuProvider = ({
   children,
 }: {
   children: React.ReactNode;
@@ -24,13 +24,13 @@ export const SideBarProvider = ({
   }, [isMobile]);
 
   return (
-    <SideBarContext.Provider
+    <MenuContext.Provider
       value={{
         isOpened,
         setIsOpened,
       }}
     >
       {children}
-    </SideBarContext.Provider>
+    </MenuContext.Provider>
   );
 };

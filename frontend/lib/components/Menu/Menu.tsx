@@ -3,7 +3,7 @@ import { usePathname } from "next/navigation";
 import { LuPanelLeftOpen } from "react-icons/lu";
 
 import { nonProtectedPaths } from "@/lib/config/routesConfig";
-import { useSideBarContext } from "@/lib/context/SidebarProvider/hooks/useSideBarContext";
+import { useMenuContext } from "@/lib/context/MenuProvider/hooks/useMenuContext";
 
 import { AnimatedDiv } from "./components/AnimationDiv";
 import { BrainsManagementButton } from "./components/BrainsManagementButton";
@@ -18,7 +18,7 @@ import Button from "../ui/Button";
 export const Menu = (): JSX.Element => {
   const pathname = usePathname() ?? "";
 
-  const { setIsOpened } = useSideBarContext();
+  const { setIsOpened } = useMenuContext();
 
   if (nonProtectedPaths.includes(pathname)) {
     return <></>;

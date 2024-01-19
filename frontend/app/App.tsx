@@ -10,7 +10,7 @@ import { useOutsideClickListener } from "@/lib/components/Menu/hooks/useOutsideC
 import { NotificationBanner } from "@/lib/components/NotificationBanner";
 import { BrainProvider } from "@/lib/context";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
-import { SideBarProvider } from "@/lib/context/SidebarProvider/sidebar-provider";
+import { MenuProvider } from "@/lib/context/MenuProvider/Menu-provider";
 import { useSupabase } from "@/lib/context/SupabaseProvider";
 import { UpdateMetadata } from "@/lib/helpers/updateMetadata";
 import { usePageTracking } from "@/services/analytics/june/usePageTracking";
@@ -69,9 +69,9 @@ const AppWithQueryClient = ({ children }: PropsWithChildren): JSX.Element => {
   return (
     <QueryClientProvider client={queryClient}>
       <BrainProvider>
-        <SideBarProvider>
+        <MenuProvider>
           <App>{children}</App>
-        </SideBarProvider>
+        </MenuProvider>
       </BrainProvider>
     </QueryClientProvider>
   );
