@@ -14,7 +14,7 @@ type MessageRowProps = {
   promptName?: string | null;
   children?: React.ReactNode;
   metadata?: {
-    sources?: string;
+    sources?: [string] | [];
   };
 };
 
@@ -43,7 +43,7 @@ export const MessageRow = React.forwardRef(
     });
 
     const messageContent = text ?? "";
-    const sourcesContent = metadata?.sources ?? "";
+    const sourcesContent = metadata?.sources ?? [];
 
     const hasSources = Boolean(sourcesContent);
 

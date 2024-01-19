@@ -24,7 +24,7 @@ export const QADisplay = ({ content }: QADisplayProps): JSX.Element => {
         text={user_message}
         promptName={prompt_title}
         brainName={brain_name}
-        metadata={metadata}
+        metadata={metadata} // eslint-disable-line @typescript-eslint/no-unsafe-assignment
       />
       <MessageRow
         key={`assistant-${message_id}`}
@@ -32,7 +32,7 @@ export const QADisplay = ({ content }: QADisplayProps): JSX.Element => {
         text={assistant}
         brainName={brain_name}
         promptName={prompt_title}
-        metadata={metadata}
+        metadata={metadata} // eslint-disable-line @typescript-eslint/no-unsafe-assignment
       />
     </>
   );
