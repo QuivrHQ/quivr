@@ -34,7 +34,8 @@ export const SearchBar = (): JSX.Element => {
             />
             <LuSearch
                 className={`${styles.search_icon} ${!inputValue ? styles.disabled : ''}`}
-                onClick={submit} />
+                onClick={submit}
+            />
         </div>
     )
 }
