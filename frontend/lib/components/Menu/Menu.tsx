@@ -14,7 +14,6 @@ import { MenuHeader } from "./components/MenuHeader";
 import { ParametersButton } from "./components/ParametersButton";
 import { ProfileButton } from "./components/ProfileButton";
 import { UpgradeToPlus } from "./components/UpgradeToPlus";
-import { useEffect } from "react";
 
 export const Menu = (): JSX.Element => {
     const { isOpened } = useMenuContext();
@@ -33,8 +32,6 @@ export const Menu = (): JSX.Element => {
     if (!isMenuDisplayed) {
         return <></>;
     }
-
-    useEffect(() => { }, [isOpened]);
 
     /* eslint-disable @typescript-eslint/restrict-template-expressions */
 
