@@ -1,9 +1,9 @@
 import { MotionConfig } from "framer-motion";
 import { usePathname } from "next/navigation";
-import { LuPanelLeftOpen } from "react-icons/lu";
+
+import styles from './Menu.module.scss'
 
 import { nonProtectedPaths } from "@/lib/config/routesConfig";
-import { useMenuContext } from "@/lib/context/MenuProvider/hooks/useMenuContext";
 
 import { AnimatedDiv } from "./components/AnimationDiv";
 import { BrainsManagementButton } from "./components/BrainsManagementButton";
@@ -13,13 +13,13 @@ import { MenuHeader } from "./components/MenuHeader";
 import { ParametersButton } from "./components/ParametersButton";
 import { ProfileButton } from "./components/ProfileButton";
 import { UpgradeToPlus } from "./components/UpgradeToPlus";
-import Button from "../ui/Button";
 import { MenuControlButton } from "@/app/chat/[chatId]/components/ActionsBar/components/ChatInput/components/MenuControlButton/MenuControlButton";
+import { useMenuContext } from "@/lib/context/MenuProvider/hooks/useMenuContext";
+import { useEffect } from "react";
 
 export const Menu = (): JSX.Element => {
+    const { isOpened } = useMenuContext();
     const pathname = usePathname() ?? "";
-
-    const { isOpened, setIsOpened } = useMenuContext();
 
     if (nonProtectedPaths.includes(pathname)) {
         return <></>;
@@ -35,6 +35,8 @@ export const Menu = (): JSX.Element => {
         return <></>;
     }
 
+    useEffect(() => { }, [isOpened])
+
     return (
         <MotionConfig transition={{ mass: 1, damping: 10, duration: 0.2 }}>
             <div
@@ -42,7 +44,7 @@ export const Menu = (): JSX.Element => {
             >
                 <AnimatedDiv>
                     <div className="flex flex-col flex-1 p-4 gap-4 h-full">
-                        < MenuHeader />
+                        <MenuHeader />
                         <div className="flex flex-1 w-full">
                             <div className="w-full gap-2 flex flex-col">
                                 <DiscussionButton />
@@ -58,7 +60,9 @@ export const Menu = (): JSX.Element => {
                     </div>
                 </AnimatedDiv>
             </div>
-            <MenuControlButton visibility={true} />
+            <div className={`${styles.menu_control_button_wrapper} ${isOpened ? styles.shifted : ''}`}>
+                <MenuControlButton />
+            </div>
         </MotionConfig>
     );
 };

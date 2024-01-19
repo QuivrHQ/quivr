@@ -1,20 +1,15 @@
 @use '@/styles/Colors';
 @use '@/styles/IconSizes';
 @use '@/styles/Spacings';
+@use '@/styles/ZIndex';
 
-.menu_icon_wrapper {
-    position: absolute;
-    z-index: 10000000;
+.menu_icon {
+    width: IconSizes.$medium;
+    height: IconSizes.$medium;
+    z-index: ZIndex.$overlay;
+    cursor: pointer;
 
-    .menu_icon {
-        width: IconSizes.$big;
-        height: IconSizes.$big;
-        margin-top: Spacings.$spacing03;
-        margin-left: Spacings.$spacing01;
-        cursor: pointer;
-
-        &:hover {
-            color: Colors.$accent;
-        }
+    &:hover {
+        color: Colors.$accent;
     }
 }

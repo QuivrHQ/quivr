@@ -1,0 +1,13 @@
+@use '@/styles/Colors';
+
+.menu_control_button_wrapper {
+    background-color: Colors.$ivory;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    transition: margin-left 0.2s ease-in-out;
+
+    &.shifted {
+        margin-left: 260px;
+    }
+}
