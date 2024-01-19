@@ -1,10 +1,11 @@
 import { MotionConfig } from "framer-motion";
 import { usePathname } from "next/navigation";
 
-import styles from './Menu.module.scss'
-
+import { MenuControlButton } from "@/app/chat/[chatId]/components/ActionsBar/components/ChatInput/components/MenuControlButton/MenuControlButton";
 import { nonProtectedPaths } from "@/lib/config/routesConfig";
+import { useMenuContext } from "@/lib/context/MenuProvider/hooks/useMenuContext";
 
+import styles from './Menu.module.scss'
 import { AnimatedDiv } from "./components/AnimationDiv";
 import { BrainsManagementButton } from "./components/BrainsManagementButton";
 import { DiscussionButton } from "./components/DiscussionButton";
@@ -13,9 +14,6 @@ import { MenuHeader } from "./components/MenuHeader";
 import { ParametersButton } from "./components/ParametersButton";
 import { ProfileButton } from "./components/ProfileButton";
 import { UpgradeToPlus } from "./components/UpgradeToPlus";
-import { MenuControlButton } from "@/app/chat/[chatId]/components/ActionsBar/components/ChatInput/components/MenuControlButton/MenuControlButton";
-import { useMenuContext } from "@/lib/context/MenuProvider/hooks/useMenuContext";
-import { useEffect } from "react";
 
 export const Menu = (): JSX.Element => {
     const { isOpened } = useMenuContext();
@@ -35,7 +33,7 @@ export const Menu = (): JSX.Element => {
         return <></>;
     }
 
-    useEffect(() => { }, [isOpened])
+    /* eslint-disable @typescript-eslint/restrict-template-expressions */
 
     return (
         <MotionConfig transition={{ mass: 1, damping: 10, duration: 0.2 }}>
