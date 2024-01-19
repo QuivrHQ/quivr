@@ -19,7 +19,7 @@
     .search_input {
         border: none;
         flex: 1;
-        
+
         &:focus {
             box-shadow: none;
         }
@@ -34,6 +34,7 @@
         &.disabled {
             color: Colors.$black;
             pointer-events: none;
+            opacity: 0.2;
         }
     }
 }

@@ -1,4 +1,5 @@
 @use '@/styles/Colors';
+@use '@/styles/IconSizes.scss';
 @use '@/styles/ScreenSizes.scss';
 @use '@/styles/Spacings.scss';
 @use '@/styles/Typography.scss';
@@ -7,6 +8,19 @@
     background-color: Colors.$ivory;
     width: 100%;
     height: 100%;
+
+    .hamburger {
+        position: absolute;
+        top: Spacings.$spacing05;
+        left: Spacings.$spacing05;
+        width: IconSizes.$big;
+        height: IconSizes.$big;
+        cursor: pointer;
+
+        &:hover {
+            color: Colors.$accent
+        }
+    }
 
     .main_container {
         display: flex;
