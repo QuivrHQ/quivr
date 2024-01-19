@@ -1,12 +1,14 @@
 import { ChangeEvent, Dispatch, SetStateAction, useState } from 'react';
 import { LuSearch } from "react-icons/lu";
-import queryString from 'query-string';
 
 import styles from './SearchBar.module.scss'
 import { useChatInput } from '@/app/chat/[chatId]/components/ActionsBar/components/ChatInput/hooks/useChatInput';
 
+import { useRouter } from "next/navigation";
+
 export const SearchBar = (): JSX.Element => {
     const { message, setMessage, submitQuestion } = useChatInput();
+    const router = useRouter();
 
     const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
         setMessage(event.target.value);
@@ -19,8 +21,7 @@ export const SearchBar = (): JSX.Element => {
     };
 
     const submit = () => {
-        const query = queryString.stringify({ question: message });
-        window.location.href = `/chat?${query}`;
+        router.push(`/chat?question=${message}`);
     }
 
     /* eslint-disable @typescript-eslint/restrict-template-expressions */
