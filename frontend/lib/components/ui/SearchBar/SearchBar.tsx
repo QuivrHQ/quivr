@@ -2,12 +2,15 @@ import { ChangeEvent, Dispatch, SetStateAction, useState } from 'react';
 import { LuSearch } from "react-icons/lu";
 
 import styles from './SearchBar.module.scss'
+import { useChat } from '@/app/chat/[chatId]/hooks/useChat';
+import { useChatInput } from '@/app/chat/[chatId]/components/ActionsBar/components/ChatInput/hooks/useChatInput';
 
 export const SearchBar = (): JSX.Element => {
-    const [inputValue, setInputValue]: [string, Dispatch<SetStateAction<string>>] = useState<string>('');
+    const { message, setMessage } = useChatInput()
+    const { addQuestion } = useChat()
 
     const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
-        setInputValue(event.target.value);
+        setMessage(event.target.value);
     };
 
     const handleEnter = (event: React.KeyboardEvent<HTMLInputElement>) => {
@@ -17,7 +20,7 @@ export const SearchBar = (): JSX.Element => {
     };
 
     const submit = () => {
-        console.info('submit')
+        addQuestion(message)
     }
 
     /* eslint-disable @typescript-eslint/restrict-template-expressions */
@@ -28,12 +31,12 @@ export const SearchBar = (): JSX.Element => {
                 className={styles.search_input}
                 type="text"
                 placeholder="Search"
-                value={inputValue}
+                value={message}
                 onChange={handleChange}
                 onKeyDown={handleEnter}
             />
             <LuSearch
-                className={`${styles.search_icon} ${!inputValue ? styles.disabled : ''}`}
+                className={`${styles.search_icon} ${!message ? styles.disabled : ''}`}
                 onClick={submit}
             />
         </div>
