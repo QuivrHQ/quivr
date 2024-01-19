@@ -1,7 +1,12 @@
 @use '@/styles/Colors.scss';
+@use '@/styles/IconSizes.scss';
 @use '@/styles/Spacings.scss';
 
 .search_bar_wrapper {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: Spacings.$spacing03;
     background-color: Colors.$white;
     padding: Spacings.$spacing05;
     border-radius: 12px;
@@ -13,9 +18,22 @@
 
     .search_input {
         border: none;
+        flex: 1;
         
         &:focus {
             box-shadow: none;
+        }
+    }
+
+    .search_icon {
+        width: IconSizes.$big;
+        height: IconSizes.$big;
+        color: Colors.$accent;
+        cursor: pointer;
+
+        &.disabled {
+            color: Colors.$black;
+            pointer-events: none;
         }
     }
 }
