@@ -24,8 +24,8 @@ class CreateApiBrainDefinition(BaseModel, extra=Extra.forbid):
 
 class CreateBrainProperties(BaseModel, extra=Extra.forbid):
     name: Optional[str] = "Default brain"
-    description: Optional[str] = "This is a description"
-    status: Optional[str] = "private"
+    description: str = "This is a description"
+    status: Optional[str] = "public"
     model: Optional[str]
     temperature: Optional[float] = 0.0
     max_tokens: Optional[int] = 256
