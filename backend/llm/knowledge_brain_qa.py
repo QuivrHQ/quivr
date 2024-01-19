@@ -28,6 +28,15 @@ brain_service = BrainService()
 chat_service = ChatService()
 
 
+def is_valid_uuid(uuid_to_test, version=4):
+    try:
+        uuid_obj = UUID(uuid_to_test, version=version)
+    except ValueError:
+        return False
+
+    return str(uuid_obj) == uuid_to_test
+
+
 class KnowledgeBrainQA(BaseModel, QAInterface):
     """
     Main class for the Brain Picking functionality.
@@ -50,7 +59,7 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
     model: str = None  # pyright: ignore reportPrivateUsage=none
     temperature: float = 0.1
     chat_id: str = None  # pyright: ignore reportPrivateUsage=none
-    brain_id: str = None  # pyright: ignore reportPrivateUsage=none
+    brain_id: str  # pyright: ignore reportPrivateUsage=none
     max_tokens: int = 256
     streaming: bool = False
     knowledge_qa: Optional[RAGInterface]
@@ -88,13 +97,18 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
 
     @property
     def prompt_to_use(self):
-        # TODO: move to prompt service or instruction or something
-        return get_prompt_to_use(UUID(self.brain_id), self.prompt_id)
+        if self.brain_id and is_valid_uuid(self.brain_id):
+            return get_prompt_to_use(UUID(self.brain_id), self.prompt_id)
+        else:
+            return None
 
     @property
     def prompt_to_use_id(self) -> Optional[UUID]:
         # TODO: move to prompt service or instruction or something
-        return get_prompt_to_use_id(UUID(self.brain_id), self.prompt_id)
+        if self.brain_id and is_valid_uuid(self.brain_id):
+            return get_prompt_to_use_id(UUID(self.brain_id), self.prompt_id)
+        else:
+            return None
 
     def generate_answer(
         self, chat_id: UUID, question: ChatQuestion, save_answer: bool = True
@@ -129,10 +143,7 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
 
         answer = model_response["answer"]
 
-        brain = None
-
-        if question.brain_id:
-            brain = brain_service.get_brain_by_id(question.brain_id)
+        brain = brain_service.get_brain_by_id(self.brain_id)
 
         if save_answer:
             # save the answer to the database or not ->  add a variable
@@ -142,7 +153,7 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
                         "chat_id": chat_id,
                         "user_message": question.question,
                         "assistant": answer,
-                        "brain_id": question.brain_id,
+                        "brain_id": brain.brain_id,
                         "prompt_id": self.prompt_to_use_id,
                     }
                 )
@@ -223,10 +234,7 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
             )
         )
 
-        brain = None
-
-        if question.brain_id:
-            brain = brain_service.get_brain_by_id(question.brain_id)
+        brain = brain_service.get_brain_by_id(self.brain_id)
 
         if save_answer:
             streamed_chat_history = chat_service.update_chat_history(
@@ -235,7 +243,7 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
                         "chat_id": chat_id,
                         "user_message": question.question,
                         "assistant": "",
-                        "brain_id": question.brain_id,
+                        "brain_id": brain.brain_id,
                         "prompt_id": self.prompt_to_use_id,
                     }
                 )

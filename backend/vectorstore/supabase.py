@@ -1,9 +1,13 @@
 from typing import Any, List
+from uuid import UUID
 
 from langchain.docstore.document import Document
 from langchain.embeddings.base import Embeddings
 from langchain.vectorstores import SupabaseVectorStore
+from logger import get_logger
 from supabase.client import Client
+
+logger = get_logger(__name__)
 
 
 class CustomSupabaseVectorStore(SupabaseVectorStore):
@@ -21,13 +25,39 @@ class CustomSupabaseVectorStore(SupabaseVectorStore):
         super().__init__(client, embedding, table_name)
         self.brain_id = brain_id
 
+    def find_brain_closest_query(
+        self,
+        query: str,
+        k: int = 6,
+        table: str = "match_brain",
+        threshold: float = 0.5,
+    ) -> UUID | None:
+        vectors = self._embedding.embed_documents([query])
+        query_embedding = vectors[0]
+        res = self._client.rpc(
+            table,
+            {
+                "query_embedding": query_embedding,
+                "match_count": k,
+            },
+        ).execute()
+
+        # Get the brain_id of the brain that is most similar to the query
+        logger.info(f"Found {len(res.data)} brains")
+        logger.info(res.data)
+        logger.info("🔥🔥🔥🔥🔥")
+        brain_id = res.data[0].get("id", None)
+        if not brain_id:
+            return None
+        return str(brain_id)
+
     def similarity_search(
         self,
         query: str,
         k: int = 6,
         table: str = "match_vectors",
         threshold: float = 0.5,
-        **kwargs: Any
+        **kwargs: Any,
     ) -> List[Document]:
         vectors = self._embedding.embed_documents([query])
         query_embedding = vectors[0]

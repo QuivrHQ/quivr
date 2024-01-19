@@ -7,6 +7,7 @@ from fastapi.responses import StreamingResponse
 from middlewares.auth import AuthBearer, get_current_user
 from models.user_usage import UserUsage
 from modules.brain.service.brain_service import BrainService
+from modules.chat.controller.chat.brainful_chat import BrainfulChat
 from modules.chat.controller.chat.factory import get_chat_strategy
 from modules.chat.controller.chat.utils import NullableUUID, check_user_requests_limit
 from modules.chat.dto.chats import ChatItem, ChatQuestion
@@ -166,6 +167,7 @@ async def create_question_handler(
             streaming=False,
             prompt_id=chat_question.prompt_id,
             user_id=current_user.id,
+            chat_question=chat_question,
         )
 
         chat_answer = gpt_answer_generator.generate_answer(
@@ -196,7 +198,7 @@ async def create_stream_question_handler(
     | None = Query(..., description="The ID of the brain"),
     current_user: UserIdentity = Depends(get_current_user),
 ) -> StreamingResponse:
-    chat_instance = get_chat_strategy(brain_id)
+    chat_instance = BrainfulChat()
     chat_instance.validate_authorization(user_id=current_user.id, brain_id=brain_id)
 
     user_daily_usage = UserUsage(
@@ -215,7 +217,6 @@ async def create_stream_question_handler(
         fallback_model = "gpt-3.5-turbo-1106"
         fallback_temperature = 0
         fallback_max_tokens = 256
-
         if brain_id:
             brain = brain_service.get_brain_by_id(brain_id)
             if brain:
@@ -240,8 +241,9 @@ async def create_stream_question_handler(
             temperature=chat_question.temperature,  # type: ignore
             streaming=True,
             prompt_id=chat_question.prompt_id,
-            brain_id=str(brain_id),
+            brain_id=brain_id,
             user_id=current_user.id,
+            chat_question=chat_question,
         )
 
         return StreamingResponse(
