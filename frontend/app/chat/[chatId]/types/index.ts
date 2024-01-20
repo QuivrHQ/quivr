@@ -16,6 +16,9 @@ export type ChatMessage = {
   message_time: string;
   prompt_title?: string;
   brain_name?: string;
+  metadata?: {
+    sources?: [string];
+  };
 };
 
 type NotificationStatus = "Pending" | "Done";

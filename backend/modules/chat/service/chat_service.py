@@ -79,7 +79,9 @@ class ChatService:
                         assistant=message.assistant,
                         message_time=message.message_time,
                         brain_name=brain.name if brain else None,
+                        brain_id=brain.id if brain else None,
                         prompt_title=prompt.title if prompt else None,
+                        metadata=message.metadata,
                     )
                 )
             return enriched_history
@@ -132,6 +134,7 @@ class ChatService:
         message_id: str,
         user_message: str = None,  # pyright: ignore reportPrivateUsage=none
         assistant: str = None,  # pyright: ignore reportPrivateUsage=none
+        metadata: dict = None,  # pyright: ignore reportPrivateUsage=none
     ) -> ChatHistory:
         if not message_id:
             logger.error("No message_id provided")
@@ -144,6 +147,9 @@ class ChatService:
 
         if assistant is not None:
             updates["assistant"] = assistant
+
+        if metadata is not None:
+            updates["metadata"] = metadata
 
         updated_message = None
 

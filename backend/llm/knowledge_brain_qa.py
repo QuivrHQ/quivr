@@ -260,6 +260,7 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
                     if self.prompt_to_use
                     else None,
                     "brain_name": brain.name if brain else None,
+                    "sources": None,
                 }
             )
         else:
@@ -285,7 +286,6 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
                 yield f"data: {json.dumps(streamed_chat_history.dict())}"
         except Exception as e:
             logger.error("Error during streaming tokens: %s", e)
-        sources_string = ""
         try:
             result = await run
             source_documents = result.get("source_documents", [])
@@ -296,11 +296,13 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
 
             if source_documents:
                 # Formatting the source documents using Markdown without new lines for each source
-                sources_string = "\n\n**Sources:** " + ", ".join(
-                    f"{doc.metadata.get('file_name', 'Unnamed Document')}"
-                    for doc in source_documents
-                )
-                streamed_chat_history.assistant += sources_string
+                sources_list = [
+                    f"[{doc.metadata['file_name']}])" for doc in source_documents
+                ]
+                # Create metadata if it doesn't exist
+                if not streamed_chat_history.metadata:
+                    streamed_chat_history.metadata = {}
+                    streamed_chat_history.metadata["sources"] = sources_list
                 yield f"data: {json.dumps(streamed_chat_history.dict())}"
             else:
                 logger.info(
@@ -311,7 +313,8 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
 
         # Combine all response tokens to form the final assistant message
         assistant = "".join(response_tokens)
-        assistant += sources_string
+        logger.info("💋💋💋💋")
+        logger.info(streamed_chat_history)
 
         try:
             if save_answer:
@@ -319,6 +322,7 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
                     message_id=str(streamed_chat_history.message_id),
                     user_message=question.question,
                     assistant=assistant,
+                    metadata=streamed_chat_history.metadata,
                 )
         except Exception as e:
             logger.error("Error updating message by ID: %s", e)
