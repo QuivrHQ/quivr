@@ -80,6 +80,9 @@ class BrainfulChat(ChatInterface):
             # Add to metadata close_brains and close_brains_similarity
             metadata["close_brains"] = list_brains
 
+        follow_up_questions = chat_service.get_follow_up_question(chat_id)
+        metadata["follow_up_questions"] = follow_up_questions
+
         brain = brain_service.get_brain_by_id(brain_id_to_use)
         if (
             brain
