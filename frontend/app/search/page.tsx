@@ -3,10 +3,10 @@ import { usePathname } from "next/navigation";
 import { useEffect } from "react";
 
 import { QuivrLogo } from "@/lib/assets/QuivrLogo";
+import { AddBrainModal } from "@/lib/components/AddBrainModal";
 import { SearchBar } from "@/lib/components/ui/SearchBar/SearchBar";
 import { useMenuContext } from "@/lib/context/MenuProvider/hooks/useMenuContext";
 
-import { AddBrainModal } from "@/lib/components/AddBrainModal";
 import styles from "./page.module.scss";
 
 const Search = (): JSX.Element => {
