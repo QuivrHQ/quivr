@@ -96,6 +96,7 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
             streaming=streaming,
             **kwargs,
         )
+        self.metadata = metadata
 
     @property
     def prompt_to_use(self):
@@ -262,7 +263,7 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
                     if self.prompt_to_use
                     else None,
                     "brain_name": brain.name if brain else None,
-                    "sources": None,
+                    "metadata": self.metadata,
                 }
             )
         else:
@@ -277,6 +278,7 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
                     if self.prompt_to_use
                     else None,
                     "brain_name": brain.name if brain else None,
+                    "metadata": self.metadata,
                 }
             )
 
@@ -304,7 +306,7 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
                 # Create metadata if it doesn't exist
                 if not streamed_chat_history.metadata:
                     streamed_chat_history.metadata = {}
-                    streamed_chat_history.metadata["sources"] = sources_list
+                streamed_chat_history.metadata["sources"] = sources_list
                 yield f"data: {json.dumps(streamed_chat_history.dict())}"
             else:
                 logger.info(
