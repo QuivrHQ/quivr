@@ -71,7 +71,11 @@ class BrainfulChat(ChatInterface):
             history = chat_service.get_chat_history(chat_id)
             if history:
                 question = history[0].user_message
-            brain_id_to_use = vector_store.find_brain_closest_query(question)
+            list_brains = vector_store.find_brain_closest_query(question)
+            if list_brains:
+                brain_id_to_use = list_brains[0]["id"]
+            else:
+                brain_id_to_use = None
 
         brain = brain_service.get_brain_by_id(brain_id_to_use)
         if (

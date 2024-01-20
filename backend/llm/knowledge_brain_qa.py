@@ -63,6 +63,7 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
     max_tokens: int = 256
     streaming: bool = False
     knowledge_qa: Optional[RAGInterface]
+    metadata: Optional[dict] = None
 
     callbacks: List[
         AsyncIteratorCallbackHandler
@@ -77,6 +78,7 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
         chat_id: str,
         streaming: bool = False,
         prompt_id: Optional[UUID] = None,
+        metadata: Optional[dict] = None,
         **kwargs,
     ):
         super().__init__(
