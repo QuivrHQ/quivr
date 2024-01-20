@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.0.167 (2024-01-20)
+
+## What's Changed
+* fix(frontend): chat still refreshs on first request by @Zewed in https://github.com/StanGirard/quivr/pull/2034
+
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.166...v0.0.167
+
 ## 0.0.166 (2024-01-20)
 
 ## What's Changed
