@@ -7,12 +7,14 @@ import { useNotificationApi } from "@/lib/api/notification/useNotificationApi";
 import { useChatContext } from "@/lib/context";
 import { useKnowledgeToFeedContext } from "@/lib/context/KnowledgeToFeedProvider/hooks/useKnowledgeToFeedContext";
 
+import { useChatInput } from "../components/ActionsBar/components/ChatInput/hooks/useChatInput";
 import { getChatNotificationsQueryKey } from "../utils/getChatNotificationsQueryKey";
 import { getMessagesFromChatItems } from "../utils/getMessagesFromChatItems";
 import { getNotificationsFromChatItems } from "../utils/getNotificationsFromChatItems";
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const useChatNotificationsSync = () => {
+  const { message } = useChatInput()
   const { setMessages, setNotifications, notifications } = useChatContext();
   const { getChatItems } = useChatApi();
   const { getChatNotifications } = useNotificationApi();
@@ -65,10 +67,11 @@ export const useChatNotificationsSync = () => {
         return;
       }
 
-      const chatItems = await getChatItems(chatId);
-
-      setMessages(getMessagesFromChatItems(chatItems));
-      setNotifications(getNotificationsFromChatItems(chatItems));
+      if (!message) {
+        const chatItems = await getChatItems(chatId);
+        setMessages(getMessagesFromChatItems(chatItems));
+        setNotifications(getNotificationsFromChatItems(chatItems));
+      }
     };
     void fetchHistory();
   }, [chatId]);
