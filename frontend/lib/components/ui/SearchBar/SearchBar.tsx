@@ -8,7 +8,7 @@ import { useChatContext } from '@/lib/context';
 
 export const SearchBar = (): JSX.Element => {
     const { message, setMessage } = useChatInput()
-    const { messages, setMessages } = useChatContext()
+    const { setMessages } = useChatContext()
     const { addQuestion } = useChat()
 
     const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
