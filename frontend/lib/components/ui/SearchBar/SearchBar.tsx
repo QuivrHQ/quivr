@@ -41,7 +41,7 @@ export const SearchBar = (): JSX.Element => {
                 placeholder="Search"
                 value={message}
                 onChange={handleChange}
-                onKeyDown={(event: React.KeyboardEvent<HTMLInputElement>) => void handleEnter(event)}
+                onKeyDown={(event) => void handleEnter(event)}
             />
             <LuSearch
                 className={`${styles.search_icon} ${!message ? styles.disabled : ''}`}
