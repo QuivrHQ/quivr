@@ -8,7 +8,6 @@ import { useMenuContext } from "@/lib/context/MenuProvider/hooks/useMenuContext"
 import { useSupabase } from "@/lib/context/SupabaseProvider";
 import { redirectToLogin } from "@/lib/router/redirectToLogin";
 
-import { useChatNotificationsSync } from "../chat/[chatId]/hooks/useChatNotificationsSync";
 import { useChatsList } from "../chat/[chatId]/hooks/useChatsList";
 // eslint-disable-next-line import/order
 import styles from "./page.module.scss";
@@ -27,7 +26,6 @@ const Search = (): JSX.Element => {
     }, [pathname, session, setIsOpened]);
 
     useChatsList();
-    useChatNotificationsSync();
 
     return (
         <div className={styles.search_page_container}>

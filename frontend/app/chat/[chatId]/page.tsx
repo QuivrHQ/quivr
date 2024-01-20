@@ -6,10 +6,13 @@ import { cn } from "@/lib/utils";
 
 import { ActionsBar } from "./components/ActionsBar";
 import { ChatDialogueArea } from "./components/ChatDialogueArea/ChatDialogue";
+import { useChatNotificationsSync } from "./hooks/useChatNotificationsSync";
 
 const SelectedChatPage = (): JSX.Element => {
     const { getRootProps } = useCustomDropzone();
     const { shouldDisplayFeedCard } = useKnowledgeToFeedContext();
+
+    useChatNotificationsSync();
 
     return (
         <div className="flex flex-1">
