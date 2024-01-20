@@ -1,6 +1,7 @@
 import { createContext, useEffect, useState } from "react";
 
 import { useDevice } from "@/lib/hooks/useDevice";
+import { usePathname } from "next/navigation";
 
 type MenuContextType = {
   isOpened: boolean;
@@ -18,11 +19,10 @@ export const MenuProvider = ({
 }): JSX.Element => {
   const { isMobile } = useDevice();
   const [isOpened, setIsOpened] = useState(false);
+  const pathname = usePathname()
 
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      setIsOpened(!isMobile && window.location.pathname !== "/search");
-    }
+      setIsOpened(!isMobile && !["/search", "/"].includes(pathname!));
   }, [isMobile]);
 
   return (
