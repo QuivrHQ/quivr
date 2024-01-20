@@ -1,9 +1,9 @@
 import { redirect } from "next/navigation";
 
-export const redirectToPreviousPageOrChatPage = (): void => {
+export const redirectToPreviousPageOrSearchPage = (): void => {
   const previousPage = sessionStorage.getItem("previous-page");
   if (previousPage === null) {
-    redirect("/chat");
+    redirect("/search");
   } else {
     sessionStorage.removeItem("previous-page");
     redirect(previousPage);

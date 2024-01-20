@@ -4,9 +4,11 @@ import { LuSearch } from "react-icons/lu";
 import styles from './SearchBar.module.scss'
 import { useChat } from '@/app/chat/[chatId]/hooks/useChat';
 import { useChatInput } from '@/app/chat/[chatId]/components/ActionsBar/components/ChatInput/hooks/useChatInput';
+import { useChatContext } from '@/lib/context';
 
 export const SearchBar = (): JSX.Element => {
     const { message, setMessage } = useChatInput()
+    const { messages, setMessages } = useChatContext()
     const { addQuestion } = useChat()
 
     const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -20,6 +22,7 @@ export const SearchBar = (): JSX.Element => {
     };
 
     const submit = () => {
+        setMessages([])
         addQuestion(message)
     }
 
