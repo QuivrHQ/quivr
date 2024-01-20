@@ -8,13 +8,13 @@ import { cn } from "@/lib/utils";
 
 export const DiscussionButton = (): JSX.Element => {
   const pathname = usePathname() ?? "";
-  const isSelected = pathname.includes("/chat");
+  const isSelected = pathname.includes("/search");
   const { t } = useTranslation("chat");
 
   return (
-    <Link href="/chat">
+    <Link href="/search">
       <Button
-        label={t("chat")}
+        label={t("search")}
         startIcon={<LuMessageSquare />}
         endIcon={<LuChevronRight size={18} />}
         className={cn(

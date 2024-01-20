@@ -1,10 +1,11 @@
 from uuid import UUID
 
 from logger import get_logger
-from models.settings import get_supabase_client
+from models.settings import get_embeddings, get_supabase_client
 from modules.brain.dto.inputs import BrainUpdatableProperties
 from modules.brain.entity.brain_entity import BrainEntity, PublicBrain
-from modules.brain.repository.interfaces.brains_interface import BrainsInterface
+from modules.brain.repository.interfaces.brains_interface import \
+    BrainsInterface
 
 logger = get_logger(__name__)
 
@@ -15,17 +16,18 @@ class Brains(BrainsInterface):
         self.db = supabase_client
 
     def create_brain(self, brain):
-        response = (
-            self.db.table("brains").insert(
-                brain.dict(
-                    exclude={
-                        "brain_definition",
-                        "brain_secrets_values",
-                        "connected_brains_ids",
-                    }
-                )
-            )
-        ).execute()
+        embeddings = get_embeddings()
+        string_to_embed = f"Name: {brain.name} Description: {brain.description}"
+        brain_meaning = embeddings.embed_query(string_to_embed)
+        brain_dict = brain.dict(
+            exclude={
+                "brain_definition",
+                "brain_secrets_values",
+                "connected_brains_ids",
+            }
+        )
+        brain_dict["meaning"] = brain_meaning
+        response = (self.db.table("brains").insert(brain_dict)).execute()
 
         return BrainEntity(**response.data[0])
 
@@ -80,9 +82,14 @@ class Brains(BrainsInterface):
     def update_brain_by_id(
         self, brain_id: UUID, brain: BrainUpdatableProperties
     ) -> BrainEntity | None:
+        embeddings = get_embeddings()
+        string_to_embed = f"Name: {brain.name} Description: {brain.description}"
+        brain_meaning = embeddings.embed_query(string_to_embed)
+        brain_dict = brain.dict(exclude_unset=True)
+        brain_dict["meaning"] = brain_meaning
         update_brain_response = (
             self.db.table("brains")
-            .update(brain.dict(exclude_unset=True))
+            .update(brain_dict)
             .match({"brain_id": brain_id})
             .execute()
         ).data

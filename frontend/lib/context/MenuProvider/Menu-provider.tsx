@@ -1,36 +1,38 @@
+import { usePathname } from "next/navigation";
 import { createContext, useEffect, useState } from "react";
 
 import { useDevice } from "@/lib/hooks/useDevice";
 
-type SideBarContextType = {
+type MenuContextType = {
   isOpened: boolean;
   setIsOpened: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
-export const SideBarContext = createContext<SideBarContextType | undefined>(
+export const MenuContext = createContext<MenuContextType | undefined>(
   undefined
 );
 
-export const SideBarProvider = ({
+export const MenuProvider = ({
   children,
 }: {
   children: React.ReactNode;
 }): JSX.Element => {
   const { isMobile } = useDevice();
-  const [isOpened, setIsOpened] = useState(!isMobile);
+  const [isOpened, setIsOpened] = useState(false);
+  const pathname = usePathname()
 
   useEffect(() => {
-    setIsOpened(!isMobile);
+      setIsOpened(!isMobile && !["/search", "/chat", "/"].includes(pathname!));
   }, [isMobile]);
 
   return (
-    <SideBarContext.Provider
+    <MenuContext.Provider
       value={{
         isOpened,
         setIsOpened,
       }}
     >
       {children}
-    </SideBarContext.Provider>
+    </MenuContext.Provider>
   );
 };

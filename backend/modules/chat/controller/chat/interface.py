@@ -17,5 +17,6 @@ class ChatInterface(ABC):
         streaming,
         prompt_id,
         user_id,
+        chat_question,
     ):
         pass

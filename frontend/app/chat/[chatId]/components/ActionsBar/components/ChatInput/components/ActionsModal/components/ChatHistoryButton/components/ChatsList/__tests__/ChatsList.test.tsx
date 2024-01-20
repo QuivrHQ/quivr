@@ -12,7 +12,7 @@ import {
   ChatProviderMock,
 } from "@/lib/context/ChatProvider/mocks/ChatProviderMock";
 import { KnowledgeToFeedProvider } from "@/lib/context/KnowledgeToFeedProvider";
-import { SideBarProvider } from "@/lib/context/SidebarProvider/sidebar-provider";
+import { MenuProvider } from "@/lib/context/MenuProvider/Menu-provider";
 import { SupabaseContextMock } from "@/lib/context/SupabaseProvider/mocks/SupabaseProviderMock";
 
 vi.mock("@/lib/context/SupabaseProvider/supabase-provider", () => ({
@@ -91,9 +91,9 @@ describe("ChatsList", () => {
         <KnowledgeToFeedProvider>
           <ChatProviderMock>
             <BrainProviderMock>
-              <SideBarProvider>
+              <MenuProvider>
                 <ChatsList />
-              </SideBarProvider>
+              </MenuProvider>
             </BrainProviderMock>
           </ChatProviderMock>
         </KnowledgeToFeedProvider>
@@ -109,9 +109,9 @@ describe("ChatsList", () => {
         <KnowledgeToFeedProvider>
           <ChatProviderMock>
             <BrainProviderMock>
-              <SideBarProvider>
+              <MenuProvider>
                 <ChatsList />
-              </SideBarProvider>
+              </MenuProvider>
             </BrainProviderMock>
           </ChatProviderMock>
         </KnowledgeToFeedProvider>

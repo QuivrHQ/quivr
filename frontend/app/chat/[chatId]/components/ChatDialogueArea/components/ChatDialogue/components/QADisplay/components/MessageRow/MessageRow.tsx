@@ -13,11 +13,21 @@ type MessageRowProps = {
   brainName?: string | null;
   promptName?: string | null;
   children?: React.ReactNode;
+  metadata?: {
+    sources?: [string] | [];
+  };
 };
 
 export const MessageRow = React.forwardRef(
   (
-    { speaker, text, brainName, promptName, children }: MessageRowProps,
+    {
+      speaker,
+      text,
+      brainName,
+      promptName,
+      children,
+      metadata,
+    }: MessageRowProps,
     ref: React.Ref<HTMLDivElement>
   ) => {
     const {
@@ -32,18 +42,10 @@ export const MessageRow = React.forwardRef(
       text,
     });
 
-    let messageContent = text ?? "";
-    let sourcesContent = "";
+    const messageContent = text ?? "";
+    const sourcesContent = metadata?.sources ?? [];
 
-    const sourcesIndex = messageContent.lastIndexOf("**Sources:**");
-    const hasSources = sourcesIndex !== -1;
-
-    if (hasSources) {
-      sourcesContent = messageContent
-        .substring(sourcesIndex + "**Sources:**".length)
-        .trim();
-      messageContent = messageContent.substring(0, sourcesIndex).trim();
-    }
+    const hasSources = Boolean(sourcesContent);
 
     return (
       <div className={containerWrapperClasses}>

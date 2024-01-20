@@ -1,12 +1,12 @@
 import { motion } from "framer-motion";
 
-import { useSideBarContext } from "@/lib/context/SidebarProvider/hooks/useSideBarContext";
+import { useMenuContext } from "@/lib/context/MenuProvider/hooks/useMenuContext";
 
 type AnimatedDivProps = {
   children: React.ReactNode;
 };
 export const AnimatedDiv = ({ children }: AnimatedDivProps): JSX.Element => {
-  const { isOpened } = useSideBarContext();
+  const { isOpened } = useMenuContext();
   const OPENED_MENU_WIDTH = 260;
 
   return (

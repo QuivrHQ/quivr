@@ -1,6 +1,6 @@
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
-import { useTranslation } from 'react-i18next'
+import { useTranslation } from 'react-i18next';
 
 import { ChatEntity } from "@/app/chat/[chatId]/types";
 import { useChatApi } from "@/lib/api/chat/useChatApi";
@@ -27,7 +27,7 @@ export const useChatsListItem = (chat: ChatEntity) => {
         chats.filter((currentChat) => currentChat.chat_id !== chatId)
       );
       // TODO: Change route only when the current chat is being deleted
-      void router.push("/chat");
+      void router.push("/search");
       publish({
         text: t('chatDeleted',{ id: chatId,ns:'chat'})  ,
         variant: "success",
