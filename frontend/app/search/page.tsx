@@ -10,6 +10,7 @@ import { redirectToLogin } from "@/lib/router/redirectToLogin";
 
 import { useChatNotificationsSync } from "../chat/[chatId]/hooks/useChatNotificationsSync";
 import { useChatsList } from "../chat/[chatId]/hooks/useChatsList";
+// eslint-disable-next-line import/order
 import styles from "./page.module.scss";
 
 
