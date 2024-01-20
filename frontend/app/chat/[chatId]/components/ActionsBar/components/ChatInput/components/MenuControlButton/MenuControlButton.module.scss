@@ -1,0 +1,13 @@
+@use '@/styles/Colors.module.scss';
+@use '@/styles/IconSizes.module.scss';
+@use '@/styles/Spacings.module.scss';
+
+.menu_icon {
+    width: IconSizes.$medium;
+    height: IconSizes.$medium;
+    cursor: pointer;
+
+    &:hover {
+        color: Colors.$accent;
+    }
+}

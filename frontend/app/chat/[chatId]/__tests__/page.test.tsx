@@ -11,7 +11,7 @@ import {
   ChatProviderMock,
 } from "@/lib/context/ChatProvider/mocks/ChatProviderMock";
 import { KnowledgeToFeedProvider } from "@/lib/context/KnowledgeToFeedProvider";
-import { SideBarProvider } from "@/lib/context/SidebarProvider/sidebar-provider";
+import { MenuProvider } from "@/lib/context/MenuProvider/Menu-provider";
 import {
   SupabaseContextMock,
   SupabaseProviderMock,
@@ -104,9 +104,9 @@ describe("Chat page", () => {
           <ChatProviderMock>
             <SupabaseProviderMock>
               <BrainProviderMock>
-                <SideBarProvider>
+                <MenuProvider>
                   <SelectedChatPage />,
-                </SideBarProvider>
+                </MenuProvider>
               </BrainProviderMock>
             </SupabaseProviderMock>
           </ChatProviderMock>

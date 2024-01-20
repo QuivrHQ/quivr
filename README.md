@@ -46,7 +46,7 @@ You can find the installation video [here](https://www.youtube.com/watch?v=cXBa6
 
 - **Step 0**: Supabase CLI
 
-  Follow the instructions [here](https://supabase.com/docs/guides/cli/getting-started) to install the Supabase CLI.
+  Follow the instructions [here](https://supabase.com/docs/guides/cli/getting-started) to install the Supabase CLI that is required.
 
   ```bash
   supabase -v # Check that the installation worked

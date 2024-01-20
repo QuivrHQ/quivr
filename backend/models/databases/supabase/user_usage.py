@@ -139,9 +139,6 @@ class UserUsage(Repository):
         matching_customers = None
         try:
             user_is_customer, user_customer_id = self.check_user_is_customer(user_id)
-            logger.info("🔥🔥🔥")
-            logger.info(user_is_customer)
-            logger.info(user_customer_id)
 
             if user_is_customer:
                 self.db.table("user_settings").update({"is_premium": True}).match(

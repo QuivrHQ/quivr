@@ -26,9 +26,9 @@ const UserPage = (): JSX.Element => {
   return (
     <>
       <main className="container lg:w-2/3 mx-auto py-10 px-5">
-        <Link href="/chat">
+        <Link href="/search">
           <Button className="mb-5" variant="primary">
-            {t("chat:back_to_chat")}
+            {t("chat:back_to_search")}
           </Button>
         </Link>
         <Card className="mb-5 shadow-sm hover:shadow-none">

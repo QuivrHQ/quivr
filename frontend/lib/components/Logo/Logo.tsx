@@ -5,7 +5,7 @@ export const Logo = (): JSX.Element => {
   return (
     <Link
       data-testid="app-logo"
-      href={"/chat"}
+      href={"/search"}
       className="flex items-center gap-4"
     >
       <Image

@@ -5,7 +5,7 @@ import { FaQuestionCircle } from "react-icons/fa";
 import { useEventTracking } from "@/services/analytics/june/useEventTracking";
 
 type SourcesButtonProps = {
-  sources: string;
+  sources: [string] | [];
 };
 
 export const SourcesButton = ({ sources }: SourcesButtonProps): JSX.Element => {
@@ -37,7 +37,7 @@ export const SourcesButton = ({ sources }: SourcesButtonProps): JSX.Element => {
 
   const sourcesList = (
     <ul className="list-disc list-inside">
-      {sources.split(", ").map((source, index) => (
+      {sources.map((source, index) => (
         <li key={index} className="truncate">
           {source.trim()}
         </li>

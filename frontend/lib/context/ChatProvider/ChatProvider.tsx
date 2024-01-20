@@ -25,7 +25,11 @@ export const ChatProvider = ({
       )
         ? prevHistory.map((item: ChatMessage) =>
             item.message_id === streamedChat.message_id
-              ? { ...item, assistant: item.assistant + streamedChat.assistant }
+              ? {
+                  ...item,
+                  assistant: item.assistant + streamedChat.assistant,
+                  metadata: streamedChat.metadata,
+                }
               : item
           )
         : [...prevHistory, streamedChat];

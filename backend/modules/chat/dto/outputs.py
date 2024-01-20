@@ -12,6 +12,8 @@ class GetChatHistoryOutput(BaseModel):
     message_time: Optional[str]
     prompt_title: Optional[str] | None
     brain_name: Optional[str] | None
+    brain_id: Optional[UUID] | None
+    metadata: Optional[dict] | None
 
     def dict(self, *args, **kwargs):
         chat_history = super().dict(*args, **kwargs)

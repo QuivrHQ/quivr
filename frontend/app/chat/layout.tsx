@@ -1,8 +1,8 @@
 "use client";
-import { ReactNode } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import { ReactNode, useEffect, useState } from "react";
 
-import { ChatProvider, KnowledgeToFeedProvider } from "@/lib/context";
-import { ChatsProvider } from "@/lib/context/ChatsProvider/chats-provider";
+import { KnowledgeToFeedProvider } from "@/lib/context";
 import { useSupabase } from "@/lib/context/SupabaseProvider";
 import { redirectToLogin } from "@/lib/router/redirectToLogin";
 
@@ -12,20 +12,29 @@ interface LayoutProps {
 
 const Layout = ({ children }: LayoutProps): JSX.Element => {
   const { session } = useSupabase();
+  const pathname = usePathname();
+  const router = useRouter();
+  const [isLoading, setIsLoading] = useState(true);
 
-  if (session === null) {
-    redirectToLogin();
+  useEffect(() => {
+    if (session === null) {
+      redirectToLogin();
+    } else if (pathname === '/chat') {
+      router.push('/search');
+    } else {
+      setIsLoading(false);
+    }
+  }, [session, pathname, router]);
+
+  if (isLoading) {
+    return <></>
   }
 
   return (
     <KnowledgeToFeedProvider>
-      <ChatsProvider>
-        <ChatProvider>
-          <div className="relative h-full w-full flex justify-stretch items-stretch overflow-auto">
-            {children}
-          </div>
-        </ChatProvider>
-      </ChatsProvider>
+      <div className="relative h-full w-full flex justify-stretch items-stretch overflow-auto">
+        {children}
+      </div>
     </KnowledgeToFeedProvider>
   );
 };

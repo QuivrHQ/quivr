@@ -28,6 +28,15 @@ logger = get_logger(__name__)
 QUIVR_DEFAULT_PROMPT = "Your name is Quivr. You're a helpful assistant.  If you don't know the answer, just say that you don't know, don't try to make up an answer."
 
 
+def is_valid_uuid(uuid_to_test, version=4):
+    try:
+        uuid_obj = UUID(uuid_to_test, version=version)
+    except ValueError:
+        return False
+
+    return str(uuid_obj) == uuid_to_test
+
+
 brain_service = BrainService()
 chat_service = ChatService()
 
@@ -65,7 +74,10 @@ class QuivrRAG(BaseModel, RAGInterface):
 
     @property
     def prompt_to_use(self):
-        return get_prompt_to_use(UUID(self.brain_id), self.prompt_id)
+        if self.brain_id and is_valid_uuid(self.brain_id):
+            return get_prompt_to_use(UUID(self.brain_id), self.prompt_id)
+        else:
+            return None
 
     supabase_client: Optional[Client] = None
     vector_store: Optional[CustomSupabaseVectorStore] = None
@@ -179,4 +191,5 @@ class QuivrRAG(BaseModel, RAGInterface):
     def get_retriever(self):
         return self.vector_store.as_retriever()
 
+    # Some other methods can be added such as on_stream, on_end,... to abstract history management (each answer should be saved or not)    # Some other methods can be added such as on_stream, on_end,... to abstract history management (each answer should be saved or not)
     # Some other methods can be added such as on_stream, on_end,... to abstract history management (each answer should be saved or not)
