@@ -1,6 +1,6 @@
-@use '@/styles/Colors.scss';
-@use '@/styles/IconSizes.scss';
-@use '@/styles/Spacings.scss';
+@use '@/styles/Colors.module.scss.scss';
+@use '@/styles/IconSizes.module.scss.scss';
+@use '@/styles/Spacings.module.scss.scss';
 
 .search_bar_wrapper {
     display: flex;

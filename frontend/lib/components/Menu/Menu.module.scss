@@ -1,6 +1,6 @@
-@use '@/styles/Colors';
-@use '@/styles/Spacings';
-@use '@/styles/Zindex';
+@use '@/styles/Colors.module.scss';
+@use '@/styles/Spacings.module.scss';
+@use '@/styles/ZIndex.module.scss';
 
 .menu_control_button_wrapper {
     background-color: transparent;

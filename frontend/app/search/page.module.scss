@@ -1,8 +1,8 @@
-@use '@/styles/Colors';
-@use '@/styles/IconSizes.scss';
-@use '@/styles/ScreenSizes.scss';
-@use '@/styles/Spacings.scss';
-@use '@/styles/Typography.scss';
+@use '@/styles/Colors.module.scss';
+@use '@/styles/IconSizes.module.scss.scss';
+@use '@/styles/ScreenSizes.module.scss.scss';
+@use '@/styles/Spacings.module.scss.scss';
+@use '@/styles/Typography.module.scss.scss';
 
 .search_page_container {
     background-color: Colors.$ivory;

@@ -1,6 +1,6 @@
-@use '@/styles/Colors';
-@use '@/styles/IconSizes';
-@use '@/styles/Spacings';
+@use '@/styles/Colors.module.scss';
+@use '@/styles/IconSizes.module.scss';
+@use '@/styles/Spacings.module.scss';
 
 .menu_icon {
     width: IconSizes.$medium;
