@@ -5,7 +5,6 @@ import { useMenuContext } from "@/lib/context/MenuProvider/hooks/useMenuContext"
 
 import styles from './MenuControlButton.module.scss'
 
-
 export const MenuControlButton = (): JSX.Element => {
     const { isOpened, setIsOpened } = useMenuContext();
     const Icon = isOpened ? LuArrowLeftFromLine : GiHamburgerMenu;

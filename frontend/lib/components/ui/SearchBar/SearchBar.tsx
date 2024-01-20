@@ -1,23 +1,34 @@
-import { ChangeEvent, Dispatch, SetStateAction, useState } from 'react';
+import { ChangeEvent } from 'react';
 import { LuSearch } from "react-icons/lu";
+
+import { useChatInput } from '@/app/chat/[chatId]/components/ActionsBar/components/ChatInput/hooks/useChatInput';
+import { useChat } from '@/app/chat/[chatId]/hooks/useChat';
+import { useChatContext } from '@/lib/context';
 
 import styles from './SearchBar.module.scss'
 
 export const SearchBar = (): JSX.Element => {
-    const [inputValue, setInputValue]: [string, Dispatch<SetStateAction<string>>] = useState<string>('');
+    const { message, setMessage } = useChatInput()
+    const { setMessages } = useChatContext()
+    const { addQuestion } = useChat()
 
-    const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
-        setInputValue(event.target.value);
+    const handleChange = (event: ChangeEvent<HTMLInputElement>): void => {
+        setMessage(event.target.value);
     };
 
-    const handleEnter = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    const handleEnter = async (event: React.KeyboardEvent<HTMLInputElement>): Promise<void> => {
         if (event.key === 'Enter') {
-            submit()
+            await submit()
         }
     };
 
-    const submit = () => {
-        console.info('submit')
+    const submit = async (): Promise<void> => {
+        setMessages([]);
+        try {
+            await addQuestion(message);
+        } catch (error) {
+            console.error(error);
+        }
     }
 
     /* eslint-disable @typescript-eslint/restrict-template-expressions */
@@ -28,13 +39,13 @@ export const SearchBar = (): JSX.Element => {
                 className={styles.search_input}
                 type="text"
                 placeholder="Search"
-                value={inputValue}
+                value={message}
                 onChange={handleChange}
-                onKeyDown={handleEnter}
+                onKeyDown={() => void handleEnter}
             />
             <LuSearch
-                className={`${styles.search_icon} ${!inputValue ? styles.disabled : ''}`}
-                onClick={submit}
+                className={`${styles.search_icon} ${!message ? styles.disabled : ''}`}
+                onClick={() => void submit()}
             />
         </div>
     )

@@ -8,14 +8,15 @@ import { PropsWithChildren, useEffect } from "react";
 import { Menu } from "@/lib/components/Menu/Menu";
 import { useOutsideClickListener } from "@/lib/components/Menu/hooks/useOutsideClickListener";
 import { NotificationBanner } from "@/lib/components/NotificationBanner";
-import { BrainProvider } from "@/lib/context";
+import { BrainProvider, ChatProvider } from "@/lib/context";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
+import { ChatsProvider } from "@/lib/context/ChatsProvider";
 import { MenuProvider } from "@/lib/context/MenuProvider/Menu-provider";
 import { useSupabase } from "@/lib/context/SupabaseProvider";
 import { UpdateMetadata } from "@/lib/helpers/updateMetadata";
 import { usePageTracking } from "@/services/analytics/june/usePageTracking";
-
 import "../lib/config/LocaleConfig/i18n";
+
 
 if (
   process.env.NEXT_PUBLIC_POSTHOG_KEY != null &&
@@ -70,7 +71,11 @@ const AppWithQueryClient = ({ children }: PropsWithChildren): JSX.Element => {
     <QueryClientProvider client={queryClient}>
       <BrainProvider>
         <MenuProvider>
-          <App>{children}</App>
+          <ChatsProvider>
+            <ChatProvider>
+              <App>{children}</App>
+            </ChatProvider>
+          </ChatsProvider>
         </MenuProvider>
       </BrainProvider>
     </QueryClientProvider>

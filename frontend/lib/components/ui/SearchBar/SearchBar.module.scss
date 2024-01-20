@@ -19,6 +19,7 @@
     .search_input {
         border: none;
         flex: 1;
+        caret-color: Colors.$accent;
 
         &:focus {
             box-shadow: none;

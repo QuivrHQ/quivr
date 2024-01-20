@@ -2,7 +2,7 @@
 import { useEffect } from "react";
 
 import { useSupabase } from "@/lib/context/SupabaseProvider";
-import { redirectToPreviousPageOrChatPage } from "@/lib/helpers/redirectToPreviousPageOrChatPage";
+import { redirectToPreviousPageOrSearchPage } from "@/lib/helpers/redirectToPreviousPageOrSearchPage";
 
 import {
   DemoSection,
@@ -21,7 +21,7 @@ const HomePage = (): JSX.Element => {
 
   useEffect(() => {
     if (session?.user !== undefined) {
-      redirectToPreviousPageOrChatPage();
+      redirectToPreviousPageOrSearchPage();
     }
   }, [session?.user]);
 
