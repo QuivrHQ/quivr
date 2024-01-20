@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.0.166 (2024-01-20)
+
+## What's Changed
+* feat(search): new way to interact with Quivr by @StanGirard in https://github.com/StanGirard/quivr/pull/2026
+* feat: adding search by @StanGirard in https://github.com/StanGirard/quivr/pull/2031
+* fix(frontend): remove close menu icon on mobile by @Zewed in https://github.com/StanGirard/quivr/pull/2030
+* fix(frontend): chat refreshed on first search request by @Zewed in https://github.com/StanGirard/quivr/pull/2033
+
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.165...v0.0.166
+
 ## 0.0.165 (2024-01-17)
 
 ## What's Changed
