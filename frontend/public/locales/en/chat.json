@@ -44,6 +44,7 @@
   "parameters": "Parameters",
   "receivedResponse": "Received response. Starting to handle stream...",
   "resposeBodyNull": "Response body is null",
+  "search": "Search",
   "shortcut_choose_prompt": "#: Choose a specific prompt",
   "shortcut_create_brain": "@+: Create a new brain",
   "shortcut_create_prompt": "#+: Create a new custom prompt",

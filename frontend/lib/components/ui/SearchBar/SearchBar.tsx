@@ -1,29 +1,34 @@
-import { ChangeEvent, Dispatch, SetStateAction, useState } from 'react';
+import { ChangeEvent } from 'react';
 import { LuSearch } from "react-icons/lu";
 
-import styles from './SearchBar.module.scss'
-import { useChat } from '@/app/chat/[chatId]/hooks/useChat';
 import { useChatInput } from '@/app/chat/[chatId]/components/ActionsBar/components/ChatInput/hooks/useChatInput';
+import { useChat } from '@/app/chat/[chatId]/hooks/useChat';
 import { useChatContext } from '@/lib/context';
+
+import styles from './SearchBar.module.scss'
 
 export const SearchBar = (): JSX.Element => {
     const { message, setMessage } = useChatInput()
     const { setMessages } = useChatContext()
     const { addQuestion } = useChat()
 
-    const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const handleChange = (event: ChangeEvent<HTMLInputElement>): void => {
         setMessage(event.target.value);
     };
 
-    const handleEnter = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    const handleEnter = async (event: React.KeyboardEvent<HTMLInputElement>): Promise<void> => {
         if (event.key === 'Enter') {
-            submit()
+            await submit()
         }
     };
 
-    const submit = () => {
-        setMessages([])
-        addQuestion(message)
+    const submit = async (): Promise<void> => {
+        setMessages([]);
+        try {
+            await addQuestion(message);
+        } catch (error) {
+            console.error(error);
+        }
     }
 
     /* eslint-disable @typescript-eslint/restrict-template-expressions */
@@ -36,11 +41,11 @@ export const SearchBar = (): JSX.Element => {
                 placeholder="Search"
                 value={message}
                 onChange={handleChange}
-                onKeyDown={handleEnter}
+                onKeyDown={() => void handleEnter}
             />
             <LuSearch
                 className={`${styles.search_icon} ${!message ? styles.disabled : ''}`}
-                onClick={submit}
+                onClick={() => void submit()}
             />
         </div>
     )

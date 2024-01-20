@@ -44,7 +44,6 @@ export const useChat = () => {
   const { t } = useTranslation(["chat"]);
 
   const addQuestion = async (question: string, callback?: () => void) => {
-    console.info(question)
     if (question === "") {
       publish({
         variant: "danger",
@@ -59,14 +58,12 @@ export const useChat = () => {
 
       let currentChatId = chatId;
 
-      let shouldUpdateUrl = false;
-
       //if chatId is not set, create a new chat. Chat name is from the first question
       if (currentChatId === undefined) {
         const chat = await createChat(getChatNameFromQuestion(question));
         currentChatId = chat.chat_id;
         setChatId(currentChatId);
-        router.replace(`/chat/${currentChatId}`);
+        router.push(`/chat/${currentChatId}`);
         void queryClient.invalidateQueries({
           queryKey: [CHATS_DATA_KEY],
         });
