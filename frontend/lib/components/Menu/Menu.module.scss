@@ -8,7 +8,7 @@
     top: Spacings.$spacing05;
     left: Spacings.$spacing05;
     transition: margin-left 0.2s ease-in-out;
-    z-index: Zindex.$overlay;
+    z-index: ZIndex.$overlay;
 
     &.shifted {
         margin-left: 260px;

@@ -1,6 +1,18 @@
 /* eslint-disable max-lines */
+const path = require("path");
+
 const nextConfig = {
   output: "standalone",
+  webpack: (config) => {
+    // Resolve the @ alias for Sass
+    config.resolve.alias["@"] = path.join(__dirname, ".");
+
+    // Important: return the modified config
+    return config;
+  },
+  sassOptions: {
+    includePaths: [path.join(__dirname, "styles")],
+  },
   redirects: async () => {
     return [
       {
