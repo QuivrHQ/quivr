@@ -30,8 +30,7 @@ if (
 
 // This wrapper is used to make effect calls at a high level in app rendering.
 const App = ({ children }: PropsWithChildren): JSX.Element => {
-  const { fetchAllBrains, fetchDefaultBrain, fetchPublicPrompts } =
-    useBrainContext();
+  const { fetchAllBrains, fetchDefaultBrain, fetchPublicPrompts } = useBrainContext();
   const { onClickOutside } = useOutsideClickListener();
   const { session } = useSupabase();
 
