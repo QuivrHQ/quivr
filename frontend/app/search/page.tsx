@@ -6,15 +6,26 @@ import { QuivrLogo } from "@/lib/assets/QuivrLogo";
 import { SearchBar } from "@/lib/components/ui/SearchBar/SearchBar";
 import { useMenuContext } from "@/lib/context/MenuProvider/hooks/useMenuContext";
 
+import { useSupabase } from "@/lib/context/SupabaseProvider";
+import { redirectToLogin } from "@/lib/router/redirectToLogin";
+import { useChatNotificationsSync } from "../chat/[chatId]/hooks/useChatNotificationsSync";
+import { useChatsList } from "../chat/[chatId]/hooks/useChatsList";
 import styles from "./page.module.scss";
 
 const Search = (): JSX.Element => {
     const {setIsOpened} = useMenuContext();
     const pathname = usePathname()
+    const { session } = useSupabase();
 
     useEffect(() => {
+    if (session === null) {
+      redirectToLogin();
+    } else
         setIsOpened(false);
-    }, [pathname]);
+    }, [pathname, session]);
+
+    useChatsList();
+    useChatNotificationsSync();
 
     return (
         <div className={styles.search_page_container}>
