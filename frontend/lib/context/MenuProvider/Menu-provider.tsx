@@ -1,7 +1,7 @@
+import { usePathname } from "next/navigation";
 import { createContext, useEffect, useState } from "react";
 
 import { useDevice } from "@/lib/hooks/useDevice";
-import { usePathname } from "next/navigation";
 
 type MenuContextType = {
   isOpened: boolean;
