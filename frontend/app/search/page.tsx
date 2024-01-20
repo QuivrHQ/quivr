@@ -1,12 +1,11 @@
 "use client";
+import { usePathname } from "next/navigation";
 import { useEffect } from "react";
 
 import { QuivrLogo } from "@/lib/assets/QuivrLogo";
 import { SearchBar } from "@/lib/components/ui/SearchBar/SearchBar";
-
 import { useMenuContext } from "@/lib/context/MenuProvider/hooks/useMenuContext";
 
-import { usePathname } from "next/navigation";
 import styles from "./page.module.scss";
 
 const Search = (): JSX.Element => {
