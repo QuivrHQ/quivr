@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.0.168 (2024-01-20)
+
+## What's Changed
+* fix(frontend): don t load chat items on search by @Zewed in https://github.com/StanGirard/quivr/pull/2036
+
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.167...v0.0.168
+
 ## 0.0.167 (2024-01-20)
 
 ## What's Changed
