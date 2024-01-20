@@ -1,4 +1,5 @@
 "use client";
+import { usePathname, useRouter } from "next/navigation";
 import { ReactNode } from "react";
 
 import { KnowledgeToFeedProvider } from "@/lib/context";
@@ -11,9 +12,13 @@ interface LayoutProps {
 
 const Layout = ({ children }: LayoutProps): JSX.Element => {
   const { session } = useSupabase();
+  const pathname = usePathname();
+  const router = useRouter()
 
   if (session === null) {
     redirectToLogin();
+  } else if (pathname === '/chat') {
+    router.push('/search')
   }
 
   return (
