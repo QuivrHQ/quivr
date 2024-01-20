@@ -5,7 +5,7 @@ import { useChatInput } from '@/app/chat/[chatId]/components/ActionsBar/componen
 import { useChat } from '@/app/chat/[chatId]/hooks/useChat';
 import { useChatContext } from '@/lib/context';
 
-import styles from './SearchBar.module.scss'
+import styles from './SearchBar.module.scss';
 
 export const SearchBar = (): JSX.Element => {
     const { message, setMessage } = useChatInput()
@@ -41,7 +41,7 @@ export const SearchBar = (): JSX.Element => {
                 placeholder="Search"
                 value={message}
                 onChange={handleChange}
-                onKeyDown={() => void handleEnter}
+                onKeyDown={(event: React.KeyboardEvent<HTMLInputElement>) => void handleEnter(event)}
             />
             <LuSearch
                 className={`${styles.search_icon} ${!message ? styles.disabled : ''}`}
