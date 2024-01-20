@@ -1,11 +1,22 @@
 "use client";
+import { useEffect } from "react";
 
 import { QuivrLogo } from "@/lib/assets/QuivrLogo";
 import { SearchBar } from "@/lib/components/ui/SearchBar/SearchBar";
 
-import styles from "./page.module.scss"
+import { useMenuContext } from "@/lib/context/MenuProvider/hooks/useMenuContext";
+
+import { usePathname } from "next/navigation";
+import styles from "./page.module.scss";
 
 const Search = (): JSX.Element => {
+    const {setIsOpened} = useMenuContext();
+    const pathname = usePathname()
+
+    useEffect(() => {
+        setIsOpened(false);
+    }, [pathname]);
+
     return (
         <div className={styles.search_page_container}>
             <div className={styles.main_container}>

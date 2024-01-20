@@ -38,11 +38,11 @@ const App = ({ children }: PropsWithChildren): JSX.Element => {
 
   useEffect(() => {
     if (session?.user) {
-      void fetchAllBrains();
-      void fetchDefaultBrain();
-      void fetchPublicPrompts();
-      posthog.identify(session.user.id, { email: session.user.email });
-      posthog.startSessionRecording();
+        void fetchAllBrains();
+        void fetchDefaultBrain();
+        void fetchPublicPrompts();
+        posthog.identify(session.user.id, { email: session.user.email });
+        posthog.startSessionRecording();
     }
   }, [session]);
 
@@ -51,11 +51,11 @@ const App = ({ children }: PropsWithChildren): JSX.Element => {
       <div className="flex flex-1 flex-col overflow-auto">
         <NotificationBanner />
         <div className="relative h-full w-full flex justify-stretch items-stretch overflow-auto">
-          <Menu />
-          <div onClick={onClickOutside} className="flex-1">
-            {children}
-          </div>
-          <UpdateMetadata />
+            <Menu />
+            <div onClick={onClickOutside} className="flex-1">
+                {children}
+            </div>
+            <UpdateMetadata />
         </div>
       </div>
     </PostHogProvider>

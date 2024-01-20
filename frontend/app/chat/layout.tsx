@@ -1,6 +1,6 @@
 "use client";
 import { usePathname, useRouter } from "next/navigation";
-import { ReactNode } from "react";
+import { ReactNode, useEffect, useState } from "react";
 
 import { KnowledgeToFeedProvider } from "@/lib/context";
 import { useSupabase } from "@/lib/context/SupabaseProvider";
@@ -13,12 +13,21 @@ interface LayoutProps {
 const Layout = ({ children }: LayoutProps): JSX.Element => {
   const { session } = useSupabase();
   const pathname = usePathname();
-  const router = useRouter()
+  const router = useRouter();
+  const [isLoading, setIsLoading] = useState(true);
 
-  if (session === null) {
-    redirectToLogin();
-  } else if (pathname === '/chat') {
-    router.push('/search')
+  useEffect(() => {
+    if (session === null) {
+      redirectToLogin();
+    } else if (pathname === '/chat') {
+      router.push('/search');
+    } else {
+      setIsLoading(false);
+    }
+  }, [session, pathname, router]);
+
+  if (isLoading) {
+    return <></>
   }
 
   return (

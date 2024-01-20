@@ -22,7 +22,7 @@ export const MenuProvider = ({
   const pathname = usePathname()
 
   useEffect(() => {
-      setIsOpened(!isMobile && !["/search", "/"].includes(pathname!));
+      setIsOpened(!isMobile && !["/search", "/chat", "/"].includes(pathname!));
   }, [isMobile]);
 
   return (
