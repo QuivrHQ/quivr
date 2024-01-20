@@ -23,7 +23,7 @@ services:
       - "--port"
       - "5050"
       - "--workers"
-      - "2"
+      - "6"
     restart: always
 
     ports:

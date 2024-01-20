@@ -43,9 +43,6 @@ class CustomSupabaseVectorStore(SupabaseVectorStore):
         ).execute()
 
         # Get the brain_id of the brain that is most similar to the query
-        logger.info(f"Found {len(res.data)} brains")
-        logger.info(res.data)
-        logger.info("🔥🔥🔥🔥🔥")
         brain_id = res.data[0].get("id", None)
         if not brain_id:
             return None
