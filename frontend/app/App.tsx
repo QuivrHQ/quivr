@@ -17,7 +17,6 @@ import { UpdateMetadata } from "@/lib/helpers/updateMetadata";
 import { usePageTracking } from "@/services/analytics/june/usePageTracking";
 import "../lib/config/LocaleConfig/i18n";
 
-
 if (
   process.env.NEXT_PUBLIC_POSTHOG_KEY != null &&
   process.env.NEXT_PUBLIC_POSTHOG_HOST != null
