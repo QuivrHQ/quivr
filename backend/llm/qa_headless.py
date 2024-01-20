@@ -246,7 +246,6 @@ class HeadlessQA(BaseModel, QAInterface):
             )
 
         async for token in callback.aiter():
-            logger.info("Token: %s", token)
             response_tokens.append(token)
             streamed_chat_history.assistant = token
             yield f"data: {json.dumps(streamed_chat_history.dict())}"

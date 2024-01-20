@@ -313,8 +313,6 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
 
         # Combine all response tokens to form the final assistant message
         assistant = "".join(response_tokens)
-        logger.info("💋💋💋💋")
-        logger.info(streamed_chat_history)
 
         try:
             if save_answer:

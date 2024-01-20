@@ -66,22 +66,14 @@ class BrainfulChat(ChatInterface):
                 supabase_client, embeddings, table_name="vectors"
             )
             # Get the first question from the chat_question
-            logger.info(f"Finding brain closest to {chat_question}")
-            logger.info("🔥🔥🔥🔥🔥")
+
             question = chat_question.question
-            logger.info(f"Question is {question}")
             history = chat_service.get_chat_history(chat_id)
             if history:
                 question = history[0].user_message
-                logger.info(f"Question is {question}")
             brain_id_to_use = vector_store.find_brain_closest_query(question)
-            logger.info(f"Found brain {brain_id_to_use}")
-            logger.info("🧠🧠🧠")
 
         brain = brain_service.get_brain_by_id(brain_id_to_use)
-        logger.info(f"Brain type: {brain.brain_type}")
-        logger.info(f"Id is {brain.brain_id}")
-        logger.info(f"Type of brain_id is {type(brain.brain_id)}")
         if (
             brain
             and brain.brain_type == BrainType.DOC
