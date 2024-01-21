@@ -64,7 +64,7 @@ class BrainfulChat(ChatInterface):
             else:
                 embeddings = OpenAIEmbeddings()
             vector_store = CustomSupabaseVectorStore(
-                supabase_client, embeddings, table_name="vectors"
+                supabase_client, embeddings, table_name="vectors", user_id=user_id
             )
             # Get the first question from the chat_question
 
@@ -72,7 +72,7 @@ class BrainfulChat(ChatInterface):
             history = chat_service.get_chat_history(chat_id)
             if history:
                 question = history[0].user_message
-            list_brains = vector_store.find_brain_closest_query(question)
+            list_brains = vector_store.find_brain_closest_query(user_id, question)
             if list_brains:
                 brain_id_to_use = list_brains[0]["id"]
             else:
