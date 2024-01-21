@@ -9,7 +9,6 @@ import {
   PopoverTrigger,
 } from "@/lib/components/ui/Popover";
 
-import { ChangeBrainButton } from "./components/ChangeBrainButton";
 import { ChatHistoryButton } from "./components/ChatHistoryButton/ChatHistoryButton";
 import { ConfigModal } from "./components/ConfigModal";
 import { FeedCardTrigger } from "./components/FeedCardTrigger";
@@ -42,7 +41,6 @@ export const ActionsModal = (): JSX.Element => {
           <FeedCardTrigger />
           <ChatHistoryButton />
           <ConfigModal />
-          <ChangeBrainButton />
         </PopoverContent>
       </Popover>
     </div>
