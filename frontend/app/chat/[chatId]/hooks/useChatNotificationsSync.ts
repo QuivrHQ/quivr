@@ -7,20 +7,17 @@ import { useNotificationApi } from "@/lib/api/notification/useNotificationApi";
 import { useChatContext } from "@/lib/context";
 import { useKnowledgeToFeedContext } from "@/lib/context/KnowledgeToFeedProvider/hooks/useKnowledgeToFeedContext";
 
-import { useChatInput } from "../components/ActionsBar/components/ChatInput/hooks/useChatInput";
 import { getChatNotificationsQueryKey } from "../utils/getChatNotificationsQueryKey";
 import { getMessagesFromChatItems } from "../utils/getMessagesFromChatItems";
 import { getNotificationsFromChatItems } from "../utils/getNotificationsFromChatItems";
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const useChatNotificationsSync = () => {
-  const { message } = useChatInput()
   const { setMessages, setNotifications, notifications } = useChatContext();
   const { getChatItems } = useChatApi();
   const { getChatNotifications } = useNotificationApi();
   const { setShouldDisplayFeedCard } = useKnowledgeToFeedContext();
   const params = useParams();
-
   const chatId = params?.chatId as string | undefined;
 
   const chatNotificationsQueryKey = getChatNotificationsQueryKey(chatId ?? "");
@@ -66,10 +63,13 @@ export const useChatNotificationsSync = () => {
 
         return;
       }
-
-      if (!message) {
-        const chatItems = await getChatItems(chatId);
-        setMessages(getMessagesFromChatItems(chatItems));
+      const chatItems = await getChatItems(chatId);
+      const messagesFromChatItems = getMessagesFromChatItems(chatItems);
+      if (
+        messagesFromChatItems.length > 1 ||
+        (messagesFromChatItems[0] && messagesFromChatItems[0].assistant !== "")
+      ) {
+        setMessages(messagesFromChatItems);
         setNotifications(getNotificationsFromChatItems(chatItems));
       }
     };
