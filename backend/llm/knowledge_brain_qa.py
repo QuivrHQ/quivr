@@ -63,6 +63,7 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
     max_tokens: int = 256
     streaming: bool = False
     knowledge_qa: Optional[RAGInterface]
+    metadata: Optional[dict] = None
 
     callbacks: List[
         AsyncIteratorCallbackHandler
@@ -77,6 +78,7 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
         chat_id: str,
         streaming: bool = False,
         prompt_id: Optional[UUID] = None,
+        metadata: Optional[dict] = None,
         **kwargs,
     ):
         super().__init__(
@@ -94,6 +96,7 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
             streaming=streaming,
             **kwargs,
         )
+        self.metadata = metadata
 
     @property
     def prompt_to_use(self):
@@ -260,7 +263,7 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
                     if self.prompt_to_use
                     else None,
                     "brain_name": brain.name if brain else None,
-                    "sources": None,
+                    "metadata": self.metadata,
                 }
             )
         else:
@@ -275,6 +278,7 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
                     if self.prompt_to_use
                     else None,
                     "brain_name": brain.name if brain else None,
+                    "metadata": self.metadata,
                 }
             )
 
@@ -302,7 +306,7 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
                 # Create metadata if it doesn't exist
                 if not streamed_chat_history.metadata:
                     streamed_chat_history.metadata = {}
-                    streamed_chat_history.metadata["sources"] = sources_list
+                streamed_chat_history.metadata["sources"] = sources_list
                 yield f"data: {json.dumps(streamed_chat_history.dict())}"
             else:
                 logger.info(

@@ -52,6 +52,7 @@ class BrainfulChat(ChatInterface):
         chat_question,
     ):
         brain_id_to_use = brain_id
+        metadata = {}
         if not brain_id:
             brain_settings = BrainSettings()
             supabase_client = get_supabase_client()
@@ -71,7 +72,16 @@ class BrainfulChat(ChatInterface):
             history = chat_service.get_chat_history(chat_id)
             if history:
                 question = history[0].user_message
-            brain_id_to_use = vector_store.find_brain_closest_query(question)
+            list_brains = vector_store.find_brain_closest_query(question)
+            if list_brains:
+                brain_id_to_use = list_brains[0]["id"]
+            else:
+                brain_id_to_use = None
+            # Add to metadata close_brains and close_brains_similarity
+            metadata["close_brains"] = list_brains
+
+        follow_up_questions = chat_service.get_follow_up_question(chat_id)
+        metadata["follow_up_questions"] = follow_up_questions
 
         brain = brain_service.get_brain_by_id(brain_id_to_use)
         if (
@@ -87,6 +97,7 @@ class BrainfulChat(ChatInterface):
                 brain_id=str(brain.brain_id),
                 streaming=streaming,
                 prompt_id=prompt_id,
+                metadata=metadata,
             )
         if brain.brain_type == BrainType.COMPOSITE:
             return CompositeBrainQA(
@@ -98,6 +109,7 @@ class BrainfulChat(ChatInterface):
                 streaming=streaming,
                 prompt_id=prompt_id,
                 user_id=user_id,
+                metadata=metadata,
             )
 
         if brain.brain_type == BrainType.API:
@@ -110,4 +122,5 @@ class BrainfulChat(ChatInterface):
                 streaming=streaming,
                 prompt_id=prompt_id,
                 user_id=user_id,
+                metadata=metadata,
             )
