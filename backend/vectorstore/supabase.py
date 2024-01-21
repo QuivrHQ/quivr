@@ -13,6 +13,7 @@ class CustomSupabaseVectorStore(SupabaseVectorStore):
     """A custom vector store that uses the match_vectors table instead of the vectors table."""
 
     brain_id: str = "none"
+    user_id: str = "none"
 
     def __init__(
         self,
@@ -20,12 +21,15 @@ class CustomSupabaseVectorStore(SupabaseVectorStore):
         embedding: Embeddings,
         table_name: str,
         brain_id: str = "none",
+        user_id: str = "none",
     ):
         super().__init__(client, embedding, table_name)
         self.brain_id = brain_id
+        self.user_id = user_id
 
     def find_brain_closest_query(
         self,
+        user_id: str,
         query: str,
         k: int = 6,
         table: str = "match_brain",
@@ -33,11 +37,14 @@ class CustomSupabaseVectorStore(SupabaseVectorStore):
     ) -> [dict]:
         vectors = self._embedding.embed_documents([query])
         query_embedding = vectors[0]
+        logger.info("🤯🤯")
+
         res = self._client.rpc(
             table,
             {
                 "query_embedding": query_embedding,
                 "match_count": k,
+                "p_user_id": str(self.user_id),
             },
         ).execute()
 
