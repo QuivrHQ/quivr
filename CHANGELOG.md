@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.0.170 (2024-01-21)
+
+## What's Changed
+* fix(frontend): translate configure for brains and successfully deleted for chat by @Zewed in https://github.com/StanGirard/quivr/pull/2042
+* fix(frontend): change search icon on menu by @Zewed in https://github.com/StanGirard/quivr/pull/2043
+* fix: 🐛 search by @StanGirard in https://github.com/StanGirard/quivr/pull/2045
+* fix(frontend): remove brain choice when search page displays by @Zewed in https://github.com/StanGirard/quivr/pull/2044
+
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.169...v0.0.170
+
 ## 0.0.169 (2024-01-21)
 
 ## What's Changed
