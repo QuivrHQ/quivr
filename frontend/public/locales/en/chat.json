@@ -55,6 +55,7 @@
   "shortcut_select_brain": "@: Select a brain",
   "shortcut_select_file": "/: Select a file to talk to",
   "subtitle": "Talk to a language model about your uploaded data",
+  "successfully_deleted": "Successfully deleted",
   "thinking": "Thinking...",
   "title": "Chat with {{brain}}",
   "today": "Today",

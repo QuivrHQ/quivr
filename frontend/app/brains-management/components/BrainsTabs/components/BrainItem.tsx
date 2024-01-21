@@ -46,7 +46,7 @@ export const BrainItem = ({ brain }: BrainItemProps): JSX.Element => {
           href={`/brains-management/${brain.id}`}
           className="px-8 py-3 flex items-center justify-center gap-2 bg-white text-primary rounded-lg border-0 w-content mt-3 disabled:bg-secondary hover:bg-primary/50 disabled:hover:bg-primary/50 w-full text-md"
         >
-          <span>Modifier</span>
+          <span>{t("configure")}</span>
           <LuChevronRightCircle className="text-md" />
         </Link>
       </div>
