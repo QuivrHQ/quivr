@@ -1,52 +1,60 @@
-import { ChangeEvent } from 'react';
+import { ChangeEvent, useEffect } from "react";
 import { LuSearch } from "react-icons/lu";
 
-import { useChatInput } from '@/app/chat/[chatId]/components/ActionsBar/components/ChatInput/hooks/useChatInput';
-import { useChat } from '@/app/chat/[chatId]/hooks/useChat';
-import { useChatContext } from '@/lib/context';
+import { useChatInput } from "@/app/chat/[chatId]/components/ActionsBar/components/ChatInput/hooks/useChatInput";
+import { useChat } from "@/app/chat/[chatId]/hooks/useChat";
+import { useChatContext } from "@/lib/context";
+import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 
-import styles from './SearchBar.module.scss';
+import styles from "./SearchBar.module.scss";
 
 export const SearchBar = (): JSX.Element => {
-    const { message, setMessage } = useChatInput()
-    const { setMessages } = useChatContext()
-    const { addQuestion } = useChat()
+  const { message, setMessage } = useChatInput();
+  const { setMessages } = useChatContext();
+  const { addQuestion } = useChat();
+  const { setCurrentBrainId } = useBrainContext();
 
-    const handleChange = (event: ChangeEvent<HTMLInputElement>): void => {
-        setMessage(event.target.value);
-    };
+  useEffect(() => {
+    setCurrentBrainId(null);
+  });
 
-    const handleEnter = async (event: React.KeyboardEvent<HTMLInputElement>): Promise<void> => {
-        if (event.key === 'Enter') {
-            await submit()
-        }
-    };
+  const handleChange = (event: ChangeEvent<HTMLInputElement>): void => {
+    setMessage(event.target.value);
+  };
 
-    const submit = async (): Promise<void> => {
-        setMessages([]);
-        try {
-            await addQuestion(message);
-        } catch (error) {
-            console.error(error);
-        }
+  const handleEnter = async (
+    event: React.KeyboardEvent<HTMLInputElement>
+  ): Promise<void> => {
+    if (event.key === "Enter") {
+      await submit();
     }
+  };
 
-    /* eslint-disable @typescript-eslint/restrict-template-expressions */
+  const submit = async (): Promise<void> => {
+    setMessages([]);
+    try {
+      await addQuestion(message);
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
-    return (
-        <div className={styles.search_bar_wrapper}>
-            <input
-                className={styles.search_input}
-                type="text"
-                placeholder="Search"
-                value={message}
-                onChange={handleChange}
-                onKeyDown={(event) => void handleEnter(event)}
-            />
-            <LuSearch
-                className={`${styles.search_icon} ${!message ? styles.disabled : ''}`}
-                onClick={() => void submit()}
-            />
-        </div>
-    )
-}
+  /* eslint-disable @typescript-eslint/restrict-template-expressions */
+
+  return (
+    <div className={styles.search_bar_wrapper}>
+      <input
+        className={styles.search_input}
+        type="text"
+        placeholder="Search"
+        value={message}
+        onChange={handleChange}
+        onKeyDown={(event) => void handleEnter(event)}
+      />
+      <LuSearch
+        className={`${styles.search_icon} ${!message ? styles.disabled : ""}`}
+        onClick={() => void submit()}
+      />
+    </div>
+  );
+};
