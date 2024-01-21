@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.0.169 (2024-01-21)
+
+## What's Changed
+* feat(brains): added now multiple brains close by by @StanGirard in https://github.com/StanGirard/quivr/pull/2039
+* fix(frontend): set chat messages only if needed by @Zewed in https://github.com/StanGirard/quivr/pull/2040
+
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.168...v0.0.169
+
 ## 0.0.168 (2024-01-20)
 
 ## What's Changed
