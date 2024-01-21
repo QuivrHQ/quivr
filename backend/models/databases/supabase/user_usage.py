@@ -150,12 +150,12 @@ class UserUsage(Repository):
                 self.update_customer_settings_with_product_settings(
                     user_id, user_customer_id
                 )
-                return True
+                return True, False
             else:
                 self.db.table("user_settings").update({"is_premium": False}).match(
                     {"user_id": str(user_id)}
                 ).execute()
-                return False
+                return False, False
 
         except Exception as e:
             logger.info(matching_customers)
@@ -164,7 +164,7 @@ class UserUsage(Repository):
                 "Error while checking if user is a premium user. Stripe needs to be configured."
             )
             logger.error(e)
-            return False
+            return False, True
 
     def get_user_settings(self, user_id):
         """
@@ -191,9 +191,9 @@ class UserUsage(Repository):
 
         user_settings = user_settings_response[0]
 
-        check_is_premium = self.check_if_is_premium_user(user_id)
+        check_is_premium, error = self.check_if_is_premium_user(user_id)
 
-        if check_is_premium:
+        if check_is_premium and not error:
             # get the possibly updated user settings
             user_settings_response = (
                 self.db.from_("user_settings")
