@@ -7,9 +7,9 @@ import {
 } from "@radix-ui/react-tooltip";
 import { cva, type VariantProps } from "class-variance-authority";
 import { ButtonHTMLAttributes, Ref, RefAttributes, forwardRef } from "react";
-import { FaSpinner } from "react-icons/fa";
 
 import { cn } from "@/lib/utils";
+import { AiOutlineLoading3Quarters } from "react-icons/ai";
 
 const ButtonVariants = cva(
   "px-8 py-3 text-sm disabled:opacity-80 text-center font-medium rounded-md focus:ring ring-primary/10 outline-none flex items-center justify-center gap-2 transition-opacity focus:ring-0",
@@ -65,7 +65,8 @@ const Button = forwardRef(
 
     const buttonChildren = (
       <>
-        {children} {isLoading && <FaSpinner className="animate-spin" />}
+        {children}{" "}
+        {isLoading && <AiOutlineLoading3Quarters className="animate-spin" />}
       </>
     );
 
