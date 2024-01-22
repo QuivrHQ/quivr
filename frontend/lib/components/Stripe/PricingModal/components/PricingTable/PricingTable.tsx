@@ -10,7 +10,7 @@ export const StripePricingTable = (): JSX.Element => {
           <ul className="list-none space-y-2">
             <li className="text-lg font-medium text-gray-800">🧠 3 brains</li>
             <li className="text-lg font-medium text-gray-800">
-              🙋‍♂️ 20 question credits per day
+              🙋‍♂️ 100 questions per month
             </li>
             <li className="text-lg font-medium text-gray-800">
               💾 Up to 30Mb of storage
