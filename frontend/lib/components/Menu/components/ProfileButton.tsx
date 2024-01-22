@@ -1,12 +1,12 @@
 import Link from "next/link";
 import { LuChevronRight, LuUser } from "react-icons/lu";
 
-import { Button } from "@/app/chat/[chatId]/components/ActionsBar/components/ChatInput/components/ActionsModal/components/Button";
+import { MenuButton } from "@/lib/components/Menu/components/MenuButton";
 
 export const ProfileButton = (): JSX.Element => {
   return (
     <Link href="/user">
-      <Button
+      <MenuButton
         label="Profile"
         startIcon={
           <div className="p-3 bg-secondary text-primary rounded-full">

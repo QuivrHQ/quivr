@@ -1,7 +1,7 @@
 import { useTranslation } from "react-i18next";
 import { LuStar } from "react-icons/lu";
 
-import { Button } from "@/app/chat/[chatId]/components/ActionsBar/components/ChatInput/components/ActionsModal/components/Button";
+import { MenuButton } from "@/lib/components/Menu/components/MenuButton";
 import { StripePricingModal } from "@/lib/components/Stripe";
 import { useUserData } from "@/lib/hooks/useUserData";
 
@@ -17,7 +17,7 @@ export const UpgradeToPlus = (): JSX.Element => {
   return (
     <StripePricingModal
       Trigger={
-        <Button
+        <MenuButton
           startIcon={<LuStar size={24} />}
           label={t("upgrade")}
           endIcon={
