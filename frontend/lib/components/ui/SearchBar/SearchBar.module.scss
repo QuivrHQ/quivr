@@ -1,41 +1,32 @@
-@use '@/styles/Colors.module.scss';
-@use '@/styles/IconSizes.module.scss';
-@use '@/styles/Spacings.module.scss';
+@use "@/styles/Colors.module.scss";
+@use "@/styles/IconSizes.module.scss";
+@use "@/styles/Spacings.module.scss";
 
 .search_bar_wrapper {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: Spacings.$spacing03;
-    background-color: Colors.$white;
-    padding: Spacings.$spacing05;
-    border-radius: 12px;
-    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: Spacings.$spacing03;
+  background-color: Colors.$white;
+  padding: Spacings.$spacing05;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
 
-    &:hover {
-        box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+  &:hover {
+    box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1),
+      0 8px 10px -6px rgb(0 0 0 / 0.1);
+  }
+
+  .search_icon {
+    width: IconSizes.$big;
+    height: IconSizes.$big;
+    color: Colors.$accent;
+    cursor: pointer;
+
+    &.disabled {
+      color: Colors.$black;
+      pointer-events: none;
+      opacity: 0.2;
     }
-
-    .search_input {
-        border: none;
-        flex: 1;
-        caret-color: Colors.$accent;
-
-        &:focus {
-            box-shadow: none;
-        }
-    }
-
-    .search_icon {
-        width: IconSizes.$big;
-        height: IconSizes.$big;
-        color: Colors.$accent;
-        cursor: pointer;
-
-        &.disabled {
-            color: Colors.$black;
-            pointer-events: none;
-            opacity: 0.2;
-        }
-    }
+  }
 }

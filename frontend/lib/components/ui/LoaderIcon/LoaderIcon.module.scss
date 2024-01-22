@@ -1,0 +1,28 @@
+@use "@/styles/Colors.module.scss";
+@use "@/styles/IconSizes.module.scss";
+
+.loader_icon {
+  animation: spin 1s linear infinite;
+  width: IconSizes.$big;
+  height: IconSizes.$big;
+  color: Colors.$accent;
+
+  @keyframes spin {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  &.normal {
+    width: IconSizes.$normal;
+    height: IconSizes.$normal;
+  }
+
+  &.big {
+    width: IconSizes.$big;
+    height: IconSizes.$big;
+  }
+}

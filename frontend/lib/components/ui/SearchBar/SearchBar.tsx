@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { LuSearch } from "react-icons/lu";
 
 import { Editor } from "@/app/chat/[chatId]/components/ActionsBar/components/ChatInput/components/ChatEditor/components/Editor/Editor";
@@ -7,9 +7,12 @@ import { useChat } from "@/app/chat/[chatId]/hooks/useChat";
 import { useChatContext } from "@/lib/context";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 
+import { LoaderIcon } from "../LoaderIcon/LoaderIcon";
+// eslint-disable-next-line import/order
 import styles from "./SearchBar.module.scss";
 
 export const SearchBar = (): JSX.Element => {
+  const [searching, setSearching] = useState(false);
   const { message, setMessage } = useChatInput();
   const { setMessages } = useChatContext();
   const { addQuestion } = useChat();
@@ -20,11 +23,14 @@ export const SearchBar = (): JSX.Element => {
   });
 
   const submit = async (): Promise<void> => {
+    setSearching(true);
     setMessages([]);
     try {
       await addQuestion(message);
     } catch (error) {
       console.error(error);
+    } finally {
+      setSearching(false);
     }
   };
 
@@ -38,10 +44,14 @@ export const SearchBar = (): JSX.Element => {
         onSubmit={() => void submit()}
         placeholder="Search"
       ></Editor>
-      <LuSearch
-        className={`${styles.search_icon} ${!message ? styles.disabled : ""}`}
-        onClick={() => void submit()}
-      />
+      {searching ? (
+        <LoaderIcon size="big" />
+      ) : (
+        <LuSearch
+          className={`${styles.search_icon} ${!message ? styles.disabled : ""}`}
+          onClick={() => void submit()}
+        />
+      )}
     </div>
   );
 };
