@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.0.171 (2024-01-22)
+
+## What's Changed
+* fix(frontend): don't set default brain as current brain and remove change brain button by @Zewed in https://github.com/StanGirard/quivr/pull/2047
+* feat: 🎸 brains by @StanGirard in https://github.com/StanGirard/quivr/pull/2048
+
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.170...v0.0.171
+
 ## 0.0.170 (2024-01-21)
 
 ## What's Changed
