@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.0.173 (2024-01-22)
+
+## What's Changed
+* fix(api-brains): fixed with new types of brains by @StanGirard in https://github.com/StanGirard/quivr/pull/2052
+* fix(frontend): font size on chat feed by @Zewed in https://github.com/StanGirard/quivr/pull/2051
+
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.172...v0.0.173
+
 ## 0.0.172 (2024-01-22)
 
 ## What's Changed
