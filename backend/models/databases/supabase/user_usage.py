@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 from uuid import UUID
 
 from logger import get_logger
@@ -122,7 +122,7 @@ class UserUsage(Repository):
                 {
                     "max_brains": product_settings["max_brains"],
                     "max_brain_size": product_settings["max_brain_size"],
-                    "daily_chat_credit": product_settings["daily_chat_credit"],
+                    "monthly_chat_credit": product_settings["monthly_chat_credit"],
                     "api_access": product_settings["api_access"],
                     "models": product_settings["models"],
                 }
@@ -229,20 +229,24 @@ class UserUsage(Repository):
         )
         return requests_stats.data
 
-    def get_user_requests_count_for_day(self, user_id, date):
+    def get_user_requests_count_for_month(self, user_id, date):
         """
         Fetch the user request count from the database
         """
+        date_30_days_ago = datetime.now() - timedelta(days=30)
+
         response = (
             self.db.from_("user_daily_usage")
             .select("daily_requests_count")
             .filter("user_id", "eq", user_id)
-            .filter("date", "eq", date)
+            .filter("date", "gte", date_30_days_ago)
             .execute()
         ).data
 
         if response and len(response) > 0:
-            return response[0]["daily_requests_count"]
+            logger.info("🔥🔥🔥🔥🔥")
+            logger.info(response)
+            return sum(row["daily_requests_count"] for row in response)
         return 0
 
     def increment_user_request_count(
