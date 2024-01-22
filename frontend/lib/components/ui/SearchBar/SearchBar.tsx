@@ -8,7 +8,7 @@ import { useChatContext } from "@/lib/context";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 
 import { LoaderIcon } from "../LoaderIcon/LoaderIcon";
-// eslint-disable-next-line import/order
+
 import styles from "./SearchBar.module.scss";
 
 export const SearchBar = (): JSX.Element => {
