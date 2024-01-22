@@ -30,7 +30,7 @@ export const Editor = ({
 
   return (
     <EditorContent
-      className="w-full"
+      className="w-full caret-accent"
       onKeyDown={(event) => void submitOnEnter(event)}
       editor={editor}
     />
