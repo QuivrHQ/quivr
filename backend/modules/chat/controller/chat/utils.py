@@ -28,8 +28,8 @@ def check_user_requests_limit(user: UserIdentity, model: str):
 
     date = time.strftime("%Y%m%d")
 
-    daily_chat_credit = userSettings.get("daily_chat_credit", 0)
-    daily_user_count = userDailyUsage.get_user_daily_usage(date)
+    monthly_chat_credit = userSettings.get("monthly_chat_credit", 0)
+    daily_user_count = userDailyUsage.get_user_monthly_usage(date)
     models_price = userDailyUsage.get_model_settings()
     user_choosen_model_price = 1000
 
@@ -37,10 +37,10 @@ def check_user_requests_limit(user: UserIdentity, model: str):
         if model_setting["name"] == model:
             user_choosen_model_price = model_setting["price"]
 
-    if int(daily_user_count + user_choosen_model_price) > int(daily_chat_credit):
+    if int(daily_user_count + user_choosen_model_price) > int(monthly_chat_credit):
         raise HTTPException(
             status_code=429,  # pyright: ignore reportPrivateUsage=none
-            detail=f"You have reached your daily chat limit of {daily_chat_credit} requests per day. Please upgrade your plan to increase your daily chat limit.",
+            detail=f"You have reached your monthly chat limit of {monthly_chat_credit} requests per months. Please upgrade your plan to increase your daily chat limit.",
         )
     else:
         userDailyUsage.handle_increment_user_request_count(

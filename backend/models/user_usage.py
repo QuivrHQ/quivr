@@ -52,14 +52,14 @@ class UserUsage(UserIdentity):
 
         return request
 
-    def get_user_daily_usage(self, date):
+    def get_user_monthly_usage(self, date):
         """
         Fetch the user daily usage from the database
         """
         posthog = PostHogSettings()
-        request = self.supabase_db.get_user_requests_count_for_day(self.id, date)
+        request = self.supabase_db.get_user_requests_count_for_month(self.id, date)
         posthog.set_user_properties(
-            self.id, "DAILY_USAGE", {"daily_chat_usage": request}
+            self.id, "MONTHLY_USAGE", {"monthly_chat_usage": request}
         )
 
         return request
@@ -68,7 +68,7 @@ class UserUsage(UserIdentity):
         """
         Increment the user request count in the database
         """
-        current_requests_count = self.supabase_db.get_user_requests_count_for_day(
+        current_requests_count = self.supabase_db.get_user_requests_count_for_month(
             self.id, date
         )
 
