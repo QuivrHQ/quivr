@@ -92,9 +92,6 @@ export const useBrainProvider = () => {
     if (userDefaultBrain !== undefined) {
       setDefaultBrainId(userDefaultBrain.id);
     }
-    if (currentBrainId === null && userDefaultBrain !== undefined) {
-      setCurrentBrainId(userDefaultBrain.id);
-    }
   }, [currentBrainId, getDefaultBrain]);
 
   const fetchPublicPrompts = useCallback(async () => {
