@@ -71,7 +71,6 @@ class UserUsage(UserIdentity):
         current_requests_count = self.supabase_db.get_user_requests_count_for_month(
             self.id, date
         )
-        logger.info("🔥🔥🔥🔥🔥🔥🔥🔥")
         logger.info(current_requests_count)
         if current_requests_count == 0:
             logger.info("Request count is 0, creating new record")
