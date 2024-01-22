@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.0.175 (2024-01-22)
+
+## What's Changed
+* fix: 🐛 limits by @StanGirard in https://github.com/StanGirard/quivr/pull/2058
+
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.174...v0.0.175
+
 ## 0.0.174 (2024-01-22)
 
 ## What's Changed
