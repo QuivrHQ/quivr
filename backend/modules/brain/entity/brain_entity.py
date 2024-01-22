@@ -2,9 +2,8 @@ from enum import Enum
 from typing import List, Optional
 from uuid import UUID
 
-from pydantic import BaseModel
-
 from modules.brain.entity.api_brain_definition_entity import ApiBrainDefinitionEntity
+from pydantic import BaseModel
 
 
 class BrainType(str, Enum):

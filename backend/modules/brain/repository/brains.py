@@ -4,8 +4,7 @@ from logger import get_logger
 from models.settings import get_embeddings, get_supabase_client
 from modules.brain.dto.inputs import BrainUpdatableProperties
 from modules.brain.entity.brain_entity import BrainEntity, PublicBrain
-from modules.brain.repository.interfaces.brains_interface import \
-    BrainsInterface
+from modules.brain.repository.interfaces.brains_interface import BrainsInterface
 
 logger = get_logger(__name__)
 
