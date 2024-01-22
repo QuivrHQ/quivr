@@ -3,7 +3,7 @@ import { usePathname } from "next/navigation";
 import { useTranslation } from "react-i18next";
 import { LuChevronRight, LuSearch } from "react-icons/lu";
 
-import { Button } from "@/app/chat/[chatId]/components/ActionsBar/components/ChatInput/components/ActionsModal/components/Button";
+import { MenuButton } from "@/lib/components/Menu/components/MenuButton";
 import { cn } from "@/lib/utils";
 
 export const DiscussionButton = (): JSX.Element => {
@@ -13,7 +13,7 @@ export const DiscussionButton = (): JSX.Element => {
 
   return (
     <Link href="/search">
-      <Button
+      <MenuButton
         label={t("search")}
         startIcon={<LuSearch />}
         endIcon={<LuChevronRight size={18} />}

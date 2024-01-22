@@ -3,7 +3,7 @@ import { usePathname } from "next/navigation";
 import { useTranslation } from "react-i18next";
 import { LuBrain, LuChevronRight } from "react-icons/lu";
 
-import { Button } from "@/app/chat/[chatId]/components/ActionsBar/components/ChatInput/components/ActionsModal/components/Button";
+import { MenuButton } from "@/lib/components/Menu/components/MenuButton";
 import { cn } from "@/lib/utils";
 
 export const BrainsManagementButton = (): JSX.Element => {
@@ -14,7 +14,7 @@ export const BrainsManagementButton = (): JSX.Element => {
 
   return (
     <Link href={`/brains-management`}>
-      <Button
+      <MenuButton
         label={t("brains")}
         startIcon={<LuBrain />}
         endIcon={<LuChevronRight size={18} />}

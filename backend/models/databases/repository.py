@@ -13,7 +13,7 @@ class Repository(ABC):
         pass
 
     @abstractmethod
-    def get_user_requests_count_for_day(self, user_id: UUID, date: datetime):
+    def get_user_requests_count_for_month(self, user_id: UUID, date: datetime):
         pass
 
     @abstractmethod

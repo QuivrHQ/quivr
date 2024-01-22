@@ -3,7 +3,7 @@ import { usePathname } from "next/navigation";
 import { useTranslation } from "react-i18next";
 import { LuChevronRight, LuGlobe } from "react-icons/lu";
 
-import { Button } from "@/app/chat/[chatId]/components/ActionsBar/components/ChatInput/components/ActionsModal/components/Button";
+import { MenuButton } from "@/lib/components/Menu/components/MenuButton";
 import { cn } from "@/lib/utils";
 
 export const ExplorerButton = (): JSX.Element => {
@@ -13,7 +13,7 @@ export const ExplorerButton = (): JSX.Element => {
 
   return (
     <Link href={`/brains-management/library`}>
-      <Button
+      <MenuButton
         label={t("brain_library_button_label")}
         startIcon={<LuGlobe />}
         endIcon={<LuChevronRight size={18} />}

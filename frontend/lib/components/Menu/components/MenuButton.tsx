@@ -13,7 +13,7 @@ type ButtonProps = CoreButtonProps & {
   endIcon?: JSX.Element;
 };
 
-export const Button = forwardRef(
+export const MenuButton = forwardRef(
   (
     { onClick, className, label, startIcon, endIcon, ...props }: ButtonProps,
     forwardedRef
@@ -39,4 +39,4 @@ export const Button = forwardRef(
   }
 );
 
-Button.displayName = CoreButton.displayName;
+MenuButton.displayName = CoreButton.displayName;

@@ -1,5 +1,47 @@
 # Changelog
 
+## 0.0.179 (2024-01-22)
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.178...v0.0.179
+
+## 0.0.178 (2024-01-22)
+
+## What's Changed
+* fix(frontend): use mention brain on search bar by @Zewed in https://github.com/StanGirard/quivr/pull/2060
+* feat: 🎸 cpu by @StanGirard in https://github.com/StanGirard/quivr/pull/2065
+
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.177...v0.0.178
+
+## 0.0.177 (2024-01-22)
+
+## What's Changed
+* fix: 🐛 usage by @StanGirard in https://github.com/StanGirard/quivr/pull/2062
+
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.176...v0.0.177
+
+## 0.0.176 (2024-01-22)
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.175...v0.0.176
+
+## 0.0.175 (2024-01-22)
+
+## What's Changed
+* fix: 🐛 limits by @StanGirard in https://github.com/StanGirard/quivr/pull/2058
+
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.174...v0.0.175
+
+## 0.0.174 (2024-01-22)
+
+## What's Changed
+* fix(frontend): remove actions modal by @Zewed in https://github.com/StanGirard/quivr/pull/2054
+* feat: 🎸 usage by @StanGirard in https://github.com/StanGirard/quivr/pull/2057
+
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.173...v0.0.174
+
 ## 0.0.173 (2024-01-22)
 
 ## What's Changed

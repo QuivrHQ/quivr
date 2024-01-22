@@ -37,7 +37,6 @@ class CustomSupabaseVectorStore(SupabaseVectorStore):
     ) -> [dict]:
         vectors = self._embedding.embed_documents([query])
         query_embedding = vectors[0]
-        logger.info("🤯🤯")
 
         res = self._client.rpc(
             table,

@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 from uuid import UUID
 
 from logger import get_logger
@@ -122,7 +122,7 @@ class UserUsage(Repository):
                 {
                     "max_brains": product_settings["max_brains"],
                     "max_brain_size": product_settings["max_brain_size"],
-                    "daily_chat_credit": product_settings["daily_chat_credit"],
+                    "monthly_chat_credit": product_settings["monthly_chat_credit"],
                     "api_access": product_settings["api_access"],
                     "models": product_settings["models"],
                 }
@@ -245,15 +245,32 @@ class UserUsage(Repository):
             return response[0]["daily_requests_count"]
         return 0
 
-    def increment_user_request_count(
-        self, user_id, date, current_requests_count: int, number: int = 1
-    ):
+    def get_user_requests_count_for_month(self, user_id, date):
+        """
+        Fetch the user request count from the database
+        """
+        date_30_days_ago = (datetime.now() - timedelta(days=30)).strftime("%Y%m%d")
+
+        response = (
+            self.db.from_("user_daily_usage")
+            .select("daily_requests_count")
+            .filter("user_id", "eq", user_id)
+            .filter("date", "gte", date_30_days_ago)
+            .execute()
+        ).data
+
+        if response and len(response) > 0:
+            return sum(row["daily_requests_count"] for row in response)
+        return 0
+
+    def increment_user_request_count(self, user_id, date, number: int = 1):
         """
         Increment the user's requests count for a specific day
         """
+        current = self.get_user_requests_count_for_day(user_id, date)
 
         self.update_user_request_count(
-            user_id, daily_requests_count=current_requests_count + number, date=date
+            user_id, daily_requests_count=current + number, date=date
         )
 
     def update_user_request_count(self, user_id, daily_requests_count, date):
