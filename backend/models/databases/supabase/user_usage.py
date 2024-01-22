@@ -229,6 +229,22 @@ class UserUsage(Repository):
         )
         return requests_stats.data
 
+    def get_user_requests_count_for_day(self, user_id, date):
+        """
+        Fetch the user request count from the database
+        """
+        response = (
+            self.db.from_("user_daily_usage")
+            .select("daily_requests_count")
+            .filter("user_id", "eq", user_id)
+            .filter("date", "eq", date)
+            .execute()
+        ).data
+
+        if response and len(response) > 0:
+            return response[0]["daily_requests_count"]
+        return 0
+
     def get_user_requests_count_for_month(self, user_id, date):
         """
         Fetch the user request count from the database
@@ -244,20 +260,17 @@ class UserUsage(Repository):
         ).data
 
         if response and len(response) > 0:
-            logger.info("🔥🔥🔥🔥🔥")
-            logger.info(response)
             return sum(row["daily_requests_count"] for row in response)
         return 0
 
-    def increment_user_request_count(
-        self, user_id, date, current_requests_count: int, number: int = 1
-    ):
+    def increment_user_request_count(self, user_id, date, number: int = 1):
         """
         Increment the user's requests count for a specific day
         """
+        current = self.get_user_requests_count_for_day(user_id, date)
 
         self.update_user_request_count(
-            user_id, daily_requests_count=current_requests_count + number, date=date
+            user_id, daily_requests_count=current + number, date=date
         )
 
     def update_user_request_count(self, user_id, daily_requests_count, date):

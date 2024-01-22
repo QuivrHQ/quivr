@@ -2,8 +2,11 @@ import time
 from uuid import UUID
 
 from fastapi import HTTPException
+from logger import get_logger
 from models import UserUsage
 from modules.user.entity.user_identity import UserIdentity
+
+logger = get_logger(__name__)
 
 
 class NullableUUID(UUID):
@@ -33,6 +36,11 @@ def check_user_requests_limit(user: UserIdentity, model: str):
     models_price = userDailyUsage.get_model_settings()
     user_choosen_model_price = 1000
 
+    # Log all info
+    logger.info(
+        f"User {user.id} with email {user.email} has {monthly_chat_credit} monthly chat credit and has used {daily_user_count} requests today."
+    )
+    logger.info("🔥🔥")
     for model_setting in models_price:
         if model_setting["name"] == model:
             user_choosen_model_price = model_setting["price"]
