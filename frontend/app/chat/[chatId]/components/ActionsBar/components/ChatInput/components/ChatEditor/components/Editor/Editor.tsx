@@ -4,29 +4,24 @@ import "./styles.css";
 import { useChatStateUpdater } from "./hooks/useChatStateUpdater";
 import { useCreateEditorState } from "./hooks/useCreateEditorState";
 import { useEditor } from "./hooks/useEditor";
-import { useEditorStateUpdater } from "./hooks/useEditorStateUpdater";
 
 type EditorProps = {
   onSubmit: () => void;
   setMessage: (text: string) => void;
   message: string;
+  placeholder?: string;
 };
 
 export const Editor = ({
   setMessage,
-  message,
   onSubmit,
+  placeholder,
 }: EditorProps): JSX.Element => {
-  const { editor } = useCreateEditorState();
+  const { editor } = useCreateEditorState(placeholder);
 
   useChatStateUpdater({
     editor,
     setMessage,
-  });
-
-  useEditorStateUpdater({
-    editor,
-    message,
   });
 
   const { submitOnEnter } = useEditor({
@@ -35,8 +30,8 @@ export const Editor = ({
 
   return (
     <EditorContent
-      className="w-full"
-      onKeyDown={submitOnEnter}
+      className="w-full caret-accent"
+      onKeyDown={(event) => void submitOnEnter(event)}
       editor={editor}
     />
   );

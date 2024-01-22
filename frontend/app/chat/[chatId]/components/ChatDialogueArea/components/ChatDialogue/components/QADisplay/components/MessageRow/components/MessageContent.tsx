@@ -29,7 +29,7 @@ export const MessageContent = ({
   };
 
   useEffect(() => {
-    if (text.includes('🧠<')) {
+    if (text.includes("🧠<")) {
       setIsLog(true);
     } else {
       setIsLog(false);
@@ -40,12 +40,14 @@ export const MessageContent = ({
 
   return (
     <div data-testid="chat-message-text" className="mt-2">
-      {isLog && showLog && (logs.length > 0) && (
+      {isLog && showLog && logs.length > 0 && (
         <div className="text-xs text-gray-600 bg-gray-100 p-2 rounded">
           <ReactMarkdown>{logs}</ReactMarkdown>
         </div>
       )}
-      <ReactMarkdown className={`text-sm ${markdownClasses}`}>{cleanedText}</ReactMarkdown>
+      <ReactMarkdown className={`text-base ${markdownClasses}`}>
+        {cleanedText}
+      </ReactMarkdown>
     </div>
   );
 };

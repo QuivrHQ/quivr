@@ -7,8 +7,7 @@ type UseEditorProps = {
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const useEditor = ({ onSubmit }: UseEditorProps) => {
   const submitOnEnter = (ev: KeyboardEvent<HTMLDivElement>) => {
-    if (ev.key === "Enter" && !ev.shiftKey) {
-      ev.preventDefault();
+    if (ev.key === "Enter" && !ev.shiftKey && !ev.metaKey) {
       onSubmit();
     }
   };

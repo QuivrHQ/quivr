@@ -52,6 +52,7 @@ class BrainfulChat(ChatInterface):
         chat_question,
     ):
         brain_id_to_use = brain_id
+        metadata = {}
         if not brain_id:
             brain_settings = BrainSettings()
             supabase_client = get_supabase_client()
@@ -63,25 +64,26 @@ class BrainfulChat(ChatInterface):
             else:
                 embeddings = OpenAIEmbeddings()
             vector_store = CustomSupabaseVectorStore(
-                supabase_client, embeddings, table_name="vectors"
+                supabase_client, embeddings, table_name="vectors", user_id=user_id
             )
             # Get the first question from the chat_question
-            logger.info(f"Finding brain closest to {chat_question}")
-            logger.info("🔥🔥🔥🔥🔥")
+
             question = chat_question.question
-            logger.info(f"Question is {question}")
             history = chat_service.get_chat_history(chat_id)
             if history:
                 question = history[0].user_message
-                logger.info(f"Question is {question}")
-            brain_id_to_use = vector_store.find_brain_closest_query(question)
-            logger.info(f"Found brain {brain_id_to_use}")
-            logger.info("🧠🧠🧠")
+            list_brains = vector_store.find_brain_closest_query(user_id, question)
+            if list_brains:
+                brain_id_to_use = list_brains[0]["id"]
+            else:
+                brain_id_to_use = None
+            # Add to metadata close_brains and close_brains_similarity
+            metadata["close_brains"] = list_brains
+
+        follow_up_questions = chat_service.get_follow_up_question(chat_id)
+        metadata["follow_up_questions"] = follow_up_questions
 
         brain = brain_service.get_brain_by_id(brain_id_to_use)
-        logger.info(f"Brain type: {brain.brain_type}")
-        logger.info(f"Id is {brain.brain_id}")
-        logger.info(f"Type of brain_id is {type(brain.brain_id)}")
         if (
             brain
             and brain.brain_type == BrainType.DOC
@@ -95,6 +97,7 @@ class BrainfulChat(ChatInterface):
                 brain_id=str(brain.brain_id),
                 streaming=streaming,
                 prompt_id=prompt_id,
+                metadata=metadata,
             )
         if brain.brain_type == BrainType.COMPOSITE:
             return CompositeBrainQA(
@@ -106,6 +109,7 @@ class BrainfulChat(ChatInterface):
                 streaming=streaming,
                 prompt_id=prompt_id,
                 user_id=user_id,
+                metadata=metadata,
             )
 
         if brain.brain_type == BrainType.API:
@@ -118,4 +122,5 @@ class BrainfulChat(ChatInterface):
                 streaming=streaming,
                 prompt_id=prompt_id,
                 user_id=user_id,
+                metadata=metadata,
             )
