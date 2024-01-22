@@ -72,11 +72,18 @@ class BrainfulChat(ChatInterface):
             history = chat_service.get_chat_history(chat_id)
             if history:
                 question = history[0].user_message
-            list_brains = vector_store.find_brain_closest_query(user_id, question)
-            if list_brains:
-                brain_id_to_use = list_brains[0]["id"]
+                brain_id_to_use = history[0].brain_id
+
+            list_brains = []
+            if history:
+                list_brains = vector_store.find_brain_closest_query(user_id, question)
+                metadata["close_brains"] = list_brains
             else:
-                brain_id_to_use = None
+                list_brains = vector_store.find_brain_closest_query(user_id, question)
+                if list_brains:
+                    brain_id_to_use = list_brains[0]["id"]
+                else:
+                    brain_id_to_use = None
             # Add to metadata close_brains and close_brains_similarity
             metadata["close_brains"] = list_brains
 

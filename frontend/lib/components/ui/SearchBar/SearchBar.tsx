@@ -20,7 +20,7 @@ export const SearchBar = (): JSX.Element => {
 
   useEffect(() => {
     setCurrentBrainId(null);
-  });
+  }, [setCurrentBrainId]);
 
   const submit = async (): Promise<void> => {
     setSearching(true);
