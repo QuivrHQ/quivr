@@ -233,7 +233,7 @@ class UserUsage(Repository):
         """
         Fetch the user request count from the database
         """
-        date_30_days_ago = datetime.now() - timedelta(days=30)
+        date_30_days_ago = (datetime.now() - timedelta(days=30)).strftime("%Y%m%d")
 
         response = (
             self.db.from_("user_daily_usage")
