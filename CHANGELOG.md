@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.0.178 (2024-01-22)
+
+## What's Changed
+* fix(frontend): use mention brain on search bar by @Zewed in https://github.com/StanGirard/quivr/pull/2060
+* feat: 🎸 cpu by @StanGirard in https://github.com/StanGirard/quivr/pull/2065
+
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.177...v0.0.178
+
 ## 0.0.177 (2024-01-22)
 
 ## What's Changed
