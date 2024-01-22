@@ -13,36 +13,37 @@ import { useChatsList } from "../chat/[chatId]/hooks/useChatsList";
 // eslint-disable-next-line import/order
 import styles from "./page.module.scss";
 
-
 const Search = (): JSX.Element => {
-    const {setIsOpened} = useMenuContext();
-    const pathname = usePathname()
-    const { session } = useSupabase();
+  const { setIsOpened } = useMenuContext();
+  const pathname = usePathname();
+  const { session } = useSupabase();
 
-    useEffect(() => {
-        if (session === null) {
-            redirectToLogin();
-        } 
-        setIsOpened(false)
-    }, [pathname, session, setIsOpened]);
+  useEffect(() => {
+    if (session === null) {
+      redirectToLogin();
+    }
+    setIsOpened(false);
+  }, [pathname, session, setIsOpened]);
 
-    useChatsList();
+  useChatsList();
 
-    return (
-        <div className={styles.search_page_container}>
-            <div className={styles.main_container}>
-                <div className={styles.quivr_logo_wrapper}>
-                    <QuivrLogo size={80} color="black" />
-                    <div className={styles.quivr_text}>
-                        <span>Talk to </span>
-                        <span className={styles.quivr_text_primary}>Quivr</span>
-                    </div>
-                </div>
-                <SearchBar />
-                <AddBrainModal triggerClassName="bg-primary text-white font-normal" />
-            </div>
-        </div >
-    );
+  return (
+    <div className={styles.search_page_container}>
+      <div className={styles.main_container}>
+        <div className={styles.quivr_logo_wrapper}>
+          <QuivrLogo size={80} color="black" />
+          <div className={styles.quivr_text}>
+            <span>Talk to </span>
+            <span className={styles.quivr_text_primary}>Quivr</span>
+          </div>
+        </div>
+        <SearchBar />
+        <div className={styles.add_brain_wrapper}>
+          <AddBrainModal triggerClassName="bg-primary text-white font-normal" />
+        </div>
+      </div>
+    </div>
+  );
 };
 
 export default Search;

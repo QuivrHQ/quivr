@@ -4,13 +4,13 @@ import { FaArrowLeft } from "react-icons/fa";
 
 import { ApiRequestDefinition } from "@/lib/components/ApiRequestDefinition";
 import Button from "@/lib/components/ui/Button";
-import { BrainType } from "@/lib/types/brainConfig";
+import { BrainType } from "@/lib/types/BrainConfig";
 
+import { useBrainCreationSteps } from "../../hooks/useBrainCreationSteps";
 import { CompositeBrainConnections } from "./components/CompositeBrainConnections/CompositeBrainConnections";
 import { KnowledgeToFeedInput } from "./components/KnowledgeToFeedInput";
 import { useBrainCreationHandler } from "./hooks/useBrainCreationHandler";
 import { useBrainKnowledgeStep } from "./hooks/useBrainKnowledgeStep";
-import { useBrainCreationSteps } from "../../hooks/useBrainCreationSteps";
 
 type BrainKnowledgeStepProps = {
   onCancelBrainCreation: () => void;

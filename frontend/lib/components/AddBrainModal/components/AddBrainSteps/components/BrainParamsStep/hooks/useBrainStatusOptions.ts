@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
 
-import { BrainStatus } from "@/lib/types/brainConfig";
+import { BrainStatus } from "@/lib/types/BrainConfig";
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const useBrainStatusOptions = () => {
   const { t } = useTranslation(["translation", "brain", "config"]);

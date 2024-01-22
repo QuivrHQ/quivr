@@ -2,7 +2,7 @@ import { UseFormSetValue } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { LuLock, LuUnlock } from "react-icons/lu";
 
-import { BrainConfig, BrainStatus } from "@/lib/types/brainConfig";
+import { BrainConfig, BrainStatus } from "@/lib/types/BrainConfig";
 
 import { BrainAccessRadio } from "./components/BrainAccessRadio";
 

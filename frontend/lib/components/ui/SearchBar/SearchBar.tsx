@@ -35,7 +35,6 @@ export const SearchBar = (): JSX.Element => {
   };
 
   /* eslint-disable @typescript-eslint/restrict-template-expressions */
-
   return (
     <div className={styles.search_bar_wrapper}>
       <Editor
@@ -45,7 +44,7 @@ export const SearchBar = (): JSX.Element => {
         placeholder="Search"
       ></Editor>
       {searching ? (
-        <LoaderIcon size="big" />
+        <LoaderIcon size="big" color="accent" />
       ) : (
         <LuSearch
           className={`${styles.search_icon} ${!message ? styles.disabled : ""}`}
