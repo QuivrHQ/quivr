@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.0.177 (2024-01-22)
+
+## What's Changed
+* fix: 🐛 usage by @StanGirard in https://github.com/StanGirard/quivr/pull/2062
+
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.176...v0.0.177
+
 ## 0.0.176 (2024-01-22)
 
 **Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.175...v0.0.176
