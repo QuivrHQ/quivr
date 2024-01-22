@@ -10,7 +10,7 @@ import { useSupabase } from "@/lib/context/SupabaseProvider";
 import { redirectToLogin } from "@/lib/router/redirectToLogin";
 
 import { useChatsList } from "../chat/[chatId]/hooks/useChatsList";
-// eslint-disable-next-line import/order
+
 import styles from "./page.module.scss";
 
 const Search = (): JSX.Element => {
