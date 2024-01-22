@@ -16,9 +16,19 @@
     }
   }
 
+  &.small {
+    width: IconSizes.$small;
+    height: IconSizes.$small;
+  }
+
   &.normal {
     width: IconSizes.$normal;
     height: IconSizes.$normal;
+  }
+
+  &.large {
+    width: IconSizes.$large;
+    height: IconSizes.$large;
   }
 
   &.big {
