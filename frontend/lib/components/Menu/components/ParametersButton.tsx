@@ -3,7 +3,7 @@ import { usePathname } from "next/navigation";
 import { useTranslation } from "react-i18next";
 import { LuChevronRight, LuSettings } from "react-icons/lu";
 
-import { Button } from "@/app/chat/[chatId]/components/ActionsBar/components/ChatInput/components/ActionsModal/components/Button";
+import { MenuButton } from "@/lib/components/Menu/components/MenuButton";
 import { cn } from "@/lib/utils";
 
 export const ParametersButton = (): JSX.Element => {
@@ -13,7 +13,7 @@ export const ParametersButton = (): JSX.Element => {
 
   return (
     <Link href="/user">
-      <Button
+      <MenuButton
         label={t("parameters")}
         startIcon={<LuSettings />}
         endIcon={<LuChevronRight size={18} />}
