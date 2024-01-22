@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.0.172 (2024-01-22)
+
+## What's Changed
+* feat(frontend): handle mentions in search bar by @Zewed in https://github.com/StanGirard/quivr/pull/2049
+
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.171...v0.0.172
+
 ## 0.0.171 (2024-01-22)
 
 ## What's Changed
