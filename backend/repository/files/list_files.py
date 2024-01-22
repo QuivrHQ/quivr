@@ -11,7 +11,6 @@ def list_files_from_storage(path):
 
     try:
         response = supabase_client.storage.from_("quivr").list(path)
-        logger.info("RESPONSE", response)
         return response
     except Exception as e:
         logger.error(e)
