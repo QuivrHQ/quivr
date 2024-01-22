@@ -9,10 +9,15 @@ type EditorProps = {
   onSubmit: () => void;
   setMessage: (text: string) => void;
   message: string;
+  placeholder?: string;
 };
 
-export const Editor = ({ setMessage, onSubmit }: EditorProps): JSX.Element => {
-  const { editor } = useCreateEditorState();
+export const Editor = ({
+  setMessage,
+  onSubmit,
+  placeholder,
+}: EditorProps): JSX.Element => {
+  const { editor } = useCreateEditorState(placeholder);
 
   useChatStateUpdater({
     editor,

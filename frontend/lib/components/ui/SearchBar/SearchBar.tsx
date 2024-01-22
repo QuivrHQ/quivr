@@ -36,6 +36,7 @@ export const SearchBar = (): JSX.Element => {
         message={message}
         setMessage={setMessage}
         onSubmit={() => void submit()}
+        placeholder="Search"
       ></Editor>
       <LuSearch
         className={`${styles.search_icon} ${!message ? styles.disabled : ""}`}
