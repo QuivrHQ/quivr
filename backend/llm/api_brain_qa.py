@@ -151,12 +151,7 @@ class APIBrainQA(KnowledgeBrainQA, QAInterface):
         save_answer: bool = True,
         should_log_steps: Optional[bool] = True,
     ):
-        if not question.brain_id:
-            raise HTTPException(
-                status_code=400, detail="No brain id provided in the question"
-            )
-
-        brain = brain_service.get_brain_by_id(question.brain_id)
+        brain = brain_service.get_brain_by_id(self.brain_id)
 
         if not brain:
             raise HTTPException(status_code=404, detail="Brain not found")
@@ -186,7 +181,7 @@ class APIBrainQA(KnowledgeBrainQA, QAInterface):
                         "chat_id": chat_id,
                         "user_message": question.question,
                         "assistant": "",
-                        "brain_id": question.brain_id,
+                        "brain_id": self.brain_id,
                         "prompt_id": self.prompt_to_use_id,
                     }
                 )
@@ -222,7 +217,7 @@ class APIBrainQA(KnowledgeBrainQA, QAInterface):
         async for value in self.make_completion(
             messages=messages,
             functions=[get_api_brain_definition_as_json_schema(brain)],
-            brain_id=question.brain_id,
+            brain_id=self.brain_id,
             should_log_steps=should_log_steps,
         ):
             streamed_chat_history.assistant = value
@@ -322,12 +317,12 @@ class APIBrainQA(KnowledgeBrainQA, QAInterface):
         question: ChatQuestion,
         save_answer: bool = True,
     ):
-        if not question.brain_id:
+        if not self.brain_id:
             raise HTTPException(
                 status_code=400, detail="No brain id provided in the question"
             )
 
-        brain = brain_service.get_brain_by_id(question.brain_id)
+        brain = brain_service.get_brain_by_id(self.brain_id)
 
         if not brain:
             raise HTTPException(status_code=404, detail="Brain not found")
@@ -353,7 +348,7 @@ class APIBrainQA(KnowledgeBrainQA, QAInterface):
         response = self.make_completion_without_streaming(
             messages=messages,
             functions=[get_api_brain_definition_as_json_schema(brain)],
-            brain_id=question.brain_id,
+            brain_id=self.brain_id,
             should_log_steps=False,
         )
 
@@ -365,7 +360,7 @@ class APIBrainQA(KnowledgeBrainQA, QAInterface):
                         "chat_id": chat_id,
                         "user_message": question.question,
                         "assistant": answer,
-                        "brain_id": question.brain_id,
+                        "brain_id": self.brain_id,
                         "prompt_id": self.prompt_to_use_id,
                     }
                 )
