@@ -37,10 +37,12 @@ const Search = (): JSX.Element => {
             <span className={styles.quivr_text_primary}>Quivr</span>
           </div>
         </div>
-        <SearchBar />
-        <div className={styles.add_brain_wrapper}>
-          <AddBrainModal triggerClassName="bg-primary text-white font-normal" />
+        <div className={styles.search_bar_wrapper}>
+          <SearchBar />
         </div>
+      </div>
+      <div className={styles.add_brain_wrapper}>
+        <AddBrainModal />
       </div>
     </div>
   );

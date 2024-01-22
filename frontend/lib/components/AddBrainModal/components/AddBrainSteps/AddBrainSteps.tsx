@@ -1,9 +1,7 @@
 import { useTranslation } from "react-i18next";
-import { LuPlusCircle } from "react-icons/lu";
 
-import Button from "@/lib/components/ui/Button";
 import { Modal } from "@/lib/components/ui/Modal";
-import { cn } from "@/lib/utils";
+import TextButton from "@/lib/components/ui/TextButton/TextButton";
 
 import { BrainKnowledgeStep } from "./components/BrainKnowledgeStep/BrainKnowledgeStep";
 import { BrainParamsStep } from "./components/BrainParamsStep/BrainParamsStep";
@@ -11,13 +9,7 @@ import { BrainTypeSelectionStep } from "./components/BrainTypeSelectionStep/Brai
 import { Stepper } from "./components/Stepper/Stepper";
 import { useAddBrainConfig } from "./hooks/useAddBrainConfig";
 
-type AddBrainConfigProps = {
-  triggerClassName?: string;
-};
-
-export const AddBrainSteps = ({
-  triggerClassName,
-}: AddBrainConfigProps): JSX.Element => {
+export const AddBrainSteps = (): JSX.Element => {
   const { t } = useTranslation(["translation", "brain", "config"]);
 
   const { isBrainCreationModalOpened, setIsBrainCreationModalOpened } =
@@ -26,15 +18,13 @@ export const AddBrainSteps = ({
   return (
     <Modal
       Trigger={
-        <Button
-          onClick={() => void 0}
-          variant={"tertiary"}
-          className={cn("border-0", triggerClassName)}
-          data-testid="add-brain-button"
-        >
-          <LuPlusCircle className="text-xl" />
-          {t("newBrain", { ns: "brain" })}
-        </Button>
+        <div onClick={() => void 0}>
+          <TextButton
+            iconName="add"
+            label={t("newBrain", { ns: "brain" })}
+            color="black"
+          ></TextButton>
+        </div>
       }
       title={t("newBrainTitle", { ns: "brain" })}
       desc={t("newBrainSubtitle", { ns: "brain" })}

@@ -1,43 +1,52 @@
-@use '@/styles/Colors.module.scss';
-@use '@/styles/IconSizes.module.scss';
-@use '@/styles/ScreenSizes.module.scss';
-@use '@/styles/Spacings.module.scss';
-@use '@/styles/Typography.module.scss';
+@use "@/styles/Colors.module.scss";
+@use "@/styles/IconSizes.module.scss";
+@use "@/styles/ScreenSizes.module.scss";
+@use "@/styles/Spacings.module.scss";
+@use "@/styles/Typography.module.scss";
+@use "@/styles/Variables.module.scss";
 
 .search_page_container {
-    background-color: Colors.$ivory;
-    width: 100%;
-    height: 100%;
+  background-color: Colors.$ivory;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  .main_container {
     display: flex;
-    justify-content: center;
-    align-items: center;
+    flex-direction: column;
+    row-gap: Spacings.$spacing05;
+    position: relative;
+    width: 50%;
+    margin-inline: auto;
+    transform: translateY(-#{Variables.$searchBarHeight});
 
-    .main_container {
-        display: flex;
-        flex-direction: column;
-        row-gap: Spacings.$spacing05;
-        position: relative;
-        width: 50vw;
-        margin-inline: auto;
-
-        @media (max-width: ScreenSizes.$small) {
-            width: 100%;
-            margin-inline: Spacings.$spacing07;
-        }
-
-        .quivr_logo_wrapper {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-
-            .quivr_text {
-                @include Typography.H1;
-
-                .quivr_text_primary {
-                    color: Colors.$primary;
-                }
-            }
-        }
+    @media (max-width: ScreenSizes.$small) {
+      width: 100%;
+      margin-inline: Spacings.$spacing07;
     }
+
+    .quivr_logo_wrapper {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+
+      .quivr_text {
+        @include Typography.H1;
+
+        .quivr_text_primary {
+          color: Colors.$primary;
+        }
+      }
+    }
+  }
+
+  .add_brain_wrapper {
+    position: absolute;
+    bottom: Spacings.$spacing05;
+    left: 50%;
+    transform: translateX(-50%);
+  }
 }

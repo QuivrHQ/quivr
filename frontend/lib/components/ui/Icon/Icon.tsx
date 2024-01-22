@@ -12,6 +12,7 @@ interface IconProps {
   color: Color;
   disabled?: boolean;
   classname?: string;
+  hovered?: boolean;
 }
 
 export const Icon = ({
@@ -20,6 +21,7 @@ export const Icon = ({
   color,
   disabled,
   classname,
+  hovered,
 }: IconProps): JSX.Element => {
   const IconComponent: IconType = iconList[name];
 
@@ -30,6 +32,7 @@ export const Icon = ({
       ${styles[size] ?? ""} 
       ${styles[color] ?? ""}
       ${disabled ? styles.disabled ?? "" : ""}
+      ${hovered ? styles.hovered ?? "" : ""}
       `}
     />
   );

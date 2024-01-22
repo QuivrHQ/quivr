@@ -23,6 +23,10 @@
 
 .black {
   color: Colors.$black;
+
+  &.hovered {
+    color: Colors.$accent;
+  }
 }
 
 .primary {

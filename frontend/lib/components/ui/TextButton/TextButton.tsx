@@ -1,3 +1,5 @@
+import { useState } from "react";
+
 import { iconList } from "@/lib/helpers/iconList";
 import { Color } from "@/lib/types/Colors";
 
@@ -6,16 +8,34 @@ import { Icon } from "../Icon/Icon";
 import styles from "./TextButton.module.scss";
 
 interface TextButtonProps {
-  name: keyof typeof iconList;
+  iconName: keyof typeof iconList;
   label: string;
   color: Color;
 }
 
 export const TextButton = (props: TextButtonProps): JSX.Element => {
+  const [hovered, setHovered] = useState(false);
+
   return (
-    <div className={styles.text_button_wrapper}>
-      <Icon name={props.name} size="normal" color={props.color} />
-      <span>{props.label}</span>
+    <div
+      className={styles.text_button_wrapper}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+    >
+      <span
+        className={`
+        ${styles[props.color] ?? ""}
+        ${hovered ? styles.hovered ?? "" : ""}
+        `}
+      >
+        {props.label}
+      </span>
+      <Icon
+        name={props.iconName}
+        size="normal"
+        color={props.color}
+        hovered={hovered}
+      />
     </div>
   );
 };

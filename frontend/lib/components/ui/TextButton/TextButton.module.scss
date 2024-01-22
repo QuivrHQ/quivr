@@ -1,0 +1,18 @@
+@use "@/styles/Colors.module.scss";
+@use "@/styles/Spacings.module.scss";
+
+.text_button_wrapper {
+  display: flex;
+  align-items: center;
+  gap: Spacings.$spacing03;
+  cursor: pointer;
+  background-color: transparent;
+}
+
+.black {
+  color: Colors.$black;
+
+  &.hovered {
+    color: Colors.$accent;
+  }
+}
