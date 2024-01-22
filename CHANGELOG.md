@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.0.174 (2024-01-22)
+
+## What's Changed
+* fix(frontend): remove actions modal by @Zewed in https://github.com/StanGirard/quivr/pull/2054
+* feat: 🎸 usage by @StanGirard in https://github.com/StanGirard/quivr/pull/2057
+
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.173...v0.0.174
+
 ## 0.0.173 (2024-01-22)
 
 ## What's Changed
