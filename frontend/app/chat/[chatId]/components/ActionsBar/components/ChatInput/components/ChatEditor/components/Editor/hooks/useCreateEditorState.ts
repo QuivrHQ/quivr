@@ -3,7 +3,7 @@ import HardBreak from "@tiptap/extension-hard-break";
 import Paragraph from "@tiptap/extension-paragraph";
 import Placeholder from "@tiptap/extension-placeholder";
 import Text from "@tiptap/extension-text";
-import { useEditor } from "@tiptap/react";
+import { Extension, useEditor } from "@tiptap/react";
 import { useTranslation } from "react-i18next";
 
 import { useBrainMention } from "./useBrainMention";
@@ -15,6 +15,14 @@ export const useCreateEditorState = () => {
   const { BrainMention, items } = useBrainMention();
   const { PromptMention } = usePromptMention();
 
+  const PreventEnter = Extension.create({
+    addKeyboardShortcuts: () => {
+      return {
+        Enter: () => true,
+      };
+    },
+  });
+
   const editor = useEditor(
     {
       autofocus: true,
@@ -22,6 +30,7 @@ export const useCreateEditorState = () => {
         editor?.commands.focus("end");
       },
       extensions: [
+        PreventEnter,
         Placeholder.configure({
           showOnlyWhenEditable: true,
           placeholder: t("actions_bar_placeholder"),

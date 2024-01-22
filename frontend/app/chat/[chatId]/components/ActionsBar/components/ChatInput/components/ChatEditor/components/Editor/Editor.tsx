@@ -4,7 +4,6 @@ import "./styles.css";
 import { useChatStateUpdater } from "./hooks/useChatStateUpdater";
 import { useCreateEditorState } from "./hooks/useCreateEditorState";
 import { useEditor } from "./hooks/useEditor";
-import { useEditorStateUpdater } from "./hooks/useEditorStateUpdater";
 
 type EditorProps = {
   onSubmit: () => void;
@@ -12,21 +11,12 @@ type EditorProps = {
   message: string;
 };
 
-export const Editor = ({
-  setMessage,
-  message,
-  onSubmit,
-}: EditorProps): JSX.Element => {
+export const Editor = ({ setMessage, onSubmit }: EditorProps): JSX.Element => {
   const { editor } = useCreateEditorState();
 
   useChatStateUpdater({
     editor,
     setMessage,
-  });
-
-  useEditorStateUpdater({
-    editor,
-    message,
   });
 
   const { submitOnEnter } = useEditor({
@@ -36,7 +26,7 @@ export const Editor = ({
   return (
     <EditorContent
       className="w-full"
-      onKeyDown={submitOnEnter}
+      onKeyDown={(event) => void submitOnEnter(event)}
       editor={editor}
     />
   );

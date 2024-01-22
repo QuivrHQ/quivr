@@ -1,6 +1,7 @@
-import { ChangeEvent, useEffect } from "react";
+import { useEffect } from "react";
 import { LuSearch } from "react-icons/lu";
 
+import { Editor } from "@/app/chat/[chatId]/components/ActionsBar/components/ChatInput/components/ChatEditor/components/Editor/Editor";
 import { useChatInput } from "@/app/chat/[chatId]/components/ActionsBar/components/ChatInput/hooks/useChatInput";
 import { useChat } from "@/app/chat/[chatId]/hooks/useChat";
 import { useChatContext } from "@/lib/context";
@@ -18,18 +19,6 @@ export const SearchBar = (): JSX.Element => {
     setCurrentBrainId(null);
   });
 
-  const handleChange = (event: ChangeEvent<HTMLInputElement>): void => {
-    setMessage(event.target.value);
-  };
-
-  const handleEnter = async (
-    event: React.KeyboardEvent<HTMLInputElement>
-  ): Promise<void> => {
-    if (event.key === "Enter") {
-      await submit();
-    }
-  };
-
   const submit = async (): Promise<void> => {
     setMessages([]);
     try {
@@ -43,14 +32,11 @@ export const SearchBar = (): JSX.Element => {
 
   return (
     <div className={styles.search_bar_wrapper}>
-      <input
-        className={styles.search_input}
-        type="text"
-        placeholder="Search"
-        value={message}
-        onChange={handleChange}
-        onKeyDown={(event) => void handleEnter(event)}
-      />
+      <Editor
+        message={message}
+        setMessage={setMessage}
+        onSubmit={() => void submit()}
+      ></Editor>
       <LuSearch
         className={`${styles.search_icon} ${!message ? styles.disabled : ""}`}
         onClick={() => void submit()}
