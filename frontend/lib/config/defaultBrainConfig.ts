@@ -1,5 +1,5 @@
 import { CreateBrainInput } from "../api/brain/types";
-import { Model } from "../types/BrainConfig";
+import { Model } from "../types/brainConfig";
 
 export const addBrainDefaultValues: CreateBrainInput = {
   model: "gpt-3.5-turbo",

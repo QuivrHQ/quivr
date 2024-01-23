@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 import { Avatar } from "@/lib/components/ui/Avatar";
-import { Testimonial } from "@/lib/types/Testimonial";
+import { Testimonial } from "@/lib/types/testimonial";
 
 import { socialMediaToIcon } from "../utils/socialMediaToIcon";
 

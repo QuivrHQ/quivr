@@ -1,6 +1,6 @@
 import { AxiosInstance } from "axios";
 
-import { Testimonial } from "@/lib/types/Testimonial";
+import { Testimonial } from "@/lib/types/testimoniall";
 
 type CmsTestimonials = {
   data: {
