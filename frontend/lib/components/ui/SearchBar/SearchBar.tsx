@@ -25,14 +25,16 @@ export const SearchBar = (): JSX.Element => {
   }, [setCurrentBrainId, message]);
 
   const submit = async (): Promise<void> => {
-    setSearching(true);
-    setMessages([]);
-    try {
-      await addQuestion(message);
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setSearching(false);
+    if (!searching) {
+      setSearching(true);
+      setMessages([]);
+      try {
+        await addQuestion(message);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setSearching(false);
+      }
     }
   };
 
