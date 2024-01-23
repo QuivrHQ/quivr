@@ -98,6 +98,7 @@ class APIBrainQA(KnowledgeBrainQA, QAInterface):
                     arguments = json.loads(function_call["arguments"])
 
                 except Exception:
+                    yield f"🧠<Issues with {arguments}>🧠"
                     arguments = {}
 
                 if should_log_steps:
@@ -110,19 +111,19 @@ class APIBrainQA(KnowledgeBrainQA, QAInterface):
                         arguments=arguments,
                     )
                 except Exception as e:
-                    raise HTTPException(
-                        status_code=400,
-                        detail=f"Error while calling API: {e}",
-                    )
+                    logger.info(f"Error while calling API: {e}")
+                    api_call_response = f"Error while calling API: {e}"
 
                 function_name = function_call["name"]
+                yield f"🧠<The function {function_name} was called and gave The following answer:(data from function) {api_call_response} (end of data from function). Don't call this function again unless there was an error or extremely necessary and asked specifically by the user. If an error, display it to the user in raw.>🧠"
                 messages.append(
                     {
                         "role": "function",
                         "name": function_call["name"],
-                        "content": f"The function {function_name} was called and gave The following answer:(data from function) {api_call_response} (end of data from function). Don't call this function again unless there was an error or extremely necessary and asked specifically by the user.",
+                        "content": f"The function {function_name} was called and gave The following answer:(data from function) {api_call_response} (end of data from function). Don't call this function again unless there was an error or extremely necessary and asked specifically by the user. If an error, display it to the user in raw.",
                     }
                 )
+
                 async for value in self.make_completion(
                     messages=messages,
                     functions=functions,
