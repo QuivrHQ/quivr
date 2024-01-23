@@ -8,6 +8,7 @@ import { KnowledgeToFeedProvider } from "@/lib/context";
 
 import { AddKnowledge } from "./components/AddKnowledge/AddKnowledge";
 import { AddedKnowledge } from "./components/AddedKnowledge/AddedKnowledge";
+
 import { useBrainFetcher } from "../../hooks/useBrainFetcher";
 import { NoAccess } from "../NoAccess";
 

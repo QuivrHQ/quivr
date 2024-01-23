@@ -1,4 +1,5 @@
 import { Page } from "@playwright/test";
+
 import { getEditor } from "./getEditor";
 
 export const testSelectBrain = async (page: Page): Promise<void> => {

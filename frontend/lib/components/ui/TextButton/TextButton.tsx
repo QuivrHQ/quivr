@@ -3,9 +3,9 @@ import { useState } from "react";
 import { iconList } from "@/lib/helpers/iconList";
 import { Color } from "@/lib/types/Colors";
 
-import { Icon } from "../Icon/Icon";
-
 import styles from "./TextButton.module.scss";
+
+import { Icon } from "../Icon/Icon";
 
 interface TextButtonProps {
   iconName: keyof typeof iconList;

@@ -7,9 +7,9 @@ import { useChat } from "@/app/chat/[chatId]/hooks/useChat";
 import { useChatContext } from "@/lib/context";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 
-import { LoaderIcon } from "../LoaderIcon/LoaderIcon";
-
 import styles from "./SearchBar.module.scss";
+
+import { LoaderIcon } from "../LoaderIcon/LoaderIcon";
 
 export const SearchBar = (): JSX.Element => {
   const [searching, setSearching] = useState(false);

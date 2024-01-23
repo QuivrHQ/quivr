@@ -3,6 +3,7 @@ import { IoMdCloseCircle } from "react-icons/io";
 import { getFileIcon } from "@/lib/helpers/getFileIcon";
 
 import { FeedTitleDisplayer } from "./FeedTitleDisplayer";
+
 import { StyledFeedItemDiv } from "../styles/StyledFeedItemDiv";
 
 type FileFeedItemProps = {

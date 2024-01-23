@@ -1,9 +1,9 @@
 import { Color } from "@/lib/types/Colors";
 import { IconSize } from "@/lib/types/Icons";
 
-import { Icon } from "../Icon/Icon";
-
 import styles from "./LoaderIcon.module.scss";
+
+import { Icon } from "../Icon/Icon";
 
 interface LoaderIconProps {
   size: IconSize;

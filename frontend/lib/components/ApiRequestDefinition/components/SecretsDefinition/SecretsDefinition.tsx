@@ -11,6 +11,7 @@ import {
   defaultSecretDefinitionRow,
 } from "./config";
 import { useSecretsDefinition } from "./hooks/useSecretsDefinition";
+
 import { tabDescriptionStyle } from "../../styles";
 
 const paramsNameStyle = "flex flex-1 justify-center";

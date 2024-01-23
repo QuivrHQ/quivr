@@ -41,8 +41,8 @@ module.exports = {
           ["external", "builtin"],
           "unknown",
           "internal",
-          "parent",
           "sibling",
+          "parent",
           "index",
         ],
         alphabetize: {

@@ -10,6 +10,7 @@ import {
   chatItemContainerClassName,
 } from "./styles";
 import { getKeyFromChatItem } from "./utils/getKeyFromChatItem";
+
 import { ChatItemWithGroupedNotifications } from "../../types";
 
 type MessagesDialogueProps = {

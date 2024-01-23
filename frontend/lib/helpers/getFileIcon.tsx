@@ -17,6 +17,7 @@ import { LiaFileVideo } from "react-icons/lia";
 import { IconType } from "react-icons/lib";
 
 import { getFileType } from "./getFileType";
+
 import { SupportedFileExtensions } from "../types/SupportedFileExtensions";
 
 const fileTypeIcons: Record<SupportedFileExtensions, IconType> = {
