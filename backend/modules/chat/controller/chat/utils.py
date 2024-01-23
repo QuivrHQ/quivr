@@ -31,7 +31,7 @@ def check_user_requests_limit(user: UserIdentity, model: str):
 
     date = time.strftime("%Y%m%d")
 
-    monthly_chat_credit = userSettings.get("monthly_chat_credit", 0)
+    monthly_chat_credit = userSettings.get("monthly_chat_credit", 100)
     daily_user_count = userDailyUsage.get_user_monthly_usage(date)
     models_price = userDailyUsage.get_model_settings()
     user_choosen_model_price = 1000
