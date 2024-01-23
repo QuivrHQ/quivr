@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
 
-import { BrainType } from "@/lib/types/BrainConfig";
+import { BrainType } from "@/lib/types/brainConfig";
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const useGeneralInformation = () => {

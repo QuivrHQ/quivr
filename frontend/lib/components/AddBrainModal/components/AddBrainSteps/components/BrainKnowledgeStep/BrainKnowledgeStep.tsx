@@ -4,7 +4,7 @@ import { FaArrowLeft } from "react-icons/fa";
 
 import { ApiRequestDefinition } from "@/lib/components/ApiRequestDefinition";
 import Button from "@/lib/components/ui/Button";
-import { BrainType } from "@/lib/types/BrainConfig";
+import { BrainType } from "@/lib/types/brainConfig";
 
 import { CompositeBrainConnections } from "./components/CompositeBrainConnections/CompositeBrainConnections";
 import { KnowledgeToFeedInput } from "./components/KnowledgeToFeedInput";

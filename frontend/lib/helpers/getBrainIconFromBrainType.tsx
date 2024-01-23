@@ -3,7 +3,7 @@ import { LuBot, LuBrain } from "react-icons/lu";
 import { PiPaperclipFill } from "react-icons/pi";
 import { TbWorld } from "react-icons/tb";
 
-import { BrainType } from "@/lib/types/BrainConfig";
+import { BrainType } from "@/lib/types/brainConfig";
 type GetBrainIconFromBrainTypeOptions = {
   iconSize?: number;
   ApiBrainIcon?: IconType;
