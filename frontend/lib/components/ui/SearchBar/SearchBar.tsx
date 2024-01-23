@@ -13,6 +13,7 @@ import styles from "./SearchBar.module.scss";
 
 export const SearchBar = (): JSX.Element => {
   const [searching, setSearching] = useState(false);
+  const [isDisabled, setIsDisabled] = useState(true);
   const { message, setMessage } = useChatInput();
   const { setMessages } = useChatContext();
   const { addQuestion } = useChat();
@@ -20,7 +21,8 @@ export const SearchBar = (): JSX.Element => {
 
   useEffect(() => {
     setCurrentBrainId(null);
-  }, [setCurrentBrainId]);
+    setIsDisabled(message === "");
+  }, [setCurrentBrainId, message]);
 
   const submit = async (): Promise<void> => {
     setSearching(true);
@@ -47,7 +49,10 @@ export const SearchBar = (): JSX.Element => {
         <LoaderIcon size="big" color="accent" />
       ) : (
         <LuSearch
-          className={`${styles.search_icon} ${!message ? styles.disabled : ""}`}
+          className={`
+          ${styles.search_icon} 
+          ${isDisabled ? styles.disabled : ""}
+          `}
           onClick={() => void submit()}
         />
       )}

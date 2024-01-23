@@ -28,9 +28,7 @@ export const useChatStateUpdater = ({
       const { text, brainId, promptId } =
         getChatInputAttributesFromEditorState(editorNewState);
 
-      if (text !== "") {
-        setMessage(text);
-      }
+      setMessage(text);
 
       if (brainId !== currentBrainId) {
         if (brainId === "") {
