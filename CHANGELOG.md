@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.0.181 (2024-01-23)
+
+## What's Changed
+* fix(frontend): unable multiple enter on search page by @Zewed in https://github.com/StanGirard/quivr/pull/2074
+* fix(frontend): force brain on search was broken by @Zewed in https://github.com/StanGirard/quivr/pull/2075
+
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.180...v0.0.181
+
 ## 0.0.180 (2024-01-23)
 
 ## What's Changed
