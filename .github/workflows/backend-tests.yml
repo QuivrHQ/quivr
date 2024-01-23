@@ -2,30 +2,30 @@ name: Backend Tests
 
 on:
   push:
-    branches: [main]
+    branches: [master]
     paths:
-      - 'backend/**'
+      - "backend/**"
   pull_request:
-    branches: [main]
+    branches: [master]
     paths:
-      - 'backend/**'
+      - "backend/**"
   workflow_dispatch:
     inputs:
       logLevel:
-        description: 'Log level'
+        description: "Log level"
         required: true
-        default: 'warning'
+        default: "warning"
         type: choice
         options:
-        - info
-        - warning
-        - debug
+          - info
+          - warning
+          - debug
       tags:
-        description: 'Test scenario tags'
+        description: "Test scenario tags"
         required: false
         type: boolean
       environment:
-        description: 'Environment to run tests against'
+        description: "Environment to run tests against"
         type: environment
         required: false
 
@@ -62,7 +62,7 @@ jobs:
           emoji: true
           job-summary: true
           click-to-expand: false
-          report-title: 'Test Report'
+          report-title: "Test Report"
         env:
           SUPABASE_URL: ${{secrets.SUPABASE_URL}}
           SUPABASE_SERVICE_KEY: ${{secrets.SUPABASE_SERVICE_KEY}}
@@ -71,5 +71,3 @@ jobs:
           JWT_SECRET_KEY: ${{secrets.JWT_SECRET_KEY}}
           CI_TEST_API_KEY: ${{secrets.CI_TEST_API_KEY}}
           CELERY_BROKER_URL: ${{secrets.CELERY_BROKER_URL}}
-
-      

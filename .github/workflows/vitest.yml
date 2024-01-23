@@ -2,20 +2,20 @@ name: Vitest
 
 on:
   push:
-    branches: [ main ]
+    branches: [master]
     paths:
-      - 'frontend/**'
+      - "frontend/**"
   pull_request:
-    branches: [ main ]
+    branches: [master]
     paths:
-      - 'frontend/**'
+      - "frontend/**"
 
 jobs:
   build:
     runs-on: ubuntu-latest
     defaults:
-        run:
-            working-directory: ./frontend
+      run:
+        working-directory: ./frontend
     strategy:
       matrix:
         node-version: [18]
@@ -26,7 +26,7 @@ jobs:
         uses: actions/setup-node@b39b52d1213e96004bfcb1c61a8a6fa8ab84f3e8 # v4
         with:
           node-version: ${{ matrix.node-version }}
-          cache: 'yarn'
+          cache: "yarn"
           cache-dependency-path: frontend/yarn.lock
       - run: yarn
       - run: yarn run test-unit
