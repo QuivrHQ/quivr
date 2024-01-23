@@ -11,6 +11,7 @@ import { PublicAccessConfirmationModal } from "./components/PublicAccessConfirma
 import { useBrainParamsStep } from "./hooks/useBrainParamsStep";
 import { useBrainStatusOptions } from "./hooks/useBrainStatusOptions";
 import { usePublicAccessConfirmationModal } from "./hooks/usePublicAccessConfirmationModal";
+
 import { useBrainCreationSteps } from "../../hooks/useBrainCreationSteps";
 import { useBrainTypeSelectionStep } from "../BrainTypeSelectionStep/hooks/useBrainTypeSelectionStep";
 

@@ -5,6 +5,7 @@ import { LuChevronRight } from "react-icons/lu";
 import Button from "@/lib/components/ui/Button";
 
 import { UseCasesListing } from "./components/UseCasesListing/UseCasesListing";
+
 import { useHomepageTracking } from "../../hooks/useHomepageTracking";
 
 export const UseCases = (): JSX.Element => {

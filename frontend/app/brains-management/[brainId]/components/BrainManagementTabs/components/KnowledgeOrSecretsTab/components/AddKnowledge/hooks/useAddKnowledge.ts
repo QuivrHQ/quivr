@@ -3,6 +3,7 @@ import { useEffect } from "react";
 import { useUrlBrain } from "@/lib/hooks/useBrainIdFromUrl";
 
 import { useFeedBrain } from "./useFeedBrain";
+
 import { useKnowledge } from "../../../hooks/useKnowledge";
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types

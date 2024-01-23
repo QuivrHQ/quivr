@@ -5,7 +5,8 @@ import { BrainRoleType } from "@/lib/components/BrainUsers/types";
 import { Document } from "@/lib/types/Document";
 
 import { useBrainProvider } from "./hooks/useBrainProvider";
-import { BrainType, Model } from "../../types/brainConfig";
+
+import { BrainType, Model } from "../../types/BrainConfig";
 
 export type BrainAccessStatus = "private" | "public";
 

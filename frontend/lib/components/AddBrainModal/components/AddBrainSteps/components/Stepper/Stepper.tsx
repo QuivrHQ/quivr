@@ -3,6 +3,7 @@ import { Fragment } from "react";
 import { cn } from "@/lib/utils";
 
 import { Step } from "./components/Step";
+
 import { useBrainCreationSteps } from "../../hooks/useBrainCreationSteps";
 
 export const Stepper = (): JSX.Element => {

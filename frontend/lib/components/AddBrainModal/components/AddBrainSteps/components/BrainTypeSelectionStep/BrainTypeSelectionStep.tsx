@@ -7,6 +7,7 @@ import { Radio } from "@/lib/components/ui/Radio";
 
 import { useBrainTypeSelectionStep } from "./hooks/useBrainTypeSelectionStep";
 import { useKnowledgeSourceLabel } from "./hooks/useKnowledgeSourceLabel";
+
 import { useBrainCreationSteps } from "../../hooks/useBrainCreationSteps";
 
 type BrainTypeSelectionStepProps = {

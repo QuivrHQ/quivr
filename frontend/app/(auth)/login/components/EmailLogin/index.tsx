@@ -9,6 +9,7 @@ import { useAuthModes } from "@/lib/hooks/useAuthModes";
 import { EmailInput } from "./components/EmailInput";
 import { MagicLinkLogin } from "./components/MagicLinkLogin/MaginLinkLogin";
 import { PasswordLogin } from "./components/PasswordLogin/PasswordLogin";
+
 import { EmailAuthContextType } from "../../types";
 
 export const EmailLogin = (): JSX.Element => {

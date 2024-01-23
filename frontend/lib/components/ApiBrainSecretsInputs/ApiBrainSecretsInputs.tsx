@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next";
 import { useBrainFetcher } from "@/app/brains-management/[brainId]/components/BrainManagementTabs/hooks/useBrainFetcher";
 
 import { useApiBrainSecretsInputs } from "./hooks/useApiBrainSecretsInputs";
+
 import Button from "../ui/Button";
 
 type ApiBrainSecretsInputsProps = {

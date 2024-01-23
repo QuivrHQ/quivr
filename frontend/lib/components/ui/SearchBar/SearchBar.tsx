@@ -7,12 +7,13 @@ import { useChat } from "@/app/chat/[chatId]/hooks/useChat";
 import { useChatContext } from "@/lib/context";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 
-import { LoaderIcon } from "../LoaderIcon/LoaderIcon";
-// eslint-disable-next-line import/order
 import styles from "./SearchBar.module.scss";
+
+import { LoaderIcon } from "../LoaderIcon/LoaderIcon";
 
 export const SearchBar = (): JSX.Element => {
   const [searching, setSearching] = useState(false);
+  const [isDisabled, setIsDisabled] = useState(true);
   const { message, setMessage } = useChatInput();
   const { setMessages } = useChatContext();
   const { addQuestion } = useChat();
@@ -20,7 +21,8 @@ export const SearchBar = (): JSX.Element => {
 
   useEffect(() => {
     setCurrentBrainId(null);
-  }, [setCurrentBrainId]);
+    setIsDisabled(message === "");
+  }, [setCurrentBrainId, message]);
 
   const submit = async (): Promise<void> => {
     setSearching(true);
@@ -35,7 +37,6 @@ export const SearchBar = (): JSX.Element => {
   };
 
   /* eslint-disable @typescript-eslint/restrict-template-expressions */
-
   return (
     <div className={styles.search_bar_wrapper}>
       <Editor
@@ -45,10 +46,13 @@ export const SearchBar = (): JSX.Element => {
         placeholder="Search"
       ></Editor>
       {searching ? (
-        <LoaderIcon size="big" />
+        <LoaderIcon size="big" color="accent" />
       ) : (
         <LuSearch
-          className={`${styles.search_icon} ${!message ? styles.disabled : ""}`}
+          className={`
+          ${styles.search_icon} 
+          ${isDisabled ? styles.disabled : ""}
+          `}
           onClick={() => void submit()}
         />
       )}

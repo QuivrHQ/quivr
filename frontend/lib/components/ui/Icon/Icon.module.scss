@@ -1,0 +1,46 @@
+@use "@/styles/Colors.module.scss";
+@use "@/styles/IconSizes.module.scss";
+
+.small {
+  width: IconSizes.$small;
+  height: IconSizes.$small;
+}
+
+.normal {
+  width: IconSizes.$normal;
+  height: IconSizes.$normal;
+}
+
+.large {
+  width: IconSizes.$large;
+  height: IconSizes.$large;
+}
+
+.big {
+  width: IconSizes.$big;
+  height: IconSizes.$big;
+}
+
+.black {
+  color: Colors.$black;
+
+  &.hovered {
+    color: Colors.$accent;
+  }
+}
+
+.primary {
+  color: Colors.$primary;
+}
+
+.accent {
+  color: Colors.$accent;
+}
+
+.white {
+  color: Colors.$white;
+}
+
+.disabled {
+  opacity: 0.2;
+}

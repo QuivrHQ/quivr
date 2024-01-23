@@ -1,4 +1,4 @@
-import { Model, PaidModels } from "../types/brainConfig";
+import { Model, PaidModels } from "../types/BrainConfig";
 
 export const defineMaxTokens = (
   model: Model | PaidModels | undefined

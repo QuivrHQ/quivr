@@ -3,9 +3,6 @@
 
 .loader_icon {
   animation: spin 1s linear infinite;
-  width: IconSizes.$big;
-  height: IconSizes.$big;
-  color: Colors.$accent;
 
   @keyframes spin {
     from {
@@ -14,25 +11,5 @@
     to {
       transform: rotate(360deg);
     }
-  }
-
-  &.small {
-    width: IconSizes.$small;
-    height: IconSizes.$small;
-  }
-
-  &.normal {
-    width: IconSizes.$normal;
-    height: IconSizes.$normal;
-  }
-
-  &.large {
-    width: IconSizes.$large;
-    height: IconSizes.$large;
-  }
-
-  &.big {
-    width: IconSizes.$big;
-    height: IconSizes.$big;
   }
 }

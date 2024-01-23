@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next";
 import Spinner from "@/lib/components/ui/Spinner";
 
 import { useAddedKnowledge } from "./hooks/useAddedKnowledge";
+
 import { KnowledgeTable } from "../KnowledgeTable/KnowledgeTable";
 
 type AddedKnowledgeProps = {

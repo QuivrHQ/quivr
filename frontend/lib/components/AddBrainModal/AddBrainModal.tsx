@@ -6,13 +6,7 @@ import { KnowledgeToFeedProvider } from "@/lib/context";
 import { AddBrainSteps } from "./components/AddBrainSteps/AddBrainSteps";
 import { CreateBrainProps } from "./types";
 
-type AddBrainModalProps = {
-  triggerClassName?: string;
-};
-
-export const AddBrainModal = ({
-  triggerClassName,
-}: AddBrainModalProps): JSX.Element => {
+export const AddBrainModal = (): JSX.Element => {
   const defaultValues: CreateBrainProps = {
     ...addBrainDefaultValues,
     setDefault: true,
@@ -26,7 +20,7 @@ export const AddBrainModal = ({
   return (
     <FormProvider {...methods}>
       <KnowledgeToFeedProvider>
-        <AddBrainSteps triggerClassName={triggerClassName} />
+        <AddBrainSteps />
       </KnowledgeToFeedProvider>
     </FormProvider>
   );

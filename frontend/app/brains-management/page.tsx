@@ -11,8 +11,8 @@ const BrainsManagement = (): JSX.Element => {
   const { t } = useTranslation("chat");
 
   return (
-    <div className="flex flex-col flex-1">
-      <div className="w-full h-full p-6 bg-highlight flex flex-col flex-1 overflow-auto">
+    <div className="flex flex-col flex-1 bg-highlight">
+      <div className="w-full h-full p-6 flex flex-col flex-1 overflow-auto">
         <div className="w-full mb-10">
           <div className="flex flex-row justify-center items-center gap-2">
             <LuBrain size={20} className="text-primary" />
@@ -24,7 +24,7 @@ const BrainsManagement = (): JSX.Element => {
         <BrainsTabs />
       </div>
       <div className="w-full flex justify-center py-4">
-        <AddBrainModal triggerClassName="bg-primary text-white font-normal" />
+        <AddBrainModal />
       </div>
     </div>
   );

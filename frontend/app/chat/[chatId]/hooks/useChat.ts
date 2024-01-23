@@ -17,6 +17,7 @@ import { useEventTracking } from "@/services/analytics/june/useEventTracking";
 
 import { useLocalStorageChatConfig } from "./useLocalStorageChatConfig";
 import { useQuestion } from "./useQuestion";
+
 import { ChatQuestion } from "../types";
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
