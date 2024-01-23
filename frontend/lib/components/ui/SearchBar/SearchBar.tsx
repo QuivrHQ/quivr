@@ -21,8 +21,11 @@ export const SearchBar = (): JSX.Element => {
 
   useEffect(() => {
     setCurrentBrainId(null);
+  }, [setCurrentBrainId]);
+
+  useEffect(() => {
     setIsDisabled(message === "");
-  }, [setCurrentBrainId, message]);
+  }, [message]);
 
   const submit = async (): Promise<void> => {
     if (!searching) {
