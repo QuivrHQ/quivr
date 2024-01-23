@@ -40,7 +40,7 @@ export const MentionList = forwardRef<MentionListRef, MentionListProps>(
             />
           ))}
         </div>
-        <div className="relative">
+        <div className="relative flex justify-center items-center py-1">
           {shouldShowScrollToBottomIcon && (
             <FaAngleDoubleDown
               size={20}

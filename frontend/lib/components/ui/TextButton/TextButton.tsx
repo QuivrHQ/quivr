@@ -22,6 +22,12 @@ export const TextButton = (props: TextButtonProps): JSX.Element => {
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
+      <Icon
+        name={props.iconName}
+        size="normal"
+        color={props.color}
+        hovered={hovered}
+      />
       <span
         className={`
         ${styles[props.color] ?? ""}
@@ -30,12 +36,6 @@ export const TextButton = (props: TextButtonProps): JSX.Element => {
       >
         {props.label}
       </span>
-      <Icon
-        name={props.iconName}
-        size="normal"
-        color={props.color}
-        hovered={hovered}
-      />
     </div>
   );
 };
