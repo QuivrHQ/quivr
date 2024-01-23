@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.0.180 (2024-01-23)
+
+## What's Changed
+* fix: 🐛 api by @StanGirard in https://github.com/StanGirard/quivr/pull/2068
+* feat(frontend): Add Brain On Search Page by @Zewed in https://github.com/StanGirard/quivr/pull/2067
+* fix(frontend): uniformize case for types by @Zewed in https://github.com/StanGirard/quivr/pull/2071
+* fix: 🐛 gitconfig by @StanGirard in https://github.com/StanGirard/quivr/pull/2072
+
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.179...v0.0.180
+
 ## 0.0.179 (2024-01-22)
 
 **Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.178...v0.0.179
