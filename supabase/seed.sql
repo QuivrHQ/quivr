@@ -172,13 +172,17 @@ INSERT INTO "public"."brains_users" ("brain_id", "rights", "default_brain", "use
 --
 
 INSERT INTO "public"."chats" ("chat_id", "user_id", "creation_time", "history", "chat_name") VALUES
-	('482872e4-91fe-4f4b-8331-882954711fc9', '39418e3b-0258-4452-af60-7acfcc1263ff', '2024-01-22 22:28:02.175246', NULL, 'What is quivr');
+	('482872e4-91fe-4f4b-8331-882954711fc9', '39418e3b-0258-4452-af60-7acfcc1263ff', '2024-01-22 22:28:02.175246', NULL, 'What is quivr'),
+	('3e3b4c4a-e606-4366-acfc-873e777cf53f', '39418e3b-0258-4452-af60-7acfcc1263ff', '2024-01-23 03:35:49.634698', NULL, 'What os quivr'),
+	('4aa85022-8162-4b39-b7c8-cfb2a0e3fd7c', '39418e3b-0258-4452-af60-7acfcc1263ff', '2024-01-23 03:38:28.700781', NULL, 'What is quivr?');
 
 
 --
 -- Data for Name: chat_history; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
+INSERT INTO "public"."chat_history" ("message_id", "chat_id", "user_message", "assistant", "message_time", "brain_id", "prompt_id", "metadata", "user_feedback") VALUES
+	('af99ce12-1080-426c-acaf-3c6c09cdbecb', '4aa85022-8162-4b39-b7c8-cfb2a0e3fd7c', 'What is quivr ? ', 'Quivr is a virtual reality archery game that allows players to experience the thrill of archery in a simulated environment. Players use motion controllers to aim, draw, and release their virtual bow to hit targets and complete challenges. The game provides a realistic and immersive archery experience for VR enthusiasts.', '2024-01-23 03:43:54.416148', '2db343ed-f650-4e3c-a527-db7829829bee', NULL, '{"close_brains": [{"id": "2db343ed-f650-4e3c-a527-db7829829bee", "name": "Default brain", "similarity": 0.717073075073519}], "follow_up_questions": ["Use simpler language", "Provide pros and cons", "Elaborate on a specific point"]}', NULL);
 
 
 --
@@ -198,7 +202,7 @@ INSERT INTO "public"."chats" ("chat_id", "user_id", "creation_time", "history", 
 --
 
 INSERT INTO "public"."models" ("name", "price", "max_input", "max_output") VALUES
-	('gpt-3.5-turbo', 1, 2000, 1000);
+	('gpt-3.5-turbo-1106', 1, 2000, 1000);
 
 
 --
@@ -225,6 +229,8 @@ INSERT INTO "public"."onboardings" ("user_id", "onboarding_a", "onboarding_b1", 
 -- Data for Name: user_daily_usage; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
+INSERT INTO "public"."user_daily_usage" ("user_id", "email", "date", "daily_requests_count") VALUES
+	('39418e3b-0258-4452-af60-7acfcc1263ff', 'admin@quivr.app', '20240123', 1);
 
 
 --
