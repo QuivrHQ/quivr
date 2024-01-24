@@ -4,7 +4,6 @@ import { MdOutlineRemoveCircle } from "react-icons/md";
 
 import Field from "@/lib/components/ui/Field";
 import { Select } from "@/lib/components/ui/Select";
-import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 
 import { BrainRoleAssignation, BrainRoleType } from "./BrainUsers/types";
 import { userRoleToAssignableRoles } from "./ShareBrain/types";
@@ -25,7 +24,6 @@ export const UserToInvite = ({
     roleAssignation.role
   );
   const [email, setEmail] = useState(roleAssignation.email);
-  const { currentBrain } = useBrainContext();
 
   useEffect(() => {
     onChange({
@@ -33,13 +31,9 @@ export const UserToInvite = ({
       email,
       role: selectedRole,
     });
-  }, [email, selectedRole]);
+  }, [email, onChange, roleAssignation, selectedRole]);
 
-  if (currentBrain === undefined) {
-    return <div />;
-  }
-
-  const assignableRoles = userRoleToAssignableRoles[currentBrain.role];
+  const assignableRoles = userRoleToAssignableRoles["Owner"];
   const translatedOptions = assignableRoles.map((role) => ({
     value: role.value,
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
