@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.0.182 (2024-01-24)
+
+## What's Changed
+* fix: 🐛 crawl by @StanGirard in https://github.com/StanGirard/quivr/pull/2076
+
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.181...v0.0.182
+
 ## 0.0.181 (2024-01-23)
 
 ## What's Changed
