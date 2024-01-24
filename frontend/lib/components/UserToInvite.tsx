@@ -12,7 +12,6 @@ type UserToInviteProps = {
   onChange: (newRole: BrainRoleAssignation) => void;
   removeCurrentInvitation?: () => void;
   roleAssignation: BrainRoleAssignation;
-  brainId: string;
 };
 
 export const UserToInvite = ({
