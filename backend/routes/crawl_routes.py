@@ -56,14 +56,14 @@ async def crawl_endpoint(
             "type": "error",
         }
     else:
-        crawl_notification = None
+        crawl_notification_id = None
         if chat_id:
-            crawl_notification = notification_service.add_notification(
+            crawl_notification_id = notification_service.add_notification(
                 CreateNotificationProperties(
                     action="CRAWL",
                     chat_id=chat_id,
                     status=NotificationsStatusEnum.Pending,
-                )
+                ).id
             )
 
         knowledge_to_add = CreateKnowledgeProperties(
@@ -78,7 +78,7 @@ async def crawl_endpoint(
         process_crawl_and_notify.delay(
             crawl_website_url=crawl_website.url,
             brain_id=brain_id,
-            notification_id=crawl_notification.id,
+            notification_id=crawl_notification_id,
         )
 
         return {"message": "Crawl processing has started."}
