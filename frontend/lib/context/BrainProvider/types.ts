@@ -11,6 +11,7 @@ import { BrainType, Model } from "../../types/BrainConfig";
 export type BrainAccessStatus = "private" | "public";
 
 export type Brain = {
+  role: BrainRoleType;
   id: UUID;
   name: string;
   documents?: Document[];

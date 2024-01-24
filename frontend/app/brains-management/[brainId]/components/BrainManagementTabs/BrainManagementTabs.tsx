@@ -1,4 +1,6 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 /* eslint-disable max-lines */
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { StyledTabsTrigger } from "@/app/brains-management/components/StyledTabsTrigger";
@@ -34,10 +36,16 @@ export const BrainManagementTabs = (): JSX.Element => {
     brainId,
   });
 
+  const [loaded, setLoaded] = useState<boolean>(false);
+
   const knowledgeOrSecretsTabLabel =
     brain?.brain_type === "doc"
       ? t("knowledge", { ns: "config" })
       : t("secrets", { ns: "external_api_definition" });
+
+  useEffect(() => {
+    setLoaded(!!brain);
+  }, [brain]);
 
   if (brainId === undefined) {
     return <div />;
@@ -74,7 +82,7 @@ export const BrainManagementTabs = (): JSX.Element => {
           <SettingsTab brainId={brainId} />
         </TabsContent>
         <TabsContent value="people">
-          <PeopleTab brainId={brainId} hasEditRights={hasEditRights} />
+          {loaded && <PeopleTab brain={brain!} hasEditRights={true} />}
         </TabsContent>
         <TabsContent value="knowledgeOrSecrets">
           <KnowledgeOrSecretsTab

@@ -4,7 +4,6 @@ import { MdOutlineRemoveCircle } from "react-icons/md";
 
 import Field from "@/lib/components/ui/Field";
 import { Select } from "@/lib/components/ui/Select";
-import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 
 import { BrainRoleAssignation, BrainRoleType } from "./BrainUsers/types";
 import { userRoleToAssignableRoles } from "./ShareBrain/types";
@@ -13,21 +12,23 @@ type UserToInviteProps = {
   onChange: (newRole: BrainRoleAssignation) => void;
   removeCurrentInvitation?: () => void;
   roleAssignation: BrainRoleAssignation;
+  brainRole: BrainRoleType;
 };
 
 export const UserToInvite = ({
   onChange,
   removeCurrentInvitation,
   roleAssignation,
+  brainRole,
 }: UserToInviteProps): JSX.Element => {
   const { t } = useTranslation("translation");
   const [selectedRole, setSelectedRole] = useState<BrainRoleType>(
     roleAssignation.role
   );
   const [email, setEmail] = useState(roleAssignation.email);
-  const { currentBrain } = useBrainContext();
 
   useEffect(() => {
+    console.info(brainRole);
     onChange({
       ...roleAssignation,
       email,
@@ -35,11 +36,11 @@ export const UserToInvite = ({
     });
   }, [email, selectedRole]);
 
-  if (currentBrain === undefined) {
+  if (!brainRole) {
     return <div />;
   }
 
-  const assignableRoles = userRoleToAssignableRoles[currentBrain.role];
+  const assignableRoles = userRoleToAssignableRoles[brainRole];
   const translatedOptions = assignableRoles.map((role) => ({
     value: role.value,
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment

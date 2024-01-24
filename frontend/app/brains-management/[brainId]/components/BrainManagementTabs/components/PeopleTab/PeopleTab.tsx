@@ -1,6 +1,5 @@
 "use client";
 
-import { UUID } from "crypto";
 import { useTranslation } from "react-i18next";
 import { ImUserPlus } from "react-icons/im";
 import { MdContentPaste, MdLink } from "react-icons/md";
@@ -8,17 +7,18 @@ import { MdContentPaste, MdLink } from "react-icons/md";
 import { BrainUsers } from "@/lib/components/BrainUsers/BrainUsers";
 import { UserToInvite } from "@/lib/components/UserToInvite";
 import Button from "@/lib/components/ui/Button";
+import { Brain } from "@/lib/context/BrainProvider/types";
 import { useShareBrain } from "@/lib/hooks/useShareBrain";
 
 import { NoAccess } from "../NoAccess";
 
 type ShareBrainModalProps = {
-  brainId: UUID;
+  brain: Brain;
   hasEditRights: boolean;
 };
 
 export const PeopleTab = ({
-  brainId,
+  brain,
   hasEditRights,
 }: ShareBrainModalProps): JSX.Element => {
   const { t } = useTranslation(["translation", "config", "brain"]);
@@ -31,7 +31,7 @@ export const PeopleTab = ({
     addNewRoleAssignationRole,
     sendingInvitation,
     canAddNewRow,
-  } = useShareBrain(brainId);
+  } = useShareBrain(brain.id);
 
   if (!hasEditRights) {
     return <NoAccess />;
@@ -76,6 +76,7 @@ export const PeopleTab = ({
               onChange={updateRoleAssignation(index)}
               removeCurrentInvitation={removeRoleAssignation(index)}
               roleAssignation={roleAssignation}
+              brainRole={brain.role}
             />
           ))}
           <Button
@@ -102,7 +103,7 @@ export const PeopleTab = ({
       <p className="text-lg font-bold">
         {t("usersWithAccess", { ns: "brain" })}
       </p>
-      <BrainUsers brainId={brainId} />
+      <BrainUsers brainId={brain.id} />
     </>
   );
 };
