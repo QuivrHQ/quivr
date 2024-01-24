@@ -76,6 +76,7 @@ export const PeopleTab = ({
               onChange={updateRoleAssignation(index)}
               removeCurrentInvitation={removeRoleAssignation(index)}
               roleAssignation={roleAssignation}
+              brainId={brainId}
             />
           ))}
           <Button
