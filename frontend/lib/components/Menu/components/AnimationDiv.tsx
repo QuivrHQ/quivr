@@ -21,7 +21,7 @@ export const AnimatedDiv = ({ children }: AnimatedDivProps): JSX.Element => {
           ? "10px 10px 16px rgba(0, 0, 0, 0)"
           : "10px 10px 16px rgba(0, 0, 0, 0.5)",
       }}
-      className={"overflow-hidden flex flex-col flex-1 bg-white"}
+      className={"overflow-hidden flex flex-col flex-1 bg-grey"}
     >
       {children}
     </motion.div>
