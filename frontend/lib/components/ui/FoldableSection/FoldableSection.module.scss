@@ -1,0 +1,24 @@
+@use "@/styles/Colors.module.scss";
+@use "@/styles/Spacings.module.scss";
+
+.foldable_section_wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: Spacings.$spacing04;
+  border-radius: 5px;
+  border: 1px solid Colors.$grey;
+  padding: Spacings.$spacing03;
+
+  .header_wrapper {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+
+    .header_left {
+      display: flex;
+      align-items: center;
+      gap: Spacings.$spacing03;
+    }
+  }
+}

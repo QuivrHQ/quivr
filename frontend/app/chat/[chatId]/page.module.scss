@@ -7,7 +7,7 @@
   background-color: Colors.$ivory;
   padding: Spacings.$spacing06;
   display: flex;
-  gap: Spacings.$spacing05;
+  gap: Spacings.$spacing09;
 
   &.feeding {
     background-color: Colors.$chat-bg-gray;
@@ -15,6 +15,6 @@
 
   .data_panel_wrapper {
     height: 100%;
-    width: 25%;
+    width: 30%;
   }
 }
