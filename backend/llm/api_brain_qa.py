@@ -49,6 +49,19 @@ class APIBrainQA(KnowledgeBrainQA, QAInterface):
         )
         self.user_id = user_id
 
+    def log_steps(self, message: str, type: str):
+        if "api" not in self.metadata:
+            self.metadata["api"] = {}
+        if "steps" not in self.metadata["api"]:
+            self.metadata["api"]["steps"] = []
+        self.metadata["api"]["steps"].append(
+            {
+                "number": len(self.metadata["api"]["steps"]),
+                "type": type,
+                "message": message,
+            }
+        )
+
     async def make_completion(
         self,
         messages,
@@ -56,13 +69,14 @@ class APIBrainQA(KnowledgeBrainQA, QAInterface):
         brain_id: UUID,
         recursive_count=0,
         should_log_steps=False,
-    ):
+        raw=True,
+    ) -> str | None:
         if recursive_count > 5:
             yield "The assistant is having issues and took more than 5 calls to the API. Please try again later or an other instruction."
             return
 
         if should_log_steps:
-            yield "🧠<Deciding what to do>🧠"
+            self.log_steps("Quivr is thinking about what to do", "info")
 
         response = completion(
             model=self.model,
@@ -81,11 +95,13 @@ class APIBrainQA(KnowledgeBrainQA, QAInterface):
         for chunk in response:
             finish_reason = chunk.choices[0].finish_reason
             if finish_reason == "stop":
+                self.log_steps("Quivr has finished", "info")
                 break
             if (
                 "function_call" in chunk.choices[0].delta
                 and chunk.choices[0].delta["function_call"]
             ):
+                self.log_steps("Quivr decided to call the API", "info")
                 if chunk.choices[0].delta["function_call"].name:
                     function_call["name"] = chunk.choices[0].delta["function_call"].name
                 if chunk.choices[0].delta["function_call"].arguments:
@@ -98,11 +114,14 @@ class APIBrainQA(KnowledgeBrainQA, QAInterface):
                     arguments = json.loads(function_call["arguments"])
 
                 except Exception:
-                    yield f"🧠<Issues with {arguments}>🧠"
+                    self.log_steps(f"Issues with {arguments}", "error")
                     arguments = {}
 
                 if should_log_steps:
                     yield f"🧠<Calling {brain_id} with arguments {arguments}>🧠"
+                    self.log_steps(
+                        f"Calling {brain_id} with arguments {arguments}", "info"
+                    )
 
                 try:
                     api_call_response = call_brain_api(
@@ -113,8 +132,8 @@ class APIBrainQA(KnowledgeBrainQA, QAInterface):
                 except Exception as e:
                     logger.info(f"Error while calling API: {e}")
                     api_call_response = f"Error while calling API: {e}"
-
                 function_name = function_call["name"]
+                self.log_steps("Quivr has called the API", "info")
                 yield f"🧠<The function {function_name} was called and gave The following answer:(data from function) {api_call_response} (end of data from function). Don't call this function again unless there was an error or extremely necessary and asked specifically by the user. If an error, display it to the user in raw.>🧠"
                 messages.append(
                     {
@@ -198,6 +217,7 @@ class APIBrainQA(KnowledgeBrainQA, QAInterface):
                     if self.prompt_to_use
                     else None,
                     "brain_name": brain.name if brain else None,
+                    "metadata": self.metadata,
                 }
             )
         else:
@@ -212,6 +232,7 @@ class APIBrainQA(KnowledgeBrainQA, QAInterface):
                     if self.prompt_to_use
                     else None,
                     "brain_name": brain.name if brain else None,
+                    "metadata": self.metadata,
                 }
             )
         response_tokens = []
@@ -234,6 +255,7 @@ class APIBrainQA(KnowledgeBrainQA, QAInterface):
                 message_id=str(streamed_chat_history.message_id),
                 user_message=question.question,
                 assistant="".join(response_tokens),
+                metadata=self.metadata,
             )
 
     def make_completion_without_streaming(

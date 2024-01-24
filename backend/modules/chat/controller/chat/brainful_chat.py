@@ -89,6 +89,9 @@ class BrainfulChat(ChatInterface):
 
         follow_up_questions = chat_service.get_follow_up_question(chat_id)
         metadata["follow_up_questions"] = follow_up_questions
+        metadata["model"] = model
+        metadata["max_tokens"] = max_tokens
+        metadata["temperature"] = temperature
 
         brain = brain_service.get_brain_by_id(brain_id_to_use)
         if (
