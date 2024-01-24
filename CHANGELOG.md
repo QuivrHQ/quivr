@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.0.183 (2024-01-24)
+
+## What's Changed
+* fix: 🐛 subscription by @StanGirard in https://github.com/StanGirard/quivr/pull/2081
+
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.182...v0.0.183
+
 ## 0.0.182 (2024-01-24)
 
 ## What's Changed
