@@ -1,0 +1,36 @@
+@use "@/styles/Colors.module.scss";
+@use "@/styles/Spacings.module.scss";
+
+.foldable_section_wrapper {
+  display: flex;
+  flex-direction: column;
+  border-radius: 5px;
+  border: 1px dashed Colors.$light-grey;
+  overflow: hidden;
+
+  .header_wrapper {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    padding: Spacings.$spacing03;
+
+    .header_left {
+      display: flex;
+      align-items: center;
+      gap: Spacings.$spacing03;
+      overflow: hidden;
+
+      .header_title {
+        font-weight: bold;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+    }
+
+    &:hover {
+      background-color: Colors.$lightest-grey;
+    }
+  }
+}

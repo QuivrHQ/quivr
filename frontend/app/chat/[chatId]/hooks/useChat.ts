@@ -83,7 +83,7 @@ export const useChat = () => {
       }
 
       const chatQuestion: ChatQuestion = {
-        model,
+        model, // eslint-disable-line @typescript-eslint/no-unsafe-assignment
         question,
         temperature: temperature,
         max_tokens: maxTokens,
@@ -93,7 +93,6 @@ export const useChat = () => {
 
       callback?.();
       await addStreamQuestion(currentChatId, chatQuestion);
-
     } catch (error) {
       console.error({ error });
 
