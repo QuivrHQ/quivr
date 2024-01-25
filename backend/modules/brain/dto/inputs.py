@@ -20,6 +20,8 @@ class CreateApiBrainDefinition(BaseModel, extra=Extra.forbid):
     params: Optional[ApiBrainDefinitionSchema] = ApiBrainDefinitionSchema()
     search_params: ApiBrainDefinitionSchema = ApiBrainDefinitionSchema()
     secrets: Optional[list[ApiBrainDefinitionSecret]] = []
+    raw: Optional[bool] = False
+    jq_instructions: Optional[str] = None
 
 
 class CreateBrainProperties(BaseModel, extra=Extra.forbid):

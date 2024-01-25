@@ -12,7 +12,7 @@ class GetChatHistoryOutput(BaseModel):
     message_time: Optional[str]
     prompt_title: Optional[str] | None
     brain_name: Optional[str] | None
-    brain_id: Optional[UUID] | None
+    brain_id: Optional[str] | None  # string because UUID is not JSON serializable
     metadata: Optional[dict] | None
 
     def dict(self, *args, **kwargs):

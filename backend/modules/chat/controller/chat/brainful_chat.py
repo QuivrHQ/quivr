@@ -6,6 +6,7 @@ from llm.knowledge_brain_qa import KnowledgeBrainQA
 from logger import get_logger
 from models.settings import BrainSettings, get_supabase_client
 from modules.brain.entity.brain_entity import BrainType, RoleEnum
+from modules.brain.service.api_brain_definition_service import ApiBrainDefinitionService
 from modules.brain.service.brain_authorization_service import (
     validate_brain_authorization,
 )
@@ -15,6 +16,7 @@ from modules.chat.service.chat_service import ChatService
 from vectorstore.supabase import CustomSupabaseVectorStore
 
 chat_service = ChatService()
+api_brain_definition_service = ApiBrainDefinitionService()
 
 logger = get_logger(__name__)
 
@@ -89,6 +91,9 @@ class BrainfulChat(ChatInterface):
 
         follow_up_questions = chat_service.get_follow_up_question(chat_id)
         metadata["follow_up_questions"] = follow_up_questions
+        metadata["model"] = model
+        metadata["max_tokens"] = max_tokens
+        metadata["temperature"] = temperature
 
         brain = brain_service.get_brain_by_id(brain_id_to_use)
         if (
@@ -120,6 +125,9 @@ class BrainfulChat(ChatInterface):
             )
 
         if brain.brain_type == BrainType.API:
+            brain_definition = api_brain_definition_service.get_api_brain_definition(
+                brain_id_to_use
+            )
             return APIBrainQA(
                 chat_id=chat_id,
                 model=model,
@@ -130,4 +138,6 @@ class BrainfulChat(ChatInterface):
                 prompt_id=prompt_id,
                 user_id=user_id,
                 metadata=metadata,
+                raw=brain_definition.raw,
+                jq_instructions=brain_definition.jq_instructions,
             )

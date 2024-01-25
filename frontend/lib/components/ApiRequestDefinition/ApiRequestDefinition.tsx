@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 import { Content, List, Root } from "@radix-ui/react-tabs";
 import { Fragment } from "react";
 import { useFormContext } from "react-hook-form";
@@ -92,6 +93,31 @@ export const ApiRequestDefinition = (): JSX.Element => {
           <Content value="secrets">
             <SecretsDefinition />
           </Content>
+        </div>
+        {/* // Add a boolean for raw = False or True by default to False */}
+        <div className="flex gap-2 w-full items-center">
+          <label htmlFor="raw-output" className="mr-2">
+            Raw output
+          </label>
+          <input
+            id="raw-output"
+            type="checkbox"
+            className="form-checkbox h-5 w-5 text-indigo-600 rounded focus:ring-2 focus:ring-indigo-400 outline-none"
+            disabled={readOnly}
+            {...register("brain_definition.raw")}
+          />
+        </div>
+        <div className="flex gap-2 w-full items-center">
+          <label htmlFor="jq_instructions" className="mr-2">
+            Parsing Instructions
+          </label>
+          <input
+            id="jq_instructions"
+            type="text"
+            className="mt-1 line-clamp-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md outline-none"
+            disabled={readOnly}
+            {...register("brain_definition.jq_instructions")}
+          />
         </div>
       </Root>
     </>
