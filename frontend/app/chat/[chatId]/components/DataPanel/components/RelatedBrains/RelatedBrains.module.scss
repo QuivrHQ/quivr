@@ -36,6 +36,10 @@
       }
     }
 
+    .similarity_score {
+      cursor: help;
+    }
+
     &:hover {
       .left .copy_icon {
         visibility: visible;

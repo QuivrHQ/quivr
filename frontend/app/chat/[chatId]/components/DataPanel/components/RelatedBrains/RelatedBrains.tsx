@@ -77,7 +77,11 @@ const RelatedBrains = ({ closeBrains }: RelatedBrainsProps): JSX.Element => {
                 @{brain.name}
               </p>
             </div>
-            <div style={{ color: closeBrainsProps[index]?.color }}>
+            <div
+              className={styles.similarity_score}
+              title="Similarity score"
+              style={{ color: closeBrainsProps[index]?.color }}
+            >
               {Math.round(brain.similarity * 100)}
             </div>
           </div>
