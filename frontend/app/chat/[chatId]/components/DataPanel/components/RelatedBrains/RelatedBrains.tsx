@@ -37,14 +37,16 @@ const RelatedBrains = ({ closeBrains }: RelatedBrainsProps): JSX.Element => {
       icon="brain"
       foldedByDefault={true}
     >
-      {closeBrains.map((brain, index) => (
-        <div className={styles.brain_line} key={index}>
-          <p className={styles.brain_name}>@{brain.name}</p>
-          <p className={styles.brain_score} style={{ color: colors[index] }}>
-            {Math.round(brain.similarity * 100)}
-          </p>
-        </div>
-      ))}
+      <div className={styles.close_brains_wrapper}>
+        {closeBrains.map((brain, index) => (
+          <div className={styles.brain_line} key={index}>
+            <p className={styles.brain_name}>@{brain.name}</p>
+            <p className={styles.brain_score} style={{ color: colors[index] }}>
+              {Math.round(brain.similarity * 100)}
+            </p>
+          </div>
+        ))}
+      </div>
     </FoldableSection>
   );
 };

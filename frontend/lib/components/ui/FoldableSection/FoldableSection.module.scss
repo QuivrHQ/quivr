@@ -4,7 +4,6 @@
 .foldable_section_wrapper {
   display: flex;
   flex-direction: column;
-  gap: Spacings.$spacing04;
   border-radius: 5px;
   border: 1px dashed Colors.$light-grey;
   overflow: hidden;
@@ -20,10 +19,14 @@
       display: flex;
       align-items: center;
       gap: Spacings.$spacing03;
-    }
+      overflow: hidden;
 
-    .header_title {
-      font-weight: bold;
+      .header_title {
+        font-weight: bold;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
     }
 
     &:hover {

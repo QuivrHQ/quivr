@@ -1,8 +1,23 @@
 @use "@/styles/Spacings.module.scss";
 
-.brain_line {
+.close_brains_wrapper {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: Spacings.$spacing02;
+  flex-direction: column;
+  padding-bottom: Spacings.$spacing03;
+  gap: Spacings.$spacing01;
+
+  .brain_line {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding-inline: Spacings.$spacing05;
+    overflow: hidden;
+
+    .brain_name {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
 }
