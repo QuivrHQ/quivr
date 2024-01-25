@@ -6,10 +6,10 @@ on:
       - "v*"
 
 env:
-  AWS_REGION: eu-west-3
-  ECR_REPOSITORY: quivr
-  ECR_REGISTRY: 253053805092.dkr.ecr.eu-west-3.amazonaws.com
-  ECS_CLUSTER: quivr
+  AWS_REGION: ca-central-1
+  ECR_REPOSITORY: inboundr
+  ECR_REGISTRY: 782916944998.dkr.ecr.ca-central-1.amazonaws.com
+  ECS_CLUSTER: inboundr
 
 jobs:
   build_and_push:
@@ -32,12 +32,12 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@2fc7aceee09e9e4a7105c0d060c656fad0b4f63d # v1
 
-      - name: Login to GitHub Container Registry
-        uses: docker/login-action@465a07811f14bebb1938fbed4728c6a1ff8901fc # v2
-        with:
-          registry: ghcr.io
-          username: ${{ github.repository_owner }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+      # - name: Login to GitHub Container Registry
+      #   uses: docker/login-action@465a07811f14bebb1938fbed4728c6a1ff8901fc # v2
+      #   with:
+      #     registry: ghcr.io
+      #     username: ${{ github.repository_owner }}
+      #     password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@885d1462b80bc1c1c7f0b00334ad271f09369c55 # v2
@@ -57,7 +57,7 @@ jobs:
         with:
           context: ./backend/
           push: true
-          tags: ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }}, ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ github.ref_name}},  ghcr.io/stangirard/quivr:${{ github.ref_name}}
+          tags: ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }}, ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ github.ref_name}}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
