@@ -1,6 +1,28 @@
 version: "3.8"
 
 services:
+  frontend:
+    image: quivr-frontend-prebuilt
+    pull_policy: never
+    build:
+      context: frontend
+      dockerfile: Dockerfile
+      args:
+        - NEXT_PUBLIC_ENV=local
+        - NEXT_PUBLIC_BACKEND_URL=${NEXT_PUBLIC_BACKEND_URL}
+        - NEXT_PUBLIC_SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL}
+        - NEXT_PUBLIC_SUPABASE_ANON_KEY=${NEXT_PUBLIC_SUPABASE_ANON_KEY}
+        - NEXT_PUBLIC_CMS_URL=${NEXT_PUBLIC_CMS_URL}
+        - NEXT_PUBLIC_FRONTEND_URL=${NEXT_PUBLIC_FRONTEND_URL}
+        - NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=${NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY}
+        - NEXT_PUBLIC_STRIPE_PRICING_TABLE_ID=${NEXT_PUBLIC_STRIPE_PRICING_TABLE_ID}
+    container_name: web
+    depends_on:
+      - backend-core
+    restart: always
+    ports:
+      - 3000:3000
+
   backend-core:
     image: backend-base
     pull_policy: never
@@ -82,3 +104,18 @@ services:
       - beat
     ports:
       - 5555:5555
+
+
+  slack-bot:
+    pull_policy: if_not_present
+    env_file:
+      - .env
+    build:
+      context: ./connectors/slack
+      dockerfile: Dockerfile
+    container_name: slack-bot
+    restart: always
+    volumes:
+      - ./connectors/slack/:/code/
+    ports:
+      - 5566:5566

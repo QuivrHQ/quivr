@@ -13,6 +13,7 @@ export const acceptedFormats: Record<string, SupportedFileExtensionsWithDot[]> =
     "application/pdf": [".pdf"],
     "text/html": [".html"],
     "text/telegram": [".telegram"],
+    "text/slack": [".slack"],
 
     "application/vnd.openxmlformats-officedocument.presentationml.presentation":
       [".pptx"],

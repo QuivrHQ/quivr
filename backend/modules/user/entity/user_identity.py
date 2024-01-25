@@ -7,3 +7,4 @@ from pydantic import BaseModel
 class UserIdentity(BaseModel):
     id: UUID
     email: Optional[str] = None
+    slack_id: Optional[str] = None

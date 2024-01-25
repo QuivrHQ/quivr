@@ -43,6 +43,7 @@ const fileTypeIcons: Record<SupportedFileExtensions, IconType> = {
   ipynb: BsFiletypePy,
   py: BsFiletypePy,
   telegram: BsFiletypeDocx,
+  slack: BsFiletypeDocx,
 };
 
 export const getFileIcon = (fileName: string): JSX.Element => {

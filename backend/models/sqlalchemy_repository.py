@@ -13,6 +13,7 @@ class User(Base):
 
     user_id = Column(String, primary_key=True)
     email = Column(String)
+    slack_id = Column(String)
     date = Column(DateTime)
     daily_requests_count = Column(Integer)
 

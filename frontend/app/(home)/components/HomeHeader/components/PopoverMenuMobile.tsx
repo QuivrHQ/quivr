@@ -46,9 +46,9 @@ export const PopoverMenuMobile = ({
             <div className="flex justify-between items-center">
               <div className="flex gap-2 items-center">
                 <QuivrLogo size={64} color="primary" />
-                <div className="text-lg font-medium text-primary cursor-default ">
+                {/* <div className="text-lg font-medium text-primary cursor-default ">
                   Quivr
-                </div>
+                </div> */}
               </div>
               <Popover.Close>
                 <button

@@ -85,7 +85,8 @@ create table "public"."chats" (
     "user_id" uuid,
     "creation_time" timestamp without time zone default CURRENT_TIMESTAMP,
     "history" jsonb,
-    "chat_name" text
+    "chat_name" text,
+    "slack_thread" text
 );
 
 

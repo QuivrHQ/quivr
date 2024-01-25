@@ -9,7 +9,7 @@ export const QuivrLogo = ({
   size,
   color = "white",
 }: QuivrLogoProps): JSX.Element => {
-  const src = color === "primary" ? "/logo-primary.svg" : "/logo-white.svg";
+  const src = color === "primary" ? "/Logo-color.svg" : "/Logo-white.svg";
   const filter = color === "black" ? "invert(1)" : "none";
 
   return (

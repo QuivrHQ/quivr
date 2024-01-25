@@ -9,12 +9,14 @@ class Chat:
     user_id: str
     creation_time: str
     chat_name: str
+    slack_thread: str
 
     def __init__(self, chat_dict: dict):
         self.chat_id = chat_dict.get("chat_id", "")
         self.user_id = chat_dict.get("user_id", "")
         self.creation_time = chat_dict.get("creation_time", "")
         self.chat_name = chat_dict.get("chat_name", "")
+        self.slack_thread = chat_dict.get("slack_thread", "")
 
 
 @dataclass

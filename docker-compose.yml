@@ -14,6 +14,8 @@ services:
         - NEXT_PUBLIC_SUPABASE_ANON_KEY=${NEXT_PUBLIC_SUPABASE_ANON_KEY}
         - NEXT_PUBLIC_CMS_URL=${NEXT_PUBLIC_CMS_URL}
         - NEXT_PUBLIC_FRONTEND_URL=${NEXT_PUBLIC_FRONTEND_URL}
+        - NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=${NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY}
+        - NEXT_PUBLIC_STRIPE_PRICING_TABLE_ID=${NEXT_PUBLIC_STRIPE_PRICING_TABLE_ID}
     container_name: web
     depends_on:
       - backend-core
@@ -100,3 +102,28 @@ services:
       - beat
     ports:
       - 5555:5555
+
+  slack-bot:
+    image: stangirard/quivr-backend-prebuilt:latest
+    pull_policy: if_not_present
+    env_file:
+      - .env
+    build:
+      context: ./connectors/slack
+      dockerfile: Dockerfile
+    container_name: slack-bot
+    command:
+      - "uvicorn"
+      - "main:app"
+      - "--reload"
+      - "--host"
+      - "0.0.0.0"
+      - "--port"
+      - "5566"
+      - "--workers"
+      - "1"
+    restart: always
+    volumes:
+      - ./connectors/slack/:/code/
+    ports:
+      - 5566:5566

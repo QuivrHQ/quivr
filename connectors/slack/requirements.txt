@@ -1,0 +1,5 @@
+slack_bolt
+requests
+uvicorn
+python-dotenv
+slack
