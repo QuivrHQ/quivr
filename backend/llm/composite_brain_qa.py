@@ -140,6 +140,7 @@ class CompositeBrainQA(
                         else None,
                         "brain_name": brain.name,
                         "message_id": new_chat.message_id,
+                        "brain_id": str(brain.id),
                     }
                 )
             return GetChatHistoryOutput(
@@ -153,6 +154,7 @@ class CompositeBrainQA(
                     else None,
                     "brain_name": brain.name,
                     "message_id": None,
+                    "brain_id": str(brain.id),
                 }
             )
 
@@ -234,6 +236,7 @@ class CompositeBrainQA(
                     else None,
                     "brain_name": brain.name if brain else None,
                     "message_id": new_chat.message_id if new_chat else None,
+                    "brain_id": str(brain.id) if brain else None,
                 }
             )
 
@@ -361,6 +364,7 @@ class CompositeBrainQA(
                     if self.prompt_to_use
                     else None,
                     "brain_name": brain.name if brain else None,
+                    "brain_id": str(brain.id) if brain else None,
                 }
             )
         else:
@@ -375,6 +379,7 @@ class CompositeBrainQA(
                     if self.prompt_to_use
                     else None,
                     "brain_name": brain.name if brain else None,
+                    "brain_id": str(brain.id) if brain else None,
                 }
             )
 

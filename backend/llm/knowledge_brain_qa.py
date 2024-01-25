@@ -173,6 +173,7 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
                     else None,
                     "brain_name": brain.name if brain else None,
                     "message_id": new_chat.message_id,
+                    "brain_id": str(brain.brain_id) if brain else None,
                 }
             )
 
@@ -187,6 +188,7 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
                 else None,
                 "brain_name": None,
                 "message_id": None,
+                "brain_id": str(brain.brain_id) if brain else None,
             }
         )
 
@@ -263,6 +265,7 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
                     if self.prompt_to_use
                     else None,
                     "brain_name": brain.name if brain else None,
+                    "brain_id": str(brain.brain_id) if brain else None,
                     "metadata": self.metadata,
                 }
             )
@@ -278,6 +281,7 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
                     if self.prompt_to_use
                     else None,
                     "brain_name": brain.name if brain else None,
+                    "brain_id": str(brain.brain_id) if brain else None,
                     "metadata": self.metadata,
                 }
             )

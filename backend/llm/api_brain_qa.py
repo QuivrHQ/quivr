@@ -25,6 +25,14 @@ chat_service = ChatService()
 logger = get_logger(__name__)
 
 
+class UUIDEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, uuid.UUID):
+            # if the object is uuid, we simply return the value of uuid
+            return str(obj)
+        return super().default(obj)
+
+
 class APIBrainQA(KnowledgeBrainQA, QAInterface):
     user_id: UUID
     raw: bool = False
@@ -271,6 +279,7 @@ class APIBrainQA(KnowledgeBrainQA, QAInterface):
                     if self.prompt_to_use
                     else None,
                     "brain_name": brain.name if brain else None,
+                    "brain_id": str(self.brain_id),
                     "metadata": self.metadata,
                 }
             )
@@ -286,6 +295,7 @@ class APIBrainQA(KnowledgeBrainQA, QAInterface):
                     if self.prompt_to_use
                     else None,
                     "brain_name": brain.name if brain else None,
+                    "brain_id": str(self.brain_id),
                     "metadata": self.metadata,
                 }
             )
@@ -470,6 +480,7 @@ class APIBrainQA(KnowledgeBrainQA, QAInterface):
                     "brain_name": brain.name if brain else None,
                     "message_id": new_chat.message_id,
                     "metadata": self.metadata,
+                    "brain_id": str(self.brain_id),
                 }
             )
         return GetChatHistoryOutput(
@@ -482,5 +493,6 @@ class APIBrainQA(KnowledgeBrainQA, QAInterface):
                 "brain_name": brain.name,
                 "message_id": None,
                 "metadata": self.metadata,
+                "brain_id": str(self.brain_id),
             }
         )
