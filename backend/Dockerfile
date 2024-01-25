@@ -15,6 +15,11 @@ RUN apt-get clean && apt-get update && apt-get install -y \
     git \
     poppler-utils \
     tesseract-ocr \
+    autoconf \
+    automake \
+    build-essential \
+    libtool \
+    python-dev \
     build-essential && \
     rm -rf /var/lib/apt/lists/* && apt-get clean
 

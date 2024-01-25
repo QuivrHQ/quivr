@@ -2,6 +2,8 @@ import json
 from typing import Optional
 from uuid import UUID
 
+import jq
+import requests
 from fastapi import HTTPException
 from litellm import completion
 from llm.knowledge_brain_qa import KnowledgeBrainQA
@@ -49,6 +51,46 @@ class APIBrainQA(KnowledgeBrainQA, QAInterface):
         )
         self.user_id = user_id
 
+    def get_api_call_response_as_text(
+        self, method, api_url, params, search_params, secrets
+    ) -> str:
+        headers = {}
+
+        api_url_with_search_params = api_url
+        if search_params:
+            api_url_with_search_params += "?"
+            for search_param in search_params:
+                api_url_with_search_params += (
+                    f"{search_param}={search_params[search_param]}&"
+                )
+
+        for secret in secrets:
+            headers[secret] = secrets[secret]
+
+        try:
+            if method in ["GET", "DELETE"]:
+                response = requests.request(
+                    method,
+                    url=api_url_with_search_params,
+                    params=params or None,
+                    headers=headers or None,
+                )
+            elif method in ["POST", "PUT", "PATCH"]:
+                response = requests.request(
+                    method,
+                    url=api_url_with_search_params,
+                    json=params or None,
+                    headers=headers or None,
+                )
+            else:
+                raise ValueError(f"Invalid method: {method}")
+
+            return response.text
+
+        except Exception as e:
+            logger.error(f"Error calling API: {e}")
+            return None
+
     def log_steps(self, message: str, type: str):
         if "api" not in self.metadata:
             self.metadata["api"] = {}
@@ -68,15 +110,20 @@ class APIBrainQA(KnowledgeBrainQA, QAInterface):
         functions,
         brain_id: UUID,
         recursive_count=0,
-        should_log_steps=False,
+        should_log_steps=True,
         raw=True,
     ) -> str | None:
         if recursive_count > 5:
-            yield "The assistant is having issues and took more than 5 calls to the API. Please try again later or an other instruction."
+            self.log_steps(
+                "The assistant is having issues and took more than 5 calls to the API. Please try again later or an other instruction.",
+                "error",
+            )
             return
 
-        if should_log_steps:
-            self.log_steps("Quivr is thinking about what to do", "info")
+        if "api" not in self.metadata:
+            self.metadata["api"] = {}
+            if "raw" not in self.metadata["api"]:
+                self.metadata["api"]["raw"] = raw
 
         response = completion(
             model=self.model,
@@ -101,7 +148,6 @@ class APIBrainQA(KnowledgeBrainQA, QAInterface):
                 "function_call" in chunk.choices[0].delta
                 and chunk.choices[0].delta["function_call"]
             ):
-                self.log_steps("Quivr decided to call the API", "info")
                 if chunk.choices[0].delta["function_call"].name:
                     function_call["name"] = chunk.choices[0].delta["function_call"].name
                 if chunk.choices[0].delta["function_call"].arguments:
@@ -117,11 +163,7 @@ class APIBrainQA(KnowledgeBrainQA, QAInterface):
                     self.log_steps(f"Issues with {arguments}", "error")
                     arguments = {}
 
-                if should_log_steps:
-                    yield f"🧠<Calling {brain_id} with arguments {arguments}>🧠"
-                    self.log_steps(
-                        f"Calling {brain_id} with arguments {arguments}", "info"
-                    )
+                self.log_steps(f"Calling {brain_id} with arguments {arguments}", "info")
 
                 try:
                     api_call_response = call_brain_api(
@@ -134,7 +176,6 @@ class APIBrainQA(KnowledgeBrainQA, QAInterface):
                     api_call_response = f"Error while calling API: {e}"
                 function_name = function_call["name"]
                 self.log_steps("Quivr has called the API", "info")
-                yield f"🧠<The function {function_name} was called and gave The following answer:(data from function) {api_call_response} (end of data from function). Don't call this function again unless there was an error or extremely necessary and asked specifically by the user. If an error, display it to the user in raw.>🧠"
                 messages.append(
                     {
                         "role": "function",
@@ -142,6 +183,13 @@ class APIBrainQA(KnowledgeBrainQA, QAInterface):
                         "content": f"The function {function_name} was called and gave The following answer:(data from function) {api_call_response} (end of data from function). Don't call this function again unless there was an error or extremely necessary and asked specifically by the user. If an error, display it to the user in raw.",
                     }
                 )
+
+                if raw:
+                    # Yield the raw response in a format that can then be catched by the generate_stream function
+                    response_to_yield = f"````raw_response: {api_call_response}````"
+                    self.metadata["api"]["raw"] = api_call_response
+                    yield response_to_yield
+                    return
 
                 async for value in self.make_completion(
                     messages=messages,
@@ -170,6 +218,10 @@ class APIBrainQA(KnowledgeBrainQA, QAInterface):
         question: ChatQuestion,
         save_answer: bool = True,
         should_log_steps: Optional[bool] = True,
+        raw: bool = True,
+        jq_instructions: Optional[
+            str
+        ] = 'if .status == "OK" then "hello" else empty end',
     ):
         brain = brain_service.get_brain_by_id(self.brain_id)
 
@@ -241,15 +293,28 @@ class APIBrainQA(KnowledgeBrainQA, QAInterface):
             functions=[get_api_brain_definition_as_json_schema(brain)],
             brain_id=self.brain_id,
             should_log_steps=should_log_steps,
+            raw=raw,
         ):
-            streamed_chat_history.assistant = value
-            response_tokens.append(value)
-            yield f"data: {json.dumps(streamed_chat_history.dict())}"
-        response_tokens = [
-            token
-            for token in response_tokens
-            if not token.startswith("🧠<") and not token.endswith(">🧠")
-        ]
+            # Look if the value is a raw response
+            if value.startswith("````raw_response:"):
+                raw_value_cleaned = value.replace("````raw_response: ", "").replace(
+                    "````", ""
+                )
+                logger.info(f"Raw response: {raw_value_cleaned}")
+                json_raw_value_cleaned = json.loads(raw_value_cleaned)
+                raw_value_cleaned = (
+                    jq.compile(jq_instructions)
+                    .input_value(json_raw_value_cleaned)
+                    .first()
+                )
+                streamed_chat_history.assistant = raw_value_cleaned
+                response_tokens.append(raw_value_cleaned)
+                yield f"data: {json.dumps(streamed_chat_history.dict())}"
+            else:
+                streamed_chat_history.assistant = value
+                response_tokens.append(value)
+                yield f"data: {json.dumps(streamed_chat_history.dict())}"
+
         if save_answer:
             chat_service.update_message_by_id(
                 message_id=str(streamed_chat_history.message_id),
@@ -265,6 +330,7 @@ class APIBrainQA(KnowledgeBrainQA, QAInterface):
         brain_id: UUID,
         recursive_count=0,
         should_log_steps=False,
+        raw=False,
     ):
         if recursive_count > 5:
             print(
@@ -297,7 +363,7 @@ class APIBrainQA(KnowledgeBrainQA, QAInterface):
                 arguments = {}
 
             if should_log_steps:
-                print(f"🧠<Calling {brain_id} with arguments {arguments}>🧠")
+                self.log_steps(f"Calling {brain_id} with arguments {arguments}", "info")
 
             try:
                 api_call_response = call_brain_api(
@@ -339,6 +405,7 @@ class APIBrainQA(KnowledgeBrainQA, QAInterface):
         chat_id: UUID,
         question: ChatQuestion,
         save_answer: bool = True,
+        raw: bool = True,
     ):
         if not self.brain_id:
             raise HTTPException(
@@ -373,6 +440,7 @@ class APIBrainQA(KnowledgeBrainQA, QAInterface):
             functions=[get_api_brain_definition_as_json_schema(brain)],
             brain_id=self.brain_id,
             should_log_steps=False,
+            raw=raw,
         )
 
         answer = response.content
@@ -400,6 +468,7 @@ class APIBrainQA(KnowledgeBrainQA, QAInterface):
                     else None,
                     "brain_name": brain.name if brain else None,
                     "message_id": new_chat.message_id,
+                    "metadata": self.metadata,
                 }
             )
         return GetChatHistoryOutput(
@@ -411,5 +480,6 @@ class APIBrainQA(KnowledgeBrainQA, QAInterface):
                 "prompt_title": None,
                 "brain_name": brain.name,
                 "message_id": None,
+                "metadata": self.metadata,
             }
         )

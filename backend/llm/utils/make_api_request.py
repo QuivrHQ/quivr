@@ -21,13 +21,6 @@ def get_api_call_response_as_text(
         headers[secret] = secrets[secret]
 
     try:
-        logger.info("🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥")
-        logger.info(f"Calling API: {api_url_with_search_params}")
-        logger.info(f"Params: {params}")
-        logger.info(f"Search params: {search_params}")
-        logger.info(f"Headers: {headers}")
-        logger.info(f"Method: {method}")
-
         if method in ["GET", "DELETE"]:
             response = requests.request(
                 method,
