@@ -6,19 +6,28 @@
   flex-direction: column;
   gap: Spacings.$spacing04;
   border-radius: 5px;
-  border: 1px solid Colors.$grey;
-  padding: Spacings.$spacing03;
+  border: 1px dashed Colors.$light-grey;
+  overflow: hidden;
 
   .header_wrapper {
     display: flex;
     justify-content: space-between;
     align-items: center;
     cursor: pointer;
+    padding: Spacings.$spacing03;
 
     .header_left {
       display: flex;
       align-items: center;
       gap: Spacings.$spacing03;
+    }
+
+    .header_title {
+      font-weight: bold;
+    }
+
+    &:hover {
+      background-color: Colors.$lightest-grey;
     }
   }
 }

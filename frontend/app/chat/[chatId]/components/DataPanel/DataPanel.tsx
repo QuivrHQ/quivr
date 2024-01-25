@@ -21,6 +21,7 @@ const DataPanel = (): JSX.Element => {
         setLastMessageRelatedBrain(lastMessage.metadata.close_brains);
       }
     }
+    console.info(messages);
   }, [lastMessageRelatedBrain, messages]);
 
   return (

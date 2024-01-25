@@ -1,1 +1,8 @@
+@use "@/styles/Spacings.module.scss";
 
+.brain_line {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: Spacings.$spacing02;
+}
