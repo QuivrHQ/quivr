@@ -47,6 +47,8 @@ export type ApiBrainDefinition = {
   search_params: ApiBrainDefinitionSchema;
   params: ApiBrainDefinitionSchema;
   secrets?: ApiBrainDefinitionSecret[];
+  raw: boolean;
+  jq_instructions: string;
 };
 
 export type CreateBrainInput = {

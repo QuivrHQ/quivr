@@ -27,6 +27,8 @@ logger = get_logger(__name__)
 
 class APIBrainQA(KnowledgeBrainQA, QAInterface):
     user_id: UUID
+    raw: bool = False
+    jq_instructions: Optional[str] = None
 
     def __init__(
         self,
@@ -35,6 +37,8 @@ class APIBrainQA(KnowledgeBrainQA, QAInterface):
         chat_id: str,
         streaming: bool = False,
         prompt_id: Optional[UUID] = None,
+        raw: bool = False,
+        jq_instructions: Optional[str] = None,
         **kwargs,
     ):
         user_id = kwargs.get("user_id")
@@ -50,6 +54,8 @@ class APIBrainQA(KnowledgeBrainQA, QAInterface):
             **kwargs,
         )
         self.user_id = user_id
+        self.raw = raw
+        self.jq_instructions = jq_instructions
 
     def get_api_call_response_as_text(
         self, method, api_url, params, search_params, secrets
@@ -111,7 +117,6 @@ class APIBrainQA(KnowledgeBrainQA, QAInterface):
         brain_id: UUID,
         recursive_count=0,
         should_log_steps=True,
-        raw=True,
     ) -> str | None:
         if recursive_count > 5:
             self.log_steps(
@@ -123,7 +128,7 @@ class APIBrainQA(KnowledgeBrainQA, QAInterface):
         if "api" not in self.metadata:
             self.metadata["api"] = {}
             if "raw" not in self.metadata["api"]:
-                self.metadata["api"]["raw"] = raw
+                self.metadata["api"]["raw_enabled"] = self.raw
 
         response = completion(
             model=self.model,
@@ -184,7 +189,7 @@ class APIBrainQA(KnowledgeBrainQA, QAInterface):
                     }
                 )
 
-                if raw:
+                if self.raw:
                     # Yield the raw response in a format that can then be catched by the generate_stream function
                     response_to_yield = f"````raw_response: {api_call_response}````"
                     self.metadata["api"]["raw"] = api_call_response
@@ -218,10 +223,6 @@ class APIBrainQA(KnowledgeBrainQA, QAInterface):
         question: ChatQuestion,
         save_answer: bool = True,
         should_log_steps: Optional[bool] = True,
-        raw: bool = True,
-        jq_instructions: Optional[
-            str
-        ] = 'if .status == "OK" then "hello" else empty end',
     ):
         brain = brain_service.get_brain_by_id(self.brain_id)
 
@@ -293,7 +294,6 @@ class APIBrainQA(KnowledgeBrainQA, QAInterface):
             functions=[get_api_brain_definition_as_json_schema(brain)],
             brain_id=self.brain_id,
             should_log_steps=should_log_steps,
-            raw=raw,
         ):
             # Look if the value is a raw response
             if value.startswith("````raw_response:"):
@@ -301,12 +301,13 @@ class APIBrainQA(KnowledgeBrainQA, QAInterface):
                     "````", ""
                 )
                 logger.info(f"Raw response: {raw_value_cleaned}")
-                json_raw_value_cleaned = json.loads(raw_value_cleaned)
-                raw_value_cleaned = (
-                    jq.compile(jq_instructions)
-                    .input_value(json_raw_value_cleaned)
-                    .first()
-                )
+                if self.jq_instructions:
+                    json_raw_value_cleaned = json.loads(raw_value_cleaned)
+                    raw_value_cleaned = (
+                        jq.compile(self.jq_instructions)
+                        .input_value(json_raw_value_cleaned)
+                        .first()
+                    )
                 streamed_chat_history.assistant = raw_value_cleaned
                 response_tokens.append(raw_value_cleaned)
                 yield f"data: {json.dumps(streamed_chat_history.dict())}"
@@ -330,7 +331,6 @@ class APIBrainQA(KnowledgeBrainQA, QAInterface):
         brain_id: UUID,
         recursive_count=0,
         should_log_steps=False,
-        raw=False,
     ):
         if recursive_count > 5:
             print(

@@ -87,6 +87,8 @@ class CompositeBrainQA(
                 streaming=self.streaming,
                 prompt_id=self.prompt_id,
                 user_id=str(self.user_id),
+                raw=brain.raw,
+                jq_instructions=brain.jq_instructions,
             ).generate_answer
         elif brain.brain_type == BrainType.DOC:
             return KnowledgeBrainQA(

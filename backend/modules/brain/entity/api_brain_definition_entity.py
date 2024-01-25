@@ -43,3 +43,5 @@ class ApiBrainDefinitionEntity(BaseModel, extra=Extra.forbid):
     params: ApiBrainDefinitionSchema
     search_params: ApiBrainDefinitionSchema
     secrets: list[ApiBrainDefinitionSecret]
+    raw: bool = False
+    jq_instructions: Optional[str] = None

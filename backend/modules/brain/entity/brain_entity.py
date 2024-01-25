@@ -25,6 +25,8 @@ class BrainEntity(BaseModel):
     brain_type: BrainType
     brain_definition: Optional[ApiBrainDefinitionEntity]
     connected_brains_ids: Optional[List[UUID]]
+    raw: Optional[bool]
+    jq_instructions: Optional[str]
 
     @property
     def id(self) -> UUID:
