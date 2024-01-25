@@ -189,10 +189,11 @@ class APIBrainQA(KnowledgeBrainQA, QAInterface):
                     }
                 )
 
+                self.metadata["api"]["raw_response"] = json.loads(api_call_response)
                 if self.raw:
                     # Yield the raw response in a format that can then be catched by the generate_stream function
                     response_to_yield = f"````raw_response: {api_call_response}````"
-                    self.metadata["api"]["raw"] = api_call_response
+
                     yield response_to_yield
                     return
 
