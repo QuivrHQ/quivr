@@ -22,6 +22,8 @@ export const addBrainDefaultValues: CreateBrainInput = {
       required: [],
     },
     secrets: [],
+    raw: false,
+    jq_instructions: "",
   },
   connected_brains_ids: [],
 };
