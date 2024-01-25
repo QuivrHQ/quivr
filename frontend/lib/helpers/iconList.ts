@@ -4,6 +4,7 @@ import {
   LuBrain,
   LuChevronDown,
   LuChevronRight,
+  LuCopy,
   LuPlusCircle,
   LuSearch,
 } from "react-icons/lu";
@@ -13,6 +14,7 @@ export const iconList: { [name: string]: IconType } = {
   brain: LuBrain,
   chevronDown: LuChevronDown,
   chevronRight: LuChevronRight,
+  copy: LuCopy,
   loader: AiOutlineLoading3Quarters,
   search: LuSearch,
 };

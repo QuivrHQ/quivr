@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 
 import { FoldableSection } from "@/lib/components/ui/FoldableSection/FoldableSection";
+import Icon from "@/lib/components/ui/Icon/Icon";
 import { useChatContext } from "@/lib/context";
 import { CloseBrain } from "@/lib/types/MessageMetadata";
 
@@ -33,12 +34,9 @@ const RelatedBrains = ({ closeBrains }: RelatedBrainsProps): JSX.Element => {
       const isCurrentBrain =
         brain.name === messages[messages.length - 1].brain_name;
 
-      console.info(messages);
-
       return { color: `rgb(${r}, ${g}, ${b})`, isCurrentBrain: isCurrentBrain };
     });
     setCloseBrainProps(newProps);
-    console.info(newProps);
   }, [closeBrains, messages]);
 
   if (closeBrains.length === 0) {
@@ -54,8 +52,20 @@ const RelatedBrains = ({ closeBrains }: RelatedBrainsProps): JSX.Element => {
       <div className={styles.close_brains_wrapper}>
         {closeBrains.map((brain, index) => (
           <div className={styles.brain_line} key={index}>
-            <p
-              className={`
+            <div className={styles.left}>
+              <div className={styles.copy_icon}>
+                <Icon
+                  name="copy"
+                  size="normal"
+                  color="black"
+                  handleHover={true}
+                  onClick={() =>
+                    void navigator.clipboard.writeText("@" + brain.name)
+                  }
+                ></Icon>
+              </div>
+              <p
+                className={`
               ${styles.brain_name ?? ""} 
               ${
                 closeBrainsProps[index]?.isCurrentBrain
@@ -63,15 +73,13 @@ const RelatedBrains = ({ closeBrains }: RelatedBrainsProps): JSX.Element => {
                   : ""
               }
               `}
-            >
-              @{brain.name}
-            </p>
-            <p
-              className={styles.brain_score}
-              style={{ color: closeBrainsProps[index]?.color }}
-            >
+              >
+                @{brain.name}
+              </p>
+            </div>
+            <div style={{ color: closeBrainsProps[index]?.color }}>
               {Math.round(brain.similarity * 100)}
-            </p>
+            </div>
           </div>
         ))}
       </div>

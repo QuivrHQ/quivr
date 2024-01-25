@@ -12,16 +12,34 @@
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
-    padding-inline: Spacings.$spacing05;
+    padding-left: Spacings.$spacing03;
+    padding-right: Spacings.$spacing05;
     overflow: hidden;
 
-    .brain_name {
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+    .left {
+      display: flex;
+      align-items: center;
+      gap: Spacings.$spacing03;
 
-      &.current {
-        color: Colors.$accent;
+      .copy_icon {
+        visibility: hidden;
+      }
+
+      .brain_name {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+
+        &.current {
+          color: Colors.$primary;
+        }
+      }
+    }
+
+    &:hover {
+      .left .copy_icon {
+        visibility: visible;
+        cursor: pointer;
       }
     }
   }
