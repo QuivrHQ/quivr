@@ -1,4 +1,5 @@
 import { EditorContent } from "@tiptap/react";
+import { useEffect } from "react";
 import "./styles.css";
 
 import { useChatStateUpdater } from "./hooks/useChatStateUpdater";
@@ -16,8 +17,15 @@ export const Editor = ({
   setMessage,
   onSubmit,
   placeholder,
+  message,
 }: EditorProps): JSX.Element => {
   const { editor } = useCreateEditorState(placeholder);
+
+  useEffect(() => {
+    if (message === "") {
+      editor?.commands.clearContent();
+    }
+  }, [message, editor]);
 
   useChatStateUpdater({
     editor,
