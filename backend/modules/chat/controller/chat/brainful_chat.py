@@ -88,7 +88,7 @@ class BrainfulChat(ChatInterface):
         # Calculate the closest brains to the question
         list_brains = vector_store.find_brain_closest_query(user_id, question)
 
-        metadata["close_brains"] = list_brains
+        metadata["close_brains"] = list_brains[:5]
 
         if list_brains and not brain_id_to_use:
             brain_id_to_use = list_brains[0]["id"]
