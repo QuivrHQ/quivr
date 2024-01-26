@@ -14,7 +14,7 @@ from llm.utils.get_prompt_to_use_id import get_prompt_to_use_id
 from logger import get_logger
 from models import BrainSettings
 from modules.brain.service.brain_service import BrainService
-from modules.chat.dto.chats import ChatQuestion
+from modules.chat.dto.chats import ChatQuestion, Sources
 from modules.chat.dto.inputs import CreateChatHistory
 from modules.chat.dto.outputs import GetChatHistoryOutput
 from modules.chat.service.chat_service import ChatService
@@ -296,21 +296,31 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
             logger.error("Error during streaming tokens: %s", e)
         try:
             result = await run
-            source_documents = result.get("source_documents", [])
-            # Deduplicate source documents
-            source_documents = list(
-                {doc.metadata["file_name"]: doc for doc in source_documents}.values()
-            )
 
+            sources_list: List[Sources] = []
+            source_documents = result.get("source_documents", [])
             if source_documents:
-                # Formatting the source documents using Markdown without new lines for each source
-                sources_list = [
-                    f"[{doc.metadata['file_name']}])" for doc in source_documents
-                ]
+                serialized_sources_list = []
+                for doc in source_documents:
+                    sources_list.append(
+                        Sources(
+                            **{
+                                "name": doc.metadata["url"]
+                                if "url" in doc.metadata
+                                else doc.metadata["file_name"],
+                                "type": "url" if "url" in doc.metadata else "file",
+                                "source_url": doc.metadata["url"]
+                                if "url" in doc.metadata
+                                else "",
+                            }
+                        )
+                    )
                 # Create metadata if it doesn't exist
                 if not streamed_chat_history.metadata:
                     streamed_chat_history.metadata = {}
-                streamed_chat_history.metadata["sources"] = sources_list
+                    # Serialize the sources list
+                serialized_sources_list = [source.dict() for source in sources_list]
+                streamed_chat_history.metadata["sources"] = serialized_sources_list
                 yield f"data: {json.dumps(streamed_chat_history.dict())}"
             else:
                 logger.info(
