@@ -53,42 +53,47 @@ class BrainfulChat(ChatInterface):
         user_id,
         chat_question,
     ):
-        brain_id_to_use = brain_id
         metadata = {}
-        if not brain_id:
-            brain_settings = BrainSettings()
-            supabase_client = get_supabase_client()
-            embeddings = None
-            if brain_settings.ollama_api_base_url:
-                embeddings = OllamaEmbeddings(
-                    base_url=brain_settings.ollama_api_base_url
-                )  # pyright: ignore reportPrivateUsage=none
-            else:
-                embeddings = OpenAIEmbeddings()
-            vector_store = CustomSupabaseVectorStore(
-                supabase_client, embeddings, table_name="vectors", user_id=user_id
-            )
-            # Get the first question from the chat_question
+        brain_settings = BrainSettings()
+        supabase_client = get_supabase_client()
+        embeddings = None
+        if brain_settings.ollama_api_base_url:
+            embeddings = OllamaEmbeddings(
+                base_url=brain_settings.ollama_api_base_url
+            )  # pyright: ignore reportPrivateUsage=none
+        else:
+            embeddings = OpenAIEmbeddings()
+        vector_store = CustomSupabaseVectorStore(
+            supabase_client, embeddings, table_name="vectors", user_id=user_id
+        )
 
-            question = chat_question.question
-            history = chat_service.get_chat_history(chat_id)
-            if history:
-                question = history[0].user_message
-                brain_id_to_use = history[0].brain_id
+        # Init
 
-            list_brains = []
-            if history:
-                list_brains = vector_store.find_brain_closest_query(user_id, question)
-                metadata["close_brains"] = list_brains
-            else:
-                list_brains = vector_store.find_brain_closest_query(user_id, question)
-                if list_brains:
-                    brain_id_to_use = list_brains[0]["id"]
-                else:
-                    brain_id_to_use = None
-            # Add to metadata close_brains and close_brains_similarity
-            metadata["close_brains"] = list_brains
+        brain_id_to_use = brain_id
 
+        # Get the first question from the chat_question
+
+        question = chat_question.question
+        history = chat_service.get_chat_history(chat_id)
+
+        list_brains = []  # To return
+
+        if history and not brain_id_to_use:
+            # Replace the question with the first question from the history
+            question = history[0].user_message
+
+        if history and not brain_id:
+            brain_id_to_use = history[0].brain_id
+
+        # Calculate the closest brains to the question
+        list_brains = vector_store.find_brain_closest_query(user_id, question)
+
+        metadata["close_brains"] = list_brains
+
+        if list_brains and not brain_id_to_use:
+            brain_id_to_use = list_brains[0]["id"]
+
+        # GENERIC
         follow_up_questions = chat_service.get_follow_up_question(chat_id)
         metadata["follow_up_questions"] = follow_up_questions
         metadata["model"] = model

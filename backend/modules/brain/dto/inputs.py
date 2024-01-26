@@ -30,7 +30,7 @@ class CreateBrainProperties(BaseModel, extra=Extra.forbid):
     status: Optional[str] = "private"
     model: Optional[str]
     temperature: Optional[float] = 0.0
-    max_tokens: Optional[int] = 256
+    max_tokens: Optional[int] = 2000
     prompt_id: Optional[UUID] = None
     brain_type: Optional[BrainType] = BrainType.DOC
     brain_definition: Optional[CreateApiBrainDefinition]
