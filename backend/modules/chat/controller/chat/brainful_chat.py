@@ -6,6 +6,7 @@ from llm.knowledge_brain_qa import KnowledgeBrainQA
 from logger import get_logger
 from models.settings import BrainSettings, get_supabase_client
 from modules.brain.entity.brain_entity import BrainType, RoleEnum
+from modules.brain.service.api_brain_definition_service import ApiBrainDefinitionService
 from modules.brain.service.brain_authorization_service import (
     validate_brain_authorization,
 )
@@ -15,6 +16,7 @@ from modules.chat.service.chat_service import ChatService
 from vectorstore.supabase import CustomSupabaseVectorStore
 
 chat_service = ChatService()
+api_brain_definition_service = ApiBrainDefinitionService()
 
 logger = get_logger(__name__)
 
@@ -51,44 +53,52 @@ class BrainfulChat(ChatInterface):
         user_id,
         chat_question,
     ):
-        brain_id_to_use = brain_id
         metadata = {}
-        if not brain_id:
-            brain_settings = BrainSettings()
-            supabase_client = get_supabase_client()
-            embeddings = None
-            if brain_settings.ollama_api_base_url:
-                embeddings = OllamaEmbeddings(
-                    base_url=brain_settings.ollama_api_base_url
-                )  # pyright: ignore reportPrivateUsage=none
-            else:
-                embeddings = OpenAIEmbeddings()
-            vector_store = CustomSupabaseVectorStore(
-                supabase_client, embeddings, table_name="vectors", user_id=user_id
-            )
-            # Get the first question from the chat_question
+        brain_settings = BrainSettings()
+        supabase_client = get_supabase_client()
+        embeddings = None
+        if brain_settings.ollama_api_base_url:
+            embeddings = OllamaEmbeddings(
+                base_url=brain_settings.ollama_api_base_url
+            )  # pyright: ignore reportPrivateUsage=none
+        else:
+            embeddings = OpenAIEmbeddings()
+        vector_store = CustomSupabaseVectorStore(
+            supabase_client, embeddings, table_name="vectors", user_id=user_id
+        )
 
-            question = chat_question.question
-            history = chat_service.get_chat_history(chat_id)
-            if history:
-                question = history[0].user_message
-                brain_id_to_use = history[0].brain_id
+        # Init
 
-            list_brains = []
-            if history:
-                list_brains = vector_store.find_brain_closest_query(user_id, question)
-                metadata["close_brains"] = list_brains
-            else:
-                list_brains = vector_store.find_brain_closest_query(user_id, question)
-                if list_brains:
-                    brain_id_to_use = list_brains[0]["id"]
-                else:
-                    brain_id_to_use = None
-            # Add to metadata close_brains and close_brains_similarity
-            metadata["close_brains"] = list_brains
+        brain_id_to_use = brain_id
 
+        # Get the first question from the chat_question
+
+        question = chat_question.question
+        history = chat_service.get_chat_history(chat_id)
+
+        list_brains = []  # To return
+
+        if history and not brain_id_to_use:
+            # Replace the question with the first question from the history
+            question = history[0].user_message
+
+        if history and not brain_id:
+            brain_id_to_use = history[0].brain_id
+
+        # Calculate the closest brains to the question
+        list_brains = vector_store.find_brain_closest_query(user_id, question)
+
+        metadata["close_brains"] = list_brains
+
+        if list_brains and not brain_id_to_use:
+            brain_id_to_use = list_brains[0]["id"]
+
+        # GENERIC
         follow_up_questions = chat_service.get_follow_up_question(chat_id)
         metadata["follow_up_questions"] = follow_up_questions
+        metadata["model"] = model
+        metadata["max_tokens"] = max_tokens
+        metadata["temperature"] = temperature
 
         brain = brain_service.get_brain_by_id(brain_id_to_use)
         if (
@@ -120,6 +130,9 @@ class BrainfulChat(ChatInterface):
             )
 
         if brain.brain_type == BrainType.API:
+            brain_definition = api_brain_definition_service.get_api_brain_definition(
+                brain_id_to_use
+            )
             return APIBrainQA(
                 chat_id=chat_id,
                 model=model,
@@ -130,4 +143,6 @@ class BrainfulChat(ChatInterface):
                 prompt_id=prompt_id,
                 user_id=user_id,
                 metadata=metadata,
+                raw=brain_definition.raw,
+                jq_instructions=brain_definition.jq_instructions,
             )

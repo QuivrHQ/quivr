@@ -1,0 +1,50 @@
+@use "@/styles/Colors.module.scss";
+@use "@/styles/Spacings.module.scss";
+
+.close_brains_wrapper {
+  display: flex;
+  flex-direction: column;
+  padding-bottom: Spacings.$spacing03;
+  gap: Spacings.$spacing01;
+
+  .brain_line {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding-left: Spacings.$spacing03;
+    padding-right: Spacings.$spacing05;
+    overflow: hidden;
+
+    .left {
+      display: flex;
+      align-items: center;
+      gap: Spacings.$spacing03;
+
+      .copy_icon {
+        visibility: hidden;
+      }
+
+      .brain_name {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+
+        &.current {
+          color: Colors.$primary;
+        }
+      }
+    }
+
+    .similarity_score {
+      cursor: help;
+    }
+
+    &:hover {
+      .left .copy_icon {
+        visibility: visible;
+        cursor: pointer;
+      }
+    }
+  }
+}

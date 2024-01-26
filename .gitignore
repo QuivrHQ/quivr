@@ -74,3 +74,4 @@ volumes/db/data/
 volumes/storage/stub/stub/quivr/*
 supabase/migrations/20240103191539_private.sql
 supabase/20240103191539_private.sql
+paulgraham.py

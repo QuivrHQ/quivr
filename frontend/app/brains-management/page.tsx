@@ -11,7 +11,7 @@ const BrainsManagement = (): JSX.Element => {
   const { t } = useTranslation("chat");
 
   return (
-    <div className="flex flex-col flex-1 bg-highlight">
+    <div className="flex flex-col flex-1 bg-white">
       <div className="w-full h-full p-6 flex flex-col flex-1 overflow-auto">
         <div className="w-full mb-10">
           <div className="flex flex-row justify-center items-center gap-2">

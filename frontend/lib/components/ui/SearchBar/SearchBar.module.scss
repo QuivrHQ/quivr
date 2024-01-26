@@ -10,12 +10,7 @@
   background-color: Colors.$white;
   padding: Spacings.$spacing05;
   border-radius: 12px;
-  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-
-  &:hover {
-    box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1),
-      0 8px 10px -6px rgb(0 0 0 / 0.1);
-  }
+  border: 1px solid Colors.$light-grey;
 
   .search_icon {
     width: IconSizes.$big;
