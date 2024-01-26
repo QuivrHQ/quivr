@@ -1,0 +1,21 @@
+@use "@/styles/Colors.module.scss";
+@use "@/styles/IconSizes.module.scss";
+@use "@/styles/Spacings.module.scss";
+
+.button_wrapper {
+  display: flex;
+  padding: Spacings.$spacing04;
+  justify-content: space-between;
+  align-items: center;
+  border: 1px solid Colors.$light-grey;
+  border-radius: 12px;
+  background-color: Colors.$white;
+  cursor: pointer;
+  color: Colors.$dark-grey;
+  transition: box-shadow 0.3s ease;
+
+  &:hover {
+    border-color: Colors.$accent;
+    box-shadow: 0 0 0 2px Colors.$accent;
+  }
+}
