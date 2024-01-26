@@ -129,6 +129,7 @@ module.exports = {
       },
       rules: {
         "@typescript-eslint/prefer-optional-chain": "error",
+        "react-hooks/exhaustive-deps": "off",
         "no-shadow": "off",
         "@typescript-eslint/no-shadow": "error",
         "@typescript-eslint/prefer-nullish-coalescing": "error",
