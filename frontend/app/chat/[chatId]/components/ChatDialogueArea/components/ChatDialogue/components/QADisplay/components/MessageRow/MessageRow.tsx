@@ -19,14 +19,7 @@ type MessageRowProps = {
 
 export const MessageRow = React.forwardRef(
   (
-    {
-      speaker,
-      text,
-      brainName,
-      promptName,
-      children,
-      metadata,
-    }: MessageRowProps,
+    { speaker, text, brainName, promptName, children }: MessageRowProps,
     ref: React.Ref<HTMLDivElement>
   ) => {
     const {
@@ -42,9 +35,6 @@ export const MessageRow = React.forwardRef(
     });
 
     const messageContent = text ?? "";
-    const sourcesContent = metadata?.sources ?? [];
-
-    const hasSources = Boolean(sourcesContent);
 
     return (
       <div className={containerWrapperClasses}>
