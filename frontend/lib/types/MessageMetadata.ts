@@ -6,4 +6,5 @@ export interface CloseBrain {
 
 export interface MessageMetadata {
   closeBrains: CloseBrain[];
+  sources: [string];
 }

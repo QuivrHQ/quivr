@@ -8,7 +8,7 @@ import { CloseBrain } from "@/lib/types/MessageMetadata";
 import styles from "./RelatedBrains.module.scss";
 
 interface RelatedBrainsProps {
-  closeBrains: CloseBrain[];
+  closeBrains?: CloseBrain[];
 }
 
 interface CloseBrainProps {
@@ -26,20 +26,25 @@ const RelatedBrains = ({ closeBrains }: RelatedBrainsProps): JSX.Element => {
   };
 
   useEffect(() => {
-    const newProps = closeBrains.map((brain) => {
-      const t = Math.pow(brain.similarity, 2);
-      const r = Math.round(lerp(211, 138, t));
-      const g = Math.round(lerp(211, 43, t));
-      const b = Math.round(lerp(211, 226, t));
-      const isCurrentBrain =
-        brain.name === messages[messages.length - 1].brain_name;
+    if (closeBrains) {
+      const newProps = closeBrains.map((brain) => {
+        const t = Math.pow(brain.similarity, 2);
+        const r = Math.round(lerp(211, 138, t));
+        const g = Math.round(lerp(211, 43, t));
+        const b = Math.round(lerp(211, 226, t));
+        const isCurrentBrain =
+          brain.name === messages[messages.length - 1].brain_name;
 
-      return { color: `rgb(${r}, ${g}, ${b})`, isCurrentBrain: isCurrentBrain };
-    });
-    setCloseBrainProps(newProps);
+        return {
+          color: `rgb(${r}, ${g}, ${b})`,
+          isCurrentBrain: isCurrentBrain,
+        };
+      });
+      setCloseBrainProps(newProps);
+    }
   }, [closeBrains, messages]);
 
-  if (closeBrains.length === 0) {
+  if (!closeBrains) {
     return <></>;
   }
 

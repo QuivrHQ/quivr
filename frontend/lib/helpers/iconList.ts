@@ -5,6 +5,7 @@ import {
   LuChevronDown,
   LuChevronRight,
   LuCopy,
+  LuFile,
   LuPlusCircle,
   LuSearch,
 } from "react-icons/lu";
@@ -15,6 +16,7 @@ export const iconList: { [name: string]: IconType } = {
   chevronDown: LuChevronDown,
   chevronRight: LuChevronRight,
   copy: LuCopy,
+  file: LuFile,
   loader: AiOutlineLoading3Quarters,
   search: LuSearch,
 };
