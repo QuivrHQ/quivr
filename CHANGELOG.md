@@ -1,5 +1,22 @@
 # Changelog
 
+## 0.0.184 (2024-01-26)
+
+## What's Changed
+* feat(panel): added by @Zewed in https://github.com/StanGirard/quivr/pull/2088
+* feat: 🎸 api by @StanGirard in https://github.com/StanGirard/quivr/pull/2078
+* fix(frontend): clear message input on submit by @Zewed in https://github.com/StanGirard/quivr/pull/2087
+* fix: 🐛 related by @StanGirard in https://github.com/StanGirard/quivr/pull/2090
+* feat: Added translation status badge from inlang by @NilsJacobsen in https://github.com/StanGirard/quivr/pull/2080
+* fix(streaming): Data Truncation Issue in useHandleStream Function by @openperf in https://github.com/StanGirard/quivr/pull/2079
+* feat: 🎸 sources by @StanGirard in https://github.com/StanGirard/quivr/pull/2092
+* fix(frontend): clean related Brains useEffect by @Zewed in https://github.com/StanGirard/quivr/pull/2091
+
+## New Contributors
+* @openperf made their first contribution in https://github.com/StanGirard/quivr/pull/2079
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.183...v0.0.184
+
 ## 0.0.183 (2024-01-24)
 
 ## What's Changed

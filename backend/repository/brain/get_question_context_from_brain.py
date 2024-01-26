@@ -29,6 +29,7 @@ def get_question_context_from_brain(brain_id: UUID, question: str) -> str:
         embeddings,
         table_name="vectors",
         brain_id=str(brain_id),
+        number_docs=20,
     )
     documents = vector_store.similarity_search(question, k=20, threshold=0.8)
 

@@ -30,12 +30,12 @@ class Vector(Repository):
         return response
 
     # TODO: remove duplicate similarity_search in supabase vector store
-    def similarity_search(self, query_embedding, table, top_k, threshold):
+    def similarity_search(self, query_embedding, table, k, threshold):
         response = self.db.rpc(
             table,
             {
                 "query_embedding": query_embedding,
-                "match_count": top_k,
+                "match_count": k,
                 "match_threshold": threshold,
             },
         ).execute()

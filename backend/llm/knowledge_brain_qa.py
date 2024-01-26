@@ -60,7 +60,7 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
     temperature: float = 0.1
     chat_id: str = None  # pyright: ignore reportPrivateUsage=none
     brain_id: str  # pyright: ignore reportPrivateUsage=none
-    max_tokens: int = 256
+    max_tokens: int = 2000
     streaming: bool = False
     knowledge_qa: Optional[RAGInterface]
     metadata: Optional[dict] = None

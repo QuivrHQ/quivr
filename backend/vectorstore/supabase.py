@@ -14,6 +14,7 @@ class CustomSupabaseVectorStore(SupabaseVectorStore):
 
     brain_id: str = "none"
     user_id: str = "none"
+    number_docs: int = 35
 
     def __init__(
         self,
@@ -22,10 +23,12 @@ class CustomSupabaseVectorStore(SupabaseVectorStore):
         table_name: str,
         brain_id: str = "none",
         user_id: str = "none",
+        number_docs: int = 35,
     ):
         super().__init__(client, embedding, table_name)
         self.brain_id = brain_id
         self.user_id = user_id
+        self.number_docs = number_docs
 
     def find_brain_closest_query(
         self,
@@ -42,7 +45,7 @@ class CustomSupabaseVectorStore(SupabaseVectorStore):
             table,
             {
                 "query_embedding": query_embedding,
-                "match_count": k,
+                "match_count": self.number_docs,
                 "p_user_id": str(self.user_id),
             },
         ).execute()
@@ -62,7 +65,7 @@ class CustomSupabaseVectorStore(SupabaseVectorStore):
     def similarity_search(
         self,
         query: str,
-        k: int = 6,
+        k: int = 35,
         table: str = "match_vectors",
         threshold: float = 0.5,
         **kwargs: Any,
@@ -73,7 +76,7 @@ class CustomSupabaseVectorStore(SupabaseVectorStore):
             table,
             {
                 "query_embedding": query_embedding,
-                "match_count": k,
+                "match_count": self.number_docs,
                 "p_brain_id": str(self.brain_id),
             },
         ).execute()
