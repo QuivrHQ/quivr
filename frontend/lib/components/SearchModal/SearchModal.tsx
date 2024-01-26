@@ -32,6 +32,10 @@ export const SearchModal = (): JSX.Element => {
     }
   };
 
+  const handleSearch = () => {
+    setIsVisible(false);
+  };
+
   useEffect(() => {
     document.addEventListener("keydown", keydownHandler);
     window.addEventListener("click", mousedownHandler);
@@ -49,7 +53,7 @@ export const SearchModal = (): JSX.Element => {
   return (
     <div className={styles.search_modal_wrapper}>
       <div className={styles.search_bar_wrapper} ref={searchBarRef}>
-        <SearchBar />
+        <SearchBar onSearch={handleSearch} />
       </div>
     </div>
   );

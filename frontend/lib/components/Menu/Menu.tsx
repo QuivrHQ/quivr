@@ -10,7 +10,6 @@ import { AnimatedDiv } from "./components/AnimationDiv";
 import { BrainsManagementButton } from "./components/BrainsManagementButton";
 import { DiscussionButton } from "./components/DiscussionButton/DiscussionButton";
 import { MenuHeader } from "./components/MenuHeader";
-import { ParametersButton } from "./components/ParametersButton";
 import { ProfileButton } from "./components/ProfileButton";
 import { UpgradeToPlus } from "./components/UpgradeToPlus";
 
@@ -49,7 +48,6 @@ export const Menu = (): JSX.Element => {
               <div className="w-full gap-2 flex flex-col">
                 <DiscussionButton />
                 <BrainsManagementButton />
-                <ParametersButton />
               </div>
             </div>
             <div>
