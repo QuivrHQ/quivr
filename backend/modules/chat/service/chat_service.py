@@ -99,7 +99,7 @@ class ChatService:
                         assistant=message.assistant,
                         message_time=message.message_time,
                         brain_name=brain.name if brain else None,
-                        brain_id=brain.id if brain else None,
+                        brain_id=str(brain.id) if brain else None,
                         prompt_title=prompt.title if prompt else None,
                         metadata=message.metadata,
                     )

@@ -331,7 +331,7 @@ class APIBrainQA(KnowledgeBrainQA, QAInterface):
             chat_service.update_message_by_id(
                 message_id=str(streamed_chat_history.message_id),
                 user_message=question.question,
-                assistant="".join(response_tokens),
+                assistant="".join(str(token) for token in response_tokens),
                 metadata=self.metadata,
             )
 
