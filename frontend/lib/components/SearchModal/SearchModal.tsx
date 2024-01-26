@@ -7,7 +7,6 @@ import { SearchBar } from "../ui/SearchBar/SearchBar";
 export const SearchModal = (): JSX.Element => {
   const [isVisible, setIsVisible] = useState(false);
   const searchBarRef = useRef(null);
-  const searchBarClassName = "SearchModal_search_modal_wrapper";
 
   const keydownHandler = ({
     key,
@@ -18,25 +17,28 @@ export const SearchModal = (): JSX.Element => {
   }) => {
     if (metaKey && key === "k") {
       setIsVisible(true);
+    } else if (key === "Escape") {
+      setIsVisible(false);
     }
   };
 
   const mousedownHandler = (event: MouseEvent) => {
     if (
-      event.target instanceof HTMLElement &&
-      event.target.className !== searchBarClassName
+      !(searchBarRef.current as HTMLElement | null)?.contains(
+        event.target as Node
+      )
     ) {
       setIsVisible(false);
     }
   };
 
   useEffect(() => {
-    window.addEventListener("keydown", keydownHandler);
-    window.addEventListener("mousedown", mousedownHandler);
+    document.addEventListener("keydown", keydownHandler);
+    window.addEventListener("click", mousedownHandler);
 
     return () => {
-      window.removeEventListener("keydown", keydownHandler);
-      window.removeEventListener("mousedown", mousedownHandler);
+      document.removeEventListener("keydown", keydownHandler);
+      window.removeEventListener("click", mousedownHandler);
     };
   }, []);
 
