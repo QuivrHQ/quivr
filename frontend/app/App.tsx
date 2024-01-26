@@ -8,6 +8,7 @@ import { PropsWithChildren, useEffect } from "react";
 import { Menu } from "@/lib/components/Menu/Menu";
 import { useOutsideClickListener } from "@/lib/components/Menu/hooks/useOutsideClickListener";
 import { NotificationBanner } from "@/lib/components/NotificationBanner";
+import SearchModal from "@/lib/components/SearchModal/SearchModal";
 import { BrainProvider, ChatProvider } from "@/lib/context";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 import { ChatsProvider } from "@/lib/context/ChatsProvider";
@@ -30,7 +31,8 @@ if (
 
 // This wrapper is used to make effect calls at a high level in app rendering.
 const App = ({ children }: PropsWithChildren): JSX.Element => {
-  const { fetchAllBrains, fetchDefaultBrain, fetchPublicPrompts } = useBrainContext();
+  const { fetchAllBrains, fetchDefaultBrain, fetchPublicPrompts } =
+    useBrainContext();
   const { onClickOutside } = useOutsideClickListener();
   const { session } = useSupabase();
 
@@ -38,24 +40,25 @@ const App = ({ children }: PropsWithChildren): JSX.Element => {
 
   useEffect(() => {
     if (session?.user) {
-        void fetchAllBrains();
-        void fetchDefaultBrain();
-        void fetchPublicPrompts();
-        posthog.identify(session.user.id, { email: session.user.email });
-        posthog.startSessionRecording();
+      void fetchAllBrains();
+      void fetchDefaultBrain();
+      void fetchPublicPrompts();
+      posthog.identify(session.user.id, { email: session.user.email });
+      posthog.startSessionRecording();
     }
   }, [session]);
 
   return (
     <PostHogProvider client={posthog}>
       <div className="flex flex-1 flex-col overflow-auto">
+        <SearchModal />
         <NotificationBanner />
         <div className="relative h-full w-full flex justify-stretch items-stretch overflow-auto">
-            <Menu />
-            <div onClick={onClickOutside} className="flex-1">
-                {children}
-            </div>
-            <UpdateMetadata />
+          <Menu />
+          <div onClick={onClickOutside} className="flex-1">
+            {children}
+          </div>
+          <UpdateMetadata />
         </div>
       </div>
     </PostHogProvider>
