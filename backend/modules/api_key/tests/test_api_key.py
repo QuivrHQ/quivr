@@ -59,10 +59,10 @@ def test_api_key_model():
     assert api_key.api_key == "1234567890"
     assert api_key.key_id == "abcd1234"
     assert api_key.days == 7
-    assert api_key.only_chat == False
+    assert api_key.only_chat is False
     assert api_key.name == "Test API Key"
     assert api_key.creation_time == "2022-01-01T00:00:00Z"
-    assert api_key.is_active == True
+    assert api_key.is_active is True
 
 
 def test_get_user_from_api_key(client, api_key):
