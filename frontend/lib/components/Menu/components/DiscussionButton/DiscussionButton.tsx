@@ -15,7 +15,13 @@ export const DiscussionButton = (): JSX.Element => {
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}
       >
-        <span>New thread</span>
+        <div className={styles.left_wrapper}>
+          <span>New Search</span>
+          <div className={styles.shortcuts_wrapper}>
+            <div className={styles.shortcut}>⌘</div>
+            <div className={styles.shortcut}>K</div>
+          </div>
+        </div>
         <Icon
           name="search"
           size="normal"
