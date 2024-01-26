@@ -1,12 +1,18 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
+
+import { useSearchModalContext } from "@/lib/context/SearchModalProvider/hooks/useSearchModalContext";
 
 import styles from "./SearchModal.module.scss";
 
 import { SearchBar } from "../ui/SearchBar/SearchBar";
 
 export const SearchModal = (): JSX.Element => {
-  const [isVisible, setIsVisible] = useState(false);
+  const { isVisible, setIsVisible } = useSearchModalContext();
   const searchBarRef = useRef(null);
+
+  useEffect(() => {
+    console.log(`isVisible has changed to: ${isVisible}`);
+  }, [isVisible]);
 
   const keydownHandler = ({
     key,

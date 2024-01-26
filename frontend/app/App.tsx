@@ -13,6 +13,7 @@ import { BrainProvider, ChatProvider } from "@/lib/context";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 import { ChatsProvider } from "@/lib/context/ChatsProvider";
 import { MenuProvider } from "@/lib/context/MenuProvider/Menu-provider";
+import { SearchModalProvider } from "@/lib/context/SearchModalProvider/search-modal-provider";
 import { useSupabase } from "@/lib/context/SupabaseProvider";
 import { UpdateMetadata } from "@/lib/helpers/updateMetadata";
 import { usePageTracking } from "@/services/analytics/june/usePageTracking";
@@ -51,15 +52,17 @@ const App = ({ children }: PropsWithChildren): JSX.Element => {
   return (
     <PostHogProvider client={posthog}>
       <div className="flex flex-1 flex-col overflow-auto">
-        <SearchModal />
-        <NotificationBanner />
-        <div className="relative h-full w-full flex justify-stretch items-stretch overflow-auto">
-          <Menu />
-          <div onClick={onClickOutside} className="flex-1">
-            {children}
+        <SearchModalProvider>
+          <SearchModal />
+          <NotificationBanner />
+          <div className="relative h-full w-full flex justify-stretch items-stretch overflow-auto">
+            <Menu />
+            <div onClick={onClickOutside} className="flex-1">
+              {children}
+            </div>
+            <UpdateMetadata />
           </div>
-          <UpdateMetadata />
-        </div>
+        </SearchModalProvider>
       </div>
     </PostHogProvider>
   );
