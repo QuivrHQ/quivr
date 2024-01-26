@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 
 import { FoldableSection } from "@/lib/components/ui/FoldableSection/FoldableSection";
 import Icon from "@/lib/components/ui/Icon/Icon";
@@ -25,8 +25,6 @@ const RelatedBrains = ({ closeBrains }: RelatedBrainsProps): JSX.Element => {
     return start * (1 - t) + end * t;
   };
 
-  const memoCloseBrains = useMemo(() => closeBrains, []);
-
   useEffect(() => {
     const newProps = closeBrains.map((brain) => {
       const t = Math.pow(brain.similarity, 2);
@@ -39,7 +37,7 @@ const RelatedBrains = ({ closeBrains }: RelatedBrainsProps): JSX.Element => {
       return { color: `rgb(${r}, ${g}, ${b})`, isCurrentBrain: isCurrentBrain };
     });
     setCloseBrainProps(newProps);
-  }, [memoCloseBrains, messages.length]);
+  }, [closeBrains, messages.length]);
 
   if (closeBrains.length === 0) {
     return <></>;
