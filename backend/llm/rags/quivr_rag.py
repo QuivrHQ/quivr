@@ -60,7 +60,7 @@ class QuivrRAG(BaseModel, RAGInterface):
     temperature: float = 0.1
     chat_id: str = None  # pyright: ignore reportPrivateUsage=none
     brain_id: str = None  # pyright: ignore reportPrivateUsage=none
-    max_tokens: int = 256
+    max_tokens: int = 2000
     streaming: bool = False
 
     @property
@@ -91,6 +91,7 @@ class QuivrRAG(BaseModel, RAGInterface):
         chat_id: str,
         streaming: bool = False,
         prompt_id: Optional[UUID] = None,
+        max_tokens: int = 2000,
         **kwargs,
     ):
         super().__init__(
@@ -103,6 +104,7 @@ class QuivrRAG(BaseModel, RAGInterface):
         self.supabase_client = self._create_supabase_client()
         self.vector_store = self._create_vector_store()
         self.prompt_id = prompt_id
+        self.max_tokens = max_tokens
 
     def _create_supabase_client(self) -> Client:
         return create_client(
