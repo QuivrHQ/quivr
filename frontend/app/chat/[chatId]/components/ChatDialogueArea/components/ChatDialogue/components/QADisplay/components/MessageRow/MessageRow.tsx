@@ -4,7 +4,6 @@ import { CopyButton } from "./components/CopyButton";
 import { MessageContent } from "./components/MessageContent";
 import { QuestionBrain } from "./components/QuestionBrain";
 import { QuestionPrompt } from "./components/QuestionPrompt";
-import { SourcesButton } from "./components/SourcesButton";
 import { useMessageRow } from "./hooks/useMessageRow";
 
 type MessageRowProps = {
@@ -60,7 +59,6 @@ export const MessageRow = React.forwardRef(
             <div className="flex items-center gap-2">
               {!isUserSpeaker && (
                 <>
-                  {hasSources && <SourcesButton sources={sourcesContent} />}
                   <CopyButton handleCopy={handleCopy} isCopied={isCopied} />
                 </>
               )}
