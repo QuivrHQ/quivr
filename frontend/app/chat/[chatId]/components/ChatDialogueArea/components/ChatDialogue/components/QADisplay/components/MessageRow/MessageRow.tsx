@@ -1,5 +1,7 @@
 import React from "react";
 
+import { Source } from "@/lib/types/MessageMetadata";
+
 import { CopyButton } from "./components/CopyButton";
 import { MessageContent } from "./components/MessageContent";
 import { QuestionBrain } from "./components/QuestionBrain";
@@ -13,7 +15,7 @@ type MessageRowProps = {
   promptName?: string | null;
   children?: React.ReactNode;
   metadata?: {
-    sources?: [string] | [];
+    sources?: Source[];
   };
 };
 

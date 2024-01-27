@@ -4,7 +4,13 @@ export interface CloseBrain {
   name: string;
 }
 
+export interface Source {
+  name: string;
+  source_url: string;
+  type: string;
+}
+
 export interface MessageMetadata {
   closeBrains: CloseBrain[];
-  sources: [string];
+  sources: Source[];
 }

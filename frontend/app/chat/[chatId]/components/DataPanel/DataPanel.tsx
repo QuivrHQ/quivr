@@ -19,7 +19,7 @@ const DataPanel = (): JSX.Element => {
       const lastMessage = messages[messages.length - 1];
       setLastMessageMetadata({
         closeBrains: lastMessage.metadata?.close_brains ?? [],
-        sources: lastMessage.metadata?.sources ?? [""],
+        sources: lastMessage.metadata?.sources ?? [],
       });
     }
   }, [messages]);

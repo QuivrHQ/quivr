@@ -2,10 +2,11 @@ import { useEffect, useRef, useState } from "react";
 import ReactDOM from "react-dom";
 import { FaQuestionCircle } from "react-icons/fa";
 
+import { Source } from "@/lib/types/MessageMetadata";
 import { useEventTracking } from "@/services/analytics/june/useEventTracking";
 
 type SourcesButtonProps = {
-  sources: [string] | [];
+  sources: Source[];
 };
 
 export const SourcesButton = ({ sources }: SourcesButtonProps): JSX.Element => {
@@ -39,7 +40,7 @@ export const SourcesButton = ({ sources }: SourcesButtonProps): JSX.Element => {
     <ul className="list-disc list-inside">
       {sources.map((source, index) => (
         <li key={index} className="truncate">
-          {source.trim()}
+          {source.name}
         </li>
       ))}
     </ul>
