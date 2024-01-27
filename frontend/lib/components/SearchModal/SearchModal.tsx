@@ -24,7 +24,8 @@ export const SearchModal = (): JSX.Element => {
     }
   };
 
-  const mousedownHandler = (event: MouseEvent) => {
+  const clickHandler = (event: MouseEvent) => {
+    console.info("heyyyyy");
     if (
       !(searchBarRef.current as HTMLElement | null)?.contains(
         event.target as Node
@@ -39,12 +40,12 @@ export const SearchModal = (): JSX.Element => {
   };
 
   useEffect(() => {
-    document.addEventListener("keydown", keydownHandler);
-    window.addEventListener("mousedown", mousedownHandler);
+    window.addEventListener("keydown", keydownHandler);
+    window.addEventListener("click", clickHandler);
 
     return () => {
-      document.removeEventListener("keydown", keydownHandler);
-      window.removeEventListener("mousedown", mousedownHandler);
+      window.removeEventListener("keydown", keydownHandler);
+      window.removeEventListener("click", clickHandler);
     };
   }, []);
 
