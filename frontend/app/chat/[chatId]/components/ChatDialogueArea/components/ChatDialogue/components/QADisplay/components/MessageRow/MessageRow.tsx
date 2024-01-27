@@ -1,10 +1,12 @@
 import React from "react";
 
+import Icon from "@/lib/components/ui/Icon/Icon";
+
 import styles from "./MessageRow.module.scss";
 import { CopyButton } from "./components/CopyButton";
 import { MessageContent } from "./components/MessageContent/MessageContent";
-import { QuestionBrain } from "./components/QuestionBrain";
-import { QuestionPrompt } from "./components/QuestionPrompt";
+import { QuestionBrain } from "./components/QuestionBrain/QuestionBrain";
+import { QuestionPrompt } from "./components/QuestionPrompt/QuestionPrompt";
 import { useMessageRow } from "./hooks/useMessageRow";
 
 type MessageRowProps = {
@@ -37,11 +39,23 @@ export const MessageRow = React.forwardRef(
       ${isUserSpeaker ? styles.user ?? "" : styles.brain ?? ""}
       `}
       >
-        <div className={styles.message_header}>
-          <QuestionBrain brainName={brainName} />
-          <QuestionPrompt promptName={promptName} />
-          <CopyButton handleCopy={handleCopy} isCopied={isCopied} />
-        </div>
+        {!isUserSpeaker ? (
+          <div className={styles.message_header}>
+            <div className={styles.left_wrapper}>
+              <QuestionBrain brainName={brainName} />
+              <QuestionPrompt promptName={promptName} />
+            </div>
+            <div className={styles.copy_button}>
+              <CopyButton handleCopy={handleCopy} isCopied={isCopied} />
+            </div>
+          </div>
+        ) : (
+          <div className={styles.message_header}>
+            <Icon name="user" color="dark-grey" size="normal" />
+            <span className={styles.me}>Me</span>
+          </div>
+        )}
+        {}
         <div ref={ref} className={styles.message_row_content}>
           {children ?? (
             <MessageContent text={messageContent} isUser={isUserSpeaker} />
