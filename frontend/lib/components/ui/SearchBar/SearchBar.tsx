@@ -11,7 +11,11 @@ import styles from "./SearchBar.module.scss";
 
 import { LoaderIcon } from "../LoaderIcon/LoaderIcon";
 
-export const SearchBar = (): JSX.Element => {
+export const SearchBar = ({
+  onSearch,
+}: {
+  onSearch?: () => void;
+}): JSX.Element => {
   const [searching, setSearching] = useState(false);
   const [isDisabled, setIsDisabled] = useState(true);
   const { message, setMessage } = useChatInput();
@@ -32,6 +36,9 @@ export const SearchBar = (): JSX.Element => {
       setSearching(true);
       setMessages([]);
       try {
+        if (onSearch) {
+          onSearch();
+        }
         await addQuestion(message);
       } catch (error) {
         console.error(error);

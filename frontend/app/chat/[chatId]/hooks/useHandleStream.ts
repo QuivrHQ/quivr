@@ -18,8 +18,7 @@ export const useHandleStream = () => {
       const { done, value } = await reader.read();
 
       if (done) {
-
-	if (incompleteData !== "") {
+        if (incompleteData !== "") {
           // Try to parse any remaining incomplete data
 
           try {
@@ -41,12 +40,7 @@ export const useHandleStream = () => {
       // Concatenate incomplete data with new chunk
       const rawData = incompleteData + decoder.decode(value, { stream: true });
 
-      console.log("Raw data before cleaning:", rawData);
-
-      const dataStrings = rawData
-        .trim()
-        .split("data: ")
-        .filter(Boolean);
+      const dataStrings = rawData.trim().split("data: ").filter(Boolean);
 
       dataStrings.forEach((data, index, array) => {
         if (index === array.length - 1 && !data.endsWith("\n")) {
@@ -74,4 +68,3 @@ export const useHandleStream = () => {
     handleStream,
   };
 };
-

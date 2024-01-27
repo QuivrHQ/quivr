@@ -8,10 +8,8 @@ import { useMenuContext } from "@/lib/context/MenuProvider/hooks/useMenuContext"
 import styles from "./Menu.module.scss";
 import { AnimatedDiv } from "./components/AnimationDiv";
 import { BrainsManagementButton } from "./components/BrainsManagementButton";
-import { DiscussionButton } from "./components/DiscussionButton";
-import { ExplorerButton } from "./components/ExplorerButton";
+import { DiscussionButton } from "./components/DiscussionButton/DiscussionButton";
 import { MenuHeader } from "./components/MenuHeader";
-import { ParametersButton } from "./components/ParametersButton";
 import { ProfileButton } from "./components/ProfileButton";
 import { UpgradeToPlus } from "./components/UpgradeToPlus";
 
@@ -49,9 +47,7 @@ export const Menu = (): JSX.Element => {
             <div className="flex flex-1 w-full">
               <div className="w-full gap-2 flex flex-col">
                 <DiscussionButton />
-                <ExplorerButton />
                 <BrainsManagementButton />
-                <ParametersButton />
               </div>
             </div>
             <div>

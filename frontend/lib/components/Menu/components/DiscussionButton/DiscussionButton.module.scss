@@ -1,0 +1,44 @@
+@use "@/styles/Colors.module.scss";
+@use "@/styles/IconSizes.module.scss";
+@use "@/styles/Spacings.module.scss";
+
+.button_wrapper {
+  display: flex;
+  padding: Spacings.$spacing04;
+  justify-content: space-between;
+  align-items: center;
+  border: 1px solid Colors.$light-grey;
+  border-radius: 12px;
+  background-color: Colors.$white;
+  cursor: pointer;
+  color: Colors.$dark-grey;
+  transition: box-shadow 0.3s ease;
+
+  .left_wrapper {
+    display: flex;
+    align-items: center;
+    gap: Spacings.$spacing03;
+
+    .shortcuts_wrapper {
+      display: flex;
+      align-items: center;
+      gap: Spacings.$spacing01;
+
+      .shortcut {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        border: 1px solid Colors.$light-grey;
+        border-radius: 3px;
+        width: 16px;
+        height: 16px;
+      }
+    }
+  }
+
+  &:hover {
+    border-color: Colors.$accent;
+    box-shadow: 0 0 0 2px Colors.$accent;
+  }
+}

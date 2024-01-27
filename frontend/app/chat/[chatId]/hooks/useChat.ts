@@ -9,6 +9,7 @@ import { CHATS_DATA_KEY } from "@/lib/api/chat/config";
 import { useChatApi } from "@/lib/api/chat/useChatApi";
 import { useChatContext } from "@/lib/context";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
+import { useSearchModalContext } from "@/lib/context/SearchModalProvider/hooks/useSearchModalContext";
 import { getChatNameFromQuestion } from "@/lib/helpers/getChatNameFromQuestion";
 import { useToast } from "@/lib/hooks";
 import { useOnboarding } from "@/lib/hooks/useOnboarding";
@@ -40,6 +41,7 @@ export const useChat = () => {
   const {
     chatConfig: { model, maxTokens, temperature },
   } = useLocalStorageChatConfig();
+  const { isVisible } = useSearchModalContext();
 
   const { addStreamQuestion } = useQuestion();
   const { t } = useTranslation(["chat"]);
@@ -60,7 +62,7 @@ export const useChat = () => {
       let currentChatId = chatId;
 
       //if chatId is not set, create a new chat. Chat name is from the first question
-      if (currentChatId === undefined) {
+      if (currentChatId === undefined || isVisible) {
         const chat = await createChat(getChatNameFromQuestion(question));
         currentChatId = chat.chat_id;
         setChatId(currentChatId);
