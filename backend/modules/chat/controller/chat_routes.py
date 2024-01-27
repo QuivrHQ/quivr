@@ -1,24 +1,23 @@
 from typing import List, Optional
 from uuid import UUID
-from venv import logger
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from fastapi.responses import StreamingResponse
 from middlewares.auth import AuthBearer, get_current_user
+from models.databases.entity import Models
 from models.user_usage import UserUsage
 from modules.brain.service.brain_service import BrainService
 from modules.chat.controller.chat.brainful_chat import BrainfulChat
 from modules.chat.controller.chat.factory import get_chat_strategy
-from modules.chat.controller.chat.utils import NullableUUID, check_user_requests_limit
+from modules.chat.controller.chat.utils import (NullableUUID,
+                                                check_user_requests_limit)
 from modules.chat.dto.chats import ChatItem, ChatQuestion
-from modules.chat.dto.inputs import (
-    ChatUpdatableProperties,
-    CreateChatProperties,
-    QuestionAndAnswer,
-)
+from modules.chat.dto.inputs import (ChatUpdatableProperties,
+                                     CreateChatProperties, QuestionAndAnswer)
 from modules.chat.entity.chat import Chat
 from modules.chat.service.chat_service import ChatService
-from modules.notification.service.notification_service import NotificationService
+from modules.notification.service.notification_service import \
+    NotificationService
 from modules.user.entity.user_identity import UserIdentity
 
 chat_router = APIRouter()
@@ -201,44 +200,44 @@ async def create_stream_question_handler(
     chat_instance = BrainfulChat()
     chat_instance.validate_authorization(user_id=current_user.id, brain_id=brain_id)
 
-    user_daily_usage = UserUsage(
+    user_usage = UserUsage(
         id=current_user.id,
         email=current_user.email,
     )
 
-    user_settings = user_daily_usage.get_user_settings()
+    # Get user settings
+    user_settings = user_usage.get_user_settings()
 
-    # Retrieve chat model (temperature, max_tokens, model)
-    if (
-        not chat_question.model
-        or chat_question.temperature is None
-        or not chat_question.max_tokens
-    ):
-        fallback_model = "gpt-3.5-turbo-1106"
-        fallback_temperature = 0
-        fallback_max_tokens = 256
-        if brain_id:
-            brain = brain_service.get_brain_by_id(brain_id)
-            if brain:
-                fallback_model = brain.model or fallback_model
-                fallback_temperature = brain.temperature or fallback_temperature
-                fallback_max_tokens = brain.max_tokens or fallback_max_tokens
+    # Get Model settings for the user
+    models_settings = user_usage.get_model_settings()
+    
+    # Get the Brain settings
+    brain = brain_service.get_brain_by_id(brain_id)
 
-        chat_question.model = chat_question.model or fallback_model
-        chat_question.temperature = chat_question.temperature or fallback_temperature
-        chat_question.max_tokens = chat_question.max_tokens or fallback_max_tokens
 
     try:
-        logger.info(f"Streaming request for {chat_question.model}")
+        # Default model is gpt-3.5-turbo-1106
+        model_to_use = Models("gpt-3.5-turbo-1106", 1, 512, 512)
+                
+        is_brain_model_available = (
+            brain.model in models_settings.get("models", ["gpt-3.5-turbo-1106"])
+        )  # Checks if the model is available in the list of models available in the instance
+        
+        is_user_allowed_model = (
+            brain.model in user_settings.get("models", ["gpt-3.5-turbo-1106"])
+        )  # Checks if the model is available in the list of models
+        
+        if is_brain_model_available and is_user_allowed_model:
+            # Use the model from the brain
+            model_to_use = models_settings[brain.model]
+            
         check_user_requests_limit(current_user, chat_question.model)
-        # TODO check if model is in the list of models available for the user
-
-        is_model_ok = chat_question.model in user_settings.get("models", ["gpt-3.5-turbo-1106"])  # type: ignore
         gpt_answer_generator = chat_instance.get_answer_generator(
             chat_id=str(chat_id),
-            model=chat_question.model if is_model_ok else "gpt-3.5-turbo-1106",  # type: ignore
-            max_tokens=chat_question.max_tokens,
-            temperature=chat_question.temperature,  # type: ignore
+            model=model_to_use.name,
+            max_tokens=model_to_use.max_output,
+            max_input=model_to_use.max_input,
+            temperature=0.1,
             streaming=True,
             prompt_id=chat_question.prompt_id,
             brain_id=brain_id,

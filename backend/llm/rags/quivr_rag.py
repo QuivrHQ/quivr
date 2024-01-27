@@ -7,11 +7,9 @@ from langchain.chat_models import ChatLiteLLM
 from langchain.embeddings.ollama import OllamaEmbeddings
 from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.llms.base import BaseLLM
-from langchain.prompts.chat import (
-    ChatPromptTemplate,
-    HumanMessagePromptTemplate,
-    SystemMessagePromptTemplate,
-)
+from langchain.prompts.chat import (ChatPromptTemplate,
+                                    HumanMessagePromptTemplate,
+                                    SystemMessagePromptTemplate)
 from llm.rags.rag_interface import RAGInterface
 from llm.utils.get_prompt_to_use import get_prompt_to_use
 from logger import get_logger
@@ -61,6 +59,7 @@ class QuivrRAG(BaseModel, RAGInterface):
     chat_id: str = None  # pyright: ignore reportPrivateUsage=none
     brain_id: str = None  # pyright: ignore reportPrivateUsage=none
     max_tokens: int = 2000
+    max_input: int = 2000
     streaming: bool = False
 
     @property
@@ -92,6 +91,7 @@ class QuivrRAG(BaseModel, RAGInterface):
         streaming: bool = False,
         prompt_id: Optional[UUID] = None,
         max_tokens: int = 2000,
+        max_input: int = 2000,
         **kwargs,
     ):
         super().__init__(
@@ -105,6 +105,7 @@ class QuivrRAG(BaseModel, RAGInterface):
         self.vector_store = self._create_vector_store()
         self.prompt_id = prompt_id
         self.max_tokens = max_tokens
+        self.max_input = max_input
 
     def _create_supabase_client(self) -> Client:
         return create_client(

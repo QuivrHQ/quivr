@@ -61,6 +61,7 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
     chat_id: str = None  # pyright: ignore reportPrivateUsage=none
     brain_id: str  # pyright: ignore reportPrivateUsage=none
     max_tokens: int = 2000
+    max_input: int = 2000
     streaming: bool = False
     knowledge_qa: Optional[RAGInterface]
     metadata: Optional[dict] = None
@@ -76,9 +77,12 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
         model: str,
         brain_id: str,
         chat_id: str,
+        max_tokens: int,
+        max_input: int,
         streaming: bool = False,
         prompt_id: Optional[UUID] = None,
         metadata: Optional[dict] = None,
+        
         **kwargs,
     ):
         super().__init__(
@@ -97,6 +101,7 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
             **kwargs,
         )
         self.metadata = metadata
+        self.max_tokens = max_tokens
 
     @property
     def prompt_to_use(self):

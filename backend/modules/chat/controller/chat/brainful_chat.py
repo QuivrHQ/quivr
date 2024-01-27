@@ -6,10 +6,10 @@ from llm.knowledge_brain_qa import KnowledgeBrainQA
 from logger import get_logger
 from models.settings import BrainSettings, get_supabase_client
 from modules.brain.entity.brain_entity import BrainType, RoleEnum
-from modules.brain.service.api_brain_definition_service import ApiBrainDefinitionService
-from modules.brain.service.brain_authorization_service import (
-    validate_brain_authorization,
-)
+from modules.brain.service.api_brain_definition_service import \
+    ApiBrainDefinitionService
+from modules.brain.service.brain_authorization_service import \
+    validate_brain_authorization
 from modules.brain.service.brain_service import BrainService
 from modules.chat.controller.chat.interface import ChatInterface
 from modules.chat.service.chat_service import ChatService
@@ -47,6 +47,7 @@ class BrainfulChat(ChatInterface):
         chat_id,
         model,
         max_tokens,
+        max_input,
         temperature,
         streaming,
         prompt_id,
@@ -110,6 +111,7 @@ class BrainfulChat(ChatInterface):
                 chat_id=chat_id,
                 model=model,
                 max_tokens=max_tokens,
+                max_input=max_input,
                 temperature=temperature,
                 brain_id=str(brain.brain_id),
                 streaming=streaming,
@@ -121,6 +123,7 @@ class BrainfulChat(ChatInterface):
                 chat_id=chat_id,
                 model=model,
                 max_tokens=max_tokens,
+                max_input=max_input,
                 temperature=temperature,
                 brain_id=str(brain.brain_id),
                 streaming=streaming,
@@ -137,6 +140,7 @@ class BrainfulChat(ChatInterface):
                 chat_id=chat_id,
                 model=model,
                 max_tokens=max_tokens,
+                max_input=max_input,
                 temperature=temperature,
                 brain_id=str(brain.brain_id),
                 streaming=streaming,
