@@ -289,6 +289,7 @@ class CompositeBrainQA(
                 )
 
                 print("querying brain", function_name)
+                # TODO: extract chat_id from generate_answer function of XBrainQA
                 function_response = function_to_call(
                     chat_id=chat_id,
                     question=question,
