@@ -11,7 +11,6 @@ import { StripePricingOrManageButton, UserStatistics } from "./components";
 import { ApiKeyConfig } from "./components/ApiKeyConfig";
 import LanguageSelect from "./components/LanguageSelect/LanguageSelect";
 import { LogoutModal } from "./components/LogoutCard/LogoutModal";
-import ThemeSelect from "./components/ThemeSelect/ThemeSelect";
 
 const UserPage = (): JSX.Element => {
   const { session } = useSupabase();
@@ -58,8 +57,6 @@ const UserPage = (): JSX.Element => {
 
           <CardBody>
             <LanguageSelect />
-
-            <ThemeSelect />
           </CardBody>
         </Card>
         <Card className="mb-5 shadow-sm hover:shadow-none">
