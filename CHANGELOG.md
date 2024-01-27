@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.0.185 (2024-01-27)
+
+## What's Changed
+* fix: 🐛 brain by @StanGirard in https://github.com/StanGirard/quivr/pull/2096
+* feat(frontend): search modal - remove parameters and explore buttons by @Zewed in https://github.com/StanGirard/quivr/pull/2094
+* fix: 🐛 tests by @StanGirard in https://github.com/StanGirard/quivr/pull/2095
+
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.184...v0.0.185
+
 ## 0.0.184 (2024-01-26)
 
 ## What's Changed
