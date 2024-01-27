@@ -24,8 +24,16 @@ export const MentionList = forwardRef<MentionListRef, MentionListProps>(
     const { suggestionsRef, shouldShowScrollToBottomIcon, scrollToBottom } =
       useSuggestionsOverflowHandler();
 
+    const handleClick = (event: React.MouseEvent<HTMLDivElement>) => {
+      event.preventDefault();
+      event.stopPropagation();
+    };
+
     return (
-      <div className="items flex flex-1 flex-col p-2 px-4 bg-gray-50 rounded-md shadow-md z-40 max-h-[200px]">
+      <div
+        className="items flex flex-1 flex-col p-2 px-4 bg-gray-50 rounded-md shadow-md z-40 max-h-[200px]"
+        onClick={handleClick}
+      >
         <div
           className="flex flex-1 flex-col overflow-y-auto"
           ref={suggestionsRef}
