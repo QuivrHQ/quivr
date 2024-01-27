@@ -3,9 +3,11 @@ import ReactMarkdown from "react-markdown";
 
 export const MessageContent = ({
   text,
+  isUser,
   markdownClasses,
 }: {
   text: string;
+  isUser: boolean;
   markdownClasses: string;
 }): JSX.Element => {
   const [showLog] = useState(true);
@@ -34,14 +36,15 @@ export const MessageContent = ({
     } else {
       setIsLog(false);
     }
+    console.info(isUser);
   }, [text]);
 
   const { logs, cleanedText } = extractLog(text);
 
   return (
-    <div data-testid="chat-message-text" className="mt-2">
+    <div data-testid="chat-message-text">
       {isLog && showLog && logs.length > 0 && (
-        <div className="text-xs text-gray-600 bg-gray-100 p-2 rounded">
+        <div className="text-xs text-white-600 p-2 rounded">
           <ReactMarkdown>{logs}</ReactMarkdown>
         </div>
       )}

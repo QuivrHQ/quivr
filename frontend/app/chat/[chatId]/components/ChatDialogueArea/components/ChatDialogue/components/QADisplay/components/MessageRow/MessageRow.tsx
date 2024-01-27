@@ -55,6 +55,7 @@ export const MessageRow = React.forwardRef(
         {children ?? (
           <MessageContent
             text={messageContent}
+            isUser={isUserSpeaker}
             markdownClasses={markdownClasses}
           />
         )}
