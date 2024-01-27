@@ -10,10 +10,6 @@ export const SearchModal = (): JSX.Element => {
   const { isVisible, setIsVisible } = useSearchModalContext();
   const searchBarRef = useRef(null);
 
-  useEffect(() => {
-    console.log(`isVisible has changed to: ${isVisible}`);
-  }, [isVisible]);
-
   const keydownHandler = ({
     key,
     metaKey,
@@ -28,7 +24,7 @@ export const SearchModal = (): JSX.Element => {
     }
   };
 
-  const mousedownHandler = (event: MouseEvent) => {
+  const clickHandler = (event: MouseEvent) => {
     if (
       !(searchBarRef.current as HTMLElement | null)?.contains(
         event.target as Node
@@ -43,12 +39,12 @@ export const SearchModal = (): JSX.Element => {
   };
 
   useEffect(() => {
-    document.addEventListener("keydown", keydownHandler);
-    window.addEventListener("click", mousedownHandler);
+    window.addEventListener("keydown", keydownHandler);
+    window.addEventListener("click", clickHandler);
 
     return () => {
-      document.removeEventListener("keydown", keydownHandler);
-      window.removeEventListener("click", mousedownHandler);
+      window.removeEventListener("keydown", keydownHandler);
+      window.removeEventListener("click", clickHandler);
     };
   }, []);
 
