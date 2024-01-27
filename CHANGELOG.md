@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.0.186 (2024-01-27)
+
+## What's Changed
+* fix(frontend): click on mention list on search bar in modal bug by @Zewed in https://github.com/StanGirard/quivr/pull/2098
+* fix(frontend): remove dark theme by @Zewed in https://github.com/StanGirard/quivr/pull/2100
+* fix(frontend): delete brain by @Zewed in https://github.com/StanGirard/quivr/pull/2101
+* feat(14k): done by @StanGirard in https://github.com/StanGirard/quivr/pull/2102
+
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.185...v0.0.186
+
 ## 0.0.185 (2024-01-27)
 
 ## What's Changed
