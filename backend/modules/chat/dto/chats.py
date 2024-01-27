@@ -32,6 +32,7 @@ class Sources(BaseModel):
     name: str
     source_url: str
     type: str
+    original_file_name: str
 
     class Config:
         json_encoders = {

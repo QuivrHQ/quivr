@@ -86,6 +86,7 @@ async def filter_file(
             result = await file_processors[file.file_extension](
                 file=file,
                 brain_id=brain_id,
+                original_file_name=original_file_name,
             )
             if result is None or result == 0:
                 return create_response(

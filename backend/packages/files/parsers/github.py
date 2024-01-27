@@ -52,6 +52,7 @@ async def process_github(
             "chunk_size": chunk_size,
             "chunk_overlap": chunk_overlap,
             "date": dateshort,
+            "original_file_name": doc.metadata["original_file_name"],
         }
         doc_with_metadata = Document(page_content=doc.page_content, metadata=metadata)
 

@@ -11,6 +11,7 @@ from llm.rags.rag_interface import RAGInterface
 from llm.utils.format_chat_history import format_chat_history
 from llm.utils.get_prompt_to_use import get_prompt_to_use
 from llm.utils.get_prompt_to_use_id import get_prompt_to_use_id
+from repository.files.generate_file_signed_url import generate_file_signed_url
 from logger import get_logger
 from models import BrainSettings
 from modules.brain.service.brain_service import BrainService
@@ -81,7 +82,6 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
         streaming: bool = False,
         prompt_id: Optional[UUID] = None,
         metadata: Optional[dict] = None,
-        
         **kwargs,
     ):
         super().__init__(
@@ -313,9 +313,14 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
                                 if "url" in doc.metadata
                                 else doc.metadata["file_name"],
                                 "type": "url" if "url" in doc.metadata else "file",
-                                "source_url": doc.metadata["url"]
-                                if "url" in doc.metadata
+                                "source_url": generate_file_signed_url(
+                                    f"{brain.brain_id}/{doc.metadata['file_name']}"
+                                ).get("signedURL", "")
+                                if "url" not in doc.metadata
                                 else "",
+                                "original_file_name": doc.metadata[
+                                    "original_file_name"
+                                ],
                             }
                         )
                     )
