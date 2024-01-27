@@ -43,6 +43,7 @@ async-generator = "*"
 posthog = "==3.1.0"
 jq = "==1.6.0"
 pytest = "*"
+ddtrace = "*"
 
 [dev-packages]
 black = "*"
