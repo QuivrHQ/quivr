@@ -32,28 +32,21 @@ export const MessageRow = React.forwardRef(
 
     return (
       <div
-        ref={ref}
         className={`
       ${styles.message_row_container ?? ""} 
       ${isUserSpeaker ? styles.user ?? "" : styles.brain ?? ""}
       `}
       >
-        {!isUserSpeaker && (
-          <div className="flex justify-between items-start w-full">
-            <div className="flex gap-1">
-              <QuestionBrain brainName={brainName} />
-              <QuestionPrompt promptName={promptName} />
-            </div>
-            <div className="flex items-center gap-2">
-              <>
-                <CopyButton handleCopy={handleCopy} isCopied={isCopied} />
-              </>
-            </div>
-          </div>
-        )}
-        {children ?? (
-          <MessageContent text={messageContent} isUser={isUserSpeaker} />
-        )}
+        <div className={styles.message_header}>
+          <QuestionBrain brainName={brainName} />
+          <QuestionPrompt promptName={promptName} />
+          <CopyButton handleCopy={handleCopy} isCopied={isCopied} />
+        </div>
+        <div ref={ref} className={styles.message_row_content}>
+          {children ?? (
+            <MessageContent text={messageContent} isUser={isUserSpeaker} />
+          )}
+        </div>
       </div>
     );
   }

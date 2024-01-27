@@ -4,21 +4,36 @@
 .message_row_container {
   display: flex;
   flex-direction: column;
-  border-radius: 12px;
-  width: fit-content;
-  padding-block: Spacings.$spacing03;
-  padding-inline: Spacings.$spacing05;
-  margin-inline: Spacings.$spacing01;
+
+  .message_row_content {
+    border-radius: 12px;
+    width: fit-content;
+    padding-block: Spacings.$spacing03;
+    padding-inline: Spacings.$spacing05;
+    margin-inline: Spacings.$spacing01;
+  }
 
   &.user {
-    align-self: flex-end;
-    background-color: Colors.$highlight;
-    box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.25);
+    .message_header {
+      align-self: flex-end;
+    }
+
+    .message_row_content {
+      align-self: flex-end;
+      background-color: Colors.$highlight;
+      box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.25);
+    }
   }
 
   &.brain {
-    align-self: flex-start;
-    background-color: rgba(Colors.$black, 0.8);
-    margin-left: 1px;
+    .message_header {
+      align-self: flex-start;
+    }
+
+    .message_row_content {
+      align-self: flex-start;
+      background-color: rgba(Colors.$black, 0.85);
+      margin-left: 1px;
+    }
   }
 }
