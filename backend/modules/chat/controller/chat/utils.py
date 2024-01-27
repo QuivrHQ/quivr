@@ -25,6 +25,7 @@ class NullableUUID(UUID):
 
 
 def check_user_requests_limit(user: UserIdentity, model: str):
+    # TODO : Pass objects to avoid multiple calls to the database
     """Checks the user requests limit.
     It checks the user requests limit and raises an exception if the user has reached the limit.
     By default, the user has a limit of 100 requests per month. The limit can be increased by upgrading the plan.

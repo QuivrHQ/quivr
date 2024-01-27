@@ -269,7 +269,7 @@ async def create_stream_question_handler(
         metadata["max_tokens"] = model_to_use.max_output
         metadata["max_input"] = model_to_use.max_input
 
-        check_user_requests_limit(current_user, chat_question.model)
+        check_user_requests_limit(current_user, model_to_use.name)
         gpt_answer_generator = chat_instance.get_answer_generator(
             chat_id=str(chat_id),
             model=model_to_use.name,
