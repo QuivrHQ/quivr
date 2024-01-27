@@ -44,11 +44,13 @@ export const MessageContent = ({
   return (
     <div data-testid="chat-message-text">
       {isLog && showLog && logs.length > 0 && (
-        <div className="text-xs text-white-600 p-2 rounded">
+        <div className="text-xs text-white p-2 rounded">
           <ReactMarkdown>{logs}</ReactMarkdown>
         </div>
       )}
-      <ReactMarkdown className={`text-base ${markdownClasses}`}>
+      <ReactMarkdown
+        className={`${isUser ? "text-black" : "text-ivory"} ${markdownClasses}`}
+      >
         {cleanedText}
       </ReactMarkdown>
     </div>

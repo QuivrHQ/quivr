@@ -18,7 +18,7 @@
 
   &.brain {
     align-self: flex-start;
-    background-color: Colors.$black;
+    background-color: rgba(Colors.$black, 0.9);
     margin-left: 1px;
   }
 }
