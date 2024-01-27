@@ -1,0 +1,24 @@
+@use "@/styles/Colors.module.scss";
+@use "@/styles/Spacings.module.scss";
+
+.message_row_container {
+  display: flex;
+  flex-direction: column;
+  border-radius: 12px;
+  width: fit-content;
+  padding-block: Spacings.$spacing03;
+  padding-inline: Spacings.$spacing05;
+  margin-inline: Spacings.$spacing01;
+
+  &.user {
+    align-self: flex-end;
+    background-color: Colors.$highlight;
+    box-shadow: 1px 1px rgba(0, 0, 0, 0.25);
+  }
+
+  &.brain {
+    align-self: flex-start;
+    background-color: Colors.$black;
+    margin-left: 1px;
+  }
+}

@@ -1,5 +1,6 @@
 import React from "react";
 
+import styles from "./MessageRow.module.scss";
 import { CopyButton } from "./components/CopyButton";
 import { MessageContent } from "./components/MessageContent";
 import { QuestionBrain } from "./components/QuestionBrain";
@@ -22,45 +23,41 @@ export const MessageRow = React.forwardRef(
     { speaker, text, brainName, promptName, children }: MessageRowProps,
     ref: React.Ref<HTMLDivElement>
   ) => {
-    const {
-      containerClasses,
-      containerWrapperClasses,
-      handleCopy,
-      isCopied,
-      isUserSpeaker,
-      markdownClasses,
-    } = useMessageRow({
-      speaker,
-      text,
-    });
+    const { handleCopy, isCopied, isUserSpeaker, markdownClasses } =
+      useMessageRow({
+        speaker,
+        text,
+      });
 
     const messageContent = text ?? "";
 
     return (
-      <div className={containerWrapperClasses}>
-        <div ref={ref} className={containerClasses}>
+      <div
+        ref={ref}
+        className={`
+      ${styles.message_row_container ?? ""} 
+      ${isUserSpeaker ? styles.user ?? "" : styles.brain ?? ""}
+      `}
+      >
+        {!isUserSpeaker && (
           <div className="flex justify-between items-start w-full">
-            {/* Left section for the question and prompt */}
             <div className="flex gap-1">
               <QuestionBrain brainName={brainName} />
               <QuestionPrompt promptName={promptName} />
             </div>
-            {/* Right section for buttons */}
             <div className="flex items-center gap-2">
-              {!isUserSpeaker && (
-                <>
-                  <CopyButton handleCopy={handleCopy} isCopied={isCopied} />
-                </>
-              )}
+              <>
+                <CopyButton handleCopy={handleCopy} isCopied={isCopied} />
+              </>
             </div>
           </div>
-          {children ?? (
-            <MessageContent
-              text={messageContent}
-              markdownClasses={markdownClasses}
-            />
-          )}
-        </div>
+        )}
+        {children ?? (
+          <MessageContent
+            text={messageContent}
+            markdownClasses={markdownClasses}
+          />
+        )}
       </div>
     );
   }
