@@ -25,7 +25,6 @@ export const SearchModal = (): JSX.Element => {
   };
 
   const clickHandler = (event: MouseEvent) => {
-    console.info("heyyyyy");
     if (
       !(searchBarRef.current as HTMLElement | null)?.contains(
         event.target as Node
