@@ -44,11 +44,11 @@ export const SearchModal = (): JSX.Element => {
 
   useEffect(() => {
     document.addEventListener("keydown", keydownHandler);
-    window.addEventListener("click", mousedownHandler);
+    window.addEventListener("mousedown", mousedownHandler);
 
     return () => {
       document.removeEventListener("keydown", keydownHandler);
-      window.removeEventListener("click", mousedownHandler);
+      window.removeEventListener("mousedown", mousedownHandler);
     };
   }, []);
 

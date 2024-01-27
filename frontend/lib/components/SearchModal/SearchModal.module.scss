@@ -5,12 +5,11 @@
 
 .search_modal_wrapper {
   display: flex;
-  background-color: Colors.$dark-black;
+  background-color: rgba(Colors.$dark-black, 0.94);
   height: 100%;
   width: 100%;
   position: absolute;
   z-index: ZIndexes.$modal;
-  opacity: 0.94;
   align-items: center;
   justify-content: center;
 
