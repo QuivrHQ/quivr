@@ -143,6 +143,6 @@ class BrainfulChat(ChatInterface):
                 prompt_id=prompt_id,
                 user_id=user_id,
                 metadata=metadata,
-                raw=brain_definition.raw,
-                jq_instructions=brain_definition.jq_instructions,
+                raw=(brain_definition.raw if brain_definition else None),
+                jq_instructions=(brain_definition.jq_instructions if brain_definition else None),
             )
