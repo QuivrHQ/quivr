@@ -27,7 +27,6 @@ export const MentionList = forwardRef<MentionListRef, MentionListProps>(
     const handleClick = (event: React.MouseEvent<HTMLDivElement>) => {
       event.preventDefault();
       event.stopPropagation();
-      console.info(event.target);
     };
 
     return (
