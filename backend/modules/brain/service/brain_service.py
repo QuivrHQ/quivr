@@ -26,6 +26,10 @@ from modules.brain.service.api_brain_definition_service import ApiBrainDefinitio
 from modules.brain.service.utils.validate_brain import validate_api_brain
 from modules.knowledge.service.knowledge_service import KnowledgeService
 
+from logger import get_logger
+
+logger = get_logger(__name__)
+
 knowledge_service = KnowledgeService()
 # TODO: directly user api_brain_definition repository
 api_brain_definition_service = ApiBrainDefinitionService()
@@ -97,7 +101,15 @@ class BrainService:
         # Calculate the closest brains to the question
         list_brains = vector_store.find_brain_closest_query(user.id, question)
 
-        metadata["close_brains"] = list_brains[:5]
+        unique_list_brains = []
+        seen_brain_ids = set()
+
+        for brain in list_brains:
+            if brain["id"] not in seen_brain_ids:
+                unique_list_brains.append(brain)
+                seen_brain_ids.add(brain["id"])
+
+        metadata["close_brains"] = unique_list_brains[:5]
 
         if list_brains and not brain_id_to_use:
             brain_id_to_use = list_brains[0]["id"]
