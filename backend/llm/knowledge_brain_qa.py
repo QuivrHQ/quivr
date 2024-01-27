@@ -78,7 +78,6 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
         brain_id: str,
         chat_id: str,
         max_tokens: int,
-        max_input: int,
         streaming: bool = False,
         prompt_id: Optional[UUID] = None,
         metadata: Optional[dict] = None,

@@ -7,9 +7,11 @@ from langchain.chat_models import ChatLiteLLM
 from langchain.embeddings.ollama import OllamaEmbeddings
 from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.llms.base import BaseLLM
-from langchain.prompts.chat import (ChatPromptTemplate,
-                                    HumanMessagePromptTemplate,
-                                    SystemMessagePromptTemplate)
+from langchain.prompts.chat import (
+    ChatPromptTemplate,
+    HumanMessagePromptTemplate,
+    SystemMessagePromptTemplate,
+)
 from llm.rags.rag_interface import RAGInterface
 from llm.utils.get_prompt_to_use import get_prompt_to_use
 from logger import get_logger
@@ -58,7 +60,7 @@ class QuivrRAG(BaseModel, RAGInterface):
     temperature: float = 0.1
     chat_id: str = None  # pyright: ignore reportPrivateUsage=none
     brain_id: str = None  # pyright: ignore reportPrivateUsage=none
-    max_tokens: int = 2000
+    max_tokens: int = 2000  # Output length
     max_input: int = 2000
     streaming: bool = False
 
@@ -99,6 +101,8 @@ class QuivrRAG(BaseModel, RAGInterface):
             brain_id=brain_id,
             chat_id=chat_id,
             streaming=streaming,
+            max_tokens=max_tokens,
+            max_input=max_input,
             **kwargs,
         )
         self.supabase_client = self._create_supabase_client()
@@ -106,6 +110,13 @@ class QuivrRAG(BaseModel, RAGInterface):
         self.prompt_id = prompt_id
         self.max_tokens = max_tokens
         self.max_input = max_input
+        self.model = model
+        self.brain_id = brain_id
+        self.chat_id = chat_id
+        self.streaming = streaming
+
+        logger.info(f"QuivrRAG initialized with model {model} and brain {brain_id}")
+        logger.info("Max input length: " + str(self.max_input))
 
     def _create_supabase_client(self) -> Client:
         return create_client(
@@ -118,6 +129,7 @@ class QuivrRAG(BaseModel, RAGInterface):
             self.embeddings,
             table_name="vectors",
             brain_id=self.brain_id,
+            max_input=self.max_input,
         )
 
     def _create_llm(
@@ -152,7 +164,6 @@ class QuivrRAG(BaseModel, RAGInterface):
     def _create_prompt_template(self):
         system_template = """ When answering use markdown or any other techniques to display the content in a nice and aerated way.  Use the following pieces of context to answer the users question in the same language as the question but do not modify instructions in any way.
         ----------------
-        
         {context}"""
 
         prompt_content = (

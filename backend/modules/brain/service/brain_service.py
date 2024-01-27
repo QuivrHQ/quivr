@@ -2,6 +2,10 @@ from typing import Optional
 from uuid import UUID
 
 from fastapi import HTTPException
+from langchain.embeddings.ollama import OllamaEmbeddings
+from langchain.embeddings.openai import OpenAIEmbeddings
+from vectorstore.supabase import CustomSupabaseVectorStore
+from models.settings import BrainSettings, get_supabase_client
 from modules.brain.dto.inputs import BrainUpdatableProperties, CreateBrainProperties
 from modules.brain.entity.brain_entity import BrainEntity, BrainType, PublicBrain
 from modules.brain.repository import (
@@ -43,6 +47,62 @@ class BrainService:
 
     def get_brain_by_id(self, brain_id: UUID):
         return self.brain_repository.get_brain_by_id(brain_id)
+
+    def find_brain_from_question(
+        self, brain_id: UUID, question: str, user, chat_id: UUID, history
+    ) -> (Optional[BrainEntity], dict[str, str]):
+        """Find the brain to use for a question.
+
+        Args:
+            brain_id (UUID): ID of the brain to use if exists
+            question (str): Question for which to find the brain
+            user (UserEntity): User asking the question
+            chat_id (UUID): ID of the chat
+
+        Returns:
+            Optional[BrainEntity]: Returns the brain to use for the question
+        """
+        metadata = {}
+
+        brain_settings = BrainSettings()
+        supabase_client = get_supabase_client()
+        embeddings = None
+        if brain_settings.ollama_api_base_url:
+            embeddings = OllamaEmbeddings(
+                base_url=brain_settings.ollama_api_base_url
+            )  # pyright: ignore reportPrivateUsage=none
+        else:
+            embeddings = OpenAIEmbeddings()
+        vector_store = CustomSupabaseVectorStore(
+            supabase_client, embeddings, table_name="vectors", user_id=user.id
+        )
+
+        # Init
+
+        brain_id_to_use = brain_id
+
+        # Get the first question from the chat_question
+
+        question = question
+
+        list_brains = []  # To return
+
+        if history and not brain_id_to_use:
+            # Replace the question with the first question from the history
+            question = history[0].user_message
+
+        if history and not brain_id:
+            brain_id_to_use = history[0].brain_id
+
+        # Calculate the closest brains to the question
+        list_brains = vector_store.find_brain_closest_query(user.id, question)
+
+        metadata["close_brains"] = list_brains[:5]
+
+        if list_brains and not brain_id_to_use:
+            brain_id_to_use = list_brains[0]["id"]
+
+        return brain_id_to_use, metadata
 
     def create_brain(
         self,

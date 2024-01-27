@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from datetime import datetime
 from uuid import UUID
 
-from .entity import Models
+from .entity import LLMModels
 
 
 class Repository(ABC):
@@ -15,7 +15,7 @@ class Repository(ABC):
         pass
 
     @abstractmethod
-    def get_model_settings(self) -> Models | None:
+    def get_model_settings(self) -> LLMModels | None:
         pass
 
     @abstractmethod

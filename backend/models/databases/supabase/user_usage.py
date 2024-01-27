@@ -1,8 +1,9 @@
+from ast import List
 from datetime import datetime, timedelta
 from uuid import UUID
 
 from logger import get_logger
-from models.databases.entity import Models
+from models.databases.entity import LLMModels
 from models.databases.repository import Repository
 
 logger = get_logger(__name__)
@@ -206,7 +207,7 @@ class UserUsage(Repository):
 
         return user_settings
 
-    def get_model_settings(self) -> Models:
+    def get_model_settings(self):
         """
         Fetch the user settings from the database
         """
