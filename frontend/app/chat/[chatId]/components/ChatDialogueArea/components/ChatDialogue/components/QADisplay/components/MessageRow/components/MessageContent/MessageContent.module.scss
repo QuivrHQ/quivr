@@ -1,0 +1,25 @@
+@use "@/styles/Spacings.module.scss";
+
+.markdown {
+  p {
+    margin: 0;
+    padding: 0;
+  }
+
+  ul {
+    list-style-type: disc;
+    margin-top: 0;
+    padding: 0;
+    margin-left: Spacings.$spacing05;
+  }
+
+  ol {
+    list-style-type: decimal;
+    padding-left: Spacings.$spacing05;
+    list-style-position: outside;
+
+    li {
+      white-space-collapse: collapse;
+    }
+  }
+}

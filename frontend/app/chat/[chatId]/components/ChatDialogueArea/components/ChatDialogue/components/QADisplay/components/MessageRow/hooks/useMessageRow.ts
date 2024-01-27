@@ -1,7 +1,5 @@
 import { useState } from "react";
 
-import { cn } from "@/lib/utils";
-
 type UseMessageRowProps = {
   speaker: "user" | "assistant";
   text?: string;
@@ -23,12 +21,9 @@ export const useMessageRow = ({ speaker, text }: UseMessageRowProps) => {
     setTimeout(() => setIsCopied(false), 2000); // Reset after 2 seconds
   };
 
-  const markdownClasses = cn("prose", "dark:prose-invert");
-
   return {
     isUserSpeaker,
     isCopied,
     handleCopy,
-    markdownClasses,
   };
 };

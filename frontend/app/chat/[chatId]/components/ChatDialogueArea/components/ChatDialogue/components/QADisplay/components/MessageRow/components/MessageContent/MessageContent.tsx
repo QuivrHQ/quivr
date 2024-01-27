@@ -1,14 +1,14 @@
 import { useEffect, useState } from "react";
 import ReactMarkdown from "react-markdown";
 
+import styles from "./MessageContent.module.scss";
+
 export const MessageContent = ({
   text,
   isUser,
-  markdownClasses,
 }: {
   text: string;
   isUser: boolean;
-  markdownClasses: string;
 }): JSX.Element => {
   const [showLog] = useState(true);
   const [isLog, setIsLog] = useState(true);
@@ -41,6 +41,8 @@ export const MessageContent = ({
 
   const { logs, cleanedText } = extractLog(text);
 
+  console.info(cleanedText);
+
   return (
     <div data-testid="chat-message-text">
       {isLog && showLog && logs.length > 0 && (
@@ -49,7 +51,9 @@ export const MessageContent = ({
         </div>
       )}
       <ReactMarkdown
-        className={`${isUser ? "text-black" : "text-ivory"} ${markdownClasses}`}
+        className={`${styles.markdown ?? ""} ${
+          isUser ? "text-black" : "text-white"
+        } `}
       >
         {cleanedText}
       </ReactMarkdown>

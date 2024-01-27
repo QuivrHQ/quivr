@@ -2,7 +2,7 @@ import React from "react";
 
 import styles from "./MessageRow.module.scss";
 import { CopyButton } from "./components/CopyButton";
-import { MessageContent } from "./components/MessageContent";
+import { MessageContent } from "./components/MessageContent/MessageContent";
 import { QuestionBrain } from "./components/QuestionBrain";
 import { QuestionPrompt } from "./components/QuestionPrompt";
 import { useMessageRow } from "./hooks/useMessageRow";
@@ -23,11 +23,10 @@ export const MessageRow = React.forwardRef(
     { speaker, text, brainName, promptName, children }: MessageRowProps,
     ref: React.Ref<HTMLDivElement>
   ) => {
-    const { handleCopy, isCopied, isUserSpeaker, markdownClasses } =
-      useMessageRow({
-        speaker,
-        text,
-      });
+    const { handleCopy, isCopied, isUserSpeaker } = useMessageRow({
+      speaker,
+      text,
+    });
 
     const messageContent = text ?? "";
 
@@ -53,11 +52,7 @@ export const MessageRow = React.forwardRef(
           </div>
         )}
         {children ?? (
-          <MessageContent
-            text={messageContent}
-            isUser={isUserSpeaker}
-            markdownClasses={markdownClasses}
-          />
+          <MessageContent text={messageContent} isUser={isUserSpeaker} />
         )}
       </div>
     );
