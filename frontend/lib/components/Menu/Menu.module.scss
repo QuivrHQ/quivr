@@ -1,16 +1,16 @@
-@use '@/styles/Colors.module.scss';
-@use '@/styles/Spacings.module.scss';
-@use '@/styles/ZIndex.module.scss';
+@use "@/styles/Colors.module.scss";
+@use "@/styles/Spacings.module.scss";
+@use "@/styles/ZIndexes.module.scss";
 
 .menu_control_button_wrapper {
-    background-color: transparent;
-    position: absolute;
-    top: Spacings.$spacing05;
-    left: Spacings.$spacing05;
-    transition: margin-left 0.2s ease-in-out;
-    z-index: ZIndex.$overlay;
+  background-color: transparent;
+  position: absolute;
+  top: Spacings.$spacing05;
+  left: Spacings.$spacing05;
+  transition: margin-left 0.2s ease-in-out;
+  z-index: ZIndexes.$overlay;
 
-    &.shifted {
-        margin-left: 260px;
-    }
+  &.shifted {
+    margin-left: 260px;
+  }
 }

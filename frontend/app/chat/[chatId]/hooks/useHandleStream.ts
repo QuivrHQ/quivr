@@ -12,11 +12,23 @@ export const useHandleStream = () => {
   ): Promise<void> => {
     const decoder = new TextDecoder("utf-8");
     let isFirstChunk = true;
+    let incompleteData = "";
 
     const handleStreamRecursively = async () => {
       const { done, value } = await reader.read();
 
       if (done) {
+        if (incompleteData !== "") {
+          // Try to parse any remaining incomplete data
+
+          try {
+            const parsedData = JSON.parse(incompleteData) as ChatMessage;
+            updateStreamingHistory(parsedData);
+          } catch (e) {
+            console.error("Error parsing incomplete data", e);
+          }
+        }
+
         return;
       }
 
@@ -25,15 +37,25 @@ export const useHandleStream = () => {
         onFirstChunk();
       }
 
-      const dataStrings = decoder
-        .decode(value)
-        .trim()
-        .split("data: ")
-        .filter(Boolean);
+      // Concatenate incomplete data with new chunk
+      const rawData = incompleteData + decoder.decode(value, { stream: true });
 
-      dataStrings.forEach((data) => {
-        const parsedData = JSON.parse(data) as ChatMessage;
-        updateStreamingHistory(parsedData);
+      const dataStrings = rawData.trim().split("data: ").filter(Boolean);
+
+      dataStrings.forEach((data, index, array) => {
+        if (index === array.length - 1 && !data.endsWith("\n")) {
+          // Last item and does not end with a newline, save as incomplete
+          incompleteData = data;
+
+          return;
+        }
+
+        try {
+          const parsedData = JSON.parse(data) as ChatMessage;
+          updateStreamingHistory(parsedData);
+        } catch (e) {
+          console.error("Error parsing data string", e);
+        }
       });
 
       await handleStreamRecursively();

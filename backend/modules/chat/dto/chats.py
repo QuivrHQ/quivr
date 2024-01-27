@@ -28,6 +28,18 @@ class ChatQuestion(BaseModel):
     prompt_id: Optional[UUID]
 
 
+class Sources(BaseModel):
+    name: str
+    source_url: str
+    type: str
+
+    class Config:
+        json_encoders = {
+            **BaseModel.Config.json_encoders,
+            UUID: lambda v: str(v),
+        }
+
+
 class ChatItemType(Enum):
     MESSAGE = "MESSAGE"
     NOTIFICATION = "NOTIFICATION"

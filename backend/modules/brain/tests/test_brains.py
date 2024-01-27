@@ -33,7 +33,7 @@ def test_create_brain(client, api_key):
         "status": "public",
         "model": "gpt-3.5-turbo-1106",
         "temperature": 0,
-        "max_tokens": 256,
+        "max_tokens": 2000,
         "brain_type": "doc",
     }
 

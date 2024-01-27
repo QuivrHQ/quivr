@@ -18,6 +18,7 @@ export type ChatMessage = {
   message_time: string;
   prompt_title?: string;
   brain_name?: string;
+  brain_id?: UUID;
   metadata?: {
     sources?: [string];
     close_brains?: CloseBrain[];

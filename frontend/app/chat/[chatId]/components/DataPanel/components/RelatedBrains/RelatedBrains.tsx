@@ -33,7 +33,7 @@ const RelatedBrains = ({ closeBrains }: RelatedBrainsProps): JSX.Element => {
         const g = Math.round(lerp(211, 43, t));
         const b = Math.round(lerp(211, 226, t));
         const isCurrentBrain =
-          brain.name === messages[messages.length - 1].brain_name;
+          brain.id === messages[messages.length - 1]?.brain_id;
 
         return {
           color: `rgb(${r}, ${g}, ${b})`,
@@ -42,7 +42,7 @@ const RelatedBrains = ({ closeBrains }: RelatedBrainsProps): JSX.Element => {
       });
       setCloseBrainProps(newProps);
     }
-  }, [closeBrains, messages]);
+  }, [closeBrains, messages.length]);
 
   if (!closeBrains) {
     return <></>;

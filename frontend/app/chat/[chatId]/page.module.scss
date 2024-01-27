@@ -5,7 +5,8 @@
   display: flex;
   flex: 1 1 0%;
   background-color: Colors.$white;
-  padding: Spacings.$spacing06;
+  padding-block: Spacings.$spacing06;
+  padding-inline: Spacings.$spacing09;
   display: flex;
   gap: Spacings.$spacing09;
 

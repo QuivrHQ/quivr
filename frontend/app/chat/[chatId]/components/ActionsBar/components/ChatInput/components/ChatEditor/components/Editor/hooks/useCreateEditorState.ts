@@ -19,6 +19,7 @@ export const useCreateEditorState = (placeholder?: string) => {
     addKeyboardShortcuts: () => {
       return {
         Enter: () => true,
+        Escape: () => true,
       };
     },
   });

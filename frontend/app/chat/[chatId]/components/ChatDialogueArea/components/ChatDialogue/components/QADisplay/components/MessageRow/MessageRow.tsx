@@ -4,7 +4,6 @@ import { CopyButton } from "./components/CopyButton";
 import { MessageContent } from "./components/MessageContent";
 import { QuestionBrain } from "./components/QuestionBrain";
 import { QuestionPrompt } from "./components/QuestionPrompt";
-import { SourcesButton } from "./components/SourcesButton";
 import { useMessageRow } from "./hooks/useMessageRow";
 
 type MessageRowProps = {
@@ -20,14 +19,7 @@ type MessageRowProps = {
 
 export const MessageRow = React.forwardRef(
   (
-    {
-      speaker,
-      text,
-      brainName,
-      promptName,
-      children,
-      metadata,
-    }: MessageRowProps,
+    { speaker, text, brainName, promptName, children }: MessageRowProps,
     ref: React.Ref<HTMLDivElement>
   ) => {
     const {
@@ -43,9 +35,6 @@ export const MessageRow = React.forwardRef(
     });
 
     const messageContent = text ?? "";
-    const sourcesContent = metadata?.sources ?? [];
-
-    const hasSources = Boolean(sourcesContent);
 
     return (
       <div className={containerWrapperClasses}>
@@ -60,7 +49,6 @@ export const MessageRow = React.forwardRef(
             <div className="flex items-center gap-2">
               {!isUserSpeaker && (
                 <>
-                  {hasSources && <SourcesButton sources={sourcesContent} />}
                   <CopyButton handleCopy={handleCopy} isCopied={isCopied} />
                 </>
               )}
