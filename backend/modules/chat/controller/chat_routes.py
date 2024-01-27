@@ -1,10 +1,10 @@
 from typing import List, Optional
 from uuid import UUID
-from venv import logger
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from fastapi.responses import StreamingResponse
 from middlewares.auth import AuthBearer, get_current_user
+from models.databases.entity import LLMModels
 from models.user_usage import UserUsage
 from modules.brain.service.brain_service import BrainService
 from modules.chat.controller.chat.brainful_chat import BrainfulChat
@@ -20,6 +20,10 @@ from modules.chat.entity.chat import Chat
 from modules.chat.service.chat_service import ChatService
 from modules.notification.service.notification_service import NotificationService
 from modules.user.entity.user_identity import UserIdentity
+
+from logger import get_logger
+
+logger = get_logger(__name__)
 
 chat_router = APIRouter()
 
@@ -163,11 +167,12 @@ async def create_question_handler(
             model=chat_question.model if is_model_ok else "gpt-3.5-turbo-1106",  # type: ignore
             max_tokens=chat_question.max_tokens,
             temperature=chat_question.temperature,
-            brain_id=str(brain_id),
             streaming=False,
             prompt_id=chat_question.prompt_id,
             user_id=current_user.id,
-            chat_question=chat_question,
+            max_input=2000,
+            brain=brain_service.get_brain_by_id(brain_id),
+            metadata={},
         )
 
         chat_answer = gpt_answer_generator.generate_answer(
@@ -201,49 +206,81 @@ async def create_stream_question_handler(
     chat_instance = BrainfulChat()
     chat_instance.validate_authorization(user_id=current_user.id, brain_id=brain_id)
 
-    user_daily_usage = UserUsage(
+    user_usage = UserUsage(
         id=current_user.id,
         email=current_user.email,
     )
 
-    user_settings = user_daily_usage.get_user_settings()
+    # Get History
+    history = chat_service.get_chat_history(chat_id)
 
-    # Retrieve chat model (temperature, max_tokens, model)
-    if (
-        not chat_question.model
-        or chat_question.temperature is None
-        or not chat_question.max_tokens
-    ):
-        fallback_model = "gpt-3.5-turbo-1106"
-        fallback_temperature = 0
-        fallback_max_tokens = 256
-        if brain_id:
-            brain = brain_service.get_brain_by_id(brain_id)
-            if brain:
-                fallback_model = brain.model or fallback_model
-                fallback_temperature = brain.temperature or fallback_temperature
-                fallback_max_tokens = brain.max_tokens or fallback_max_tokens
+    # Get user settings
+    user_settings = user_usage.get_user_settings()
 
-        chat_question.model = chat_question.model or fallback_model
-        chat_question.temperature = chat_question.temperature or fallback_temperature
-        chat_question.max_tokens = chat_question.max_tokens or fallback_max_tokens
+    # Get Model settings for the user
+    models_settings = user_usage.get_model_settings()
 
+    # Generic
+    brain_id_to_use, metadata_brain = brain_service.find_brain_from_question(
+        brain_id, chat_question.question, current_user, chat_id, history
+    )
+
+    # Add metadata_brain to metadata
+    metadata = {}
+    metadata = {**metadata, **metadata_brain}
+    follow_up_questions = chat_service.get_follow_up_question(chat_id)
+    metadata["follow_up_questions"] = follow_up_questions
+
+    # Get the Brain settings
+    brain = brain_service.get_brain_by_id(brain_id_to_use)
+
+    logger.info(f"Brain model: {brain.model}")
+    logger.info(f"Brain is : {str(brain)}")
     try:
-        logger.info(f"Streaming request for {chat_question.model}")
-        check_user_requests_limit(current_user, chat_question.model)
-        # TODO check if model is in the list of models available for the user
+        # Default model is gpt-3.5-turbo-1106
+        model_to_use = LLMModels(
+            name="gpt-3.5-turbo-1106", price=1, max_input=512, max_output=512
+        )
 
-        is_model_ok = chat_question.model in user_settings.get("models", ["gpt-3.5-turbo-1106"])  # type: ignore
+        is_brain_model_available = any(
+            brain.model == model_dict.get("name") for model_dict in models_settings
+        )
+
+        is_user_allowed_model = brain.model in user_settings.get(
+            "models", ["gpt-3.5-turbo-1106"]
+        )  # Checks if the model is available in the list of models
+
+        logger.info(f"Brain model: {brain.model}")
+        logger.info(f"User models: {user_settings.get('models', [])}")
+        logger.info(f"Model available: {is_brain_model_available}")
+        logger.info(f"User allowed model: {is_user_allowed_model}")
+
+        if is_brain_model_available and is_user_allowed_model:
+            # Use the model from the brain
+            model_to_use.name = brain.model
+            for model_dict in models_settings:
+                if model_dict.get("name") == model_to_use.name:
+                    logger.info(f"Using model {model_to_use.name}")
+                    model_to_use.max_input = model_dict.get("max_input")
+                    model_to_use.max_output = model_dict.get("max_output")
+                    break
+
+        metadata["model"] = model_to_use.name
+        metadata["max_tokens"] = model_to_use.max_output
+        metadata["max_input"] = model_to_use.max_input
+
+        check_user_requests_limit(current_user, chat_question.model)
         gpt_answer_generator = chat_instance.get_answer_generator(
             chat_id=str(chat_id),
-            model=chat_question.model if is_model_ok else "gpt-3.5-turbo-1106",  # type: ignore
-            max_tokens=chat_question.max_tokens,
-            temperature=chat_question.temperature,  # type: ignore
+            model=model_to_use.name,
+            max_tokens=model_to_use.max_output,
+            max_input=model_to_use.max_input,
+            temperature=0.1,
             streaming=True,
             prompt_id=chat_question.prompt_id,
-            brain_id=brain_id,
             user_id=current_user.id,
-            chat_question=chat_question,
+            metadata=metadata,
+            brain=brain,
         )
 
         return StreamingResponse(

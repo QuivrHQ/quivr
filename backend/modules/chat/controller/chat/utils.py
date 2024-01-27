@@ -25,6 +25,17 @@ class NullableUUID(UUID):
 
 
 def check_user_requests_limit(user: UserIdentity, model: str):
+    """Checks the user requests limit.
+    It checks the user requests limit and raises an exception if the user has reached the limit.
+    By default, the user has a limit of 100 requests per month. The limit can be increased by upgrading the plan.
+
+    Args:
+        user (UserIdentity): User object
+        model (str): Model name for which the user is making the request
+
+    Raises:
+        HTTPException: Raises a 429 error if the user has reached the limit.
+    """
     userDailyUsage = UserUsage(id=user.id, email=user.email)
 
     userSettings = userDailyUsage.get_user_settings()
