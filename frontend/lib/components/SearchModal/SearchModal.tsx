@@ -10,10 +10,6 @@ export const SearchModal = (): JSX.Element => {
   const { isVisible, setIsVisible } = useSearchModalContext();
   const searchBarRef = useRef(null);
 
-  useEffect(() => {
-    console.log(`isVisible has changed to: ${isVisible}`);
-  }, [isVisible]);
-
   const keydownHandler = ({
     key,
     metaKey,
