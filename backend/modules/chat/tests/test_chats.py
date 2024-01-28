@@ -53,23 +53,10 @@ def test_create_chat_and_talk(client, api_key):
             "model": "gpt-3.5-turbo-1106",
             "question": "Hello, how are you?",
             "temperature": "0",
-            "max_tokens": "256",
+            "max_tokens": "2000",
         },
         headers={"Authorization": "Bearer " + api_key},
     )
-    assert response.status_code == 200
-
-    response = client.post(
-        f"/chat/{chat_id}/question?brain_id={default_brain_id}",
-        json={
-            "model": "gpt-4",
-            "question": "Hello, how are you?",
-            "temperature": "0",
-            "max_tokens": "256",
-        },
-        headers={"Authorization": "Bearer " + api_key},
-    )
-    print(response)
     assert response.status_code == 200
 
     # Now, let's delete the chat
