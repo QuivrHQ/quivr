@@ -3,8 +3,11 @@ from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from fastapi.responses import StreamingResponse
+from langchain.embeddings.ollama import OllamaEmbeddings
+from langchain.embeddings.openai import OpenAIEmbeddings
 from logger import get_logger
 from middlewares.auth import AuthBearer, get_current_user
+from models.settings import BrainSettings, get_supabase_client
 from models.user_usage import UserUsage
 from modules.brain.service.brain_service import BrainService
 from modules.chat.controller.chat.brainful_chat import BrainfulChat
@@ -23,6 +26,7 @@ from modules.chat.entity.chat import Chat
 from modules.chat.service.chat_service import ChatService
 from modules.notification.service.notification_service import NotificationService
 from modules.user.entity.user_identity import UserIdentity
+from vectorstore.supabase import CustomSupabaseVectorStore
 
 logger = get_logger(__name__)
 
@@ -31,6 +35,26 @@ chat_router = APIRouter()
 notification_service = NotificationService()
 brain_service = BrainService()
 chat_service = ChatService()
+
+
+def init_vector_store(user_id: UUID) -> CustomSupabaseVectorStore:
+    """
+    Initialize the vector store
+    """
+    brain_settings = BrainSettings()
+    supabase_client = get_supabase_client()
+    embeddings = None
+    if brain_settings.ollama_api_base_url:
+        embeddings = OllamaEmbeddings(
+            base_url=brain_settings.ollama_api_base_url
+        )  # pyright: ignore reportPrivateUsage=none
+    else:
+        embeddings = OpenAIEmbeddings()
+    vector_store = CustomSupabaseVectorStore(
+        supabase_client, embeddings, table_name="vectors", user_id=user_id
+    )
+
+    return vector_store
 
 
 def get_answer_generator(
@@ -47,6 +71,8 @@ def get_answer_generator(
         email=current_user.email,
     )
 
+    vector_store = init_vector_store(user_id=current_user.id)
+
     # Get History
     history = chat_service.get_chat_history(chat_id)
 
@@ -58,7 +84,7 @@ def get_answer_generator(
 
     # Generic
     brain, metadata_brain = brain_service.find_brain_from_question(
-        brain_id, chat_question.question, current_user, chat_id, history
+        brain_id, chat_question.question, current_user, chat_id, history, vector_store
     )
 
     model_to_use, metadata = find_model_and_generate_metadata(
@@ -76,6 +102,7 @@ def get_answer_generator(
         models_settings=models_settings,
         model_name=model_to_use.name,
     )
+
     gpt_answer_generator = chat_instance.get_answer_generator(
         chat_id=str(chat_id),
         model=model_to_use.name,
@@ -216,6 +243,13 @@ async def create_stream_question_handler(
     | None = Query(..., description="The ID of the brain"),
     current_user: UserIdentity = Depends(get_current_user),
 ) -> StreamingResponse:
+    chat_instance = BrainfulChat()
+    chat_instance.validate_authorization(user_id=current_user.id, brain_id=brain_id)
+
+    user_usage = UserUsage(
+        id=current_user.id,
+        email=current_user.email,
+    )
     gpt_answer_generator = get_answer_generator(
         chat_id, chat_question, brain_id, current_user
     )

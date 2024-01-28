@@ -2,10 +2,7 @@ from typing import Optional
 from uuid import UUID
 
 from fastapi import HTTPException
-from langchain.embeddings.ollama import OllamaEmbeddings
-from langchain.embeddings.openai import OpenAIEmbeddings
 from logger import get_logger
-from models.settings import BrainSettings, get_supabase_client
 from modules.brain.dto.inputs import BrainUpdatableProperties, CreateBrainProperties
 from modules.brain.entity.brain_entity import BrainEntity, BrainType, PublicBrain
 from modules.brain.repository import (
@@ -52,7 +49,13 @@ class BrainService:
         return self.brain_repository.get_brain_by_id(brain_id)
 
     def find_brain_from_question(
-        self, brain_id: UUID, question: str, user, chat_id: UUID, history
+        self,
+        brain_id: UUID,
+        question: str,
+        user,
+        chat_id: UUID,
+        history,
+        vector_store: CustomSupabaseVectorStore,
     ) -> (Optional[BrainEntity], dict[str, str]):
         """Find the brain to use for a question.
 
@@ -67,19 +70,6 @@ class BrainService:
         """
         metadata = {}
 
-        brain_settings = BrainSettings()
-        supabase_client = get_supabase_client()
-        embeddings = None
-        if brain_settings.ollama_api_base_url:
-            embeddings = OllamaEmbeddings(
-                base_url=brain_settings.ollama_api_base_url
-            )  # pyright: ignore reportPrivateUsage=none
-        else:
-            embeddings = OpenAIEmbeddings()
-        vector_store = CustomSupabaseVectorStore(
-            supabase_client, embeddings, table_name="vectors", user_id=user.id
-        )
-
         # Init
 
         brain_id_to_use = brain_id
@@ -92,11 +82,12 @@ class BrainService:
         list_brains = []  # To return
 
         if history and not brain_id_to_use:
-            # Replace the question with the first question from the history
             question = history[0].user_message
-
-        if history and not brain_id:
             brain_id_to_use = history[0].brain_id
+            brain_to_use = self.get_brain_by_id(brain_id_to_use)
+
+        # If a brain_id is provided, use it
+        if brain_id_to_use and not brain_to_use:
             brain_to_use = self.get_brain_by_id(brain_id_to_use)
 
         # Calculate the closest brains to the question

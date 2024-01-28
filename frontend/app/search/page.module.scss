@@ -34,7 +34,7 @@
       align-items: center;
 
       .quivr_text {
-        @include Typography.H1;
+        @include Typography.Big;
 
         .quivr_text_primary {
           color: Colors.$primary;

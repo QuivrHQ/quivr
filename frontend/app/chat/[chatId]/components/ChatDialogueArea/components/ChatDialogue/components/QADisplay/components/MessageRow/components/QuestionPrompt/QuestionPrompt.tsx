@@ -1,5 +1,9 @@
 import { Fragment } from "react";
 
+import Icon from "@/lib/components/ui/Icon/Icon";
+
+import styles from "./QuestionPompt.module.scss";
+
 type QuestionProptProps = {
   promptName?: string | null;
 };
@@ -11,11 +15,9 @@ export const QuestionPrompt = ({
   }
 
   return (
-    <span
-      data-testid="prompt-tags"
-      className="text-msg-header-gray mb-1 text-xs"
-    >
-      #{promptName}
-    </span>
+    <div data-testid="prompt-tags" className={styles.prompt_name_wrapper}>
+      <Icon name="hastag" color="black" size="normal" />
+      <span>{promptName}</span>
+    </div>
   );
 };

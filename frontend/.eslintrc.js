@@ -170,13 +170,7 @@ module.exports = {
         "@typescript-eslint/no-unnecessary-type-arguments": "error",
         "@typescript-eslint/prefer-string-starts-ends-with": "error",
         "@typescript-eslint/switch-exhaustiveness-check": "error",
-        "@typescript-eslint/restrict-template-expressions": [
-          "error",
-          {
-            allowNumber: true,
-            allowBoolean: true,
-          },
-        ],
+        "@typescript-eslint/restrict-template-expressions": "off",
       },
     },
   ],

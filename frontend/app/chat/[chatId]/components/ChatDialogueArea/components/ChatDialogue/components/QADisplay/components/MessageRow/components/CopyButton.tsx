@@ -1,4 +1,4 @@
-import { FaCheckCircle, FaCopy } from "react-icons/fa";
+import Icon from "@/lib/components/ui/Icon/Icon";
 
 type CopyButtonProps = {
   handleCopy: () => void;
@@ -14,6 +14,11 @@ export const CopyButton = ({
     onClick={handleCopy}
     title={isCopied ? "Copied!" : "Copy to clipboard"}
   >
-    {isCopied ? <FaCheckCircle /> : <FaCopy />}
+    <Icon
+      name={isCopied ? "checkCircle" : "copy"}
+      color={isCopied ? "primary" : "black"}
+      size="normal"
+      handleHover={true}
+    />
   </button>
 );

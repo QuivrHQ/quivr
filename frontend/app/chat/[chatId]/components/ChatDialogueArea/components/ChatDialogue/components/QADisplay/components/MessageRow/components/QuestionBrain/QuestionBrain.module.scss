@@ -1,0 +1,9 @@
+@use "@/styles/Colors.module.scss";
+@use "@/styles/Spacings.module.scss";
+
+.brain_name_wrapper {
+  display: flex;
+  align-items: center;
+  gap: Spacings.$spacing02;
+  color: Colors.$black;
+}
