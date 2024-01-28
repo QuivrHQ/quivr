@@ -288,16 +288,12 @@ class CompositeBrainQA(
                     question=function_args["question"], brain_id=function_name
                 )
 
-                print("querying brain", function_name)
                 # TODO: extract chat_id from generate_answer function of XBrainQA
                 function_response = function_to_call(
                     chat_id=chat_id,
                     question=question,
                     save_answer=False,
                 )
-
-                print("brain_answer", function_response.assistant)
-
                 messages.append(
                     {
                         "tool_call_id": tool_call.id,

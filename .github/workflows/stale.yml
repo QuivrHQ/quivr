@@ -1,12 +1,12 @@
-name: 'Close stale issues and PRs'
+name: "Close stale issues and PRs"
 on:
   schedule:
-    - cron: '0 */4 * * *'
+    - cron: "0 */4 * * *"
 
 permissions:
-    contents: write # only for delete-branch option
-    issues: write
-    pull-requests: write
+  contents: write # only for delete-branch option
+  issues: write
+  pull-requests: write
 
 jobs:
   stale:
@@ -16,7 +16,7 @@ jobs:
         with:
           exempt-assignees: true
           exempt-draft-pr: true
-          days-before-stale: 30
+          days-before-stale: 90
           days-before-close: 5
           operations-per-run: 400
           exempt-milestones: true

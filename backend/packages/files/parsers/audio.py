@@ -9,10 +9,7 @@ from models import File, get_documents_vector_store
 from packages.files.file import compute_sha1_from_content
 
 
-async def process_audio(
-    file: File,
-    user,
-):
+async def process_audio(file: File, user, original_file_name):
     temp_filename = None
     file_sha = ""
     dateshort = time.strftime("%Y%m%d-%H%M%S")

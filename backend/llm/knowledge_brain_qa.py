@@ -11,6 +11,7 @@ from llm.rags.rag_interface import RAGInterface
 from llm.utils.format_chat_history import format_chat_history
 from llm.utils.get_prompt_to_use import get_prompt_to_use
 from llm.utils.get_prompt_to_use_id import get_prompt_to_use_id
+from repository.files.generate_file_signed_url import generate_file_signed_url
 from logger import get_logger
 from models import BrainSettings
 from modules.brain.service.brain_service import BrainService
@@ -61,6 +62,7 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
     chat_id: str = None  # pyright: ignore reportPrivateUsage=none
     brain_id: str  # pyright: ignore reportPrivateUsage=none
     max_tokens: int = 2000
+    max_input: int = 2000
     streaming: bool = False
     knowledge_qa: Optional[RAGInterface]
     metadata: Optional[dict] = None
@@ -76,6 +78,7 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
         model: str,
         brain_id: str,
         chat_id: str,
+        max_tokens: int,
         streaming: bool = False,
         prompt_id: Optional[UUID] = None,
         metadata: Optional[dict] = None,
@@ -97,6 +100,7 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
             **kwargs,
         )
         self.metadata = metadata
+        self.max_tokens = max_tokens
 
     @property
     def prompt_to_use(self):
@@ -309,9 +313,14 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
                                 if "url" in doc.metadata
                                 else doc.metadata["file_name"],
                                 "type": "url" if "url" in doc.metadata else "file",
-                                "source_url": doc.metadata["url"]
-                                if "url" in doc.metadata
+                                "source_url": generate_file_signed_url(
+                                    f"{brain.brain_id}/{doc.metadata['file_name']}"
+                                ).get("signedURL", "")
+                                if "url" not in doc.metadata
                                 else "",
+                                "original_file_name": doc.metadata[
+                                    "original_file_name"
+                                ],
                             }
                         )
                     )
