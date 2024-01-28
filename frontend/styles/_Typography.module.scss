@@ -1,4 +1,19 @@
+@mixin Big {
+  font-weight: 500;
+  font-size: 36px;
+}
+
 @mixin H1 {
-    font-weight: 500;
-    font-size: 36px;
+  font-weight: 600;
+  font-size: 20px;
+}
+
+@mixin H2 {
+  font-weight: 600;
+  font-size: 18px;
+}
+
+@mixin H3 {
+  font-weight: 500;
+  font-size: 16px;
 }

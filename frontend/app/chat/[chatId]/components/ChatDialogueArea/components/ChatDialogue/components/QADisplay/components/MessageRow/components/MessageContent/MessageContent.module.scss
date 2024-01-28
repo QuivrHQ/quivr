@@ -1,5 +1,6 @@
 @use "@/styles/Colors.module.scss";
 @use "@/styles/Spacings.module.scss";
+@use "@/styles/Typography.module.scss";
 
 .markdown {
   p {
@@ -22,6 +23,18 @@
     li {
       white-space-collapse: collapse;
     }
+  }
+
+  h1 {
+    @include Typography.H1;
+  }
+
+  h2 {
+    @include Typography.H2;
+  }
+
+  h3 {
+    @include Typography.H3;
   }
 }
 
