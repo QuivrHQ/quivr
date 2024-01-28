@@ -2,19 +2,7 @@ from typing import Optional
 from uuid import UUID
 
 from fastapi import HTTPException
-<<<<<<< Updated upstream
-from langchain.embeddings.ollama import OllamaEmbeddings
-from langchain.embeddings.openai import OpenAIEmbeddings
 from logger import get_logger
-from models.settings import BrainSettings, get_supabase_client
-||||||| Stash base
-from langchain.embeddings.ollama import OllamaEmbeddings
-from langchain.embeddings.openai import OpenAIEmbeddings
-from logger import get_logger
-from models.settings import BrainSettings, get_supabase_client
-=======
-from logger import get_logger
->>>>>>> Stashed changes
 from modules.brain.dto.inputs import BrainUpdatableProperties, CreateBrainProperties
 from modules.brain.entity.brain_entity import BrainEntity, BrainType, PublicBrain
 from modules.brain.repository import (

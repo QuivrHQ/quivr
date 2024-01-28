@@ -1,3 +1,4 @@
+from typing import List, Optional
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
@@ -15,8 +16,13 @@ from modules.chat.controller.chat.utils import (
     check_user_requests_limit,
     find_model_and_generate_metadata,
 )
-from modules.chat.dto.chats import ChatQuestion
-from modules.chat.dto.inputs import ChatUpdatableProperties, CreateChatProperties
+from modules.chat.dto.chats import ChatItem, ChatQuestion
+from modules.chat.dto.inputs import (
+    ChatUpdatableProperties,
+    CreateChatProperties,
+    QuestionAndAnswer,
+)
+from modules.chat.entity.chat import Chat
 from modules.chat.service.chat_service import ChatService
 from modules.notification.service.notification_service import NotificationService
 from modules.user.entity.user_identity import UserIdentity
