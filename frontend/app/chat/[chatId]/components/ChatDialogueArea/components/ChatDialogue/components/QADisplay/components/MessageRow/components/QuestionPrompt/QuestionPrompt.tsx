@@ -16,7 +16,7 @@ export const QuestionPrompt = ({
 
   return (
     <div data-testid="prompt-tags" className={styles.prompt_name_wrapper}>
-      <Icon name="hastag" color="primary" size="normal" />
+      <Icon name="hastag" color="black" size="normal" />
       <span>{promptName}</span>
     </div>
   );

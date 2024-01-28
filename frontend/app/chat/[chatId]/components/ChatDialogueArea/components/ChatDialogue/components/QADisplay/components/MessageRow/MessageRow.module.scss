@@ -5,8 +5,11 @@
   display: flex;
   flex-direction: column;
   padding-right: Spacings.$spacing05;
+  width: 85%;
+  padding-block: Spacings.$spacing03;
 
   .message_row_content {
+    align-self: flex-end;
     border-radius: 12px;
     width: fit-content;
     padding-block: Spacings.$spacing03;
@@ -53,7 +56,7 @@
 
     .message_row_content {
       align-self: flex-start;
-      background-color: rgba(Colors.$black, 0.85);
+      background-color: rgba(Colors.$black, 0.8);
       margin-left: 1px;
     }
   }
