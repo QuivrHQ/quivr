@@ -5,7 +5,7 @@ from fastapi import HTTPException
 <<<<<<< Updated upstream
 from langchain.embeddings.ollama import OllamaEmbeddings
 from langchain.embeddings.openai import OpenAIEmbeddings
-from vectorstore.supabase import CustomSupabaseVectorStore
+from logger import get_logger
 from models.settings import BrainSettings, get_supabase_client
 ||||||| Stash base
 from langchain.embeddings.ollama import OllamaEmbeddings
@@ -34,8 +34,7 @@ from modules.brain.repository.interfaces import (
 from modules.brain.service.api_brain_definition_service import ApiBrainDefinitionService
 from modules.brain.service.utils.validate_brain import validate_api_brain
 from modules.knowledge.service.knowledge_service import KnowledgeService
-
-from logger import get_logger
+from vectorstore.supabase import CustomSupabaseVectorStore
 
 logger = get_logger(__name__)
 
@@ -86,6 +85,7 @@ class BrainService:
         # Init
 
         brain_id_to_use = brain_id
+        brain_to_use = None
 
         # Get the first question from the chat_question
 
@@ -96,6 +96,7 @@ class BrainService:
         if history and not brain_id_to_use:
             question = history[0].user_message
             brain_id_to_use = history[0].brain_id
+            brain_to_use = self.get_brain_by_id(brain_id_to_use)
 
         # If a brain_id is provided, use it
         if brain_id_to_use and not brain_to_use:
@@ -114,10 +115,11 @@ class BrainService:
 
         metadata["close_brains"] = unique_list_brains[:5]
 
-        if list_brains and not brain_id_to_use:
+        if list_brains and not brain_to_use:
             brain_id_to_use = list_brains[0]["id"]
+            brain_to_use = self.get_brain_by_id(brain_id_to_use)
 
-        return brain_id_to_use, metadata
+        return brain_to_use, metadata
 
     def create_brain(
         self,
