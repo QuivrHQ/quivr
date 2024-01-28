@@ -4,7 +4,7 @@ from uuid import UUID
 from fastapi import HTTPException
 from langchain.embeddings.ollama import OllamaEmbeddings
 from langchain.embeddings.openai import OpenAIEmbeddings
-from vectorstore.supabase import CustomSupabaseVectorStore
+from logger import get_logger
 from models.settings import BrainSettings, get_supabase_client
 from modules.brain.dto.inputs import BrainUpdatableProperties, CreateBrainProperties
 from modules.brain.entity.brain_entity import BrainEntity, BrainType, PublicBrain
@@ -25,8 +25,7 @@ from modules.brain.repository.interfaces import (
 from modules.brain.service.api_brain_definition_service import ApiBrainDefinitionService
 from modules.brain.service.utils.validate_brain import validate_api_brain
 from modules.knowledge.service.knowledge_service import KnowledgeService
-
-from logger import get_logger
+from vectorstore.supabase import CustomSupabaseVectorStore
 
 logger = get_logger(__name__)
 
@@ -84,6 +83,7 @@ class BrainService:
         # Init
 
         brain_id_to_use = brain_id
+        brain_to_use = None
 
         # Get the first question from the chat_question
 
@@ -97,6 +97,7 @@ class BrainService:
 
         if history and not brain_id:
             brain_id_to_use = history[0].brain_id
+            brain_to_use = self.get_brain_by_id(brain_id_to_use)
 
         # Calculate the closest brains to the question
         list_brains = vector_store.find_brain_closest_query(user.id, question)
@@ -111,10 +112,11 @@ class BrainService:
 
         metadata["close_brains"] = unique_list_brains[:5]
 
-        if list_brains and not brain_id_to_use:
+        if list_brains and not brain_to_use:
             brain_id_to_use = list_brains[0]["id"]
+            brain_to_use = self.get_brain_by_id(brain_id_to_use)
 
-        return brain_id_to_use, metadata
+        return brain_to_use, metadata
 
     def create_brain(
         self,
