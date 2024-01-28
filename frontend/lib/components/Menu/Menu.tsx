@@ -10,8 +10,6 @@ import { AnimatedDiv } from "./components/AnimationDiv";
 import { BrainsManagementButton } from "./components/BrainsManagementButton";
 import { DiscussionButton } from "./components/DiscussionButton/DiscussionButton";
 import { MenuHeader } from "./components/MenuHeader";
-import { ProfileButton } from "./components/ProfileButton";
-import { UpgradeToPlus } from "./components/UpgradeToPlus";
 
 export const Menu = (): JSX.Element => {
   const { isOpened } = useMenuContext();
@@ -40,7 +38,7 @@ export const Menu = (): JSX.Element => {
 
   return (
     <MotionConfig transition={{ mass: 1, damping: 10, duration: 0.2 }}>
-      <div className="flex flex-col fixed sm:sticky top-0 left-0 h-full overflow-visible z-[1000] border-r border-black/10 dark:border-white/25 bg-highlight">
+      <div className="flex flex-col fixed sm:sticky top-0 left-0 h-full overflow-visible z-[1000] border-r border-black/10 dark:border-white/25 bg-light-black">
         <AnimatedDiv>
           <div className="flex flex-col flex-1 p-4 gap-4 h-full">
             <MenuHeader />
@@ -50,10 +48,10 @@ export const Menu = (): JSX.Element => {
                 <BrainsManagementButton />
               </div>
             </div>
-            <div>
+            {/* <div>
               <UpgradeToPlus />
               <ProfileButton />
-            </div>
+            </div> */}
           </div>
         </AnimatedDiv>
       </div>

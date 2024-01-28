@@ -1,10 +1,8 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTranslation } from "react-i18next";
-import { LuBrain, LuChevronRight } from "react-icons/lu";
 
 import { MenuButton } from "@/lib/components/Menu/components/MenuButton";
-import { cn } from "@/lib/utils";
 
 export const BrainsManagementButton = (): JSX.Element => {
   const pathname = usePathname() ?? "";
@@ -16,12 +14,9 @@ export const BrainsManagementButton = (): JSX.Element => {
     <Link href={`/brains-management`}>
       <MenuButton
         label={t("brains")}
-        startIcon={<LuBrain />}
-        endIcon={<LuChevronRight size={18} />}
-        className={cn(
-          "w-full hover:bg-secondary py-3 capitalize",
-          isSelected ? "bg-secondary" : ""
-        )}
+        isSelected={isSelected}
+        iconName="brain"
+        type="open"
       />
     </Link>
   );
