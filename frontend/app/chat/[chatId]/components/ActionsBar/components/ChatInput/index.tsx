@@ -44,6 +44,8 @@ export const ChatInput = (): JSX.Element => {
               size="large"
               color="accent"
               disabled={!message}
+              handleHover={true}
+              onClick={handleSubmitQuestion}
             />
           )}
         </form>

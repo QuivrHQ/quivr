@@ -47,5 +47,10 @@
 
 .disabled {
   color: Colors.$black;
+  pointer-events: none;
   opacity: 0.2;
+}
+
+.hovered {
+  cursor: pointer;
 }
