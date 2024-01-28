@@ -11,7 +11,6 @@ from llm.rags.rag_interface import RAGInterface
 from llm.utils.format_chat_history import format_chat_history
 from llm.utils.get_prompt_to_use import get_prompt_to_use
 from llm.utils.get_prompt_to_use_id import get_prompt_to_use_id
-from repository.files.generate_file_signed_url import generate_file_signed_url
 from logger import get_logger
 from models import BrainSettings
 from modules.brain.service.brain_service import BrainService
@@ -20,6 +19,7 @@ from modules.chat.dto.inputs import CreateChatHistory
 from modules.chat.dto.outputs import GetChatHistoryOutput
 from modules.chat.service.chat_service import ChatService
 from pydantic import BaseModel
+from repository.files.generate_file_signed_url import generate_file_signed_url
 
 logger = get_logger(__name__)
 QUIVR_DEFAULT_PROMPT = "Your name is Quivr. You're a helpful assistant.  If you don't know the answer, just say that you don't know, don't try to make up an answer."
@@ -299,29 +299,56 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
         except Exception as e:
             logger.error("Error during streaming tokens: %s", e)
         try:
+            # Python
+
+            # Await the run
             result = await run
 
+            # Initialize an empty list for sources
             sources_list: List[Sources] = []
+
+            # Get source documents from the result, default to an empty list if not found
             source_documents = result.get("source_documents", [])
+
+            # If source documents exist
             if source_documents:
-                serialized_sources_list = []
+                logger.info(f"Source documents found: {source_documents}")
+                # Iterate over each document
                 for doc in source_documents:
+                    # Check if 'url' is in the document metadata
+                    logger.info(f"Metadata: {doc.metadata}")
+                    is_url = (
+                        "original_file_name" in doc.metadata
+                        and doc.metadata["original_file_name"] is not None
+                        and doc.metadata["original_file_name"].startswith("http")
+                    )
+                    logger.info(f"Is URL: {is_url}")
+
+                    # Determine the name based on whether it's a URL or a file
+                    name = (
+                        doc.metadata["original_file_name"]
+                        if is_url
+                        else doc.metadata["file_name"]
+                    )
+
+                    # Determine the type based on whether it's a URL or a file
+                    type_ = "url" if is_url else "file"
+
+                    # Determine the source URL based on whether it's a URL or a file
+                    if is_url:
+                        source_url = doc.metadata["original_file_name"]
+                    else:
+                        source_url = generate_file_signed_url(
+                            f"{brain.brain_id}/{doc.metadata['file_name']}"
+                        ).get("signedURL", "")
+
+                    # Append a new Sources object to the list
                     sources_list.append(
                         Sources(
-                            **{
-                                "name": doc.metadata["url"]
-                                if "url" in doc.metadata
-                                else doc.metadata["file_name"],
-                                "type": "url" if "url" in doc.metadata else "file",
-                                "source_url": generate_file_signed_url(
-                                    f"{brain.brain_id}/{doc.metadata['file_name']}"
-                                ).get("signedURL", "")
-                                if "url" not in doc.metadata
-                                else "",
-                                "original_file_name": doc.metadata[
-                                    "original_file_name"
-                                ],
-                            }
+                            name=name,
+                            type=type_,
+                            source_url=source_url,
+                            original_file_name=name,
                         )
                     )
                 # Create metadata if it doesn't exist
