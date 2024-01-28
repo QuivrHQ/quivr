@@ -1,5 +1,6 @@
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import { FaCheckCircle, FaRegUserCircle } from "react-icons/fa";
+import { FaArrowUpFromBracket } from "react-icons/fa6";
 import { IconType } from "react-icons/lib";
 import {
   LuBrain,
@@ -18,6 +19,7 @@ export const iconList: { [name: string]: IconType } = {
   chevronDown: LuChevronDown,
   chevronRight: LuChevronRight,
   copy: LuCopy,
+  followUp: FaArrowUpFromBracket,
   hastag: RiHashtag,
   loader: AiOutlineLoading3Quarters,
   search: LuSearch,
