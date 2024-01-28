@@ -77,10 +77,10 @@ export const useBrainManagementTabs = () => {
       setCurrentBrainId(null);
       setIsDeleteOrUnsubscribeModalOpened(false);
       void fetchAllBrains();
-      router.push("/brains-management");
     } catch (error) {
       console.error("Error deleting brain: ", error);
     } finally {
+      router.push("/brains-management");
       setIsDeleteOrUnsubscribeRequestPending(false);
     }
   };

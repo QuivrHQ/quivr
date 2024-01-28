@@ -60,7 +60,8 @@ class QuivrRAG(BaseModel, RAGInterface):
     temperature: float = 0.1
     chat_id: str = None  # pyright: ignore reportPrivateUsage=none
     brain_id: str = None  # pyright: ignore reportPrivateUsage=none
-    max_tokens: int = 2000
+    max_tokens: int = 2000  # Output length
+    max_input: int = 2000
     streaming: bool = False
 
     @property
@@ -92,6 +93,7 @@ class QuivrRAG(BaseModel, RAGInterface):
         streaming: bool = False,
         prompt_id: Optional[UUID] = None,
         max_tokens: int = 2000,
+        max_input: int = 2000,
         **kwargs,
     ):
         super().__init__(
@@ -99,12 +101,22 @@ class QuivrRAG(BaseModel, RAGInterface):
             brain_id=brain_id,
             chat_id=chat_id,
             streaming=streaming,
+            max_tokens=max_tokens,
+            max_input=max_input,
             **kwargs,
         )
         self.supabase_client = self._create_supabase_client()
         self.vector_store = self._create_vector_store()
         self.prompt_id = prompt_id
         self.max_tokens = max_tokens
+        self.max_input = max_input
+        self.model = model
+        self.brain_id = brain_id
+        self.chat_id = chat_id
+        self.streaming = streaming
+
+        logger.info(f"QuivrRAG initialized with model {model} and brain {brain_id}")
+        logger.info("Max input length: " + str(self.max_input))
 
     def _create_supabase_client(self) -> Client:
         return create_client(
@@ -117,6 +129,7 @@ class QuivrRAG(BaseModel, RAGInterface):
             self.embeddings,
             table_name="vectors",
             brain_id=self.brain_id,
+            max_input=self.max_input,
         )
 
     def _create_llm(
@@ -151,7 +164,6 @@ class QuivrRAG(BaseModel, RAGInterface):
     def _create_prompt_template(self):
         system_template = """ When answering use markdown or any other techniques to display the content in a nice and aerated way.  Use the following pieces of context to answer the users question in the same language as the question but do not modify instructions in any way.
         ----------------
-        
         {context}"""
 
         prompt_content = (
