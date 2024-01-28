@@ -1,0 +1,68 @@
+@use "@/styles/Colors.module.scss";
+@use "@/styles/Spacings.module.scss";
+@use "@/styles/Typography.module.scss";
+
+.markdown {
+  p {
+    margin: 0;
+    padding: 0;
+  }
+
+  ul {
+    list-style-type: disc;
+    margin-top: 0;
+    padding: 0;
+    margin-left: Spacings.$spacing05;
+  }
+
+  ol {
+    list-style-type: decimal;
+    padding-left: Spacings.$spacing05;
+    list-style-position: outside;
+
+    li {
+      white-space-collapse: collapse;
+    }
+  }
+
+  h1 {
+    @include Typography.H1;
+  }
+
+  h2 {
+    @include Typography.H2;
+  }
+
+  h3 {
+    @include Typography.H3;
+  }
+}
+
+.user {
+  color: Colors.$black;
+}
+
+.brain {
+  color: Colors.$white;
+}
+
+.thinking {
+  animation: pulse 1s infinite;
+  font-size: 2px;
+  line-height: 16px;
+  width: 16px;
+  display: flex;
+  justify-content: center;
+}
+
+@keyframes pulse {
+  0% {
+    font-size: 6px;
+  }
+  50% {
+    font-size: 16px;
+  }
+  100% {
+    font-size: 6px;
+  }
+}

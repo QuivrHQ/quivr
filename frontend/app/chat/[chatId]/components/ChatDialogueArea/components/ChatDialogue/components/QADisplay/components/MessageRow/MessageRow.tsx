@@ -1,9 +1,12 @@
 import React from "react";
 
+import Icon from "@/lib/components/ui/Icon/Icon";
+
+import styles from "./MessageRow.module.scss";
 import { CopyButton } from "./components/CopyButton";
-import { MessageContent } from "./components/MessageContent";
-import { QuestionBrain } from "./components/QuestionBrain";
-import { QuestionPrompt } from "./components/QuestionPrompt";
+import { MessageContent } from "./components/MessageContent/MessageContent";
+import { QuestionBrain } from "./components/QuestionBrain/QuestionBrain";
+import { QuestionPrompt } from "./components/QuestionPrompt/QuestionPrompt";
 import { useMessageRow } from "./hooks/useMessageRow";
 
 type MessageRowProps = {
@@ -22,14 +25,7 @@ export const MessageRow = React.forwardRef(
     { speaker, text, brainName, promptName, children }: MessageRowProps,
     ref: React.Ref<HTMLDivElement>
   ) => {
-    const {
-      containerClasses,
-      containerWrapperClasses,
-      handleCopy,
-      isCopied,
-      isUserSpeaker,
-      markdownClasses,
-    } = useMessageRow({
+    const { handleCopy, isCopied, isUserSpeaker } = useMessageRow({
       speaker,
       text,
     });
@@ -37,28 +33,32 @@ export const MessageRow = React.forwardRef(
     const messageContent = text ?? "";
 
     return (
-      <div className={containerWrapperClasses}>
-        <div ref={ref} className={containerClasses}>
-          <div className="flex justify-between items-start w-full">
-            {/* Left section for the question and prompt */}
-            <div className="flex gap-1">
+      <div
+        className={`
+      ${styles.message_row_container ?? ""} 
+      ${isUserSpeaker ? styles.user ?? "" : styles.brain ?? ""}
+      `}
+      >
+        {!isUserSpeaker ? (
+          <div className={styles.message_header}>
+            <div className={styles.left_wrapper}>
               <QuestionBrain brainName={brainName} />
               <QuestionPrompt promptName={promptName} />
             </div>
-            {/* Right section for buttons */}
-            <div className="flex items-center gap-2">
-              {!isUserSpeaker && (
-                <>
-                  <CopyButton handleCopy={handleCopy} isCopied={isCopied} />
-                </>
-              )}
+            <div className={styles.copy_button}>
+              <CopyButton handleCopy={handleCopy} isCopied={isCopied} />
             </div>
           </div>
+        ) : (
+          <div className={styles.message_header}>
+            <Icon name="user" color="dark-grey" size="normal" />
+            <span className={styles.me}>Me</span>
+          </div>
+        )}
+        {}
+        <div ref={ref} className={styles.message_row_content}>
           {children ?? (
-            <MessageContent
-              text={messageContent}
-              markdownClasses={markdownClasses}
-            />
+            <MessageContent text={messageContent} isUser={isUserSpeaker} />
           )}
         </div>
       </div>

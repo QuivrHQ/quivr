@@ -1,5 +1,9 @@
 import { Fragment } from "react";
 
+import Icon from "@/lib/components/ui/Icon/Icon";
+
+import styles from "./QuestionBrain.module.scss";
+
 type QuestionBrainProps = {
   brainName?: string | null;
 };
@@ -11,11 +15,9 @@ export const QuestionBrain = ({
   }
 
   return (
-    <span
-      data-testid="brain-tags"
-      className="text-msg-header-gray mb-1 text-xs"
-    >
-      @{brainName}
-    </span>
+    <div data-testid="brain-tags" className={styles.brain_name_wrapper}>
+      <Icon name="brain" color="black" size="normal" />
+      <span>{brainName}</span>
+    </div>
   );
 };

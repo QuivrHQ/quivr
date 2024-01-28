@@ -1,7 +1,7 @@
 "use client";
-import { useTranslation } from "react-i18next";
 
-import Button from "@/lib/components/ui/Button";
+import Icon from "@/lib/components/ui/Icon/Icon";
+import { LoaderIcon } from "@/lib/components/ui/LoaderIcon/LoaderIcon";
 
 import { OnboardingQuestions } from "./components";
 import { ChatEditor } from "./components/ChatEditor/ChatEditor";
@@ -11,7 +11,11 @@ export const ChatInput = (): JSX.Element => {
   const { setMessage, submitQuestion, generatingAnswer, message } =
     useChatInput();
 
-  const { t } = useTranslation(["chat"]);
+  const handleSubmitQuestion = () => {
+    if (message.trim() !== "") {
+      submitQuestion();
+    }
+  };
 
   return (
     <>
@@ -21,7 +25,7 @@ export const ChatInput = (): JSX.Element => {
           data-testid="chat-input-form"
           onSubmit={(e) => {
             e.preventDefault();
-            submitQuestion();
+            handleSubmitQuestion();
           }}
           className="sticky bottom-0 bg-white dark:bg-black w-full flex items-center gap-2 z-20 p-2"
         >
@@ -29,22 +33,21 @@ export const ChatInput = (): JSX.Element => {
             <ChatEditor
               message={message}
               setMessage={setMessage}
-              onSubmit={submitQuestion}
+              onSubmit={handleSubmitQuestion}
             />
           </div>
-
-          <div className="flex flex-row items-center gap-4">
-            <Button
-              className="px-3 py-2 sm:px-4 sm:py-2 bg-primary border-0"
-              type="submit"
-              isLoading={generatingAnswer}
-              data-testid="submit-button"
-            >
-              {generatingAnswer
-                ? t("thinking", { ns: "chat" })
-                : t("chat", { ns: "chat" })}
-            </Button>
-          </div>
+          {generatingAnswer ? (
+            <LoaderIcon size="large" color="accent" />
+          ) : (
+            <Icon
+              name="followUp"
+              size="large"
+              color="accent"
+              disabled={!message}
+              handleHover={true}
+              onClick={handleSubmitQuestion}
+            />
+          )}
         </form>
       </div>
     </>

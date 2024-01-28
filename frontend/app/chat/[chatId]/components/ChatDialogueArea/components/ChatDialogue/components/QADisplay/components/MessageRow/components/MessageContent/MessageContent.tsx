@@ -1,12 +1,14 @@
 import { useEffect, useState } from "react";
 import ReactMarkdown from "react-markdown";
 
+import styles from "./MessageContent.module.scss";
+
 export const MessageContent = ({
   text,
-  markdownClasses,
+  isUser,
 }: {
   text: string;
-  markdownClasses: string;
+  isUser: boolean;
 }): JSX.Element => {
   const [showLog] = useState(true);
   const [isLog, setIsLog] = useState(true);
@@ -39,13 +41,19 @@ export const MessageContent = ({
   const { logs, cleanedText } = extractLog(text);
 
   return (
-    <div data-testid="chat-message-text" className="mt-2">
+    <div data-testid="chat-message-text">
       {isLog && showLog && logs.length > 0 && (
-        <div className="text-xs text-gray-600 bg-gray-100 p-2 rounded">
+        <div className="text-xs text-white p-2 rounded">
           <ReactMarkdown>{logs}</ReactMarkdown>
         </div>
       )}
-      <ReactMarkdown className={`text-base ${markdownClasses}`}>
+      <ReactMarkdown
+        className={`
+        ${styles.markdown} 
+        ${isUser ? styles.user : styles.brain}
+        ${cleanedText === "🧠" ? styles.thinking : ""} 
+        `}
+      >
         {cleanedText}
       </ReactMarkdown>
     </div>

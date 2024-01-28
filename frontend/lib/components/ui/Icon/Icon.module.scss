@@ -29,6 +29,10 @@
   }
 }
 
+.dark-grey {
+  color: Colors.$dark-grey;
+}
+
 .primary {
   color: Colors.$primary;
 }
@@ -42,5 +46,11 @@
 }
 
 .disabled {
+  color: Colors.$black;
+  pointer-events: none;
   opacity: 0.2;
+}
+
+.hovered {
+  cursor: pointer;
 }

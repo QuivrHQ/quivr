@@ -23,7 +23,6 @@ export const QADisplay = ({ content }: QADisplayProps): JSX.Element => {
         speaker={"user"}
         text={user_message}
         promptName={prompt_title}
-        brainName={brain_name}
         metadata={metadata} // eslint-disable-line @typescript-eslint/no-unsafe-assignment
       />
       <MessageRow

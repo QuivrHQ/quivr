@@ -1,0 +1,8 @@
+@use "@/styles/Colors.module.scss";
+@use "@/styles/Spacings.module.scss";
+
+.prompt_name_wrapper {
+  display: flex;
+  align-items: center;
+  color: Colors.$black;
+}
