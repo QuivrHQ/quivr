@@ -36,12 +36,9 @@ export const MessageContent = ({
     } else {
       setIsLog(false);
     }
-    console.info(isUser);
   }, [text]);
 
   const { logs, cleanedText } = extractLog(text);
-
-  console.info(cleanedText);
 
   return (
     <div data-testid="chat-message-text">
@@ -51,9 +48,11 @@ export const MessageContent = ({
         </div>
       )}
       <ReactMarkdown
-        className={`${styles.markdown ?? ""} ${
-          isUser ? "text-black" : "text-white"
-        } `}
+        className={`
+        ${styles.markdown} 
+        ${isUser ? styles.user : styles.brain}
+        ${cleanedText === "🧠" ? styles.thinking : ""} 
+        `}
       >
         {cleanedText}
       </ReactMarkdown>

@@ -1,3 +1,4 @@
+@use "@/styles/Colors.module.scss";
 @use "@/styles/Spacings.module.scss";
 
 .markdown {
@@ -21,5 +22,34 @@
     li {
       white-space-collapse: collapse;
     }
+  }
+}
+
+.user {
+  color: Colors.$black;
+}
+
+.brain {
+  color: Colors.$white;
+}
+
+.thinking {
+  animation: pulse 1s infinite;
+  font-size: 2px;
+  line-height: 16px;
+  width: 16px;
+  display: flex;
+  justify-content: center;
+}
+
+@keyframes pulse {
+  0% {
+    font-size: 6px;
+  }
+  50% {
+    font-size: 16px;
+  }
+  100% {
+    font-size: 6px;
   }
 }
