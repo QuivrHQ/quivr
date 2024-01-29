@@ -26,8 +26,8 @@ const DataPanel = (): JSX.Element => {
 
   return (
     <div className={styles.data_panel_wrapper}>
-      <Sources sources={lastMessageMetadata?.sources} />
       <RelatedBrains closeBrains={lastMessageMetadata?.closeBrains} />
+      <Sources sources={lastMessageMetadata?.sources} />
     </div>
   );
 };

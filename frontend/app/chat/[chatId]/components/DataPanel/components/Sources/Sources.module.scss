@@ -1,0 +1,17 @@
+@use "@/styles/Colors.module.scss";
+@use "@/styles/Spacings.module.scss";
+
+.sources_wrapper {
+  display: flex;
+  flex-direction: column;
+  padding-bottom: Spacings.$spacing03;
+  gap: Spacings.$spacing01;
+  overflow: hidden;
+
+  .source {
+    padding-inline: Spacings.$spacing05;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
