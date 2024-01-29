@@ -51,19 +51,19 @@ def generate_source(result, brain):
         # Iterate over each document
         for doc in source_documents:
             # Check if 'url' is in the document metadata
-            logger.info(f"Metadata: {doc['metadata']}")
+            logger.info(f"Metadata 1: {doc.metadata}")
             is_url = (
-                "original_file_name" in doc["metadata"]
-                and doc["metadata"]["original_file_name"] is not None
-                and doc["metadata"]["original_file_name"].startswith("http")
+                "original_file_name" in doc.metadata
+                and doc.metadata["original_file_name"] is not None
+                and doc.metadata["original_file_name"].startswith("http")
             )
             logger.info(f"Is URL: {is_url}")
 
             # Determine the name based on whether it's a URL or a file
             name = (
-                doc["metadata"]["original_file_name"]
+                doc.metadata["original_file_name"]
                 if is_url
-                else doc["metadata"]["file_name"]
+                else doc.metadata["file_name"]
             )
 
             # Determine the type based on whether it's a URL or a file
@@ -71,10 +71,10 @@ def generate_source(result, brain):
 
             # Determine the source URL based on whether it's a URL or a file
             if is_url:
-                source_url = doc["metadata"]["original_file_name"]
+                source_url = doc.metadata["original_file_name"]
             else:
                 source_url = generate_file_signed_url(
-                    f"{brain.brain_id}/{doc['metadata']['file_name']}"
+                    f"{brain.brain_id}/{doc.metadata['file_name']}"
                 ).get("signedURL", "")
 
             # Append a new Sources object to the list
