@@ -28,6 +28,10 @@ class Notifications(NotificationInterface):
         notification_id,
         notification,
     ):
+        if notification_id is None:
+            logger.info("Notification id is required")
+            return None
+
         """Update a notification by id"""
         response = (
             self.db.from_("notifications")
