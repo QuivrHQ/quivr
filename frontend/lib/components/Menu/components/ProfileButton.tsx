@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { LuChevronRight, LuUser } from "react-icons/lu";
 
-import { MenuButton } from "@/lib/components/Menu/components/MenuButton";
+import { MenuButton } from "@/lib/components/Menu/components/MenuButton/MenuButton";
 
 export const ProfileButton = (): JSX.Element => {
   return (

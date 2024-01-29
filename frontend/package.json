@@ -62,6 +62,7 @@
     "@vercel/analytics": "1.0.1",
     "autoprefixer": "10.4.16",
     "axios": "1.4.0",
+    "change-case": "^5.4.2",
     "class-variance-authority": "0.7.0",
     "clsx": "1.2.1",
     "date-fns": "2.30.0",

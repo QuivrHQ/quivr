@@ -2,7 +2,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTranslation } from "react-i18next";
 
-import { MenuButton } from "@/lib/components/Menu/components/MenuButton";
+import { MenuButton } from "@/lib/components/Menu/components/MenuButton/MenuButton";
 
 export const BrainsManagementButton = (): JSX.Element => {
   const pathname = usePathname() ?? "";

@@ -1,0 +1,33 @@
+@use "@/styles/Colors.module.scss";
+@use "@/styles/Spacings.module.scss";
+
+.menu_button_wrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  padding: Spacings.$spacing03;
+  border-radius: 5px;
+  overflow: hidden;
+  border: 1px solid transparent;
+
+  .left {
+    display: flex;
+    align-items: center;
+    gap: Spacings.$spacing03;
+    overflow: hidden;
+
+    .title {
+      font-weight: bold;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      color: Colors.$white;
+    }
+  }
+
+  &:hover,
+  &.selected {
+    border-color: Colors.$accent;
+  }
+}

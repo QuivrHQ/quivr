@@ -10,6 +10,7 @@ import {
   LuPlusCircle,
   LuSearch,
 } from "react-icons/lu";
+import { MdHistory } from "react-icons/md";
 import { RiHashtag } from "react-icons/ri";
 
 export const iconList: { [name: string]: IconType } = {
@@ -21,6 +22,7 @@ export const iconList: { [name: string]: IconType } = {
   copy: LuCopy,
   followUp: FaArrowUpFromBracket,
   hastag: RiHashtag,
+  history: MdHistory,
   loader: AiOutlineLoading3Quarters,
   search: LuSearch,
   user: FaRegUserCircle,
