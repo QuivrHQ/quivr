@@ -2,6 +2,16 @@
 @use "@/styles/Spacings.module.scss";
 @use "@/styles/ZIndexes.module.scss";
 
+.menu_container {
+  background-color: Colors.$black;
+  box-shadow: 10px 10px 15px 10px rgba(0, 0, 0, 0.5);
+
+  .quivr_logo_wrapper {
+    cursor: pointer;
+    margin-inline: auto;
+  }
+}
+
 .menu_control_button_wrapper {
   background-color: transparent;
   position: absolute;
