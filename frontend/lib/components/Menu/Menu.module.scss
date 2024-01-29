@@ -4,6 +4,7 @@
 
 .menu_container {
   background-color: Colors.$light-black;
+  border-right: 1px solid Colors.$dark-black;
 
   .quivr_logo_wrapper {
     cursor: pointer;
