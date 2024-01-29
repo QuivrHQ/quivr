@@ -44,5 +44,7 @@ class NotificationService:
         """
         Update a notification
         """
-
-        return self.repository.update_notification_by_id(notification_id, notification)
+        if notification:
+            return self.repository.update_notification_by_id(
+                notification_id, notification
+            )
