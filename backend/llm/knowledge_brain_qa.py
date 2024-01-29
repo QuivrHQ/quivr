@@ -38,6 +38,59 @@ def is_valid_uuid(uuid_to_test, version=4):
     return str(uuid_obj) == uuid_to_test
 
 
+def generate_source(result, brain):
+    # Initialize an empty list for sources
+    sources_list: List[Sources] = []
+
+    # Get source documents from the result, default to an empty list if not found
+    source_documents = result.get("source_documents", [])
+
+    # If source documents exist
+    if source_documents:
+        logger.info(f"Source documents found: {source_documents}")
+        # Iterate over each document
+        for doc in source_documents:
+            # Check if 'url' is in the document metadata
+            logger.info(f"Metadata: {doc['metadata']}")
+            is_url = (
+                "original_file_name" in doc["metadata"]
+                and doc["metadata"]["original_file_name"] is not None
+                and doc["metadata"]["original_file_name"].startswith("http")
+            )
+            logger.info(f"Is URL: {is_url}")
+
+            # Determine the name based on whether it's a URL or a file
+            name = (
+                doc["metadata"]["original_file_name"]
+                if is_url
+                else doc["metadata"]["file_name"]
+            )
+
+            # Determine the type based on whether it's a URL or a file
+            type_ = "url" if is_url else "file"
+
+            # Determine the source URL based on whether it's a URL or a file
+            if is_url:
+                source_url = doc["metadata"]["original_file_name"]
+            else:
+                source_url = generate_file_signed_url(
+                    f"{brain.brain_id}/{doc['metadata']['file_name']}"
+                ).get("signedURL", "")
+
+            # Append a new Sources object to the list
+            sources_list.append(
+                Sources(
+                    name=name,
+                    type=type_,
+                    source_url=source_url,
+                    original_file_name=name,
+                )
+            )
+    else:
+        logger.info("No source documents found or source_documents is not a list.")
+    return sources_list
+
+
 class KnowledgeBrainQA(BaseModel, QAInterface):
     """
     Main class for the Brain Picking functionality.
@@ -304,64 +357,15 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
             # Await the run
             result = await run
 
-            # Initialize an empty list for sources
-            sources_list: List[Sources] = []
+            sources_list = generate_source(result, brain)
+            # Create metadata if it doesn't exist
+            if not streamed_chat_history.metadata:
+                streamed_chat_history.metadata = {}
+                # Serialize the sources list
+            serialized_sources_list = [source.dict() for source in sources_list]
+            streamed_chat_history.metadata["sources"] = serialized_sources_list
+            yield f"data: {json.dumps(streamed_chat_history.dict())}"
 
-            # Get source documents from the result, default to an empty list if not found
-            source_documents = result.get("source_documents", [])
-
-            # If source documents exist
-            if source_documents:
-                logger.info(f"Source documents found: {source_documents}")
-                # Iterate over each document
-                for doc in source_documents:
-                    # Check if 'url' is in the document metadata
-                    logger.info(f"Metadata: {doc.metadata}")
-                    is_url = (
-                        "original_file_name" in doc.metadata
-                        and doc.metadata["original_file_name"] is not None
-                        and doc.metadata["original_file_name"].startswith("http")
-                    )
-                    logger.info(f"Is URL: {is_url}")
-
-                    # Determine the name based on whether it's a URL or a file
-                    name = (
-                        doc.metadata["original_file_name"]
-                        if is_url
-                        else doc.metadata["file_name"]
-                    )
-
-                    # Determine the type based on whether it's a URL or a file
-                    type_ = "url" if is_url else "file"
-
-                    # Determine the source URL based on whether it's a URL or a file
-                    if is_url:
-                        source_url = doc.metadata["original_file_name"]
-                    else:
-                        source_url = generate_file_signed_url(
-                            f"{brain.brain_id}/{doc.metadata['file_name']}"
-                        ).get("signedURL", "")
-
-                    # Append a new Sources object to the list
-                    sources_list.append(
-                        Sources(
-                            name=name,
-                            type=type_,
-                            source_url=source_url,
-                            original_file_name=name,
-                        )
-                    )
-                # Create metadata if it doesn't exist
-                if not streamed_chat_history.metadata:
-                    streamed_chat_history.metadata = {}
-                    # Serialize the sources list
-                serialized_sources_list = [source.dict() for source in sources_list]
-                streamed_chat_history.metadata["sources"] = serialized_sources_list
-                yield f"data: {json.dumps(streamed_chat_history.dict())}"
-            else:
-                logger.info(
-                    "No source documents found or source_documents is not a list."
-                )
         except Exception as e:
             logger.error("Error processing source documents: %s", e)
 
