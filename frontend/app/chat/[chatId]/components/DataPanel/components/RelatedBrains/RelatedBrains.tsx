@@ -8,7 +8,7 @@ import { CloseBrain } from "@/lib/types/MessageMetadata";
 import styles from "./RelatedBrains.module.scss";
 
 interface RelatedBrainsProps {
-  closeBrains: CloseBrain[];
+  closeBrains?: CloseBrain[];
 }
 
 interface CloseBrainProps {
@@ -26,31 +26,32 @@ const RelatedBrains = ({ closeBrains }: RelatedBrainsProps): JSX.Element => {
   };
 
   useEffect(() => {
-    const newProps = closeBrains.map((brain) => {
-      const t = Math.pow(brain.similarity, 2);
-      const r = Math.round(lerp(211, 138, t));
-      const g = Math.round(lerp(211, 43, t));
-      const b = Math.round(lerp(211, 226, t));
-      const isCurrentBrain =
-        brain.id === messages[messages.length - 1]?.brain_id;
+    if (closeBrains) {
+      const newProps = closeBrains.map((brain) => {
+        const t = Math.pow(brain.similarity, 2);
+        const r = Math.round(lerp(211, 138, t));
+        const g = Math.round(lerp(211, 43, t));
+        const b = Math.round(lerp(211, 226, t));
+        const isCurrentBrain =
+          brain.id === messages[messages.length - 1]?.brain_id;
 
-      return { color: `rgb(${r}, ${g}, ${b})`, isCurrentBrain: isCurrentBrain };
-    });
-    setCloseBrainProps(newProps);
+        return {
+          color: `rgb(${r}, ${g}, ${b})`,
+          isCurrentBrain: isCurrentBrain,
+        };
+      });
+      setCloseBrainProps(newProps);
+    }
   }, [closeBrains, messages.length]);
-
-  if (closeBrains.length === 0) {
-    return <></>;
-  }
 
   return (
     <FoldableSection
       label="Related Brains (Beta)"
       icon="brain"
-      foldedByDefault={true}
+      foldedByDefault={closeBrains?.length === 0}
     >
       <div className={styles.close_brains_wrapper}>
-        {closeBrains.map((brain, index) => (
+        {closeBrains?.map((brain, index) => (
           <div className={styles.brain_line} key={index}>
             <div className={styles.left}>
               <div className={styles.copy_icon}>
