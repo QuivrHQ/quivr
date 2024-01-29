@@ -1,5 +1,6 @@
 import { MotionConfig } from "framer-motion";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { useState } from "react";
 
 import { MenuControlButton } from "@/app/chat/[chatId]/components/ActionsBar/components/ChatInput/components/MenuControlButton/MenuControlButton";
 import { QuivrLogo } from "@/lib/assets/QuivrLogo";
@@ -13,7 +14,9 @@ import { DiscussionButton } from "./components/DiscussionButton/DiscussionButton
 
 export const Menu = (): JSX.Element => {
   const { isOpened } = useMenuContext();
+  const router = useRouter();
   const pathname = usePathname() ?? "";
+  const [isLogoHovered, setIsLogoHovered] = useState<boolean>(false);
 
   if (nonProtectedPaths.includes(pathname)) {
     return <></>;
@@ -41,8 +44,16 @@ export const Menu = (): JSX.Element => {
       <div className={styles.menu_container}>
         <AnimatedDiv>
           <div className="flex flex-col flex-1 p-4 gap-4 h-full">
-            <div className={styles.quivr_logo_wrapper}>
-              <QuivrLogo size={60} color="white" />
+            <div
+              className={styles.quivr_logo_wrapper}
+              onClick={() => router.push("/search")}
+              onMouseEnter={() => setIsLogoHovered(true)}
+              onMouseLeave={() => setIsLogoHovered(false)}
+            >
+              <QuivrLogo
+                size={60}
+                color={isLogoHovered ? "primary" : "white"}
+              />
             </div>
             <div className="flex flex-1 w-full">
               <div className="w-full gap-2 flex flex-col">
