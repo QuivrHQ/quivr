@@ -9,6 +9,8 @@ import styles from "./DataPanel.module.scss";
 import RelatedBrains from "./components/RelatedBrains/RelatedBrains";
 import Sources from "./components/Sources/Sources";
 
+import { ChatMessage } from "../../types";
+
 const DataPanel = (): JSX.Element => {
   const { messages } = useChatContext();
   const [lastMessageMetadata, setLastMessageMetadata] =
@@ -16,21 +18,29 @@ const DataPanel = (): JSX.Element => {
 
   useEffect(() => {
     if (messages.length > 0) {
-      const lastMessage = messages[messages.length - 1];
-      const newSources: Source[] = lastMessage.metadata?.sources ?? [];
+      const lastMessage: ChatMessage = messages[messages.length - 1];
+      const newSources: Source[] = (lastMessage.metadata?.sources ?? []).map(
+        (source: Source) => ({
+          ...source,
+          frequency: 0,
+        })
+      );
 
       const updatedSources: Source[] = lastMessageMetadata?.sources
         ? [...lastMessageMetadata.sources]
         : [];
 
-      newSources.forEach((source) => {
-        const existingSource = updatedSources.find(
-          (s) => s.source_url === source.source_url
+      newSources.forEach((newSource) => {
+        const existingSourceIndex = updatedSources.findIndex(
+          (source) => source.source_url === newSource.source_url
         );
-        if (existingSource) {
-          existingSource.frequency += 1;
+        if (existingSourceIndex !== -1) {
+          updatedSources[existingSourceIndex] = {
+            ...updatedSources[existingSourceIndex],
+            frequency: updatedSources[existingSourceIndex].frequency + 1,
+          };
         } else {
-          updatedSources.push(source);
+          updatedSources.push(newSource);
         }
       });
 

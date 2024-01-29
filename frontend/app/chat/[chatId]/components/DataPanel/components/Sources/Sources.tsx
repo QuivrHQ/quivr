@@ -12,14 +12,17 @@ const Sources = ({ sources }: SourcesProps): JSX.Element => {
     <FoldableSection label="Sources" icon="file">
       <div className={styles.sources_wrapper}>
         {sources?.map((source, index) => (
-          <a
-            href={source.source_url}
-            key={index}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <div className={styles.source}>{source.name}</div>
-          </a>
+          <div className={styles.source_wrapper} key={index}>
+            <a
+              href={source.source_url}
+              key={index}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <div className={styles.source}>{source.name}</div>
+            </a>
+            <span>{source.frequency}</span>
+          </div>
         ))}
       </div>
     </FoldableSection>
