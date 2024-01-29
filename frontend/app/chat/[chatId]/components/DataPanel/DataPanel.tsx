@@ -26,9 +26,7 @@ const DataPanel = (): JSX.Element => {
         })
       );
 
-      const updatedSources: Source[] = lastMessageMetadata?.sources
-        ? [...lastMessageMetadata.sources]
-        : [];
+      const updatedSources: Source[] = [];
 
       newSources.forEach((newSource) => {
         const existingSourceIndex = updatedSources.findIndex(

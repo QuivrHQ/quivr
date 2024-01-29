@@ -9,7 +9,11 @@ interface SourcesProps {
 
 const Sources = ({ sources }: SourcesProps): JSX.Element => {
   return (
-    <FoldableSection label="Sources" icon="file">
+    <FoldableSection
+      label="Sources"
+      icon="file"
+      foldedByDefault={sources?.length === 0}
+    >
       <div className={styles.sources_wrapper}>
         {sources?.map((source, index) => (
           <div className={styles.source_wrapper} key={index}>

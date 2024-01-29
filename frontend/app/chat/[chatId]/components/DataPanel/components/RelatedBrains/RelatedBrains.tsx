@@ -44,18 +44,14 @@ const RelatedBrains = ({ closeBrains }: RelatedBrainsProps): JSX.Element => {
     }
   }, [closeBrains, messages.length]);
 
-  if (!closeBrains) {
-    return <></>;
-  }
-
   return (
     <FoldableSection
       label="Related Brains (Beta)"
       icon="brain"
-      foldedByDefault={true}
+      foldedByDefault={closeBrains?.length === 0}
     >
       <div className={styles.close_brains_wrapper}>
-        {closeBrains.map((brain, index) => (
+        {closeBrains?.map((brain, index) => (
           <div className={styles.brain_line} key={index}>
             <div className={styles.left}>
               <div className={styles.copy_icon}>
