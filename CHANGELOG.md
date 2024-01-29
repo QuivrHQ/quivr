@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.0.188 (2024-01-29)
+
+## What's Changed
+* fix: 🐛 upload by @StanGirard in https://github.com/StanGirard/quivr/pull/2112
+* feat(frontend): add sources to metadata by @Zewed in https://github.com/StanGirard/quivr/pull/2113
+
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.187...v0.0.188
+
 ## 0.0.187 (2024-01-28)
 
 ## What's Changed
