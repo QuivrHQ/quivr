@@ -41,8 +41,8 @@ def find_model_and_generate_metadata(
     follow_up_questions = chat_service.get_follow_up_question(chat_id)
     metadata["follow_up_questions"] = follow_up_questions
     # Default model is gpt-3.5-turbo-1106
-    model_to_use = LLMModels(
-        name="gpt-3.5-turbo-1106", price=1, max_input=512, max_output=512
+    model_to_use = LLMModels(  # TODO Implement default models in database
+        name="gpt-3.5-turbo-1106", price=1, max_input=12000, max_output=1000
     )
 
     is_brain_model_available = any(
