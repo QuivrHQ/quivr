@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 
 import { useChatContext } from "@/lib/context";
-import { MessageMetadata } from "@/lib/types/MessageMetadata";
+import { MessageMetadata, Source } from "@/lib/types/MessageMetadata";
 
 import styles from "./DataPanel.module.scss";
 import RelatedBrains from "./components/RelatedBrains/RelatedBrains";
@@ -17,9 +17,26 @@ const DataPanel = (): JSX.Element => {
   useEffect(() => {
     if (messages.length > 0) {
       const lastMessage = messages[messages.length - 1];
+      const newSources: Source[] = lastMessage.metadata?.sources ?? [];
+
+      const updatedSources: Source[] = lastMessageMetadata?.sources
+        ? [...lastMessageMetadata.sources]
+        : [];
+
+      newSources.forEach((source) => {
+        const existingSource = updatedSources.find(
+          (s) => s.source_url === source.source_url
+        );
+        if (existingSource) {
+          existingSource.frequency += 1;
+        } else {
+          updatedSources.push(source);
+        }
+      });
+
       setLastMessageMetadata({
         closeBrains: lastMessage.metadata?.close_brains ?? [],
-        sources: lastMessage.metadata?.sources ?? [],
+        sources: updatedSources,
       });
     }
   }, [messages]);
