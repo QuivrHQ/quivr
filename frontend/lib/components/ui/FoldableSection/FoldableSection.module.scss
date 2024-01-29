@@ -33,4 +33,24 @@
       background-color: Colors.$lightest-grey;
     }
   }
+
+  &.dark_mode {
+    border-color: transparent;
+
+    .header_wrapper {
+      .header_left {
+        .header_title {
+          color: Colors.$white;
+        }
+      }
+
+      &:hover {
+        background-color: Colors.$light-black;
+      }
+    }
+
+    &:hover {
+      border-color: Colors.$accent;
+    }
+  }
 }

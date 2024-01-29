@@ -11,6 +11,7 @@ import styles from "./Menu.module.scss";
 import { AnimatedDiv } from "./components/AnimationDiv";
 import { BrainsManagementButton } from "./components/BrainsManagementButton";
 import { DiscussionButton } from "./components/DiscussionButton/DiscussionButton";
+import { HistoryButton } from "./components/HistoryButton/HistoryButton";
 
 export const Menu = (): JSX.Element => {
   const { isOpened } = useMenuContext();
@@ -59,6 +60,7 @@ export const Menu = (): JSX.Element => {
               <div className="w-full gap-2 flex flex-col">
                 <DiscussionButton />
                 <BrainsManagementButton />
+                <HistoryButton />
               </div>
             </div>
             {/* <div>
