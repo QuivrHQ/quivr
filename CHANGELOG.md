@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.0.187 (2024-01-28)
+
+## What's Changed
+* feat: 🎸 user-limits by @StanGirard in https://github.com/StanGirard/quivr/pull/2104
+* fix: 🐛 brains by @StanGirard in https://github.com/StanGirard/quivr/pull/2107
+* feat(frontend): chat page ui/ux design by @Zewed in https://github.com/StanGirard/quivr/pull/2106
+* Fix typo of UI: Ressources ==> Resources by @iharel in https://github.com/StanGirard/quivr/pull/2109
+* fix(frontend): fix li markdown on chat by @Zewed in https://github.com/StanGirard/quivr/pull/2110
+
+## New Contributors
+* @iharel made their first contribution in https://github.com/StanGirard/quivr/pull/2109
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.186...v0.0.187
+
 ## 0.0.186 (2024-01-27)
 
 ## What's Changed
