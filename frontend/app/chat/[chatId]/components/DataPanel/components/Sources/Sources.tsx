@@ -21,7 +21,6 @@ const Sources = ({ sources }: SourcesProps): JSX.Element => {
             >
               <div className={styles.source}>{source.name}</div>
             </a>
-            <span>{source.frequency}</span>
           </div>
         ))}
       </div>

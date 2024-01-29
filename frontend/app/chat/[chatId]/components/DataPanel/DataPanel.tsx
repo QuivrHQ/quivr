@@ -44,6 +44,8 @@ const DataPanel = (): JSX.Element => {
         }
       });
 
+      updatedSources.sort((a, b) => b.frequency - a.frequency);
+
       setLastMessageMetadata({
         closeBrains: lastMessage.metadata?.close_brains ?? [],
         sources: updatedSources,
