@@ -85,7 +85,7 @@ async def upload_file(
             "name": uploadFile.filename if uploadFile else "Last Upload File",
         }
         notification_service.update_notification_by_id(
-            upload_notification.id,
+            upload_notification.id if upload_notification else None,
             NotificationUpdatableProperties(
                 status=NotificationsStatusEnum.Done,
                 message=str(notification_message),
