@@ -136,6 +136,8 @@ Did you get a pull request? Open it, and we'll review it as soon as possible. Ch
 ## Partners ❤️
 
 This project would not be possible without the support of our partners. Thank you for your support!
+
+
 <a href="https://ycombinator.com/">
     <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b2/Y_Combinator_logo.svg/1200px-Y_Combinator_logo.svg.png" alt="YCombinator" style="padding: 10px" width="70px">
 </a>
