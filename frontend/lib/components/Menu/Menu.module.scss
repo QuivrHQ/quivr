@@ -3,8 +3,7 @@
 @use "@/styles/ZIndexes.module.scss";
 
 .menu_container {
-  background-color: Colors.$black;
-  box-shadow: 10px 10px 15px 10px rgba(0, 0, 0, 0.5);
+  background-color: Colors.$light-black;
 
   .quivr_logo_wrapper {
     cursor: pointer;
