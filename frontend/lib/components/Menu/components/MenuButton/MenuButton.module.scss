@@ -33,4 +33,14 @@
   &.selected {
     border-color: Colors.$accent;
   }
+
+  &.gold {
+    &:hover {
+      border-color: Colors.$gold;
+    }
+
+    &.selected {
+      border-color: Colors.$gold;
+    }
+  }
 }

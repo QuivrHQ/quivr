@@ -15,6 +15,7 @@ import { DiscussionButton } from "./components/DiscussionButton/DiscussionButton
 import { HistoryButton } from "./components/HistoryButton/HistoryButton";
 import { HomeButton } from "./components/HomeButton/HomeButton";
 import { ProfileButton } from "./components/ProfileButton/ProfileButton";
+import { UpgradeToPlusButton } from "./components/UpgradeToPlusButton/UpgradeToPlusButton";
 
 import { AddBrainModal } from "../AddBrainModal";
 
@@ -68,6 +69,7 @@ export const Menu = (): JSX.Element => {
               </div>
               <div className={styles.block}>
                 <AddBrainModal isMenuButton={true} />
+                <UpgradeToPlusButton />
                 <ProfileButton />
               </div>
             </div>

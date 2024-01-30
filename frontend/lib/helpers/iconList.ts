@@ -3,6 +3,7 @@ import {
   FaCheck,
   FaCheckCircle,
   FaHome,
+  FaRegStar,
   FaRegUserCircle,
 } from "react-icons/fa";
 import { FaArrowUpFromBracket } from "react-icons/fa6";
@@ -40,5 +41,6 @@ export const iconList: { [name: string]: IconType } = {
   home: FaHome,
   loader: AiOutlineLoading3Quarters,
   search: LuSearch,
+  star: FaRegStar,
   user: FaRegUserCircle,
 };
