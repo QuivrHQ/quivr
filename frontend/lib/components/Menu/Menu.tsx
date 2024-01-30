@@ -51,10 +51,7 @@ export const Menu = (): JSX.Element => {
               onMouseEnter={() => setIsLogoHovered(true)}
               onMouseLeave={() => setIsLogoHovered(false)}
             >
-              <QuivrLogo
-                size={60}
-                color={isLogoHovered ? "primary" : "white"}
-              />
+              <QuivrLogo size={60} color={isLogoHovered ? "accent" : "white"} />
             </div>
             <div className="flex flex-1 w-full">
               <div className="w-full gap-2 flex flex-col">
