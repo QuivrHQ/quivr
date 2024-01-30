@@ -25,6 +25,7 @@
   "confirm_set_brain_status_to_private": "Да, установить как частное",
   "confirm_set_brain_status_to_public": "Да, установить как публичный",
   "copiedToClipboard": "Скопировано в буфер обмена",
+  "createBrain": "Создать мозг",
   "defaultBrain": "Мозг по умолчанию",
   "empty_brain_description": "Нет описания",
   "errorCreatingBrain": "Произошла ошибка при создании мозга",

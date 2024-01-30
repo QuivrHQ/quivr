@@ -10,7 +10,7 @@ export interface ButtonProps {
   label: string;
   iconName: keyof typeof iconList;
   type: "add" | "open";
-  isSelected: boolean;
+  isSelected?: boolean;
 }
 
 export const MenuButton = (props: ButtonProps): JSX.Element => {

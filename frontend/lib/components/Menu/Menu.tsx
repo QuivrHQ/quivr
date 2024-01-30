@@ -15,7 +15,6 @@ import { DiscussionButton } from "./components/DiscussionButton/DiscussionButton
 import { HistoryButton } from "./components/HistoryButton/HistoryButton";
 import { HomeButton } from "./components/HomeButton/HomeButton";
 import { ProfileButton } from "./components/ProfileButton";
-import { UpgradeToPlus } from "./components/UpgradeToPlus";
 
 export const Menu = (): JSX.Element => {
   const { isOpened } = useMenuContext();
@@ -44,13 +43,11 @@ export const Menu = (): JSX.Element => {
     return <></>;
   }
 
-  /* eslint-disable @typescript-eslint/restrict-template-expressions */
-
   return (
     <MotionConfig transition={{ mass: 1, damping: 10, duration: 0.1 }}>
       <div className={styles.menu_container}>
         <AnimatedDiv>
-          <div className="flex flex-col flex-1 p-4 gap-4 h-full">
+          <div>
             <div
               className={styles.quivr_logo_wrapper}
               onClick={() => router.push("/search")}
@@ -59,25 +56,25 @@ export const Menu = (): JSX.Element => {
             >
               <QuivrLogo size={50} color={isLogoHovered ? "accent" : "white"} />
             </div>
-            <div className="flex flex-1 w-full">
-              <div className="w-full gap-2 flex flex-col">
+            <div className={styles.buttons_wrapper}>
+              <div className={styles.top}>
                 <DiscussionButton />
                 <HomeButton />
                 <BrainsManagementButton />
                 <HistoryButton />
               </div>
-            </div>
-            <div>
-              <UpgradeToPlus />
-              <ProfileButton />
+              <div>
+                <ProfileButton />
+              </div>
             </div>
           </div>
         </AnimatedDiv>
       </div>
       <div
-        className={`${styles.menu_control_button_wrapper} ${
-          isOpened ? styles.shifted : ""
-        }`}
+        className={`
+        ${styles.menu_control_button_wrapper} 
+        ${isOpened ? styles.shifted : ""}
+        `}
       >
         <MenuControlButton />
       </div>

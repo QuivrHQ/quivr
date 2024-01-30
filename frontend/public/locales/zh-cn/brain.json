@@ -25,6 +25,7 @@
   "confirm_set_brain_status_to_private": "是的，设为私有",
   "confirm_set_brain_status_to_public": "是的，设为公共",
   "copiedToClipboard": "已复制到剪贴板",
+  "createBrain": "创建大脑",
   "defaultBrain": "默认大脑",
   "empty_brain_description": "无描述",
   "errorCreatingBrain": "创建大脑时发生错误",

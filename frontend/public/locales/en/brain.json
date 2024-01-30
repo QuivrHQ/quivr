@@ -25,6 +25,7 @@
   "confirm_set_brain_status_to_private": "Yes, set as private",
   "confirm_set_brain_status_to_public": "Yes, set as public",
   "copiedToClipboard": "Copied to clipboard",
+  "createBrain": "Create Brain",
   "defaultBrain": "Default Brain",
   "empty_brain_description": "No description",
   "errorCreatingBrain": "Error occurred while creating a brain",

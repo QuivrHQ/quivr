@@ -25,6 +25,7 @@
   "confirm_set_brain_status_to_private": "Sí, establecer como privado",
   "confirm_set_brain_status_to_public": "Sí, establecer como público",
   "copiedToClipboard": "Copiado al portapeles",
+  "createBrain": "Crear cerebro",
   "defaultBrain": "Cerebro por defecto",
   "empty_brain_description": "Sin descripción",
   "errorCreatingBrain": "Error al crear cerebro",
