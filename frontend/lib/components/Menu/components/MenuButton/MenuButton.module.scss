@@ -1,5 +1,6 @@
 @use "@/styles/Colors.module.scss";
 @use "@/styles/Spacings.module.scss";
+@use "@/styles/Typography.module.scss";
 
 .menu_button_wrapper {
   display: flex;
@@ -18,10 +19,8 @@
     overflow: hidden;
 
     .title {
+      @include Typography.EllipsisOverflow;
       font-weight: bold;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
       color: Colors.$white;
     }
   }

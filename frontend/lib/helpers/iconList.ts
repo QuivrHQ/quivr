@@ -11,7 +11,7 @@ import {
   LuPlusCircle,
   LuSearch,
 } from "react-icons/lu";
-import { MdHistory } from "react-icons/md";
+import { MdDelete, MdEdit, MdHistory } from "react-icons/md";
 import { RiHashtag } from "react-icons/ri";
 
 export const iconList: { [name: string]: IconType } = {
@@ -21,6 +21,8 @@ export const iconList: { [name: string]: IconType } = {
   chevronDown: LuChevronDown,
   chevronRight: LuChevronRight,
   copy: LuCopy,
+  delete: MdDelete,
+  edit: MdEdit,
   file: LuFile,
   followUp: FaArrowUpFromBracket,
   hastag: RiHashtag,

@@ -43,6 +43,10 @@
 
 .white {
   color: Colors.$white;
+
+  &:hover {
+    color: Colors.$accent;
+  }
 }
 
 .disabled {

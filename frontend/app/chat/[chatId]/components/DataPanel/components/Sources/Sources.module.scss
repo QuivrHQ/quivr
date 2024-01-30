@@ -1,5 +1,6 @@
 @use "@/styles/Colors.module.scss";
 @use "@/styles/Spacings.module.scss";
+@use "@/styles/Typography.module.scss";
 
 .sources_wrapper {
   display: flex;
@@ -9,9 +10,7 @@
   overflow: hidden;
 
   .source {
+    @include Typography.EllipsisOverflow;
     padding-inline: Spacings.$spacing05;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
   }
 }
