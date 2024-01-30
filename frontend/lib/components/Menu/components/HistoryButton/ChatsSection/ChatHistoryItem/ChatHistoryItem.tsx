@@ -29,7 +29,6 @@ export const ChatHistoryItem = ({
           className={styles.edit_chat_name}
           onChange={(event) => setChatName(event.target.value)}
           value={chatName}
-          autoFocus
         />
       ) : (
         <Link

@@ -15,13 +15,14 @@
 
     background-color: Colors.$black;
     color: Colors.$white;
-    border-radius: 12px;
-    height: 32px;
-    border: 1px solid transparent;
+    border-radius: 5px;
+    height: 21px;
     outline: none;
+    font-size: Typography.$small;
 
     &:focus {
-      outline: none;
+      box-shadow: none;
+      border-color: Colors.$light-grey;
     }
   }
 
