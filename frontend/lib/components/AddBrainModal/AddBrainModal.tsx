@@ -6,7 +6,11 @@ import { KnowledgeToFeedProvider } from "@/lib/context";
 import { AddBrainSteps } from "./components/AddBrainSteps/AddBrainSteps";
 import { CreateBrainProps } from "./types";
 
-export const AddBrainModal = (): JSX.Element => {
+export const AddBrainModal = ({
+  isMenuButton,
+}: {
+  isMenuButton?: boolean;
+}): JSX.Element => {
   const defaultValues: CreateBrainProps = {
     ...addBrainDefaultValues,
     setDefault: true,
@@ -20,7 +24,7 @@ export const AddBrainModal = (): JSX.Element => {
   return (
     <FormProvider {...methods}>
       <KnowledgeToFeedProvider>
-        <AddBrainSteps />
+        <AddBrainSteps isMenuButton={isMenuButton} />
       </KnowledgeToFeedProvider>
     </FormProvider>
   );

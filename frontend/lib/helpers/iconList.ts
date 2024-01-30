@@ -9,10 +9,12 @@ import { FaArrowUpFromBracket } from "react-icons/fa6";
 import { IconType } from "react-icons/lib";
 import {
   LuBrain,
+  LuBrainCircuit,
   LuChevronDown,
   LuChevronRight,
   LuCopy,
   LuFile,
+  LuPlus,
   LuPlusCircle,
   LuSearch,
 } from "react-icons/lu";
@@ -21,7 +23,9 @@ import { RiHashtag } from "react-icons/ri";
 
 export const iconList: { [name: string]: IconType } = {
   add: LuPlusCircle,
+  addWithoutCircle: LuPlus,
   brain: LuBrain,
+  brainCircuit: LuBrainCircuit,
   check: FaCheck,
   checkCircle: FaCheckCircle,
   chevronDown: LuChevronDown,

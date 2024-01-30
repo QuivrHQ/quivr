@@ -14,7 +14,9 @@ import { BrainsManagementButton } from "./components/BrainsManagementButton/Brai
 import { DiscussionButton } from "./components/DiscussionButton/DiscussionButton";
 import { HistoryButton } from "./components/HistoryButton/HistoryButton";
 import { HomeButton } from "./components/HomeButton/HomeButton";
-import { ProfileButton } from "./components/ProfileButton";
+import { ProfileButton } from "./components/ProfileButton/ProfileButton";
+
+import { AddBrainModal } from "../AddBrainModal";
 
 export const Menu = (): JSX.Element => {
   const { isOpened } = useMenuContext();
@@ -64,6 +66,7 @@ export const Menu = (): JSX.Element => {
                 <HistoryButton />
               </div>
               <div>
+                <AddBrainModal isMenuButton={true} />
                 <ProfileButton />
               </div>
             </div>

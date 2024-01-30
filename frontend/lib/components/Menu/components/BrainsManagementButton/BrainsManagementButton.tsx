@@ -15,7 +15,7 @@ export const BrainsManagementButton = (): JSX.Element => {
       <MenuButton
         label={t("brains")}
         isSelected={isSelected}
-        iconName="brain"
+        iconName="brainCircuit"
         type="open"
       />
     </Link>

@@ -26,7 +26,7 @@ export const MenuButton = (props: ButtonProps): JSX.Element => {
         <span className={styles.title}>{capitalCase(props.label)}</span>
       </div>
       <Icon
-        name={props.type === "add" ? "add" : "chevronRight"}
+        name={props.type === "add" ? "addWithoutCircle" : "chevronRight"}
         size="large"
         color="accent"
       />
