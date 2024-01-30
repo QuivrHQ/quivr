@@ -22,6 +22,10 @@ export const ChatHistoryItem = ({
     setChatName,
   } = useChatsListItem(chatHistoryItem);
 
+  const onNameEdited = () => {
+    handleEditNameClick();
+  };
+
   return (
     <div className={styles.chat_item_wrapper}>
       {editingName ? (
@@ -29,6 +33,12 @@ export const ChatHistoryItem = ({
           className={styles.edit_chat_name}
           onChange={(event) => setChatName(event.target.value)}
           value={chatName}
+          onKeyDown={(event) => {
+            if (event.key === "Enter") {
+              onNameEdited();
+            }
+          }}
+          autoFocus
         />
       ) : (
         <Link
@@ -44,7 +54,7 @@ export const ChatHistoryItem = ({
           size="normal"
           color="white"
           handleHover={true}
-          onClick={() => handleEditNameClick()}
+          onClick={() => onNameEdited()}
         />
         <Icon
           name="delete"

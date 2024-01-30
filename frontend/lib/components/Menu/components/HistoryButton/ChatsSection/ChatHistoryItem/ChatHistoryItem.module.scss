@@ -13,16 +13,17 @@
   .edit_chat_name {
     @include Typography.EllipsisOverflow;
 
-    background-color: Colors.$black;
     color: Colors.$white;
-    border-radius: 5px;
+    border: none;
     height: 21px;
     outline: none;
+    padding: 0;
     font-size: Typography.$small;
+    background-color: Colors.$black;
+    border-radius: 2px;
 
     &:focus {
       box-shadow: none;
-      border-color: Colors.$light-grey;
     }
   }
 
