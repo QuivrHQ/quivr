@@ -5,7 +5,7 @@ import Icon from "@/lib/components/ui/Icon/Icon";
 
 import styles from "./ChatHistoryItem.module.scss";
 
-import { useChatsListItem } from "../../ChatsListItem/hooks/useChatsListItem";
+import { useChatsListItem } from "../../hooks/useChatsListItem";
 
 type ChatHistoryItemProps = {
   chatHistoryItem: ChatEntity;
