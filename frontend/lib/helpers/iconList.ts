@@ -1,5 +1,5 @@
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
-import { FaCheckCircle, FaRegUserCircle } from "react-icons/fa";
+import { FaCheckCircle, FaHome, FaRegUserCircle } from "react-icons/fa";
 import { FaArrowUpFromBracket } from "react-icons/fa6";
 import { IconType } from "react-icons/lib";
 import {
@@ -25,6 +25,7 @@ export const iconList: { [name: string]: IconType } = {
   followUp: FaArrowUpFromBracket,
   hastag: RiHashtag,
   history: MdHistory,
+  home: FaHome,
   loader: AiOutlineLoading3Quarters,
   search: LuSearch,
   user: FaRegUserCircle,
