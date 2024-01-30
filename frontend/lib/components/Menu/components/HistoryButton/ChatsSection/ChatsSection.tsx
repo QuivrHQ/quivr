@@ -4,7 +4,7 @@ import { ChatHistoryItem } from "./ChatHistoryItem/ChatHistoryItem";
 import styles from "./ChatsSection.module.scss";
 
 type ChatSectionProps = {
-  chats: ChatEntity[]; // replace ChatType with the actual type of your chats
+  chats: ChatEntity[];
   title: string;
 };
 

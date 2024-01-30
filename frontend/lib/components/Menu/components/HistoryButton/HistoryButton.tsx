@@ -10,7 +10,7 @@ import styles from "./HistoryButton.module.scss";
 import { isWithinLast30Days, isWithinLast7Days, isYesterday } from "./utils";
 
 export const HistoryButton = (): JSX.Element => {
-  const [canScrollDown, setCanScrollDown] = useState<boolean>(true);
+  const [canScrollDown, setCanScrollDown] = useState<boolean>(false);
   const { allChats } = useChatsContext();
   const { t } = useTranslation("chat");
   const todayChats = allChats.filter((chat) =>
@@ -31,17 +31,21 @@ export const HistoryButton = (): JSX.Element => {
       `.${styles.history_content_wrapper}`
     );
 
+    setCanScrollDown(!!wrapper && wrapper.clientHeight >= 200);
+
     const handleScroll = () => {
       if (wrapper) {
         const maxScrollTop = wrapper.scrollHeight - wrapper.clientHeight;
-        setCanScrollDown(wrapper.scrollTop < maxScrollTop);
+        setCanScrollDown(
+          wrapper.scrollTop < maxScrollTop && wrapper.clientHeight >= 200
+        );
       }
     };
 
     wrapper?.addEventListener("scroll", handleScroll);
 
     return () => wrapper?.removeEventListener("scroll", handleScroll);
-  }, []);
+  }, [allChats]);
 
   return (
     <FoldableSection

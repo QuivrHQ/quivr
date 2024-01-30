@@ -8,7 +8,7 @@
   padding-top: 0;
   color: Colors.$normal-grey;
   font-size: Typography.$small;
-  height: 200px;
+  max-height: 200px;
   overflow-y: scroll;
   display: flex;
   flex-direction: column;
