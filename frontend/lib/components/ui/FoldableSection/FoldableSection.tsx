@@ -44,7 +44,7 @@ export const FoldableSection = (props: FoldableSectionProps): JSX.Element => {
           color="accent"
         />
       </div>
-      {!folded && <div>{props.children}</div>}
+      <div style={{ height: folded ? "0" : "auto" }}>{props.children}</div>
     </div>
   );
 };
