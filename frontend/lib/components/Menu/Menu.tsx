@@ -49,7 +49,7 @@ export const Menu = (): JSX.Element => {
     <MotionConfig transition={{ mass: 1, damping: 10, duration: 0.1 }}>
       <div className={styles.menu_container}>
         <AnimatedDiv>
-          <div>
+          <div className={styles.menu_wrapper}>
             <div
               className={styles.quivr_logo_wrapper}
               onClick={() => router.push("/search")}
@@ -58,14 +58,15 @@ export const Menu = (): JSX.Element => {
             >
               <QuivrLogo size={50} color={isLogoHovered ? "accent" : "white"} />
             </div>
+
             <div className={styles.buttons_wrapper}>
-              <div className={styles.top}>
+              <div className={styles.block}>
                 <DiscussionButton />
                 <HomeButton />
                 <BrainsManagementButton />
                 <HistoryButton />
               </div>
-              <div>
+              <div className={styles.block}>
                 <AddBrainModal isMenuButton={true} />
                 <ProfileButton />
               </div>
