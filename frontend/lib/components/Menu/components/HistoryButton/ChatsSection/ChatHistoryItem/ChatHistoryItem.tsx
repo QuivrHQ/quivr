@@ -45,7 +45,7 @@ export const ChatHistoryItem = ({
           className={styles.chat_item_name}
           href={`/chat/${chatHistoryItem.chat_id}`}
         >
-          {chatHistoryItem.chat_name.trim()}
+          {chatName.trim()}
         </Link>
       )}
       <div className={styles.icons_wrapper}>
