@@ -14,6 +14,8 @@ import { BrainsManagementButton } from "./components/BrainsManagementButton/Brai
 import { DiscussionButton } from "./components/DiscussionButton/DiscussionButton";
 import { HistoryButton } from "./components/HistoryButton/HistoryButton";
 import { HomeButton } from "./components/HomeButton/HomeButton";
+import { ProfileButton } from "./components/ProfileButton";
+import { UpgradeToPlus } from "./components/UpgradeToPlus";
 
 export const Menu = (): JSX.Element => {
   const { isOpened } = useMenuContext();
@@ -55,7 +57,7 @@ export const Menu = (): JSX.Element => {
               onMouseEnter={() => setIsLogoHovered(true)}
               onMouseLeave={() => setIsLogoHovered(false)}
             >
-              <QuivrLogo size={60} color={isLogoHovered ? "accent" : "white"} />
+              <QuivrLogo size={50} color={isLogoHovered ? "accent" : "white"} />
             </div>
             <div className="flex flex-1 w-full">
               <div className="w-full gap-2 flex flex-col">
@@ -65,10 +67,10 @@ export const Menu = (): JSX.Element => {
                 <HistoryButton />
               </div>
             </div>
-            {/* <div>
+            <div>
               <UpgradeToPlus />
               <ProfileButton />
-            </div> */}
+            </div>
           </div>
         </AnimatedDiv>
       </div>
