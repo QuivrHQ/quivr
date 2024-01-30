@@ -26,7 +26,11 @@
     }
   }
 
-  &:hover,
+  &:hover {
+    border-color: Colors.$accent;
+    background-color: Colors.$black;
+  }
+
   &.selected {
     border-color: Colors.$accent;
   }

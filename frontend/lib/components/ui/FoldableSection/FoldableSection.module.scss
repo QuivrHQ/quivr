@@ -45,11 +45,12 @@
       }
 
       &:hover {
-        background-color: Colors.$light-black;
+        background-color: Colors.$black;
       }
     }
 
-    &:hover {
+    &:hover,
+    &.unfolded {
       border-color: Colors.$accent;
     }
   }

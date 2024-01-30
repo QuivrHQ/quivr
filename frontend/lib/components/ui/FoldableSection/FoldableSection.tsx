@@ -26,6 +26,7 @@ export const FoldableSection = (props: FoldableSectionProps): JSX.Element => {
       className={`
       ${styles.foldable_section_wrapper} 
       ${props.darkMode ? styles.dark_mode : ""}
+      ${!folded ? styles.unfolded : ""}
       `}
     >
       <div className={styles.header_wrapper} onClick={() => setFolded(!folded)}>
