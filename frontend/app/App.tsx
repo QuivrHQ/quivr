@@ -9,7 +9,6 @@ import { Menu } from "@/lib/components/Menu/Menu";
 import { useOutsideClickListener } from "@/lib/components/Menu/hooks/useOutsideClickListener";
 import { NotificationBanner } from "@/lib/components/NotificationBanner";
 import SearchModal from "@/lib/components/SearchModal/SearchModal";
-import { UploadDocumentModal } from "@/lib/components/UploadDocumentModal/UploadDocumentModal";
 import {
   BrainProvider,
   ChatProvider,
@@ -59,7 +58,6 @@ const App = ({ children }: PropsWithChildren): JSX.Element => {
       <div className="flex flex-1 flex-col overflow-auto">
         <SearchModalProvider>
           <SearchModal />
-          <UploadDocumentModal />
           <NotificationBanner />
           <div className="relative h-full w-full flex justify-stretch items-stretch overflow-auto">
             <Menu />

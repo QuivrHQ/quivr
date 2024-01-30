@@ -16,7 +16,6 @@ export const UploadDocumentModal = (): JSX.Element => {
 
   return (
     <div className={styles.knowledge_modal}>
-      AHAHAHHH
       <AnimatePresence>
         <motion.div
           key="slide"

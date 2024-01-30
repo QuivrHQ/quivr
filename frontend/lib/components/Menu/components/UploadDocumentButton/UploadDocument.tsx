@@ -1,18 +1,34 @@
 import { useTranslation } from "react-i18next";
 
 import { MenuButton } from "@/lib/components/Menu/components/MenuButton/MenuButton";
+import { UploadDocumentModal } from "@/lib/components/UploadDocumentModal/UploadDocumentModal";
+import { Modal } from "@/lib/components/ui/Modal";
 import { useKnowledgeToFeedContext } from "@/lib/context/KnowledgeToFeedProvider/hooks/useKnowledgeToFeedContext";
 
 export const UploadDocumentButton = (): JSX.Element => {
-  const { setShouldDisplayFeedCard } = useKnowledgeToFeedContext();
+  const { shouldDisplayFeedCard, setShouldDisplayFeedCard } =
+    useKnowledgeToFeedContext();
   const { t } = useTranslation("upload");
 
   return (
-    <MenuButton
-      iconName="upload"
-      label={t("title")}
-      type="add"
-      onClick={() => setShouldDisplayFeedCard(true)}
-    />
+    <Modal
+      Trigger={
+        <div onClick={() => void 0}>
+          <MenuButton
+            iconName="upload"
+            label={t("title")}
+            type="add"
+            onClick={() => setShouldDisplayFeedCard(true)}
+          />
+        </div>
+      }
+      title={t("newBrainTitle", { ns: "brain" })}
+      desc={t("newBrainSubtitle", { ns: "brain" })}
+      isOpen={shouldDisplayFeedCard}
+      setOpen={setShouldDisplayFeedCard}
+      CloseTrigger={<div />}
+    >
+      <UploadDocumentModal />
+    </Modal>
   );
 };
