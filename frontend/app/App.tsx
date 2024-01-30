@@ -9,7 +9,11 @@ import { Menu } from "@/lib/components/Menu/Menu";
 import { useOutsideClickListener } from "@/lib/components/Menu/hooks/useOutsideClickListener";
 import { NotificationBanner } from "@/lib/components/NotificationBanner";
 import SearchModal from "@/lib/components/SearchModal/SearchModal";
-import { BrainProvider, ChatProvider } from "@/lib/context";
+import {
+  BrainProvider,
+  ChatProvider,
+  KnowledgeToFeedProvider,
+} from "@/lib/context";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 import { ChatsProvider } from "@/lib/context/ChatsProvider";
 import { MenuProvider } from "@/lib/context/MenuProvider/Menu-provider";
@@ -74,13 +78,15 @@ const AppWithQueryClient = ({ children }: PropsWithChildren): JSX.Element => {
   return (
     <QueryClientProvider client={queryClient}>
       <BrainProvider>
-        <MenuProvider>
-          <ChatsProvider>
-            <ChatProvider>
-              <App>{children}</App>
-            </ChatProvider>
-          </ChatsProvider>
-        </MenuProvider>
+        <KnowledgeToFeedProvider>
+          <MenuProvider>
+            <ChatsProvider>
+              <ChatProvider>
+                <App>{children}</App>
+              </ChatProvider>
+            </ChatsProvider>
+          </MenuProvider>
+        </KnowledgeToFeedProvider>
       </BrainProvider>
     </QueryClientProvider>
   );

@@ -2,6 +2,7 @@ import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import {
   FaCheck,
   FaCheckCircle,
+  FaFileUpload,
   FaHome,
   FaRegStar,
   FaRegUserCircle,
@@ -42,5 +43,6 @@ export const iconList: { [name: string]: IconType } = {
   loader: AiOutlineLoading3Quarters,
   search: LuSearch,
   star: FaRegStar,
+  upload: FaFileUpload,
   user: FaRegUserCircle,
 };

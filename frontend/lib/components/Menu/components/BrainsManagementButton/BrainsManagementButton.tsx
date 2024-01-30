@@ -8,12 +8,12 @@ export const BrainsManagementButton = (): JSX.Element => {
   const pathname = usePathname() ?? "";
   const isSelected =
     pathname.includes("/brains-management") && !pathname.includes("/library");
-  const { t } = useTranslation("chat");
+  const { t } = useTranslation("brain");
 
   return (
     <Link href={`/brains-management`}>
       <MenuButton
-        label={t("brains")}
+        label={t("manage_brains")}
         isSelected={isSelected}
         iconName="brainCircuit"
         type="open"

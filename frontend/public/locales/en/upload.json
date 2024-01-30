@@ -1,1 +1,20 @@
-{"title":"Upload Knowledge","subtitle":"Text, document, spreadsheet, presentation, audio, video, and URLs supported","drop":"Drop the files here...","webSite":"Insert website URL","success":"File uploaded successfully","uploadFailed":"Failed to upload file: {{message}}","maxSizeError":"File too big","alreadyAdded":"{{fileName}} was already added but not sent to your brain","addFiles":"Please, add files to upload","selectBrain":"Please, select or create a brain to upload a file","invalidUrl":"Invalid URL","crawlFailed":"Failed to crawl website: {{message}}","ohNo":"Oh no!","selectBrainFirst":"You need to select a brain first. 🧠💡🥲","missingNecessaryRole":"You don't have the necessary role to upload content to the selected brain. 🧠💡🥲","invalidFileType":"Invalid file type","feed_form_submit_button":"Send to my brain","selected_brain_select_label":"Select a brain"}
+{
+  "title": "Upload Knowledge",
+  "subtitle": "Text, document, spreadsheet, presentation, audio, video, and URLs supported",
+  "drop": "Drop the files here...",
+  "webSite": "Insert website URL",
+  "success": "File uploaded successfully",
+  "uploadFailed": "Failed to upload file: {{message}}",
+  "maxSizeError": "File too big",
+  "alreadyAdded": "{{fileName}} was already added but not sent to your brain",
+  "addFiles": "Please, add files to upload",
+  "selectBrain": "Please, select or create a brain to upload a file",
+  "invalidUrl": "Invalid URL",
+  "crawlFailed": "Failed to crawl website: {{message}}",
+  "ohNo": "Oh no!",
+  "selectBrainFirst": "You need to select a brain first. 🧠💡🥲",
+  "missingNecessaryRole": "You don't have the necessary role to upload content to the selected brain. 🧠💡🥲",
+  "invalidFileType": "Invalid file type",
+  "feed_form_submit_button": "Send to my brain",
+  "selected_brain_select_label": "Select a brain"
+}
