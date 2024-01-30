@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.0.189 (2024-01-30)
+
+## What's Changed
+* feat(frontend): design menu by @Zewed in https://github.com/StanGirard/quivr/pull/2116
+* fix(frontend): fix z index popover on add knwoledge modal by @Zewed in https://github.com/StanGirard/quivr/pull/2118
+
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.188...v0.0.189
+
 ## 0.0.188 (2024-01-29)
 
 ## What's Changed
