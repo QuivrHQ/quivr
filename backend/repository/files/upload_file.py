@@ -1,4 +1,5 @@
 import json
+import os
 from multiprocessing import get_logger
 
 from langchain.pydantic_v1 import Field
@@ -8,14 +9,48 @@ from supabase.client import Client
 
 logger = get_logger()
 
+# Mapping of file extensions to MIME types
+mime_types = {
+    ".txt": "text/plain",
+    ".csv": "text/csv",
+    ".md": "text/markdown",
+    ".markdown": "text/markdown",
+    ".telegram": "application/x-telegram",
+    ".m4a": "audio/mp4",
+    ".mp3": "audio/mpeg",
+    ".webm": "audio/webm",
+    ".mp4": "video/mp4",
+    ".mpga": "audio/mpeg",
+    ".wav": "audio/wav",
+    ".mpeg": "video/mpeg",
+    ".pdf": "application/pdf",
+    ".html": "text/html",
+    ".pptx": "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+    ".docx": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    ".odt": "application/vnd.oasis.opendocument.text",
+    ".xlsx": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    ".xls": "application/vnd.ms-excel",
+    ".epub": "application/epub+zip",
+    ".ipynb": "application/x-ipynb+json",
+    ".py": "text/x-python",
+}
+
 
 def upload_file_storage(file, file_identifier: str):
     supabase_client: Client = get_supabase_client()
-    # res = supabase_client.storage.create_bucket("quivr")
     response = None
 
     try:
-        response = supabase_client.storage.from_("quivr").upload(file_identifier, file)
+        # Get the file extension
+        _, file_extension = os.path.splitext(file_identifier)
+
+        # Get the MIME type for the file extension
+        mime_type = mime_types.get(file_extension, "text/html")
+
+        response = supabase_client.storage.from_("quivr").upload(
+            file_identifier, file, file_options={"content-type": mime_type}
+        )
+
         return response
     except Exception as e:
         logger.error(e)

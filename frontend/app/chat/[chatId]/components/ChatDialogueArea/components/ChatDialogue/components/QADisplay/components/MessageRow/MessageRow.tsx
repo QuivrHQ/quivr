@@ -1,6 +1,7 @@
 import React from "react";
 
 import Icon from "@/lib/components/ui/Icon/Icon";
+import { Source } from "@/lib/types/MessageMetadata";
 
 import styles from "./MessageRow.module.scss";
 import { CopyButton } from "./components/CopyButton";
@@ -16,7 +17,7 @@ type MessageRowProps = {
   promptName?: string | null;
   children?: React.ReactNode;
   metadata?: {
-    sources?: [string] | [];
+    sources?: Source[];
   };
 };
 
