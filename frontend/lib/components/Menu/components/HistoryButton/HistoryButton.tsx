@@ -1,4 +1,5 @@
 import { isToday } from "date-fns";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { FoldableSection } from "@/lib/components/ui/FoldableSection/FoldableSection";
@@ -9,6 +10,7 @@ import styles from "./HistoryButton.module.scss";
 import { isWithinLast30Days, isWithinLast7Days, isYesterday } from "./utils";
 
 export const HistoryButton = (): JSX.Element => {
+  const [canScrollDown, setCanScrollDown] = useState<boolean>(true);
   const { allChats } = useChatsContext();
   const { t } = useTranslation("chat");
   const todayChats = allChats.filter((chat) =>
@@ -24,9 +26,31 @@ export const HistoryButton = (): JSX.Element => {
     isWithinLast30Days(new Date(chat.creation_time))
   );
 
+  useEffect(() => {
+    const wrapper = document.querySelector(
+      `.${styles.history_content_wrapper}`
+    );
+
+    const handleScroll = () => {
+      if (wrapper) {
+        const maxScrollTop = wrapper.scrollHeight - wrapper.clientHeight;
+        setCanScrollDown(wrapper.scrollTop < maxScrollTop);
+      }
+    };
+
+    wrapper?.addEventListener("scroll", handleScroll);
+
+    return () => wrapper?.removeEventListener("scroll", handleScroll);
+  }, []);
+
   return (
     <FoldableSection label={t("history")} icon="history" darkMode={true}>
-      <div className={styles.history_content_wrapper}>
+      <div
+        className={`
+        ${styles.history_content_wrapper} 
+        ${canScrollDown ? styles.fade_out : ""}
+        `}
+      >
         <ChatsSection chats={todayChats} title={t("today")} />
         <ChatsSection chats={yesterdayChats} title={t("yesterday")} />
         <ChatsSection chats={last7DaysChats} title={t("last7Days")} />
