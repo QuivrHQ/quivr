@@ -1,5 +1,6 @@
 import { useTranslation } from "react-i18next";
 
+import { MenuButton } from "@/lib/components/Menu/components/MenuButton/MenuButton";
 import { Modal } from "@/lib/components/ui/Modal";
 import TextButton from "@/lib/components/ui/TextButton/TextButton";
 
@@ -9,7 +10,11 @@ import { BrainTypeSelectionStep } from "./components/BrainTypeSelectionStep/Brai
 import { Stepper } from "./components/Stepper/Stepper";
 import { useAddBrainConfig } from "./hooks/useAddBrainConfig";
 
-export const AddBrainSteps = (): JSX.Element => {
+export const AddBrainSteps = ({
+  isMenuButton,
+}: {
+  isMenuButton?: boolean;
+}): JSX.Element => {
   const { t } = useTranslation(["translation", "brain", "config"]);
 
   const { isBrainCreationModalOpened, setIsBrainCreationModalOpened } =
@@ -19,11 +24,19 @@ export const AddBrainSteps = (): JSX.Element => {
     <Modal
       Trigger={
         <div onClick={() => void 0}>
-          <TextButton
-            iconName="add"
-            label={t("newBrain", { ns: "brain" })}
-            color="black"
-          ></TextButton>
+          {isMenuButton ? (
+            <MenuButton
+              iconName="brain"
+              label={t("newBrain", { ns: "brain" })}
+              type="add"
+            />
+          ) : (
+            <TextButton
+              iconName="add"
+              label={t("newBrain", { ns: "brain" })}
+              color="black"
+            />
+          )}
         </div>
       }
       title={t("newBrainTitle", { ns: "brain" })}

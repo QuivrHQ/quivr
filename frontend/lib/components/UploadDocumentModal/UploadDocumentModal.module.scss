@@ -1,0 +1,9 @@
+@use "@/styles/Colors.module.scss";
+@use "@/styles/ZIndexes.module.scss";
+
+.knowledge_modal {
+  display: flex;
+  background-color: Colors.$white;
+  align-items: center;
+  justify-content: center;
+}

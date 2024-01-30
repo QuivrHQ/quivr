@@ -1,0 +1,49 @@
+@use "@/styles/Colors.module.scss";
+@use "@/styles/Spacings.module.scss";
+@use "@/styles/Typography.module.scss";
+
+.chat_item_wrapper {
+  color: Colors.$highlight;
+  display: flex;
+  justify-content: space-between;
+  gap: Spacings.$spacing03;
+  align-items: center;
+  overflow: hidden;
+
+  .edit_chat_name {
+    @include Typography.EllipsisOverflow;
+
+    color: Colors.$white;
+    border: none;
+    height: 21px;
+    outline: none;
+    padding: 0;
+    font-size: Typography.$small;
+    background-color: Colors.$black;
+    border-radius: 2px;
+
+    &:focus {
+      box-shadow: none;
+    }
+  }
+
+  .chat_item_name {
+    @include Typography.EllipsisOverflow;
+
+    &:hover {
+      color: Colors.$accent;
+    }
+  }
+
+  .icons_wrapper {
+    visibility: hidden;
+    display: flex;
+    gap: Spacings.$spacing02;
+  }
+
+  &:hover {
+    .icons_wrapper {
+      visibility: visible;
+    }
+  }
+}

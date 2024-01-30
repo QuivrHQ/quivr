@@ -1,6 +1,6 @@
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from "react-i18next";
 
 import { ChatEntity } from "@/app/chat/[chatId]/types";
 import { useChatApi } from "@/lib/api/chat/useChatApi";
@@ -17,7 +17,7 @@ export const useChatsListItem = (chat: ChatEntity) => {
   const { updateChat, deleteChat } = useChatApi();
   const { setAllChats } = useChatsContext();
   const router = useRouter();
-  const { t } = useTranslation(['chat']);
+  const { t } = useTranslation(["chat"]);
 
   const deleteChatHandler = async () => {
     const chatId = chat.chat_id;
@@ -29,13 +29,13 @@ export const useChatsListItem = (chat: ChatEntity) => {
       // TODO: Change route only when the current chat is being deleted
       void router.push("/search");
       publish({
-        text: t('chatDeleted',{ id: chatId,ns:'chat'})  ,
+        text: t("chatDeleted", { id: chatId, ns: "chat" }),
         variant: "success",
       });
     } catch (error) {
-      console.error(t('errorDeleting',{ error: error, ns:'chat'}));
+      console.error(t("errorDeleting", { error: error, ns: "chat" }));
       publish({
-        text: t('errorDeleting',{ error: error, ns:'chat'}),
+        text: t("errorDeleting", { error: error, ns: "chat" }),
         variant: "danger",
       });
     }
@@ -44,9 +44,9 @@ export const useChatsListItem = (chat: ChatEntity) => {
   const updateChatName = async () => {
     if (chatName !== chat.chat_name) {
       await updateChat(chat.chat_id, { chat_name: chatName });
-      publish({ 
-        text: t('chatNameUpdated',{ ns:'chat'}), 
-        variant: "success" 
+      publish({
+        text: t("chatNameUpdated", { ns: "chat" }),
+        variant: "success",
       });
     }
   };

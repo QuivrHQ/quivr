@@ -11,6 +11,7 @@ interface FoldableSectionProps {
   icon: keyof typeof iconList;
   children: React.ReactNode;
   foldedByDefault?: boolean;
+  darkMode?: boolean;
 }
 
 export const FoldableSection = (props: FoldableSectionProps): JSX.Element => {
@@ -21,10 +22,20 @@ export const FoldableSection = (props: FoldableSectionProps): JSX.Element => {
   }, [props.foldedByDefault]);
 
   return (
-    <div className={styles.foldable_section_wrapper}>
+    <div
+      className={`
+      ${styles.foldable_section_wrapper} 
+      ${props.darkMode ? styles.dark_mode : ""}
+      ${!folded ? styles.unfolded : ""}
+      `}
+    >
       <div className={styles.header_wrapper} onClick={() => setFolded(!folded)}>
         <div className={styles.header_left}>
-          <Icon name={props.icon} size="normal" color="black" />
+          <Icon
+            name={props.icon}
+            size="normal"
+            color={props.darkMode ? "accent" : "black"}
+          />
           <p className={styles.header_title}>{props.label}</p>
         </div>
         <Icon
@@ -33,7 +44,7 @@ export const FoldableSection = (props: FoldableSectionProps): JSX.Element => {
           color="accent"
         />
       </div>
-      {!folded && <div>{props.children}</div>}
+      <div style={{ height: folded ? "0" : "auto" }}>{props.children}</div>
     </div>
   );
 };

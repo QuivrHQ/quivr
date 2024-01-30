@@ -1,0 +1,27 @@
+@use "@/styles/Colors.module.scss";
+@use "@/styles/ScreenSizes.module.scss";
+@use "@/styles/Spacings.module.scss";
+@use "@/styles/Typography.module.scss";
+
+.history_content_wrapper {
+  position: relative;
+  padding: Spacings.$spacing03;
+  padding-top: 0;
+  color: Colors.$normal-grey;
+  font-size: Typography.$small;
+  max-height: 200px;
+  overflow-y: scroll;
+  display: flex;
+  flex-direction: column;
+
+  &.fade_out {
+    mask-image: -webkit-gradient(
+      linear,
+      left top,
+      left bottom,
+      from(black),
+      to(transparent)
+    );
+    mask-image: linear-gradient(to bottom, black 50%, transparent 100%);
+  }
+}

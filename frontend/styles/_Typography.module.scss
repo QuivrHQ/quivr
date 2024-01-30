@@ -17,3 +17,13 @@
   font-weight: 500;
   font-size: 16px;
 }
+
+@mixin EllipsisOverflow {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+$small: 14px;
+$medium: 16px;
+$large: 18px;

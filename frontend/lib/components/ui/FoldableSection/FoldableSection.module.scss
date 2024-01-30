@@ -1,5 +1,6 @@
 @use "@/styles/Colors.module.scss";
 @use "@/styles/Spacings.module.scss";
+@use "@/styles/Typography.module.scss";
 
 .foldable_section_wrapper {
   display: flex;
@@ -22,15 +23,34 @@
       overflow: hidden;
 
       .header_title {
+        @include Typography.EllipsisOverflow;
         font-weight: bold;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
       }
     }
 
     &:hover {
       background-color: Colors.$lightest-grey;
+    }
+  }
+
+  &.dark_mode {
+    border-color: transparent;
+
+    .header_wrapper {
+      .header_left {
+        .header_title {
+          color: Colors.$white;
+        }
+      }
+
+      &:hover {
+        background-color: Colors.$black;
+      }
+    }
+
+    &:hover,
+    &.unfolded {
+      border-color: Colors.$accent;
     }
   }
 }

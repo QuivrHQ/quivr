@@ -1,0 +1,11 @@
+@use "@/styles/Colors.module.scss";
+@use "@/styles/Spacings.module.scss";
+
+.chats_wrapper {
+  border-left: 1px solid Colors.$accent;
+  padding-left: Spacings.$spacing03;
+  margin: Spacings.$spacing02;
+  display: flex;
+  flex-direction: column;
+  gap: Spacings.$spacing02;
+}

@@ -3,19 +3,13 @@ import { usePathname } from "next/navigation";
 import { useEffect } from "react";
 
 import { QuivrLogo } from "@/lib/assets/QuivrLogo";
-import { AddBrainModal } from "@/lib/components/AddBrainModal";
 import { SearchBar } from "@/lib/components/ui/SearchBar/SearchBar";
-import { useMenuContext } from "@/lib/context/MenuProvider/hooks/useMenuContext";
 import { useSupabase } from "@/lib/context/SupabaseProvider";
 import { redirectToLogin } from "@/lib/router/redirectToLogin";
 
 import styles from "./page.module.scss";
 
-import { useChatsList } from "../chat/[chatId]/hooks/useChatsList";
-
-
 const Search = (): JSX.Element => {
-  const { setIsOpened } = useMenuContext();
   const pathname = usePathname();
   const { session } = useSupabase();
 
@@ -23,10 +17,7 @@ const Search = (): JSX.Element => {
     if (session === null) {
       redirectToLogin();
     }
-    setIsOpened(false);
-  }, [pathname, session, setIsOpened]);
-
-  useChatsList();
+  }, [pathname, session]);
 
   return (
     <div className={styles.search_page_container}>
@@ -41,9 +32,6 @@ const Search = (): JSX.Element => {
         <div className={styles.search_bar_wrapper}>
           <SearchBar />
         </div>
-      </div>
-      <div className={styles.add_brain_wrapper}>
-        <AddBrainModal />
       </div>
     </div>
   );

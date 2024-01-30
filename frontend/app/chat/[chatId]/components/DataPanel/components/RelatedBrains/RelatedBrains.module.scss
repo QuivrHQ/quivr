@@ -1,5 +1,6 @@
 @use "@/styles/Colors.module.scss";
 @use "@/styles/Spacings.module.scss";
+@use "@/styles/Typography.module.scss";
 
 .close_brains_wrapper {
   display: flex;
@@ -27,9 +28,7 @@
       }
 
       .brain_name {
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
+        @include Typography.EllipsisOverflow;
 
         &.current {
           color: Colors.$primary;

@@ -41,8 +41,16 @@
   color: Colors.$accent;
 }
 
+.gold {
+  color: Colors.$gold;
+}
+
 .white {
   color: Colors.$white;
+
+  &:hover {
+    color: Colors.$accent;
+  }
 }
 
 .disabled {
