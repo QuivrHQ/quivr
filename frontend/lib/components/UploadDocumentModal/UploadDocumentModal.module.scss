@@ -1,0 +1,13 @@
+@use "@/styles/Colors.module.scss";
+@use "@/styles/ZIndexes.module.scss";
+
+.knowledge_modal {
+  display: flex;
+  background-color: rgba(Colors.$dark-black, 0.94);
+  height: 100%;
+  width: 100%;
+  position: absolute;
+  z-index: ZIndexes.$modal;
+  align-items: center;
+  justify-content: center;
+}
