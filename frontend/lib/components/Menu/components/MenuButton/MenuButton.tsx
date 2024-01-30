@@ -22,6 +22,7 @@ export const MenuButton = (props: ButtonProps): JSX.Element => {
       ${props.isSelected ? styles.selected : ""}
       ${props.gold ? styles.gold : ""}
       `}
+      onClick={props.onClick}
     >
       <div className={styles.left}>
         <Icon
