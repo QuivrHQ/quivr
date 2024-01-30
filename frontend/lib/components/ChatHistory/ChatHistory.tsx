@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
 
-import { ChatsListItem } from "@/lib/components/ChatsListItem";
+import { ChatsListItem } from "@/lib/components/Menu/components/HistoryButton/ChatsListItem";
 import { useChatsContext } from "@/lib/context/ChatsProvider/hooks/useChatsContext";
 
 import {
@@ -8,8 +8,7 @@ import {
   isWithinLast30Days,
   isWithinLast7Days,
   isYesterday,
-} from "./utils";
-
+} from "../Menu/components/HistoryButton/utils";
 import Spinner from "../ui/Spinner";
 
 export const ChatHistory = (): JSX.Element => {

@@ -1,0 +1,20 @@
+@use "@/styles/Colors.module.scss";
+@use "@/styles/Spacings.module.scss";
+@use "@/styles/Typography.module.scss";
+
+.history_content_wrapper {
+  padding: Spacings.$spacing03;
+  padding-top: 0;
+  color: Colors.$light-grey;
+  font-size: Typography.$small;
+  height: 200px;
+  overflow-y: scroll;
+  display: flex;
+  flex-direction: column;
+
+  .chats_wrapper {
+    border-left: 1px solid Colors.$accent;
+    padding-left: Spacings.$spacing03;
+    margin: Spacings.$spacing02;
+  }
+}
