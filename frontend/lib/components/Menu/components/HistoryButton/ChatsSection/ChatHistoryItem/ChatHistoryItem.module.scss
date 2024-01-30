@@ -10,6 +10,21 @@
   align-items: center;
   overflow: hidden;
 
+  .edit_chat_name {
+    @include Typography.EllipsisOverflow;
+
+    background-color: Colors.$black;
+    color: Colors.$white;
+    border-radius: 12px;
+    height: 32px;
+    border: 1px solid transparent;
+    outline: none;
+
+    &:focus {
+      outline: none;
+    }
+  }
+
   .chat_item_name {
     @include Typography.EllipsisOverflow;
 

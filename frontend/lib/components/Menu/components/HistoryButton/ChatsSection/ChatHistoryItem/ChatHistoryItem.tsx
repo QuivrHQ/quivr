@@ -14,18 +14,39 @@ type ChatHistoryItemProps = {
 export const ChatHistoryItem = ({
   chatHistoryItem,
 }: ChatHistoryItemProps): JSX.Element => {
-  const { deleteChat } = useChatsListItem(chatHistoryItem);
+  const {
+    chatName,
+    deleteChat,
+    editingName,
+    handleEditNameClick,
+    setChatName,
+  } = useChatsListItem(chatHistoryItem);
 
   return (
     <div className={styles.chat_item_wrapper}>
-      <Link
-        className={styles.chat_item_name}
-        href={`/chat/${chatHistoryItem.chat_id}`}
-      >
-        {chatHistoryItem.chat_name.trim()}
-      </Link>
+      {editingName ? (
+        <input
+          className={styles.edit_chat_name}
+          onChange={(event) => setChatName(event.target.value)}
+          value={chatName}
+          autoFocus
+        />
+      ) : (
+        <Link
+          className={styles.chat_item_name}
+          href={`/chat/${chatHistoryItem.chat_id}`}
+        >
+          {chatHistoryItem.chat_name.trim()}
+        </Link>
+      )}
       <div className={styles.icons_wrapper}>
-        <Icon name="edit" size="normal" color="white" handleHover={true} />
+        <Icon
+          name={editingName ? "check" : "edit"}
+          size="normal"
+          color="white"
+          handleHover={true}
+          onClick={() => handleEditNameClick()}
+        />
         <Icon
           name="delete"
           size="normal"
