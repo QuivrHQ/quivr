@@ -1,6 +1,5 @@
 @use "@/styles/Colors.module.scss";
 @use "@/styles/Spacings.module.scss";
-@use "@/styles/Typography.module.scss";
 
 .chats_wrapper {
   border-left: 1px solid Colors.$accent;
@@ -9,33 +8,4 @@
   display: flex;
   flex-direction: column;
   gap: Spacings.$spacing02;
-
-  .chat_item_wrapper {
-    color: Colors.$highlight;
-    display: flex;
-    justify-content: space-between;
-    gap: Spacings.$spacing03;
-    align-items: center;
-    overflow: hidden;
-
-    .chat_item_name {
-      @include Typography.EllipsisOverflow;
-
-      &:hover {
-        color: Colors.$accent;
-      }
-    }
-
-    .icons_wrapper {
-      visibility: hidden;
-      display: flex;
-      gap: Spacings.$spacing02;
-    }
-
-    &:hover {
-      .icons_wrapper {
-        visibility: visible;
-      }
-    }
-  }
 }
