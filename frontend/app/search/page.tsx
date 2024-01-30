@@ -9,8 +9,6 @@ import { redirectToLogin } from "@/lib/router/redirectToLogin";
 
 import styles from "./page.module.scss";
 
-import { useChatsList } from "../chat/[chatId]/hooks/useChatsList";
-
 const Search = (): JSX.Element => {
   const pathname = usePathname();
   const { session } = useSupabase();
@@ -20,8 +18,6 @@ const Search = (): JSX.Element => {
       redirectToLogin();
     }
   }, [pathname, session]);
-
-  useChatsList();
 
   return (
     <div className={styles.search_page_container}>

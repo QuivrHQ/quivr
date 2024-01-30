@@ -3,6 +3,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 
 import { MenuControlButton } from "@/app/chat/[chatId]/components/ActionsBar/components/ChatInput/components/MenuControlButton/MenuControlButton";
+import { useChatsList } from "@/app/chat/[chatId]/hooks/useChatsList";
 import { QuivrLogo } from "@/lib/assets/QuivrLogo";
 import { nonProtectedPaths } from "@/lib/config/routesConfig";
 import { useMenuContext } from "@/lib/context/MenuProvider/hooks/useMenuContext";
@@ -18,6 +19,8 @@ export const Menu = (): JSX.Element => {
   const router = useRouter();
   const pathname = usePathname() ?? "";
   const [isLogoHovered, setIsLogoHovered] = useState<boolean>(false);
+
+  useChatsList();
 
   if (nonProtectedPaths.includes(pathname)) {
     return <></>;
