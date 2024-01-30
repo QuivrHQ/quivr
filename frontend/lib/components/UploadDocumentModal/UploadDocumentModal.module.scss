@@ -4,11 +4,6 @@
 .knowledge_modal {
   display: flex;
   background-color: Colors.$white;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, 50%);
-  z-index: ZIndexes.$modal;
   align-items: center;
   justify-content: center;
 }

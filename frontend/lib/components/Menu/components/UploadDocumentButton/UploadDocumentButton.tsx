@@ -22,8 +22,7 @@ export const UploadDocumentButton = (): JSX.Element => {
           />
         </div>
       }
-      title={t("newBrainTitle", { ns: "brain" })}
-      desc={t("newBrainSubtitle", { ns: "brain" })}
+      title={t("title", { ns: "upload" })}
       isOpen={shouldDisplayFeedCard}
       setOpen={setShouldDisplayFeedCard}
       CloseTrigger={<div />}

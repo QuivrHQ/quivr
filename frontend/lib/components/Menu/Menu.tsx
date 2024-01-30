@@ -16,7 +16,7 @@ import { HistoryButton } from "./components/HistoryButton/HistoryButton";
 import { HomeButton } from "./components/HomeButton/HomeButton";
 import { ProfileButton } from "./components/ProfileButton/ProfileButton";
 import { UpgradeToPlusButton } from "./components/UpgradeToPlusButton/UpgradeToPlusButton";
-import { UploadDocumentButton } from "./components/UploadDocumentButton/UploadDocument";
+import { UploadDocumentButton } from "./components/UploadDocumentButton/UploadDocumentButton";
 
 import { AddBrainModal } from "../AddBrainModal";
 

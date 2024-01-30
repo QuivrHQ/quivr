@@ -1,9 +1,7 @@
 import Link from "next/link";
 import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
-import { MdClose } from "react-icons/md";
 
-import { AddBrainModal } from "@/lib/components/AddBrainModal";
 import { ApiBrainSecretsInputs } from "@/lib/components/ApiBrainSecretsInputs/ApiBrainSecretsInputs";
 import { KnowledgeToFeedInput } from "@/lib/components/KnowledgeToFeedInput";
 import Button from "@/lib/components/ui/Button";
@@ -38,18 +36,7 @@ export const KnowledgeToFeed = ({
   });
 
   return (
-    <div className="flex-col w-full relative" data-testid="feed-card">
-      <div className="flex flex-1 justify-between">
-        <AddBrainModal />
-        <Button
-          variant={"tertiary"}
-          onClick={() => setShouldDisplayFeedCard(false)}
-        >
-          <span>
-            <MdClose className="text-3xl" />
-          </span>
-        </Button>
-      </div>
+    <div className="flex-col w-full relative pt-3" data-testid="feed-card">
       <div className="flex justify-center">
         <Select
           options={formatMinimalBrainsToSelectComponentInput(
