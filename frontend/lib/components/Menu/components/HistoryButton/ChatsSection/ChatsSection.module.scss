@@ -5,4 +5,12 @@
   border-left: 1px solid Colors.$accent;
   padding-left: Spacings.$spacing03;
   margin: Spacings.$spacing02;
+
+  .link {
+    color: Colors.$highlight;
+
+    &:hover {
+      color: Colors.$accent;
+    }
+  }
 }

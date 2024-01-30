@@ -19,7 +19,11 @@ export const ChatsSection = (props: ChatSectionProps): JSX.Element => {
       <div>{props.title}</div>
       <div className={styles.chats_wrapper}>
         {props.chats.map((chat) => (
-          <Link href={`/chat/${chat.chat_id}`} key={chat.chat_id}>
+          <Link
+            className={styles.link}
+            href={`/chat/${chat.chat_id}`}
+            key={chat.chat_id}
+          >
             <div>{chat.chat_name.trim()}</div>
           </Link>
         ))}
