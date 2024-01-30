@@ -5,6 +5,8 @@
 .menu_container {
   background-color: Colors.$light-black;
   border-right: 1px solid Colors.$dark-black;
+  overflow-y: scroll;
+  overflow-x: auto;
 
   .quivr_logo_wrapper {
     cursor: pointer;
