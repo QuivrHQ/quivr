@@ -34,9 +34,7 @@ class ApiKeyService:
                     result.data[0]["creation_time"], "%Y-%m-%dT%H:%M:%S"
                 ).date()
 
-                if (api_key_creation_date.month == current_date.month) and (
-                    api_key_creation_date.year == current_date.year
-                ):
+                if api_key_creation_date.year == current_date.year:
                     return True
             return False
         except DateError:

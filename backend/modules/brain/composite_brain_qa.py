@@ -4,11 +4,11 @@ from uuid import UUID
 
 from fastapi import HTTPException
 from litellm import completion
-from llm.api_brain_qa import APIBrainQA
-from llm.knowledge_brain_qa import KnowledgeBrainQA
-from llm.qa_headless import HeadlessQA
 from logger import get_logger
+from modules.brain.api_brain_qa import APIBrainQA
 from modules.brain.entity.brain_entity import BrainEntity, BrainType
+from modules.brain.knowledge_brain_qa import KnowledgeBrainQA
+from modules.brain.qa_headless import HeadlessQA
 from modules.brain.service.brain_service import BrainService
 from modules.chat.dto.chats import ChatQuestion
 from modules.chat.dto.inputs import CreateChatHistory

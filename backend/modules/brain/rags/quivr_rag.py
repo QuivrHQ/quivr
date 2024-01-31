@@ -12,17 +12,16 @@ from langchain.prompts.chat import (
     HumanMessagePromptTemplate,
     SystemMessagePromptTemplate,
 )
-from llm.rags.rag_interface import RAGInterface
+from llm.prompts.CONDENSE_PROMPT import CONDENSE_QUESTION_PROMPT
 from llm.utils.get_prompt_to_use import get_prompt_to_use
 from logger import get_logger
 from models import BrainSettings  # Importing settings related to the 'brain'
+from modules.brain.rags.rag_interface import RAGInterface
 from modules.brain.service.brain_service import BrainService
 from modules.chat.service.chat_service import ChatService
 from pydantic import BaseModel
 from supabase.client import Client, create_client
 from vectorstore.supabase import CustomSupabaseVectorStore
-
-from ..prompts.CONDENSE_PROMPT import CONDENSE_QUESTION_PROMPT
 
 logger = get_logger(__name__)
 QUIVR_DEFAULT_PROMPT = "Your name is Quivr. You're a helpful assistant.  If you don't know the answer, just say that you don't know, don't try to make up an answer."

@@ -5,14 +5,14 @@ from uuid import UUID
 
 from langchain.callbacks.streaming_aiter import AsyncIteratorCallbackHandler
 from langchain.chains import ConversationalRetrievalChain
-from llm.qa_interface import QAInterface
-from llm.rags.quivr_rag import QuivrRAG
-from llm.rags.rag_interface import RAGInterface
 from llm.utils.format_chat_history import format_chat_history
 from llm.utils.get_prompt_to_use import get_prompt_to_use
 from llm.utils.get_prompt_to_use_id import get_prompt_to_use_id
 from logger import get_logger
 from models import BrainSettings
+from modules.brain.qa_interface import QAInterface
+from modules.brain.rags.quivr_rag import QuivrRAG
+from modules.brain.rags.rag_interface import RAGInterface
 from modules.brain.service.brain_service import BrainService
 from modules.chat.dto.chats import ChatQuestion, Sources
 from modules.chat.dto.inputs import CreateChatHistory

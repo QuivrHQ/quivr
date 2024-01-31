@@ -1,7 +1,7 @@
-from llm.api_brain_qa import APIBrainQA
-from llm.knowledge_brain_qa import KnowledgeBrainQA
 from logger import get_logger
+from modules.brain.api_brain_qa import APIBrainQA
 from modules.brain.entity.brain_entity import BrainType, RoleEnum
+from modules.brain.knowledge_brain_qa import KnowledgeBrainQA
 from modules.brain.service.api_brain_definition_service import ApiBrainDefinitionService
 from modules.brain.service.brain_authorization_service import (
     validate_brain_authorization,
@@ -22,6 +22,8 @@ models_supporting_function_calls = [
     "gpt-3.5-turbo-1106",
     "gpt-3.5-turbo-1106",
     "gpt-3.5-turbo-0613",
+    "gpt-4-0125-preview",
+    "gpt-3.5-turbo",
 ]
 
 brain_service = BrainService()
