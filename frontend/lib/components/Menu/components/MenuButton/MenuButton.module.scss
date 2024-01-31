@@ -10,6 +10,12 @@
   padding: Spacings.$spacing03;
   border-radius: 5px;
   overflow: hidden;
+  border-left: 2px solid transparent;
+
+  &.selected {
+    border-left: 2px solid Colors.$primary;
+    border-radius: 0 5px 5px 0;
+  }
 
   .left {
     display: flex;
@@ -34,19 +40,5 @@
 
   &:hover {
     background-color: Colors.$lightest-black;
-  }
-
-  &.selected {
-    border-color: Colors.$accent;
-  }
-
-  &.gold {
-    &:hover {
-      border-color: Colors.$gold;
-    }
-
-    &.selected {
-      border-color: Colors.$gold;
-    }
   }
 }
