@@ -1,4 +1,5 @@
 {
+  "addBrain": "Agregar cerebro",
   "api_brain": {
     "addRow": "Agregar fila",
     "description": "Descripción",

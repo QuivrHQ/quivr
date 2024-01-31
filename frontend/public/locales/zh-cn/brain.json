@@ -1,4 +1,5 @@
 {
+  "addBrain": "添加大脑",
   "api_brain": {
     "addRow": "添加行",
     "description": "描述",
