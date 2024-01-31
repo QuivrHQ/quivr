@@ -16,7 +16,7 @@ export const QuestionBrain = ({
 
   return (
     <div data-testid="brain-tags" className={styles.brain_name_wrapper}>
-      <Icon name="brain" color="black" size="normal" />
+      <Icon name="brain" color="primary" size="normal" />
       <span>{brainName}</span>
     </div>
   );
