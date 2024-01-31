@@ -56,7 +56,7 @@ export const MessageRow = React.forwardRef(
           {children ?? (
             <>
               <MessageContent text={messageContent} isUser={isUserSpeaker} />
-              {!isUserSpeaker && (
+              {!isUserSpeaker && messageContent !== "🧠" && (
                 <div className={styles.copy_button}>
                   <CopyButton handleCopy={handleCopy} isCopied={isCopied} />
                 </div>
