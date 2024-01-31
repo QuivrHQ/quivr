@@ -1,27 +1,42 @@
 @use "@/styles/Colors.module.scss";
 @use "@/styles/IconSizes.module.scss";
 @use "@/styles/Spacings.module.scss";
+@use "@/styles/Typography.module.scss";
 
 .search_bar_wrapper {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  flex-direction: column;
   gap: Spacings.$spacing03;
   background-color: Colors.$white;
-  padding: Spacings.$spacing05;
   border-radius: 12px;
   border: 1px solid Colors.$lighter-grey;
+  overflow: hidden;
 
-  .search_icon {
-    width: IconSizes.$big;
-    height: IconSizes.$big;
-    color: Colors.$accent;
-    cursor: pointer;
+  .current_brain_wrapper {
+    background-color: Colors.$lightest-grey;
+    padding-inline: Spacings.$spacing05;
+    padding-block: Spacings.$spacing01;
+    font-size: Typography.$small;
+  }
 
-    &.disabled {
-      color: Colors.$black;
-      pointer-events: none;
-      opacity: 0.2;
+  .editor_wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-inline: Spacings.$spacing05;
+    padding-bottom: Spacings.$spacing03;
+
+    .search_icon {
+      width: IconSizes.$big;
+      height: IconSizes.$big;
+      color: Colors.$accent;
+      cursor: pointer;
+
+      &.disabled {
+        color: Colors.$black;
+        pointer-events: none;
+        opacity: 0.2;
+      }
     }
   }
 }
