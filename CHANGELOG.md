@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.0.190 (2024-01-31)
+
+## What's Changed
+* fix(frontend): Better contrast in Menu by @Zewed in https://github.com/StanGirard/quivr/pull/2119
+* fix(frontend): better chat color and copy icon position by @Zewed in https://github.com/StanGirard/quivr/pull/2121
+* fix(frontend): better visualisation of current path on menu by @Zewed in https://github.com/StanGirard/quivr/pull/2122
+* feat(frontend): uniformize behaviour for metadata panel by @Zewed in https://github.com/StanGirard/quivr/pull/2124
+* fix(frontend): fetch chat only if session exist by @Zewed in https://github.com/StanGirard/quivr/pull/2130
+* fix(frontend): prompt display by @Zewed in https://github.com/StanGirard/quivr/pull/2129
+* fix(frontend): upload knwoledge in brains manegement by @Zewed in https://github.com/StanGirard/quivr/pull/2131
+
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.189...v0.0.190
+
 ## 0.0.189 (2024-01-30)
 
 ## What's Changed
