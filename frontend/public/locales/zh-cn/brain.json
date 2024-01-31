@@ -1,4 +1,5 @@
 {
+  "addBrain": "添加大脑",
   "api_brain": {
     "addRow": "添加行",
     "description": "描述",
@@ -38,9 +39,9 @@
   "knowledge_source_doc": "文档",
   "knowledge_source_label": "知识来源",
   "manage_brain": "管理大脑",
-  "manage_my_brains": "管理我的大脑",
+  "manage_brains": "管理大脑",
   "myBrains": "我的大脑",
-  "newBrain": "添加新大脑",
+  "newBrain": "新大脑",
   "newBrainSubtitle": "为您的数据创建一个新空间",
   "newBrainTitle": "添加新大脑",
   "noBrainUsers": "没有大脑用户",

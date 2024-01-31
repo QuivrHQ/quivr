@@ -28,7 +28,7 @@ export const DiscussionButton = (): JSX.Element => {
           <div className={styles.shortcut}>K</div>
         </div>
       </div>
-      <Icon name="search" size="normal" color={hovered ? "accent" : "black"} />
+      <Icon name="search" size="normal" color={hovered ? "primary" : "black"} />
     </div>
   );
 };

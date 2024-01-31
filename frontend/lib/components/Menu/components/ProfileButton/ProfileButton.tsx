@@ -14,6 +14,7 @@ export const ProfileButton = (): JSX.Element => {
         iconName="user"
         type="open"
         isSelected={isSelected}
+        color="primary"
       />
     </Link>
   );

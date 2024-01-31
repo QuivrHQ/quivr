@@ -58,7 +58,10 @@ export const Menu = (): JSX.Element => {
               onMouseEnter={() => setIsLogoHovered(true)}
               onMouseLeave={() => setIsLogoHovered(false)}
             >
-              <QuivrLogo size={50} color={isLogoHovered ? "accent" : "white"} />
+              <QuivrLogo
+                size={50}
+                color={isLogoHovered ? "primary" : "black"}
+              />
             </div>
 
             <div className={styles.buttons_wrapper}>

@@ -1,4 +1,5 @@
 {
+  "addBrain": "Add Brain",
   "api_brain": {
     "addRow": "Add row",
     "description": "Description",
@@ -38,9 +39,9 @@
   "knowledge_source_doc": "Documents",
   "knowledge_source_label": "Knowledge source",
   "manage_brain": "Manage brain",
-  "manage_my_brains": "Manage my brains",
+  "manage_brains": "Manage brains",
   "myBrains": "My Brains",
-  "newBrain": "Add New Brain",
+  "newBrain": "New Brain",
   "newBrainSubtitle": "Create a new space for your data",
   "newBrainTitle": "Add New Brain",
   "noBrainUsers": "No brainUsers",

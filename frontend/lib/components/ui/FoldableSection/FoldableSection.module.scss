@@ -6,8 +6,13 @@
   display: flex;
   flex-direction: column;
   border-radius: 5px;
-  border: 1px dashed Colors.$light-grey;
+  border: 1px dashed Colors.$lighter-grey;
   overflow: hidden;
+  font-size: Typography.$small;
+
+  &.hide_border {
+    border-color: transparent;
+  }
 
   .header_wrapper {
     display: flex;
@@ -24,33 +29,11 @@
 
       .header_title {
         @include Typography.EllipsisOverflow;
-        font-weight: bold;
       }
     }
 
     &:hover {
-      background-color: Colors.$lightest-grey;
-    }
-  }
-
-  &.dark_mode {
-    border-color: transparent;
-
-    .header_wrapper {
-      .header_left {
-        .header_title {
-          color: Colors.$white;
-        }
-      }
-
-      &:hover {
-        background-color: Colors.$black;
-      }
-    }
-
-    &:hover,
-    &.unfolded {
-      border-color: Colors.$accent;
+      background-color: Colors.$lightest-black;
     }
   }
 }

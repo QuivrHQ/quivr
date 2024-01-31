@@ -7,7 +7,7 @@ type AnimatedDivProps = {
 };
 export const AnimatedDiv = ({ children }: AnimatedDivProps): JSX.Element => {
   const { isOpened } = useMenuContext();
-  const OPENED_MENU_WIDTH = 260;
+  const OPENED_MENU_WIDTH = 230;
 
   return (
     <motion.div

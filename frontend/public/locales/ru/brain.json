@@ -1,4 +1,5 @@
 {
+  "addBrain": "Добавить мозг",
   "api_brain": {
     "addRow": "Добавить строку",
     "description": "Описание",
@@ -38,9 +39,9 @@
   "knowledge_source_doc": "Документы",
   "knowledge_source_label": "Источник знаний",
   "manage_brain": "Управление мозгом",
-  "manage_my_brains": "Управление моими мозгами",
+  "manage_brains": "Управление мозгами",
   "myBrains": "Мои мозги",
-  "newBrain": "Добавить новый мозг",
+  "newBrain": "Новый мозг",
   "newBrainSubtitle": "Создайте новое пространство для ваших данных",
   "newBrainTitle": "Добавить новый мозг",
   "noBrainUsers": "Нет пользователей мозга",
