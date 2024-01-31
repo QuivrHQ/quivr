@@ -40,18 +40,8 @@
   &.brain {
     .message_header {
       display: flex;
-      justify-content: space-between;
-      width: 100%;
-
-      .left_wrapper {
-        display: flex;
-        gap: Spacings.$spacing05;
-        align-items: center;
-      }
-
-      .copy_button {
-        visibility: hidden;
-      }
+      gap: Spacings.$spacing04;
+      align-items: baseline;
     }
 
     .message_row_content {
@@ -65,14 +55,6 @@
         position: absolute;
         left: Spacings.$spacing02;
         top: calc(100% + #{Spacings.$spacing02});
-      }
-    }
-  }
-
-  &:hover {
-    .message_header {
-      .copy_button {
-        visibility: visible;
       }
     }
   }
