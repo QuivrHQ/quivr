@@ -58,6 +58,13 @@
       align-self: flex-start;
       background-color: Colors.$lightest-black;
       margin-left: 1px;
+      position: relative;
+
+      .copy_button {
+        position: absolute;
+        left: Spacings.$spacing02;
+        top: calc(100% + #{Spacings.$spacing02});
+      }
     }
   }
 
