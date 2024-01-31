@@ -21,7 +21,11 @@ export const SearchBar = ({
   const { message, setMessage } = useChatInput();
   const { setMessages } = useChatContext();
   const { addQuestion } = useChat();
-  const { currentBrain } = useBrainContext();
+  const { currentBrain, setCurrentBrainId } = useBrainContext();
+
+  useEffect(() => {
+    setCurrentBrainId(null);
+  }, []);
 
   useEffect(() => {
     console.info(currentBrain);
