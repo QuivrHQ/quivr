@@ -13,38 +13,24 @@
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
-    padding-left: Spacings.$spacing03;
-    padding-right: Spacings.$spacing05;
+    padding-inline: Spacings.$spacing05;
     overflow: hidden;
 
-    .left {
-      display: flex;
-      align-items: center;
-      gap: Spacings.$spacing03;
-      overflow: hidden;
+    .brain_name {
+      @include Typography.EllipsisOverflow;
+      cursor: pointer;
 
-      .copy_icon {
-        visibility: hidden;
+      &.current {
+        color: Colors.$primary;
       }
 
-      .brain_name {
-        @include Typography.EllipsisOverflow;
-
-        &.current {
-          color: Colors.$primary;
-        }
+      &:hover {
+        color: Colors.$primary;
       }
     }
 
     .similarity_score {
       cursor: help;
-    }
-
-    &:hover {
-      .left .copy_icon {
-        visibility: visible;
-        cursor: pointer;
-      }
     }
   }
 }

@@ -1,8 +1,9 @@
+import { UUID } from "crypto";
 import { useEffect, useState } from "react";
 
 import { FoldableSection } from "@/lib/components/ui/FoldableSection/FoldableSection";
-import Icon from "@/lib/components/ui/Icon/Icon";
 import { useChatContext } from "@/lib/context";
+import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 import { CloseBrain } from "@/lib/types/MessageMetadata";
 
 import styles from "./RelatedBrains.module.scss";
@@ -17,6 +18,7 @@ interface CloseBrainProps {
 }
 
 const RelatedBrains = ({ closeBrains }: RelatedBrainsProps): JSX.Element => {
+  const { setCurrentBrainId } = useBrainContext();
   const [closeBrainsProps, setCloseBrainProps] = useState<CloseBrainProps[]>(
     []
   );
@@ -44,6 +46,16 @@ const RelatedBrains = ({ closeBrains }: RelatedBrainsProps): JSX.Element => {
     }
   }, [closeBrains, messages.length]);
 
+  const setCurrentBrain = (index: number) => {
+    if (closeBrains?.[index]) {
+      setCurrentBrainId(closeBrains[index].id as UUID);
+      closeBrainsProps.forEach((_closeBrains, closeBrainIndex) => {
+        closeBrainsProps[closeBrainIndex].isCurrentBrain =
+          index === closeBrainIndex;
+      });
+    }
+  };
+
   return (
     <FoldableSection
       label="Related Brains (Beta)"
@@ -53,20 +65,8 @@ const RelatedBrains = ({ closeBrains }: RelatedBrainsProps): JSX.Element => {
       <div className={styles.close_brains_wrapper}>
         {closeBrains?.map((brain, index) => (
           <div className={styles.brain_line} key={index}>
-            <div className={styles.left}>
-              <div className={styles.copy_icon}>
-                <Icon
-                  name="copy"
-                  size="normal"
-                  color="black"
-                  handleHover={true}
-                  onClick={() =>
-                    void navigator.clipboard.writeText("@" + brain.name)
-                  }
-                ></Icon>
-              </div>
-              <p
-                className={`
+            <span
+              className={`
               ${styles.brain_name ?? ""} 
               ${
                 closeBrainsProps[index]?.isCurrentBrain
@@ -74,10 +74,10 @@ const RelatedBrains = ({ closeBrains }: RelatedBrainsProps): JSX.Element => {
                   : ""
               }
               `}
-              >
-                @{brain.name}
-              </p>
-            </div>
+              onClick={() => void setCurrentBrain(index)}
+            >
+              {brain.name}
+            </span>
             <div
               className={styles.similarity_score}
               title="Similarity score"
