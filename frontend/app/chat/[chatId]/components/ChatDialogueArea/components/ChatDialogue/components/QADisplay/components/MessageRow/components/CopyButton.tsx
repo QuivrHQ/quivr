@@ -17,7 +17,7 @@ export const CopyButton = ({
     <Icon
       name={isCopied ? "checkCircle" : "copy"}
       color={isCopied ? "primary" : "black"}
-      size="normal"
+      size="small"
       handleHover={true}
     />
   </button>

@@ -36,19 +36,14 @@ export const MessageRow = React.forwardRef(
     return (
       <div
         className={`
-      ${styles.message_row_container ?? ""} 
-      ${isUserSpeaker ? styles.user ?? "" : styles.brain ?? ""}
+      ${styles.message_row_container} 
+      ${isUserSpeaker ? styles.user : styles.brain}
       `}
       >
         {!isUserSpeaker ? (
           <div className={styles.message_header}>
-            <div className={styles.left_wrapper}>
-              <QuestionBrain brainName={brainName} />
-              <QuestionPrompt promptName={promptName} />
-            </div>
-            <div className={styles.copy_button}>
-              <CopyButton handleCopy={handleCopy} isCopied={isCopied} />
-            </div>
+            <QuestionBrain brainName={brainName} />
+            <QuestionPrompt promptName={promptName} />
           </div>
         ) : (
           <div className={styles.message_header}>
@@ -59,7 +54,14 @@ export const MessageRow = React.forwardRef(
         {}
         <div ref={ref} className={styles.message_row_content}>
           {children ?? (
-            <MessageContent text={messageContent} isUser={isUserSpeaker} />
+            <>
+              <MessageContent text={messageContent} isUser={isUserSpeaker} />
+              {!isUserSpeaker && (
+                <div className={styles.copy_button}>
+                  <CopyButton handleCopy={handleCopy} isCopied={isCopied} />
+                </div>
+              )}
+            </>
           )}
         </div>
       </div>

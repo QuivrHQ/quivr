@@ -32,7 +32,7 @@
     }
 
     .message_row_content {
-      background-color: Colors.$highlight;
+      background-color: Colors.$white;
       box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.25);
     }
   }
@@ -56,8 +56,16 @@
 
     .message_row_content {
       align-self: flex-start;
-      background-color: Colors.$lightest-black;
+      background-color: Colors.$primary-lightest;
+      box-shadow: 0px 2px 2px rgba(97, 66, 212, 0.25);
       margin-left: 1px;
+      position: relative;
+
+      .copy_button {
+        position: absolute;
+        left: Spacings.$spacing02;
+        top: calc(100% + #{Spacings.$spacing02});
+      }
     }
   }
 
