@@ -1,3 +1,4 @@
+import { usePathname } from "next/navigation";
 import { FileRejection, useDropzone } from "react-dropzone";
 import { useTranslation } from "react-i18next";
 
@@ -18,6 +19,7 @@ export const useCustomDropzone = () => {
     useKnowledgeToFeedContext();
   const { isOnboarding } = useOnboarding();
   const { trackOnboardingEvent } = useOnboardingTracker();
+  const pathname = usePathname();
 
   const files: File[] = (
     knowledgeToFeed.filter((c) => c.source === "upload") as FeedItemUploadType[]
@@ -29,7 +31,9 @@ export const useCustomDropzone = () => {
   const { t } = useTranslation(["upload"]);
 
   const onDrop = (acceptedFiles: File[], fileRejections: FileRejection[]) => {
-    setShouldDisplayFeedCard(true);
+    if (pathname && !pathname.includes("brains-management")) {
+      setShouldDisplayFeedCard(true);
+    }
     if (fileRejections.length > 0) {
       const firstRejection = fileRejections[0];
 
