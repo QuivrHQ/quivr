@@ -19,6 +19,7 @@ export const UploadDocumentButton = (): JSX.Element => {
             label={t("title")}
             type="add"
             onClick={() => setShouldDisplayFeedCard(true)}
+            color="primary"
           />
         </div>
       }

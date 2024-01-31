@@ -16,6 +16,7 @@ export const HomeButton = (): JSX.Element => {
         isSelected={isSelected}
         iconName="home"
         type="open"
+        color="primary"
       />
     </Link>
   );

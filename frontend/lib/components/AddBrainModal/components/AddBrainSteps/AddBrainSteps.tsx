@@ -29,6 +29,7 @@ export const AddBrainSteps = ({
               iconName="brain"
               label={t("newBrain", { ns: "brain" })}
               type="add"
+              color="primary"
             />
           ) : (
             <TextButton

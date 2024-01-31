@@ -19,8 +19,8 @@ export const UpgradeToPlusButton = (): JSX.Element => {
         <MenuButton
           iconName="star"
           label={t("upgrade")}
-          type="open"
-          gold={true}
+          type="add"
+          color="gold"
         />
       }
     />

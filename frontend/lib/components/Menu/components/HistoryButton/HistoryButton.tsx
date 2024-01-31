@@ -51,8 +51,8 @@ export const HistoryButton = (): JSX.Element => {
     <FoldableSection
       label={t("history")}
       icon="history"
-      darkMode={true}
       foldedByDefault={true}
+      hideBorderIfUnfolded={true}
     >
       <div
         className={`

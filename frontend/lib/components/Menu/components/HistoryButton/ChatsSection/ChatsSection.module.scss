@@ -2,7 +2,7 @@
 @use "@/styles/Spacings.module.scss";
 
 .chats_wrapper {
-  border-left: 1px solid Colors.$accent;
+  border-left: 1px solid Colors.$normal-grey;
   padding-left: Spacings.$spacing03;
   margin: Spacings.$spacing02;
   display: flex;

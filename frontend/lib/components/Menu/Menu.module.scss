@@ -3,8 +3,8 @@
 @use "@/styles/ZIndexes.module.scss";
 
 .menu_container {
-  background-color: Colors.$light-black;
-  border-right: 1px solid Colors.$dark-black;
+  background-color: Colors.$highlight;
+  border-right: 1px solid Colors.$lightest-black;
 
   .menu_wrapper {
     padding-top: Spacings.$spacing05;
@@ -46,6 +46,6 @@
   z-index: ZIndexes.$overlay;
 
   &.shifted {
-    margin-left: 260px;
+    margin-left: 230px;
   }
 }
