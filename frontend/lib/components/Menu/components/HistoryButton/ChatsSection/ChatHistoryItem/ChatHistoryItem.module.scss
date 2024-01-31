@@ -3,7 +3,7 @@
 @use "@/styles/Typography.module.scss";
 
 .chat_item_wrapper {
-  color: Colors.$highlight;
+  color: Colors.$black;
   display: flex;
   justify-content: space-between;
   gap: Spacings.$spacing03;
@@ -13,13 +13,13 @@
   .edit_chat_name {
     @include Typography.EllipsisOverflow;
 
-    color: Colors.$white;
+    color: Colors.$black;
     border: none;
     height: 21px;
     outline: none;
     padding: 0;
     font-size: Typography.$small;
-    background-color: Colors.$black;
+    background-color: Colors.$lighter-grey;
     border-radius: 2px;
 
     &:focus {
@@ -31,7 +31,7 @@
     @include Typography.EllipsisOverflow;
 
     &:hover {
-      color: Colors.$accent;
+      color: Colors.$primary;
     }
   }
 

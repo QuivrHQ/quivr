@@ -1,4 +1,5 @@
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
+import { BsArrowRightShort } from "react-icons/bs";
 import {
   FaCheck,
   FaCheckCircle,
@@ -6,6 +7,7 @@ import {
   FaRegUserCircle,
 } from "react-icons/fa";
 import { FaArrowUpFromBracket } from "react-icons/fa6";
+import { IoIosAdd } from "react-icons/io";
 import { IoHomeOutline } from "react-icons/io5";
 import { IconType } from "react-icons/lib";
 import {
@@ -15,7 +17,6 @@ import {
   LuChevronRight,
   LuCopy,
   LuFile,
-  LuPlus,
   LuPlusCircle,
   LuSearch,
 } from "react-icons/lu";
@@ -24,7 +25,7 @@ import { RiHashtag } from "react-icons/ri";
 
 export const iconList: { [name: string]: IconType } = {
   add: LuPlusCircle,
-  addWithoutCircle: LuPlus,
+  addWithoutCircle: IoIosAdd,
   brain: LuBrain,
   brainCircuit: LuBrainCircuit,
   check: FaCheck,
@@ -40,6 +41,7 @@ export const iconList: { [name: string]: IconType } = {
   history: MdHistory,
   home: IoHomeOutline,
   loader: AiOutlineLoading3Quarters,
+  redirection: BsArrowRightShort,
   search: LuSearch,
   star: FaRegStar,
   upload: MdUploadFile,

@@ -27,13 +27,14 @@ export const AddBrainSteps = ({
           {isMenuButton ? (
             <MenuButton
               iconName="brain"
-              label={t("newBrain", { ns: "brain" })}
+              label={t("addBrain", { ns: "brain" })}
               type="add"
+              color="primary"
             />
           ) : (
             <TextButton
               iconName="add"
-              label={t("newBrain", { ns: "brain" })}
+              label={t("addBrain", { ns: "brain" })}
               color="black"
             />
           )}

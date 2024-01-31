@@ -52,14 +52,14 @@ export const ChatHistoryItem = ({
         <Icon
           name={editingName ? "check" : "edit"}
           size="normal"
-          color="white"
+          color="black"
           handleHover={true}
           onClick={() => onNameEdited()}
         />
         <Icon
           name="delete"
           size="normal"
-          color="white"
+          color="black"
           handleHover={true}
           onClick={() => void deleteChat()}
         />

@@ -10,7 +10,6 @@
   padding: Spacings.$spacing03;
   border-radius: 5px;
   overflow: hidden;
-  border: 1px solid transparent;
 
   .left {
     display: flex;
@@ -20,14 +19,21 @@
 
     .title {
       @include Typography.EllipsisOverflow;
-      font-weight: bold;
-      color: Colors.$white;
+      font-size: Typography.$small;
+      color: Colors.$black;
+
+      &.gold {
+        color: Colors.$gold;
+      }
+
+      &.primary {
+        color: Colors.$primary;
+      }
     }
   }
 
   &:hover {
-    border-color: Colors.$accent;
-    background-color: Colors.$black;
+    background-color: Colors.$lightest-black;
   }
 
   &.selected {

@@ -1,4 +1,5 @@
 {
+  "addBrain": "Agregar cerebro",
   "api_brain": {
     "addRow": "Agregar fila",
     "description": "Descripción",
@@ -38,9 +39,9 @@
   "knowledge_source_doc": "Documentos",
   "knowledge_source_label": "Fuente de conocimiento",
   "manage_brain": "Gestionar cerebro",
-  "manage_my_brains": "Gestionar mis cerebros",
+  "manage_brains": "Gestionar cerebros",
   "myBrains": "Mis cerebros",
-  "newBrain": "Agregar nuevo cerebro",
+  "newBrain": "Nuevo cerebro",
   "newBrainSubtitle": "Crea un nuevo espacio para tus datos",
   "newBrainTitle": "Agregar nuevo cerebro",
   "noBrainUsers": "Sin usuarios del cerebro",
