@@ -50,7 +50,6 @@ const RelatedBrains = ({ closeBrains }: RelatedBrainsProps): JSX.Element => {
     if (closeBrains?.[index]) {
       setCurrentBrainId(closeBrains[index].id as UUID);
       closeBrainsProps.forEach((_closeBrains, closeBrainIndex) => {
-        console.info(index === closeBrainIndex);
         closeBrainsProps[closeBrainIndex].isCurrentBrain =
           index === closeBrainIndex;
       });
