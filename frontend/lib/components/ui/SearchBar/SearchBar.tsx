@@ -55,9 +55,13 @@ export const SearchBar = ({
 
   /* eslint-disable @typescript-eslint/restrict-template-expressions */
   return (
-    <div className={styles.search_bar_wrapper}>
-      <div className={styles.current_brain_wrapper}>
-        {currentBrain && (
+    <div
+      className={`
+      ${styles.search_bar_wrapper}
+      ${currentBrain ? styles.with_brain : ""}`}
+    >
+      {currentBrain && (
+        <div className={styles.current_brain_wrapper}>
           <div className={styles.brain_infos}>
             <div className={styles.left}>
               <span>Talking to</span>
@@ -75,8 +79,8 @@ export const SearchBar = ({
               />
             </div>
           </div>
-        )}
-      </div>
+        </div>
+      )}
       <div
         className={`
       ${styles.editor_wrapper}
