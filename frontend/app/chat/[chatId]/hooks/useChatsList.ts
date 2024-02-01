@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next";
 import { CHATS_DATA_KEY } from "@/lib/api/chat/config";
 import { useChatApi } from "@/lib/api/chat/useChatApi";
 import { useChatsContext } from "@/lib/context/ChatsProvider/hooks/useChatsContext";
+import { useSupabase } from "@/lib/context/SupabaseProvider";
 import { useToast } from "@/lib/hooks";
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
@@ -14,18 +15,21 @@ export const useChatsList = () => {
   const { setAllChats, setIsLoading } = useChatsContext();
   const { publish } = useToast();
   const { getChats } = useChatApi();
+  const { session } = useSupabase();
 
   const fetchAllChats = async () => {
-    try {
-      const response = await getChats();
+    if (session) {
+      try {
+        const response = await getChats();
 
-      return response.reverse();
-    } catch (error) {
-      console.error(error);
-      publish({
-        variant: "danger",
-        text: t("errorFetching", { ns: "chat" }),
-      });
+        return response.reverse();
+      } catch (error) {
+        console.error(error);
+        publish({
+          variant: "danger",
+          text: t("errorFetching", { ns: "chat" }),
+        });
+      }
     }
   };
 
