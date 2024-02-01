@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.0.191 (2024-02-01)
+
+## What's Changed
+* fix(frontend): no sources repetition in data panel by @Zewed in https://github.com/StanGirard/quivr/pull/2132
+* fix(frontend): don't show copy icon when thinking by @Zewed in https://github.com/StanGirard/quivr/pull/2133
+
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.190...v0.0.191
+
 ## 0.0.190 (2024-01-31)
 
 ## What's Changed
