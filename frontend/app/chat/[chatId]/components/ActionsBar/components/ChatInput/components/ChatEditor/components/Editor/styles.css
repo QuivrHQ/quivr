@@ -4,9 +4,8 @@
     color: #adb5bd;
     pointer-events: none;
     height: 0;
+    display: none;
 }
 .mention {
-    background-color: #E0DDFC;
-    border-radius: 4px;
-    padding: 2px 4px;
+    display: none;
 }
