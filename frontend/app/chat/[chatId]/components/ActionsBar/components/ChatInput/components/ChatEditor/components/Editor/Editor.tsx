@@ -23,12 +23,12 @@ export const Editor = ({
 
   useEffect(() => {
     const htmlString = editor?.getHTML();
-    const textContent = htmlString
-      ? new DOMParser().parseFromString(htmlString, "text/html").body
-          .textContent ?? ""
-      : "";
-
-    if (message === "" || textContent === " ") {
+    if (
+      message === "" ||
+      (htmlString &&
+        new DOMParser().parseFromString(htmlString, "text/html").body
+          .textContent === " ")
+    ) {
       editor?.commands.clearContent();
     }
   }, [message, editor]);
