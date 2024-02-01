@@ -4,7 +4,6 @@
     color: #adb5bd;
     pointer-events: none;
     height: 0;
-    display: none;
 }
 .mention {
     display: none;

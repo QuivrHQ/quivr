@@ -22,9 +22,6 @@ export const Editor = ({
   const { editor } = useCreateEditorState(placeholder);
 
   useEffect(() => {
-    if (editor?.getHTML() !== "<p></p>") {
-      editor?.commands.setContent(editor.getHTML().trim());
-    }
     if (message === "") {
       editor?.commands.clearContent();
     }

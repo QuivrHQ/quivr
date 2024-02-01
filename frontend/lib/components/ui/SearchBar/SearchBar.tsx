@@ -9,6 +9,7 @@ import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainConte
 
 import styles from "./SearchBar.module.scss";
 
+import { Icon } from "../Icon/Icon";
 import { LoaderIcon } from "../LoaderIcon/LoaderIcon";
 
 export const SearchBar = ({
@@ -26,10 +27,6 @@ export const SearchBar = ({
   useEffect(() => {
     setCurrentBrainId(null);
   }, []);
-
-  useEffect(() => {
-    console.info(currentBrain);
-  }, [currentBrain]);
 
   useEffect(() => {
     setIsDisabled(message === "");
@@ -52,13 +49,40 @@ export const SearchBar = ({
     }
   };
 
+  const removeCurrentBrain = (): void => {
+    setCurrentBrainId(null);
+  };
+
   /* eslint-disable @typescript-eslint/restrict-template-expressions */
   return (
     <div className={styles.search_bar_wrapper}>
-      {currentBrain && (
-        <div className={styles.current_brain_wrapper}>{currentBrain.name}</div>
-      )}
-      <div className={styles.editor_wrapper}>
+      <div className={styles.current_brain_wrapper}>
+        {currentBrain && (
+          <div className={styles.brain_infos}>
+            <div className={styles.left}>
+              <span>Talking to</span>
+              <div className={styles.brain_name_wrapper}>
+                <Icon size="small" name="brain" color="primary" />
+                <span className={styles.brain_name}>{currentBrain.name}</span>
+              </div>
+            </div>
+            <div onClick={removeCurrentBrain}>
+              <Icon
+                size="normal"
+                name="close"
+                color="black"
+                handleHover={true}
+              />
+            </div>
+          </div>
+        )}
+      </div>
+      <div
+        className={`
+      ${styles.editor_wrapper}
+      ${currentBrain ? styles.with_brain : ""}
+      `}
+      >
         <Editor
           message={message}
           setMessage={setMessage}

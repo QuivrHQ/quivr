@@ -17,14 +17,37 @@
     padding-inline: Spacings.$spacing05;
     padding-block: Spacings.$spacing01;
     font-size: Typography.$small;
+    color: Colors.$normal-grey;
+
+    .brain_infos {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+
+      .left {
+        display: flex;
+        gap: Spacings.$spacing02;
+        align-items: center;
+
+        .brain_name_wrapper {
+          display: flex;
+          gap: Spacings.$spacing02;
+          align-items: center;
+
+          .brain_name {
+            color: Colors.$black;
+          }
+        }
+      }
+    }
   }
 
   .editor_wrapper {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding-inline: Spacings.$spacing05;
-    padding-bottom: Spacings.$spacing03;
+    padding: Spacings.$spacing05;
+    padding-top: 0;
 
     .search_icon {
       width: IconSizes.$big;
