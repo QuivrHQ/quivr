@@ -1,5 +1,6 @@
 @use "@/styles/Colors.module.scss";
 @use "@/styles/IconSizes.module.scss";
+@use "@/styles/Radius.module.scss";
 @use "@/styles/Spacings.module.scss";
 
 .button_wrapper {
@@ -8,7 +9,7 @@
   justify-content: space-between;
   align-items: center;
   border: 1px solid Colors.$lighter-grey;
-  border-radius: 12px;
+  border-radius: Radius.$big;
   background-color: Colors.$white;
   cursor: pointer;
   color: Colors.$dark-grey;
@@ -30,7 +31,7 @@
         justify-content: center;
         font-size: 12px;
         border: 1px solid Colors.$lighter-grey;
-        border-radius: 3px;
+        border-radius: Radius.$small;
         width: 16px;
         height: 16px;
       }

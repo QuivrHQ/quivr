@@ -1,5 +1,6 @@
 @use "@/styles/Colors.module.scss";
 @use "@/styles/IconSizes.module.scss";
+@use "@/styles/Radius.module.scss";
 @use "@/styles/Spacings.module.scss";
 @use "@/styles/Typography.module.scss";
 
@@ -8,7 +9,7 @@
   flex-direction: column;
   gap: Spacings.$spacing03;
   background-color: Colors.$white;
-  border-radius: 12px;
+  border-radius: Radius.$big;
   border: 1px solid Colors.$lighter-grey;
   overflow: hidden;
 
