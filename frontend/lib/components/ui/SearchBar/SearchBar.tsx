@@ -70,7 +70,12 @@ export const SearchBar = ({
                 <span className={styles.brain_name}>{currentBrain.name}</span>
               </div>
             </div>
-            <div onClick={removeCurrentBrain}>
+            <div
+              onClick={(event) => {
+                event.nativeEvent.stopImmediatePropagation();
+                removeCurrentBrain();
+              }}
+            >
               <Icon
                 size="normal"
                 name="close"
