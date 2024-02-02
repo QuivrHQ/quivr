@@ -5,10 +5,11 @@ import {
   FaCheckCircle,
   FaRegStar,
   FaRegUserCircle,
+  FaUnlock,
 } from "react-icons/fa";
 import { FaArrowUpFromBracket } from "react-icons/fa6";
 import { IoIosAdd, IoMdClose } from "react-icons/io";
-import { IoHomeOutline } from "react-icons/io5";
+import { IoHomeOutline, IoSettingsSharp } from "react-icons/io5";
 import { IconType } from "react-icons/lib";
 import {
   LuBrain,
@@ -22,6 +23,7 @@ import {
 } from "react-icons/lu";
 import { MdDelete, MdEdit, MdHistory, MdUploadFile } from "react-icons/md";
 import { RiHashtag } from "react-icons/ri";
+import { VscGraph } from "react-icons/vsc";
 
 export const iconList: { [name: string]: IconType } = {
   add: LuPlusCircle,
@@ -38,13 +40,16 @@ export const iconList: { [name: string]: IconType } = {
   edit: MdEdit,
   file: LuFile,
   followUp: FaArrowUpFromBracket,
+  graph: VscGraph,
   hastag: RiHashtag,
   history: MdHistory,
   home: IoHomeOutline,
   loader: AiOutlineLoading3Quarters,
   redirection: BsArrowRightShort,
   search: LuSearch,
+  settings: IoSettingsSharp,
   star: FaRegStar,
+  unlock: FaUnlock,
   upload: MdUploadFile,
   user: FaRegUserCircle,
 };

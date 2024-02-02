@@ -14,14 +14,17 @@ const UserPage = (): JSX.Element => {
     {
       title: "Settings",
       subtitle: "Change your settings",
+      iconName: "settings",
     },
     {
       title: "Brain Usage",
       subtitle: "View your brain usage",
+      iconName: "graph",
     },
     {
       title: "Plan",
       subtitle: "Manage your plan",
+      iconName: "unlock",
     },
   ];
 
@@ -38,6 +41,7 @@ const UserPage = (): JSX.Element => {
               key={index}
               title={card.title}
               subtitle={card.subtitle}
+              iconName={card.iconName}
             />
           ))}
         </div>
