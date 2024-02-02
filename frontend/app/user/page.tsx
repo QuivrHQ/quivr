@@ -72,11 +72,6 @@ const UserPage = (): JSX.Element => {
       </main>
       {/* <main className="container lg:w-2/3 mx-auto py-10 px-5">
         <Card className="mb-5 shadow-sm hover:shadow-none">
-          <CardHeader>
-            <h2 className="font-bold text-xl">
-              {t("accountSection", { ns: "config" })}
-            </h2>
-          </CardHeader>
 
           <CardBody className="flex flex-col items-stretch max-w-max gap-2">
             <div className="flex gap-5 items-center">
