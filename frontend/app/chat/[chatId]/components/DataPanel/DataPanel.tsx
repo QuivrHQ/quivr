@@ -29,8 +29,9 @@ const DataPanel = (): JSX.Element => {
       const updatedSources: Source[] = [];
 
       newSources.forEach((newSource) => {
+        console.info(newSource.source_url.length);
         const existingSourceIndex = updatedSources.findIndex(
-          (source) => source.source_url === newSource.source_url
+          (source) => source.name.trim() === newSource.name.trim()
         );
         if (existingSourceIndex !== -1) {
           updatedSources[existingSourceIndex] = {
