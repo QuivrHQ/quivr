@@ -9,6 +9,7 @@ import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainConte
 
 import styles from "./SearchBar.module.scss";
 
+import { CurrentBrain } from "../../CurrentBrain/CurrentBrain";
 import { LoaderIcon } from "../LoaderIcon/LoaderIcon";
 
 export const SearchBar = ({
@@ -21,11 +22,11 @@ export const SearchBar = ({
   const { message, setMessage } = useChatInput();
   const { setMessages } = useChatContext();
   const { addQuestion } = useChat();
-  const { setCurrentBrainId } = useBrainContext();
+  const { currentBrain, setCurrentBrainId } = useBrainContext();
 
   useEffect(() => {
     setCurrentBrainId(null);
-  }, [setCurrentBrainId]);
+  }, []);
 
   useEffect(() => {
     setIsDisabled(message === "");
@@ -48,26 +49,38 @@ export const SearchBar = ({
     }
   };
 
-  /* eslint-disable @typescript-eslint/restrict-template-expressions */
   return (
-    <div className={styles.search_bar_wrapper}>
-      <Editor
-        message={message}
-        setMessage={setMessage}
-        onSubmit={() => void submit()}
-        placeholder="Search"
-      ></Editor>
-      {searching ? (
-        <LoaderIcon size="big" color="accent" />
-      ) : (
-        <LuSearch
-          className={`
+    <div
+      className={`
+      ${styles.search_bar_wrapper}
+      ${currentBrain ? styles.with_brain : ""}
+      `}
+    >
+      <CurrentBrain />
+      <div
+        className={`
+      ${styles.editor_wrapper}
+      ${currentBrain ? styles.with_brain : ""}
+      `}
+      >
+        <Editor
+          message={message}
+          setMessage={setMessage}
+          onSubmit={() => void submit()}
+          placeholder="Search"
+        ></Editor>
+        {searching ? (
+          <LoaderIcon size="big" color="accent" />
+        ) : (
+          <LuSearch
+            className={`
           ${styles.search_icon} 
           ${isDisabled ? styles.disabled : ""}
           `}
-          onClick={() => void submit()}
-        />
-      )}
+            onClick={() => void submit()}
+          />
+        )}
+      </div>
     </div>
   );
 };

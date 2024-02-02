@@ -33,6 +33,16 @@ const Search = (): JSX.Element => {
           <SearchBar />
         </div>
       </div>
+      <div className={styles.shortcuts_card_wrapper}>
+        <div className={styles.shortcut_wrapper}>
+          <span className={styles.shortcut}>@</span>
+          <span>Select a brain</span>
+        </div>
+        <div className={styles.shortcut_wrapper}>
+          <span className={styles.shortcut}>#</span>
+          <span>Select a prompt</span>
+        </div>
+      </div>
     </div>
   );
 };

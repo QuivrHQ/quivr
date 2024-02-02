@@ -1,4 +1,5 @@
 @use "@/styles/Colors.module.scss";
+@use "@/styles/Radius.module.scss";
 @use "@/styles/Spacings.module.scss";
 @use "@/styles/Typography.module.scss";
 
@@ -8,13 +9,13 @@
   align-items: center;
   cursor: pointer;
   padding: Spacings.$spacing03;
-  border-radius: 5px;
+  border-radius: Radius.$normal;
   overflow: hidden;
   border-left: 2px solid transparent;
 
   &.selected {
     border-left: 2px solid Colors.$primary;
-    border-radius: 0 5px 5px 0;
+    border-radius: 0 Radius.$normal Radius.$normal 0;
   }
 
   .left {

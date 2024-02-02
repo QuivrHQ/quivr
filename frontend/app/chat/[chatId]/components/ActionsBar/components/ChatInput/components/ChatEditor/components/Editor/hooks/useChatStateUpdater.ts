@@ -32,7 +32,7 @@ export const useChatStateUpdater = ({
 
       if (brainId !== currentBrainId) {
         if (brainId === "") {
-          setCurrentBrainId(null);
+          return;
         } else {
           if (currentBrainId !== null) {
             removeExistingMentionFromEditor(editorNewState, "mention@");

@@ -39,12 +39,12 @@ export const SearchModal = (): JSX.Element => {
   };
 
   useEffect(() => {
-    window.addEventListener("keydown", keydownHandler);
-    window.addEventListener("click", clickHandler);
+    document.addEventListener("keydown", keydownHandler);
+    document.addEventListener("click", clickHandler);
 
     return () => {
-      window.removeEventListener("keydown", keydownHandler);
-      window.removeEventListener("click", clickHandler);
+      document.removeEventListener("keydown", keydownHandler);
+      document.removeEventListener("click", clickHandler);
     };
   }, []);
 
