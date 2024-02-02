@@ -53,7 +53,8 @@ export const SearchBar = ({
     <div
       className={`
       ${styles.search_bar_wrapper}
-      ${currentBrain ? styles.with_brain : ""}`}
+      ${currentBrain ? styles.with_brain : ""}
+      `}
     >
       <CurrentBrain />
       <div
