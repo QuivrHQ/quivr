@@ -10,14 +10,20 @@ export const UserMenuCard = ({
   title,
   subtitle,
   iconName,
+  selected,
+  onClick,
 }: UserMenuCardProps): JSX.Element => {
   const [isHovered, setIsHovered] = useState(false);
 
   return (
     <div
-      className={styles.menu_card_container}
+      className={`
+        ${styles.menu_card_container}
+        ${selected ? styles.selected : ""}
+        `}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
+      onClick={onClick}
     >
       <div className={styles.first_line_wrapper}>
         <span className={styles.title}>{title}</span>

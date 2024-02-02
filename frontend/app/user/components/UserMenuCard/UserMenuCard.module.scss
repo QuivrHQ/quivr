@@ -1,6 +1,7 @@
 @use "@/styles/Colors.module.scss";
 @use "@/styles/Radius.module.scss";
 @use "@/styles/Spacings.module.scss";
+@use "@/styles/ScreenSizes.module.scss";
 @use "@/styles/Typography.module.scss";
 
 .menu_card_container {
@@ -12,9 +13,18 @@
   flex-direction: column;
   gap: Spacings.$spacing03;
   width: 20%;
-  min-width: 200px;
 
-  &:hover {
+  @media (max-width: ScreenSizes.$small) {
+    width: auto;
+
+    .title,
+    .subtitle {
+      display: none;
+    }
+  }
+
+  &:hover,
+  &.selected {
     background-color: Colors.$primary-lightest;
   }
 
