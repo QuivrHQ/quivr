@@ -60,7 +60,8 @@ const RelatedBrains = ({ closeBrains }: RelatedBrainsProps): JSX.Element => {
     <FoldableSection
       label="Related Brains (Beta)"
       icon="brain"
-      foldedByDefault={closeBrains?.length === 0}
+      // When related brains are fixed, foldedByDefault={closeBrains?.length === 0}
+      foldedByDefault={true}
     >
       <div className={styles.close_brains_wrapper}>
         {closeBrains?.map((brain, index) => (

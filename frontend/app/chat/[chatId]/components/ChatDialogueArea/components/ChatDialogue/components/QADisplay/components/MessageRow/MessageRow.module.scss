@@ -1,4 +1,5 @@
 @use "@/styles/Colors.module.scss";
+@use "@/styles/Radius.module.scss";
 @use "@/styles/Spacings.module.scss";
 
 .message_row_container {
@@ -10,7 +11,7 @@
 
   .message_row_content {
     align-self: flex-end;
-    border-radius: 12px;
+    border-radius: Radius.$big;
     width: fit-content;
     padding-block: Spacings.$spacing03;
     padding-inline: Spacings.$spacing05;

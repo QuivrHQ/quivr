@@ -1,11 +1,12 @@
 @use "@/styles/Colors.module.scss";
+@use "@/styles/Radius.module.scss";
 @use "@/styles/Spacings.module.scss";
 @use "@/styles/Typography.module.scss";
 
 .foldable_section_wrapper {
   display: flex;
   flex-direction: column;
-  border-radius: 5px;
+  border-radius: Radius.$normal;
   border: 1px dashed Colors.$lighter-grey;
   overflow: hidden;
   font-size: Typography.$small;
