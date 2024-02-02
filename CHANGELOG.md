@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.0.192 (2024-02-02)
+
+## What's Changed
+* feat(frontend): display which brain you are talking to by @Zewed in https://github.com/StanGirard/quivr/pull/2137
+
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.191...v0.0.192
+
 ## 0.0.191 (2024-02-01)
 
 ## What's Changed
