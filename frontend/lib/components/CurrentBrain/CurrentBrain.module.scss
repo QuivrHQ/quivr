@@ -1,0 +1,33 @@
+@use "@/styles/Colors.module.scss";
+@use "@/styles/Spacings.module.scss";
+@use "@/styles/Typography.module.scss";
+
+.current_brain_wrapper {
+  background-color: Colors.$lightest-grey;
+  padding-inline: Spacings.$spacing05;
+  padding-block: Spacings.$spacing01;
+  font-size: Typography.$small;
+  color: Colors.$normal-grey;
+
+  .brain_infos {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    .left {
+      display: flex;
+      gap: Spacings.$spacing02;
+      align-items: center;
+
+      .brain_name_wrapper {
+        display: flex;
+        gap: Spacings.$spacing02;
+        align-items: center;
+
+        .brain_name {
+          color: Colors.$black;
+        }
+      }
+    }
+  }
+}

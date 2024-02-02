@@ -7,7 +7,7 @@ import {
   FaRegUserCircle,
 } from "react-icons/fa";
 import { FaArrowUpFromBracket } from "react-icons/fa6";
-import { IoIosAdd } from "react-icons/io";
+import { IoIosAdd, IoMdClose } from "react-icons/io";
 import { IoHomeOutline } from "react-icons/io5";
 import { IconType } from "react-icons/lib";
 import {
@@ -32,6 +32,7 @@ export const iconList: { [name: string]: IconType } = {
   checkCircle: FaCheckCircle,
   chevronDown: LuChevronDown,
   chevronRight: LuChevronRight,
+  close: IoMdClose,
   copy: LuCopy,
   delete: MdDelete,
   edit: MdEdit,

@@ -1,5 +1,6 @@
 @use "@/styles/Colors.module.scss";
 @use "@/styles/IconSizes.module.scss";
+@use "@/styles/Radius.module.scss";
 @use "@/styles/ScreenSizes.module.scss";
 @use "@/styles/Spacings.module.scss";
 @use "@/styles/Typography.module.scss";
@@ -12,6 +13,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  flex-direction: column;
 
   .main_container {
     display: flex;
@@ -24,7 +26,7 @@
 
     @media (max-width: ScreenSizes.$small) {
       width: 100%;
-      margin-inline: Spacings.$spacing07;
+      padding-inline: Spacings.$spacing07;
     }
 
     .quivr_logo_wrapper {
@@ -43,10 +45,20 @@
     }
   }
 
-  .add_brain_wrapper {
-    position: absolute;
-    bottom: Spacings.$spacing05;
-    left: 50%;
-    transform: translateX(-50%);
+  .shortcuts_card_wrapper {
+    background-color: Colors.$lightest-grey;
+    padding: Spacings.$spacing05;
+    gap: Spacings.$spacing03;
+    border-radius: Radius.$big;
+
+    .shortcut_wrapper {
+      display: flex;
+      align-items: center;
+      gap: Spacings.$spacing03;
+
+      .shortcut {
+        color: Colors.$primary;
+      }
+    }
   }
 }

@@ -109,8 +109,9 @@ export const useMentionConfig = ({
       class: "mention",
     },
     suggestion: suggestionsConfig,
-    renderLabel: ({ options, node }) =>
-      `${options.suggestion.char ?? ""}${node.attrs.label as string}`,
+    renderLabel: () => {
+      return "";
+    },
   });
 
   return {

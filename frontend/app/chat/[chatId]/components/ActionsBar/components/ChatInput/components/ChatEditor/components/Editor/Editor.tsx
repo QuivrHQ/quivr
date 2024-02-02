@@ -22,7 +22,13 @@ export const Editor = ({
   const { editor } = useCreateEditorState(placeholder);
 
   useEffect(() => {
-    if (message === "") {
+    const htmlString = editor?.getHTML();
+    if (
+      message === "" ||
+      (htmlString &&
+        new DOMParser().parseFromString(htmlString, "text/html").body
+          .textContent === " ")
+    ) {
       editor?.commands.clearContent();
     }
   }, [message, editor]);
