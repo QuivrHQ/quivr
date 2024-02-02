@@ -1,8 +1,6 @@
 "use client";
-import Link from "next/link";
 import { useTranslation } from "react-i18next";
 
-import Button from "@/lib/components/ui/Button";
 import Card, { CardBody, CardHeader } from "@/lib/components/ui/Card";
 import { useSupabase } from "@/lib/context/SupabaseProvider";
 import { redirectToLogin } from "@/lib/router/redirectToLogin";
@@ -25,11 +23,6 @@ const UserPage = (): JSX.Element => {
   return (
     <>
       <main className="container lg:w-2/3 mx-auto py-10 px-5">
-        <Link href="/search">
-          <Button className="mb-5" variant="primary">
-            {t("chat:back_to_search")}
-          </Button>
-        </Link>
         <Card className="mb-5 shadow-sm hover:shadow-none">
           <CardHeader>
             <h2 className="font-bold text-xl">
