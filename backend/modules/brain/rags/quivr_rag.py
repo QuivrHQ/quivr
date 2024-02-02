@@ -203,6 +203,3 @@ class QuivrRAG(BaseModel, RAGInterface):
 
     def get_retriever(self):
         return self.vector_store.as_retriever()
-
-    # Some other methods can be added such as on_stream, on_end,... to abstract history management (each answer should be saved or not)    # Some other methods can be added such as on_stream, on_end,... to abstract history management (each answer should be saved or not)
-    # Some other methods can be added such as on_stream, on_end,... to abstract history management (each answer should be saved or not)

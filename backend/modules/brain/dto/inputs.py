@@ -24,6 +24,12 @@ class CreateApiBrainDefinition(BaseModel, extra=Extra.forbid):
     jq_instructions: Optional[str] = None
 
 
+class CreateIntegrationBrain(BaseModel, extra=Extra.forbid):
+    integration_name: str
+    integration_logo_url: str
+    connection_settings: dict
+
+
 class CreateBrainProperties(BaseModel, extra=Extra.forbid):
     name: Optional[str] = "Default brain"
     description: str = "This is a description"
