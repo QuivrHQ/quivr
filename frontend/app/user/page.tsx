@@ -5,6 +5,9 @@ import { useState } from "react";
 import { useSupabase } from "@/lib/context/SupabaseProvider";
 import { redirectToLogin } from "@/lib/router/redirectToLogin";
 
+import { BrainsUsage } from "./components/BrainsUsage/BrainsUsage";
+import { Plan } from "./components/Plan/Plan";
+import { Settings } from "./components/Settings/Settings";
 import { UserMenuCard } from "./components/UserMenuCard/UserMenuCard";
 import { UserMenuCardProps } from "./components/types/types";
 import styles from "./page.module.scss";
@@ -60,6 +63,11 @@ const UserPage = (): JSX.Element => {
               onClick={() => handleCardClick(index)}
             />
           ))}
+        </div>
+        <div className={styles.content_wrapper}>
+          {userMenuCards[0].selected && <Settings />}
+          {userMenuCards[1].selected && <BrainsUsage />}
+          {userMenuCards[2].selected && <Plan />}
         </div>
       </main>
       {/* <main className="container lg:w-2/3 mx-auto py-10 px-5">
