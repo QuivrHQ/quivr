@@ -37,10 +37,6 @@ const RelatedBrains = ({ closeBrains }: RelatedBrainsProps): JSX.Element => {
         const isCurrentBrain =
           brain.id === messages[messages.length - 1]?.brain_id;
 
-        if (isCurrentBrain) {
-          setCurrentBrainId(brain.id as UUID);
-        }
-
         return {
           color: `rgb(${r}, ${g}, ${b})`,
           isCurrentBrain: isCurrentBrain,
@@ -64,7 +60,8 @@ const RelatedBrains = ({ closeBrains }: RelatedBrainsProps): JSX.Element => {
     <FoldableSection
       label="Related Brains (Beta)"
       icon="brain"
-      foldedByDefault={closeBrains?.length === 0}
+      // When related brains are fixed, foldedByDefault={closeBrains?.length === 0}
+      foldedByDefault={true}
     >
       <div className={styles.close_brains_wrapper}>
         {closeBrains?.map((brain, index) => (
