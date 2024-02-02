@@ -1,28 +1,48 @@
 "use client";
-import { useTranslation } from "react-i18next";
 
-import Card, { CardBody, CardHeader } from "@/lib/components/ui/Card";
 import { useSupabase } from "@/lib/context/SupabaseProvider";
 import { redirectToLogin } from "@/lib/router/redirectToLogin";
 
-import { StripePricingOrManageButton, UserStatistics } from "./components";
-import { ApiKeyConfig } from "./components/ApiKeyConfig";
-import LanguageSelect from "./components/LanguageSelect/LanguageSelect";
-import { LogoutModal } from "./components/LogoutCard/LogoutModal";
+import { UserMenuCard } from "./components/UserMenuCard/UserMenuCard";
+import { UserMenuCardProps } from "./components/types/types";
+import styles from "./page.module.scss";
 
 const UserPage = (): JSX.Element => {
   const { session } = useSupabase();
+
+  const userMenuCards: UserMenuCardProps[] = [
+    {
+      title: "Settings",
+      subtitle: "Change your settings",
+    },
+    {
+      title: "Brain Usage",
+      subtitle: "View your brain usage",
+    },
+    {
+      title: "Plan",
+      subtitle: "Manage your plan",
+    },
+  ];
 
   if (!session) {
     redirectToLogin();
   }
 
-  const { user } = session;
-  const { t } = useTranslation(["translation", "user", "config", "chat"]);
-
   return (
     <>
-      <main className="container lg:w-2/3 mx-auto py-10 px-5">
+      <main className={styles.user_page_container}>
+        <div className={styles.left_menu_wrapper}>
+          {userMenuCards.map((card, index) => (
+            <UserMenuCard
+              key={index}
+              title={card.title}
+              subtitle={card.subtitle}
+            />
+          ))}
+        </div>
+      </main>
+      {/* <main className="container lg:w-2/3 mx-auto py-10 px-5">
         <Card className="mb-5 shadow-sm hover:shadow-none">
           <CardHeader>
             <h2 className="font-bold text-xl">
@@ -74,7 +94,7 @@ const UserPage = (): JSX.Element => {
             <ApiKeyConfig />
           </CardBody>
         </Card>
-      </main>
+      </main> */}
     </>
   );
 };
