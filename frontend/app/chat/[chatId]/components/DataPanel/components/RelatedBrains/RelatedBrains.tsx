@@ -37,6 +37,10 @@ const RelatedBrains = ({ closeBrains }: RelatedBrainsProps): JSX.Element => {
         const isCurrentBrain =
           brain.id === messages[messages.length - 1]?.brain_id;
 
+        if (isCurrentBrain) {
+          setCurrentBrainId(brain.id as UUID);
+        }
+
         return {
           color: `rgb(${r}, ${g}, ${b})`,
           isCurrentBrain: isCurrentBrain,
