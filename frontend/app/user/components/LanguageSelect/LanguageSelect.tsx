@@ -10,8 +10,6 @@ const LanguageSelect = (): JSX.Element => {
   const { t } = useTranslation(["translation"]);
   const { currentLanguage, change } = useLanguageHook();
 
-  console.info(currentLanguage);
-
   if (!currentLanguage) {
     return <></>;
   }

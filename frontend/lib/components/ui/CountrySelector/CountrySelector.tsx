@@ -1,4 +1,7 @@
-import { useLanguageHook } from "@/app/user/components/LanguageSelect/hooks/useLanguageHook";
+import {
+  Language,
+  useLanguageHook,
+} from "@/app/user/components/LanguageSelect/hooks/useLanguageHook";
 
 import styles from "./CountrySelector.module.scss";
 
@@ -8,7 +11,7 @@ type CountrySelectorProps = {
   iconName: string;
   label: string;
   currentValue: { label: string; flag: string };
-  setCurrentValue: (newCountry: { label: string; flag: string }) => void;
+  setCurrentValue: (newCountry: Language) => void;
 };
 
 export const CountrySelector = ({
@@ -27,11 +30,21 @@ export const CountrySelector = ({
         name="language"
         id="language"
         value={currentValue.label}
-        onChange={(e) => setCurrentValue(allLanguages[e.target.value])}
+        onChange={(e) =>
+          setCurrentValue(
+            allLanguages.find(
+              (language) => language.label === e.target.value
+            ) ?? allLanguages[2]
+          )
+        }
       >
-        {Object.keys(allLanguages).map((lang) => (
-          <option data-testid={`option-${lang}`} value={lang} key={lang}>
-            {allLanguages[lang].label} {allLanguages[lang].flag}
+        {allLanguages.map((lang) => (
+          <option
+            data-testid={`option-${lang}`}
+            value={lang.label}
+            key={lang.shortName}
+          >
+            {lang.flag} {lang.label}
           </option>
         ))}
       </select>
