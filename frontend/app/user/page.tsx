@@ -72,43 +72,10 @@ const UserPage = (): JSX.Element => {
           {userMenuCards[2].selected && <Plan />}
         </div>
       </main>
-      {/* <main className="container lg:w-2/3 mx-auto py-10 px-5">
-        <Card className="mb-5 shadow-sm hover:shadow-none">
-
-          <CardBody className="flex flex-col items-stretch max-w-max gap-2">
-
-              <LogoutModal />
-            </div>
-          </CardBody>
-        </Card>
-        <Card className="mb-5 shadow-sm hover:shadow-none">
-          <CardHeader>
-            <h2 className="font-bold text-xl">
-              {t("settings", { ns: "config" })}
-            </h2>
-          </CardHeader>
-
-          <CardBody>
-            <LanguageSelect />
-          </CardBody>
-        </Card>
-        <Card className="mb-5 shadow-sm hover:shadow-none">
-          <CardHeader>
-            <h2 className="font-bold text-xl">
-              {t("brainUsage", { ns: "user" })}
-            </h2>
-          </CardHeader>
-
+      {/* 
           <CardBody>
             <UserStatistics />
           </CardBody>
-        </Card>
-        <Card className="mb-5 shadow-sm hover:shadow-none">
-          <CardHeader>
-            <h2 className="font-bold text-xl">
-              {t("apiKey", { ns: "config" })}
-            </h2>
-          </CardHeader>
 
           <CardBody className="p-3 flex flex-col">
             <ApiKeyConfig />

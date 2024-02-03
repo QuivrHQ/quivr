@@ -1,3 +1,5 @@
+import { UserStatistics } from "../UserStatistics";
+
 export const BrainsUsage = (): JSX.Element => {
-  return <div>Brains Usage</div>;
+  return <UserStatistics />;
 };
