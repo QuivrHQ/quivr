@@ -4,7 +4,7 @@ import styles from "./Settings.module.scss";
 
 import { ApiKeyConfig } from "../ApiKeyConfig";
 import LanguageSelect from "../LanguageSelect/LanguageSelect";
-import { LogoutModal } from "../LogoutCard/LogoutModal";
+import { LogoutModal } from "../LogoutModal/LogoutModal";
 
 type InfoDisplayerProps = {
   email: string;
