@@ -23,9 +23,10 @@ export const CountrySelector = ({
   const { allLanguages } = useLanguageHook();
 
   return (
-    <div className={styles.text_input_container}>
+    <div className={styles.country_selector_container}>
       <FieldHeader iconName={iconName} label={label} />
       <select
+        className={styles.selection}
         data-testid="language-select"
         name="language"
         id="language"
