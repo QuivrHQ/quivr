@@ -1,0 +1,14 @@
+@use "@/styles/Spacings.module.scss";
+
+.info_displayer_container {
+  display: flex;
+  flex-direction: column;
+  gap: Spacings.$spacing02;
+
+  .header {
+    display: flex;
+    align-items: center;
+    gap: Spacings.$spacing03;
+    font-weight: bold;
+  }
+}

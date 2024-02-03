@@ -21,7 +21,13 @@ import {
   LuPlusCircle,
   LuSearch,
 } from "react-icons/lu";
-import { MdDelete, MdEdit, MdHistory, MdUploadFile } from "react-icons/md";
+import {
+  MdAlternateEmail,
+  MdDelete,
+  MdEdit,
+  MdHistory,
+  MdUploadFile,
+} from "react-icons/md";
 import { RiHashtag } from "react-icons/ri";
 import { VscGraph } from "react-icons/vsc";
 
@@ -38,6 +44,7 @@ export const iconList: { [name: string]: IconType } = {
   copy: LuCopy,
   delete: MdDelete,
   edit: MdEdit,
+  email: MdAlternateEmail,
   file: LuFile,
   followUp: FaArrowUpFromBracket,
   graph: VscGraph,

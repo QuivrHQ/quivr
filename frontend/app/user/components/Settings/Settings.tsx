@@ -1,18 +1,15 @@
-import { useState } from "react";
+import { InfoDisplayer } from "@/lib/components/ui/InfoDisplayer/InfoDisplayer";
 
-import { TextInput } from "@/lib/components/ui/TextInput/TextInput";
+type InfoDisplayerProps = {
+  email: string;
+};
 
-export const Settings = (): JSX.Element => {
-  const [username, setUsername] = useState<string>("");
-
+export const Settings = ({ email }: InfoDisplayerProps): JSX.Element => {
   return (
     <div>
-      <TextInput
-        label="Username"
-        iconName="user"
-        inputValue={username}
-        setInputValue={setUsername}
-      />
+      <InfoDisplayer label="Email" iconName="email">
+        <span>{email}</span>
+      </InfoDisplayer>
     </div>
   );
 };

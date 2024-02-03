@@ -3,6 +3,7 @@
 import { useState } from "react";
 
 import { useSupabase } from "@/lib/context/SupabaseProvider";
+import { useUserData } from "@/lib/hooks/useUserData";
 import { redirectToLogin } from "@/lib/router/redirectToLogin";
 
 import { BrainsUsage } from "./components/BrainsUsage/BrainsUsage";
@@ -14,6 +15,7 @@ import styles from "./page.module.scss";
 
 const UserPage = (): JSX.Element => {
   const { session } = useSupabase();
+  const { userData } = useUserData();
 
   const [userMenuCards, setUserMenuCards] = useState<UserMenuCardProps[]>([
     {
@@ -45,7 +47,7 @@ const UserPage = (): JSX.Element => {
     );
   };
 
-  if (!session) {
+  if (!session || !userData) {
     redirectToLogin();
   }
 
@@ -65,7 +67,7 @@ const UserPage = (): JSX.Element => {
           ))}
         </div>
         <div className={styles.content_wrapper}>
-          {userMenuCards[0].selected && <Settings />}
+          {userMenuCards[0].selected && <Settings email={userData.email} />}
           {userMenuCards[1].selected && <BrainsUsage />}
           {userMenuCards[2].selected && <Plan />}
         </div>
