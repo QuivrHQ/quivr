@@ -72,16 +72,6 @@ const UserPage = (): JSX.Element => {
           {userMenuCards[2].selected && <Plan />}
         </div>
       </main>
-      {/* 
-          <CardBody>
-            <UserStatistics />
-          </CardBody>
-
-          <CardBody className="p-3 flex flex-col">
-            <ApiKeyConfig />
-          </CardBody>
-        </Card>
-      </main> */}
     </>
   );
 };

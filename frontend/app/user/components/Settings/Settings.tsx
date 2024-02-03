@@ -2,6 +2,7 @@ import { InfoDisplayer } from "@/lib/components/ui/InfoDisplayer/InfoDisplayer";
 
 import styles from "./Settings.module.scss";
 
+import { ApiKeyConfig } from "../ApiKeyConfig";
 import LanguageSelect from "../LanguageSelect/LanguageSelect";
 import { LogoutModal } from "../LogoutCard/LogoutModal";
 
@@ -16,6 +17,7 @@ export const Settings = ({ email }: InfoDisplayerProps): JSX.Element => {
         <span>{email}</span>
       </InfoDisplayer>
       <LanguageSelect />
+      <ApiKeyConfig />
       <LogoutModal />
     </div>
   );

@@ -4,6 +4,7 @@ import { CiFlag1 } from "react-icons/ci";
 import {
   FaCheck,
   FaCheckCircle,
+  FaKey,
   FaRegStar,
   FaRegUserCircle,
   FaUnlock,
@@ -53,6 +54,7 @@ export const iconList: { [name: string]: IconType } = {
   hastag: RiHashtag,
   history: MdHistory,
   home: IoHomeOutline,
+  key: FaKey,
   loader: AiOutlineLoading3Quarters,
   logout: IoMdLogOut,
   redirection: BsArrowRightShort,
