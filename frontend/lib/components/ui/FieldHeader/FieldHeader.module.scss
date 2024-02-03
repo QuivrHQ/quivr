@@ -1,7 +1,8 @@
 @use "@/styles/Spacings.module.scss";
 
-.text_input_container {
+.field_header_wrapper {
   display: flex;
   gap: Spacings.$spacing03;
   font-weight: bold;
+  align-items: center;
 }
