@@ -1,0 +1,7 @@
+@use "@/styles/Spacings.module.scss";
+
+.text_input_container {
+  display: flex;
+  gap: Spacings.$spacing03;
+  font-weight: bold;
+}

@@ -1,6 +1,6 @@
 import styles from "./TextInput.module.scss";
 
-import { Icon } from "../Icon/Icon";
+import { FieldHeader } from "../FieldHeader/FieldHeader";
 
 type TextInputProps = {
   iconName: string;
@@ -17,10 +17,7 @@ export const TextInput = ({
 }: TextInputProps): JSX.Element => {
   return (
     <div className={styles.text_input_container}>
-      <div className={styles.input_header}>
-        <Icon name={iconName} color="black" size="small" />
-        <label>{label}</label>
-      </div>
+      <FieldHeader iconName={iconName} label={label} />
       <input
         className={styles.text_input}
         type="text"

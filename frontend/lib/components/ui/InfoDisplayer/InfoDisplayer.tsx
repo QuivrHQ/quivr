@@ -1,6 +1,6 @@
 import styles from "./InfoDisplayer.module.scss";
 
-import { Icon } from "../Icon/Icon";
+import { FieldHeader } from "../FieldHeader/FieldHeader";
 
 type InfoDisplayerProps = {
   iconName: string;
@@ -15,10 +15,7 @@ export const InfoDisplayer = ({
 }: InfoDisplayerProps): JSX.Element => {
   return (
     <div className={styles.info_displayer_container}>
-      <div className={styles.header}>
-        <Icon name={iconName} color="black" size="small" />
-        <label>{label}</label>
-      </div>
+      <FieldHeader iconName={iconName} label={label} />
       {children}
     </div>
   );
