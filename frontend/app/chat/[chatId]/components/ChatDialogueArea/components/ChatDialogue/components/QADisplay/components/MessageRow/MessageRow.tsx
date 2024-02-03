@@ -1,5 +1,6 @@
 import React from "react";
 
+import { CopyButton } from "@/lib/components/ui/CopyButton";
 import Icon from "@/lib/components/ui/Icon/Icon";
 import { Source } from "@/lib/types/MessageMetadata";
 
@@ -8,8 +9,6 @@ import { MessageContent } from "./components/MessageContent/MessageContent";
 import { QuestionBrain } from "./components/QuestionBrain/QuestionBrain";
 import { QuestionPrompt } from "./components/QuestionPrompt/QuestionPrompt";
 import { useMessageRow } from "./hooks/useMessageRow";
-
-import { CopyButton } from "../../../../../../../../../../../lib/components/ui/CopyButton";
 
 type MessageRowProps = {
   speaker: "user" | "assistant";
