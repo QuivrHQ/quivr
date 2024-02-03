@@ -76,14 +76,9 @@ const UserPage = (): JSX.Element => {
         <Card className="mb-5 shadow-sm hover:shadow-none">
 
           <CardBody className="flex flex-col items-stretch max-w-max gap-2">
-            <div className="flex gap-5 items-center">
-              <p>
-                <strong>{t("email")}:</strong> <span>{user.email}</span>
-              </p>
 
               <LogoutModal />
             </div>
-            <StripePricingOrManageButton />
           </CardBody>
         </Card>
         <Card className="mb-5 shadow-sm hover:shadow-none">

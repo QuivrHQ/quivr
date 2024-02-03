@@ -6,27 +6,34 @@ import { useEventTracking } from "@/services/analytics/june/useEventTracking";
 export const languages = {
   en: {
     label: "English",
+    flag: "🇬🇧",
   },
   es: {
     label: "Español",
+    flag: "🇪🇸",
   },
   fr: {
     label: "Français",
+    flag: "🇫🇷",
   },
   ptbr: {
     label: "Português",
+    flag: "🇵🇹",
   },
   ru: {
     label: "Русский",
+    flag: "🇷🇺",
   },
   zh_cn: {
     label: "简体中文",
+    flag: "🇨🇳",
   },
 };
 
 export type Language = {
   [key: string]: {
     label: string;
+    flag: string;
   };
 };
 

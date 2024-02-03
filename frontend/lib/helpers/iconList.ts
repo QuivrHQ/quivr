@@ -1,5 +1,6 @@
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import { BsArrowRightShort } from "react-icons/bs";
+import { CiFlag1 } from "react-icons/ci";
 import {
   FaCheck,
   FaCheckCircle,
@@ -46,6 +47,7 @@ export const iconList: { [name: string]: IconType } = {
   edit: MdEdit,
   email: MdAlternateEmail,
   file: LuFile,
+  flag: CiFlag1,
   followUp: FaArrowUpFromBracket,
   graph: VscGraph,
   hastag: RiHashtag,
