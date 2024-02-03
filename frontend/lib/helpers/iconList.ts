@@ -9,7 +9,7 @@ import {
   FaUnlock,
 } from "react-icons/fa";
 import { FaArrowUpFromBracket } from "react-icons/fa6";
-import { IoIosAdd, IoMdClose } from "react-icons/io";
+import { IoIosAdd, IoMdClose, IoMdLogOut } from "react-icons/io";
 import { IoHomeOutline, IoSettingsSharp } from "react-icons/io5";
 import { IconType } from "react-icons/lib";
 import {
@@ -54,6 +54,7 @@ export const iconList: { [name: string]: IconType } = {
   history: MdHistory,
   home: IoHomeOutline,
   loader: AiOutlineLoading3Quarters,
+  logout: IoMdLogOut,
   redirection: BsArrowRightShort,
   search: LuSearch,
   settings: IoSettingsSharp,
