@@ -56,7 +56,7 @@
 .dangerous {
   color: Colors.$dangerous;
 
-  &:hover {
+  &.hovered {
     color: Colors.$dangerous-dark;
   }
 }
