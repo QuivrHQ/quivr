@@ -1,5 +1,7 @@
 "use client";
 
+import { useState } from "react";
+
 import { Icon } from "@/lib/components/ui/Icon/Icon";
 import { Tabs } from "@/lib/components/ui/Tabs/Tabs";
 import { Tab } from "@/lib/types/Tab";
@@ -7,21 +9,23 @@ import { Tab } from "@/lib/types/Tab";
 import styles from "./page.module.scss";
 
 const Studio = (): JSX.Element => {
+  const [selectedTab, setSelectedTab] = useState("Manage my brains");
+
   const studioTabs: Tab[] = [
     {
       label: "Manage my brains",
-      isSelected: true,
-      onClick: () => void 0,
+      isSelected: selectedTab === "Manage my brains",
+      onClick: () => setSelectedTab("Manage my brains"),
     },
     {
       label: "Create brain",
-      isSelected: false,
-      onClick: () => void 0,
+      isSelected: selectedTab === "Create brain",
+      onClick: () => setSelectedTab("Create brain"),
     },
     {
       label: "Analytics",
-      isSelected: false,
-      onClick: () => void 0,
+      isSelected: selectedTab === "Analytics",
+      onClick: () => setSelectedTab("Analytics"),
     },
   ];
 
