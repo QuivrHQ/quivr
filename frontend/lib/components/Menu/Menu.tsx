@@ -37,6 +37,7 @@ export const Menu = (): JSX.Element => {
     "/library",
     "/brains-management",
     "/search",
+    "/user",
   ];
 
   const isMenuDisplayed = displayedOnPages.some((page) =>

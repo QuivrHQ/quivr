@@ -1,0 +1,45 @@
+@use "@/styles/Colors.module.scss";
+@use "@/styles/Radius.module.scss";
+@use "@/styles/Spacings.module.scss";
+@use "@/styles/ScreenSizes.module.scss";
+@use "@/styles/Typography.module.scss";
+
+.menu_card_container {
+  padding: Spacings.$spacing05;
+  border-radius: Radius.$big;
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.25);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: Spacings.$spacing03;
+  width: 20%;
+
+  @media (max-width: ScreenSizes.$small) {
+    width: auto;
+
+    .title,
+    .subtitle {
+      display: none;
+    }
+  }
+
+  &:hover,
+  &.selected {
+    background-color: Colors.$primary-lightest;
+  }
+
+  .first_line_wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    .title {
+      @include Typography.H2;
+    }
+  }
+
+  .subtitle {
+    font-size: Typography.$small;
+    color: Colors.$normal-grey;
+  }
+}

@@ -4,4 +4,5 @@ export type Color =
   | "primary"
   | "gold"
   | "accent"
-  | "white";
+  | "white"
+  | "dangerous";

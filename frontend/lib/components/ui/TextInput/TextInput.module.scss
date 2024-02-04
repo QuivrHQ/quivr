@@ -1,0 +1,20 @@
+@use "@/styles/Colors.module.scss";
+@use "@/styles/Radius.module.scss";
+@use "@/styles/Spacings.module.scss";
+
+.text_input_container {
+  display: flex;
+  flex-direction: column;
+  gap: Spacings.$spacing03;
+
+  .text_input {
+    border: 1px solid Colors.$lighter-grey;
+    border-radius: Radius.$big;
+    padding: Spacings.$spacing03;
+    caret-color: Colors.$accent;
+
+    &:focus {
+      box-shadow: none;
+    }
+  }
+}

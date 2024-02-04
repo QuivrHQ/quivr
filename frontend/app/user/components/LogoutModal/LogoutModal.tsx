@@ -2,6 +2,7 @@ import { useTranslation } from "react-i18next";
 
 import Button from "@/lib/components/ui/Button";
 import { Modal } from "@/lib/components/ui/Modal";
+import TextButton from "@/lib/components/ui/TextButton/TextButton";
 
 import { useLogoutModal } from "./hooks/useLogoutModal";
 
@@ -17,9 +18,13 @@ export const LogoutModal = (): JSX.Element => {
   return (
     <Modal
       Trigger={
-        <Button className="px-3 py-2" variant="secondary">
-          {t("logoutButton")}
-        </Button>
+        <div onClick={() => void 0}>
+          <TextButton
+            iconName="logout"
+            color="dangerous"
+            label={t("logoutButton")}
+          />
+        </div>
       }
       isOpen={isLogoutModalOpened}
       setOpen={setIsLogoutModalOpened}

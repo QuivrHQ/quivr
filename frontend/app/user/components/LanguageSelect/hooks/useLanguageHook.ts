@@ -3,58 +3,70 @@ import { useTranslation } from "react-i18next";
 
 import { useEventTracking } from "@/services/analytics/june/useEventTracking";
 
-export const languages = {
-  en: {
-    label: "English",
-  },
-  es: {
-    label: "Español",
-  },
-  fr: {
-    label: "Français",
-  },
-  ptbr: {
-    label: "Português",
-  },
-  ru: {
-    label: "Русский",
-  },
-  zh_cn: {
-    label: "简体中文",
-  },
+export type Language = {
+  label: string;
+  flag: string;
+  shortName: string;
 };
 
-export type Language = {
-  [key: string]: {
-    label: string;
-  };
-};
+export const languages: Language[] = [
+  {
+    label: "English",
+    flag: "🇬🇧",
+    shortName: "en",
+  },
+  {
+    label: "Español",
+    flag: "🇪🇸",
+    shortName: "es",
+  },
+  {
+    label: "Français",
+    flag: "🇫🇷",
+    shortName: "fr",
+  },
+  {
+    label: "Português",
+    flag: "🇵🇹",
+    shortName: "pt",
+  },
+  {
+    label: "Русский",
+    flag: "🇷🇺",
+    shortName: "ru",
+  },
+  {
+    label: "简体中文",
+    flag: "🇨🇳",
+    shortName: "zh",
+  },
+];
 
 export const useLanguageHook = (): {
-  change: (newLanguage: string) => void;
-  allLanguages: Language;
-  currentLanguage: string | undefined;
+  change: (newLanguage: Language) => void;
+  allLanguages: Language[];
+  currentLanguage: Language | undefined;
 } => {
   const { i18n } = useTranslation();
-  const [allLanguages, setAllLanguages] = useState<Language>({});
-  const [currentLanguage, setCurrentLanguage] = useState<string | undefined>();
+  const [allLanguages, setAllLanguages] = useState<Language[]>([]);
+  const [currentLanguage, setCurrentLanguage] = useState<Language>();
   const { track } = useEventTracking();
 
   useEffect(() => {
     setAllLanguages(languages);
+    const savedLanguage = localStorage.getItem("selectedLanguage") ?? "English";
 
-    // get language from localStorage
-    const savedLanguage = localStorage.getItem("selectedLanguage") ?? "en";
-
-    setCurrentLanguage(savedLanguage);
+    setCurrentLanguage(
+      languages.find((language) => language.label === savedLanguage)
+    );
     void i18n.changeLanguage(savedLanguage);
   }, [i18n]);
 
-  const change = (newLanguage: string) => {
+  const change = (newLanguage: Language) => {
     void track("CHANGE_LANGUAGE");
     setCurrentLanguage(newLanguage);
-    localStorage.setItem("selectedLanguage", newLanguage);
-    void i18n.changeLanguage(newLanguage);
+    localStorage.setItem("selectedLanguage", newLanguage.label);
+    void i18n.changeLanguage(newLanguage.shortName);
   };
 
   return {

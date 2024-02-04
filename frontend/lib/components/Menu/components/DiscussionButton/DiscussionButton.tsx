@@ -10,8 +10,8 @@ export const DiscussionButton = (): JSX.Element => {
   const { setIsVisible } = useSearchModalContext();
 
   const handleClick = (event: React.MouseEvent<HTMLDivElement>) => {
-    event.stopPropagation();
     setIsVisible(true);
+    event.nativeEvent.stopImmediatePropagation();
   };
 
   return (

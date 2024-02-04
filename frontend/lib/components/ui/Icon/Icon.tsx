@@ -40,11 +40,11 @@ export const Icon = ({
   return (
     <IconComponent
       className={`
-      ${classname ?? ""} 
-      ${styles[size] ?? ""} 
-      ${styles[color] ?? ""}
-      ${disabled ? styles.disabled ?? "" : ""}
-      ${iconHovered ? styles.hovered ?? "" : ""}
+      ${classname} 
+      ${styles[size]} 
+      ${styles[color]}
+      ${disabled ? styles.disabled : ""}
+      ${iconHovered || hovered ? styles.hovered : ""}
       `}
       onMouseEnter={() => handleHover && setIconHovered(true)}
       onMouseLeave={() => handleHover && setIconHovered(false)}

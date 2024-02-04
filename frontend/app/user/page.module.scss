@@ -1,0 +1,13 @@
+@use "@/styles/Spacings.module.scss";
+
+.user_page_container {
+  padding: Spacings.$spacing09;
+  display: flex;
+  flex-direction: column;
+  gap: Spacings.$spacing09;
+
+  .left_menu_wrapper {
+    display: flex;
+    gap: Spacings.$spacing05;
+  }
+}

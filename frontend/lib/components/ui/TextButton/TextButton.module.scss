@@ -16,3 +16,11 @@
     color: Colors.$primary;
   }
 }
+
+.dangerous {
+  color: Colors.$dangerous;
+
+  &.hovered {
+    color: Colors.$dangerous-dark;
+  }
+}
