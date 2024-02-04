@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.0.193 (2024-02-04)
+
+## What's Changed
+* feat(frontend): design changes on user profile by @Zewed in https://github.com/StanGirard/quivr/pull/2140
+* fix(frontend): rename upgrade to plus to upgrade by @Zewed in https://github.com/StanGirard/quivr/pull/2141
+
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.192...v0.0.193
+
 ## 0.0.192 (2024-02-02)
 
 ## What's Changed
