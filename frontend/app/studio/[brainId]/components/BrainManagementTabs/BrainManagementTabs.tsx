@@ -1,7 +1,7 @@
 /* eslint-disable max-lines */
 import { useTranslation } from "react-i18next";
 
-import { StyledTabsTrigger } from "@/app/brains-management/components/StyledTabsTrigger";
+import { StyledTabsTrigger } from "@/app/studio/components/StyledTabsTrigger";
 import Button from "@/lib/components/ui/Button";
 import Spinner from "@/lib/components/ui/Spinner";
 import { Tabs, TabsContent, TabsList } from "@/lib/components/ui/Tabs";

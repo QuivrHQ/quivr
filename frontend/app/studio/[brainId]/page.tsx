@@ -16,7 +16,7 @@ const BrainsManagement = (): JSX.Element => {
   return (
     <div className="flex flex-col w-full p-5 lg:p-20 bg-highlight">
       <div>
-        <Link href="/brains-management">
+        <Link href="/studio">
           <Button variant="tertiary" className="p-0">
             <LuChevronLeftCircle className="text-primary" />
             {t("previous")}

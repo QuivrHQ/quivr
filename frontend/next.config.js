@@ -16,7 +16,7 @@ const nextConfig = {
   redirects: async () => {
     return [
       {
-        source: "/brains-management/library",
+        source: "/studio/library",
         destination: "/library",
         permanent: false,
       },

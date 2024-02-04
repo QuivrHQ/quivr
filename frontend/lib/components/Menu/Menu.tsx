@@ -32,13 +32,7 @@ export const Menu = (): JSX.Element => {
     return <></>;
   }
 
-  const displayedOnPages = [
-    "/chat",
-    "/library",
-    "/brains-management",
-    "/search",
-    "/user",
-  ];
+  const displayedOnPages = ["/chat", "/library", "/studio", "/search", "/user"];
 
   const isMenuDisplayed = displayedOnPages.some((page) =>
     pathname.includes(page)

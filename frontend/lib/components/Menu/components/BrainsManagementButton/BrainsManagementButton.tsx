@@ -7,11 +7,11 @@ import { MenuButton } from "@/lib/components/Menu/components/MenuButton/MenuButt
 export const BrainsManagementButton = (): JSX.Element => {
   const pathname = usePathname() ?? "";
   const isSelected =
-    pathname.includes("/brains-management") && !pathname.includes("/library");
+    pathname.includes("/studio") && !pathname.includes("/library");
   const { t } = useTranslation("brain");
 
   return (
-    <Link href={`/brains-management`}>
+    <Link href={`/studio`}>
       <MenuButton
         label={t("manage_brains")}
         isSelected={isSelected}

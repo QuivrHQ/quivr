@@ -43,7 +43,7 @@ export const BrainItem = ({ brain }: BrainItemProps): JSX.Element => {
       </div>
       <div className="w-full px-2">
         <Link
-          href={`/brains-management/${brain.id}`}
+          href={`/studio/${brain.id}`}
           className="px-8 py-3 flex items-center justify-center gap-2 bg-white text-primary rounded-lg border-0 w-content mt-3 disabled:bg-secondary hover:bg-primary/50 disabled:hover:bg-primary/50 w-full text-md"
         >
           <span>{t("configure")}</span>

@@ -80,7 +80,7 @@ export const useBrainManagementTabs = () => {
     } catch (error) {
       console.error("Error deleting brain: ", error);
     } finally {
-      router.push("/brains-management");
+      router.push("/studio");
       setIsDeleteOrUnsubscribeRequestPending(false);
     }
   };

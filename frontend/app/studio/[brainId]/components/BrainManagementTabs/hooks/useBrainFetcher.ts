@@ -23,7 +23,7 @@ export const useBrainFetcher = ({ brainId }: UseBrainFetcherProps) => {
 
       return await getBrain(brainId);
     } catch (error) {
-      router.push("/brains-management");
+      router.push("/studio");
     }
   };
 
