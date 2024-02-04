@@ -64,14 +64,14 @@ def test_find_model_and_generate_metadata_user_not_allowed(mock_chat_service):
 
     assert isinstance(model_to_use, LLMModels)
     assert model_to_use.name == "gpt-3.5-turbo-1106"  # Default model is used
-    assert model_to_use.max_input == 512
-    assert model_to_use.max_output == 512
+    assert model_to_use.max_input == 12000
+    assert model_to_use.max_output == 1000
     assert metadata == {
         "key": "value",
         "follow_up_questions": [],
         "model": "gpt-3.5-turbo-1106",
-        "max_tokens": 512,
-        "max_input": 512,
+        "max_tokens": 1000,
+        "max_input": 12000,
     }
 
 
