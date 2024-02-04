@@ -23,6 +23,7 @@ class Brains(BrainsInterface):
                 "brain_definition",
                 "brain_secrets_values",
                 "connected_brains_ids",
+                "integration",
             }
         )
         brain_dict["meaning"] = brain_meaning

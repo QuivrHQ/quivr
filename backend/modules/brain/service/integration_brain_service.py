@@ -1,8 +1,6 @@
 from modules.brain.entity.integration_brain import IntegrationDescriptionEntity
 from modules.brain.repository.integration_brains import IntegrationDescription
-from modules.brain.repository.interfaces.integration_brains import (
-    IntegrationDescriptionInterface,
-)
+from modules.brain.repository.interfaces import IntegrationDescriptionInterface
 
 
 class IntegrationBrainDescriptionService:

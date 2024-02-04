@@ -11,6 +11,7 @@ from modules.brain.repository import (
     BrainsVectors,
     CompositeBrainsConnections,
     ExternalApiSecrets,
+    IntegrationBrain,
 )
 from modules.brain.repository.interfaces import (
     BrainsInterface,
@@ -18,6 +19,7 @@ from modules.brain.repository.interfaces import (
     BrainsVectorsInterface,
     CompositeBrainsConnectionsInterface,
     ExternalApiSecretsInterface,
+    IntegrationBrainInterface,
 )
 from modules.brain.service.api_brain_definition_service import ApiBrainDefinitionService
 from modules.brain.service.utils.validate_brain import validate_api_brain
@@ -37,6 +39,7 @@ class BrainService:
     brain_vector_repository: BrainsVectorsInterface
     external_api_secrets_repository: ExternalApiSecretsInterface
     composite_brains_connections_repository: CompositeBrainsConnectionsInterface
+    integration_brains_repository: IntegrationBrainInterface
 
     def __init__(self):
         self.brain_repository = Brains()
@@ -44,6 +47,7 @@ class BrainService:
         self.brain_vector = BrainsVectors()
         self.external_api_secrets_repository = ExternalApiSecrets()
         self.composite_brains_connections_repository = CompositeBrainsConnections()
+        self.integration_brains_repository = IntegrationBrain()
 
     def get_brain_by_id(self, brain_id: UUID):
         return self.brain_repository.get_brain_by_id(brain_id)
@@ -124,6 +128,9 @@ class BrainService:
         if brain.brain_type == BrainType.COMPOSITE:
             return self.create_brain_composite(brain)
 
+        if brain.brain_type == BrainType.INTEGRATION:
+            return self.create_brain_integration(user_id, brain)
+
         created_brain = self.brain_repository.create_brain(brain)
         return created_brain
 
@@ -165,6 +172,22 @@ class BrainService:
                     connected_brain_id=connected_brain_id,
                 )
 
+        return created_brain
+
+    def create_brain_integration(
+        self,
+        user_id: UUID,
+        brain: CreateBrainProperties,
+    ) -> BrainEntity:
+        created_brain = self.brain_repository.create_brain(brain)
+
+        if brain.integration is not None:
+            self.integration_brains_repository.add_integration_brain(
+                user_id=user_id,
+                brain_id=created_brain.brain_id,
+                integration_id=brain.integration.integration_id,
+                settings=brain.integration.settings,
+            )
         return created_brain
 
     def delete_brain_secrets_values(self, brain_id: UUID) -> None:

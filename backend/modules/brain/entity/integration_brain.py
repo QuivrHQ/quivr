@@ -12,9 +12,9 @@ class IntegrationDescriptionEntity(BaseModel):
 
 
 class IntegrationEntity(BaseModel):
-    id: UUID
-    user_id: UUID
-    brain_id: UUID
+    id: str
+    user_id: str
+    brain_id: str
     integration_id: str
     settings: Optional[dict]
     credentials: Optional[dict]

@@ -110,22 +110,13 @@ async def create_new_brain(
         brain=brain,
         user_id=current_user.id,
     )
-    if brain_user_service.get_user_default_brain(current_user.id):
-        logger.info(f"Default brain already exists for user {current_user.id}")
-        brain_user_service.create_brain_user(
-            user_id=current_user.id,
-            brain_id=new_brain.brain_id,
-            rights=RoleEnum.Owner,
-            is_default_brain=False,
-        )
-    else:
-        logger.info(f"Creating default brain for user {current_user.id}.")
-        brain_user_service.create_brain_user(
-            user_id=current_user.id,
-            brain_id=new_brain.brain_id,
-            rights=RoleEnum.Owner,
-            is_default_brain=True,
-        )
+    logger.info(f"Creating default brain for user {current_user.id}.")
+    brain_user_service.create_brain_user(
+        user_id=current_user.id,
+        brain_id=new_brain.brain_id,
+        rights=RoleEnum.Owner,
+        is_default_brain=True,
+    )
 
     return {"id": new_brain.brain_id, "name": brain.name, "rights": "Owner"}
 

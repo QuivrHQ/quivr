@@ -3,7 +3,7 @@ from modules.brain.entity.integration_brain import (
     IntegrationDescriptionEntity,
     IntegrationEntity,
 )
-from modules.brain.repository.interfaces.integration_brains import (
+from modules.brain.repository.interfaces.integration_brains_interface import (
     IntegrationBrainInterface,
     IntegrationDescriptionInterface,
 )
@@ -15,7 +15,7 @@ class IntegrationBrain(IntegrationBrainInterface):
 
     def get_integration_brain(self, brain_id, user_id):
         response = (
-            self.db.table("integration_users")
+            self.db.table("integrations_user")
             .select("*")
             .filter("brain_id", "eq", brain_id)
             .filter("user_id", "eq", user_id)
@@ -26,18 +26,17 @@ class IntegrationBrain(IntegrationBrainInterface):
 
         return IntegrationEntity(**response.data[0])
 
-    def add_integration_brain(
-        self, brain_id, user_id, integration_brain, integration_id
-    ):
+    def add_integration_brain(self, brain_id, user_id, integration_id, settings):
+
         response = (
-            self.db.table("integration_users")
+            self.db.table("integrations_user")
             .insert(
                 [
                     {
                         "brain_id": str(brain_id),
                         "user_id": str(user_id),
                         "integration_id": str(integration_id),
-                        **integration_brain.dict(),
+                        "settings": settings,
                     }
                 ]
             )
@@ -49,7 +48,7 @@ class IntegrationBrain(IntegrationBrainInterface):
 
     def update_integration_brain(self, brain_id, user_id, integration_brain):
         response = (
-            self.db.table("integration_users")
+            self.db.table("integrations_user")
             .update(integration_brain.dict(exclude={"brain_id", "user_id"}))
             .filter("brain_id", "eq", str(brain_id))
             .filter("user_id", "eq", str(user_id))
@@ -60,7 +59,7 @@ class IntegrationBrain(IntegrationBrainInterface):
         return IntegrationEntity(**response.data[0])
 
     def delete_integration_brain(self, brain_id, user_id):
-        self.db.table("integration_users").delete().filter(
+        self.db.table("integrations_user").delete().filter(
             "brain_id", "eq", str(brain_id)
         ).filter("user_id", "eq", str(user_id)).execute()
         return None
