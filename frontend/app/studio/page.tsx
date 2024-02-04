@@ -23,9 +23,10 @@ const Studio = (): JSX.Element => {
       onClick: () => setSelectedTab("Create brain"),
     },
     {
-      label: "Analytics",
+      label: "Analytics - Coming soon",
       isSelected: selectedTab === "Analytics",
       onClick: () => setSelectedTab("Analytics"),
+      disabled: true,
     },
   ];
 

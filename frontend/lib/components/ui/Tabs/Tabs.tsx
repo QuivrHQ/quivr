@@ -7,6 +7,8 @@ type TabsProps = {
 };
 
 export const Tabs = ({ tabList }: TabsProps): JSX.Element => {
+  console.info(tabList);
+
   return (
     <div className={styles.tabs_container}>
       {tabList.map((tab, index) => (
@@ -14,6 +16,7 @@ export const Tabs = ({ tabList }: TabsProps): JSX.Element => {
           className={`
           ${styles.tab_wrapper}
           ${tab.isSelected ? styles.selected : ""}
+          ${tab.disabled ? styles.disabled : ""}
           `}
           key={index}
           onClick={tab.onClick}

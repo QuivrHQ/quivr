@@ -25,5 +25,10 @@
     &:hover {
       color: Colors.$primary;
     }
+
+    &.disabled {
+      pointer-events: none;
+      color: Colors.$normal-grey;
+    }
   }
 }
