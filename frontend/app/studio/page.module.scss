@@ -1,0 +1,16 @@
+@use "@/styles/Spacings.module.scss";
+@use "@/styles/Typography.module.scss";
+
+.page_wrapper {
+  @include Typography.H1;
+  padding: Spacings.$spacing09;
+  width: 100%;
+
+  .title_wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: Spacings.$spacing03;
+    margin-inline: auto;
+  }
+}
