@@ -3,14 +3,23 @@ import { Tab } from "@/lib/types/Tab";
 import styles from "./Tabs.module.scss";
 
 type TabsProps = {
-  tabs: Tab[];
+  tabList: Tab[];
 };
 
-export const Tabs = ({ tabs }: TabsProps): JSX.Element => {
+export const Tabs = ({ tabList }: TabsProps): JSX.Element => {
   return (
     <div className={styles.tabs_container}>
-      {tabs.map((tab, index) => (
-        <div key={index}>{tab.label}</div>
+      {tabList.map((tab, index) => (
+        <div
+          className={`
+          ${styles.tab_wrapper}
+          ${tab.isSelected ? styles.selected : ""}
+          `}
+          key={index}
+          onClick={tab.onClick}
+        >
+          <span>{tab.label}</span>
+        </div>
       ))}
     </div>
   );

@@ -2,11 +2,15 @@
 @use "@/styles/Typography.module.scss";
 
 .page_wrapper {
-  @include Typography.H1;
   padding: Spacings.$spacing09;
+  display: flex;
+  flex-direction: column;
+  gap: Spacings.$spacing05;
   width: 100%;
 
   .title_wrapper {
+    @include Typography.H1;
+
     display: flex;
     align-items: center;
     justify-content: center;
