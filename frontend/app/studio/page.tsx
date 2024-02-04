@@ -6,6 +6,7 @@ import { Icon } from "@/lib/components/ui/Icon/Icon";
 import { Tabs } from "@/lib/components/ui/Tabs/Tabs";
 import { Tab } from "@/lib/types/Tab";
 
+import { BrainsTabs } from "./components/BrainsTabs/BrainsTabs";
 import styles from "./page.module.scss";
 
 const Studio = (): JSX.Element => {
@@ -37,6 +38,7 @@ const Studio = (): JSX.Element => {
         <h1 className={styles.title}>Studio</h1>
       </div>
       <Tabs tabList={studioTabs} />
+      {selectedTab === "Manage my brains" && <BrainsTabs />}
     </div>
   );
 };
