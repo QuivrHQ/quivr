@@ -18,7 +18,6 @@
     "format-fix": "prettier --write ."
   },
   "dependencies": {
-    "@angular/material": "^17.1.2",
     "@emotion/react": "11.11.1",
     "@emotion/styled": "11.11.0",
     "@growthbook/growthbook-react": "0.17.0",
