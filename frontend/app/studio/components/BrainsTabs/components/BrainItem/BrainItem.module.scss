@@ -1,0 +1,22 @@
+@use "@/styles/Colors.module.scss";
+@use "@/styles/Spacings.module.scss";
+@use "@/styles/Typography.module.scss";
+
+.brain_item_wrapper {
+  padding: Spacings.$spacing03;
+  border-top: 1px solid Colors.$normal-grey;
+  .brain_info_wrapper {
+    display: flex;
+    overflow: hidden;
+
+    .name {
+      @include Typography.EllipsisOverflow;
+      width: 20%;
+    }
+
+    .description {
+      @include Typography.EllipsisOverflow;
+      width: 80%;
+    }
+  }
+}

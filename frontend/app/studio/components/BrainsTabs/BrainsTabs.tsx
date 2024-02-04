@@ -1,7 +1,7 @@
 import Spinner from "@/lib/components/ui/Spinner";
 
 import { BrainSearchBar } from "./components/BrainSearchBar";
-import { BrainsList } from "./components/BrainsList";
+import { BrainsList } from "./components/BrainsList/BrainsList";
 import { useBrainsTabs } from "./hooks/useBrainsTabs";
 
 export const BrainsTabs = (): JSX.Element => {
