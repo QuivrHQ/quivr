@@ -4,10 +4,12 @@ from io import BytesIO
 from typing import Any, List, Optional
 
 import requests
+from celery_worker import process_file_and_notify
 from fastapi import UploadFile
 from logger import get_logger
 from modules.brain.entity.integration_brain import IntegrationEntity
 from modules.brain.repository.integration_brains import IntegrationBrain
+from modules.knowledge.dto.inputs import CreateKnowledgeProperties
 from modules.knowledge.repository.knowledge_interface import KnowledgeInterface
 from modules.knowledge.service.knowledge_service import KnowledgeService
 from pydantic import BaseModel
@@ -188,7 +190,12 @@ class NotionConnector(IntegrationBrain):
                 break
         if page_title is None:
             page_title = f"Untitled Page [{page.id}]"
+        page_title = "".join(e for e in page_title if e.isalnum())
         return page_title
+
+    def _read_page_url(self, page: NotionPage) -> str:
+        """Extracts the URL from a Notion page"""
+        return page.url
 
     def _read_pages_from_database(self, database_id: str) -> list[str]:
         """Reads pages from a Notion database"""
@@ -206,7 +213,8 @@ class NotionConnector(IntegrationBrain):
         page = self._fetch_page(page_id)
         page_title = self._read_page_title(page)
         page_content, child_pages = self._read_blocks(page_id)
-        return page_title, page_content, child_pages
+        page_url = self._read_page_url(page)
+        return page_title, page_content, child_pages, page_url
 
     def get_all_pages(self) -> list[NotionPage]:
         """
@@ -228,7 +236,7 @@ class NotionConnector(IntegrationBrain):
         return all_pages
 
     def add_file_to_knowledge(
-        self, page_content: List[tuple[str, str]], page_name: str
+        self, page_content: List[tuple[str, str]], page_name: str, page_url: str
     ):
         """
         Add a file to the knowledge base
@@ -260,6 +268,23 @@ class NotionConnector(IntegrationBrain):
             # Delete the temporary file
             os.remove(temp_file_path)
 
+            knowledge_to_add = CreateKnowledgeProperties(
+                brain_id=self.brain_id,
+                file_name=page_name + "_notion.txt",
+                extension="txt",
+                integration="notion",
+                integration_link=page_url,
+            )
+
+            added_knowledge = self.knowledge_service.add_knowledge(knowledge_to_add)
+            logger.info(f"Knowledge {added_knowledge} added successfully")
+
+            process_file_and_notify.delay(
+                file_name=filename_with_brain_id,
+                file_original_name=page_name + "_notion.txt",
+                brain_id=self.brain_id,
+            )
+
     def compile_all_pages(self):
         """
         Get all the pages, blocks, databases from Notion into a single document per page
@@ -267,14 +292,15 @@ class NotionConnector(IntegrationBrain):
         all_pages = self.get_all_pages()
         documents = []
         for page in all_pages:
-            page_title, page_content, child_pages = self._read_page(page.id)
+            page_title, page_content, child_pages, page_url = self._read_page(page.id)
             document = {
                 "page_title": page_title,
                 "page_content": page_content,
                 "child_pages": child_pages,
+                "page_url": page_url,
             }
             documents.append(document)
-            self.add_file_to_knowledge(page_content, page_title)
+            self.add_file_to_knowledge(page_content, page_title, page_url)
         return documents
 
 

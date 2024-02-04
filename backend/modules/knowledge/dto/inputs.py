@@ -9,6 +9,8 @@ class CreateKnowledgeProperties(BaseModel):
     file_name: Optional[str] = None
     url: Optional[str] = None
     extension: str = "txt"
+    integration: Optional[str] = None
+    integration_link: Optional[str] = None
 
     def dict(self, *args, **kwargs):
         knowledge_dict = super().dict(*args, **kwargs)

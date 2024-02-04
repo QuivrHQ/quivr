@@ -1,6 +1,7 @@
 from logger import get_logger
 from modules.brain.api_brain_qa import APIBrainQA
 from modules.brain.entity.brain_entity import BrainType, RoleEnum
+from modules.brain.integrations.Notion.Notion_brain import NotionBrain
 from modules.brain.knowledge_brain_qa import KnowledgeBrainQA
 from modules.brain.service.api_brain_definition_service import ApiBrainDefinitionService
 from modules.brain.service.brain_authorization_service import (
@@ -51,11 +52,7 @@ class BrainfulChat(ChatInterface):
         user_id,
         metadata,
     ):
-        if (
-            brain
-            and brain.brain_type == BrainType.DOC
-            or model not in models_supporting_function_calls
-        ):
+        if brain and brain.brain_type == BrainType.DOC:
             return KnowledgeBrainQA(
                 chat_id=chat_id,
                 model=model,
@@ -87,4 +84,16 @@ class BrainfulChat(ChatInterface):
                 jq_instructions=(
                     brain_definition.jq_instructions if brain_definition else None
                 ),
+            )
+        if brain.brain_type == BrainType.INTEGRATION:
+            return NotionBrain(
+                chat_id=chat_id,
+                model=model,
+                max_tokens=max_tokens,
+                max_input=max_input,
+                temperature=temperature,
+                brain_id=str(brain.brain_id),
+                streaming=streaming,
+                prompt_id=prompt_id,
+                metadata=metadata,
             )

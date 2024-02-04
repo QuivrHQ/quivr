@@ -9,5 +9,10 @@ class NotionBrain(KnowledgeBrainQA):
         KnowledgeBrainQA (_type_): A brain that store the knowledge internaly
     """
 
-    def __init__(self):
-        super().__init__()
+    def __init__(
+        self,
+        **kwargs,
+    ):
+        super().__init__(
+            **kwargs,
+        )

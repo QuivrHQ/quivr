@@ -71,6 +71,7 @@ def process_file_and_notify(
     file_original_name: str,
     brain_id,
     notification_id=None,
+    integration=None,
 ):
     try:
         supabase_client = get_supabase_client()

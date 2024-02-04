@@ -52,7 +52,7 @@ def test_find_model_and_generate_metadata_user_not_allowed(mock_chat_service):
     }  # User is not allowed to use the brain's model
     models_settings = [
         {"name": "gpt-3.5-turbo-1106", "max_input": 512, "max_output": 512},
-        {"name": "gpt-3.5-turbo-1107", "max_input": 512, "max_output": 512},
+        {"name": "gpt-3.5-turbo-1107", "max_input": 12000, "max_output": 12000},
     ]
     metadata_brain = {"key": "value"}
 
