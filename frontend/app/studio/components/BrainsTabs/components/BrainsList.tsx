@@ -1,3 +1,5 @@
+import { MaterialReactTable } from "material-react-table";
+
 import { MinimalBrainForUser } from "@/lib/context/BrainProvider/types";
 
 import { BrainItem } from "./BrainItem";
@@ -16,6 +18,7 @@ export const BrainsList = ({ brains }: BrainsListProps): JSX.Element => {
           </div>
         ))}
       </div>
+      <MaterialReactTable />
     </div>
   );
 };
