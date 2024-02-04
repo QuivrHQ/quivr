@@ -120,9 +120,9 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
     knowledge_qa: Optional[RAGInterface]
     metadata: Optional[dict] = None
 
-    callbacks: List[
-        AsyncIteratorCallbackHandler
-    ] = None  # pyright: ignore reportPrivateUsage=none
+    callbacks: List[AsyncIteratorCallbackHandler] = (
+        None  # pyright: ignore reportPrivateUsage=none
+    )
 
     prompt_id: Optional[UUID]
 
@@ -225,9 +225,9 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
                     "user_message": question.question,
                     "assistant": answer,
                     "message_time": new_chat.message_time,
-                    "prompt_title": self.prompt_to_use.title
-                    if self.prompt_to_use
-                    else None,
+                    "prompt_title": (
+                        self.prompt_to_use.title if self.prompt_to_use else None
+                    ),
                     "brain_name": brain.name if brain else None,
                     "message_id": new_chat.message_id,
                     "brain_id": str(brain.brain_id) if brain else None,
@@ -240,9 +240,9 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
                 "user_message": question.question,
                 "assistant": answer,
                 "message_time": None,
-                "prompt_title": self.prompt_to_use.title
-                if self.prompt_to_use
-                else None,
+                "prompt_title": (
+                    self.prompt_to_use.title if self.prompt_to_use else None
+                ),
                 "brain_name": None,
                 "message_id": None,
                 "brain_id": str(brain.brain_id) if brain else None,
@@ -318,9 +318,9 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
                     "message_time": streamed_chat_history.message_time,
                     "user_message": question.question,
                     "assistant": "",
-                    "prompt_title": self.prompt_to_use.title
-                    if self.prompt_to_use
-                    else None,
+                    "prompt_title": (
+                        self.prompt_to_use.title if self.prompt_to_use else None
+                    ),
                     "brain_name": brain.name if brain else None,
                     "brain_id": str(brain.brain_id) if brain else None,
                     "metadata": self.metadata,
@@ -334,9 +334,9 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
                     "message_time": None,
                     "user_message": question.question,
                     "assistant": "",
-                    "prompt_title": self.prompt_to_use.title
-                    if self.prompt_to_use
-                    else None,
+                    "prompt_title": (
+                        self.prompt_to_use.title if self.prompt_to_use else None
+                    ),
                     "brain_name": brain.name if brain else None,
                     "brain_id": str(brain.brain_id) if brain else None,
                     "metadata": self.metadata,

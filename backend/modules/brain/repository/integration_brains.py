@@ -10,6 +10,12 @@ from modules.brain.repository.interfaces.integration_brains_interface import (
 
 
 class IntegrationBrain(IntegrationBrainInterface):
+    """This is all the methods to interact with the integration brain.
+
+    Args:
+        IntegrationBrainInterface (_type_): _description_
+    """
+
     def __init__(self):
         self.db = get_supabase_client()
 
@@ -23,7 +29,7 @@ class IntegrationBrain(IntegrationBrainInterface):
         )
         if len(response.data) == 0:
             return None
-
+        
         return IntegrationEntity(**response.data[0])
 
     def add_integration_brain(self, brain_id, user_id, integration_id, settings):

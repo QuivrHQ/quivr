@@ -78,3 +78,4 @@ paulgraham.py
 .env_test
 supabase/seed-airwallex.sql
 airwallexpayouts.py
+application.log
