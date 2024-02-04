@@ -10,11 +10,11 @@ import { useMenuContext } from "@/lib/context/MenuProvider/hooks/useMenuContext"
 
 import styles from "./Menu.module.scss";
 import { AnimatedDiv } from "./components/AnimationDiv";
-import { BrainsManagementButton } from "./components/BrainsManagementButton/BrainsManagementButton";
 import { DiscussionButton } from "./components/DiscussionButton/DiscussionButton";
 import { HistoryButton } from "./components/HistoryButton/HistoryButton";
 import { HomeButton } from "./components/HomeButton/HomeButton";
 import { ProfileButton } from "./components/ProfileButton/ProfileButton";
+import { StudioButton } from "./components/StudioButton/StudioButton";
 import { UpgradeToPlusButton } from "./components/UpgradeToPlusButton/UpgradeToPlusButton";
 import { UploadDocumentButton } from "./components/UploadDocumentButton/UploadDocumentButton";
 
@@ -63,7 +63,7 @@ export const Menu = (): JSX.Element => {
               <div className={styles.block}>
                 <DiscussionButton />
                 <HomeButton />
-                <BrainsManagementButton />
+                <StudioButton />
                 <AddBrainModal isMenuButton={true} />
                 <UploadDocumentButton />
                 <HistoryButton />
