@@ -1,10 +1,10 @@
 import React from "react";
 
+import { CopyButton } from "@/lib/components/ui/CopyButton";
 import Icon from "@/lib/components/ui/Icon/Icon";
 import { Source } from "@/lib/types/MessageMetadata";
 
 import styles from "./MessageRow.module.scss";
-import { CopyButton } from "./components/CopyButton";
 import { MessageContent } from "./components/MessageContent/MessageContent";
 import { QuestionBrain } from "./components/QuestionBrain/QuestionBrain";
 import { QuestionPrompt } from "./components/QuestionPrompt/QuestionPrompt";
@@ -26,7 +26,7 @@ export const MessageRow = React.forwardRef(
     { speaker, text, brainName, promptName, children }: MessageRowProps,
     ref: React.Ref<HTMLDivElement>
   ) => {
-    const { handleCopy, isCopied, isUserSpeaker } = useMessageRow({
+    const { handleCopy, isUserSpeaker } = useMessageRow({
       speaker,
       text,
     });
@@ -58,7 +58,7 @@ export const MessageRow = React.forwardRef(
               <MessageContent text={messageContent} isUser={isUserSpeaker} />
               {!isUserSpeaker && messageContent !== "🧠" && (
                 <div className={styles.copy_button}>
-                  <CopyButton handleCopy={handleCopy} isCopied={isCopied} />
+                  <CopyButton handleCopy={handleCopy} />
                 </div>
               )}
             </>

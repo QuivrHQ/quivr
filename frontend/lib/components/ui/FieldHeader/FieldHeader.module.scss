@@ -1,0 +1,9 @@
+@use "@/styles/Spacings.module.scss";
+
+.field_header_wrapper {
+  display: flex;
+  gap: Spacings.$spacing03;
+  font-weight: bold;
+  align-items: center;
+  padding-bottom: Spacings.$spacing02;
+}

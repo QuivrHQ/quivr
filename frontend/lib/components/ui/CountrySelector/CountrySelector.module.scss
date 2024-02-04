@@ -1,0 +1,17 @@
+@use "@/styles/Colors.module.scss";
+@use "@/styles/Radius.module.scss";
+
+.selection {
+  border-radius: Radius.$normal;
+  box-shadow: none;
+  cursor: pointer;
+
+  &:hover {
+    background-color: Colors.$lightest-black;
+  }
+
+  &:focus {
+    box-shadow: none;
+    border-color: Colors.$primary;
+  }
+}

@@ -53,6 +53,14 @@
   }
 }
 
+.dangerous {
+  color: Colors.$dangerous;
+
+  &.hovered {
+    color: Colors.$dangerous-dark;
+  }
+}
+
 .disabled {
   color: Colors.$black;
   pointer-events: none;
