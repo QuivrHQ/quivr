@@ -1,10 +1,3 @@
-/* eslint-disable max-lines */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable prefer-arrow/prefer-arrow-functions */
-/* eslint-disable prefer-rest-params */
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 "use client";
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
