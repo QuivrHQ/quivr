@@ -46,6 +46,7 @@ class NotionConnector(IntegrationBrain):
     user_id: str = None
     knowledge_service: KnowledgeInterface
     recursive_index_enabled: bool = False
+    max_pages: int = 100
 
     def __init__(self, brain_id: str, user_id: str):
         super().__init__()
@@ -129,7 +130,7 @@ class NotionConnector(IntegrationBrain):
             res.raise_for_status()
         except Exception as e:
             logger.exception(f"Error fetching page - {res.json()}")
-            raise e
+            return None
         return NotionPage(**res.json())
 
     def _read_blocks(
@@ -211,6 +212,8 @@ class NotionConnector(IntegrationBrain):
     def _read_page(self, page_id: str) -> tuple[str, list[str]]:
         """Reads a Notion page"""
         page = self._fetch_page(page_id)
+        if page is None:
+            return None, None, None, None
         page_title = self._read_page_title(page)
         page_content, child_pages = self._read_blocks(page_id)
         page_url = self._read_page_url(page)
@@ -220,20 +223,24 @@ class NotionConnector(IntegrationBrain):
         """
         Get all the pages from Notion.
         """
-        all_pages = []
         query_dict = {
             "filter": {"property": "object", "value": "page"},
             "page_size": 100,
         }
+        max_pages = self.max_pages
+        pages_count = 0
         while True:
             search_response = self._search_notion(query_dict)
-            pages = [NotionPage(**page) for page in search_response.results]
-            all_pages.extend(pages)
+            for page in search_response.results:
+                pages_count += 1
+                if pages_count > max_pages:
+                    break
+                yield NotionPage(**page)
+
             if search_response.has_more:
                 query_dict["start_cursor"] = search_response.next_cursor
             else:
                 break
-        return all_pages
 
     def add_file_to_knowledge(
         self, page_content: List[tuple[str, str]], page_name: str, page_url: str
@@ -244,57 +251,60 @@ class NotionConnector(IntegrationBrain):
         filename_with_brain_id = (
             str(self.brain_id) + "/" + str(page_name) + "_notion.txt"
         )
+        try:
+            concatened_page_content = ""
+            if page_content:
+                for content in page_content:
+                    concatened_page_content += content[0] + "\n"
 
-        concatened_page_content = ""
-        if page_content:
-            for content in page_content:
-                concatened_page_content += content[0] + "\n"
+                # Create a BytesIO object from the content
+                content_io = BytesIO(concatened_page_content.encode("utf-8"))
 
-            # Create a BytesIO object from the content
-            content_io = BytesIO(concatened_page_content.encode("utf-8"))
+                # Create a file of type UploadFile
+                file = UploadFile(filename=filename_with_brain_id, file=content_io)
 
-            # Create a file of type UploadFile
-            file = UploadFile(filename=filename_with_brain_id, file=content_io)
+                # Write the UploadFile content to a temporary file
+                with tempfile.NamedTemporaryFile(delete=False) as temp_file:
+                    temp_file.write(file.file.read())
+                    temp_file_path = temp_file.name
 
-            # Write the UploadFile content to a temporary file
-            with tempfile.NamedTemporaryFile(delete=False) as temp_file:
-                temp_file.write(file.file.read())
-                temp_file_path = temp_file.name
+                # Upload the temporary file to the knowledge base
+                response = upload_file_storage(temp_file_path, filename_with_brain_id)
+                logger.info(f"File {response} uploaded successfully")
 
-            # Upload the temporary file to the knowledge base
-            response = upload_file_storage(temp_file_path, filename_with_brain_id)
-            logger.info(f"File {response} uploaded successfully")
+                # Delete the temporary file
+                os.remove(temp_file_path)
 
-            # Delete the temporary file
-            os.remove(temp_file_path)
+                knowledge_to_add = CreateKnowledgeProperties(
+                    brain_id=self.brain_id,
+                    file_name=page_name + "_notion.txt",
+                    extension="txt",
+                    integration="notion",
+                    integration_link=page_url,
+                )
 
-            knowledge_to_add = CreateKnowledgeProperties(
-                brain_id=self.brain_id,
-                file_name=page_name + "_notion.txt",
-                extension="txt",
-                integration="notion",
-                integration_link=page_url,
-            )
+                added_knowledge = self.knowledge_service.add_knowledge(knowledge_to_add)
+                logger.info(f"Knowledge {added_knowledge} added successfully")
 
-            added_knowledge = self.knowledge_service.add_knowledge(knowledge_to_add)
-            logger.info(f"Knowledge {added_knowledge} added successfully")
-
-            celery.send_task(
-                "process_file_and_notify",
-                kwargs={
-                    "file_name": filename_with_brain_id,
-                    "file_original_name": page_name + "_notion.txt",
-                    "brain_id": self.brain_id,
-                },
-            )
+                celery.send_task(
+                    "process_file_and_notify",
+                    kwargs={
+                        "file_name": filename_with_brain_id,
+                        "file_original_name": page_name + "_notion.txt",
+                        "brain_id": self.brain_id,
+                    },
+                )
+        except Exception:
+            logger.error("Error adding knowledge")
 
     def compile_all_pages(self):
         """
         Get all the pages, blocks, databases from Notion into a single document per page
         """
-        all_pages = self.get_all_pages()
+        all_pages = list(self.get_all_pages())  # Convert generator to list
         documents = []
         for page in all_pages:
+            logger.info(f"Reading page: {page.id}")
             page_title, page_content, child_pages, page_url = self._read_page(page.id)
             document = {
                 "page_title": page_title,
