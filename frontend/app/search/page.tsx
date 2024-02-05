@@ -3,6 +3,7 @@ import { usePathname } from "next/navigation";
 import { useEffect } from "react";
 
 import { QuivrLogo } from "@/lib/assets/QuivrLogo";
+import PageHeader from "@/lib/components/PageHeader/PageHeader";
 import { SearchBar } from "@/lib/components/ui/SearchBar/SearchBar";
 import { useSupabase } from "@/lib/context/SupabaseProvider";
 import { redirectToLogin } from "@/lib/router/redirectToLogin";
@@ -20,30 +21,35 @@ const Search = (): JSX.Element => {
   }, [pathname, session]);
 
   return (
-    <div className={styles.search_page_container}>
-      <div className={styles.main_container}>
-        <div className={styles.quivr_logo_wrapper}>
-          <QuivrLogo size={80} color="black" />
-          <div className={styles.quivr_text}>
-            <span>Talk to </span>
-            <span className={styles.quivr_text_primary}>Quivr</span>
+    <>
+      <div className={styles.page_header}>
+        <PageHeader iconName="home" label="Home" buttons={[]} />
+      </div>
+      <div className={styles.search_page_container}>
+        <div className={styles.main_container}>
+          <div className={styles.quivr_logo_wrapper}>
+            <QuivrLogo size={80} color="black" />
+            <div className={styles.quivr_text}>
+              <span>Talk to </span>
+              <span className={styles.quivr_text_primary}>Quivr</span>
+            </div>
+          </div>
+          <div className={styles.search_bar_wrapper}>
+            <SearchBar />
           </div>
         </div>
-        <div className={styles.search_bar_wrapper}>
-          <SearchBar />
+        <div className={styles.shortcuts_card_wrapper}>
+          <div className={styles.shortcut_wrapper}>
+            <span className={styles.shortcut}>@</span>
+            <span>Select a brain</span>
+          </div>
+          <div className={styles.shortcut_wrapper}>
+            <span className={styles.shortcut}>#</span>
+            <span>Select a prompt</span>
+          </div>
         </div>
       </div>
-      <div className={styles.shortcuts_card_wrapper}>
-        <div className={styles.shortcut_wrapper}>
-          <span className={styles.shortcut}>@</span>
-          <span>Select a brain</span>
-        </div>
-        <div className={styles.shortcut_wrapper}>
-          <span className={styles.shortcut}>#</span>
-          <span>Select a prompt</span>
-        </div>
-      </div>
-    </div>
+    </>
   );
 };
 
