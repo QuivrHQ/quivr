@@ -7,9 +7,9 @@ export const load = (): void => {
 }
 
 // Initializes Intercom
-export const boot = (options = {}): void => {
+export const boot = (email: string): void => {
   (window as any).Intercom &&
-    (window as any).Intercom("boot", { app_id: APP_ID, ...options });
+    (window as any).Intercom("boot", { app_id: APP_ID, email });
 };
 
 export const update = (): void => {

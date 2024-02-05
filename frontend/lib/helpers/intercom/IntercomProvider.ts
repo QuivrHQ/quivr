@@ -1,6 +1,8 @@
 import { usePathname } from "next/navigation";
 import { useEffect } from "react";
 
+import { useUserData } from "@/lib/hooks/useUserData";
+
 import {
   boot as bootIntercom,
   load as loadIntercom,
@@ -13,13 +15,14 @@ export const IntercomProvider = ({
   children: React.ReactNode;
 }): React.ReactNode => {
   const pathname = usePathname();
+  const { userData } = useUserData();
 
   if (
     typeof window !== "undefined" &&
     process.env.NEXT_PUBLIC_INTERCOM_APP_ID
   ) {
     loadIntercom();
-    bootIntercom();
+    bootIntercom(userData?.email ?? "");
   }
 
   useEffect(() => {
