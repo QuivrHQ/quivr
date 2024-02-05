@@ -1,5 +1,6 @@
 @use "@/styles/Colors.module.scss";
 @use "@/styles/Radius.module.scss";
+@use "@/styles/ScreenSizes.module.scss";
 @use "@/styles/Spacings.module.scss";
 @use "@/styles/Typography.module.scss";
 
@@ -16,10 +17,20 @@
     display: flex;
     padding: Spacings.$spacing05;
     gap: Spacings.$spacing05;
-    background-color: Colors.$primary-lightest;
+    background-color: Colors.$lightest-grey;
 
     .name {
       width: 200px;
+    }
+
+    .description {
+      color: Colors.$dark-grey;
+    }
+
+    @media (max-width: ScreenSizes.$small) {
+      .description {
+        display: none;
+      }
     }
   }
 }

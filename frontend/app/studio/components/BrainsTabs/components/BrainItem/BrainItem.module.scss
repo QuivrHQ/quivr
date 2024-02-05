@@ -1,18 +1,19 @@
 @use "@/styles/Colors.module.scss";
+@use "@/styles/ScreenSizes.module.scss";
 @use "@/styles/Spacings.module.scss";
 @use "@/styles/Typography.module.scss";
 
 .brain_item_wrapper {
   padding-block: Spacings.$spacing03;
   padding-inline: Spacings.$spacing05;
-  border-top: 1px solid Colors.$lightest-grey;
+  border-top: 1px solid Colors.$primary-lightest;
   overflow: hidden;
   display: flex;
   justify-content: space-between;
   align-items: center;
 
   &:hover {
-    background-color: Colors.$lightest-grey;
+    background-color: Colors.$primary-lightest;
   }
 
   .brain_info_wrapper {
@@ -29,8 +30,18 @@
 
     .description {
       @include Typography.EllipsisOverflow;
-      flex: 1; // Add this line
-      min-width: 0; // Add this line
+      flex: 1;
+      color: Colors.$dark-grey;
+    }
+
+    @media (max-width: ScreenSizes.$small) {
+      .name {
+        width: auto;
+      }
+
+      .description {
+        display: none;
+      }
     }
   }
 }
