@@ -4,19 +4,20 @@
 @use "@/styles/Typography.module.scss";
 
 .brain_item_wrapper {
-  padding-block: Spacings.$spacing03;
   padding-inline: Spacings.$spacing05;
   border-top: 1px solid Colors.$primary-lightest;
   overflow: hidden;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  cursor: pointer;
 
   &:hover {
-    background-color: Colors.$lightest-grey;
+    background-color: Colors.$lightest-black;
   }
 
   .brain_info_wrapper {
+    padding-block: Spacings.$spacing03;
     display: flex;
     overflow: hidden;
     gap: Spacings.$spacing05;
