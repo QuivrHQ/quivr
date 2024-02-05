@@ -13,11 +13,11 @@
   cursor: pointer;
 
   &.primary {
-    border-color: Colors.$primary-light;
+    border-color: Colors.$primary;
     color: Colors.$primary;
 
     &:hover {
-      background-color: Colors.$primary-light;
+      background-color: Colors.$primary;
       color: Colors.$white;
     }
   }

@@ -22,7 +22,7 @@ export const PageHeader = ({
   return (
     <div className={styles.page_header_wrapper}>
       <div className={`${styles.left} ${!isOpened ? styles.menu_closed : ""}`}>
-        <Icon name={iconName} size="normal" color="primary" />
+        <Icon name={iconName} size="large" color="primary" />
         <span>{label}</span>
       </div>
       <div className={styles.buttons_wrapper}>
