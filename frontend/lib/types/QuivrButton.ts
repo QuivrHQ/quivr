@@ -1,5 +1,7 @@
+import { Color } from "./Colors";
+
 export interface Button {
   label: string;
-  color: string;
+  color: Color;
   onClick: () => void;
 }

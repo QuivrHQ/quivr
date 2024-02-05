@@ -1,0 +1,24 @@
+@use "@/styles/Colors.module.scss";
+@use "@/styles/Radius.module.scss";
+@use "@/styles/Spacings.module.scss";
+@use "@/styles/Typography.module.scss";
+
+.button_wrapper {
+  font-size: Typography.$small;
+  white-space: nowrap;
+  padding-inline: Spacings.$spacing04;
+  padding-block: Spacings.$spacing02;
+  border-radius: Radius.$normal;
+  border: 2px solid transparent;
+  cursor: pointer;
+
+  &.primary {
+    border-color: Colors.$primary-light;
+    color: Colors.$primary;
+
+    &:hover {
+      background-color: Colors.$primary-light;
+      color: Colors.$white;
+    }
+  }
+}

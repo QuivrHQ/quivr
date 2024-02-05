@@ -3,14 +3,18 @@
 
 .page_header_wrapper {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: space-between;
 
   .left {
     @include Typography.H2;
     display: flex;
     align-items: center;
     gap: Spacings.$spacing03;
+
+    &.menu_closed {
+      padding-left: Spacings.$spacing06;
+    }
   }
 
   .buttons_wrapper {
