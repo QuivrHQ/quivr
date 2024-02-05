@@ -1,0 +1,15 @@
+@use "@/styles/Spacings.module.scss";
+@use "@/styles/Typography.module.scss";
+
+.page_header_wrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  .left {
+    @include Typography.H1;
+    display: flex;
+    align-items: center;
+    gap: Spacings.$spacing03;
+  }
+}

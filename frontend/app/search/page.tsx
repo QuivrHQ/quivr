@@ -7,6 +7,7 @@ import PageHeader from "@/lib/components/PageHeader/PageHeader";
 import { SearchBar } from "@/lib/components/ui/SearchBar/SearchBar";
 import { useSupabase } from "@/lib/context/SupabaseProvider";
 import { redirectToLogin } from "@/lib/router/redirectToLogin";
+import { Button } from "@/lib/types/QuivrButton";
 
 import styles from "./page.module.scss";
 
@@ -20,13 +21,30 @@ const Search = (): JSX.Element => {
     }
   }, [pathname, session]);
 
+  const buttons: Button[] = [
+    {
+      label: "Create brain",
+      color: "primary",
+      onClick: () => {
+        console.info("create");
+      },
+    },
+    {
+      label: "Add knowledge",
+      color: "primary",
+      onClick: () => {
+        console.info("add");
+      },
+    },
+  ];
+
   return (
-    <>
+    <div className={styles.main_container}>
       <div className={styles.page_header}>
-        <PageHeader iconName="home" label="Home" buttons={[]} />
+        <PageHeader iconName="home" label="Home" buttons={buttons} />
       </div>
       <div className={styles.search_page_container}>
-        <div className={styles.main_container}>
+        <div className={styles.main_wrapper}>
           <div className={styles.quivr_logo_wrapper}>
             <QuivrLogo size={80} color="black" />
             <div className={styles.quivr_text}>
@@ -49,7 +67,7 @@ const Search = (): JSX.Element => {
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
 };
 
