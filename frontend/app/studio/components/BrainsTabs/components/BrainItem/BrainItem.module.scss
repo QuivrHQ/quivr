@@ -5,21 +5,32 @@
 .brain_item_wrapper {
   padding-block: Spacings.$spacing03;
   padding-inline: Spacings.$spacing05;
-  border-top: 1px solid Colors.$normal-grey;
+  border-top: 1px solid Colors.$lightest-grey;
   overflow: hidden;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  &:hover {
+    background-color: Colors.$lightest-grey;
+  }
 
   .brain_info_wrapper {
     display: flex;
     overflow: hidden;
+    gap: Spacings.$spacing05;
+    overflow: hidden;
+    flex: 1;
 
     .name {
       @include Typography.EllipsisOverflow;
-      flex: 0.2;
+      width: 200px;
     }
 
     .description {
       @include Typography.EllipsisOverflow;
-      flex: 0.8;
+      flex: 1; // Add this line
+      min-width: 0; // Add this line
     }
   }
 }

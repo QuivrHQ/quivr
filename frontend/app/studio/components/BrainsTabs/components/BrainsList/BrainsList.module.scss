@@ -1,3 +1,4 @@
+@use "@/styles/Colors.module.scss";
 @use "@/styles/Radius.module.scss";
 @use "@/styles/Spacings.module.scss";
 @use "@/styles/Typography.module.scss";
@@ -14,15 +15,11 @@
     @include Typography.H3;
     display: flex;
     padding: Spacings.$spacing05;
-    gap: Spacings.$spacing03;
-    width: 100%;
+    gap: Spacings.$spacing05;
+    background-color: Colors.$primary-lightest;
 
     .name {
-      flex: 0.2;
-    }
-
-    .description {
-      flex: 0.88;
+      width: 200px;
     }
   }
 }
