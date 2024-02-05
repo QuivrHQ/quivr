@@ -1,3 +1,10 @@
+/* eslint-disable max-lines */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable prefer-arrow/prefer-arrow-functions */
+/* eslint-disable prefer-rest-params */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 "use client";
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -19,6 +26,7 @@ import { ChatsProvider } from "@/lib/context/ChatsProvider";
 import { MenuProvider } from "@/lib/context/MenuProvider/Menu-provider";
 import { SearchModalProvider } from "@/lib/context/SearchModalProvider/search-modal-provider";
 import { useSupabase } from "@/lib/context/SupabaseProvider";
+import { IntercomProvider } from "@/lib/helpers/intercom/IntercomProvider";
 import { UpdateMetadata } from "@/lib/helpers/updateMetadata";
 import { usePageTracking } from "@/services/analytics/june/usePageTracking";
 import "../lib/config/LocaleConfig/i18n";
@@ -55,19 +63,21 @@ const App = ({ children }: PropsWithChildren): JSX.Element => {
 
   return (
     <PostHogProvider client={posthog}>
-      <div className="flex flex-1 flex-col overflow-auto">
-        <SearchModalProvider>
-          <SearchModal />
-          <NotificationBanner />
-          <div className="relative h-full w-full flex justify-stretch items-stretch overflow-auto">
-            <Menu />
-            <div onClick={onClickOutside} className="flex-1">
-              {children}
+      <IntercomProvider>
+        <div className="flex flex-1 flex-col overflow-auto">
+          <SearchModalProvider>
+            <SearchModal />
+            <NotificationBanner />
+            <div className="relative h-full w-full flex justify-stretch items-stretch overflow-auto">
+              <Menu />
+              <div onClick={onClickOutside} className="flex-1">
+                {children}
+              </div>
+              <UpdateMetadata />
             </div>
-            <UpdateMetadata />
-          </div>
-        </SearchModalProvider>
-      </div>
+          </SearchModalProvider>
+        </div>
+      </IntercomProvider>
     </PostHogProvider>
   );
 };
