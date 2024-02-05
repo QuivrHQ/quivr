@@ -59,7 +59,7 @@ export const ChatHistoryItem = ({
         <Icon
           name="delete"
           size="normal"
-          color="black"
+          color="dangerous"
           handleHover={true}
           onClick={() => void deleteChat()}
         />

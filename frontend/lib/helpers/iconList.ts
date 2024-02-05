@@ -25,7 +25,7 @@ import {
 } from "react-icons/lu";
 import {
   MdAlternateEmail,
-  MdDelete,
+  MdDeleteOutline,
   MdEdit,
   MdHistory,
   MdUploadFile,
@@ -44,7 +44,7 @@ export const iconList: { [name: string]: IconType } = {
   chevronRight: LuChevronRight,
   close: IoMdClose,
   copy: LuCopy,
-  delete: MdDelete,
+  delete: MdDeleteOutline,
   edit: MdEdit,
   email: MdAlternateEmail,
   file: LuFile,
