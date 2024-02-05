@@ -4,7 +4,7 @@ from io import BytesIO
 from typing import Any, List, Optional
 
 import requests
-from celery_worker import process_file_and_notify
+from celery_config import celery
 from fastapi import UploadFile
 from logger import get_logger
 from modules.brain.entity.integration_brain import IntegrationEntity
@@ -279,10 +279,13 @@ class NotionConnector(IntegrationBrain):
             added_knowledge = self.knowledge_service.add_knowledge(knowledge_to_add)
             logger.info(f"Knowledge {added_knowledge} added successfully")
 
-            process_file_and_notify.delay(
-                file_name=filename_with_brain_id,
-                file_original_name=page_name + "_notion.txt",
-                brain_id=self.brain_id,
+            celery.send_task(
+                "process_file_and_notify",
+                kwargs={
+                    "file_name": filename_with_brain_id,
+                    "file_original_name": page_name + "_notion.txt",
+                    "brain_id": self.brain_id,
+                },
             )
 
     def compile_all_pages(self):
@@ -307,11 +310,14 @@ class NotionConnector(IntegrationBrain):
 if __name__ == "__main__":
 
     notion = NotionConnector(
-        brain_id="32b8dee3-7241-4e82-b4e1-bdfc131d46e3",
+        brain_id="b3ab23c5-9e13-4dd8-8883-106d613e3de8",
         user_id="39418e3b-0258-4452-af60-7acfcc1263ff",
     )
 
-    pages = notion.compile_all_pages()
-
-    for page in pages:
-        print(page)
+    celery.send_task(
+        "NotionConnectorLoad",
+        kwargs={
+            "brain_id": "b3ab23c5-9e13-4dd8-8883-106d613e3de8",
+            "user_id": "39418e3b-0258-4452-af60-7acfcc1263ff",
+        },
+    )

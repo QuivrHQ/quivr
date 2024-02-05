@@ -1,6 +1,7 @@
 from typing import Optional
 from uuid import UUID
 
+from celery_config import celery
 from fastapi import HTTPException
 from logger import get_logger
 from modules.brain.dto.inputs import BrainUpdatableProperties, CreateBrainProperties
@@ -180,14 +181,19 @@ class BrainService:
         brain: CreateBrainProperties,
     ) -> BrainEntity:
         created_brain = self.brain_repository.create_brain(brain)
-
+        logger.info(f"Created brain: {created_brain}")
         if brain.integration is not None:
+            logger.info(f"Integration: {brain.integration}")
             self.integration_brains_repository.add_integration_brain(
                 user_id=user_id,
                 brain_id=created_brain.brain_id,
                 integration_id=brain.integration.integration_id,
                 settings=brain.integration.settings,
             )
+        celery.send_task(
+            "NotionConnectorLoad",
+            kwargs={"brain_id": created_brain.brain_id, "user_id": user_id},
+        )
         return created_brain
 
     def delete_brain_secrets_values(self, brain_id: UUID) -> None:

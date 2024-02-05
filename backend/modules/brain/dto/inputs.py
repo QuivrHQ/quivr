@@ -35,6 +35,10 @@ class BrainIntegrationSettings(BaseModel, extra=Extra.forbid):
     settings: dict
 
 
+class BrainIntegrationUpdateSettings(BaseModel, extra=Extra.forbid):
+    settings: dict
+
+
 class CreateBrainProperties(BaseModel, extra=Extra.forbid):
     name: Optional[str] = "Default brain"
     description: str = "This is a description"
@@ -66,6 +70,7 @@ class BrainUpdatableProperties(BaseModel):
     prompt_id: Optional[UUID]
     brain_definition: Optional[ApiBrainDefinitionEntity]
     connected_brains_ids: Optional[list[UUID]] = []
+    integration: Optional[BrainIntegrationUpdateSettings] = None
 
     def dict(self, *args, **kwargs):
         brain_dict = super().dict(*args, **kwargs)
