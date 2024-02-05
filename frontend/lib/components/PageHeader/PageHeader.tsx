@@ -25,15 +25,17 @@ export const PageHeader = ({
         <Icon name={iconName} size="large" color="primary" />
         <span>{label}</span>
       </div>
-      {buttons.map((button, index) => (
-        <button
-          key={index}
-          style={{ color: button.color }}
-          onClick={button.onClick}
-        >
-          {button.label}
-        </button>
-      ))}
+      <div className={styles.buttons_wrapper}>
+        {buttons.map((button, index) => (
+          <button
+            key={index}
+            style={{ color: button.color }}
+            onClick={button.onClick}
+          >
+            {button.label}
+          </button>
+        ))}
+      </div>
     </div>
   );
 };

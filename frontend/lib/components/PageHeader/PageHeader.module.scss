@@ -7,9 +7,14 @@
   align-items: center;
 
   .left {
-    @include Typography.H1;
+    @include Typography.H2;
     display: flex;
     align-items: center;
+    gap: Spacings.$spacing03;
+  }
+
+  .buttons_wrapper {
+    display: flex;
     gap: Spacings.$spacing03;
   }
 }

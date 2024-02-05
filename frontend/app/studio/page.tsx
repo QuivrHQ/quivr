@@ -19,11 +19,6 @@ const Studio = (): JSX.Element => {
       onClick: () => setSelectedTab("Manage my brains"),
     },
     {
-      label: "Create brain",
-      isSelected: selectedTab === "Create brain",
-      onClick: () => setSelectedTab("Create brain"),
-    },
-    {
       label: "Analytics - Coming soon",
       isSelected: selectedTab === "Analytics",
       onClick: () => setSelectedTab("Analytics"),
