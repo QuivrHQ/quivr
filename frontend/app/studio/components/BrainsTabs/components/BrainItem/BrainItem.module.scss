@@ -3,20 +3,23 @@
 @use "@/styles/Typography.module.scss";
 
 .brain_item_wrapper {
-  padding: Spacings.$spacing03;
+  padding-block: Spacings.$spacing03;
+  padding-inline: Spacings.$spacing05;
   border-top: 1px solid Colors.$normal-grey;
+  overflow: hidden;
+
   .brain_info_wrapper {
     display: flex;
     overflow: hidden;
 
     .name {
       @include Typography.EllipsisOverflow;
-      width: 20%;
+      flex: 0.2;
     }
 
     .description {
       @include Typography.EllipsisOverflow;
-      width: 80%;
+      flex: 0.8;
     }
   }
 }

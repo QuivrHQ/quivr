@@ -7,8 +7,6 @@ type TabsProps = {
 };
 
 export const Tabs = ({ tabList }: TabsProps): JSX.Element => {
-  console.info(tabList);
-
   return (
     <div className={styles.tabs_container}>
       {tabList.map((tab, index) => (
