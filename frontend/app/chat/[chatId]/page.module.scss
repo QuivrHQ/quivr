@@ -9,6 +9,7 @@
   padding-inline: Spacings.$spacing09;
   display: flex;
   gap: Spacings.$spacing09;
+  overflow: hidden;
 
   &.feeding {
     background-color: Colors.$chat-bg-gray;
