@@ -112,7 +112,7 @@ pyflakes==3.0.1; python_version >= '3.6'
 pygments==2.17.2; python_version >= '3.7'
 pypandoc==1.11; python_version >= '3.6'
 pypdf==3.9.0; python_version >= '3.6'
-pyright==1.1.316; python_version >= '3.7'
+pyright==1.1.350; python_version >= '3.7'
 pytesseract==0.3.10; python_version >= '3.7'
 pytest==7.4.4; python_version >= '3.7'
 pytest-celery==0.0.0
