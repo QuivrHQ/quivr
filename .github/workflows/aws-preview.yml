@@ -31,7 +31,7 @@ jobs:
 
     - name: Login to Amazon ECR
       id: login-ecr
-      uses: aws-actions/amazon-ecr-login@2fc7aceee09e9e4a7105c0d060c656fad0b4f63d # v1
+      uses: aws-actions/amazon-ecr-login@062b18b96a7aff071d4dc91bc00c4c1a7945b076 # v2
     
     - name: Login to GitHub Container Registry
       uses: docker/login-action@465a07811f14bebb1938fbed4728c6a1ff8901fc # v2
