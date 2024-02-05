@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.0.194 (2024-02-05)
+
+## What's Changed
+* feat(frontend): add a chatbot for users  by @Zewed in https://github.com/StanGirard/quivr/pull/2144
+
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.193...v0.0.194
+
 ## 0.0.193 (2024-02-04)
 
 ## What's Changed
