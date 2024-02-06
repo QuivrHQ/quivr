@@ -1,4 +1,4 @@
-from langchain.document_loaders import UnstructuredPDFLoader
+from langchain_community.document_loaders import UnstructuredPDFLoader
 from models import File
 
 from .common import process_file

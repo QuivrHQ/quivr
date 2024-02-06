@@ -1,4 +1,4 @@
-from langchain.document_loaders import Docx2txtLoader
+from langchain_community.document_loaders import Docx2txtLoader
 from models import File
 
 from .common import process_file

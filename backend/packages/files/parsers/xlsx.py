@@ -1,4 +1,4 @@
-from langchain.document_loaders import UnstructuredExcelLoader
+from langchain_community.document_loaders import UnstructuredExcelLoader
 from models.files import File
 
 from .common import process_file

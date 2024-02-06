@@ -1,4 +1,4 @@
-from langchain.document_loaders import UnstructuredHTMLLoader
+from langchain_community.document_loaders import UnstructuredHTMLLoader
 from models import File
 
 from .common import process_file

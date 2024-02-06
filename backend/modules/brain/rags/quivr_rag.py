@@ -3,7 +3,6 @@ from uuid import UUID
 
 from langchain.chains import ConversationalRetrievalChain, LLMChain
 from langchain.chains.question_answering import load_qa_chain
-from langchain.chat_models import ChatLiteLLM
 from langchain.embeddings.ollama import OllamaEmbeddings
 from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.llms.base import BaseLLM
@@ -12,6 +11,7 @@ from langchain.prompts.chat import (
     HumanMessagePromptTemplate,
     SystemMessagePromptTemplate,
 )
+from langchain_community.chat_models import ChatLiteLLM
 from llm.prompts.CONDENSE_PROMPT import CONDENSE_QUESTION_PROMPT
 from llm.utils.get_prompt_to_use import get_prompt_to_use
 from logger import get_logger

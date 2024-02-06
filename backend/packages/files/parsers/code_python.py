@@ -1,4 +1,4 @@
-from langchain.document_loaders import PythonLoader
+from langchain_community.document_loaders import PythonLoader
 from models import File
 
 from .common import process_file

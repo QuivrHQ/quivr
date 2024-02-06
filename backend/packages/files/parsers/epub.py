@@ -1,4 +1,4 @@
-from langchain.document_loaders.epub import UnstructuredEPubLoader
+from langchain_community.document_loaders.epub import UnstructuredEPubLoader
 from models import File
 
 from .common import process_file
