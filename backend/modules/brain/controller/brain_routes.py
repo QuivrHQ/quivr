@@ -11,9 +11,13 @@ from modules.brain.dto.inputs import (
     CreateBrainProperties,
 )
 from modules.brain.entity.brain_entity import PublicBrain, RoleEnum
+from modules.brain.entity.integration_brain import IntegrationDescriptionEntity
 from modules.brain.service.brain_authorization_service import has_brain_authorization
 from modules.brain.service.brain_service import BrainService
 from modules.brain.service.brain_user_service import BrainUserService
+from modules.brain.service.integration_brain_service import (
+    IntegrationBrainDescriptionService,
+)
 from modules.prompt.service.prompt_service import PromptService
 from modules.user.entity.user_identity import UserIdentity
 from repository.brain import get_question_context_from_brain
@@ -24,6 +28,16 @@ brain_router = APIRouter()
 prompt_service = PromptService()
 brain_service = BrainService()
 brain_user_service = BrainUserService()
+integration_brain_description_service = IntegrationBrainDescriptionService()
+
+
+@brain_router.get(
+    "/brains/integrations/",
+    dependencies=[Depends(AuthBearer())],
+)
+async def get_integration_brain_description() -> list[IntegrationDescriptionEntity]:
+    """Retrieve the integration brain description."""
+    return integration_brain_description_service.get_all_integration_descriptions()
 
 
 @brain_router.get("/brains/", dependencies=[Depends(AuthBearer())], tags=["Brain"])
@@ -96,22 +110,13 @@ async def create_new_brain(
         brain=brain,
         user_id=current_user.id,
     )
-    if brain_user_service.get_user_default_brain(current_user.id):
-        logger.info(f"Default brain already exists for user {current_user.id}")
-        brain_user_service.create_brain_user(
-            user_id=current_user.id,
-            brain_id=new_brain.brain_id,
-            rights=RoleEnum.Owner,
-            is_default_brain=False,
-        )
-    else:
-        logger.info(f"Creating default brain for user {current_user.id}.")
-        brain_user_service.create_brain_user(
-            user_id=current_user.id,
-            brain_id=new_brain.brain_id,
-            rights=RoleEnum.Owner,
-            is_default_brain=True,
-        )
+    logger.info(f"Creating default brain for user {current_user.id}.")
+    brain_user_service.create_brain_user(
+        user_id=current_user.id,
+        brain_id=new_brain.brain_id,
+        rights=RoleEnum.Owner,
+        is_default_brain=True,
+    )
 
     return {"id": new_brain.brain_id, "name": brain.name, "rights": "Owner"}
 

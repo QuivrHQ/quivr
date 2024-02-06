@@ -76,3 +76,6 @@ supabase/migrations/20240103191539_private.sql
 supabase/20240103191539_private.sql
 paulgraham.py
 .env_test
+supabase/seed-airwallex.sql
+airwallexpayouts.py
+application.log

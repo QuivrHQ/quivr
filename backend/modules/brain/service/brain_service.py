@@ -1,16 +1,20 @@
 from typing import Optional
 from uuid import UUID
 
+from celery_config import celery
 from fastapi import HTTPException
 from logger import get_logger
 from modules.brain.dto.inputs import BrainUpdatableProperties, CreateBrainProperties
 from modules.brain.entity.brain_entity import BrainEntity, BrainType, PublicBrain
+from modules.brain.entity.integration_brain import IntegrationEntity
 from modules.brain.repository import (
     Brains,
     BrainsUsers,
     BrainsVectors,
     CompositeBrainsConnections,
     ExternalApiSecrets,
+    IntegrationBrain,
+    IntegrationDescription,
 )
 from modules.brain.repository.interfaces import (
     BrainsInterface,
@@ -18,6 +22,7 @@ from modules.brain.repository.interfaces import (
     BrainsVectorsInterface,
     CompositeBrainsConnectionsInterface,
     ExternalApiSecretsInterface,
+    IntegrationDescriptionInterface,
 )
 from modules.brain.service.api_brain_definition_service import ApiBrainDefinitionService
 from modules.brain.service.utils.validate_brain import validate_api_brain
@@ -37,6 +42,8 @@ class BrainService:
     brain_vector_repository: BrainsVectorsInterface
     external_api_secrets_repository: ExternalApiSecretsInterface
     composite_brains_connections_repository: CompositeBrainsConnectionsInterface
+    integration_brains_repository: IntegrationDescriptionInterface
+    integration_description_repository: IntegrationDescriptionInterface
 
     def __init__(self):
         self.brain_repository = Brains()
@@ -44,9 +51,16 @@ class BrainService:
         self.brain_vector = BrainsVectors()
         self.external_api_secrets_repository = ExternalApiSecrets()
         self.composite_brains_connections_repository = CompositeBrainsConnections()
+        self.integration_brains_repository = IntegrationBrain()
+        self.integration_description_repository = IntegrationDescription()
 
     def get_brain_by_id(self, brain_id: UUID):
         return self.brain_repository.get_brain_by_id(brain_id)
+
+    def get_integration_brain(self, brain_id, user_id) -> IntegrationEntity | None:
+        return self.integration_brains_repository.get_integration_brain(
+            brain_id, user_id
+        )
 
     def find_brain_from_question(
         self,
@@ -124,6 +138,9 @@ class BrainService:
         if brain.brain_type == BrainType.COMPOSITE:
             return self.create_brain_composite(brain)
 
+        if brain.brain_type == BrainType.INTEGRATION:
+            return self.create_brain_integration(user_id, brain)
+
         created_brain = self.brain_repository.create_brain(brain)
         return created_brain
 
@@ -165,6 +182,33 @@ class BrainService:
                     connected_brain_id=connected_brain_id,
                 )
 
+        return created_brain
+
+    def create_brain_integration(
+        self,
+        user_id: UUID,
+        brain: CreateBrainProperties,
+    ) -> BrainEntity:
+        created_brain = self.brain_repository.create_brain(brain)
+        logger.info(f"Created brain: {created_brain}")
+        if brain.integration is not None:
+            logger.info(f"Integration: {brain.integration}")
+            self.integration_brains_repository.add_integration_brain(
+                user_id=user_id,
+                brain_id=created_brain.brain_id,
+                integration_id=brain.integration.integration_id,
+                settings=brain.integration.settings,
+            )
+        if (
+            self.integration_description_repository.get_integration_description(
+                brain.integration.integration_id
+            ).integration_name
+            == "Notion"
+        ):
+            celery.send_task(
+                "NotionConnectorLoad",
+                kwargs={"brain_id": created_brain.brain_id, "user_id": user_id},
+            )
         return created_brain
 
     def delete_brain_secrets_values(self, brain_id: UUID) -> None:
@@ -229,7 +273,7 @@ class BrainService:
             brain_id,
             brain=BrainUpdatableProperties(
                 **brain_new_values.dict(
-                    exclude={"brain_definition", "connected_brains_ids"}
+                    exclude={"brain_definition", "connected_brains_ids", "integration"}
                 )
             ),
         )

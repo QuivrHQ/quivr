@@ -4,8 +4,8 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-langchain = "==0.0.341"
-litellm = "==1.7.7"
+langchain = "*"
+litellm = "*"
 openai = "==1.1.1"
 gitpython = "==3.1.36"
 pdf2image = "==1.16.3"
@@ -44,6 +44,8 @@ posthog = "==3.1.0"
 jq = "==1.6.0"
 pytest = "*"
 ddtrace = "*"
+watchdog = "*"
+langchain-community = "*"
 
 [dev-packages]
 black = "*"

@@ -46,7 +46,12 @@ services:
       context: backend
       dockerfile: Dockerfile
     container_name: worker
-    command: celery -A celery_worker worker -l info
+    volumes:
+      - ./backend/:/code/
+    command: >
+      /bin/sh -c "
+      watchmedo auto-restart -d . -p '*.py' --recursive -- celery -A celery_worker worker -l info
+      "
     restart: always
     depends_on:
       - redis
@@ -59,8 +64,13 @@ services:
     build:
       context: backend
       dockerfile: Dockerfile
+    volumes:
+      - ./backend/:/code/
     container_name: beat
-    command: celery -A celery_worker beat -l info
+    command: >
+      /bin/sh -c "
+      watchmedo auto-restart -d . -p '*.py' --recursive -- celery -A celery_worker beat -l info
+      "
     restart: always
     depends_on:
       - redis
@@ -73,6 +83,8 @@ services:
     build:
       context: backend
       dockerfile: Dockerfile
+    volumes:
+      - ./backend/:/code/
     container_name: flower
     command: celery -A celery_worker flower -l info --port=5555
     restart: always

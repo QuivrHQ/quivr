@@ -9,7 +9,14 @@ from repository.files.upload_file import DocumentSerializable
 logger = get_logger(__name__)
 
 
-async def process_file(file: File, loader_class, brain_id, original_file_name):
+async def process_file(
+    file: File,
+    loader_class,
+    brain_id,
+    original_file_name,
+    integration=None,
+    integration_link=None,
+):
     dateshort = time.strftime("%Y%m%d")
     neurons = Neurons()
 
@@ -23,6 +30,8 @@ async def process_file(file: File, loader_class, brain_id, original_file_name):
         "chunk_overlap": file.chunk_overlap,
         "date": dateshort,
         "original_file_name": original_file_name or file.file_name,
+        "integration": integration or "",
+        "integration_link": integration_link or "",
     }
     docs = []
 

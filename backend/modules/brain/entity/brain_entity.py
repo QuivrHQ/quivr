@@ -10,6 +10,7 @@ class BrainType(str, Enum):
     DOC = "doc"
     API = "api"
     COMPOSITE = "composite"
+    INTEGRATION = "integration"
 
 
 class BrainEntity(BaseModel):

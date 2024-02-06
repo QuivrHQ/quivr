@@ -3,7 +3,6 @@ from uuid import UUID
 
 from langchain.chains import ConversationalRetrievalChain, LLMChain
 from langchain.chains.question_answering import load_qa_chain
-from langchain.chat_models import ChatLiteLLM
 from langchain.embeddings.ollama import OllamaEmbeddings
 from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.llms.base import BaseLLM
@@ -12,17 +11,17 @@ from langchain.prompts.chat import (
     HumanMessagePromptTemplate,
     SystemMessagePromptTemplate,
 )
-from llm.rags.rag_interface import RAGInterface
+from langchain_community.chat_models import ChatLiteLLM
+from llm.prompts.CONDENSE_PROMPT import CONDENSE_QUESTION_PROMPT
 from llm.utils.get_prompt_to_use import get_prompt_to_use
 from logger import get_logger
 from models import BrainSettings  # Importing settings related to the 'brain'
+from modules.brain.rags.rag_interface import RAGInterface
 from modules.brain.service.brain_service import BrainService
 from modules.chat.service.chat_service import ChatService
 from pydantic import BaseModel
 from supabase.client import Client, create_client
 from vectorstore.supabase import CustomSupabaseVectorStore
-
-from ..prompts.CONDENSE_PROMPT import CONDENSE_QUESTION_PROMPT
 
 logger = get_logger(__name__)
 QUIVR_DEFAULT_PROMPT = "Your name is Quivr. You're a helpful assistant.  If you don't know the answer, just say that you don't know, don't try to make up an answer."
@@ -204,6 +203,3 @@ class QuivrRAG(BaseModel, RAGInterface):
 
     def get_retriever(self):
         return self.vector_store.as_retriever()
-
-    # Some other methods can be added such as on_stream, on_end,... to abstract history management (each answer should be saved or not)    # Some other methods can be added such as on_stream, on_end,... to abstract history management (each answer should be saved or not)
-    # Some other methods can be added such as on_stream, on_end,... to abstract history management (each answer should be saved or not)

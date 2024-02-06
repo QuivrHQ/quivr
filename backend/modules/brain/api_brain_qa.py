@@ -6,13 +6,13 @@ import jq
 import requests
 from fastapi import HTTPException
 from litellm import completion
-from llm.knowledge_brain_qa import KnowledgeBrainQA
-from llm.qa_interface import QAInterface
 from llm.utils.call_brain_api import call_brain_api
 from llm.utils.get_api_brain_definition_as_json_schema import (
     get_api_brain_definition_as_json_schema,
 )
 from logger import get_logger
+from modules.brain.knowledge_brain_qa import KnowledgeBrainQA
+from modules.brain.qa_interface import QAInterface
 from modules.brain.service.brain_service import BrainService
 from modules.chat.dto.chats import ChatQuestion
 from modules.chat.dto.inputs import CreateChatHistory
@@ -27,7 +27,7 @@ logger = get_logger(__name__)
 
 class UUIDEncoder(json.JSONEncoder):
     def default(self, obj):
-        if isinstance(obj, uuid.UUID):
+        if isinstance(obj, UUID):
             # if the object is uuid, we simply return the value of uuid
             return str(obj)
         return super().default(obj)
