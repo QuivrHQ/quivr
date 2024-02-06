@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 
+import { AddBrainModal } from "@/lib/components/AddBrainModal";
 import { useBrainCreationContext } from "@/lib/components/AddBrainModal/components/AddBrainSteps/brainCreation-provider";
 import PageHeader from "@/lib/components/PageHeader/PageHeader";
 import { UploadDocumentModal } from "@/lib/components/UploadDocumentModal/UploadDocumentModal";
@@ -59,6 +60,7 @@ const Studio = (): JSX.Element => {
         {selectedTab === "Manage my brains" && <ManageBrains />}
       </div>
       <UploadDocumentModal />
+      <AddBrainModal />
     </div>
   );
 };
