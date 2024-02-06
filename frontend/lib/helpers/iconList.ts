@@ -1,6 +1,6 @@
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import { BsArrowRightShort } from "react-icons/bs";
-import { CiFlag1 } from "react-icons/ci";
+import { CiChat1, CiFlag1 } from "react-icons/ci";
 import {
   FaCheck,
   FaCheckCircle,
@@ -38,6 +38,7 @@ export const iconList: { [name: string]: IconType } = {
   addWithoutCircle: IoIosAdd,
   brain: LuBrain,
   brainCircuit: LuBrainCircuit,
+  chat: CiChat1,
   check: FaCheck,
   checkCircle: FaCheckCircle,
   chevronDown: LuChevronDown,

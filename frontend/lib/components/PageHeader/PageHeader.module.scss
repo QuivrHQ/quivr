@@ -8,7 +8,7 @@
   justify-content: space-between;
   padding: Spacings.$spacing04;
   padding-left: Spacings.$spacing09;
-  box-shadow: 0px 1px 2px rgb(0, 0, 0, 0.25);
+  border-bottom: 1px solid Colors.$lightest-black;
 
   .left {
     @include Typography.H2;
