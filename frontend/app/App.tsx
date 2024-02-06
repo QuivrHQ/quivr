@@ -19,6 +19,7 @@ import { ChatsProvider } from "@/lib/context/ChatsProvider";
 import { MenuProvider } from "@/lib/context/MenuProvider/Menu-provider";
 import { SearchModalProvider } from "@/lib/context/SearchModalProvider/search-modal-provider";
 import { useSupabase } from "@/lib/context/SupabaseProvider";
+import { IntercomProvider } from "@/lib/helpers/intercom/IntercomProvider";
 import { UpdateMetadata } from "@/lib/helpers/updateMetadata";
 import { usePageTracking } from "@/services/analytics/june/usePageTracking";
 import "../lib/config/LocaleConfig/i18n";
@@ -55,19 +56,21 @@ const App = ({ children }: PropsWithChildren): JSX.Element => {
 
   return (
     <PostHogProvider client={posthog}>
-      <div className="flex flex-1 flex-col overflow-auto">
-        <SearchModalProvider>
-          <SearchModal />
-          <NotificationBanner />
-          <div className="relative h-full w-full flex justify-stretch items-stretch overflow-auto">
-            <Menu />
-            <div onClick={onClickOutside} className="flex-1">
-              {children}
+      <IntercomProvider>
+        <div className="flex flex-1 flex-col overflow-auto">
+          <SearchModalProvider>
+            <SearchModal />
+            <NotificationBanner />
+            <div className="relative h-full w-full flex justify-stretch items-stretch overflow-auto">
+              <Menu />
+              <div onClick={onClickOutside} className="flex-1">
+                {children}
+              </div>
+              <UpdateMetadata />
             </div>
-            <UpdateMetadata />
-          </div>
-        </SearchModalProvider>
-      </div>
+          </SearchModalProvider>
+        </div>
+      </IntercomProvider>
     </PostHogProvider>
   );
 };
