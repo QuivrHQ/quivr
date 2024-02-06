@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 
 import { Modal } from "@/lib/components/ui/Modal";
@@ -14,10 +13,6 @@ export const AddBrainSteps = (): JSX.Element => {
 
   const { isBrainCreationModalOpened, setIsBrainCreationModalOpened } =
     useBrainCreationContext();
-
-  useEffect(() => {
-    console.info(isBrainCreationModalOpened);
-  }, [isBrainCreationModalOpened]);
 
   return (
     <Modal
