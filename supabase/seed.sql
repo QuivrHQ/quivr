@@ -24,7 +24,8 @@ SET row_security = off;
 
 INSERT INTO "auth"."audit_log_entries" ("instance_id", "id", "payload", "created_at", "ip_address") VALUES
 	('00000000-0000-0000-0000-000000000000', '84e89c28-6f5f-4e24-a03b-68cdaa90b3f2', '{"action":"user_signedup","actor_id":"00000000-0000-0000-0000-000000000000","actor_username":"service_role","actor_via_sso":false,"log_type":"team","traits":{"user_email":"admin@quivr.app","user_id":"39418e3b-0258-4452-af60-7acfcc1263ff","user_phone":""}}', '2024-01-22 22:27:00.164777+00', ''),
-	('00000000-0000-0000-0000-000000000000', 'ac1d43e6-2b2a-4af1-bdd1-c03907e7ba5a', '{"action":"login","actor_id":"39418e3b-0258-4452-af60-7acfcc1263ff","actor_username":"admin@quivr.app","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2024-01-22 22:27:50.16388+00', '');
+	('00000000-0000-0000-0000-000000000000', 'ac1d43e6-2b2a-4af1-bdd1-c03907e7ba5a', '{"action":"login","actor_id":"39418e3b-0258-4452-af60-7acfcc1263ff","actor_username":"admin@quivr.app","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2024-01-22 22:27:50.16388+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'e86de23b-ea26-408e-8e8c-a97d2f1f259c', '{"action":"login","actor_id":"39418e3b-0258-4452-af60-7acfcc1263ff","actor_username":"admin@quivr.app","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2024-02-06 04:08:08.378325+00', '');
 
 
 --
@@ -38,7 +39,7 @@ INSERT INTO "auth"."audit_log_entries" ("instance_id", "id", "payload", "created
 --
 
 INSERT INTO "auth"."users" ("instance_id", "id", "aud", "role", "email", "encrypted_password", "email_confirmed_at", "invited_at", "confirmation_token", "confirmation_sent_at", "recovery_token", "recovery_sent_at", "email_change_token_new", "email_change", "email_change_sent_at", "last_sign_in_at", "raw_app_meta_data", "raw_user_meta_data", "is_super_admin", "created_at", "updated_at", "phone", "phone_confirmed_at", "phone_change", "phone_change_token", "phone_change_sent_at", "email_change_token_current", "email_change_confirm_status", "banned_until", "reauthentication_token", "reauthentication_sent_at", "is_sso_user", "deleted_at") VALUES
-	('00000000-0000-0000-0000-000000000000', '39418e3b-0258-4452-af60-7acfcc1263ff', 'authenticated', 'authenticated', 'admin@quivr.app', '$2a$10$vwKX0eMLlrOZvxQEA3Vl4e5V4/hOuxPjGYn9QK1yqeaZxa.42Uhze', '2024-01-22 22:27:00.166861+00', NULL, '', NULL, '', NULL, '', '', NULL, '2024-01-22 22:27:50.165259+00', '{"provider": "email", "providers": ["email"]}', '{}', NULL, '2024-01-22 22:27:00.158026+00', '2024-01-22 22:27:50.169826+00', NULL, NULL, '', '', NULL, '', 0, NULL, '', NULL, false, NULL);
+	('00000000-0000-0000-0000-000000000000', '39418e3b-0258-4452-af60-7acfcc1263ff', 'authenticated', 'authenticated', 'admin@quivr.app', '$2a$10$vwKX0eMLlrOZvxQEA3Vl4e5V4/hOuxPjGYn9QK1yqeaZxa.42Uhze', '2024-01-22 22:27:00.166861+00', NULL, '', NULL, '', NULL, '', '', NULL, '2024-02-06 04:08:08.379821+00', '{"provider": "email", "providers": ["email"]}', '{}', NULL, '2024-01-22 22:27:00.158026+00', '2024-02-06 04:08:08.38296+00', NULL, NULL, '', '', NULL, '', 0, NULL, '', NULL, false, NULL);
 
 
 --
@@ -60,7 +61,8 @@ INSERT INTO "auth"."identities" ("provider_id", "user_id", "identity_data", "pro
 --
 
 INSERT INTO "auth"."sessions" ("id", "user_id", "created_at", "updated_at", "factor_id", "aal", "not_after", "refreshed_at", "user_agent", "ip", "tag") VALUES
-	('99541374-fc9d-4f5b-b0f6-ff092a455a60', '39418e3b-0258-4452-af60-7acfcc1263ff', '2024-01-22 22:27:50.165335+00', '2024-01-22 22:27:50.165335+00', NULL, 'aal1', NULL, NULL, 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36', '192.168.65.1', NULL);
+	('99541374-fc9d-4f5b-b0f6-ff092a455a60', '39418e3b-0258-4452-af60-7acfcc1263ff', '2024-01-22 22:27:50.165335+00', '2024-01-22 22:27:50.165335+00', NULL, 'aal1', NULL, NULL, 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36', '192.168.65.1', NULL),
+	('52f4a82d-9e1f-4beb-9548-61f894563ce9', '39418e3b-0258-4452-af60-7acfcc1263ff', '2024-02-06 04:08:08.379919+00', '2024-02-06 04:08:08.379919+00', NULL, 'aal1', NULL, NULL, 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36', '192.168.65.1', NULL);
 
 
 --
@@ -68,7 +70,8 @@ INSERT INTO "auth"."sessions" ("id", "user_id", "created_at", "updated_at", "fac
 --
 
 INSERT INTO "auth"."mfa_amr_claims" ("session_id", "created_at", "updated_at", "authentication_method", "id") VALUES
-	('99541374-fc9d-4f5b-b0f6-ff092a455a60', '2024-01-22 22:27:50.170258+00', '2024-01-22 22:27:50.170258+00', 'password', 'ecaccc76-7e60-4cac-8472-c104837906cd');
+	('99541374-fc9d-4f5b-b0f6-ff092a455a60', '2024-01-22 22:27:50.170258+00', '2024-01-22 22:27:50.170258+00', 'password', 'ecaccc76-7e60-4cac-8472-c104837906cd'),
+	('52f4a82d-9e1f-4beb-9548-61f894563ce9', '2024-02-06 04:08:08.383754+00', '2024-02-06 04:08:08.383754+00', 'password', '481e338a-dbff-45e3-9e5f-18ae4d96a9c8');
 
 
 --
@@ -88,7 +91,8 @@ INSERT INTO "auth"."mfa_amr_claims" ("session_id", "created_at", "updated_at", "
 --
 
 INSERT INTO "auth"."refresh_tokens" ("instance_id", "id", "token", "user_id", "revoked", "created_at", "updated_at", "parent", "session_id") VALUES
-	('00000000-0000-0000-0000-000000000000', 1, 'qusbTEienvum2hAm8cjwzw', '39418e3b-0258-4452-af60-7acfcc1263ff', false, '2024-01-22 22:27:50.167806+00', '2024-01-22 22:27:50.167806+00', NULL, '99541374-fc9d-4f5b-b0f6-ff092a455a60');
+	('00000000-0000-0000-0000-000000000000', 1, 'qusbTEienvum2hAm8cjwzw', '39418e3b-0258-4452-af60-7acfcc1263ff', false, '2024-01-22 22:27:50.167806+00', '2024-01-22 22:27:50.167806+00', NULL, '99541374-fc9d-4f5b-b0f6-ff092a455a60'),
+	('00000000-0000-0000-0000-000000000000', 2, 'GgZ5ahBDWrTNx5RyrsRjIA', '39418e3b-0258-4452-af60-7acfcc1263ff', false, '2024-02-06 04:08:08.381408+00', '2024-02-06 04:08:08.381408+00', NULL, '52f4a82d-9e1f-4beb-9548-61f894563ce9');
 
 
 --
@@ -192,6 +196,26 @@ INSERT INTO "public"."chat_history" ("message_id", "chat_id", "user_message", "a
 
 
 --
+-- Data for Name: integrations; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+
+
+--
+-- Data for Name: users; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+INSERT INTO "public"."users" ("id", "email") VALUES
+	('39418e3b-0258-4452-af60-7acfcc1263ff', 'admin@quivr.app');
+
+
+--
+-- Data for Name: integrations_user; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+
+
+--
 -- Data for Name: knowledge; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -202,7 +226,7 @@ INSERT INTO "public"."chat_history" ("message_id", "chat_id", "user_message", "a
 --
 
 INSERT INTO "public"."models" ("name", "price", "max_input", "max_output") VALUES
-	('gpt-3.5-turbo-1106', 1, 2000, 1000);
+	('gpt-3.5-turbo-0125', 1, 2000, 1000);
 
 
 --
@@ -244,22 +268,21 @@ INSERT INTO "public"."user_daily_usage" ("user_id", "email", "date", "daily_requ
 --
 
 INSERT INTO "public"."user_settings" ("user_id", "models", "max_brains", "max_brain_size", "is_premium", "api_access", "monthly_chat_credit") VALUES
-	('39418e3b-0258-4452-af60-7acfcc1263ff', '["gpt-3.5-turbo-1106"]', 3, 50000000, false, false, 100);
-
-
---
--- Data for Name: users; Type: TABLE DATA; Schema: public; Owner: postgres
---
-
-INSERT INTO "public"."users" ("id", "email") VALUES
-	('39418e3b-0258-4452-af60-7acfcc1263ff', 'admin@quivr.app');
+	('39418e3b-0258-4452-af60-7acfcc1263ff', '["gpt-3.5-turbo-0125"]', 3, 50000000, false, false, 100);
 
 
 --
 -- Name: refresh_tokens_id_seq; Type: SEQUENCE SET; Schema: auth; Owner: supabase_auth_admin
 --
 
-SELECT pg_catalog.setval('"auth"."refresh_tokens_id_seq"', 1, true);
+SELECT pg_catalog.setval('"auth"."refresh_tokens_id_seq"', 2, true);
+
+
+--
+-- Name: integrations_user_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('"public"."integrations_user_id_seq"', 1, false);
 
 
 --
