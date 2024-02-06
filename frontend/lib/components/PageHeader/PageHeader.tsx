@@ -27,7 +27,12 @@ export const PageHeader = ({
       </div>
       <div className={styles.buttons_wrapper}>
         {buttons.map((button, index) => (
-          <QuivrButton key={index} button={button} />
+          <QuivrButton
+            key={index}
+            label={button.label}
+            onClick={button.onClick}
+            color={button.color}
+          />
         ))}
       </div>
     </div>

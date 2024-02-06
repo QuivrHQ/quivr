@@ -5,19 +5,20 @@ import styles from "./QuivrButton.module.scss";
 import { LoaderIcon } from "../LoaderIcon/LoaderIcon";
 
 export const QuivrButton = ({
-  button,
-}: {
-  button: ButtonType;
-}): JSX.Element => {
+  onClick,
+  label,
+  color,
+  isLoading,
+}: ButtonType): JSX.Element => {
   return (
     <div
-      className={`${styles.button_wrapper} ${styles[button.color]}`}
-      onClick={button.onClick}
+      className={`${styles.button_wrapper} ${styles[color]}`}
+      onClick={onClick}
     >
-      {!button.isLoading ? (
-        <span>button.label </span>
+      {!isLoading ? (
+        <span>{label}</span>
       ) : (
-        <LoaderIcon color="white" size="small" />
+        <LoaderIcon color="black" size="small" />
       )}
     </div>
   );

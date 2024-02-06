@@ -4,8 +4,8 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import PageHeader from "@/lib/components/PageHeader/PageHeader";
-import Button from "@/lib/components/ui/Button";
 import { Modal } from "@/lib/components/ui/Modal";
+import QuivrButton from "@/lib/components/ui/QuivrButton/QuivrButton";
 import { Tabs } from "@/lib/components/ui/Tabs/Tabs";
 import { useSupabase } from "@/lib/context/SupabaseProvider";
 import { useUserData } from "@/lib/hooks/useUserData";
@@ -14,10 +14,11 @@ import { ButtonType } from "@/lib/types/QuivrButton";
 import { Tab } from "@/lib/types/Tab";
 
 import { BrainsUsage } from "./components/BrainsUsage/BrainsUsage";
-import { useLogoutModal } from "./components/LogoutModal/hooks/useLogoutModal";
 import { Plan } from "./components/Plan/Plan";
 import { Settings } from "./components/Settings/Settings";
 import styles from "./page.module.scss";
+
+import { useLogoutModal } from "../../lib/hooks/useLogoutModal";
 
 const UserPage = (): JSX.Element => {
   const [selectedTab, setSelectedTab] = useState("Settings");
@@ -83,20 +84,17 @@ const UserPage = (): JSX.Element => {
             {t("areYouSure", { ns: "logout" })}
           </h2>
           <div className="flex gap-5 items-center justify-center">
-            <Button
+            <QuivrButton
               onClick={() => setIsLogoutModalOpened(false)}
-              variant={"primary"}
-            >
-              {t("cancel", { ns: "logout" })}
-            </Button>
-            <Button
+              color="primary"
+              label={t("cancel", { ns: "logout" })}
+            ></QuivrButton>
+            <QuivrButton
               isLoading={isLoggingOut}
-              variant={"danger"}
+              color="dangerous"
               onClick={() => void handleLogout()}
-              data-testid="logout-button"
-            >
-              {t("logoutButton")}
-            </Button>
+              label={t("logoutButton")}
+            ></QuivrButton>
           </div>
         </div>
       </Modal>
