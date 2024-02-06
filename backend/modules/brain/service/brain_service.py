@@ -273,7 +273,7 @@ class BrainService:
             brain_id,
             brain=BrainUpdatableProperties(
                 **brain_new_values.dict(
-                    exclude={"brain_definition", "connected_brains_ids"}
+                    exclude={"brain_definition", "connected_brains_ids", "integration"}
                 )
             ),
         )
