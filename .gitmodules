@@ -1,3 +1,0 @@
-[submodule "frontend/app/platform"]
-	path = frontend/app/platform
-	url = https://github.com/StanGirard/platform.git

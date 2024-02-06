@@ -16,10 +16,10 @@ from modules.chat.controller.chat.utils import (
 def test_find_model_and_generate_metadata(mock_chat_service):
     chat_id = uuid.uuid4()
     brain = Mock()
-    brain.model = "gpt-3.5-turbo-1106"
-    user_settings = {"models": ["gpt-3.5-turbo-1106"]}
+    brain.model = "gpt-3.5-turbo-0125"
+    user_settings = {"models": ["gpt-3.5-turbo-0125"]}
     models_settings = [
-        {"name": "gpt-3.5-turbo-1106", "max_input": 512, "max_output": 512}
+        {"name": "gpt-3.5-turbo-0125", "max_input": 512, "max_output": 512}
     ]
     metadata_brain = {"key": "value"}
 
@@ -30,13 +30,13 @@ def test_find_model_and_generate_metadata(mock_chat_service):
     )
 
     assert isinstance(model_to_use, LLMModels)
-    assert model_to_use.name == "gpt-3.5-turbo-1106"
+    assert model_to_use.name == "gpt-3.5-turbo-0125"
     assert model_to_use.max_input == 512
     assert model_to_use.max_output == 512
     assert metadata == {
         "key": "value",
         "follow_up_questions": [],
-        "model": "gpt-3.5-turbo-1106",
+        "model": "gpt-3.5-turbo-0125",
         "max_tokens": 512,
         "max_input": 512,
     }
@@ -46,13 +46,13 @@ def test_find_model_and_generate_metadata(mock_chat_service):
 def test_find_model_and_generate_metadata_user_not_allowed(mock_chat_service):
     chat_id = uuid.uuid4()
     brain = Mock()
-    brain.model = "gpt-3.5-turbo-1106"
+    brain.model = "gpt-3.5-turbo-0125"
     user_settings = {
         "models": ["gpt-3.5-turbo-1107"]
     }  # User is not allowed to use the brain's model
     models_settings = [
-        {"name": "gpt-3.5-turbo-1106", "max_input": 512, "max_output": 512},
-        {"name": "gpt-3.5-turbo-1107", "max_input": 512, "max_output": 512},
+        {"name": "gpt-3.5-turbo-0125", "max_input": 512, "max_output": 512},
+        {"name": "gpt-3.5-turbo-1107", "max_input": 12000, "max_output": 12000},
     ]
     metadata_brain = {"key": "value"}
 
@@ -63,15 +63,15 @@ def test_find_model_and_generate_metadata_user_not_allowed(mock_chat_service):
     )
 
     assert isinstance(model_to_use, LLMModels)
-    assert model_to_use.name == "gpt-3.5-turbo-1106"  # Default model is used
-    assert model_to_use.max_input == 512
-    assert model_to_use.max_output == 512
+    assert model_to_use.name == "gpt-3.5-turbo-0125"  # Default model is used
+    assert model_to_use.max_input == 12000
+    assert model_to_use.max_output == 1000
     assert metadata == {
         "key": "value",
         "follow_up_questions": [],
-        "model": "gpt-3.5-turbo-1106",
-        "max_tokens": 512,
-        "max_input": 512,
+        "model": "gpt-3.5-turbo-0125",
+        "max_tokens": 1000,
+        "max_input": 12000,
     }
 
 

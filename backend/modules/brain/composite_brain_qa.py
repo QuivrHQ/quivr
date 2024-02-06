@@ -4,11 +4,11 @@ from uuid import UUID
 
 from fastapi import HTTPException
 from litellm import completion
-from llm.api_brain_qa import APIBrainQA
-from llm.knowledge_brain_qa import KnowledgeBrainQA
-from llm.qa_headless import HeadlessQA
 from logger import get_logger
+from modules.brain.api_brain_qa import APIBrainQA
 from modules.brain.entity.brain_entity import BrainEntity, BrainType
+from modules.brain.knowledge_brain_qa import KnowledgeBrainQA
+from modules.brain.qa_headless import HeadlessQA
 from modules.brain.service.brain_service import BrainService
 from modules.chat.dto.chats import ChatQuestion
 from modules.chat.dto.inputs import CreateChatHistory
@@ -135,9 +135,9 @@ class CompositeBrainQA(
                         "user_message": question.question,
                         "assistant": response.assistant,
                         "message_time": new_chat.message_time,
-                        "prompt_title": self.prompt_to_use.title
-                        if self.prompt_to_use
-                        else None,
+                        "prompt_title": (
+                            self.prompt_to_use.title if self.prompt_to_use else None
+                        ),
                         "brain_name": brain.name,
                         "message_id": new_chat.message_id,
                         "brain_id": str(brain.id),
@@ -149,9 +149,9 @@ class CompositeBrainQA(
                     "user_message": question.question,
                     "assistant": response.assistant,
                     "message_time": None,
-                    "prompt_title": self.prompt_to_use.title
-                    if self.prompt_to_use
-                    else None,
+                    "prompt_title": (
+                        self.prompt_to_use.title if self.prompt_to_use else None
+                    ),
                     "brain_name": brain.name,
                     "message_id": None,
                     "brain_id": str(brain.id),
@@ -169,9 +169,9 @@ class CompositeBrainQA(
 
             tools.append(format_brain_to_tool(connected_brain))
 
-            available_functions[
-                connected_brain_id
-            ] = self.get_answer_generator_from_brain_type(connected_brain)
+            available_functions[connected_brain_id] = (
+                self.get_answer_generator_from_brain_type(connected_brain)
+            )
 
             connected_brains_details[str(connected_brain.id)] = connected_brain
 
@@ -194,7 +194,7 @@ class CompositeBrainQA(
         messages.append({"role": "user", "content": question.question})
 
         response = completion(
-            model="gpt-3.5-turbo-1106",
+            model="gpt-3.5-turbo-0125",
             messages=messages,
             tools=tools,
             tool_choice="auto",
@@ -231,9 +231,9 @@ class CompositeBrainQA(
                     "user_message": question.question,
                     "assistant": brain_completion_output.response.message.content,
                     "message_time": new_chat.message_time if new_chat else None,
-                    "prompt_title": self.prompt_to_use.title
-                    if self.prompt_to_use
-                    else None,
+                    "prompt_title": (
+                        self.prompt_to_use.title if self.prompt_to_use else None
+                    ),
                     "brain_name": brain.name if brain else None,
                     "message_id": new_chat.message_id if new_chat else None,
                     "brain_id": str(brain.id) if brain else None,
@@ -313,7 +313,7 @@ class CompositeBrainQA(
                 )
 
             response_after_tools_answers = completion(
-                model="gpt-3.5-turbo-1106",
+                model="gpt-3.5-turbo-0125",
                 messages=messages,
                 tools=tools,
                 tool_choice="auto",
@@ -356,9 +356,9 @@ class CompositeBrainQA(
                     "message_time": streamed_chat_history.message_time,
                     "user_message": question.question,
                     "assistant": "",
-                    "prompt_title": self.prompt_to_use.title
-                    if self.prompt_to_use
-                    else None,
+                    "prompt_title": (
+                        self.prompt_to_use.title if self.prompt_to_use else None
+                    ),
                     "brain_name": brain.name if brain else None,
                     "brain_id": str(brain.id) if brain else None,
                 }
@@ -371,9 +371,9 @@ class CompositeBrainQA(
                     "message_time": None,
                     "user_message": question.question,
                     "assistant": "",
-                    "prompt_title": self.prompt_to_use.title
-                    if self.prompt_to_use
-                    else None,
+                    "prompt_title": (
+                        self.prompt_to_use.title if self.prompt_to_use else None
+                    ),
                     "brain_name": brain.name if brain else None,
                     "brain_id": str(brain.id) if brain else None,
                 }
@@ -442,7 +442,7 @@ class CompositeBrainQA(
         messages.append({"role": "user", "content": question.question})
 
         initial_response = completion(
-            model="gpt-3.5-turbo-1106",
+            model="gpt-3.5-turbo-0125",
             stream=True,
             messages=messages,
             tools=tools,
@@ -555,7 +555,7 @@ class CompositeBrainQA(
                 messages.append({"role": "system", "content": PROMPT_2})
 
                 response_after_tools_answers = completion(
-                    model="gpt-3.5-turbo-1106",
+                    model="gpt-3.5-turbo-0125",
                     messages=messages,
                     tools=tools,
                     tool_choice="auto",

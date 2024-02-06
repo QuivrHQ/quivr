@@ -5,10 +5,9 @@ from uuid import UUID
 
 from langchain.callbacks.streaming_aiter import AsyncIteratorCallbackHandler
 from langchain.chains import LLMChain
-from langchain.chat_models import ChatLiteLLM
 from langchain.chat_models.base import BaseChatModel
 from langchain.prompts.chat import ChatPromptTemplate, HumanMessagePromptTemplate
-from llm.qa_interface import QAInterface
+from langchain_community.chat_models import ChatLiteLLM
 from llm.utils.format_chat_history import (
     format_chat_history,
     format_history_to_openai_mesages,
@@ -17,6 +16,7 @@ from llm.utils.get_prompt_to_use import get_prompt_to_use
 from llm.utils.get_prompt_to_use_id import get_prompt_to_use_id
 from logger import get_logger
 from models import BrainSettings  # Importing settings related to the 'brain'
+from modules.brain.qa_interface import QAInterface
 from modules.chat.dto.chats import ChatQuestion
 from modules.chat.dto.inputs import CreateChatHistory
 from modules.chat.dto.outputs import GetChatHistoryOutput
@@ -140,9 +140,9 @@ class HeadlessQA(BaseModel, QAInterface):
                     "user_message": question.question,
                     "assistant": answer,
                     "message_time": new_chat.message_time,
-                    "prompt_title": self.prompt_to_use.title
-                    if self.prompt_to_use
-                    else None,
+                    "prompt_title": (
+                        self.prompt_to_use.title if self.prompt_to_use else None
+                    ),
                     "brain_name": None,
                     "message_id": new_chat.message_id,
                 }
@@ -154,9 +154,9 @@ class HeadlessQA(BaseModel, QAInterface):
                     "user_message": question.question,
                     "assistant": answer,
                     "message_time": None,
-                    "prompt_title": self.prompt_to_use.title
-                    if self.prompt_to_use
-                    else None,
+                    "prompt_title": (
+                        self.prompt_to_use.title if self.prompt_to_use else None
+                    ),
                     "brain_name": None,
                     "message_id": None,
                 }
@@ -224,9 +224,9 @@ class HeadlessQA(BaseModel, QAInterface):
                     "message_time": streamed_chat_history.message_time,
                     "user_message": question.question,
                     "assistant": "",
-                    "prompt_title": self.prompt_to_use.title
-                    if self.prompt_to_use
-                    else None,
+                    "prompt_title": (
+                        self.prompt_to_use.title if self.prompt_to_use else None
+                    ),
                     "brain_name": None,
                 }
             )
@@ -238,9 +238,9 @@ class HeadlessQA(BaseModel, QAInterface):
                     "message_time": None,
                     "user_message": question.question,
                     "assistant": "",
-                    "prompt_title": self.prompt_to_use.title
-                    if self.prompt_to_use
-                    else None,
+                    "prompt_title": (
+                        self.prompt_to_use.title if self.prompt_to_use else None
+                    ),
                     "brain_name": None,
                 }
             )

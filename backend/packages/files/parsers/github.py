@@ -1,9 +1,9 @@
 import os
 import time
 
-from langchain.document_loaders import GitLoader
 from langchain.schema import Document
 from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain_community.document_loaders import GitLoader
 from models.files import File
 from packages.embeddings.vectors import Neurons
 from packages.files.file import compute_sha1_from_content

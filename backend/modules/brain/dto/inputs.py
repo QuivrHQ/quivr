@@ -24,6 +24,21 @@ class CreateApiBrainDefinition(BaseModel, extra=Extra.forbid):
     jq_instructions: Optional[str] = None
 
 
+class CreateIntegrationBrain(BaseModel, extra=Extra.forbid):
+    integration_name: str
+    integration_logo_url: str
+    connection_settings: dict
+
+
+class BrainIntegrationSettings(BaseModel, extra=Extra.forbid):
+    integration_id: str
+    settings: dict
+
+
+class BrainIntegrationUpdateSettings(BaseModel, extra=Extra.forbid):
+    settings: dict
+
+
 class CreateBrainProperties(BaseModel, extra=Extra.forbid):
     name: Optional[str] = "Default brain"
     description: str = "This is a description"
@@ -34,8 +49,9 @@ class CreateBrainProperties(BaseModel, extra=Extra.forbid):
     prompt_id: Optional[UUID] = None
     brain_type: Optional[BrainType] = BrainType.DOC
     brain_definition: Optional[CreateApiBrainDefinition]
-    brain_secrets_values: dict = {}
+    brain_secrets_values: Optional[dict] = {}
     connected_brains_ids: Optional[list[UUID]] = []
+    integration: Optional[BrainIntegrationSettings] = None
 
     def dict(self, *args, **kwargs):
         brain_dict = super().dict(*args, **kwargs)
@@ -54,6 +70,7 @@ class BrainUpdatableProperties(BaseModel):
     prompt_id: Optional[UUID]
     brain_definition: Optional[ApiBrainDefinitionEntity]
     connected_brains_ids: Optional[list[UUID]] = []
+    integration: Optional[BrainIntegrationUpdateSettings] = None
 
     def dict(self, *args, **kwargs):
         brain_dict = super().dict(*args, **kwargs)

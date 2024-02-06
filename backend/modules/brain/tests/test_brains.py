@@ -31,7 +31,7 @@ def test_create_brain(client, api_key):
     payload = {
         "name": random_brain_name,
         "status": "public",
-        "model": "gpt-3.5-turbo-1106",
+        "model": "gpt-3.5-turbo-0125",
         "temperature": 0,
         "max_tokens": 2000,
         "brain_type": "doc",
@@ -175,7 +175,7 @@ def test_set_as_default_brain_endpoint(client, api_key):
     payload = {
         "name": random_brain_name,
         "status": "public",
-        "model": "gpt-3.5-turbo-1106",
+        "model": "gpt-3.5-turbo-0125",
         "temperature": 0,
         "max_tokens": 256,
     }
@@ -228,7 +228,7 @@ def create_public_brain_retrieve_and_then_delete(client, api_key):
     payload = {
         "name": random_brain_name,
         "status": "public",
-        "model": "gpt-3.5-turbo-1106",
+        "model": "gpt-3.5-turbo-0125",
         "temperature": 0,
         "max_tokens": 256,
         "brain_type": "doc",
