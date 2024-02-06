@@ -16,9 +16,6 @@ import { HomeButton } from "./components/HomeButton/HomeButton";
 import { ProfileButton } from "./components/ProfileButton/ProfileButton";
 import { StudioButton } from "./components/StudioButton/StudioButton";
 import { UpgradeToPlusButton } from "./components/UpgradeToPlusButton/UpgradeToPlusButton";
-import { UploadDocumentButton } from "./components/UploadDocumentButton/UploadDocumentButton";
-
-import { AddBrainModal } from "../AddBrainModal";
 
 export const Menu = (): JSX.Element => {
   const { isOpened } = useMenuContext();
@@ -64,8 +61,6 @@ export const Menu = (): JSX.Element => {
                 <DiscussionButton />
                 <HomeButton />
                 <StudioButton />
-                <AddBrainModal isMenuButton={true} />
-                <UploadDocumentButton />
                 <HistoryButton />
               </div>
               <div className={styles.block}>
