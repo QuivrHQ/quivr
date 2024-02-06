@@ -26,8 +26,8 @@ import {
 import {
   MdAlternateEmail,
   MdDeleteOutline,
-  MdEdit,
   MdHistory,
+  MdOutlineModeEditOutline,
   MdUploadFile,
 } from "react-icons/md";
 import { RiHashtag } from "react-icons/ri";
@@ -45,7 +45,7 @@ export const iconList: { [name: string]: IconType } = {
   close: IoMdClose,
   copy: LuCopy,
   delete: MdDeleteOutline,
-  edit: MdEdit,
+  edit: MdOutlineModeEditOutline,
   email: MdAlternateEmail,
   file: LuFile,
   flag: CiFlag1,

@@ -8,6 +8,7 @@
   border-top: 1px solid Colors.$primary-lightest;
   overflow: hidden;
   display: flex;
+  gap: Spacings.$spacing02;
   justify-content: space-between;
   align-items: center;
   cursor: pointer;

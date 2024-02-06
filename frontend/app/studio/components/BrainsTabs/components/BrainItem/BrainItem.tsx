@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { useState } from "react";
 
 import { DeleteOrUnsubscribeConfirmationModal } from "@/app/studio/[brainId]/components/BrainManagementTabs/components/Modals/DeleteOrUnsubscribeConfirmationModal";
 import { useBrainManagementTabs } from "@/app/studio/[brainId]/components/BrainManagementTabs/hooks/useBrainManagementTabs";
@@ -20,7 +21,8 @@ export const BrainItem = ({ brain, even }: BrainItemProps): JSX.Element => {
     isDeleteOrUnsubscribeModalOpened,
     setIsDeleteOrUnsubscribeModalOpened,
     isDeleteOrUnsubscribeRequestPending,
-  } = useBrainManagementTabs();
+  } = useBrainManagementTabs(brain.id);
+  const [isHovered, setIsHovered] = useState<boolean>(false);
 
   const { allBrains } = useBrainContext();
 
@@ -35,11 +37,20 @@ export const BrainItem = ({ brain, even }: BrainItemProps): JSX.Element => {
       ${even ? styles.even : styles.odd}
       ${styles.brain_item_wrapper}
       `}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
     >
       <Link className={styles.brain_info_wrapper} href={`/studio/${brain.id}`}>
         <span className={styles.name}>{brain.name}</span>
         <span className={styles.description}>{brain.description}</span>
       </Link>
+      <Icon
+        name="edit"
+        size="normal"
+        color="black"
+        hovered={isHovered}
+        onClick={() => (window.location.href = `/studio/${brain.id}`)}
+      />
       <Icon
         name="delete"
         size="normal"

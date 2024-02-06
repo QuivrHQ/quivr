@@ -1,5 +1,5 @@
 import { UUID } from "crypto";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -13,7 +13,7 @@ import { getBrainPermissions } from "../utils/getBrainPermissions";
 import { getTargetedTab } from "../utils/getTargetedTab";
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-export const useBrainManagementTabs = () => {
+export const useBrainManagementTabs = (customBrainId?: UUID) => {
   const [selectedTab, setSelectedTab] =
     useState<BrainManagementTab>("settings");
   const { allBrains } = useBrainContext();
@@ -41,8 +41,9 @@ export const useBrainManagementTabs = () => {
   const router = useRouter();
 
   const params = useParams();
+  const pathname = usePathname();
   const { t } = useTranslation(["delete_or_unsubscribe_from_brain"]);
-  const brainId = params?.brainId as UUID | undefined;
+  const brainId = customBrainId ?? (params?.brainId as UUID | undefined);
 
   const { hasEditRights, isOwnedByCurrentUser, isPublicBrain } =
     getBrainPermissions({
@@ -67,6 +68,7 @@ export const useBrainManagementTabs = () => {
     if (brainId === undefined) {
       return;
     }
+
     setIsDeleteOrUnsubscribeRequestPending(true);
     try {
       if (!isOwnedByCurrentUser) {
@@ -80,7 +82,7 @@ export const useBrainManagementTabs = () => {
     } catch (error) {
       console.error("Error deleting brain: ", error);
     } finally {
-      router.push("/studio");
+      pathname === "/studio" ? void fetchAllBrains() : router.push("/studio");
       setIsDeleteOrUnsubscribeRequestPending(false);
     }
   };
