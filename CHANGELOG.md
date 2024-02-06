@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.0.195 (2024-02-06)
+
+## What's Changed
+* feat(integrations): integration with Notion in the backend by @StanGirard in https://github.com/StanGirard/quivr/pull/2123
+
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.194...v0.0.195
+
 ## 0.0.194 (2024-02-05)
 
 ## What's Changed
