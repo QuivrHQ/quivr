@@ -4,16 +4,19 @@ import { useEffect } from "react";
 
 import { QuivrLogo } from "@/lib/assets/QuivrLogo";
 import PageHeader from "@/lib/components/PageHeader/PageHeader";
+import { UploadDocumentModal } from "@/lib/components/UploadDocumentModal/UploadDocumentModal";
 import { SearchBar } from "@/lib/components/ui/SearchBar/SearchBar";
+import { useKnowledgeToFeedContext } from "@/lib/context/KnowledgeToFeedProvider/hooks/useKnowledgeToFeedContext";
 import { useSupabase } from "@/lib/context/SupabaseProvider";
 import { redirectToLogin } from "@/lib/router/redirectToLogin";
-import { Button } from "@/lib/types/QuivrButton";
+import { ButtonType } from "@/lib/types/QuivrButton";
 
 import styles from "./page.module.scss";
 
 const Search = (): JSX.Element => {
   const pathname = usePathname();
   const { session } = useSupabase();
+  const { setShouldDisplayFeedCard } = useKnowledgeToFeedContext();
 
   useEffect(() => {
     if (session === null) {
@@ -21,7 +24,7 @@ const Search = (): JSX.Element => {
     }
   }, [pathname, session]);
 
-  const buttons: Button[] = [
+  const buttons: ButtonType[] = [
     {
       label: "Create brain",
       color: "primary",
@@ -33,7 +36,7 @@ const Search = (): JSX.Element => {
       label: "Add knowledge",
       color: "primary",
       onClick: () => {
-        console.info("add");
+        setShouldDisplayFeedCard(true);
       },
     },
   ];
@@ -67,6 +70,7 @@ const Search = (): JSX.Element => {
           </div>
         </div>
       </div>
+      <UploadDocumentModal />
     </div>
   );
 };

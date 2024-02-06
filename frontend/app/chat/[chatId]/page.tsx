@@ -1,5 +1,6 @@
 "use client";
 
+import { UploadDocumentModal } from "@/lib/components/UploadDocumentModal/UploadDocumentModal";
 import { useKnowledgeToFeedContext } from "@/lib/context/KnowledgeToFeedProvider/hooks/useKnowledgeToFeedContext";
 import { useDevice } from "@/lib/hooks/useDevice";
 import { useCustomDropzone } from "@/lib/hooks/useDropzone";
@@ -47,6 +48,7 @@ const SelectedChatPage = (): JSX.Element => {
           <DataPanel />
         </div>
       )}
+      <UploadDocumentModal />
     </div>
   );
 };
