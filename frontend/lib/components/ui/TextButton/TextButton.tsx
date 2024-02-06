@@ -11,6 +11,7 @@ interface TextButtonProps {
   iconName: keyof typeof iconList;
   label: string;
   color: Color;
+  onClick?: () => void;
 }
 
 export const TextButton = (props: TextButtonProps): JSX.Element => {
@@ -21,6 +22,7 @@ export const TextButton = (props: TextButtonProps): JSX.Element => {
       className={styles.text_button_wrapper}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
+      onClick={props.onClick}
     >
       <Icon
         name={props.iconName}

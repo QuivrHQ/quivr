@@ -2,7 +2,8 @@ import { SuggestionKeyDownProps } from "@tiptap/suggestion";
 import { forwardRef } from "react";
 import { FaAngleDoubleDown } from "react-icons/fa";
 
-import { AddBrainModal } from "@/lib/components/AddBrainModal";
+import { useBrainCreationContext } from "@/lib/components/AddBrainModal/components/AddBrainSteps/brainCreation-provider";
+import TextButton from "@/lib/components/ui/TextButton/TextButton";
 
 import { AddNewPromptButton } from "./components/AddNewPromptButton";
 import { MentionItem } from "./components/MentionItem/MentionItem";
@@ -23,6 +24,7 @@ export const MentionList = forwardRef<MentionListRef, MentionListProps>(
 
     const { suggestionsRef, shouldShowScrollToBottomIcon, scrollToBottom } =
       useSuggestionsOverflowHandler();
+    const { setIsBrainCreationModalOpened } = useBrainCreationContext();
 
     const handleClick = (event: React.MouseEvent<HTMLDivElement>) => {
       event.preventDefault();
@@ -56,7 +58,14 @@ export const MentionList = forwardRef<MentionListRef, MentionListProps>(
               onClick={scrollToBottom}
             />
           )}
-          {isBrain && <AddBrainModal />}
+          {isBrain && (
+            <TextButton
+              label="Create Brain"
+              iconName="add"
+              color="black"
+              onClick={() => setIsBrainCreationModalOpened(true)}
+            />
+          )}
           {isPrompt && <AddNewPromptButton />}
         </div>
       </div>

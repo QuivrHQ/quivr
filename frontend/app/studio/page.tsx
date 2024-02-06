@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 
+import { useBrainCreationContext } from "@/lib/components/AddBrainModal/components/AddBrainSteps/brainCreation-provider";
 import PageHeader from "@/lib/components/PageHeader/PageHeader";
 import { UploadDocumentModal } from "@/lib/components/UploadDocumentModal/UploadDocumentModal";
 import { Tabs } from "@/lib/components/ui/Tabs/Tabs";
@@ -15,6 +16,7 @@ import styles from "./page.module.scss";
 const Studio = (): JSX.Element => {
   const [selectedTab, setSelectedTab] = useState("Manage my brains");
   const { setShouldDisplayFeedCard } = useKnowledgeToFeedContext();
+  const { setIsBrainCreationModalOpened } = useBrainCreationContext();
 
   const studioTabs: Tab[] = [
     {
@@ -35,7 +37,7 @@ const Studio = (): JSX.Element => {
       label: "Create brain",
       color: "primary",
       onClick: () => {
-        console.info("create");
+        setIsBrainCreationModalOpened(true);
       },
     },
     {
