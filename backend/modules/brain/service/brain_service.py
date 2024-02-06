@@ -14,6 +14,7 @@ from modules.brain.repository import (
     CompositeBrainsConnections,
     ExternalApiSecrets,
     IntegrationBrain,
+    IntegrationDescription,
 )
 from modules.brain.repository.interfaces import (
     BrainsInterface,
@@ -21,7 +22,7 @@ from modules.brain.repository.interfaces import (
     BrainsVectorsInterface,
     CompositeBrainsConnectionsInterface,
     ExternalApiSecretsInterface,
-    IntegrationBrainInterface,
+    IntegrationDescriptionInterface,
 )
 from modules.brain.service.api_brain_definition_service import ApiBrainDefinitionService
 from modules.brain.service.utils.validate_brain import validate_api_brain
@@ -41,7 +42,8 @@ class BrainService:
     brain_vector_repository: BrainsVectorsInterface
     external_api_secrets_repository: ExternalApiSecretsInterface
     composite_brains_connections_repository: CompositeBrainsConnectionsInterface
-    integration_brains_repository: IntegrationBrainInterface
+    integration_brains_repository: IntegrationDescriptionInterface
+    integration_description_repository: IntegrationDescriptionInterface
 
     def __init__(self):
         self.brain_repository = Brains()
@@ -50,6 +52,7 @@ class BrainService:
         self.external_api_secrets_repository = ExternalApiSecrets()
         self.composite_brains_connections_repository = CompositeBrainsConnections()
         self.integration_brains_repository = IntegrationBrain()
+        self.integration_description_repository = IntegrationDescription()
 
     def get_brain_by_id(self, brain_id: UUID):
         return self.brain_repository.get_brain_by_id(brain_id)
@@ -196,10 +199,16 @@ class BrainService:
                 integration_id=brain.integration.integration_id,
                 settings=brain.integration.settings,
             )
-        celery.send_task(
-            "NotionConnectorLoad",
-            kwargs={"brain_id": created_brain.brain_id, "user_id": user_id},
-        )
+        if (
+            self.integration_description_repository.get_integration_description(
+                brain.integration.integration_id
+            ).integration_name
+            == "Notion"
+        ):
+            celery.send_task(
+                "NotionConnectorLoad",
+                kwargs={"brain_id": created_brain.brain_id, "user_id": user_id},
+            )
         return created_brain
 
     def delete_brain_secrets_values(self, brain_id: UUID) -> None:
