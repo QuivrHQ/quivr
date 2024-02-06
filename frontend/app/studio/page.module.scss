@@ -1,20 +1,13 @@
 @use "@/styles/Spacings.module.scss";
-@use "@/styles/Typography.module.scss";
 
 .page_wrapper {
-  padding: Spacings.$spacing09;
   display: flex;
   flex-direction: column;
   gap: Spacings.$spacing05;
   width: 100%;
 
-  .title_wrapper {
-    @include Typography.H1;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: Spacings.$spacing03;
-    margin-inline: auto;
+  .content_wrapper {
+    padding-inline: Spacings.$spacing09;
+    padding-block: Spacings.$spacing05;
   }
 }

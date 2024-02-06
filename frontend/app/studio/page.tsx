@@ -2,8 +2,9 @@
 
 import { useState } from "react";
 
-import { Icon } from "@/lib/components/ui/Icon/Icon";
+import PageHeader from "@/lib/components/PageHeader/PageHeader";
 import { Tabs } from "@/lib/components/ui/Tabs/Tabs";
+import { Button } from "@/lib/types/QuivrButton";
 import { Tab } from "@/lib/types/Tab";
 
 import { ManageBrains } from "./components/BrainsTabs/components/ManageBrains/ManageBrains";
@@ -26,14 +27,32 @@ const Studio = (): JSX.Element => {
     },
   ];
 
+  const buttons: Button[] = [
+    {
+      label: "Create brain",
+      color: "primary",
+      onClick: () => {
+        console.info("create");
+      },
+    },
+    {
+      label: "Add knowledge",
+      color: "primary",
+      onClick: () => {
+        console.info("add");
+      },
+    },
+  ];
+
   return (
     <div className={styles.page_wrapper}>
-      <div className={styles.title_wrapper}>
-        <Icon name="brainCircuit" size="big" color="primary" />
-        <h1 className={styles.title}>Studio</h1>
+      <div className={styles.page_header}>
+        <PageHeader iconName="brainCircuit" label="Studio" buttons={buttons} />
       </div>
-      <Tabs tabList={studioTabs} />
-      {selectedTab === "Manage my brains" && <ManageBrains />}
+      <div className={styles.content_wrapper}>
+        <Tabs tabList={studioTabs} />
+        {selectedTab === "Manage my brains" && <ManageBrains />}
+      </div>
     </div>
   );
 };
