@@ -11,6 +11,8 @@ import { Button } from "@/lib/types/QuivrButton";
 import { Tab } from "@/lib/types/Tab";
 
 import { BrainsUsage } from "./components/BrainsUsage/BrainsUsage";
+import { LogoutModal } from "./components/LogoutModal/LogoutModal";
+import { useLogoutModal } from "./components/LogoutModal/hooks/useLogoutModal";
 import { Plan } from "./components/Plan/Plan";
 import { Settings } from "./components/Settings/Settings";
 import styles from "./page.module.scss";
@@ -19,12 +21,13 @@ const UserPage = (): JSX.Element => {
   const [selectedTab, setSelectedTab] = useState("Settings");
   const { session } = useSupabase();
   const { userData } = useUserData();
+  const { isLogoutModalOpened, setIsLogoutModalOpened } = useLogoutModal();
 
   const button: Button = {
     label: "Logout",
     color: "dangerous",
     onClick: () => {
-      console.info("create");
+      setIsLogoutModalOpened(true);
     },
   };
   const userTabs: Tab[] = [
@@ -62,6 +65,7 @@ const UserPage = (): JSX.Element => {
           {userTabs[2].isSelected && <Plan />}
         </div>
       </div>
+      <LogoutModal isLogoutModalOpened={isLogoutModalOpened} />
     </>
   );
 };
