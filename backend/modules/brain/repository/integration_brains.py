@@ -29,7 +29,7 @@ class IntegrationBrain(IntegrationBrainInterface):
         )
         if len(response.data) == 0:
             return None
-        
+
         return IntegrationEntity(**response.data[0])
 
     def add_integration_brain(self, brain_id, user_id, integration_id, settings):
@@ -87,6 +87,20 @@ class IntegrationDescription(IntegrationDescriptionInterface):
             return None
 
         return IntegrationDescriptionEntity(**response.data[0])
+
+    def get_integration_description_by_user_brain_id(self, brain_id, user_id):
+        response = (
+            self.db.table("integrations_user")
+            .select("*")
+            .filter("brain_id", "eq", brain_id)
+            .filter("user_id", "eq", user_id)
+            .execute()
+        )
+        if len(response.data) == 0:
+            return None
+
+        integration_id = response.data[0]["integration_id"]
+        return self.get_integration_description(integration_id)
 
     def get_all_integration_descriptions(self):
         response = self.db.table("integrations").select("*").execute()

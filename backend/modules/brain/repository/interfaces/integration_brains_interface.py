@@ -1,7 +1,10 @@
 from abc import ABC, abstractmethod
 from uuid import UUID
 
-from modules.brain.entity.integration_brain import IntegrationEntity
+from modules.brain.entity.integration_brain import (
+    IntegrationDescriptionEntity,
+    IntegrationEntity,
+)
 
 
 class IntegrationBrainInterface(ABC):
@@ -37,7 +40,9 @@ class IntegrationBrainInterface(ABC):
 class IntegrationDescriptionInterface(ABC):
 
     @abstractmethod
-    def get_integration_description(self, integration_id: UUID) -> IntegrationEntity:
+    def get_integration_description(
+        self, integration_id: UUID
+    ) -> IntegrationDescriptionEntity:
         """Get the integration description entity
 
         Args:
@@ -49,5 +54,11 @@ class IntegrationDescriptionInterface(ABC):
         pass
 
     @abstractmethod
-    def get_all_integration_descriptions(self) -> list[IntegrationEntity]:
+    def get_all_integration_descriptions(self) -> list[IntegrationDescriptionEntity]:
+        pass
+
+    @abstractmethod
+    def get_integration_description_by_user_brain_id(
+        self, brain_id: UUID, user_id: UUID
+    ) -> IntegrationDescriptionEntity:
         pass

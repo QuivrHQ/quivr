@@ -16,3 +16,10 @@ class IntegrationBrainDescriptionService:
         self, integration_id
     ) -> IntegrationDescriptionEntity:
         return self.repository.get_integration_description(integration_id)
+
+    def get_integration_description_by_user_brain_id(
+        self, brain_id, user_id
+    ) -> IntegrationDescriptionEntity:
+        return self.repository.get_integration_description_by_user_brain_id(
+            brain_id, user_id
+        )

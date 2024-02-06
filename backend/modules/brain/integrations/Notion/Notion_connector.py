@@ -128,7 +128,7 @@ class NotionConnector(IntegrationBrain):
         )
         try:
             res.raise_for_status()
-        except Exception as e:
+        except Exception:
             logger.exception(f"Error fetching page - {res.json()}")
             return None
         return NotionPage(**res.json())

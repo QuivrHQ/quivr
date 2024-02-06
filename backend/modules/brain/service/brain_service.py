@@ -6,6 +6,7 @@ from fastapi import HTTPException
 from logger import get_logger
 from modules.brain.dto.inputs import BrainUpdatableProperties, CreateBrainProperties
 from modules.brain.entity.brain_entity import BrainEntity, BrainType, PublicBrain
+from modules.brain.entity.integration_brain import IntegrationEntity
 from modules.brain.repository import (
     Brains,
     BrainsUsers,
@@ -52,6 +53,11 @@ class BrainService:
 
     def get_brain_by_id(self, brain_id: UUID):
         return self.brain_repository.get_brain_by_id(brain_id)
+
+    def get_integration_brain(self, brain_id, user_id) -> IntegrationEntity | None:
+        return self.integration_brains_repository.get_integration_brain(
+            brain_id, user_id
+        )
 
     def find_brain_from_question(
         self,
