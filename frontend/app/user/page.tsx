@@ -1,17 +1,19 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 
 import PageHeader from "@/lib/components/PageHeader/PageHeader";
+import Button from "@/lib/components/ui/Button";
+import { Modal } from "@/lib/components/ui/Modal";
 import { Tabs } from "@/lib/components/ui/Tabs/Tabs";
 import { useSupabase } from "@/lib/context/SupabaseProvider";
 import { useUserData } from "@/lib/hooks/useUserData";
 import { redirectToLogin } from "@/lib/router/redirectToLogin";
-import { Button } from "@/lib/types/QuivrButton";
+import { ButtonType } from "@/lib/types/QuivrButton";
 import { Tab } from "@/lib/types/Tab";
 
 import { BrainsUsage } from "./components/BrainsUsage/BrainsUsage";
-import { LogoutModal } from "./components/LogoutModal/LogoutModal";
 import { useLogoutModal } from "./components/LogoutModal/hooks/useLogoutModal";
 import { Plan } from "./components/Plan/Plan";
 import { Settings } from "./components/Settings/Settings";
@@ -21,9 +23,15 @@ const UserPage = (): JSX.Element => {
   const [selectedTab, setSelectedTab] = useState("Settings");
   const { session } = useSupabase();
   const { userData } = useUserData();
-  const { isLogoutModalOpened, setIsLogoutModalOpened } = useLogoutModal();
+  const { t } = useTranslation(["translation", "logout"]);
+  const {
+    handleLogout,
+    isLoggingOut,
+    isLogoutModalOpened,
+    setIsLogoutModalOpened,
+  } = useLogoutModal();
 
-  const button: Button = {
+  const button: ButtonType = {
     label: "Logout",
     color: "dangerous",
     onClick: () => {
@@ -65,7 +73,33 @@ const UserPage = (): JSX.Element => {
           {userTabs[2].isSelected && <Plan />}
         </div>
       </div>
-      <LogoutModal isLogoutModalOpened={isLogoutModalOpened} />
+      <Modal
+        isOpen={isLogoutModalOpened}
+        setOpen={setIsLogoutModalOpened}
+        CloseTrigger={<div />}
+      >
+        <div className="text-center flex flex-col items-center gap-5">
+          <h2 className="text-lg font-medium mb-5">
+            {t("areYouSure", { ns: "logout" })}
+          </h2>
+          <div className="flex gap-5 items-center justify-center">
+            <Button
+              onClick={() => setIsLogoutModalOpened(false)}
+              variant={"primary"}
+            >
+              {t("cancel", { ns: "logout" })}
+            </Button>
+            <Button
+              isLoading={isLoggingOut}
+              variant={"danger"}
+              onClick={() => void handleLogout()}
+              data-testid="logout-button"
+            >
+              {t("logoutButton")}
+            </Button>
+          </div>
+        </div>
+      </Modal>
     </>
   );
 };

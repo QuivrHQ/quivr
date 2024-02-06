@@ -1,5 +1,5 @@
 import { useMenuContext } from "@/lib/context/MenuProvider/hooks/useMenuContext";
-import { Button } from "@/lib/types/QuivrButton";
+import { ButtonType } from "@/lib/types/QuivrButton";
 
 import styles from "./PageHeader.module.scss";
 
@@ -9,7 +9,7 @@ import { QuivrButton } from "../ui/QuivrButton/QuivrButton";
 type Props = {
   iconName: string;
   label: string;
-  buttons: Button[];
+  buttons: ButtonType[];
 };
 
 export const PageHeader = ({

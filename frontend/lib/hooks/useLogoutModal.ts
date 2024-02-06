@@ -1,4 +1,3 @@
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -17,7 +16,6 @@ export const useLogoutModal = () => {
   const { t } = useTranslation(["translation", "logout"]);
 
   const { publish } = useToast();
-  const router = useRouter();
 
   const handleLogout = async () => {
     setIsLoggingOut(true);
@@ -36,7 +34,7 @@ export const useLogoutModal = () => {
         variant: "success",
         text: t("loggedOut", { ns: "logout" }),
       });
-      router.replace("/");
+      window.location.href = "/";
     }
     setIsLoggingOut(false);
   };

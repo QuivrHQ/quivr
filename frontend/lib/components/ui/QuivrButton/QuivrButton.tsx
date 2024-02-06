@@ -1,14 +1,24 @@
-import { Button } from "@/lib/types/QuivrButton";
+import { ButtonType } from "@/lib/types/QuivrButton";
 
 import styles from "./QuivrButton.module.scss";
 
-export const QuivrButton = ({ button }: { button: Button }): JSX.Element => {
+import { LoaderIcon } from "../LoaderIcon/LoaderIcon";
+
+export const QuivrButton = ({
+  button,
+}: {
+  button: ButtonType;
+}): JSX.Element => {
   return (
     <div
       className={`${styles.button_wrapper} ${styles[button.color]}`}
       onClick={button.onClick}
     >
-      {button.label}
+      {!button.isLoading ? (
+        <span>button.label </span>
+      ) : (
+        <LoaderIcon color="white" size="small" />
+      )}
     </div>
   );
 };

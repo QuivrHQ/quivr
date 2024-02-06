@@ -4,7 +4,7 @@ import { useState } from "react";
 
 import PageHeader from "@/lib/components/PageHeader/PageHeader";
 import { Tabs } from "@/lib/components/ui/Tabs/Tabs";
-import { Button } from "@/lib/types/QuivrButton";
+import { ButtonType } from "@/lib/types/QuivrButton";
 import { Tab } from "@/lib/types/Tab";
 
 import { ManageBrains } from "./components/BrainsTabs/components/ManageBrains/ManageBrains";
@@ -27,7 +27,7 @@ const Studio = (): JSX.Element => {
     },
   ];
 
-  const buttons: Button[] = [
+  const buttons: ButtonType[] = [
     {
       label: "Create brain",
       color: "primary",
