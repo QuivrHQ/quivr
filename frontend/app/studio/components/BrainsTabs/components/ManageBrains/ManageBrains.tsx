@@ -20,10 +20,12 @@ export const ManageBrains = (): JSX.Element => {
 
   return (
     <div className={styles.manage_brains_wrapper}>
-      <BrainSearchBar
-        searchQuery={searchQuery}
-        setSearchQuery={setSearchQuery}
-      />
+      <div className={styles.search_brain}>
+        <BrainSearchBar
+          searchQuery={searchQuery}
+          setSearchQuery={setSearchQuery}
+        />
+      </div>
 
       <BrainsList brains={brains} />
     </div>

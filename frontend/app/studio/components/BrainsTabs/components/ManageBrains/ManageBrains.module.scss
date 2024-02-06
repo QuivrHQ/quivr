@@ -4,5 +4,9 @@
   display: flex;
   flex-direction: column;
   gap: Spacings.$spacing05;
-  padding-bottom: Spacings.$spacing09;
+  padding-block: Spacings.$spacing05;
+
+  .search_brain {
+    width: 200px;
+  }
 }
