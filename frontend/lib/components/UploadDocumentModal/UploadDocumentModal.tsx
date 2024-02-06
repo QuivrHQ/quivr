@@ -1,5 +1,4 @@
 import { AnimatePresence, motion } from "framer-motion";
-import { useEffect } from "react";
 
 import { KnowledgeToFeed } from "@/app/chat/[chatId]/components/ActionsBar/components";
 import { useActionBar } from "@/app/chat/[chatId]/components/ActionsBar/hooks/useActionBar";
@@ -13,10 +12,6 @@ export const UploadDocumentModal = (): JSX.Element => {
   const { shouldDisplayFeedCard, setShouldDisplayFeedCard } =
     useKnowledgeToFeedContext();
   const { setHasPendingRequests } = useActionBar();
-
-  useEffect(() => {
-    console.info(shouldDisplayFeedCard);
-  }, [shouldDisplayFeedCard]);
 
   if (!shouldDisplayFeedCard) {
     return <></>;

@@ -3,6 +3,8 @@ import { usePathname } from "next/navigation";
 import { useEffect } from "react";
 
 import { QuivrLogo } from "@/lib/assets/QuivrLogo";
+import { AddBrainModal } from "@/lib/components/AddBrainModal";
+import { useBrainCreationContext } from "@/lib/components/AddBrainModal/components/AddBrainSteps/brainCreation-provider";
 import PageHeader from "@/lib/components/PageHeader/PageHeader";
 import { UploadDocumentModal } from "@/lib/components/UploadDocumentModal/UploadDocumentModal";
 import { SearchBar } from "@/lib/components/ui/SearchBar/SearchBar";
@@ -17,6 +19,7 @@ const Search = (): JSX.Element => {
   const pathname = usePathname();
   const { session } = useSupabase();
   const { setShouldDisplayFeedCard } = useKnowledgeToFeedContext();
+  const { setIsBrainCreationModalOpened } = useBrainCreationContext();
 
   useEffect(() => {
     if (session === null) {
@@ -29,7 +32,7 @@ const Search = (): JSX.Element => {
       label: "Create brain",
       color: "primary",
       onClick: () => {
-        console.info("create");
+        setIsBrainCreationModalOpened(true);
       },
     },
     {
@@ -71,6 +74,7 @@ const Search = (): JSX.Element => {
         </div>
       </div>
       <UploadDocumentModal />
+      <AddBrainModal />
     </div>
   );
 };
