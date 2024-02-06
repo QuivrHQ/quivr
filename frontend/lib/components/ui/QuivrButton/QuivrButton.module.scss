@@ -21,4 +21,14 @@
       color: Colors.$white;
     }
   }
+
+  &.dangerous {
+    border-color: Colors.$dangerous;
+    color: Colors.$dangerous;
+
+    &:hover {
+      background-color: Colors.$dangerous;
+      color: Colors.$white;
+    }
+  }
 }
