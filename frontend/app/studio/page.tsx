@@ -3,7 +3,9 @@
 import { useState } from "react";
 
 import PageHeader from "@/lib/components/PageHeader/PageHeader";
+import { UploadDocumentModal } from "@/lib/components/UploadDocumentModal/UploadDocumentModal";
 import { Tabs } from "@/lib/components/ui/Tabs/Tabs";
+import { useKnowledgeToFeedContext } from "@/lib/context/KnowledgeToFeedProvider/hooks/useKnowledgeToFeedContext";
 import { ButtonType } from "@/lib/types/QuivrButton";
 import { Tab } from "@/lib/types/Tab";
 
@@ -12,6 +14,7 @@ import styles from "./page.module.scss";
 
 const Studio = (): JSX.Element => {
   const [selectedTab, setSelectedTab] = useState("Manage my brains");
+  const { setShouldDisplayFeedCard } = useKnowledgeToFeedContext();
 
   const studioTabs: Tab[] = [
     {
@@ -39,7 +42,7 @@ const Studio = (): JSX.Element => {
       label: "Add knowledge",
       color: "primary",
       onClick: () => {
-        console.info("add");
+        setShouldDisplayFeedCard(true);
       },
     },
   ];
@@ -53,6 +56,7 @@ const Studio = (): JSX.Element => {
         <Tabs tabList={studioTabs} />
         {selectedTab === "Manage my brains" && <ManageBrains />}
       </div>
+      <UploadDocumentModal />
     </div>
   );
 };
