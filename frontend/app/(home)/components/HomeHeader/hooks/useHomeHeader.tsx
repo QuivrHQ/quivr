@@ -20,7 +20,7 @@ export const useHomeHeader = ({ color }: UseHomeHeaderProps) => {
 
   const navItems: NavbarItem[] = [
     {
-      href: "https://github.com/QuivrHQ/quivr",
+      href: "https://github.com/quivrhq/quivr",
       label: t("star_us"),
       leftIcon: <AiFillStar size={16} className="hidden md:inline" />,
       rightIcon: null,

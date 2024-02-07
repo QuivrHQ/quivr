@@ -57,7 +57,7 @@ jobs:
         with:
           context: ./backend/
           push: true
-          tags: ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }}, ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ github.ref_name}},  ghcr.io/QuivrHQ/quivr:${{ github.ref_name}}
+          tags: ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }}, ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ github.ref_name}},  ghcr.io/quivrhq/quivr:${{ github.ref_name}}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
