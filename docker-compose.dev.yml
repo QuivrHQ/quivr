@@ -46,8 +46,8 @@ services:
       context: backend
       dockerfile: Dockerfile
     container_name: worker
-    volumes:
-      - ./backend/:/code/
+    # volumes:
+    #   - ./backend/:/code/
     command: >
       /bin/sh -c "
       watchmedo auto-restart -d . -p '*.py' --recursive -- celery -A celery_worker worker -l info
