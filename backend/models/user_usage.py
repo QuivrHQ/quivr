@@ -76,8 +76,6 @@ class UserUsage(UserIdentity):
             self.id, date
         )
 
-        logger.info("Are you here?")
-        logger.info(current_requests_count)
         if daily_requests_count == 0:
             logger.info("Request count is 0, creating new record")
             if self.email is None:
@@ -87,7 +85,6 @@ class UserUsage(UserIdentity):
             )
             self.daily_requests_count = number
             return
-        logger.info("Request count is not 0, updating the record")
 
         self.supabase_db.increment_user_request_count(
             user_id=self.id,
