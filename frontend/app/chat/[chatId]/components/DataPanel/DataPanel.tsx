@@ -6,7 +6,6 @@ import { useChatContext } from "@/lib/context";
 import { MessageMetadata, Source } from "@/lib/types/MessageMetadata";
 
 import styles from "./DataPanel.module.scss";
-import RelatedBrains from "./components/RelatedBrains/RelatedBrains";
 import Sources from "./components/Sources/Sources";
 
 import { ChatMessage } from "../../types";
@@ -53,7 +52,6 @@ const DataPanel = (): JSX.Element => {
 
   return (
     <div className={styles.data_panel_wrapper}>
-      <RelatedBrains closeBrains={lastMessageMetadata?.closeBrains} />
       <Sources sources={lastMessageMetadata?.sources} />
     </div>
   );
