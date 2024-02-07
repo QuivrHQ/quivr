@@ -1,5 +1,26 @@
 # Changelog
 
+## 0.0.197 (2024-02-07)
+
+## What's Changed
+* fix(prompts): can now be removed by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2154
+* tests: Add tests for deleting prompts by ID by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2156
+* fix(related): removed public brains by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2157
+* perf: ⚡️ signed_url by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2159
+* fix(backend): typo in word response by @untilhamza in https://github.com/QuivrHQ/quivr/pull/2158
+* fix(frontend): better UI for phone device by @Zewed in https://github.com/QuivrHQ/quivr/pull/2160
+* fix(frontend): add knwoledge from create brain by @Zewed in https://github.com/QuivrHQ/quivr/pull/2161
+* feat(chunks): now chunk size is saved in database dynamically and not just 500 by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2164
+* fix(frontend): remove related brains for now by @Zewed in https://github.com/QuivrHQ/quivr/pull/2162
+* fix(frontend): can"t choose private or public brains by @Zewed in https://github.com/QuivrHQ/quivr/pull/2163
+* feat(frontend): manage current brain by @Zewed in https://github.com/QuivrHQ/quivr/pull/2165
+* fix(frontend): upgrade my plan by @Zewed in https://github.com/QuivrHQ/quivr/pull/2167
+
+## New Contributors
+* @untilhamza made their first contribution in https://github.com/QuivrHQ/quivr/pull/2158
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.196...v0.0.197
+
 ## 0.0.196 (2024-02-07)
 
 ## What's Changed
