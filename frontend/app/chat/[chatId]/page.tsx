@@ -40,6 +40,7 @@ const SelectedChatPage = (): JSX.Element => {
       onClick: () => {
         setIsBrainCreationModalOpened(true);
       },
+      iconName: "brain",
     },
     {
       label: "Add knowledge",
@@ -47,13 +48,15 @@ const SelectedChatPage = (): JSX.Element => {
       onClick: () => {
         setShouldDisplayFeedCard(true);
       },
+      iconName: "upload",
     },
     {
-      label: `Manage ${currentBrain?.name}`,
+      label: "Manage current brain",
       color: "primary",
       onClick: () => {
-        setShouldDisplayFeedCard(true);
+        window.location.href = `/studio/${currentBrain?.id}`;
       },
+      iconName: "edit",
     },
   ];
 

@@ -1,5 +1,6 @@
 @use "@/styles/Colors.module.scss";
 @use "@/styles/Radius.module.scss";
+@use "@/styles/ScreenSizes.module.scss";
 @use "@/styles/Spacings.module.scss";
 @use "@/styles/Typography.module.scss";
 
@@ -11,6 +12,7 @@
   border-radius: Radius.$normal;
   border: 1.5px solid transparent;
   cursor: pointer;
+  display: flex;
 
   &.primary {
     border-color: Colors.$primary;
@@ -29,6 +31,19 @@
     &:hover {
       background-color: Colors.$dangerous;
       color: Colors.$white;
+    }
+  }
+}
+
+.icon_label {
+  display: flex;
+  flex-direction: row;
+  gap: Spacings.$spacing02;
+  align-items: center;
+
+  @media (max-width: ScreenSizes.$small) {
+    .label {
+      display: none;
     }
   }
 }

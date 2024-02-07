@@ -32,6 +32,7 @@ export const PageHeader = ({
             label={button.label}
             onClick={button.onClick}
             color={button.color}
+            iconName={button.iconName}
           />
         ))}
       </div>

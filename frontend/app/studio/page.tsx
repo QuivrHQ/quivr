@@ -42,6 +42,7 @@ const Studio = (): JSX.Element => {
       onClick: () => {
         setIsBrainCreationModalOpened(true);
       },
+      iconName: "brain",
     },
     {
       label: "Add knowledge",
@@ -49,6 +50,7 @@ const Studio = (): JSX.Element => {
       onClick: () => {
         setShouldDisplayFeedCard(true);
       },
+      iconName: "upload",
     },
   ];
 
