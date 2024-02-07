@@ -42,6 +42,9 @@ def generate_source(result, brain):
     # Initialize an empty list for sources
     sources_list: List[Sources] = []
 
+    # Initialize a dictionary for storing generated URLs
+    generated_urls = {}
+
     # Get source documents from the result, default to an empty list if not found
     source_documents = result.get("source_documents", [])
 
@@ -73,9 +76,16 @@ def generate_source(result, brain):
             if is_url:
                 source_url = doc.metadata["original_file_name"]
             else:
-                source_url = generate_file_signed_url(
-                    f"{brain.brain_id}/{doc.metadata['file_name']}"
-                ).get("signedURL", "")
+                file_path = f"{brain.brain_id}/{doc.metadata['file_name']}"
+                # Check if the URL has already been generated
+                if file_path in generated_urls:
+                    source_url = generated_urls[file_path]
+                else:
+                    source_url = generate_file_signed_url(file_path).get(
+                        "signedURL", ""
+                    )
+                    # Store the generated URL
+                    generated_urls[file_path] = source_url
 
             # Append a new Sources object to the list
             sources_list.append(
