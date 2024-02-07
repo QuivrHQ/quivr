@@ -31,7 +31,7 @@ export const useCustomDropzone = () => {
   const { t } = useTranslation(["upload"]);
 
   const onDrop = (acceptedFiles: File[], fileRejections: FileRejection[]) => {
-    if (pathname && !pathname.includes("brains-management")) {
+    if (pathname && !pathname.includes("studio")) {
       setShouldDisplayFeedCard(true);
     }
     if (fileRejections.length > 0) {
