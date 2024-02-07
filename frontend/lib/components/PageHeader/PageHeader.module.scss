@@ -1,4 +1,5 @@
 @use "@/styles/Colors.module.scss";
+@use "@/styles/ScreenSizes.module.scss";
 @use "@/styles/Spacings.module.scss";
 @use "@/styles/Typography.module.scss";
 
@@ -21,10 +22,15 @@
       visibility: visible;
       padding-left: Spacings.$spacing07;
     }
+
+    @media (max-width: ScreenSizes.$small) {
+      display: none;
+    }
   }
 
   .buttons_wrapper {
     display: flex;
     gap: Spacings.$spacing03;
+    align-self: flex-end;
   }
 }
