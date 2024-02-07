@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 
 import { ApiBrainSecretsInputs } from "@/lib/components/ApiBrainSecretsInputs/ApiBrainSecretsInputs";
 import { KnowledgeToFeedInput } from "@/lib/components/KnowledgeToFeedInput";
-import Button from "@/lib/components/ui/Button";
+
 import { Select } from "@/lib/components/ui/Select";
 import { requiredRolesForUpload } from "@/lib/config/upload";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
@@ -57,13 +57,6 @@ export const KnowledgeToFeed = ({
         />
       ) : (
         <KnowledgeToFeedInput feedBrain={() => void feedBrain()} />
-      )}
-      {Boolean(currentBrainId) && (
-        <Link href={`/studio/${currentBrainId ?? ""}`}>
-          <Button variant={"tertiary"}>
-            {t("manage_brain", { ns: "brain" })}
-          </Button>
-        </Link>
       )}
     </div>
   );
