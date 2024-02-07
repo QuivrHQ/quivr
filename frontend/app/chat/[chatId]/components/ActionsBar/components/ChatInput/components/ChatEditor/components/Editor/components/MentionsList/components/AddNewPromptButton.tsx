@@ -10,7 +10,7 @@ export const AddNewPromptButton = (): JSX.Element => {
 
   return (
     <Button
-      onClick={() => router.push("/brains-management")}
+      onClick={() => router.push("/studio")}
       variant={"tertiary"}
       className={"border-0"}
       data-testid="add-brain-button"

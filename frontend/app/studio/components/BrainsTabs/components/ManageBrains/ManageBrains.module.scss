@@ -1,0 +1,13 @@
+@use "@/styles/Spacings.module.scss";
+
+.manage_brains_wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: Spacings.$spacing05;
+  padding-block: Spacings.$spacing05;
+  height: 100%;
+
+  .search_brain {
+    width: 250px;
+  }
+}

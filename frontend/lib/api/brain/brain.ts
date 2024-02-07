@@ -146,8 +146,12 @@ export const getDocsFromQuestion = async (
   question: string,
   axiosInstance: AxiosInstance
 ): Promise<ListFilesProps["files"]> => {
-  return (await axiosInstance.post<Record<"docs",ListFilesProps["files"]>>(`/brains/${brainId}/documents`, {
-    question,
-  })).data.docs;
-  }
-
+  return (
+    await axiosInstance.post<Record<"docs", ListFilesProps["files"]>>(
+      `/brains/${brainId}/documents`,
+      {
+        question,
+      }
+    )
+  ).data.docs;
+};

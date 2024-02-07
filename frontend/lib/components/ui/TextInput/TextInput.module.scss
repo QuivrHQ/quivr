@@ -4,14 +4,16 @@
 
 .text_input_container {
   display: flex;
-  flex-direction: column;
+  border: 1px solid Colors.$lighter-grey;
   gap: Spacings.$spacing03;
+  padding-block: Spacings.$spacing02;
+  padding-inline: Spacings.$spacing05;
+  border-radius: Radius.$big;
+  align-items: center;
 
   .text_input {
-    border: 1px solid Colors.$lighter-grey;
-    border-radius: Radius.$big;
-    padding: Spacings.$spacing03;
     caret-color: Colors.$accent;
+    border: none;
 
     &:focus {
       box-shadow: none;

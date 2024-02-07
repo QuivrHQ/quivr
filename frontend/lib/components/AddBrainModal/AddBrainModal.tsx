@@ -5,11 +5,7 @@ import { addBrainDefaultValues } from "@/lib/config/defaultBrainConfig";
 import { AddBrainSteps } from "./components/AddBrainSteps/AddBrainSteps";
 import { CreateBrainProps } from "./types";
 
-export const AddBrainModal = ({
-  isMenuButton,
-}: {
-  isMenuButton?: boolean;
-}): JSX.Element => {
+export const AddBrainModal = (): JSX.Element => {
   const defaultValues: CreateBrainProps = {
     ...addBrainDefaultValues,
     setDefault: true,
@@ -22,7 +18,7 @@ export const AddBrainModal = ({
 
   return (
     <FormProvider {...methods}>
-      <AddBrainSteps isMenuButton={isMenuButton} />
+      <AddBrainSteps />
     </FormProvider>
   );
 };

@@ -1,0 +1,30 @@
+@use "@/styles/Colors.module.scss";
+@use "@/styles/Spacings.module.scss";
+@use "@/styles/Typography.module.scss";
+
+.page_header_wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: Spacings.$spacing04;
+  padding-left: Spacings.$spacing09;
+  border-bottom: 1px solid Colors.$lightest-black;
+
+  .left {
+    @include Typography.H2;
+    display: flex;
+    align-items: center;
+    gap: Spacings.$spacing03;
+    visibility: hidden;
+
+    &.menu_closed {
+      visibility: visible;
+      padding-left: Spacings.$spacing07;
+    }
+  }
+
+  .buttons_wrapper {
+    display: flex;
+    gap: Spacings.$spacing03;
+  }
+}

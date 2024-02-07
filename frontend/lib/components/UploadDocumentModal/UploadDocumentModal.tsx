@@ -6,8 +6,11 @@ import { useKnowledgeToFeedContext } from "@/lib/context/KnowledgeToFeedProvider
 
 import styles from "./UploadDocumentModal.module.scss";
 
+import { Modal } from "../ui/Modal";
+
 export const UploadDocumentModal = (): JSX.Element => {
-  const { shouldDisplayFeedCard } = useKnowledgeToFeedContext();
+  const { shouldDisplayFeedCard, setShouldDisplayFeedCard } =
+    useKnowledgeToFeedContext();
   const { setHasPendingRequests } = useActionBar();
 
   if (!shouldDisplayFeedCard) {
@@ -15,19 +18,25 @@ export const UploadDocumentModal = (): JSX.Element => {
   }
 
   return (
-    <div className={styles.knowledge_modal}>
-      <AnimatePresence>
-        <motion.div
-          key="slide"
-          initial={{ y: "100%", opacity: 0 }}
-          animate={{ y: 0, opacity: 1, transition: { duration: 0.2 } }}
-          exit={{ y: "100%", opacity: 0 }}
-        >
-          <KnowledgeToFeed
-            dispatchHasPendingRequests={() => setHasPendingRequests(true)}
-          />
-        </motion.div>
-      </AnimatePresence>
-    </div>
+    <Modal
+      isOpen={shouldDisplayFeedCard}
+      setOpen={setShouldDisplayFeedCard}
+      CloseTrigger={<div />}
+    >
+      <div className={styles.knowledge_modal}>
+        <AnimatePresence>
+          <motion.div
+            key="slide"
+            initial={{ y: "100%", opacity: 0 }}
+            animate={{ y: 0, opacity: 1, transition: { duration: 0.2 } }}
+            exit={{ y: "100%", opacity: 0 }}
+          >
+            <KnowledgeToFeed
+              dispatchHasPendingRequests={() => setHasPendingRequests(true)}
+            />
+          </motion.div>
+        </AnimatePresence>
+      </div>
+    </Modal>
   );
 };

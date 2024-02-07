@@ -10,15 +10,12 @@ import { useMenuContext } from "@/lib/context/MenuProvider/hooks/useMenuContext"
 
 import styles from "./Menu.module.scss";
 import { AnimatedDiv } from "./components/AnimationDiv";
-import { BrainsManagementButton } from "./components/BrainsManagementButton/BrainsManagementButton";
 import { DiscussionButton } from "./components/DiscussionButton/DiscussionButton";
 import { HistoryButton } from "./components/HistoryButton/HistoryButton";
 import { HomeButton } from "./components/HomeButton/HomeButton";
 import { ProfileButton } from "./components/ProfileButton/ProfileButton";
+import { StudioButton } from "./components/StudioButton/StudioButton";
 import { UpgradeToPlusButton } from "./components/UpgradeToPlusButton/UpgradeToPlusButton";
-import { UploadDocumentButton } from "./components/UploadDocumentButton/UploadDocumentButton";
-
-import { AddBrainModal } from "../AddBrainModal";
 
 export const Menu = (): JSX.Element => {
   const { isOpened } = useMenuContext();
@@ -32,13 +29,7 @@ export const Menu = (): JSX.Element => {
     return <></>;
   }
 
-  const displayedOnPages = [
-    "/chat",
-    "/library",
-    "/brains-management",
-    "/search",
-    "/user",
-  ];
+  const displayedOnPages = ["/chat", "/library", "/studio", "/search", "/user"];
 
   const isMenuDisplayed = displayedOnPages.some((page) =>
     pathname.includes(page)
@@ -69,9 +60,7 @@ export const Menu = (): JSX.Element => {
               <div className={styles.block}>
                 <DiscussionButton />
                 <HomeButton />
-                <BrainsManagementButton />
-                <AddBrainModal isMenuButton={true} />
-                <UploadDocumentButton />
+                <StudioButton />
                 <HistoryButton />
               </div>
               <div className={styles.block}>

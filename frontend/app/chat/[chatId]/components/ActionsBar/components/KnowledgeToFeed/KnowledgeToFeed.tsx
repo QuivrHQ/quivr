@@ -59,7 +59,7 @@ export const KnowledgeToFeed = ({
         <KnowledgeToFeedInput feedBrain={() => void feedBrain()} />
       )}
       {Boolean(currentBrainId) && (
-        <Link href={`/brains-management/${currentBrainId ?? ""}`}>
+        <Link href={`/studio/${currentBrainId ?? ""}`}>
           <Button variant={"tertiary"}>
             {t("manage_brain", { ns: "brain" })}
           </Button>

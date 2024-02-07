@@ -1,0 +1,16 @@
+@use "@/styles/Spacings.module.scss";
+
+.page_wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: Spacings.$spacing05;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+
+  .content_wrapper {
+    padding-inline: Spacings.$spacing09;
+    padding-block: Spacings.$spacing05;
+    overflow-y: scroll;
+  }
+}

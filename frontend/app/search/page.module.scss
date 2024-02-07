@@ -6,58 +6,68 @@
 @use "@/styles/Typography.module.scss";
 @use "@/styles/Variables.module.scss";
 
-.search_page_container {
-  background-color: Colors.$white;
+.main_container {
+  position: relative;
   width: 100%;
   height: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
 
-  .main_container {
+  .page_header {
+    position: absolute;
+    width: 100%;
+  }
+
+  .search_page_container {
+    background-color: Colors.$white;
+    width: 100%;
+    height: 100%;
     display: flex;
+    align-items: center;
+    justify-content: center;
     flex-direction: column;
-    row-gap: Spacings.$spacing05;
-    position: relative;
-    width: 50%;
-    margin-inline: auto;
-    transform: translateY(-#{Variables.$searchBarHeight});
 
-    @media (max-width: ScreenSizes.$small) {
-      width: 100%;
-      padding-inline: Spacings.$spacing07;
-    }
-
-    .quivr_logo_wrapper {
+    .main_wrapper {
       display: flex;
       flex-direction: column;
-      justify-content: center;
-      align-items: center;
+      row-gap: Spacings.$spacing05;
+      width: 50%;
+      margin-inline: auto;
+      transform: translateY(-#{Variables.$searchBarHeight});
 
-      .quivr_text {
-        @include Typography.Big;
+      @media (max-width: ScreenSizes.$small) {
+        width: 100%;
+        padding-inline: Spacings.$spacing07;
+      }
 
-        .quivr_text_primary {
-          color: Colors.$primary;
+      .quivr_logo_wrapper {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+
+        .quivr_text {
+          @include Typography.Big;
+
+          .quivr_text_primary {
+            color: Colors.$primary;
+          }
         }
       }
     }
-  }
 
-  .shortcuts_card_wrapper {
-    background-color: Colors.$lightest-grey;
-    padding: Spacings.$spacing05;
-    gap: Spacings.$spacing03;
-    border-radius: Radius.$big;
-
-    .shortcut_wrapper {
-      display: flex;
-      align-items: center;
+    .shortcuts_card_wrapper {
+      background-color: Colors.$lightest-grey;
+      padding: Spacings.$spacing05;
       gap: Spacings.$spacing03;
+      border-radius: Radius.$big;
 
-      .shortcut {
-        color: Colors.$primary;
+      .shortcut_wrapper {
+        display: flex;
+        align-items: center;
+        gap: Spacings.$spacing03;
+
+        .shortcut {
+          color: Colors.$primary;
+        }
       }
     }
   }

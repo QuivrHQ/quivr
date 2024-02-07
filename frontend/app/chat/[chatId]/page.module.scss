@@ -1,21 +1,24 @@
 @use "@/styles/Colors.module.scss";
 @use "@/styles/Spacings.module.scss";
 
-.chat_page_container {
+.main_container {
   display: flex;
-  flex: 1 1 0%;
-  background-color: Colors.$white;
-  padding-block: Spacings.$spacing06;
-  padding-inline: Spacings.$spacing09;
-  display: flex;
-  gap: Spacings.$spacing09;
+  flex-direction: column;
+  width: 100%;
 
-  &.feeding {
-    background-color: Colors.$chat-bg-gray;
-  }
+  .chat_page_container {
+    display: flex;
+    flex: 1 1 0%;
+    background-color: Colors.$white;
+    padding-block: Spacings.$spacing06;
+    padding-inline: Spacings.$spacing09;
+    display: flex;
+    gap: Spacings.$spacing09;
+    overflow: hidden;
 
-  .data_panel_wrapper {
-    height: 100%;
-    width: 30%;
+    .data_panel_wrapper {
+      height: 100%;
+      width: 30%;
+    }
   }
 }

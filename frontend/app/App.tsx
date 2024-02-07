@@ -5,6 +5,7 @@ import { posthog } from "posthog-js";
 import { PostHogProvider } from "posthog-js/react";
 import { PropsWithChildren, useEffect } from "react";
 
+import { BrainCreationProvider } from "@/lib/components/AddBrainModal/components/AddBrainSteps/brainCreation-provider";
 import { Menu } from "@/lib/components/Menu/Menu";
 import { useOutsideClickListener } from "@/lib/components/Menu/hooks/useOutsideClickListener";
 import { NotificationBanner } from "@/lib/components/NotificationBanner";
@@ -82,13 +83,15 @@ const AppWithQueryClient = ({ children }: PropsWithChildren): JSX.Element => {
     <QueryClientProvider client={queryClient}>
       <BrainProvider>
         <KnowledgeToFeedProvider>
-          <MenuProvider>
-            <ChatsProvider>
-              <ChatProvider>
-                <App>{children}</App>
-              </ChatProvider>
-            </ChatsProvider>
-          </MenuProvider>
+          <BrainCreationProvider>
+            <MenuProvider>
+              <ChatsProvider>
+                <ChatProvider>
+                  <App>{children}</App>
+                </ChatProvider>
+              </ChatsProvider>
+            </MenuProvider>
+          </BrainCreationProvider>
         </KnowledgeToFeedProvider>
       </BrainProvider>
     </QueryClientProvider>
