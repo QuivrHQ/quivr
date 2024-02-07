@@ -79,7 +79,7 @@ class CustomSupabaseVectorStore(SupabaseVectorStore):
             table,
             {
                 "query_embedding": query_embedding,
-                "match_count": self.number_docs,
+                "max_chunk_sum": self.max_input,
                 "p_brain_id": str(self.brain_id),
             },
         ).execute()

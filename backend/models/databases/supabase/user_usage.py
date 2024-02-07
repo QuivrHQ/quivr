@@ -1,9 +1,7 @@
-from ast import List
 from datetime import datetime, timedelta
 from uuid import UUID
 
 from logger import get_logger
-from models.databases.entity import LLMModels
 from models.databases.repository import Repository
 
 logger = get_logger(__name__)
@@ -269,11 +267,8 @@ class UserUsage(Repository):
         """
         Increment the user's requests count for a specific day
         """
-        current = self.get_user_requests_count_for_day(user_id, date)
 
-        self.update_user_request_count(
-            user_id, daily_requests_count=current + number, date=date
-        )
+        self.update_user_request_count(user_id, daily_requests_count=number, date=date)
 
     def update_user_request_count(self, user_id, daily_requests_count, date):
         response = (

@@ -13,8 +13,6 @@ logger = get_logger(__name__)
 class Neurons(BaseModel):
     def create_vector(self, docs):
         documents_vector_store = get_documents_vector_store()
-        logger.info("Creating vector for document")
-        logger.info(f"Document: {docs}")
 
         try:
             sids = documents_vector_store.add_documents(docs)

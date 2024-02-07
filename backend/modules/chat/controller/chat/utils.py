@@ -41,16 +41,23 @@ def find_model_and_generate_metadata(
     follow_up_questions = chat_service.get_follow_up_question(chat_id)
     metadata["follow_up_questions"] = follow_up_questions
     # Default model is gpt-3.5-turbo-0125
+    default_model = "gpt-3.5-turbo-0125"
     model_to_use = LLMModels(  # TODO Implement default models in database
-        name="gpt-3.5-turbo-0125", price=1, max_input=12000, max_output=1000
+        name=default_model, price=1, max_input=4000, max_output=1000
     )
+
+    logger.info("Brain model: %s", brain.model)
+
+    # If brain.model is None, set it to the default_model
+    if brain.model is None:
+        brain.model = default_model
 
     is_brain_model_available = any(
         brain.model == model_dict.get("name") for model_dict in models_settings
     )
 
     is_user_allowed_model = brain.model in user_settings.get(
-        "models", ["gpt-3.5-turbo-0125"]
+        "models", [default_model]
     )  # Checks if the model is available in the list of models
 
     logger.info(f"Brain model: {brain.model}")
@@ -63,7 +70,7 @@ def find_model_and_generate_metadata(
         model_to_use.name = brain.model
         for model_dict in models_settings:
             if model_dict.get("name") == model_to_use.name:
-                logger.info(f"Using model {model_to_use.name}")
+                model_to_use.price = model_dict.get("price")
                 model_to_use.max_input = model_dict.get("max_input")
                 model_to_use.max_output = model_dict.get("max_output")
                 break
@@ -71,6 +78,9 @@ def find_model_and_generate_metadata(
     metadata["model"] = model_to_use.name
     metadata["max_tokens"] = model_to_use.max_output
     metadata["max_input"] = model_to_use.max_input
+
+    logger.info(f"Model to use: {model_to_use}")
+    logger.info(f"Metadata: {metadata}")
 
     return model_to_use, metadata
 
