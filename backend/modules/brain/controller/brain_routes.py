@@ -137,17 +137,21 @@ async def update_existing_brain(
     if existing_brain is None:
         raise HTTPException(status_code=404, detail="Brain not found")
 
-    brain_service.update_brain_by_id(brain_id, brain_update_data)
-
     if brain_update_data.prompt_id is None and existing_brain.prompt_id:
         prompt = prompt_service.get_prompt_by_id(existing_brain.prompt_id)
         if prompt and prompt.status == "private":
             prompt_service.delete_prompt_by_id(existing_brain.prompt_id)
 
-    if brain_update_data.status == "private" and existing_brain.status == "public":
-        brain_user_service.delete_brain_users(brain_id)
+            return {"message": f"Prompt {brain_id} has been updated."}
 
-    return {"message": f"Brain {brain_id} has been updated."}
+    elif brain_update_data.status == "private" and existing_brain.status == "public":
+        brain_user_service.delete_brain_users(brain_id)
+        return {"message": f"Brain {brain_id} has been deleted."}
+
+    else:
+        brain_service.update_brain_by_id(brain_id, brain_update_data)
+
+        return {"message": f"Brain {brain_id} has been updated."}
 
 
 @brain_router.put(
