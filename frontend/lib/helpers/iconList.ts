@@ -9,9 +9,12 @@ import {
   FaRegUserCircle,
   FaUnlock,
 } from "react-icons/fa";
-import { FaArrowUpFromBracket } from "react-icons/fa6";
 import { IoIosAdd, IoMdClose, IoMdLogOut } from "react-icons/io";
-import { IoHomeOutline, IoSettingsSharp } from "react-icons/io5";
+import {
+  IoArrowUpCircleOutline,
+  IoHomeOutline,
+  IoSettingsSharp,
+} from "react-icons/io5";
 import { IconType } from "react-icons/lib";
 import {
   LuBrain,
@@ -50,7 +53,7 @@ export const iconList: { [name: string]: IconType } = {
   email: MdAlternateEmail,
   file: LuFile,
   flag: CiFlag1,
-  followUp: FaArrowUpFromBracket,
+  followUp: IoArrowUpCircleOutline,
   graph: VscGraph,
   hastag: RiHashtag,
   history: MdHistory,
