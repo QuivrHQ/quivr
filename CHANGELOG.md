@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.0.196 (2024-02-07)
+
+## What's Changed
+* feat(frontend): Page Header + Begin of Studio by @Zewed in https://github.com/StanGirard/quivr/pull/2151
+* fix(frontend): overflow brain item by @Zewed in https://github.com/StanGirard/quivr/pull/2153
+
+
+**Full Changelog**: https://github.com/StanGirard/quivr/compare/v0.0.195...v0.0.196
+
 ## 0.0.195 (2024-02-06)
 
 ## What's Changed
