@@ -1,10 +1,10 @@
 from fastapi import HTTPException
+from models.settings import get_supabase_client
 from modules.prompt.entity.prompt import Prompt
 from modules.prompt.repository.prompts_interface import (
     DeletePromptResponse,
     PromptsInterface,
 )
-from models.settings import get_supabase_client
 
 
 class Prompts(PromptsInterface):
@@ -30,6 +30,18 @@ class Prompts(PromptsInterface):
         Returns:
         A dictionary containing the status of the delete and prompt_id of the deleted prompt
         """
+
+        # Update brains where prompt_id is equal to the value to NULL
+        self.db.from_("brains").update({"prompt_id": None}).filter(
+            "prompt_id", "eq", prompt_id
+        ).execute()
+
+        # Update chat_history where prompt_id is equal to the value to NULL
+        self.db.from_("chat_history").update({"prompt_id": None}).filter(
+            "prompt_id", "eq", prompt_id
+        ).execute()
+
+        # Delete the prompt
         response = (
             self.db.from_("prompts")
             .delete()

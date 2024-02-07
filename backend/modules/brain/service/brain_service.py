@@ -268,7 +268,6 @@ class BrainService:
                 status_code=404,
                 detail=f"Brain with id {brain_id} not found",
             )
-
         brain_update_answer = self.brain_repository.update_brain_by_id(
             brain_id,
             brain=BrainUpdatableProperties(
