@@ -56,7 +56,7 @@ export const SearchBar = ({
       ${currentBrain ? styles.with_brain : ""}
       `}
     >
-      <CurrentBrain />
+      <CurrentBrain allowingRemoveBrain={true} />
       <div
         className={`
       ${styles.editor_wrapper}

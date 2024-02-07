@@ -33,7 +33,7 @@ export const ChatInput = (): JSX.Element => {
         }}
       >
         <div className={styles.chat_container}>
-          <CurrentBrain />
+          <CurrentBrain allowingRemoveBrain={false} />
           <div
             className={`
             ${styles.chat_wrapper}

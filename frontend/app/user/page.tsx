@@ -38,6 +38,7 @@ const UserPage = (): JSX.Element => {
     onClick: () => {
       setIsLogoutModalOpened(true);
     },
+    iconName: "logout",
   };
   const userTabs: Tab[] = [
     {
@@ -91,12 +92,14 @@ const UserPage = (): JSX.Element => {
               onClick={() => setIsLogoutModalOpened(false)}
               color="primary"
               label={t("cancel", { ns: "logout" })}
+              iconName="close"
             ></QuivrButton>
             <QuivrButton
               isLoading={isLoggingOut}
               color="dangerous"
               onClick={() => void handleLogout()}
               label={t("logoutButton")}
+              iconName="logout"
             ></QuivrButton>
           </div>
         </div>

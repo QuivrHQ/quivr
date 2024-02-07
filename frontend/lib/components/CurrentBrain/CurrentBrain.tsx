@@ -4,7 +4,13 @@ import styles from "./CurrentBrain.module.scss";
 
 import { Icon } from "../ui/Icon/Icon";
 
-export const CurrentBrain = (): JSX.Element => {
+interface CurrentBrainProps {
+  allowingRemoveBrain: boolean;
+}
+
+export const CurrentBrain = ({
+  allowingRemoveBrain,
+}: CurrentBrainProps): JSX.Element => {
   const { currentBrain, setCurrentBrainId } = useBrainContext();
 
   const removeCurrentBrain = (): void => {
@@ -25,14 +31,16 @@ export const CurrentBrain = (): JSX.Element => {
             <span className={styles.brain_name}>{currentBrain.name}</span>
           </div>
         </div>
-        <div
-          onClick={(event) => {
-            event.nativeEvent.stopImmediatePropagation();
-            removeCurrentBrain();
-          }}
-        >
-          <Icon size="normal" name="close" color="black" handleHover={true} />
-        </div>
+        {allowingRemoveBrain && (
+          <div
+            onClick={(event) => {
+              event.nativeEvent.stopImmediatePropagation();
+              removeCurrentBrain();
+            }}
+          >
+            <Icon size="normal" name="close" color="black" handleHover={true} />
+          </div>
+        )}
       </div>
     </div>
   );

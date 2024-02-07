@@ -1,6 +1,6 @@
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
-import { BsArrowRightShort } from "react-icons/bs";
-import { CiChat1, CiFlag1 } from "react-icons/ci";
+import { BsArrowRightShort, BsChatLeftText } from "react-icons/bs";
+import { CiFlag1 } from "react-icons/ci";
 import {
   FaCheck,
   FaCheckCircle,
@@ -9,9 +9,12 @@ import {
   FaRegUserCircle,
   FaUnlock,
 } from "react-icons/fa";
-import { FaArrowUpFromBracket } from "react-icons/fa6";
 import { IoIosAdd, IoMdClose, IoMdLogOut } from "react-icons/io";
-import { IoHomeOutline, IoSettingsSharp } from "react-icons/io5";
+import {
+  IoArrowUpCircleOutline,
+  IoHomeOutline,
+  IoSettingsSharp,
+} from "react-icons/io5";
 import { IconType } from "react-icons/lib";
 import {
   LuBrain,
@@ -38,7 +41,7 @@ export const iconList: { [name: string]: IconType } = {
   addWithoutCircle: IoIosAdd,
   brain: LuBrain,
   brainCircuit: LuBrainCircuit,
-  chat: CiChat1,
+  chat: BsChatLeftText,
   check: FaCheck,
   checkCircle: FaCheckCircle,
   chevronDown: LuChevronDown,
@@ -50,7 +53,7 @@ export const iconList: { [name: string]: IconType } = {
   email: MdAlternateEmail,
   file: LuFile,
   flag: CiFlag1,
-  followUp: FaArrowUpFromBracket,
+  followUp: IoArrowUpCircleOutline,
   graph: VscGraph,
   hastag: RiHashtag,
   history: MdHistory,
