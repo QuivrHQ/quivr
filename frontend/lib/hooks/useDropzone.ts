@@ -1,4 +1,3 @@
-import { usePathname } from "next/navigation";
 import { FileRejection, useDropzone } from "react-dropzone";
 import { useTranslation } from "react-i18next";
 
@@ -9,6 +8,7 @@ import { useOnboarding } from "./useOnboarding";
 import { useOnboardingTracker } from "./useOnboardingTracker";
 import { useToast } from "./useToast";
 
+import { useBrainCreationContext } from "../components/AddBrainModal/components/AddBrainSteps/brainCreation-provider";
 import { useKnowledgeToFeedContext } from "../context/KnowledgeToFeedProvider/hooks/useKnowledgeToFeedContext";
 import { acceptedFormats } from "../helpers/acceptedFormats";
 import { cloneFileWithSanitizedName } from "../helpers/cloneFileWithSanitizedName";
@@ -17,10 +17,9 @@ import { cloneFileWithSanitizedName } from "../helpers/cloneFileWithSanitizedNam
 export const useCustomDropzone = () => {
   const { knowledgeToFeed, addKnowledgeToFeed, setShouldDisplayFeedCard } =
     useKnowledgeToFeedContext();
+  const { isBrainCreationModalOpened } = useBrainCreationContext();
   const { isOnboarding } = useOnboarding();
   const { trackOnboardingEvent } = useOnboardingTracker();
-  const pathname = usePathname();
-
   const files: File[] = (
     knowledgeToFeed.filter((c) => c.source === "upload") as FeedItemUploadType[]
   ).map((c) => c.file);
@@ -31,7 +30,7 @@ export const useCustomDropzone = () => {
   const { t } = useTranslation(["upload"]);
 
   const onDrop = (acceptedFiles: File[], fileRejections: FileRejection[]) => {
-    if (pathname && !pathname.includes("brains-management")) {
+    if (!isBrainCreationModalOpened) {
       setShouldDisplayFeedCard(true);
     }
     if (fileRejections.length > 0) {
