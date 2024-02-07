@@ -10,7 +10,6 @@ import Field from "@/lib/components/ui/Field";
 import { Radio } from "@/lib/components/ui/Radio";
 import { TextArea } from "@/lib/components/ui/TextArea";
 
-import { BrainAccess } from "./components/BrainAccess/BrainAccess";
 import { useGeneralInformation } from "./hooks/useGeneralInformation";
 
 import { useBrainFormState } from "../../hooks/useBrainFormState";
@@ -36,7 +35,7 @@ export const GeneralInformation = (
     isSettingAsDefault,
     setAsDefaultBrainHandler,
   } = props;
-  const { register, setValue, status } = useBrainFormState();
+  const { register } = useBrainFormState();
 
   const { brainTypeOptions } = useGeneralInformation();
 
@@ -89,14 +88,6 @@ export const GeneralInformation = (
         disabled={!hasEditRights}
         {...register("description")}
       />
-      {isOwnedByCurrentUser && (
-        <div className="w-full mt-4">
-          <span className="font-semibold">
-            {t("brain_status_label", { ns: "brain" })}
-          </span>
-          <BrainAccess status={status} setValue={setValue} />
-        </div>
-      )}
 
       <div className="w-full mt-4">
         <Radio
