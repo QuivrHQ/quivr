@@ -4,12 +4,10 @@ import { FaArrowLeft, FaArrowRight } from "react-icons/fa";
 
 import Button from "@/lib/components/ui/Button";
 import Field from "@/lib/components/ui/Field";
-import { Radio } from "@/lib/components/ui/Radio";
 import { TextArea } from "@/lib/components/ui/TextArea";
 
 import { PublicAccessConfirmationModal } from "./components/PublicAccessConfirmationModal";
 import { useBrainParamsStep } from "./hooks/useBrainParamsStep";
-import { useBrainStatusOptions } from "./hooks/useBrainStatusOptions";
 import { usePublicAccessConfirmationModal } from "./hooks/usePublicAccessConfirmationModal";
 
 import { useBrainCreationSteps } from "../../hooks/useBrainCreationSteps";
@@ -26,7 +24,6 @@ export const BrainParamsStep = ({
     useBrainCreationSteps();
   const { register } = useBrainTypeSelectionStep();
   const { t } = useTranslation(["translation", "brain", "config"]);
-  const { brainStatusOptions } = useBrainStatusOptions();
   const { isNextButtonDisabled } = useBrainParamsStep();
   const {
     isPublicAccessConfirmationModalOpened,
@@ -57,14 +54,6 @@ export const BrainParamsStep = ({
         required
         {...register("description")}
       />
-      <fieldset className="w-full flex flex-col">
-        <Radio
-          items={brainStatusOptions}
-          label={t("brain_status_label", { ns: "brain" })}
-          className="flex-1 justify-between w-[50%]"
-          {...register("status")}
-        />
-      </fieldset>
       <div className="flex flex-row justify-between items-center flex-1 mt-10 w-full">
         <Button
           type="button"
