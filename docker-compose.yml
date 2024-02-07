@@ -22,7 +22,7 @@ services:
       - 3000:3000
 
   backend-core:
-    image: quivrhq/quivr-backend-prebuilt:latest
+    image: stangirard/quivr-backend-prebuilt:latest
     pull_policy: if_not_present
     env_file:
       - .env
@@ -57,7 +57,7 @@ services:
 
   worker:
     pull_policy: if_not_present
-    image: quivrhq/quivr-backend-prebuilt:latest
+    image: stangirard/quivr-backend-prebuilt:latest
     env_file:
       - .env
     build:
@@ -70,7 +70,7 @@ services:
       - redis
 
   beat:
-    image: quivrhq/quivr-backend-prebuilt:latest
+    image: stangirard/quivr-backend-prebuilt:latest
     pull_policy: if_not_present
     env_file:
       - .env
@@ -84,7 +84,7 @@ services:
       - redis
 
   flower:
-    image: quivrhq/quivr-backend-prebuilt:latest
+    image: stangirard/quivr-backend-prebuilt:latest
     pull_policy: if_not_present
     env_file:
       - .env

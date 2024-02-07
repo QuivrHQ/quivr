@@ -77,6 +77,7 @@ class UserUsage(UserIdentity):
         )
 
         if daily_requests_count == 0:
+            logger.info("Request count is 0, creating new record")
             if self.email is None:
                 raise ValueError("User Email should be defined for daily usage table")
             self.supabase_db.create_user_daily_usage(
