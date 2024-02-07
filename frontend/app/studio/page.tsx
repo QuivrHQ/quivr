@@ -24,12 +24,14 @@ const Studio = (): JSX.Element => {
       label: "Manage my brains",
       isSelected: selectedTab === "Manage my brains",
       onClick: () => setSelectedTab("Manage my brains"),
+      iconName: "edit",
     },
     {
       label: "Analytics - Coming soon",
       isSelected: selectedTab === "Analytics",
       onClick: () => setSelectedTab("Analytics"),
       disabled: true,
+      iconName: "graph",
     },
   ];
 

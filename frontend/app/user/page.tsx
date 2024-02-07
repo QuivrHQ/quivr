@@ -44,16 +44,19 @@ const UserPage = (): JSX.Element => {
       label: "Settings",
       isSelected: selectedTab === "Settings",
       onClick: () => setSelectedTab("Settings"),
+      iconName: "settings",
     },
     {
       label: "Brains Usage",
       isSelected: selectedTab === "Brains Usage",
       onClick: () => setSelectedTab("Brains Usage"),
+      iconName: "graph",
     },
     {
       label: "Plan",
       isSelected: selectedTab === "Plan",
       onClick: () => setSelectedTab("Plan"),
+      iconName: "star",
     },
   ];
 

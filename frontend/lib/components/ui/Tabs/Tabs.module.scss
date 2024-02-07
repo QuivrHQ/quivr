@@ -1,5 +1,6 @@
 @use "@/styles/Colors.module.scss";
 @use "@/styles/Radius.module.scss";
+@use "@/styles/ScreenSizes.module.scss";
 @use "@/styles/Spacings.module.scss";
 
 .tabs_container {
@@ -15,6 +16,7 @@
     padding-block: Spacings.$spacing03;
     cursor: pointer;
     box-sizing: border-box;
+    gap: Spacings.$spacing03;
 
     &.selected {
       border-bottom-color: Colors.$primary;
@@ -29,6 +31,12 @@
     &.disabled {
       pointer-events: none;
       color: Colors.$normal-grey;
+    }
+
+    @media (max-width: ScreenSizes.$small) {
+      .label {
+        display: none;
+      }
     }
   }
 }
