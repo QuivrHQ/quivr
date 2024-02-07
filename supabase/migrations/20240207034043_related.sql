@@ -1,5 +1,3 @@
-alter extension "wrappers" update to '0.2.0';
-
 alter table "public"."brains" drop constraint "brains_prompt_id_fkey";
 
 alter table "public"."chat_history" drop constraint "chat_history_prompt_id_fkey";

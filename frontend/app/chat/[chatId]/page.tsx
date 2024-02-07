@@ -1,9 +1,14 @@
 "use client";
 
+import { UUID } from "crypto";
+import { useEffect } from "react";
+
 import { AddBrainModal } from "@/lib/components/AddBrainModal";
 import { useBrainCreationContext } from "@/lib/components/AddBrainModal/components/AddBrainSteps/brainCreation-provider";
 import PageHeader from "@/lib/components/PageHeader/PageHeader";
 import { UploadDocumentModal } from "@/lib/components/UploadDocumentModal/UploadDocumentModal";
+import { useChatContext } from "@/lib/context";
+import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 import { useKnowledgeToFeedContext } from "@/lib/context/KnowledgeToFeedProvider/hooks/useKnowledgeToFeedContext";
 import { useDevice } from "@/lib/hooks/useDevice";
 import { useCustomDropzone } from "@/lib/hooks/useDropzone";
@@ -23,6 +28,9 @@ const SelectedChatPage = (): JSX.Element => {
   const { setShouldDisplayFeedCard } = useKnowledgeToFeedContext();
   const { setIsBrainCreationModalOpened } = useBrainCreationContext();
 
+  const { currentBrain, setCurrentBrainId } = useBrainContext();
+  const { messages } = useChatContext();
+
   useChatNotificationsSync();
 
   const buttons: ButtonType[] = [
@@ -40,7 +48,20 @@ const SelectedChatPage = (): JSX.Element => {
         setShouldDisplayFeedCard(true);
       },
     },
+    {
+      label: `Manage ${currentBrain?.name}`,
+      color: "primary",
+      onClick: () => {
+        setShouldDisplayFeedCard(true);
+      },
+    },
   ];
+
+  useEffect(() => {
+    if (!currentBrain && messages.length > 0) {
+      setCurrentBrainId(messages[messages.length - 1].brain_id as UUID);
+    }
+  }, [messages]);
 
   return (
     <div className={styles.main_container}>
