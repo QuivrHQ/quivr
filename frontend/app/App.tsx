@@ -64,7 +64,7 @@ const App = ({ children }: PropsWithChildren): JSX.Element => {
             <NotificationBanner />
             <div className="relative h-full w-full flex justify-stretch items-stretch overflow-auto">
               <Menu />
-              <div onClick={onClickOutside} className="flex-1">
+              <div onClick={onClickOutside} className="flex-1 overflow-scroll">
                 {children}
               </div>
               <UpdateMetadata />
