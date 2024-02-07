@@ -5,6 +5,7 @@ from uuid import UUID
 
 from fastapi import UploadFile
 from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain_core.documents import Document
 from logger import get_logger
 from models.databases.supabase.supabase import SupabaseDB
 from models.settings import get_supabase_db
@@ -26,7 +27,7 @@ class File(BaseModel):
     content: Optional[Any] = None
     chunk_size: int = 500
     chunk_overlap: int = 0
-    documents: Optional[Any] = None
+    documents: Optional[Document] = None
 
     @property
     def supabase_db(self) -> SupabaseDB:

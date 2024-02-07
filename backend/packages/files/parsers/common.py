@@ -1,5 +1,6 @@
 import time
 
+import tiktoken
 from logger import get_logger
 from models import File
 from modules.brain.service.brain_vector_service import BrainVectorService
@@ -35,10 +36,16 @@ async def process_file(
     }
     docs = []
 
+    enc = tiktoken.get_encoding("cl100k_base")
+
     if file.documents is not None:
         for doc in file.documents:  # pyright: ignore reportPrivateUsage=none
+            new_metadata = metadata.copy()
+            len_chunk = len(enc.encode(doc.page_content))
+            logger.info(f"Chunk size: {len_chunk}")
+            new_metadata["chunk_size"] = len_chunk
             doc_with_metadata = DocumentSerializable(
-                page_content=doc.page_content, metadata=metadata
+                page_content=doc.page_content, metadata=new_metadata
             )
             docs.append(doc_with_metadata)
 
