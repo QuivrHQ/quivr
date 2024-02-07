@@ -39,7 +39,7 @@ class Chats(ChatsInterface):
         return None
 
     def get_chat_history(self, chat_id: str):
-        reponse = (
+        response = (
             self.db.from_("chat_history")
             .select("*")
             .filter("chat_id", "eq", chat_id)
@@ -47,7 +47,7 @@ class Chats(ChatsInterface):
             .execute()
         )
 
-        return reponse
+        return response
 
     def get_user_chats(self, user_id):
         response = (
@@ -67,12 +67,12 @@ class Chats(ChatsInterface):
                     "chat_id": str(chat_history.chat_id),
                     "user_message": chat_history.user_message,
                     "assistant": chat_history.assistant,
-                    "prompt_id": str(chat_history.prompt_id)
-                    if chat_history.prompt_id
-                    else None,
-                    "brain_id": str(chat_history.brain_id)
-                    if chat_history.brain_id
-                    else None,
+                    "prompt_id": (
+                        str(chat_history.prompt_id) if chat_history.prompt_id else None
+                    ),
+                    "brain_id": (
+                        str(chat_history.brain_id) if chat_history.brain_id else None
+                    ),
                 }
             )
             .execute()
