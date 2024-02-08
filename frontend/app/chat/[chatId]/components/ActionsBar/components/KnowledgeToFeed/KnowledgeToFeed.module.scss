@@ -6,9 +6,10 @@
   flex-direction: column;
   padding-block: Spacings.$spacing05;
   width: 100%;
+  gap: Spacings.$spacing05;
 
   .single_selector_wrapper {
-    width: 50%;
+    width: 30%;
 
     @media (max-width: ScreenSizes.$small) {
       width: 100%;

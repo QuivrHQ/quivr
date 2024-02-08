@@ -1,11 +1,65 @@
 @use "@/styles/Colors.module.scss";
+@use "@/styles/IconSizes.module.scss";
+@use "@/styles/Radius.module.scss";
 @use "@/styles/Spacings.module.scss";
+@use "@/styles/Typography.module.scss";
 
 .single_selector_wrapper {
   display: flex;
   flex-direction: column;
+
   .first_line_wrapper {
     display: flex;
-    background-color: Colors.$lightest-grey;
+    justify-content: space-between;
+    border: 1px solid Colors.$normal-grey;
+    border-radius: Radius.$normal;
+    align-items: center;
+    cursor: pointer;
+
+    &:hover {
+      background-color: Colors.$lightest-grey;
+    }
+
+    .left {
+      display: flex;
+      align-items: center;
+      gap: Spacings.$spacing03;
+      padding: Spacings.$spacing03;
+      overflow: hidden;
+      flex: 1;
+
+      .icon {
+        width: IconSizes.$normal;
+      }
+
+      .label {
+        @include Typography.EllipsisOverflow;
+        color: Colors.$white;
+        background-color: Colors.$primary;
+        border-radius: Radius.$small;
+        padding-inline: Spacings.$spacing05;
+        padding-block: Spacings.$spacing02;
+        white-space: nowrap;
+
+        &.not_set {
+          color: Colors.$normal-grey;
+          background-color: transparent;
+          padding-inline: 0;
+        }
+
+        &.unfolded_not_set {
+          width: 0;
+        }
+      }
+    }
+
+    .right {
+      flex: 1;
+      max-width: 50%;
+
+      &.folded {
+        display: none;
+      }
+    }
   }
 }

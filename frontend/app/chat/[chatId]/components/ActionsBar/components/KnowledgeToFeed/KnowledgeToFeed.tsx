@@ -4,6 +4,7 @@ import { SingleSelector } from "@/lib/components/ui/SingleSelector/SingleSelecto
 import { Tabs } from "@/lib/components/ui/Tabs/Tabs";
 import { requiredRolesForUpload } from "@/lib/config/upload";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
+import { Tab } from "@/lib/types/Tab";
 
 import styles from "./KnowledgeToFeed.module.scss";
 import { formatMinimalBrainsToSelectComponentInput } from "./utils/formatMinimalBrainsToSelectComponentInput";

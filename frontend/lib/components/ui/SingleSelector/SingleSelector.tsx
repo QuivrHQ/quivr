@@ -3,6 +3,7 @@ import { useState } from "react";
 
 import styles from "./SingleSelector.module.scss";
 
+import Icon from "../Icon/Icon";
 import { TextInput } from "../TextInput/TextInput";
 
 export type SelectOptionProps<T> = {
@@ -22,32 +23,61 @@ export const SingleSelector = <T extends string | number | UUID>({
   selectedOption,
 }: SelectProps<T>): JSX.Element => {
   const [search, setSearch] = useState<string>("");
+  const [folded, setFolded] = useState<boolean>(true);
 
   const filteredOptions = options.filter((option) =>
     option.label.toLowerCase().includes(search.toLowerCase())
   );
 
+  const handleOptionClick = (option: SelectOptionProps<T>) => {
+    onChange(option.value);
+    setFolded(true);
+  };
+
   return (
     <div className={styles.single_selector_wrapper}>
       <div className={styles.first_line_wrapper}>
-        <div>{selectedOption?.label}</div>
-        <TextInput
-          iconName="search"
-          label="Search"
-          inputValue={search}
-          setInputValue={setSearch}
-        />
-      </div>
-      <div>
-        {filteredOptions.map((option) => (
-          <div
-            key={option.value.toString()}
-            onClick={() => onChange(option.value)}
-          >
-            {option.label}
+        <div className={styles.left} onClick={() => setFolded(!folded)}>
+          <div className={styles.icon}>
+            <Icon
+              name={folded ? "chevronDown" : "chevronRight"}
+              size="normal"
+              color="black"
+            />
           </div>
-        ))}
+          <div
+            className={`
+            ${styles.label} 
+            ${!selectedOption ? styles.not_set : ""}
+            ${!selectedOption && !folded ? styles.unfolded_not_set : ""}
+            `}
+          >
+            {selectedOption?.label ?? "Choose a brain"}
+          </div>
+        </div>
+        {!folded && (
+          <div className={styles.right}>
+            <TextInput
+              label="Search..."
+              inputValue={search}
+              setInputValue={setSearch}
+              simple={true}
+            />
+          </div>
+        )}
       </div>
+      {!folded && (
+        <div className={styles.options}>
+          {filteredOptions.map((option) => (
+            <div
+              key={option.value.toString()}
+              onClick={() => handleOptionClick(option)}
+            >
+              {option.label}
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 };
