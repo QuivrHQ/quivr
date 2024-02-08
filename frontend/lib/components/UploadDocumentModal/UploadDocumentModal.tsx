@@ -1,4 +1,5 @@
 import { AnimatePresence, motion } from "framer-motion";
+import { useTranslation } from "react-i18next";
 
 import { KnowledgeToFeed } from "@/app/chat/[chatId]/components/ActionsBar/components";
 import { useActionBar } from "@/app/chat/[chatId]/components/ActionsBar/hooks/useActionBar";
@@ -12,6 +13,7 @@ export const UploadDocumentModal = (): JSX.Element => {
   const { shouldDisplayFeedCard, setShouldDisplayFeedCard } =
     useKnowledgeToFeedContext();
   const { setHasPendingRequests } = useActionBar();
+  const { t } = useTranslation(["knowledge"]);
 
   if (!shouldDisplayFeedCard) {
     return <></>;
@@ -21,6 +23,8 @@ export const UploadDocumentModal = (): JSX.Element => {
     <Modal
       isOpen={shouldDisplayFeedCard}
       setOpen={setShouldDisplayFeedCard}
+      title={t("addKnowledgeTitle", { ns: "knowledge" })}
+      desc={t("addKnowledgeSubtitle", { ns: "knowledge" })}
       CloseTrigger={<div />}
     >
       <div className={styles.knowledge_modal}>
