@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 
-import { Select } from "@/lib/components/ui/Select";
+import { SingleSelector } from "@/lib/components/ui/SingleSelector/SingleSelector";
 import { requiredRolesForUpload } from "@/lib/config/upload";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 
@@ -8,7 +8,7 @@ import styles from "./KnowledgeToFeed.module.scss";
 import { formatMinimalBrainsToSelectComponentInput } from "./utils/formatMinimalBrainsToSelectComponentInput";
 
 export const KnowledgeToFeed = (): JSX.Element => {
-  const { allBrains, setCurrentBrainId } = useBrainContext();
+  const { allBrains, setCurrentBrainId, currentBrain } = useBrainContext();
   const brainsWithUploadRights = formatMinimalBrainsToSelectComponentInput(
     useMemo(
       () =>
@@ -21,7 +21,15 @@ export const KnowledgeToFeed = (): JSX.Element => {
 
   return (
     <div className={styles.knowledge_to_feed_wrapper}>
-      <Select options={brainsWithUploadRights} onChange={setCurrentBrainId} />
+      <SingleSelector
+        options={brainsWithUploadRights}
+        onChange={setCurrentBrainId}
+        selectedOption={
+          currentBrain
+            ? { label: currentBrain.name, value: currentBrain.id }
+            : undefined
+        }
+      />
     </div>
   );
 };
