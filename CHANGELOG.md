@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.0.199 (2024-02-08)
+
+## What's Changed
+* feat: 🎸 telemetry by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2169
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.198...v0.0.199
+
 ## 0.0.197 (2024-02-07)
 
 ## What's Changed
