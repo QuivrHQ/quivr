@@ -1,3 +1,4 @@
+@use "@/styles/ScreenSizes.module.scss";
 @use "@/styles/Spacings.module.scss";
 
 .knowledge_to_feed_wrapper {
@@ -5,4 +6,12 @@
   flex-direction: column;
   padding-block: Spacings.$spacing05;
   width: 100%;
+
+  .single_selector_wrapper {
+    width: 50%;
+
+    @media (max-width: ScreenSizes.$small) {
+      width: 100%;
+    }
+  }
 }

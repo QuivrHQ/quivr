@@ -1,4 +1,9 @@
 import { UUID } from "crypto";
+import { useState } from "react";
+
+import styles from "./SingleSelector.module.scss";
+
+import { TextInput } from "../TextInput/TextInput";
 
 export type SelectOptionProps<T> = {
   label: string;
@@ -16,7 +21,33 @@ export const SingleSelector = <T extends string | number | UUID>({
   options,
   selectedOption,
 }: SelectProps<T>): JSX.Element => {
-  console.info(onChange, options, selectedOption);
+  const [search, setSearch] = useState<string>("");
 
-  return <div></div>;
+  const filteredOptions = options.filter((option) =>
+    option.label.toLowerCase().includes(search.toLowerCase())
+  );
+
+  return (
+    <div className={styles.single_selector_wrapper}>
+      <div className={styles.first_line_wrapper}>
+        <div>{selectedOption?.label}</div>
+        <TextInput
+          iconName="search"
+          label="Search"
+          inputValue={search}
+          setInputValue={setSearch}
+        />
+      </div>
+      <div>
+        {filteredOptions.map((option) => (
+          <div
+            key={option.value.toString()}
+            onClick={() => onChange(option.value)}
+          >
+            {option.label}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 };
