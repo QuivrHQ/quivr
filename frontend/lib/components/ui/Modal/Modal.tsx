@@ -19,6 +19,7 @@ type CommonModalProps = {
   CloseTrigger?: ReactNode;
   isOpen?: undefined;
   setOpen?: undefined;
+  bigModal?: boolean;
 };
 
 type ModalProps =
@@ -36,6 +37,7 @@ export const Modal = ({
   CloseTrigger,
   isOpen: customIsOpen,
   setOpen: customSetOpen,
+  bigModal,
 }: ModalProps): JSX.Element => {
   const [isOpen, setOpen] = useState(false);
   const { t } = useTranslation(["translation"]);
@@ -60,10 +62,12 @@ export const Modal = ({
               >
                 <Dialog.Content asChild forceMount>
                   <motion.div
+                    className={`${styles.modal_content_wrapper} ${
+                      bigModal ? styles.big_modal : ""
+                    }`}
                     initial={{ opacity: 0, y: "-40%" }}
                     animate={{ opacity: 1, y: "0%" }}
                     exit={{ opacity: 0, y: "40%" }}
-                    className={styles.modal_content_wrapper}
                   >
                     <Dialog.Title
                       className="m-0 text-2xl font-bold"

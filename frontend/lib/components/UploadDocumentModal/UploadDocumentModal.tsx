@@ -22,6 +22,7 @@ export const UploadDocumentModal = (): JSX.Element => {
       setOpen={setShouldDisplayFeedCard}
       title={t("addKnowledgeTitle", { ns: "knowledge" })}
       desc={t("addKnowledgeSubtitle", { ns: "knowledge" })}
+      bigModal={true}
       CloseTrigger={<div />}
     >
       <div className={styles.knowledge_modal}>
