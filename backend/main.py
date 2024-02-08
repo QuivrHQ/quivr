@@ -23,6 +23,7 @@ from modules.prompt.controller import prompt_router
 from modules.upload.controller import upload_router
 from modules.user.controller import user_router
 from packages.utils import handle_request_validation_error
+from packages.utils.telemetry import send_telemetry
 from routes.crawl_routes import crawl_router
 from routes.subscription_routes import subscription_router
 from sentry_sdk.integrations.fastapi import FastApiIntegration
@@ -78,6 +79,14 @@ async def http_exception_handler(_, exc):
 
 
 handle_request_validation_error(app)
+
+if os.getenv("TELEMETRY_ENABLED") == "true":
+    logger.info("Telemetry enabled, we use telemetry to collect anonymous usage data.")
+    logger.info(
+        "To disable telemetry, set the TELEMETRY_ENABLED environment variable to false."
+    )
+    send_telemetry("booting", {"status": "ok"})
+
 
 if __name__ == "__main__":
     # run main.py to debug backend

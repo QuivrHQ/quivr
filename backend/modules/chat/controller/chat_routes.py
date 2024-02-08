@@ -26,6 +26,7 @@ from modules.chat.entity.chat import Chat
 from modules.chat.service.chat_service import ChatService
 from modules.notification.service.notification_service import NotificationService
 from modules.user.entity.user_identity import UserIdentity
+from packages.utils.telemetry import send_telemetry
 from vectorstore.supabase import CustomSupabaseVectorStore
 
 logger = get_logger(__name__)
@@ -102,6 +103,8 @@ def get_answer_generator(
         models_settings=models_settings,
         model_name=model_to_use.name,
     )
+
+    send_telemetry("question_asked", {"model_name": model_to_use.name})
 
     gpt_answer_generator = chat_instance.get_answer_generator(
         chat_id=str(chat_id),
@@ -205,9 +208,9 @@ async def create_question_handler(
     request: Request,
     chat_question: ChatQuestion,
     chat_id: UUID,
-    brain_id: NullableUUID
-    | UUID
-    | None = Query(..., description="The ID of the brain"),
+    brain_id: NullableUUID | UUID | None = Query(
+        ..., description="The ID of the brain"
+    ),
     current_user: UserIdentity = Depends(get_current_user),
 ):
     try:
@@ -238,9 +241,9 @@ async def create_stream_question_handler(
     request: Request,
     chat_question: ChatQuestion,
     chat_id: UUID,
-    brain_id: NullableUUID
-    | UUID
-    | None = Query(..., description="The ID of the brain"),
+    brain_id: NullableUUID | UUID | None = Query(
+        ..., description="The ID of the brain"
+    ),
     current_user: UserIdentity = Depends(get_current_user),
 ) -> StreamingResponse:
     chat_instance = BrainfulChat()
