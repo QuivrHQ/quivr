@@ -7,11 +7,13 @@ import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainConte
 import { Tab } from "@/lib/types/Tab";
 
 import styles from "./KnowledgeToFeed.module.scss";
+import { FromDocuments } from "./components/FromDocuments/FromDocuments";
+import { FromWebsites } from "./components/FromWebsites/FromWebsites";
 import { formatMinimalBrainsToSelectComponentInput } from "./utils/formatMinimalBrainsToSelectComponentInput";
 
 export const KnowledgeToFeed = (): JSX.Element => {
   const { allBrains, setCurrentBrainId, currentBrain } = useBrainContext();
-  const [selectedTab, setSelectedTab] = useState("From document");
+  const [selectedTab, setSelectedTab] = useState("From documents");
   const brainsWithUploadRights = formatMinimalBrainsToSelectComponentInput(
     useMemo(
       () =>
@@ -25,8 +27,8 @@ export const KnowledgeToFeed = (): JSX.Element => {
   const knowledgesTabs: Tab[] = [
     {
       label: "From documents",
-      isSelected: selectedTab === "From document",
-      onClick: () => setSelectedTab("From document"),
+      isSelected: selectedTab === "From documents",
+      onClick: () => setSelectedTab("From documents"),
       iconName: "edit",
     },
     {
@@ -48,9 +50,15 @@ export const KnowledgeToFeed = (): JSX.Element => {
               ? { label: currentBrain.name, value: currentBrain.id }
               : undefined
           }
+          placeholder="Select a brain"
         />
       </div>
       <Tabs tabList={knowledgesTabs} />
+      <div className={styles.tabs_content_wrapper}>
+        {selectedTab === "From documents" && <FromDocuments />}
+        {selectedTab === "From websites" && <FromWebsites />}
+      </div>
+      <div>Uploaded Contents</div>
     </div>
   );
 };

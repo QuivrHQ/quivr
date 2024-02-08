@@ -3,7 +3,7 @@ import { useState } from "react";
 
 import styles from "./SingleSelector.module.scss";
 
-import Icon from "../Icon/Icon";
+import { Icon } from "../Icon/Icon";
 import { TextInput } from "../TextInput/TextInput";
 
 export type SelectOptionProps<T> = {
@@ -15,12 +15,14 @@ type SelectProps<T> = {
   options: SelectOptionProps<T>[];
   onChange: (option: T) => void;
   selectedOption: SelectOptionProps<T> | undefined;
+  placeholder: string;
 };
 
 export const SingleSelector = <T extends string | number | UUID>({
   onChange,
   options,
   selectedOption,
+  placeholder,
 }: SelectProps<T>): JSX.Element => {
   const [search, setSearch] = useState<string>("");
   const [folded, setFolded] = useState<boolean>(true);
@@ -36,7 +38,11 @@ export const SingleSelector = <T extends string | number | UUID>({
 
   return (
     <div className={styles.single_selector_wrapper}>
-      <div className={styles.first_line_wrapper}>
+      <div
+        className={`${styles.first_line_wrapper} ${
+          !folded ? styles.unfolded : ""
+        }`}
+      >
         <div className={styles.left} onClick={() => setFolded(!folded)}>
           <div className={styles.icon}>
             <Icon
@@ -49,10 +55,9 @@ export const SingleSelector = <T extends string | number | UUID>({
             className={`
             ${styles.label} 
             ${!selectedOption ? styles.not_set : ""}
-            ${!selectedOption && !folded ? styles.unfolded_not_set : ""}
             `}
           >
-            {selectedOption?.label ?? "Choose a brain"}
+            {selectedOption?.label ?? placeholder}
           </div>
         </div>
         {!folded && (
@@ -70,10 +75,14 @@ export const SingleSelector = <T extends string | number | UUID>({
         <div className={styles.options}>
           {filteredOptions.map((option) => (
             <div
+              className={styles.option}
               key={option.value.toString()}
               onClick={() => handleOptionClick(option)}
             >
-              {option.label}
+              <div className={styles.icon}>
+                <Icon name="brain" size="normal" color="black" />
+              </div>
+              <span className={styles.brain_name}>{option.label}</span>
             </div>
           ))}
         </div>

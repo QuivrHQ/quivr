@@ -7,6 +7,7 @@
 .single_selector_wrapper {
   display: flex;
   flex-direction: column;
+  position: relative;
 
   .first_line_wrapper {
     display: flex;
@@ -15,6 +16,10 @@
     border-radius: Radius.$normal;
     align-items: center;
     cursor: pointer;
+
+    &.unfolded {
+      border-radius: Radius.$normal Radius.$normal 0 0;
+    }
 
     &:hover {
       background-color: Colors.$lightest-grey;
@@ -59,6 +64,48 @@
 
       &.folded {
         display: none;
+      }
+    }
+  }
+
+  .options {
+    position: absolute;
+    background-color: Colors.$white;
+    width: 100%;
+    top: 100%;
+    border: 1px solid Colors.$normal-grey;
+    border-top: none;
+    border-radius: 0 0 Radius.$normal Radius.$normal;
+    overflow: hidden;
+
+    .option {
+      padding: Spacings.$spacing03;
+      cursor: pointer;
+      display: flex;
+      gap: Spacings.$spacing03;
+      align-items: center;
+      overflow: hidden;
+
+      &:hover {
+        background-color: Colors.$lightest-grey;
+
+        .brain_name {
+          background-color: Colors.$primary;
+          color: Colors.$white;
+        }
+      }
+
+      .icon {
+        width: IconSizes.$normal;
+      }
+
+      .brain_name {
+        @include Typography.EllipsisOverflow;
+        border: 1px solid Colors.$lightest-black;
+        border-radius: Radius.$small;
+        padding-inline: Spacings.$spacing05;
+        padding-block: Spacings.$spacing02;
+        white-space: nowrap;
       }
     }
   }

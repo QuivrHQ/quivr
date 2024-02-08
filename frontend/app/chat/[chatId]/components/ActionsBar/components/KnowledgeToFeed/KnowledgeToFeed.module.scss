@@ -10,9 +10,15 @@
 
   .single_selector_wrapper {
     width: 30%;
+    min-width: 250px;
 
     @media (max-width: ScreenSizes.$small) {
       width: 100%;
     }
+  }
+
+  .tabs_content_wrapper {
+    width: 100%;
+    height: 200px;
   }
 }

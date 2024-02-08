@@ -1,0 +1,18 @@
+@use "@/styles/Colors.module.scss";
+@use "@/styles/Radius.module.scss";
+@use "@/styles/Spacings.module.scss";
+
+.from_document_wrapper {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 1px dashed Colors.$lighter-grey;
+  border-radius: Radius.$big;
+
+  .input {
+    padding: Spacings.$spacing05;
+    cursor: pointer;
+  }
+}
