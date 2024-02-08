@@ -1,4 +1,3 @@
-import { AnimatePresence, motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
 
 import { KnowledgeToFeed } from "@/app/chat/[chatId]/components/ActionsBar/components";
@@ -26,16 +25,7 @@ export const UploadDocumentModal = (): JSX.Element => {
       CloseTrigger={<div />}
     >
       <div className={styles.knowledge_modal}>
-        <AnimatePresence>
-          <motion.div
-            key="slide"
-            initial={{ y: "100%", opacity: 0 }}
-            animate={{ y: 0, opacity: 1, transition: { duration: 0.2 } }}
-            exit={{ y: "100%", opacity: 0 }}
-          >
-            <KnowledgeToFeed />
-          </motion.div>
-        </AnimatePresence>
+        <KnowledgeToFeed />
       </div>
     </Modal>
   );
