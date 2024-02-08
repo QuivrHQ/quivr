@@ -1,0 +1,8 @@
+@use "@/styles/Spacings.module.scss";
+
+.knowledge_to_feed_wrapper {
+  display: flex;
+  flex-direction: column;
+  padding-block: Spacings.$spacing05;
+  width: 100%;
+}
