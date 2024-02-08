@@ -7,7 +7,9 @@ import { ReactNode, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { MdClose } from "react-icons/md";
 
-import Button from "./Button";
+import styles from "./Modal.module.scss";
+
+import Button from "../Button";
 
 type CommonModalProps = {
   title?: string;
@@ -51,7 +53,7 @@ export const Modal = ({
           <Dialog.Portal forceMount>
             <Dialog.Overlay asChild forceMount>
               <motion.div
-                className="z-[10000] py-20 fixed inset-0 flex justify-center overflow-auto cursor-pointer bg-black/50 backdrop-blur-sm"
+                className={styles.modal_container}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
@@ -61,7 +63,7 @@ export const Modal = ({
                     initial={{ opacity: 0, y: "-40%" }}
                     animate={{ opacity: 1, y: "0%" }}
                     exit={{ opacity: 0, y: "40%" }}
-                    className="w-[90vw] my-auto flex flex-col h-fit max-w-2xl rounded-xl bg-white dark:bg-black border border-black/10 dark:border-white/25 p-10 shadow-xl dark:shadow-primary/50 focus:outline-none cursor-auto"
+                    className={styles.modal_content_wrapper}
                   >
                     <Dialog.Title
                       className="m-0 text-2xl font-bold"
@@ -87,7 +89,7 @@ export const Modal = ({
                     </Dialog.Close>
                     <Dialog.Close asChild>
                       <button
-                        className="absolute top-0 p-5 right-0 inline-flex appearance-none items-center justify-center rounded-full focus:shadow-sm focus:outline-none"
+                        className={styles.close_button_wrapper}
                         aria-label="Close"
                       >
                         <MdClose />

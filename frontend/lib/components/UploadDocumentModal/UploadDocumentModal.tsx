@@ -5,7 +5,7 @@ import { useKnowledgeToFeedContext } from "@/lib/context/KnowledgeToFeedProvider
 
 import styles from "./UploadDocumentModal.module.scss";
 
-import { Modal } from "../ui/Modal";
+import { Modal } from "../ui/Modal/Modal";
 
 export const UploadDocumentModal = (): JSX.Element => {
   const { shouldDisplayFeedCard, setShouldDisplayFeedCard } =

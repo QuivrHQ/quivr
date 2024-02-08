@@ -1,7 +1,7 @@
 import { useTranslation } from "react-i18next";
 
 import Button from "@/lib/components/ui/Button";
-import { Modal } from "@/lib/components/ui/Modal";
+import { Modal } from "@/lib/components/ui/Modal/Modal";
 
 import { useBrainFormState } from "../../hooks/useBrainFormState";
 
