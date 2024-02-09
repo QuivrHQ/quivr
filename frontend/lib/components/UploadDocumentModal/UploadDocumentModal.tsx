@@ -1,6 +1,7 @@
 import { useTranslation } from "react-i18next";
 
 import { KnowledgeToFeed } from "@/app/chat/[chatId]/components/ActionsBar/components";
+import { useAddKnowledge } from "@/app/studio/[brainId]/components/BrainManagementTabs/components/KnowledgeOrSecretsTab/components/AddKnowledge/hooks/useAddKnowledge";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 import { useKnowledgeToFeedContext } from "@/lib/context/KnowledgeToFeedProvider/hooks/useKnowledgeToFeedContext";
 
@@ -13,6 +14,8 @@ export const UploadDocumentModal = (): JSX.Element => {
   const { shouldDisplayFeedCard, setShouldDisplayFeedCard, knowledgeToFeed } =
     useKnowledgeToFeedContext();
   const { currentBrain } = useBrainContext();
+  const { feedBrain } = useAddKnowledge();
+
   useKnowledgeToFeedContext();
   const { t } = useTranslation(["knowledge"]);
 
@@ -36,9 +39,7 @@ export const UploadDocumentModal = (): JSX.Element => {
             label="Feed Brain"
             color="primary"
             iconName="add"
-            onClick={() => {
-              console.info("feed");
-            }}
+            onClick={() => void feedBrain()}
             disabled={knowledgeToFeed.length === 0 || !currentBrain}
           />
         </div>
