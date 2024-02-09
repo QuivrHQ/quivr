@@ -61,11 +61,18 @@ export const KnowledgeToFeed = (): JSX.Element => {
         {selectedTab === "From documents" && <FromDocuments />}
         {selectedTab === "From websites" && <FromWebsites />}
       </div>
-      {knowledgeToFeed.map((knowledge, index) => (
-        <div key={index}>
-          <h2>{knowledge.source}</h2>
-        </div>
-      ))}
+      <div>
+        <span>Uploaded Knowledges:</span>
+        {knowledgeToFeed.map((knowledge, index) => (
+          <div className={styles.uploaded_knowledges} key={index}>
+            <span>
+              {knowledge.source === "crawl"
+                ? knowledge.url
+                : knowledge.file.name}
+            </span>
+          </div>
+        ))}
+      </div>
     </div>
   );
 };
