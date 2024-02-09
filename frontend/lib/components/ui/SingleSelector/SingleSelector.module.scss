@@ -41,7 +41,7 @@
         @include Typography.EllipsisOverflow;
         color: Colors.$white;
         background-color: Colors.$primary;
-        border-radius: Radius.$small;
+        border-radius: Radius.$normal;
         padding-inline: Spacings.$spacing05;
         padding-block: Spacings.$spacing02;
         white-space: nowrap;
@@ -77,7 +77,7 @@
     border-top: none;
     border-radius: 0 0 Radius.$normal Radius.$normal;
     overflow: hidden;
-    height: 180px;
+    max-height: 180px;
     overflow: scroll;
 
     .option {
