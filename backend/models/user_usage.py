@@ -89,7 +89,7 @@ class UserUsage(UserIdentity):
         self.supabase_db.increment_user_request_count(
             user_id=self.id,
             date=date,
-            number=current_requests_count + number,
+            number=daily_requests_count + number,
         )
 
         self.daily_requests_count = current_requests_count + number
