@@ -2,23 +2,31 @@
 @use "@/styles/IconSizes.module.scss";
 
 .small {
-  width: IconSizes.$small;
-  height: IconSizes.$small;
+  min-width: IconSizes.$small;
+  min-height: IconSizes.$small;
+  max-width: IconSizes.$small;
+  max-height: IconSizes.$small;
 }
 
 .normal {
-  width: IconSizes.$normal;
-  height: IconSizes.$normal;
+  min-width: IconSizes.$normal;
+  min-height: IconSizes.$normal;
+  max-width: IconSizes.$normal;
+  max-height: IconSizes.$normal;
 }
 
 .large {
-  width: IconSizes.$large;
-  height: IconSizes.$large;
+  min-width: IconSizes.$large;
+  min-height: IconSizes.$large;
+  max-width: IconSizes.$large;
+  max-height: IconSizes.$large;
 }
 
 .big {
-  width: IconSizes.$big;
-  height: IconSizes.$big;
+  min-width: IconSizes.$big;
+  min-height: IconSizes.$big;
+  max-width: IconSizes.$big;
+  max-height: IconSizes.$big;
 }
 
 .black {

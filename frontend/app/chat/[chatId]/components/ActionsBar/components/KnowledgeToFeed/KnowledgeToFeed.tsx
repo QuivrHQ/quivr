@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 
+import { Icon } from "@/lib/components/ui/Icon/Icon";
 import { SingleSelector } from "@/lib/components/ui/SingleSelector/SingleSelector";
 import { Tabs } from "@/lib/components/ui/Tabs/Tabs";
 import { requiredRolesForUpload } from "@/lib/config/upload";
@@ -62,16 +63,28 @@ export const KnowledgeToFeed = (): JSX.Element => {
         {selectedTab === "From websites" && <FromWebsites />}
       </div>
       <div>
-        <span>Uploaded Knowledges:</span>
-        {knowledgeToFeed.map((knowledge, index) => (
-          <div className={styles.uploaded_knowledges} key={index}>
-            <span>
-              {knowledge.source === "crawl"
-                ? knowledge.url
-                : knowledge.file.name}
-            </span>
-          </div>
-        ))}
+        <span className={styles.uploaded_knowledges_title}>
+          Uploaded Knowledges
+        </span>
+        <div className={styles.uploaded_knowledges}>
+          {knowledgeToFeed.map((knowledge, index) => (
+            <div className={styles.uploaded_knowledge} key={index}>
+              <div className={styles.left}>
+                <Icon
+                  name={knowledge.source === "crawl" ? "website" : "file"}
+                  size="small"
+                  color="black"
+                />
+                <span className={styles.label}>
+                  {knowledge.source === "crawl"
+                    ? knowledge.url
+                    : knowledge.file.name}
+                </span>
+              </div>
+              <Icon name="delete" size="normal" color="dangerous" />
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );

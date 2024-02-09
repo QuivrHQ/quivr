@@ -3,7 +3,9 @@
 @use "@/styles/ZIndexes.module.scss";
 
 .knowledge_modal {
+  position: relative;
   display: flex;
   background-color: Colors.$white;
   width: 100%;
+  flex: 1;
 }
