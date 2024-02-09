@@ -9,7 +9,6 @@
   padding-block: Spacings.$spacing05;
   width: 100%;
   gap: Spacings.$spacing05;
-  overflow: hidden;
 
   .single_selector_wrapper {
     width: 30%;
@@ -27,12 +26,15 @@
 
   .uploaded_knowledges_title {
     color: Colors.$dark-grey;
+    display: flex;
+    justify-content: space-between;
   }
 
   .uploaded_knowledges {
-    padding-top: Spacings.$spacing03;
+    padding: Spacings.$spacing03;
     display: flex;
     width: 100%;
+    overflow: scroll;
     flex-direction: column;
     gap: Spacings.$spacing02;
     overflow: scroll;

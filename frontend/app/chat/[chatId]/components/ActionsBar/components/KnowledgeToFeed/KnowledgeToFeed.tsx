@@ -63,9 +63,10 @@ export const KnowledgeToFeed = (): JSX.Element => {
         {selectedTab === "From websites" && <FromWebsites />}
       </div>
       <div>
-        <span className={styles.uploaded_knowledges_title}>
-          Uploaded Knowledges
-        </span>
+        <div className={styles.uploaded_knowledges_title}>
+          <span>Uploaded knowledges</span>
+          <span>{knowledgeToFeed.length}</span>
+        </div>
         <div className={styles.uploaded_knowledges}>
           {knowledgeToFeed.map((knowledge, index) => (
             <div className={styles.uploaded_knowledge} key={index}>
