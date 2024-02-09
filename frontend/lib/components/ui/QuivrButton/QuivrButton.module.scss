@@ -13,6 +13,7 @@
   border: 1.5px solid transparent;
   cursor: pointer;
   display: flex;
+  width: fit-content;
 
   &.primary {
     border-color: Colors.$primary;

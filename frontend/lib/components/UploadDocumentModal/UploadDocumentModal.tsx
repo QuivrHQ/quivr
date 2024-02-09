@@ -6,6 +6,7 @@ import { useKnowledgeToFeedContext } from "@/lib/context/KnowledgeToFeedProvider
 import styles from "./UploadDocumentModal.module.scss";
 
 import { Modal } from "../ui/Modal/Modal";
+import { QuivrButton } from "../ui/QuivrButton/QuivrButton";
 
 export const UploadDocumentModal = (): JSX.Element => {
   const { shouldDisplayFeedCard, setShouldDisplayFeedCard } =
@@ -27,6 +28,16 @@ export const UploadDocumentModal = (): JSX.Element => {
     >
       <div className={styles.knowledge_modal}>
         <KnowledgeToFeed />
+        <div className={styles.button}>
+          <QuivrButton
+            label="Feed Brain"
+            color="primary"
+            iconName="add"
+            onClick={() => {
+              console.info("feed");
+            }}
+          />
+        </div>
       </div>
     </Modal>
   );

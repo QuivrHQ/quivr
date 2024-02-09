@@ -5,7 +5,14 @@
 .knowledge_modal {
   position: relative;
   display: flex;
+  flex-direction: column;
+  justify-content: space-between;
   background-color: Colors.$white;
   width: 100%;
   flex: 1;
+
+  .button {
+    display: flex;
+    justify-content: flex-end;
+  }
 }
