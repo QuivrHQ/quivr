@@ -46,6 +46,7 @@ pytest = "*"
 ddtrace = "*"
 watchdog = "*"
 langchain-community = "*"
+pandasai = "*"
 
 [dev-packages]
 black = "*"

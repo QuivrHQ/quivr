@@ -11,6 +11,9 @@ from modules.brain.entity.brain_entity import RoleEnum
 from modules.brain.service.brain_authorization_service import (
     validate_brain_authorization,
 )
+from modules.brain.service.integration_brain_service import (
+    IntegrationBrainDescriptionService,
+)
 from modules.knowledge.dto.inputs import CreateKnowledgeProperties
 from modules.knowledge.service.knowledge_service import KnowledgeService
 from modules.notification.dto.inputs import (
@@ -29,6 +32,7 @@ upload_router = APIRouter()
 
 notification_service = NotificationService()
 knowledge_service = KnowledgeService()
+integration_description_repository = IntegrationBrainDescriptionService()
 
 
 @upload_router.get("/upload/healthz", tags=["Health"])
@@ -113,10 +117,30 @@ async def upload_file(
     added_knowledge = knowledge_service.add_knowledge(knowledge_to_add)
     logger.info(f"Knowledge {added_knowledge} added successfully")
 
-    process_file_and_notify.delay(
-        file_name=filename_with_brain_id,
-        file_original_name=uploadFile.filename,
-        brain_id=brain_id,
-        notification_id=upload_notification.id if upload_notification else None,
-    )
-    return {"message": "File processing has started."}
+    if (
+        not integration_description_repository.get_integration_description(
+            brain_id=brain_id
+        ).integration_name
+        == "Excel"
+    ):
+        process_file_and_notify.delay(
+            file_name=filename_with_brain_id,
+            file_original_name=uploadFile.filename,
+            brain_id=brain_id,
+            notification_id=upload_notification.id if upload_notification else None,
+        )
+        return {"message": "File processing has started."}
+    else:  # TODO to remove once cleaned Excel Upload
+        notification_message = {
+            "status": "success",
+            "message": "File uploaded successfully",
+            "name": uploadFile.filename,
+        }
+        notification_service.update_notification_by_id(
+            upload_notification.id if upload_notification else None,
+            NotificationUpdatableProperties(
+                status=NotificationsStatusEnum.Done,
+                message=str(notification_message),
+            ),
+        )
+        return {"message": "File uploaded successfully"}
