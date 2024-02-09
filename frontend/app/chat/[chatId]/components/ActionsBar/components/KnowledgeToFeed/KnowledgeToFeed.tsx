@@ -32,13 +32,13 @@ export const KnowledgeToFeed = (): JSX.Element => {
       label: "From documents",
       isSelected: selectedTab === "From documents",
       onClick: () => setSelectedTab("From documents"),
-      iconName: "edit",
+      iconName: "file",
     },
     {
       label: "From websites",
       isSelected: selectedTab === "From websites",
       onClick: () => setSelectedTab("From websites"),
-      iconName: "graph",
+      iconName: "website",
     },
   ];
 

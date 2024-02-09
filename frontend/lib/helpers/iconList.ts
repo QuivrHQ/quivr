@@ -35,6 +35,7 @@ import {
   MdUploadFile,
 } from "react-icons/md";
 import { RiHashtag } from "react-icons/ri";
+import { TbNetwork } from "react-icons/tb";
 import { VscGraph } from "react-icons/vsc";
 
 export const iconList: { [name: string]: IconType } = {
@@ -70,4 +71,5 @@ export const iconList: { [name: string]: IconType } = {
   upload: FiUpload,
   uploadFile: MdUploadFile,
   user: FaRegUserCircle,
+  website: TbNetwork,
 };
