@@ -8,4 +8,5 @@ export interface ButtonType {
   isLoading?: boolean;
   iconName: keyof typeof iconList;
   onClick: () => void;
+  disabled?: boolean;
 }

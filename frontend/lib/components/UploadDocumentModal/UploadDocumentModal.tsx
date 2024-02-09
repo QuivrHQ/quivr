@@ -1,6 +1,7 @@
 import { useTranslation } from "react-i18next";
 
 import { KnowledgeToFeed } from "@/app/chat/[chatId]/components/ActionsBar/components";
+import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 import { useKnowledgeToFeedContext } from "@/lib/context/KnowledgeToFeedProvider/hooks/useKnowledgeToFeedContext";
 
 import styles from "./UploadDocumentModal.module.scss";
@@ -9,8 +10,10 @@ import { Modal } from "../ui/Modal/Modal";
 import { QuivrButton } from "../ui/QuivrButton/QuivrButton";
 
 export const UploadDocumentModal = (): JSX.Element => {
-  const { shouldDisplayFeedCard, setShouldDisplayFeedCard } =
+  const { shouldDisplayFeedCard, setShouldDisplayFeedCard, knowledgeToFeed } =
     useKnowledgeToFeedContext();
+  const { currentBrain } = useBrainContext();
+  useKnowledgeToFeedContext();
   const { t } = useTranslation(["knowledge"]);
 
   if (!shouldDisplayFeedCard) {
@@ -36,6 +39,7 @@ export const UploadDocumentModal = (): JSX.Element => {
             onClick={() => {
               console.info("feed");
             }}
+            disabled={knowledgeToFeed.length === 0 || !currentBrain}
           />
         </div>
       </div>

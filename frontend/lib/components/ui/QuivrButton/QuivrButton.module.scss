@@ -34,6 +34,12 @@
       color: Colors.$white;
     }
   }
+
+  &.disabled {
+    border-color: Colors.$normal-grey;
+    pointer-events: none;
+    color: Colors.$normal-grey;
+  }
 }
 
 .icon_label {

@@ -77,6 +77,8 @@
     border-top: none;
     border-radius: 0 0 Radius.$normal Radius.$normal;
     overflow: hidden;
+    height: 180px;
+    overflow: scroll;
 
     .option {
       padding: Spacings.$spacing03;

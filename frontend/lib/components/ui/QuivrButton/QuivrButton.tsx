@@ -13,12 +13,17 @@ export const QuivrButton = ({
   color,
   isLoading,
   iconName,
+  disabled,
 }: ButtonType): JSX.Element => {
   const [hovered, setHovered] = useState<boolean>(false);
 
   return (
     <div
-      className={`${styles.button_wrapper} ${styles[color]}`}
+      className={`
+      ${styles.button_wrapper} 
+      ${styles[color]} 
+      ${disabled ? styles.disabled : ""}
+      `}
       onClick={onClick}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
@@ -28,7 +33,7 @@ export const QuivrButton = ({
           <Icon
             name={iconName}
             size="normal"
-            color={hovered ? "white" : color}
+            color={hovered ? "white" : disabled ? "grey" : color}
             handleHover={false}
           />
           <span className={styles.label}>{label}</span>
