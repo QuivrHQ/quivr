@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.0.200 (2024-02-09)
+
+## What's Changed
+* fix(daily-usage): Update daily requests count in UserUsage model by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2171
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.199...v0.0.200
+
 ## 0.0.199 (2024-02-08)
 
 ## What's Changed
