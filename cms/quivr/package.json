@@ -1,15 +1,18 @@
 {
   "name": "quivr",
-  "private": true,
   "version": "0.1.0",
+  "private": true,
   "description": "A Strapi application",
+  "license": "MIT",
+  "author": {
+    "name": "A Strapi developer"
+  },
   "scripts": {
+    "build": "strapi build",
     "develop": "strapi develop",
     "start": "strapi start",
-    "build": "strapi build",
     "strapi": "strapi"
   },
-  "devDependencies": {},
   "dependencies": {
     "@ckeditor/strapi-plugin-ckeditor": "0.0.9",
     "@strapi/plugin-i18n": "4.16.2",
@@ -21,15 +24,12 @@
     "pg": "8.11.3",
     "strapi-provider-email-resend": "1.0.4"
   },
-  "author": {
-    "name": "A Strapi developer"
-  },
-  "strapi": {
-    "uuid": "c2cbd510-4048-4ef6-b14c-0e3d74744031"
-  },
+  "devDependencies": {},
   "engines": {
     "node": "18.19.0",
     "npm": "10.2.5"
   },
-  "license": "MIT"
+  "strapi": {
+    "uuid": "c2cbd510-4048-4ef6-b14c-0e3d74744031"
+  }
 }
