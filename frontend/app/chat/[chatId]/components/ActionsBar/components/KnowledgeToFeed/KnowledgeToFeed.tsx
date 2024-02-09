@@ -16,7 +16,8 @@ import { formatMinimalBrainsToSelectComponentInput } from "./utils/formatMinimal
 export const KnowledgeToFeed = (): JSX.Element => {
   const { allBrains, setCurrentBrainId, currentBrain } = useBrainContext();
   const [selectedTab, setSelectedTab] = useState("From documents");
-  const { knowledgeToFeed } = useKnowledgeToFeedContext();
+  const { knowledgeToFeed, removeKnowledgeToFeed } =
+    useKnowledgeToFeedContext();
 
   const brainsWithUploadRights = formatMinimalBrainsToSelectComponentInput(
     useMemo(
@@ -82,7 +83,13 @@ export const KnowledgeToFeed = (): JSX.Element => {
                     : knowledge.file.name}
                 </span>
               </div>
-              <Icon name="delete" size="normal" color="dangerous" />
+              <Icon
+                name="delete"
+                size="normal"
+                color="dangerous"
+                handleHover={true}
+                onClick={() => removeKnowledgeToFeed(index)}
+              />
             </div>
           ))}
         </div>
