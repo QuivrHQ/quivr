@@ -24,6 +24,7 @@ export const UploadDocumentModal = (): JSX.Element => {
   const handleFeedBrain = async () => {
     setFeeding(true);
     await feedBrain();
+    setFeeding(false);
     setShouldDisplayFeedCard(false);
   };
 
