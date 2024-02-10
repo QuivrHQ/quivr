@@ -66,6 +66,7 @@ export const useKnowledgeToFeedInput = () => {
       } catch (e: unknown) {
         const errorParams = getAxiosErrorParams(e);
         if (errorParams !== undefined) {
+          console.info("2");
           publish({
             variant: "danger",
             text: t("uploadFailed", {
@@ -73,6 +74,7 @@ export const useKnowledgeToFeedInput = () => {
             }),
           });
         } else {
+          console.info("3");
           publish({
             variant: "danger",
             text: t("uploadFailed", {

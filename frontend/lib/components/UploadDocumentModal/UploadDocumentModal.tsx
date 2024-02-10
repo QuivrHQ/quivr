@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { KnowledgeToFeed } from "@/app/chat/[chatId]/components/ActionsBar/components";
@@ -15,9 +16,16 @@ export const UploadDocumentModal = (): JSX.Element => {
     useKnowledgeToFeedContext();
   const { currentBrain } = useBrainContext();
   const { feedBrain } = useAddKnowledge();
+  const [feeding, setFeeding] = useState<boolean>(false);
 
   useKnowledgeToFeedContext();
   const { t } = useTranslation(["knowledge"]);
+
+  const handleFeedBrain = async () => {
+    setFeeding(true);
+    await feedBrain();
+    setShouldDisplayFeedCard(false);
+  };
 
   if (!shouldDisplayFeedCard) {
     return <></>;
@@ -39,8 +47,9 @@ export const UploadDocumentModal = (): JSX.Element => {
             label="Feed Brain"
             color="primary"
             iconName="add"
-            onClick={() => void feedBrain()}
+            onClick={handleFeedBrain}
             disabled={knowledgeToFeed.length === 0 || !currentBrain}
+            isLoading={feeding}
           />
         </div>
       </div>

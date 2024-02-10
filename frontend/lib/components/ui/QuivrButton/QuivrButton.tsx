@@ -24,23 +24,24 @@ export const QuivrButton = ({
       ${styles[color]} 
       ${disabled ? styles.disabled : ""}
       `}
-      onClick={onClick}
+      // eslint-disable-next-line @typescript-eslint/no-misused-promises
+      onClick={() => onClick()}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
-      {!isLoading ? (
-        <div className={styles.icon_label}>
+      <div className={styles.icon_label}>
+        {!isLoading ? (
           <Icon
             name={iconName}
             size="normal"
             color={hovered ? "white" : disabled ? "grey" : color}
             handleHover={false}
           />
-          <span className={styles.label}>{label}</span>
-        </div>
-      ) : (
-        <LoaderIcon color="black" size="small" />
-      )}
+        ) : (
+          <LoaderIcon color="black" size="small" />
+        )}
+        <span className={styles.label}>{label}</span>
+      </div>
     </div>
   );
 };
