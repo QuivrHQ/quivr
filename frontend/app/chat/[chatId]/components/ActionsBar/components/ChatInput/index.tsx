@@ -5,7 +5,6 @@ import Icon from "@/lib/components/ui/Icon/Icon";
 import { LoaderIcon } from "@/lib/components/ui/LoaderIcon/LoaderIcon";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 
-import { OnboardingQuestions } from "./components";
 import { ChatEditor } from "./components/ChatEditor/ChatEditor";
 import { useChatInput } from "./hooks/useChatInput";
 import styles from "./index.module.scss";
@@ -23,8 +22,6 @@ export const ChatInput = (): JSX.Element => {
 
   return (
     <>
-      <OnboardingQuestions />
-
       <form
         data-testid="chat-input-form"
         onSubmit={(e) => {
