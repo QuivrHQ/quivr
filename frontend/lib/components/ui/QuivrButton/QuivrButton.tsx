@@ -38,7 +38,10 @@ export const QuivrButton = ({
             handleHover={false}
           />
         ) : (
-          <LoaderIcon color="black" size="small" />
+          <LoaderIcon
+            color={hovered ? "white" : disabled ? "grey" : color}
+            size="small"
+          />
         )}
         <span className={styles.label}>{label}</span>
       </div>
