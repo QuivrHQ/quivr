@@ -20,26 +20,22 @@ export const useAxios = (): { axiosInstance: AxiosInstance } => {
   axiosInstance.interceptors.request.use(
     async (value: InternalAxiosRequestConfig) => {
       // Check if the session is valid
-      if (
-        session &&
-        session.expires_at &&
-        session.expires_at * 1000 < Date.now()
-      ) {
+      if (session?.expires_at && session.expires_at * 1000 < Date.now()) {
         // If the session is not valid, refresh it
         const { data, error } = await supabase.auth.refreshSession();
         if (error) {
           throw error;
         }
-        session = data?.session;
+        session = data.session;
       }
 
-      value.headers = value.headers || {};
       value.headers["Authorization"] = `Bearer ${session?.access_token ?? ""}`;
 
       return value;
     },
     (error: AxiosError) => {
       console.error({ error });
+
       return Promise.reject(error);
     }
   );
