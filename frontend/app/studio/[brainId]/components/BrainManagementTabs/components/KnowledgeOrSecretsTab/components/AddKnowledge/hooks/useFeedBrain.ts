@@ -21,9 +21,11 @@ export const useFeedBrain = ({
   const { t } = useTranslation(["upload"]);
   let { brainId } = useUrlBrain();
   const { currentBrainId } = useBrainContext();
-  const { setKnowledgeToFeed, knowledgeToFeed } = useKnowledgeToFeedContext();
+  const { setKnowledgeToFeed, knowledgeToFeed, setShouldDisplayFeedCard } =
+    useKnowledgeToFeedContext();
   const [hasPendingRequests, setHasPendingRequests] = useState(false);
   const { handleFeedBrain } = useFeedBrainHandler();
+
   const { createChat, deleteChat } = useChatApi();
 
   const feedBrain = async (): Promise<void> => {
@@ -53,6 +55,7 @@ export const useFeedBrain = ({
       dispatchHasPendingRequests?.();
       closeFeedInput?.();
       setHasPendingRequests(true);
+      setShouldDisplayFeedCard(false);
       await handleFeedBrain({
         brainId,
         chatId: currentChatId,
