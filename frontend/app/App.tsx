@@ -8,7 +8,6 @@ import { PropsWithChildren, useEffect } from "react";
 import { BrainCreationProvider } from "@/lib/components/AddBrainModal/components/AddBrainSteps/brainCreation-provider";
 import { Menu } from "@/lib/components/Menu/Menu";
 import { useOutsideClickListener } from "@/lib/components/Menu/hooks/useOutsideClickListener";
-import { NotificationBanner } from "@/lib/components/NotificationBanner";
 import SearchModal from "@/lib/components/SearchModal/SearchModal";
 import {
   BrainProvider,
@@ -61,7 +60,6 @@ const App = ({ children }: PropsWithChildren): JSX.Element => {
         <div className="flex flex-1 flex-col overflow-auto">
           <SearchModalProvider>
             <SearchModal />
-            <NotificationBanner />
             <div className="relative h-full w-full flex justify-stretch items-stretch overflow-auto">
               <Menu />
               <div onClick={onClickOutside} className="flex-1 overflow-scroll">
