@@ -11,7 +11,7 @@ from langchain_core.messages import get_buffer_string
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate, PromptTemplate
 from langchain_core.runnables import RunnableParallel, RunnablePassthrough
-from langchain_openai import ChatOpenAI, OpenAIEmbeddings
+from langchain_openai import OpenAIEmbeddings
 from llm.utils.get_prompt_to_use import get_prompt_to_use
 from logger import get_logger
 from models import BrainSettings  # Importing settings related to the 'brain'
@@ -197,7 +197,7 @@ class QuivrRAG(BaseModel):
                 chat_history=lambda x: get_buffer_string(x["chat_history"])
             )
             | CONDENSE_QUESTION_PROMPT
-            | ChatOpenAI(temperature=0)
+            | ChatLiteLLM(temperature=0)
             | StrOutputParser(),
         )
 
@@ -207,6 +207,11 @@ class QuivrRAG(BaseModel):
             | self._combine_documents,
             "question": lambda x: x["standalone_question"],
         }
-        conversational_qa_chain = _inputs | _context | ANSWER_PROMPT | ChatOpenAI()
+        conversational_qa_chain = (
+            _inputs
+            | _context
+            | ANSWER_PROMPT
+            | ChatLiteLLM(model=self.model, max_tokens=self.max_tokens)
+        )
 
         return conversational_qa_chain
