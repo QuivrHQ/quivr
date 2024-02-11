@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.0.201 (2024-02-10)
+
+## What's Changed
+* fix: 🐛 session by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2174
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.200...v0.0.201
+
 ## 0.0.200 (2024-02-09)
 
 ## What's Changed
