@@ -131,7 +131,7 @@ redis==4.5.4; python_version >= '3.7'
 regex==2023.12.25; python_version >= '3.7'
 requests==2.31.0; python_version >= '3.7'
 requests-file==2.0.0
-resend==0.5.1; python_version >= '3.7'
+resend==0.7.2; python_version >= '3.7'
 rich==13.7.0; python_full_version >= '3.7.0'
 rsa==4.9; python_version >= '3.6' and python_version < '4'
 s3transfer==0.8.2; python_version >= '3.7'
