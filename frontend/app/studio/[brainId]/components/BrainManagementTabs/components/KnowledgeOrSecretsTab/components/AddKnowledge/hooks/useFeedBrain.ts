@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { useChatApi } from "@/lib/api/chat/useChatApi";
+import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 import { useKnowledgeToFeedContext } from "@/lib/context/KnowledgeToFeedProvider/hooks/useKnowledgeToFeedContext";
 import { useToast } from "@/lib/hooks";
 import { useUrlBrain } from "@/lib/hooks/useBrainIdFromUrl";
@@ -18,13 +19,17 @@ export const useFeedBrain = ({
 }) => {
   const { publish } = useToast();
   const { t } = useTranslation(["upload"]);
-  const { brainId } = useUrlBrain();
-  const { setKnowledgeToFeed, knowledgeToFeed } = useKnowledgeToFeedContext();
+  let { brainId } = useUrlBrain();
+  const { currentBrainId } = useBrainContext();
+  const { setKnowledgeToFeed, knowledgeToFeed, setShouldDisplayFeedCard } =
+    useKnowledgeToFeedContext();
   const [hasPendingRequests, setHasPendingRequests] = useState(false);
   const { handleFeedBrain } = useFeedBrainHandler();
+
   const { createChat, deleteChat } = useChatApi();
 
   const feedBrain = async (): Promise<void> => {
+    brainId ??= currentBrainId ?? undefined;
     if (brainId === undefined) {
       publish({
         variant: "danger",
@@ -50,6 +55,7 @@ export const useFeedBrain = ({
       dispatchHasPendingRequests?.();
       closeFeedInput?.();
       setHasPendingRequests(true);
+      setShouldDisplayFeedCard(false);
       await handleFeedBrain({
         brainId,
         chatId: currentChatId,

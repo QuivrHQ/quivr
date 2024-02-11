@@ -7,13 +7,25 @@
   border: 1px solid Colors.$lighter-grey;
   gap: Spacings.$spacing03;
   padding-block: Spacings.$spacing02;
-  padding-inline: Spacings.$spacing05;
+  padding-inline: Spacings.$spacing03;
   border-radius: Radius.$big;
   align-items: center;
+  width: 100%;
+
+  &.simple {
+    border: none;
+    padding: 0;
+
+    .text_input {
+      background-color: transparent;
+      width: 10px;
+    }
+  }
 
   .text_input {
     caret-color: Colors.$accent;
     border: none;
+    flex: 1;
 
     &:focus {
       box-shadow: none;

@@ -9,6 +9,7 @@ import {
   FaRegUserCircle,
   FaUnlock,
 } from "react-icons/fa";
+import { FiUpload } from "react-icons/fi";
 import { IoIosAdd, IoMdClose, IoMdLogOut } from "react-icons/io";
 import {
   IoArrowUpCircleOutline,
@@ -34,6 +35,7 @@ import {
   MdUploadFile,
 } from "react-icons/md";
 import { RiHashtag } from "react-icons/ri";
+import { TbNetwork } from "react-icons/tb";
 import { VscGraph } from "react-icons/vsc";
 
 export const iconList: { [name: string]: IconType } = {
@@ -66,6 +68,8 @@ export const iconList: { [name: string]: IconType } = {
   settings: IoSettingsSharp,
   star: FaRegStar,
   unlock: FaUnlock,
-  upload: MdUploadFile,
+  upload: FiUpload,
+  uploadFile: MdUploadFile,
   user: FaRegUserCircle,
+  website: TbNetwork,
 };

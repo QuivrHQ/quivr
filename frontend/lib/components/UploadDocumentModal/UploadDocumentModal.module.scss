@@ -1,9 +1,18 @@
 @use "@/styles/Colors.module.scss";
+@use "@/styles/Spacings.module.scss";
 @use "@/styles/ZIndexes.module.scss";
 
 .knowledge_modal {
+  position: relative;
   display: flex;
+  flex-direction: column;
+  justify-content: space-between;
   background-color: Colors.$white;
-  align-items: center;
-  justify-content: center;
+  width: 100%;
+  flex: 1;
+
+  .button {
+    display: flex;
+    justify-content: flex-end;
+  }
 }

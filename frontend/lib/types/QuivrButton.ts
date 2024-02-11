@@ -7,5 +7,6 @@ export interface ButtonType {
   color: Color;
   isLoading?: boolean;
   iconName: keyof typeof iconList;
-  onClick: () => void;
+  onClick: () => void | Promise<void>;
+  disabled?: boolean;
 }

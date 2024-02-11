@@ -50,7 +50,7 @@ const Studio = (): JSX.Element => {
       onClick: () => {
         setShouldDisplayFeedCard(true);
       },
-      iconName: "upload",
+      iconName: "uploadFile",
     },
   ];
 

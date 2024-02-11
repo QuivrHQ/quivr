@@ -13,6 +13,7 @@
   border: 1.5px solid transparent;
   cursor: pointer;
   display: flex;
+  width: fit-content;
 
   &.primary {
     border-color: Colors.$primary;
@@ -32,6 +33,12 @@
       background-color: Colors.$dangerous;
       color: Colors.$white;
     }
+  }
+
+  &.disabled {
+    border-color: Colors.$normal-grey;
+    pointer-events: none;
+    color: Colors.$normal-grey;
   }
 }
 

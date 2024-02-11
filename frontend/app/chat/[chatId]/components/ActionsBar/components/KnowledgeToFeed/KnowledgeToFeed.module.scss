@@ -1,0 +1,62 @@
+@use "@/styles/Colors.module.scss";
+@use "@/styles/ScreenSizes.module.scss";
+@use "@/styles/Spacings.module.scss";
+@use "@/styles/Typography.module.scss";
+
+.knowledge_to_feed_wrapper {
+  display: flex;
+  flex-direction: column;
+  padding-block: Spacings.$spacing05;
+  width: 100%;
+  gap: Spacings.$spacing05;
+
+  .single_selector_wrapper {
+    width: 30%;
+    min-width: 250px;
+
+    @media (max-width: ScreenSizes.$small) {
+      width: 100%;
+    }
+  }
+
+  .tabs_content_wrapper {
+    width: 100%;
+    height: 200px;
+  }
+
+  .uploaded_knowledges_title {
+    color: Colors.$dark-grey;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .uploaded_knowledges {
+    padding: Spacings.$spacing03;
+    display: flex;
+    width: 100%;
+    overflow: scroll;
+    flex-direction: column;
+    gap: Spacings.$spacing02;
+    overflow: scroll;
+
+    .uploaded_knowledge {
+      display: flex;
+      gap: Spacings.$spacing02;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      overflow: hidden;
+
+      .left {
+        display: flex;
+        align-items: center;
+        gap: Spacings.$spacing02;
+        overflow: hidden;
+
+        .label {
+          @include Typography.EllipsisOverflow;
+        }
+      }
+    }
+  }
+}

@@ -48,7 +48,7 @@ const SelectedChatPage = (): JSX.Element => {
       onClick: () => {
         setShouldDisplayFeedCard(true);
       },
-      iconName: "upload",
+      iconName: "uploadFile",
     },
     {
       label: "Manage current brain",

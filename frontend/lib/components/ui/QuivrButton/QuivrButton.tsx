@@ -13,29 +13,38 @@ export const QuivrButton = ({
   color,
   isLoading,
   iconName,
+  disabled,
 }: ButtonType): JSX.Element => {
   const [hovered, setHovered] = useState<boolean>(false);
 
   return (
     <div
-      className={`${styles.button_wrapper} ${styles[color]}`}
-      onClick={onClick}
+      className={`
+      ${styles.button_wrapper} 
+      ${styles[color]} 
+      ${disabled ? styles.disabled : ""}
+      `}
+      // eslint-disable-next-line @typescript-eslint/no-misused-promises
+      onClick={() => onClick()}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
-      {!isLoading ? (
-        <div className={styles.icon_label}>
+      <div className={styles.icon_label}>
+        {!isLoading ? (
           <Icon
             name={iconName}
             size="normal"
-            color={hovered ? "white" : color}
+            color={hovered ? "white" : disabled ? "grey" : color}
             handleHover={false}
           />
-          <span className={styles.label}>{label}</span>
-        </div>
-      ) : (
-        <LoaderIcon color="black" size="small" />
-      )}
+        ) : (
+          <LoaderIcon
+            color={hovered ? "white" : disabled ? "grey" : color}
+            size="small"
+          />
+        )}
+        <span className={styles.label}>{label}</span>
+      </div>
     </div>
   );
 };

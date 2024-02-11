@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import PageHeader from "@/lib/components/PageHeader/PageHeader";
-import { Modal } from "@/lib/components/ui/Modal";
+import { Modal } from "@/lib/components/ui/Modal/Modal";
 import QuivrButton from "@/lib/components/ui/QuivrButton/QuivrButton";
 import { Tabs } from "@/lib/components/ui/Tabs/Tabs";
 import { useSupabase } from "@/lib/context/SupabaseProvider";

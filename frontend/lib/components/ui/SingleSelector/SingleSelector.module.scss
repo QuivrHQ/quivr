@@ -1,0 +1,114 @@
+@use "@/styles/Colors.module.scss";
+@use "@/styles/IconSizes.module.scss";
+@use "@/styles/Radius.module.scss";
+@use "@/styles/Spacings.module.scss";
+@use "@/styles/Typography.module.scss";
+
+.single_selector_wrapper {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+
+  .first_line_wrapper {
+    display: flex;
+    justify-content: space-between;
+    border: 1px solid Colors.$normal-grey;
+    border-radius: Radius.$normal;
+    align-items: center;
+    cursor: pointer;
+
+    &.unfolded {
+      border-radius: Radius.$normal Radius.$normal 0 0;
+    }
+
+    &:hover {
+      background-color: Colors.$lightest-grey;
+    }
+
+    .left {
+      display: flex;
+      align-items: center;
+      gap: Spacings.$spacing03;
+      padding: Spacings.$spacing03;
+      overflow: hidden;
+      flex: 1;
+
+      .icon {
+        width: IconSizes.$normal;
+      }
+
+      .label {
+        @include Typography.EllipsisOverflow;
+        color: Colors.$white;
+        background-color: Colors.$primary;
+        border-radius: Radius.$normal;
+        padding-inline: Spacings.$spacing05;
+        padding-block: Spacings.$spacing02;
+        white-space: nowrap;
+
+        &.not_set {
+          color: Colors.$normal-grey;
+          background-color: transparent;
+          padding-inline: 0;
+        }
+
+        &.unfolded_not_set {
+          width: 0;
+        }
+      }
+    }
+
+    .right {
+      flex: 1;
+      max-width: 50%;
+
+      &.folded {
+        display: none;
+      }
+    }
+  }
+
+  .options {
+    position: absolute;
+    background-color: Colors.$white;
+    width: 100%;
+    top: 100%;
+    border: 1px solid Colors.$normal-grey;
+    border-top: none;
+    border-radius: 0 0 Radius.$normal Radius.$normal;
+    overflow: hidden;
+    max-height: 180px;
+    overflow: scroll;
+
+    .option {
+      padding: Spacings.$spacing03;
+      cursor: pointer;
+      display: flex;
+      gap: Spacings.$spacing03;
+      align-items: center;
+      overflow: hidden;
+
+      &:hover {
+        background-color: Colors.$lightest-grey;
+
+        .brain_name {
+          background-color: Colors.$primary;
+          color: Colors.$white;
+        }
+      }
+
+      .icon {
+        width: IconSizes.$normal;
+      }
+
+      .brain_name {
+        @include Typography.EllipsisOverflow;
+        border: 1px solid Colors.$lightest-black;
+        border-radius: Radius.$small;
+        padding-inline: Spacings.$spacing05;
+        padding-block: Spacings.$spacing02;
+        white-space: nowrap;
+      }
+    }
+  }
+}

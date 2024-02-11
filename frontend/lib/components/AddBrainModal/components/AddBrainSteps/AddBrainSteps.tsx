@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
 
-import { Modal } from "@/lib/components/ui/Modal";
+import { Modal } from "@/lib/components/ui/Modal/Modal";
 
 import { useBrainCreationContext } from "./brainCreation-provider";
 import { BrainKnowledgeStep } from "./components/BrainKnowledgeStep/BrainKnowledgeStep";
