@@ -50,6 +50,7 @@ template = """Answer the question based only on the following context from files
 {context}
 
 Question: {question}
+
 """
 ANSWER_PROMPT = ChatPromptTemplate.from_template(template)
 
@@ -106,7 +107,7 @@ class QuivrRAG(BaseModel):
         if self.brain_id and is_valid_uuid(self.brain_id):
             return get_prompt_to_use(UUID(self.brain_id), self.prompt_id)
         else:
-            return None
+            return "No Instructions."
 
     supabase_client: Optional[Client] = None
     vector_store: Optional[CustomSupabaseVectorStore] = None
