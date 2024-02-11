@@ -8,7 +8,7 @@ from pydantic import BaseModel, Extra
 class ApiBrainDefinitionSchemaProperty(BaseModel, extra=Extra.forbid):
     type: str
     description: str
-    enum: Optional[list]
+    enum: Optional[list] = None
     name: str
 
     def dict(self, **kwargs):
@@ -26,7 +26,7 @@ class ApiBrainDefinitionSchema(BaseModel, extra=Extra.forbid):
 class ApiBrainDefinitionSecret(BaseModel, extra=Extra.forbid):
     name: str
     type: str
-    description: Optional[str]
+    description: Optional[str] = None
 
 
 class ApiBrainAllowedMethods(str, Enum):

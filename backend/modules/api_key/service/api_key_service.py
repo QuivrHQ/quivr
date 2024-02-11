@@ -6,7 +6,6 @@ from modules.api_key.repository.api_key_interface import ApiKeysInterface
 from modules.api_key.repository.api_keys import ApiKeys
 from modules.user.entity.user_identity import UserIdentity
 from modules.user.service.user_service import UserService
-from pydantic import DateError
 
 logger = get_logger(__name__)
 
@@ -37,7 +36,8 @@ class ApiKeyService:
                 if api_key_creation_date.year == current_date.year:
                     return True
             return False
-        except DateError:
+        except Exception as e:
+            logger.error(f"Error verifying API key: {e}")
             return False
 
     async def get_user_from_api_key(
