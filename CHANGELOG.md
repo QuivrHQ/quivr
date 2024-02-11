@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.0.202 (2024-02-11)
+
+## What's Changed
+* fix(frontend): change placeholder in chat bar by @Zewed in https://github.com/QuivrHQ/quivr/pull/2177
+* fix(frontend): remove notification banner by @Zewed in https://github.com/QuivrHQ/quivr/pull/2178
+* fix(frontend): remove onboarding questions by @Zewed in https://github.com/QuivrHQ/quivr/pull/2176
+* feat(frontend): new modal for add knowledge by @Zewed in https://github.com/QuivrHQ/quivr/pull/2173
+* Revert "fix(frontend): remove onboarding questions" by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2181
+* fix(frontend): remove onboarding question by @Zewed in https://github.com/QuivrHQ/quivr/pull/2183
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.201...v0.0.202
+
 ## 0.0.201 (2024-02-10)
 
 ## What's Changed
