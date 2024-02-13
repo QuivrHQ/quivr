@@ -20,7 +20,13 @@ RUN apt-get clean && apt-get update && apt-get install -y \
     build-essential \
     libtool \
     python-dev \
-    build-essential && \
+    build-essential \
+    # Additional dependencies for document handling
+    libmagic-dev \
+    poppler-utils \
+    tesseract-ocr \
+    libreoffice \
+    pandoc && \
     rm -rf /var/lib/apt/lists/* && apt-get clean
 
 # Add Rust binaries to the PATH
