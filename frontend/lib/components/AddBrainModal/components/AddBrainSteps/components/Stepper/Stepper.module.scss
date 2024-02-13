@@ -1,6 +1,7 @@
 @use "@/styles/Colors.module.scss";
 @use "@/styles/Radius.module.scss";
 @use "@/styles/Spacings.module.scss";
+@use "@/styles/Typography.module.scss";
 
 .stepper_wrapper {
   display: flex;
@@ -36,6 +37,12 @@
       .circle {
         background-color: Colors.$success;
       }
+
+      .step_info {
+        .step_status {
+          color: Colors.$success;
+        }
+      }
     }
 
     &.current_step {
@@ -49,15 +56,37 @@
         width: 70%;
         height: 70%;
       }
+
+      .step_info {
+        .step_status {
+          color: Colors.$primary;
+        }
+      }
     }
 
     &.pending_step {
       .circle {
         background-color: Colors.$primary-light;
       }
+
+      .step_info {
+        .step_status {
+          color: Colors.$normal-grey;
+        }
+      }
     }
 
     .step_info {
+      margin-top: Spacings.$spacing03;
+      display: flex;
+      flex-direction: column;
+      font-size: Typography.$tiny;
+      width: 2.5rem;
+
+      .step_index {
+        white-space: nowrap;
+        color: Colors.$normal-grey;
+      }
     }
   }
 
@@ -71,10 +100,6 @@
 
     &.done {
       background-color: Colors.$success;
-    }
-
-    .step:nth-child(2) .bar {
-      height: 20px;
     }
   }
 }

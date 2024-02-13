@@ -7,8 +7,9 @@ import { useBrainCreationSteps } from "../../hooks/useBrainCreationSteps";
 export const Stepper = (): JSX.Element => {
   const { currentStep, steps } = useBrainCreationSteps();
 
-  const currentStepIndex =
-    steps.findIndex((step) => step.value === currentStep) + 1;
+  const currentStepIndex = steps.findIndex(
+    (step) => step.value === currentStep
+  );
 
   return (
     <div className={styles.stepper_wrapper}>
@@ -31,7 +32,16 @@ export const Stepper = (): JSX.Element => {
                 )}
               </div>
             </div>
-            <div className={styles.step_info}>Heyeyuyiuye</div>
+            <div className={styles.step_info}>
+              <span className={styles.step_index}>STEP {index + 1}</span>
+              <span className={styles.step_status}>
+                {index === currentStepIndex
+                  ? "Progress"
+                  : index < currentStepIndex
+                  ? "Completed"
+                  : "Pending"}
+              </span>
+            </div>
           </div>
           {index < steps.length - 1 && (
             <div

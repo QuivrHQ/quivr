@@ -1,56 +1,43 @@
-import { Fragment } from "react";
-import { useTranslation } from "react-i18next";
-import { FaArrowRight } from "react-icons/fa";
+import { iconList } from "@/lib/helpers/iconList";
 
-import Button from "@/lib/components/ui/Button";
-import { Radio } from "@/lib/components/ui/Radio";
+import { BrainTypeSelection } from "./BrainTypeSelection/BrainTypeSelection";
+import styles from "./BrainTypeSelectionStep.module.scss";
 
-import { useBrainTypeSelectionStep } from "./hooks/useBrainTypeSelectionStep";
-import { useKnowledgeSourceLabel } from "./hooks/useKnowledgeSourceLabel";
+interface BrainType {
+  name: string;
+  description: string;
+  iconName: keyof typeof iconList;
+}
 
-import { useBrainCreationSteps } from "../../hooks/useBrainCreationSteps";
-
-type BrainTypeSelectionStepProps = {
-  onCancelBrainCreation: () => void;
-};
-
-export const BrainTypeSelectionStep = ({
-  onCancelBrainCreation,
-}: BrainTypeSelectionStepProps): JSX.Element => {
-  const { knowledgeSourceOptions } = useKnowledgeSourceLabel();
-  const { register } = useBrainTypeSelectionStep();
-  const { goToNextStep, currentStep } = useBrainCreationSteps();
-  const { t } = useTranslation(["translation"]);
-  if (currentStep !== "BRAIN_TYPE") {
-    return <Fragment />;
-  }
+export const BrainTypeSelectionStep = (): JSX.Element => {
+  const brainTypes: BrainType[] = [
+    {
+      name: "Core Brain",
+      description: "Upload documents or website links to feed your brain.",
+      iconName: "feed",
+    },
+    {
+      name: "Sync Brain",
+      description:
+        "Connect to your tools and applications to interact with your data.",
+      iconName: "software",
+    },
+    {
+      name: "Custom Brain",
+      description:
+        "Explore your databases, converse with your APIs, and much more!",
+      iconName: "custom",
+    },
+  ];
 
   return (
-    <>
-      <Radio
-        items={knowledgeSourceOptions}
-        className="flex-1 justify-between"
-        {...register("brain_type")}
-      />
-      <div className="flex flex-row flex-1 justify-center w-full gap-48 mt-10">
-        <Button
-          type="button"
-          variant="tertiary"
-          onClick={onCancelBrainCreation}
-        >
-          {t("cancel")}
-        </Button>
-
-        <Button
-          className="bg-primary text-white py-2 border-none"
-          type="button"
-          data-testid="create-brain-submit-button"
-          onClick={goToNextStep}
-        >
-          {t("next")}
-          <FaArrowRight className="text-xl" size={16} />
-        </Button>
-      </div>
-    </>
+    <div className={styles.brain_types_wrapper}>
+      <span className={styles.title}>Choose a type of brain</span>
+      {brainTypes.map((brainType, index) => (
+        <div key={index} className={styles.brain_type}>
+          <BrainTypeSelection brainType={brainType} />
+        </div>
+      ))}
+    </div>
   );
 };

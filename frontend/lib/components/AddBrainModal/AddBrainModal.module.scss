@@ -3,10 +3,18 @@
 .add_brain_modal_container {
   display: flex;
   padding-top: Spacings.$spacing05;
+  flex-direction: column;
   width: 100%;
+  height: 100%;
 
   .stepper_container {
     width: 100%;
-    padding-inline: Spacings.$spacing12;
+    padding-inline: Spacings.$spacing08;
+  }
+
+  .content_wrapper {
+    flex-grow: 0.8;
+    display: flex;
+    align-items: center;
   }
 }
