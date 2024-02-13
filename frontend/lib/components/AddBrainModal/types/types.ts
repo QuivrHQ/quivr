@@ -15,4 +15,10 @@ export interface BrainType {
   description: string;
   iconName: keyof typeof iconList;
   disabled?: boolean;
+  onClick?: () => void;
 }
+
+export type Step = {
+  label: string;
+  value: BrainCreationStep;
+};

@@ -1,9 +1,14 @@
+import { useState } from "react";
+
 import { BrainType } from "@/lib/components/AddBrainModal/types/types";
+import QuivrButton from "@/lib/components/ui/QuivrButton/QuivrButton";
 
 import { BrainTypeSelection } from "./BrainTypeSelection/BrainTypeSelection";
 import styles from "./BrainTypeSelectionStep.module.scss";
 
 export const BrainTypeSelectionStep = (): JSX.Element => {
+  const [selectedIndex, setSelectedIndex] = useState<number>(0);
+
   const brainTypes: BrainType[] = [
     {
       name: "Core Brain",
@@ -26,14 +31,30 @@ export const BrainTypeSelectionStep = (): JSX.Element => {
     },
   ];
 
+  const next = (): void => {
+    console.info("nerxt");
+  };
+
   return (
     <div className={styles.brain_types_wrapper}>
       <span className={styles.title}>Choose a type of brain</span>
       {brainTypes.map((brainType, index) => (
-        <div key={index} className={styles.brain_type}>
-          <BrainTypeSelection brainType={brainType} />
+        <div key={index}>
+          <BrainTypeSelection
+            brainType={brainType}
+            selected={index === selectedIndex}
+            onClick={() => setSelectedIndex(index)}
+          />
         </div>
       ))}
+      <div className={styles.button}>
+        <QuivrButton
+          label="Next Step"
+          iconName="chevronRight"
+          color="primary"
+          onClick={() => next()}
+        />
+      </div>
     </div>
   );
 };

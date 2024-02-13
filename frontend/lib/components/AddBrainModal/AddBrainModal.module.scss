@@ -6,6 +6,7 @@
   flex-direction: column;
   width: 100%;
   height: 100%;
+  gap: Spacings.$spacing08;
 
   .stepper_container {
     width: 100%;
@@ -13,8 +14,6 @@
   }
 
   .content_wrapper {
-    flex-grow: 0.8;
-    display: flex;
-    align-items: center;
+    flex-grow: 1;
   }
 }
