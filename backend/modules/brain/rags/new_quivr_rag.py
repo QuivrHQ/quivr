@@ -7,28 +7,17 @@ from langchain.embeddings.ollama import OllamaEmbeddings
 from langchain.llms.base import BaseLLM
 from langchain.schema import format_document
 from langchain_community.chat_models import ChatLiteLLM
-<<<<<<< HEAD
-from langchain_core.messages import get_buffer_string
-from langchain_core.output_parsers import StrOutputParser
-from langchain_core.prompts import ChatPromptTemplate, PromptTemplate
-from langchain_core.runnables import RunnableParallel, RunnablePassthrough
-from langchain_openai import OpenAIEmbeddings
-||||||| parent of cd78c059 (feat: 🎸 lcel)
-from llm.prompts.CONDENSE_PROMPT import CONDENSE_QUESTION_PROMPT
-=======
 from langchain_core.messages import get_buffer_string
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate, PromptTemplate
 from langchain_core.runnables import RunnableParallel, RunnablePassthrough
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
->>>>>>> cd78c059 (feat: 🎸 lcel)
 from llm.utils.get_prompt_to_use import get_prompt_to_use
 from logger import get_logger
 from models import BrainSettings  # Importing settings related to the 'brain'
 from modules.brain.service.brain_service import BrainService
 from modules.chat.service.chat_service import ChatService
 from pydantic import BaseModel, ConfigDict
-from pydantic_settings import BaseSettings
 from supabase.client import Client, create_client
 from vectorstore.supabase import CustomSupabaseVectorStore
 
@@ -56,7 +45,7 @@ ANSWER_PROMPT = ChatPromptTemplate.from_template(template)
 # How we format documents
 
 DEFAULT_DOCUMENT_PROMPT = PromptTemplate.from_template(
-    template="File: {file_name} Content:  {page_content}"
+    template="File {file_name}: {page_content}"
 )
 
 
@@ -81,7 +70,7 @@ class QuivrRAG(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
     # Instantiate settings
-    brain_settings: BaseSettings = BrainSettings()
+    brain_settings = BrainSettings()  # type: ignore other parameters are optional
 
     # Default class attributes
     model: str = None  # pyright: ignore reportPrivateUsage=none
@@ -111,7 +100,7 @@ class QuivrRAG(BaseModel):
     supabase_client: Optional[Client] = None
     vector_store: Optional[CustomSupabaseVectorStore] = None
     qa: Optional[ConversationalRetrievalChain] = None
-    prompt_id: Optional[UUID] = None
+    prompt_id: Optional[UUID]
 
     def __init__(
         self,
@@ -190,47 +179,16 @@ class QuivrRAG(BaseModel):
         )
 
     def _combine_documents(
-        self, docs, document_prompt=DEFAULT_DOCUMENT_PROMPT, document_separator="\n\n"
+        docs, document_prompt=DEFAULT_DOCUMENT_PROMPT, document_separator="\n\n"
     ):
-        logger.info("docs: ", docs[0])
-        doc_strings = [format_document(doc[0], document_prompt) for doc in docs]
+        doc_strings = [format_document(doc, document_prompt) for doc in docs]
         return document_separator.join(doc_strings)
 
     def get_retriever(self):
         return self.vector_store.as_retriever()
-<<<<<<< HEAD
 
     def get_chain(self):
-        retriever_doc = self.get_retriever()
-
-        _inputs = RunnableParallel(
-            standalone_question=RunnablePassthrough.assign(
-                chat_history=lambda x: get_buffer_string(x["chat_history"])
-            )
-            | CONDENSE_QUESTION_PROMPT
-            | ChatLiteLLM(temperature=0)
-            | StrOutputParser(),
-        )
-
-        _context = {
-            "context": itemgetter("standalone_question")
-            | retriever_doc
-            | self._combine_documents,
-            "question": lambda x: x["standalone_question"],
-        }
-        conversational_qa_chain = (
-            _inputs
-            | _context
-            | ANSWER_PROMPT
-            | ChatLiteLLM(model=self.model, max_tokens=self.max_tokens)
-        )
-
-        return conversational_qa_chain
-||||||| parent of cd78c059 (feat: 🎸 lcel)
-=======
-
-    def get_chain(self):
-        retriever_doc = self.get_retriever()
+        retriever = self.get_retriever()
 
         _inputs = RunnableParallel(
             standalone_question=RunnablePassthrough.assign(
@@ -243,11 +201,10 @@ class QuivrRAG(BaseModel):
 
         _context = {
             "context": itemgetter("standalone_question")
-            | retriever_doc
+            | retriever
             | self._combine_documents,
             "question": lambda x: x["standalone_question"],
         }
         conversational_qa_chain = _inputs | _context | ANSWER_PROMPT | ChatOpenAI()
 
         return conversational_qa_chain
->>>>>>> cd78c059 (feat: 🎸 lcel)
