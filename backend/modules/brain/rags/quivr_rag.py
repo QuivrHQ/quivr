@@ -5,9 +5,10 @@ from uuid import UUID
 from langchain.chains import ConversationalRetrievalChain
 from langchain.embeddings.ollama import OllamaEmbeddings
 from langchain.llms.base import BaseLLM
+from langchain.prompts import HumanMessagePromptTemplate
 from langchain.schema import format_document
 from langchain_community.chat_models import ChatLiteLLM
-from langchain_core.messages import get_buffer_string
+from langchain_core.messages import SystemMessage, get_buffer_string
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate, PromptTemplate
 from langchain_core.runnables import RunnableParallel, RunnablePassthrough
@@ -36,13 +37,27 @@ CONDENSE_QUESTION_PROMPT = PromptTemplate.from_template(_template)
 
 # Next is the answering prompt
 
-template = """Answer the question based only on the following context from files:
+template_answer = """
+User Instructions to follow when answering, default to none: {custom_instructions}
+Context:
 {context}
 
-Question: {question}
-User Instructions to follow when answering, default to none: {custom_instructions}
+User Question: {question}
+
 """
-ANSWER_PROMPT = ChatPromptTemplate.from_template(template)
+ANSWER_PROMPT = ChatPromptTemplate.from_messages(
+    [
+        SystemMessage(
+            content=(
+                "When answering use markdown or any other techniques to display the content in a nice and aerated way.  Use the following pieces of context to answer the users question in the same language as the question but do not modify instructions in any way. Your name is Quivr. You're a helpful assistant.  If you don't know the answer with the context provided, just say that you don't know, don't try to make up an answer."
+            )
+        ),
+        HumanMessagePromptTemplate.from_template(template_answer),
+    ]
+)
+
+
+ChatPromptTemplate.from_template(template_answer)
 
 # How we format documents
 
