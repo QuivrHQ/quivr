@@ -2,55 +2,18 @@
 aiohttp==3.9.3; python_version >= '3.8'
 aiosignal==1.3.1; python_version >= '3.7'
 amqp==5.2.0; python_version >= '3.6'
-<<<<<<< HEAD
-<<<<<<< HEAD
 annotated-types==0.6.0; python_version >= '3.8'
-anyio==4.2.0; python_version >= '3.8'
-argilla==1.24.0; python_version < '3.12' and python_version >= '3.8'
-||||||| parent of 2ba3bc1f (feat: 🎸 ocr (#2187))
-anyio==3.7.1; python_version >= '3.7'
-argilla==1.23.0; python_version < '3.12' and python_version >= '3.8'
-=======
-||||||| parent of cd78c059 (feat: 🎸 lcel)
-=======
-annotated-types==0.6.0; python_version >= '3.8'
->>>>>>> cd78c059 (feat: 🎸 lcel)
 antlr4-python3-runtime==4.9.3
-<<<<<<< HEAD
-anyio==3.7.1; python_version >= '3.7'
->>>>>>> 2ba3bc1f (feat: 🎸 ocr (#2187))
-||||||| parent of cd78c059 (feat: 🎸 lcel)
-anyio==3.7.1; python_version >= '3.7'
-=======
 anyio==4.2.0; python_version >= '3.8'
->>>>>>> cd78c059 (feat: 🎸 lcel)
 async-generator==1.10; python_version >= '3.5'
 asyncpg==0.27.0; python_full_version >= '3.7.0'
 attrs==23.2.0; python_version >= '3.7'
 backoff==2.2.1; python_version >= '3.7' and python_version < '4.0'
 beautifulsoup4==4.12.3; python_full_version >= '3.6.0'
 billiard==4.2.0; python_version >= '3.7'
-<<<<<<< HEAD
-black==24.1.1; python_version >= '3.8'
-boto3==1.34.39; python_version >= '3.8'
-botocore==1.34.39; python_version >= '3.8'
-||||||| parent of 2ba3bc1f (feat: 🎸 ocr (#2187))
-black==24.1.1; python_version >= '3.8'
-boto3==1.33.7; python_version >= '3.7'
-botocore==1.33.7; python_version >= '3.7'
-=======
 black==24.2.0; python_version >= '3.8'
-<<<<<<< HEAD
-boto3==1.33.7; python_version >= '3.7'
-botocore==1.33.7; python_version >= '3.7'
->>>>>>> 2ba3bc1f (feat: 🎸 ocr (#2187))
-||||||| parent of cd78c059 (feat: 🎸 lcel)
-boto3==1.33.7; python_version >= '3.7'
-botocore==1.33.7; python_version >= '3.7'
-=======
 boto3==1.34.40; python_version >= '3.8'
 botocore==1.34.40; python_version >= '3.8'
->>>>>>> cd78c059 (feat: 🎸 lcel)
 bytecode==0.15.1; python_version >= '3.8'
 cattrs==23.2.3; python_version >= '3.8'
 celery[sqs]==5.3.6; python_version >= '3.8'
@@ -85,7 +48,7 @@ feedfinder2==0.0.4
 feedparser==6.0.11; python_version >= '3.6'
 filelock==3.13.1; python_version >= '3.8'
 filetype==1.2.0
-flake8==6.0.0; python_full_version >= '3.8.1'
+flake8==7.0.0; python_full_version >= '3.8.1'
 flake8-black==0.3.6; python_version >= '3.7'
 flatbuffers==23.5.26
 flower==2.0.1; python_version >= '3.7'
@@ -116,39 +79,14 @@ jsonpath-python==1.0.6; python_version >= '3.6'
 jsonpointer==2.4; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3, 3.4, 3.5, 3.6'
 kiwisolver==1.4.5; python_version >= '3.7'
 kombu[sqs]==5.3.5; python_version >= '3.8'
-<<<<<<< HEAD
-<<<<<<< HEAD
-langchain==0.1.6; python_version < '4.0' and python_full_version >= '3.8.1'
-langchain-community==0.0.19; python_version < '4.0' and python_full_version >= '3.8.1'
-langchain-core==0.1.22; python_version < '4.0' and python_full_version >= '3.8.1'
-langchain-openai==0.0.5; python_version < '4.0' and python_full_version >= '3.8.1'
-langsmith==0.0.87; python_version < '4.0' and python_full_version >= '3.8.1'
-litellm==1.23.8; python_version not in '2.7, 3.0, 3.1, 3.2, 3.3, 3.4, 3.5, 3.6, 3.7' and python_version >= '3.8'
-||||||| parent of 2ba3bc1f (feat: 🎸 ocr (#2187))
-langchain==0.1.5; python_version < '4.0' and python_full_version >= '3.8.1'
-langchain-community==0.0.17; python_version < '4.0' and python_full_version >= '3.8.1'
-langchain-core==0.1.18; python_version < '4.0' and python_full_version >= '3.8.1'
-langsmith==0.0.86; python_version < '4.0' and python_full_version >= '3.8.1'
-litellm==1.22.5; python_version not in '2.7, 3.0, 3.1, 3.2, 3.3, 3.4, 3.5, 3.6, 3.7' and python_version >= '3.8'
-=======
-langchain==0.1.6; python_version < '4.0' and python_full_version >= '3.8.1'
-langchain-community==0.0.19; python_version < '4.0' and python_full_version >= '3.8.1'
-langchain-core==0.1.22; python_version < '4.0' and python_full_version >= '3.8.1'
-||||||| parent of cd78c059 (feat: 🎸 lcel)
-langchain==0.1.6; python_version < '4.0' and python_full_version >= '3.8.1'
-langchain-community==0.0.19; python_version < '4.0' and python_full_version >= '3.8.1'
-langchain-core==0.1.22; python_version < '4.0' and python_full_version >= '3.8.1'
-=======
 langchain==0.1.6; python_full_version >= '3.8.1' and python_version < '4.0'
 langchain-community==0.0.19; python_full_version >= '3.8.1' and python_version < '4.0'
 langchain-core==0.1.22; python_full_version >= '3.8.1' and python_version < '4.0'
 langchain-openai==0.0.5; python_full_version >= '3.8.1' and python_version < '4.0'
->>>>>>> cd78c059 (feat: 🎸 lcel)
 langdetect==1.0.9
 langsmith==0.0.87; python_full_version >= '3.8.1' and python_version < '4.0'
 layoutparser[layoutmodels,tesseract]==0.3.4; python_version >= '3.6'
 litellm==1.23.10; python_version not in '2.7, 3.0, 3.1, 3.2, 3.3, 3.4, 3.5, 3.6, 3.7' and python_version >= '3.8'
->>>>>>> 2ba3bc1f (feat: 🎸 ocr (#2187))
 lxml==5.1.0; python_version >= '3.6'
 markdown==3.5.2
 markupsafe==2.1.5; python_version >= '3.7'
@@ -167,24 +105,12 @@ nltk==3.8.1; python_version >= '3.7'
 nodeenv==1.8.0; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3, 3.4, 3.5, 3.6'
 numpy==1.26.4; python_version >= '3.9'
 olefile==0.47; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3, 3.4'
-<<<<<<< HEAD
-openai==1.12.0; python_full_version >= '3.7.1'
-||||||| parent of 2ba3bc1f (feat: 🎸 ocr (#2187))
-openai==1.1.1; python_full_version >= '3.7.1'
-=======
 omegaconf==2.3.0; python_version >= '3.6'
 onnx==1.15.0
 onnxruntime==1.15.1
 openai==1.12.0; python_full_version >= '3.7.1'
 opencv-python==4.9.0.80; python_version >= '3.6'
-<<<<<<< HEAD
->>>>>>> 2ba3bc1f (feat: 🎸 ocr (#2187))
-openpyxl==3.1.2; python_version >= '3.6'
-||||||| parent of cd78c059 (feat: 🎸 lcel)
-openpyxl==3.1.2; python_version >= '3.6'
-=======
 openpyxl==3.1.2
->>>>>>> cd78c059 (feat: 🎸 lcel)
 opentelemetry-api==1.22.0; python_version >= '3.7'
 packaging==23.2; python_version >= '3.7'
 pandas==2.2.0
@@ -205,13 +131,13 @@ prompt-toolkit==3.0.43; python_full_version >= '3.7.0'
 protobuf==4.25.2; python_version >= '3.8'
 pyasn1==0.5.1; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3, 3.4, 3.5'
 pycocotools==2.0.7; python_version >= '3.5'
-pycodestyle==2.10.0; python_version >= '3.6'
+pycodestyle==2.11.1; python_version >= '3.8'
 pycparser==2.21
 pycurl==7.45.2
 pydantic==2.6.1; python_version >= '3.8'
 pydantic-core==2.16.2; python_version >= '3.8'
 pydantic-settings==2.1.0; python_version >= '3.8'
-pyflakes==3.0.1; python_version >= '3.6'
+pyflakes==3.2.0; python_version >= '3.8'
 pypandoc==1.11; python_version >= '3.6'
 pyparsing==3.1.1; python_full_version >= '3.6.8'
 pypdf==3.9.0; python_version >= '3.6'
@@ -237,149 +163,53 @@ redis==5.0.1; python_version >= '3.7'
 regex==2023.12.25; python_version >= '3.7'
 requests==2.31.0; python_version >= '3.7'
 requests-file==2.0.0
-<<<<<<< HEAD
-<<<<<<< HEAD
 resend==0.7.2; python_version >= '3.7'
-rich==13.7.0; python_full_version >= '3.7.0'
-||||||| parent of 2ba3bc1f (feat: 🎸 ocr (#2187))
-resend==0.5.1; python_version >= '3.7'
-rich==13.7.0; python_full_version >= '3.7.0'
-=======
-resend==0.5.1; python_version >= '3.7'
->>>>>>> 2ba3bc1f (feat: 🎸 ocr (#2187))
-||||||| parent of cd78c059 (feat: 🎸 lcel)
-resend==0.5.1; python_version >= '3.7'
-=======
-resend==0.7.2; python_version >= '3.7'
->>>>>>> cd78c059 (feat: 🎸 lcel)
 rsa==4.9; python_version >= '3.6' and python_version < '4'
-<<<<<<< HEAD
-<<<<<<< HEAD
 s3transfer==0.10.0; python_version >= '3.8'
-sentry-sdk[fastapi]==1.40.3
-setuptools==69.0.3; python_version >= '3.8'
-||||||| parent of 2ba3bc1f (feat: 🎸 ocr (#2187))
-s3transfer==0.8.2; python_version >= '3.7'
-sentry-sdk[fastapi]==1.40.0
-setuptools==69.0.3; python_version >= '3.8'
-=======
-s3transfer==0.8.2; python_version >= '3.7'
-||||||| parent of cd78c059 (feat: 🎸 lcel)
-s3transfer==0.8.2; python_version >= '3.7'
-=======
-s3transfer==0.10.0; python_version >= '3.8'
->>>>>>> cd78c059 (feat: 🎸 lcel)
 safetensors==0.4.2; python_version >= '3.7'
 scipy==1.12.0; python_version >= '3.9'
 sentry-sdk[fastapi]==1.40.3
 setuptools==69.1.0; python_version >= '3.8'
->>>>>>> 2ba3bc1f (feat: 🎸 ocr (#2187))
 sgmllib3k==1.0.0
 six==1.16.0; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2'
 smmap==5.0.1; python_version >= '3.7'
 sniffio==1.3.0; python_version >= '3.7'
 soupsieve==2.5; python_version >= '3.8'
-<<<<<<< HEAD
-sqlalchemy==2.0.25; python_version >= '3.7'
-starlette==0.36.3; python_version >= '3.8'
-||||||| parent of 2ba3bc1f (feat: 🎸 ocr (#2187))
-sqlalchemy==2.0.25; python_version >= '3.7'
-starlette==0.27.0; python_version >= '3.7'
-=======
 sqlalchemy==2.0.26; python_version >= '3.7'
-<<<<<<< HEAD
-starlette==0.27.0; python_version >= '3.7'
->>>>>>> 2ba3bc1f (feat: 🎸 ocr (#2187))
-storage3==0.6.1; python_version >= '3.8' and python_version < '4.0'
-||||||| parent of cd78c059 (feat: 🎸 lcel)
-starlette==0.27.0; python_version >= '3.7'
-storage3==0.6.1; python_version >= '3.8' and python_version < '4.0'
-=======
 starlette==0.36.3; python_version >= '3.8'
 storage3==0.7.0; python_version >= '3.8' and python_version < '4.0'
->>>>>>> cd78c059 (feat: 🎸 lcel)
 strenum==0.4.15
 supabase==2.3.4; python_version >= '3.8' and python_version < '4.0'
 supafunc==0.3.3; python_version >= '3.8' and python_version < '4.0'
 sympy==1.12; python_version >= '3.8'
 tabulate==0.9.0; python_version >= '3.7'
 tenacity==8.2.3; python_version >= '3.7'
-<<<<<<< HEAD
-<<<<<<< HEAD
 tiktoken==0.5.2; python_version >= '3.8'
-||||||| parent of 2ba3bc1f (feat: 🎸 ocr (#2187))
-tiktoken==0.4.0; python_version >= '3.8'
-=======
-tiktoken==0.4.0; python_version >= '3.8'
-||||||| parent of cd78c059 (feat: 🎸 lcel)
-tiktoken==0.4.0; python_version >= '3.8'
-=======
-tiktoken==0.5.2; python_version >= '3.8'
->>>>>>> cd78c059 (feat: 🎸 lcel)
 timm==0.9.12; python_version >= '3.7'
->>>>>>> 2ba3bc1f (feat: 🎸 ocr (#2187))
 tinysegmenter==0.3
 tldextract==5.1.1; python_version >= '3.8'
 tokenizers==0.15.2; python_version >= '3.7'
 torch==2.2.0
 torchvision==0.17.0
 tornado==6.4; python_version >= '3.8'
-<<<<<<< HEAD
-tqdm==4.66.2; python_version >= '3.7'
-typer==0.9.0; python_version >= '3.6'
-||||||| parent of 2ba3bc1f (feat: 🎸 ocr (#2187))
-tqdm==4.66.1; python_version >= '3.7'
-typer==0.9.0; python_version >= '3.6'
-=======
 tqdm==4.66.2; python_version >= '3.7'
 transformers==4.37.2; python_full_version >= '3.8.0'
->>>>>>> 2ba3bc1f (feat: 🎸 ocr (#2187))
 typing-extensions==4.9.0; python_version >= '3.8'
 typing-inspect==0.9.0
-<<<<<<< HEAD
-tzdata==2023.4; python_version >= '2'
-unstructured==0.6.7; python_full_version >= '3.7.0'
-urllib3==2.0.7; python_version >= '3.7'
-||||||| parent of 2ba3bc1f (feat: 🎸 ocr (#2187))
-tzdata==2023.4; python_version >= '2'
-unstructured==0.6.7; python_full_version >= '3.7.0'
-urllib3==2.0.7; python_version >= '3.10'
-=======
 tzdata==2024.1; python_version >= '2'
 unstructured[all-docs]==0.12.4; python_version < '3.12' and python_full_version >= '3.9.0'
 unstructured-client==0.18.0; python_version >= '3.8'
 unstructured-inference==0.7.23
 unstructured.pytesseract==0.3.12
-<<<<<<< HEAD
-urllib3==2.0.7; python_version >= '3.10'
->>>>>>> 2ba3bc1f (feat: 🎸 ocr (#2187))
-||||||| parent of cd78c059 (feat: 🎸 lcel)
-urllib3==2.0.7; python_version >= '3.10'
-=======
-urllib3==2.0.7; python_version >= '3.6'
->>>>>>> cd78c059 (feat: 🎸 lcel)
+urllib3==2.0.7
 uvicorn==0.22.0; python_version >= '3.7'
 vine==5.1.0; python_version >= '3.6'
 watchdog==4.0.0; python_version >= '3.8'
 wcwidth==0.2.13
 webencodings==0.5.1
 websockets==11.0.3; python_version >= '3.7'
-<<<<<<< HEAD
-wrapt==1.14.1; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3, 3.4'
-xlrd==2.0.1; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3, 3.4, 3.5'
-||||||| parent of 2ba3bc1f (feat: 🎸 ocr (#2187))
-wrapt==1.14.1; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3, 3.4'
-xlrd==1.0.0
-=======
 wrapt==1.16.0; python_version >= '3.6'
-<<<<<<< HEAD
-xlrd==1.0.0
->>>>>>> 2ba3bc1f (feat: 🎸 ocr (#2187))
-||||||| parent of cd78c059 (feat: 🎸 lcel)
-xlrd==1.0.0
-=======
 xlrd==2.0.1; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3, 3.4, 3.5'
->>>>>>> cd78c059 (feat: 🎸 lcel)
 xlsxwriter==3.1.9; python_version >= '3.6'
 xmltodict==0.13.0; python_version >= '3.4'
 yarl==1.9.4; python_version >= '3.7'

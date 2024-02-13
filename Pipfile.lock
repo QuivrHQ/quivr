@@ -1,19 +1,7 @@
 {
     "_meta": {
         "hash": {
-<<<<<<< HEAD
-<<<<<<< HEAD
-            "sha256": "214012b223b75ab59ae6ca94ab578a4ca8f307e0b07a5c53622183bc6c992617"
-||||||| parent of 2ba3bc1f (feat: 🎸 ocr (#2187))
-            "sha256": "972b2454ca508e88f502cb3236716f92c24b78d0cfe29fc0624f0da49f27f945"
-=======
-            "sha256": "becea0fb81efa32cb46e3aaad1318f8f95e9559418c8ca309fe9f568cb905e01"
->>>>>>> 2ba3bc1f (feat: 🎸 ocr (#2187))
-||||||| parent of cd78c059 (feat: 🎸 lcel)
-            "sha256": "becea0fb81efa32cb46e3aaad1318f8f95e9559418c8ca309fe9f568cb905e01"
-=======
             "sha256": "5057a263763a8c0a9a16c0d00d6cccafba3120b72846ab0426a84d7887a6c8ca"
->>>>>>> cd78c059 (feat: 🎸 lcel)
         },
         "pipfile-spec": 6,
         "requires": {
@@ -126,8 +114,6 @@
             "markers": "python_version >= '3.6'",
             "version": "==5.2.0"
         },
-<<<<<<< HEAD
-<<<<<<< HEAD
         "annotated-types": {
             "hashes": [
                 "sha256:0641064de18ba7a25dee8f96403ebc39113d0cb953a01429249d5c7564666a43",
@@ -136,26 +122,12 @@
             "markers": "python_version >= '3.8'",
             "version": "==0.6.0"
         },
-||||||| parent of 2ba3bc1f (feat: 🎸 ocr (#2187))
-=======
-||||||| parent of cd78c059 (feat: 🎸 lcel)
-=======
-        "annotated-types": {
-            "hashes": [
-                "sha256:0641064de18ba7a25dee8f96403ebc39113d0cb953a01429249d5c7564666a43",
-                "sha256:563339e807e53ffd9c267e99fc6d9ea23eb8443c08f112651963e24e22f84a5d"
-            ],
-            "markers": "python_version >= '3.8'",
-            "version": "==0.6.0"
-        },
->>>>>>> cd78c059 (feat: 🎸 lcel)
         "antlr4-python3-runtime": {
             "hashes": [
                 "sha256:f224469b4168294902bb1efa80a8bf7855f24c99aef99cbefc1bcd3cce77881b"
             ],
             "version": "==4.9.3"
         },
->>>>>>> 2ba3bc1f (feat: 🎸 ocr (#2187))
         "anyio": {
             "hashes": [
                 "sha256:745843b39e829e108e518c489b31dc757de7d2131d53fac32bd8df268227bfee",
@@ -164,26 +136,6 @@
             "markers": "python_version >= '3.8'",
             "version": "==4.2.0"
         },
-<<<<<<< HEAD
-        "argilla": {
-            "hashes": [
-                "sha256:76a45f9e576d1b503538a21383c860c693f50e010f1ee6fb4fddae978d3b5d2c",
-                "sha256:862a86439ef283a24a245d67ae92214861b45a28c5d6e7c9a1f15d0a0af44b05"
-            ],
-            "markers": "python_version < '3.12' and python_version >= '3.8'",
-            "version": "==1.24.0"
-        },
-||||||| parent of 2ba3bc1f (feat: 🎸 ocr (#2187))
-        "argilla": {
-            "hashes": [
-                "sha256:5d23cfe7429dba7d3eef8d25546984faa10082196484c32ec8e536610c47fb10",
-                "sha256:983bea03b9451870f3e5c5a014d17be53889291291df1e87273f8f0f9611e466"
-            ],
-            "markers": "python_version < '3.12' and python_version >= '3.8'",
-            "version": "==1.23.0"
-        },
-=======
->>>>>>> 2ba3bc1f (feat: 🎸 ocr (#2187))
         "async-generator": {
             "hashes": [
                 "sha256:01c7bf666359b4967d2cda0000cc2e4af16a0ae098cbffcb8472fb9e8ad6585b",
@@ -299,53 +251,21 @@
         },
         "boto3": {
             "hashes": [
-<<<<<<< HEAD
-                "sha256:35bcbecf1b5d3620c93f0062d2994177f8bda25a9d2cba144d6462793c16065b",
-                "sha256:476896e70d36c9134d4125834280c597c17b54bff4902baf2e5fcde74f8acec8"
-||||||| parent of cd78c059 (feat: 🎸 lcel)
-                "sha256:d12467fb3a64d359b0bda0570a8163a5859fcac13e786f2a3db0392523178556",
-                "sha256:eed0f7df91066b6ac63a53d16459ac082458d57061bedf766135d9e1c2b75a6b"
-=======
                 "sha256:49eb215e4142d441e26eedaf5d0b43065200f0849d82c904bc9a62d1328016cd",
                 "sha256:81d026ed8c8305b880c71f9f287f9b745b52bd358a91cfc133844c907db4d7ee"
->>>>>>> cd78c059 (feat: 🎸 lcel)
             ],
             "index": "pypi",
-<<<<<<< HEAD
-            "markers": "python_version >= '3.8'",
-            "version": "==1.34.39"
-||||||| parent of cd78c059 (feat: 🎸 lcel)
-            "markers": "python_version >= '3.7'",
-            "version": "==1.33.7"
-=======
             "markers": "python_version >= '3.8'",
             "version": "==1.34.40"
->>>>>>> cd78c059 (feat: 🎸 lcel)
         },
         "botocore": {
             "hashes": [
-<<<<<<< HEAD
-                "sha256:9f00bd5e4698bcdd37ce6e224a896baf58d209678ed92834944b767de9061cc5",
-                "sha256:e175360445424b83b0e28ae20d301b99cf44ff2c9d5ab1d8670899bec05a9753"
-||||||| parent of cd78c059 (feat: 🎸 lcel)
-                "sha256:71ec0e85b996cf9def3dd8f4ca6cb4a9fd3a614aa4c9c7cbf33f2f68e1d0649a",
-                "sha256:b2299bc13bb8c0928edc98bf4594deb14cba2357536120f63772027a16ce7374"
-=======
                 "sha256:a3edd774653a61a1b211e4ea88cdb1c2655ffcc7660ba77b41a4027b097d145d",
                 "sha256:cb794bdb5b3d41845749a182ec93cb1453560e52b97ae0ab43ace81deb011f6d"
->>>>>>> cd78c059 (feat: 🎸 lcel)
             ],
             "index": "pypi",
-<<<<<<< HEAD
-            "markers": "python_version >= '3.8'",
-            "version": "==1.34.39"
-||||||| parent of cd78c059 (feat: 🎸 lcel)
-            "markers": "python_version >= '3.7'",
-            "version": "==1.33.7"
-=======
             "markers": "python_version >= '3.8'",
             "version": "==1.34.40"
->>>>>>> cd78c059 (feat: 🎸 lcel)
         },
         "bytecode": {
             "hashes": [
@@ -887,12 +807,12 @@
         },
         "flake8": {
             "hashes": [
-                "sha256:3833794e27ff64ea4e9cf5d410082a8b97ff1a06c16aa3d2027339cd0f1195c7",
-                "sha256:c61007e76655af75e6785a931f452915b371dc48f56efd765247c8fe68f2b181"
+                "sha256:33f96621059e65eec474169085dc92bf26e7b2d47366b70be2f67ab80dc25132",
+                "sha256:a6dfbb75e03252917f2473ea9653f7cd799c3064e54d4c8140044c5c065f53c3"
             ],
             "index": "pypi",
             "markers": "python_full_version >= '3.8.1'",
-            "version": "==6.0.0"
+            "version": "==7.0.0"
         },
         "flake8-black": {
             "hashes": [
@@ -1449,27 +1369,7 @@
                 "sha256:d1263c2707ce18bb13654c88f891e53f39edec9b11ff7d0d0f23fd920927b2d6",
                 "sha256:deac12b3e42a08bbbaa2acf83d5f8dd2d5513256d8daf0e853e9d68ff4c99d79"
             ],
-<<<<<<< HEAD
-            "markers": "python_version < '4.0' and python_full_version >= '3.8.1'",
-<<<<<<< HEAD
-            "version": "==0.1.22"
-        },
-        "langchain-openai": {
-            "hashes": [
-                "sha256:93b37dfac274adad65e46d5d6e71411e00c6984bcc5e10f1d6bb58e7944dc01b",
-                "sha256:f317fee5b652949ad96ad7edf8ef7a044a6a3f0cc71d1e12f9d5261789fd68c4"
-            ],
-            "index": "pypi",
-            "markers": "python_version < '4.0' and python_full_version >= '3.8.1'",
-            "version": "==0.0.5"
-||||||| parent of 2ba3bc1f (feat: 🎸 ocr (#2187))
-            "version": "==0.1.18"
-=======
-||||||| parent of cd78c059 (feat: 🎸 lcel)
-            "markers": "python_version < '4.0' and python_full_version >= '3.8.1'",
-=======
             "markers": "python_full_version >= '3.8.1' and python_version < '4.0'",
->>>>>>> cd78c059 (feat: 🎸 lcel)
             "version": "==0.1.22"
         },
         "langchain-openai": {
@@ -1487,25 +1387,13 @@
                 "sha256:cbc1fef89f8d062739774bd51eda3da3274006b3661d199c2655f6b3f6d605a0"
             ],
             "version": "==1.0.9"
->>>>>>> 2ba3bc1f (feat: 🎸 ocr (#2187))
         },
         "langsmith": {
             "hashes": [
                 "sha256:36c4cc47e5b54be57d038036a30fb19ce6e4c73048cd7a464b8f25b459694d34",
                 "sha256:8903d3811b9fc89eb18f5961c8e6935fbd2d0f119884fbf30dc70b8f8f4121fc"
             ],
-<<<<<<< HEAD
-            "markers": "python_version < '4.0' and python_full_version >= '3.8.1'",
-<<<<<<< HEAD
-            "version": "==0.0.87"
-||||||| parent of 2ba3bc1f (feat: 🎸 ocr (#2187))
-            "version": "==0.0.86"
-=======
-||||||| parent of cd78c059 (feat: 🎸 lcel)
-            "markers": "python_version < '4.0' and python_full_version >= '3.8.1'",
-=======
             "markers": "python_full_version >= '3.8.1' and python_version < '4.0'",
->>>>>>> cd78c059 (feat: 🎸 lcel)
             "version": "==0.0.87"
         },
         "layoutparser": {
@@ -1519,30 +1407,15 @@
             ],
             "markers": "python_version >= '3.6'",
             "version": "==0.3.4"
->>>>>>> 2ba3bc1f (feat: 🎸 ocr (#2187))
         },
         "litellm": {
             "hashes": [
-<<<<<<< HEAD
-                "sha256:086edbc5b8b5a88ceebf667cb4f26720cd9faa58cad36c2e3bb990d23bdfe44c",
-                "sha256:f82aef617f886690ae943e12093c2b86cc69edeb89864e9a6a34666582b6cde8"
-||||||| parent of 2ba3bc1f (feat: 🎸 ocr (#2187))
-                "sha256:70d74f6abfa5c9efee16f4917d51597abf23fc453c68b7f74270642b20c87a9c",
-                "sha256:a86f10d1d9fb3c1a226821249c91e96489adf02a70a0bf5f9962ea4816c7e848"
-=======
                 "sha256:b26713d96fd76f1f4699d9e85f59a58db2554a4c2f506a559a12d3d0aaf99292",
                 "sha256:c4ee756646383c78280c932c5a3b85864cc2549733f577a9d7055e7edefe16df"
->>>>>>> 2ba3bc1f (feat: 🎸 ocr (#2187))
             ],
             "index": "pypi",
             "markers": "python_version not in '2.7, 3.0, 3.1, 3.2, 3.3, 3.4, 3.5, 3.6, 3.7' and python_version >= '3.8'",
-<<<<<<< HEAD
-            "version": "==1.23.8"
-||||||| parent of 2ba3bc1f (feat: 🎸 ocr (#2187))
-            "version": "==1.22.5"
-=======
             "version": "==1.23.10"
->>>>>>> 2ba3bc1f (feat: 🎸 ocr (#2187))
         },
         "lxml": {
             "hashes": [
@@ -2419,11 +2292,11 @@
         },
         "pycodestyle": {
             "hashes": [
-                "sha256:347187bdb476329d98f695c213d7295a846d1152ff4fe9bacb8a9590b8ee7053",
-                "sha256:8a4eaf0d0495c7395bdab3589ac2db602797d76207242c17d470186815706610"
+                "sha256:41ba0e7afc9752dfb53ced5489e89f8186be00e599e712660695b7a75ff2663f",
+                "sha256:44fe31000b2d866f2e41841b18528a505fbd7fef9017b04eff4e2648a0fadc67"
             ],
-            "markers": "python_version >= '3.6'",
-            "version": "==2.10.0"
+            "markers": "python_version >= '3.8'",
+            "version": "==2.11.1"
         },
         "pycparser": {
             "hashes": [
@@ -2542,11 +2415,11 @@
         },
         "pyflakes": {
             "hashes": [
-                "sha256:ec55bf7fe21fff7f1ad2f7da62363d749e2a470500eab1b555334b67aa1ef8cf",
-                "sha256:ec8b276a6b60bd80defed25add7e439881c19e64850afd9b346283d4165fd0fd"
+                "sha256:1c61603ff154621fb2a9172037d84dca3500def8c8b630657d1701f026f8af3f",
+                "sha256:84b5be138a2dfbb40689ca07e2152deb896a65c3a3e24c251c5c62489568074a"
             ],
-            "markers": "python_version >= '3.6'",
-            "version": "==3.0.1"
+            "markers": "python_version >= '3.8'",
+            "version": "==3.2.0"
         },
         "pypandoc": {
             "hashes": [
@@ -3674,13 +3547,6 @@
                 "sha256:c97dfde1f7bd43a71c8d2a58e369e9b2bf692d1334ea9f9cae55add7d0dd0f84",
                 "sha256:fdb6d215c776278489906c2f8916e6e7d4f5a9b602ccbcfdf7f016fc8da0596e"
             ],
-<<<<<<< HEAD
-            "markers": "python_version >= '3.7'",
-||||||| parent of cd78c059 (feat: 🎸 lcel)
-            "markers": "python_version >= '3.10'",
-=======
-            "markers": "python_version >= '3.6'",
->>>>>>> cd78c059 (feat: 🎸 lcel)
             "version": "==2.0.7"
         },
         "uvicorn": {

@@ -11,29 +11,9 @@ gitpython = "==3.1.36"
 pdf2image = "==1.16.3"
 nest-asyncio = "==1.5.6"
 pypdf = "==3.9.0"
-<<<<<<< HEAD
-supabase = "==1.1.0"
-<<<<<<< HEAD
-tiktoken = "*"
-unstructured = "==0.6.7"
-fastapi = "*"
-||||||| parent of 2ba3bc1f (feat: 🎸 ocr (#2187))
-tiktoken = "==0.4.0"
-unstructured = "==0.6.7"
-fastapi = "==0.95.2"
-=======
-tiktoken = "==0.4.0"
-fastapi = "==0.95.2"
->>>>>>> 2ba3bc1f (feat: 🎸 ocr (#2187))
-||||||| parent of cd78c059 (feat: 🎸 lcel)
-supabase = "==1.1.0"
-tiktoken = "==0.4.0"
-fastapi = "==0.95.2"
-=======
 supabase = "*"
 tiktoken = "*"
 fastapi = "*"
->>>>>>> cd78c059 (feat: 🎸 lcel)
 python-multipart = "==0.0.6"
 uvicorn = "==0.22.0"
 pypandoc = "==1.11"
@@ -65,19 +45,10 @@ pytest = "*"
 ddtrace = "*"
 watchdog = "*"
 langchain-community = "*"
-<<<<<<< HEAD
 langchain-openai = "*"
 pydantic-settings = "*"
-||||||| parent of 2ba3bc1f (feat: 🎸 ocr (#2187))
-=======
 unstructured = {extras = ["all-docs"], version = "*"}
-<<<<<<< HEAD
->>>>>>> 2ba3bc1f (feat: 🎸 ocr (#2187))
-||||||| parent of cd78c059 (feat: 🎸 lcel)
-=======
-langchain-openai = "*"
-pydantic-settings = "*"
->>>>>>> cd78c059 (feat: 🎸 lcel)
+
 
 [dev-packages]
 black = "*"
