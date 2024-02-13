@@ -12,6 +12,12 @@
   border-radius: Radius.$big;
   cursor: pointer;
 
+  &.disabled {
+    pointer-events: none;
+    background-color: Colors.$lightest-grey;
+    opacity: 0.6;
+  }
+
   .first_line_wrapper {
     display: flex;
     gap: Spacings.$spacing03;
