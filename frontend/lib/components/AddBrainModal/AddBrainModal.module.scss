@@ -1,0 +1,12 @@
+@use "@/styles/Spacings.module.scss";
+
+.add_brain_modal_container {
+  display: flex;
+  padding-top: Spacings.$spacing05;
+  width: 100%;
+
+  .stepper_container {
+    width: 100%;
+    padding-inline: Spacings.$spacing12;
+  }
+}

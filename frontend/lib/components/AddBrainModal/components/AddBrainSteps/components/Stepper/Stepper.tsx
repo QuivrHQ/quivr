@@ -1,3 +1,5 @@
+import { Icon } from "@/lib/components/ui/Icon/Icon";
+
 import styles from "./Stepper.module.scss";
 
 import { useBrainCreationSteps } from "../../hooks/useBrainCreationSteps";
@@ -23,10 +25,22 @@ export const Stepper = (): JSX.Element => {
             key={step.value}
           >
             <div className={styles.circle}>
-              {index < currentStepIndex ? "✔️" : index + 1}
+              <div className={styles.inside_circle}>
+                {index < currentStepIndex && (
+                  <Icon name="check" size="normal" color="white" />
+                )}
+              </div>
             </div>
+            <div className={styles.step_info}>Heyeyuyiuye</div>
           </div>
-          {index < steps.length - 1 && <div className={styles.bar}></div>}
+          {index < steps.length - 1 && (
+            <div
+              className={`
+              ${styles.bar} 
+              ${index < currentStepIndex ? styles.done : ""}
+              `}
+            ></div>
+          )}
         </>
       ))}
     </div>
