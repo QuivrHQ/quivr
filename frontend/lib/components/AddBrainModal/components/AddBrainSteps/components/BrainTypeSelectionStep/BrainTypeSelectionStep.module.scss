@@ -5,7 +5,6 @@
 .brain_types_wrapper {
   display: flex;
   justify-content: space-between;
-  row-gap: Spacings.$spacing05;
   flex-direction: column;
   width: 100%;
   padding-inline: Spacings.$spacing08;
@@ -15,8 +14,14 @@
     padding-inline: 0;
   }
 
-  .title {
-    @include Typography.H2;
+  .main_wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: Spacings.$spacing05;
+
+    .title {
+      @include Typography.H2;
+    }
   }
 
   .button {

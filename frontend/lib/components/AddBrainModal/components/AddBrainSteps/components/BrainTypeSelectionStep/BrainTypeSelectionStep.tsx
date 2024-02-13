@@ -37,16 +37,18 @@ export const BrainTypeSelectionStep = (): JSX.Element => {
 
   return (
     <div className={styles.brain_types_wrapper}>
-      <span className={styles.title}>Choose a type of brain</span>
-      {brainTypes.map((brainType, index) => (
-        <div key={index}>
-          <BrainTypeSelection
-            brainType={brainType}
-            selected={index === selectedIndex}
-            onClick={() => setSelectedIndex(index)}
-          />
-        </div>
-      ))}
+      <div className={styles.main_wrapper}>
+        <span className={styles.title}>Choose a type of brain</span>
+        {brainTypes.map((brainType, index) => (
+          <div key={index}>
+            <BrainTypeSelection
+              brainType={brainType}
+              selected={index === selectedIndex}
+              onClick={() => setSelectedIndex(index)}
+            />
+          </div>
+        ))}
+      </div>
       <div className={styles.button}>
         <QuivrButton
           label="Next Step"
