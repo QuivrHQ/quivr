@@ -40,7 +40,7 @@ template = """Answer the question based only on the following context from files
 {context}
 
 Question: {question}
-User Instructions to follow when answering, default to none: {user_instructions}
+User Instructions to follow when answering, default to none: {custom_instructions}
 """
 ANSWER_PROMPT = ChatPromptTemplate.from_template(template)
 
@@ -92,7 +92,6 @@ class QuivrRAG(BaseModel):
         else:
             return OpenAIEmbeddings()
 
-    @property
     def prompt_to_use(self):
         if self.brain_id and is_valid_uuid(self.brain_id):
             return get_prompt_to_use(UUID(self.brain_id), self.prompt_id)
@@ -183,7 +182,6 @@ class QuivrRAG(BaseModel):
     def _combine_documents(
         self, docs, document_prompt=DEFAULT_DOCUMENT_PROMPT, document_separator="\n\n"
     ):
-        logger.info("docs: ", docs[0])
         doc_strings = [format_document(doc[0], document_prompt) for doc in docs]
         return document_separator.join(doc_strings)
 
@@ -202,13 +200,17 @@ class QuivrRAG(BaseModel):
             | StrOutputParser(),
         )
 
-        prompt_custom_user = self.prompt_to_use
+        prompt_custom_user = self.prompt_to_use()
+        prompt_to_use = "None"
+        if prompt_custom_user:
+            prompt_to_use = prompt_custom_user.content
+        logger.info(f"Prompt to use: {prompt_custom_user}")
         _context = {
             "context": itemgetter("standalone_question")
             | retriever_doc
             | self._combine_documents,
             "question": lambda x: x["standalone_question"],
-            "user_instructions": lambda x: prompt_custom_user or "none",
+            "custom_instructions": lambda x: prompt_to_use,
         }
 
         conversational_qa_chain = _inputs | _context | ANSWER_PROMPT | ChatOpenAI()
