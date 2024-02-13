@@ -1,0 +1,14 @@
+@use "@/styles/Spacings.module.scss";
+
+.brain_main_infos_wrapper {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+  padding-inline: Spacings.$spacing08;
+
+  .buttons_wrapper {
+    display: flex;
+    justify-content: space-between;
+  }
+}
