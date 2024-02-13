@@ -97,7 +97,7 @@ class QuivrRAG(BaseModel):
         if self.brain_id and is_valid_uuid(self.brain_id):
             return get_prompt_to_use(UUID(self.brain_id), self.prompt_id)
         else:
-            return "No Instructions."
+            return None
 
     supabase_client: Optional[Client] = None
     vector_store: Optional[CustomSupabaseVectorStore] = None
@@ -202,13 +202,15 @@ class QuivrRAG(BaseModel):
             | StrOutputParser(),
         )
 
+        prompt_custom_user = self.prompt_to_use
         _context = {
             "context": itemgetter("standalone_question")
             | retriever_doc
             | self._combine_documents,
             "question": lambda x: x["standalone_question"],
-            "user_instructions": "totaly optional",
+            "user_instructions": lambda x: prompt_custom_user or "none",
         }
+
         conversational_qa_chain = _inputs | _context | ANSWER_PROMPT | ChatOpenAI()
 
         return conversational_qa_chain
