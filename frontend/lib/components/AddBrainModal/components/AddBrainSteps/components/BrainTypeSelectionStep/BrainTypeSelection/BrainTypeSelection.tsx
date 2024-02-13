@@ -1,15 +1,9 @@
 import { useState } from "react";
 
+import { BrainType } from "@/lib/components/AddBrainModal/types/types";
 import Icon from "@/lib/components/ui/Icon/Icon";
-import { iconList } from "@/lib/helpers/iconList";
 
 import styles from "./BrainTypeSelection.module.scss";
-
-interface BrainType {
-  name: string;
-  description: string;
-  iconName: keyof typeof iconList;
-}
 
 export const BrainTypeSelection = ({
   brainType,
@@ -20,7 +14,10 @@ export const BrainTypeSelection = ({
 
   return (
     <div
-      className={styles.brain_type_wrapper}
+      className={`
+      ${styles.brain_type_wrapper} 
+      ${brainType.disabled && styles.disabled}
+      `}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >

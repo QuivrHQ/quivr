@@ -1,13 +1,7 @@
-import { iconList } from "@/lib/helpers/iconList";
+import { BrainType } from "@/lib/components/AddBrainModal/types/types";
 
 import { BrainTypeSelection } from "./BrainTypeSelection/BrainTypeSelection";
 import styles from "./BrainTypeSelectionStep.module.scss";
-
-interface BrainType {
-  name: string;
-  description: string;
-  iconName: keyof typeof iconList;
-}
 
 export const BrainTypeSelectionStep = (): JSX.Element => {
   const brainTypes: BrainType[] = [
@@ -17,16 +11,18 @@ export const BrainTypeSelectionStep = (): JSX.Element => {
       iconName: "feed",
     },
     {
-      name: "Sync Brain",
+      name: "Sync Brain - Coming soon!",
       description:
         "Connect to your tools and applications to interact with your data.",
       iconName: "software",
+      disabled: true,
     },
     {
-      name: "Custom Brain",
+      name: "Custom Brain - Coming soon!",
       description:
         "Explore your databases, converse with your APIs, and much more!",
       iconName: "custom",
+      disabled: true,
     },
   ];
 

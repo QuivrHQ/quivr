@@ -1,6 +1,6 @@
 import { useFormContext } from "react-hook-form";
 
-import { CreateBrainProps } from "@/lib/components/AddBrainModal/types";
+import { CreateBrainProps } from "@/lib/components/AddBrainModal/types/types";
 
 import { defaultParamDefinitionRow } from "../config";
 import { mapApiBrainDefinitionSchemaToParameterDefinition } from "../utils/mapApiBrainDefinitionSchemaToParameterDefinition";

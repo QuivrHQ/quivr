@@ -18,7 +18,7 @@
     align-items: center;
 
     .name {
-      @include Typography.H2;
+      @include Typography.H3;
     }
   }
 

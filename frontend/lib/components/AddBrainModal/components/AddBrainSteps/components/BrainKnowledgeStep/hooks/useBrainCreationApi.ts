@@ -5,7 +5,7 @@ import { useTranslation } from "react-i18next";
 
 import { PUBLIC_BRAINS_KEY } from "@/lib/api/brain/config";
 import { useBrainApi } from "@/lib/api/brain/useBrainApi";
-import { CreateBrainProps } from "@/lib/components/AddBrainModal/types";
+import { CreateBrainProps } from "@/lib/components/AddBrainModal/types/types";
 import { useKnowledgeToFeedInput } from "@/lib/components/KnowledgeToFeedInput/hooks/useKnowledgeToFeedInput.ts";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 import { useKnowledgeToFeedContext } from "@/lib/context/KnowledgeToFeedProvider/hooks/useKnowledgeToFeedContext";

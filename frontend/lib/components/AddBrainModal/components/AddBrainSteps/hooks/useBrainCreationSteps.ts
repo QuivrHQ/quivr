@@ -1,7 +1,7 @@
 import { useFormContext } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 
-import { CreateBrainProps } from "@/lib/components/AddBrainModal/types";
+import { CreateBrainProps } from "@/lib/components/AddBrainModal/types/types";
 
 import { Step } from "../types";
 

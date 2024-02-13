@@ -8,7 +8,7 @@ import styles from "./AddBrainModal.module.scss";
 import { useBrainCreationContext } from "./components/AddBrainSteps/brainCreation-provider";
 import { BrainTypeSelectionStep } from "./components/AddBrainSteps/components/BrainTypeSelectionStep/BrainTypeSelectionStep";
 import { Stepper } from "./components/AddBrainSteps/components/Stepper/Stepper";
-import { CreateBrainProps } from "./types";
+import { CreateBrainProps } from "./types/types";
 
 export const AddBrainModal = (): JSX.Element => {
   const { t } = useTranslation(["translation", "brain", "config"]);
