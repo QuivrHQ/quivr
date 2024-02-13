@@ -1,9 +1,10 @@
 import { useFormContext } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 
-import { CreateBrainProps } from "@/lib/components/AddBrainModal/types/types";
-
-import { Step } from "../types";
+import {
+  CreateBrainProps,
+  Step,
+} from "@/lib/components/AddBrainModal/types/types";
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const useBrainCreationSteps = () => {

@@ -6,8 +6,11 @@ import QuivrButton from "@/lib/components/ui/QuivrButton/QuivrButton";
 import { BrainTypeSelection } from "./BrainTypeSelection/BrainTypeSelection";
 import styles from "./BrainTypeSelectionStep.module.scss";
 
+import { useBrainCreationSteps } from "../../hooks/useBrainCreationSteps";
+
 export const BrainTypeSelectionStep = (): JSX.Element => {
   const [selectedIndex, setSelectedIndex] = useState<number>(0);
+  const { goToNextStep, currentStepIndex } = useBrainCreationSteps();
 
   const brainTypes: BrainType[] = [
     {
@@ -32,8 +35,12 @@ export const BrainTypeSelectionStep = (): JSX.Element => {
   ];
 
   const next = (): void => {
-    console.info("nerxt");
+    goToNextStep();
   };
+
+  if (currentStepIndex !== 0) {
+    return <></>;
+  }
 
   return (
     <div className={styles.brain_types_wrapper}>
