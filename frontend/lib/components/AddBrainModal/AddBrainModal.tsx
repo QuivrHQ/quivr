@@ -1,11 +1,19 @@
 import { FormProvider, useForm } from "react-hook-form";
+import { useTranslation } from "react-i18next";
 
+import { Modal } from "@/lib/components/ui/Modal/Modal";
 import { addBrainDefaultValues } from "@/lib/config/defaultBrainConfig";
 
-import { AddBrainSteps } from "./components/AddBrainSteps/AddBrainSteps";
+import { useBrainCreationContext } from "./components/AddBrainSteps/brainCreation-provider";
+import { Stepper } from "./components/AddBrainSteps/components/Stepper/Stepper";
 import { CreateBrainProps } from "./types";
 
 export const AddBrainModal = (): JSX.Element => {
+  const { t } = useTranslation(["translation", "brain", "config"]);
+
+  const { isBrainCreationModalOpened, setIsBrainCreationModalOpened } =
+    useBrainCreationContext();
+
   const defaultValues: CreateBrainProps = {
     ...addBrainDefaultValues,
     setDefault: true,
@@ -18,7 +26,16 @@ export const AddBrainModal = (): JSX.Element => {
 
   return (
     <FormProvider {...methods}>
-      <AddBrainSteps />
+      <Modal
+        title={t("newBrainTitle", { ns: "brain" })}
+        desc={t("newBrainSubtitle", { ns: "brain" })}
+        isOpen={isBrainCreationModalOpened}
+        setOpen={setIsBrainCreationModalOpened}
+        bigModal={true}
+        CloseTrigger={<div />}
+      >
+        <Stepper />
+      </Modal>
     </FormProvider>
   );
 };

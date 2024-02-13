@@ -1,0 +1,50 @@
+@use "@/styles/Colors.module.scss";
+
+.stepper_wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  .step {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 3rem;
+    height: 3rem;
+    border-radius: 50%;
+    background-color: #fff;
+    position: relative;
+
+    &.done_step {
+      background-color: Colors.$success;
+      color: Colors.$white;
+    }
+
+    &.current_step {
+      border-color: #007bff;
+      background-color: #007bff;
+      color: #fff;
+    }
+
+    &.pending_step {
+      border-color: #007bff;
+      background-color: red;
+      color: #fff;
+    }
+  }
+
+  .circle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+  }
+
+  .bar {
+    flex-grow: 1;
+    height: 2px;
+    background-color: #ccc;
+    margin: 0 8px; // Ajustez selon l'espacement désiré entre les étapes et les barres
+  }
+}
