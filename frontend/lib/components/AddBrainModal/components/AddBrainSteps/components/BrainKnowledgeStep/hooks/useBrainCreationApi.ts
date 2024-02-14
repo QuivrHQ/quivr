@@ -46,17 +46,6 @@ export const useBrainCreationApi = () => {
       connected_brains_ids,
     } = getValues();
 
-    console.info(
-      name,
-      description,
-      setDefault,
-      brain_definition,
-      brain_secrets_values,
-      status,
-      brain_type,
-      connected_brains_ids
-    );
-
     const createdBrainId = await createBrainApi({
       name,
       description,
