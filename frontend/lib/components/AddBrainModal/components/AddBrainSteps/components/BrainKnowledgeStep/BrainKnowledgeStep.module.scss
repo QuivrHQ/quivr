@@ -1,8 +1,12 @@
+@use "@/styles/Spacings.module.scss";
+
 .brain_knowledge_wrapper {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   height: 100%;
+  padding-inline: Spacings.$spacing08;
+  overflow: hidden;
 
   .buttons_wrapper {
     display: flex;

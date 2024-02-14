@@ -1,23 +1,12 @@
 import { KnowledgeToFeed } from "@/app/chat/[chatId]/components/ActionsBar/components";
-import { ApiRequestDefinition } from "@/lib/components/ApiRequestDefinition";
 import QuivrButton from "@/lib/components/ui/QuivrButton/QuivrButton";
-import { BrainType } from "@/lib/types/BrainConfig";
 
 import styles from "./BrainKnowledgeStep.module.scss";
-import { CompositeBrainConnections } from "./components/CompositeBrainConnections/CompositeBrainConnections";
-import { useBrainKnowledgeStep } from "./hooks/useBrainKnowledgeStep";
 
 import { useBrainCreationSteps } from "../../hooks/useBrainCreationSteps";
 
 export const BrainKnowledgeStep = (): JSX.Element => {
-  const { brainType } = useBrainKnowledgeStep();
   const { currentStepIndex, goToPreviousStep } = useBrainCreationSteps();
-
-  const brainTypeToKnowledgeComponent: Record<BrainType, JSX.Element> = {
-    doc: <KnowledgeToFeed hideBrainSelector={true} />,
-    api: <ApiRequestDefinition />,
-    composite: <CompositeBrainConnections />,
-  };
 
   const previous = (): void => {
     goToPreviousStep();
@@ -27,13 +16,13 @@ export const BrainKnowledgeStep = (): JSX.Element => {
     console.info("hey");
   };
 
-  if (currentStepIndex !== 2 || !brainType) {
+  if (currentStepIndex !== 2) {
     return <></>;
   }
 
   return (
     <div className={styles.brain_knowledge_wrapper}>
-      {brainTypeToKnowledgeComponent[brainType]}
+      <KnowledgeToFeed hideBrainSelector={true} />
       <div className={styles.buttons_wrapper}>
         <QuivrButton
           label="Previous step"
