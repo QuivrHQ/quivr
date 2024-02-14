@@ -84,8 +84,10 @@ export const useBrainCreationApi = () => {
     if (setDefault) {
       await setAsDefaultBrain(createdBrainId);
     }
+
     setCurrentBrainId(createdBrainId);
     reset();
+
     void queryClient.invalidateQueries({
       queryKey: [PUBLIC_BRAINS_KEY],
     });

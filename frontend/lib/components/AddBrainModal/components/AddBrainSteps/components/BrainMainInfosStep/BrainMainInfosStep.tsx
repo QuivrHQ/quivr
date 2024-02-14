@@ -1,5 +1,6 @@
-import { useEffect, useState } from "react";
+import { Controller, useFormContext } from "react-hook-form";
 
+import { CreateBrainProps } from "@/lib/components/AddBrainModal/types/types";
 import QuivrButton from "@/lib/components/ui/QuivrButton/QuivrButton";
 import { TextAreaInput } from "@/lib/components/ui/TextAreaInput/TextAreaInput";
 import { TextInput } from "@/lib/components/ui/TextInput/TextInput";
@@ -12,9 +13,11 @@ export const BrainMainInfosStep = (): JSX.Element => {
   const { currentStepIndex, goToNextStep, goToPreviousStep } =
     useBrainCreationSteps();
 
-  const [name, setName] = useState<string>("");
-  const [description, setDescription] = useState<string>("");
-  const [completed, setCompleted] = useState<boolean>(false);
+  const { watch } = useFormContext<CreateBrainProps>();
+  const name = watch("name");
+  const description = watch("description");
+
+  const isDisabled = !name || !description;
 
   const next = (): void => {
     goToNextStep();
@@ -24,14 +27,6 @@ export const BrainMainInfosStep = (): JSX.Element => {
     goToPreviousStep();
   };
 
-  useEffect(() => {
-    if (!!name && !!description) {
-      setCompleted(true);
-    } else {
-      setCompleted(false);
-    }
-  }, [name, description]);
-
   if (currentStepIndex !== 1) {
     return <></>;
   }
@@ -40,11 +35,25 @@ export const BrainMainInfosStep = (): JSX.Element => {
     <div className={styles.brain_main_infos_wrapper}>
       <div className={styles.inputs_wrapper}>
         <span className={styles.title}>Define brain identity</span>
-        <TextInput label="Name" inputValue={name} setInputValue={setName} />
-        <TextAreaInput
-          label="Description"
-          inputValue={description}
-          setInputValue={setDescription}
+        <Controller
+          name="name"
+          render={({ field }) => (
+            <TextInput
+              label="Name"
+              inputValue={field.value as string} // Explicitly specify the type as string
+              setInputValue={field.onChange}
+            />
+          )}
+        />
+        <Controller
+          name="description"
+          render={({ field }) => (
+            <TextAreaInput
+              label="Description"
+              inputValue={field.value as string}
+              setInputValue={field.onChange}
+            />
+          )}
         />
       </div>
       <div className={styles.buttons_wrapper}>
@@ -59,7 +68,7 @@ export const BrainMainInfosStep = (): JSX.Element => {
           label="Next Step"
           onClick={() => next()}
           iconName="chevronRight"
-          disabled={!completed}
+          disabled={isDisabled}
         />
       </div>
     </div>
