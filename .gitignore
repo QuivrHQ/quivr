@@ -79,3 +79,5 @@ paulgraham.py
 supabase/seed-airwallex.sql
 airwallexpayouts.py
 application.log
+backend/celerybeat-schedule.db
+

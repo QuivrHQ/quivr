@@ -49,6 +49,8 @@ langchain-openai = "*"
 pydantic-settings = "*"
 unstructured = {extras = ["all-docs"], version = "*"}
 langfuse = "*"
+pandasai = "*"
+colorlog = "*"
 
 [dev-packages]
 black = "*"
