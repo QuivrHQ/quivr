@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import QuivrButton from "@/lib/components/ui/QuivrButton/QuivrButton";
 import { TextAreaInput } from "@/lib/components/ui/TextAreaInput/TextAreaInput";
@@ -14,6 +14,7 @@ export const BrainMainInfosStep = (): JSX.Element => {
 
   const [name, setName] = useState<string>("");
   const [description, setDescription] = useState<string>("");
+  const [completed, setCompleted] = useState<boolean>(false);
 
   const next = (): void => {
     goToNextStep();
@@ -22,6 +23,14 @@ export const BrainMainInfosStep = (): JSX.Element => {
   const previous = (): void => {
     goToPreviousStep();
   };
+
+  useEffect(() => {
+    if (!!name && !!description) {
+      setCompleted(true);
+    } else {
+      setCompleted(false);
+    }
+  }, [name, description]);
 
   if (currentStepIndex !== 1) {
     return <></>;
@@ -49,6 +58,7 @@ export const BrainMainInfosStep = (): JSX.Element => {
           label="Next Step"
           onClick={() => next()}
           iconName="chevronRight"
+          disabled={!completed}
         />
       </div>
     </div>
