@@ -1,0 +1,11 @@
+.brain_knowledge_wrapper {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+
+  .buttons_wrapper {
+    display: flex;
+    justify-content: space-between;
+  }
+}
