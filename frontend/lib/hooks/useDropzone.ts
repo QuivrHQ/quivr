@@ -8,7 +8,7 @@ import { useOnboarding } from "./useOnboarding";
 import { useOnboardingTracker } from "./useOnboardingTracker";
 import { useToast } from "./useToast";
 
-import { useBrainCreationContext } from "../components/AddBrainModal/components/AddBrainSteps/brainCreation-provider";
+import { useBrainCreationContext } from "../components/AddBrainModal/brainCreation-provider";
 import { useKnowledgeToFeedContext } from "../context/KnowledgeToFeedProvider/hooks/useKnowledgeToFeedContext";
 import { acceptedFormats } from "../helpers/acceptedFormats";
 import { cloneFileWithSanitizedName } from "../helpers/cloneFileWithSanitizedName";

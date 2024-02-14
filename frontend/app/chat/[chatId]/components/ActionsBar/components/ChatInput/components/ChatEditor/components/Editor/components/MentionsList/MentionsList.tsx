@@ -2,7 +2,7 @@ import { SuggestionKeyDownProps } from "@tiptap/suggestion";
 import { forwardRef } from "react";
 import { FaAngleDoubleDown } from "react-icons/fa";
 
-import { useBrainCreationContext } from "@/lib/components/AddBrainModal/components/AddBrainSteps/brainCreation-provider";
+import { useBrainCreationContext } from "@/lib/components/AddBrainModal/brainCreation-provider";
 import TextButton from "@/lib/components/ui/TextButton/TextButton";
 
 import { AddNewPromptButton } from "./components/AddNewPromptButton";

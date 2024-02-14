@@ -5,7 +5,7 @@ import { posthog } from "posthog-js";
 import { PostHogProvider } from "posthog-js/react";
 import { PropsWithChildren, useEffect } from "react";
 
-import { BrainCreationProvider } from "@/lib/components/AddBrainModal/components/AddBrainSteps/brainCreation-provider";
+import { BrainCreationProvider } from "@/lib/components/AddBrainModal/brainCreation-provider";
 import { Menu } from "@/lib/components/Menu/Menu";
 import { useOutsideClickListener } from "@/lib/components/Menu/hooks/useOutsideClickListener";
 import SearchModal from "@/lib/components/SearchModal/SearchModal";

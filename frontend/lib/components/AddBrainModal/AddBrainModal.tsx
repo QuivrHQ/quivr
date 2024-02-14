@@ -5,11 +5,11 @@ import { Modal } from "@/lib/components/ui/Modal/Modal";
 import { addBrainDefaultValues } from "@/lib/config/defaultBrainConfig";
 
 import styles from "./AddBrainModal.module.scss";
-import { useBrainCreationContext } from "./components/AddBrainSteps/brainCreation-provider";
-import { BrainKnowledgeStep } from "./components/AddBrainSteps/components/BrainKnowledgeStep/BrainKnowledgeStep";
-import { BrainMainInfosStep } from "./components/AddBrainSteps/components/BrainMainInfosStep/BrainMainInfosStep";
-import { BrainTypeSelectionStep } from "./components/AddBrainSteps/components/BrainTypeSelectionStep/BrainTypeSelectionStep";
-import { Stepper } from "./components/AddBrainSteps/components/Stepper/Stepper";
+import { useBrainCreationContext } from "./brainCreation-provider";
+import { BrainKnowledgeStep } from "./components/BrainKnowledgeStep/BrainKnowledgeStep";
+import { BrainMainInfosStep } from "./components/BrainMainInfosStep/BrainMainInfosStep";
+import { BrainTypeSelectionStep } from "./components/BrainTypeSelectionStep/BrainTypeSelectionStep";
+import { Stepper } from "./components/Stepper/Stepper";
 import { CreateBrainProps } from "./types/types";
 
 export const AddBrainModal = (): JSX.Element => {
