@@ -12,14 +12,8 @@ import { useKnowledgeToFeedContext } from "@/lib/context/KnowledgeToFeedProvider
 import { useToast } from "@/lib/hooks";
 import { useKnowledgeToFeedFilesAndUrls } from "@/lib/hooks/useKnowledgeToFeed";
 
-type UseBrainCreationHandler = {
-  closeBrainCreationModal: () => void;
-};
-
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-export const useBrainCreationApi = ({
-  closeBrainCreationModal,
-}: UseBrainCreationHandler) => {
+export const useBrainCreationApi = () => {
   const queryClient = useQueryClient();
   const { publish } = useToast();
   const { t } = useTranslation(["brain", "config"]);
@@ -52,6 +46,17 @@ export const useBrainCreationApi = ({
       connected_brains_ids,
     } = getValues();
 
+    console.info(
+      name,
+      description,
+      setDefault,
+      brain_definition,
+      brain_secrets_values,
+      status,
+      brain_type,
+      connected_brains_ids
+    );
+
     const createdBrainId = await createBrainApi({
       name,
       description,
@@ -80,7 +85,6 @@ export const useBrainCreationApi = ({
       await setAsDefaultBrain(createdBrainId);
     }
     setCurrentBrainId(createdBrainId);
-    closeBrainCreationModal();
     reset();
     void queryClient.invalidateQueries({
       queryKey: [PUBLIC_BRAINS_KEY],

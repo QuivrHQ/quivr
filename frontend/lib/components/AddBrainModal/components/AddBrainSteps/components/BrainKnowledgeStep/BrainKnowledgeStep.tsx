@@ -2,18 +2,20 @@ import { KnowledgeToFeed } from "@/app/chat/[chatId]/components/ActionsBar/compo
 import QuivrButton from "@/lib/components/ui/QuivrButton/QuivrButton";
 
 import styles from "./BrainKnowledgeStep.module.scss";
+import { useBrainCreationApi } from "./hooks/useBrainCreationApi";
 
 import { useBrainCreationSteps } from "../../hooks/useBrainCreationSteps";
 
 export const BrainKnowledgeStep = (): JSX.Element => {
   const { currentStepIndex, goToPreviousStep } = useBrainCreationSteps();
+  const { createBrain } = useBrainCreationApi();
 
   const previous = (): void => {
     goToPreviousStep();
   };
 
   const feed = (): void => {
-    console.info("hey");
+    createBrain();
   };
 
   if (currentStepIndex !== 2) {
