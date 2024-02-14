@@ -23,5 +23,5 @@ class CreateNotificationProperties(BaseModel):
 class NotificationUpdatableProperties(BaseModel):
     """Properties that can be received on notification update"""
 
-    message: Optional[str]
+    message: Optional[str] = None
     status: Optional[NotificationsStatusEnum] = NotificationsStatusEnum.Done

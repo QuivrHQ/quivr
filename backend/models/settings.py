@@ -5,7 +5,7 @@ from langchain.embeddings.openai import OpenAIEmbeddings
 from logger import get_logger
 from models.databases.supabase.supabase import SupabaseDB
 from posthog import Posthog
-from pydantic import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
 from supabase.client import Client, create_client
 from vectorstore.supabase import SupabaseVectorStore
 
@@ -13,11 +13,13 @@ logger = get_logger(__name__)
 
 
 class BrainRateLimiting(BaseSettings):
+    model_config = SettingsConfigDict(validate_default=False)
     max_brain_per_user: int = 5
 
 
 # The `PostHogSettings` class is used to initialize and interact with the PostHog analytics service.
 class PostHogSettings(BaseSettings):
+    model_config = SettingsConfigDict(validate_default=False)
     posthog_api_key: str = None
     posthog_api_url: str = None
     posthog: Posthog = None
@@ -102,15 +104,19 @@ class PostHogSettings(BaseSettings):
 
 
 class BrainSettings(BaseSettings):
-    openai_api_key: str
-    supabase_url: str
-    supabase_service_key: str
+    model_config = SettingsConfigDict(validate_default=False)
+    openai_api_key: str = ""
+    supabase_url: str = ""
+    supabase_service_key: str = ""
     resend_api_key: str = "null"
     resend_email_address: str = "brain@mail.quivr.app"
     ollama_api_base_url: str = None
+    langfuse_public_key: str = None
+    langfuse_secret_key: str = None
 
 
 class ResendSettings(BaseSettings):
+    model_config = SettingsConfigDict(validate_default=False)
     resend_api_key: str = "null"
 
 

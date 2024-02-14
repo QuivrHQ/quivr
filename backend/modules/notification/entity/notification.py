@@ -13,8 +13,8 @@ class NotificationsStatusEnum(str, Enum):
 class Notification(BaseModel):
     id: UUID
     datetime: str
-    chat_id: Optional[UUID]
-    message: Optional[str]
+    chat_id: Optional[UUID] = None
+    message: Optional[str] = None
     action: str
     status: NotificationsStatusEnum
 

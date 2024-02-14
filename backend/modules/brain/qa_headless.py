@@ -21,8 +21,7 @@ from modules.chat.dto.chats import ChatQuestion
 from modules.chat.dto.inputs import CreateChatHistory
 from modules.chat.dto.outputs import GetChatHistoryOutput
 from modules.chat.service.chat_service import ChatService
-from modules.prompt.entity.prompt import Prompt
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 logger = get_logger(__name__)
 SYSTEM_MESSAGE = "Your name is Quivr. You're a helpful assistant. If you don't know the answer, just say that you don't know, don't try to make up an answer.When answering use markdown or any other techniques to display the content in a nice and aerated way."
@@ -58,7 +57,7 @@ class HeadlessQA(BaseModel, QAInterface):
         self.callbacks = self._determine_callback_array(self.streaming)
 
     @property
-    def prompt_to_use(self) -> Optional[Prompt]:
+    def prompt_to_use(self) -> str:
         return get_prompt_to_use(None, self.prompt_id)
 
     @property
@@ -260,5 +259,4 @@ class HeadlessQA(BaseModel, QAInterface):
                 assistant=assistant,
             )
 
-    class Config:
-        arbitrary_types_allowed = True
+    model_config = ConfigDict(arbitrary_types_allowed=True)

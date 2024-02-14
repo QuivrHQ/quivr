@@ -292,7 +292,7 @@ async def decline_invitation(
 
 
 class BrainSubscriptionUpdatableProperties(BaseModel):
-    rights: str | None
+    rights: str | None = None
     email: str
 
 

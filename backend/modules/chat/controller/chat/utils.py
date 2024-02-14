@@ -19,7 +19,8 @@ class NullableUUID(UUID):
         yield cls.validate
 
     @classmethod
-    def validate(cls, v) -> UUID | None:
+    def validate(v, values, **kwargs):
+        logger.info(f"Validating UUID: {v}")
         if v == "":
             return None
         try:

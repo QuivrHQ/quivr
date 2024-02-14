@@ -18,7 +18,7 @@ logger = get_logger(__name__)
 
 class File(BaseModel):
     id: Optional[UUID] = None
-    file: Optional[UploadFile]
+    file: Optional[UploadFile] = None
     file_name: Optional[str] = ""
     file_size: Optional[int] = None
     file_sha1: Optional[str] = ""

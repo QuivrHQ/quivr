@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import Annotated, List, Optional
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
@@ -12,7 +12,6 @@ from models.user_usage import UserUsage
 from modules.brain.service.brain_service import BrainService
 from modules.chat.controller.chat.brainful_chat import BrainfulChat
 from modules.chat.controller.chat.utils import (
-    NullableUUID,
     check_user_requests_limit,
     find_model_and_generate_metadata,
 )
@@ -87,6 +86,8 @@ def get_answer_generator(
     brain, metadata_brain = brain_service.find_brain_from_question(
         brain_id, chat_question.question, current_user, chat_id, history, vector_store
     )
+
+    logger.info(f"Brain: {brain}")
 
     model_to_use, metadata = find_model_and_generate_metadata(
         chat_id,
@@ -208,12 +209,13 @@ async def create_question_handler(
     request: Request,
     chat_question: ChatQuestion,
     chat_id: UUID,
-    brain_id: NullableUUID | UUID | None = Query(
-        ..., description="The ID of the brain"
-    ),
+    brain_id: Annotated[UUID | None, Query()] = None,
     current_user: UserIdentity = Depends(get_current_user),
 ):
     try:
+        logger.info(
+            f"Creating question for chat {chat_id} with brain {brain_id} of type {type(brain_id)}"
+        )
         gpt_answer_generator = get_answer_generator(
             chat_id, chat_question, brain_id, current_user
         )
@@ -241,11 +243,10 @@ async def create_stream_question_handler(
     request: Request,
     chat_question: ChatQuestion,
     chat_id: UUID,
-    brain_id: NullableUUID | UUID | None = Query(
-        ..., description="The ID of the brain"
-    ),
+    brain_id: Annotated[UUID | None, Query()] = None,
     current_user: UserIdentity = Depends(get_current_user),
 ) -> StreamingResponse:
+
     chat_instance = BrainfulChat()
     chat_instance.validate_authorization(user_id=current_user.id, brain_id=brain_id)
 
@@ -253,9 +254,16 @@ async def create_stream_question_handler(
         id=current_user.id,
         email=current_user.email,
     )
+
+    logger.info(
+        f"Creating question for chat {chat_id} with brain {brain_id} of type {type(brain_id)}"
+    )
+
     gpt_answer_generator = get_answer_generator(
         chat_id, chat_question, brain_id, current_user
     )
+
+    logger.info(gpt_answer_generator)
 
     try:
         return StreamingResponse(

@@ -5,10 +5,9 @@ from uuid import UUID
 from langchain.chains import ConversationalRetrievalChain
 from langchain.embeddings.ollama import OllamaEmbeddings
 from langchain.llms.base import BaseLLM
-from langchain.prompts import HumanMessagePromptTemplate
 from langchain.schema import format_document
 from langchain_community.chat_models import ChatLiteLLM
-from langchain_core.messages import SystemMessage, get_buffer_string
+from langchain_core.messages import get_buffer_string
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate, PromptTemplate
 from langchain_core.runnables import RunnableParallel, RunnablePassthrough
@@ -19,7 +18,6 @@ from models import BrainSettings  # Importing settings related to the 'brain'
 from modules.brain.service.brain_service import BrainService
 from modules.chat.service.chat_service import ChatService
 from pydantic import BaseModel, ConfigDict
-from pydantic_settings import BaseSettings
 from supabase.client import Client, create_client
 from vectorstore.supabase import CustomSupabaseVectorStore
 
@@ -37,32 +35,17 @@ CONDENSE_QUESTION_PROMPT = PromptTemplate.from_template(_template)
 
 # Next is the answering prompt
 
-template_answer = """
-Context:
+template = """Answer the question based only on the following context from files:
 {context}
 
-User Instructions to follow when answering, default to none: {custom_instructions}
-User Question: {question}
-Answer:
+Question: {question}
 """
-ANSWER_PROMPT = ChatPromptTemplate.from_messages(
-    [
-        SystemMessage(
-            content=(
-                "When answering use markdown or any other techniques to display the content in a nice and aerated way.  Use the following pieces of context from files provided by the user to answer the users question in the same language as the user question. Your name is Quivr. You're a helpful assistant.  If you don't know the answer with the context provided from the files, just say that you don't know, don't try to make up an answer."
-            )
-        ),
-        HumanMessagePromptTemplate.from_template(template_answer),
-    ]
-)
-
-
-ChatPromptTemplate.from_template(template_answer)
+ANSWER_PROMPT = ChatPromptTemplate.from_template(template)
 
 # How we format documents
 
 DEFAULT_DOCUMENT_PROMPT = PromptTemplate.from_template(
-    template="File: {file_name} Content:  {page_content}"
+    template="File {file_name}: {page_content}"
 )
 
 
@@ -87,7 +70,7 @@ class QuivrRAG(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
     # Instantiate settings
-    brain_settings: BaseSettings = BrainSettings()
+    brain_settings = BrainSettings()  # type: ignore other parameters are optional
 
     # Default class attributes
     model: str = None  # pyright: ignore reportPrivateUsage=none
@@ -107,6 +90,7 @@ class QuivrRAG(BaseModel):
         else:
             return OpenAIEmbeddings()
 
+    @property
     def prompt_to_use(self):
         if self.brain_id and is_valid_uuid(self.brain_id):
             return get_prompt_to_use(UUID(self.brain_id), self.prompt_id)
@@ -116,7 +100,7 @@ class QuivrRAG(BaseModel):
     supabase_client: Optional[Client] = None
     vector_store: Optional[CustomSupabaseVectorStore] = None
     qa: Optional[ConversationalRetrievalChain] = None
-    prompt_id: Optional[UUID] = None
+    prompt_id: Optional[UUID]
 
     def __init__(
         self,
@@ -195,16 +179,16 @@ class QuivrRAG(BaseModel):
         )
 
     def _combine_documents(
-        self, docs, document_prompt=DEFAULT_DOCUMENT_PROMPT, document_separator="\n\n"
+        docs, document_prompt=DEFAULT_DOCUMENT_PROMPT, document_separator="\n\n"
     ):
-        doc_strings = [format_document(doc[0], document_prompt) for doc in docs]
+        doc_strings = [format_document(doc, document_prompt) for doc in docs]
         return document_separator.join(doc_strings)
 
     def get_retriever(self):
         return self.vector_store.as_retriever()
 
     def get_chain(self):
-        retriever_doc = self.get_retriever()
+        retriever = self.get_retriever()
 
         _inputs = RunnableParallel(
             standalone_question=RunnablePassthrough.assign(
@@ -215,19 +199,12 @@ class QuivrRAG(BaseModel):
             | StrOutputParser(),
         )
 
-        prompt_custom_user = self.prompt_to_use()
-        prompt_to_use = "None"
-        if prompt_custom_user:
-            prompt_to_use = prompt_custom_user.content
-        logger.info(f"Prompt to use: {prompt_custom_user}")
         _context = {
             "context": itemgetter("standalone_question")
-            | retriever_doc
+            | retriever
             | self._combine_documents,
             "question": lambda x: x["standalone_question"],
-            "custom_instructions": lambda x: prompt_to_use,
         }
-
         conversational_qa_chain = _inputs | _context | ANSWER_PROMPT | ChatOpenAI()
 
         return conversational_qa_chain

@@ -9,11 +9,13 @@ class GetChatHistoryOutput(BaseModel):
     message_id: Optional[UUID] | str
     user_message: str
     assistant: str
-    message_time: Optional[str]
-    prompt_title: Optional[str] | None
-    brain_name: Optional[str] | None
-    brain_id: Optional[str] | None  # string because UUID is not JSON serializable
-    metadata: Optional[dict] | None
+    message_time: Optional[str] = None
+    prompt_title: Optional[str] | None = None
+    brain_name: Optional[str] | None = None
+    brain_id: Optional[str] | None = (
+        None  # string because UUID is not JSON serializable
+    )
+    metadata: Optional[dict] | None = None
 
     def dict(self, *args, **kwargs):
         chat_history = super().dict(*args, **kwargs)
@@ -37,8 +39,8 @@ class ChatCompletionMessageToolCall(BaseModel):
 class CompletionMessage(BaseModel):
     # = "assistant" | "user" | "system" | "tool"
     role: str
-    content: str | None
-    tool_calls: Optional[List[ChatCompletionMessageToolCall]]
+    content: str | None = None
+    tool_calls: Optional[List[ChatCompletionMessageToolCall]] = None
 
 
 class CompletionResponse(BaseModel):

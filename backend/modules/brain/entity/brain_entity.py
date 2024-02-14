@@ -16,18 +16,18 @@ class BrainType(str, Enum):
 class BrainEntity(BaseModel):
     brain_id: UUID
     name: str
-    description: Optional[str]
-    temperature: Optional[float]
-    model: Optional[str]
-    max_tokens: Optional[int]
-    status: Optional[str]
-    prompt_id: Optional[UUID]
+    description: Optional[str] = None
+    temperature: Optional[float] = None
+    model: Optional[str] = None
+    max_tokens: Optional[int] = None
+    status: Optional[str] = None
+    prompt_id: Optional[UUID] = None
     last_update: str
     brain_type: BrainType
-    brain_definition: Optional[ApiBrainDefinitionEntity]
-    connected_brains_ids: Optional[List[UUID]]
-    raw: Optional[bool]
-    jq_instructions: Optional[str]
+    brain_definition: Optional[ApiBrainDefinitionEntity] = None
+    connected_brains_ids: Optional[List[UUID]] = None
+    raw: Optional[bool] = None
+    jq_instructions: Optional[str] = None
 
     @property
     def id(self) -> UUID:
@@ -44,11 +44,11 @@ class BrainEntity(BaseModel):
 class PublicBrain(BaseModel):
     id: UUID
     name: str
-    description: Optional[str]
+    description: Optional[str] = None
     number_of_subscribers: int = 0
     last_update: str
     brain_type: BrainType
-    brain_definition: Optional[ApiBrainDefinitionEntity]
+    brain_definition: Optional[ApiBrainDefinitionEntity] = None
 
 
 class RoleEnum(str, Enum):
