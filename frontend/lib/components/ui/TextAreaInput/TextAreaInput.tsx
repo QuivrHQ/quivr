@@ -1,4 +1,4 @@
-import styles from "./TextInput.module.scss";
+import styles from "./TextAreaInput.module.scss";
 
 type TextAreaInputProps = {
   label: string;

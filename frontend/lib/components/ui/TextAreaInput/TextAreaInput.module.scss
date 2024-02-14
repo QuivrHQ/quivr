@@ -26,6 +26,7 @@
     caret-color: Colors.$accent;
     border: none;
     flex: 1;
+    resize: none;
 
     &:focus {
       box-shadow: none;
