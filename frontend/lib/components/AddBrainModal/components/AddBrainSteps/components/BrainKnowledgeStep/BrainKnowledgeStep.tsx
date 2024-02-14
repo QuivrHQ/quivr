@@ -4,17 +4,20 @@ import QuivrButton from "@/lib/components/ui/QuivrButton/QuivrButton";
 import styles from "./BrainKnowledgeStep.module.scss";
 import { useBrainCreationApi } from "./hooks/useBrainCreationApi";
 
+import { useBrainCreationContext } from "../../brainCreation-provider";
 import { useBrainCreationSteps } from "../../hooks/useBrainCreationSteps";
 
 export const BrainKnowledgeStep = (): JSX.Element => {
   const { currentStepIndex, goToPreviousStep } = useBrainCreationSteps();
   const { createBrain } = useBrainCreationApi();
+  const { creating, setCreating } = useBrainCreationContext();
 
   const previous = (): void => {
     goToPreviousStep();
   };
 
   const feed = (): void => {
+    setCreating(true);
     createBrain();
   };
 
@@ -40,6 +43,7 @@ export const BrainKnowledgeStep = (): JSX.Element => {
           color="primary"
           iconName="add"
           onClick={feed}
+          isLoading={creating}
         />
       </div>
     </div>

@@ -4,13 +4,14 @@ import { useFormContext } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 
 import { PUBLIC_BRAINS_KEY } from "@/lib/api/brain/config";
-import { useBrainApi } from "@/lib/api/brain/useBrainApi";
 import { CreateBrainProps } from "@/lib/components/AddBrainModal/types/types";
 import { useKnowledgeToFeedInput } from "@/lib/components/KnowledgeToFeedInput/hooks/useKnowledgeToFeedInput.ts";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 import { useKnowledgeToFeedContext } from "@/lib/context/KnowledgeToFeedProvider/hooks/useKnowledgeToFeedContext";
 import { useToast } from "@/lib/hooks";
 import { useKnowledgeToFeedFilesAndUrls } from "@/lib/hooks/useKnowledgeToFeed";
+
+import { useBrainCreationContext } from "../../../brainCreation-provider";
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const useBrainCreationApi = () => {
@@ -21,8 +22,9 @@ export const useBrainCreationApi = () => {
   const { getValues, reset } = useFormContext<CreateBrainProps>();
   const { setKnowledgeToFeed } = useKnowledgeToFeedContext();
   const { createBrain: createBrainApi, setCurrentBrainId } = useBrainContext();
-  const { setAsDefaultBrain } = useBrainApi();
   const { crawlWebsiteHandler, uploadFileHandler } = useKnowledgeToFeedInput();
+  const { setIsBrainCreationModalOpened, setCreating } =
+    useBrainCreationContext();
 
   const handleFeedBrain = async (brainId: UUID): Promise<void> => {
     const uploadPromises = files.map((file) =>
@@ -38,7 +40,6 @@ export const useBrainCreationApi = () => {
     const {
       name,
       description,
-      setDefault,
       brain_definition,
       brain_secrets_values,
       status,
@@ -70,11 +71,9 @@ export const useBrainCreationApi = () => {
       void handleFeedBrain(createdBrainId);
     }
 
-    if (setDefault) {
-      await setAsDefaultBrain(createdBrainId);
-    }
-
     setCurrentBrainId(createdBrainId);
+    setIsBrainCreationModalOpened(false);
+    setCreating(false);
     reset();
 
     void queryClient.invalidateQueries({

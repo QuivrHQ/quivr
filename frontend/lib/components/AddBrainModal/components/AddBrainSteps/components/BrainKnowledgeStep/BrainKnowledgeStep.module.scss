@@ -6,7 +6,7 @@
   flex-direction: column;
   justify-content: space-between;
   padding-inline: Spacings.$spacing08;
-  overflow: hidden;
+  height: 100%;
 
   .title {
     @include Typography.H2;
