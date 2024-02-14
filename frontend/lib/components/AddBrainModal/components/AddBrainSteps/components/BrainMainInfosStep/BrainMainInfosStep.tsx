@@ -4,11 +4,11 @@ import QuivrButton from "@/lib/components/ui/QuivrButton/QuivrButton";
 import { TextAreaInput } from "@/lib/components/ui/TextAreaInput/TextAreaInput";
 import { TextInput } from "@/lib/components/ui/TextInput/TextInput";
 
-import styles from "./BrainMainInfos.module.scss";
+import styles from "./BrainMainInfosStep.module.scss";
 
 import { useBrainCreationSteps } from "../../hooks/useBrainCreationSteps";
 
-export const BrainMainInfos = (): JSX.Element => {
+export const BrainMainInfosStep = (): JSX.Element => {
   const { currentStepIndex, goToNextStep, goToPreviousStep } =
     useBrainCreationSteps();
 
