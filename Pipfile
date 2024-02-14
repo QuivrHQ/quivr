@@ -48,7 +48,7 @@ langchain-community = "*"
 langchain-openai = "*"
 pydantic-settings = "*"
 unstructured = {extras = ["all-docs"], version = "*"}
-
+langfuse = "*"
 
 [dev-packages]
 black = "*"

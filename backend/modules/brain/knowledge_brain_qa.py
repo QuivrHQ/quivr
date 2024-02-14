@@ -2,6 +2,7 @@ import json
 from typing import AsyncIterable, List, Optional
 from uuid import UUID
 
+import litellm
 from langchain.callbacks.streaming_aiter import AsyncIteratorCallbackHandler
 from langchain.chains import ConversationalRetrievalChain
 from llm.utils.format_chat_history import format_chat_history
@@ -133,6 +134,9 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
 
     prompt_id: Optional[UUID] = None
 
+    if brain_settings.langfuse_public_key and brain_settings.langfuse_secret_key:
+        litellm.success_callback = ["langfuse"]
+
     def __init__(
         self,
         model: str,
@@ -176,6 +180,20 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
             return get_prompt_to_use_id(UUID(self.brain_id), self.prompt_id)
         else:
             return None
+
+    def langfuse_callback_handler(self):
+        from langfuse.callback import CallbackHandler
+
+        handler = None
+        if (
+            self.brain_settings.langfuse_public_key
+            and self.brain_settings.langfuse_secret_key
+        ):
+            handler = CallbackHandler(
+                self.brain_settings.langfuse_public_key,
+                self.brain_settings.langfuse_secret_key,
+            )
+        return handler
 
     def generate_answer(
         self, chat_id: UUID, question: ChatQuestion, save_answer: bool = True
@@ -298,6 +316,9 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
         )
 
         try:
+            config = {}
+            if self.langfuse_callback_handler() is not None:
+                config["callbacks"] = [self.langfuse_callback_handler]
             async for chunk in conversational_qa_chain.astream(
                 {
                     "question": question.question,
@@ -305,7 +326,8 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
                     "custom_personality": (
                         self.prompt_to_use.content if self.prompt_to_use else None
                     ),
-                }
+                },
+                config=config,
             ):
                 response_tokens.append(chunk.content)
                 streamed_chat_history.assistant = chunk.content

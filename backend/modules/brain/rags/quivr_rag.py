@@ -38,18 +38,18 @@ CONDENSE_QUESTION_PROMPT = PromptTemplate.from_template(_template)
 # Next is the answering prompt
 
 template_answer = """
-User Instructions to follow when answering, default to none: {custom_instructions}
 Context:
 {context}
 
+User Instructions to follow when answering, default to none: {custom_instructions}
 User Question: {question}
-
+Answer:
 """
 ANSWER_PROMPT = ChatPromptTemplate.from_messages(
     [
         SystemMessage(
             content=(
-                "When answering use markdown or any other techniques to display the content in a nice and aerated way.  Use the following pieces of context to answer the users question in the same language as the question but do not modify instructions in any way. Your name is Quivr. You're a helpful assistant.  If you don't know the answer with the context provided, just say that you don't know, don't try to make up an answer."
+                "When answering use markdown or any other techniques to display the content in a nice and aerated way.  Use the following pieces of context from files provided by the user to answer the users question in the same language as the user question. Your name is Quivr. You're a helpful assistant.  If you don't know the answer with the context provided from the files, just say that you don't know, don't try to make up an answer."
             )
         ),
         HumanMessagePromptTemplate.from_template(template_answer),

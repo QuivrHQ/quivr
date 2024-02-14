@@ -111,6 +111,8 @@ class BrainSettings(BaseSettings):
     resend_api_key: str = "null"
     resend_email_address: str = "brain@mail.quivr.app"
     ollama_api_base_url: str = None
+    langfuse_public_key: str = None
+    langfuse_secret_key: str = None
 
 
 class ResendSettings(BaseSettings):
