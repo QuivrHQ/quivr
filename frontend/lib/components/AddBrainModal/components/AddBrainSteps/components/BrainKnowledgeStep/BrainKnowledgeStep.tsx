@@ -24,7 +24,10 @@ export const BrainKnowledgeStep = (): JSX.Element => {
 
   return (
     <div className={styles.brain_knowledge_wrapper}>
-      <KnowledgeToFeed hideBrainSelector={true} />
+      <div>
+        <span className={styles.title}>Feed your brain</span>
+        <KnowledgeToFeed hideBrainSelector={true} />
+      </div>
       <div className={styles.buttons_wrapper}>
         <QuivrButton
           label="Previous step"

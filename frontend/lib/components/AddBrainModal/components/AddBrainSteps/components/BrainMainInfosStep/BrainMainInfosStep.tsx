@@ -39,6 +39,7 @@ export const BrainMainInfosStep = (): JSX.Element => {
   return (
     <div className={styles.brain_main_infos_wrapper}>
       <div className={styles.inputs_wrapper}>
+        <span className={styles.title}>Define brain identity</span>
         <TextInput label="Name" inputValue={name} setInputValue={setName} />
         <TextAreaInput
           label="Description"
