@@ -5,8 +5,8 @@ import { useTranslation } from "react-i18next";
 import { FoldableSection } from "@/lib/components/ui/FoldableSection/FoldableSection";
 import { useChatsContext } from "@/lib/context/ChatsProvider/hooks/useChatsContext";
 
-import { ChatsSection } from "./ChatsSection/ChatsSection";
 import styles from "./ThreadsButton.module.scss";
+import { ThreadsSection } from "./ThreadsSection/ThreadsSection";
 import { isWithinLast30Days, isWithinLast7Days, isYesterday } from "./utils";
 
 export const ThreadsButton = (): JSX.Element => {
@@ -60,10 +60,10 @@ export const ThreadsButton = (): JSX.Element => {
         ${canScrollDown ? styles.fade_out : ""}
         `}
       >
-        <ChatsSection chats={todayChats} title={t("today")} />
-        <ChatsSection chats={yesterdayChats} title={t("yesterday")} />
-        <ChatsSection chats={last7DaysChats} title={t("last7Days")} />
-        <ChatsSection chats={last30DaysChats} title={t("last30Days")} />
+        <ThreadsSection chats={todayChats} title={t("today")} />
+        <ThreadsSection chats={yesterdayChats} title={t("yesterday")} />
+        <ThreadsSection chats={last7DaysChats} title={t("last7Days")} />
+        <ThreadsSection chats={last30DaysChats} title={t("last30Days")} />
       </div>
     </FoldableSection>
   );

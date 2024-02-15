@@ -32,29 +32,31 @@ export const BrainItem = ({ brain, even }: BrainItemProps): JSX.Element => {
     userAccessibleBrains: allBrains,
   });
 
-  const optionsRef = useRef<HTMLDivElement | null>(null);
   const iconRef = useRef<HTMLDivElement | null>(null);
+  const optionsRef = useRef<HTMLDivElement | null>(null);
 
   const options: Option[] = [
     {
       label: "Edit",
       onClick: () => (window.location.href = `/studio/${brain.id}`),
       iconName: "edit",
+      iconColor: "primary",
     },
     {
       label: "Delete",
       onClick: () => void setIsDeleteOrUnsubscribeModalOpened(true),
       iconName: "delete",
+      iconColor: "dangerous",
     },
   ];
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
-        optionsRef.current &&
-        !optionsRef.current.contains(event.target as Node) &&
         iconRef.current &&
-        !iconRef.current.contains(event.target as Node)
+        !iconRef.current.contains(event.target as Node) &&
+        optionsRef.current &&
+        !optionsRef.current.contains(event.target as Node)
       ) {
         setOptionsOpened(false);
         event.preventDefault();
@@ -109,7 +111,11 @@ export const BrainItem = ({ brain, even }: BrainItemProps): JSX.Element => {
           />
         </div>
       </div>
-      {optionsOpened && <OptionsModal options={options} />}
+      {optionsOpened && (
+        <div ref={optionsRef}>
+          <OptionsModal options={options} />{" "}
+        </div>
+      )}
     </>
   );
 };

@@ -3,7 +3,7 @@ import Link from "next/link";
 import { ChatEntity } from "@/app/chat/[chatId]/types";
 import Icon from "@/lib/components/ui/Icon/Icon";
 
-import styles from "./ChatHistoryItem.module.scss";
+import styles from "./ThreadItem.module.scss.module.scss";
 
 import { useChatsListItem } from "../../hooks/useChatsListItem";
 
@@ -11,7 +11,7 @@ type ChatHistoryItemProps = {
   chatHistoryItem: ChatEntity;
 };
 
-export const ChatHistoryItem = ({
+export const ThreadItem = ({
   chatHistoryItem,
 }: ChatHistoryItemProps): JSX.Element => {
   const {
