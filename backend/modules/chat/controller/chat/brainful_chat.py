@@ -1,7 +1,9 @@
 from logger import get_logger
 from modules.brain.api_brain_qa import APIBrainQA
 from modules.brain.entity.brain_entity import BrainType, RoleEnum
+from modules.brain.integrations.GPT4.Brain import GPT4Brain
 from modules.brain.integrations.Notion.Brain import NotionBrain
+from modules.brain.integrations.SQL.Brain import SQLBrain
 from modules.brain.knowledge_brain_qa import KnowledgeBrainQA
 from modules.brain.service.api_brain_definition_service import ApiBrainDefinitionService
 from modules.brain.service.brain_authorization_service import (
@@ -30,6 +32,13 @@ models_supporting_function_calls = [
     "gpt-4-0125-preview",
     "gpt-3.5-turbo",
 ]
+
+
+integration_list = {
+    "notion": NotionBrain,
+    "gpt4": GPT4Brain,
+    "sql": SQLBrain,
+}
 
 brain_service = BrainService()
 
@@ -67,6 +76,7 @@ class BrainfulChat(ChatInterface):
                 streaming=streaming,
                 prompt_id=prompt_id,
                 metadata=metadata,
+                user_id=user_id,
             )
 
         if brain.brain_type == BrainType.API:
@@ -94,8 +104,11 @@ class BrainfulChat(ChatInterface):
                 brain.brain_id, user_id
             )
 
-            if integration_brain.integration_name == "Notion":
-                return NotionBrain(
+            integration_class = integration_list.get(
+                integration_brain.integration_name.lower()
+            )
+            if integration_class:
+                return integration_class(
                     chat_id=chat_id,
                     model=model,
                     max_tokens=max_tokens,
@@ -105,4 +118,5 @@ class BrainfulChat(ChatInterface):
                     streaming=streaming,
                     prompt_id=prompt_id,
                     metadata=metadata,
+                    user_id=user_id,
                 )

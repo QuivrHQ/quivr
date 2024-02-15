@@ -202,8 +202,8 @@ class BrainService:
         if (
             self.integration_description_repository.get_integration_description(
                 brain.integration.integration_id
-            ).integration_name
-            == "Notion"
+            ).integration_name.lower()
+            == "notion"
         ):
             celery.send_task(
                 "NotionConnectorLoad",

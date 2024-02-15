@@ -5,14 +5,15 @@ from uuid import UUID
 from langchain.chains import ConversationalRetrievalChain
 from langchain.embeddings.ollama import OllamaEmbeddings
 from langchain.llms.base import BaseLLM
+from langchain.memory import ConversationBufferMemory
 from langchain.prompts import HumanMessagePromptTemplate
 from langchain.schema import format_document
 from langchain_community.chat_models import ChatLiteLLM
 from langchain_core.messages import SystemMessage, get_buffer_string
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate, PromptTemplate
-from langchain_core.runnables import RunnableParallel, RunnablePassthrough
-from langchain_openai import ChatOpenAI, OpenAIEmbeddings
+from langchain_core.runnables import RunnableLambda, RunnablePassthrough
+from langchain_openai import OpenAIEmbeddings
 from llm.utils.get_prompt_to_use import get_prompt_to_use
 from logger import get_logger
 from models import BrainSettings  # Importing settings related to the 'brain'
@@ -56,8 +57,6 @@ ANSWER_PROMPT = ChatPromptTemplate.from_messages(
     ]
 )
 
-
-ChatPromptTemplate.from_template(template_answer)
 
 # How we format documents
 
@@ -205,29 +204,49 @@ class QuivrRAG(BaseModel):
 
     def get_chain(self):
         retriever_doc = self.get_retriever()
-
-        _inputs = RunnableParallel(
-            standalone_question=RunnablePassthrough.assign(
-                chat_history=lambda x: get_buffer_string(x["chat_history"])
-            )
-            | CONDENSE_QUESTION_PROMPT
-            | ChatOpenAI(temperature=0)
-            | StrOutputParser(),
+        memory = ConversationBufferMemory(
+            return_messages=True, output_key="answer", input_key="question"
         )
+
+        loaded_memory = RunnablePassthrough.assign(
+            chat_history=RunnableLambda(memory.load_memory_variables)
+            | itemgetter("history"),
+        )
+
+        standalone_question = {
+            "standalone_question": {
+                "question": lambda x: x["question"],
+                "chat_history": lambda x: get_buffer_string(x["chat_history"]),
+            }
+            | CONDENSE_QUESTION_PROMPT
+            | ChatLiteLLM(temperature=0, model=self.model)
+            | StrOutputParser(),
+        }
 
         prompt_custom_user = self.prompt_to_use()
         prompt_to_use = "None"
         if prompt_custom_user:
             prompt_to_use = prompt_custom_user.content
-        logger.info(f"Prompt to use: {prompt_custom_user}")
-        _context = {
-            "context": itemgetter("standalone_question")
-            | retriever_doc
-            | self._combine_documents,
+
+        # Now we retrieve the documents
+        retrieved_documents = {
+            "docs": itemgetter("standalone_question") | retriever_doc,
             "question": lambda x: x["standalone_question"],
             "custom_instructions": lambda x: prompt_to_use,
         }
 
-        conversational_qa_chain = _inputs | _context | ANSWER_PROMPT | ChatOpenAI()
+        final_inputs = {
+            "context": lambda x: self._combine_documents(x["docs"]),
+            "question": itemgetter("question"),
+            "custom_instructions": itemgetter("custom_instructions"),
+        }
 
-        return conversational_qa_chain
+        # And finally, we do the part that returns the answers
+        answer = {
+            "answer": final_inputs
+            | ANSWER_PROMPT
+            | ChatLiteLLM(max_tokens=self.max_tokens, model=self.model),
+            "docs": itemgetter("docs"),
+        }
+
+        return loaded_memory | standalone_question | retrieved_documents | answer

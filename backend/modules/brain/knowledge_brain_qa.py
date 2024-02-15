@@ -38,7 +38,7 @@ def is_valid_uuid(uuid_to_test, version=4):
     return str(uuid_obj) == uuid_to_test
 
 
-def generate_source(result, brain):
+def generate_source(source_documents, brain_id):
     # Initialize an empty list for sources
     sources_list: List[Sources] = []
 
@@ -46,27 +46,28 @@ def generate_source(result, brain):
     generated_urls = {}
 
     # Get source documents from the result, default to an empty list if not found
-    source_documents = result.get("source_documents", [])
 
     # If source documents exist
     if source_documents:
         logger.info(f"Source documents found: {source_documents}")
         # Iterate over each document
         for doc in source_documents:
+            doc0 = doc[0]
+            logger.info("Document: %s", doc0)
             # Check if 'url' is in the document metadata
-            logger.info(f"Metadata 1: {doc.metadata}")
+            logger.info(f"Metadata 1: {doc0.metadata}")
             is_url = (
-                "original_file_name" in doc.metadata
-                and doc.metadata["original_file_name"] is not None
-                and doc.metadata["original_file_name"].startswith("http")
+                "original_file_name" in doc0.metadata
+                and doc0.metadata["original_file_name"] is not None
+                and doc0.metadata["original_file_name"].startswith("http")
             )
             logger.info(f"Is URL: {is_url}")
 
             # Determine the name based on whether it's a URL or a file
             name = (
-                doc.metadata["original_file_name"]
+                doc0.metadata["original_file_name"]
                 if is_url
-                else doc.metadata["file_name"]
+                else doc0.metadata["file_name"]
             )
 
             # Determine the type based on whether it's a URL or a file
@@ -74,9 +75,9 @@ def generate_source(result, brain):
 
             # Determine the source URL based on whether it's a URL or a file
             if is_url:
-                source_url = doc.metadata["original_file_name"]
+                source_url = doc0.metadata["original_file_name"]
             else:
-                file_path = f"{brain.brain_id}/{doc.metadata['file_name']}"
+                file_path = f"{brain_id}/{doc0.metadata['file_name']}"
                 # Check if the URL has already been generated
                 if file_path in generated_urls:
                     source_url = generated_urls[file_path]
@@ -126,6 +127,7 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
     streaming: bool = False
     knowledge_qa: Optional[RAGInterface] = None
     metadata: Optional[dict] = None
+    user_id: str = None
 
     callbacks: List[AsyncIteratorCallbackHandler] = (
         None  # pyright: ignore reportPrivateUsage=none
@@ -142,6 +144,7 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
         streaming: bool = False,
         prompt_id: Optional[UUID] = None,
         metadata: Optional[dict] = None,
+        user_id: str = None,
         **kwargs,
     ):
         super().__init__(
@@ -161,6 +164,7 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
         )
         self.metadata = metadata
         self.max_tokens = max_tokens
+        self.user_id = user_id
 
     @property
     def prompt_to_use(self):
@@ -259,14 +263,42 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
     async def generate_stream(
         self, chat_id: UUID, question: ChatQuestion, save_answer: bool = True
     ) -> AsyncIterable:
-        history = chat_service.get_chat_history(self.chat_id)
-
         conversational_qa_chain = self.knowledge_qa.get_chain()
-
-        transformed_history = format_chat_history(history)
-
+        transformed_history, streamed_chat_history = (
+            self.initialize_streamed_chat_history(chat_id, question)
+        )
         response_tokens = []
+        sources = []
 
+        async for chunk in conversational_qa_chain.astream(
+            {
+                "question": question.question,
+                "chat_history": transformed_history,
+                "custom_personality": (
+                    self.prompt_to_use.content if self.prompt_to_use else None
+                ),
+            }
+        ):
+            if chunk.get("answer"):
+                logger.info(f"Chunk: {chunk}")
+                response_tokens.append(chunk["answer"].content)
+                streamed_chat_history.assistant = chunk["answer"].content
+                yield f"data: {json.dumps(streamed_chat_history.dict())}"
+            if chunk.get("docs"):
+                sources = chunk["docs"]
+
+        sources_list = generate_source(sources, self.brain_id)
+        if not streamed_chat_history.metadata:
+            streamed_chat_history.metadata = {}
+            # Serialize the sources list
+        serialized_sources_list = [source.dict() for source in sources_list]
+        streamed_chat_history.metadata["sources"] = serialized_sources_list
+        yield f"data: {json.dumps(streamed_chat_history.dict())}"
+        self.save_answer(question, response_tokens, streamed_chat_history, save_answer)
+
+    def initialize_streamed_chat_history(self, chat_id, question):
+        history = chat_service.get_chat_history(self.chat_id)
+        transformed_history = format_chat_history(history)
         brain = brain_service.get_brain_by_id(self.brain_id)
 
         streamed_chat_history = chat_service.update_chat_history(
@@ -297,24 +329,11 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
             }
         )
 
-        try:
+        return transformed_history, streamed_chat_history
 
-            async for chunk in conversational_qa_chain.astream(
-                {
-                    "question": question.question,
-                    "chat_history": transformed_history,
-                    "custom_personality": (
-                        self.prompt_to_use.content if self.prompt_to_use else None
-                    ),
-                }
-            ):
-                response_tokens.append(chunk.content)
-                streamed_chat_history.assistant = chunk.content
-                yield f"data: {json.dumps(streamed_chat_history.dict())}"
-
-        except Exception as e:
-            logger.error("Error generating stream: %s", e)
-
+    def save_answer(
+        self, question, response_tokens, streamed_chat_history, save_answer
+    ):
         assistant = "".join(response_tokens)
 
         try:
