@@ -58,6 +58,7 @@
   "subtitle": "Converse com um modelo de linguagem sobre seus dados enviados",
   "successfully_deleted": "Conversa excluída com sucesso",
   "thinking": "Pensando...",
+  "threads": "Tópicos",
   "title": "Converse com {{brain}}",
   "today": "Hoje",
   "tooManyRequests": "Você excedeu o número de solicitações por dia. Para continuar conversando, insira uma chave de API da OpenAI em seu perfil ou no cérebro utilizado.",

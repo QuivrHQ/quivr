@@ -58,6 +58,7 @@
   "subtitle": "Habla con un modelo de lenguaje acerca de tus datos subidos",
   "successfully_deleted": "Chat borrado correctamente",
   "thinking": "Pensando...",
+  "threads": "Hilos",
   "title": "Conversa con {{brain}}",
   "today": "Hoy",
   "tooManyRequests": "Has excedido el número de solicitudes por día. Para continuar chateando, por favor ingresa una clave de API de OpenAI en tu perfil o en el cerebro utilizado.",
