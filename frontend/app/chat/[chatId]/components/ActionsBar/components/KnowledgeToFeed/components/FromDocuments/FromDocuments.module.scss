@@ -1,5 +1,6 @@
 @use "@/styles/Colors.module.scss";
 @use "@/styles/Radius.module.scss";
+@use "@/styles/ScreenSizes.module.scss";
 @use "@/styles/Spacings.module.scss";
 
 .from_document_wrapper {
@@ -23,6 +24,10 @@
     padding: Spacings.$spacing05;
     display: flex;
     gap: Spacings.$spacing02;
+
+    @media (max-width: ScreenSizes.$small) {
+      flex-direction: column;
+    }
 
     .clickable {
       cursor: pointer;
