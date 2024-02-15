@@ -5,8 +5,10 @@ import { DeleteOrUnsubscribeConfirmationModal } from "@/app/studio/[brainId]/com
 import { useBrainManagementTabs } from "@/app/studio/[brainId]/components/BrainManagementTabs/hooks/useBrainManagementTabs";
 import { getBrainPermissions } from "@/app/studio/[brainId]/components/BrainManagementTabs/utils/getBrainPermissions";
 import Icon from "@/lib/components/ui/Icon/Icon";
+import { OptionsModal } from "@/lib/components/ui/OptionsModal/OptionsModal";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 import { MinimalBrainForUser } from "@/lib/context/BrainProvider/types";
+import { Option } from "@/lib/types/Options";
 
 import styles from "./BrainItem.module.scss";
 
@@ -17,8 +19,6 @@ type BrainItemProps = {
 
 export const BrainItem = ({ brain, even }: BrainItemProps): JSX.Element => {
   const [optionsOpened, setOptionsOpened] = useState<boolean>(false);
-  const [deleteHovered, setDeleteHovered] = useState<boolean>(false);
-  const [editHovered, setEditHovered] = useState<boolean>(false);
 
   const {
     handleUnsubscribeOrDeleteBrain,
@@ -34,6 +34,19 @@ export const BrainItem = ({ brain, even }: BrainItemProps): JSX.Element => {
 
   const optionsRef = useRef<HTMLDivElement | null>(null);
   const iconRef = useRef<HTMLDivElement | null>(null);
+
+  const options: Option[] = [
+    {
+      label: "Edit",
+      onClick: () => (window.location.href = `/studio/${brain.id}`),
+      iconName: "edit",
+    },
+    {
+      label: "Delete",
+      onClick: () => void setIsDeleteOrUnsubscribeModalOpened(true),
+      iconName: "delete",
+    },
+  ];
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -96,38 +109,7 @@ export const BrainItem = ({ brain, even }: BrainItemProps): JSX.Element => {
           />
         </div>
       </div>
-      {optionsOpened && (
-        <div className={styles.options_menu} ref={optionsRef}>
-          <div
-            className={styles.option}
-            onClick={() => setIsDeleteOrUnsubscribeModalOpened(true)}
-            onMouseEnter={() => setDeleteHovered(true)}
-            onMouseLeave={() => setDeleteHovered(false)}
-          >
-            <span>Delete</span>
-            <Icon
-              name="delete"
-              size="normal"
-              color="dangerous"
-              hovered={deleteHovered}
-            />
-          </div>
-          <div
-            className={styles.option}
-            onClick={() => (window.location.href = `/studio/${brain.id}`)}
-            onMouseEnter={() => setEditHovered(true)}
-            onMouseLeave={() => setEditHovered(false)}
-          >
-            <span>Edit</span>
-            <Icon
-              name="edit"
-              size="normal"
-              color="black"
-              hovered={editHovered}
-            />
-          </div>
-        </div>
-      )}
+      {optionsOpened && <OptionsModal options={options} />}
     </>
   );
 };
