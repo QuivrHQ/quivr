@@ -259,14 +259,30 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
     async def generate_stream(
         self, chat_id: UUID, question: ChatQuestion, save_answer: bool = True
     ) -> AsyncIterable:
-        history = chat_service.get_chat_history(self.chat_id)
-
         conversational_qa_chain = self.knowledge_qa.get_chain()
-
-        transformed_history = format_chat_history(history)
-
+        transformed_history, streamed_chat_history = (
+            self.initialize_streamed_chat_history(chat_id, question)
+        )
         response_tokens = []
 
+        async for chunk in conversational_qa_chain.astream(
+            {
+                "question": question.question,
+                "chat_history": transformed_history,
+                "custom_personality": (
+                    self.prompt_to_use.content if self.prompt_to_use else None
+                ),
+            }
+        ):
+            response_tokens.append(chunk.content)
+            streamed_chat_history.assistant = chunk.content
+            yield f"data: {json.dumps(streamed_chat_history.dict())}"
+
+        self.save_answer(question, response_tokens, streamed_chat_history, save_answer)
+
+    def initialize_streamed_chat_history(self, chat_id, question):
+        history = chat_service.get_chat_history(self.chat_id)
+        transformed_history = format_chat_history(history)
         brain = brain_service.get_brain_by_id(self.brain_id)
 
         streamed_chat_history = chat_service.update_chat_history(
@@ -297,24 +313,11 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
             }
         )
 
-        try:
+        return transformed_history, streamed_chat_history
 
-            async for chunk in conversational_qa_chain.astream(
-                {
-                    "question": question.question,
-                    "chat_history": transformed_history,
-                    "custom_personality": (
-                        self.prompt_to_use.content if self.prompt_to_use else None
-                    ),
-                }
-            ):
-                response_tokens.append(chunk.content)
-                streamed_chat_history.assistant = chunk.content
-                yield f"data: {json.dumps(streamed_chat_history.dict())}"
-
-        except Exception as e:
-            logger.error("Error generating stream: %s", e)
-
+    def save_answer(
+        self, question, response_tokens, streamed_chat_history, save_answer
+    ):
         assistant = "".join(response_tokens)
 
         try:
