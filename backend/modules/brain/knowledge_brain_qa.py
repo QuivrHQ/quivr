@@ -3,7 +3,6 @@ from typing import AsyncIterable, List, Optional
 from uuid import UUID
 
 from langchain.callbacks.streaming_aiter import AsyncIteratorCallbackHandler
-from langchain.chains import ConversationalRetrievalChain
 from llm.utils.format_chat_history import format_chat_history
 from llm.utils.get_prompt_to_use import get_prompt_to_use
 from llm.utils.get_prompt_to_use_id import get_prompt_to_use_id
@@ -184,35 +183,21 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
     def generate_answer(
         self, chat_id: UUID, question: ChatQuestion, save_answer: bool = True
     ) -> GetChatHistoryOutput:
-        transformed_history = format_chat_history(
-            chat_service.get_chat_history(self.chat_id)
+        conversational_qa_chain = self.knowledge_qa.get_chain()
+        transformed_history, streamed_chat_history = (
+            self.initialize_streamed_chat_history(chat_id, question)
         )
-
-        # The Chain that combines the question and answer
-        qa = ConversationalRetrievalChain(
-            retriever=self.knowledge_qa.get_retriever(),
-            combine_docs_chain=self.knowledge_qa.get_doc_chain(
-                streaming=False,
-            ),
-            question_generator=self.knowledge_qa.get_question_generation_llm(),
-            verbose=False,
-            rephrase_question=False,
-            return_source_documents=True,
-        )
-
-        prompt_content = (
-            self.prompt_to_use.content if self.prompt_to_use else QUIVR_DEFAULT_PROMPT
-        )
-
-        model_response = qa(
+        model_response = conversational_qa_chain.invoke(
             {
                 "question": question.question,
                 "chat_history": transformed_history,
-                "custom_personality": prompt_content,
+                "custom_personality": (
+                    self.prompt_to_use.content if self.prompt_to_use else None
+                ),
             }
         )
 
-        answer = model_response["answer"]
+        answer = model_response["answer"].content
 
         brain = brain_service.get_brain_by_id(self.brain_id)
 
