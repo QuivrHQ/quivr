@@ -8,7 +8,7 @@ from modules.brain.knowledge_brain_qa import KnowledgeBrainQA
 from modules.chat.dto.chats import ChatQuestion
 
 
-class GPT4(KnowledgeBrainQA):
+class GPT4Brain(KnowledgeBrainQA):
     """This is the Notion brain class. it is a KnowledgeBrainQA has the data is stored locally.
     It is going to call the Data Store internally to get the data.
 
