@@ -41,7 +41,7 @@ COPY ./requirements.txt .
 RUN pip install --upgrade pip
 
 # Increase timeout to wait for the new installation
-RUN pip install --no-cache-dir -r requirements.txt --timeout 200
+RUN pip install --no-cache-dir -r requirements.txt --timeout 20000
 
 RUN if [ "$DEV_MODE" = "true" ]; then pip install --no-cache debugpy --timeout 200; fi
 
