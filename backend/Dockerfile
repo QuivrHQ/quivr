@@ -26,6 +26,8 @@ RUN apt-get clean && apt-get update && apt-get install -y \
     poppler-utils \
     tesseract-ocr \
     libreoffice \
+    libpq-dev \
+    gcc \
     pandoc && \
     rm -rf /var/lib/apt/lists/* && apt-get clean
 
