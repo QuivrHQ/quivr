@@ -39,6 +39,7 @@ import {
   MdUploadFile,
 } from "react-icons/md";
 import { RiHashtag } from "react-icons/ri";
+import { SlOptions } from "react-icons/sl";
 import { TbNetwork } from "react-icons/tb";
 import { VscGraph } from "react-icons/vsc";
 
@@ -70,6 +71,7 @@ export const iconList: { [name: string]: IconType } = {
   key: FaKey,
   loader: AiOutlineLoading3Quarters,
   logout: IoMdLogOut,
+  options: SlOptions,
   redirection: BsArrowRightShort,
   search: LuSearch,
   settings: IoSettingsSharp,
