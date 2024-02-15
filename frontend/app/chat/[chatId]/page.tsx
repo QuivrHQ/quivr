@@ -4,7 +4,7 @@ import { UUID } from "crypto";
 import { useEffect } from "react";
 
 import { AddBrainModal } from "@/lib/components/AddBrainModal";
-import { useBrainCreationContext } from "@/lib/components/AddBrainModal/components/AddBrainSteps/brainCreation-provider";
+import { useBrainCreationContext } from "@/lib/components/AddBrainModal/brainCreation-provider";
 import PageHeader from "@/lib/components/PageHeader/PageHeader";
 import { UploadDocumentModal } from "@/lib/components/UploadDocumentModal/UploadDocumentModal";
 import { useChatContext } from "@/lib/context";

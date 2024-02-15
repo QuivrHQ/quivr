@@ -1,5 +1,6 @@
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import { BsArrowRightShort, BsChatLeftText } from "react-icons/bs";
+import { CgSoftwareDownload } from "react-icons/cg";
 import { CiFlag1 } from "react-icons/ci";
 import {
   FaCheck,
@@ -21,6 +22,7 @@ import {
   LuBrain,
   LuBrainCircuit,
   LuChevronDown,
+  LuChevronLeft,
   LuChevronRight,
   LuCopy,
   LuFile,
@@ -29,7 +31,9 @@ import {
 } from "react-icons/lu";
 import {
   MdAlternateEmail,
+  MdDashboardCustomize,
   MdDeleteOutline,
+  MdDynamicFeed,
   MdHistory,
   MdOutlineModeEditOutline,
   MdUploadFile,
@@ -47,12 +51,15 @@ export const iconList: { [name: string]: IconType } = {
   check: FaCheck,
   checkCircle: FaCheckCircle,
   chevronDown: LuChevronDown,
+  chevronLeft: LuChevronLeft,
   chevronRight: LuChevronRight,
   close: IoMdClose,
   copy: LuCopy,
+  custom: MdDashboardCustomize,
   delete: MdDeleteOutline,
   edit: MdOutlineModeEditOutline,
   email: MdAlternateEmail,
+  feed: MdDynamicFeed,
   file: LuFile,
   flag: CiFlag1,
   followUp: IoArrowUpCircleOutline,
@@ -66,6 +73,7 @@ export const iconList: { [name: string]: IconType } = {
   redirection: BsArrowRightShort,
   search: LuSearch,
   settings: IoSettingsSharp,
+  software: CgSoftwareDownload,
   star: FaRegStar,
   unlock: FaUnlock,
   upload: FiUpload,

@@ -1,0 +1,21 @@
+@use "@/styles/Spacings.module.scss";
+
+.add_brain_modal_container {
+  display: flex;
+  padding-block: Spacings.$spacing05;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  gap: Spacings.$spacing08;
+
+  .stepper_container {
+    width: 100%;
+    padding-inline: Spacings.$spacing08;
+  }
+
+  .content_wrapper {
+    flex-grow: 1;
+    overflow: scroll;
+  }
+}

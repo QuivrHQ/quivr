@@ -1,0 +1,105 @@
+@use "@/styles/Colors.module.scss";
+@use "@/styles/Radius.module.scss";
+@use "@/styles/Spacings.module.scss";
+@use "@/styles/Typography.module.scss";
+
+.stepper_wrapper {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+
+  .step {
+    display: flex;
+    flex-direction: column;
+    border-radius: Radius.$circle;
+    position: relative;
+
+    .circle {
+      width: 2.5rem;
+      height: 2.5rem;
+      background-color: Colors.$primary;
+      border-radius: Radius.$circle;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      .inside_circle {
+        width: 100%;
+        height: 100%;
+        border-radius: Radius.$circle;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+    }
+
+    &.done_step {
+      .circle {
+        background-color: Colors.$success;
+      }
+
+      .step_info {
+        .step_status {
+          color: Colors.$success;
+        }
+      }
+    }
+
+    &.current_step {
+      .circle {
+        background-color: Colors.$white;
+        border: 1px solid Colors.$primary;
+      }
+
+      .inside_circle {
+        background-color: Colors.$primary;
+        width: 70%;
+        height: 70%;
+      }
+
+      .step_info {
+        .step_status {
+          color: Colors.$primary;
+        }
+      }
+    }
+
+    &.pending_step {
+      .circle {
+        background-color: Colors.$primary-light;
+      }
+
+      .step_info {
+        .step_status {
+          color: Colors.$normal-grey;
+        }
+      }
+    }
+
+    .step_info {
+      margin-top: Spacings.$spacing03;
+      display: flex;
+      flex-direction: column;
+      font-size: Typography.$tiny;
+      width: 2.5rem;
+
+      .step_index {
+        white-space: nowrap;
+        color: Colors.$normal-grey;
+      }
+    }
+  }
+
+  .bar {
+    flex-grow: 1;
+    height: 4px;
+    border-radius: Radius.$big;
+    background-color: Colors.$primary-light;
+    margin: 0 8px;
+    margin-top: Spacings.$spacing05;
+
+    &.done {
+      background-color: Colors.$success;
+    }
+  }
+}

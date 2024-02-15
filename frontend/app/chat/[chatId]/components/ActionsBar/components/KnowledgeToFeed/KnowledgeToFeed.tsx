@@ -13,7 +13,11 @@ import { FromDocuments } from "./components/FromDocuments/FromDocuments";
 import { FromWebsites } from "./components/FromWebsites/FromWebsites";
 import { formatMinimalBrainsToSelectComponentInput } from "./utils/formatMinimalBrainsToSelectComponentInput";
 
-export const KnowledgeToFeed = (): JSX.Element => {
+export const KnowledgeToFeed = ({
+  hideBrainSelector,
+}: {
+  hideBrainSelector?: boolean;
+}): JSX.Element => {
   const { allBrains, setCurrentBrainId, currentBrain } = useBrainContext();
   const [selectedTab, setSelectedTab] = useState("From documents");
   const { knowledgeToFeed, removeKnowledgeToFeed } =
@@ -46,18 +50,20 @@ export const KnowledgeToFeed = (): JSX.Element => {
 
   return (
     <div className={styles.knowledge_to_feed_wrapper}>
-      <div className={styles.single_selector_wrapper}>
-        <SingleSelector
-          options={brainsWithUploadRights}
-          onChange={setCurrentBrainId}
-          selectedOption={
-            currentBrain
-              ? { label: currentBrain.name, value: currentBrain.id }
-              : undefined
-          }
-          placeholder="Select a brain"
-        />
-      </div>
+      {!hideBrainSelector && (
+        <div className={styles.single_selector_wrapper}>
+          <SingleSelector
+            options={brainsWithUploadRights}
+            onChange={setCurrentBrainId}
+            selectedOption={
+              currentBrain
+                ? { label: currentBrain.name, value: currentBrain.id }
+                : undefined
+            }
+            placeholder="Select a brain"
+          />
+        </div>
+      )}
       <Tabs tabList={knowledgesTabs} />
       <div className={styles.tabs_content_wrapper}>
         {selectedTab === "From documents" && <FromDocuments />}
