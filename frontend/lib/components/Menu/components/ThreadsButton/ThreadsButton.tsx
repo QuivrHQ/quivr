@@ -6,10 +6,10 @@ import { FoldableSection } from "@/lib/components/ui/FoldableSection/FoldableSec
 import { useChatsContext } from "@/lib/context/ChatsProvider/hooks/useChatsContext";
 
 import { ChatsSection } from "./ChatsSection/ChatsSection";
-import styles from "./HistoryButton.module.scss";
+import styles from "./ThreadsButton.module.scss";
 import { isWithinLast30Days, isWithinLast7Days, isYesterday } from "./utils";
 
-export const HistoryButton = (): JSX.Element => {
+export const ThreadsButton = (): JSX.Element => {
   const [canScrollDown, setCanScrollDown] = useState<boolean>(false);
   const { allChats } = useChatsContext();
   const { t } = useTranslation("chat");

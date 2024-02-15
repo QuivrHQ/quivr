@@ -11,10 +11,10 @@ import { useMenuContext } from "@/lib/context/MenuProvider/hooks/useMenuContext"
 import styles from "./Menu.module.scss";
 import { AnimatedDiv } from "./components/AnimationDiv";
 import { DiscussionButton } from "./components/DiscussionButton/DiscussionButton";
-import { HistoryButton } from "./components/HistoryButton/HistoryButton";
 import { HomeButton } from "./components/HomeButton/HomeButton";
 import { ProfileButton } from "./components/ProfileButton/ProfileButton";
 import { StudioButton } from "./components/StudioButton/StudioButton";
+import { ThreadsButton } from "./components/ThreadsButton/ThreadsButton";
 import { UpgradeToPlusButton } from "./components/UpgradeToPlusButton/UpgradeToPlusButton";
 
 export const Menu = (): JSX.Element => {
@@ -61,7 +61,7 @@ export const Menu = (): JSX.Element => {
                 <DiscussionButton />
                 <HomeButton />
                 <StudioButton />
-                <HistoryButton />
+                <ThreadsButton />
               </div>
               <div className={styles.block}>
                 <UpgradeToPlusButton />
