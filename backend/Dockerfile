@@ -26,6 +26,8 @@ RUN apt-get clean && apt-get update && apt-get install -y \
     poppler-utils \
     tesseract-ocr \
     libreoffice \
+    libpq-dev \
+    gcc \
     pandoc && \
     rm -rf /var/lib/apt/lists/* && apt-get clean
 
@@ -41,7 +43,7 @@ COPY ./requirements.txt .
 RUN pip install --upgrade pip
 
 # Increase timeout to wait for the new installation
-RUN pip install --no-cache-dir -r requirements.txt --timeout 200
+RUN pip install --no-cache-dir -r requirements.txt --timeout 20000
 
 RUN if [ "$DEV_MODE" = "true" ]; then pip install --no-cache debugpy --timeout 200; fi
 
