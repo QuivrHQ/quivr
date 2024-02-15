@@ -1,7 +1,7 @@
 import { ChatEntity } from "@/app/chat/[chatId]/types";
 
 import { ThreadItem } from "./ThreadItem/ThreadItem";
-import styles from "./ThreadsSection.module.scss.module.scss";
+import styles from "./ThreadsSection.module.scss";
 
 type ChatSectionProps = {
   chats: ChatEntity[];
