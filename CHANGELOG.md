@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.0.203 (2024-02-15)
+
+## What's Changed
+* feat: 🎸 ocr by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2187
+* feat(lcel): migrated to lcel and pydantic by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2185
+* feat(frontend): new brain creation modal by @Zewed in https://github.com/QuivrHQ/quivr/pull/2192
+* feat(integration): implementation by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2191
+* feat(frontend): new design for brain table by @Zewed in https://github.com/QuivrHQ/quivr/pull/2193
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.202...v0.0.203
+
 ## 0.0.202 (2024-02-11)
 
 ## What's Changed
