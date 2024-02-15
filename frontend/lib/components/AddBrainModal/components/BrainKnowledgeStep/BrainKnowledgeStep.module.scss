@@ -1,0 +1,19 @@
+@use "@/styles/Spacings.module.scss";
+@use "@/styles/Typography.module.scss";
+
+.brain_knowledge_wrapper {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding-inline: Spacings.$spacing08;
+  height: 100%;
+
+  .title {
+    @include Typography.H2;
+  }
+
+  .buttons_wrapper {
+    display: flex;
+    justify-content: space-between;
+  }
+}

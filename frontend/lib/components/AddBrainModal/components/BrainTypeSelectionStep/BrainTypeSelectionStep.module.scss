@@ -1,0 +1,31 @@
+@use "@/styles/ScreenSizes.module.scss";
+@use "@/styles/Spacings.module.scss";
+@use "@/styles/Typography.module.scss";
+
+.brain_types_wrapper {
+  display: flex;
+  justify-content: space-between;
+  flex-direction: column;
+  width: 100%;
+  padding-inline: Spacings.$spacing08;
+  height: 100%;
+  gap: Spacings.$spacing05;
+
+  @media (max-width: ScreenSizes.$small) {
+    padding-inline: 0;
+  }
+
+  .main_wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: Spacings.$spacing05;
+
+    .title {
+      @include Typography.H2;
+    }
+  }
+
+  .button {
+    align-self: flex-end;
+  }
+}

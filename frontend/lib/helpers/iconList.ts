@@ -1,5 +1,6 @@
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import { BsArrowRightShort, BsChatLeftText } from "react-icons/bs";
+import { CgSoftwareDownload } from "react-icons/cg";
 import { CiFlag1 } from "react-icons/ci";
 import {
   FaCheck,
@@ -21,6 +22,7 @@ import {
   LuBrain,
   LuBrainCircuit,
   LuChevronDown,
+  LuChevronLeft,
   LuChevronRight,
   LuCopy,
   LuFile,
@@ -29,12 +31,15 @@ import {
 } from "react-icons/lu";
 import {
   MdAlternateEmail,
+  MdDashboardCustomize,
   MdDeleteOutline,
+  MdDynamicFeed,
   MdHistory,
   MdOutlineModeEditOutline,
   MdUploadFile,
 } from "react-icons/md";
 import { RiHashtag } from "react-icons/ri";
+import { SlOptions } from "react-icons/sl";
 import { TbNetwork } from "react-icons/tb";
 import { VscGraph } from "react-icons/vsc";
 
@@ -47,12 +52,15 @@ export const iconList: { [name: string]: IconType } = {
   check: FaCheck,
   checkCircle: FaCheckCircle,
   chevronDown: LuChevronDown,
+  chevronLeft: LuChevronLeft,
   chevronRight: LuChevronRight,
   close: IoMdClose,
   copy: LuCopy,
+  custom: MdDashboardCustomize,
   delete: MdDeleteOutline,
   edit: MdOutlineModeEditOutline,
   email: MdAlternateEmail,
+  feed: MdDynamicFeed,
   file: LuFile,
   flag: CiFlag1,
   followUp: IoArrowUpCircleOutline,
@@ -63,9 +71,11 @@ export const iconList: { [name: string]: IconType } = {
   key: FaKey,
   loader: AiOutlineLoading3Quarters,
   logout: IoMdLogOut,
+  options: SlOptions,
   redirection: BsArrowRightShort,
   search: LuSearch,
   settings: IoSettingsSharp,
+  software: CgSoftwareDownload,
   star: FaRegStar,
   unlock: FaUnlock,
   upload: FiUpload,

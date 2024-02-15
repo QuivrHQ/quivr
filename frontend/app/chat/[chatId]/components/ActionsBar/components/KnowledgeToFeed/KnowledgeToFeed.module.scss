@@ -9,6 +9,7 @@
   padding-block: Spacings.$spacing05;
   width: 100%;
   gap: Spacings.$spacing05;
+  overflow: hidden;
 
   .single_selector_wrapper {
     width: 30%;
@@ -37,6 +38,7 @@
     overflow: scroll;
     flex-direction: column;
     gap: Spacings.$spacing02;
+    flex-grow: 1;
     overflow: scroll;
 
     .uploaded_knowledge {
@@ -46,6 +48,7 @@
       justify-content: space-between;
       width: 100%;
       overflow: hidden;
+      font-size: Typography.$small;
 
       .left {
         display: flex;

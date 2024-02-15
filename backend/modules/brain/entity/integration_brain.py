@@ -12,7 +12,7 @@ class IntegrationDescriptionEntity(BaseModel):
 
 
 class IntegrationEntity(BaseModel):
-    id: str
+    id: int
     user_id: str
     brain_id: str
     integration_id: str
