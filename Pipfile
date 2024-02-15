@@ -47,10 +47,12 @@ watchdog = "*"
 langchain-community = "*"
 langchain-openai = "*"
 pydantic-settings = "*"
-unstructured = {extras = ["all-docs"], version = "*"}
+unstructured = "*"
 langfuse = "*"
 pandasai = "*"
 colorlog = "*"
+psycopg2-binary = "*"
+psycopg2 = "*"
 
 [dev-packages]
 black = "*"

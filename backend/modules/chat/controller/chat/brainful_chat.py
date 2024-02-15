@@ -3,6 +3,7 @@ from modules.brain.api_brain_qa import APIBrainQA
 from modules.brain.entity.brain_entity import BrainType, RoleEnum
 from modules.brain.integrations.GPT4.Brain import GPT4Brain
 from modules.brain.integrations.Notion.Brain import NotionBrain
+from modules.brain.integrations.SQL.Brain import SQLBrain
 from modules.brain.knowledge_brain_qa import KnowledgeBrainQA
 from modules.brain.service.api_brain_definition_service import ApiBrainDefinitionService
 from modules.brain.service.brain_authorization_service import (
@@ -36,6 +37,7 @@ models_supporting_function_calls = [
 integration_list = {
     "notion": NotionBrain,
     "gpt4": GPT4Brain,
+    "sql": SQLBrain,
 }
 
 brain_service = BrainService()
@@ -74,6 +76,7 @@ class BrainfulChat(ChatInterface):
                 streaming=streaming,
                 prompt_id=prompt_id,
                 metadata=metadata,
+                user_id=user_id,
             )
 
         if brain.brain_type == BrainType.API:
@@ -115,4 +118,5 @@ class BrainfulChat(ChatInterface):
                     streaming=streaming,
                     prompt_id=prompt_id,
                     metadata=metadata,
+                    user_id=user_id,
                 )

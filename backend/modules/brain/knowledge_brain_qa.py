@@ -126,6 +126,7 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
     streaming: bool = False
     knowledge_qa: Optional[RAGInterface] = None
     metadata: Optional[dict] = None
+    user_id: str = None
 
     callbacks: List[AsyncIteratorCallbackHandler] = (
         None  # pyright: ignore reportPrivateUsage=none
@@ -142,6 +143,7 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
         streaming: bool = False,
         prompt_id: Optional[UUID] = None,
         metadata: Optional[dict] = None,
+        user_id: str = None,
         **kwargs,
     ):
         super().__init__(
@@ -161,6 +163,7 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
         )
         self.metadata = metadata
         self.max_tokens = max_tokens
+        self.user_id = user_id
 
     @property
     def prompt_to_use(self):
