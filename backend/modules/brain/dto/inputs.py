@@ -1,3 +1,4 @@
+from enum import Enum
 from typing import Optional
 from uuid import UUID
 
@@ -14,6 +15,11 @@ from pydantic import BaseModel, Extra
 logger = get_logger(__name__)
 
 
+class IntegrationType(str, Enum):
+    CUSTOM = "custom"
+    SYNC = "sync"
+
+
 class CreateApiBrainDefinition(BaseModel, extra=Extra.forbid):
     method: ApiBrainAllowedMethods
     url: str
@@ -28,6 +34,9 @@ class CreateIntegrationBrain(BaseModel, extra=Extra.forbid):
     integration_name: str
     integration_logo_url: str
     connection_settings: dict
+    integration_type: IntegrationType
+    description: str
+    max_files: int
 
 
 class BrainIntegrationSettings(BaseModel, extra=Extra.forbid):
