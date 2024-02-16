@@ -1,6 +1,8 @@
+import { useEffect } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 
+import { useBrainApi } from "@/lib/api/brain/useBrainApi";
 import { Modal } from "@/lib/components/ui/Modal/Modal";
 import { addBrainDefaultValues } from "@/lib/config/defaultBrainConfig";
 
@@ -17,6 +19,14 @@ export const AddBrainModal = (): JSX.Element => {
 
   const { isBrainCreationModalOpened, setIsBrainCreationModalOpened } =
     useBrainCreationContext();
+
+  const { getIntegrationBrains } = useBrainApi();
+
+  useEffect(() => {
+    getIntegrationBrains().then((res) => {
+      console.info(res);
+    });
+  }, [getIntegrationBrains]);
 
   const defaultValues: CreateBrainProps = {
     ...addBrainDefaultValues,

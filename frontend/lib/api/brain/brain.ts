@@ -155,3 +155,9 @@ export const getDocsFromQuestion = async (
     )
   ).data.docs;
 };
+
+export const getIntegrationBrains = async (
+  axiosInstance: AxiosInstance
+): Promise<void> => {
+  return await axiosInstance.get(`/brains/integrations`);
+};
