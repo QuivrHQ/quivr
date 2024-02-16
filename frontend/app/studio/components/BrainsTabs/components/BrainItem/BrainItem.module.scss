@@ -3,6 +3,7 @@
 @use "@/styles/ScreenSizes.module.scss";
 @use "@/styles/Spacings.module.scss";
 @use "@/styles/Typography.module.scss";
+@use "@/styles/ZIndexes.module.scss";
 
 .brain_item_wrapper {
   padding-inline: Spacings.$spacing05;
@@ -57,8 +58,9 @@
 
   .options_modal {
     position: absolute;
-    right: 0;
+    right: Spacings.$spacing02;
     top: Spacings.$spacing08;
-    z-index: 1090909999;
+    z-index: ZIndexes.$modal;
+    padding-bottom: Spacings.$spacing01;
   }
 }
