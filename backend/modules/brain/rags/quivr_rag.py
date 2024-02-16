@@ -196,7 +196,7 @@ class QuivrRAG(BaseModel):
     def _combine_documents(
         self, docs, document_prompt=DEFAULT_DOCUMENT_PROMPT, document_separator="\n\n"
     ):
-        doc_strings = [format_document(doc[0], document_prompt) for doc in docs]
+        doc_strings = [format_document(doc, document_prompt) for doc in docs]
         return document_separator.join(doc_strings)
 
     def get_retriever(self):
