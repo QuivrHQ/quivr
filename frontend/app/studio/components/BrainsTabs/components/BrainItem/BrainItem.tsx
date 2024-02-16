@@ -33,7 +33,6 @@ export const BrainItem = ({ brain, even }: BrainItemProps): JSX.Element => {
   });
 
   const iconRef = useRef<HTMLDivElement | null>(null);
-  const optionsRef = useRef<HTMLDivElement | null>(null);
 
   const options: Option[] = [
     {
@@ -52,12 +51,7 @@ export const BrainItem = ({ brain, even }: BrainItemProps): JSX.Element => {
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (
-        iconRef.current &&
-        !iconRef.current.contains(event.target as Node) &&
-        optionsRef.current &&
-        !optionsRef.current.contains(event.target as Node)
-      ) {
+      if (iconRef.current && !iconRef.current.contains(event.target as Node)) {
         setOptionsOpened(false);
         event.preventDefault();
       }
@@ -110,12 +104,10 @@ export const BrainItem = ({ brain, even }: BrainItemProps): JSX.Element => {
             }
           />
         </div>
-      </div>
-      {optionsOpened && (
-        <div ref={optionsRef}>
-          <OptionsModal options={options} />{" "}
+        <div className={styles.options_modal}>
+          {optionsOpened && <OptionsModal options={options} />}
         </div>
-      )}
+      </div>
     </>
   );
 };

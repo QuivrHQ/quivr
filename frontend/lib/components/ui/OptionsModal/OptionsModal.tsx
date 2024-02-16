@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { Option } from "@/lib/types/Options";
 
@@ -27,8 +27,14 @@ export const OptionsModal = ({ options }: OptionsModalProps): JSX.Element => {
     );
   };
 
+  const modalRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    modalRef.current?.focus();
+  }, []);
+
   return (
-    <div className={styles.options_modal_wrapper}>
+    <div className={styles.options_modal_wrapper} ref={modalRef} tabIndex={-1}>
       {options.map((option, index) => (
         <div
           className={styles.option}

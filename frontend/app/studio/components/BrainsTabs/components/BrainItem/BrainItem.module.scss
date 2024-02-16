@@ -16,6 +16,8 @@
   border: 1px solid Colors.$lightest-black;
   border-radius: Radius.$normal;
   padding-block: Spacings.$spacing03;
+  position: relative;
+  overflow: visible;
 
   &:hover {
     border-color: Colors.$primary;
@@ -51,5 +53,12 @@
         display: none;
       }
     }
+  }
+
+  .options_modal {
+    position: absolute;
+    right: 0;
+    top: Spacings.$spacing08;
+    z-index: 1090909999;
   }
 }
