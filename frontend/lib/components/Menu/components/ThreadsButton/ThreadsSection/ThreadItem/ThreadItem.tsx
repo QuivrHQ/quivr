@@ -108,13 +108,11 @@ export const ThreadItem = ({
             color="black"
             handleHover={true}
           />
+          <div ref={optionsRef} className={styles.options_modal}>
+            {optionsOpened && <OptionsModal options={options} />}
+          </div>
         </div>
       </div>
-      {optionsOpened && (
-        <div ref={optionsRef}>
-          <OptionsModal options={options} />{" "}
-        </div>
-      )}
     </>
   );
 };

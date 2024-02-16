@@ -2,6 +2,7 @@
 @use "@/styles/Radius.module.scss";
 @use "@/styles/Spacings.module.scss";
 @use "@/styles/Typography.module.scss";
+@use "@/styles/ZIndexes.module.scss";
 
 .thread_item_wrapper {
   color: Colors.$black;
@@ -36,10 +37,10 @@
     }
   }
 
-  .icons_wrapper {
-    visibility: hidden;
-    display: flex;
-    gap: Spacings.$spacing02;
+  .options_modal {
+    position: absolute;
+    right: Spacings.$spacing02;
+    z-index: ZIndexes.$modal;
   }
 
   &:hover {
