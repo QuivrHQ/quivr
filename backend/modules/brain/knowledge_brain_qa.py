@@ -51,22 +51,21 @@ def generate_source(source_documents, brain_id):
         logger.info(f"Source documents found: {source_documents}")
         # Iterate over each document
         for doc in source_documents:
-            doc0 = doc[0]
-            logger.info("Document: %s", doc0)
+            logger.info("Document: %s", doc)
             # Check if 'url' is in the document metadata
-            logger.info(f"Metadata 1: {doc0.metadata}")
+            logger.info(f"Metadata 1: {doc.metadata}")
             is_url = (
-                "original_file_name" in doc0.metadata
-                and doc0.metadata["original_file_name"] is not None
-                and doc0.metadata["original_file_name"].startswith("http")
+                "original_file_name" in doc.metadata
+                and doc.metadata["original_file_name"] is not None
+                and doc.metadata["original_file_name"].startswith("http")
             )
             logger.info(f"Is URL: {is_url}")
 
             # Determine the name based on whether it's a URL or a file
             name = (
-                doc0.metadata["original_file_name"]
+                doc.metadata["original_file_name"]
                 if is_url
-                else doc0.metadata["file_name"]
+                else doc.metadata["file_name"]
             )
 
             # Determine the type based on whether it's a URL or a file
@@ -74,9 +73,9 @@ def generate_source(source_documents, brain_id):
 
             # Determine the source URL based on whether it's a URL or a file
             if is_url:
-                source_url = doc0.metadata["original_file_name"]
+                source_url = doc.metadata["original_file_name"]
             else:
-                file_path = f"{brain_id}/{doc0.metadata['file_name']}"
+                file_path = f"{brain_id}/{doc.metadata['file_name']}"
                 # Check if the URL has already been generated
                 if file_path in generated_urls:
                     source_url = generated_urls[file_path]

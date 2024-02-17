@@ -11,7 +11,7 @@ interface FoldableSectionProps {
   icon: keyof typeof iconList;
   children: React.ReactNode;
   foldedByDefault?: boolean;
-  hideBorderIfUnfolded?: boolean;
+  hideBorder?: boolean;
 }
 
 export const FoldableSection = (props: FoldableSectionProps): JSX.Element => {
@@ -26,7 +26,7 @@ export const FoldableSection = (props: FoldableSectionProps): JSX.Element => {
       className={`
       ${styles.foldable_section_wrapper} 
       ${!folded ? styles.unfolded : ""}
-      ${props.hideBorderIfUnfolded && folded ? styles.hide_border : ""}
+      ${props.hideBorder ? styles.hide_border : ""}
       `}
     >
       <div className={styles.header_wrapper} onClick={() => setFolded(!folded)}>

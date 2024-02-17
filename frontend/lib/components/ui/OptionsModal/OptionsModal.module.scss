@@ -1,0 +1,31 @@
+@use "@/styles/Colors.module.scss";
+@use "@/styles/Radius.module.scss";
+@use "@/styles/Spacings.module.scss";
+@use "@/styles/ZIndexes.module.scss";
+
+.options_modal_wrapper {
+  background-color: Colors.$highlight;
+  border-radius: Radius.$normal;
+  border-radius: Radius.$normal;
+  box-shadow: 0 1px 2px rgb(0, 0, 0, 0.25);
+  width: fit-content;
+
+  .option {
+    padding: Spacings.$spacing03;
+    padding-inline: Spacings.$spacing05;
+    display: flex;
+    gap: Spacings.$spacing05;
+    align-items: center;
+    cursor: pointer;
+    justify-content: space-between;
+    overflow: hidden;
+
+    &:not(:first-child) {
+      border-top: 1px solid Colors.$light-grey;
+    }
+
+    &:hover {
+      background-color: Colors.$primary-lightest;
+    }
+  }
+}

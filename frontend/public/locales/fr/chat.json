@@ -58,6 +58,7 @@
   "subtitle": "Parlez à un modèle linguistique de vos données téléchargées",
   "successfully_deleted": "Chat supprimé avec succès",
   "thinking": "Réflexion...",
+  "threads": "Fils",
   "title": "Discuter avec {{brain}}",
   "today": "Aujourd'hui",
   "tooManyRequests": "Vous avez dépassé le nombre de requêtes par jour. Pour continuer à discuter, veuillez entrer une clé d'API OpenAI dans votre profil ou dans le cerveau utilisé.",
