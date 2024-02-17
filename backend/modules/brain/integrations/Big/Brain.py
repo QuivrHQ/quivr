@@ -11,6 +11,7 @@ from langchain_core.prompts.chat import (
     HumanMessagePromptTemplate,
     SystemMessagePromptTemplate,
 )
+from langchain_core.prompts.prompt import PromptTemplate
 from logger import get_logger
 from modules.brain.knowledge_brain_qa import KnowledgeBrainQA
 from modules.chat.dto.chats import ChatQuestion
@@ -44,13 +45,26 @@ class BigBrain(KnowledgeBrainQA):
         ]
         CHAT_COMBINE_PROMPT = ChatPromptTemplate.from_messages(messages)
 
+        ### Question prompt
+        question_prompt_template = """Use the following portion of a long document to see if any of the text is relevant to answer the question. 
+        Return any relevant text verbatim.
+        {context}
+        Question: {question}
+        Relevant text, if any, else say Nothing:"""
+        QUESTION_PROMPT = PromptTemplate(
+            template=question_prompt_template, input_variables=["context", "question"]
+        )
+
         llm = ChatLiteLLM(temperature=0, model=self.model)
 
         retriever_doc = self.knowledge_qa.get_retriever()
 
         question_generator = LLMChain(llm=llm, prompt=CONDENSE_QUESTION_PROMPT)
         doc_chain = load_qa_chain(
-            llm, chain_type="map_reduce", combine_prompt=CHAT_COMBINE_PROMPT
+            llm,
+            chain_type="map_reduce",
+            question_prompt=QUESTION_PROMPT,
+            combine_prompt=CHAT_COMBINE_PROMPT,
         )
 
         chain = ConversationalRetrievalChain(
