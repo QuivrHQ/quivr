@@ -58,6 +58,7 @@
   "subtitle": "Talk to a language model about your uploaded data",
   "successfully_deleted": "Successfully deleted",
   "thinking": "Thinking...",
+  "threads": "Threads",
   "title": "Chat with {{brain}}",
   "today": "Today",
   "tooManyRequests": "You have exceeded the number of requests per day. To continue chatting, please upgrade your account or come back tomorrow.",

@@ -2,8 +2,9 @@
 @use "@/styles/Radius.module.scss";
 @use "@/styles/Spacings.module.scss";
 @use "@/styles/Typography.module.scss";
+@use "@/styles/ZIndexes.module.scss";
 
-.chat_item_wrapper {
+.thread_item_wrapper {
   color: Colors.$black;
   display: flex;
   justify-content: space-between;
@@ -11,7 +12,7 @@
   align-items: center;
   overflow: hidden;
 
-  .edit_chat_name {
+  .edit_thread_name {
     @include Typography.EllipsisOverflow;
 
     color: Colors.$black;
@@ -28,7 +29,7 @@
     }
   }
 
-  .chat_item_name {
+  .thread_item_name {
     @include Typography.EllipsisOverflow;
 
     &:hover {
@@ -36,10 +37,10 @@
     }
   }
 
-  .icons_wrapper {
-    visibility: hidden;
-    display: flex;
-    gap: Spacings.$spacing02;
+  .options_modal {
+    position: absolute;
+    right: Spacings.$spacing02;
+    z-index: ZIndexes.$modal;
   }
 
   &:hover {

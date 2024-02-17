@@ -5,11 +5,11 @@ import { useTranslation } from "react-i18next";
 import { FoldableSection } from "@/lib/components/ui/FoldableSection/FoldableSection";
 import { useChatsContext } from "@/lib/context/ChatsProvider/hooks/useChatsContext";
 
-import { ChatsSection } from "./ChatsSection/ChatsSection";
-import styles from "./HistoryButton.module.scss";
+import styles from "./ThreadsButton.module.scss";
+import { ThreadsSection } from "./ThreadsSection/ThreadsSection";
 import { isWithinLast30Days, isWithinLast7Days, isYesterday } from "./utils";
 
-export const HistoryButton = (): JSX.Element => {
+export const ThreadsButton = (): JSX.Element => {
   const [canScrollDown, setCanScrollDown] = useState<boolean>(false);
   const { allChats } = useChatsContext();
   const { t } = useTranslation("chat");
@@ -49,10 +49,10 @@ export const HistoryButton = (): JSX.Element => {
 
   return (
     <FoldableSection
-      label={t("history")}
+      label={t("threads")}
       icon="history"
       foldedByDefault={true}
-      hideBorderIfUnfolded={true}
+      hideBorder={true}
     >
       <div
         className={`
@@ -60,10 +60,10 @@ export const HistoryButton = (): JSX.Element => {
         ${canScrollDown ? styles.fade_out : ""}
         `}
       >
-        <ChatsSection chats={todayChats} title={t("today")} />
-        <ChatsSection chats={yesterdayChats} title={t("yesterday")} />
-        <ChatsSection chats={last7DaysChats} title={t("last7Days")} />
-        <ChatsSection chats={last30DaysChats} title={t("last30Days")} />
+        <ThreadsSection chats={todayChats} title={t("today")} />
+        <ThreadsSection chats={yesterdayChats} title={t("yesterday")} />
+        <ThreadsSection chats={last7DaysChats} title={t("last7Days")} />
+        <ThreadsSection chats={last30DaysChats} title={t("last30Days")} />
       </div>
     </FoldableSection>
   );
