@@ -9,19 +9,8 @@
   padding-top: 0;
   color: Colors.$dark-grey;
   font-size: Typography.$small;
-  max-height: 200px;
+  max-height: 300px;
   overflow-y: scroll;
   display: flex;
   flex-direction: column;
-
-  &.fade_out {
-    mask-image: -webkit-gradient(
-      linear,
-      left top,
-      left bottom,
-      from(black),
-      to(transparent)
-    );
-    mask-image: linear-gradient(to bottom, black 50%, transparent 100%);
-  }
 }
