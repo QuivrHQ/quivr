@@ -11,6 +11,19 @@
   overflow: hidden;
   font-size: Typography.$small;
 
+  .contentWrapper {
+    overflow: hidden;
+    transition: max-height 0.3s cubic-bezier(0.65, 0.05, 0.36, 1);
+  }
+
+  .contentExpanded {
+  max-height: 200px;
+  }
+
+  .contentCollapsed {
+    max-height: 0;
+  }
+
   &.hide_border {
     border-color: transparent;
   }

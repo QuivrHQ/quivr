@@ -35,12 +35,21 @@ export const FoldableSection = (props: FoldableSectionProps): JSX.Element => {
           <p className={styles.header_title}>{props.label}</p>
         </div>
         <Icon
-          name={folded ? "chevronDown" : "chevronRight"}
+          name="chevronDown"
           size="normal"
           color="black"
+          classname={`${styles.iconRotate} ${
+            folded ? styles.iconRotateDown : styles.iconRotateUp
+          }`}
         />
       </div>
-      <div style={{ height: folded ? "0" : "auto" }}>{props.children}</div>
+      <div
+        className={`${styles.contentWrapper} ${
+          folded ? styles.contentCollapsed : styles.contentExpanded
+        }`}
+      >
+        {props.children}
+      </div>
     </div>
   );
 };
