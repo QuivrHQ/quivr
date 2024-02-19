@@ -6,7 +6,7 @@ import { Document } from "@/lib/types/Document";
 
 import { useBrainProvider } from "./hooks/useBrainProvider";
 
-import { Model } from "../../types/BrainConfig";
+import { BrainType, Model } from "../../types/BrainConfig";
 
 export type BrainAccessStatus = "private" | "public";
 
@@ -20,6 +20,7 @@ export type Brain = {
   temperature?: number;
   description?: string;
   prompt_id?: string | null;
+  brain_type?: BrainType;
   brain_definition?: ApiBrainDefinition;
 };
 
@@ -28,6 +29,7 @@ export type MinimalBrainForUser = {
   name: string;
   role: BrainRoleType;
   status: BrainAccessStatus;
+  brain_type?: BrainType;
   description: string;
 };
 
@@ -42,6 +44,7 @@ export type PublicBrain = {
   description?: string;
   number_of_subscribers: number;
   last_update: string;
+  brain_type?: BrainType;
   brain_definition?: ApiBrainDefinition;
 };
 
