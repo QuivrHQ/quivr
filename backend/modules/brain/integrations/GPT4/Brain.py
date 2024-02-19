@@ -24,11 +24,17 @@ class GPT4Brain(KnowledgeBrainQA):
             **kwargs,
         )
 
+    def calculate_pricing(self):
+        return 3
+
     def get_chain(self):
 
         prompt = ChatPromptTemplate.from_messages(
             [
-                ("system", "You are GPT-4 powered by Quivr. You are an assistant."),
+                (
+                    "system",
+                    "You are GPT-4 powered by Quivr. You are an assistant. {custom_personality}",
+                ),
                 MessagesPlaceholder(variable_name="chat_history"),
                 ("human", "{question}"),
             ]
@@ -53,6 +59,9 @@ class GPT4Brain(KnowledgeBrainQA):
             {
                 "question": question.question,
                 "chat_history": transformed_history,
+                "custom_personality": (
+                    self.prompt_to_use.content if self.prompt_to_use else None
+                ),
             }
         ):
             response_tokens.append(chunk.content)

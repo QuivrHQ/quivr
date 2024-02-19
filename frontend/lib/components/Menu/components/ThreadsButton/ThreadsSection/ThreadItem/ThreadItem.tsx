@@ -58,7 +58,6 @@ export const ThreadItem = ({
         !optionsRef.current.contains(event.target as Node)
       ) {
         setOptionsOpened(false);
-        event.preventDefault();
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
