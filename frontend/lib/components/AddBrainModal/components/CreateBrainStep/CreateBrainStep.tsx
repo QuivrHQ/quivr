@@ -1,7 +1,7 @@
 import { KnowledgeToFeed } from "@/app/chat/[chatId]/components/ActionsBar/components";
 import QuivrButton from "@/lib/components/ui/QuivrButton/QuivrButton";
 
-import styles from "./CreateBrainStep.module.scss.module.scss";
+import styles from "./CreateBrainStep.module.scss";
 import { useBrainCreationApi } from "./hooks/useBrainCreationApi";
 
 import { useBrainCreationContext } from "../../brainCreation-provider";
