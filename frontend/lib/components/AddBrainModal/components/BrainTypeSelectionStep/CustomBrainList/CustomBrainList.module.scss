@@ -1,29 +1,45 @@
 @use "@/styles/Colors.module.scss";
 @use "@/styles/Radius.module.scss";
+@use "@/styles/ScreenSizes.module.scss";
 @use "@/styles/Spacings.module.scss";
 @use "@/styles/Typography.module.scss";
 
-.brain_card_wrapper {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  border-radius: Radius.$normal;
-  gap: Spacings.$spacing03;
-  padding: Spacings.$spacing03;
-  border: 1px solid Colors.$lightest-black;
-  width: fit-content;
-  cursor: pointer;
+.card_container {
+  position: relative;
 
-  .brain_title {
-    font-size: Typography.$small;
-    color: Colors.$normal-grey;
+  .icon_help {
+    position: absolute;
+    left: -(Spacings.$spacing03);
+    top: -(Spacings.$spacing03);
+    background-color: Colors.$white;
   }
 
-  &:hover {
-    border-color: Colors.$primary;
+  .brain_card_wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border-radius: Radius.$normal;
+    gap: Spacings.$spacing03;
+    padding: Spacings.$spacing03;
+    border: 1px solid Colors.$lightest-black;
+    width: fit-content;
+    cursor: pointer;
+    width: 25%;
+
+    @media (max-width: ScreenSizes.$small) {
+      width: 50%;
+    }
 
     .brain_title {
-      color: Colors.$black;
+      font-size: Typography.$small;
+    }
+
+    &:hover {
+      border-color: Colors.$primary;
+
+      .brain_title {
+        font-weight: 500;
+      }
     }
   }
 }
