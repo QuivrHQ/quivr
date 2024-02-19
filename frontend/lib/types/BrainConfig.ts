@@ -6,10 +6,6 @@ export const brainStatuses = ["private", "public"] as const;
 
 export type BrainStatus = (typeof brainStatuses)[number];
 
-export const brainTypes = ["doc", "api", "composite"] as const;
-
-export type BrainType = (typeof brainTypes)[number];
-
 export type Model = (typeof freeModels)[number];
 
 // TODO: update this type to match the backend (antropic, openai and some other keys should be removed)
@@ -26,7 +22,6 @@ export type BrainConfig = {
   supabaseKey?: string;
   prompt_id?: string;
   status: BrainStatus;
-  brain_type: BrainType;
   prompt: {
     title: string;
     content: string;
