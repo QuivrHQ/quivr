@@ -4,6 +4,10 @@ import { ApiBrainDefinition } from "../api/brain/types";
 
 export const brainStatuses = ["private", "public"] as const;
 
+export const brainTypes = ["doc", "api", "composite"] as const;
+
+export type BrainType = (typeof brainTypes)[number];
+
 export type BrainStatus = (typeof brainStatuses)[number];
 
 export type Model = (typeof freeModels)[number];
@@ -22,6 +26,7 @@ export type BrainConfig = {
   supabaseKey?: string;
   prompt_id?: string;
   status: BrainStatus;
+  brain_type: BrainType;
   prompt: {
     title: string;
     content: string;

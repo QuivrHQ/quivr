@@ -37,26 +37,11 @@ export const useBrainCreationApi = () => {
   };
 
   const createBrain = async (): Promise<void> => {
-    const {
-      name,
-      description,
-      brain_definition,
-      brain_secrets_values,
-      status,
-      brain_type,
-      connected_brains_ids,
-    } = getValues();
+    const { name, description } = getValues();
 
     const createdBrainId = await createBrainApi({
       name,
       description,
-      status,
-      brain_type,
-      brain_definition: brain_type === "api" ? brain_definition : undefined,
-      brain_secrets_values:
-        brain_type === "api" ? brain_secrets_values : undefined,
-      connected_brains_ids:
-        brain_type === "composite" ? connected_brains_ids : undefined,
     });
 
     if (createdBrainId === undefined) {
@@ -67,9 +52,8 @@ export const useBrainCreationApi = () => {
 
       return;
     }
-    if (brain_type === "doc") {
-      void handleFeedBrain(createdBrainId);
-    }
+
+    void handleFeedBrain(createdBrainId);
 
     setCurrentBrainId(createdBrainId);
     setIsBrainCreationModalOpened(false);
