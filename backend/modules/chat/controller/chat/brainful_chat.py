@@ -68,8 +68,6 @@ class BrainfulChat(ChatInterface):
         if brain and brain.brain_type == BrainType.DOC:
             return KnowledgeBrainQA(
                 chat_id=chat_id,
-                model=model,
-                temperature=temperature,
                 brain_id=str(brain.brain_id),
                 streaming=streaming,
                 prompt_id=prompt_id,

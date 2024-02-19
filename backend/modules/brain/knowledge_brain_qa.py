@@ -9,6 +9,7 @@ from llm.utils.get_prompt_to_use_id import get_prompt_to_use_id
 from logger import get_logger
 from models import BrainSettings
 from models.user_usage import UserUsage
+from modules.brain.entity.brain_entity import BrainEntity
 from modules.brain.qa_interface import QAInterface
 from modules.brain.rags.quivr_rag import QuivrRAG
 from modules.brain.rags.rag_interface import RAGInterface
@@ -121,7 +122,7 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
     brain_settings: BaseSettings = BrainSettings()
 
     # Default class attributes
-    model: str = None  # pyright: ignore reportPrivateUsage=none
+    model: str = "gpt-3.5-turbo-0125"  # pyright: ignore reportPrivateUsage=none
     temperature: float = 0.1
     chat_id: str = None  # pyright: ignore reportPrivateUsage=none
     brain_id: str = None  # pyright: ignore reportPrivateUsage=none
@@ -129,6 +130,7 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
     max_input: int = 2000
     streaming: bool = False
     knowledge_qa: Optional[RAGInterface] = None
+    brain: Optional[BrainEntity] = None
     user_id: str = None
     user_email: str = None
     user_usage: Optional[UserUsage] = None
@@ -144,7 +146,6 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
 
     def __init__(
         self,
-        model: str,
         brain_id: str,
         chat_id: str,
         streaming: bool = False,
@@ -156,31 +157,32 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
         **kwargs,
     ):
         super().__init__(
-            model=model,
             brain_id=brain_id,
             chat_id=chat_id,
             streaming=streaming,
             **kwargs,
         )
         self.prompt_id = prompt_id
-        self.knowledge_qa = QuivrRAG(
-            model=model,
-            brain_id=brain_id,
-            chat_id=chat_id,
-            streaming=streaming,
-            **kwargs,
-        )
         self.user_id = user_id
         self.user_email = user_email
         self.user_usage = UserUsage(
             id=user_id,
             email=user_email,
         )
+        self.brain = brain_service.get_brain_by_id(brain_id)
+
         self.user_settings = self.user_usage.get_user_settings()
 
         # Get Model settings for the user
         self.models_settings = self.user_usage.get_model_settings()
         self.increase_usage_user()
+        self.knowledge_qa = QuivrRAG(
+            model=self.brain.model,
+            brain_id=brain_id,
+            chat_id=chat_id,
+            streaming=streaming,
+            **kwargs,
+        )
 
     @property
     def prompt_to_use(self):
@@ -214,11 +216,10 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
         logger.info(f"Models settings: {self.models_settings}")
         model_to_use = find_model_and_generate_metadata(
             self.chat_id,
-            self.model,
+            self.brain.model,
             self.user_settings,
             self.models_settings,
         )
-
         self.model = model_to_use.name
         self.max_input = model_to_use.max_input
         self.max_tokens = model_to_use.max_output
@@ -249,8 +250,6 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
 
         answer = model_response["answer"].content
 
-        brain = brain_service.get_brain_by_id(self.brain_id)
-
         if save_answer:
             # save the answer to the database or not ->  add a variable
             new_chat = chat_service.update_chat_history(
@@ -259,7 +258,7 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
                         "chat_id": chat_id,
                         "user_message": question.question,
                         "assistant": answer,
-                        "brain_id": brain.brain_id,
+                        "brain_id": self.brain.brain_id,
                         "prompt_id": self.prompt_to_use_id,
                     }
                 )
@@ -274,9 +273,9 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
                     "prompt_title": (
                         self.prompt_to_use.title if self.prompt_to_use else None
                     ),
-                    "brain_name": brain.name if brain else None,
+                    "brain_name": self.brain.name if self.brain else None,
                     "message_id": new_chat.message_id,
-                    "brain_id": str(brain.brain_id) if brain else None,
+                    "brain_id": str(self.brain.brain_id) if self.brain else None,
                 }
             )
 
@@ -291,7 +290,7 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
                 ),
                 "brain_name": None,
                 "message_id": None,
-                "brain_id": str(brain.brain_id) if brain else None,
+                "brain_id": str(self.brain.brain_id) if self.brain else None,
             }
         )
 
