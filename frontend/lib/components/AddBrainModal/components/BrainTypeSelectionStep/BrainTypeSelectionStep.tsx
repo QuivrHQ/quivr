@@ -1,23 +1,35 @@
 import { useEffect, useState } from "react";
 
+import { IntegrationBrains } from "@/lib/api/brain/types";
 import { useBrainApi } from "@/lib/api/brain/useBrainApi";
 import { BrainType } from "@/lib/components/AddBrainModal/types/types";
 import QuivrButton from "@/lib/components/ui/QuivrButton/QuivrButton";
 
 import { BrainTypeSelection } from "./BrainTypeSelection/BrainTypeSelection";
 import styles from "./BrainTypeSelectionStep.module.scss";
+import { CustomBrainList } from "./CustomBrainList/CustomBrainList";
 
 import { useBrainCreationSteps } from "../../hooks/useBrainCreationSteps";
 
 export const BrainTypeSelectionStep = (): JSX.Element => {
   const [selectedIndex, setSelectedIndex] = useState<number>(0);
+  const [customBrainsCatalogueOpened, setCustomBrainsCatalogueOpened] =
+    useState<boolean>(false);
+  const [customBrains, setCustomBrains] = useState<IntegrationBrains[]>([]);
   const { goToNextStep, currentStepIndex } = useBrainCreationSteps();
   const { getIntegrationBrains } = useBrainApi();
 
-  useEffect(async () => {
-    const res = await getIntegrationBrains();
-    console.log(res.data);
-  }, []); // eslint-disable-line
+  useEffect(() => {
+    getIntegrationBrains()
+      .then((response) => {
+        setCustomBrains(
+          response.filter((brain) => brain.integration_type === "custom")
+        );
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  }, []);
 
   const brainTypes: BrainType[] = [
     {
@@ -26,10 +38,13 @@ export const BrainTypeSelectionStep = (): JSX.Element => {
       iconName: "feed",
     },
     {
-      name: "Custom Brain - Coming soon!",
+      name: "Custom Brain!",
       description:
         "Explore your databases, converse with your APIs, and much more!",
       iconName: "custom",
+      onClick: () => {
+        setCustomBrainsCatalogueOpened(true);
+      },
     },
     {
       name: "Sync Brain - Coming soon!",
@@ -51,24 +66,52 @@ export const BrainTypeSelectionStep = (): JSX.Element => {
   return (
     <div className={styles.brain_types_wrapper}>
       <div className={styles.main_wrapper}>
-        <span className={styles.title}>Choose a type of brain</span>
-        {brainTypes.map((brainType, index) => (
-          <div key={index}>
-            <BrainTypeSelection
-              brainType={brainType}
-              selected={index === selectedIndex}
-              onClick={() => setSelectedIndex(index)}
-            />
-          </div>
-        ))}
+        {customBrainsCatalogueOpened ? (
+          <CustomBrainList customBrainList={customBrains} />
+        ) : (
+          <>
+            <span className={styles.title}>Choose a type of brain</span>
+            {brainTypes.map((brainType, index) => (
+              <div key={index}>
+                <BrainTypeSelection
+                  brainType={brainType}
+                  selected={index === selectedIndex}
+                  onClick={() => {
+                    setSelectedIndex(index);
+                    if (brainType.onClick) {
+                      brainType.onClick();
+                    }
+                  }}
+                />
+              </div>
+            ))}
+          </>
+        )}
       </div>
-      <div className={styles.button}>
-        <QuivrButton
-          label="Next Step"
-          iconName="chevronRight"
-          color="primary"
-          onClick={() => next()}
-        />
+      <div
+        className={`${styles.buttons_wrapper} ${
+          customBrainsCatalogueOpened ? styles.two_brains : ""
+        }`}
+      >
+        {customBrainsCatalogueOpened && (
+          <QuivrButton
+            label="Choose type of brain"
+            iconName="chevronLeft"
+            color="primary"
+            onClick={() => {
+              setCustomBrainsCatalogueOpened(false);
+              setSelectedIndex(-1);
+            }}
+          />
+        )}
+        {(selectedIndex === 0 || customBrainsCatalogueOpened) && (
+          <QuivrButton
+            label="Next Step"
+            iconName="chevronRight"
+            color="primary"
+            onClick={() => next()}
+          />
+        )}
       </div>
     </div>
   );

@@ -11,7 +11,12 @@ import {
   FaUnlock,
 } from "react-icons/fa";
 import { FiUpload } from "react-icons/fi";
-import { IoIosAdd, IoMdClose, IoMdLogOut } from "react-icons/io";
+import {
+  IoIosAdd,
+  IoIosHelpCircleOutline,
+  IoMdClose,
+  IoMdLogOut,
+} from "react-icons/io";
 import {
   IoArrowUpCircleOutline,
   IoHomeOutline,
@@ -66,6 +71,7 @@ export const iconList: { [name: string]: IconType } = {
   followUp: IoArrowUpCircleOutline,
   graph: VscGraph,
   hastag: RiHashtag,
+  help: IoIosHelpCircleOutline,
   history: MdHistory,
   home: IoHomeOutline,
   key: FaKey,

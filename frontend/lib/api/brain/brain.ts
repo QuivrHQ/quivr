@@ -160,5 +160,6 @@ export const getDocsFromQuestion = async (
 export const getIntegrationBrains = async (
   axiosInstance: AxiosInstance
 ): Promise<IntegrationBrains[]> => {
-  return (await axiosInstance.get(`/brains/integrations`)).data;
+  return (await axiosInstance.get<IntegrationBrains[]>(`/brains/integrations`))
+    .data;
 };

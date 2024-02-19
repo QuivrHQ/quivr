@@ -25,7 +25,13 @@
     }
   }
 
-  .button {
+  .buttons_wrapper {
     align-self: flex-end;
+
+    &.two_brains {
+      display: flex;
+      justify-content: space-between;
+      align-self: normal;
+    }
   }
 }

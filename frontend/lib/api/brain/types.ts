@@ -70,7 +70,7 @@ export type IntegrationBrains = {
   integration_name: string;
   integration_logo_url: string;
   connections_settings: Record<string, unknown>;
-  intregration_type: "custom" | "sync";
+  integration_type: "custom" | "sync";
   description: string;
   max_files: number;
 };
