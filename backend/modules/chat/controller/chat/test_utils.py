@@ -7,8 +7,8 @@ import pytest
 from fastapi import HTTPException
 from models.databases.entity import LLMModels
 from modules.chat.controller.chat.utils import (
+    check_user_requests_limit,
     find_model_and_generate_metadata,
-    update_user_usage,
 )
 
 
@@ -76,7 +76,7 @@ def test_find_model_and_generate_metadata_user_not_allowed(mock_chat_service):
 
 
 @patch("modules.chat.controller.chat.utils.time")
-def test_check_update_user_usage_within_limit(mock_time):
+def test_check_user_requests_limit_within_limit(mock_time):
     mock_time.strftime.return_value = "20220101"
     usage = Mock()
     usage.get_user_monthly_usage.return_value = 50
@@ -84,13 +84,13 @@ def test_check_update_user_usage_within_limit(mock_time):
     models_settings = [{"name": "gpt-3.5-turbo", "price": 10}]
     model_name = "gpt-3.5-turbo"
 
-    update_user_usage(usage, user_settings, models_settings, model_name)
+    check_user_requests_limit(usage, user_settings, models_settings, model_name)
 
     usage.handle_increment_user_request_count.assert_called_once_with("20220101", 10)
 
 
 @patch("modules.chat.controller.chat.utils.time")
-def test_update_user_usage_exceeds_limit(mock_time):
+def test_check_user_requests_limit_exceeds_limit(mock_time):
     mock_time.strftime.return_value = "20220101"
     usage = Mock()
     usage.get_user_monthly_usage.return_value = 100
@@ -99,7 +99,7 @@ def test_update_user_usage_exceeds_limit(mock_time):
     model_name = "gpt-3.5-turbo"
 
     with pytest.raises(HTTPException) as exc_info:
-        update_user_usage(usage, user_settings, models_settings, model_name)
+        check_user_requests_limit(usage, user_settings, models_settings, model_name)
 
     assert exc_info.value.status_code == 429
     assert (
