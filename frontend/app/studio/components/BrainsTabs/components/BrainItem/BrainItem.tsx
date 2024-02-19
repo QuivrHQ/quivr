@@ -59,7 +59,6 @@ export const BrainItem = ({ brain, even }: BrainItemProps): JSX.Element => {
         !optionsRef.current.contains(event.target as Node)
       ) {
         setOptionsOpened(false);
-        event.preventDefault();
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
