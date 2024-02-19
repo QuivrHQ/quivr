@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.0.206 (2024-02-19)
+
+## What's Changed
+* feat: Add pricing calculation method to GPT4Brain class and update user usage in chat controller by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2210
+* fix(frontend): click on inputs by @Zewed in https://github.com/QuivrHQ/quivr/pull/2212
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.205...v0.0.206
+
 ## 0.0.205 (2024-02-19)
 
 ## What's Changed
