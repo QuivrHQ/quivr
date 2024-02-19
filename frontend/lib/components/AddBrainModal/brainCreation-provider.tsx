@@ -1,10 +1,16 @@
 import { createContext, useContext, useState } from "react";
 
+import { IntegrationBrains } from "@/lib/api/brain/types";
+
 interface BrainCreationContextProps {
   isBrainCreationModalOpened: boolean;
   setIsBrainCreationModalOpened: React.Dispatch<React.SetStateAction<boolean>>;
   creating: boolean;
   setCreating: React.Dispatch<React.SetStateAction<boolean>>;
+  currentIntegrationBrain: IntegrationBrains | undefined;
+  setCurrentIntegrationBrain: React.Dispatch<
+    React.SetStateAction<IntegrationBrains | undefined>
+  >;
 }
 
 export const BrainCreationContext = createContext<
@@ -18,6 +24,8 @@ export const BrainCreationProvider = ({
 }): JSX.Element => {
   const [isBrainCreationModalOpened, setIsBrainCreationModalOpened] =
     useState<boolean>(false);
+  const [currentIntegrationBrain, setCurrentIntegrationBrain] =
+    useState<IntegrationBrains>();
   const [creating, setCreating] = useState<boolean>(false);
 
   return (
@@ -27,6 +35,8 @@ export const BrainCreationProvider = ({
         setIsBrainCreationModalOpened,
         creating,
         setCreating,
+        currentIntegrationBrain,
+        setCurrentIntegrationBrain,
       }}
     >
       {children}

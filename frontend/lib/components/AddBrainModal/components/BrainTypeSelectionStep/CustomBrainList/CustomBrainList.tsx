@@ -6,14 +6,14 @@ import Tooltip from "@/lib/components/ui/Tooltip/Tooltip";
 
 import styles from "./CustomBrainList.module.scss";
 
-import { useBrainCreationSteps } from "../../../hooks/useBrainCreationSteps";
+import { useBrainCreationContext } from "../../../brainCreation-provider";
 
 export const CustomBrainList = ({
   customBrainList,
 }: {
   customBrainList: IntegrationBrains[];
 }): JSX.Element => {
-  const { setCurrentIntegrationBrain } = useBrainCreationSteps();
+  const { setCurrentIntegrationBrain } = useBrainCreationContext();
 
   return (
     <div className={styles.cards_wrapper}>

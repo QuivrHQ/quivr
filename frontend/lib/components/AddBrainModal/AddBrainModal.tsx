@@ -6,9 +6,9 @@ import { addBrainDefaultValues } from "@/lib/config/defaultBrainConfig";
 
 import styles from "./AddBrainModal.module.scss";
 import { useBrainCreationContext } from "./brainCreation-provider";
-import { BrainKnowledgeStep } from "./components/BrainKnowledgeStep/BrainKnowledgeStep";
 import { BrainMainInfosStep } from "./components/BrainMainInfosStep/BrainMainInfosStep";
 import { BrainTypeSelectionStep } from "./components/BrainTypeSelectionStep/BrainTypeSelectionStep";
+import { CreateBrainStep } from "./components/CreateBrainStep/CreateBrainStep";
 import { Stepper } from "./components/Stepper/Stepper";
 import { CreateBrainProps } from "./types/types";
 
@@ -45,7 +45,7 @@ export const AddBrainModal = (): JSX.Element => {
           <div className={styles.content_wrapper}>
             <BrainTypeSelectionStep />
             <BrainMainInfosStep />
-            <BrainKnowledgeStep />
+            <CreateBrainStep />
           </div>
         </div>
       </Modal>

@@ -1,13 +1,13 @@
 import { KnowledgeToFeed } from "@/app/chat/[chatId]/components/ActionsBar/components";
 import QuivrButton from "@/lib/components/ui/QuivrButton/QuivrButton";
 
-import styles from "./BrainKnowledgeStep.module.scss";
+import styles from "./CreateBrainStep.module.scss.module.scss";
 import { useBrainCreationApi } from "./hooks/useBrainCreationApi";
 
 import { useBrainCreationContext } from "../../brainCreation-provider";
 import { useBrainCreationSteps } from "../../hooks/useBrainCreationSteps";
 
-export const BrainKnowledgeStep = (): JSX.Element => {
+export const CreateBrainStep = (): JSX.Element => {
   const { currentStepIndex, goToPreviousStep } = useBrainCreationSteps();
   const { createBrain } = useBrainCreationApi();
   const { creating, setCreating } = useBrainCreationContext();
