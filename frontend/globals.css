@@ -13,7 +13,6 @@ section {
 
 a {
   @apply hover:text-primary dark:hover:text-gray-200 transition-colors;
-  @apply underline;
 }
 
 @layer utilities {
