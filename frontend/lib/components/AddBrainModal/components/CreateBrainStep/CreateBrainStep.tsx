@@ -10,7 +10,8 @@ import { useBrainCreationSteps } from "../../hooks/useBrainCreationSteps";
 export const CreateBrainStep = (): JSX.Element => {
   const { currentStepIndex, goToPreviousStep } = useBrainCreationSteps();
   const { createBrain } = useBrainCreationApi();
-  const { creating, setCreating } = useBrainCreationContext();
+  const { creating, setCreating, currentIntegrationBrain } =
+    useBrainCreationContext();
 
   const previous = (): void => {
     goToPreviousStep();
@@ -27,10 +28,12 @@ export const CreateBrainStep = (): JSX.Element => {
 
   return (
     <div className={styles.brain_knowledge_wrapper}>
-      <div>
-        <span className={styles.title}>Feed your brain</span>
-        <KnowledgeToFeed hideBrainSelector={true} />
-      </div>
+      {!currentIntegrationBrain && (
+        <div>
+          <span className={styles.title}>Feed your brain</span>
+          <KnowledgeToFeed hideBrainSelector={true} />
+        </div>
+      )}
       <div className={styles.buttons_wrapper}>
         <QuivrButton
           label="Previous step"

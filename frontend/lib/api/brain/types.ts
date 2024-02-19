@@ -51,6 +51,11 @@ export type ApiBrainDefinition = {
   jq_instructions: string;
 };
 
+export type IntegrationSettings = {
+  id: UUID;
+  settings: Record<string, unknown>;
+};
+
 export type CreateBrainInput = {
   name: string;
   description: string;
@@ -63,6 +68,7 @@ export type CreateBrainInput = {
   brain_definition?: Omit<ApiBrainDefinition, "brain_id">;
   brain_secrets_values?: Record<string, string>;
   connected_brains_ids?: UUID[];
+  integration?: IntegrationSettings;
 };
 
 export type IntegrationBrains = {

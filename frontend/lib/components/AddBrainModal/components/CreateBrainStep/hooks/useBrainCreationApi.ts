@@ -4,6 +4,7 @@ import { useFormContext } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 
 import { PUBLIC_BRAINS_KEY } from "@/lib/api/brain/config";
+import { IntegrationSettings } from "@/lib/api/brain/types";
 import { CreateBrainProps } from "@/lib/components/AddBrainModal/types/types";
 import { useKnowledgeToFeedInput } from "@/lib/components/KnowledgeToFeedInput/hooks/useKnowledgeToFeedInput.ts";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
@@ -23,8 +24,11 @@ export const useBrainCreationApi = () => {
   const { setKnowledgeToFeed } = useKnowledgeToFeedContext();
   const { createBrain: createBrainApi, setCurrentBrainId } = useBrainContext();
   const { crawlWebsiteHandler, uploadFileHandler } = useKnowledgeToFeedInput();
-  const { setIsBrainCreationModalOpened, setCreating } =
-    useBrainCreationContext();
+  const {
+    setIsBrainCreationModalOpened,
+    setCreating,
+    currentIntegrationBrain,
+  } = useBrainCreationContext();
 
   const handleFeedBrain = async (brainId: UUID): Promise<void> => {
     const uploadPromises = files.map((file) =>
@@ -38,10 +42,19 @@ export const useBrainCreationApi = () => {
 
   const createBrain = async (): Promise<void> => {
     const { name, description } = getValues();
+    let integrationSettings: IntegrationSettings | undefined = undefined;
+
+    if (currentIntegrationBrain) {
+      integrationSettings = {
+        id: currentIntegrationBrain.id,
+        settings: {},
+      };
+    }
 
     const createdBrainId = await createBrainApi({
       name,
       description,
+      integration: integrationSettings,
     });
 
     if (createdBrainId === undefined) {
