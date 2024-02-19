@@ -1,6 +1,8 @@
+import { useState } from "react";
 import { useFormContext } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 
+import { IntegrationBrains } from "@/lib/api/brain/types";
 import {
   CreateBrainProps,
   Step,
@@ -8,6 +10,8 @@ import {
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const useBrainCreationSteps = () => {
+  const [currentIntegrationBrain, setCurrentIntegrationBrain] =
+    useState<IntegrationBrains>();
   const { t } = useTranslation("brain");
 
   const steps: Step[] = [
@@ -54,5 +58,7 @@ export const useBrainCreationSteps = () => {
     goToNextStep,
     goToPreviousStep,
     currentStepIndex,
+    currentIntegrationBrain,
+    setCurrentIntegrationBrain,
   };
 };
