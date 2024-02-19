@@ -11,6 +11,10 @@ from models.settings import BrainSettings, get_supabase_client
 from models.user_usage import UserUsage
 from modules.brain.service.brain_service import BrainService
 from modules.chat.controller.chat.brainful_chat import BrainfulChat
+from modules.chat.controller.chat.utils import (
+    check_user_requests_limit,
+    find_model_and_generate_metadata,
+)
 from modules.chat.dto.chats import ChatItem, ChatQuestion
 from modules.chat.dto.inputs import (
     ChatUpdatableProperties,
@@ -72,6 +76,12 @@ def get_answer_generator(
     # Get History
     history = chat_service.get_chat_history(chat_id)
 
+    # Get user settings
+    user_settings = user_usage.get_user_settings()
+
+    # Get Model settings for the user
+    models_settings = user_usage.get_model_settings()
+
     # Generic
     brain, metadata_brain = brain_service.find_brain_from_question(
         brain_id, chat_question.question, current_user, chat_id, history, vector_store
@@ -79,17 +89,35 @@ def get_answer_generator(
 
     logger.info(f"Brain: {brain}")
 
-    send_telemetry("question_asked", {"model_name": brain.model})
+    model_to_use, metadata = find_model_and_generate_metadata(
+        chat_id,
+        brain,
+        user_settings,
+        models_settings,
+        metadata_brain,
+    )
+
+    # Raises an error if the user has consumed all of of his credits
+    check_user_requests_limit(
+        usage=user_usage,
+        user_settings=user_settings,
+        models_settings=models_settings,
+        model_name=model_to_use.name,
+    )
+
+    send_telemetry("question_asked", {"model_name": model_to_use.name})
 
     gpt_answer_generator = chat_instance.get_answer_generator(
-        brain=brain,
         chat_id=str(chat_id),
-        model=brain.model,
+        model=model_to_use.name,
+        max_tokens=model_to_use.max_output,
+        max_input=model_to_use.max_input,
         temperature=0.1,
         streaming=True,
         prompt_id=chat_question.prompt_id,
         user_id=current_user.id,
-        user_email=current_user.email,
+        metadata=metadata,
+        brain=brain,
     )
 
     return gpt_answer_generator

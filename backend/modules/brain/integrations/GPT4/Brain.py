@@ -24,9 +24,6 @@ class GPT4Brain(KnowledgeBrainQA):
             **kwargs,
         )
 
-    def calculate_pricing(self):
-        return 3
-
     def get_chain(self):
 
         prompt = ChatPromptTemplate.from_messages(
