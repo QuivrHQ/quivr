@@ -36,7 +36,8 @@ class BigBrain(KnowledgeBrainQA):
 
     def get_chain(self):
         system_template = """Combine these summaries in a way that makes sense and answer the user's question.
-        Use markdown or any other techniques to display the content in a nice and aerated way. 
+        Use markdown or any other techniques to display the content in a nice and aerated way.
+        Here are user instructions on how to respond: {custom_personality}
         ______________________
         {summaries}"""
         messages = [
@@ -88,6 +89,9 @@ class BigBrain(KnowledgeBrainQA):
             {
                 "question": question.question,
                 "chat_history": transformed_history,
+                "custom_personality": (
+                    self.prompt_to_use.content if self.prompt_to_use else None
+                ),
             }
         ):
             if "answer" in chunk:
