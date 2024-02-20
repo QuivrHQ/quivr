@@ -54,6 +54,7 @@ export const FoldableSection = (props: FoldableSectionProps): JSX.Element => {
           folded ? styles.contentCollapsed : styles.contentExpanded
         }`}
         style={{ maxHeight: getContentHeight() }}
+      >
         {props.children}
       </div>
     </div>
