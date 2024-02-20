@@ -5,6 +5,9 @@ from celery import Celery
 
 CELERY_BROKER_URL = os.getenv("CELERY_BROKER_URL", "")
 CELERY_BROKER_QUEUE_NAME = os.getenv("CELERY_BROKER_QUEUE_NAME", "quivr")
+REDIS_HOST = os.getenv("REDIS_HOST", "")
+REDIS_PORT = os.getenv("REDIS_PORT", "")
+REDIS_PASS = os.getenv("REDIS_PASS", "")
 
 celery = Celery(__name__)
 
@@ -25,11 +28,12 @@ if CELERY_BROKER_URL.startswith("sqs"):
         broker_transport_options=broker_transport_options,
     )
     celery.conf.task_default_queue = CELERY_BROKER_QUEUE_NAME
-elif CELERY_BROKER_URL.startswith("redis"):
+elif REDIS_HOST:
     celery = Celery(
         __name__,
-        broker=CELERY_BROKER_URL,
-        backend=CELERY_BROKER_URL,
+        # redis://:password@hostname:port/db_number
+        broker=f"redis://:{REDIS_PASS}@{REDIS_HOST}:{REDIS_PORT}/0",
+        backend=f"redis://:{REDIS_PASS}@{REDIS_HOST}:{REDIS_PORT}/0",
         task_concurrency=4,
         worker_prefetch_multiplier=1,
         task_serializer="json",
