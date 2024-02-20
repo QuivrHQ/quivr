@@ -177,7 +177,7 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
         self.models_settings = self.user_usage.get_model_settings()
         self.increase_usage_user()
         self.knowledge_qa = QuivrRAG(
-            model=self.brain.model,
+            model=self.brain.model if self.brain.model else self.model,
             brain_id=brain_id,
             chat_id=chat_id,
             streaming=streaming,
