@@ -103,6 +103,7 @@ class BrainsUsers(BrainsUsersInterface):
                 if brain_data["brains"]["description"] is not None
                 else ""
             ),
+            integration_logo_url="",
         )
 
     def delete_brain_user_by_id(
