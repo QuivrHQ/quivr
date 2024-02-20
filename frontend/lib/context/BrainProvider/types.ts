@@ -29,7 +29,7 @@ export type MinimalBrainForUser = {
   name: string;
   role: BrainRoleType;
   status: BrainAccessStatus;
-  brain_type?: BrainType;
+  brain_type: BrainType;
   description: string;
 };
 
