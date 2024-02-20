@@ -1,0 +1,44 @@
+@use "@/styles/Colors.module.scss";
+@use "@/styles/Radius.module.scss";
+@use "@/styles/ScreenSizes.module.scss";
+@use "@/styles/Spacings.module.scss";
+@use "@/styles/Typography.module.scss";
+
+.cards_wrapper {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: Spacings.$spacing05;
+
+  .title {
+    @include Typography.H2;
+  }
+
+  .brain_card_wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border-radius: Radius.$normal;
+    gap: Spacings.$spacing03;
+    padding: Spacings.$spacing04;
+    border: 1px solid Colors.$lightest-black;
+    width: fit-content;
+    cursor: pointer;
+    width: 100px;
+
+    .brain_title {
+      font-size: Typography.$small;
+    }
+
+    &:hover,
+    &.selected {
+      border-color: Colors.$primary;
+      background-color: Colors.$primary-lightest;
+
+      .brain_title {
+        color: Colors.$primary;
+      }
+    }
+  }
+}

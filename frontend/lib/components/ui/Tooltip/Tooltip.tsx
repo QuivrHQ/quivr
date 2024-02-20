@@ -3,6 +3,8 @@ import * as TooltipPrimitive from "@radix-ui/react-tooltip";
 import { AnimatePresence, motion } from "framer-motion";
 import { ReactNode, useState } from "react";
 
+import styles from "./Tooltip.module.scss";
+
 interface TooltipProps {
   children?: ReactNode;
   tooltip?: ReactNode;
@@ -31,11 +33,9 @@ const Tooltip = ({ children, tooltip }: TooltipProps): JSX.Element => {
                     opacity: 0,
                     transition: { ease: "easeIn", duration: 0.1 },
                   }}
-                  //   transition={{ duration: 0.2, ease: "circInOut" }}
-                  className="select-none rounded-md border border-black/10 dark:border-white/25 bg-white dark:bg-gray-800 px-5 py-3 text-sm leading-none shadow-lg dark:shadow-primary/25"
+                  className={styles.tooltip_content_wrapper}
                 >
                   {tooltip}
-                  <TooltipPrimitive.Arrow className="fill-white dark:fill-black" />
                 </motion.div>
               </TooltipPrimitive.Content>
             </TooltipPrimitive.Portal>

@@ -11,6 +11,7 @@ import {
 
 import {
   CreateBrainInput,
+  IntegrationBrains,
   ListFilesProps,
   SubscriptionUpdatableProperties,
   UpdateBrainInput,
@@ -154,4 +155,11 @@ export const getDocsFromQuestion = async (
       }
     )
   ).data.docs;
+};
+
+export const getIntegrationBrains = async (
+  axiosInstance: AxiosInstance
+): Promise<IntegrationBrains[]> => {
+  return (await axiosInstance.get<IntegrationBrains[]>(`/brains/integrations`))
+    .data;
 };

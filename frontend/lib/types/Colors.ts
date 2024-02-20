@@ -6,4 +6,5 @@ export type Color =
   | "gold"
   | "accent"
   | "white"
-  | "dangerous";
+  | "dangerous"
+  | "success";

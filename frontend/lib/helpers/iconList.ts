@@ -10,8 +10,14 @@ import {
   FaRegUserCircle,
   FaUnlock,
 } from "react-icons/fa";
+import { FaInfo } from "react-icons/fa6";
 import { FiUpload } from "react-icons/fi";
-import { IoIosAdd, IoMdClose, IoMdLogOut } from "react-icons/io";
+import {
+  IoIosAdd,
+  IoIosHelpCircleOutline,
+  IoMdClose,
+  IoMdLogOut,
+} from "react-icons/io";
 import {
   IoArrowUpCircleOutline,
   IoHomeOutline,
@@ -66,8 +72,10 @@ export const iconList: { [name: string]: IconType } = {
   followUp: IoArrowUpCircleOutline,
   graph: VscGraph,
   hastag: RiHashtag,
+  help: IoIosHelpCircleOutline,
   history: MdHistory,
   home: IoHomeOutline,
+  info: FaInfo,
   key: FaKey,
   loader: AiOutlineLoading3Quarters,
   logout: IoMdLogOut,

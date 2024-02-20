@@ -4,7 +4,7 @@ import { HTMLAttributes } from "react";
 
 import { cn } from "@/lib/utils";
 
-import Tooltip from "./Tooltip";
+import Tooltip from "./Tooltip/Tooltip";
 
 interface EllipsisProps extends HTMLAttributes<HTMLDivElement> {
   children: string;

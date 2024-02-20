@@ -9,6 +9,7 @@ import {
   getBrainUsers,
   getDefaultBrain,
   getDocsFromQuestion,
+  getIntegrationBrains,
   getPublicBrains,
   setAsDefaultBrain,
   Subscription,
@@ -55,5 +56,6 @@ export const useBrainApi = () => {
       brainId: string,
       secrets: Record<string, string>
     ) => updateBrainSecrets(brainId, secrets, axiosInstance),
+    getIntegrationBrains: async () => getIntegrationBrains(axiosInstance),
   };
 };

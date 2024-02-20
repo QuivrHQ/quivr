@@ -15,6 +15,8 @@ import { usePermissionsController } from "./hooks/usePermissionsController";
 import { UsePromptProps } from "./hooks/usePrompt";
 import { useSettingsTab } from "./hooks/useSettingsTab";
 
+import { useBrainFetcher } from "../../hooks/useBrainFetcher";
+
 type SettingsTabProps = {
   brainId: UUID;
 };
@@ -47,6 +49,10 @@ export const SettingsTabContent = ({
       brainId,
     });
 
+  const { brain } = useBrainFetcher({
+    brainId,
+  });
+
   return (
     <>
       <form
@@ -65,18 +71,23 @@ export const SettingsTabContent = ({
           isSettingAsDefault={isSettingAsDefault}
           setAsDefaultBrainHandler={setAsDefaultBrainHandler}
         />
-        <Divider
-          textClassName="font-semibold text-black w-full mx-1"
-          separatorClassName="w-full"
-          className="w-full my-10"
-          text={t("modelSection", { ns: "config" })}
-        />
-        <ModelSelection
-          accessibleModels={accessibleModels}
-          hasEditRights={hasEditRights}
-          brainId={brainId}
-          handleSubmit={handleSubmit}
-        />
+        {brain?.brain_type === "doc" && (
+          <>
+            <Divider
+              textClassName="font-semibold text-black w-full mx-1"
+              separatorClassName="w-full"
+              className="w-full my-10"
+              text={t("modelSection", { ns: "config" })}
+            />
+
+            <ModelSelection
+              accessibleModels={accessibleModels}
+              hasEditRights={hasEditRights}
+              brainId={brainId}
+              handleSubmit={handleSubmit}
+            />
+          </>
+        )}
         <Divider text={t("customPromptSection", { ns: "config" })} />
         <Prompt
           usePromptProps={promptProps}

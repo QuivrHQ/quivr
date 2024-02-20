@@ -14,6 +14,7 @@ export const QADisplay = ({ content }: QADisplayProps): JSX.Element => {
     brain_name,
     prompt_title,
     metadata,
+    brain_id,
   } = content;
 
   return (
@@ -31,6 +32,7 @@ export const QADisplay = ({ content }: QADisplayProps): JSX.Element => {
         text={assistant}
         brainName={brain_name}
         promptName={prompt_title}
+        brainId={brain_id}
         metadata={metadata} // eslint-disable-line @typescript-eslint/no-unsafe-assignment
       />
     </>

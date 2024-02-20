@@ -205,7 +205,7 @@ def get_user_invitation(
             detail="You have not been invited to this brain",
         )
 
-    brain_details = brain_service.get_brain_details(brain_id)
+    brain_details = brain_service.get_brain_details(brain_id, current_user.id)
 
     if brain_details is None:
         raise HTTPException(

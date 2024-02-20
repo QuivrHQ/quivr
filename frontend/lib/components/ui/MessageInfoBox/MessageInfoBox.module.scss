@@ -1,0 +1,18 @@
+@use "@/styles/Colors.module.scss";
+@use "@/styles/Radius.module.scss";
+@use "@/styles/Spacings.module.scss";
+
+.message_info_box_wrapper {
+  padding: Spacings.$spacing03;
+  display: flex;
+  align-items: center;
+  gap: Spacings.$spacing03;
+  width: 100%;
+  border: 1px solid Colors.$normal-grey;
+  color: Colors.$black;
+  border-radius: Radius.$normal;
+
+  &.success {
+    border-color: Colors.$success;
+  }
+}

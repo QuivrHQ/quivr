@@ -15,6 +15,10 @@
   display: flex;
   width: fit-content;
 
+  &.hidden {
+    display: none;
+  }
+
   &.primary {
     border-color: Colors.$primary;
     color: Colors.$primary;

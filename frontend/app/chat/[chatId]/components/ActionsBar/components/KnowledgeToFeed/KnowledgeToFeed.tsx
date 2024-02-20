@@ -26,8 +26,9 @@ export const KnowledgeToFeed = ({
   const brainsWithUploadRights = formatMinimalBrainsToSelectComponentInput(
     useMemo(
       () =>
-        allBrains.filter((brain) =>
-          requiredRolesForUpload.includes(brain.role)
+        allBrains.filter(
+          (brain) =>
+            requiredRolesForUpload.includes(brain.role) && !!brain.max_files
         ),
       [allBrains]
     )

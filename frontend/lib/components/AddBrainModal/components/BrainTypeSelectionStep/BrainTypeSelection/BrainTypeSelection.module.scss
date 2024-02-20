@@ -10,7 +10,7 @@
   padding: Spacings.$spacing05;
   border-radius: Radius.$big;
   cursor: pointer;
-  border: 2px solid transparent;
+  border: 1px solid Colors.$lightest-black;
 
   &.disabled {
     pointer-events: none;
@@ -35,6 +35,7 @@
   &:hover,
   &.selected {
     border-color: Colors.$primary;
+    background-color: Colors.$primary-lightest;
 
     .name {
       color: Colors.$primary;

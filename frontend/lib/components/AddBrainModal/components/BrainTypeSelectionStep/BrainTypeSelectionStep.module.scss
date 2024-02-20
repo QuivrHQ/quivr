@@ -10,6 +10,8 @@
   padding-inline: Spacings.$spacing08;
   height: 100%;
   gap: Spacings.$spacing05;
+  overflow-y: hidden;
+  overflow-x: visible;
 
   @media (max-width: ScreenSizes.$small) {
     padding-inline: 0;
@@ -19,13 +21,22 @@
     display: flex;
     flex-direction: column;
     gap: Spacings.$spacing05;
+    padding-top: Spacings.$spacing03;
+    overflow-y: scroll;
+    overflow-x: visible;
 
     .title {
       @include Typography.H2;
     }
   }
 
-  .button {
+  .buttons_wrapper {
     align-self: flex-end;
+
+    &.two_buttons {
+      display: flex;
+      justify-content: space-between;
+      align-self: normal;
+    }
   }
 }

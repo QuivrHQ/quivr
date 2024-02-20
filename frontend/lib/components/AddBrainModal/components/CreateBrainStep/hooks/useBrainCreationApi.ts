@@ -4,6 +4,7 @@ import { useFormContext } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 
 import { PUBLIC_BRAINS_KEY } from "@/lib/api/brain/config";
+import { IntegrationSettings } from "@/lib/api/brain/types";
 import { CreateBrainProps } from "@/lib/components/AddBrainModal/types/types";
 import { useKnowledgeToFeedInput } from "@/lib/components/KnowledgeToFeedInput/hooks/useKnowledgeToFeedInput.ts";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
@@ -23,8 +24,11 @@ export const useBrainCreationApi = () => {
   const { setKnowledgeToFeed } = useKnowledgeToFeedContext();
   const { createBrain: createBrainApi, setCurrentBrainId } = useBrainContext();
   const { crawlWebsiteHandler, uploadFileHandler } = useKnowledgeToFeedInput();
-  const { setIsBrainCreationModalOpened, setCreating } =
-    useBrainCreationContext();
+  const {
+    setIsBrainCreationModalOpened,
+    setCreating,
+    currentIntegrationBrain,
+  } = useBrainCreationContext();
 
   const handleFeedBrain = async (brainId: UUID): Promise<void> => {
     const uploadPromises = files.map((file) =>
@@ -37,26 +41,21 @@ export const useBrainCreationApi = () => {
   };
 
   const createBrain = async (): Promise<void> => {
-    const {
-      name,
-      description,
-      brain_definition,
-      brain_secrets_values,
-      status,
-      brain_type,
-      connected_brains_ids,
-    } = getValues();
+    const { name, description } = getValues();
+    let integrationSettings: IntegrationSettings | undefined = undefined;
+
+    if (currentIntegrationBrain) {
+      integrationSettings = {
+        integration_id: currentIntegrationBrain.id,
+        settings: {},
+      };
+    }
 
     const createdBrainId = await createBrainApi({
+      brain_type: currentIntegrationBrain ? "integration" : "doc",
       name,
       description,
-      status,
-      brain_type,
-      brain_definition: brain_type === "api" ? brain_definition : undefined,
-      brain_secrets_values:
-        brain_type === "api" ? brain_secrets_values : undefined,
-      connected_brains_ids:
-        brain_type === "composite" ? connected_brains_ids : undefined,
+      integration: integrationSettings,
     });
 
     if (createdBrainId === undefined) {
@@ -67,9 +66,8 @@ export const useBrainCreationApi = () => {
 
       return;
     }
-    if (brain_type === "doc") {
-      void handleFeedBrain(createdBrainId);
-    }
+
+    void handleFeedBrain(createdBrainId);
 
     setCurrentBrainId(createdBrainId);
     setIsBrainCreationModalOpened(false);

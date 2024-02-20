@@ -14,6 +14,7 @@ export const QuivrButton = ({
   isLoading,
   iconName,
   disabled,
+  hidden,
 }: ButtonType): JSX.Element => {
   const [hovered, setHovered] = useState<boolean>(false);
 
@@ -23,6 +24,7 @@ export const QuivrButton = ({
       ${styles.button_wrapper} 
       ${styles[color]} 
       ${disabled ? styles.disabled : ""}
+      ${hidden ? styles.hidden : ""}
       `}
       // eslint-disable-next-line @typescript-eslint/no-misused-promises
       onClick={() => onClick()}

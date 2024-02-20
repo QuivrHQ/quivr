@@ -51,6 +51,11 @@ export type ApiBrainDefinition = {
   jq_instructions: string;
 };
 
+export type IntegrationSettings = {
+  integration_id?: string;
+  settings?: { [x: string]: object | undefined };
+};
+
 export type CreateBrainInput = {
   name: string;
   description: string;
@@ -63,6 +68,17 @@ export type CreateBrainInput = {
   brain_definition?: Omit<ApiBrainDefinition, "brain_id">;
   brain_secrets_values?: Record<string, string>;
   connected_brains_ids?: UUID[];
+  integration?: IntegrationSettings;
+};
+
+export type IntegrationBrains = {
+  id: UUID;
+  integration_name: string;
+  integration_logo_url: string;
+  connections_settings: Record<string, unknown>;
+  integration_type: "custom" | "sync";
+  description: string;
+  max_files: number;
 };
 
 export type UpdateBrainInput = Partial<CreateBrainInput>;

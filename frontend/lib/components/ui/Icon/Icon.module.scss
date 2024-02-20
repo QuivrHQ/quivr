@@ -69,6 +69,10 @@
   }
 }
 
+.success {
+  color: Colors.$success;
+}
+
 .disabled {
   color: Colors.$black;
   pointer-events: none;
