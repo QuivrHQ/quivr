@@ -10,6 +10,16 @@ import { BrainType, Model } from "../../types/BrainConfig";
 
 export type BrainAccessStatus = "private" | "public";
 
+export type IntegrationDescription = {
+  connection_settings?: object;
+  description: string;
+  id: UUID;
+  integration_logo_url: string;
+  integration_name: string;
+  integration_type: "custom" | "sync";
+  max_files: number;
+};
+
 export type Brain = {
   id: UUID;
   name: string;
@@ -22,6 +32,7 @@ export type Brain = {
   prompt_id?: string | null;
   brain_type?: BrainType;
   brain_definition?: ApiBrainDefinition;
+  integration_description?: IntegrationDescription;
 };
 
 export type MinimalBrainForUser = {
