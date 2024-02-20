@@ -47,7 +47,7 @@ def validate_brain_authorization(
     return: None
     """
 
-    brain = brain_service.get_brain_details(brain_id)
+    brain = brain_service.get_brain_details(brain_id, user_id)
 
     if brain and brain.status == "public":
         return

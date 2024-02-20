@@ -1,4 +1,3 @@
-from enum import Enum
 from typing import Optional
 from uuid import UUID
 
@@ -10,17 +9,13 @@ from modules.brain.entity.api_brain_definition_entity import (
     ApiBrainDefinitionSecret,
 )
 from modules.brain.entity.brain_entity import BrainType
+from modules.brain.entity.integration_brain import IntegrationType
 from pydantic import BaseModel, Extra
 
 logger = get_logger(__name__)
 
 
-class IntegrationType(str, Enum):
-    CUSTOM = "custom"
-    SYNC = "sync"
-
-
-class CreateApiBrainDefinition(BaseModel, extra=Extra.forbid):
+class CreateApiBrainDefinition(BaseModel, extra="ignore"):
     method: ApiBrainAllowedMethods
     url: str
     params: Optional[ApiBrainDefinitionSchema] = ApiBrainDefinitionSchema()
@@ -30,7 +25,7 @@ class CreateApiBrainDefinition(BaseModel, extra=Extra.forbid):
     jq_instructions: Optional[str] = None
 
 
-class CreateIntegrationBrain(BaseModel, extra=Extra.forbid):
+class CreateIntegrationBrain(BaseModel, extra="ignore"):
     integration_name: str
     integration_logo_url: str
     connection_settings: dict
@@ -39,16 +34,16 @@ class CreateIntegrationBrain(BaseModel, extra=Extra.forbid):
     max_files: int
 
 
-class BrainIntegrationSettings(BaseModel, extra=Extra.forbid):
+class BrainIntegrationSettings(BaseModel, extra="ignore"):
     integration_id: str
     settings: dict
 
 
-class BrainIntegrationUpdateSettings(BaseModel, extra=Extra.forbid):
+class BrainIntegrationUpdateSettings(BaseModel, extra="ignore"):
     settings: dict
 
 
-class CreateBrainProperties(BaseModel, extra=Extra.forbid):
+class CreateBrainProperties(BaseModel, extra="ignore"):
     name: Optional[str] = "Default brain"
     description: str = "This is a description"
     status: Optional[str] = "private"
@@ -69,7 +64,8 @@ class CreateBrainProperties(BaseModel, extra=Extra.forbid):
         return brain_dict
 
 
-class BrainUpdatableProperties(BaseModel):
+class BrainUpdatableProperties(BaseModel, extra="ignore"):
+
     name: Optional[str] = None
     description: Optional[str] = None
     temperature: Optional[float] = None

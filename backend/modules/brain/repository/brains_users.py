@@ -36,13 +36,22 @@ class BrainsUsers(BrainsUsersInterface):
         response = (
             self.db.from_("brains_users")
             .select(
-                "id:brain_id, rights, brains (brain_id, name, status, brain_type, description, meaning)"
+                "id:brain_id, rights, brains (brain_id, name, status, brain_type, description, meaning, integrations_user (brain_id, integration_id, integrations (id, integration_name, integration_logo_url)))"
             )
             .filter("user_id", "eq", user_id)
             .execute()
         )
         user_brains: list[MinimalUserBrainEntity] = []
         for item in response.data:
+            integration_logo_url = ""
+            if item["brains"]["brain_type"] == "integration":
+                if "integrations_user" in item["brains"]:
+                    for integration_user in item["brains"]["integrations_user"]:
+                        if "integrations" in integration_user:
+                            integration_logo_url = integration_user["integrations"][
+                                "integration_logo_url"
+                            ]
+
             user_brains.append(
                 MinimalUserBrainEntity(
                     id=item["brains"]["brain_id"],
@@ -50,9 +59,12 @@ class BrainsUsers(BrainsUsersInterface):
                     rights=item["rights"],
                     status=item["brains"]["status"],
                     brain_type=item["brains"]["brain_type"],
-                    description=item["brains"]["description"]
-                    if item["brains"]["description"] is not None
-                    else "",
+                    description=(
+                        item["brains"]["description"]
+                        if item["brains"]["description"] is not None
+                        else ""
+                    ),
+                    integration_logo_url=str(integration_logo_url),
                 )
             )
             user_brains[-1].rights = item["rights"]
@@ -81,9 +93,12 @@ class BrainsUsers(BrainsUsersInterface):
             rights=brain_data["rights"],
             status=brain_data["brains"]["status"],
             brain_type=brain_data["brains"]["brain_type"],
-            description=brain_data["brains"]["description"]
-            if brain_data["brains"]["description"] is not None
-            else "",
+            description=(
+                brain_data["brains"]["description"]
+                if brain_data["brains"]["description"] is not None
+                else ""
+            ),
+            integration_logo_url="",
         )
 
     def delete_brain_user_by_id(

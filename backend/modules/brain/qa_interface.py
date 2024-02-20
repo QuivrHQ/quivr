@@ -11,6 +11,12 @@ class QAInterface(ABC):
     """
 
     @abstractmethod
+    def calculate_pricing(self):
+        raise NotImplementedError(
+            "calculate_pricing is an abstract method and must be implemented"
+        )
+
+    @abstractmethod
     def generate_answer(
         self,
         chat_id: UUID,

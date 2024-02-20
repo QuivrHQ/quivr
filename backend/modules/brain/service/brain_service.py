@@ -22,6 +22,7 @@ from modules.brain.repository.interfaces import (
     BrainsVectorsInterface,
     CompositeBrainsConnectionsInterface,
     ExternalApiSecretsInterface,
+    IntegrationBrainInterface,
     IntegrationDescriptionInterface,
 )
 from modules.brain.service.api_brain_definition_service import ApiBrainDefinitionService
@@ -42,7 +43,7 @@ class BrainService:
     brain_vector_repository: BrainsVectorsInterface
     external_api_secrets_repository: ExternalApiSecretsInterface
     composite_brains_connections_repository: CompositeBrainsConnectionsInterface
-    integration_brains_repository: IntegrationDescriptionInterface
+    integration_brains_repository: IntegrationBrainInterface
     integration_description_repository: IntegrationDescriptionInterface
 
     def __init__(self):
@@ -324,7 +325,7 @@ class BrainService:
     def update_brain_last_update_time(self, brain_id: UUID):
         self.brain_repository.update_brain_last_update_time(brain_id)
 
-    def get_brain_details(self, brain_id: UUID) -> BrainEntity | None:
+    def get_brain_details(self, brain_id: UUID, user_id: UUID) -> BrainEntity | None:
         brain = self.brain_repository.get_brain_details(brain_id)
         if brain == None:
             return None
@@ -339,6 +340,17 @@ class BrainService:
             brain.connected_brains_ids = (
                 self.composite_brains_connections_repository.get_connected_brains(
                     brain_id
+                )
+            )
+        if brain.brain_type == BrainType.INTEGRATION:
+            brain.integration = (
+                self.integration_brains_repository.get_integration_brain(
+                    brain_id, user_id
+                )
+            )
+            brain.integration_description = (
+                self.integration_description_repository.get_integration_description(
+                    brain.integration.integration_id
                 )
             )
         return brain

@@ -3,6 +3,10 @@ from typing import List, Optional
 from uuid import UUID
 
 from modules.brain.entity.api_brain_definition_entity import ApiBrainDefinitionEntity
+from modules.brain.entity.integration_brain import (
+    IntegrationDescriptionEntity,
+    IntegrationEntity,
+)
 from pydantic import BaseModel
 
 
@@ -28,6 +32,8 @@ class BrainEntity(BaseModel):
     connected_brains_ids: Optional[List[UUID]] = None
     raw: Optional[bool] = None
     jq_instructions: Optional[str] = None
+    integration: Optional[IntegrationEntity] = None
+    integration_description: Optional[IntegrationDescriptionEntity] = None
 
     @property
     def id(self) -> UUID:
@@ -71,3 +77,4 @@ class MinimalUserBrainEntity(BaseModel):
     status: str
     brain_type: BrainType
     description: str
+    integration_logo_url: str
