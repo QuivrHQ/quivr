@@ -10,6 +10,7 @@ import {
   FaRegUserCircle,
   FaUnlock,
 } from "react-icons/fa";
+import { FaInfo } from "react-icons/fa6";
 import { FiUpload } from "react-icons/fi";
 import {
   IoIosAdd,
@@ -74,6 +75,7 @@ export const iconList: { [name: string]: IconType } = {
   help: IoIosHelpCircleOutline,
   history: MdHistory,
   home: IoHomeOutline,
+  info: FaInfo,
   key: FaKey,
   loader: AiOutlineLoading3Quarters,
   logout: IoMdLogOut,

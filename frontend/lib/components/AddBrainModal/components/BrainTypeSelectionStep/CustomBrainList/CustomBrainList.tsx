@@ -1,7 +1,7 @@
 import Image from "next/image";
 
 import { IntegrationBrains } from "@/lib/api/brain/types";
-import { Icon } from "@/lib/components/ui/Icon/Icon";
+import { MessageInfoBox } from "@/lib/components/ui/MessageInfoBox/MessageInfoBox";
 import Tooltip from "@/lib/components/ui/Tooltip/Tooltip";
 
 import styles from "./CustomBrainList.module.scss";
@@ -17,39 +17,31 @@ export const CustomBrainList = ({
 
   return (
     <div className={styles.cards_wrapper}>
-      {customBrainList.map((brain) => {
-        return (
-          <div
-            className={styles.card_container}
-            key={brain.id}
-            onClick={() => setCurrentIntegrationBrain(brain)}
-          >
-            <div className={styles.icon_help}>
+      <MessageInfoBox content="More custom brains are coming!" />
+      <div>
+        {customBrainList.map((brain) => {
+          return (
+            <div
+              key={brain.id}
+              onClick={() => setCurrentIntegrationBrain(brain)}
+            >
               <Tooltip tooltip={brain.description}>
-                <div>
-                  <Icon
-                    color="black"
-                    handleHover={true}
-                    size="normal"
-                    name="help"
+                <div className={styles.brain_card_wrapper}>
+                  <Image
+                    src={brain.integration_logo_url}
+                    alt={brain.integration_name}
+                    width={70}
+                    height={70}
                   />
+                  <span className={styles.brain_title}>
+                    {brain.integration_name}
+                  </span>
                 </div>
               </Tooltip>
             </div>
-            <div className={styles.brain_card_wrapper}>
-              <span className={styles.brain_title}>
-                {brain.integration_name}
-              </span>
-              <Image
-                src={brain.integration_logo_url}
-                alt={brain.integration_name}
-                width={70}
-                height={70}
-              />
-            </div>
-          </div>
-        );
-      })}
+          );
+        })}
+      </div>
     </div>
   );
 };
