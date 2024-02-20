@@ -46,12 +46,13 @@ export const useBrainCreationApi = () => {
 
     if (currentIntegrationBrain) {
       integrationSettings = {
-        id: currentIntegrationBrain.id,
+        integration_id: currentIntegrationBrain.id,
         settings: {},
       };
     }
 
     const createdBrainId = await createBrainApi({
+      brain_type: currentIntegrationBrain ? "integration" : "doc",
       name,
       description,
       integration: integrationSettings,

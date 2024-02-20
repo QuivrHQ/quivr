@@ -52,7 +52,7 @@ export type ApiBrainDefinition = {
 };
 
 export type IntegrationSettings = {
-  id: UUID;
+  integration_id: string;
   settings: Record<string, unknown>;
 };
 
