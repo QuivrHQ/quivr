@@ -2,6 +2,9 @@
 import os
 
 from celery import Celery
+from logger import get_logger
+
+logger = get_logger(__name__)
 
 CELERY_BROKER_URL = os.getenv("CELERY_BROKER_URL", "")
 CELERY_BROKER_QUEUE_NAME = os.getenv("CELERY_BROKER_QUEUE_NAME", "quivr")
@@ -29,6 +32,7 @@ if CELERY_BROKER_URL.startswith("sqs"):
     )
     celery.conf.task_default_queue = CELERY_BROKER_QUEUE_NAME
 elif REDIS_HOST:
+    logger.info(f"Using Redis as broker: {REDIS_HOST}:{REDIS_PORT}")
     celery = Celery(
         __name__,
         # redis://:password@hostname:port/db_number
