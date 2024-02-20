@@ -40,7 +40,7 @@ export const BrainTypeSelectionStep = (): JSX.Element => {
       iconName: "feed",
     },
     {
-      name: "Custom Brain!",
+      name: "Custom Brain",
       description:
         "Explore your databases, converse with your APIs, and much more!",
       iconName: "custom",
