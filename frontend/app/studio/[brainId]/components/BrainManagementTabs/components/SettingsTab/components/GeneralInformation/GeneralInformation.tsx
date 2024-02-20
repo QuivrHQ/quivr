@@ -1,16 +1,11 @@
 /* eslint max-lines:["error", 150] */
 
 import { useTranslation } from "react-i18next";
-import { LuStar } from "react-icons/lu";
 
 import { ApiRequestDefinition } from "@/lib/components/ApiRequestDefinition";
-import Button from "@/lib/components/ui/Button";
 import { Chip } from "@/lib/components/ui/Chip";
 import Field from "@/lib/components/ui/Field";
-import { Radio } from "@/lib/components/ui/Radio";
 import { TextArea } from "@/lib/components/ui/TextArea";
-
-import { useGeneralInformation } from "./hooks/useGeneralInformation";
 
 import { useBrainFormState } from "../../hooks/useBrainFormState";
 
@@ -27,17 +22,8 @@ export const GeneralInformation = (
   props: GeneralInformationProps
 ): JSX.Element => {
   const { t } = useTranslation(["translation", "brain", "config"]);
-  const {
-    hasEditRights,
-    isPublicBrain,
-    isOwnedByCurrentUser,
-    isDefaultBrain,
-    isSettingAsDefault,
-    setAsDefaultBrainHandler,
-  } = props;
+  const { hasEditRights, isPublicBrain, isOwnedByCurrentUser } = props;
   const { register } = useBrainFormState();
-
-  const { brainTypeOptions } = useGeneralInformation();
 
   return (
     <>
@@ -61,21 +47,6 @@ export const GeneralInformation = (
                 {t("brain:public_brain_label")}
               </Chip>
             )}
-            <div>
-              {hasEditRights && (
-                <Button
-                  variant={"secondary"}
-                  isLoading={isSettingAsDefault}
-                  onClick={() => void setAsDefaultBrainHandler()}
-                  type="button"
-                  className="bg-secondary text-primary border-none hover:bg-primary hover:text-white hover:disabled:text-primary disabled:bg-secondary disabled:text-primary disabled:cursor-not-allowed"
-                  disabled={isSettingAsDefault || isDefaultBrain}
-                >
-                  <LuStar size={18} />
-                  {t("defaultBrain", { ns: "brain" })}
-                </Button>
-              )}
-            </div>
           </div>
         </div>
       </div>
@@ -89,15 +60,6 @@ export const GeneralInformation = (
         {...register("description")}
       />
 
-      <div className="w-full mt-4">
-        <Radio
-          items={brainTypeOptions}
-          label={t("knowledge_source_label", { ns: "brain" })}
-          className="flex-1 justify-between w-[50%]"
-          disabled={true}
-          {...register("brain_type")}
-        />
-      </div>
       <ApiRequestDefinition />
     </>
   );

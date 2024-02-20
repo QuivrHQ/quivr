@@ -5,6 +5,7 @@ import { FormProvider, useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { FaSpinner } from "react-icons/fa";
 
+import { useBrainApi } from "@/lib/api/brain/useBrainApi";
 import { Divider } from "@/lib/components/ui/Divider";
 import { Brain } from "@/lib/context/BrainProvider/types";
 
@@ -20,9 +21,9 @@ type SettingsTabProps = {
 };
 
 // eslint-disable-next-line complexity
-export const SettingsTabContent = ({
+export const SettingsTabContent = async ({
   brainId,
-}: SettingsTabProps): JSX.Element => {
+}: SettingsTabProps): Promise<JSX.Element> => {
   const { t } = useTranslation(["translation", "brain", "config"]);
   const {
     handleSubmit,
@@ -34,6 +35,9 @@ export const SettingsTabContent = ({
     accessibleModels,
     setIsUpdating,
   } = useSettingsTab({ brainId });
+
+  const { getBrain } = useBrainApi();
+  const brain = await getBrain(brainId);
 
   const promptProps: UsePromptProps = {
     setIsUpdating,
@@ -71,12 +75,14 @@ export const SettingsTabContent = ({
           className="w-full my-10"
           text={t("modelSection", { ns: "config" })}
         />
-        <ModelSelection
-          accessibleModels={accessibleModels}
-          hasEditRights={hasEditRights}
-          brainId={brainId}
-          handleSubmit={handleSubmit}
-        />
+        {brain?.brain_type === "doc" && (
+          <ModelSelection
+            accessibleModels={accessibleModels}
+            hasEditRights={hasEditRights}
+            brainId={brainId}
+            handleSubmit={handleSubmit}
+          />
+        )}
         <Divider text={t("customPromptSection", { ns: "config" })} />
         <Prompt
           usePromptProps={promptProps}
