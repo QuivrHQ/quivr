@@ -1,4 +1,5 @@
 import { KnowledgeToFeed } from "@/app/chat/[chatId]/components/ActionsBar/components";
+import { MessageInfoBox } from "@/lib/components/ui/MessageInfoBox/MessageInfoBox";
 import QuivrButton from "@/lib/components/ui/QuivrButton/QuivrButton";
 
 import styles from "./CreateBrainStep.module.scss";
@@ -28,11 +29,16 @@ export const CreateBrainStep = (): JSX.Element => {
 
   return (
     <div className={styles.brain_knowledge_wrapper}>
-      {!currentIntegrationBrain && (
+      {!currentIntegrationBrain ? (
         <div>
           <span className={styles.title}>Feed your brain</span>
           <KnowledgeToFeed hideBrainSelector={true} />
         </div>
+      ) : (
+        <MessageInfoBox
+          content="Your custom brain is ready to be created"
+          type="success"
+        />
       )}
       <div className={styles.buttons_wrapper}>
         <QuivrButton

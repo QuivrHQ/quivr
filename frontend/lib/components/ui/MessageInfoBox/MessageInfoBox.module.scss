@@ -8,7 +8,11 @@
   align-items: center;
   gap: Spacings.$spacing03;
   width: 100%;
-  background-color: Colors.$lightest-grey;
-  color: Colors.$dark-grey;
+  border: 1px solid Colors.$normal-grey;
+  color: Colors.$black;
   border-radius: Radius.$normal;
+
+  &.success {
+    border-color: Colors.$success;
+  }
 }
