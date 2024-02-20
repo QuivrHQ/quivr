@@ -1,5 +1,3 @@
-import { useEffect } from "react";
-
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 
 import styles from "./CurrentBrain.module.scss";
@@ -18,10 +16,6 @@ export const CurrentBrain = ({
   const removeCurrentBrain = (): void => {
     setCurrentBrainId(null);
   };
-
-  useEffect(() => {
-    console.info(currentBrain);
-  }, [currentBrain]);
 
   if (!currentBrain) {
     return <></>;

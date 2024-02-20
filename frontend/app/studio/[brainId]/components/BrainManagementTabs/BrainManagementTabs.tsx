@@ -25,7 +25,6 @@ export const BrainManagementTabs = (): JSX.Element => {
     isDeleteOrUnsubscribeModalOpened,
     setIsDeleteOrUnsubscribeModalOpened,
     hasEditRights,
-    isPublicBrain,
     isOwnedByCurrentUser,
     isDeleteOrUnsubscribeRequestPending,
   } = useBrainManagementTabs();
@@ -33,6 +32,8 @@ export const BrainManagementTabs = (): JSX.Element => {
   const { brain, isLoading } = useBrainFetcher({
     brainId,
   });
+
+  console.info(brain);
 
   const knowledgeOrSecretsTabLabel =
     brain?.brain_type === "doc"
@@ -57,14 +58,16 @@ export const BrainManagementTabs = (): JSX.Element => {
         <StyledTabsTrigger value="settings">
           {t("settings", { ns: "config" })}
         </StyledTabsTrigger>
-        {(!isPublicBrain || hasEditRights) && (
+        {hasEditRights && (
           <>
             <StyledTabsTrigger value="people">
               {t("people", { ns: "config" })}
             </StyledTabsTrigger>
-            <StyledTabsTrigger value="knowledgeOrSecrets">
-              {knowledgeOrSecretsTabLabel}
-            </StyledTabsTrigger>
+            {brain?.brain_type === "doc" && (
+              <StyledTabsTrigger value="knowledgeOrSecrets">
+                {knowledgeOrSecretsTabLabel}
+              </StyledTabsTrigger>
+            )}
           </>
         )}
       </TabsList>
@@ -76,12 +79,14 @@ export const BrainManagementTabs = (): JSX.Element => {
         <TabsContent value="people">
           <PeopleTab brainId={brainId} hasEditRights={hasEditRights} />
         </TabsContent>
-        <TabsContent value="knowledgeOrSecrets">
-          <KnowledgeOrSecretsTab
-            brainId={brainId}
-            hasEditRights={hasEditRights}
-          />
-        </TabsContent>
+        {brain?.brain_type === "doc" && (
+          <TabsContent value="knowledgeOrSecrets">
+            <KnowledgeOrSecretsTab
+              brainId={brainId}
+              hasEditRights={hasEditRights}
+            />
+          </TabsContent>
+        )}
       </div>
 
       <div className="flex justify-center">
