@@ -19,11 +19,19 @@ type MessageRowProps = {
   metadata?: {
     sources?: Source[];
   };
+  brainId?: string;
 };
 
 export const MessageRow = React.forwardRef(
   (
-    { speaker, text, brainName, promptName, children }: MessageRowProps,
+    {
+      speaker,
+      text,
+      brainName,
+      promptName,
+      children,
+      brainId,
+    }: MessageRowProps,
     ref: React.Ref<HTMLDivElement>
   ) => {
     const { handleCopy, isUserSpeaker } = useMessageRow({
@@ -42,7 +50,7 @@ export const MessageRow = React.forwardRef(
       >
         {!isUserSpeaker ? (
           <div className={styles.message_header}>
-            <QuestionBrain brainName={brainName} />
+            <QuestionBrain brainName={brainName} brainId={brainId} />
             <QuestionPrompt promptName={promptName} />
           </div>
         ) : (

@@ -33,8 +33,8 @@ export const CurrentBrain = ({
               <Image
                 src={currentBrain.integration_logo_url}
                 alt="brain"
-                width={24}
-                height={24}
+                width={18}
+                height={18}
               />
             ) : (
               <Icon size="small" name="brain" color="primary" />
