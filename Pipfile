@@ -33,6 +33,7 @@ redis = "*"
 flower = "*"
 boto3 = "*"
 botocore = "*"
+celery = {extras = ["sqs"] }
 python-dotenv = "*"
 pytest-mock = "*"
 pytest-celery = "*"
@@ -52,7 +53,6 @@ colorlog = "*"
 psycopg2-binary = "*"
 psycopg2 = "*"
 unstructured = {extras = ["all-docs"], version = "*"}
-celery = {extras = ["redis"], version = "*"}
 
 [dev-packages]
 black = "*"
