@@ -33,7 +33,6 @@ export const QuestionBrain = ({
 
   useEffect(() => {
     void getBrainLogoUrl();
-    console.info(brainId);
   }, [brainId]);
 
   if (brainName === undefined || brainName === null) {

@@ -33,8 +33,6 @@ export const BrainManagementTabs = (): JSX.Element => {
     brainId,
   });
 
-  console.info(brain);
-
   const knowledgeOrSecretsTabLabel =
     brain?.brain_type === "doc"
       ? t("knowledge", { ns: "config" })

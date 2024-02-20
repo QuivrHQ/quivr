@@ -64,6 +64,7 @@ const SelectedChatPage = (): JSX.Element => {
     if (!currentBrain && messages.length > 0) {
       setCurrentBrainId(messages[messages.length - 1].brain_id as UUID);
     }
+    console.info(currentBrain);
   }, [messages]);
 
   return (

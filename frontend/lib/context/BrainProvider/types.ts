@@ -43,6 +43,7 @@ export type MinimalBrainForUser = {
   brain_type: BrainType;
   description: string;
   integration_logo_url?: string;
+  max_files: number;
 };
 
 //TODO: rename rights to role in Backend and use MinimalBrainForUser instead of BackendMinimalBrainForUser
