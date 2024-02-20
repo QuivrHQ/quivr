@@ -13,7 +13,8 @@ export const CustomBrainList = ({
 }: {
   customBrainList: IntegrationBrains[];
 }): JSX.Element => {
-  const { setCurrentIntegrationBrain } = useBrainCreationContext();
+  const { setCurrentIntegrationBrain, currentIntegrationBrain } =
+    useBrainCreationContext();
 
   return (
     <div className={styles.cards_wrapper}>
@@ -26,7 +27,11 @@ export const CustomBrainList = ({
               onClick={() => setCurrentIntegrationBrain(brain)}
             >
               <Tooltip tooltip={brain.description}>
-                <div className={styles.brain_card_wrapper}>
+                <div
+                  className={`${styles.brain_card_wrapper} ${
+                    currentIntegrationBrain === brain ? styles.selected : ""
+                  }`}
+                >
                   <Image
                     src={brain.integration_logo_url}
                     alt={brain.integration_name}

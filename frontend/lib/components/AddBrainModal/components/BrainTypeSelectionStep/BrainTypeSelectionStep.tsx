@@ -9,6 +9,7 @@ import { BrainTypeSelection } from "./BrainTypeSelection/BrainTypeSelection";
 import styles from "./BrainTypeSelectionStep.module.scss";
 import { CustomBrainList } from "./CustomBrainList/CustomBrainList";
 
+import { useBrainCreationContext } from "../../brainCreation-provider";
 import { useBrainCreationSteps } from "../../hooks/useBrainCreationSteps";
 
 export const BrainTypeSelectionStep = (): JSX.Element => {
@@ -18,6 +19,7 @@ export const BrainTypeSelectionStep = (): JSX.Element => {
   const [customBrains, setCustomBrains] = useState<IntegrationBrains[]>([]);
   const { goToNextStep, currentStepIndex } = useBrainCreationSteps();
   const { getIntegrationBrains } = useBrainApi();
+  const { currentIntegrationBrain } = useBrainCreationContext();
 
   useEffect(() => {
     getIntegrationBrains()
@@ -90,12 +92,12 @@ export const BrainTypeSelectionStep = (): JSX.Element => {
       </div>
       <div
         className={`${styles.buttons_wrapper} ${
-          customBrainsCatalogueOpened ? styles.two_brains : ""
+          customBrainsCatalogueOpened ? styles.two_buttons : ""
         }`}
       >
         {customBrainsCatalogueOpened && (
           <QuivrButton
-            label="Choose type of brain"
+            label="Type of brain"
             iconName="chevronLeft"
             color="primary"
             onClick={() => {
@@ -104,14 +106,16 @@ export const BrainTypeSelectionStep = (): JSX.Element => {
             }}
           />
         )}
-        {(selectedIndex === 0 || customBrainsCatalogueOpened) && (
-          <QuivrButton
-            label="Next Step"
-            iconName="chevronRight"
-            color="primary"
-            onClick={() => next()}
-          />
-        )}
+        <QuivrButton
+          label="Next Step"
+          iconName="chevronRight"
+          color="primary"
+          onClick={() => next()}
+          disabled={
+            selectedIndex === -1 ||
+            (!!customBrainsCatalogueOpened && !currentIntegrationBrain)
+          }
+        />
       </div>
     </div>
   );

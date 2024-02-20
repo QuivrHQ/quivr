@@ -27,7 +27,8 @@
       font-size: Typography.$small;
     }
 
-    &:hover {
+    &:hover,
+    &.selected {
       border-color: Colors.$primary;
       background-color: Colors.$primary-lightest;
 
