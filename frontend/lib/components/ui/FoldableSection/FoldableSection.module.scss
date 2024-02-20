@@ -2,6 +2,7 @@
 @use "@/styles/Radius.module.scss";
 @use "@/styles/Spacings.module.scss";
 @use "@/styles/Typography.module.scss";
+@use "@/styles/Transitions.module.scss";
 
 .foldable_section_wrapper {
   display: flex;
@@ -10,6 +11,15 @@
   border: 1px dashed Colors.$lighter-grey;
   overflow: hidden;
   font-size: Typography.$small;
+
+  .contentWrapper {
+    overflow: hidden;
+    transition: max-height 0.3s Transitions.$easeOutBack;
+  }
+  
+  .contentCollapsed {
+    max-height: 0;
+  }
 
   &.hide_border {
     border-color: transparent;
@@ -36,5 +46,17 @@
     &:hover {
       background-color: Colors.$lightest-black;
     }
+  }
+  
+  .iconRotate {
+    transition: transform 0.3s Transitions.$easeOutBack;
+  }
+
+  .iconRotateDown {
+    transform: rotate(0deg);
+  }
+
+  .iconRotateRight {
+    transform: rotate(-90deg);
   }
 }

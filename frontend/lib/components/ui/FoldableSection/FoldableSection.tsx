@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { iconList } from "@/lib/helpers/iconList";
 
@@ -16,10 +16,15 @@ interface FoldableSectionProps {
 
 export const FoldableSection = (props: FoldableSectionProps): JSX.Element => {
   const [folded, setFolded] = useState<boolean>(false);
+  const contentRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setFolded(props.foldedByDefault ?? false);
   }, [props.foldedByDefault]);
+
+  const getContentHeight = (): string => {
+    return folded ? "0" : `${contentRef.current?.scrollHeight}px`;
+  };
 
   return (
     <div
@@ -35,12 +40,22 @@ export const FoldableSection = (props: FoldableSectionProps): JSX.Element => {
           <p className={styles.header_title}>{props.label}</p>
         </div>
         <Icon
-          name={folded ? "chevronDown" : "chevronRight"}
+          name="chevronDown"
           size="normal"
           color="black"
+          classname={`${styles.iconRotate} ${
+            folded ? styles.iconRotateDown : styles.iconRotateRight
+          }`}
         />
       </div>
-      <div style={{ height: folded ? "0" : "auto" }}>{props.children}</div>
+      <div
+        ref={contentRef}
+        className={`${styles.contentWrapper} ${
+          folded ? styles.contentCollapsed : styles.contentExpanded
+        }`}
+        style={{ maxHeight: getContentHeight() }}
+        {props.children}
+      </div>
     </div>
   );
 };
