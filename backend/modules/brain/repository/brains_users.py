@@ -36,7 +36,7 @@ class BrainsUsers(BrainsUsersInterface):
         response = (
             self.db.from_("brains_users")
             .select(
-                "id:brain_id, rights, brains (brain_id, name, status, brain_type, description, meaning, integrations_user (brain_id, integration_id, integrations (id, integration_name, integration_logo_url)))"
+                "id:brain_id, rights, brains (brain_id, name, status, brain_type, description, meaning, integrations_user (brain_id, integration_id, integrations (id, integration_name, integration_logo_url, max_files)))"
             )
             .filter("user_id", "eq", user_id)
             .execute()
@@ -44,6 +44,7 @@ class BrainsUsers(BrainsUsersInterface):
         user_brains: list[MinimalUserBrainEntity] = []
         for item in response.data:
             integration_logo_url = ""
+            max_files = 5000
             if item["brains"]["brain_type"] == "integration":
                 if "integrations_user" in item["brains"]:
                     for integration_user in item["brains"]["integrations_user"]:
@@ -51,6 +52,7 @@ class BrainsUsers(BrainsUsersInterface):
                             integration_logo_url = integration_user["integrations"][
                                 "integration_logo_url"
                             ]
+                            max_files = integration_user["integrations"]["max_files"]
 
             user_brains.append(
                 MinimalUserBrainEntity(
@@ -65,6 +67,7 @@ class BrainsUsers(BrainsUsersInterface):
                         else ""
                     ),
                     integration_logo_url=str(integration_logo_url),
+                    max_files=max_files,
                 )
             )
             user_brains[-1].rights = item["rights"]
@@ -99,6 +102,7 @@ class BrainsUsers(BrainsUsersInterface):
                 else ""
             ),
             integration_logo_url="",
+            max_files=100,
         )
 
     def delete_brain_user_by_id(
