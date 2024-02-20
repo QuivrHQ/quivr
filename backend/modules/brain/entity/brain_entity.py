@@ -77,3 +77,4 @@ class MinimalUserBrainEntity(BaseModel):
     status: str
     brain_type: BrainType
     description: str
+    integration_logo_url: str
