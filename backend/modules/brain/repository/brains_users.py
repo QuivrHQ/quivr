@@ -45,17 +45,12 @@ class BrainsUsers(BrainsUsersInterface):
         for item in response.data:
             integration_logo_url = ""
             if item["brains"]["brain_type"] == "integration":
-                logger.info("Integration brain")
-                logger.info(item["brains"])
                 if "integrations_user" in item["brains"]:
                     for integration_user in item["brains"]["integrations_user"]:
                         if "integrations" in integration_user:
                             integration_logo_url = integration_user["integrations"][
                                 "integration_logo_url"
                             ]
-                            logger.info(
-                                "Integration logo url: " + str(integration_logo_url)
-                            )
 
             user_brains.append(
                 MinimalUserBrainEntity(

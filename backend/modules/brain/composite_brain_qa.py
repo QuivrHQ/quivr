@@ -94,7 +94,6 @@ class CompositeBrainQA(
             return KnowledgeBrainQA(
                 brain_id=str(brain.id),
                 chat_id=self.chat_id,
-                model=self.model,
                 max_tokens=self.max_tokens,
                 temperature=self.temperature,
                 streaming=self.streaming,
