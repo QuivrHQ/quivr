@@ -38,6 +38,7 @@ elif REDIS_HOST:
         # redis://:password@hostname:port/db_number
         broker=f"redis://:{REDIS_PASS}@{REDIS_HOST}:{REDIS_PORT}/0",
         backend=f"redis://:{REDIS_PASS}@{REDIS_HOST}:{REDIS_PORT}/0",
+        result_backend=f"redis://:{REDIS_PASS}@{REDIS_HOST}:{REDIS_PORT}/0",
         task_concurrency=4,
         worker_prefetch_multiplier=1,
         task_serializer="json",
