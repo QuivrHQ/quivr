@@ -20,7 +20,6 @@
     padding: Spacings.$spacing03;
     border: 1px solid Colors.$lightest-black;
     width: fit-content;
-    box-shadow: 0 2px 4px rgb(0, 0, 0, 0.25);
     cursor: pointer;
     width: 100px;
 
@@ -33,7 +32,7 @@
       background-color: Colors.$primary-lightest;
 
       .brain_title {
-        font-weight: 500;
+        color: Colors.$primary;
       }
     }
   }
