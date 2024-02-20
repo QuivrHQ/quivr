@@ -78,3 +78,4 @@ class MinimalUserBrainEntity(BaseModel):
     brain_type: BrainType
     description: str
     integration_logo_url: str
+    max_files: int
