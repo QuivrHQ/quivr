@@ -33,6 +33,7 @@ export const QuestionBrain = ({
 
   useEffect(() => {
     void getBrainLogoUrl();
+    console.info(brainId);
   }, [brainId]);
 
   if (brainName === undefined || brainName === null) {
@@ -42,7 +43,7 @@ export const QuestionBrain = ({
   return (
     <div data-testid="brain-tags" className={styles.brain_name_wrapper}>
       {brainLogoUrl ? (
-        <Image src={brainLogoUrl} alt="brainLogo" width={24} height={24} />
+        <Image src={brainLogoUrl} alt="brainLogo" width={18} height={18} />
       ) : (
         <Icon name="brain" color="primary" size="normal" />
       )}
