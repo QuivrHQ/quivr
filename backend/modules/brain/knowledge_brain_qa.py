@@ -8,10 +8,16 @@ from llm.utils.get_prompt_to_use import get_prompt_to_use
 from llm.utils.get_prompt_to_use_id import get_prompt_to_use_id
 from logger import get_logger
 from models import BrainSettings
+from models.user_usage import UserUsage
+from modules.brain.entity.brain_entity import BrainEntity
 from modules.brain.qa_interface import QAInterface
 from modules.brain.rags.quivr_rag import QuivrRAG
 from modules.brain.rags.rag_interface import RAGInterface
 from modules.brain.service.brain_service import BrainService
+from modules.chat.controller.chat.utils import (
+    find_model_and_generate_metadata,
+    update_user_usage,
+)
 from modules.chat.dto.chats import ChatQuestion, Sources
 from modules.chat.dto.inputs import CreateChatHistory
 from modules.chat.dto.outputs import GetChatHistoryOutput
@@ -51,22 +57,21 @@ def generate_source(source_documents, brain_id):
         logger.info(f"Source documents found: {source_documents}")
         # Iterate over each document
         for doc in source_documents:
-            doc0 = doc[0]
-            logger.info("Document: %s", doc0)
+            logger.info("Document: %s", doc)
             # Check if 'url' is in the document metadata
-            logger.info(f"Metadata 1: {doc0.metadata}")
+            logger.info(f"Metadata 1: {doc.metadata}")
             is_url = (
-                "original_file_name" in doc0.metadata
-                and doc0.metadata["original_file_name"] is not None
-                and doc0.metadata["original_file_name"].startswith("http")
+                "original_file_name" in doc.metadata
+                and doc.metadata["original_file_name"] is not None
+                and doc.metadata["original_file_name"].startswith("http")
             )
             logger.info(f"Is URL: {is_url}")
 
             # Determine the name based on whether it's a URL or a file
             name = (
-                doc0.metadata["original_file_name"]
+                doc.metadata["original_file_name"]
                 if is_url
-                else doc0.metadata["file_name"]
+                else doc.metadata["file_name"]
             )
 
             # Determine the type based on whether it's a URL or a file
@@ -74,9 +79,9 @@ def generate_source(source_documents, brain_id):
 
             # Determine the source URL based on whether it's a URL or a file
             if is_url:
-                source_url = doc0.metadata["original_file_name"]
+                source_url = doc.metadata["original_file_name"]
             else:
-                file_path = f"{brain_id}/{doc0.metadata['file_name']}"
+                file_path = f"{brain_id}/{doc.metadata['file_name']}"
                 # Check if the URL has already been generated
                 if file_path in generated_urls:
                     source_url = generated_urls[file_path]
@@ -117,7 +122,7 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
     brain_settings: BaseSettings = BrainSettings()
 
     # Default class attributes
-    model: str = None  # pyright: ignore reportPrivateUsage=none
+    model: str = "gpt-3.5-turbo-0125"  # pyright: ignore reportPrivateUsage=none
     temperature: float = 0.1
     chat_id: str = None  # pyright: ignore reportPrivateUsage=none
     brain_id: str = None  # pyright: ignore reportPrivateUsage=none
@@ -125,8 +130,13 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
     max_input: int = 2000
     streaming: bool = False
     knowledge_qa: Optional[RAGInterface] = None
-    metadata: Optional[dict] = None
+    brain: Optional[BrainEntity] = None
     user_id: str = None
+    user_email: str = None
+    user_usage: Optional[UserUsage] = None
+    user_settings: Optional[dict] = None
+    models_settings: Optional[List[dict]] = None
+    metadata: Optional[dict] = None
 
     callbacks: List[AsyncIteratorCallbackHandler] = (
         None  # pyright: ignore reportPrivateUsage=none
@@ -136,34 +146,43 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
 
     def __init__(
         self,
-        model: str,
         brain_id: str,
         chat_id: str,
-        max_tokens: int,
         streaming: bool = False,
         prompt_id: Optional[UUID] = None,
         metadata: Optional[dict] = None,
         user_id: str = None,
+        user_email: str = None,
+        cost: int = 100,
         **kwargs,
     ):
         super().__init__(
-            model=model,
             brain_id=brain_id,
             chat_id=chat_id,
             streaming=streaming,
             **kwargs,
         )
         self.prompt_id = prompt_id
+        self.user_id = user_id
+        self.user_email = user_email
+        self.user_usage = UserUsage(
+            id=user_id,
+            email=user_email,
+        )
+        self.brain = brain_service.get_brain_by_id(brain_id)
+
+        self.user_settings = self.user_usage.get_user_settings()
+
+        # Get Model settings for the user
+        self.models_settings = self.user_usage.get_model_settings()
+        self.increase_usage_user()
         self.knowledge_qa = QuivrRAG(
-            model=model,
+            model=self.brain.model,
             brain_id=brain_id,
             chat_id=chat_id,
             streaming=streaming,
             **kwargs,
         )
-        self.metadata = metadata
-        self.max_tokens = max_tokens
-        self.user_id = user_id
 
     @property
     def prompt_to_use(self):
@@ -179,6 +198,38 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
             return get_prompt_to_use_id(UUID(self.brain_id), self.prompt_id)
         else:
             return None
+
+    def increase_usage_user(self):
+        # Raises an error if the user has consumed all of of his credits
+
+        update_user_usage(
+            usage=self.user_usage,
+            user_settings=self.user_settings,
+            cost=self.calculate_pricing(),
+        )
+
+    def calculate_pricing(self):
+
+        logger.info("Calculating pricing")
+        logger.info(f"Model: {self.model}")
+        logger.info(f"User settings: {self.user_settings}")
+        logger.info(f"Models settings: {self.models_settings}")
+        model_to_use = find_model_and_generate_metadata(
+            self.chat_id,
+            self.brain.model,
+            self.user_settings,
+            self.models_settings,
+        )
+        self.model = model_to_use.name
+        self.max_input = model_to_use.max_input
+        self.max_tokens = model_to_use.max_output
+        user_choosen_model_price = 1000
+
+        for model_setting in self.models_settings:
+            if model_setting["name"] == self.model:
+                user_choosen_model_price = model_setting["price"]
+
+        return user_choosen_model_price
 
     def generate_answer(
         self, chat_id: UUID, question: ChatQuestion, save_answer: bool = True
@@ -199,8 +250,6 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
 
         answer = model_response["answer"].content
 
-        brain = brain_service.get_brain_by_id(self.brain_id)
-
         if save_answer:
             # save the answer to the database or not ->  add a variable
             new_chat = chat_service.update_chat_history(
@@ -209,7 +258,7 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
                         "chat_id": chat_id,
                         "user_message": question.question,
                         "assistant": answer,
-                        "brain_id": brain.brain_id,
+                        "brain_id": self.brain.brain_id,
                         "prompt_id": self.prompt_to_use_id,
                     }
                 )
@@ -224,9 +273,9 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
                     "prompt_title": (
                         self.prompt_to_use.title if self.prompt_to_use else None
                     ),
-                    "brain_name": brain.name if brain else None,
+                    "brain_name": self.brain.name if self.brain else None,
                     "message_id": new_chat.message_id,
-                    "brain_id": str(brain.brain_id) if brain else None,
+                    "brain_id": str(self.brain.brain_id) if self.brain else None,
                 }
             )
 
@@ -241,7 +290,7 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
                 ),
                 "brain_name": None,
                 "message_id": None,
-                "brain_id": str(brain.brain_id) if brain else None,
+                "brain_id": str(self.brain.brain_id) if self.brain else None,
             }
         )
 

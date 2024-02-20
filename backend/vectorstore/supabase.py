@@ -85,16 +85,13 @@ class CustomSupabaseVectorStore(SupabaseVectorStore):
         ).execute()
 
         match_result = [
-            (
-                Document(
-                    metadata={
-                        **search.get("metadata", {}),
-                        "id": search.get("id", ""),
-                        "similarity": search.get("similarity", 0.0),
-                    },
-                    page_content=search.get("content", ""),
-                ),
-                search.get("similarity", 0.0),
+            Document(
+                metadata={
+                    **search.get("metadata", {}),
+                    "id": search.get("id", ""),
+                    "similarity": search.get("similarity", 0.0),
+                },
+                page_content=search.get("content", ""),
             )
             for search in res.data
             if search.get("content")

@@ -58,6 +58,7 @@
   "subtitle": "与语言模型讨论您上传的数据",
   "successfully_deleted": "成功删除",
   "thinking": "思考中…",
+  "threads": "讨论",
   "title": "与 {{brain}} 聊天",
   "today": "今天",
   "tooManyRequests": "您已超过每天的请求次数。想要继续聊天，请在您的个人资料中或为当前大脑配置 OpenAI API 密钥。",

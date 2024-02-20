@@ -1,6 +1,7 @@
 from logger import get_logger
 from modules.brain.api_brain_qa import APIBrainQA
 from modules.brain.entity.brain_entity import BrainType, RoleEnum
+from modules.brain.integrations.Big.Brain import BigBrain
 from modules.brain.integrations.GPT4.Brain import GPT4Brain
 from modules.brain.integrations.Notion.Brain import NotionBrain
 from modules.brain.integrations.SQL.Brain import SQLBrain
@@ -38,6 +39,7 @@ integration_list = {
     "notion": NotionBrain,
     "gpt4": GPT4Brain,
     "sql": SQLBrain,
+    "big": BigBrain,
 }
 
 brain_service = BrainService()
@@ -57,26 +59,20 @@ class BrainfulChat(ChatInterface):
         brain,
         chat_id,
         model,
-        max_tokens,
-        max_input,
         temperature,
         streaming,
         prompt_id,
         user_id,
-        metadata,
+        user_email,
     ):
         if brain and brain.brain_type == BrainType.DOC:
             return KnowledgeBrainQA(
                 chat_id=chat_id,
-                model=model,
-                max_tokens=max_tokens,
-                max_input=max_input,
-                temperature=temperature,
                 brain_id=str(brain.brain_id),
                 streaming=streaming,
                 prompt_id=prompt_id,
-                metadata=metadata,
                 user_id=user_id,
+                user_email=user_email,
             )
 
         if brain.brain_type == BrainType.API:
@@ -86,18 +82,16 @@ class BrainfulChat(ChatInterface):
             return APIBrainQA(
                 chat_id=chat_id,
                 model=model,
-                max_tokens=max_tokens,
-                max_input=max_input,
                 temperature=temperature,
                 brain_id=str(brain.brain_id),
                 streaming=streaming,
                 prompt_id=prompt_id,
                 user_id=user_id,
-                metadata=metadata,
                 raw=(brain_definition.raw if brain_definition else None),
                 jq_instructions=(
                     brain_definition.jq_instructions if brain_definition else None
                 ),
+                user_email=user_email,
             )
         if brain.brain_type == BrainType.INTEGRATION:
             integration_brain = integration_brain_description_service.get_integration_description_by_user_brain_id(
@@ -111,12 +105,10 @@ class BrainfulChat(ChatInterface):
                 return integration_class(
                     chat_id=chat_id,
                     model=model,
-                    max_tokens=max_tokens,
-                    max_input=max_input,
                     temperature=temperature,
                     brain_id=str(brain.brain_id),
                     streaming=streaming,
                     prompt_id=prompt_id,
-                    metadata=metadata,
                     user_id=user_id,
+                    user_email=user_email,
                 )
