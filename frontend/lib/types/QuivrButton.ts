@@ -9,5 +9,5 @@ export interface ButtonType {
   iconName: keyof typeof iconList;
   onClick: () => void | Promise<void>;
   disabled?: boolean;
-  visible?: boolean;
+  hidden?: boolean;
 }

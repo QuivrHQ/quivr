@@ -49,6 +49,7 @@ const SelectedChatPage = (): JSX.Element => {
         setShouldDisplayFeedCard(true);
       },
       iconName: "uploadFile",
+      hidden: !currentBrain?.max_files,
     },
     {
       label: "Manage current brain",
@@ -64,7 +65,6 @@ const SelectedChatPage = (): JSX.Element => {
     if (!currentBrain && messages.length > 0) {
       setCurrentBrainId(messages[messages.length - 1].brain_id as UUID);
     }
-    console.info(currentBrain);
   }, [messages]);
 
   return (
