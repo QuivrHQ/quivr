@@ -1,8 +1,13 @@
+from enum import Enum
 from typing import Optional
 from uuid import UUID
 
-from modules.brain.dto.inputs import IntegrationType
 from pydantic import BaseModel
+
+
+class IntegrationType(str, Enum):
+    CUSTOM = "custom"
+    SYNC = "sync"
 
 
 class IntegrationDescriptionEntity(BaseModel):

@@ -81,9 +81,12 @@ async def retrieve_default_brain(
     ],
     tags=["Brain"],
 )
-async def retrieve_brain_by_id(brain_id: UUID):
+async def retrieve_brain_by_id(
+    brain_id: UUID,
+    current_user: UserIdentity = Depends(get_current_user),
+):
     """Retrieve details of a specific brain by its ID."""
-    brain_details = brain_service.get_brain_details(brain_id)
+    brain_details = brain_service.get_brain_details(brain_id, current_user.id)
     if brain_details is None:
         raise HTTPException(status_code=404, detail="Brain details not found")
     return brain_details
@@ -131,10 +134,12 @@ async def create_new_brain(
     tags=["Brain"],
 )
 async def update_existing_brain(
-    brain_id: UUID, brain_update_data: BrainUpdatableProperties
+    brain_id: UUID,
+    brain_update_data: BrainUpdatableProperties,
+    current_user: UserIdentity = Depends(get_current_user),
 ):
     """Update an existing brain's configuration."""
-    existing_brain = brain_service.get_brain_details(brain_id)
+    existing_brain = brain_service.get_brain_details(brain_id, current_user.id)
     if existing_brain is None:
         raise HTTPException(status_code=404, detail="Brain not found")
 
@@ -169,7 +174,7 @@ async def update_existing_brain_secrets(
 ):
     """Update an existing brain's secrets."""
 
-    existing_brain = brain_service.get_brain_details(brain_id)
+    existing_brain = brain_service.get_brain_details(brain_id, None)
 
     if existing_brain is None:
         raise HTTPException(status_code=404, detail="Brain not found")
