@@ -7,4 +7,9 @@
   align-items: center;
   color: Colors.$black;
   font-size: Typography.$small;
+  overflow: hidden;
+
+  .prompt_name {
+    @include Typography.EllipsisOverflow;
+  }
 }
