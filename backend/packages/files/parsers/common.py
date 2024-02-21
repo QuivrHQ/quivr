@@ -42,7 +42,6 @@ async def process_file(
         for doc in file.documents:  # pyright: ignore reportPrivateUsage=none
             new_metadata = metadata.copy()
             len_chunk = len(enc.encode(doc.page_content))
-            logger.info(f"Chunk size: {len_chunk}")
             new_metadata["chunk_size"] = len_chunk
             doc_with_metadata = DocumentSerializable(
                 page_content=doc.page_content, metadata=new_metadata

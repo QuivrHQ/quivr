@@ -47,8 +47,6 @@ class Brains(BrainsInterface):
             if not item["brain_definition"]:
                 del item["brain_definition"]
             else:
-                logger.info("brain_definition;;")
-                logger.info(item["brain_definition"])
                 item["brain_definition"]["secrets"] = []
 
             public_brains.append(PublicBrain(**item))

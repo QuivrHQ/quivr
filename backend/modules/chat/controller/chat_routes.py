@@ -77,8 +77,6 @@ def get_answer_generator(
         brain_id, chat_question.question, current_user, chat_id, history, vector_store
     )
 
-    logger.info(f"Brain: {brain}")
-
     send_telemetry("question_asked", {"model_name": brain.model})
 
     gpt_answer_generator = chat_instance.get_answer_generator(
@@ -234,8 +232,6 @@ async def create_stream_question_handler(
     gpt_answer_generator = get_answer_generator(
         chat_id, chat_question, brain_id, current_user
     )
-
-    logger.info(gpt_answer_generator)
 
     try:
         return StreamingResponse(
