@@ -147,9 +147,6 @@ class QuivrRAG(BaseModel):
         self.chat_id = chat_id
         self.streaming = streaming
 
-        logger.info(f"QuivrRAG initialized with model {model} and brain {brain_id}")
-        logger.info("Max input length: " + str(self.max_input))
-
     def _create_supabase_client(self) -> Client:
         return create_client(
             self.brain_settings.supabase_url, self.brain_settings.supabase_service_key

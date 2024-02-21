@@ -43,12 +43,8 @@ class BrainUserService:
     def get_user_default_brain(self, user_id: UUID) -> BrainEntity | None:
         brain_id = self.brain_user_repository.get_user_default_brain_id(user_id)
 
-        logger.info(f"Default brain response: {brain_id}")
-
         if brain_id is None:
             return None
-
-        logger.info(f"Default brain id: {brain_id}")
 
         return brain_service.get_brain_by_id(brain_id)
 

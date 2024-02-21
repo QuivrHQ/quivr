@@ -191,9 +191,7 @@ class BrainService:
         brain: CreateBrainProperties,
     ) -> BrainEntity:
         created_brain = self.brain_repository.create_brain(brain)
-        logger.info(f"Created brain: {created_brain}")
         if brain.integration is not None:
-            logger.info(f"Integration: {brain.integration}")
             self.integration_brains_repository.add_integration_brain(
                 user_id=user_id,
                 brain_id=created_brain.brain_id,
