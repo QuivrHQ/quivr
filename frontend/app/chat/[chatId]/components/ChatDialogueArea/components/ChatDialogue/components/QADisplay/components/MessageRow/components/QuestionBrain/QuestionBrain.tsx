@@ -46,7 +46,7 @@ export const QuestionBrain = ({
       ) : (
         <Icon name="brain" color="primary" size="normal" />
       )}
-      <span>{brainName}</span>
+      <span className={styles.brain_name}>{brainName}</span>
     </div>
   );
 };

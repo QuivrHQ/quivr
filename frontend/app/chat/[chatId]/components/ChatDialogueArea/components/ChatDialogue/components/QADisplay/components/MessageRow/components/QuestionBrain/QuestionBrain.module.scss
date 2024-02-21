@@ -1,9 +1,15 @@
 @use "@/styles/Colors.module.scss";
 @use "@/styles/Spacings.module.scss";
+@use "@/styles/Typography.module.scss";
 
 .brain_name_wrapper {
   display: flex;
   align-items: center;
   gap: Spacings.$spacing02;
   color: Colors.$black;
+  overflow: hidden;
+
+  .brain_name {
+    @include Typography.EllipsisOverflow;
+  }
 }

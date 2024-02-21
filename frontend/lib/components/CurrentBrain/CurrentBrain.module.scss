@@ -13,19 +13,27 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+    overflow: hidden;
 
     .left {
       display: flex;
       gap: Spacings.$spacing02;
       align-items: center;
+      @include Typography.EllipsisOverflow;
+
+      .title {
+        white-space: nowrap;
+      }
 
       .brain_name_wrapper {
         display: flex;
         gap: Spacings.$spacing02;
         align-items: center;
+        overflow: hidden;
 
         .brain_name {
           color: Colors.$black;
+          @include Typography.EllipsisOverflow;
         }
       }
     }

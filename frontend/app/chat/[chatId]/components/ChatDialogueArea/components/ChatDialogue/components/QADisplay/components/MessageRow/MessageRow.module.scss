@@ -19,6 +19,7 @@
 
   .message_header {
     padding: Spacings.$spacing02;
+    overflow: hidden;
   }
 
   &.user {

@@ -27,7 +27,7 @@ export const CurrentBrain = ({
     <div className={styles.current_brain_wrapper}>
       <div className={styles.brain_infos}>
         <div className={styles.left}>
-          <span>Talking to</span>
+          <span className={styles.title}>Talking to</span>
           <div className={styles.brain_name_wrapper}>
             {currentBrain.integration_logo_url ? (
               <Image
