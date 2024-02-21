@@ -1,5 +1,32 @@
 # Changelog
 
+## 0.0.208 (2024-02-21)
+
+## What's Changed
+* feat: Add pricing calculation method to GPT4Brain class and update user usage in chat controller by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2216
+* Enable Porter Application quivr by @porter-deployment-app in https://github.com/QuivrHQ/quivr/pull/2220
+* Delete Porter Application quivr by @porter-deployment-app in https://github.com/QuivrHQ/quivr/pull/2221
+* Enable Porter Application preview-quivr by @porter-deployment-app in https://github.com/QuivrHQ/quivr/pull/2222
+* Enable Porter Application prod-quivr by @porter-deployment-app in https://github.com/QuivrHQ/quivr/pull/2223
+* feat(brains): added description by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2224
+* feat: Add integration_logo_url to MinimalUserBrainEntity by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2225
+* Add Redis configuration to celery_config.py by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2227
+* Remove unused 'model' variable and logging statements by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2228
+* feat: Add max_files attribute to MinimalUserBrainEntity and BrainsUsers repository by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2229
+* Feature: Add animations to foldable section by @johnfewell in https://github.com/QuivrHQ/quivr/pull/2202
+* feat(frontend): first custom brain live by @Zewed in https://github.com/QuivrHQ/quivr/pull/2226
+* fix(frontend): legacy on foldable section animation pr by @Zewed in https://github.com/QuivrHQ/quivr/pull/2230
+* Fix: API endpoint for getting integration brains by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2231
+* feat: Update dependencies and remove unnecessary logging statements by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2232
+* feat: implement elasticache by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2234
+* fix(frontend): ellipsis overflow on large brain or prompt names by @Zewed in https://github.com/QuivrHQ/quivr/pull/2233
+
+## New Contributors
+* @porter-deployment-app made their first contribution in https://github.com/QuivrHQ/quivr/pull/2220
+* @johnfewell made their first contribution in https://github.com/QuivrHQ/quivr/pull/2202
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.207...v0.0.208
+
 ## 0.0.206 (2024-02-19)
 
 ## What's Changed
