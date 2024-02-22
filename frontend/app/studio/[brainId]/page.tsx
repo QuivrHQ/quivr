@@ -14,7 +14,7 @@ const BrainsManagement = (): JSX.Element => {
   const { brain } = useBrainManagement();
 
   return (
-    <div className="flex flex-col w-full p-5 lg:p-20 bg-highlight">
+    <div className="flex flex-col w-full p-5 lg:p-20">
       <div>
         <Link href="/studio">
           <Button variant="tertiary" className="p-0">

@@ -2,7 +2,6 @@
 
 import { UUID } from "crypto";
 import { useTranslation } from "react-i18next";
-import { ImUserPlus } from "react-icons/im";
 import { MdContentPaste, MdLink } from "react-icons/md";
 
 import { BrainUsers } from "@/lib/components/BrainUsers/BrainUsers";
@@ -28,9 +27,9 @@ export const PeopleTab = ({
     updateRoleAssignation,
     removeRoleAssignation,
     inviteUsers,
-    addNewRoleAssignationRole,
+    // addNewRoleAssignationRole,
     sendingInvitation,
-    canAddNewRow,
+    // canAddNewRow,
   } = useShareBrain(brainId);
 
   if (!hasEditRights) {
@@ -70,22 +69,7 @@ export const PeopleTab = ({
             {t("inviteUsers", { ns: "brain" })}
           </p>
 
-          {roleAssignations.map((roleAssignation, index) => (
-            <UserToInvite
-              key={roleAssignation.id}
-              onChange={updateRoleAssignation(index)}
-              removeCurrentInvitation={removeRoleAssignation(index)}
-              roleAssignation={roleAssignation}
-            />
-          ))}
-          <Button
-            className="my-5"
-            onClick={addNewRoleAssignationRole}
-            disabled={sendingInvitation || !canAddNewRow}
-            data-testid="add-new-row-role-button"
-          >
-            <ImUserPlus />
-          </Button>
+          <UserToInvite />
         </div>
 
         <div className="mb-3 flex flex-row justify-end">

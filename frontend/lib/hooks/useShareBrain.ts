@@ -46,18 +46,12 @@ export const useShareBrain = (brainId: string) => {
     (rowIndex: number) => (data: BrainRoleAssignation) => {
       const concernedRow = roleAssignations[rowIndex];
 
-      if (concernedRow !== undefined) {
-        setRoleAssignation(
-          roleAssignations.map((row, index) => {
-            if (index === rowIndex) {
-              return data;
-            }
+      console.info(concernedRow);
 
-            return row;
-          })
-        );
+      if (concernedRow !== undefined) {
+        setRoleAssignation([data]);
       } else {
-        setRoleAssignation([...roleAssignations, data]);
+        setRoleAssignation([data]);
       }
     };
 
@@ -104,6 +98,7 @@ export const useShareBrain = (brainId: string) => {
   const addNewRoleAssignationRole = () => {
     setRoleAssignation([...roleAssignations, generateBrainAssignation()]);
   };
+
   const canAddNewRow =
     roleAssignations.length === 0 ||
     roleAssignations.filter((invitingUser) => invitingUser.email === "")
