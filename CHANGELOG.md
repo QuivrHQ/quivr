@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.0.210 (2024-02-22)
+
+## What's Changed
+* feat: Update memory allocation in task definition by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2243
+* fix: get_brain_details API to include user_id parameter by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2242
+* feat(chat): Add follow up questions functionality by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2241
+* Reduce sampling rate for Sentry traces by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2245
+* Revert "feat(chat): Add follow up questions functionality" by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2246
+* Add max_input and max_tokens parameters to KnowledgeBrainQA constructor by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2247
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.209...v0.0.210
+
 ## 0.0.209 (2024-02-22)
 
 ## What's Changed
