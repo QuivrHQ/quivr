@@ -48,7 +48,7 @@ export const CreateBrainStep = (): JSX.Element => {
           onClick={previous}
         />
         <QuivrButton
-          label="Create brain"
+          label="Create"
           color="primary"
           iconName="add"
           onClick={feed}
