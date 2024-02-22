@@ -82,6 +82,7 @@ def invite_users_to_brain(
                 resend_invitation_email(
                     subscription,
                     inviter_email=current_user.email or "Quivr",
+                    user_id=current_user.id,
                     origin=origin,
                 )
         except Exception as e:
