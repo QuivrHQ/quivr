@@ -181,6 +181,8 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
             brain_id=brain_id,
             chat_id=chat_id,
             streaming=streaming,
+            max_input=self.max_input,
+            max_tokens=self.max_tokens,
             **kwargs,
         )
 
