@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.0.209 (2024-02-22)
+
+## What's Changed
+* fix(frontend): fix share brain by @Zewed in https://github.com/QuivrHQ/quivr/pull/2238
+* fix(frontend): don't preselect core brain by @Zewed in https://github.com/QuivrHQ/quivr/pull/2239
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.208...v0.0.209
+
 ## 0.0.208 (2024-02-21)
 
 ## What's Changed
