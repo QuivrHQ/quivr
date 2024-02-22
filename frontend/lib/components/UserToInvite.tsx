@@ -26,11 +26,16 @@ export const UserToInvite = ({
   const [email, setEmail] = useState(roleAssignation.email);
 
   useEffect(() => {
-    onChange({
-      ...roleAssignation,
-      email,
-      role: selectedRole,
-    });
+    if (
+      email !== roleAssignation.email ||
+      selectedRole !== roleAssignation.role
+    ) {
+      onChange({
+        ...roleAssignation,
+        email,
+        role: selectedRole,
+      });
+    }
   }, [email, onChange, roleAssignation, selectedRole]);
 
   const assignableRoles = userRoleToAssignableRoles["Owner"];
