@@ -13,7 +13,7 @@ import { useBrainCreationContext } from "../../brainCreation-provider";
 import { useBrainCreationSteps } from "../../hooks/useBrainCreationSteps";
 
 export const BrainTypeSelectionStep = (): JSX.Element => {
-  const [selectedIndex, setSelectedIndex] = useState<number>(0);
+  const [selectedIndex, setSelectedIndex] = useState<number>(-1);
   const [customBrainsCatalogueOpened, setCustomBrainsCatalogueOpened] =
     useState<boolean>(false);
   const [customBrains, setCustomBrains] = useState<IntegrationBrains[]>([]);
