@@ -1,0 +1,7 @@
+{
+  "image": "mcr.microsoft.com/devcontainers/universal:2",
+  "features": {
+    "ghcr.io/devcontainers-contrib/features/supabase-cli:1": {},
+    "ghcr.io/meaningful-ooo/devcontainer-features/homebrew:2": {}
+  }
+}
