@@ -44,6 +44,7 @@ if sentry_dsn:
         dsn=sentry_dsn,
         sample_rate=0.1,
         enable_tracing=True,
+        traces_sample_rate=0.1,
         integrations=[
             StarletteIntegration(transaction_style="endpoint"),
             FastApiIntegration(transaction_style="endpoint"),
