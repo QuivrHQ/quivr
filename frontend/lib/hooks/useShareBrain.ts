@@ -42,18 +42,9 @@ export const useShareBrain = (brainId: string) => {
     );
   };
 
-  const updateRoleAssignation =
-    (rowIndex: number) => (data: BrainRoleAssignation) => {
-      const concernedRow = roleAssignations[rowIndex];
-
-      console.info(concernedRow);
-
-      if (concernedRow !== undefined) {
-        setRoleAssignation([data]);
-      } else {
-        setRoleAssignation([data]);
-      }
-    };
+  const updateRoleAssignation = (data: BrainRoleAssignation) => {
+    setRoleAssignation([data]);
+  };
 
   const inviteUsers = async (): Promise<void> => {
     setSendingInvitation(true);

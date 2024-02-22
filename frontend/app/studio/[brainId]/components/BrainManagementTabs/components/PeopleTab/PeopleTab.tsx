@@ -24,12 +24,8 @@ export const PeopleTab = ({
   const {
     roleAssignations,
     handleCopyInvitationLink,
-    updateRoleAssignation,
-    removeRoleAssignation,
     inviteUsers,
-    // addNewRoleAssignationRole,
     sendingInvitation,
-    // canAddNewRow,
   } = useShareBrain(brainId);
 
   if (!hasEditRights) {
@@ -69,7 +65,7 @@ export const PeopleTab = ({
             {t("inviteUsers", { ns: "brain" })}
           </p>
 
-          <UserToInvite />
+          <UserToInvite brainId={brainId} />
         </div>
 
         <div className="mb-3 flex flex-row justify-end">
