@@ -4,7 +4,7 @@ from uuid import UUID
 
 from modules.chat.dto.outputs import GetChatHistoryOutput
 from modules.notification.entity.notification import Notification
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 
 class ChatMessage(BaseModel):
