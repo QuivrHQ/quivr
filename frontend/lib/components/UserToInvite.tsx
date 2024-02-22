@@ -26,7 +26,6 @@ export const UserToInvite = ({
   const [email, setEmail] = useState(roleAssignation.email);
 
   useEffect(() => {
-    // Only call onChange if email or selectedRole has actually changed
     if (
       email !== roleAssignation.email ||
       selectedRole !== roleAssignation.role
