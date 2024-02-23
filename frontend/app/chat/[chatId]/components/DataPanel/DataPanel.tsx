@@ -14,16 +14,20 @@ const DataPanel = (): JSX.Element => {
   const { messages } = useChatContext();
   const [lastMessageMetadata, setLastMessageMetadata] =
     useState<MessageMetadata>();
+  const { sourcesMessageIndex } = useChatContext();
 
   useEffect(() => {
-    if (messages.length > 0) {
-      const lastMessage: ChatMessage = messages[messages.length - 1];
+    console.info(sourcesMessageIndex);
+    if (messages.length > 0 && sourcesMessageIndex !== undefined) {
+      const lastMessage: ChatMessage = messages[sourcesMessageIndex];
       const newSources: Source[] = (lastMessage.metadata?.sources ?? []).map(
         (source: Source) => ({
           ...source,
           frequency: 0,
         })
       );
+
+      console.info(sourcesMessageIndex, lastMessage);
 
       const updatedSources: Source[] = [];
 
@@ -48,7 +52,7 @@ const DataPanel = (): JSX.Element => {
         sources: updatedSources,
       });
     }
-  }, [messages]);
+  }, [messages, sourcesMessageIndex]);
 
   return (
     <div className={styles.data_panel_wrapper}>

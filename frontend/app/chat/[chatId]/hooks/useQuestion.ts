@@ -61,7 +61,6 @@ export const useQuestion = (): UseChatService => {
 
     try {
       let url = `/chat/${chatId}/question/stream`;
-      console.log("currentBrain", currentBrain);
       if (currentBrain?.id) {
         url += `?brain_id=${currentBrain.id}`;
       }
