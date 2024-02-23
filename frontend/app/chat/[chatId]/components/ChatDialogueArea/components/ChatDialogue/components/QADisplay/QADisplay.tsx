@@ -8,8 +8,9 @@ import "./styles.css";
 
 type QADisplayProps = {
   content: ChatMessage;
+  index: number;
 };
-export const QADisplay = ({ content }: QADisplayProps): JSX.Element => {
+export const QADisplay = ({ content, index }: QADisplayProps): JSX.Element => {
   const {
     assistant,
     message_id,
@@ -42,6 +43,7 @@ export const QADisplay = ({ content }: QADisplayProps): JSX.Element => {
         brainName={brain_name}
         promptName={prompt_title}
         brainId={brain_id}
+        index={index}
         metadata={metadata} // eslint-disable-line @typescript-eslint/no-unsafe-assignment
       />
     </>

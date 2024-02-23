@@ -21,6 +21,7 @@ type MessageRowProps = {
     sources?: Source[];
   };
   brainId?: string;
+  index?: number;
 };
 
 export const MessageRow = React.forwardRef(
@@ -32,6 +33,7 @@ export const MessageRow = React.forwardRef(
       promptName,
       children,
       brainId,
+      index,
     }: MessageRowProps,
     ref: React.Ref<HTMLDivElement>
   ) => {
@@ -67,7 +69,7 @@ export const MessageRow = React.forwardRef(
             <>
               <MessageContent text={messageContent} isUser={isUserSpeaker} />
               {!isUserSpeaker && messageContent !== "🧠" && (
-                <div className={styles.copy_button}>
+                <div className={styles.icons_wrapper}>
                   <CopyButton handleCopy={handleCopy} />
                   <Icon
                     name="file"
@@ -75,7 +77,8 @@ export const MessageRow = React.forwardRef(
                     size="small"
                     handleHover={true}
                     onClick={() => {
-                      setSourcesMessageIndex(0);
+                      console.info(index);
+                      setSourcesMessageIndex(index);
                     }}
                   />
                 </div>
