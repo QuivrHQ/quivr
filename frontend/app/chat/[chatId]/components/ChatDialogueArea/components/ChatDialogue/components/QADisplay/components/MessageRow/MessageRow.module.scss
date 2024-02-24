@@ -34,8 +34,8 @@
     }
 
     .message_row_content {
-      background-color: Colors.$white;
-      box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.25);
+      border-top: 2px solid Colors.$normal-grey;
+      background-color: Colors.$highlight;
     }
   }
 
@@ -48,8 +48,8 @@
 
     .message_row_content {
       align-self: flex-start;
+      border-top: 3px solid Colors.$primary-light;
       background-color: Colors.$primary-lightest;
-      box-shadow: 0px 2px 2px rgba(97, 66, 212, 0.25);
       margin-left: 1px;
       position: relative;
 
