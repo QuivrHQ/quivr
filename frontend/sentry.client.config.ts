@@ -5,7 +5,7 @@
 import * as Sentry from "@sentry/nextjs";
 
 // Get the DSN from the environment variable
-const SENTRY_DSN = process.env.SENTRY_DSN;
+const SENTRY_DSN = process.env.NEXT_PUBLIC_SENTRY_DSN;
 
 // Only initialize Sentry if the DSN is set
 if (SENTRY_DSN) {

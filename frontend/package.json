@@ -33,7 +33,7 @@
     "@radix-ui/react-tabs": "1.0.4",
     "@radix-ui/react-toast": "1.1.4",
     "@radix-ui/react-tooltip": "1.0.6",
-    "@sentry/nextjs": "^7.99.0",
+    "@sentry/nextjs": "^7.102.1",
     "@supabase/auth-helpers-nextjs": "0.6.1",
     "@supabase/auth-ui-react": "0.4.2",
     "@supabase/auth-ui-shared": "0.1.6",
