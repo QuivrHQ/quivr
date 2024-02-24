@@ -42,7 +42,7 @@ export const MessageRow = React.forwardRef(
       speaker,
       text,
     });
-    const { setSourcesMessageIndex } = useChatContext();
+    const { setSourcesMessageIndex, sourcesMessageIndex } = useChatContext();
     const { isMobile } = useDevice();
 
     const messageContent = text ?? "";
@@ -74,15 +74,21 @@ export const MessageRow = React.forwardRef(
                 <div className={styles.icons_wrapper}>
                   <CopyButton handleCopy={handleCopy} />
                   {!isMobile && (
-                    <Icon
-                      name="file"
-                      color="black"
-                      size="small"
-                      handleHover={true}
-                      onClick={() => {
-                        setSourcesMessageIndex(index);
-                      }}
-                    />
+                    <div className={styles.sources_icon_wrapper}>
+                      <Icon
+                        name="file"
+                        handleHover={true}
+                        color={
+                          sourcesMessageIndex === index ? "primary" : "black"
+                        }
+                        size="small"
+                        onClick={() => {
+                          setSourcesMessageIndex(
+                            sourcesMessageIndex === index ? undefined : index
+                          );
+                        }}
+                      />
+                    </div>
                   )}
                 </div>
               )}

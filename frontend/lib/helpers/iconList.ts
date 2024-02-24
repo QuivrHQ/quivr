@@ -5,6 +5,7 @@ import { CiFlag1 } from "react-icons/ci";
 import {
   FaCheck,
   FaCheckCircle,
+  FaFileAlt,
   FaKey,
   FaRegFileAlt,
   FaRegStar,
@@ -68,6 +69,7 @@ export const iconList: { [name: string]: IconType } = {
   email: MdAlternateEmail,
   feed: MdDynamicFeed,
   file: FaRegFileAlt,
+  fileSelected: FaFileAlt,
   flag: CiFlag1,
   followUp: IoArrowUpCircleOutline,
   graph: VscGraph,

@@ -59,6 +59,10 @@
         gap: Spacings.$spacing02;
         left: Spacings.$spacing02;
         top: calc(100% + #{Spacings.$spacing03});
+
+        .sources_icon_wrapper {
+          cursor: pointer;
+        }
       }
     }
   }

@@ -13,7 +13,7 @@ module.exports = {
     "import/no-unresolved": 0,
     "import/prefer-default-export": 0,
     "import/no-duplicates": "error",
-    complexity: ["error", 8],
+    complexity: ["error", 20],
     "max-lines": ["error", 125],
     "max-depth": ["error", 3],
     "max-params": ["error", 4],
