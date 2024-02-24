@@ -2,32 +2,30 @@
 
 import { useEffect, useState } from "react";
 
+import { FoldableSection } from "@/lib/components/ui/FoldableSection/FoldableSection";
 import { useChatContext } from "@/lib/context";
-import { MessageMetadata, Source } from "@/lib/types/MessageMetadata";
+import { Source } from "@/lib/types/MessageMetadata";
 
 import styles from "./DataPanel.module.scss";
-import Sources from "./components/Sources/Sources";
 
 import { ChatMessage } from "../../types";
 
 const DataPanel = (): JSX.Element => {
   const { messages } = useChatContext();
-  const [lastMessageMetadata, setLastMessageMetadata] =
-    useState<MessageMetadata>();
+  const [selectedMessageSources, setSelectedMessageSources] =
+    useState<Source[]>();
   const { sourcesMessageIndex } = useChatContext();
 
   useEffect(() => {
     console.info(sourcesMessageIndex);
     if (messages.length > 0 && sourcesMessageIndex !== undefined) {
-      const lastMessage: ChatMessage = messages[sourcesMessageIndex];
-      const newSources: Source[] = (lastMessage.metadata?.sources ?? []).map(
-        (source: Source) => ({
-          ...source,
-          frequency: 0,
-        })
-      );
-
-      console.info(sourcesMessageIndex, lastMessage);
+      const selectedMessage: ChatMessage = messages[sourcesMessageIndex];
+      const newSources: Source[] = (
+        selectedMessage.metadata?.sources ?? []
+      ).map((source: Source) => ({
+        ...source,
+        frequency: 0,
+      }));
 
       const updatedSources: Source[] = [];
 
@@ -47,16 +45,32 @@ const DataPanel = (): JSX.Element => {
 
       updatedSources.sort((a, b) => b.frequency - a.frequency);
 
-      setLastMessageMetadata({
-        closeBrains: lastMessage.metadata?.close_brains ?? [],
-        sources: updatedSources,
-      });
+      setSelectedMessageSources(updatedSources);
     }
   }, [messages, sourcesMessageIndex]);
 
   return (
     <div className={styles.data_panel_wrapper}>
-      <Sources sources={lastMessageMetadata?.sources} />
+      <FoldableSection
+        label="Sources"
+        icon="file"
+        foldedByDefault={selectedMessageSources?.length === 0}
+      >
+        <div className={styles.sources_wrapper}>
+          {selectedMessageSources?.map((source, index) => (
+            <div className={styles.source_wrapper} key={index}>
+              <a
+                href={source.source_url}
+                key={index}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <div className={styles.source}>{source.name}</div>
+              </a>
+            </div>
+          ))}
+        </div>
+      </FoldableSection>
     </div>
   );
 };
