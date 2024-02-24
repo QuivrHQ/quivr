@@ -63,18 +63,20 @@ const Sources = (): JSX.Element => {
           onClick={() => setSourcesMessageIndex(undefined)}
         />
       </div>
-      {selectedMessageSources?.map((source, index) => (
-        <div className={styles.source_wrapper} key={index}>
-          <a
-            href={source.source_url}
-            key={index}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <div className={styles.source}>{source.name}</div>
-          </a>
-        </div>
-      ))}
+      <div className={styles.source_list}>
+        {selectedMessageSources?.map((source, index) => (
+          <div className={styles.source_wrapper} key={index}>
+            <a
+              href={source.source_url}
+              key={index}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <div className={styles.source}>{source.name}</div>
+            </a>
+          </div>
+        ))}
+      </div>
     </div>
   );
 };

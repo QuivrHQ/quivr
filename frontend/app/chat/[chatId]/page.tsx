@@ -30,7 +30,7 @@ const SelectedChatPage = (): JSX.Element => {
 
   const { currentBrain, setCurrentBrainId } = useBrainContext();
   const { messages } = useChatContext();
-  const { sourcesMessageIndex } = useChatContext();
+  const { sourcesMessageIndex, setSourcesMessageIndex } = useChatContext();
 
   useChatNotificationsSync();
 
@@ -67,6 +67,12 @@ const SelectedChatPage = (): JSX.Element => {
       setCurrentBrainId(messages[messages.length - 1].brain_id as UUID);
     }
   }, [messages]);
+
+  useEffect(() => {
+    return () => {
+      setSourcesMessageIndex(undefined);
+    };
+  }, []);
 
   return (
     <div className={styles.main_container}>
