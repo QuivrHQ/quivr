@@ -3,6 +3,7 @@ import React from "react";
 import { CopyButton } from "@/lib/components/ui/CopyButton";
 import Icon from "@/lib/components/ui/Icon/Icon";
 import { useChatContext } from "@/lib/context";
+import { useDevice } from "@/lib/hooks/useDevice";
 import { Source } from "@/lib/types/MessageMetadata";
 
 import styles from "./MessageRow.module.scss";
@@ -42,6 +43,7 @@ export const MessageRow = React.forwardRef(
       text,
     });
     const { setSourcesMessageIndex } = useChatContext();
+    const { isMobile } = useDevice();
 
     const messageContent = text ?? "";
 
@@ -71,15 +73,17 @@ export const MessageRow = React.forwardRef(
               {!isUserSpeaker && messageContent !== "🧠" && (
                 <div className={styles.icons_wrapper}>
                   <CopyButton handleCopy={handleCopy} />
-                  <Icon
-                    name="file"
-                    color="black"
-                    size="small"
-                    handleHover={true}
-                    onClick={() => {
-                      setSourcesMessageIndex(index);
-                    }}
-                  />
+                  {!isMobile && (
+                    <Icon
+                      name="file"
+                      color="black"
+                      size="small"
+                      handleHover={true}
+                      onClick={() => {
+                        setSourcesMessageIndex(index);
+                      }}
+                    />
+                  )}
                 </div>
               )}
             </>

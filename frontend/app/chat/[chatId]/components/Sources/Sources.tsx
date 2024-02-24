@@ -14,7 +14,7 @@ const Sources = (): JSX.Element => {
   const { messages } = useChatContext();
   const [selectedMessageSources, setSelectedMessageSources] =
     useState<Source[]>();
-  const { sourcesMessageIndex } = useChatContext();
+  const { sourcesMessageIndex, setSourcesMessageIndex } = useChatContext();
 
   useEffect(() => {
     if (messages.length > 0 && sourcesMessageIndex !== undefined) {
@@ -55,7 +55,13 @@ const Sources = (): JSX.Element => {
           <Icon name="file" color="primary" size="normal" />
           <span className={styles.title}>Sources</span>
         </div>
-        <Icon name="close" color="black" size="normal" handleHover={true} />
+        <Icon
+          name="close"
+          color="black"
+          size="normal"
+          handleHover={true}
+          onClick={() => setSourcesMessageIndex(undefined)}
+        />
       </div>
       {selectedMessageSources?.map((source, index) => (
         <div className={styles.source_wrapper} key={index}>
