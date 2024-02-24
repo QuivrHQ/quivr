@@ -1,6 +1,7 @@
 "use client";
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import Script from "next/script";
 import { posthog } from "posthog-js";
 import { PostHogProvider } from "posthog-js/react";
 import { PropsWithChildren, useEffect } from "react";
@@ -55,22 +56,32 @@ const App = ({ children }: PropsWithChildren): JSX.Element => {
   }, [session]);
 
   return (
-    <PostHogProvider client={posthog}>
-      <IntercomProvider>
-        <div className="flex flex-1 flex-col overflow-auto">
-          <SearchModalProvider>
-            <SearchModal />
-            <div className="relative h-full w-full flex justify-stretch items-stretch overflow-auto">
-              <Menu />
-              <div onClick={onClickOutside} className="flex-1 overflow-scroll">
-                {children}
+    <>
+      <Script
+        id="octolane-script"
+        src="https://cdn.octolane.com/tag.js?pk=0a213725640302dff773"
+      />
+
+      <PostHogProvider client={posthog}>
+        <IntercomProvider>
+          <div className="flex flex-1 flex-col overflow-auto">
+            <SearchModalProvider>
+              <SearchModal />
+              <div className="relative h-full w-full flex justify-stretch items-stretch overflow-auto">
+                <Menu />
+                <div
+                  onClick={onClickOutside}
+                  className="flex-1 overflow-scroll"
+                >
+                  {children}
+                </div>
+                <UpdateMetadata />
               </div>
-              <UpdateMetadata />
-            </div>
-          </SearchModalProvider>
-        </div>
-      </IntercomProvider>
-    </PostHogProvider>
+            </SearchModalProvider>
+          </div>
+        </IntercomProvider>
+      </PostHogProvider>
+    </>
   );
 };
 
