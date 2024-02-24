@@ -18,6 +18,8 @@ export const ChatProviderMock = ({
         notifications: [],
         setNotifications: () => void 0,
         removeMessage: () => void 0,
+        sourcesMessageIndex: undefined,
+        setSourcesMessageIndex: () => void 0,
       }}
     >
       {children}

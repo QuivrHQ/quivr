@@ -5,7 +5,9 @@ import { CiFlag1 } from "react-icons/ci";
 import {
   FaCheck,
   FaCheckCircle,
+  FaFileAlt,
   FaKey,
+  FaRegFileAlt,
   FaRegStar,
   FaRegUserCircle,
   FaUnlock,
@@ -31,7 +33,6 @@ import {
   LuChevronLeft,
   LuChevronRight,
   LuCopy,
-  LuFile,
   LuPlusCircle,
   LuSearch,
 } from "react-icons/lu";
@@ -67,7 +68,8 @@ export const iconList: { [name: string]: IconType } = {
   edit: MdOutlineModeEditOutline,
   email: MdAlternateEmail,
   feed: MdDynamicFeed,
-  file: LuFile,
+  file: FaRegFileAlt,
+  fileSelected: FaFileAlt,
   flag: CiFlag1,
   followUp: IoArrowUpCircleOutline,
   graph: VscGraph,

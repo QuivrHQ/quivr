@@ -1,6 +1,6 @@
 import { UUID } from "crypto";
 
-import { CloseBrain, Source } from "@/lib/types/MessageMetadata";
+import { Source } from "@/lib/types/MessageMetadata";
 
 export type ChatQuestion = {
   model?: string;
@@ -21,7 +21,6 @@ export type ChatMessage = {
   brain_id?: UUID;
   metadata?: {
     sources?: Source[];
-    close_brains?: CloseBrain[];
   };
 };
 

@@ -1,7 +1,0 @@
-@use "@/styles/Spacings.module.scss";
-
-.data_panel_wrapper {
-  display: flex;
-  flex-direction: column;
-  row-gap: Spacings.$spacing05;
-}

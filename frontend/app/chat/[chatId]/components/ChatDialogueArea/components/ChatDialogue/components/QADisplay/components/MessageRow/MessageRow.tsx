@@ -2,6 +2,8 @@ import React from "react";
 
 import { CopyButton } from "@/lib/components/ui/CopyButton";
 import Icon from "@/lib/components/ui/Icon/Icon";
+import { useChatContext } from "@/lib/context";
+import { useDevice } from "@/lib/hooks/useDevice";
 import { Source } from "@/lib/types/MessageMetadata";
 
 import styles from "./MessageRow.module.scss";
@@ -20,6 +22,7 @@ type MessageRowProps = {
     sources?: Source[];
   };
   brainId?: string;
+  index?: number;
 };
 
 export const MessageRow = React.forwardRef(
@@ -31,6 +34,7 @@ export const MessageRow = React.forwardRef(
       promptName,
       children,
       brainId,
+      index,
     }: MessageRowProps,
     ref: React.Ref<HTMLDivElement>
   ) => {
@@ -38,6 +42,8 @@ export const MessageRow = React.forwardRef(
       speaker,
       text,
     });
+    const { setSourcesMessageIndex, sourcesMessageIndex } = useChatContext();
+    const { isMobile } = useDevice();
 
     const messageContent = text ?? "";
 
@@ -65,8 +71,25 @@ export const MessageRow = React.forwardRef(
             <>
               <MessageContent text={messageContent} isUser={isUserSpeaker} />
               {!isUserSpeaker && messageContent !== "🧠" && (
-                <div className={styles.copy_button}>
+                <div className={styles.icons_wrapper}>
                   <CopyButton handleCopy={handleCopy} />
+                  {!isMobile && (
+                    <div className={styles.sources_icon_wrapper}>
+                      <Icon
+                        name="file"
+                        handleHover={true}
+                        color={
+                          sourcesMessageIndex === index ? "primary" : "black"
+                        }
+                        size="small"
+                        onClick={() => {
+                          setSourcesMessageIndex(
+                            sourcesMessageIndex === index ? undefined : index
+                          );
+                        }}
+                      />
+                    </div>
+                  )}
                 </div>
               )}
             </>

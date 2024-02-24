@@ -53,10 +53,16 @@
       margin-left: 1px;
       position: relative;
 
-      .copy_button {
+      .icons_wrapper {
         position: absolute;
+        display: flex;
+        gap: Spacings.$spacing02;
         left: Spacings.$spacing02;
-        top: calc(100% + #{Spacings.$spacing02});
+        top: calc(100% + #{Spacings.$spacing03});
+
+        .sources_icon_wrapper {
+          cursor: pointer;
+        }
       }
     }
   }

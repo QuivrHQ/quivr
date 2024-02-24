@@ -30,8 +30,12 @@ export const ChatDialogue = ({
       <div className={chatDialogueContainerClassName} ref={chatListRef}>
         <Onboarding />
         <div className={chatItemContainerClassName}>
-          {chatItems.map((chatItem) => (
-            <ChatItem key={getKeyFromChatItem(chatItem)} content={chatItem} />
+          {chatItems.map((chatItem, index) => (
+            <ChatItem
+              key={getKeyFromChatItem(chatItem)}
+              content={chatItem}
+              index={index}
+            />
           ))}
         </div>
       </div>
@@ -49,8 +53,12 @@ export const ChatDialogue = ({
         </div>
       ) : (
         <div className={chatItemContainerClassName}>
-          {chatItems.map((chatItem) => (
-            <ChatItem key={getKeyFromChatItem(chatItem)} content={chatItem} />
+          {chatItems.map((chatItem, index) => (
+            <ChatItem
+              key={getKeyFromChatItem(chatItem)}
+              content={chatItem}
+              index={index}
+            />
           ))}
         </div>
       )}
