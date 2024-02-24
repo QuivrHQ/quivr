@@ -159,8 +159,7 @@ if (process.env.SENTRY_DSN) {
 
       // Suppresses source map uploading logs during build
       silent: true,
-
-      org: "quivr-0f",
+      org: "quivr-brain",
       project: "javascript-nextjs",
     },
     {
@@ -181,6 +180,12 @@ if (process.env.SENTRY_DSN) {
 
       // Automatically tree-shake Sentry logger statements to reduce bundle size
       disableLogger: true,
+
+      // Enables automatic instrumentation of Vercel Cron Monitors.
+      // See the following for more information:
+      // https://docs.sentry.io/product/crons/
+      // https://vercel.com/docs/cron-jobs
+      automaticVercelMonitors: true,
     }
   );
 } else {
