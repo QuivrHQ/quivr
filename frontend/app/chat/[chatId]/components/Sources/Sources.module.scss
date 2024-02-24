@@ -8,7 +8,7 @@
   display: flex;
   flex-direction: column;
   padding-bottom: Spacings.$spacing03;
-  gap: Spacings.$spacing01;
+  gap: Spacings.$spacing03;
   overflow: hidden;
   height: 100%;
   border: 1px solid Colors.$lightest-black;
@@ -28,8 +28,14 @@
     }
   }
 
-  .source {
-    @include Typography.EllipsisOverflow;
-    padding-inline: Spacings.$spacing05;
+  .source_list {
+    display: flex;
+    flex-direction: column;
+    gap: Spacings.$spacing01;
+
+    .source {
+      @include Typography.EllipsisOverflow;
+      padding-inline: Spacings.$spacing05;
+    }
   }
 }
