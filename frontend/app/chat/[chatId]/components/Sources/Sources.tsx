@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 
+import { Icon } from "@/lib/components/ui/Icon/Icon";
 import { useChatContext } from "@/lib/context";
 import { Source } from "@/lib/types/MessageMetadata";
 
@@ -16,7 +17,6 @@ const Sources = (): JSX.Element => {
   const { sourcesMessageIndex } = useChatContext();
 
   useEffect(() => {
-    console.info(sourcesMessageIndex);
     if (messages.length > 0 && sourcesMessageIndex !== undefined) {
       const selectedMessage: ChatMessage = messages[sourcesMessageIndex];
       const newSources: Source[] = (
@@ -50,6 +50,13 @@ const Sources = (): JSX.Element => {
 
   return (
     <div className={styles.sources_wrapper}>
+      <div className={styles.title_wrapper}>
+        <div className={styles.left}>
+          <Icon name="file" color="primary" size="normal" />
+          <span className={styles.title}>Sources</span>
+        </div>
+        <Icon name="close" color="black" size="normal" handleHover={true} />
+      </div>
       {selectedMessageSources?.map((source, index) => (
         <div className={styles.source_wrapper} key={index}>
           <a

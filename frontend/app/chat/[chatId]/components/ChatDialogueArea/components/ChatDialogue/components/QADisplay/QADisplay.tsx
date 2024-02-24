@@ -1,7 +1,4 @@
-import { useEffect } from "react";
-
 import { ChatMessage } from "@/app/chat/[chatId]/types";
-import { useChatContext } from "@/lib/context";
 
 import { MessageRow } from "./components";
 import "./styles.css";
@@ -20,12 +17,6 @@ export const QADisplay = ({ content, index }: QADisplayProps): JSX.Element => {
     metadata,
     brain_id,
   } = content;
-
-  const { sourcesMessageIndex } = useChatContext();
-
-  useEffect(() => {
-    console.info(sourcesMessageIndex);
-  }, [sourcesMessageIndex]);
 
   return (
     <>

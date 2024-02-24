@@ -30,6 +30,7 @@ const SelectedChatPage = (): JSX.Element => {
 
   const { currentBrain, setCurrentBrainId } = useBrainContext();
   const { messages } = useChatContext();
+  const { sourcesMessageIndex } = useChatContext();
 
   useChatNotificationsSync();
 
@@ -92,8 +93,8 @@ const SelectedChatPage = (): JSX.Element => {
             <ActionsBar />
           </div>
         </div>
-        {!isMobile && (
-          <div className={styles.data_panel_wrapper}>
+        {!isMobile && sourcesMessageIndex !== undefined && (
+          <div className={styles.sources_wrapper}>
             <Sources />
           </div>
         )}

@@ -77,7 +77,6 @@ export const MessageRow = React.forwardRef(
                     size="small"
                     handleHover={true}
                     onClick={() => {
-                      console.info(index);
                       setSourcesMessageIndex(index);
                     }}
                   />

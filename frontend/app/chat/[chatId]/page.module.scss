@@ -16,9 +16,16 @@
     gap: Spacings.$spacing09;
     overflow: hidden;
 
-    .data_panel_wrapper {
+    .sources_wrapper {
       height: 100%;
-      width: 30%;
+      width: 0;
+      animation: expand 0.2s forwards;
+
+      @keyframes expand {
+        to {
+          width: 30%;
+        }
+      }
     }
   }
 }
