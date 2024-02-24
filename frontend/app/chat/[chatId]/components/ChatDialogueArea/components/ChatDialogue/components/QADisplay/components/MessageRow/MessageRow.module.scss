@@ -34,7 +34,7 @@
     }
 
     .message_row_content {
-      background-color: Colors.$highlight;
+      background-color: Colors.$lightest-grey;
     }
   }
 
@@ -50,7 +50,6 @@
       background-color: Colors.$primary-lightest;
       margin-left: 1px;
       position: relative;
-      border: 1px solid Colors.$primary-light;
 
       .icons_wrapper {
         position: absolute;
