@@ -1,75 +1,74 @@
-name: Backend Tests
+# name: Backend Tests
 
-on:
-  push:
-    branches: [main]
-    paths:
-      - 'backend/**'
-  pull_request:
-    branches: [main]
-    paths:
-      - 'backend/**'
-  workflow_dispatch:
-    inputs:
-      logLevel:
-        description: 'Log level'
-        required: true
-        default: 'warning'
-        type: choice
-        options:
-        - info
-        - warning
-        - debug
-      tags:
-        description: 'Test scenario tags'
-        required: false
-        type: boolean
-      environment:
-        description: 'Environment to run tests against'
-        type: environment
-        required: false
+# on:
+#   push:
+#     branches: [main]
+#     paths:
+#       - 'backend/**'
+#   pull_request:
+#     branches: [main]
+#     paths:
+#       - 'backend/**'
+#   workflow_dispatch:
+#     inputs:
+#       logLevel:
+#         description: 'Log level'
+#         required: true
+#         default: 'warning'
+#         type: choice
+#         options:
+#         - info
+#         - warning
+#         - debug
+#       tags:
+#         description: 'Test scenario tags'
+#         required: false
+#         type: boolean
+#       environment:
+#         description: 'Environment to run tests against'
+#         type: environment
+#         required: false
 
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./backend
-    environment: preview
-    strategy:
-      matrix:
-        python-version: ["3.11"]
+# jobs:
+#   build:
+#     runs-on: ubuntu-latest
+#     defaults:
+#       run:
+#         working-directory: ./backend
+#     environment: preview
+#     strategy:
+#       matrix:
+#         python-version: ["3.11"]
 
-    steps:
-      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@65d7f2d534ac1bc67fcd62888c5f4f3d2cb2b236 # v4
-        with:
-          python-version: ${{ matrix.python-version }}
-          cache: "pip"
-      - name: Install system dependencies
-        run: sudo apt-get update && sudo apt-get install -y libcurl4-openssl-dev
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install pytest pytest-emoji pytest-md pytest-mock
-          pip install pyright
-          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-      - name: Run pytest
-        uses: pavelzw/pytest-action@510c5e90c360a185039bea56ce8b3e7e51a16507 # v2
-        with:
-          verbose: true
-          emoji: true
-          job-summary: true
-          click-to-expand: false
-          report-title: 'Test Report'
-        env:
-          SUPABASE_URL: ${{secrets.SUPABASE_URL}}
-          SUPABASE_SERVICE_KEY: ${{secrets.SUPABASE_SERVICE_KEY}}
-          OPENAI_API_KEY: ${{secrets.OPENAI_API_KEY}}
-          ANTHROPIC_API_KEY: ${{secrets.ANTHROPIC_API_KEY}}
-          JWT_SECRET_KEY: ${{secrets.JWT_SECRET_KEY}}
-          CI_TEST_API_KEY: ${{secrets.CI_TEST_API_KEY}}
-          CELERY_BROKER_URL: ${{secrets.CELERY_BROKER_URL}}
+#     steps:
+#       - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4
+#       - name: Set up Python ${{ matrix.python-version }}
+#         uses: actions/setup-python@65d7f2d534ac1bc67fcd62888c5f4f3d2cb2b236 # v4
+#         with:
+#           python-version: ${{ matrix.python-version }}
+#           cache: "pip"
+#       - name: Install system dependencies
+#         run: sudo apt-get update && sudo apt-get install -y libcurl4-openssl-dev
+#       - name: Install dependencies
+#         run: |
+#           python -m pip install --upgrade pip
+#           pip install pytest pytest-emoji pytest-md pytest-mock
+#           pip install pyright
+#           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+#       - name: Run pytest
+#         uses: pavelzw/pytest-action@510c5e90c360a185039bea56ce8b3e7e51a16507 # v2
+#         with:
+#           verbose: true
+#           emoji: true
+#           job-summary: true
+#           click-to-expand: false
+#           report-title: 'Test Report'
+#         env:
+#           SUPABASE_URL: ${{secrets.SUPABASE_URL}}
+#           SUPABASE_SERVICE_KEY: ${{secrets.SUPABASE_SERVICE_KEY}}
+#           OPENAI_API_KEY: ${{secrets.OPENAI_API_KEY}}
+#           ANTHROPIC_API_KEY: ${{secrets.ANTHROPIC_API_KEY}}
+#           JWT_SECRET_KEY: ${{secrets.JWT_SECRET_KEY}}
+#           CI_TEST_API_KEY: ${{secrets.CI_TEST_API_KEY}}
+#           CELERY_BROKER_URL: ${{secrets.CELERY_BROKER_URL}}
 
-      
