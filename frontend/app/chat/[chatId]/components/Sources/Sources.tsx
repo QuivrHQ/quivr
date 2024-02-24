@@ -2,15 +2,14 @@
 
 import { useEffect, useState } from "react";
 
-import { FoldableSection } from "@/lib/components/ui/FoldableSection/FoldableSection";
 import { useChatContext } from "@/lib/context";
 import { Source } from "@/lib/types/MessageMetadata";
 
-import styles from "./DataPanel.module.scss";
+import styles from "./Sources.module.scss";
 
 import { ChatMessage } from "../../types";
 
-const DataPanel = (): JSX.Element => {
+const Sources = (): JSX.Element => {
   const { messages } = useChatContext();
   const [selectedMessageSources, setSelectedMessageSources] =
     useState<Source[]>();
@@ -50,29 +49,21 @@ const DataPanel = (): JSX.Element => {
   }, [messages, sourcesMessageIndex]);
 
   return (
-    <div className={styles.data_panel_wrapper}>
-      <FoldableSection
-        label="Sources"
-        icon="file"
-        foldedByDefault={selectedMessageSources?.length === 0}
-      >
-        <div className={styles.sources_wrapper}>
-          {selectedMessageSources?.map((source, index) => (
-            <div className={styles.source_wrapper} key={index}>
-              <a
-                href={source.source_url}
-                key={index}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <div className={styles.source}>{source.name}</div>
-              </a>
-            </div>
-          ))}
+    <div className={styles.sources_wrapper}>
+      {selectedMessageSources?.map((source, index) => (
+        <div className={styles.source_wrapper} key={index}>
+          <a
+            href={source.source_url}
+            key={index}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <div className={styles.source}>{source.name}</div>
+          </a>
         </div>
-      </FoldableSection>
+      ))}
     </div>
   );
 };
 
-export default DataPanel;
+export default Sources;

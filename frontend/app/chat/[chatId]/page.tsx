@@ -17,7 +17,7 @@ import { cn } from "@/lib/utils";
 
 import { ActionsBar } from "./components/ActionsBar";
 import { ChatDialogueArea } from "./components/ChatDialogueArea/ChatDialogue";
-import DataPanel from "./components/DataPanel/DataPanel";
+import Sources from "./components/Sources/Sources";
 import { useChatNotificationsSync } from "./hooks/useChatNotificationsSync";
 import styles from "./page.module.scss";
 
@@ -94,7 +94,7 @@ const SelectedChatPage = (): JSX.Element => {
         </div>
         {!isMobile && (
           <div className={styles.data_panel_wrapper}>
-            <DataPanel />
+            <Sources />
           </div>
         )}
         <UploadDocumentModal />
