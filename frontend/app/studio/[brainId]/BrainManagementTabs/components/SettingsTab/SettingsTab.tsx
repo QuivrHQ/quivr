@@ -1,5 +1,3 @@
-/* eslint max-lines:["error", 135] */
-
 import { UUID } from "crypto";
 import { FormProvider, useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
@@ -8,6 +6,7 @@ import { FaSpinner } from "react-icons/fa";
 import { Divider } from "@/lib/components/ui/Divider";
 import { Brain } from "@/lib/context/BrainProvider/types";
 
+import styles from "./SettingsTab.module.scss";
 import { GeneralInformation } from "./components/GeneralInformation/GeneralInformation";
 import { ModelSelection } from "./components/ModelSelection/ModelSelection";
 import { Prompt } from "./components/Prompt/Prompt";
@@ -50,24 +49,21 @@ export const SettingsTabContent = ({
         className="mb-10 mt-5 flex flex-col items-center gap-2"
         ref={formRef}
       >
-        <GeneralInformation hasEditRights={hasEditRights} />
-        {brain?.brain_type === "doc" && (
-          <>
-            <Divider
-              textClassName="font-semibold text-black w-full mx-1"
-              separatorClassName="w-full"
-              className="w-full my-10"
-              text={t("modelSection", { ns: "config" })}
-            />
-
-            <ModelSelection
-              accessibleModels={accessibleModels}
-              hasEditRights={hasEditRights}
-              brainId={brainId}
-              handleSubmit={handleSubmit}
-            />
-          </>
-        )}
+        <div className={styles.main_infos_wrapper}>
+          <div className={styles.general_information}>
+            <GeneralInformation hasEditRights={hasEditRights} />
+          </div>
+          {brain?.brain_type === "doc" && (
+            <div className={styles.model_information}>
+              <ModelSelection
+                accessibleModels={accessibleModels}
+                hasEditRights={hasEditRights}
+                brainId={brainId}
+                handleSubmit={handleSubmit}
+              />
+            </div>
+          )}
+        </div>
         <Divider text={t("customPromptSection", { ns: "config" })} />
         <Prompt
           usePromptProps={promptProps}

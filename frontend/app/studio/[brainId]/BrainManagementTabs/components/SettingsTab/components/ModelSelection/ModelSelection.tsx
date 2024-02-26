@@ -20,7 +20,6 @@ export const ModelSelection = (props: ModelSelectionProps): JSX.Element => {
 
   return (
     <>
-      
       <fieldset className="w-full flex flex-col mt-2">
         <label className="flex-1 text-sm" htmlFor="model">
           {t("modelLabel", { ns: "config" })}
