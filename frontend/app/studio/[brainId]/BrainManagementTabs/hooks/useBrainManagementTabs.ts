@@ -1,6 +1,6 @@
 import { UUID } from "crypto";
 import { useParams, usePathname, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { useSubscriptionApi } from "@/lib/api/subscription/useSubscriptionApi";
@@ -8,26 +8,15 @@ import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainConte
 import { useToast } from "@/lib/hooks";
 import { useEventTracking } from "@/services/analytics/june/useEventTracking";
 
-import { BrainManagementTab } from "../types";
 import { getBrainPermissions } from "../utils/getBrainPermissions";
-import { getTargetedTab } from "../utils/getTargetedTab";
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const useBrainManagementTabs = (customBrainId?: UUID) => {
-  const [selectedTab, setSelectedTab] =
-    useState<BrainManagementTab>("settings");
   const { allBrains } = useBrainContext();
   const [
     isDeleteOrUnsubscribeRequestPending,
     setIsDeleteOrUnsubscribeRequestPending,
   ] = useState(false);
-
-  useEffect(() => {
-    const targetedTab = getTargetedTab();
-    if (targetedTab !== undefined) {
-      setSelectedTab(targetedTab);
-    }
-  }, []);
 
   const { track } = useEventTracking();
   const { publish } = useToast();
@@ -88,8 +77,6 @@ export const useBrainManagementTabs = (customBrainId?: UUID) => {
   };
 
   return {
-    selectedTab,
-    setSelectedTab,
     brainId,
     handleUnsubscribeOrDeleteBrain,
     isDeleteOrUnsubscribeModalOpened,

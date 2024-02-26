@@ -1,7 +1,7 @@
 import { UUID } from "crypto";
 import { useParams } from "next/navigation";
 
-import { useBrainFetcher } from "@/app/studio/[brainId]/components/BrainManagementTabs/hooks/useBrainFetcher";
+import { useBrainFetcher } from "@/app/studio/[brainId]/BrainManagementTabs/hooks/useBrainFetcher";
 
 import { useBrainContext } from "../context/BrainProvider/hooks/useBrainContext";
 

@@ -3,7 +3,7 @@
 import PageHeader from "@/lib/components/PageHeader/PageHeader";
 import { ButtonType } from "@/lib/types/QuivrButton";
 
-import { BrainManagementTabs } from "./components";
+import { BrainManagementTabs } from "./BrainManagementTabs/BrainManagementTabs";
 import { useBrainManagement } from "./hooks/useBrainManagement";
 import styles from "./page.module.scss";
 
