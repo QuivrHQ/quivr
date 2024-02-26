@@ -13,7 +13,7 @@ export type SelectOptionProps<T> = {
 
 type SelectProps<T> = {
   options: SelectOptionProps<T>[];
-  onChange: (option: T) => void;
+  onChange: (option: T) => void | Promise<void>;
   selectedOption: SelectOptionProps<T> | undefined;
   placeholder: string;
 };
@@ -31,8 +31,11 @@ export const SingleSelector = <T extends string | number | UUID>({
     option.label.toLowerCase().includes(search.toLowerCase())
   );
 
-  const handleOptionClick = (option: SelectOptionProps<T>) => {
-    onChange(option.value);
+  const handleOptionClick = async (option: SelectOptionProps<T>) => {
+    console.info(selectedOption);
+    if (option !== selectedOption) {
+      await onChange(option.value);
+    }
     setFolded(true);
   };
 
@@ -77,7 +80,7 @@ export const SingleSelector = <T extends string | number | UUID>({
             <div
               className={styles.option}
               key={option.value.toString()}
-              onClick={() => handleOptionClick(option)}
+              onClick={void handleOptionClick(option)}
             >
               <div className={styles.icon}>
                 <Icon name="brain" size="normal" color="black" />

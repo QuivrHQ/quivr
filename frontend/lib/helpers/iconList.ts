@@ -29,6 +29,7 @@ import {
   IoHomeOutline,
   IoSettingsSharp,
 } from "react-icons/io5";
+import { LiaRobotSolid } from "react-icons/lia";
 import { IconType } from "react-icons/lib";
 import {
   LuBrain,
@@ -77,7 +78,7 @@ export const iconList: { [name: string]: IconType } = {
   flag: CiFlag1,
   followUp: IoArrowUpCircleOutline,
   graph: VscGraph,
-  hastag: RiHashtag,
+  hashtag: RiHashtag,
   help: IoIosHelpCircleOutline,
   history: MdHistory,
   home: IoHomeOutline,
@@ -88,6 +89,7 @@ export const iconList: { [name: string]: IconType } = {
   options: SlOptions,
   paragraph: BsTextParagraph,
   redirection: BsArrowRightShort,
+  robot: LiaRobotSolid,
   search: LuSearch,
   settings: IoSettingsSharp,
   software: CgSoftwareDownload,

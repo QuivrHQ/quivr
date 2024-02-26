@@ -1,3 +1,4 @@
+@use "@/styles/ScreenSizes.module.scss";
 @use "@/styles/Spacings.module.scss";
 
 .main_infos_wrapper {
@@ -12,5 +13,18 @@
 
   .model_information {
     width: 30%;
+    min-width: 200px;
+  }
+
+  @media (max-width: ScreenSizes.$small) {
+    flex-direction: column;
+
+    .general_information {
+      width: 100%;
+    }
+
+    .model_information {
+      width: 100%;
+    }
   }
 }

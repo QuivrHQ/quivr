@@ -1,8 +1,10 @@
 import { UUID } from "crypto";
-import { useTranslation } from "react-i18next";
 
+import { FieldHeader } from "@/lib/components/ui/FieldHeader/FieldHeader";
+import { SingleSelector } from "@/lib/components/ui/SingleSelector/SingleSelector";
 import { defineMaxTokens } from "@/lib/helpers/defineMaxTokens";
-import { SaveButton } from "@/shared/SaveButton";
+
+import styles from "./ModelSelection.module.scss";
 
 import { useBrainFormState } from "../../hooks/useBrainFormState";
 
@@ -15,36 +17,25 @@ type ModelSelectionProps = {
 
 export const ModelSelection = (props: ModelSelectionProps): JSX.Element => {
   const { model, maxTokens, register } = useBrainFormState();
-  const { t } = useTranslation(["translation", "brain", "config"]);
   const { handleSubmit, hasEditRights, accessibleModels } = props;
 
+  const accessibleModelOptions = accessibleModels.map((accessibleModel) => {
+    return { value: accessibleModel, label: accessibleModel };
+  });
+
   return (
-    <>
-      <fieldset className="w-full flex flex-col mt-2">
-        <label className="flex-1 text-sm" htmlFor="model">
-          {t("modelLabel", { ns: "config" })}
-        </label>
-        <select
-          id="model"
-          disabled={!hasEditRights}
-          {...register("model", {
-            onChange: () => {
-              void handleSubmit(false);
-            },
-          })}
-          className="px-5 py-2 dark:bg-gray-700 bg-gray-200 rounded-md"
-        >
-          {accessibleModels.map((availableModel) => (
-            <option value={availableModel} key={availableModel}>
-              {availableModel}
-            </option>
-          ))}
-        </select>
+    <div className={styles.model_selection_wrapper}>
+      <fieldset>
+        <FieldHeader label="Model" iconName="robot" />
+        <SingleSelector
+          options={accessibleModelOptions}
+          onChange={() => handleSubmit(false)}
+          placeholder="Choose a model"
+          selectedOption={{ value: model, label: model }}
+        />
       </fieldset>
-      <fieldset className="w-full flex mt-4">
-        <label className="flex-1" htmlFor="tokens">
-          {t("maxTokens", { ns: "config" })}: {maxTokens}
-        </label>
+      <fieldset>
+        <FieldHeader label="Max tokens" iconName="hashtag" />
         <input
           type="range"
           min="10"
@@ -54,11 +45,11 @@ export const ModelSelection = (props: ModelSelectionProps): JSX.Element => {
           {...register("maxTokens")}
         />
       </fieldset>
-      {hasEditRights && (
-        <div className="flex w-full justify-end py-4">
+      {/* {hasEditRights && (
+        <div>
           <SaveButton handleSubmit={handleSubmit} />
         </div>
-      )}
-    </>
+      )} */}
+    </div>
   );
 };
