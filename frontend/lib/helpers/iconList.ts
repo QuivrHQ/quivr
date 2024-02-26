@@ -1,5 +1,9 @@
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
-import { BsArrowRightShort, BsChatLeftText } from "react-icons/bs";
+import {
+  BsArrowRightShort,
+  BsChatLeftText,
+  BsTextParagraph,
+} from "react-icons/bs";
 import { CgSoftwareDownload } from "react-icons/cg";
 import { CiFlag1 } from "react-icons/ci";
 import {
@@ -82,6 +86,7 @@ export const iconList: { [name: string]: IconType } = {
   loader: AiOutlineLoading3Quarters,
   logout: IoMdLogOut,
   options: SlOptions,
+  paragraph: BsTextParagraph,
   redirection: BsArrowRightShort,
   search: LuSearch,
   settings: IoSettingsSharp,
