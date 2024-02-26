@@ -2,12 +2,10 @@
 import { useTranslation } from "react-i18next";
 
 import { StyledTabsTrigger } from "@/app/studio/components/StyledTabsTrigger";
-import Button from "@/lib/components/ui/Button";
 import Spinner from "@/lib/components/ui/Spinner";
 import { Tabs, TabsContent, TabsList } from "@/lib/components/ui/Tabs";
 
 import { KnowledgeOrSecretsTab, PeopleTab, SettingsTab } from "./components";
-import { DeleteOrUnsubscribeConfirmationModal } from "./components/Modals/DeleteOrUnsubscribeConfirmationModal";
 import { useBrainFetcher } from "./hooks/useBrainFetcher";
 import { useBrainManagementTabs } from "./hooks/useBrainManagementTabs";
 
@@ -18,16 +16,7 @@ export const BrainManagementTabs = (): JSX.Element => {
     "delete_or_unsubscribe_from_brain",
     "external_api_definition",
   ]);
-  const {
-    selectedTab,
-    brainId,
-    handleUnsubscribeOrDeleteBrain,
-    isDeleteOrUnsubscribeModalOpened,
-    setIsDeleteOrUnsubscribeModalOpened,
-    hasEditRights,
-    isOwnedByCurrentUser,
-    isDeleteOrUnsubscribeRequestPending,
-  } = useBrainManagementTabs();
+  const { selectedTab, brainId, hasEditRights } = useBrainManagementTabs();
 
   const { brain, isLoading } = useBrainFetcher({
     brainId,
@@ -86,36 +75,6 @@ export const BrainManagementTabs = (): JSX.Element => {
           </TabsContent>
         )}
       </div>
-
-      <div className="flex justify-center">
-        {isOwnedByCurrentUser ? (
-          <Button
-            className="px-8 md:px-20 py-2 bg-red-500 text-white rounded-md"
-            onClick={() => setIsDeleteOrUnsubscribeModalOpened(true)}
-          >
-            {t("deleteButton", { ns: "delete_or_unsubscribe_from_brain" })}
-          </Button>
-        ) : (
-          <Button
-            className="px-8 md:px-20 py-2 bg-red-500 text-white rounded-md"
-            onClick={() => setIsDeleteOrUnsubscribeModalOpened(true)}
-          >
-            {t("unsubscribeButton", {
-              ns: "delete_or_unsubscribe_from_brain",
-            })}
-          </Button>
-        )}
-      </div>
-
-      <DeleteOrUnsubscribeConfirmationModal
-        isOpen={isDeleteOrUnsubscribeModalOpened}
-        setOpen={setIsDeleteOrUnsubscribeModalOpened}
-        onConfirm={() => void handleUnsubscribeOrDeleteBrain()}
-        isOwnedByCurrentUser={isOwnedByCurrentUser}
-        isDeleteOrUnsubscribeRequestPending={
-          isDeleteOrUnsubscribeRequestPending
-        }
-      />
     </Tabs>
   );
 };
