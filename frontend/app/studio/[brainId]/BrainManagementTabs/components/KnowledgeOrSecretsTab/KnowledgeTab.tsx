@@ -6,23 +6,15 @@ import { ApiBrainSecretsInputs } from "@/lib/components/ApiBrainSecretsInputs/Ap
 import { AddedKnowledge } from "./components/AddedKnowledge/AddedKnowledge";
 
 import { useBrainFetcher } from "../../hooks/useBrainFetcher";
-import { NoAccess } from "../NoAccess";
 
-type KnowledgeOrSecretsTabProps = {
+type KnowledgeTabProps = {
   brainId: UUID;
   hasEditRights: boolean;
 };
-export const KnowledgeOrSecretsTab = ({
-  brainId,
-  hasEditRights,
-}: KnowledgeOrSecretsTabProps): JSX.Element => {
+export const KnowledgeTab = ({ brainId }: KnowledgeTabProps): JSX.Element => {
   const { brain } = useBrainFetcher({
     brainId,
   });
-
-  if (!hasEditRights) {
-    return <NoAccess />;
-  }
 
   if (brain?.brain_type === "api") {
     return <ApiBrainSecretsInputs brainId={brainId} />;

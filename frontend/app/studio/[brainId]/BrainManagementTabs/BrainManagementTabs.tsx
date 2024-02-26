@@ -6,7 +6,7 @@ import Spinner from "@/lib/components/ui/Spinner";
 import { Tabs } from "@/lib/components/ui/Tabs/Tabs";
 import { Tab } from "@/lib/types/Tab";
 
-import { KnowledgeOrSecretsTab } from "./components";
+import { KnowledgeTab } from "./components/KnowledgeOrSecretsTab/KnowledgeTab";
 import { PeopleTab } from "./components/PeopleTab/PeopleTab";
 import { SettingsTab } from "./components/SettingsTab/SettingsTab";
 import { useBrainFetcher } from "./hooks/useBrainFetcher";
@@ -61,10 +61,7 @@ export const BrainManagementTabs = (): JSX.Element => {
       {selectedTab === "Settings" && <SettingsTab brainId={brainId} />}
       {selectedTab === "People" && <PeopleTab brainId={brainId} />}
       {selectedTab === "Knowledge" && (
-        <KnowledgeOrSecretsTab
-          brainId={brainId}
-          hasEditRights={hasEditRights}
-        />
+        <KnowledgeTab brainId={brainId} hasEditRights={hasEditRights} />
       )}
     </>
   );
