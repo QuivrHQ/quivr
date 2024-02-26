@@ -40,7 +40,7 @@ export const BrainMainInfosStep = (): JSX.Element => {
           render={({ field }) => (
             <TextInput
               label="Name"
-              inputValue={field.value as string} // Explicitly specify the type as string
+              inputValue={field.value as string}
               setInputValue={field.onChange}
             />
           )}

@@ -8,9 +8,11 @@ import { FaSpinner } from "react-icons/fa";
 import { Divider } from "@/lib/components/ui/Divider";
 import { Brain } from "@/lib/context/BrainProvider/types";
 
-import { GeneralInformation, ModelSelection, Prompt } from "./components";
+import { GeneralInformation } from "./components/GeneralInformation/GeneralInformation";
+import { ModelSelection } from "./components/ModelSelection/ModelSelection";
 import { AccessConfirmationModal } from "./components/PrivateAccessConfirmationModal/AccessConfirmationModal";
 import { useAccessConfirmationModal } from "./components/PrivateAccessConfirmationModal/hooks/useAccessConfirmationModal";
+import { Prompt } from "./components/Prompt/Prompt";
 import { usePermissionsController } from "./hooks/usePermissionsController";
 import { UsePromptProps } from "./hooks/usePrompt";
 import { useSettingsTab } from "./hooks/useSettingsTab";
@@ -26,16 +28,8 @@ export const SettingsTabContent = ({
   brainId,
 }: SettingsTabProps): JSX.Element => {
   const { t } = useTranslation(["translation", "brain", "config"]);
-  const {
-    handleSubmit,
-    setAsDefaultBrainHandler,
-    isSettingAsDefault,
-    isUpdating,
-    isDefaultBrain,
-    formRef,
-    accessibleModels,
-    setIsUpdating,
-  } = useSettingsTab({ brainId });
+  const { handleSubmit, isUpdating, formRef, accessibleModels, setIsUpdating } =
+    useSettingsTab({ brainId });
 
   const promptProps: UsePromptProps = {
     setIsUpdating,
@@ -44,10 +38,9 @@ export const SettingsTabContent = ({
   const { onCancel, isAccessModalOpened, closeModal } =
     useAccessConfirmationModal();
 
-  const { hasEditRights, isOwnedByCurrentUser, isPublicBrain } =
-    usePermissionsController({
-      brainId,
-    });
+  const { hasEditRights } = usePermissionsController({
+    brainId,
+  });
 
   const { brain } = useBrainFetcher({
     brainId,
@@ -63,14 +56,7 @@ export const SettingsTabContent = ({
         className="mb-10 mt-5 flex flex-col items-center gap-2"
         ref={formRef}
       >
-        <GeneralInformation
-          hasEditRights={hasEditRights}
-          isDefaultBrain={isDefaultBrain}
-          isOwnedByCurrentUser={isOwnedByCurrentUser}
-          isPublicBrain={isPublicBrain}
-          isSettingAsDefault={isSettingAsDefault}
-          setAsDefaultBrainHandler={setAsDefaultBrainHandler}
-        />
+        <GeneralInformation hasEditRights={hasEditRights} />
         {brain?.brain_type === "doc" && (
           <>
             <Divider

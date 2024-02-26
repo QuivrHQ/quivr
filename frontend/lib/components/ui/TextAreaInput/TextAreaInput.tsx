@@ -5,6 +5,7 @@ type TextAreaInputProps = {
   inputValue: string;
   setInputValue: (value: string) => void;
   onSubmit?: () => void;
+  disabled?: boolean;
 };
 
 export const TextAreaInput = ({
@@ -12,9 +13,14 @@ export const TextAreaInput = ({
   inputValue,
   setInputValue,
   onSubmit,
+  disabled,
 }: TextAreaInputProps): JSX.Element => {
   return (
-    <div className={styles.text_area_input_container}>
+    <div
+      className={`${styles.text_area_input_container} ${
+        disabled ? styles.disabled : ""
+      }`}
+    >
       <textarea
         className={styles.text_area_input}
         value={inputValue}
