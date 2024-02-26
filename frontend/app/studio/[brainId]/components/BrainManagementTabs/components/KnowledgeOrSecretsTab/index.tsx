@@ -1,7 +1,6 @@
 "use client";
 import { UUID } from "crypto";
 
-import { KnowledgeToFeed } from "@/app/chat/[chatId]/components/ActionsBar/components";
 import { ApiBrainSecretsInputs } from "@/lib/components/ApiBrainSecretsInputs/ApiBrainSecretsInputs";
 
 import { AddedKnowledge } from "./components/AddedKnowledge/AddedKnowledge";
@@ -29,10 +28,5 @@ export const KnowledgeOrSecretsTab = ({
     return <ApiBrainSecretsInputs brainId={brainId} />;
   }
 
-  return (
-    <>
-      <KnowledgeToFeed hideBrainSelector={true} />
-      <AddedKnowledge brainId={brainId} />
-    </>
-  );
+  return <AddedKnowledge brainId={brainId} />;
 };
