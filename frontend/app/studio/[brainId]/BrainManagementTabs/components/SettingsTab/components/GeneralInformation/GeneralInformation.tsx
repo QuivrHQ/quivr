@@ -20,7 +20,7 @@ export const GeneralInformation = (
   return (
     <>
       <div className={styles.general_info_wrapper}>
-        <div className={styles.field_wrapper}>
+        <div className={styles.name_field_wrapper}>
           <FieldHeader label="Name" iconName="brain" />
           <Controller
             name="name"
