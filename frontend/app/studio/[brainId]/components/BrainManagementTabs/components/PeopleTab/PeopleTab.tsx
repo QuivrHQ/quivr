@@ -10,17 +10,11 @@ import { UserToInvite } from "@/lib/components/UserToInvite";
 import Button from "@/lib/components/ui/Button";
 import { useShareBrain } from "@/lib/hooks/useShareBrain";
 
-import { NoAccess } from "../NoAccess";
-
 type ShareBrainModalProps = {
   brainId: UUID;
-  hasEditRights: boolean;
 };
 
-export const PeopleTab = ({
-  brainId,
-  hasEditRights,
-}: ShareBrainModalProps): JSX.Element => {
+export const PeopleTab = ({ brainId }: ShareBrainModalProps): JSX.Element => {
   const { t } = useTranslation(["translation", "config", "brain"]);
   const {
     roleAssignations,
@@ -32,10 +26,6 @@ export const PeopleTab = ({
     sendingInvitation,
     canAddNewRow,
   } = useShareBrain(brainId);
-
-  if (!hasEditRights) {
-    return <NoAccess />;
-  }
 
   return (
     <>
