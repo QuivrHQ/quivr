@@ -38,6 +38,17 @@ if os.getenv("DEV_MODE") == "true":
     debugpy.listen(("0.0.0.0", 5678))
 
 
+def before_send(event, hint):
+    # If this is a transaction event
+    if event["type"] == "transaction":
+        # And the transaction name contains 'healthz'
+        if "healthz" in event["transaction"]:
+            # Drop the event by returning None
+            return None
+    # For other events, return them as is
+    return event
+
+
 sentry_dsn = os.getenv("SENTRY_DSN")
 if sentry_dsn:
     sentry_sdk.init(
@@ -46,9 +57,10 @@ if sentry_dsn:
         enable_tracing=True,
         traces_sample_rate=0.1,
         integrations=[
-            StarletteIntegration(transaction_style="endpoint"),
-            FastApiIntegration(transaction_style="endpoint"),
+            StarletteIntegration(transaction_style="url"),
+            FastApiIntegration(transaction_style="url"),
         ],
+        before_send=before_send,
     )
 
 app = FastAPI()

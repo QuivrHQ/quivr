@@ -34,8 +34,7 @@
     }
 
     .message_row_content {
-      border-top: 2px solid Colors.$normal-grey;
-      background-color: Colors.$highlight;
+      background-color: Colors.$lightest-grey;
     }
   }
 
@@ -48,7 +47,6 @@
 
     .message_row_content {
       align-self: flex-start;
-      border-top: 3px solid Colors.$primary-light;
       background-color: Colors.$primary-lightest;
       margin-left: 1px;
       position: relative;

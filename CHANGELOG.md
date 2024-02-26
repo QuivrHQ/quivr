@@ -1,5 +1,34 @@
 # Changelog
 
+## 0.0.212 (2024-02-26)
+
+## What's Changed
+* feat: new landing page by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2264
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.211...v0.0.212
+
+## 0.0.211 (2024-02-24)
+
+## What's Changed
+* fix: ollama migration documentation by @bidoubiwa in https://github.com/QuivrHQ/quivr/pull/2248
+* Update Sentry configuration and ignore file by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2250
+* Fix Sentry DSN environment variable by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2251
+* fix(sentry): Refactor GlobalError component to use arrow function syntax by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2252
+* fix: Update Sentry configuration to use NEXT_PUBLIC_SENTRY_DSN by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2254
+* feat(frontend): integrate octolane by @Zewed in https://github.com/QuivrHQ/quivr/pull/2256
+* fix(frontend): better search bar and chat box by @Zewed in https://github.com/QuivrHQ/quivr/pull/2255
+* feat(frontend): sources per messages by @Zewed in https://github.com/QuivrHQ/quivr/pull/2253
+* feat(sentry): remove health endpoint by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2257
+* Add octolane.com to Content Security Policy by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2258
+* fix(frontend): ui chat box & sources small bug by @Zewed in https://github.com/QuivrHQ/quivr/pull/2260
+* Refactor GitHub workflows by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2261
+
+## New Contributors
+* @bidoubiwa made their first contribution in https://github.com/QuivrHQ/quivr/pull/2248
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.210...v0.0.211
+
 ## 0.0.210 (2024-02-22)
 
 ## What's Changed
