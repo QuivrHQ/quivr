@@ -32,6 +32,7 @@ export const ModelSelection = (props: ModelSelectionProps): JSX.Element => {
           onChange={() => handleSubmit(false)}
           placeholder="Choose a model"
           selectedOption={{ value: model, label: model }}
+          iconName="robot"
         />
       </fieldset>
       <fieldset>

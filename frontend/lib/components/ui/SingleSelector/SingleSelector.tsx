@@ -1,6 +1,8 @@
 import { UUID } from "crypto";
 import { useState } from "react";
 
+import { iconList } from "@/lib/helpers/iconList";
+
 import styles from "./SingleSelector.module.scss";
 
 import { Icon } from "../Icon/Icon";
@@ -16,6 +18,7 @@ type SelectProps<T> = {
   onChange: (option: T) => void | Promise<void>;
   selectedOption: SelectOptionProps<T> | undefined;
   placeholder: string;
+  iconName: keyof typeof iconList;
 };
 
 export const SingleSelector = <T extends string | number | UUID>({
@@ -23,20 +26,27 @@ export const SingleSelector = <T extends string | number | UUID>({
   options,
   selectedOption,
   placeholder,
+  iconName,
 }: SelectProps<T>): JSX.Element => {
   const [search, setSearch] = useState<string>("");
   const [folded, setFolded] = useState<boolean>(true);
+  const [updating, setUpdating] = useState<boolean>(false);
 
   const filteredOptions = options.filter((option) =>
     option.label.toLowerCase().includes(search.toLowerCase())
   );
 
   const handleOptionClick = async (option: SelectOptionProps<T>) => {
-    console.info(selectedOption);
-    if (option !== selectedOption) {
-      await onChange(option.value);
+    try {
+      if (option !== selectedOption && !updating) {
+        setUpdating(true);
+        await onChange(option.value);
+        setUpdating(false);
+      }
+      setFolded(true);
+    } catch (error) {
+      console.error(error);
     }
-    setFolded(true);
   };
 
   return (
@@ -46,7 +56,12 @@ export const SingleSelector = <T extends string | number | UUID>({
           !folded ? styles.unfolded : ""
         }`}
       >
-        <div className={styles.left} onClick={() => setFolded(!folded)}>
+        <div
+          className={styles.left}
+          onClick={() => {
+            setFolded(!folded);
+          }}
+        >
           <div className={styles.icon}>
             <Icon
               name={folded ? "chevronDown" : "chevronRight"}
@@ -80,10 +95,12 @@ export const SingleSelector = <T extends string | number | UUID>({
             <div
               className={styles.option}
               key={option.value.toString()}
-              onClick={void handleOptionClick(option)}
+              onClick={() => {
+                handleOptionClick(option).catch(console.error);
+              }}
             >
               <div className={styles.icon}>
-                <Icon name="brain" size="normal" color="black" />
+                <Icon name={iconName} size="normal" color="black" />
               </div>
               <span className={styles.brain_name}>{option.label}</span>
             </div>

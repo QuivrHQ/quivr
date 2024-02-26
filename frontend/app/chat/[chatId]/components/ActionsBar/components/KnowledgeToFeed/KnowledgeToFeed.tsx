@@ -62,6 +62,7 @@ export const KnowledgeToFeed = ({
                 : undefined
             }
             placeholder="Select a brain"
+            iconName="brain"
           />
         </div>
       )}
