@@ -15,7 +15,7 @@ def resend_invitation_email(
     brain_subscription: BrainSubscription,
     inviter_email: str,
     user_id: UUID,
-    origin: str = "https://www.quivr.app",
+    origin: str = "https://chat.quivr.app",
 ):
     brains_settings = BrainSettings()  # pyright: ignore reportPrivateUsage=none
 
