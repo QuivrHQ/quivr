@@ -25,6 +25,7 @@ const nextConfig = {
   images: {
     domains: [
       "www.quivr.app",
+      "chat.quivr.app",
       "quivr-cms.s3.eu-west-3.amazonaws.com",
       "www.gravatar.com",
       "media.licdn.com",
@@ -50,6 +51,7 @@ const ContentSecurityPolicy = {
     "https://api.june.so",
     "https://us.posthog.com",
     "https://preview.quivr.app",
+    "https://chat.quivr.app",
     "*.intercom.io",
     "*.intercomcdn.com",
     "https://*.octolane.com",
@@ -85,6 +87,7 @@ const ContentSecurityPolicy = {
     process.env.NEXT_PUBLIC_FRONTEND_URL,
     "https://quivr-cms.s3.eu-west-3.amazonaws.com",
     "https://preview.quivr.app",
+    "https://chat.quivr.app",
     "https://*.vercel.app",
   ],
   "script-src": [
