@@ -10,8 +10,6 @@ import { Brain } from "@/lib/context/BrainProvider/types";
 
 import { GeneralInformation } from "./components/GeneralInformation/GeneralInformation";
 import { ModelSelection } from "./components/ModelSelection/ModelSelection";
-import { AccessConfirmationModal } from "./components/PrivateAccessConfirmationModal/AccessConfirmationModal";
-import { useAccessConfirmationModal } from "./components/PrivateAccessConfirmationModal/hooks/useAccessConfirmationModal";
 import { Prompt } from "./components/Prompt/Prompt";
 import { usePermissionsController } from "./hooks/usePermissionsController";
 import { UsePromptProps } from "./hooks/usePrompt";
@@ -23,7 +21,6 @@ type SettingsTabProps = {
   brainId: UUID;
 };
 
-// eslint-disable-next-line complexity
 export const SettingsTabContent = ({
   brainId,
 }: SettingsTabProps): JSX.Element => {
@@ -34,9 +31,6 @@ export const SettingsTabContent = ({
   const promptProps: UsePromptProps = {
     setIsUpdating,
   };
-
-  const { onCancel, isAccessModalOpened, closeModal } =
-    useAccessConfirmationModal();
 
   const { hasEditRights } = usePermissionsController({
     brainId,
@@ -89,12 +83,6 @@ export const SettingsTabContent = ({
           )}
         </div>
       </form>
-      <AccessConfirmationModal
-        opened={isAccessModalOpened}
-        onClose={onCancel}
-        onCancel={onCancel}
-        onConfirm={closeModal}
-      />
     </>
   );
 };
