@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.0.212 (2024-02-26)
+
+## What's Changed
+* feat: new landing page by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2264
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.211...v0.0.212
+
 ## 0.0.211 (2024-02-24)
 
 ## What's Changed
