@@ -71,7 +71,10 @@ export const useBrainManagementTabs = (customBrainId?: UUID) => {
     } catch (error) {
       console.error("Error deleting brain: ", error);
     } finally {
-      pathname === "/studio" ? void fetchAllBrains() : router.push("/studio");
+      if (pathname !== "studio") {
+        router.push("/studio");
+      }
+      void fetchAllBrains();
       setIsDeleteOrUnsubscribeRequestPending(false);
     }
   };
