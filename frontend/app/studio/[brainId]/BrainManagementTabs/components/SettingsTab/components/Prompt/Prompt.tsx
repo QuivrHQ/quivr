@@ -51,14 +51,6 @@ export const Prompt = (props: PromptProps): JSX.Element => {
         )}
       />
       <div className={styles.buttons_wrapper}>
-        <div>
-          <QuivrButton
-            label="Save"
-            iconName="upload"
-            color="primary"
-            onClick={() => submitPrompt()}
-          />
-        </div>
         {promptId !== "" && (
           <QuivrButton
             disabled={isUpdatingBrain || isRemovingPrompt}
@@ -68,6 +60,14 @@ export const Prompt = (props: PromptProps): JSX.Element => {
             iconName="delete"
           ></QuivrButton>
         )}
+        <div>
+          <QuivrButton
+            label="Save"
+            iconName="upload"
+            color="primary"
+            onClick={() => submitPrompt()}
+          />
+        </div>
       </div>
     </div>
   );
