@@ -47,7 +47,7 @@ export const Prompt = (props: PromptProps): JSX.Element => {
         {...register("prompt.content")}
       />
       {hasEditRights && (
-        <div className="flex w-full justify-end py-4">
+        <div>
           <QuivrButton
             label="Save"
             iconName="upload"

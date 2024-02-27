@@ -3,7 +3,6 @@ import { FormProvider, useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { FaSpinner } from "react-icons/fa";
 
-import { Divider } from "@/lib/components/ui/Divider";
 import QuivrButton from "@/lib/components/ui/QuivrButton/QuivrButton";
 import { Brain } from "@/lib/context/BrainProvider/types";
 
@@ -81,18 +80,15 @@ export const SettingsTabContent = ({
               </div>
             )}
           </div>
-          <Divider text={t("customPromptSection", { ns: "config" })} />
           <Prompt
             usePromptProps={promptProps}
             isUpdatingBrain={isUpdating}
             hasEditRights={hasEditRights}
           />
-          <div className="flex flex-row justify-end flex-1 w-full mt-8">
+          <div>
             {isUpdating && <FaSpinner className="animate-spin" />}
             {isUpdating && (
-              <span className="ml-2 text-sm">
-                {t("updatingBrainSettings", { ns: "config" })}
-              </span>
+              <span>{t("updatingBrainSettings", { ns: "config" })}</span>
             )}
           </div>
         </div>
