@@ -16,7 +16,7 @@
     display: flex;
     align-items: center;
     gap: Spacings.$spacing03;
-    visibility: hidden;
+    visibility: visible;
 
     &.menu_closed {
       visibility: visible;
