@@ -24,10 +24,6 @@ export const ModelSelection = (props: ModelSelectionProps): JSX.Element => {
     return { value: accessibleModel, label: accessibleModel };
   });
 
-  if (!maxTokens) {
-    return <></>;
-  }
-
   return (
     <div className={styles.model_selection_wrapper}>
       <fieldset {...register("model")}>
@@ -45,14 +41,18 @@ export const ModelSelection = (props: ModelSelectionProps): JSX.Element => {
       </fieldset>
       <fieldset>
         <FieldHeader label="Max tokens" iconName="hashtag" />
-        <input
-          type="range"
-          min="10"
-          max={defineMaxTokens(model)}
-          value={maxTokens}
-          disabled={!hasEditRights}
-          {...register("maxTokens")}
-        />
+        <div className={styles.max_tokens}>
+          <input
+            className={styles.slider}
+            type="range"
+            min="10"
+            max={defineMaxTokens(model)}
+            value={maxTokens}
+            disabled={!hasEditRights}
+            {...register("maxTokens")}
+          />
+          <span>{maxTokens}</span>
+        </div>
       </fieldset>
       {/* {hasEditRights && (
         <div>
