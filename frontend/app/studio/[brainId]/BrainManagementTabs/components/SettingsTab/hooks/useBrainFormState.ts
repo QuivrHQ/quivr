@@ -6,7 +6,7 @@ import { useFormContext } from "react-hook-form";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 import { Brain } from "@/lib/context/BrainProvider/types";
 import { useUrlBrain } from "@/lib/hooks/useBrainIdFromUrl";
-import { BrainConfig, Model } from "@/lib/types/BrainConfig";
+import { BrainConfig } from "@/lib/types/BrainConfig";
 
 import { useBrainFetcher } from "../../../hooks/useBrainFetcher";
 
@@ -70,10 +70,6 @@ export const useBrainFormState = () => {
     updateFormValues();
   }, [brain, updateFormValues]);
 
-  const setModel = (newModel: Model) => {
-    setValue("model", newModel);
-  };
-
   return {
     brain,
     brainId,
@@ -92,6 +88,5 @@ export const useBrainFormState = () => {
     reset,
     resetField,
     refetchBrain,
-    setModel,
   };
 };

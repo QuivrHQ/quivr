@@ -18,7 +18,7 @@ type ModelSelectionProps = {
 };
 
 export const ModelSelection = (props: ModelSelectionProps): JSX.Element => {
-  const { model, maxTokens, register, setModel } = useBrainFormState();
+  const { model, maxTokens, register } = useBrainFormState();
   const { handleSubmit, hasEditRights, accessibleModels } = props;
 
   const accessibleModelOptions = accessibleModels.map((accessibleModel) => {
@@ -29,13 +29,16 @@ export const ModelSelection = (props: ModelSelectionProps): JSX.Element => {
 
   return (
     <div className={styles.model_selection_wrapper}>
-      <fieldset {...register("model")}>
+      <fieldset
+        {...register("model", {
+          value: accessibleModelOptions[0].value as Model, // Set a default value for model
+        })}
+      >
         <FieldHeader label="Model" iconName="robot" />
         <SingleSelector
           options={accessibleModelOptions}
-          onChange={(option) => {
+          onChange={() => {
             void handleSubmit(false);
-            setModel(option as Model);
           }}
           selectedOption={{ value: model, label: model }}
           placeholder="hey"
