@@ -4,6 +4,7 @@ import { FieldHeader } from "@/lib/components/ui/FieldHeader/FieldHeader";
 import { SingleSelector } from "@/lib/components/ui/SingleSelector/SingleSelector";
 import { defineMaxTokens } from "@/lib/helpers/defineMaxTokens";
 import { Model } from "@/lib/types/BrainConfig";
+import { SaveButton } from "@/shared/SaveButton";
 
 import styles from "./ModelSelection.module.scss";
 
@@ -23,6 +24,8 @@ export const ModelSelection = (props: ModelSelectionProps): JSX.Element => {
   const accessibleModelOptions = accessibleModels.map((accessibleModel) => {
     return { value: accessibleModel, label: accessibleModel };
   });
+
+  console.info(model);
 
   return (
     <div className={styles.model_selection_wrapper}>
@@ -54,11 +57,11 @@ export const ModelSelection = (props: ModelSelectionProps): JSX.Element => {
           <span>{maxTokens}</span>
         </div>
       </fieldset>
-      {/* {hasEditRights && (
+      {hasEditRights && (
         <div>
           <SaveButton handleSubmit={handleSubmit} />
         </div>
-      )} */}
+      )}
     </div>
   );
 };

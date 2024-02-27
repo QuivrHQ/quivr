@@ -10,6 +10,7 @@ import styles from "./SettingsTab.module.scss";
 import { GeneralInformation } from "./components/GeneralInformation/GeneralInformation";
 import { ModelSelection } from "./components/ModelSelection/ModelSelection";
 import { Prompt } from "./components/Prompt/Prompt";
+import { useBrainFormState } from "./hooks/useBrainFormState";
 import { usePermissionsController } from "./hooks/usePermissionsController";
 import { UsePromptProps } from "./hooks/usePrompt";
 import { useSettingsTab } from "./hooks/useSettingsTab";
@@ -30,6 +31,8 @@ export const SettingsTabContent = ({
   const promptProps: UsePromptProps = {
     setIsUpdating,
   };
+
+  useBrainFormState();
 
   const { hasEditRights } = usePermissionsController({
     brainId,
