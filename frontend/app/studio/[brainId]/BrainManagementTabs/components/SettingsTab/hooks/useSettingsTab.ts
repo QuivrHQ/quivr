@@ -1,5 +1,4 @@
-/* eslint-disable max-lines */
-import axios from "axios";
+import { isAxiosError } from "axios";
 import { UUID } from "crypto";
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -69,7 +68,9 @@ export const useSettingsTab = ({ brainId }: UseSettingsTabProps) => {
       void fetchAllBrains();
       void fetchDefaultBrain();
     } catch (err) {
-      if (axios.isAxiosError(err) && err.response?.status === 429) {
+      // ...
+
+      if (isAxiosError(err) && err.response?.status === 429) {
         publish({
           variant: "danger",
           text: `${JSON.stringify(
@@ -117,7 +118,7 @@ export const useSettingsTab = ({ brainId }: UseSettingsTabProps) => {
       });
       void fetchAllBrains();
     } catch (err) {
-      if (axios.isAxiosError(err) && err.response?.status === 429) {
+      if (isAxiosError(err) && err.response?.status === 429) {
         publish({
           variant: "danger",
           text: `${JSON.stringify(
