@@ -1,7 +1,7 @@
 import { useTranslation } from "react-i18next";
 
-import Button from "@/lib/components/ui/Button";
 import { Modal } from "@/lib/components/ui/Modal/Modal";
+import QuivrButton from "@/lib/components/ui/QuivrButton/QuivrButton";
 
 type DeleteOrUnsubscribeConfirmationModalProps = {
   isOpen: boolean;
@@ -33,19 +33,23 @@ export const DeleteOrUnsubscribeConfirmationModal = ({
       CloseTrigger={<div />}
     >
       <div className="flex flex-row justify-center items-center mt-10 gap-20">
-        <Button onClick={() => setOpen(false)} data-testid="return-button">
-          {t("returnButton")}
-        </Button>
-        <Button
-          data-testid="delete-brain"
-          className="px-4 bg-red-500 text-white"
+        <QuivrButton
+          onClick={() => setOpen(false)}
+          label={t("returnButton")}
+          iconName="chevronLeft"
+          color="primary"
+        ></QuivrButton>
+        <QuivrButton
           onClick={onConfirm}
           isLoading={isDeleteOrUnsubscribeRequestPending}
-        >
-          {isOwnedByCurrentUser
-            ? t("deleteConfirmYes")
-            : t("unsubscribeButton")}
-        </Button>
+          color="dangerous"
+          iconName="delete"
+          label={
+            isOwnedByCurrentUser
+              ? t("deleteConfirmYes")
+              : t("unsubscribeButton")
+          }
+        ></QuivrButton>
       </div>
     </Modal>
   );
