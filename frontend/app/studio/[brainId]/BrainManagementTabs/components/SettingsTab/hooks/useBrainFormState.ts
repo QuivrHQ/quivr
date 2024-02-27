@@ -6,7 +6,7 @@ import { useFormContext } from "react-hook-form";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 import { Brain } from "@/lib/context/BrainProvider/types";
 import { useUrlBrain } from "@/lib/hooks/useBrainIdFromUrl";
-import { BrainConfig } from "@/lib/types/BrainConfig";
+import { BrainConfig, Model } from "@/lib/types/BrainConfig";
 
 import { useBrainFetcher } from "../../../hooks/useBrainFetcher";
 
@@ -60,7 +60,7 @@ export const useBrainFormState = () => {
     }
 
     setTimeout(() => {
-      if (brain.model !== undefined && brain.model !== null) {
+      if (brain.model) {
         setValue("model", brain.model);
       }
     }, 50);
@@ -69,6 +69,10 @@ export const useBrainFormState = () => {
   useEffect(() => {
     updateFormValues();
   }, [brain, updateFormValues]);
+
+  const setModel = (newModel: Model) => {
+    setValue("model", newModel);
+  };
 
   return {
     brain,
@@ -88,5 +92,6 @@ export const useBrainFormState = () => {
     reset,
     resetField,
     refetchBrain,
+    setModel,
   };
 };

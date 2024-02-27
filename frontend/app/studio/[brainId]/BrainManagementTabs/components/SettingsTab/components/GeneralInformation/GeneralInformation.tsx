@@ -24,6 +24,7 @@ export const GeneralInformation = (
           <FieldHeader label="Name" iconName="brain" />
           <Controller
             name="name"
+            defaultValue=""
             render={({ field }) => (
               <TextInput
                 label="Name"
@@ -39,6 +40,7 @@ export const GeneralInformation = (
           <FieldHeader label="Description" iconName="paragraph" />
           <Controller
             name="description"
+            defaultValue=""
             render={({ field }) => (
               <TextAreaInput
                 label="Description"

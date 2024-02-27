@@ -1,9 +1,9 @@
 import { UUID } from "crypto";
-import { useEffect } from "react";
 
 import { FieldHeader } from "@/lib/components/ui/FieldHeader/FieldHeader";
 import { SingleSelector } from "@/lib/components/ui/SingleSelector/SingleSelector";
 import { defineMaxTokens } from "@/lib/helpers/defineMaxTokens";
+import { Model } from "@/lib/types/BrainConfig";
 
 import styles from "./ModelSelection.module.scss";
 
@@ -17,24 +17,27 @@ type ModelSelectionProps = {
 };
 
 export const ModelSelection = (props: ModelSelectionProps): JSX.Element => {
-  const { model, maxTokens, register } = useBrainFormState();
+  const { model, maxTokens, register, setModel } = useBrainFormState();
   const { handleSubmit, hasEditRights, accessibleModels } = props;
 
   const accessibleModelOptions = accessibleModels.map((accessibleModel) => {
     return { value: accessibleModel, label: accessibleModel };
   });
 
-  useEffect(() => {
-    console.info(model);
-  }, [model]);
+  if (!maxTokens) {
+    return <></>;
+  }
 
   return (
     <div className={styles.model_selection_wrapper}>
-      <fieldset>
+      <fieldset {...register("model")}>
         <FieldHeader label="Model" iconName="robot" />
         <SingleSelector
           options={accessibleModelOptions}
-          onChange={() => handleSubmit(false)}
+          onChange={(option) => {
+            void handleSubmit(false);
+            setModel(option as Model);
+          }}
           selectedOption={{ value: model, label: model }}
           placeholder="hey"
           iconName="robot"
