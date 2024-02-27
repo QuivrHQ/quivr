@@ -18,7 +18,7 @@ type ModelSelectionProps = {
 };
 
 export const ModelSelection = (props: ModelSelectionProps): JSX.Element => {
-  const { model, maxTokens, register } = useBrainFormState();
+  const { model, maxTokens, register, setModel } = useBrainFormState();
   const { handleSubmit, hasEditRights, accessibleModels } = props;
 
   const accessibleModelOptions = accessibleModels.map((accessibleModel) => {
@@ -37,7 +37,8 @@ export const ModelSelection = (props: ModelSelectionProps): JSX.Element => {
         <FieldHeader label="Model" iconName="robot" />
         <SingleSelector
           options={accessibleModelOptions}
-          onChange={() => {
+          onChange={(option) => {
+            setModel(option as Model);
             void handleSubmit(false);
           }}
           selectedOption={{ value: model, label: model }}
