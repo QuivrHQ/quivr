@@ -56,4 +56,15 @@
       align-self: flex-end;
     }
   }
+
+  .prompt_wrapper {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    gap: Spacings.$spacing05;
+    box-shadow: 0 2px 4px rgb(0, 0, 0, 0.25);
+    border-radius: Radius.$big;
+    padding: Spacings.$spacing06;
+    background-color: Colors.$highlight;
+  }
 }

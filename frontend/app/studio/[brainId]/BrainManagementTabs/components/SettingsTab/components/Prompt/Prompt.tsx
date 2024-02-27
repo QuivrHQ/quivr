@@ -5,6 +5,8 @@ import Field from "@/lib/components/ui/Field";
 import QuivrButton from "@/lib/components/ui/QuivrButton/QuivrButton";
 import { TextArea } from "@/lib/components/ui/TextArea";
 
+import styles from "./Prompt.module.scss";
+
 import { usePrompt, UsePromptProps } from "../../hooks/usePrompt";
 import { PublicPrompts } from "../PublicPrompts";
 
@@ -28,13 +30,12 @@ export const Prompt = (props: PromptProps): JSX.Element => {
   } = usePrompt(usePromptProps);
 
   return (
-    <>
+    <div className={styles.prompt_wrapper}>
       {hasEditRights && <PublicPrompts onSelect={pickPublicPrompt} />}
       <Field
         label={t("promptName", { ns: "config" })}
         placeholder={t("promptNamePlaceholder", { ns: "config" })}
         autoComplete="off"
-        className="flex-1"
         disabled={!hasEditRights}
         {...register("prompt.title")}
       />
@@ -42,7 +43,6 @@ export const Prompt = (props: PromptProps): JSX.Element => {
         label={t("promptContent", { ns: "config" })}
         placeholder={t("promptContentPlaceholder", { ns: "config" })}
         autoComplete="off"
-        className="flex-1"
         disabled={!hasEditRights}
         {...register("prompt.content")}
       />
@@ -64,6 +64,6 @@ export const Prompt = (props: PromptProps): JSX.Element => {
           {t("removePrompt", { ns: "config" })}
         </Button>
       )}
-    </>
+    </div>
   );
 };

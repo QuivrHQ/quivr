@@ -3,6 +3,7 @@ import { FormProvider, useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { FaSpinner } from "react-icons/fa";
 
+import { MessageInfoBox } from "@/lib/components/ui/MessageInfoBox/MessageInfoBox";
 import QuivrButton from "@/lib/components/ui/QuivrButton/QuivrButton";
 import { Brain } from "@/lib/context/BrainProvider/types";
 
@@ -80,16 +81,23 @@ export const SettingsTabContent = ({
               </div>
             )}
           </div>
-          <Prompt
-            usePromptProps={promptProps}
-            isUpdatingBrain={isUpdating}
-            hasEditRights={hasEditRights}
-          />
-          <div>
-            {isUpdating && <FaSpinner className="animate-spin" />}
-            {isUpdating && (
-              <span>{t("updatingBrainSettings", { ns: "config" })}</span>
-            )}
+          <div className={styles.prompt_wrapper}>
+            <span className={styles.section_title}>Prompt</span>
+            <MessageInfoBox
+              type="info"
+              content="Select a suggested prompt or create your own for tailored interactions."
+            />
+            <Prompt
+              usePromptProps={promptProps}
+              isUpdatingBrain={isUpdating}
+              hasEditRights={hasEditRights}
+            />
+            <div>
+              {isUpdating && <FaSpinner className="animate-spin" />}
+              {isUpdating && (
+                <span>{t("updatingBrainSettings", { ns: "config" })}</span>
+              )}
+            </div>
           </div>
         </div>
       </form>
