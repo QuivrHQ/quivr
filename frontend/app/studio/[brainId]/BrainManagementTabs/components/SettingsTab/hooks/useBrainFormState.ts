@@ -60,7 +60,6 @@ export const useBrainFormState = () => {
     }
 
     setTimeout(() => {
-      console.info(brain.model);
       if (brain.model) {
         setValue("model", brain.model);
       }
