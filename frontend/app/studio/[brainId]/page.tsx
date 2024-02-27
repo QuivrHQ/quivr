@@ -39,6 +39,7 @@ const BrainsManagement = (): JSX.Element => {
         setShouldDisplayFeedCard(true);
       },
       iconName: "uploadFile",
+      hidden: !isOwnedByCurrentUser || !brain?.max_files,
     },
     {
       label: "Delete brain",

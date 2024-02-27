@@ -31,7 +31,7 @@ export const ModelSelection = (props: ModelSelectionProps): JSX.Element => {
     <div className={styles.model_selection_wrapper}>
       <fieldset
         {...register("model", {
-          value: accessibleModelOptions[0].value as Model, // Set a default value for model
+          value: accessibleModelOptions[0].value as Model,
         })}
       >
         <FieldHeader label="Model" iconName="robot" />
