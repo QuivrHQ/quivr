@@ -1,9 +1,8 @@
-import { useTranslation } from "react-i18next";
+import { Controller } from "react-hook-form";
 
-import Button from "@/lib/components/ui/Button";
-import Field from "@/lib/components/ui/Field";
 import QuivrButton from "@/lib/components/ui/QuivrButton/QuivrButton";
-import { TextArea } from "@/lib/components/ui/TextArea";
+import { TextAreaInput } from "@/lib/components/ui/TextAreaInput/TextAreaInput";
+import { TextInput } from "@/lib/components/ui/TextInput/TextInput";
 
 import styles from "./Prompt.module.scss";
 
@@ -13,16 +12,13 @@ import { PublicPrompts } from "../PublicPrompts";
 type PromptProps = {
   usePromptProps: UsePromptProps;
   isUpdatingBrain: boolean;
-  hasEditRights: boolean;
 };
 
 export const Prompt = (props: PromptProps): JSX.Element => {
-  const { t } = useTranslation(["translation", "brain", "config"]);
-  const { isUpdatingBrain, hasEditRights, usePromptProps } = props;
+  const { isUpdatingBrain, usePromptProps } = props;
 
   const {
     pickPublicPrompt,
-    register,
     submitPrompt,
     promptId,
     isRemovingPrompt,
@@ -31,22 +27,30 @@ export const Prompt = (props: PromptProps): JSX.Element => {
 
   return (
     <div className={styles.prompt_wrapper}>
-      {hasEditRights && <PublicPrompts onSelect={pickPublicPrompt} />}
-      <Field
-        label={t("promptName", { ns: "config" })}
-        placeholder={t("promptNamePlaceholder", { ns: "config" })}
-        autoComplete="off"
-        disabled={!hasEditRights}
-        {...register("prompt.title")}
+      <PublicPrompts onSelect={pickPublicPrompt} />
+      <Controller
+        name="promptName"
+        defaultValue=""
+        render={({ field }) => (
+          <TextInput
+            label="Prompt Name"
+            inputValue={field.value as string}
+            setInputValue={field.onChange}
+          />
+        )}
       />
-      <TextArea
-        label={t("promptContent", { ns: "config" })}
-        placeholder={t("promptContentPlaceholder", { ns: "config" })}
-        autoComplete="off"
-        disabled={!hasEditRights}
-        {...register("prompt.content")}
+      <Controller
+        name="promptContent"
+        defaultValue=""
+        render={({ field }) => (
+          <TextAreaInput
+            label="Prompt Content"
+            inputValue={field.value as string}
+            setInputValue={field.onChange}
+          />
+        )}
       />
-      {hasEditRights && (
+      <div className={styles.buttons_wrapper}>
         <div>
           <QuivrButton
             label="Save"
@@ -55,15 +59,16 @@ export const Prompt = (props: PromptProps): JSX.Element => {
             onClick={() => submitPrompt()}
           />
         </div>
-      )}
-      {hasEditRights && promptId !== "" && (
-        <Button
-          disabled={isUpdatingBrain || isRemovingPrompt}
-          onClick={() => void removeBrainPrompt()}
-        >
-          {t("removePrompt", { ns: "config" })}
-        </Button>
-      )}
+        {promptId !== "" && (
+          <QuivrButton
+            disabled={isUpdatingBrain || isRemovingPrompt}
+            onClick={() => void removeBrainPrompt()}
+            label="Remove Prompt"
+            color="dangerous"
+            iconName="delete"
+          ></QuivrButton>
+        )}
+      </div>
     </div>
   );
 };

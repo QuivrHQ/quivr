@@ -86,7 +86,7 @@
       overflow: hidden;
 
       &:hover {
-        .brain_name {
+        .option_name {
           background-color: Colors.$primary;
           color: Colors.$white;
         }
@@ -96,7 +96,7 @@
         width: IconSizes.$normal;
       }
 
-      .brain_name {
+      .option_name {
         @include Typography.EllipsisOverflow;
         border: 1px solid Colors.$lightest-black;
         border-radius: Radius.$small;

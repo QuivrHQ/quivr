@@ -81,24 +81,25 @@ export const SettingsTabContent = ({
               </div>
             )}
           </div>
-          <div className={styles.prompt_wrapper}>
-            <span className={styles.section_title}>Prompt</span>
-            <MessageInfoBox
-              type="info"
-              content="Select a suggested prompt or create your own for tailored interactions."
-            />
-            <Prompt
-              usePromptProps={promptProps}
-              isUpdatingBrain={isUpdating}
-              hasEditRights={hasEditRights}
-            />
-            <div>
-              {isUpdating && <FaSpinner className="animate-spin" />}
-              {isUpdating && (
-                <span>{t("updatingBrainSettings", { ns: "config" })}</span>
-              )}
+          {hasEditRights && (
+            <div className={styles.prompt_wrapper}>
+              <span className={styles.section_title}>Prompt</span>
+              <MessageInfoBox
+                type="info"
+                content="Select a suggested prompt or create your own for tailored interactions."
+              />
+              <Prompt
+                usePromptProps={promptProps}
+                isUpdatingBrain={isUpdating}
+              />
+              <div>
+                {isUpdating && <FaSpinner className="animate-spin" />}
+                {isUpdating && (
+                  <span>{t("updatingBrainSettings", { ns: "config" })}</span>
+                )}
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </form>
     </>

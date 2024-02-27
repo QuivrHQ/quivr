@@ -102,7 +102,7 @@ export const SingleSelector = <T extends string | number | UUID>({
               <div className={styles.icon}>
                 <Icon name={iconName} size="normal" color="black" />
               </div>
-              <span className={styles.brain_name}>{option.label}</span>
+              <span className={styles.option_name}>{option.label}</span>
             </div>
           ))}
         </div>

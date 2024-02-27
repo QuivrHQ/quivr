@@ -66,5 +66,9 @@
     border-radius: Radius.$big;
     padding: Spacings.$spacing06;
     background-color: Colors.$highlight;
+
+    .section_title {
+      @include Typography.H2;
+    }
   }
 }
