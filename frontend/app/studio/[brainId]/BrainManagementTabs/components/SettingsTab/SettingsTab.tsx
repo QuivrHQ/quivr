@@ -46,37 +46,41 @@ export const SettingsTabContent = ({
           e.preventDefault();
           void handleSubmit();
         }}
-        className="mb-10 mt-5 flex flex-col items-center gap-2"
         ref={formRef}
       >
-        <div className={styles.main_infos_wrapper}>
-          <div className={styles.general_information}>
-            <GeneralInformation hasEditRights={hasEditRights} />
-          </div>
-          {brain?.brain_type === "doc" && (
-            <div className={styles.model_information}>
-              <ModelSelection
-                accessibleModels={accessibleModels}
-                hasEditRights={hasEditRights}
-                brainId={brainId}
-                handleSubmit={handleSubmit}
-              />
+        <div className={styles.main_container}>
+          <div className={styles.main_infos_wrapper}>
+            <span className={styles.section_title}>General Information</span>
+            <div className={styles.inputs_wrapper}>
+              <div className={styles.general_information}>
+                <GeneralInformation hasEditRights={hasEditRights} />
+              </div>
+              {brain?.brain_type === "doc" && (
+                <div className={styles.model_information}>
+                  <ModelSelection
+                    accessibleModels={accessibleModels}
+                    hasEditRights={hasEditRights}
+                    brainId={brainId}
+                    handleSubmit={handleSubmit}
+                  />
+                </div>
+              )}
             </div>
-          )}
-        </div>
-        <Divider text={t("customPromptSection", { ns: "config" })} />
-        <Prompt
-          usePromptProps={promptProps}
-          isUpdatingBrain={isUpdating}
-          hasEditRights={hasEditRights}
-        />
-        <div className="flex flex-row justify-end flex-1 w-full mt-8">
-          {isUpdating && <FaSpinner className="animate-spin" />}
-          {isUpdating && (
-            <span className="ml-2 text-sm">
-              {t("updatingBrainSettings", { ns: "config" })}
-            </span>
-          )}
+          </div>
+          <Divider text={t("customPromptSection", { ns: "config" })} />
+          <Prompt
+            usePromptProps={promptProps}
+            isUpdatingBrain={isUpdating}
+            hasEditRights={hasEditRights}
+          />
+          <div className="flex flex-row justify-end flex-1 w-full mt-8">
+            {isUpdating && <FaSpinner className="animate-spin" />}
+            {isUpdating && (
+              <span className="ml-2 text-sm">
+                {t("updatingBrainSettings", { ns: "config" })}
+              </span>
+            )}
+          </div>
         </div>
       </form>
     </>

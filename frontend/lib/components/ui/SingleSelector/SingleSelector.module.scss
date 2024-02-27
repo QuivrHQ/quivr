@@ -8,21 +8,18 @@
   display: flex;
   flex-direction: column;
   position: relative;
+  background-color: Colors.$white;
 
   .first_line_wrapper {
     display: flex;
     justify-content: space-between;
     border: 1px solid Colors.$normal-grey;
-    border-radius: Radius.$normal;
+    border-radius: Radius.$big;
     align-items: center;
     cursor: pointer;
 
     &.unfolded {
       border-radius: Radius.$normal Radius.$normal 0 0;
-    }
-
-    &:hover {
-      background-color: Colors.$lightest-grey;
     }
 
     .left {
@@ -89,8 +86,6 @@
       overflow: hidden;
 
       &:hover {
-        background-color: Colors.$lightest-grey;
-
         .brain_name {
           background-color: Colors.$primary;
           color: Colors.$white;

@@ -1,4 +1,5 @@
 import { UUID } from "crypto";
+import { useEffect } from "react";
 
 import { FieldHeader } from "@/lib/components/ui/FieldHeader/FieldHeader";
 import { SingleSelector } from "@/lib/components/ui/SingleSelector/SingleSelector";
@@ -23,6 +24,10 @@ export const ModelSelection = (props: ModelSelectionProps): JSX.Element => {
     return { value: accessibleModel, label: accessibleModel };
   });
 
+  useEffect(() => {
+    console.info(model);
+  }, [model]);
+
   return (
     <div className={styles.model_selection_wrapper}>
       <fieldset>
@@ -30,8 +35,8 @@ export const ModelSelection = (props: ModelSelectionProps): JSX.Element => {
         <SingleSelector
           options={accessibleModelOptions}
           onChange={() => handleSubmit(false)}
-          placeholder="Choose a model"
           selectedOption={{ value: model, label: model }}
+          placeholder="hey"
           iconName="robot"
         />
       </fieldset>

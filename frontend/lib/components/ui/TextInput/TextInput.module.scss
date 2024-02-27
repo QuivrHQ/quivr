@@ -11,6 +11,7 @@
   border-radius: Radius.$big;
   align-items: center;
   width: 100%;
+  background-color: Colors.$white;
 
   &.simple {
     border: none;
@@ -32,6 +33,7 @@
     caret-color: Colors.$accent;
     border: none;
     flex: 1;
+    background-color: transparent;
 
     &:focus {
       box-shadow: none;
