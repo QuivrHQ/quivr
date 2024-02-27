@@ -36,7 +36,7 @@ mime_types = {
 }
 
 
-def upload_file_storage(file, file_identifier: str):
+def upload_file_storage(file, file_identifier: str, upsert: str = "false"):
     supabase_client: Client = get_supabase_client()
     response = None
 
@@ -48,13 +48,29 @@ def upload_file_storage(file, file_identifier: str):
         mime_type = mime_types.get(file_extension, "text/html")
 
         response = supabase_client.storage.from_("quivr").upload(
-            file_identifier, file, file_options={"content-type": mime_type}
+            file_identifier,
+            file,
+            file_options={
+                "content-type": mime_type,
+                "upsert": upsert,
+                "cache-control": "3600",
+            },
         )
 
         return response
     except Exception as e:
-        logger.error(e)
-        raise e
+        if "The resource already exists" in str(e) and upsert == "true":
+            response = supabase_client.storage.from_("quivr").update(
+                file_identifier,
+                file,
+                file_options={
+                    "content-type": mime_type,
+                    "upsert": upsert,
+                    "cache-control": "3600",
+                },
+            )
+        else:
+            raise e
 
 
 class DocumentSerializable(Document):

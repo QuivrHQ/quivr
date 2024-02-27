@@ -1,3 +1,6 @@
+from abc import ABC, abstractmethod
+from typing import List
+
 from models.settings import get_supabase_client
 from modules.brain.entity.integration_brain import (
     IntegrationDescriptionEntity,
@@ -7,6 +10,17 @@ from modules.brain.repository.interfaces.integration_brains_interface import (
     IntegrationBrainInterface,
     IntegrationDescriptionInterface,
 )
+
+
+class Integration(ABC):
+
+    @abstractmethod
+    def load(self):
+        pass
+
+    @abstractmethod
+    def poll(self):
+        pass
 
 
 class IntegrationBrain(IntegrationBrainInterface):
@@ -30,6 +44,18 @@ class IntegrationBrain(IntegrationBrainInterface):
         if len(response.data) == 0:
             return None
 
+        return IntegrationEntity(**response.data[0])
+
+    def update_last_synced(self, brain_id, user_id):
+        response = (
+            self.db.table("integrations_user")
+            .update({"last_synced": "now()"})
+            .filter("brain_id", "eq", str(brain_id))
+            .filter("user_id", "eq", str(user_id))
+            .execute()
+        )
+        if len(response.data) == 0:
+            return None
         return IntegrationEntity(**response.data[0])
 
     def add_integration_brain(self, brain_id, user_id, integration_id, settings):
@@ -69,6 +95,20 @@ class IntegrationBrain(IntegrationBrainInterface):
             "brain_id", "eq", str(brain_id)
         ).filter("user_id", "eq", str(user_id)).execute()
         return None
+
+    def get_integration_brain_by_type_integration(
+        self, integration_name
+    ) -> List[IntegrationEntity]:
+        response = (
+            self.db.table("integrations_user")
+            .select("*, integrations ()")
+            .filter("integrations.integration_name", "eq", integration_name)
+            .execute()
+        )
+        if len(response.data) == 0:
+            return None
+
+        return [IntegrationEntity(**data) for data in response.data]
 
 
 class IntegrationDescription(IntegrationDescriptionInterface):

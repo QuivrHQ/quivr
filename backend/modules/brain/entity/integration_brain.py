@@ -27,3 +27,4 @@ class IntegrationEntity(BaseModel):
     integration_id: str
     settings: Optional[dict] = None
     credentials: Optional[dict] = None
+    last_synced: str
