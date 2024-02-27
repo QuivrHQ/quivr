@@ -4,7 +4,6 @@ import { FieldHeader } from "@/lib/components/ui/FieldHeader/FieldHeader";
 import { SingleSelector } from "@/lib/components/ui/SingleSelector/SingleSelector";
 import { defineMaxTokens } from "@/lib/helpers/defineMaxTokens";
 import { Model } from "@/lib/types/BrainConfig";
-import { SaveButton } from "@/shared/SaveButton";
 
 import styles from "./ModelSelection.module.scss";
 
@@ -61,11 +60,6 @@ export const ModelSelection = (props: ModelSelectionProps): JSX.Element => {
           <span>{maxTokens}</span>
         </div>
       </fieldset>
-      {hasEditRights && (
-        <div>
-          <SaveButton handleSubmit={handleSubmit} />
-        </div>
-      )}
     </div>
   );
 };

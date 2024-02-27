@@ -2,8 +2,8 @@ import { useTranslation } from "react-i18next";
 
 import Button from "@/lib/components/ui/Button";
 import Field from "@/lib/components/ui/Field";
+import QuivrButton from "@/lib/components/ui/QuivrButton/QuivrButton";
 import { TextArea } from "@/lib/components/ui/TextArea";
-import { SaveButton } from "@/shared/SaveButton";
 
 import { usePrompt, UsePromptProps } from "../../hooks/usePrompt";
 import { PublicPrompts } from "../PublicPrompts";
@@ -48,7 +48,12 @@ export const Prompt = (props: PromptProps): JSX.Element => {
       />
       {hasEditRights && (
         <div className="flex w-full justify-end py-4">
-          <SaveButton handleSubmit={submitPrompt} />
+          <QuivrButton
+            label="Save"
+            iconName="upload"
+            color="primary"
+            onClick={() => submitPrompt()}
+          />
         </div>
       )}
       {hasEditRights && promptId !== "" && (

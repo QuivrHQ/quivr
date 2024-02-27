@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import { FaSpinner } from "react-icons/fa";
 
 import { Divider } from "@/lib/components/ui/Divider";
+import QuivrButton from "@/lib/components/ui/QuivrButton/QuivrButton";
 import { Brain } from "@/lib/context/BrainProvider/types";
 
 import styles from "./SettingsTab.module.scss";
@@ -69,6 +70,16 @@ export const SettingsTabContent = ({
                 </div>
               )}
             </div>
+            {hasEditRights && (
+              <div className={styles.save_button}>
+                <QuivrButton
+                  label="Save"
+                  iconName="upload"
+                  color="primary"
+                  onClick={() => handleSubmit()}
+                />
+              </div>
+            )}
           </div>
           <Divider text={t("customPromptSection", { ns: "config" })} />
           <Prompt
