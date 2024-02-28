@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.0.213 (2024-02-28)
+
+## What's Changed
+* feat(notion): added custom integration by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2268
+* feat: Remove constraints and add foreign key references to brain tables by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2273
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.212...v0.0.213
+
 ## 0.0.212 (2024-02-26)
 
 ## What's Changed
