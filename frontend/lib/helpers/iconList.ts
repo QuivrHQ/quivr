@@ -9,7 +9,6 @@ import { CiFlag1 } from "react-icons/ci";
 import {
   FaCheck,
   FaCheckCircle,
-  FaDownload,
   FaFileAlt,
   FaKey,
   FaRegFileAlt,
@@ -28,6 +27,7 @@ import {
 } from "react-icons/io";
 import {
   IoArrowUpCircleOutline,
+  IoCloudDownloadOutline,
   IoHomeOutline,
   IoSettingsSharp,
   IoWarningOutline,
@@ -74,7 +74,7 @@ export const iconList: { [name: string]: IconType } = {
   copy: LuCopy,
   custom: MdDashboardCustomize,
   delete: MdDeleteOutline,
-  download: FaDownload,
+  download: IoCloudDownloadOutline,
   edit: MdOutlineModeEditOutline,
   email: MdAlternateEmail,
   feed: MdDynamicFeed,

@@ -1,7 +1,8 @@
 "use client";
-
+import axios from "axios";
 import { useEffect, useRef, useState } from "react";
 
+import { useKnowledgeApi } from "@/lib/api/knowledge/useKnowledgeApi";
 import Icon from "@/lib/components/ui/Icon/Icon";
 import { OptionsModal } from "@/lib/components/ui/OptionsModal/OptionsModal";
 import { getFileIcon } from "@/lib/helpers/getFileIcon";
@@ -23,6 +24,7 @@ const KnowledgeItem = ({
   const optionsRef = useRef<HTMLDivElement | null>(null);
   const { onDeleteKnowledge } = useKnowledgeItem();
   const { brain } = useUrlBrain();
+  const { generateSignedUrlKnowledge } = useKnowledgeApi();
 
   const options: Option[] = [
     {
@@ -32,7 +34,42 @@ const KnowledgeItem = ({
       iconColor: "dangerous",
       disabled: brain?.role !== "Owner",
     },
+    {
+      label: "Download",
+      onClick: () => void downloadFile(),
+      iconName: "download",
+      iconColor: "primary",
+      disabled: brain?.role !== "Owner" || !isUploadedKnowledge(knowledge),
+    },
   ];
+
+  const downloadFile = async () => {
+    if (isUploadedKnowledge(knowledge)) {
+      const download_url = await generateSignedUrlKnowledge({
+        knowledgeId: knowledge.id,
+      });
+
+      console.info(download_url);
+
+      try {
+        const response = await axios.get(download_url, {
+          responseType: "blob",
+        });
+
+        const blobUrl = window.URL.createObjectURL(new Blob([response.data]));
+
+        const a = document.createElement("a");
+        a.href = blobUrl;
+        a.download = knowledge.fileName;
+        document.body.appendChild(a);
+        a.click();
+
+        window.URL.revokeObjectURL(blobUrl);
+      } catch (error) {
+        console.error("Error downloading the file:", error);
+      }
+    }
+  };
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
