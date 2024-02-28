@@ -21,7 +21,7 @@
     background-color: Colors.$highlight;
 
     .section_title {
-      @include Typography.H2;
+      @include Typography.H3;
     }
 
     .inputs_wrapper {
@@ -68,7 +68,7 @@
     background-color: Colors.$highlight;
 
     .section_title {
-      @include Typography.H2;
+      @include Typography.H3;
     }
   }
 }

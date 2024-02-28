@@ -1,4 +1,5 @@
-import { PublicPromptsList } from "./components/PublicPromptsList/PublicPromptsList";
+import styles from "./PublicPrompts.module.scss";
+import { PublicPromptsList } from "./PublicPromptsList/PublicPromptsList";
 import { usePublicPrompts } from "./hooks/usePublicPrompts";
 
 type PublicPromptsProps = {
@@ -13,10 +14,12 @@ export const PublicPrompts = ({
   });
 
   return (
-    <PublicPromptsList
-      options={publicPrompts}
-      onChange={handleChange}
-      onSelect={onSelect}
-    />
+    <div className={styles.selector_wrapper}>
+      <PublicPromptsList
+        options={publicPrompts}
+        onChange={handleChange}
+        onSelect={onSelect}
+      />
+    </div>
   );
 };

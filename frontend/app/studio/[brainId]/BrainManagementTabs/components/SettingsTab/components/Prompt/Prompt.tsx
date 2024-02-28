@@ -7,7 +7,7 @@ import { TextInput } from "@/lib/components/ui/TextInput/TextInput";
 import styles from "./Prompt.module.scss";
 
 import { usePrompt, UsePromptProps } from "../../hooks/usePrompt";
-import { PublicPrompts } from "../PublicPrompts";
+import { PublicPrompts } from "../PublicPrompts/PublicPrompts";
 
 type PromptProps = {
   usePromptProps: UsePromptProps;
