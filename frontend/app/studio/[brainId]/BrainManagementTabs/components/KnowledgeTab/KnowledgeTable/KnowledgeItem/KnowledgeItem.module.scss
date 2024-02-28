@@ -23,4 +23,18 @@
     border-color: Colors.$primary;
     background-color: Colors.$primary-lightest;
   }
+
+  .left {
+    display: flex;
+    align-items: center;
+    gap: Spacings.$spacing03;
+  }
+
+  .options_modal {
+    position: absolute;
+    right: Spacings.$spacing02;
+    top: Spacings.$spacing08;
+    z-index: ZIndexes.$modal;
+    padding-bottom: Spacings.$spacing01;
+  }
 }

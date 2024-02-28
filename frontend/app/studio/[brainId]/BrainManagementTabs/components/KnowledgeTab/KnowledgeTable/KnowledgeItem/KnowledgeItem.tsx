@@ -37,18 +37,20 @@ const KnowledgeItem = ({
 
   return (
     <div className={styles.knowledge_item_wrapper}>
-      {isUploadedKnowledge(knowledge) ? (
-        getFileIcon(knowledge.fileName)
-      ) : (
-        <Icon name="link" size="normal" color="black" />
-      )}
-      {isUploadedKnowledge(knowledge) ? (
-        <span>{knowledge.fileName}</span>
-      ) : (
-        <a href={knowledge.url} target="_blank" rel="noopener noreferrer">
-          {knowledge.url}
-        </a>
-      )}
+      <div className={styles.left}>
+        {isUploadedKnowledge(knowledge) ? (
+          getFileIcon(knowledge.fileName)
+        ) : (
+          <Icon name="link" size="normal" color="black" />
+        )}
+        {isUploadedKnowledge(knowledge) ? (
+          <span>{knowledge.fileName}</span>
+        ) : (
+          <a href={knowledge.url} target="_blank" rel="noopener noreferrer">
+            {knowledge.url}
+          </a>
+        )}
+      </div>
       <div
         ref={iconRef}
         onClick={(event: React.MouseEvent<HTMLElement>) => {
