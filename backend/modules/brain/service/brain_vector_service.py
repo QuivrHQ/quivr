@@ -44,10 +44,11 @@ class BrainVectorService:
 
         return self.files
 
-    def delete_file_from_brain(self, file_name: str):
+    def delete_file_from_brain(self, file_name: str, only_vectors: bool = False):
         file_name_with_brain_id = f"{self.id}/{file_name}"
         storage = Storage()
-        storage.remove_file(file_name_with_brain_id)
+        if not only_vectors:
+            storage.remove_file(file_name_with_brain_id)
         return self.repository.delete_file_from_brain(self.id, file_name)  # type: ignore
 
     def delete_file_url_from_brain(self, file_name: str):

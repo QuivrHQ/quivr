@@ -57,7 +57,7 @@ def process_file_and_notify(
             brain_vector_service = BrainVectorService(brain_id)
             if delete_file:  # TODO fix bug
                 brain_vector_service.delete_file_from_brain(
-                    brain_id, file_original_name
+                    file_original_name, only_vectors=True
                 )
             message = loop.run_until_complete(
                 filter_file(

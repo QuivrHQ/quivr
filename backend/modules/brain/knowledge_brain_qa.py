@@ -86,9 +86,11 @@ def generate_source(source_documents, brain_id):
                 if file_path in generated_urls:
                     source_url = generated_urls[file_path]
                 else:
-                    source_url = generate_file_signed_url(file_path).get(
-                        "signedURL", ""
-                    )
+                    generated_url = generate_file_signed_url(file_path)
+                    if generated_url is not None:
+                        source_url = generated_url.get("signedURL", "")
+                    else:
+                        source_url = ""
                     # Store the generated URL
                     generated_urls[file_path] = source_url
 

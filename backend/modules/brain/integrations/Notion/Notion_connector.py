@@ -314,6 +314,7 @@ class NotionConnector(IntegrationBrain, Integration):
                         "file_name": filename_with_brain_id,
                         "file_original_name": page_name + "_notion.txt",
                         "brain_id": self.brain_id,
+                        "delete_file": True,
                     },
                 )
         except Exception:
