@@ -1,4 +1,9 @@
+@use "@/styles/ScreenSizes.module.scss";
+
 .selector_wrapper {
-  width: 30%;
-  min-width: 250px;
+  width: 300px;
+
+  @media (max-width: ScreenSizes.$small) {
+    width: 100%;
+  }
 }
