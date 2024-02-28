@@ -3,7 +3,8 @@ import { useTranslation } from "react-i18next";
 import { MdOutlineRemoveCircle } from "react-icons/md";
 
 import Field from "@/lib/components/ui/Field";
-import { Select } from "@/lib/components/ui/Select";
+
+import { SingleSelector } from "./ui/SingleSelector/SingleSelector";
 
 import {
   BrainRoleAssignation,
@@ -41,13 +42,6 @@ export const UserToInvite = ({
     }
   }, [email, onChange, roleAssignation, selectedRole]);
 
-  const assignableRoles = userRoleToAssignableRoles["Owner"];
-  const translatedOptions = assignableRoles.map((role) => ({
-    value: role.value,
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-    label: t(role.value),
-  }));
-
   return (
     <div
       data-testid="assignation-row"
@@ -68,12 +62,13 @@ export const UserToInvite = ({
           data-testid="role-assignation-email-input"
         />
       </div>
-      <Select
+
+      <SingleSelector
+        selectedOption={{ label: selectedRole, value: selectedRole }}
+        options={userRoleToAssignableRoles["Owner"]}
         onChange={setSelectedRole}
-        value={selectedRole}
-        options={translatedOptions}
-        popoverSide="bottom"
-        popoverClassName="w-36"
+        placeholder="Role"
+        iconName="user"
       />
     </div>
   );

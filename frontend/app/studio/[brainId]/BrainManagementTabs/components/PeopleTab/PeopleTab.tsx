@@ -1,11 +1,10 @@
 "use client";
 
 import { UUID } from "crypto";
-import { ImUserPlus } from "react-icons/im";
 
 import { BrainUsers } from "@/app/studio/[brainId]/BrainManagementTabs/components/PeopleTab/BrainUsers/BrainUsers";
 import { UserToInvite } from "@/lib/components/UserToInvite";
-import Button from "@/lib/components/ui/Button";
+import QuivrButton from "@/lib/components/ui/QuivrButton/QuivrButton";
 import { useShareBrain } from "@/lib/hooks/useShareBrain";
 
 import styles from "./PeopleTab.module.scss";
@@ -43,21 +42,24 @@ export const PeopleTab = ({ brainId }: ShareBrainModalProps): JSX.Element => {
               roleAssignation={roleAssignation}
             />
           ))}
-          <Button
-            onClick={addNewRoleAssignationRole}
-            disabled={sendingInvitation || !canAddNewRow}
-          >
-            <ImUserPlus />
-          </Button>
-          <Button
-            isLoading={sendingInvitation}
-            disabled={roleAssignations.length === 0}
-            type="submit"
-          >
-            Share
-          </Button>
+          <div className={styles.buttons_wrapper}>
+            <QuivrButton
+              onClick={addNewRoleAssignationRole}
+              disabled={sendingInvitation || !canAddNewRow}
+              label="Add new user"
+              color="primary"
+              iconName="add"
+            ></QuivrButton>
+            <QuivrButton
+              isLoading={sendingInvitation}
+              disabled={roleAssignations.length === 0}
+              label="Invite"
+              color="primary"
+              iconName="share"
+              onClick={inviteUsers}
+            ></QuivrButton>
+          </div>
         </div>
-        <div></div>
       </form>
       <div className={styles.section_wrapper}>
         <span className={styles.section_title}>Users with access</span>

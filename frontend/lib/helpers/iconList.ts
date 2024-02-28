@@ -30,6 +30,7 @@ import {
   IoCloudDownloadOutline,
   IoHomeOutline,
   IoSettingsSharp,
+  IoShareSocial,
   IoWarningOutline,
 } from "react-icons/io5";
 import { LiaRobotSolid } from "react-icons/lia";
@@ -99,6 +100,7 @@ export const iconList: { [name: string]: IconType } = {
   robot: LiaRobotSolid,
   search: LuSearch,
   settings: IoSettingsSharp,
+  share: IoShareSocial,
   software: CgSoftwareDownload,
   star: FaRegStar,
   unlock: FaUnlock,
