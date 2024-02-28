@@ -2,9 +2,10 @@
 import { UUID } from "crypto";
 import { AnimatePresence, motion } from "framer-motion";
 
+import { LoaderIcon } from "@/lib/components/ui/LoaderIcon/LoaderIcon";
 import { MessageInfoBox } from "@/lib/components/ui/MessageInfoBox/MessageInfoBox";
-import Spinner from "@/lib/components/ui/Spinner";
 
+import styles from "./KnowledgeTab.module.scss";
 import { KnowledgeTable } from "./KnowledgeTable/KnowledgeTable";
 import { useAddedKnowledge } from "./hooks/useAddedKnowledge";
 
@@ -18,23 +19,27 @@ export const KnowledgeTab = ({ brainId }: KnowledgeTabProps): JSX.Element => {
   });
 
   if (isPending) {
-    return <Spinner />;
+    return <LoaderIcon size="big" color="accent" />;
   }
 
   if (allKnowledge.length === 0) {
     return (
-      <MessageInfoBox
-        type="warning"
-        content="This brain is empty! You can add knowledge by clicking on the topbar button."
-      />
+      <div className={styles.knowledge_tab_wrapper}>
+        <MessageInfoBox
+          type="warning"
+          content="This brain is empty! You can add knowledge by clicking on the topbar button."
+        />
+      </div>
     );
   }
 
   return (
-    <motion.div layout className="w-full flex flex-col gap-5">
-      <AnimatePresence mode="popLayout">
-        <KnowledgeTable knowledgeList={allKnowledge} />
-      </AnimatePresence>
-    </motion.div>
+    <div className={styles.knowledge_tab_wrapper}>
+      <motion.div layout className="w-full flex flex-col gap-5">
+        <AnimatePresence mode="popLayout">
+          <KnowledgeTable knowledgeList={allKnowledge} />
+        </AnimatePresence>
+      </motion.div>
+    </div>
   );
 };

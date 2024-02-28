@@ -1,0 +1,14 @@
+@use "@/styles/Colors.module.scss";
+@use "@/styles/Radius.module.scss";
+@use "@/styles/Spacings.module.scss";
+@use "@/styles/Typography.module.scss";
+
+.knowledge_table_wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: Spacings.$spacing05;
+
+  .title {
+    @include Typography.H3;
+  }
+}
