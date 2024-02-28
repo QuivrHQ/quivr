@@ -41,6 +41,7 @@
 
       @media (max-width: ScreenSizes.$small) {
         flex-direction: column;
+        gap: Spacings.$spacing05;
 
         .general_information {
           width: 100%;

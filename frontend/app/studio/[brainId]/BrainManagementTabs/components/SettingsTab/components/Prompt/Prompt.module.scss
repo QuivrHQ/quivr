@@ -5,6 +5,11 @@
   flex-direction: column;
   gap: Spacings.$spacing05;
 
+  .name_wrapper {
+    width: 30%;
+    min-width: 250px;
+  }
+
   .buttons_wrapper {
     display: flex;
     justify-content: space-between;

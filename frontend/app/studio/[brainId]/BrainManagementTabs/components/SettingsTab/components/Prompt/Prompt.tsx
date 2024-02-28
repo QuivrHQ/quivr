@@ -28,17 +28,19 @@ export const Prompt = (props: PromptProps): JSX.Element => {
   return (
     <div className={styles.prompt_wrapper}>
       <PublicPrompts onSelect={pickPublicPrompt} />
-      <Controller
-        name="promptName"
-        defaultValue=""
-        render={({ field }) => (
-          <TextInput
-            label="Prompt Name"
-            inputValue={field.value as string}
-            setInputValue={field.onChange}
-          />
-        )}
-      />
+      <div className={styles.name_wrapper}>
+        <Controller
+          name="promptName"
+          defaultValue=""
+          render={({ field }) => (
+            <TextInput
+              label="Prompt Name"
+              inputValue={field.value as string}
+              setInputValue={field.onChange}
+            />
+          )}
+        />
+      </div>
       <Controller
         name="promptContent"
         defaultValue=""
