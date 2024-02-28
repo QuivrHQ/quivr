@@ -5,11 +5,10 @@ import { MdOutlineRemoveCircle } from "react-icons/md";
 import Field from "@/lib/components/ui/Field";
 import { Select } from "@/lib/components/ui/Select";
 
-import { userRoleToAssignableRoles } from "./ShareBrain/types";
-
 import {
   BrainRoleAssignation,
   BrainRoleType,
+  userRoleToAssignableRoles,
 } from "../../app/studio/[brainId]/BrainManagementTabs/components/PeopleTab/BrainUsers/types";
 
 type UserToInviteProps = {
