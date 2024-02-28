@@ -8,6 +8,8 @@ import { UserToInvite } from "@/lib/components/UserToInvite";
 import Button from "@/lib/components/ui/Button";
 import { useShareBrain } from "@/lib/hooks/useShareBrain";
 
+import styles from "./PeopleTab.module.scss";
+
 type ShareBrainModalProps = {
   brainId: UUID;
 };
@@ -24,17 +26,15 @@ export const PeopleTab = ({ brainId }: ShareBrainModalProps): JSX.Element => {
   } = useShareBrain(brainId);
 
   return (
-    <>
+    <div className={styles.people_tab_wrapper}>
       <form
         onSubmit={(event) => {
           event.preventDefault();
           void inviteUsers();
         }}
       >
-        <div>
-          <div />
-          <p>Invite new users</p>
-
+        <div className={styles.section_wrapper}>
+          <span className={styles.section_title}>Invite new users</span>
           {roleAssignations.map((roleAssignation, index) => (
             <UserToInvite
               key={roleAssignation.id}
@@ -50,7 +50,6 @@ export const PeopleTab = ({ brainId }: ShareBrainModalProps): JSX.Element => {
             <ImUserPlus />
           </Button>
         </div>
-
         <div>
           <Button
             isLoading={sendingInvitation}
@@ -61,9 +60,10 @@ export const PeopleTab = ({ brainId }: ShareBrainModalProps): JSX.Element => {
           </Button>
         </div>
       </form>
-      <div />
-      <p>Users with access</p>
-      <BrainUsers brainId={brainId} />
-    </>
+      <div className={styles.section_wrapper}>
+        <span className={styles.section_title}>Users with access</span>
+        <BrainUsers brainId={brainId} />
+      </div>
+    </div>
   );
 };
