@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import Icon from "@/lib/components/ui/Icon/Icon";
 import { OptionsModal } from "@/lib/components/ui/OptionsModal/OptionsModal";
@@ -27,13 +27,30 @@ const KnowledgeItem = ({
   const options: Option[] = [
     {
       label: "Delete",
-      onClick: (knowledgeToRemove: Knowledge) =>
-        void onDeleteKnowledge(knowledgeToRemove),
+      onClick: () => void onDeleteKnowledge(knowledge),
       iconName: "delete",
       iconColor: "dangerous",
       disabled: brain?.role !== "Owner",
     },
   ];
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        iconRef.current &&
+        !iconRef.current.contains(event.target as Node) &&
+        optionsRef.current &&
+        !optionsRef.current.contains(event.target as Node)
+      ) {
+        setOptionsOpened(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   return (
     <div className={styles.knowledge_item_wrapper}>

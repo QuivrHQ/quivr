@@ -9,6 +9,7 @@ import { CiFlag1 } from "react-icons/ci";
 import {
   FaCheck,
   FaCheckCircle,
+  FaDownload,
   FaFileAlt,
   FaKey,
   FaRegFileAlt,
@@ -73,6 +74,7 @@ export const iconList: { [name: string]: IconType } = {
   copy: LuCopy,
   custom: MdDashboardCustomize,
   delete: MdDeleteOutline,
+  download: FaDownload,
   edit: MdOutlineModeEditOutline,
   email: MdAlternateEmail,
   feed: MdDynamicFeed,

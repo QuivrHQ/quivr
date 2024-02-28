@@ -5,8 +5,7 @@ import { Color } from "./Colors";
 export type Option = {
   label: string;
   iconName: keyof typeof iconList;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  onClick: (object?: any) => void;
+  onClick: () => void;
   iconColor: Color;
   disabled?: boolean;
 };
