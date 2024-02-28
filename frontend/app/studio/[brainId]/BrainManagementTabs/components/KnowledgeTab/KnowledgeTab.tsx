@@ -22,7 +22,12 @@ export const KnowledgeTab = ({ brainId }: KnowledgeTabProps): JSX.Element => {
   }
 
   if (allKnowledge.length === 0) {
-    return <MessageInfoBox type="info" content="hey" />;
+    return (
+      <MessageInfoBox
+        type="warning"
+        content="This brain is empty! You can add knowledge by clicking on the topbar button."
+      />
+    );
   }
 
   return (

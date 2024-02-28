@@ -29,6 +29,7 @@ import {
   IoArrowUpCircleOutline,
   IoHomeOutline,
   IoSettingsSharp,
+  IoWarningOutline,
 } from "react-icons/io5";
 import { LiaRobotSolid } from "react-icons/lia";
 import { IconType } from "react-icons/lib";
@@ -100,5 +101,6 @@ export const iconList: { [name: string]: IconType } = {
   upload: FiUpload,
   uploadFile: MdUploadFile,
   user: FaRegUserCircle,
+  warning: IoWarningOutline,
   website: TbNetwork,
 };

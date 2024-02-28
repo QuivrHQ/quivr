@@ -23,4 +23,10 @@
     color: Colors.$primary;
     background-color: Colors.$primary-lightest;
   }
+
+  &.warning {
+    border-color: Colors.$warning;
+    color: Colors.$warning;
+    background-color: Colors.$warning-lightest;
+  }
 }

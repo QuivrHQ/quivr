@@ -23,6 +23,8 @@ export const MessageInfoBox = ({
         return { iconName: "info", iconColor: "primary" };
       case "success":
         return { iconName: "check", iconColor: "success" };
+      case "warning":
+        return { iconName: "warning", iconColor: "warning" };
       default:
         return { iconName: "info", iconColor: "primary" };
     }
