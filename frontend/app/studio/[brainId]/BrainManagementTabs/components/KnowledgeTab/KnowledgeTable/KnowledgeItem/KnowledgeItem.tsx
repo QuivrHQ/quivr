@@ -49,8 +49,6 @@ const KnowledgeItem = ({
         knowledgeId: knowledge.id,
       });
 
-      console.info(download_url);
-
       try {
         const response = await axios.get(download_url, {
           responseType: "blob",
@@ -69,6 +67,7 @@ const KnowledgeItem = ({
         console.error("Error downloading the file:", error);
       }
     }
+    setOptionsOpened(false);
   };
 
   useEffect(() => {
