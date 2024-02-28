@@ -2,7 +2,7 @@ import { UUID } from "crypto";
 
 import { MessageInfoBox } from "@/lib/components/ui/MessageInfoBox/MessageInfoBox";
 
-import { BrainUser } from "./BrainUser/BrainUser";
+import { BrainUser } from "./components/BrainUser/BrainUser";
 import { useBrainUsers } from "./hooks/useBrainUsers";
 
 type BrainUsersProps = {

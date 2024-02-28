@@ -1,16 +1,13 @@
 import { useEffect, useState } from "react";
-import { useTranslation } from "react-i18next";
 import { MdOutlineRemoveCircle } from "react-icons/md";
 
-import Field from "@/lib/components/ui/Field";
-
-import { SingleSelector } from "./ui/SingleSelector/SingleSelector";
-
+import { SingleSelector } from "../../../../../../../../../lib/components/ui/SingleSelector/SingleSelector";
+import { TextInput } from "../../../../../../../../../lib/components/ui/TextInput/TextInput";
 import {
   BrainRoleAssignation,
   BrainRoleType,
   userRoleToAssignableRoles,
-} from "../../app/studio/[brainId]/BrainManagementTabs/components/PeopleTab/BrainUsers/types";
+} from "../../types";
 
 type UserToInviteProps = {
   onChange: (newRole: BrainRoleAssignation) => void;
@@ -23,7 +20,6 @@ export const UserToInvite = ({
   removeCurrentInvitation,
   roleAssignation,
 }: UserToInviteProps): JSX.Element => {
-  const { t } = useTranslation("translation");
   const [selectedRole, setSelectedRole] = useState<BrainRoleType>(
     roleAssignation.role
   );
@@ -43,25 +39,12 @@ export const UserToInvite = ({
   }, [email, onChange, roleAssignation, selectedRole]);
 
   return (
-    <div
-      data-testid="assignation-row"
-      className="flex flex-row align-center my-2 gap-3 items-center"
-    >
-      <div className="cursor-pointer" onClick={removeCurrentInvitation}>
+    <div>
+      <div onClick={removeCurrentInvitation}>
         <MdOutlineRemoveCircle />
       </div>
-      <div className="flex flex-1">
-        <Field
-          name="email"
-          required
-          type="email"
-          placeholder={t("email")}
-          onChange={(e) => setEmail(e.target.value)}
-          value={email}
-          onBlur={() => email === "" && removeCurrentInvitation?.()}
-          data-testid="role-assignation-email-input"
-        />
-      </div>
+
+      <TextInput label="Email" inputValue={email} setInputValue={setEmail} />
 
       <SingleSelector
         selectedOption={{ label: selectedRole, value: selectedRole }}
