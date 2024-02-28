@@ -1,6 +1,6 @@
 import { Knowledge } from "@/lib/types/Knowledge";
 
-import KnowledgeItem from "./KnowledgeItem";
+import KnowledgeItem from "./KnowledgeItem/KnowledgeItem";
 import styles from "./KnowledgeTable.module.scss";
 
 interface KnowledgeTableProps {

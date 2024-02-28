@@ -49,6 +49,7 @@ import {
   MdDeleteOutline,
   MdDynamicFeed,
   MdHistory,
+  MdLink,
   MdOutlineModeEditOutline,
   MdUploadFile,
 } from "react-icons/md";
@@ -86,6 +87,7 @@ export const iconList: { [name: string]: IconType } = {
   home: IoHomeOutline,
   info: FaInfo,
   key: FaKey,
+  link: MdLink,
   loader: AiOutlineLoading3Quarters,
   logout: IoMdLogOut,
   options: SlOptions,
