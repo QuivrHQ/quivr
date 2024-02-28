@@ -14,6 +14,18 @@ class Knowledges(KnowledgeInterface):
         """
         Add a knowledge
         """
+        # Check if the knowledge already exists
+        knowledge_exists = (
+            self.db.from_("knowledge")
+            .select("*")
+            .filter("brain_id", "eq", knowledge.brain_id)
+            .filter("file_name", "eq", knowledge.file_name)
+            .execute()
+        ).data
+
+        if knowledge_exists:
+            return Knowledge(**knowledge_exists[0])  # TODO fix this
+
         response = (self.db.from_("knowledge").insert(knowledge.dict()).execute()).data
         return Knowledge(**response[0])
 

@@ -1,5 +1,6 @@
 import os
 import tempfile
+import time
 from io import BytesIO
 from typing import Any, List, Optional
 
@@ -8,7 +9,7 @@ from celery_config import celery
 from fastapi import UploadFile
 from logger import get_logger
 from modules.brain.entity.integration_brain import IntegrationEntity
-from modules.brain.repository.integration_brains import IntegrationBrain
+from modules.brain.repository.integration_brains import Integration, IntegrationBrain
 from modules.knowledge.dto.inputs import CreateKnowledgeProperties
 from modules.knowledge.repository.knowledge_interface import KnowledgeInterface
 from modules.knowledge.service.knowledge_service import KnowledgeService
@@ -37,7 +38,7 @@ class NotionSearchResponse(BaseModel):
     has_more: bool = False
 
 
-class NotionConnector(IntegrationBrain):
+class NotionConnector(IntegrationBrain, Integration):
     """A class to interact with the Notion API"""
 
     credentials: dict[str, str] = None
@@ -219,6 +220,24 @@ class NotionConnector(IntegrationBrain):
         page_url = self._read_page_url(page)
         return page_title, page_content, child_pages, page_url
 
+    def _filter_pages_by_time(
+        self,
+        pages: list[dict[str, Any]],
+        start: str,
+        filter_field: str = "last_edited_time",
+    ) -> list[NotionPage]:
+        filtered_pages: list[NotionPage] = []
+        start_time = time.mktime(
+            time.strptime(start, "%Y-%m-%dT%H:%M:%S.%f%z")
+        )  # Convert `start` to a float
+        for page in pages:
+            compare_time = time.mktime(
+                time.strptime(page[filter_field], "%Y-%m-%dT%H:%M:%S.%f%z")
+            )
+            if compare_time > start_time:  # Compare `compare_time` with `start_time`
+                filtered_pages += [NotionPage(**page)]
+        return filtered_pages
+
     def get_all_pages(self) -> list[NotionPage]:
         """
         Get all the pages from Notion.
@@ -248,6 +267,7 @@ class NotionConnector(IntegrationBrain):
         """
         Add a file to the knowledge base
         """
+        logger.info(f"Adding file to knowledge: {page_name}")
         filename_with_brain_id = (
             str(self.brain_id) + "/" + str(page_name) + "_notion.txt"
         )
@@ -269,7 +289,9 @@ class NotionConnector(IntegrationBrain):
                     temp_file_path = temp_file.name
 
                 # Upload the temporary file to the knowledge base
-                response = upload_file_storage(temp_file_path, filename_with_brain_id)
+                response = upload_file_storage(
+                    temp_file_path, filename_with_brain_id, "true"
+                )
                 logger.info(f"File {response} uploaded successfully")
 
                 # Delete the temporary file
@@ -292,12 +314,13 @@ class NotionConnector(IntegrationBrain):
                         "file_name": filename_with_brain_id,
                         "file_original_name": page_name + "_notion.txt",
                         "brain_id": self.brain_id,
+                        "delete_file": True,
                     },
                 )
         except Exception:
             logger.error("Error adding knowledge")
 
-    def compile_all_pages(self):
+    def load(self):
         """
         Get all the pages, blocks, databases from Notion into a single document per page
         """
@@ -316,18 +339,52 @@ class NotionConnector(IntegrationBrain):
             self.add_file_to_knowledge(page_content, page_title, page_url)
         return documents
 
+    def poll(self):
+        """
+        Update all the brains with the latest data from Notion
+        """
+        integration = self.get_integration_brain(self.brain_id, self.user_id)
+        last_synced = integration.last_synced
+
+        query_dict = {
+            "page_size": self.max_pages,
+            "sort": {"timestamp": "last_edited_time", "direction": "descending"},
+            "filter": {"property": "object", "value": "page"},
+        }
+        documents = []
+
+        while True:
+            db_res = self._search_notion(query_dict)
+            pages = self._filter_pages_by_time(
+                db_res.results, last_synced, filter_field="last_edited_time"
+            )
+            for page in pages:
+                logger.info(f"Reading page: {page.id}")
+                page_title, page_content, child_pages, page_url = self._read_page(
+                    page.id
+                )
+                document = {
+                    "page_title": page_title,
+                    "page_content": page_content,
+                    "child_pages": child_pages,
+                    "page_url": page_url,
+                }
+                documents.append(document)
+                self.add_file_to_knowledge(page_content, page_title, page_url)
+            if not db_res.has_more:
+                break
+            query_dict["start_cursor"] = db_res.next_cursor
+        logger.info(
+            f"last Synced: {self.update_last_synced(self.brain_id, self.user_id)}"
+        )
+        return documents
+
 
 if __name__ == "__main__":
 
     notion = NotionConnector(
-        brain_id="b3ab23c5-9e13-4dd8-8883-106d613e3de8",
+        brain_id="73f7d092-d596-4fd0-b24f-24031e9b53cd",
         user_id="39418e3b-0258-4452-af60-7acfcc1263ff",
     )
 
-    celery.send_task(
-        "NotionConnectorLoad",
-        kwargs={
-            "brain_id": "b3ab23c5-9e13-4dd8-8883-106d613e3de8",
-            "user_id": "39418e3b-0258-4452-af60-7acfcc1263ff",
-        },
-    )
+    print(notion.poll())

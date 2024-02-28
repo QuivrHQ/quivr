@@ -85,6 +85,10 @@ jobs:
             service: "preview-worker"
             task_definition: ".aws/task_definition_preview_worker.json"
             container: "quivr-chat"
+          - name: "quivr-beat"
+            service: "preview-beat"
+            task_definition: ".aws/task_definition_preview_beat.json"
+            container: "quivr-beat"
 
     steps:
       - name: Checkout

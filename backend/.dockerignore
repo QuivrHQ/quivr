@@ -8,3 +8,4 @@
 **/build/
 **/.docusaurus/
 **/node_modules/
+**/.venv/
