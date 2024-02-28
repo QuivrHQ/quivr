@@ -6,7 +6,7 @@ import Spinner from "@/lib/components/ui/Spinner";
 import { Tabs } from "@/lib/components/ui/Tabs/Tabs";
 import { Tab } from "@/lib/types/Tab";
 
-import { KnowledgeTab } from "./components/KnowledgeOrSecretsTab/KnowledgeTab";
+import { KnowledgeTab } from "./components/KnowledgeTab/KnowledgeTab";
 import { PeopleTab } from "./components/PeopleTab/PeopleTab";
 import { SettingsTab } from "./components/SettingsTab/SettingsTab";
 import { useBrainFetcher } from "./hooks/useBrainFetcher";

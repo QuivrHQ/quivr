@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { KnowledgeToFeed } from "@/app/chat/[chatId]/components/ActionsBar/components";
-import { useAddKnowledge } from "@/app/studio/[brainId]/BrainManagementTabs/components/KnowledgeOrSecretsTab/components/AddKnowledge/hooks/useAddKnowledge";
+import { useAddKnowledge } from "@/app/studio/[brainId]/BrainManagementTabs/components/KnowledgeTab/components/AddKnowledge/hooks/useAddKnowledge";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 import { useKnowledgeToFeedContext } from "@/lib/context/KnowledgeToFeedProvider/hooks/useKnowledgeToFeedContext";
 
