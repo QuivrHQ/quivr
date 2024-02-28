@@ -24,8 +24,6 @@ export const ModelSelection = (props: ModelSelectionProps): JSX.Element => {
     return { value: accessibleModel, label: accessibleModel };
   });
 
-  console.info(model);
-
   return (
     <div className={styles.model_selection_wrapper}>
       <fieldset

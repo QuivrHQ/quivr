@@ -102,11 +102,7 @@ export const usePrompt = (props: UsePromptProps) => {
 
   // eslint-disable-next-line complexity
   const submitPrompt = async () => {
-    const {
-      prompt,
-      maxTokens: max_tokens,
-      ...otherConfigs
-    } = getValues();
+    const { prompt, maxTokens: max_tokens, ...otherConfigs } = getValues();
 
     if (!dirtyFields["prompt"]) {
       return;
