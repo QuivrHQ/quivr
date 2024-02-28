@@ -7,7 +7,7 @@ import { Subscription } from "@/lib/api/brain/brain";
 import { useBrainApi } from "@/lib/api/brain/useBrainApi";
 import { useToast } from "@/lib/hooks";
 
-import { BrainRoleAssignation } from "../components/BrainUsers/types";
+import { BrainRoleAssignation } from "../../app/studio/[brainId]/BrainManagementTabs/components/PeopleTab/BrainUsers/types";
 import { generateBrainAssignation } from "../components/ShareBrain/utils/generateBrainAssignation";
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types

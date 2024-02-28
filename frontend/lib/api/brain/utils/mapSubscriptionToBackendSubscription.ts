@@ -1,4 +1,4 @@
-import { BrainRoleType } from "@/lib/components/BrainUsers/types";
+import { BrainRoleType } from "@/app/studio/[brainId]/BrainManagementTabs/components/PeopleTab/BrainUsers/types";
 
 import { Subscription } from "../brain";
 

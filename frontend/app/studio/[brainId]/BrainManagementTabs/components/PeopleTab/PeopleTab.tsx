@@ -3,7 +3,7 @@
 import { UUID } from "crypto";
 import { ImUserPlus } from "react-icons/im";
 
-import { BrainUsers } from "@/lib/components/BrainUsers/BrainUsers";
+import { BrainUsers } from "@/app/studio/[brainId]/BrainManagementTabs/components/PeopleTab/BrainUsers/BrainUsers";
 import { UserToInvite } from "@/lib/components/UserToInvite";
 import Button from "@/lib/components/ui/Button";
 import { useShareBrain } from "@/lib/hooks/useShareBrain";
@@ -49,8 +49,6 @@ export const PeopleTab = ({ brainId }: ShareBrainModalProps): JSX.Element => {
           >
             <ImUserPlus />
           </Button>
-        </div>
-        <div>
           <Button
             isLoading={sendingInvitation}
             disabled={roleAssignations.length === 0}
@@ -59,6 +57,7 @@ export const PeopleTab = ({ brainId }: ShareBrainModalProps): JSX.Element => {
             Share
           </Button>
         </div>
+        <div></div>
       </form>
       <div className={styles.section_wrapper}>
         <span className={styles.section_title}>Users with access</span>
