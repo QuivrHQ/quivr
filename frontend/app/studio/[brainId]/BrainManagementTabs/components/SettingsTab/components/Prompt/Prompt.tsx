@@ -1,5 +1,6 @@
 import { Controller } from "react-hook-form";
 
+import { FieldHeader } from "@/lib/components/ui/FieldHeader/FieldHeader";
 import QuivrButton from "@/lib/components/ui/QuivrButton/QuivrButton";
 import { TextAreaInput } from "@/lib/components/ui/TextAreaInput/TextAreaInput";
 import { TextInput } from "@/lib/components/ui/TextInput/TextInput";
@@ -29,29 +30,33 @@ export const Prompt = (props: PromptProps): JSX.Element => {
     <div className={styles.prompt_wrapper}>
       <PublicPrompts onSelect={pickPublicPrompt} />
       <div className={styles.name_wrapper}>
+        <FieldHeader label="Prompt Name" iconName="prompt" />
         <Controller
-          name="promptName"
+          name="prompt.title"
           defaultValue=""
           render={({ field }) => (
             <TextInput
-              label="Prompt Name"
+              label="Choose a name for your prompt"
               inputValue={field.value as string}
               setInputValue={field.onChange}
             />
           )}
         />
       </div>
-      <Controller
-        name="promptContent"
-        defaultValue=""
-        render={({ field }) => (
-          <TextAreaInput
-            label="Prompt Content"
-            inputValue={field.value as string}
-            setInputValue={field.onChange}
-          />
-        )}
-      />
+      <div>
+        <FieldHeader label="Prompt Instructions" iconName="paragraph" />
+        <Controller
+          name="prompt.content"
+          defaultValue=""
+          render={({ field }) => (
+            <TextAreaInput
+              label="Write specific instructions for your brain here"
+              inputValue={field.value as string}
+              setInputValue={field.onChange}
+            />
+          )}
+        />
+      </div>
       <div className={styles.buttons_wrapper}>
         {promptId !== "" && (
           <QuivrButton
