@@ -7,7 +7,7 @@ import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainConte
 import { RemoveAccessIcon } from "./components/RemoveAccessIcon";
 import { useBrainUser } from "./hooks/useBrainUser";
 
-import { availableRoles, BrainRoleType } from "../../types";
+import { availableRoles, BrainRoleType } from "../types";
 
 type BrainUserProps = {
   email: string;

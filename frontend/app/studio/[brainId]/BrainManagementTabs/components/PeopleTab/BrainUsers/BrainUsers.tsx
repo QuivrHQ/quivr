@@ -2,7 +2,7 @@ import { UUID } from "crypto";
 
 import { MessageInfoBox } from "@/lib/components/ui/MessageInfoBox/MessageInfoBox";
 
-import { BrainUser } from "./components";
+import { BrainUser } from "./BrainUser/BrainUser";
 import { useBrainUsers } from "./hooks/useBrainUsers";
 
 type BrainUsersProps = {
@@ -15,7 +15,7 @@ export const BrainUsers = ({ brainId }: BrainUsersProps): JSX.Element => {
     return (
       <MessageInfoBox
         type="info"
-        content="You the only user to have access to this brain."
+        content="You're the only user to have access to this brain."
       />
     );
   }

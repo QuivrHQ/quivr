@@ -6,7 +6,7 @@ import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainConte
 import { getAxiosErrorParams } from "@/lib/helpers/getAxiosErrorParams";
 import { useToast } from "@/lib/hooks";
 
-import { BrainRoleType } from "../../../types";
+import { BrainRoleType } from "../../types";
 type UseBrainUserProps = {
   fetchBrainUsers: () => Promise<void>;
   role: BrainRoleType;
