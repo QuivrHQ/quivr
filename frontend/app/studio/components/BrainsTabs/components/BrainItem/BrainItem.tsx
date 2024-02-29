@@ -1,9 +1,9 @@
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 
-import { DeleteOrUnsubscribeConfirmationModal } from "@/app/studio/[brainId]/components/BrainManagementTabs/components/Modals/DeleteOrUnsubscribeConfirmationModal";
-import { useBrainManagementTabs } from "@/app/studio/[brainId]/components/BrainManagementTabs/hooks/useBrainManagementTabs";
-import { getBrainPermissions } from "@/app/studio/[brainId]/components/BrainManagementTabs/utils/getBrainPermissions";
+import { DeleteOrUnsubscribeConfirmationModal } from "@/app/studio/[brainId]/BrainManagementTabs/components/DeleteOrUnsubscribeModal/DeleteOrUnsubscribeConfirmationModal";
+import { useBrainManagementTabs } from "@/app/studio/[brainId]/BrainManagementTabs/hooks/useBrainManagementTabs";
+import { getBrainPermissions } from "@/app/studio/[brainId]/BrainManagementTabs/utils/getBrainPermissions";
 import Icon from "@/lib/components/ui/Icon/Icon";
 import { OptionsModal } from "@/lib/components/ui/OptionsModal/OptionsModal";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";

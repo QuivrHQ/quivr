@@ -8,21 +8,18 @@
   display: flex;
   flex-direction: column;
   position: relative;
+  background-color: Colors.$white;
 
   .first_line_wrapper {
     display: flex;
     justify-content: space-between;
     border: 1px solid Colors.$normal-grey;
-    border-radius: Radius.$normal;
+    border-radius: Radius.$big;
     align-items: center;
     cursor: pointer;
 
     &.unfolded {
-      border-radius: Radius.$normal Radius.$normal 0 0;
-    }
-
-    &:hover {
-      background-color: Colors.$lightest-grey;
+      border-radius: Radius.$big Radius.$big 0 0;
     }
 
     .left {
@@ -39,8 +36,7 @@
 
       .label {
         @include Typography.EllipsisOverflow;
-        color: Colors.$white;
-        background-color: Colors.$primary;
+        background-color: Colors.$primary-light;
         border-radius: Radius.$normal;
         padding-inline: Spacings.$spacing05;
         padding-block: Spacings.$spacing02;
@@ -89,11 +85,8 @@
       overflow: hidden;
 
       &:hover {
-        background-color: Colors.$lightest-grey;
-
-        .brain_name {
-          background-color: Colors.$primary;
-          color: Colors.$white;
+        .option_name {
+          background-color: Colors.$primary-lightest;
         }
       }
 
@@ -101,7 +94,7 @@
         width: IconSizes.$normal;
       }
 
-      .brain_name {
+      .option_name {
         @include Typography.EllipsisOverflow;
         border: 1px solid Colors.$lightest-black;
         border-radius: Radius.$small;

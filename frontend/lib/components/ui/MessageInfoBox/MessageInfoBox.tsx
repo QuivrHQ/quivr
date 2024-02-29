@@ -20,11 +20,13 @@ export const MessageInfoBox = ({
   } => {
     switch (type) {
       case "info":
-        return { iconName: "info", iconColor: "grey" };
+        return { iconName: "info", iconColor: "primary" };
       case "success":
         return { iconName: "check", iconColor: "success" };
+      case "warning":
+        return { iconName: "warning", iconColor: "warning" };
       default:
-        return { iconName: "info", iconColor: "grey" };
+        return { iconName: "info", iconColor: "primary" };
     }
   };
 

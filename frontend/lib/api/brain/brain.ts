@@ -1,7 +1,7 @@
 /* eslint-disable max-lines */
 import { AxiosInstance } from "axios";
 
-import { BrainRoleType } from "@/lib/components/BrainUsers/types";
+import { BrainRoleType } from "@/app/studio/[brainId]/BrainManagementTabs/components/PeopleTab/BrainUsers/types";
 import {
   BackendMinimalBrainForUser,
   Brain,

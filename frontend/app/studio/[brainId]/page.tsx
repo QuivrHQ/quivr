@@ -1,34 +1,85 @@
 "use client";
 
-import Link from "next/link";
-import { useTranslation } from "react-i18next";
-import { LuBrain, LuChevronLeftCircle } from "react-icons/lu";
+import { useEffect } from "react";
 
-import Button from "@/lib/components/ui/Button";
+import PageHeader from "@/lib/components/PageHeader/PageHeader";
+import { UploadDocumentModal } from "@/lib/components/UploadDocumentModal/UploadDocumentModal";
+import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
+import { useKnowledgeToFeedContext } from "@/lib/context/KnowledgeToFeedProvider/hooks/useKnowledgeToFeedContext";
+import { ButtonType } from "@/lib/types/QuivrButton";
 
-import { BrainManagementTabs } from "./components";
+import { BrainManagementTabs } from "./BrainManagementTabs/BrainManagementTabs";
+import { DeleteOrUnsubscribeConfirmationModal } from "./BrainManagementTabs/components/DeleteOrUnsubscribeModal/DeleteOrUnsubscribeConfirmationModal";
+import { useBrainManagementTabs } from "./BrainManagementTabs/hooks/useBrainManagementTabs";
+import { getBrainPermissions } from "./BrainManagementTabs/utils/getBrainPermissions";
 import { useBrainManagement } from "./hooks/useBrainManagement";
+import styles from "./page.module.scss";
 
 const BrainsManagement = (): JSX.Element => {
-  const { t } = useTranslation(["translation"]);
   const { brain } = useBrainManagement();
+  const {
+    handleUnsubscribeOrDeleteBrain,
+    isDeleteOrUnsubscribeModalOpened,
+    setIsDeleteOrUnsubscribeModalOpened,
+    isDeleteOrUnsubscribeRequestPending,
+  } = useBrainManagementTabs(brain?.id);
+  const { allBrains } = useBrainContext();
+  const { isOwnedByCurrentUser } = getBrainPermissions({
+    brainId: brain?.id,
+    userAccessibleBrains: allBrains,
+  });
+  const { setShouldDisplayFeedCard } = useKnowledgeToFeedContext();
+  const { setCurrentBrainId } = useBrainContext();
+
+  const buttons: ButtonType[] = [
+    {
+      label: "Add knowledge",
+      color: "primary",
+      onClick: () => {
+        setShouldDisplayFeedCard(true);
+      },
+      iconName: "uploadFile",
+      hidden: !isOwnedByCurrentUser || !brain?.max_files,
+    },
+    {
+      label: "Delete brain",
+      color: "dangerous",
+      onClick: () => {
+        setIsDeleteOrUnsubscribeModalOpened(true);
+      },
+      iconName: "delete",
+    },
+  ];
+
+  useEffect(() => {
+    if (brain) {
+      setCurrentBrainId(brain.id);
+    }
+  }, [brain]);
+
+  if (!brain) {
+    return <></>;
+  }
 
   return (
-    <div className="flex flex-col w-full p-5 lg:p-20 bg-highlight">
-      <div>
-        <Link href="/studio">
-          <Button variant="tertiary" className="p-0">
-            <LuChevronLeftCircle className="text-primary" />
-            {t("previous")}
-          </Button>
-        </Link>
+    <>
+      <div className={styles.brain_management_wrapper}>
+        <PageHeader iconName="brain" label={brain.name} buttons={buttons} />
+        <div className={styles.content_wrapper}>
+          <BrainManagementTabs />
+        </div>
       </div>
-      <div className="w-full justify-center flex items-center gap-2">
-        <LuBrain size={25} className="text-primary" />
-        <span className="text-3xl font-semibold">{brain?.name}</span>
-      </div>
-      <BrainManagementTabs />
-    </div>
+      <UploadDocumentModal />
+      <DeleteOrUnsubscribeConfirmationModal
+        isOpen={isDeleteOrUnsubscribeModalOpened}
+        setOpen={setIsDeleteOrUnsubscribeModalOpened}
+        onConfirm={() => void handleUnsubscribeOrDeleteBrain()}
+        isOwnedByCurrentUser={isOwnedByCurrentUser}
+        isDeleteOrUnsubscribeRequestPending={
+          isDeleteOrUnsubscribeRequestPending
+        }
+      />
+    </>
   );
 };
 

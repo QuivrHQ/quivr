@@ -1,0 +1,7 @@
+@use "@/styles/Spacings.module.scss";
+
+.knowledge_tab_wrapper {
+  display: flex;
+  justify-content: center;
+  padding: Spacings.$spacing05;
+}

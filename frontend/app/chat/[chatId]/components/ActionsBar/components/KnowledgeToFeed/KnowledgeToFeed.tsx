@@ -62,6 +62,7 @@ export const KnowledgeToFeed = ({
                 : undefined
             }
             placeholder="Select a brain"
+            iconName="brain"
           />
         </div>
       )}
@@ -72,7 +73,7 @@ export const KnowledgeToFeed = ({
       </div>
       <div>
         <div className={styles.uploaded_knowledges_title}>
-          <span>Uploaded knowledges</span>
+          <span>Knowledges to upload</span>
           <span>{knowledgeToFeed.length}</span>
         </div>
         <div className={styles.uploaded_knowledges}>

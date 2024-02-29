@@ -7,12 +7,26 @@
   display: flex;
   align-items: center;
   gap: Spacings.$spacing03;
-  width: 100%;
+  width: fit-content;
   border: 1px solid Colors.$normal-grey;
   color: Colors.$black;
   border-radius: Radius.$normal;
 
   &.success {
     border-color: Colors.$success;
+    color: Colors.$success;
+    background-color: Colors.$success-lightest;
+  }
+
+  &.info {
+    border-color: Colors.$primary;
+    color: Colors.$primary;
+    background-color: Colors.$primary-lightest;
+  }
+
+  &.warning {
+    border-color: Colors.$warning;
+    color: Colors.$warning;
+    background-color: Colors.$warning-lightest;
   }
 }

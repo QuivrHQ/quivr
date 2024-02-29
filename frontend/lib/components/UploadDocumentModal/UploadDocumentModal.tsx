@@ -2,11 +2,11 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { KnowledgeToFeed } from "@/app/chat/[chatId]/components/ActionsBar/components";
-import { useAddKnowledge } from "@/app/studio/[brainId]/components/BrainManagementTabs/components/KnowledgeOrSecretsTab/components/AddKnowledge/hooks/useAddKnowledge";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 import { useKnowledgeToFeedContext } from "@/lib/context/KnowledgeToFeedProvider/hooks/useKnowledgeToFeedContext";
 
 import styles from "./UploadDocumentModal.module.scss";
+import { useAddKnowledge } from "./hooks/useAddKnowledge";
 
 import { Modal } from "../ui/Modal/Modal";
 import { QuivrButton } from "../ui/QuivrButton/QuivrButton";

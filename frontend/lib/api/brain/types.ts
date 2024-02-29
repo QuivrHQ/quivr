@@ -1,6 +1,6 @@
 import { UUID } from "crypto";
 
-import { BrainRoleType } from "@/lib/components/BrainUsers/types";
+import { BrainRoleType } from "@/app/studio/[brainId]/BrainManagementTabs/components/PeopleTab/BrainUsers/types";
 import { BrainStatus, BrainType, Model } from "@/lib/types/BrainConfig";
 
 export type ApiBrainDefinitionSchemaPropertyType = "string" | "number";

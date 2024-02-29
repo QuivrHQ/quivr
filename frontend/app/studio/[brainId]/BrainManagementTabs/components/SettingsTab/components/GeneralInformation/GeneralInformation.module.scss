@@ -1,0 +1,24 @@
+@use "@/styles/ScreenSizes.module.scss";
+@use "@/styles/Spacings.module.scss";
+
+.general_info_wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: Spacings.$spacing05;
+  width: 100%;
+
+  .field_wrapper {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .name_field_wrapper {
+    display: flex;
+    flex-direction: column;
+    width: 300px;
+
+    @media (max-width: ScreenSizes.$small) {
+      width: 100%;
+    }
+  }
+}

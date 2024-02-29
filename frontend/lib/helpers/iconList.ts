@@ -1,5 +1,9 @@
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
-import { BsArrowRightShort, BsChatLeftText } from "react-icons/bs";
+import {
+  BsArrowRightShort,
+  BsChatLeftText,
+  BsTextParagraph,
+} from "react-icons/bs";
 import { CgSoftwareDownload } from "react-icons/cg";
 import { CiFlag1 } from "react-icons/ci";
 import {
@@ -8,6 +12,7 @@ import {
   FaFileAlt,
   FaKey,
   FaRegFileAlt,
+  FaRegKeyboard,
   FaRegStar,
   FaRegUserCircle,
   FaUnlock,
@@ -22,9 +27,13 @@ import {
 } from "react-icons/io";
 import {
   IoArrowUpCircleOutline,
+  IoCloudDownloadOutline,
   IoHomeOutline,
   IoSettingsSharp,
+  IoShareSocial,
+  IoWarningOutline,
 } from "react-icons/io5";
+import { LiaRobotSolid } from "react-icons/lia";
 import { IconType } from "react-icons/lib";
 import {
   LuBrain,
@@ -42,6 +51,7 @@ import {
   MdDeleteOutline,
   MdDynamicFeed,
   MdHistory,
+  MdLink,
   MdOutlineModeEditOutline,
   MdUploadFile,
 } from "react-icons/md";
@@ -65,6 +75,7 @@ export const iconList: { [name: string]: IconType } = {
   copy: LuCopy,
   custom: MdDashboardCustomize,
   delete: MdDeleteOutline,
+  download: IoCloudDownloadOutline,
   edit: MdOutlineModeEditOutline,
   email: MdAlternateEmail,
   feed: MdDynamicFeed,
@@ -73,23 +84,29 @@ export const iconList: { [name: string]: IconType } = {
   flag: CiFlag1,
   followUp: IoArrowUpCircleOutline,
   graph: VscGraph,
-  hastag: RiHashtag,
+  hashtag: RiHashtag,
   help: IoIosHelpCircleOutline,
   history: MdHistory,
   home: IoHomeOutline,
   info: FaInfo,
   key: FaKey,
+  link: MdLink,
   loader: AiOutlineLoading3Quarters,
   logout: IoMdLogOut,
   options: SlOptions,
+  paragraph: BsTextParagraph,
+  prompt: FaRegKeyboard,
   redirection: BsArrowRightShort,
+  robot: LiaRobotSolid,
   search: LuSearch,
   settings: IoSettingsSharp,
+  share: IoShareSocial,
   software: CgSoftwareDownload,
   star: FaRegStar,
   unlock: FaUnlock,
   upload: FiUpload,
   uploadFile: MdUploadFile,
   user: FaRegUserCircle,
+  warning: IoWarningOutline,
   website: TbNetwork,
 };

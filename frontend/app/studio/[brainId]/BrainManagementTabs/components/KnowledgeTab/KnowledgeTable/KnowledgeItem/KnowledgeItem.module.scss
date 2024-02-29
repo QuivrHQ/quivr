@@ -1,0 +1,40 @@
+@use "@/styles/Colors.module.scss";
+@use "@/styles/Radius.module.scss";
+@use "@/styles/ScreenSizes.module.scss";
+@use "@/styles/Spacings.module.scss";
+@use "@/styles/Typography.module.scss";
+@use "@/styles/ZIndexes.module.scss";
+
+.knowledge_item_wrapper {
+  padding-inline: Spacings.$spacing05;
+  overflow: hidden;
+  display: flex;
+  gap: Spacings.$spacing02;
+  justify-content: space-between;
+  align-items: center;
+  margin-block: Spacings.$spacing03;
+  border: 1px solid Colors.$lightest-black;
+  border-radius: Radius.$normal;
+  padding-block: Spacings.$spacing03;
+  position: relative;
+  overflow: visible;
+
+  &:hover {
+    border-color: Colors.$primary;
+    background-color: Colors.$primary-lightest;
+  }
+
+  .left {
+    display: flex;
+    align-items: center;
+    gap: Spacings.$spacing03;
+  }
+
+  .options_modal {
+    position: absolute;
+    right: Spacings.$spacing02;
+    top: Spacings.$spacing08;
+    z-index: ZIndexes.$modal;
+    padding-bottom: Spacings.$spacing01;
+  }
+}

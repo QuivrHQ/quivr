@@ -3,12 +3,12 @@ import axios, { AxiosResponse } from "axios";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
+import { generateBrainAssignation } from "@/app/studio/[brainId]/BrainManagementTabs/components/PeopleTab/BrainUsers/utils/generateBrainAssignation";
 import { Subscription } from "@/lib/api/brain/brain";
 import { useBrainApi } from "@/lib/api/brain/useBrainApi";
 import { useToast } from "@/lib/hooks";
 
-import { BrainRoleAssignation } from "../components/BrainUsers/types";
-import { generateBrainAssignation } from "../components/ShareBrain/utils/generateBrainAssignation";
+import { BrainRoleAssignation } from "../../app/studio/[brainId]/BrainManagementTabs/components/PeopleTab/BrainUsers/types";
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const useShareBrain = (brainId: string) => {

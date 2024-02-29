@@ -1,7 +1,7 @@
 import { UUID } from "crypto";
 
+import { BrainRoleType } from "@/app/studio/[brainId]/BrainManagementTabs/components/PeopleTab/BrainUsers/types";
 import { ApiBrainDefinition } from "@/lib/api/brain/types";
-import { BrainRoleType } from "@/lib/components/BrainUsers/types";
 import { Document } from "@/lib/types/Document";
 
 import { useBrainProvider } from "./hooks/useBrainProvider";

@@ -1,0 +1,21 @@
+@use "@/styles/ScreenSizes.module.scss";
+@use "@/styles/Spacings.module.scss";
+
+.prompt_wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: Spacings.$spacing05;
+
+  .name_wrapper {
+    width: 300px;
+
+    @media (max-width: ScreenSizes.$small) {
+      width: 100%;
+    }
+  }
+
+  .buttons_wrapper {
+    display: flex;
+    justify-content: space-between;
+  }
+}

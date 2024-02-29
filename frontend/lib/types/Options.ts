@@ -7,4 +7,5 @@ export type Option = {
   iconName: keyof typeof iconList;
   onClick: () => void;
   iconColor: Color;
+  disabled?: boolean;
 };

@@ -9,6 +9,7 @@ type TextInputProps = {
   setInputValue: (value: string) => void;
   simple?: boolean;
   onSubmit?: () => void;
+  disabled?: boolean;
 };
 
 export const TextInput = ({
@@ -18,12 +19,14 @@ export const TextInput = ({
   setInputValue,
   simple,
   onSubmit,
+  disabled,
 }: TextInputProps): JSX.Element => {
   return (
     <div
       className={`
       ${styles.text_input_container} 
       ${simple ? styles.simple : ""}
+      ${disabled ? styles.disabled : ""}
       `}
     >
       <input

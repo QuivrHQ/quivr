@@ -11,6 +11,7 @@
   border-radius: Radius.$big;
   align-items: center;
   width: 100%;
+  background-color: Colors.$white;
 
   &.simple {
     border: none;
@@ -20,6 +21,12 @@
       background-color: transparent;
       width: 10px;
     }
+  }
+
+  &.disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+    pointer-events: none;
   }
 
   .text_area_input {

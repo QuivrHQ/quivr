@@ -37,7 +37,9 @@ export const OptionsModal = ({ options }: OptionsModalProps): JSX.Element => {
     <div className={styles.options_modal_wrapper} ref={modalRef} tabIndex={-1}>
       {options.map((option, index) => (
         <div
-          className={styles.option}
+          className={`${styles.option} ${
+            option.disabled ? styles.disabled : ""
+          }`}
           key={index}
           onClick={option.onClick}
           onMouseEnter={() => handleMouseEnter(index)}
