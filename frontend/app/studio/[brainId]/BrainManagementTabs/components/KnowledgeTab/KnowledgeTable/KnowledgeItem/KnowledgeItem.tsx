@@ -116,8 +116,6 @@ const KnowledgeItem = ({
       <div ref={optionsRef} className={styles.options_modal}>
         {optionsOpened && <OptionsModal options={options} />}
       </div>
-      {/* <DownloadUploadedKnowledge knowledge={knowledge} /> */}
-      {/* <DeleteKnowledge knowledge={knowledge} /> */}
     </div>
   );
 };
