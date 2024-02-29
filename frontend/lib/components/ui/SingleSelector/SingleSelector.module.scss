@@ -3,6 +3,7 @@
 @use "@/styles/Radius.module.scss";
 @use "@/styles/Spacings.module.scss";
 @use "@/styles/Typography.module.scss";
+@use "@/styles/ZIndexes.module.scss";
 
 .single_selector_wrapper {
   display: flex;
@@ -71,10 +72,11 @@
     top: 100%;
     border: 1px solid Colors.$normal-grey;
     border-top: none;
-    border-radius: 0 0 Radius.$normal Radius.$normal;
+    border-radius: 0 0 Radius.$big Radius.$big;
     overflow: hidden;
     max-height: 180px;
     overflow: scroll;
+    z-index: ZIndexes.$overlay;
 
     .option {
       padding: Spacings.$spacing03;
