@@ -25,10 +25,10 @@ export const KnowledgeTab = ({ brainId }: KnowledgeTabProps): JSX.Element => {
   if (allKnowledge.length === 0) {
     return (
       <div className={styles.knowledge_tab_wrapper}>
-        <MessageInfoBox
-          type="warning"
-          content="This brain is empty! You can add knowledge by clicking on the Add knowledge button."
-        />
+        <MessageInfoBox type="warning">
+          This brain is empty! You can add knowledge by clicking on the Add
+          knowledge button.
+        </MessageInfoBox>
       </div>
     );
   }

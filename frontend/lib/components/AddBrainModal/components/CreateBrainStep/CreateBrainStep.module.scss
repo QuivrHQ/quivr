@@ -7,9 +7,23 @@
   justify-content: space-between;
   padding-inline: Spacings.$spacing08;
   height: 100%;
+  align-items: center;
 
   .title {
     @include Typography.H2;
+  }
+
+  .message_content {
+    display: flex;
+    flex-direction: column;
+    gap: Spacings.$spacing02;
+
+    .second_line {
+      display: flex;
+      flex-wrap: wrap;
+      gap: Spacings.$spacing03;
+      align-items: center;
+    }
   }
 
   .buttons_wrapper {

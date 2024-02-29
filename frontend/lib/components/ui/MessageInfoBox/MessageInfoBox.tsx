@@ -6,12 +6,12 @@ import styles from "./MessageInfoBox.module.scss";
 import { Icon } from "../Icon/Icon";
 
 export type MessageInfoBoxProps = {
-  content: string;
+  children: React.ReactNode;
   type: "info" | "success" | "warning" | "error";
 };
 
 export const MessageInfoBox = ({
-  content,
+  children,
   type,
 }: MessageInfoBoxProps): JSX.Element => {
   const getIconProps = (): {
@@ -37,7 +37,7 @@ export const MessageInfoBox = ({
         size="normal"
         color={getIconProps().iconColor}
       />
-      <span>{content}</span>
+      {children}
     </div>
   );
 };
