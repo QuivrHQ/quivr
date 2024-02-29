@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.0.214 (2024-02-29)
+
+## What's Changed
+* fix(frontend): revamp quivr studio by @Zewed in https://github.com/QuivrHQ/quivr/pull/2274
+* fix(frontend): zindex and radius on single selector component by @Zewed in https://github.com/QuivrHQ/quivr/pull/2276
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.213...v0.0.214
+
 ## 0.0.213 (2024-02-28)
 
 ## What's Changed
