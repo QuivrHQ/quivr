@@ -1,5 +1,8 @@
 import { useEffect, useState } from "react";
-import { MdOutlineRemoveCircle } from "react-icons/md";
+
+import Icon from "@/lib/components/ui/Icon/Icon";
+
+import styles from "./UserToInvite.module.scss";
 
 import { SingleSelector } from "../../../../../../../../../lib/components/ui/SingleSelector/SingleSelector";
 import { TextInput } from "../../../../../../../../../lib/components/ui/TextInput/TextInput";
@@ -39,20 +42,26 @@ export const UserToInvite = ({
   }, [email, onChange, roleAssignation, selectedRole]);
 
   return (
-    <div>
-      <div onClick={removeCurrentInvitation}>
-        <MdOutlineRemoveCircle />
-      </div>
+    <div className={styles.user_to_invite_wrapper}>
+      <Icon
+        color="dangerous"
+        name="delete"
+        handleHover={true}
+        size="normal"
+        onClick={removeCurrentInvitation}
+      />
 
       <TextInput label="Email" inputValue={email} setInputValue={setEmail} />
 
-      <SingleSelector
-        selectedOption={{ label: selectedRole, value: selectedRole }}
-        options={userRoleToAssignableRoles["Owner"]}
-        onChange={setSelectedRole}
-        placeholder="Role"
-        iconName="user"
-      />
+      <div className={styles.selector}>
+        <SingleSelector
+          selectedOption={{ label: selectedRole, value: selectedRole }}
+          options={userRoleToAssignableRoles["Owner"]}
+          onChange={setSelectedRole}
+          placeholder="Role"
+          iconName="user"
+        />
+      </div>
     </div>
   );
 };
