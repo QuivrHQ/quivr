@@ -1,3 +1,4 @@
+@use "@/styles/Colors.module.scss";
 @use "@/styles/Spacings.module.scss";
 
 .page_wrapper {
@@ -7,6 +8,7 @@
   width: 100%;
   height: 100vh;
   overflow: hidden;
+  background-color: Colors.$white;
 
   .content_wrapper {
     padding-inline: Spacings.$spacing09;

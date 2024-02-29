@@ -47,7 +47,7 @@ const Search = (): JSX.Element => {
             <QuivrLogo size={80} color="black" />
             <div className={styles.quivr_text}>
               <span>Talk to </span>
-              <span className={styles.quivr_text_primary}>Quivr</span>
+              <span className={styles.quivr_text_primary}>Disney</span>
             </div>
           </div>
           <div className={styles.search_bar_wrapper}>

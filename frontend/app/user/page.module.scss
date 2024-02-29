@@ -1,3 +1,4 @@
+@use "@/styles/Colors.module.scss";
 @use "@/styles/Spacings.module.scss";
 
 .user_page_container {
@@ -6,4 +7,5 @@
   display: flex;
   flex-direction: column;
   gap: Spacings.$spacing05;
+  background-color: Colors.$white;
 }

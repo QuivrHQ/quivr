@@ -14,7 +14,6 @@ import { ButtonType } from "@/lib/types/QuivrButton";
 import { Tab } from "@/lib/types/Tab";
 
 import { BrainsUsage } from "./components/BrainsUsage/BrainsUsage";
-import { Plan } from "./components/Plan/Plan";
 import { Settings } from "./components/Settings/Settings";
 import styles from "./page.module.scss";
 
@@ -53,12 +52,6 @@ const UserPage = (): JSX.Element => {
       onClick: () => setSelectedTab("Brains Usage"),
       iconName: "graph",
     },
-    {
-      label: "Plan",
-      isSelected: selectedTab === "Plan",
-      onClick: () => setSelectedTab("Plan"),
-      iconName: "star",
-    },
   ];
 
   if (!session || !userData) {
@@ -75,7 +68,6 @@ const UserPage = (): JSX.Element => {
         <div className={styles.content_wrapper}>
           {userTabs[0].isSelected && <Settings email={userData.email} />}
           {userTabs[1].isSelected && <BrainsUsage />}
-          {userTabs[2].isSelected && <Plan />}
         </div>
       </div>
       <Modal
