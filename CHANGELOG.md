@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.0.215 (2024-03-01)
+
+## What's Changed
+* fix(frontend): message info box  by @Zewed in https://github.com/QuivrHQ/quivr/pull/2277
+* fix(frontend): see knowledge in custom brains by @Zewed in https://github.com/QuivrHQ/quivr/pull/2278
+* fix(frontend): fix disabled knwoledge tab by @Zewed in https://github.com/QuivrHQ/quivr/pull/2280
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.214...v0.0.215
+
 ## 0.0.214 (2024-02-29)
 
 ## What's Changed
