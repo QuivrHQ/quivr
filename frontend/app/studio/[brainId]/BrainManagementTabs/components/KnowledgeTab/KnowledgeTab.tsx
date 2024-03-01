@@ -4,6 +4,8 @@ import { AnimatePresence, motion } from "framer-motion";
 
 import { LoaderIcon } from "@/lib/components/ui/LoaderIcon/LoaderIcon";
 import { MessageInfoBox } from "@/lib/components/ui/MessageInfoBox/MessageInfoBox";
+import QuivrButton from "@/lib/components/ui/QuivrButton/QuivrButton";
+import { useKnowledgeToFeedContext } from "@/lib/context/KnowledgeToFeedProvider/hooks/useKnowledgeToFeedContext";
 
 import styles from "./KnowledgeTab.module.scss";
 import { KnowledgeTable } from "./KnowledgeTable/KnowledgeTable";
@@ -17,6 +19,7 @@ export const KnowledgeTab = ({ brainId }: KnowledgeTabProps): JSX.Element => {
   const { isPending, allKnowledge } = useAddedKnowledge({
     brainId,
   });
+  const { setShouldDisplayFeedCard } = useKnowledgeToFeedContext();
 
   if (isPending) {
     return <LoaderIcon size="big" color="accent" />;
@@ -26,8 +29,14 @@ export const KnowledgeTab = ({ brainId }: KnowledgeTabProps): JSX.Element => {
     return (
       <div className={styles.knowledge_tab_wrapper}>
         <MessageInfoBox type="warning">
-          This brain is empty! You can add knowledge by clicking on the Add
-          knowledge button.
+          This brain is empty! You can add knowledge by clicking on
+          <QuivrButton
+            label="Add knowledge"
+            color="primary"
+            iconName="add"
+            onClick={() => setShouldDisplayFeedCard(true)}
+          />
+          .
         </MessageInfoBox>
       </div>
     );
