@@ -41,6 +41,8 @@ export const getBrain = async (
     await axiosInstance.get<Brain | undefined>(`/brains/${brainId}/`)
   ).data;
 
+  console.info(brain);
+
   return brain;
 };
 

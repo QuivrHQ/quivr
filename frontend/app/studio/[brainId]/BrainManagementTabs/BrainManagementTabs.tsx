@@ -40,7 +40,9 @@ export const BrainManagementTabs = (): JSX.Element => {
       onClick: () => setSelectedTab("Knowledge"),
       iconName: "file",
       disabled:
-        !hasEditRights || (!brain?.max_files && brain?.brain_type !== "doc"),
+        !hasEditRights ||
+        (!brain?.integration_description?.max_files &&
+          brain?.brain_type !== "doc"),
     },
   ];
 
