@@ -35,10 +35,9 @@ export const CreateBrainStep = (): JSX.Element => {
           <KnowledgeToFeed hideBrainSelector={true} />
         </div>
       ) : (
-        <MessageInfoBox type="info">
-          <div className={styles.message_content}>
-            You brain does not need additional information.
-            <div className={styles.second_line}>
+        <div className={styles.message_info_box_wrapper}>
+          <MessageInfoBox type="info">
+            <div className={styles.message_content}>
               Click on
               <QuivrButton
                 label="Create"
@@ -47,10 +46,10 @@ export const CreateBrainStep = (): JSX.Element => {
                 onClick={feed}
                 isLoading={creating}
               />
-              to finish
+              to finish your brain creation.
             </div>
-          </div>
-        </MessageInfoBox>
+          </MessageInfoBox>
+        </div>
       )}
       <div className={styles.buttons_wrapper}>
         <QuivrButton
