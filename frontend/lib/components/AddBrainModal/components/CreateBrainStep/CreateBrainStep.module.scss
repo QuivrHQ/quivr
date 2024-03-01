@@ -12,6 +12,19 @@
     @include Typography.H2;
   }
 
+  .message_info_box_wrapper {
+    align-self: center;
+    display: flex;
+
+    .message_content {
+      display: flex;
+      gap: Spacings.$spacing03;
+      flex-wrap: wrap;
+      align-items: center;
+      align-self: center;
+    }
+  }
+
   .buttons_wrapper {
     display: flex;
     justify-content: space-between;

@@ -84,10 +84,10 @@ export const SettingsTabContent = ({
           {hasEditRights && (
             <div className={styles.prompt_wrapper}>
               <span className={styles.section_title}>Prompt</span>
-              <MessageInfoBox
-                type="info"
-                content="Select a suggested prompt or create your own for tailored interactions."
-              />
+              <MessageInfoBox type="info">
+                Select a suggested prompt or create your own for tailored
+                interactions
+              </MessageInfoBox>
               <Prompt
                 usePromptProps={promptProps}
                 isUpdatingBrain={isUpdating}
