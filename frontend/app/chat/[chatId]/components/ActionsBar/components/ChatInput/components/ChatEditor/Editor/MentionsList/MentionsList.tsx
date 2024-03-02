@@ -4,7 +4,7 @@ import { forwardRef } from "react";
 import { useBrainCreationContext } from "@/lib/components/AddBrainModal/brainCreation-provider";
 import TextButton from "@/lib/components/ui/TextButton/TextButton";
 
-import { AddNewPromptButton } from "./components/AddNewPromptButton";
+import styles from "./MentionsList.module.scss";
 import { MentionItem } from "./components/MentionItem/MentionItem";
 import { useMentionList } from "./hooks/useMentionList";
 import { MentionListProps } from "./types";
@@ -15,7 +15,7 @@ export type MentionListRef = {
 
 export const MentionList = forwardRef<MentionListRef, MentionListProps>(
   (props, ref) => {
-    const { selectItem, selectedIndex, isBrain, isPrompt } = useMentionList({
+    const { selectItem, selectedIndex, isBrain } = useMentionList({
       ...props,
       ref,
     });
@@ -28,7 +28,7 @@ export const MentionList = forwardRef<MentionListRef, MentionListProps>(
     };
 
     return (
-      <div onClick={handleClick}>
+      <div className={styles.mentions_list_wrapper} onClick={handleClick}>
         <div>
           {props.suggestionData.items.map((item, index) => (
             <MentionItem
@@ -49,7 +49,6 @@ export const MentionList = forwardRef<MentionListRef, MentionListProps>(
               onClick={() => setIsBrainCreationModalOpened(true)}
             />
           )}
-          {isPrompt && <AddNewPromptButton />}
         </div>
       </div>
     );

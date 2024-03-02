@@ -1,4 +1,4 @@
-export const mentionTriggers = ["@", "#"] as const;
+export const mentionTriggers = ["@"] as const;
 
 export type MentionTriggerType = (typeof mentionTriggers)[number];
 export type FeedItemSource = "crawl" | "upload";
