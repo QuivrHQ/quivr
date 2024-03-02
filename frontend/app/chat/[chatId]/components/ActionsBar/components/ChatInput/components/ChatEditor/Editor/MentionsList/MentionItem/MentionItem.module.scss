@@ -1,0 +1,15 @@
+@use "@/styles/Colors.module.scss";
+@use "@/styles/Radius.module.scss";
+@use "@/styles/Spacings.module.scss";
+
+.mention_item_wrapper {
+  display: flex;
+  cursor: pointer;
+  gap: Spacings.$spacing03;
+  padding: Spacings.$spacing02;
+  border-radius: Radius.$normal;
+
+  &:hover {
+    background-color: Colors.$primary-light;
+  }
+}

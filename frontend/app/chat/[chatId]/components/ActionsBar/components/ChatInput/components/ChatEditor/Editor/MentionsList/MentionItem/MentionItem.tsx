@@ -1,8 +1,7 @@
-import { cn } from "@/lib/utils";
-
+import styles from "./MentionItem.module.scss";
 import { useMentionItemIcon } from "./hooks/useMentionItemIcon";
 
-import { SuggestionDataType, SuggestionItem } from "../../../types";
+import { SuggestionDataType, SuggestionItem } from "../../types";
 
 type MentionItemProps = {
   item: SuggestionItem;
@@ -13,7 +12,6 @@ type MentionItemProps = {
 
 export const MentionItem = ({
   item,
-  isSelected,
   onClick,
   type,
 }: MentionItemProps): JSX.Element => {
@@ -21,11 +19,7 @@ export const MentionItem = ({
 
   return (
     <span
-      className={cn(
-        isSelected ? "bg-msg-purple" : "bg-transparent",
-        "hover:text-blue-500",
-        "px-3 py-1 rounded-md cursor-pointer flex flex-row gap-1"
-      )}
+      className={styles.mention_item_wrapper}
       key={item.id}
       onClick={onClick}
     >

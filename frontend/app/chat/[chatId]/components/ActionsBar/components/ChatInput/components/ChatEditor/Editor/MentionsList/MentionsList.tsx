@@ -2,10 +2,10 @@ import { SuggestionKeyDownProps } from "@tiptap/suggestion";
 import { forwardRef } from "react";
 
 import { useBrainCreationContext } from "@/lib/components/AddBrainModal/brainCreation-provider";
-import TextButton from "@/lib/components/ui/TextButton/TextButton";
+import QuivrButton from "@/lib/components/ui/QuivrButton/QuivrButton";
 
+import { MentionItem } from "./MentionItem/MentionItem";
 import styles from "./MentionsList.module.scss";
-import { MentionItem } from "./components/MentionItem/MentionItem";
 import { useMentionList } from "./hooks/useMentionList";
 import { MentionListProps } from "./types";
 
@@ -42,10 +42,10 @@ export const MentionList = forwardRef<MentionListRef, MentionListProps>(
         </div>
         <div>
           {isBrain && (
-            <TextButton
+            <QuivrButton
               label="Create Brain"
               iconName="add"
-              color="black"
+              color="primary"
               onClick={() => setIsBrainCreationModalOpened(true)}
             />
           )}

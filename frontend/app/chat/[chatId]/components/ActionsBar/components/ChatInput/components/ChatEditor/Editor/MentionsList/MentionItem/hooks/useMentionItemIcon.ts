@@ -3,7 +3,7 @@ import { CgFileDocument } from "react-icons/cg";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 import { getBrainIconFromBrainType } from "@/lib/helpers/getBrainIconFromBrainType";
 
-import { SuggestionDataType, SuggestionItem } from "../../../../types";
+import { SuggestionDataType, SuggestionItem } from "../../../types";
 
 type UseBrainIcon = {
   item: SuggestionItem;
