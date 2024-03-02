@@ -56,7 +56,11 @@ class BigBrain(KnowledgeBrainQA):
             template=question_prompt_template, input_variables=["context", "question"]
         )
 
-        llm = ChatLiteLLM(temperature=0, model=self.model)
+        api_base = None
+        if self.brain_settings.ollama_api_base_url and self.model.startswith("ollama"):
+            api_base = self.brain_settings.ollama_api_base_url
+
+        llm = ChatLiteLLM(temperature=0, model=self.model, api_base=api_base)
 
         retriever_doc = self.knowledge_qa.get_retriever()
 
