@@ -16,19 +16,22 @@ type MentionItemProps = {
 export const MentionItem = ({
   item,
   onClick,
+  isSelected,
 }: MentionItemProps): JSX.Element => {
   return (
     <span
-      className={styles.mention_item_wrapper}
+      className={`${styles.mention_item_wrapper} ${
+        isSelected ? styles.selected : ""
+      }`}
       key={item.id}
       onClick={onClick}
     >
       {item.iconUrl ? (
-        <Image src={item.iconUrl} width={18} height={18} alt="hey" />
+        <Image src={item.iconUrl} width={18} height={18} alt="logo_url" />
       ) : (
         <Icon color="primary" size="normal" name="brain" />
       )}
-      {item.label}
+      <span className={styles.brain_name}>{item.label}</span>
     </span>
   );
 };

@@ -29,7 +29,7 @@ export const MentionList = forwardRef<MentionListRef, MentionListProps>(
 
     return (
       <div className={styles.mentions_list_wrapper} onClick={handleClick}>
-        <div>
+        <div className={styles.mentions_list}>
           {props.suggestionData.items.map((item, index) => (
             <MentionItem
               key={item.id}
