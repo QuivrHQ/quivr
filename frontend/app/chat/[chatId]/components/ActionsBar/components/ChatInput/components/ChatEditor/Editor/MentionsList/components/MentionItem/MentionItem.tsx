@@ -2,7 +2,7 @@ import { cn } from "@/lib/utils";
 
 import { useMentionItemIcon } from "./hooks/useMentionItemIcon";
 
-import { SuggestionDataType, SuggestionItem } from "../../../../types";
+import { SuggestionDataType, SuggestionItem } from "../../../types";
 
 type MentionItemProps = {
   item: SuggestionItem;

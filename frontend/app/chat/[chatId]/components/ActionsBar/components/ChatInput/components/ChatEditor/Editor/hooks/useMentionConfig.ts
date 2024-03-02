@@ -5,11 +5,8 @@ import { SuggestionOptions } from "@tiptap/suggestion";
 import { RefAttributes, useMemo } from "react";
 import tippy, { Instance } from "tippy.js";
 
-import {
-  MentionList,
-  MentionListRef,
-} from "../components/MentionsList/MentionsList";
-import { MentionListProps } from "../components/MentionsList/types";
+import { MentionList, MentionListRef } from "../MentionsList/MentionsList";
+import { MentionListProps } from "../MentionsList/types";
 import { SuggestionData, SuggestionItem } from "../types";
 
 type UseMentionConfigProps = {
