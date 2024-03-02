@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 import styles from "./MentionItem.module.scss";
 import { useMentionItemIcon } from "./hooks/useMentionItemIcon";
 
@@ -23,6 +25,7 @@ export const MentionItem = ({
       key={item.id}
       onClick={onClick}
     >
+      {item.iconUrl && <Image src={item.iconUrl} width={20} alt="hey" />}
       {icon} {item.label}
     </span>
   );

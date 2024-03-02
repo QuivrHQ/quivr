@@ -58,6 +58,7 @@ export const useMentionConfig = ({
               editor: props.editor,
             });
             popup = tippy("body", {
+              zIndex: 1000,
               getReferenceClientRect: () => {
                 const rect = props.clientRect?.();
 
