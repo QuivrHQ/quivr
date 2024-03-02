@@ -1,7 +1,8 @@
 import Image from "next/image";
 
+import Icon from "@/lib/components/ui/Icon/Icon";
+
 import styles from "./MentionItem.module.scss";
-import { useMentionItemIcon } from "./hooks/useMentionItemIcon";
 
 import { SuggestionDataType, SuggestionItem } from "../../types";
 
@@ -15,18 +16,19 @@ type MentionItemProps = {
 export const MentionItem = ({
   item,
   onClick,
-  type,
 }: MentionItemProps): JSX.Element => {
-  const { icon } = useMentionItemIcon({ item, type });
-
   return (
     <span
       className={styles.mention_item_wrapper}
       key={item.id}
       onClick={onClick}
     >
-      {item.iconUrl && <Image src={item.iconUrl} width={20} alt="hey" />}
-      {icon} {item.label}
+      {item.iconUrl ? (
+        <Image src={item.iconUrl} width={18} height={18} alt="hey" />
+      ) : (
+        <Icon color="primary" size="normal" name="brain" />
+      )}
+      {item.label}
     </span>
   );
 };
