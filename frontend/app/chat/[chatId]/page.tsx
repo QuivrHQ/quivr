@@ -25,7 +25,8 @@ const SelectedChatPage = (): JSX.Element => {
   const { getRootProps } = useCustomDropzone();
   const { isMobile } = useDevice();
 
-  const { setShouldDisplayFeedCard } = useKnowledgeToFeedContext();
+  const { setShouldDisplayFeedCard, shouldDisplayFeedCard } =
+    useKnowledgeToFeedContext();
   const { setIsBrainCreationModalOpened } = useBrainCreationContext();
 
   const { currentBrain, setCurrentBrainId } = useBrainContext();
@@ -79,7 +80,10 @@ const SelectedChatPage = (): JSX.Element => {
       <div className={styles.page_header}>
         <PageHeader iconName="chat" label="Chat" buttons={buttons} />
       </div>
-      <div className={styles.chat_page_container} {...getRootProps()}>
+      <div
+        className={styles.chat_page_container}
+        {...(shouldDisplayFeedCard ? {} : getRootProps())}
+      >
         <div
           className={cn(
             "flex flex-col flex-1 items-center justify-stretch w-full h-full overflow-hidden",
