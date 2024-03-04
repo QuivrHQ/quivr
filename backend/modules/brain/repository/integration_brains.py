@@ -97,12 +97,12 @@ class IntegrationBrain(IntegrationBrainInterface):
         return None
 
     def get_integration_brain_by_type_integration(
-        self, integration_name
+        self, name
     ) -> List[IntegrationEntity]:
         response = (
             self.db.table("integrations_user")
             .select("*, integrations ()")
-            .filter("integrations.integration_name", "eq", integration_name)
+            .filter("integrations.name", "eq", name)
             .execute()
         )
         if len(response.data) == 0:

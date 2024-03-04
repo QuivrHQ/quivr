@@ -73,10 +73,10 @@ export type CreateBrainInput = {
 
 export type IntegrationBrains = {
   id: UUID;
-  integration_name: string;
-  integration_logo_url: string;
+  name: string;
+  logo_url: string;
   connections_settings: Record<string, unknown>;
-  integration_type: "custom" | "sync";
+  type: "custom" | "sync" | "doc";
   description: string;
   max_files: number;
 };

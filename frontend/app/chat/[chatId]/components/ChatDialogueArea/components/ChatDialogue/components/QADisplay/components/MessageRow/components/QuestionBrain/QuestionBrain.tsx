@@ -24,7 +24,7 @@ export const QuestionBrain = ({
     if (brainId) {
       try {
         const brain = await getBrain(brainId.toString());
-        setBrainLogoUrl(brain?.integration_description?.integration_logo_url);
+        setBrainLogoUrl(brain?.integration_description?.logo_url);
       } catch (error) {
         console.error(error);
       }

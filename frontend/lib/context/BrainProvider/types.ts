@@ -14,9 +14,9 @@ export type IntegrationDescription = {
   connection_settings?: object;
   description: string;
   id: UUID;
-  integration_logo_url: string;
-  integration_name: string;
-  integration_type: "custom" | "sync";
+  logo_url: string;
+  name: string;
+  type: "custom" | "sync" | "doc";
   max_files: number;
 };
 
@@ -43,7 +43,7 @@ export type MinimalBrainForUser = {
   status: BrainAccessStatus;
   brain_type: BrainType;
   description: string;
-  integration_logo_url?: string;
+  logo_url?: string;
   max_files: number;
 };
 
