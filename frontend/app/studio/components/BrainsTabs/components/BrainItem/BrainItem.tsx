@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 
@@ -76,6 +77,16 @@ export const BrainItem = ({ brain, even }: BrainItemProps): JSX.Element => {
       ${styles.brain_item_wrapper}
       `}
       >
+        {brain.integration_logo_url ? (
+          <Image
+            src={brain.integration_logo_url}
+            alt="logo_image"
+            width={18}
+            height={18}
+          />
+        ) : (
+          <Icon name="brain" size="normal" color="primary" />
+        )}
         <Link
           className={styles.brain_info_wrapper}
           href={`/studio/${brain.id}`}
