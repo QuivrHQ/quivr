@@ -7,6 +7,6 @@
   margin: Spacings.$spacing02;
   display: flex;
   flex-direction: column;
-  gap: Spacings.$spacing02;
+  gap: calc(#{Spacings.$spacing01} + #{Spacings.$spacing02});
   position: relative;
 }

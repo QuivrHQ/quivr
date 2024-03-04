@@ -37,6 +37,10 @@
     }
   }
 
+  .icon_wrapper {
+    visibility: hidden;
+  }
+
   .options_modal {
     position: absolute;
     right: Spacings.$spacing02;
@@ -44,7 +48,7 @@
   }
 
   &:hover {
-    .icons_wrapper {
+    .icon_wrapper {
       visibility: visible;
     }
   }

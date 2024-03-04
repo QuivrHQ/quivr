@@ -13,10 +13,9 @@ export const BrainUsers = ({ brainId }: BrainUsersProps): JSX.Element => {
 
   if (brainUsers.length === 0) {
     return (
-      <MessageInfoBox
-        type="info"
-        content="You're the only user to have access to this brain."
-      />
+      <MessageInfoBox type="info">
+        You are the only user to have access to this brain.
+      </MessageInfoBox>
     );
   }
 

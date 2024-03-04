@@ -33,6 +33,7 @@ export type Brain = {
   brain_type?: BrainType;
   brain_definition?: ApiBrainDefinition;
   integration_description?: IntegrationDescription;
+  max_files?: number;
 };
 
 export type MinimalBrainForUser = {

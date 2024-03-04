@@ -18,7 +18,9 @@ export const CustomBrainList = ({
 
   return (
     <div className={styles.cards_wrapper}>
-      <MessageInfoBox content="More custom brains are coming!" type="info" />
+      <MessageInfoBox type="info">
+        More custom brains are coming!
+      </MessageInfoBox>
       <span className={styles.title}>Choose a custom brain</span>
       <div>
         {customBrainList.map((brain) => {

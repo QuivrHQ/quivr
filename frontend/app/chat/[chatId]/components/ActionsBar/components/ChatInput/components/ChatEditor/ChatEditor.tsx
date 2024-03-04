@@ -1,4 +1,4 @@
-import { Editor } from "./components/Editor/Editor";
+import { Editor } from "./Editor/Editor";
 
 type ChatEditorProps = {
   onSubmit: () => void;
