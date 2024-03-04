@@ -19,7 +19,7 @@ export const AddBrainModal = (): JSX.Element => {
   const {
     isBrainCreationModalOpened,
     setIsBrainCreationModalOpened,
-    setCurrentIntegrationBrain,
+    setCurrentSelectedBrain,
   } = useBrainCreationContext();
 
   const defaultValues: CreateBrainProps = {
@@ -33,7 +33,7 @@ export const AddBrainModal = (): JSX.Element => {
   });
 
   useEffect(() => {
-    setCurrentIntegrationBrain(undefined);
+    setCurrentSelectedBrain(undefined);
   }, [isBrainCreationModalOpened]);
 
   return (

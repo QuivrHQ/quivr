@@ -20,7 +20,7 @@ export const BrainCatalogue = ({
     <div className={styles.cards_wrapper}>
       <MessageInfoBox type="info">More brains are coming!</MessageInfoBox>
       <span className={styles.title}>Choose a brain</span>
-      <div>
+      <div className={styles.brains_grid}>
         {brains.map((brain) => {
           return (
             <div key={brain.id} onClick={() => setCurrentSelectedBrain(brain)}>
