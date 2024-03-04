@@ -101,8 +101,8 @@ class IntegrationBrain(IntegrationBrainInterface):
     ) -> List[IntegrationEntity]:
         response = (
             self.db.table("integrations_user")
-            .select("*, catalogue ()")
-            .filter("catalogue.name", "eq", name)
+            .select("*, integrations ()")
+            .filter("integrations.name", "eq", name)
             .execute()
         )
         if len(response.data) == 0:
@@ -118,7 +118,7 @@ class IntegrationDescription(IntegrationDescriptionInterface):
 
     def get_integration_description(self, integration_id):
         response = (
-            self.db.table("catalogue")
+            self.db.table("integrations")
             .select("*")
             .filter("id", "eq", integration_id)
             .execute()
@@ -143,5 +143,5 @@ class IntegrationDescription(IntegrationDescriptionInterface):
         return self.get_integration_description(integration_id)
 
     def get_all_integration_descriptions(self):
-        response = self.db.table("catalogue").select("*").execute()
+        response = self.db.table("integrations").select("*").execute()
         return [IntegrationDescriptionEntity(**data) for data in response.data]
