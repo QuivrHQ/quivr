@@ -5,6 +5,12 @@
     pointer-events: none;
     height: 0;
 }
+
+.ProseMirror * {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
 .mention {
     display: none;
 }
