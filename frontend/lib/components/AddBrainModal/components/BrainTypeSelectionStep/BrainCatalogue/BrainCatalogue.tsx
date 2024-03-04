@@ -4,26 +4,24 @@ import { IntegrationBrains } from "@/lib/api/brain/types";
 import { MessageInfoBox } from "@/lib/components/ui/MessageInfoBox/MessageInfoBox";
 import Tooltip from "@/lib/components/ui/Tooltip/Tooltip";
 
-import styles from "./CustomBrainList.module.scss";
+import styles from "./BrainCatalogue.module.scss";
 
 import { useBrainCreationContext } from "../../../brainCreation-provider";
 
-export const CustomBrainList = ({
-  customBrainList,
+export const BrainCatalogue = ({
+  brains,
 }: {
-  customBrainList: IntegrationBrains[];
+  brains: IntegrationBrains[];
 }): JSX.Element => {
   const { setCurrentIntegrationBrain, currentIntegrationBrain } =
     useBrainCreationContext();
 
   return (
     <div className={styles.cards_wrapper}>
-      <MessageInfoBox type="info">
-        More custom brains are coming!
-      </MessageInfoBox>
-      <span className={styles.title}>Choose a custom brain</span>
+      <MessageInfoBox type="info">More brains are coming!</MessageInfoBox>
+      <span className={styles.title}>Choose a brain</span>
       <div>
-        {customBrainList.map((brain) => {
+        {brains.map((brain) => {
           return (
             <div
               key={brain.id}
