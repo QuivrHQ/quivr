@@ -24,7 +24,9 @@ export const BrainTypeSelectionStep = (): JSX.Element => {
   useEffect(() => {
     getIntegrationBrains()
       .then((response) => {
-        setCustomBrains(response.filter((brain) => brain.type === "custom"));
+        setCustomBrains(
+          response.filter((brain) => brain.integration_type === "custom")
+        );
       })
       .catch((error) => {
         console.error(error);

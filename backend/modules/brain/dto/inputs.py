@@ -10,7 +10,7 @@ from modules.brain.entity.api_brain_definition_entity import (
 )
 from modules.brain.entity.brain_entity import BrainType
 from modules.brain.entity.integration_brain import IntegrationType
-from pydantic import BaseModel
+from pydantic import BaseModel, Extra
 
 logger = get_logger(__name__)
 
@@ -26,10 +26,10 @@ class CreateApiBrainDefinition(BaseModel, extra="ignore"):
 
 
 class CreateIntegrationBrain(BaseModel, extra="ignore"):
-    name: str
-    logo_url: str
+    integration_name: str
+    integration_logo_url: str
     connection_settings: dict
-    type: IntegrationType
+    integration_type: IntegrationType
     description: str
     max_files: int
 

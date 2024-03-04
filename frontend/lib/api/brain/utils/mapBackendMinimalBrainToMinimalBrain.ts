@@ -12,6 +12,6 @@ export const mapBackendMinimalBrainToMinimalBrain = (
   status: backendMinimalBrain.status,
   brain_type: backendMinimalBrain.brain_type,
   description: backendMinimalBrain.description,
-  logo_url: backendMinimalBrain.logo_url,
+  integration_logo_url: backendMinimalBrain.integration_logo_url,
   max_files: backendMinimalBrain.max_files,
 });

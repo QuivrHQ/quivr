@@ -40,7 +40,6 @@ integration_list = {
     "gpt4": GPT4Brain,
     "sql": SQLBrain,
     "big": BigBrain,
-    "doc": KnowledgeBrainQA,
 }
 
 brain_service = BrainService()
@@ -66,7 +65,6 @@ class BrainfulChat(ChatInterface):
         user_id,
         user_email,
     ):
-        # TODO Legacy to remove once no more brains are type doc but all are integrations type doc
         if brain and brain.brain_type == BrainType.DOC:
             return KnowledgeBrainQA(
                 chat_id=chat_id,
@@ -99,7 +97,9 @@ class BrainfulChat(ChatInterface):
                 brain.brain_id, user_id
             )
 
-            integration_class = integration_list.get(integration_brain.name.lower())
+            integration_class = integration_list.get(
+                integration_brain.integration_name.lower()
+            )
             if integration_class:
                 return integration_class(
                     chat_id=chat_id,

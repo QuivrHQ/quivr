@@ -77,8 +77,13 @@ export const BrainItem = ({ brain, even }: BrainItemProps): JSX.Element => {
       ${styles.brain_item_wrapper}
       `}
       >
-        {brain.logo_url ? (
-          <Image src={brain.logo_url} alt="logo_image" width={18} height={18} />
+        {brain.integration_logo_url ? (
+          <Image
+            src={brain.integration_logo_url}
+            alt="logo_image"
+            width={18}
+            height={18}
+          />
         ) : (
           <Icon name="brain" size="normal" color="primary" />
         )}

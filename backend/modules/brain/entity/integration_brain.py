@@ -8,15 +8,14 @@ from pydantic import BaseModel
 class IntegrationType(str, Enum):
     CUSTOM = "custom"
     SYNC = "sync"
-    DOC = "doc"
 
 
 class IntegrationDescriptionEntity(BaseModel):
     id: UUID
-    name: str
-    logo_url: Optional[str] = None
+    integration_name: str
+    integration_logo_url: Optional[str] = None
     connection_settings: Optional[dict] = None
-    type: IntegrationType
+    integration_type: IntegrationType
     description: str
     max_files: int
 

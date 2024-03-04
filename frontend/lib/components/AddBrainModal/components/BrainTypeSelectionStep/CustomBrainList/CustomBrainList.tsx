@@ -36,12 +36,14 @@ export const CustomBrainList = ({
                   }`}
                 >
                   <Image
-                    src={brain.logo_url}
-                    alt={brain.name}
+                    src={brain.integration_logo_url}
+                    alt={brain.integration_name}
                     width={50}
                     height={50}
                   />
-                  <span className={styles.brain_title}>{brain.name}</span>
+                  <span className={styles.brain_title}>
+                    {brain.integration_name}
+                  </span>
                 </div>
               </Tooltip>
             </div>
