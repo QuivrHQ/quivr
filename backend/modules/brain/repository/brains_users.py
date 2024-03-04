@@ -36,7 +36,7 @@ class BrainsUsers(BrainsUsersInterface):
         response = (
             self.db.from_("brains_users")
             .select(
-                "id:brain_id, rights, brains (brain_id, name, status, brain_type, description, meaning, integrations_user (brain_id, integration_id, integrations (id, name, logo_url, max_files)))"
+                "id:brain_id, rights, brains (brain_id, name, status, brain_type, description, meaning, integrations_user (brain_id, integration_id, catalogue (id, name, logo_url, max_files)))"
             )
             .filter("user_id", "eq", user_id)
             .execute()
@@ -48,9 +48,9 @@ class BrainsUsers(BrainsUsersInterface):
             if item["brains"]["brain_type"] == "integration":
                 if "integrations_user" in item["brains"]:
                     for integration_user in item["brains"]["integrations_user"]:
-                        if "integrations" in integration_user:
-                            logo_url = integration_user["integrations"]["logo_url"]
-                            max_files = integration_user["integrations"]["max_files"]
+                        if "catalogue" in integration_user:
+                            logo_url = integration_user["catalogue"]["logo_url"]
+                            max_files = integration_user["catalogue"]["max_files"]
 
             user_brains.append(
                 MinimalUserBrainEntity(
