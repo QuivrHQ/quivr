@@ -101,12 +101,14 @@ export const ThreadItem = ({
             }
           }}
         >
-          <Icon
-            name={editingName ? "check" : "options"}
-            size="small"
-            color="black"
-            handleHover={true}
-          />
+          <div className={styles.icon_wrapper}>
+            <Icon
+              name={editingName ? "check" : "options"}
+              size="small"
+              color="black"
+              handleHover={true}
+            />
+          </div>
           <div ref={optionsRef} className={styles.options_modal}>
             {optionsOpened && <OptionsModal options={options} />}
           </div>
