@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.0.217 (2024-03-04)
+
+## What's Changed
+* fix(frontend): fix home page redirection by @Zewed in https://github.com/QuivrHQ/quivr/pull/2295
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.216...v0.0.217
+
 ## 0.0.216 (2024-03-04)
 
 ## What's Changed
