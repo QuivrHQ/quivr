@@ -28,6 +28,9 @@ export const useCreateEditorState = (placeholder?: string) => {
       onFocus: () => {
         editor?.commands.focus("end");
       },
+      parseOptions: {
+        preserveWhitespace: "full",
+      },
       extensions: [
         PreventEnter,
         Placeholder.configure({
