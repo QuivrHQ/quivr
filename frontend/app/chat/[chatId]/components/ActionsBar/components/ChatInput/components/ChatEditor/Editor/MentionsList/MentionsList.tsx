@@ -1,14 +1,12 @@
 import { SuggestionKeyDownProps } from "@tiptap/suggestion";
 import { forwardRef } from "react";
-import { FaAngleDoubleDown } from "react-icons/fa";
 
 import { useBrainCreationContext } from "@/lib/components/AddBrainModal/brainCreation-provider";
-import TextButton from "@/lib/components/ui/TextButton/TextButton";
+import QuivrButton from "@/lib/components/ui/QuivrButton/QuivrButton";
 
-import { AddNewPromptButton } from "./components/AddNewPromptButton";
-import { MentionItem } from "./components/MentionItem/MentionItem";
+import { MentionItem } from "./MentionItem/MentionItem";
+import styles from "./MentionsList.module.scss";
 import { useMentionList } from "./hooks/useMentionList";
-import { useSuggestionsOverflowHandler } from "./hooks/useSuggestionsOverflowHandler";
 import { MentionListProps } from "./types";
 
 export type MentionListRef = {
@@ -17,13 +15,11 @@ export type MentionListRef = {
 
 export const MentionList = forwardRef<MentionListRef, MentionListProps>(
   (props, ref) => {
-    const { selectItem, selectedIndex, isBrain, isPrompt } = useMentionList({
+    const { selectItem, selectedIndex, isBrain } = useMentionList({
       ...props,
       ref,
     });
 
-    const { suggestionsRef, shouldShowScrollToBottomIcon, scrollToBottom } =
-      useSuggestionsOverflowHandler();
     const { setIsBrainCreationModalOpened } = useBrainCreationContext();
 
     const handleClick = (event: React.MouseEvent<HTMLDivElement>) => {
@@ -32,14 +28,8 @@ export const MentionList = forwardRef<MentionListRef, MentionListProps>(
     };
 
     return (
-      <div
-        className="items flex flex-1 flex-col p-2 px-4 bg-gray-50 rounded-md shadow-md z-40 max-h-[200px]"
-        onClick={handleClick}
-      >
-        <div
-          className="flex flex-1 flex-col overflow-y-auto"
-          ref={suggestionsRef}
-        >
+      <div className={styles.mentions_list_wrapper} onClick={handleClick}>
+        <div className={styles.mentions_list}>
           {props.suggestionData.items.map((item, index) => (
             <MentionItem
               key={item.id}
@@ -50,23 +40,15 @@ export const MentionList = forwardRef<MentionListRef, MentionListProps>(
             />
           ))}
         </div>
-        <div className="relative flex justify-center items-center py-1">
-          {shouldShowScrollToBottomIcon && (
-            <FaAngleDoubleDown
-              size={20}
-              className="animate-bounce cursor-pointer absolute right-1 top-0 hover:text-primary"
-              onClick={scrollToBottom}
-            />
-          )}
+        <div>
           {isBrain && (
-            <TextButton
+            <QuivrButton
               label="Create Brain"
               iconName="add"
-              color="black"
+              color="primary"
               onClick={() => setIsBrainCreationModalOpened(true)}
             />
           )}
-          {isPrompt && <AddNewPromptButton />}
         </div>
       </div>
     );
