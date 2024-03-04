@@ -2,6 +2,7 @@ from logger import get_logger
 from modules.brain.api_brain_qa import APIBrainQA
 from modules.brain.entity.brain_entity import BrainType, RoleEnum
 from modules.brain.integrations.Big.Brain import BigBrain
+from modules.brain.integrations.GPT3.Brain import GPT3Brain
 from modules.brain.integrations.GPT4.Brain import GPT4Brain
 from modules.brain.integrations.Notion.Brain import NotionBrain
 from modules.brain.integrations.SQL.Brain import SQLBrain
@@ -40,6 +41,7 @@ integration_list = {
     "gpt4": GPT4Brain,
     "sql": SQLBrain,
     "big": BigBrain,
+    "gpt3": GPT3Brain,
 }
 
 brain_service = BrainService()
