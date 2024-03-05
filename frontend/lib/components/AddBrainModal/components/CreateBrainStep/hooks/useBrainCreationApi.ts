@@ -24,11 +24,8 @@ export const useBrainCreationApi = () => {
   const { setKnowledgeToFeed } = useKnowledgeToFeedContext();
   const { createBrain: createBrainApi, setCurrentBrainId } = useBrainContext();
   const { crawlWebsiteHandler, uploadFileHandler } = useKnowledgeToFeedInput();
-  const {
-    setIsBrainCreationModalOpened,
-    setCreating,
-    currentIntegrationBrain,
-  } = useBrainCreationContext();
+  const { setIsBrainCreationModalOpened, setCreating, currentSelectedBrain } =
+    useBrainCreationContext();
 
   const handleFeedBrain = async (brainId: UUID): Promise<void> => {
     const uploadPromises = files.map((file) =>
@@ -44,15 +41,15 @@ export const useBrainCreationApi = () => {
     const { name, description } = getValues();
     let integrationSettings: IntegrationSettings | undefined = undefined;
 
-    if (currentIntegrationBrain) {
+    if (currentSelectedBrain) {
       integrationSettings = {
-        integration_id: currentIntegrationBrain.id,
+        integration_id: currentSelectedBrain.id,
         settings: {},
       };
     }
 
     const createdBrainId = await createBrainApi({
-      brain_type: currentIntegrationBrain ? "integration" : "doc",
+      brain_type: currentSelectedBrain ? "integration" : "doc",
       name,
       description,
       integration: integrationSettings,

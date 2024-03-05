@@ -11,7 +11,7 @@ import { useBrainCreationSteps } from "../../hooks/useBrainCreationSteps";
 export const CreateBrainStep = (): JSX.Element => {
   const { currentStepIndex, goToPreviousStep } = useBrainCreationSteps();
   const { createBrain } = useBrainCreationApi();
-  const { creating, setCreating, currentIntegrationBrain } =
+  const { creating, setCreating, currentSelectedBrain } =
     useBrainCreationContext();
 
   const previous = (): void => {
@@ -29,7 +29,7 @@ export const CreateBrainStep = (): JSX.Element => {
 
   return (
     <div className={styles.brain_knowledge_wrapper}>
-      {!currentIntegrationBrain ? (
+      {currentSelectedBrain?.max_files ? (
         <div>
           <span className={styles.title}>Feed your brain</span>
           <KnowledgeToFeed hideBrainSelector={true} />
