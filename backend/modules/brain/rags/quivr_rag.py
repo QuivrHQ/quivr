@@ -210,13 +210,17 @@ class QuivrRAG(BaseModel):
             | itemgetter("history"),
         )
 
+        api_base = None
+        if self.brain_settings.ollama_api_base_url and self.model.startswith("ollama"):
+            api_base = self.brain_settings.ollama_api_base_url
+
         standalone_question = {
             "standalone_question": {
                 "question": lambda x: x["question"],
                 "chat_history": lambda x: get_buffer_string(x["chat_history"]),
             }
             | CONDENSE_QUESTION_PROMPT
-            | ChatLiteLLM(temperature=0, model=self.model)
+            | ChatLiteLLM(temperature=0, model=self.model, api_base=api_base)
             | StrOutputParser(),
         }
 
@@ -242,7 +246,7 @@ class QuivrRAG(BaseModel):
         answer = {
             "answer": final_inputs
             | ANSWER_PROMPT
-            | ChatLiteLLM(max_tokens=self.max_tokens, model=self.model),
+            | ChatLiteLLM(max_tokens=self.max_tokens, model=self.model, api_base=api_base),
             "docs": itemgetter("docs"),
         }
 

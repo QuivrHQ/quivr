@@ -50,7 +50,11 @@ class SQLBrain(KnowledgeBrainQA, IntegrationBrain):
 
         self.db = SQLDatabase.from_uri(self.sql_connector.credentials["uri"])
 
-        model = ChatLiteLLM(model=self.model)
+        api_base = None
+        if self.brain_settings.ollama_api_base_url and self.model.startswith("ollama"):
+            api_base = self.brain_settings.ollama_api_base_url
+
+        model = ChatLiteLLM(model=self.model, api_base=api_base)
 
         sql_response = (
             RunnablePassthrough.assign(schema=self.get_schema)
