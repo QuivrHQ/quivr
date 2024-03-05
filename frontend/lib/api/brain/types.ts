@@ -53,7 +53,7 @@ export type ApiBrainDefinition = {
 
 export type IntegrationSettings = {
   integration_id?: string;
-  settings?: { [x: string]: object | undefined };
+  settings?: { [x: string]: string | undefined };
 };
 
 export type CreateBrainInput = {

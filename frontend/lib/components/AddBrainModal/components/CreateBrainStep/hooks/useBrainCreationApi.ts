@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { UUID } from "crypto";
+import { useState } from "react";
 import { useFormContext } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 
@@ -26,6 +27,9 @@ export const useBrainCreationApi = () => {
   const { crawlWebsiteHandler, uploadFileHandler } = useKnowledgeToFeedInput();
   const { setIsBrainCreationModalOpened, setCreating, currentSelectedBrain } =
     useBrainCreationContext();
+  const [fields, setFields] = useState<
+    { name: string; type: string; value: string }[]
+  >([]);
 
   const handleFeedBrain = async (brainId: UUID): Promise<void> => {
     const uploadPromises = files.map((file) =>
@@ -44,7 +48,11 @@ export const useBrainCreationApi = () => {
     if (currentSelectedBrain) {
       integrationSettings = {
         integration_id: currentSelectedBrain.id,
-        settings: {},
+        settings: fields.reduce((acc, field) => {
+          acc[field.name] = field.value;
+
+          return acc;
+        }, {} as { [key: string]: string }),
       };
     }
 
@@ -95,5 +103,7 @@ export const useBrainCreationApi = () => {
   return {
     createBrain: mutate,
     isBrainCreationPending,
+    fields,
+    setFields,
   };
 };

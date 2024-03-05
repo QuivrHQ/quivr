@@ -1,8 +1,10 @@
-import { useState } from "react";
+import { capitalCase } from "change-case";
+import { useEffect } from "react";
 
 import { KnowledgeToFeed } from "@/app/chat/[chatId]/components/ActionsBar/components";
 import { MessageInfoBox } from "@/lib/components/ui/MessageInfoBox/MessageInfoBox";
 import QuivrButton from "@/lib/components/ui/QuivrButton/QuivrButton";
+import { TextInput } from "@/lib/components/ui/TextInput/TextInput";
 
 import styles from "./CreateBrainStep.module.scss";
 import { useBrainCreationApi } from "./hooks/useBrainCreationApi";
@@ -11,14 +13,29 @@ import { useBrainCreationContext } from "../../brainCreation-provider";
 import { useBrainCreationSteps } from "../../hooks/useBrainCreationSteps";
 
 export const CreateBrainStep = (): JSX.Element => {
-  const [settingsValues, setSettingsValues] = useState({});
   const { currentStepIndex, goToPreviousStep } = useBrainCreationSteps();
-  const { createBrain } = useBrainCreationApi();
+  const { createBrain, fields, setFields } = useBrainCreationApi();
   const { creating, setCreating, currentSelectedBrain } =
     useBrainCreationContext();
 
+  useEffect(() => {
+    if (currentSelectedBrain?.connection_settings) {
+      const newFields = Object.entries(
+        currentSelectedBrain.connection_settings
+      ).map(([key, type]) => {
+        return { name: key, type, value: "" };
+      });
+      setFields(newFields);
+    }
+  }, [currentSelectedBrain?.connection_settings]);
+
+  const handleInputChange = (name: string, value: string) => {
+    setFields(
+      fields.map((field) => (field.name === name ? { ...field, value } : field))
+    );
+  };
+
   const previous = (): void => {
-    console.info(currentSelectedBrain);
     goToPreviousStep();
   };
 
@@ -27,25 +44,20 @@ export const CreateBrainStep = (): JSX.Element => {
     createBrain();
   };
 
-  const handleInputChange = (key: string, newValue: string) => {
-    setSettingsValues((prevValues) => ({
-      ...prevValues,
-      [key]: newValue,
-    }));
-  };
-
-  if (currentSelectedBrain) {
-    console.info(
-      JSON.parse(JSON.stringify(currentSelectedBrain.connection_settings))
-    );
-  }
-
   if (currentStepIndex !== 2) {
     return <></>;
   }
 
   return (
     <div className={styles.brain_knowledge_wrapper}>
+      {fields.map(({ name, value }) => (
+        <TextInput
+          key={name}
+          inputValue={value}
+          setInputValue={(inputValue) => handleInputChange(name, inputValue)}
+          label={capitalCase(name)}
+        />
+      ))}
       {currentSelectedBrain?.max_files ? (
         <div>
           <span className={styles.title}>Feed your brain</span>
@@ -66,22 +78,6 @@ export const CreateBrainStep = (): JSX.Element => {
               to finish your brain creation.
             </div>
           </MessageInfoBox>
-        </div>
-      )}
-      {currentSelectedBrain?.connections_settings && (
-        <div>
-          {Object.entries(currentSelectedBrain.connections_settings).map(
-            ([key, type]) => (
-              <div key={key}>
-                <label>{key}</label>
-                <input
-                  type={type === "string" ? "text" : "number"}
-                  value={settingsValues[key] || ""}
-                  onChange={(e) => handleInputChange(key, e.target.value)}
-                />
-              </div>
-            )
-          )}
         </div>
       )}
       <div className={styles.buttons_wrapper}>
