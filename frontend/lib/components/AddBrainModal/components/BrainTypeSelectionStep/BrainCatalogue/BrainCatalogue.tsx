@@ -10,8 +10,10 @@ import { useBrainCreationContext } from "../../../brainCreation-provider";
 
 export const BrainCatalogue = ({
   brains,
+  next,
 }: {
   brains: IntegrationBrains[];
+  next: () => void;
 }): JSX.Element => {
   const { setCurrentSelectedBrain, currentSelectedBrain } =
     useBrainCreationContext();
@@ -23,7 +25,13 @@ export const BrainCatalogue = ({
       <div className={styles.brains_grid}>
         {brains.map((brain) => {
           return (
-            <div key={brain.id} onClick={() => setCurrentSelectedBrain(brain)}>
+            <div
+              key={brain.id}
+              onClick={() => {
+                next();
+                setCurrentSelectedBrain(brain);
+              }}
+            >
               <Tooltip tooltip={brain.description}>
                 <div
                   className={`${styles.brain_card_wrapper} ${

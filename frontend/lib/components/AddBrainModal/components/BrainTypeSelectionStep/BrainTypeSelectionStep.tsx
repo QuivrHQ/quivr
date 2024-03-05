@@ -1,18 +1,20 @@
 import { useEffect, useState } from "react";
+import { useFormContext } from "react-hook-form";
 
 import { IntegrationBrains } from "@/lib/api/brain/types";
 import { useBrainApi } from "@/lib/api/brain/useBrainApi";
-import QuivrButton from "@/lib/components/ui/QuivrButton/QuivrButton";
 
 import { BrainCatalogue } from "./BrainCatalogue/BrainCatalogue";
 import styles from "./BrainTypeSelectionStep.module.scss";
 
 import { useBrainCreationSteps } from "../../hooks/useBrainCreationSteps";
+import { CreateBrainProps } from "../../types/types";
 
 export const BrainTypeSelectionStep = (): JSX.Element => {
   const [brains, setBrains] = useState<IntegrationBrains[]>([]);
   const { goToNextStep, currentStepIndex } = useBrainCreationSteps();
   const { getIntegrationBrains } = useBrainApi();
+  const { setValue } = useFormContext<CreateBrainProps>();
 
   useEffect(() => {
     getIntegrationBrains()
@@ -22,11 +24,10 @@ export const BrainTypeSelectionStep = (): JSX.Element => {
       .catch((error) => {
         console.error(error);
       });
-  }, []);
 
-  const next = (): void => {
-    goToNextStep();
-  };
+    setValue("name", "");
+    setValue("description", "");
+  }, []);
 
   if (currentStepIndex !== 0) {
     return <></>;
@@ -35,15 +36,7 @@ export const BrainTypeSelectionStep = (): JSX.Element => {
   return (
     <div className={styles.brain_types_wrapper}>
       <div className={styles.main_wrapper}>
-        <BrainCatalogue brains={brains} />
-      </div>
-      <div className={styles.buttons_wrapper}>
-        <QuivrButton
-          label="Next Step"
-          iconName="chevronRight"
-          color="primary"
-          onClick={() => next()}
-        />
+        <BrainCatalogue brains={brains} next={goToNextStep} />
       </div>
     </div>
   );

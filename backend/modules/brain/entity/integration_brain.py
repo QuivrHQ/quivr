@@ -26,7 +26,7 @@ class IntegrationDescriptionEntity(BaseModel):
     integration_logo_url: Optional[str] = None
     connection_settings: Optional[dict] = None
     integration_type: IntegrationType
-    tags: list[IntegrationBrainTag] = []
+    tags: Optional[list[IntegrationBrainTag]] = []
     information: Optional[str] = None
     description: str
     max_files: int

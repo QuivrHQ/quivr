@@ -29,9 +29,7 @@ export const CreateBrainStep = (): JSX.Element => {
       setFields(newFields);
     }
 
-    if (!currentSelectedBrain?.connection_settings) {
-      setCreateBrainStepIndex(1);
-    }
+    setCreateBrainStepIndex(Number(!currentSelectedBrain?.connection_settings));
   }, [currentSelectedBrain?.connection_settings]);
 
   const handleInputChange = (name: string, value: string) => {
@@ -55,7 +53,7 @@ export const CreateBrainStep = (): JSX.Element => {
 
   return (
     <div className={styles.brain_knowledge_wrapper}>
-      {createBrainStepIndex === 0 &&
+      {createBrainStepIndex === 1 &&
         fields.map(({ name, value }) => (
           <TextInput
             key={name}
