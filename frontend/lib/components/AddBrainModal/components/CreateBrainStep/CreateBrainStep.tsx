@@ -1,5 +1,5 @@
 import { capitalCase } from "change-case";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 import { KnowledgeToFeed } from "@/app/chat/[chatId]/components/ActionsBar/components";
 import { MessageInfoBox } from "@/lib/components/ui/MessageInfoBox/MessageInfoBox";
@@ -17,6 +17,7 @@ export const CreateBrainStep = (): JSX.Element => {
   const { createBrain, fields, setFields } = useBrainCreationApi();
   const { creating, setCreating, currentSelectedBrain } =
     useBrainCreationContext();
+  const [createBrainStepIndex, setCreateBrainStepIndex] = useState<number>(0);
 
   useEffect(() => {
     if (currentSelectedBrain?.connection_settings) {
@@ -26,6 +27,10 @@ export const CreateBrainStep = (): JSX.Element => {
         return { name: key, type, value: "" };
       });
       setFields(newFields);
+    }
+
+    if (!currentSelectedBrain?.connection_settings) {
+      setCreateBrainStepIndex(1);
     }
   }, [currentSelectedBrain?.connection_settings]);
 
@@ -50,15 +55,16 @@ export const CreateBrainStep = (): JSX.Element => {
 
   return (
     <div className={styles.brain_knowledge_wrapper}>
-      {fields.map(({ name, value }) => (
-        <TextInput
-          key={name}
-          inputValue={value}
-          setInputValue={(inputValue) => handleInputChange(name, inputValue)}
-          label={capitalCase(name)}
-        />
-      ))}
-      {currentSelectedBrain?.max_files ? (
+      {createBrainStepIndex === 0 &&
+        fields.map(({ name, value }) => (
+          <TextInput
+            key={name}
+            inputValue={value}
+            setInputValue={(inputValue) => handleInputChange(name, inputValue)}
+            label={capitalCase(name)}
+          />
+        ))}
+      {currentSelectedBrain?.max_files && createBrainStepIndex ? (
         <div>
           <span className={styles.title}>Feed your brain</span>
           <KnowledgeToFeed hideBrainSelector={true} />

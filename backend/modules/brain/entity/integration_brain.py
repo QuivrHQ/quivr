@@ -10,6 +10,15 @@ class IntegrationType(str, Enum):
     SYNC = "sync"
     DOC = "doc"
 
+class IntegrationBrainTag(str, Enum):
+    NEW = "new"
+    RECOMMENDED = "recommended"
+    MOST_POPULAR = "most_popular"
+    PREMIUM = "premium"
+    COMING_SOON = "coming_soon"
+    COMMUNITY = "community"
+    DEPRECATED = "deprecated"
+
 
 class IntegrationDescriptionEntity(BaseModel):
     id: UUID
@@ -17,6 +26,8 @@ class IntegrationDescriptionEntity(BaseModel):
     integration_logo_url: Optional[str] = None
     connection_settings: Optional[dict] = None
     integration_type: IntegrationType
+    tags: list[IntegrationBrainTag] = []
+    information: Optional[str] = None
     description: str
     max_files: int
 
