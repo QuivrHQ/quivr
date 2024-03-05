@@ -8,6 +8,7 @@ from pydantic import BaseModel
 class IntegrationType(str, Enum):
     CUSTOM = "custom"
     SYNC = "sync"
+    DOC = "doc"
 
 
 class IntegrationDescriptionEntity(BaseModel):

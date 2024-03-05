@@ -40,6 +40,7 @@ integration_list = {
     "gpt4": GPT4Brain,
     "sql": SQLBrain,
     "big": BigBrain,
+    "doc": KnowledgeBrainQA,
 }
 
 brain_service = BrainService()
