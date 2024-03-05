@@ -1,3 +1,5 @@
+import { useState } from "react";
+
 import { KnowledgeToFeed } from "@/app/chat/[chatId]/components/ActionsBar/components";
 import { MessageInfoBox } from "@/lib/components/ui/MessageInfoBox/MessageInfoBox";
 import QuivrButton from "@/lib/components/ui/QuivrButton/QuivrButton";
@@ -9,6 +11,7 @@ import { useBrainCreationContext } from "../../brainCreation-provider";
 import { useBrainCreationSteps } from "../../hooks/useBrainCreationSteps";
 
 export const CreateBrainStep = (): JSX.Element => {
+  const [settingsValues, setSettingsValues] = useState({});
   const { currentStepIndex, goToPreviousStep } = useBrainCreationSteps();
   const { createBrain } = useBrainCreationApi();
   const { creating, setCreating, currentSelectedBrain } =
@@ -24,7 +27,18 @@ export const CreateBrainStep = (): JSX.Element => {
     createBrain();
   };
 
-  console.info(currentSelectedBrain);
+  const handleInputChange = (key: string, newValue: string) => {
+    setSettingsValues((prevValues) => ({
+      ...prevValues,
+      [key]: newValue,
+    }));
+  };
+
+  if (currentSelectedBrain) {
+    console.info(
+      JSON.parse(JSON.stringify(currentSelectedBrain.connection_settings))
+    );
+  }
 
   if (currentStepIndex !== 2) {
     return <></>;
@@ -52,6 +66,22 @@ export const CreateBrainStep = (): JSX.Element => {
               to finish your brain creation.
             </div>
           </MessageInfoBox>
+        </div>
+      )}
+      {currentSelectedBrain?.connections_settings && (
+        <div>
+          {Object.entries(currentSelectedBrain.connections_settings).map(
+            ([key, type]) => (
+              <div key={key}>
+                <label>{key}</label>
+                <input
+                  type={type === "string" ? "text" : "number"}
+                  value={settingsValues[key] || ""}
+                  onChange={(e) => handleInputChange(key, e.target.value)}
+                />
+              </div>
+            )
+          )}
         </div>
       )}
       <div className={styles.buttons_wrapper}>
