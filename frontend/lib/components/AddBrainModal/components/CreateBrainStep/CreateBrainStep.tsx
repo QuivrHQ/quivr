@@ -15,6 +15,7 @@ export const CreateBrainStep = (): JSX.Element => {
     useBrainCreationContext();
 
   const previous = (): void => {
+    console.info(currentSelectedBrain);
     goToPreviousStep();
   };
 
@@ -22,6 +23,8 @@ export const CreateBrainStep = (): JSX.Element => {
     setCreating(true);
     createBrain();
   };
+
+  console.info(currentSelectedBrain);
 
   if (currentStepIndex !== 2) {
     return <></>;
