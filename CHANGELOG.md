@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.0.218 (2024-03-05)
+
+## What's Changed
+* feat: doc as integration by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2297
+* fix(rag): add api_base by @niels-garve in https://github.com/QuivrHQ/quivr/pull/2289
+* fix(frontend): login bug by @Zewed in https://github.com/QuivrHQ/quivr/pull/2300
+
+## New Contributors
+* @niels-garve made their first contribution in https://github.com/QuivrHQ/quivr/pull/2289
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.217...v0.0.218
+
 ## 0.0.217 (2024-03-04)
 
 ## What's Changed
