@@ -1,5 +1,29 @@
 # Changelog
 
+## 0.0.217 (2024-03-04)
+
+## What's Changed
+* fix(frontend): fix home page redirection by @Zewed in https://github.com/QuivrHQ/quivr/pull/2295
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.216...v0.0.217
+
+## 0.0.216 (2024-03-04)
+
+## What's Changed
+* feat: Update chunk_size in File model by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2281
+* fix(frontend): double file upload on drag and drop by @Zewed in https://github.com/QuivrHQ/quivr/pull/2284
+* fix(frontend): click anywhere on drop zone to upload file by @Zewed in https://github.com/QuivrHQ/quivr/pull/2285
+* fix(frontend): smalls on thread section by @Zewed in https://github.com/QuivrHQ/quivr/pull/2286
+* fix(frontend): remove tests by @Zewed in https://github.com/QuivrHQ/quivr/pull/2287
+* feat(frontend): better UI/UX on select brain by @Zewed in https://github.com/QuivrHQ/quivr/pull/2288
+* feat(frontend): add brain icon on brain list by @Zewed in https://github.com/QuivrHQ/quivr/pull/2292
+* fix(frontend): whitespace on firefox by @Zewed in https://github.com/QuivrHQ/quivr/pull/2293
+* fix(frontend): remove unused stuff by @Zewed in https://github.com/QuivrHQ/quivr/pull/2282
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.215...v0.0.216
+
 ## 0.0.215 (2024-03-01)
 
 ## What's Changed

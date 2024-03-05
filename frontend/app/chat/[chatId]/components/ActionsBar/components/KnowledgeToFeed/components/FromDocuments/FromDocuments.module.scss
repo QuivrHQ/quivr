@@ -14,6 +14,7 @@
   border: 1px dashed Colors.$lighter-grey;
   border-radius: Radius.$big;
   box-sizing: border-box;
+  cursor: pointer;
 
   &.dragging {
     border: 3px dashed Colors.$accent;
@@ -30,7 +31,6 @@
     }
 
     .clickable {
-      cursor: pointer;
       font-weight: bold;
     }
   }

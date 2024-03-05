@@ -25,9 +25,10 @@ export const FromDocuments = (): JSX.Element => {
       onDragOver={() => setDragging(true)}
       onDragLeave={() => setDragging(false)}
       onMouseLeave={() => setDragging(false)}
+      onClick={open}
     >
       <Icon name="upload" size="big" color={dragging ? "accent" : "black"} />
-      <div className={styles.input} onClick={open}>
+      <div className={styles.input}>
         <div className={styles.clickable}>
           <span>Choose files</span>
           <input {...getInputProps()} />
