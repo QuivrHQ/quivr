@@ -41,7 +41,7 @@ export const MessageContent = ({
   const { logs, cleanedText } = extractLog(text);
 
   return (
-    <div data-testid="chat-message-text">
+    <div data-testid="thread-message-text">
       {isLog && showLog && logs.length > 0 && (
         <div className="text-xs text-white p-2 rounded">
           <ReactMarkdown>{logs}</ReactMarkdown>

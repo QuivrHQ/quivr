@@ -2,21 +2,21 @@ import { useThreadContext } from "@/lib/context";
 import { useOnboarding } from "@/lib/hooks/useOnboarding";
 
 import { ThreadDialogue } from "./components/ThreadDialogue";
-import { getMergedThreadMessagesWithDoneStatusNotificationsReduced } from "./utils/getMergedThreadMessagesWithDoneStatusNotificationsReduced";
+import { getMergedThreadMessagesWithDoneStatusNotificationsReduced } from "./utils/getMergedChatMessagesWithDoneStatusNotificationsReduced";
 
 export const ThreadDialogueArea = (): JSX.Element => {
   const { messages, notifications } = useThreadContext();
 
-  const chatItems = getMergedThreadMessagesWithDoneStatusNotificationsReduced(
+  const threadItems = getMergedThreadMessagesWithDoneStatusNotificationsReduced(
     messages,
     notifications
   );
   const { isOnboarding } = useOnboarding();
 
-  const shouldDisplayShortcuts = chatItems.length === 0 && !isOnboarding;
+  const shouldDisplayShortcuts = threadItems.length === 0 && !isOnboarding;
 
   if (!shouldDisplayShortcuts) {
-    return <ThreadDialogue chatItems={chatItems} />;
+    return <ThreadDialogue threadItems={threadItems} />;
   }
 
   return <></>;

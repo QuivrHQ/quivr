@@ -11,7 +11,7 @@ import { stepsContainerStyle } from "./styles";
 import { MessageRow } from "../QADisplay";
 
 export const Onboarding = (): JSX.Element => {
-  const { t } = useTranslation(["chat"]);
+  const { t } = useTranslation(["thread"]);
   const title = t("onboarding.title");
   const step1 = t("onboarding.step_1_1");
   const step1Details = t("onboarding.step_1_2");
