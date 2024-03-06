@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
-import { useChatApi } from "@/lib/api/chat/useChatApi";
+import { useThreadApi } from "@/lib/api/thread/useThreadApi";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 import { useKnowledgeToFeedContext } from "@/lib/context/KnowledgeToFeedProvider/hooks/useKnowledgeToFeedContext";
 import { useToast } from "@/lib/hooks";
@@ -26,7 +26,7 @@ export const useFeedBrain = ({
   const [hasPendingRequests, setHasPendingRequests] = useState(false);
   const { handleFeedBrain } = useFeedBrainHandler();
 
-  const { createChat, deleteChat } = useChatApi();
+  const { createThread, deleteThread } = useThreadApi();
 
   const feedBrain = async (): Promise<void> => {
     brainId ??= currentBrainId ?? undefined;
@@ -48,8 +48,8 @@ export const useFeedBrain = ({
       return;
     }
 
-    //TODO: Modify backend archi to avoid creating a chat for each feed action
-    const currentChatId = (await createChat("New Chat")).chat_id;
+    //TODO: Modify backend archi to avoid creating a thread for each feed action
+    const currentThreadId = (await createThread("New Thread")).thread_id;
 
     try {
       dispatchHasPendingRequests?.();
@@ -58,7 +58,7 @@ export const useFeedBrain = ({
       setShouldDisplayFeedCard(false);
       await handleFeedBrain({
         brainId,
-        chatId: currentChatId,
+        threadId: currentThreadId,
       });
 
       setKnowledgeToFeed([]);
@@ -69,7 +69,7 @@ export const useFeedBrain = ({
       });
     } finally {
       setHasPendingRequests(false);
-      await deleteChat(currentChatId);
+      await deleteThread(currentThreadId);
     }
   };
 

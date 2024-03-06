@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { FoldableSection } from "@/lib/components/ui/FoldableSection/FoldableSection";
-import { useChatsContext } from "@/lib/context/ChatsProvider/hooks/useChatsContext";
+import { useThreadsContext } from "@/lib/context/ThreadsProvider/hooks/useChatsContext";
 
 import styles from "./ThreadsButton.module.scss";
 import { ThreadsSection } from "./ThreadsSection/ThreadsSection";
@@ -11,18 +11,18 @@ import { isWithinLast30Days, isWithinLast7Days, isYesterday } from "./utils";
 
 export const ThreadsButton = (): JSX.Element => {
   const [canScrollDown, setCanScrollDown] = useState<boolean>(false);
-  const { allChats } = useChatsContext();
-  const { t } = useTranslation("chat");
-  const todayChats = allChats.filter((chat) =>
+  const { allThreads } = useThreadsContext();
+  const { t } = useTranslation("thread");
+  const todayThreads = allThreads.filter((chat) =>
     isToday(new Date(chat.creation_time))
   );
-  const yesterdayChats = allChats.filter((chat) =>
+  const yesterdayThreads = allThreads.filter((chat) =>
     isYesterday(new Date(chat.creation_time))
   );
-  const last7DaysChats = allChats.filter((chat) =>
+  const last7DaysThreads = allThreads.filter((chat) =>
     isWithinLast7Days(new Date(chat.creation_time))
   );
-  const last30DaysChats = allChats.filter((chat) =>
+  const last30DaysThreads = allThreads.filter((chat) =>
     isWithinLast30Days(new Date(chat.creation_time))
   );
 
@@ -45,7 +45,7 @@ export const ThreadsButton = (): JSX.Element => {
     wrapper?.addEventListener("scroll", handleScroll);
 
     return () => wrapper?.removeEventListener("scroll", handleScroll);
-  }, [allChats]);
+  }, [allThreads]);
 
   return (
     <FoldableSection
@@ -60,10 +60,10 @@ export const ThreadsButton = (): JSX.Element => {
         ${canScrollDown ? styles.fade_out : ""}
         `}
       >
-        <ThreadsSection chats={todayChats} title={t("today")} />
-        <ThreadsSection chats={yesterdayChats} title={t("yesterday")} />
-        <ThreadsSection chats={last7DaysChats} title={t("last7Days")} />
-        <ThreadsSection chats={last30DaysChats} title={t("last30Days")} />
+        <ThreadsSection chats={todayThreads} title={t("today")} />
+        <ThreadsSection chats={yesterdayThreads} title={t("yesterday")} />
+        <ThreadsSection chats={last7DaysThreads} title={t("last7Days")} />
+        <ThreadsSection chats={last30DaysThreads} title={t("last30Days")} />
       </div>
     </FoldableSection>
   );

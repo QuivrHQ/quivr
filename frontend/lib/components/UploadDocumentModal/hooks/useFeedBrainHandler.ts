@@ -6,7 +6,7 @@ import { useOnboarding } from "@/lib/hooks/useOnboarding";
 
 type FeedBrainProps = {
   brainId: UUID;
-  chatId: UUID;
+  threadId: UUID;
 };
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const useFeedBrainHandler = () => {
@@ -24,13 +24,13 @@ export const useFeedBrainHandler = () => {
 
   const handleFeedBrain = async ({
     brainId,
-    chatId,
+    threadId,
   }: FeedBrainProps): Promise<void> => {
     const uploadPromises = files.map((file) =>
-      uploadFileHandler(file, brainId, chatId)
+      uploadFileHandler(file, brainId, threadId)
     );
     const crawlPromises = urls.map((url) =>
-      crawlWebsiteHandler(url, brainId, chatId)
+      crawlWebsiteHandler(url, brainId, threadId)
     );
 
     await Promise.all([

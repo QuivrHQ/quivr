@@ -93,7 +93,7 @@ export const useInvitation = () => {
       }
     } finally {
       setIsProcessingRequest(false);
-      void router.push("/chat");
+      void router.push("/thread");
     }
   };
 
@@ -124,7 +124,7 @@ export const useInvitation = () => {
       }
     } finally {
       setIsProcessingRequest(false);
-      void router.push("/chat");
+      void router.push("/thread");
     }
   };
 

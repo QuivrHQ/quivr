@@ -1,7 +1,7 @@
 import {
   FeedItemCrawlType,
   FeedItemUploadType,
-} from "@/app/chat/[chatId]/components/ActionsBar/types";
+} from "@/app/thread/[threadId]/components/ActionsBar/types";
 import { useKnowledgeToFeedContext } from "@/lib/context/KnowledgeToFeedProvider/hooks/useKnowledgeToFeedContext";
 
 type UseKnowledgeToFeed = {

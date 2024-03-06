@@ -15,7 +15,7 @@ export const useKnowledgeToFeedInput = () => {
   const { crawlWebsiteUrl } = useCrawlApi();
 
   const crawlWebsiteHandler = useCallback(
-    async (url: string, brainId: UUID, chat_id?: UUID) => {
+    async (url: string, brainId: UUID, thread_id?: UUID) => {
       // Configure parameters
       const config = {
         url: url,
@@ -29,7 +29,7 @@ export const useKnowledgeToFeedInput = () => {
         await crawlWebsiteUrl({
           brainId,
           config,
-          chat_id,
+          thread_id,
         });
       } catch (error: unknown) {
         const errorParams = getAxiosErrorParams(error);
@@ -54,14 +54,14 @@ export const useKnowledgeToFeedInput = () => {
   );
 
   const uploadFileHandler = useCallback(
-    async (file: File, brainId: UUID, chat_id?: UUID) => {
+    async (file: File, brainId: UUID, thread_id?: UUID) => {
       const formData = new FormData();
       formData.append("uploadFile", file);
       try {
         await uploadFile({
           brainId,
           formData,
-          chat_id,
+          thread_id,
         });
       } catch (e: unknown) {
         const errorParams = getAxiosErrorParams(e);

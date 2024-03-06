@@ -1,14 +1,14 @@
-import { ChatEntity } from "@/app/chat/[chatId]/types";
+import { ThreadEntity } from "@/app/thread/[threadId]/types";
 
 import { ThreadItem } from "./ThreadItem/ThreadItem";
 import styles from "./ThreadsSection.module.scss";
 
-type ChatSectionProps = {
-  chats: ChatEntity[];
+type ThreadSectionProps = {
+  chats: ThreadEntity[];
   title: string;
 };
 
-export const ThreadsSection = (props: ChatSectionProps): JSX.Element => {
+export const ThreadsSection = (props: ThreadSectionProps): JSX.Element => {
   if (props.chats.length === 0) {
     return <></>;
   }

@@ -1,4 +1,4 @@
-import { KnowledgeToFeed } from "@/app/chat/[chatId]/components/ActionsBar/components";
+import { KnowledgeToFeed } from "@/app/thread/[threadId]/components/ActionsBar/components";
 import { MessageInfoBox } from "@/lib/components/ui/MessageInfoBox/MessageInfoBox";
 import QuivrButton from "@/lib/components/ui/QuivrButton/QuivrButton";
 

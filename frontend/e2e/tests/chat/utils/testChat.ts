@@ -2,7 +2,7 @@ import { Page } from "@playwright/test";
 
 import { getEditor } from "./getEditor";
 
-export const testChat = async (page: Page): Promise<void> => {
+export const testThread = async (page: Page): Promise<void> => {
   const randomMessage = Math.random().toString(36).substring(7);
 
   const editor = getEditor(page);
@@ -12,7 +12,7 @@ export const testChat = async (page: Page): Promise<void> => {
   await page.getByTestId("submit-button").click();
 
   await page
-    .getByTestId("chat-message-text")
+    .getByTestId("thread-message-text")
     .getByText(`${randomMessage}`)
     .isVisible();
 };

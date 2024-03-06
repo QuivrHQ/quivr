@@ -1,6 +1,6 @@
 import { useContext } from "react";
 
-import { FeedItemType } from "@/app/chat/[chatId]/components/ActionsBar/types";
+import { FeedItemType } from "@/app/thread/[threadId]/components/ActionsBar/types";
 
 import { KnowledgeToFeedContext } from "../knowledgeToFeed-provider";
 

@@ -1,7 +1,6 @@
 /* eslint-disable max-lines */
 // import all namespaces English
 import brain_en from "../../../public/locales/en/brain.json";
-import chat_en from "../../../public/locales/en/chat.json";
 import config_en from "../../../public/locales/en/config.json";
 import contact_en from "../../../public/locales/en/contact.json";
 import delete_brain_en from "../../../public/locales/en/deleteOrUnsubscribeFromBrain.json";
@@ -13,12 +12,12 @@ import knowlegde_en from "../../../public/locales/en/knowledge.json";
 import login_en from "../../../public/locales/en/login.json";
 import logout_en from "../../../public/locales/en/logout.json";
 import monetization_en from "../../../public/locales/en/monetization.json";
+import thread_en from "../../../public/locales/en/thread.json";
 import translation_en from "../../../public/locales/en/translation.json";
 import upload_en from "../../../public/locales/en/upload.json";
 import user_en from "../../../public/locales/en/user.json";
 // import all namespaces Spanish
 import brain_es from "../../../public/locales/es/brain.json";
-import chat_es from "../../../public/locales/es/chat.json";
 import config_es from "../../../public/locales/es/config.json";
 import contact_es from "../../../public/locales/es/contact.json";
 import delete_brain_es from "../../../public/locales/es/deleteOrUnsubscribeFromBrain.json";
@@ -30,12 +29,12 @@ import knowlegde_es from "../../../public/locales/es/knowledge.json";
 import login_es from "../../../public/locales/es/login.json";
 import logout_es from "../../../public/locales/es/logout.json";
 import monetization_es from "../../../public/locales/es/monetization.json";
+import thread_es from "../../../public/locales/es/thread.json";
 import translation_es from "../../../public/locales/es/translation.json";
 import upload_es from "../../../public/locales/es/upload.json";
 import user_es from "../../../public/locales/es/user.json";
 // import all namespaces French
 import brain_fr from "../../../public/locales/fr/brain.json";
-import chat_fr from "../../../public/locales/fr/chat.json";
 import config_fr from "../../../public/locales/fr/config.json";
 import contact_fr from "../../../public/locales/fr/contact.json";
 import delete_brain_fr from "../../../public/locales/fr/deleteOrUnsubscribeFromBrain.json";
@@ -47,12 +46,12 @@ import knowlegde_fr from "../../../public/locales/fr/knowledge.json";
 import login_fr from "../../../public/locales/fr/login.json";
 import logout_fr from "../../../public/locales/fr/logout.json";
 import monetization_fr from "../../../public/locales/fr/monetization.json";
+import thread_fr from "../../../public/locales/fr/thread.json";
 import translation_fr from "../../../public/locales/fr/translation.json";
 import upload_fr from "../../../public/locales/fr/upload.json";
 import user_fr from "../../../public/locales/fr/user.json";
 // import all namespaces Portuguese
 import brain_ptbr from "../../../public/locales/pt-br/brain.json";
-import chat_ptbr from "../../../public/locales/pt-br/chat.json";
 import config_ptbr from "../../../public/locales/pt-br/config.json";
 import contact_ptbr from "../../../public/locales/pt-br/contact.json";
 import delete_brain_ptbr from "../../../public/locales/pt-br/deleteOrUnsubscribeFromBrain.json";
@@ -64,12 +63,12 @@ import knowlegde_ptbr from "../../../public/locales/pt-br/knowledge.json";
 import login_ptbr from "../../../public/locales/pt-br/login.json";
 import logout_ptbr from "../../../public/locales/pt-br/logout.json";
 import monetization_ptbr from "../../../public/locales/pt-br/monetization.json";
+import thread_ptbr from "../../../public/locales/pt-br/thread.json";
 import translation_ptbr from "../../../public/locales/pt-br/translation.json";
 import upload_ptbr from "../../../public/locales/pt-br/upload.json";
 import user_ptbr from "../../../public/locales/pt-br/user.json";
 // import all namespaces Russian
 import brain_ru from "../../../public/locales/ru/brain.json";
-import chat_ru from "../../../public/locales/ru/chat.json";
 import config_ru from "../../../public/locales/ru/config.json";
 import contact_ru from "../../../public/locales/ru/contact.json";
 import delete_brain_ru from "../../../public/locales/ru/deleteOrUnsubscribeFromBrain.json";
@@ -81,12 +80,12 @@ import knowlegde_ru from "../../../public/locales/ru/knowledge.json";
 import login_ru from "../../../public/locales/ru/login.json";
 import logout_ru from "../../../public/locales/ru/logout.json";
 import monetization_ru from "../../../public/locales/ru/monetization.json";
+import thread_ru from "../../../public/locales/ru/thread.json";
 import translation_ru from "../../../public/locales/ru/translation.json";
 import upload_ru from "../../../public/locales/ru/upload.json";
 import user_ru from "../../../public/locales/ru/user.json";
 // import all namespaces Simplified Chinese
 import brain_zh_cn from "../../../public/locales/zh-cn/brain.json";
-import chat_zh_cn from "../../../public/locales/zh-cn/chat.json";
 import config_zh_cn from "../../../public/locales/zh-cn/config.json";
 import contact_zh_cn from "../../../public/locales/zh-cn/contact.json";
 import delete_brain_zh_cn from "../../../public/locales/zh-cn/deleteOrUnsubscribeFromBrain.json";
@@ -98,6 +97,7 @@ import knowlegde_zh_cn from "../../../public/locales/zh-cn/knowledge.json";
 import login_zh_cn from "../../../public/locales/zh-cn/login.json";
 import logout_zh_cn from "../../../public/locales/zh-cn/logout.json";
 import monetization_zh_cn from "../../../public/locales/zh-cn/monetization.json";
+import thread_zh_cn from "../../../public/locales/zh-cn/thread.json";
 import translation_zh_cn from "../../../public/locales/zh-cn/translation.json";
 import upload_zh_cn from "../../../public/locales/zh-cn/upload.json";
 import user_zh_cn from "../../../public/locales/zh-cn/user.json";
@@ -105,7 +105,7 @@ import user_zh_cn from "../../../public/locales/zh-cn/user.json";
 //type all translations
 export type Translations = {
   brain: typeof import("../../../public/locales/en/brain.json");
-  chat: typeof import("../../../public/locales/en/chat.json");
+  thread: typeof import("../../../public/locales/en/thread.json");
   config: typeof import("../../../public/locales/en/config.json");
   contact: typeof import("../../../public/locales/en/contact.json");
   delete_or_unsubscribe_from_brain: typeof import("../../../public/locales/en/deleteOrUnsubscribeFromBrain.json");
@@ -135,7 +135,7 @@ export const defaultNS = "translation";
 export const resources: Record<SupportedLanguages, Translations> = {
   en: {
     brain: brain_en,
-    chat: chat_en,
+    thread: thread_en,
     config: config_en,
     contact: contact_en,
     explore: explore_en,
@@ -153,7 +153,7 @@ export const resources: Record<SupportedLanguages, Translations> = {
   },
   es: {
     brain: brain_es,
-    chat: chat_es,
+    thread: thread_es,
     config: config_es,
     contact: contact_es,
     explore: explore_es,
@@ -171,7 +171,7 @@ export const resources: Record<SupportedLanguages, Translations> = {
   },
   fr: {
     brain: brain_fr,
-    chat: chat_fr,
+    thread: thread_fr,
     config: config_fr,
     contact: contact_fr,
     explore: explore_fr,
@@ -189,7 +189,7 @@ export const resources: Record<SupportedLanguages, Translations> = {
   },
   ptbr: {
     brain: brain_ptbr,
-    chat: chat_ptbr,
+    thread: thread_ptbr,
     config: config_ptbr,
     contact: contact_ptbr,
     explore: explore_ptbr,
@@ -207,7 +207,7 @@ export const resources: Record<SupportedLanguages, Translations> = {
   },
   ru: {
     brain: brain_ru,
-    chat: chat_ru,
+    thread: thread_ru,
     config: config_ru,
     contact: contact_ru,
     explore: explore_ru,
@@ -225,7 +225,7 @@ export const resources: Record<SupportedLanguages, Translations> = {
   },
   zh_cn: {
     brain: brain_zh_cn,
-    chat: chat_zh_cn,
+    thread: thread_zh_cn,
     config: config_zh_cn,
     contact: contact_zh_cn,
     explore: explore_zh_cn,

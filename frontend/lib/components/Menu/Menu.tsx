@@ -2,8 +2,8 @@ import { MotionConfig } from "framer-motion";
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 
-import { MenuControlButton } from "@/app/chat/[chatId]/components/ActionsBar/components/ChatInput/components/MenuControlButton/MenuControlButton";
-import { useChatsList } from "@/app/chat/[chatId]/hooks/useChatsList";
+import { MenuControlButton } from "@/app/thread/[threadId]/components/ActionsBar/components/ThreadInput/components/MenuControlButton/MenuControlButton";
+import { useThreadsList } from "@/app/thread/[threadId]/hooks/useThreadsList";
 import { QuivrLogo } from "@/lib/assets/QuivrLogo";
 import { nonProtectedPaths } from "@/lib/config/routesConfig";
 import { useMenuContext } from "@/lib/context/MenuProvider/hooks/useMenuContext";
@@ -23,7 +23,7 @@ export const Menu = (): JSX.Element => {
   const pathname = usePathname() ?? "";
   const [isLogoHovered, setIsLogoHovered] = useState<boolean>(false);
 
-  useChatsList();
+  useThreadsList();
 
   if (nonProtectedPaths.includes(pathname)) {
     return <></>;

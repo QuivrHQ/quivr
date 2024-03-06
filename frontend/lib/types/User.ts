@@ -8,7 +8,7 @@ export interface UserStats {
   email: string;
   max_brain_size: number;
   current_brain_size: number;
-  monthly_chat_credit: number;
+  monthly_thread_credit: number;
   requests_stats: RequestStat[];
   date: string;
   models: string[];

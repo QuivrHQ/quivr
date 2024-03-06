@@ -1,18 +1,18 @@
 import { test } from "@playwright/test";
 
-import { testChat } from "./utils/testChat";
-import { testDeleteChats } from "./utils/testDeleteChats";
+import { testDeleteThreads } from "./utils/testDeleteThreads";
 import { testSelectBrain } from "./utils/testSelectBrain";
-import { testUnplugChat } from "./utils/testUnplugChat";
+import { testThread } from "./utils/testThread";
+import { testUnplugThread } from "./utils/testUnplugThread";
 
 import { login } from "../../utils/login";
 
-export const chatTests = (): void => {
-  test("chat", async ({ page }) => {
+export const threadTests = (): void => {
+  test("thread", async ({ page }) => {
     await login(page);
-    await testChat(page);
-    await testUnplugChat(page);
+    await testThread(page);
+    await testUnplugThread(page);
     await testSelectBrain(page);
-    await testDeleteChats(page);
+    await testDeleteThreads(page);
   });
 };

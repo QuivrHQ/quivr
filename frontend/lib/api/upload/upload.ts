@@ -10,7 +10,7 @@ export type UploadResponse = {
 export type UploadInputProps = {
   brainId: UUID;
   formData: FormData;
-  chat_id?: UUID;
+  thread_id?: UUID;
 };
 
 export const uploadFile = async (
@@ -18,8 +18,8 @@ export const uploadFile = async (
   axiosInstance: AxiosInstance
 ): Promise<UploadResponse> => {
   let uploadUrl = `/upload?brain_id=${props.brainId}`;
-  if (props.chat_id !== undefined) {
-    uploadUrl = uploadUrl.concat(`&chat_id=${props.chat_id}`);
+  if (props.thread_id !== undefined) {
+    uploadUrl = uploadUrl.concat(`&thread_id=${props.thread_id}`);
   }
 
   return axiosInstance.post(uploadUrl, props.formData);

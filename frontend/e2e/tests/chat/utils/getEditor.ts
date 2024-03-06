@@ -1,8 +1,8 @@
 import { Locator, Page } from "@playwright/test";
 
 export const getEditor = (page: Page): Locator => {
-  const chatInputEditor = page.locator('[data-testid="chat-input"]');
-  const contentEditableDiv = chatInputEditor.locator(
+  const threadInputEditor = page.locator('[data-testid="thread-input"]');
+  const contentEditableDiv = threadInputEditor.locator(
     'div[contentEditable="true"]'
   );
 

@@ -1,7 +1,7 @@
 import { FileRejection, useDropzone } from "react-dropzone";
 import { useTranslation } from "react-i18next";
 
-import { FeedItemUploadType } from "@/app/chat/[chatId]/components/ActionsBar/types";
+import { FeedItemUploadType } from "@/app/thread/[threadId]/components/ActionsBar/types";
 import { useEventTracking } from "@/services/analytics/june/useEventTracking";
 
 import { useOnboarding } from "./useOnboarding";

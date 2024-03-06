@@ -1,8 +1,8 @@
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import {
   BsArrowRightShort,
-  BsChatLeftText,
   BsTextParagraph,
+  BsThreadLeftText,
 } from "react-icons/bs";
 import { CgSoftwareDownload } from "react-icons/cg";
 import { CiFlag1 } from "react-icons/ci";
@@ -65,7 +65,7 @@ export const iconList: { [name: string]: IconType } = {
   addWithoutCircle: IoIosAdd,
   brain: LuBrain,
   brainCircuit: LuBrainCircuit,
-  chat: BsChatLeftText,
+  thread: BsThreadLeftText,
   check: FaCheck,
   checkCircle: FaCheckCircle,
   chevronDown: LuChevronDown,

@@ -10,16 +10,13 @@ import { BrainCreationProvider } from "@/lib/components/AddBrainModal/brainCreat
 import { Menu } from "@/lib/components/Menu/Menu";
 import { useOutsideClickListener } from "@/lib/components/Menu/hooks/useOutsideClickListener";
 import SearchModal from "@/lib/components/SearchModal/SearchModal";
-import {
-  BrainProvider,
-  ChatProvider,
-  KnowledgeToFeedProvider,
-} from "@/lib/context";
+import { BrainProvider, KnowledgeToFeedProvider } from "@/lib/context";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
-import { ChatsProvider } from "@/lib/context/ChatsProvider";
 import { MenuProvider } from "@/lib/context/MenuProvider/Menu-provider";
 import { SearchModalProvider } from "@/lib/context/SearchModalProvider/search-modal-provider";
 import { useSupabase } from "@/lib/context/SupabaseProvider";
+import { ThreadProvider } from "@/lib/context/ThreadProvider";
+import { ThreadsProvider } from "@/lib/context/ThreadsProvider";
 import { IntercomProvider } from "@/lib/helpers/intercom/IntercomProvider";
 import { UpdateMetadata } from "@/lib/helpers/updateMetadata";
 import { usePageTracking } from "@/services/analytics/june/usePageTracking";
@@ -94,11 +91,11 @@ const AppWithQueryClient = ({ children }: PropsWithChildren): JSX.Element => {
         <KnowledgeToFeedProvider>
           <BrainCreationProvider>
             <MenuProvider>
-              <ChatsProvider>
-                <ChatProvider>
+              <ThreadsProvider>
+                <ThreadProvider>
                   <App>{children}</App>
-                </ChatProvider>
-              </ChatsProvider>
+                </ThreadProvider>
+              </ThreadsProvider>
             </MenuProvider>
           </BrainCreationProvider>
         </KnowledgeToFeedProvider>

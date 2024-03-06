@@ -1,11 +1,11 @@
 import { AxiosInstance } from "axios";
 
-import { Notification } from "@/app/chat/[chatId]/types";
+import { Notification } from "@/app/thread/[threadId]/types";
 
-export const getChatNotifications = async (
-  chatId: string,
+export const getThreadNotifications = async (
+  threadId: string,
   axiosInstance: AxiosInstance
 ): Promise<Notification[]> => {
-  return (await axiosInstance.get<Notification[]>(`/notifications/${chatId}`))
+  return (await axiosInstance.get<Notification[]>(`/notifications/${threadId}`))
     .data;
 };

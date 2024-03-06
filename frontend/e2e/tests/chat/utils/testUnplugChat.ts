@@ -2,7 +2,7 @@ import { Page } from "@playwright/test";
 
 import { getEditor } from "./getEditor";
 
-export const testUnplugChat = async (page: Page): Promise<void> => {
+export const testUnplugThread = async (page: Page): Promise<void> => {
   await page.getByTestId("remove-mention").click();
   await page.getByTestId("mention-input").isHidden();
 
@@ -15,7 +15,7 @@ export const testUnplugChat = async (page: Page): Promise<void> => {
   await page.getByTestId("submit-button").click();
 
   await page
-    .getByTestId("chat-message-text")
+    .getByTestId("thread-message-text")
     .getByText(`${randomMessage}`)
     .isVisible();
 };

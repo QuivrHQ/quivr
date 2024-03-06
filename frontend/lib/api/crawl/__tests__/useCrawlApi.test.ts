@@ -24,7 +24,7 @@ describe("useCrawlApi", () => {
     } = renderHook(() => useCrawlApi());
     const crawlInputProps: CrawlInputProps = {
       brainId: "e7001ccd-6d90-4eab-8c50-2f23d39441e4",
-      chat_id: "e7001ccd-6d90-4eab-8c50-2f23d39441es",
+      thread_id: "e7001ccd-6d90-4eab-8c50-2f23d39441es",
       config: {
         url: "https://en.wikipedia.org/wiki/Mali",
         js: false,
@@ -37,8 +37,8 @@ describe("useCrawlApi", () => {
 
     expect(axiosPostMock).toHaveBeenCalledTimes(1);
     expect(axiosPostMock).toHaveBeenCalledWith(
-      `/crawl?brain_id=${crawlInputProps.brainId}&chat_id=${
-        crawlInputProps.chat_id ?? ""
+      `/crawl?brain_id=${crawlInputProps.brainId}&thread_id=${
+        crawlInputProps.thread_id ?? ""
       }`,
       crawlInputProps.config
     );

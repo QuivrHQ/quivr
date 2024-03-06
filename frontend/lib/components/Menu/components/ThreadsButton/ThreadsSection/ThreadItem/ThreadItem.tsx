@@ -1,31 +1,31 @@
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 
-import { ChatEntity } from "@/app/chat/[chatId]/types";
+import { ThreadEntity } from "@/app/thread/[threadId]/types";
 import Icon from "@/lib/components/ui/Icon/Icon";
 import { OptionsModal } from "@/lib/components/ui/OptionsModal/OptionsModal";
 import { Option } from "@/lib/types/Options";
 
 import styles from "./ThreadItem.module.scss";
 
-import { useChatsListItem } from "../../hooks/useChatsListItem";
+import { useThreadsListItem } from "../../hooks/useThreadsListItem";
 
-type ChatHistoryItemProps = {
-  chatHistoryItem: ChatEntity;
+type ThreadHistoryItemProps = {
+  chatHistoryItem: ThreadEntity;
 };
 
 export const ThreadItem = ({
   chatHistoryItem,
-}: ChatHistoryItemProps): JSX.Element => {
+}: ThreadHistoryItemProps): JSX.Element => {
   const [optionsOpened, setOptionsOpened] = useState<boolean>(false);
 
   const {
     chatName,
-    deleteChat,
+    deleteThread,
     editingName,
     handleEditNameClick,
-    setChatName,
-  } = useChatsListItem(chatHistoryItem);
+    setThreadName,
+  } = useThreadsListItem(chatHistoryItem);
 
   const onNameEdited = () => {
     handleEditNameClick();
@@ -43,7 +43,7 @@ export const ThreadItem = ({
     },
     {
       label: "Delete",
-      onClick: () => void deleteChat(),
+      onClick: () => void deleteThread(),
       iconName: "delete",
       iconColor: "dangerous",
     },
@@ -73,7 +73,7 @@ export const ThreadItem = ({
         {editingName ? (
           <input
             className={styles.edit_thread_name}
-            onChange={(event) => setChatName(event.target.value)}
+            onChange={(event) => setThreadName(event.target.value)}
             value={chatName}
             onKeyDown={(event) => {
               if (event.key === "Enter") {

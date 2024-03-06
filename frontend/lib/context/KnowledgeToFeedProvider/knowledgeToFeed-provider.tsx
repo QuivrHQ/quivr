@@ -2,7 +2,7 @@
 
 import { createContext, useState } from "react";
 
-import { FeedItemType } from "@/app/chat/[chatId]/components/ActionsBar/types";
+import { FeedItemType } from "@/app/thread/[threadId]/components/ActionsBar/types";
 
 type KnowledgeToFeedContextType = {
   knowledgeToFeed: FeedItemType[];

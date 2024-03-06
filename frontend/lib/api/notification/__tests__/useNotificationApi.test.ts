@@ -14,15 +14,15 @@ vi.mock("@/lib/hooks", () => ({
 }));
 
 describe("useNotificationApi", () => {
-  it("should call getChatNotifications with the correct parameters", async () => {
-    const chatId = "test-chat-id";
+  it("should call getThreadNotifications with the correct parameters", async () => {
+    const threadId = "test-thread-id";
     const {
       result: {
-        current: { getChatNotifications },
+        current: { getThreadNotifications },
       },
     } = renderHook(() => useNotificationApi());
-    await getChatNotifications(chatId);
+    await getThreadNotifications(threadId);
     expect(axiosGetMock).toHaveBeenCalledTimes(1);
-    expect(axiosGetMock).toHaveBeenCalledWith(`/notifications/${chatId}`);
+    expect(axiosGetMock).toHaveBeenCalledWith(`/notifications/${threadId}`);
   });
 });

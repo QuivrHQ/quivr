@@ -1,11 +1,13 @@
 import { expect, Page } from "@playwright/test";
 
-export const testDeleteChats = async (page: Page): Promise<void> => {
-  const deleteChatButtons = await page.getByTestId("delete-chat-button").all();
+export const testDeleteThreads = async (page: Page): Promise<void> => {
+  const deleteThreadButtons = await page
+    .getByTestId("delete-thread-button")
+    .all();
 
-  for (const button of deleteChatButtons) {
+  for (const button of deleteThreadButtons) {
     await button.click();
   }
 
-  expect((await page.getByTestId("chats-list-item").all()).length === 0);
+  expect((await page.getByTestId("threads-list-item").all()).length === 0);
 };

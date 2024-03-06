@@ -16,7 +16,7 @@ export const testSelectBrain = async (page: Page): Promise<void> => {
   await page.getByTestId("submit-button").click();
 
   await page
-    .getByTestId("chat-message-text")
+    .getByTestId("thread-message-text")
     .getByText(`${randomMessage}`)
     .isVisible();
 

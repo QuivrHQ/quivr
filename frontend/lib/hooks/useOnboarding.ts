@@ -13,7 +13,7 @@ export const useOnboarding = () => {
   const { updateOnboarding } = useOnboardingApi();
   const queryClient = useQueryClient();
 
-  const chatId = params?.chatId as string | undefined;
+  const threadId = params?.threadId as string | undefined;
 
   const { data } = useQuery({
     queryFn: getOnboarding,
@@ -36,15 +36,15 @@ export const useOnboarding = () => {
     await queryClient.invalidateQueries({ queryKey: [ONBOARDING_DATA_KEY] });
   };
 
-  const shouldDisplayWelcomeChat = onboarding.onboarding_a;
+  const shouldDisplayWelcomeThread = onboarding.onboarding_a;
 
   const shouldDisplayOnboardingAInstructions =
-    chatId === undefined && shouldDisplayWelcomeChat;
+    threadId === undefined && shouldDisplayWelcomeThread;
 
   return {
     onboarding,
     shouldDisplayOnboardingAInstructions,
-    shouldDisplayWelcomeChat,
+    shouldDisplayWelcomeThread,
     updateOnboarding: updateOnboardingHandler,
     isOnboarding,
   };

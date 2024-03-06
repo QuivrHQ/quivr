@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 import { LuSearch } from "react-icons/lu";
 
-import { Editor } from "@/app/chat/[chatId]/components/ActionsBar/components/ChatInput/components/ChatEditor/Editor/Editor";
-import { useChatInput } from "@/app/chat/[chatId]/components/ActionsBar/components/ChatInput/hooks/useChatInput";
-import { useChat } from "@/app/chat/[chatId]/hooks/useChat";
-import { useChatContext } from "@/lib/context";
+import { Editor } from "@/app/thread/[threadId]/components/ActionsBar/components/ThreadInput/components/ThreadEditor/Editor/Editor";
+import { useThreadInput } from "@/app/thread/[threadId]/components/ActionsBar/components/ThreadInput/hooks/useChatInput";
+import { useThread } from "@/app/thread/[threadId]/hooks/useThread";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
+import { useThreadContext } from "@/lib/context/ThreadProvider";
 
 import styles from "./SearchBar.module.scss";
 
@@ -19,9 +19,9 @@ export const SearchBar = ({
 }): JSX.Element => {
   const [searching, setSearching] = useState(false);
   const [isDisabled, setIsDisabled] = useState(true);
-  const { message, setMessage } = useChatInput();
-  const { setMessages } = useChatContext();
-  const { addQuestion } = useChat();
+  const { message, setMessage } = useThreadInput();
+  const { setMessages } = useThreadContext();
+  const { addQuestion } = useThread();
   const { currentBrain, setCurrentBrainId } = useBrainContext();
 
   useEffect(() => {

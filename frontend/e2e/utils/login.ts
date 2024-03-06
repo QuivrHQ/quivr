@@ -20,5 +20,5 @@ export const login = async (page: Page): Promise<void> => {
   await page.getByPlaceholder("Email").fill(email);
   await page.getByPlaceholder("Password").fill(password);
   await page.getByTestId("submit-login").click();
-  await page.getByTestId("chat-page").isVisible();
+  await page.getByTestId("thread-page").isVisible();
 };
