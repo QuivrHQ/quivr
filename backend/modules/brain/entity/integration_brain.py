@@ -30,6 +30,7 @@ class IntegrationDescriptionEntity(BaseModel):
     information: Optional[str] = None
     description: str
     max_files: int
+    allow_model_change: bool
 
 
 class IntegrationEntity(BaseModel):
