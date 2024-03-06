@@ -78,7 +78,7 @@ const SelectedChatPage = (): JSX.Element => {
   return (
     <div className={styles.main_container}>
       <div className={styles.page_header}>
-        <PageHeader iconName="chat" label="Chat" buttons={buttons} />
+        <PageHeader iconName="chat" label="Thread" buttons={buttons} />
       </div>
       <div
         className={styles.chat_page_container}
