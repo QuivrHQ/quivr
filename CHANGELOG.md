@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.0.220 (2024-03-06)
+
+## What's Changed
+* fix(frontend): brain name by @Zewed in https://github.com/QuivrHQ/quivr/pull/2311
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.219...v0.0.220
+
 ## 0.0.219 (2024-03-06)
 
 ## What's Changed
