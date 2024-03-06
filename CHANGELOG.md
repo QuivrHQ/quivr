@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.0.219 (2024-03-06)
+
+## What's Changed
+* feat: Update to newest version of litellm by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2307
+* fix(frontend): small renaiming chat to thread by @Zewed in https://github.com/QuivrHQ/quivr/pull/2306
+* feat(frontend): brain Catalogue by @Zewed in https://github.com/QuivrHQ/quivr/pull/2303
+* feat(frontend): 404 redirection by @Zewed in https://github.com/QuivrHQ/quivr/pull/2309
+* fix(frontend): old brain legacy by @Zewed in https://github.com/QuivrHQ/quivr/pull/2310
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.218...v0.0.219
+
 ## 0.0.218 (2024-03-05)
 
 ## What's Changed
