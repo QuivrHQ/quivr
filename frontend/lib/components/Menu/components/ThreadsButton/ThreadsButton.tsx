@@ -13,17 +13,17 @@ export const ThreadsButton = (): JSX.Element => {
   const [canScrollDown, setCanScrollDown] = useState<boolean>(false);
   const { allThreads } = useThreadsContext();
   const { t } = useTranslation("thread");
-  const todayThreads = allThreads.filter((chat) =>
-    isToday(new Date(chat.creation_time))
+  const todayThreads = allThreads.filter((thread) =>
+    isToday(new Date(thread.creation_time))
   );
-  const yesterdayThreads = allThreads.filter((chat) =>
-    isYesterday(new Date(chat.creation_time))
+  const yesterdayThreads = allThreads.filter((thread) =>
+    isYesterday(new Date(thread.creation_time))
   );
-  const last7DaysThreads = allThreads.filter((chat) =>
-    isWithinLast7Days(new Date(chat.creation_time))
+  const last7DaysThreads = allThreads.filter((thread) =>
+    isWithinLast7Days(new Date(thread.creation_time))
   );
-  const last30DaysThreads = allThreads.filter((chat) =>
-    isWithinLast30Days(new Date(chat.creation_time))
+  const last30DaysThreads = allThreads.filter((thread) =>
+    isWithinLast30Days(new Date(thread.creation_time))
   );
 
   useEffect(() => {
@@ -60,10 +60,10 @@ export const ThreadsButton = (): JSX.Element => {
         ${canScrollDown ? styles.fade_out : ""}
         `}
       >
-        <ThreadsSection chats={todayThreads} title={t("today")} />
-        <ThreadsSection chats={yesterdayThreads} title={t("yesterday")} />
-        <ThreadsSection chats={last7DaysThreads} title={t("last7Days")} />
-        <ThreadsSection chats={last30DaysThreads} title={t("last30Days")} />
+        <ThreadsSection threads={todayThreads} title={t("today")} />
+        <ThreadsSection threads={yesterdayThreads} title={t("yesterday")} />
+        <ThreadsSection threads={last7DaysThreads} title={t("last7Days")} />
+        <ThreadsSection threads={last30DaysThreads} title={t("last30Days")} />
       </div>
     </FoldableSection>
   );

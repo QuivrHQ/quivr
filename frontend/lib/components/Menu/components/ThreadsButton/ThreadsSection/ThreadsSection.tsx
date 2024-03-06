@@ -4,21 +4,21 @@ import { ThreadItem } from "./ThreadItem/ThreadItem";
 import styles from "./ThreadsSection.module.scss";
 
 type ThreadSectionProps = {
-  chats: ThreadEntity[];
+  threads: ThreadEntity[];
   title: string;
 };
 
 export const ThreadsSection = (props: ThreadSectionProps): JSX.Element => {
-  if (props.chats.length === 0) {
+  if (props.threads.length === 0) {
     return <></>;
   }
 
   return (
     <div>
       <div>{props.title}</div>
-      <div className={styles.chats_wrapper}>
-        {props.chats.map((chat) => (
-          <ThreadItem key={chat.chat_id} chatHistoryItem={chat} />
+      <div className={styles.threads_wrapper}>
+        {props.threads.map((thread) => (
+          <ThreadItem key={thread.thread_id} threadHistoryItem={thread} />
         ))}
       </div>
     </div>

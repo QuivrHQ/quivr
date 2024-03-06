@@ -23,17 +23,17 @@ export const ThreadInput = (): JSX.Element => {
   return (
     <>
       <form
-        data-testid="chat-input-form"
+        data-testid="thread-input-form"
         onSubmit={(e) => {
           e.preventDefault();
           handleSubmitQuestion();
         }}
       >
-        <div className={styles.chat_container}>
+        <div className={styles.thread_container}>
           <CurrentBrain allowingRemoveBrain={false} />
           <div
             className={`
-            ${styles.chat_wrapper}
+            ${styles.thread_wrapper}
             ${currentBrain ? styles.with_brain : ""}
           `}
           >

@@ -16,8 +16,8 @@ import { ButtonType } from "@/lib/types/QuivrButton";
 import { cn } from "@/lib/utils";
 
 import { ActionsBar } from "./components/ActionsBar";
-import { ThreadDialogueArea } from "./components/ChatDialogueArea/ChatDialogue";
 import Sources from "./components/Sources/Sources";
+import { ThreadDialogueArea } from "./components/ThreadDialogueArea/ThreadDialogue";
 import { useThreadNotificationsSync } from "./hooks/useThreadNotificationSync";
 import styles from "./page.module.scss";
 
@@ -78,10 +78,10 @@ const SelectedThreadPage = (): JSX.Element => {
   return (
     <div className={styles.main_container}>
       <div className={styles.page_header}>
-        <PageHeader iconName="chat" label="Thread" buttons={buttons} />
+        <PageHeader iconName="thread" label="Thread" buttons={buttons} />
       </div>
       <div
-        className={styles.chat_page_container}
+        className={styles.thread_page_container}
         {...(shouldDisplayFeedCard ? {} : getRootProps())}
       >
         <div

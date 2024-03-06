@@ -11,21 +11,21 @@ import styles from "./ThreadItem.module.scss";
 import { useThreadsListItem } from "../../hooks/useThreadsListItem";
 
 type ThreadHistoryItemProps = {
-  chatHistoryItem: ThreadEntity;
+  threadHistoryItem: ThreadEntity;
 };
 
 export const ThreadItem = ({
-  chatHistoryItem,
+  threadHistoryItem,
 }: ThreadHistoryItemProps): JSX.Element => {
   const [optionsOpened, setOptionsOpened] = useState<boolean>(false);
 
   const {
-    chatName,
+    threadName,
     deleteThread,
     editingName,
     handleEditNameClick,
     setThreadName,
-  } = useThreadsListItem(chatHistoryItem);
+  } = useThreadsListItem(threadHistoryItem);
 
   const onNameEdited = () => {
     handleEditNameClick();
@@ -74,7 +74,7 @@ export const ThreadItem = ({
           <input
             className={styles.edit_thread_name}
             onChange={(event) => setThreadName(event.target.value)}
-            value={chatName}
+            value={threadName}
             onKeyDown={(event) => {
               if (event.key === "Enter") {
                 onNameEdited();
@@ -85,9 +85,9 @@ export const ThreadItem = ({
         ) : (
           <Link
             className={styles.thread_item_name}
-            href={`/chat/${chatHistoryItem.chat_id}`}
+            href={`/thread/${threadHistoryItem.thread_id}`}
           >
-            {chatName.trim()}
+            {threadName.trim()}
           </Link>
         )}
         <div

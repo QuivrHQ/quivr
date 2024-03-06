@@ -7,7 +7,7 @@ import { useActionBar } from "./hooks/useActionBar";
 export const ActionsBar = (): JSX.Element => {
   const { hasPendingRequests } = useActionBar();
 
-  const { t } = useTranslation(["chat"]);
+  const { t } = useTranslation(["thread"]);
 
   return (
     <>

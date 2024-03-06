@@ -12,7 +12,7 @@ const Layout = ({ children }: LayoutProps): JSX.Element => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    if (pathname === "/chat") {
+    if (pathname === "/thread") {
       router.push("/search");
     } else {
       setIsLoading(false);

@@ -7,7 +7,7 @@ import { MenuButton } from "@/lib/components/Menu/components/MenuButton/MenuButt
 export const HomeButton = (): JSX.Element => {
   const pathname = usePathname() ?? "";
   const isSelected = pathname.includes("/search");
-  const { t } = useTranslation("chat");
+  const { t } = useTranslation("thread");
 
   return (
     <Link href={`/search`}>
