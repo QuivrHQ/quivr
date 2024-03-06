@@ -2,8 +2,8 @@ import { useTranslation } from "react-i18next";
 
 import { useOnboarding } from "@/lib/hooks/useOnboarding";
 
-import { ThreadItem } from "./components/ChatItem/ChatItem";
 import { Onboarding } from "./components/Onboarding/Onboarding";
+import { ThreadItem } from "./components/ThreadItem/ThreadItem";
 import { useThreadDialogue } from "./hooks/useChatDialogue";
 import {
   threadDialogueContainerClassName,

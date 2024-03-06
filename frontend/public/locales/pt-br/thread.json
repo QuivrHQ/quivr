@@ -6,9 +6,9 @@
   "brain": "cérebro",
   "brains": "cérebros",
   "change_brain": "Mudar cérebro",
-  "chat": "Conversa",
-  "chatDeleted": "Conversa excluída com sucesso. Id: {{id}}",
-  "chatNameUpdated": "Nome da conversa atualizado",
+  "thread": "Conversa",
+  "threadDeleted": "Conversa excluída com sucesso. Id: {{id}}",
+  "threadNameUpdated": "Nome da conversa atualizado",
   "error_occurred": "Ocorreu um erro ao obter a resposta",
   "errorCallingAPI": "Erro ao chamar a API",
   "errorDeleting": "Erro ao excluir a conversa: {{error}}",
@@ -31,10 +31,10 @@
     "answer": {
       "how_to_use_quivr": "Verifique a documentação em https://brain.quivr.app/docs/intro.html",
       "what_is_brain": "Um cérebro é uma pasta virtual para organizar informações sobre um tópico específico. Ele pode armazenar documentos e se conectar a aplicativos ou APIs externas. Por exemplo, um cérebro 'Ciência Médica' poderia conter dados relacionados à saúde, e um cérebro 'Jurídico' poderia ter informações legais. Os cérebros podem ser tornados públicos para que outros os usem sem revelar o conteúdo, promovendo o compartilhamento de conhecimento.",
-      "what_is_quivr": "Quivr é um assistente útil. Você pode facilmente arrastar e soltar arquivos no chat ou na seção de conhecimento para interagir com eles. Não é apenas uma ferramenta de chat; você também pode se comunicar com aplicativos usando APIs.\nPara manter seu trabalho organizado, você pode criar cérebros, essencialmente pastas virtuais, e se inscrever nos cérebros de outras pessoas na seção de exploração para colaboração e compartilhamento de informações perfeitos."
+      "what_is_quivr": "Quivr é um assistente útil. Você pode facilmente arrastar e soltar arquivos no thread ou na seção de conhecimento para interagir com eles. Não é apenas uma ferramenta de thread; você também pode se comunicar com aplicativos usando APIs.\nPara manter seu trabalho organizado, você pode criar cérebros, essencialmente pastas virtuais, e se inscrever nos cérebros de outras pessoas na seção de exploração para colaboração e compartilhamento de informações perfeitos."
     },
     "how_to_use_quivr": "Como usar o Quivr?",
-    "step_1_1": "1. Arraste e solte o arquivo no chat ou no 📎.",
+    "step_1_1": "1. Arraste e solte o arquivo no thread ou no 📎.",
     "step_1_2": "Não tem um arquivo? Baixe 'Documentação do Quivr'",
     "step_2": "2. Comece a conversar com seu arquivo",
     "step_3": "3. Divirta-se!",

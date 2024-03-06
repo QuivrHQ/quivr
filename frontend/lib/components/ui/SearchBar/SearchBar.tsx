@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { LuSearch } from "react-icons/lu";
 
 import { Editor } from "@/app/thread/[threadId]/components/ActionsBar/components/ThreadInput/components/ThreadEditor/Editor/Editor";
-import { useThreadInput } from "@/app/thread/[threadId]/components/ActionsBar/components/ThreadInput/hooks/useChatInput";
+import { useThreadInput } from "@/app/thread/[threadId]/components/ActionsBar/components/ThreadInput/hooks/useThreadInput";
 import { useThread } from "@/app/thread/[threadId]/hooks/useThread";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 import { useThreadContext } from "@/lib/context/ThreadProvider";
