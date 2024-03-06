@@ -71,6 +71,16 @@ export type CreateBrainInput = {
   integration?: IntegrationSettings;
 };
 
+enum IntegrationBrainTag {
+  NEW = "new",
+  RECOMMENDED = "recommended",
+  MOST_POPULAR = "most_popular",
+  PREMIUM = "premium",
+  COMING_SOON = "coming_soon",
+  COMMUNITY = "community",
+  DEPRECATED = "deprecated",
+}
+
 export type IntegrationBrains = {
   id: UUID;
   integration_name: string;
@@ -79,6 +89,8 @@ export type IntegrationBrains = {
   integration_type: "custom" | "sync";
   description: string;
   max_files: number;
+  tags: IntegrationBrainTag[];
+  information: string;
 };
 
 export type UpdateBrainInput = Partial<CreateBrainInput>;

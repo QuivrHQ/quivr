@@ -53,15 +53,23 @@ export const CreateBrainStep = (): JSX.Element => {
 
   return (
     <div className={styles.brain_knowledge_wrapper}>
-      {!createBrainStepIndex &&
-        fields.map(({ name, value }) => (
-          <TextInput
-            key={name}
-            inputValue={value}
-            setInputValue={(inputValue) => handleInputChange(name, inputValue)}
-            label={capitalCase(name)}
-          />
-        ))}
+      {!createBrainStepIndex && (
+        <div className={styles.settings_wrapper}>
+          <MessageInfoBox type="warning">
+            {currentSelectedBrain?.information}
+          </MessageInfoBox>
+          {fields.map(({ name, value }) => (
+            <TextInput
+              key={name}
+              inputValue={value}
+              setInputValue={(inputValue) =>
+                handleInputChange(name, inputValue)
+              }
+              label={capitalCase(name)}
+            />
+          ))}
+        </div>
+      )}
       {!!currentSelectedBrain?.max_files && !!createBrainStepIndex && (
         <div>
           <span className={styles.title}>Feed your brain</span>
