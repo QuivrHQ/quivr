@@ -7,8 +7,8 @@ interface BrainCreationContextProps {
   setIsBrainCreationModalOpened: React.Dispatch<React.SetStateAction<boolean>>;
   creating: boolean;
   setCreating: React.Dispatch<React.SetStateAction<boolean>>;
-  currentIntegrationBrain: IntegrationBrains | undefined;
-  setCurrentIntegrationBrain: React.Dispatch<
+  currentSelectedBrain: IntegrationBrains | undefined;
+  setCurrentSelectedBrain: React.Dispatch<
     React.SetStateAction<IntegrationBrains | undefined>
   >;
 }
@@ -24,7 +24,7 @@ export const BrainCreationProvider = ({
 }): JSX.Element => {
   const [isBrainCreationModalOpened, setIsBrainCreationModalOpened] =
     useState<boolean>(false);
-  const [currentIntegrationBrain, setCurrentIntegrationBrain] =
+  const [currentSelectedBrain, setCurrentSelectedBrain] =
     useState<IntegrationBrains>();
   const [creating, setCreating] = useState<boolean>(false);
 
@@ -35,8 +35,8 @@ export const BrainCreationProvider = ({
         setIsBrainCreationModalOpened,
         creating,
         setCreating,
-        currentIntegrationBrain,
-        setCurrentIntegrationBrain,
+        currentSelectedBrain,
+        setCurrentSelectedBrain,
       }}
     >
       {children}

@@ -59,7 +59,7 @@ export const SettingsTabContent = ({
               <div className={styles.general_information}>
                 <GeneralInformation hasEditRights={hasEditRights} />
               </div>
-              {brain?.brain_type === "doc" && (
+              {brain?.integration_description?.allow_model_change && (
                 <div className={styles.model_information}>
                   <ModelSelection
                     accessibleModels={accessibleModels}

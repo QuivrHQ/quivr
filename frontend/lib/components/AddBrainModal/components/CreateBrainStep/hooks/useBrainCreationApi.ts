@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { UUID } from "crypto";
+import { useState } from "react";
 import { useFormContext } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 
@@ -24,11 +25,11 @@ export const useBrainCreationApi = () => {
   const { setKnowledgeToFeed } = useKnowledgeToFeedContext();
   const { createBrain: createBrainApi, setCurrentBrainId } = useBrainContext();
   const { crawlWebsiteHandler, uploadFileHandler } = useKnowledgeToFeedInput();
-  const {
-    setIsBrainCreationModalOpened,
-    setCreating,
-    currentIntegrationBrain,
-  } = useBrainCreationContext();
+  const { setIsBrainCreationModalOpened, setCreating, currentSelectedBrain } =
+    useBrainCreationContext();
+  const [fields, setFields] = useState<
+    { name: string; type: string; value: string }[]
+  >([]);
 
   const handleFeedBrain = async (brainId: UUID): Promise<void> => {
     const uploadPromises = files.map((file) =>
@@ -44,15 +45,19 @@ export const useBrainCreationApi = () => {
     const { name, description } = getValues();
     let integrationSettings: IntegrationSettings | undefined = undefined;
 
-    if (currentIntegrationBrain) {
+    if (currentSelectedBrain) {
       integrationSettings = {
-        integration_id: currentIntegrationBrain.id,
-        settings: {},
+        integration_id: currentSelectedBrain.id,
+        settings: fields.reduce((acc, field) => {
+          acc[field.name] = field.value;
+
+          return acc;
+        }, {} as { [key: string]: string }),
       };
     }
 
     const createdBrainId = await createBrainApi({
-      brain_type: currentIntegrationBrain ? "integration" : "doc",
+      brain_type: currentSelectedBrain ? "integration" : "doc",
       name,
       description,
       integration: integrationSettings,
@@ -98,5 +103,7 @@ export const useBrainCreationApi = () => {
   return {
     createBrain: mutate,
     isBrainCreationPending,
+    fields,
+    setFields,
   };
 };

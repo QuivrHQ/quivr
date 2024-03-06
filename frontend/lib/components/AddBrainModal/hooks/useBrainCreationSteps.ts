@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { useFormContext } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 
@@ -6,9 +7,12 @@ import {
   Step,
 } from "@/lib/components/AddBrainModal/types/types";
 
+import { useBrainCreationContext } from "../brainCreation-provider";
+
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const useBrainCreationSteps = () => {
   const { t } = useTranslation("brain");
+  const { isBrainCreationModalOpened } = useBrainCreationContext();
 
   const steps: Step[] = [
     {
@@ -30,6 +34,10 @@ export const useBrainCreationSteps = () => {
     (step) => step.value === currentStep
   );
 
+  useEffect(() => {
+    goToFirstStep();
+  }, [isBrainCreationModalOpened]);
+
   const goToNextStep = () => {
     if (currentStepIndex === -1 || currentStepIndex === steps.length - 1) {
       return;
@@ -46,6 +54,10 @@ export const useBrainCreationSteps = () => {
     const previousStep = steps[currentStepIndex - 1];
 
     return setValue("brainCreationStep", previousStep.value);
+  };
+
+  const goToFirstStep = () => {
+    return setValue("brainCreationStep", steps[0].value);
   };
 
   return {

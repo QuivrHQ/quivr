@@ -53,7 +53,7 @@ export type ApiBrainDefinition = {
 
 export type IntegrationSettings = {
   integration_id?: string;
-  settings?: { [x: string]: object | undefined };
+  settings?: { [x: string]: string | undefined };
 };
 
 export type CreateBrainInput = {
@@ -71,14 +71,26 @@ export type CreateBrainInput = {
   integration?: IntegrationSettings;
 };
 
+enum IntegrationBrainTag {
+  NEW = "new",
+  RECOMMENDED = "recommended",
+  MOST_POPULAR = "most_popular",
+  PREMIUM = "premium",
+  COMING_SOON = "coming_soon",
+  COMMUNITY = "community",
+  DEPRECATED = "deprecated",
+}
+
 export type IntegrationBrains = {
   id: UUID;
   integration_name: string;
   integration_logo_url: string;
-  connections_settings: Record<string, unknown>;
+  connection_settings: string;
   integration_type: "custom" | "sync";
   description: string;
   max_files: number;
+  tags: IntegrationBrainTag[];
+  information: string;
 };
 
 export type UpdateBrainInput = Partial<CreateBrainInput>;
