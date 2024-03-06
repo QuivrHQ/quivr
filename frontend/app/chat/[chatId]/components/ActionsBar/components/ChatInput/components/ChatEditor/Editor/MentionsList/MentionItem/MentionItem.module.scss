@@ -11,6 +11,7 @@
   border-radius: Radius.$normal;
   overflow: hidden;
   padding: Spacings.$spacing02;
+  min-height: 2rem;
 
   &:hover,
   &.selected {

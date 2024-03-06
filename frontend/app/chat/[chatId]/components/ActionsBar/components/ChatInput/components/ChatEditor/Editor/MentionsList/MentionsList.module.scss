@@ -11,11 +11,10 @@
   border-radius: Radius.$normal;
   gap: Spacings.$spacing03;
   max-width: 300px;
-  position: relative;
-  overflow: hidden;
+  overflow: scroll;
+  max-height: 300px;
 
   .mentions_list {
-    overflow: hidden;
     display: flex;
     flex-direction: column;
     gap: Spacings.$spacing02;
