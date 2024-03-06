@@ -53,7 +53,7 @@ export const BrainCatalogue = ({
                     height={50}
                   />
                   <span className={styles.brain_title}>
-                    {brain.integration_name}
+                    {brain.integration_display_name}
                   </span>
                   <div className={styles.tag_wrapper}>
                     {brain.tags[0] && (

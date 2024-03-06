@@ -19,6 +19,7 @@ export type IntegrationDescription = {
   integration_type: "custom" | "sync";
   max_files: number;
   allow_model_change: boolean;
+  integration_display_name: string;
 };
 
 export type Brain = {

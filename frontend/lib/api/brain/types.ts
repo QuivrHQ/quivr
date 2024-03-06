@@ -91,6 +91,7 @@ export type IntegrationBrains = {
   max_files: number;
   tags: IntegrationBrainTag[];
   information: string;
+  integration_display_name: string;
 };
 
 export type UpdateBrainInput = Partial<CreateBrainInput>;
