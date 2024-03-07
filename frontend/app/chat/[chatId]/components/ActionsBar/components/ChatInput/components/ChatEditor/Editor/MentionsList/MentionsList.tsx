@@ -1,9 +1,6 @@
 import { SuggestionKeyDownProps } from "@tiptap/suggestion";
 import { forwardRef } from "react";
 
-import { useBrainCreationContext } from "@/lib/components/AddBrainModal/brainCreation-provider";
-import QuivrButton from "@/lib/components/ui/QuivrButton/QuivrButton";
-
 import { MentionItem } from "./MentionItem/MentionItem";
 import styles from "./MentionsList.module.scss";
 import { useMentionList } from "./hooks/useMentionList";
@@ -15,12 +12,10 @@ export type MentionListRef = {
 
 export const MentionList = forwardRef<MentionListRef, MentionListProps>(
   (props, ref) => {
-    const { selectItem, selectedIndex, isBrain } = useMentionList({
+    const { selectItem, selectedIndex } = useMentionList({
       ...props,
       ref,
     });
-
-    const { setIsBrainCreationModalOpened } = useBrainCreationContext();
 
     const handleClick = (event: React.MouseEvent<HTMLDivElement>) => {
       event.preventDefault();
@@ -39,16 +34,6 @@ export const MentionList = forwardRef<MentionListRef, MentionListProps>(
               type={props.suggestionData.type}
             />
           ))}
-        </div>
-        <div>
-          {isBrain && (
-            <QuivrButton
-              label="Create Brain"
-              iconName="add"
-              color="primary"
-              onClick={() => setIsBrainCreationModalOpened(true)}
-            />
-          )}
         </div>
       </div>
     );
