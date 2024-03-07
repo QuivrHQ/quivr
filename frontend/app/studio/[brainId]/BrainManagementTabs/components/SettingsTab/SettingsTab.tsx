@@ -59,17 +59,17 @@ export const SettingsTabContent = ({
               <div className={styles.general_information}>
                 <GeneralInformation hasEditRights={hasEditRights} />
               </div>
-              {brain?.integration_description?.allow_model_change ||
-                (brain?.brain_type === "doc" && (
-                  <div className={styles.model_information}>
-                    <ModelSelection
-                      accessibleModels={accessibleModels}
-                      hasEditRights={hasEditRights}
-                      brainId={brainId}
-                      handleSubmit={handleSubmit}
-                    />
-                  </div>
-                ))}
+              {(!!brain?.integration_description?.allow_model_change ||
+                brain?.brain_type === "doc") && (
+                <div className={styles.model_information}>
+                  <ModelSelection
+                    accessibleModels={accessibleModels}
+                    hasEditRights={hasEditRights}
+                    brainId={brainId}
+                    handleSubmit={handleSubmit}
+                  />
+                </div>
+              )}
             </div>
             {hasEditRights && (
               <div className={styles.save_button}>
