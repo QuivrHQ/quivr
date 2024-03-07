@@ -180,7 +180,7 @@ create table "public"."user_identity" (
 
 create table "public"."user_settings" (
     "user_id" uuid not null,
-    "models" jsonb default '["gpt-3.5-turbo-1106"]'::jsonb,
+    "models" jsonb default '["gpt-3.5-turbo"]'::jsonb,
     "daily_chat_credit" integer default 20,
     "max_brains" integer default 3,
     "max_brain_size" integer default 1000000
@@ -533,19 +533,19 @@ BEGIN
             NEW.models := '[]'::jsonb;
         END IF;
 
-        -- Add gpt-4 if not present
-        IF NOT NEW.models ? 'gpt-4' THEN
-            NEW.models := NEW.models || '["gpt-4"]'::jsonb;
-        END IF;
-
         -- Add gpt-3.5-turbo if not present
         IF NOT NEW.models ? 'gpt-3.5-turbo' THEN
             NEW.models := NEW.models || '["gpt-3.5-turbo"]'::jsonb;
         END IF;
 
-        -- Add gpt-3.5-turbo-16k if not present
-        IF NOT NEW.models ? 'gpt-3.5-turbo-16k' THEN
-            NEW.models := NEW.models || '["gpt-3.5-turbo-16k"]'::jsonb;
+        -- Add gpt-4 if not present
+        IF NOT NEW.models ? 'gpt-4' THEN
+            NEW.models := NEW.models || '["gpt-4"]'::jsonb;
+        END IF;
+
+        -- Add gpt-4-turbo-preview if not present
+        IF NOT NEW.models ? 'gpt-4-turbo-preview' THEN
+            NEW.models := NEW.models || '["gpt-4-turbo-preview"]'::jsonb;
         END IF;
 
         UPDATE user_settings
@@ -578,19 +578,19 @@ BEGIN
             NEW.models := '[]'::jsonb;
         END IF;
 
-        -- Add gpt-4 if not present
-        IF NOT NEW.models ? 'gpt-4' THEN
-            NEW.models := NEW.models || '["gpt-4"]'::jsonb;
-        END IF;
-
         -- Add gpt-3.5-turbo if not present
         IF NOT NEW.models ? 'gpt-3.5-turbo' THEN
             NEW.models := NEW.models || '["gpt-3.5-turbo"]'::jsonb;
         END IF;
 
-        -- Add gpt-3.5-turbo-16k if not present
-        IF NOT NEW.models ? 'gpt-3.5-turbo-16k' THEN
-            NEW.models := NEW.models || '["gpt-3.5-turbo-16k"]'::jsonb;
+        -- Add gpt-4 if not present
+        IF NOT NEW.models ? 'gpt-4' THEN
+            NEW.models := NEW.models || '["gpt-4"]'::jsonb;
+        END IF;
+
+        -- Add gpt-4-turbo-preview if not present
+        IF NOT NEW.models ? 'gpt-4-turbo-preview' THEN
+            NEW.models := NEW.models || '["gpt-4-turbo-preview"]'::jsonb;
         END IF;
 
         UPDATE user_settings
@@ -621,7 +621,7 @@ BEGIN
 
         -- Append new values to the JSONB array. 
         -- This does not check for duplicates, so you might get repeated values.
-        NEW.models := NEW.models || '["gpt-4", "gpt-3.5-turbo"]'::jsonb;
+        NEW.models := NEW.models || '["gpt-4", "gpt-4-turbo-preview", "gpt-3.5-turbo"]'::jsonb;
     END IF;
     RETURN NEW;
 END;
@@ -1896,7 +1896,7 @@ $$ LANGUAGE plpgsql;
 
 CREATE TABLE IF NOT EXISTS user_settings (
   user_id UUID PRIMARY KEY,
-  models JSONB DEFAULT '["gpt-3.5-turbo-1106","gpt-4"]'::jsonb,
+  models JSONB DEFAULT '["gpt-3.5-turbo","gpt-4", "gpt-4-turbo-preview"]'::jsonb,
   daily_chat_credit INT DEFAULT 300,
   max_brains INT DEFAULT 30,
   max_brain_size INT DEFAULT 100000000

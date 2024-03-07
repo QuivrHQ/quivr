@@ -41,7 +41,7 @@ class GPT4Brain(KnowledgeBrainQA):
         )
 
         chain = prompt | ChatLiteLLM(
-            model="gpt-4-0125-preview", max_tokens=self.max_tokens
+            model="gpt-4-turbo-preview", max_tokens=self.max_tokens
         )
 
         return chain

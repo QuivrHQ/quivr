@@ -59,9 +59,9 @@ grant truncate on table "public"."models" to "service_role";
 grant update on table "public"."models" to "service_role";
 
 INSERT INTO public.models ("name", "price", "max_input", "max_output") VALUES
-	('gpt-3.5-turbo-1106', 1, 2000, 1000),
+	('gpt-3.5-turbo', 1, 2000, 1000),
   ('gpt-4', 1, 2000, 1000),
-  ('gpt-4-1106-preview', 1, 2000, 1000);
+  ('gpt-4-turbo-preview', 1, 2000, 1000);
 
 -- Update migrations table
 INSERT INTO migrations (name)

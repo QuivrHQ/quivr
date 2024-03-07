@@ -193,7 +193,7 @@ class CompositeBrainQA(
         messages.append({"role": "user", "content": question.question})
 
         response = completion(
-            model="gpt-3.5-turbo-0125",
+            model="gpt-3.5-turbo",
             messages=messages,
             tools=tools,
             tool_choice="auto",
@@ -312,7 +312,7 @@ class CompositeBrainQA(
                 )
 
             response_after_tools_answers = completion(
-                model="gpt-3.5-turbo-0125",
+                model="gpt-3.5-turbo",
                 messages=messages,
                 tools=tools,
                 tool_choice="auto",
@@ -441,7 +441,7 @@ class CompositeBrainQA(
         messages.append({"role": "user", "content": question.question})
 
         initial_response = completion(
-            model="gpt-3.5-turbo-0125",
+            model="gpt-3.5-turbo",
             stream=True,
             messages=messages,
             tools=tools,
@@ -554,7 +554,7 @@ class CompositeBrainQA(
                 messages.append({"role": "system", "content": PROMPT_2})
 
                 response_after_tools_answers = completion(
-                    model="gpt-3.5-turbo-0125",
+                    model="gpt-3.5-turbo",
                     messages=messages,
                     tools=tools,
                     tool_choice="auto",

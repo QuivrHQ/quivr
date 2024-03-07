@@ -34,7 +34,7 @@ alter table "public"."brains" alter column "brain_type" set default 'doc'::brain
 
 drop type "public"."brain_type_enum__old_version_to_be_dropped";
 
-alter table "public"."brains" alter column "model" set default 'gpt-3.5-turbo-1106'::text;
+alter table "public"."brains" alter column "model" set default 'gpt-3.5-turbo'::text;
 
 alter table "public"."brains_vectors" add column "id" uuid not null default gen_random_uuid();
 
@@ -44,7 +44,7 @@ alter table "public"."knowledge" add column "integration" text;
 
 alter table "public"."knowledge" add column "integration_link" text;
 
-alter table "public"."user_settings" alter column "models" set default '["gpt-3.5-turbo-0125"]'::jsonb;
+alter table "public"."user_settings" alter column "models" set default '["gpt-3.5-turbo"]'::jsonb;
 
 CREATE UNIQUE INDEX brains_vectors_pkey ON public.brains_vectors USING btree (id);
 

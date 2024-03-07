@@ -36,8 +36,8 @@ def find_model_and_generate_metadata(
     models_settings,
 ):
 
-    # Default model is gpt-3.5-turbo-0125
-    default_model = "gpt-3.5-turbo-0125"
+    # Default model is gpt-3.5-turbo
+    default_model = "gpt-3.5-turbo"
     model_to_use = LLMModels(  # TODO Implement default models in database
         name=default_model, price=1, max_input=4000, max_output=1000
     )

@@ -124,7 +124,7 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
     brain_settings: BaseSettings = BrainSettings()
 
     # Default class attributes
-    model: str = "gpt-3.5-turbo-0125"  # pyright: ignore reportPrivateUsage=none
+    model: str = "gpt-3.5-turbo"  # pyright: ignore reportPrivateUsage=none
     temperature: float = 0.1
     chat_id: str = None  # pyright: ignore reportPrivateUsage=none
     brain_id: str = None  # pyright: ignore reportPrivateUsage=none

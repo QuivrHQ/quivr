@@ -276,8 +276,9 @@ INSERT INTO "public"."users" ("id", "email") VALUES
 --
 
 INSERT INTO "public"."models" ("name", "price", "max_input", "max_output") VALUES
-	('gpt-3.5-turbo-0125', 1, 10000, 1000),
-	('gpt-4-0125-preview', 1, 4000, 4000);
+	('gpt-3.5-turbo', 1, 10000, 1000),
+	('gpt-4', 1, 10000, 1000),
+	('gpt-4-turbo-preview', 1, 10000, 1000);
 
 
 --
@@ -324,7 +325,7 @@ INSERT INTO "public"."user_identity" ("user_id", "openai_api_key") VALUES
 --
 
 INSERT INTO "public"."user_settings" ("user_id", "models", "max_brains", "max_brain_size", "is_premium", "api_access", "monthly_chat_credit") VALUES
-	('39418e3b-0258-4452-af60-7acfcc1263ff', '["gpt-3.5-turbo-0125", "gpt-4-0125-preview"]', 10, 50000000, false, false, 100);
+	('39418e3b-0258-4452-af60-7acfcc1263ff', '["gpt-3.5-turbo", "gpt-4", "gpt-4-turbo-preview"]', 10, 50000000, false, false, 100);
 
 
 --

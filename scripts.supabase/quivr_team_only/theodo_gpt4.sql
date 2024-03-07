@@ -11,19 +11,19 @@ BEGIN
             NEW.models := '[]'::jsonb;
         END IF;
 
-        -- Add gpt-4 if not present
-        IF NOT NEW.models ? 'gpt-4' THEN
-            NEW.models := NEW.models || '["gpt-4"]'::jsonb;
-        END IF;
-
         -- Add gpt-3.5-turbo if not present
         IF NOT NEW.models ? 'gpt-3.5-turbo' THEN
             NEW.models := NEW.models || '["gpt-3.5-turbo"]'::jsonb;
         END IF;
 
-        -- Add gpt-3.5-turbo-16k if not present
-        IF NOT NEW.models ? 'gpt-3.5-turbo-16k' THEN
-            NEW.models := NEW.models || '["gpt-3.5-turbo-16k"]'::jsonb;
+        -- Add gpt-4 if not present
+        IF NOT NEW.models ? 'gpt-4' THEN
+            NEW.models := NEW.models || '["gpt-4"]'::jsonb;
+        END IF;
+
+        -- Add gpt-4-turbo-preview if not present
+        IF NOT NEW.models ? 'gpt-4-turbo-preview' THEN
+            NEW.models := NEW.models || '["gpt-4-turbo-preview"]'::jsonb;
         END IF;
 
         UPDATE user_settings
