@@ -1,14 +1,16 @@
-from typing import List, Optional
+from typing import Annotated, List, Optional
 from uuid import UUID
-from venv import logger
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from fastapi.responses import StreamingResponse
+from langchain.embeddings.ollama import OllamaEmbeddings
+from langchain.embeddings.openai import OpenAIEmbeddings
+from logger import get_logger
 from middlewares.auth import AuthBearer, get_current_user
+from models.settings import BrainSettings, get_supabase_client
 from models.user_usage import UserUsage
 from modules.brain.service.brain_service import BrainService
-from modules.chat.controller.chat.factory import get_chat_strategy
-from modules.chat.controller.chat.utils import NullableUUID, check_user_requests_limit
+from modules.chat.controller.chat.brainful_chat import BrainfulChat
 from modules.chat.dto.chats import ChatItem, ChatQuestion
 from modules.chat.dto.inputs import (
     ChatUpdatableProperties,
@@ -19,12 +21,76 @@ from modules.chat.entity.chat import Chat
 from modules.chat.service.chat_service import ChatService
 from modules.notification.service.notification_service import NotificationService
 from modules.user.entity.user_identity import UserIdentity
+from packages.utils.telemetry import send_telemetry
+from vectorstore.supabase import CustomSupabaseVectorStore
+
+logger = get_logger(__name__)
 
 chat_router = APIRouter()
 
 notification_service = NotificationService()
 brain_service = BrainService()
 chat_service = ChatService()
+
+
+def init_vector_store(user_id: UUID) -> CustomSupabaseVectorStore:
+    """
+    Initialize the vector store
+    """
+    brain_settings = BrainSettings()
+    supabase_client = get_supabase_client()
+    embeddings = None
+    if brain_settings.ollama_api_base_url:
+        embeddings = OllamaEmbeddings(
+            base_url=brain_settings.ollama_api_base_url
+        )  # pyright: ignore reportPrivateUsage=none
+    else:
+        embeddings = OpenAIEmbeddings()
+    vector_store = CustomSupabaseVectorStore(
+        supabase_client, embeddings, table_name="vectors", user_id=user_id
+    )
+
+    return vector_store
+
+
+def get_answer_generator(
+    chat_id: UUID,
+    chat_question: ChatQuestion,
+    brain_id: UUID,
+    current_user: UserIdentity,
+):
+    chat_instance = BrainfulChat()
+    chat_instance.validate_authorization(user_id=current_user.id, brain_id=brain_id)
+
+    user_usage = UserUsage(
+        id=current_user.id,
+        email=current_user.email,
+    )
+
+    vector_store = init_vector_store(user_id=current_user.id)
+
+    # Get History
+    history = chat_service.get_chat_history(chat_id)
+
+    # Generic
+    brain, metadata_brain = brain_service.find_brain_from_question(
+        brain_id, chat_question.question, current_user, chat_id, history, vector_store
+    )
+
+    send_telemetry("question_asked", {"model_name": brain.model})
+
+    gpt_answer_generator = chat_instance.get_answer_generator(
+        brain=brain,
+        chat_id=str(chat_id),
+        model=brain.model,
+        temperature=0.1,
+        streaming=True,
+        prompt_id=chat_question.prompt_id,
+        user_id=current_user.id,
+        user_email=current_user.email,
+    )
+
+    return gpt_answer_generator
 
 
 @chat_router.get("/chat/healthz", tags=["Health"])
@@ -113,59 +179,15 @@ async def create_question_handler(
     request: Request,
     chat_question: ChatQuestion,
     chat_id: UUID,
-    brain_id: NullableUUID
-    | UUID
-    | None = Query(..., description="The ID of the brain"),
+    brain_id: Annotated[UUID | None, Query()] = None,
     current_user: UserIdentity = Depends(get_current_user),
 ):
-    """
-    Add a new question to the chat.
-    """
-
-    chat_instance = get_chat_strategy(brain_id)
-
-    chat_instance.validate_authorization(user_id=current_user.id, brain_id=brain_id)
-
-    fallback_model = "gpt-3.5-turbo-1106"
-    fallback_temperature = 0.1
-    fallback_max_tokens = 512
-
-    user_daily_usage = UserUsage(
-        id=current_user.id,
-        email=current_user.email,
-    )
-    user_settings = user_daily_usage.get_user_settings()
-    is_model_ok = (chat_question).model in user_settings.get("models", ["gpt-3.5-turbo-1106"])  # type: ignore
-
-    # Retrieve chat model (temperature, max_tokens, model)
-    if (
-        not chat_question.model
-        or not chat_question.temperature
-        or not chat_question.max_tokens
-    ):
-        if brain_id:
-            brain = brain_service.get_brain_by_id(brain_id)
-            if brain:
-                fallback_model = brain.model or fallback_model
-                fallback_temperature = brain.temperature or fallback_temperature
-                fallback_max_tokens = brain.max_tokens or fallback_max_tokens
-
-        chat_question.model = chat_question.model or fallback_model
-        chat_question.temperature = chat_question.temperature or fallback_temperature
-        chat_question.max_tokens = chat_question.max_tokens or fallback_max_tokens
-
     try:
-        check_user_requests_limit(current_user, chat_question.model)
-        is_model_ok = (chat_question).model in user_settings.get("models", ["gpt-3.5-turbo-1106"])  # type: ignore
-        gpt_answer_generator = chat_instance.get_answer_generator(
-            chat_id=str(chat_id),
-            model=chat_question.model if is_model_ok else "gpt-3.5-turbo-1106",  # type: ignore
-            max_tokens=chat_question.max_tokens,
-            temperature=chat_question.temperature,
-            brain_id=str(brain_id),
-            streaming=False,
-            prompt_id=chat_question.prompt_id,
-            user_id=current_user.id,
+        logger.info(
+            f"Creating question for chat {chat_id} with brain {brain_id} of type {type(brain_id)}"
+        )
+        gpt_answer_generator = get_answer_generator(
+            chat_id, chat_question, brain_id, current_user
         )
 
         chat_answer = gpt_answer_generator.generate_answer(
@@ -191,59 +213,27 @@ async def create_stream_question_handler(
     request: Request,
     chat_question: ChatQuestion,
     chat_id: UUID,
-    brain_id: NullableUUID
-    | UUID
-    | None = Query(..., description="The ID of the brain"),
+    brain_id: Annotated[UUID | None, Query()] = None,
     current_user: UserIdentity = Depends(get_current_user),
 ) -> StreamingResponse:
-    chat_instance = get_chat_strategy(brain_id)
+
+    chat_instance = BrainfulChat()
     chat_instance.validate_authorization(user_id=current_user.id, brain_id=brain_id)
 
-    user_daily_usage = UserUsage(
+    user_usage = UserUsage(
         id=current_user.id,
         email=current_user.email,
     )
 
-    user_settings = user_daily_usage.get_user_settings()
+    logger.info(
+        f"Creating question for chat {chat_id} with brain {brain_id} of type {type(brain_id)}"
+    )
 
-    # Retrieve chat model (temperature, max_tokens, model)
-    if (
-        not chat_question.model
-        or chat_question.temperature is None
-        or not chat_question.max_tokens
-    ):
-        fallback_model = "gpt-3.5-turbo-1106"
-        fallback_temperature = 0
-        fallback_max_tokens = 256
-
-        if brain_id:
-            brain = brain_service.get_brain_by_id(brain_id)
-            if brain:
-                fallback_model = brain.model or fallback_model
-                fallback_temperature = brain.temperature or fallback_temperature
-                fallback_max_tokens = brain.max_tokens or fallback_max_tokens
-
-        chat_question.model = chat_question.model or fallback_model
-        chat_question.temperature = chat_question.temperature or fallback_temperature
-        chat_question.max_tokens = chat_question.max_tokens or fallback_max_tokens
+    gpt_answer_generator = get_answer_generator(
+        chat_id, chat_question, brain_id, current_user
+    )
 
     try:
-        logger.info(f"Streaming request for {chat_question.model}")
-        check_user_requests_limit(current_user, chat_question.model)
-        # TODO check if model is in the list of models available for the user
-
-        is_model_ok = chat_question.model in user_settings.get("models", ["gpt-3.5-turbo-1106"])  # type: ignore
-        gpt_answer_generator = chat_instance.get_answer_generator(
-            chat_id=str(chat_id),
-            model=chat_question.model if is_model_ok else "gpt-3.5-turbo-1106",  # type: ignore
-            max_tokens=chat_question.max_tokens,
-            temperature=chat_question.temperature,  # type: ignore
-            streaming=True,
-            prompt_id=chat_question.prompt_id,
-            brain_id=str(brain_id),
-            user_id=current_user.id,
-        )
-
         return StreamingResponse(
             gpt_answer_generator.generate_stream(
                 chat_id, chat_question, save_answer=True

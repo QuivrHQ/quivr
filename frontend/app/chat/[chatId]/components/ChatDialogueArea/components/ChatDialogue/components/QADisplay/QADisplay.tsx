@@ -5,10 +5,18 @@ import "./styles.css";
 
 type QADisplayProps = {
   content: ChatMessage;
+  index: number;
 };
-export const QADisplay = ({ content }: QADisplayProps): JSX.Element => {
-  const { assistant, message_id, user_message, brain_name, prompt_title } =
-    content;
+export const QADisplay = ({ content, index }: QADisplayProps): JSX.Element => {
+  const {
+    assistant,
+    message_id,
+    user_message,
+    brain_name,
+    prompt_title,
+    metadata,
+    brain_id,
+  } = content;
 
   return (
     <>
@@ -17,7 +25,7 @@ export const QADisplay = ({ content }: QADisplayProps): JSX.Element => {
         speaker={"user"}
         text={user_message}
         promptName={prompt_title}
-        brainName={brain_name}
+        metadata={metadata} // eslint-disable-line @typescript-eslint/no-unsafe-assignment
       />
       <MessageRow
         key={`assistant-${message_id}`}
@@ -25,6 +33,9 @@ export const QADisplay = ({ content }: QADisplayProps): JSX.Element => {
         text={assistant}
         brainName={brain_name}
         promptName={prompt_title}
+        brainId={brain_id}
+        index={index}
+        metadata={metadata} // eslint-disable-line @typescript-eslint/no-unsafe-assignment
       />
     </>
   );

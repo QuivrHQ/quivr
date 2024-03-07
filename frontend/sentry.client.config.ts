@@ -5,7 +5,7 @@
 import * as Sentry from "@sentry/nextjs";
 
 // Get the DSN from the environment variable
-const SENTRY_DSN = process.env.SENTRY_DSN;
+const SENTRY_DSN = process.env.NEXT_PUBLIC_SENTRY_DSN;
 
 // Only initialize Sentry if the DSN is set
 if (SENTRY_DSN) {
@@ -14,6 +14,7 @@ if (SENTRY_DSN) {
 
     // Adjust this value in production, or use tracesSampler for greater control
     sampleRate: 0.1,
+    tracesSampleRate: 0.1,
 
     // Setting this option to true will print useful information to the console while you're setting up Sentry.
     debug: false,

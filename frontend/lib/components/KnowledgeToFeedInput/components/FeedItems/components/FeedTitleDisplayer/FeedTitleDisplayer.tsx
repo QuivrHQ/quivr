@@ -1,4 +1,4 @@
-import Tooltip from "@/lib/components/ui/Tooltip";
+import Tooltip from "@/lib/components/ui/Tooltip/Tooltip";
 
 import { enhanceUrlDisplay } from "./utils/enhanceUrlDisplay";
 import { removeFileExtension } from "./utils/removeFileExtension";

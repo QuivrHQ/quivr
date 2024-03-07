@@ -1,20 +1,28 @@
 "use client";
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import Script from "next/script";
 import { posthog } from "posthog-js";
 import { PostHogProvider } from "posthog-js/react";
 import { PropsWithChildren, useEffect } from "react";
 
+import { BrainCreationProvider } from "@/lib/components/AddBrainModal/brainCreation-provider";
 import { Menu } from "@/lib/components/Menu/Menu";
 import { useOutsideClickListener } from "@/lib/components/Menu/hooks/useOutsideClickListener";
-import { NotificationBanner } from "@/lib/components/NotificationBanner";
-import { BrainProvider } from "@/lib/context";
+import SearchModal from "@/lib/components/SearchModal/SearchModal";
+import {
+  BrainProvider,
+  ChatProvider,
+  KnowledgeToFeedProvider,
+} from "@/lib/context";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
-import { SideBarProvider } from "@/lib/context/SidebarProvider/sidebar-provider";
+import { ChatsProvider } from "@/lib/context/ChatsProvider";
+import { MenuProvider } from "@/lib/context/MenuProvider/Menu-provider";
+import { SearchModalProvider } from "@/lib/context/SearchModalProvider/search-modal-provider";
 import { useSupabase } from "@/lib/context/SupabaseProvider";
+import { IntercomProvider } from "@/lib/helpers/intercom/IntercomProvider";
 import { UpdateMetadata } from "@/lib/helpers/updateMetadata";
 import { usePageTracking } from "@/services/analytics/june/usePageTracking";
-
 import "../lib/config/LocaleConfig/i18n";
 
 if (
@@ -48,18 +56,32 @@ const App = ({ children }: PropsWithChildren): JSX.Element => {
   }, [session]);
 
   return (
-    <PostHogProvider client={posthog}>
-      <div className="flex flex-1 flex-col overflow-auto">
-        <NotificationBanner />
-        <div className="relative h-full w-full flex justify-stretch items-stretch overflow-auto">
-          <Menu />
-          <div onClick={onClickOutside} className="flex-1">
-            {children}
+    <>
+      <Script
+        id="octolane-script"
+        src="https://cdn.octolane.com/tag.js?pk=0a213725640302dff773"
+      />
+
+      <PostHogProvider client={posthog}>
+        <IntercomProvider>
+          <div className="flex flex-1 flex-col overflow-auto">
+            <SearchModalProvider>
+              <SearchModal />
+              <div className="relative h-full w-full flex justify-stretch items-stretch overflow-auto">
+                <Menu />
+                <div
+                  onClick={onClickOutside}
+                  className="flex-1 overflow-scroll"
+                >
+                  {children}
+                </div>
+                <UpdateMetadata />
+              </div>
+            </SearchModalProvider>
           </div>
-          <UpdateMetadata />
-        </div>
-      </div>
-    </PostHogProvider>
+        </IntercomProvider>
+      </PostHogProvider>
+    </>
   );
 };
 
@@ -69,9 +91,17 @@ const AppWithQueryClient = ({ children }: PropsWithChildren): JSX.Element => {
   return (
     <QueryClientProvider client={queryClient}>
       <BrainProvider>
-        <SideBarProvider>
-          <App>{children}</App>
-        </SideBarProvider>
+        <KnowledgeToFeedProvider>
+          <BrainCreationProvider>
+            <MenuProvider>
+              <ChatsProvider>
+                <ChatProvider>
+                  <App>{children}</App>
+                </ChatProvider>
+              </ChatsProvider>
+            </MenuProvider>
+          </BrainCreationProvider>
+        </KnowledgeToFeedProvider>
       </BrainProvider>
     </QueryClientProvider>
   );

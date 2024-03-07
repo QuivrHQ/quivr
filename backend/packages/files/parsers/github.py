@@ -1,9 +1,9 @@
 import os
 import time
 
-from langchain.document_loaders import GitLoader
 from langchain.schema import Document
 from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain_community.document_loaders import GitLoader
 from models.files import File
 from packages.embeddings.vectors import Neurons
 from packages.files.file import compute_sha1_from_content
@@ -52,6 +52,7 @@ async def process_github(
             "chunk_size": chunk_size,
             "chunk_overlap": chunk_overlap,
             "date": dateshort,
+            "original_file_name": doc.metadata["original_file_name"],
         }
         doc_with_metadata = Document(page_content=doc.page_content, metadata=metadata)
 

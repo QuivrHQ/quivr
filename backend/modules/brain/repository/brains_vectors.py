@@ -57,6 +57,7 @@ class BrainsVectors(BrainsVectorsInterface):
 
     def delete_file_from_brain(self, brain_id, file_name: str):
         # First, get the vector_ids associated with the file_name
+        # TODO: filter by brain_id
         file_vectors = (
             self.db.table("vectors")
             .select("id")

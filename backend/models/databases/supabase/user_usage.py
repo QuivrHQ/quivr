@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 from uuid import UUID
 
 from logger import get_logger
@@ -122,7 +122,7 @@ class UserUsage(Repository):
                 {
                     "max_brains": product_settings["max_brains"],
                     "max_brain_size": product_settings["max_brain_size"],
-                    "daily_chat_credit": product_settings["daily_chat_credit"],
+                    "monthly_chat_credit": product_settings["monthly_chat_credit"],
                     "api_access": product_settings["api_access"],
                     "models": product_settings["models"],
                 }
@@ -139,9 +139,6 @@ class UserUsage(Repository):
         matching_customers = None
         try:
             user_is_customer, user_customer_id = self.check_user_is_customer(user_id)
-            logger.info("🔥🔥🔥")
-            logger.info(user_is_customer)
-            logger.info(user_customer_id)
 
             if user_is_customer:
                 self.db.table("user_settings").update({"is_premium": True}).match(
@@ -153,12 +150,12 @@ class UserUsage(Repository):
                 self.update_customer_settings_with_product_settings(
                     user_id, user_customer_id
                 )
-                return True
+                return True, False
             else:
                 self.db.table("user_settings").update({"is_premium": False}).match(
                     {"user_id": str(user_id)}
                 ).execute()
-                return False
+                return False, False
 
         except Exception as e:
             logger.info(matching_customers)
@@ -167,7 +164,7 @@ class UserUsage(Repository):
                 "Error while checking if user is a premium user. Stripe needs to be configured."
             )
             logger.error(e)
-            return False
+            return False, True
 
     def get_user_settings(self, user_id):
         """
@@ -194,9 +191,9 @@ class UserUsage(Repository):
 
         user_settings = user_settings_response[0]
 
-        check_is_premium = self.check_if_is_premium_user(user_id)
+        check_is_premium, error = self.check_if_is_premium_user(user_id)
 
-        if check_is_premium:
+        if check_is_premium and not error:
             # get the possibly updated user settings
             user_settings_response = (
                 self.db.from_("user_settings")
@@ -248,16 +245,30 @@ class UserUsage(Repository):
             return response[0]["daily_requests_count"]
         return 0
 
-    def increment_user_request_count(
-        self, user_id, date, current_requests_count: int, number: int = 1
-    ):
+    def get_user_requests_count_for_month(self, user_id, date):
+        """
+        Fetch the user request count from the database
+        """
+        date_30_days_ago = (datetime.now() - timedelta(days=30)).strftime("%Y%m%d")
+
+        response = (
+            self.db.from_("user_daily_usage")
+            .select("daily_requests_count")
+            .filter("user_id", "eq", user_id)
+            .filter("date", "gte", date_30_days_ago)
+            .execute()
+        ).data
+
+        if response and len(response) > 0:
+            return sum(row["daily_requests_count"] for row in response)
+        return 0
+
+    def increment_user_request_count(self, user_id, date, number: int = 1):
         """
         Increment the user's requests count for a specific day
         """
 
-        self.update_user_request_count(
-            user_id, daily_requests_count=current_requests_count + number, date=date
-        )
+        self.update_user_request_count(user_id, daily_requests_count=number, date=date)
 
     def update_user_request_count(self, user_id, daily_requests_count, date):
         response = (

@@ -1,3 +1,4 @@
+import random
 from typing import List, Optional
 from uuid import UUID
 
@@ -46,6 +47,25 @@ class ChatService:
 
         return insert_response.data[0]
 
+    def get_follow_up_question(
+        self, brain_id: UUID = None, question: str = None
+    ) -> [str]:
+        follow_up = [
+            "Summarize the conversation",
+            "Explain in more detail",
+            "Explain like I'm 5",
+            "Provide a list",
+            "Give examples",
+            "Use simpler language",
+            "Elaborate on a specific point",
+            "Provide pros and cons",
+            "Break down into steps",
+            "Illustrate with an image or diagram",
+        ]
+        # Return 3 random follow up questions amongs the list
+        random3 = random.sample(follow_up, 3)
+        return random3
+
     def add_question_and_answer(
         self, chat_id: UUID, question_and_answer: QuestionAndAnswer
     ) -> Optional[Chat]:
@@ -79,7 +99,9 @@ class ChatService:
                         assistant=message.assistant,
                         message_time=message.message_time,
                         brain_name=brain.name if brain else None,
+                        brain_id=str(brain.id) if brain else None,
                         prompt_title=prompt.title if prompt else None,
+                        metadata=message.metadata,
                     )
                 )
             return enriched_history
@@ -132,6 +154,7 @@ class ChatService:
         message_id: str,
         user_message: str = None,  # pyright: ignore reportPrivateUsage=none
         assistant: str = None,  # pyright: ignore reportPrivateUsage=none
+        metadata: dict = None,  # pyright: ignore reportPrivateUsage=none
     ) -> ChatHistory:
         if not message_id:
             logger.error("No message_id provided")
@@ -144,6 +167,9 @@ class ChatService:
 
         if assistant is not None:
             updates["assistant"] = assistant
+
+        if metadata is not None:
+            updates["metadata"] = metadata
 
         updated_message = None
 

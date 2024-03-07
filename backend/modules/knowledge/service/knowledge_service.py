@@ -18,7 +18,6 @@ class KnowledgeService:
     def add_knowledge(self, knowledge_to_add: CreateKnowledgeProperties):
         knowledge = self.repository.insert_knowledge(knowledge_to_add)
 
-        logger.info(f"Knowledge { knowledge.id} added successfully")
         return knowledge
 
     def get_all_knowledge(self, brain_id: UUID):
@@ -40,7 +39,5 @@ class KnowledgeService:
 
     def remove_knowledge(self, knowledge_id: UUID):
         message = self.repository.remove_knowledge_by_id(knowledge_id)
-
-        logger.info(f"Knowledge { knowledge_id} removed successfully from table")
 
         return message

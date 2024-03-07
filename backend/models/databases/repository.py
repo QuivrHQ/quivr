@@ -2,6 +2,8 @@ from abc import ABC, abstractmethod
 from datetime import datetime
 from uuid import UUID
 
+from .entity import LLMModels
+
 
 class Repository(ABC):
     @abstractmethod
@@ -13,7 +15,11 @@ class Repository(ABC):
         pass
 
     @abstractmethod
-    def get_user_requests_count_for_day(self, user_id: UUID, date: datetime):
+    def get_model_settings(self) -> LLMModels | None:
+        pass
+
+    @abstractmethod
+    def get_user_requests_count_for_month(self, user_id: UUID, date: datetime):
         pass
 
     @abstractmethod
@@ -59,9 +65,7 @@ class Repository(ABC):
         pass
 
     @abstractmethod
-    def similarity_search(
-        self, query_embedding, table: str, top_k: int, threshold: float
-    ):
+    def similarity_search(self, query_embedding, table: str, k: int, threshold: float):
         pass
 
     @abstractmethod

@@ -1,0 +1,13 @@
+@use "@/styles/Colors.module.scss";
+@use "@/styles/Radius.module.scss";
+@use "@/styles/Spacings.module.scss";
+@use "@/styles/Typography.module.scss";
+@use "@/styles/ZIndexes.module.scss";
+
+.tooltip_content_wrapper {
+  z-index: ZIndexes.$tooltip;
+  background-color: Colors.$lightest-black;
+  padding: Spacings.$spacing03;
+  border-radius: Radius.$normal;
+  font-size: Typography.$small;
+}

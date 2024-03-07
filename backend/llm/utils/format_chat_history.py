@@ -1,12 +1,18 @@
-from typing import List, Tuple
+from typing import Dict, List, Tuple
 
 from langchain.schema import AIMessage, BaseMessage, HumanMessage, SystemMessage
+from modules.chat.dto.outputs import GetChatHistoryOutput
 
 
-def format_chat_history(history) -> List[Tuple[str, str]]:
-    """Format the chat history into a list of tuples (human, ai)"""
-
-    return [(chat.user_message, chat.assistant) for chat in history]
+def format_chat_history(
+    history: List[GetChatHistoryOutput],
+) -> List[Dict[str, str]]:
+    """Format the chat history into a list of HumanMessage and AIMessage"""
+    formatted_history = []
+    for chat in history:
+        formatted_history.append(HumanMessage(chat.user_message))
+        formatted_history.append(AIMessage(chat.assistant))
+    return formatted_history
 
 
 def format_history_to_openai_mesages(

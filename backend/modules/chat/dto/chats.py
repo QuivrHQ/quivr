@@ -4,7 +4,7 @@ from uuid import UUID
 
 from modules.chat.dto.outputs import GetChatHistoryOutput
 from modules.notification.entity.notification import Notification
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 
 class ChatMessage(BaseModel):
@@ -21,11 +21,18 @@ class ChatMessage(BaseModel):
 
 class ChatQuestion(BaseModel):
     question: str
-    model: Optional[str]
-    temperature: Optional[float]
-    max_tokens: Optional[int]
-    brain_id: Optional[UUID]
-    prompt_id: Optional[UUID]
+    model: Optional[str] = None
+    temperature: Optional[float] = None
+    max_tokens: Optional[int] = None
+    brain_id: Optional[UUID] = None
+    prompt_id: Optional[UUID] = None
+
+
+class Sources(BaseModel):
+    name: str
+    source_url: str
+    type: str
+    original_file_name: str
 
 
 class ChatItemType(Enum):

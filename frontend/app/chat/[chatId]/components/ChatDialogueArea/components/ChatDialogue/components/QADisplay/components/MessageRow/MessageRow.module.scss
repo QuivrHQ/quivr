@@ -1,0 +1,67 @@
+@use "@/styles/Colors.module.scss";
+@use "@/styles/Radius.module.scss";
+@use "@/styles/Spacings.module.scss";
+
+.message_row_container {
+  display: flex;
+  flex-direction: column;
+  padding-right: Spacings.$spacing05;
+  width: 85%;
+  padding-block: Spacings.$spacing03;
+
+  .message_row_content {
+    align-self: flex-end;
+    border-radius: Radius.$big;
+    width: fit-content;
+    padding-block: Spacings.$spacing03;
+    padding-inline: Spacings.$spacing05;
+  }
+
+  .message_header {
+    padding: Spacings.$spacing02;
+    overflow: hidden;
+  }
+
+  &.user {
+    align-self: flex-end;
+
+    .message_header {
+      align-self: flex-end;
+      display: flex;
+      gap: Spacings.$spacing02;
+      align-items: center;
+      color: Colors.$dark-grey;
+    }
+
+    .message_row_content {
+      background-color: Colors.$lightest-grey;
+    }
+  }
+
+  &.brain {
+    .message_header {
+      display: flex;
+      gap: Spacings.$spacing04;
+      align-items: baseline;
+    }
+
+    .message_row_content {
+      align-self: flex-start;
+      background-color: Colors.$primary-lightest;
+      margin-left: 1px;
+      position: relative;
+
+      .icons_wrapper {
+        position: absolute;
+        display: flex;
+        gap: Spacings.$spacing02;
+        left: Spacings.$spacing02;
+        top: calc(100% + #{Spacings.$spacing03});
+
+        .sources_icon_wrapper {
+          cursor: pointer;
+        }
+      }
+    }
+  }
+}

@@ -63,10 +63,7 @@ export const useApiKeyConfig = () => {
     try {
       setChangeOpenAiApiKeyRequestPending(true);
 
-      
-
-      await updateUserIdentity({
-      });
+      await updateUserIdentity({});
       void queryClient.invalidateQueries({
         queryKey: [USER_IDENTITY_DATA_KEY],
       });
@@ -85,8 +82,7 @@ export const useApiKeyConfig = () => {
   const removeOpenAiApiKey = async () => {
     try {
       setChangeOpenAiApiKeyRequestPending(true);
-      await updateUserIdentity({
-      });
+      await updateUserIdentity({});
 
       publish({
         variant: "success",
@@ -102,8 +98,6 @@ export const useApiKeyConfig = () => {
       setChangeOpenAiApiKeyRequestPending(false);
     }
   };
-
-
 
   return {
     handleCreateClick,

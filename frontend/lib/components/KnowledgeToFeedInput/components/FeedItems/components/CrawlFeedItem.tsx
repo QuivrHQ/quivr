@@ -2,6 +2,7 @@ import { IoMdCloseCircle } from "react-icons/io";
 import { MdLink } from "react-icons/md";
 
 import { FeedTitleDisplayer } from "./FeedTitleDisplayer";
+
 import { StyledFeedItemDiv } from "../styles/StyledFeedItemDiv";
 
 type CrawlFeedItemProps = {

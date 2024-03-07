@@ -1,0 +1,15 @@
+@use "@/styles/Colors.module.scss";
+@use "@/styles/Spacings.module.scss";
+@use "@/styles/Typography.module.scss";
+
+.prompt_name_wrapper {
+  display: flex;
+  align-items: center;
+  color: Colors.$black;
+  font-size: Typography.$small;
+  overflow: hidden;
+
+  .prompt_name {
+    @include Typography.EllipsisOverflow;
+  }
+}

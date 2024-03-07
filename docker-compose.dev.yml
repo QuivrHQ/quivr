@@ -23,7 +23,7 @@ services:
       - "--port"
       - "5050"
       - "--workers"
-      - "2"
+      - "6"
     restart: always
 
     ports:
@@ -31,7 +31,7 @@ services:
       - 5678:5678 # debug port
 
   redis:
-    image: redis:latest@sha256:a7cee7c8178ff9b5297cb109e6240f5072cdaaafd775ce6b586c3c704b06458e
+    image: redis:latest
     container_name: redis
     restart: always
     ports:
@@ -44,8 +44,10 @@ services:
       - .env
     build:
       context: backend
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.dev
     container_name: worker
+    # volumes:
+    #   - ./backend/:/code/
     command: celery -A celery_worker worker -l info
     restart: always
     depends_on:
@@ -58,7 +60,8 @@ services:
       - .env
     build:
       context: backend
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.dev
+
     container_name: beat
     command: celery -A celery_worker beat -l info
     restart: always
@@ -72,7 +75,8 @@ services:
       - .env
     build:
       context: backend
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.dev
+
     container_name: flower
     command: celery -A celery_worker flower -l info --port=5555
     restart: always

@@ -21,6 +21,7 @@ from modules.notification.entity.notification import NotificationsStatusEnum
 from modules.notification.service.notification_service import NotificationService
 from modules.user.entity.user_identity import UserIdentity
 from packages.files.file import convert_bytes, get_file_size
+from packages.utils.telemetry import send_telemetry
 from repository.files.upload_file import upload_file_storage
 
 logger = get_logger(__name__)
@@ -55,7 +56,7 @@ async def upload_file(
     user_settings = user_daily_usage.get_user_settings()
 
     remaining_free_space = user_settings.get("max_brain_size", 1000000000)
-
+    send_telemetry("upload_file", {"file_name": uploadFile.filename})
     file_size = get_file_size(uploadFile)
     if remaining_free_space - file_size < 0:
         message = f"Brain will exceed maximum capacity. Maximum file allowed is : {convert_bytes(remaining_free_space)}"
@@ -85,7 +86,7 @@ async def upload_file(
             "name": uploadFile.filename if uploadFile else "Last Upload File",
         }
         notification_service.update_notification_by_id(
-            upload_notification.id,
+            upload_notification.id if upload_notification else None,
             NotificationUpdatableProperties(
                 status=NotificationsStatusEnum.Done,
                 message=str(notification_message),

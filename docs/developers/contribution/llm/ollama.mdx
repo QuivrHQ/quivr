@@ -20,7 +20,7 @@ ollama run llama2
 ### Run Migrations
 
 ```bash
-mv supabase/local_20240107152745_ollama.sql supabase/20240107152745_ollama.sql
+mv supabase/migrations/local_20240107152745_ollama.sql supabase/migrations/20240107152745_ollama.sql
 supabase db reset
 ```
 
@@ -36,7 +36,7 @@ Go to [supabase](https://localhost:54323) and in the table `user_settings` eithe
 ```json
 [
   "ollama/llama2",
-  "ollama/mistral",
+  "ollama/mistral"
 ]
 ```
 

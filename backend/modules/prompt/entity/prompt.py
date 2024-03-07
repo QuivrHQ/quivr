@@ -28,9 +28,9 @@ class CreatePromptProperties(BaseModel):
 class PromptUpdatableProperties(BaseModel):
     """Properties that can be received on prompt update"""
 
-    title: Optional[str]
-    content: Optional[str]
-    status: Optional[PromptStatusEnum]
+    title: Optional[str] = None
+    content: Optional[str] = None
+    status: Optional[PromptStatusEnum] = None
 
 
 class DeletePromptResponse(BaseModel):

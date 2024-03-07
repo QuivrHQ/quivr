@@ -9,8 +9,8 @@ class CreateChatHistory(BaseModel):
     chat_id: UUID
     user_message: str
     assistant: str
-    prompt_id: Optional[UUID]
-    brain_id: Optional[UUID]
+    prompt_id: Optional[UUID] = None
+    brain_id: Optional[UUID] = None
 
 
 class QuestionAndAnswer(BaseModel):

@@ -20,6 +20,15 @@ class DocumentAnswer:
 
 
 def get_question_context_from_brain(brain_id: UUID, question: str) -> str:
+    """Finds the best brain to answer the question based on the question's meaning.
+
+    Args:
+        brain_id (UUID): Id of the brain to search in
+        question (str): Question to search for in the vector store
+
+    Returns:
+        str: _descripton_
+    """
     # TODO: Move to AnswerGenerator service
     supabase_client = get_supabase_client()
     embeddings = get_embeddings()
@@ -29,6 +38,7 @@ def get_question_context_from_brain(brain_id: UUID, question: str) -> str:
         embeddings,
         table_name="vectors",
         brain_id=str(brain_id),
+        number_docs=20,
     )
     documents = vector_store.similarity_search(question, k=20, threshold=0.8)
 

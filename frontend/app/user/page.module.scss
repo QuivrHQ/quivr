@@ -1,0 +1,9 @@
+@use "@/styles/Spacings.module.scss";
+
+.user_page_container {
+  padding-inline: Spacings.$spacing09;
+  padding-block: Spacings.$spacing07;
+  display: flex;
+  flex-direction: column;
+  gap: Spacings.$spacing05;
+}

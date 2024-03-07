@@ -1,0 +1,51 @@
+@use "@/styles/Colors.module.scss";
+@use "@/styles/Spacings.module.scss";
+@use "@/styles/ZIndexes.module.scss";
+
+.menu_container {
+  background-color: Colors.$highlight;
+  border-right: 1px solid Colors.$lightest-black;
+
+  .menu_wrapper {
+    padding-top: Spacings.$spacing05;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    overflow-y: scroll;
+
+    .quivr_logo_wrapper {
+      cursor: pointer;
+      margin-inline: auto;
+      display: flex;
+      justify-content: center;
+    }
+
+    .buttons_wrapper {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: Spacings.$spacing05;
+      flex-grow: 1;
+      gap: Spacings.$spacing05;
+
+      .block {
+        display: flex;
+        flex-direction: column;
+        gap: Spacings.$spacing04;
+      }
+    }
+  }
+}
+
+.menu_control_button_wrapper {
+  background-color: transparent;
+  position: absolute;
+  top: Spacings.$spacing05;
+  left: Spacings.$spacing05;
+  transition: margin-left 0.2s ease-in-out;
+  z-index: ZIndexes.$overlay;
+
+  &.shifted {
+    margin-left: 180px;
+  }
+}

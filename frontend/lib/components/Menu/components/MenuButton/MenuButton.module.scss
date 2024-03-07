@@ -1,0 +1,45 @@
+@use "@/styles/Colors.module.scss";
+@use "@/styles/Radius.module.scss";
+@use "@/styles/Spacings.module.scss";
+@use "@/styles/Typography.module.scss";
+
+.menu_button_wrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  padding: Spacings.$spacing03;
+  border-radius: Radius.$normal;
+  overflow: hidden;
+  border-left: 2px solid transparent;
+
+  &.selected {
+    border-left: 2px solid Colors.$primary;
+    border-radius: 0 Radius.$normal Radius.$normal 0;
+  }
+
+  .left {
+    display: flex;
+    align-items: center;
+    gap: Spacings.$spacing03;
+    overflow: hidden;
+
+    .title {
+      @include Typography.EllipsisOverflow;
+      font-size: Typography.$small;
+      color: Colors.$black;
+
+      &.gold {
+        color: Colors.$gold;
+      }
+
+      &.primary {
+        color: Colors.$primary;
+      }
+    }
+  }
+
+  &:hover {
+    background-color: Colors.$lightest-black;
+  }
+}

@@ -18,7 +18,6 @@ export const useChatNotificationsSync = () => {
   const { getChatNotifications } = useNotificationApi();
   const { setShouldDisplayFeedCard } = useKnowledgeToFeedContext();
   const params = useParams();
-
   const chatId = params?.chatId as string | undefined;
 
   const chatNotificationsQueryKey = getChatNotificationsQueryKey(chatId ?? "");
@@ -64,11 +63,15 @@ export const useChatNotificationsSync = () => {
 
         return;
       }
-
       const chatItems = await getChatItems(chatId);
-
-      setMessages(getMessagesFromChatItems(chatItems));
-      setNotifications(getNotificationsFromChatItems(chatItems));
+      const messagesFromChatItems = getMessagesFromChatItems(chatItems);
+      if (
+        messagesFromChatItems.length > 1 ||
+        (messagesFromChatItems[0] && messagesFromChatItems[0].assistant !== "")
+      ) {
+        setMessages(messagesFromChatItems);
+        setNotifications(getNotificationsFromChatItems(chatItems));
+      }
     };
     void fetchHistory();
   }, [chatId]);

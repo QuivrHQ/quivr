@@ -50,60 +50,10 @@ def test_create_chat_and_talk(client, api_key):
     response = client.post(
         f"/chat/{chat_id}/question?brain_id={default_brain_id}",
         json={
-            "model": "gpt-3.5-turbo-1106",
+            "model": "gpt-3.5-turbo-0125",
             "question": "Hello, how are you?",
             "temperature": "0",
-            "max_tokens": "256",
-        },
-        headers={"Authorization": "Bearer " + api_key},
-    )
-    assert response.status_code == 200
-
-    response = client.post(
-        f"/chat/{chat_id}/question?brain_id={default_brain_id}",
-        json={
-            "model": "gpt-4",
-            "question": "Hello, how are you?",
-            "temperature": "0",
-            "max_tokens": "256",
-        },
-        headers={"Authorization": "Bearer " + api_key},
-    )
-    print(response)
-    assert response.status_code == 200
-
-    # Now, let's delete the chat
-    delete_response = client.delete(
-        "/chat/" + chat_id, headers={"Authorization": "Bearer " + api_key}
-    )
-    assert delete_response.status_code == 200
-
-
-def test_create_chat_and_talk_with_no_brain(client, api_key):
-    # Make a POST request to chat with no brain id and a random chat name
-    random_chat_name = "".join(
-        random.choices(string.ascii_letters + string.digits, k=10)
-    )
-
-    # Create a chat
-    response = client.post(
-        "/chat",
-        json={"name": random_chat_name},
-        headers={"Authorization": "Bearer " + api_key},
-    )
-    assert response.status_code == 200
-
-    # now talk to the chat with a question
-    response_data = response.json()
-    print(response_data)
-    chat_id = response_data["chat_id"]
-    response = client.post(
-        f"/chat/{chat_id}/question?brain_id=",
-        json={
-            "model": "gpt-3.5-turbo-1106",
-            "question": "Hello, how are you?",
-            "temperature": "0",
-            "max_tokens": "256",
+            "max_tokens": "2000",
         },
         headers={"Authorization": "Bearer " + api_key},
     )

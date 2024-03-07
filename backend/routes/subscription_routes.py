@@ -82,6 +82,7 @@ def invite_users_to_brain(
                 resend_invitation_email(
                     subscription,
                     inviter_email=current_user.email or "Quivr",
+                    user_id=current_user.id,
                     origin=origin,
                 )
         except Exception as e:
@@ -205,7 +206,7 @@ def get_user_invitation(
             detail="You have not been invited to this brain",
         )
 
-    brain_details = brain_service.get_brain_details(brain_id)
+    brain_details = brain_service.get_brain_details(brain_id, current_user.id)
 
     if brain_details is None:
         raise HTTPException(
@@ -292,7 +293,7 @@ async def decline_invitation(
 
 
 class BrainSubscriptionUpdatableProperties(BaseModel):
-    rights: str | None
+    rights: str | None = None
     email: str
 
 

@@ -2,7 +2,6 @@ import { useChatContext } from "@/lib/context";
 import { useOnboarding } from "@/lib/hooks/useOnboarding";
 
 import { ChatDialogue } from "./components/ChatDialogue";
-import { ShortCuts } from "./components/ShortCuts";
 import { getMergedChatMessagesWithDoneStatusNotificationsReduced } from "./utils/getMergedChatMessagesWithDoneStatusNotificationsReduced";
 
 export const ChatDialogueArea = (): JSX.Element => {
@@ -20,5 +19,5 @@ export const ChatDialogueArea = (): JSX.Element => {
     return <ChatDialogue chatItems={chatItems} />;
   }
 
-  return <ShortCuts />;
+  return <></>;
 };

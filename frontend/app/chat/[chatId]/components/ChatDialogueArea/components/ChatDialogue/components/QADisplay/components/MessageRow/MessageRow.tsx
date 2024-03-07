@@ -1,10 +1,15 @@
 import React from "react";
 
-import { CopyButton } from "./components/CopyButton";
-import { MessageContent } from "./components/MessageContent";
-import { QuestionBrain } from "./components/QuestionBrain";
-import { QuestionPrompt } from "./components/QuestionPrompt";
-import { SourcesButton } from "./components/SourcesButton";
+import { CopyButton } from "@/lib/components/ui/CopyButton";
+import Icon from "@/lib/components/ui/Icon/Icon";
+import { useChatContext } from "@/lib/context";
+import { useDevice } from "@/lib/hooks/useDevice";
+import { Source } from "@/lib/types/MessageMetadata";
+
+import styles from "./MessageRow.module.scss";
+import { MessageContent } from "./components/MessageContent/MessageContent";
+import { QuestionBrain } from "./components/QuestionBrain/QuestionBrain";
+import { QuestionPrompt } from "./components/QuestionPrompt/QuestionPrompt";
 import { useMessageRow } from "./hooks/useMessageRow";
 
 type MessageRowProps = {
@@ -13,62 +18,81 @@ type MessageRowProps = {
   brainName?: string | null;
   promptName?: string | null;
   children?: React.ReactNode;
+  metadata?: {
+    sources?: Source[];
+  };
+  brainId?: string;
+  index?: number;
 };
 
 export const MessageRow = React.forwardRef(
   (
-    { speaker, text, brainName, promptName, children }: MessageRowProps,
+    {
+      speaker,
+      text,
+      brainName,
+      promptName,
+      children,
+      brainId,
+      index,
+    }: MessageRowProps,
     ref: React.Ref<HTMLDivElement>
   ) => {
-    const {
-      containerClasses,
-      containerWrapperClasses,
-      handleCopy,
-      isCopied,
-      isUserSpeaker,
-      markdownClasses,
-    } = useMessageRow({
+    const { handleCopy, isUserSpeaker } = useMessageRow({
       speaker,
       text,
     });
+    const { setSourcesMessageIndex, sourcesMessageIndex } = useChatContext();
+    const { isMobile } = useDevice();
 
-    let messageContent = text ?? "";
-    let sourcesContent = "";
-
-    const sourcesIndex = messageContent.lastIndexOf("**Sources:**");
-    const hasSources = sourcesIndex !== -1;
-
-    if (hasSources) {
-      sourcesContent = messageContent
-        .substring(sourcesIndex + "**Sources:**".length)
-        .trim();
-      messageContent = messageContent.substring(0, sourcesIndex).trim();
-    }
+    const messageContent = text ?? "";
 
     return (
-      <div className={containerWrapperClasses}>
-        <div ref={ref} className={containerClasses}>
-          <div className="flex justify-between items-start w-full">
-            {/* Left section for the question and prompt */}
-            <div className="flex gap-1">
-              <QuestionBrain brainName={brainName} />
-              <QuestionPrompt promptName={promptName} />
-            </div>
-            {/* Right section for buttons */}
-            <div className="flex items-center gap-2">
-              {!isUserSpeaker && (
-                <>
-                  {hasSources && <SourcesButton sources={sourcesContent} />}
-                  <CopyButton handleCopy={handleCopy} isCopied={isCopied} />
-                </>
-              )}
-            </div>
+      <div
+        className={`
+      ${styles.message_row_container} 
+      ${isUserSpeaker ? styles.user : styles.brain}
+      `}
+      >
+        {!isUserSpeaker ? (
+          <div className={styles.message_header}>
+            <QuestionBrain brainName={brainName} brainId={brainId} />
+            <QuestionPrompt promptName={promptName} />
           </div>
+        ) : (
+          <div className={styles.message_header}>
+            <Icon name="user" color="dark-grey" size="normal" />
+            <span className={styles.me}>Me</span>
+          </div>
+        )}
+        {}
+        <div ref={ref} className={styles.message_row_content}>
           {children ?? (
-            <MessageContent
-              text={messageContent}
-              markdownClasses={markdownClasses}
-            />
+            <>
+              <MessageContent text={messageContent} isUser={isUserSpeaker} />
+              {!isUserSpeaker && messageContent !== "🧠" && (
+                <div className={styles.icons_wrapper}>
+                  <CopyButton handleCopy={handleCopy} />
+                  {!isMobile && (
+                    <div className={styles.sources_icon_wrapper}>
+                      <Icon
+                        name="file"
+                        handleHover={true}
+                        color={
+                          sourcesMessageIndex === index ? "primary" : "black"
+                        }
+                        size="small"
+                        onClick={() => {
+                          setSourcesMessageIndex(
+                            sourcesMessageIndex === index ? undefined : index
+                          );
+                        }}
+                      />
+                    </div>
+                  )}
+                </div>
+              )}
+            </>
           )}
         </div>
       </div>

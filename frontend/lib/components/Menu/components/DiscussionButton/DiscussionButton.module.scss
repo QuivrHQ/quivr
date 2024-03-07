@@ -1,0 +1,45 @@
+@use "@/styles/Colors.module.scss";
+@use "@/styles/IconSizes.module.scss";
+@use "@/styles/Radius.module.scss";
+@use "@/styles/Spacings.module.scss";
+
+.button_wrapper {
+  display: flex;
+  padding: Spacings.$spacing03;
+  justify-content: space-between;
+  align-items: center;
+  border: 1px solid Colors.$lighter-grey;
+  border-radius: Radius.$big;
+  background-color: Colors.$white;
+  cursor: pointer;
+  color: Colors.$dark-grey;
+  transition: box-shadow 0.3s ease;
+
+  .left_wrapper {
+    display: flex;
+    align-items: center;
+    gap: Spacings.$spacing03;
+
+    .shortcuts_wrapper {
+      display: flex;
+      align-items: center;
+      gap: Spacings.$spacing01;
+
+      .shortcut {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        border: 1px solid Colors.$lighter-grey;
+        border-radius: Radius.$small;
+        width: 16px;
+        height: 16px;
+      }
+    }
+  }
+
+  &:hover {
+    border-color: Colors.$primary;
+    box-shadow: 0 0 0 1px Colors.$primary;
+  }
+}

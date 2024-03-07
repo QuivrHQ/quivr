@@ -17,6 +17,9 @@ export const ChatProvider = ({
 }): JSX.Element => {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [sourcesMessageIndex, setSourcesMessageIndex] = useState<
+    number | undefined
+  >(undefined);
 
   const updateStreamingHistory = (streamedChat: ChatMessage): void => {
     setMessages((prevHistory: ChatMessage[]) => {
@@ -25,7 +28,11 @@ export const ChatProvider = ({
       )
         ? prevHistory.map((item: ChatMessage) =>
             item.message_id === streamedChat.message_id
-              ? { ...item, assistant: item.assistant + streamedChat.assistant }
+              ? {
+                  ...item,
+                  assistant: item.assistant + streamedChat.assistant,
+                  metadata: streamedChat.metadata,
+                }
               : item
           )
         : [...prevHistory, streamedChat];
@@ -49,6 +56,8 @@ export const ChatProvider = ({
         removeMessage,
         notifications,
         setNotifications,
+        sourcesMessageIndex,
+        setSourcesMessageIndex,
       }}
     >
       {children}

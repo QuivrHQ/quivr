@@ -1,5 +1,3 @@
-import json
-
 import requests
 from logger import get_logger
 
@@ -23,14 +21,25 @@ def get_api_call_response_as_text(
         headers[secret] = secrets[secret]
 
     try:
-        response = requests.request(
-            method,
-            url=api_url_with_search_params,
-            params=search_params or None,
-            headers=headers or None,
-            data=json.dumps(params) or None,
-        )
+        if method in ["GET", "DELETE"]:
+            response = requests.request(
+                method,
+                url=api_url_with_search_params,
+                params=params or None,
+                headers=headers or None,
+            )
+        elif method in ["POST", "PUT", "PATCH"]:
+            response = requests.request(
+                method,
+                url=api_url_with_search_params,
+                json=params or None,
+                headers=headers or None,
+            )
+        else:
+            raise ValueError(f"Invalid method: {method}")
+
         return response.text
+
     except Exception as e:
         logger.error(f"Error calling API: {e}")
-        return str(e)
+        return None

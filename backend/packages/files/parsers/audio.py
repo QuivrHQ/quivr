@@ -10,8 +10,7 @@ from packages.files.file import compute_sha1_from_content
 
 
 async def process_audio(
-    file: File,
-    user,
+    file: File, user, original_file_name, integration=None, integration_link=None
 ):
     temp_filename = None
     file_sha = ""

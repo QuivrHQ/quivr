@@ -1,0 +1,22 @@
+@use "@/styles/Colors.module.scss";
+@use "@/styles/Radius.module.scss";
+@use "@/styles/Spacings.module.scss";
+
+.chat_container {
+  display: flex;
+  flex-direction: column;
+  background-color: Colors.$white;
+  gap: Spacings.$spacing03;
+  border-radius: Radius.$big;
+  border: 1px solid Colors.$lighter-grey;
+  overflow: hidden;
+
+  .chat_wrapper {
+    display: flex;
+    padding: Spacings.$spacing05;
+
+    &.with_brain {
+      padding-top: 0;
+    }
+  }
+}

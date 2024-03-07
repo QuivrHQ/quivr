@@ -1,0 +1,24 @@
+@use "@/styles/Colors.module.scss";
+@use "@/styles/ScreenSizes.module.scss";
+@use "@/styles/Spacings.module.scss";
+@use "@/styles/ZIndexes.module.scss";
+
+.search_modal_wrapper {
+  display: flex;
+  background-color: rgba(Colors.$dark-black, 0.94);
+  height: 100%;
+  width: 100%;
+  position: absolute;
+  z-index: ZIndexes.$modal;
+  align-items: center;
+  justify-content: center;
+
+  .search_bar_wrapper {
+    width: 50%;
+
+    @media (max-width: ScreenSizes.$small) {
+      width: 100%;
+      margin-inline: Spacings.$spacing07;
+    }
+  }
+}

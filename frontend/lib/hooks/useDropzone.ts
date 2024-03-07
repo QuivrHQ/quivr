@@ -7,6 +7,8 @@ import { useEventTracking } from "@/services/analytics/june/useEventTracking";
 import { useOnboarding } from "./useOnboarding";
 import { useOnboardingTracker } from "./useOnboardingTracker";
 import { useToast } from "./useToast";
+
+import { useBrainCreationContext } from "../components/AddBrainModal/brainCreation-provider";
 import { useKnowledgeToFeedContext } from "../context/KnowledgeToFeedProvider/hooks/useKnowledgeToFeedContext";
 import { acceptedFormats } from "../helpers/acceptedFormats";
 import { cloneFileWithSanitizedName } from "../helpers/cloneFileWithSanitizedName";
@@ -15,9 +17,9 @@ import { cloneFileWithSanitizedName } from "../helpers/cloneFileWithSanitizedNam
 export const useCustomDropzone = () => {
   const { knowledgeToFeed, addKnowledgeToFeed, setShouldDisplayFeedCard } =
     useKnowledgeToFeedContext();
+  const { isBrainCreationModalOpened } = useBrainCreationContext();
   const { isOnboarding } = useOnboarding();
   const { trackOnboardingEvent } = useOnboardingTracker();
-
   const files: File[] = (
     knowledgeToFeed.filter((c) => c.source === "upload") as FeedItemUploadType[]
   ).map((c) => c.file);
@@ -28,7 +30,9 @@ export const useCustomDropzone = () => {
   const { t } = useTranslation(["upload"]);
 
   const onDrop = (acceptedFiles: File[], fileRejections: FileRejection[]) => {
-    setShouldDisplayFeedCard(true);
+    if (!isBrainCreationModalOpened) {
+      setShouldDisplayFeedCard(true);
+    }
     if (fileRejections.length > 0) {
       const firstRejection = fileRejections[0];
 

@@ -1,0 +1,88 @@
+@use "@/styles/Colors.module.scss";
+@use "@/styles/IconSizes.module.scss";
+
+.small {
+  min-width: IconSizes.$small;
+  min-height: IconSizes.$small;
+  max-width: IconSizes.$small;
+  max-height: IconSizes.$small;
+}
+
+.normal {
+  min-width: IconSizes.$normal;
+  min-height: IconSizes.$normal;
+  max-width: IconSizes.$normal;
+  max-height: IconSizes.$normal;
+}
+
+.large {
+  min-width: IconSizes.$large;
+  min-height: IconSizes.$large;
+  max-width: IconSizes.$large;
+  max-height: IconSizes.$large;
+}
+
+.big {
+  min-width: IconSizes.$big;
+  min-height: IconSizes.$big;
+  max-width: IconSizes.$big;
+  max-height: IconSizes.$big;
+}
+
+.black {
+  color: Colors.$black;
+
+  &.hovered {
+    color: Colors.$primary;
+  }
+}
+
+.dark-grey {
+  color: Colors.$dark-grey;
+}
+
+.grey {
+  color: Colors.$normal-grey;
+}
+
+.primary {
+  color: Colors.$primary;
+}
+
+.accent {
+  color: Colors.$accent;
+}
+
+.gold {
+  color: Colors.$gold;
+}
+
+.white {
+  color: Colors.$white;
+}
+
+.dangerous {
+  color: Colors.$dangerous;
+
+  &.hovered {
+    color: Colors.$dangerous-dark;
+  }
+}
+
+.warning {
+  color: Colors.$warning;
+}
+
+.success {
+  color: Colors.$success;
+}
+
+.disabled {
+  color: Colors.$black;
+  pointer-events: none;
+  opacity: 0.2;
+}
+
+.hovered {
+  cursor: pointer;
+}

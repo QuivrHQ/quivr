@@ -8,8 +8,6 @@ from middlewares.auth import AuthBearer, get_current_user
 from models import UserUsage
 from modules.knowledge.dto.inputs import CreateKnowledgeProperties
 from modules.knowledge.service.knowledge_service import KnowledgeService
-from modules.notification.dto.inputs import CreateNotificationProperties
-from modules.notification.entity.notification import NotificationsStatusEnum
 from modules.notification.service.notification_service import NotificationService
 from modules.user.entity.user_identity import UserIdentity
 from packages.files.crawl.crawler import CrawlWebsite
@@ -56,16 +54,6 @@ async def crawl_endpoint(
             "type": "error",
         }
     else:
-        crawl_notification = None
-        if chat_id:
-            crawl_notification = notification_service.add_notification(
-                CreateNotificationProperties(
-                    action="CRAWL",
-                    chat_id=chat_id,
-                    status=NotificationsStatusEnum.Pending,
-                )
-            )
-
         knowledge_to_add = CreateKnowledgeProperties(
             brain_id=brain_id,
             url=crawl_website.url,
@@ -78,7 +66,7 @@ async def crawl_endpoint(
         process_crawl_and_notify.delay(
             crawl_website_url=crawl_website.url,
             brain_id=brain_id,
-            notification_id=crawl_notification.id,
+            notification_id=None,
         )
 
         return {"message": "Crawl processing has started."}

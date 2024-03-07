@@ -1,0 +1,75 @@
+@use "@/styles/Colors.module.scss";
+@use "@/styles/Radius.module.scss";
+@use "@/styles/ScreenSizes.module.scss";
+@use "@/styles/Spacings.module.scss";
+@use "@/styles/Typography.module.scss";
+
+.main_container {
+  display: flex;
+  flex-direction: column;
+  gap: Spacings.$spacing06;
+  padding-block: Spacings.$spacing05;
+
+  .main_infos_wrapper {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    gap: Spacings.$spacing05;
+    box-shadow: 0 1px 2px rgb(0, 0, 0, 0.25);
+    border-radius: Radius.$big;
+    padding: Spacings.$spacing06;
+    background-color: Colors.$highlight;
+
+    .section_title {
+      @include Typography.H3;
+    }
+
+    .inputs_wrapper {
+      display: flex;
+      gap: Spacings.$spacing08;
+      justify-content: space-between;
+      width: 100%;
+
+      .general_information {
+        width: 65%;
+      }
+
+      .model_information {
+        width: 35%;
+        min-width: 200px;
+      }
+
+      @media (max-width: ScreenSizes.$small) {
+        flex-direction: column;
+        gap: Spacings.$spacing05;
+
+        .general_information {
+          width: 100%;
+        }
+
+        .model_information {
+          width: 100%;
+        }
+      }
+    }
+
+    .save_button {
+      align-self: flex-end;
+    }
+  }
+
+  .prompt_wrapper {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    gap: Spacings.$spacing05;
+    box-shadow: 0 1px 2px rgb(0, 0, 0, 0.25);
+    border-radius: Radius.$big;
+    padding: Spacings.$spacing06;
+    background-color: Colors.$highlight;
+
+    .section_title {
+      @include Typography.H3;
+    }
+  }
+}

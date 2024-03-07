@@ -1,0 +1,11 @@
+@use "Spacings.module.scss";
+
+.brain_management_wrapper {
+  width: 100%;
+  height: 100vh;
+
+  .content_wrapper {
+    padding-block: Spacings.$spacing05;
+    padding-inline: Spacings.$spacing09;
+  }
+}

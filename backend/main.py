@@ -23,6 +23,7 @@ from modules.prompt.controller import prompt_router
 from modules.upload.controller import upload_router
 from modules.user.controller import user_router
 from packages.utils import handle_request_validation_error
+from packages.utils.telemetry import send_telemetry
 from routes.crawl_routes import crawl_router
 from routes.subscription_routes import subscription_router
 from sentry_sdk.integrations.fastapi import FastApiIntegration
@@ -37,16 +38,29 @@ if os.getenv("DEV_MODE") == "true":
     debugpy.listen(("0.0.0.0", 5678))
 
 
+def before_send(event, hint):
+    # If this is a transaction event
+    if event["type"] == "transaction":
+        # And the transaction name contains 'healthz'
+        if "healthz" in event["transaction"]:
+            # Drop the event by returning None
+            return None
+    # For other events, return them as is
+    return event
+
+
 sentry_dsn = os.getenv("SENTRY_DSN")
 if sentry_dsn:
     sentry_sdk.init(
         dsn=sentry_dsn,
         sample_rate=0.1,
         enable_tracing=True,
+        traces_sample_rate=0.1,
         integrations=[
-            StarletteIntegration(transaction_style="endpoint"),
-            FastApiIntegration(transaction_style="endpoint"),
+            StarletteIntegration(transaction_style="url"),
+            FastApiIntegration(transaction_style="url"),
         ],
+        before_send=before_send,
     )
 
 app = FastAPI()
@@ -78,6 +92,14 @@ async def http_exception_handler(_, exc):
 
 
 handle_request_validation_error(app)
+
+if os.getenv("TELEMETRY_ENABLED") == "true":
+    logger.info("Telemetry enabled, we use telemetry to collect anonymous usage data.")
+    logger.info(
+        "To disable telemetry, set the TELEMETRY_ENABLED environment variable to false."
+    )
+    send_telemetry("booting", {"status": "ok"})
+
 
 if __name__ == "__main__":
     # run main.py to debug backend

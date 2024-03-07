@@ -7,6 +7,7 @@ import { useOnboardingTracker } from "@/lib/hooks/useOnboardingTracker";
 import { useStreamText } from "@/lib/hooks/useStreamText";
 
 import { stepsContainerStyle } from "./styles";
+
 import { MessageRow } from "../QADisplay";
 
 export const Onboarding = (): JSX.Element => {

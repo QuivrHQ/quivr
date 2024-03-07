@@ -41,7 +41,7 @@ serve(
         send_welcome_email: false,
         utm_source: "quivr",
         utm_medium: "organic",
-        referring_site: "https://quivr.app",
+        referring_site: "https://chat.quivr.app",
       };
 
       const response = await fetch(url, {

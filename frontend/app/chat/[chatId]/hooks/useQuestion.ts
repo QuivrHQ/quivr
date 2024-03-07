@@ -5,6 +5,7 @@ import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainConte
 import { useFetch, useToast } from "@/lib/hooks";
 
 import { useHandleStream } from "./useHandleStream";
+
 import { ChatQuestion } from "../types";
 import { generatePlaceHolderMessage } from "../utils/generatePlaceHolderMessage";
 
@@ -59,11 +60,11 @@ export const useQuestion = (): UseChatService => {
     const body = JSON.stringify(chatQuestion);
 
     try {
-      const response = await fetchInstance.post(
-        `/chat/${chatId}/question/stream?brain_id=${currentBrain?.id ?? ""}`,
-        body,
-        headers
-      );
+      let url = `/chat/${chatId}/question/stream`;
+      if (currentBrain?.id) {
+        url += `?brain_id=${currentBrain.id}`;
+      }
+      const response = await fetchInstance.post(url, body, headers);
       if (!response.ok) {
         void handleFetchError(response);
 

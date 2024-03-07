@@ -1,6 +1,6 @@
 import { ChatMessage, Notification } from "@/app/chat/[chatId]/types";
 
-import { Model } from "../../types/brainConfig";
+import { Model } from "../../types/BrainConfig";
 
 export type ChatConfig = {
   model: Model;
@@ -15,4 +15,6 @@ export type ChatContextProps = {
   notifications: Notification[];
   setNotifications: (notifications: Notification[]) => void;
   removeMessage: (id: string) => void;
+  sourcesMessageIndex: number | undefined;
+  setSourcesMessageIndex: (index: number | undefined) => void;
 };

@@ -1,11 +1,13 @@
 from datetime import datetime, timedelta
 
-from fastapi import HTTPException
+from logger import get_logger
 from modules.notification.dto.outputs import DeleteNotificationResponse
 from modules.notification.entity.notification import Notification
 from modules.notification.repository.notifications_interface import (
     NotificationInterface,
 )
+
+logger = get_logger(__name__)
 
 
 class Notifications(NotificationInterface):
@@ -26,6 +28,10 @@ class Notifications(NotificationInterface):
         notification_id,
         notification,
     ):
+        if notification_id is None:
+            logger.info("Notification id is required")
+            return None
+
         """Update a notification by id"""
         response = (
             self.db.from_("notifications")
@@ -35,7 +41,8 @@ class Notifications(NotificationInterface):
         ).data
 
         if response == []:
-            raise HTTPException(404, "Notification not found")
+            logger.info(f"Notification with id {notification_id} not found")
+            return None
 
         return Notification(**response[0])
 
@@ -57,7 +64,8 @@ class Notifications(NotificationInterface):
         )
 
         if response == []:
-            raise HTTPException(404, "Notification not found")
+            logger.info(f"Notification with id {notification_id} not found")
+            return None
 
         return DeleteNotificationResponse(
             status="deleted", notification_id=notification_id

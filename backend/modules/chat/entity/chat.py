@@ -26,6 +26,7 @@ class ChatHistory:
     message_time: str
     prompt_id: Optional[UUID]
     brain_id: Optional[UUID]
+    metadata: Optional[dict] = None
 
     def __init__(self, chat_dict: dict):
         self.chat_id = chat_dict.get("chat_id", "")
@@ -36,6 +37,7 @@ class ChatHistory:
 
         self.prompt_id = chat_dict.get("prompt_id")
         self.brain_id = chat_dict.get("brain_id")
+        self.metadata = chat_dict.get("metadata")
 
     def to_dict(self):
         return asdict(self)

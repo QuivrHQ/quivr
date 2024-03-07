@@ -3,7 +3,7 @@ import { UUID } from "crypto";
 import { useCallback, useState } from "react";
 import { useTranslation } from "react-i18next";
 
-import { useBrainFetcher } from "@/app/brains-management/[brainId]/components/BrainManagementTabs/hooks/useBrainFetcher";
+import { useBrainFetcher } from "@/app/studio/[brainId]/BrainManagementTabs/hooks/useBrainFetcher";
 import { CreateBrainInput } from "@/lib/api/brain/types";
 import { useBrainApi } from "@/lib/api/brain/useBrainApi";
 import { usePromptApi } from "@/lib/api/prompt/usePromptApi";
@@ -91,9 +91,6 @@ export const useBrainProvider = () => {
     const userDefaultBrain = await getDefaultBrain();
     if (userDefaultBrain !== undefined) {
       setDefaultBrainId(userDefaultBrain.id);
-    }
-    if (currentBrainId === null && userDefaultBrain !== undefined) {
-      setCurrentBrainId(userDefaultBrain.id);
     }
   }, [currentBrainId, getDefaultBrain]);
 

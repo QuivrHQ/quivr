@@ -90,9 +90,7 @@
         "developers/contribution/test",
         {
           "group": "RAG",
-          "pages": [
-            "developers/contribution/chains/qa"
-          ]
+          "pages": ["developers/contribution/chains/qa"]
         },
         {
           "group": "LLM",
@@ -106,9 +104,7 @@
     },
     {
       "group": "Self Hosting",
-      "pages": [
-        "developers/selfHosting/authentication"
-      ]
+      "pages": ["developers/selfHosting/authentication"]
     },
     {
       "group": "Integrating",
@@ -171,9 +167,7 @@
         },
         {
           "group": "Crawl",
-          "pages": [
-            "api-reference/crawl/crawl-endpoint"
-          ]
+          "pages": ["api-reference/crawl/crawl-endpoint"]
         },
         {
           "group": "Onboarding",
@@ -185,9 +179,7 @@
         "api-reference/root",
         {
           "group": "Upload",
-          "pages": [
-            "api-reference/upload/upload-file"
-          ]
+          "pages": ["api-reference/upload/upload-file"]
         },
         {
           "group": "User",
@@ -233,9 +225,7 @@
         },
         {
           "group": "Notification",
-          "pages": [
-            "api-reference/notification/get-notifications"
-          ]
+          "pages": ["api-reference/notification/get-notifications"]
         },
         {
           "group": "Knowledge",
@@ -251,7 +241,7 @@
   ],
   "footerSocials": {
     "twitter": "https://twitter.com/quivr_brain",
-    "github": "https://github.com/stangirard/quivr",
+    "github": "https://github.com/quivrhq/quivr",
     "linkedin": "https://www.linkedin.com/company/getquivr",
     "discord": "https://discord.gg/HUpRgp2HG8"
   },

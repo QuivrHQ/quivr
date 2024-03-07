@@ -1,4 +1,4 @@
-from langchain.document_loaders import UnstructuredPDFLoader
+from langchain_community.document_loaders import UnstructuredPDFLoader
 from models import File
 
 from .common import process_file
@@ -6,9 +6,14 @@ from .common import process_file
 
 # TODO(pg): different mode can be used to UnstructuredPDFLoader like "paged"
 # => check the docs!
-def process_pdf(file: File, brain_id):
+def process_pdf(
+    file: File, brain_id, original_file_name, integration=None, integration_link=None
+):
     return process_file(
         file=file,
         loader_class=UnstructuredPDFLoader,
         brain_id=brain_id,
+        original_file_name=original_file_name,
+        integration=integration,
+        integration_link=integration_link,
     )

@@ -11,11 +11,16 @@ from modules.brain.dto.inputs import (
     CreateBrainProperties,
 )
 from modules.brain.entity.brain_entity import PublicBrain, RoleEnum
+from modules.brain.entity.integration_brain import IntegrationDescriptionEntity
 from modules.brain.service.brain_authorization_service import has_brain_authorization
 from modules.brain.service.brain_service import BrainService
 from modules.brain.service.brain_user_service import BrainUserService
+from modules.brain.service.integration_brain_service import (
+    IntegrationBrainDescriptionService,
+)
 from modules.prompt.service.prompt_service import PromptService
 from modules.user.entity.user_identity import UserIdentity
+from packages.utils.telemetry import send_telemetry
 from repository.brain import get_question_context_from_brain
 
 logger = get_logger(__name__)
@@ -24,6 +29,16 @@ brain_router = APIRouter()
 prompt_service = PromptService()
 brain_service = BrainService()
 brain_user_service = BrainUserService()
+integration_brain_description_service = IntegrationBrainDescriptionService()
+
+
+@brain_router.get(
+    "/brains/integrations/",
+    dependencies=[Depends(AuthBearer())],
+)
+async def get_integration_brain_description() -> list[IntegrationDescriptionEntity]:
+    """Retrieve the integration brain description."""
+    return integration_brain_description_service.get_all_integration_descriptions()
 
 
 @brain_router.get("/brains/", dependencies=[Depends(AuthBearer())], tags=["Brain"])
@@ -66,9 +81,12 @@ async def retrieve_default_brain(
     ],
     tags=["Brain"],
 )
-async def retrieve_brain_by_id(brain_id: UUID):
+async def retrieve_brain_by_id(
+    brain_id: UUID,
+    current_user: UserIdentity = Depends(get_current_user),
+):
     """Retrieve details of a specific brain by its ID."""
-    brain_details = brain_service.get_brain_details(brain_id)
+    brain_details = brain_service.get_brain_details(brain_id, current_user.id)
     if brain_details is None:
         raise HTTPException(status_code=404, detail="Brain details not found")
     return brain_details
@@ -91,27 +109,18 @@ async def create_new_brain(
             status_code=429,
             detail=f"Maximum number of brains reached ({user_settings.get('max_brains', 5)}).",
         )
-
+    send_telemetry("create_brain", {"brain_name": brain.name})
     new_brain = brain_service.create_brain(
         brain=brain,
         user_id=current_user.id,
     )
-    if brain_user_service.get_user_default_brain(current_user.id):
-        logger.info(f"Default brain already exists for user {current_user.id}")
-        brain_user_service.create_brain_user(
-            user_id=current_user.id,
-            brain_id=new_brain.brain_id,
-            rights=RoleEnum.Owner,
-            is_default_brain=False,
-        )
-    else:
-        logger.info(f"Creating default brain for user {current_user.id}.")
-        brain_user_service.create_brain_user(
-            user_id=current_user.id,
-            brain_id=new_brain.brain_id,
-            rights=RoleEnum.Owner,
-            is_default_brain=True,
-        )
+    logger.info(f"Creating default brain for user {current_user.id}.")
+    brain_user_service.create_brain_user(
+        user_id=current_user.id,
+        brain_id=new_brain.brain_id,
+        rights=RoleEnum.Owner,
+        is_default_brain=True,
+    )
 
     return {"id": new_brain.brain_id, "name": brain.name, "rights": "Owner"}
 
@@ -125,24 +134,30 @@ async def create_new_brain(
     tags=["Brain"],
 )
 async def update_existing_brain(
-    brain_id: UUID, brain_update_data: BrainUpdatableProperties
+    brain_id: UUID,
+    brain_update_data: BrainUpdatableProperties,
+    current_user: UserIdentity = Depends(get_current_user),
 ):
     """Update an existing brain's configuration."""
-    existing_brain = brain_service.get_brain_details(brain_id)
+    existing_brain = brain_service.get_brain_details(brain_id, current_user.id)
     if existing_brain is None:
         raise HTTPException(status_code=404, detail="Brain not found")
-
-    brain_service.update_brain_by_id(brain_id, brain_update_data)
 
     if brain_update_data.prompt_id is None and existing_brain.prompt_id:
         prompt = prompt_service.get_prompt_by_id(existing_brain.prompt_id)
         if prompt and prompt.status == "private":
             prompt_service.delete_prompt_by_id(existing_brain.prompt_id)
 
-    if brain_update_data.status == "private" and existing_brain.status == "public":
-        brain_user_service.delete_brain_users(brain_id)
+            return {"message": f"Prompt {brain_id} has been updated."}
 
-    return {"message": f"Brain {brain_id} has been updated."}
+    elif brain_update_data.status == "private" and existing_brain.status == "public":
+        brain_user_service.delete_brain_users(brain_id)
+        return {"message": f"Brain {brain_id} has been deleted."}
+
+    else:
+        brain_service.update_brain_by_id(brain_id, brain_update_data)
+
+        return {"message": f"Brain {brain_id} has been updated."}
 
 
 @brain_router.put(
@@ -159,7 +174,7 @@ async def update_existing_brain_secrets(
 ):
     """Update an existing brain's secrets."""
 
-    existing_brain = brain_service.get_brain_details(brain_id)
+    existing_brain = brain_service.get_brain_details(brain_id, None)
 
     if existing_brain is None:
         raise HTTPException(status_code=404, detail="Brain not found")

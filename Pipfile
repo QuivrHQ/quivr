@@ -1,0 +1,61 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+langchain = "*"
+litellm = "*"
+openai = "*"
+gitpython = "==3.1.36"
+pdf2image = "==1.16.3"
+nest-asyncio = "==1.5.6"
+pypdf = "==3.9.0"
+supabase = "*"
+tiktoken = "*"
+fastapi = "*"
+python-multipart = "==0.0.6"
+uvicorn = "==0.22.0"
+pypandoc = "==1.11"
+docx2txt = "==0.8"
+python-jose = "==3.3.0"
+asyncpg = "==0.27.0"
+flake8 = "*"
+flake8-black = "*"
+sentry-sdk = {extras = ["fastapi"] }
+pyright = "==1.1.316"
+resend = "*"
+html5lib = "==1.1"
+beautifulsoup4 = "*"
+newspaper3k = "*"
+xlrd = "*"
+redis = "*"
+flower = "*"
+boto3 = "*"
+botocore = "*"
+python-dotenv = "*"
+pytest-mock = "*"
+pytest-celery = "*"
+pytesseract = "*"
+async-generator = "*"
+posthog = "*"
+jq = "==1.6.0"
+pytest = "*"
+ddtrace = "*"
+watchdog = "*"
+langchain-community = "*"
+langchain-openai = "*"
+pydantic-settings = "*"
+langfuse = "*"
+pandasai = "*"
+colorlog = "*"
+psycopg2-binary = "*"
+psycopg2 = "*"
+unstructured = {extras = ["all-docs"], version = "*"}
+celery = {extras = ["redis", "sqs"], version = "*"}
+
+[dev-packages]
+black = "*"
+
+[requires]
+python_version = "3.11"

@@ -5,6 +5,7 @@ from uuid import UUID
 
 from fastapi import UploadFile
 from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain_core.documents import Document
 from logger import get_logger
 from models.databases.supabase.supabase import SupabaseDB
 from models.settings import get_supabase_db
@@ -17,16 +18,16 @@ logger = get_logger(__name__)
 
 class File(BaseModel):
     id: Optional[UUID] = None
-    file: Optional[UploadFile]
+    file: Optional[UploadFile] = None
     file_name: Optional[str] = ""
     file_size: Optional[int] = None
     file_sha1: Optional[str] = ""
     vectors_ids: Optional[list] = []
     file_extension: Optional[str] = ""
     content: Optional[Any] = None
-    chunk_size: int = 500
+    chunk_size: int = 250
     chunk_overlap: int = 0
-    documents: Optional[Any] = None
+    documents: Optional[Document] = None
 
     @property
     def supabase_db(self) -> SupabaseDB:

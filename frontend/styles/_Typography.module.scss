@@ -1,0 +1,30 @@
+@mixin Big {
+  font-weight: 500;
+  font-size: 36px;
+}
+
+@mixin H1 {
+  font-weight: 600;
+  font-size: 20px;
+}
+
+@mixin H2 {
+  font-weight: 600;
+  font-size: 18px;
+}
+
+@mixin H3 {
+  font-weight: 500;
+  font-size: 16px;
+}
+
+@mixin EllipsisOverflow {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+$tiny: 12px;
+$small: 14px;
+$medium: 16px;
+$large: 18px;

@@ -17,6 +17,7 @@ import { LiaFileVideo } from "react-icons/lia";
 import { IconType } from "react-icons/lib";
 
 import { getFileType } from "./getFileType";
+
 import { SupportedFileExtensions } from "../types/SupportedFileExtensions";
 
 const fileTypeIcons: Record<SupportedFileExtensions, IconType> = {
@@ -49,5 +50,5 @@ export const getFileIcon = (fileName: string): JSX.Element => {
 
   const Icon = fileType !== undefined ? fileTypeIcons[fileType] : FaFile;
 
-  return <Icon className="text-2xl" />;
+  return <Icon width={16} />;
 };
