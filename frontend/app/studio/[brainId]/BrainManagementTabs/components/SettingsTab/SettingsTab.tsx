@@ -43,8 +43,6 @@ export const SettingsTabContent = ({
     brainId,
   });
 
-  console.info(brain);
-
   return (
     <>
       <form
