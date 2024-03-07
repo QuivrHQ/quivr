@@ -31,7 +31,11 @@ export const ModelSelection = (props: ModelSelectionProps): JSX.Element => {
           value: accessibleModelOptions[0].value as Model,
         })}
       >
-        <FieldHeader label="Model" iconName="robot" />
+        <FieldHeader
+          label="Model"
+          iconName="robot"
+          help="Changing the model could make this brain smarter, understanding you better and giving you more helpful answers."
+        />
         <SingleSelector
           options={accessibleModelOptions}
           onChange={(option) => {
@@ -44,7 +48,11 @@ export const ModelSelection = (props: ModelSelectionProps): JSX.Element => {
         />
       </fieldset>
       <fieldset>
-        <FieldHeader label="Max tokens" iconName="hashtag" />
+        <FieldHeader
+          label="Max tokens"
+          iconName="hashtag"
+          help="Increasing the number of tokens this brain can use in its replies will give you more detailed answers"
+        />
         <div className={styles.max_tokens}>
           <input
             className={styles.slider}
