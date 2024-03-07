@@ -2,7 +2,7 @@
 import { usePathname } from "next/navigation";
 import { useEffect } from "react";
 
-import { QuivrLogo } from "@/lib/assets/QuivrLogo";
+import { LuccidLogo } from "@/lib/assets/LuccidLogo";
 import { AddBrainModal } from "@/lib/components/AddBrainModal";
 import { useBrainCreationContext } from "@/lib/components/AddBrainModal/brainCreation-provider";
 import PageHeader from "@/lib/components/PageHeader/PageHeader";
@@ -44,7 +44,7 @@ const Search = (): JSX.Element => {
       <div className={styles.search_page_container}>
         <div className={styles.main_wrapper}>
           <div className={styles.quivr_logo_wrapper}>
-            <QuivrLogo size={80} color="black" />
+            <LuccidLogo size={80} />
             <div className={styles.quivr_text}>
               <span>Talk to </span>
               <span className={styles.quivr_text_primary}>Quivr</span>

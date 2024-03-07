@@ -4,7 +4,7 @@ import { Suspense } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 
-import { QuivrLogo } from "@/lib/assets/QuivrLogo";
+import { LuccidLogo } from "@/lib/assets/LuccidLogo";
 import { Divider } from "@/lib/components/ui/Divider";
 import { useAuthModes } from "@/lib/hooks/useAuthModes";
 
@@ -30,7 +30,7 @@ const Main = (): JSX.Element => {
       <main className="h-full flex flex-col items-center justify-center">
         <section className="w-full md:w-1/2 lg:w-1/3 flex flex-col gap-2">
           <Link href="/" className="flex justify-center">
-            <QuivrLogo size={80} color="black" />
+            <LuccidLogo size={80} />
           </Link>
           <p className="text-center text-4xl font-medium">
             {t("talk_to", { ns: "login" })}{" "}

@@ -4,7 +4,7 @@ import { useState } from "react";
 
 import { MenuControlButton } from "@/app/chat/[chatId]/components/ActionsBar/components/ChatInput/components/MenuControlButton/MenuControlButton";
 import { useChatsList } from "@/app/chat/[chatId]/hooks/useChatsList";
-import { QuivrLogo } from "@/lib/assets/QuivrLogo";
+import { LuccidLogo } from "@/lib/assets/LuccidLogo";
 import { nonProtectedPaths } from "@/lib/config/routesConfig";
 import { useMenuContext } from "@/lib/context/MenuProvider/hooks/useMenuContext";
 
@@ -50,9 +50,8 @@ export const Menu = (): JSX.Element => {
               onMouseEnter={() => setIsLogoHovered(true)}
               onMouseLeave={() => setIsLogoHovered(false)}
             >
-              <QuivrLogo
+              <LuccidLogo
                 size={50}
-                color={isLogoHovered ? "primary" : "black"}
               />
             </div>
 
