@@ -57,7 +57,11 @@ const Studio = (): JSX.Element => {
   return (
     <div className={styles.page_wrapper}>
       <div className={styles.page_header}>
-        <PageHeader iconName="brainCircuit" label="Studio" buttons={buttons} />
+        <PageHeader
+          iconName="brainCircuit"
+          label="Brain Studio"
+          buttons={buttons}
+        />
       </div>
       <div className={styles.content_wrapper}>
         <Tabs tabList={studioTabs} />
