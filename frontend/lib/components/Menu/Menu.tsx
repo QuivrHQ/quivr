@@ -1,6 +1,5 @@
 import { MotionConfig } from "framer-motion";
 import { usePathname, useRouter } from "next/navigation";
-import { useState } from "react";
 
 import { MenuControlButton } from "@/app/chat/[chatId]/components/ActionsBar/components/ChatInput/components/MenuControlButton/MenuControlButton";
 import { useChatsList } from "@/app/chat/[chatId]/hooks/useChatsList";
@@ -21,7 +20,6 @@ export const Menu = (): JSX.Element => {
   const { isOpened } = useMenuContext();
   const router = useRouter();
   const pathname = usePathname() ?? "";
-  const [isLogoHovered, setIsLogoHovered] = useState<boolean>(false);
 
   useChatsList();
 
@@ -47,8 +45,6 @@ export const Menu = (): JSX.Element => {
             <div
               className={styles.quivr_logo_wrapper}
               onClick={() => router.push("/search")}
-              onMouseEnter={() => setIsLogoHovered(true)}
-              onMouseLeave={() => setIsLogoHovered(false)}
             >
               <LuccidLogo
                 size={50}
