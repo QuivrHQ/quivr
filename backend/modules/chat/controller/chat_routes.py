@@ -83,7 +83,7 @@ def get_answer_generator(
         brain=brain,
         chat_id=str(chat_id),
         model=brain.model,
-        temperature=0.1,
+        temperature=0.0,
         streaming=True,
         prompt_id=chat_question.prompt_id,
         user_id=current_user.id,

@@ -125,7 +125,7 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
 
     # Default class attributes
     model: str = "gpt-3.5-turbo"  # pyright: ignore reportPrivateUsage=none
-    temperature: float = 0.1
+    temperature: float = 0.0
     chat_id: str = None  # pyright: ignore reportPrivateUsage=none
     brain_id: str = None  # pyright: ignore reportPrivateUsage=none
     max_tokens: int = 2000

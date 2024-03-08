@@ -74,7 +74,7 @@ class QuivrRAG(BaseModel):
 
     # Default class attributes
     model: str = None  # pyright: ignore reportPrivateUsage=none
-    temperature: float = 0.1
+    temperature: float = 0.0
     chat_id: str = None  # pyright: ignore reportPrivateUsage=none
     brain_id: str = None  # pyright: ignore reportPrivateUsage=none
     max_tokens: int = 2000  # Output length
