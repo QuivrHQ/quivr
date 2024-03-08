@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.0.221 (2024-03-07)
+
+## What's Changed
+* feat: seed updated by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2313
+* fix(frontend): allow model change by @Zewed in https://github.com/QuivrHQ/quivr/pull/2317
+* fix(frontend): mention list by @Zewed in https://github.com/QuivrHQ/quivr/pull/2315
+* fix(frontend): studio to brain studio by @Zewed in https://github.com/QuivrHQ/quivr/pull/2316
+* feat(frontend): add help tooltip for model selection by @Zewed in https://github.com/QuivrHQ/quivr/pull/2318
+* fix(frontend): page header studio to brain studio by @Zewed in https://github.com/QuivrHQ/quivr/pull/2319
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.220...v0.0.221
+
 ## 0.0.220 (2024-03-06)
 
 ## What's Changed
