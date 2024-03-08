@@ -67,7 +67,7 @@ export const useBrainCreationApi = () => {
     if (createdBrainId === undefined) {
       publish({
         variant: "danger",
-        text: "prout",
+        text: "Error occurred while creating a brain",
       });
 
       return;
