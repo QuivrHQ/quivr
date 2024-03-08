@@ -29,12 +29,7 @@ class ApiKeyService:
             result = self.repository.get_active_api_key(api_key)
 
             if result.data is not None and len(result.data) > 0:
-                api_key_creation_date = datetime.strptime(
-                    result.data[0]["creation_time"], "%Y-%m-%dT%H:%M:%S"
-                ).date()
-
-                if api_key_creation_date.year == current_date.year:
-                    return True
+                return True
             return False
         except Exception as e:
             logger.error(f"Error verifying API key: {e}")
