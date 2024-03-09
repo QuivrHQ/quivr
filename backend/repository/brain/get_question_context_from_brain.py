@@ -27,7 +27,7 @@ def get_question_context_from_brain(brain_id: UUID, question: str) -> str:
         question (str): Question to search for in the vector store
 
     Returns:
-        str: _descripton_
+        str: _description_
     """
     # TODO: Move to AnswerGenerator service
     supabase_client = get_supabase_client()

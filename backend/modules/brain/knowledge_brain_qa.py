@@ -227,13 +227,13 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
         self.model = model_to_use.name
         self.max_input = model_to_use.max_input
         self.max_tokens = model_to_use.max_output
-        user_choosen_model_price = 1000
+        user_chosen_model_price = 1000
 
         for model_setting in self.models_settings:
             if model_setting["name"] == self.model:
-                user_choosen_model_price = model_setting["price"]
+                user_chosen_model_price = model_setting["price"]
 
-        return user_choosen_model_price
+        return user_chosen_model_price
 
     def generate_answer(
         self, chat_id: UUID, question: ChatQuestion, save_answer: bool = True
