@@ -34,6 +34,11 @@
         gap: Spacings.$spacing04;
       }
     }
+
+    .social_buttons_wrapper {
+      padding-block: Spacings.$spacing04;
+      border-top: 1px solid Colors.$lightest-black;
+    }
   }
 }
 

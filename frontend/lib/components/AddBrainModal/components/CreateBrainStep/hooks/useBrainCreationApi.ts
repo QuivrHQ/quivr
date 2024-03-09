@@ -1,4 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { AxiosError } from "axios";
 import { UUID } from "crypto";
 import { useState } from "react";
 import { useFormContext } from "react-hook-form";
@@ -92,11 +93,18 @@ export const useBrainCreationApi = () => {
         text: t("brainCreated", { ns: "brain" }),
       });
     },
-    onError: () => {
-      publish({
-        variant: "danger",
-        text: t("errorCreatingBrain", { ns: "brain" }),
-      });
+    onError: (error: AxiosError) => {
+      if (error.response && error.response.status === 429) {
+        publish({
+          variant: "danger",
+          text: "You have reached your maximum amount of brains. Upgrade your plan to create more.",
+        });
+      } else {
+        publish({
+          variant: "danger",
+          text: t("errorCreatingBrain", { ns: "brain" }),
+        });
+      }
     },
   });
 
