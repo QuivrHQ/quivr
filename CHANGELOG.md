@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.0.222 (2024-03-09)
+
+## What's Changed
+* feat: Update langchain.prompts and langchain_core.messages modules by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2326
+* feat(frontend): social buttons by @Zewed in https://github.com/QuivrHQ/quivr/pull/2325
+* fix(frontend): upgrade to plus button by @Zewed in https://github.com/QuivrHQ/quivr/pull/2324
+* fix(frontend): maximum amount of brains reached by @Zewed in https://github.com/QuivrHQ/quivr/pull/2323
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.221...v0.0.222
+
 ## 0.0.221 (2024-03-07)
 
 ## What's Changed
