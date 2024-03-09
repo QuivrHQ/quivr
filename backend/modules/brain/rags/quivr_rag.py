@@ -6,10 +6,10 @@ from langchain.chains import ConversationalRetrievalChain
 from langchain.embeddings.ollama import OllamaEmbeddings
 from langchain.llms.base import BaseLLM
 from langchain.memory import ConversationBufferMemory
-from langchain.prompts import HumanMessagePromptTemplate
+from langchain.prompts import HumanMessagePromptTemplate, SystemMessagePromptTemplate
 from langchain.schema import format_document
 from langchain_community.chat_models import ChatLiteLLM
-from langchain_core.messages import SystemMessage, get_buffer_string
+from langchain_core.messages import get_buffer_string
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate, PromptTemplate
 from langchain_core.runnables import RunnableLambda, RunnablePassthrough
@@ -42,17 +42,21 @@ template_answer = """
 Context:
 {context}
 
-User Instructions to follow when answering, default to none: {custom_instructions}
 User Question: {question}
 Answer:
 """
+
+system_message_template = """
+When answering use markdown to make it concise and neat.
+Use the following pieces of context from files provided by the user that are store in a brain to answer  the users question in the same language as the user question. Your name is Quivr. You're a helpful assistant.  
+If you don't know the answer with the context provided from the files, just say that you don't know, don't try to make up an answer.
+User instruction to follow if provided to answer: {custom_instructions}
+"""
+
+
 ANSWER_PROMPT = ChatPromptTemplate.from_messages(
     [
-        SystemMessage(
-            content=(
-                "When answering use markdown or any other techniques to display the content in a nice and aerated way.  Use the following pieces of context from files provided by the user to answer the users question in the same language as the user question. Your name is Quivr. You're a helpful assistant.  If you don't know the answer with the context provided from the files, just say that you don't know, don't try to make up an answer."
-            )
-        ),
+        SystemMessagePromptTemplate.from_template(system_message_template),
         HumanMessagePromptTemplate.from_template(template_answer),
     ]
 )
@@ -246,7 +250,9 @@ class QuivrRAG(BaseModel):
         answer = {
             "answer": final_inputs
             | ANSWER_PROMPT
-            | ChatLiteLLM(max_tokens=self.max_tokens, model=self.model, api_base=api_base),
+            | ChatLiteLLM(
+                max_tokens=self.max_tokens, model=self.model, api_base=api_base
+            ),
             "docs": itemgetter("docs"),
         }
 
