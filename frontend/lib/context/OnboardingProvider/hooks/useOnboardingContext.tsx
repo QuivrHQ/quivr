@@ -8,7 +8,9 @@ import {
 export const useOnboardingContext = (): OnboardingContextType => {
   const context = useContext(OnboardingContext);
   if (context === undefined) {
-    throw new Error("useMenuContext must be used within a MenuProvider");
+    throw new Error(
+      "useOnboardingContext must be used within a OnboardingProvider"
+    );
   }
 
   return context;
