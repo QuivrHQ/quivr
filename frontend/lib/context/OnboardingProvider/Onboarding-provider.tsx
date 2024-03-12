@@ -14,7 +14,7 @@ export const OnboardingProvider = ({
 }: {
   children: React.ReactNode;
 }): JSX.Element => {
-  const [isOnboardingModalOpened, setIsOnboardingModalOpened] = useState(false);
+  const [isOnboardingModalOpened, setIsOnboardingModalOpened] = useState(true);
 
   return (
     <OnboardingContext.Provider

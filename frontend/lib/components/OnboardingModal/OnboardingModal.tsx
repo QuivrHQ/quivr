@@ -1,20 +1,15 @@
 import { FormProvider, useForm } from "react-hook-form";
 
 import { Modal } from "@/lib/components/ui/Modal/Modal";
-import { addBrainDefaultValues } from "@/lib/config/defaultBrainConfig";
+import { useOnboardingContext } from "@/lib/context/OnboardingProvider/hooks/useOnboardingContext";
 
-import { CreateBrainProps } from "../AddBrainModal/types/types";
+import { OnboardingProps } from "../OnboardingModal/types/types";
 
-export const AddBrainModal = (): JSX.Element => {
-  const defaultValues: CreateBrainProps = {
-    ...addBrainDefaultValues,
-    setDefault: true,
-    brainCreationStep: "BRAIN_TYPE",
-  };
+export const OnboardingModal = (): JSX.Element => {
+  const { isOnboardingModalOpened, setIsOnboardingModalOpened } =
+    useOnboardingContext();
 
-  const methods = useForm<CreateBrainProps>({
-    defaultValues,
-  });
+  const methods = useForm<OnboardingProps>({});
 
   return (
     <FormProvider {...methods}>
@@ -22,8 +17,12 @@ export const AddBrainModal = (): JSX.Element => {
         title="Title"
         desc="Desc"
         bigModal={true}
+        isOpen={isOnboardingModalOpened}
+        setOpen={setIsOnboardingModalOpened}
         CloseTrigger={<div />}
-      ></Modal>
+      >
+        HEY
+      </Modal>
     </FormProvider>
   );
 };
