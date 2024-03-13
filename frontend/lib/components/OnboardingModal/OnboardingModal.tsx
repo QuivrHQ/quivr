@@ -44,6 +44,7 @@ export const OnboardingModal = (): JSX.Element => {
       company: methods.getValues("companyName"),
       onboarded: true,
     });
+    window.location.reload();
   };
 
   return (
