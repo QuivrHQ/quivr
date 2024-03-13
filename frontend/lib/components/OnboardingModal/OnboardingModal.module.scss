@@ -15,6 +15,7 @@
 
   .button_wrapper {
     width: 100%;
-    align-self: flex-end;
+    display: flex;
+    justify-content: flex-end;
   }
 }
