@@ -1,0 +1,8 @@
+@use "@/styles/Spacings.module.scss";
+
+.form_wrapper {
+  display: flex;
+  flex-direction: column;
+  padding: Spacings.$spacing05;
+  gap: Spacings.$spacing05;
+}
