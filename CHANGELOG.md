@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.0.223 (2024-03-13)
+
+## What's Changed
+* chore: update packages backend by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2339
+* feat: Add optional fields to UserIdentity and UserUpdatableProperties by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2341
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.222...v0.0.223
+
 ## 0.0.222 (2024-03-09)
 
 ## What's Changed
