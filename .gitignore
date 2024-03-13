@@ -86,3 +86,4 @@ airwallexpayouts.py
 application.log
 backend/celerybeat-schedule.db
 
+letsencrypt/

@@ -1,0 +1,26 @@
+http:
+  routers:
+    supabase-api:
+      rule: "Host(`{{env "SUPABASE_API_DOMAIN_NAME"}}`)"
+      service: "supabase-api"
+      entryPoints: ["websecure"]
+      tls:
+        certResolver: myresolver
+    supabase-studio:
+      rule: "Host(`{{env "SUPABASE_STUDIO_DOMAIN_NAME"}}`)"
+      service: "supabase-studio"
+      entryPoints: ["websecure"]
+      tls:
+        certResolver: myresolver
+
+  services:
+    supabase-api:
+      loadBalancer:
+        passHostHeader: true
+        servers:
+          - url: "http://{{env "HOST_IP"}}:54321"
+    supabase-studio:
+      loadBalancer:
+        passHostHeader: true
+        servers:
+          - url: "http://{{env "HOST_IP"}}:54323"

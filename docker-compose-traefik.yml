@@ -1,0 +1,184 @@
+version: "3.8"
+
+services:
+  traefik:
+    image: traefik:v2.7
+    container_name: traefik
+    command:
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--providers.file.directory=/traefik"
+      - "--providers.file.watch=true"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+      - "--certificatesresolvers.myresolver.acme.tlschallenge=true"
+      - "--certificatesresolvers.myresolver.acme.email=${EMAIL}"
+      - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
+      - "--log.level=ERROR"
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "./letsencrypt:/letsencrypt"
+      - "./traefik:/traefik"
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    restart: always
+    env_file:
+      - .env
+
+  frontend:
+    image: quivr-frontend-prebuilt
+    pull_policy: never
+    build:
+      context: frontend
+      dockerfile: Dockerfile
+      args:
+        - NEXT_PUBLIC_ENV=local
+        - NEXT_PUBLIC_BACKEND_URL=${NEXT_PUBLIC_BACKEND_URL}
+        - NEXT_PUBLIC_SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL}
+        - NEXT_PUBLIC_SUPABASE_ANON_KEY=${NEXT_PUBLIC_SUPABASE_ANON_KEY}
+        - NEXT_PUBLIC_CMS_URL=${NEXT_PUBLIC_CMS_URL}
+        - NEXT_PUBLIC_FRONTEND_URL=${NEXT_PUBLIC_FRONTEND_URL}
+    container_name: web
+    depends_on:
+      - backend-core
+      - traefik
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    restart: always
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.frontend.rule=Host(`${FRONTEND_DOMAIN_NAME}`)"
+      - "traefik.http.routers.frontend.entrypoints=websecure"
+      - "traefik.http.routers.frontend.tls.certresolver=myresolver"
+    ports:
+      - 3000:3000
+
+  backend-core:
+    image: stangirard/quivr-backend-prebuilt:latest
+    pull_policy: if_not_present
+    env_file:
+      - .env
+    build:
+      context: backend
+      dockerfile: Dockerfile
+    container_name: backend-core
+    healthcheck:
+      test: ["CMD", "curl", "http://localhost:5050/healthz"]
+    command:
+      - "uvicorn"
+      - "main:app"
+      - "--reload"
+      - "--host"
+      - "0.0.0.0"
+      - "--port"
+      - "5050"
+      - "--workers"
+      - "1"
+    restart: always
+    volumes:
+      - ./backend/:/code/
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    depends_on:
+      - traefik
+    ports:
+      - 5050:5050
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.backend-core.rule=Host(`${BACKEND_DOMAIN_NAME}`)"
+      - "traefik.http.routers.backend-core.entrypoints=websecure"
+      - "traefik.http.routers.backend-core.tls.certresolver=myresolver"
+      - "traefik.http.services.backend-core.loadbalancer.server.port=5050"
+
+  redis:
+    image: redis:latest@sha256:a7cee7c8178ff9b5297cb109e6240f5072cdaaafd775ce6b586c3c704b06458e
+    container_name: redis
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    restart: always
+    ports:
+      - 6379:6379
+
+  worker:
+    pull_policy: if_not_present
+    image: stangirard/quivr-backend-prebuilt:latest
+    env_file:
+      - .env
+    build:
+      context: backend
+      dockerfile: Dockerfile
+    container_name: worker
+    command: celery -A celery_worker worker -l info
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    restart: always
+    depends_on:
+      - redis
+
+  beat:
+    image: stangirard/quivr-backend-prebuilt:latest
+    pull_policy: if_not_present
+    env_file:
+      - .env
+    build:
+      context: backend
+      dockerfile: Dockerfile
+    container_name: beat
+    command: celery -A celery_worker beat -l info
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    restart: always
+    depends_on:
+      - redis
+
+  flower:
+    image: stangirard/quivr-backend-prebuilt:latest
+    pull_policy: if_not_present
+    env_file:
+      - .env
+    build:
+      context: backend
+      dockerfile: Dockerfile
+    container_name: flower
+    command: celery -A celery_worker flower -l info --port=5555
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    restart: always
+    depends_on:
+      - redis
+      - worker
+      - beat
+      - traefik
+    ports:
+      - 5555:5555
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.flower.rule=Host(`${FLOWER_DOMAIN_NAME}`)"
+      - "traefik.http.routers.flower.entrypoints=websecure"
+      - "traefik.http.routers.flower.tls.certresolver=myresolver"
+      - "traefik.http.services.flower.loadbalancer.server.port=5555"
