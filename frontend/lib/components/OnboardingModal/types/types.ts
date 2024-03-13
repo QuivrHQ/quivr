@@ -9,5 +9,5 @@ export enum UserDiscoverySource {
 export type OnboardingProps = {
   username: string;
   companyName: string;
-  discoverySource: UserDiscoverySource;
+  discoverySource: UserDiscoverySource | string;
 };

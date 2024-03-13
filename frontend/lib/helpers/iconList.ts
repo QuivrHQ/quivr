@@ -22,9 +22,11 @@ import {
 } from "react-icons/fa";
 import { FaInfo } from "react-icons/fa6";
 import { FiUpload } from "react-icons/fi";
+import { HiBuildingOffice } from "react-icons/hi2";
 import {
   IoIosAdd,
   IoIosHelpCircleOutline,
+  IoIosRadio,
   IoMdClose,
   IoMdLogOut,
 } from "react-icons/io";
@@ -98,10 +100,12 @@ export const iconList: { [name: string]: IconType } = {
   linkedin: FaLinkedin,
   loader: AiOutlineLoading3Quarters,
   logout: IoMdLogOut,
+  office: HiBuildingOffice,
   options: SlOptions,
   paragraph: BsTextParagraph,
   prompt: FaRegKeyboard,
   redirection: BsArrowRightShort,
+  radio: IoIosRadio,
   robot: LiaRobotSolid,
   search: LuSearch,
   settings: IoSettingsSharp,

@@ -5,8 +5,13 @@ import { useOnboardingContext } from "@/lib/context/OnboardingProvider/hooks/use
 
 import styles from "./OnboardingModal.module.scss";
 
-import { OnboardingProps } from "../OnboardingModal/types/types";
+import {
+  OnboardingProps,
+  UserDiscoverySource,
+} from "../OnboardingModal/types/types";
 import { FieldHeader } from "../ui/FieldHeader/FieldHeader";
+import { QuivrButton } from "../ui/QuivrButton/QuivrButton";
+import { SingleSelector } from "../ui/SingleSelector/SingleSelector";
 import { TextInput } from "../ui/TextInput/TextInput";
 
 export const OnboardingModal = (): JSX.Element => {
@@ -14,6 +19,17 @@ export const OnboardingModal = (): JSX.Element => {
     useOnboardingContext();
 
   const methods = useForm<OnboardingProps>({});
+  const { watch } = methods;
+  const username = watch("username");
+
+  const discoverySourceOptions = Object.entries(UserDiscoverySource).map(
+    ([key, value]) => ({
+      label: value,
+      value: key,
+    })
+  );
+
+  const submitForm = () => console.log("Hey");
 
   return (
     <FormProvider {...methods}>
@@ -26,33 +42,64 @@ export const OnboardingModal = (): JSX.Element => {
         CloseTrigger={<div />}
         unclosable={true}
       >
-        <div className={styles.form_wrapper}>
-          <div>
-            <FieldHeader iconName="user" label="Username" mandatory={true} />
-            <Controller
-              name="username"
-              render={({ field }) => (
-                <TextInput
-                  label="Choose a username"
-                  inputValue={field.value as string}
-                  setInputValue={field.onChange}
-                />
-              )}
-            />
+        <div className={styles.modal_content_wrapper}>
+          <div className={styles.form_wrapper}>
+            <div>
+              <FieldHeader iconName="user" label="Username" mandatory={true} />
+              <Controller
+                name="username"
+                render={({ field }) => (
+                  <TextInput
+                    label="Choose a username"
+                    inputValue={field.value as string}
+                    setInputValue={field.onChange}
+                  />
+                )}
+              />
+            </div>
+            <div>
+              <FieldHeader iconName="office" label="Company" />
+              <Controller
+                name="companyName"
+                render={({ field }) => (
+                  <TextInput
+                    label="Your company name"
+                    inputValue={field.value as string}
+                    setInputValue={field.onChange}
+                  />
+                )}
+              />
+            </div>
+            <div>
+              <FieldHeader iconName="radio" label="Discovery Source" />
+              <Controller
+                name="discoverySource"
+                render={({ field }) => (
+                  <SingleSelector
+                    iconName="radio"
+                    options={discoverySourceOptions}
+                    placeholder="How did you hear about us?"
+                    selectedOption={
+                      field.value
+                        ? {
+                            label: field.value as string,
+                            value: field.value as string,
+                          }
+                        : undefined
+                    }
+                    onChange={field.onChange}
+                  />
+                )}
+              />
+            </div>
           </div>
-          <div>
-            <FieldHeader iconName="user" label="Company" />
-            <Controller
-              name="companyName"
-              render={({ field }) => (
-                <TextInput
-                  label="Company Name"
-                  inputValue={field.value as string}
-                  setInputValue={field.onChange}
-                />
-              )}
-            />
-          </div>
+          <QuivrButton
+            iconName="chevronRight"
+            label="Submit"
+            color="primary"
+            onClick={() => submitForm()}
+            disabled={!username}
+          />
         </div>
       </Modal>
     </FormProvider>
