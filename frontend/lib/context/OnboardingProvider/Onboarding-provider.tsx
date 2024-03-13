@@ -1,4 +1,6 @@
-import { createContext, useState } from "react";
+import { createContext, useEffect, useState } from "react";
+
+import { useUserData } from "@/lib/hooks/useUserData";
 
 export type OnboardingContextType = {
   isOnboardingModalOpened: boolean;
@@ -14,7 +16,12 @@ export const OnboardingProvider = ({
 }: {
   children: React.ReactNode;
 }): JSX.Element => {
-  const [isOnboardingModalOpened, setIsOnboardingModalOpened] = useState(true);
+  const [isOnboardingModalOpened, setIsOnboardingModalOpened] = useState(false);
+  const { userIdentityData } = useUserData();
+
+  useEffect(() => {
+    setIsOnboardingModalOpened(!!userIdentityData?.onboarded);
+  });
 
   return (
     <OnboardingContext.Provider

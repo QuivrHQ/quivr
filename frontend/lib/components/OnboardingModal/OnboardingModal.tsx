@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import { Controller, FormProvider, useForm } from "react-hook-form";
 
 import { useUserApi } from "@/lib/api/user/useUserApi";
@@ -20,11 +19,17 @@ export const OnboardingModal = (): JSX.Element => {
   const { isOnboardingModalOpened, setIsOnboardingModalOpened } =
     useOnboardingContext();
 
-  const methods = useForm<OnboardingProps>({});
+  const methods = useForm<OnboardingProps>({
+    defaultValues: {
+      username: "",
+      companyName: "",
+      discoverySource: "",
+    },
+  });
   const { watch } = methods;
   const username = watch("username");
 
-  const { getUserIdentity } = useUserApi();
+  const { updateUserIdentity } = useUserApi();
 
   const discoverySourceOptions = Object.entries(UserDiscoverySource).map(
     ([key, value]) => ({
@@ -33,11 +38,13 @@ export const OnboardingModal = (): JSX.Element => {
     })
   );
 
-  const submitForm = () => console.log("Hey");
-
-  useEffect(() => {
-    console.info(getUserIdentity());
-  });
+  const submitForm = async () => {
+    await updateUserIdentity({
+      username: methods.getValues("username"),
+      company: methods.getValues("companyName"),
+      onboarded: true,
+    });
+  };
 
   return (
     <FormProvider {...methods}>

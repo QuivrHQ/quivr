@@ -4,11 +4,15 @@ import { UUID } from "crypto";
 import { UserStats } from "@/lib/types/User";
 
 export type UserIdentityUpdatableProperties = {
-  empty?: string | null;
+  username: string;
+  company?: string;
+  onboarded: boolean;
 };
 
 export type UserIdentity = {
   user_id: UUID;
+  onboarded: boolean;
+  username: string;
 };
 
 export const updateUserIdentity = async (
