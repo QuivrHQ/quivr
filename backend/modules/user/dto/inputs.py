@@ -1,6 +1,10 @@
+from typing import Optional
+
 from pydantic import BaseModel
 
 
 class UserUpdatableProperties(BaseModel):
     # Nothing for now
-    empty: bool = True
+    username: Optional[str] = None
+    company: Optional[str] = None
+    onboarded: Optional[bool] = None

@@ -44,7 +44,7 @@ class Users(UsersInterface):
     def get_user_identity(self, user_id):
         response = (
             self.db.from_("user_identity")
-            .select("*")
+            .select("*, users (email)")
             .filter("user_id", "eq", str(user_id))
             .execute()
         )
@@ -53,8 +53,10 @@ class Users(UsersInterface):
             return self.create_user_identity(user_id)
 
         user_identity = response.data[0]
-        print("USER_IDENTITY", user_identity)
-        return UserIdentity(id=user_id)
+
+        user_identity["id"] = user_id  # Add 'id' field to the dictionary
+        user_identity["email"] = user_identity["users"]["email"]
+        return UserIdentity(**user_identity)
 
     def get_user_id_by_user_email(self, email):
         response = (
