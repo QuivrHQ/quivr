@@ -20,6 +20,7 @@ type CommonModalProps = {
   isOpen?: undefined;
   setOpen?: undefined;
   bigModal?: boolean;
+  unclosable?: boolean;
 };
 
 type ModalProps =
@@ -38,6 +39,7 @@ export const Modal = ({
   isOpen: customIsOpen,
   setOpen: customSetOpen,
   bigModal,
+  unclosable,
 }: ModalProps): JSX.Element => {
   const [isOpen, setOpen] = useState(false);
   const { t } = useTranslation(["translation"]);
@@ -60,7 +62,13 @@ export const Modal = ({
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
               >
-                <Dialog.Content asChild forceMount>
+                <Dialog.Content
+                  asChild
+                  forceMount
+                  onInteractOutside={
+                    unclosable ? undefined : (event) => event.preventDefault()
+                  }
+                >
                   <motion.div
                     className={`${styles.modal_content_wrapper} ${
                       bigModal ? styles.big_modal : ""
@@ -91,14 +99,16 @@ export const Modal = ({
                         </Button>
                       )}
                     </Dialog.Close>
-                    <Dialog.Close asChild>
-                      <button
-                        className={styles.close_button_wrapper}
-                        aria-label="Close"
-                      >
-                        <MdClose />
-                      </button>
-                    </Dialog.Close>
+                    {!unclosable && (
+                      <Dialog.Close asChild>
+                        <button
+                          className={styles.close_button_wrapper}
+                          aria-label="Close"
+                        >
+                          <MdClose />
+                        </button>
+                      </Dialog.Close>
+                    )}
                   </motion.div>
                 </Dialog.Content>
               </motion.div>

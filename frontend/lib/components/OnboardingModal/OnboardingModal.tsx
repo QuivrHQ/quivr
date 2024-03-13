@@ -24,6 +24,7 @@ export const OnboardingModal = (): JSX.Element => {
         isOpen={isOnboardingModalOpened}
         setOpen={setIsOnboardingModalOpened}
         CloseTrigger={<div />}
+        unclosable={true}
       >
         <div className={styles.form_wrapper}>
           <div>
