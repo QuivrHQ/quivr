@@ -66,7 +66,7 @@ export const Modal = ({
                   asChild
                   forceMount
                   onInteractOutside={
-                    unclosable ? undefined : (event) => event.preventDefault()
+                    unclosable ? (event) => event.preventDefault() : undefined
                   }
                 >
                   <motion.div

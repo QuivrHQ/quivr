@@ -1,5 +1,7 @@
+import { useEffect } from "react";
 import { Controller, FormProvider, useForm } from "react-hook-form";
 
+import { useUserApi } from "@/lib/api/user/useUserApi";
 import { Modal } from "@/lib/components/ui/Modal/Modal";
 import { useOnboardingContext } from "@/lib/context/OnboardingProvider/hooks/useOnboardingContext";
 
@@ -22,6 +24,8 @@ export const OnboardingModal = (): JSX.Element => {
   const { watch } = methods;
   const username = watch("username");
 
+  const { getUserIdentity } = useUserApi();
+
   const discoverySourceOptions = Object.entries(UserDiscoverySource).map(
     ([key, value]) => ({
       label: value,
@@ -30,6 +34,10 @@ export const OnboardingModal = (): JSX.Element => {
   );
 
   const submitForm = () => console.log("Hey");
+
+  useEffect(() => {
+    console.info(getUserIdentity());
+  });
 
   return (
     <FormProvider {...methods}>
