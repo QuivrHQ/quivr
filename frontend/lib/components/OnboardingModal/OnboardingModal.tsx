@@ -93,13 +93,15 @@ export const OnboardingModal = (): JSX.Element => {
               />
             </div>
           </div>
-          <QuivrButton
-            iconName="chevronRight"
-            label="Submit"
-            color="primary"
-            onClick={() => submitForm()}
-            disabled={!username}
-          />
+          <div className={styles.button_wrapper}>
+            <QuivrButton
+              iconName="chevronRight"
+              label="Submit"
+              color="primary"
+              onClick={() => submitForm()}
+              disabled={!username}
+            />
+          </div>
         </div>
       </Modal>
     </FormProvider>
