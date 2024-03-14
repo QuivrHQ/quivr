@@ -35,10 +35,12 @@ export const OnboardingModal = (): JSX.Element => {
     value: value,
   }));
 
-  const companyRoleOptions = Object.entries(CompanyRole).map(([, value]) => ({
-    label: value,
-    value: value,
-  }));
+  const companyRoleOptions = Object.entries(CompanyRole).map(
+    ([key, value]) => ({
+      label: value,
+      value: key,
+    })
+  );
 
   const submitForm = async () => {
     await updateUserIdentity({

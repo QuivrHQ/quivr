@@ -25,6 +25,7 @@ export enum CompanyRole {
   chiefMarketingOfficer = "Chief Marketing Officer",
   chiefOperatingOfficer = "Chief Operating Officer",
   chiefPeopleOfficer = "Chief People Officer",
+  chiefProductOfficer = "Chief Product Officer",
   chiefTechnologyOfficer = "Chief Technology Officer",
   communicationsManager = "Communications Manager",
   contentCreator = "Content Creator",
@@ -38,6 +39,7 @@ export enum CompanyRole {
   directorOfEngineering = "Director Of Engineering",
   environmentalHealthAndSafetyOfficer = "Environmental Health And Safety Officer",
   financeManager = "Finance Manager",
+  founder = "Founder",
   frontEndDeveloper = "Front End Developer",
   graphicDesigner = "Graphic Designer",
   humanResourcesCoordinator = "Human Resources Coordinator",
@@ -74,6 +76,7 @@ export enum CompanyRole {
   uiUxDesigner = "UI/UX Designer",
   webDesigner = "Web Designer",
   webDeveloper = "Web Developer",
+  other = "Other",
 }
 
 export type UserIdentityUpdatableProperties = {
