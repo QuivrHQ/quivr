@@ -60,6 +60,7 @@ import {
   MdOutlineModeEditOutline,
   MdUploadFile,
 } from "react-icons/md";
+import { PiOfficeChairFill } from "react-icons/pi";
 import { RiHashtag } from "react-icons/ri";
 import { SlOptions } from "react-icons/sl";
 import { TbNetwork } from "react-icons/tb";
@@ -70,6 +71,7 @@ export const iconList: { [name: string]: IconType } = {
   addWithoutCircle: IoIosAdd,
   brain: LuBrain,
   brainCircuit: LuBrainCircuit,
+  chair: PiOfficeChairFill,
   chat: BsChatLeftText,
   check: FaCheck,
   checkCircle: FaCheckCircle,

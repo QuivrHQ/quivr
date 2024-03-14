@@ -1,14 +1,8 @@
-// export enum UserDiscoverySource {
-//   Twitter = "Twitter",
-//   LinkedIn = "Linkedin",
-//   Github = "Github",
-//   SEO = "SEO",
-//   Other = "Other",
-// }
+import { CompanySize } from "@/lib/api/user/user";
 
 export type OnboardingProps = {
   username: string;
   companyName: string;
-  companySize: string;
+  companySize: CompanySize;
   roleInCompany: string;
 };
