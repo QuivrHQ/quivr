@@ -72,7 +72,7 @@ export const MessageRow = React.forwardRef(
               <MessageContent text={messageContent} isUser={isUserSpeaker} />
               {!isUserSpeaker && messageContent !== "🧠" && (
                 <div className={styles.icons_wrapper}>
-                  <CopyButton handleCopy={handleCopy} />
+                  <CopyButton handleCopy={handleCopy} size="normal" />
                   {!isMobile && (
                     <div className={styles.sources_icon_wrapper}>
                       <Icon
@@ -81,7 +81,7 @@ export const MessageRow = React.forwardRef(
                         color={
                           sourcesMessageIndex === index ? "primary" : "black"
                         }
-                        size="small"
+                        size="normal"
                         onClick={() => {
                           setSourcesMessageIndex(
                             sourcesMessageIndex === index ? undefined : index
