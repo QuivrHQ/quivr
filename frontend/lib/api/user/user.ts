@@ -7,6 +7,7 @@ export type UserIdentityUpdatableProperties = {
   username: string;
   company?: string;
   onboarded: boolean;
+  discovery_source?: string;
 };
 
 export type UserIdentity = {

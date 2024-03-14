@@ -6,13 +6,9 @@ import { useOnboardingContext } from "@/lib/context/OnboardingProvider/hooks/use
 
 import styles from "./OnboardingModal.module.scss";
 
-import {
-  OnboardingProps,
-  UserDiscoverySource,
-} from "../OnboardingModal/types/types";
+import { OnboardingProps } from "../OnboardingModal/types/types";
 import { FieldHeader } from "../ui/FieldHeader/FieldHeader";
 import { QuivrButton } from "../ui/QuivrButton/QuivrButton";
-import { SingleSelector } from "../ui/SingleSelector/SingleSelector";
 import { TextInput } from "../ui/TextInput/TextInput";
 
 export const OnboardingModal = (): JSX.Element => {
@@ -23,7 +19,6 @@ export const OnboardingModal = (): JSX.Element => {
     defaultValues: {
       username: "",
       companyName: "",
-      discoverySource: "",
     },
   });
   const { watch } = methods;
@@ -31,12 +26,12 @@ export const OnboardingModal = (): JSX.Element => {
 
   const { updateUserIdentity } = useUserApi();
 
-  const discoverySourceOptions = Object.entries(UserDiscoverySource).map(
-    ([key, value]) => ({
-      label: value,
-      value: key,
-    })
-  );
+  //   const discoverySourceOptions = Object.entries(UserDiscoverySource).map(
+  //     ([key, value]) => ({
+  //       label: value,
+  //       value: key,
+  //     })
+  //   );
 
   const submitForm = async () => {
     await updateUserIdentity({
@@ -87,7 +82,7 @@ export const OnboardingModal = (): JSX.Element => {
               />
             </div>
             <div>
-              <FieldHeader iconName="radio" label="Discovery Source" />
+              {/* <FieldHeader iconName="radio" label="Discovery Source" />
               <Controller
                 name="discoverySource"
                 render={({ field }) => (
@@ -106,7 +101,7 @@ export const OnboardingModal = (): JSX.Element => {
                     onChange={field.onChange}
                   />
                 )}
-              />
+              /> */}
             </div>
           </div>
           <div className={styles.button_wrapper}>
