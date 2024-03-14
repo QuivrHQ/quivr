@@ -99,7 +99,7 @@ export const OnboardingModal = (): JSX.Element => {
                 name="roleInCompany"
                 render={({ field }) => (
                   <SingleSelector
-                    iconName="radio"
+                    iconName="chair"
                     options={companyRoleOptions}
                     placeholder="What is your role in the company?"
                     selectedOption={
@@ -121,7 +121,7 @@ export const OnboardingModal = (): JSX.Element => {
                 name="companySize"
                 render={({ field }) => (
                   <SingleSelector
-                    iconName="radio"
+                    iconName="hashtag"
                     options={companySizeOptions}
                     placeholder="Number of employees in your company"
                     selectedOption={
