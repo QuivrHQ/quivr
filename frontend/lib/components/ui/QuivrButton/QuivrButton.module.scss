@@ -40,6 +40,16 @@
     }
   }
 
+  &.gold {
+    border-color: Colors.$gold;
+    color: Colors.$gold;
+
+    &:hover {
+      background-color: Colors.$gold;
+      color: Colors.$white;
+    }
+  }
+
   &.disabled {
     border-color: Colors.$normal-grey;
     pointer-events: none;
