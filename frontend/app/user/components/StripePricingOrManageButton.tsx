@@ -1,5 +1,3 @@
-import { useTranslation } from "react-i18next";
-
 import { StripePricingModal } from "@/lib/components/Stripe";
 import QuivrButton from "@/lib/components/ui/QuivrButton/QuivrButton";
 import { useUserData } from "@/lib/hooks/useUserData";
@@ -7,7 +5,6 @@ import { useUserData } from "@/lib/hooks/useUserData";
 const MANAGE_PLAN_URL = process.env.NEXT_PUBLIC_STRIPE_MANAGE_PLAN_URL;
 
 export const StripePricingOrManageButton = (): JSX.Element => {
-  const { t } = useTranslation("monetization");
   const { userData } = useUserData();
 
   const is_premium = userData?.is_premium ?? false;
