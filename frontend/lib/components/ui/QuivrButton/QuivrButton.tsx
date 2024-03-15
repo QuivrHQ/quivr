@@ -27,7 +27,7 @@ export const QuivrButton = ({
       ${hidden ? styles.hidden : ""}
       `}
       // eslint-disable-next-line @typescript-eslint/no-misused-promises
-      onClick={() => onClick()}
+      onClick={() => onClick?.()}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
