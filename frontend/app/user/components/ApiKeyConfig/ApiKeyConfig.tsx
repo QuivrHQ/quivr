@@ -3,9 +3,9 @@
 
 import { useTranslation } from "react-i18next";
 
-import Button from "@/lib/components/ui/Button";
 import { CopyButton } from "@/lib/components/ui/CopyButton";
 import { FieldHeader } from "@/lib/components/ui/FieldHeader/FieldHeader";
+import QuivrButton from "@/lib/components/ui/QuivrButton/QuivrButton";
 
 import styles from "./ApiKeyConfig.module.scss";
 import { useApiKeyConfig } from "./hooks/useApiKeyConfig";
@@ -18,13 +18,12 @@ export const ApiKeyConfig = (): JSX.Element => {
     <div>
       <FieldHeader iconName="key" label={`Quivr ${t("apiKey")}`} />
       {apiKey === "" ? (
-        <Button
-          data-testid="create-new-key"
-          variant="secondary"
+        <QuivrButton
+          color="primary"
+          iconName="key"
+          label="Create API Key"
           onClick={() => void handleCreateClick()}
-        >
-          Create New Key
-        </Button>
+        ></QuivrButton>
       ) : (
         <div className={styles.response_wrapper}>
           <span>{apiKey}</span>
