@@ -94,12 +94,12 @@ export const OnboardingModal = (): JSX.Element => {
               />
             </div>
             <div>
-              <FieldHeader iconName="chair" label="Role" />
+              <FieldHeader iconName="goal" label="Usage Purpose" />
               <Controller
                 name="usagePurpose"
                 render={({ field }) => (
                   <SingleSelector
-                    iconName="chair"
+                    iconName="goal"
                     options={usagePurposeOptions}
                     placeholder="In what context will you be using Quivr"
                     selectedOption={

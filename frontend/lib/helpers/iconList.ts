@@ -47,6 +47,7 @@ import {
   LuChevronLeft,
   LuChevronRight,
   LuCopy,
+  LuGoal,
   LuPlusCircle,
   LuSearch,
 } from "react-icons/lu";
@@ -91,6 +92,7 @@ export const iconList: { [name: string]: IconType } = {
   flag: CiFlag1,
   followUp: IoArrowUpCircleOutline,
   github: FaGithub,
+  goal: LuGoal,
   graph: VscGraph,
   hashtag: RiHashtag,
   help: IoIosHelpCircleOutline,
