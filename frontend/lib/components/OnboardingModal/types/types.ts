@@ -4,5 +4,5 @@ export type OnboardingProps = {
   username: string;
   companyName: string;
   companySize: CompanySize;
-  roleInCompany: string;
+  usagePurpose: string;
 };

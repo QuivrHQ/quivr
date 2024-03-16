@@ -14,69 +14,12 @@ export enum CompanySize {
   Eight = "+5000",
 }
 
-export enum CompanyRole {
-  accountExecutive = "Account Executive",
-  accountant = "Accountant",
-  businessAnalyst = "Business Analyst",
-  businessDevelopmentManager = "Business Development Manager",
-  chiefExecutiveOfficer = "Chief Executive Officer",
-  chiefFinancialOfficer = "Chief Financial Officer",
-  chiefInformationOfficer = "Chief Information Officer",
-  chiefMarketingOfficer = "Chief Marketing Officer",
-  chiefOperatingOfficer = "Chief Operating Officer",
-  chiefPeopleOfficer = "Chief People Officer",
-  chiefProductOfficer = "Chief Product Officer",
-  chiefTechnologyOfficer = "Chief Technology Officer",
-  communicationsManager = "Communications Manager",
-  contentCreator = "Content Creator",
-  customerRelationshipManager = "Customer Relationship Manager",
-  customerServiceRepresentative = "Customer Service Representative",
-  dataAnalyst = "Data Analyst",
-  dataEngineer = "Data Engineer",
-  dataScientist = "Data Scientist",
-  developer = "Developer",
-  digitalMarketingSpecialist = "Digital Marketing Specialist",
-  directorOfEngineering = "Director Of Engineering",
-  environmentalHealthAndSafetyOfficer = "Environmental Health And Safety Officer",
-  financeManager = "Finance Manager",
-  founder = "Founder",
-  frontEndDeveloper = "Front End Developer",
-  graphicDesigner = "Graphic Designer",
-  humanResourcesCoordinator = "Human Resources Coordinator",
-  humanResourcesManager = "Human Resources Manager",
-  informationSecurityAnalyst = "Information Security Analyst",
-  itSupportSpecialist = "IT Support Specialist",
-  legalAdvisor = "Legal Advisor",
-  logisticsCoordinator = "Logistics Coordinator",
-  marketingCoordinator = "Marketing Coordinator",
-  marketingManager = "Marketing Manager",
-  networkAdministrator = "Network Administrator",
-  officeManager = "Office Manager",
-  operationsManager = "Operations Manager",
-  productDesigner = "Product Designer",
-  productManager = "Product Manager",
-  projectCoordinator = "Project Coordinator",
-  projectManager = "Project Manager",
-  publicRelationsSpecialist = "Public Relations Specialist",
-  qualityAssuranceEngineer = "Quality Assurance Engineer",
-  recruitmentSpecialist = "Recruitment Specialist",
-  salesAssociate = "Sales Associate",
-  salesManager = "Sales Manager",
-  scrumMaster = "Scrum Master",
-  socialMediaManager = "Social Media Manager",
-  softwareArchitect = "Software Architect",
-  softwareDeveloper = "Software Developer",
-  softwareEngineer = "Software Engineer",
-  solutionsArchitect = "Solutions Architect",
-  supplyChainManager = "Supply Chain Manager",
-  supportSpecialist = "Support Specialist",
-  systemAdministrator = "System Administrator",
-  technicalLead = "Technical Lead",
-  technicalSupportSpecialist = "Technical Support Specialist",
-  uiUxDesigner = "UI/UX Designer",
-  webDesigner = "Web Designer",
-  webDeveloper = "Web Developer",
-  other = "Other",
+export enum UsagePurpose {
+  Business = "Business",
+  NGO = "NGO",
+  Personal = "Personal",
+  Student = "Student",
+  Teacher = "Teacher",
 }
 
 export type UserIdentityUpdatableProperties = {
@@ -84,7 +27,7 @@ export type UserIdentityUpdatableProperties = {
   company?: string;
   onboarded: boolean;
   company_size?: CompanySize;
-  role_in_company?: CompanyRole;
+  usage_purpose?: UsagePurpose;
 };
 
 export type UserIdentity = {

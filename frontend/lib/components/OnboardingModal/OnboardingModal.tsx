@@ -1,7 +1,7 @@
 import { Controller, FormProvider, useForm } from "react-hook-form";
 
 import { useUserApi } from "@/lib/api/user/useUserApi";
-import { CompanyRole, CompanySize } from "@/lib/api/user/user";
+import { CompanySize, UsagePurpose } from "@/lib/api/user/user";
 import { Modal } from "@/lib/components/ui/Modal/Modal";
 import { useOnboardingContext } from "@/lib/context/OnboardingProvider/hooks/useOnboardingContext";
 
@@ -22,7 +22,7 @@ export const OnboardingModal = (): JSX.Element => {
       username: "",
       companyName: "",
       companySize: undefined,
-      roleInCompany: "",
+      usagePurpose: "",
     },
   });
   const { watch } = methods;
@@ -35,7 +35,7 @@ export const OnboardingModal = (): JSX.Element => {
     value: value,
   }));
 
-  const companyRoleOptions = Object.entries(CompanyRole).map(
+  const usagePurposeOptions = Object.entries(UsagePurpose).map(
     ([key, value]) => ({
       label: value,
       value: key,
@@ -48,8 +48,8 @@ export const OnboardingModal = (): JSX.Element => {
       company: methods.getValues("companyName"),
       onboarded: true,
       company_size: methods.getValues("companySize"),
-      role_in_company: methods.getValues("roleInCompany") as
-        | CompanyRole
+      usage_purpose: methods.getValues("usagePurpose") as
+        | UsagePurpose
         | undefined,
     });
     window.location.reload();
@@ -96,12 +96,12 @@ export const OnboardingModal = (): JSX.Element => {
             <div>
               <FieldHeader iconName="chair" label="Role" />
               <Controller
-                name="roleInCompany"
+                name="usagePurpose"
                 render={({ field }) => (
                   <SingleSelector
                     iconName="chair"
-                    options={companyRoleOptions}
-                    placeholder="What is your role in the company?"
+                    options={usagePurposeOptions}
+                    placeholder="In what context will you be using Quivr"
                     selectedOption={
                       field.value
                         ? {
