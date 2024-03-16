@@ -50,6 +50,7 @@ system_message_template = """
 When answering use markdown to make it concise and neat.
 Use the following pieces of context from files provided by the user that are store in a brain to answer  the users question in the same language as the user question. Your name is Quivr. You're a helpful assistant.  
 If you don't know the answer with the context provided from the files, just say that you don't know, don't try to make up an answer.
+The relevance of the context is ranked from 0 to 2. 2 being the most relevant and 0 being the least relevant. Value more relevant information when answering.
 User instruction to follow if provided to answer: {custom_instructions}
 """
 
@@ -65,7 +66,7 @@ ANSWER_PROMPT = ChatPromptTemplate.from_messages(
 # How we format documents
 
 DEFAULT_DOCUMENT_PROMPT = PromptTemplate.from_template(
-    template="File: {file_name} Content:  {page_content}"
+    template="File: {file_name} Content:  {page_content} Relevance: {similarity}"
 )
 
 
@@ -226,6 +227,7 @@ class QuivrRAG(BaseModel):
             | CONDENSE_QUESTION_PROMPT
             | ChatLiteLLM(temperature=0, model=self.model, api_base=api_base)
             | StrOutputParser(),
+            "question": lambda x: x["question"],
         }
 
         prompt_custom_user = self.prompt_to_use()
@@ -236,7 +238,7 @@ class QuivrRAG(BaseModel):
         # Now we retrieve the documents
         retrieved_documents = {
             "docs": itemgetter("standalone_question") | retriever_doc,
-            "question": lambda x: x["standalone_question"],
+            "question": itemgetter("question"),
             "custom_instructions": lambda x: prompt_to_use,
         }
 
