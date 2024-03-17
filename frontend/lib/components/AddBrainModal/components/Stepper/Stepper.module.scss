@@ -47,7 +47,7 @@
 
     &.current_step {
       .circle {
-        background-color: Colors.$light-background;
+        background-color: Colors.$background-0;
         border: 1px solid Colors.$primary;
       }
 
@@ -71,7 +71,7 @@
 
       .step_info {
         .step_status {
-          color: Colors.$lighter-text;
+          color: Colors.$text-1;
         }
       }
     }
@@ -85,7 +85,7 @@
 
       .step_index {
         white-space: nowrap;
-        color: Colors.$lighter-text;
+        color: Colors.$text-1;
       }
     }
   }

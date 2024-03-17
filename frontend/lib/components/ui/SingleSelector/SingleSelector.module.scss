@@ -9,12 +9,12 @@
   display: flex;
   flex-direction: column;
   position: relative;
-  background-color: Colors.$light-background;
+  background-color: Colors.$background-0;
 
   .first_line_wrapper {
     display: flex;
     justify-content: space-between;
-    border: 1px solid Colors.$darkest-border;
+    border: 1px solid Colors.$border-2;
     border-radius: Radius.$big;
     align-items: center;
     cursor: pointer;
@@ -44,7 +44,7 @@
         white-space: nowrap;
 
         &.not_set {
-          color: Colors.$lighter-text;
+          color: Colors.$text-1;
           background-color: transparent;
           padding-inline: 0;
         }
@@ -67,10 +67,10 @@
 
   .options {
     position: absolute;
-    background-color: Colors.$light-background;
+    background-color: Colors.$background-0;
     width: 100%;
     top: 100%;
-    border: 1px solid Colors.$darkest-border;
+    border: 1px solid Colors.$border-2;
     border-top: none;
     border-radius: 0 0 Radius.$big Radius.$big;
     overflow: hidden;
@@ -98,7 +98,7 @@
 
       .option_name {
         @include Typography.EllipsisOverflow;
-        border: 1px solid Colors.$darker-border;
+        border: 1px solid Colors.$border-1;
         border-radius: Radius.$small;
         padding-inline: Spacings.$spacing05;
         padding-block: Spacings.$spacing02;

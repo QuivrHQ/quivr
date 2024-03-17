@@ -27,7 +27,7 @@
     .title {
       @include Typography.EllipsisOverflow;
       font-size: Typography.$small;
-      color: Colors.$normal-text;
+      color: Colors.$text-3;
 
       &.gold {
         color: Colors.$gold;
@@ -40,6 +40,6 @@
   }
 
   &:hover {
-    background-color: Colors.$dark-background;
+    background-color: Colors.$background-3;
   }
 }

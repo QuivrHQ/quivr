@@ -30,7 +30,7 @@
 }
 
 .black {
-  color: Colors.$normal-icon;
+  color: Colors.$icon-3;
 
   &.hovered {
     color: Colors.$primary;
@@ -38,11 +38,11 @@
 }
 
 .dark-grey {
-  color: Colors.$light-icon;
+  color: Colors.$icon-2;
 }
 
 .grey {
-  color: Colors.$lighter-icon;
+  color: Colors.$icon-1;
 }
 
 .primary {
@@ -58,7 +58,7 @@
 }
 
 .white {
-  color: Colors.$lightest-icon;
+  color: Colors.$icon-0;
 }
 
 .dangerous {
@@ -78,7 +78,7 @@
 }
 
 .disabled {
-  color: Colors.$normal-icon;
+  color: Colors.$icon-3;
   pointer-events: none;
   opacity: 0.2;
 }

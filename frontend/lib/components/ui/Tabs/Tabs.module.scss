@@ -12,7 +12,7 @@
     align-items: center;
     justify-content: center;
     flex: 1;
-    border-bottom: 2px solid Colors.$normal-border;
+    border-bottom: 2px solid Colors.$border-0;
     padding-block: Spacings.$spacing03;
     cursor: pointer;
     box-sizing: border-box;
@@ -21,7 +21,7 @@
     &.selected {
       border-bottom-color: Colors.$primary;
       color: Colors.$primary;
-      background-color: Colors.$darker-background;
+      background-color: Colors.$background-2;
     }
 
     &:hover {
@@ -30,7 +30,7 @@
 
     &.disabled {
       pointer-events: none;
-      color: Colors.$lighter-text;
+      color: Colors.$text-1;
     }
 
     @media (max-width: ScreenSizes.$small) {

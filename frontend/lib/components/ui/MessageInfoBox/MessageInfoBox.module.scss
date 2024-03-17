@@ -8,8 +8,8 @@
   align-items: center;
   gap: Spacings.$spacing03;
   width: fit-content;
-  border: 1px solid Colors.$darkest-border;
-  color: Colors.$normal-text;
+  border: 1px solid Colors.$border-2;
+  color: Colors.$text-3;
   border-radius: Radius.$normal;
 
   &.success {

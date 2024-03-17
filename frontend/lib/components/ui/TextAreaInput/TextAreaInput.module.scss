@@ -4,14 +4,14 @@
 
 .text_area_input_container {
   display: flex;
-  border: 1px solid Colors.$normal-border;
+  border: 1px solid Colors.$border-0;
   gap: Spacings.$spacing03;
   padding-block: Spacings.$spacing02;
   padding-inline: Spacings.$spacing03;
   border-radius: Radius.$big;
   align-items: center;
   width: 100%;
-  background-color: Colors.$light-background;
+  background-color: Colors.$background-0;
 
   &.simple {
     border: none;

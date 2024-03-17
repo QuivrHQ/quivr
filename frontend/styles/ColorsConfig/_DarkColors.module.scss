@@ -1,17 +1,17 @@
 @use "@/styles/Colors.module.scss";
 
 // BACKGROUNDS
-$background-0: Colors.$white;
-$background-1: Colors.$highlight;
-$background-2: Colors.$lightest-grey;
-$background-3: Colors.$lightest-black;
-$background-4: Colors.$dark-grey;
-$background-5: Colors.$dark-black;
+$background-0: Colors.$dark-black;
+$background-1: Colors.$dark-grey;
+$background-2: Colors.$lightest-black;
+$background-3: Colors.$lightest-grey;
+$background-4: Colors.$highlight;
+$background-5: Colors.$white;
 
 // BORDERS
-$border-0: Colors.$lighter-grey;
+$border-0: Colors.$normal-grey;
 $border-1: Colors.$lightest-black;
-$border-2: Colors.$normal-grey;
+$border-2: Colors.$lightest-grey;
 
 // ICONS
 $icon-0: Colors.$white;

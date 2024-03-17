@@ -4,7 +4,7 @@
 @use "@/styles/ZIndexes.module.scss";
 
 .options_modal_wrapper {
-  background-color: Colors.$normal-background;
+  background-color: Colors.$background-1;
   border-radius: Radius.$normal;
   border-radius: Radius.$normal;
   box-shadow: 0 1px 2px rgb(0, 0, 0, 0.25);
@@ -21,7 +21,7 @@
     overflow: hidden;
 
     &:not(:first-child) {
-      border-top: 1px solid Colors.$darkest-border;
+      border-top: 1px solid Colors.$border-2;
     }
 
     &:hover {

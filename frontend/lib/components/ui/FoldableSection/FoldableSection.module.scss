@@ -8,7 +8,7 @@
   display: flex;
   flex-direction: column;
   border-radius: Radius.$normal;
-  border: 1px dashed Colors.$normal-border;
+  border: 1px dashed Colors.$border-0;
   overflow: hidden;
   font-size: Typography.$small;
 
@@ -44,7 +44,7 @@
     }
 
     &:hover {
-      background-color: Colors.$dark-background;
+      background-color: Colors.$background-3;
     }
   }
 

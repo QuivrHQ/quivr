@@ -7,9 +7,9 @@
   display: flex;
   flex-direction: column;
   gap: Spacings.$spacing03;
-  background-color: Colors.$light-background;
+  background-color: Colors.$background-0;
   border-radius: Radius.$big;
-  border: 1px solid Colors.$normal-border;
+  border: 1px solid Colors.$border-0;
   overflow: hidden;
   box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.25);
 
@@ -30,7 +30,7 @@
       cursor: pointer;
 
       &.disabled {
-        color: Colors.$normal-text;
+        color: Colors.$text-3;
         pointer-events: none;
         opacity: 0.2;
       }

@@ -5,10 +5,10 @@
 .chat_container {
   display: flex;
   flex-direction: column;
-  background-color: Colors.$light-background;
+  background-color: Colors.$background-0;
   gap: Spacings.$spacing03;
   border-radius: Radius.$big;
-  border: 1px solid Colors.$normal-border;
+  border: 1px solid Colors.$border-0;
   overflow: hidden;
 
   .chat_wrapper {
