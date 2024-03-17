@@ -1,4 +1,4 @@
-@use "@/styles/Colors.module.scss";
+@use "@/styles/ColorsConfig/LightColors.module.scss" as Colors;
 @use "@/styles/IconSizes.module.scss";
 @use "@/styles/Radius.module.scss";
 @use "@/styles/Spacings.module.scss";
@@ -9,12 +9,12 @@
   display: flex;
   flex-direction: column;
   position: relative;
-  background-color: Colors.$white;
+  background-color: Colors.$light-background;
 
   .first_line_wrapper {
     display: flex;
     justify-content: space-between;
-    border: 1px solid Colors.$normal-grey;
+    border: 1px solid Colors.$darkest-border;
     border-radius: Radius.$big;
     align-items: center;
     cursor: pointer;
@@ -44,7 +44,7 @@
         white-space: nowrap;
 
         &.not_set {
-          color: Colors.$normal-grey;
+          color: Colors.$lighter-text;
           background-color: transparent;
           padding-inline: 0;
         }
@@ -67,10 +67,10 @@
 
   .options {
     position: absolute;
-    background-color: Colors.$white;
+    background-color: Colors.$light-background;
     width: 100%;
     top: 100%;
-    border: 1px solid Colors.$normal-grey;
+    border: 1px solid Colors.$darkest-border;
     border-top: none;
     border-radius: 0 0 Radius.$big Radius.$big;
     overflow: hidden;
@@ -98,7 +98,7 @@
 
       .option_name {
         @include Typography.EllipsisOverflow;
-        border: 1px solid Colors.$lightest-black;
+        border: 1px solid Colors.$darker-border;
         border-radius: Radius.$small;
         padding-inline: Spacings.$spacing05;
         padding-block: Spacings.$spacing02;

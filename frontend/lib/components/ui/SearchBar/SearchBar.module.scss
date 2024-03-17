@@ -1,4 +1,4 @@
-@use "@/styles/Colors.module.scss";
+@use "@/styles/ColorsConfig/LightColors.module.scss" as Colors;
 @use "@/styles/IconSizes.module.scss";
 @use "@/styles/Radius.module.scss";
 @use "@/styles/Spacings.module.scss";
@@ -7,9 +7,9 @@
   display: flex;
   flex-direction: column;
   gap: Spacings.$spacing03;
-  background-color: Colors.$white;
+  background-color: Colors.$light-background;
   border-radius: Radius.$big;
-  border: 1px solid Colors.$lighter-grey;
+  border: 1px solid Colors.$normal-border;
   overflow: hidden;
   box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.25);
 
@@ -30,7 +30,7 @@
       cursor: pointer;
 
       &.disabled {
-        color: Colors.$black;
+        color: Colors.$normal-text;
         pointer-events: none;
         opacity: 0.2;
       }

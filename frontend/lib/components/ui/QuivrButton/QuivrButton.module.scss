@@ -1,4 +1,4 @@
-@use "@/styles/Colors.module.scss";
+@use "@/styles/ColorsConfig/LightColors.module.scss" as Colors;
 @use "@/styles/Radius.module.scss";
 @use "@/styles/ScreenSizes.module.scss";
 @use "@/styles/Spacings.module.scss";
@@ -14,7 +14,7 @@
   cursor: pointer;
   display: flex;
   width: fit-content;
-  background-color: Colors.$white;
+  background-color: Colors.$light-background;
 
   &.hidden {
     display: none;
@@ -26,7 +26,7 @@
 
     &:hover {
       background-color: Colors.$primary;
-      color: Colors.$white;
+      color: Colors.$lightest-text;
     }
   }
 
@@ -36,7 +36,7 @@
 
     &:hover {
       background-color: Colors.$dangerous;
-      color: Colors.$white;
+      color: Colors.$lightest-text;
     }
   }
 
@@ -51,9 +51,9 @@
   }
 
   &.disabled {
-    border-color: Colors.$normal-grey;
+    border-color: Colors.$darkest-border;
     pointer-events: none;
-    color: Colors.$normal-grey;
+    color: Colors.$lighter-text;
   }
 }
 

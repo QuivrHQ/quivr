@@ -1,4 +1,4 @@
-@use "@/styles/Colors.module.scss";
+@use "@/styles/ColorsConfig/LightColors.module.scss" as Colors;
 @use "@/styles/Radius.module.scss";
 @use "@/styles/Spacings.module.scss";
 @use "@/styles/Typography.module.scss";
@@ -47,7 +47,7 @@
 
     &.current_step {
       .circle {
-        background-color: Colors.$white;
+        background-color: Colors.$light-background;
         border: 1px solid Colors.$primary;
       }
 
@@ -71,7 +71,7 @@
 
       .step_info {
         .step_status {
-          color: Colors.$normal-grey;
+          color: Colors.$lighter-text;
         }
       }
     }
@@ -85,7 +85,7 @@
 
       .step_index {
         white-space: nowrap;
-        color: Colors.$normal-grey;
+        color: Colors.$lighter-text;
       }
     }
   }

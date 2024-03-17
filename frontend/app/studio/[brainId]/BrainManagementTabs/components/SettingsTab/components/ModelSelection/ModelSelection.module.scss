@@ -1,4 +1,4 @@
-@use "@/styles/Colors.module.scss";
+@use "@/styles/ColorsConfig/LightColors.module.scss" as Colors;
 @use "@/styles/Radius.module.scss";
 @use "@/styles/Spacings.module.scss";
 
@@ -34,15 +34,7 @@
       width: 15px;
       height: 30px;
       border-radius: Radius.$big;
-      background: Colors.$primary; /* Changez la couleur ici */
-      cursor: pointer;
-    }
-
-    .slider::-moz-range-thumb {
-      width: 25px;
-      height: 25px;
-      border-radius: 50%;
-      background: #4caf50; /* Changez la couleur ici */
+      background: Colors.$primary;
       cursor: pointer;
     }
   }

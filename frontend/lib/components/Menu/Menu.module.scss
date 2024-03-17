@@ -1,10 +1,10 @@
-@use "@/styles/Colors.module.scss";
+@use "@/styles/ColorsConfig/LightColors.module.scss" as Colors;
 @use "@/styles/Spacings.module.scss";
 @use "@/styles/ZIndexes.module.scss";
 
 .menu_container {
-  background-color: Colors.$highlight;
-  border-right: 1px solid Colors.$lightest-black;
+  background-color: Colors.$normal-background;
+  border-right: 1px solid Colors.$darker-border;
 
   .menu_wrapper {
     padding-top: Spacings.$spacing05;
@@ -37,7 +37,7 @@
 
     .social_buttons_wrapper {
       padding-block: Spacings.$spacing04;
-      border-top: 1px solid Colors.$lightest-black;
+      border-top: 1px solid Colors.$darker-border;
     }
   }
 }

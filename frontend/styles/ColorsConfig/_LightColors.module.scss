@@ -1,0 +1,49 @@
+@use "@/styles/Colors.module.scss";
+
+// BACKGROUNDS
+$very-darkest-background: Colors.$dark-black;
+$darkest-background: Colors.$dark-grey;
+$dark-background: Colors.$lightest-black;
+$darker-background: Colors.$lightest-grey;
+$normal-background: Colors.$highlight;
+$light-background: Colors.$white;
+
+// BORDERS
+$darkest-border: Colors.$normal-grey;
+$darker-border: Colors.$lightest-black;
+$normal-border: Colors.$lighter-grey;
+
+// ICONS
+$normal-icon: Colors.$black;
+$light-icon: Colors.$dark-grey;
+$lighter-icon: Colors.$normal-grey;
+$lightest-icon: Colors.$white;
+
+// TEXT
+$lightest-text: Colors.$white;
+$lighter-text: Colors.$normal-grey;
+$light-text: Colors.$dark-grey;
+$normal-text: Colors.$black;
+
+// PRIMARY
+$primary: Colors.$primary;
+$primary-light: Colors.$primary-light;
+$primary-lightest: Colors.$primary-lightest;
+
+// ACCENT
+$accent: Colors.$accent;
+
+// GOLD
+$gold: Colors.$gold;
+
+// SUCCESS
+$success: Colors.$success;
+$success-lightest: Colors.$success-lightest;
+
+// DANGEROUS
+$dangerous: Colors.$dangerous;
+$dangerous-dark: Colors.$dangerous-dark;
+
+// WARNING
+$warning: Colors.$warning;
+$warning-lightest: Colors.$warning-lightest;

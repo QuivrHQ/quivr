@@ -1,4 +1,4 @@
-@use "@/styles/Colors.module.scss";
+@use "@/styles/ColorsConfig/LightColors.module.scss" as Colors;
 @use "@/styles/Spacings.module.scss";
 @use "@/styles/Typography.module.scss";
 
@@ -6,7 +6,7 @@
   display: flex;
   align-items: center;
   gap: Spacings.$spacing02;
-  color: Colors.$black;
+  color: Colors.$normal-text;
   overflow: hidden;
 
   .brain_name {

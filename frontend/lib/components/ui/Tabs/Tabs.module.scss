@@ -1,4 +1,4 @@
-@use "@/styles/Colors.module.scss";
+@use "@/styles/ColorsConfig/LightColors.module.scss" as Colors;
 @use "@/styles/Radius.module.scss";
 @use "@/styles/ScreenSizes.module.scss";
 @use "@/styles/Spacings.module.scss";
@@ -12,7 +12,7 @@
     align-items: center;
     justify-content: center;
     flex: 1;
-    border-bottom: 2px solid Colors.$lightest-grey;
+    border-bottom: 2px solid Colors.$normal-border;
     padding-block: Spacings.$spacing03;
     cursor: pointer;
     box-sizing: border-box;
@@ -21,7 +21,7 @@
     &.selected {
       border-bottom-color: Colors.$primary;
       color: Colors.$primary;
-      background-color: Colors.$lightest-grey;
+      background-color: Colors.$darker-background;
     }
 
     &:hover {
@@ -30,7 +30,7 @@
 
     &.disabled {
       pointer-events: none;
-      color: Colors.$normal-grey;
+      color: Colors.$lighter-text;
     }
 
     @media (max-width: ScreenSizes.$small) {

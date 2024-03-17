@@ -1,4 +1,4 @@
-@use "@/styles/Colors.module.scss";
+@use "@/styles/ColorsConfig/LightColors.module.scss" as Colors;
 @use "@/styles/Radius.module.scss";
 @use "@/styles/ScreenSizes.module.scss";
 @use "@/styles/Spacings.module.scss";
@@ -13,7 +13,7 @@
   justify-content: space-between;
   align-items: center;
   margin-block: Spacings.$spacing03;
-  border: 1px solid Colors.$lightest-black;
+  border: 1px solid Colors.$darker-border;
   border-radius: Radius.$normal;
   padding-block: Spacings.$spacing03;
   position: relative;

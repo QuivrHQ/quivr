@@ -1,17 +1,17 @@
-@use "@/styles/Colors.module.scss";
+@use "@/styles/ColorsConfig/LightColors.module.scss" as Colors;
 @use "@/styles/Radius.module.scss";
 @use "@/styles/Spacings.module.scss";
 
 .text_area_input_container {
   display: flex;
-  border: 1px solid Colors.$lighter-grey;
+  border: 1px solid Colors.$normal-border;
   gap: Spacings.$spacing03;
   padding-block: Spacings.$spacing02;
   padding-inline: Spacings.$spacing03;
   border-radius: Radius.$big;
   align-items: center;
   width: 100%;
-  background-color: Colors.$white;
+  background-color: Colors.$light-background;
 
   &.simple {
     border: none;

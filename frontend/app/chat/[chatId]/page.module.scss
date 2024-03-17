@@ -1,4 +1,4 @@
-@use "@/styles/Colors.module.scss";
+@use "@/styles/ColorsConfig/LightColors.module.scss" as Colors;
 @use "@/styles/Spacings.module.scss";
 
 .main_container {
@@ -9,7 +9,7 @@
   .chat_page_container {
     display: flex;
     flex: 1 1 0%;
-    background-color: Colors.$white;
+    background-color: Colors.$light-background;
     padding-block: Spacings.$spacing06;
     padding-inline: Spacings.$spacing09;
     display: flex;

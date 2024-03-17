@@ -1,13 +1,13 @@
-@use "@/styles/Colors.module.scss";
+@use "@/styles/ColorsConfig/LightColors.module.scss" as Colors;
 @use "@/styles/Spacings.module.scss";
 @use "@/styles/Typography.module.scss";
 
 .current_brain_wrapper {
-  background-color: Colors.$lightest-grey;
+  background-color: Colors.$darker-background;
   padding-inline: Spacings.$spacing05;
   padding-block: Spacings.$spacing01;
   font-size: Typography.$small;
-  color: Colors.$normal-grey;
+  color: Colors.$lighter-text;
 
   .brain_infos {
     display: flex;
@@ -32,7 +32,7 @@
         overflow: hidden;
 
         .brain_name {
-          color: Colors.$black;
+          color: Colors.$normal-text;
           @include Typography.EllipsisOverflow;
         }
       }

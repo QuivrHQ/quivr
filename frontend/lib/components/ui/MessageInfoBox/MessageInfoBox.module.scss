@@ -1,4 +1,4 @@
-@use "@/styles/Colors.module.scss";
+@use "@/styles/ColorsConfig/LightColors.module.scss" as Colors;
 @use "@/styles/Radius.module.scss";
 @use "@/styles/Spacings.module.scss";
 
@@ -8,8 +8,8 @@
   align-items: center;
   gap: Spacings.$spacing03;
   width: fit-content;
-  border: 1px solid Colors.$normal-grey;
-  color: Colors.$black;
+  border: 1px solid Colors.$darkest-border;
+  color: Colors.$normal-text;
   border-radius: Radius.$normal;
 
   &.success {

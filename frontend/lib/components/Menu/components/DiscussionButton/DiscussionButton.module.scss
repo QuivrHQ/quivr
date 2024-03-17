@@ -1,4 +1,4 @@
-@use "@/styles/Colors.module.scss";
+@use "@/styles/ColorsConfig/LightColors.module.scss" as Colors;
 @use "@/styles/IconSizes.module.scss";
 @use "@/styles/Radius.module.scss";
 @use "@/styles/Spacings.module.scss";
@@ -8,11 +8,11 @@
   padding: Spacings.$spacing03;
   justify-content: space-between;
   align-items: center;
-  border: 1px solid Colors.$lighter-grey;
+  border: 1px solid Colors.$normal-border;
   border-radius: Radius.$big;
-  background-color: Colors.$white;
+  background-color: Colors.$light-background;
   cursor: pointer;
-  color: Colors.$dark-grey;
+  color: Colors.$light-text;
   transition: box-shadow 0.3s ease;
 
   .left_wrapper {
@@ -30,7 +30,7 @@
         align-items: center;
         justify-content: center;
         font-size: 12px;
-        border: 1px solid Colors.$lighter-grey;
+        border: 1px solid Colors.$normal-border;
         border-radius: Radius.$small;
         width: 16px;
         height: 16px;

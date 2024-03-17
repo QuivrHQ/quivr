@@ -1,10 +1,10 @@
-@use "@/styles/Colors.module.scss";
+@use "@/styles/ColorsConfig/LightColors.module.scss" as Colors;
 @use "@/styles/Radius.module.scss";
 @use "@/styles/Spacings.module.scss";
 @use "@/styles/ZIndexes.module.scss";
 
 .options_modal_wrapper {
-  background-color: Colors.$highlight;
+  background-color: Colors.$normal-background;
   border-radius: Radius.$normal;
   border-radius: Radius.$normal;
   box-shadow: 0 1px 2px rgb(0, 0, 0, 0.25);
@@ -21,7 +21,7 @@
     overflow: hidden;
 
     &:not(:first-child) {
-      border-top: 1px solid Colors.$light-grey;
+      border-top: 1px solid Colors.$darkest-border;
     }
 
     &:hover {

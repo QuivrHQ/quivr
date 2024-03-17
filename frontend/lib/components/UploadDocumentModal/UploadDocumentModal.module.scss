@@ -1,4 +1,4 @@
-@use "@/styles/Colors.module.scss";
+@use "@/styles/ColorsConfig/LightColors.module.scss" as Colors;
 @use "@/styles/Spacings.module.scss";
 @use "@/styles/ZIndexes.module.scss";
 
@@ -7,7 +7,7 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  background-color: Colors.$white;
+  background-color: Colors.$light-background;
   width: 100%;
   flex: 1;
 

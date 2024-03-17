@@ -1,8 +1,8 @@
-@use "@/styles/Colors.module.scss";
+@use "@/styles/ColorsConfig/LightColors.module.scss" as Colors;
 @use "@/styles/Spacings.module.scss";
 
 .chats_wrapper {
-  border-left: 1px solid Colors.$normal-grey;
+  border-left: 1px solid Colors.$darkest-border;
   padding-left: Spacings.$spacing03;
   margin: Spacings.$spacing02;
   display: flex;

@@ -1,4 +1,4 @@
-@use "@/styles/Colors.module.scss";
+@use "@/styles/ColorsConfig/LightColors.module.scss" as Colors;
 @use "@/styles/IconSizes.module.scss";
 
 .small {
@@ -30,7 +30,7 @@
 }
 
 .black {
-  color: Colors.$black;
+  color: Colors.$normal-icon;
 
   &.hovered {
     color: Colors.$primary;
@@ -38,11 +38,11 @@
 }
 
 .dark-grey {
-  color: Colors.$dark-grey;
+  color: Colors.$light-icon;
 }
 
 .grey {
-  color: Colors.$normal-grey;
+  color: Colors.$lighter-icon;
 }
 
 .primary {
@@ -58,7 +58,7 @@
 }
 
 .white {
-  color: Colors.$white;
+  color: Colors.$lightest-icon;
 }
 
 .dangerous {
@@ -78,7 +78,7 @@
 }
 
 .disabled {
-  color: Colors.$black;
+  color: Colors.$normal-icon;
   pointer-events: none;
   opacity: 0.2;
 }

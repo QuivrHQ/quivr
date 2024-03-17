@@ -1,4 +1,4 @@
-@use "@/styles/Colors.module.scss";
+@use "@/styles/ColorsConfig/LightColors.module.scss" as Colors;
 @use "@/styles/Spacings.module.scss";
 
 .text_button_wrapper {
@@ -10,7 +10,7 @@
 }
 
 .black {
-  color: Colors.$black;
+  color: Colors.$normal-text;
 
   &.hovered {
     color: Colors.$primary;

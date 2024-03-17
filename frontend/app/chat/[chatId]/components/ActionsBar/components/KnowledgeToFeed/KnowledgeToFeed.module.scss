@@ -1,4 +1,4 @@
-@use "@/styles/Colors.module.scss";
+@use "@/styles/ColorsConfig/LightColors.module.scss" as Colors;
 @use "@/styles/ScreenSizes.module.scss";
 @use "@/styles/Spacings.module.scss";
 @use "@/styles/Typography.module.scss";
@@ -26,7 +26,7 @@
   }
 
   .uploaded_knowledges_title {
-    color: Colors.$dark-grey;
+    color: Colors.$light-text;
     display: flex;
     justify-content: space-between;
   }

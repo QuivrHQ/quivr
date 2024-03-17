@@ -1,4 +1,4 @@
-@use "@/styles/Colors.module.scss";
+@use "@/styles/ColorsConfig/LightColors.module.scss" as Colors;
 @use "@/styles/Radius.module.scss";
 @use "@/styles/Spacings.module.scss";
 
@@ -34,7 +34,7 @@
     }
 
     .message_row_content {
-      background-color: Colors.$lightest-grey;
+      background-color: Colors.$darkest-background;
     }
   }
 

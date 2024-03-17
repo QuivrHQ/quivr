@@ -1,4 +1,4 @@
-@use "@/styles/Colors.module.scss";
+@use "@/styles/ColorsConfig/LightColors.module.scss" as Colors;
 @use "@/styles/Radius.module.scss";
 @use "@/styles/ScreenSizes.module.scss";
 @use "@/styles/Spacings.module.scss";
@@ -18,7 +18,7 @@
     box-shadow: 0 1px 2px rgb(0, 0, 0, 0.25);
     border-radius: Radius.$big;
     padding: Spacings.$spacing06;
-    background-color: Colors.$highlight;
+    background-color: Colors.$normal-background;
 
     .section_title {
       @include Typography.H3;
@@ -66,7 +66,7 @@
     box-shadow: 0 1px 2px rgb(0, 0, 0, 0.25);
     border-radius: Radius.$big;
     padding: Spacings.$spacing06;
-    background-color: Colors.$highlight;
+    background-color: Colors.$normal-background;
 
     .section_title {
       @include Typography.H3;
