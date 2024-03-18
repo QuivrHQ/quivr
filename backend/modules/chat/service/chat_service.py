@@ -103,6 +103,7 @@ class ChatService:
                         brain_id=str(brain.id) if brain else None,
                         prompt_title=prompt.title if prompt else None,
                         metadata=message.metadata,
+                        thumbs=message.thumbs,
                     )
                 )
             return enriched_history
@@ -201,7 +202,7 @@ class ChatService:
         try:
             return self.repository.update_chat_message(
                 chat_id, message_id, chat_message_properties
-            )
+            ).data
         except Exception as e:
             print(e)
             pass

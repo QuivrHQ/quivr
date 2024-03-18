@@ -81,15 +81,13 @@ export const updateChatMessage = async (
   messageId: string,
   chatMessageUpdatableProperties: ChatMessageUpdatableProperties,
   axiosInstance: AxiosInstance
-): Promise<ChatEntity> => {
+): Promise<ChatItem> => {
   console.info(chatId, messageId, chatMessageUpdatableProperties);
 
   return (
-    await axiosInstance.put<ChatEntity>(`/chat/${chatId}/${messageId}`, {
-      chatId,
-      messageId,
-      chatMessageUpdatableProperties,
-      axiosInstance,
-    })
+    await axiosInstance.put<ChatItem>(
+      `/chat/${chatId}/${messageId}`,
+      chatMessageUpdatableProperties
+    )
   ).data;
 };

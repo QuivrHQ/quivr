@@ -162,7 +162,7 @@ async def update_chat_message(
     chat_id: UUID,
     message_id: UUID,
     current_user: UserIdentity = Depends(get_current_user),
-) -> ChatItem:
+)  :
 
     chat = chat_service.get_chat_by_id(
         chat_id  # pyright: ignore reportPrivateUsage=none
