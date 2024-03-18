@@ -7,6 +7,7 @@ from logger import get_logger
 from modules.brain.service.brain_service import BrainService
 from modules.chat.dto.chats import ChatItem
 from modules.chat.dto.inputs import (
+    ChatMessageProperties,
     ChatUpdatableProperties,
     CreateChatHistory,
     CreateChatProperties,
@@ -193,3 +194,11 @@ class ChatService:
         except Exception as e:
             print(e)
             pass
+    
+    def update_chat_message(self, chat_id, message_id, chat_message_properties: ChatMessageProperties):
+        try:
+            self.repository.update_chat_message(chat_id, message_id, chat_message_properties)
+        except Exception as e:
+            print(e)
+            pass
+

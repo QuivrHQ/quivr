@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from typing import Optional
 from uuid import UUID
 
-from modules.chat.dto.inputs import CreateChatHistory, QuestionAndAnswer
+from modules.chat.dto.inputs import ChatMessageProperties, CreateChatHistory, QuestionAndAnswer
 from modules.chat.entity.chat import Chat
 
 
@@ -76,5 +76,12 @@ class ChatsInterface(ABC):
     def delete_chat_history(self, chat_id):
         """
         Delete chat history
+        """
+        pass
+
+    @abstractmethod
+    def update_chat_message(self, chat_id, message_id, chat_message_properties: ChatMessageProperties):
+        """
+        Update chat message
         """
         pass

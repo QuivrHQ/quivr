@@ -32,3 +32,11 @@ class ChatUpdatableProperties:
 
     def __init__(self, chat_name: Optional[str]):
         self.chat_name = chat_name
+
+
+@dataclass
+class ChatMessageProperties:
+    thumbs: Optional[bool] = None
+
+    def __init__(self, thumbs: Optional[bool]):
+        self.thumbs = thumbs
