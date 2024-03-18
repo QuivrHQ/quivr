@@ -47,6 +47,13 @@ export const MessageRow = React.forwardRef(
 
     const messageContent = text ?? "";
 
+    const thumbsUp = () => {
+      console.info(thumbsUp);
+    };
+    const thumbsDown = () => {
+      console.info(thumbsDown);
+    };
+
     return (
       <div
         className={`
@@ -90,6 +97,24 @@ export const MessageRow = React.forwardRef(
                       />
                     </div>
                   )}
+                  <Icon
+                    name="thumbsDown"
+                    handleHover={true}
+                    color="black"
+                    size="normal"
+                    onClick={() => {
+                      thumbsUp();
+                    }}
+                  />
+                  <Icon
+                    name="thumbsUp"
+                    handleHover={true}
+                    color="black"
+                    size="normal"
+                    onClick={() => {
+                      thumbsDown();
+                    }}
+                  />
                 </div>
               )}
             </>
