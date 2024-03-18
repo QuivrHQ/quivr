@@ -12,7 +12,7 @@ export type ChatUpdatableProperties = {
 };
 
 export type ChatMessageUpdatableProperties = {
-  thumbs?: boolean;
+  thumbs?: boolean | null;
 };
 
 export const createChat = async (
@@ -82,8 +82,6 @@ export const updateChatMessage = async (
   chatMessageUpdatableProperties: ChatMessageUpdatableProperties,
   axiosInstance: AxiosInstance
 ): Promise<ChatItem> => {
-  console.info(chatId, messageId, chatMessageUpdatableProperties);
-
   return (
     await axiosInstance.put<ChatItem>(
       `/chat/${chatId}/${messageId}`,

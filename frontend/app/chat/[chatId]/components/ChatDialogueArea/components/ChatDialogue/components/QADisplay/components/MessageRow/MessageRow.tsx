@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 
 import { useChat } from "@/app/chat/[chatId]/hooks/useChat";
 import { useChatApi } from "@/lib/api/chat/useChatApi";
@@ -40,7 +40,7 @@ export const MessageRow = React.forwardRef(
       brainId,
       index,
       messageId,
-      thumbs,
+      thumbs: initialThumbs,
     }: MessageRowProps,
     ref: React.Ref<HTMLDivElement>
   ) => {
@@ -52,22 +52,31 @@ export const MessageRow = React.forwardRef(
     const { isMobile } = useDevice();
     const { updateChatMessage } = useChatApi();
     const { chatId } = useChat();
+    const [thumbs, setThumbs] = useState<boolean | undefined | null>(
+      initialThumbs
+    );
+
+    useEffect(() => {
+      setThumbs(initialThumbs);
+    }, [initialThumbs]);
 
     const messageContent = text ?? "";
 
     const thumbsUp = async () => {
       if (chatId && messageId) {
         await updateChatMessage(chatId, messageId, {
-          thumbs: thumbs ? undefined : true,
+          thumbs: thumbs ? null : true,
         });
+        setThumbs(thumbs ? null : true);
       }
     };
 
     const thumbsDown = async () => {
       if (chatId && messageId) {
         await updateChatMessage(chatId, messageId, {
-          thumbs: thumbs === false ? undefined : false,
+          thumbs: thumbs === false ? null : false,
         });
+        setThumbs(thumbs === false ? null : false);
       }
     };
 
