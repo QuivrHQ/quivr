@@ -34,9 +34,12 @@ class ChatUpdatableProperties:
         self.chat_name = chat_name
 
 
-@dataclass
-class ChatMessageProperties:
-    thumbs: Optional[bool] = None
+class ChatMessageProperties(BaseModel, extra="ignore"):
+    thumbs: Optional[bool]
 
-    def __init__(self, thumbs: Optional[bool]):
-        self.thumbs = thumbs
+    def dict(self, *args, **kwargs):
+        chat_dict = super().dict(*args, **kwargs)
+        if chat_dict.get("thumbs"):
+            # Set thumbs to boolean value or None if not present
+            chat_dict["thumbs"] = bool(chat_dict["thumbs"])
+        return chat_dict

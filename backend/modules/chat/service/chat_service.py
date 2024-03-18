@@ -194,11 +194,14 @@ class ChatService:
         except Exception as e:
             print(e)
             pass
-    
-    def update_chat_message(self, chat_id, message_id, chat_message_properties: ChatMessageProperties):
+
+    def update_chat_message(
+        self, chat_id, message_id, chat_message_properties: ChatMessageProperties
+    ):
         try:
-            self.repository.update_chat_message(chat_id, message_id, chat_message_properties)
+            return self.repository.update_chat_message(
+                chat_id, message_id, chat_message_properties
+            )
         except Exception as e:
             print(e)
             pass
-

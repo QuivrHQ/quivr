@@ -152,6 +152,7 @@ async def update_chat_metadata_handler(
         )
     return chat_service.update_chat(chat_id=chat_id, chat_data=chat_data)
 
+
 # update existing message
 @chat_router.put(
     "/chat/{chat_id}/{message_id}", dependencies=[Depends(AuthBearer())], tags=["Chat"]
@@ -161,7 +162,7 @@ async def update_chat_message(
     chat_id: UUID,
     message_id: UUID,
     current_user: UserIdentity = Depends(get_current_user),
-):
+) -> ChatItem:
 
     chat = chat_service.get_chat_by_id(
         chat_id  # pyright: ignore reportPrivateUsage=none
@@ -171,7 +172,12 @@ async def update_chat_message(
             status_code=403,  # pyright: ignore reportPrivateUsage=none
             detail="You should be the owner of the chat to update it.",  # pyright: ignore reportPrivateUsage=none
         )
-    return chat_service.update_chat_message(chat_id=chat_id, message_id=message_id, chat_message_properties=chat_message_properties)
+    return chat_service.update_chat_message(
+        chat_id=chat_id,
+        message_id=message_id,
+        chat_message_properties=chat_message_properties.dict(),
+    )
+
 
 # create new chat
 @chat_router.post("/chat", dependencies=[Depends(AuthBearer())], tags=["Chat"])
