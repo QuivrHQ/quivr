@@ -7,6 +7,14 @@ import {
   ChatQuestion,
 } from "@/app/chat/[chatId]/types";
 
+export type ChatUpdatableProperties = {
+  chat_name?: string;
+};
+
+export type ChatMessageUpdatableProperties = {
+  thumbs?: boolean;
+};
+
 export const createChat = async (
   name: string,
   axiosInstance: AxiosInstance
@@ -59,9 +67,6 @@ export const getChatItems = async (
 ): Promise<ChatItem[]> =>
   (await axiosInstance.get<ChatItem[]>(`/chat/${chatId}/history`)).data;
 
-export type ChatUpdatableProperties = {
-  chat_name?: string;
-};
 export const updateChat = async (
   chatId: string,
   chat: ChatUpdatableProperties,
@@ -69,4 +74,22 @@ export const updateChat = async (
 ): Promise<ChatEntity> => {
   return (await axiosInstance.put<ChatEntity>(`/chat/${chatId}/metadata`, chat))
     .data;
+};
+
+export const updateChatMessage = async (
+  chatId: string,
+  messageId: string,
+  chatMessageUpdatableProperties: ChatMessageUpdatableProperties,
+  axiosInstance: AxiosInstance
+): Promise<ChatEntity> => {
+  console.info(chatId, messageId, chatMessageUpdatableProperties);
+
+  return (
+    await axiosInstance.put<ChatEntity>(`/chat/${chatId}/${messageId}`, {
+      chatId,
+      messageId,
+      chatMessageUpdatableProperties,
+      axiosInstance,
+    })
+  ).data;
 };

@@ -1,5 +1,7 @@
 import React from "react";
 
+import { useChat } from "@/app/chat/[chatId]/hooks/useChat";
+import { useChatApi } from "@/lib/api/chat/useChatApi";
 import { CopyButton } from "@/lib/components/ui/CopyButton";
 import Icon from "@/lib/components/ui/Icon/Icon";
 import { useChatContext } from "@/lib/context";
@@ -23,6 +25,7 @@ type MessageRowProps = {
   };
   brainId?: string;
   index?: number;
+  messageId?: string;
 };
 
 export const MessageRow = React.forwardRef(
@@ -35,6 +38,7 @@ export const MessageRow = React.forwardRef(
       children,
       brainId,
       index,
+      messageId,
     }: MessageRowProps,
     ref: React.Ref<HTMLDivElement>
   ) => {
@@ -44,12 +48,17 @@ export const MessageRow = React.forwardRef(
     });
     const { setSourcesMessageIndex, sourcesMessageIndex } = useChatContext();
     const { isMobile } = useDevice();
+    const { updateChatMessage } = useChatApi();
+    const { chatId } = useChat();
 
     const messageContent = text ?? "";
 
-    const thumbsUp = () => {
-      console.info(thumbsUp);
+    const thumbsUp = async () => {
+      if (chatId && messageId) {
+        await updateChatMessage(chatId, messageId, { thumbs: true });
+      }
     };
+
     const thumbsDown = () => {
       console.info(thumbsDown);
     };
@@ -98,16 +107,16 @@ export const MessageRow = React.forwardRef(
                     </div>
                   )}
                   <Icon
-                    name="thumbsDown"
+                    name="thumbsUp"
                     handleHover={true}
                     color="black"
                     size="normal"
-                    onClick={() => {
-                      thumbsUp();
+                    onClick={async () => {
+                      await thumbsUp();
                     }}
                   />
                   <Icon
-                    name="thumbsUp"
+                    name="thumbsDown"
                     handleHover={true}
                     color="black"
                     size="normal"
