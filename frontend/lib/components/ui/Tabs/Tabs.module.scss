@@ -19,13 +19,13 @@
     gap: Spacings.$spacing03;
 
     &.selected {
-      border-bottom-color: Colors.$primary;
-      color: Colors.$primary;
+      border-bottom-color: var(--primary);
+      color: var(--primary);
       background-color: Colors.$background-2;
     }
 
     &:hover {
-      color: Colors.$primary;
+      color: var(--primary);
     }
 
     &.disabled {

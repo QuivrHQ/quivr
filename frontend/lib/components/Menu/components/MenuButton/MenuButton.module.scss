@@ -1,4 +1,3 @@
-@use "@/styles/ColorsConfig/LightColors.module.scss" as Colors;
 @use "@/styles/Radius.module.scss";
 @use "@/styles/Spacings.module.scss";
 @use "@/styles/Typography.module.scss";
@@ -14,7 +13,7 @@
   border-left: 2px solid transparent;
 
   &.selected {
-    border-left: 2px solid Colors.$primary;
+    border-left: 2px solid var(--primary);
     border-radius: 0 Radius.$normal Radius.$normal 0;
   }
 
@@ -27,19 +26,19 @@
     .title {
       @include Typography.EllipsisOverflow;
       font-size: Typography.$small;
-      color: Colors.$text-3;
+      color: var(--primary);
 
       &.gold {
-        color: Colors.$gold;
+        color: var(--gold);
       }
 
       &.primary {
-        color: Colors.$primary;
+        color: var(--primary);
       }
     }
   }
 
   &:hover {
-    background-color: Colors.$background-3;
+    background-color: var(--primary);
   }
 }

@@ -34,7 +34,7 @@
       width: 15px;
       height: 30px;
       border-radius: Radius.$big;
-      background: Colors.$primary;
+      background: var(--primary);
       cursor: pointer;
     }
   }

@@ -33,7 +33,7 @@
     @include Typography.EllipsisOverflow;
 
     &:hover {
-      color: Colors.$primary;
+      color: var(--primary);
     }
   }
 

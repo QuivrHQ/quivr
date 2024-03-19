@@ -17,7 +17,7 @@
   }
 
   .search_page_container {
-    background-color: Colors.$background-0;
+    background-color: var(--background-0);
     width: 100%;
     height: 100%;
     display: flex;
@@ -48,7 +48,7 @@
           @include Typography.Big;
 
           .quivr_text_primary {
-            color: Colors.$primary;
+            color: var(--primary);
           }
         }
       }
@@ -66,7 +66,7 @@
         gap: Spacings.$spacing02;
 
         .shortcut {
-          color: Colors.$primary;
+          color: var(--primary);
         }
       }
     }

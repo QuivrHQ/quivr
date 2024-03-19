@@ -17,7 +17,7 @@
     .circle {
       width: 2.5rem;
       height: 2.5rem;
-      background-color: Colors.$primary;
+      background-color: var(--primary);
       border-radius: Radius.$circle;
       display: flex;
       justify-content: center;
@@ -47,19 +47,19 @@
 
     &.current_step {
       .circle {
-        background-color: Colors.$background-0;
-        border: 1px solid Colors.$primary;
+        background-color: var(--background-0);
+        border: 1px solid var(--primary);
       }
 
       .inside_circle {
-        background-color: Colors.$primary;
+        background-color: var(--primary);
         width: 70%;
         height: 70%;
       }
 
       .step_info {
         .step_status {
-          color: Colors.$primary;
+          color: var(--primary);
         }
       }
     }

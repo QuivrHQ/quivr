@@ -21,7 +21,7 @@
   overflow: visible;
 
   &:hover {
-    border-color: Colors.$primary;
+    border-color: var(--primary);
     background-color: Colors.$primary-lightest;
   }
 

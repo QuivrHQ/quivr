@@ -15,6 +15,6 @@
   }
 
   &.gold {
-    background-color: Colors.$gold;
+    background-color: var(--gold);
   }
 }

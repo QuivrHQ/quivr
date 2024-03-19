@@ -12,6 +12,6 @@
 
   &:focus {
     box-shadow: none;
-    border-color: Colors.$primary;
+    border-color: var(--primary);
   }
 }

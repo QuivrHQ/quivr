@@ -26,7 +26,7 @@ $text-2: Colors.$dark-grey;
 $text-3: Colors.$black;
 
 // PRIMARY
-$primary: Colors.$primary;
+$primary: var(--primary);
 $primary-light: Colors.$primary-light;
 $primary-lightest: Colors.$primary-lightest;
 
@@ -34,7 +34,7 @@ $primary-lightest: Colors.$primary-lightest;
 $accent: Colors.$accent;
 
 // GOLD
-$gold: Colors.$gold;
+$gold: var(--gold);
 
 // SUCCESS
 $success: Colors.$success;

@@ -11,7 +11,7 @@
   border-radius: Radius.$big;
   align-items: center;
   width: 100%;
-  background-color: Colors.$background-0;
+  background-color: var(--background-0);
 
   &.simple {
     border: none;

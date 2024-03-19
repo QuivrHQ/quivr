@@ -13,7 +13,7 @@
   color: Colors.$text-3;
 
   &.hovered {
-    color: Colors.$primary;
+    color: var(--primary);
   }
 }
 

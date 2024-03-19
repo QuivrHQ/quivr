@@ -48,3 +48,57 @@ div:focus {
     @apply h-[100vh] supports-[height:100cqh]:h-[100cqh] supports-[height:100svh]:h-[100svh];
   }
 }
+
+:root {
+  --background-O: Colors.$background-2;
+  --highlight: #fafafa;
+  --ivory: #fcfaf6;
+  --primary: blue;
+  --primary-light: #d0c6f2;
+  --primary-lightest: #f5f3fd;
+  --accent: #13abba;
+  --dark-black: #081621;
+  --black: #11243e;
+  --light-black: #293a51;
+  --lightest-black: #e7e9ec;
+  --lightest-grey: #f5f5f5;
+  --lighter-grey: #d3d3d3;
+  --light-grey: #cbcbcb;
+  --normal-grey: #c8c8c8;
+  --dark-grey: #707070;
+  --gold: #b8860b;
+  --dangerous-dark: #e30c17;
+  --dangerous: #9b373c;
+  --dangerous-lightest: #eedddd;
+  --warning: #c77d33;
+  --warning-lightest: #e9d9c9;
+  --success: #47a455;
+  --success-lightest: #d0edd4;
+}
+
+body.dark {
+  --background-O: Colors.$background-3;
+  --highlight: #6142d4;
+  --ivory: #6142d4;
+  --primary: red;
+  --primary-light: #6142d4;
+  --primary-lightest: #6142d4;
+  --accent: #13abba;
+  --dark-black: #6142d4;
+  --black: #ffffff;
+  --light-black: #fafafa;
+  --lightest-black: #6142d4;
+  --lightest-grey: #c8c8c8;
+  --lighter-grey: #6142d4;
+  --light-grey: #6142d4;
+  --normal-grey: #f5f5f5;
+  --dark-grey: #707070;
+  --gold: #b8860b;
+  --dangerous-dark: #9b373c;
+  --dangerous: #eedddd;
+  --dangerous-lightest: #e30c17;
+  --warning: #e9d9c9;
+  --warning-lightest: #c77d33;
+  --success: #d0edd4;
+  --success-lightest: #47a455;
+}

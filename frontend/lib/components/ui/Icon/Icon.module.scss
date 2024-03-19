@@ -33,7 +33,7 @@
   color: Colors.$icon-3;
 
   &.hovered {
-    color: Colors.$primary;
+    color: var(--primary);
   }
 }
 
@@ -46,7 +46,7 @@
 }
 
 .primary {
-  color: Colors.$primary;
+  color: var(--primary);
 }
 
 .accent {
@@ -54,7 +54,7 @@
 }
 
 .gold {
-  color: Colors.$gold;
+  color: var(--gold);
 }
 
 .white {

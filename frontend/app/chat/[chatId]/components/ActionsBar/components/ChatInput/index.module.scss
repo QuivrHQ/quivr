@@ -5,7 +5,7 @@
 .chat_container {
   display: flex;
   flex-direction: column;
-  background-color: Colors.$background-0;
+  background-color: var(--background-0);
   gap: Spacings.$spacing03;
   border-radius: Radius.$big;
   border: 1px solid Colors.$border-0;

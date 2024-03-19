@@ -19,8 +19,8 @@
   }
 
   &.info {
-    border-color: Colors.$primary;
-    color: Colors.$primary;
+    border-color: var(--primary);
+    color: var(--primary);
     background-color: Colors.$primary-lightest;
   }
 

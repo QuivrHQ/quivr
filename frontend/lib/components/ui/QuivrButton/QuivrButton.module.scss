@@ -14,18 +14,18 @@
   cursor: pointer;
   display: flex;
   width: fit-content;
-  background-color: Colors.$background-0;
+  background-color: var(--background-0);
 
   &.hidden {
     display: none;
   }
 
   &.primary {
-    border-color: Colors.$primary;
-    color: Colors.$primary;
+    border-color: var(--primary);
+    color: var(--primary);
 
     &:hover {
-      background-color: Colors.$primary;
+      background-color: var(--primary);
       color: Colors.$text-0;
     }
   }
@@ -41,11 +41,11 @@
   }
 
   &.gold {
-    border-color: Colors.$gold;
-    color: Colors.$gold;
+    border-color: var(--gold);
+    color: var(--gold);
 
     &:hover {
-      background-color: Colors.$gold;
+      background-color: var(--gold);
       color: Colors.$text-0;
     }
   }

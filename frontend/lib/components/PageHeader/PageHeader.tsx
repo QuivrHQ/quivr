@@ -1,3 +1,5 @@
+import { useState } from "react";
+
 import { useMenuContext } from "@/lib/context/MenuProvider/hooks/useMenuContext";
 import { ButtonType } from "@/lib/types/QuivrButton";
 
@@ -18,6 +20,16 @@ export const PageHeader = ({
   buttons,
 }: Props): JSX.Element => {
   const { isOpened } = useMenuContext();
+  const [isDark, setIsDark] = useState(false);
+
+  const toggleTheme = () => {
+    setIsDark(!isDark);
+    if (!isDark) {
+      document.body.classList.add("dark");
+    } else {
+      document.body.classList.remove("dark");
+    }
+  };
 
   return (
     <div className={styles.page_header_wrapper}>
@@ -36,6 +48,9 @@ export const PageHeader = ({
             hidden={button.hidden}
           />
         ))}
+        <button onClick={toggleTheme}>
+          Switch to {isDark ? "light" : "dark"} mode
+        </button>
       </div>
     </div>
   );
