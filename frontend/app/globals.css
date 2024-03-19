@@ -1,6 +1,7 @@
 @import "tailwindcss/base";
 @import "tailwindcss/components";
 @import "tailwindcss/utilities";
+@import './colors.css';
 
 main {
   @apply max-w-screen-xl mx-auto flex flex-col;
@@ -50,30 +51,30 @@ div:focus {
 }
 
 :root {
-  --background-O: Colors.$background-2;
-  --highlight: #fafafa;
-  --ivory: #fcfaf6;
-  --primary: blue;
-  --primary-light: #d0c6f2;
-  --primary-lightest: #f5f3fd;
-  --accent: #13abba;
-  --dark-black: #081621;
-  --black: #11243e;
-  --light-black: #293a51;
-  --lightest-black: #e7e9ec;
-  --lightest-grey: #f5f5f5;
-  --lighter-grey: #d3d3d3;
-  --light-grey: #cbcbcb;
-  --normal-grey: #c8c8c8;
-  --dark-grey: #707070;
-  --gold: #b8860b;
-  --dangerous-dark: #e30c17;
-  --dangerous: #9b373c;
-  --dangerous-lightest: #eedddd;
-  --warning: #c77d33;
-  --warning-lightest: #e9d9c9;
-  --success: #47a455;
-  --success-lightest: #d0edd4;
+  /* Backgrounds */
+  --background-0: var(--white);
+  --background-1: var(--highlight);
+  --background-2: var(--lightest-grey);
+  --background-3: var(--lightest-black);
+  --background-4: var(--dark-grey);
+  --background-5: var(--dark-black);
+
+  /* Borders */
+  --border-0: var(--lighter-grey);
+  --border-1: var(--lightest-black);
+  --border-2: var(--normal-grey);
+
+  /* Icons */
+  --icon-0: var(--white);
+  --icon-1: var(--normal-grey);
+  --icon-2: var(--dark-grey);
+  --icon-3: var(--black);
+
+  /* Text */
+  --text-0: var(--white);
+  --text-1: var(--normal-grey);
+  --text-2: var(--dark-grey);
+  --text-3: var(--black);
 }
 
 body.dark {
