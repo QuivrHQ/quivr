@@ -16,7 +16,7 @@
   cursor: pointer;
 
   &.dragging {
-    border: 3px dashed Colors.$accent;
+    border: 3px dashed var(--accent);
     background-color: var(--background-3);
   }
 

@@ -12,9 +12,9 @@
   border-radius: Radius.$normal;
 
   &.success {
-    border-color: Colors.$success;
-    color: Colors.$success;
-    background-color: Colors.$success-lightest;
+    border-color: var(--success);
+    color: var(--success);
+    background-color: var(--success)-lightest;
   }
 
   &.info {
@@ -24,8 +24,8 @@
   }
 
   &.warning {
-    border-color: Colors.$warning;
-    color: Colors.$warning;
-    background-color: Colors.$warning-lightest;
+    border-color: var(--warning);
+    color: var(--warning);
+    background-color: var(--warning)-lightest;
   }
 }

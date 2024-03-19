@@ -29,7 +29,7 @@
   }
 
   .text_area_input {
-    caret-color: Colors.$accent;
+    caret-color: var(--accent);
     border: none;
     flex: 1;
     resize: none;

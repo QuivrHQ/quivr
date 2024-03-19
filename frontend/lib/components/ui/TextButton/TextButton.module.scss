@@ -17,9 +17,9 @@
 }
 
 .dangerous {
-  color: Colors.$dangerous;
+  color: var(--dangerous);
 
   &.hovered {
-    color: Colors.$dangerous-dark;
+    color: var(--dangerous)-dark;
   }
 }

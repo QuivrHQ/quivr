@@ -7,6 +7,6 @@
   cursor: pointer;
 
   &:hover {
-    color: Colors.$accent;
+    color: var(--accent);
   }
 }

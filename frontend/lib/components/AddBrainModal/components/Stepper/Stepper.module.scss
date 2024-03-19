@@ -34,12 +34,12 @@
 
     &.done_step {
       .circle {
-        background-color: Colors.$success;
+        background-color: var(--success);
       }
 
       .step_info {
         .step_status {
-          color: Colors.$success;
+          color: var(--success);
         }
       }
     }
@@ -98,7 +98,7 @@
     margin-top: Spacings.$spacing05;
 
     &.done {
-      background-color: Colors.$success;
+      background-color: var(--success);
     }
   }
 }

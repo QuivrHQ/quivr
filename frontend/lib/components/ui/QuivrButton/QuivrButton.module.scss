@@ -30,21 +30,21 @@
   }
 
   &.dangerous {
-    border-color: Colors.$dangerous;
-    color: Colors.$dangerous;
+    border-color: var(--dangerous);
+    color: var(--dangerous);
 
     &:hover {
-      background-color: Colors.$dangerous;
+      background-color: var(--dangerous);
       color: var(--text-0);
     }
   }
 
   &.gold {
-    border-color: Colors.$gold;
-    color: Colors.$gold;
+    border-color: var(--gold);
+    color: var(--gold);
 
     &:hover {
-      background-color: Colors.$gold;
+      background-color: var(--gold);
       color: var(--text-0);
     }
   }

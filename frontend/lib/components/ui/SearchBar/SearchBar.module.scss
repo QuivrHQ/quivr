@@ -25,7 +25,7 @@
     .search_icon {
       width: IconSizes.$big;
       height: IconSizes.$big;
-      color: Colors.$accent;
+      color: var(--accent);
       cursor: pointer;
 
       &.disabled {

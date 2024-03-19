@@ -29,7 +29,7 @@
 }
 
 .black {
-  color: Colors.$icon-3;
+  color: var(--icon-3);
 
   &.hovered {
     color: var(--primary-0);
@@ -37,11 +37,11 @@
 }
 
 .dark-grey {
-  color: Colors.$icon-2;
+  color: var(--icon-2);
 }
 
 .grey {
-  color: Colors.$icon-1;
+  color: var(--icon-1);
 }
 
 .primary {
@@ -49,35 +49,35 @@
 }
 
 .accent {
-  color: Colors.$accent;
+  color: var(--accent);
 }
 
 .gold {
-  color: Colors.$gold;
+  color: var(--gold);
 }
 
 .white {
-  color: Colors.$icon-0;
+  color: var(--icon-0);
 }
 
 .dangerous {
-  color: Colors.$dangerous;
+  color: var(--dangerous);
 
   &.hovered {
-    color: Colors.$dangerous-dark;
+    color: var(--dangerous)-dark;
   }
 }
 
 .warning {
-  color: Colors.$warning;
+  color: var(--warning);
 }
 
 .success {
-  color: Colors.$success;
+  color: var(--success);
 }
 
 .disabled {
-  color: Colors.$icon-3;
+  color: var(--icon-3);
   pointer-events: none;
   opacity: 0.2;
 }
