@@ -5,7 +5,7 @@
 .prompt_name_wrapper {
   display: flex;
   align-items: center;
-  color: Colors.$text-3;
+  color: var(--text-3);
   font-size: Typography.$small;
   overflow: hidden;
 

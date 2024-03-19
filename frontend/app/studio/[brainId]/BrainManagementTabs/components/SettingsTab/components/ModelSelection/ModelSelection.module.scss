@@ -18,7 +18,7 @@
       width: 80%;
       height: 15px;
       border-radius: Radius.$normal;
-      background: Colors.$primary-light;
+      background: var(--primary-1);
       outline: none;
       -webkit-transition: 0.2s;
       transition: opacity 0.2s;
@@ -34,7 +34,7 @@
       width: 15px;
       height: 30px;
       border-radius: Radius.$big;
-      background: var(--primary);
+      background: var(--primary-0);
       cursor: pointer;
     }
   }

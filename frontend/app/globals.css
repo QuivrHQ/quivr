@@ -52,54 +52,56 @@ div:focus {
 
 :root {
   /* Backgrounds */
-  --background-0: var(--white);
-  --background-1: var(--highlight);
-  --background-2: var(--lightest-grey);
-  --background-3: var(--lightest-black);
-  --background-4: var(--dark-grey);
-  --background-5: var(--dark-black);
+  --background-0: var(--white-0);
+  --background-1: var(--white-1);
+  --background-2: var(--grey-5);
+  --background-3: var(--grey-3);
+  --background-4: var(--grey-0);
+  --background-5: var(--black-0);
+  --background-special: var(--primary-2);
 
   /* Borders */
-  --border-0: var(--lighter-grey);
-  --border-1: var(--lightest-black);
-  --border-2: var(--normal-grey);
+  --border-0: var(--grey-4);
+  --border-1: var(--grey-3);
+  --border-2: var(--grey-1);
 
   /* Icons */
-  --icon-0: var(--white);
-  --icon-1: var(--normal-grey);
-  --icon-2: var(--dark-grey);
-  --icon-3: var(--black);
+  --icon-0: var(--white-0);
+  --icon-1: var(--grey-1);
+  --icon-2: var(--grey-0);
+  --icon-3: var(--black-0);
 
   /* Text */
-  --text-0: var(--white);
-  --text-1: var(--normal-grey);
-  --text-2: var(--dark-grey);
-  --text-3: var(--black);
+  --text-0: var(--white-0);
+  --text-1: var(--grey-1);
+  --text-2: var(--grey-0);
+  --text-3: var(--black-0);
 }
 
 body.dark {
-  --background-O: Colors.$background-3;
-  --highlight: #6142d4;
-  --ivory: #6142d4;
-  --primary: red;
-  --primary-light: #6142d4;
-  --primary-lightest: #6142d4;
-  --accent: #13abba;
-  --dark-black: #6142d4;
-  --black: #ffffff;
-  --light-black: #fafafa;
-  --lightest-black: #6142d4;
-  --lightest-grey: #c8c8c8;
-  --lighter-grey: #6142d4;
-  --light-grey: #6142d4;
-  --normal-grey: #f5f5f5;
-  --dark-grey: #707070;
-  --gold: #b8860b;
-  --dangerous-dark: #9b373c;
-  --dangerous: #eedddd;
-  --dangerous-lightest: #e30c17;
-  --warning: #e9d9c9;
-  --warning-lightest: #c77d33;
-  --success: #d0edd4;
-  --success-lightest: #47a455;
+   /* Backgrounds */
+   --background-0: var(--black-0);
+   --background-1: var(--black-1);
+   --background-2: var(--black-2);
+   --background-3: var(--black-3);
+   --background-4: var(--black-4);
+   --background-5: var(--black-5);
+   --background-special: var(--primary-1);
+ 
+   /* Borders */
+   --border-0: var(--grey-0);
+   --border-1: var(--grey-1);
+   --border-2: var(--grey-2);
+ 
+   /* Icons */
+   --icon-0: var(--black-0);
+   --icon-1: var(--grey-0);
+   --icon-2: var(--grey-1);
+   --icon-3: var(--white-0);
+ 
+   /* Text */
+   --text-0: var(--black-0);
+   --text-1: var(--grey-0);
+   --text-2: var(--grey-1);
+   --text-3: var(--white-0);
 }

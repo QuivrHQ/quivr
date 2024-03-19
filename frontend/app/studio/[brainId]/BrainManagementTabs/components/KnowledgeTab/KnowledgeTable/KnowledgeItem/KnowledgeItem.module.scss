@@ -13,15 +13,15 @@
   justify-content: space-between;
   align-items: center;
   margin-block: Spacings.$spacing03;
-  border: 1px solid Colors.$border-1;
+  border: 1px solid var(--border-1);
   border-radius: Radius.$normal;
   padding-block: Spacings.$spacing03;
   position: relative;
   overflow: visible;
 
   &:hover {
-    border-color: var(--primary);
-    background-color: Colors.$primary-lightest;
+    border-color: var(--primary-0);
+    background-color: var(--primary-2);
   }
 
   .left {

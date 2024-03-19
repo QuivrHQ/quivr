@@ -11,7 +11,7 @@
 
   .section_wrapper {
     border-radius: Radius.$big;
-    background-color: Colors.$background-1;
+    background-color: var(--background-1);
     padding: Spacings.$spacing05;
     box-shadow: 0 1px 2px rgb(0, 0, 0, 0.25);
     display: flex;

@@ -11,14 +11,14 @@
   column-gap: Spacings.$spacing05;
   justify-content: center;
   align-items: center;
-  border: 1px dashed Colors.$border-0;
+  border: 1px dashed var(--border-0);
   border-radius: Radius.$big;
   box-sizing: border-box;
   cursor: pointer;
 
   &.dragging {
     border: 3px dashed Colors.$accent;
-    background-color: Colors.$background-3;
+    background-color: var(--background-3);
   }
 
   .input {

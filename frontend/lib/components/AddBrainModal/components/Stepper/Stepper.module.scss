@@ -17,7 +17,7 @@
     .circle {
       width: 2.5rem;
       height: 2.5rem;
-      background-color: var(--primary);
+      background-color: var(--primary-0);
       border-radius: Radius.$circle;
       display: flex;
       justify-content: center;
@@ -48,30 +48,30 @@
     &.current_step {
       .circle {
         background-color: var(--background-0);
-        border: 1px solid var(--primary);
+        border: 1px solid var(--primary-0);
       }
 
       .inside_circle {
-        background-color: var(--primary);
+        background-color: var(--primary-0);
         width: 70%;
         height: 70%;
       }
 
       .step_info {
         .step_status {
-          color: var(--primary);
+          color: var(--primary-0);
         }
       }
     }
 
     &.pending_step {
       .circle {
-        background-color: Colors.$primary-light;
+        background-color: var(--primary-1);
       }
 
       .step_info {
         .step_status {
-          color: Colors.$text-1;
+          color: var(--text-1);
         }
       }
     }
@@ -85,7 +85,7 @@
 
       .step_index {
         white-space: nowrap;
-        color: Colors.$text-1;
+        color: var(--text-1);
       }
     }
   }
@@ -94,7 +94,7 @@
     flex-grow: 1;
     height: 4px;
     border-radius: Radius.$big;
-    background-color: Colors.$primary-light;
+    background-color: var(--primary-1);
     margin: 0 8px;
     margin-top: Spacings.$spacing05;
 

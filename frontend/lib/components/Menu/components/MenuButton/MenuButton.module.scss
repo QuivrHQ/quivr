@@ -14,7 +14,7 @@
   border-left: 2px solid transparent;
 
   &.selected {
-    border-left: 2px solid Colors.$primary;
+    border-left: 2px solid var(--primary-0);
     border-radius: 0 Radius.$normal Radius.$normal 0;
   }
 
@@ -27,19 +27,19 @@
     .title {
       @include Typography.EllipsisOverflow;
       font-size: Typography.$small;
-      color: Colors.$text-3;
+      color: var(--text-3);
 
       &.gold {
         color: Colors.$gold;
       }
 
       &.primary {
-        color: Colors.$primary;
+        color: var(--primary-0);
       }
     }
   }
 
   &:hover {
-    background-color: Colors.$background-3;
+    background-color: var(--background-3);
   }
 }

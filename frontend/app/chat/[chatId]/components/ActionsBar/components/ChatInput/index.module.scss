@@ -8,7 +8,7 @@
   background-color: var(--background-0);
   gap: Spacings.$spacing03;
   border-radius: Radius.$big;
-  border: 1px solid Colors.$border-0;
+  border: 1px solid var(--border-0);
   overflow: hidden;
 
   .chat_wrapper {

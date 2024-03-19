@@ -8,8 +8,8 @@
   align-items: center;
   gap: Spacings.$spacing03;
   width: fit-content;
-  border: 1px solid Colors.$border-2;
-  color: Colors.$text-3;
+  border: 1px solid var(--border-2);
+  color: var(--text-3);
   border-radius: Radius.$normal;
 
   &.success {
@@ -19,9 +19,9 @@
   }
 
   &.info {
-    border-color: var(--primary);
-    color: var(--primary);
-    background-color: Colors.$primary-lightest;
+    border-color: var(--primary-0);
+    color: var(--primary-0);
+    background-color: var(--primary-2);
   }
 
   &.warning {

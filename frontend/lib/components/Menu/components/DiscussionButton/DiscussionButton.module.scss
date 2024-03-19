@@ -8,11 +8,11 @@
   padding: Spacings.$spacing03;
   justify-content: space-between;
   align-items: center;
-  border: 1px solid Colors.$border-0;
+  border: 1px solid var(--border-0);
   border-radius: Radius.$big;
   background-color: var(--background-0);
   cursor: pointer;
-  color: Colors.$text-2;
+  color: var(--text-2);
   transition: box-shadow 0.3s ease;
 
   .left_wrapper {
@@ -30,7 +30,7 @@
         align-items: center;
         justify-content: center;
         font-size: 12px;
-        border: 1px solid Colors.$border-0;
+        border: 1px solid var(--border-0);
         border-radius: Radius.$small;
         width: 16px;
         height: 16px;
@@ -39,7 +39,7 @@
   }
 
   &:hover {
-    border-color: var(--primary);
-    box-shadow: 0 0 0 1px var(--primary);
+    border-color: var(--primary-0);
+    box-shadow: 0 0 0 1px var(--primary-0);
   }
 }

@@ -14,15 +14,15 @@
   align-items: center;
   cursor: pointer;
   margin-block: Spacings.$spacing03;
-  border: 1px solid Colors.$border-1;
+  border: 1px solid var(--border-1);
   border-radius: Radius.$normal;
   padding-block: Spacings.$spacing03;
   position: relative;
   overflow: visible;
 
   &:hover {
-    border-color: var(--primary);
-    background-color: Colors.$primary-lightest;
+    border-color: var(--primary-0);
+    background-color: var(--primary-2);
   }
 
   .brain_info_wrapper {
@@ -37,13 +37,13 @@
     .name {
       @include Typography.EllipsisOverflow;
       width: 200px;
-      color: Colors.$text-3;
+      color: var(--text-3);
     }
 
     .description {
       @include Typography.EllipsisOverflow;
       flex: 1;
-      color: Colors.$text-2;
+      color: var(--text-2);
     }
 
     @media (max-width: ScreenSizes.$small) {

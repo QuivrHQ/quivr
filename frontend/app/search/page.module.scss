@@ -48,14 +48,14 @@
           @include Typography.Big;
 
           .quivr_text_primary {
-            color: var(--primary);
+            color: var(--primary-0);
           }
         }
       }
     }
 
     .shortcuts_card_wrapper {
-      background-color: Colors.$background-2;
+      background-color: var(--background-2);
       padding: Spacings.$spacing05;
       gap: Spacings.$spacing03;
       border-radius: Radius.$big;
@@ -66,7 +66,7 @@
         gap: Spacings.$spacing02;
 
         .shortcut {
-          color: var(--primary);
+          color: var(--primary-0);
         }
       }
     }

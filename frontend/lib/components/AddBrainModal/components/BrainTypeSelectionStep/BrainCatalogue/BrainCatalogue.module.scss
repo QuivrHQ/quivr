@@ -47,11 +47,11 @@
 
         &:hover,
         &.selected {
-          border-color: var(--primary);
-          background-color: Colors.$primary-lightest;
+          border-color: var(--primary-0);
+          background-color: var(--primary-2);
 
           .brain_title {
-            color: var(--primary);
+            color: var(--primary-0);
           }
         }
       }

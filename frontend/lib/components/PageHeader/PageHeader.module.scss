@@ -9,7 +9,7 @@
   justify-content: space-between;
   padding: Spacings.$spacing04;
   padding-left: Spacings.$spacing09;
-  border-bottom: 1px solid Colors.$border-1;
+  border-bottom: 1px solid var(--border-1);
 
   .left {
     @include Typography.H2;

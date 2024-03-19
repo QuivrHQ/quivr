@@ -1,29 +1,34 @@
 :root {
     /* White */
-    --white: #ffffff;
-    --highlight: #fafafa;
-    --ivory: #fcfaf6;
-  
-    /* Primary */
-    --primary: #6142d4;
-    --primary-light: #d0c6f2;
-    --primary-lightest: #f5f3fd;
-  
-    /* Accent */
-    --accent: #13abba;
-  
+    --white-0: #ffffff;
+    --white-1: #fafafa;
+    --white-2: #fcfaf6;
+
     /* Black */
-    --dark-black: #081621;
-    --black: #11243e;
-    --light-black: #293a51;
-    --lightest-black: #e7e9ec;
+    --black-0: #111111;
+    --black-1: #171717;
+    --black-2: #1c1c1c;
+    --black-3: #222222;
+    --black-4: #272727;
+    --black-5: #2d2d2d;
+    --black-6: #323232;
+    --black-7: #383838;
   
     /* Grey */
-    --lightest-grey: #f5f5f5;
-    --lighter-grey: #d3d3d3;
-    --light-grey: #cbcbcb;
-    --normal-grey: #c8c8c8;
-    --dark-grey: #707070;
+    --grey-O: #707070;
+    --grey-1: #c8c8c8;
+    --grey-2: #cbcbcb;
+    --grey-3: #e7e9ec;
+    --grey-4: #d3d3d3;
+    --grey-5: #f5f5f5;
+
+    /* Primary */
+    --primary-0: #6142d4;
+    --primary-1: #d0c6f2;
+    --primary-2: #f5f3fd;
+
+    /* Accent */
+    --accent: #13abba;
   
     /* Gold */
     --gold: #b8860b;

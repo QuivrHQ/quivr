@@ -18,7 +18,7 @@
     box-shadow: 0 1px 2px rgb(0, 0, 0, 0.25);
     border-radius: Radius.$big;
     padding: Spacings.$spacing06;
-    background-color: Colors.$background-1;
+    background-color: var(--background-1);
 
     .section_title {
       @include Typography.H3;
@@ -66,7 +66,7 @@
     box-shadow: 0 1px 2px rgb(0, 0, 0, 0.25);
     border-radius: Radius.$big;
     padding: Spacings.$spacing06;
-    background-color: Colors.$background-1;
+    background-color: var(--background-1);
 
     .section_title {
       @include Typography.H3;

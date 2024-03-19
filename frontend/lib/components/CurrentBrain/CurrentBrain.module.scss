@@ -3,11 +3,11 @@
 @use "@/styles/Typography.module.scss";
 
 .current_brain_wrapper {
-  background-color: Colors.$background-2;
+  background-color: var(--background-2);
   padding-inline: Spacings.$spacing05;
   padding-block: Spacings.$spacing01;
   font-size: Typography.$small;
-  color: Colors.$text-1;
+  color: var(--text-1);
 
   .brain_infos {
     display: flex;
@@ -32,7 +32,7 @@
         overflow: hidden;
 
         .brain_name {
-          color: Colors.$text-3;
+          color: var(--text-3);
           @include Typography.EllipsisOverflow;
         }
       }

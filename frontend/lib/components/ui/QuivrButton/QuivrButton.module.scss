@@ -21,12 +21,12 @@
   }
 
   &.primary {
-    border-color: var(--primary);
-    color: var(--primary);
+    border-color: var(--primary-0);
+    color: var(--primary-0);
 
     &:hover {
-      background-color: var(--primary);
-      color: Colors.$text-0;
+      background-color: var(--primary-0);
+      color: var(--text-0);
     }
   }
 
@@ -36,24 +36,24 @@
 
     &:hover {
       background-color: Colors.$dangerous;
-      color: Colors.$text-0;
+      color: var(--text-0);
     }
   }
 
   &.gold {
-    border-color: var(--gold);
-    color: var(--gold);
+    border-color: Colors.$gold;
+    color: Colors.$gold;
 
     &:hover {
-      background-color: var(--gold);
-      color: Colors.$text-0;
+      background-color: Colors.$gold;
+      color: var(--text-0);
     }
   }
 
   &.disabled {
-    border-color: Colors.$border-2;
+    border-color: var(--border-2);
     pointer-events: none;
-    color: Colors.$text-1;
+    color: var(--text-1);
   }
 }
 

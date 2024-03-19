@@ -6,7 +6,7 @@
 
 .modal_container {
   display: flex;
-  background-color: rgba(Colors.$background-5, 0.94);
+  background-color: rgba(var(--background-5), 0.94);
   height: 100%;
   width: 100%;
   position: absolute;

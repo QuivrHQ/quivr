@@ -7,11 +7,11 @@
   cursor: pointer;
 
   &:hover {
-    background-color: Colors.$background-3;
+    background-color: var(--background-3);
   }
 
   &:focus {
     box-shadow: none;
-    border-color: var(--primary);
+    border-color: var(--primary-0);
   }
 }

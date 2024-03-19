@@ -11,7 +11,7 @@
   gap: Spacings.$spacing03;
   overflow: hidden;
   height: 100%;
-  border: 1px solid Colors.$border-1;
+  border: 1px solid var(--border-1);
   border-radius: Radius.$big;
 
   .title_wrapper {

@@ -12,25 +12,25 @@
     align-items: center;
     justify-content: center;
     flex: 1;
-    border-bottom: 2px solid Colors.$border-0;
+    border-bottom: 2px solid var(--border-0);
     padding-block: Spacings.$spacing03;
     cursor: pointer;
     box-sizing: border-box;
     gap: Spacings.$spacing03;
 
     &.selected {
-      border-bottom-color: var(--primary);
-      color: var(--primary);
-      background-color: Colors.$background-2;
+      border-bottom-color: var(--primary-0);
+      color: var(--primary-0);
+      background-color: var(--background-2);
     }
 
     &:hover {
-      color: var(--primary);
+      color: var(--primary-0);
     }
 
     &.disabled {
       pointer-events: none;
-      color: Colors.$text-1;
+      color: var(--text-1);
     }
 
     @media (max-width: ScreenSizes.$small) {

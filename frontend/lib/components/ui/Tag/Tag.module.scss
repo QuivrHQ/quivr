@@ -11,10 +11,10 @@
   font-size: Typography.$tiny;
 
   &.primary {
-    background-color: Colors.$primary-light;
+    background-color: var(--primary-1);
   }
 
   &.gold {
-    background-color: var(--gold);
+    background-color: Colors.$gold;
   }
 }
