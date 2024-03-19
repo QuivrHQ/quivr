@@ -1,3 +1,4 @@
+@use "@/styles/BoxShadow.module.scss";
 @use "@/styles/Radius.module.scss";
 @use "@/styles/Spacings.module.scss";
 @use "@/styles/ZIndexes.module.scss";
@@ -6,7 +7,7 @@
   background-color: var(--background-1);
   border-radius: Radius.$normal;
   border-radius: Radius.$normal;
-  box-shadow: 0 1px 2px rgb(0, 0, 0, 0.25);
+  box-shadow: BoxShadow.$box-shadow-0;
   width: fit-content;
 
   .option {

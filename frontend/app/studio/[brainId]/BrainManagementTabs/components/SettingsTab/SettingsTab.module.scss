@@ -1,3 +1,4 @@
+@use "@/styles/BoxShadow.module.scss";
 @use "@/styles/Radius.module.scss";
 @use "@/styles/ScreenSizes.module.scss";
 @use "@/styles/Spacings.module.scss";
@@ -14,7 +15,7 @@
     flex-direction: column;
     width: 100%;
     gap: Spacings.$spacing05;
-    box-shadow: 0 1px 2px rgb(0, 0, 0, 0.25);
+    box-shadow: BoxShadow.$box-shadow-0;
     border-radius: Radius.$big;
     padding: Spacings.$spacing06;
     background-color: var(--background-1);
@@ -62,7 +63,7 @@
     flex-direction: column;
     width: 100%;
     gap: Spacings.$spacing05;
-    box-shadow: 0 1px 2px rgb(0, 0, 0, 0.25);
+    box-shadow: BoxShadow.$box-shadow-0;
     border-radius: Radius.$big;
     padding: Spacings.$spacing06;
     background-color: var(--background-1);
