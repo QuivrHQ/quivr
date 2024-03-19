@@ -45,7 +45,7 @@ export const openAiFreeModels = [
   "gpt-3.5-turbo-0125",
   "mistral/mistral-small",
   "mistral/mistral-medium",
-  "mistral/mistral-large",
+  "mistral/mistral-large-latest",
 ] as const;
 
 export const openAiPaidModels = [...openAiFreeModels, "gpt-4"] as const;
