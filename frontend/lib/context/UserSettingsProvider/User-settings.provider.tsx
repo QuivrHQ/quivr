@@ -16,35 +16,43 @@ export const UserSettingsProvider = ({
 }: {
   children: React.ReactNode;
 }): JSX.Element => {
-  const localIsDarkMode = localStorage.getItem("isDarkMode");
   const [isDarkMode, setIsDarkMode] = useState<boolean>(() => {
-    return parseBoolean(localIsDarkMode);
+    if (typeof window !== "undefined") {
+      const localIsDarkMode = localStorage.getItem("isDarkMode");
+
+      return parseBoolean(localIsDarkMode);
+    }
+
+    return false;
   });
 
   useEffect(() => {
-    const prefersDarkMode = window.matchMedia(
-      "(prefers-color-scheme: dark)"
-    ).matches;
-    const newState =
-      localIsDarkMode !== null
-        ? parseBoolean(localIsDarkMode)
-        : prefersDarkMode;
-    setIsDarkMode(newState);
-    newState
-      ? document.body.classList.add("dark_mode")
-      : document.body.classList.remove("dark_mode");
+    if (typeof window !== "undefined") {
+      const prefersDarkMode = window.matchMedia(
+        "(prefers-color-scheme: dark)"
+      ).matches;
+      const localIsDarkMode = localStorage.getItem("isDarkMode");
+      const newState =
+        localIsDarkMode !== null
+          ? parseBoolean(localIsDarkMode)
+          : prefersDarkMode;
+      setIsDarkMode(newState);
+      newState
+        ? document.body.classList.add("dark_mode")
+        : document.body.classList.remove("dark_mode");
 
-    const mediaQueryList = window.matchMedia("(prefers-color-scheme: dark)");
-    const listener = (event: MediaQueryListEvent) => {
-      const updatedState = event.matches;
-      setIsDarkMode(updatedState);
-      localStorage.setItem("isDarkMode", JSON.stringify(updatedState));
-    };
-    mediaQueryList.addEventListener("change", listener);
+      const mediaQueryList = window.matchMedia("(prefers-color-scheme: dark)");
+      const listener = (event: MediaQueryListEvent) => {
+        const updatedState = event.matches;
+        setIsDarkMode(updatedState);
+        localStorage.setItem("isDarkMode", JSON.stringify(updatedState));
+      };
+      mediaQueryList.addEventListener("change", listener);
 
-    return () => {
-      mediaQueryList.removeEventListener("change", listener);
-    };
+      return () => {
+        mediaQueryList.removeEventListener("change", listener);
+      };
+    }
   }, []);
 
   useEffect(() => {
