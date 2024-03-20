@@ -82,7 +82,7 @@ div:focus {
   --box-shadow: rgba(0, 0, 0, 0.25);
 }
 
-body.dark {
+body.dark_mode {
   /* Backgrounds */
   --background-0: var(--black-0);
   --background-1: var(--black-1);
