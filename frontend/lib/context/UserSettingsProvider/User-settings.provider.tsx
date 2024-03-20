@@ -1,5 +1,7 @@
 import { createContext, useEffect, useState } from "react";
 
+import { parseBoolean } from "@/lib/helpers/parseBoolean";
+
 type UserSettingsContextType = {
   isDarkMode: boolean;
   setIsDarkMode: React.Dispatch<React.SetStateAction<boolean>>;
@@ -14,23 +16,29 @@ export const UserSettingsProvider = ({
 }: {
   children: React.ReactNode;
 }): JSX.Element => {
-  const [isDarkMode, setIsDarkMode] = useState<boolean>(false);
+  const localIsDarkMode = localStorage.getItem("isDarkMode");
+  const [isDarkMode, setIsDarkMode] = useState<boolean>(() => {
+    return parseBoolean(localIsDarkMode);
+  });
 
-  const checkPreferredColorScheme = () => {
+  useEffect(() => {
     const prefersDarkMode = window.matchMedia(
       "(prefers-color-scheme: dark)"
     ).matches;
-    setIsDarkMode(prefersDarkMode);
-    prefersDarkMode
+    const newState =
+      localIsDarkMode !== null
+        ? parseBoolean(localIsDarkMode)
+        : prefersDarkMode;
+    setIsDarkMode(newState);
+    newState
       ? document.body.classList.add("dark_mode")
       : document.body.classList.remove("dark_mode");
-  };
 
-  useEffect(() => {
-    checkPreferredColorScheme();
     const mediaQueryList = window.matchMedia("(prefers-color-scheme: dark)");
     const listener = (event: MediaQueryListEvent) => {
-      setIsDarkMode(event.matches);
+      const updatedState = event.matches;
+      setIsDarkMode(updatedState);
+      localStorage.setItem("isDarkMode", JSON.stringify(updatedState));
     };
     mediaQueryList.addEventListener("change", listener);
 
@@ -38,6 +46,14 @@ export const UserSettingsProvider = ({
       mediaQueryList.removeEventListener("change", listener);
     };
   }, []);
+
+  useEffect(() => {
+    isDarkMode
+      ? document.body.classList.add("dark_mode")
+      : document.body.classList.remove("dark_mode");
+
+    localStorage.setItem("isDarkMode", JSON.stringify(isDarkMode));
+  }, [isDarkMode]);
 
   return (
     <UserSettingsContext.Provider
