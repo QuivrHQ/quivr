@@ -24,6 +24,15 @@
     background-color: var(--primary-2);
   }
 
+  .brain_image {
+    padding: Spacings.$spacing01;
+    border-radius: Radius.$normal;
+
+    &.dark_image {
+      background-color: var(--background-opposite);
+    }
+  }
+
   .brain_info_wrapper {
     padding-block: Spacings.$spacing03;
     padding-left: Spacings.$spacing03;
