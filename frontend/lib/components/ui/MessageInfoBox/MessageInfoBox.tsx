@@ -1,3 +1,4 @@
+import { useUserSettingsContext } from "@/lib/context/UserSettingsProvider/hooks/useUserSettingsContext";
 import { iconList } from "@/lib/helpers/iconList";
 import { Color } from "@/lib/types/Colors";
 
@@ -30,8 +31,14 @@ export const MessageInfoBox = ({
     }
   };
 
+  const { isDarkMode } = useUserSettingsContext();
+
   return (
-    <div className={`${styles.message_info_box_wrapper} ${styles[type]} `}>
+    <div
+      className={`${styles.message_info_box_wrapper} ${styles[type]} ${
+        isDarkMode ? styles.dark : ""
+      }`}
+    >
       <Icon
         name={getIconProps().iconName}
         size="normal"

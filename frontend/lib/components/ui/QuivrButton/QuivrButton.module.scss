@@ -53,6 +53,10 @@
     border-color: var(--border-2);
     pointer-events: none;
     color: var(--text-1);
+
+    &.dark {
+      opacity: 0.2;
+    }
   }
 }
 

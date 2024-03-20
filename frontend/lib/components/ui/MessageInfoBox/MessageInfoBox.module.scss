@@ -14,7 +14,7 @@
   &.success {
     border-color: var(--success);
     color: var(--success);
-    background-color: var(--success)-lightest;
+    background-color: var(--success-lightest);
   }
 
   &.info {
@@ -26,6 +26,10 @@
   &.warning {
     border-color: var(--warning);
     color: var(--warning);
-    background-color: var(--warning)-lightest;
+    background-color: var(--warning-lightest);
+  }
+
+  &.dark {
+    background-color: var(--background-special-0);
   }
 }
