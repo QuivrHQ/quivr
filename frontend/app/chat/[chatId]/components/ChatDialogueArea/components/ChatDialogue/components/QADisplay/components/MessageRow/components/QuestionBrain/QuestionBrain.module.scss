@@ -1,3 +1,4 @@
+@use "@/styles/Radius.module.scss";
 @use "@/styles/Spacings.module.scss";
 @use "@/styles/Typography.module.scss";
 
@@ -7,6 +8,15 @@
   gap: Spacings.$spacing02;
   color: var(--text-3);
   overflow: hidden;
+
+  .brain_image {
+    padding: Spacings.$spacing01;
+    border-radius: Radius.$normal;
+
+    &.dark_image {
+      filter: invert(100%);
+    }
+  }
 
   .brain_name {
     @include Typography.EllipsisOverflow;

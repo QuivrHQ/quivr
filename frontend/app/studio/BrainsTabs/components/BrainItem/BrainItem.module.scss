@@ -29,7 +29,7 @@
     border-radius: Radius.$normal;
 
     &.dark_image {
-      background-color: var(--background-opposite);
+      filter: invert(100%);
     }
   }
 
