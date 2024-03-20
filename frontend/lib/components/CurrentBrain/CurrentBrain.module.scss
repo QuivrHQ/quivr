@@ -30,6 +30,10 @@
         align-items: center;
         overflow: hidden;
 
+        .dark_image {
+          filter: invert(100%);
+        }
+
         .brain_name {
           color: var(--text-3);
           @include Typography.EllipsisOverflow;

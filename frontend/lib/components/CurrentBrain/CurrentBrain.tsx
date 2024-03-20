@@ -31,9 +31,7 @@ export const CurrentBrain = ({
           <span className={styles.title}>Talking to</span>
           <div className={styles.brain_name_wrapper}>
             <Image
-              className={`${styles.brain_image} ${
-                isDarkMode ? styles.dark_image : ""
-              }`}
+              className={isDarkMode ? styles.dark_image : ""}
               src={
                 currentBrain.integration_logo_url
                   ? currentBrain.integration_logo_url

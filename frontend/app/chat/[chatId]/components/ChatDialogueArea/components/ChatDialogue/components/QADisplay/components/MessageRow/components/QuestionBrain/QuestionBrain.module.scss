@@ -9,13 +9,8 @@
   color: var(--text-3);
   overflow: hidden;
 
-  .brain_image {
-    padding: Spacings.$spacing01;
-    border-radius: Radius.$normal;
-
-    &.dark_image {
-      filter: invert(100%);
-    }
+  .dark_image {
+    filter: invert(100%);
   }
 
   .brain_name {

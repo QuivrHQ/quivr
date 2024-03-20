@@ -42,9 +42,7 @@ export const QuestionBrain = ({
   return (
     <div data-testid="brain-tags" className={styles.brain_name_wrapper}>
       <Image
-        className={`${styles.brain_image} ${
-          isDarkMode ? styles.dark_image : ""
-        }`}
+        className={isDarkMode ? styles.dark_image : ""}
         src={brainLogoUrl ? brainLogoUrl : "/default_brain_image.png"}
         alt="logo_image"
         width={18}

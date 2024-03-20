@@ -80,9 +80,7 @@ export const BrainItem = ({ brain, even }: BrainItemProps): JSX.Element => {
       `}
       >
         <Image
-          className={`${styles.brain_image} ${
-            isDarkMode ? styles.dark_image : ""
-          }`}
+          className={isDarkMode ? styles.dark_image : ""}
           src={
             brain.integration_logo_url
               ? brain.integration_logo_url
