@@ -89,7 +89,7 @@ body.dark {
   --background-3: var(--black-3);
   --background-4: var(--black-4);
   --background-5: var(--black-5);
-  --background-special: var(--primary-1);
+  --background-special: var(--black-3);
   --background-opposite: var(--white-0);
  
   /* Borders */
