@@ -15,7 +15,7 @@
     flex-direction: column;
     width: 100%;
     gap: Spacings.$spacing05;
-    box-shadow: BoxShadow.$box-shadow-0;
+    box-shadow: BoxShadow.$small;
     border-radius: Radius.$big;
     padding: Spacings.$spacing06;
     background-color: var(--background-1);
@@ -63,7 +63,7 @@
     flex-direction: column;
     width: 100%;
     gap: Spacings.$spacing05;
-    box-shadow: BoxShadow.$box-shadow-0;
+    box-shadow: BoxShadow.$small;
     border-radius: Radius.$big;
     padding: Spacings.$spacing06;
     background-color: var(--background-1);

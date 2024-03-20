@@ -48,9 +48,13 @@ export const PageHeader = ({
             hidden={button.hidden}
           />
         ))}
-        <button onClick={toggleTheme}>
-          Switch to {isDark ? "light" : "dark"} mode
-        </button>
+        <Icon
+          name={isDark ? "sun" : "moon"}
+          color="black"
+          handleHover={true}
+          size="small"
+          onClick={toggleTheme}
+        />
       </div>
     </div>
   );
