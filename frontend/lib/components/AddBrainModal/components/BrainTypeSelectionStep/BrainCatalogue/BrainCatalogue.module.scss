@@ -39,6 +39,10 @@
         cursor: pointer;
         width: 120px;
 
+        .dark_image {
+          filter: invert(100%);
+        }
+
         .brain_title {
           font-size: Typography.$medium;
           font-weight: 500;
@@ -47,7 +51,7 @@
         &:hover,
         &.selected {
           border-color: var(--primary-0);
-          background-color: var(--primary-2);
+          background-color: var(--background-special-0);
 
           .brain_title {
             color: var(--primary-0);

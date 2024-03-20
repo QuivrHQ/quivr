@@ -23,11 +23,6 @@ export const PageHeader = ({
 
   const toggleTheme = () => {
     setIsDarkMode(!isDarkMode);
-    if (!isDarkMode) {
-      document.body.classList.add("dark_mode");
-    } else {
-      document.body.classList.remove("dark_mode");
-    }
   };
 
   return (

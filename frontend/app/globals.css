@@ -60,6 +60,7 @@ div:focus {
   --background-5: var(--black-0);
   --background-special-0: var(--primary-2);
   --background-special-1: var(--primary-1);
+  --background-blur: rgba(0, 0, 0, 0.85);
 
   /* Borders */
   --border-0: var(--grey-4);
@@ -93,6 +94,7 @@ body.dark_mode {
   --background-special-0: var(--black-3);
   --background-special-1: var(--black-5);
   --background-opposite: var(--white-0);
+  --background-blur: rgba(0, 0, 0, 0.85);
  
   /* Borders */
   --border-0: var(--white-0);
