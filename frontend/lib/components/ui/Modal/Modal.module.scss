@@ -30,6 +30,11 @@
       height: 90vh;
     }
 
+    &.white {
+      background-color: var(--white-0);
+      color: var(--text-0);
+    }
+
     @media (max-width: ScreenSizes.$small) {
       &.big_modal {
         width: 90vw;

@@ -9,11 +9,13 @@ import { Icon } from "../Icon/Icon";
 export type MessageInfoBoxProps = {
   children: React.ReactNode;
   type: "info" | "success" | "warning" | "error";
+  unforceWhite?: boolean;
 };
 
 export const MessageInfoBox = ({
   children,
   type,
+  unforceWhite,
 }: MessageInfoBoxProps): JSX.Element => {
   const getIconProps = (): {
     iconName: keyof typeof iconList;
@@ -36,7 +38,7 @@ export const MessageInfoBox = ({
   return (
     <div
       className={`${styles.message_info_box_wrapper} ${styles[type]} ${
-        isDarkMode ? styles.dark : ""
+        isDarkMode && !unforceWhite ? styles.dark : ""
       }`}
     >
       <Icon
