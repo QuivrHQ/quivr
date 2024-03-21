@@ -5,6 +5,7 @@ import { useEffect } from "react";
 import { QuivrLogo } from "@/lib/assets/QuivrLogo";
 import { AddBrainModal } from "@/lib/components/AddBrainModal";
 import { useBrainCreationContext } from "@/lib/components/AddBrainModal/brainCreation-provider";
+import { OnboardingModal } from "@/lib/components/OnboardingModal/OnboardingModal";
 import PageHeader from "@/lib/components/PageHeader/PageHeader";
 import { UploadDocumentModal } from "@/lib/components/UploadDocumentModal/UploadDocumentModal";
 import { SearchBar } from "@/lib/components/ui/SearchBar/SearchBar";
@@ -66,6 +67,7 @@ const Search = (): JSX.Element => {
       </div>
       <UploadDocumentModal />
       <AddBrainModal />
+      <OnboardingModal />
     </div>
   );
 };

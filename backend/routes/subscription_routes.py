@@ -458,11 +458,7 @@ async def unsubscribe_from_brain_handler(
 
     if brain is None:
         raise HTTPException(status_code=404, detail="Brain not found")
-    if brain.status != "public":
-        raise HTTPException(
-            status_code=403,
-            detail="You cannot subscribe to this brain without invitation",
-        )
+
     # check if user is already subscribed to brain
     user_brain = brain_user_service.get_brain_for_user(current_user.id, brain_id)
     if user_brain is None:

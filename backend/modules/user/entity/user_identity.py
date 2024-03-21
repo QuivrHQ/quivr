@@ -10,3 +10,5 @@ class UserIdentity(BaseModel):
     username: Optional[str] = None
     company: Optional[str] = None
     onboarded: Optional[bool] = None
+    company_size: Optional[str] = None
+    usage_purpose: Optional[str] = None
