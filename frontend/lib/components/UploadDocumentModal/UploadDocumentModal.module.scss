@@ -1,4 +1,3 @@
-@use "@/styles/Colors.module.scss";
 @use "@/styles/Spacings.module.scss";
 @use "@/styles/ZIndexes.module.scss";
 
@@ -7,7 +6,7 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  background-color: Colors.$white;
+  background-color: var(--background-0);
   width: 100%;
   flex: 1;
 

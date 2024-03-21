@@ -1,4 +1,3 @@
-@use "@/styles/Colors.module.scss";
 @use "@/styles/Radius.module.scss";
 @use "@/styles/Spacings.module.scss";
 @use "@/styles/Typography.module.scss";
@@ -8,7 +7,7 @@
   display: flex;
   flex-direction: column;
   border-radius: Radius.$normal;
-  border: 1px dashed Colors.$lighter-grey;
+  border: 1px dashed var(--border-0);
   overflow: hidden;
   font-size: Typography.$small;
 
@@ -16,7 +15,7 @@
     overflow: hidden;
     transition: max-height 0.3s Transitions.$easeOutBack;
   }
-  
+
   .contentCollapsed {
     max-height: 0;
   }
@@ -44,10 +43,10 @@
     }
 
     &:hover {
-      background-color: Colors.$lightest-black;
+      background-color: var(--background-3);
     }
   }
-  
+
   .iconRotate {
     transition: transform 0.3s Transitions.$easeOutBack;
   }

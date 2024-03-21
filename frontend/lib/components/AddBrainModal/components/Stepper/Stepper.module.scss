@@ -1,4 +1,3 @@
-@use "@/styles/Colors.module.scss";
 @use "@/styles/Radius.module.scss";
 @use "@/styles/Spacings.module.scss";
 @use "@/styles/Typography.module.scss";
@@ -17,7 +16,7 @@
     .circle {
       width: 2.5rem;
       height: 2.5rem;
-      background-color: Colors.$primary;
+      background-color: var(--primary-0);
       border-radius: Radius.$circle;
       display: flex;
       justify-content: center;
@@ -35,43 +34,43 @@
 
     &.done_step {
       .circle {
-        background-color: Colors.$success;
+        background-color: var(--success);
       }
 
       .step_info {
         .step_status {
-          color: Colors.$success;
+          color: var(--success);
         }
       }
     }
 
     &.current_step {
       .circle {
-        background-color: Colors.$white;
-        border: 1px solid Colors.$primary;
+        background-color: var(--background-0);
+        border: 1px solid var(--primary-0);
       }
 
       .inside_circle {
-        background-color: Colors.$primary;
+        background-color: var(--primary-0);
         width: 70%;
         height: 70%;
       }
 
       .step_info {
         .step_status {
-          color: Colors.$primary;
+          color: var(--primary-0);
         }
       }
     }
 
     &.pending_step {
       .circle {
-        background-color: Colors.$primary-light;
+        background-color: var(--primary-1);
       }
 
       .step_info {
         .step_status {
-          color: Colors.$normal-grey;
+          color: var(--text-1);
         }
       }
     }
@@ -85,7 +84,7 @@
 
       .step_index {
         white-space: nowrap;
-        color: Colors.$normal-grey;
+        color: var(--text-1);
       }
     }
   }
@@ -94,12 +93,12 @@
     flex-grow: 1;
     height: 4px;
     border-radius: Radius.$big;
-    background-color: Colors.$primary-light;
+    background-color: var(--primary-1);
     margin: 0 8px;
     margin-top: Spacings.$spacing05;
 
     &.done {
-      background-color: Colors.$success;
+      background-color: var(--success);
     }
   }
 }

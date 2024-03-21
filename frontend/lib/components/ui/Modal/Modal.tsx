@@ -20,6 +20,7 @@ type CommonModalProps = {
   isOpen?: undefined;
   setOpen?: undefined;
   bigModal?: boolean;
+  unforceWhite?: boolean;
 };
 
 type ModalProps =
@@ -38,6 +39,7 @@ export const Modal = ({
   isOpen: customIsOpen,
   setOpen: customSetOpen,
   bigModal,
+  unforceWhite,
 }: ModalProps): JSX.Element => {
   const [isOpen, setOpen] = useState(false);
   const { t } = useTranslation(["translation"]);
@@ -64,7 +66,7 @@ export const Modal = ({
                   <motion.div
                     className={`${styles.modal_content_wrapper} ${
                       bigModal ? styles.big_modal : ""
-                    }`}
+                    } ${unforceWhite ? styles.white : ""}`}
                     initial={{ opacity: 0, y: "-40%" }}
                     animate={{ opacity: 1, y: "0%" }}
                     exit={{ opacity: 0, y: "40%" }}

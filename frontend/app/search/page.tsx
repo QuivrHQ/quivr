@@ -9,6 +9,7 @@ import PageHeader from "@/lib/components/PageHeader/PageHeader";
 import { UploadDocumentModal } from "@/lib/components/UploadDocumentModal/UploadDocumentModal";
 import { SearchBar } from "@/lib/components/ui/SearchBar/SearchBar";
 import { useSupabase } from "@/lib/context/SupabaseProvider";
+import { useUserSettingsContext } from "@/lib/context/UserSettingsProvider/hooks/useUserSettingsContext";
 import { redirectToLogin } from "@/lib/router/redirectToLogin";
 import { ButtonType } from "@/lib/types/QuivrButton";
 
@@ -18,6 +19,7 @@ const Search = (): JSX.Element => {
   const pathname = usePathname();
   const { session } = useSupabase();
   const { setIsBrainCreationModalOpened } = useBrainCreationContext();
+  const { isDarkMode } = useUserSettingsContext();
 
   useEffect(() => {
     if (session === null) {
@@ -44,7 +46,7 @@ const Search = (): JSX.Element => {
       <div className={styles.search_page_container}>
         <div className={styles.main_wrapper}>
           <div className={styles.quivr_logo_wrapper}>
-            <QuivrLogo size={80} color="black" />
+            <QuivrLogo size={80} color={isDarkMode ? "white" : "black"} />
             <div className={styles.quivr_text}>
               <span>Talk to </span>
               <span className={styles.quivr_text_primary}>Quivr</span>
