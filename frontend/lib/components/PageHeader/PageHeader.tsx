@@ -1,3 +1,5 @@
+import { useEffect, useState } from "react";
+
 import { useMenuContext } from "@/lib/context/MenuProvider/hooks/useMenuContext";
 import { useUserSettingsContext } from "@/lib/context/UserSettingsProvider/hooks/useUserSettingsContext";
 import { ButtonType } from "@/lib/types/QuivrButton";
@@ -20,10 +22,15 @@ export const PageHeader = ({
 }: Props): JSX.Element => {
   const { isOpened } = useMenuContext();
   const { isDarkMode, setIsDarkMode } = useUserSettingsContext();
+  const [lightModeIconName, setLightModeIconName] = useState("sun");
 
   const toggleTheme = () => {
     setIsDarkMode(!isDarkMode);
   };
+
+  useEffect(() => {
+    setLightModeIconName(isDarkMode ? "sun" : "moon");
+  }, [isDarkMode]);
 
   return (
     <div className={styles.page_header_wrapper}>
@@ -43,7 +50,7 @@ export const PageHeader = ({
           />
         ))}
         <Icon
-          name={isDarkMode ? "sun" : "moon"}
+          name={lightModeIconName}
           color="black"
           handleHover={true}
           size="small"
