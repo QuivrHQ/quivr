@@ -1,5 +1,6 @@
 import { useState } from "react";
 
+import { useUserSettingsContext } from "@/lib/context/UserSettingsProvider/hooks/useUserSettingsContext";
 import { ButtonType } from "@/lib/types/QuivrButton";
 
 import styles from "./QuivrButton.module.scss";
@@ -17,6 +18,7 @@ export const QuivrButton = ({
   hidden,
 }: ButtonType): JSX.Element => {
   const [hovered, setHovered] = useState<boolean>(false);
+  const { isDarkMode } = useUserSettingsContext();
 
   return (
     <div
@@ -24,10 +26,11 @@ export const QuivrButton = ({
       ${styles.button_wrapper} 
       ${styles[color]} 
       ${disabled ? styles.disabled : ""}
+      ${isDarkMode ? styles.dark : ""}
       ${hidden ? styles.hidden : ""}
       `}
-      // eslint-disable-next-line @typescript-eslint/no-misused-promises
-      onClick={() => onClick?.()}
+      // eslint-disable-next-line @typescript-eslint/no-misused-promises, @typescript-eslint/prefer-optional-chain, @typescript-eslint/no-unnecessary-condition
+      onClick={() => onClick && onClick()}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >

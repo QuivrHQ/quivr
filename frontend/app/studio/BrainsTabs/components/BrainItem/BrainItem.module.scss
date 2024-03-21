@@ -1,4 +1,3 @@
-@use "@/styles/Colors.module.scss";
 @use "@/styles/Radius.module.scss";
 @use "@/styles/ScreenSizes.module.scss";
 @use "@/styles/Spacings.module.scss";
@@ -14,15 +13,19 @@
   align-items: center;
   cursor: pointer;
   margin-block: Spacings.$spacing03;
-  border: 1px solid Colors.$lightest-black;
+  border: 1px solid var(--border-1);
   border-radius: Radius.$normal;
   padding-block: Spacings.$spacing03;
   position: relative;
   overflow: visible;
 
   &:hover {
-    border-color: Colors.$primary;
-    background-color: Colors.$primary-lightest;
+    border-color: var(--primary-0);
+    background-color: var(--background-special-0);
+  }
+
+  .dark_image {
+    filter: invert(100%);
   }
 
   .brain_info_wrapper {
@@ -37,13 +40,13 @@
     .name {
       @include Typography.EllipsisOverflow;
       width: 200px;
-      color: Colors.$black;
+      color: var(--text-3);
     }
 
     .description {
       @include Typography.EllipsisOverflow;
       flex: 1;
-      color: Colors.$dark-grey;
+      color: var(--text-2);
     }
 
     @media (max-width: ScreenSizes.$small) {

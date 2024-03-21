@@ -9,6 +9,7 @@ import Icon from "@/lib/components/ui/Icon/Icon";
 import { OptionsModal } from "@/lib/components/ui/OptionsModal/OptionsModal";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 import { MinimalBrainForUser } from "@/lib/context/BrainProvider/types";
+import { useUserSettingsContext } from "@/lib/context/UserSettingsProvider/hooks/useUserSettingsContext";
 import { Option } from "@/lib/types/Options";
 
 import styles from "./BrainItem.module.scss";
@@ -32,6 +33,7 @@ export const BrainItem = ({ brain, even }: BrainItemProps): JSX.Element => {
     brainId: brain.id,
     userAccessibleBrains: allBrains,
   });
+  const { isDarkMode } = useUserSettingsContext();
 
   const iconRef = useRef<HTMLDivElement | null>(null);
   const optionsRef = useRef<HTMLDivElement | null>(null);
@@ -67,7 +69,7 @@ export const BrainItem = ({ brain, even }: BrainItemProps): JSX.Element => {
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, []);
+  }, [isDarkMode]);
 
   return (
     <>
@@ -77,16 +79,18 @@ export const BrainItem = ({ brain, even }: BrainItemProps): JSX.Element => {
       ${styles.brain_item_wrapper}
       `}
       >
-        {brain.integration_logo_url ? (
-          <Image
-            src={brain.integration_logo_url}
-            alt="logo_image"
-            width={18}
-            height={18}
-          />
-        ) : (
-          <Icon name="brain" size="normal" color="primary" />
-        )}
+        <Image
+          className={isDarkMode ? styles.dark_image : ""}
+          src={
+            brain.integration_logo_url
+              ? brain.integration_logo_url
+              : "/default_brain_image.png"
+          }
+          alt="logo_image"
+          width={18}
+          height={18}
+        />
+
         <Link
           className={styles.brain_info_wrapper}
           href={`/studio/${brain.id}`}
@@ -94,7 +98,6 @@ export const BrainItem = ({ brain, even }: BrainItemProps): JSX.Element => {
           <span className={styles.name}>{brain.name}</span>
           <span className={styles.description}>{brain.description}</span>
         </Link>
-
         <div>
           <div
             ref={iconRef}

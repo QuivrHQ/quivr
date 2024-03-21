@@ -1,0 +1,9 @@
+@use "@/styles/Spacings.module.scss";
+
+.info_content {
+  padding: Spacings.$spacing06;
+
+  .bold {
+    font-weight: 800;
+  }
+}

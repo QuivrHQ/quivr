@@ -1,4 +1,3 @@
-@use "@/styles/Colors.module.scss";
 @use "@/styles/Radius.module.scss";
 @use "@/styles/ScreenSizes.module.scss";
 @use "@/styles/Spacings.module.scss";
@@ -12,25 +11,25 @@
     align-items: center;
     justify-content: center;
     flex: 1;
-    border-bottom: 2px solid Colors.$lightest-grey;
+    border-bottom: 2px solid var(--border-0);
     padding-block: Spacings.$spacing03;
     cursor: pointer;
     box-sizing: border-box;
     gap: Spacings.$spacing03;
 
     &.selected {
-      border-bottom-color: Colors.$primary;
-      color: Colors.$primary;
-      background-color: Colors.$lightest-grey;
+      border-bottom-color: var(--primary-0);
+      color: var(--primary-0);
+      background-color: var(--background-2);
     }
 
     &:hover {
-      color: Colors.$primary;
+      color: var(--primary-0);
     }
 
     &.disabled {
       pointer-events: none;
-      color: Colors.$normal-grey;
+      color: var(--text-1);
     }
 
     @media (max-width: ScreenSizes.$small) {

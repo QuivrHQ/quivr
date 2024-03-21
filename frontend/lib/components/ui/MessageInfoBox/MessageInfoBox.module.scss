@@ -1,4 +1,3 @@
-@use "@/styles/Colors.module.scss";
 @use "@/styles/Radius.module.scss";
 @use "@/styles/Spacings.module.scss";
 
@@ -8,25 +7,29 @@
   align-items: center;
   gap: Spacings.$spacing03;
   width: fit-content;
-  border: 1px solid Colors.$normal-grey;
-  color: Colors.$black;
+  border: 1px solid var(--border-2);
+  color: var(--text-3);
   border-radius: Radius.$normal;
 
   &.success {
-    border-color: Colors.$success;
-    color: Colors.$success;
-    background-color: Colors.$success-lightest;
+    border-color: var(--success);
+    color: var(--success);
+    background-color: var(--success-lightest);
   }
 
   &.info {
-    border-color: Colors.$primary;
-    color: Colors.$primary;
-    background-color: Colors.$primary-lightest;
+    border-color: var(--primary-0);
+    color: var(--primary-0);
+    background-color: var(--primary-2);
   }
 
   &.warning {
-    border-color: Colors.$warning;
-    color: Colors.$warning;
-    background-color: Colors.$warning-lightest;
+    border-color: var(--warning);
+    color: var(--warning);
+    background-color: var(--warning-lightest);
+  }
+
+  &.dark {
+    background-color: var(--background-special-0);
   }
 }

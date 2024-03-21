@@ -1,4 +1,3 @@
-@use "@/styles/Colors.module.scss";
 @use "@/styles/Radius.module.scss";
 @use "@/styles/Spacings.module.scss";
 @use "@/styles/Typography.module.scss";
@@ -11,10 +10,10 @@
   font-size: Typography.$tiny;
 
   &.primary {
-    background-color: Colors.$primary-light;
+    background-color: var(--primary-1);
   }
 
   &.gold {
-    background-color: Colors.$gold;
+    background-color: var(--gold);
   }
 }

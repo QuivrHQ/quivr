@@ -1,4 +1,3 @@
-@use "@/styles/Colors.module.scss";
 @use "@/styles/Radius.module.scss";
 @use "@/styles/ScreenSizes.module.scss";
 @use "@/styles/Spacings.module.scss";
@@ -14,46 +13,50 @@
   cursor: pointer;
   display: flex;
   width: fit-content;
-  background-color: Colors.$white;
+  background-color: var(--background-0);
 
   &.hidden {
     display: none;
   }
 
   &.primary {
-    border-color: Colors.$primary;
-    color: Colors.$primary;
+    border-color: var(--primary-0);
+    color: var(--primary-0);
 
     &:hover {
-      background-color: Colors.$primary;
-      color: Colors.$white;
+      background-color: var(--primary-0);
+      color: var(--text-0);
     }
   }
 
   &.dangerous {
-    border-color: Colors.$dangerous;
-    color: Colors.$dangerous;
+    border-color: var(--dangerous);
+    color: var(--dangerous);
 
     &:hover {
-      background-color: Colors.$dangerous;
-      color: Colors.$white;
+      background-color: var(--dangerous);
+      color: var(--text-0);
     }
   }
 
   &.gold {
-    border-color: Colors.$gold;
-    color: Colors.$gold;
+    border-color: var(--gold);
+    color: var(--gold);
 
     &:hover {
-      background-color: Colors.$gold;
-      color: Colors.$white;
+      background-color: var(--gold);
+      color: var(--text-0);
     }
   }
 
   &.disabled {
-    border-color: Colors.$normal-grey;
+    border-color: var(--border-2);
     pointer-events: none;
-    color: Colors.$normal-grey;
+    color: var(--text-1);
+
+    &.dark {
+      opacity: 0.2;
+    }
   }
 }
 
