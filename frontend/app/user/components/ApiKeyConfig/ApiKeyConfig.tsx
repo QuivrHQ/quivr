@@ -28,7 +28,7 @@ export const ApiKeyConfig = (): JSX.Element => {
       ) : (
         <div className={styles.response_wrapper}>
           <span>{apiKey}</span>
-          <CopyButton handleCopy={handleCopyClick} />
+          <CopyButton handleCopy={handleCopyClick} size="small" />
         </div>
       )}
     </div>

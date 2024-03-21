@@ -16,14 +16,12 @@ export const UpgradeToPlusButton = (): JSX.Element => {
   return (
     <StripePricingModal
       Trigger={
-        <>
-          <MenuButton
-            iconName="star"
-            label={t("upgrade")}
-            type="add"
-            color="gold"
-          />
-        </>
+        <MenuButton
+          iconName="star"
+          label={t("upgrade")}
+          type="add"
+          color="gold"
+        />
       }
     />
   );
