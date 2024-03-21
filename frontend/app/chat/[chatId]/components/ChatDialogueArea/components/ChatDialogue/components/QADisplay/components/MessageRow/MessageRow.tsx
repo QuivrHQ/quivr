@@ -1,5 +1,7 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 
+import { useChat } from "@/app/chat/[chatId]/hooks/useChat";
+import { useChatApi } from "@/lib/api/chat/useChatApi";
 import { CopyButton } from "@/lib/components/ui/CopyButton";
 import Icon from "@/lib/components/ui/Icon/Icon";
 import { useChatContext } from "@/lib/context";
@@ -23,6 +25,8 @@ type MessageRowProps = {
   };
   brainId?: string;
   index?: number;
+  messageId?: string;
+  thumbs?: boolean;
 };
 
 export const MessageRow = React.forwardRef(
@@ -35,6 +39,8 @@ export const MessageRow = React.forwardRef(
       children,
       brainId,
       index,
+      messageId,
+      thumbs: initialThumbs,
     }: MessageRowProps,
     ref: React.Ref<HTMLDivElement>
   ) => {
@@ -44,8 +50,96 @@ export const MessageRow = React.forwardRef(
     });
     const { setSourcesMessageIndex, sourcesMessageIndex } = useChatContext();
     const { isMobile } = useDevice();
+    const { updateChatMessage } = useChatApi();
+    const { chatId } = useChat();
+    const [thumbs, setThumbs] = useState<boolean | undefined | null>(
+      initialThumbs
+    );
+
+    useEffect(() => {
+      setThumbs(initialThumbs);
+    }, [initialThumbs]);
 
     const messageContent = text ?? "";
+
+    const thumbsUp = async () => {
+      if (chatId && messageId) {
+        await updateChatMessage(chatId, messageId, {
+          thumbs: thumbs ? null : true,
+        });
+        setThumbs(thumbs ? null : true);
+      }
+    };
+
+    const thumbsDown = async () => {
+      if (chatId && messageId) {
+        await updateChatMessage(chatId, messageId, {
+          thumbs: thumbs === false ? null : false,
+        });
+        setThumbs(thumbs === false ? null : false);
+      }
+    };
+
+    const renderMessageHeader = () => {
+      if (!isUserSpeaker) {
+        return (
+          <div className={styles.message_header}>
+            <QuestionBrain brainName={brainName} brainId={brainId} />
+            <QuestionPrompt promptName={promptName} />
+          </div>
+        );
+      } else {
+        return (
+          <div className={styles.message_header}>
+            <Icon name="user" color="dark-grey" size="normal" />
+            <span className={styles.me}>Me</span>
+          </div>
+        );
+      }
+    };
+
+    const renderIcons = () => {
+      if (!isUserSpeaker && messageContent !== "🧠") {
+        return (
+          <div className={styles.icons_wrapper}>
+            <CopyButton handleCopy={handleCopy} size="normal" />
+            {!isMobile && (
+              <div className={styles.sources_icon_wrapper}>
+                <Icon
+                  name="file"
+                  handleHover={true}
+                  color={sourcesMessageIndex === index ? "primary" : "black"}
+                  size="normal"
+                  onClick={() => {
+                    setSourcesMessageIndex(
+                      sourcesMessageIndex === index ? undefined : index
+                    );
+                  }}
+                />
+              </div>
+            )}
+            <Icon
+              name="thumbsUp"
+              handleHover={true}
+              color={thumbs ? "primary" : "black"}
+              size="normal"
+              onClick={async () => {
+                await thumbsUp();
+              }}
+            />
+            <Icon
+              name="thumbsDown"
+              handleHover={true}
+              color={thumbs === false ? "primary" : "black"}
+              size="normal"
+              onClick={async () => {
+                await thumbsDown();
+              }}
+            />
+          </div>
+        );
+      }
+    };
 
     return (
       <div
@@ -54,44 +148,12 @@ export const MessageRow = React.forwardRef(
       ${isUserSpeaker ? styles.user : styles.brain}
       `}
       >
-        {!isUserSpeaker ? (
-          <div className={styles.message_header}>
-            <QuestionBrain brainName={brainName} brainId={brainId} />
-            <QuestionPrompt promptName={promptName} />
-          </div>
-        ) : (
-          <div className={styles.message_header}>
-            <Icon name="user" color="dark-grey" size="normal" />
-            <span className={styles.me}>Me</span>
-          </div>
-        )}
-        {}
+        {renderMessageHeader()}
         <div ref={ref} className={styles.message_row_content}>
           {children ?? (
             <>
               <MessageContent text={messageContent} isUser={isUserSpeaker} />
-              {!isUserSpeaker && messageContent !== "🧠" && (
-                <div className={styles.icons_wrapper}>
-                  <CopyButton handleCopy={handleCopy} size="normal" />
-                  {!isMobile && (
-                    <div className={styles.sources_icon_wrapper}>
-                      <Icon
-                        name="file"
-                        handleHover={true}
-                        color={
-                          sourcesMessageIndex === index ? "primary" : "black"
-                        }
-                        size="normal"
-                        onClick={() => {
-                          setSourcesMessageIndex(
-                            sourcesMessageIndex === index ? undefined : index
-                          );
-                        }}
-                      />
-                    </div>
-                  )}
-                </div>
-              )}
+              {renderIcons()}
             </>
           )}
         </div>

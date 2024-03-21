@@ -42,7 +42,7 @@ const BrainsManagement = (): JSX.Element => {
       hidden: !isOwnedByCurrentUser || !brain?.max_files,
     },
     {
-      label: "Delete brain",
+      label: isOwnedByCurrentUser ? "Delete Brain" : "Unsubscribe from Brain",
       color: "dangerous",
       onClick: () => {
         setIsDeleteOrUnsubscribeModalOpened(true);
