@@ -1,11 +1,10 @@
-@use "@/styles/Colors.module.scss";
 @use "@/styles/Spacings.module.scss";
 @use "@/styles/Typography.module.scss";
 
 .prompt_name_wrapper {
   display: flex;
   align-items: center;
-  color: Colors.$black;
+  color: var(--text-3);
   font-size: Typography.$small;
   overflow: hidden;
 

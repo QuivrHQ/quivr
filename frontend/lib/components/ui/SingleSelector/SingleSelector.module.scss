@@ -1,4 +1,3 @@
-@use "@/styles/Colors.module.scss";
 @use "@/styles/IconSizes.module.scss";
 @use "@/styles/Radius.module.scss";
 @use "@/styles/Spacings.module.scss";
@@ -9,12 +8,12 @@
   display: flex;
   flex-direction: column;
   position: relative;
-  background-color: Colors.$white;
+  background-color: var(--background-0);
 
   .first_line_wrapper {
     display: flex;
     justify-content: space-between;
-    border: 1px solid Colors.$normal-grey;
+    border: 1px solid var(--border-2);
     border-radius: Radius.$big;
     align-items: center;
     cursor: pointer;
@@ -37,14 +36,14 @@
 
       .label {
         @include Typography.EllipsisOverflow;
-        background-color: Colors.$primary-light;
+        background-color: var(--background-special-1);
         border-radius: Radius.$normal;
         padding-inline: Spacings.$spacing05;
         padding-block: Spacings.$spacing02;
         white-space: nowrap;
 
         &.not_set {
-          color: Colors.$normal-grey;
+          color: var(--text-1);
           background-color: transparent;
           padding-inline: 0;
         }
@@ -67,10 +66,10 @@
 
   .options {
     position: absolute;
-    background-color: Colors.$white;
+    background-color: var(--background-0);
     width: 100%;
     top: 100%;
-    border: 1px solid Colors.$normal-grey;
+    border: 1px solid var(--border-2);
     border-top: none;
     border-radius: 0 0 Radius.$big Radius.$big;
     overflow: hidden;
@@ -88,7 +87,7 @@
 
       &:hover {
         .option_name {
-          background-color: Colors.$primary-lightest;
+          background-color: var(--background-special-1);
         }
       }
 
@@ -98,7 +97,7 @@
 
       .option_name {
         @include Typography.EllipsisOverflow;
-        border: 1px solid Colors.$lightest-black;
+        border: 1px solid var(--border-1);
         border-radius: Radius.$small;
         padding-inline: Spacings.$spacing05;
         padding-block: Spacings.$spacing02;

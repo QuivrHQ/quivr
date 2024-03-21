@@ -1,4 +1,3 @@
-@use "@/styles/Colors.module.scss";
 @use "@/styles/Radius.module.scss";
 @use "@/styles/Spacings.module.scss";
 @use "@/styles/Typography.module.scss";
@@ -15,7 +14,7 @@
 
   &:hover,
   &.selected {
-    background-color: Colors.$primary-light;
+    background-color: var(--background-special-1);
     font-weight: 550;
   }
 

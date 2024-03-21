@@ -1,4 +1,4 @@
-@use "@/styles/Colors.module.scss";
+@use "@/styles/BoxShadow.module.scss";
 @use "@/styles/Radius.module.scss";
 @use "@/styles/Spacings.module.scss";
 @use "@/styles/Typography.module.scss";
@@ -11,9 +11,9 @@
 
   .section_wrapper {
     border-radius: Radius.$big;
-    background-color: Colors.$highlight;
+    background-color: var(--background-1);
     padding: Spacings.$spacing05;
-    box-shadow: 0 1px 2px rgb(0, 0, 0, 0.25);
+    box-shadow: BoxShadow.$small;
     display: flex;
     flex-direction: column;
     gap: Spacings.$spacing05;

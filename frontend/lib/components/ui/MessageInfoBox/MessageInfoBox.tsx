@@ -1,3 +1,4 @@
+import { useUserSettingsContext } from "@/lib/context/UserSettingsProvider/hooks/useUserSettingsContext";
 import { iconList } from "@/lib/helpers/iconList";
 import { Color } from "@/lib/types/Colors";
 
@@ -8,11 +9,13 @@ import { Icon } from "../Icon/Icon";
 export type MessageInfoBoxProps = {
   children: React.ReactNode;
   type: "info" | "success" | "warning" | "error";
+  unforceWhite?: boolean;
 };
 
 export const MessageInfoBox = ({
   children,
   type,
+  unforceWhite,
 }: MessageInfoBoxProps): JSX.Element => {
   const getIconProps = (): {
     iconName: keyof typeof iconList;
@@ -30,8 +33,14 @@ export const MessageInfoBox = ({
     }
   };
 
+  const { isDarkMode } = useUserSettingsContext();
+
   return (
-    <div className={`${styles.message_info_box_wrapper} ${styles[type]} `}>
+    <div
+      className={`${styles.message_info_box_wrapper} ${styles[type]} ${
+        isDarkMode && !unforceWhite ? styles.dark : ""
+      }`}
+    >
       <Icon
         name={getIconProps().iconName}
         size="normal"

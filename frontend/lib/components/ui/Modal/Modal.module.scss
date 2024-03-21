@@ -1,4 +1,4 @@
-@use "@/styles/Colors.module.scss";
+@use "@/styles/BoxShadow.module.scss";
 @use "@/styles/Radius.module.scss";
 @use "@/styles/ScreenSizes.module.scss";
 @use "@/styles/Spacings.module.scss";
@@ -6,7 +6,7 @@
 
 .modal_container {
   display: flex;
-  background-color: rgba(Colors.$dark-black, 0.94);
+  background-color: var(--background-blur);
   height: 100%;
   width: 100%;
   position: absolute;
@@ -18,16 +18,21 @@
     display: flex;
     flex-direction: column;
     border-radius: Radius.$big;
-    background-color: Colors.$white;
+    background-color: var(--background-0);
     padding: Spacings.$spacing05;
     cursor: auto;
-    box-shadow: 0 2px 4px rgb(0, 0, 0, 0.25);
+    box-shadow: BoxShadow.$medium;
     max-width: 90vw;
     overflow: scroll;
 
     &.big_modal {
       width: 40vw;
       height: 90vh;
+    }
+
+    &.white {
+      background-color: var(--white-0);
+      color: var(--text-0);
     }
 
     @media (max-width: ScreenSizes.$small) {

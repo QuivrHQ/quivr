@@ -1,4 +1,3 @@
-@use "@/styles/Colors.module.scss";
 @use "@/styles/Radius.module.scss";
 @use "@/styles/ScreenSizes.module.scss";
 @use "@/styles/Spacings.module.scss";
@@ -11,14 +10,14 @@
   column-gap: Spacings.$spacing05;
   justify-content: center;
   align-items: center;
-  border: 1px dashed Colors.$lighter-grey;
+  border: 1px dashed var(--border-0);
   border-radius: Radius.$big;
   box-sizing: border-box;
   cursor: pointer;
 
   &.dragging {
-    border: 3px dashed Colors.$accent;
-    background-color: Colors.$lightest-black;
+    border: 3px dashed var(--accent);
+    background-color: var(--background-3);
   }
 
   .input {

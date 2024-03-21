@@ -1,11 +1,10 @@
-@use "@/styles/Colors.module.scss";
 @use "@/styles/ScreenSizes.module.scss";
 @use "@/styles/Spacings.module.scss";
 @use "@/styles/ZIndexes.module.scss";
 
 .search_modal_wrapper {
   display: flex;
-  background-color: rgba(Colors.$dark-black, 0.94);
+  background-color: var(--background-blur);
   height: 100%;
   width: 100%;
   position: absolute;

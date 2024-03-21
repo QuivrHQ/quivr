@@ -5,6 +5,7 @@ import { IntegrationBrains } from "@/lib/api/brain/types";
 import { MessageInfoBox } from "@/lib/components/ui/MessageInfoBox/MessageInfoBox";
 import { Tag } from "@/lib/components/ui/Tag/Tag";
 import Tooltip from "@/lib/components/ui/Tooltip/Tooltip";
+import { useUserSettingsContext } from "@/lib/context/UserSettingsProvider/hooks/useUserSettingsContext";
 
 import styles from "./BrainCatalogue.module.scss";
 
@@ -19,6 +20,7 @@ export const BrainCatalogue = ({
 }): JSX.Element => {
   const { setCurrentSelectedBrain, currentSelectedBrain } =
     useBrainCreationContext();
+  const { isDarkMode } = useUserSettingsContext();
 
   return (
     <div className={styles.cards_wrapper}>
@@ -47,6 +49,7 @@ export const BrainCatalogue = ({
                   }`}
                 >
                   <Image
+                    className={isDarkMode ? styles.dark_image : ""}
                     src={brain.integration_logo_url}
                     alt={brain.integration_name}
                     width={50}
