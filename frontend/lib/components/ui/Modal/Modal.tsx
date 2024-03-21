@@ -20,6 +20,7 @@ type CommonModalProps = {
   isOpen?: undefined;
   setOpen?: undefined;
   bigModal?: boolean;
+  unclosable?: boolean;
   unforceWhite?: boolean;
 };
 
@@ -30,6 +31,31 @@ type ModalProps =
       setOpen: (isOpen: boolean) => void;
     });
 
+const handleInteractOutside = (unclosable: boolean, event: Event) => {
+  if (unclosable) {
+    event.preventDefault();
+  }
+};
+
+const handleModalContentAnimation = (
+  isOpen: boolean,
+  bigModal: boolean,
+  unforceWhite: boolean
+) => {
+  const initialAnimation = { opacity: 0, y: "-40%" };
+  const animateAnimation = { opacity: 1, y: "0%" };
+  const exitAnimation = { opacity: 0, y: "40%" };
+
+  return {
+    initial: initialAnimation,
+    animate: animateAnimation,
+    exit: exitAnimation,
+    className: `${styles.modal_content_wrapper} ${
+      bigModal ? styles.big_modal : ""
+    } ${unforceWhite ? styles.white : ""}`,
+  };
+};
+
 export const Modal = ({
   title,
   desc,
@@ -39,6 +65,7 @@ export const Modal = ({
   isOpen: customIsOpen,
   setOpen: customSetOpen,
   bigModal,
+  unclosable,
   unforceWhite,
 }: ModalProps): JSX.Element => {
   const [isOpen, setOpen] = useState(false);
@@ -62,14 +89,19 @@ export const Modal = ({
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
               >
-                <Dialog.Content asChild forceMount>
+                <Dialog.Content
+                  asChild
+                  forceMount
+                  onInteractOutside={(event) =>
+                    handleInteractOutside(!!unclosable, event)
+                  }
+                >
                   <motion.div
-                    className={`${styles.modal_content_wrapper} ${
-                      bigModal ? styles.big_modal : ""
-                    } ${unforceWhite ? styles.white : ""}`}
-                    initial={{ opacity: 0, y: "-40%" }}
-                    animate={{ opacity: 1, y: "0%" }}
-                    exit={{ opacity: 0, y: "40%" }}
+                    {...handleModalContentAnimation(
+                      customIsOpen ?? isOpen,
+                      !!bigModal,
+                      !!unforceWhite
+                    )}
                   >
                     <Dialog.Title
                       className="m-0 text-2xl font-bold"
@@ -93,14 +125,16 @@ export const Modal = ({
                         </Button>
                       )}
                     </Dialog.Close>
-                    <Dialog.Close asChild>
-                      <button
-                        className={styles.close_button_wrapper}
-                        aria-label="Close"
-                      >
-                        <MdClose />
-                      </button>
-                    </Dialog.Close>
+                    {!unclosable && (
+                      <Dialog.Close asChild>
+                        <button
+                          className={styles.close_button_wrapper}
+                          aria-label="Close"
+                        >
+                          <MdClose />
+                        </button>
+                      </Dialog.Close>
+                    )}
                   </motion.div>
                 </Dialog.Content>
               </motion.div>

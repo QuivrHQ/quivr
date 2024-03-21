@@ -24,6 +24,8 @@
     box-shadow: BoxShadow.$medium;
     max-width: 90vw;
     overflow: scroll;
+    width: 35vw;
+    height: 80vh;
 
     &.big_modal {
       width: 40vw;
@@ -36,9 +38,7 @@
     }
 
     @media (max-width: ScreenSizes.$small) {
-      &.big_modal {
-        width: 90vw;
-      }
+      width: 90vw;
     }
 
     .close_button_wrapper {

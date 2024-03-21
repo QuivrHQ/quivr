@@ -27,9 +27,11 @@ import {
 } from "react-icons/fa";
 import { FaInfo } from "react-icons/fa6";
 import { FiUpload } from "react-icons/fi";
+import { HiBuildingOffice } from "react-icons/hi2";
 import {
   IoIosAdd,
   IoIosHelpCircleOutline,
+  IoIosRadio,
   IoMdClose,
   IoMdLogOut,
 } from "react-icons/io";
@@ -50,6 +52,7 @@ import {
   LuChevronLeft,
   LuChevronRight,
   LuCopy,
+  LuGoal,
   LuPlusCircle,
   LuSearch,
 } from "react-icons/lu";
@@ -63,6 +66,7 @@ import {
   MdOutlineModeEditOutline,
   MdUploadFile,
 } from "react-icons/md";
+import { PiOfficeChairFill } from "react-icons/pi";
 import { RiHashtag } from "react-icons/ri";
 import { SlOptions } from "react-icons/sl";
 import { TbNetwork } from "react-icons/tb";
@@ -73,6 +77,7 @@ export const iconList: { [name: string]: IconType } = {
   addWithoutCircle: IoIosAdd,
   brain: LuBrain,
   brainCircuit: LuBrainCircuit,
+  chair: PiOfficeChairFill,
   chat: BsChatLeftText,
   check: FaCheck,
   checkCircle: FaCheckCircle,
@@ -93,6 +98,7 @@ export const iconList: { [name: string]: IconType } = {
   flag: CiFlag1,
   followUp: IoArrowUpCircleOutline,
   github: FaGithub,
+  goal: LuGoal,
   graph: VscGraph,
   hashtag: RiHashtag,
   help: IoIosHelpCircleOutline,
@@ -105,10 +111,12 @@ export const iconList: { [name: string]: IconType } = {
   loader: AiOutlineLoading3Quarters,
   logout: IoMdLogOut,
   moon: FaMoon,
+  office: HiBuildingOffice,
   options: SlOptions,
   paragraph: BsTextParagraph,
   prompt: FaRegKeyboard,
   redirection: BsArrowRightShort,
+  radio: IoIosRadio,
   robot: LiaRobotSolid,
   search: LuSearch,
   settings: IoSettingsSharp,
