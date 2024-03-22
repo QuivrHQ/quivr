@@ -213,7 +213,7 @@ class UserUsage(Repository):
         model_settings_response = (self.db.from_("models").select("*").execute()).data
 
         if len(model_settings_response) == 0:
-            raise ValueError("An issue occured while fetching the model settings")
+            raise ValueError("An issue occurred while fetching the model settings")
 
         return model_settings_response
 
