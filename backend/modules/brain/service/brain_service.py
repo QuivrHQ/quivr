@@ -329,7 +329,6 @@ class BrainService:
             return None
 
         if brain.brain_type == BrainType.INTEGRATION:
-            print("BRAAAAAAIN", brain)
             brain.integration = (
                 self.integration_brains_repository.get_integration_brain(
                     brain_id, user_id
