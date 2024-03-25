@@ -334,12 +334,14 @@ class BrainService:
                     brain_id, user_id
                 )
             )
-            brain.integration_description = (
-                self.integration_description_repository.get_integration_description(
-                    brain.integration.integration_id
+            
+            if (brain.integration):
+                brain.integration_description = (
+                    self.integration_description_repository.get_integration_description(
+                        brain.integration.integration_id
+                    )
                 )
-            )
-            print('BRAIN', brain.integration)
+                
         return brain
 
     def get_connected_brains(self, brain_id: UUID) -> list[BrainEntity]:
