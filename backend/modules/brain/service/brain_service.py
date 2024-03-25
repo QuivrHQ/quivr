@@ -328,27 +328,10 @@ class BrainService:
         if brain == None:
             return None
 
-        if brain.brain_type == BrainType.API:
-            brain_definition = api_brain_definition_service.get_api_brain_definition(
-                brain_id
-            )
-            brain.brain_definition = brain_definition
-
-        if brain.brain_type == BrainType.COMPOSITE:
-            brain.connected_brains_ids = (
-                self.composite_brains_connections_repository.get_connected_brains(
-                    brain_id
-                )
-            )
         if brain.brain_type == BrainType.INTEGRATION:
             brain.integration = (
                 self.integration_brains_repository.get_integration_brain(
                     brain_id, user_id
-                )
-            )
-            brain.integration_description = (
-                self.integration_description_repository.get_integration_description(
-                    brain.integration.integration_id
                 )
             )
         return brain
