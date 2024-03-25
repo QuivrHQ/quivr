@@ -1,2 +1,2 @@
 export * from "./ChatItem";
-export * from "./QADisplay";
+export * from "./ChatItem/QADisplay";

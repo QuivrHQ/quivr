@@ -6,8 +6,13 @@ import "./styles.css";
 type QADisplayProps = {
   content: ChatMessage;
   index: number;
+  lastMessage?: boolean;
 };
-export const QADisplay = ({ content, index }: QADisplayProps): JSX.Element => {
+export const QADisplay = ({
+  content,
+  index,
+  lastMessage,
+}: QADisplayProps): JSX.Element => {
   const {
     assistant,
     message_id,
@@ -39,6 +44,7 @@ export const QADisplay = ({ content, index }: QADisplayProps): JSX.Element => {
         metadata={metadata} // eslint-disable-line @typescript-eslint/no-unsafe-assignment
         messageId={message_id}
         thumbs={thumbs}
+        lastMessage={lastMessage}
       />
     </>
   );
