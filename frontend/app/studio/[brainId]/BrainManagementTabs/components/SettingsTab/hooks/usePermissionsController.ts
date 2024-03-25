@@ -21,11 +21,10 @@ export const usePermissionsController = ({
     isUpdatingApiDefinition: boolean;
   }>();
 
-  const { hasEditRights, isOwnedByCurrentUser, isPublicBrain } =
-    getBrainPermissions({
-      brainId,
-      userAccessibleBrains: allBrains,
-    });
+  const { hasEditRights, isOwnedByCurrentUser } = getBrainPermissions({
+    brainId,
+    userAccessibleBrains: allBrains,
+  });
 
   useEffect(() => {
     setValue("isApiDefinitionReadOnly", !hasEditRights);
@@ -35,6 +34,5 @@ export const usePermissionsController = ({
   return {
     hasEditRights,
     isOwnedByCurrentUser,
-    isPublicBrain,
   };
 };
