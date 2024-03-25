@@ -58,9 +58,9 @@ class BrainService:
     def get_brain_by_id(self, brain_id: UUID):
         return self.brain_repository.get_brain_by_id(brain_id)
 
-    def get_integration_brain(self, brain_id, user_id) -> IntegrationEntity | None:
+    def get_integration_brain(self, brain_id) -> IntegrationEntity | None:
         return self.integration_brains_repository.get_integration_brain(
-            brain_id, user_id
+            brain_id
         )
 
     def find_brain_from_question(
@@ -323,7 +323,7 @@ class BrainService:
     def update_brain_last_update_time(self, brain_id: UUID):
         self.brain_repository.update_brain_last_update_time(brain_id)
 
-    def get_brain_details(self, brain_id: UUID, user_id: UUID) -> BrainEntity | None:
+    def get_brain_details(self, brain_id: UUID, user_id: UUID = None) -> BrainEntity | None:
         brain = self.brain_repository.get_brain_details(brain_id)
         if brain == None:
             return None
@@ -334,6 +334,14 @@ class BrainService:
                     brain_id, user_id
                 )
             )
+            
+            if (brain.integration):
+                brain.integration_description = (
+                    self.integration_description_repository.get_integration_description(
+                        brain.integration.integration_id
+                    )
+                )
+                
         return brain
 
     def get_connected_brains(self, brain_id: UUID) -> list[BrainEntity]:
