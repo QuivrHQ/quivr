@@ -5,10 +5,12 @@ import { useEffect } from "react";
 import { LuccidLogo } from "@/lib/assets/LuccidLogo";
 import { AddBrainModal } from "@/lib/components/AddBrainModal";
 import { useBrainCreationContext } from "@/lib/components/AddBrainModal/brainCreation-provider";
+import { OnboardingModal } from "@/lib/components/OnboardingModal/OnboardingModal";
 import PageHeader from "@/lib/components/PageHeader/PageHeader";
 import { UploadDocumentModal } from "@/lib/components/UploadDocumentModal/UploadDocumentModal";
 import { SearchBar } from "@/lib/components/ui/SearchBar/SearchBar";
 import { useSupabase } from "@/lib/context/SupabaseProvider";
+import { useUserSettingsContext } from "@/lib/context/UserSettingsProvider/hooks/useUserSettingsContext";
 import { redirectToLogin } from "@/lib/router/redirectToLogin";
 import { ButtonType } from "@/lib/types/QuivrButton";
 
@@ -18,6 +20,7 @@ const Search = (): JSX.Element => {
   const pathname = usePathname();
   const { session } = useSupabase();
   const { setIsBrainCreationModalOpened } = useBrainCreationContext();
+  const { isDarkMode } = useUserSettingsContext();
 
   useEffect(() => {
     if (session === null) {
@@ -64,6 +67,7 @@ const Search = (): JSX.Element => {
       </div>
       <UploadDocumentModal />
       <AddBrainModal />
+      <OnboardingModal />
     </div>
   );
 };

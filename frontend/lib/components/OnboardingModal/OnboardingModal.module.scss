@@ -1,0 +1,21 @@
+@use "@/styles/Spacings.module.scss";
+
+.modal_content_wrapper {
+  height: 100%;
+  padding: Spacings.$spacing05;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+
+  .form_wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: Spacings.$spacing05;
+  }
+
+  .button_wrapper {
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+  }
+}

@@ -22,6 +22,7 @@ export type ChatMessage = {
   metadata?: {
     sources?: Source[];
   };
+  thumbs?: boolean;
 };
 
 type NotificationStatus = "Pending" | "Done";

@@ -16,6 +16,7 @@ class GetChatHistoryOutput(BaseModel):
         None  # string because UUID is not JSON serializable
     )
     metadata: Optional[dict] | None = None
+    thumbs: Optional[bool] | None = None
 
     def dict(self, *args, **kwargs):
         chat_history = super().dict(*args, **kwargs)

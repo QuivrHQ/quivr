@@ -9,7 +9,7 @@ from modules.brain.entity.integration_brain import (
 
 class IntegrationBrainInterface(ABC):
     @abstractmethod
-    def get_integration_brain(self, brain_id: UUID, user_id: UUID) -> IntegrationEntity:
+    def get_integration_brain(self, brain_id: UUID) -> IntegrationEntity:
         """Get the integration brain entity
 
         Args:

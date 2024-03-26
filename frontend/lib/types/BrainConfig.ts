@@ -39,6 +39,9 @@ export type BrainConfig = {
 
 export const openAiFreeModels = [
   "gpt-3.5-turbo",
+  "mistral/mistral-small",
+  "mistral/mistral-medium",
+  "mistral/mistral-large-latest",
 ] as const;
 
 export const openAiPaidModels = [

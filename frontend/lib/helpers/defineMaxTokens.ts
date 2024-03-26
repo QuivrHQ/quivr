@@ -10,7 +10,13 @@ export const defineMaxTokens = (
     case "gpt-4":
       return 4000;
     case "gpt-4-turbo-preview":
-        return 4000;
+      return 4000;
+    case "mistral/mistral-small":
+      return 1000;
+    case "mistral/mistral-medium":
+      return 2000;
+    case "mistral/mistral-large-latest":
+      return 2000;
     default:
       return 1000;
   }

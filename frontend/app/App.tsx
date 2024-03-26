@@ -18,8 +18,10 @@ import {
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 import { ChatsProvider } from "@/lib/context/ChatsProvider";
 import { MenuProvider } from "@/lib/context/MenuProvider/Menu-provider";
+import { OnboardingProvider } from "@/lib/context/OnboardingProvider/Onboarding-provider";
 import { SearchModalProvider } from "@/lib/context/SearchModalProvider/search-modal-provider";
 import { useSupabase } from "@/lib/context/SupabaseProvider";
+import { UserSettingsProvider } from "@/lib/context/UserSettingsProvider/User-settings.provider";
 import { IntercomProvider } from "@/lib/helpers/intercom/IntercomProvider";
 import { UpdateMetadata } from "@/lib/helpers/updateMetadata";
 import { usePageTracking } from "@/services/analytics/june/usePageTracking";
@@ -90,19 +92,23 @@ const queryClient = new QueryClient();
 const AppWithQueryClient = ({ children }: PropsWithChildren): JSX.Element => {
   return (
     <QueryClientProvider client={queryClient}>
-      <BrainProvider>
-        <KnowledgeToFeedProvider>
-          <BrainCreationProvider>
-            <MenuProvider>
-              <ChatsProvider>
-                <ChatProvider>
-                  <App>{children}</App>
-                </ChatProvider>
-              </ChatsProvider>
-            </MenuProvider>
-          </BrainCreationProvider>
-        </KnowledgeToFeedProvider>
-      </BrainProvider>
+      <UserSettingsProvider>
+        <BrainProvider>
+          <KnowledgeToFeedProvider>
+            <BrainCreationProvider>
+              <MenuProvider>
+                <OnboardingProvider>
+                  <ChatsProvider>
+                    <ChatProvider>
+                      <App>{children}</App>
+                    </ChatProvider>
+                  </ChatsProvider>
+                </OnboardingProvider>
+              </MenuProvider>
+            </BrainCreationProvider>
+          </KnowledgeToFeedProvider>
+        </BrainProvider>
+      </UserSettingsProvider>
     </QueryClientProvider>
   );
 };

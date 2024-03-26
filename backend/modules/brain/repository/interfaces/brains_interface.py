@@ -21,7 +21,7 @@ class BrainsInterface(ABC):
         pass
 
     @abstractmethod
-    def get_brain_details(self, brain_id: UUID) -> BrainEntity | None:
+    def get_brain_details(self, brain_id: UUID, user_id: UUID) -> BrainEntity | None:
         """
         Get all public brains
         """

@@ -1,4 +1,3 @@
-@use "@/styles/Colors.module.scss";
 @use "@/styles/Radius.module.scss";
 @use "@/styles/Spacings.module.scss";
 @use "@/styles/Typography.module.scss";
@@ -11,7 +10,7 @@
   gap: Spacings.$spacing03;
   overflow: hidden;
   height: 100%;
-  border: 1px solid Colors.$lightest-black;
+  border: 1px solid var(--border-1);
   border-radius: Radius.$big;
 
   .title_wrapper {

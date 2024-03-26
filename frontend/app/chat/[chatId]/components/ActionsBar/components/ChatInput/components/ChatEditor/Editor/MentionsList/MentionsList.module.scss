@@ -1,13 +1,13 @@
-@use "@/styles/Colors.module.scss";
+@use "@/styles/BoxShadow.module.scss";
 @use "@/styles/Radius.module.scss";
 @use "@/styles/Spacings.module.scss";
 
 .mentions_list_wrapper {
   display: flex;
-  background-color: Colors.$white;
+  background-color: var(--background-0);
   flex-direction: column;
   padding: Spacings.$spacing03;
-  box-shadow: 0 1px 2px rgb(0, 0, 0, 0.25);
+  box-shadow: BoxShadow.$small;
   border-radius: Radius.$normal;
   gap: Spacings.$spacing03;
   max-width: 300px;

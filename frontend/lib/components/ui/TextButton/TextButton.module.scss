@@ -1,4 +1,3 @@
-@use "@/styles/Colors.module.scss";
 @use "@/styles/Spacings.module.scss";
 
 .text_button_wrapper {
@@ -10,17 +9,17 @@
 }
 
 .black {
-  color: Colors.$black;
+  color: var(--text-3);
 
   &.hovered {
-    color: Colors.$primary;
+    color: var(--primary-0);
   }
 }
 
 .dangerous {
-  color: Colors.$dangerous;
+  color: var(--dangerous);
 
   &.hovered {
-    color: Colors.$dangerous-dark;
+    color: var(--dangerous)-dark;
   }
 }

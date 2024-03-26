@@ -7,6 +7,7 @@ from logger import get_logger
 from modules.brain.service.brain_service import BrainService
 from modules.chat.dto.chats import ChatItem
 from modules.chat.dto.inputs import (
+    ChatMessageProperties,
     ChatUpdatableProperties,
     CreateChatHistory,
     CreateChatProperties,
@@ -102,6 +103,7 @@ class ChatService:
                         brain_id=str(brain.id) if brain else None,
                         prompt_title=prompt.title if prompt else None,
                         metadata=message.metadata,
+                        thumbs=message.thumbs,
                     )
                 )
             return enriched_history
@@ -190,6 +192,17 @@ class ChatService:
             pass
         try:
             self.repository.delete_chat(chat_id)
+        except Exception as e:
+            print(e)
+            pass
+
+    def update_chat_message(
+        self, chat_id, message_id, chat_message_properties: ChatMessageProperties
+    ):
+        try:
+            return self.repository.update_chat_message(
+                chat_id, message_id, chat_message_properties
+            ).data
         except Exception as e:
             print(e)
             pass

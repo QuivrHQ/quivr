@@ -1,11 +1,10 @@
-@use "@/styles/Colors.module.scss";
 @use "@/styles/Radius.module.scss";
 @use "@/styles/Spacings.module.scss";
 @use "@/styles/Typography.module.scss";
 @use "@/styles/ZIndexes.module.scss";
 
 .thread_item_wrapper {
-  color: Colors.$black;
+  color: var(--text-3);
   display: flex;
   justify-content: space-between;
   gap: Spacings.$spacing03;
@@ -15,13 +14,13 @@
   .edit_thread_name {
     @include Typography.EllipsisOverflow;
 
-    color: Colors.$black;
+    color: var(--text-3);
     border: none;
     height: 21px;
     outline: none;
     padding: 0;
     font-size: Typography.$small;
-    background-color: Colors.$lighter-grey;
+    background-color: var(--background-3);
     border-radius: Radius.$small;
 
     &:focus {
@@ -33,7 +32,7 @@
     @include Typography.EllipsisOverflow;
 
     &:hover {
-      color: Colors.$primary;
+      color: var(--primary-0);
     }
   }
 

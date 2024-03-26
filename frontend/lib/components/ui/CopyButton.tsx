@@ -1,12 +1,17 @@
 import { useEffect, useState } from "react";
 
 import Icon from "@/lib/components/ui/Icon/Icon";
+import { IconSize } from "@/lib/types/Icons";
 
 type CopyButtonProps = {
   handleCopy: () => void;
+  size: IconSize;
 };
 
-export const CopyButton = ({ handleCopy }: CopyButtonProps): JSX.Element => {
+export const CopyButton = ({
+  handleCopy,
+  size,
+}: CopyButtonProps): JSX.Element => {
   const [isCopied, setIsCopied] = useState(false);
 
   const handleClick = () => {
@@ -35,7 +40,7 @@ export const CopyButton = ({ handleCopy }: CopyButtonProps): JSX.Element => {
       <Icon
         name={isCopied ? "checkCircle" : "copy"}
         color={isCopied ? "primary" : "black"}
-        size="small"
+        size={size}
         handleHover={true}
       />
     </button>

@@ -3,7 +3,6 @@ from typing import AsyncIterable
 from uuid import UUID
 
 from langchain.chains import ConversationalRetrievalChain, LLMChain
-from langchain.chains.conversational_retrieval.prompts import CONDENSE_QUESTION_PROMPT
 from langchain.chains.question_answering import load_qa_chain
 from langchain_community.chat_models import ChatLiteLLM
 from langchain_core.prompts.chat import (
@@ -36,7 +35,7 @@ class BigBrain(KnowledgeBrainQA):
 
     def get_chain(self):
         system_template = """Combine these summaries in a way that makes sense and answer the user's question.
-        Use markdown or any other techniques to display the content in a nice and aerated way.
+        Use markdown or any other techniques to display the content in a nice and aerated way. Answer in the language of the question.
         Here are user instructions on how to respond: {custom_personality}
         ______________________
         {summaries}"""
@@ -48,7 +47,7 @@ class BigBrain(KnowledgeBrainQA):
 
         ### Question prompt
         question_prompt_template = """Use the following portion of a long document to see if any of the text is relevant to answer the question. 
-        Return any relevant text verbatim.
+        Return any relevant text verbatim. Return the answer in the same language as the question. If the answer is not in the text, just say nothing in the same language as the question.
         {context}
         Question: {question}
         Relevant text, if any, else say Nothing:"""
@@ -56,11 +55,26 @@ class BigBrain(KnowledgeBrainQA):
             template=question_prompt_template, input_variables=["context", "question"]
         )
 
+        ### Condense Question Prompt
+
+        _template = """Given the following conversation and a follow up question, rephrase the follow up question to be a standalone question in exactly the same language as the original question.
+
+        Chat History:
+        {chat_history}
+        Follow Up Input: {question}
+        Standalone question in same language as question:"""
+        CONDENSE_QUESTION_PROMPT = PromptTemplate.from_template(_template)
+
         api_base = None
         if self.brain_settings.ollama_api_base_url and self.model.startswith("ollama"):
             api_base = self.brain_settings.ollama_api_base_url
 
-        llm = ChatLiteLLM(temperature=0, model=self.model, api_base=api_base)
+        llm = ChatLiteLLM(
+            temperature=0,
+            model=self.model,
+            api_base=api_base,
+            max_tokens=self.max_tokens,
+        )
 
         retriever_doc = self.knowledge_qa.get_retriever()
 
