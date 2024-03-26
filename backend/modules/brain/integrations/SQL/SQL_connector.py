@@ -26,7 +26,7 @@ class SQLConnector(IntegrationBrain):
     def _load_credentials(self) -> dict[str, str]:
         """Load the Notion credentials"""
         self.integration_details = self.get_integration_brain(
-            self.brain_id, self.user_id
+            self.brain_id
         )
         if self.credentials is None:
             logger.info("Loading Notion credentials")
