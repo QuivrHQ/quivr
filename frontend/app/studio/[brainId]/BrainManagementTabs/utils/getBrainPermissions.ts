@@ -14,7 +14,6 @@ export const getBrainPermissions = ({
   brainId,
   userAccessibleBrains,
 }: GetBrainPermissionsProps): {
-  isPublicBrain: boolean;
   hasEditRights: boolean;
   isOwnedByCurrentUser: boolean;
 } => {
@@ -28,11 +27,10 @@ export const getBrainPermissions = ({
     userAccessibleBrains,
   });
 
-  const isPublicBrain =
-    userAccessibleBrains.find((brain) => brain.id === brainId)?.status ===
-    "public";
-
   const hasEditRights = isOwnedByCurrentUser || userHasBrainEditorRights;
 
-  return { isPublicBrain, hasEditRights, isOwnedByCurrentUser };
+  return {
+    hasEditRights,
+    isOwnedByCurrentUser,
+  };
 };
