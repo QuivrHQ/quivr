@@ -10,7 +10,6 @@ import PageHeader from "@/lib/components/PageHeader/PageHeader";
 import { UploadDocumentModal } from "@/lib/components/UploadDocumentModal/UploadDocumentModal";
 import { SearchBar } from "@/lib/components/ui/SearchBar/SearchBar";
 import { useSupabase } from "@/lib/context/SupabaseProvider";
-import { useUserSettingsContext } from "@/lib/context/UserSettingsProvider/hooks/useUserSettingsContext";
 import { redirectToLogin } from "@/lib/router/redirectToLogin";
 import { ButtonType } from "@/lib/types/QuivrButton";
 
@@ -20,7 +19,6 @@ const Search = (): JSX.Element => {
   const pathname = usePathname();
   const { session } = useSupabase();
   const { setIsBrainCreationModalOpened } = useBrainCreationContext();
-  const { isDarkMode } = useUserSettingsContext();
 
   useEffect(() => {
     if (session === null) {
