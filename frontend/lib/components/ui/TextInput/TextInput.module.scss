@@ -1,17 +1,16 @@
-@use "@/styles/Colors.module.scss";
 @use "@/styles/Radius.module.scss";
 @use "@/styles/Spacings.module.scss";
 
 .text_input_container {
   display: flex;
-  border: 1px solid Colors.$lighter-grey;
+  border: 1px solid var(--border-0);
   gap: Spacings.$spacing03;
   padding-block: Spacings.$spacing02;
   padding-inline: Spacings.$spacing03;
   border-radius: Radius.$big;
   align-items: center;
   width: 100%;
-  background-color: Colors.$white;
+  background-color: var(--background-0);
 
   &.simple {
     border: none;
@@ -30,7 +29,7 @@
   }
 
   .text_input {
-    caret-color: Colors.$accent;
+    caret-color: var(--accent);
     border: none;
     flex: 1;
     background-color: transparent;

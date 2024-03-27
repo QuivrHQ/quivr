@@ -1,4 +1,3 @@
-@use "@/styles/Colors.module.scss";
 @use "@/styles/Radius.module.scss";
 @use "@/styles/ScreenSizes.module.scss";
 @use "@/styles/Spacings.module.scss";
@@ -40,6 +39,10 @@
         cursor: pointer;
         width: 120px;
 
+        .dark_image {
+          filter: invert(100%);
+        }
+
         .brain_title {
           font-size: Typography.$medium;
           font-weight: 500;
@@ -47,11 +50,11 @@
 
         &:hover,
         &.selected {
-          border-color: Colors.$primary;
-          background-color: Colors.$primary-lightest;
+          border-color: var(--primary-0);
+          background-color: var(--background-special-0);
 
           .brain_title {
-            color: Colors.$primary;
+            color: var(--primary-0);
           }
         }
       }

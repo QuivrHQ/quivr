@@ -1,3 +1,4 @@
+@use "@/styles/Colors.module.scss";
 @use "@/styles/Spacings.module.scss";
 
 .field_header_wrapper {
@@ -6,4 +7,8 @@
   font-weight: 500;
   align-items: center;
   padding-bottom: Spacings.$spacing02;
+
+  .mandatory {
+    color: Colors.$dangerous;
+  }
 }

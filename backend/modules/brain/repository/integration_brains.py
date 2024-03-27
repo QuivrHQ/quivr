@@ -33,14 +33,18 @@ class IntegrationBrain(IntegrationBrainInterface):
     def __init__(self):
         self.db = get_supabase_client()
 
-    def get_integration_brain(self, brain_id, user_id):
-        response = (
+    def get_integration_brain(self, brain_id, user_id = None):
+        query = (
             self.db.table("integrations_user")
             .select("*")
             .filter("brain_id", "eq", brain_id)
-            .filter("user_id", "eq", user_id)
-            .execute()
         )
+
+        if user_id:
+            query.filter("user_id", "eq", user_id)
+
+        response = query.execute()
+
         if len(response.data) == 0:
             return None
 

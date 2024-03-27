@@ -1,4 +1,4 @@
-@use "@/styles/Colors.module.scss";
+@use "@/styles/Radius.module.scss";
 @use "@/styles/Spacings.module.scss";
 @use "@/styles/Typography.module.scss";
 
@@ -6,8 +6,12 @@
   display: flex;
   align-items: center;
   gap: Spacings.$spacing02;
-  color: Colors.$black;
+  color: var(--text-3);
   overflow: hidden;
+
+  .dark_image {
+    filter: invert(100%);
+  }
 
   .brain_name {
     @include Typography.EllipsisOverflow;

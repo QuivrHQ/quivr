@@ -1,13 +1,12 @@
-@use "@/styles/Colors.module.scss";
 @use "@/styles/Spacings.module.scss";
 @use "@/styles/Typography.module.scss";
 
 .current_brain_wrapper {
-  background-color: Colors.$lightest-grey;
+  background-color: var(--background-2);
   padding-inline: Spacings.$spacing05;
   padding-block: Spacings.$spacing01;
   font-size: Typography.$small;
-  color: Colors.$normal-grey;
+  color: var(--text-1);
 
   .brain_infos {
     display: flex;
@@ -31,8 +30,12 @@
         align-items: center;
         overflow: hidden;
 
+        .dark_image {
+          filter: invert(100%);
+        }
+
         .brain_name {
-          color: Colors.$black;
+          color: var(--text-3);
           @include Typography.EllipsisOverflow;
         }
       }

@@ -1,4 +1,3 @@
-@use "@/styles/Colors.module.scss";
 @use "@/styles/IconSizes.module.scss";
 @use "@/styles/Radius.module.scss";
 @use "@/styles/ScreenSizes.module.scss";
@@ -17,7 +16,7 @@
   }
 
   .search_page_container {
-    background-color: Colors.$white;
+    background-color: var(--background-0);
     width: 100%;
     height: 100%;
     display: flex;
@@ -48,14 +47,14 @@
           @include Typography.Big;
 
           .quivr_text_primary {
-            color: Colors.$primary;
+            color: var(--primary-0);
           }
         }
       }
     }
 
     .shortcuts_card_wrapper {
-      background-color: Colors.$lightest-grey;
+      background-color: var(--background-2);
       padding: Spacings.$spacing05;
       gap: Spacings.$spacing03;
       border-radius: Radius.$big;
@@ -66,7 +65,7 @@
         gap: Spacings.$spacing02;
 
         .shortcut {
-          color: Colors.$primary;
+          color: var(--primary-0);
         }
       }
     }

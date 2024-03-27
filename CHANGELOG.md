@@ -1,5 +1,52 @@
 # Changelog
 
+## 0.0.226 (2024-03-21)
+
+## What's Changed
+* feat: Add Mistral models to defineMaxTokens and BrainConfig by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2363
+* feat: mistral by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2365
+* fix(retriever): Update match_vectors sql function to rank chunks in correct order by @dmourot in https://github.com/QuivrHQ/quivr/pull/2367
+* feat(docker image): Docker image Optimized for CPU-only env by @dmourot in https://github.com/QuivrHQ/quivr/pull/2368
+* feat(frontend): dark mode by @Zewed in https://github.com/QuivrHQ/quivr/pull/2369
+* feat(frontend & backend): thumbs for message feedback by @Zewed in https://github.com/QuivrHQ/quivr/pull/2360
+* fix(backend): migration legacy by @Zewed in https://github.com/QuivrHQ/quivr/pull/2370
+* fix(frontend): type stripe casing by @Zewed in https://github.com/QuivrHQ/quivr/pull/2371
+* fix(backend): unsubscribe from brain by @Zewed in https://github.com/QuivrHQ/quivr/pull/2373
+* feat(frontend): onboarding form by @Zewed in https://github.com/QuivrHQ/quivr/pull/2342
+* fix(frontend): onBoarding issue by @Zewed in https://github.com/QuivrHQ/quivr/pull/2374
+
+## New Contributors
+* @dmourot made their first contribution in https://github.com/QuivrHQ/quivr/pull/2367
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.225...v0.0.226
+
+## 0.0.225 (2024-03-15)
+
+## What's Changed
+* fix(frontend): bigger icon on message row by @Zewed in https://github.com/QuivrHQ/quivr/pull/2345
+* fix(frontend): remove brains usage in user page by @Zewed in https://github.com/QuivrHQ/quivr/pull/2349
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.224...v0.0.225
+
+## 0.0.224 (2024-03-15)
+
+## What's Changed
+* feat(frontend): add discord link by @Zewed in https://github.com/QuivrHQ/quivr/pull/2343
+* fix(frontend): upgrade to plus  by @Zewed in https://github.com/QuivrHQ/quivr/pull/2346
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.223...v0.0.224
+
+## 0.0.223 (2024-03-13)
+
+## What's Changed
+* chore: update packages backend by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2339
+* feat: Add optional fields to UserIdentity and UserUpdatableProperties by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2341
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.222...v0.0.223
+
 ## 0.0.222 (2024-03-09)
 
 ## What's Changed

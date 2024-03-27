@@ -1,10 +1,9 @@
-@use "@/styles/Colors.module.scss";
 @use "@/styles/Spacings.module.scss";
 @use "@/styles/ZIndexes.module.scss";
 
 .menu_container {
-  background-color: Colors.$highlight;
-  border-right: 1px solid Colors.$lightest-black;
+  background-color: var(--background-1);
+  border-right: 1px solid var(--border-1);
 
   .menu_wrapper {
     padding-top: Spacings.$spacing05;
@@ -37,7 +36,7 @@
 
     .social_buttons_wrapper {
       padding-block: Spacings.$spacing04;
-      border-top: 1px solid Colors.$lightest-black;
+      border-top: 1px solid var(--border-1);
     }
   }
 }

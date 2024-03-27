@@ -1,4 +1,4 @@
-@use "@/styles/Colors.module.scss";
+@use "@/styles/BoxShadow.module.scss";
 @use "@/styles/IconSizes.module.scss";
 @use "@/styles/Radius.module.scss";
 @use "@/styles/Spacings.module.scss";
@@ -8,11 +8,11 @@
   padding: Spacings.$spacing03;
   justify-content: space-between;
   align-items: center;
-  border: 1px solid Colors.$lighter-grey;
+  border: 1px solid var(--border-0);
   border-radius: Radius.$big;
-  background-color: Colors.$white;
+  background-color: var(--background-0);
   cursor: pointer;
-  color: Colors.$dark-grey;
+  color: var(--text-2);
   transition: box-shadow 0.3s ease;
 
   .left_wrapper {
@@ -30,7 +30,7 @@
         align-items: center;
         justify-content: center;
         font-size: 12px;
-        border: 1px solid Colors.$lighter-grey;
+        border: 1px solid var(--border-0);
         border-radius: Radius.$small;
         width: 16px;
         height: 16px;
@@ -39,7 +39,7 @@
   }
 
   &:hover {
-    border-color: Colors.$primary;
-    box-shadow: 0 0 0 1px Colors.$primary;
+    border-color: var(--primary-0);
+    box-shadow: BoxShadow.$primary;
   }
 }

@@ -7,12 +7,14 @@ import {
 import {
   addQuestion,
   AddQuestionParams,
+  ChatMessageUpdatableProperties,
   ChatUpdatableProperties,
   createChat,
   deleteChat,
   getChatItems,
   getChats,
   updateChat,
+  updateChatMessage,
 } from "./chat";
 
 // TODO: split './chat.ts' into multiple files, per function for example
@@ -33,5 +35,10 @@ export const useChatApi = () => {
       chatId: string,
       questionAndAnswer: QuestionAndAnwser
     ) => addQuestionAndAnswer(chatId, questionAndAnswer, axiosInstance),
+    updateChatMessage: async (
+      chatId: string,
+      messageId: string,
+      props: ChatMessageUpdatableProperties
+    ) => updateChatMessage(chatId, messageId, props, axiosInstance),
   };
 };

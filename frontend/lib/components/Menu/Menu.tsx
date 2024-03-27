@@ -47,9 +47,7 @@ export const Menu = (): JSX.Element => {
               className={styles.quivr_logo_wrapper}
               onClick={() => router.push("/search")}
             >
-              <LuccidLogo
-                size={50}
-              />
+              <LuccidLogo size={50} />
             </div>
 
             <div className={styles.buttons_wrapper}>

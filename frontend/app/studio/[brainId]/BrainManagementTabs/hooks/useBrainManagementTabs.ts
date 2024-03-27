@@ -34,11 +34,10 @@ export const useBrainManagementTabs = (customBrainId?: UUID) => {
   const { t } = useTranslation(["delete_or_unsubscribe_from_brain"]);
   const brainId = customBrainId ?? (params?.brainId as UUID | undefined);
 
-  const { hasEditRights, isOwnedByCurrentUser, isPublicBrain } =
-    getBrainPermissions({
-      brainId,
-      userAccessibleBrains: allBrains,
-    });
+  const { hasEditRights, isOwnedByCurrentUser } = getBrainPermissions({
+    brainId,
+    userAccessibleBrains: allBrains,
+  });
 
   const handleUnSubscription = async () => {
     if (brainId === undefined) {
@@ -87,6 +86,5 @@ export const useBrainManagementTabs = (customBrainId?: UUID) => {
     hasEditRights,
     isOwnedByCurrentUser,
     isDeleteOrUnsubscribeRequestPending,
-    isPublicBrain,
   };
 };

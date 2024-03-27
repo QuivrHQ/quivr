@@ -30,6 +30,13 @@ export const SocialsButtons = (): JSX.Element => {
         handleHover={true}
         onClick={() => handleClick("https://twitter.com/quivr_brain")}
       />
+      <Icon
+        name="discord"
+        color="black"
+        size="small"
+        handleHover={true}
+        onClick={() => handleClick("https://discord.gg/HUpRgp2HG8")}
+      />
     </div>
   );
 };
