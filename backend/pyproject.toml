@@ -1,0 +1,69 @@
+[tool.poetry]
+name = "Quivr"
+version = "0.0.203"
+description = "Open-source chat powered Second brain"
+authors = ["Stan Girard <stan@quivr.app"]
+license = "Apache 2.0"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = ">=3.10,<3.12"
+langchain = "*"
+litellm = "^1.26.0"
+openai = "^1.12.0"
+supabase = "^2.3.5"
+tiktoken = "^0.6.0"
+fastapi = "^0.109.2"
+python-multipart = "^0.0.9"
+uvicorn = "^0.27.1"
+asyncpg = "^0.29.0"
+flake8 = "^7.0.0"
+flake8-black = "^0.3.6"
+pyright = "^1.1.350"
+resend = "^0.7.2"
+redis = "^5.0.1"
+python-dotenv = "^1.0.1"
+pytest-mock = "^3.12.0"
+pytest-celery = "^0.0.0"
+boto3 = "^1.34.45"
+botocore = "^1.34.45"
+flower = "^2.0.1"
+jq = "^1.6.0"
+pytest = "^8.0.1"
+pydantic= "^2.0.0"
+watchdog = "^4.0.0"
+langchain-community = "^0.0.21"
+langchain-openai = "^0.0.6"
+pydantic-settings = "^2.2.1"
+langfuse = "^2.13.4"
+psycopg2-binary = "^2.9.9"
+colorlog = "^6.8.2"
+nest-asyncio = "^1.6.0"
+python-jose = "^3.3.0"
+async-generator = "^1.10"
+posthog = "^3.4.1"
+sentry-sdk = {extras = ["fastapi"], version = "^1.40.5"}
+celery = {extras = ["sqs"], version = "^5.3.6"}
+
+[tool.poetry.group.dev.dependencies]
+black = "^24.2.0"
+
+
+[tool.poetry.group.worker.dependencies]
+gitpython = "^3.1.42"
+pdf2image = "^1.17.0"
+pypdf = "^4.0.2"
+pypandoc = "^1.13"
+docx2txt = "^0.8"
+async-generator = "^1.10"
+pytesseract = "^0.3.10"
+xlrd = "^2.0.1"
+newspaper3k = "^0.2.8"
+beautifulsoup4 = "^4.12.3"
+html5lib = "^1.1"
+unstructured = {extras = ["all-docs"], version = "^0.12.4"}
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

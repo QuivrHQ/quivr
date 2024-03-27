@@ -13,13 +13,23 @@ RUN apt-get update && apt-get install -y \
     pandoc \
     curl \
     git \
+    poppler-utils \
+    tesseract-ocr \
     autoconf \
     automake \
     build-essential \
     libtool \
     python-dev \
     build-essential \
-    && curl -sSL https://install.python-poetry.org | python3 - && \
+    # Additional dependencies for document handling
+    libmagic-dev \
+    poppler-utils \
+    tesseract-ocr \
+    libreoffice \
+    libpq-dev \
+    gcc \
+    pandoc && \
+    curl -sSL https://install.python-poetry.org | python3 - && \
     rm -rf /var/lib/apt/lists/* && apt-get clean
 
 # Add Rust and Poetry binaries to the PATH
@@ -32,7 +42,7 @@ COPY pyproject.toml poetry.lock* ./
 
 # Disable virtualenv creation by Poetry and install dependencies
 RUN poetry config virtualenvs.create false && \
-    poetry install --without worker --no-interaction --no-ansi 
+    poetry install --no-interaction --no-ansi --with main,worker
 
 # Copy the rest of the application
 COPY . .
