@@ -18,12 +18,10 @@ export const UserSettingsProvider = ({
 }): JSX.Element => {
   const [isDarkMode, setIsDarkMode] = useState<boolean>(() => {
     if (typeof window !== "undefined") {
-      const localIsDarkMode = localStorage.getItem("isDarkMode");
-
-      return parseBoolean(localIsDarkMode);
+      return true;
     }
 
-    return false;
+    return true;
   });
 
   useEffect(() => {
