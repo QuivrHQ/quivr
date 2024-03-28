@@ -27,7 +27,11 @@
     width: 35vw;
     height: 80vh;
 
-    &.big_modal {
+    &.auto {
+      height: auto;
+    }
+
+    &.big {
       width: 40vw;
       height: 90vh;
     }
