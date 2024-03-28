@@ -42,7 +42,7 @@
     }
 
     @media (max-width: ScreenSizes.$small) {
-      width: 90vw;
+      min-width: 90vw;
     }
 
     .close_button_wrapper {
