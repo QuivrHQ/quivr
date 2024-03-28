@@ -52,6 +52,7 @@ const UserPage = (): JSX.Element => {
       <Modal
         isOpen={isLogoutModalOpened}
         setOpen={setIsLogoutModalOpened}
+        size="auto"
         CloseTrigger={<div />}
       >
         <div className="text-center flex flex-col items-center gap-5">

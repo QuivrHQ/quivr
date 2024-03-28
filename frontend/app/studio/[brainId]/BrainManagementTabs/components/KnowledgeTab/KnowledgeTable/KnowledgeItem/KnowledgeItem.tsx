@@ -91,13 +91,15 @@ const KnowledgeItem = ({
   return (
     <div className={styles.knowledge_item_wrapper}>
       <div className={styles.left}>
+        <div className={styles.icon}>
+          {isUploadedKnowledge(knowledge) ? (
+            getFileIcon(knowledge.fileName)
+          ) : (
+            <Icon name="link" size="normal" color="black" />
+          )}
+        </div>
         {isUploadedKnowledge(knowledge) ? (
-          getFileIcon(knowledge.fileName)
-        ) : (
-          <Icon name="link" size="normal" color="black" />
-        )}
-        {isUploadedKnowledge(knowledge) ? (
-          <span>{knowledge.fileName}</span>
+          <span className={styles.file_name}>{knowledge.fileName}</span>
         ) : (
           <a href={knowledge.url} target="_blank" rel="noopener noreferrer">
             {knowledge.url}
