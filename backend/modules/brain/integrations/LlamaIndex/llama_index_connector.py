@@ -1,10 +1,8 @@
 import os
 import tempfile
-import time
 from io import BytesIO
 from typing import Any, List
 
-import requests
 from celery_config import celery
 from fastapi import UploadFile
 from logger import get_logger
@@ -15,7 +13,6 @@ from modules.knowledge.repository.knowledge_interface import KnowledgeInterface
 from modules.knowledge.service.knowledge_service import KnowledgeService
 from pydantic import BaseModel
 from repository.files.upload_file import upload_file_storage
-from LlamaIndex_connector
 
 logger = get_logger(__name__)
 
@@ -75,161 +72,6 @@ class LlamaIndexConnector(IntegrationBrain, Integration):
             "Content-Type": "application/json",
             "Notion-Version": "2022-06-28",
         }
-
-    def _search_notion(self, query_dict: dict[str, Any]) -> NotionSearchResponse:
-        """
-        Search for pages from a Notion database.
-        """
-        # Use self.credentials to authenticate the request
-        headers = self._headers()
-        res = requests.post(
-            "https://api.notion.com/v1/search",
-            headers=headers,
-            json=query_dict,
-            # Adjust the timeout as needed
-            timeout=10,
-        )
-        res.raise_for_status()
-        return NotionSearchResponse(**res.json())
-
-    def _fetch_blocks(self, page_id: str, cursor: str | None = None) -> dict[str, Any]:
-        """
-        Fetch the blocks of a Notion page.
-        """
-        logger.info(f"Fetching blocks for page: {page_id}")
-        headers = self._headers()
-        query_params = None if not cursor else {"start_cursor": cursor}
-        res = requests.get(
-            f"https://api.notion.com/v1/blocks/{page_id}/children",
-            params=query_params,
-            headers=headers,
-            timeout=10,
-        )
-        res.raise_for_status()
-        return res.json()
-
-    def _fetch_page(self, page_id: str) -> dict[str, Any]:
-        """
-        Fetch a Notion page.
-        """
-        logger.info(f"Fetching page: {page_id}")
-        headers = self._headers()
-        block_url = f"https://api.notion.com/v1/pages/{page_id}"
-        res = requests.get(
-            block_url,
-            headers=headers,
-            timeout=10,
-        )
-        try:
-            res.raise_for_status()
-        except Exception:
-            logger.exception(f"Error fetching page - {res.json()}")
-            return None
-        return NotionPage(**res.json())
-
-    def _read_blocks(
-        self, page_block_id: str
-    ) -> tuple[list[tuple[str, str]], list[str]]:
-        """Reads blocks for a page"""
-        result_lines: list[tuple[str, str]] = []
-        child_pages: list[str] = []
-        cursor = None
-        while True:
-            data = self._fetch_blocks(page_block_id, cursor)
-
-            for result in data["results"]:
-                result_block_id = result["id"]
-                result_type = result["type"]
-                result_obj = result[result_type]
-
-                cur_result_text_arr = []
-                if "rich_text" in result_obj:
-                    for rich_text in result_obj["rich_text"]:
-                        # skip if doesn't have text object
-                        if "text" in rich_text:
-                            text = rich_text["text"]["content"]
-                            cur_result_text_arr.append(text)
-
-                if result["has_children"]:
-                    if result_type == "child_page":
-                        child_pages.append(result_block_id)
-                    else:
-                        logger.info(f"Entering sub-block: {result_block_id}")
-                        subblock_result_lines, subblock_child_pages = self._read_blocks(
-                            result_block_id
-                        )
-                        logger.info(f"Finished sub-block: {result_block_id}")
-                        result_lines.extend(subblock_result_lines)
-                        child_pages.extend(subblock_child_pages)
-
-                # if result_type == "child_database" and self.recursive_index_enabled:
-                #     child_pages.extend(self._read_pages_from_database(result_block_id))
-
-                cur_result_text = "\n".join(cur_result_text_arr)
-                if cur_result_text:
-                    result_lines.append((cur_result_text, result_block_id))
-
-            if data["next_cursor"] is None:
-                break
-
-            cursor = data["next_cursor"]
-
-        return result_lines, child_pages
-
-    def _read_page_title(self, page: NotionPage) -> str:
-        """Extracts the title from a Notion page"""
-        page_title = None
-        for _, prop in page.properties.items():
-            if prop["type"] == "title" and len(prop["title"]) > 0:
-                page_title = " ".join([t["plain_text"] for t in prop["title"]]).strip()
-                break
-        if page_title is None:
-            page_title = f"Untitled Page [{page.id}]"
-        page_title = "".join(e for e in page_title if e.isalnum())
-        return page_title
-
-    def _read_page_url(self, page: NotionPage) -> str:
-        """Extracts the URL from a Notion page"""
-        return page.url
-
-    def _read_pages_from_database(self, database_id: str) -> list[str]:
-        """Reads pages from a Notion database"""
-        headers = self._headers()
-        res = requests.post(
-            f"https://api.notion.com/v1/databases/{database_id}/query",
-            headers=headers,
-            timeout=10,
-        )
-        res.raise_for_status()
-        return [page["id"] for page in res.json()["results"]]
-
-    def _read_page(self, page_id: str) -> tuple[str, list[str]]:
-        """Reads a Notion page"""
-        page = self._fetch_page(page_id)
-        if page is None:
-            return None, None, None, None
-        page_title = self._read_page_title(page)
-        page_content, child_pages = self._read_blocks(page_id)
-        page_url = self._read_page_url(page)
-        return page_title, page_content, child_pages, page_url
-
-    def _filter_pages_by_time(
-        self,
-        pages: list[dict[str, Any]],
-        start: str,
-        filter_field: str = "last_edited_time",
-    ) -> list[NotionPage]:
-        filtered_pages: list[NotionPage] = []
-        start_time = time.mktime(
-            time.strptime(start, "%Y-%m-%dT%H:%M:%S.%f%z")
-        )  # Convert `start` to a float
-        for page in pages:
-            compare_time = time.mktime(
-                time.strptime(page[filter_field], "%Y-%m-%dT%H:%M:%S.%f%z")
-            )
-            if compare_time > start_time:  # Compare `compare_time` with `start_time`
-                filtered_pages += [NotionPage(**page)]
-        return filtered_pages
 
     def get_all_pages(self) -> list[NotionPage]:
         """

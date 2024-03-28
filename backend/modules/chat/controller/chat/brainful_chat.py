@@ -5,7 +5,7 @@ from modules.brain.integrations.Big.Brain import BigBrain
 from modules.brain.integrations.GPT4.Brain import GPT4Brain
 from modules.brain.integrations.Notion.Brain import NotionBrain
 from modules.brain.integrations.SQL.Brain import SQLBrain
-from modules.brain.integrations.LlamaIndex.Brain import LlamaIndexBrain
+from modules.brain.integrations.LlamaIndex.brain import LlamaIndexBrain
 from modules.brain.knowledge_brain_qa import KnowledgeBrainQA
 from modules.brain.service.api_brain_definition_service import ApiBrainDefinitionService
 from modules.brain.service.brain_authorization_service import (

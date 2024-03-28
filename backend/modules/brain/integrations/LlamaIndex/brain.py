@@ -2,7 +2,7 @@ from modules.brain.knowledge_brain_qa import KnowledgeBrainQA
 
 
 class LlamaIndexBrain(KnowledgeBrainQA):
-    """This is the Notion brain class. it is a KnowledgeBrainQA has the data is stored locally.
+    """This is a first implementation of LlamaIndex recursive retriever RAG class. it is a KnowledgeBrainQA has the data is stored locally.
     It is going to call the Data Store internally to get the data.
 
     Args:
