@@ -51,6 +51,7 @@
       position: relative;
 
       .icons_wrapper {
+        visibility: hidden;
         position: absolute;
         display: flex;
         gap: Spacings.$spacing03;
@@ -59,6 +60,18 @@
 
         .sources_icon_wrapper {
           cursor: pointer;
+        }
+
+        &.sticky {
+          visibility: visible;
+        }
+      }
+    }
+
+    &:hover {
+      .message_row_content {
+        .icons_wrapper {
+          visibility: visible;
         }
       }
     }

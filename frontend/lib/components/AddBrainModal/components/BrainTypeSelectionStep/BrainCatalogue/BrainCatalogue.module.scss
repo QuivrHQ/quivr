@@ -44,8 +44,12 @@
         }
 
         .brain_title {
-          font-size: Typography.$medium;
+          @include Typography.EllipsisOverflow;
+          font-size: Typography.$small;
           font-weight: 500;
+          width: 100%;
+          display: flex;
+          justify-content: center;
         }
 
         &:hover,

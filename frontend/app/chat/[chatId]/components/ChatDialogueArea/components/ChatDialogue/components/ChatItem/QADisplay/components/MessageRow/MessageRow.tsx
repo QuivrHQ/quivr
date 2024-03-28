@@ -27,6 +27,7 @@ type MessageRowProps = {
   index?: number;
   messageId?: string;
   thumbs?: boolean;
+  lastMessage?: boolean;
 };
 
 export const MessageRow = React.forwardRef(
@@ -41,6 +42,7 @@ export const MessageRow = React.forwardRef(
       index,
       messageId,
       thumbs: initialThumbs,
+      lastMessage,
     }: MessageRowProps,
     ref: React.Ref<HTMLDivElement>
   ) => {
@@ -101,7 +103,11 @@ export const MessageRow = React.forwardRef(
     const renderIcons = () => {
       if (!isUserSpeaker && messageContent !== "🧠") {
         return (
-          <div className={styles.icons_wrapper}>
+          <div
+            className={`${styles.icons_wrapper} ${
+              lastMessage ? styles.sticky : ""
+            }`}
+          >
             <CopyButton handleCopy={handleCopy} size="normal" />
             {!isMobile && (
               <div className={styles.sources_icon_wrapper}>
