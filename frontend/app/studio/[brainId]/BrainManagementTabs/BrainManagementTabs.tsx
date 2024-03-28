@@ -1,6 +1,6 @@
 /* eslint-disable max-lines */
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import Spinner from "@/lib/components/ui/Spinner";
 import { Tabs } from "@/lib/components/ui/Tabs/Tabs";
@@ -19,6 +19,14 @@ export const BrainManagementTabs = (): JSX.Element => {
   const { brain, isLoading } = useBrainFetcher({
     brainId,
   });
+
+  const knowledgeTabDisabled = (): boolean => {
+    return (
+      !hasEditRights ||
+      (brain?.integration_description?.max_files === 0 &&
+        brain.brain_type !== "doc")
+    );
+  };
 
   const brainManagementTabs: Tab[] = [
     {
@@ -39,12 +47,13 @@ export const BrainManagementTabs = (): JSX.Element => {
       isSelected: selectedTab === "Knowledge",
       onClick: () => setSelectedTab("Knowledge"),
       iconName: "file",
-      disabled:
-        !hasEditRights ||
-        (!brain?.integration_description?.max_files &&
-          brain?.brain_type !== "doc"),
+      disabled: knowledgeTabDisabled(),
     },
   ];
+
+  useEffect(() => {
+    brainManagementTabs[2].disabled = knowledgeTabDisabled();
+  }, [hasEditRights]);
 
   if (!brainId) {
     return <div />;
