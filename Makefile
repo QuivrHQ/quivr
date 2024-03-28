@@ -24,9 +24,10 @@ prod:
 	docker compose build backend-core
 	docker compose -f docker-compose.yml up --build
 
-prod-supabase-traefik:
-	docker compose -f docker-compose-supabase-traefik.yml build backend-core
-	docker compose -f docker-compose-supabase-traefik.yml up --build
+prod-traefik:
+	docker compose -f docker-compose-traefik.yml down
+	docker compose -f docker-compose-traefik.yml build backend-core
+	docker compose -f docker-compose-traefik.yml up --build
 
 test-type:
 	@if command -v python3 &>/dev/null; then \
