@@ -19,7 +19,7 @@ type CommonModalProps = {
   CloseTrigger?: ReactNode;
   isOpen?: undefined;
   setOpen?: undefined;
-  bigModal?: boolean;
+  size?: "auto" | "normal" | "big";
   unclosable?: boolean;
   unforceWhite?: boolean;
 };
@@ -38,8 +38,7 @@ const handleInteractOutside = (unclosable: boolean, event: Event) => {
 };
 
 const handleModalContentAnimation = (
-  isOpen: boolean,
-  bigModal: boolean,
+  size: "auto" | "normal" | "big",
   unforceWhite: boolean
 ) => {
   const initialAnimation = { opacity: 0, y: "-40%" };
@@ -50,9 +49,9 @@ const handleModalContentAnimation = (
     initial: initialAnimation,
     animate: animateAnimation,
     exit: exitAnimation,
-    className: `${styles.modal_content_wrapper} ${
-      bigModal ? styles.big_modal : ""
-    } ${unforceWhite ? styles.white : ""}`,
+    className: `${styles.modal_content_wrapper} ${styles[size]} ${
+      unforceWhite ? styles.white : ""
+    }`,
   };
 };
 
@@ -64,7 +63,7 @@ export const Modal = ({
   CloseTrigger,
   isOpen: customIsOpen,
   setOpen: customSetOpen,
-  bigModal,
+  size = "normal",
   unclosable,
   unforceWhite,
 }: ModalProps): JSX.Element => {
@@ -97,11 +96,7 @@ export const Modal = ({
                   }
                 >
                   <motion.div
-                    {...handleModalContentAnimation(
-                      customIsOpen ?? isOpen,
-                      !!bigModal,
-                      !!unforceWhite
-                    )}
+                    {...handleModalContentAnimation(size, !!unforceWhite)}
                   >
                     <Dialog.Title
                       className="m-0 text-2xl font-bold"
