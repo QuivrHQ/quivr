@@ -22,7 +22,6 @@ from modules.brain.repository.interfaces.external_api_secrets_interface import (
 )
 from modules.brain.service.api_brain_definition_service import ApiBrainDefinitionService
 from modules.brain.service.brain_service import BrainService
-from modules.user.entity.user_identity import UserIdentity
 
 logger = get_logger(__name__)
 
@@ -72,33 +71,6 @@ class BrainUserService:
         self.brain_user_repository.delete_brain_user_by_id(
             user_id=user_id,
             brain_id=brain_id,
-        )
-
-    def get_default_user_brain_or_create_new(self, user: UserIdentity):
-        default_brain = self.get_user_default_brain(user.id)
-
-        if not default_brain:
-            default_brain = brain_service.create_brain(brain=None, user_id=user.id)
-            self.brain_user_repository.create_brain_user(
-                user.id, default_brain.brain_id, RoleEnum.Owner, True
-            )
-
-        return default_brain
-
-    def set_as_default_brain_for_user(self, user_id: UUID, brain_id: UUID):
-        old_default_brain = self.get_user_default_brain(user_id)
-
-        if old_default_brain is not None:
-            self.brain_user_repository.update_brain_user_default_status(
-                user_id=user_id,
-                brain_id=old_default_brain.brain_id,
-                default_brain=False,
-            )
-
-        self.brain_user_repository.update_brain_user_default_status(
-            user_id=user_id,
-            brain_id=brain_id,
-            default_brain=True,
         )
 
     def delete_brain_users(self, brain_id: UUID) -> None:
