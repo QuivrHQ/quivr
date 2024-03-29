@@ -77,6 +77,9 @@ const Search = (): JSX.Element => {
       {!isBrainCreationModalOpened && !userIdentityData?.onboarded && (
         <div className={styles.onboarding_overlay}>
           <div className={styles.first_brain_button}>
+            <div className={styles.text}>
+              Press the following button to create your first brain
+            </div>
             <QuivrButton
               iconName="brain"
               label="Create Brain"

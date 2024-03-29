@@ -8,7 +8,7 @@ import { Icon } from "../Icon/Icon";
 
 export type MessageInfoBoxProps = {
   children: React.ReactNode;
-  type: "info" | "success" | "warning" | "error";
+  type: "info" | "success" | "warning" | "error" | "tutorial";
   unforceWhite?: boolean;
 };
 
@@ -41,11 +41,13 @@ export const MessageInfoBox = ({
         isDarkMode && !unforceWhite ? styles.dark : ""
       }`}
     >
-      <Icon
-        name={getIconProps().iconName}
-        size="normal"
-        color={getIconProps().iconColor}
-      />
+      {type !== "tutorial" && (
+        <Icon
+          name={getIconProps().iconName}
+          size="normal"
+          color={getIconProps().iconColor}
+        />
+      )}
       {children}
     </div>
   );

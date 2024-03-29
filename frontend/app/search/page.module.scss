@@ -86,5 +86,29 @@
     position: absolute;
     right: Spacings.$spacing07;
     top: Spacings.$spacing04;
+    display: flex;
+    gap: Spacings.$spacing05;
+
+    .text {
+      font-size: Typography.$small;
+      background-color: var(--background-0);
+      border-radius: Radius.$normal;
+      padding: Spacings.$spacing03;
+      border: 1px solid var(--primary-1);
+      color: var(--primary-1);
+      position: relative;
+
+      &::after {
+        content: "";
+        position: absolute;
+        right: -10px;
+        top: 8px;
+        width: 0;
+        height: 0;
+        border: 10px solid transparent;
+        border-left-color: var(--primary-1);
+        border-right: none;
+      }
+    }
   }
 }

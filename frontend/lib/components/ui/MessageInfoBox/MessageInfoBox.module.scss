@@ -29,6 +29,12 @@
     background-color: var(--warning-lightest);
   }
 
+  &.tutorial {
+    border-color: var(--primary-1);
+    color: var(--primary-1);
+    background-color: var(--primary-1);
+  }
+
   &.dark {
     background-color: var(--background-special-0);
   }
