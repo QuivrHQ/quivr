@@ -6,6 +6,7 @@ import { MessageInfoBox } from "@/lib/components/ui/MessageInfoBox/MessageInfoBo
 import { Tag } from "@/lib/components/ui/Tag/Tag";
 import Tooltip from "@/lib/components/ui/Tooltip/Tooltip";
 import { useUserSettingsContext } from "@/lib/context/UserSettingsProvider/hooks/useUserSettingsContext";
+import { useUserData } from "@/lib/hooks/useUserData";
 
 import styles from "./BrainCatalogue.module.scss";
 
@@ -21,6 +22,7 @@ export const BrainCatalogue = ({
   const { setCurrentSelectedBrain, currentSelectedBrain } =
     useBrainCreationContext();
   const { isDarkMode } = useUserSettingsContext();
+  const { userIdentityData } = useUserData();
 
   return (
     <div className={styles.cards_wrapper}>
@@ -36,7 +38,11 @@ export const BrainCatalogue = ({
           return (
             <div
               key={brain.id}
-              className={styles.brain_card_container}
+              className={`${styles.brain_card_container} ${
+                !userIdentityData?.onboarded && !brain.onboarding_brain
+                  ? styles.disabled
+                  : ""
+              }`}
               onClick={() => {
                 next();
                 setCurrentSelectedBrain(brain);

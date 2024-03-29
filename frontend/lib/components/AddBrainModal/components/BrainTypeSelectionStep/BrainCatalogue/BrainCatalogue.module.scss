@@ -24,6 +24,11 @@
       flex-direction: column;
       gap: Spacings.$spacing02;
 
+      &.disabled {
+        pointer-events: none;
+        opacity: 0.1;
+      }
+
       .tag_wrapper {
         height: 2rem;
       }

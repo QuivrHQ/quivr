@@ -92,6 +92,7 @@ export type IntegrationBrains = {
   tags: IntegrationBrainTag[];
   information: string;
   integration_display_name: string;
+  onboarding_brain: boolean;
 };
 
 export type UpdateBrainInput = Partial<CreateBrainInput>;
