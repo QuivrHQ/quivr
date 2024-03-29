@@ -21,7 +21,7 @@ export const OnboardingProvider = ({
 
   useEffect(() => {
     if (userIdentityData) {
-      setIsOnboardingModalOpened(!userIdentityData.onboarded);
+      setIsOnboardingModalOpened(!userIdentityData.username);
     }
   }, [userIdentityData]);
 

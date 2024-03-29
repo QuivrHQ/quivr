@@ -68,6 +68,7 @@ const Search = (): JSX.Element => {
       <UploadDocumentModal />
       <AddBrainModal />
       <OnboardingModal />
+      <div className={styles.onboarding_overlay}>HEEEEY</div>
     </div>
   );
 };
