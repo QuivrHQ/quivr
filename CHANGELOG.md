@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.0.227 (2024-03-28)
+
+## What's Changed
+* fix(backend): invitation with new brains did not work by @Zewed in https://github.com/QuivrHQ/quivr/pull/2378
+* fix(backend): invitation brain bugs by @Zewed in https://github.com/QuivrHQ/quivr/pull/2380
+* fix(frontend): disable knowledge tab by @Zewed in https://github.com/QuivrHQ/quivr/pull/2381
+* fix(frontend): dark mode issues by @Zewed in https://github.com/QuivrHQ/quivr/pull/2382
+* feat(frontend): show icons only on hover except for last message by @Zewed in https://github.com/QuivrHQ/quivr/pull/2377
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.226...v0.0.227
+
 ## 0.0.226 (2024-03-21)
 
 ## What's Changed

@@ -46,7 +46,7 @@ export const AddBrainModal = (): JSX.Element => {
         isOpen={isBrainCreationModalOpened}
         setOpen={setIsBrainCreationModalOpened}
         unclosable={!userIdentityData?.onboarded}
-        bigModal={true}
+        size="big"
         CloseTrigger={<div />}
       >
         <div className={styles.add_brain_modal_container}>
