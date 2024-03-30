@@ -8,6 +8,7 @@ import { useBrainCreationContext } from "@/lib/components/AddBrainModal/brainCre
 import { OnboardingModal } from "@/lib/components/OnboardingModal/OnboardingModal";
 import PageHeader from "@/lib/components/PageHeader/PageHeader";
 import { UploadDocumentModal } from "@/lib/components/UploadDocumentModal/UploadDocumentModal";
+import { MessageInfoBox } from "@/lib/components/ui/MessageInfoBox/MessageInfoBox";
 import QuivrButton from "@/lib/components/ui/QuivrButton/QuivrButton";
 import { SearchBar } from "@/lib/components/ui/SearchBar/SearchBar";
 import { useSupabase } from "@/lib/context/SupabaseProvider";
@@ -77,9 +78,9 @@ const Search = (): JSX.Element => {
       {!isBrainCreationModalOpened && !userIdentityData?.onboarded && (
         <div className={styles.onboarding_overlay}>
           <div className={styles.first_brain_button}>
-            <div className={styles.text}>
-              Press the following button to create your first brain
-            </div>
+            <MessageInfoBox type="tutorial">
+              <span>Press the following button to create your first brain</span>
+            </MessageInfoBox>
             <QuivrButton
               iconName="brain"
               label="Create Brain"
