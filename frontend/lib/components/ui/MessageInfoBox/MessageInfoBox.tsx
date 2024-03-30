@@ -28,6 +28,8 @@ export const MessageInfoBox = ({
         return { iconName: "check", iconColor: "success" };
       case "warning":
         return { iconName: "warning", iconColor: "warning" };
+      case "tutorial":
+        return { iconName: "step", iconColor: "gold" };
       default:
         return { iconName: "info", iconColor: "primary" };
     }
@@ -41,13 +43,11 @@ export const MessageInfoBox = ({
         isDarkMode && !unforceWhite ? styles.dark : ""
       }`}
     >
-      {type !== "tutorial" && (
-        <Icon
-          name={getIconProps().iconName}
-          size="normal"
-          color={getIconProps().iconColor}
-        />
-      )}
+      <Icon
+        name={getIconProps().iconName}
+        size="normal"
+        color={getIconProps().iconColor}
+      />
       {children}
     </div>
   );

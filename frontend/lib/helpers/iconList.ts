@@ -38,6 +38,7 @@ import {
 import {
   IoArrowUpCircleOutline,
   IoCloudDownloadOutline,
+  IoFootsteps,
   IoHomeOutline,
   IoSettingsSharp,
   IoShareSocial,
@@ -123,6 +124,7 @@ export const iconList: { [name: string]: IconType } = {
   share: IoShareSocial,
   software: CgSoftwareDownload,
   star: FaRegStar,
+  step: IoFootsteps,
   sun: FaSun,
   thumbsDown: FaRegThumbsDown,
   thumbsUp: FaRegThumbsUp,
