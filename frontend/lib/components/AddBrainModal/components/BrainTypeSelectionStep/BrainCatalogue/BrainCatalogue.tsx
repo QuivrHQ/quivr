@@ -32,13 +32,15 @@ export const BrainCatalogue = ({
           use cases or data sources.
         </span>
       </MessageInfoBox>
-      <MessageInfoBox type="tutorial">
-        <span>
-          Let&apos;s start by creating a Docs &amp; URLs brain.<br></br>Of
-          course, feel free to explore other types of brains during your Quivr
-          journey.
-        </span>
-      </MessageInfoBox>
+      {!userIdentityData?.onboarded && (
+        <MessageInfoBox type="tutorial">
+          <span>
+            Let&apos;s start by creating a Docs &amp; URLs brain.<br></br>Of
+            course, feel free to explore other types of brains during your Quivr
+            journey.
+          </span>
+        </MessageInfoBox>
+      )}
       <span className={styles.title}>Choose a brain type</span>
       <div className={styles.brains_grid}>
         {brains.map((brain) => {
