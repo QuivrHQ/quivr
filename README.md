@@ -56,7 +56,7 @@ You can find the installation video [here](https://www.youtube.com/watch?v=cXBa6
 - **Step 1**: Clone the repository:
 
   ```bash
-  git clone https://github.com/quivrhq/quivr.git && cd Quivr
+  git clone https://github.com/quivrhq/quivr.git && cd quivr
   ```
 
 - **Step 2**: Copy the `.env.example` files
