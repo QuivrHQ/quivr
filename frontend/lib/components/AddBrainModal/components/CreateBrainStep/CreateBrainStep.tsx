@@ -2,6 +2,7 @@ import { capitalCase } from "change-case";
 import { useEffect, useState } from "react";
 
 import { KnowledgeToFeed } from "@/app/chat/[chatId]/components/ActionsBar/components";
+import { useUserApi } from "@/lib/api/user/useUserApi";
 import { MessageInfoBox } from "@/lib/components/ui/MessageInfoBox/MessageInfoBox";
 import QuivrButton from "@/lib/components/ui/QuivrButton/QuivrButton";
 import { TextInput } from "@/lib/components/ui/TextInput/TextInput";
@@ -22,6 +23,7 @@ export const CreateBrainStep = (): JSX.Element => {
   const [createBrainStepIndex, setCreateBrainStepIndex] = useState<number>(0);
   const { knowledgeToFeed } = useKnowledgeToFeedContext();
   const { userIdentityData } = useUserData();
+  const { updateUserIdentity } = useUserApi();
 
   useEffect(() => {
     if (currentSelectedBrain?.connection_settings) {
@@ -46,7 +48,14 @@ export const CreateBrainStep = (): JSX.Element => {
     goToPreviousStep();
   };
 
-  const feed = (): void => {
+  const feed = async (): Promise<void> => {
+    if (!userIdentityData?.onboarded) {
+      await updateUserIdentity({
+        ...userIdentityData,
+        username: userIdentityData?.username ?? "",
+        onboarded: true,
+      });
+    }
     setCreating(true);
     createBrain();
   };
@@ -72,8 +81,17 @@ export const CreateBrainStep = (): JSX.Element => {
   const renderFeedBrain = () => {
     return (
       <>
-        <span className={styles.title}>Feed your brain</span>
-        <KnowledgeToFeed hideBrainSelector={true} />
+        {!userIdentityData?.onboarded && (
+          <MessageInfoBox type="tutorial">
+            <span>
+              Upload documents or add URLs to add knowledges to your brain.
+            </span>
+          </MessageInfoBox>
+        )}
+        <div>
+          <span className={styles.title}>Feed your brain</span>
+          <KnowledgeToFeed hideBrainSelector={true} />
+        </div>
       </>
     );
   };
