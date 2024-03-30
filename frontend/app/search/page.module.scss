@@ -94,8 +94,8 @@
       background-color: var(--background-0);
       border-radius: Radius.$normal;
       padding: Spacings.$spacing03;
-      border: 1px solid var(--primary-1);
-      color: var(--primary-1);
+      border: 1px solid var(--border-0);
+      color: var(--text-1);
       position: relative;
 
       &::after {
@@ -106,7 +106,7 @@
         width: 0;
         height: 0;
         border: 10px solid transparent;
-        border-left-color: var(--primary-1);
+        border-left-color: var(--border-0);
         border-right: none;
       }
     }
