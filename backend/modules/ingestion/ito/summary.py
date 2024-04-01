@@ -1,30 +1,27 @@
 import random
 import tempfile
 from io import BytesIO
-from uuid import UUID
 
 from fastapi import UploadFile
 from langchain_community.chat_models import ChatLiteLLM
 from langchain_community.document_loaders import UnstructuredPDFLoader
 from langchain_core.messages import HumanMessage
 from logger import get_logger
+from modules.ingestion.ito.ito import ITO
 from modules.upload.controller.upload_routes import upload_file
-from modules.user.entity.user_identity import UserIdentity
 
 logger = get_logger(__name__)
 
 
-class SummaryIngestion:
-    uploadFile: UploadFile = None
-    current_user: UserIdentity = None
-    brain_id: UUID = None
+class SummaryIngestion(ITO):
 
     def __init__(
-        self, uploadFile: UploadFile, current_user: UserIdentity, brain_id: UUID
+        self,
+        **kwargs,
     ):
-        self.uploadFile = uploadFile
-        self.current_user = current_user
-        self.brain_id = brain_id
+        super().__init__(
+            **kwargs,
+        )
 
     async def process_ingestion(self):
 
@@ -69,6 +66,10 @@ class SummaryIngestion:
 
         file_to_upload = UploadFile(filename=new_filename, file=content_io)
 
+        if self.send_file_email:
+            await self.send_output_by_email(
+                file_to_upload, new_filename, "Summary of the document"
+            )
         # Create a file of type UploadFile
         await upload_file(
             uploadFile=file_to_upload,

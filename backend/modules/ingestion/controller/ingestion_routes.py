@@ -5,7 +5,7 @@ from fastapi import APIRouter, Depends, Query, UploadFile
 from logger import get_logger
 from middlewares.auth import AuthBearer, get_current_user
 from modules.ingestion.entity.ingestion import IngestionEntity
-from modules.ingestion.extensions.summary import SummaryIngestion
+from modules.ingestion.ito.summary import SummaryIngestion
 from modules.ingestion.service.ingestion import Ingestion
 from modules.user.entity.user_identity import UserIdentity
 
@@ -39,6 +39,7 @@ async def process_ingestion(
     ingestion_id: UUID = None,
     current_user: UserIdentity = Depends(get_current_user),
     brain_id: UUID = Query(..., description="The ID of the brain"),
+    send_file_email: bool = Query(False, description="Send the file by email"),
 ):
     if ingestion_id is None:
         raise ValueError("Ingestion ID is required")
@@ -46,7 +47,12 @@ async def process_ingestion(
     ingestion = ingestion_service.get_ingestion_by_id(ingestion_id)
 
     if ingestion.name == "summary":
-        summary = SummaryIngestion(uploadFile, current_user, brain_id)
+        summary = SummaryIngestion(
+            uploadFile=uploadFile,
+            current_user=current_user,
+            brain_id=brain_id,
+            send_file_email=send_file_email,
+        )
         return await summary.process_ingestion()
 
     return {"status": "ok"}
