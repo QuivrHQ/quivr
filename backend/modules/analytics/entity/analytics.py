@@ -12,4 +12,4 @@ class BrainUsages(BaseModel):
     usages: List[Usage]
 
 class BrainsUsages(BaseModel):
-    brains_usage: List[BrainUsages]
+    brains_usages: List[BrainUsages]
