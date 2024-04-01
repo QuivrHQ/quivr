@@ -47,6 +47,6 @@ async def process_ingestion(
 
     if ingestion.name == "summary":
         summary = SummaryIngestion(uploadFile, current_user, brain_id)
-        return summary.process_ingestion()
+        return await summary.process_ingestion()
 
     return {"status": "ok"}
