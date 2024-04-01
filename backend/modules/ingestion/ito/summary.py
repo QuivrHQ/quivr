@@ -3,9 +3,16 @@ import tempfile
 from io import BytesIO
 
 from fastapi import UploadFile
+from langchain.chains import (
+    MapReduceDocumentsChain,
+    ReduceDocumentsChain,
+    StuffDocumentsChain,
+)
+from langchain.chains.llm import LLMChain
 from langchain_community.chat_models import ChatLiteLLM
 from langchain_community.document_loaders import UnstructuredPDFLoader
-from langchain_core.messages import HumanMessage
+from langchain_core.prompts import PromptTemplate
+from langchain_text_splitters import CharacterTextSplitter
 from logger import get_logger
 from modules.ingestion.ito.ito import ITO
 from modules.upload.controller.upload_routes import upload_file
@@ -39,16 +46,58 @@ class SummaryIngestion(ITO):
 
         data = loader.load()
 
-        chat = ChatLiteLLM(model="gpt-3.5-turbo")
+        llm = ChatLiteLLM(model="gpt-3.5-turbo")
 
-        messages = [
-            HumanMessage(
-                content=f"Summarize the following document. Make it succinct and to the point. Content to summarize: {data[0].page_content}"
-            )
-        ]
-        answer = chat(messages)
+        map_template = """The following is a set of documents
+        {docs}
+        Based on this list of docs, please identify the main themes 
+        Helpful Answer:"""
+        map_prompt = PromptTemplate.from_template(map_template)
+        map_chain = LLMChain(llm=llm, prompt=map_prompt)
 
-        content = answer.content
+        # Reduce
+        reduce_template = """The following is set of summaries:
+        {docs}
+        Take these and distill it into a final, consolidated summary of the main themes. 
+        Helpful Answer:"""
+        reduce_prompt = PromptTemplate.from_template(reduce_template)
+
+        # Run chain
+        reduce_chain = LLMChain(llm=llm, prompt=reduce_prompt)
+
+        # Takes a list of documents, combines them into a single string, and passes this to an LLMChain
+        combine_documents_chain = StuffDocumentsChain(
+            llm_chain=reduce_chain, document_variable_name="docs"
+        )
+
+        # Combines and iteratively reduces the mapped documents
+        reduce_documents_chain = ReduceDocumentsChain(
+            # This is final chain that is called.
+            combine_documents_chain=combine_documents_chain,
+            # If documents exceed context for `StuffDocumentsChain`
+            collapse_documents_chain=combine_documents_chain,
+            # The maximum number of tokens to group documents into.
+            token_max=4000,
+        )
+
+        # Combining documents by mapping a chain over them, then combining results
+        map_reduce_chain = MapReduceDocumentsChain(
+            # Map chain
+            llm_chain=map_chain,
+            # Reduce chain
+            reduce_documents_chain=reduce_documents_chain,
+            # The variable name in the llm_chain to put the documents in
+            document_variable_name="docs",
+            # Return the results of the map steps in the output
+            return_intermediate_steps=False,
+        )
+
+        text_splitter = CharacterTextSplitter.from_tiktoken_encoder(
+            chunk_size=1000, chunk_overlap=0
+        )
+        split_docs = text_splitter.split_documents(data)
+
+        content = map_reduce_chain.run(split_docs)
 
         # Now create a fake.txt file with the content of the summary with the name of the original file without the extension as an UploadFile object
 
@@ -77,4 +126,4 @@ class SummaryIngestion(ITO):
             current_user=self.current_user,
             chat_id=None,
         )
-        return answer.content
+        return content
