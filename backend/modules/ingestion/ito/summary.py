@@ -126,4 +126,4 @@ class SummaryIngestion(ITO):
             current_user=self.current_user,
             chat_id=None,
         )
-        return content
+        return {"message": "Summary generated successfully"}

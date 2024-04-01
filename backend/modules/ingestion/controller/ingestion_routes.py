@@ -55,4 +55,4 @@ async def process_ingestion(
         )
         return await summary.process_ingestion()
 
-    return {"status": "ok"}
+    return {"message": "Not found"}
