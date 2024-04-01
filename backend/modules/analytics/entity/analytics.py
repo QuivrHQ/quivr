@@ -3,13 +3,13 @@ from uuid import UUID
 from pydantic import BaseModel
 from datetime import date
 
-class BrainUsage(BaseModel):
+class Usage(BaseModel):
     date: date
     usage_count: int
 
 class BrainUsages(BaseModel):
     brain_id: UUID
-    usages: List[BrainUsage]
+    usages: List[Usage]
 
-class BrainsUsage(BaseModel):
+class BrainsUsages(BaseModel):
     brains_usage: List[BrainUsages]
