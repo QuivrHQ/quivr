@@ -49,7 +49,7 @@ def client():
 
 @pytest.fixture(scope="session")
 def api_key():
-    API_KEY="be4328f36e9d7d818693ee7c77ec013c"
+    API_KEY = os.getenv("CI_TEST_API_KEY")
     if not API_KEY:
         raise ValueError(
             "CI_TEST_API_KEY environment variable not set. Cannot run tests."
