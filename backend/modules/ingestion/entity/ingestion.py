@@ -8,3 +8,4 @@ class IngestionEntity(BaseModel):
     name: str
     brain_id_required: bool
     file_1_required: bool
+    url_required: bool
