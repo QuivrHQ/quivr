@@ -3,7 +3,7 @@ from typing import Optional
 from uuid import UUID
 
 from celery_worker import process_file_and_notify
-from fastapi import APIRouter, Depends, HTTPException, Query, Request, UploadFile
+from fastapi import APIRouter, Depends, HTTPException, Query, UploadFile
 from logger import get_logger
 from middlewares.auth import AuthBearer, get_current_user
 from models import UserUsage
@@ -38,7 +38,6 @@ async def healthz():
 
 @upload_router.post("/upload", dependencies=[Depends(AuthBearer())], tags=["Upload"])
 async def upload_file(
-    request: Request,
     uploadFile: UploadFile,
     brain_id: UUID = Query(..., description="The ID of the brain"),
     chat_id: Optional[UUID] = Query(None, description="The ID of the chat"),
@@ -47,7 +46,8 @@ async def upload_file(
     validate_brain_authorization(
         brain_id, current_user.id, [RoleEnum.Editor, RoleEnum.Owner]
     )
-
+    uploadFile.file.seek(0)
+    logger.info(f"Uploading file {uploadFile.filename} to brain {brain_id}")
     user_daily_usage = UserUsage(
         id=current_user.id,
         email=current_user.email,
@@ -72,6 +72,8 @@ async def upload_file(
         )
 
     file_content = await uploadFile.read()
+    logger.info(f"File {uploadFile.filename} read successfully")
+    logger.info(f"Content length: {len(file_content)}")
     filename_with_brain_id = str(brain_id) + "/" + str(uploadFile.filename)
 
     try:
