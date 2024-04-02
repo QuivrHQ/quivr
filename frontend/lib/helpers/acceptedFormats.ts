@@ -27,4 +27,5 @@ export const acceptedFormats: Record<string, SupportedFileExtensionsWithDot[]> =
     "application/epub+zip": [".epub"],
     "application/x-ipynb+json": [".ipynb"],
     "text/x-python": [".py"],
+    "text/bib": [".bib"]
   };
