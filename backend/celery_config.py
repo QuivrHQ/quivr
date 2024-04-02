@@ -3,7 +3,7 @@ import os
 
 from celery import Celery
 
-CELERY_BROKER_URL = os.getenv("CELERY_BROKER_URL", "")
+CELERY_BROKER_URL = "redis://redis:6379/0"
 CELERY_BROKER_QUEUE_NAME = os.getenv("CELERY_BROKER_QUEUE_NAME", "quivr")
 
 celery = Celery(__name__)

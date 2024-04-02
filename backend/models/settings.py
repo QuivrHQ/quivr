@@ -106,8 +106,8 @@ class PostHogSettings(BaseSettings):
 class BrainSettings(BaseSettings):
     model_config = SettingsConfigDict(validate_default=False)
     openai_api_key: str = ""
-    supabase_url: str = ""
-    supabase_service_key: str = ""
+    supabase_url: str = "http://host.docker.internal:54321"
+    supabase_service_key: str = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImV4cCI6MTk4MzgxMjk5Nn0.EGIM96RAZx35lJzdJsyH-qQwv8Hdp7fsn3W0YpN81IU"
     resend_api_key: str = "null"
     resend_email_address: str = "brain@mail.quivr.app"
     ollama_api_base_url: str = None

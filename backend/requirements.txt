@@ -146,7 +146,7 @@ posthog==3.5.0
 prometheus-client==0.20.0; python_version >= '3.8'
 prompt-toolkit==3.0.43; python_full_version >= '3.7.0'
 protobuf==4.25.3; python_version >= '3.8'
-psycopg2==2.9.9; python_version >= '3.7'
+# psycopg2==2.9.9; python_version >= '3.7'
 psycopg2-binary==2.9.9; python_version >= '3.7'
 ptyprocess==0.7.0
 pure-eval==0.2.2
