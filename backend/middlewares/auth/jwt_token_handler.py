@@ -6,7 +6,7 @@ from jose import jwt
 from jose.exceptions import JWTError
 from modules.user.entity.user_identity import UserIdentity
 
-SECRET_KEY = "super-secret-jwt-token-with-at-least-32-characters-long"
+SECRET_KEY = os.environ.get("JWT_SECRET_KEY")
 ALGORITHM = "HS256"
 
 if not SECRET_KEY:
