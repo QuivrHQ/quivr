@@ -1,3 +1,4 @@
+from abc import abstractmethod
 from tempfile import NamedTemporaryFile
 from uuid import UUID
 
@@ -31,6 +32,7 @@ class ITO(BaseModel):
             send_file_email=send_file_email,
         )
 
+    @abstractmethod
     async def process_ingestion(self):
         pass
 
@@ -55,7 +57,7 @@ class ITO(BaseModel):
                 "html": body,
                 "attachments": [{"filename": name, "content": list(f.read())}],
             }
-            logger.info(params)
+            logger.info(f"Sending email to {mail_to} with file {name}")
             send_email(params)
 
     async def uploadfile_to_file(self, uploadFile: UploadFile):

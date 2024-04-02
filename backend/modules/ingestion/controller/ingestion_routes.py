@@ -5,6 +5,7 @@ from fastapi import APIRouter, Depends, Query, UploadFile
 from logger import get_logger
 from middlewares.auth import AuthBearer, get_current_user
 from modules.ingestion.entity.ingestion import IngestionEntity
+from modules.ingestion.ito.audio_summary import AudioSummaryIngestion
 from modules.ingestion.ito.summary import SummaryIngestion
 from modules.ingestion.service.ingestion import Ingestion
 from modules.user.entity.user_identity import UserIdentity
@@ -54,5 +55,15 @@ async def process_ingestion(
             send_file_email=send_file_email,
         )
         return await summary.process_ingestion()
+
+    if ingestion.name == "audio_summary":
+        logger.info("Going into audio summary ingestion")
+        audio_summary = AudioSummaryIngestion(
+            uploadFile=uploadFile,
+            current_user=current_user,
+            brain_id=brain_id,
+            send_file_email=send_file_email,
+        )
+        return await audio_summary.process_ingestion()
 
     return {"message": "Not found"}

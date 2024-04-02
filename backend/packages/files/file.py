@@ -1,5 +1,5 @@
 import hashlib
-import io
+from io import BytesIO
 
 from fastapi import UploadFile
 
@@ -17,18 +17,17 @@ def convert_bytes(bytes, precision=2):
     return f"{size:.{precision}f} {abbreviations[index]}"
 
 
-def get_file_size(file: UploadFile) -> int:
-    # Read the entire file into memory
-    data = file.file.read()
-
-    # Create a new BytesIO object from the data
-    file.file = io.BytesIO(data)
-
-    # Now the file is seekable
-    file.file.seek(0, 2)
-    file_size = file.file.tell()
-
-    # Move the cursor back to the beginning of the file
+def get_file_size(file: UploadFile):
+    if isinstance(file.file, BytesIO):
+        # If the file object is a BytesIO object, get the size of the bytes data
+        file_size = len(file.file.getvalue())
+        return file_size
+    # move the cursor to the end of the file
+    file.file._file.seek(0, 2)  # pyright: ignore reportPrivateUsage=none
+    file_size = (
+        file.file._file.tell()  # pyright: ignore reportPrivateUsage=none
+    )  # Getting the size of the file
+    # move the cursor back to the beginning of the file
     file.file.seek(0)
 
     return file_size

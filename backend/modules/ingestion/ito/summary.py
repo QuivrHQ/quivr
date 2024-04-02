@@ -102,6 +102,7 @@ class SummaryIngestion(ITO):
         # Now create a fake.txt file with the content of the summary with the name of the original file without the extension as an UploadFile object
 
         content_io = BytesIO(content.encode("utf-8"))
+        content_io.seek(0)
 
         # Create a file of type UploadFile
 
@@ -113,13 +114,18 @@ class SummaryIngestion(ITO):
             + ".txt"
         )
 
-        file_to_upload = UploadFile(filename=new_filename, file=content_io)
+        file_to_upload = UploadFile(
+            filename=new_filename,
+            file=content_io,
+            headers={"content-type": "text/plain"},
+        )
 
         if self.send_file_email:
             await self.send_output_by_email(
                 file_to_upload, new_filename, "Summary of the document"
             )
         # Create a file of type UploadFile
+        file_to_upload.file.seek(0)
         await upload_file(
             uploadFile=file_to_upload,
             brain_id=self.brain_id,

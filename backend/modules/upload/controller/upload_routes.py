@@ -46,6 +46,7 @@ async def upload_file(
     validate_brain_authorization(
         brain_id, current_user.id, [RoleEnum.Editor, RoleEnum.Owner]
     )
+    uploadFile.file.seek(0)
     logger.info(f"Uploading file {uploadFile.filename} to brain {brain_id}")
     user_daily_usage = UserUsage(
         id=current_user.id,
@@ -71,6 +72,8 @@ async def upload_file(
         )
 
     file_content = await uploadFile.read()
+    logger.info(f"File {uploadFile.filename} read successfully")
+    logger.info(f"Content length: {len(file_content)}")
     filename_with_brain_id = str(brain_id) + "/" + str(uploadFile.filename)
 
     try:
