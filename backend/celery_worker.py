@@ -189,6 +189,8 @@ def process_integration_brain_sync():
     time = datetime.now(timezone.utc)  # Make `time` timezone-aware
     # last_synced is a string that represents a timestampz in the database
     # only call process_integration_brain_sync_user_brain if more than 1 day has passed since the last sync
+    if not integrations:
+        return
     for integration in integrations:
         print(f"last_synced: {integration.last_synced}")  # Add this line
         last_synced = datetime.strptime(
