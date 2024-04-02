@@ -16,10 +16,11 @@ logger = get_logger(__name__)
 
 
 class ITO(BaseModel):
-    uploadFile: UploadFile = None
+    uploadFile: UploadFile | None = None
     current_user: UserIdentity = None
-    brain_id: UUID = None
+    brain_id: UUID | None = None
     send_file_email: bool = False
+    url: str | None = None
 
     def __init__(
         self,
@@ -27,12 +28,14 @@ class ITO(BaseModel):
         current_user: UserIdentity,
         brain_id: UUID,
         send_file_email: bool = False,
+        url: str = None,
     ):
         super().__init__(
             uploadFile=uploadFile,
             current_user=current_user,
             brain_id=brain_id,
             send_file_email=send_file_email,
+            url=url,
         )
 
     @abstractmethod
