@@ -200,21 +200,6 @@ INSERT INTO "public"."brains_users" ("brain_id", "rights", "default_brain", "use
 
 
 
---
--- Data for Name: composite_brain_connections; Type: TABLE DATA; Schema: public; Owner: postgres
---
-
-
-
---
--- Data for Name: ingestions; Type: TABLE DATA; Schema: public; Owner: postgres
---
-
-INSERT INTO "public"."ingestions" ("name", "id", "brain_id_required", "file_1_required", "url_required") VALUES
-	('summary', 'bc414385-342e-49fc-b252-3529c935c63a', true, true, false),
-	('audio_transcript', 'c502a10d-5a98-40f9-9699-a65d7ece37de', true, true, false),
-	('crawler', '948ae685-5710-4dde-bb80-36ce0097ca7b', true, false, true);
-
 
 --
 -- Data for Name: integrations; Type: TABLE DATA; Schema: public; Owner: postgres
