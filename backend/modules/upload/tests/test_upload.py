@@ -1,3 +1,6 @@
+import os
+import json
+import subprocess
 # def test_upload_and_delete_file(client, api_key):
 #     # Retrieve the default brain
 #     brain_response = client.get(
@@ -200,3 +203,59 @@
 #     # Optionally, you can assert on specific fields in the delete response data
 #     delete_response_data = delete_response.json()
 #     assert "message" in delete_response_data
+
+
+def test_upload_and_delete_file_bibtex(client, api_key):
+
+    # Retrieve the default brain
+    curl_command = [
+        'curl', '-s',  # '-s' for silent mode to not show progress meter or error messages
+        '-H', f"Authorization: Bearer {api_key}",
+        '-H', "Accept: application/json",
+        'http://localhost:5050/brains/default/'
+    ]
+
+    # Execute the curl command
+    brain_response = subprocess.run(curl_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+    response_json = json.loads(brain_response.stdout)
+    default_brain_id = response_json["id"]
+
+    # File to upload quivr/backend/modules/upload/tests/test_files/test.txt
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+
+    # Construct the absolute path to the file
+    file_path = os.path.join(dir_path, "test_files", "test.bib")
+    file_name = "test.bib"  # Assuming the name of the file on the server is the same as the local file name
+
+    # Set enable_summarization flag
+    enable_summarization = False
+    
+    curl_command = [
+    'curl', '-s', '-X', 'POST',
+    '-H', f"Authorization: Bearer {api_key}",
+    '-H', "Accept: application/json",
+    '-F', f"uploadFile=@{file_path}",
+    f'http://localhost:5050/upload?brain_id={default_brain_id}&enable_summarization={enable_summarization}'
+    ]
+
+
+    brain_response = subprocess.run(curl_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+
+    # Optionally, you can assert on specific fields in the upload response data
+    upload_response_data = brain_response
+    assert "message" in json.loads(upload_response_data.stdout)
+
+    # Delete the file
+    curl_command = [
+    'curl', '-s', '-X', 'POST',
+    '-H', f"Authorization: Bearer {api_key}",
+    '-H', "Accept: application/json",
+    '-F', f"uploadFile=@{file_path}",
+    f'http://localhost:5050/upload?brain_id={default_brain_id}&enable_summarization={enable_summarization}'
+    ]
+
+    brain_response = subprocess.run(curl_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+
+    # Optionally, you can assert on specific fields in the upload response data
+    upload_response_data = json.loads(brain_response.stdout)
+    assert upload_response_data["detail"] == "File test.bib already exists in storage."
