@@ -8,5 +8,5 @@ class AnalyticsService:
     def __init__(self):
         self.repository = Analytics()
 
-    def get_brains_usages(self, user_id):
-        return self.repository.get_brains_usages(user_id)
+    def get_brains_usages(self, user_id, brain_id = None):
+        return self.repository.get_brains_usages(user_id, brain_id)

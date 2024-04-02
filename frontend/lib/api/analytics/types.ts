@@ -3,11 +3,6 @@ interface Usage {
   usageCount: number;
 }
 
-interface BrainUsages {
-  brainId: string;
-  usages: Usage[];
-}
-
 export interface BrainsUsages {
-  brainsUsages: BrainUsages[];
+  usages: Usage[];
 }
