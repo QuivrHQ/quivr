@@ -7,7 +7,7 @@ export const getBrainsUsages = async (
 ): Promise<BrainsUsages | undefined> => {
   const brainsUsages = (
     await axiosInstance.get<BrainsUsages | undefined>(
-      `/analytics/brains-usages`
+      "/analytics/brains-usages"
     )
   ).data;
 

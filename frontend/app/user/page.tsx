@@ -2,6 +2,7 @@
 
 import { useTranslation } from "react-i18next";
 
+import { useAnalytics } from "@/lib/api/analytics/useAnalyticsApi";
 import PageHeader from "@/lib/components/PageHeader/PageHeader";
 import { Modal } from "@/lib/components/ui/Modal/Modal";
 import QuivrButton from "@/lib/components/ui/QuivrButton/QuivrButton";
@@ -26,11 +27,14 @@ const UserPage = (): JSX.Element => {
     setIsLogoutModalOpened,
   } = useLogoutModal();
 
+  const { getBrainsUsages } = useAnalytics();
+
   const button: ButtonType = {
     label: "Logout",
     color: "dangerous",
-    onClick: () => {
-      setIsLogoutModalOpened(true);
+    onClick: async () => {
+      const res = await getBrainsUsages();
+      console.info(res);
     },
     iconName: "logout",
   };

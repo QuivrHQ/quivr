@@ -10,10 +10,11 @@ analytics_router = APIRouter()
     "/analytics/brains-usages", dependencies=[Depends(AuthBearer())], tags=["Analytics"]
 )
 async def get_brains_usages(
-    user_id: UUID = Depends(get_current_user).id,
+    user: UUID = Depends(get_current_user),
 ):
+    print('trugger')
     """
     Get all user brains usages
     """
 
-    return analytics_service.get_brains_usages(user_id)
+    return analytics_service.get_brains_usages(user.id)

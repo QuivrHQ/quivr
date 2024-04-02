@@ -9,4 +9,4 @@ class AnalyticsService:
         self.repository = Analytics()
 
     def get_brains_usages(self, user_id):
-        return self.repository.get(user_id)
+        return self.repository.get_brains_usages(user_id)
