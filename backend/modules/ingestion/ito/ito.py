@@ -1,10 +1,13 @@
+import random
 from abc import abstractmethod
+from io import BytesIO
 from tempfile import NamedTemporaryFile
 from uuid import UUID
 
 from fastapi import UploadFile
 from logger import get_logger
 from modules.contact_support.controller.settings import ContactsSettings
+from modules.upload.controller.upload_routes import upload_file
 from modules.user.entity.user_identity import UserIdentity
 from packages.emails.send_email import send_email
 from pydantic import BaseModel
@@ -66,3 +69,43 @@ class ITO(BaseModel):
         tmp_file.write(uploadFile.file.read())
         tmp_file.flush()  # Make sure all data is written to disk
         return tmp_file
+
+    async def create_and_upload_processed_file(
+        self, processed_content: str, original_filename: str, file_description: str
+    ) -> dict:
+        """Handles creation and uploading of the processed file."""
+        content_io = BytesIO(processed_content.encode("utf-8"))
+        content_io.seek(0)
+
+        new_filename = (
+            original_filename.split(".")[0]
+            + "_"
+            + file_description.lower().replace(" ", "_")
+            + "_"
+            + str(random.randint(1000, 9999))
+            + ".txt"
+        )
+
+        file_to_upload = UploadFile(
+            filename=new_filename,
+            file=content_io,
+            headers={"content-type": "text/plain"},
+        )
+
+        if self.send_file_email:
+            await self.send_output_by_email(
+                file_to_upload,
+                new_filename,
+                f"{file_description} of {original_filename}",
+            )
+
+        # Reset to start of file before upload
+        file_to_upload.file.seek(0)
+        await upload_file(
+            uploadFile=file_to_upload,
+            brain_id=self.brain_id,
+            current_user=self.current_user,
+            chat_id=None,
+        )
+
+        return {"message": f"{file_description} generated successfully"}

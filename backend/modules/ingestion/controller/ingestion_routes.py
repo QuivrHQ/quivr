@@ -5,7 +5,7 @@ from fastapi import APIRouter, Depends, Query, UploadFile
 from logger import get_logger
 from middlewares.auth import AuthBearer, get_current_user
 from modules.ingestion.entity.ingestion import IngestionEntity
-from modules.ingestion.ito.audio_summary import AudioSummaryIngestion
+from modules.ingestion.ito.audio_transcript import AudioTranscriptIngestion
 from modules.ingestion.ito.summary import SummaryIngestion
 from modules.ingestion.service.ingestion import Ingestion
 from modules.user.entity.user_identity import UserIdentity
@@ -56,9 +56,8 @@ async def process_ingestion(
         )
         return await summary.process_ingestion()
 
-    if ingestion.name == "audio_summary":
-        logger.info("Going into audio summary ingestion")
-        audio_summary = AudioSummaryIngestion(
+    if ingestion.name == "audio_transcript":
+        audio_summary = AudioTranscriptIngestion(
             uploadFile=uploadFile,
             current_user=current_user,
             brain_id=brain_id,
