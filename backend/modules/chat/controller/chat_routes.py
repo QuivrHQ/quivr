@@ -22,7 +22,7 @@ from modules.chat.entity.chat import Chat
 from modules.chat.service.chat_service import ChatService
 from modules.notification.service.notification_service import NotificationService
 from modules.user.entity.user_identity import UserIdentity
-from packages.utils.telemetry import send_telemetry
+from packages.utils.telemetry import maybe_send_telemetry
 from vectorstore.supabase import CustomSupabaseVectorStore
 
 logger = get_logger(__name__)
@@ -78,7 +78,7 @@ def get_answer_generator(
         brain_id, chat_question.question, current_user, chat_id, history, vector_store
     )
 
-    send_telemetry("question_asked", {"model_name": brain.model})
+    maybe_send_telemetry("question_asked", {"model_name": brain.model})
 
     gpt_answer_generator = chat_instance.get_answer_generator(
         brain=brain,
@@ -162,7 +162,7 @@ async def update_chat_message(
     chat_id: UUID,
     message_id: UUID,
     current_user: UserIdentity = Depends(get_current_user),
-)  :
+):
 
     chat = chat_service.get_chat_by_id(
         chat_id  # pyright: ignore reportPrivateUsage=none
