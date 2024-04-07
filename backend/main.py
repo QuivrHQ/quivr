@@ -111,4 +111,4 @@ if __name__ == "__main__":
     # run main.py to debug backend
     import uvicorn
 
-    uvicorn.run(app, host="0.0.0.0", port=5050, log_level="info", access_log=False)
+    uvicorn.run(app, host="0.0.0.0", port=5050, log_level="warning", access_log=False)
