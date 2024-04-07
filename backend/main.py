@@ -32,7 +32,8 @@ from sentry_sdk.integrations.starlette import StarletteIntegration
 import logging
 
 # Set the logging level for all loggers to WARNING
-logging.basicConfig(level=logging.WARNING)
+logging.basicConfig(level=logging.INFO)
+logging.getLogger("httpx").setLevel(logging.WARNING)
 
 
 logger = get_logger(__name__)
@@ -106,4 +107,4 @@ if __name__ == "__main__":
     # run main.py to debug backend
     import uvicorn
 
-    uvicorn.run(app, host="0.0.0.0", port=5050, log_level="warning", access_log=False)
+    uvicorn.run(app, host="0.0.0.0", port=5050, log_level="info", access_log=False)
