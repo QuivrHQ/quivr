@@ -7,6 +7,7 @@ if __name__ == "__main__":
 
     load_dotenv()
 import sentry_sdk
+import litellm
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import JSONResponse
 from logger import get_logger
@@ -34,6 +35,9 @@ import logging
 # Set the logging level for all loggers to WARNING
 logging.basicConfig(level=logging.INFO)
 logging.getLogger("httpx").setLevel(logging.WARNING)
+logging.getLogger("LiteLLM").setLevel(logging.WARNING)
+logging.getLogger("litellm").setLevel(logging.WARNING)
+litellm.set_verbose = False
 
 
 logger = get_logger(__name__)

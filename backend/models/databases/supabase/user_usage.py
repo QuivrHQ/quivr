@@ -158,12 +158,9 @@ class UserUsage(Repository):
                 return False, False
 
         except Exception as e:
-            logger.info(matching_customers)
-            logger.error(e)
-            logger.error(
-                "Error while checking if user is a premium user. Stripe needs to be configured."
+            logger.info(
+                "Stripe needs to be configured if you want to have the premium features"
             )
-            logger.error(e)
             return False, True
 
     def get_user_settings(self, user_id):
