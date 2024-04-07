@@ -7,6 +7,7 @@ if __name__ == "__main__":
 
     load_dotenv()
 import sentry_sdk
+import litellm
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import JSONResponse
 from logger import get_logger
@@ -24,19 +25,22 @@ from modules.prompt.controller import prompt_router
 from modules.upload.controller import upload_router
 from modules.user.controller import user_router
 from packages.utils import handle_request_validation_error
-from packages.utils.telemetry import send_telemetry
+from packages.utils.telemetry import maybe_send_telemetry
 from routes.crawl_routes import crawl_router
 from routes.subscription_routes import subscription_router
 from sentry_sdk.integrations.fastapi import FastApiIntegration
 from sentry_sdk.integrations.starlette import StarletteIntegration
+import logging
+
+# Set the logging level for all loggers to WARNING
+logging.basicConfig(level=logging.INFO)
+logging.getLogger("httpx").setLevel(logging.WARNING)
+logging.getLogger("LiteLLM").setLevel(logging.WARNING)
+logging.getLogger("litellm").setLevel(logging.WARNING)
+litellm.set_verbose = False
+
 
 logger = get_logger(__name__)
-
-if os.getenv("DEV_MODE") == "true":
-    import debugpy
-
-    logger.debug("👨‍💻 Running in dev mode")
-    debugpy.listen(("0.0.0.0", 5678))
 
 
 def before_send(event, hint):
@@ -100,11 +104,11 @@ if os.getenv("TELEMETRY_ENABLED") == "true":
     logger.info(
         "To disable telemetry, set the TELEMETRY_ENABLED environment variable to false."
     )
-    send_telemetry("booting", {"status": "ok"})
+    maybe_send_telemetry("booting", {"status": "ok"})
 
 
 if __name__ == "__main__":
     # run main.py to debug backend
     import uvicorn
 
-    uvicorn.run(app, host="0.0.0.0", port=5050)
+    uvicorn.run(app, host="0.0.0.0", port=5050, log_level="warning", access_log=False)

@@ -20,7 +20,7 @@ from modules.brain.service.integration_brain_service import (
 )
 from modules.prompt.service.prompt_service import PromptService
 from modules.user.entity.user_identity import UserIdentity
-from packages.utils.telemetry import send_telemetry
+from packages.utils.telemetry import maybe_send_telemetry
 from repository.brain import get_question_context_from_brain
 
 logger = get_logger(__name__)
@@ -109,12 +109,11 @@ async def create_new_brain(
             status_code=429,
             detail=f"Maximum number of brains reached ({user_settings.get('max_brains', 5)}).",
         )
-    send_telemetry("create_brain", {"brain_name": brain.name})
+    maybe_send_telemetry("create_brain", {"brain_name": brain.name})
     new_brain = brain_service.create_brain(
         brain=brain,
         user_id=current_user.id,
     )
-    logger.info(f"Creating default brain for user {current_user.id}.")
     brain_user_service.create_brain_user(
         user_id=current_user.id,
         brain_id=new_brain.brain_id,
