@@ -59,11 +59,6 @@ const App = ({ children }: PropsWithChildren): JSX.Element => {
 
   return (
     <>
-      <Script
-        id="octolane-script"
-        src="https://cdn.octolane.com/tag.js?pk=0a213725640302dff773"
-      />
-
       <PostHogProvider client={posthog}>
         <IntercomProvider>
           <div className="flex flex-1 flex-col overflow-auto">
