@@ -2,6 +2,7 @@ import {
   CategoryScale,
   ChartDataset,
   Chart as ChartJS,
+  Filler,
   Legend,
   LinearScale,
   LineElement,
@@ -14,6 +15,7 @@ import { Line } from "react-chartjs-2";
 
 ChartJS.register(
   CategoryScale,
+  Filler,
   LinearScale,
   PointElement,
   LineElement,
@@ -29,7 +31,7 @@ export const Analytics = (): JSX.Element => {
 
   const [chartData, setChartData] = useState({
     labels: [] as Date[],
-    datasets: [] as ChartDataset[],
+    datasets: [{}] as ChartDataset<"line", number[]>[],
   });
 
   useEffect(() => {
@@ -50,7 +52,8 @@ export const Analytics = (): JSX.Element => {
               label: "Usage Count",
               data: chartDataset,
               borderColor: "rgb(75, 192, 192)",
-              tension: 0.1,
+              backgroundColor: "rgba(75, 192, 192, 0.2)",
+              fill: "origin",
             },
           ],
         });
@@ -63,6 +66,7 @@ export const Analytics = (): JSX.Element => {
   }, [chartData.labels.length]);
 
   const options = {
+    type: "line",
     scales: {
       y: {
         beginAtZero: true,
