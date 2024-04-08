@@ -7,10 +7,11 @@ import {
   LinearScale,
   LineElement,
   PointElement,
+  ScriptableContext,
   Title,
   Tooltip,
 } from "chart.js";
-import { useEffect, useState } from "react";
+import { useLayoutEffect, useState } from "react";
 import { Line } from "react-chartjs-2";
 
 ChartJS.register(
@@ -34,7 +35,7 @@ export const Analytics = (): JSX.Element => {
     datasets: [{}] as ChartDataset<"line", number[]>[],
   });
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     void (async () => {
       try {
         const res = await getBrainsUsages();
@@ -43,8 +44,6 @@ export const Analytics = (): JSX.Element => {
           (usage) => usage.usage_count
         ) as number[];
 
-        console.info(res?.usages);
-
         setChartData({
           labels: chartLabels,
           datasets: [
@@ -52,8 +51,15 @@ export const Analytics = (): JSX.Element => {
               label: "Usage Count",
               data: chartDataset,
               borderColor: "rgb(75, 192, 192)",
-              backgroundColor: "rgba(75, 192, 192, 0.2)",
-              fill: "origin",
+              backgroundColor: (context: ScriptableContext<"line">) => {
+                const ctx = context.chart.ctx;
+                const gradient = ctx.createLinearGradient(100, 100, 100, 250);
+                gradient.addColorStop(0, "rgba(75, 192, 192, 0.4)");
+                gradient.addColorStop(1, "rgba(75, 192, 192, 0.05)");
+
+                return gradient;
+              },
+              fill: true,
             },
           ],
         });
@@ -68,8 +74,19 @@ export const Analytics = (): JSX.Element => {
   const options = {
     type: "line",
     scales: {
+      x: {
+        grid: {
+          display: false,
+        },
+      },
       y: {
         beginAtZero: true,
+        grid: {
+          display: false,
+        },
+        ticks: {
+          stepSize: 1,
+        },
       },
     },
   };
