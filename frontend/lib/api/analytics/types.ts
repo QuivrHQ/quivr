@@ -1,6 +1,6 @@
 interface Usage {
   date: Date;
-  usageCount: number;
+  usage_count: number;
 }
 
 export interface BrainsUsages {
