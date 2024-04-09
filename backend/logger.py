@@ -6,7 +6,7 @@ from colorlog import (
 )  # You need to install this package: pip install colorlog
 
 
-def get_logger(logger_name, log_level=logging.INFO, log_file="application.log"):
+def get_logger(logger_name, log_level=logging.WARNING, log_file="application.log"):
     logger = logging.getLogger(logger_name)
     logger.setLevel(log_level)
     logger.propagate = False  # Prevent log propagation to avoid double logging

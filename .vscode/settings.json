@@ -5,8 +5,6 @@
     "source.fixAll": "explicit",
     "source.unusedImports": "explicit"
   },
-  "python.linting.enabled": true,
-  "python.linting.flake8Enabled": true,
   "python.analysis.extraPaths": [
     "./backend"
   ],
@@ -54,6 +52,5 @@
   ],
   "python.testing.unittestEnabled": false,
   "python.testing.pytestEnabled": true,
-  
   "python.envFile": "${workspaceFolder}/.env_test",
 }

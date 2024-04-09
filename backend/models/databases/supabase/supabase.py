@@ -1,7 +1,4 @@
-from logger import get_logger
 from models.databases.supabase import BrainSubscription, File, UserUsage, Vector
-
-logger = get_logger(__name__)
 
 
 class SupabaseDB(

@@ -1,7 +1,7 @@
 import asyncio
 import io
 import os
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timezone
 
 from celery.schedules import crontab
 from celery_config import celery
@@ -189,15 +189,19 @@ def process_integration_brain_sync():
     time = datetime.now(timezone.utc)  # Make `time` timezone-aware
     # last_synced is a string that represents a timestampz in the database
     # only call process_integration_brain_sync_user_brain if more than 1 day has passed since the last sync
-    for integration in integrations:
-        print(f"last_synced: {integration.last_synced}")  # Add this line
-        last_synced = datetime.strptime(
-            integration.last_synced, "%Y-%m-%dT%H:%M:%S.%f%z"
-        )
-        if last_synced < time - timedelta(hours=12):
-            process_integration_brain_sync_user_brain.delay(
-                brain_id=integration.brain_id, user_id=integration.user_id
-            )
+    if not integrations:
+        return
+    # TODO fix this
+    # for integration in integrations:
+    #     print(f"last_synced: {integration.last_synced}")
+    #     print(f"Integration Name: {integration.name}")
+    #     last_synced = datetime.strptime(
+    #         integration.last_synced, "%Y-%m-%dT%H:%M:%S.%f%z"
+    #     )
+    #     if last_synced < time - timedelta(hours=12) and integration.name == "notion":
+    #         process_integration_brain_sync_user_brain.delay(
+    #             brain_id=integration.brain_id, user_id=integration.user_id
+    #         )
 
 
 celery.conf.beat_schedule = {
