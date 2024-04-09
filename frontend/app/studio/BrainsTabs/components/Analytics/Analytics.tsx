@@ -18,8 +18,10 @@ import { formatMinimalBrainsToSelectComponentInput } from "@/app/chat/[chatId]/c
 import { Range } from "@/lib/api/analytics/types";
 import { useAnalytics } from "@/lib/api/analytics/useAnalyticsApi";
 import { LoaderIcon } from "@/lib/components/ui/LoaderIcon/LoaderIcon";
+import { MessageInfoBox } from "@/lib/components/ui/MessageInfoBox/MessageInfoBox";
 import { SingleSelector } from "@/lib/components/ui/SingleSelector/SingleSelector";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
+import { useDevice } from "@/lib/hooks/useDevice";
 
 import styles from "./Analytics.module.scss";
 
@@ -35,6 +37,7 @@ ChartJS.register(
 );
 
 export const Analytics = (): JSX.Element => {
+  const { isMobile } = useDevice();
   const { getBrainsUsages } = useAnalytics();
   const { allBrains } = useBrainContext();
   const [chartData, setChartData] = useState({
@@ -125,42 +128,50 @@ export const Analytics = (): JSX.Element => {
 
   return (
     <div className={styles.analytics_wrapper}>
-      {chartData.labels.length ? (
-        <>
-          <div className={styles.selectors_wrapper}>
-            <div className={styles.selector}>
-              <SingleSelector
-                iconName="calendar"
-                options={graphRangeOptions}
-                onChange={(option) => handleGraphRangeChange(option)}
-                selectedOption={selectedGraphRangeOption}
-                placeholder="Select range"
-              />
-            </div>
-            <div className={styles.selector}>
-              <SingleSelector
-                iconName="brain"
-                options={brainsWithUploadRights}
-                onChange={(brainId) => setSelectedBrainId(brainId)}
-                onBackClick={() => setSelectedBrainId(null)}
-                selectedOption={
-                  selectedBrainId
-                    ? {
-                        value: selectedBrainId,
-                        label: allBrains.find(
-                          (brain) => brain.id === selectedBrainId
-                        )?.name as string,
-                      }
-                    : undefined
-                }
-                placeholder="Select specific brain"
-              />
-            </div>
-          </div>
-          <Line data={chartData} options={options} />
-        </>
+      {!isMobile ? (
+        <div>
+          {chartData.labels.length ? (
+            <>
+              <div className={styles.selectors_wrapper}>
+                <div className={styles.selector}>
+                  <SingleSelector
+                    iconName="calendar"
+                    options={graphRangeOptions}
+                    onChange={(option) => handleGraphRangeChange(option)}
+                    selectedOption={selectedGraphRangeOption}
+                    placeholder="Select range"
+                  />
+                </div>
+                <div className={styles.selector}>
+                  <SingleSelector
+                    iconName="brain"
+                    options={brainsWithUploadRights}
+                    onChange={(brainId) => setSelectedBrainId(brainId)}
+                    onBackClick={() => setSelectedBrainId(null)}
+                    selectedOption={
+                      selectedBrainId
+                        ? {
+                            value: selectedBrainId,
+                            label: allBrains.find(
+                              (brain) => brain.id === selectedBrainId
+                            )?.name as string,
+                          }
+                        : undefined
+                    }
+                    placeholder="Select specific brain"
+                  />
+                </div>
+              </div>
+              <Line data={chartData} options={options} />
+            </>
+          ) : (
+            <LoaderIcon size="big" color="accent" />
+          )}
+        </div>
       ) : (
-        <LoaderIcon size="big" color="accent" />
+        <MessageInfoBox type="warning">
+          This feature is not available on small screens
+        </MessageInfoBox>
       )}
     </div>
   );
