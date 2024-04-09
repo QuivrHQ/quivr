@@ -7,9 +7,15 @@ export const getBrainsUsages = async (
   brain_id: string | null,
   graph_range: Range
 ): Promise<BrainsUsages | undefined> => {
+  const params = {
+    graph_range: graph_range,
+    brain_id: brain_id,
+  };
+
   const brainsUsages = (
     await axiosInstance.get<BrainsUsages | undefined>(
-      `/analytics/brains-usages?brain_id=${brain_id}&graph_range=${graph_range}`
+      "/analytics/brains-usages",
+      { params: params }
     )
   ).data;
 

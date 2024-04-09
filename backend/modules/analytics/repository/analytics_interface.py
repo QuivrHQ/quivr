@@ -1,11 +1,11 @@
 from abc import ABC, abstractmethod
 from typing import Optional
 from uuid import UUID
-from modules.analytics.entity.analytics import BrainsUsages
+from modules.analytics.entity.analytics import BrainsUsages, Range
 
 class AnalyticsInterface(ABC):
     @abstractmethod
-    def get_brains_usages(self, user_id: UUID, brain_id: Optional[UUID] = None) -> BrainsUsages:
+    def get_brains_usages(self, user_id: UUID, graph_range: Range = Range.WEEK, brain_id: Optional[UUID] = None) -> BrainsUsages:
         """
         Get user brains usage
         Args:

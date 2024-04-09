@@ -15,6 +15,7 @@ import { useLayoutEffect, useState } from "react";
 import { Line } from "react-chartjs-2";
 
 import { formatMinimalBrainsToSelectComponentInput } from "@/app/chat/[chatId]/components/ActionsBar/components/KnowledgeToFeed/utils/formatMinimalBrainsToSelectComponentInput";
+import { Range } from "@/lib/api/analytics/types";
 import { useAnalytics } from "@/lib/api/analytics/useAnalyticsApi";
 import { LoaderIcon } from "@/lib/components/ui/LoaderIcon/LoaderIcon";
 import { SingleSelector } from "@/lib/components/ui/SingleSelector/SingleSelector";
@@ -40,24 +41,37 @@ export const Analytics = (): JSX.Element => {
     labels: [] as Date[],
     datasets: [{}] as ChartDataset<"line", number[]>[],
   });
+  const [currentChartRange, setCurrentChartRange] = useState(
+    Range.WEEK as number
+  );
 
   const graphRangeOptions = [
-    { label: "Last 7 days", value: "Last 7 days" },
-    { label: "Last 30 days", value: "Last 30 days" },
-    { label: "Last 90 days", value: "Last 90 days" },
+    { label: "Last 7 days", value: Range.WEEK },
+    { label: "Last 30 days", value: Range.MONTH },
+    { label: "Last 90 days", value: Range.QUARTER },
   ];
 
   const brainsWithUploadRights =
     formatMinimalBrainsToSelectComponentInput(allBrains);
 
+  const selectedGraphRangeOption = graphRangeOptions.find(
+    (option) => option.value === currentChartRange
+  );
+
+  const handleGraphRangeChange = (newValue: number) => {
+    setCurrentChartRange(newValue);
+  };
+
   useLayoutEffect(() => {
     void (async () => {
       try {
-        const res = await getBrainsUsages();
+        const res = await getBrainsUsages(null, currentChartRange);
         const chartLabels = res?.usages.map((usage) => usage.date) as Date[];
         const chartDataset = res?.usages.map(
           (usage) => usage.usage_count
         ) as number[];
+
+        console.info("hey");
 
         setChartData({
           labels: chartLabels,
@@ -83,7 +97,7 @@ export const Analytics = (): JSX.Element => {
         console.error(error);
       }
     })();
-  }, [chartData.labels.length]);
+  }, [chartData.labels.length, currentChartRange]);
 
   const options = {
     type: "line",
@@ -114,8 +128,8 @@ export const Analytics = (): JSX.Element => {
               <SingleSelector
                 iconName="calendar"
                 options={graphRangeOptions}
-                onChange={() => console.info("hey")}
-                selectedOption={graphRangeOptions[0]}
+                onChange={(option) => handleGraphRangeChange(option)}
+                selectedOption={selectedGraphRangeOption}
                 placeholder="Select range"
               />
             </div>

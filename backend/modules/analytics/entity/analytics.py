@@ -1,9 +1,9 @@
-from enum import Enum
+from enum import IntEnum
 from typing import List
 from pydantic import BaseModel
 from datetime import date
 
-class Range(Enum):
+class Range(IntEnum):
     WEEK = 7
     MONTH = 30
     QUARTER = 90
