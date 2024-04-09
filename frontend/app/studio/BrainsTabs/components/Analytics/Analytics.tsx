@@ -25,15 +25,28 @@ ChartJS.register(
   Legend
 );
 
+import { formatMinimalBrainsToSelectComponentInput } from "@/app/chat/[chatId]/components/ActionsBar/components/KnowledgeToFeed/utils/formatMinimalBrainsToSelectComponentInput";
 import { useAnalytics } from "@/lib/api/analytics/useAnalyticsApi";
+import { LoaderIcon } from "@/lib/components/ui/LoaderIcon/LoaderIcon";
+import { SingleSelector } from "@/lib/components/ui/SingleSelector/SingleSelector";
+import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 
 export const Analytics = (): JSX.Element => {
   const { getBrainsUsages } = useAnalytics();
-
+  const { allBrains } = useBrainContext();
   const [chartData, setChartData] = useState({
     labels: [] as Date[],
     datasets: [{}] as ChartDataset<"line", number[]>[],
   });
+
+  const graphRangeOptions = [
+    { label: "Last 7 days", value: "Last 7 days" },
+    { label: "Last 30 days", value: "Last 30 days" },
+    { label: "Last 90 days", value: "Last 90 days" },
+  ];
+
+  const brainsWithUploadRights =
+    formatMinimalBrainsToSelectComponentInput(allBrains);
 
   useLayoutEffect(() => {
     void (async () => {
@@ -66,8 +79,6 @@ export const Analytics = (): JSX.Element => {
       } catch (error) {
         console.error(error);
       }
-
-      console.info(chartData);
     })();
   }, [chartData.labels.length]);
 
@@ -93,11 +104,28 @@ export const Analytics = (): JSX.Element => {
 
   return (
     <div>
-      <h2>Analytics</h2>
       {chartData.labels.length ? (
-        <Line data={chartData} options={options} />
+        <div>
+          <div>
+            <SingleSelector
+              iconName="calendar"
+              options={graphRangeOptions}
+              onChange={() => console.info("hey")}
+              selectedOption={graphRangeOptions[0]}
+              placeholder="Select range"
+            />
+            <SingleSelector
+              iconName="brain"
+              options={brainsWithUploadRights}
+              onChange={() => console.info("hey")}
+              selectedOption={undefined}
+              placeholder="Select specific brain"
+            />
+          </div>
+          <Line data={chartData} options={options} />
+        </div>
       ) : (
-        <p>Loading...</p>
+        <LoaderIcon size="big" color="accent" />
       )}
     </div>
   );
