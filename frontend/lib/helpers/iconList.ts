@@ -7,6 +7,7 @@ import {
 import { CgSoftwareDownload } from "react-icons/cg";
 import { CiFlag1 } from "react-icons/ci";
 import {
+  FaCalendar,
   FaCheck,
   FaCheckCircle,
   FaDiscord,
@@ -77,6 +78,7 @@ export const iconList: { [name: string]: IconType } = {
   addWithoutCircle: IoIosAdd,
   brain: LuBrain,
   brainCircuit: LuBrainCircuit,
+  calendar: FaCalendar,
   chair: PiOfficeChairFill,
   chat: BsChatLeftText,
   check: FaCheck,

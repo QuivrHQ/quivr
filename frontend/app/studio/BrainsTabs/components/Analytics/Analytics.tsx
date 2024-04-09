@@ -14,6 +14,14 @@ import {
 import { useLayoutEffect, useState } from "react";
 import { Line } from "react-chartjs-2";
 
+import { formatMinimalBrainsToSelectComponentInput } from "@/app/chat/[chatId]/components/ActionsBar/components/KnowledgeToFeed/utils/formatMinimalBrainsToSelectComponentInput";
+import { useAnalytics } from "@/lib/api/analytics/useAnalyticsApi";
+import { LoaderIcon } from "@/lib/components/ui/LoaderIcon/LoaderIcon";
+import { SingleSelector } from "@/lib/components/ui/SingleSelector/SingleSelector";
+import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
+
+import styles from "./Analytics.module.scss";
+
 ChartJS.register(
   CategoryScale,
   Filler,
@@ -24,12 +32,6 @@ ChartJS.register(
   Tooltip,
   Legend
 );
-
-import { formatMinimalBrainsToSelectComponentInput } from "@/app/chat/[chatId]/components/ActionsBar/components/KnowledgeToFeed/utils/formatMinimalBrainsToSelectComponentInput";
-import { useAnalytics } from "@/lib/api/analytics/useAnalyticsApi";
-import { LoaderIcon } from "@/lib/components/ui/LoaderIcon/LoaderIcon";
-import { SingleSelector } from "@/lib/components/ui/SingleSelector/SingleSelector";
-import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 
 export const Analytics = (): JSX.Element => {
   const { getBrainsUsages } = useAnalytics();
@@ -73,6 +75,7 @@ export const Analytics = (): JSX.Element => {
                 return gradient;
               },
               fill: true,
+              tension: 0.2,
             },
           ],
         });
@@ -103,10 +106,10 @@ export const Analytics = (): JSX.Element => {
   };
 
   return (
-    <div>
+    <div className={styles.analytics_wrapper}>
       {chartData.labels.length ? (
-        <div>
-          <div>
+        <>
+          <div className={styles.selectors_wrapper}>
             <SingleSelector
               iconName="calendar"
               options={graphRangeOptions}
@@ -123,7 +126,7 @@ export const Analytics = (): JSX.Element => {
             />
           </div>
           <Line data={chartData} options={options} />
-        </div>
+        </>
       ) : (
         <LoaderIcon size="big" color="accent" />
       )}
