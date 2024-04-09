@@ -32,6 +32,7 @@ class IntegrationDescriptionEntity(BaseModel):
     max_files: int
     allow_model_change: bool
     integration_display_name: str
+    onboarding_brain: bool
 
 
 class IntegrationEntity(BaseModel):

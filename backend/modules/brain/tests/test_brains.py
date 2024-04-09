@@ -5,22 +5,6 @@ from modules.brain.service.brain_user_service import BrainUserService
 
 brain_user_service = BrainUserService()
 
-
-def test_retrieve_default_brain(client, api_key):
-    # Making a GET request to the /brains/default/ endpoint
-    response = client.get(
-        "/brains/default/",
-        headers={"Authorization": "Bearer " + api_key},
-    )
-
-    # Assert that the response status code is 200 (HTTP OK)
-    assert response.status_code == 200
-
-    default_brain = response.json()
-    assert "id" in default_brain
-    assert "name" in default_brain
-
-
 def test_create_brain(client, api_key):
     # Generate a random name for the brain
     random_brain_name = "".join(

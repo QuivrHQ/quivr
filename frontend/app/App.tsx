@@ -39,8 +39,7 @@ if (
 
 // This wrapper is used to make effect calls at a high level in app rendering.
 const App = ({ children }: PropsWithChildren): JSX.Element => {
-  const { fetchAllBrains, fetchDefaultBrain, fetchPublicPrompts } =
-    useBrainContext();
+  const { fetchAllBrains, fetchPublicPrompts } = useBrainContext();
   const { onClickOutside } = useOutsideClickListener();
   const { session } = useSupabase();
 
@@ -49,7 +48,7 @@ const App = ({ children }: PropsWithChildren): JSX.Element => {
   useEffect(() => {
     if (session?.user) {
       void fetchAllBrains();
-      void fetchDefaultBrain();
+
       void fetchPublicPrompts();
       posthog.identify(session.user.id, { email: session.user.email });
       posthog.startSessionRecording();

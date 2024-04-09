@@ -58,16 +58,6 @@ async def retrieve_public_brains() -> list[PublicBrain]:
     return brain_service.get_public_brains()
 
 
-@brain_router.get(
-    "/brains/default/", dependencies=[Depends(AuthBearer())], tags=["Brain"]
-)
-async def retrieve_default_brain(
-    current_user: UserIdentity = Depends(get_current_user),
-):
-    """Retrieve or create the default brain for the current user."""
-    brain = brain_user_service.get_default_user_brain_or_create_new(current_user)
-    return {"id": brain.brain_id, "name": brain.name, "rights": "Owner"}
-
 
 @brain_router.get(
     "/brains/{brain_id}/",
@@ -218,19 +208,6 @@ async def update_existing_brain_secrets(
             )
 
     return {"message": f"Brain {brain_id} has been updated."}
-
-
-@brain_router.post(
-    "/brains/{brain_id}/default",
-    dependencies=[Depends(AuthBearer()), Depends(has_brain_authorization())],
-    tags=["Brain"],
-)
-async def set_brain_as_default(
-    brain_id: UUID, user: UserIdentity = Depends(get_current_user)
-):
-    """Set a brain as the default for the current user."""
-    brain_user_service.set_as_default_brain_for_user(user.id, brain_id)
-    return {"message": f"Brain {brain_id} has been set as default brain."}
 
 
 @brain_router.post(

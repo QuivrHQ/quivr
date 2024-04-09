@@ -23,14 +23,13 @@ type UseSettingsTabProps = {
 export const useSettingsTab = ({ brainId }: UseSettingsTabProps) => {
   const { t } = useTranslation(["translation", "brain", "config"]);
   const [isUpdating, setIsUpdating] = useState(false);
-  const [isSettingAsDefault, setIsSettingAsDefault] = useState(false);
   const { publish } = useToast();
   const formRef = useRef<HTMLFormElement>(null);
-  const { setAsDefaultBrain, updateBrain } = useBrainApi();
-  const { fetchAllBrains, fetchDefaultBrain } = useBrainContext();
+  const { updateBrain } = useBrainApi();
+  const { fetchAllBrains } = useBrainContext();
   const { userData } = useUserData();
 
-  const { getValues, maxTokens, setValue, openAiKey, model, isDefaultBrain } =
+  const { getValues, maxTokens, setValue, openAiKey, model } =
     useBrainFormState();
 
   const accessibleModels = getAccessibleModels({
@@ -56,38 +55,6 @@ export const useSettingsTab = ({ brainId }: UseSettingsTabProps) => {
       formRef.current?.removeEventListener("keydown", handleKeyPress);
     };
   }, [formRef.current]);
-
-  const setAsDefaultBrainHandler = async () => {
-    try {
-      setIsSettingAsDefault(true);
-      await setAsDefaultBrain(brainId);
-      publish({
-        variant: "success",
-        text: t("defaultBrainSet", { ns: "config" }),
-      });
-      void fetchAllBrains();
-      void fetchDefaultBrain();
-    } catch (err) {
-      // ...
-
-      if (isAxiosError(err) && err.response?.status === 429) {
-        publish({
-          variant: "danger",
-          text: `${JSON.stringify(
-            (
-              err.response as {
-                data: { detail: string };
-              }
-            ).data.detail
-          )}`,
-        });
-
-        return;
-      }
-    } finally {
-      setIsSettingAsDefault(false);
-    }
-  };
 
   const handleSubmit = async () => {
     const { name, description } = getValues();
@@ -142,10 +109,7 @@ export const useSettingsTab = ({ brainId }: UseSettingsTabProps) => {
 
   return {
     handleSubmit,
-    setAsDefaultBrainHandler,
     isUpdating,
-    isSettingAsDefault,
-    isDefaultBrain,
     formRef,
     accessibleModels,
     setIsUpdating,
