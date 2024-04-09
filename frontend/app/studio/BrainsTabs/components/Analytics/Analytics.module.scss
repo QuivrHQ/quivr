@@ -8,5 +8,9 @@
   .selectors_wrapper {
     display: flex;
     justify-content: space-between;
+
+    .selector {
+      width: 300px;
+    }
   }
 }

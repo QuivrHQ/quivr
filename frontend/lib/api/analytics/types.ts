@@ -6,3 +6,9 @@ interface Usage {
 export interface BrainsUsages {
   usages: Usage[];
 }
+
+export enum Range {
+  WEEK = 7,
+  MONTH = 30,
+  QUARTER = 90,
+}

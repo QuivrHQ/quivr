@@ -110,20 +110,24 @@ export const Analytics = (): JSX.Element => {
       {chartData.labels.length ? (
         <>
           <div className={styles.selectors_wrapper}>
-            <SingleSelector
-              iconName="calendar"
-              options={graphRangeOptions}
-              onChange={() => console.info("hey")}
-              selectedOption={graphRangeOptions[0]}
-              placeholder="Select range"
-            />
-            <SingleSelector
-              iconName="brain"
-              options={brainsWithUploadRights}
-              onChange={() => console.info("hey")}
-              selectedOption={undefined}
-              placeholder="Select specific brain"
-            />
+            <div className={styles.selector}>
+              <SingleSelector
+                iconName="calendar"
+                options={graphRangeOptions}
+                onChange={() => console.info("hey")}
+                selectedOption={graphRangeOptions[0]}
+                placeholder="Select range"
+              />
+            </div>
+            <div className={styles.selector}>
+              <SingleSelector
+                iconName="brain"
+                options={brainsWithUploadRights}
+                onChange={() => console.info("hey")}
+                selectedOption={undefined}
+                placeholder="Select specific brain"
+              />
+            </div>
           </div>
           <Line data={chartData} options={options} />
         </>
