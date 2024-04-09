@@ -9,5 +9,5 @@ class AnalyticsService:
         self.repository = Analytics()
 
     def get_brains_usages(self, user_id, graph_range, brain_id = None):
-        print('GRAAAPHGGG', graph_range)
+
         return self.repository.get_brains_usages(user_id, graph_range, brain_id)
