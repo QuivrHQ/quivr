@@ -44,6 +44,7 @@ export const Analytics = (): JSX.Element => {
   const [currentChartRange, setCurrentChartRange] = useState(
     Range.WEEK as number
   );
+  const [selectedBrainId, setSeletedBrainId] = useState<string | null>(null);
 
   const graphRangeOptions = [
     { label: "Last 7 days", value: Range.WEEK },
@@ -65,13 +66,11 @@ export const Analytics = (): JSX.Element => {
   useLayoutEffect(() => {
     void (async () => {
       try {
-        const res = await getBrainsUsages(null, currentChartRange);
+        const res = await getBrainsUsages(selectedBrainId, currentChartRange);
         const chartLabels = res?.usages.map((usage) => usage.date) as Date[];
         const chartDataset = res?.usages.map(
           (usage) => usage.usage_count
         ) as number[];
-
-        console.info("hey");
 
         setChartData({
           labels: chartLabels,
@@ -97,7 +96,7 @@ export const Analytics = (): JSX.Element => {
         console.error(error);
       }
     })();
-  }, [chartData.labels.length, currentChartRange]);
+  }, [chartData.labels.length, currentChartRange, selectedBrainId]);
 
   const options = {
     type: "line",
@@ -137,8 +136,17 @@ export const Analytics = (): JSX.Element => {
               <SingleSelector
                 iconName="brain"
                 options={brainsWithUploadRights}
-                onChange={() => console.info("hey")}
-                selectedOption={undefined}
+                onChange={(brainId) => setSeletedBrainId(brainId)}
+                selectedOption={
+                  selectedBrainId
+                    ? {
+                        value: selectedBrainId,
+                        label: allBrains.find(
+                          (brain) => brain.id === selectedBrainId
+                        )?.name as string,
+                      }
+                    : undefined
+                }
                 placeholder="Select specific brain"
               />
             </div>
