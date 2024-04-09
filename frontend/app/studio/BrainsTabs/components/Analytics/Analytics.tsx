@@ -44,7 +44,7 @@ export const Analytics = (): JSX.Element => {
   const [currentChartRange, setCurrentChartRange] = useState(
     Range.WEEK as number
   );
-  const [selectedBrainId, setSeletedBrainId] = useState<string | null>(null);
+  const [selectedBrainId, setSelectedBrainId] = useState<string | null>(null);
 
   const graphRangeOptions = [
     { label: "Last 7 days", value: Range.WEEK },
@@ -136,7 +136,8 @@ export const Analytics = (): JSX.Element => {
               <SingleSelector
                 iconName="brain"
                 options={brainsWithUploadRights}
-                onChange={(brainId) => setSeletedBrainId(brainId)}
+                onChange={(brainId) => setSelectedBrainId(brainId)}
+                onBackClick={() => setSelectedBrainId(null)}
                 selectedOption={
                   selectedBrainId
                     ? {
