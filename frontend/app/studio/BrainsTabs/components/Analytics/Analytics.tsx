@@ -76,7 +76,12 @@ export const Analytics = (): JSX.Element => {
           labels: chartLabels,
           datasets: [
             {
-              label: "Usage Count",
+              label: `Daily questions to ${
+                selectedBrainId
+                  ? allBrains.find((brain) => brain.id === selectedBrainId)
+                      ?.name
+                  : "your brains"
+              }`,
               data: chartDataset,
               borderColor: "rgb(75, 192, 192)",
               backgroundColor: (context: ScriptableContext<"line">) => {
