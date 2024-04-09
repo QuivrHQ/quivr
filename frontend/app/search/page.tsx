@@ -1,6 +1,6 @@
 "use client";
 import { usePathname } from "next/navigation";
-import { useEffect } from "react";
+import { useLayoutEffect, useState } from "react";
 
 import { QuivrLogo } from "@/lib/assets/QuivrLogo";
 import { AddBrainModal } from "@/lib/components/AddBrainModal";
@@ -20,6 +20,7 @@ import { ButtonType } from "@/lib/types/QuivrButton";
 import styles from "./page.module.scss";
 
 const Search = (): JSX.Element => {
+  const [isPageLoaded, setIsPageLoaded] = useState<boolean>(false);
   const pathname = usePathname();
   const { session } = useSupabase();
   const { isBrainCreationModalOpened, setIsBrainCreationModalOpened } =
@@ -27,9 +28,11 @@ const Search = (): JSX.Element => {
   const { userIdentityData } = useUserData();
   const { isDarkMode } = useUserSettingsContext();
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (session === null) {
       redirectToLogin();
+    } else {
+      setTimeout(() => setIsPageLoaded(true), 1000);
     }
   }, [pathname, session]);
 
@@ -75,23 +78,27 @@ const Search = (): JSX.Element => {
         <AddBrainModal />
         <OnboardingModal />
       </div>
-      {!isBrainCreationModalOpened && !userIdentityData?.onboarded && (
-        <div className={styles.onboarding_overlay}>
-          <div className={styles.first_brain_button}>
-            <MessageInfoBox type="tutorial">
-              <span>Press the following button to create your first brain</span>
-            </MessageInfoBox>
-            <QuivrButton
-              iconName="brain"
-              label="Create Brain"
-              color="primary"
-              onClick={() => {
-                setIsBrainCreationModalOpened(true);
-              }}
-            />
+      {!isBrainCreationModalOpened &&
+        !userIdentityData?.onboarded &&
+        !!isPageLoaded && (
+          <div className={styles.onboarding_overlay}>
+            <div className={styles.first_brain_button}>
+              <MessageInfoBox type="tutorial">
+                <span>
+                  Press the following button to create your first brain
+                </span>
+              </MessageInfoBox>
+              <QuivrButton
+                iconName="brain"
+                label="Create Brain"
+                color="primary"
+                onClick={() => {
+                  setIsBrainCreationModalOpened(true);
+                }}
+              />
+            </div>
           </div>
-        </div>
-      )}
+        )}
     </>
   );
 };
