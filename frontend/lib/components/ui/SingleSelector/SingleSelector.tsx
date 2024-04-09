@@ -62,7 +62,9 @@ export const SingleSelector = <T extends string | number | UUID>({
           className={styles.left}
           onClick={() => {
             setFolded(!folded);
-            onBackClick?.();
+            if (!folded) {
+              onBackClick?.();
+            }
           }}
         >
           <div className={styles.icon}>

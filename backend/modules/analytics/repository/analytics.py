@@ -14,12 +14,11 @@ class Analytics:
         self.db = supabase_client
 
     def get_brains_usages(self, user_id: UUID, graph_range: Range, brain_id: Optional[UUID] = None) -> BrainsUsages:
-
         user_brains = brain_user_service.get_user_brains(user_id)
         if brain_id is not None:
             user_brains = [brain for brain in user_brains if brain.id == brain_id]
 
-        usages = []
+        usage_per_day = defaultdict(int) 
 
         for brain in user_brains:
             chat_history = (
@@ -29,20 +28,20 @@ class Analytics:
                 .execute()
             ).data
 
-            usage_per_day = defaultdict(int)
             for chat in chat_history:
                 message_time = datetime.strptime(chat['message_time'], "%Y-%m-%dT%H:%M:%S.%f")
                 usage_per_day[message_time.date()] += 1
 
-            start_date = datetime.now().date() - timedelta(days=graph_range)
-            all_dates = [start_date + timedelta(days=i) for i in range(graph_range)]
-            for date in all_dates:
-                usage_per_day[date] += 0
+        start_date = datetime.now().date() - timedelta(days=graph_range)
+        all_dates = [start_date + timedelta(days=i) for i in range(graph_range)]
+        
+        for date in all_dates:
+            usage_per_day[date] += 0 
 
-            brain_usages = sorted(
-                [Usage(date=date, usage_count=count) for date, count in usage_per_day.items() if start_date <= date <= datetime.now().date()],
-                key=lambda usage: usage.date
-            )
-            usages.extend(brain_usages)
+        usages = sorted(
+            [Usage(date=date, usage_count=count) for date, count in usage_per_day.items() if start_date <= date <= datetime.now().date()],
+            key=lambda usage: usage.date
+        )
 
         return BrainsUsages(usages=usages)
+
