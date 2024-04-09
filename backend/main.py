@@ -6,10 +6,14 @@ if __name__ == "__main__":
     from dotenv import load_dotenv  # type: ignore
 
     load_dotenv()
-import sentry_sdk
+import logging
+
+import highlight_io
 import litellm
+import sentry_sdk
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import JSONResponse
+from highlight_io.integrations.fastapi import FastAPIMiddleware
 from logger import get_logger
 from middlewares.cors import add_cors_middleware
 from modules.api_key.controller import api_key_router
@@ -30,7 +34,6 @@ from routes.crawl_routes import crawl_router
 from routes.subscription_routes import subscription_router
 from sentry_sdk.integrations.fastapi import FastApiIntegration
 from sentry_sdk.integrations.starlette import StarletteIntegration
-import logging
 
 # Set the logging level for all loggers to WARNING
 logging.basicConfig(level=logging.INFO)
@@ -69,6 +72,19 @@ if sentry_dsn:
     )
 
 app = FastAPI()
+
+hightlight_io_variable = os.getenv("HIGHLIGHT_IO")
+backend_env = os.getenv("BACKEND_ENV")
+if hightlight_io_variable and backend_env:
+    H = highlight_io.H(
+        hightlight_io_variable,
+        instrument_logging=True,
+        service_name="quivr",
+        service_version="git-sha",
+        environment=backend_env,
+    )
+    logger.error("Highlight.io enabled")
+    app.add_middleware(FastAPIMiddleware)
 
 add_cors_middleware(app)
 

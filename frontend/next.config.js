@@ -69,6 +69,7 @@ const ContentSecurityPolicy = {
     "https://cdn.growthbook.io",
     "https://vitals.vercel-insights.com/v1/vitals",
     "https://us.posthog.com",
+    "https://pub.highlight.io",
   ],
   "img-src": [
     "'self'",
@@ -91,6 +92,7 @@ const ContentSecurityPolicy = {
   "script-src": [
     "'unsafe-inline'",
     "'unsafe-eval'",
+    "'blob'",
     "https://va.vercel-scripts.com/",
     "*.intercom.io",
     "*.intercomcdn.com",

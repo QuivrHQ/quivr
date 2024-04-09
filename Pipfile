@@ -52,6 +52,8 @@ psycopg2-binary = "*"
 psycopg2 = "*"
 celery = {extras = ["redis", "sqs"], version = "*"}
 unstructured = {extras = ["all-docs"], version = "*"}
+highlight-io = {extras = ["fastapi"], version = "*"}
+lxml = {extras = ["html_clean"], version = "*"}
 
 [dev-packages]
 black = "*"

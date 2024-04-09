@@ -4,6 +4,8 @@ import { cookies, headers } from "next/headers";
 
 import { ToastProvider } from "@/lib/components/ui/Toast";
 import { SupabaseProvider } from "@/lib/context/SupabaseProvider";
+import { HighlightInit } from '@highlight-run/next/client';
+
 
 import { App } from "./App";
 import "./globals.css";
@@ -31,6 +33,16 @@ const RootLayout = async ({
 
   return (
     <html lang="en">
+      <HighlightInit
+				projectId={'1epp527e'}
+				serviceName="quivr-frontend"
+				tracingOrigins
+				networkRecording={{
+					enabled: true,
+					recordHeadersAndBody: true,
+					urlBlocklist: [],
+				}}
+			/>
       <body
         className={styles.body}
         // className={`bg-white text-black h-screen flex flex-col dark:bg-black dark:text-white w-full ${inter.className}`}
