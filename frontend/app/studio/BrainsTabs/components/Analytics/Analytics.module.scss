@@ -1,0 +1,16 @@
+@use "@/styles/Spacings.module.scss";
+
+.analytics_wrapper {
+  padding: Spacings.$spacing06;
+  display: flex;
+  flex-direction: column;
+
+  .selectors_wrapper {
+    display: flex;
+    justify-content: space-between;
+
+    .selector {
+      width: 300px;
+    }
+  }
+}

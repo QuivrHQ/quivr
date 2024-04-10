@@ -11,6 +11,7 @@ import { useKnowledgeToFeedContext } from "@/lib/context/KnowledgeToFeedProvider
 import { ButtonType } from "@/lib/types/QuivrButton";
 import { Tab } from "@/lib/types/Tab";
 
+import { Analytics } from "./BrainsTabs/components/Analytics/Analytics";
 import { ManageBrains } from "./BrainsTabs/components/ManageBrains/ManageBrains";
 import styles from "./page.module.scss";
 
@@ -27,10 +28,9 @@ const Studio = (): JSX.Element => {
       iconName: "edit",
     },
     {
-      label: "Analytics - Coming soon",
+      label: "Analytics",
       isSelected: selectedTab === "Analytics",
       onClick: () => setSelectedTab("Analytics"),
-      disabled: true,
       iconName: "graph",
     },
   ];
@@ -66,6 +66,7 @@ const Studio = (): JSX.Element => {
       <div className={styles.content_wrapper}>
         <Tabs tabList={studioTabs} />
         {selectedTab === "Manage my brains" && <ManageBrains />}
+        {selectedTab === "Analytics" && <Analytics />}
       </div>
       <UploadDocumentModal />
       <AddBrainModal />

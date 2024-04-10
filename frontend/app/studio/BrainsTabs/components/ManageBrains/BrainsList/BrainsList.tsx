@@ -1,8 +1,7 @@
 import { MinimalBrainForUser } from "@/lib/context/BrainProvider/types";
 
+import { BrainItem } from "./BrainItem/BrainItem";
 import styles from "./BrainsList.module.scss";
-
-import { BrainItem } from "../BrainItem/BrainItem";
 
 type BrainsListProps = {
   brains: MinimalBrainForUser[];

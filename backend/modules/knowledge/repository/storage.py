@@ -4,7 +4,6 @@ from modules.knowledge.repository.storage_interface import StorageInterface
 
 logger = get_logger(__name__)
 
-
 class Storage(StorageInterface):
     def __init__(self):
         supabase_client = get_supabase_client()
