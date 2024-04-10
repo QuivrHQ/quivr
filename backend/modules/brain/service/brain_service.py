@@ -59,9 +59,7 @@ class BrainService:
         return self.brain_repository.get_brain_by_id(brain_id)
 
     def get_integration_brain(self, brain_id) -> IntegrationEntity | None:
-        return self.integration_brains_repository.get_integration_brain(
-            brain_id
-        )
+        return self.integration_brains_repository.get_integration_brain(brain_id)
 
     def find_brain_from_question(
         self,
@@ -105,22 +103,23 @@ class BrainService:
         if brain_id_to_use and not brain_to_use:
             brain_to_use = self.get_brain_by_id(brain_id_to_use)
 
-        # Calculate the closest brains to the question
-        list_brains = vector_store.find_brain_closest_query(user.id, question)
+        else:
+            # Calculate the closest brains to the question
+            list_brains = vector_store.find_brain_closest_query(user.id, question)
 
-        unique_list_brains = []
-        seen_brain_ids = set()
+            unique_list_brains = []
+            seen_brain_ids = set()
 
-        for brain in list_brains:
-            if brain["id"] not in seen_brain_ids:
-                unique_list_brains.append(brain)
-                seen_brain_ids.add(brain["id"])
+            for brain in list_brains:
+                if brain["id"] not in seen_brain_ids:
+                    unique_list_brains.append(brain)
+                    seen_brain_ids.add(brain["id"])
 
-        metadata["close_brains"] = unique_list_brains[:5]
+            metadata["close_brains"] = unique_list_brains[:5]
 
-        if list_brains and not brain_to_use:
-            brain_id_to_use = list_brains[0]["id"]
-            brain_to_use = self.get_brain_by_id(brain_id_to_use)
+            if list_brains and not brain_to_use:
+                brain_id_to_use = list_brains[0]["id"]
+                brain_to_use = self.get_brain_by_id(brain_id_to_use)
 
         return brain_to_use, metadata
 
@@ -323,7 +322,9 @@ class BrainService:
     def update_brain_last_update_time(self, brain_id: UUID):
         self.brain_repository.update_brain_last_update_time(brain_id)
 
-    def get_brain_details(self, brain_id: UUID, user_id: UUID = None) -> BrainEntity | None:
+    def get_brain_details(
+        self, brain_id: UUID, user_id: UUID = None
+    ) -> BrainEntity | None:
         brain = self.brain_repository.get_brain_details(brain_id)
         if brain == None:
             return None
@@ -334,14 +335,14 @@ class BrainService:
                     brain_id, user_id
                 )
             )
-            
-            if (brain.integration):
+
+            if brain.integration:
                 brain.integration_description = (
                     self.integration_description_repository.get_integration_description(
                         brain.integration.integration_id
                     )
                 )
-                
+
         return brain
 
     def get_connected_brains(self, brain_id: UUID) -> list[BrainEntity]:

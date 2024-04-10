@@ -1,10 +1,7 @@
-import time
-
 from fastapi import APIRouter, Depends, Request
 from middlewares.auth import AuthBearer, get_current_user
 from models import UserUsage
 from modules.brain.service.brain_user_service import BrainUserService
-from modules.brain.service.brain_vector_service import BrainVectorService
 from modules.user.dto.inputs import UserUpdatableProperties
 from modules.user.entity.user_identity import UserIdentity
 from modules.user.repository.users import Users
@@ -37,26 +34,16 @@ async def get_user_endpoint(
     user_settings = user_daily_usage.get_user_settings()
     max_brain_size = user_settings.get("max_brain_size", 1000000000)
 
-    date = time.strftime("%Y%m%d")
     monthly_chat_credit = user_settings.get("monthly_chat_credit", 10)
 
     user_daily_usage = UserUsage(id=current_user.id)
-    requests_stats = user_daily_usage.get_user_usage()
-    default_brain = brain_user_service.get_user_default_brain(current_user.id)
-
-    if default_brain:
-        defaul_brain_size = BrainVectorService(default_brain.brain_id).brain_size
-    else:
-        defaul_brain_size = 0
 
     return {
         "email": current_user.email,
         "max_brain_size": max_brain_size,
-        "current_brain_size": defaul_brain_size,
+        "current_brain_size": 0,
         "monthly_chat_credit": monthly_chat_credit,
-        "requests_stats": requests_stats,
         "models": user_settings.get("models", []),
-        "date": date,
         "id": current_user.id,
         "is_premium": user_settings["is_premium"],
     }

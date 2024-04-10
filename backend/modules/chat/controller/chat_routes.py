@@ -61,7 +61,6 @@ def get_answer_generator(
     current_user: UserIdentity,
 ):
     chat_instance = BrainfulChat()
-    chat_instance.validate_authorization(user_id=current_user.id, brain_id=brain_id)
 
     user_usage = UserUsage(
         id=current_user.id,
@@ -246,11 +245,6 @@ async def create_stream_question_handler(
 
     chat_instance = BrainfulChat()
     chat_instance.validate_authorization(user_id=current_user.id, brain_id=brain_id)
-
-    user_usage = UserUsage(
-        id=current_user.id,
-        email=current_user.email,
-    )
 
     logger.info(
         f"Creating question for chat {chat_id} with brain {brain_id} of type {type(brain_id)}"

@@ -10,6 +10,7 @@ class IntegrationType(str, Enum):
     SYNC = "sync"
     DOC = "doc"
 
+
 class IntegrationBrainTag(str, Enum):
     NEW = "new"
     RECOMMENDED = "recommended"
