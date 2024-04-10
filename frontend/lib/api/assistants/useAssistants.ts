@@ -7,6 +7,6 @@ export const useAssistants = () => {
   const { axiosInstance } = useAxios();
 
   return {
-    getBrainsUsages: async () => getAssistants(axiosInstance),
+    getAssistants: async () => getAssistants(axiosInstance),
   };
 };

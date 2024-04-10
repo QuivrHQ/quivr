@@ -25,7 +25,7 @@ interface AssistantOutputs {
   brain: AssistantOutput;
 }
 
-export interface Assistants {
+export interface Assistant {
   name: string;
   input_description: string;
   output_description: string;

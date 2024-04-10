@@ -1,9 +1,9 @@
 import { AxiosInstance } from "axios";
 
-import { Assistants } from "./types";
+import { Assistant } from "./types";
 
 export const getAssistants = async (
   axiosInstance: AxiosInstance
-): Promise<Assistants | undefined> => {
-  return (await axiosInstance.get<Assistants | undefined>("/assistants/")).data;
+): Promise<Assistant | undefined> => {
+  return (await axiosInstance.get<Assistant | undefined>("/assistants/")).data;
 };
