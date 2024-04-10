@@ -2,13 +2,13 @@ import os
 from tempfile import NamedTemporaryFile
 
 from logger import get_logger
-from modules.ingestion.ito.ito import ITO
+from modules.assistant.ito.ito import ITO
 from openai import OpenAI
 
 logger = get_logger(__name__)
 
 
-class AudioTranscriptIngestion(ITO):
+class AudioTranscriptAssistant(ITO):
 
     def __init__(
         self,
@@ -18,7 +18,7 @@ class AudioTranscriptIngestion(ITO):
             **kwargs,
         )
 
-    async def process_ingestion(self):
+    async def process_assistant(self):
         client = OpenAI()
 
         logger.info(f"Processing audio file {self.uploadFile.filename}")

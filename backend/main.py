@@ -6,24 +6,26 @@ if __name__ == "__main__":
     from dotenv import load_dotenv  # type: ignore
 
     load_dotenv()
-import sentry_sdk
+import logging
+
 import litellm
+import sentry_sdk
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import JSONResponse
 from logger import get_logger
 from middlewares.cors import add_cors_middleware
+from modules.analytics.controller.analytics_routes import analytics_router
 from modules.api_key.controller import api_key_router
+from modules.assistant.controller import assistant_router
 from modules.brain.controller import brain_router
 from modules.chat.controller import chat_router
 from modules.contact_support.controller import contact_router
-from modules.ingestion.controller import ingestion_router
 from modules.knowledge.controller import knowledge_router
 from modules.misc.controller import misc_router
 from modules.notification.controller import notification_router
 from modules.onboarding.controller import onboarding_router
 from modules.prompt.controller import prompt_router
 from modules.upload.controller import upload_router
-from modules.analytics.controller.analytics_routes import analytics_router
 from modules.user.controller import user_router
 from packages.utils import handle_request_validation_error
 from packages.utils.telemetry import maybe_send_telemetry
@@ -31,7 +33,6 @@ from routes.crawl_routes import crawl_router
 from routes.subscription_routes import subscription_router
 from sentry_sdk.integrations.fastapi import FastApiIntegration
 from sentry_sdk.integrations.starlette import StarletteIntegration
-import logging
 
 # Set the logging level for all loggers to WARNING
 logging.basicConfig(level=logging.INFO)
@@ -76,7 +77,7 @@ add_cors_middleware(app)
 app.include_router(brain_router)
 app.include_router(chat_router)
 app.include_router(crawl_router)
-app.include_router(ingestion_router)
+app.include_router(assistant_router)
 app.include_router(onboarding_router)
 app.include_router(misc_router)
 app.include_router(analytics_router)

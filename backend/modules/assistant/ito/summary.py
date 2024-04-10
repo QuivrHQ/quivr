@@ -11,12 +11,20 @@ from langchain_community.document_loaders import UnstructuredPDFLoader
 from langchain_core.prompts import PromptTemplate
 from langchain_text_splitters import CharacterTextSplitter
 from logger import get_logger
-from modules.ingestion.ito.ito import ITO
+from modules.assistant.dto.outputs import (
+    AssistantOutput,
+    InputFile,
+    Inputs,
+    OutputBrain,
+    OutputEmail,
+    Outputs,
+)
+from modules.assistant.ito.ito import ITO
 
 logger = get_logger(__name__)
 
 
-class SummaryIngestion(ITO):
+class SummaryAssistant(ITO):
 
     def __init__(
         self,
@@ -26,7 +34,7 @@ class SummaryIngestion(ITO):
             **kwargs,
         )
 
-    async def process_ingestion(self):
+    async def process_assistant(self):
 
         # Create a temporary file with the uploaded file as a temporary file and then pass it to the loader
         tmp_file = tempfile.NamedTemporaryFile(delete=False)
@@ -98,3 +106,35 @@ class SummaryIngestion(ITO):
         return await self.create_and_upload_processed_file(
             content, self.uploadFile.filename, "Summary"
         )
+
+
+def summary_inputs():
+    output = AssistantOutput(
+        name="Summary",
+        description="Summarize a set of documents",
+        input_description="One document to summarize",
+        output_description="A summary of the document",
+        inputs=Inputs(
+            files=[
+                InputFile(
+                    key="doc_to_summarize",
+                    allowed_extensions=["pdf"],
+                    required=True,
+                    description="The document to summarize",
+                )
+            ]
+        ),
+        outputs=Outputs(
+            brain=OutputBrain(
+                required=True,
+                description="The brain to which upload the document",
+                type="uuid",
+            ),
+            email=OutputEmail(
+                required=True,
+                description="Send the document by email",
+                type="str",
+            ),
+        ),
+    )
+    return output

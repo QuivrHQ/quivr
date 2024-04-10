@@ -1,13 +1,13 @@
 from abc import ABC, abstractmethod
 from typing import List
 
-from modules.ingestion.entity.ingestion import IngestionEntity
+from modules.assistant.entity.assistant import AssistantEntity
 
 
-class IngestionInterface(ABC):
+class AssistantInterface(ABC):
 
     @abstractmethod
-    def get_all_ingestions(self) -> List[IngestionEntity]:
+    def get_all_assistants(self) -> List[AssistantEntity]:
         """
         Get all the knowledge in a brain
         Args:
