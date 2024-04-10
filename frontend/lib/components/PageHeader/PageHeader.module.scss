@@ -9,6 +9,7 @@
   padding: Spacings.$spacing04;
   padding-left: Spacings.$spacing09;
   border-bottom: 1px solid var(--border-1);
+  height: 3rem;
 
   .left {
     @include Typography.H2;
@@ -30,7 +31,6 @@
   .buttons_wrapper {
     display: flex;
     gap: Spacings.$spacing03;
-    align-self: flex-end;
     align-items: center;
   }
 }

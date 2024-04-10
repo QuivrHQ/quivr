@@ -34,7 +34,7 @@ export const Menu = (): JSX.Element => {
   }
 
   const displayedOnPages = [
-    "assistant",
+    "/assistants",
     "/chat",
     "/library",
     "/search",
