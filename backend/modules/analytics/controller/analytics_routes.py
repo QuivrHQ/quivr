@@ -13,7 +13,7 @@ analytics_router = APIRouter()
 async def get_brains_usages(
     user: UUID = Depends(get_current_user),
     brain_id: UUID = Query(None),
-    graph_range: Range = Query(7, alias="graph_range")
+    graph_range: Range = Query(Range.WEEK, alias="graph_range")
 ):
     """
     Get all user brains usages
