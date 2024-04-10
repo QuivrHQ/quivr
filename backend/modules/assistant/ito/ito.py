@@ -6,6 +6,7 @@ from uuid import UUID
 
 from fastapi import UploadFile
 from logger import get_logger
+from modules.assistant.dto.outputs import AssistantOutput
 from modules.contact_support.controller.settings import ContactsSettings
 from modules.upload.controller.upload_routes import upload_file
 from modules.user.entity.user_identity import UserIdentity
@@ -39,7 +40,11 @@ class ITO(BaseModel):
         )
 
     @abstractmethod
-    async def process_ingestion(self):
+    async def process_assistant(self):
+        pass
+
+    @abstractmethod
+    def assistant_inputs(self) -> AssistantOutput:
         pass
 
     async def send_output_by_email(
