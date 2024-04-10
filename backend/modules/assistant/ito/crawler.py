@@ -1,12 +1,12 @@
 from bs4 import BeautifulSoup as Soup
 from langchain_community.document_loaders.recursive_url_loader import RecursiveUrlLoader
 from logger import get_logger
-from modules.ingestion.ito.ito import ITO
+from modules.assistant.ito.ito import ITO
 
 logger = get_logger(__name__)
 
 
-class CrawlerIngestion(ITO):
+class CrawlerAssistant(ITO):
 
     def __init__(
         self,
@@ -16,7 +16,7 @@ class CrawlerIngestion(ITO):
             **kwargs,
         )
 
-    async def process_ingestion(self):
+    async def process_assistant(self):
 
         url = self.url
         loader = RecursiveUrlLoader(
