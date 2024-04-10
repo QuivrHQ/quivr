@@ -29,6 +29,7 @@ export const DeleteOrUnsubscribeConfirmationModal = ({
       }
       isOpen={isOpen}
       setOpen={setOpen}
+      size="auto"
       Trigger={<div />}
       CloseTrigger={<div />}
     >

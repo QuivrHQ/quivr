@@ -27,7 +27,11 @@
     width: 35vw;
     height: 80vh;
 
-    &.big_modal {
+    &.auto {
+      height: auto;
+    }
+
+    &.big {
       width: 40vw;
       height: 90vh;
     }
@@ -38,7 +42,7 @@
     }
 
     @media (max-width: ScreenSizes.$small) {
-      width: 90vw;
+      min-width: 90vw;
     }
 
     .close_button_wrapper {

@@ -43,7 +43,7 @@ export const AddBrainModal = (): JSX.Element => {
         desc={t("newBrainSubtitle", { ns: "brain" })}
         isOpen={isBrainCreationModalOpened}
         setOpen={setIsBrainCreationModalOpened}
-        bigModal={true}
+        size="big"
         CloseTrigger={<div />}
       >
         <div className={styles.add_brain_modal_container}>

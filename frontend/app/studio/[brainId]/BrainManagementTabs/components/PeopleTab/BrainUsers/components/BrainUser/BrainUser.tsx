@@ -1,7 +1,5 @@
-import { useTranslation } from "react-i18next";
-
-import Field from "@/lib/components/ui/Field";
 import { Select } from "@/lib/components/ui/Select";
+import { TextInput } from "@/lib/components/ui/TextInput/TextInput";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 
 import { RemoveAccessIcon } from "./components/RemoveAccessIcon";
@@ -35,7 +33,6 @@ export const BrainUser = ({
     email,
   });
   const { currentBrain } = useBrainContext();
-  const { t } = useTranslation();
 
   return (
     <div
@@ -49,15 +46,7 @@ export const BrainUser = ({
         />
       )}
       <div className="flex flex-1">
-        <Field
-          name="email"
-          required
-          type="email"
-          placeholder={t("email")}
-          value={email}
-          data-testid="role-assignation-email-input"
-          readOnly
-        />
+        <TextInput label="Email" inputValue={email} disabled={true} />
       </div>
       <Select
         onChange={(newRole) => void updateSelectedRole(newRole)}
