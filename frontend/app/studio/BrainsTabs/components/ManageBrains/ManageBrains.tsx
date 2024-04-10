@@ -1,10 +1,10 @@
 import Spinner from "@/lib/components/ui/Spinner";
 
+import { BrainSearchBar } from "./BrainSearchBar";
+import { BrainsList } from "./BrainsList/BrainsList";
 import styles from "./ManageBrains.module.scss";
 
 import { useBrainsTabs } from "../../hooks/useBrainsTabs";
-import { BrainSearchBar } from "../BrainSearchBar";
-import { BrainsList } from "../BrainsList/BrainsList";
 
 export const ManageBrains = (): JSX.Element => {
   const { searchQuery, isFetchingBrains, setSearchQuery, brains } =

@@ -1,5 +1,29 @@
 # Changelog
 
+## 0.0.228 (2024-04-10)
+
+## What's Changed
+* fix(frontend): phone display issues by @Zewed in https://github.com/QuivrHQ/quivr/pull/2386
+* Patch 1 by @llwp in https://github.com/QuivrHQ/quivr/pull/2388
+* fix: typo in README.md by @bolens in https://github.com/QuivrHQ/quivr/pull/2391
+* feat(ingestion): Add ingestion module and routes by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2393
+* feat: Add seed ingestions to supabase migrations by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2399
+* feat: Add url_required field to IngestionEntity by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2400
+* Feat: Bibtex file uploads by @colesnic in https://github.com/QuivrHQ/quivr/pull/2398
+* fix: logger level and telemetry function calls by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2409
+* fix: Add integration brain to subscription route by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2410
+* feat(frontend): onboarding V2 by @Zewed in https://github.com/QuivrHQ/quivr/pull/2394
+* fix(frontend): onboardind bug by @Zewed in https://github.com/QuivrHQ/quivr/pull/2414
+* fix(frontend): cleaner fix for onboarding by @Zewed in https://github.com/QuivrHQ/quivr/pull/2415
+* feat(analytics): added analytics page  by @Zewed in https://github.com/QuivrHQ/quivr/pull/2416
+
+## New Contributors
+* @llwp made their first contribution in https://github.com/QuivrHQ/quivr/pull/2388
+* @bolens made their first contribution in https://github.com/QuivrHQ/quivr/pull/2391
+* @colesnic made their first contribution in https://github.com/QuivrHQ/quivr/pull/2398
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.227...v0.0.228
+
 ## 0.0.227 (2024-03-28)
 
 ## What's Changed

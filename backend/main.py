@@ -23,6 +23,7 @@ from modules.notification.controller import notification_router
 from modules.onboarding.controller import onboarding_router
 from modules.prompt.controller import prompt_router
 from modules.upload.controller import upload_router
+from modules.analytics.controller.analytics_routes import analytics_router
 from modules.user.controller import user_router
 from packages.utils import handle_request_validation_error
 from packages.utils.telemetry import maybe_send_telemetry
@@ -78,6 +79,7 @@ app.include_router(crawl_router)
 app.include_router(ingestion_router)
 app.include_router(onboarding_router)
 app.include_router(misc_router)
+app.include_router(analytics_router)
 
 app.include_router(upload_router)
 app.include_router(user_router)

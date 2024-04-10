@@ -205,8 +205,8 @@ INSERT INTO "public"."brains_users" ("brain_id", "rights", "default_brain", "use
 -- Data for Name: integrations; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-INSERT INTO "public"."integrations" ("created_at", "integration_name", "integration_logo_url", "connection_settings", "id", "description", "integration_type", "max_files", "information", "tags", "allow_model_change", "integration_display_name") VALUES
-	('2024-03-06 21:21:07.251232+00', 'doc', 'https://quivr-cms.s3.eu-west-3.amazonaws.com/225911_200_46634039e4.png', NULL, 'b37a2275-61b3-460b-b4ab-94dfdf3642fb', 'Default description', 'custom', 5000, NULL, '{}', true, 'Brain');
+INSERT INTO "public"."integrations" ("created_at", "integration_name", "integration_logo_url", "connection_settings", "id", "description", "integration_type", "max_files", "information", "tags", "allow_model_change", "integration_display_name", "onboarding_brain") VALUES
+	('2024-03-06 21:21:07.251232+00', 'doc', 'https://quivr-cms.s3.eu-west-3.amazonaws.com/225911_200_46634039e4.png', NULL, 'b37a2275-61b3-460b-b4ab-94dfdf3642fb', 'Default description', 'custom', 5000, NULL, '{}', true, 'Brain', true);
 
 
 --

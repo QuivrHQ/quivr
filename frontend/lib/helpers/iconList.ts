@@ -7,6 +7,7 @@ import {
 import { CgSoftwareDownload } from "react-icons/cg";
 import { CiFlag1 } from "react-icons/ci";
 import {
+  FaCalendar,
   FaCheck,
   FaCheckCircle,
   FaDiscord,
@@ -68,7 +69,7 @@ import {
   MdUploadFile,
 } from "react-icons/md";
 import { PiOfficeChairFill } from "react-icons/pi";
-import { RiHashtag } from "react-icons/ri";
+import { RiDeleteBackLine, RiHashtag } from "react-icons/ri";
 import { SlOptions } from "react-icons/sl";
 import { TbNetwork } from "react-icons/tb";
 import { VscGraph } from "react-icons/vsc";
@@ -76,8 +77,10 @@ import { VscGraph } from "react-icons/vsc";
 export const iconList: { [name: string]: IconType } = {
   add: LuPlusCircle,
   addWithoutCircle: IoIosAdd,
+  back: RiDeleteBackLine,
   brain: LuBrain,
   brainCircuit: LuBrainCircuit,
+  calendar: FaCalendar,
   chair: PiOfficeChairFill,
   chat: BsChatLeftText,
   check: FaCheck,
