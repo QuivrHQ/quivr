@@ -1,7 +1,8 @@
+import json
 from typing import List, Optional
 from uuid import UUID
 
-from pydantic import BaseModel
+from pydantic import BaseModel, model_validator
 
 
 class EmailInput(BaseModel):
@@ -43,3 +44,8 @@ class InputAssistant(BaseModel):
     name: str
     inputs: Inputs
     outputs: Outputs
+
+    @model_validator(mode="before")
+    @classmethod
+    def to_py_dict(cls, data):
+        return json.loads(data)

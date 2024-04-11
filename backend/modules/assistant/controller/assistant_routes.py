@@ -39,44 +39,8 @@ async def list_assistants(
     tags=["Assistant"],
 )
 async def process_assistant(
-    values: InputAssistant,
-    files: List[UploadFile] = File(None),
+    input: InputAssistant,
+    files: List[UploadFile] = File(...),
     current_user: UserIdentity = Depends(get_current_user),
-):
-    logger.info(f"Processing assistant with inputs: {values}")
-    # if ingestion_id is None:
-    #     raise ValueError("Ingestion ID is required")
-
-    # assistant = assistant_service.get_assistant_by_id(ingestion_id)
-
-    # if assistant.name == "summary":
-    #     summary = SummaryAssistant(
-    #         uploadFile=file_1,
-    #         current_user=current_user,
-    #         brain_id=brain_id,
-    #         send_file_email=send_file_email,
-    #         url=url,
-    #     )
-    #     return await summary.process_assistant()
-
-    # if assistant.name == "audio_transcript":
-    #     audio_summary = AudioTranscriptAssistant(
-    #         uploadFile=file_1,
-    #         current_user=current_user,
-    #         brain_id=brain_id,
-    #         send_file_email=send_file_email,
-    #         url=url,
-    #     )
-    #     return await audio_summary.process_assistant()
-
-    # if assistant.name == "crawler":
-    #     crawler = CrawlerAssistant(
-    #         uploadFile=file_1,
-    #         current_user=current_user,
-    #         brain_id=brain_id,
-    #         send_file_email=send_file_email,
-    #         url=url,
-    #     )
-    #     return await crawler.process_assistant()
-
-    return {"message": "Not found"}
+) -> InputAssistant:
+    return input
