@@ -1,50 +1,21 @@
 import random
-from abc import abstractmethod
+from abc import ABC, abstractmethod
 from io import BytesIO
 from tempfile import NamedTemporaryFile
-from uuid import UUID
 
 from fastapi import UploadFile
 from logger import get_logger
-from modules.assistant.dto.outputs import AssistantOutput
 from modules.contact_support.controller.settings import ContactsSettings
 from modules.upload.controller.upload_routes import upload_file
-from modules.user.entity.user_identity import UserIdentity
 from packages.emails.send_email import send_email
-from pydantic import BaseModel
 
 logger = get_logger(__name__)
 
 
-class ITO(BaseModel):
-    uploadFile: UploadFile | None = None
-    current_user: UserIdentity = None
-    brain_id: UUID | None = None
-    send_file_email: bool = False
-    url: str | None = None
-
-    def __init__(
-        self,
-        uploadFile: UploadFile,
-        current_user: UserIdentity,
-        brain_id: UUID,
-        send_file_email: bool = False,
-        url: str = None,
-    ):
-        super().__init__(
-            uploadFile=uploadFile,
-            current_user=current_user,
-            brain_id=brain_id,
-            send_file_email=send_file_email,
-            url=url,
-        )
+class ITO(ABC):
 
     @abstractmethod
     async def process_assistant(self):
-        pass
-
-    @abstractmethod
-    def assistant_inputs(self) -> AssistantOutput:
         pass
 
     async def send_output_by_email(
