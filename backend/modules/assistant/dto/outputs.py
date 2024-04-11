@@ -51,3 +51,4 @@ class AssistantOutput(BaseModel):
     output_description: str
     inputs: Inputs
     outputs: Outputs
+    icon_url: Optional[str] = None
