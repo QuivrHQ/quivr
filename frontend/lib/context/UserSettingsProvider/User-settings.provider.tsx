@@ -16,11 +16,12 @@ export const UserSettingsProvider = ({
 }: {
   children: React.ReactNode;
 }): JSX.Element => {
+  var bool = localStorage.getItem("isDarkMode") === "true" ? true : false;
+
   const [isDarkMode, setIsDarkMode] = useState<boolean>(() => {
     if (typeof window !== "undefined") {
-      return true;
+      return bool;
     }
-
     return true;
   });
 
@@ -45,6 +46,7 @@ export const UserSettingsProvider = ({
         setIsDarkMode(updatedState);
         localStorage.setItem("isDarkMode", JSON.stringify(updatedState));
       };
+
       mediaQueryList.addEventListener("change", listener);
 
       return () => {
