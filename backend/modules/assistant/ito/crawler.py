@@ -45,6 +45,7 @@ def crawler_inputs():
     output = AssistantOutput(
         name="Crawler",
         description="Crawls a website and extracts the text from the pages",
+        tags=["new"],
         input_description="One URL to crawl",
         output_description="Text extracted from the pages",
         inputs=Inputs(

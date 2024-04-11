@@ -59,6 +59,7 @@ def audio_transcript_inputs():
     output = AssistantOutput(
         name="Audio Transcript",
         description="Transcribes an audio file",
+        tags=["new"],
         input_description="One audio file to transcribe",
         output_description="Transcription of the audio file",
         inputs=Inputs(
