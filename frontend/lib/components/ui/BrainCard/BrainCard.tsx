@@ -10,13 +10,13 @@ import Tooltip from "../Tooltip/Tooltip";
 
 interface BrainCardProps {
   tooltip: string;
-  selected: boolean;
+  selected?: boolean;
   imageUrl: string;
   brainName: string;
   tags: string[];
   callback: () => void;
   key: string;
-  disabled: boolean;
+  disabled?: boolean;
 }
 
 export const BrainCard = ({
