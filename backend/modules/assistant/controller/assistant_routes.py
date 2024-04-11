@@ -1,6 +1,6 @@
 from typing import List
 
-from fastapi import APIRouter, Depends, File, UploadFile
+from fastapi import APIRouter, Depends, UploadFile
 from logger import get_logger
 from middlewares.auth import AuthBearer, get_current_user
 from modules.assistant.dto.inputs import InputAssistant
@@ -40,7 +40,7 @@ async def list_assistants(
 )
 async def process_assistant(
     input: InputAssistant,
-    files: List[UploadFile] = File(...),
+    files: List[UploadFile] = None,
     current_user: UserIdentity = Depends(get_current_user),
 ) -> InputAssistant:
     return input
