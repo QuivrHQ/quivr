@@ -55,7 +55,7 @@ const Search = (): JSX.Element => {
           {assistants.map((assistant) => {
             return (
               <BrainCard
-                tooltip={"Hello"}
+                tooltip={assistant.description}
                 brainName={assistant.name}
                 tags={assistant.tags}
                 imageUrl={assistant.logo_url}

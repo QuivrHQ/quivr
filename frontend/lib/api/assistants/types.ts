@@ -33,4 +33,5 @@ export interface Assistant {
   outputs: AssistantOutputs;
   tags: string[];
   logo_url: string;
+  description: string;
 }
