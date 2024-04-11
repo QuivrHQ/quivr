@@ -1,11 +1,6 @@
-import { capitalCase } from "change-case";
-import Image from "next/image";
-
 import { IntegrationBrains } from "@/lib/api/brain/types";
+import { BrainCard } from "@/lib/components/ui/BrainCard/BrainCard";
 import { MessageInfoBox } from "@/lib/components/ui/MessageInfoBox/MessageInfoBox";
-import { Tag } from "@/lib/components/ui/Tag/Tag";
-import Tooltip from "@/lib/components/ui/Tooltip/Tooltip";
-import { useUserSettingsContext } from "@/lib/context/UserSettingsProvider/hooks/useUserSettingsContext";
 import { useUserData } from "@/lib/hooks/useUserData";
 
 import styles from "./BrainCatalogue.module.scss";
@@ -21,7 +16,6 @@ export const BrainCatalogue = ({
 }): JSX.Element => {
   const { setCurrentSelectedBrain, currentSelectedBrain } =
     useBrainCreationContext();
-  const { isDarkMode } = useUserSettingsContext();
   const { userIdentityData } = useUserData();
 
   return (
@@ -45,42 +39,19 @@ export const BrainCatalogue = ({
       <div className={styles.brains_grid}>
         {brains.map((brain) => {
           return (
-            <div
-              key={brain.id}
-              className={`${styles.brain_card_container} ${
-                !userIdentityData?.onboarded && !brain.onboarding_brain
-                  ? styles.disabled
-                  : ""
-              }`}
-              onClick={() => {
+            <BrainCard
+              tooltip={brain.description}
+              brainName={brain.integration_display_name}
+              tags={brain.tags}
+              selected={currentSelectedBrain?.id === brain.id}
+              imageUrl={brain.integration_logo_url}
+              callback={() => {
                 next();
                 setCurrentSelectedBrain(brain);
               }}
-            >
-              <Tooltip tooltip={brain.description}>
-                <div
-                  className={`${styles.brain_card_wrapper} ${
-                    currentSelectedBrain === brain ? styles.selected : ""
-                  }`}
-                >
-                  <Image
-                    className={isDarkMode ? styles.dark_image : ""}
-                    src={brain.integration_logo_url}
-                    alt={brain.integration_name}
-                    width={50}
-                    height={50}
-                  />
-                  <span className={styles.brain_title}>
-                    {brain.integration_display_name}
-                  </span>
-                  <div className={styles.tag_wrapper}>
-                    {brain.tags[0] && (
-                      <Tag color="primary" name={capitalCase(brain.tags[0])} />
-                    )}
-                  </div>
-                </div>
-              </Tooltip>
-            </div>
+              key={brain.id}
+              disabled={!userIdentityData?.onboarded && !brain.onboarding_brain}
+            />
           );
         })}
       </div>
