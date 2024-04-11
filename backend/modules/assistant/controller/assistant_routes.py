@@ -5,8 +5,6 @@ from logger import get_logger
 from middlewares.auth import AuthBearer, get_current_user
 from modules.assistant.dto.inputs import InputAssistant
 from modules.assistant.dto.outputs import AssistantOutput
-from modules.assistant.ito.audio_transcript import audio_transcript_inputs
-from modules.assistant.ito.crawler import crawler_inputs
 from modules.assistant.ito.summary import SummaryAssistant, summary_inputs
 from modules.assistant.service.assistant import Assistant
 from modules.user.entity.user_identity import UserIdentity
@@ -28,9 +26,9 @@ async def list_assistants(
     """
 
     summary = summary_inputs()
-    crawler = crawler_inputs()
-    audio_transcript = audio_transcript_inputs()
-    return [summary, crawler, audio_transcript]
+    # crawler = crawler_inputs()
+    # audio_transcript = audio_transcript_inputs()
+    return [summary]
 
 
 @assistant_router.post(
