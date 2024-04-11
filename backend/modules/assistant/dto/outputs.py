@@ -47,7 +47,9 @@ class Outputs(BaseModel):
 
 class AssistantOutput(BaseModel):
     name: str
+    tags: Optional[List[str]] = []
     input_description: str
     output_description: str
     inputs: Inputs
     outputs: Outputs
+    icon_url: Optional[str] = None
