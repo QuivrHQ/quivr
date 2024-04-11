@@ -2,11 +2,11 @@ import random
 from abc import abstractmethod
 from io import BytesIO
 from tempfile import NamedTemporaryFile
-from uuid import UUID
+from typing import List
 
 from fastapi import UploadFile
 from logger import get_logger
-from modules.assistant.dto.outputs import AssistantOutput
+from modules.assistant.dto.inputs import InputAssistant
 from modules.contact_support.controller.settings import ContactsSettings
 from modules.upload.controller.upload_routes import upload_file
 from modules.user.entity.user_identity import UserIdentity
@@ -17,34 +17,12 @@ logger = get_logger(__name__)
 
 
 class ITO(BaseModel):
-    uploadFile: UploadFile | None = None
-    current_user: UserIdentity = None
-    brain_id: UUID | None = None
-    send_file_email: bool = False
-    url: str | None = None
-
-    def __init__(
-        self,
-        uploadFile: UploadFile,
-        current_user: UserIdentity,
-        brain_id: UUID,
-        send_file_email: bool = False,
-        url: str = None,
-    ):
-        super().__init__(
-            uploadFile=uploadFile,
-            current_user=current_user,
-            brain_id=brain_id,
-            send_file_email=send_file_email,
-            url=url,
-        )
+    input: InputAssistant
+    files: List[UploadFile]
+    current_user: UserIdentity
 
     @abstractmethod
     async def process_assistant(self):
-        pass
-
-    @abstractmethod
-    def assistant_inputs(self) -> AssistantOutput:
         pass
 
     async def send_output_by_email(
@@ -100,7 +78,7 @@ class ITO(BaseModel):
             headers={"content-type": "text/plain"},
         )
 
-        if self.send_file_email:
+        if self.input.outputs.email.activated:
             await self.send_output_by_email(
                 file_to_upload,
                 new_filename,
@@ -109,11 +87,12 @@ class ITO(BaseModel):
 
         # Reset to start of file before upload
         file_to_upload.file.seek(0)
-        await upload_file(
-            uploadFile=file_to_upload,
-            brain_id=self.brain_id,
-            current_user=self.current_user,
-            chat_id=None,
-        )
+        if self.input.outputs.brain.activated:
+            await upload_file(
+                uploadFile=file_to_upload,
+                brain_id=self.input.outputs.brain.value,
+                current_user=self.current_user,
+                chat_id=None,
+            )
 
         return {"message": f"{file_description} generated successfully"}

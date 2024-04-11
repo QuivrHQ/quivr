@@ -1,57 +1,51 @@
-from typing import List
+import json
+from typing import List, Optional
 from uuid import UUID
 
-from pydantic import BaseModel
+from pydantic import BaseModel, model_validator
 
 
-class InputFile(BaseModel):
-    allowed_extensions: List[str]
-    required: bool
-    description: str
+class EmailInput(BaseModel):
+    activated: bool
 
 
-class InputUrl(BaseModel):
-    required: bool
-    description: bool
+class BrainInput(BaseModel):
+    activated: bool
+    value: UUID
 
 
-class InputText(BaseModel):
-    required: bool
-    description: bool
+class FileInput(BaseModel):
+    key: str
+    value: str
+
+
+class UrlInput(BaseModel):
+    key: str
+    value: str
+
+
+class TextInput(BaseModel):
+    key: str
+    value: str
 
 
 class Inputs(BaseModel):
-    files: List[InputFile]
-    urls: List[InputUrl]
-    texts: List[InputText]
-
-
-class OutputEmail(BaseModel):
-    required: bool
-    description: str
-    type: str
-
-
-class OutputBrain(BaseModel):
-    required: bool
-    description: str
-    type: UUID
+    files: Optional[List[FileInput]] = None
+    urls: Optional[List[UrlInput]] = None
+    texts: Optional[List[TextInput]] = None
 
 
 class Outputs(BaseModel):
-    emails: OutputEmail
-    brains: OutputBrain
+    email: Optional[EmailInput] = None
+    brain: Optional[BrainInput] = None
 
 
-class Outputs(BaseModel):
-    files: List[InputFile]
-    urls: List[InputUrl]
-    texts: List[InputText]
-
-
-class AssistantOutput(BaseModel):
+class InputAssistant(BaseModel):
     name: str
-    input_description: str
-    output_description: str
     inputs: Inputs
     outputs: Outputs
+
+    @model_validator(mode="before")
+    @classmethod
+    def to_py_dict(cls, data):
+        return json.loads(data)

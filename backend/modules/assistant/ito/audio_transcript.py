@@ -2,6 +2,14 @@ import os
 from tempfile import NamedTemporaryFile
 
 from logger import get_logger
+from modules.assistant.dto.outputs import (
+    AssistantOutput,
+    InputFile,
+    Inputs,
+    OutputBrain,
+    OutputEmail,
+    Outputs,
+)
 from modules.assistant.ito.ito import ITO
 from openai import OpenAI
 
@@ -45,3 +53,36 @@ class AudioTranscriptAssistant(ITO):
         return await self.create_and_upload_processed_file(
             transcription, self.uploadFile.filename, "Audio Transcript"
         )
+
+
+def audio_transcript_inputs():
+    output = AssistantOutput(
+        name="Audio Transcript",
+        description="Transcribes an audio file",
+        tags=["new"],
+        input_description="One audio file to transcribe",
+        output_description="Transcription of the audio file",
+        inputs=Inputs(
+            files=[
+                InputFile(
+                    key="audio_file",
+                    allowed_extensions=["mp3", "wav", "ogg", "m4a"],
+                    required=True,
+                    description="The audio file to transcribe",
+                )
+            ]
+        ),
+        outputs=Outputs(
+            brain=OutputBrain(
+                required=True,
+                description="The brain to which to upload the document",
+                type="uuid",
+            ),
+            email=OutputEmail(
+                required=True,
+                description="Send the document by email",
+                type="str",
+            ),
+        ),
+    )
+    return output
