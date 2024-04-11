@@ -141,6 +141,7 @@ def summary_inputs():
     output = AssistantOutput(
         name="Summary",
         description="Summarize a set of documents",
+        tags=["new"],
         input_description="One document to summarize",
         output_description="A summary of the document",
         inputs=Inputs(
