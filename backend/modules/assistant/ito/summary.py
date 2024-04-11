@@ -23,25 +23,26 @@ from modules.assistant.dto.outputs import (
     Outputs,
 )
 from modules.assistant.ito.ito import ITO
+from modules.user.entity.user_identity import UserIdentity
 
 logger = get_logger(__name__)
 
 
 class SummaryAssistant(ITO):
-    input: InputAssistant
-    files: List[UploadFile]
 
     def __init__(
         self,
         input: InputAssistant,
         files: List[UploadFile] = None,
+        current_user: UserIdentity = None,
         **kwargs,
     ):
         super().__init__(
+            input=input,
+            files=files,
+            current_user=current_user,
             **kwargs,
         )
-        self.input = input
-        self.files = files
 
     def check_input(self):
         if not self.files:
@@ -68,7 +69,7 @@ class SummaryAssistant(ITO):
         tmp_file = tempfile.NamedTemporaryFile(delete=False)
 
         # Write the file to the temporary file
-        tmp_file.write(self.uploadFile.file.read())
+        tmp_file.write(self.files[0].file.read())
 
         # Now pass the path of the temporary file to the loader
 
@@ -132,7 +133,7 @@ class SummaryAssistant(ITO):
         content = map_reduce_chain.run(split_docs)
 
         return await self.create_and_upload_processed_file(
-            content, self.uploadFile.filename, "Summary"
+            content, self.files[0].filename, "Summary"
         )
 
 

@@ -1,18 +1,25 @@
 import random
-from abc import ABC, abstractmethod
+from abc import abstractmethod
 from io import BytesIO
 from tempfile import NamedTemporaryFile
+from typing import List
 
 from fastapi import UploadFile
 from logger import get_logger
+from modules.assistant.dto.inputs import InputAssistant
 from modules.contact_support.controller.settings import ContactsSettings
 from modules.upload.controller.upload_routes import upload_file
+from modules.user.entity.user_identity import UserIdentity
 from packages.emails.send_email import send_email
+from pydantic import BaseModel
 
 logger = get_logger(__name__)
 
 
-class ITO(ABC):
+class ITO(BaseModel):
+    input: InputAssistant
+    files: List[UploadFile]
+    current_user: UserIdentity
 
     @abstractmethod
     async def process_assistant(self):
@@ -71,7 +78,7 @@ class ITO(ABC):
             headers={"content-type": "text/plain"},
         )
 
-        if self.send_file_email:
+        if self.input.outputs.email.activated:
             await self.send_output_by_email(
                 file_to_upload,
                 new_filename,
@@ -80,11 +87,12 @@ class ITO(ABC):
 
         # Reset to start of file before upload
         file_to_upload.file.seek(0)
-        await upload_file(
-            uploadFile=file_to_upload,
-            brain_id=self.brain_id,
-            current_user=self.current_user,
-            chat_id=None,
-        )
+        if self.input.outputs.brain.activated:
+            await upload_file(
+                uploadFile=file_to_upload,
+                brain_id=self.input.outputs.brain.value,
+                current_user=self.current_user,
+                chat_id=None,
+            )
 
         return {"message": f"{file_description} generated successfully"}

@@ -42,11 +42,14 @@ async def process_assistant(
     input: InputAssistant,
     files: List[UploadFile] = None,
     current_user: UserIdentity = Depends(get_current_user),
-) -> InputAssistant | dict:
+):
     if input.name == "summary":
-        summary_assistant = SummaryAssistant(input=input, files=files)
+        summary_assistant = SummaryAssistant(
+            input=input, files=files, current_user=current_user
+        )
         try:
             summary_assistant.check_input()
+            return await summary_assistant.process_assistant()
         except ValueError as e:
             raise HTTPException(status_code=400, detail=str(e))
-    return input
+    return {"message": "Assistant not found"}
