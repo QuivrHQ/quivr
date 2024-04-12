@@ -2,6 +2,8 @@ import { createContext, useContext, useState } from "react";
 
 import { IntegrationBrains } from "@/lib/api/brain/types";
 
+import { StepValue } from "./types/types";
+
 interface BrainCreationContextProps {
   isBrainCreationModalOpened: boolean;
   setIsBrainCreationModalOpened: React.Dispatch<React.SetStateAction<boolean>>;
@@ -11,6 +13,8 @@ interface BrainCreationContextProps {
   setCurrentSelectedBrain: React.Dispatch<
     React.SetStateAction<IntegrationBrains | undefined>
   >;
+  currentStep: StepValue;
+  setCurrentStep: React.Dispatch<React.SetStateAction<StepValue>>;
 }
 
 export const BrainCreationContext = createContext<
@@ -27,6 +31,7 @@ export const BrainCreationProvider = ({
   const [currentSelectedBrain, setCurrentSelectedBrain] =
     useState<IntegrationBrains>();
   const [creating, setCreating] = useState<boolean>(false);
+  const [currentStep, setCurrentStep] = useState<StepValue>("FIRST_STEP");
 
   return (
     <BrainCreationContext.Provider
@@ -37,6 +42,8 @@ export const BrainCreationProvider = ({
         setCreating,
         currentSelectedBrain,
         setCurrentSelectedBrain,
+        currentStep,
+        setCurrentStep,
       }}
     >
       {children}

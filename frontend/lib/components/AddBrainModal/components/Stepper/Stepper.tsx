@@ -2,11 +2,12 @@ import { Icon } from "@/lib/components/ui/Icon/Icon";
 
 import styles from "./Stepper.module.scss";
 
-import { useBrainCreationSteps } from "../../hooks/useBrainCreationSteps";
+interface StepperProps {
+  currentStep: string;
+  steps: { value: string; label: string }[];
+}
 
-export const Stepper = (): JSX.Element => {
-  const { currentStep, steps } = useBrainCreationSteps();
-
+export const Stepper = ({ currentStep, steps }: StepperProps): JSX.Element => {
   const currentStepIndex = steps.findIndex(
     (step) => step.value === currentStep
   );
