@@ -57,9 +57,9 @@ export const useLanguageHook = (): {
     const savedLanguage = localStorage.getItem("selectedLanguage") ?? "English";
 
     setCurrentLanguage(
-        languages.find((language) => language.label === savedLanguage)
+      languages.find((language) => language.label === savedLanguage)
     );
-    var shortName = languages.find(
+    const shortName = languages.find(
         (language) => language.label === savedLanguage
     )?.shortName;
     void i18n.changeLanguage(shortName);
