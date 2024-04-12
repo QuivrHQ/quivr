@@ -1,12 +1,14 @@
+import os
 import tempfile
 from typing import List
 
+import nest_asyncio
 from fastapi import UploadFile
 from langchain.prompts import HumanMessagePromptTemplate, SystemMessagePromptTemplate
 from langchain_community.chat_models import ChatLiteLLM
-from langchain_community.document_loaders import UnstructuredPDFLoader
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate, PromptTemplate
+from llama_parse import LlamaParse
 from logger import get_logger
 from modules.assistant.dto.inputs import InputAssistant
 from modules.assistant.dto.outputs import (
@@ -19,6 +21,9 @@ from modules.assistant.dto.outputs import (
 )
 from modules.assistant.ito.ito import ITO
 from modules.user.entity.user_identity import UserIdentity
+
+nest_asyncio.apply()
+
 
 logger = get_logger(__name__)
 
@@ -65,25 +70,36 @@ class DifferenceAssistant(ITO):
         document_1 = self.files[0]
         document_2 = self.files[1]
 
-        document_1_tmp = tempfile.NamedTemporaryFile(delete=False)
-        document_2_tmp = tempfile.NamedTemporaryFile(delete=False)
+        # Get the file extensions
+        document_1_ext = os.path.splitext(document_1.filename)[1]
+        document_2_ext = os.path.splitext(document_2.filename)[1]
+
+        # Create temporary files with the same extension as the original files
+        document_1_tmp = tempfile.NamedTemporaryFile(
+            suffix=document_1_ext, delete=False
+        )
+        document_2_tmp = tempfile.NamedTemporaryFile(
+            suffix=document_2_ext, delete=False
+        )
 
         document_1_tmp.write(document_1.file.read())
         document_2_tmp.write(document_2.file.read())
 
-        document_1_loader = UnstructuredPDFLoader(document_1_tmp.name)
-        document_2_loader = UnstructuredPDFLoader(document_2_tmp.name)
+        parser = LlamaParse(
+            result_type="markdown"  # "markdown" and "text" are available
+        )
+
+        logger.error(f"Document 1: {document_1_tmp.name}")
+        document_1_llama_parsed = parser.load_data(document_1_tmp.name)
+        document_2_llama_parsed = parser.load_data(document_2_tmp.name)
 
         document_1_tmp.close()
         document_2_tmp.close()
 
-        document_1_loaded = document_1_loader.load()
-        document_2_loaded = document_2_loader.load()
+        document_1_to_langchain = document_1_llama_parsed[0].to_langchain_format()
+        document_2_to_langchain = document_2_llama_parsed[0].to_langchain_format()
 
-        logger.error(f"Document 1: {document_1_loaded[0].page_content}")
-        logger.error(f"Document 2: {document_2_loaded[0].page_content}")
-
-        llm = ChatLiteLLM(model="gpt-3.5-turbo")
+        llm = ChatLiteLLM(model="gpt-4-turbo-2024-04-09")
 
         human_prompt = """Given the following two documents, find the difference between them:
 
@@ -96,7 +112,8 @@ class DifferenceAssistant(ITO):
         CONDENSE_QUESTION_PROMPT = PromptTemplate.from_template(human_prompt)
 
         system_message_template = """
-        You are an expert in finding the difference between two documents. You look deeply into what makes the two documents different and provide a detailed analysis.
+        You are an expert in finding the difference between two documents. You look deeply into what makes the two documents different and provide a detailed analysis if needed of the differences between the two documents.
+        If no differences are found, simply say that there are no differences.
         """
 
         ANSWER_PROMPT = ChatPromptTemplate.from_messages(
@@ -107,8 +124,8 @@ class DifferenceAssistant(ITO):
         )
 
         final_inputs = {
-            "document_1": document_1_loaded[0].page_content,
-            "document_2": document_2_loaded[0].page_content,
+            "document_1": document_1_to_langchain.page_content,
+            "document_2": document_2_to_langchain.page_content,
         }
 
         output_parser = StrOutputParser()
