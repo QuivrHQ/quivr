@@ -144,6 +144,7 @@ def summary_inputs():
         tags=["new"],
         input_description="One document to summarize",
         output_description="A summary of the document",
+        icon_url="https://quivr-cms.s3.eu-west-3.amazonaws.com/assistant_summary_434446a2aa.png",
         inputs=Inputs(
             files=[
                 InputFile(
