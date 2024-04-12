@@ -2,8 +2,10 @@ import { Icon } from "@/lib/components/ui/Icon/Icon";
 
 import styles from "./Stepper.module.scss";
 
+import { StepValue } from "../../types/types";
+
 interface StepperProps {
-  currentStep: string;
+  currentStep: StepValue;
   steps: { value: string; label: string }[];
 }
 
