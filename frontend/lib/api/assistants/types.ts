@@ -32,6 +32,6 @@ export interface Assistant {
   inputs: AssistantInputs;
   outputs: AssistantOutputs;
   tags: string[];
-  logo_url: string;
+  icon_url: string;
   description: string;
 }

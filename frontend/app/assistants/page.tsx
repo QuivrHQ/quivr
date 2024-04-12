@@ -58,7 +58,7 @@ const Search = (): JSX.Element => {
                 tooltip={assistant.description}
                 brainName={assistant.name}
                 tags={assistant.tags}
-                imageUrl={assistant.logo_url}
+                imageUrl={assistant.icon_url}
                 callback={() => {
                   console.info("Click");
                 }}
