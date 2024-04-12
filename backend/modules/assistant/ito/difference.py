@@ -89,7 +89,6 @@ class DifferenceAssistant(ITO):
             result_type="markdown"  # "markdown" and "text" are available
         )
 
-        logger.error(f"Document 1: {document_1_tmp.name}")
         document_1_llama_parsed = parser.load_data(document_1_tmp.name)
         document_2_llama_parsed = parser.load_data(document_2_tmp.name)
 
