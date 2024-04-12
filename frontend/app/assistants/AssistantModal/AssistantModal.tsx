@@ -3,6 +3,8 @@ import { Stepper } from "@/lib/components/AddBrainModal/components/Stepper/Stepp
 import { Modal } from "@/lib/components/ui/Modal/Modal";
 import { Step } from "@/lib/types/Modal";
 
+import styles from "./AssistantModal.module.scss";
+
 interface AssistantModalProps {
   isOpen: boolean;
   setIsOpen: (value: boolean) => void;
@@ -24,7 +26,7 @@ export const AssistantModal = ({
       value: "SECOND_STEP",
     },
   ];
-  const currentStep = "INPUTS";
+  const currentStep = "FIRST_STEP";
 
   return (
     <Modal
@@ -35,9 +37,9 @@ export const AssistantModal = ({
       size="big"
       CloseTrigger={<div />}
     >
-      <>
+      <div className={styles.modal_content_wrapper}>
         <Stepper steps={steps} currentStep={currentStep} />
-      </>
+      </div>
     </Modal>
   );
 };

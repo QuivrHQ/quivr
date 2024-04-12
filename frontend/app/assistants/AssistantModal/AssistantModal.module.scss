@@ -1,0 +1,5 @@
+@use "@/styles/Spacings.module.scss";
+
+.modal_content_wrapper {
+  padding: Spacings.$spacing05;
+}
