@@ -28,10 +28,18 @@ from langchain_core.runnables.base import RunnableSerializable
 
 def main(testset_path, input_folder, output_folder, model, context_size, metrics):
     # Create a fake user and brain
-    uuid_value = uuid.uuid4()
-    brain_service = BrainService()
-    knowledge_service = KnowledgeService()
-    brain = brain_service.create_brain(user_id=uuid_value, brain=None)
+    # Check if a brain ID was provided
+    if args.brain_id:
+        brain = brain_service.get_brain(args.brain_id)
+        if not brain:
+            print('Invalid brain ID provided.')
+            sys.exit(1)
+    else:
+        # Create a new brain
+        uuid_value = uuid.uuid4()
+        brain_service = BrainService()
+        knowledge_service = KnowledgeService()
+        brain = brain_service.create_brain(user_id=uuid_value, brain=None)
     brain_id = brain.brain_id
 
     for document_path in glob.glob(input_folder + '/*'):
@@ -64,6 +72,9 @@ def main(testset_path, input_folder, output_folder, model, context_size, metrics
     for metric in metrics:
         print(f"{metric} mean score: {score[metric].mean()}")
         print(f"{metric} median score: {score[metric].median()}")
+    # Cleanup if a new brain was created
+    if not args.brain_id:
+        brain_service.delete_brain(brain_id)
 
 def process_document(knowledge_service: KnowledgeService, brain_id: uuid.UUID, document_path: str) -> None:
     """
@@ -137,6 +148,7 @@ if __name__ == "__main__":
     parser.add_argument('--model', type=str, default='gpt-3.5-turbo-0125', help='Model to use')
     parser.add_argument('--context_size', type=int, default=4000, help='Context size for the model')
     parser.add_argument('--metrics', type=str, nargs='+', choices=['answer_correctness', 'context_relevancy', 'context_precision', 'faithfulness', 'answer_similarity'], default=['answer_correctness'], help='Metrics to evaluate')
+    parser.add_argument('--brain_id', type=str, default=None, help='ID of an existing brain to use for the evaluation')
     args = parser.parse_args()
 
-    main(args.testset_path, args.input_folder, args.output_folder, args.model, args.context_size, args.metrics)
+    main(args.testset_path, args.input_folder, args.output_folder, args.model, args.context_size, args.metrics, args.brain_id)
