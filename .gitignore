@@ -82,3 +82,4 @@ application.log
 backend/celerybeat-schedule.db
 
 backend/application.log.*
+backend/score.json
