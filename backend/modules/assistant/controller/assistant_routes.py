@@ -5,7 +5,7 @@ from logger import get_logger
 from middlewares.auth import AuthBearer, get_current_user
 from modules.assistant.dto.inputs import InputAssistant
 from modules.assistant.dto.outputs import AssistantOutput
-from modules.assistant.ito.difference import DifferenceAssistant, difference_inputs
+from modules.assistant.ito.difference import DifferenceAssistant
 from modules.assistant.ito.summary import SummaryAssistant, summary_inputs
 from modules.assistant.service.assistant import Assistant
 from modules.user.entity.user_identity import UserIdentity
@@ -43,7 +43,7 @@ async def process_assistant(
     files: List[UploadFile] = None,
     current_user: UserIdentity = Depends(get_current_user),
 ):
-    if input.name == "summary":
+    if input.name.lower() == "summary":
         summary_assistant = SummaryAssistant(
             input=input, files=files, current_user=current_user
         )
@@ -52,7 +52,7 @@ async def process_assistant(
             return await summary_assistant.process_assistant()
         except ValueError as e:
             raise HTTPException(status_code=400, detail=str(e))
-    elif input.name == "difference":
+    elif input.name.lower() == "difference":
         difference_assistant = DifferenceAssistant(
             input=input, files=files, current_user=current_user
         )

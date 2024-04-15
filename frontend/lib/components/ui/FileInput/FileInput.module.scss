@@ -1,0 +1,12 @@
+@use "@/styles/Spacings.module.scss";
+
+.header_wrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  .header_left {
+    display: flex;
+    align-items: center;
+  }
+}

@@ -1,5 +1,27 @@
-import styles from "./InputsStep.module.scss";
+import { capitalCase } from "change-case";
 
-export const InputsStep = (): JSX.Element => {
-  return <div className={styles.field_header_wrapper}></div>;
+import { AssistantInputs } from "@/lib/api/assistants/types";
+import { FileInput } from "@/lib/components/ui/FileInput/FileInput";
+
+interface InputsStepProps {
+  inputs: AssistantInputs;
+  onFileChange: (file: File, inputKey: string) => void; //
+}
+
+export const InputsStep = ({
+  inputs,
+  onFileChange,
+}: InputsStepProps): JSX.Element => {
+  return (
+    <div>
+      {inputs.files.map((fileInput) => (
+        <FileInput
+          key={fileInput.key}
+          label={capitalCase(fileInput.key)}
+          icon="file"
+          onFileChange={(file) => onFileChange(file, fileInput.key)}
+        />
+      ))}
+    </div>
+  );
 };

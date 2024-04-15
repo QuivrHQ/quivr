@@ -8,7 +8,7 @@ interface FilesInputAssistant extends AssistantInput {
   allowed_extensions: string[];
 }
 
-interface AssistantInputs {
+export interface AssistantInputs {
   files: FilesInputAssistant[];
   urls: AssistantInput[];
   texts: AssistantInput[];
@@ -34,4 +34,31 @@ export interface Assistant {
   tags: string[];
   icon_url: string;
   description: string;
+}
+
+export interface ProcessAssistantRequest {
+  name: string;
+  inputs: {
+    files: {
+      key: string;
+      value: string;
+    }[];
+    urls: {
+      key: string;
+      value: string;
+    }[];
+    texts: {
+      key: string;
+      value: string;
+    }[];
+  };
+  outputs: {
+    email: {
+      activated: boolean;
+    };
+    brain: {
+      activated: boolean;
+      value: string;
+    };
+  };
 }
