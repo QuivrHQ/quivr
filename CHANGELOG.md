@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.0.229 (2024-04-12)
+
+## What's Changed
+* feat: optimization calls by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2417
+* feat: Add assistant module and remove ingestion module by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2420
+* feat: assistants by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2421
+* feat: Add tags to AssistantOutput classes by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2425
+* feat: Add icon and description to assistant by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2426
+* feat: llamaparse & diff agent by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2427
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.228...v0.0.229
+
 ## 0.0.228 (2024-04-10)
 
 ## What's Changed
