@@ -1,7 +1,6 @@
 "use client";
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import Script from "next/script";
 import { posthog } from "posthog-js";
 import { PostHogProvider } from "posthog-js/react";
 import { PropsWithChildren, useEffect } from "react";
@@ -40,8 +39,7 @@ if (
 
 // This wrapper is used to make effect calls at a high level in app rendering.
 const App = ({ children }: PropsWithChildren): JSX.Element => {
-  const { fetchAllBrains, fetchDefaultBrain, fetchPublicPrompts } =
-    useBrainContext();
+  const { fetchAllBrains } = useBrainContext();
   const { onClickOutside } = useOutsideClickListener();
   const { session } = useSupabase();
 
@@ -50,8 +48,7 @@ const App = ({ children }: PropsWithChildren): JSX.Element => {
   useEffect(() => {
     if (session?.user) {
       void fetchAllBrains();
-      void fetchDefaultBrain();
-      void fetchPublicPrompts();
+
       posthog.identify(session.user.id, { email: session.user.email });
       posthog.startSessionRecording();
     }
@@ -59,11 +56,6 @@ const App = ({ children }: PropsWithChildren): JSX.Element => {
 
   return (
     <>
-      <Script
-        id="octolane-script"
-        src="https://cdn.octolane.com/tag.js?pk=0a213725640302dff773"
-      />
-
       <PostHogProvider client={posthog}>
         <IntercomProvider>
           <div className="flex flex-1 flex-col overflow-auto">

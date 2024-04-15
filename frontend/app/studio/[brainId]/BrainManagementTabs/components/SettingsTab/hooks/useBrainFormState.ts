@@ -3,7 +3,6 @@
 import { useCallback, useEffect } from "react";
 import { useFormContext } from "react-hook-form";
 
-import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 import { Brain } from "@/lib/context/BrainProvider/types";
 import { useUrlBrain } from "@/lib/hooks/useBrainIdFromUrl";
 import { BrainConfig, Model } from "@/lib/types/BrainConfig";
@@ -13,8 +12,6 @@ import { useBrainFetcher } from "../../../hooks/useBrainFetcher";
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const useBrainFormState = () => {
   const { brainId } = useUrlBrain();
-
-  const { defaultBrainId } = useBrainContext();
 
   const {
     register,
@@ -30,7 +27,6 @@ export const useBrainFormState = () => {
     brainId,
   });
 
-  const isDefaultBrain = defaultBrainId === brainId;
   const promptId = watch("prompt_id");
   const openAiKey = watch("openAiKey");
   const model = watch("model");
@@ -80,7 +76,6 @@ export const useBrainFormState = () => {
     model,
     temperature,
     maxTokens,
-    isDefaultBrain,
     promptId,
     openAiKey,
     defaultValues,

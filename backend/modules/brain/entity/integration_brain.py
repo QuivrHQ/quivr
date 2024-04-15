@@ -10,6 +10,7 @@ class IntegrationType(str, Enum):
     SYNC = "sync"
     DOC = "doc"
 
+
 class IntegrationBrainTag(str, Enum):
     NEW = "new"
     RECOMMENDED = "recommended"
@@ -32,6 +33,7 @@ class IntegrationDescriptionEntity(BaseModel):
     max_files: int
     allow_model_change: bool
     integration_display_name: str
+    onboarding_brain: bool
 
 
 class IntegrationEntity(BaseModel):

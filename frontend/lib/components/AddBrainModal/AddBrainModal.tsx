@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 
 import { Modal } from "@/lib/components/ui/Modal/Modal";
 import { addBrainDefaultValues } from "@/lib/config/defaultBrainConfig";
+import { useUserData } from "@/lib/hooks/useUserData";
 
 import styles from "./AddBrainModal.module.scss";
 import { useBrainCreationContext } from "./brainCreation-provider";
@@ -15,6 +16,7 @@ import { CreateBrainProps } from "./types/types";
 
 export const AddBrainModal = (): JSX.Element => {
   const { t } = useTranslation(["translation", "brain", "config"]);
+  const { userIdentityData } = useUserData();
 
   const {
     isBrainCreationModalOpened,
@@ -43,6 +45,7 @@ export const AddBrainModal = (): JSX.Element => {
         desc={t("newBrainSubtitle", { ns: "brain" })}
         isOpen={isBrainCreationModalOpened}
         setOpen={setIsBrainCreationModalOpened}
+        unclosable={!userIdentityData?.onboarded}
         size="big"
         CloseTrigger={<div />}
       >

@@ -24,6 +24,8 @@ services:
       - "5050"
       - "--workers"
       - "6"
+      - "--log-level"
+      - "info"
     restart: always
 
     ports:

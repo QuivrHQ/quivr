@@ -46,7 +46,7 @@ export const OnboardingModal = (): JSX.Element => {
     await updateUserIdentity({
       username: methods.getValues("username"),
       company: methods.getValues("companyName"),
-      onboarded: true,
+      onboarded: false,
       company_size: methods.getValues("companySize"),
       usage_purpose: methods.getValues("usagePurpose") as
         | UsagePurpose

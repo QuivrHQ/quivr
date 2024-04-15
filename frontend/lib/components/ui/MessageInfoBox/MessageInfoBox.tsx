@@ -8,7 +8,7 @@ import { Icon } from "../Icon/Icon";
 
 export type MessageInfoBoxProps = {
   children: React.ReactNode;
-  type: "info" | "success" | "warning" | "error";
+  type: "info" | "success" | "warning" | "error" | "tutorial";
   unforceWhite?: boolean;
 };
 
@@ -28,6 +28,8 @@ export const MessageInfoBox = ({
         return { iconName: "check", iconColor: "success" };
       case "warning":
         return { iconName: "warning", iconColor: "warning" };
+      case "tutorial":
+        return { iconName: "step", iconColor: "gold" };
       default:
         return { iconName: "info", iconColor: "primary" };
     }

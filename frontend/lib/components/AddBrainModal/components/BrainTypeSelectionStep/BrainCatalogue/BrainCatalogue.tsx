@@ -6,6 +6,7 @@ import { MessageInfoBox } from "@/lib/components/ui/MessageInfoBox/MessageInfoBo
 import { Tag } from "@/lib/components/ui/Tag/Tag";
 import Tooltip from "@/lib/components/ui/Tooltip/Tooltip";
 import { useUserSettingsContext } from "@/lib/context/UserSettingsProvider/hooks/useUserSettingsContext";
+import { useUserData } from "@/lib/hooks/useUserData";
 
 import styles from "./BrainCatalogue.module.scss";
 
@@ -21,6 +22,7 @@ export const BrainCatalogue = ({
   const { setCurrentSelectedBrain, currentSelectedBrain } =
     useBrainCreationContext();
   const { isDarkMode } = useUserSettingsContext();
+  const { userIdentityData } = useUserData();
 
   return (
     <div className={styles.cards_wrapper}>
@@ -30,13 +32,26 @@ export const BrainCatalogue = ({
           use cases or data sources.
         </span>
       </MessageInfoBox>
+      {!userIdentityData?.onboarded && (
+        <MessageInfoBox type="tutorial">
+          <span>
+            Let&apos;s start by creating a Docs &amp; URLs brain.<br></br>Of
+            course, feel free to explore other types of brains during your Quivr
+            journey.
+          </span>
+        </MessageInfoBox>
+      )}
       <span className={styles.title}>Choose a brain type</span>
       <div className={styles.brains_grid}>
         {brains.map((brain) => {
           return (
             <div
               key={brain.id}
-              className={styles.brain_card_container}
+              className={`${styles.brain_card_container} ${
+                !userIdentityData?.onboarded && !brain.onboarding_brain
+                  ? styles.disabled
+                  : ""
+              }`}
               onClick={() => {
                 next();
                 setCurrentSelectedBrain(brain);

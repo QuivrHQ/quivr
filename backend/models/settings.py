@@ -1,7 +1,7 @@
 from uuid import UUID
 
 from langchain.embeddings.ollama import OllamaEmbeddings
-from langchain.embeddings.openai import OpenAIEmbeddings
+from langchain_openai import OpenAIEmbeddings
 from logger import get_logger
 from models.databases.supabase.supabase import SupabaseDB
 from posthog import Posthog

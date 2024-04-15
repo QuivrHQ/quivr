@@ -51,15 +51,6 @@ export const deleteBrain = async (
   await axiosInstance.delete(`/brains/${brainId}/subscription`);
 };
 
-export const getDefaultBrain = async (
-  axiosInstance: AxiosInstance
-): Promise<MinimalBrainForUser | undefined> => {
-  return mapBackendMinimalBrainToMinimalBrain(
-    (await axiosInstance.get<BackendMinimalBrainForUser>(`/brains/default/`))
-      .data
-  );
-};
-
 export const getBrains = async (
   axiosInstance: AxiosInstance
 ): Promise<MinimalBrainForUser[]> => {
@@ -111,13 +102,6 @@ export const updateBrainAccess = async (
     ),
     email: userEmail,
   });
-};
-
-export const setAsDefaultBrain = async (
-  brainId: string,
-  axiosInstance: AxiosInstance
-): Promise<void> => {
-  await axiosInstance.post(`/brains/${brainId}/default`);
 };
 
 export const updateBrain = async (
