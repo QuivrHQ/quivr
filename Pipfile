@@ -57,6 +57,7 @@ llama-index = "*"
 lxml = {extras = ["html_clean"], version = "*"}
 ragas = "*"
 datasets = "*"
+pytest-dotenv = "*"
 
 [dev-packages]
 black = "*"
