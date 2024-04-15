@@ -55,6 +55,8 @@ unstructured = {extras = ["all-docs"], version = "*"}
 llama-parse = "*"
 llama-index = "*"
 lxml = {extras = ["html_clean"], version = "*"}
+ragas = "*"
+datasets = "*"
 
 [dev-packages]
 black = "*"

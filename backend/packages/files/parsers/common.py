@@ -41,6 +41,8 @@ async def process_file(
     if file.documents is not None:
         for doc in file.documents:  # pyright: ignore reportPrivateUsage=none
             new_metadata = metadata.copy()
+            # Add filename at beginning of page content
+            doc.page_content = f"Filename: {new_metadata['original_file_name']} Content: {doc.page_content}"
             len_chunk = len(enc.encode(doc.page_content))
             page_content_encoded = doc.page_content.encode("unicode_escape").decode(
                 "ascii", "replace"
