@@ -1,7 +1,6 @@
 import { useState } from "react";
 
 import { Assistant } from "@/lib/api/assistants/types";
-import { useAssistants } from "@/lib/api/assistants/useAssistants";
 import { Stepper } from "@/lib/components/AddBrainModal/components/Stepper/Stepper";
 import { StepValue } from "@/lib/components/AddBrainModal/types/types";
 import { MessageInfoBox } from "@/lib/components/ui/MessageInfoBox/MessageInfoBox";
@@ -41,32 +40,38 @@ export const AssistantModal = ({
     }))
   );
 
-  const { processAssistant } = useAssistants();
-
   const handleFileChange = (file: File, inputKey: string) => {
-    const res = processAssistant(
-      {
-        name: assistant.name,
-        inputs: {
-          files: [{ value: file.name, key: inputKey }],
-          urls: [],
-          texts: [],
-        },
-        outputs: {
-          email: {
-            activated: true,
-          },
-          brain: {
-            activated: true,
-            value: "9654e397-571a-4370-b3e9-0245acc8191a",
-          },
-        },
-      },
-      [file]
+    setFiles((prevFiles) =>
+      prevFiles.map((fileObj) =>
+        fileObj.key === inputKey ? { ...fileObj, file } : fileObj
+      )
     );
 
-    console.info(res, files);
+    console.info(files);
   };
+
+  // const processAssistant = () => {
+  //   const res = processAssistant(
+  //     {
+  //       name: assistant.name,
+  //       inputs: {
+  //         files: [{ value: file.name, key: inputKey }],
+  //         urls: [],
+  //         texts: [],
+  //       },
+  //       outputs: {
+  //         email: {
+  //           activated: true,
+  //         },
+  //         brain: {
+  //           activated: true,
+  //           value: "9654e397-571a-4370-b3e9-0245acc8191a",
+  //         },
+  //       },
+  //     },
+  //     [file]
+  //   );
+  // };
 
   return (
     <Modal
@@ -97,6 +102,7 @@ export const AssistantModal = ({
             color="primary"
             iconName="chevronRight"
             onClick={() => setCurrentStep("SECOND_STEP")}
+            disabled={!!files.find((file) => !file.file)}
           />
         </div>
       </div>
