@@ -82,9 +82,15 @@ class Outputs(BaseModel):
     brain: Optional[OutputBrain] = None
 
 
+class Pricing(BaseModel):
+    cost: int = 20
+    description: str = "Credits per use"
+
+
 class AssistantOutput(BaseModel):
     name: str
     description: str
+    pricing: Optional[Pricing] = Pricing()
     tags: Optional[List[str]] = []
     input_description: str
     output_description: str
