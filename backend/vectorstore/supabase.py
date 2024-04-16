@@ -68,19 +68,28 @@ class CustomSupabaseVectorStore(SupabaseVectorStore):
     def similarity_search(
         self,
         query: str,
+        full_text_weight: float = 2.0,  # Add this parameter
+        semantic_weight: float = 1.0,  # Add this parameter
+        rrf_k: int = 1,  # Add this parameter
         k: int = 40,
-        table: str = "match_vectors",
+        table: str = "hybrid_match_vectors",
         threshold: float = 0.5,
         **kwargs: Any,
     ) -> List[Document]:
         vectors = self._embedding.embed_documents([query])
         query_embedding = vectors[0]
+        query_lower = query.lower()
         res = self._client.rpc(
             table,
             {
+                "query_text": query_lower,
+                "match_count": 500,
                 "query_embedding": query_embedding,
-                "max_chunk_sum": self.max_input,
+                "full_text_weight": full_text_weight,  # Add this line
+                "semantic_weight": semantic_weight,  # Add this line
+                "rrf_k": rrf_k,  # Add this line
                 "p_brain_id": str(self.brain_id),
+                "max_chunk_sum": self.max_input,
             },
         ).execute()
 
@@ -96,5 +105,10 @@ class CustomSupabaseVectorStore(SupabaseVectorStore):
             for search in res.data
             if search.get("content")
         ]
+        for search in res.data:
+            if search.get("content"):
+                logger.info("ft_rank: %s", search.get("ft_rank", 0.0))
+                logger.info("similarity: %s", search.get("similarity", 0.0))
+                logger.info("rank_ix: %s", search.get("rank_ix", 0))
 
         return match_result

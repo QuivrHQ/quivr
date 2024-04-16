@@ -44,9 +44,11 @@ async def process_file(
             # Add filename at beginning of page content
             doc.page_content = f"Filename: {new_metadata['original_file_name']} Content: {doc.page_content}"
             len_chunk = len(enc.encode(doc.page_content))
-            page_content_encoded = doc.page_content.encode("unicode_escape").decode(
+            page_content_encoded = doc.page_content.replace("\n", " ")
+            page_content_encoded = page_content_encoded.encode("unicode_escape").decode(
                 "ascii", "replace"
             )
+            # Replace \n with space
 
             new_metadata["chunk_size"] = len_chunk
             doc_with_metadata = DocumentSerializable(
