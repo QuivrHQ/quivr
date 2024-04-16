@@ -65,6 +65,12 @@ class SummaryAssistant(ITO):
 
     async def process_assistant(self):
 
+        try:
+            self.increase_usage_user()
+        except Exception as e:
+            logger.error(f"Error increasing usage: {e}")
+            return {"error": str(e)}
+
         # Create a temporary file with the uploaded file as a temporary file and then pass it to the loader
         tmp_file = tempfile.NamedTemporaryFile(delete=False)
 

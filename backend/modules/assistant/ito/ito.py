@@ -7,6 +7,7 @@ from typing import List
 from fastapi import UploadFile
 from logger import get_logger
 from modules.assistant.dto.inputs import InputAssistant
+from modules.chat.controller.chat.utils import update_user_usage
 from modules.contact_support.controller.settings import ContactsSettings
 from modules.upload.controller.upload_routes import upload_file
 from modules.user.entity.user_identity import UserIdentity
@@ -20,6 +21,18 @@ class ITO(BaseModel):
     input: InputAssistant
     files: List[UploadFile]
     current_user: UserIdentity
+
+    def increase_usage_user(self):
+        # Raises an error if the user has consumed all of of his credits
+
+        update_user_usage(
+            usage=self.user_usage,
+            user_settings=self.user_settings,
+            cost=self.calculate_pricing(),
+        )
+
+    def calculate_pricing(self):
+        return 20
 
     @abstractmethod
     async def process_assistant(self):
