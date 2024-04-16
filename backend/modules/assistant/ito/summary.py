@@ -87,18 +87,19 @@ class SummaryAssistant(ITO):
 
         llm = ChatLiteLLM(model="gpt-3.5-turbo")
 
-        map_template = """The following is a set of documents
+        map_template = """The following is one document to summarize that has been split into multiple sections:
         {docs}
-        Based on this list of docs, please identify the main themes 
-        Helpful Answer:"""
+        Based on the section, please identify the main themes, key points, and important information in each section.
+        Helpful Knowledge:"""
         map_prompt = PromptTemplate.from_template(map_template)
         map_chain = LLMChain(llm=llm, prompt=map_prompt)
 
         # Reduce
-        reduce_template = """The following is set of summaries:
+        reduce_template = """The following is set of summaries for each section of the document:
         {docs}
-        Take these and distill it into a final, consolidated summary of the main themes. 
-        Helpful Answer:"""
+        Take these and distill it into a final, consolidated summary of the document. Make sure to include the main themes, key points, and important information.
+        Use markdown, headings, bullet points, or any other formatting to make the summary clear and easy to read.
+        Summary:"""
         reduce_prompt = PromptTemplate.from_template(reduce_template)
 
         # Run chain
