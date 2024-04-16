@@ -2,10 +2,11 @@ import random
 from abc import abstractmethod
 from io import BytesIO
 from tempfile import NamedTemporaryFile
-from typing import List
+from typing import List, Optional
 
 from fastapi import UploadFile
 from logger import get_logger
+from models.user_usage import UserUsage
 from modules.assistant.dto.inputs import InputAssistant
 from modules.chat.controller.chat.utils import update_user_usage
 from modules.contact_support.controller.settings import ContactsSettings
@@ -21,6 +22,28 @@ class ITO(BaseModel):
     input: InputAssistant
     files: List[UploadFile]
     current_user: UserIdentity
+    user_usage: Optional[UserUsage] = None
+    user_settings: Optional[dict] = None
+
+    def __init__(
+        self,
+        input: InputAssistant,
+        files: List[UploadFile] = None,
+        current_user: UserIdentity = None,
+        **kwargs,
+    ):
+        super().__init__(
+            input=input,
+            files=files,
+            current_user=current_user,
+            **kwargs,
+        )
+        self.user_usage = UserUsage(
+            id=current_user.id,
+            email=current_user.email,
+        )
+        self.user_settings = self.user_usage.get_user_settings()
+        self.increase_usage_user()
 
     def increase_usage_user(self):
         # Raises an error if the user has consumed all of of his credits
