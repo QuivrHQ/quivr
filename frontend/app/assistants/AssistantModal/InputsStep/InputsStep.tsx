@@ -19,6 +19,7 @@ export const InputsStep = ({
           key={fileInput.key}
           label={capitalCase(fileInput.key)}
           icon="file"
+          acceptedFileTypes={fileInput.allowed_extensions}
           onFileChange={(file) => onFileChange(file, fileInput.key)}
         />
       ))}

@@ -11,17 +11,25 @@ interface FileInputProps {
   label: string;
   icon: keyof typeof iconList;
   onFileChange: (file: File) => void;
+  acceptedFileTypes?: string[];
 }
 
 export const FileInput = (props: FileInputProps): JSX.Element => {
-  const [currentFile, setCurrentFile] = useState<File | null>(null);
+  const [currentFile, setcurrentFile] = useState<File | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string>("");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      props.onFileChange(file);
-      setCurrentFile(file);
+      const fileExtension = file.name.split(".").pop();
+      if (props.acceptedFileTypes?.includes(fileExtension || "")) {
+        props.onFileChange(file);
+        setcurrentFile(file);
+        setErrorMessage("");
+      } else {
+        setErrorMessage("Wrong extension");
+      }
     }
   };
 
@@ -49,6 +57,9 @@ export const FileInput = (props: FileInputProps): JSX.Element => {
       </div>
       {currentFile && (
         <span className={styles.filename}>{currentFile.name}</span>
+      )}
+      {errorMessage !== "" && (
+        <span className={styles.error_message}>{errorMessage}</span>
       )}
     </div>
   );

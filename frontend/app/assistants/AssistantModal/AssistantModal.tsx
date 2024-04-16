@@ -10,6 +10,7 @@ import { Step } from "@/lib/types/Modal";
 
 import styles from "./AssistantModal.module.scss";
 import { InputsStep } from "./InputsStep/InputsStep";
+import { OutputsStep } from "./OutputsStep/OutputsStep";
 
 interface AssistantModalProps {
   isOpen: boolean;
@@ -33,6 +34,7 @@ export const AssistantModal = ({
     },
   ];
   const [currentStep, setCurrentStep] = useState<StepValue>("FIRST_STEP");
+  const [emailOutput, setEmailOutput] = useState<boolean>(true);
   const [files, setFiles] = useState<{ key: string; file: File | null }[]>(
     assistant.inputs.files.map((fileInput) => ({
       key: fileInput.key,
@@ -85,25 +87,44 @@ export const AssistantModal = ({
       <div className={styles.modal_content_container}>
         <div className={styles.modal_content_wrapper}>
           <Stepper steps={steps} currentStep={currentStep} />
-          <MessageInfoBox type="info">
-            <span className={styles.title}>Expected Input:</span>
-            {assistant.input_description}
-          </MessageInfoBox>
-          {currentStep === "FIRST_STEP" && (
+          {currentStep === "FIRST_STEP" ? (
+            <MessageInfoBox type="info">
+              <span className={styles.title}>Expected Input:</span>
+              {assistant.input_description}
+            </MessageInfoBox>
+          ) : (
+            <MessageInfoBox type="info">
+              <span className={styles.title}>Output:</span>
+              {assistant.output_description}
+            </MessageInfoBox>
+          )}
+          {currentStep === "FIRST_STEP" ? (
             <InputsStep
               inputs={assistant.inputs}
               onFileChange={handleFileChange}
             />
+          ) : (
+            <OutputsStep setEmailOutput={setEmailOutput} />
           )}
         </div>
         <div className={styles.button}>
-          <QuivrButton
-            label="Next"
-            color="primary"
-            iconName="chevronRight"
-            onClick={() => setCurrentStep("SECOND_STEP")}
-            disabled={!!files.find((file) => !file.file)}
-          />
+          {currentStep === "FIRST_STEP" ? (
+            <QuivrButton
+              label="Next"
+              color="primary"
+              iconName="chevronRight"
+              onClick={() => setCurrentStep("SECOND_STEP")}
+              disabled={!!files.find((file) => !file.file)}
+            />
+          ) : (
+            <QuivrButton
+              label="Process"
+              color="primary"
+              iconName="chevronRight"
+              onClick={() => setCurrentStep("SECOND_STEP")}
+              disabled={!!files.find((file) => !file.file)}
+            />
+          )}
         </div>
       </div>
     </Modal>

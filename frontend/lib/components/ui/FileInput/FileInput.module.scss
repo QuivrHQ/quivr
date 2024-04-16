@@ -25,3 +25,8 @@
 .filename {
   font-size: Typography.$tiny;
 }
+
+.error_message {
+  font-size: Typography.$tiny;
+  color: var(--dangerous);
+}
