@@ -104,7 +104,8 @@ services:
       - "traefik.http.services.backend-core.loadbalancer.server.port=5050"
 
   redis:
-    image: redis:latest@sha256:a7cee7c8178ff9b5297cb109e6240f5072cdaaafd775ce6b586c3c704b06458e
+    image: redis/redis-stack:latest
+    # image: redis:latest@sha256:a7cee7c8178ff9b5297cb109e6240f5072cdaaafd775ce6b586c3c704b06458e
     container_name: redis
     logging:
       driver: json-file

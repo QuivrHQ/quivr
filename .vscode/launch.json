@@ -27,6 +27,17 @@
             "program": "${workspaceFolder}/backend/test_process_file_and_notify.py",
             "console": "integratedTerminal",
             "justMyCode": false
+        },
+        {
+            "name": "Python: Debug",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}/backend:${env:PYTHONPATH}"
+            }
         }
     ]
 }

@@ -51,6 +51,9 @@ RUN if [ "$DEV_MODE" = "true" ]; then pip install --no-cache debugpy --timeout 2
 # Copy the rest of the application
 COPY . .
 
+# Download data
+# RUN rm -rf luccid-data && git clone --depth 1 https://github.com/Luccid-ai/luccid-data.git && rm -rf luccid-data/.git
+
 EXPOSE 5050
 
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "5050", "--workers", "6"]

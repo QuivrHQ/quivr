@@ -73,6 +73,7 @@ backend/slim.report.json
 
 ## some PDFs
 backend/Building_Codes/**
+backend/luccid-data/**
 tmp-file-*
 
 volumes/db/data/
