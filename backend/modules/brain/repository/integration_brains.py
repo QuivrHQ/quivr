@@ -136,8 +136,8 @@ class IntegrationDescription(IntegrationDescriptionInterface):
         response = (
             self.db.table("integrations_user")
             .select("*")
-            .filter("brain_id", "eq", brain_id)
-            .filter("user_id", "eq", user_id)
+            .filter("brain_id", "eq", str(brain_id))
+            # .filter("user_id", "eq", user_id)
             .execute()
         )
         if len(response.data) == 0:
