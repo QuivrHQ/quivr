@@ -58,6 +58,7 @@ lxml = {extras = ["html_clean"], version = "*"}
 ragas = "*"
 datasets = "*"
 pytest-dotenv = "*"
+fpdf2 = "*"
 
 [dev-packages]
 black = "*"
