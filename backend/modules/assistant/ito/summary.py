@@ -90,7 +90,7 @@ class SummaryAssistant(ITO):
         map_template = """The following is one document to summarize that has been split into multiple sections:
         {docs}
         Based on the section, please identify the main themes, key points, and important information in each section.
-        Helpful Knowledge:"""
+        Helpful Knowledge in language of the document:"""
         map_prompt = PromptTemplate.from_template(map_template)
         map_chain = LLMChain(llm=llm, prompt=map_prompt)
 
@@ -101,6 +101,7 @@ class SummaryAssistant(ITO):
         Use markdown such as bold, italics, underlined. For example, **bold**, *italics*, and _underlined_ to highlight key points.
         Please provide the final summary with sections using bold headers. 
         Sections should be: a short summary of the document called summary, and a list of key points called key points.
+        Keep the same language as the documents.
         Summary:"""
         reduce_prompt = PromptTemplate.from_template(reduce_template)
 
