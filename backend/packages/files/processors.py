@@ -14,6 +14,7 @@ from .parsers.powerpoint import process_powerpoint
 from .parsers.telegram import process_telegram
 from .parsers.txt import process_txt
 from .parsers.xlsx import process_xlsx
+from .parsers.bibtex import process_bibtex
 
 file_processors = {
     ".txt": process_txt,
@@ -30,6 +31,7 @@ file_processors = {
     ".mpeg": process_audio,
     ".pdf": process_pdf,
     ".html": process_html,
+    ".bib": process_bibtex,
     ".pptx": process_powerpoint,
     ".docx": process_docx,
     ".odt": process_odt,

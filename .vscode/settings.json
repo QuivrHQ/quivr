@@ -1,15 +1,9 @@
 {
-  "python.formatting.provider": "black",
   "editor.codeActionsOnSave": {
     "source.organizeImports": "explicit",
     "source.fixAll": "explicit",
     "source.unusedImports": "explicit"
   },
-  "python.linting.enabled": true,
-  "python.linting.flake8Enabled": true,
-  "python.analysis.extraPaths": [
-    "./backend"
-  ],
   "editor.formatOnSave": true,
   "[sql]": {
     "editor.formatOnSave": false,
@@ -48,14 +42,22 @@
     "**/.docusaurus/": true,
     "**/node_modules/": true
   },
-  "python.linting.pycodestyleCategorySeverity.W": "Error",
-  "python.defaultInterpreterPath": "python3",
-  "python.linting.flake8CategorySeverity.W": "Error",
   "json.sortOnSave.enable": true,
+  "python.formatting.provider": "black",
+  "python.analysis.extraPaths": [
+    "./backend"
+  ],
+  "python.defaultInterpreterPath": "python3",
+  "python.envFile": "${workspaceFolder}/.env",
+  "python.linting.pycodestyleCategorySeverity.W": "Error",
+  "python.linting.flake8CategorySeverity.W": "Error",
   "python.testing.pytestArgs": [
-    "backend"
+    "-v",
+    "--color=yes",
+    "--envfile=backend/tests/.env_test",
+    "backend/",
   ],
   "python.testing.unittestEnabled": false,
   "python.testing.pytestEnabled": true,
-  "python.envFile": "${workspaceFolder}/.env",
+  "python.testing.autoTestDiscoverOnSaveEnabled": true,
 }

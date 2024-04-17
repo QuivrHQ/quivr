@@ -75,6 +75,7 @@ backend/slim.report.json
 backend/Building_Codes/**
 backend/luccid-data/**
 tmp-file-*
+letsencrypt/
 
 volumes/db/data/
 volumes/storage/stub/stub/quivr/*
@@ -87,5 +88,5 @@ airwallexpayouts.py
 application.log
 backend/celerybeat-schedule.db
 backend/application.log.*
-
-letsencrypt/
+backend/score.json
+backend/modules/assistant/ito/utils/simple.pdf

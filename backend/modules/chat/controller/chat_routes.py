@@ -4,7 +4,7 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from fastapi.responses import StreamingResponse
 from langchain.embeddings.ollama import OllamaEmbeddings
-from langchain.embeddings.openai import OpenAIEmbeddings
+from langchain_openai import OpenAIEmbeddings
 from logger import get_logger
 from middlewares.auth import AuthBearer, get_current_user
 from models.settings import BrainSettings, get_supabase_client
@@ -22,7 +22,7 @@ from modules.chat.entity.chat import Chat
 from modules.chat.service.chat_service import ChatService
 from modules.notification.service.notification_service import NotificationService
 from modules.user.entity.user_identity import UserIdentity
-from packages.utils.telemetry import send_telemetry
+from packages.utils.telemetry import maybe_send_telemetry
 from vectorstore.supabase import CustomSupabaseVectorStore
 
 logger = get_logger(__name__)
@@ -61,7 +61,6 @@ def get_answer_generator(
     current_user: UserIdentity,
 ):
     chat_instance = BrainfulChat()
-    chat_instance.validate_authorization(user_id=current_user.id, brain_id=brain_id)
 
     user_usage = UserUsage(
         id=current_user.id,
@@ -78,7 +77,7 @@ def get_answer_generator(
         brain_id, chat_question.question, current_user, chat_id, history, vector_store
     )
 
-    send_telemetry("question_asked", {"model_name": brain.model})
+    maybe_send_telemetry("question_asked", {"model_name": brain.model})
 
     gpt_answer_generator = chat_instance.get_answer_generator(
         brain=brain,
@@ -162,7 +161,7 @@ async def update_chat_message(
     chat_id: UUID,
     message_id: UUID,
     current_user: UserIdentity = Depends(get_current_user),
-)  :
+):
 
     chat = chat_service.get_chat_by_id(
         chat_id  # pyright: ignore reportPrivateUsage=none
@@ -246,11 +245,6 @@ async def create_stream_question_handler(
 
     chat_instance = BrainfulChat()
     chat_instance.validate_authorization(user_id=current_user.id, brain_id=brain_id)
-
-    user_usage = UserUsage(
-        id=current_user.id,
-        email=current_user.email,
-    )
 
     logger.info(
         f"Creating question for chat {chat_id} with brain {brain_id} of type {type(brain_id)}"

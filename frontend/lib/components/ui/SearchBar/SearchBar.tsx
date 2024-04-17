@@ -67,7 +67,7 @@ export const SearchBar = ({
           message={message}
           setMessage={setMessage}
           onSubmit={() => void submit()}
-          placeholder="Search"
+          placeholder="Ask a question..."
         ></Editor>
         {searching ? (
           <LoaderIcon size="big" color="accent" />

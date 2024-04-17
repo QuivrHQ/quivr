@@ -1,0 +1,37 @@
+@use "@/styles/Radius.module.scss";
+@use "@/styles/ScreenSizes.module.scss";
+@use "@/styles/Spacings.module.scss";
+@use "@/styles/Typography.module.scss";
+
+.brains_wrapper {
+  display: flex;
+  flex-direction: column;
+  border-radius: Radius.$big;
+  overflow: hidden;
+  width: 100%;
+  overflow-y: scroll;
+
+  .columns {
+    @include Typography.H3;
+    display: flex;
+    padding: Spacings.$spacing05;
+    gap: Spacings.$spacing05;
+    background-color: var(--background-1);
+    margin-bottom: Spacings.$spacing03;
+    padding-left: Spacings.$spacing09;
+
+    .name {
+      width: 200px;
+    }
+
+    .description {
+      color: var(--text-2);
+    }
+
+    @media (max-width: ScreenSizes.$small) {
+      .description {
+        display: none;
+      }
+    }
+  }
+}

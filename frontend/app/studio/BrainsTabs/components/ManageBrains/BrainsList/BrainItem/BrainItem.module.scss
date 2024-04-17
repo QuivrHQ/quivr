@@ -1,0 +1,70 @@
+@use "@/styles/Radius.module.scss";
+@use "@/styles/ScreenSizes.module.scss";
+@use "@/styles/Spacings.module.scss";
+@use "@/styles/Typography.module.scss";
+@use "@/styles/ZIndexes.module.scss";
+
+.brain_item_wrapper {
+  padding-inline: Spacings.$spacing05;
+  overflow: hidden;
+  display: flex;
+  gap: Spacings.$spacing02;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  margin-block: Spacings.$spacing03;
+  border: 1px solid var(--border-1);
+  border-radius: Radius.$normal;
+  padding-block: Spacings.$spacing03;
+  position: relative;
+  overflow: visible;
+
+  &:hover {
+    border-color: var(--primary-0);
+    background-color: var(--background-special-0);
+  }
+
+  .dark_image {
+    filter: invert(100%);
+  }
+
+  .brain_info_wrapper {
+    padding-block: Spacings.$spacing03;
+    padding-left: Spacings.$spacing03;
+    display: flex;
+    overflow: hidden;
+    gap: Spacings.$spacing05;
+    overflow: hidden;
+    flex: 1;
+
+    .name {
+      @include Typography.EllipsisOverflow;
+      width: 200px;
+      color: var(--text-3);
+    }
+
+    .description {
+      @include Typography.EllipsisOverflow;
+      flex: 1;
+      color: var(--text-2);
+    }
+
+    @media (max-width: ScreenSizes.$small) {
+      .name {
+        width: auto;
+      }
+
+      .description {
+        display: none;
+      }
+    }
+  }
+
+  .options_modal {
+    position: absolute;
+    right: Spacings.$spacing02;
+    top: Spacings.$spacing08;
+    z-index: ZIndexes.$modal;
+    padding-bottom: Spacings.$spacing01;
+  }
+}
