@@ -171,6 +171,7 @@ pydantic-core==2.16.3; python_version >= '3.8'
 pydantic-settings==2.2.1; python_version >= '3.8'
 pyflakes==3.2.0; python_version >= '3.8'
 pygments==2.17.2; python_version >= '3.7'
+pyOpenSSL==24.1.0
 pypandoc==1.11; python_version >= '3.6'
 pyparsing==3.1.2; python_full_version >= '3.6.8'
 pypdf>=3.9.0,<5.0.0; python_version >= '3.6'
