@@ -2,7 +2,7 @@ version: "3.8"
 
 services:
   backend-core:
-    image: backend-base
+    image: backend-base:latest
     pull_policy: never
     env_file:
       - .env
@@ -10,7 +10,7 @@ services:
       context: backend
       dockerfile: Dockerfile.dev
       cache_from:
-        - backend-base
+        - backend-base:latest
       args:
         - DEV_MODE=true
     container_name: backend-core
@@ -43,7 +43,7 @@ services:
 
   worker:
     pull_policy: never
-    image: backend-base
+    image: backend-base:latest
     env_file:
       - .env
     container_name: worker
@@ -55,7 +55,7 @@ services:
       - redis
 
   beat:
-    image: backend-base
+    image: backend-base:latest
     pull_policy: never
     env_file:
       - .env
@@ -67,7 +67,7 @@ services:
       - redis
 
   flower:
-    image: backend-base
+    image: backend-base:latest
     pull_policy: never
     env_file:
       - .env
