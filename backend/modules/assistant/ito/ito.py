@@ -1,5 +1,7 @@
 import os
 import random
+import re
+import string
 from abc import abstractmethod
 from io import BytesIO
 from tempfile import NamedTemporaryFile
@@ -16,6 +18,7 @@ from modules.upload.controller.upload_routes import upload_file
 from modules.user.entity.user_identity import UserIdentity
 from packages.emails.send_email import send_email
 from pydantic import BaseModel
+from unidecode import unidecode
 
 logger = get_logger(__name__)
 
@@ -129,6 +132,7 @@ class ITO(BaseModel):
         self, processed_content: str, original_filename: str, file_description: str
     ) -> dict:
         """Handles creation and uploading of the processed file."""
+        # remove any special characters from the filename that aren't http safe
 
         new_filename = (
             original_filename.split(".")[0]
@@ -138,6 +142,11 @@ class ITO(BaseModel):
             + str(random.randint(1000, 9999))
             + ".pdf"
         )
+        new_filename = unidecode(new_filename)
+        new_filename = re.sub(
+            "[^{}0-9a-zA-Z]".format(re.escape(string.punctuation)), "", new_filename
+        )
+
         self.generate_pdf(
             new_filename,
             f"{file_description} of {original_filename}",

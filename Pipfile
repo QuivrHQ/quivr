@@ -59,6 +59,7 @@ ragas = "*"
 datasets = "*"
 pytest-dotenv = "*"
 fpdf2 = "*"
+unidecode = "*"
 
 [dev-packages]
 black = "*"
