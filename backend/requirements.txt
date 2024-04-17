@@ -255,7 +255,7 @@ unstructured-client==0.18.0; python_version >= '3.8'
 unstructured-inference==0.7.25
 unstructured.pytesseract==0.3.12
 # urllib3==2.0.7; python_version >= '3.10'
-urllib3==2.2.1; python_version >= '3.8'
+urllib3
 uvicorn==0.29.0; python_version >= '3.8'
 vine==5.1.0; python_version >= '3.6'
 watchdog==4.0.0; python_version >= '3.8'
