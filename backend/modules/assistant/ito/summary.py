@@ -85,7 +85,7 @@ class SummaryAssistant(ITO):
 
         data = loader.load()
 
-        llm = ChatLiteLLM(model="gpt-3.5-turbo")
+        llm = ChatLiteLLM(model="gpt-3.5-turbo", max_tokens=2000)
 
         map_template = """The following is one document to summarize that has been split into multiple sections:
         {docs}
