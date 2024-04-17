@@ -9,7 +9,6 @@ from modules.brain.service.brain_user_service import BrainUserService
 
 brain_user_service = BrainUserService()
 
-
 class Analytics:
     def __init__(self):
         supabase_client = get_supabase_client()
@@ -42,7 +41,7 @@ class Analytics:
         all_dates = [start_date + timedelta(days=i) for i in range(graph_range)]
 
         for date in all_dates:
-            usage_per_day[date] += 0
+            pass
 
         usages = sorted(
             [
