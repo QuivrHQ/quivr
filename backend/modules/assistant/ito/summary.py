@@ -57,6 +57,11 @@ class SummaryAssistant(ITO):
             raise ValueError("The key of the file should be doc_to_summarize")
         if not self.input.inputs.files[0].value:
             raise ValueError("No file was uploaded")
+        # Check if name of file is same as the key
+        if not self.input.inputs.files[0].value == self.files[0].filename:
+            raise ValueError(
+                "The key of the file should be the same as the name of the file"
+            )
         if not (
             self.input.outputs.brain.activated or self.input.outputs.email.activated
         ):
