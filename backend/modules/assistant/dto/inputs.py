@@ -2,7 +2,7 @@ import json
 from typing import List, Optional
 from uuid import UUID
 
-from pydantic import BaseModel, model_validator
+from pydantic import BaseModel, model_validator, root_validator
 
 
 class EmailInput(BaseModel):
@@ -10,8 +10,15 @@ class EmailInput(BaseModel):
 
 
 class BrainInput(BaseModel):
-    activated: bool
-    value: UUID
+    activated: Optional[bool] = False
+    value: Optional[UUID] = None
+
+    @root_validator(pre=True)
+    def empty_string_to_none(cls, values):
+        for field, value in values.items():
+            if value == "":
+                values[field] = None
+        return values
 
 
 class FileInput(BaseModel):
