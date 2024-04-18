@@ -51,8 +51,6 @@ export const AssistantModal = ({
         fileObj.key === inputKey ? { ...fileObj, file } : fileObj
       )
     );
-
-    console.info(files);
   };
 
   const handleSetIsOpen = (value: boolean) => {
@@ -63,7 +61,6 @@ export const AssistantModal = ({
   };
 
   const handleProcessAssistant = async () => {
-    console.info(emailOutput, brainOutput);
     await processAssistant(
       {
         name: assistant.name,
@@ -80,8 +77,8 @@ export const AssistantModal = ({
             activated: emailOutput,
           },
           brain: {
-            activated: true,
-            value: "9654e397-571a-4370-b3e9-0245acc8191a",
+            activated: brainOutput !== "",
+            value: brainOutput,
           },
         },
       },
