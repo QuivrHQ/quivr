@@ -29,10 +29,34 @@ class TextInput(BaseModel):
     value: str
 
 
+class InputBoolean(BaseModel):
+    key: str
+    value: bool
+
+
+class InputNumber(BaseModel):
+    key: str
+    value: int
+
+
+class InputSelectText(BaseModel):
+    key: str
+    value: str
+
+
+class InputSelectNumber(BaseModel):
+    key: str
+    value: int
+
+
 class Inputs(BaseModel):
     files: Optional[List[FileInput]] = None
     urls: Optional[List[UrlInput]] = None
     texts: Optional[List[TextInput]] = None
+    booleans: Optional[List[InputBoolean]] = None
+    numbers: Optional[List[InputNumber]] = None
+    select_texts: Optional[List[InputSelectText]] = None
+    select_numbers: Optional[List[InputSelectNumber]] = None
 
 
 class Outputs(BaseModel):

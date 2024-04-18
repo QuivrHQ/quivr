@@ -64,9 +64,7 @@ ANSWER_PROMPT = ChatPromptTemplate.from_messages(
 
 # How we format documents
 
-DEFAULT_DOCUMENT_PROMPT = PromptTemplate.from_template(
-    template="File: {file_name} Content:  {page_content}"
-)
+DEFAULT_DOCUMENT_PROMPT = PromptTemplate.from_template(template="{page_content}")
 
 
 def is_valid_uuid(uuid_to_test, version=4):

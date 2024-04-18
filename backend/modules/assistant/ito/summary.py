@@ -57,6 +57,11 @@ class SummaryAssistant(ITO):
             raise ValueError("The key of the file should be doc_to_summarize")
         if not self.input.inputs.files[0].value:
             raise ValueError("No file was uploaded")
+        # Check if name of file is same as the key
+        if not self.input.inputs.files[0].value == self.files[0].filename:
+            raise ValueError(
+                "The key of the file should be the same as the name of the file"
+            )
         if not (
             self.input.outputs.brain.activated or self.input.outputs.email.activated
         ):
@@ -64,6 +69,12 @@ class SummaryAssistant(ITO):
         return True
 
     async def process_assistant(self):
+
+        try:
+            self.increase_usage_user()
+        except Exception as e:
+            logger.error(f"Error increasing usage: {e}")
+            return {"error": str(e)}
 
         # Create a temporary file with the uploaded file as a temporary file and then pass it to the loader
         tmp_file = tempfile.NamedTemporaryFile(delete=False)
@@ -79,20 +90,24 @@ class SummaryAssistant(ITO):
 
         data = loader.load()
 
-        llm = ChatLiteLLM(model="gpt-3.5-turbo")
+        llm = ChatLiteLLM(model="gpt-3.5-turbo", max_tokens=2000)
 
-        map_template = """The following is a set of documents
+        map_template = """The following is one document to summarize that has been split into multiple sections:
         {docs}
-        Based on this list of docs, please identify the main themes 
-        Helpful Answer:"""
+        Based on the section, please identify the main themes, key points, and important information in each section.
+        Helpful Knowledge in language of the document:"""
         map_prompt = PromptTemplate.from_template(map_template)
         map_chain = LLMChain(llm=llm, prompt=map_prompt)
 
         # Reduce
-        reduce_template = """The following is set of summaries:
+        reduce_template = """The following is set of summaries for each section of the document:
         {docs}
-        Take these and distill it into a final, consolidated summary of the main themes. 
-        Helpful Answer:"""
+        Take these and distill it into a final, consolidated summary of the document. Make sure to include the main themes, key points, and important information.
+        Use markdown such as bold, italics, underlined. For example, **bold**, *italics*, and _underlined_ to highlight key points.
+        Please provide the final summary with sections using bold headers. 
+        Sections should be: a short summary of the document called summary, and a list of key points called key points.
+        Keep the same language as the documents.
+        Summary:"""
         reduce_prompt = PromptTemplate.from_template(reduce_template)
 
         # Run chain

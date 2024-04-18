@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.0.230 (2024-04-16)
+
+## What's Changed
+* feat(backend): add RAG evaluation using Ragas by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2429
+* feat(assistants):  Add new input models for boolean, number, select text, and select number by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2432
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.229...v0.0.230
+
 ## 0.0.229 (2024-04-12)
 
 ## What's Changed

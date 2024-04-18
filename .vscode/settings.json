@@ -48,9 +48,12 @@
   "python.linting.flake8CategorySeverity.W": "Error",
   "json.sortOnSave.enable": true,
   "python.testing.pytestArgs": [
-    "backend"
+    "-v",
+    "--color=yes",
+    "--envfile=backend/tests/.env_test",
+    "backend/",
   ],
   "python.testing.unittestEnabled": false,
   "python.testing.pytestEnabled": true,
-  "python.envFile": "${workspaceFolder}/.env_test",
+  "python.testing.autoTestDiscoverOnSaveEnabled": true,
 }
