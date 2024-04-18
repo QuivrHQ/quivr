@@ -63,7 +63,7 @@ export const AssistantModal = ({
   };
 
   const handleProcessAssistant = async () => {
-    console.info(emailOutput);
+    console.info(emailOutput, brainOutput);
     await processAssistant(
       {
         name: assistant.name,

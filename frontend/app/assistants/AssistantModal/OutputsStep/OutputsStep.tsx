@@ -20,7 +20,6 @@ export const OutputsStep = ({
 }: OutputsStepProps): JSX.Element => {
   const [existingBrainChecked, setExistingBrainChecked] =
     useState<boolean>(false);
-  const [newBrainChecked, setNewBrainChecked] = useState<boolean>(false);
   const [selectedBrainId, setSelectedBrainId] = useState<string>("");
   const { allBrains } = useBrainContext();
 
@@ -50,11 +49,7 @@ export const OutputsStep = ({
         label="Upload on an existing Brain"
         checked={existingBrainChecked}
         setChecked={() => {
-          const newCheckedState = !existingBrainChecked;
-          setExistingBrainChecked(newCheckedState);
-          if (newCheckedState) {
-            setNewBrainChecked(false);
-          }
+          setExistingBrainChecked(!existingBrainChecked);
         }}
       />
       {existingBrainChecked && (
@@ -80,17 +75,6 @@ export const OutputsStep = ({
           />
         </div>
       )}
-      <Checkbox
-        label="Upload on a new Brain"
-        checked={newBrainChecked}
-        setChecked={() => {
-          const newCheckedState = !newBrainChecked;
-          setNewBrainChecked(newCheckedState);
-          if (newCheckedState) {
-            setExistingBrainChecked(false);
-          }
-        }}
-      />
     </div>
   );
 };
