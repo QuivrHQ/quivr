@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import styles from "./Checkbox.module.scss";
 
@@ -14,6 +14,10 @@ export const Checkbox = ({
   setChecked,
 }: CheckboxProps): JSX.Element => {
   const [currentChecked, setCurrentChecked] = useState<boolean>(checked);
+
+  useEffect(() => {
+    setCurrentChecked(checked);
+  }, [checked]);
 
   return (
     <div className={styles.checkbox_wrapper}>

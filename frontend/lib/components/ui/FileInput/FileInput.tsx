@@ -43,7 +43,7 @@ export const FileInput = (props: FileInputProps): JSX.Element => {
       <div className={styles.file_input_wrapper} onClick={handleClick}>
         <div className={styles.header_wrapper}>
           <span className={styles.placeholder}>
-            Click here to upload a file
+            Click here to {currentFile ? "change your" : "upload a"} file
           </span>
           <Icon name="upload" size="normal" color="black" />
         </div>

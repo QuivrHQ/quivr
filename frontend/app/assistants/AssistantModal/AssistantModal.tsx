@@ -1,6 +1,7 @@
 import { useState } from "react";
 
 import { Assistant } from "@/lib/api/assistants/types";
+import { useAssistants } from "@/lib/api/assistants/useAssistants";
 import { Stepper } from "@/lib/components/AddBrainModal/components/Stepper/Stepper";
 import { StepValue } from "@/lib/components/AddBrainModal/types/types";
 import { MessageInfoBox } from "@/lib/components/ui/MessageInfoBox/MessageInfoBox";
@@ -35,12 +36,14 @@ export const AssistantModal = ({
   ];
   const [currentStep, setCurrentStep] = useState<StepValue>("FIRST_STEP");
   const [emailOutput, setEmailOutput] = useState<boolean>(true);
+  const [brainOutput, setBrainOutput] = useState<string>("");
   const [files, setFiles] = useState<{ key: string; file: File | null }[]>(
     assistant.inputs.files.map((fileInput) => ({
       key: fileInput.key,
       file: null,
     }))
   );
+  const { processAssistant } = useAssistants();
 
   const handleFileChange = (file: File, inputKey: string) => {
     setFiles((prevFiles) =>
@@ -52,35 +55,46 @@ export const AssistantModal = ({
     console.info(files);
   };
 
-  // const processAssistant = () => {
-  //   const res = processAssistant(
-  //     {
-  //       name: assistant.name,
-  //       inputs: {
-  //         files: [{ value: file.name, key: inputKey }],
-  //         urls: [],
-  //         texts: [],
-  //       },
-  //       outputs: {
-  //         email: {
-  //           activated: true,
-  //         },
-  //         brain: {
-  //           activated: true,
-  //           value: "9654e397-571a-4370-b3e9-0245acc8191a",
-  //         },
-  //       },
-  //     },
-  //     [file]
-  //   );
-  // };
+  const handleSetIsOpen = (value: boolean) => {
+    if (!value) {
+      setCurrentStep("FIRST_STEP");
+    }
+    setIsOpen(value);
+  };
+
+  const handleProcessAssistant = async () => {
+    console.info(emailOutput);
+    await processAssistant(
+      {
+        name: assistant.name,
+        inputs: {
+          files: files.map((file) => ({
+            key: file.key,
+            value: (file.file as File).name,
+          })),
+          urls: [],
+          texts: [],
+        },
+        outputs: {
+          email: {
+            activated: emailOutput,
+          },
+          brain: {
+            activated: true,
+            value: "9654e397-571a-4370-b3e9-0245acc8191a",
+          },
+        },
+      },
+      files.map((file) => file.file as File)
+    );
+  };
 
   return (
     <Modal
       title={assistant.name}
       desc={assistant.description}
       isOpen={isOpen}
-      setOpen={setIsOpen}
+      setOpen={handleSetIsOpen}
       size="big"
       CloseTrigger={<div />}
     >
@@ -88,12 +102,12 @@ export const AssistantModal = ({
         <div className={styles.modal_content_wrapper}>
           <Stepper steps={steps} currentStep={currentStep} />
           {currentStep === "FIRST_STEP" ? (
-            <MessageInfoBox type="info">
+            <MessageInfoBox type="tutorial">
               <span className={styles.title}>Expected Input:</span>
               {assistant.input_description}
             </MessageInfoBox>
           ) : (
-            <MessageInfoBox type="info">
+            <MessageInfoBox type="tutorial">
               <span className={styles.title}>Output:</span>
               {assistant.output_description}
             </MessageInfoBox>
@@ -104,7 +118,10 @@ export const AssistantModal = ({
               onFileChange={handleFileChange}
             />
           ) : (
-            <OutputsStep setEmailOutput={setEmailOutput} />
+            <OutputsStep
+              setEmailOutput={setEmailOutput}
+              setBrainOutput={setBrainOutput}
+            />
           )}
         </div>
         <div className={styles.button}>
@@ -121,8 +138,7 @@ export const AssistantModal = ({
               label="Process"
               color="primary"
               iconName="chevronRight"
-              onClick={() => setCurrentStep("SECOND_STEP")}
-              disabled={!!files.find((file) => !file.file)}
+              onClick={() => handleProcessAssistant()}
             />
           )}
         </div>
