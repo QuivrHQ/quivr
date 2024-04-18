@@ -1,5 +1,3 @@
-version: "3.8"
-
 services:
   frontend:
     image: quivr-frontend-prebuilt
@@ -31,7 +29,7 @@ services:
       dockerfile: Dockerfile
     container_name: backend-core
     healthcheck:
-      test: [ "CMD", "curl", "http://localhost:5050/healthz" ]
+      test: ["CMD", "curl", "http://localhost:5050/healthz"]
     command:
       - "uvicorn"
       - "main:app"
