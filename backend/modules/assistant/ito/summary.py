@@ -92,22 +92,32 @@ class SummaryAssistant(ITO):
 
         llm = ChatLiteLLM(model="gpt-3.5-turbo", max_tokens=2000)
 
-        map_template = """The following is one document to summarize that has been split into multiple sections:
+        map_template = """The following is a document that has been divided into multiple sections:
         {docs}
-        Based on the section, please identify the main themes, key points, and important information in each section.
-        Helpful Knowledge in language of the document:"""
+        
+        Please carefully analyze each section and identify the following:
+
+        1. Main Themes: What are the overarching ideas or topics in this section?
+        2. Key Points: What are the most important facts, arguments, or ideas presented in this section?
+        3. Important Information: Are there any crucial details that stand out? This could include data, quotes, specific events, entity, or other relevant information.
+        4. People: Who are the key individuals mentioned in this section? What roles do they play?
+        5. Reasoning: What logic or arguments are used to support the key points?
+        6. Chapters: If the document is divided into chapters, what is the main focus of each chapter?
+
+        Remember to consider the language and context of the document. This will help in understanding the nuances and subtleties of the text."""
         map_prompt = PromptTemplate.from_template(map_template)
         map_chain = LLMChain(llm=llm, prompt=map_prompt)
 
         # Reduce
-        reduce_template = """The following is set of summaries for each section of the document:
+        reduce_template = """The following is a set of summaries for parts of the document:
         {docs}
-        Take these and distill it into a final, consolidated summary of the document. Make sure to include the main themes, key points, and important information.
+        Take these and distill it into a final, consolidated summary of the document. Make sure to include the main themes, key points, and important information such as data, quotes,people and specific events.
         Use markdown such as bold, italics, underlined. For example, **bold**, *italics*, and _underlined_ to highlight key points.
         Please provide the final summary with sections using bold headers. 
-        Sections should be: a short summary of the document called summary, and a list of key points called key points.
+        Sections should always be Summary and Key Points, but feel free to add more sections as needed.
+        Always use bold text for the sections headers.
         Keep the same language as the documents.
-        Summary:"""
+        Answer:"""
         reduce_prompt = PromptTemplate.from_template(reduce_template)
 
         # Run chain
@@ -141,7 +151,7 @@ class SummaryAssistant(ITO):
         )
 
         text_splitter = CharacterTextSplitter.from_tiktoken_encoder(
-            chunk_size=1000, chunk_overlap=0
+            chunk_size=1000, chunk_overlap=100
         )
         split_docs = text_splitter.split_documents(data)
 
