@@ -52,6 +52,9 @@ export const FileInput = (props: FileInputProps): JSX.Element => {
           type="file"
           className={styles.file_input}
           onChange={handleFileChange}
+          accept={props.acceptedFileTypes
+            ?.map((type) => `application/${type}`)
+            .join(",")}
           style={{ display: "none" }}
         />
       </div>

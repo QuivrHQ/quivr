@@ -102,13 +102,17 @@ export const AssistantModal = ({
           <Stepper steps={steps} currentStep={currentStep} />
           {currentStep === "FIRST_STEP" ? (
             <MessageInfoBox type="tutorial">
-              <span className={styles.title}>Expected Input:</span>
-              {assistant.input_description}
+              <div className={styles.message_wrapper}>
+                <span className={styles.title}>Expected Input</span>
+                {assistant.input_description}
+              </div>
             </MessageInfoBox>
           ) : (
             <MessageInfoBox type="tutorial">
-              <span className={styles.title}>Output:</span>
-              {assistant.output_description}
+              <div className={styles.message_wrapper}>
+                <span className={styles.title}>Output</span>
+                {assistant.output_description}
+              </div>
             </MessageInfoBox>
           )}
           {currentStep === "FIRST_STEP" ? (
