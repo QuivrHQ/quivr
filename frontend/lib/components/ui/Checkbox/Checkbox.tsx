@@ -20,13 +20,15 @@ export const Checkbox = ({
   }, [checked]);
 
   return (
-    <div className={styles.checkbox_wrapper}>
+    <div
+      className={styles.checkbox_wrapper}
+      onClick={() => {
+        setChecked(!currentChecked);
+        setCurrentChecked(!currentChecked);
+      }}
+    >
       <div
         className={`${styles.checkbox} ${currentChecked ? styles.filled : ""}`}
-        onClick={() => {
-          setChecked(!currentChecked);
-          setCurrentChecked(!currentChecked);
-        }}
       ></div>
       <span>{label}</span>
     </div>

@@ -37,18 +37,21 @@ export const OutputsStep = ({
   return (
     <div className={styles.outputs_wrapper}>
       <MessageInfoBox type="info">
-        You can receive the result by mail or upload it on an existing or new
-        brain
+        It can take a few minutes to process.
       </MessageInfoBox>
       <Checkbox
-        label="Receive by Email"
+        label="Receive the results by Email"
         checked={true}
         setChecked={setEmailOutput}
       />
       <Checkbox
-        label="Upload on an existing Brain"
+        label="Upload the results on an existing Brain"
         checked={existingBrainChecked}
         setChecked={() => {
+          if (existingBrainChecked) {
+            setBrainOutput("");
+            setSelectedBrainId("");
+          }
           setExistingBrainChecked(!existingBrainChecked);
         }}
       />

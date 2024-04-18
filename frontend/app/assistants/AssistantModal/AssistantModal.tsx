@@ -61,6 +61,7 @@ export const AssistantModal = ({
   };
 
   const handleProcessAssistant = async () => {
+    console.info(emailOutput, brainOutput !== "", brainOutput);
     await processAssistant(
       {
         name: assistant.name,
@@ -77,13 +78,14 @@ export const AssistantModal = ({
             activated: emailOutput,
           },
           brain: {
-            activated: brainOutput !== "",
-            value: brainOutput,
+            activated: true,
+            value: "52ff83f8-0d0f-4a94-b359-da61b6f63d97",
           },
         },
       },
       files.map((file) => file.file as File)
     );
+    handleSetIsOpen(false);
   };
 
   return (
@@ -136,6 +138,7 @@ export const AssistantModal = ({
               color="primary"
               iconName="chevronRight"
               onClick={() => handleProcessAssistant()}
+              disabled={!emailOutput && brainOutput === ""}
             />
           )}
         </div>
