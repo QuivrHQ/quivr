@@ -61,7 +61,7 @@ export const AssistantModal = ({
   };
 
   const handleProcessAssistant = async () => {
-    console.info(emailOutput, brainOutput !== "", brainOutput);
+    console.info(brainOutput);
     await processAssistant(
       {
         name: assistant.name,
@@ -78,8 +78,8 @@ export const AssistantModal = ({
             activated: emailOutput,
           },
           brain: {
-            activated: true,
-            value: "52ff83f8-0d0f-4a94-b359-da61b6f63d97",
+            activated: brainOutput !== "",
+            value: brainOutput,
           },
         },
       },

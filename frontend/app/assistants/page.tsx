@@ -36,7 +36,6 @@ const Search = (): JSX.Element => {
         if (res) {
           setAssistants(res);
         }
-        console.info(res);
       } catch (error) {
         console.error(error);
       }

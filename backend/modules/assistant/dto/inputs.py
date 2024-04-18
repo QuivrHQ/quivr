@@ -11,7 +11,7 @@ class EmailInput(BaseModel):
 
 class BrainInput(BaseModel):
     activated: bool
-    value: UUID
+    value: Optional[UUID] = None
 
 
 class FileInput(BaseModel):
