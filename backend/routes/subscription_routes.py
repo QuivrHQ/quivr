@@ -17,7 +17,7 @@ from modules.prompt.service.prompt_service import PromptService
 from modules.user.entity.user_identity import UserIdentity
 from modules.user.service.user_service import UserService
 from pydantic import BaseModel
-from repository.brain_subscription import (
+from modules.brain.service.brain_subscription import (
     SubscriptionInvitationService,
     resend_invitation_email,
 )
