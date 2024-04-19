@@ -61,7 +61,7 @@ export const AssistantModal = ({
   };
 
   const handleProcessAssistant = async () => {
-    console.info(brainOutput);
+    handleSetIsOpen(false);
     await processAssistant(
       {
         name: assistant.name,
@@ -85,7 +85,6 @@ export const AssistantModal = ({
       },
       files.map((file) => file.file as File)
     );
-    handleSetIsOpen(false);
   };
 
   return (
