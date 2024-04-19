@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from datetime import datetime
 from uuid import UUID
 
-from .entity import LLMModels
+from .llm_models import LLMModels
 
 
 class Repository(ABC):
