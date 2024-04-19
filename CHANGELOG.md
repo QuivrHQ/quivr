@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.0.232 (2024-04-19)
+
+## What's Changed
+* Update CPU and memory settings in task definition files by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2450
+* fix: Fix error message in SummaryAssistant class by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2453
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.231...v0.0.232
+
 ## 0.0.231 (2024-04-19)
 
 ## What's Changed
