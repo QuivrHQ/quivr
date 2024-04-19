@@ -3,7 +3,7 @@ from uuid import UUID
 from attr import dataclass
 from logger import get_logger
 from models.settings import get_embeddings, get_supabase_client
-from repository.files.generate_file_signed_url import generate_file_signed_url
+from modules.upload.service.generate_file_signed_url import generate_file_signed_url
 from vectorstore.supabase import CustomSupabaseVectorStore
 
 logger = get_logger(__name__)

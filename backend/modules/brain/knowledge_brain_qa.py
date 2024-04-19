@@ -24,7 +24,7 @@ from modules.chat.dto.outputs import GetChatHistoryOutput
 from modules.chat.service.chat_service import ChatService
 from pydantic import BaseModel, ConfigDict
 from pydantic_settings import BaseSettings
-from repository.files.generate_file_signed_url import generate_file_signed_url
+from modules.upload.service.generate_file_signed_url import generate_file_signed_url
 
 logger = get_logger(__name__)
 QUIVR_DEFAULT_PROMPT = "Your name is Quivr. You're a helpful assistant.  If you don't know the answer, just say that you don't know, don't try to make up an answer."
