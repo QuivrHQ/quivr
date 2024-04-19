@@ -15,7 +15,6 @@ export const processAssistant = async (
 ): Promise<string | undefined> => {
   const formData = new FormData();
 
-  // Ajouter l'objet 'input' sous forme de chaîne JSON
   formData.append(
     "input",
     JSON.stringify({
