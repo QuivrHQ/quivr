@@ -3,9 +3,9 @@ from typing import AsyncIterable, List, Optional
 from uuid import UUID
 
 from langchain.callbacks.streaming_aiter import AsyncIteratorCallbackHandler
-from llm.utils.format_chat_history import format_chat_history
-from llm.utils.get_prompt_to_use import get_prompt_to_use
-from llm.utils.get_prompt_to_use_id import get_prompt_to_use_id
+from utils.format_chat_history import format_chat_history
+from utils.get_prompt_to_use import get_prompt_to_use
+from utils.get_prompt_to_use_id import get_prompt_to_use_id
 from logger import get_logger
 from models import BrainSettings
 from models.user_usage import UserUsage
