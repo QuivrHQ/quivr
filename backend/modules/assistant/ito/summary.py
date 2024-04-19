@@ -50,7 +50,7 @@ class SummaryAssistant(ITO):
         if len(self.files) > 1:
             raise ValueError("Only one file can be uploaded")
         if not self.input.inputs.files:
-            raise ValueError("No files were given in the input")
+            raise ValueError("No files key were given in the input")
         if len(self.input.inputs.files) > 1:
             raise ValueError("Only one file can be uploaded")
         if not self.input.inputs.files[0].key == "doc_to_summarize":
