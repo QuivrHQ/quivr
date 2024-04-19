@@ -4,11 +4,16 @@ from logger import get_logger
 from models import BrainSettings, BrainSubscription
 from modules.brain.service.brain_service import BrainService
 from packages.emails.send_email import send_email
-from repository.brain_subscription import get_brain_url
 
 logger = get_logger(__name__)
 
 brain_service = BrainService()
+
+
+def get_brain_url(origin: str, brain_id: UUID) -> str:
+    """Generates the brain URL based on the brain_id."""
+
+    return f"{origin}/invitation/{brain_id}"
 
 
 def resend_invitation_email(
