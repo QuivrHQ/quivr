@@ -1,13 +1,13 @@
 import { CreateBrainInput } from "@/lib/api/brain/types";
 import { iconList } from "@/lib/helpers/iconList";
 
-const brainCreationSteps = ["BRAIN_TYPE", "BRAIN_PARAMS", "KNOWLEDGE"] as const;
+const steps = ["FIRST_STEP", "SECOND_STEP", "THIRD_STEP"] as const;
 
-export type BrainCreationStep = (typeof brainCreationSteps)[number];
+export type StepValue = (typeof steps)[number];
 
 export type CreateBrainProps = CreateBrainInput & {
   setDefault: boolean;
-  brainCreationStep: BrainCreationStep;
+  brainCreationStep: StepValue;
 };
 
 export interface BrainType {
@@ -17,8 +17,3 @@ export interface BrainType {
   disabled?: boolean;
   onClick?: () => void;
 }
-
-export type Step = {
-  label: string;
-  value: BrainCreationStep;
-};

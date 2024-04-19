@@ -71,12 +71,13 @@ import {
 import { PiOfficeChairFill } from "react-icons/pi";
 import { RiDeleteBackLine, RiHashtag } from "react-icons/ri";
 import { SlOptions } from "react-icons/sl";
-import { TbNetwork } from "react-icons/tb";
+import { TbNetwork, TbRobot } from "react-icons/tb";
 import { VscGraph } from "react-icons/vsc";
 
 export const iconList: { [name: string]: IconType } = {
   add: LuPlusCircle,
   addWithoutCircle: IoIosAdd,
+  assistant: TbRobot,
   back: RiDeleteBackLine,
   brain: LuBrain,
   brainCircuit: LuBrainCircuit,

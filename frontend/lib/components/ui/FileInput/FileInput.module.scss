@@ -1,0 +1,32 @@
+@use "@/styles/Radius.module.scss";
+@use "@/styles/Spacings.module.scss";
+@use "@/styles/Typography.module.scss";
+
+.header_wrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border: 1px solid var(--border-2);
+  border-radius: Radius.$big;
+  padding: Spacings.$spacing03;
+  cursor: pointer;
+
+  &:hover {
+    background-color: var(--background-2);
+    border-color: var(--accent);
+  }
+
+  .placeholder {
+    color: var(--text-2);
+    font-size: Typography.$small;
+  }
+}
+
+.filename {
+  font-size: Typography.$tiny;
+}
+
+.error_message {
+  font-size: Typography.$tiny;
+  color: var(--dangerous);
+}

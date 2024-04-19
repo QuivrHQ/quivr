@@ -1,0 +1,20 @@
+@use "@/styles/Radius.module.scss";
+@use "@/styles/Spacings.module.scss";
+
+.checkbox_wrapper {
+  display: flex;
+  align-items: center;
+  gap: Spacings.$spacing03;
+  cursor: pointer;
+
+  .checkbox {
+    width: 16px;
+    height: 16px;
+    border: 1px solid var(--border-2);
+    border-radius: Radius.$small;
+
+    &.filled {
+      background-color: var(--primary-0);
+    }
+  }
+}

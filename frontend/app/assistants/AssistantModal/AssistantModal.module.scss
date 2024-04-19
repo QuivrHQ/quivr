@@ -1,0 +1,29 @@
+@use "@/styles/Spacings.module.scss";
+
+.modal_content_container {
+  padding: Spacings.$spacing05;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  justify-content: space-between;
+
+  .modal_content_wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: Spacings.$spacing05;
+
+    .message_wrapper {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .title {
+      font-weight: 600;
+    }
+  }
+
+  .button {
+    display: flex;
+    align-self: flex-end;
+  }
+}

@@ -1,0 +1,16 @@
+@use "@/styles/Spacings.module.scss";
+
+.outputs_wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: Spacings.$spacing03;
+
+  .message_wrapper {
+    width: 100%;
+  }
+
+  .brain_selector {
+    padding-block: Spacings.$spacing02;
+    max-width: 250px;
+  }
+}
