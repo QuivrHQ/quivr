@@ -8,7 +8,7 @@ from utils.get_prompt_to_use import get_prompt_to_use
 from utils.get_prompt_to_use_id import get_prompt_to_use_id
 from logger import get_logger
 from models import BrainSettings
-from models.user_usage import UserUsage
+from modules.user.service.user_usage import UserUsage
 from modules.brain.entity.brain_entity import BrainEntity
 from modules.brain.qa_interface import QAInterface
 from modules.brain.rags.quivr_rag import QuivrRAG
