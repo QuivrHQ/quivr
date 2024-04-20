@@ -1,7 +1,7 @@
 from typing import Optional
 from uuid import UUID
 
-from utils.get_prompt_to_use_id import get_prompt_to_use_id
+from llm.utils.get_prompt_to_use_id import get_prompt_to_use_id
 from modules.prompt.service import PromptService
 
 promptService = PromptService()

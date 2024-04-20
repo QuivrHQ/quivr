@@ -22,7 +22,7 @@ from modules.notification.service.notification_service import NotificationServic
 from modules.user.entity.user_identity import UserIdentity
 from packages.files.file import convert_bytes, get_file_size
 from packages.utils.telemetry import maybe_send_telemetry
-from modules.upload.service.upload_file import upload_file_storage
+from repository.files.upload_file import upload_file_storage
 
 logger = get_logger(__name__)
 upload_router = APIRouter()
