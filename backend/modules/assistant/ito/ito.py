@@ -9,7 +9,7 @@ from typing import List, Optional
 
 from fastapi import UploadFile
 from logger import get_logger
-from modules.user.service.user_usage import UserUsage
+from models.user_usage import UserUsage
 from modules.assistant.dto.inputs import InputAssistant
 from modules.assistant.ito.utils.pdf_generator import PDFGenerator, PDFModel
 from modules.chat.controller.chat.utils import update_user_usage
