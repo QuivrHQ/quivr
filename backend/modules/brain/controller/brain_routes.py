@@ -4,7 +4,6 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException
 from logger import get_logger
 from middlewares.auth.auth_bearer import AuthBearer, get_current_user
-from models import UserUsage
 from modules.brain.dto.inputs import (
     BrainQuestionRequest,
     BrainUpdatableProperties,
@@ -15,13 +14,14 @@ from modules.brain.entity.integration_brain import IntegrationDescriptionEntity
 from modules.brain.service.brain_authorization_service import has_brain_authorization
 from modules.brain.service.brain_service import BrainService
 from modules.brain.service.brain_user_service import BrainUserService
+from modules.brain.service.get_question_context_from_brain import get_question_context_from_brain
 from modules.brain.service.integration_brain_service import (
     IntegrationBrainDescriptionService,
 )
 from modules.prompt.service.prompt_service import PromptService
 from modules.user.entity.user_identity import UserIdentity
+from modules.user.service.user_usage import UserUsage
 from packages.utils.telemetry import maybe_send_telemetry
-from repository.brain import get_question_context_from_brain
 
 logger = get_logger(__name__)
 brain_router = APIRouter()

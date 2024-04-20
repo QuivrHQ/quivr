@@ -8,7 +8,7 @@ from langchain_openai import OpenAIEmbeddings
 from logger import get_logger
 from middlewares.auth import AuthBearer, get_current_user
 from models.settings import BrainSettings, get_supabase_client
-from models.user_usage import UserUsage
+from modules.user.service.user_usage import UserUsage
 from modules.brain.service.brain_service import BrainService
 from modules.chat.controller.chat.brainful_chat import BrainfulChat
 from modules.chat.dto.chats import ChatItem, ChatQuestion

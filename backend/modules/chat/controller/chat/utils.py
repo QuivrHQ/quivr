@@ -3,10 +3,10 @@ from uuid import UUID
 
 from fastapi import HTTPException
 from logger import get_logger
-from models import UserUsage
-from models.databases.entity import LLMModels
+from models.databases.llm_models import LLMModels
 from modules.brain.service.brain_service import BrainService
 from modules.chat.service.chat_service import ChatService
+from modules.user.service.user_usage import UserUsage
 
 logger = get_logger(__name__)
 brain_service = BrainService()

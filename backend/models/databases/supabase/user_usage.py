@@ -7,6 +7,7 @@ from models.databases.repository import Repository
 logger = get_logger(__name__)
 
 
+#TODO: change the name of this class because another one already exists
 class UserUsage(Repository):
     def __init__(self, supabase_client):
         self.db = supabase_client
