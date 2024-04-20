@@ -1,11 +1,18 @@
+import re
+
 from fastapi import HTTPException
 
 from modules.brain.entity.api_brain_definition_entity import ApiBrainDefinitionSchemaProperty
-from utils.sanitize_function_name import sanitize_function_name
 from modules.brain.entity.brain_entity import BrainEntity
 from modules.brain.service.api_brain_definition_service import ApiBrainDefinitionService
 
 api_brain_definition_service = ApiBrainDefinitionService()
+
+
+def sanitize_function_name(string):
+    sanitized_string = re.sub(r"[^a-zA-Z0-9_-]", "", string)
+
+    return sanitized_string
 
 
 def format_api_brain_property(property: ApiBrainDefinitionSchemaProperty):
