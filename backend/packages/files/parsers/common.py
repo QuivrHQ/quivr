@@ -5,7 +5,7 @@ from logger import get_logger
 from models import File
 from modules.brain.service.brain_vector_service import BrainVectorService
 from packages.embeddings.vectors import Neurons
-from repository.files.upload_file import DocumentSerializable
+from modules.upload.service.upload_file import DocumentSerializable
 
 logger = get_logger(__name__)
 

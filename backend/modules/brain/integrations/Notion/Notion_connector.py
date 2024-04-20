@@ -14,7 +14,7 @@ from modules.knowledge.dto.inputs import CreateKnowledgeProperties
 from modules.knowledge.repository.knowledge_interface import KnowledgeInterface
 from modules.knowledge.service.knowledge_service import KnowledgeService
 from pydantic import BaseModel
-from repository.files.upload_file import upload_file_storage
+from modules.upload.service.upload_file import upload_file_storage
 
 logger = get_logger(__name__)
 
