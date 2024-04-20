@@ -12,7 +12,7 @@ from utils.format_chat_history import (
     format_chat_history,
     format_history_to_openai_mesages,
 )
-from utils.get_prompt_to_use import get_prompt_to_use
+from modules.prompt.service.get_prompt_to_use import get_prompt_to_use
 from utils.get_prompt_to_use_id import get_prompt_to_use_id
 from logger import get_logger
 from models import BrainSettings  # Importing settings related to the 'brain'
