@@ -1,15 +1,37 @@
 from uuid import UUID
 
 from fastapi import HTTPException
-from utils.extract_api_brain_definition_values_from_llm_output import (
-    extract_api_brain_definition_values_from_llm_output,
-)
+
+from modules.brain.entity.api_brain_definition_entity import ApiBrainDefinitionSchema
 from utils.make_api_request import get_api_call_response_as_text
 from modules.brain.service.api_brain_definition_service import ApiBrainDefinitionService
 from modules.brain.service.brain_service import BrainService
 
 brain_service = BrainService()
 api_brain_definition_service = ApiBrainDefinitionService()
+
+
+def extract_api_brain_definition_values_from_llm_output(
+    brain_schema: ApiBrainDefinitionSchema, arguments: dict
+) -> dict:
+    params_values = {}
+    properties = brain_schema.properties
+    required_values = brain_schema.required
+    for property in properties:
+        if property.name in arguments:
+            if property.type == "number":
+                params_values[property.name] = float(arguments[property.name])
+            else:
+                params_values[property.name] = arguments[property.name]
+            continue
+
+        if property.name in required_values:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Required parameter {property.name} not found in arguments",
+            )
+
+    return params_values
 
 
 def call_brain_api(brain_id: UUID, user_id: UUID, arguments: dict) -> str:
