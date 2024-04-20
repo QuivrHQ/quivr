@@ -7,7 +7,7 @@ import requests
 from fastapi import HTTPException
 from litellm import completion
 from modules.brain.service.call_brain_api import call_brain_api
-from utils.get_api_brain_definition_as_json_schema import (
+from modules.brain.service.get_api_brain_definition_as_json_schema import (
     get_api_brain_definition_as_json_schema,
 )
 from logger import get_logger
