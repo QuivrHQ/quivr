@@ -1,10 +1,21 @@
 from fastapi import HTTPException
-from utils.extract_api_definition import format_api_brain_property
+
+from modules.brain.entity.api_brain_definition_entity import ApiBrainDefinitionSchemaProperty
 from utils.sanitize_function_name import sanitize_function_name
 from modules.brain.entity.brain_entity import BrainEntity
 from modules.brain.service.api_brain_definition_service import ApiBrainDefinitionService
 
 api_brain_definition_service = ApiBrainDefinitionService()
+
+
+def format_api_brain_property(property: ApiBrainDefinitionSchemaProperty):
+    property_data: dict = {
+        "type": property.type,
+        "description": property.description,
+    }
+    if property.enum:
+        property_data["enum"] = property.enum
+    return property_data
 
 
 def get_api_brain_definition_as_json_schema(brain: BrainEntity):
