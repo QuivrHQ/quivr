@@ -6,7 +6,6 @@ from celery_worker import process_file_and_notify
 from fastapi import APIRouter, Depends, HTTPException, Query, UploadFile
 from logger import get_logger
 from middlewares.auth import AuthBearer, get_current_user
-from models import UserUsage
 from modules.brain.entity.brain_entity import RoleEnum
 from modules.brain.service.brain_authorization_service import (
     validate_brain_authorization,
@@ -20,9 +19,10 @@ from modules.notification.dto.inputs import (
 from modules.notification.entity.notification import NotificationsStatusEnum
 from modules.notification.service.notification_service import NotificationService
 from modules.user.entity.user_identity import UserIdentity
+from modules.user.service.user_usage import UserUsage
 from packages.files.file import convert_bytes, get_file_size
 from packages.utils.telemetry import maybe_send_telemetry
-from repository.files.upload_file import upload_file_storage
+from modules.upload.service.upload_file import upload_file_storage
 
 logger = get_logger(__name__)
 upload_router = APIRouter()

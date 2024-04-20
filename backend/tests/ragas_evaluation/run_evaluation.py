@@ -24,7 +24,7 @@ from modules.knowledge.dto.inputs import CreateKnowledgeProperties
 from modules.knowledge.service.knowledge_service import KnowledgeService
 from ragas import evaluate
 from ragas.embeddings.base import LangchainEmbeddingsWrapper
-from repository.files.upload_file import upload_file_storage
+from modules.upload.service.upload_file import upload_file_storage
 
 
 def main(

@@ -1,10 +1,10 @@
 from uuid import UUID
 
 from fastapi import HTTPException
-from llm.utils.extract_api_brain_definition_values_from_llm_output import (
+from utils.extract_api_brain_definition_values_from_llm_output import (
     extract_api_brain_definition_values_from_llm_output,
 )
-from llm.utils.make_api_request import get_api_call_response_as_text
+from utils.make_api_request import get_api_call_response_as_text
 from modules.brain.service.api_brain_definition_service import ApiBrainDefinitionService
 from modules.brain.service.brain_service import BrainService
 

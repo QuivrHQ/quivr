@@ -1,6 +1,6 @@
 from fastapi import HTTPException
-from llm.utils.extract_api_definition import format_api_brain_property
-from llm.utils.sanitize_function_name import sanitize_function_name
+from utils.extract_api_definition import format_api_brain_property
+from utils.sanitize_function_name import sanitize_function_name
 from modules.brain.entity.brain_entity import BrainEntity
 from modules.brain.service.api_brain_definition_service import ApiBrainDefinitionService
 

@@ -1,10 +1,10 @@
 from fastapi import APIRouter, Depends, Request
 from middlewares.auth import AuthBearer, get_current_user
-from models import UserUsage
 from modules.brain.service.brain_user_service import BrainUserService
 from modules.user.dto.inputs import UserUpdatableProperties
 from modules.user.entity.user_identity import UserIdentity
 from modules.user.repository.users import Users
+from modules.user.service.user_usage import UserUsage
 
 user_router = APIRouter()
 brain_user_service = BrainUserService()
