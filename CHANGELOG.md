@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.0.234 (2024-04-21)
+
+## What's Changed
+* fix(gpt4): Refactor GPT4Brain and KnowledgeBrainQA classes to add non-streaming-saving-answer by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2460
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.233...v0.0.234
+
 ## 0.0.233 (2024-04-21)
 
 ## What's Changed
