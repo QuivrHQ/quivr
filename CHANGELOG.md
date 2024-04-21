@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.0.235 (2024-04-21)
+
+## What's Changed
+* fix(sources): Remove duplicate sources and add metadata to model response by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2462
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.234...v0.0.235
+
 ## 0.0.234 (2024-04-21)
 
 ## What's Changed
