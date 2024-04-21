@@ -50,6 +50,11 @@ def generate_source(source_documents, brain_id):
     # Initialize a dictionary for storing generated URLs
     generated_urls = {}
 
+    # remove duplicate sources with same name and create a list of unique sources
+    source_documents = list(
+        {v.metadata["file_name"]: v for v in source_documents}.values()
+    )
+
     # Get source documents from the result, default to an empty list if not found
 
     # If source documents exist
@@ -242,6 +247,7 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
         transformed_history, streamed_chat_history = (
             self.initialize_streamed_chat_history(chat_id, question)
         )
+        metadata = self.metadata or {}
         model_response = conversational_qa_chain.invoke(
             {
                 "question": question.question,
@@ -251,6 +257,11 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
                 ),
             }
         )
+
+        sources = model_response["docs"] or []
+        if len(sources) > 0:
+            sources_list = generate_source(sources, self.brain_id)
+            metadata["sources"] = sources_list
 
         answer = model_response["answer"].content
 
@@ -280,6 +291,7 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
                     "brain_name": self.brain.name if self.brain else None,
                     "message_id": new_chat.message_id,
                     "brain_id": str(self.brain.brain_id) if self.brain else None,
+                    "metadata": metadata,
                 }
             )
 
@@ -295,6 +307,7 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
                 "brain_name": None,
                 "message_id": None,
                 "brain_id": str(self.brain.brain_id) if self.brain else None,
+                "metadata": metadata,
             }
         )
 
