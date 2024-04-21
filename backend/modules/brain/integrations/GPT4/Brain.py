@@ -4,11 +4,13 @@ from uuid import UUID
 
 from langchain_community.chat_models import ChatLiteLLM
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
+from logger import get_logger
 from modules.brain.knowledge_brain_qa import KnowledgeBrainQA
 from modules.chat.dto.chats import ChatQuestion
-from modules.chat.dto.inputs import CreateChatHistory
 from modules.chat.dto.outputs import GetChatHistoryOutput
 from modules.chat.service.chat_service import ChatService
+
+logger = get_logger(__name__)
 
 chat_service = ChatService()
 
@@ -92,30 +94,10 @@ class GPT4Brain(KnowledgeBrainQA):
             }
         )
 
-        answer = model_response["answer"].content
-        new_chat = chat_service.update_chat_history(
-            CreateChatHistory(
-                **{
-                    "chat_id": chat_id,
-                    "user_message": question.question,
-                    "assistant": answer,
-                    "brain_id": self.brain.brain_id,
-                    "prompt_id": self.prompt_to_use_id,
-                }
-            )
-        )
+        answer = model_response.content
 
-        return GetChatHistoryOutput(
-            **{
-                "chat_id": chat_id,
-                "user_message": question.question,
-                "assistant": answer,
-                "message_time": new_chat.message_time,
-                "prompt_title": (
-                    self.prompt_to_use.title if self.prompt_to_use else None
-                ),
-                "brain_name": self.brain.name if self.brain else None,
-                "message_id": new_chat.message_id,
-                "brain_id": str(self.brain.brain_id) if self.brain else None,
-            }
+        return self.save_non_streaming_answer(
+            chat_id=chat_id,
+            question=question,
+            answer=answer,
         )
