@@ -6,6 +6,11 @@ from langchain_community.chat_models import ChatLiteLLM
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from modules.brain.knowledge_brain_qa import KnowledgeBrainQA
 from modules.chat.dto.chats import ChatQuestion
+from modules.chat.dto.inputs import CreateChatHistory
+from modules.chat.dto.outputs import GetChatHistoryOutput
+from modules.chat.service.chat_service import ChatService
+
+chat_service = ChatService()
 
 
 class GPT4Brain(KnowledgeBrainQA):
@@ -69,3 +74,48 @@ class GPT4Brain(KnowledgeBrainQA):
             yield f"data: {json.dumps(streamed_chat_history.dict())}"
 
         self.save_answer(question, response_tokens, streamed_chat_history, save_answer)
+
+    def generate_answer(
+        self, chat_id: UUID, question: ChatQuestion, save_answer: bool = True
+    ) -> GetChatHistoryOutput:
+        conversational_qa_chain = self.get_chain()
+        transformed_history, streamed_chat_history = (
+            self.initialize_streamed_chat_history(chat_id, question)
+        )
+        model_response = conversational_qa_chain.invoke(
+            {
+                "question": question.question,
+                "chat_history": transformed_history,
+                "custom_personality": (
+                    self.prompt_to_use.content if self.prompt_to_use else None
+                ),
+            }
+        )
+
+        answer = model_response["answer"].content
+        new_chat = chat_service.update_chat_history(
+            CreateChatHistory(
+                **{
+                    "chat_id": chat_id,
+                    "user_message": question.question,
+                    "assistant": answer,
+                    "brain_id": self.brain.brain_id,
+                    "prompt_id": self.prompt_to_use_id,
+                }
+            )
+        )
+
+        return GetChatHistoryOutput(
+            **{
+                "chat_id": chat_id,
+                "user_message": question.question,
+                "assistant": answer,
+                "message_time": new_chat.message_time,
+                "prompt_title": (
+                    self.prompt_to_use.title if self.prompt_to_use else None
+                ),
+                "brain_name": self.brain.name if self.brain else None,
+                "message_id": new_chat.message_id,
+                "brain_id": str(self.brain.brain_id) if self.brain else None,
+            }
+        )
