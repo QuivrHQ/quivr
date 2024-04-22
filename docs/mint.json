@@ -44,18 +44,19 @@
       "pages": [
         "intro",
         "install",
-        "slackbot",
         {
-          "group": "Use Cases",
+          "group": "Features",
           "icon": "lightbulb",
           "pages": [
-            "use-cases/entreprise-gpt",
-            "use-cases/content-generation",
-            "use-cases/hr",
-            "use-cases/market-analysis",
-            "use-cases/project-management"
+            "features/brain-creation",
+            "features/brain-sharing",
+            "features/quivr-assistants",
+            "features/chat",
+            "features/analytics",
+            "features/brain-customisation"
           ]
         },
+        "slackbot",
         "configuring",
         "tech-design",
         "contact-us"
