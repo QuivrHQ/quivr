@@ -1,0 +1,136 @@
+---
+title: Deploy with Porter
+description: Deploy your Quivr instance with Porter
+icon: cube
+--- 
+
+## Deploying Quivr Backend with Porter
+
+[Porter](https://porter.run) is a platform that allows you to easily deploy, manage, and scale your applications. This guide will walk you through deploying the Quivr backend using Porter.
+
+### Prerequisites
+
+Before you begin, make sure you have the following:
+
+- A Porter account. If you don't have one, you can sign up at [porter.run](https://porter.run).
+- The Quivr backend source code. You can find it in the [Quivr GitHub repository](https://github.com/Quivr/quivr).
+
+### Step 1: Create a Porter Project
+
+1. Log in to your Porter account.
+2. Click on the "New Project" button.
+3. Give your project a name (e.g., "quivr-backend") and select a region.
+4. Click "Create Project".
+
+### Step 2: Configure the Porter.yaml File
+
+When asked to create a new project, you will be prompted to create a `Porter.yaml` file. This file defines the services, build settings, and environment variables for your application.
+You can give this file to help you deploy. 
+
+```yaml
+version: v2
+name: quivr-back
+services:
+- name: flower
+  run: celery -A celery_worker flower -l info --port=5555
+  type: web
+  instances: 1
+  cpuCores: 0.1
+  ramMegabytes: 200
+  terminationGracePeriodSeconds: 30
+  port: 5555
+  domains:
+  - name: demo-flower.quivr.app
+  sleep: false
+- name: quivr-backend
+  run: uvicorn main:app --reload --host 0.0.0.0 --port 5050 --workers 6 --log-level
+    info
+  type: web
+  instances: 2
+  cpuCores: 1
+  ramMegabytes: 2700
+  terminationGracePeriodSeconds: 30
+  port: 5050
+  domains:
+  - name: demo-api.quivr.app
+  healthCheck:
+    enabled: true
+    httpPath: /healthz
+    timeoutSeconds: 20
+    initialDelaySeconds: 60
+  sleep: false
+- name: quivr-beat
+  run: celery -A celery_worker beat -l info
+  type: worker
+  instances: 1
+  cpuCores: 0.1
+  ramMegabytes: 200
+  terminationGracePeriodSeconds: 30
+  sleep: false
+- name: quivr-worker
+  run: celery -A celery_worker worker -l info
+  type: worker
+  instances: 1
+  cpuCores: 1
+  ramMegabytes: 2030
+  terminationGracePeriodSeconds: 30
+  sleep: false
+build:
+  context: ./backend/
+  method: docker
+  dockerfile: ./backend/Dockerfile
+autoRollback:
+  enabled: false
+```
+
+
+### Step 3: Set Up Environment Variables
+
+In Porter, you can set environment variables for your services using the environment groups. Add the environment variables required for your Quivr backend to the an environment group in the the web portal.
+
+These environment variables are the one you would normally set in your `.env` file when running the Quivr backend locally.
+
+
+### Step 4: Deploy the frontend 
+
+
+To deploy the Quivr frontend on Porter, use the following configuration in your `Porter.yaml` file:
+
+```yaml
+version: v2
+name: quivr-demo-front
+services:
+- name: quivr-frontend
+  run: ""
+  type: web
+  instances: 1
+  cpuCores: 0.2
+  ramMegabytes: 240
+  terminationGracePeriodSeconds: 30
+  port: 3000
+  domains:
+  - name: demo.quivr.app
+  sleep: false
+build:
+  context: ./frontend
+  method: docker
+  dockerfile: ./frontend/Dockerfile
+autoRollback:
+  enabled: false
+```
+
+### Step 5: Setup the environment variables for the frontend
+
+Add the environment variables required for your Quivr frontend to the an environment group in the the web portal.
+
+These environment variables are the one you would normally set in your `.env` file when running the Quivr frontend locally.
+
+### Step 6: Deploy the Application
+
+1. Click on the "Deploy" button in your Porter project.
+2. Select the branch you want to deploy (e.g., `main`).
+3. Click "Deploy".
+
+Porter will build and deploy your Quivr backend and frontend services based on the configuration in your `Porter.yaml` file.
+
+
