@@ -30,8 +30,10 @@ services:
       context: backend
       dockerfile: Dockerfile
     container_name: backend-core
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     healthcheck:
-      test: ["CMD", "curl", "http://localhost:5050/healthz"]
+      test: [ "CMD", "curl", "http://localhost:5050/healthz" ]
     command:
       - "uvicorn"
       - "main:app"
@@ -63,6 +65,8 @@ services:
       context: backend
       dockerfile: Dockerfile
     container_name: worker
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     command: celery -A celery_worker worker -l info
     restart: always
     depends_on:
@@ -77,6 +81,8 @@ services:
       context: backend
       dockerfile: Dockerfile
     container_name: beat
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     command: celery -A celery_worker beat -l info
     restart: always
     depends_on:
@@ -91,6 +97,8 @@ services:
       context: backend
       dockerfile: Dockerfile
     container_name: flower
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     command: celery -A celery_worker flower -l info --port=5555
     restart: always
     depends_on:
