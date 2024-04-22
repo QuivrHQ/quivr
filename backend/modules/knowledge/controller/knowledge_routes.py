@@ -11,7 +11,7 @@ from modules.brain.service.brain_authorization_service import (
 from modules.brain.service.brain_vector_service import BrainVectorService
 from modules.knowledge.service.knowledge_service import KnowledgeService
 from modules.user.entity.user_identity import UserIdentity
-from repository.files.generate_file_signed_url import generate_file_signed_url
+from modules.upload.service.generate_file_signed_url import generate_file_signed_url
 
 knowledge_router = APIRouter()
 logger = get_logger(__name__)

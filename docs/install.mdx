@@ -1,0 +1,91 @@
+---
+title: Quickstart
+description: Get your own assistant in less than 5 seconds
+icon: bolt
+---
+
+## Getting Started 🚀
+
+Follow these instructions to get a copy of the project up and running on your local machine for development and testing purposes.
+
+You can find everything on the [documentation](https://docs.quivr.app/).
+
+### Prerequisites 📋
+
+Ensure you have the following installed:
+
+- Docker
+- Docker Compose
+
+### 60 seconds Installation 💽
+
+You can find the installation video [here](https://www.youtube.com/watch?v=cXBa6dZJN48).
+
+- **Step 1**: Clone the repository:
+
+  ```bash
+  git clone https://github.com/quivrhq/quivr.git && cd Quivr
+  ```
+
+- **Step 2**: Copy the `.env.example` files
+
+  ```bash
+  cp .env.example .env
+  ```
+
+- **Step 3**: Update the `.env` files
+
+  ```bash
+  vim .env # or emacs or vscode or nano
+  ```
+
+  Update **OPENAI_API_KEY** in the `.env` file.
+
+  You just need to update the `OPENAI_API_KEY` variable in the `.env` file. You can get your API key [here](https://platform.openai.com/api-keys). You need to create an account first. And put your credit card information. Don't worry, you won't be charged unless you use the API. You can find more information about the pricing [here](https://openai.com/pricing/).
+
+  > Want to use [Ollama.ai](https://ollama.ai) instead?
+  > Uncomment the following lines in the `.env` file:
+  > OLLAMA_API_BASE_URL
+  > Run the following command to start Ollama: `ollama run llama2`
+  > You can find more information about Ollama [here](https://ollama.ai/).
+
+- **Step 4**: Launch the project
+
+  ```bash
+  docker compose pull
+  docker compose up --build # if OPENAI
+  # docker compose -f docker-compose-ollama.yml up --build  # Only if using Ollama. You need to run `ollama run llama2` first.
+  ```
+
+  If you have a Mac, go to Docker Desktop > Settings > General and check that the "file sharing implementation" is set to `VirtioFS`.
+
+  If you are a developer, you can run the project in development mode with the following command: `docker compose -f docker-compose.dev.yml up --build`
+
+- **Step 5**: Login to the app
+
+  Connect to the supabase database at [http://localhost:8000/project/default/auth/users](http://localhost:8000/project/default/auth/users) with the following credentials: admin/admin in order to create new users. Auto-confirm the email.
+
+  You can now sign in to the app with your new user. You can access the app at [http://localhost:3000/login](http://localhost:3000/login).
+
+  You can access Quivr backend API at [http://localhost:5050/docs](http://localhost:5050/docs)
+
+## Updating Quivr 🚀
+
+- **Step 1**: Pull the latest changes
+
+  ```bash
+  git pull
+  ```
+
+- **Step 2**: Use the `migration.sh` script to run the migration scripts
+
+  ```bash
+  chmod +x migration.sh # You need to install Gum & postgresql (brew install gum for example)
+  ./migration.sh
+  # Select  2) Run migrations
+  ```
+
+  Alternatively, you can run the script on the Supabase database via the web
+  interface (SQL Editor -> `New query` -> paste the script -> `Run`)
+
+  All the scripts can be found in the `scripts/` folder

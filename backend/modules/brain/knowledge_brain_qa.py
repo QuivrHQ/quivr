@@ -3,17 +3,15 @@ from typing import AsyncIterable, List, Optional
 from uuid import UUID
 
 from langchain.callbacks.streaming_aiter import AsyncIteratorCallbackHandler
-from llm.utils.format_chat_history import format_chat_history
-from llm.utils.get_prompt_to_use import get_prompt_to_use
-from llm.utils.get_prompt_to_use_id import get_prompt_to_use_id
 from logger import get_logger
 from models import BrainSettings
-from models.user_usage import UserUsage
 from modules.brain.entity.brain_entity import BrainEntity
 from modules.brain.qa_interface import QAInterface
 from modules.brain.rags.quivr_rag import QuivrRAG
 from modules.brain.rags.rag_interface import RAGInterface
 from modules.brain.service.brain_service import BrainService
+from modules.brain.service.utils.format_chat_history import format_chat_history
+from modules.brain.service.utils.get_prompt_to_use_id import get_prompt_to_use_id
 from modules.chat.controller.chat.utils import (
     find_model_and_generate_metadata,
     update_user_usage,
@@ -22,9 +20,11 @@ from modules.chat.dto.chats import ChatQuestion, Sources
 from modules.chat.dto.inputs import CreateChatHistory
 from modules.chat.dto.outputs import GetChatHistoryOutput
 from modules.chat.service.chat_service import ChatService
+from modules.prompt.service.get_prompt_to_use import get_prompt_to_use
+from modules.upload.service.generate_file_signed_url import generate_file_signed_url
+from modules.user.service.user_usage import UserUsage
 from pydantic import BaseModel, ConfigDict
 from pydantic_settings import BaseSettings
-from repository.files.generate_file_signed_url import generate_file_signed_url
 
 logger = get_logger(__name__)
 QUIVR_DEFAULT_PROMPT = "Your name is Quivr. You're a helpful assistant.  If you don't know the answer, just say that you don't know, don't try to make up an answer."
@@ -49,6 +49,11 @@ def generate_source(source_documents, brain_id):
 
     # Initialize a dictionary for storing generated URLs
     generated_urls = {}
+
+    # remove duplicate sources with same name and create a list of unique sources
+    source_documents = list(
+        {v.metadata["file_name"]: v for v in source_documents}.values()
+    )
 
     # Get source documents from the result, default to an empty list if not found
 
@@ -242,6 +247,7 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
         transformed_history, streamed_chat_history = (
             self.initialize_streamed_chat_history(chat_id, question)
         )
+        metadata = self.metadata or {}
         model_response = conversational_qa_chain.invoke(
             {
                 "question": question.question,
@@ -251,6 +257,11 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
                 ),
             }
         )
+
+        sources = model_response["docs"] or []
+        if len(sources) > 0:
+            sources_list = generate_source(sources, self.brain_id)
+            metadata["sources"] = sources_list
 
         answer = model_response["answer"].content
 
@@ -280,6 +291,7 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
                     "brain_name": self.brain.name if self.brain else None,
                     "message_id": new_chat.message_id,
                     "brain_id": str(self.brain.brain_id) if self.brain else None,
+                    "metadata": metadata,
                 }
             )
 
@@ -295,6 +307,7 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
                 "brain_name": None,
                 "message_id": None,
                 "brain_id": str(self.brain.brain_id) if self.brain else None,
+                "metadata": metadata,
             }
         )
 
@@ -384,3 +397,31 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
                 )
         except Exception as e:
             logger.error("Error updating message by ID: %s", e)
+
+    def save_non_streaming_answer(self, chat_id, question, answer):
+        new_chat = chat_service.update_chat_history(
+            CreateChatHistory(
+                **{
+                    "chat_id": chat_id,
+                    "user_message": question.question,
+                    "assistant": answer,
+                    "brain_id": self.brain.brain_id,
+                    "prompt_id": self.prompt_to_use_id,
+                }
+            )
+        )
+
+        return GetChatHistoryOutput(
+            **{
+                "chat_id": chat_id,
+                "user_message": question.question,
+                "assistant": answer,
+                "message_time": new_chat.message_time,
+                "prompt_title": (
+                    self.prompt_to_use.title if self.prompt_to_use else None
+                ),
+                "brain_name": self.brain.name if self.brain else None,
+                "message_id": new_chat.message_id,
+                "brain_id": str(self.brain.brain_id) if self.brain else None,
+            }
+        )

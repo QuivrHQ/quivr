@@ -1,0 +1,83 @@
+---
+title: Configuring Quivr
+description: Learn how to configure Quivr to suit your needs
+icon: gear
+---
+
+# Authentication Methods
+
+Quivr offers three authentication methods when self-hosting. You can choose which authentication methods you want to offer to your users from these three options:
+
+1. **Email/Password Authentication**
+2. **Google Authentication**
+3. **Magic Link Authentication**
+
+To enable one or more of these methods, you need to configure the following environment variables in your `.env` file:
+
+```bash
+# Authentication Configuration
+NEXT_PUBLIC_AUTH_MODES=magic_link,google_sso,password
+```
+
+Since each of these methods uses Supabase, you should configure your Supabase instance to support the chosen methods.
+
+Please refer to the [Supabase documentation](https://supabase.com/docs/guides/auth) for more information on how to configure each authentication method.
+
+
+# Environment variables
+
+You have two environment files in the root of the project:
+
+The .env file is used to configure the app server. It contains the following variables:
+
+### Backend Environment File
+
+The backend environment file is used to configure the backend server. It contains the following variables:
+
+- `SUPABASE_URL`: The connection string to the project's Supabase application, which is a suite of open source tools that provide functionality similar to Firebase.
+
+- `SUPABASE_SERVICE_KEY`: Used for server-side requests to authenticate with Supabase, providing administrative access to the database and other services.
+
+- `OPENAI_API_KEY`: The key required to authenticate requests to OpenAI's API for accessing their services, such as language models like GPT-3 or GPT-4.
+
+- `JWT_SECRET_KEY`: A secret key for signing and verifying JSON Web Tokens, used in the authentication process to secure the tokens exchanged between client and server.
+
+- `CELERY_BROKER_URL`: The URL of the message broker for Celery (using Redis), which is an asynchronous task queue/job queue based on distributed message passing.
+
+- `RESEND_API_KEY`: The API key for a service referred to as "RESEND," which likely deals with email sending or processing.
+
+- `RESEND_EMAIL_ADDRESS`: The email address used by the "RESEND" service, possibly as the sender's address for onboarding communications.
+
+- `RESEND_CONTACT_SALES_FROM`: The sender's email address for sales-related inquiries sent through the "RESEND" service.
+
+- `RESEND_CONTACT_SALES_TO`: The recipient's email address for sales inquiries using the "RESEND" service.
+
+- `PREMIUM_MAX_BRAIN_NUMBER`: A limit on the number of 'brains' a premium user can have
+
+- `PREMIUM_MAX_BRAIN_SIZE`: The maximum allowed size for a 'brain'
+
+- `PREMIUM_DAILY_CHAT_CREDIT`: The number of daily credits allocated to a premium user, possibly limiting the number of API calls or operations a user can perform each day.
+
+### Frontend Environment File
+
+The frontend environment file is used to configure the frontend application. It contains the following variables:
+
+- `NEXT_PUBLIC_ENV`: Specifies the environment in which the Next.js application is running (e.g., local, development, production).
+
+- `NEXT_PUBLIC_BACKEND_URL`: The URL where the backend of the application is running, used to make server-side requests.
+
+- `NEXT_PUBLIC_FRONTEND_URL`: The URL where the frontend of the application is accessible. The asterisk (*) may indicate that any port can be used when running locally.
+
+- `NEXT_PUBLIC_SUPABASE_URL`: The connection string to the project's Supabase application for the frontend to interact with Supabase services.
+
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY`: The public 'anonymous' key for Supabase that is used in the frontend for services that don't require full user authentication.
+
+- `NEXT_PUBLIC_CMS_URL`: The URL to access the Content Management System (CMS) for the application.
+
+- `NEXT_PUBLIC_STRIPE_PRICING_TABLE_ID`: An identifier for a pricing table in Stripe, which is a payment processing platform.
+
+- `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`: The publishable key for Stripe, used to initiate transactions on the frontend.
+
+- `NEXT_PUBLIC_STRIPE_MANAGE_PLAN_URL`: The URL for managing Stripe subscription plans.
+
+- `NEXT_PUBLIC_AUTH_MODES`: The authentication modes supported by the application, such as magic link, password-based authentication, and Google Single Sign-On (SSO).

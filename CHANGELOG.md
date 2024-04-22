@@ -1,5 +1,35 @@
 # Changelog
 
+## 0.0.235 (2024-04-21)
+
+## What's Changed
+* fix(sources): Remove duplicate sources and add metadata to model response by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2462
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.234...v0.0.235
+
+## 0.0.234 (2024-04-21)
+
+## What's Changed
+* fix(gpt4): Refactor GPT4Brain and KnowledgeBrainQA classes to add non-streaming-saving-answer by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2460
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.233...v0.0.234
+
+## 0.0.233 (2024-04-21)
+
+## What's Changed
+* refactor: reorg files in backend by @MaximeThoonsen in https://github.com/QuivrHQ/quivr/pull/2449
+* Revert "refactor: reorg files in backend" by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2456
+* refactor: Refacto code #1 by @MaximeThoonsen in https://github.com/QuivrHQ/quivr/pull/2458
+* refactor: reorg the files #2 by @MaximeThoonsen in https://github.com/QuivrHQ/quivr/pull/2457
+* feat(gpt4): Add chat service and generate answer method to GPT4Brain class by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2459
+
+## New Contributors
+* @MaximeThoonsen made their first contribution in https://github.com/QuivrHQ/quivr/pull/2449
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.232...v0.0.233
+
 ## 0.0.232 (2024-04-19)
 
 ## What's Changed

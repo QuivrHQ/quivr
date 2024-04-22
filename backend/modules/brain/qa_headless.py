@@ -8,12 +8,12 @@ from langchain.chains import LLMChain
 from langchain.chat_models.base import BaseChatModel
 from langchain.prompts.chat import ChatPromptTemplate, HumanMessagePromptTemplate
 from langchain_community.chat_models import ChatLiteLLM
-from llm.utils.format_chat_history import (
+from modules.brain.service.utils.format_chat_history import (
     format_chat_history,
     format_history_to_openai_mesages,
 )
-from llm.utils.get_prompt_to_use import get_prompt_to_use
-from llm.utils.get_prompt_to_use_id import get_prompt_to_use_id
+from modules.prompt.service.get_prompt_to_use import get_prompt_to_use
+from modules.brain.service.utils.get_prompt_to_use_id import get_prompt_to_use_id
 from logger import get_logger
 from models import BrainSettings  # Importing settings related to the 'brain'
 from modules.brain.qa_interface import QAInterface
