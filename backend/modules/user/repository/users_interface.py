@@ -44,3 +44,16 @@ class UsersInterface(ABC):
         Get the user email by user id
         """
         pass
+
+    @abstractmethod
+    def delete_user(
+    self, user_id: UUID, current_user: UserIdentity
+    ):
+        """
+        Delete a user.
+
+        - `user_id`: The ID of the user to delete.
+        - `current_user`: The current authenticated user.
+
+        This endpoint deletes a user from the system. Only an authenticated user can delete their own account.
+        """

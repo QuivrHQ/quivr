@@ -1,3 +1,4 @@
+from http.client import HTTPException
 from fastapi import APIRouter, Depends, Request
 from middlewares.auth import AuthBearer, get_current_user
 from modules.brain.service.brain_user_service import BrainUserService
@@ -78,3 +79,27 @@ def get_user_identity_route(
     Get user identity.
     """
     return user_repository.get_user_identity(current_user.id)
+
+@user_router.delete(
+    "/user/{user_id}",
+    dependencies=[Depends(AuthBearer())],
+    tags=["User"],
+)
+async def delete_user_route(
+    user_id: int, current_user: UserIdentity = Depends(get_current_user)
+):
+    """
+    Delete a user.
+
+    - `user_id`: The ID of the user to delete.
+    - `current_user`: The current authenticated user.
+
+    This endpoint deletes a user from the system. Only an authenticated user can delete their own account.
+    """
+
+    if current_user.id != user_id:
+        raise HTTPException(status_code=403, detail="Not authorized to delete this user")
+
+    user_repository.delete_user(user_id)
+
+    return {"message": "User deleted successfully"}
