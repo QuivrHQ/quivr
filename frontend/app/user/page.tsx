@@ -2,6 +2,7 @@
 
 import { useTranslation } from "react-i18next";
 
+import { useUserApi } from "@/lib/api/user/useUserApi";
 import PageHeader from "@/lib/components/PageHeader/PageHeader";
 import { Modal } from "@/lib/components/ui/Modal/Modal";
 import QuivrButton from "@/lib/components/ui/QuivrButton/QuivrButton";
@@ -17,7 +18,8 @@ import { useLogoutModal } from "../../lib/hooks/useLogoutModal";
 
 const UserPage = (): JSX.Element => {
   const { session } = useSupabase();
-  const { userData } = useUserData();
+  const { userData, userIdentityData } = useUserData();
+  const { deleteUser } = useUserApi();
   const { t } = useTranslation(["translation", "logout"]);
   const {
     handleLogout,
@@ -26,14 +28,27 @@ const UserPage = (): JSX.Element => {
     setIsLogoutModalOpened,
   } = useLogoutModal();
 
-  const button: ButtonType = {
-    label: "Logout",
-    color: "dangerous",
-    onClick: () => {
-      setIsLogoutModalOpened(true);
+  const buttons: ButtonType[] = [
+    {
+      label: "Logout",
+      color: "dangerous",
+      onClick: () => {
+        setIsLogoutModalOpened(true);
+      },
+      iconName: "logout",
     },
-    iconName: "logout",
-  };
+    {
+      label: "Delete Account",
+      color: "dangerous",
+      onClick: async () => {
+        console.info(userIdentityData);
+        if (userIdentityData) {
+          await deleteUser(userIdentityData.id);
+        }
+      },
+      iconName: "delete",
+    },
+  ];
 
   if (!session || !userData) {
     redirectToLogin();
@@ -42,7 +57,7 @@ const UserPage = (): JSX.Element => {
   return (
     <>
       <div className={styles.page_header}>
-        <PageHeader iconName="user" label="Profile" buttons={[button]} />
+        <PageHeader iconName="user" label="Profile" buttons={buttons} />
       </div>
       <div className={styles.user_page_container}>
         <div className={styles.content_wrapper}>

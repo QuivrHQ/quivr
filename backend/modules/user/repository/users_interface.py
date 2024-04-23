@@ -47,7 +47,7 @@ class UsersInterface(ABC):
 
     @abstractmethod
     def delete_user(
-    self, user_id: UUID, current_user: UserIdentity
+    self, user_id: str, current_user: UserIdentity
     ):
         """
         Delete a user.

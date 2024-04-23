@@ -86,7 +86,7 @@ def get_user_identity_route(
     tags=["User"],
 )
 async def delete_user_route(
-    user_id: int, current_user: UserIdentity = Depends(get_current_user)
+    user_id: str, current_user: UserIdentity = Depends(get_current_user)
 ):
     """
     Delete a user.

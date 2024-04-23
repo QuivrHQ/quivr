@@ -31,7 +31,7 @@ export type UserIdentityUpdatableProperties = {
 };
 
 export type UserIdentity = {
-  user_id: UUID;
+  id: UUID;
   onboarded: boolean;
   username: string;
 };
@@ -53,3 +53,11 @@ export const getUserIdentity = async (
 export const getUser = async (
   axiosInstance: AxiosInstance
 ): Promise<UserStats> => (await axiosInstance.get<UserStats>("/user")).data;
+
+export const deleteUser = async (
+  axiosInstance: AxiosInstance,
+  userId: string
+): Promise<void> => {
+  console.info(userId);
+  await axiosInstance.delete(`/user/${userId}`);
+};
