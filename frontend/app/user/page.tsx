@@ -111,7 +111,7 @@ const UserPage = (): JSX.Element => {
                 if (userIdentityData) {
                   void deleteUser(userIdentityData.id, session);
                 }
-                // void handleLogout();
+                void handleLogout();
               }}
               label="Delete Account"
               iconName="logout"

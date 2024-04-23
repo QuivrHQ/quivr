@@ -91,9 +91,8 @@ async def delete_user_route(
     Delete a user.
 
     - `user_id`: The ID of the user to delete.
-    - `current_user`: The current authenticated user.
 
-    This endpoint deletes a user from the system. Only an authenticated user can delete their own account.
+    This endpoint deletes a user from the system.
     """
 
     user_repository.delete_user(user_id)
