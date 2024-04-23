@@ -43,10 +43,8 @@ const UserPage = (): JSX.Element => {
     {
       label: "Delete Account",
       color: "dangerous",
-      onClick: async () => {
-        if (userIdentityData) {
-          await deleteUser(userIdentityData.id);
-        }
+      onClick: () => {
+        setDeleteAccountModalOpened(true);
       },
       iconName: "delete",
     },
@@ -72,9 +70,9 @@ const UserPage = (): JSX.Element => {
         size="auto"
         CloseTrigger={<div />}
       >
-        <div>
+        <div className={styles.modal_wrapper}>
           <h2>{t("areYouSure", { ns: "logout" })}</h2>
-          <div className="flex gap-5 items-center justify-center">
+          <div className={styles.buttons}>
             <QuivrButton
               onClick={() => setIsLogoutModalOpened(false)}
               color="primary"
@@ -97,9 +95,9 @@ const UserPage = (): JSX.Element => {
         size="auto"
         CloseTrigger={<div />}
       >
-        <div>
+        <div className={styles.modal_wrapper}>
           <h2>Are you sure you want to delete your account ?</h2>
-          <div>
+          <div className={styles.buttons}>
             <QuivrButton
               onClick={() => setDeleteAccountModalOpened(false)}
               color="primary"
