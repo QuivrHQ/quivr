@@ -7,6 +7,8 @@ from langchain.embeddings.ollama import OllamaEmbeddings
 from langchain.llms.base import BaseLLM
 from langchain.memory import ConversationBufferMemory
 from langchain.prompts import HumanMessagePromptTemplate, SystemMessagePromptTemplate
+from langchain.retrievers import ContextualCompressionRetriever
+from langchain.retrievers.document_compressors import FlashrankRerank
 from langchain.schema import format_document
 from langchain_community.chat_models import ChatLiteLLM
 from langchain_core.messages import get_buffer_string
@@ -14,11 +16,11 @@ from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate, PromptTemplate
 from langchain_core.runnables import RunnableLambda, RunnablePassthrough
 from langchain_openai import OpenAIEmbeddings
-from modules.prompt.service.get_prompt_to_use import get_prompt_to_use
 from logger import get_logger
 from models import BrainSettings  # Importing settings related to the 'brain'
 from modules.brain.service.brain_service import BrainService
 from modules.chat.service.chat_service import ChatService
+from modules.prompt.service.get_prompt_to_use import get_prompt_to_use
 from pydantic import BaseModel, ConfigDict
 from pydantic_settings import BaseSettings
 from supabase.client import Client, create_client
@@ -202,7 +204,12 @@ class QuivrRAG(BaseModel):
         return self.vector_store.as_retriever()
 
     def get_chain(self):
+        compressor = FlashrankRerank(model="ms-marco-TinyBERT-L-2-v2", top_n=100)
+
         retriever_doc = self.get_retriever()
+        compression_retriever = ContextualCompressionRetriever(
+            base_compressor=compressor, base_retriever=retriever_doc
+        )
         memory = ConversationBufferMemory(
             return_messages=True, output_key="answer", input_key="question"
         )
@@ -233,7 +240,7 @@ class QuivrRAG(BaseModel):
 
         # Now we retrieve the documents
         retrieved_documents = {
-            "docs": itemgetter("standalone_question") | retriever_doc,
+            "docs": itemgetter("standalone_question") | compression_retriever,
             "question": lambda x: x["standalone_question"],
             "custom_instructions": lambda x: prompt_to_use,
         }

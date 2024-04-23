@@ -60,6 +60,7 @@ datasets = "*"
 pytest-dotenv = "*"
 fpdf2 = "*"
 unidecode = "*"
+flashrank = "*"
 
 [dev-packages]
 black = "*"
