@@ -75,6 +75,24 @@ class Users(UsersInterface):
         return response.data[0]["email"]
     
     def delete_user(self, user_id):
+        response = (
+            self.db.from_("brains_users")
+            .select("brain_id")
+            .filter("rights", "eq", "Owner")
+            .filter("user_id", "eq", str(user_id))
+            .execute()
+        )
+        brain_ids = [row["brain_id"] for row in response.data]
+
+        for brain_id in brain_ids:
+            self.db.table("brains").delete().filter("brain_id", "eq", brain_id).execute()
+
+        for brain_id in brain_ids:
+            self.db.table("brains_vectors").delete().filter("brain_id", "eq", brain_id).execute()
+
+        for brain_id in brain_ids:
+            self.db.table("chat_history").delete().filter("brain_id", "eq", brain_id).execute()
+
         self.db.table("user_settings").delete().filter("user_id", "eq", str(user_id)).execute()
         self.db.table("user_identity").delete().filter("user_id", "eq", str(user_id)).execute()
         self.db.table("users").delete().filter("id", "eq", str(user_id)).execute()
