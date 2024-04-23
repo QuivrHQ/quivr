@@ -11,4 +11,10 @@
     gap: Spacings.$spacing03;
     flex-wrap: wrap;
   }
+
+  .message_wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: Spacings.$spacing02;
+  }
 }
