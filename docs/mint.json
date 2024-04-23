@@ -71,7 +71,7 @@
       "pages": [ "brains/docs-and-urls","brains/gpt4", "brains/sql"]
     },
     {
-      "group": "Agents",
+      "group": "Assistants",
       "pages": ["agents/summary"]
     }
   ],
