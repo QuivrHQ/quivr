@@ -75,6 +75,7 @@ class Users(UsersInterface):
         return response.data[0]["email"]
     
     def delete_user(self, user_id):
+        self.db.table("user_settings").delete().filter("user_id", "eq", str(user_id)).execute()
         self.db.table("user_identity").delete().filter("user_id", "eq", str(user_id)).execute()
         self.db.table("users").delete().filter("id", "eq", str(user_id)).execute()
         

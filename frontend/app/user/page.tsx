@@ -18,7 +18,7 @@ import styles from "./page.module.scss";
 import { useLogoutModal } from "../../lib/hooks/useLogoutModal";
 
 const UserPage = (): JSX.Element => {
-  const { session } = useSupabase();
+  const { session, supabase } = useSupabase();
   const { userData, userIdentityData } = useUserData();
   const { deleteUser } = useUserApi();
   const { t } = useTranslation(["translation", "logout"]);
@@ -109,9 +109,9 @@ const UserPage = (): JSX.Element => {
               color="dangerous"
               onClick={() => {
                 if (userIdentityData) {
-                  void deleteUser(userIdentityData.id);
+                  void deleteUser(userIdentityData.id, session);
                 }
-                void handleLogout();
+                // void handleLogout();
               }}
               label="Delete Account"
               iconName="logout"

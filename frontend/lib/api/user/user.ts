@@ -1,3 +1,4 @@
+import { Session } from "@supabase/auth-helpers-nextjs";
 import { AxiosInstance } from "axios";
 import { UUID } from "crypto";
 
@@ -56,8 +57,10 @@ export const getUser = async (
 
 export const deleteUser = async (
   axiosInstance: AxiosInstance,
-  userId: string
+  userId: string,
+  session: Session
 ): Promise<void> => {
-  console.info(userId);
-  await axiosInstance.delete(`/user/${userId}`);
+  if (session.user.id === userId) {
+    await axiosInstance.delete(`/user/${userId}`);
+  }
 };

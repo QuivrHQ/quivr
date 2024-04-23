@@ -1,3 +1,5 @@
+import { Session } from "@supabase/supabase-js";
+
 import { useAxios } from "@/lib/hooks";
 
 import {
@@ -18,6 +20,7 @@ export const useUserApi = () => {
     ) => updateUserIdentity(userIdentityUpdatableProperties, axiosInstance),
     getUserIdentity: async () => getUserIdentity(axiosInstance),
     getUser: async () => getUser(axiosInstance),
-    deleteUser: async (userId: string) => deleteUser(axiosInstance, userId),
+    deleteUser: async (userId: string, session: Session) =>
+      deleteUser(axiosInstance, userId, session),
   };
 };
