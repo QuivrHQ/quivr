@@ -82,27 +82,37 @@ const Search = (): JSX.Element => {
         <AddBrainModal />
         <OnboardingModal />
       </div>
-      {!isBrainCreationModalOpened &&
+      {(!isBrainCreationModalOpened &&
         !userIdentityData?.onboarded &&
-        !!isUserDataFetched && (
-          <div className={styles.onboarding_overlay}>
-            <div className={styles.first_brain_button}>
-              <MessageInfoBox type="tutorial">
+        !!isUserDataFetched) || (
+        <div className={styles.onboarding_overlay}>
+          <div className={styles.main_message_wrapper}>
+            <MessageInfoBox type="tutorial">
+              <div className={styles.main_message}>
+                <span>Welcome {userIdentityData?.username}!</span>
                 <span>
-                  Press the following button to create your first brain
+                  We will guide you through your quivr adventure and the
+                  creation of your first brain.
                 </span>
-              </MessageInfoBox>
-              <QuivrButton
-                iconName="brain"
-                label="Create Brain"
-                color="primary"
-                onClick={() => {
-                  setIsBrainCreationModalOpened(true);
-                }}
-              />
-            </div>
+                <span className={styles.bolder}>
+                  First, Press the Create Brain button on the top right corner
+                  to create your first brain.
+                </span>
+              </div>
+            </MessageInfoBox>
           </div>
-        )}
+          <div className={styles.first_brain_button}>
+            <QuivrButton
+              iconName="brain"
+              label="Create Brain"
+              color="primary"
+              onClick={() => {
+                setIsBrainCreationModalOpened(true);
+              }}
+            />
+          </div>
+        </div>
+      )}
     </>
   );
 };
