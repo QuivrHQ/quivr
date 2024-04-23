@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.0.236 (2024-04-23)
+
+## What's Changed
+* feat(docs): update to new by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2465
+* feat(docs): Add new brain files and update navigation by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2467
+* Feat/docs category brains agents by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2469
+* fix(docs): update doc by @Zewed in https://github.com/QuivrHQ/quivr/pull/2470
+* feat(digital-ocean): Update deployment instructions for Digital Ocean by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2472
+* docs(digital-ocean): added missing photo by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2473
+* docs: Update brain documentation and images by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2475
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.235...v0.0.236
+
 ## 0.0.235 (2024-04-21)
 
 ## What's Changed
