@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { useUserApi } from "@/lib/api/user/useUserApi";
@@ -21,6 +22,8 @@ const UserPage = (): JSX.Element => {
   const { userData, userIdentityData } = useUserData();
   const { deleteUser } = useUserApi();
   const { t } = useTranslation(["translation", "logout"]);
+  const [deleteAccountModalOpened, setDeleteAccountModalOpened] =
+    useState(false);
   const {
     handleLogout,
     isLoggingOut,
@@ -41,7 +44,6 @@ const UserPage = (): JSX.Element => {
       label: "Delete Account",
       color: "dangerous",
       onClick: async () => {
-        console.info(userIdentityData);
         if (userIdentityData) {
           await deleteUser(userIdentityData.id);
         }
@@ -70,10 +72,8 @@ const UserPage = (): JSX.Element => {
         size="auto"
         CloseTrigger={<div />}
       >
-        <div className="text-center flex flex-col items-center gap-5">
-          <h2 className="text-lg font-medium mb-5">
-            {t("areYouSure", { ns: "logout" })}
-          </h2>
+        <div>
+          <h2>{t("areYouSure", { ns: "logout" })}</h2>
           <div className="flex gap-5 items-center justify-center">
             <QuivrButton
               onClick={() => setIsLogoutModalOpened(false)}
@@ -86,6 +86,36 @@ const UserPage = (): JSX.Element => {
               color="dangerous"
               onClick={() => void handleLogout()}
               label={t("logoutButton")}
+              iconName="logout"
+            ></QuivrButton>
+          </div>
+        </div>
+      </Modal>
+      <Modal
+        isOpen={deleteAccountModalOpened}
+        setOpen={setDeleteAccountModalOpened}
+        size="auto"
+        CloseTrigger={<div />}
+      >
+        <div>
+          <h2>Are you sure you want to delete your account ?</h2>
+          <div>
+            <QuivrButton
+              onClick={() => setDeleteAccountModalOpened(false)}
+              color="primary"
+              label={t("cancel", { ns: "logout" })}
+              iconName="close"
+            ></QuivrButton>
+            <QuivrButton
+              isLoading={isLoggingOut}
+              color="dangerous"
+              onClick={() => {
+                if (userIdentityData) {
+                  void deleteUser(userIdentityData.id);
+                }
+                void handleLogout();
+              }}
+              label="Delete Account"
               iconName="logout"
             ></QuivrButton>
           </div>

@@ -75,21 +75,7 @@ class Users(UsersInterface):
         return response.data[0]["email"]
     
     def delete_user(self, user_id):
-        response_identity = (
-            self.db.table("user_identity")
-            .delete()
-            .where("user_id", "==", str(user_id))
-            .execute()
-        )
+        self.db.table("user_identity").delete().filter("user_id", "eq", str(user_id)).execute()
+        self.db.table("users").delete().filter("id", "eq", str(user_id)).execute()
+        
 
-        response_users = (
-            self.db.table("users")
-            .delete()
-            .where("user_id", "==", str(user_id))
-            .execute()
-        )
-
-        if response_identity.error or response_users.error:
-            raise Exception("An error occurred while deleting the user.")
-
-        return {"message": "User deleted successfully"}
