@@ -53,3 +53,7 @@ export const getUserIdentity = async (
 export const getUser = async (
   axiosInstance: AxiosInstance
 ): Promise<UserStats> => (await axiosInstance.get<UserStats>("/user")).data;
+
+export const getUserCredits = async (
+  axiosInstance: AxiosInstance
+): Promise<number> => (await axiosInstance.get<number>("/user/credits")).data;
