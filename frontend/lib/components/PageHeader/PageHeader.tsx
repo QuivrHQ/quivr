@@ -33,14 +33,16 @@ export const PageHeader = ({
 
   useEffect(() => {
     setLightModeIconName(isDarkMode ? "sun" : "moon");
+  }, [isDarkMode]);
 
+  useEffect(() => {
     void (async () => {
       const res = await getUserCredits();
       if (res) {
         setRemainingCredits(res);
       }
-    });
-  }, [isDarkMode]);
+    })();
+  }, []);
 
   return (
     <div className={styles.page_header_wrapper}>

@@ -1,6 +1,8 @@
+import time
 from models.settings import get_supabase_client
 from modules.user.entity.user_identity import UserIdentity
 from modules.user.repository.users_interface import UsersInterface
+from modules.user.service import user_usage
 
 
 class Users(UsersInterface):
@@ -75,5 +77,8 @@ class Users(UsersInterface):
         return response.data[0]["email"]
     
     def get_user_credits(self, user_id):
-        print("GET USER CREDITS", user_id)
-        return 12
+        user_usage_instance = user_usage.UserUsage(id=user_id)
+        user_monthly_usage = user_usage_instance.get_user_monthly_usage(time.strftime("%Y%m%d"))
+        monthly_chat_credit = self.db.from_("user_settings").select("monthly_chat_credit").filter("user_id", "eq", str(user_id)).execute().data[0]["monthly_chat_credit"]
+
+        return monthly_chat_credit - user_monthly_usage
