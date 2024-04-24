@@ -1,0 +1,26 @@
+---
+title: Emails
+description: Allow Quivr to send emails
+---
+
+# Emails with Resend
+
+Quivr uses the [Resend](https://resend.com/) service to send emails. Resend is a transactional email service that allows you to send emails from your application. This guide will show you how to set up Resend in Quivr.
+
+## Setting up Resend
+
+To set up Resend in Quivr, you need to configure the following environment variables in your `.env` file:
+
+```bash
+# Resend Configuration
+RESEND_API_KEY=<change-me>
+RESEND_EMAIL_ADDRESS=<change-me>
+RESEND_CONTACT_SALES_FROM=<change-me>
+RESEND_CONTACT_SALES_TO=<change-me>
+```
+
+You can get the `RESEND_API_KEY` from your Resend account. The `RESEND_EMAIL_ADDRESS` is the email address that will be used to send emails from your application. The `RESEND_CONTACT_SALES_FROM` and `RESEND_CONTACT_SALES_TO` are the email addresses that will be used for sales-related inquiries.
+
+Make sure that these emails and domains have been verified in your Resend account to avoid any issues with sending emails.
+
+
