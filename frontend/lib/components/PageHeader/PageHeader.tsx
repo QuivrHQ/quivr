@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 
+import { useUserApi } from "@/lib/api/user/useUserApi";
 import { useMenuContext } from "@/lib/context/MenuProvider/hooks/useMenuContext";
 import { useUserSettingsContext } from "@/lib/context/UserSettingsProvider/hooks/useUserSettingsContext";
 import { ButtonType } from "@/lib/types/QuivrButton";
@@ -23,6 +24,8 @@ export const PageHeader = ({
   const { isOpened } = useMenuContext();
   const { isDarkMode, setIsDarkMode } = useUserSettingsContext();
   const [lightModeIconName, setLightModeIconName] = useState("sun");
+  const [remainingCredits, setRemainingCredits] = useState<number>(0);
+  const { getUserCredits } = useUserApi();
 
   const toggleTheme = () => {
     setIsDarkMode(!isDarkMode);
@@ -30,6 +33,13 @@ export const PageHeader = ({
 
   useEffect(() => {
     setLightModeIconName(isDarkMode ? "sun" : "moon");
+
+    void (async () => {
+      const res = await getUserCredits();
+      if (res) {
+        setRemainingCredits(res);
+      }
+    });
   }, [isDarkMode]);
 
   return (
@@ -56,6 +66,7 @@ export const PageHeader = ({
           size="small"
           onClick={toggleTheme}
         />
+        {remainingCredits}
       </div>
     </div>
   );
