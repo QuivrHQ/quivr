@@ -1,0 +1,28 @@
+---
+title: Reranking
+description: Learn how to configure reranking in Quivr.
+---
+
+Quivr uses its own reranking service to improve the quality of search results. This guide will show you how to configure the reranking service in Quivr.
+
+## Reranking Configuration
+
+We are using FlashrankRerank from [Flashrank](https://github.com/PrithivirajDamodaran/FlashRank) to improve the quality of search results. 
+It is a reranking open-source library that uses deep learning models to rerank search results.
+
+## Use Cohere ReRanker
+
+To use the Cohere ReRanker, you need to configure the following environment variables in your `.env` file:
+
+```bash
+COHERE_API_KEY=your-cohere-api-key
+```
+
+By default, the `COHERE_API_KEY` variable is not set. If you want to use the Cohere ReRanker, you need to set it to your Cohere API key.
+
+## Configuration
+
+By default the Ranker outputs the best 5 results.
+
+We only use the Cohere ReRanker to improve the quality of search results. We do not collect any personal data or sensitive information.
+

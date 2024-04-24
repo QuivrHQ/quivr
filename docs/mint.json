@@ -60,7 +60,15 @@
         {
           "group": "Configuring",
           "icon": "gear",
-          "pages": ["configuring/authentication", "configuring/new-model", "configuring/increase-user-usage", "configuring/resend-emails", "configuring/environment-variables", "configuring/telemetry"]
+          "pages": [
+            "configuring/authentication",
+            "configuring/new-model",
+            "configuring/increase-user-usage",
+            "configuring/resend-emails",
+            "configuring/reranking",
+            "configuring/environment-variables",
+            "configuring/telemetry"
+          ]
         },
         "tech-design",
         "contact-us"
@@ -68,15 +76,25 @@
     },
     {
       "group": "Deploy Quivr",
-      "pages": ["deployment/porter", "deployment/aws", "deployment/digital_ocean"]
+      "pages": [
+        "deployment/porter",
+        "deployment/aws",
+        "deployment/digital_ocean"
+      ]
     },
     {
       "group": "Brains",
-      "pages": [ "brains/docs-and-urls","brains/gpt4", "brains/sql"]
+      "pages": [
+        "brains/docs-and-urls",
+        "brains/gpt4",
+        "brains/sql"
+      ]
     },
     {
       "group": "Assistants",
-      "pages": ["agents/summary"]
+      "pages": [
+        "agents/summary"
+      ]
     }
   ],
   "footerSocials": {
