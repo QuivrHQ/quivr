@@ -26,7 +26,7 @@ class File(BaseModel):
     file_extension: Optional[str] = ""
     content: Optional[Any] = None
     chunk_size: int = 800
-    chunk_overlap: int = 300
+    chunk_overlap: int = 200
     documents: Optional[Document] = None
 
     @property
