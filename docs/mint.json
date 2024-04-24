@@ -60,7 +60,7 @@
         {
           "group": "Configuring",
           "icon": "gear",
-          "pages": ["configuring/environment-variables", "configuring/new-model", "configuring/increase-user-usage"]
+          "pages": ["configuring/authentication", "configuring/environment-variables", "configuring/new-model", "configuring/increase-user-usage"]
         },
         "tech-design",
         "contact-us"
