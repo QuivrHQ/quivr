@@ -44,3 +44,10 @@ class UsersInterface(ABC):
         Get the user email by user id
         """
         pass
+
+    @abstractmethod
+    def get_user_credits(self, user_id: UUID) -> int:
+        """
+        Get user remaining credits
+        """
+        pass

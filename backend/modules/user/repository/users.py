@@ -73,3 +73,7 @@ class Users(UsersInterface):
             "get_user_email_by_user_id", {"user_id": str(user_id)}
         ).execute()
         return response.data[0]["email"]
+    
+    def get_user_credits(self, user_id):
+        print("GET USER CREDITS", user_id)
+        return 12
