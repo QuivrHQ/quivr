@@ -1,3 +1,4 @@
+import os
 from operator import itemgetter
 from typing import Optional
 from uuid import UUID
@@ -5,20 +6,21 @@ from uuid import UUID
 from langchain.chains import ConversationalRetrievalChain
 from langchain.embeddings.ollama import OllamaEmbeddings
 from langchain.llms.base import BaseLLM
-from langchain.memory import ConversationBufferMemory
 from langchain.prompts import HumanMessagePromptTemplate, SystemMessagePromptTemplate
+from langchain.retrievers import ContextualCompressionRetriever
+from langchain.retrievers.document_compressors import FlashrankRerank
 from langchain.schema import format_document
+from langchain_cohere import CohereRerank
 from langchain_community.chat_models import ChatLiteLLM
-from langchain_core.messages import get_buffer_string
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate, PromptTemplate
-from langchain_core.runnables import RunnableLambda, RunnablePassthrough
+from langchain_core.runnables import RunnablePassthrough
 from langchain_openai import OpenAIEmbeddings
-from modules.prompt.service.get_prompt_to_use import get_prompt_to_use
 from logger import get_logger
 from models import BrainSettings  # Importing settings related to the 'brain'
 from modules.brain.service.brain_service import BrainService
 from modules.chat.service.chat_service import ChatService
+from modules.prompt.service.get_prompt_to_use import get_prompt_to_use
 from pydantic import BaseModel, ConfigDict
 from pydantic_settings import BaseSettings
 from supabase.client import Client, create_client
@@ -28,7 +30,7 @@ logger = get_logger(__name__)
 
 
 # First step is to create the Rephrasing Prompt
-_template = """Given the following conversation and a follow up question, rephrase the follow up question to be a standalone question, in its original language.
+_template = """Given the following conversation and a follow up question, rephrase the follow up question to be a standalone question, in its original language. Keep as much details as possible from previous messages. Keep entity names and all. 
 
 Chat History:
 {chat_history}
@@ -202,14 +204,20 @@ class QuivrRAG(BaseModel):
         return self.vector_store.as_retriever()
 
     def get_chain(self):
+        compressor = None
+        if os.getenv("COHERE_API_KEY"):
+            compressor = CohereRerank(top_n=5)
+        else:
+            compressor = FlashrankRerank(model="ms-marco-TinyBERT-L-2-v2", top_n=5)
+
         retriever_doc = self.get_retriever()
-        memory = ConversationBufferMemory(
-            return_messages=True, output_key="answer", input_key="question"
+        compression_retriever = ContextualCompressionRetriever(
+            base_compressor=compressor, base_retriever=retriever_doc
         )
 
         loaded_memory = RunnablePassthrough.assign(
-            chat_history=RunnableLambda(memory.load_memory_variables)
-            | itemgetter("history"),
+            chat_history=lambda x: x["chat_history"],
+            question=lambda x: x["question"],
         )
 
         api_base = None
@@ -219,7 +227,7 @@ class QuivrRAG(BaseModel):
         standalone_question = {
             "standalone_question": {
                 "question": lambda x: x["question"],
-                "chat_history": lambda x: get_buffer_string(x["chat_history"]),
+                "chat_history": lambda x: x["chat_history"],
             }
             | CONDENSE_QUESTION_PROMPT
             | ChatLiteLLM(temperature=0, model=self.model, api_base=api_base)
@@ -233,7 +241,7 @@ class QuivrRAG(BaseModel):
 
         # Now we retrieve the documents
         retrieved_documents = {
-            "docs": itemgetter("standalone_question") | retriever_doc,
+            "docs": itemgetter("standalone_question") | compression_retriever,
             "question": lambda x: x["standalone_question"],
             "custom_instructions": lambda x: prompt_to_use,
         }
