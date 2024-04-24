@@ -22,9 +22,9 @@ from modules.brain.rags.quivr_rag import QuivrRAG
 from modules.brain.service.brain_service import BrainService
 from modules.knowledge.dto.inputs import CreateKnowledgeProperties
 from modules.knowledge.service.knowledge_service import KnowledgeService
+from modules.upload.service.upload_file import upload_file_storage
 from ragas import evaluate
 from ragas.embeddings.base import LangchainEmbeddingsWrapper
-from modules.upload.service.upload_file import upload_file_storage
 
 
 def main(
@@ -176,7 +176,7 @@ if __name__ == "__main__":
         "--model", type=str, default="gpt-3.5-turbo-0125", help="Model to use"
     )
     parser.add_argument(
-        "--context_size", type=int, default=4000, help="Context size for the model"
+        "--context_size", type=int, default=10000, help="Context size for the model"
     )
     parser.add_argument(
         "--metrics",
