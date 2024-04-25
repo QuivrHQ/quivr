@@ -78,6 +78,7 @@ class Users(UsersInterface):
     
     def get_user_credits(self, user_id):
         user_usage_instance = user_usage.UserUsage(id=user_id)
+        
         user_monthly_usage = user_usage_instance.get_user_monthly_usage(time.strftime("%Y%m%d"))
         monthly_chat_credit = self.db.from_("user_settings").select("monthly_chat_credit").filter("user_id", "eq", str(user_id)).execute().data[0]["monthly_chat_credit"]
 
