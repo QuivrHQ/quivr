@@ -33,8 +33,6 @@ const Search = (): JSX.Element => {
     void (async () => {
       try {
         const res = await getAssistants();
-
-        console.info(res);
         if (res) {
           setAssistants(res);
         }

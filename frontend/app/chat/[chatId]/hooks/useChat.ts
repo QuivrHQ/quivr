@@ -101,7 +101,6 @@ export const useChat = () => {
       await addStreamQuestion(currentChatId, chatQuestion);
       void (async () => {
         const res = await getUserCredits();
-        console.info(res);
         if (res) {
           setRemainingCredits(res);
         }
