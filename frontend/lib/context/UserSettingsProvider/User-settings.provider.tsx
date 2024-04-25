@@ -32,9 +32,7 @@ export const UserSettingsProvider = ({
   useEffect(() => {
     void (async () => {
       const res = await getUserCredits();
-      if (res) {
-        setRemainingCredits(res);
-      }
+      setRemainingCredits(res);
     })();
   }, []);
 
