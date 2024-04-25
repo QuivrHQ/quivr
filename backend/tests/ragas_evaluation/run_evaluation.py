@@ -142,7 +142,7 @@ def generate_replies(
     test_groundtruths = test_data.ground_truth.tolist()
 
     for question in test_questions:
-        response = brain_chain.invoke({"question": question})
+        response = brain_chain.invoke({"question": question, "chat_history": []})
         answers.append(response["answer"].content)
         contexts.append([context.page_content for context in response["docs"]])
 
