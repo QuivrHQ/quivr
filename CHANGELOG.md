@@ -1,5 +1,22 @@
 # Changelog
 
+## 0.0.237 (2024-04-24)
+
+## What's Changed
+* docs: Add environment variables, increase user usage, and add new models by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2481
+* fix(frontend): Warning for Quivr Assistants by @Zewed in https://github.com/QuivrHQ/quivr/pull/2479
+* fix(frontend): better UI for Onboarding by @Zewed in https://github.com/QuivrHQ/quivr/pull/2477
+* docs: add new configuration items by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2483
+* Revert "fix(frontend): better UI for Onboarding" by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2485
+* feat(reranker): Add flashrank and contextual compression retriever by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2480
+* feat(history): max tokens in the history provided by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2487
+* feat: Update chunk overlap to 200 by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2488
+* docs: Add reranking configuration guide by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2489
+* docs: Update telemetry configuration in Quivr by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2490
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.236...v0.0.237
+
 ## 0.0.236 (2024-04-23)
 
 ## What's Changed
