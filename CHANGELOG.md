@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.0.238 (2024-04-25)
+
+## What's Changed
+* Enable Porter Application cherry-pick-backend by @porter-deployment-app in https://github.com/QuivrHQ/quivr/pull/2492
+* Enable Porter Application cherry-pick-frontend by @porter-deployment-app in https://github.com/QuivrHQ/quivr/pull/2493
+* feat: Add telemetry ping task to celery worker and main.py by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2494
+* fix(backend): compute history only if needed and put some cache to remove some call… by @dmourot in https://github.com/QuivrHQ/quivr/pull/2497
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.237...v0.0.238
+
 ## 0.0.237 (2024-04-24)
 
 ## What's Changed
