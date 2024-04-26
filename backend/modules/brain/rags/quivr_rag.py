@@ -1,6 +1,7 @@
+import logging
 import os
 from operator import itemgetter
-from typing import Optional
+from typing import List, Optional
 from uuid import UUID
 
 from langchain.chains import ConversationalRetrievalChain
@@ -14,8 +15,10 @@ from langchain_cohere import CohereRerank
 from langchain_community.chat_models import ChatLiteLLM
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate, PromptTemplate
+from langchain_core.pydantic_v1 import BaseModel as BaseModelV1
+from langchain_core.pydantic_v1 import Field as FieldV1
 from langchain_core.runnables import RunnableLambda, RunnablePassthrough
-from langchain_openai import OpenAIEmbeddings
+from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 from logger import get_logger
 from models import BrainSettings  # Importing settings related to the 'brain'
 from modules.brain.service.brain_service import BrainService
@@ -26,7 +29,20 @@ from pydantic_settings import BaseSettings
 from supabase.client import Client, create_client
 from vectorstore.supabase import CustomSupabaseVectorStore
 
-logger = get_logger(__name__)
+logger = get_logger(__name__, log_level=logging.INFO)
+
+
+class cited_answer(BaseModelV1):
+    """Answer the user question based only on the given sources, and cite the sources used."""
+
+    answer: str = FieldV1(
+        ...,
+        description="The answer to the user question, which is based only on the given sources.",
+    )
+    citations: List[int] = FieldV1(
+        ...,
+        description="The integer IDs of the SPECIFIC sources which justify the answer.",
+    )
 
 
 # First step is to create the Rephrasing Prompt
@@ -66,7 +82,9 @@ ANSWER_PROMPT = ChatPromptTemplate.from_messages(
 
 # How we format documents
 
-DEFAULT_DOCUMENT_PROMPT = PromptTemplate.from_template(template="{page_content}")
+DEFAULT_DOCUMENT_PROMPT = PromptTemplate.from_template(
+    template="Source: {index} \n {page_content}"
+)
 
 
 def is_valid_uuid(uuid_to_test, version=4):
@@ -115,6 +133,23 @@ class QuivrRAG(BaseModel):
             return get_prompt_to_use(UUID(self.brain_id), self.prompt_id)
         else:
             return None
+
+    def model_compatible_with_function_calling(self):
+        if self.model in [
+            "gpt-4-turbo",
+            "gpt-4-turbo-2024-04-09",
+            "gpt-4-turbo-preview",
+            "gpt-4-0125-preview",
+            "gpt-4-1106-preview",
+            "gpt-4",
+            "gpt-4-0613",
+            "gpt-3.5-turbo",
+            "gpt-3.5-turbo-0125",
+            "gpt-3.5-turbo-1106",
+            "gpt-3.5-turbo-0613",
+        ]:
+            return True
+        return False
 
     supabase_client: Optional[Client] = None
     vector_store: Optional[CustomSupabaseVectorStore] = None
@@ -197,6 +232,9 @@ class QuivrRAG(BaseModel):
     def _combine_documents(
         self, docs, document_prompt=DEFAULT_DOCUMENT_PROMPT, document_separator="\n\n"
     ):
+        # for each docs, add an index in the metadata to be able to cite the sources
+        for doc, index in zip(docs, range(len(docs))):
+            doc.metadata["index"] = index
         doc_strings = [format_document(doc, document_prompt) for doc in docs]
         return document_separator.join(doc_strings)
 
@@ -287,14 +325,27 @@ class QuivrRAG(BaseModel):
             "question": itemgetter("question"),
             "custom_instructions": itemgetter("custom_instructions"),
         }
+        llm = ChatLiteLLM(
+            max_tokens=self.max_tokens,
+            model=self.model,
+            temperature=self.temperature,
+            api_base=api_base,
+        )
+        if self.model_compatible_with_function_calling():
 
-        # And finally, we do the part that returns the answers
+            # And finally, we do the part that returns the answers
+            llm_function = ChatOpenAI(
+                max_tokens=self.max_tokens,
+                model=self.model,
+                temperature=self.temperature,
+            )
+            llm = llm_function.bind_tools(
+                [cited_answer],
+                tool_choice="cited_answer",
+            )
+
         answer = {
-            "answer": final_inputs
-            | ANSWER_PROMPT
-            | ChatLiteLLM(
-                max_tokens=self.max_tokens, model=self.model, api_base=api_base
-            ),
+            "answer": final_inputs | ANSWER_PROMPT | llm,
             "docs": itemgetter("docs"),
         }
 
