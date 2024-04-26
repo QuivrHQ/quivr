@@ -252,6 +252,8 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
             self.initialize_streamed_chat_history(chat_id, question)
         )
         metadata = self.metadata or {}
+        citations = None
+        answer = ""
         model_response = conversational_qa_chain.invoke(
             {
                 "question": question.question,
@@ -262,12 +264,19 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
             }
         )
 
+        if self.model_compatible_with_function_calling(model=self.model):
+            if model_response["answer"].tool_calls:
+                citations = model_response["answer"].tool_calls[-1]["args"]["citations"]
+                if citations:
+                    citations = citations
+                answer = model_response["answer"].tool_calls[-1]["args"]["answer"]
+        else:
+            answer = model_response["answer"].content
         sources = model_response["docs"] or []
         if len(sources) > 0:
-            sources_list = generate_source(sources, self.brain_id)
+            sources_list = generate_source(sources, self.brain_id, citations=citations)
             metadata["sources"] = sources_list
 
-        answer = model_response["answer"].content
         print(model_response)
         logger.error(f"Model response: {model_response}")
 
