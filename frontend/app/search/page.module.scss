@@ -82,6 +82,22 @@
   top: 0;
   left: 0;
 
+  .main_message_wrapper {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
+    .main_message {
+      display: flex;
+      flex-direction: column;
+
+      .bolder {
+        font-weight: bold;
+      }
+    }
+  }
+
   .first_brain_button {
     position: absolute;
     right: Spacings.$spacing07;
