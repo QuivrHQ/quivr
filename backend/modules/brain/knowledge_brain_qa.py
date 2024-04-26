@@ -56,9 +56,7 @@ def generate_source(source_documents, brain_id, citations: List[int] = None):
     generated_urls = {}
 
     # remove duplicate sources with same name and create a list of unique sources
-    source_documents = list(
-        {v.metadata["file_name"]: v for v in source_documents}.values()
-    )
+    sources_url_cache = {}
 
     # Get source documents from the result, default to an empty list if not found
 
@@ -98,11 +96,15 @@ def generate_source(source_documents, brain_id, citations: List[int] = None):
                 if file_path in generated_urls:
                     source_url = generated_urls[file_path]
                 else:
-                    generated_url = generate_file_signed_url(file_path)
-                    if generated_url is not None:
-                        source_url = generated_url.get("signedURL", "")
+                    # Generate the URL
+                    if file_path in sources_url_cache:
+                        source_url = sources_url_cache[file_path]
                     else:
-                        source_url = ""
+                        generated_url = generate_file_signed_url(file_path)
+                        if generated_url is not None:
+                            source_url = generated_url.get("signedURL", "")
+                        else:
+                            source_url = ""
                     # Store the generated URL
                     generated_urls[file_path] = source_url
 
@@ -270,60 +272,17 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
                 if citations:
                     citations = citations
                 answer = model_response["answer"].tool_calls[-1]["args"]["answer"]
+                metadata["citations"] = citations
         else:
             answer = model_response["answer"].content
         sources = model_response["docs"] or []
         if len(sources) > 0:
             sources_list = generate_source(sources, self.brain_id, citations=citations)
-            metadata["sources"] = sources_list
+            serialized_sources_list = [source.dict() for source in sources_list]
+            metadata["sources"] = serialized_sources_list
 
-        print(model_response)
-        logger.error(f"Model response: {model_response}")
-
-        if save_answer:
-            # save the answer to the database or not ->  add a variable
-            new_chat = chat_service.update_chat_history(
-                CreateChatHistory(
-                    **{
-                        "chat_id": chat_id,
-                        "user_message": question.question,
-                        "assistant": answer,
-                        "brain_id": self.brain.brain_id,
-                        "prompt_id": self.prompt_to_use_id,
-                    }
-                )
-            )
-
-            return GetChatHistoryOutput(
-                **{
-                    "chat_id": chat_id,
-                    "user_message": question.question,
-                    "assistant": answer,
-                    "message_time": new_chat.message_time,
-                    "prompt_title": (
-                        self.prompt_to_use.title if self.prompt_to_use else None
-                    ),
-                    "brain_name": self.brain.name if self.brain else None,
-                    "message_id": new_chat.message_id,
-                    "brain_id": str(self.brain.brain_id) if self.brain else None,
-                    "metadata": metadata,
-                }
-            )
-
-        return GetChatHistoryOutput(
-            **{
-                "chat_id": chat_id,
-                "user_message": question.question,
-                "assistant": answer,
-                "message_time": None,
-                "prompt_title": (
-                    self.prompt_to_use.title if self.prompt_to_use else None
-                ),
-                "brain_name": None,
-                "message_id": None,
-                "brain_id": str(self.brain.brain_id) if self.brain else None,
-                "metadata": metadata,
-            }
+        return self.save_non_streaming_answer(
+            chat_id=chat_id, question=question, answer=answer, metadata=metadata
         )
 
     async def generate_stream(
@@ -443,7 +402,7 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
         except Exception as e:
             logger.error("Error updating message by ID: %s", e)
 
-    def save_non_streaming_answer(self, chat_id, question, answer):
+    def save_non_streaming_answer(self, chat_id, question, answer, metadata):
         new_chat = chat_service.update_chat_history(
             CreateChatHistory(
                 **{
@@ -452,6 +411,7 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
                     "assistant": answer,
                     "brain_id": self.brain.brain_id,
                     "prompt_id": self.prompt_to_use_id,
+                    "metadata": metadata,
                 }
             )
         )
@@ -468,5 +428,6 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
                 "brain_name": self.brain.name if self.brain else None,
                 "message_id": new_chat.message_id,
                 "brain_id": str(self.brain.brain_id) if self.brain else None,
+                "metadata": metadata,
             }
         )

@@ -11,6 +11,7 @@ class CreateChatHistory(BaseModel):
     assistant: str
     prompt_id: Optional[UUID] = None
     brain_id: Optional[UUID] = None
+    metadata: Optional[dict] = {}
 
 
 class QuestionAndAnswer(BaseModel):
