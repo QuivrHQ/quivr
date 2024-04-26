@@ -8,7 +8,7 @@ import QuivrButton from "@/lib/components/ui/QuivrButton/QuivrButton";
 import { useKnowledgeToFeedContext } from "@/lib/context/KnowledgeToFeedProvider/hooks/useKnowledgeToFeedContext";
 
 import styles from "./KnowledgeTab.module.scss";
-import { KnowledgeTable } from "./KnowledgeTable/KnowledgeTable";
+import KnowledgeTable from "./KnowledgeTable/KnowledgeTable";
 import { useAddedKnowledge } from "./hooks/useAddedKnowledge";
 
 type KnowledgeTabProps = {
