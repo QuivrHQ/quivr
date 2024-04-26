@@ -1,4 +1,5 @@
 import json
+import logging
 from typing import AsyncIterable, List, Optional
 from uuid import UUID
 
@@ -26,7 +27,7 @@ from modules.user.service.user_usage import UserUsage
 from pydantic import BaseModel, ConfigDict
 from pydantic_settings import BaseSettings
 
-logger = get_logger(__name__)
+logger = get_logger(__name__, log_level=logging.INFO)
 QUIVR_DEFAULT_PROMPT = "Your name is Quivr. You're a helpful assistant.  If you don't know the answer, just say that you don't know, don't try to make up an answer."
 
 
@@ -59,18 +60,14 @@ def generate_source(source_documents, brain_id):
 
     # If source documents exist
     if source_documents:
-        logger.info(f"Source documents found: {source_documents}")
         # Iterate over each document
         for doc in source_documents:
-            logger.info("Document: %s", doc)
             # Check if 'url' is in the document metadata
-            logger.info(f"Metadata 1: {doc.metadata}")
             is_url = (
                 "original_file_name" in doc.metadata
                 and doc.metadata["original_file_name"] is not None
                 and doc.metadata["original_file_name"].startswith("http")
             )
-            logger.info(f"Is URL: {is_url}")
 
             # Determine the name based on whether it's a URL or a file
             name = (
@@ -219,10 +216,6 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
 
     def calculate_pricing(self):
 
-        logger.info("Calculating pricing")
-        logger.info(f"Model: {self.model}")
-        logger.info(f"User settings: {self.user_settings}")
-        logger.info(f"Models settings: {self.models_settings}")
         model_to_use = find_model_and_generate_metadata(
             self.chat_id,
             self.brain.model,
@@ -264,6 +257,8 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
             metadata["sources"] = sources_list
 
         answer = model_response["answer"].content
+        print(model_response)
+        logger.error(f"Model response: {model_response}")
 
         if save_answer:
             # save the answer to the database or not ->  add a variable
@@ -318,9 +313,10 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
         transformed_history, streamed_chat_history = (
             self.initialize_streamed_chat_history(chat_id, question)
         )
-        response_tokens = []
+        response_tokens = ""
         sources = []
-
+        citations = []
+        first = True
         async for chunk in conversational_qa_chain.astream(
             {
                 "question": question.question,
@@ -331,10 +327,29 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
             }
         ):
             if chunk.get("answer"):
-                logger.info(f"Chunk: {chunk}")
-                response_tokens.append(chunk["answer"].content)
-                streamed_chat_history.assistant = chunk["answer"].content
-                yield f"data: {json.dumps(streamed_chat_history.dict())}"
+                if first:
+                    gathered = chunk["answer"]
+                    first = False
+                else:
+                    gathered = gathered + chunk["answer"]
+                    if (
+                        gathered.tool_calls
+                        and gathered.tool_calls[-1].get("args")
+                        and "answer" in gathered.tool_calls[-1]["args"]
+                    ):
+                        # Only send the difference between answer and response_tokens which was the previous answer
+                        answer = gathered.tool_calls[-1]["args"]["answer"]
+                        difference = answer[len(response_tokens) :]
+                        streamed_chat_history.assistant = difference
+                        response_tokens = answer
+
+                        yield f"data: {json.dumps(streamed_chat_history.dict())}"
+                    if (
+                        gathered.tool_calls
+                        and gathered.tool_calls[-1].get("args")
+                        and "citations" in gathered.tool_calls[-1]["args"]
+                    ):
+                        citations = gathered.tool_calls[-1]["args"]["citations"]
             if chunk.get("docs"):
                 sources = chunk["docs"]
 
@@ -344,6 +359,7 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
             # Serialize the sources list
         serialized_sources_list = [source.dict() for source in sources_list]
         streamed_chat_history.metadata["sources"] = serialized_sources_list
+        streamed_chat_history.metadata["citations"] = citations
         yield f"data: {json.dumps(streamed_chat_history.dict())}"
         self.save_answer(question, response_tokens, streamed_chat_history, save_answer)
 
