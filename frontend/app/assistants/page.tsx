@@ -86,6 +86,7 @@ const Search = (): JSX.Element => {
                     setCurrentAssistant(assistant);
                   }}
                   key={assistant.name}
+                  cardKey={assistant.name}
                 />
               );
             })}

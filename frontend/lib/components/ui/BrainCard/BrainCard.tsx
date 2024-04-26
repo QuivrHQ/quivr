@@ -15,7 +15,7 @@ interface BrainCardProps {
   brainName: string;
   tags: string[];
   callback: () => void;
-  key: string;
+  cardKey: string;
   disabled?: boolean;
 }
 
@@ -26,14 +26,14 @@ export const BrainCard = ({
   brainName,
   tags,
   callback,
-  key,
+  cardKey,
   disabled,
 }: BrainCardProps): JSX.Element => {
   const { isDarkMode } = useUserSettingsContext();
 
   return (
     <div
-      key={key}
+      key={cardKey}
       className={`${styles.brain_card_container} ${
         disabled ? styles.disabled : ""
       }`}

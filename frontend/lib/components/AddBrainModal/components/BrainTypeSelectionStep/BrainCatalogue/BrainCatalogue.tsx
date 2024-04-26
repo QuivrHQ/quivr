@@ -40,6 +40,7 @@ export const BrainCatalogue = ({
         {brains.map((brain) => {
           return (
             <BrainCard
+              key={brain.id}
               tooltip={brain.description}
               brainName={brain.integration_display_name}
               tags={brain.tags}
@@ -49,7 +50,7 @@ export const BrainCatalogue = ({
                 next();
                 setCurrentSelectedBrain(brain);
               }}
-              key={brain.id}
+              cardKey={brain.id}
               disabled={!userIdentityData?.onboarded && !brain.onboarding_brain}
             />
           );
