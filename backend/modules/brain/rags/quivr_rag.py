@@ -134,6 +134,23 @@ class QuivrRAG(BaseModel):
         else:
             return None
 
+    def model_compatible_with_function_calling(self):
+        if self.model in [
+            "gpt-4-turbo",
+            "gpt-4-turbo-2024-04-09",
+            "gpt-4-turbo-preview",
+            "gpt-4-0125-preview",
+            "gpt-4-1106-preview",
+            "gpt-4",
+            "gpt-4-0613",
+            "gpt-3.5-turbo",
+            "gpt-3.5-turbo-0125",
+            "gpt-3.5-turbo-1106",
+            "gpt-3.5-turbo-0613",
+        ]:
+            return True
+        return False
+
     supabase_client: Optional[Client] = None
     vector_store: Optional[CustomSupabaseVectorStore] = None
     qa: Optional[ConversationalRetrievalChain] = None
@@ -308,18 +325,27 @@ class QuivrRAG(BaseModel):
             "question": itemgetter("question"),
             "custom_instructions": itemgetter("custom_instructions"),
         }
+        llm = ChatLiteLLM(
+            max_tokens=self.max_tokens,
+            model=self.model,
+            temperature=self.temperature,
+            api_base=api_base,
+        )
+        if self.model_compatible_with_function_calling():
 
-        # And finally, we do the part that returns the answers
-        llm = ChatOpenAI(
-            max_tokens=self.max_tokens, model=self.model, temperature=self.temperature
-        )
-        llm_with_tool = llm.bind_tools(
-            [cited_answer],
-            tool_choice="cited_answer",
-        )
+            # And finally, we do the part that returns the answers
+            llm_function = ChatOpenAI(
+                max_tokens=self.max_tokens,
+                model=self.model,
+                temperature=self.temperature,
+            )
+            llm = llm_function.bind_tools(
+                [cited_answer],
+                tool_choice="cited_answer",
+            )
 
         answer = {
-            "answer": final_inputs | ANSWER_PROMPT | llm_with_tool,
+            "answer": final_inputs | ANSWER_PROMPT | llm,
             "docs": itemgetter("docs"),
         }
 

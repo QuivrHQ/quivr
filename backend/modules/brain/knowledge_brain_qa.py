@@ -44,7 +44,11 @@ def is_valid_uuid(uuid_to_test, version=4):
     return str(uuid_obj) == uuid_to_test
 
 
-def generate_source(source_documents, brain_id):
+def generate_source(source_documents, brain_id, citations: List[int] = None):
+    """
+    Generate the sources list for the answer
+    It takes in a list of sources documents and citations that points to the docs index that was used in the answer
+    """
     # Initialize an empty list for sources
     sources_list: List[Sources] = []
 
@@ -60,8 +64,14 @@ def generate_source(source_documents, brain_id):
 
     # If source documents exist
     if source_documents:
+        logger.info(f"Citations {citations}")
         # Iterate over each document
-        for doc in source_documents:
+        for doc, index in zip(source_documents, range(len(source_documents))):
+            logger.info(f"Processing source document {doc.metadata['file_name']}")
+            if citations is not None:
+                if index not in citations:
+                    logger.info(f"Skipping source document {doc.metadata['file_name']}")
+                    continue
             # Check if 'url' is in the document metadata
             is_url = (
                 "original_file_name" in doc.metadata
@@ -103,6 +113,7 @@ def generate_source(source_documents, brain_id):
                     type=type_,
                     source_url=source_url,
                     original_file_name=name,
+                    citation=doc.page_content,
                 )
             )
     else:
@@ -326,40 +337,49 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
                 ),
             }
         ):
-            if chunk.get("answer"):
-                if first:
-                    gathered = chunk["answer"]
-                    first = False
-                else:
-                    gathered = gathered + chunk["answer"]
-                    if (
-                        gathered.tool_calls
-                        and gathered.tool_calls[-1].get("args")
-                        and "answer" in gathered.tool_calls[-1]["args"]
-                    ):
-                        # Only send the difference between answer and response_tokens which was the previous answer
-                        answer = gathered.tool_calls[-1]["args"]["answer"]
-                        difference = answer[len(response_tokens) :]
-                        streamed_chat_history.assistant = difference
-                        response_tokens = answer
+            if not streamed_chat_history.metadata:
+                streamed_chat_history.metadata = {}
+            if self.model_compatible_with_function_calling(model=self.model):
+                if chunk.get("answer"):
+                    if first:
+                        gathered = chunk["answer"]
+                        first = False
+                    else:
+                        gathered = gathered + chunk["answer"]
+                        if (
+                            gathered.tool_calls
+                            and gathered.tool_calls[-1].get("args")
+                            and "answer" in gathered.tool_calls[-1]["args"]
+                        ):
+                            # Only send the difference between answer and response_tokens which was the previous answer
+                            answer = gathered.tool_calls[-1]["args"]["answer"]
+                            difference = answer[len(response_tokens) :]
+                            streamed_chat_history.assistant = difference
+                            response_tokens = answer
 
-                        yield f"data: {json.dumps(streamed_chat_history.dict())}"
-                    if (
-                        gathered.tool_calls
-                        and gathered.tool_calls[-1].get("args")
-                        and "citations" in gathered.tool_calls[-1]["args"]
-                    ):
-                        citations = gathered.tool_calls[-1]["args"]["citations"]
+                            yield f"data: {json.dumps(streamed_chat_history.dict())}"
+                        if (
+                            gathered.tool_calls
+                            and gathered.tool_calls[-1].get("args")
+                            and "citations" in gathered.tool_calls[-1]["args"]
+                        ):
+                            citations = gathered.tool_calls[-1]["args"]["citations"]
+            else:
+                if chunk.get("answer"):
+                    response_tokens += chunk["answer"].content
+                    streamed_chat_history.assistant = chunk["answer"].content
+                    yield f"data: {json.dumps(streamed_chat_history.dict())}"
+
             if chunk.get("docs"):
                 sources = chunk["docs"]
 
-        sources_list = generate_source(sources, self.brain_id)
-        if not streamed_chat_history.metadata:
-            streamed_chat_history.metadata = {}
-            # Serialize the sources list
+        sources_list = generate_source(sources, self.brain_id, citations)
+
+        streamed_chat_history.metadata["citations"] = citations
+
+        # Serialize the sources list
         serialized_sources_list = [source.dict() for source in sources_list]
         streamed_chat_history.metadata["sources"] = serialized_sources_list
-        streamed_chat_history.metadata["citations"] = citations
         yield f"data: {json.dumps(streamed_chat_history.dict())}"
         self.save_answer(question, response_tokens, streamed_chat_history, save_answer)
 
