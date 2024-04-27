@@ -28,9 +28,9 @@
       "url": "https://discord.gg/HUpRgp2HG8"
     },
     {
-      "name": "Blog",
-      "icon": "newspaper",
-      "url": "https://quivr.app/blog"
+      "name": "API Docs",
+      "icon": "globe",
+      "url": "https://api.quivr.app/docs"
     },
     {
       "name": "Status",
