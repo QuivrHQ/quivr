@@ -278,9 +278,9 @@ class QuivrRAG(BaseModel):
     def get_chain(self):
         compressor = None
         if os.getenv("COHERE_API_KEY"):
-            compressor = CohereRerank(top_n=5)
+            compressor = CohereRerank(top_n=10)
         else:
-            compressor = FlashrankRerank(model="ms-marco-TinyBERT-L-2-v2", top_n=5)
+            compressor = FlashrankRerank(model="ms-marco-TinyBERT-L-2-v2", top_n=10)
 
         retriever_doc = self.get_retriever()
         compression_retriever = ContextualCompressionRetriever(
