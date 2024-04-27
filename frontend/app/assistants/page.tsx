@@ -51,16 +51,28 @@ const Search = (): JSX.Element => {
           buttons={[]}
         />
         <div className={styles.content_wrapper}>
-          <div className={styles.message_wrapper}>
-            <MessageInfoBox type="info">
+          <MessageInfoBox type="info">
+            <div className={styles.message_wrapper}>
               <span>
-                Quivr assistants are AI-driven agents that apply specific
-                processes to an input in order to generate a usable output.{" "}
-                <br></br>This output can be directly uploaded to a digital brain
-                or sent via email.{" "}
+                A Quivr Assistant is an AI agent that apply specific processes
+                to an input in order to generate a usable output.
               </span>
-            </MessageInfoBox>
-          </div>
+              <span>
+                For now, you can try the summary assistant, that summarizes a
+                document and send the result by email or upload it in one of
+                your brains.
+              </span>
+              <span> But don&apos;t worry! Other assistants are cooking!</span>
+            </div>
+          </MessageInfoBox>
+          <MessageInfoBox type="warning">
+            <div className={styles.message_wrapper}>
+              <span>
+                <strong>Feature still in Beta.</strong> Please provide feedbacks
+                on the chat below!
+              </span>
+            </div>
+          </MessageInfoBox>
           <div className={styles.assistants_grid}>
             {assistants.map((assistant) => {
               return (

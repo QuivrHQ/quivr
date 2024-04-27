@@ -108,6 +108,7 @@ if os.getenv("TELEMETRY_ENABLED") == "true":
         "To disable telemetry, set the TELEMETRY_ENABLED environment variable to false."
     )
     maybe_send_telemetry("booting", {"status": "ok"})
+    maybe_send_telemetry("ping", {"ping": "pong"})
 
 
 if __name__ == "__main__":

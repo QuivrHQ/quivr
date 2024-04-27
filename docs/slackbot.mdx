@@ -1,0 +1,69 @@
+---
+title: Slack Bot setup
+description: Setup your own Slack Bot connected to Quivr
+icon: slack
+---
+
+# How to Install a Slackbot on Slack
+
+This guide will walk you through the steps to install the Quivr Slackbot on your Slack workspace.
+
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/1yMe21vIl9E?si=OdmWw9vcqyGqs0KI" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+
+## Prerequisites
+
+- Clone the Quivr Slackbot repository and install the requirements
+- Have an ngrok account (for making the Slackbot accessible outside your local network)
+- Have a Slack workspace where you want to install the Slackbot
+
+## Step 1: Set up the Environment
+
+1. Copy the `slackbot.env.example` file and rename it to `.env`.
+
+## Step 2: Make the Slackbot Accessible
+
+1. Use ngrok to make the Quivr Slackbot accessible outside your local network.
+2. Save the generated URL for later use.
+
+## Step 3: Create a New Slack App
+
+1. Go to [api.slack.com](https://api.slack.com/) and create a new app.
+2. Select "From an app manifest" and choose the workspace where you want to use the Slackbot.
+3. Copy the contents of `app_manifest.json` from the Quivr repository and paste it into the app manifest field.
+4. Click "Create" to create the app.
+
+## Step 4: Configure the Slackbot
+
+1. Copy the "Signing Secret" from the Slack app settings and paste it into the `.env` file.
+2. Go to the "OAuth & Permissions" section and install the app to your workspace.
+3. Copy the "Bot User OAuth Token" and paste it into the `.env` file.
+4. Obtain a Quivr API key from the Quivr production environment and add it to the `.env` file.
+
+## Step 5: Start the Quivr Slackbot
+
+1. Run the command `python main.py` to start the Quivr Slackbot locally.
+
+## Step 6: Configure Event Subscriptions
+
+1. In the Slack app settings, go to the "Event Subscriptions" section.
+2. Change the URL to the one provided by ngrok (e.g., `https://your-ngrok-url.ngrok.io/slack/events`).
+3. Save the changes.
+
+## Step 7: Enable Interactivity
+
+1. In the Slack app settings, go to the "Interactivity & Shortcuts" section.
+2. Enable interactivity and set the URL to `https://your-ngrok-url.ngrok.io/slack/interactive`.
+3. Save the changes.
+
+## Step 8: Customize the Slackbot (Optional)
+
+1. You can change the name and background color of the Slackbot in the Slack app settings.
+
+## Step 9: Test the Slackbot
+
+1. Go to your Slack workspace and mention the Slackbot using `@quivr` (or the name you set).
+2. Ask a question and select the brain you want to use (e.g., "quivr").
+3. The Slackbot will provide an answer based on the selected brain.
+
+Congratulations! You have successfully installed and configured the Quivr Slackbot on your Slack workspace. Enjoy using it to ask questions and get answers from your Quivr brains.

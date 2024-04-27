@@ -82,15 +82,25 @@ class ChatService:
             return []
         else:
             enriched_history: List[GetChatHistoryOutput] = []
+            brain_cache = {}
+            prompt_cache = {}
             for message in history:
                 message = ChatHistory(message)
                 brain = None
                 if message.brain_id:
-                    brain = brain_service.get_brain_by_id(message.brain_id)
+                    if message.brain_id in brain_cache:
+                        brain = brain_cache[message.brain_id]
+                    else:
+                        brain = brain_service.get_brain_by_id(message.brain_id)
+                        brain_cache[message.brain_id] = brain
 
                 prompt = None
                 if message.prompt_id:
-                    prompt = prompt_service.get_prompt_by_id(message.prompt_id)
+                    if message.prompt_id in prompt_cache:
+                        prompt = prompt_cache[message.prompt_id]
+                    else:
+                        prompt = prompt_service.get_prompt_by_id(message.prompt_id)
+                        prompt_cache[message.prompt_id] = prompt
 
                 enriched_history.append(
                     GetChatHistoryOutput(

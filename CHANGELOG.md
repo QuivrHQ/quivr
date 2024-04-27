@@ -1,5 +1,77 @@
 # Changelog
 
+## 0.0.238 (2024-04-25)
+
+## What's Changed
+* Enable Porter Application cherry-pick-backend by @porter-deployment-app in https://github.com/QuivrHQ/quivr/pull/2492
+* Enable Porter Application cherry-pick-frontend by @porter-deployment-app in https://github.com/QuivrHQ/quivr/pull/2493
+* feat: Add telemetry ping task to celery worker and main.py by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2494
+* fix(backend): compute history only if needed and put some cache to remove some call… by @dmourot in https://github.com/QuivrHQ/quivr/pull/2497
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.237...v0.0.238
+
+## 0.0.237 (2024-04-24)
+
+## What's Changed
+* docs: Add environment variables, increase user usage, and add new models by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2481
+* fix(frontend): Warning for Quivr Assistants by @Zewed in https://github.com/QuivrHQ/quivr/pull/2479
+* fix(frontend): better UI for Onboarding by @Zewed in https://github.com/QuivrHQ/quivr/pull/2477
+* docs: add new configuration items by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2483
+* Revert "fix(frontend): better UI for Onboarding" by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2485
+* feat(reranker): Add flashrank and contextual compression retriever by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2480
+* feat(history): max tokens in the history provided by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2487
+* feat: Update chunk overlap to 200 by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2488
+* docs: Add reranking configuration guide by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2489
+* docs: Update telemetry configuration in Quivr by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2490
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.236...v0.0.237
+
+## 0.0.236 (2024-04-23)
+
+## What's Changed
+* feat(docs): update to new by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2465
+* feat(docs): Add new brain files and update navigation by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2467
+* Feat/docs category brains agents by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2469
+* fix(docs): update doc by @Zewed in https://github.com/QuivrHQ/quivr/pull/2470
+* feat(digital-ocean): Update deployment instructions for Digital Ocean by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2472
+* docs(digital-ocean): added missing photo by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2473
+* docs: Update brain documentation and images by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2475
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.235...v0.0.236
+
+## 0.0.235 (2024-04-21)
+
+## What's Changed
+* fix(sources): Remove duplicate sources and add metadata to model response by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2462
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.234...v0.0.235
+
+## 0.0.234 (2024-04-21)
+
+## What's Changed
+* fix(gpt4): Refactor GPT4Brain and KnowledgeBrainQA classes to add non-streaming-saving-answer by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2460
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.233...v0.0.234
+
+## 0.0.233 (2024-04-21)
+
+## What's Changed
+* refactor: reorg files in backend by @MaximeThoonsen in https://github.com/QuivrHQ/quivr/pull/2449
+* Revert "refactor: reorg files in backend" by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2456
+* refactor: Refacto code #1 by @MaximeThoonsen in https://github.com/QuivrHQ/quivr/pull/2458
+* refactor: reorg the files #2 by @MaximeThoonsen in https://github.com/QuivrHQ/quivr/pull/2457
+* feat(gpt4): Add chat service and generate answer method to GPT4Brain class by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2459
+
+## New Contributors
+* @MaximeThoonsen made their first contribution in https://github.com/QuivrHQ/quivr/pull/2449
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.232...v0.0.233
+
 ## 0.0.232 (2024-04-19)
 
 ## What's Changed

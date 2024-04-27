@@ -1,0 +1,81 @@
+---
+title: Deploy with Digital Ocean
+description:  Deploy Quivr on Digital Ocean
+icon: digital-ocean
+---
+
+
+1. Go to [Digital Ocean](https://www.digitalocean.com/) and create an account.
+2. Create a new Droplet.
+3. Choose the Docker image from the Marketplace.
+
+![2024-04-22-21-49-27.png](/images/2024-04-22-21-49-27.png)
+
+4. Choose the Standard Droplet plan.
+
+We recommended the $48/month plan for the best performance with 4 vCPUs, 8GB RAM, and 160GB SSD.
+
+
+5. Wait for the Droplet to be created.
+
+6. SSH into your Droplet.
+
+```bash
+ssh root@your-droplet-ip
+```
+
+7. Clone the Quivr repository.
+
+```bash
+git clone https://github.com/QuivrHQ/quivr.git && cd quivr
+```
+
+8. Copy the `.env.example` file.
+
+```bash
+cp .env.example .env
+```
+
+9. Update the `.env` file.
+
+```bash
+vim .env
+```
+
+- Update the `OPENAI_API_KEY` 
+- Update the `NEXT_PUBLIC_BACKEND_URL` with your Droplet IP -> `http://your-droplet-ip:5050`
+- UPDATE the `NEXT_PUBLIC_SUPABASE_URL` with your Droplet IP -> `http://your-droplet-ip:54321`
+- Update the `NEXT_PUBLIC_FRONTEND_URL` with your Droplet IP -> `http://your-droplet-ip:3000`
+
+
+10. Install Supabase
+
+```bash
+apt install npm
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
+source ~/.bashrc
+nvm install 20
+nvm use 20
+npx supabase start
+```
+
+11. Allow the firewall
+
+```bash
+ufw allow 54321
+```
+
+12. Launch the project
+
+```bash
+docker compose pull
+docker compose up
+```
+
+It needs at least 5 minutes to build the frontend and pulling the Docker images.
+
+13. Access the Quivr app
+
+```bash
+http://your-droplet-ip:3000
+```
