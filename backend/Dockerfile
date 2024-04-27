@@ -58,6 +58,9 @@ RUN pip install --no-cache-dir --upgrade pip && \
 # Copy the rest of the application
 COPY . .
 
+# COPY Supabase from ../supabase in /code/supabase
+COPY ../supabase /code/supabase
+
 EXPOSE 5050
 
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "5050", "--workers", "6"]
