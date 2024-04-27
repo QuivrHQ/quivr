@@ -7,6 +7,7 @@ import { Tabs } from "@/lib/components/ui/Tabs/Tabs";
 import { Tab } from "@/lib/types/Tab";
 
 import { KnowledgeTab } from "./components/KnowledgeTab/KnowledgeTab";
+import { useAddedKnowledge } from "./components/KnowledgeTab/hooks/useAddedKnowledge";
 import { PeopleTab } from "./components/PeopleTab/PeopleTab";
 import { SettingsTab } from "./components/SettingsTab/SettingsTab";
 import { useBrainFetcher } from "./hooks/useBrainFetcher";
@@ -15,6 +16,7 @@ import { useBrainManagementTabs } from "./hooks/useBrainManagementTabs";
 export const BrainManagementTabs = (): JSX.Element => {
   const [selectedTab, setSelectedTab] = useState("Settings");
   const { brainId, hasEditRights } = useBrainManagementTabs();
+  const { allKnowledge } = useAddedKnowledge({ brainId: brainId ?? undefined });
 
   const { brain, isLoading } = useBrainFetcher({
     brainId,
@@ -43,7 +45,9 @@ export const BrainManagementTabs = (): JSX.Element => {
       disabled: !hasEditRights,
     },
     {
-      label: "Knowledge",
+      label: `Knowledge${allKnowledge.length > 1 ? "s" : ""} (${
+        allKnowledge.length
+      })`,
       isSelected: selectedTab === "Knowledge",
       onClick: () => setSelectedTab("Knowledge"),
       iconName: "file",
@@ -73,7 +77,11 @@ export const BrainManagementTabs = (): JSX.Element => {
       {selectedTab === "Settings" && <SettingsTab brainId={brainId} />}
       {selectedTab === "People" && <PeopleTab brainId={brainId} />}
       {selectedTab === "Knowledge" && (
-        <KnowledgeTab brainId={brainId} hasEditRights={hasEditRights} />
+        <KnowledgeTab
+          brainId={brainId}
+          hasEditRights={hasEditRights}
+          allKnowledge={allKnowledge}
+        />
       )}
     </>
   );
