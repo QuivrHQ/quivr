@@ -272,7 +272,6 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
                 if citations:
                     citations = citations
                 answer = model_response["answer"].tool_calls[-1]["args"]["answer"]
-                metadata["citations"] = citations
         else:
             answer = model_response["answer"].content
         sources = model_response["docs"] or []
@@ -342,8 +341,6 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
                 sources = chunk["docs"]
 
         sources_list = generate_source(sources, self.brain_id, citations)
-
-        streamed_chat_history.metadata["citations"] = citations
 
         # Serialize the sources list
         serialized_sources_list = [source.dict() for source in sources_list]
