@@ -16,5 +16,5 @@ echo "Running supabase link"
 supabase link --project-ref $PROJECT_ID --password $SUPABASE_DB_PASSWORD
 
 echo "Running supabase db push"
-supabase db push --linked --password $SUPABASE_DB_PASSWORD --debug
+supabase db push --linked --password $SUPABASE_DB_PASSWORD
 
