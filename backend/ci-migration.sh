@@ -9,9 +9,6 @@ SUPABASE_ACCESS_TOKEN=$SUPABASE_ACCESS_TOKEN
 echo "Setting the supabase db password from environment variable"
 SUPABASE_DB_PASSWORD=$SUPABASE_DB_PASSWORD
 
-echo "Initializing supabase"
-supabase init
-
 echo "Logging in to supabase"
 supabase login --token $SUPABASE_ACCESS_TOKEN
 
