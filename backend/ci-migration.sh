@@ -6,6 +6,8 @@ PROJECT_ID=$PROJECT_ID
 # Set the supabase token from environment variable
 SUPABASE_ACCESS_TOKEN=$SUPABASE_ACCESS_TOKEN
 
+supabase init
+
 # Login to supabase
 supabase login --token $SUPABASE_ACCESS_TOKEN
 
