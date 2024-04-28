@@ -129,6 +129,7 @@ _supabase_db: Optional[SupabaseDB] = None
 def get_supabase_client() -> Client:
     global _supabase_client
     if _supabase_client is None:
+        logger.info("Creating Supabase client")
         settings = BrainSettings()  # pyright: ignore reportPrivateUsage=none
         _supabase_client = create_client(
             settings.supabase_url, settings.supabase_service_key
@@ -139,6 +140,7 @@ def get_supabase_client() -> Client:
 def get_supabase_db() -> SupabaseDB:
     global _supabase_db
     if _supabase_db is None:
+        logger.info("Creating Supabase DB")
         _supabase_db = SupabaseDB(get_supabase_client())
     return _supabase_db
 
@@ -157,9 +159,7 @@ def get_embeddings():
 def get_documents_vector_store() -> SupabaseVectorStore:
     settings = BrainSettings()  # pyright: ignore reportPrivateUsage=none
     embeddings = get_embeddings()
-    supabase_client: Client = create_client(
-        settings.supabase_url, settings.supabase_service_key
-    )
+    supabase_client: Client = get_supabase_client()
     documents_vector_store = SupabaseVectorStore(
         supabase_client, embeddings, table_name="vectors"
     )
