@@ -1,3 +1,4 @@
+import re
 import time
 
 import tiktoken
@@ -43,6 +44,11 @@ async def process_file(
             new_metadata = metadata.copy()
             # Add filename at beginning of page content
             doc.page_content = f"Filename: {new_metadata['original_file_name']} Content: {doc.page_content}"
+
+            doc.page_content = doc.page_content.replace("\u0000", "")
+            # Replace unsupported Unicode characters
+            doc.page_content = re.sub(r"[^\x00-\x7F]+", " ", doc.page_content)
+
             len_chunk = len(enc.encode(doc.page_content))
 
             # Ensure the text is in UTF-8
