@@ -1,5 +1,26 @@
 # Changelog
 
+## 0.0.239 (2024-04-28)
+
+## What's Changed
+* feat(citations): system added by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2498
+* feat(frontend): add nb of knowledges per brain by @Zewed in https://github.com/QuivrHQ/quivr/pull/2502
+* docs: Update links in mint.json to add api by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2504
+* feat(docker): Update Dockerfile to install Supabase CLI by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2505
+* fix(frontend): fix some next errors by @Zewed in https://github.com/QuivrHQ/quivr/pull/2503
+* feat(frontend): show remaining credits by @Zewed in https://github.com/QuivrHQ/quivr/pull/2495
+* feat(embedding): keeping citations by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2506
+* fix(metadata): Removed citation from metadata by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2507
+* Add ci-migration script by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2508
+* Feat/migration ci 2 by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2509
+* Enable Porter Application quivr-com-backend by @porter-deployment-app in https://github.com/QuivrHQ/quivr/pull/2510
+* Enable Porter Application quivr-com by @porter-deployment-app in https://github.com/QuivrHQ/quivr/pull/2511
+* feat(profiler): Add pyinstrument package and update Makefile and backend code by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2512
+* feat(db): Add Supabase client and database instances caching by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2513
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.238...v0.0.239
+
 ## 0.0.238 (2024-04-25)
 
 ## What's Changed

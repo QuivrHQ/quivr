@@ -1,5 +1,4 @@
 import json
-import logging
 from typing import AsyncIterable, List, Optional
 from uuid import UUID
 
@@ -27,7 +26,7 @@ from modules.user.service.user_usage import UserUsage
 from pydantic import BaseModel, ConfigDict
 from pydantic_settings import BaseSettings
 
-logger = get_logger(__name__, log_level=logging.INFO)
+logger = get_logger(__name__)
 QUIVR_DEFAULT_PROMPT = "Your name is Quivr. You're a helpful assistant.  If you don't know the answer, just say that you don't know, don't try to make up an answer."
 
 
@@ -272,7 +271,6 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
                 if citations:
                     citations = citations
                 answer = model_response["answer"].tool_calls[-1]["args"]["answer"]
-                metadata["citations"] = citations
         else:
             answer = model_response["answer"].content
         sources = model_response["docs"] or []
@@ -342,8 +340,6 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
                 sources = chunk["docs"]
 
         sources_list = generate_source(sources, self.brain_id, citations)
-
-        streamed_chat_history.metadata["citations"] = citations
 
         # Serialize the sources list
         serialized_sources_list = [source.dict() for source in sources_list]

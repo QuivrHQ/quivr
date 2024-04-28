@@ -1,4 +1,5 @@
 import logging
+import os
 from logging.handlers import RotatingFileHandler
 
 from colorlog import (
@@ -6,7 +7,8 @@ from colorlog import (
 )  # You need to install this package: pip install colorlog
 
 
-def get_logger(logger_name, log_level=logging.WARNING, log_file="application.log"):
+def get_logger(logger_name, log_file="application.log"):
+    log_level = os.getenv("LOG_LEVEL", "WARNING").upper()
     logger = logging.getLogger(logger_name)
     logger.setLevel(log_level)
     logger.propagate = False  # Prevent log propagation to avoid double logging

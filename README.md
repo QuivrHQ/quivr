@@ -80,10 +80,11 @@ You can find the installation video [here](https://www.youtube.com/watch?v=cXBa6
 - **Step 4**: Launch the project
 
   ```bash
-  supabase start
+  cd backend && supabase start
   ```
   and then 
   ```bash
+  cd ../
   docker compose pull
   docker compose up
   ```

@@ -9,7 +9,7 @@ import { useKnowledgeToFeedContext } from "@/lib/context/KnowledgeToFeedProvider
 import { Knowledge } from "@/lib/types/Knowledge";
 
 import styles from "./KnowledgeTab.module.scss";
-import { KnowledgeTable } from "./KnowledgeTable/KnowledgeTable";
+import KnowledgeTable from "./KnowledgeTable/KnowledgeTable";
 import { useAddedKnowledge } from "./hooks/useAddedKnowledge";
 
 type KnowledgeTabProps = {

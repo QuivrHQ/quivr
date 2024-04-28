@@ -1,11 +1,12 @@
+import re
 import time
 
 import tiktoken
 from logger import get_logger
 from models import File
 from modules.brain.service.brain_vector_service import BrainVectorService
-from packages.embeddings.vectors import Neurons
 from modules.upload.service.upload_file import DocumentSerializable
+from packages.embeddings.vectors import Neurons
 
 logger = get_logger(__name__)
 
@@ -43,14 +44,21 @@ async def process_file(
             new_metadata = metadata.copy()
             # Add filename at beginning of page content
             doc.page_content = f"Filename: {new_metadata['original_file_name']} Content: {doc.page_content}"
+
+            doc.page_content = doc.page_content.replace("\u0000", "")
+            # Replace unsupported Unicode characters
+            doc.page_content = re.sub(r"[^\x00-\x7F]+", " ", doc.page_content)
+
             len_chunk = len(enc.encode(doc.page_content))
-            page_content_encoded = doc.page_content.encode("unicode_escape").decode(
-                "ascii", "replace"
+
+            # Ensure the text is in UTF-8
+            doc.page_content = doc.page_content.encode("utf-8", "replace").decode(
+                "utf-8"
             )
 
             new_metadata["chunk_size"] = len_chunk
             doc_with_metadata = DocumentSerializable(
-                page_content=page_content_encoded, metadata=new_metadata
+                page_content=doc.page_content, metadata=new_metadata
             )
             docs.append(doc_with_metadata)
 

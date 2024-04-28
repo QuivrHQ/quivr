@@ -1,4 +1,5 @@
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
+import { BiCoin } from "react-icons/bi";
 import {
   BsArrowRightShort,
   BsChatLeftText,
@@ -90,6 +91,7 @@ export const iconList: { [name: string]: IconType } = {
   chevronLeft: LuChevronLeft,
   chevronRight: LuChevronRight,
   close: IoMdClose,
+  coin: BiCoin,
   copy: LuCopy,
   custom: MdDashboardCustomize,
   delete: MdDeleteOutline,

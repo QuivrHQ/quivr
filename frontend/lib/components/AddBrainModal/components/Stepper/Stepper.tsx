@@ -1,3 +1,5 @@
+import React from "react";
+
 import { Icon } from "@/lib/components/ui/Icon/Icon";
 
 import styles from "./Stepper.module.scss";
@@ -17,7 +19,7 @@ export const Stepper = ({ currentStep, steps }: StepperProps): JSX.Element => {
   return (
     <div className={styles.stepper_wrapper}>
       {steps.map((step, index) => (
-        <>
+        <React.Fragment key={step.value}>
           <div
             className={`${styles.step} ${
               index === currentStepIndex
@@ -54,7 +56,7 @@ export const Stepper = ({ currentStep, steps }: StepperProps): JSX.Element => {
               `}
             ></div>
           )}
-        </>
+        </React.Fragment>
       ))}
     </div>
   );

@@ -78,3 +78,16 @@ def get_user_identity_route(
     Get user identity.
     """
     return user_repository.get_user_identity(current_user.id)
+
+@user_router.get(
+    "/user/credits",
+    dependencies=[Depends(AuthBearer())],
+    tags=["User"],
+)
+def get_user_credits(
+    current_user: UserIdentity = Depends(get_current_user),
+) -> int:
+    """
+    Get user remaining credits.
+    """
+    return user_repository.get_user_credits(current_user.id)

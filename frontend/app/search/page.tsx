@@ -86,12 +86,22 @@ const Search = (): JSX.Element => {
         !userIdentityData?.onboarded &&
         !!isUserDataFetched && (
           <div className={styles.onboarding_overlay}>
-            <div className={styles.first_brain_button}>
+            <div className={styles.main_message_wrapper}>
               <MessageInfoBox type="tutorial">
-                <span>
-                  Press the following button to create your first brain
-                </span>
+                <div className={styles.main_message}>
+                  <span>Welcome {userIdentityData?.username}!</span>
+                  <span>
+                    We will guide you through your quivr adventure and the
+                    creation of your first brain.
+                  </span>
+                  <span className={styles.bolder}>
+                    First, Press the Create Brain button on the top right corner
+                    to create your first brain.
+                  </span>
+                </div>
               </MessageInfoBox>
+            </div>
+            <div className={styles.first_brain_button}>
               <QuivrButton
                 iconName="brain"
                 label="Create Brain"

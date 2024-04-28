@@ -26,3 +26,6 @@ test-type:
 	else \
 		python -m pyright; \
 	fi
+
+front:
+	cd frontend  && yarn build && yarn start
