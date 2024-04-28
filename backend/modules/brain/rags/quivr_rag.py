@@ -1,4 +1,3 @@
-import logging
 import os
 from operator import itemgetter
 from typing import List, Optional
@@ -29,7 +28,7 @@ from pydantic_settings import BaseSettings
 from supabase.client import Client, create_client
 from vectorstore.supabase import CustomSupabaseVectorStore
 
-logger = get_logger(__name__, log_level=logging.INFO)
+logger = get_logger(__name__)
 
 
 class cited_answer(BaseModelV1):

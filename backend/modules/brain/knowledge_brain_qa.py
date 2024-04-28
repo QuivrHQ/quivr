@@ -1,5 +1,4 @@
 import json
-import logging
 from typing import AsyncIterable, List, Optional
 from uuid import UUID
 
@@ -27,7 +26,7 @@ from modules.user.service.user_usage import UserUsage
 from pydantic import BaseModel, ConfigDict
 from pydantic_settings import BaseSettings
 
-logger = get_logger(__name__, log_level=logging.INFO)
+logger = get_logger(__name__)
 QUIVR_DEFAULT_PROMPT = "Your name is Quivr. You're a helpful assistant.  If you don't know the answer, just say that you don't know, don't try to make up an answer."
 
 
