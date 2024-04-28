@@ -5,7 +5,7 @@ ARG DEV_MODE
 ENV DEV_MODE=$DEV_MODE
 
 # Install GEOS library, Rust, and other dependencies, then clean up
-RUN apt-get clean && apt-get update && apt-get install -y --no-install-recommends \
+RUN apt-get clean && apt-get update && apt-get install -y \
     libgeos-dev \
     libcurl4-openssl-dev \
     libssl-dev \
