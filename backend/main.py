@@ -10,8 +10,8 @@ import logging
 
 import litellm
 import sentry_sdk
-from fastapi import FastAPI, HTTPException
-from fastapi.responses import JSONResponse
+from fastapi import FastAPI, HTTPException, Request
+from fastapi.responses import HTMLResponse, JSONResponse
 from logger import get_logger
 from middlewares.cors import add_cors_middleware
 from modules.analytics.controller.analytics_routes import analytics_router
@@ -29,6 +29,7 @@ from modules.upload.controller import upload_router
 from modules.user.controller import user_router
 from packages.utils import handle_request_validation_error
 from packages.utils.telemetry import maybe_send_telemetry
+from pyinstrument import Profiler
 from routes.crawl_routes import crawl_router
 from routes.subscription_routes import subscription_router
 from sentry_sdk.integrations.fastapi import FastApiIntegration
@@ -90,6 +91,23 @@ app.include_router(prompt_router)
 app.include_router(notification_router)
 app.include_router(knowledge_router)
 app.include_router(contact_router)
+
+PROFILING = os.getenv("PROFILING", "false").lower() == "true"
+
+
+if PROFILING:
+
+    @app.middleware("http")
+    async def profile_request(request: Request, call_next):
+        profiling = request.query_params.get("profile", False)
+        if profiling:
+            profiler = Profiler()
+            profiler.start()
+            await call_next(request)
+            profiler.stop()
+            return HTMLResponse(profiler.output_html())
+        else:
+            return await call_next(request)
 
 
 @app.exception_handler(HTTPException)
