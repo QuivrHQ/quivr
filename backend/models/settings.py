@@ -1,3 +1,4 @@
+from typing import Optional
 from uuid import UUID
 
 from langchain.embeddings.ollama import OllamaEmbeddings
@@ -120,17 +121,26 @@ class ResendSettings(BaseSettings):
     resend_api_key: str = "null"
 
 
+# Global variables to store the Supabase client and database instances
+_supabase_client: Optional[Client] = None
+_supabase_db: Optional[SupabaseDB] = None
+
+
 def get_supabase_client() -> Client:
-    settings = BrainSettings()  # pyright: ignore reportPrivateUsage=none
-    supabase_client: Client = create_client(
-        settings.supabase_url, settings.supabase_service_key
-    )
-    return supabase_client
+    global _supabase_client
+    if _supabase_client is None:
+        settings = BrainSettings()  # pyright: ignore reportPrivateUsage=none
+        _supabase_client = create_client(
+            settings.supabase_url, settings.supabase_service_key
+        )
+    return _supabase_client
 
 
 def get_supabase_db() -> SupabaseDB:
-    supabase_client = get_supabase_client()
-    return SupabaseDB(supabase_client)
+    global _supabase_db
+    if _supabase_db is None:
+        _supabase_db = SupabaseDB(get_supabase_client())
+    return _supabase_db
 
 
 def get_embeddings():
