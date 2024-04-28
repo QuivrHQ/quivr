@@ -67,6 +67,7 @@
             "configuring/resend-emails",
             "configuring/reranking",
             "configuring/environment-variables",
+            "configuring/profiler",
             "configuring/telemetry"
           ]
         },
