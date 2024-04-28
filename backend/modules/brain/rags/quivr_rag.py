@@ -20,12 +20,13 @@ from langchain_core.runnables import RunnableLambda, RunnablePassthrough
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 from logger import get_logger
 from models import BrainSettings  # Importing settings related to the 'brain'
+from models.settings import get_supabase_client
 from modules.brain.service.brain_service import BrainService
 from modules.chat.service.chat_service import ChatService
 from modules.prompt.service.get_prompt_to_use import get_prompt_to_use
 from pydantic import BaseModel, ConfigDict
 from pydantic_settings import BaseSettings
-from supabase.client import Client, create_client
+from supabase.client import Client
 from vectorstore.supabase import CustomSupabaseVectorStore
 
 logger = get_logger(__name__)
@@ -186,9 +187,7 @@ class QuivrRAG(BaseModel):
         self.streaming = streaming
 
     def _create_supabase_client(self) -> Client:
-        return create_client(
-            self.brain_settings.supabase_url, self.brain_settings.supabase_service_key
-        )
+        return get_supabase_client()
 
     def _create_vector_store(self) -> CustomSupabaseVectorStore:
         return CustomSupabaseVectorStore(
