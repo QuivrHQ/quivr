@@ -43,6 +43,7 @@ export const MessageRow = React.forwardRef(
       messageId,
       thumbs: initialThumbs,
       lastMessage,
+      metadata,
     }: MessageRowProps,
     ref: React.Ref<HTMLDivElement>
   ) => {
@@ -60,6 +61,7 @@ export const MessageRow = React.forwardRef(
 
     useEffect(() => {
       setThumbs(initialThumbs);
+      console.info(metadata);
     }, [initialThumbs]);
 
     const messageContent = text ?? "";
@@ -159,6 +161,9 @@ export const MessageRow = React.forwardRef(
           {children ?? (
             <>
               <MessageContent text={messageContent} isUser={isUserSpeaker} />
+              {/* {!isUserSpeaker && messageContent !== "🧠" && (
+                <span>{metadata?.sources? || ""} </span>
+              )} */}
               {renderIcons()}
             </>
           )}
