@@ -7,6 +7,7 @@ from logger import get_logger
 from models.databases.supabase.supabase import SupabaseDB
 from posthog import Posthog
 from pydantic_settings import BaseSettings, SettingsConfigDict
+from sqlalchemy import Engine, create_engine
 from supabase.client import Client, create_client
 from vectorstore.supabase import SupabaseVectorStore
 
@@ -114,6 +115,7 @@ class BrainSettings(BaseSettings):
     ollama_api_base_url: str = None
     langfuse_public_key: str = None
     langfuse_secret_key: str = None
+    pg_database_url: str = None
 
 
 class ResendSettings(BaseSettings):
@@ -124,6 +126,16 @@ class ResendSettings(BaseSettings):
 # Global variables to store the Supabase client and database instances
 _supabase_client: Optional[Client] = None
 _supabase_db: Optional[SupabaseDB] = None
+_db_engine: Optional[Engine] = None
+
+
+def get_pg_database_engine():
+    global _db_engine
+    if _db_engine is None:
+        logger.info("Creating Postgres DB engine")
+        settings = BrainSettings()  # pyright: ignore reportPrivateUsage=none
+        _db_engine = create_engine(settings.pg_database_url)
+    return _db_engine
 
 
 def get_supabase_client() -> Client:
