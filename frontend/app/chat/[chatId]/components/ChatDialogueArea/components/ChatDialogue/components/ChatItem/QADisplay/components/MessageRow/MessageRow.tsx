@@ -58,10 +58,11 @@ export const MessageRow = React.forwardRef(
     const [thumbs, setThumbs] = useState<boolean | undefined | null>(
       initialThumbs
     );
+    const [citations, setCitations] = useState<string[]>([]);
 
     useEffect(() => {
       setThumbs(initialThumbs);
-      console.info(metadata?.sources?.[0]?.citation);
+      setCitations(metadata?.sources?.map((source) => source.citation) ?? []);
     }, [initialThumbs]);
 
     const messageContent = text ?? "";
@@ -110,6 +111,12 @@ export const MessageRow = React.forwardRef(
               lastMessage ? styles.sticky : ""
             }`}
           >
+            <div className={styles.citations}>
+              {citations.map((citation, i) => (
+                <div key={i}>{citation}</div>
+              ))}
+            </div>
+
             <CopyButton handleCopy={handleCopy} size="normal" />
             {!isMobile && (
               <div className={styles.sources_icon_wrapper}>
@@ -161,9 +168,6 @@ export const MessageRow = React.forwardRef(
           {children ?? (
             <>
               <MessageContent text={messageContent} isUser={isUserSpeaker} />
-              {/* {!isUserSpeaker && messageContent !== "🧠" && (
-                <span>{metadata?.sources? || ""} </span>
-              )} */}
               {renderIcons()}
             </>
           )}
