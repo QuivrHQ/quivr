@@ -66,6 +66,7 @@
             "configuring/increase-user-usage",
             "configuring/resend-emails",
             "configuring/reranking",
+            "configuring/llamaparse",
             "configuring/environment-variables",
             "configuring/profiler",
             "configuring/telemetry"
