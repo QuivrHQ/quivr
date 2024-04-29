@@ -50,20 +50,26 @@
       margin-left: 1px;
       position: relative;
 
-      .icons_wrapper {
-        visibility: hidden;
-        position: absolute;
+      .metadata_wrapper {
         display: flex;
-        gap: Spacings.$spacing03;
+        flex-direction: column;
+        position: absolute;
         left: Spacings.$spacing02;
         top: calc(100% + #{Spacings.$spacing03});
+        gap: Spacings.$spacing03;
 
-        .sources_icon_wrapper {
-          cursor: pointer;
-        }
+        .icons_wrapper {
+          visibility: hidden;
+          display: flex;
+          gap: Spacings.$spacing03;
 
-        &.sticky {
-          visibility: visible;
+          .sources_icon_wrapper {
+            cursor: pointer;
+          }
+
+          &.sticky {
+            visibility: visible;
+          }
         }
       }
     }

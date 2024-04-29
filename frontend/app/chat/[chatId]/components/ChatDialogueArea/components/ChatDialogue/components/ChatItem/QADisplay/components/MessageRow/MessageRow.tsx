@@ -9,10 +9,12 @@ import { useDevice } from "@/lib/hooks/useDevice";
 import { Source } from "@/lib/types/MessageMetadata";
 
 import styles from "./MessageRow.module.scss";
+import { Citation } from "./components/Citation/Citation";
 import { MessageContent } from "./components/MessageContent/MessageContent";
 import { QuestionBrain } from "./components/QuestionBrain/QuestionBrain";
 import { QuestionPrompt } from "./components/QuestionPrompt/QuestionPrompt";
 import { useMessageRow } from "./hooks/useMessageRow";
+import { CitationType } from "./types/types";
 
 type MessageRowProps = {
   speaker: "user" | "assistant";
@@ -58,11 +60,17 @@ export const MessageRow = React.forwardRef(
     const [thumbs, setThumbs] = useState<boolean | undefined | null>(
       initialThumbs
     );
-    const [citations, setCitations] = useState<string[]>([]);
+    const [citations, setCitations] = useState<CitationType[]>([]);
 
     useEffect(() => {
       setThumbs(initialThumbs);
-      setCitations(metadata?.sources?.map((source) => source.citation) ?? []);
+      setCitations(
+        metadata?.sources?.map((source) => ({
+          citation: source.citation,
+          filename: source.name,
+          file_url: source.source_url,
+        })) ?? []
+      );
     }, [initialThumbs]);
 
     const messageContent = text ?? "";
@@ -103,54 +111,56 @@ export const MessageRow = React.forwardRef(
       }
     };
 
-    const renderIcons = () => {
+    const renderMetadata = () => {
       if (!isUserSpeaker && messageContent !== "🧠") {
         return (
           <div
-            className={`${styles.icons_wrapper} ${
+            className={`${styles.metadata_wrapper} ${
               lastMessage ? styles.sticky : ""
             }`}
           >
             <div className={styles.citations}>
               {citations.map((citation, i) => (
-                <div key={i}>{citation}</div>
+                <Citation key={i} citation={citation} />
               ))}
             </div>
 
-            <CopyButton handleCopy={handleCopy} size="normal" />
-            {!isMobile && (
-              <div className={styles.sources_icon_wrapper}>
-                <Icon
-                  name="file"
-                  handleHover={true}
-                  color={sourcesMessageIndex === index ? "primary" : "black"}
-                  size="normal"
-                  onClick={() => {
-                    setSourcesMessageIndex(
-                      sourcesMessageIndex === index ? undefined : index
-                    );
-                  }}
-                />
-              </div>
-            )}
-            <Icon
-              name="thumbsUp"
-              handleHover={true}
-              color={thumbs ? "primary" : "black"}
-              size="normal"
-              onClick={async () => {
-                await thumbsUp();
-              }}
-            />
-            <Icon
-              name="thumbsDown"
-              handleHover={true}
-              color={thumbs === false ? "primary" : "black"}
-              size="normal"
-              onClick={async () => {
-                await thumbsDown();
-              }}
-            />
+            <div className={styles.icons_wrapper}>
+              <CopyButton handleCopy={handleCopy} size="normal" />
+              {!isMobile && (
+                <div className={styles.sources_icon_wrapper}>
+                  <Icon
+                    name="file"
+                    handleHover={true}
+                    color={sourcesMessageIndex === index ? "primary" : "black"}
+                    size="normal"
+                    onClick={() => {
+                      setSourcesMessageIndex(
+                        sourcesMessageIndex === index ? undefined : index
+                      );
+                    }}
+                  />
+                </div>
+              )}
+              <Icon
+                name="thumbsUp"
+                handleHover={true}
+                color={thumbs ? "primary" : "black"}
+                size="normal"
+                onClick={async () => {
+                  await thumbsUp();
+                }}
+              />
+              <Icon
+                name="thumbsDown"
+                handleHover={true}
+                color={thumbs === false ? "primary" : "black"}
+                size="normal"
+                onClick={async () => {
+                  await thumbsDown();
+                }}
+              />
+            </div>
           </div>
         );
       }
@@ -168,7 +178,7 @@ export const MessageRow = React.forwardRef(
           {children ?? (
             <>
               <MessageContent text={messageContent} isUser={isUserSpeaker} />
-              {renderIcons()}
+              {renderMetadata()}
             </>
           )}
         </div>
