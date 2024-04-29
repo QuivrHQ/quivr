@@ -61,7 +61,7 @@ export const MessageRow = React.forwardRef(
 
     useEffect(() => {
       setThumbs(initialThumbs);
-      console.info(metadata);
+      console.info(metadata?.sources?.[0]?.citation);
     }, [initialThumbs]);
 
     const messageContent = text ?? "";
