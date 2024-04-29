@@ -1,3 +1,4 @@
+from datetime import datetime
 from enum import Enum
 from typing import List, Optional
 from uuid import UUID
@@ -26,7 +27,7 @@ class BrainEntity(BaseModel):
     max_tokens: Optional[int] = None
     status: Optional[str] = None
     prompt_id: Optional[UUID] = None
-    last_update: str
+    last_update: datetime
     brain_type: BrainType
     brain_definition: Optional[ApiBrainDefinitionEntity] = None
     connected_brains_ids: Optional[List[UUID]] = None
