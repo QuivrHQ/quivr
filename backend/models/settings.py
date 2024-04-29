@@ -3,11 +3,11 @@ from uuid import UUID
 
 from langchain.embeddings.ollama import OllamaEmbeddings
 from langchain_openai import OpenAIEmbeddings
-from sqlalchemy import Engine, create_engine
 from logger import get_logger
 from models.databases.supabase.supabase import SupabaseDB
 from posthog import Posthog
 from pydantic_settings import BaseSettings, SettingsConfigDict
+from sqlalchemy import Engine, create_engine
 from supabase.client import Client, create_client
 from vectorstore.supabase import SupabaseVectorStore
 
@@ -128,6 +128,7 @@ _supabase_client: Optional[Client] = None
 _supabase_db: Optional[SupabaseDB] = None
 _db_engine: Optional[Engine] = None
 
+
 def get_pg_database_engine():
     global _db_engine
     if _db_engine is None:
@@ -135,6 +136,7 @@ def get_pg_database_engine():
         settings = BrainSettings()  # pyright: ignore reportPrivateUsage=none
         _db_engine = create_engine(settings.pg_database_url)
     return _db_engine
+
 
 def get_supabase_client() -> Client:
     global _supabase_client
