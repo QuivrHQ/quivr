@@ -1,0 +1,46 @@
+---
+title: New Models
+description: Learn how to add new models to Quivr.
+---
+
+#  Add New Models
+
+Quivr allows you to add new models to your account. You can add models from the OpenAI API or from your own custom models.
+
+## Add a Model
+
+To add a new model, follow these steps:
+
+<Steps>
+<Step title="Go to supabase">
+    Go to the [Supabase](http://localhost:54323) dashboard.
+</Step>
+<Step title="Select the table models">
+    Select the table `models`.
+    ![Supabase tables](/images/supabase-table.png)
+</Step>
+<Step title="Add a new model">
+    Click on the "Add new row" button.
+</Step>
+<Step title="Fill in the form">
+    Fill in the form with the model's name, maximum tokens, and other details.
+</Step>
+<Step title="Go to the user_settings table">
+    Go to the `user_settings` table.
+</Step>
+<Step title="Add the model to the user settings">
+    Add the model to the user settings by updating the `models` field.
+    ![Supabase user settings](/images/supabase-user-settings.png)
+</Step>
+<Step title="Input the model's name">
+    Input the model's name in the `models` array default value.
+    ![Supabase user settings models](/images/supabase-user-settings-models.png)
+</Step>
+<Step title="Update existing user settings">
+    Update the existing user settings with the new model.
+</Step>
+</Steps>
+
+You have successfully added a new model to your account.
+
+

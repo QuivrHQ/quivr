@@ -4,7 +4,7 @@ from uuid import UUID
 
 from modules.chat.dto.outputs import GetChatHistoryOutput
 from modules.notification.entity.notification import Notification
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel
 
 
 class ChatMessage(BaseModel):
@@ -33,6 +33,7 @@ class Sources(BaseModel):
     source_url: str
     type: str
     original_file_name: str
+    citation: str
 
 
 class ChatItemType(Enum):

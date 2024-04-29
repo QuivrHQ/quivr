@@ -28,9 +28,9 @@
       "url": "https://discord.gg/HUpRgp2HG8"
     },
     {
-      "name": "Blog",
-      "icon": "newspaper",
-      "url": "https://quivr.app/blog"
+      "name": "API Docs",
+      "icon": "globe",
+      "url": "https://api.quivr.app/docs"
     },
     {
       "name": "Status",
@@ -57,22 +57,45 @@
           ]
         },
         "slackbot",
-        "configuring",
+        {
+          "group": "Configuring",
+          "icon": "gear",
+          "pages": [
+            "configuring/authentication",
+            "configuring/new-model",
+            "configuring/increase-user-usage",
+            "configuring/resend-emails",
+            "configuring/reranking",
+            "configuring/environment-variables",
+            "configuring/profiler",
+            "configuring/telemetry"
+          ]
+        },
         "tech-design",
         "contact-us"
       ]
     },
     {
       "group": "Deploy Quivr",
-      "pages": ["deployment/porter", "deployment/aws", "deployment/digital_ocean"]
+      "pages": [
+        "deployment/porter",
+        "deployment/aws",
+        "deployment/digital_ocean"
+      ]
     },
     {
       "group": "Brains",
-      "pages": [ "brains/docs-and-urls","brains/gpt4", "brains/sql"]
+      "pages": [
+        "brains/docs-and-urls",
+        "brains/gpt4",
+        "brains/sql"
+      ]
     },
     {
-      "group": "Agents",
-      "pages": ["agents/summary"]
+      "group": "Assistants",
+      "pages": [
+        "agents/summary"
+      ]
     }
   ],
   "footerSocials": {

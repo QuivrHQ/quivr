@@ -64,3 +64,7 @@ export const deleteUser = async (
     await axiosInstance.delete(`/user/${userId}`);
   }
 };
+
+export const getUserCredits = async (
+  axiosInstance: AxiosInstance
+): Promise<number> => (await axiosInstance.get<number>("/user/credits")).data;

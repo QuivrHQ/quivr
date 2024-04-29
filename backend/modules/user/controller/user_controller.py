@@ -98,3 +98,16 @@ async def delete_user_route(
     user_repository.delete_user(user_id)
 
     return {"message": "User deleted successfully"}
+
+@user_router.get(
+    "/user/credits",
+    dependencies=[Depends(AuthBearer())],
+    tags=["User"],
+)
+def get_user_credits(
+    current_user: UserIdentity = Depends(get_current_user),
+) -> int:
+    """
+    Get user remaining credits.
+    """
+    return user_repository.get_user_credits(current_user.id)

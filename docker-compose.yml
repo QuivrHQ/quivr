@@ -107,3 +107,7 @@ services:
       - beat
     ports:
       - 5555:5555
+
+networks:
+  quivr-network:
+    driver: bridge

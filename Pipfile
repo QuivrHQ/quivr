@@ -60,6 +60,9 @@ datasets = "*"
 pytest-dotenv = "*"
 fpdf2 = "*"
 unidecode = "*"
+flashrank = "*"
+langchain-cohere = "*"
+pyinstrument = "*"
 
 [dev-packages]
 black = "*"

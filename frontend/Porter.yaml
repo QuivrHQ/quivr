@@ -1,0 +1,23 @@
+version: v2
+name: quivr-demo-front
+services:
+- name: quivr-frontend
+  run: ""
+  type: web
+  instances: 1
+  cpuCores: 0.2
+  ramMegabytes: 240
+  terminationGracePeriodSeconds: 30
+  port: 3000
+  domains:
+  - name: demo.quivr.app
+  sleep: false
+build:
+  context: ./frontend
+  method: docker
+  dockerfile: ./frontend/Dockerfile
+envGroups:
+- preview-frontend
+autoRollback:
+  enabled: false
+

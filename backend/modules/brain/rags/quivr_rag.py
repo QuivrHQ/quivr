@@ -1,34 +1,52 @@
+import os
 from operator import itemgetter
-from typing import Optional
+from typing import List, Optional
 from uuid import UUID
 
 from langchain.chains import ConversationalRetrievalChain
 from langchain.embeddings.ollama import OllamaEmbeddings
 from langchain.llms.base import BaseLLM
-from langchain.memory import ConversationBufferMemory
 from langchain.prompts import HumanMessagePromptTemplate, SystemMessagePromptTemplate
+from langchain.retrievers import ContextualCompressionRetriever
+from langchain.retrievers.document_compressors import FlashrankRerank
 from langchain.schema import format_document
+from langchain_cohere import CohereRerank
 from langchain_community.chat_models import ChatLiteLLM
-from langchain_core.messages import get_buffer_string
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate, PromptTemplate
+from langchain_core.pydantic_v1 import BaseModel as BaseModelV1
+from langchain_core.pydantic_v1 import Field as FieldV1
 from langchain_core.runnables import RunnableLambda, RunnablePassthrough
-from langchain_openai import OpenAIEmbeddings
-from modules.prompt.service.get_prompt_to_use import get_prompt_to_use
+from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 from logger import get_logger
 from models import BrainSettings  # Importing settings related to the 'brain'
+from models.settings import get_supabase_client
 from modules.brain.service.brain_service import BrainService
 from modules.chat.service.chat_service import ChatService
+from modules.prompt.service.get_prompt_to_use import get_prompt_to_use
 from pydantic import BaseModel, ConfigDict
 from pydantic_settings import BaseSettings
-from supabase.client import Client, create_client
+from supabase.client import Client
 from vectorstore.supabase import CustomSupabaseVectorStore
 
 logger = get_logger(__name__)
 
 
+class cited_answer(BaseModelV1):
+    """Answer the user question based only on the given sources, and cite the sources used."""
+
+    answer: str = FieldV1(
+        ...,
+        description="The answer to the user question, which is based only on the given sources.",
+    )
+    citations: List[int] = FieldV1(
+        ...,
+        description="The integer IDs of the SPECIFIC sources which justify the answer.",
+    )
+
+
 # First step is to create the Rephrasing Prompt
-_template = """Given the following conversation and a follow up question, rephrase the follow up question to be a standalone question, in its original language.
+_template = """Given the following conversation and a follow up question, rephrase the follow up question to be a standalone question, in its original language. Keep as much details as possible from previous messages. Keep entity names and all. 
 
 Chat History:
 {chat_history}
@@ -64,7 +82,9 @@ ANSWER_PROMPT = ChatPromptTemplate.from_messages(
 
 # How we format documents
 
-DEFAULT_DOCUMENT_PROMPT = PromptTemplate.from_template(template="{page_content}")
+DEFAULT_DOCUMENT_PROMPT = PromptTemplate.from_template(
+    template="Source: {index} \n {page_content}"
+)
 
 
 def is_valid_uuid(uuid_to_test, version=4):
@@ -114,6 +134,23 @@ class QuivrRAG(BaseModel):
         else:
             return None
 
+    def model_compatible_with_function_calling(self):
+        if self.model in [
+            "gpt-4-turbo",
+            "gpt-4-turbo-2024-04-09",
+            "gpt-4-turbo-preview",
+            "gpt-4-0125-preview",
+            "gpt-4-1106-preview",
+            "gpt-4",
+            "gpt-4-0613",
+            "gpt-3.5-turbo",
+            "gpt-3.5-turbo-0125",
+            "gpt-3.5-turbo-1106",
+            "gpt-3.5-turbo-0613",
+        ]:
+            return True
+        return False
+
     supabase_client: Optional[Client] = None
     vector_store: Optional[CustomSupabaseVectorStore] = None
     qa: Optional[ConversationalRetrievalChain] = None
@@ -150,9 +187,7 @@ class QuivrRAG(BaseModel):
         self.streaming = streaming
 
     def _create_supabase_client(self) -> Client:
-        return create_client(
-            self.brain_settings.supabase_url, self.brain_settings.supabase_service_key
-        )
+        return get_supabase_client()
 
     def _create_vector_store(self) -> CustomSupabaseVectorStore:
         return CustomSupabaseVectorStore(
@@ -195,21 +230,66 @@ class QuivrRAG(BaseModel):
     def _combine_documents(
         self, docs, document_prompt=DEFAULT_DOCUMENT_PROMPT, document_separator="\n\n"
     ):
+        # for each docs, add an index in the metadata to be able to cite the sources
+        for doc, index in zip(docs, range(len(docs))):
+            doc.metadata["index"] = index
         doc_strings = [format_document(doc, document_prompt) for doc in docs]
         return document_separator.join(doc_strings)
 
     def get_retriever(self):
         return self.vector_store.as_retriever()
 
+    def filter_history(
+        self, chat_history, max_history: int = 10, max_tokens: int = 2000
+    ):
+        """
+        Filter out the chat history to only include the messages that are relevant to the current question
+
+        Takes in a chat_history= [HumanMessage(content='Qui est Chloé ? '), AIMessage(content="Chloé est une salariée travaillant pour l'entreprise Quivr en tant qu'AI Engineer, sous la direction de son supérieur hiérarchique, Stanislas Girard."), HumanMessage(content='Dis moi en plus sur elle'), AIMessage(content=''), HumanMessage(content='Dis moi en plus sur elle'), AIMessage(content="Désolé, je n'ai pas d'autres informations sur Chloé à partir des fichiers fournis.")]
+        Returns a filtered chat_history with in priority: first max_tokens, then max_history where a Human message and an AI message count as one pair
+        a token is 4 characters
+        """
+        chat_history = chat_history[::-1]
+        total_tokens = 0
+        total_pairs = 0
+        filtered_chat_history = []
+        for i in range(0, len(chat_history), 2):
+            if i + 1 < len(chat_history):
+                human_message = chat_history[i]
+                ai_message = chat_history[i + 1]
+                message_tokens = (
+                    len(human_message.content) + len(ai_message.content)
+                ) // 4
+                if (
+                    total_tokens + message_tokens > max_tokens
+                    or total_pairs >= max_history
+                ):
+                    break
+                filtered_chat_history.append(human_message)
+                filtered_chat_history.append(ai_message)
+                total_tokens += message_tokens
+                total_pairs += 1
+        chat_history = filtered_chat_history[::-1]
+
+        return chat_history
+
     def get_chain(self):
+        compressor = None
+        if os.getenv("COHERE_API_KEY"):
+            compressor = CohereRerank(top_n=10)
+        else:
+            compressor = FlashrankRerank(model="ms-marco-TinyBERT-L-2-v2", top_n=10)
+
         retriever_doc = self.get_retriever()
-        memory = ConversationBufferMemory(
-            return_messages=True, output_key="answer", input_key="question"
+        compression_retriever = ContextualCompressionRetriever(
+            base_compressor=compressor, base_retriever=retriever_doc
         )
 
         loaded_memory = RunnablePassthrough.assign(
-            chat_history=RunnableLambda(memory.load_memory_variables)
-            | itemgetter("history"),
+            chat_history=RunnableLambda(
+                lambda x: self.filter_history(x["chat_history"]),
+            ),
+            question=lambda x: x["question"],
         )
 
         api_base = None
@@ -219,7 +299,7 @@ class QuivrRAG(BaseModel):
         standalone_question = {
             "standalone_question": {
                 "question": lambda x: x["question"],
-                "chat_history": lambda x: get_buffer_string(x["chat_history"]),
+                "chat_history": itemgetter("chat_history"),
             }
             | CONDENSE_QUESTION_PROMPT
             | ChatLiteLLM(temperature=0, model=self.model, api_base=api_base)
@@ -233,7 +313,7 @@ class QuivrRAG(BaseModel):
 
         # Now we retrieve the documents
         retrieved_documents = {
-            "docs": itemgetter("standalone_question") | retriever_doc,
+            "docs": itemgetter("standalone_question") | compression_retriever,
             "question": lambda x: x["standalone_question"],
             "custom_instructions": lambda x: prompt_to_use,
         }
@@ -243,14 +323,27 @@ class QuivrRAG(BaseModel):
             "question": itemgetter("question"),
             "custom_instructions": itemgetter("custom_instructions"),
         }
+        llm = ChatLiteLLM(
+            max_tokens=self.max_tokens,
+            model=self.model,
+            temperature=self.temperature,
+            api_base=api_base,
+        )
+        if self.model_compatible_with_function_calling():
 
-        # And finally, we do the part that returns the answers
+            # And finally, we do the part that returns the answers
+            llm_function = ChatOpenAI(
+                max_tokens=self.max_tokens,
+                model=self.model,
+                temperature=self.temperature,
+            )
+            llm = llm_function.bind_tools(
+                [cited_answer],
+                tool_choice="cited_answer",
+            )
+
         answer = {
-            "answer": final_inputs
-            | ANSWER_PROMPT
-            | ChatLiteLLM(
-                max_tokens=self.max_tokens, model=self.model, api_base=api_base
-            ),
+            "answer": final_inputs | ANSWER_PROMPT | llm,
             "docs": itemgetter("docs"),
         }
 

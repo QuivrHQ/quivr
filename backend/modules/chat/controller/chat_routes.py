@@ -69,8 +69,11 @@ def get_answer_generator(
 
     vector_store = init_vector_store(user_id=current_user.id)
 
-    # Get History
-    history = chat_service.get_chat_history(chat_id)
+    # Get History only if needed
+    if not brain_id:
+        history = chat_service.get_chat_history(chat_id)
+    else:
+        history = []
 
     # Generic
     brain, metadata_brain = brain_service.find_brain_from_question(

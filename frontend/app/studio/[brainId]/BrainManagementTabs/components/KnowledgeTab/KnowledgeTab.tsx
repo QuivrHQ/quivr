@@ -6,17 +6,22 @@ import { LoaderIcon } from "@/lib/components/ui/LoaderIcon/LoaderIcon";
 import { MessageInfoBox } from "@/lib/components/ui/MessageInfoBox/MessageInfoBox";
 import QuivrButton from "@/lib/components/ui/QuivrButton/QuivrButton";
 import { useKnowledgeToFeedContext } from "@/lib/context/KnowledgeToFeedProvider/hooks/useKnowledgeToFeedContext";
+import { Knowledge } from "@/lib/types/Knowledge";
 
 import styles from "./KnowledgeTab.module.scss";
-import { KnowledgeTable } from "./KnowledgeTable/KnowledgeTable";
+import KnowledgeTable from "./KnowledgeTable/KnowledgeTable";
 import { useAddedKnowledge } from "./hooks/useAddedKnowledge";
 
 type KnowledgeTabProps = {
   brainId: UUID;
   hasEditRights: boolean;
+  allKnowledge: Knowledge[];
 };
-export const KnowledgeTab = ({ brainId }: KnowledgeTabProps): JSX.Element => {
-  const { isPending, allKnowledge } = useAddedKnowledge({
+export const KnowledgeTab = ({
+  brainId,
+  allKnowledge,
+}: KnowledgeTabProps): JSX.Element => {
+  const { isPending } = useAddedKnowledge({
     brainId,
   });
   const { setShouldDisplayFeedCard } = useKnowledgeToFeedContext();

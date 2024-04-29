@@ -54,7 +54,7 @@ class UserUsage(UserIdentity):
 
     def get_user_monthly_usage(self, date):
         """
-        Fetch the user daily usage from the database
+        Fetch the user monthly usage from the database
         """
         posthog = PostHogSettings()
         request = self.supabase_db.get_user_requests_count_for_month(self.id, date)
