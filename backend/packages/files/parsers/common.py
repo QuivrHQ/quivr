@@ -1,12 +1,20 @@
+import os
 import re
+import tempfile
 import time
 
+import nest_asyncio
 import tiktoken
+from langchain.schema import Document
+from langchain.text_splitter import RecursiveCharacterTextSplitter
+from llama_parse import LlamaParse
 from logger import get_logger
 from models import File
 from modules.brain.service.brain_vector_service import BrainVectorService
 from modules.upload.service.upload_file import DocumentSerializable
 from packages.embeddings.vectors import Neurons
+
+nest_asyncio.apply()
 
 logger = get_logger(__name__)
 
@@ -22,7 +30,35 @@ async def process_file(
     dateshort = time.strftime("%Y%m%d")
     neurons = Neurons()
 
-    file.compute_documents(loader_class)
+    if os.getenv("LLAMA_CLOUD_API_KEY"):
+        doc = file.file
+        document_ext = os.path.splitext(doc.filename)[1]
+        if document_ext in [".pdf", ".docx", ".doc"]:
+            document_tmp = tempfile.NamedTemporaryFile(
+                suffix=document_ext, delete=False
+            )
+            # Seek to the beginning of the file
+            doc.file.seek(0)
+            document_tmp.write(doc.file.read())
+
+            parser = LlamaParse(
+                result_type="mardown",  # "markdown" and "text" are available
+                parsing_instruction="Extract all the information as possible in a way a human can understand by being as verbose as possible.",
+            )
+
+            document_llama_parsed = parser.load_data(document_tmp.name)
+            document_tmp.close()
+            document_to_langchain = document_llama_parsed[0].to_langchain_format()
+            text_splitter = RecursiveCharacterTextSplitter.from_tiktoken_encoder(
+                chunk_size=file.chunk_size, chunk_overlap=file.chunk_overlap
+            )
+            document_to_langchain = Document(
+                page_content=document_to_langchain.page_content
+            )
+            file.documents = text_splitter.split_documents([document_to_langchain])
+    else:
+
+        file.compute_documents(loader_class)
 
     metadata = {
         "file_sha1": file.file_sha1,
@@ -40,8 +76,10 @@ async def process_file(
     enc = tiktoken.get_encoding("cl100k_base")
 
     if file.documents is not None:
+        logger.info("Coming here?")
         for doc in file.documents:  # pyright: ignore reportPrivateUsage=none
             new_metadata = metadata.copy()
+            logger.info(f"Processing document {doc}")
             # Add filename at beginning of page content
             doc.page_content = f"Filename: {new_metadata['original_file_name']} Content: {doc.page_content}"
 
