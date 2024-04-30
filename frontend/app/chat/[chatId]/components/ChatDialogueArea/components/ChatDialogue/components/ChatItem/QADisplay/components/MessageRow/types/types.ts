@@ -3,3 +3,9 @@ export interface CitationType {
   filename: string;
   file_url: string;
 }
+
+export interface SourceFile {
+  filename: string;
+  file_url: string;
+  citations: string[];
+}

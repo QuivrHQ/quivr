@@ -9,12 +9,12 @@ import { useDevice } from "@/lib/hooks/useDevice";
 import { Source } from "@/lib/types/MessageMetadata";
 
 import styles from "./MessageRow.module.scss";
-import { Citation } from "./components/Citation/Citation";
 import { MessageContent } from "./components/MessageContent/MessageContent";
 import { QuestionBrain } from "./components/QuestionBrain/QuestionBrain";
 import { QuestionPrompt } from "./components/QuestionPrompt/QuestionPrompt";
+import { SourceCitations } from "./components/Source/Source";
 import { useMessageRow } from "./hooks/useMessageRow";
-import { CitationType } from "./types/types";
+import { SourceFile } from "./types/types";
 
 type MessageRowProps = {
   speaker: "user" | "assistant";
@@ -60,16 +60,25 @@ export const MessageRow = React.forwardRef(
     const [thumbs, setThumbs] = useState<boolean | undefined | null>(
       initialThumbs
     );
-    const [citations, setCitations] = useState<CitationType[]>([]);
+    const [sourceFiles, setSourceFiles] = useState<SourceFile[]>([]);
 
     useEffect(() => {
       setThumbs(initialThumbs);
-      setCitations(
-        metadata?.sources?.map((source) => ({
-          citation: source.citation,
-          filename: source.name,
-          file_url: source.source_url,
-        })) ?? []
+      setSourceFiles(
+        metadata?.sources?.reduce((acc, source) => {
+          const existingSource = acc.find((s) => s.filename === source.name);
+          if (existingSource) {
+            existingSource.citations.push(source.citation);
+          } else {
+            acc.push({
+              filename: source.name,
+              file_url: source.source_url,
+              citations: [source.citation],
+            });
+          }
+
+          return acc;
+        }, [] as SourceFile[]) ?? []
       );
     }, [initialThumbs]);
 
@@ -119,9 +128,9 @@ export const MessageRow = React.forwardRef(
               lastMessage ? styles.sticky : ""
             }`}
           >
-            <div className={styles.citations}>
-              {citations.map((citation, i) => (
-                <Citation key={i} citation={citation} />
+            <div className={styles.sources}>
+              {sourceFiles.map((sourceFile, i) => (
+                <SourceCitations key={i} sourceFile={sourceFile} />
               ))}
             </div>
 
