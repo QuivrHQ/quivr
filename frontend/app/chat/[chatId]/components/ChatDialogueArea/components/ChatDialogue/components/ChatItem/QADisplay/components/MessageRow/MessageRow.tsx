@@ -9,6 +9,7 @@ import { useDevice } from "@/lib/hooks/useDevice";
 import { Source } from "@/lib/types/MessageMetadata";
 
 import styles from "./MessageRow.module.scss";
+import { Citation } from "./components/Citation/Citation";
 import { MessageContent } from "./components/MessageContent/MessageContent";
 import { QuestionBrain } from "./components/QuestionBrain/QuestionBrain";
 import { QuestionPrompt } from "./components/QuestionPrompt/QuestionPrompt";
@@ -147,6 +148,11 @@ export const MessageRow = React.forwardRef(
                       selectedSourceFile.filename === sourceFile.filename
                     }
                   />
+                  {!!selectedSourceFile &&
+                    selectedSourceFile.filename === sourceFile.filename &&
+                    sourceFile.citations.map((citation, j) => (
+                      <Citation key={j} citation={citation} />
+                    ))}
                 </div>
               ))}
             </div>

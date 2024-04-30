@@ -17,7 +17,7 @@ export const SourceCitations = ({
   return (
     <div
       className={`${styles.source_wrapper} ${
-        isSelected ? "" : styles.selected_source
+        isSelected ? styles.selected_source : ""
       }`}
       onClick={() => setIsExpanded(!isExpanded)}
     >

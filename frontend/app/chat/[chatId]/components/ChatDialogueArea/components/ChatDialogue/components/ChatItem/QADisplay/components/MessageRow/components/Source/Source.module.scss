@@ -15,7 +15,7 @@
 
   &.selected_source {
     background-color: var(--primary-0);
-    color: var(--white);
+    color: var(--text-3);
   }
 
   .source_header {
@@ -34,8 +34,7 @@
     }
   }
 
-  &:hover {
-    background-color: var(--primary-0);
-    color: var(--white-0);
+  &:hover:not(.selected_source) {
+    background-color: var(--background-1);
   }
 }
