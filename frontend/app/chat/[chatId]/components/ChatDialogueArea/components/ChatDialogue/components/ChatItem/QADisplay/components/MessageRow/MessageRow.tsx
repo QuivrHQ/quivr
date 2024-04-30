@@ -61,6 +61,14 @@ export const MessageRow = React.forwardRef(
       initialThumbs
     );
     const [sourceFiles, setSourceFiles] = useState<SourceFile[]>([]);
+    const [selectedSourceFile, setSelectedSourceFile] =
+      useState<SourceFile | null>(null);
+
+    const handleSourceFileClick = (sourceFile: SourceFile) => {
+      setSelectedSourceFile((prev) =>
+        prev && prev.filename === sourceFile.filename ? null : sourceFile
+      );
+    };
 
     useEffect(() => {
       setThumbs(initialThumbs);
@@ -74,6 +82,7 @@ export const MessageRow = React.forwardRef(
               filename: source.name,
               file_url: source.source_url,
               citations: [source.citation],
+              selected: false,
             });
           }
 
@@ -130,7 +139,15 @@ export const MessageRow = React.forwardRef(
           >
             <div className={styles.sources}>
               {sourceFiles.map((sourceFile, i) => (
-                <SourceCitations key={i} sourceFile={sourceFile} />
+                <div key={i} onClick={() => handleSourceFileClick(sourceFile)}>
+                  <SourceCitations
+                    sourceFile={sourceFile}
+                    isSelected={
+                      !!selectedSourceFile &&
+                      selectedSourceFile.filename === sourceFile.filename
+                    }
+                  />
+                </div>
               ))}
             </div>
 
