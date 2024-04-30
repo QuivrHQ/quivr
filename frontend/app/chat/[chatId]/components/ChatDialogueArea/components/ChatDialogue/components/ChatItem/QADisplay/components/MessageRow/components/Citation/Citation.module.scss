@@ -1,0 +1,37 @@
+@use "@/styles/Colors.module.scss";
+@use "@/styles/Radius.module.scss";
+@use "@/styles/Spacings.module.scss";
+@use "@/styles/Typography.module.scss";
+
+.citation_wrapper {
+  display: flex;
+  flex-direction: column;
+  border-radius: Radius.$normal;
+  border: 1px solid var(--primary-1);
+  padding: Spacings.$spacing03;
+  gap: Spacings.$spacing03;
+
+  .citation_header {
+    display: flex;
+    align-items: center;
+    gap: Spacings.$spacing03;
+    font-size: Typography.$small;
+    color: var(--text-1);
+  }
+
+  .citation_content {
+    display: none;
+  }
+
+  &.unfolded {
+    .citation_content {
+      display: flex;
+      font-size: Typography.$tiny;
+    }
+  }
+
+  &:hover {
+    cursor: pointer;
+    background-color: var(--background-2);
+  }
+}

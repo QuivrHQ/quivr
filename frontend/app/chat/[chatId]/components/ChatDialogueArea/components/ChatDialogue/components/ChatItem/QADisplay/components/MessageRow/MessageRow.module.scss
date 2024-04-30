@@ -49,33 +49,32 @@
       background-color: var(--background-special-0);
       margin-left: 1px;
       position: relative;
+    }
 
-      .metadata_wrapper {
+    .metadata_wrapper {
+      display: flex;
+      flex-direction: column;
+      left: Spacings.$spacing02;
+      top: calc(100% + #{Spacings.$spacing03});
+      gap: Spacings.$spacing03;
+
+      .icons_wrapper {
+        visibility: hidden;
         display: flex;
-        flex-direction: column;
-        position: absolute;
-        left: Spacings.$spacing02;
-        top: calc(100% + #{Spacings.$spacing03});
         gap: Spacings.$spacing03;
 
-        .icons_wrapper {
-          visibility: hidden;
-          display: flex;
-          gap: Spacings.$spacing03;
+        .sources_icon_wrapper {
+          cursor: pointer;
+        }
 
-          .sources_icon_wrapper {
-            cursor: pointer;
-          }
-
-          &.sticky {
-            visibility: visible;
-          }
+        &.sticky {
+          visibility: visible;
         }
       }
     }
 
     &:hover {
-      .message_row_content {
+      .metadata_wrapper {
         .icons_wrapper {
           visibility: visible;
         }
