@@ -81,7 +81,8 @@
       "pages": [
         "deployment/porter",
         "deployment/aws",
-        "deployment/digital_ocean"
+        "deployment/digital_ocean",
+        "deployment/vercel"
       ]
     },
     {
