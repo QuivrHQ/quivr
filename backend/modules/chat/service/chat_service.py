@@ -123,7 +123,7 @@ class ChatService:
         chat_id: UUID,
     ) -> List[ChatItem]:
         chat_history = self.get_chat_history(str(chat_id))
-        chat_notifications = notification_service.get_chat_notifications(chat_id)
+        chat_notifications = []
         return merge_chat_history_and_notifications(chat_history, chat_notifications)
 
     def get_user_chats(self, user_id: str) -> List[Chat]:

@@ -1,6 +1,3 @@
-from typing import List
-from uuid import UUID
-
 from models.settings import get_supabase_client
 from modules.notification.dto.inputs import NotificationUpdatableProperties
 from modules.notification.entity.notification import Notification
@@ -22,12 +19,6 @@ class NotificationService:
         Add a notification
         """
         return self.repository.add_notification(notification)
-
-    def get_chat_notifications(self, chat_id: UUID) -> List[Notification]:
-        """
-        Get notifications by chat_id
-        """
-        return self.repository.get_notifications_by_chat_id(chat_id)
 
     def update_notification_by_id(
         self, notification_id, notification: NotificationUpdatableProperties
