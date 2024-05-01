@@ -15,7 +15,7 @@
 
   &.selected_source {
     background-color: var(--primary-0);
-    color: var(--text-3);
+    color: var(--text-0);
     border-color: var(--primary-0);
   }
 
@@ -28,7 +28,7 @@
     width: 100%;
     justify-content: space-between;
     color: var(--text-2);
-    max-width: 250px;
+    max-width: 200px;
 
     .filename {
       @include Typography.EllipsisOverflow;
@@ -36,6 +36,6 @@
   }
 
   &:hover:not(.selected_source) {
-    background-color: var(--background-1);
+    background-color: var(--background-special-1);
   }
 }

@@ -26,16 +26,18 @@ export const Citation = ({ citation }: CitationProps): JSX.Element => {
     >
       <div className={styles.citation_header}>
         <span
-          className={`${styles.one_liner} ${!isExpanded ? styles.folded : ""}`}
+          className={`${styles.citation} ${!isExpanded ? styles.folded : ""}`}
         >
           {content}
         </span>
-        <Icon
-          name={isExpanded ? "fold" : "unfold"}
-          size="normal"
-          color="black"
-          handleHover={true}
-        />
+        <div className={styles.icon}>
+          <Icon
+            name={isExpanded ? "fold" : "unfold"}
+            size="normal"
+            color="black"
+            handleHover={true}
+          />
+        </div>
       </div>
     </div>
   );

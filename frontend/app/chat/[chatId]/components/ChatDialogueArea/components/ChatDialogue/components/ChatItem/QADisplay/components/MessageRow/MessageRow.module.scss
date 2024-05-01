@@ -1,5 +1,6 @@
 @use "@/styles/Radius.module.scss";
 @use "@/styles/Spacings.module.scss";
+@use "@/styles/Typography.module.scss";
 
 .message_row_container {
   display: flex;
@@ -68,7 +69,22 @@
         .sources {
           display: flex;
           gap: Spacings.$spacing03;
+          flex-wrap: wrap;
           max-width: 100%;
+        }
+
+        .citations {
+          display: flex;
+          flex-direction: column;
+          gap: Spacings.$spacing02;
+          padding: Spacings.$spacing03;
+          border: 1px solid var(--primary-0);
+          border-radius: Radius.$big;
+          font-size: Typography.$small;
+
+          .box_title {
+            padding-block: Spacings.$spacing02;
+          }
         }
       }
 

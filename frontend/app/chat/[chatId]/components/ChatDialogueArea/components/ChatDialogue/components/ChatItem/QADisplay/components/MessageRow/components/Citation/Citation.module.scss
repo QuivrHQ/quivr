@@ -5,8 +5,11 @@
 .citation_wrapper {
   padding: Spacings.$spacing03;
   border-radius: Radius.$normal;
-  background-color: var(--background-0);
+  background-color: var(--background-special-0);
   width: 100%;
+  font-size: Typography.$tiny;
+  font-style: italic;
+  cursor: pointer;
 
   .citation_header {
     display: flex;
@@ -14,14 +17,22 @@
     overflow: hidden;
     width: 100%;
 
-    .one_liner {
+    .citation {
       &.folded {
         @include Typography.EllipsisOverflow;
       }
     }
+
+    .icon {
+      visibility: hidden;
+    }
   }
 
   &:hover {
-    background-color: var(--primary-0);
+    background-color: var(--background-special-1);
+
+    .icon {
+      visibility: visible;
+    }
   }
 }

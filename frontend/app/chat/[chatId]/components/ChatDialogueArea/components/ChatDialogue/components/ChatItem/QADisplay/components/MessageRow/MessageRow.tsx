@@ -4,8 +4,6 @@ import { useChat } from "@/app/chat/[chatId]/hooks/useChat";
 import { useChatApi } from "@/lib/api/chat/useChatApi";
 import { CopyButton } from "@/lib/components/ui/CopyButton";
 import Icon from "@/lib/components/ui/Icon/Icon";
-import { useChatContext } from "@/lib/context";
-import { useDevice } from "@/lib/hooks/useDevice";
 import { Source } from "@/lib/types/MessageMetadata";
 
 import styles from "./MessageRow.module.scss";
@@ -42,7 +40,6 @@ export const MessageRow = React.forwardRef(
       promptName,
       children,
       brainId,
-      index,
       messageId,
       thumbs: initialThumbs,
       lastMessage,
@@ -54,8 +51,6 @@ export const MessageRow = React.forwardRef(
       speaker,
       text,
     });
-    const { setSourcesMessageIndex, sourcesMessageIndex } = useChatContext();
-    const { isMobile } = useDevice();
     const { updateChatMessage } = useChatApi();
     const { chatId } = useChat();
     const [thumbs, setThumbs] = useState<boolean | undefined | null>(
@@ -156,34 +151,37 @@ export const MessageRow = React.forwardRef(
                 ))}
               </div>
 
-              <div>
-                {!!selectedSourceFile &&
-                  selectedSourceFile.citations.length > 0 &&
-                  selectedSourceFile.citations.map((citation, i) => (
+              {selectedSourceFile && (
+                <div className={styles.citations}>
+                  <div>
+                    <span className={styles.box_title}>Source</span>
+                    <a
+                      href={selectedSourceFile.file_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <div className={styles.source}>
+                        {selectedSourceFile.filename}
+                      </div>
+                    </a>
+                    <Icon
+                      name="upload"
+                      size="normal"
+                      handleHover={true}
+                      color="black"
+                    />
+                  </div>
+                  {selectedSourceFile.citations.map((citation, i) => (
                     <div key={i}>
                       <Citation citation={citation} />
                     </div>
                   ))}
-              </div>
+                </div>
+              )}
             </div>
 
             <div className={styles.icons_wrapper}>
               <CopyButton handleCopy={handleCopy} size="normal" />
-              {!isMobile && (
-                <div className={styles.sources_icon_wrapper}>
-                  <Icon
-                    name="file"
-                    handleHover={true}
-                    color={sourcesMessageIndex === index ? "primary" : "black"}
-                    size="normal"
-                    onClick={() => {
-                      setSourcesMessageIndex(
-                        sourcesMessageIndex === index ? undefined : index
-                      );
-                    }}
-                  />
-                </div>
-              )}
               <Icon
                 name="thumbsUp"
                 handleHover={true}
