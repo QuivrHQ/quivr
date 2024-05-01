@@ -1,3 +1,4 @@
+from datetime import datetime
 from enum import Enum
 from typing import Optional
 from uuid import UUID
@@ -6,20 +7,18 @@ from pydantic import BaseModel
 
 
 class NotificationsStatusEnum(str, Enum):
-    Pending = "Pending"
-    Done = "Done"
+    INFO = "info"
+    SUCCESS = "success"
+    WARNING = "warning"
+    ERROR = "error"
 
 
 class Notification(BaseModel):
     id: UUID
-    datetime: str
-    chat_id: Optional[UUID] = None
-    message: Optional[str] = None
-    action: str
+    user_id: UUID
     status: NotificationsStatusEnum
-
-    def dict(self, *args, **kwargs):
-        notification_dict = super().dict(*args, **kwargs)
-        if notification_dict.get("chat_id"):
-            notification_dict["chat_id"] = str(notification_dict.get("chat_id"))
-        return notification_dict
+    title: str
+    description: Optional[str]
+    archived: Optional[bool] = False
+    read: Optional[bool] = False
+    datetime: Optional[datetime]  # timestamp

@@ -22,7 +22,6 @@ from modules.chat.controller import chat_router
 from modules.contact_support.controller import contact_router
 from modules.knowledge.controller import knowledge_router
 from modules.misc.controller import misc_router
-from modules.notification.controller import notification_router
 from modules.onboarding.controller import onboarding_router
 from modules.prompt.controller import prompt_router
 from modules.upload.controller import upload_router
@@ -88,7 +87,6 @@ app.include_router(user_router)
 app.include_router(api_key_router)
 app.include_router(subscription_router)
 app.include_router(prompt_router)
-app.include_router(notification_router)
 app.include_router(knowledge_router)
 app.include_router(contact_router)
 
