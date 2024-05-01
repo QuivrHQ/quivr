@@ -82,8 +82,24 @@
           border-radius: Radius.$big;
           font-size: Typography.$small;
 
+          .file_name_wrapper {
+            display: flex;
+            gap: Spacings.$spacing03;
+            align-items: center;
+
+            .box_title {
+              padding-block: Spacings.$spacing02;
+              font-weight: 600;
+            }
+
+            .source {
+              font-size: Typography.$tiny;
+            }
+          }
+
           .box_title {
             padding-block: Spacings.$spacing02;
+            font-weight: 600;
           }
         }
       }

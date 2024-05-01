@@ -85,7 +85,7 @@ export const MessageRow = React.forwardRef(
           return acc;
         }, [] as SourceFile[]) ?? []
       );
-    }, [initialThumbs]);
+    }, [initialThumbs, metadata]);
 
     const messageContent = text ?? "";
 
@@ -153,23 +153,17 @@ export const MessageRow = React.forwardRef(
 
               {selectedSourceFile && (
                 <div className={styles.citations}>
-                  <div>
-                    <span className={styles.box_title}>Source</span>
+                  <div className={styles.file_name_wrapper}>
+                    <span className={styles.box_title}>Source:</span>
                     <a
                       href={selectedSourceFile.file_url}
                       target="_blank"
                       rel="noopener noreferrer"
                     >
-                      <div className={styles.source}>
+                      <span className={styles.source}>
                         {selectedSourceFile.filename}
-                      </div>
+                      </span>
                     </a>
-                    <Icon
-                      name="upload"
-                      size="normal"
-                      handleHover={true}
-                      color="black"
-                    />
                   </div>
                   {selectedSourceFile.citations.map((citation, i) => (
                     <div key={i}>
