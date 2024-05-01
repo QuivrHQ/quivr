@@ -59,10 +59,17 @@
       top: calc(100% + #{Spacings.$spacing03});
       gap: Spacings.$spacing03;
 
-      .sources {
+      .sources_and_citations_wrapper {
         display: flex;
+        flex-direction: column;
         gap: Spacings.$spacing03;
         max-width: 100%;
+
+        .sources {
+          display: flex;
+          gap: Spacings.$spacing03;
+          max-width: 100%;
+        }
       }
 
       .icons_wrapper {

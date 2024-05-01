@@ -138,23 +138,33 @@ export const MessageRow = React.forwardRef(
               lastMessage ? styles.sticky : ""
             }`}
           >
-            <div className={styles.sources}>
-              {sourceFiles.map((sourceFile, i) => (
-                <div key={i} onClick={() => handleSourceFileClick(sourceFile)}>
-                  <SourceCitations
-                    sourceFile={sourceFile}
-                    isSelected={
-                      !!selectedSourceFile &&
-                      selectedSourceFile.filename === sourceFile.filename
-                    }
-                  />
-                  {!!selectedSourceFile &&
-                    selectedSourceFile.filename === sourceFile.filename &&
-                    sourceFile.citations.map((citation, j) => (
-                      <Citation key={j} citation={citation} />
-                    ))}
-                </div>
-              ))}
+            <div className={styles.sources_and_citations_wrapper}>
+              <div className={styles.sources}>
+                {sourceFiles.map((sourceFile, i) => (
+                  <div
+                    key={i}
+                    onClick={() => handleSourceFileClick(sourceFile)}
+                  >
+                    <SourceCitations
+                      sourceFile={sourceFile}
+                      isSelected={
+                        !!selectedSourceFile &&
+                        selectedSourceFile.filename === sourceFile.filename
+                      }
+                    />
+                  </div>
+                ))}
+              </div>
+
+              <div>
+                {!!selectedSourceFile &&
+                  selectedSourceFile.citations.length > 0 &&
+                  selectedSourceFile.citations.map((citation, i) => (
+                    <div key={i}>
+                      <Citation citation={citation} />
+                    </div>
+                  ))}
+              </div>
             </div>
 
             <div className={styles.icons_wrapper}>
