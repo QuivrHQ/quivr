@@ -8,7 +8,6 @@ from langchain_openai import OpenAIEmbeddings
 from logger import get_logger
 from middlewares.auth import AuthBearer, get_current_user
 from models.settings import BrainSettings, get_supabase_client
-from modules.user.service.user_usage import UserUsage
 from modules.brain.service.brain_service import BrainService
 from modules.chat.controller.chat.brainful_chat import BrainfulChat
 from modules.chat.dto.chats import ChatItem, ChatQuestion
@@ -20,8 +19,8 @@ from modules.chat.dto.inputs import (
 )
 from modules.chat.entity.chat import Chat
 from modules.chat.service.chat_service import ChatService
-from modules.notification.service.notification_service import NotificationService
 from modules.user.entity.user_identity import UserIdentity
+from modules.user.service.user_usage import UserUsage
 from packages.utils.telemetry import maybe_send_telemetry
 from vectorstore.supabase import CustomSupabaseVectorStore
 
@@ -29,7 +28,6 @@ logger = get_logger(__name__)
 
 chat_router = APIRouter()
 
-notification_service = NotificationService()
 brain_service = BrainService()
 chat_service = ChatService()
 
@@ -125,7 +123,6 @@ async def delete_chat(chat_id: UUID):
     """
     Delete a specific chat by chat ID.
     """
-    notification_service.remove_chat_notifications(chat_id)
 
     chat_service.delete_chat_from_db(chat_id)
     return {"message": f"{chat_id}  has been deleted."}

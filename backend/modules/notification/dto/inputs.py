@@ -5,23 +5,22 @@ from modules.notification.entity.notification import NotificationsStatusEnum
 from pydantic import BaseModel
 
 
-class CreateNotificationProperties(BaseModel):
+class CreateNotification(BaseModel):
     """Properties that can be received on notification creation"""
 
-    chat_id: Optional[UUID] = None
-    message: Optional[str] = None
-    action: str
-    status: NotificationsStatusEnum = NotificationsStatusEnum.Pending
+    user_id: UUID
+    status: NotificationsStatusEnum
+    title: str
+    description: Optional[str] = None
 
-    def dict(self, *args, **kwargs):
-        notification_dict = super().dict(*args, **kwargs)
-        if notification_dict.get("chat_id"):
-            notification_dict["chat_id"] = str(notification_dict.get("chat_id"))
+    def model_dump(self, *args, **kwargs):
+        notification_dict = super().model_dump(*args, **kwargs)
+        notification_dict["user_id"] = str(notification_dict["user_id"])
         return notification_dict
 
 
 class NotificationUpdatableProperties(BaseModel):
     """Properties that can be received on notification update"""
 
-    message: Optional[str] = None
-    status: Optional[NotificationsStatusEnum] = NotificationsStatusEnum.Done
+    status: Optional[NotificationsStatusEnum]
+    description: Optional[str]
