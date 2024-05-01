@@ -11,8 +11,14 @@ export const Citation = ({ citation }: CitationProps): JSX.Element => {
   const [isExpanded, setIsExpanded] = useState<boolean>(false);
 
   const contentIndex = citation.indexOf("Content:");
-  const cleanedCitation = citation.substring(contentIndex);
-  const [, content] = cleanedCitation.split("Content:");
+  let cleanedCitation, content;
+
+  if (contentIndex !== -1) {
+    cleanedCitation = citation.substring(contentIndex);
+    [, content] = cleanedCitation.split("Content:");
+  } else {
+    content = citation;
+  }
 
   const handleIconClick = (event: React.MouseEvent) => {
     event.stopPropagation();
