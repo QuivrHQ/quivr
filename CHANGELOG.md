@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.0.242 (2024-05-01)
+
+## What's Changed
+* feat(notifications): implemented notifications with RLS and realtime by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2525
+* chore: packages by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2527
+* Enable Porter Application production by @porter-deployment-app in https://github.com/QuivrHQ/quivr/pull/2528
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.241...v0.0.242
+
 ## 0.0.241 (2024-05-01)
 
 ## What's Changed
