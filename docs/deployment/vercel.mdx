@@ -1,0 +1,37 @@
+---
+title: Deploy with Vercel
+description: Deploy your Quivr frontend with Vercel
+icon: caret-up
+---
+
+Vercel is a cloud platform that enables developers to host websites and web services that deploy instantly. You can deploy your Quivr frontend on Vercel by following the steps below.
+
+## Click on this button
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fquivrhq%2Fquivr%2F&env=NEXT_PUBLIC_ENV,NEXT_PUBLIC_BACKEND_URL,NEXT_PUBLIC_SUPABASE_URL,NEXT_PUBLIC_SUPABASE_ANON_KEY,NEXT_PUBLIC_CMS_URL,NEXT_PUBLIC_FRONTEND_URL&envDescription=Env%20Variables%20needed%20for%20your%20project&envLink=https%3A%2F%2Fdocs.quivr.app%2Fdeployment%2Fvercel&demo-title=Quivr%20in%20Production&demo-description=Quivr%20is%20your%20GenAI%20second%20Brain&demo-url=https%3A%2F%2Fchat.quivr.app)
+
+
+## Setup the Environment Variables
+
+```yaml
+NEXT_PUBLIC_ENV=prod
+NEXT_PUBLIC_BACKEND_URL=<your backend url>
+NEXT_PUBLIC_SUPABASE_URL=<your supabase url>
+NEXT_PUBLIC_SUPABASE_ANON_KEY=<your supabase anon key>
+NEXT_PUBLIC_CMS_URL=https://cms.quivr.app
+NEXT_PUBLIC_FRONTEND_URL=<your frontend url>
+```
+
+## Deploy the Application
+
+1. Click on the "Deploy" button in your Vercel project.
+2. Select the branch you want to deploy (e.g., `main`).
+3. Click "Deploy".
+
+## Change source directory
+
+Then go to your settings for the project and change the source directory to `frontend`:
+
+![Change source directory](/images/vercel-source.png)
+
+
