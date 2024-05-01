@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.0.243 (2024-05-01)
+
+## What's Changed
+* fix: Refactor chat_service.py and remove unused code by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2530
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.242...v0.0.243
+
 ## 0.0.242 (2024-05-01)
 
 ## What's Changed
