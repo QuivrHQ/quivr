@@ -1,5 +1,6 @@
 @use "@/styles/Radius.module.scss";
 @use "@/styles/Spacings.module.scss";
+@use "@/styles/Typography.module.scss";
 
 .message_row_container {
   display: flex;
@@ -7,6 +8,7 @@
   padding-right: Spacings.$spacing05;
   width: 85%;
   padding-block: Spacings.$spacing03;
+  gap: Spacings.$spacing03;
 
   .message_row_content {
     align-self: flex-end;
@@ -49,14 +51,63 @@
       background-color: var(--background-special-0);
       margin-left: 1px;
       position: relative;
+    }
+
+    .metadata_wrapper {
+      display: flex;
+      flex-direction: column;
+      left: Spacings.$spacing02;
+      top: calc(100% + #{Spacings.$spacing03});
+      gap: Spacings.$spacing03;
+
+      .sources_and_citations_wrapper {
+        display: flex;
+        flex-direction: column;
+        gap: Spacings.$spacing03;
+        max-width: 100%;
+
+        .sources {
+          display: flex;
+          gap: Spacings.$spacing03;
+          flex-wrap: wrap;
+          max-width: 100%;
+        }
+
+        .citations {
+          display: flex;
+          flex-direction: column;
+          gap: Spacings.$spacing02;
+          padding: Spacings.$spacing03;
+          border: 1px solid var(--primary-0);
+          border-radius: Radius.$big;
+          font-size: Typography.$small;
+
+          .file_name_wrapper {
+            display: flex;
+            gap: Spacings.$spacing03;
+            align-items: center;
+
+            .box_title {
+              padding-block: Spacings.$spacing02;
+              font-weight: 600;
+            }
+
+            .source {
+              font-size: Typography.$tiny;
+            }
+          }
+
+          .box_title {
+            padding-block: Spacings.$spacing02;
+            font-weight: 600;
+          }
+        }
+      }
 
       .icons_wrapper {
         visibility: hidden;
-        position: absolute;
         display: flex;
         gap: Spacings.$spacing03;
-        left: Spacings.$spacing02;
-        top: calc(100% + #{Spacings.$spacing03});
 
         .sources_icon_wrapper {
           cursor: pointer;
@@ -69,7 +120,7 @@
     }
 
     &:hover {
-      .message_row_content {
+      .metadata_wrapper {
         .icons_wrapper {
           visibility: visible;
         }

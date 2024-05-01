@@ -15,6 +15,4 @@ export type ChatContextProps = {
   notifications: Notification[];
   setNotifications: (notifications: Notification[]) => void;
   removeMessage: (id: string) => void;
-  sourcesMessageIndex: number | undefined;
-  setSourcesMessageIndex: (index: number | undefined) => void;
 };
