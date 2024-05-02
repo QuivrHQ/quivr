@@ -54,10 +54,10 @@ export const getUser = async (
   axiosInstance: AxiosInstance
 ): Promise<UserStats> => (await axiosInstance.get<UserStats>("/user")).data;
 
-export const deleteUser = async (
+export const deleteUserData = async (
   axiosInstance: AxiosInstance
 ): Promise<void> => {
-  await axiosInstance.delete(`/user`);
+  await axiosInstance.delete(`/user_data`);
 };
 
 export const getUserCredits = async (

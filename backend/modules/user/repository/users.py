@@ -76,7 +76,7 @@ class Users(UsersInterface):
         ).execute()
         return response.data[0]["email"]
     
-    def delete_user(self, user_id):
+    def delete_user_data(self, user_id):
         response = (
             self.db.from_("brains_users")
             .select("brain_id")

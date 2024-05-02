@@ -48,11 +48,11 @@ class BrainUserService:
         return brain_service.get_brain_by_id(brain_id)
 
     def delete_brain_user(self, user_id: UUID, brain_id: UUID) -> None:
-        brain_to_delete_user_from = brain_service.get_brain_by_id(brain_id=brain_id)
-        if brain_to_delete_user_from is None:
+        brain_to_delete_user_data_from = brain_service.get_brain_by_id(brain_id=brain_id)
+        if brain_to_delete_user_data_from is None:
             raise HTTPException(status_code=404, detail="Brain not found.")
 
-        if brain_to_delete_user_from.brain_type == BrainType.API:
+        if brain_to_delete_user_data_from.brain_type == BrainType.API:
             brain_definition = api_brain_definition_service.get_api_brain_definition(
                 brain_id=brain_id
             )

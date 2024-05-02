@@ -20,7 +20,7 @@ import { useLogoutModal } from "../../lib/hooks/useLogoutModal";
 const UserPage = (): JSX.Element => {
   const { session } = useSupabase();
   const { userData } = useUserData();
-  const { deleteUser } = useUserApi();
+  const { deleteUserData } = useUserApi();
   const { t } = useTranslation(["translation", "logout"]);
   const [deleteAccountModalOpened, setDeleteAccountModalOpened] =
     useState(false);
@@ -108,7 +108,7 @@ const UserPage = (): JSX.Element => {
               isLoading={isLoggingOut}
               color="dangerous"
               onClick={() => {
-                void deleteUser();
+                void deleteUserData();
                 void handleLogout();
               }}
               label="Delete Account"

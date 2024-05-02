@@ -1,7 +1,7 @@
 import { useAxios } from "@/lib/hooks";
 
 import {
-  deleteUser,
+  deleteUserData,
   getUser,
   getUserCredits,
   getUserIdentity,
@@ -19,7 +19,7 @@ export const useUserApi = () => {
     ) => updateUserIdentity(userIdentityUpdatableProperties, axiosInstance),
     getUserIdentity: async () => getUserIdentity(axiosInstance),
     getUser: async () => getUser(axiosInstance),
-    deleteUser: async () => deleteUser(axiosInstance),
+    deleteUserData: async () => deleteUserData(axiosInstance),
     getUserCredits: async () => getUserCredits(axiosInstance),
   };
 };

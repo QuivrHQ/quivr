@@ -80,11 +80,11 @@ def get_user_identity_route(
     return user_repository.get_user_identity(current_user.id)
 
 @user_router.delete(
-    "/user/",
+    "/user_data",
     dependencies=[Depends(AuthBearer())],
     tags=["User"],
 )
-async def delete_user_route(
+async def delete_user_data_route(
     current_user: UserIdentity = Depends(get_current_user),
 ):
     """
@@ -95,7 +95,7 @@ async def delete_user_route(
     This endpoint deletes a user from the system.
     """
 
-    user_repository.delete_user(current_user.id)
+    user_repository.delete_user_data(current_user.id)
 
     return {"message": "User deleted successfully"}
 
