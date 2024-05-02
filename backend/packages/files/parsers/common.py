@@ -42,8 +42,8 @@ async def process_file(
             document_tmp.write(doc.file.read())
 
             parser = LlamaParse(
-                result_type="mardown",  # "markdown" and "text" are available
-                parsing_instruction="Extract all the information as possible in a way a human can understand by being as verbose as possible.",
+                result_type="markdown",  # "markdown" and "text" are available
+                parsing_instruction="The document might contain checkboxes, tables and others elements hard to parse. Find a way to parse them in a meaningful way. ",
             )
 
             document_llama_parsed = parser.load_data(document_tmp.name)
