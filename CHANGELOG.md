@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.0.240 (2024-04-29)
+
+## What's Changed
+* feat(supabase): Add logging statements and refactor Supabase client creation by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2514
+* feat(backend): use SQLAlchemy instead od supabase API by @dmourot in https://github.com/QuivrHQ/quivr/pull/2516
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.239...v0.0.240
+
 ## 0.0.239 (2024-04-28)
 
 ## What's Changed
