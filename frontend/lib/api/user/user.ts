@@ -1,4 +1,3 @@
-import { Session } from "@supabase/auth-helpers-nextjs";
 import { AxiosInstance } from "axios";
 import { UUID } from "crypto";
 
@@ -56,13 +55,9 @@ export const getUser = async (
 ): Promise<UserStats> => (await axiosInstance.get<UserStats>("/user")).data;
 
 export const deleteUser = async (
-  axiosInstance: AxiosInstance,
-  userId: string,
-  session: Session
+  axiosInstance: AxiosInstance
 ): Promise<void> => {
-  if (session.user.id === userId) {
-    await axiosInstance.delete(`/user/${userId}`);
-  }
+  await axiosInstance.delete(`/user`);
 };
 
 export const getUserCredits = async (
