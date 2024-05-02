@@ -1,5 +1,45 @@
 # Changelog
 
+## 0.0.244 (2024-05-02)
+
+## What's Changed
+* fix: Update parsing instruction in common.py by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2531
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.243...v0.0.244
+
+## 0.0.243 (2024-05-01)
+
+## What's Changed
+* fix: Refactor chat_service.py and remove unused code by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2530
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.242...v0.0.243
+
+## 0.0.242 (2024-05-01)
+
+## What's Changed
+* feat(notifications): implemented notifications with RLS and realtime by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2525
+* chore: packages by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2527
+* Enable Porter Application production by @porter-deployment-app in https://github.com/QuivrHQ/quivr/pull/2528
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.241...v0.0.242
+
+## 0.0.241 (2024-05-01)
+
+## What's Changed
+* feat(llamaparse): Add Llama Parse integration for complex document parsing by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2517
+* Delete Porter Application quivr-back by @porter-deployment-app in https://github.com/QuivrHQ/quivr/pull/2519
+* Delete Porter Application quivr-demo-front by @porter-deployment-app in https://github.com/QuivrHQ/quivr/pull/2520
+* Enable Porter Application preview by @porter-deployment-app in https://github.com/QuivrHQ/quivr/pull/2521
+* Enable Porter Application preview-frontend by @porter-deployment-app in https://github.com/QuivrHQ/quivr/pull/2522
+* feat(frontend): citations & sources by @Zewed in https://github.com/QuivrHQ/quivr/pull/2523
+* Fix: citation handling in ChatItem component by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2524
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.240...v0.0.241
+
 ## 0.0.240 (2024-04-29)
 
 ## What's Changed

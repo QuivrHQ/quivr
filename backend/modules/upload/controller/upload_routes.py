@@ -13,16 +13,16 @@ from modules.brain.service.brain_authorization_service import (
 from modules.knowledge.dto.inputs import CreateKnowledgeProperties
 from modules.knowledge.service.knowledge_service import KnowledgeService
 from modules.notification.dto.inputs import (
-    CreateNotificationProperties,
+    CreateNotification,
     NotificationUpdatableProperties,
 )
 from modules.notification.entity.notification import NotificationsStatusEnum
 from modules.notification.service.notification_service import NotificationService
+from modules.upload.service.upload_file import upload_file_storage
 from modules.user.entity.user_identity import UserIdentity
 from modules.user.service.user_usage import UserUsage
 from packages.files.file import convert_bytes, get_file_size
 from packages.utils.telemetry import maybe_send_telemetry
-from modules.upload.service.upload_file import upload_file_storage
 
 logger = get_logger(__name__)
 upload_router = APIRouter()
@@ -52,6 +52,14 @@ async def upload_file(
         email=current_user.email,
     )
 
+    upload_notification = notification_service.add_notification(
+        CreateNotification(
+            user_id=current_user.id,
+            status=NotificationsStatusEnum.INFO,
+            title=f"Processing File {uploadFile.filename}",
+        )
+    )
+
     user_settings = user_daily_usage.get_user_settings()
 
     remaining_free_space = user_settings.get("max_brain_size", 1000000000)
@@ -60,15 +68,6 @@ async def upload_file(
     if remaining_free_space - file_size < 0:
         message = f"Brain will exceed maximum capacity. Maximum file allowed is : {convert_bytes(remaining_free_space)}"
         raise HTTPException(status_code=403, detail=message)
-    upload_notification = None
-    if chat_id:
-        upload_notification = notification_service.add_notification(
-            CreateNotificationProperties(
-                action="UPLOAD",
-                chat_id=chat_id,
-                status=NotificationsStatusEnum.Pending,
-            )
-        )
 
     file_content = await uploadFile.read()
 
@@ -79,16 +78,12 @@ async def upload_file(
 
     except Exception as e:
         print(e)
-        notification_message = {
-            "status": "error",
-            "message": "There was an error uploading the file. Please check the file and try again. If the issue persist, please open an issue on Github",
-            "name": uploadFile.filename if uploadFile else "Last Upload File",
-        }
+
         notification_service.update_notification_by_id(
             upload_notification.id if upload_notification else None,
             NotificationUpdatableProperties(
-                status=NotificationsStatusEnum.Done,
-                message=str(notification_message),
+                status=NotificationsStatusEnum.ERROR,
+                description=f"There was an error uploading the file: {e}",
             ),
         )
         if "The resource already exists" in str(e):
@@ -115,6 +110,6 @@ async def upload_file(
         file_name=filename_with_brain_id,
         file_original_name=uploadFile.filename,
         brain_id=brain_id,
-        notification_id=upload_notification.id if upload_notification else None,
+        notification_id=upload_notification.id,
     )
     return {"message": "File processing has started."}

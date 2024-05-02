@@ -66,6 +66,7 @@
             "configuring/increase-user-usage",
             "configuring/resend-emails",
             "configuring/reranking",
+            "configuring/llamaparse",
             "configuring/environment-variables",
             "configuring/profiler",
             "configuring/telemetry"
@@ -80,7 +81,8 @@
       "pages": [
         "deployment/porter",
         "deployment/aws",
-        "deployment/digital_ocean"
+        "deployment/digital_ocean",
+        "deployment/vercel"
       ]
     },
     {

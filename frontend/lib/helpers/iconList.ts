@@ -67,6 +67,8 @@ import {
   MdHistory,
   MdLink,
   MdOutlineModeEditOutline,
+  MdUnfoldLess,
+  MdUnfoldMore,
   MdUploadFile,
 } from "react-icons/md";
 import { PiOfficeChairFill } from "react-icons/pi";
@@ -103,6 +105,7 @@ export const iconList: { [name: string]: IconType } = {
   file: FaRegFileAlt,
   fileSelected: FaFileAlt,
   flag: CiFlag1,
+  fold: MdUnfoldLess,
   followUp: IoArrowUpCircleOutline,
   github: FaGithub,
   goal: LuGoal,
@@ -135,6 +138,7 @@ export const iconList: { [name: string]: IconType } = {
   thumbsDown: FaRegThumbsDown,
   thumbsUp: FaRegThumbsUp,
   twitter: FaTwitter,
+  unfold: MdUnfoldMore,
   unlock: FaUnlock,
   upload: FiUpload,
   uploadFile: MdUploadFile,

@@ -1,7 +1,5 @@
-from datetime import datetime, timedelta
-
 from logger import get_logger
-from modules.notification.dto.outputs import DeleteNotificationResponse
+from modules.notification.dto.inputs import CreateNotification
 from modules.notification.entity.notification import Notification
 from modules.notification.repository.notifications_interface import (
     NotificationInterface,
@@ -14,12 +12,12 @@ class Notifications(NotificationInterface):
     def __init__(self, supabase_client):
         self.db = supabase_client
 
-    def add_notification(self, notification):
+    def add_notification(self, notification: CreateNotification):
         """
         Add a notification
         """
         response = (
-            self.db.from_("notifications").insert(notification.dict()).execute()
+            self.db.from_("notifications").insert(notification.model_dump()).execute()
         ).data
         return Notification(**response[0])
 
@@ -35,7 +33,7 @@ class Notifications(NotificationInterface):
         """Update a notification by id"""
         response = (
             self.db.from_("notifications")
-            .update(notification.dict(exclude_unset=True))
+            .update(notification.model_dump(exclude_unset=True))
             .filter("id", "eq", notification_id)
             .execute()
         ).data
@@ -67,42 +65,4 @@ class Notifications(NotificationInterface):
             logger.info(f"Notification with id {notification_id} not found")
             return None
 
-        return DeleteNotificationResponse(
-            status="deleted", notification_id=notification_id
-        )
-
-    def remove_notifications_by_chat_id(self, chat_id):
-        """
-        Remove all notifications for a chat
-        Args:
-            chat_id (UUID): The id of the chat
-        """
-        (
-            self.db.from_("notifications")
-            .delete()
-            .filter("chat_id", "eq", chat_id)
-            .execute()
-        ).data
-
-    def get_notifications_by_chat_id(self, chat_id):
-        """
-        Get all notifications for a chat
-        Args:
-            chat_id (UUID): The id of the chat
-
-        Returns:
-            list[Notification]: The notifications
-        """
-        five_minutes_ago = (datetime.now() - timedelta(minutes=5)).strftime(
-            "%Y-%m-%d %H:%M:%S.%f"
-        )
-
-        notifications = (
-            self.db.from_("notifications")
-            .select("*")
-            .filter("chat_id", "eq", chat_id)
-            .filter("datetime", "gt", five_minutes_ago)
-            .execute()
-        ).data
-
-        return [Notification(**notification) for notification in notifications]
+        return {"status": "success"}

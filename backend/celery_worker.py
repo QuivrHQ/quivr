@@ -72,16 +72,12 @@ def process_file_and_notify(
             os.remove(tmp_file_name)
 
             if notification_id:
-                notification_message = {
-                    "status": message["type"],
-                    "message": message["message"],
-                    "name": file_instance.file.filename if file_instance.file else "",
-                }
+
                 notification_service.update_notification_by_id(
                     notification_id,
                     NotificationUpdatableProperties(
-                        status=NotificationsStatusEnum.Done,
-                        message=str(notification_message),
+                        status=NotificationsStatusEnum.SUCCESS,
+                        description="Your file has been properly uploaded!",
                     ),
                 )
             brain_service.update_brain_last_update_time(brain_id)
@@ -91,19 +87,14 @@ def process_file_and_notify(
         logger.error("TimeoutError")
 
     except Exception as e:
-        notification_message = {
-            "status": "error",
-            "message": "There was an error uploading the file. Please check the file and try again. If the issue persist, please open an issue on Github",
-            "name": file_instance.file.filename if file_instance.file else "",
-        }
         notification_service.update_notification_by_id(
             notification_id,
             NotificationUpdatableProperties(
-                status=NotificationsStatusEnum.Done,
-                message=str(notification_message),
+                status=NotificationsStatusEnum.ERROR,
+                description=f"An error occurred while processing the file: {e}",
             ),
         )
-        raise e
+        return False
 
 
 @celery.task(name="process_crawl_and_notify")
@@ -145,16 +136,11 @@ def process_crawl_and_notify(
         )
 
     if notification_id:
-        notification_message = {
-            "status": message["type"],
-            "message": message["message"],
-            "name": crawl_website_url,
-        }
         notification_service.update_notification_by_id(
             notification_id,
             NotificationUpdatableProperties(
-                status=NotificationsStatusEnum.Done,
-                message=str(notification_message),
+                status=NotificationsStatusEnum.SUCCESS,
+                description="Your file has been properly uploaded!",
             ),
         )
     brain_service.update_brain_last_update_time(brain_id)
