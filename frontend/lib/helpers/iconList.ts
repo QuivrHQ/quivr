@@ -33,6 +33,7 @@ import { HiBuildingOffice } from "react-icons/hi2";
 import {
   IoIosAdd,
   IoIosHelpCircleOutline,
+  IoIosNotifications,
   IoIosRadio,
   IoMdClose,
   IoMdLogOut,
@@ -121,6 +122,7 @@ export const iconList: { [name: string]: IconType } = {
   loader: AiOutlineLoading3Quarters,
   logout: IoMdLogOut,
   moon: FaMoon,
+  notification: IoIosNotifications,
   office: HiBuildingOffice,
   options: SlOptions,
   paragraph: BsTextParagraph,

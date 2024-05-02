@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 
 import { useUserApi } from "@/lib/api/user/useUserApi";
 import { useMenuContext } from "@/lib/context/MenuProvider/hooks/useMenuContext";
+import { useSupabase } from "@/lib/context/SupabaseProvider";
 import { useUserSettingsContext } from "@/lib/context/UserSettingsProvider/hooks/useUserSettingsContext";
 import { ButtonType } from "@/lib/types/QuivrButton";
 
@@ -26,6 +27,7 @@ export const PageHeader = ({
   const [lightModeIconName, setLightModeIconName] = useState("sun");
   const { remainingCredits, setRemainingCredits } = useUserSettingsContext();
   const { getUserCredits } = useUserApi();
+  const { supabase } = useSupabase();
 
   const toggleTheme = () => {
     setIsDarkMode(!isDarkMode);
@@ -39,6 +41,14 @@ export const PageHeader = ({
     void (async () => {
       const res = await getUserCredits();
       setRemainingCredits(res);
+      void (async () => {
+        try {
+          const res = await supabase.from("notifications").select();
+          console.info(res);
+        } catch (error) {
+          console.error(error);
+        }
+      })();
     })();
   }, []);
 
