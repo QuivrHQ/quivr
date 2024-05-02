@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.0.244 (2024-05-02)
+
+## What's Changed
+* fix: Update parsing instruction in common.py by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2531
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.243...v0.0.244
+
 ## 0.0.243 (2024-05-01)
 
 ## What's Changed
