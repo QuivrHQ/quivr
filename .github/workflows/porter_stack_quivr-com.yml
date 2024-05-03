@@ -1,7 +1,7 @@
-on:
+"on":
   push:
-    tags:
-      - "v*"
+    branches:
+    - main
 name: Deploy to quivr-com
 jobs:
   porter-deploy:
