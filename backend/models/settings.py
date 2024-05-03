@@ -134,7 +134,7 @@ def get_pg_database_engine():
     if _db_engine is None:
         logger.info("Creating Postgres DB engine")
         settings = BrainSettings()  # pyright: ignore reportPrivateUsage=none
-        _db_engine = create_engine(settings.pg_database_url)
+        _db_engine = create_engine(settings.pg_database_url, pool_pre_ping=True)
     return _db_engine
 
 
