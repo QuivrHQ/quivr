@@ -43,7 +43,7 @@ async def process_file(
 
             parser = LlamaParse(
                 result_type="markdown",  # "markdown" and "text" are available
-                parsing_instruction="The document might contain checkboxes, tables and others elements hard to parse. Find a way to parse them in a meaningful way. ",
+                parsing_instruction="Try to extract the tables and checkboxes. Transform tables to key = value. You can duplicates Keys if needed. For example: Productions Fonts = 300 productions Fonts Company Desktop License = Yes for Maximum of 60 Licensed Desktop users For example checkboxes should be: Premium Activated = Yes License Premier = No If a checkbox is present for a table with multiple options.  Say Yes for the one activated and no for the one not activated",
             )
 
             document_llama_parsed = parser.load_data(document_tmp.name)
