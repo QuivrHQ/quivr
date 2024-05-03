@@ -4,6 +4,7 @@ from modules.brain.entity.brain_entity import BrainType, RoleEnum
 from modules.brain.integrations.Big.Brain import BigBrain
 from modules.brain.integrations.GPT4.Brain import GPT4Brain
 from modules.brain.integrations.Notion.Brain import NotionBrain
+from modules.brain.integrations.Proxy.Brain import ProxyBrain
 from modules.brain.integrations.SQL.Brain import SQLBrain
 from modules.brain.knowledge_brain_qa import KnowledgeBrainQA
 from modules.brain.service.api_brain_definition_service import ApiBrainDefinitionService
@@ -41,6 +42,7 @@ integration_list = {
     "sql": SQLBrain,
     "big": BigBrain,
     "doc": KnowledgeBrainQA,
+    "proxy": ProxyBrain,
 }
 
 brain_service = BrainService()
