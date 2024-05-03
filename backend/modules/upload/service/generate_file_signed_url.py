@@ -10,7 +10,7 @@ SIGNED_URL_EXPIRATION_PERIOD_IN_SECONDS = 3600
 
 def generate_file_signed_url(path):
     supabase_client: Client = get_supabase_client()
-
+    response = None
     try:
         response = supabase_client.storage.from_("quivr").create_signed_url(
             path,
@@ -24,3 +24,5 @@ def generate_file_signed_url(path):
         return response
     except Exception as e:
         logger.error(e)
+        
+    return response
