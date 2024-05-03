@@ -35,6 +35,16 @@ chat_service = ChatService()
 
 
 def is_valid_uuid(uuid_to_test, version=4):
+    """
+    Check if a given string is a valid UUID.
+
+    Args:
+        uuid_to_test (str): The string to be checked.
+        version (int, optional): The version of UUID to be checked against. Defaults to 4.
+
+    Returns:
+        bool: True if the string is a valid UUID, False otherwise.
+    """
     try:
         uuid_obj = UUID(uuid_to_test, version=version)
     except ValueError:
@@ -43,13 +53,42 @@ def is_valid_uuid(uuid_to_test, version=4):
     return str(uuid_obj) == uuid_to_test
 
 def filter_documents(documents, citations):
-    """Filter documents based on provided citations."""
+    """
+    Filter documents based on provided citations.
+    
+    Args:
+        documents (list): The list of documents to be filtered.
+        citations (list): The list of indices of the documents to be included in the filtered list.
+        
+    Returns:
+        list: The filtered list of documents.
+    """
     if citations is None:
         return documents
     return [doc for index, doc in enumerate(documents) if index in citations]
 
 def get_or_generate_url(doc, brain_id, url_cache):
-    """Retrieve or generate a new URL for the given document."""
+    """
+    Retrieve or generate a new URL for the given document.
+
+    Args:
+        doc (dict): The document for which to retrieve or generate a URL.
+        brain_id (str): The ID of the brain containing the document.
+        url_cache (dict): A dictionary to cache previously generated URLs.
+
+    Returns:
+        str: The URL for the given document. If a URL is already cached for the document, it is retrieved from the cache. Otherwise, a new URL is generated or retrieved from the `generate_file_signed_url` function, and it is stored in the cache before returning.
+
+    Note:
+        - The `doc` parameter is expected to be a dictionary with the following keys:
+            - `file_name` (str): The name of the document file.
+            - `is_url` (bool): Indicates whether the document is a URL or not.
+            - `original_file_name` (str, optional): The original URL of the document if it is a URL.
+        - If the `doc` parameter is a URL document, the `original_file_name` key is used as the source URL.
+        - If the `doc` parameter is not a URL document, the `generate_file_signed_url` function is called to generate a signed URL for the document. If a URL is successfully generated, it is used as the source URL. Otherwise, an empty string is used.
+        - The generated or retrieved URL is stored in the `url_cache` dictionary for future retrieval.
+
+    """
     file_path = f"{brain_id}/{doc['file_name']}"
     if file_path in url_cache:
         return url_cache[file_path]
@@ -64,7 +103,21 @@ def get_or_generate_url(doc, brain_id, url_cache):
     return source_url
 
 def create_source_object(doc, source_type, source_url):
-    """Create and return a Sources object for the given document."""
+    """
+    Create and return a Sources object for the given document.
+
+    Parameters:
+        doc (dict): The document for which to create the Sources object. It should have the following keys:
+            - 'file_name' (str): The name of the document file.
+            - 'original_file_name' (str, optional): The original URL of the document if it is a URL.
+            - 'page_content' (str): The content of the document page.
+        source_type (str): The type of the source. It should be either 'file' or 'url'.
+        source_url (str): The URL of the source.
+
+    Returns:
+        Sources: The created Sources object.
+
+    """
     return Sources(
         name=doc['file_name'],
         type=source_type,
@@ -75,8 +128,25 @@ def create_source_object(doc, source_type, source_url):
 
 def generate_source(source_documents, brain_id, citations: List[int] = None):
     """
-    Generate the sources list for the answer
-    It takes in a list of sources documents and citations that points to the docs index that was used in the answer
+    Generate a list of Sources objects based on the given source documents and brain ID.
+
+    Parameters:
+        source_documents (list): A list of source documents. Each document should be a dictionary with the following keys:
+            - 'file_name' (str): The name of the document file.
+            - 'original_file_name' (str, optional): The original URL of the document if it is a URL.
+            - 'page_content' (str): The content of the document page.
+            - 'is_url' (bool): Indicates whether the document is a URL.
+        brain_id (str): The ID of the brain.
+        citations (list[int], optional): A list of citation indices to filter the source documents. Defaults to None.
+
+    Returns:
+        list[Sources]: A list of Sources objects representing the generated sources. Each Sources object has the following attributes:
+            - name (str): The name of the source.
+            - type (str): The type of the source. It is either 'file' or 'url'.
+            - source_url (str): The URL of the source.
+            - original_file_name (str): The original file name of the source. It is empty if the source is a URL.
+            - citation (str): The citation of the source.
+
     """
     # Initialize an empty list for sources
     sources_list: List[Sources] = []
