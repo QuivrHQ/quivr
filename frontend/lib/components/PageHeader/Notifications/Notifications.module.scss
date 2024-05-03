@@ -1,0 +1,22 @@
+@use "@/styles/Radius.module.scss";
+@use "@/styles/Spacings.module.scss";
+@use "@/styles/Typography.module.scss";
+
+.notifications_wrapper {
+  position: relative;
+
+  .badge {
+    position: absolute;
+    color: var(--white-0);
+    background-color: var(--accent);
+    border-radius: Radius.$circle;
+    width: 14px;
+    height: 14px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: Typography.$very_tiny;
+    top: -(Spacings.$spacing02);
+    right: -(Spacings.$spacing01);
+  }
+}

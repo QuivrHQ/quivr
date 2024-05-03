@@ -122,7 +122,7 @@ export const iconList: { [name: string]: IconType } = {
   loader: AiOutlineLoading3Quarters,
   logout: IoMdLogOut,
   moon: FaMoon,
-  notification: IoIosNotifications,
+  notifications: IoIosNotifications,
   office: HiBuildingOffice,
   options: SlOptions,
   paragraph: BsTextParagraph,
