@@ -291,107 +291,122 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
 
         return user_choosen_model_price
 
-    def generate_answer(
-        self, chat_id: UUID, question: ChatQuestion, save_answer: bool = True
-    ) -> GetChatHistoryOutput:
-        conversational_qa_chain = self.knowledge_qa.get_chain()
-        transformed_history, streamed_chat_history = (
-            self.initialize_streamed_chat_history(chat_id, question)
-        )
+    def generate_answer(self, chat_id: UUID, question: ChatQuestion, save_answer: bool = True) -> GetChatHistoryOutput:
+        """
+        Generates an answer for a given question using a conversational QA chain,
+        and returns the updated chat history with the generated answer.
+        """
+        qa_chain = self.knowledge_qa.get_chain()
+        transformed_history, metadata = self.prepare_for_answer_generation(chat_id, question)
+
+        model_response = self.invoke_qa_chain(qa_chain, question, transformed_history)
+        answer, citations = self.process_model_response(model_response)
+        
+        metadata.update(self.handle_sources(model_response["docs"], citations))
+        return self.finalize_answer(chat_id, question, answer, metadata, save_answer)
+
+    def prepare_for_answer_generation(self, chat_id: UUID, question: ChatQuestion):
+        """
+        Prepares necessary data transformations and metadata setup before generating an answer.
+        """
+        transformed_history, _ = self.initialize_streamed_chat_history(chat_id, question)
         metadata = self.metadata or {}
-        citations = None
-        answer = ""
-        model_response = conversational_qa_chain.invoke(
-            {
-                "question": question.question,
-                "chat_history": transformed_history,
-                "custom_personality": (
-                    self.prompt_to_use.content if self.prompt_to_use else None
-                ),
-            }
-        )
+        return transformed_history, metadata
 
+    def invoke_qa_chain(self, qa_chain, question, transformed_history):
+        """
+        Invokes the QA chain with the required context and returns the model's response.
+        """
+        return qa_chain.invoke({
+            "question": question.question,
+            "chat_history": transformed_history,
+            "custom_personality": (self.prompt_to_use.content if self.prompt_to_use else None),
+        })
+
+    def process_model_response(self, model_response):
+        """
+        Processes the raw response from the model, extracting the answer and any citations.
+        """
         if self.model_compatible_with_function_calling(model=self.model):
-            if model_response["answer"].tool_calls:
-                citations = model_response["answer"].tool_calls[-1]["args"]["citations"]
-                if citations:
-                    citations = citations
-                answer = model_response["answer"].tool_calls[-1]["args"]["answer"]
+            answer = model_response.get("answer", {}).get("tool_calls", [{}])[-1].get("args", {}).get("answer", "")
+            citations = model_response.get("answer", {}).get("tool_calls", [{}])[-1].get("args", {}).get("citations", [])
         else:
-            answer = model_response["answer"].content
-        sources = model_response["docs"] or []
-        if len(sources) > 0:
-            sources_list = generate_source(sources, self.brain_id, citations=citations)
-            serialized_sources_list = [source.dict() for source in sources_list]
-            metadata["sources"] = serialized_sources_list
+            answer = model_response.get("answer", {}).get("content", "")
+            citations = []
+        return answer, citations
 
+    def handle_sources(self, docs, citations):
+        """
+        Handles the processing of documents to generate serialized sources list.
+        """
+        if docs:
+            sources_list = generate_source(docs, self.brain_id, citations)
+            return {"sources": [source.dict() for source in sources_list]}
+        return {}
+
+    def finalize_answer(self, chat_id, question, answer, metadata, save_answer):
+        """
+        Finalizes the chat history update with the answer and any associated metadata.
+        """
         return self.save_non_streaming_answer(
-            chat_id=chat_id, question=question, answer=answer, metadata=metadata
+            chat_id=chat_id,
+            question=question,
+            answer=answer,
+            metadata=metadata,
+            save_answer=save_answer
         )
+    
+    async def generate_stream(self, chat_id: UUID, question: ChatQuestion, save_answer: bool = True) -> AsyncIterable:
+        qa_chain = self.knowledge_qa.get_chain()
+        transformed_history, streamed_chat_history = self.initialize_streamed_chat_history(chat_id, question)
 
-    async def generate_stream(
-        self, chat_id: UUID, question: ChatQuestion, save_answer: bool = True
-    ) -> AsyncIterable:
-        conversational_qa_chain = self.knowledge_qa.get_chain()
-        transformed_history, streamed_chat_history = (
-            self.initialize_streamed_chat_history(chat_id, question)
-        )
-        response_tokens = ""
-        sources = []
-        citations = []
-        first = True
-        async for chunk in conversational_qa_chain.astream(
-            {
-                "question": question.question,
-                "chat_history": transformed_history,
-                "custom_personality": (
-                    self.prompt_to_use.content if self.prompt_to_use else None
-                ),
-            }
-        ):
-            if not streamed_chat_history.metadata:
-                streamed_chat_history.metadata = {}
-            if self.model_compatible_with_function_calling(model=self.model):
-                if chunk.get("answer"):
-                    if first:
-                        gathered = chunk["answer"]
-                        first = False
-                    else:
-                        gathered = gathered + chunk["answer"]
-                        if (
-                            gathered.tool_calls
-                            and gathered.tool_calls[-1].get("args")
-                            and "answer" in gathered.tool_calls[-1]["args"]
-                        ):
-                            # Only send the difference between answer and response_tokens which was the previous answer
-                            answer = gathered.tool_calls[-1]["args"]["answer"]
-                            difference = answer[len(response_tokens) :]
-                            streamed_chat_history.assistant = difference
-                            response_tokens = answer
+        async for chunk in qa_chain.astream({
+            "question": question.question,
+            "chat_history": transformed_history,
+            "custom_personality": self.prompt_to_use.content if self.prompt_to_use else None
+        }):
+            await self.process_stream_chunk(chunk, streamed_chat_history, question)
 
-                            yield f"data: {json.dumps(streamed_chat_history.dict())}"
-                        if (
-                            gathered.tool_calls
-                            and gathered.tool_calls[-1].get("args")
-                            and "citations" in gathered.tool_calls[-1]["args"]
-                        ):
-                            citations = gathered.tool_calls[-1]["args"]["citations"]
-            else:
-                if chunk.get("answer"):
-                    response_tokens += chunk["answer"].content
-                    streamed_chat_history.assistant = chunk["answer"].content
-                    yield f"data: {json.dumps(streamed_chat_history.dict())}"
+        await self.finalize_streaming(streamed_chat_history, save_answer)
+    async def process_stream_chunk(self, chunk, streamed_chat_history, question):
+        self.update_stream_metadata_if_needed(streamed_chat_history)
+        answer, response_tokens = self.extract_answer_from_chunk(chunk, streamed_chat_history.assistant)
+        if answer:
+            streamed_chat_history.assistant = answer
+            yield self.format_stream_output(streamed_chat_history)
+        if 'docs' in chunk:
+            await self.handle_documentation(chunk['docs'], streamed_chat_history.metadata)
 
-            if chunk.get("docs"):
-                sources = chunk["docs"]
+    def update_stream_metadata_if_needed(self, streamed_chat_history):
+        """Ensure that metadata is initialized."""
+        if not streamed_chat_history.metadata:
+            streamed_chat_history.metadata = {}
 
-        sources_list = generate_source(sources, self.brain_id, citations)
+    def extract_answer_from_chunk(self, chunk, previous_tokens):
+        """Extract and process the answer from the current chunk."""
+        if chunk.get("answer"):
+            new_tokens = chunk["answer"].content
+            return new_tokens, previous_tokens + new_tokens
+        return None, previous_tokens
 
-        # Serialize the sources list
+    async def handle_documentation(self, docs, metadata):
+        """Handle the documentation associated with answers."""
+        sources_list = generate_source(docs, self.brain_id, self.extract_citations(docs))
         serialized_sources_list = [source.dict() for source in sources_list]
-        streamed_chat_history.metadata["sources"] = serialized_sources_list
-        yield f"data: {json.dumps(streamed_chat_history.dict())}"
-        self.save_answer(question, response_tokens, streamed_chat_history, save_answer)
+        metadata["sources"] = serialized_sources_list
+
+    def extract_citations(self, docs):
+        """Extract citation data from documents if available."""
+        return [doc.get('citation') for doc in docs if 'citation' in doc]
+
+    async def finalize_streaming(self, streamed_chat_history, save_answer):
+        """Final actions to conclude streaming, such as saving answers."""
+        if save_answer:
+            self.save_answer(streamed_chat_history.question, streamed_chat_history.assistant, streamed_chat_history, save_answer)
+
+    def format_stream_output(self, streamed_chat_history):
+        """Format the streamed output for transmission."""
+        return f"data: {json.dumps(streamed_chat_history.dict())}"
 
     def initialize_streamed_chat_history(self, chat_id, question):
         history = chat_service.get_chat_history(self.chat_id)
