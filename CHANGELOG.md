@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.0.245 (2024-05-03)
+
+## What's Changed
+* feat(user): Delete User Data from frontend by @Zewed in https://github.com/QuivrHQ/quivr/pull/2476
+* feat(backend): Add a pre_pring on Connection polling to handle disconnection by @dmourot in https://github.com/QuivrHQ/quivr/pull/2534
+* feat(llama-parse): improve prompt by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2535
+* feat(brain): Add ProxyBrain integration by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2536
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.244...v0.0.245
+
 ## 0.0.244 (2024-05-02)
 
 ## What's Changed
