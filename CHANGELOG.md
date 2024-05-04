@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.0.246 (2024-05-04)
+
+## What's Changed
+* Enable Porter Application theodo-backend by @porter-deployment-app in https://github.com/QuivrHQ/quivr/pull/2537
+* Enable Porter Application theodo-frontend by @porter-deployment-app in https://github.com/QuivrHQ/quivr/pull/2538
+* Add config parameter to conversational_qa_chain by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2540
+* feat(notion): update doc by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2542
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.245...v0.0.246
+
 ## 0.0.245 (2024-05-03)
 
 ## What's Changed
