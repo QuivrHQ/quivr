@@ -19,7 +19,7 @@ async def process_audio(
     documents_vector_store = get_documents_vector_store()
 
     try:
-        upload_file = file.file
+        upload_file = file.upload_file
         with tempfile.NamedTemporaryFile(
             delete=False,
             suffix=upload_file.filename,  # pyright: ignore reportPrivateUsage=none

@@ -19,7 +19,7 @@ nest_asyncio.apply()
 logger = get_logger(__name__)
 
 
-async def process_file(
+def process_file(
     file: File,
     loader_class,
     brain_id,

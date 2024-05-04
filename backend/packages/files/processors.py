@@ -1,4 +1,3 @@
-from fastapi import HTTPException
 from modules.brain.service.brain_service import BrainService
 
 from .parsers.audio import process_audio
@@ -52,16 +51,14 @@ brain_service = BrainService()
 
 
 # TODO: Move filter_file to a file service to avoid circular imports from models/files.py for File class
-async def filter_file(
+def filter_file(
     file,
     brain_id,
     original_file_name=None,
 ):
-    await file.compute_file_sha1()
-
     file_exists = file.file_already_exists()
     file_exists_in_brain = file.file_already_exists_in_brain(brain_id)
-    using_file_name = original_file_name or file.file.filename if file.file else ""
+    using_file_name = file.file_name
 
     brain = brain_service.get_brain_by_id(brain_id)
     if brain is None:
@@ -86,7 +83,7 @@ async def filter_file(
 
     if file.file_extension in file_processors:
         try:
-            result = await file_processors[file.file_extension](
+            result = file_processors[file.file_extension](
                 file=file,
                 brain_id=brain_id,
                 original_file_name=original_file_name,

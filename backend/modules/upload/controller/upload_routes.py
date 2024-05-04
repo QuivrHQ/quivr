@@ -74,7 +74,7 @@ async def upload_file(
     filename_with_brain_id = str(brain_id) + "/" + str(uploadFile.filename)
 
     try:
-        file_in_storage = upload_file_storage(file_content, filename_with_brain_id)
+        upload_file_storage(file_content, filename_with_brain_id)
 
     except Exception as e:
         print(e)
@@ -104,7 +104,7 @@ async def upload_file(
         )[-1].lower(),
     )
 
-    added_knowledge = knowledge_service.add_knowledge(knowledge_to_add)
+    knowledge_service.add_knowledge(knowledge_to_add)
 
     process_file_and_notify.delay(
         file_name=filename_with_brain_id,
