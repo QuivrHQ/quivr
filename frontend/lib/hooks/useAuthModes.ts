@@ -4,9 +4,6 @@ export const useAuthModes = () => {
     "password",
   ];
 
-  console.log('Environment Variable NEXT_PUBLIC_AUTH_MODES:', process.env.NEXT_PUBLIC_AUTH_MODES);
-  console.log('authModes:', authModes);
-
   return {
     magicLink: authModes.includes("magic_link"),
     password: authModes.includes("password"),

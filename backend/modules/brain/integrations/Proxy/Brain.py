@@ -55,6 +55,7 @@ class ProxyBrain(KnowledgeBrainQA):
             self.initialize_streamed_chat_history(chat_id, question)
         )
         response_tokens = []
+        config = {"metadata": {"conversation_id": str(chat_id)}}
 
         async for chunk in conversational_qa_chain.astream(
             {
@@ -63,7 +64,8 @@ class ProxyBrain(KnowledgeBrainQA):
                 "custom_personality": (
                     self.prompt_to_use.content if self.prompt_to_use else None
                 ),
-            }
+            },
+            config=config,
         ):
             response_tokens.append(chunk.content)
             streamed_chat_history.assistant = chunk.content
@@ -78,6 +80,7 @@ class ProxyBrain(KnowledgeBrainQA):
         transformed_history, streamed_chat_history = (
             self.initialize_streamed_chat_history(chat_id, question)
         )
+        config = {"metadata": {"conversation_id": str(chat_id)}}
         model_response = conversational_qa_chain.invoke(
             {
                 "question": question.question,
@@ -85,7 +88,8 @@ class ProxyBrain(KnowledgeBrainQA):
                 "custom_personality": (
                     self.prompt_to_use.content if self.prompt_to_use else None
                 ),
-            }
+            },
+            config=config,
         )
 
         answer = model_response.content
