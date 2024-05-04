@@ -15,9 +15,8 @@ logger = get_logger(__name__)
 chat_service = ChatService()
 
 
-class GPT4Brain(KnowledgeBrainQA):
-    """This is the Notion brain class. it is a KnowledgeBrainQA has the data is stored locally.
-    It is going to call the Data Store internally to get the data.
+class ProxyBrain(KnowledgeBrainQA):
+    """This is the Proxy brain class.
 
     Args:
         KnowledgeBrainQA (_type_): A brain that store the knowledge internaly
@@ -31,25 +30,20 @@ class GPT4Brain(KnowledgeBrainQA):
             **kwargs,
         )
 
-    def calculate_pricing(self):
-        return 3
-
     def get_chain(self):
 
         prompt = ChatPromptTemplate.from_messages(
             [
                 (
                     "system",
-                    "You are GPT-4 powered by Quivr. You are an assistant. {custom_personality}",
+                    "You are Quivr. You are an assistant. {custom_personality}",
                 ),
                 MessagesPlaceholder(variable_name="chat_history"),
                 ("human", "{question}"),
             ]
         )
 
-        chain = prompt | ChatLiteLLM(
-            model="gpt-4-0125-preview", max_tokens=self.max_tokens
-        )
+        chain = prompt | ChatLiteLLM(model=self.model, max_tokens=self.max_tokens)
 
         return chain
 
@@ -86,6 +80,7 @@ class GPT4Brain(KnowledgeBrainQA):
         transformed_history, streamed_chat_history = (
             self.initialize_streamed_chat_history(chat_id, question)
         )
+        config = {"metadata": {"conversation_id": str(chat_id)}}
         model_response = conversational_qa_chain.invoke(
             {
                 "question": question.question,
@@ -93,7 +88,8 @@ class GPT4Brain(KnowledgeBrainQA):
                 "custom_personality": (
                     self.prompt_to_use.content if self.prompt_to_use else None
                 ),
-            }
+            },
+            config=config,
         )
 
         answer = model_response.content
