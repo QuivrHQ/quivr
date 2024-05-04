@@ -498,7 +498,6 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
         answer, response_tokens = self.extract_answer_from_chunk(chunk, streamed_chat_history.assistant)
         if answer:
             streamed_chat_history.assistant = answer
-            yield self.format_stream_output(streamed_chat_history)
         if 'docs' in chunk:
             await self.handle_documentation(chunk['docs'], streamed_chat_history.metadata)
 
