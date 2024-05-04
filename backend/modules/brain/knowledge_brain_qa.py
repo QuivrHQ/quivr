@@ -255,6 +255,8 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
         metadata = self.metadata or {}
         citations = None
         answer = ""
+        config = {"metadata": {"conversation_id": str(chat_id)}}
+
         model_response = conversational_qa_chain.invoke(
             {
                 "question": question.question,
@@ -262,7 +264,8 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
                 "custom_personality": (
                     self.prompt_to_use.content if self.prompt_to_use else None
                 ),
-            }
+            },
+            config=config,
         )
 
         if self.model_compatible_with_function_calling(model=self.model):
@@ -294,6 +297,8 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
         sources = []
         citations = []
         first = True
+        config = {"metadata": {"conversation_id": str(chat_id)}}
+
         async for chunk in conversational_qa_chain.astream(
             {
                 "question": question.question,
@@ -301,7 +306,8 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
                 "custom_personality": (
                     self.prompt_to_use.content if self.prompt_to_use else None
                 ),
-            }
+            },
+            config=config,
         ):
             if not streamed_chat_history.metadata:
                 streamed_chat_history.metadata = {}

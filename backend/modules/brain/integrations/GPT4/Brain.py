@@ -61,6 +61,7 @@ class GPT4Brain(KnowledgeBrainQA):
             self.initialize_streamed_chat_history(chat_id, question)
         )
         response_tokens = []
+        config = {"metadata": {"conversation_id": str(chat_id)}}
 
         async for chunk in conversational_qa_chain.astream(
             {
@@ -69,7 +70,8 @@ class GPT4Brain(KnowledgeBrainQA):
                 "custom_personality": (
                     self.prompt_to_use.content if self.prompt_to_use else None
                 ),
-            }
+            },
+            config=config,
         ):
             response_tokens.append(chunk.content)
             streamed_chat_history.assistant = chunk.content
