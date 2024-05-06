@@ -17,7 +17,6 @@ export const Notifications = (): JSX.Element => {
     void (async () => {
       try {
         const notifs = (await supabase.from("notifications").select()).data;
-        console.info("Notifications", notifs);
         setNotifications(notifs ?? []);
       } catch (error) {
         console.error(error);

@@ -6,7 +6,7 @@ export enum NotificationStatus {
 }
 
 export interface NotificationType {
-  id: number;
+  id: string;
   title: string;
   datetime: string;
   status: NotificationStatus;
