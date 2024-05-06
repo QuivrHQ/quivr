@@ -70,21 +70,28 @@ export const Notifications = (): JSX.Element => {
       {panelOpened && (
         <div className={styles.notifications_panel}>
           <div className={styles.notifications_panel_header}>
-            <span>Notifications</span>
+            <span className={styles.title}>Notifications</span>
             <div className={styles.buttons}>
               <TextButton
                 label="Mark all as read"
                 color="black"
                 onClick={() => void markAllAsRead()}
+                disabled={unreadNotifications === 0}
               />
               <span>|</span>
               <TextButton
                 label="Delete all"
                 color="black"
                 onClick={() => void deleteAllNotifications()}
+                disabled={notifications.length === 0}
               />
             </div>
           </div>
+          {notifications.length === 0 && (
+            <div className={styles.no_notifications}>
+              You have no notifications
+            </div>
+          )}
           {notifications.map((notification, i) => (
             <Notification
               key={i}

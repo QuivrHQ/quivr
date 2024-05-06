@@ -10,11 +10,17 @@ interface TextButtonProps {
   label: string;
   color: Color;
   onClick?: () => void;
+  disabled?: boolean;
 }
 
 export const TextButton = (props: TextButtonProps): JSX.Element => {
   return (
-    <div className={styles.text_button_wrapper} onClick={props.onClick}>
+    <div
+      className={`${styles.text_button_wrapper} ${
+        props.disabled ? styles.disabled : ""
+      }`}
+      onClick={props.onClick}
+    >
       {!!props.iconName && (
         <Icon name={props.iconName} size="normal" color={props.color} />
       )}
