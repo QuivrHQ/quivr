@@ -51,6 +51,23 @@ export const Notifications = (): JSX.Element => {
   };
 
   useEffect(() => {
+    const channel = supabase
+      .channel("notifications")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "notifications" },
+        () => {
+          void updateNotifications();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      void supabase.removeChannel(channel);
+    };
+  }, []);
+
+  useEffect(() => {
     void (async () => {
       await updateNotifications();
     })();
