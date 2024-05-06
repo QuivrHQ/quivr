@@ -44,11 +44,33 @@ export const Notifications = (): JSX.Element => {
     for (const notification of notifications) {
       await supabase
         .from("notifications")
-        .update({ read: !notification.read })
+        .update({ read: true })
         .eq("id", notification.id);
     }
     await updateNotifications();
   };
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as Node;
+      const panel = document.getElementById("notifications-panel");
+      const bell = document.getElementById("notifications-bell");
+
+      if (bell?.contains(target)) {
+        return;
+      }
+
+      if (!panel?.contains(target)) {
+        setPanelOpened(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   useEffect(() => {
     const channel = supabase
@@ -75,7 +97,7 @@ export const Notifications = (): JSX.Element => {
 
   return (
     <div className={styles.notifications_wrapper}>
-      <div onClick={() => setPanelOpened(!panelOpened)}>
+      <div id="notifications-bell" onClick={() => setPanelOpened(!panelOpened)}>
         <Icon
           name="notifications"
           size="large"
@@ -85,7 +107,7 @@ export const Notifications = (): JSX.Element => {
         <span className={styles.badge}>{unreadNotifications}</span>
       </div>
       {panelOpened && (
-        <div className={styles.notifications_panel}>
+        <div id="notifications-panel" className={styles.notifications_panel}>
           <div className={styles.notifications_panel_header}>
             <span className={styles.title}>Notifications</span>
             <div className={styles.buttons}>
