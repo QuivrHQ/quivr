@@ -54,11 +54,6 @@ export const Notifications = (): JSX.Element => {
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as Node;
       const panel = document.getElementById("notifications-panel");
-      const bell = document.getElementById("notifications-bell");
-
-      if (bell?.contains(target)) {
-        return;
-      }
 
       if (!panel?.contains(target)) {
         setPanelOpened(false);
@@ -96,8 +91,13 @@ export const Notifications = (): JSX.Element => {
   }, []);
 
   return (
-    <div className={styles.notifications_wrapper}>
-      <div id="notifications-bell" onClick={() => setPanelOpened(!panelOpened)}>
+    <div id="notifications-panel" className={styles.notifications_wrapper}>
+      <div
+        onClick={(event) => {
+          setPanelOpened(!panelOpened);
+          event.nativeEvent.stopImmediatePropagation();
+        }}
+      >
         <Icon
           name="notifications"
           size="large"
@@ -107,7 +107,7 @@ export const Notifications = (): JSX.Element => {
         <span className={styles.badge}>{unreadNotifications}</span>
       </div>
       {panelOpened && (
-        <div id="notifications-panel" className={styles.notifications_panel}>
+        <div className={styles.notifications_panel}>
           <div className={styles.notifications_panel_header}>
             <span className={styles.title}>Notifications</span>
             <div className={styles.buttons}>
