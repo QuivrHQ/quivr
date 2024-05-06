@@ -38,7 +38,7 @@ export const Notification = ({
     <div
       className={`${styles.notification_wrapper} ${
         lastNotification ? styles.no_border : ""
-      }`}
+      } ${notification.read ? styles.read : ""}`}
     >
       <div className={styles.header}>
         <div className={styles.left}>
