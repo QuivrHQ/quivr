@@ -60,7 +60,7 @@ const ContentSecurityPolicy = {
   "connect-src": [
     "'self'",
     process.env.NEXT_PUBLIC_SUPABASE_URL,
-    process.env.NEXT_PUBLIC_SUPABASE_URL.replace("http", "wss"),
+    process.env.NEXT_PUBLIC_SUPABASE_URL.replace("https", "wss"),
     process.env.NEXT_PUBLIC_SUPABASE_URL.replace("http", "ws"),
     process.env.NEXT_PUBLIC_BACKEND_URL,
     process.env.NEXT_PUBLIC_CMS_URL,

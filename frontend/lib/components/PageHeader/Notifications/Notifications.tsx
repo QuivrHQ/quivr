@@ -56,8 +56,7 @@ export const Notifications = (): JSX.Element => {
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "notifications" },
-        (payload) => {
-          console.info("Notification received", payload);
+        () => {
           void updateNotifications();
         }
       )
