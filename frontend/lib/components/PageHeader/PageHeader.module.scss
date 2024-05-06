@@ -32,16 +32,5 @@
     display: flex;
     gap: Spacings.$spacing04;
     align-items: center;
-
-    .credits {
-      display: flex;
-      align-items: center;
-      gap: Spacings.$spacing02;
-
-      .number {
-        font-size: Typography.$tiny;
-        color: var(--gold);
-      }
-    }
   }
 }

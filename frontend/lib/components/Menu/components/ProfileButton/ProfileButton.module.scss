@@ -1,0 +1,19 @@
+@use "@/styles/Spacings.module.scss";
+@use "@/styles/Typography.module.scss";
+
+.button_wrapper {
+  display: flex;
+  gap: Spacings.$spacing02;
+  align-items: center;
+
+  .credits {
+    display: flex;
+    align-items: center;
+    gap: Spacings.$spacing02;
+
+    .number {
+      font-size: Typography.$tiny;
+      color: var(--gold);
+    }
+  }
+}
