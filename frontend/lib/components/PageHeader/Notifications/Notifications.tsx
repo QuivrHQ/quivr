@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 
 import { useSupabase } from "@/lib/context/SupabaseProvider";
 
+import { Notification } from "./Notification/Notification";
 import styles from "./Notifications.module.scss";
 import { NotificationType } from "./types/types";
 
@@ -16,6 +17,7 @@ export const Notifications = (): JSX.Element => {
     void (async () => {
       try {
         const notifs = (await supabase.from("notifications").select()).data;
+        console.info("Notifications", notifs);
         setNotifications(notifs ?? []);
       } catch (error) {
         console.error(error);
@@ -34,6 +36,17 @@ export const Notifications = (): JSX.Element => {
         />
         <span className={styles.badge}>{notifications.length}</span>
       </div>
+      {panelOpened && (
+        <div className={styles.notifications_panel}>
+          {notifications.map((notification, i) => (
+            <Notification
+              key={i}
+              notification={notification}
+              lastNotification={i === notifications.length - 1}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 };

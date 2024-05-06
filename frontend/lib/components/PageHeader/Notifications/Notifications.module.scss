@@ -1,9 +1,12 @@
+@use "@/styles/BoxShadow.module.scss";
 @use "@/styles/Radius.module.scss";
 @use "@/styles/Spacings.module.scss";
 @use "@/styles/Typography.module.scss";
+@use "@/styles/ZIndexes.module.scss";
 
 .notifications_wrapper {
   position: relative;
+  z-index: ZIndexes.$overlay;
 
   .badge {
     position: absolute;
@@ -18,5 +21,18 @@
     font-size: Typography.$very_tiny;
     top: -(Spacings.$spacing02);
     right: -(Spacings.$spacing01);
+  }
+
+  .notifications_panel {
+    position: absolute;
+    background-color: var(--background-0);
+    max-width: 400px;
+    max-height: 60vh;
+    overflow: scroll;
+    right: 0;
+    top: Spacings.$spacing07;
+    border-radius: Radius.$normal;
+    border: 1px solid var(--border-2);
+    box-shadow: BoxShadow.$small;
   }
 }
