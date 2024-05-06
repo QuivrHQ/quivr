@@ -10,16 +10,19 @@ import { NotificationType } from "../types/types";
 interface NotificationProps {
   notification: NotificationType;
   lastNotification?: boolean;
+  updateNotifications: () => Promise<void>;
 }
 
 export const Notification = ({
   notification,
   lastNotification,
+  updateNotifications,
 }: NotificationProps): JSX.Element => {
   const { supabase } = useSupabase();
 
   const deleteNotif = async () => {
     await supabase.from("notifications").delete().eq("id", notification.id);
+    await updateNotifications();
   };
 
   const readNotif = async () => {
@@ -27,6 +30,8 @@ export const Notification = ({
       .from("notifications")
       .update({ read: !notification.read })
       .eq("id", notification.id);
+
+    await updateNotifications();
   };
 
   return (
@@ -42,7 +47,7 @@ export const Notification = ({
         </div>
         <div className={styles.icons}>
           <Icon
-            name="delete"
+            name={notification.read ? "unread" : "read"}
             color="black"
             handleHover={true}
             size="normal"

@@ -10,17 +10,31 @@ import { Icon } from "../../ui/Icon/Icon";
 
 export const Notifications = (): JSX.Element => {
   const [notifications, setNotifications] = useState<NotificationType[]>([]);
+  const [unreadNotifications, setUnreadNotifications] = useState<number>(0);
   const [panelOpened, setPanelOpened] = useState<boolean>(false);
   const { supabase } = useSupabase();
 
+  const updateNotifications = async () => {
+    try {
+      let notifs = (await supabase.from("notifications").select()).data;
+      if (notifs) {
+        notifs = notifs.sort(
+          (a: NotificationType, b: NotificationType) =>
+            new Date(b.datetime).getTime() - new Date(a.datetime).getTime()
+        );
+      }
+      setNotifications(notifs ?? []);
+      setUnreadNotifications(
+        notifs?.filter((n: NotificationType) => !n.read).length ?? 0
+      );
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   useEffect(() => {
     void (async () => {
-      try {
-        const notifs = (await supabase.from("notifications").select()).data;
-        setNotifications(notifs ?? []);
-      } catch (error) {
-        console.error(error);
-      }
+      await updateNotifications();
     })();
   }, []);
 
@@ -33,7 +47,7 @@ export const Notifications = (): JSX.Element => {
           color="black"
           handleHover={true}
         />
-        <span className={styles.badge}>{notifications.length}</span>
+        <span className={styles.badge}>{unreadNotifications}</span>
       </div>
       {panelOpened && (
         <div className={styles.notifications_panel}>
@@ -42,6 +56,7 @@ export const Notifications = (): JSX.Element => {
               key={i}
               notification={notification}
               lastNotification={i === notifications.length - 1}
+              updateNotifications={updateNotifications}
             />
           ))}
         </div>
