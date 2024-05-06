@@ -29,7 +29,7 @@ services:
       dockerfile: Dockerfile
     container_name: backend-core
     healthcheck:
-      test: ["CMD", "curl", "http://localhost:5050/healthz"]
+      test: [ "CMD", "curl", "http://localhost:5050/healthz" ]
     command:
       - "uvicorn"
       - "main:app"
@@ -38,10 +38,12 @@ services:
       - "--port"
       - "5050"
       - "--workers"
-      - "6"
+      - "1"
     restart: always
     volumes:
       - ./backend/:/code/
+      # be sure to mount the data directory from the Github repo at the same level of Quivr
+      - ../luccid-data/:/data/
     ports:
       - 5050:5050
 
