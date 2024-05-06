@@ -37,7 +37,8 @@
             "justMyCode": false,
             "env": {
                 "PYTHONPATH": "${workspaceFolder}/backend:${env:PYTHONPATH}"
-            }
+            },
+            "envFile": "${workspaceFolder}/.env"
         }
     ]
 }
