@@ -26,7 +26,7 @@
   .notifications_panel {
     position: absolute;
     background-color: var(--background-0);
-    max-width: 400px;
+    width: 400px;
     max-height: 60vh;
     overflow: scroll;
     right: 0;
@@ -34,5 +34,19 @@
     border-radius: Radius.$normal;
     border: 1px solid var(--border-2);
     box-shadow: BoxShadow.$small;
+
+    .notifications_panel_header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border-2);
+      font-size: Typography.$small;
+      padding: Spacings.$spacing03;
+
+      .buttons {
+        display: flex;
+        gap: Spacings.$spacing02;
+      }
+    }
   }
 }

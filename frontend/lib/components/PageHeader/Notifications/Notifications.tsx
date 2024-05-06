@@ -7,6 +7,7 @@ import styles from "./Notifications.module.scss";
 import { NotificationType } from "./types/types";
 
 import { Icon } from "../../ui/Icon/Icon";
+import { TextButton } from "../../ui/TextButton/TextButton";
 
 export const Notifications = (): JSX.Element => {
   const [notifications, setNotifications] = useState<NotificationType[]>([]);
@@ -32,6 +33,23 @@ export const Notifications = (): JSX.Element => {
     }
   };
 
+  const deleteAllNotifications = async () => {
+    for (const notification of notifications) {
+      await supabase.from("notifications").delete().eq("id", notification.id);
+    }
+    await updateNotifications();
+  };
+
+  const markAllAsRead = async () => {
+    for (const notification of notifications) {
+      await supabase
+        .from("notifications")
+        .update({ read: !notification.read })
+        .eq("id", notification.id);
+    }
+    await updateNotifications();
+  };
+
   useEffect(() => {
     void (async () => {
       await updateNotifications();
@@ -51,6 +69,22 @@ export const Notifications = (): JSX.Element => {
       </div>
       {panelOpened && (
         <div className={styles.notifications_panel}>
+          <div className={styles.notifications_panel_header}>
+            <span>Notifications</span>
+            <div className={styles.buttons}>
+              <TextButton
+                label="Mark all as read"
+                color="black"
+                onClick={() => void markAllAsRead()}
+              />
+              <span>|</span>
+              <TextButton
+                label="Delete all"
+                color="black"
+                onClick={() => void deleteAllNotifications()}
+              />
+            </div>
+          </div>
           {notifications.map((notification, i) => (
             <Notification
               key={i}
