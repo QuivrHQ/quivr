@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.0.248 (2024-05-07)
+
+## What's Changed
+* fix: utf8 encoding by @chloedia in https://github.com/QuivrHQ/quivr/pull/2555
+* feat(celery): moved assistant summary to celery by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2557
+* Revert "feat(celery): moved assistant summary to celery" by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2558
+
+## New Contributors
+* @chloedia made their first contribution in https://github.com/QuivrHQ/quivr/pull/2555
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.247...v0.0.248
+
 ## 0.0.247 (2024-05-07)
 
 ## What's Changed
