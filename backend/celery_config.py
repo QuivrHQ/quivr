@@ -8,6 +8,7 @@ CELERY_BROKER_QUEUE_NAME = os.getenv("CELERY_BROKER_QUEUE_NAME", "quivr")
 
 celery = Celery(__name__)
 
+
 if CELERY_BROKER_URL.startswith("sqs"):
     broker_transport_options = {
         CELERY_BROKER_QUEUE_NAME: {
@@ -36,3 +37,5 @@ elif CELERY_BROKER_URL.startswith("redis"):
     )
 else:
     raise ValueError(f"Unsupported broker URL: {CELERY_BROKER_URL}")
+
+celery.autodiscover_tasks(["modules.assistant.ito"])
