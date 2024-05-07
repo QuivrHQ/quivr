@@ -44,11 +44,28 @@ export const Notifications = (): JSX.Element => {
     for (const notification of notifications) {
       await supabase
         .from("notifications")
-        .update({ read: !notification.read })
+        .update({ read: true })
         .eq("id", notification.id);
     }
     await updateNotifications();
   };
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as Node;
+      const panel = document.getElementById("notifications-panel");
+
+      if (!panel?.contains(target)) {
+        setPanelOpened(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   useEffect(() => {
     const channel = supabase
@@ -74,8 +91,13 @@ export const Notifications = (): JSX.Element => {
   }, []);
 
   return (
-    <div className={styles.notifications_wrapper}>
-      <div onClick={() => setPanelOpened(!panelOpened)}>
+    <div id="notifications-panel" className={styles.notifications_wrapper}>
+      <div
+        onClick={(event) => {
+          setPanelOpened(!panelOpened);
+          event.nativeEvent.stopImmediatePropagation();
+        }}
+      >
         <Icon
           name="notifications"
           size="large"
