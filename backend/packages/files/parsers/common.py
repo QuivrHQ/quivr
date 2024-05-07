@@ -1,5 +1,4 @@
 import os
-import re
 import tempfile
 import time
 
@@ -84,8 +83,6 @@ async def process_file(
             doc.page_content = f"Filename: {new_metadata['original_file_name']} Content: {doc.page_content}"
 
             doc.page_content = doc.page_content.replace("\u0000", "")
-            # Replace unsupported Unicode characters
-            doc.page_content = re.sub(r"[^\x00-\x7F]+", " ", doc.page_content)
 
             len_chunk = len(enc.encode(doc.page_content))
 
