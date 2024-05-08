@@ -74,7 +74,7 @@ class SummaryAssistant(ITO):
 
     async def process_assistant(self):
         try:
-            notification_service.add_notification(
+            notification = notification_service.add_notification(
                 CreateNotification(
                     user_id=self.current_user.id,
                     status="info",
@@ -117,6 +117,7 @@ class SummaryAssistant(ITO):
                     brain_id,
                     email_activated,
                     self.current_user.model_dump(mode="json"),
+                    notification.id,
                 ),
             )
         except Exception as e:

@@ -11,7 +11,9 @@ logger = get_logger(__name__)
 
 
 @celery.task(name="task_summary")
-def task_summary(split_docs, filename, brain_id, email_activated, current_user):
+def task_summary(
+    split_docs, filename, brain_id, email_activated, current_user, notification_id
+):
     loop = asyncio.get_event_loop()
     # turn split_docs into a list of Document objects
     logger.info("split_docs: %s", split_docs)
@@ -38,5 +40,6 @@ def task_summary(split_docs, filename, brain_id, email_activated, current_user):
             brain_id,
             email_activated,
             current_user,
+            notification_id,
         )
     )

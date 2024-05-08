@@ -13,6 +13,9 @@ from modules.assistant.dto.inputs import InputAssistant
 from modules.assistant.ito.utils.pdf_generator import PDFGenerator, PDFModel
 from modules.chat.controller.chat.utils import update_user_usage
 from modules.contact_support.controller.settings import ContactsSettings
+from modules.notification.dto.inputs import NotificationUpdatableProperties
+from modules.notification.entity.notification import NotificationsStatusEnum
+from modules.notification.service.notification_service import NotificationService
 from modules.upload.controller.upload_routes import upload_file
 from modules.user.entity.user_identity import UserIdentity
 from modules.user.service.user_usage import UserUsage
@@ -21,6 +24,8 @@ from pydantic import BaseModel
 from unidecode import unidecode
 
 logger = get_logger(__name__)
+
+notification_service = NotificationService()
 
 
 class ITO(BaseModel):
@@ -149,6 +154,7 @@ class OutputHandler(BaseModel):
         brain_id: str = None,
         email_activated: bool = False,
         current_user: UserIdentity = None,
+        notification_id: str = None,
     ) -> dict:
         """Handles creation and uploading of the processed file."""
         # remove any special characters from the filename that aren't http safe
@@ -206,5 +212,13 @@ class OutputHandler(BaseModel):
             )
 
         os.remove(new_filename)
+
+        notification_service.update_notification_by_id(
+            notification_id,
+            NotificationUpdatableProperties(
+                status=NotificationsStatusEnum.SUCCESS,
+                title=f"Summary of {original_filename} generated successfully",
+            ),
+        )
 
         return {"message": f"{file_description} generated successfully"}
