@@ -41,7 +41,8 @@ COPY ./requirements.txt .
 RUN pip install --upgrade pip
 
 # Increase timeout to wait for the new installation
-RUN pip install --no-cache-dir -r requirements.txt --timeout 200
+RUN pip install --no-cache-dir -r requirements.txt --timeout 200 && \
+    playwright install --with-deps
 
 WORKDIR /code
 # Copy the rest of the application
