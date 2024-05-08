@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.0.249 (2024-05-08)
+
+## What's Changed
+* feat(crawler): Add Playwright for web crawling by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2562
+* ci(ecr): added build to public ecr by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2564
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.248...v0.0.249
+
 ## 0.0.248 (2024-05-07)
 
 ## What's Changed
