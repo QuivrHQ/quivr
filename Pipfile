@@ -64,9 +64,13 @@ flashrank = "*"
 langchain-cohere = "*"
 pyinstrument = "*"
 playwright = "*"
+langgraph = "*"
+tavily-python = "*"
+duckduckgo-search = "*"
 
 [dev-packages]
 black = "*"
+ipykernel = "*"
 
 [requires]
 python_version = "3.11"

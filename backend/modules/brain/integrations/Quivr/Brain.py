@@ -4,8 +4,7 @@ from typing import Annotated, AsyncIterable, List, Sequence, TypedDict
 from uuid import UUID
 
 from langchain_community.tools import DuckDuckGoSearchResults
-from langchain_core.messages import BaseMessage, ToolMessage
-from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
+from langchain_core.messages import BaseMessage, HumanMessage, ToolMessage
 from langchain_core.tools import BaseTool
 from langchain_openai import ChatOpenAI
 from langgraph.graph import END, StateGraph
@@ -28,7 +27,7 @@ logger = get_logger(__name__)
 chat_service = ChatService()
 
 
-class GPT4Brain(KnowledgeBrainQA):
+class QuivrBrain(KnowledgeBrainQA):
     """This is the Notion brain class. it is a KnowledgeBrainQA has the data is stored locally.
     It is going to call the Data Store internally to get the data.
 
@@ -134,7 +133,7 @@ class GPT4Brain(KnowledgeBrainQA):
 
     def get_chain(self):
         self.model_function = ChatOpenAI(
-            model="gpt-4-turbo", temperature=0, streaming=True
+            model="gpt-3.5-turbo-0125", temperature=0, streaming=True
         )
 
         self.model_function = self.model_function.bind_tools(self.tools)
@@ -154,26 +153,8 @@ class GPT4Brain(KnowledgeBrainQA):
         response_tokens = []
         config = {"metadata": {"conversation_id": str(chat_id)}}
 
-        prompt = ChatPromptTemplate.from_messages(
-            [
-                (
-                    "system",
-                    "You are GPT-4 powered by Quivr. You are an assistant. {custom_personality}",
-                ),
-                MessagesPlaceholder(variable_name="chat_history"),
-                ("human", "{question}"),
-            ]
-        )
-        prompt_formated = prompt.format_messages(
-            chat_history=filtered_history,
-            question=question.question,
-            custom_personality=(
-                self.prompt_to_use.content if self.prompt_to_use else None
-            ),
-        )
-
         async for event in conversational_qa_chain.astream_events(
-            {"messages": prompt_formated},
+            {"messages": filtered_history + [HumanMessage(content=question.question)]},
             config=config,
             version="v1",
         ):
@@ -206,34 +187,20 @@ class GPT4Brain(KnowledgeBrainQA):
         transformed_history, streamed_chat_history = (
             self.initialize_streamed_chat_history(chat_id, question)
         )
-        filtered_history = self.filter_history(transformed_history, 20, 2000)
-        response_tokens = []
-        config = {"metadata": {"conversation_id": str(chat_id)}}
-
-        prompt = ChatPromptTemplate.from_messages(
-            [
-                (
-                    "system",
-                    "You are GPT-4 powered by Quivr. You are an assistant. {custom_personality}",
-                ),
-                MessagesPlaceholder(variable_name="chat_history"),
-                ("human", "{question}"),
-            ]
-        )
-        prompt_formated = prompt.format_messages(
-            chat_history=filtered_history,
-            question=question.question,
-            custom_personality=(
-                self.prompt_to_use.content if self.prompt_to_use else None
-            ),
-        )
         model_response = conversational_qa_chain.invoke(
-            {"messages": prompt_formated},
-            config=config,
+            {
+                "question": question.question,
+                "chat_history": transformed_history,
+                "custom_personality": (
+                    self.prompt_to_use.content if self.prompt_to_use else None
+                ),
+            }
         )
 
-        answer = model_response["messages"][-1].content
+        answer = model_response.content
 
         return self.save_non_streaming_answer(
-            chat_id=chat_id, question=question, answer=answer, metadata={}
+            chat_id=chat_id,
+            question=question,
+            answer=answer,
         )
