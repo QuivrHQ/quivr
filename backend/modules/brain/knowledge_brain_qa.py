@@ -283,8 +283,8 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
         self, chat_id: UUID, question: ChatQuestion, save_answer: bool = True
     ) -> GetChatHistoryOutput:
         conversational_qa_chain = self.knowledge_qa.get_chain()
-        transformed_history, streamed_chat_history = (
-            self.initialize_streamed_chat_history(chat_id, question)
+        transformed_history, _ = self.initialize_streamed_chat_history(
+            chat_id, question
         )
         metadata = self.metadata or {}
         citations = None
