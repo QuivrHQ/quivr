@@ -6,6 +6,10 @@ from modules.brain.integrations.GPT4.Brain import GPT4Brain
 from modules.brain.integrations.Notion.Brain import NotionBrain
 from modules.brain.integrations.SQL.Brain import SQLBrain
 from modules.brain.integrations.LlamaIndex.brain import LlamaIndexBrain
+from modules.brain.integrations.LlamaIndexBerlin.brain import LlamaIndexBerlin
+from modules.brain.integrations.LlamaIndexKnauf.brain import LlamaIndexKnauf
+from modules.brain.integrations.LlamaIndexSerbia.brain import LlamaIndexSerbia
+from modules.brain.integrations.LlamaIndexVelux.brain import LlamaIndexVeluxUK
 from modules.brain.knowledge_brain_qa import KnowledgeBrainQA
 from modules.brain.service.api_brain_definition_service import ApiBrainDefinitionService
 from modules.brain.service.brain_authorization_service import (
@@ -37,7 +41,11 @@ integration_list = {
     "sql": SQLBrain,
     "big": BigBrain,
     "doc": KnowledgeBrainQA,
-    "llamaindex": LlamaIndexBrain,
+    # "llamaindex": LlamaIndexBrain,
+    "llamaindexberlin": LlamaIndexBerlin,
+    "llamaindexserbia": LlamaIndexSerbia,
+    "llamaindexveluxuk": LlamaIndexVeluxUK,
+    "llamaindexknauf": LlamaIndexKnauf,
 }
 
 brain_service = BrainService()
@@ -73,23 +81,23 @@ class BrainfulChat(ChatInterface):
                 user_email=user_email,
             )
 
-        if brain.brain_type == BrainType.API:
-            brain_definition = api_brain_definition_service.get_api_brain_definition(
-                brain.brain_id
-            )
-            return APIBrainQA(
-                chat_id=chat_id,
-                temperature=temperature,
-                brain_id=str(brain.brain_id),
-                streaming=streaming,
-                prompt_id=prompt_id,
-                user_id=user_id,
-                raw=(brain_definition.raw if brain_definition else None),
-                jq_instructions=(
-                    brain_definition.jq_instructions if brain_definition else None
-                ),
-                user_email=user_email,
-            )
+        # if brain.brain_type == BrainType.API:
+        #     brain_definition = api_brain_definition_service.get_api_brain_definition(
+        #         brain.brain_id
+        #     )
+        #     return APIBrainQA(
+        #         chat_id=chat_id,
+        #         temperature=temperature,
+        #         brain_id=str(brain.brain_id),
+        #         streaming=streaming,
+        #         prompt_id=prompt_id,
+        #         user_id=user_id,
+        #         raw=(brain_definition.raw if brain_definition else None),
+        #         jq_instructions=(
+        #             brain_definition.jq_instructions if brain_definition else None
+        #         ),
+        #         user_email=user_email,
+        #     )
         if brain.brain_type == BrainType.INTEGRATION:
             integration_brain = integration_brain_description_service.get_integration_description_by_user_brain_id(
                 brain.brain_id, user_id
