@@ -9,8 +9,6 @@ from langchain_core.messages.human import HumanMessage
 from langchain_core.messages.system import SystemMessage
 from llama_index.core import (
     Settings,
-    VectorStoreIndex,
-    SimpleDirectoryReader,
     load_index_from_storage,
     StorageContext,
 )
@@ -18,7 +16,6 @@ from llama_index.core import (
 # from llama_index.core.base.base_query_engine import BaseQueryEngine
 from llama_index.core.chat_engine.types import ChatMode
 from llama_index.core.llms import ChatMessage, MessageRole
-from llama_index.core.node_parser import MarkdownElementNodeParser
 from llama_index.core.prompts import PromptTemplate, PromptType
 
 # from llama_index.core.ingestion import (
@@ -38,9 +35,61 @@ from llama_index.postprocessor.flag_embedding_reranker import FlagEmbeddingReran
 from modules.brain.knowledge_brain_qa import KnowledgeBrainQA
 from modules.chat.dto.chats import ChatQuestion
 
-current_directory = os.path.dirname(os.path.abspath(__file__))
-data_directory = os.path.join(current_directory, "luccid-data/Documents")
-folder_name = "Serbia"
+data_directory = "/data/"
+folder_name = "Documents/Manufacturers/Velux-Serbia"
+index_data = os.path.join(data_directory, folder_name, "index-data")
+
+storage_context = None
+index = None
+reranker = None
+
+if os.path.exists(index_data):
+    try:
+        if not storage_context:
+            print("####### Starting loading storage context... #######")
+            start_time = time.time()  # Record the start time
+
+            storage_context = StorageContext.from_defaults(
+                persist_dir=index_data
+            )
+
+            end_time = time.time()  # Record the end time
+            elapsed_time = end_time - start_time  # Calculate elapsed time
+            print(
+                f"####### Finishing loading storage context... in {elapsed_time:.2f} seconds #######"
+            )
+        if not index:
+            print("####### Starting loading index from storage... #######")
+            start_time = time.time()  # Record the start time
+
+            index = load_index_from_storage(
+                storage_context=storage_context, index_id="vector_index"
+            )
+
+            end_time = time.time()  # Record the end time
+            elapsed_time = end_time - start_time  # Calculate elapsed time
+            print(
+                f"####### Finishing loading index from storage... in {elapsed_time:.2f} seconds #######"
+            )
+        if not reranker:
+            print("####### Starting loading reranker... #######")
+            start_time = time.time()  # Record the start time
+
+            reranker = FlagEmbeddingReranker(
+                top_n=7, model="BAAI/bge-reranker-large", use_fp16=True
+            )
+
+            end_time = time.time()  # Record the end time
+            elapsed_time = end_time - start_time  # Calculate elapsed time
+            print(
+                f"####### Finishing loading reranker... in {elapsed_time:.2f} seconds #######"
+            )
+    except ValueError as e:
+        print(e)
+    except FileNotFoundError as e:
+        print(f"### {e}")
+else:
+    print("### No index found...")
 
 embed_model = OpenAIEmbedding(model="text-embedding-3-small")
 llm = OpenAI(model="gpt-4-turbo-preview")
@@ -64,92 +113,9 @@ class LlamaIndexBrain(KnowledgeBrainQA):
         super().__init__(
             **kwargs,
         )
-
-        # self._vector_store = RedisVectorStore(
-        #     index_name="redis_vectore_store",
-        #     index_prefix="vector_store",
-        #     redis_url="redis://redis:6379",
-        # )
-        # self._ingestion_cache = IngestionCache(
-        #     cache=RedisCache.from_host_and_port("redis", 6379),
-        #     collection="redis_cache",
-        # )
-        # self._ingestion_pipeline = IngestionPipeline(
-        #     transformations=[
-        #         MarkdownElementNodeParser(),
-        #         embed_model,
-        #     ],
-        #     docstore=RedisDocumentStore.from_host_and_port(
-        #         "localhost", 6379, namespace="document_store"
-        #     ),
-        #     vector_store=self._vector_store,
-        #     cache=self._ingestion_cache,
-        #     docstore_strategy=DocstoreStrategy.UPSERTS,
-        # )
-        # self._index = VectorStoreIndex.from_vector_store(
-        #     self._vector_store, embed_model=embed_model
-        # )
-        print("####### Starting loading index from storage... #######")
-        start_time = time.time()  # Record the start time
-
-        try:
-            self._storage_context = StorageContext.from_defaults(
-                persist_dir=os.path.join(data_directory, folder_name, "index-data")
-            )
-            self._index = load_index_from_storage(
-                storage_context=self._storage_context, index_id="vector_index"
-            )
-        except ValueError as e:
-            print(e)
-            self._index = None
-            raise e
-        except FileNotFoundError as e:
-            print(e)
-            self._index = None
-            raise e
-
-        end_time = time.time()  # Record the end time
-        elapsed_time = end_time - start_time  # Calculate elapsed time
-        print(
-            f"####### Finishing loading index from storage... in {elapsed_time:.2f} seconds #######"
-        )
-        self._reranker = FlagEmbeddingReranker(
-            top_n=7, model="BAAI/bge-reranker-large", use_fp16=True
-        )
-
-    @classmethod
-    def _load_data(cls, folder_name: str, recursive: bool = False):
-        # credentials_path = os.path.join(
-        #     current_directory, "luccid-app-llamaindex-google-readers.json"
-        # )
-        # print(f"####### PG ####### credentials_path: {credentials_path}")
-        # loader = GoogleDriveReader(credentials_path=credentials_path)
-        # docs = loader.load_data(
-        #     folder_id=folder_id,
-        #     query_string="name contains 'corrected.md'",
-        #     # TODO(pg): do a PR to add recursive to the GDrive loader
-        #     # recursive=recursive
-        # )
-        # for doc in docs:
-        #     doc.id_ = doc.metadata["file_name"]
-        reader = SimpleDirectoryReader(
-            input_dir=os.path.join(data_directory, folder_name)
-        )
-        docs = reader.load_data()
-
-        return docs
-
-    @classmethod
-    def _parse_nodes(cls, folder_name, docs):
-        node_parser = MarkdownElementNodeParser(llm=llm)
-        nodes = node_parser.get_nodes_from_documents(docs)
-        base_nodes, objects = node_parser.get_nodes_and_objects(nodes)
-        index = VectorStoreIndex(nodes=base_nodes + objects)
-        index.set_index_id("vector_index")
-        index.storage_context.persist(
-            os.path.join(data_directory, folder_name, "index-data")
-        )
-        print(f"Ingested {len(nodes)} Nodes")
+        self._storage_context = storage_context
+        self._index = index
+        self._reranker = reranker
 
     def _get_engine(self):
         if not self._index:
@@ -161,7 +127,17 @@ class LlamaIndexBrain(KnowledgeBrainQA):
             "---------------------\n"
             "{context_str}\n"
             "---------------------\n"
-            "You are an experienced Serbian architect specializing in Serbian building codes, regulations, and norms. You will answer in Professional architectural Serbian Latin Language. Keep your answers short and always deliver only what was asked. Always quote the specific regulation name, paragraph, or norm depending on the case. You should use professional language and have a deep understanding of the relevant Serbian laws and guidelines in the field of architecture and construction. Be as descriptive as possible. Always make sure to provide 100% correct information. When responding, avoid giving personal opinions or advice that goes beyond the scope of Serbian regulations. In cases of conflicting information, use the most recent regulation by the date of being published. Your responses should be clear, concise, and tailored to the level of understanding of the user, ensuring they receive the most relevant and accurate information. Always answer in Serbian Latin. Your goal is to help architects with building regulations so they don't get rejected by the building inspectorate. Always do your best. If information is unavailable on a queried topic, respond with: “Na žalost, na ovo pitanje nemam odgovor"
+            "You are an experienced Serbian architect specializing in Serbian building codes, regulations, and norms." 
+            "You will answer in Professional architectural language."
+            "Keep your answers short and always deliver only what was asked."
+            "Always quote the specific regulation name, paragraph, or norm depending on the case."
+            "You should use professional language and have a deep understanding of the relevant laws and guidelines in the field of architecture and construction."
+            "Be as descriptive as possible. Always make sure to provide 100% correct information."
+            "When responding, avoid giving personal opinions or advice that goes beyond the scope of regulations."
+            "In cases of conflicting information, use the most recent regulation by the date of being published."
+            "Your responses should be clear, concise, and tailored to the level of understanding of the user, ensuring they receive the most relevant and accurate information."
+            "Your goal is to help architects with building regulations so they don't get rejected by the building inspectorate."
+            "If information is unavailable on a queried topic, respond with: “Na žalost, na ovo pitanje nemam odgovor"
             "Query: {query_str}\n"
             "Answer: "
         )
