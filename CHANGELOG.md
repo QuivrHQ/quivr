@@ -1,5 +1,23 @@
 # Changelog
 
+## 0.0.250 (2024-05-10)
+
+## What's Changed
+* feat(gpt4): Add search functionality by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2566
+* [ImgBot] Optimize images by @imgbot in https://github.com/QuivrHQ/quivr/pull/2568
+* feat(gpt4): image generation by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2569
+* fix(front): Add NEXT_PUBLIC_AUTH_MODES to .env.example by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2570
+* fix: NEXT_PUBLIC_AUTH_MODES in docker-compose.yml by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2572
+* docs: Add Supabase configuration documentation by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2574
+* docs(gpt4): Update GPT-4 Documentation by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2573
+* chore: tools by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2575
+* feat(brave-search): Update GPT4Brain tools and add WebSearchTool by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2576
+
+## New Contributors
+* @imgbot made their first contribution in https://github.com/QuivrHQ/quivr/pull/2568
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.249...v0.0.250
+
 ## 0.0.249 (2024-05-08)
 
 ## What's Changed
