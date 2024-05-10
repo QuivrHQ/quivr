@@ -19,7 +19,6 @@ class CrawlWebsite(BaseModel):
 
     def process(self):
         # Extract and combine content recursively
-        visited_urls = set()
         loader = PlaywrightURLLoader(
             urls=[self.url], remove_selectors=["header", "footer"]
         )
