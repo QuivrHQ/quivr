@@ -35,11 +35,20 @@ chat_service = ChatService()
 
 
 class GPT4Brain(KnowledgeBrainQA):
-    """This is the Notion brain class. it is a KnowledgeBrainQA has the data is stored locally.
-    It is going to call the Data Store internally to get the data.
-
-    Args:
-        KnowledgeBrainQA (_type_): A brain that store the knowledge internaly
+    """
+    GPT4Brain integrates with GPT-4 to provide real-time answers and supports various tools to enhance its capabilities.
+    
+    Available Tools:
+    - WebSearchTool: Performs web searches to find relevant information.
+    - ImageGeneratorTool: Generates images based on textual descriptions.
+    - URLReaderTool: Reads and summarizes content from URLs.
+    - EmailSenderTool: Sends emails with specified content.
+    
+    Use Cases:
+    - WebSearchTool can be used to find the latest news articles on a specific topic or to gather information from various websites.
+    - ImageGeneratorTool is useful for creating visual content based on textual prompts, such as generating a company logo based on a description.
+    - URLReaderTool can be used to summarize articles or web pages, making it easier to quickly understand the content without reading the entire text.
+    - EmailSenderTool enables automated email sending, such as sending a summary of a meeting's minutes to all participants.
     """
 
     tools: Optional[List[BaseTool]] = None
