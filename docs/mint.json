@@ -69,7 +69,8 @@
             "configuring/llamaparse",
             "configuring/environment-variables",
             "configuring/profiler",
-            "configuring/telemetry"
+            "configuring/telemetry",
+            "configuring/supabase-setup"
           ]
         },
         "tech-design",
