@@ -57,5 +57,6 @@ class ImageGeneratorTool(BaseTool):
             n=1,
         )
         image_url = response.data[0].url
+        revised_prompt = response.data[0].revised_prompt
         # Make the url a markdown image
-        return f"![Generated Image]({image_url})"
+        return f"{revised_prompt} \n ![Generated Image]({image_url}) "

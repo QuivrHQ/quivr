@@ -78,3 +78,8 @@ class WebSearchTool(BaseTool):
 
     def _format_result(self, title: str, description: str, url: str) -> str:
         return f"**{title}**\n{description}\n{url}"
+
+
+if __name__ == "__main__":
+    tool = WebSearchTool()
+    print(tool.run("python"))
