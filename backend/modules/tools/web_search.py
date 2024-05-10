@@ -23,7 +23,7 @@ class WebSearchTool(BaseTool):
     name = "brave-web-search"
     description = "useful for when you need to search the web for something."
     args_schema: Type[BaseModel] = WebSearchInput
-    api_key = os.getenv("BRAVE_SEARCH_API_KEY")
+    api_key: str = os.getenv("BRAVE_SEARCH_API_KEY", "")
 
     def _check_environment_variable(self) -> bool:
         """Check if the environment variable is set."""
