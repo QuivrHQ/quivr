@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.0.251 (2024-05-10)
+
+## What's Changed
+* feat(tool): Add URLReaderTool by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2577
+* feat(email): Add email sender tool and update image generator tool by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2579
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.250...v0.0.251
+
 ## 0.0.250 (2024-05-10)
 
 ## What's Changed
