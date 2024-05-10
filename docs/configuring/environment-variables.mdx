@@ -59,3 +59,17 @@ The frontend environment file is used to configure the frontend application. It 
 - `NEXT_PUBLIC_STRIPE_MANAGE_PLAN_URL`: The URL for managing Stripe subscription plans.
 
 - `NEXT_PUBLIC_AUTH_MODES`: The authentication modes supported by the application, such as magic link, password-based authentication, and Google Single Sign-On (SSO).
+
+### Configuring BRAVE_SEARCH_API_KEY
+
+To use the Brave Search functionality within Quivr, you need to configure the `BRAVE_SEARCH_API_KEY` in your environment. Here's how to obtain and set up your API key:
+
+1. **Create a Brave Search Account**: Visit [Brave Search](https://api.search.brave.com/app/keys) and sign up for an account if you haven't already.
+2. **Obtain API Key**: Once logged in, navigate to the developer settings or API section to generate a new API key for your application.
+3. **Configure .env File**: Add the following line to your `.env` file in the root of the Quivr project:
+   ```
+   BRAVE_SEARCH_API_KEY=your_brave_search_api_key_here
+   ```
+   Replace `your_brave_search_api_key_here` with the actual API key you obtained from Brave Search.
+
+By configuring the `BRAVE_SEARCH_API_KEY`, you enable Quivr to perform web searches using Brave Search's capabilities directly from within the application.

@@ -70,7 +70,8 @@
             "configuring/environment-variables",
             "configuring/profiler",
             "configuring/telemetry",
-            "configuring/supabase-setup"
+            "configuring/supabase-setup",
+            "configuring/brave-search"
           ]
         },
         "tech-design",
