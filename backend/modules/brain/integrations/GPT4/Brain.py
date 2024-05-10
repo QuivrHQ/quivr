@@ -47,7 +47,7 @@ class ImageGenerationInput(BaseModelV1):
 
 class ImageGeneratorTool(BaseTool):
     name = "image-generator"
-    description = "useful for when you need to answer questions about current events"
+    description = "useful for when you need to generate an image from a prompt."
     args_schema: Type[BaseModel] = ImageGenerationInput
     return_direct = True
 
@@ -63,7 +63,6 @@ class ImageGeneratorTool(BaseTool):
             quality="standard",
             n=1,
         )
-        logger.info(response.data[0])
         image_url = response.data[0].url
         revised_prompt = response.data[0].revised_prompt
         # Make the url a markdown image
