@@ -1,0 +1,68 @@
+---
+title: Supabase
+description: Comprehensive guide on setting up Supabase for Quivr, including CLI usage, migrations, database reset, and deployment.
+---
+
+# Configuring Supabase in Quivr
+
+This document provides a comprehensive guide on how to configure Supabase in Quivr, detailing CLI usage, running migrations, resetting the database, and deploying to a hosted version of Supabase.
+
+## Prerequisites
+
+Before you begin, ensure you have the following:
+
+- A Supabase account
+- The Supabase CLI installed on your machine
+
+## Setting Up Supabase
+
+### 1. Initialize Supabase
+
+To start, initialize a new Supabase project:
+
+```bash
+supabase init
+```
+
+### 2. Configure Environment Variables
+
+Set up the necessary environment variables in your `.env` file:
+
+```plaintext
+SUPABASE_URL=your_supabase_url
+SUPABASE_SERVICE_KEY=your_service_key
+```
+
+## Using the Supabase CLI
+
+### Running Migrations
+
+To run migrations on your Supabase project:
+
+```bash
+supabase db push
+```
+
+### Resetting the Database
+
+If you need to reset your database:
+
+```bash
+supabase db reset
+```
+
+## Deploying to Hosted Supabase
+
+To deploy your Quivr configurations to a hosted version of Supabase:
+
+1. Commit your changes to your project repository.
+2. Use the Supabase CLI to push your changes:
+
+```bash
+supabase db push --linked
+```
+
+## Conclusion
+
+By following these steps, you can successfully configure Supabase in Quivr, making use of its powerful database and backend services to enhance your project.
+
