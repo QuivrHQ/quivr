@@ -15,7 +15,7 @@ from modules.brain.knowledge_brain_qa import KnowledgeBrainQA
 from modules.chat.dto.chats import ChatQuestion
 from modules.chat.dto.outputs import GetChatHistoryOutput
 from modules.chat.service.chat_service import ChatService
-from modules.tools import ImageGeneratorTool, WebSearchTool
+from modules.tools import ImageGeneratorTool, URLReaderTool, WebSearchTool
 
 
 class AgentState(TypedDict):
@@ -37,7 +37,7 @@ class GPT4Brain(KnowledgeBrainQA):
         KnowledgeBrainQA (_type_): A brain that store the knowledge internaly
     """
 
-    tools: List[BaseTool] = [WebSearchTool(), ImageGeneratorTool()]
+    tools: List[BaseTool] = [WebSearchTool(), ImageGeneratorTool(), URLReaderTool()]
     tool_executor: ToolExecutor = ToolExecutor(tools)
     model_function: ChatOpenAI = None
 
