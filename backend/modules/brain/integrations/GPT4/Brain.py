@@ -1,16 +1,9 @@
 import json
 import operator
-from typing import Annotated, AsyncIterable, List, Optional, Sequence, Type, TypedDict
+from typing import Annotated, AsyncIterable, List, Sequence, TypedDict
 from uuid import UUID
 
-from langchain.callbacks.manager import (
-    AsyncCallbackManagerForToolRun,
-    CallbackManagerForToolRun,
-)
-from langchain.pydantic_v1 import BaseModel as BaseModelV1
-from langchain.pydantic_v1 import Field as FieldV1
 from langchain.tools import BaseTool
-from langchain_community.tools import DuckDuckGoSearchResults
 from langchain_core.messages import BaseMessage, ToolMessage
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_core.tools import BaseTool
@@ -22,9 +15,7 @@ from modules.brain.knowledge_brain_qa import KnowledgeBrainQA
 from modules.chat.dto.chats import ChatQuestion
 from modules.chat.dto.outputs import GetChatHistoryOutput
 from modules.chat.service.chat_service import ChatService
-from openai import OpenAI
-from pydantic import BaseModel
-from modules.tools import ImageGeneratorTool
+from modules.tools import ImageGeneratorTool, WebSearchTool
 
 
 class AgentState(TypedDict):
@@ -37,6 +28,7 @@ logger = get_logger(__name__)
 
 chat_service = ChatService()
 
+
 class GPT4Brain(KnowledgeBrainQA):
     """This is the Notion brain class. it is a KnowledgeBrainQA has the data is stored locally.
     It is going to call the Data Store internally to get the data.
@@ -45,7 +37,7 @@ class GPT4Brain(KnowledgeBrainQA):
         KnowledgeBrainQA (_type_): A brain that store the knowledge internaly
     """
 
-    tools: List[BaseTool] = [DuckDuckGoSearchResults(), ImageGeneratorTool()]
+    tools: List[BaseTool] = [WebSearchTool(), ImageGeneratorTool()]
     tool_executor: ToolExecutor = ToolExecutor(tools)
     model_function: ChatOpenAI = None
 
