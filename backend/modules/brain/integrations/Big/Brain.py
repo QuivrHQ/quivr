@@ -19,21 +19,35 @@ logger = get_logger(__name__)
 
 
 class BigBrain(KnowledgeBrainQA):
-    """This is the Big brain class.
+    """
+    The BigBrain class integrates advanced conversational retrieval and language model chains
+    to provide comprehensive and context-aware responses to user queries.
 
-    Args:
-        KnowledgeBrainQA (_type_): A brain that store the knowledge internaly
+    It leverages a combination of document retrieval, question condensation, and document-based
+    question answering to generate responses that are informed by a wide range of knowledge sources.
     """
 
     def __init__(
         self,
         **kwargs,
     ):
+        """
+        Initializes the BigBrain class with specific configurations.
+
+        Args:
+            **kwargs: Arbitrary keyword arguments.
+        """
         super().__init__(
             **kwargs,
         )
 
     def get_chain(self):
+        """
+        Constructs and returns the conversational QA chain used by BigBrain.
+
+        Returns:
+            A ConversationalRetrievalChain instance.
+        """
         system_template = """Combine these summaries in a way that makes sense and answer the user's question.
         Use markdown or any other techniques to display the content in a nice and aerated way. Answer in the language of the question.
         Here are user instructions on how to respond: {custom_personality}
@@ -97,6 +111,17 @@ class BigBrain(KnowledgeBrainQA):
     async def generate_stream(
         self, chat_id: UUID, question: ChatQuestion, save_answer: bool = True
     ) -> AsyncIterable:
+        """
+        Generates a stream of responses for a given question in real-time.
+
+        Args:
+            chat_id (UUID): The unique identifier for the chat session.
+            question (ChatQuestion): The question object containing the user's query.
+            save_answer (bool): Flag indicating whether to save the answer to the chat history.
+
+        Returns:
+            An asynchronous iterable of response strings.
+        """
         conversational_qa_chain = self.get_chain()
         transformed_history, streamed_chat_history = (
             self.initialize_streamed_chat_history(chat_id, question)

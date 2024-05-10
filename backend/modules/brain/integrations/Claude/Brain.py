@@ -9,26 +9,43 @@ from modules.chat.dto.chats import ChatQuestion
 
 
 class ClaudeBrain(KnowledgeBrainQA):
-    """This is the Notion brain class. it is a KnowledgeBrainQA has the data is stored locally.
-    It is going to call the Data Store internally to get the data.
-
-    Args:
-        KnowledgeBrainQA (_type_): A brain that store the knowledge internaly
     """
+    ClaudeBrain integrates with Claude model to provide conversational AI capabilities.
+    It leverages the Claude model for generating responses based on the provided context.
 
+    Attributes:
+        **kwargs: Arbitrary keyword arguments for KnowledgeBrainQA initialization.
+    """
     def __init__(
         self,
         **kwargs,
     ):
+        """
+        Initializes the ClaudeBrain with the given arguments.
+
+        Args:
+            **kwargs: Arbitrary keyword arguments.
+        """
         super().__init__(
             **kwargs,
         )
 
     def calculate_pricing(self):
+        """
+        Calculates the pricing for using the ClaudeBrain.
+
+        Returns:
+            int: The pricing value.
+        """
         return 3
 
     def get_chain(self):
+        """
+        Constructs and returns the conversational chain for ClaudeBrain.
 
+        Returns:
+            A conversational chain object.
+        """
         prompt = ChatPromptTemplate.from_messages(
             [
                 (
@@ -49,6 +66,17 @@ class ClaudeBrain(KnowledgeBrainQA):
     async def generate_stream(
         self, chat_id: UUID, question: ChatQuestion, save_answer: bool = True
     ) -> AsyncIterable:
+        """
+        Generates a stream of responses for the given question.
+
+        Args:
+            chat_id (UUID): The chat session ID.
+            question (ChatQuestion): The question object.
+            save_answer (bool): Whether to save the answer.
+
+        Yields:
+            AsyncIterable: A stream of response strings.
+        """
         conversational_qa_chain = self.get_chain()
         transformed_history, streamed_chat_history = (
             self.initialize_streamed_chat_history(chat_id, question)

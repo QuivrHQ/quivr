@@ -27,8 +27,6 @@ class AgentState(TypedDict):
     messages: Annotated[Sequence[BaseMessage], operator.add]
 
 
-# Define the function that determines whether to continue or not
-
 logger = get_logger(__name__)
 
 chat_service = ChatService()
