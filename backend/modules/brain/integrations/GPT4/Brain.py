@@ -1,6 +1,6 @@
 import json
 import operator
-from typing import Annotated, AsyncIterable, List, Sequence, TypedDict
+from typing import Annotated, AsyncIterable, List, Optional, Sequence, TypedDict
 from uuid import UUID
 
 from langchain.tools import BaseTool
@@ -15,7 +15,12 @@ from modules.brain.knowledge_brain_qa import KnowledgeBrainQA
 from modules.chat.dto.chats import ChatQuestion
 from modules.chat.dto.outputs import GetChatHistoryOutput
 from modules.chat.service.chat_service import ChatService
-from modules.tools import ImageGeneratorTool, URLReaderTool, WebSearchTool
+from modules.tools import (
+    EmailSenderTool,
+    ImageGeneratorTool,
+    URLReaderTool,
+    WebSearchTool,
+)
 
 
 class AgentState(TypedDict):
@@ -37,8 +42,8 @@ class GPT4Brain(KnowledgeBrainQA):
         KnowledgeBrainQA (_type_): A brain that store the knowledge internaly
     """
 
-    tools: List[BaseTool] = [WebSearchTool(), ImageGeneratorTool(), URLReaderTool()]
-    tool_executor: ToolExecutor = ToolExecutor(tools)
+    tools: Optional[List[BaseTool]] = None
+    tool_executor: Optional[ToolExecutor] = None
     model_function: ChatOpenAI = None
 
     def __init__(
@@ -48,6 +53,13 @@ class GPT4Brain(KnowledgeBrainQA):
         super().__init__(
             **kwargs,
         )
+        self.tools = [
+            WebSearchTool(),
+            ImageGeneratorTool(),
+            URLReaderTool(),
+            EmailSenderTool(user_email=self.user_email),
+        ]
+        self.tool_executor = ToolExecutor(tools=self.tools)
 
     def calculate_pricing(self):
         return 3
@@ -164,7 +176,7 @@ class GPT4Brain(KnowledgeBrainQA):
         transformed_history, streamed_chat_history = (
             self.initialize_streamed_chat_history(chat_id, question)
         )
-        filtered_history = self.filter_history(transformed_history, 20, 2000)
+        filtered_history = self.filter_history(transformed_history, 40, 2000)
         response_tokens = []
         config = {"metadata": {"conversation_id": str(chat_id)}}
 
@@ -232,7 +244,7 @@ class GPT4Brain(KnowledgeBrainQA):
         transformed_history, _ = self.initialize_streamed_chat_history(
             chat_id, question
         )
-        filtered_history = self.filter_history(transformed_history, 20, 2000)
+        filtered_history = self.filter_history(transformed_history, 40, 2000)
         config = {"metadata": {"conversation_id": str(chat_id)}}
 
         prompt = ChatPromptTemplate.from_messages(
