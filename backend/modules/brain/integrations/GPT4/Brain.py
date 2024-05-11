@@ -35,13 +35,13 @@ chat_service = ChatService()
 class GPT4Brain(KnowledgeBrainQA):
     """
     GPT4Brain integrates with GPT-4 to provide real-time answers and supports various tools to enhance its capabilities.
-    
+
     Available Tools:
     - WebSearchTool: Performs web searches to find relevant information.
     - ImageGeneratorTool: Generates images based on textual descriptions.
     - URLReaderTool: Reads and summarizes content from URLs.
     - EmailSenderTool: Sends emails with specified content.
-    
+
     Use Cases:
     - WebSearchTool can be used to find the latest news articles on a specific topic or to gather information from various websites.
     - ImageGeneratorTool is useful for creating visual content based on textual prompts, such as generating a company logo based on a description.
@@ -51,7 +51,7 @@ class GPT4Brain(KnowledgeBrainQA):
 
     tools: Optional[List[BaseTool]] = None
     tool_executor: Optional[ToolExecutor] = None
-    model_function: ChatOpenAI = None
+    function_model: ChatOpenAI = None
 
     def __init__(
         self,
@@ -90,7 +90,7 @@ class GPT4Brain(KnowledgeBrainQA):
     # Define the function that calls the model
     def call_model(self, state):
         messages = state["messages"]
-        response = self.model_function.invoke(messages)
+        response = self.function_model.invoke(messages)
         # We return a list, because this will get added to the existing list
         return {"messages": [response]}
 
@@ -166,11 +166,11 @@ class GPT4Brain(KnowledgeBrainQA):
         return app
 
     def get_chain(self):
-        self.model_function = ChatOpenAI(
+        self.function_model = ChatOpenAI(
             model="gpt-4-turbo", temperature=0, streaming=True
         )
 
-        self.model_function = self.model_function.bind_tools(self.tools)
+        self.function_model = self.function_model.bind_tools(self.tools)
 
         graph = self.create_graph()
 
