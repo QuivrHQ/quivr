@@ -4,7 +4,7 @@ from typing import List, Optional
 from uuid import UUID
 
 from langchain.chains import ConversationalRetrievalChain
-from langchain.embeddings.ollama import OllamaEmbeddings
+from langchain_community.embeddings import OllamaEmbeddings
 from langchain.llms.base import BaseLLM
 from langchain.prompts import HumanMessagePromptTemplate, SystemMessagePromptTemplate
 from langchain.retrievers import ContextualCompressionRetriever

@@ -1,7 +1,7 @@
 from typing import Optional
 from uuid import UUID
 
-from langchain.embeddings.ollama import OllamaEmbeddings
+from langchain_community.embeddings import OllamaEmbeddings
 from langchain_openai import OpenAIEmbeddings
 from logger import get_logger
 from models.databases.supabase.supabase import SupabaseDB
