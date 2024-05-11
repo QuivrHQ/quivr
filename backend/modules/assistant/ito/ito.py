@@ -121,8 +121,8 @@ class OutputHandler(BaseModel):
             </div>
             """
             params = {
-                "from": mail_from,
-                "to": mail_to,
+                "sender": mail_from,
+                "to": [mail_to],
                 "subject": "Quivr Ingestion Processed",
                 "reply_to": "no-reply@quivr.app",
                 "html": body,

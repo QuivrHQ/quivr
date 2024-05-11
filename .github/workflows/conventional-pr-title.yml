@@ -1,22 +1,20 @@
-name: Check PR title conventional commit
+name: "Lint PR"
 
 on:
-  pull_request:
+  pull_request_target:
     types:
       - opened
-      - reopened
       - edited
       - synchronize
 
+permissions:
+  pull-requests: read
+
 jobs:
-  lint:
+  main:
+    name: Validate PR title
     runs-on: ubuntu-latest
     steps:
-      - uses: aslafy-z/conventional-pr-title-action@main
-        with:
-          success-state: Title follows the specification.
-          failure-state: Title does not follow the specification.
-          context-name: conventional-pr-title
-          preset: conventional-changelog-angular@latest
+      - uses: amannn/action-semantic-pull-request@v5
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

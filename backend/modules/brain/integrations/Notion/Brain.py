@@ -2,17 +2,24 @@ from modules.brain.knowledge_brain_qa import KnowledgeBrainQA
 
 
 class NotionBrain(KnowledgeBrainQA):
-    """This is the Notion brain class. it is a KnowledgeBrainQA has the data is stored locally.
-    It is going to call the Data Store internally to get the data.
+    """
+    NotionBrain integrates with Notion to provide knowledge-based responses.
+    It leverages data stored in Notion to answer user queries.
 
-    Args:
-        KnowledgeBrainQA (_type_): A brain that store the knowledge internaly
+    Attributes:
+        **kwargs: Arbitrary keyword arguments for KnowledgeBrainQA initialization.
     """
 
     def __init__(
         self,
         **kwargs,
     ):
+        """
+        Initializes the NotionBrain with the given arguments.
+
+        Args:
+            **kwargs: Arbitrary keyword arguments.
+        """
         super().__init__(
             **kwargs,
         )

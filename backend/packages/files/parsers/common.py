@@ -1,10 +1,11 @@
+import asyncio
 import os
-import re
 import tempfile
 import time
 
 import nest_asyncio
 import tiktoken
+import uvloop
 from langchain.schema import Document
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from llama_parse import LlamaParse
@@ -14,7 +15,8 @@ from modules.brain.service.brain_vector_service import BrainVectorService
 from modules.upload.service.upload_file import DocumentSerializable
 from packages.embeddings.vectors import Neurons
 
-nest_asyncio.apply()
+if not isinstance(asyncio.get_event_loop(), uvloop.Loop):
+    nest_asyncio.apply()
 
 logger = get_logger(__name__)
 
@@ -84,8 +86,6 @@ async def process_file(
             doc.page_content = f"Filename: {new_metadata['original_file_name']} Content: {doc.page_content}"
 
             doc.page_content = doc.page_content.replace("\u0000", "")
-            # Replace unsupported Unicode characters
-            doc.page_content = re.sub(r"[^\x00-\x7F]+", " ", doc.page_content)
 
             len_chunk = len(enc.encode(doc.page_content))
 

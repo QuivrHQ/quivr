@@ -1,5 +1,66 @@
 # Changelog
 
+## 0.0.251 (2024-05-10)
+
+## What's Changed
+* feat(tool): Add URLReaderTool by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2577
+* feat(email): Add email sender tool and update image generator tool by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2579
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.250...v0.0.251
+
+## 0.0.250 (2024-05-10)
+
+## What's Changed
+* feat(gpt4): Add search functionality by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2566
+* [ImgBot] Optimize images by @imgbot in https://github.com/QuivrHQ/quivr/pull/2568
+* feat(gpt4): image generation by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2569
+* fix(front): Add NEXT_PUBLIC_AUTH_MODES to .env.example by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2570
+* fix: NEXT_PUBLIC_AUTH_MODES in docker-compose.yml by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2572
+* docs: Add Supabase configuration documentation by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2574
+* docs(gpt4): Update GPT-4 Documentation by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2573
+* chore: tools by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2575
+* feat(brave-search): Update GPT4Brain tools and add WebSearchTool by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2576
+
+## New Contributors
+* @imgbot made their first contribution in https://github.com/QuivrHQ/quivr/pull/2568
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.249...v0.0.250
+
+## 0.0.249 (2024-05-08)
+
+## What's Changed
+* feat(crawler): Add Playwright for web crawling by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2562
+* ci(ecr): added build to public ecr by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2564
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.248...v0.0.249
+
+## 0.0.248 (2024-05-07)
+
+## What's Changed
+* fix: utf8 encoding by @chloedia in https://github.com/QuivrHQ/quivr/pull/2555
+* feat(celery): moved assistant summary to celery by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2557
+* Revert "feat(celery): moved assistant summary to celery" by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2558
+
+## New Contributors
+* @chloedia made their first contribution in https://github.com/QuivrHQ/quivr/pull/2555
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.247...v0.0.248
+
+## 0.0.247 (2024-05-07)
+
+## What's Changed
+* feat(frontend): add notifications for document uploads by @Zewed in https://github.com/QuivrHQ/quivr/pull/2549
+* Update install.mdx by @dazeb in https://github.com/QuivrHQ/quivr/pull/2552
+* fix(frontend): fix notifications issues by @Zewed in https://github.com/QuivrHQ/quivr/pull/2551
+* chore(ci): Update PR title linting workflow by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2553
+
+## New Contributors
+* @dazeb made their first contribution in https://github.com/QuivrHQ/quivr/pull/2552
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.246...v0.0.247
+
 ## 0.0.246 (2024-05-04)
 
 ## What's Changed

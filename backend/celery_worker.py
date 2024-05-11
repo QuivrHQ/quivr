@@ -126,6 +126,13 @@ def process_crawl_and_notify(
                 original_file_name=crawl_website_url,
             )
         )
+        notification_service.update_notification_by_id(
+            notification_id,
+            NotificationUpdatableProperties(
+                status=NotificationsStatusEnum.SUCCESS,
+                description=f"Your URL has been properly crawled!",
+            ),
+        )
     else:
         loop = asyncio.get_event_loop()
         message = loop.run_until_complete(
@@ -143,6 +150,7 @@ def process_crawl_and_notify(
                 description="Your file has been properly uploaded!",
             ),
         )
+
     brain_service.update_brain_last_update_time(brain_id)
     return True
 
