@@ -3,9 +3,9 @@ import operator
 from typing import Annotated, AsyncIterable, List, Sequence, TypedDict
 from uuid import UUID
 
+from langchain.pydantic_v1 import Field
 from langchain_core.messages import BaseMessage
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
-
 from langchain_openai import ChatOpenAI
 from langgraph.graph import END, StateGraph
 from logger import get_logger
@@ -13,17 +13,17 @@ from modules.brain.knowledge_brain_qa import KnowledgeBrainQA
 from modules.chat.dto.chats import ChatQuestion
 from modules.chat.dto.outputs import GetChatHistoryOutput
 from modules.chat.service.chat_service import ChatService
-from langchain.pydantic_v1 import Field 
 from pydantic import BaseModel
 
 
 class CodeGenerationOutput(BaseModel):
     """Code formatted Output"""
 
-    prefix: str = Field(...,description="Description of the problem and approach")
-    imports: str = Field(...,description="Code block import statements")
-    code: str = Field(...,description="Code block not including import statements")
-    #description: str = "Schema for code solutions to questions about the doc"
+    prefix: str = Field(..., description="Description of the problem and approach")
+    imports: str = Field(..., description="Code block import statements")
+    code: str = Field(..., description="Code block not including import statements")
+    # description: str = "Schema for code solutions to questions about the doc"
+
 
 class AgentState(TypedDict):
     generation: CodeGenerationOutput
@@ -33,12 +33,12 @@ class AgentState(TypedDict):
     error: str
 
 
-
 # Define the function that determines whether to continue or not
 
 logger = get_logger(__name__)
 
 chat_service = ChatService()
+
 
 class GPT4CodeBrain(KnowledgeBrainQA):
     """This is the Notion brain class. it is a KnowledgeBrainQA has the data is stored locally.
@@ -48,12 +48,13 @@ class GPT4CodeBrain(KnowledgeBrainQA):
         KnowledgeBrainQA (_type_): A brain that store the knowledge internaly
     """
 
-    #tools: List[BaseTool] = [DuckDuckGoSearchResults(), ImageGeneratorTool()]
-    #tool_executor: ToolExecutor = ToolExecutor(tools)
+    # tools: List[BaseTool] = [DuckDuckGoSearchResults(), ImageGeneratorTool()]
+    # tool_executor: ToolExecutor = ToolExecutor(tools)
     model_function: ChatOpenAI = None
-    max_iterations: int = 3 
+    max_iterations: int = 3
     prompt: ChatPromptTemplate = None
-    count: int = 0 #FIXME: Delete
+    count: int = 0  # FIXME: Delete
+
     def __init__(
         self,
         **kwargs,
@@ -72,10 +73,10 @@ class GPT4CodeBrain(KnowledgeBrainQA):
 
         error: str = state["error"]
         iterations: int = state["iterations"]
-        
+
         if error == "no":
             return "end"
-        
+
         elif iterations < self.max_iterations:
             return "end"
         else:
@@ -88,14 +89,14 @@ class GPT4CodeBrain(KnowledgeBrainQA):
         response = self.model_function.invoke(messages)
         # We return a list, because this will get added to the existing list
         return {"messages": [response]}
-    
+
     def generate(self, state: AgentState):
         # State
         messages = state["messages"]
         iterations = state["iterations"]
         error = state["error"]
 
-         # Check if we are called because of an error
+        # Check if we are called because of an error
         if error == "yes":
             messages += [
                 (
@@ -103,8 +104,10 @@ class GPT4CodeBrain(KnowledgeBrainQA):
                     "Now, try again. Invoke the code tool to structure the output with a prefix, imports, and code block:",
                 )
             ]
-        
-        code_gen_chain = self.prompt | self.model_function.with_structured_output(CodeGenerationOutput)
+
+        code_gen_chain = self.prompt | self.model_function.with_structured_output(
+            CodeGenerationOutput
+        )
 
         # Solution
         if error != "no":
@@ -120,8 +123,11 @@ class GPT4CodeBrain(KnowledgeBrainQA):
 
         # Increment
         iterations = iterations + 1
-        return {"generation": code_solution, "messages": messages, "iterations": iterations}
-    
+        return {
+            "generation": code_solution,
+            "messages": messages,
+            "iterations": iterations,
+        }
 
     def code_check(self, state: AgentState) -> AgentState:
         """
@@ -141,7 +147,7 @@ class GPT4CodeBrain(KnowledgeBrainQA):
         messages_seq = state["messages_seq"]
 
         # Get solution components
-        #prefix = code_solution.prefix
+        # prefix = code_solution.prefix
         imports = code_solution["imports"]
         code = code_solution["code"]
 
@@ -163,7 +169,9 @@ class GPT4CodeBrain(KnowledgeBrainQA):
         try:
             exec(imports + "\n" + code)
         except Exception as e:
-            error_message = [("user", f"Your solution failed the code execution test: {e}")]
+            error_message = [
+                ("user", f"Your solution failed the code execution test: {e}")
+            ]
             messages += error_message
             return {
                 "generation": code_solution,
@@ -189,13 +197,12 @@ class GPT4CodeBrain(KnowledgeBrainQA):
         # Define the two nodes we will cycle between
         workflow.add_node("generate", self.generate)  # generate solution
         workflow.add_node("code_check", self.code_check)  # check code
-        #workflow.add_node("final", self.code_check)  # render the final message
+        # workflow.add_node("final", self.code_check)  # render the final message
 
         # Set the entrypoint as `agent`
         # This means that this node is the first one called
         workflow.set_entry_point("generate")
         workflow.add_edge("generate", "code_check")
-
 
         # We now add a conditional edge
         workflow.add_conditional_edges(
@@ -213,15 +220,14 @@ class GPT4CodeBrain(KnowledgeBrainQA):
             {
                 "end": END,
                 "generate": "generate",
-                #"final": "final"
+                # "final": "final"
             },
         )
-        #workflow.add_edge("final", END)
-
+        # workflow.add_edge("final", END)
 
         # We now add a normal edge from `tools` to `agent`.
         # This means that after `tools` is called, `agent` node is called next.
-        #workflow.add_edge("reflect", "generate")
+        # workflow.add_edge("reflect", "generate")
 
         # Finally, we compile it!
         # This compiles it into a LangChain Runnable,
@@ -251,7 +257,7 @@ class GPT4CodeBrain(KnowledgeBrainQA):
         response_tokens = []
         config = {"metadata": {"conversation_id": str(chat_id)}}
 
-        self.prompt = ChatPromptTemplate.from_messages( #type: ignore
+        self.prompt = ChatPromptTemplate.from_messages(  # type: ignore
             [
                 (
                     "system",
@@ -293,20 +299,17 @@ class GPT4CodeBrain(KnowledgeBrainQA):
                 output = event["data"]["output"]
                 print(f"OUTPUT #{self.count}: {output}")
                 for item in output:
-                    print("ITEM: ", item)
-                print("LEN OUTPUT :", len(output))
-                final_output = [item for item in output if "final" in item]
-                print("Final : ", final_output)
-                if final_output:
-                    if (
-                        final_output[0]["final"]["messages"][0].name
-                        == "code-generator"
-                    ):
-                        final_message = final_output[0]["final"]["messages"][0].content
+                    if "code_check" in item:
+                        print("ITEM: ", item)
+
+                for item in output:
+                    if "code_check" in item:
+                        print("Code Check: ", item["code_check"])
+                        final_message = item["code_check"]["generation"]["code"]
                         response_tokens.append(final_message)
                         streamed_chat_history.assistant = final_message
                         yield f"data: {json.dumps(streamed_chat_history.dict())}"
-        self.count+=1
+        self.count += 1
 
         self.save_answer(question, response_tokens, streamed_chat_history, save_answer)
 
@@ -321,7 +324,7 @@ class GPT4CodeBrain(KnowledgeBrainQA):
 
         config = {"metadata": {"conversation_id": str(chat_id)}}
 
-        self.prompt = ChatPromptTemplate.from_messages( #type: ignore
+        self.prompt = ChatPromptTemplate.from_messages(  # type: ignore
             [
                 (
                     "system",
@@ -331,7 +334,7 @@ class GPT4CodeBrain(KnowledgeBrainQA):
             with all required imports and variables defined. Structure your answer with a description of the code solution. \n
             Then list the imports. And finally list the functioning code block. Here is the user question:""",
                 ),
-                #MessagesPlaceholder(variable_name="chat_history"),
+                # MessagesPlaceholder(variable_name="chat_history"),
                 ("human", "{messages}"),
             ]
         )
