@@ -1,3 +1,4 @@
+@use "@/styles/Radius.module.scss";
 @use "@/styles/Spacings.module.scss";
 @use "@/styles/Typography.module.scss";
 
@@ -5,6 +6,7 @@
   display: flex;
   gap: Spacings.$spacing02;
   align-items: center;
+  border-radius: Radius.$normal;
 
   .credits {
     display: flex;
@@ -15,5 +17,9 @@
       font-size: Typography.$tiny;
       color: var(--gold);
     }
+  }
+
+  &:hover {
+    background-color: var(--background-3);
   }
 }
