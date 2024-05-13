@@ -46,7 +46,6 @@ export const UserToInvite = ({
         inputValue={email}
         setInputValue={setEmail}
         onKeyDown={(event) => {
-          console.info(event.key);
           if (
             event.key === "Backspace" &&
             removeCurrentInvitation &&
