@@ -3,6 +3,7 @@ from modules.brain.api_brain_qa import APIBrainQA
 from modules.brain.entity.brain_entity import BrainType, RoleEnum
 from modules.brain.integrations.Big.Brain import BigBrain
 from modules.brain.integrations.GPT4.Brain import GPT4Brain
+from modules.brain.integrations.GPT4_code.Brain import GPT4CodeBrain
 from modules.brain.integrations.Notion.Brain import NotionBrain
 from modules.brain.integrations.Proxy.Brain import ProxyBrain
 from modules.brain.integrations.SQL.Brain import SQLBrain
@@ -40,6 +41,7 @@ models_supporting_function_calls = [
 integration_list = {
     "notion": NotionBrain,
     "gpt4": GPT4Brain,
+    "gpt4-code": GPT4CodeBrain,
     "sql": SQLBrain,
     "big": BigBrain,
     "doc": KnowledgeBrainQA,
