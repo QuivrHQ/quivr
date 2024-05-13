@@ -3,6 +3,7 @@ from typing import AsyncIterable, List, TypedDict
 from uuid import UUID
 
 from langchain.pydantic_v1 import Field
+from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_openai import ChatOpenAI
 from langgraph.graph import END, StateGraph
 from logger import get_logger
@@ -11,10 +12,6 @@ from modules.chat.dto.chats import ChatQuestion
 from modules.chat.dto.outputs import GetChatHistoryOutput
 from modules.chat.service.chat_service import ChatService
 from pydantic import BaseModel
-from langgraph.prebuilt import ToolExecutor, ToolInvocation
-from langchain_core.tools import BaseTool
-from langchain_core.messages import ToolMessage
-
 
 
 class CodeGenerationOutput(BaseModel):
@@ -49,10 +46,12 @@ class GPT4CodeBrain(KnowledgeBrainQA):
         KnowledgeBrainQA (_type_): A brain that store the knowledge internaly
     """
 
-    tools: List[BaseTool] = [CodeChecker(), CodeGeneratorTool()]
-    tool_executor: ToolExecutor = ToolExecutor(tools)
+    # tools: List[BaseTool] = [DuckDuckGoSearchResults(), ImageGeneratorTool()]
+    # tool_executor: ToolExecutor = ToolExecutor(tools)
     model_function: ChatOpenAI = None
     max_iterations: int = 3
+    prompt: ChatPromptTemplate = None
+    count: int = 0  # FIXME: Delete
 
     def __init__(
         self,
@@ -81,38 +80,121 @@ class GPT4CodeBrain(KnowledgeBrainQA):
         else:
             # else we try re generating an answer
             return "generate"
-        
-    def call_tool(self, state: AgentState) -> AgentState:
+
+    # Define the function that calls the model
+    def call_model(self, state: AgentState):
         messages = state["messages"]
-        # Based on the continue condition
-        # we know the last message involves a function call
-        last_message = messages[-1]
-        # We construct an ToolInvocation from the function_call
-        tool_call = last_message.tool_calls[0]
-        tool_name = tool_call["name"]
-        arguments = tool_call["args"]
-
-        action = ToolInvocation(
-            tool=tool_call["name"],
-            tool_input=tool_call["args"],
-        )
-        # We call the tool_executor and get back a response
-        response = self.tool_executor.invoke(action)
-        # We use the response to create a FunctionMessage
-        function_message = ToolMessage(
-            content=str(response), name=action.tool, tool_call_id=tool_call["id"]
-        )
+        response = self.model_function.invoke(messages)
         # We return a list, because this will get added to the existing list
-        return {"messages": [function_message]} #FIXME: check if this is correct
+        return {"messages": [response]}
 
+    def generate(self, state: AgentState):
+        # State
+        messages = state["messages"]
+        iterations = state["iterations"]
+        error = state["error"]
+
+        # Check if we are called because of an error
+        if error == "yes":
+            messages += [
+                (
+                    "user",
+                    "Now, try again. Invoke the code tool to structure the output with a prefix, imports, and code block:",
+                )
+            ]
+
+        code_gen_chain = self.prompt | self.model_function.with_structured_output(
+            CodeGenerationOutput
+        )
+
+        # Solution
+        if error != "no":
+            code_solution = code_gen_chain.invoke(
+                {"chat_history": [""], "messages": messages}
+            )
+        messages += [
+            (
+                "assistant",
+                f"\n{code_solution['prefix']} \n Imports: {code_solution['imports']} \n Code: {code_solution['code']}",
+            )
+        ]
+
+        # Increment
+        iterations = iterations + 1
+        return {
+            "generation": code_solution,
+            "messages": messages,
+            "iterations": iterations,
+        }
+
+    def code_check(self, state: AgentState) -> AgentState:
+        """
+        Check code validity
+
+        Args:
+            state (dict): The current graph state
+
+        Returns:
+            state (dict): New key added to state, error
+        """
+
+        # State
+        messages = state["messages"]
+        code_solution = state["generation"]
+        iterations = state["iterations"]
+        #messages_seq = state["messages_seq"]
+
+        # Get solution components
+        # prefix = code_solution.prefix
+        imports = code_solution["imports"]
+        code = code_solution["code"]
+
+        # Check imports
+        try:
+            exec(imports)
+        except Exception as e:
+            error_message = [("user", f"Your solution failed the import test: {e}")]
+            messages += error_message
+            return {
+                "generation": code_solution,
+                "messages": messages,
+                "iterations": iterations,
+                "error": "yes",
+                #"messages_seq": messages_seq,
+            }
+
+        # Check execution
+        try:
+            exec(imports + "\n" + code)
+        except Exception as e:
+            error_message = [
+                ("user", f"Your solution failed the code execution test: {e}")
+            ]
+            messages += error_message
+            return {
+                "generation": code_solution,
+                "messages": messages,
+                "iterations": iterations,
+                "error": "yes",
+                #"messages_seq": messages_seq,
+            }
+
+        # No errors
+        return {
+            "generation": code_solution,
+            "messages": messages,
+            "iterations": iterations,
+            "error": "no",
+            #"messages_seq": messages_seq,
+        }
 
     def create_graph(self):
         # Define a new graph
         workflow = StateGraph(AgentState)
 
         # Define the two nodes we will cycle between
-        workflow.add_node("generate", self.call_tool)  # generate solution
-        workflow.add_node("code_check", self.call_tool)  # check code
+        workflow.add_node("generate", self.generate)  # generate solution
+        workflow.add_node("code_check", self.code_check)  # check code
         # workflow.add_node("final", self.code_check)  # render the final message
 
         # Set the entrypoint as `agent`
@@ -173,20 +255,20 @@ class GPT4CodeBrain(KnowledgeBrainQA):
         response_tokens = []
         config = {"metadata": {"conversation_id": str(chat_id)}}
 
-        # self.prompt = ChatPromptTemplate.from_messages(  # type: ignore
-        #     [
-        #         (
-        #             "system",
-        #             """You are a coding assistant. \n 
-        #     Here is a full set of a specific documentation:  \n ------- \n  || \n ------- \n Answer the user 
-        #     question based on the above provided documentation. Ensure any code you provide can be executed \n 
-        #     with all required imports and variables defined. Structure your answer with a description of the code solution. \n
-        #     Then list the imports. And finally list the functioning code block. Here is the user question:""",
-        #         ),
-        #         MessagesPlaceholder(variable_name="chat_history"),
-        #         ("human", "{messages}"),
-        #     ]
-        # )
+        self.prompt = ChatPromptTemplate.from_messages(  # type: ignore
+            [
+                (
+                    "system",
+                    """You are a coding assistant. \n 
+            Here is a full set of a specific documentation:  \n ------- \n  || \n ------- \n Answer the user 
+            question based on the above provided documentation. Ensure any code you provide can be executed \n 
+            with all required imports and variables defined. Structure your answer with a description of the code solution. \n
+            Then list the imports. And finally list the functioning code block. Here is the user question:""",
+                ),
+                MessagesPlaceholder(variable_name="chat_history"),
+                ("human", "{messages}"),
+            ]
+        )
         # prompt_formated = prompt.format_messages(
         #     chat_history=filtered_history,
         #     question=question.question,
@@ -213,6 +295,7 @@ class GPT4CodeBrain(KnowledgeBrainQA):
                     yield f"data: {json.dumps(streamed_chat_history.dict())}"
             elif kind == "on_chain_end":
                 output = event["data"]["output"]
+                print(f"OUTPUT #{self.count}: {output}")
                 for item in output:
                     if "code_check" in item:
                         print("ITEM: ", item)
@@ -230,6 +313,7 @@ class GPT4CodeBrain(KnowledgeBrainQA):
                         response_tokens.append(final_message)
                         streamed_chat_history.assistant = final_message
                         yield f"data: {json.dumps(streamed_chat_history.dict())}"
+        self.count += 1
 
         self.save_answer(question, response_tokens, streamed_chat_history, save_answer)
 
@@ -244,20 +328,20 @@ class GPT4CodeBrain(KnowledgeBrainQA):
 
         config = {"metadata": {"conversation_id": str(chat_id)}}
 
-        # self.prompt = ChatPromptTemplate.from_messages(  # type: ignore
-        #     [
-        #         (
-        #             "system",
-        #             """You are a coding assistant with expertise in LCEL, LangChain expression language. \n 
-        #     Here is a full set of a specific documentation:  \n ------- \n ||  \n ------- \n Answer the user 
-        #     question based on the above provided documentation. Ensure any code you provide can be executed \n 
-        #     with all required imports and variables defined. Structure your answer with a description of the code solution. \n
-        #     Then list the imports. And finally list the functioning code block. Here is the user question:""",
-        #         ),
-        #         # MessagesPlaceholder(variable_name="chat_history"),
-        #         ("human", "{messages}"),
-        #     ]
-        # )
+        self.prompt = ChatPromptTemplate.from_messages(  # type: ignore
+            [
+                (
+                    "system",
+                    """You are a coding assistant with expertise in LCEL, LangChain expression language. \n 
+            Here is a full set of a specific documentation:  \n ------- \n ||  \n ------- \n Answer the user 
+            question based on the above provided documentation. Ensure any code you provide can be executed \n 
+            with all required imports and variables defined. Structure your answer with a description of the code solution. \n
+            Then list the imports. And finally list the functioning code block. Here is the user question:""",
+                ),
+                # MessagesPlaceholder(variable_name="chat_history"),
+                ("human", "{messages}"),
+            ]
+        )
         # prompt_formated = prompt.format_messages(
         #     chat_history=filtered_history,
         #     question=question.question,
