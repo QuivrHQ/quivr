@@ -28,7 +28,7 @@ import {
   FaUnlock,
 } from "react-icons/fa";
 import { FaInfo } from "react-icons/fa6";
-import { FiUpload } from "react-icons/fi";
+import { FiBook, FiUpload } from "react-icons/fi";
 import { HiBuildingOffice } from "react-icons/hi2";
 import {
   IoIosAdd,
@@ -85,6 +85,7 @@ export const iconList: { [name: string]: IconType } = {
   addWithoutCircle: IoIosAdd,
   assistant: TbRobot,
   back: RiDeleteBackLine,
+  book: FiBook,
   brain: LuBrain,
   brainCircuit: LuBrainCircuit,
   calendar: FaCalendar,

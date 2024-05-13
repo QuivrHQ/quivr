@@ -14,6 +14,7 @@ import { AnimatedDiv } from "./components/AnimationDiv";
 import { AssistantsButton } from "./components/AssistantsButton/AssistantsButton";
 import { DiscussionButton } from "./components/DiscussionButton/DiscussionButton";
 import { HomeButton } from "./components/HomeButton/HomeButton";
+import { KnowledgeButton } from "./components/KnowledgeButton/KnowledgeButton";
 import { ProfileButton } from "./components/ProfileButton/ProfileButton";
 import { SocialsButtons } from "./components/SocialsButtons/SocialsButtons";
 import { StudioButton } from "./components/StudioButton/StudioButton";
@@ -36,9 +37,10 @@ export const Menu = (): JSX.Element => {
   const displayedOnPages = [
     "/assistants",
     "/chat",
+    "/knowledge",
     "/library",
     "/search",
-    "studio",
+    "/studio",
     "/user",
   ];
 
@@ -73,6 +75,7 @@ export const Menu = (): JSX.Element => {
               <div className={styles.block}>
                 <DiscussionButton />
                 <HomeButton />
+                <KnowledgeButton />
                 <StudioButton />
                 <AssistantsButton />
                 <ThreadsButton />
