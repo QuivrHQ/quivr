@@ -123,11 +123,12 @@ class LlamaIndexVeluxUK(KnowledgeBrainQA):
             print("### No index found...")
             return None
 
-        DEFAULT_TEXT_QA_PROMPT_TMPL = (
+        VELUX_TEXT_QA_PROMPT_TMPL = (
             "Context information is below.\n"
             "---------------------\n"
             "{context_str}\n"
             "---------------------\n"
+            "Only use information and product details provided in the context."
             "You are an experienced architect specializing in Velux products (building and construction products, TODO(pg)...)."
             "You will answer in Professional architectural and building and construction products Language."
             "Keep your answers short and always deliver only what was asked."
@@ -136,25 +137,26 @@ class LlamaIndexVeluxUK(KnowledgeBrainQA):
             "In cases of conflicting information, use the most recent product by the date of being published."
             "Your responses should be clear, concise, and tailored to the level of understanding of the user, ensuring they receive the most relevant and accurate information."
             "Your goal is to help architects with building regulations so they don't get rejected by the building inspectorate."
-            "Always answer in the language you were spoken to unless the user speaks in serbian or croation, then always answer in latin serbian."
+            "Always answer in the language you were spoken to unless the user speaks in serbian or croatian, then always answer in latin serbian."
             "Query: {query_str}\n"
-            "Answer: "
         )
-        DEFAULT_TEXT_QA_PROMPT = PromptTemplate(
-            DEFAULT_TEXT_QA_PROMPT_TMPL, prompt_type=PromptType.QUESTION_ANSWER
+        VELUX_TEXT_QA_PROMPT = PromptTemplate(
+            VELUX_TEXT_QA_PROMPT_TMPL, prompt_type=PromptType.QUESTION_ANSWER
+        )
+        VELUX_SYSTEM_PROMPT_TMPL = VELUX_TEXT_QA_PROMPT_TMPL
+        VELUX_SYSTEM_PROMPT = PromptTemplate(
+            VELUX_SYSTEM_PROMPT_TMPL, prompt_type=PromptType.CUSTOM
         )
 
         return self._index.as_chat_engine(
             chat_mode=ChatMode.CONTEXT,
             similarity_top_k=10,
             node_postprocessors=[self._reranker],
-            text_qa_template=DEFAULT_TEXT_QA_PROMPT,
+            text_qa_template=VELUX_TEXT_QA_PROMPT,
+            system_prompt=VELUX_SYSTEM_PROMPT,
             stream=True,
             verbose=True,
         )
-        # return self._index.as_query_engine(
-        #     text_qa_template=DEFAULT_TEXT_QA_PROMPT, stream=True, verbose=True
-        # )
 
     def _format_chat_history(self, chat_history):
         return [
