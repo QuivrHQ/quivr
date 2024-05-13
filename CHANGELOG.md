@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.0.252 (2024-05-13)
+
+## What's Changed
+* docs: Update GPT4 documentation with available tools and use cases by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2580
+* docs: Add docstrings to integration brains by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2582
+* fix: Update import statements for OllamaEmbeddings by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2584
+* feat: Add support for gpt-4o model by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2589
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.251...v0.0.252
+
 ## 0.0.251 (2024-05-10)
 
 ## What's Changed
