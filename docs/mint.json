@@ -28,9 +28,9 @@
       "url": "https://discord.gg/HUpRgp2HG8"
     },
     {
-      "name": "Blog",
-      "icon": "newspaper",
-      "url": "https://quivr.app/blog"
+      "name": "API Docs",
+      "icon": "globe",
+      "url": "https://api.quivr.app/docs"
     },
     {
       "name": "Status",
@@ -66,8 +66,12 @@
             "configuring/increase-user-usage",
             "configuring/resend-emails",
             "configuring/reranking",
+            "configuring/llamaparse",
             "configuring/environment-variables",
-            "configuring/telemetry"
+            "configuring/profiler",
+            "configuring/telemetry",
+            "configuring/supabase-setup",
+            "configuring/brave-search"
           ]
         },
         "tech-design",
@@ -79,7 +83,8 @@
       "pages": [
         "deployment/porter",
         "deployment/aws",
-        "deployment/digital_ocean"
+        "deployment/digital_ocean",
+        "deployment/vercel"
       ]
     },
     {

@@ -1,0 +1,41 @@
+@use "@/styles/Radius.module.scss";
+@use "@/styles/Spacings.module.scss";
+@use "@/styles/Typography.module.scss";
+
+.source_wrapper {
+  padding: Spacings.$spacing02;
+  border-radius: Radius.$normal;
+  border: 1px solid var(--border-1);
+  width: fit-content;
+  max-width: 100%;
+  overflow: hidden;
+  display: flex;
+  gap: Spacings.$spacing03;
+  cursor: pointer;
+
+  &.selected_source {
+    background-color: var(--primary-0);
+    color: var(--text-0);
+    border-color: var(--primary-0);
+  }
+
+  .source_header {
+    display: flex;
+    align-items: center;
+    gap: Spacings.$spacing03;
+    font-size: Typography.$tiny;
+    overflow: hidden;
+    width: 100%;
+    justify-content: space-between;
+    color: var(--text-2);
+    max-width: 200px;
+
+    .filename {
+      @include Typography.EllipsisOverflow;
+    }
+  }
+
+  &:hover:not(.selected_source) {
+    background-color: var(--background-special-1);
+  }
+}

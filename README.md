@@ -75,15 +75,15 @@ You can find the installation video [here](https://www.youtube.com/watch?v=cXBa6
 
   You just need to update the `OPENAI_API_KEY` variable in the `.env` file. You can get your API key [here](https://platform.openai.com/api-keys). You need to create an account first. And put your credit card information. Don't worry, you won't be charged unless you use the API. You can find more information about the pricing [here](https://openai.com/pricing/).
 
-  > Don't want to use OpenAI and want to use Ollama instead for a completely private experience? You can find the instructions [here](https://docs.quivr.app/developers/contribution/llm/ollama).
 
 - **Step 4**: Launch the project
 
   ```bash
-  supabase start
+  cd backend && supabase start
   ```
   and then 
   ```bash
+  cd ../
   docker compose pull
   docker compose up
   ```

@@ -78,3 +78,36 @@ def get_user_identity_route(
     Get user identity.
     """
     return user_repository.get_user_identity(current_user.id)
+
+@user_router.delete(
+    "/user_data",
+    dependencies=[Depends(AuthBearer())],
+    tags=["User"],
+)
+async def delete_user_data_route(
+    current_user: UserIdentity = Depends(get_current_user),
+):
+    """
+    Delete a user.
+
+    - `user_id`: The ID of the user to delete.
+
+    This endpoint deletes a user from the system.
+    """
+
+    user_repository.delete_user_data(current_user.id)
+
+    return {"message": "User deleted successfully"}
+
+@user_router.get(
+    "/user/credits",
+    dependencies=[Depends(AuthBearer())],
+    tags=["User"],
+)
+def get_user_credits(
+    current_user: UserIdentity = Depends(get_current_user),
+) -> int:
+    """
+    Get user remaining credits.
+    """
+    return user_repository.get_user_credits(current_user.id)

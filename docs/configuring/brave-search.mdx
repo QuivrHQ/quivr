@@ -1,0 +1,42 @@
+---
+title: Configuring Brave Search in Quivr
+description: A guide on how to integrate Brave Search into Quivr by obtaining and configuring the BRAVE_SEARCH_API_KEY.
+---
+
+# Configuring Brave Search in Quivr
+
+Integrating Brave Search into Quivr enhances your search capabilities by leveraging the privacy-focused search engine. This guide will walk you through the process of obtaining a Brave Search API key and configuring it in Quivr.
+
+## Step 1: Create a Brave Search Account
+
+To use Brave Search's API, you first need to create an account with Brave Search. Follow these steps:
+
+1. Visit [Brave Search](https://api.search.brave.com/app/dashboard) and click on the "Sign Up" button.
+2. Follow the on-screen instructions to create your account.
+
+## Step 2: Obtain the API Key
+
+Once you have a Brave Search account, you can obtain an API key:
+
+1. Log in to your Brave Search account.
+2. Navigate to the API section (this might be located in your account settings or developer settings).
+3. Generate a new API key for your application. Note this key as you will need it for the next step.
+
+## Step 3: Configure the BRAVE_SEARCH_API_KEY in Quivr
+
+With your Brave Search API key in hand, you can now configure it in Quivr:
+
+1. Open your Quivr project's `.env` file.
+2. Add the following line to the file:
+   ```
+   BRAVE_SEARCH_API_KEY=your_brave_search_api_key_here
+   ```
+   Replace `your_brave_search_api_key_here` with the actual API key you obtained from Brave Search.
+
+3. Save the `.env` file.
+
+## Conclusion
+
+You have successfully integrated Brave Search into Quivr. Your searches will now leverage the privacy-focused and efficient search capabilities of Brave Search.
+
+For any issues or further configuration options, refer to the Brave Search API documentation or contact Quivr support.

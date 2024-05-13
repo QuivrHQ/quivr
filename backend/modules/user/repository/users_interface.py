@@ -44,3 +44,19 @@ class UsersInterface(ABC):
         Get the user email by user id
         """
         pass
+
+    @abstractmethod
+    def delete_user_data(self, user_id: str):
+        """
+        Delete a user.
+
+        - `user_id`: The ID of the user to delete.
+
+        This endpoint deletes a user from the system. 
+        """
+    @abstractmethod  
+    def get_user_credits(self, user_id: UUID) -> int:
+        """
+        Get user remaining credits
+        """
+        pass

@@ -98,7 +98,7 @@ def update_user_usage(usage: UserUsage, user_settings, cost: int = 100):
     if int(montly_usage + cost) > int(monthly_chat_credit):
         raise HTTPException(
             status_code=429,  # pyright: ignore reportPrivateUsage=none
-            detail=f"You have reached your monthly chat limit of {monthly_chat_credit} requests per months. Please upgrade your plan to increase your daily chat limit.",
+            detail=f"You have reached your monthly chat limit of {monthly_chat_credit} requests per months. Please upgrade your plan to increase your monthly chat limit.",
         )
     else:
         usage.handle_increment_user_request_count(date, cost)

@@ -13,14 +13,14 @@ from modules.brain.repository.integration_brains import Integration, Integration
 from modules.knowledge.dto.inputs import CreateKnowledgeProperties
 from modules.knowledge.repository.knowledge_interface import KnowledgeInterface
 from modules.knowledge.service.knowledge_service import KnowledgeService
-from pydantic import BaseModel
 from modules.upload.service.upload_file import upload_file_storage
+from pydantic import BaseModel
 
 logger = get_logger(__name__)
 
 
 class NotionPage(BaseModel):
-    """Represents a Notion Page object"""
+    """Represents a Notion Page object to be used in the NotionConnector class"""
 
     id: str
     created_time: str
@@ -58,9 +58,7 @@ class NotionConnector(IntegrationBrain, Integration):
 
     def _load_credentials(self) -> dict[str, str]:
         """Load the Notion credentials"""
-        self.integration_details = self.get_integration_brain(
-            self.brain_id
-        )
+        self.integration_details = self.get_integration_brain(self.brain_id)
         if self.credentials is None:
             logger.info("Loading Notion credentials")
             self.integration_details.credentials = {

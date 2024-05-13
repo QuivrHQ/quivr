@@ -7,3 +7,14 @@
   flex-direction: column;
   gap: Spacings.$spacing05;
 }
+
+.modal_wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: Spacings.$spacing05;
+
+  .buttons {
+    display: flex;
+    justify-content: space-between;
+  }
+}

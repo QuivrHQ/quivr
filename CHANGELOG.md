@@ -1,5 +1,158 @@
 # Changelog
 
+## 0.0.251 (2024-05-10)
+
+## What's Changed
+* feat(tool): Add URLReaderTool by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2577
+* feat(email): Add email sender tool and update image generator tool by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2579
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.250...v0.0.251
+
+## 0.0.250 (2024-05-10)
+
+## What's Changed
+* feat(gpt4): Add search functionality by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2566
+* [ImgBot] Optimize images by @imgbot in https://github.com/QuivrHQ/quivr/pull/2568
+* feat(gpt4): image generation by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2569
+* fix(front): Add NEXT_PUBLIC_AUTH_MODES to .env.example by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2570
+* fix: NEXT_PUBLIC_AUTH_MODES in docker-compose.yml by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2572
+* docs: Add Supabase configuration documentation by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2574
+* docs(gpt4): Update GPT-4 Documentation by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2573
+* chore: tools by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2575
+* feat(brave-search): Update GPT4Brain tools and add WebSearchTool by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2576
+
+## New Contributors
+* @imgbot made their first contribution in https://github.com/QuivrHQ/quivr/pull/2568
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.249...v0.0.250
+
+## 0.0.249 (2024-05-08)
+
+## What's Changed
+* feat(crawler): Add Playwright for web crawling by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2562
+* ci(ecr): added build to public ecr by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2564
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.248...v0.0.249
+
+## 0.0.248 (2024-05-07)
+
+## What's Changed
+* fix: utf8 encoding by @chloedia in https://github.com/QuivrHQ/quivr/pull/2555
+* feat(celery): moved assistant summary to celery by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2557
+* Revert "feat(celery): moved assistant summary to celery" by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2558
+
+## New Contributors
+* @chloedia made their first contribution in https://github.com/QuivrHQ/quivr/pull/2555
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.247...v0.0.248
+
+## 0.0.247 (2024-05-07)
+
+## What's Changed
+* feat(frontend): add notifications for document uploads by @Zewed in https://github.com/QuivrHQ/quivr/pull/2549
+* Update install.mdx by @dazeb in https://github.com/QuivrHQ/quivr/pull/2552
+* fix(frontend): fix notifications issues by @Zewed in https://github.com/QuivrHQ/quivr/pull/2551
+* chore(ci): Update PR title linting workflow by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2553
+
+## New Contributors
+* @dazeb made their first contribution in https://github.com/QuivrHQ/quivr/pull/2552
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.246...v0.0.247
+
+## 0.0.246 (2024-05-04)
+
+## What's Changed
+* Enable Porter Application theodo-backend by @porter-deployment-app in https://github.com/QuivrHQ/quivr/pull/2537
+* Enable Porter Application theodo-frontend by @porter-deployment-app in https://github.com/QuivrHQ/quivr/pull/2538
+* Add config parameter to conversational_qa_chain by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2540
+* feat(notion): update doc by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2542
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.245...v0.0.246
+
+## 0.0.245 (2024-05-03)
+
+## What's Changed
+* feat(user): Delete User Data from frontend by @Zewed in https://github.com/QuivrHQ/quivr/pull/2476
+* feat(backend): Add a pre_pring on Connection polling to handle disconnection by @dmourot in https://github.com/QuivrHQ/quivr/pull/2534
+* feat(llama-parse): improve prompt by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2535
+* feat(brain): Add ProxyBrain integration by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2536
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.244...v0.0.245
+
+## 0.0.244 (2024-05-02)
+
+## What's Changed
+* fix: Update parsing instruction in common.py by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2531
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.243...v0.0.244
+
+## 0.0.243 (2024-05-01)
+
+## What's Changed
+* fix: Refactor chat_service.py and remove unused code by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2530
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.242...v0.0.243
+
+## 0.0.242 (2024-05-01)
+
+## What's Changed
+* feat(notifications): implemented notifications with RLS and realtime by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2525
+* chore: packages by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2527
+* Enable Porter Application production by @porter-deployment-app in https://github.com/QuivrHQ/quivr/pull/2528
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.241...v0.0.242
+
+## 0.0.241 (2024-05-01)
+
+## What's Changed
+* feat(llamaparse): Add Llama Parse integration for complex document parsing by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2517
+* Delete Porter Application quivr-back by @porter-deployment-app in https://github.com/QuivrHQ/quivr/pull/2519
+* Delete Porter Application quivr-demo-front by @porter-deployment-app in https://github.com/QuivrHQ/quivr/pull/2520
+* Enable Porter Application preview by @porter-deployment-app in https://github.com/QuivrHQ/quivr/pull/2521
+* Enable Porter Application preview-frontend by @porter-deployment-app in https://github.com/QuivrHQ/quivr/pull/2522
+* feat(frontend): citations & sources by @Zewed in https://github.com/QuivrHQ/quivr/pull/2523
+* Fix: citation handling in ChatItem component by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2524
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.240...v0.0.241
+
+## 0.0.240 (2024-04-29)
+
+## What's Changed
+* feat(supabase): Add logging statements and refactor Supabase client creation by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2514
+* feat(backend): use SQLAlchemy instead od supabase API by @dmourot in https://github.com/QuivrHQ/quivr/pull/2516
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.239...v0.0.240
+
+## 0.0.239 (2024-04-28)
+
+## What's Changed
+* feat(citations): system added by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2498
+* feat(frontend): add nb of knowledges per brain by @Zewed in https://github.com/QuivrHQ/quivr/pull/2502
+* docs: Update links in mint.json to add api by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2504
+* feat(docker): Update Dockerfile to install Supabase CLI by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2505
+* fix(frontend): fix some next errors by @Zewed in https://github.com/QuivrHQ/quivr/pull/2503
+* feat(frontend): show remaining credits by @Zewed in https://github.com/QuivrHQ/quivr/pull/2495
+* feat(embedding): keeping citations by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2506
+* fix(metadata): Removed citation from metadata by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2507
+* Add ci-migration script by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2508
+* Feat/migration ci 2 by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2509
+* Enable Porter Application quivr-com-backend by @porter-deployment-app in https://github.com/QuivrHQ/quivr/pull/2510
+* Enable Porter Application quivr-com by @porter-deployment-app in https://github.com/QuivrHQ/quivr/pull/2511
+* feat(profiler): Add pyinstrument package and update Makefile and backend code by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2512
+* feat(db): Add Supabase client and database instances caching by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2513
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.238...v0.0.239
+
 ## 0.0.238 (2024-04-25)
 
 ## What's Changed

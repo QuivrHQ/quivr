@@ -1,0 +1,25 @@
+---
+title: Profiler
+description: How to use the Profiler to measure performance of your application.
+---
+
+
+# Profiler
+
+The Profiler is a tool that measures the performance of your application. It helps you to identify performance bottlenecks and optimize your application.
+
+## Enabling the Profiler
+
+To enable, add the variable `PROFILING` to your `.env` file:
+
+```bash
+PROFILING=true
+```
+
+## Using the Profiler
+
+To use the Profiler, make a query and add `?profiler=1` to the end of the URL. For example:
+
+```bash
+http://localhost:5050/brains/?profile=1
+```

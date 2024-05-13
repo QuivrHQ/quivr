@@ -1,8 +1,10 @@
+import asyncio
 import os
 import tempfile
 from typing import List
 
 import nest_asyncio
+import uvloop
 from fastapi import UploadFile
 from langchain.prompts import HumanMessagePromptTemplate, SystemMessagePromptTemplate
 from langchain_community.chat_models import ChatLiteLLM
@@ -22,7 +24,8 @@ from modules.assistant.dto.outputs import (
 from modules.assistant.ito.ito import ITO
 from modules.user.entity.user_identity import UserIdentity
 
-nest_asyncio.apply()
+if not isinstance(asyncio.get_event_loop(), uvloop.Loop):
+    nest_asyncio.apply()
 
 
 logger = get_logger(__name__)

@@ -30,10 +30,6 @@ export const useLogoutModal = () => {
         text: t("error", { errorMessage: error.message, ns: "logout" }),
       });
     } else {
-      publish({
-        variant: "success",
-        text: t("loggedOut", { ns: "logout" }),
-      });
       window.location.href = "/";
     }
     setIsLoggingOut(false);

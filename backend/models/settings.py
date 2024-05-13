@@ -1,11 +1,13 @@
+from typing import Optional
 from uuid import UUID
 
-from langchain.embeddings.ollama import OllamaEmbeddings
+from langchain_community.embeddings import OllamaEmbeddings
 from langchain_openai import OpenAIEmbeddings
 from logger import get_logger
 from models.databases.supabase.supabase import SupabaseDB
 from posthog import Posthog
 from pydantic_settings import BaseSettings, SettingsConfigDict
+from sqlalchemy import Engine, create_engine
 from supabase.client import Client, create_client
 from vectorstore.supabase import SupabaseVectorStore
 
@@ -113,6 +115,7 @@ class BrainSettings(BaseSettings):
     ollama_api_base_url: str = None
     langfuse_public_key: str = None
     langfuse_secret_key: str = None
+    pg_database_url: str = None
 
 
 class ResendSettings(BaseSettings):
@@ -120,17 +123,38 @@ class ResendSettings(BaseSettings):
     resend_api_key: str = "null"
 
 
+# Global variables to store the Supabase client and database instances
+_supabase_client: Optional[Client] = None
+_supabase_db: Optional[SupabaseDB] = None
+_db_engine: Optional[Engine] = None
+
+
+def get_pg_database_engine():
+    global _db_engine
+    if _db_engine is None:
+        logger.info("Creating Postgres DB engine")
+        settings = BrainSettings()  # pyright: ignore reportPrivateUsage=none
+        _db_engine = create_engine(settings.pg_database_url, pool_pre_ping=True)
+    return _db_engine
+
+
 def get_supabase_client() -> Client:
-    settings = BrainSettings()  # pyright: ignore reportPrivateUsage=none
-    supabase_client: Client = create_client(
-        settings.supabase_url, settings.supabase_service_key
-    )
-    return supabase_client
+    global _supabase_client
+    if _supabase_client is None:
+        logger.info("Creating Supabase client")
+        settings = BrainSettings()  # pyright: ignore reportPrivateUsage=none
+        _supabase_client = create_client(
+            settings.supabase_url, settings.supabase_service_key
+        )
+    return _supabase_client
 
 
 def get_supabase_db() -> SupabaseDB:
-    supabase_client = get_supabase_client()
-    return SupabaseDB(supabase_client)
+    global _supabase_db
+    if _supabase_db is None:
+        logger.info("Creating Supabase DB")
+        _supabase_db = SupabaseDB(get_supabase_client())
+    return _supabase_db
 
 
 def get_embeddings():
@@ -147,9 +171,7 @@ def get_embeddings():
 def get_documents_vector_store() -> SupabaseVectorStore:
     settings = BrainSettings()  # pyright: ignore reportPrivateUsage=none
     embeddings = get_embeddings()
-    supabase_client: Client = create_client(
-        settings.supabase_url, settings.supabase_service_key
-    )
+    supabase_client: Client = get_supabase_client()
     documents_vector_store = SupabaseVectorStore(
         supabase_client, embeddings, table_name="vectors"
     )
