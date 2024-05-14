@@ -1,0 +1,15 @@
+.brain_folder_wrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  .left {
+    display: flex;
+    align-items: center;
+    gap: Spacings.$spacing03;
+
+    .dark_image {
+      filter: invert(100%);
+    }
+  }
+}
