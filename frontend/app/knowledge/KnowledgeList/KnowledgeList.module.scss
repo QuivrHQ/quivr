@@ -1,0 +1,12 @@
+@use "@/styles/Spacings.module.scss";
+
+.knowledge_list_wrapper {
+  display: flex;
+  width: 500px;
+  border-right: 1px solid var(--border-1);
+
+  .search_bar {
+    padding: Spacings.$spacing03;
+    width: 100%;
+  }
+}

@@ -1,0 +1,14 @@
+@use "Spacings.module.scss";
+@use "Variables.module.scss";
+
+.page_wrapper {
+  width: 100%;
+  height: 100%;
+
+  .content_wrapper {
+    display: flex;
+    gap: Spacings.$spacing05;
+    height: calc(100% - Variables.$pageHeaderBarHeight);
+    padding: Spacings.$spacing06;
+  }
+}
