@@ -4,7 +4,6 @@ from typing import List, Optional
 from uuid import UUID
 
 from langchain.chains import ConversationalRetrievalChain
-from langchain_community.embeddings import OllamaEmbeddings
 from langchain.llms.base import BaseLLM
 from langchain.prompts import HumanMessagePromptTemplate, SystemMessagePromptTemplate
 from langchain.retrievers import ContextualCompressionRetriever
@@ -12,6 +11,7 @@ from langchain.retrievers.document_compressors import FlashrankRerank
 from langchain.schema import format_document
 from langchain_cohere import CohereRerank
 from langchain_community.chat_models import ChatLiteLLM
+from langchain_community.embeddings import OllamaEmbeddings
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate, PromptTemplate
 from langchain_core.pydantic_v1 import BaseModel as BaseModelV1
@@ -136,6 +136,7 @@ class QuivrRAG(BaseModel):
 
     def model_compatible_with_function_calling(self):
         if self.model in [
+            "gpt-4o",
             "gpt-4-turbo",
             "gpt-4-turbo-2024-04-09",
             "gpt-4-turbo-preview",

@@ -101,7 +101,7 @@ class DifferenceAssistant(ITO):
         document_1_to_langchain = document_1_llama_parsed[0].to_langchain_format()
         document_2_to_langchain = document_2_llama_parsed[0].to_langchain_format()
 
-        llm = ChatLiteLLM(model="gpt-4-turbo-2024-04-09")
+        llm = ChatLiteLLM(model="gpt-4o")
 
         human_prompt = """Given the following two documents, find the difference between them:
 
