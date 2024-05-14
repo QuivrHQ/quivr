@@ -66,6 +66,7 @@ div:focus {
   --border-0: var(--grey-4);
   --border-1: var(--grey-3);
   --border-2: var(--grey-1);
+  --border-3: var(--grey-0);
 
   /* Icons */
   --icon-0: var(--white-0);
@@ -100,6 +101,7 @@ body.dark_mode {
   --border-0: var(--white-0);
   --border-1: var(--grey-1);
   --border-2: var(--grey-2);
+  --border-3: var(--black-5);
  
   /* Icons */
   --icon-0: var(--black-0);
