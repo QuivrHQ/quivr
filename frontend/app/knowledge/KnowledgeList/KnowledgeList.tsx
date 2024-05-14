@@ -22,11 +22,13 @@ const KnowledgeList = (): JSX.Element => {
           setInputValue={setSearchValue}
         />
       </div>
-      {allBrains.map((brain) => (
-        <div key={brain.id}>
-          <BrainFolder brain={brain} />
-        </div>
-      ))}
+      <div className={styles.brains_wrapper}>
+        {allBrains.map((brain) => (
+          <div key={brain.id}>
+            <BrainFolder brain={brain} />
+          </div>
+        ))}
+      </div>
     </div>
   );
 };

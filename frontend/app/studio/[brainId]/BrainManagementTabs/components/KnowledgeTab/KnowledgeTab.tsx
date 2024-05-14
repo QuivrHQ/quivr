@@ -10,7 +10,8 @@ import { Knowledge } from "@/lib/types/Knowledge";
 
 import styles from "./KnowledgeTab.module.scss";
 import KnowledgeTable from "./KnowledgeTable/KnowledgeTable";
-import { useAddedKnowledge } from "./hooks/useAddedKnowledge";
+
+import { useAddedKnowledge } from "../../../../../../lib/hooks/useAddedKnowledge";
 
 type KnowledgeTabProps = {
   brainId: UUID;

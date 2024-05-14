@@ -1,15 +1,46 @@
+@use "@/styles/Spacings.module.scss";
+@use "@/styles/Transitions.module.scss";
+
 .brain_folder_wrapper {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  flex-direction: column;
+  overflow: hidden;
 
-  .left {
+  .brain_folder_header {
     display: flex;
+    justify-content: space-between;
     align-items: center;
-    gap: Spacings.$spacing03;
+    cursor: pointer;
 
-    .dark_image {
-      filter: invert(100%);
+    .left {
+      display: flex;
+      align-items: center;
+      gap: Spacings.$spacing03;
+
+      .icon_rotate {
+        transition: transform 0.3s Transitions.$easeOutBack;
+      }
+
+      .icon_rotate_down {
+        transform: rotate(0deg);
+      }
+
+      .icon_rotate_right {
+        transform: rotate(-90deg);
+      }
+
+      .dark_image {
+        filter: invert(100%);
+      }
     }
+  }
+
+  .content_wrapper {
+    overflow: hidden;
+    transition: max-height 0.3s Transitions.$easeOutBack;
+  }
+
+  .content_collapsed {
+    max-height: 0;
   }
 }

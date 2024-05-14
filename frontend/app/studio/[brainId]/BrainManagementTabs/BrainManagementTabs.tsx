@@ -7,11 +7,12 @@ import { Tabs } from "@/lib/components/ui/Tabs/Tabs";
 import { Tab } from "@/lib/types/Tab";
 
 import { KnowledgeTab } from "./components/KnowledgeTab/KnowledgeTab";
-import { useAddedKnowledge } from "./components/KnowledgeTab/hooks/useAddedKnowledge";
 import { PeopleTab } from "./components/PeopleTab/PeopleTab";
 import { SettingsTab } from "./components/SettingsTab/SettingsTab";
 import { useBrainFetcher } from "./hooks/useBrainFetcher";
 import { useBrainManagementTabs } from "./hooks/useBrainManagementTabs";
+
+import { useAddedKnowledge } from "../../../../lib/hooks/useAddedKnowledge";
 
 export const BrainManagementTabs = (): JSX.Element => {
   const [selectedTab, setSelectedTab] = useState("Settings");

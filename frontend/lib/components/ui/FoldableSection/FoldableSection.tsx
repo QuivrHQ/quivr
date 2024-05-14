@@ -43,15 +43,15 @@ export const FoldableSection = (props: FoldableSectionProps): JSX.Element => {
           name="chevronDown"
           size="normal"
           color="black"
-          classname={`${styles.iconRotate} ${
-            folded ? styles.iconRotateDown : styles.iconRotateRight
+          classname={`${styles.icon_rotate} ${
+            folded ? styles.icon_rotate_down : styles.icon_rotate_right
           }`}
         />
       </div>
       <div
         ref={contentRef}
-        className={`${styles.contentWrapper} ${
-          folded ? styles.contentCollapsed : styles.contentExpanded
+        className={`${styles.content_wrapper} ${
+          folded ? styles.content_collapsed : styles.content_expanded
         }`}
         style={{ maxHeight: getContentHeight() }}
       >

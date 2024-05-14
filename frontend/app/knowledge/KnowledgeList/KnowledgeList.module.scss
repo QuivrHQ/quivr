@@ -4,9 +4,16 @@
   display: flex;
   width: 500px;
   flex-direction: column;
+  gap: Spacings.$spacing03;
 
   .search_bar {
     padding: Spacings.$spacing03;
     width: 100%;
+  }
+
+  .brains_wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: Spacings.$spacing03;
   }
 }
