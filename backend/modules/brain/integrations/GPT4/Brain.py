@@ -166,9 +166,7 @@ class GPT4Brain(KnowledgeBrainQA):
         return app
 
     def get_chain(self):
-        self.function_model = ChatOpenAI(
-            model="gpt-4-turbo", temperature=0, streaming=True
-        )
+        self.function_model = ChatOpenAI(model="gpt-4o", temperature=0, streaming=True)
 
         self.function_model = self.function_model.bind_tools(self.tools)
 
