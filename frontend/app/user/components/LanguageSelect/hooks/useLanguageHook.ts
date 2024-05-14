@@ -55,19 +55,22 @@ export const useLanguageHook = (): {
   useEffect(() => {
     setAllLanguages(languages);
     const savedLanguage = localStorage.getItem("selectedLanguage") ?? "English";
-    let currentLanguage = languages.find(lang => lang.label === savedLanguage);
-    if (!currentLanguage) {
-        currentLanguage = languages.find(lang => lang.label === "English");
+    let choosedLanguage = languages.find(
+      (lang) => lang.label === savedLanguage
+    );
+    if (!choosedLanguage) {
+      choosedLanguage = languages.find((lang) => lang.label === "English");
     }
     if (currentLanguage) {
-        setCurrentLanguage(currentLanguage);
-        localStorage.setItem("selectedLanguage", currentLanguage.label);
-        void i18n.changeLanguage(currentLanguage.shortName);
-    
+      setCurrentLanguage(choosedLanguage);
+      localStorage.setItem("selectedLanguage", currentLanguage.label);
+      void i18n.changeLanguage(currentLanguage.shortName);
     } else {
-        console.error("No valid language found, please check the languages configuration.");
+      console.error(
+        "No valid language found, please check the languages configuration."
+      );
     }
-    }, [i18n]);
+  }, [i18n]);
 
   const change = (newLanguage: Language) => {
     void track("CHANGE_LANGUAGE");
