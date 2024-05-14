@@ -23,10 +23,14 @@ export const UserSettingsProvider = ({
   const [remainingCredits, setRemainingCredits] = useState<number | null>(null);
   const [isDarkMode, setIsDarkMode] = useState<boolean>(() => {
     if (typeof window !== "undefined") {
-      return true;
+      const localIsDarkMode = localStorage.getItem("isDarkMode");
+
+      return localIsDarkMode !== null
+        ? parseBoolean(localIsDarkMode)
+        : window.matchMedia("(prefers-color-scheme: dark)").matches;
     }
 
-    return true;
+    return false;
   });
 
   useEffect(() => {
@@ -37,40 +41,26 @@ export const UserSettingsProvider = ({
   }, []);
 
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      const prefersDarkMode = window.matchMedia(
-        "(prefers-color-scheme: dark)"
-      ).matches;
-      const localIsDarkMode = localStorage.getItem("isDarkMode");
-      const newState =
-        localIsDarkMode !== null
-          ? parseBoolean(localIsDarkMode)
-          : prefersDarkMode;
-      setIsDarkMode(newState);
-      newState
-        ? document.body.classList.add("dark_mode")
-        : document.body.classList.remove("dark_mode");
+    const mediaQueryList = window.matchMedia("(prefers-color-scheme: dark)");
+    const listener = (event: MediaQueryListEvent) => {
+      const updatedState = event.matches;
+      setIsDarkMode(updatedState);
+      localStorage.setItem("isDarkMode", JSON.stringify(updatedState));
+    };
+    mediaQueryList.addEventListener("change", listener);
 
-      const mediaQueryList = window.matchMedia("(prefers-color-scheme: dark)");
-      const listener = (event: MediaQueryListEvent) => {
-        const updatedState = event.matches;
-        setIsDarkMode(updatedState);
-        localStorage.setItem("isDarkMode", JSON.stringify(updatedState));
-      };
-      mediaQueryList.addEventListener("change", listener);
-
-      return () => {
-        mediaQueryList.removeEventListener("change", listener);
-      };
-    }
+    return () => {
+      mediaQueryList.removeEventListener("change", listener);
+    };
   }, []);
 
   useEffect(() => {
-    isDarkMode
-      ? document.body.classList.add("dark_mode")
-      : document.body.classList.remove("dark_mode");
-
-    localStorage.setItem("isDarkMode", JSON.stringify(isDarkMode));
+    if (typeof window !== "undefined") {
+      isDarkMode
+        ? document.body.classList.add("dark_mode")
+        : document.body.classList.remove("dark_mode");
+      localStorage.setItem("isDarkMode", JSON.stringify(isDarkMode));
+    }
   }, [isDarkMode]);
 
   return (
