@@ -50,9 +50,7 @@ if os.path.exists(index_data):
             print("####### Starting loading storage context... #######")
             start_time = time.time()  # Record the start time
 
-            storage_context = StorageContext.from_defaults(
-                persist_dir=index_data
-            )
+            storage_context = StorageContext.from_defaults(persist_dir=index_data)
 
             end_time = time.time()  # Record the end time
             elapsed_time = end_time - start_time  # Calculate elapsed time
@@ -150,7 +148,7 @@ class LlamaIndexVeluxUK(KnowledgeBrainQA):
 
         return self._index.as_chat_engine(
             chat_mode=ChatMode.CONTEXT,
-            similarity_top_k=10,
+            similarity_top_k=15,
             node_postprocessors=[self._reranker],
             text_qa_template=VELUX_TEXT_QA_PROMPT,
             system_prompt=VELUX_SYSTEM_PROMPT,
