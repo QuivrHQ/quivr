@@ -30,8 +30,6 @@ const BrainFolder = ({ brain }: BrainFolderProps): JSX.Element => {
 
   useEffect(() => {
     setStoredKnowledge([...allKnowledge]);
-    console.info(allKnowledge.length);
-    console.info(storedKnowledge.length);
   }, [allKnowledge, storedKnowledge.length]);
 
   return (
