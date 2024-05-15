@@ -15,7 +15,7 @@ export const UploadDocumentModal = (): JSX.Element => {
   const { shouldDisplayFeedCard, setShouldDisplayFeedCard, knowledgeToFeed } =
     useKnowledgeToFeedContext();
   const { currentBrain } = useBrainContext();
-  const { feedBrain } = useAddKnowledge();
+  const { feedBrain } = useAddKnowledge(currentBrain?.id);
   const [feeding, setFeeding] = useState<boolean>(false);
 
   useKnowledgeToFeedContext();

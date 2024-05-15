@@ -1,11 +1,12 @@
 "use client";
 import Image from "next/image";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import Icon from "@/lib/components/ui/Icon/Icon";
 import { MinimalBrainForUser } from "@/lib/context/BrainProvider/types";
 import { useUserSettingsContext } from "@/lib/context/UserSettingsProvider/hooks/useUserSettingsContext";
 import { useAddedKnowledge } from "@/lib/hooks/useAddedKnowledge";
+import { Knowledge } from "@/lib/types/Knowledge";
 
 import styles from "./BrainFolder.module.scss";
 import KnowledgeItem from "./KnowledgeItem/KnowledgeItem";
@@ -21,10 +22,17 @@ const BrainFolder = ({ brain }: BrainFolderProps): JSX.Element => {
   });
   const [folded, setFolded] = useState<boolean>(true);
   const contentRef = useRef<HTMLDivElement>(null);
+  const [storedKnowledge, setStoredKnowledge] = useState<Knowledge[]>([]);
 
   const getContentHeight = (): string => {
     return folded ? "0" : `${contentRef.current?.scrollHeight}px`;
   };
+
+  useEffect(() => {
+    setStoredKnowledge([...allKnowledge]);
+    console.info(allKnowledge.length);
+    console.info(storedKnowledge.length);
+  }, [allKnowledge, storedKnowledge.length]);
 
   return (
     <div className={styles.brain_folder_wrapper}>
@@ -62,7 +70,7 @@ const BrainFolder = ({ brain }: BrainFolderProps): JSX.Element => {
         }`}
         style={{ maxHeight: getContentHeight() }}
       >
-        {allKnowledge.map((knowledge) => (
+        {storedKnowledge.map((knowledge) => (
           <div key={knowledge.id} className={styles.knowledge}>
             <KnowledgeItem knowledge={knowledge} />
           </div>

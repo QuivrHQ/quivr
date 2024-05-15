@@ -1,14 +1,17 @@
+import { UUID } from "crypto";
 import { useEffect } from "react";
 
-import { useKnowledge } from "@/app/studio/[brainId]/BrainManagementTabs/components/KnowledgeTab/hooks/useKnowledge";
+import { useAddedKnowledge } from "@/lib/hooks/useAddedKnowledge";
 import { useUrlBrain } from "@/lib/hooks/useBrainIdFromUrl";
 
 import { useFeedBrain } from "./useFeedBrain";
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-export const useAddKnowledge = () => {
-  const { brainId } = useUrlBrain();
-  const { invalidateKnowledgeDataKey } = useKnowledge({
+export const useAddKnowledge = (inputBrainId?: UUID) => {
+  const { brainId: urlBrainId } = useUrlBrain();
+  const brainId = inputBrainId ?? urlBrainId;
+
+  const { invalidateKnowledgeDataKey } = useAddedKnowledge({
     brainId,
   });
 
