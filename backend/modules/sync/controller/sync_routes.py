@@ -5,6 +5,7 @@ from fastapi import APIRouter, Depends
 from logger import get_logger
 from middlewares.auth import AuthBearer, get_current_user
 from modules.sync.controller.google_sync_routes import google_sync_router
+from modules.sync.controller.azure_sync_routes import azure_sync_router
 from modules.sync.dto import SyncsDescription
 from modules.sync.dto.outputs import AuthMethodEnum
 from modules.sync.service.sync_service import SyncService
@@ -24,6 +25,7 @@ sync_router = APIRouter()
 
 # Add Google routes here
 sync_router.include_router(google_sync_router)
+sync_router.include_router(azure_sync_router)
 
 
 # Google sync description
