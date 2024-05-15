@@ -52,7 +52,7 @@ const BrainFolder = ({ brain }: BrainFolderProps): JSX.Element => {
             width={18}
             height={18}
           />
-          <span>{brain.name}</span>
+          <span className={styles.name}>{brain.name}</span>
         </div>
       </div>
       <div

@@ -12,9 +12,17 @@ const KnowledgeItem = ({ knowledge }: KnowledgeItemProps): JSX.Element => {
   return (
     <div className={styles.knowledge_item_wrapper}>
       {isUploadedKnowledge(knowledge) ? (
-        <span className={styles.file_name}>{knowledge.fileName}</span>
+        <span className={styles.name}>
+          {knowledge.fileName}djsklqjdlqshdkqsgdqsklgdsqhgdsjdhkgkd
+          qshgdsgdqsgqshd qshg
+        </span>
       ) : (
-        <a href={knowledge.url} target="_blank" rel="noopener noreferrer">
+        <a
+          className={styles.name}
+          href={knowledge.url}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
           {knowledge.url}
         </a>
       )}

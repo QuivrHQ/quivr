@@ -1,6 +1,7 @@
 @use "@/styles/Radius.module.scss";
 @use "@/styles/Spacings.module.scss";
 @use "@/styles/Transitions.module.scss";
+@use "@/styles/Typography.module.scss";
 
 .brain_folder_wrapper {
   display: flex;
@@ -15,6 +16,7 @@
     cursor: pointer;
     font-weight: 550;
     padding: Spacings.$spacing02;
+    overflow: hidden;
 
     &:hover {
       background-color: var(--background-2);
@@ -24,6 +26,7 @@
       display: flex;
       align-items: center;
       gap: Spacings.$spacing03;
+      overflow: hidden;
 
       .icon_rotate {
         transition: transform 0.3s Transitions.$easeOutBack;
@@ -39,6 +42,10 @@
 
       .dark_image {
         filter: invert(100%);
+      }
+
+      .name {
+        @include Typography.EllipsisOverflow;
       }
     }
   }

@@ -5,4 +5,5 @@
   padding: Spacings.$spacing01;
   padding-left: Spacings.$spacing06;
   font-size: Typography.$tiny;
+  @include Typography.EllipsisOverflow;
 }
