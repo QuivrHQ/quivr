@@ -6,9 +6,9 @@ import Icon from "@/lib/components/ui/Icon/Icon";
 import { MinimalBrainForUser } from "@/lib/context/BrainProvider/types";
 import { useUserSettingsContext } from "@/lib/context/UserSettingsProvider/hooks/useUserSettingsContext";
 import { useAddedKnowledge } from "@/lib/hooks/useAddedKnowledge";
-import { isUploadedKnowledge } from "@/lib/types/Knowledge";
 
 import styles from "./BrainFolder.module.scss";
+import KnowledgeItem from "./KnowledgeItem/KnowledgeItem";
 
 type BrainFolderProps = {
   brain: MinimalBrainForUser;
@@ -64,13 +64,7 @@ const BrainFolder = ({ brain }: BrainFolderProps): JSX.Element => {
       >
         {allKnowledge.map((knowledge) => (
           <div key={knowledge.id} className={styles.knowledge}>
-            {isUploadedKnowledge(knowledge) ? (
-              <span className={styles.file_name}>{knowledge.fileName}</span>
-            ) : (
-              <a href={knowledge.url} target="_blank" rel="noopener noreferrer">
-                {knowledge.url}
-              </a>
-            )}
+            <KnowledgeItem knowledge={knowledge} />
           </div>
         ))}
       </div>
