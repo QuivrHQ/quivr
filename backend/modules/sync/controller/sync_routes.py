@@ -1,13 +1,15 @@
 import os
 from typing import List
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, status
 from logger import get_logger
 from middlewares.auth import AuthBearer, get_current_user
-from modules.sync.controller.google_sync_routes import google_sync_router
 from modules.sync.controller.azure_sync_routes import azure_sync_router
+from modules.sync.controller.google_sync_routes import google_sync_router
 from modules.sync.dto import SyncsDescription
+from modules.sync.dto.inputs import SyncsActiveInput, SyncsActiveUpdateInput
 from modules.sync.dto.outputs import AuthMethodEnum
+from modules.sync.entity.sync import SyncsActive
 from modules.sync.service.sync_service import SyncService
 from modules.user.entity.user_identity import UserIdentity
 
@@ -73,3 +75,109 @@ async def get_user_syncs(current_user: UserIdentity = Depends(get_current_user))
     """
     logger.debug(f"Fetching user syncs for user: {current_user.id}")
     return sync_service.get_syncs_user(str(current_user.id))
+
+@sync_router.post(
+    "/sync/active",
+    response_model=SyncsActive,
+    dependencies=[Depends(AuthBearer())],
+    tags=["Sync"],
+)
+async def create_sync_active(sync_active_input: SyncsActiveInput, current_user: UserIdentity = Depends(get_current_user)):
+    """
+    Create a new active sync for the current user.
+
+    Args:
+        sync_active_input (SyncsActiveInput): The sync active input data.
+        current_user (UserIdentity): The current authenticated user.
+
+    Returns:
+        SyncsActive: The created sync active data.
+    """
+    sync_active_input.user_id = str(current_user.id)
+    logger.debug(f"Creating active sync for user: {current_user.id} with data: {sync_active_input}")
+    return sync_service.create_sync_active(sync_active_input)
+
+
+@sync_router.put(
+    "/sync/active/{sync_id}",
+    response_model=SyncsActive,
+    dependencies=[Depends(AuthBearer())],
+    tags=["Sync"],
+)
+async def update_sync_active(sync_id: str, sync_active_input: SyncsActiveUpdateInput, current_user: UserIdentity = Depends(get_current_user)):
+    """
+    Update an existing active sync for the current user.
+
+    Args:
+        sync_id (str): The ID of the active sync to update.
+        sync_active_input (SyncsActiveUpdateInput): The updated sync active input data.
+        current_user (UserIdentity): The current authenticated user.
+
+    Returns:
+        SyncsActive: The updated sync active data.
+    """
+    logger.debug(f"Updating active sync for user: {current_user.id} with data: {sync_active_input}")
+    return sync_service.update_sync_active(sync_id, sync_active_input)
+
+
+@sync_router.delete(
+    "/sync/active/{sync_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    dependencies=[Depends(AuthBearer())],
+    tags=["Sync"],
+)
+async def delete_sync_active(sync_id: str, current_user: UserIdentity = Depends(get_current_user)):
+    """
+    Delete an existing active sync for the current user.
+
+    Args:
+        sync_id (str): The ID of the active sync to delete.
+        current_user (UserIdentity): The current authenticated user.
+
+    Returns:
+        None
+    """
+    logger.debug(f"Deleting active sync for user: {current_user.id} with sync ID: {sync_id}")
+    sync_service.delete_sync_active(sync_id, str(current_user.id))
+    return None
+
+@sync_router.get(
+    "/sync/active",
+    response_model=List[SyncsActive],
+    dependencies=[Depends(AuthBearer())],
+    tags=["Sync"],
+)
+async def get_active_syncs_for_user(current_user: UserIdentity = Depends(get_current_user)):
+    """
+    Get all active syncs for the current user.
+
+    Args:
+        current_user (UserIdentity): The current authenticated user.
+
+    Returns:
+        List[SyncsActive]: A list of active syncs for the current user.
+    """
+    logger.debug(f"Fetching active syncs for user: {current_user.id}")
+    return sync_service.get_syncs_active(current_user.id)
+
+
+@sync_router.get(
+    "/sync/active/{sync_id}/files",
+    response_model=SyncsActive,
+    dependencies=[Depends(AuthBearer())],
+    tags=["Sync"],
+)
+async def get_files_folder_active_sync(sync_id: str, folder_id: str = None, current_user: UserIdentity = Depends(get_current_user)):
+    """
+    Get files for an active sync.
+
+    Args:
+        sync_id (str): The ID of the active sync.
+        folder_id (str): The ID of the folder to get files from.
+        current_user (UserIdentity): The current authenticated user.
+
+    Returns:
+        SyncsActive: The active sync data.
+    """
+    logger.debug(f"Fetching files for active sync: {sync_id} for user: {current_user.id}")
+    return sync_service.get_files_folder_active_sync(sync_id, folder_id)

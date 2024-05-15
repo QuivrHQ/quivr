@@ -11,3 +11,16 @@ class SyncsUserInput(BaseModel):
 class SyncUserUpdateInput(BaseModel):
     credentials: dict
     state: dict
+    
+class SyncsActiveInput(BaseModel):
+    name: str
+    user_id: str
+    id_syncs_user: int
+    sync_interval_minutes: int
+    settings: dict
+
+class SyncsActiveUpdateInput(BaseModel):
+    name: str
+    sync_interval_minutes: int
+    settings: dict
+    

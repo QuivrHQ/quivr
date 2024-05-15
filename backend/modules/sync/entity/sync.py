@@ -1,11 +1,11 @@
 from pydantic import BaseModel
+from datetime import datetime
 
-
-class ApiKey(BaseModel):
-    api_key: str
-    key_id: str
-    days: int
-    only_chat: bool
+class SyncsActive(BaseModel):
+    id: int
     name: str
-    creation_time: str
-    is_active: bool
+    id_syncs_user: int
+    user_id: str
+    settings: dict
+    last_synced: datetime
+    sync_interval_minutes: int
