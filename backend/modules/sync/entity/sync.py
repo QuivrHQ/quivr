@@ -1,10 +1,12 @@
-from pydantic import BaseModel
 from datetime import datetime
+
+from pydantic import BaseModel
+
 
 class SyncsActive(BaseModel):
     id: int
     name: str
-    id_syncs_user: int
+    syncs_user_id: int
     user_id: str
     settings: dict
     last_synced: datetime

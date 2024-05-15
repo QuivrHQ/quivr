@@ -163,7 +163,6 @@ async def get_active_syncs_for_user(current_user: UserIdentity = Depends(get_cur
 
 @sync_router.get(
     "/sync/active/{sync_id}/files",
-    response_model=SyncsActive,
     dependencies=[Depends(AuthBearer())],
     tags=["Sync"],
 )
