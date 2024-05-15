@@ -1,6 +1,7 @@
 "use client";
 
 import PageHeader from "@/lib/components/PageHeader/PageHeader";
+import { UploadDocumentModal } from "@/lib/components/UploadDocumentModal/UploadDocumentModal";
 import { useKnowledgeToFeedContext } from "@/lib/context/KnowledgeToFeedProvider/hooks/useKnowledgeToFeedContext";
 import { ButtonType } from "@/lib/types/QuivrButton";
 
@@ -21,7 +22,7 @@ const Knowledge = (): JSX.Element => {
       iconName: "uploadFile",
     },
     {
-      label: "New",
+      label: "New Note",
       color: "primary",
       onClick: () => {
         console.info("New");
@@ -39,6 +40,7 @@ const Knowledge = (): JSX.Element => {
         <KnowledgeList />
         <NotesEditor />
       </div>
+      <UploadDocumentModal />
     </div>
   );
 };
