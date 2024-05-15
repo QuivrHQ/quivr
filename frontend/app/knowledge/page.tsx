@@ -1,6 +1,7 @@
 "use client";
 
 import PageHeader from "@/lib/components/PageHeader/PageHeader";
+import { useKnowledgeToFeedContext } from "@/lib/context/KnowledgeToFeedProvider/hooks/useKnowledgeToFeedContext";
 import { ButtonType } from "@/lib/types/QuivrButton";
 
 import KnowledgeList from "./KnowledgeList/KnowledgeList";
@@ -8,7 +9,17 @@ import NotesEditor from "./NotesEditor/NotesEditor";
 import styles from "./page.module.scss";
 
 const Knowledge = (): JSX.Element => {
+  const { setShouldDisplayFeedCard } = useKnowledgeToFeedContext();
+
   const buttons: ButtonType[] = [
+    {
+      label: "Add knowledge",
+      color: "primary",
+      onClick: () => {
+        setShouldDisplayFeedCard(true);
+      },
+      iconName: "uploadFile",
+    },
     {
       label: "New",
       color: "primary",

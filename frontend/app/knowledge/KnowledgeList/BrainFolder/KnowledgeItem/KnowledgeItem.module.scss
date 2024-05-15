@@ -1,3 +1,4 @@
+@use "@/styles/Radius.module.scss";
 @use "@/styles/Spacings.module.scss";
 @use "@/styles/Typography.module.scss";
 
@@ -6,4 +7,10 @@
   padding-left: Spacings.$spacing06;
   font-size: Typography.$tiny;
   @include Typography.EllipsisOverflow;
+  border-radius: Radius.$small;
+  cursor: pointer;
+
+  &:hover {
+    background-color: var(--background-1);
+  }
 }

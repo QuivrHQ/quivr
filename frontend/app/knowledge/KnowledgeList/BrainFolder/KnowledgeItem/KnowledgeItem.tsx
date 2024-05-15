@@ -12,10 +12,7 @@ const KnowledgeItem = ({ knowledge }: KnowledgeItemProps): JSX.Element => {
   return (
     <div className={styles.knowledge_item_wrapper}>
       {isUploadedKnowledge(knowledge) ? (
-        <span className={styles.name}>
-          {knowledge.fileName}djsklqjdlqshdkqsgdqsklgdsqhgdsjdhkgkd
-          qshgdsgdqsgqshd qshg
-        </span>
+        <span className={styles.name}>{knowledge.fileName}</span>
       ) : (
         <a
           className={styles.name}
