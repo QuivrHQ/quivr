@@ -1,0 +1,8 @@
+@use "@/styles/Spacings.module.scss";
+@use "@/styles/Typography.module.scss";
+
+.knowledge_item_wrapper {
+  padding: Spacings.$spacing01;
+  padding-left: Spacings.$spacing06;
+  font-size: Typography.$tiny;
+}
