@@ -6,16 +6,17 @@ import Icon from "@/lib/components/ui/Icon/Icon";
 import { MinimalBrainForUser } from "@/lib/context/BrainProvider/types";
 import { useUserSettingsContext } from "@/lib/context/UserSettingsProvider/hooks/useUserSettingsContext";
 import { useAddedKnowledge } from "@/lib/hooks/useAddedKnowledge";
-import { Knowledge } from "@/lib/types/Knowledge";
+import { isUploadedKnowledge, Knowledge } from "@/lib/types/Knowledge";
 
 import styles from "./BrainFolder.module.scss";
 import KnowledgeItem from "./KnowledgeItem/KnowledgeItem";
 
 type BrainFolderProps = {
   brain: MinimalBrainForUser;
+  searchValue: string;
 };
 
-const BrainFolder = ({ brain }: BrainFolderProps): JSX.Element => {
+const BrainFolder = ({ brain, searchValue }: BrainFolderProps): JSX.Element => {
   const { isDarkMode } = useUserSettingsContext();
   const { allKnowledge } = useAddedKnowledge({
     brainId: brain.id,
@@ -23,6 +24,12 @@ const BrainFolder = ({ brain }: BrainFolderProps): JSX.Element => {
   const [folded, setFolded] = useState<boolean>(true);
   const contentRef = useRef<HTMLDivElement>(null);
   const [storedKnowledge, setStoredKnowledge] = useState<Knowledge[]>([]);
+
+  const filteredKnowledge = storedKnowledge.filter((knowledge) =>
+    isUploadedKnowledge(knowledge)
+      ? knowledge.fileName.toLowerCase().includes(searchValue.toLowerCase())
+      : knowledge.url.toLowerCase().includes(searchValue.toLowerCase())
+  );
 
   const getContentHeight = (): string => {
     return folded ? "0" : `${contentRef.current?.scrollHeight}px`;
@@ -68,7 +75,7 @@ const BrainFolder = ({ brain }: BrainFolderProps): JSX.Element => {
         }`}
         style={{ maxHeight: getContentHeight() }}
       >
-        {storedKnowledge.map((knowledge) => (
+        {filteredKnowledge.map((knowledge) => (
           <div key={knowledge.id} className={styles.knowledge}>
             <KnowledgeItem knowledge={knowledge} />
           </div>

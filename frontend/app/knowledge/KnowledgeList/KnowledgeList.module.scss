@@ -2,9 +2,10 @@
 
 .knowledge_list_wrapper {
   display: flex;
-  width: 500px;
+  width: 400px;
   flex-direction: column;
   gap: Spacings.$spacing03;
+  overflow: scroll;
 
   .search_bar {
     padding: Spacings.$spacing03;

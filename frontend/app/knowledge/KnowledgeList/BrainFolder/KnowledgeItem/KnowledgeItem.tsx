@@ -19,7 +19,6 @@ const KnowledgeItem = ({ knowledge }: KnowledgeItemProps): JSX.Element => {
       let download_url = await generateSignedUrlKnowledge({
         knowledgeId: knowledge.id,
       });
-      console.info(download_url);
       download_url = download_url.replace("host.docker.internal", "localhost");
 
       try {

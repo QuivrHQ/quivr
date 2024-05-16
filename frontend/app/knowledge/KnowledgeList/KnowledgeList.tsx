@@ -16,7 +16,7 @@ const KnowledgeList = (): JSX.Element => {
     <div className={styles.knowledge_list_wrapper}>
       <div className={styles.search_bar}>
         <TextInput
-          label="Search"
+          label="Search knowledge"
           iconName="search"
           inputValue={searchValue}
           setInputValue={setSearchValue}
@@ -25,7 +25,7 @@ const KnowledgeList = (): JSX.Element => {
       <div className={styles.brains_wrapper}>
         {allBrains.map((brain) => (
           <div key={brain.id}>
-            <BrainFolder brain={brain} />
+            <BrainFolder brain={brain} searchValue={searchValue} />
           </div>
         ))}
       </div>
