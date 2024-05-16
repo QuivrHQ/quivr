@@ -3,6 +3,7 @@
 import axios from "axios";
 
 import { useKnowledgeApi } from "@/lib/api/knowledge/useKnowledgeApi";
+import { useNotesEditorContext } from "@/lib/context/NotesEditorProvider/hooks/useNotesEditorContext";
 import { isUploadedKnowledge, Knowledge } from "@/lib/types/Knowledge";
 
 import styles from "./KnowledgeItem.module.scss";
@@ -13,6 +14,7 @@ type KnowledgeItemProps = {
 
 const KnowledgeItem = ({ knowledge }: KnowledgeItemProps): JSX.Element => {
   const { generateSignedUrlKnowledge } = useKnowledgeApi();
+  const { updateContent } = useNotesEditorContext();
 
   const logFileContent = async () => {
     if (isUploadedKnowledge(knowledge)) {
@@ -29,7 +31,7 @@ const KnowledgeItem = ({ knowledge }: KnowledgeItemProps): JSX.Element => {
         const reader = new FileReader();
 
         reader.onload = (event) => {
-          console.info(event.target?.result);
+          updateContent(event.target?.result as string);
         };
 
         reader.onerror = (event) => {

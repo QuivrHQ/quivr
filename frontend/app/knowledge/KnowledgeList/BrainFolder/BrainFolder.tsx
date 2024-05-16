@@ -44,7 +44,7 @@ const BrainFolder = ({ brain, searchValue }: BrainFolderProps): JSX.Element => {
 
   useEffect(() => {
     setStoredKnowledge([...allKnowledge]);
-  }, [allKnowledge, filteredKnowledge, storedKnowledge.length]);
+  }, [allKnowledge, storedKnowledge.length, searchValue]);
 
   return (
     <div className={styles.brain_folder_wrapper}>

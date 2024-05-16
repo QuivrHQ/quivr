@@ -3,7 +3,7 @@
 @use "@/styles/Spacings.module.scss";
 
 .editor_wrapper {
-  width: 100%;
+  max-width: 100%;
   min-height: 100%;
   border-radius: Radius.$normal;
   border: 1px solid var(--border-3);

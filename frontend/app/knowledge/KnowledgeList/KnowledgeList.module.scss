@@ -3,6 +3,7 @@
 .knowledge_list_wrapper {
   display: flex;
   width: 400px;
+  min-width: 300px;
   flex-direction: column;
   gap: Spacings.$spacing03;
   overflow: scroll;
