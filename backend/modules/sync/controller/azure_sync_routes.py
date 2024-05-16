@@ -34,7 +34,7 @@ client = PublicClientApplication(CLIENT_ID, authority=AUTHORITY)
     tags=["Sync"],
 )
 def authorize_azure(
-    request: Request, current_user: UserIdentity = Depends(get_current_user)
+    request: Request, name: str, current_user: UserIdentity = Depends(get_current_user)
 ):
     """
     Authorize Azure sync for the current user.
@@ -54,7 +54,8 @@ def authorize_azure(
 
     sync_user_input = SyncsUserInput(
         user_id=str(current_user.id),
-        sync_name="Azure",
+        name=name,
+        provider="Azure",
         credentials={},
         state={"state": state},
     )
@@ -75,7 +76,7 @@ def oauth2callback_azure(request: Request):
     """
     state = request.query_params.get("state")
     state_dict = {"state": state}
-    current_user = state.split('=')[1]  # Extract user_id from state
+    current_user = state.split("=")[1]  # Extract user_id from state
     logger.debug(
         f"Handling OAuth2 callback for user: {current_user} with state: {state}"
     )

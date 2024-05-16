@@ -23,7 +23,10 @@ google_sync_router = APIRouter()
 
 # Constants
 CLIENT_SECRETS_FILE = "modules/sync/controller/credentials.json"
-SCOPES = ["https://www.googleapis.com/auth/drive.metadata.readonly"]
+SCOPES = [
+    "https://www.googleapis.com/auth/drive.metadata.readonly",
+    "https://www.googleapis.com/auth/drive.readonly"
+]
 BASE_REDIRECT_URI = "http://localhost:5050/sync/google/oauth2callback"
 
 
@@ -33,7 +36,7 @@ BASE_REDIRECT_URI = "http://localhost:5050/sync/google/oauth2callback"
     tags=["Sync"],
 )
 def authorize_google(
-    request: Request, current_user: UserIdentity = Depends(get_current_user)
+    request: Request, name: str, current_user: UserIdentity = Depends(get_current_user)
 ):
     """
     Authorize Google Drive sync for the current user.
@@ -57,8 +60,9 @@ def authorize_google(
         f"Generated authorization URL: {authorization_url} for user: {current_user.id}"
     )
     sync_user_input = SyncsUserInput(
+        name=name,
         user_id=str(current_user.id),
-        sync_name="Google",
+        provider="Google",
         credentials={},
         state={"state": state},
     )

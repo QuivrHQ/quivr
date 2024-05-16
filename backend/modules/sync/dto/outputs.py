@@ -15,6 +15,6 @@ class SyncsDescription(BaseModel):
 
 class SyncsUserOutput(BaseModel):
     user_id: str
-    sync_name: str
+    provider: str
     state: dict
     credentials: dict
