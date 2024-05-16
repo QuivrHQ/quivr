@@ -25,11 +25,18 @@ const BrainFolder = ({ brain, searchValue }: BrainFolderProps): JSX.Element => {
   const contentRef = useRef<HTMLDivElement>(null);
   const [storedKnowledge, setStoredKnowledge] = useState<Knowledge[]>([]);
 
-  const filteredKnowledge = storedKnowledge.filter((knowledge) =>
-    isUploadedKnowledge(knowledge)
-      ? knowledge.fileName.toLowerCase().includes(searchValue.toLowerCase())
-      : knowledge.url.toLowerCase().includes(searchValue.toLowerCase())
-  );
+  const filteredKnowledge = storedKnowledge
+    .filter((knowledge) =>
+      isUploadedKnowledge(knowledge)
+        ? knowledge.fileName.toLowerCase().includes(searchValue.toLowerCase())
+        : knowledge.url.toLowerCase().includes(searchValue.toLowerCase())
+    )
+    .sort((a, b) => {
+      const nameA = isUploadedKnowledge(a) ? a.fileName : a.url;
+      const nameB = isUploadedKnowledge(b) ? b.fileName : b.url;
+
+      return nameA.localeCompare(nameB);
+    });
 
   const getContentHeight = (): string => {
     return folded ? "0" : `${contentRef.current?.scrollHeight}px`;
@@ -37,7 +44,7 @@ const BrainFolder = ({ brain, searchValue }: BrainFolderProps): JSX.Element => {
 
   useEffect(() => {
     setStoredKnowledge([...allKnowledge]);
-  }, [allKnowledge, storedKnowledge.length]);
+  }, [allKnowledge, filteredKnowledge, storedKnowledge.length]);
 
   return (
     <div className={styles.brain_folder_wrapper}>
