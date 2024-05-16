@@ -7,22 +7,25 @@ import { useNotesEditorContext } from "@/lib/context/NotesEditorProvider/hooks/u
 import styles from "./TipTapEditor.module.scss";
 
 const TipTapEditor = (): JSX.Element => {
-  const { content } = useNotesEditorContext();
+  const { content, updateContent } = useNotesEditorContext();
 
-  const editor = useEditor({
+  const tipTapEditor = useEditor({
     extensions: [StarterKit],
     content,
+    onUpdate: ({ editor }) => {
+      updateContent(editor.getHTML());
+    },
   });
 
   useEffect(() => {
-    if (editor) {
-      editor.commands.setContent(content);
+    if (tipTapEditor) {
+      tipTapEditor.commands.setContent(content);
     }
-  }, [content, editor]);
+  }, [content, tipTapEditor]);
 
   return (
     <div className={styles.editor_wrapper}>
-      <EditorContent editor={editor} />
+      <EditorContent editor={tipTapEditor} />
     </div>
   );
 };
