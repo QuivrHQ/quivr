@@ -1,5 +1,7 @@
 "use client";
 
+import { AddBrainModal } from "@/lib/components/AddBrainModal";
+import { useBrainCreationContext } from "@/lib/components/AddBrainModal/brainCreation-provider";
 import PageHeader from "@/lib/components/PageHeader/PageHeader";
 import { UploadDocumentModal } from "@/lib/components/UploadDocumentModal/UploadDocumentModal";
 import { useKnowledgeToFeedContext } from "@/lib/context/KnowledgeToFeedProvider/hooks/useKnowledgeToFeedContext";
@@ -11,8 +13,17 @@ import styles from "./page.module.scss";
 
 const Knowledge = (): JSX.Element => {
   const { setShouldDisplayFeedCard } = useKnowledgeToFeedContext();
+  const { setIsBrainCreationModalOpened } = useBrainCreationContext();
 
   const buttons: ButtonType[] = [
+    {
+      label: "Create brain",
+      color: "primary",
+      onClick: () => {
+        setIsBrainCreationModalOpened(true);
+      },
+      iconName: "brain",
+    },
     {
       label: "Add knowledge",
       color: "primary",
@@ -41,6 +52,7 @@ const Knowledge = (): JSX.Element => {
         <NotesEditor />
       </div>
       <UploadDocumentModal />
+      <AddBrainModal />
     </div>
   );
 };
