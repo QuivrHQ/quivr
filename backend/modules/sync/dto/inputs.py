@@ -1,5 +1,5 @@
-import datetime
 from typing import List, Optional
+
 from pydantic import BaseModel
 
 
@@ -14,6 +14,7 @@ class SyncsUserInput(BaseModel):
         credentials (dict): The credentials required for the sync service.
         state (dict): The state information for the sync user.
     """
+
     user_id: str
     name: str
     provider: str
@@ -29,8 +30,10 @@ class SyncUserUpdateInput(BaseModel):
         credentials (dict): The updated credentials for the sync service.
         state (dict): The updated state information for the sync user.
     """
+
     credentials: dict
     state: dict
+
 
 class SyncActiveSettings(BaseModel):
     """
@@ -40,6 +43,7 @@ class SyncActiveSettings(BaseModel):
         folders (List[str] | None): A list of folder paths to be synced, or None if not applicable.
         files (List[str] | None): A list of file paths to be synced, or None if not applicable.
     """
+
     folders: Optional[List[str]] = None
     files: Optional[List[str]] = None
 
@@ -53,9 +57,11 @@ class SyncsActiveInput(BaseModel):
         syncs_user_id (int): The ID of the sync user associated with this sync.
         settings (SyncActiveSettings): The settings for the active sync.
     """
+
     name: str
     syncs_user_id: int
     settings: SyncActiveSettings
+    brain_id: str
 
 
 class SyncsActiveUpdateInput(BaseModel):
@@ -67,6 +73,7 @@ class SyncsActiveUpdateInput(BaseModel):
         sync_interval_minutes (int): The updated sync interval in minutes.
         settings (dict): The updated settings for the active sync.
     """
+
     name: Optional[str] = None
     settings: Optional[SyncActiveSettings] = None
     last_synced: Optional[str] = None

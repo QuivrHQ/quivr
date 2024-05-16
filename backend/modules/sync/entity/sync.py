@@ -11,3 +11,4 @@ class SyncsActive(BaseModel):
     settings: dict
     last_synced: datetime
     sync_interval_minutes: int
+    brain_id: str

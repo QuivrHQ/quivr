@@ -67,5 +67,5 @@ class SyncInterface(ABC):
         pass
     
     @abstractmethod
-    def get_syncs_active_in_interval(self):
+    async def get_syncs_active_in_interval(self):
         pass

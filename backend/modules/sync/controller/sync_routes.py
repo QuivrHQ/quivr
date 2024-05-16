@@ -209,7 +209,9 @@ async def get_files_folder_user_sync(
     logger.debug(
         f"Fetching files for user sync: {user_sync_id} for user: {current_user.id}"
     )
-    return sync_service.get_files_folder_user_sync(user_sync_id,current_user.id, folder_id)
+    return sync_service.get_files_folder_user_sync(
+        user_sync_id, current_user.id, folder_id
+    )
 
 
 @sync_router.get(
@@ -225,4 +227,4 @@ async def get_syncs_active_in_interval():
         List: A list of active syncs that need to be synced.
     """
     logger.debug("Fetching active syncs in interval")
-    return sync_service.get_syncs_active_in_interval()
+    return await sync_service.get_syncs_active_in_interval()

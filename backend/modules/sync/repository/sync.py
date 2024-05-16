@@ -1,13 +1,30 @@
-from datetime import datetime, timedelta
 import json
+import os
+from datetime import datetime, timedelta
+from io import BytesIO
 from typing import List
+from uuid import UUID
 
+from celery_worker import process_file_and_notify
+from fastapi import HTTPException, UploadFile
 from google.auth.transport.requests import Request as GoogleRequest
 from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 from logger import get_logger
 from models.settings import get_supabase_client
+from modules.brain.entity.brain_entity import RoleEnum
+from modules.brain.service.brain_authorization_service import (
+    validate_brain_authorization,
+)
+from modules.knowledge.dto.inputs import CreateKnowledgeProperties
+from modules.knowledge.service.knowledge_service import KnowledgeService
+from modules.notification.dto.inputs import (
+    CreateNotification,
+    NotificationUpdatableProperties,
+)
+from modules.notification.entity.notification import NotificationsStatusEnum
+from modules.notification.service.notification_service import NotificationService
 from modules.sync.dto.inputs import (
     SyncsActiveInput,
     SyncsActiveUpdateInput,
@@ -16,7 +33,13 @@ from modules.sync.dto.inputs import (
 )
 from modules.sync.entity.sync import SyncsActive
 from modules.sync.repository.sync_interfaces import SyncInterface
+from modules.upload.service.upload_file import upload_file_storage
+from modules.user.service.user_usage import UserUsage
+from packages.files.file import convert_bytes, get_file_size
+from packages.utils.telemetry import maybe_send_telemetry
 
+notification_service = NotificationService()
+knowledge_service = KnowledgeService()
 logger = get_logger(__name__)
 
 
@@ -348,7 +371,9 @@ class Sync(SyncInterface):
             )
             return {"error": f"An error occurred: {error}"}
 
-    def download_google_drive_files(self, credentials: dict, file_ids: list):
+    async def download_google_drive_files(
+        self, credentials: dict, file_ids: list, current_user: str
+    ):
         """
         Download files from Google Drive.
 
@@ -371,18 +396,27 @@ class Sync(SyncInterface):
             downloaded_files = []
             for file_id in file_ids:
                 # Get file metadata to retrieve the file name
-                file_metadata = service.files().get(fileId=file_id, fields="name").execute()
+                file_metadata = (
+                    service.files().get(fileId=file_id, fields="name").execute()
+                )
                 file_name = file_metadata["name"]
-                
+
                 request = service.files().get_media(fileId=file_id)
                 file_data = request.execute()
-                
-                # Save file with the same name
-                file_path = f"./{file_name}"
-                with open(file_path, "wb") as f:
-                    f.write(file_data)
-                
-                downloaded_files.append(file_path)
+
+                to_upload_file = UploadFile(
+                    file=BytesIO(file_data),
+                    filename=file_name,
+                )
+
+                # Since 'await' is only allowed in asynchronous functions, we need to ensure this function is asynchronous.
+                # If the function is not already asynchronous, we should make it so.
+                # Assuming the function is now asynchronous:
+                await upload_file(
+                    to_upload_file, "40ba47d7-51b2-4b2a-9247-89e29619efb0", current_user
+                )
+
+                downloaded_files.append(file_name)
                 logger.info("File downloaded and saved successfully: %s", file_name)
             return {"downloaded_files": downloaded_files}
         except HttpError as error:
@@ -436,7 +470,7 @@ class Sync(SyncInterface):
             logger.warning("No sync found for provider: %s", sync_user["provider"])
             return "No sync found"
 
-    def get_syncs_active_in_interval(self):
+    async def get_syncs_active_in_interval(self):
         """
         Retrieve active syncs that are due for synchronization based on their interval.
 
@@ -458,13 +492,13 @@ class Sync(SyncInterface):
             logger.info("Active syncs retrieved successfully: %s", response.data)
             for sync in response.data:
                 # Now we can call the sync_google_drive_if_not_synced method to sync the Google Drive files
-                self.sync_google_drive_if_not_synced(sync["id"], sync["user_id"])
+                await self.sync_google_drive_if_not_synced(sync["id"], sync["user_id"])
 
             return response.data
         logger.warning("No active syncs found due for synchronization")
         return []
 
-    def sync_google_drive_if_not_synced(self, sync_active_id: int, user_id: str):
+    async def sync_google_drive_if_not_synced(self, sync_active_id: int, user_id: str):
         """
         Check if the Google sync has not been synced and download the folders and files based on the settings.
 
@@ -540,15 +574,19 @@ class Sync(SyncInterface):
             return None
 
         # Download only the files found
-        file_ids = [file["id"] for file in files.get("files", []) if not file["is_folder"]]
-        downloaded_files = self.download_google_drive_files(sync_user["credentials"], file_ids)
+        file_ids = [
+            file["id"] for file in files.get("files", []) if not file["is_folder"]
+        ]
+        downloaded_files = await self.download_google_drive_files(
+            sync_user["credentials"], file_ids, user_id
+        )
         if "error" in downloaded_files:
             logger.error(
                 "Failed to download files from Google Drive for sync_active_id: %s",
                 sync_active_id,
             )
             return None
-        
+
         # Update the last_synced timestamp
         self.update_sync_active(
             sync_active_id,
@@ -558,3 +596,77 @@ class Sync(SyncInterface):
             "Google Drive sync completed for sync_active_id: %s", sync_active_id
         )
         return downloaded_files
+
+
+async def upload_file(
+    upload_file: UploadFile,
+    brain_id: UUID,
+    current_user: str,
+):
+    validate_brain_authorization(
+        brain_id, current_user, [RoleEnum.Editor, RoleEnum.Owner]
+    )
+    user_daily_usage = UserUsage(
+        id=current_user,
+    )
+    upload_notification = notification_service.add_notification(
+        CreateNotification(
+            user_id=current_user,
+            status=NotificationsStatusEnum.INFO,
+            title=f"Processing File {upload_file.filename}",
+        )
+    )
+
+    user_settings = user_daily_usage.get_user_settings()
+
+    remaining_free_space = user_settings.get("max_brain_size", 1000000000)
+    maybe_send_telemetry("upload_file", {"file_name": upload_file.filename})
+    file_size = get_file_size(upload_file)
+    if remaining_free_space - file_size < 0:
+        message = f"Brain will exceed maximum capacity. Maximum file allowed is : {convert_bytes(remaining_free_space)}"
+        raise HTTPException(status_code=403, detail=message)
+
+    file_content = await upload_file.read()
+
+    filename_with_brain_id = str(brain_id) + "/" + str(upload_file.filename)
+
+    try:
+        file_in_storage = upload_file_storage(file_content, filename_with_brain_id)
+
+    except Exception as e:
+        print(e)
+
+        notification_service.update_notification_by_id(
+            upload_notification.id if upload_notification else None,
+            NotificationUpdatableProperties(
+                status=NotificationsStatusEnum.ERROR,
+                description=f"There was an error uploading the file: {e}",
+            ),
+        )
+        if "The resource already exists" in str(e):
+            raise HTTPException(
+                status_code=403,
+                detail=f"File {upload_file.filename} already exists in storage.",
+            )
+        else:
+            raise HTTPException(
+                status_code=500, detail=f"Failed to upload file to storage. {e}"
+            )
+
+    knowledge_to_add = CreateKnowledgeProperties(
+        brain_id=brain_id,
+        file_name=upload_file.filename,
+        extension=os.path.splitext(
+            upload_file.filename  # pyright: ignore reportPrivateUsage=none
+        )[-1].lower(),
+    )
+
+    added_knowledge = knowledge_service.add_knowledge(knowledge_to_add)
+
+    process_file_and_notify.delay(
+        file_name=filename_with_brain_id,
+        file_original_name=upload_file.filename,
+        brain_id=brain_id,
+        notification_id=upload_notification.id,
+    )
+    return {"message": "File processing has started."}
