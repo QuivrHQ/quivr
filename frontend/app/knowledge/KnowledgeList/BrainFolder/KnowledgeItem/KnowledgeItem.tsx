@@ -31,7 +31,9 @@ const KnowledgeItem = ({ knowledge }: KnowledgeItemProps): JSX.Element => {
         const reader = new FileReader();
 
         reader.onload = (event) => {
-          updateContent(event.target?.result as string);
+          const text = event.target?.result as string;
+          const html = text.replace(/\n/g, "<br/>");
+          updateContent(html);
         };
 
         reader.onerror = (event) => {
