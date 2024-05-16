@@ -20,6 +20,7 @@ const KnowledgeList = (): JSX.Element => {
           iconName="search"
           inputValue={searchValue}
           setInputValue={setSearchValue}
+          small={true}
         />
       </div>
       <div className={styles.brains_wrapper}>
