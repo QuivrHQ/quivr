@@ -6,7 +6,6 @@
   padding: Spacings.$spacing01;
   padding-left: Spacings.$spacing06;
   font-size: Typography.$tiny;
-  @include Typography.EllipsisOverflow;
   border-radius: Radius.$small;
   cursor: pointer;
 
@@ -17,5 +16,14 @@
   &.disabled {
     pointer-events: none;
     opacity: 0.3;
+  }
+
+  .absolute_wrapper {
+    position: relative;
+
+    .absolute {
+      position: absolute;
+      background-color: red;
+    }
   }
 }

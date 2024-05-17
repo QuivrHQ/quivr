@@ -80,6 +80,9 @@ const KnowledgeItem = ({ knowledge }: KnowledgeItemProps): JSX.Element => {
           {knowledge.url}
         </a>
       )}
+      <div className={styles.absolute_wrapper}>
+        <div className={styles.absolute}>Hey</div>
+      </div>
     </div>
   );
 };

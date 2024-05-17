@@ -101,6 +101,14 @@ const BrainFolder = ({ brain, searchValue }: BrainFolderProps): JSX.Element => {
     };
   }, []);
 
+  useEffect(() => {
+    if (!folded && contentRef.current) {
+      contentRef.current.style.maxHeight = `${contentRef.current.scrollHeight}px`;
+    } else if (folded && contentRef.current) {
+      contentRef.current.style.maxHeight = "0";
+    }
+  }, [folded, storedKnowledge]);
+
   return (
     <div className={styles.brain_folder_wrapper}>
       <div

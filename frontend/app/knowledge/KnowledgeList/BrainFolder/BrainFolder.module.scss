@@ -54,12 +54,16 @@
   }
 
   .content_wrapper {
-    overflow: hidden;
-    transition: max-height 0.3s Transitions.$easeOutBack;
+    transition: max-height 0.3s Transitions.$easeOutBack, opacity 0.5s,
+      visibility 0.5s;
   }
 
   .content_collapsed {
     max-height: 0;
+    opacity: 0;
+    visibility: hidden;
+    transition: max-height 0.3s Transitions.$easeOutBack, opacity 0.5s,
+      visibility 0.5s;
   }
 
   .options_modal_wrapper {
