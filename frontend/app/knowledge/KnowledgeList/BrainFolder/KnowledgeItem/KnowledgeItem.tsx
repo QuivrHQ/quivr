@@ -16,6 +16,15 @@ const KnowledgeItem = ({ knowledge }: KnowledgeItemProps): JSX.Element => {
   const { generateSignedUrlKnowledge } = useKnowledgeApi();
   const { updateContent } = useNotesEditorContext();
 
+  const canReadFile = (fileName: string): boolean => {
+    const extension = fileName.split(".").pop();
+
+    return (
+      (extension === "txt" || extension === "md") &&
+      isUploadedKnowledge(knowledge)
+    );
+  };
+
   const logFileContent = async () => {
     if (isUploadedKnowledge(knowledge)) {
       let download_url = await generateSignedUrlKnowledge({
@@ -48,7 +57,15 @@ const KnowledgeItem = ({ knowledge }: KnowledgeItemProps): JSX.Element => {
   };
 
   return (
-    <div className={styles.knowledge_item_wrapper}>
+    <div
+      className={`${styles.knowledge_item_wrapper} ${
+        !canReadFile(
+          isUploadedKnowledge(knowledge) ? knowledge.fileName : knowledge.url
+        )
+          ? styles.disabled
+          : ""
+      }`}
+    >
       {isUploadedKnowledge(knowledge) ? (
         <span className={styles.name} onClick={() => void logFileContent()}>
           {knowledge.fileName}

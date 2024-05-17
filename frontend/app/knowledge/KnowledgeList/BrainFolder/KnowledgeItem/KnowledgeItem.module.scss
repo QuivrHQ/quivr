@@ -13,4 +13,9 @@
   &:hover {
     background-color: var(--background-1);
   }
+
+  &.disabled {
+    pointer-events: none;
+    opacity: 0.3;
+  }
 }
