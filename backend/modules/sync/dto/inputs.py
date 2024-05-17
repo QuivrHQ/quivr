@@ -103,4 +103,4 @@ class SyncFileUpdateInput(BaseModel):
         last_modified (datetime.datetime): The updated last modified date and time.
     """
 
-    last_modified: datetime.datetime
+    last_modified: str

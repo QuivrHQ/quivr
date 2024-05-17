@@ -7,7 +7,8 @@ from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 from logger import get_logger
-from modules.knowledge.service.knowledge_service import KnowledgeService
+from modules.brain.repository.brains_vectors import BrainsVectors
+from modules.knowledge.repository.storage import Storage
 from modules.sync.dto.inputs import (
     SyncFileInput,
     SyncFileUpdateInput,
@@ -29,7 +30,7 @@ class GoogleSyncUtils(BaseModel):
     sync_user_service: SyncUserService
     sync_active_service: SyncService
     sync_files_repo: SyncFiles
-    knowledge_service: KnowledgeService
+    storage: Storage
 
     async def _upload_files(
         self,
@@ -105,43 +106,46 @@ class GoogleSyncUtils(BaseModel):
                 logger.info(
                     "Checking if file already exists in the storage: %s", file_name
                 )
-                if not check_file_exists(brain_id, file_name):
+                if check_file_exists(brain_id, file_name):
                     logger.info("🔥 File already exists in the storage: %s", file_name)
 
-                    to_upload_file = UploadFile(
-                        file=BytesIO(file_data),
-                        filename=file_name,
+                    self.storage.remove_file(brain_id + "/" + file_name)
+                    BrainsVectors().delete_file_from_brain(brain_id, file_name)
+
+                to_upload_file = UploadFile(
+                    file=BytesIO(file_data),
+                    filename=file_name,
+                )
+
+                await upload_file(to_upload_file, brain_id, current_user)
+
+                # Check if the file already exists in the database
+                existing_files = self.sync_files_repo.get_sync_files(sync_active_id)
+                existing_file = next(
+                    (f for f in existing_files if f.path == file_name), None
+                )
+
+                if existing_file:
+                    # Update the existing file record
+                    self.sync_files_repo.update_sync_file(
+                        existing_file.id,
+                        SyncFileUpdateInput(
+                            last_modified=modified_time,
+                        ),
+                    )
+                else:
+                    # Create a new file record
+                    self.sync_files_repo.create_sync_file(
+                        SyncFileInput(
+                            path=file_name,
+                            syncs_active_id=sync_active_id,
+                            last_modified=modified_time,
+                            brain_id=brain_id,
+                        )
                     )
 
-                    await upload_file(to_upload_file, brain_id, current_user)
-
-                    # Check if the file already exists in the database
-                    existing_files = self.sync_files_repo.get_sync_files(sync_active_id)
-                    existing_file = next(
-                        (f for f in existing_files if f.path == file_name), None
-                    )
-
-                    if existing_file:
-                        # Update the existing file record
-                        self.sync_files_repo.update_sync_file(
-                            existing_file.id,
-                            SyncFileUpdateInput(
-                                last_modified=modified_time.isoformat(),
-                            ),
-                        )
-                    else:
-                        # Create a new file record
-                        self.sync_files_repo.create_sync_file(
-                            SyncFileInput(
-                                path=file_name,
-                                syncs_active_id=sync_active_id,
-                                last_modified=modified_time,
-                                brain_id=brain_id,
-                            )
-                        )
-
-                    downloaded_files.append(file_name)
-                    logger.info("File downloaded and saved successfully: %s", file_name)
+                downloaded_files.append(file_name)
+                logger.info("File downloaded and saved successfully: %s", file_name)
             return {"downloaded_files": downloaded_files}
         except HttpError as error:
             logger.error(
@@ -268,12 +272,13 @@ async def main():
     sync_user_service = SyncUserService()
     sync_active_service = SyncService()
     sync_files_repo = SyncFiles()
-    knowledge_service = KnowledgeService()
+    storage = Storage()
+
     google_sync_utils = GoogleSyncUtils(
         sync_user_service=sync_user_service,
         sync_active_service=sync_active_service,
         sync_files_repo=sync_files_repo,
-        knowledge_service=knowledge_service,
+        storage=storage,
     )
     await google_sync_utils.sync(2, "39418e3b-0258-4452-af60-7acfcc1263ff")
 
