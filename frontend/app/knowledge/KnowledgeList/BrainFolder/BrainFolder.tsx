@@ -99,7 +99,7 @@ const BrainFolder = ({ brain, searchValue }: BrainFolderProps): JSX.Element => {
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [isDarkMode]);
+  }, []);
 
   return (
     <div className={styles.brain_folder_wrapper}>
