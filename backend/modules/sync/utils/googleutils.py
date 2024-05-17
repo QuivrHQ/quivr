@@ -12,6 +12,7 @@ from modules.sync.service.sync_service import SyncService, SyncUserService
 from modules.sync.utils.upload import upload_file
 from pydantic import BaseModel, ConfigDict
 from requests import HTTPError
+from modules.sync.utils.list_files import get_google_drive_files
 
 logger = get_logger(__name__)
 
@@ -189,59 +190,8 @@ class GoogleSyncUtils(BaseModel):
         )
         return downloaded_files
 
-    def get_google_drive_files(self, credentials: dict, folder_id: str = None):
-        """
-        Retrieve files from Google Drive.
 
-        Args:
-            credentials (dict): The credentials for accessing Google Drive.
-            folder_id (str, optional): The folder ID to filter files. Defaults to None.
 
-        Returns:
-            dict: A dictionary containing the list of files or an error message.
-        """
-        logger.info("Retrieving Google Drive files with folder_id: %s", folder_id)
-        creds = Credentials.from_authorized_user_info(credentials)
-        if creds.expired and creds.refresh_token:
-            creds.refresh(GoogleRequest())
-            logger.info("Google Drive credentials refreshed")
-            # Updating the credentials in the database
-
-        try:
-            service = build("drive", "v3", credentials=creds)
-            query = f"'{folder_id}' in parents" if folder_id else None
-            results = (
-                service.files()
-                .list(
-                    q=query,
-                    pageSize=10,
-                    fields="nextPageToken, files(id, name, mimeType, modifiedTime)",
-                )
-                .execute()
-            )
-            items = results.get("files", [])
-
-            if not items:
-                logger.info("No files found in Google Drive")
-                return {"files": "No files found."}
-
-            files = [
-                {
-                    "name": item["name"],
-                    "id": item["id"],
-                    "is_folder": item["mimeType"]
-                    == "application/vnd.google-apps.folder",
-                    "modified_time": item["modifiedTime"],
-                }
-                for item in items
-            ]
-            logger.info("Google Drive files retrieved successfully: %s", files)
-            return {"files": files}
-        except HTTPError as error:
-            logger.error(
-                "An error occurred while retrieving Google Drive files: %s", error
-            )
-            return {"error": f"An error occurred: {error}"}
 
 
 import asyncio

@@ -6,6 +6,7 @@ from modules.knowledge.service.knowledge_service import KnowledgeService
 from modules.notification.service.notification_service import NotificationService
 from modules.sync.dto.inputs import SyncsUserInput, SyncUserUpdateInput
 from modules.sync.repository.sync_interfaces import SyncUserInterface
+from modules.sync.utils.list_files import get_google_drive_files
 
 notification_service = NotificationService()
 knowledge_service = KnowledgeService()
@@ -183,7 +184,7 @@ class SyncUser(SyncUserInterface):
         provider = sync_user["provider"].lower()
         if provider == "google":
             logger.info("Getting files for Google sync")
-            return self.get_google_drive_files(sync_user["credentials"], folder_id)
+            return get_google_drive_files(sync_user["credentials"], folder_id)
         elif provider == "azure":
             logger.info("Getting files for Azure sync")
             return "Azure"
