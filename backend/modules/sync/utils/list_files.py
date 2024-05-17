@@ -7,7 +7,7 @@ from requests import HTTPError
 logger = get_logger(__name__)
 
 
-def get_google_drive_files(self, credentials: dict, folder_id: str = None):
+def get_google_drive_files(credentials: dict, folder_id: str = None):
     """
     Retrieve files from Google Drive.
 

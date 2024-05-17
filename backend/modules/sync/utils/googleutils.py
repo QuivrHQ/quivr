@@ -9,10 +9,9 @@ from googleapiclient.errors import HttpError
 from logger import get_logger
 from modules.sync.dto.inputs import SyncsActiveUpdateInput
 from modules.sync.service.sync_service import SyncService, SyncUserService
+from modules.sync.utils.list_files import get_google_drive_files
 from modules.sync.utils.upload import upload_file
 from pydantic import BaseModel, ConfigDict
-from requests import HTTPError
-from modules.sync.utils.list_files import get_google_drive_files
 
 logger = get_logger(__name__)
 
@@ -58,15 +57,36 @@ class GoogleSyncUtils(BaseModel):
                 mime_type = file_metadata["mimeType"]
                 modified_time = file_metadata["modifiedTime"]
                 logger.info("File last modified on: %s", modified_time)
-                # Convert Google Docs files to PDF before downloading
-                if mime_type.startswith("application/vnd.google-apps."):
+                # Convert Google Docs files to appropriate formats before downloading
+                if mime_type == "application/vnd.google-apps.document":
                     logger.info(
-                        "Converting Google Docs file with file_id: %s to PDF.", file_id
+                        "Converting Google Docs file with file_id: %s to DOCX.", file_id
                     )
                     request = service.files().export_media(
-                        fileId=file_id, mimeType="application/pdf"
+                        fileId=file_id,
+                        mimeType="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
                     )
-                    file_name += ".pdf"
+                    file_name += ".docx"
+                elif mime_type == "application/vnd.google-apps.spreadsheet":
+                    logger.info(
+                        "Converting Google Sheets file with file_id: %s to XLSX.",
+                        file_id,
+                    )
+                    request = service.files().export_media(
+                        fileId=file_id,
+                        mimeType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                    )
+                    file_name += ".xlsx"
+                elif mime_type == "application/vnd.google-apps.presentation":
+                    logger.info(
+                        "Converting Google Slides file with file_id: %s to PPTX.",
+                        file_id,
+                    )
+                    request = service.files().export_media(
+                        fileId=file_id,
+                        mimeType="application/vnd.openxmlformats-officedocument.presentationml.presentation",
+                    )
+                    file_name += ".pptx"
                 else:
                     request = service.files().get_media(fileId=file_id)
 
@@ -156,7 +176,7 @@ class GoogleSyncUtils(BaseModel):
         settings = sync_active.get("settings", {})
         folders = settings.get("folders", [])
         logger.info("Folders: %s", folders)
-        files = self.get_google_drive_files(
+        files = get_google_drive_files(
             sync_user["credentials"], folder_id=folders[0] if folders else None
         )
         if "error" in files:
@@ -189,9 +209,6 @@ class GoogleSyncUtils(BaseModel):
             "Google Drive sync completed for sync_active_id: %s", sync_active_id
         )
         return downloaded_files
-
-
-
 
 
 import asyncio
