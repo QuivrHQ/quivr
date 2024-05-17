@@ -1,18 +1,19 @@
 @use "@/styles/BoxShadow.module.scss";
 @use "@/styles/Radius.module.scss";
 @use "@/styles/Spacings.module.scss";
+@use "@/styles/Typography.module.scss";
 @use "@/styles/ZIndexes.module.scss";
 
 .options_modal_wrapper {
   background-color: var(--background-1);
-  border-radius: Radius.$normal;
-  border-radius: Radius.$normal;
-  box-shadow: BoxShadow.$small;
+  border-radius: Radius.$small;
+  box-shadow: BoxShadow.$medium;
   width: fit-content;
+  font-size: Typography.$tiny;
 
   .option {
-    padding: Spacings.$spacing03;
-    padding-inline: Spacings.$spacing05;
+    padding-block: Spacings.$spacing02;
+    padding-inline: Spacings.$spacing03;
     display: flex;
     gap: Spacings.$spacing05;
     align-items: center;

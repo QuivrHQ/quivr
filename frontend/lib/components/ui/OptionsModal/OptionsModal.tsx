@@ -49,7 +49,7 @@ export const OptionsModal = ({ options }: OptionsModalProps): JSX.Element => {
           <Icon
             name={option.iconName}
             color={hovered[index] ? option.iconColor : "black"}
-            size="normal"
+            size="small"
           />
         </div>
       ))}
