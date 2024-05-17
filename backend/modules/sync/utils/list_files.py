@@ -48,7 +48,8 @@ def get_google_drive_files(credentials: dict, folder_id: str = None):
                 "name": item["name"],
                 "id": item["id"],
                 "is_folder": item["mimeType"] == "application/vnd.google-apps.folder",
-                "modified_time": item["modifiedTime"],
+                "last_modified": item["modifiedTime"],
+                "mime_type": item["mimeType"],
             }
             for item in items
         ]

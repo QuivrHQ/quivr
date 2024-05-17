@@ -90,10 +90,11 @@ class SyncFileInput(BaseModel):
     """
 
     path: str
-    syncs_active_id: str
-    last_modified: datetime.datetime
+    syncs_active_id: int
+    last_modified: str
     brain_id: str
-    
+
+
 class SyncFileUpdateInput(BaseModel):
     """
     Input model for updating an existing sync file.

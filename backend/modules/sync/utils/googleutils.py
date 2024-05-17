@@ -7,7 +7,12 @@ from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 from logger import get_logger
-from modules.sync.dto.inputs import SyncsActiveUpdateInput
+from modules.sync.dto.inputs import (
+    SyncFileInput,
+    SyncFileUpdateInput,
+    SyncsActiveUpdateInput,
+)
+from modules.sync.repository.sync_files import SyncFiles
 from modules.sync.service.sync_service import SyncService, SyncUserService
 from modules.sync.utils.list_files import get_google_drive_files
 from modules.sync.utils.upload import upload_file
@@ -21,21 +26,27 @@ class GoogleSyncUtils(BaseModel):
 
     sync_user_service: SyncUserService
     sync_active_service: SyncService
+    sync_files_repo: SyncFiles
 
     async def _upload_files(
-        self, credentials: dict, file_ids: list, current_user: str, brain_id: str
+        self,
+        credentials: dict,
+        files: list,
+        current_user: str,
+        brain_id: str,
+        sync_active_id: int,
     ):
         """
         Download files from Google Drive.
 
         Args:
             credentials (dict): The credentials for accessing Google Drive.
-            file_ids (list): The list of file IDs to download.
+            files (list): The list of file metadata to download.
 
         Returns:
             dict: A dictionary containing the status of the download or an error message.
         """
-        logger.info("Downloading Google Drive files with file_ids: %s", file_ids)
+        logger.info("Downloading Google Drive files with metadata: %s", files)
         creds = Credentials.from_authorized_user_info(credentials)
         if creds.expired and creds.refresh_token:
             creds.refresh(GoogleRequest())
@@ -45,17 +56,12 @@ class GoogleSyncUtils(BaseModel):
         try:
             service = build("drive", "v3", credentials=creds)
             downloaded_files = []
-            for file_id in file_ids:
+            for file in files:
+                file_id = file["id"]
+                file_name = file["name"]
+                mime_type = file["mime_type"]
+                modified_time = file["last_modified"]
                 logger.info("Downloading file with file_id: %s", file_id)
-                # Get file metadata to retrieve the file name, mimeType, and modifiedTime
-                file_metadata = (
-                    service.files()
-                    .get(fileId=file_id, fields="name, mimeType, modifiedTime")
-                    .execute()
-                )
-                file_name = file_metadata["name"]
-                mime_type = file_metadata["mimeType"]
-                modified_time = file_metadata["modifiedTime"]
                 logger.info("File last modified on: %s", modified_time)
                 # Convert Google Docs files to appropriate formats before downloading
                 if mime_type == "application/vnd.google-apps.document":
@@ -97,10 +103,32 @@ class GoogleSyncUtils(BaseModel):
                     filename=file_name,
                 )
 
-                # Since 'await' is only allowed in asynchronous functions, we need to ensure this function is asynchronous.
-                # If the function is not already asynchronous, we should make it so.
-                # Assuming the function is now asynchronous:
                 await upload_file(to_upload_file, brain_id, current_user)
+
+                # Check if the file already exists in the database
+                existing_files = self.sync_files_repo.get_sync_files(sync_active_id)
+                existing_file = next(
+                    (f for f in existing_files if f.path == file_name), None
+                )
+
+                if existing_file:
+                    # Update the existing file record
+                    self.sync_files_repo.update_sync_file(
+                        existing_file.id,
+                        SyncFileUpdateInput(
+                            last_modified=modified_time.isoformat(),
+                        ),
+                    )
+                else:
+                    # Create a new file record
+                    self.sync_files_repo.create_sync_file(
+                        SyncFileInput(
+                            path=file_name,
+                            syncs_active_id=sync_active_id,
+                            last_modified=modified_time,
+                            brain_id=brain_id,
+                        )
+                    )
 
                 downloaded_files.append(file_name)
                 logger.info("File downloaded and saved successfully: %s", file_name)
@@ -186,12 +214,24 @@ class GoogleSyncUtils(BaseModel):
             )
             return None
 
-        # Download only the files found
-        file_ids = [
-            file["id"] for file in files.get("files", []) if not file["is_folder"]
+        # Filter files that have been modified since the last sync
+        last_synced_time = datetime.fromisoformat(last_synced) if last_synced else None
+        files_to_download = [
+            file
+            for file in files.get("files", [])
+            if not file["is_folder"]
+            and (
+                not last_synced_time
+                or datetime.fromisoformat(file["last_modified"]) > last_synced_time
+            )
         ]
+
         downloaded_files = await self._upload_files(
-            sync_user["credentials"], file_ids, user_id, sync_active["brain_id"]
+            sync_user["credentials"],
+            files_to_download,
+            user_id,
+            sync_active["brain_id"],
+            sync_active_id,
         )
         if "error" in downloaded_files:
             logger.error(
@@ -217,8 +257,11 @@ import asyncio
 async def main():
     sync_user_service = SyncUserService()
     sync_active_service = SyncService()
+    sync_files_repo = SyncFiles()
     google_sync_utils = GoogleSyncUtils(
-        sync_user_service=sync_user_service, sync_active_service=sync_active_service
+        sync_user_service=sync_user_service,
+        sync_active_service=sync_active_service,
+        sync_files_repo=sync_files_repo,
     )
     await google_sync_utils.sync(2, "39418e3b-0258-4452-af60-7acfcc1263ff")
 

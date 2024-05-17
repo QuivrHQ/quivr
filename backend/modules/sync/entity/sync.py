@@ -18,5 +18,5 @@ class SyncsFiles(BaseModel):
     id: int
     path: str
     syncs_active_id: int
-    last_modified: datetime
+    last_modified: str
     brain_id: str
