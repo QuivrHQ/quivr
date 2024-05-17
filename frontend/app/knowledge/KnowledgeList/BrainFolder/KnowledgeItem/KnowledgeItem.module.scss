@@ -1,29 +1,38 @@
 @use "@/styles/Radius.module.scss";
 @use "@/styles/Spacings.module.scss";
 @use "@/styles/Typography.module.scss";
+@use "@/styles/ZIndexes.module.scss";
 
-.knowledge_item_wrapper {
+.knowledge_item_container {
   padding: Spacings.$spacing01;
   padding-left: Spacings.$spacing06;
   font-size: Typography.$tiny;
   border-radius: Radius.$small;
-  cursor: pointer;
 
-  &:hover {
-    background-color: var(--background-1);
+  .knowledge_item_wrapper {
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: Spacings.$spacing03;
+    width: 100%;
+
+    .name {
+      @include Typography.EllipsisOverflow;
+    }
+
+    &:hover {
+      background-color: var(--background-1);
+    }
   }
 
-  &.disabled {
-    pointer-events: none;
-    opacity: 0.3;
-  }
-
-  .absolute_wrapper {
+  .options_modal_wrapper {
     position: relative;
 
-    .absolute {
+    .options_modal {
       position: absolute;
-      background-color: red;
+      right: 0;
+      z-index: ZIndexes.$overlay;
     }
   }
 }
