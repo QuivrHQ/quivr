@@ -74,6 +74,7 @@ const BrainFolder = ({ brain, searchValue }: BrainFolderProps): JSX.Element => {
           />
           <span className={styles.name}>{brain.name}</span>
         </div>
+        <Icon name="options" size="normal" color="black" handleHover={true} />
       </div>
       <div
         ref={contentRef}

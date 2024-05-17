@@ -17,6 +17,7 @@
     font-weight: 550;
     padding: Spacings.$spacing02;
     overflow: hidden;
+    gap: Spacings.$spacing03;
 
     &:hover {
       background-color: var(--background-2);
