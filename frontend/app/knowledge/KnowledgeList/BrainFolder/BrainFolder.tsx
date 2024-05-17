@@ -141,8 +141,10 @@ const BrainFolder = ({ brain, searchValue }: BrainFolderProps): JSX.Element => {
           <Icon name="options" size="normal" color="black" handleHover={true} />
         </div>
       </div>
-      <div ref={optionsRef} className={styles.options_modal}>
-        {optionsOpened && <OptionsModal options={options} />}
+      <div className={styles.options_modal_wrapper}>
+        <div ref={optionsRef} className={styles.options_modal}>
+          {optionsOpened && <OptionsModal options={options} />}
+        </div>
       </div>
       <div
         ref={contentRef}

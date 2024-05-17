@@ -7,7 +7,6 @@
 .brain_folder_wrapper {
   display: flex;
   flex-direction: column;
-  position: relative;
   border-radius: Radius.$small;
 
   .brain_folder_header {
@@ -63,11 +62,14 @@
     max-height: 0;
   }
 
-  .options_modal {
-    position: absolute;
-    right: Spacings.$spacing01;
-    top: Spacings.$spacing06;
-    z-index: ZIndexes.$modal;
-    padding-bottom: Spacings.$spacing01;
+  .options_modal_wrapper {
+    position: relative;
+
+    .options_modal {
+      position: absolute;
+      right: Spacings.$spacing01;
+      z-index: ZIndexes.$modal;
+      padding-bottom: Spacings.$spacing01;
+    }
   }
 }
