@@ -2,22 +2,25 @@
 @use "@/styles/Spacings.module.scss";
 @use "@/styles/Transitions.module.scss";
 @use "@/styles/Typography.module.scss";
+@use "@/styles/ZIndexes.module.scss";
 
 .brain_folder_wrapper {
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  position: relative;
   border-radius: Radius.$small;
 
   .brain_folder_header {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    width: 100%;
     cursor: pointer;
     font-weight: 550;
     padding: Spacings.$spacing02;
     overflow: hidden;
     gap: Spacings.$spacing03;
+    position: relative;
 
     &:hover {
       background-color: var(--background-2);
@@ -58,5 +61,13 @@
 
   .content_collapsed {
     max-height: 0;
+  }
+
+  .options_modal {
+    position: absolute;
+    right: Spacings.$spacing02;
+    top: Spacings.$spacing08;
+    z-index: ZIndexes.$modal;
+    padding-bottom: Spacings.$spacing01;
   }
 }

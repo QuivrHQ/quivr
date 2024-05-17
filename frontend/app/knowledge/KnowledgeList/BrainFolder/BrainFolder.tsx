@@ -2,11 +2,17 @@
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 
+import { DeleteOrUnsubscribeConfirmationModal } from "@/app/studio/[brainId]/BrainManagementTabs/components/DeleteOrUnsubscribeModal/DeleteOrUnsubscribeConfirmationModal";
+import { useBrainManagementTabs } from "@/app/studio/[brainId]/BrainManagementTabs/hooks/useBrainManagementTabs";
+import { getBrainPermissions } from "@/app/studio/[brainId]/BrainManagementTabs/utils/getBrainPermissions";
 import Icon from "@/lib/components/ui/Icon/Icon";
+import { OptionsModal } from "@/lib/components/ui/OptionsModal/OptionsModal";
+import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 import { MinimalBrainForUser } from "@/lib/context/BrainProvider/types";
 import { useUserSettingsContext } from "@/lib/context/UserSettingsProvider/hooks/useUserSettingsContext";
 import { useAddedKnowledge } from "@/lib/hooks/useAddedKnowledge";
 import { isUploadedKnowledge, Knowledge } from "@/lib/types/Knowledge";
+import { Option } from "@/lib/types/Options";
 
 import styles from "./BrainFolder.module.scss";
 import KnowledgeItem from "./KnowledgeItem/KnowledgeItem";
@@ -23,7 +29,38 @@ const BrainFolder = ({ brain, searchValue }: BrainFolderProps): JSX.Element => {
   });
   const [folded, setFolded] = useState<boolean>(true);
   const contentRef = useRef<HTMLDivElement>(null);
+  const {
+    handleUnsubscribeOrDeleteBrain,
+    isDeleteOrUnsubscribeModalOpened,
+    setIsDeleteOrUnsubscribeModalOpened,
+    isDeleteOrUnsubscribeRequestPending,
+  } = useBrainManagementTabs(brain.id);
   const [storedKnowledge, setStoredKnowledge] = useState<Knowledge[]>([]);
+  const [optionsOpened, setOptionsOpened] = useState<boolean>(false);
+
+  const { allBrains } = useBrainContext();
+  const { isOwnedByCurrentUser } = getBrainPermissions({
+    brainId: brain.id,
+    userAccessibleBrains: allBrains,
+  });
+
+  const iconRef = useRef<HTMLDivElement | null>(null);
+  const optionsRef = useRef<HTMLDivElement | null>(null);
+
+  const options: Option[] = [
+    {
+      label: "Edit",
+      onClick: () => (window.location.href = `/studio/${brain.id}`),
+      iconName: "edit",
+      iconColor: "primary",
+    },
+    {
+      label: "Delete",
+      onClick: () => void setIsDeleteOrUnsubscribeModalOpened(true),
+      iconName: "delete",
+      iconColor: "dangerous",
+    },
+  ];
 
   const filteredKnowledge = storedKnowledge
     .filter((knowledge) =>
@@ -45,6 +82,24 @@ const BrainFolder = ({ brain, searchValue }: BrainFolderProps): JSX.Element => {
   useEffect(() => {
     setStoredKnowledge([...allKnowledge]);
   }, [allKnowledge, storedKnowledge.length, searchValue]);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        iconRef.current &&
+        !iconRef.current.contains(event.target as Node) &&
+        optionsRef.current &&
+        !optionsRef.current.contains(event.target as Node)
+      ) {
+        setOptionsOpened(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isDarkMode]);
 
   return (
     <div className={styles.brain_folder_wrapper}>
@@ -74,7 +129,20 @@ const BrainFolder = ({ brain, searchValue }: BrainFolderProps): JSX.Element => {
           />
           <span className={styles.name}>{brain.name}</span>
         </div>
-        <Icon name="options" size="normal" color="black" handleHover={true} />
+        <div
+          className={styles.icon_wrapper}
+          ref={iconRef}
+          onClick={(event: React.MouseEvent<HTMLElement>) => {
+            event.nativeEvent.stopImmediatePropagation();
+            event.stopPropagation();
+            setOptionsOpened(!optionsOpened);
+          }}
+        >
+          <Icon name="options" size="normal" color="black" handleHover={true} />
+        </div>
+      </div>
+      <div ref={optionsRef} className={styles.options_modal}>
+        {optionsOpened && <OptionsModal options={options} />}
       </div>
       <div
         ref={contentRef}
@@ -89,6 +157,15 @@ const BrainFolder = ({ brain, searchValue }: BrainFolderProps): JSX.Element => {
           </div>
         ))}
       </div>
+      <DeleteOrUnsubscribeConfirmationModal
+        isOpen={isDeleteOrUnsubscribeModalOpened}
+        setOpen={setIsDeleteOrUnsubscribeModalOpened}
+        onConfirm={() => void handleUnsubscribeOrDeleteBrain()}
+        isOwnedByCurrentUser={isOwnedByCurrentUser}
+        isDeleteOrUnsubscribeRequestPending={
+          isDeleteOrUnsubscribeRequestPending
+        }
+      />
     </div>
   );
 };
