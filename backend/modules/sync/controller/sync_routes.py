@@ -10,7 +10,7 @@ from modules.sync.dto import SyncsDescription
 from modules.sync.dto.inputs import SyncsActiveInput, SyncsActiveUpdateInput
 from modules.sync.dto.outputs import AuthMethodEnum
 from modules.sync.entity.sync import SyncsActive
-from modules.sync.service.sync_service import SyncService
+from modules.sync.service.sync_service import SyncService, SyncUserService
 from modules.user.entity.user_identity import UserIdentity
 
 # Set environment variable for OAuthlib
@@ -21,6 +21,7 @@ logger = get_logger(__name__)
 
 # Initialize sync service
 sync_service = SyncService()
+sync_user_service = SyncUserService()
 
 # Initialize API router
 sync_router = APIRouter()
@@ -80,7 +81,7 @@ async def get_user_syncs(current_user: UserIdentity = Depends(get_current_user))
         List: A list of syncs for the user.
     """
     logger.debug(f"Fetching user syncs for user: {current_user.id}")
-    return sync_service.get_syncs_user(str(current_user.id))
+    return sync_user_service.get_syncs_user(str(current_user.id))
 
 
 @sync_router.post(
@@ -182,7 +183,7 @@ async def get_active_syncs_for_user(
         List[SyncsActive]: A list of active syncs for the current user.
     """
     logger.debug(f"Fetching active syncs for user: {current_user.id}")
-    return sync_service.get_syncs_active(current_user.id)
+    return sync_service.get_syncs_active(str(current_user.id))
 
 
 @sync_router.get(
@@ -191,7 +192,7 @@ async def get_active_syncs_for_user(
     tags=["Sync"],
 )
 async def get_files_folder_user_sync(
-    user_sync_id: str,
+    user_sync_id: int,
     folder_id: str = None,
     current_user: UserIdentity = Depends(get_current_user),
 ):
@@ -209,8 +210,8 @@ async def get_files_folder_user_sync(
     logger.debug(
         f"Fetching files for user sync: {user_sync_id} for user: {current_user.id}"
     )
-    return sync_service.get_files_folder_user_sync(
-        user_sync_id, current_user.id, folder_id
+    return sync_user_service.get_files_folder_user_sync(
+        user_sync_id, str(current_user.id), folder_id
     )
 
 

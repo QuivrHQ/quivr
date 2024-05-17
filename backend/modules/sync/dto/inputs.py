@@ -1,3 +1,4 @@
+import datetime
 from typing import List, Optional
 
 from pydantic import BaseModel
@@ -77,3 +78,28 @@ class SyncsActiveUpdateInput(BaseModel):
     name: Optional[str] = None
     settings: Optional[SyncActiveSettings] = None
     last_synced: Optional[str] = None
+
+
+class SyncFileInput(BaseModel):
+    """
+    Input model for creating a new sync file.
+
+    Attributes:
+        path (str): The path of the file.
+        syncs_active_id (int): The ID of the active sync associated with this file.
+    """
+
+    path: str
+    syncs_active_id: str
+    last_modified: datetime.datetime
+    brain_id: str
+    
+class SyncFileUpdateInput(BaseModel):
+    """
+    Input model for updating an existing sync file.
+
+    Attributes:
+        last_modified (datetime.datetime): The updated last modified date and time.
+    """
+
+    last_modified: datetime.datetime

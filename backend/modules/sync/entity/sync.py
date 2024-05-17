@@ -12,3 +12,11 @@ class SyncsActive(BaseModel):
     last_synced: datetime
     sync_interval_minutes: int
     brain_id: str
+
+
+class SyncsFiles(BaseModel):
+    id: int
+    path: str
+    syncs_active_id: int
+    last_modified: datetime
+    brain_id: str

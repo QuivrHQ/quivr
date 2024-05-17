@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, Request
 from logger import get_logger
 from middlewares.auth import AuthBearer, get_current_user
 from modules.sync.dto.inputs import SyncsUserInput, SyncUserUpdateInput
-from modules.sync.service.sync_service import SyncService
+from modules.sync.service.sync_service import SyncService, SyncUserService
 from modules.user.entity.user_identity import UserIdentity
 from msal import PublicClientApplication
 
@@ -11,6 +11,7 @@ logger = get_logger(__name__)
 
 # Initialize sync service
 sync_service = SyncService()
+sync_user_service = SyncUserService()
 
 # Initialize API router
 azure_sync_router = APIRouter()
@@ -59,7 +60,7 @@ def authorize_azure(
         credentials={},
         state={"state": state},
     )
-    sync_service.create_sync_user(sync_user_input)
+    sync_user_service.create_sync_user(sync_user_input)
     return {"authorization_url": authorization_url}
 
 
@@ -80,7 +81,7 @@ def oauth2callback_azure(request: Request):
     logger.debug(
         f"Handling OAuth2 callback for user: {current_user} with state: {state}"
     )
-    sync_user_state = sync_service.get_sync_user_by_state(state_dict)
+    sync_user_state = sync_user_service.get_sync_user_by_state(state_dict)
     logger.info(f"Retrieved sync user state: {sync_user_state}")
 
     if state_dict != sync_user_state["state"]:
@@ -104,6 +105,6 @@ def oauth2callback_azure(request: Request):
         credentials=creds,
         state={},
     )
-    sync_service.update_sync_user(current_user, state_dict, sync_user_input)
+    sync_user_service.update_sync_user(current_user, state_dict, sync_user_input)
     logger.info(f"Azure sync created successfully for user: {current_user}")
     return {"message": "Azure sync created successfully"}

@@ -6,7 +6,7 @@ from google_auth_oauthlib.flow import Flow
 from logger import get_logger
 from middlewares.auth import AuthBearer, get_current_user
 from modules.sync.dto.inputs import SyncsUserInput, SyncUserUpdateInput
-from modules.sync.service.sync_service import SyncService
+from modules.sync.service.sync_service import SyncService, SyncUserService
 from modules.user.entity.user_identity import UserIdentity
 
 # Set environment variable for OAuthlib
@@ -17,6 +17,7 @@ logger = get_logger(__name__)
 
 # Initialize sync service
 sync_service = SyncService()
+sync_user_service = SyncUserService()
 
 # Initialize API router
 google_sync_router = APIRouter()
@@ -25,7 +26,7 @@ google_sync_router = APIRouter()
 CLIENT_SECRETS_FILE = "modules/sync/controller/credentials.json"
 SCOPES = [
     "https://www.googleapis.com/auth/drive.metadata.readonly",
-    "https://www.googleapis.com/auth/drive.readonly"
+    "https://www.googleapis.com/auth/drive.readonly",
 ]
 BASE_REDIRECT_URI = "http://localhost:5050/sync/google/oauth2callback"
 
@@ -66,7 +67,7 @@ def authorize_google(
         credentials={},
         state={"state": state},
     )
-    sync_service.create_sync_user(sync_user_input)
+    sync_user_service.create_sync_user(sync_user_input)
     return {"authorization_url": authorization_url}
 
 
@@ -87,7 +88,7 @@ def oauth2callback_google(request: Request):
     logger.debug(
         f"Handling OAuth2 callback for user: {current_user} with state: {state}"
     )
-    sync_user_state = sync_service.get_sync_user_by_state(state_dict)
+    sync_user_state = sync_user_service.get_sync_user_by_state(state_dict)
     logger.info(f"Retrieved sync user state: {sync_user_state}")
 
     if state_dict != sync_user_state["state"]:
@@ -109,6 +110,6 @@ def oauth2callback_google(request: Request):
         credentials=json.loads(creds.to_json()),
         state={},
     )
-    sync_service.update_sync_user(current_user, state_dict, sync_user_input)
+    sync_user_service.update_sync_user(current_user, state_dict, sync_user_input)
     logger.info(f"Google Drive sync created successfully for user: {current_user}")
     return {"message": "Google Drive sync created successfully"}
