@@ -10,7 +10,6 @@
   border-radius: Radius.$small;
 
   .knowledge_item_wrapper {
-    cursor: pointer;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -21,8 +20,17 @@
       @include Typography.EllipsisOverflow;
     }
 
+    .icon_wrapper {
+      visibility: hidden;
+    }
+
     &:hover {
       background-color: var(--background-1);
+
+      .icon_wrapper {
+        visibility: visible;
+        cursor: pointer;
+      }
     }
   }
 
