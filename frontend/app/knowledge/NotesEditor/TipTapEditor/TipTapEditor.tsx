@@ -1,4 +1,3 @@
-import Typography from "@tiptap/extension-typography";
 import { EditorContent, useEditor } from "@tiptap/react";
 import { StarterKit } from "@tiptap/starter-kit";
 import { useEffect } from "react";
@@ -12,7 +11,7 @@ const TipTapEditor = (): JSX.Element => {
   const { content, updateContent, expand, setExpand } = useNotesEditorContext();
 
   const tipTapEditor = useEditor({
-    extensions: [StarterKit, Typography],
+    extensions: [StarterKit],
     content,
     onUpdate: ({ editor }) => {
       updateContent(editor.getHTML());
