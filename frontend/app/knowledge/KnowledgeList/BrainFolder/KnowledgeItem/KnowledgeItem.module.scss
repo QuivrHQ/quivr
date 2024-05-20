@@ -8,6 +8,14 @@
   padding-left: Spacings.$spacing06;
   font-size: Typography.$tiny;
   border-radius: Radius.$small;
+  cursor: grab;
+  padding: Spacings.$spacing01;
+  border: 1px solid transparent;
+  border-radius: Radius.$normal;
+
+  &.dragging {
+    border-color: var(--primary-1);
+  }
 
   .knowledge_item_wrapper {
     display: flex;

@@ -79,6 +79,19 @@ const BrainFolder = ({ brain, searchValue }: BrainFolderProps): JSX.Element => {
     return folded ? "0" : `${contentRef.current?.scrollHeight}px`;
   };
 
+  const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    const droppedKnowledge = JSON.parse(
+      event.dataTransfer.getData("text/plain")
+    ) as Knowledge;
+
+    console.log("Dropped knowledge:", droppedKnowledge, "to brain:", brain.id);
+  };
+
+  const handleDragOver = (event: React.DragEvent<HTMLDivElement>) => {
+    event.preventDefault();
+  };
+
   useEffect(() => {
     setStoredKnowledge([...allKnowledge]);
   }, [allKnowledge, storedKnowledge.length, searchValue]);
@@ -110,7 +123,11 @@ const BrainFolder = ({ brain, searchValue }: BrainFolderProps): JSX.Element => {
   }, [folded, storedKnowledge]);
 
   return (
-    <div className={styles.brain_folder_wrapper}>
+    <div
+      className={styles.brain_folder_wrapper}
+      onDrop={handleDrop}
+      onDragOver={handleDragOver}
+    >
       <div
         className={styles.brain_folder_header}
         onClick={() => setFolded(!folded)}

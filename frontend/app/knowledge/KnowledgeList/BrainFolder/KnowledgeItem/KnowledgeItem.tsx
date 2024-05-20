@@ -20,6 +20,7 @@ const KnowledgeItem = ({ knowledge }: KnowledgeItemProps): JSX.Element => {
   const { generateSignedUrlKnowledge } = useKnowledgeApi();
   const { updateContent } = useNotesEditorContext();
   const [optionsOpened, setOptionsOpened] = useState<boolean>(false);
+  const [dragActivated, setDragActivated] = useState<boolean>(false);
 
   const iconRef = useRef<HTMLDivElement | null>(null);
   const optionsRef = useRef<HTMLDivElement | null>(null);
@@ -47,6 +48,10 @@ const KnowledgeItem = ({ knowledge }: KnowledgeItemProps): JSX.Element => {
       iconColor: "dangerous",
     },
   ];
+
+  const handleDragStart = (event: React.DragEvent<HTMLDivElement>) => {
+    event.dataTransfer.setData("text/plain", JSON.stringify(knowledge));
+  };
 
   const logFileContent = async () => {
     if (isUploadedKnowledge(knowledge)) {
@@ -98,7 +103,17 @@ const KnowledgeItem = ({ knowledge }: KnowledgeItemProps): JSX.Element => {
   }, []);
 
   return (
-    <div className={styles.knowledge_item_container}>
+    <div
+      className={`${styles.knowledge_item_container} ${
+        dragActivated ? styles.dragging : ""
+      }`}
+      draggable
+      onDragStart={(event) => {
+        handleDragStart(event);
+        setDragActivated(true);
+      }}
+      onDragEnd={() => setDragActivated(false)}
+    >
       <div
         className={`${styles.knowledge_item_wrapper} ${
           !canReadFile(
