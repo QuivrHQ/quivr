@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from typing import List
 from uuid import UUID
 
 from modules.sync.dto.inputs import (
@@ -74,7 +75,7 @@ class SyncInterface(ABC):
         pass
 
     @abstractmethod
-    async def get_syncs_active_in_interval(self):
+    async def get_syncs_active_in_interval(self) -> List[SyncsActive]:
         pass
 
 

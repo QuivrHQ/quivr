@@ -220,7 +220,7 @@ async def get_files_folder_user_sync(
     dependencies=[Depends(AuthBearer())],
     tags=["Sync"],
 )
-async def get_syncs_active_in_interval():
+async def get_syncs_active_in_interval() -> List[SyncsActive]:
     """
     Get all active syncs that need to be synced.
 

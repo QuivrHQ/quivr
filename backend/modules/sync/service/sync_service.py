@@ -72,7 +72,7 @@ class SyncService:
     def delete_sync_active(self, sync_active_id: str, user_id: str):
         return self.repository.delete_sync_active(sync_active_id, user_id)
 
-    async def get_syncs_active_in_interval(self):
+    async def get_syncs_active_in_interval(self) -> List[SyncsActive]:
         return await self.repository.get_syncs_active_in_interval()
 
     def get_details_sync_active(self, sync_active_id: int):

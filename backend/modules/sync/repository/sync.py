@@ -164,7 +164,7 @@ class Sync(SyncInterface):
         )
         return None
 
-    async def get_syncs_active_in_interval(self):
+    async def get_syncs_active_in_interval(self) -> List[SyncsActive]:
         """
         Retrieve active syncs that are due for synchronization based on their interval.
 
@@ -179,7 +179,7 @@ class Sync(SyncInterface):
         response = (
             self.db.table("syncs_active")
             .select("*")
-            .lt("last_synced", (current_time - timedelta(minutes=1)).isoformat())
+            .lt("last_synced", (current_time - timedelta(minutes=360)).isoformat())
             .execute()
         )
         if response.data:
@@ -188,6 +188,6 @@ class Sync(SyncInterface):
                 # Now we can call the sync_google_drive_if_not_synced method to sync the Google Drive files
                 logger.info("Syncing Google Drive for sync_active_id: %s", sync["id"])
 
-            return response.data
+            return [SyncsActive(**sync) for sync in response.data]
         logger.warning("No active syncs found due for synchronization")
         return []
