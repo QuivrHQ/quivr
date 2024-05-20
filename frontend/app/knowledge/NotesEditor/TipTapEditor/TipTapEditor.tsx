@@ -7,12 +7,16 @@ import { useNotesEditorContext } from "@/lib/context/NotesEditorProvider/hooks/u
 
 import styles from "./TipTapEditor.module.scss";
 
+import "@/app/globals.css";
+
 const TipTapEditor = (): JSX.Element => {
   const { content, updateContent, expand, setExpand } = useNotesEditorContext();
 
   const tipTapEditor = useEditor({
     extensions: [StarterKit],
-    content,
+    parseOptions: {
+      preserveWhitespace: "full",
+    },
     onUpdate: ({ editor }) => {
       updateContent(editor.getHTML());
     },

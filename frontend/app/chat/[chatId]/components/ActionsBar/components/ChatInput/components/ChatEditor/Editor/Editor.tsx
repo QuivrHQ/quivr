@@ -1,6 +1,6 @@
+import "@/app/globals.css";
 import { EditorContent } from "@tiptap/react";
 import { useEffect } from "react";
-import "./styles.css";
 
 import { useChatStateUpdater } from "./hooks/useChatStateUpdater";
 import { useCreateEditorState } from "./hooks/useCreateEditorState";
