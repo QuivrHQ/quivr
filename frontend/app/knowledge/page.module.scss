@@ -11,5 +11,15 @@
     height: calc(100% - Variables.$pageHeaderBarHeight);
     padding: Spacings.$spacing06;
     padding-bottom: 0;
+
+    .knowledge_list_wrapper {
+      transition: width 0.1s ease-in-out;
+      width: 400px;
+
+      &.collapsed {
+        width: 0;
+        overflow: hidden;
+      }
+    }
   }
 }

@@ -50,7 +50,13 @@ const Knowledge = (): JSX.Element => {
         <PageHeader iconName="book" label="Knowledge" buttons={buttons} />
       </div>
       <div className={styles.content_wrapper}>
-        {!expand && <KnowledgeList />}
+        <div
+          className={`${styles.knowledge_list_wrapper} ${
+            expand ? styles.collapsed : ""
+          }`}
+        >
+          <KnowledgeList />
+        </div>
         <NotesEditor />
       </div>
       <UploadDocumentModal />
