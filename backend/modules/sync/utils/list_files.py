@@ -1,3 +1,6 @@
+import msal
+import requests
+from fastapi import HTTPException
 from google.auth.transport.requests import Request as GoogleRequest
 from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
@@ -58,3 +61,75 @@ def get_google_drive_files(credentials: dict, folder_id: str = None):
     except HTTPError as error:
         logger.error("An error occurred while retrieving Google Drive files: %s", error)
         return {"error": f"An error occurred: {error}"}
+
+
+CLIENT_ID = "511dce23-02f3-4724-8684-05da226df5f3"
+AUTHORITY = "https://login.microsoftonline.com/common"
+REDIRECT_URI = "http://localhost:5050/sync/azure/oauth2callback"
+SCOPE = [
+    "https://graph.microsoft.com/Files.Read",
+    "https://graph.microsoft.com/User.Read",
+    "https://graph.microsoft.com/Sites.Read.All",
+]
+
+
+def get_azure_token_data(credentials):
+    if "access_token" not in credentials:
+        raise HTTPException(status_code=401, detail="Invalid token data")
+    return credentials
+
+
+def refresh_azure_token(credentials):
+    if "refresh_token" not in credentials:
+        raise HTTPException(status_code=401, detail="No refresh token available")
+
+    client = msal.PublicClientApplication(CLIENT_ID, authority=AUTHORITY)
+    result = client.acquire_token_by_refresh_token(
+        credentials["refresh_token"], scopes=SCOPE
+    )
+    if "access_token" not in result:
+        raise HTTPException(status_code=400, detail="Failed to refresh token")
+
+    return result
+
+
+def get_azure_headers(token_data):
+    return {
+        "Authorization": f"Bearer {token_data['access_token']}",
+        "Accept": "application/json",
+    }
+
+
+def list_azure_files(credentials, folder_id=None):
+    token_data = get_azure_token_data(credentials)
+    headers = get_azure_headers(token_data)
+    endpoint = f"https://graph.microsoft.com/v1.0/me/drive/root/children"
+    if folder_id:
+        endpoint = (
+            f"https://graph.microsoft.com/v1.0/me/drive/items/{folder_id}/children"
+        )
+    response = requests.get(endpoint, headers=headers)
+    if response.status_code == 401:
+        token_data = refresh_azure_token(credentials)
+        headers = get_azure_headers(token_data)
+        response = requests.get(endpoint, headers=headers)
+    if response.status_code != 200:
+        return {"error": response.text}
+    items = response.json().get("value", [])
+
+    if not items:
+        logger.info("No files found in Azure Drive")
+        return {"files": "No files found."}
+
+    files = [
+        {
+            "name": item["name"],
+            "id": item["id"],
+            "is_folder": "folder" in item,
+            "last_modified": item["lastModifiedDateTime"],
+            "mime_type": item.get("file", {}).get("mimeType", "folder"),
+        }
+        for item in items
+    ]
+    logger.info("Azure Drive files retrieved successfully: %s", files)
+    return {"files": files}

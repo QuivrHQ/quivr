@@ -6,7 +6,7 @@ from modules.knowledge.service.knowledge_service import KnowledgeService
 from modules.notification.service.notification_service import NotificationService
 from modules.sync.dto.inputs import SyncsUserInput, SyncUserUpdateInput
 from modules.sync.repository.sync_interfaces import SyncUserInterface
-from modules.sync.utils.list_files import get_google_drive_files
+from modules.sync.utils.list_files import get_google_drive_files, list_azure_files
 
 notification_service = NotificationService()
 knowledge_service = KnowledgeService()
@@ -187,7 +187,7 @@ class SyncUser(SyncUserInterface):
             return get_google_drive_files(sync_user["credentials"], folder_id)
         elif provider == "azure":
             logger.info("Getting files for Azure sync")
-            return "Azure"
+            return list_azure_files(sync_user["credentials"], folder_id)
         else:
             logger.warning("No sync found for provider: %s", sync_user["provider"])
             return "No sync found"
