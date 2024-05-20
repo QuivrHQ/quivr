@@ -5,6 +5,7 @@ import { useBrainCreationContext } from "@/lib/components/AddBrainModal/brainCre
 import PageHeader from "@/lib/components/PageHeader/PageHeader";
 import { UploadDocumentModal } from "@/lib/components/UploadDocumentModal/UploadDocumentModal";
 import { useKnowledgeToFeedContext } from "@/lib/context/KnowledgeToFeedProvider/hooks/useKnowledgeToFeedContext";
+import { useNotesEditorContext } from "@/lib/context/NotesEditorProvider/hooks/useNotesEditorContext";
 import { ButtonType } from "@/lib/types/QuivrButton";
 
 import KnowledgeList from "./KnowledgeList/KnowledgeList";
@@ -14,6 +15,7 @@ import styles from "./page.module.scss";
 const Knowledge = (): JSX.Element => {
   const { setShouldDisplayFeedCard } = useKnowledgeToFeedContext();
   const { setIsBrainCreationModalOpened } = useBrainCreationContext();
+  const { expand } = useNotesEditorContext();
 
   const buttons: ButtonType[] = [
     {
@@ -48,7 +50,7 @@ const Knowledge = (): JSX.Element => {
         <PageHeader iconName="book" label="Knowledge" buttons={buttons} />
       </div>
       <div className={styles.content_wrapper}>
-        <KnowledgeList />
+        {!expand && <KnowledgeList />}
         <NotesEditor />
       </div>
       <UploadDocumentModal />

@@ -8,7 +8,7 @@ import { useNotesEditorContext } from "@/lib/context/NotesEditorProvider/hooks/u
 import styles from "./TipTapEditor.module.scss";
 
 const TipTapEditor = (): JSX.Element => {
-  const { content, updateContent } = useNotesEditorContext();
+  const { content, updateContent, expand, setExpand } = useNotesEditorContext();
 
   const tipTapEditor = useEditor({
     extensions: [StarterKit],
@@ -27,7 +27,13 @@ const TipTapEditor = (): JSX.Element => {
   return (
     <div className={styles.editor_wrapper}>
       <div className={styles.editor_header}>
-        <Icon name="expand" size="normal" color="black" handleHover={true} />
+        <Icon
+          name={expand ? "collapse" : "expand"}
+          size="normal"
+          color="black"
+          handleHover={true}
+          onClick={() => setExpand(!expand)}
+        />
       </div>
       <EditorContent editor={tipTapEditor} />
     </div>
