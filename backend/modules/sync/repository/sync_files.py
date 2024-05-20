@@ -63,7 +63,7 @@ class SyncFiles(SyncFileInterface):
             .execute()
         )
         if response.data:
-            logger.info("Sync files retrieved successfully: %s", response.data)
+            # logger.info("Sync files retrieved successfully: %s", response.data)
             return [SyncsFiles(**file) for file in response.data]
         logger.warning("No sync files found for sync_active_id: %s", sync_active_id)
         return []

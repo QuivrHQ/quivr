@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from io import BytesIO
 
 from fastapi import UploadFile
@@ -65,11 +65,9 @@ class GoogleSyncUtils(BaseModel):
                 file_name = file["name"]
                 mime_type = file["mime_type"]
                 modified_time = file["last_modified"]
-                logger.info("Downloading file with file_id: %s", file_id)
-                logger.info("File last modified on: %s", modified_time)
                 # Convert Google Docs files to appropriate formats before downloading
                 if mime_type == "application/vnd.google-apps.document":
-                    logger.info(
+                    logger.debug(
                         "Converting Google Docs file with file_id: %s to DOCX.", file_id
                     )
                     request = service.files().export_media(
@@ -78,7 +76,7 @@ class GoogleSyncUtils(BaseModel):
                     )
                     file_name += ".docx"
                 elif mime_type == "application/vnd.google-apps.spreadsheet":
-                    logger.info(
+                    logger.debug(
                         "Converting Google Sheets file with file_id: %s to XLSX.",
                         file_id,
                     )
@@ -88,7 +86,7 @@ class GoogleSyncUtils(BaseModel):
                     )
                     file_name += ".xlsx"
                 elif mime_type == "application/vnd.google-apps.presentation":
-                    logger.info(
+                    logger.debug(
                         "Converting Google Slides file with file_id: %s to PPTX.",
                         file_id,
                     )
@@ -97,15 +95,29 @@ class GoogleSyncUtils(BaseModel):
                         mimeType="application/vnd.openxmlformats-officedocument.presentationml.presentation",
                     )
                     file_name += ".pptx"
-                else:
+                ### Elif pdf, txt, md, csv, docx, xlsx, pptx, doc
+                elif file_name.split(".")[-1] in [
+                    "pdf",
+                    "txt",
+                    "md",
+                    "csv",
+                    "docx",
+                    "xlsx",
+                    "pptx",
+                    "doc",
+                ]:
                     request = service.files().get_media(fileId=file_id)
+                else:
+                    logger.warning(
+                        "Skipping unsupported file type: %s for file_id: %s",
+                        mime_type,
+                        file_id,
+                    )
+                    continue
 
                 file_data = request.execute()
 
                 # Check if the file already exists in the storage
-                logger.info(
-                    "Checking if file already exists in the storage: %s", file_name
-                )
                 if check_file_exists(brain_id, file_name):
                     logger.info("🔥 File already exists in the storage: %s", file_name)
 
@@ -145,7 +157,6 @@ class GoogleSyncUtils(BaseModel):
                     )
 
                 downloaded_files.append(file_name)
-                logger.info("File downloaded and saved successfully: %s", file_name)
             return {"downloaded_files": downloaded_files}
         except HttpError as error:
             logger.error(
@@ -161,11 +172,6 @@ class GoogleSyncUtils(BaseModel):
             sync_active_id (int): The ID of the active sync.
             user_id (str): The user ID associated with the active sync.
         """
-        logger.info(
-            "Checking if Google sync has not been synced for sync_active_id: %s, user_id: %s",
-            sync_active_id,
-            user_id,
-        )
 
         # Retrieve the active sync details
         sync_active = self.sync_active_service.get_details_sync_active(sync_active_id)
@@ -179,11 +185,20 @@ class GoogleSyncUtils(BaseModel):
         last_synced = sync_active.get("last_synced")
         sync_interval_minutes = sync_active.get("sync_interval_minutes", 0)
         if last_synced:
-            last_synced_time = datetime.fromisoformat(last_synced)
+            last_synced_time = datetime.fromisoformat(last_synced).astimezone(
+                timezone.utc
+            )
             current_time = datetime.now().astimezone()
-            if current_time - last_synced_time < timedelta(
-                minutes=sync_interval_minutes
-            ):
+
+            # Debug logging to check the values
+            logger.debug("Last synced time (UTC): %s", last_synced_time)
+            logger.debug("Current time (local timezone): %s", current_time)
+
+            # Convert current_time to UTC for comparison
+            current_time_utc = current_time.astimezone(timezone.utc)
+            logger.debug("Current time (UTC): %s", current_time_utc)
+            time_difference = current_time_utc - last_synced_time
+            if time_difference < timedelta(minutes=sync_interval_minutes):
                 logger.info(
                     "Google sync is not due for sync_active_id: %s", sync_active_id
                 )
@@ -217,7 +232,6 @@ class GoogleSyncUtils(BaseModel):
         # Get the folder id from the settings from sync_active
         settings = sync_active.get("settings", {})
         folders = settings.get("folders", [])
-        logger.info("Folders: %s", folders)
         files = get_google_drive_files(
             sync_user["credentials"], folder_id=folders[0] if folders else None
         )
@@ -257,7 +271,7 @@ class GoogleSyncUtils(BaseModel):
         # Update the last_synced timestamp
         self.sync_active_service.update_sync_active(
             sync_active_id,
-            SyncsActiveUpdateInput(last_synced=datetime.now().isoformat()),
+            SyncsActiveUpdateInput(last_synced=datetime.now().astimezone().isoformat()),
         )
         logger.info(
             "Google Drive sync completed for sync_active_id: %s", sync_active_id

@@ -26,8 +26,6 @@ SCOPE = [
     "https://graph.microsoft.com/Sites.Read.All",
 ]
 
-client = PublicClientApplication(CLIENT_ID, authority=AUTHORITY)
-
 
 @azure_sync_router.get(
     "/sync/azure/authorize",
@@ -47,6 +45,7 @@ def authorize_azure(
     Returns:
         dict: A dictionary containing the authorization URL.
     """
+    client = PublicClientApplication(CLIENT_ID, authority=AUTHORITY)
     logger.debug(f"Authorizing Azure sync for user: {current_user.id}")
     state = f"user_id={current_user.id}"
     authorization_url = client.get_authorization_request_url(
@@ -75,6 +74,7 @@ def oauth2callback_azure(request: Request):
     Returns:
         dict: A dictionary containing a success message.
     """
+    client = PublicClientApplication(CLIENT_ID, authority=AUTHORITY)
     state = request.query_params.get("state")
     state_dict = {"state": state}
     current_user = state.split("=")[1]  # Extract user_id from state
