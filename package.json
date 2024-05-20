@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "@tiptap/extension-typography": "^2.4.0"
+  }
+}
