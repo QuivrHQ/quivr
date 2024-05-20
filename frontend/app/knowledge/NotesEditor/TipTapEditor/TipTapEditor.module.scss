@@ -10,4 +10,9 @@
   border-bottom: none;
   padding: Spacings.$spacing06;
   box-shadow: BoxShadow.$medium;
+
+  .editor_header {
+    display: flex;
+    justify-content: flex-end;
+  }
 }

@@ -2,6 +2,7 @@ import { EditorContent, useEditor } from "@tiptap/react";
 import { StarterKit } from "@tiptap/starter-kit";
 import { useEffect } from "react";
 
+import Icon from "@/lib/components/ui/Icon/Icon";
 import { useNotesEditorContext } from "@/lib/context/NotesEditorProvider/hooks/useNotesEditorContext";
 
 import styles from "./TipTapEditor.module.scss";
@@ -25,6 +26,9 @@ const TipTapEditor = (): JSX.Element => {
 
   return (
     <div className={styles.editor_wrapper}>
+      <div className={styles.editor_header}>
+        <Icon name="expand" size="normal" color="black" handleHover={true} />
+      </div>
       <EditorContent editor={tipTapEditor} />
     </div>
   );
