@@ -3,13 +3,16 @@ import { BiCoin, BiCollapse } from "react-icons/bi";
 import {
   BsArrowRightShort,
   BsChatLeftText,
-  BsJustify,
-  BsJustifyLeft,
-  BsJustifyRight,
   BsTextParagraph,
 } from "react-icons/bs";
 import { CgSoftwareDownload } from "react-icons/cg";
-import { CiFlag1 } from "react-icons/ci";
+import {
+  CiFlag1,
+  CiTextAlignCenter,
+  CiTextAlignJustify,
+  CiTextAlignLeft,
+  CiTextAlignRight,
+} from "react-icons/ci";
 import {
   FaCalendar,
   FaCheck,
@@ -125,9 +128,10 @@ export const iconList: { [name: string]: IconType } = {
   history: MdHistory,
   home: IoHomeOutline,
   info: FaInfo,
-  justifyCenter: BsJustify,
-  justifyLeft: BsJustifyLeft,
-  justifyRight: BsJustifyRight,
+  justify: CiTextAlignJustify,
+  justifyCenter: CiTextAlignCenter,
+  justifyLeft: CiTextAlignLeft,
+  justifyRight: CiTextAlignRight,
   key: FaKey,
   link: MdLink,
   linkedin: FaLinkedin,

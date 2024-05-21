@@ -23,4 +23,9 @@
       gap: Spacings.$spacing02;
     }
   }
+
+  .editor_content {
+    padding: Spacings.$spacing06;
+    caret-color: var(--accent);
+  }
 }

@@ -74,6 +74,19 @@ const TipTapEditor = (): JSX.Element => {
               void tipTapEditor?.chain().focus().setTextAlign("right").run()
             }
           />
+          <Icon
+            name="justify"
+            size="large"
+            color={
+              tipTapEditor?.isActive({ textAlign: "justify" })
+                ? "primary"
+                : "black"
+            }
+            handleHover={true}
+            onClick={() =>
+              void tipTapEditor?.chain().focus().setTextAlign("justify").run()
+            }
+          />
         </div>
         <Icon
           name={expand ? "collapse" : "expand"}
@@ -83,7 +96,7 @@ const TipTapEditor = (): JSX.Element => {
           onClick={() => setExpand(!expand)}
         />
       </div>
-      <EditorContent editor={tipTapEditor} />
+      <EditorContent className={styles.editor_content} editor={tipTapEditor} />
     </div>
   );
 };
