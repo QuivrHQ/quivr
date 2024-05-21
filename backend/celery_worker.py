@@ -7,6 +7,7 @@ from celery.schedules import crontab
 from celery_config import celery
 from fastapi import UploadFile
 from logger import get_logger
+from middlewares.auth.auth_bearer import AuthBearer
 from models.files import File
 from models.settings import get_supabase_client
 from modules.brain.integrations.Notion.Notion_connector import NotionConnector
@@ -27,6 +28,7 @@ logger = get_logger(__name__)
 onboardingService = OnboardingService()
 notification_service = NotificationService()
 brain_service = BrainService()
+auth_bearer = AuthBearer()
 
 
 @celery.task(name="process_file_and_notify")
@@ -216,5 +218,9 @@ celery.conf.beat_schedule = {
     "ping_telemetry": {
         "task": f"{__name__}.ping_telemetry",
         "schedule": crontab(minute="*/30", hour="*"),
+    },
+    "process_sync_active": {
+        "task": "process_sync_active",
+        "schedule": crontab(minute="*/5", hour="*"),
     },
 }

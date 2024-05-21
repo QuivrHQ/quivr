@@ -39,6 +39,7 @@ export type BrainConfig = {
 
 export const openAiFreeModels = [
   "gpt-3.5-turbo",
+  "gpt-4o",
   "gpt-3.5-turbo-1106",
   "gpt-3.5-turbo-16k",
   "gpt-4-0125-preview",

@@ -125,7 +125,7 @@ class SummaryAssistant(ITO):
 
 
 def map_reduce_chain():
-    llm = ChatLiteLLM(model="gpt-3.5-turbo", max_tokens=2000)
+    llm = ChatLiteLLM(model="gpt-4o", max_tokens=2000)
 
     map_template = """The following is a document that has been divided into multiple sections:
     {docs}
@@ -156,6 +156,7 @@ def map_reduce_chain():
     reduce_prompt = PromptTemplate.from_template(reduce_template)
 
     # Run chain
+    llm = ChatLiteLLM(model="gpt-4o", max_tokens=2000)
     reduce_chain = LLMChain(llm=llm, prompt=reduce_prompt)
 
     # Takes a list of documents, combines them into a single string, and passes this to an LLMChain
