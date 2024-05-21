@@ -217,7 +217,7 @@ class OutputHandler(BaseModel):
             notification_id,
             NotificationUpdatableProperties(
                 status=NotificationsStatusEnum.SUCCESS,
-                title=f"Summary of {original_filename} generated successfully",
+                description=f"Summary of {original_filename} generated successfully",
             ),
         )
 
