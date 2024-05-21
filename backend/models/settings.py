@@ -1,7 +1,7 @@
 from typing import Optional
 from uuid import UUID
 
-from langchain_community.embeddings import OllamaEmbeddings
+from langchain_community.embeddings.ollama import OllamaEmbeddings
 from langchain_openai import OpenAIEmbeddings
 from logger import get_logger
 from models.databases.supabase.supabase import SupabaseDB
@@ -9,8 +9,7 @@ from posthog import Posthog
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from sqlalchemy import Engine, create_engine
 from supabase.client import Client, create_client
-from vectorstore.supabase import SupabaseVectorStore
-
+from langchain_community.vectorstores.supabase import SupabaseVectorStore
 logger = get_logger(__name__)
 
 

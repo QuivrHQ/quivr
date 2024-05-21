@@ -1,37 +1,10 @@
 {
-  "python.formatting.provider": "black",
   "editor.codeActionsOnSave": {
     "source.organizeImports": "explicit",
     "source.fixAll": "explicit",
-    "source.unusedImports": "explicit"
+    "source.unusedImports": "explicit",
   },
-  "python.analysis.extraPaths": [
-    "./backend"
-  ],
   "editor.formatOnSave": true,
-  "[python]": {
-    "editor.defaultFormatter": "ms-python.black-formatter",
-    "editor.formatOnSave": true,
-    "editor.codeActionsOnSave": {
-      "source.organizeImports": "explicit",
-      "source.fixAll": "explicit"
-    }
-  },
-  "[typescriptreact]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
-  },
-  "[typescript]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode",
-    "editor.formatOnSave": true
-  },
-  "[javascript]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode",
-    "editor.formatOnSave": true
-  },
-  "[javascriptreact]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode",
-    "editor.formatOnSave": true
-  },
   "editor.formatOnSaveMode": "file",
   "files.exclude": {
     "**/__pycache__": true,
@@ -43,17 +16,42 @@
     "**/.docusaurus/": true,
     "**/node_modules/": true
   },
-  "python.linting.pycodestyleCategorySeverity.W": "Error",
-  "python.defaultInterpreterPath": "python3",
-  "python.linting.flake8CategorySeverity.W": "Error",
   "json.sortOnSave.enable": true,
+  "[python]": {
+    "editor.defaultFormatter": "ms-python.black-formatter",
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+      "source.organizeImports": "explicit",
+      "source.fixAll": "explicit"
+    }
+  },
+  "python.formatting.provider": "black",
+  "python.analysis.extraPaths": [
+    "./backend"
+  ],
+  "python.sortImports.path": "isort",
+  "python.linting.mypyEnabled": true,
+  "python.defaultInterpreterPath": "python3",
+  "python.linting.enabled": true,
+  "python.linting.flake8Enabled": true,
+  "python.linting.pycodestyleEnabled": true,
+  "python.linting.pylintEnabled": true,
+  "python.linting.pycodestyleCategorySeverity.W": "Error",
+  "python.linting.flake8CategorySeverity.W": "Error",
   "python.testing.pytestArgs": [
     "-v",
     "--color=yes",
     "--envfile=backend/tests/.env_test",
-    "backend/",
+    "backend/"
   ],
   "python.testing.unittestEnabled": false,
   "python.testing.pytestEnabled": true,
   "python.testing.autoTestDiscoverOnSaveEnabled": true,
+  "python.analysis.autoImportCompletions": true,
+  "python.analysis.typeCheckingMode": "basic",
+  "python.analysis.diagnosticSeverityOverrides": {
+    "reportMissingImports": "error",
+    "reportUnusedImport": "warning",
+    "reportGeneralTypeIssues": "warning"
+  }
 }
