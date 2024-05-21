@@ -11,6 +11,8 @@ from modules.brain.repository import (
     Brains,
     BrainsUsers,
     BrainsVectors,
+    CompositeBrainsConnections,
+    ExternalApiSecrets,
     IntegrationBrain,
     IntegrationDescription,
 )
@@ -18,6 +20,7 @@ from modules.brain.repository.interfaces import (
     BrainsInterface,
     BrainsUsersInterface,
     BrainsVectorsInterface,
+    CompositeBrainsConnectionsInterface,
     ExternalApiSecretsInterface,
     IntegrationBrainInterface,
     IntegrationDescriptionInterface,
@@ -39,6 +42,7 @@ class BrainService:
     brain_user_repository: BrainsUsersInterface
     brain_vector_repository: BrainsVectorsInterface
     external_api_secrets_repository: ExternalApiSecretsInterface
+    composite_brains_connections_repository: CompositeBrainsConnectionsInterface
     integration_brains_repository: IntegrationBrainInterface
     integration_description_repository: IntegrationDescriptionInterface
 
@@ -46,6 +50,8 @@ class BrainService:
         self.brain_repository = Brains()
         self.brain_user_repository = BrainsUsers()
         self.brain_vector = BrainsVectors()
+        self.external_api_secrets_repository = ExternalApiSecrets()
+        self.composite_brains_connections_repository = CompositeBrainsConnections()
         self.integration_brains_repository = IntegrationBrain()
         self.integration_description_repository = IntegrationDescription()
 
