@@ -49,6 +49,7 @@
     "@tiptap/extension-paragraph": "2.1.12",
     "@tiptap/extension-placeholder": "2.1.12",
     "@tiptap/extension-text": "2.1.12",
+    "@tiptap/extension-text-align": "^2.4.0",
     "@tiptap/pm": "2.1.12",
     "@tiptap/react": "2.1.12",
     "@tiptap/starter-kit": "2.1.12",

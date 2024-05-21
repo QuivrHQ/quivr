@@ -1,3 +1,4 @@
+import { TextAlign } from "@tiptap/extension-text-align";
 import { EditorContent, useEditor } from "@tiptap/react";
 import { StarterKit } from "@tiptap/starter-kit";
 import { useEffect } from "react";
@@ -13,7 +14,12 @@ const TipTapEditor = (): JSX.Element => {
   const { content, expand, setExpand } = useNotesEditorContext();
 
   const tipTapEditor = useEditor({
-    extensions: [StarterKit],
+    extensions: [
+      StarterKit,
+      TextAlign.configure({
+        types: ["heading", "paragraph"],
+      }),
+    ],
     parseOptions: {
       preserveWhitespace: "full",
     },
@@ -28,6 +34,47 @@ const TipTapEditor = (): JSX.Element => {
   return (
     <div className={styles.editor_wrapper}>
       <div className={styles.editor_header}>
+        <div className={styles.text_manipulation_wrapper}>
+          <Icon
+            name="justifyLeft"
+            size="large"
+            color={
+              tipTapEditor?.isActive({ textAlign: "left" })
+                ? "primary"
+                : "black"
+            }
+            handleHover={true}
+            onClick={() =>
+              void tipTapEditor?.chain().focus().setTextAlign("left").run()
+            }
+          />
+          <Icon
+            name="justifyCenter"
+            size="large"
+            color={
+              tipTapEditor?.isActive({ textAlign: "center" })
+                ? "primary"
+                : "black"
+            }
+            handleHover={true}
+            onClick={() =>
+              void tipTapEditor?.chain().focus().setTextAlign("center").run()
+            }
+          />
+          <Icon
+            name="justifyRight"
+            size="large"
+            color={
+              tipTapEditor?.isActive({ textAlign: "right" })
+                ? "primary"
+                : "black"
+            }
+            handleHover={true}
+            onClick={() =>
+              void tipTapEditor?.chain().focus().setTextAlign("right").run()
+            }
+          />
+        </div>
         <Icon
           name={expand ? "collapse" : "expand"}
           size="normal"

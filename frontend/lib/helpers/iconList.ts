@@ -3,6 +3,9 @@ import { BiCoin, BiCollapse } from "react-icons/bi";
 import {
   BsArrowRightShort,
   BsChatLeftText,
+  BsJustify,
+  BsJustifyLeft,
+  BsJustifyRight,
   BsTextParagraph,
 } from "react-icons/bs";
 import { CgSoftwareDownload } from "react-icons/cg";
@@ -122,6 +125,9 @@ export const iconList: { [name: string]: IconType } = {
   history: MdHistory,
   home: IoHomeOutline,
   info: FaInfo,
+  justifyCenter: BsJustify,
+  justifyLeft: BsJustifyLeft,
+  justifyRight: BsJustifyRight,
   key: FaKey,
   link: MdLink,
   linkedin: FaLinkedin,

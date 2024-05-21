@@ -8,11 +8,19 @@
   border-radius: Radius.$normal;
   border: 1px solid var(--border-3);
   border-bottom: none;
-  padding: Spacings.$spacing06;
   box-shadow: BoxShadow.$medium;
 
   .editor_header {
     display: flex;
-    justify-content: flex-end;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--border-1);
+    padding-inline: Spacings.$spacing06;
+    padding-block: Spacings.$spacing04;
+    align-items: center;
+
+    .text_manipulation_wrapper {
+      display: flex;
+      gap: Spacings.$spacing02;
+    }
   }
 }
