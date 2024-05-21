@@ -6,6 +6,7 @@
   flex-direction: column;
   gap: Spacings.$spacing03;
   overflow: scroll;
+  min-height: 100%;
 
   .search_bar {
     padding: Spacings.$spacing03;
