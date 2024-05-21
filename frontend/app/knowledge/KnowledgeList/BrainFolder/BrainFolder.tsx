@@ -180,7 +180,7 @@ const BrainFolder = ({ brain, searchValue }: BrainFolderProps): JSX.Element => {
       >
         {filteredKnowledge.map((knowledge) => (
           <div key={knowledge.id} className={styles.knowledge}>
-            <KnowledgeItem knowledge={knowledge} />
+            <KnowledgeItem knowledge={knowledge} brain={brain} />
           </div>
         ))}
       </div>

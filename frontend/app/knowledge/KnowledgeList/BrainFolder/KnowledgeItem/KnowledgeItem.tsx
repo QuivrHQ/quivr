@@ -7,6 +7,7 @@ import { useKnowledgeItem } from "@/app/knowledge/KnowledgeList/BrainFolder/Know
 import { useKnowledgeApi } from "@/lib/api/knowledge/useKnowledgeApi";
 import Icon from "@/lib/components/ui/Icon/Icon";
 import { OptionsModal } from "@/lib/components/ui/OptionsModal/OptionsModal";
+import { MinimalBrainForUser } from "@/lib/context/BrainProvider/types";
 import { useNotesEditorContext } from "@/lib/context/NotesEditorProvider/hooks/useNotesEditorContext";
 import { isUploadedKnowledge, Knowledge } from "@/lib/types/Knowledge";
 import { Option } from "@/lib/types/Options";
@@ -15,11 +16,15 @@ import styles from "./KnowledgeItem.module.scss";
 
 type KnowledgeItemProps = {
   knowledge: Knowledge;
+  brain: MinimalBrainForUser;
 };
 
-const KnowledgeItem = ({ knowledge }: KnowledgeItemProps): JSX.Element => {
+const KnowledgeItem = ({
+  knowledge,
+  brain,
+}: KnowledgeItemProps): JSX.Element => {
   const { generateSignedUrlKnowledge } = useKnowledgeApi();
-  const { onDeleteKnowledge } = useKnowledgeItem();
+  const { onDeleteKnowledge } = useKnowledgeItem(brain);
   const { updateContent } = useNotesEditorContext();
   const [optionsOpened, setOptionsOpened] = useState<boolean>(false);
   const [dragActivated, setDragActivated] = useState<boolean>(false);

@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { useKnowledgeApi } from "@/lib/api/knowledge/useKnowledgeApi";
+import { MinimalBrainForUser } from "@/lib/context/BrainProvider/types";
 import { useToast } from "@/lib/hooks";
 import { useUrlBrain } from "@/lib/hooks/useBrainIdFromUrl";
 import { Knowledge } from "@/lib/types/Knowledge";
@@ -11,12 +12,15 @@ import { useEventTracking } from "@/services/analytics/june/useEventTracking";
 import { useKnowledge } from "../../../../../studio/[brainId]/BrainManagementTabs/components/KnowledgeTab/hooks/useKnowledge";
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-export const useKnowledgeItem = () => {
+export const useKnowledgeItem = (passedBrain?: MinimalBrainForUser) => {
   const { deleteKnowledge } = useKnowledgeApi();
   const [isDeleting, setIsDeleting] = useState(false);
   const { publish } = useToast();
   const { track } = useEventTracking();
-  const { brainId, brain } = useUrlBrain();
+
+  const { brainId: urlBrainId, brain: urlBrain } = useUrlBrain();
+  const brain = passedBrain ?? urlBrain;
+  const brainId = brain?.id ?? urlBrainId;
   const { invalidateKnowledgeDataKey } = useKnowledge({
     brainId,
   });
