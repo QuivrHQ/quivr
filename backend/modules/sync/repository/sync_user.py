@@ -55,6 +55,17 @@ class SyncUser(SyncUserInterface):
         logger.warning("Failed to create sync user")
         return None
 
+    def get_sync_user_by_id(self, sync_id: int):
+        """
+        Retrieve sync users from the database.
+        """
+        response = self.db.from_("syncs_user").select("*").eq("id", sync_id).execute()
+        if response.data:
+            logger.info("Sync user found: %s", response.data[0])
+            return response.data[0]
+        logger.warning("No sync user found for sync_id: %s", sync_id)
+        return None
+
     def get_syncs_user(self, user_id: str, sync_user_id: int = None):
         """
         Retrieve sync users from the database.

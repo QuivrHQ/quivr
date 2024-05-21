@@ -237,7 +237,11 @@ class AzureSyncUtils(BaseModel):
             return None
 
         # Filter files that have been modified since the last sync
-        last_synced_time = datetime.fromisoformat(last_synced) if last_synced else None
+        last_synced_time = (
+            datetime.fromisoformat(last_synced).astimezone(timezone.utc)
+            if last_synced
+            else None
+        )
         logger.info("Files retrieved from Azure: %s", files.get("files", []))
         files_to_download = [
             file
@@ -245,7 +249,10 @@ class AzureSyncUtils(BaseModel):
             if not file["is_folder"]
             and (
                 not last_synced_time
-                or datetime.fromisoformat(file["last_modified"]) > last_synced_time
+                or datetime.strptime(
+                    file["last_modified"], "%Y-%m-%dT%H:%M:%SZ"
+                ).replace(tzinfo=timezone.utc)
+                > last_synced_time
             )
         ]
 

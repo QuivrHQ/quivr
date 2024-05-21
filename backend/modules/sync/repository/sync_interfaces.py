@@ -26,6 +26,10 @@ class SyncUserInterface(ABC):
         pass
 
     @abstractmethod
+    def get_sync_user_by_id(self, sync_id: int):
+        pass
+
+    @abstractmethod
     def delete_sync_user(self, sync_user_id: UUID, user_id: UUID):
         pass
 

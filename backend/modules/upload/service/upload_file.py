@@ -47,7 +47,6 @@ def check_file_exists(brain_id: str, file_identifier: str) -> bool:
         # This needs to be converted into a file_identifier that is safe for a URL
 
         response = supabase_client.storage.from_("quivr").list(brain_id)
-        logger.info(f"Response: {response}")
 
         # Check if the file_identifier is in the response
         file_exists = any(file["name"] == file_identifier for file in response)

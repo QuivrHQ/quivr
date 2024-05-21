@@ -36,6 +36,9 @@ class SyncUserService:
 
     def get_sync_user_by_state(self, state: dict):
         return self.repository.get_sync_user_by_state(state)
+    
+    def get_sync_user_by_id(self, sync_id: int):
+        return self.repository.get_sync_user_by_id(sync_id)
 
     def update_sync_user(
         self, sync_user_id: str, state: dict, sync_user_input: SyncUserUpdateInput
