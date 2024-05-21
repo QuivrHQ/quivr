@@ -3,6 +3,7 @@
 import axios from "axios";
 import { useEffect, useRef, useState } from "react";
 
+import { useKnowledgeItem } from "@/app/knowledge/KnowledgeList/BrainFolder/KnowledgeItem/hooks/useKnowledgeItem";
 import { useKnowledgeApi } from "@/lib/api/knowledge/useKnowledgeApi";
 import Icon from "@/lib/components/ui/Icon/Icon";
 import { OptionsModal } from "@/lib/components/ui/OptionsModal/OptionsModal";
@@ -18,6 +19,7 @@ type KnowledgeItemProps = {
 
 const KnowledgeItem = ({ knowledge }: KnowledgeItemProps): JSX.Element => {
   const { generateSignedUrlKnowledge } = useKnowledgeApi();
+  const { onDeleteKnowledge } = useKnowledgeItem();
   const { updateContent } = useNotesEditorContext();
   const [optionsOpened, setOptionsOpened] = useState<boolean>(false);
   const [dragActivated, setDragActivated] = useState<boolean>(false);
@@ -46,7 +48,7 @@ const KnowledgeItem = ({ knowledge }: KnowledgeItemProps): JSX.Element => {
     },
     {
       label: "Delete",
-      onClick: () => void true,
+      onClick: () => void onDeleteKnowledge(knowledge),
       iconName: "delete",
       iconColor: "dangerous",
     },

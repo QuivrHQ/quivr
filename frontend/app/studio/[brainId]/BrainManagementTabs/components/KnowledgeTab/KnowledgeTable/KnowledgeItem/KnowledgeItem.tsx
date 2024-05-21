@@ -10,7 +10,8 @@ import { useUrlBrain } from "@/lib/hooks/useBrainIdFromUrl";
 import { isUploadedKnowledge, Knowledge } from "@/lib/types/Knowledge";
 import { Option } from "@/lib/types/Options";
 
-import { useKnowledgeItem } from "./hooks/useKnowledgeItem";
+import { useKnowledgeItem } from "../../../../../../../knowledge/KnowledgeList/BrainFolder/KnowledgeItem/hooks/useKnowledgeItem";
+
 // eslint-disable-next-line import/order
 import styles from "./KnowledgeItem.module.scss";
 
