@@ -1,3 +1,4 @@
+import os
 from datetime import datetime, timedelta, timezone
 from io import BytesIO
 
@@ -21,9 +22,10 @@ from pydantic import BaseModel, ConfigDict
 
 logger = get_logger(__name__)
 
-CLIENT_ID = "511dce23-02f3-4724-8684-05da226df5f3"
+CLIENT_ID = os.getenv("SHAREPOINT_CLIENT_ID")
 AUTHORITY = "https://login.microsoftonline.com/common"
-REDIRECT_URI = "http://localhost:5050/sync/azure/oauth2callback"
+BACKEND_URL = os.getenv("BACKEND_URL", "http://localhost:5050")
+REDIRECT_URI = f"{BACKEND_URL}/sync/azure/oauth2callback"
 SCOPE = [
     "https://graph.microsoft.com/Files.Read",
     "https://graph.microsoft.com/User.Read",

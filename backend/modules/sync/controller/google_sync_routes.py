@@ -23,12 +23,25 @@ sync_user_service = SyncUserService()
 google_sync_router = APIRouter()
 
 # Constants
-CLIENT_SECRETS_FILE = "modules/sync/controller/credentials.json"
 SCOPES = [
     "https://www.googleapis.com/auth/drive.metadata.readonly",
     "https://www.googleapis.com/auth/drive.readonly",
 ]
-BASE_REDIRECT_URI = "http://localhost:5050/sync/google/oauth2callback"
+BACKEND_URL = os.getenv("BACKEND_URL", "http://localhost:5050")
+BASE_REDIRECT_URI = f"{BACKEND_URL}/sync/google/oauth2callback"
+
+# Create credentials content from environment variables
+CLIENT_SECRETS_FILE_CONTENT = {
+    "installed": {
+        "client_id": os.getenv("GOOGLE_CLIENT_ID"),
+        "project_id": os.getenv("GOOGLE_PROJECT_ID"),
+        "auth_uri": os.getenv("GOOGLE_AUTH_URI"),
+        "token_uri": os.getenv("GOOGLE_TOKEN_URI"),
+        "auth_provider_x509_cert_url": os.getenv("GOOGLE_AUTH_PROVIDER_CERT_URL"),
+        "client_secret": os.getenv("GOOGLE_CLIENT_SECRET"),
+        "redirect_uris": [os.getenv("GOOGLE_REDIRECT_URI")],
+    }
+}
 
 
 @google_sync_router.get(
@@ -51,8 +64,8 @@ def authorize_google(
     """
     logger.debug(f"Authorizing Google Drive sync for user: {current_user.id}")
     redirect_uri = f"{BASE_REDIRECT_URI}?user_id={current_user.id}"
-    flow = Flow.from_client_secrets_file(
-        CLIENT_SECRETS_FILE, scopes=SCOPES, redirect_uri=redirect_uri
+    flow = Flow.from_client_config(
+        CLIENT_SECRETS_FILE_CONTENT, scopes=SCOPES, redirect_uri=redirect_uri
     )
     authorization_url, state = flow.authorization_url(
         access_type="offline", include_granted_scopes="true"
@@ -99,8 +112,11 @@ def oauth2callback_google(request: Request):
         raise HTTPException(status_code=400, detail="Invalid user")
 
     redirect_uri = f"{BASE_REDIRECT_URI}?user_id={current_user}"
-    flow = Flow.from_client_secrets_file(
-        CLIENT_SECRETS_FILE, scopes=SCOPES, state=state, redirect_uri=redirect_uri
+    flow = Flow.from_client_config(
+        CLIENT_SECRETS_FILE_CONTENT,
+        scopes=SCOPES,
+        state=state,
+        redirect_uri=redirect_uri,
     )
     flow.fetch_token(authorization_response=str(request.url))
     creds = flow.credentials
