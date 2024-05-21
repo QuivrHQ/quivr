@@ -38,4 +38,4 @@ else:
     raise ValueError(f"Unsupported broker URL: {CELERY_BROKER_URL}")
 
 
-celery.autodiscover_tasks(["modules.sync.task"])
+celery.autodiscover_tasks(["modules.sync"])
