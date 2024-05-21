@@ -10,15 +10,12 @@ import styles from "./TipTapEditor.module.scss";
 import "@/app/globals.css";
 
 const TipTapEditor = (): JSX.Element => {
-  const { content, updateContent, expand, setExpand } = useNotesEditorContext();
+  const { content, expand, setExpand } = useNotesEditorContext();
 
   const tipTapEditor = useEditor({
     extensions: [StarterKit],
     parseOptions: {
       preserveWhitespace: "full",
-    },
-    onUpdate: ({ editor }) => {
-      updateContent(editor.getHTML());
     },
   });
 

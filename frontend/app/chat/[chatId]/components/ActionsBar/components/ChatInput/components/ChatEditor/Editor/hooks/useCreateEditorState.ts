@@ -1,3 +1,4 @@
+import { Bold } from "@tiptap/extension-bold";
 import { Document } from "@tiptap/extension-document";
 import { HardBreak } from "@tiptap/extension-hard-break";
 import { Paragraph } from "@tiptap/extension-paragraph";
@@ -32,6 +33,7 @@ export const useCreateEditorState = (placeholder?: string) => {
         preserveWhitespace: "full",
       },
       extensions: [
+        Bold,
         PreventEnter,
         Placeholder.configure({
           showOnlyWhenEditable: true,

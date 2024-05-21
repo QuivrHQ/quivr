@@ -133,6 +133,24 @@ body.dark_mode {
   word-wrap: break-word;
 }
 
+.ProseMirror {
+
+  h1 {
+    font-weight: 600;
+    font-size: 24px;
+  }
+  
+  h2 {
+    font-weight: 600;
+    font-size: 20px;
+  }
+  
+  h3 {
+    font-weight: 500;
+    font-size: 16px;
+  }
+}
+
 .mention {
   display: none;
 }
