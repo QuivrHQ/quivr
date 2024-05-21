@@ -37,9 +37,12 @@ const KnowledgeItem = ({ knowledge }: KnowledgeItemProps): JSX.Element => {
   const options: Option[] = [
     {
       label: "Edit",
-      onClick: () => ({}),
+      onClick: () => void logFileContent(),
       iconName: "edit",
       iconColor: "primary",
+      disabled: isUploadedKnowledge(knowledge)
+        ? !canReadFile(knowledge.fileName)
+        : false,
     },
     {
       label: "Delete",
@@ -124,9 +127,7 @@ const KnowledgeItem = ({ knowledge }: KnowledgeItemProps): JSX.Element => {
         }`}
       >
         {isUploadedKnowledge(knowledge) ? (
-          <span className={styles.name} onClick={() => void logFileContent()}>
-            {knowledge.fileName}
-          </span>
+          <span className={styles.name}>{knowledge.fileName}</span>
         ) : (
           <a
             className={styles.name}
