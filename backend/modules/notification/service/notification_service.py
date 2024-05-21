@@ -1,6 +1,8 @@
 from models.settings import get_supabase_client
-from modules.notification.dto.inputs import NotificationUpdatableProperties
-from modules.notification.entity.notification import Notification
+from modules.notification.dto.inputs import (
+    CreateNotification,
+    NotificationUpdatableProperties,
+)
 from modules.notification.repository.notifications import Notifications
 from modules.notification.repository.notifications_interface import (
     NotificationInterface,
@@ -14,7 +16,7 @@ class NotificationService:
         supabase_client = get_supabase_client()
         self.repository = Notifications(supabase_client)
 
-    def add_notification(self, notification: Notification):
+    def add_notification(self, notification: CreateNotification):
         """
         Add a notification
         """

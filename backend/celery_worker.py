@@ -217,4 +217,8 @@ celery.conf.beat_schedule = {
         "task": f"{__name__}.ping_telemetry",
         "schedule": crontab(minute="*/30", hour="*"),
     },
+    "process_sync_active": {
+        "task": "process_sync_active",
+        "schedule": crontab(minute="*/5", hour="*"),
+    },
 }
