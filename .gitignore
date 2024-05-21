@@ -83,4 +83,3 @@ backend/celerybeat-schedule.db
 backend/application.log.*
 backend/score.json
 backend/modules/assistant/ito/utils/simple.pdf
-backend/modules/sync/controller/credentials.json
