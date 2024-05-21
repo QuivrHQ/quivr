@@ -1,5 +1,26 @@
 # Changelog
 
+## 0.0.254 (2024-05-21)
+
+## What's Changed
+* fix:  sender email address in resend_invitation_email.py by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2600
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.253...v0.0.254
+
+## 0.0.253 (2024-05-14)
+
+## What's Changed
+* fix(frontend): Implement persistent dark mode setting and & Implement persistent dark mode setting by @elazarnaaman in https://github.com/QuivrHQ/quivr/pull/2423
+* fix(frontend): hover effect on profile Button by @Zewed in https://github.com/QuivrHQ/quivr/pull/2587
+* fix(frontend): user invite UI on Mobile by @Zewed in https://github.com/QuivrHQ/quivr/pull/2586
+* feat: Update ChatLiteLLM model and add RLS optimization for notifications by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2591
+
+## New Contributors
+* @elazarnaaman made their first contribution in https://github.com/QuivrHQ/quivr/pull/2423
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.252...v0.0.253
+
 ## 0.0.252 (2024-05-13)
 
 ## What's Changed
