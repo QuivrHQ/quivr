@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.0.254 (2024-05-21)
+
+## What's Changed
+* fix:  sender email address in resend_invitation_email.py by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2600
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.253...v0.0.254
+
 ## 0.0.253 (2024-05-14)
 
 ## What's Changed
