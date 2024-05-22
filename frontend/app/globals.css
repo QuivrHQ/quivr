@@ -61,6 +61,7 @@ div:focus {
   --background-special-0: var(--primary-2);
   --background-special-1: var(--primary-1);
   --background-blur: rgba(0, 0, 0, 0.9);
+  --background-code: var(--grey-3);
 
   /* Borders */
   --border-0: var(--grey-4);
@@ -96,6 +97,7 @@ body.dark_mode {
   --background-special-1: var(--black-5);
   --background-opposite: var(--white-0);
   --background-blur: rgba(0, 0, 0, 0.9);
+  --background-code: var(--black-5);
  
   /* Borders */
   --border-0: var(--white-0);
@@ -161,6 +163,13 @@ body.dark_mode {
       list-style-type: decimal;
     }
   
+  }
+
+  code {
+    background-color: var(--background-code);
+    color: var(--gold);
+    padding: 2px;
+    border-radius: 3px;
   }
 }
 
