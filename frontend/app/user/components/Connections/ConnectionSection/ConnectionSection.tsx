@@ -48,6 +48,7 @@ export const ConnectionSection = ({
               className={styles.new_connection}
               onMouseEnter={() => setNewConnectionHovered(true)}
               onMouseLeave={() => setNewConnectionHovered(false)}
+              onClick={() => setConnectionModalOpened(true)}
             >
               <Icon
                 name="add"
