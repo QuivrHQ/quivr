@@ -15,22 +15,44 @@ export const ConnectionSection = ({
   iconUrl,
 }: ConnectionSectionProps): JSX.Element => {
   const [folded, setFolded] = useState<boolean>(true);
+  const [newConnectionHovered, setNewConnectionHovered] =
+    useState<boolean>(false);
 
   return (
-    <div
-      className={styles.connection_section_wrapper}
-      onClick={() => setFolded(!folded)}
-    >
-      <Icon
-        name="chevronDown"
-        size="normal"
-        color="black"
-        classname={`${styles.iconRotate} ${
-          folded ? styles.iconRotateDown : styles.iconRotateRight
+    <div className={styles.connection_section_wrapper}>
+      <div
+        className={`${styles.connection_section_header} ${
+          !folded ? styles.unfolded : ""
         }`}
-      />
-      <Image src={iconUrl} alt={label} width={24} height={24} />
-      <span className={styles.label}>{label}</span>
+        onClick={() => setFolded(!folded)}
+      >
+        <Icon
+          name="chevronDown"
+          size="normal"
+          color="black"
+          classname={`${styles.iconRotate} ${
+            folded ? styles.iconRotateDown : styles.iconRotateRight
+          }`}
+        />
+        <Image src={iconUrl} alt={label} width={24} height={24} />
+        <span className={styles.label}>{label}</span>
+      </div>
+      {!folded && (
+        <div className={styles.connection_section_content}>
+          <div
+            className={styles.new_connection}
+            onMouseEnter={() => setNewConnectionHovered(true)}
+            onMouseLeave={() => setNewConnectionHovered(false)}
+          >
+            <Icon
+              name="add"
+              color={newConnectionHovered ? "primary" : "black"}
+              size="small"
+            />
+            <span>New Connection</span>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
