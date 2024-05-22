@@ -1,3 +1,4 @@
+@use "@/styles/ScreenSizes.module.scss";
 @use "@/styles/Spacings.module.scss";
 
 .menu_button {
@@ -21,11 +22,12 @@
     }
   }
 
-  &.selected {
-    background-color: var(--background-special-0);
+  @media (max-width: ScreenSizes.$small) {
+    border-bottom: none;
+    border-right: 1px solid var(--border-1);
 
-    .label {
-      color: var(--primary-0);
+    &.last {
+      border-right: none;
     }
   }
 }
