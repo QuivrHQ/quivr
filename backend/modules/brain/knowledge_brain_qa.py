@@ -200,7 +200,7 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
             max_input=self.max_input,
             max_tokens=self.max_tokens,
             **kwargs,
-        )
+        )  # type: ignore
 
     @property
     def prompt_to_use(self):
