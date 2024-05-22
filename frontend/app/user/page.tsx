@@ -12,6 +12,7 @@ import { useUserData } from "@/lib/hooks/useUserData";
 import { redirectToLogin } from "@/lib/router/redirectToLogin";
 import { ButtonType } from "@/lib/types/QuivrButton";
 
+import { Connections } from "./components/Connections/Connections";
 import { Settings } from "./components/Settings/Settings";
 import { UserMenuButton } from "./components/UserMenuButton/UserMenuButton";
 import styles from "./page.module.scss";
@@ -79,6 +80,7 @@ const UserPage = (): JSX.Element => {
         </div>
         <div className={styles.content_wrapper}>
           {indexSelected === 0 && <Settings email={userData.email} />}
+          {indexSelected === 1 && <Connections />}
         </div>
       </div>
       <Modal

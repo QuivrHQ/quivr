@@ -1,0 +1,7 @@
+@use "@/styles/Spacings.module.scss";
+
+.connections_wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: Spacings.$spacing03;
+}
