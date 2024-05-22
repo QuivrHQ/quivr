@@ -54,10 +54,17 @@ export const PageHeader = ({
         ))}
         {!isMobile && <Notifications />}
         <Icon
+          name="settings"
+          color="black"
+          handleHover={true}
+          size="normal"
+          onClick={() => void (window.location.href = "/user")}
+        />
+        <Icon
           name={lightModeIconName}
           color="black"
           handleHover={true}
-          size="small"
+          size="normal"
           onClick={toggleTheme}
         />
       </div>
