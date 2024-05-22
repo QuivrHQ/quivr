@@ -104,7 +104,7 @@ class SummaryAssistant(ITO):
             split_docs = [doc.to_json() for doc in split_docs]
             ## Turn this into a task
             brain_id = (
-                self.input.outputs.brain.id
+                self.input.outputs.brain.value
                 if self.input.outputs.brain.activated
                 else None
             )
