@@ -13,6 +13,7 @@ import { redirectToLogin } from "@/lib/router/redirectToLogin";
 import { ButtonType } from "@/lib/types/QuivrButton";
 
 import { Settings } from "./components/Settings/Settings";
+import { UserMenuButton } from "./components/UserMenuButton/UserMenuButton";
 import styles from "./page.module.scss";
 
 import { useLogoutModal } from "../../lib/hooks/useLogoutModal";
@@ -30,6 +31,7 @@ const UserPage = (): JSX.Element => {
     isLogoutModalOpened,
     setIsLogoutModalOpened,
   } = useLogoutModal();
+  const [indexSelected, setIndexSelected] = useState<number>(0);
 
   const buttons: ButtonType[] = [
     {
@@ -60,8 +62,23 @@ const UserPage = (): JSX.Element => {
         <PageHeader iconName="user" label="Profile" buttons={buttons} />
       </div>
       <div className={styles.user_page_container}>
+        <div className={styles.user_page_menu}>
+          <UserMenuButton
+            label="General"
+            iconName="user"
+            onClick={() => setIndexSelected(0)}
+            selected={indexSelected === 0}
+          />
+          <UserMenuButton
+            label="Connections"
+            last={true}
+            iconName="sync"
+            onClick={() => setIndexSelected(1)}
+            selected={indexSelected === 1}
+          />
+        </div>
         <div className={styles.content_wrapper}>
-          <Settings email={userData.email} />
+          {indexSelected === 0 && <Settings email={userData.email} />}
         </div>
       </div>
       <Modal

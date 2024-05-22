@@ -22,6 +22,7 @@ import {
   FaRegThumbsDown,
   FaRegThumbsUp,
   FaRegUserCircle,
+  FaSync,
   FaTwitter,
   FaUnlock,
 } from "react-icons/fa";
@@ -140,6 +141,7 @@ export const iconList: { [name: string]: IconType } = {
   star: FaRegStar,
   step: IoFootsteps,
   sun: MdOutlineLightMode,
+  sync: FaSync,
   thumbsDown: FaRegThumbsDown,
   thumbsUp: FaRegThumbsUp,
   twitter: FaTwitter,

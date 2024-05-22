@@ -1,11 +1,29 @@
+@use "@/styles/Radius.module.scss";
 @use "@/styles/Spacings.module.scss";
 
 .user_page_container {
   padding-inline: Spacings.$spacing09;
   padding-block: Spacings.$spacing07;
   display: flex;
-  flex-direction: column;
-  gap: Spacings.$spacing05;
+  gap: Spacings.$spacing07;
+  width: 100%;
+  height: 100%;
+
+  .user_page_menu {
+    display: flex;
+    flex-direction: column;
+    background-color: var(--background-1);
+    border-radius: Radius.$normal;
+    height: min-content;
+    overflow: hidden;
+    border: 1px solid var(--border-1);
+  }
+
+  .content_wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: Spacings.$spacing05;
+  }
 }
 
 .modal_wrapper {
