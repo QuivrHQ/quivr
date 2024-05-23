@@ -1,11 +1,11 @@
 :root {
     /* White */
-    --white-0: #e8e8e8; /* Ajusté pour être moins clair mais pas trop */
+    --white-0: #e8e8e8;
     --white-1: #e4e4e4;
     --white-2: #e0e0e0;
 
     /* Black */
-    --black-0: #1f1f1f; /* Ajusté pour être moins noir mais pas trop */
+    --black-0: #1f1f1f;
     --black-1: #252525;
     --black-2: #2b2b2b;
     --black-3: #313131;
@@ -15,7 +15,7 @@
     --black-7: #494949;
 
     /* Grey */
-    --grey-0: #808080; /* Ajusté pour être moins clair mais pas trop */
+    --grey-0: #808080;
     --grey-1: #a8a8a8;
     --grey-2: #ababab;
     --grey-3: #b8babc;
