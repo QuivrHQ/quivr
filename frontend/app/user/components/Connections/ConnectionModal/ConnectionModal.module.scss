@@ -1,0 +1,13 @@
+@use "@/styles/Spacings.module.scss";
+
+.connection_modal_wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: Spacings.$spacing05;
+
+  .subtitle {
+    display: flex;
+    align-items: center;
+    gap: Spacings.$spacing03;
+  }
+}
