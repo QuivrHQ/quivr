@@ -63,6 +63,8 @@ export const ConnectionSection = ({
       <ConnectionModal
         modalOpened={connectionModalOpened}
         setModalOpened={setConnectionModalOpened}
+        label={label}
+        iconUrl={iconUrl}
       />
     </>
   );
