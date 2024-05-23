@@ -22,7 +22,6 @@ import {
   FaRegThumbsDown,
   FaRegThumbsUp,
   FaRegUserCircle,
-  FaSync,
   FaTwitter,
   FaUnlock,
 } from "react-icons/fa";
@@ -37,6 +36,7 @@ import {
   IoMdClose,
   IoMdLogOut,
   IoMdSettings,
+  IoMdSync,
 } from "react-icons/io";
 import {
   IoArrowUpCircleOutline,
@@ -141,7 +141,7 @@ export const iconList: { [name: string]: IconType } = {
   star: FaRegStar,
   step: IoFootsteps,
   sun: MdOutlineLightMode,
-  sync: FaSync,
+  sync: IoMdSync,
   thumbsDown: FaRegThumbsDown,
   thumbsUp: FaRegThumbsUp,
   twitter: FaTwitter,
