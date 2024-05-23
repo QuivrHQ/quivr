@@ -44,7 +44,7 @@ CLIENT_SECRETS_FILE_CONTENT = {
 }
 
 
-@google_sync_router.get(
+@google_sync_router.post(
     "/sync/google/authorize",
     dependencies=[Depends(AuthBearer())],
     tags=["Sync"],

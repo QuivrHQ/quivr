@@ -12,6 +12,7 @@ interface ConnectionModalProps {
   setModalOpened: (value: boolean) => void;
   label: string;
   iconUrl: string;
+  callback: (name: string) => void;
 }
 
 export const ConnectionModal = ({
@@ -19,6 +20,7 @@ export const ConnectionModal = ({
   setModalOpened,
   label,
   iconUrl,
+  callback,
 }: ConnectionModalProps): JSX.Element => {
   const [connectionName, setConnectionName] = useState<string>("");
 
@@ -37,7 +39,7 @@ export const ConnectionModal = ({
             <span>Add a new {label} connection</span>
           </div>
           <TextInput
-            label={`${label} connection`}
+            label={`${label} connection name`}
             inputValue={connectionName}
             setInputValue={setConnectionName}
           />
@@ -48,7 +50,8 @@ export const ConnectionModal = ({
               color="primary"
               disabled={!connectionName}
               onClick={() => {
-                console.info("hey");
+                console.info(connectionName, callback);
+                callback(connectionName);
               }}
             />
           </div>

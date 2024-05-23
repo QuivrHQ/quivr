@@ -10,11 +10,13 @@ import { ConnectionModal } from "../ConnectionModal/ConnectionModal";
 interface ConnectionSectionProps {
   label: string;
   iconUrl: string;
+  callback: (name: string) => void;
 }
 
 export const ConnectionSection = ({
   label,
   iconUrl,
+  callback,
 }: ConnectionSectionProps): JSX.Element => {
   const [folded, setFolded] = useState<boolean>(true);
   const [newConnectionHovered, setNewConnectionHovered] =
@@ -65,6 +67,7 @@ export const ConnectionSection = ({
         setModalOpened={setConnectionModalOpened}
         label={label}
         iconUrl={iconUrl}
+        callback={(name) => callback(name)}
       />
     </>
   );
