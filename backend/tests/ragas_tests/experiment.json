@@ -2,12 +2,12 @@
     {
         "question": "When is the current contract with Contoso ending?",
         "evolution_type": "simple",
-        "ground_truth": "12/31/2028"
+        "ground_truth": "The current contract with Contoso is ending on December 31, 2028."
     },
     {
         "question": "What's the maximum Production Fonts Contoso have?",
         "evolution_type": "simple",
-        "ground_truth": "Unlimited"
+        "ground_truth": "Contoso has an unlimited Production Fonts licensed under the Monotype Fonts License Agreement."
     },
     {
         "question": "How many contracts we have with Contoso?",
@@ -17,22 +17,17 @@
     {
         "question": "Have we got any change in number of production fonts by addendum in previous contracts, before the current contract?",
         "evolution_type": "simple",
-        "ground_truth": "Yes"
-    },
-    {
-        "question": "For Contoso, can you mention the following based on all the contracts available: Contract Number, contract Start Date, contract End date. The result should be in tabular format with these 3 columns.",
-        "evolution_type": "simple",
-        "ground_truth": ""
+        "ground_truth": "Yes, there have been changes in the number of production fonts in previous contracts. For example, in the Addendum No. 1 to the Design and Deploy License Agreement, the Permitted Usage per Term table"
     },
     {
         "question": "What's the number of production fonts for previous contract before current contract with Contoso?",
         "evolution_type": "simple",
-        "ground_truth": "140"
+        "ground_truth": "The number of production fonts for the contract with Contoso that preceded the current contract was 140."
     },
     {
         "question": "What will be the next renewal date for Contoso?",
         "evolution_type": "simple",
-        "ground_truth": "12/31/2028"
+        "ground_truth": "The next renewal date for Contoso will be December 31, 2028,"
     },
     {
         "question": "How many Software License Order Form contract we ever had with Contoso?",
@@ -52,7 +47,7 @@
     {
         "question": "What's the Licensed Page Views in the latest contract with Contoso?",
         "evolution_type": "simple",
-        "ground_truth": "Unlimited"
+        "ground_truth": "The latest contract with Contoso specifies that the Licensed Page Views are unlimited"
     },
     {
         "question": "What's the Licensed Impressions (Digital Marketing Communications) in the latest contract with Contoso?",

@@ -79,7 +79,6 @@ def main(
 
     score.to_json(output_folder + "/score.json", orient="records")
     for metric in metrics:
-        print(f"{metric} scores: {score[metric]}")
         print(f"{metric} mean score: {score[metric].mean()}")
         print(f"{metric} median score: {score[metric].median()}")
     # Cleanup if a new brain was created
@@ -149,10 +148,7 @@ def generate_replies(
             "function"
         ]["arguments"]
         cited_answer_obj = json.loads(cited_answer_data)
-        print(f"Answer: {cited_answer_obj['answer']}")
         answers.append(cited_answer_obj["answer"])
-        print(f"Context: {cited_answer_obj}")
-        print(response)
         contexts.append([context.page_content for context in response["docs"]])
 
     return Dataset.from_dict(
@@ -181,9 +177,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--testset_path", type=str, required=True, help="Path to the testset JSON file"
     )
-    parser.add_argument(
-        "--model", type=str, default="gpt-3.5-turbo-0125", help="Model to use"
-    )
+    parser.add_argument("--model", type=str, default="gpt-4o", help="Model to use")
     parser.add_argument(
         "--context_size", type=int, default=10000, help="Context size for the model"
     )
