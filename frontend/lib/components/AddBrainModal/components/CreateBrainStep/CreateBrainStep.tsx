@@ -134,6 +134,7 @@ export const CreateBrainStep = (): JSX.Element => {
               knowledgeToFeed.length === 0 && !userIdentityData?.onboarded
             }
             isLoading={creating}
+            important={true}
           />
         ) : (
           <QuivrButton
@@ -142,6 +143,7 @@ export const CreateBrainStep = (): JSX.Element => {
             iconName="add"
             onClick={() => setCreateBrainStepIndex(1)}
             isLoading={creating}
+            important={true}
           />
         )}
       </div>
