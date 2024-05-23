@@ -1,4 +1,5 @@
 import argparse
+import json
 import os
 import sys
 
@@ -78,6 +79,7 @@ def main(
 
     score.to_json(output_folder + "/score.json", orient="records")
     for metric in metrics:
+        print(f"{metric} scores: {score[metric]}")
         print(f"{metric} mean score: {score[metric].mean()}")
         print(f"{metric} median score: {score[metric].median()}")
     # Cleanup if a new brain was created
@@ -143,7 +145,14 @@ def generate_replies(
 
     for question in test_questions:
         response = brain_chain.invoke({"question": question, "chat_history": []})
-        answers.append(response["answer"].content)
+        cited_answer_data = response["answer"].additional_kwargs["tool_calls"][0][
+            "function"
+        ]["arguments"]
+        cited_answer_obj = json.loads(cited_answer_data)
+        print(f"Answer: {cited_answer_obj['answer']}")
+        answers.append(cited_answer_obj["answer"])
+        print(f"Context: {cited_answer_obj}")
+        print(response)
         contexts.append([context.page_content for context in response["docs"]])
 
     return Dataset.from_dict(
@@ -189,7 +198,7 @@ if __name__ == "__main__":
             "faithfulness",
             "answer_similarity",
         ],
-        default=["answer_correctness"],
+        default=["answer_similarity"],
         help="Metrics to evaluate",
     )
     parser.add_argument(
