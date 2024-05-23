@@ -39,6 +39,10 @@
       background-color: var(--primary-0);
       color: var(--text-0);
     }
+
+    &:hover {
+      border-color: var(--primary-1);
+    }
   }
 
   &.dangerous:not(.disabled) {
