@@ -71,7 +71,7 @@ def pdf2md(source_path: Path, post_process: bool = True, output_path : Path | No
     documents = [doc.get_content() for doc in documents]
 
     if post_process:
-        documents = [md_post_processing(doc) for doc in documents]
+        documents = [md_post_processing(doc, min_length=5, min_repetitions=3) for doc in documents]
     
     if output_path:
         print("Saving the markdown file...")
@@ -98,7 +98,6 @@ def get_nodes(src_path: Path, output_nodes_path: Path) :
         raw_nodes = pickle.load(open(output_nodes_path, "rb"))
     
     return raw_nodes
-
 
 
 if __name__ == "__main__":

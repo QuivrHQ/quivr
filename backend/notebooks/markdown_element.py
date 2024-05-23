@@ -27,6 +27,8 @@ class MarkdownElementNodeParser(BaseElementNodeParser):
             table_filters=[self.filter_table],
             node_id=node.id_,
         )
+        #remove nodes that are exactly the same
+
         #table_elements = self.get_table_elements(elements)
         table_elements = elements
 
@@ -58,6 +60,8 @@ class MarkdownElementNodeParser(BaseElementNodeParser):
         elements: List[Element] = []
         # Then parse the lines
         for i,line in enumerate(lines):
+            if line == "\n":
+                continue
             if line.startswith("```"):
                 # check if this is the end of a code block
                 if currentElement is not None and currentElement.type == "code":
@@ -98,14 +102,12 @@ class MarkdownElementNodeParser(BaseElementNodeParser):
                 if currentElement is not None and currentElement.type != "table":
                     if currentElement is not None:
                         elements.append(currentElement)
-                    #FIXME: Maybe add that the context can be given before or after the table
                     currentElement = Element(
                         id=f"id_{len(elements)}", type="table", element=line
                     )
                 elif currentElement is not None:
                     currentElement.element += "\n" + line
                 else:
-                    #FIXME: Maybe add a that context can be given before or after the table
                     currentElement = Element(
                         id=f"id_{len(elements)}", type="table", element=line
                     )
@@ -130,7 +132,7 @@ class MarkdownElementNodeParser(BaseElementNodeParser):
                     currentElement = Element(
                         id=f"id_{len(elements)}", type="text", element=line
                     )
-        if currentElement is not None:
+        if currentElement is not None and currentElement.element != "": #Modified by Chloé
             elements.append(currentElement)
 
         for idx, element in enumerate(elements):

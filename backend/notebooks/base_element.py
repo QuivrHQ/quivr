@@ -165,7 +165,6 @@ class BaseElementNodeParser(NodeParser):
                 table_context += "\n" + str(elements[idx + 1].element)
 
             table_context_list.append(table_context)
-            print(table_context)
 
         async def _get_table_output(table_context: str, summary_query_str: str) -> Any:
             index = SummaryIndex.from_documents(
