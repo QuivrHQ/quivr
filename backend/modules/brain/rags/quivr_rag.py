@@ -329,7 +329,7 @@ class QuivrRAG(BaseModel):
             model=self.model,
             temperature=self.temperature,
             api_base=api_base,
-        )
+        )  # pyright: ignore reportPrivateUsage=none
         if self.model_compatible_with_function_calling():
 
             # And finally, we do the part that returns the answers
