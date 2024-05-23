@@ -80,6 +80,7 @@ export const BrainMainInfosStep = (): JSX.Element => {
           onClick={() => next()}
           iconName="chevronRight"
           disabled={isDisabled}
+          important={true}
         />
       </div>
     </div>
