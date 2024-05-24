@@ -26,7 +26,9 @@ export const ConnectionModal = ({
 
   const connect = async () => {
     const res = await callback(connectionName);
-    console.info(res);
+    if (res.authorization_url) {
+      window.open(res.authorization_url, "_blank");
+    }
   };
 
   return (
