@@ -8,7 +8,7 @@ import styles from "./FromConnections.module.scss";
 
 export const FromConnections = (): JSX.Element => {
   const [userSyncs, setUserSyncs] = useState<Sync[]>([]);
-  const { getUserSyncs, iconUrls } = useSync();
+  const { getSyncFiles, getUserSyncs, iconUrls } = useSync();
 
   useEffect(() => {
     void (async () => {
@@ -21,10 +21,19 @@ export const FromConnections = (): JSX.Element => {
     })();
   }, []);
 
+  const handleClick = async (syncId: number) => {
+    const res = await getSyncFiles(syncId);
+    console.info(res);
+  };
+
   return (
     <div className={styles.user_syncs_wrapper}>
       {userSyncs.map((sync, index) => (
-        <div className={styles.user_sync_wrapper} key={index}>
+        <div
+          className={styles.user_sync_wrapper}
+          key={index}
+          onClick={() => void handleClick(sync.id)}
+        >
           <Image
             src={iconUrls[sync.provider] || ""}
             alt={sync.name}
