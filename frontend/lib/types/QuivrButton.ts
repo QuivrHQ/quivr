@@ -11,4 +11,5 @@ export interface ButtonType {
   disabled?: boolean;
   hidden?: boolean;
   important?: boolean;
+  small?: boolean;
 }
