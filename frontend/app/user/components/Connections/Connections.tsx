@@ -1,10 +1,25 @@
+import { useEffect } from "react";
+
 import { useSync } from "@/lib/api/sync/useSync";
 
 import { ConnectionSection } from "./ConnectionSection/ConnectionSection";
 import styles from "./Connections.module.scss";
 
 export const Connections = (): JSX.Element => {
-  const { syncGoogleDrive, syncSharepoint } = useSync();
+  const { getUserSyncs, syncGoogleDrive, syncSharepoint } = useSync();
+
+  useEffect(() => {
+    void (async () => {
+      try {
+        const res = await getUserSyncs();
+        if (res) {
+          console.info(res);
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    })();
+  }, []);
 
   return (
     <div className={styles.connections_wrapper}>

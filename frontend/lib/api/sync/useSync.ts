@@ -1,6 +1,6 @@
 import { useAxios } from "@/lib/hooks";
 
-import { syncGoogleDrive, syncSharepoint } from "./sync";
+import { getUserSyncs, syncGoogleDrive, syncSharepoint } from "./sync";
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const useSync = () => {
@@ -10,5 +10,6 @@ export const useSync = () => {
     syncGoogleDrive: async (name: string) =>
       syncGoogleDrive(name, axiosInstance),
     syncSharepoint: async (name: string) => syncSharepoint(name, axiosInstance),
+    getUserSyncs: async () => getUserSyncs(axiosInstance),
   };
 };
