@@ -37,21 +37,21 @@ export const KnowledgeToFeed = ({
 
   const knowledgesTabs: Tab[] = [
     {
-      label: "From documents",
-      isSelected: selectedTab === "From documents",
-      onClick: () => setSelectedTab("From documents"),
+      label: "Documents",
+      isSelected: selectedTab === "Documents",
+      onClick: () => setSelectedTab("Documents"),
       iconName: "file",
     },
     {
-      label: "From websites",
-      isSelected: selectedTab === "From websites",
-      onClick: () => setSelectedTab("From websites"),
+      label: "Websites",
+      isSelected: selectedTab === "Websites",
+      onClick: () => setSelectedTab("Websites"),
       iconName: "website",
     },
     {
-      label: "From connections",
-      isSelected: selectedTab === "From connections",
-      onClick: () => setSelectedTab("From connections"),
+      label: "Connections",
+      isSelected: selectedTab === "Connections",
+      onClick: () => setSelectedTab("Connections"),
       iconName: "sync",
     },
   ];
@@ -75,9 +75,9 @@ export const KnowledgeToFeed = ({
       )}
       <Tabs tabList={knowledgesTabs} />
       <div className={styles.tabs_content_wrapper}>
-        {selectedTab === "From documents" && <FromDocuments />}
-        {selectedTab === "From websites" && <FromWebsites />}
-        {selectedTab === "From connections" && <FromConnections />}
+        {selectedTab === "Documents" && <FromDocuments />}
+        {selectedTab === "Websites" && <FromWebsites />}
+        {selectedTab === "Connections" && <FromConnections />}
       </div>
       <div>
         <div className={styles.uploaded_knowledges_title}>

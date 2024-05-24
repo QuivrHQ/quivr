@@ -1,25 +1,10 @@
-import { useEffect } from "react";
-
 import { useSync } from "@/lib/api/sync/useSync";
 
 import { ConnectionSection } from "./ConnectionSection/ConnectionSection";
 import styles from "./Connections.module.scss";
 
 export const Connections = (): JSX.Element => {
-  const { getUserSyncs, syncGoogleDrive, syncSharepoint } = useSync();
-
-  useEffect(() => {
-    void (async () => {
-      try {
-        const res = await getUserSyncs();
-        if (res) {
-          console.info(res);
-        }
-      } catch (error) {
-        console.error(error);
-      }
-    })();
-  }, []);
+  const { syncGoogleDrive, syncSharepoint, iconUrls } = useSync();
 
   return (
     <div className={styles.connections_wrapper}>
@@ -27,12 +12,12 @@ export const Connections = (): JSX.Element => {
       <div className={styles.connection_cards}>
         <ConnectionSection
           label="Google Drive"
-          iconUrl="https://quivr-cms.s3.eu-west-3.amazonaws.com/gdrive_8316d080fd.png"
+          iconUrl={iconUrls.googleDrive}
           callback={(name) => syncGoogleDrive(name)}
         />
         <ConnectionSection
           label="Sharepoint"
-          iconUrl="https://quivr-cms.s3.eu-west-3.amazonaws.com/sharepoint_8c41cfdb09.png"
+          iconUrl={iconUrls.azure}
           callback={(name) => syncSharepoint(name)}
         />
       </div>
