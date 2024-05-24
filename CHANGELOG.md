@@ -1,5 +1,26 @@
 # Changelog
 
+## 0.0.255 (2024-05-24)
+
+## What's Changed
+* feat: Add Google Drive & Sharepoint sync in backend by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2592
+* Revert "feat: Add Google Drive & Sharepoint sync in backend" by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2603
+* Feat/auth-playground by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2605
+* feat: add init to create packages by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2606
+* Add additional modules to celery.autodiscover_tasks() by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2607
+* Feat/celery import by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2608
+* feat: self-reflect brain by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2610
+* feat: ragas improved testing by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2611
+* fix(frontend): less agressive colors by @Zewed in https://github.com/QuivrHQ/quivr/pull/2612
+* fix(frontend): important buttons by @Zewed in https://github.com/QuivrHQ/quivr/pull/2613
+* fix(frontend): fix white colors by @Zewed in https://github.com/QuivrHQ/quivr/pull/2614
+* fix(frontend): using dark mode in tiptap by @ramonzaca in https://github.com/QuivrHQ/quivr/pull/2616
+
+## New Contributors
+* @ramonzaca made their first contribution in https://github.com/QuivrHQ/quivr/pull/2616
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.254...v0.0.255
+
 ## 0.0.254 (2024-05-21)
 
 ## What's Changed
