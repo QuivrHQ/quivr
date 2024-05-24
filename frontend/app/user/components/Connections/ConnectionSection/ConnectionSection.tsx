@@ -10,7 +10,7 @@ import { ConnectionModal } from "../ConnectionModal/ConnectionModal";
 interface ConnectionSectionProps {
   label: string;
   iconUrl: string;
-  callback: (name: string) => void;
+  callback: (name: string) => Promise<{ authorization_url: string }>;
 }
 
 export const ConnectionSection = ({

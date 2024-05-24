@@ -12,7 +12,7 @@ interface ConnectionModalProps {
   setModalOpened: (value: boolean) => void;
   label: string;
   iconUrl: string;
-  callback: (name: string) => void;
+  callback: (name: string) => Promise<{ authorization_url: string }>;
 }
 
 export const ConnectionModal = ({
@@ -23,6 +23,11 @@ export const ConnectionModal = ({
   callback,
 }: ConnectionModalProps): JSX.Element => {
   const [connectionName, setConnectionName] = useState<string>("");
+
+  const connect = async () => {
+    const res = await callback(connectionName);
+    console.info(res);
+  };
 
   return (
     <div className={styles.connection_modal_wrapper}>
@@ -50,8 +55,7 @@ export const ConnectionModal = ({
               color="primary"
               disabled={!connectionName}
               onClick={() => {
-                console.info(connectionName, callback);
-                callback(connectionName);
+                void connect();
               }}
             />
           </div>
