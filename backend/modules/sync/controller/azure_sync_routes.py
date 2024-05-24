@@ -30,7 +30,7 @@ SCOPE = [
 ]
 
 
-@azure_sync_router.get(
+@azure_sync_router.post(
     "/sync/azure/authorize",
     dependencies=[Depends(AuthBearer())],
     tags=["Sync"],

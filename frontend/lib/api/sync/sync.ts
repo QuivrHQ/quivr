@@ -25,3 +25,5 @@ export const syncSharepoint = async (
 
   return connection;
 };
+
+// export const getUserSyncs = async (axiosInstance: AxiosInstance) => {
