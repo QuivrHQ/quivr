@@ -1,6 +1,7 @@
 @use "@/styles/BoxShadow.module.scss";
 @use "@/styles/Radius.module.scss";
 @use "@/styles/Spacings.module.scss";
+@use "@/styles/Typography.module.scss";
 
 .user_syncs_wrapper {
   display: grid;
@@ -15,5 +16,15 @@
     flex-direction: column;
     gap: Spacings.$spacing02;
     padding: Spacings.$spacing03;
+    justify-content: center;
+    align-items: center;
+    font-size: Typography.$tiny;
+    font-weight: 550;
+    cursor: pointer;
+
+    &:hover {
+      background-color: var(--background-2);
+      color: var(--primary-0);
+    }
   }
 }
