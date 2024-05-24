@@ -6,7 +6,7 @@
   padding-inline: Spacings.$spacing09;
   padding-block: Spacings.$spacing07;
   display: flex;
-  gap: Spacings.$spacing07;
+  flex-direction: column;
   width: 100%;
   height: 100%;
 
@@ -15,28 +15,8 @@
     flex-direction: column;
   }
 
-  .user_page_menu {
-    display: flex;
-    flex-direction: column;
-    background-color: var(--background-1);
-    border-radius: Radius.$normal;
-    height: min-content;
-    overflow: hidden;
-    border: 1px solid var(--border-1);
-
-    @media (max-width: ScreenSizes.$small) {
-      display: flex;
-      flex-direction: row;
-
-      > * {
-        flex: 1;
-      }
-    }
-  }
-
   .content_wrapper {
     display: flex;
-    flex-direction: column;
     gap: Spacings.$spacing05;
   }
 }

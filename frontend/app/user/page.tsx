@@ -7,14 +7,15 @@ import { useUserApi } from "@/lib/api/user/useUserApi";
 import PageHeader from "@/lib/components/PageHeader/PageHeader";
 import { Modal } from "@/lib/components/ui/Modal/Modal";
 import QuivrButton from "@/lib/components/ui/QuivrButton/QuivrButton";
+import { Tabs } from "@/lib/components/ui/Tabs/Tabs";
 import { useSupabase } from "@/lib/context/SupabaseProvider";
 import { useUserData } from "@/lib/hooks/useUserData";
 import { redirectToLogin } from "@/lib/router/redirectToLogin";
 import { ButtonType } from "@/lib/types/QuivrButton";
+import { Tab } from "@/lib/types/Tab";
 
 import { Connections } from "./components/Connections/Connections";
 import { Settings } from "./components/Settings/Settings";
-import { UserMenuButton } from "./components/UserMenuButton/UserMenuButton";
 import styles from "./page.module.scss";
 
 import { useLogoutModal } from "../../lib/hooks/useLogoutModal";
@@ -32,7 +33,7 @@ const UserPage = (): JSX.Element => {
     isLogoutModalOpened,
     setIsLogoutModalOpened,
   } = useLogoutModal();
-  const [indexSelected, setIndexSelected] = useState<number>(0);
+  const [selectedTab, setSelectedTab] = useState("General");
 
   const buttons: ButtonType[] = [
     {
@@ -53,6 +54,21 @@ const UserPage = (): JSX.Element => {
     },
   ];
 
+  const studioTabs: Tab[] = [
+    {
+      label: "General",
+      isSelected: selectedTab === "General",
+      onClick: () => setSelectedTab("General"),
+      iconName: "user",
+    },
+    {
+      label: "Connections",
+      isSelected: selectedTab === "Connections",
+      onClick: () => setSelectedTab("Connections"),
+      iconName: "sync",
+    },
+  ];
+
   if (!session || !userData) {
     redirectToLogin();
   }
@@ -63,24 +79,11 @@ const UserPage = (): JSX.Element => {
         <PageHeader iconName="user" label="Profile" buttons={buttons} />
       </div>
       <div className={styles.user_page_container}>
-        <div className={styles.user_page_menu}>
-          <UserMenuButton
-            label="General"
-            iconName="user"
-            onClick={() => setIndexSelected(0)}
-            selected={indexSelected === 0}
-          />
-          <UserMenuButton
-            label="Connections"
-            last={true}
-            iconName="sync"
-            onClick={() => setIndexSelected(1)}
-            selected={indexSelected === 1}
-          />
-        </div>
+        <Tabs tabList={studioTabs} />
+        <div className={styles.user_page_menu}></div>
         <div className={styles.content_wrapper}>
-          {indexSelected === 0 && <Settings email={userData.email} />}
-          {indexSelected === 1 && <Connections />}
+          {selectedTab === "General" && <Settings email={userData.email} />}
+          {selectedTab === "Connections" && <Connections />}
         </div>
       </div>
       <Modal
