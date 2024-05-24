@@ -9,6 +9,7 @@ import { useKnowledgeToFeedContext } from "@/lib/context/KnowledgeToFeedProvider
 import { Tab } from "@/lib/types/Tab";
 
 import styles from "./KnowledgeToFeed.module.scss";
+import { FromConnections } from "./components/FromConnections/FromConnections";
 import { FromDocuments } from "./components/FromDocuments/FromDocuments";
 import { FromWebsites } from "./components/FromWebsites/FromWebsites";
 import { formatMinimalBrainsToSelectComponentInput } from "./utils/formatMinimalBrainsToSelectComponentInput";
@@ -47,6 +48,12 @@ export const KnowledgeToFeed = ({
       onClick: () => setSelectedTab("From websites"),
       iconName: "website",
     },
+    {
+      label: "From connections",
+      isSelected: selectedTab === "From connections",
+      onClick: () => setSelectedTab("From connections"),
+      iconName: "sync",
+    },
   ];
 
   return (
@@ -70,6 +77,7 @@ export const KnowledgeToFeed = ({
       <div className={styles.tabs_content_wrapper}>
         {selectedTab === "From documents" && <FromDocuments />}
         {selectedTab === "From websites" && <FromWebsites />}
+        {selectedTab === "From connections" && <FromConnections />}
       </div>
       <div>
         <div className={styles.uploaded_knowledges_title}>
