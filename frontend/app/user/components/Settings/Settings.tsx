@@ -14,7 +14,7 @@ export const Settings = ({ email }: InfoDisplayerProps): JSX.Element => {
   return (
     <div className={styles.settings_wrapper}>
       <span className={styles.title}>
-        General Settings and Main Information
+        General settings and main information
       </span>
       <InfoDisplayer label="Email" iconName="email">
         <span>{email}</span>

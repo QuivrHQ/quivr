@@ -1,0 +1,19 @@
+@use "@/styles/BoxShadow.module.scss";
+@use "@/styles/Radius.module.scss";
+@use "@/styles/Spacings.module.scss";
+
+.user_syncs_wrapper {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: Spacings.$spacing03;
+  padding: Spacings.$spacing03;
+  overflow: scroll;
+
+  .user_sync_wrapper {
+    box-shadow: BoxShadow.$medium;
+    display: flex;
+    flex-direction: column;
+    gap: Spacings.$spacing02;
+    padding: Spacings.$spacing03;
+  }
+}

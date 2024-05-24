@@ -20,7 +20,7 @@ export const KnowledgeToFeed = ({
   hideBrainSelector?: boolean;
 }): JSX.Element => {
   const { allBrains, setCurrentBrainId, currentBrain } = useBrainContext();
-  const [selectedTab, setSelectedTab] = useState("From documents");
+  const [selectedTab, setSelectedTab] = useState("Documents");
   const { knowledgeToFeed, removeKnowledgeToFeed } =
     useKnowledgeToFeedContext();
 

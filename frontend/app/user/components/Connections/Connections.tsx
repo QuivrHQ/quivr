@@ -8,16 +8,16 @@ export const Connections = (): JSX.Element => {
 
   return (
     <div className={styles.connections_wrapper}>
-      <span className={styles.title}>Link Apps You Want to Search Across</span>
+      <span className={styles.title}>Link apps you want to search across</span>
       <div className={styles.connection_cards}>
         <ConnectionSection
           label="Google Drive"
-          iconUrl={iconUrls.googleDrive}
+          iconUrl={iconUrls.Google}
           callback={(name) => syncGoogleDrive(name)}
         />
         <ConnectionSection
           label="Sharepoint"
-          iconUrl={iconUrls.azure}
+          iconUrl={iconUrls.Azure}
           callback={(name) => syncSharepoint(name)}
         />
       </div>

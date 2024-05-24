@@ -1,15 +1,16 @@
 import { useAxios } from "@/lib/hooks";
 
 import { getUserSyncs, syncGoogleDrive, syncSharepoint } from "./sync";
+import { Provider } from "./types";
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const useSync = () => {
   const { axiosInstance } = useAxios();
 
-  const iconUrls = {
-    googleDrive:
+  const iconUrls: Record<Provider, string> = {
+    Google:
       "https://quivr-cms.s3.eu-west-3.amazonaws.com/gdrive_8316d080fd.png",
-    azure:
+    Azure:
       "https://quivr-cms.s3.eu-west-3.amazonaws.com/sharepoint_8c41cfdb09.png",
   };
 
