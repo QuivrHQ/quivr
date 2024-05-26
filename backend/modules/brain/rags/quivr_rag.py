@@ -7,6 +7,7 @@ from uuid import UUID
 from langchain.chains import ConversationalRetrievalChain
 from langchain.llms.base import BaseLLM
 from langchain.prompts import HumanMessagePromptTemplate, SystemMessagePromptTemplate
+from langchain.retrievers import ContextualCompressionRetriever
 from langchain.retrievers.document_compressors import FlashrankRerank
 from langchain.schema import format_document
 from langchain_cohere import CohereRerank
@@ -295,14 +296,14 @@ class QuivrRAG(BaseModel):
     def get_chain(self):
         compressor = None
         if os.getenv("COHERE_API_KEY"):
-            compressor = CohereRerank(top_n=100)
+            compressor = CohereRerank(top_n=10)
         else:
             compressor = FlashrankRerank(model="ms-marco-TinyBERT-L-2-v2", top_n=10)
 
         retriever_doc = self.get_retriever()
-        # compression_retriever = ContextualCompressionRetriever(
-        #     base_compressor=compressor, base_retriever=retriever_doc
-        # )
+        compression_retriever = ContextualCompressionRetriever(
+            base_compressor=compressor, base_retriever=retriever_doc
+        )
 
         loaded_memory = RunnablePassthrough.assign(
             chat_history=RunnableLambda(
@@ -332,7 +333,7 @@ class QuivrRAG(BaseModel):
 
         # Now we retrieve the documents
         retrieved_documents = {
-            "docs": itemgetter("standalone_question") | retriever_doc,
+            "docs": itemgetter("standalone_question") | compression_retriever,
             "question": lambda x: x["standalone_question"],
             "custom_instructions": lambda x: prompt_to_use,
         }
