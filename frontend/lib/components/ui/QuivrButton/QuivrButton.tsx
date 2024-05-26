@@ -16,35 +16,60 @@ export const QuivrButton = ({
   iconName,
   disabled,
   hidden,
+  important,
 }: ButtonType): JSX.Element => {
   const [hovered, setHovered] = useState<boolean>(false);
   const { isDarkMode } = useUserSettingsContext();
+
+  const handleClick = () => {
+    if (onClick) {
+      void onClick();
+    }
+  };
+
+  const handleMouseEnter = () => {
+    setHovered(true);
+  };
+
+  const handleMouseLeave = () => {
+    setHovered(false);
+  };
+
+  const getIconColor = () => {
+    if (hovered || (important && !disabled)) {
+      return "white";
+    } else if (disabled) {
+      return "grey";
+    } else {
+      return color;
+    }
+  };
 
   return (
     <div
       className={`
       ${styles.button_wrapper} 
       ${styles[color]} 
-      ${disabled ? styles.disabled : ""}
       ${isDarkMode ? styles.dark : ""}
       ${hidden ? styles.hidden : ""}
+      ${important ? styles.important : ""}
+      ${disabled ? styles.disabled : ""}
       `}
-      // eslint-disable-next-line @typescript-eslint/no-misused-promises
-      onClick={() => onClick?.()}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
+      onClick={handleClick}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
     >
       <div className={styles.icon_label}>
         {!isLoading ? (
           <Icon
             name={iconName}
             size="normal"
-            color={hovered ? "white" : disabled ? "grey" : color}
+            color={getIconColor()}
             handleHover={false}
           />
         ) : (
           <LoaderIcon
-            color={hovered ? "white" : disabled ? "grey" : color}
+            color={hovered || important ? "white" : disabled ? "grey" : color}
             size="small"
           />
         )}

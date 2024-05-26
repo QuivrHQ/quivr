@@ -111,7 +111,7 @@ body.dark_mode {
   --text-0: var(--black-0);
   --text-1: var(--grey-0);
   --text-2: var(--grey-1);
-  --text-3: var(--white-0);
+  --text-3: var(--white-2);
 
   /* Box Shadow */
   --box-shadow: rgba(255, 255, 255, 0.25);

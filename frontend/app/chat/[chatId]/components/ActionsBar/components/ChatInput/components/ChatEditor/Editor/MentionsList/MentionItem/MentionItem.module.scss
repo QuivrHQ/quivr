@@ -21,4 +21,8 @@
   .brain_name {
     @include Typography.EllipsisOverflow;
   }
+
+  .dark_image {
+    filter: invert(100%);
+  }
 }
