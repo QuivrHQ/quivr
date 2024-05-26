@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.0.256 (2024-05-26)
+
+## What's Changed
+* feat(rag): follow-up questions and thoughts with spanish fix by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2618
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.255...v0.0.256
+
 ## 0.0.255 (2024-05-24)
 
 ## What's Changed
