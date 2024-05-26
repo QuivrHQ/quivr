@@ -305,8 +305,16 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
         if self.model_compatible_with_function_calling(model=self.model):
             if model_response["answer"].tool_calls:
                 citations = model_response["answer"].tool_calls[-1]["args"]["citations"]
+                followup_questions = model_response["answer"].tool_calls[-1]["args"][
+                    "followup_questions"
+                ]
+                thoughts = model_response["answer"].tool_calls[-1]["args"]["thoughts"]
                 if citations:
                     citations = citations
+                if followup_questions:
+                    metadata["followup_questions"] = followup_questions
+                if thoughts:
+                    metadata["thoughts"] = thoughts
                 answer = model_response["answer"].tool_calls[-1]["args"]["answer"]
         else:
             answer = model_response["answer"].content
@@ -370,6 +378,24 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
                             and "citations" in gathered.tool_calls[-1]["args"]
                         ):
                             citations = gathered.tool_calls[-1]["args"]["citations"]
+                        if (
+                            gathered.tool_calls
+                            and gathered.tool_calls[-1].get("args")
+                            and "followup_questions" in gathered.tool_calls[-1]["args"]
+                        ):
+                            followup_questions = gathered.tool_calls[-1]["args"][
+                                "followup_questions"
+                            ]
+                            streamed_chat_history.metadata["followup_questions"] = (
+                                followup_questions
+                            )
+                        if (
+                            gathered.tool_calls
+                            and gathered.tool_calls[-1].get("args")
+                            and "thoughts" in gathered.tool_calls[-1]["args"]
+                        ):
+                            thoughts = gathered.tool_calls[-1]["args"]["thoughts"]
+                            streamed_chat_history.metadata["thoughts"] = thoughts
             else:
                 if chunk.get("answer"):
                     response_tokens += chunk["answer"].content
