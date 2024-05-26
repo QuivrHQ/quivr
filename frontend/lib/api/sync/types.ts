@@ -6,6 +6,10 @@ export interface SyncElement {
   is_folder: boolean;
 }
 
+export interface SyncElements {
+  files: SyncElement[];
+}
+
 interface Credentials {
   token: string;
 }

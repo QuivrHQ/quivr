@@ -1,6 +1,6 @@
 import { AxiosInstance } from "axios";
 
-import { Sync, SyncElement } from "./types";
+import { Sync, SyncElements } from "./types";
 
 export const syncGoogleDrive = async (
   name: string,
@@ -33,9 +33,9 @@ export const getUserSyncs = async (
 export const getSyncFiles = async (
   axiosInstance: AxiosInstance,
   userSyncId: number
-): Promise<SyncElement[]> => {
+): Promise<SyncElements> => {
   return (
-    await axiosInstance.get<SyncElement[]>(
+    await axiosInstance.get<SyncElements>(
       `/sync/${userSyncId}/files?user_sync_id=${userSyncId}`
     )
   ).data;
