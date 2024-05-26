@@ -14,7 +14,7 @@ export const FromConnections = (): JSX.Element => {
     void (async () => {
       try {
         const res: Sync[] = await getUserSyncs();
-        setUserSyncs(res);
+        setUserSyncs(res.filter((sync) => !!sync.credentials.token));
       } catch (error) {
         console.error(error);
       }
