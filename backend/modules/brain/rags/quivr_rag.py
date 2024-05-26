@@ -56,7 +56,7 @@ class cited_answer(BaseModelV1):
 
 
 # First step is to create the Rephrasing Prompt
-_template = """Given the following conversation and a follow up question, rephrase the follow up question to be a standalone question, in its original language. Keep as much details as possible from previous messages. Keep entity names and all. Today's date is May 23rd, 2024. 
+_template = """Given the following conversation and a follow up question, rephrase the follow up question to be a standalone question, in its original language. Keep as much details as possible from previous messages. Keep entity names and all.
 
 Chat History:
 {chat_history}
