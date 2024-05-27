@@ -11,10 +11,4 @@
   .title {
     @include Typography.H2;
   }
-
-  .connection_cards {
-    display: flex;
-    flex-wrap: wrap;
-    gap: Spacings.$spacing05;
-  }
 }

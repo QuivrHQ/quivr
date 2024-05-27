@@ -1,0 +1,7 @@
+@use "@/styles/Spacings.module.scss";
+
+.connection_cards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: Spacings.$spacing05;
+}

@@ -1,7 +1,7 @@
 import { useSync } from "@/lib/api/sync/useSync";
 
+import styles from "./ConnectionCards.module.scss";
 import { ConnectionSection } from "./ConnectionSection/ConnectionSection";
-import styles from "./Connections.module.scss";
 
 export const ConnectionCards = (): JSX.Element => {
   const { syncGoogleDrive, syncSharepoint, iconUrls } = useSync();
