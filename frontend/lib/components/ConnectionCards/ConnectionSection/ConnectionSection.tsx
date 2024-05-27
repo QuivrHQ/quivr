@@ -5,8 +5,11 @@ import { Provider, Sync } from "@/lib/api/sync/types";
 import { useSync } from "@/lib/api/sync/useSync";
 import QuivrButton from "@/lib/components/ui/QuivrButton/QuivrButton";
 
+import { ConnectionLine } from "./ConnectionLine/ConnectionLine";
 import styles from "./ConnectionSection.module.scss";
 
+import { ConnectionIcon } from "../../ui/ConnectionIcon/ConnectionIcon";
+import Icon from "../../ui/Icon/Icon";
 import { ConnectionModal } from "../ConnectionModal/ConnectionModal";
 
 interface ConnectionSectionProps {
@@ -24,6 +27,7 @@ export const ConnectionSection = ({
     useState<boolean>(false);
   const { iconUrls, getUserSyncs } = useSync();
   const [existingConnections, setExistingConnections] = useState<Sync[]>([]);
+  const [folded, setFolded] = useState<boolean>(true);
 
   useEffect(() => {
     void (async () => {
@@ -44,16 +48,52 @@ export const ConnectionSection = ({
     <>
       <div className={styles.connection_section_wrapper}>
         <div className={styles.connection_section_header}>
-          <Image src={iconUrls[provider]} alt={label} width={24} height={24} />
-          <span className={styles.label}>{label}</span>
+          <div className={styles.left}>
+            <Image
+              src={iconUrls[provider]}
+              alt={label}
+              width={24}
+              height={24}
+            />
+            <span className={styles.label}>{label}</span>
+          </div>
+          <QuivrButton
+            iconName={existingConnections.length ? "add" : "sync"}
+            label={existingConnections.length ? "Add more" : "Connect"}
+            color="primary"
+            onClick={() => setConnectionModalOpened(true)}
+            small={true}
+          />
         </div>
-        <QuivrButton
-          iconName={existingConnections.length ? "add" : "sync"}
-          label={existingConnections.length ? "Add more" : "Connect"}
-          color="primary"
-          onClick={() => setConnectionModalOpened(true)}
-          small={true}
-        />
+        {!!existingConnections.length && (
+          <div className={styles.existing_connections}>
+            <div className={styles.existing_connections_header}>
+              <span className={styles.label}>Connected accounts</span>
+              <Icon
+                name="settings"
+                size="normal"
+                color="black"
+                handleHover={true}
+                onClick={() => setFolded(!folded)}
+              />
+            </div>
+            {!folded ? (
+              existingConnections.map((connection, index) => (
+                <div key={index}>
+                  <ConnectionLine label={connection.name} index={index} />
+                </div>
+              ))
+            ) : (
+              <div className={styles.folded}>
+                {existingConnections.map((connection, index) => (
+                  <div className={styles.negative_margin} key={index}>
+                    <ConnectionIcon letter={connection.name[0]} index={index} />
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
       </div>
       <ConnectionModal
         modalOpened={connectionModalOpened}

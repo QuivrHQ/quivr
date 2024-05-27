@@ -7,16 +7,17 @@
 
 .connection_section_wrapper {
   padding: Spacings.$spacing05;
-  cursor: pointer;
   border-radius: Radius.$normal;
   overflow: hidden;
   border-bottom: 1px solid transparent;
   display: flex;
+  flex-direction: column;
   justify-content: space-between;
   width: 300px;
   align-items: center;
   border-radius: Radius.$normal;
   box-shadow: BoxShadow.$medium;
+  height: min-content;
 
   @media (max-width: ScreenSizes.$small) {
     width: 100%;
@@ -25,12 +26,15 @@
   .connection_section_header {
     display: flex;
     align-items: center;
-    gap: Spacings.$spacing03;
-    padding: Spacings.$spacing03;
+    justify-content: space-between;
+    width: 100%;
+    padding-block: Spacings.$spacing03;
     @include Typography.H3;
 
-    &.unfolded {
-      border-bottom: 1px solid var(--border-1);
+    .left {
+      display: flex;
+      gap: Spacings.$spacing03;
+      align-items: center;
     }
 
     .iconRotate {
@@ -48,29 +52,32 @@
         @include Typography.H3;
       }
     }
-
-    &:hover {
-      background-color: var(--background-3);
-      border-radius: Radius.$normal;
-    }
   }
 
-  .connection_section_content {
+  .existing_connections {
     display: flex;
     flex-direction: column;
-    padding-block: Spacings.$spacing02;
+    gap: Spacings.$spacing03;
+    width: 100%;
+    padding-top: Spacings.$spacing05;
 
-    .new_connection {
+    .existing_connections_header {
       display: flex;
+      justify-content: space-between;
       align-items: center;
-      gap: Spacings.$spacing03;
-      font-size: Typography.$tiny;
-      padding-left: Spacings.$spacing08;
 
-      &:hover {
-        color: var(--primary-0);
-        background-color: var(--background-2);
-        border-radius: Radius.$small;
+      .label {
+        font-weight: 500;
+        font-size: Typography.$tiny;
+      }
+    }
+
+    .folded {
+      display: flex;
+      padding-left: Spacings.$spacing03;
+
+      .negative_margin {
+        margin-left: -4px;
       }
     }
   }
