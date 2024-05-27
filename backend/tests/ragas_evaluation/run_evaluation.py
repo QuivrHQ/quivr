@@ -1,5 +1,4 @@
 import argparse
-import json
 import os
 import sys
 
@@ -8,9 +7,10 @@ from dotenv import load_dotenv
 # Add the current directory to the Python path
 sys.path.append(os.getcwd())
 # Load environment variables from .env file
-load_dotenv(verbose=True, override=True)
+load_dotenv(verbose=True, override=True, dotenv_path=".env.test")
 
 import glob
+import json
 import uuid
 
 import pandas as pd
@@ -62,6 +62,7 @@ def main(
         max_input=context_size,
         max_tokens=1000,
     )
+
     brain_chain = knowledge_qa.get_chain()
 
     # run langchain RAG
@@ -141,6 +142,7 @@ def generate_replies(
     contexts = []
     test_questions = test_data.question.tolist()
     test_groundtruths = test_data.ground_truth.tolist()
+    thoughts = []
 
     for question in test_questions:
         response = brain_chain.invoke({"question": question, "chat_history": []})
@@ -149,12 +151,14 @@ def generate_replies(
         ]["arguments"]
         cited_answer_obj = json.loads(cited_answer_data)
         answers.append(cited_answer_obj["answer"])
+        thoughts.append(cited_answer_obj["thoughts"])
         contexts.append([context.page_content for context in response["docs"]])
 
     return Dataset.from_dict(
         {
             "question": test_questions,
             "answer": answers,
+            "thoughs" : thoughts,
             "contexts": contexts,
             "ground_truth": test_groundtruths,
         }

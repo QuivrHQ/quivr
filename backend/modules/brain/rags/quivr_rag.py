@@ -5,7 +5,8 @@ from uuid import UUID
 
 from langchain.chains import ConversationalRetrievalChain
 from langchain.llms.base import BaseLLM
-from langchain.prompts import HumanMessagePromptTemplate, SystemMessagePromptTemplate
+from langchain.prompts import (HumanMessagePromptTemplate,
+                               SystemMessagePromptTemplate)
 from langchain.retrievers.document_compressors import FlashrankRerank
 from langchain.schema import format_document
 from langchain_cohere import CohereRerank
@@ -33,7 +34,12 @@ logger = get_logger(__name__)
 
 class cited_answer(BaseModelV1):
     """Answer the user question based only on the given sources, and cite the sources used."""
-
+    thoughts: str = FieldV1(
+        ...,
+        description="""Description of the thought process, based only on the given sources. 
+        Cite the text when possible and give the document name it appears in. In the format : 'Doc_name states : cited_text'. Be the most 
+        procedural as possible.""",
+    )
     answer: str = FieldV1(
         ...,
         description="The answer to the user question, which is based only on the given sources.",
@@ -63,6 +69,13 @@ User Question: {question}
 Answer:
 """
 
+# You have access to the following contracts and addendum files to answer the user question:
+# COMPLETED Contoso Healthcare Pvt  Ltd  LOF 12 01 2021.pdf (date : 1 dec 2021)
+# COMPLETED Contoso Laboratories Other 01 01 2022.pdf (date : 1 jan 2022)
+# COMPLETED Contoso Laboratories Other 04 09 2022.pdf (date : 9 Apr 2022)
+# COMPLETED Contoso Laboratories Other 12 31 2023.pdf (date : 31 Dec 2023)
+# COMPLETED Contoso Lyon MT Fonts Enterprise License 08 04 2023.pdf (date : 4 Aug 2023)
+
 system_message_template = """
 Your name is Quivr. You're a helpful assistant. Today's date is May 23rd, 2024.
 When answering use markdown neat.
@@ -72,12 +85,11 @@ Answer in the same language as the user question.
 If you don't know the answer with the context provided from the files, just say that you don't know, don't try to make up an answer.
 If not None, User instruction to follow to answer: You are an expert at answer questions about contracts on Monotype. You have access to one or multiple contracts to answer.
 Don't cite the source id in the answer objects, but you can use the source to answer the question.
-You have access to the following contracts and addendum files to answer the user question:
-COMPLETED Contoso Healthcare Pvt  Ltd  LOF 12 01 2021.pdf
-COMPLETED Contoso Laboratories Other 01 01 2022.pdf
-COMPLETED Contoso Laboratories Other 04 09 2022.pdf
-COMPLETED Contoso Laboratories Other 12 31 2023.pdf
-COMPLETED Contoso Lyon MT Fonts Enterprise License 08 04 2023.pdf
+
+Any document refered in term of time indication (last, before to last) refers to the date of the documents. 
+
+If the file name is the same consider heading 1, heading 2, heading 3 as unique and not multiple.
+
 """
 
 
