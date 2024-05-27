@@ -8,8 +8,12 @@
   padding-inline: Spacings.$spacing08;
   height: 100%;
 
-  .title {
-    @include Typography.H2;
+  .feed_brain {
+    height: 100%;
+
+    .title {
+      @include Typography.H2;
+    }
   }
 
   .settings_wrapper {

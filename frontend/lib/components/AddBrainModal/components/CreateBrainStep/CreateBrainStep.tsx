@@ -30,7 +30,7 @@ export const CreateBrainStep = (): JSX.Element => {
             </span>
           </MessageInfoBox>
         )}
-        <div>
+        <div className={styles.feed_brain}>
           <span className={styles.title}>Feed your brain</span>
           <KnowledgeToFeed hideBrainSelector={true} />
         </div>
