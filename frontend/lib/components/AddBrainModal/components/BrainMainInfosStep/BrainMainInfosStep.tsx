@@ -36,7 +36,7 @@ export const BrainMainInfosStep = (): JSX.Element => {
     <div className={styles.brain_main_infos_wrapper}>
       <div className={styles.inputs_wrapper}>
         <span className={styles.title}>Define brain identity</span>
-        <div>
+        <div className={styles.name_field}>
           <FieldHeader iconName="brain" label="Name" mandatory={true} />
           <Controller
             name="name"

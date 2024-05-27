@@ -21,45 +21,7 @@
 
   .tabs_content_wrapper {
     width: 100%;
-    height: 200px;
     overflow: scroll;
-  }
-
-  .uploaded_knowledges_title {
-    color: var(--text-2);
-    display: flex;
-    justify-content: space-between;
-  }
-
-  .uploaded_knowledges {
-    padding: Spacings.$spacing03;
-    display: flex;
-    width: 100%;
-    overflow: scroll;
-    flex-direction: column;
-    gap: Spacings.$spacing02;
-    flex-grow: 1;
-    overflow: scroll;
-
-    .uploaded_knowledge {
-      display: flex;
-      gap: Spacings.$spacing02;
-      align-items: center;
-      justify-content: space-between;
-      width: 100%;
-      overflow: hidden;
-      font-size: Typography.$small;
-
-      .left {
-        display: flex;
-        align-items: center;
-        gap: Spacings.$spacing02;
-        overflow: hidden;
-
-        .label {
-          @include Typography.EllipsisOverflow;
-        }
-      }
-    }
+    padding: Spacings.$spacing01;
   }
 }
