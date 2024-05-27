@@ -33,7 +33,7 @@ const UserPage = (): JSX.Element => {
     isLogoutModalOpened,
     setIsLogoutModalOpened,
   } = useLogoutModal();
-  const [selectedTab, setSelectedTab] = useState("General");
+  const [selectedTab, setSelectedTab] = useState("Connections");
 
   const buttons: ButtonType[] = [
     {
@@ -56,16 +56,16 @@ const UserPage = (): JSX.Element => {
 
   const studioTabs: Tab[] = [
     {
-      label: "General",
-      isSelected: selectedTab === "General",
-      onClick: () => setSelectedTab("General"),
-      iconName: "user",
-    },
-    {
       label: "Connections",
       isSelected: selectedTab === "Connections",
       onClick: () => setSelectedTab("Connections"),
       iconName: "sync",
+    },
+    {
+      label: "General",
+      isSelected: selectedTab === "General",
+      onClick: () => setSelectedTab("General"),
+      iconName: "user",
     },
   ];
 
