@@ -1,5 +1,3 @@
-import os
-from operator import itemgetter
 from typing import List, Optional
 from uuid import UUID
 
@@ -9,20 +7,18 @@ from langchain.prompts import (HumanMessagePromptTemplate,
                                SystemMessagePromptTemplate)
 from langchain.retrievers.document_compressors import FlashrankRerank
 from langchain.schema import format_document
-from langchain_cohere import CohereRerank
 from langchain_community.chat_models import ChatLiteLLM
 from langchain_community.embeddings import OllamaEmbeddings
-from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate, PromptTemplate
 from langchain_core.pydantic_v1 import BaseModel as BaseModelV1
 from langchain_core.pydantic_v1 import Field as FieldV1
-from langchain_core.runnables import RunnableLambda, RunnablePassthrough
-from langchain_openai import ChatOpenAI, OpenAIEmbeddings
+from langchain_openai import OpenAIEmbeddings
 from logger import get_logger
 from models import BrainSettings  # Importing settings related to the 'brain'
 from models.settings import get_supabase_client
 from modules.brain.service.brain_service import BrainService
 from modules.chat.service.chat_service import ChatService
+from modules.knowledge.repository.knowledges import Knowledges
 from modules.prompt.service.get_prompt_to_use import get_prompt_to_use
 from pydantic import BaseModel, ConfigDict
 from pydantic_settings import BaseSettings
@@ -83,13 +79,19 @@ Answer in a concise and clear manner.
 Use the following pieces of context from files provided by the user to answer the users.
 Answer in the same language as the user question.
 If you don't know the answer with the context provided from the files, just say that you don't know, don't try to make up an answer.
-If not None, User instruction to follow to answer: You are an expert at answer questions about contracts on Monotype. You have access to one or multiple contracts to answer.
 Don't cite the source id in the answer objects, but you can use the source to answer the question.
 
 Any document refered in term of time indication (last, before to last) refers to the date of the documents. 
 
 If the file name is the same consider heading 1, heading 2, heading 3 as unique and not multiple.
 
+If not None, User instruction to follow to answer: 
+
+You are an expert at answer questions about contracts on Monotype. You have access to one or multiple contracts to answer.
+Files are formated as follow: <Status> <Contract Name> <Date> 
+When asked a question about first or last, you should be careful to answer with the first or last contract in the list.
+You have access to the following contracts and addendum files to answer the user question:
+{files}
 """
 
 
@@ -130,7 +132,7 @@ class QuivrRAG(BaseModel):
 
     # Instantiate settings
     brain_settings: BaseSettings = BrainSettings()
-
+    knowledge_service: Knowledges = Knowledges()
     # Default class attributes
     model: str = None  # pyright: ignore reportPrivateUsage=none
     temperature: float = 0.1
@@ -296,6 +298,16 @@ class QuivrRAG(BaseModel):
         return chat_history
 
     def get_chain(self):
+
+        list_files = self.knowledge_service.get_all_knowledge_in_brain(
+            self.brain_id
+        )  # pyright: ignore reportPrivateUsage=none
+
+        list_files = [file.file_name for file in list_files]
+        # Max first 10 files
+        if len(list_files) > 10:
+            list_files = list_files[:10]
+
         compressor = None
         if os.getenv("COHERE_API_KEY"):
             compressor = CohereRerank(top_n=100)
@@ -344,6 +356,7 @@ class QuivrRAG(BaseModel):
             "context": lambda x: self._combine_documents(x["docs"]),
             "question": itemgetter("question"),
             "custom_instructions": itemgetter("custom_instructions"),
+            "files": lambda x: list_files,
         }
         llm = ChatLiteLLM(
             max_tokens=self.max_tokens,
