@@ -100,6 +100,12 @@
       "pages": [
         "agents/summary"
       ]
+    },
+    {
+      "group": "Privacy and Compliance",
+      "pages": [
+        "privacy-and-compliance"
+      ]
     }
   ],
   "footerSocials": {
