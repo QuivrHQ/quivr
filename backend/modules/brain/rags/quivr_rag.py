@@ -1,3 +1,5 @@
+import os
+from operator import itemgetter
 from typing import List, Optional
 from uuid import UUID
 
@@ -7,12 +9,15 @@ from langchain.prompts import (HumanMessagePromptTemplate,
                                SystemMessagePromptTemplate)
 from langchain.retrievers.document_compressors import FlashrankRerank
 from langchain.schema import format_document
+from langchain_cohere import CohereRerank
 from langchain_community.chat_models import ChatLiteLLM
 from langchain_community.embeddings import OllamaEmbeddings
+from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate, PromptTemplate
 from langchain_core.pydantic_v1 import BaseModel as BaseModelV1
 from langchain_core.pydantic_v1 import Field as FieldV1
-from langchain_openai import OpenAIEmbeddings
+from langchain_core.runnables import RunnableLambda, RunnablePassthrough
+from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 from logger import get_logger
 from models import BrainSettings  # Importing settings related to the 'brain'
 from models.settings import get_supabase_client
@@ -33,7 +38,7 @@ class cited_answer(BaseModelV1):
     thoughts: str = FieldV1(
         ...,
         description="""Description of the thought process, based only on the given sources. 
-        Cite the text when possible and give the document name it appears in. In the format : 'Doc_name states : cited_text'. Be the most 
+        Cite the text as much as possible and give the document name it appears in. In the format : 'Doc_name states : cited_text'. Be the most 
         procedural as possible.""",
     )
     answer: str = FieldV1(
@@ -81,17 +86,16 @@ Answer in the same language as the user question.
 If you don't know the answer with the context provided from the files, just say that you don't know, don't try to make up an answer.
 Don't cite the source id in the answer objects, but you can use the source to answer the question.
 
-Any document refered in term of time indication (last, before to last) refers to the date of the documents. 
-
-If the file name is the same consider heading 1, heading 2, heading 3 as unique and not multiple.
-
-If not None, User instruction to follow to answer: 
-
 You are an expert at answer questions about contracts on Monotype. You have access to one or multiple contracts to answer.
-Files are formated as follow: <Status> <Contract Name> <Date> 
-When asked a question about first or last, you should be careful to answer with the first or last contract in the list.
+
+Files are formated as follow: <Status> <Contract Name> <Date (US)> 
+Note that there exists multiple type of contracts : Software License Order Form and Monotype Fonts License Order Form.
 You have access to the following contracts and addendum files to answer the user question:
 {files}
+
+Any document refered in term of time indication (last, before to last) refers to the date of the documents and present questions refer to the latest contract. Don't forget to look in addendum if needed. Note that addendum are not contracts, they are just modification of a contract.
+When asked for the second to last contract specifications, check for the last addendum of this contract.
+
 """
 
 
@@ -132,7 +136,6 @@ class QuivrRAG(BaseModel):
 
     # Instantiate settings
     brain_settings: BaseSettings = BrainSettings()
-    knowledge_service: Knowledges = Knowledges()
     # Default class attributes
     model: str = None  # pyright: ignore reportPrivateUsage=none
     temperature: float = 0.1
@@ -141,6 +144,7 @@ class QuivrRAG(BaseModel):
     max_tokens: int = 2000  # Output length
     max_input: int = 2000
     streaming: bool = False
+
 
     @property
     def embeddings(self):
@@ -209,6 +213,13 @@ class QuivrRAG(BaseModel):
         self.brain_id = brain_id
         self.chat_id = chat_id
         self.streaming = streaming
+        self._knowledge_service = Knowledges()
+
+    @property
+    def knowledge_service(self):
+        if self._knowledge_service is None:
+            self._knowledge_service = Knowledges()
+        return self._knowledge_service
 
     def _create_supabase_client(self) -> Client:
         return get_supabase_client()
