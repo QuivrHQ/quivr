@@ -17,4 +17,9 @@
       font-size: Typography.$small;
     }
   }
+
+  .icons {
+    display: flex;
+    gap: Spacings.$spacing02;
+  }
 }

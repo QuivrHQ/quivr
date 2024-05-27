@@ -18,7 +18,20 @@ export const ConnectionLine = ({
         <ConnectionIcon letter={label[0]} index={index} />
         <span className={styles.label}>{label}</span>
       </div>
-      <Icon name="uploadFile" size="normal" color="black" handleHover={true} />
+      <div className={styles.icons}>
+        <Icon
+          name="uploadFile"
+          size="normal"
+          color="black"
+          handleHover={true}
+        />
+        <Icon
+          name="delete"
+          size="normal"
+          color="dangerous"
+          handleHover={true}
+        />
+      </div>
     </div>
   );
 };
