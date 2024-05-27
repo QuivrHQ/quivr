@@ -28,7 +28,7 @@ export const BrainMainInfosStep = (): JSX.Element => {
     goToPreviousStep();
   };
 
-  if (currentStepIndex !== 1) {
+  if (currentStepIndex !== 0) {
     return <></>;
   }
 

@@ -150,7 +150,7 @@ export const CreateBrainStep = (): JSX.Element => {
     );
   };
 
-  if (currentStepIndex !== 2) {
+  if (currentStepIndex !== 1) {
     return <></>;
   }
 
