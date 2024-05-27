@@ -23,12 +23,13 @@ export const ConnectionSection = ({
   label,
   provider,
   callback,
+  fromAddKnowledge,
 }: ConnectionSectionProps): JSX.Element => {
   const [connectionModalOpened, setConnectionModalOpened] =
     useState<boolean>(false);
   const { iconUrls, getUserSyncs } = useSync();
   const [existingConnections, setExistingConnections] = useState<Sync[]>([]);
-  const [folded, setFolded] = useState<boolean>(true);
+  const [folded, setFolded] = useState<boolean>(!fromAddKnowledge);
 
   useEffect(() => {
     void (async () => {
@@ -66,7 +67,7 @@ export const ConnectionSection = ({
             small={true}
           />
         </div>
-        {!!existingConnections.length && (
+        {!!existingConnections.length && !fromAddKnowledge && (
           <div className={styles.existing_connections}>
             <div className={styles.existing_connections_header}>
               <span className={styles.label}>Connected accounts</span>
@@ -95,6 +96,13 @@ export const ConnectionSection = ({
             )}
           </div>
         )}
+        {!!existingConnections.length &&
+          fromAddKnowledge &&
+          existingConnections.map((connection, index) => (
+            <div key={index}>
+              <ConnectionLine label={connection.name} index={index} />
+            </div>
+          ))}
       </div>
       <ConnectionModal
         modalOpened={connectionModalOpened}
