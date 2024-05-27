@@ -1,11 +1,9 @@
 import { useMemo, useState } from "react";
 
-import { Icon } from "@/lib/components/ui/Icon/Icon";
 import { SingleSelector } from "@/lib/components/ui/SingleSelector/SingleSelector";
 import { Tabs } from "@/lib/components/ui/Tabs/Tabs";
 import { requiredRolesForUpload } from "@/lib/config/upload";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
-import { useKnowledgeToFeedContext } from "@/lib/context/KnowledgeToFeedProvider/hooks/useKnowledgeToFeedContext";
 import { Tab } from "@/lib/types/Tab";
 
 import styles from "./KnowledgeToFeed.module.scss";
@@ -21,8 +19,6 @@ export const KnowledgeToFeed = ({
 }): JSX.Element => {
   const { allBrains, setCurrentBrainId, currentBrain } = useBrainContext();
   const [selectedTab, setSelectedTab] = useState("Documents");
-  const { knowledgeToFeed, removeKnowledgeToFeed } =
-    useKnowledgeToFeedContext();
 
   const brainsWithUploadRights = formatMinimalBrainsToSelectComponentInput(
     useMemo(
@@ -78,37 +74,6 @@ export const KnowledgeToFeed = ({
         {selectedTab === "Documents" && <FromDocuments />}
         {selectedTab === "Websites" && <FromWebsites />}
         {selectedTab === "Connections" && <FromConnections />}
-      </div>
-      <div>
-        <div className={styles.uploaded_knowledges_title}>
-          <span>Knowledges to upload</span>
-          <span>{knowledgeToFeed.length}</span>
-        </div>
-        <div className={styles.uploaded_knowledges}>
-          {knowledgeToFeed.map((knowledge, index) => (
-            <div className={styles.uploaded_knowledge} key={index}>
-              <div className={styles.left}>
-                <Icon
-                  name={knowledge.source === "crawl" ? "website" : "file"}
-                  size="small"
-                  color="black"
-                />
-                <span className={styles.label}>
-                  {knowledge.source === "crawl"
-                    ? knowledge.url
-                    : knowledge.file.name}
-                </span>
-              </div>
-              <Icon
-                name="delete"
-                size="normal"
-                color="dangerous"
-                handleHover={true}
-                onClick={() => removeKnowledgeToFeed(index)}
-              />
-            </div>
-          ))}
-        </div>
       </div>
     </div>
   );
