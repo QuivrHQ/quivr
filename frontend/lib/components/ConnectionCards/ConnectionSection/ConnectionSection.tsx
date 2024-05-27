@@ -16,6 +16,7 @@ interface ConnectionSectionProps {
   label: string;
   provider: Provider;
   callback: (name: string) => Promise<{ authorization_url: string }>;
+  fromAddKnowledge?: boolean;
 }
 
 export const ConnectionSection = ({

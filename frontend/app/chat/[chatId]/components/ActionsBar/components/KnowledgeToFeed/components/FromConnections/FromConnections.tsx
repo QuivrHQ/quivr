@@ -8,7 +8,7 @@ export const FromConnections = (): JSX.Element => {
   return (
     <div>
       {!currentSyncElements?.files.length ? (
-        <ConnectionCards />
+        <ConnectionCards fromAddKnowledge={true} />
       ) : (
         <div>{currentSyncElements.files.length}</div>
       )}

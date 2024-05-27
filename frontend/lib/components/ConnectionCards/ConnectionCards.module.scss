@@ -4,4 +4,8 @@
   display: flex;
   flex-wrap: wrap;
   gap: Spacings.$spacing05;
+
+  &.spaced {
+    justify-content: space-between;
+  }
 }
