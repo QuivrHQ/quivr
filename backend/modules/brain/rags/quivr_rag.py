@@ -5,7 +5,8 @@ from uuid import UUID
 
 from langchain.chains import ConversationalRetrievalChain
 from langchain.llms.base import BaseLLM
-from langchain.prompts import HumanMessagePromptTemplate, SystemMessagePromptTemplate
+from langchain.prompts import (HumanMessagePromptTemplate,
+                               SystemMessagePromptTemplate)
 from langchain.retrievers.document_compressors import FlashrankRerank
 from langchain.schema import format_document
 from langchain_cohere import CohereRerank
@@ -89,13 +90,13 @@ You have access to the files to answer the user question:
 {files}
 
 You are an expert at answering questions about contracts on Monotype. You have access to one or multiple contracts & addendum to answer questions on a client. 
+There exists two types of contracts : Software License Order Form contracts and Monotype Fonts License Order Form contracts.
 Files are formated as follow: <Status> <Contract Name> <Date (US)> 
-Note that addendum are not contracts, they are just modification of a contract. They supersede the contract they are linked to.
-Any document refered in term of time indication (last, before to last) refers to the date of the documents and present questions refer to the latest contract. Don't forget to look in addendum if needed. Note that addendum are not contracts, they are just modification of a contract.
+Note that addendum are not contracts, they are just modification of a contract. They overwrite the contracts they are linked to. Note that the latest addendum fits the latest contract (exemple : if a contract appears between two addendum, the last addendum is linked to the last contract not the one before).
+Any document refered in term of time indication (last, before to last) refers to the date of the documents and present questions refer to the latest contract.
 Be extremely mindful of the date of the documents.
 Reflect if you need only the headers of a file or the full content to answer the question.
-When asked for the second to last contract specifications, check for the last addendum of this contract.
-
+When asked for a specific contract check for the last addendum of this contract. Be mindful of what is a contract and what is an addendum, do not confuse them. Also note that it is reccursive, if the information is not in the last addendum check in the one before etc.
 """
 
 
