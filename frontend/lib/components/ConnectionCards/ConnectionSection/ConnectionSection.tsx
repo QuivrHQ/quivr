@@ -5,6 +5,7 @@ import { Provider, Sync } from "@/lib/api/sync/types";
 import { useSync } from "@/lib/api/sync/useSync";
 import QuivrButton from "@/lib/components/ui/QuivrButton/QuivrButton";
 
+import { ConnectionButton } from "./ConnectionButton/ConnectionButton";
 import { ConnectionLine } from "./ConnectionLine/ConnectionLine";
 import styles from "./ConnectionSection.module.scss";
 
@@ -100,7 +101,7 @@ export const ConnectionSection = ({
           fromAddKnowledge &&
           existingConnections.map((connection, index) => (
             <div key={index}>
-              <ConnectionLine label={connection.name} index={index} />
+              <ConnectionButton label={connection.name} index={index} />
             </div>
           ))}
       </div>
