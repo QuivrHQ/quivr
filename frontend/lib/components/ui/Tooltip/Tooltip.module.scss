@@ -9,4 +9,8 @@
   padding: Spacings.$spacing03;
   border-radius: Radius.$normal;
   font-size: Typography.$small;
+  white-space: pre-wrap;
+  overflow: hidden;
+  max-width: 300px;
+  /* Ensures the tooltip height increases to fit content */
 }
