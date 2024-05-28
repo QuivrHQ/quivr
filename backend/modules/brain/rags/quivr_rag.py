@@ -6,7 +6,8 @@ from uuid import UUID
 
 from langchain.chains import ConversationalRetrievalChain
 from langchain.llms.base import BaseLLM
-from langchain.prompts import HumanMessagePromptTemplate, SystemMessagePromptTemplate
+from langchain.prompts import (HumanMessagePromptTemplate,
+                               SystemMessagePromptTemplate)
 from langchain.retrievers import ContextualCompressionRetriever
 from langchain.retrievers.document_compressors import FlashrankRerank
 from langchain.schema import format_document
@@ -41,7 +42,7 @@ class cited_answer(BaseModelV1):
         ...,
         description="""Description of the thought process, based only on the given sources. 
         Cite the text as much as possible and give the document name it appears in. In the format : 'Doc_name states : cited_text'. Be the most 
-        procedural as possible.""",
+        procedural as possible. Write all the steps needed to find the answer until you find it.""",
     )
     answer: str = FieldV1(
         ...,
