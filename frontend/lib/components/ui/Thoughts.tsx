@@ -2,10 +2,12 @@ import { useState } from "react";
 
 import Icon from "@/lib/components/ui/Icon/Icon";
 import Tooltip from "@/lib/components/ui/Tooltip/Tooltip";
+import { IconSize } from "@/lib/types/Icons";
+
 
 type ThoughtsButtonProps = {
   text: string;
-  size: string;
+  size: IconSize;
 };
 
 export const ThoughtsButton = ({ text, size }: ThoughtsButtonProps): JSX.Element => {
