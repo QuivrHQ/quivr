@@ -2,18 +2,20 @@ from logger import get_logger
 from modules.brain.entity.brain_entity import BrainType, RoleEnum
 from modules.brain.integrations.Big.Brain import BigBrain
 from modules.brain.integrations.GPT4.Brain import GPT4Brain
+from modules.brain.integrations.Multi_Contract.Brain import MultiContractBrain
 from modules.brain.integrations.Notion.Brain import NotionBrain
 from modules.brain.integrations.Proxy.Brain import ProxyBrain
 from modules.brain.integrations.Self.Brain import SelfBrain
 from modules.brain.integrations.SQL.Brain import SQLBrain
 from modules.brain.knowledge_brain_qa import KnowledgeBrainQA
-from modules.brain.service.api_brain_definition_service import \
-    ApiBrainDefinitionService
-from modules.brain.service.brain_authorization_service import \
-    validate_brain_authorization
+from modules.brain.service.api_brain_definition_service import ApiBrainDefinitionService
+from modules.brain.service.brain_authorization_service import (
+    validate_brain_authorization,
+)
 from modules.brain.service.brain_service import BrainService
-from modules.brain.service.integration_brain_service import \
-    IntegrationBrainDescriptionService
+from modules.brain.service.integration_brain_service import (
+    IntegrationBrainDescriptionService,
+)
 from modules.chat.controller.chat.interface import ChatInterface
 from modules.chat.service.chat_service import ChatService
 
@@ -45,6 +47,7 @@ integration_list = {
     "doc": KnowledgeBrainQA,
     "proxy": ProxyBrain,
     "self": SelfBrain,
+    "multi-contract": MultiContractBrain,
 }
 
 brain_service = BrainService()

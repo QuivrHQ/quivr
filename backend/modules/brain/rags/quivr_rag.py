@@ -147,6 +147,7 @@ class QuivrRAG(BaseModel):
     max_tokens: int = 2000  # Output length
     max_input: int = 2000
     streaming: bool = False
+    knowledge_service: Knowledges = None
 
     @property
     def embeddings(self):
@@ -215,13 +216,7 @@ class QuivrRAG(BaseModel):
         self.brain_id = brain_id
         self.chat_id = chat_id
         self.streaming = streaming
-        self._knowledge_service = Knowledges()
-
-    @property
-    def knowledge_service(self):
-        if self._knowledge_service is None:
-            self._knowledge_service = Knowledges()
-        return self._knowledge_service
+        self.knowledge_service = Knowledges()
 
     def _create_supabase_client(self) -> Client:
         return get_supabase_client()
