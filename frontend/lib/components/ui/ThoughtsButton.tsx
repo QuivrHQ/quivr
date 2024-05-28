@@ -12,9 +12,10 @@ type ThoughtsButtonProps = {
 export const ThoughtsButton = ({ text, size }: ThoughtsButtonProps): JSX.Element => {
 
   return (
-
       <Tooltip tooltip={text}>
+        <div>
           <Icon name="question" size={size} color="black" handleHover={true}/>
+        </div>
       </Tooltip>
   );
 };
