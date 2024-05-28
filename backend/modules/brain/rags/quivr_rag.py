@@ -5,8 +5,7 @@ from uuid import UUID
 
 from langchain.chains import ConversationalRetrievalChain
 from langchain.llms.base import BaseLLM
-from langchain.prompts import (HumanMessagePromptTemplate,
-                               SystemMessagePromptTemplate)
+from langchain.prompts import HumanMessagePromptTemplate, SystemMessagePromptTemplate
 from langchain.retrievers.document_compressors import FlashrankRerank
 from langchain.schema import format_document
 from langchain_cohere import CohereRerank
@@ -35,6 +34,7 @@ logger = get_logger(__name__)
 
 class cited_answer(BaseModelV1):
     """Answer the user question based only on the given sources, and cite the sources used."""
+
     thoughts: str = FieldV1(
         ...,
         description="""Description of the thought process, based only on the given sources. 
@@ -85,15 +85,15 @@ Use the following pieces of context from files provided by the user to answer th
 Answer in the same language as the user question.
 If you don't know the answer with the context provided from the files, just say that you don't know, don't try to make up an answer.
 Don't cite the source id in the answer objects, but you can use the source to answer the question.
-
-You are an expert at answer questions about contracts on Monotype. You have access to one or multiple contracts to answer.
-
-Files are formated as follow: <Status> <Contract Name> <Date (US)> 
-Note that there exists multiple type of contracts : Software License Order Form and Monotype Fonts License Order Form.
-You have access to the following contracts and addendum files to answer the user question:
+You have access to the files to answer the user question:
 {files}
 
+You are an expert at answering questions about contracts on Monotype. You have access to one or multiple contracts & addendum to answer questions on a client. 
+Files are formated as follow: <Status> <Contract Name> <Date (US)> 
+Note that addendum are not contracts, they are just modification of a contract. They supersede the contract they are linked to.
 Any document refered in term of time indication (last, before to last) refers to the date of the documents and present questions refer to the latest contract. Don't forget to look in addendum if needed. Note that addendum are not contracts, they are just modification of a contract.
+Be extremely mindful of the date of the documents.
+Reflect if you need only the headers of a file or the full content to answer the question.
 When asked for the second to last contract specifications, check for the last addendum of this contract.
 
 """
@@ -144,7 +144,6 @@ class QuivrRAG(BaseModel):
     max_tokens: int = 2000  # Output length
     max_input: int = 2000
     streaming: bool = False
-
 
     @property
     def embeddings(self):
@@ -250,7 +249,9 @@ class QuivrRAG(BaseModel):
 
         api_base = None
         if self.brain_settings.ollama_api_base_url and model.startswith("ollama"):
-            api_base = self.brain_settings.ollama_api_base_url
+            api_base = (
+                self.brain_settings.ollama_api_base_url  # pyright: ignore reportPrivateUsage=none
+            )
 
         return ChatLiteLLM(
             temperature=temperature,
@@ -260,7 +261,7 @@ class QuivrRAG(BaseModel):
             verbose=False,
             callbacks=callbacks,
             api_base=api_base,
-        )
+        )  # pyright: ignore reportPrivateUsage=none
 
     def _combine_documents(
         self, docs, document_prompt=DEFAULT_DOCUMENT_PROMPT, document_separator="\n\n"
@@ -310,14 +311,16 @@ class QuivrRAG(BaseModel):
 
     def get_chain(self):
 
-        list_files = self.knowledge_service.get_all_knowledge_in_brain(
+        list_files_array = self.knowledge_service.get_all_knowledge_in_brain(
             self.brain_id
         )  # pyright: ignore reportPrivateUsage=none
 
-        list_files = [file.file_name for file in list_files]
+        list_files_array = [file.file_name for file in list_files_array]
         # Max first 10 files
-        if len(list_files) > 10:
-            list_files = list_files[:10]
+        if len(list_files_array) > 10:
+            list_files_array = list_files_array[:10]
+
+        list_files = "\n".join(list_files_array) if list_files_array else "None"
 
         compressor = None
         if os.getenv("COHERE_API_KEY"):

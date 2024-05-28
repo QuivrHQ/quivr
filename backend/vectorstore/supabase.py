@@ -97,4 +97,8 @@ class CustomSupabaseVectorStore(SupabaseVectorStore):
             if search.get("content")
         ]
 
-        return match_result
+        sorted_match_result_by_file_name_metadata = sorted(
+            match_result, key=lambda x: x.metadata.get("file_name", "")
+        )
+
+        return sorted_match_result_by_file_name_metadata
