@@ -45,7 +45,9 @@ async def process_file(
 
             parser = LlamaParse(
                 result_type="markdown",  # "markdown" and "text" are available
-                parsing_instruction="Try to extract the tables and checkboxes. Transform tables to key = value. You can duplicates Keys if needed. For example: Productions Fonts = 300 productions Fonts Company Desktop License = Yes for Maximum of 60 Licensed Desktop users For example checkboxes should be: Premium Activated = Yes License Premier = No If a checkbox is present for a table with multiple options.  Say Yes for the one activated and no for the one not activated",
+                parsing_instruction="Extract the tables and checkboxes. Transform tables to key = value. You can duplicates Keys if needed. For example: Productions Fonts = 300 productions Fonts Company Desktop License = Yes for Maximum of 60 Licensed Desktop users For example checkboxes should be: Premium Activated = Yes License Premier = No If a checkbox is present for a table with multiple options.  Say Yes for the one activated and no for the one not activated.Format using headers.",
+                gpt4o_mode=True,
+                gpt4o_api_key=os.getenv("OPENAI_API_KEY"),
             )
 
             document_llama_parsed = parser.load_data(document_tmp.name)
@@ -79,7 +81,9 @@ async def process_file(
 
     if file.documents is not None:
         logger.info("Coming here?")
-        for doc in file.documents:  # pyright: ignore reportPrivateUsage=none
+        for index, doc in enumerate(
+            file.documents, start=1
+        ):  # pyright: ignore reportPrivateUsage=none
             new_metadata = metadata.copy()
             logger.info(f"Processing document {doc}")
             # Add filename at beginning of page content
@@ -95,6 +99,7 @@ async def process_file(
             )
 
             new_metadata["chunk_size"] = len_chunk
+            new_metadata["index"] = index
             doc_with_metadata = DocumentSerializable(
                 page_content=doc.page_content, metadata=new_metadata
             )

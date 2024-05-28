@@ -331,7 +331,9 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
     async def generate_stream(
         self, chat_id: UUID, question: ChatQuestion, save_answer: bool = True
     ) -> AsyncIterable:
-        conversational_qa_chain = self.knowledge_qa.get_chain()
+        conversational_qa_chain = (
+            self.get_chain() if self.get_chain() else self.knowledge_qa.get_chain()
+        )
         transformed_history, streamed_chat_history = (
             self.initialize_streamed_chat_history(chat_id, question)
         )

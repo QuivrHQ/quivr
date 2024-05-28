@@ -24,6 +24,7 @@ from models import BrainSettings  # Importing settings related to the 'brain'
 from models.settings import get_supabase_client
 from modules.brain.service.brain_service import BrainService
 from modules.chat.service.chat_service import ChatService
+from modules.knowledge.repository.knowledges import Knowledges
 from modules.prompt.service.get_prompt_to_use import get_prompt_to_use
 from pydantic import BaseModel, ConfigDict
 from pydantic_settings import BaseSettings
@@ -36,6 +37,12 @@ logger = get_logger(__name__)
 class cited_answer(BaseModelV1):
     """Answer the user question based only on the given sources, and cite the sources used."""
 
+    thoughts: str = FieldV1(
+        ...,
+        description="""Description of the thought process, based only on the given sources. 
+        Cite the text as much as possible and give the document name it appears in. In the format : 'Doc_name states : cited_text'. Be the most 
+        procedural as possible.""",
+    )
     answer: str = FieldV1(
         ...,
         description="The answer to the user question, which is based only on the given sources.",
@@ -47,7 +54,7 @@ class cited_answer(BaseModelV1):
 
     thoughts: str = FieldV1(
         ...,
-        description="Explain shortly what you did to generate the answer. Explain any assumptions you made, and why you made them.",
+        description="Explain shortly what you did to find the answer and what you used by citing the sources by their name.",
     )
     followup_questions: List[str] = FieldV1(
         ...,
@@ -86,6 +93,10 @@ Answer in a concise and clear manner.
 Use the following pieces of context from files provided by the user to answer the users.
 Answer in the same language as the user question.
 If you don't know the answer with the context provided from the files, just say that you don't know, don't try to make up an answer.
+Don't cite the source id in the answer objects, but you can use the source to answer the question.
+You have access to the files to answer the user question (limited to first 20 files):
+{files}
+
 If not None, User instruction to follow to answer: {custom_instructions}
 Don't cite the source id in the answer objects, but you can use the source to answer the question.
 """
@@ -128,7 +139,6 @@ class QuivrRAG(BaseModel):
 
     # Instantiate settings
     brain_settings: BaseSettings = BrainSettings()
-
     # Default class attributes
     model: str = None  # pyright: ignore reportPrivateUsage=none
     temperature: float = 0.1
@@ -137,6 +147,7 @@ class QuivrRAG(BaseModel):
     max_tokens: int = 2000  # Output length
     max_input: int = 2000
     streaming: bool = False
+    knowledge_service: Knowledges = None
 
     @property
     def embeddings(self):
@@ -205,6 +216,7 @@ class QuivrRAG(BaseModel):
         self.brain_id = brain_id
         self.chat_id = chat_id
         self.streaming = streaming
+        self.knowledge_service = Knowledges()
 
     def _create_supabase_client(self) -> Client:
         return get_supabase_client()
@@ -235,7 +247,9 @@ class QuivrRAG(BaseModel):
 
         api_base = None
         if self.brain_settings.ollama_api_base_url and model.startswith("ollama"):
-            api_base = self.brain_settings.ollama_api_base_url
+            api_base = (
+                self.brain_settings.ollama_api_base_url  # pyright: ignore reportPrivateUsage=none
+            )
 
         return ChatLiteLLM(
             temperature=temperature,
@@ -245,7 +259,7 @@ class QuivrRAG(BaseModel):
             verbose=False,
             callbacks=callbacks,
             api_base=api_base,
-        )
+        )  # pyright: ignore reportPrivateUsage=none
 
     def _combine_documents(
         self, docs, document_prompt=DEFAULT_DOCUMENT_PROMPT, document_separator="\n\n"
@@ -294,11 +308,23 @@ class QuivrRAG(BaseModel):
         return chat_history
 
     def get_chain(self):
+
+        list_files_array = self.knowledge_service.get_all_knowledge_in_brain(
+            self.brain_id
+        )  # pyright: ignore reportPrivateUsage=none
+
+        list_files_array = [file.file_name for file in list_files_array]
+        # Max first 10 files
+        if len(list_files_array) > 20:
+            list_files_array = list_files_array[:20]
+
+        list_files = "\n".join(list_files_array) if list_files_array else "None"
+
         compressor = None
         if os.getenv("COHERE_API_KEY"):
-            compressor = CohereRerank(top_n=10)
+            compressor = CohereRerank(top_n=20)
         else:
-            compressor = FlashrankRerank(model="ms-marco-TinyBERT-L-2-v2", top_n=10)
+            compressor = FlashrankRerank(model="ms-marco-TinyBERT-L-2-v2", top_n=20)
 
         retriever_doc = self.get_retriever()
         compression_retriever = ContextualCompressionRetriever(
@@ -342,6 +368,7 @@ class QuivrRAG(BaseModel):
             "context": lambda x: self._combine_documents(x["docs"]),
             "question": itemgetter("question"),
             "custom_instructions": itemgetter("custom_instructions"),
+            "files": lambda x: list_files,
         }
         llm = ChatLiteLLM(
             max_tokens=self.max_tokens,
