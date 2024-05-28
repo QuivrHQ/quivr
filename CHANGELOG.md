@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.0.257 (2024-05-28)
+
+## What's Changed
+* Add Privacy & Compliance Documentation by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2620
+* docs(security): added compliance by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2621
+* fix(frontend): upgrade button on user page by @Zewed in https://github.com/QuivrHQ/quivr/pull/2623
+* feat(frontend): Add ThoughtsButton component for displaying thoughts by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2624
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.256...v0.0.257
+
 ## 0.0.256 (2024-05-26)
 
 ## What's Changed
