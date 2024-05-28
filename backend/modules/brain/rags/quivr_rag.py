@@ -1,3 +1,4 @@
+import datetime
 import os
 from operator import itemgetter
 from typing import List, Optional
@@ -44,9 +45,18 @@ class cited_answer(BaseModelV1):
         description="The integer IDs of the SPECIFIC sources which justify the answer.",
     )
 
+    thoughts: str = FieldV1(
+        ...,
+        description="Explain shortly what you did to generate the answer. Explain any assumptions you made, and why you made them.",
+    )
+    followup_questions: List[str] = FieldV1(
+        ...,
+        description="Generate up to 3 follow-up questions that could be asked based on the answer given or context provided.",
+    )
+
 
 # First step is to create the Rephrasing Prompt
-_template = """Given the following conversation and a follow up question, rephrase the follow up question to be a standalone question, in its original language. Keep as much details as possible from previous messages. Keep entity names and all. 
+_template = """Given the following conversation and a follow up question, rephrase the follow up question to be a standalone question, in its original language. Keep as much details as possible from previous messages. Keep entity names and all.
 
 Chat History:
 {chat_history}
@@ -64,11 +74,20 @@ User Question: {question}
 Answer:
 """
 
-system_message_template = """
-When answering use markdown to make it concise and neat.
-Use the following pieces of context from files provided by the user that are store in a brain to answer  the users question in the same language as the user question. Your name is Quivr. You're a helpful assistant.  
+today_date = datetime.datetime.now().strftime("%B %d, %Y")
+
+system_message_template = (
+    f"Your name is Quivr. You're a helpful assistant. Today's date is {today_date}."
+)
+
+system_message_template += """
+When answering use markdown neat.
+Answer in a concise and clear manner.
+Use the following pieces of context from files provided by the user to answer the users.
+Answer in the same language as the user question.
 If you don't know the answer with the context provided from the files, just say that you don't know, don't try to make up an answer.
-User instruction to follow if provided to answer: {custom_instructions}
+If not None, User instruction to follow to answer: {custom_instructions}
+Don't cite the source id in the answer objects, but you can use the source to answer the question.
 """
 
 
