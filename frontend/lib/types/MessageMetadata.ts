@@ -4,4 +4,5 @@ export interface Source {
   name: string;
   source_url: string;
   type: string;
+  thoughts: string;
 }

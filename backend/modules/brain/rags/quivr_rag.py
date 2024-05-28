@@ -1,3 +1,4 @@
+import datetime
 import os
 from operator import itemgetter
 from typing import List, Optional
@@ -51,9 +52,18 @@ class cited_answer(BaseModelV1):
         description="The integer IDs of the SPECIFIC sources which justify the answer.",
     )
 
+    thoughts: str = FieldV1(
+        ...,
+        description="Explain shortly what you did to generate the answer. Explain any assumptions you made, and why you made them.",
+    )
+    followup_questions: List[str] = FieldV1(
+        ...,
+        description="Generate up to 3 follow-up questions that could be asked based on the answer given or context provided.",
+    )
+
 
 # First step is to create the Rephrasing Prompt
-_template = """Given the following conversation and a follow up question, rephrase the follow up question to be a standalone question, in its original language. Keep as much details as possible from previous messages. Keep entity names and all. Today's date is May 23rd, 2024. 
+_template = """Given the following conversation and a follow up question, rephrase the follow up question to be a standalone question, in its original language. Keep as much details as possible from previous messages. Keep entity names and all.
 
 Chat History:
 {chat_history}
@@ -71,15 +81,13 @@ User Question: {question}
 Answer:
 """
 
-# You have access to the following contracts and addendum files to answer the user question:
-# COMPLETED Contoso Healthcare Pvt  Ltd  LOF 12 01 2021.pdf (date : 1 dec 2021)
-# COMPLETED Contoso Laboratories Other 01 01 2022.pdf (date : 1 jan 2022)
-# COMPLETED Contoso Laboratories Other 04 09 2022.pdf (date : 9 Apr 2022)
-# COMPLETED Contoso Laboratories Other 12 31 2023.pdf (date : 31 Dec 2023)
-# COMPLETED Contoso Lyon MT Fonts Enterprise License 08 04 2023.pdf (date : 4 Aug 2023)
+today_date = datetime.datetime.now().strftime("%B %d, %Y")
 
-system_message_template = """
-Your name is Quivr. You're a helpful assistant. Today's date is May 23rd, 2024.
+system_message_template = (
+    f"Your name is Quivr. You're a helpful assistant. Today's date is {today_date}."
+)
+
+system_message_template += """
 When answering use markdown neat.
 Answer in a concise and clear manner.
 Use the following pieces of context from files provided by the user to answer the users.
@@ -89,14 +97,8 @@ Don't cite the source id in the answer objects, but you can use the source to an
 You have access to the files to answer the user question:
 {files}
 
-You are an expert at answering questions about contracts on Monotype. You have access to one or multiple contracts & addendum to answer questions on a client. 
-There exists two types of contracts : Software License Order Form contracts and Monotype Fonts License Order Form contracts.
-Files are formated as follow: <Status> <Contract Name> <Date (US)> 
-Note that addendum are not contracts, they are just modification of a contract. They overwrite the contracts they are linked to. Note that the latest addendum fits the latest contract (exemple : if a contract appears between two addendum, the last addendum is linked to the last contract not the one before).
-Any document refered in term of time indication (last, before to last) refers to the date of the documents and present questions refer to the latest contract.
-Be extremely mindful of the date of the documents.
-Reflect if you need only the headers of a file or the full content to answer the question.
-When asked for a specific contract check for the last addendum of this contract. Be mindful of what is a contract and what is an addendum, do not confuse them. Also note that it is reccursive, if the information is not in the last addendum check in the one before etc.
+If not None, User instruction to follow to answer: {custom_instructions}
+Don't cite the source id in the answer objects, but you can use the source to answer the question.
 """
 
 
