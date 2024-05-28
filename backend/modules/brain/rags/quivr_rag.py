@@ -6,8 +6,8 @@ from uuid import UUID
 
 from langchain.chains import ConversationalRetrievalChain
 from langchain.llms.base import BaseLLM
-from langchain.prompts import (HumanMessagePromptTemplate,
-                               SystemMessagePromptTemplate)
+from langchain.prompts import HumanMessagePromptTemplate, SystemMessagePromptTemplate
+from langchain.retrievers import ContextualCompressionRetriever
 from langchain.retrievers.document_compressors import FlashrankRerank
 from langchain.schema import format_document
 from langchain_cohere import CohereRerank
@@ -54,7 +54,7 @@ class cited_answer(BaseModelV1):
 
     thoughts: str = FieldV1(
         ...,
-        description="Explain shortly what you did to generate the answer. Explain any assumptions you made, and why you made them.",
+        description="Explain shortly what you did to find the answer and what you used by citing the sources by their name.",
     )
     followup_questions: List[str] = FieldV1(
         ...,
@@ -94,7 +94,7 @@ Use the following pieces of context from files provided by the user to answer th
 Answer in the same language as the user question.
 If you don't know the answer with the context provided from the files, just say that you don't know, don't try to make up an answer.
 Don't cite the source id in the answer objects, but you can use the source to answer the question.
-You have access to the files to answer the user question:
+You have access to the files to answer the user question (limited to first 20 files):
 {files}
 
 If not None, User instruction to follow to answer: {custom_instructions}
@@ -320,21 +320,21 @@ class QuivrRAG(BaseModel):
 
         list_files_array = [file.file_name for file in list_files_array]
         # Max first 10 files
-        if len(list_files_array) > 10:
-            list_files_array = list_files_array[:10]
+        if len(list_files_array) > 20:
+            list_files_array = list_files_array[:20]
 
         list_files = "\n".join(list_files_array) if list_files_array else "None"
 
         compressor = None
         if os.getenv("COHERE_API_KEY"):
-            compressor = CohereRerank(top_n=100)
+            compressor = CohereRerank(top_n=20)
         else:
-            compressor = FlashrankRerank(model="ms-marco-TinyBERT-L-2-v2", top_n=10)
+            compressor = FlashrankRerank(model="ms-marco-TinyBERT-L-2-v2", top_n=20)
 
         retriever_doc = self.get_retriever()
-        # compression_retriever = ContextualCompressionRetriever(
-        #     base_compressor=compressor, base_retriever=retriever_doc
-        # )
+        compression_retriever = ContextualCompressionRetriever(
+            base_compressor=compressor, base_retriever=retriever_doc
+        )
 
         loaded_memory = RunnablePassthrough.assign(
             chat_history=RunnableLambda(
@@ -364,7 +364,7 @@ class QuivrRAG(BaseModel):
 
         # Now we retrieve the documents
         retrieved_documents = {
-            "docs": itemgetter("standalone_question") | retriever_doc,
+            "docs": itemgetter("standalone_question") | compression_retriever,
             "question": lambda x: x["standalone_question"],
             "custom_instructions": lambda x: prompt_to_use,
         }
