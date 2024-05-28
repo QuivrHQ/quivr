@@ -98,7 +98,11 @@ class CustomSupabaseVectorStore(SupabaseVectorStore):
         ]
 
         sorted_match_result_by_file_name_metadata = sorted(
-            match_result, key=lambda x: x.metadata.get("file_name", "")
+            match_result,
+            key=lambda x: (
+                x.metadata.get("file_name", ""),
+                x.metadata.get("index", float("inf")),
+            ),
         )
 
         return sorted_match_result_by_file_name_metadata

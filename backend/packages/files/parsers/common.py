@@ -81,7 +81,9 @@ async def process_file(
 
     if file.documents is not None:
         logger.info("Coming here?")
-        for doc in file.documents:  # pyright: ignore reportPrivateUsage=none
+        for index, doc in enumerate(
+            file.documents, start=1
+        ):  # pyright: ignore reportPrivateUsage=none
             new_metadata = metadata.copy()
             logger.info(f"Processing document {doc}")
             # Add filename at beginning of page content
@@ -97,6 +99,7 @@ async def process_file(
             )
 
             new_metadata["chunk_size"] = len_chunk
+            new_metadata["index"] = index
             doc_with_metadata = DocumentSerializable(
                 page_content=doc.page_content, metadata=new_metadata
             )
