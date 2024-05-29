@@ -31,8 +31,8 @@ class SyncUserService:
     def create_sync_user(self, sync_user_input: SyncsUserInput):
         return self.repository.create_sync_user(sync_user_input)
 
-    def delete_sync_user(self, provider: str, user_id: str):
-        return self.repository.delete_sync_user(provider, user_id)
+    def delete_sync_user(self, sync_id: str, user_id: str):
+        return self.repository.delete_sync_user(sync_id, user_id)
 
     def get_sync_user_by_state(self, state: dict):
         return self.repository.get_sync_user_by_state(state)

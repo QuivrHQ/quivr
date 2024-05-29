@@ -118,7 +118,7 @@ class SyncUser(SyncUserInterface):
         logger.warning("No sync user found for state: %s", state)
         return []
 
-    def delete_sync_user(self, provider: str, user_id: str):
+    def delete_sync_user(self, sync_id: str, user_id: str):
         """
         Delete a sync user from the database.
 
@@ -127,9 +127,9 @@ class SyncUser(SyncUserInterface):
             user_id (str): The user ID of the sync user.
         """
         logger.info(
-            "Deleting sync user with provider: %s, user_id: %s", provider, user_id
+            "Deleting sync user with sync_id: %s, user_id: %s", sync_id, user_id
         )
-        self.db.from_("syncs_user").delete().eq("provider", provider).eq(
+        self.db.from_("syncs_user").delete().eq("id", sync_id).eq(
             "user_id", user_id
         ).execute()
         logger.info("Sync user deleted successfully")
