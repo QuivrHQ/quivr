@@ -3,11 +3,11 @@ import { MessageInfoBox } from "@/lib/components/ui/MessageInfoBox/MessageInfoBo
 import QuivrButton from "@/lib/components/ui/QuivrButton/QuivrButton";
 import { useUserData } from "@/lib/hooks/useUserData";
 
-import styles from "./CreateBrainStep.module.scss";
+import styles from "./FeedBrainStep.module.scss";
 
 import { useBrainCreationSteps } from "../../hooks/useBrainCreationSteps";
 
-export const CreateBrainStep = (): JSX.Element => {
+export const FeedBrainStep = (): JSX.Element => {
   const { currentStepIndex, goToPreviousStep, goToNextStep } =
     useBrainCreationSteps();
   const { userIdentityData } = useUserData();

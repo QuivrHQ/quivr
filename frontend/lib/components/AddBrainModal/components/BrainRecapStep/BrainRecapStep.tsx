@@ -7,7 +7,7 @@ import styles from "./BrainRecapStep.module.scss";
 
 import { useBrainCreationContext } from "../../brainCreation-provider";
 import { useBrainCreationSteps } from "../../hooks/useBrainCreationSteps";
-import { useBrainCreationApi } from "../CreateBrainStep/hooks/useBrainCreationApi";
+import { useBrainCreationApi } from "../FeedBrainStep/hooks/useBrainCreationApi";
 
 export const BrainRecapStep = (): JSX.Element => {
   const { currentStepIndex } = useBrainCreationSteps();

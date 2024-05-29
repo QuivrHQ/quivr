@@ -50,7 +50,7 @@ const renderExistingConnections = (
   folded: boolean,
   setFolded: (folded: boolean) => void,
   fromAddKnowledge: boolean,
-  handleGetSyncFiles: (userSyncId: number) => void
+  handleGetSyncFiles: (userSyncId: number, currentProvider: Provider) => void
 ) => {
   if (!!existingConnections.length && !fromAddKnowledge) {
     return (
@@ -76,7 +76,9 @@ const renderExistingConnections = (
             <ConnectionButton
               label={connection.name}
               index={index}
-              onClick={() => handleGetSyncFiles(connection.id)}
+              onClick={() =>
+                handleGetSyncFiles(connection.id, connection.provider)
+              }
             />
           </div>
         ))}
@@ -96,7 +98,8 @@ export const ConnectionSection = ({
   const [connectionModalOpened, setConnectionModalOpened] =
     useState<boolean>(false);
   const { iconUrls, getUserSyncs, getSyncFiles } = useSync();
-  const { setCurrentSyncElements } = useFromConnectionsContext();
+  const { setCurrentSyncElements, setCurrentProvider } =
+    useFromConnectionsContext();
   const [existingConnections, setExistingConnections] = useState<Sync[]>([]);
   const [folded, setFolded] = useState<boolean>(!fromAddKnowledge);
 
@@ -115,11 +118,14 @@ export const ConnectionSection = ({
     })();
   }, []);
 
-  const handleGetSyncFiles = async (userSyncId: number) => {
+  const handleGetSyncFiles = async (
+    userSyncId: number,
+    currentProvider: Provider
+  ) => {
     try {
       const res = await getSyncFiles(userSyncId);
       setCurrentSyncElements(res);
-      console.info(res);
+      setCurrentProvider(currentProvider);
     } catch (error) {
       console.error("Failed to get sync files:", error);
     }
@@ -161,7 +167,8 @@ export const ConnectionSection = ({
           folded,
           setFolded,
           !!fromAddKnowledge,
-          (userSyncId) => void handleGetSyncFiles(userSyncId)
+          (userSyncId: number, currentProvider: Provider) =>
+            void handleGetSyncFiles(userSyncId, currentProvider)
         )}
       </div>
       <ConnectionModal

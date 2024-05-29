@@ -10,7 +10,7 @@ import styles from "./AddBrainModal.module.scss";
 import { useBrainCreationContext } from "./brainCreation-provider";
 import { BrainMainInfosStep } from "./components/BrainMainInfosStep/BrainMainInfosStep";
 import { BrainRecapStep } from "./components/BrainRecapStep/BrainRecapStep";
-import { CreateBrainStep } from "./components/CreateBrainStep/CreateBrainStep";
+import { FeedBrainStep } from "./components/FeedBrainStep/FeedBrainStep";
 import { Stepper } from "./components/Stepper/Stepper";
 import { useBrainCreationSteps } from "./hooks/useBrainCreationSteps";
 import { CreateBrainProps } from "./types/types";
@@ -57,7 +57,7 @@ export const AddBrainModal = (): JSX.Element => {
           </div>
           <div className={styles.content_wrapper}>
             <BrainMainInfosStep />
-            <CreateBrainStep />
+            <FeedBrainStep />
             <BrainRecapStep />
           </div>
         </div>
