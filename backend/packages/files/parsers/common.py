@@ -45,7 +45,7 @@ async def process_file(
 
             parser = LlamaParse(
                 result_type="markdown",  # "markdown" and "text" are available
-                parsing_instruction="Extract the tables and checkboxes. Transform tables to key = value. You can duplicates Keys if needed. For example: Productions Fonts = 300 productions Fonts Company Desktop License = Yes for Maximum of 60 Licensed Desktop users For example checkboxes should be: Premium Activated = Yes License Premier = No If a checkbox is present for a table with multiple options.  Say Yes for the one activated and no for the one not activated.Format using headers.",
+                parsing_instruction="Extract the tables and transform checkboxes into text. Transform tables to key = value. You can duplicates Keys if needed. For example: Productions Fonts = 300 productions Fonts Company Desktop License = Yes for Maximum of 60 Licensed Desktop users For example checkboxes should be: Premium Activated = Yes License Premier = No If a checkbox is present for a table with multiple options.  Say Yes for the one activated and no for the one not activated. Format using headers.",
                 gpt4o_mode=True,
                 gpt4o_api_key=os.getenv("OPENAI_API_KEY"),
             )
