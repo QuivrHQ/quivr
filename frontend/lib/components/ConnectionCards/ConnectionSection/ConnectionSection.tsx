@@ -10,7 +10,8 @@ import { ConnectionLine } from "./ConnectionLine/ConnectionLine";
 import styles from "./ConnectionSection.module.scss";
 
 import { ConnectionIcon } from "../../ui/ConnectionIcon/ConnectionIcon";
-import Icon from "../../ui/Icon/Icon";
+import { Icon } from "../../ui/Icon/Icon";
+import { TextButton } from "../../ui/TextButton/TextButton";
 import { ConnectionModal } from "../ConnectionModal/ConnectionModal";
 
 interface ConnectionSectionProps {
@@ -19,6 +20,66 @@ interface ConnectionSectionProps {
   callback: (name: string) => Promise<{ authorization_url: string }>;
   fromAddKnowledge?: boolean;
 }
+
+const renderConnectionLines = (
+  existingConnections: Sync[],
+  folded: boolean
+) => {
+  if (!folded) {
+    return existingConnections.map((connection, index) => (
+      <div key={index}>
+        <ConnectionLine label={connection.name} index={index} />
+      </div>
+    ));
+  } else {
+    return (
+      <div className={styles.folded}>
+        {existingConnections.map((connection, index) => (
+          <div className={styles.negative_margin} key={index}>
+            <ConnectionIcon letter={connection.name[0]} index={index} />
+          </div>
+        ))}
+      </div>
+    );
+  }
+};
+
+const renderExistingConnections = (
+  existingConnections: Sync[],
+  folded: boolean,
+  setFolded: (folded: boolean) => void,
+  fromAddKnowledge: boolean
+) => {
+  if (!!existingConnections.length && !fromAddKnowledge) {
+    return (
+      <div className={styles.existing_connections}>
+        <div className={styles.existing_connections_header}>
+          <span className={styles.label}>Connected accounts</span>
+          <Icon
+            name="settings"
+            size="normal"
+            color="black"
+            handleHover={true}
+            onClick={() => setFolded(!folded)}
+          />
+        </div>
+        {renderConnectionLines(existingConnections, folded)}
+      </div>
+    );
+  } else if (existingConnections.length > 0 && fromAddKnowledge) {
+    return (
+      <div className={styles.existing_connections}>
+        {existingConnections.map((connection, index) => (
+          <div key={index}>
+            <ConnectionButton label={connection.name} index={index} />
+          </div>
+        ))}
+      </div>
+    );
+  } else {
+    return null;
+  }
+};
 
 export const ConnectionSection = ({
   label,
@@ -60,50 +121,30 @@ export const ConnectionSection = ({
             />
             <span className={styles.label}>{label}</span>
           </div>
-          <QuivrButton
-            iconName={existingConnections.length ? "add" : "sync"}
-            label={existingConnections.length ? "Add more" : "Connect"}
-            color="primary"
-            onClick={() => setConnectionModalOpened(true)}
-            small={true}
-          />
+          {!fromAddKnowledge ? (
+            <QuivrButton
+              iconName={existingConnections.length ? "add" : "sync"}
+              label={existingConnections.length ? "Add more" : "Connect"}
+              color="primary"
+              onClick={() => setConnectionModalOpened(true)}
+              small={true}
+            />
+          ) : (
+            <TextButton
+              iconName={existingConnections.length ? "add" : "sync"}
+              label={existingConnections.length ? "Add more" : "Connect"}
+              color="black"
+              onClick={() => setConnectionModalOpened(true)}
+              small={true}
+            />
+          )}
         </div>
-        {!!existingConnections.length && !fromAddKnowledge && (
-          <div className={styles.existing_connections}>
-            <div className={styles.existing_connections_header}>
-              <span className={styles.label}>Connected accounts</span>
-              <Icon
-                name="settings"
-                size="normal"
-                color="black"
-                handleHover={true}
-                onClick={() => setFolded(!folded)}
-              />
-            </div>
-            {!folded ? (
-              existingConnections.map((connection, index) => (
-                <div key={index}>
-                  <ConnectionLine label={connection.name} index={index} />
-                </div>
-              ))
-            ) : (
-              <div className={styles.folded}>
-                {existingConnections.map((connection, index) => (
-                  <div className={styles.negative_margin} key={index}>
-                    <ConnectionIcon letter={connection.name[0]} index={index} />
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
+        {renderExistingConnections(
+          existingConnections,
+          folded,
+          setFolded,
+          !!fromAddKnowledge
         )}
-        {!!existingConnections.length &&
-          fromAddKnowledge &&
-          existingConnections.map((connection, index) => (
-            <div key={index}>
-              <ConnectionButton label={connection.name} index={index} />
-            </div>
-          ))}
       </div>
       <ConnectionModal
         modalOpened={connectionModalOpened}

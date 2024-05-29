@@ -1,5 +1,5 @@
 import { ConnectionIcon } from "@/lib/components/ui/ConnectionIcon/ConnectionIcon";
-import Icon from "@/lib/components/ui/Icon/Icon";
+import QuivrButton from "@/lib/components/ui/QuivrButton/QuivrButton";
 
 import styles from "./ConnectionButton.module.scss";
 
@@ -18,18 +18,12 @@ export const ConnectionButton = ({
         <ConnectionIcon letter={label[0]} index={index} />
         <span className={styles.label}>{label}</span>
       </div>
-      <div className={styles.icons}>
-        <Icon
-          name="uploadFile"
-          size="normal"
-          color="black"
-          handleHover={true}
-        />
-        <Icon
-          name="delete"
-          size="normal"
-          color="dangerous"
-          handleHover={true}
+      <div className={styles.button_wrapper}>
+        <QuivrButton
+          label="Use"
+          small={true}
+          iconName="chevronRight"
+          color="primary"
         />
       </div>
     </div>
