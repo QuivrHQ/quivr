@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { useEffect, useState } from "react";
 
+import { useFromConnectionsContext } from "@/app/chat/[chatId]/components/ActionsBar/components/KnowledgeToFeed/components/FromConnections/FromConnectionsProvider/hooks/useFromConnectionContext";
 import { Provider, Sync } from "@/lib/api/sync/types";
 import { useSync } from "@/lib/api/sync/useSync";
 import QuivrButton from "@/lib/components/ui/QuivrButton/QuivrButton";
@@ -48,7 +49,8 @@ const renderExistingConnections = (
   existingConnections: Sync[],
   folded: boolean,
   setFolded: (folded: boolean) => void,
-  fromAddKnowledge: boolean
+  fromAddKnowledge: boolean,
+  handleGetSyncFiles: (userSyncId: number) => void
 ) => {
   if (!!existingConnections.length && !fromAddKnowledge) {
     return (
@@ -71,7 +73,11 @@ const renderExistingConnections = (
       <div className={styles.existing_connections}>
         {existingConnections.map((connection, index) => (
           <div key={index}>
-            <ConnectionButton label={connection.name} index={index} />
+            <ConnectionButton
+              label={connection.name}
+              index={index}
+              onClick={() => handleGetSyncFiles(connection.id)}
+            />
           </div>
         ))}
       </div>
@@ -89,7 +95,8 @@ export const ConnectionSection = ({
 }: ConnectionSectionProps): JSX.Element => {
   const [connectionModalOpened, setConnectionModalOpened] =
     useState<boolean>(false);
-  const { iconUrls, getUserSyncs } = useSync();
+  const { iconUrls, getUserSyncs, getSyncFiles } = useSync();
+  const { setCurrentSyncElements } = useFromConnectionsContext();
   const [existingConnections, setExistingConnections] = useState<Sync[]>([]);
   const [folded, setFolded] = useState<boolean>(!fromAddKnowledge);
 
@@ -107,6 +114,16 @@ export const ConnectionSection = ({
       }
     })();
   }, []);
+
+  const handleGetSyncFiles = async (userSyncId: number) => {
+    try {
+      const res = await getSyncFiles(userSyncId);
+      setCurrentSyncElements(res);
+      console.info(res);
+    } catch (error) {
+      console.error("Failed to get sync files:", error);
+    }
+  };
 
   return (
     <>
@@ -143,7 +160,8 @@ export const ConnectionSection = ({
           existingConnections,
           folded,
           setFolded,
-          !!fromAddKnowledge
+          !!fromAddKnowledge,
+          (userSyncId) => void handleGetSyncFiles(userSyncId)
         )}
       </div>
       <ConnectionModal

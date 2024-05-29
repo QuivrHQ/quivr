@@ -6,7 +6,7 @@ import styles from "./ConnectionButton.module.scss";
 interface ConnectionButtonProps {
   label: string;
   index: number;
-  onClick?: () => void;
+  onClick: (id: number) => void;
 }
 
 export const ConnectionButton = ({
@@ -26,7 +26,7 @@ export const ConnectionButton = ({
           small={true}
           iconName="chevronRight"
           color="primary"
-          onClick={onClick}
+          onClick={() => onClick(index)}
         />
       </div>
     </div>

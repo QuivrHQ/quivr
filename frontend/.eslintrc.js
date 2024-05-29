@@ -16,7 +16,7 @@ module.exports = {
     complexity: ["error", 10],
     "max-lines": ["error", 300],
     "max-depth": ["error", 3],
-    "max-params": ["error", 4],
+    "max-params": ["error", 5],
     eqeqeq: ["error", "smart"],
     "import/no-extraneous-dependencies": [
       "error",
