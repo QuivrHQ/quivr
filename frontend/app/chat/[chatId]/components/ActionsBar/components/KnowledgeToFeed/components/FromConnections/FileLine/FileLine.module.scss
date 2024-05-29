@@ -1,0 +1,14 @@
+@use "@/styles/Spacings.module.scss";
+@use "@/styles/Typography.module.scss";
+
+.file_line_wrapper {
+  display: flex;
+  gap: Spacings.$spacing03;
+  padding-block: Spacings.$spacing03;
+  border-top: 1px solid var(--border-1);
+  align-items: center;
+
+  .file_name {
+    font-size: Typography.$small;
+  }
+}
