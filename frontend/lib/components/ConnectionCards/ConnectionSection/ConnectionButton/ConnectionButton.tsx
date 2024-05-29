@@ -6,11 +6,13 @@ import styles from "./ConnectionButton.module.scss";
 interface ConnectionButtonProps {
   label: string;
   index: number;
+  onClick?: () => void;
 }
 
 export const ConnectionButton = ({
   label,
   index,
+  onClick,
 }: ConnectionButtonProps): JSX.Element => {
   return (
     <div className={styles.connection_button_wrapper}>
@@ -24,6 +26,7 @@ export const ConnectionButton = ({
           small={true}
           iconName="chevronRight"
           color="primary"
+          onClick={onClick}
         />
       </div>
     </div>
