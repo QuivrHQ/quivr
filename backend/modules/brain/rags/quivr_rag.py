@@ -6,8 +6,7 @@ from uuid import UUID
 
 from langchain.chains import ConversationalRetrievalChain
 from langchain.llms.base import BaseLLM
-from langchain.prompts import (HumanMessagePromptTemplate,
-                               SystemMessagePromptTemplate)
+from langchain.prompts import HumanMessagePromptTemplate, SystemMessagePromptTemplate
 from langchain.retrievers import ContextualCompressionRetriever
 from langchain.retrievers.document_compressors import FlashrankRerank
 from langchain.schema import format_document
@@ -89,7 +88,8 @@ system_message_template = (
 )
 
 system_message_template += """
-When answering use markdown neat.
+When answering use markdown.
+Use markdown code blocks for code snippets.
 Answer in a concise and clear manner.
 Use the following pieces of context from files provided by the user to answer the users.
 Answer in the same language as the user question.
