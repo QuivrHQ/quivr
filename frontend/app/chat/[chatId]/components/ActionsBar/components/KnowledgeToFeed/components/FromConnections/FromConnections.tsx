@@ -96,7 +96,10 @@ export const FromConnections = (): JSX.Element => {
                   void handleFolderClick(currentSyncId, folder.id);
                 }}
               >
-                <FolderLine name={folder.name} />
+                <FolderLine
+                  name={folder.name}
+                  selectable={selectSpecificFiles}
+                />
               </div>
             ))}
             {currentFiles.map((file) => (
