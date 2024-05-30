@@ -13,11 +13,11 @@
     border-radius: Radius.$big;
     height: 18px;
     width: 42px;
-    background-color: var(--background-special-0);
+    background-color: var(--primary-2);
     cursor: pointer;
 
     &.checked {
-      background-color: var(--background-special-1);
+      background-color: var(--primary-1);
 
       .slider_bubble {
         margin-left: 26px;
@@ -31,7 +31,7 @@
       height: 14px;
       width: 14px;
       border-radius: Radius.$circle;
-      background-color: var(--background-special-1);
+      background-color: var(--primary-1);
       transition: margin-left 0.2s ease-in-out;
     }
   }
