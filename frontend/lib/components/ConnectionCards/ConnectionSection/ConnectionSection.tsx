@@ -98,8 +98,7 @@ export const ConnectionSection = ({
   const [connectionModalOpened, setConnectionModalOpened] =
     useState<boolean>(false);
   const { iconUrls, getUserSyncs, getSyncFiles } = useSync();
-  const { setCurrentSyncElements, setCurrentProvider } =
-    useFromConnectionsContext();
+  const { setCurrentSyncElements } = useFromConnectionsContext();
   const [existingConnections, setExistingConnections] = useState<Sync[]>([]);
   const [folded, setFolded] = useState<boolean>(!fromAddKnowledge);
 
@@ -118,14 +117,10 @@ export const ConnectionSection = ({
     })();
   }, []);
 
-  const handleGetSyncFiles = async (
-    userSyncId: number,
-    currentProvider: Provider
-  ) => {
+  const handleGetSyncFiles = async (userSyncId: number) => {
     try {
       const res = await getSyncFiles(userSyncId);
       setCurrentSyncElements(res);
-      setCurrentProvider(currentProvider);
     } catch (error) {
       console.error("Failed to get sync files:", error);
     }
@@ -167,8 +162,7 @@ export const ConnectionSection = ({
           folded,
           setFolded,
           !!fromAddKnowledge,
-          (userSyncId: number, currentProvider: Provider) =>
-            void handleGetSyncFiles(userSyncId, currentProvider)
+          (userSyncId: number) => void handleGetSyncFiles(userSyncId)
         )}
       </div>
       <ConnectionModal

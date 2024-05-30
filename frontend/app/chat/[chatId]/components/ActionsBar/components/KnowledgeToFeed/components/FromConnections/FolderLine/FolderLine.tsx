@@ -4,6 +4,7 @@ import styles from "./FolderLine.module.scss";
 
 interface FolderLineProps {
   name: string;
+  onClick?: () => void;
 }
 
 export const FolderLine = ({ name }: FolderLineProps): JSX.Element => {

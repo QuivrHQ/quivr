@@ -7,8 +7,14 @@
   padding-block: Spacings.$spacing03;
   border-top: 1px solid var(--border-1);
   align-items: center;
+  cursor: pointer;
+  font-weight: 500;
 
   .folder_name {
     font-size: Typography.$small;
+  }
+
+  &:hover {
+    background-color: var(--background-3);
   }
 }
