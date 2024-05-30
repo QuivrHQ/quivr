@@ -98,7 +98,8 @@ export const ConnectionSection = ({
   const [connectionModalOpened, setConnectionModalOpened] =
     useState<boolean>(false);
   const { iconUrls, getUserSyncs, getSyncFiles } = useSync();
-  const { setCurrentSyncElements } = useFromConnectionsContext();
+  const { setCurrentSyncElements, setCurrentSyncId } =
+    useFromConnectionsContext();
   const [existingConnections, setExistingConnections] = useState<Sync[]>([]);
   const [folded, setFolded] = useState<boolean>(!fromAddKnowledge);
 
@@ -121,6 +122,7 @@ export const ConnectionSection = ({
     try {
       const res = await getSyncFiles(userSyncId);
       setCurrentSyncElements(res);
+      setCurrentSyncId(userSyncId);
     } catch (error) {
       console.error("Failed to get sync files:", error);
     }

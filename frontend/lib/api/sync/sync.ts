@@ -32,11 +32,12 @@ export const getUserSyncs = async (
 
 export const getSyncFiles = async (
   axiosInstance: AxiosInstance,
-  userSyncId: number
+  userSyncId: number,
+  folderId?: string
 ): Promise<SyncElements> => {
-  return (
-    await axiosInstance.get<SyncElements>(
-      `/sync/${userSyncId}/files?user_sync_id=${userSyncId}`
-    )
-  ).data;
+  const url = folderId
+    ? `/sync/${userSyncId}/files?user_sync_id=${userSyncId}&folder_id=${folderId}`
+    : `/sync/${userSyncId}/files?user_sync_id=${userSyncId}`;
+
+  return (await axiosInstance.get<SyncElements>(url)).data;
 };

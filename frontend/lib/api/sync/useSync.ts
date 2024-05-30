@@ -24,8 +24,8 @@ export const useSync = () => {
       syncGoogleDrive(name, axiosInstance),
     syncSharepoint: async (name: string) => syncSharepoint(name, axiosInstance),
     getUserSyncs: async () => getUserSyncs(axiosInstance),
-    getSyncFiles: async (userSyncId: number) =>
-      getSyncFiles(axiosInstance, userSyncId),
+    getSyncFiles: async (userSyncId: number, folderId?: string) =>
+      getSyncFiles(axiosInstance, userSyncId, folderId),
     iconUrls,
   };
 };

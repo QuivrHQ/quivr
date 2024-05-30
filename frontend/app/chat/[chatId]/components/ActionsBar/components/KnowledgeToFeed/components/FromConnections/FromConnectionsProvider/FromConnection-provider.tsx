@@ -7,6 +7,8 @@ export type FromConnectionsContextType = {
   setCurrentSyncElements: React.Dispatch<
     React.SetStateAction<SyncElements | undefined>
   >;
+  currentSyncId: number | undefined;
+  setCurrentSyncId: React.Dispatch<React.SetStateAction<number | undefined>>;
 };
 
 export const FromConnectionsContext = createContext<
@@ -21,12 +23,17 @@ export const FromConnectionsProvider = ({
   const [currentSyncElements, setCurrentSyncElements] = useState<
     SyncElements | undefined
   >(undefined);
+  const [currentSyncId, setCurrentSyncId] = useState<number | undefined>(
+    undefined
+  );
 
   return (
     <FromConnectionsContext.Provider
       value={{
         currentSyncElements,
         setCurrentSyncElements,
+        currentSyncId,
+        setCurrentSyncId,
       }}
     >
       {children}
