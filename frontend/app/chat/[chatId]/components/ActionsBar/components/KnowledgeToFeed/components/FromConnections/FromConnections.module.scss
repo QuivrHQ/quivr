@@ -1,19 +1,24 @@
 @use "@/styles/Spacings.module.scss";
 
-.from_connection_wrapper {
-  display: flex;
-  flex-direction: column;
-  gap: Spacings.$spacing06;
-  overflow: hidden;
-  max-height: 100%;
+.from_connection_container {
+  overflow: auto;
+  height: 100%;
 
-  .header_buttons {
+  .from_connection_wrapper {
     display: flex;
-    justify-content: space-between;
-  }
+    flex-direction: column;
+    gap: Spacings.$spacing06;
+    overflow: hidden;
+    max-height: 100%;
 
-  .connection_content {
-    overflow: auto;
-    flex-grow: 1;
+    .header_buttons {
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .connection_content {
+      overflow: auto;
+      flex-grow: 1;
+    }
   }
 }

@@ -66,7 +66,7 @@ export const FromConnections = (): JSX.Element => {
   };
 
   return (
-    <div>
+    <div className={styles.from_connection_container}>
       {!currentSyncElements?.files.length || !currentSyncId ? (
         <ConnectionCards fromAddKnowledge={true} />
       ) : (
