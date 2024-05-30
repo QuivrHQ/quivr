@@ -4,4 +4,9 @@
   display: flex;
   flex-direction: column;
   gap: Spacings.$spacing06;
+
+  .header_buttons {
+    display: flex;
+    justify-content: space-between;
+  }
 }

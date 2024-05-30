@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 
 import { SyncElement } from "@/lib/api/sync/types";
 import { ConnectionCards } from "@/lib/components/ConnectionCards/ConnectionCards";
+import SwitchButton from "@/lib/components/ui/SwitchButton/SwitchButton";
 import TextButton from "@/lib/components/ui/TextButton/TextButton";
 
 import { FileLine } from "./FileLine/FileLine";
@@ -14,9 +15,10 @@ export const FromConnections = (): JSX.Element => {
     useFromConnectionsContext();
   const [currentFiles, setCurrentFiles] = useState<SyncElement[]>([]);
   const [currentFolders, setCurrentFolders] = useState<SyncElement[]>([]);
+  const [selectSpecificFiles, setselectSpecificFiles] =
+    useState<boolean>(false);
 
   useEffect(() => {
-    console.info(currentSyncElements);
     setCurrentFiles(
       currentSyncElements?.files.filter((file) => !file.is_folder) ?? []
     );
@@ -31,15 +33,22 @@ export const FromConnections = (): JSX.Element => {
         <ConnectionCards fromAddKnowledge={true} />
       ) : (
         <div className={styles.from_connection_wrapper}>
-          <TextButton
-            label="Back"
-            iconName="chevronLeft"
-            color="black"
-            onClick={() => {
-              setCurrentSyncElements({ files: [] });
-            }}
-            small={true}
-          />
+          <div className={styles.header_buttons}>
+            <TextButton
+              label="Back"
+              iconName="chevronLeft"
+              color="black"
+              onClick={() => {
+                setCurrentSyncElements({ files: [] });
+              }}
+              small={true}
+            />
+            <SwitchButton
+              label="Select specific files"
+              checked={selectSpecificFiles}
+              setChecked={setselectSpecificFiles}
+            />
+          </div>
           <div className={styles.connection_content}>
             {currentFolders.map((folder) => (
               <div key={folder.id}>
