@@ -48,7 +48,7 @@ export const FeedBrainStep = (): JSX.Element => {
           onClick={previous}
         />
         <QuivrButton
-          label="Previous step"
+          label="Next step"
           color="primary"
           iconName="chevronRight"
           onClick={next}

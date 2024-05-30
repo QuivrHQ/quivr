@@ -27,13 +27,15 @@ export const FromDocuments = (): JSX.Element => {
       onMouseLeave={() => setDragging(false)}
       onClick={open}
     >
-      <Icon name="upload" size="big" color={dragging ? "accent" : "black"} />
-      <div className={styles.input}>
-        <div className={styles.clickable}>
-          <span>Choose files</span>
-          <input {...getInputProps()} />
+      <div className={styles.box_content}>
+        <Icon name="upload" size="big" color={dragging ? "accent" : "black"} />
+        <div className={styles.input}>
+          <div className={styles.clickable}>
+            <span>Choose files</span>
+            <input {...getInputProps()} />
+          </div>
+          <span>or drag it here</span>
         </div>
-        <span>or drag it here</span>
       </div>
     </div>
   );

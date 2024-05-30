@@ -9,17 +9,14 @@
   height: 100%;
 
   .feed_brain {
+    display: flex;
+    flex-direction: column;
+    overflow: scroll;
     height: 100%;
 
     .title {
       @include Typography.H2;
     }
-  }
-
-  .settings_wrapper {
-    display: flex;
-    flex-direction: column;
-    gap: Spacings.$spacing05;
   }
 
   .message_info_box_wrapper {

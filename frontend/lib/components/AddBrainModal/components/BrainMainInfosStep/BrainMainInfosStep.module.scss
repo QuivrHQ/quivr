@@ -8,6 +8,7 @@
   justify-content: space-between;
   height: 100%;
   padding-inline: Spacings.$spacing08;
+  gap: Spacings.$spacing03;
 
   .title {
     @include Typography.H2;
@@ -17,6 +18,7 @@
     display: flex;
     flex-direction: column;
     gap: Spacings.$spacing05;
+    overflow: scroll;
 
     .name_field {
       width: 300px;
