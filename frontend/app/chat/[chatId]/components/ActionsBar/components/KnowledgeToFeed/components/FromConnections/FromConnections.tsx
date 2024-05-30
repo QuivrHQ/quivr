@@ -12,6 +12,7 @@ import styles from "./FromConnections.module.scss";
 import { useFromConnectionsContext } from "./FromConnectionsProvider/hooks/useFromConnectionContext";
 
 export const FromConnections = (): JSX.Element => {
+  const [folderStack, setFolderStack] = useState<(string | null)[]>([]);
   const { currentSyncElements, setCurrentSyncElements, currentSyncId } =
     useFromConnectionsContext();
   const [currentFiles, setCurrentFiles] = useState<SyncElement[]>([]);
@@ -29,14 +30,39 @@ export const FromConnections = (): JSX.Element => {
     );
   }, [currentSyncElements]);
 
-  const handleGetSyncFiles = async (userSyncId: number, folderId: string) => {
+  const handleGetSyncFiles = async (
+    userSyncId: number,
+    folderId: string | null
+  ) => {
     try {
-      const res = await getSyncFiles(userSyncId, folderId);
+      let res;
+      if (folderId !== null) {
+        res = await getSyncFiles(userSyncId, folderId);
+      } else {
+        res = await getSyncFiles(userSyncId);
+      }
       setCurrentSyncElements(res);
       console.info(res);
     } catch (error) {
       console.error("Failed to get sync files:", error);
     }
+  };
+
+  const handleBackClick = async () => {
+    if (folderStack.length > 0 && currentSyncId) {
+      const newFolderStack = [...folderStack];
+      newFolderStack.pop();
+      setFolderStack(newFolderStack);
+      const parentFolderId = newFolderStack[newFolderStack.length - 1];
+      await handleGetSyncFiles(currentSyncId, parentFolderId);
+    } else {
+      setCurrentSyncElements({ files: [] });
+    }
+  };
+
+  const handleFolderClick = async (userSyncId: number, folderId: string) => {
+    setFolderStack([...folderStack, folderId]); // Add folderId to stack
+    await handleGetSyncFiles(userSyncId, folderId);
   };
 
   return (
@@ -51,9 +77,10 @@ export const FromConnections = (): JSX.Element => {
               iconName="chevronLeft"
               color="black"
               onClick={() => {
-                setCurrentSyncElements({ files: [] });
+                void handleBackClick();
               }}
               small={true}
+              disabled={!folderStack.length}
             />
             <SwitchButton
               label="Select specific files"
@@ -66,7 +93,7 @@ export const FromConnections = (): JSX.Element => {
               <div
                 key={folder.id}
                 onClick={() => {
-                  void handleGetSyncFiles(currentSyncId, folder.id);
+                  void handleFolderClick(currentSyncId, folder.id);
                 }}
               >
                 <FolderLine name={folder.name} />
