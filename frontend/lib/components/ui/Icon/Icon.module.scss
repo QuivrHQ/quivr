@@ -1,5 +1,12 @@
 @use "@/styles/IconSizes.module.scss";
 
+.tiny {
+  min-width: IconSizes.$tiny;
+  min-height: IconSizes.$tiny;
+  max-width: IconSizes.$tiny;
+  max-height: IconSizes.$tiny;
+}
+
 .small {
   min-width: IconSizes.$small;
   min-height: IconSizes.$small;

@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 
 import styles from "./Checkbox.module.scss";
 
+import { Icon } from "../Icon/Icon";
+
 interface CheckboxProps {
   label?: string;
   checked: boolean;
@@ -29,7 +31,9 @@ export const Checkbox = ({
     >
       <div
         className={`${styles.checkbox} ${currentChecked ? styles.filled : ""}`}
-      ></div>
+      >
+        {currentChecked && <Icon name="check" size="tiny" color="white" />}
+      </div>
       {label && <span>{label}</span>}
     </div>
   );

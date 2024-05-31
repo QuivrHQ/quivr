@@ -12,9 +12,16 @@
     height: 16px;
     border: 1px solid var(--border-2);
     border-radius: Radius.$small;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 
     &.filled {
       background-color: var(--primary-0);
     }
+  }
+
+  &:hover {
+    background-color: var(--background-3);
   }
 }

@@ -3,6 +3,7 @@
 .from_connection_container {
   overflow: auto;
   height: 100%;
+  padding: Spacings.$spacing01;
 
   .from_connection_wrapper {
     display: flex;
