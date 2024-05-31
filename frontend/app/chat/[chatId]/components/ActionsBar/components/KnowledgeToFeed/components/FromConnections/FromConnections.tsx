@@ -106,12 +106,17 @@ export const FromConnections = (): JSX.Element => {
                 <FolderLine
                   name={folder.name}
                   selectable={selectSpecificFiles}
+                  id={folder.id}
                 />
               </div>
             ))}
             {currentFiles.map((file) => (
               <div key={file.id}>
-                <FileLine name={file.name} selectable={selectSpecificFiles} />
+                <FileLine
+                  name={file.name}
+                  selectable={selectSpecificFiles}
+                  id={file.id}
+                />
               </div>
             ))}
           </div>
