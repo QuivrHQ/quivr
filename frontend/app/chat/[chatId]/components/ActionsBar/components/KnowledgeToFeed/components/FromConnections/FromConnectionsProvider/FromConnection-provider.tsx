@@ -1,6 +1,14 @@
 import { createContext, useState } from "react";
 
-import { SyncElements } from "@/lib/api/sync/types";
+import { Provider, SyncElements } from "@/lib/api/sync/types";
+
+export interface OpenedConnection {
+  id: number;
+  provider: Provider;
+  submitted: boolean;
+  allFiles: boolean;
+  selectedFiles: string[];
+}
 
 export type FromConnectionsContextType = {
   currentSyncElements: SyncElements | undefined;
@@ -9,6 +17,10 @@ export type FromConnectionsContextType = {
   >;
   currentSyncId: number | undefined;
   setCurrentSyncId: React.Dispatch<React.SetStateAction<number | undefined>>;
+  openedConnections: OpenedConnection[];
+  setOpenedConnections: React.Dispatch<
+    React.SetStateAction<OpenedConnection[]>
+  >;
 };
 
 export const FromConnectionsContext = createContext<
@@ -26,6 +38,9 @@ export const FromConnectionsProvider = ({
   const [currentSyncId, setCurrentSyncId] = useState<number | undefined>(
     undefined
   );
+  const [openedConnections, setOpenedConnections] = useState<
+    OpenedConnection[]
+  >([]);
 
   return (
     <FromConnectionsContext.Provider
@@ -34,6 +49,8 @@ export const FromConnectionsProvider = ({
         setCurrentSyncElements,
         currentSyncId,
         setCurrentSyncId,
+        openedConnections,
+        setOpenedConnections,
       }}
     >
       {children}

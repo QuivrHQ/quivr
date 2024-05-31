@@ -19,6 +19,11 @@
     .connection_content {
       overflow: auto;
       flex-grow: 1;
+
+      &.disable {
+        opacity: 0.5;
+        pointer-events: none;
+      }
     }
   }
 }

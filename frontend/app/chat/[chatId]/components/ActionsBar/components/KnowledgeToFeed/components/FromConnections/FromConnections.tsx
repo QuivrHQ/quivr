@@ -88,7 +88,11 @@ export const FromConnections = (): JSX.Element => {
               setChecked={setselectSpecificFiles}
             />
           </div>
-          <div className={styles.connection_content}>
+          <div
+            className={`${styles.connection_content} ${
+              !selectSpecificFiles ? styles.disable : ""
+            }`}
+          >
             {currentFolders.map((folder) => (
               <div
                 key={folder.id}
@@ -104,7 +108,7 @@ export const FromConnections = (): JSX.Element => {
             ))}
             {currentFiles.map((file) => (
               <div key={file.id}>
-                <FileLine name={file.name} />
+                <FileLine name={file.name} selectable={selectSpecificFiles} />
               </div>
             ))}
           </div>

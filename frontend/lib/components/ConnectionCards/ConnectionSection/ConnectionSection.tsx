@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { useEffect, useState } from "react";
 
+import { OpenedConnection } from "@/app/chat/[chatId]/components/ActionsBar/components/KnowledgeToFeed/components/FromConnections/FromConnectionsProvider/FromConnection-provider";
 import { useFromConnectionsContext } from "@/app/chat/[chatId]/components/ActionsBar/components/KnowledgeToFeed/components/FromConnections/FromConnectionsProvider/hooks/useFromConnectionContext";
 import { Provider, Sync } from "@/lib/api/sync/types";
 import { useSync } from "@/lib/api/sync/useSync";
@@ -98,8 +99,12 @@ export const ConnectionSection = ({
   const [connectionModalOpened, setConnectionModalOpened] =
     useState<boolean>(false);
   const { iconUrls, getUserSyncs, getSyncFiles } = useSync();
-  const { setCurrentSyncElements, setCurrentSyncId } =
-    useFromConnectionsContext();
+  const {
+    setCurrentSyncElements,
+    setCurrentSyncId,
+    setOpenedConnections,
+    openedConnections,
+  } = useFromConnectionsContext();
   const [existingConnections, setExistingConnections] = useState<Sync[]>([]);
   const [folded, setFolded] = useState<boolean>(!fromAddKnowledge);
 
@@ -118,11 +123,30 @@ export const ConnectionSection = ({
     })();
   }, []);
 
+  const handleOpenedConnections = (userSyncId: number) => {
+    const existingConnection = openedConnections.find(
+      (connection) => connection.id === userSyncId
+    );
+
+    if (!existingConnection) {
+      const newConnection: OpenedConnection = {
+        id: userSyncId,
+        provider: provider,
+        submitted: false,
+        allFiles: true,
+        selectedFiles: [],
+      };
+
+      setOpenedConnections([...openedConnections, newConnection]);
+    }
+  };
+
   const handleGetSyncFiles = async (userSyncId: number) => {
     try {
       const res = await getSyncFiles(userSyncId);
       setCurrentSyncElements(res);
       setCurrentSyncId(userSyncId);
+      handleOpenedConnections(userSyncId);
     } catch (error) {
       console.error("Failed to get sync files:", error);
     }
