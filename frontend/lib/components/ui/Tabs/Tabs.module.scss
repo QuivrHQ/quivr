@@ -1,6 +1,7 @@
 @use "@/styles/Radius.module.scss";
 @use "@/styles/ScreenSizes.module.scss";
 @use "@/styles/Spacings.module.scss";
+@use "@/styles/Typography.module.scss";
 
 .tabs_container {
   display: flex;
@@ -35,6 +36,24 @@
     @media (max-width: ScreenSizes.$small) {
       .label {
         display: none;
+      }
+    }
+
+    .label_wrapper {
+      display: flex;
+      position: relative;
+      gap: Spacings.$spacing02;
+
+      .label_badge {
+        border-radius: Radius.$circle;
+        width: 16px;
+        height: 16px;
+        color: var(--white-0);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: var(--primary-0);
+        font-size: Typography.$very-tiny;
       }
     }
   }

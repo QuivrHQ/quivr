@@ -4,10 +4,12 @@ import { SingleSelector } from "@/lib/components/ui/SingleSelector/SingleSelecto
 import { Tabs } from "@/lib/components/ui/Tabs/Tabs";
 import { requiredRolesForUpload } from "@/lib/config/upload";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
+import { useKnowledgeToFeedContext } from "@/lib/context/KnowledgeToFeedProvider/hooks/useKnowledgeToFeedContext";
 import { Tab } from "@/lib/types/Tab";
 
 import styles from "./KnowledgeToFeed.module.scss";
 import { FromConnections } from "./components/FromConnections/FromConnections";
+import { useFromConnectionsContext } from "./components/FromConnections/FromConnectionsProvider/hooks/useFromConnectionContext";
 import { FromDocuments } from "./components/FromDocuments/FromDocuments";
 import { FromWebsites } from "./components/FromWebsites/FromWebsites";
 import { formatMinimalBrainsToSelectComponentInput } from "./utils/formatMinimalBrainsToSelectComponentInput";
@@ -19,6 +21,8 @@ export const KnowledgeToFeed = ({
 }): JSX.Element => {
   const { allBrains, setCurrentBrainId, currentBrain } = useBrainContext();
   const [selectedTab, setSelectedTab] = useState("Documents");
+  const { knowledgeToFeed } = useKnowledgeToFeedContext();
+  const { openedConnections } = useFromConnectionsContext();
 
   const brainsWithUploadRights = formatMinimalBrainsToSelectComponentInput(
     useMemo(
@@ -37,18 +41,24 @@ export const KnowledgeToFeed = ({
       isSelected: selectedTab === "Documents",
       onClick: () => setSelectedTab("Documents"),
       iconName: "file",
+      badge: knowledgeToFeed.filter(
+        (knowledge) => knowledge.source === "upload"
+      ).length,
     },
     {
       label: "Websites",
       isSelected: selectedTab === "Websites",
       onClick: () => setSelectedTab("Websites"),
       iconName: "website",
+      badge: knowledgeToFeed.filter((knowledge) => knowledge.source === "crawl")
+        .length,
     },
     {
       label: "Connections",
       isSelected: selectedTab === "Connections",
       onClick: () => setSelectedTab("Connections"),
       iconName: "sync",
+      badge: openedConnections.length,
     },
   ];
 
