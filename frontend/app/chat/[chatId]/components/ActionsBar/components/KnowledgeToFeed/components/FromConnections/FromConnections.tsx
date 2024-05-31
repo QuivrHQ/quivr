@@ -13,12 +13,15 @@ import { useFromConnectionsContext } from "./FromConnectionsProvider/hooks/useFr
 
 export const FromConnections = (): JSX.Element => {
   const [folderStack, setFolderStack] = useState<(string | null)[]>([]);
-  const { currentSyncElements, setCurrentSyncElements, currentSyncId } =
-    useFromConnectionsContext();
+  const {
+    currentSyncElements,
+    setCurrentSyncElements,
+    currentSyncId,
+    selectSpecificFiles,
+    setSelectSpecificFiles,
+  } = useFromConnectionsContext();
   const [currentFiles, setCurrentFiles] = useState<SyncElement[]>([]);
   const [currentFolders, setCurrentFolders] = useState<SyncElement[]>([]);
-  const [selectSpecificFiles, setselectSpecificFiles] =
-    useState<boolean>(false);
   const { getSyncFiles } = useSync();
 
   useEffect(() => {
@@ -85,7 +88,7 @@ export const FromConnections = (): JSX.Element => {
             <SwitchButton
               label="Select specific files"
               checked={selectSpecificFiles}
-              setChecked={setselectSpecificFiles}
+              setChecked={setSelectSpecificFiles}
             />
           </div>
           <div

@@ -12,7 +12,8 @@ export const FeedBrainStep = (): JSX.Element => {
   const { currentStepIndex, goToPreviousStep, goToNextStep } =
     useBrainCreationSteps();
   const { userIdentityData } = useUserData();
-  const { currentSyncId, setCurrentSyncId } = useFromConnectionsContext();
+  const { currentSyncId, setCurrentSyncId, selectSpecificFiles } =
+    useFromConnectionsContext();
 
   const previous = (): void => {
     goToPreviousStep();
@@ -58,13 +59,23 @@ export const FeedBrainStep = (): JSX.Element => {
             onClick={previous}
           />
         )}
-        <QuivrButton
-          label="Next step"
-          color="primary"
-          iconName="chevronRight"
-          onClick={next}
-          important={true}
-        />
+        {currentSyncId ? (
+          <QuivrButton
+            label={selectSpecificFiles ? "Add selected files" : "Add all"}
+            color="primary"
+            iconName="add"
+            onClick={next}
+            important={true}
+          />
+        ) : (
+          <QuivrButton
+            label={"Next step"}
+            color="primary"
+            iconName="chevronRight"
+            onClick={next}
+            important={true}
+          />
+        )}
       </div>
     );
   };

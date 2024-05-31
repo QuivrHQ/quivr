@@ -24,7 +24,8 @@ export const Checkbox = ({
   return (
     <div
       className={styles.checkbox_wrapper}
-      onClick={() => {
+      onClick={(event) => {
+        event.stopPropagation();
         setChecked(!currentChecked);
         setCurrentChecked(!currentChecked);
       }}

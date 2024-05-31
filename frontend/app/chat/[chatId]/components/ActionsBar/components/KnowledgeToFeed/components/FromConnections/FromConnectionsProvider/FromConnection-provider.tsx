@@ -21,6 +21,8 @@ export type FromConnectionsContextType = {
   setOpenedConnections: React.Dispatch<
     React.SetStateAction<OpenedConnection[]>
   >;
+  selectSpecificFiles: boolean;
+  setSelectSpecificFiles: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 export const FromConnectionsContext = createContext<
@@ -41,6 +43,8 @@ export const FromConnectionsProvider = ({
   const [openedConnections, setOpenedConnections] = useState<
     OpenedConnection[]
   >([]);
+  const [selectSpecificFiles, setSelectSpecificFiles] =
+    useState<boolean>(false);
 
   return (
     <FromConnectionsContext.Provider
@@ -51,6 +55,8 @@ export const FromConnectionsProvider = ({
         setCurrentSyncId,
         openedConnections,
         setOpenedConnections,
+        selectSpecificFiles,
+        setSelectSpecificFiles,
       }}
     >
       {children}
