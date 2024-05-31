@@ -1,3 +1,4 @@
+import { useFromConnectionsContext } from "@/app/chat/[chatId]/components/ActionsBar/components/KnowledgeToFeed/components/FromConnections/FromConnectionsProvider/hooks/useFromConnectionContext";
 import { useUserApi } from "@/lib/api/user/useUserApi";
 import QuivrButton from "@/lib/components/ui/QuivrButton/QuivrButton";
 import { useKnowledgeToFeedContext } from "@/lib/context/KnowledgeToFeedProvider/hooks/useKnowledgeToFeedContext";
@@ -17,6 +18,7 @@ export const BrainRecapStep = (): JSX.Element => {
   const { createBrain } = useBrainCreationApi();
   const { updateUserIdentity } = useUserApi();
   const { userIdentityData } = useUserData();
+  const { openedConnections } = useFromConnectionsContext();
 
   const feed = async (): Promise<void> => {
     if (!userIdentityData?.onboarded) {
@@ -41,9 +43,21 @@ export const BrainRecapStep = (): JSX.Element => {
   return (
     <div className={styles.brain_recap_wrapper}>
       <div className={styles.content}>
-        <BrainRecapCard label="Connection" number={knowledgeToFeed.length} />
-        <BrainRecapCard label="URL" number={knowledgeToFeed.length} />
-        <BrainRecapCard label="Document" number={knowledgeToFeed.length} />
+        <BrainRecapCard label="Connection" number={openedConnections.length} />
+        <BrainRecapCard
+          label="URL"
+          number={
+            knowledgeToFeed.filter((knowledge) => knowledge.source === "crawl")
+              .length
+          }
+        />
+        <BrainRecapCard
+          label="Document"
+          number={
+            knowledgeToFeed.filter((knowledge) => knowledge.source === "upload")
+              .length
+          }
+        />
       </div>
       <div className={styles.buttons_wrapper}>
         <QuivrButton
