@@ -1,4 +1,5 @@
 import { KnowledgeToFeed } from "@/app/chat/[chatId]/components/ActionsBar/components";
+import { useFromConnectionsContext } from "@/app/chat/[chatId]/components/ActionsBar/components/KnowledgeToFeed/components/FromConnections/FromConnectionsProvider/hooks/useFromConnectionContext";
 import { MessageInfoBox } from "@/lib/components/ui/MessageInfoBox/MessageInfoBox";
 import QuivrButton from "@/lib/components/ui/QuivrButton/QuivrButton";
 import { useUserData } from "@/lib/hooks/useUserData";
@@ -11,6 +12,7 @@ export const FeedBrainStep = (): JSX.Element => {
   const { currentStepIndex, goToPreviousStep, goToNextStep } =
     useBrainCreationSteps();
   const { userIdentityData } = useUserData();
+  const { currentSyncId, setCurrentSyncId } = useFromConnectionsContext();
 
   const previous = (): void => {
     goToPreviousStep();
@@ -41,17 +43,27 @@ export const FeedBrainStep = (): JSX.Element => {
   const renderButtons = () => {
     return (
       <div className={styles.buttons_wrapper}>
-        <QuivrButton
-          label="Previous step"
-          color="primary"
-          iconName="chevronLeft"
-          onClick={previous}
-        />
+        {currentSyncId ? (
+          <QuivrButton
+            label="Back to connections"
+            color="primary"
+            iconName="chevronLeft"
+            onClick={() => setCurrentSyncId(undefined)}
+          />
+        ) : (
+          <QuivrButton
+            label="Previous step"
+            color="primary"
+            iconName="chevronLeft"
+            onClick={previous}
+          />
+        )}
         <QuivrButton
           label="Next step"
           color="primary"
           iconName="chevronRight"
           onClick={next}
+          important={true}
         />
       </div>
     );

@@ -1,0 +1,19 @@
+@use "@/styles/Spacings.module.scss";
+
+.brain_recap_wrapper {
+  display: flex;
+  justify-content: space-between;
+  flex-direction: column;
+  height: 100%;
+
+  .content {
+    display: flex;
+    flex-wrap: wrap;
+    padding: Spacings.$spacing01;
+  }
+
+  .buttons_wrapper {
+    display: flex;
+    justify-content: space-between;
+  }
+}
