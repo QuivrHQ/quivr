@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.0.258 (2024-05-29)
+
+## What's Changed
+* feat: Update QuivrRAG and run_evaluation.py files by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2615
+* fix: modify thought prompt by @chloedia in https://github.com/QuivrHQ/quivr/pull/2626
+* feat(llamaparse): Update parsing instructions in common.py by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2627
+* feat(sync): retrieve user email used for the connection by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2628
+* fix: Refactor conversational_qa_chain initialization in KnowledgeBrainQA by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2629
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.257...v0.0.258
+
 ## 0.0.257 (2024-05-28)
 
 ## What's Changed
