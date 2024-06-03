@@ -83,6 +83,29 @@ async def get_user_syncs(current_user: UserIdentity = Depends(get_current_user))
     logger.debug(f"Fetching user syncs for user: {current_user.id}")
     return sync_user_service.get_syncs_user(str(current_user.id))
 
+@sync_router.delete(
+    "/sync/{sync_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    dependencies=[Depends(AuthBearer())],
+    tags=["Sync"],
+)
+async def delete_user_sync(
+    sync_id: int, current_user: UserIdentity = Depends(get_current_user)
+):
+    """
+    Delete a sync for the current user.
+
+    Args:
+        sync_id (int): The ID of the sync to delete.
+        current_user (UserIdentity): The current authenticated user.
+
+    Returns:
+        None
+    """
+    logger.debug(f"Deleting user sync for user: {current_user.id} with sync ID: {sync_id}")
+    sync_user_service.delete_sync_user(sync_id, str(current_user.id))
+    return None
+
 
 @sync_router.post(
     "/sync/active",

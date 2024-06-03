@@ -1,5 +1,4 @@
 import argparse
-import json
 import os
 import sys
 
@@ -8,9 +7,10 @@ from dotenv import load_dotenv
 # Add the current directory to the Python path
 sys.path.append(os.getcwd())
 # Load environment variables from .env file
-load_dotenv(verbose=True, override=True)
+load_dotenv(verbose=True, override=True, dotenv_path=".env.test")
 
 import glob
+import json
 import uuid
 
 import pandas as pd
@@ -62,6 +62,7 @@ def main(
         max_input=context_size,
         max_tokens=1000,
     )
+
     brain_chain = knowledge_qa.get_chain()
 
     # run langchain RAG
@@ -79,7 +80,6 @@ def main(
 
     score.to_json(output_folder + "/score.json", orient="records")
     for metric in metrics:
-        print(f"{metric} scores: {score[metric]}")
         print(f"{metric} mean score: {score[metric].mean()}")
         print(f"{metric} median score: {score[metric].median()}")
     # Cleanup if a new brain was created
@@ -142,6 +142,7 @@ def generate_replies(
     contexts = []
     test_questions = test_data.question.tolist()
     test_groundtruths = test_data.ground_truth.tolist()
+    thoughts = []
 
     for question in test_questions:
         response = brain_chain.invoke({"question": question, "chat_history": []})
@@ -149,16 +150,15 @@ def generate_replies(
             "function"
         ]["arguments"]
         cited_answer_obj = json.loads(cited_answer_data)
-        print(f"Answer: {cited_answer_obj['answer']}")
         answers.append(cited_answer_obj["answer"])
-        print(f"Context: {cited_answer_obj}")
-        print(response)
+        thoughts.append(cited_answer_obj["thoughts"])
         contexts.append([context.page_content for context in response["docs"]])
 
     return Dataset.from_dict(
         {
             "question": test_questions,
             "answer": answers,
+            "thoughs" : thoughts,
             "contexts": contexts,
             "ground_truth": test_groundtruths,
         }
@@ -181,9 +181,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--testset_path", type=str, required=True, help="Path to the testset JSON file"
     )
-    parser.add_argument(
-        "--model", type=str, default="gpt-3.5-turbo-0125", help="Model to use"
-    )
+    parser.add_argument("--model", type=str, default="gpt-4o", help="Model to use")
     parser.add_argument(
         "--context_size", type=int, default=10000, help="Context size for the model"
     )

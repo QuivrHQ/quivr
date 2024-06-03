@@ -4,6 +4,7 @@ import { useChat } from "@/app/chat/[chatId]/hooks/useChat";
 import { useChatApi } from "@/lib/api/chat/useChatApi";
 import { CopyButton } from "@/lib/components/ui/CopyButton";
 import Icon from "@/lib/components/ui/Icon/Icon";
+import { ThoughtsButton } from "@/lib/components/ui/ThoughtsButton";
 import { Source } from "@/lib/types/MessageMetadata";
 
 import styles from "./MessageRow.module.scss";
@@ -23,6 +24,7 @@ type MessageRowProps = {
   children?: React.ReactNode;
   metadata?: {
     sources?: Source[];
+    thoughts?: string;
   };
   brainId?: string;
   index?: number;
@@ -175,6 +177,12 @@ export const MessageRow = React.forwardRef(
             </div>
 
             <div className={styles.icons_wrapper}>
+              {metadata?.thoughts && metadata.thoughts.trim() !== "" && (
+                <ThoughtsButton
+                  text={metadata.thoughts}
+                  size="normal"
+                />
+              )}
               <CopyButton handleCopy={handleCopy} size="normal" />
               <Icon
                 name="thumbsUp"

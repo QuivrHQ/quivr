@@ -3,6 +3,7 @@ import os
 
 from fastapi import APIRouter, Depends, HTTPException, Request
 from google_auth_oauthlib.flow import Flow
+from googleapiclient.discovery import build
 from logger import get_logger
 from middlewares.auth import AuthBearer, get_current_user
 from modules.sync.dto.inputs import SyncsUserInput, SyncUserUpdateInput
@@ -26,6 +27,8 @@ google_sync_router = APIRouter()
 SCOPES = [
     "https://www.googleapis.com/auth/drive.metadata.readonly",
     "https://www.googleapis.com/auth/drive.readonly",
+    "https://www.googleapis.com/auth/userinfo.email",
+    "openid",
 ]
 BACKEND_URL = os.getenv("BACKEND_URL", "http://localhost:5050")
 BASE_REDIRECT_URI = f"{BACKEND_URL}/sync/google/oauth2callback"
@@ -104,7 +107,7 @@ def oauth2callback_google(request: Request):
     sync_user_state = sync_user_service.get_sync_user_by_state(state_dict)
     logger.info(f"Retrieved sync user state: {sync_user_state}")
 
-    if state_dict != sync_user_state["state"]:
+    if not sync_user_state or state_dict != sync_user_state.get("state"):
         logger.error("Invalid state parameter")
         raise HTTPException(status_code=400, detail="Invalid state parameter")
     if sync_user_state.get("user_id") != current_user:
@@ -122,9 +125,16 @@ def oauth2callback_google(request: Request):
     creds = flow.credentials
     logger.info(f"Fetched OAuth2 token for user: {current_user}")
 
+    # Use the credentials to get the user's email
+    service = build("oauth2", "v2", credentials=creds)
+    user_info = service.userinfo().get().execute()
+    user_email = user_info.get("email")
+    logger.info(f"Retrieved email for user: {current_user} - {user_email}")
+
     sync_user_input = SyncUserUpdateInput(
         credentials=json.loads(creds.to_json()),
         state={},
+        email=user_email,
     )
     sync_user_service.update_sync_user(current_user, state_dict, sync_user_input)
     logger.info(f"Google Drive sync created successfully for user: {current_user}")

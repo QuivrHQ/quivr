@@ -33,6 +33,7 @@ class SyncUserUpdateInput(BaseModel):
 
     credentials: dict
     state: dict
+    email: str
 
 
 class SyncActiveSettings(BaseModel):
