@@ -14,7 +14,6 @@ import styles from "./ConnectionSection.module.scss";
 import { ConnectionIcon } from "../../ui/ConnectionIcon/ConnectionIcon";
 import { Icon } from "../../ui/Icon/Icon";
 import { TextButton } from "../../ui/TextButton/TextButton";
-import { ConnectionModal } from "../ConnectionModal/ConnectionModal";
 
 interface ConnectionSectionProps {
   label: string;
@@ -30,7 +29,7 @@ const renderConnectionLines = (
   if (!folded) {
     return existingConnections.map((connection, index) => (
       <div key={index}>
-        <ConnectionLine label={connection.name} index={index} />
+        <ConnectionLine label={connection.email} index={index} />
       </div>
     ));
   } else {
@@ -38,7 +37,7 @@ const renderConnectionLines = (
       <div className={styles.folded}>
         {existingConnections.map((connection, index) => (
           <div className={styles.negative_margin} key={index}>
-            <ConnectionIcon letter={connection.name[0]} index={index} />
+            <ConnectionIcon letter={connection.email[0]} index={index} />
           </div>
         ))}
       </div>
@@ -75,7 +74,7 @@ const renderExistingConnections = (
         {existingConnections.map((connection, index) => (
           <div key={index}>
             <ConnectionButton
-              label={connection.name}
+              label={connection.email}
               index={index}
               onClick={() =>
                 handleGetSyncFiles(connection.id, connection.provider)
@@ -93,11 +92,9 @@ const renderExistingConnections = (
 export const ConnectionSection = ({
   label,
   provider,
-  callback,
   fromAddKnowledge,
+  callback,
 }: ConnectionSectionProps): JSX.Element => {
-  const [connectionModalOpened, setConnectionModalOpened] =
-    useState<boolean>(false);
   const { iconUrls, getUserSyncs, getSyncFiles } = useSync();
   const {
     setCurrentSyncElements,
@@ -152,6 +149,16 @@ export const ConnectionSection = ({
     }
   };
 
+  const connect = async () => {
+    const res = await callback(
+      Math.random().toString(36).substring(2, 15) +
+        Math.random().toString(36).substring(2, 15)
+    );
+    if (res.authorization_url) {
+      window.open(res.authorization_url, "_blank");
+    }
+  };
+
   return (
     <>
       <div className={styles.connection_section_wrapper}>
@@ -170,7 +177,7 @@ export const ConnectionSection = ({
               iconName={existingConnections.length ? "add" : "sync"}
               label={existingConnections.length ? "Add more" : "Connect"}
               color="primary"
-              onClick={() => setConnectionModalOpened(true)}
+              onClick={() => connect()}
               small={true}
             />
           ) : (
@@ -178,7 +185,7 @@ export const ConnectionSection = ({
               iconName={existingConnections.length ? "add" : "sync"}
               label={existingConnections.length ? "Add more" : "Connect"}
               color="black"
-              onClick={() => setConnectionModalOpened(true)}
+              onClick={() => connect()}
               small={true}
             />
           )}
@@ -191,13 +198,6 @@ export const ConnectionSection = ({
           (userSyncId: number) => void handleGetSyncFiles(userSyncId)
         )}
       </div>
-      <ConnectionModal
-        modalOpened={connectionModalOpened}
-        setModalOpened={setConnectionModalOpened}
-        label={label}
-        iconUrl={iconUrls[provider]}
-        callback={(name) => callback(name)}
-      />
     </>
   );
 };

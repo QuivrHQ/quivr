@@ -11,7 +11,7 @@ interface TextButtonProps {
   iconName?: keyof typeof iconList;
   label: string;
   color: Color;
-  onClick?: () => void;
+  onClick?: () => void | Promise<void>;
   disabled?: boolean;
   small?: boolean;
 }

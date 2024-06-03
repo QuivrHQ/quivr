@@ -18,4 +18,5 @@ export interface Sync {
   provider: Provider;
   id: number;
   credentials: Credentials;
+  email: string;
 }
