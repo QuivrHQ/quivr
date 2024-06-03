@@ -1,6 +1,10 @@
+import { Controller } from "react-hook-form";
+
 import { useFromConnectionsContext } from "@/app/chat/[chatId]/components/ActionsBar/components/KnowledgeToFeed/components/FromConnections/FromConnectionsProvider/hooks/useFromConnectionContext";
 import { useUserApi } from "@/lib/api/user/useUserApi";
 import QuivrButton from "@/lib/components/ui/QuivrButton/QuivrButton";
+import { TextAreaInput } from "@/lib/components/ui/TextAreaInput/TextAreaInput";
+import { TextInput } from "@/lib/components/ui/TextInput/TextInput";
 import { useKnowledgeToFeedContext } from "@/lib/context/KnowledgeToFeedProvider/hooks/useKnowledgeToFeedContext";
 import { useUserData } from "@/lib/hooks/useUserData";
 
@@ -65,6 +69,34 @@ export const BrainRecapStep = (): JSX.Element => {
               ).length
             }
           />
+        </div>
+        <div className={styles.brain_info_wrapper}>
+          <div className={styles.name_field}>
+            <Controller
+              name="name"
+              render={({ field }) => (
+                <TextInput
+                  label="Enter your brain name"
+                  inputValue={field.value as string}
+                  setInputValue={field.onChange}
+                  disabled={true}
+                />
+              )}
+            />
+          </div>
+          <div>
+            <Controller
+              name="description"
+              render={({ field }) => (
+                <TextAreaInput
+                  label="Enter your brain description"
+                  inputValue={field.value as string}
+                  setInputValue={field.onChange}
+                  disabled={true}
+                />
+              )}
+            />
+          </div>
         </div>
       </div>
       <div className={styles.buttons_wrapper}>
