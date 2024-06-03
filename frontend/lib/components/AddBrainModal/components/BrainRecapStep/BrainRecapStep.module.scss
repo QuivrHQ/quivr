@@ -21,6 +21,23 @@
       @include Typography.H2;
     }
 
+    .brain_info_wrapper {
+      display: flex;
+      flex-direction: column;
+      gap: Spacings.$spacing05;
+
+      .name_field {
+        width: 300px;
+      }
+
+      @media screen and (max-width: ScreenSizes.$small) {
+        .name_field {
+          min-width: 100%;
+          max-width: 100%;
+        }
+      }
+    }
+
     .cards_wrapper {
       display: flex;
       flex-wrap: wrap;
@@ -39,23 +56,6 @@
           min-width: 100%;
           max-width: 100%;
           flex: 1;
-        }
-      }
-    }
-
-    .brain_info_wrapper {
-      display: flex;
-      flex-direction: column;
-      gap: Spacings.$spacing05;
-
-      .name_field {
-        width: 300px;
-      }
-
-      @media screen and (max-width: ScreenSizes.$small) {
-        .name_field {
-          min-width: 100%;
-          max-width: 100%;
         }
       }
     }

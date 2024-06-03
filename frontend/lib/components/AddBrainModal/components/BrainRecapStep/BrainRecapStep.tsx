@@ -48,28 +48,6 @@ export const BrainRecapStep = (): JSX.Element => {
     <div className={styles.brain_recap_wrapper}>
       <div className={styles.content_wrapper}>
         <span className={styles.title}>Brain Recap</span>
-        <div className={styles.cards_wrapper}>
-          <BrainRecapCard
-            label="Connection"
-            number={openedConnections.length}
-          />
-          <BrainRecapCard
-            label="URL"
-            number={
-              knowledgeToFeed.filter(
-                (knowledge) => knowledge.source === "crawl"
-              ).length
-            }
-          />
-          <BrainRecapCard
-            label="Document"
-            number={
-              knowledgeToFeed.filter(
-                (knowledge) => knowledge.source === "upload"
-              ).length
-            }
-          />
-        </div>
         <div className={styles.brain_info_wrapper}>
           <div className={styles.name_field}>
             <Controller
@@ -97,6 +75,28 @@ export const BrainRecapStep = (): JSX.Element => {
               )}
             />
           </div>
+        </div>
+        <div className={styles.cards_wrapper}>
+          <BrainRecapCard
+            label="Connection"
+            number={openedConnections.length}
+          />
+          <BrainRecapCard
+            label="URL"
+            number={
+              knowledgeToFeed.filter(
+                (knowledge) => knowledge.source === "crawl"
+              ).length
+            }
+          />
+          <BrainRecapCard
+            label="Document"
+            number={
+              knowledgeToFeed.filter(
+                (knowledge) => knowledge.source === "upload"
+              ).length
+            }
+          />
         </div>
       </div>
       <div className={styles.buttons_wrapper}>
