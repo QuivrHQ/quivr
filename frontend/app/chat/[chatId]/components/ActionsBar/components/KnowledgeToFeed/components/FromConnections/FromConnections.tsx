@@ -19,6 +19,7 @@ export const FromConnections = (): JSX.Element => {
     currentSyncId,
     selectSpecificFiles,
     setSelectSpecificFiles,
+    setOpenedConnections,
   } = useFromConnectionsContext();
   const [currentFiles, setCurrentFiles] = useState<SyncElement[]>([]);
   const [currentFolders, setCurrentFolders] = useState<SyncElement[]>([]);
@@ -45,7 +46,6 @@ export const FromConnections = (): JSX.Element => {
         res = await getSyncFiles(userSyncId);
       }
       setCurrentSyncElements(res);
-      console.info(res);
     } catch (error) {
       console.error("Failed to get sync files:", error);
     }
@@ -64,8 +64,29 @@ export const FromConnections = (): JSX.Element => {
   };
 
   const handleFolderClick = async (userSyncId: number, folderId: string) => {
-    setFolderStack([...folderStack, folderId]); // Add folderId to stack
+    setFolderStack([...folderStack, folderId]);
     await handleGetSyncFiles(userSyncId, folderId);
+  };
+
+  const handleSwitch = () => {
+    setSelectSpecificFiles(!selectSpecificFiles);
+    setOpenedConnections((prevConnections) => {
+      const connectionIndex = prevConnections.findIndex(
+        (connection) => connection.id === currentSyncId
+      );
+
+      if (connectionIndex !== -1) {
+        const newConnections = [...prevConnections];
+        newConnections[connectionIndex] = {
+          ...newConnections[connectionIndex],
+          allFiles: selectSpecificFiles,
+        };
+
+        return newConnections;
+      }
+
+      return prevConnections;
+    });
   };
 
   return (
@@ -88,7 +109,7 @@ export const FromConnections = (): JSX.Element => {
             <SwitchButton
               label="Select specific files"
               checked={selectSpecificFiles}
-              setChecked={setSelectSpecificFiles}
+              setChecked={handleSwitch}
             />
           </div>
           <div
