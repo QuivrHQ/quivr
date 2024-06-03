@@ -45,13 +45,24 @@ const renderConnectionLines = (
   }
 };
 
-const renderExistingConnections = (
-  existingConnections: Sync[],
-  folded: boolean,
-  setFolded: (folded: boolean) => void,
-  fromAddKnowledge: boolean,
-  handleGetSyncFiles: (userSyncId: number, currentProvider: Provider) => void
-) => {
+const renderExistingConnections = ({
+  existingConnections,
+  folded,
+  setFolded,
+  fromAddKnowledge,
+  handleGetSyncFiles,
+  openedConnections,
+}: {
+  existingConnections: Sync[];
+  folded: boolean;
+  setFolded: (folded: boolean) => void;
+  fromAddKnowledge: boolean;
+  handleGetSyncFiles: (
+    userSyncId: number,
+    currentProvider: Provider
+  ) => Promise<void>;
+  openedConnections: OpenedConnection[];
+}) => {
   if (!!existingConnections.length && !fromAddKnowledge) {
     return (
       <div className={styles.existing_connections}>
@@ -76,8 +87,13 @@ const renderExistingConnections = (
             <ConnectionButton
               label={connection.email}
               index={index}
+              submitted={openedConnections.some(
+                (openedConnection) =>
+                  openedConnection.id === connection.id &&
+                  openedConnection.submitted
+              )}
               onClick={() =>
-                handleGetSyncFiles(connection.id, connection.provider)
+                void handleGetSyncFiles(connection.id, connection.provider)
               }
             />
           </div>
@@ -190,13 +206,14 @@ export const ConnectionSection = ({
             />
           )}
         </div>
-        {renderExistingConnections(
+        {renderExistingConnections({
           existingConnections,
           folded,
           setFolded,
-          !!fromAddKnowledge,
-          (userSyncId: number) => void handleGetSyncFiles(userSyncId)
-        )}
+          fromAddKnowledge: !!fromAddKnowledge,
+          handleGetSyncFiles,
+          openedConnections,
+        })}
       </div>
     </>
   );
