@@ -12,8 +12,12 @@ export const FeedBrainStep = (): JSX.Element => {
   const { currentStepIndex, goToPreviousStep, goToNextStep } =
     useBrainCreationSteps();
   const { userIdentityData } = useUserData();
-  const { currentSyncId, setCurrentSyncId, selectSpecificFiles } =
-    useFromConnectionsContext();
+  const {
+    currentSyncId,
+    setCurrentSyncId,
+    selectSpecificFiles,
+    setOpenedConnections,
+  } = useFromConnectionsContext();
 
   const previous = (): void => {
     goToPreviousStep();
@@ -21,6 +25,28 @@ export const FeedBrainStep = (): JSX.Element => {
 
   const next = (): void => {
     goToNextStep();
+  };
+
+  const addConnection = (): void => {
+    setOpenedConnections((prevConnections) => {
+      const connectionIndex = prevConnections.findIndex(
+        (connection) => connection.id === currentSyncId
+      );
+
+      if (connectionIndex !== -1) {
+        const newConnections = [...prevConnections];
+        newConnections[connectionIndex] = {
+          ...newConnections[connectionIndex],
+          submitted: true,
+        };
+
+        return newConnections;
+      }
+
+      return prevConnections;
+    });
+
+    setCurrentSyncId(undefined);
   };
 
   const renderFeedBrain = () => {
@@ -64,7 +90,7 @@ export const FeedBrainStep = (): JSX.Element => {
             label={selectSpecificFiles ? "Add selected files" : "Add all"}
             color="primary"
             iconName="add"
-            onClick={next}
+            onClick={addConnection}
             important={true}
           />
         ) : (

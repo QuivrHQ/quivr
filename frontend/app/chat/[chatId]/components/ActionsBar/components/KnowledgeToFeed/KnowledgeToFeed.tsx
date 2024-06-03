@@ -58,7 +58,8 @@ export const KnowledgeToFeed = ({
       isSelected: selectedTab === "Connections",
       onClick: () => setSelectedTab("Connections"),
       iconName: "sync",
-      badge: openedConnections.length,
+      badge: openedConnections.filter((connection) => connection.submitted)
+        .length,
     },
   ];
 
