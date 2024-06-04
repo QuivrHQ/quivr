@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.0.259 (2024-06-04)
+
+## What's Changed
+* feat(upload): async improved by @AmineDiro in https://github.com/QuivrHQ/quivr/pull/2544
+
+## New Contributors
+* @AmineDiro made their first contribution in https://github.com/QuivrHQ/quivr/pull/2544
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.258...v0.0.259
+
 ## 0.0.258 (2024-05-29)
 
 ## What's Changed
