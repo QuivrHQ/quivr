@@ -16,7 +16,7 @@ logger = get_logger(__name__)
 class File(BaseModel):
     file_name: str
     tmp_file_path: Path
-    content: bytes | str
+    bytes_content: bytes
     file_size: int
     file_extension: str
     chunk_size: int = 400
@@ -27,7 +27,7 @@ class File(BaseModel):
 
     def __init__(self, **data):
         super().__init__(**data)
-        data["file_sha1"] = compute_sha1_from_content(data.get("content"))
+        data["file_sha1"] = compute_sha1_from_content(data["bytes_content"])
 
     @property
     def supabase_db(self) -> SupabaseDB:
