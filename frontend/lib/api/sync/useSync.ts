@@ -1,8 +1,12 @@
+import { UUID } from "crypto";
+
+import { OpenedConnection } from "@/app/chat/[chatId]/components/ActionsBar/components/KnowledgeToFeed/components/FromConnections/FromConnectionsProvider/FromConnection-provider";
 import { useAxios } from "@/lib/hooks";
 
 import {
   getSyncFiles,
   getUserSyncs,
+  syncFiles,
   syncGoogleDrive,
   syncSharepoint,
 } from "./sync";
@@ -27,5 +31,7 @@ export const useSync = () => {
     getSyncFiles: async (userSyncId: number, folderId?: string) =>
       getSyncFiles(axiosInstance, userSyncId, folderId),
     iconUrls,
+    syncFiles: async (openedConnection: OpenedConnection, brainId: UUID) =>
+      syncFiles(axiosInstance, openedConnection, brainId),
   };
 };

@@ -143,6 +143,9 @@ export const ConnectionSection = ({
 
     if (!existingConnection) {
       const newConnection: OpenedConnection = {
+        name:
+          existingConnections.find((connection) => connection.id === userSyncId)
+            ?.name ?? "",
         id: userSyncId,
         provider: provider,
         submitted: false,

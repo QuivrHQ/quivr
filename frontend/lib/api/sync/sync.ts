@@ -1,4 +1,7 @@
 import { AxiosInstance } from "axios";
+import { UUID } from "crypto";
+
+import { OpenedConnection } from "@/app/chat/[chatId]/components/ActionsBar/components/KnowledgeToFeed/components/FromConnections/FromConnectionsProvider/FromConnection-provider";
 
 import { Sync, SyncElements } from "./types";
 
@@ -40,4 +43,26 @@ export const getSyncFiles = async (
     : `/sync/${userSyncId}/files?user_sync_id=${userSyncId}`;
 
   return (await axiosInstance.get<SyncElements>(url)).data;
+};
+
+export const syncFiles = async (
+  axiosInstance: AxiosInstance,
+  openedConnection: OpenedConnection,
+  brainId: UUID
+): Promise<void> => {
+  console.info({
+    name: openedConnection.name,
+    syncs_user_id: openedConnection.id,
+    settings: {},
+    brain_id: brainId,
+  });
+
+  return (
+    await axiosInstance.post<void>(`/sync/active`, {
+      name: openedConnection.name,
+      syncs_user_id: openedConnection.id,
+      settings: {},
+      brain_id: brainId,
+    })
+  ).data;
 };

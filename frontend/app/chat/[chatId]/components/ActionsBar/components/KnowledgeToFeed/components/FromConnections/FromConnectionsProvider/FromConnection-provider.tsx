@@ -8,6 +8,7 @@ export interface OpenedConnection {
   submitted: boolean;
   allFiles: boolean;
   selectedFiles: string[];
+  name: string;
 }
 
 export type FromConnectionsContextType = {

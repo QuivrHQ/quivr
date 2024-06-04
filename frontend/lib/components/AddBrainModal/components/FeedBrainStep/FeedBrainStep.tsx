@@ -1,4 +1,7 @@
+import { useEffect, useState } from "react";
+
 import { KnowledgeToFeed } from "@/app/chat/[chatId]/components/ActionsBar/components";
+import { OpenedConnection } from "@/app/chat/[chatId]/components/ActionsBar/components/KnowledgeToFeed/components/FromConnections/FromConnectionsProvider/FromConnection-provider";
 import { useFromConnectionsContext } from "@/app/chat/[chatId]/components/ActionsBar/components/KnowledgeToFeed/components/FromConnections/FromConnectionsProvider/hooks/useFromConnectionContext";
 import { MessageInfoBox } from "@/lib/components/ui/MessageInfoBox/MessageInfoBox";
 import QuivrButton from "@/lib/components/ui/QuivrButton/QuivrButton";
@@ -16,8 +19,18 @@ export const FeedBrainStep = (): JSX.Element => {
     currentSyncId,
     setCurrentSyncId,
     selectSpecificFiles,
+    openedConnections,
     setOpenedConnections,
   } = useFromConnectionsContext();
+  const [currentConnection, setCurrentConnection] = useState<
+    OpenedConnection | undefined
+  >(undefined);
+
+  useEffect(() => {
+    setCurrentConnection(
+      openedConnections.find((connection) => connection.id === currentSyncId)
+    );
+  }, [currentSyncId]);
 
   const previous = (): void => {
     goToPreviousStep();
@@ -25,6 +38,28 @@ export const FeedBrainStep = (): JSX.Element => {
 
   const next = (): void => {
     goToNextStep();
+  };
+
+  const getButtonName = (): string => {
+    if (currentConnection) {
+      const matchingOpenedConnection = openedConnections.find(
+        (conn) => conn.id === currentConnection.id
+      );
+
+      if (
+        matchingOpenedConnection &&
+        currentConnection.allFiles &&
+        !selectSpecificFiles
+      ) {
+        return "Remove All";
+      }
+    }
+
+    if (selectSpecificFiles) {
+      return "Add selected files";
+    } else {
+      return "Add all";
+    }
   };
 
   const addConnection = (): void => {
@@ -87,7 +122,7 @@ export const FeedBrainStep = (): JSX.Element => {
         )}
         {currentSyncId ? (
           <QuivrButton
-            label={selectSpecificFiles ? "Add selected files" : "Add all"}
+            label={getButtonName()}
             color="primary"
             iconName="add"
             onClick={addConnection}
