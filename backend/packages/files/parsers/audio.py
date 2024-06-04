@@ -1,5 +1,3 @@
-import os
-import tempfile
 import time
 
 import openai
@@ -9,33 +7,13 @@ from models import File, get_documents_vector_store
 from packages.files.file import compute_sha1_from_content
 
 
-async def process_audio(
-    file: File, user, original_file_name, integration=None, integration_link=None
-):
-    temp_filename = None
-    file_sha = ""
+def process_audio(file: File, **kwargs):
     dateshort = time.strftime("%Y%m%d-%H%M%S")
     file_meta_name = f"audiotranscript_{dateshort}.txt"
     documents_vector_store = get_documents_vector_store()
 
-    try:
-        upload_file = file.file
-        with tempfile.NamedTemporaryFile(
-            delete=False,
-            suffix=upload_file.filename,  # pyright: ignore reportPrivateUsage=none
-        ) as tmp_file:
-            await upload_file.seek(0)  # pyright: ignore reportPrivateUsage=none
-            content = (
-                await upload_file.read()  # pyright: ignore reportPrivateUsage=none
-            )
-            tmp_file.write(content)
-            tmp_file.flush()
-            tmp_file.close()
-
-            temp_filename = tmp_file.name
-
-            with open(tmp_file.name, "rb") as audio_file:
-                transcript = openai.Audio.transcribe("whisper-1", audio_file)
+    with open(file.tmp_file_path, "rb") as audio_file:
+        transcript = openai.Audio.transcribe("whisper-1", audio_file)
 
         file_sha = compute_sha1_from_content(
             transcript.text.encode("utf-8")  # pyright: ignore reportPrivateUsage=none
@@ -70,7 +48,3 @@ async def process_audio(
         ]
 
         documents_vector_store.add_documents(docs_with_metadata)
-
-    finally:
-        if temp_filename and os.path.exists(temp_filename):
-            os.remove(temp_filename)

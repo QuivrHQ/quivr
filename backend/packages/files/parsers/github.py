@@ -9,7 +9,7 @@ from packages.embeddings.vectors import Neurons
 from packages.files.file import compute_sha1_from_content
 
 
-async def process_github(
+def process_github(
     repo,
     brain_id,
 ):
