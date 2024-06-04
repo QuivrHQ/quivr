@@ -1,19 +1,18 @@
 :root {
-    /* White */
-    --white-0: #ffffff;
-    --white-1: #fafafa;
-    --white-2: #fcfaf6;
+    --white-0: #fcfcfc;
+    --white-1: #f8f8f8;
+    --white-2: #f4f4f4;
 
     /* Black */
-    --black-0: #111111;
-    --black-1: #171717;
-    --black-2: #1c1c1c;
-    --black-3: #222222;
-    --black-4: #272727;
-    --black-5: #2d2d2d;
-    --black-6: #323232;
-    --black-7: #383838;
-  
+    --black-0: #1f1f1f;
+    --black-1: #252525;
+    --black-2: #2b2b2b;
+    --black-3: #313131;
+    --black-4: #373737;
+    --black-5: #3d3d3d;
+    --black-6: #434343;
+    --black-7: #494949;
+
     /* Grey */
     --grey-O: #707070;
     --grey-1: #c8c8c8;
@@ -41,7 +40,7 @@
   
     /* Warning */
     --warning: #c77d33;
-    --warning-lightest: #e9d9c9;
+    --warning-lightest: #f2e9e0;
   
     /* Success */
     --success: #47a455;

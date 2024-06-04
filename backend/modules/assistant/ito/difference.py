@@ -1,8 +1,10 @@
+import asyncio
 import os
 import tempfile
 from typing import List
 
 import nest_asyncio
+import uvloop
 from fastapi import UploadFile
 from langchain.prompts import HumanMessagePromptTemplate, SystemMessagePromptTemplate
 from langchain_community.chat_models import ChatLiteLLM
@@ -22,7 +24,8 @@ from modules.assistant.dto.outputs import (
 from modules.assistant.ito.ito import ITO
 from modules.user.entity.user_identity import UserIdentity
 
-nest_asyncio.apply()
+if not isinstance(asyncio.get_event_loop(), uvloop.Loop):
+    nest_asyncio.apply()
 
 
 logger = get_logger(__name__)
@@ -98,7 +101,7 @@ class DifferenceAssistant(ITO):
         document_1_to_langchain = document_1_llama_parsed[0].to_langchain_format()
         document_2_to_langchain = document_2_llama_parsed[0].to_langchain_format()
 
-        llm = ChatLiteLLM(model="gpt-4-turbo-2024-04-09")
+        llm = ChatLiteLLM(model="gpt-4o")
 
         human_prompt = """Given the following two documents, find the difference between them:
 

@@ -39,3 +39,6 @@ elif CELERY_BROKER_URL.startswith("redis"):
     )
 else:
     raise ValueError(f"Unsupported broker URL: {CELERY_BROKER_URL}")
+
+
+celery.autodiscover_tasks(["modules.sync", "modules", "middlewares", "packages"])

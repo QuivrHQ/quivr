@@ -200,7 +200,7 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
             max_input=self.max_input,
             max_tokens=self.max_tokens,
             **kwargs,
-        )
+        )  # type: ignore
 
     @property
     def prompt_to_use(self):
@@ -216,6 +216,40 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
             return get_prompt_to_use_id(UUID(self.brain_id), self.prompt_id)
         else:
             return None
+
+    def filter_history(
+        self, chat_history, max_history: int = 10, max_tokens: int = 2000
+    ):
+        """
+        Filter out the chat history to only include the messages that are relevant to the current question
+
+        Takes in a chat_history= [HumanMessage(content='Qui est Chloé ? '), AIMessage(content="Chloé est une salariée travaillant pour l'entreprise Quivr en tant qu'AI Engineer, sous la direction de son supérieur hiérarchique, Stanislas Girard."), HumanMessage(content='Dis moi en plus sur elle'), AIMessage(content=''), HumanMessage(content='Dis moi en plus sur elle'), AIMessage(content="Désolé, je n'ai pas d'autres informations sur Chloé à partir des fichiers fournis.")]
+        Returns a filtered chat_history with in priority: first max_tokens, then max_history where a Human message and an AI message count as one pair
+        a token is 4 characters
+        """
+        chat_history = chat_history[::-1]
+        total_tokens = 0
+        total_pairs = 0
+        filtered_chat_history = []
+        for i in range(0, len(chat_history), 2):
+            if i + 1 < len(chat_history):
+                human_message = chat_history[i]
+                ai_message = chat_history[i + 1]
+                message_tokens = (
+                    len(human_message.content) + len(ai_message.content)
+                ) // 4
+                if (
+                    total_tokens + message_tokens > max_tokens
+                    or total_pairs >= max_history
+                ):
+                    break
+                filtered_chat_history.append(human_message)
+                filtered_chat_history.append(ai_message)
+                total_tokens += message_tokens
+                total_pairs += 1
+        chat_history = filtered_chat_history[::-1]
+
+        return chat_history
 
     def increase_usage_user(self):
         # Raises an error if the user has consumed all of of his credits
@@ -249,8 +283,8 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
         self, chat_id: UUID, question: ChatQuestion, save_answer: bool = True
     ) -> GetChatHistoryOutput:
         conversational_qa_chain = self.knowledge_qa.get_chain()
-        transformed_history, streamed_chat_history = (
-            self.initialize_streamed_chat_history(chat_id, question)
+        transformed_history, _ = self.initialize_streamed_chat_history(
+            chat_id, question
         )
         metadata = self.metadata or {}
         citations = None
@@ -271,8 +305,16 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
         if self.model_compatible_with_function_calling(model=self.model):
             if model_response["answer"].tool_calls:
                 citations = model_response["answer"].tool_calls[-1]["args"]["citations"]
+                followup_questions = model_response["answer"].tool_calls[-1]["args"][
+                    "followup_questions"
+                ]
+                thoughts = model_response["answer"].tool_calls[-1]["args"]["thoughts"]
                 if citations:
                     citations = citations
+                if followup_questions:
+                    metadata["followup_questions"] = followup_questions
+                if thoughts:
+                    metadata["thoughts"] = thoughts
                 answer = model_response["answer"].tool_calls[-1]["args"]["answer"]
         else:
             answer = model_response["answer"].content
@@ -289,7 +331,10 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
     async def generate_stream(
         self, chat_id: UUID, question: ChatQuestion, save_answer: bool = True
     ) -> AsyncIterable:
-        conversational_qa_chain = self.knowledge_qa.get_chain()
+        if hasattr(self, "get_chain") and callable(getattr(self, "get_chain")):
+            conversational_qa_chain = self.get_chain()
+        else:
+            conversational_qa_chain = self.knowledge_qa.get_chain()
         transformed_history, streamed_chat_history = (
             self.initialize_streamed_chat_history(chat_id, question)
         )
@@ -336,6 +381,24 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
                             and "citations" in gathered.tool_calls[-1]["args"]
                         ):
                             citations = gathered.tool_calls[-1]["args"]["citations"]
+                        if (
+                            gathered.tool_calls
+                            and gathered.tool_calls[-1].get("args")
+                            and "followup_questions" in gathered.tool_calls[-1]["args"]
+                        ):
+                            followup_questions = gathered.tool_calls[-1]["args"][
+                                "followup_questions"
+                            ]
+                            streamed_chat_history.metadata["followup_questions"] = (
+                                followup_questions
+                            )
+                        if (
+                            gathered.tool_calls
+                            and gathered.tool_calls[-1].get("args")
+                            and "thoughts" in gathered.tool_calls[-1]["args"]
+                        ):
+                            thoughts = gathered.tool_calls[-1]["args"]["thoughts"]
+                            streamed_chat_history.metadata["thoughts"] = thoughts
             else:
                 if chunk.get("answer"):
                     response_tokens += chunk["answer"].content

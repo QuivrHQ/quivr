@@ -7,9 +7,10 @@ from dotenv import load_dotenv
 # Add the current directory to the Python path
 sys.path.append(os.getcwd())
 # Load environment variables from .env file
-load_dotenv(verbose=True, override=True)
+load_dotenv(verbose=True, override=True, dotenv_path=".env.test")
 
 import glob
+import json
 import uuid
 
 import pandas as pd
@@ -61,6 +62,7 @@ def main(
         max_input=context_size,
         max_tokens=1000,
     )
+
     brain_chain = knowledge_qa.get_chain()
 
     # run langchain RAG
@@ -70,7 +72,7 @@ def main(
     score = evaluate(
         response_dataset,
         metrics=ragas_metrics,
-        llm=ChatOpenAI(model="gpt-3.5-turbo-0125", temperature=0.1),
+        llm=ChatOpenAI(model="gpt-4o", temperature=0.1),
         embeddings=LangchainEmbeddingsWrapper(
             OpenAIEmbeddings(model="text-embedding-3-large", dimensions=1536)
         ),
@@ -140,16 +142,23 @@ def generate_replies(
     contexts = []
     test_questions = test_data.question.tolist()
     test_groundtruths = test_data.ground_truth.tolist()
+    thoughts = []
 
     for question in test_questions:
         response = brain_chain.invoke({"question": question, "chat_history": []})
-        answers.append(response["answer"].content)
+        cited_answer_data = response["answer"].additional_kwargs["tool_calls"][0][
+            "function"
+        ]["arguments"]
+        cited_answer_obj = json.loads(cited_answer_data)
+        answers.append(cited_answer_obj["answer"])
+        thoughts.append(cited_answer_obj["thoughts"])
         contexts.append([context.page_content for context in response["docs"]])
 
     return Dataset.from_dict(
         {
             "question": test_questions,
             "answer": answers,
+            "thoughs" : thoughts,
             "contexts": contexts,
             "ground_truth": test_groundtruths,
         }
@@ -172,9 +181,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--testset_path", type=str, required=True, help="Path to the testset JSON file"
     )
-    parser.add_argument(
-        "--model", type=str, default="gpt-3.5-turbo-0125", help="Model to use"
-    )
+    parser.add_argument("--model", type=str, default="gpt-4o", help="Model to use")
     parser.add_argument(
         "--context_size", type=int, default=10000, help="Context size for the model"
     )
@@ -189,7 +196,7 @@ if __name__ == "__main__":
             "faithfulness",
             "answer_similarity",
         ],
-        default=["answer_correctness"],
+        default=["answer_similarity"],
         help="Metrics to evaluate",
     )
     parser.add_argument(

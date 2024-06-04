@@ -16,22 +16,32 @@ chat_service = ChatService()
 
 
 class ProxyBrain(KnowledgeBrainQA):
-    """This is the Proxy brain class.
-
-    Args:
-        KnowledgeBrainQA (_type_): A brain that store the knowledge internaly
+    """
+    ProxyBrain class serves as a proxy to utilize various language models for generating responses.
+    It dynamically selects and uses the appropriate language model based on the provided context and question.
     """
 
     def __init__(
         self,
         **kwargs,
     ):
+        """
+        Initializes the ProxyBrain with the given arguments.
+
+        Args:
+            **kwargs: Arbitrary keyword arguments.
+        """
         super().__init__(
             **kwargs,
         )
 
     def get_chain(self):
+        """
+        Constructs and returns the conversational chain for ProxyBrain.
 
+        Returns:
+            A conversational chain object.
+        """
         prompt = ChatPromptTemplate.from_messages(
             [
                 (
@@ -50,6 +60,17 @@ class ProxyBrain(KnowledgeBrainQA):
     async def generate_stream(
         self, chat_id: UUID, question: ChatQuestion, save_answer: bool = True
     ) -> AsyncIterable:
+        """
+        Generates a stream of responses for the given question.
+
+        Args:
+            chat_id (UUID): The chat session ID.
+            question (ChatQuestion): The question object.
+            save_answer (bool): Whether to save the answer.
+
+        Yields:
+            AsyncIterable: A stream of response strings.
+        """
         conversational_qa_chain = self.get_chain()
         transformed_history, streamed_chat_history = (
             self.initialize_streamed_chat_history(chat_id, question)
@@ -76,6 +97,17 @@ class ProxyBrain(KnowledgeBrainQA):
     def generate_answer(
         self, chat_id: UUID, question: ChatQuestion, save_answer: bool = True
     ) -> GetChatHistoryOutput:
+        """
+        Generates a non-streaming answer for the given question.
+
+        Args:
+            chat_id (UUID): The chat session ID.
+            question (ChatQuestion): The question object.
+            save_answer (bool): Whether to save the answer.
+
+        Returns:
+            GetChatHistoryOutput: The chat history output object containing the answer.
+        """
         conversational_qa_chain = self.get_chain()
         transformed_history, streamed_chat_history = (
             self.initialize_streamed_chat_history(chat_id, question)

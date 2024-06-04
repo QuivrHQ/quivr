@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
 
-import { useUserApi } from "@/lib/api/user/useUserApi";
 import { useMenuContext } from "@/lib/context/MenuProvider/hooks/useMenuContext";
 import { useUserSettingsContext } from "@/lib/context/UserSettingsProvider/hooks/useUserSettingsContext";
+import { useDevice } from "@/lib/hooks/useDevice";
 import { ButtonType } from "@/lib/types/QuivrButton";
 
+import { Notifications } from "./Notifications/Notifications";
 import styles from "./PageHeader.module.scss";
 
 import { Icon } from "../ui/Icon/Icon";
@@ -24,8 +25,7 @@ export const PageHeader = ({
   const { isOpened } = useMenuContext();
   const { isDarkMode, setIsDarkMode } = useUserSettingsContext();
   const [lightModeIconName, setLightModeIconName] = useState("sun");
-  const { remainingCredits, setRemainingCredits } = useUserSettingsContext();
-  const { getUserCredits } = useUserApi();
+  const { isMobile } = useDevice();
 
   const toggleTheme = () => {
     setIsDarkMode(!isDarkMode);
@@ -34,13 +34,6 @@ export const PageHeader = ({
   useEffect(() => {
     setLightModeIconName(isDarkMode ? "sun" : "moon");
   }, [isDarkMode]);
-
-  useEffect(() => {
-    void (async () => {
-      const res = await getUserCredits();
-      setRemainingCredits(res);
-    })();
-  }, []);
 
   return (
     <div className={styles.page_header_wrapper}>
@@ -59,12 +52,7 @@ export const PageHeader = ({
             hidden={button.hidden}
           />
         ))}
-        {remainingCredits !== null && (
-          <div className={styles.credits}>
-            <span className={styles.number}>{remainingCredits}</span>
-            <Icon name="coin" color="gold" size="normal"></Icon>
-          </div>
-        )}
+        {!isMobile && <Notifications />}
         <Icon
           name={lightModeIconName}
           color="black"

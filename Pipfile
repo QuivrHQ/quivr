@@ -63,9 +63,18 @@ unidecode = "*"
 flashrank = "*"
 langchain-cohere = "*"
 pyinstrument = "*"
+playwright = "*"
+langgraph = "*"
+tavily-python = "*"
+duckduckgo-search = "*"
+google-api-python-client = "*"
+google-auth-httplib2 = "*"
+google-auth-oauthlib = "*"
+msal = "*"
 
 [dev-packages]
 black = "*"
+ipykernel = "*"
 
 [requires]
 python_version = "3.11"

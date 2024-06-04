@@ -8,6 +8,7 @@ from celery.schedules import crontab
 from celery_config import celery
 from fastapi import UploadFile
 from logger import get_logger
+from middlewares.auth.auth_bearer import AuthBearer
 from models.files import File
 from models.settings import get_supabase_client
 from modules.brain.integrations.Notion.Notion_connector import NotionConnector
@@ -28,6 +29,7 @@ logger = get_logger(__name__)
 onboardingService = OnboardingService()
 notification_service = NotificationService()
 brain_service = BrainService()
+auth_bearer = AuthBearer()
 
 
 @celery.task(name="process_file_and_notify")
@@ -124,6 +126,13 @@ def process_crawl_and_notify(
                 original_file_name=crawl_website_url,
             )
         )
+        notification_service.update_notification_by_id(
+            notification_id,
+            NotificationUpdatableProperties(
+                status=NotificationsStatusEnum.SUCCESS,
+                description=f"Your URL has been properly crawled!",
+            ),
+        )
     else:
         loop = asyncio.get_event_loop()
         message = loop.run_until_complete(
@@ -141,6 +150,7 @@ def process_crawl_and_notify(
                 description="Your file has been properly uploaded!",
             ),
         )
+
     brain_service.update_brain_last_update_time(brain_id)
     return True
 
@@ -206,5 +216,9 @@ celery.conf.beat_schedule = {
     "ping_telemetry": {
         "task": f"{__name__}.ping_telemetry",
         "schedule": crontab(minute="*/30", hour="*"),
+    },
+    "process_sync_active": {
+        "task": "process_sync_active",
+        "schedule": crontab(minute="*/5", hour="*"),
     },
 }

@@ -44,6 +44,12 @@
 
     &:hover {
       background-color: var(--background-3);
+
+      .header_left {
+        .header_title {
+          color: var(--primary-0);
+        }
+      }
     }
   }
 

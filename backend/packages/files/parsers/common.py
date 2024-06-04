@@ -1,10 +1,11 @@
+import asyncio
 import os
-import re
 import tempfile
 import time
 
 import nest_asyncio
 import tiktoken
+import uvloop
 from langchain.schema import Document
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from llama_parse import LlamaParse
@@ -14,7 +15,8 @@ from modules.brain.service.brain_vector_service import BrainVectorService
 from modules.upload.service.upload_file import DocumentSerializable
 from packages.embeddings.vectors import Neurons
 
-nest_asyncio.apply()
+if not isinstance(asyncio.get_event_loop(), uvloop.Loop):
+    nest_asyncio.apply()
 
 logger = get_logger(__name__)
 
@@ -43,7 +45,9 @@ def process_file(
 
             parser = LlamaParse(
                 result_type="markdown",  # "markdown" and "text" are available
-                parsing_instruction="Try to extract the tables and checkboxes. Transform tables to key = value. You can duplicates Keys if needed. For example: Productions Fonts = 300 productions Fonts Company Desktop License = Yes for Maximum of 60 Licensed Desktop users For example checkboxes should be: Premium Activated = Yes License Premier = No If a checkbox is present for a table with multiple options.  Say Yes for the one activated and no for the one not activated",
+                parsing_instruction="Extract the tables and transform checkboxes into text. Transform tables to key = value. You can duplicates Keys if needed. For example: Productions Fonts = 300 productions Fonts Company Desktop License = Yes for Maximum of 60 Licensed Desktop users For example checkboxes should be: Premium Activated = Yes License Premier = No If a checkbox is present for a table with multiple options.  Say Yes for the one activated and no for the one not activated. Format using headers.",
+                gpt4o_mode=True,
+                gpt4o_api_key=os.getenv("OPENAI_API_KEY"),
             )
 
             document_llama_parsed = parser.load_data(document_tmp.name)
@@ -77,15 +81,15 @@ def process_file(
 
     if file.documents is not None:
         logger.info("Coming here?")
-        for doc in file.documents:  # pyright: ignore reportPrivateUsage=none
+        for index, doc in enumerate(
+            file.documents, start=1
+        ):  # pyright: ignore reportPrivateUsage=none
             new_metadata = metadata.copy()
             logger.info(f"Processing document {doc}")
             # Add filename at beginning of page content
             doc.page_content = f"Filename: {new_metadata['original_file_name']} Content: {doc.page_content}"
 
             doc.page_content = doc.page_content.replace("\u0000", "")
-            # Replace unsupported Unicode characters
-            doc.page_content = re.sub(r"[^\x00-\x7F]+", " ", doc.page_content)
 
             len_chunk = len(enc.encode(doc.page_content))
 
@@ -95,6 +99,7 @@ def process_file(
             )
 
             new_metadata["chunk_size"] = len_chunk
+            new_metadata["index"] = index
             doc_with_metadata = DocumentSerializable(
                 page_content=doc.page_content, metadata=new_metadata
             )

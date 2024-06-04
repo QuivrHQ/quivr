@@ -69,7 +69,9 @@
             "configuring/llamaparse",
             "configuring/environment-variables",
             "configuring/profiler",
-            "configuring/telemetry"
+            "configuring/telemetry",
+            "configuring/supabase-setup",
+            "configuring/brave-search"
           ]
         },
         "tech-design",
@@ -97,6 +99,12 @@
       "group": "Assistants",
       "pages": [
         "agents/summary"
+      ]
+    },
+    {
+      "group": "Privacy and Compliance",
+      "pages": [
+        "privacy-and-compliance"
       ]
     }
   ],

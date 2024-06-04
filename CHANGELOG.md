@@ -1,5 +1,150 @@
 # Changelog
 
+## 0.0.258 (2024-05-29)
+
+## What's Changed
+* feat: Update QuivrRAG and run_evaluation.py files by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2615
+* fix: modify thought prompt by @chloedia in https://github.com/QuivrHQ/quivr/pull/2626
+* feat(llamaparse): Update parsing instructions in common.py by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2627
+* feat(sync): retrieve user email used for the connection by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2628
+* fix: Refactor conversational_qa_chain initialization in KnowledgeBrainQA by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2629
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.257...v0.0.258
+
+## 0.0.257 (2024-05-28)
+
+## What's Changed
+* Add Privacy & Compliance Documentation by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2620
+* docs(security): added compliance by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2621
+* fix(frontend): upgrade button on user page by @Zewed in https://github.com/QuivrHQ/quivr/pull/2623
+* feat(frontend): Add ThoughtsButton component for displaying thoughts by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2624
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.256...v0.0.257
+
+## 0.0.256 (2024-05-26)
+
+## What's Changed
+* feat(rag): follow-up questions and thoughts with spanish fix by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2618
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.255...v0.0.256
+
+## 0.0.255 (2024-05-24)
+
+## What's Changed
+* feat: Add Google Drive & Sharepoint sync in backend by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2592
+* Revert "feat: Add Google Drive & Sharepoint sync in backend" by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2603
+* Feat/auth-playground by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2605
+* feat: add init to create packages by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2606
+* Add additional modules to celery.autodiscover_tasks() by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2607
+* Feat/celery import by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2608
+* feat: self-reflect brain by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2610
+* feat: ragas improved testing by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2611
+* fix(frontend): less agressive colors by @Zewed in https://github.com/QuivrHQ/quivr/pull/2612
+* fix(frontend): important buttons by @Zewed in https://github.com/QuivrHQ/quivr/pull/2613
+* fix(frontend): fix white colors by @Zewed in https://github.com/QuivrHQ/quivr/pull/2614
+* fix(frontend): using dark mode in tiptap by @ramonzaca in https://github.com/QuivrHQ/quivr/pull/2616
+
+## New Contributors
+* @ramonzaca made their first contribution in https://github.com/QuivrHQ/quivr/pull/2616
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.254...v0.0.255
+
+## 0.0.254 (2024-05-21)
+
+## What's Changed
+* fix:  sender email address in resend_invitation_email.py by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2600
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.253...v0.0.254
+
+## 0.0.253 (2024-05-14)
+
+## What's Changed
+* fix(frontend): Implement persistent dark mode setting and & Implement persistent dark mode setting by @elazarnaaman in https://github.com/QuivrHQ/quivr/pull/2423
+* fix(frontend): hover effect on profile Button by @Zewed in https://github.com/QuivrHQ/quivr/pull/2587
+* fix(frontend): user invite UI on Mobile by @Zewed in https://github.com/QuivrHQ/quivr/pull/2586
+* feat: Update ChatLiteLLM model and add RLS optimization for notifications by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2591
+
+## New Contributors
+* @elazarnaaman made their first contribution in https://github.com/QuivrHQ/quivr/pull/2423
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.252...v0.0.253
+
+## 0.0.252 (2024-05-13)
+
+## What's Changed
+* docs: Update GPT4 documentation with available tools and use cases by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2580
+* docs: Add docstrings to integration brains by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2582
+* fix: Update import statements for OllamaEmbeddings by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2584
+* feat: Add support for gpt-4o model by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2589
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.251...v0.0.252
+
+## 0.0.251 (2024-05-10)
+
+## What's Changed
+* feat(tool): Add URLReaderTool by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2577
+* feat(email): Add email sender tool and update image generator tool by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2579
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.250...v0.0.251
+
+## 0.0.250 (2024-05-10)
+
+## What's Changed
+* feat(gpt4): Add search functionality by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2566
+* [ImgBot] Optimize images by @imgbot in https://github.com/QuivrHQ/quivr/pull/2568
+* feat(gpt4): image generation by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2569
+* fix(front): Add NEXT_PUBLIC_AUTH_MODES to .env.example by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2570
+* fix: NEXT_PUBLIC_AUTH_MODES in docker-compose.yml by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2572
+* docs: Add Supabase configuration documentation by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2574
+* docs(gpt4): Update GPT-4 Documentation by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2573
+* chore: tools by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2575
+* feat(brave-search): Update GPT4Brain tools and add WebSearchTool by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2576
+
+## New Contributors
+* @imgbot made their first contribution in https://github.com/QuivrHQ/quivr/pull/2568
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.249...v0.0.250
+
+## 0.0.249 (2024-05-08)
+
+## What's Changed
+* feat(crawler): Add Playwright for web crawling by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2562
+* ci(ecr): added build to public ecr by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2564
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.248...v0.0.249
+
+## 0.0.248 (2024-05-07)
+
+## What's Changed
+* fix: utf8 encoding by @chloedia in https://github.com/QuivrHQ/quivr/pull/2555
+* feat(celery): moved assistant summary to celery by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2557
+* Revert "feat(celery): moved assistant summary to celery" by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2558
+
+## New Contributors
+* @chloedia made their first contribution in https://github.com/QuivrHQ/quivr/pull/2555
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.247...v0.0.248
+
+## 0.0.247 (2024-05-07)
+
+## What's Changed
+* feat(frontend): add notifications for document uploads by @Zewed in https://github.com/QuivrHQ/quivr/pull/2549
+* Update install.mdx by @dazeb in https://github.com/QuivrHQ/quivr/pull/2552
+* fix(frontend): fix notifications issues by @Zewed in https://github.com/QuivrHQ/quivr/pull/2551
+* chore(ci): Update PR title linting workflow by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2553
+
+## New Contributors
+* @dazeb made their first contribution in https://github.com/QuivrHQ/quivr/pull/2552
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.246...v0.0.247
+
 ## 0.0.246 (2024-05-04)
 
 ## What's Changed

@@ -6,20 +6,25 @@
   gap: Spacings.$spacing03;
   cursor: pointer;
   background-color: transparent;
-}
 
-.black {
-  color: var(--text-3);
-
-  &.hovered {
-    color: var(--primary-0);
+  &.disabled {
+    pointer-events: none;
+    opacity: 0.5;
   }
-}
 
-.dangerous {
-  color: var(--dangerous);
+  .black {
+    color: var(--text-3);
 
-  &.hovered {
-    color: var(--dangerous)-dark;
+    &:hover {
+      color: var(--primary-0);
+    }
+  }
+
+  .dangerous {
+    color: var(--dangerous);
+
+    &:hover {
+      color: var(--dangerous-0);
+    }
   }
 }

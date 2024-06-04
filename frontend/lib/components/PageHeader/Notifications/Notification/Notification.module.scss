@@ -1,0 +1,79 @@
+@use "@/styles/Radius.module.scss";
+@use "@/styles/Spacings.module.scss";
+@use "@/styles/Typography.module.scss";
+
+.notification_wrapper {
+  padding: Spacings.$spacing03;
+  display: flex;
+  flex-direction: column;
+  gap: Spacings.$spacing02;
+  width: 100%;
+  border-bottom: 1px solid var(--border-1);
+
+  &.no_border {
+    border-bottom: none;
+  }
+
+  &.read {
+    opacity: 0.4;
+  }
+
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: Typography.$small;
+    overflow: hidden;
+    gap: Spacings.$spacing06;
+
+    .left {
+      display: flex;
+      align-items: center;
+      gap: Spacings.$spacing02;
+      overflow: hidden;
+
+      .badge {
+        min-width: 6px;
+        min-height: 6px;
+        border-radius: Radius.$circle;
+        background-color: var(--primary-0);
+      }
+
+      .title {
+        @include Typography.EllipsisOverflow;
+      }
+    }
+
+    .icons {
+      display: flex;
+      gap: Spacings.$spacing01;
+      align-items: center;
+    }
+  }
+
+  .description {
+    font-size: Typography.$tiny;
+    font-style: italic;
+
+    &.info {
+      color: var(--text-1);
+    }
+
+    &.warning {
+      color: var(--warning);
+    }
+
+    &.success {
+      color: var(--success);
+    }
+
+    &.error {
+      color: var(--dangerous);
+    }
+  }
+
+  .date {
+    font-size: Typography.$tiny;
+    color: var(--text-2);
+  }
+}
