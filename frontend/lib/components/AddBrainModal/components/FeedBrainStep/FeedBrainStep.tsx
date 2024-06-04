@@ -40,26 +40,39 @@ export const FeedBrainStep = (): JSX.Element => {
     goToNextStep();
   };
 
-  const getButtonName = (): string => {
-    if (currentConnection) {
-      const matchingOpenedConnection = openedConnections.find(
-        (conn) => conn.id === currentConnection.id
-      );
+  const isRemoveAll = (): boolean => {
+    return !!(
+      currentConnection?.allFiles &&
+      !selectSpecificFiles &&
+      currentConnection.submitted
+    );
+  };
 
-      if (
-        matchingOpenedConnection &&
-        currentConnection.allFiles &&
-        !selectSpecificFiles
-      ) {
+  const isUpdate = (): boolean => {
+    return !!(
+      !currentConnection?.allFiles &&
+      (selectSpecificFiles ||
+        (currentConnection?.submitted && selectSpecificFiles))
+    );
+  };
+
+  const getButtonName = (): string => {
+    const matchingOpenedConnection =
+      currentConnection &&
+      openedConnections.find((conn) => conn.id === currentConnection.id);
+
+    if (matchingOpenedConnection) {
+      if (isRemoveAll()) {
         return "Remove All";
+      } else if (
+        isUpdate() ||
+        (selectSpecificFiles && currentConnection.submitted)
+      ) {
+        return "Update added files";
       }
     }
 
-    if (selectSpecificFiles) {
-      return "Add selected files";
-    } else {
-      return "Add all";
-    }
+    return selectSpecificFiles ? "Add specific files" : "Add all";
   };
 
   const addConnection = (): void => {
