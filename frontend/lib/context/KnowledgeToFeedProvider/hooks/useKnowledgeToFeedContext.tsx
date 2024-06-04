@@ -24,9 +24,18 @@ export const useKnowledgeToFeedContext = () => {
     });
   };
 
+  const removeAllKnowledgeToFeed = () => {
+    context?.setKnowledgeToFeed([]);
+  };
+
   if (context === undefined) {
     throw new Error("useKnowledge must be used inside KnowledgeToFeedProvider");
   }
 
-  return { ...context, addKnowledgeToFeed, removeKnowledgeToFeed };
+  return {
+    ...context,
+    addKnowledgeToFeed,
+    removeKnowledgeToFeed,
+    removeAllKnowledgeToFeed,
+  };
 };
