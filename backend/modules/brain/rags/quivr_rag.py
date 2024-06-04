@@ -314,7 +314,7 @@ class QuivrRAG(BaseModel):
             self.brain_id
         )  # pyright: ignore reportPrivateUsage=none
 
-        list_files_array = [file.file_name for file in list_files_array]
+        list_files_array = [file.file_name or file.url for file in list_files_array]
         # Max first 10 files
         if len(list_files_array) > 20:
             list_files_array = list_files_array[:20]
