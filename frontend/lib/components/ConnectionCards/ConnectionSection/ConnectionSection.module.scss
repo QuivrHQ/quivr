@@ -13,11 +13,11 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  width: 300px;
   align-items: center;
   border-radius: Radius.$normal;
   box-shadow: BoxShadow.$medium;
   height: min-content;
+  width: 100%;
 
   @media (max-width: ScreenSizes.$small) {
     width: 100%;

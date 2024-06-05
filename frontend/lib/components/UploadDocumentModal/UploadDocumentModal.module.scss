@@ -10,8 +10,12 @@
   width: 100%;
   flex: 1;
 
-  .button {
+  .buttons {
     display: flex;
-    justify-content: flex-end;
+    justify-content: space-between;
+
+    &.standalone {
+      justify-content: flex-end;
+    }
   }
 }
