@@ -1,9 +1,8 @@
 import Image from "next/image";
 import { useEffect, useState } from "react";
 
-import { OpenedConnection } from "@/app/chat/[chatId]/components/ActionsBar/components/KnowledgeToFeed/components/FromConnections/FromConnectionsProvider/FromConnection-provider";
 import { useFromConnectionsContext } from "@/app/chat/[chatId]/components/ActionsBar/components/KnowledgeToFeed/components/FromConnections/FromConnectionsProvider/hooks/useFromConnectionContext";
-import { Provider, Sync } from "@/lib/api/sync/types";
+import { OpenedConnection, Provider, Sync } from "@/lib/api/sync/types";
 import { useSync } from "@/lib/api/sync/useSync";
 import QuivrButton from "@/lib/components/ui/QuivrButton/QuivrButton";
 
@@ -151,7 +150,7 @@ export const ConnectionSection = ({
         submitted: false,
         allFiles: true,
         selectedFiles: [],
-        lasy_synced: "",
+        last_synced: "",
       };
 
       setOpenedConnections([...openedConnections, newConnection]);

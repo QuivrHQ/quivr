@@ -22,8 +22,8 @@ export interface Sync {
 }
 
 export interface SyncSettings {
-  folders: string[];
-  files: string[];
+  folders?: string[];
+  files?: string[];
 }
 
 export interface ActiveSync {
@@ -35,4 +35,14 @@ export interface ActiveSync {
   last_synced: string;
   sync_interval_minutes: number;
   brain_id: string;
+}
+
+export interface OpenedConnection {
+  id: number;
+  provider: Provider;
+  submitted: boolean;
+  allFiles: boolean;
+  selectedFiles: string[];
+  name: string;
+  last_synced: string;
 }

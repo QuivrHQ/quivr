@@ -1,16 +1,6 @@
 import { createContext, useState } from "react";
 
-import { Provider, SyncElements } from "@/lib/api/sync/types";
-
-export interface OpenedConnection {
-  id: number;
-  provider: Provider;
-  submitted: boolean;
-  allFiles: boolean;
-  selectedFiles: string[];
-  name: string;
-  lasy_synced: string;
-}
+import { OpenedConnection, SyncElements } from "@/lib/api/sync/types";
 
 export type FromConnectionsContextType = {
   currentSyncElements: SyncElements | undefined;

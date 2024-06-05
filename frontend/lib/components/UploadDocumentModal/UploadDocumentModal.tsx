@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { KnowledgeToFeed } from "@/app/chat/[chatId]/components/ActionsBar/components";
+import { useFromConnectionsContext } from "@/app/chat/[chatId]/components/ActionsBar/components/KnowledgeToFeed/components/FromConnections/FromConnectionsProvider/hooks/useFromConnectionContext";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 import { useKnowledgeToFeedContext } from "@/lib/context/KnowledgeToFeedProvider/hooks/useKnowledgeToFeedContext";
 
@@ -17,6 +18,7 @@ export const UploadDocumentModal = (): JSX.Element => {
   const { currentBrain } = useBrainContext();
   const { feedBrain } = useAddKnowledge();
   const [feeding, setFeeding] = useState<boolean>(false);
+  const { currentSyncId, setCurrentSyncId } = useFromConnectionsContext();
 
   useKnowledgeToFeedContext();
   const { t } = useTranslation(["knowledge"]);
@@ -44,6 +46,14 @@ export const UploadDocumentModal = (): JSX.Element => {
       <div className={styles.knowledge_modal}>
         <KnowledgeToFeed />
         <div className={styles.button}>
+          {!!currentSyncId && (
+            <QuivrButton
+              label="Back to connections"
+              color="primary"
+              iconName="chevronLeft"
+              onClick={() => setCurrentSyncId(undefined)}
+            />
+          )}
           <QuivrButton
             label="Feed Brain"
             color="primary"

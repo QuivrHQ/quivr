@@ -1,9 +1,7 @@
 import { AxiosInstance } from "axios";
 import { UUID } from "crypto";
 
-import { OpenedConnection } from "@/app/chat/[chatId]/components/ActionsBar/components/KnowledgeToFeed/components/FromConnections/FromConnectionsProvider/FromConnection-provider";
-
-import { ActiveSync, Sync, SyncElements } from "./types";
+import { ActiveSync, OpenedConnection, Sync, SyncElements } from "./types";
 
 export const syncGoogleDrive = async (
   name: string,
@@ -63,5 +61,5 @@ export const syncFiles = async (
 export const getActiveSyncs = async (
   axiosInstance: AxiosInstance
 ): Promise<ActiveSync[]> => {
-  return (await axiosInstance.post<ActiveSync[]>(`/sync/active`)).data;
+  return (await axiosInstance.get<ActiveSync[]>(`/sync/active`)).data;
 };

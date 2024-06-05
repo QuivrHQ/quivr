@@ -1,16 +1,16 @@
 import { UUID } from "crypto";
 
-import { OpenedConnection } from "@/app/chat/[chatId]/components/ActionsBar/components/KnowledgeToFeed/components/FromConnections/FromConnectionsProvider/FromConnection-provider";
 import { useAxios } from "@/lib/hooks";
 
 import {
+  getActiveSyncs,
   getSyncFiles,
   getUserSyncs,
   syncFiles,
   syncGoogleDrive,
   syncSharepoint,
 } from "./sync";
-import { Provider } from "./types";
+import { OpenedConnection, Provider } from "./types";
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const useSync = () => {
@@ -23,6 +23,12 @@ export const useSync = () => {
       "https://quivr-cms.s3.eu-west-3.amazonaws.com/sharepoint_8c41cfdb09.png",
   };
 
+  const getActiveSyncsForBrain = async (brainId: string) => {
+    const activeSyncs = await getActiveSyncs(axiosInstance);
+
+    return activeSyncs.filter((sync) => sync.brain_id === brainId);
+  };
+
   return {
     syncGoogleDrive: async (name: string) =>
       syncGoogleDrive(name, axiosInstance),
@@ -33,5 +39,7 @@ export const useSync = () => {
     iconUrls,
     syncFiles: async (openedConnection: OpenedConnection, brainId: UUID) =>
       syncFiles(axiosInstance, openedConnection, brainId),
+    getActiveSyncs: async () => getActiveSyncs(axiosInstance),
+    getActiveSyncsForBrain,
   };
 };
