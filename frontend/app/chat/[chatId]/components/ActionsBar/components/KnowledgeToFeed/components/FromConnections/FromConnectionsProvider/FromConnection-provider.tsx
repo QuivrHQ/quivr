@@ -9,6 +9,7 @@ export interface OpenedConnection {
   allFiles: boolean;
   selectedFiles: string[];
   name: string;
+  lasy_synced: string;
 }
 
 export type FromConnectionsContextType = {

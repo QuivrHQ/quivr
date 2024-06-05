@@ -151,6 +151,7 @@ export const ConnectionSection = ({
         submitted: false,
         allFiles: true,
         selectedFiles: [],
+        lasy_synced: "",
       };
 
       setOpenedConnections([...openedConnections, newConnection]);

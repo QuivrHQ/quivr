@@ -1,0 +1,50 @@
+@use "@/styles/Radius.module.scss";
+@use "@/styles/ScreenSizes.module.scss";
+@use "@/styles/Spacings.module.scss";
+@use "@/styles/Typography.module.scss";
+
+.brain_card_container {
+  display: flex;
+  flex-direction: column;
+  gap: Spacings.$spacing02;
+
+  &.disabled {
+    pointer-events: none;
+    opacity: 0.1;
+  }
+
+  .brain_card_wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border-radius: Radius.$normal;
+    gap: Spacings.$spacing03;
+    padding: Spacings.$spacing04;
+    width: fit-content;
+    cursor: pointer;
+    width: 120px;
+
+    .dark_image {
+      filter: invert(100%);
+    }
+
+    .brain_title {
+      @include Typography.EllipsisOverflow;
+      font-size: Typography.$small;
+      font-weight: 500;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+    }
+
+    &:hover,
+    &.selected {
+      border-color: var(--primary-0);
+      background-color: var(--background-special-0);
+
+      .brain_title {
+        color: var(--primary-0);
+      }
+    }
+  }
+}
