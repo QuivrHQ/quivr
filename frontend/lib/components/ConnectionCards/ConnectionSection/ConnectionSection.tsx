@@ -86,11 +86,12 @@ const renderExistingConnections = ({
             <ConnectionButton
               label={connection.email}
               index={index}
-              submitted={openedConnections.some(
-                (openedConnection) =>
-                  openedConnection.id === connection.id &&
+              submitted={openedConnections.some((openedConnection) => {
+                return (
+                  openedConnection.name === connection.name &&
                   openedConnection.submitted
-              )}
+                );
+              })}
               onClick={() =>
                 void handleGetSyncFiles(connection.id, connection.provider)
               }
