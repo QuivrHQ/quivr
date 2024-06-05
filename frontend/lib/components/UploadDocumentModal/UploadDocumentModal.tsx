@@ -18,7 +18,8 @@ export const UploadDocumentModal = (): JSX.Element => {
   const { currentBrain } = useBrainContext();
   const { feedBrain } = useAddKnowledge();
   const [feeding, setFeeding] = useState<boolean>(false);
-  const { currentSyncId, setCurrentSyncId } = useFromConnectionsContext();
+  const { currentSyncId, setCurrentSyncId, setSelectSpecificFiles } =
+    useFromConnectionsContext();
 
   useKnowledgeToFeedContext();
   const { t } = useTranslation(["knowledge"]);
@@ -51,7 +52,10 @@ export const UploadDocumentModal = (): JSX.Element => {
               label="Back to connections"
               color="primary"
               iconName="chevronLeft"
-              onClick={() => setCurrentSyncId(undefined)}
+              onClick={() => {
+                setCurrentSyncId(undefined);
+                setSelectSpecificFiles(false);
+              }}
             />
           )}
           <QuivrButton

@@ -150,7 +150,7 @@ export const ConnectionSection = ({
         provider: provider,
         submitted: false,
         allFiles: true,
-        selectedFiles: [],
+        selectedFiles: { files: [] },
         last_synced: "",
       };
 

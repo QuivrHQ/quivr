@@ -19,6 +19,7 @@ export const FeedBrainStep = (): JSX.Element => {
     currentSyncId,
     setCurrentSyncId,
     selectSpecificFiles,
+    setSelectSpecificFiles,
     openedConnections,
     setOpenedConnections,
   } = useFromConnectionsContext();
@@ -95,6 +96,7 @@ export const FeedBrainStep = (): JSX.Element => {
     });
 
     setCurrentSyncId(undefined);
+    setSelectSpecificFiles(false);
   };
 
   const renderFeedBrain = () => {

@@ -27,7 +27,7 @@ export const FileLine = ({
     );
 
     return currentConnection
-      ? currentConnection.selectedFiles.includes(id)
+      ? currentConnection.selectedFiles.files.some((file) => file.id === id)
       : false;
   };
 
@@ -37,17 +37,32 @@ export const FileLine = ({
     setOpenedConnections((prevState) => {
       return prevState.map((connection) => {
         if (connection.id === currentSyncId) {
-          if (connection.selectedFiles.includes(id)) {
+          const currentConnection = prevState.find(
+            (conn) => conn.id === currentSyncId
+          );
+
+          if (
+            currentConnection?.selectedFiles.files.some(
+              (file) => file.id === id
+            )
+          ) {
             return {
               ...connection,
-              selectedFiles: connection.selectedFiles.filter(
-                (fileId) => fileId !== id
-              ),
+              selectedFiles: {
+                files: connection.selectedFiles.files.filter(
+                  (file) => file.id !== id
+                ),
+              },
             };
           } else {
             return {
               ...connection,
-              selectedFiles: [...connection.selectedFiles, id],
+              selectedFiles: {
+                files: [
+                  ...connection.selectedFiles.files,
+                  { id, name, is_folder: false },
+                ],
+              },
             };
           }
         } else {

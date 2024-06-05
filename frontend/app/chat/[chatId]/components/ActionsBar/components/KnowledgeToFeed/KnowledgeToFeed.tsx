@@ -1,6 +1,5 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 
-import { useSync } from "@/lib/api/sync/useSync";
 import { SingleSelector } from "@/lib/components/ui/SingleSelector/SingleSelector";
 import { Tabs } from "@/lib/components/ui/Tabs/Tabs";
 import { requiredRolesForUpload } from "@/lib/config/upload";
@@ -23,9 +22,8 @@ export const KnowledgeToFeed = ({
   const { allBrains, setCurrentBrainId, currentBrain } = useBrainContext();
   const [selectedTab, setSelectedTab] = useState("Documents");
   const { knowledgeToFeed } = useKnowledgeToFeedContext();
-  const { openedConnections, setOpenedConnections } =
-    useFromConnectionsContext();
-  const { getActiveSyncsForBrain } = useSync();
+  const { openedConnections } = useFromConnectionsContext();
+  // const { getActiveSyncsForBrain } = useSync();
 
   const brainsWithUploadRights = formatMinimalBrainsToSelectComponentInput(
     useMemo(
@@ -66,29 +64,31 @@ export const KnowledgeToFeed = ({
     },
   ];
 
-  useEffect(() => {
-    if (currentBrain) {
-      void (async () => {
-        try {
-          const res = await getActiveSyncsForBrain(currentBrain.id);
-          setOpenedConnections(
-            res.map((sync) => ({
-              id: sync.id,
-              provider: "Google",
-              submitted: true,
-              allFiles:
-                !sync.settings.files?.length && !sync.settings.folders?.length,
-              selectedFiles: sync.settings.files ?? [],
-              name: sync.name,
-              last_synced: sync.last_synced,
-            }))
-          );
-        } catch (error) {
-          console.error(error);
-        }
-      })();
-    }
-  }, [currentBrain]);
+  // useEffect(() => {
+  //   if (currentBrain) {
+  //     void (async () => {
+  //       try {
+  //         const res = await getActiveSyncsForBrain(currentBrain.id);
+  //         setOpenedConnections(
+  //           res.map((sync) => ({
+  //             id: sync.id,
+  //             provider: "Google",
+  //             submitted: true,
+  //             allFiles:
+  //               !sync.settings.files?.length && !sync.settings.folders?.length,
+  //             selectedFiles: sync.settings.files
+  //               ? sync.settings.files.map((file) => ({ files: file }))
+  //               : [],
+  //             name: sync.name,
+  //             last_synced: sync.last_synced,
+  //           }))
+  //         );
+  //       } catch (error) {
+  //         console.error(error);
+  //       }
+  //     })();
+  //   }
+  // }, [currentBrain]);
 
   return (
     <div className={styles.knowledge_to_feed_wrapper}>

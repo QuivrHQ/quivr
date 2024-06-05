@@ -42,7 +42,7 @@ export interface OpenedConnection {
   provider: Provider;
   submitted: boolean;
   allFiles: boolean;
-  selectedFiles: string[];
+  selectedFiles: SyncElements;
   name: string;
   last_synced: string;
 }
