@@ -20,3 +20,19 @@ export interface Sync {
   credentials: Credentials;
   email: string;
 }
+
+export interface SyncSettings {
+  folders: string[];
+  files: string[];
+}
+
+export interface ActiveSync {
+  id: number;
+  name: string;
+  syncs_user_id: number;
+  user_id: string;
+  settings: SyncSettings;
+  last_synced: string;
+  sync_interval_minutes: number;
+  brain_id: string;
+}

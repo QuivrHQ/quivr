@@ -3,7 +3,7 @@ import { UUID } from "crypto";
 
 import { OpenedConnection } from "@/app/chat/[chatId]/components/ActionsBar/components/KnowledgeToFeed/components/FromConnections/FromConnectionsProvider/FromConnection-provider";
 
-import { Sync, SyncElements } from "./types";
+import { ActiveSync, Sync, SyncElements } from "./types";
 
 export const syncGoogleDrive = async (
   name: string,
@@ -58,4 +58,10 @@ export const syncFiles = async (
       brain_id: brainId,
     })
   ).data;
+};
+
+export const getActiveSyncs = async (
+  axiosInstance: AxiosInstance
+): Promise<ActiveSync[]> => {
+  return (await axiosInstance.post<ActiveSync[]>(`/sync/active`)).data;
 };
