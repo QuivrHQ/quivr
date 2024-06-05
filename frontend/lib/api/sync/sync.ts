@@ -50,13 +50,6 @@ export const syncFiles = async (
   openedConnection: OpenedConnection,
   brainId: UUID
 ): Promise<void> => {
-  console.info({
-    name: openedConnection.name,
-    syncs_user_id: openedConnection.id,
-    settings: {},
-    brain_id: brainId,
-  });
-
   return (
     await axiosInstance.post<void>(`/sync/active`, {
       name: openedConnection.name,
