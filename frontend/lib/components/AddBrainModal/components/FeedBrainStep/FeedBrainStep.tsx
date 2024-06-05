@@ -57,23 +57,72 @@ export const FeedBrainStep = (): JSX.Element => {
     );
   };
 
-  const getButtonName = (): string => {
+  const arraysAreEqual = (arr1: string[], arr2: string[]): boolean => {
+    if (arr1.length !== arr2.length) {
+      return false;
+    }
+
+    for (let i = 0; i < arr1.length; i++) {
+      if (arr1[i] !== arr2[i]) {
+        return false;
+      }
+    }
+
+    return true;
+  };
+
+  const getButtonProps = (): {
+    label: string;
+    type: "dangerous" | "primary";
+    disabled: boolean;
+    callback: () => void;
+  } => {
     const matchingOpenedConnection =
       currentConnection &&
       openedConnections.find((conn) => conn.id === currentConnection.id);
 
     if (matchingOpenedConnection) {
       if (isRemoveAll()) {
-        return "Remove All";
+        return {
+          label: "Remove All",
+          type: "dangerous",
+          disabled: false,
+          callback: removeConnection,
+        };
       } else if (
         isUpdate() ||
         (selectSpecificFiles && currentConnection.submitted)
       ) {
-        return "Update added files";
+        const matchingSelectedFileIds =
+          matchingOpenedConnection.selectedFiles.files
+            .map((file) => file.id)
+            .sort();
+
+        const currentSelectedFileIds = currentConnection.selectedFiles.files
+          .map((file) => file.id)
+          .sort();
+
+        const isDisabled = arraysAreEqual(
+          matchingSelectedFileIds,
+          currentSelectedFileIds
+        );
+
+        return {
+          label: "Update added files",
+          type: "primary",
+          disabled:
+            !matchingOpenedConnection.selectedFiles.files.length || isDisabled,
+          callback: addConnection,
+        };
       }
     }
 
-    return selectSpecificFiles ? "Add specific files" : "Add all";
+    return {
+      label: selectSpecificFiles ? "Add specific files" : "Add all",
+      type: "primary",
+      disabled: false,
+      callback: addConnection,
+    };
   };
 
   const addConnection = (): void => {
@@ -94,6 +143,15 @@ export const FeedBrainStep = (): JSX.Element => {
 
       return prevConnections;
     });
+
+    setCurrentSyncId(undefined);
+    setSelectSpecificFiles(false);
+  };
+
+  const removeConnection = (): void => {
+    setOpenedConnections((prevConnections) =>
+      prevConnections.filter((connection) => connection.id !== currentSyncId)
+    );
 
     setCurrentSyncId(undefined);
     setSelectSpecificFiles(false);
@@ -137,11 +195,12 @@ export const FeedBrainStep = (): JSX.Element => {
         )}
         {currentSyncId ? (
           <QuivrButton
-            label={getButtonName()}
-            color="primary"
-            iconName="add"
-            onClick={addConnection}
+            label={getButtonProps().label}
+            color={getButtonProps().type}
+            iconName={getButtonProps().type === "dangerous" ? "delete" : "add"}
+            onClick={getButtonProps().callback}
             important={true}
+            disabled={getButtonProps().disabled}
           />
         ) : (
           <QuivrButton
