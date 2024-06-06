@@ -95,6 +95,12 @@ const renderExistingConnections = ({
               onClick={() =>
                 void handleGetSyncFiles(connection.id, connection.provider)
               }
+              specificFiles={openedConnections.some((openedConnection) => {
+                return (
+                  openedConnection.name === connection.name &&
+                  !openedConnection.allFiles
+                );
+              })}
             />
           </div>
         ))}
@@ -127,7 +133,9 @@ export const ConnectionSection = ({
         const res: Sync[] = await getUserSyncs();
         setExistingConnections(
           res.filter(
-            (sync) => !!sync.credentials.token && sync.provider === provider
+            (sync) =>
+              Object.keys(sync.credentials).length !== 0 &&
+              sync.provider === provider
           )
         );
       } catch (error) {

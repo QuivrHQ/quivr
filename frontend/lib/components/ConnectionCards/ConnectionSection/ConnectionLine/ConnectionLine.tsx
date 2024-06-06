@@ -20,12 +20,6 @@ export const ConnectionLine = ({
       </div>
       <div className={styles.icons}>
         <Icon
-          name="uploadFile"
-          size="normal"
-          color="black"
-          handleHover={true}
-        />
-        <Icon
           name="delete"
           size="normal"
           color="dangerous"
