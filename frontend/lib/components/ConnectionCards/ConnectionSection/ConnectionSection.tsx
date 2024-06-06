@@ -28,7 +28,11 @@ const renderConnectionLines = (
   if (!folded) {
     return existingConnections.map((connection, index) => (
       <div key={index}>
-        <ConnectionLine label={connection.email} index={index} />
+        <ConnectionLine
+          label={connection.email}
+          index={index}
+          id={connection.id}
+        />
       </div>
     ));
   } else {
@@ -123,26 +127,38 @@ export const ConnectionSection = ({
     setCurrentSyncId,
     setOpenedConnections,
     openedConnections,
+    hasToReload,
+    setHasToReload,
   } = useFromConnectionsContext();
   const [existingConnections, setExistingConnections] = useState<Sync[]>([]);
   const [folded, setFolded] = useState<boolean>(!fromAddKnowledge);
 
+  const fetchUserSyncs = async () => {
+    try {
+      const res: Sync[] = await getUserSyncs();
+      setExistingConnections(
+        res.filter(
+          (sync) =>
+            Object.keys(sync.credentials).length !== 0 &&
+            sync.provider === provider
+        )
+      );
+      console.info(res);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   useEffect(() => {
-    void (async () => {
-      try {
-        const res: Sync[] = await getUserSyncs();
-        setExistingConnections(
-          res.filter(
-            (sync) =>
-              Object.keys(sync.credentials).length !== 0 &&
-              sync.provider === provider
-          )
-        );
-      } catch (error) {
-        console.error(error);
-      }
-    })();
+    void fetchUserSyncs();
   }, []);
+
+  useEffect(() => {
+    if (hasToReload) {
+      void fetchUserSyncs();
+      setHasToReload(false);
+    }
+  }, [hasToReload]);
 
   const handleOpenedConnections = (userSyncId: number) => {
     const existingConnection = openedConnections.find(

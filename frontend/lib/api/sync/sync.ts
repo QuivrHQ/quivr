@@ -72,3 +72,10 @@ export const getActiveSyncs = async (
 ): Promise<ActiveSync[]> => {
   return (await axiosInstance.get<ActiveSync[]>(`/sync/active`)).data;
 };
+
+export const deleteUserSync = async (
+  axiosInstance: AxiosInstance,
+  syncId: number
+): Promise<void> => {
+  return (await axiosInstance.delete<void>(`/sync/${syncId}`)).data;
+};

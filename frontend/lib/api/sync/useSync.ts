@@ -3,6 +3,7 @@ import { UUID } from "crypto";
 import { useAxios } from "@/lib/hooks";
 
 import {
+  deleteUserSync,
   getActiveSyncs,
   getSyncFiles,
   getUserSyncs,
@@ -41,5 +42,7 @@ export const useSync = () => {
       syncFiles(axiosInstance, openedConnection, brainId),
     getActiveSyncs: async () => getActiveSyncs(axiosInstance),
     getActiveSyncsForBrain,
+    deleteUserSync: async (syncId: number) =>
+      deleteUserSync(axiosInstance, syncId),
   };
 };
