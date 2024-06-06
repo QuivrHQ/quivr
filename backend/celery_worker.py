@@ -1,11 +1,10 @@
-import asyncio
-import io
 import os
 from datetime import datetime, timezone
+from tempfile import NamedTemporaryFile
+from uuid import UUID
 
 from celery.schedules import crontab
 from celery_config import celery
-from fastapi import UploadFile
 from logger import get_logger
 from middlewares.auth.auth_bearer import AuthBearer
 from models.files import File
@@ -18,7 +17,7 @@ from modules.notification.dto.inputs import NotificationUpdatableProperties
 from modules.notification.entity.notification import NotificationsStatusEnum
 from modules.notification.service.notification_service import NotificationService
 from modules.onboarding.service.onboarding_service import OnboardingService
-from packages.files.crawl.crawler import CrawlWebsite
+from packages.files.crawl.crawler import CrawlWebsite, slugify
 from packages.files.parsers.github import process_github
 from packages.files.processors import filter_file
 from packages.utils.telemetry import maybe_send_telemetry
@@ -42,39 +41,36 @@ def process_file_and_notify(
 ):
     try:
         supabase_client = get_supabase_client()
-        tmp_file_name = "tmp-file-" + file_name
-        tmp_file_name = tmp_file_name.replace("/", "_")
+        tmp_name = file_name.replace("/", "_")
+        base_file_name = os.path.basename(file_name)
+        _, file_extension = os.path.splitext(base_file_name)
 
-        with open(tmp_file_name, "wb+") as f:
+        with NamedTemporaryFile(
+            suffix="_" + tmp_name,  # pyright: ignore reportPrivateUsage=none
+        ) as tmp_file:
             res = supabase_client.storage.from_("quivr").download(file_name)
-            f.write(res)
-            f.seek(0)
-            file_content = f.read()
-
-            upload_file = UploadFile(
-                file=f, filename=file_name.split("/")[-1], size=len(file_content)
+            tmp_file.write(res)
+            tmp_file.flush()
+            file_instance = File(
+                file_name=base_file_name,
+                tmp_file_path=tmp_file.name,
+                bytes_content=res,
+                file_size=len(res),
+                file_extension=file_extension,
             )
-
-            file_instance = File(file=upload_file)
-            loop = asyncio.get_event_loop()
             brain_vector_service = BrainVectorService(brain_id)
             if delete_file:  # TODO fix bug
                 brain_vector_service.delete_file_from_brain(
                     file_original_name, only_vectors=True
                 )
-            message = loop.run_until_complete(
-                filter_file(
-                    file=file_instance,
-                    brain_id=brain_id,
-                    original_file_name=file_original_name,
-                )
+
+            message = filter_file(
+                file=file_instance,
+                brain_id=brain_id,
+                original_file_name=file_original_name,
             )
 
-            f.close()
-            os.remove(tmp_file_name)
-
             if notification_id:
-
                 notification_service.update_notification_by_id(
                     notification_id,
                     NotificationUpdatableProperties(
@@ -85,10 +81,12 @@ def process_file_and_notify(
             brain_service.update_brain_last_update_time(brain_id)
 
             return True
+
     except TimeoutError:
         logger.error("TimeoutError")
 
     except Exception as e:
+        logger.exception(e)
         notification_service.update_notification_by_id(
             notification_id,
             NotificationUpdatableProperties(
@@ -96,52 +94,51 @@ def process_file_and_notify(
                 description=f"An error occurred while processing the file: {e}",
             ),
         )
-        return False
 
 
 @celery.task(name="process_crawl_and_notify")
 def process_crawl_and_notify(
-    crawl_website_url,
-    brain_id,
+    crawl_website_url: str,
+    brain_id: UUID,
     notification_id=None,
 ):
+
     crawl_website = CrawlWebsite(url=crawl_website_url)
 
     if not crawl_website.checkGithub():
-        file_path, file_name = crawl_website.process()
+        # Build file data
+        extracted_content = crawl_website.process()
+        extracted_content_bytes = extracted_content.encode("utf-8")
+        file_name = slugify(crawl_website.url) + ".txt"
 
-        with open(file_path, "rb") as f:
-            file_content = f.read()
-
-        # Create a file-like object in memory using BytesIO
-        file_object = io.BytesIO(file_content)
-        upload_file = UploadFile(
-            file=file_object, filename=file_name, size=len(file_content)
-        )
-        file_instance = File(file=upload_file)
-
-        loop = asyncio.get_event_loop()
-        message = loop.run_until_complete(
-            filter_file(
+        with NamedTemporaryFile(
+            suffix="_" + file_name,  # pyright: ignore reportPrivateUsage=none
+        ) as tmp_file:
+            tmp_file.write(extracted_content_bytes)
+            tmp_file.flush()
+            file_instance = File(
+                file_name=file_name,
+                tmp_file_path=tmp_file.name,
+                bytes_content=extracted_content_bytes,
+                file_size=len(extracted_content),
+                file_extension=".txt",
+            )
+            message = filter_file(
                 file=file_instance,
                 brain_id=brain_id,
                 original_file_name=crawl_website_url,
             )
-        )
-        notification_service.update_notification_by_id(
-            notification_id,
-            NotificationUpdatableProperties(
-                status=NotificationsStatusEnum.SUCCESS,
-                description=f"Your URL has been properly crawled!",
-            ),
-        )
-    else:
-        loop = asyncio.get_event_loop()
-        message = loop.run_until_complete(
-            process_github(
-                repo=crawl_website.url,
-                brain_id=brain_id,
+            notification_service.update_notification_by_id(
+                notification_id,
+                NotificationUpdatableProperties(
+                    status=NotificationsStatusEnum.SUCCESS,
+                    description="Your URL has been properly crawled!",
+                ),
             )
+    else:
+        message = process_github(
+            repo=crawl_website.url,
+            brain_id=brain_id,
         )
 
     if notification_id:
@@ -221,6 +218,6 @@ celery.conf.beat_schedule = {
     },
     "process_sync_active": {
         "task": "process_sync_active",
-        "schedule": crontab(minute="*/5", hour="*"),
+        "schedule": crontab(minute="*/1", hour="*"),
     },
 }

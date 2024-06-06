@@ -3,6 +3,8 @@ version: "3.8"
 services:
   backend-core:
     image: backend-base:latest
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     pull_policy: never
     env_file:
       - .env
@@ -24,8 +26,6 @@ services:
       - "0.0.0.0"
       - "--port"
       - "5050"
-      - "--workers"
-      - "6"
       - "--log-level"
       - "info"
     restart: always
@@ -37,6 +37,8 @@ services:
   redis:
     image: redis:latest
     container_name: redis
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     restart: always
     ports:
       - 6379:6379
@@ -44,6 +46,8 @@ services:
   worker:
     pull_policy: never
     image: backend-base:latest
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     env_file:
       - .env
     container_name: worker
@@ -57,6 +61,8 @@ services:
   beat:
     image: backend-base:latest
     pull_policy: never
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     env_file:
       - .env
 
@@ -69,6 +75,8 @@ services:
   flower:
     image: backend-base:latest
     pull_policy: never
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     env_file:
       - .env
 

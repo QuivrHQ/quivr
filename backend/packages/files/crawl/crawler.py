@@ -1,6 +1,5 @@
 import os
 import re
-import tempfile
 import unicodedata
 
 from langchain_community.document_loaders import PlaywrightURLLoader
@@ -17,27 +16,21 @@ class CrawlWebsite(BaseModel):
     max_pages: int = 100
     max_time: int = 60
 
-    def process(self):
+    def process(self) -> str:
         # Extract and combine content recursively
         loader = PlaywrightURLLoader(
             urls=[self.url], remove_selectors=["header", "footer"]
         )
-        data = loader.load()
 
+        data = loader.load()
         # Now turn the data into a string
         logger.info(f"Extracted content from {len(data)} pages")
-        logger.info(data)
+        logger.debug(f"Extracted data : {data}")
         extracted_content = ""
         for page in data:
             extracted_content += page.page_content
 
-        # Create a file
-        file_name = slugify(self.url) + ".txt"
-        temp_file_path = os.path.join(tempfile.gettempdir(), file_name)
-        with open(temp_file_path, "w") as temp_file:
-            temp_file.write(extracted_content)  # type: ignore
-
-        return temp_file_path, file_name
+        return extracted_content
 
     def checkGithub(self):
         return "github.com" in self.url

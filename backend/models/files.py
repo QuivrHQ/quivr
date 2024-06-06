@@ -1,65 +1,37 @@
-import os
-import tempfile
-from typing import Any, Optional
-from uuid import UUID
+from pathlib import Path
+from typing import List, Optional
 
-from fastapi import UploadFile
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_core.documents import Document
 from logger import get_logger
 from models.databases.supabase.supabase import SupabaseDB
 from models.settings import get_supabase_db
 from modules.brain.service.brain_vector_service import BrainVectorService
-from packages.files.file import compute_sha1_from_file
+from packages.files.file import compute_sha1_from_content
 from pydantic import BaseModel
 
 logger = get_logger(__name__)
 
 
 class File(BaseModel):
-    id: Optional[UUID] = None
-    file: Optional[UploadFile] = None
-    file_name: Optional[str] = ""
-    file_size: Optional[int] = None
-    file_sha1: Optional[str] = ""
-    vectors_ids: Optional[list] = []
-    file_extension: Optional[str] = ""
-    content: Optional[Any] = None
+    file_name: str
+    tmp_file_path: Path
+    bytes_content: bytes
+    file_size: int
+    file_extension: str
     chunk_size: int = 400
     chunk_overlap: int = 100
-    documents: Optional[Document] = None
+    documents: List[Document] = []
+    file_sha1: Optional[str] = None
+    vectors_ids: Optional[list] = []
+
+    def __init__(self, **data):
+        super().__init__(**data)
+        data["file_sha1"] = compute_sha1_from_content(data["bytes_content"])
 
     @property
     def supabase_db(self) -> SupabaseDB:
         return get_supabase_db()
-
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-
-        if self.file:
-            self.file_name = self.file.filename
-            self.file_size = self.file.size  # pyright: ignore reportPrivateUsage=none
-            self.file_extension = os.path.splitext(
-                self.file.filename  # pyright: ignore reportPrivateUsage=none
-            )[-1].lower()
-
-    async def compute_file_sha1(self):
-        """
-        Compute the sha1 of the file using a temporary file
-        """
-        with tempfile.NamedTemporaryFile(
-            delete=False,
-            suffix=self.file.filename,  # pyright: ignore reportPrivateUsage=none
-        ) as tmp_file:
-            await self.file.seek(0)  # pyright: ignore reportPrivateUsage=none
-            self.content = (
-                await self.file.read()  # pyright: ignore reportPrivateUsage=none
-            )
-            tmp_file.write(self.content)
-            tmp_file.flush()
-            self.file_sha1 = compute_sha1_from_file(tmp_file.name)
-
-        os.remove(tmp_file.name)
 
     def compute_documents(self, loader_class):
         """
@@ -69,18 +41,8 @@ class File(BaseModel):
             loader_class (class): The class of the loader to use to load the file
         """
         logger.info(f"Computing documents from file {self.file_name}")
-
-        documents = []
-        with tempfile.NamedTemporaryFile(
-            delete=False,
-            suffix=self.file.filename,  # pyright: ignore reportPrivateUsage=none
-        ) as tmp_file:
-            tmp_file.write(self.content)  # pyright: ignore reportPrivateUsage=none
-            tmp_file.flush()
-            loader = loader_class(tmp_file.name)
-            documents = loader.load()
-
-        os.remove(tmp_file.name)
+        loader = loader_class(self.tmp_file_path)
+        documents = loader.load()
 
         text_splitter = RecursiveCharacterTextSplitter.from_tiktoken_encoder(
             chunk_size=self.chunk_size, chunk_overlap=self.chunk_overlap
@@ -129,7 +91,7 @@ class File(BaseModel):
         """
         Check if file is empty by checking if the file pointer is at the beginning of the file
         """
-        return self.file.size < 1  # pyright: ignore reportPrivateUsage=none
+        return self.file_size < 1  # pyright: ignore reportPrivateUsage=none
 
     def link_file_to_brain(self, brain_id):
         self.set_file_vectors_ids()

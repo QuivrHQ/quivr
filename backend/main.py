@@ -1,15 +1,9 @@
-import os
-
-if __name__ == "__main__":
-    # import needed here when running main.py to debug backend
-    # you will need to run pip install python-dotenv
-    from dotenv import load_dotenv  # type: ignore
-
-    load_dotenv()
 import logging
+import os
 
 import litellm
 import sentry_sdk
+from dotenv import load_dotenv  # type: ignore
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import HTMLResponse, JSONResponse
 from logger import get_logger
@@ -34,6 +28,8 @@ from routes.crawl_routes import crawl_router
 from routes.subscription_routes import subscription_router
 from sentry_sdk.integrations.fastapi import FastApiIntegration
 from sentry_sdk.integrations.starlette import StarletteIntegration
+
+load_dotenv()
 
 # Set the logging level for all loggers to WARNING
 logging.basicConfig(level=logging.INFO)
