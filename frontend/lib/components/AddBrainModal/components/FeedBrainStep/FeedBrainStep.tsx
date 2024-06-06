@@ -120,7 +120,9 @@ export const FeedBrainStep = (): JSX.Element => {
     return {
       label: selectSpecificFiles ? "Add specific files" : "Add all",
       type: "primary",
-      disabled: false,
+      disabled:
+        selectSpecificFiles &&
+        !matchingOpenedConnection?.selectedFiles.files.length,
       callback: addConnection,
     };
   };
