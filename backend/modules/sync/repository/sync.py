@@ -179,7 +179,7 @@ class Sync(SyncInterface):
         response = (
             self.db.table("syncs_active")
             .select("*")
-            .lt("last_synced", (current_time - timedelta(minutes=30)).isoformat())
+            .lt("last_synced", (current_time - timedelta(minutes=360)).isoformat())
             .execute()
         )
         if response.data:
