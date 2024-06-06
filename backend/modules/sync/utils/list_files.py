@@ -46,7 +46,7 @@ def get_google_drive_files(credentials: dict, folder_id: str = None):
 
         if not items:
             logger.info("No files found in Google Drive")
-            return {"files": "No files found."}
+            return {"files": []}
 
         files = [
             {
@@ -122,7 +122,7 @@ def list_azure_files(credentials, folder_id=None):
 
     if not items:
         logger.info("No files found in Azure Drive")
-        return {"files": "No files found."}
+        return {"files": []}
 
     files = [
         {

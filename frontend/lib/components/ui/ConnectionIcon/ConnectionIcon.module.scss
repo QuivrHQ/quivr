@@ -6,8 +6,10 @@
   border-radius: Radius.$circle;
   padding: Spacings.$spacing01;
   color: var(--white-0);
-  width: 24px;
-  height: 24px;
+  min-width: 24px;
+  min-height: 24px;
+  max-height: 24px;
+  max-width: 24px;
   font-size: Typography.$tiny;
   display: flex;
   align-items: center;

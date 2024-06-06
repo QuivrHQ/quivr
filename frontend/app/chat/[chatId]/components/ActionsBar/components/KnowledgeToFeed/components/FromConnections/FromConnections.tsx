@@ -91,7 +91,7 @@ export const FromConnections = (): JSX.Element => {
 
   return (
     <div className={styles.from_connection_container}>
-      {!currentSyncElements?.files.length || !currentSyncId ? (
+      {!currentSyncId ? (
         <ConnectionCards fromAddKnowledge={true} />
       ) : (
         <div className={styles.from_connection_wrapper}>
@@ -140,6 +140,9 @@ export const FromConnections = (): JSX.Element => {
                 />
               </div>
             ))}
+            {!currentFiles.length && !currentFolders.length && (
+              <span className={styles.empty_folder}>Empty folder</span>
+            )}
           </div>
         </div>
       )}

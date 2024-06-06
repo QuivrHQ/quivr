@@ -1,4 +1,5 @@
 @use "@/styles/Spacings.module.scss";
+@use "@/styles/Typography.module.scss";
 
 .from_connection_container {
   overflow: auto;
@@ -24,6 +25,11 @@
       &.disable {
         opacity: 0.5;
         pointer-events: none;
+      }
+
+      .empty_folder {
+        font-style: italic;
+        font-size: Typography.$small;
       }
     }
   }
