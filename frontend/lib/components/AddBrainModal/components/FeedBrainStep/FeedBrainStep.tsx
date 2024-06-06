@@ -41,11 +41,14 @@ export const FeedBrainStep = (): JSX.Element => {
     goToNextStep();
   };
 
-  const isRemoveAll = (): boolean => {
+  const isRemoveAll = (matchingOpenedConnection: OpenedConnection): boolean => {
     return !!(
-      currentConnection?.allFiles &&
-      !selectSpecificFiles &&
-      currentConnection.submitted
+      (selectSpecificFiles &&
+        currentConnection?.submitted &&
+        matchingOpenedConnection.selectedFiles.files.length === 0) ||
+      (currentConnection?.submitted &&
+        !selectSpecificFiles &&
+        currentConnection.allFiles)
     );
   };
 
@@ -82,7 +85,7 @@ export const FeedBrainStep = (): JSX.Element => {
       openedConnections.find((conn) => conn.id === currentConnection.id);
 
     if (matchingOpenedConnection) {
-      if (isRemoveAll()) {
+      if (isRemoveAll(matchingOpenedConnection)) {
         return {
           label: "Remove All",
           type: "dangerous",

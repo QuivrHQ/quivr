@@ -14,6 +14,7 @@ export interface SyncElements {
 interface Credentials {
   token: string;
 }
+
 export interface Sync {
   name: string;
   provider: Provider;
