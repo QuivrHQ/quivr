@@ -218,6 +218,6 @@ celery.conf.beat_schedule = {
     },
     "process_sync_active": {
         "task": "process_sync_active",
-        "schedule": crontab(minute="*/5", hour="*"),
+        "schedule": crontab(minute="*/1", hour="*"),
     },
 }

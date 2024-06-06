@@ -103,7 +103,7 @@ class AzureSyncUtils(BaseModel):
 
                 # Check if the file already exists in the storage
                 if check_file_exists(brain_id, file_name):
-                    logger.info("🔥 File already exists in the storage: %s", file_name)
+                    logger.debug("🔥 File already exists in the storage: %s", file_name)
 
                     self.storage.remove_file(brain_id + "/" + file_name)
                     BrainsVectors().delete_file_from_brain(brain_id, file_name)
@@ -250,11 +250,14 @@ class AzureSyncUtils(BaseModel):
             for file in files.get("files", [])
             if not file["is_folder"]
             and (
-                not last_synced_time
-                or datetime.strptime(
-                    file["last_modified"], "%Y-%m-%dT%H:%M:%SZ"
-                ).replace(tzinfo=timezone.utc)
-                > last_synced_time
+                (
+                    not last_synced_time
+                    or datetime.strptime(
+                        file["last_modified"], "%Y-%m-%dT%H:%M:%SZ"
+                    ).replace(tzinfo=timezone.utc)
+                    > last_synced_time
+                )
+                or not check_file_exists(sync_active["brain_id"], file["name"])
             )
         ]
 
