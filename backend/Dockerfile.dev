@@ -1,5 +1,5 @@
 # Using a slim version for a smaller base image
-FROM python:3.11.6-slim-bullseye@sha256:0c1fbb294096d842ad795ee232d783cab436c90b034210fe894f2bb2f2be7626
+FROM python:3.11.6-slim-bullseye
 
 ARG DEV_MODE
 ENV DEV_MODE=$DEV_MODE

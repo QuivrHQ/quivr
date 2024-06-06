@@ -49,8 +49,12 @@ def check_file_exists(brain_id: str, file_identifier: str) -> bool:
         response = supabase_client.storage.from_("quivr").list(brain_id)
 
         # Check if the file_identifier is in the response
-        file_exists = any(file["name"] == file_identifier for file in response)
-
+        file_exists = any(
+            file["name"].split(".")[0] == file_identifier.split(".")[0]
+            for file in response
+        )
+        logger.info(f"File identifier: {file_identifier}")
+        logger.info(f"File exists: {file_exists}")
         if file_exists:
             logger.info(f"File {file_identifier} exists.")
             return True
@@ -59,7 +63,7 @@ def check_file_exists(brain_id: str, file_identifier: str) -> bool:
             return False
     except Exception as e:
         logger.error(f"An error occurred while checking the file: {e}")
-        raise e
+        return True
 
 
 def upload_file_storage(file, file_identifier: str, upsert: str = "false"):

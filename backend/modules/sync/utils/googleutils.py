@@ -57,10 +57,11 @@ class GoogleSyncUtils(BaseModel):
             logger.info("Google Drive credentials refreshed")
             # Updating the credentials in the database
 
-        try:
-            service = build("drive", "v3", credentials=creds)
-            downloaded_files = []
-            for file in files:
+        service = build("drive", "v3", credentials=creds)
+        downloaded_files = []
+        for file in files:
+            logger.info("🔥🔥🔥🔥: %s", file)
+            try:
                 file_id = file["id"]
                 file_name = file["name"]
                 mime_type = file["mime_type"]
@@ -68,7 +69,8 @@ class GoogleSyncUtils(BaseModel):
                 # Convert Google Docs files to appropriate formats before downloading
                 if mime_type == "application/vnd.google-apps.document":
                     logger.debug(
-                        "Converting Google Docs file with file_id: %s to DOCX.", file_id
+                        "Converting Google Docs file with file_id: %s to DOCX.",
+                        file_id,
                     )
                     request = service.files().export_media(
                         fileId=file_id,
@@ -119,7 +121,7 @@ class GoogleSyncUtils(BaseModel):
 
                 # Check if the file already exists in the storage
                 if check_file_exists(brain_id, file_name):
-                    logger.info("🔥 File already exists in the storage: %s", file_name)
+                    logger.debug("🔥 File already exists in the storage: %s", file_name)
 
                     self.storage.remove_file(brain_id + "/" + file_name)
                     BrainsVectors().delete_file_from_brain(brain_id, file_name)
@@ -129,7 +131,7 @@ class GoogleSyncUtils(BaseModel):
                     filename=file_name,
                 )
 
-                await upload_file(to_upload_file, brain_id, current_user)
+                await upload_file(to_upload_file, brain_id, current_user)  # type: ignore
 
                 # Check if the file already exists in the database
                 existing_files = self.sync_files_repo.get_sync_files(sync_active_id)
@@ -156,13 +158,13 @@ class GoogleSyncUtils(BaseModel):
                         )
                     )
 
-                downloaded_files.append(file_name)
-            return {"downloaded_files": downloaded_files}
-        except HttpError as error:
-            logger.error(
-                "An error occurred while downloading Google Drive files: %s", error
-            )
-            return {"error": f"An error occurred: {error}"}
+                    downloaded_files.append(file_name)
+            except HttpError as error:
+                logger.error(
+                    "An error occurred while downloading Google Drive files: %s",
+                    error,
+                )
+        return {"downloaded_files": downloaded_files}
 
     async def sync(self, sync_active_id: int, user_id: str):
         """
@@ -244,15 +246,21 @@ class GoogleSyncUtils(BaseModel):
 
         # Filter files that have been modified since the last sync
         last_synced_time = datetime.fromisoformat(last_synced) if last_synced else None
+
         files_to_download = [
             file
             for file in files.get("files", [])
             if not file["is_folder"]
             and (
-                not last_synced_time
-                or datetime.fromisoformat(file["last_modified"]) > last_synced_time
+                (
+                    not last_synced_time
+                    or datetime.fromisoformat(file["last_modified"]) > last_synced_time
+                )
+                or not check_file_exists(sync_active["brain_id"], file["name"])
             )
         ]
+
+        logger.error(files_to_download)
 
         downloaded_files = await self._upload_files(
             sync_user["credentials"],
@@ -261,12 +269,6 @@ class GoogleSyncUtils(BaseModel):
             sync_active["brain_id"],
             sync_active_id,
         )
-        if "error" in downloaded_files:
-            logger.error(
-                "Failed to download files from Google Drive for sync_active_id: %s",
-                sync_active_id,
-            )
-            return None
 
         # Update the last_synced timestamp
         self.sync_active_service.update_sync_active(
