@@ -21,6 +21,10 @@
       @include Typography.H2;
     }
 
+    .warning_message {
+      font-size: Typography.$small;
+    }
+
     .brain_info_wrapper {
       display: flex;
       flex-direction: column;

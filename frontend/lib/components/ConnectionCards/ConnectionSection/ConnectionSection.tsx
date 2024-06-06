@@ -154,6 +154,20 @@ export const ConnectionSection = ({
   }, []);
 
   useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "visible" && !document.hidden) {
+        void fetchUserSyncs();
+      }
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+  }, []);
+
+  useEffect(() => {
     if (hasToReload) {
       void fetchUserSyncs();
       setHasToReload(false);

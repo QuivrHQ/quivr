@@ -2,6 +2,7 @@ import { Controller } from "react-hook-form";
 
 import { useFromConnectionsContext } from "@/app/chat/[chatId]/components/ActionsBar/components/KnowledgeToFeed/components/FromConnections/FromConnectionsProvider/hooks/useFromConnectionContext";
 import { useUserApi } from "@/lib/api/user/useUserApi";
+import { MessageInfoBox } from "@/lib/components/ui/MessageInfoBox/MessageInfoBox";
 import QuivrButton from "@/lib/components/ui/QuivrButton/QuivrButton";
 import { TextAreaInput } from "@/lib/components/ui/TextAreaInput/TextAreaInput";
 import { TextInput } from "@/lib/components/ui/TextInput/TextInput";
@@ -48,6 +49,12 @@ export const BrainRecapStep = (): JSX.Element => {
     <div className={styles.brain_recap_wrapper}>
       <div className={styles.content_wrapper}>
         <span className={styles.title}>Brain Recap</span>
+        <MessageInfoBox type="warning">
+          <span className={styles.warning_message}>
+            Depending on the number of selected files, the brain creation can
+            take from <strong>1 minute</strong> to <strong>1 hour</strong>
+          </span>
+        </MessageInfoBox>
         <div className={styles.brain_info_wrapper}>
           <div className={styles.name_field}>
             <Controller

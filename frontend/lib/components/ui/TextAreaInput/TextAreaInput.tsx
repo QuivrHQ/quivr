@@ -24,7 +24,7 @@ export const TextAreaInput = ({
       <textarea
         className={styles.text_area_input}
         value={inputValue}
-        rows={5}
+        rows={4}
         onChange={(e) => setInputValue(e.target.value)}
         placeholder={label}
         onKeyDown={(e) => {
