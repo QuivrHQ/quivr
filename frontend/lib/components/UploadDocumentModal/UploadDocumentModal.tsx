@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { KnowledgeToFeed } from "@/app/chat/[chatId]/components/ActionsBar/components";
@@ -32,6 +32,18 @@ export const UploadDocumentModal = (): JSX.Element => {
 
   useKnowledgeToFeedContext();
   const { t } = useTranslation(["knowledge"]);
+
+  const disabled = useMemo(() => {
+    console.info(openedConnections);
+
+    return (
+      (knowledgeToFeed.length === 0 &&
+        openedConnections.filter((connection) => {
+          return connection.submitted || !!connection.last_synced;
+        }).length === 0) ||
+      !currentBrain
+    );
+  }, [knowledgeToFeed, openedConnections, currentBrain, currentSyncId]);
 
   const handleFeedBrain = async () => {
     setFeeding(true);
@@ -102,13 +114,7 @@ export const UploadDocumentModal = (): JSX.Element => {
               color="primary"
               iconName="add"
               onClick={handleFeedBrain}
-              disabled={
-                (knowledgeToFeed.length === 0 &&
-                  openedConnections.filter((connection) => {
-                    return connection.submitted || !!connection.last_synced;
-                  }).length === 0) ||
-                !currentBrain
-              }
+              disabled={disabled}
               isLoading={feeding}
               important={true}
             />

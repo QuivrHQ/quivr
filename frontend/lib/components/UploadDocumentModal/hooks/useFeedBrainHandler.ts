@@ -38,7 +38,6 @@ export const useFeedBrainHandler = () => {
     );
 
     const existingConnections = await getActiveSyncsForBrain(brainId);
-    console.info(existingConnections, openedConnections);
 
     await Promise.all(
       openedConnections.map(async (openedConnection) => {

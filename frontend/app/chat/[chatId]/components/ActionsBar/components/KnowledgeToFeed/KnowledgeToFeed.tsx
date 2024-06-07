@@ -68,7 +68,6 @@ export const KnowledgeToFeed = ({
   ];
 
   useEffect(() => {
-    console.info(currentBrainId);
     if (currentBrain) {
       void (async () => {
         try {

@@ -8,7 +8,8 @@ const isRemoveAll = (
 ): boolean => {
   return !!(
     currentConnection?.submitted &&
-    matchingOpenedConnection.selectedFiles.files.length === 0
+    matchingOpenedConnection.selectedFiles.files.length === 0 &&
+    !currentConnection.cleaned
   );
 };
 
@@ -111,6 +112,7 @@ const addConnection = (
       newConnections[connectionIndex] = {
         ...newConnections[connectionIndex],
         submitted: true,
+        cleaned: false,
       };
 
       return newConnections;
@@ -130,9 +132,22 @@ const removeConnection = (
   setCurrentSyncId: React.Dispatch<React.SetStateAction<number | undefined>>
 ): void => {
   setOpenedConnections((prevConnections) =>
-    prevConnections.filter(
-      (connection) => connection.user_sync_id !== currentSyncId
-    )
+    prevConnections
+      .filter((connection) => {
+        return (
+          connection.user_sync_id === currentSyncId || !!connection.last_synced
+        );
+      })
+      .map((connection) => {
+        if (
+          connection.user_sync_id === currentSyncId &&
+          !!connection.last_synced
+        ) {
+          return { ...connection, cleaned: true };
+        } else {
+          return connection;
+        }
+      })
   );
 
   setCurrentSyncId(undefined);

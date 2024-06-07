@@ -46,4 +46,5 @@ export interface OpenedConnection {
   selectedFiles: SyncElements;
   name: string;
   last_synced: string;
+  cleaned?: boolean;
 }
