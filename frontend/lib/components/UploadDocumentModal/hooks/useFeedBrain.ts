@@ -57,12 +57,11 @@ export const useFeedBrain = ({
       dispatchHasPendingRequests?.();
       closeFeedInput?.();
       setHasPendingRequests(true);
-      setShouldDisplayFeedCard(false);
       await handleFeedBrain({
         brainId,
         chatId: currentChatId,
       });
-
+      setShouldDisplayFeedCard(false);
       setKnowledgeToFeed([]);
     } catch (e) {
       publish({

@@ -104,8 +104,9 @@ export const UploadDocumentModal = (): JSX.Element => {
               onClick={handleFeedBrain}
               disabled={
                 (knowledgeToFeed.length === 0 &&
-                  openedConnections.filter((connection) => connection.submitted)
-                    .length === 0) ||
+                  openedConnections.filter((connection) => {
+                    return connection.submitted || !!connection.last_synced;
+                  }).length === 0) ||
                 !currentBrain
               }
               isLoading={feeding}

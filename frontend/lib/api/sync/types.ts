@@ -8,7 +8,6 @@ export interface SyncElement {
 
 export interface SyncElements {
   files: SyncElement[];
-  empty?: boolean;
 }
 
 interface Credentials {

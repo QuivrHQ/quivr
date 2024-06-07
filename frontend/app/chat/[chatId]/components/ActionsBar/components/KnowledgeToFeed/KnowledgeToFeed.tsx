@@ -20,7 +20,8 @@ export const KnowledgeToFeed = ({
 }: {
   hideBrainSelector?: boolean;
 }): JSX.Element => {
-  const { allBrains, setCurrentBrainId, currentBrain } = useBrainContext();
+  const { allBrains, setCurrentBrainId, currentBrainId, currentBrain } =
+    useBrainContext();
   const [selectedTab, setSelectedTab] = useState("Documents");
   const { knowledgeToFeed } = useKnowledgeToFeedContext();
   const { openedConnections, setOpenedConnections, setCurrentSyncId } =
@@ -67,6 +68,7 @@ export const KnowledgeToFeed = ({
   ];
 
   useEffect(() => {
+    console.info(currentBrainId);
     if (currentBrain) {
       void (async () => {
         try {
@@ -101,7 +103,7 @@ export const KnowledgeToFeed = ({
         }
       })();
     }
-  }, [currentBrain]);
+  }, [currentBrainId]);
 
   return (
     <div className={styles.knowledge_to_feed_wrapper}>
