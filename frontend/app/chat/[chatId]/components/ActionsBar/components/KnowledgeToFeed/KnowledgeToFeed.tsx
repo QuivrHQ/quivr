@@ -98,7 +98,6 @@ export const KnowledgeToFeed = ({
           console.error(error);
         }
       })();
-      console.info(openedConnections);
     }
   }, [currentBrain]);
 

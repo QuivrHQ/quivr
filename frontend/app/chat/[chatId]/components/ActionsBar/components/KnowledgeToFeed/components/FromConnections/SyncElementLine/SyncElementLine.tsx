@@ -75,16 +75,24 @@ export const SyncElementLine = ({
         }
       }}
     >
-      {selectable && (
-        <div
-          className={styles.checkbox_wrapper}
-          onMouseEnter={() => setIsCheckboxHovered(true)}
-          onMouseLeave={() => setIsCheckboxHovered(false)}
-          style={{ pointerEvents: "auto" }}
-        >
-          <Checkbox checked={checked} setChecked={handleSetChecked} />
-        </div>
-      )}
+      <div
+        className={styles.checkbox_wrapper}
+        onMouseEnter={() => setIsCheckboxHovered(true)}
+        onMouseLeave={() => setIsCheckboxHovered(false)}
+        style={{ pointerEvents: "auto" }}
+      >
+        <Checkbox
+          checked={checked}
+          setChecked={handleSetChecked}
+          disabled={!selectable}
+          tooltip={
+            !selectable
+              ? "Only premium members can sync folders. This feature automatically adds new files from your folders to your brain, keeping it up-to-date without manual effort."
+              : ""
+          }
+        />
+      </div>
+
       <Icon name={isFolder ? "folder" : "file"} color="black" size="normal" />
       <span className={styles.element_name}>{name}</span>
     </div>

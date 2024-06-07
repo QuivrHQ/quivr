@@ -21,6 +21,12 @@
     }
   }
 
+  &.disabled {
+    background-color: var(--background-3);
+    opacity: 0.4;
+    cursor: default;
+  }
+
   &:hover {
     background-color: var(--background-3);
   }
