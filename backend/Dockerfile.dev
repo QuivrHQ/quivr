@@ -10,11 +10,8 @@ RUN apt-get clean && apt-get update && apt-get install -y \
     libcurl4-openssl-dev \
     libssl-dev \
     binutils \
-    pandoc \
     curl \
     git \
-    poppler-utils \
-    tesseract-ocr \
     autoconf \
     automake \
     build-essential \
@@ -31,13 +28,17 @@ RUN apt-get clean && apt-get update && apt-get install -y \
     pandoc && \
     rm -rf /var/lib/apt/lists/* && apt-get clean
 
+# TODO(@aminediro) : multistage build. Probably dont neet poetry once its built
+# Install Poetry
 RUN curl -sSL https://install.python-poetry.org | POETRY_HOME=/opt/poetry python && \
     cd /usr/local/bin && \
     ln -s /opt/poetry/bin/poetry && \
     poetry config virtualenvs.create false
 
 # Add Rust binaries to the PATH
-ENV PATH="/root/.cargo/bin:${PATH}"
+ENV PATH="/root/.cargo/bin:${PATH}" \
+    POETRY_CACHE_DIR=/tmp/poetry_cache \
+    PYTHONDONTWRITEBYTECODE=1
 
 WORKDIR /code
 
@@ -45,10 +46,11 @@ WORKDIR /code
 COPY ./pyproject.toml ./poetry.lock* /code/
 
 # Run install
-RUN bash -c "if [ $DEV_MODE == 'true' ] ; then poetry install --no-root ; else poetry install --no-root --only main ; fi"
+RUN poetry install --no-root  && \
+    playwright install --with-deps && \
+    rm -rf $POETRY_CACHE_DIR
+
 
 ENV PYTHONPATH=/code
 
 EXPOSE 5050
-
-CMD ["uvicorn", "main:app","--reload", "--host", "0.0.0.0", "--port", "5050", "--workers", "6"]
