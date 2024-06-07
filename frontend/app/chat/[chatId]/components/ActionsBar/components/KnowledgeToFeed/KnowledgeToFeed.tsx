@@ -23,7 +23,7 @@ export const KnowledgeToFeed = ({
   const { allBrains, setCurrentBrainId, currentBrain } = useBrainContext();
   const [selectedTab, setSelectedTab] = useState("Documents");
   const { knowledgeToFeed } = useKnowledgeToFeedContext();
-  const { openedConnections, setOpenedConnections } =
+  const { openedConnections, setOpenedConnections, setCurrentSyncId } =
     useFromConnectionsContext();
   const { getActiveSyncsForBrain } = useSync();
 
@@ -71,6 +71,7 @@ export const KnowledgeToFeed = ({
       void (async () => {
         try {
           const res = await getActiveSyncsForBrain(currentBrain.id);
+          setCurrentSyncId(undefined);
           setOpenedConnections(
             res.map((sync) => ({
               id: sync.syncs_user_id,

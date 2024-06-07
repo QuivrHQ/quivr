@@ -1,3 +1,5 @@
+import { SetStateAction } from "react";
+
 import { OpenedConnection } from "../api/sync/types";
 
 const isRemoveAll = (
@@ -131,3 +133,31 @@ const removeConnection = (
 
   setCurrentSyncId(undefined);
 };
+
+export const createHandleGetButtonProps =
+  (
+    currentConnection: OpenedConnection | undefined,
+    openedConnections: OpenedConnection[],
+    setOpenedConnections: {
+      (value: SetStateAction<OpenedConnection[]>): void;
+      (value: SetStateAction<OpenedConnection[]>): void;
+    },
+    currentSyncId: number | undefined,
+    setCurrentSyncId: {
+      (value: SetStateAction<number | undefined>): void;
+      (value: SetStateAction<number | undefined>): void;
+    }
+  ) =>
+  (): {
+    label: string;
+    type: "primary" | "dangerous";
+    disabled: boolean;
+    callback: () => void;
+  } =>
+    handleGetButtonProps(
+      currentConnection,
+      openedConnections,
+      setOpenedConnections,
+      currentSyncId,
+      setCurrentSyncId
+    );

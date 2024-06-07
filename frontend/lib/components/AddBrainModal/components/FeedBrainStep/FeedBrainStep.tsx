@@ -1,39 +1,16 @@
-import { SetStateAction, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 import { KnowledgeToFeed } from "@/app/chat/[chatId]/components/ActionsBar/components";
 import { useFromConnectionsContext } from "@/app/chat/[chatId]/components/ActionsBar/components/KnowledgeToFeed/components/FromConnections/FromConnectionsProvider/hooks/useFromConnectionContext";
 import { OpenedConnection } from "@/lib/api/sync/types";
 import { MessageInfoBox } from "@/lib/components/ui/MessageInfoBox/MessageInfoBox";
 import QuivrButton from "@/lib/components/ui/QuivrButton/QuivrButton";
-import { handleGetButtonProps } from "@/lib/helpers/handleConnectionButtons";
+import { createHandleGetButtonProps } from "@/lib/helpers/handleConnectionButtons";
 import { useUserData } from "@/lib/hooks/useUserData";
 
 import styles from "./FeedBrainStep.module.scss";
 
 import { useBrainCreationSteps } from "../../hooks/useBrainCreationSteps";
-
-const createHandleGetButtonProps =
-  (
-    currentConnection: OpenedConnection | undefined,
-    openedConnections: OpenedConnection[],
-    setOpenedConnections: {
-      (value: SetStateAction<OpenedConnection[]>): void;
-      (value: SetStateAction<OpenedConnection[]>): void;
-    },
-    currentSyncId: number | undefined,
-    setCurrentSyncId: {
-      (value: SetStateAction<number | undefined>): void;
-      (value: SetStateAction<number | undefined>): void;
-    }
-  ) =>
-  () =>
-    handleGetButtonProps(
-      currentConnection,
-      openedConnections,
-      setOpenedConnections,
-      currentSyncId,
-      setCurrentSyncId
-    );
 
 export const FeedBrainStep = (): JSX.Element => {
   const { currentStepIndex, goToPreviousStep, goToNextStep } =
