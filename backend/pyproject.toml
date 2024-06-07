@@ -96,6 +96,7 @@ google-auth-httplib2 = "*"
 google-auth-oauthlib = "*"
 msal = "*"
 sentry-sdk = { version = "^2.5.0", extras = ["fastapi"] }
+sqlmodel = "^0.0.19"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "*"

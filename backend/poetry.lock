@@ -7123,6 +7123,21 @@ pymysql = ["pymysql"]
 sqlcipher = ["sqlcipher3_binary"]
 
 [[package]]
+name = "sqlmodel"
+version = "0.0.19"
+description = "SQLModel, SQL databases in Python, designed for simplicity, compatibility, and robustness."
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "sqlmodel-0.0.19-py3-none-any.whl", hash = "sha256:6c8125d4101970d031e9aae970b20cbeaf44149989f8366d939f4ab21aab8763"},
+    {file = "sqlmodel-0.0.19.tar.gz", hash = "sha256:95449b0b48a40a3eecf0a629fa5735b9dfc8a5574a91090d24ca17f02246ad96"},
+]
+
+[package.dependencies]
+pydantic = ">=1.10.13,<3.0.0"
+SQLAlchemy = ">=2.0.14,<2.1.0"
+
+[[package]]
 name = "stack-data"
 version = "0.6.3"
 description = "Extract data from python stack frames and tracebacks for informative displays"
@@ -8804,4 +8819,4 @@ test = ["big-O", "importlib-resources", "jaraco.functools", "jaraco.itertools", 
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "c69e394dbf476fd131cc65c2f604d79f88a7ef783ebf11847c80cd359ac99e7c"
+content-hash = "b979401c34d944b67dee63dc19c8842965d8287c9543e3621852d48407501c67"
