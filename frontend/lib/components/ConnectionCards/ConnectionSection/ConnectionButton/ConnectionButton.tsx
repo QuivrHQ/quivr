@@ -1,4 +1,3 @@
-import { useFromConnectionsContext } from "@/app/chat/[chatId]/components/ActionsBar/components/KnowledgeToFeed/components/FromConnections/FromConnectionsProvider/hooks/useFromConnectionContext";
 import { ConnectionIcon } from "@/lib/components/ui/ConnectionIcon/ConnectionIcon";
 import QuivrButton from "@/lib/components/ui/QuivrButton/QuivrButton";
 
@@ -9,7 +8,6 @@ interface ConnectionButtonProps {
   index: number;
   onClick: (id: number) => void;
   submitted?: boolean;
-  specificFiles?: boolean;
 }
 
 export const ConnectionButton = ({
@@ -17,10 +15,7 @@ export const ConnectionButton = ({
   index,
   onClick,
   submitted,
-  specificFiles,
 }: ConnectionButtonProps): JSX.Element => {
-  const { setSelectSpecificFiles } = useFromConnectionsContext();
-
   return (
     <div className={styles.connection_button_wrapper}>
       <div className={styles.left}>
@@ -33,12 +28,7 @@ export const ConnectionButton = ({
           small={true}
           iconName="chevronRight"
           color="primary"
-          onClick={() => {
-            onClick(index);
-            if (specificFiles) {
-              setSelectSpecificFiles(true);
-            }
-          }}
+          onClick={() => onClick(index)}
         />
       </div>
     </div>

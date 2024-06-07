@@ -99,12 +99,6 @@ const renderExistingConnections = ({
               onClick={() =>
                 void handleGetSyncFiles(connection.id, connection.provider)
               }
-              specificFiles={openedConnections.some((openedConnection) => {
-                return (
-                  openedConnection.name === connection.name &&
-                  !openedConnection.allFiles
-                );
-              })}
             />
           </div>
         ))}
@@ -187,7 +181,6 @@ export const ConnectionSection = ({
         id: userSyncId,
         provider: provider,
         submitted: false,
-        allFiles: true,
         selectedFiles: { files: [] },
         last_synced: "",
       };

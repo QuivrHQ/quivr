@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 import { SyncElement } from "@/lib/api/sync/types";
 import { useSync } from "@/lib/api/sync/useSync";
 import { ConnectionCards } from "@/lib/components/ConnectionCards/ConnectionCards";
-import SwitchButton from "@/lib/components/ui/SwitchButton/SwitchButton";
 import TextButton from "@/lib/components/ui/TextButton/TextButton";
 
 import { FileLine } from "./FileLine/FileLine";
@@ -13,14 +12,8 @@ import { useFromConnectionsContext } from "./FromConnectionsProvider/hooks/useFr
 
 export const FromConnections = (): JSX.Element => {
   const [folderStack, setFolderStack] = useState<(string | null)[]>([]);
-  const {
-    currentSyncElements,
-    setCurrentSyncElements,
-    currentSyncId,
-    selectSpecificFiles,
-    setSelectSpecificFiles,
-    setOpenedConnections,
-  } = useFromConnectionsContext();
+  const { currentSyncElements, setCurrentSyncElements, currentSyncId } =
+    useFromConnectionsContext();
   const [currentFiles, setCurrentFiles] = useState<SyncElement[]>([]);
   const [currentFolders, setCurrentFolders] = useState<SyncElement[]>([]);
   const { getSyncFiles } = useSync();
@@ -68,27 +61,6 @@ export const FromConnections = (): JSX.Element => {
     await handleGetSyncFiles(userSyncId, folderId);
   };
 
-  const handleSwitch = () => {
-    setSelectSpecificFiles(!selectSpecificFiles);
-    setOpenedConnections((prevConnections) => {
-      const connectionIndex = prevConnections.findIndex(
-        (connection) => connection.id === currentSyncId
-      );
-
-      if (connectionIndex !== -1) {
-        const newConnections = [...prevConnections];
-        newConnections[connectionIndex] = {
-          ...newConnections[connectionIndex],
-          allFiles: selectSpecificFiles,
-        };
-
-        return newConnections;
-      }
-
-      return prevConnections;
-    });
-  };
-
   return (
     <div className={styles.from_connection_container}>
       {!currentSyncId ? (
@@ -106,17 +78,8 @@ export const FromConnections = (): JSX.Element => {
               small={true}
               disabled={!folderStack.length}
             />
-            <SwitchButton
-              label="Select specific files"
-              checked={selectSpecificFiles}
-              setChecked={handleSwitch}
-            />
           </div>
-          <div
-            className={`${styles.connection_content} ${
-              !selectSpecificFiles ? styles.disable : ""
-            }`}
-          >
+          <div className={styles.connection_content}>
             {currentFolders.map((folder) => (
               <div
                 key={folder.id}
@@ -126,18 +89,14 @@ export const FromConnections = (): JSX.Element => {
               >
                 <FolderLine
                   name={folder.name}
-                  selectable={selectSpecificFiles}
+                  selectable={false}
                   id={folder.id}
                 />
               </div>
             ))}
             {currentFiles.map((file) => (
               <div key={file.id}>
-                <FileLine
-                  name={file.name}
-                  selectable={selectSpecificFiles}
-                  id={file.id}
-                />
+                <FileLine name={file.name} selectable={true} id={file.id} />
               </div>
             ))}
             {!currentFiles.length && !currentFolders.length && (

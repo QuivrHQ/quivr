@@ -18,8 +18,6 @@ export const FeedBrainStep = (): JSX.Element => {
   const {
     currentSyncId,
     setCurrentSyncId,
-    selectSpecificFiles,
-    setSelectSpecificFiles,
     openedConnections,
     setOpenedConnections,
   } = useFromConnectionsContext();
@@ -43,20 +41,8 @@ export const FeedBrainStep = (): JSX.Element => {
 
   const isRemoveAll = (matchingOpenedConnection: OpenedConnection): boolean => {
     return !!(
-      (selectSpecificFiles &&
-        currentConnection?.submitted &&
-        matchingOpenedConnection.selectedFiles.files.length === 0) ||
-      (currentConnection?.submitted &&
-        !selectSpecificFiles &&
-        currentConnection.allFiles)
-    );
-  };
-
-  const isUpdate = (): boolean => {
-    return !!(
-      !currentConnection?.allFiles &&
-      (selectSpecificFiles ||
-        (currentConnection?.submitted && selectSpecificFiles))
+      currentConnection?.submitted &&
+      matchingOpenedConnection.selectedFiles.files.length === 0
     );
   };
 
@@ -92,10 +78,7 @@ export const FeedBrainStep = (): JSX.Element => {
           disabled: false,
           callback: removeConnection,
         };
-      } else if (
-        isUpdate() ||
-        (selectSpecificFiles && currentConnection.submitted)
-      ) {
+      } else if (currentConnection.submitted) {
         const matchingSelectedFileIds =
           matchingOpenedConnection.selectedFiles.files
             .map((file) => file.id)
@@ -121,11 +104,9 @@ export const FeedBrainStep = (): JSX.Element => {
     }
 
     return {
-      label: selectSpecificFiles ? "Add specific files" : "Add all",
+      label: "Add specific files",
       type: "primary",
-      disabled:
-        selectSpecificFiles &&
-        !matchingOpenedConnection?.selectedFiles.files.length,
+      disabled: !matchingOpenedConnection?.selectedFiles.files.length,
       callback: addConnection,
     };
   };
@@ -150,7 +131,6 @@ export const FeedBrainStep = (): JSX.Element => {
     });
 
     setCurrentSyncId(undefined);
-    setSelectSpecificFiles(false);
   };
 
   const removeConnection = (): void => {
@@ -159,7 +139,6 @@ export const FeedBrainStep = (): JSX.Element => {
     );
 
     setCurrentSyncId(undefined);
-    setSelectSpecificFiles(false);
   };
 
   const renderFeedBrain = () => {

@@ -43,7 +43,6 @@ export interface OpenedConnection {
   id: number;
   provider: Provider;
   submitted: boolean;
-  allFiles: boolean;
   selectedFiles: SyncElements;
   name: string;
   last_synced: string;

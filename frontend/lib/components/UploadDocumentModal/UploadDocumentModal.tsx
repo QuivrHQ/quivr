@@ -18,8 +18,7 @@ export const UploadDocumentModal = (): JSX.Element => {
   const { currentBrain } = useBrainContext();
   const { feedBrain } = useAddKnowledge();
   const [feeding, setFeeding] = useState<boolean>(false);
-  const { currentSyncId, setCurrentSyncId, setSelectSpecificFiles } =
-    useFromConnectionsContext();
+  const { currentSyncId, setCurrentSyncId } = useFromConnectionsContext();
 
   useKnowledgeToFeedContext();
   const { t } = useTranslation(["knowledge"]);
@@ -54,7 +53,6 @@ export const UploadDocumentModal = (): JSX.Element => {
               iconName="chevronLeft"
               onClick={() => {
                 setCurrentSyncId(undefined);
-                setSelectSpecificFiles(false);
               }}
             />
           )}

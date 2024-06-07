@@ -13,8 +13,6 @@ export type FromConnectionsContextType = {
   setOpenedConnections: React.Dispatch<
     React.SetStateAction<OpenedConnection[]>
   >;
-  selectSpecificFiles: boolean;
-  setSelectSpecificFiles: React.Dispatch<React.SetStateAction<boolean>>;
   hasToReload: boolean;
   setHasToReload: React.Dispatch<React.SetStateAction<boolean>>;
 };
@@ -37,8 +35,6 @@ export const FromConnectionsProvider = ({
   const [openedConnections, setOpenedConnections] = useState<
     OpenedConnection[]
   >([]);
-  const [selectSpecificFiles, setSelectSpecificFiles] =
-    useState<boolean>(false);
   const [hasToReload, setHasToReload] = useState<boolean>(false);
 
   return (
@@ -50,8 +46,7 @@ export const FromConnectionsProvider = ({
         setCurrentSyncId,
         openedConnections,
         setOpenedConnections,
-        selectSpecificFiles,
-        setSelectSpecificFiles,
+
         hasToReload,
         setHasToReload,
       }}

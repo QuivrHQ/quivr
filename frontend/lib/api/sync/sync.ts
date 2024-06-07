@@ -52,16 +52,14 @@ export const syncFiles = async (
     await axiosInstance.post<void>(`/sync/active`, {
       name: openedConnection.name,
       syncs_user_id: openedConnection.id,
-      settings: openedConnection.allFiles
-        ? {}
-        : {
-            files: openedConnection.selectedFiles.files
-              .filter((file) => !file.is_folder)
-              .map((file) => file.id),
-            folders: openedConnection.selectedFiles.files
-              .filter((file) => file.is_folder)
-              .map((file) => file.id),
-          },
+      settings: {
+        files: openedConnection.selectedFiles.files
+          .filter((file) => !file.is_folder)
+          .map((file) => file.id),
+        folders: openedConnection.selectedFiles.files
+          .filter((file) => file.is_folder)
+          .map((file) => file.id),
+      },
       brain_id: brainId,
     })
   ).data;
