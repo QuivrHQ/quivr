@@ -1,8 +1,12 @@
 import pytest
-from modules.brain.dto.inputs import BrainIntegrationSettings, CreateBrainProperties
-from modules.brain.entity.brain_entity import BrainEntity, BrainType
-from modules.brain.service.brain_service import BrainService
 from pydantic import ValidationError
+
+from backend.modules.brain.dto.inputs import (
+    BrainIntegrationSettings,
+    CreateBrainProperties,
+)
+from backend.modules.brain.entity.brain_entity import BrainEntity, BrainType
+from backend.modules.brain.service.brain_service import BrainService
 
 
 @pytest.fixture

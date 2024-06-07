@@ -20,7 +20,7 @@ services:
       - ./backend/:/code/
     command:
       - "uvicorn"
-      - "main:app"
+      - "backend.main:app"
       - "--reload"
       - "--host"
       - "0.0.0.0"
@@ -51,9 +51,9 @@ services:
     env_file:
       - .env
     container_name: worker
-    # volumes:
-    #   - ./backend/:/code/
-    command: celery -A celery_worker worker -l info
+    volumes:
+      - ./backend/:/code/
+    command: "watchfiles 'celery -A backend.celery_worker worker -l info' "
     restart: always
     depends_on:
       - redis
