@@ -51,8 +51,8 @@ export const BrainRecapStep = (): JSX.Element => {
         <span className={styles.title}>Brain Recap</span>
         <MessageInfoBox type="warning">
           <span className={styles.warning_message}>
-            Depending on the number of selected files, knowledge upload can take
-            from <strong>1 minute</strong> to <strong>1 hour</strong>
+            Depending on the number of knowledge, the upload can take
+            <strong> few minutes</strong>.
           </span>
         </MessageInfoBox>
         <div className={styles.brain_info_wrapper}>
