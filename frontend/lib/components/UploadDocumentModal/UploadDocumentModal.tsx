@@ -34,8 +34,6 @@ export const UploadDocumentModal = (): JSX.Element => {
   const { t } = useTranslation(["knowledge"]);
 
   const disabled = useMemo(() => {
-    console.info(openedConnections);
-
     return (
       (knowledgeToFeed.length === 0 &&
         openedConnections.filter((connection) => {
