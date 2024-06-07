@@ -137,7 +137,6 @@ export const ConnectionSection = ({
             sync.provider === provider
         )
       );
-      console.info(res);
     } catch (error) {
       console.error(error);
     }

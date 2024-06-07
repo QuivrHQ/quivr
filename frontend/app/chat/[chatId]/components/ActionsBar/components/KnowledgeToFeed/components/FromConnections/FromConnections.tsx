@@ -92,7 +92,7 @@ export const FromConnections = (): JSX.Element => {
                 }}
               >
                 <FolderLine
-                  name={folder.name}
+                  name={folder.name ?? ""}
                   selectable={!!isPremium}
                   id={folder.id}
                 />
@@ -100,7 +100,11 @@ export const FromConnections = (): JSX.Element => {
             ))}
             {currentFiles.map((file) => (
               <div key={file.id}>
-                <FileLine name={file.name} selectable={true} id={file.id} />
+                <FileLine
+                  name={file.name ?? ""}
+                  selectable={true}
+                  id={file.id}
+                />
               </div>
             ))}
             {!currentFiles.length && !currentFolders.length && (

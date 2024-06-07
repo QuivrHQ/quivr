@@ -1,7 +1,7 @@
 export type Provider = "Google" | "Azure";
 
 export interface SyncElement {
-  name: string;
+  name?: string;
   id: string;
   is_folder: boolean;
 }
