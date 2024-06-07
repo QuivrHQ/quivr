@@ -15,7 +15,12 @@ export const useFeedBrainHandler = () => {
   const { files, urls } = useKnowledgeToFeedFilesAndUrls();
   const { crawlWebsiteHandler, uploadFileHandler } = useKnowledgeToFeedInput();
   const { updateOnboarding, onboarding } = useOnboarding();
-  const { syncFiles, getActiveSyncsForBrain } = useSync();
+  const {
+    syncFiles,
+    getActiveSyncsForBrain,
+    deleteActiveSync,
+    updateActiveSync,
+  } = useSync();
   const { openedConnections } = useFromConnectionsContext();
 
   const updateOnboardingA = async () => {
@@ -50,9 +55,9 @@ export const useFeedBrainHandler = () => {
         ) {
           await syncFiles(openedConnection, brainId);
         } else if (!openedConnection.selectedFiles.files.length) {
-          console.info("delete");
+          await deleteActiveSync(openedConnection.id);
         } else {
-          console.info("update");
+          await updateActiveSync(openedConnection);
         }
       })
     );

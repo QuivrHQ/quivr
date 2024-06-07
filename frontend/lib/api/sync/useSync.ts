@@ -3,6 +3,7 @@ import { UUID } from "crypto";
 import { useAxios } from "@/lib/hooks";
 
 import {
+  deleteActiveSync,
   deleteUserSync,
   getActiveSyncs,
   getSyncFiles,
@@ -10,6 +11,7 @@ import {
   syncFiles,
   syncGoogleDrive,
   syncSharepoint,
+  updateActiveSync,
 } from "./sync";
 import { OpenedConnection, Provider } from "./types";
 
@@ -44,5 +46,9 @@ export const useSync = () => {
     getActiveSyncsForBrain,
     deleteUserSync: async (syncId: number) =>
       deleteUserSync(axiosInstance, syncId),
+    deleteActiveSync: async (syncId: number) =>
+      deleteActiveSync(axiosInstance, syncId),
+    updateActiveSync: async (openedConnection: OpenedConnection) =>
+      updateActiveSync(axiosInstance, openedConnection),
   };
 };

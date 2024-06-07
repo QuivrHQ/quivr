@@ -1,7 +1,19 @@
 import { AxiosInstance } from "axios";
 import { UUID } from "crypto";
 
-import { ActiveSync, OpenedConnection, Sync, SyncElements } from "./types";
+import {
+  ActiveSync,
+  OpenedConnection,
+  Sync,
+  SyncElement,
+  SyncElements,
+} from "./types";
+
+const createFilesSettings = (files: SyncElement[]) =>
+  files.filter((file) => !file.is_folder).map((file) => file.id);
+
+const createFoldersSettings = (files: SyncElement[]) =>
+  files.filter((file) => file.is_folder).map((file) => file.id);
 
 export const syncGoogleDrive = async (
   name: string,
@@ -53,16 +65,35 @@ export const syncFiles = async (
       name: openedConnection.name,
       syncs_user_id: openedConnection.user_sync_id,
       settings: {
-        files: openedConnection.selectedFiles.files
-          .filter((file) => !file.is_folder)
-          .map((file) => file.id),
-        folders: openedConnection.selectedFiles.files
-          .filter((file) => file.is_folder)
-          .map((file) => file.id),
+        files: createFilesSettings(openedConnection.selectedFiles.files),
+        folders: createFoldersSettings(openedConnection.selectedFiles.files),
       },
       brain_id: brainId,
     })
   ).data;
+};
+
+export const updateActiveSync = async (
+  axiosInstance: AxiosInstance,
+  openedConnection: OpenedConnection
+): Promise<void> => {
+  return (
+    await axiosInstance.put<void>(`/sync/active/${openedConnection.id}`, {
+      name: openedConnection.name,
+      settings: {
+        files: createFilesSettings(openedConnection.selectedFiles.files),
+        folders: createFoldersSettings(openedConnection.selectedFiles.files),
+      },
+      last_synced: openedConnection.last_synced,
+    })
+  ).data;
+};
+
+export const deleteActiveSync = async (
+  axiosInstance: AxiosInstance,
+  syncId: number
+): Promise<void> => {
+  await axiosInstance.delete<void>(`/sync/active/${syncId}`);
 };
 
 export const getActiveSyncs = async (
