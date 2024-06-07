@@ -4,6 +4,7 @@ import { SyncElement } from "@/lib/api/sync/types";
 import { useSync } from "@/lib/api/sync/useSync";
 import { ConnectionCards } from "@/lib/components/ConnectionCards/ConnectionCards";
 import TextButton from "@/lib/components/ui/TextButton/TextButton";
+import { useUserData } from "@/lib/hooks/useUserData";
 
 import { FileLine } from "./FileLine/FileLine";
 import { FolderLine } from "./FolderLine/FolderLine";
@@ -17,6 +18,9 @@ export const FromConnections = (): JSX.Element => {
   const [currentFiles, setCurrentFiles] = useState<SyncElement[]>([]);
   const [currentFolders, setCurrentFolders] = useState<SyncElement[]>([]);
   const { getSyncFiles } = useSync();
+  const { userData } = useUserData();
+
+  const isPremium = userData?.is_premium;
 
   useEffect(() => {
     setCurrentFiles(
@@ -89,7 +93,7 @@ export const FromConnections = (): JSX.Element => {
               >
                 <FolderLine
                   name={folder.name}
-                  selectable={false}
+                  selectable={!!isPremium}
                   id={folder.id}
                 />
               </div>
