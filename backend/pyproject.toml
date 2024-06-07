@@ -5,6 +5,8 @@ build-backend = "poetry.core.masonry.api"
 [tool.ruff]
 line-length = 88
 exclude = [".git", "__pycache__", ".mypy_cache", ".pytest_cache"]
+
+[tool.ruff.lint]
 select = [
     "E", # pycodestyle errors
     "W", # pycodestyle warnings
@@ -20,6 +22,20 @@ ignore = [
     "B008", # do not perform function calls in argument defaults
     "C901", # too complex
 ]
+
+
+[tool.ruff.lint.isort]
+order-by-type = true
+relative-imports-order = "closest-to-furthest"
+extra-standard-library = ["typing"]
+section-order = [
+    "future",
+    "standard-library",
+    "third-party",
+    "first-party",
+    "local-folder",
+]
+known-first-party = []
 
 [tool.poetry]
 name = "backend"
