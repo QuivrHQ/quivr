@@ -46,6 +46,7 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.11"
+torch = { version = "^2.3.1+cpu", source = "pytorch-cpu-src" }
 langchain = "*"
 litellm = "*"
 openai = "*"
