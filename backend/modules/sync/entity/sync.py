@@ -20,3 +20,4 @@ class SyncsFiles(BaseModel):
     syncs_active_id: int
     last_modified: str
     brain_id: str
+    supported: bool

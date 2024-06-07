@@ -93,6 +93,7 @@ class SyncFileInput(BaseModel):
     syncs_active_id: int
     last_modified: str
     brain_id: str
+    supported: Optional[bool] = True
 
 
 class SyncFileUpdateInput(BaseModel):
@@ -103,4 +104,5 @@ class SyncFileUpdateInput(BaseModel):
         last_modified (datetime.datetime): The updated last modified date and time.
     """
 
-    last_modified: str
+    last_modified: Optional[str] = None
+    supported: Optional[bool] = None

@@ -45,7 +45,11 @@ class SyncUserInterface(ABC):
 
     @abstractmethod
     def get_files_folder_user_sync(
-        self, sync_active_id: int, user_id: str, folder_id: int = None
+        self,
+        sync_active_id: int,
+        user_id: str,
+        folder_id: int = None,
+        recursive: bool = False,
     ):
         pass
 
