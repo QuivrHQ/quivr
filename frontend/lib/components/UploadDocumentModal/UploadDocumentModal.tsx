@@ -100,7 +100,12 @@ export const UploadDocumentModal = (): JSX.Element => {
               color="primary"
               iconName="add"
               onClick={handleFeedBrain}
-              disabled={knowledgeToFeed.length === 0 || !currentBrain}
+              disabled={
+                (knowledgeToFeed.length === 0 &&
+                  openedConnections.filter((connection) => connection.submitted)
+                    .length === 0) ||
+                !currentBrain
+              }
               isLoading={feeding}
               important={true}
             />
