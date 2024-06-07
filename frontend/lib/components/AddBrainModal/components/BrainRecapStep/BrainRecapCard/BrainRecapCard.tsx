@@ -13,7 +13,7 @@ export const BrainRecapCard = ({
     <div className={styles.brain_recap_card_wrapper}>
       <span className={styles.number_label}>{number.toString()}</span>
       <span className={styles.label}>
-        Knowledges from {label}
+        Knowledge from {label}
         {number > 1 ? "s" : ""}
       </span>
     </div>
