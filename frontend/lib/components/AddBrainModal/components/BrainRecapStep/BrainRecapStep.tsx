@@ -83,6 +83,7 @@ export const BrainRecapStep = (): JSX.Element => {
             />
           </div>
         </div>
+        <span className={styles.subtitle}>Knowledge From</span>
         <div className={styles.cards_wrapper}>
           <BrainRecapCard
             label="Connection"

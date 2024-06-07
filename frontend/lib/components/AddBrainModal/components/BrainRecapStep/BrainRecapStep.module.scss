@@ -21,6 +21,10 @@
       @include Typography.H2;
     }
 
+    .subtitle {
+      @include Typography.H3;
+    }
+
     .warning_message {
       font-size: Typography.$small;
     }
@@ -50,8 +54,8 @@
       gap: Spacings.$spacing05;
 
       > * {
-        min-width: 300px;
-        max-width: 300px;
+        min-width: 120px;
+        max-width: 200px;
         flex: 1;
       }
 
