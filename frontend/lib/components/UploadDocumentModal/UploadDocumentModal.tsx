@@ -45,7 +45,11 @@ export const UploadDocumentModal = (): JSX.Element => {
     >
       <div className={styles.knowledge_modal}>
         <KnowledgeToFeed />
-        <div className={styles.button}>
+        <div
+          className={`${styles.buttons} ${
+            !currentSyncId ? styles.standalone : ""
+          }`}
+        >
           {!!currentSyncId && (
             <QuivrButton
               label="Back to connections"
