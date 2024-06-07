@@ -40,7 +40,8 @@ export interface ActiveSync {
 }
 
 export interface OpenedConnection {
-  id: number;
+  user_sync_id: number;
+  id: number | undefined;
   provider: Provider;
   submitted: boolean;
   selectedFiles: SyncElements;

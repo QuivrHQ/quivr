@@ -42,6 +42,8 @@ export const useBrainCreationApi = () => {
     );
     const crawlPromises = urls.map((url) => crawlWebsiteHandler(url, brainId));
 
+    console.info(openedConnections);
+
     await Promise.all([...uploadPromises, ...crawlPromises]);
     await Promise.all(
       openedConnections.map(async (openedConnection) => {

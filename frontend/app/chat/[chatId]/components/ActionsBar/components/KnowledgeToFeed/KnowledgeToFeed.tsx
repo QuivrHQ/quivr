@@ -74,7 +74,8 @@ export const KnowledgeToFeed = ({
           setCurrentSyncId(undefined);
           setOpenedConnections(
             res.map((sync) => ({
-              id: sync.syncs_user_id,
+              user_sync_id: sync.syncs_user_id,
+              id: sync.id,
               provider: "Google",
               submitted: true,
               selectedFiles: {

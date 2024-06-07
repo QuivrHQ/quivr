@@ -26,7 +26,7 @@ export const SyncElementLine = ({
 
   const initialChecked = (): boolean => {
     const currentConnection = openedConnections.find(
-      (connection) => connection.id === currentSyncId
+      (connection) => connection.user_sync_id === currentSyncId
     );
 
     return currentConnection
@@ -39,7 +39,7 @@ export const SyncElementLine = ({
   const handleSetChecked = () => {
     setOpenedConnections((prevState) => {
       return prevState.map((connection) => {
-        if (connection.id === currentSyncId) {
+        if (connection.user_sync_id === currentSyncId) {
           const isFileSelected = connection.selectedFiles.files.some(
             (file) => file.id === id
           );

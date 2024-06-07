@@ -169,7 +169,7 @@ export const ConnectionSection = ({
 
   const handleOpenedConnections = (userSyncId: number) => {
     const existingConnection = openedConnections.find(
-      (connection) => connection.id === userSyncId
+      (connection) => connection.user_sync_id === userSyncId
     );
 
     if (!existingConnection) {
@@ -177,7 +177,8 @@ export const ConnectionSection = ({
         name:
           existingConnections.find((connection) => connection.id === userSyncId)
             ?.name ?? "",
-        id: userSyncId,
+        user_sync_id: userSyncId,
+        id: undefined,
         provider: provider,
         submitted: false,
         selectedFiles: { files: [] },

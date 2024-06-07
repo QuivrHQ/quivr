@@ -51,7 +51,7 @@ export const syncFiles = async (
   return (
     await axiosInstance.post<void>(`/sync/active`, {
       name: openedConnection.name,
-      syncs_user_id: openedConnection.id,
+      syncs_user_id: openedConnection.user_sync_id,
       settings: {
         files: openedConnection.selectedFiles.files
           .filter((file) => !file.is_folder)

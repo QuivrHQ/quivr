@@ -28,7 +28,9 @@ export const FeedBrainStep = (): JSX.Element => {
 
   useEffect(() => {
     setCurrentConnection(
-      openedConnections.find((connection) => connection.id === currentSyncId)
+      openedConnections.find(
+        (connection) => connection.user_sync_id === currentSyncId
+      )
     );
   }, [currentSyncId]);
 

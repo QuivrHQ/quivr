@@ -42,7 +42,9 @@ export const handleGetButtonProps = (
 } => {
   const matchingOpenedConnection =
     currentConnection &&
-    openedConnections.find((conn) => conn.id === currentConnection.id);
+    openedConnections.find(
+      (conn) => conn.user_sync_id === currentConnection.user_sync_id
+    );
 
   if (matchingOpenedConnection) {
     if (isRemoveAll(matchingOpenedConnection, currentConnection)) {
@@ -101,7 +103,7 @@ const addConnection = (
 ): void => {
   setOpenedConnections((prevConnections) => {
     const connectionIndex = prevConnections.findIndex(
-      (connection) => connection.id === currentSyncId
+      (connection) => connection.user_sync_id === currentSyncId
     );
 
     if (connectionIndex !== -1) {
@@ -128,7 +130,9 @@ const removeConnection = (
   setCurrentSyncId: React.Dispatch<React.SetStateAction<number | undefined>>
 ): void => {
   setOpenedConnections((prevConnections) =>
-    prevConnections.filter((connection) => connection.id !== currentSyncId)
+    prevConnections.filter(
+      (connection) => connection.user_sync_id !== currentSyncId
+    )
   );
 
   setCurrentSyncId(undefined);
