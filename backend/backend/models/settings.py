@@ -129,12 +129,13 @@ _supabase_client: Optional[Client] = None
 _supabase_db: Optional[SupabaseDB] = None
 _db_engine: Optional[Engine] = None
 
+settings = BrainSettings()
+
 
 def get_pg_database_engine():
     global _db_engine
     if _db_engine is None:
         logger.info("Creating Postgres DB engine")
-        settings = BrainSettings()  # pyright: ignore reportPrivateUsage=none
         _db_engine = create_engine(settings.pg_database_url, pool_pre_ping=True)
     return _db_engine
 
@@ -143,7 +144,6 @@ def get_supabase_client() -> Client:
     global _supabase_client
     if _supabase_client is None:
         logger.info("Creating Supabase client")
-        settings = BrainSettings()  # pyright: ignore reportPrivateUsage=none
         _supabase_client = create_client(
             settings.supabase_url, settings.supabase_service_key
         )
@@ -159,7 +159,6 @@ def get_supabase_db() -> SupabaseDB:
 
 
 def get_embeddings():
-    settings = BrainSettings()  # pyright: ignore reportPrivateUsage=none
     if settings.ollama_api_base_url:
         embeddings = OllamaEmbeddings(
             base_url=settings.ollama_api_base_url,
@@ -170,7 +169,6 @@ def get_embeddings():
 
 
 def get_documents_vector_store() -> SupabaseVectorStore:
-    settings = BrainSettings()  # pyright: ignore reportPrivateUsage=none
     embeddings = get_embeddings()
     supabase_client: Client = get_supabase_client()
     documents_vector_store = SupabaseVectorStore(
