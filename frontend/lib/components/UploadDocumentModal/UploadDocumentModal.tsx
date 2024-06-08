@@ -111,7 +111,10 @@ export const UploadDocumentModal = (): JSX.Element => {
               label="Feed Brain"
               color="primary"
               iconName="add"
-              onClick={handleFeedBrain}
+              onClick={() => {
+                setOpenedConnections([]);
+                void handleFeedBrain();
+              }}
               disabled={disabled}
               isLoading={feeding}
               important={true}
