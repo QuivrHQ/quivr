@@ -119,9 +119,9 @@ export const BrainRecapStep = (): JSX.Element => {
           label="Create"
           color="primary"
           iconName="add"
-          onClick={() => {
+          onClick={async () => {
+            await feed();
             setOpenedConnections([]);
-            void feed();
           }}
           disabled={
             knowledgeToFeed.length === 0 && !userIdentityData?.onboarded
