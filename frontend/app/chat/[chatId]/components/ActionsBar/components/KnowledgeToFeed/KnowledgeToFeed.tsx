@@ -77,7 +77,7 @@ export const KnowledgeToFeed = ({
             res.map((sync) => ({
               user_sync_id: sync.syncs_user_id,
               id: sync.id,
-              provider: "Google",
+              provider: sync.syncs_user.provider,
               submitted: true,
               selectedFiles: {
                 files: [
