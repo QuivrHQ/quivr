@@ -36,6 +36,9 @@ export interface ActiveSync {
   last_synced: string;
   sync_interval_minutes: number;
   brain_id: string;
+  syncs_user: {
+    provider: Provider;
+  };
 }
 
 export interface OpenedConnection {
