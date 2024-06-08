@@ -81,9 +81,9 @@ class SyncFiles(SyncFileInterface):
             sync_file_id,
             sync_file_input,
         )
-        self.db.from_("syncs_files").update(sync_file_input.model_dump()).eq(
-            "id", sync_file_id
-        ).execute()
+        self.db.from_("syncs_files").update(
+            sync_file_input.model_dump(exclude_unset=True)
+        ).eq("id", sync_file_id).execute()
         logger.info("Sync file updated successfully")
 
     def delete_sync_file(self, sync_file_id: int):

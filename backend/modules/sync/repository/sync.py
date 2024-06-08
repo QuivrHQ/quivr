@@ -64,7 +64,10 @@ class Sync(SyncInterface):
         """
         logger.info("Retrieving active syncs for user_id: %s", user_id)
         response = (
-            self.db.from_("syncs_active").select("*").eq("user_id", user_id).execute()
+            self.db.from_("syncs_active")
+            .select("*, syncs_user(*)")
+            .eq("user_id", user_id)
+            .execute()
         )
         if response.data:
             logger.info("Active syncs retrieved successfully: %s", response.data)

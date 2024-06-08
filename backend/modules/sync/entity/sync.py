@@ -1,6 +1,14 @@
 from datetime import datetime
+from typing import Optional
 
 from pydantic import BaseModel
+
+
+class SyncsUser(BaseModel):
+    id: int
+    user_id: str
+    name: str
+    provider: str
 
 
 class SyncsActive(BaseModel):
@@ -12,6 +20,7 @@ class SyncsActive(BaseModel):
     last_synced: datetime
     sync_interval_minutes: int
     brain_id: str
+    syncs_user: Optional[SyncsUser]
 
 
 class SyncsFiles(BaseModel):
@@ -20,3 +29,4 @@ class SyncsFiles(BaseModel):
     syncs_active_id: int
     last_modified: str
     brain_id: str
+    supported: bool

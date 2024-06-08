@@ -15,7 +15,7 @@ from modules.sync.dto.inputs import (
 )
 from modules.sync.repository.sync_files import SyncFiles
 from modules.sync.service.sync_service import SyncService, SyncUserService
-from modules.sync.utils.list_files import list_azure_files
+from modules.sync.utils.list_files import get_azure_files_by_id, list_azure_files
 from modules.sync.utils.upload import upload_file
 from modules.upload.service.upload_file import check_file_exists
 from pydantic import BaseModel, ConfigDict
@@ -75,9 +75,9 @@ class AzureSyncUtils(BaseModel):
         logger.info("Downloading Azure files with metadata: %s", files)
         headers = self.get_headers(token_data)
 
-        try:
-            downloaded_files = []
-            for file in files:
+        downloaded_files = []
+        for file in files:
+            try:
                 file_id = file["id"]
                 file_name = file["name"]
                 modified_time = file["last_modified"]
@@ -127,13 +127,16 @@ class AzureSyncUtils(BaseModel):
                     filename=file_name,
                 )
 
-                await upload_file(to_upload_file, brain_id, current_user)
-
                 # Check if the file already exists in the database
                 existing_files = self.sync_files_repo.get_sync_files(sync_active_id)
                 existing_file = next(
                     (f for f in existing_files if f.path == file_name), None
                 )
+
+                supported = False
+                if (existing_file and existing_file.supported) or not existing_file:
+                    supported = True
+                    await upload_file(to_upload_file, brain_id, current_user)
 
                 if existing_file:
                     # Update the existing file record
@@ -141,6 +144,7 @@ class AzureSyncUtils(BaseModel):
                         existing_file.id,
                         SyncFileUpdateInput(
                             last_modified=modified_time,
+                            supported=supported,
                         ),
                     )
                 else:
@@ -151,14 +155,40 @@ class AzureSyncUtils(BaseModel):
                             syncs_active_id=sync_active_id,
                             last_modified=modified_time,
                             brain_id=brain_id,
+                            supported=supported,
                         )
                     )
 
                 downloaded_files.append(file_name)
-            return {"downloaded_files": downloaded_files}
-        except Exception as error:
-            logger.error("An error occurred while downloading Azure files: %s", error)
-            return {"error": f"An error occurred: {error}"}
+            except Exception as error:
+                logger.error(
+                    "An error occurred while downloading Azure files: %s", error
+                )
+                # Check if the file already exists in the database
+                existing_files = self.sync_files_repo.get_sync_files(sync_active_id)
+                existing_file = next(
+                    (f for f in existing_files if f.path == file["name"]), None
+                )
+                # Update the existing file record
+                if existing_file:
+                    self.sync_files_repo.update_sync_file(
+                        existing_file.id,
+                        SyncFileUpdateInput(
+                            supported=False,
+                        ),
+                    )
+                else:
+                    # Create a new file record
+                    self.sync_files_repo.create_sync_file(
+                        SyncFileInput(
+                            path=file["name"],
+                            syncs_active_id=sync_active_id,
+                            last_modified=file["last_modified"],
+                            brain_id=brain_id,
+                            supported=False,
+                        )
+                    )
+        return {"downloaded_files": downloaded_files}
 
     async def sync(self, sync_active_id: int, user_id: str):
         """
@@ -228,9 +258,25 @@ class AzureSyncUtils(BaseModel):
         # Get the folder id from the settings from sync_active
         settings = sync_active.get("settings", {})
         folders = settings.get("folders", [])
-        files = list_azure_files(
-            sync_user["credentials"], folder_id=folders[0] if folders else None
-        )
+        files_to_download = settings.get("files", [])
+        files = []
+        if len(folders) > 0:
+            files = []
+            for folder in folders:
+                files.extend(
+                    list_azure_files(
+                        sync_user["credentials"],
+                        folder_id=folder,
+                        recursive=True,
+                    )
+                )
+        if len(files_to_download) > 0:
+            files_metadata = get_azure_files_by_id(
+                sync_user["credentials"],
+                files_to_download,
+            )
+        files = files + files_metadata  # type: ignore
+
         if "error" in files:
             logger.error(
                 "Failed to download files from Azure for sync_active_id: %s",
@@ -244,10 +290,11 @@ class AzureSyncUtils(BaseModel):
             if last_synced
             else None
         )
-        logger.info("Files retrieved from Azure: %s", files.get("files", []))
+        logger.info("Files retrieved from Azure: %s", len(files))
+        logger.info("Files retrieved from Azure: %s", files)
         files_to_download = [
             file
-            for file in files.get("files", [])
+            for file in files
             if not file["is_folder"]
             and (
                 (
