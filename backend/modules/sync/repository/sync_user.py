@@ -159,7 +159,7 @@ class SyncUser(SyncUserInterface):
         logger.info("Sync user updated successfully")
 
     def get_files_folder_user_sync(
-        self, sync_active_id: int, user_id: str, folder_id: str = None
+        self, sync_active_id: int, user_id: str, folder_id: str = None, recursive: bool = False
     ):
         """
         Retrieve files from a user's sync folder, either from Google Drive or Azure.
@@ -195,10 +195,12 @@ class SyncUser(SyncUserInterface):
         provider = sync_user["provider"].lower()
         if provider == "google":
             logger.info("Getting files for Google sync")
-            return get_google_drive_files(sync_user["credentials"], folder_id)
+            return {
+                "files": get_google_drive_files(sync_user["credentials"], folder_id)
+            }
         elif provider == "azure":
             logger.info("Getting files for Azure sync")
-            return list_azure_files(sync_user["credentials"], folder_id)
+            return {"files": list_azure_files(sync_user["credentials"], folder_id, recursive)}
         else:
-            logger.warning("No sync found for provider: %s", sync_user["provider"])
+            logger.warning("No sync found for provider: %s", sync_user["provider"], recursive)
             return "No sync found"

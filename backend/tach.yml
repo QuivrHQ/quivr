@@ -1,0 +1,124 @@
+modules:
+- path: <root>
+  depends_on:
+  - modules.analytics
+  - modules.api_key
+  - modules.assistant
+  - modules.brain
+  - modules.chat
+  - modules.contact_support
+  - modules.knowledge
+  - modules.misc
+  - modules.notification
+  - modules.onboarding
+  - modules.prompt
+  - modules.sync
+  - modules.upload
+  - modules.user
+  strict: false
+- path: modules.analytics
+  depends_on:
+  - <root>
+  - modules.brain
+  strict: false
+- path: modules.api_key
+  depends_on:
+  - <root>
+  - modules.user
+  strict: false
+- path: modules.assistant
+  depends_on:
+  - <root>
+  - modules.chat
+  - modules.contact_support
+  # - modules.upload
+  - modules.user
+  strict: false
+- path: modules.authorization
+  depends_on: []
+  strict: false
+- path: modules.brain
+  depends_on:
+  - <root>
+  - modules.chat
+  - modules.knowledge
+  - modules.prompt
+  - modules.tools
+  - modules.upload
+  - modules.user
+  strict: false
+- path: modules.chat
+  depends_on:
+  - <root>
+  - modules.brain
+  - modules.notification
+  - modules.prompt
+  - modules.user
+  strict: false
+- path: modules.contact_support
+  depends_on:
+  - <root>
+  strict: false
+- path: modules.ingestion
+  depends_on: []
+  strict: false
+- path: modules.knowledge
+  depends_on:
+  - <root>
+  - modules.brain
+  - modules.upload
+  - modules.user
+  strict: false
+- path: modules.message
+  depends_on: []
+  strict: false
+- path: modules.misc
+  depends_on: []
+  strict: false
+- path: modules.notification
+  depends_on:
+  - <root>
+  strict: false
+- path: modules.onboarding
+  depends_on:
+  - <root>
+  - modules.user
+  strict: false
+- path: modules.prompt
+  depends_on:
+  - <root>
+  - modules.brain
+  strict: false
+- path: modules.sync
+  depends_on:
+  - <root>
+  - modules.brain
+  - modules.knowledge
+  - modules.notification
+  - modules.upload
+  - modules.user
+  strict: false
+- path: modules.tools
+  depends_on:
+  - <root>
+  - modules.contact_support
+  strict: false
+- path: modules.upload
+  depends_on:
+  - <root>
+  - modules.brain
+  - modules.knowledge
+  - modules.notification
+  - modules.user
+  strict: false
+- path: modules.user
+  depends_on:
+  - <root>
+  - modules.brain
+  strict: false
+exclude:
+- docs
+- tests
+exact: false
+disable_logging: false
+ignore_type_checking_imports: false

@@ -36,7 +36,7 @@ class SyncUserService:
 
     def get_sync_user_by_state(self, state: dict):
         return self.repository.get_sync_user_by_state(state)
-    
+
     def get_sync_user_by_id(self, sync_id: int):
         return self.repository.get_sync_user_by_id(sync_id)
 
@@ -46,10 +46,14 @@ class SyncUserService:
         return self.repository.update_sync_user(sync_user_id, state, sync_user_input)
 
     def get_files_folder_user_sync(
-        self, sync_active_id: int, user_id: str, folder_id: str = None
+        self,
+        sync_active_id: int,
+        user_id: str,
+        folder_id: str = None,
+        recursive: bool = False,
     ):
         return self.repository.get_files_folder_user_sync(
-            sync_active_id, user_id, folder_id
+            sync_active_id, user_id, folder_id, recursive
         )
 
 
