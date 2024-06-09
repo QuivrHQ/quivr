@@ -8,14 +8,15 @@
   padding-inline: Spacings.$spacing08;
   height: 100%;
 
-  .title {
-    @include Typography.H2;
-  }
-
-  .settings_wrapper {
+  .feed_brain {
     display: flex;
     flex-direction: column;
-    gap: Spacings.$spacing05;
+    overflow: scroll;
+    height: 100%;
+
+    .title {
+      @include Typography.H2;
+    }
   }
 
   .message_info_box_wrapper {

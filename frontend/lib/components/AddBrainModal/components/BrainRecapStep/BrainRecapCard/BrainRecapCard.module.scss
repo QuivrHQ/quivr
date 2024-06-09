@@ -1,0 +1,24 @@
+@use "@/styles/BoxShadow.module.scss";
+@use "@/styles/Radius.module.scss";
+@use "@/styles/Spacings.module.scss";
+@use "@/styles/Typography.module.scss";
+
+.brain_recap_card_wrapper {
+  display: flex;
+  padding: Spacings.$spacing05;
+  justify-content: center;
+  box-shadow: BoxShadow.$small;
+  border-radius: Radius.$normal;
+  display: flex;
+  align-items: center;
+  gap: Spacings.$spacing03;
+
+  .number_label {
+    @include Typography.Big;
+    color: var(--primary-0);
+  }
+
+  .type {
+    @include Typography.H1;
+  }
+}

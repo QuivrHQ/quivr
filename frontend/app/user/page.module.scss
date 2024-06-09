@@ -1,3 +1,5 @@
+@use "@/styles/Radius.module.scss";
+@use "@/styles/ScreenSizes.module.scss";
 @use "@/styles/Spacings.module.scss";
 
 .user_page_container {
@@ -5,7 +7,18 @@
   padding-block: Spacings.$spacing07;
   display: flex;
   flex-direction: column;
-  gap: Spacings.$spacing05;
+  width: 100%;
+  height: 100%;
+
+  @media (max-width: ScreenSizes.$small) {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .content_wrapper {
+    display: flex;
+    gap: Spacings.$spacing05;
+  }
 }
 
 .modal_wrapper {

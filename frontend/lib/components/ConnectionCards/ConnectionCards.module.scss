@@ -1,0 +1,13 @@
+@use "@/styles/ScreenSizes.module.scss";
+@use "@/styles/Spacings.module.scss";
+
+.connection_cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: Spacings.$spacing05;
+  width: 100%;
+
+  &.spaced {
+    justify-content: space-between;
+  }
+}

@@ -1,6 +1,6 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
-import { Icon } from "@/lib/components/ui/Icon/Icon";
+import { useSync } from "@/lib/api/sync/useSync";
 import { SingleSelector } from "@/lib/components/ui/SingleSelector/SingleSelector";
 import { Tabs } from "@/lib/components/ui/Tabs/Tabs";
 import { requiredRolesForUpload } from "@/lib/config/upload";
@@ -9,6 +9,8 @@ import { useKnowledgeToFeedContext } from "@/lib/context/KnowledgeToFeedProvider
 import { Tab } from "@/lib/types/Tab";
 
 import styles from "./KnowledgeToFeed.module.scss";
+import { FromConnections } from "./components/FromConnections/FromConnections";
+import { useFromConnectionsContext } from "./components/FromConnections/FromConnectionsProvider/hooks/useFromConnectionContext";
 import { FromDocuments } from "./components/FromDocuments/FromDocuments";
 import { FromWebsites } from "./components/FromWebsites/FromWebsites";
 import { formatMinimalBrainsToSelectComponentInput } from "./utils/formatMinimalBrainsToSelectComponentInput";
@@ -18,10 +20,13 @@ export const KnowledgeToFeed = ({
 }: {
   hideBrainSelector?: boolean;
 }): JSX.Element => {
-  const { allBrains, setCurrentBrainId, currentBrain } = useBrainContext();
-  const [selectedTab, setSelectedTab] = useState("From documents");
-  const { knowledgeToFeed, removeKnowledgeToFeed } =
-    useKnowledgeToFeedContext();
+  const { allBrains, setCurrentBrainId, currentBrainId, currentBrain } =
+    useBrainContext();
+  const [selectedTab, setSelectedTab] = useState("Documents");
+  const { knowledgeToFeed } = useKnowledgeToFeedContext();
+  const { openedConnections, setOpenedConnections, setCurrentSyncId } =
+    useFromConnectionsContext();
+  const { getActiveSyncsForBrain } = useSync();
 
   const brainsWithUploadRights = formatMinimalBrainsToSelectComponentInput(
     useMemo(
@@ -36,18 +41,68 @@ export const KnowledgeToFeed = ({
 
   const knowledgesTabs: Tab[] = [
     {
-      label: "From documents",
-      isSelected: selectedTab === "From documents",
-      onClick: () => setSelectedTab("From documents"),
+      label: "Documents",
+      isSelected: selectedTab === "Documents",
+      onClick: () => setSelectedTab("Documents"),
       iconName: "file",
+      badge: knowledgeToFeed.filter(
+        (knowledge) => knowledge.source === "upload"
+      ).length,
     },
     {
-      label: "From websites",
-      isSelected: selectedTab === "From websites",
-      onClick: () => setSelectedTab("From websites"),
+      label: "Websites",
+      isSelected: selectedTab === "Websites",
+      onClick: () => setSelectedTab("Websites"),
       iconName: "website",
+      badge: knowledgeToFeed.filter((knowledge) => knowledge.source === "crawl")
+        .length,
+    },
+    {
+      label: "Connections",
+      isSelected: selectedTab === "Connections",
+      onClick: () => setSelectedTab("Connections"),
+      iconName: "sync",
+      badge: openedConnections.filter((connection) => connection.submitted)
+        .length,
     },
   ];
+
+  useEffect(() => {
+    if (currentBrain) {
+      void (async () => {
+        try {
+          const res = await getActiveSyncsForBrain(currentBrain.id);
+          setCurrentSyncId(undefined);
+          setOpenedConnections(
+            res.map((sync) => ({
+              user_sync_id: sync.syncs_user_id,
+              id: sync.id,
+              provider: sync.syncs_user.provider,
+              submitted: true,
+              selectedFiles: {
+                files: [
+                  ...(sync.settings.folders?.map((folder) => ({
+                    id: folder,
+                    name: undefined,
+                    is_folder: true,
+                  })) ?? []),
+                  ...(sync.settings.files?.map((file) => ({
+                    id: file,
+                    name: undefined,
+                    is_folder: false,
+                  })) ?? []),
+                ],
+              },
+              name: sync.name,
+              last_synced: sync.last_synced,
+            }))
+          );
+        } catch (error) {
+          console.error(error);
+        }
+      })();
+    }
+  }, [currentBrainId]);
 
   return (
     <div className={styles.knowledge_to_feed_wrapper}>
@@ -68,39 +123,9 @@ export const KnowledgeToFeed = ({
       )}
       <Tabs tabList={knowledgesTabs} />
       <div className={styles.tabs_content_wrapper}>
-        {selectedTab === "From documents" && <FromDocuments />}
-        {selectedTab === "From websites" && <FromWebsites />}
-      </div>
-      <div>
-        <div className={styles.uploaded_knowledges_title}>
-          <span>Knowledges to upload</span>
-          <span>{knowledgeToFeed.length}</span>
-        </div>
-        <div className={styles.uploaded_knowledges}>
-          {knowledgeToFeed.map((knowledge, index) => (
-            <div className={styles.uploaded_knowledge} key={index}>
-              <div className={styles.left}>
-                <Icon
-                  name={knowledge.source === "crawl" ? "website" : "file"}
-                  size="small"
-                  color="black"
-                />
-                <span className={styles.label}>
-                  {knowledge.source === "crawl"
-                    ? knowledge.url
-                    : knowledge.file.name}
-                </span>
-              </div>
-              <Icon
-                name="delete"
-                size="normal"
-                color="dangerous"
-                handleHover={true}
-                onClick={() => removeKnowledgeToFeed(index)}
-              />
-            </div>
-          ))}
-        </div>
+        {selectedTab === "Documents" && <FromDocuments />}
+        {selectedTab === "Websites" && <FromWebsites />}
+        {selectedTab === "Connections" && <FromConnections />}
       </div>
     </div>
   );

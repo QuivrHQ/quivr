@@ -17,6 +17,7 @@ export const QuivrButton = ({
   disabled,
   hidden,
   important,
+  small,
 }: ButtonType): JSX.Element => {
   const [hovered, setHovered] = useState<boolean>(false);
   const { isDarkMode } = useUserSettingsContext();
@@ -36,12 +37,33 @@ export const QuivrButton = ({
   };
 
   const getIconColor = () => {
+    let iconColor = color;
     if (hovered || (important && !disabled)) {
-      return "white";
+      iconColor = "white";
     } else if (disabled) {
-      return "grey";
+      iconColor = "grey";
+    }
+
+    return iconColor;
+  };
+
+  const renderIcon = () => {
+    if (!isLoading) {
+      return (
+        <Icon
+          name={iconName}
+          size={small ? "small" : "normal"}
+          color={getIconColor()}
+          handleHover={false}
+        />
+      );
     } else {
-      return color;
+      return (
+        <LoaderIcon
+          color={hovered || important ? "white" : disabled ? "grey" : color}
+          size={small ? "small" : "normal"}
+        />
+      );
     }
   };
 
@@ -54,25 +76,14 @@ export const QuivrButton = ({
       ${hidden ? styles.hidden : ""}
       ${important ? styles.important : ""}
       ${disabled ? styles.disabled : ""}
+      ${small ? styles.small : ""}
       `}
       onClick={handleClick}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
       <div className={styles.icon_label}>
-        {!isLoading ? (
-          <Icon
-            name={iconName}
-            size="normal"
-            color={getIconColor()}
-            handleHover={false}
-          />
-        ) : (
-          <LoaderIcon
-            color={hovered || important ? "white" : disabled ? "grey" : color}
-            size="small"
-          />
-        )}
+        {renderIcon()}
         <span className={styles.label}>{label}</span>
       </div>
     </div>

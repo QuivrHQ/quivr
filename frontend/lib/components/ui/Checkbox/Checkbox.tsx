@@ -2,16 +2,23 @@ import { useEffect, useState } from "react";
 
 import styles from "./Checkbox.module.scss";
 
+import { Icon } from "../Icon/Icon";
+import Tooltip from "../Tooltip/Tooltip";
+
 interface CheckboxProps {
-  label: string;
+  label?: string;
   checked: boolean;
   setChecked: (value: boolean) => void;
+  disabled?: boolean;
+  tooltip?: string;
 }
 
 export const Checkbox = ({
   label,
   checked,
   setChecked,
+  disabled,
+  tooltip,
 }: CheckboxProps): JSX.Element => {
   const [currentChecked, setCurrentChecked] = useState<boolean>(checked);
 
@@ -19,18 +26,31 @@ export const Checkbox = ({
     setCurrentChecked(checked);
   }, [checked]);
 
-  return (
+  const checkboxElement = (
     <div
-      className={styles.checkbox_wrapper}
-      onClick={() => {
-        setChecked(!currentChecked);
-        setCurrentChecked(!currentChecked);
+      className={`${styles.checkbox_wrapper} ${
+        disabled ? styles.disabled : ""
+      }`}
+      onClick={(event) => {
+        event.stopPropagation();
+        if (!disabled) {
+          setChecked(!currentChecked);
+          setCurrentChecked(!currentChecked);
+        }
       }}
     >
       <div
         className={`${styles.checkbox} ${currentChecked ? styles.filled : ""}`}
-      ></div>
-      <span>{label}</span>
+      >
+        {currentChecked && <Icon name="check" size="tiny" color="white" />}
+      </div>
+      {label && <span>{label}</span>}
     </div>
+  );
+
+  return tooltip ? (
+    <Tooltip tooltip={tooltip}>{checkboxElement}</Tooltip>
+  ) : (
+    checkboxElement
   );
 };

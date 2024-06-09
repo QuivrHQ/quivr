@@ -14,9 +14,16 @@
   display: flex;
   width: fit-content;
   background-color: var(--background-0);
+  height: fit-content;
 
   &.hidden {
     display: none;
+  }
+
+  &.small {
+    padding-inline: Spacings.$spacing03;
+    padding-block: Spacings.$spacing01;
+    font-size: Typography.$tiny;
   }
 
   &.disabled {

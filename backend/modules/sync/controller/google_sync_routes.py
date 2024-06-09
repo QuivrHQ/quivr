@@ -9,6 +9,9 @@ from middlewares.auth import AuthBearer, get_current_user
 from modules.sync.dto.inputs import SyncsUserInput, SyncUserUpdateInput
 from modules.sync.service.sync_service import SyncService, SyncUserService
 from modules.user.entity.user_identity import UserIdentity
+from .successfull_connection import successfullConnectionPage
+from fastapi.responses import HTMLResponse
+
 
 # Set environment variable for OAuthlib
 os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
@@ -47,7 +50,7 @@ CLIENT_SECRETS_FILE_CONTENT = {
 }
 
 
-@google_sync_router.get(
+@google_sync_router.post(
     "/sync/google/authorize",
     dependencies=[Depends(AuthBearer())],
     tags=["Sync"],
@@ -138,4 +141,4 @@ def oauth2callback_google(request: Request):
     )
     sync_user_service.update_sync_user(current_user, state_dict, sync_user_input)
     logger.info(f"Google Drive sync created successfully for user: {current_user}")
-    return {"message": "Google Drive sync created successfully"}
+    return HTMLResponse(successfullConnectionPage)

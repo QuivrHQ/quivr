@@ -1,0 +1,25 @@
+@use "@/styles/Spacings.module.scss";
+@use "@/styles/Typography.module.scss";
+
+.connection_line_wrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+
+  .left {
+    display: flex;
+    gap: Spacings.$spacing02;
+    overflow: hidden;
+
+    .label {
+      @include Typography.EllipsisOverflow;
+      font-size: Typography.$small;
+    }
+  }
+
+  .icons {
+    display: flex;
+    gap: Spacings.$spacing02;
+  }
+}

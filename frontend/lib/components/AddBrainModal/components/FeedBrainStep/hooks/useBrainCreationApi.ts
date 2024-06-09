@@ -5,8 +5,10 @@ import { useState } from "react";
 import { useFormContext } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 
+import { useFromConnectionsContext } from "@/app/chat/[chatId]/components/ActionsBar/components/KnowledgeToFeed/components/FromConnections/FromConnectionsProvider/hooks/useFromConnectionContext";
 import { PUBLIC_BRAINS_KEY } from "@/lib/api/brain/config";
 import { IntegrationSettings } from "@/lib/api/brain/types";
+import { useSync } from "@/lib/api/sync/useSync";
 import { CreateBrainProps } from "@/lib/components/AddBrainModal/types/types";
 import { useKnowledgeToFeedInput } from "@/lib/components/KnowledgeToFeedInput/hooks/useKnowledgeToFeedInput.ts";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
@@ -31,14 +33,22 @@ export const useBrainCreationApi = () => {
   const [fields, setFields] = useState<
     { name: string; type: string; value: string }[]
   >([]);
+  const { syncFiles } = useSync();
+  const { openedConnections } = useFromConnectionsContext();
 
   const handleFeedBrain = async (brainId: UUID): Promise<void> => {
     const uploadPromises = files.map((file) =>
       uploadFileHandler(file, brainId)
     );
+
     const crawlPromises = urls.map((url) => crawlWebsiteHandler(url, brainId));
 
     await Promise.all([...uploadPromises, ...crawlPromises]);
+    await Promise.all(
+      openedConnections.map(async (openedConnection) => {
+        await syncFiles(openedConnection, brainId);
+      })
+    );
     setKnowledgeToFeed([]);
   };
 

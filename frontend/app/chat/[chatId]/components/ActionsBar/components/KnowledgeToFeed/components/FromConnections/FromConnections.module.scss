@@ -1,0 +1,36 @@
+@use "@/styles/Spacings.module.scss";
+@use "@/styles/Typography.module.scss";
+
+.from_connection_container {
+  overflow: auto;
+  height: 100%;
+  padding: Spacings.$spacing01;
+
+  .from_connection_wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: Spacings.$spacing06;
+    overflow: hidden;
+    max-height: 100%;
+
+    .header_buttons {
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .connection_content {
+      overflow: auto;
+      flex-grow: 1;
+
+      &.disable {
+        opacity: 0.5;
+        pointer-events: none;
+      }
+
+      .empty_folder {
+        font-style: italic;
+        font-size: Typography.$small;
+      }
+    }
+  }
+}

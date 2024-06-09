@@ -1,0 +1,84 @@
+@use "@/styles/BoxShadow.module.scss";
+@use "@/styles/Radius.module.scss";
+@use "@/styles/ScreenSizes.module.scss";
+@use "@/styles/Spacings.module.scss";
+@use "@/styles/Transitions.module.scss";
+@use "@/styles/Typography.module.scss";
+
+.connection_section_wrapper {
+  padding: Spacings.$spacing05;
+  border-radius: Radius.$normal;
+  overflow: hidden;
+  border-bottom: 1px solid transparent;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  border-radius: Radius.$normal;
+  box-shadow: BoxShadow.$medium;
+  height: min-content;
+  width: 100%;
+
+  @media (max-width: ScreenSizes.$small) {
+    width: 100%;
+  }
+
+  .connection_section_header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding-block: Spacings.$spacing03;
+    @include Typography.H3;
+
+    .left {
+      display: flex;
+      gap: Spacings.$spacing03;
+      align-items: center;
+    }
+
+    .iconRotate {
+      transition: transform 0.3s Transitions.$easeOutBack;
+    }
+
+    .iconRotateDown {
+      transform: rotate(0deg);
+    }
+
+    .iconRotateRight {
+      transform: rotate(-90deg);
+
+      .label {
+        @include Typography.H3;
+      }
+    }
+  }
+
+  .existing_connections {
+    display: flex;
+    flex-direction: column;
+    gap: Spacings.$spacing03;
+    width: 100%;
+    padding-top: Spacings.$spacing05;
+
+    .existing_connections_header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+
+      .label {
+        font-weight: 500;
+        font-size: Typography.$tiny;
+      }
+    }
+
+    .folded {
+      display: flex;
+      padding-left: Spacings.$spacing03;
+
+      .negative_margin {
+        margin-left: -(Spacings.$spacing02);
+      }
+    }
+  }
+}

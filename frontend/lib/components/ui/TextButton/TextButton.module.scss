@@ -1,4 +1,5 @@
 @use "@/styles/Spacings.module.scss";
+@use "@/styles/Typography.module.scss";
 
 .text_button_wrapper {
   display: flex;
@@ -10,6 +11,11 @@
   &.disabled {
     pointer-events: none;
     opacity: 0.5;
+  }
+
+  &.small {
+    gap: Spacings.$spacing02;
+    font-size: Typography.$tiny;
   }
 
   .black {

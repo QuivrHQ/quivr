@@ -24,7 +24,9 @@ import { UserSettingsProvider } from "@/lib/context/UserSettingsProvider/User-se
 import { IntercomProvider } from "@/lib/helpers/intercom/IntercomProvider";
 import { UpdateMetadata } from "@/lib/helpers/updateMetadata";
 import { usePageTracking } from "@/services/analytics/june/usePageTracking";
+
 import "../lib/config/LocaleConfig/i18n";
+import { FromConnectionsProvider } from "./chat/[chatId]/components/ActionsBar/components/KnowledgeToFeed/components/FromConnections/FromConnectionsProvider/FromConnection-provider";
 
 if (
   process.env.NEXT_PUBLIC_POSTHOG_KEY != null &&
@@ -90,11 +92,13 @@ const AppWithQueryClient = ({ children }: PropsWithChildren): JSX.Element => {
             <BrainCreationProvider>
               <MenuProvider>
                 <OnboardingProvider>
-                  <ChatsProvider>
-                    <ChatProvider>
-                      <App>{children}</App>
-                    </ChatProvider>
-                  </ChatsProvider>
+                  <FromConnectionsProvider>
+                    <ChatsProvider>
+                      <ChatProvider>
+                        <App>{children}</App>
+                      </ChatProvider>
+                    </ChatsProvider>
+                  </FromConnectionsProvider>
                 </OnboardingProvider>
               </MenuProvider>
             </BrainCreationProvider>

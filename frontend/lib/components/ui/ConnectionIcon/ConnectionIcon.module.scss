@@ -1,0 +1,18 @@
+@use "@/styles/Radius.module.scss";
+@use "@/styles/Spacings.module.scss";
+@use "@/styles/Typography.module.scss";
+
+.connection_icon {
+  border-radius: Radius.$circle;
+  padding: Spacings.$spacing01;
+  color: var(--white-0);
+  min-width: 24px;
+  min-height: 24px;
+  max-height: 24px;
+  max-width: 24px;
+  font-size: Typography.$tiny;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid var(--background-0);
+}

@@ -14,8 +14,8 @@
     position: relative;
 
     .circle {
-      width: 2.5rem;
-      height: 2.5rem;
+      width: 1.75rem;
+      height: 1.75rem;
       background-color: var(--primary-0);
       border-radius: Radius.$circle;
       display: flex;
@@ -80,7 +80,7 @@
       display: flex;
       flex-direction: column;
       font-size: Typography.$tiny;
-      width: 2.5rem;
+      width: 1.75rem;
 
       .step_index {
         white-space: nowrap;
@@ -95,7 +95,7 @@
     border-radius: Radius.$big;
     background-color: var(--primary-1);
     margin: 0 8px;
-    margin-top: Spacings.$spacing05;
+    margin-top: Spacings.$spacing04;
 
     &.done {
       background-color: var(--success);

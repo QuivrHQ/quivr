@@ -7,11 +7,14 @@ import { useUserApi } from "@/lib/api/user/useUserApi";
 import PageHeader from "@/lib/components/PageHeader/PageHeader";
 import { Modal } from "@/lib/components/ui/Modal/Modal";
 import QuivrButton from "@/lib/components/ui/QuivrButton/QuivrButton";
+import { Tabs } from "@/lib/components/ui/Tabs/Tabs";
 import { useSupabase } from "@/lib/context/SupabaseProvider";
 import { useUserData } from "@/lib/hooks/useUserData";
 import { redirectToLogin } from "@/lib/router/redirectToLogin";
 import { ButtonType } from "@/lib/types/QuivrButton";
+import { Tab } from "@/lib/types/Tab";
 
+import { Connections } from "./components/Connections/Connections";
 import { Settings } from "./components/Settings/Settings";
 import styles from "./page.module.scss";
 
@@ -30,6 +33,7 @@ const UserPage = (): JSX.Element => {
     isLogoutModalOpened,
     setIsLogoutModalOpened,
   } = useLogoutModal();
+  const [selectedTab, setSelectedTab] = useState("Connections");
 
   const buttons: ButtonType[] = [
     {
@@ -50,6 +54,21 @@ const UserPage = (): JSX.Element => {
     },
   ];
 
+  const studioTabs: Tab[] = [
+    {
+      label: "Connections",
+      isSelected: selectedTab === "Connections",
+      onClick: () => setSelectedTab("Connections"),
+      iconName: "sync",
+    },
+    {
+      label: "General",
+      isSelected: selectedTab === "General",
+      onClick: () => setSelectedTab("General"),
+      iconName: "user",
+    },
+  ];
+
   if (!session || !userData) {
     redirectToLogin();
   }
@@ -60,8 +79,11 @@ const UserPage = (): JSX.Element => {
         <PageHeader iconName="user" label="Profile" buttons={buttons} />
       </div>
       <div className={styles.user_page_container}>
+        <Tabs tabList={studioTabs} />
+        <div className={styles.user_page_menu}></div>
         <div className={styles.content_wrapper}>
-          <Settings email={userData.email} />
+          {selectedTab === "General" && <Settings email={userData.email} />}
+          {selectedTab === "Connections" && <Connections />}
         </div>
       </div>
       <Modal

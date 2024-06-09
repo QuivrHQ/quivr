@@ -1,0 +1,38 @@
+@use "@/styles/Radius.module.scss";
+@use "@/styles/Spacings.module.scss";
+@use "@/styles/Typography.module.scss";
+
+.switch_wrapper {
+  display: flex;
+  gap: Spacings.$spacing03;
+  align-items: center;
+  font-size: Typography.$small;
+  font-weight: 500;
+
+  .slider {
+    border-radius: Radius.$big;
+    height: 18px;
+    width: 42px;
+    background-color: var(--primary-2);
+    cursor: pointer;
+
+    &.checked {
+      background-color: var(--primary-1);
+
+      .slider_bubble {
+        margin-left: 26px;
+        background-color: var(--primary-0);
+      }
+    }
+
+    .slider_bubble {
+      margin-left: Spacings.$spacing01;
+      margin-top: Spacings.$spacing01;
+      height: 14px;
+      width: 14px;
+      border-radius: Radius.$circle;
+      background-color: var(--primary-1);
+      transition: margin-left 0.2s ease-in-out;
+    }
+  }
+}

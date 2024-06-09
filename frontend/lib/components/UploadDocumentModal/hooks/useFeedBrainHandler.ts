@@ -1,5 +1,7 @@
 import { UUID } from "crypto";
 
+import { useFromConnectionsContext } from "@/app/chat/[chatId]/components/ActionsBar/components/KnowledgeToFeed/components/FromConnections/FromConnectionsProvider/hooks/useFromConnectionContext";
+import { useSync } from "@/lib/api/sync/useSync";
 import { useKnowledgeToFeedInput } from "@/lib/components/KnowledgeToFeedInput/hooks/useKnowledgeToFeedInput.ts";
 import { useKnowledgeToFeedFilesAndUrls } from "@/lib/hooks/useKnowledgeToFeed";
 import { useOnboarding } from "@/lib/hooks/useOnboarding";
@@ -13,6 +15,13 @@ export const useFeedBrainHandler = () => {
   const { files, urls } = useKnowledgeToFeedFilesAndUrls();
   const { crawlWebsiteHandler, uploadFileHandler } = useKnowledgeToFeedInput();
   const { updateOnboarding, onboarding } = useOnboarding();
+  const {
+    syncFiles,
+    getActiveSyncsForBrain,
+    deleteActiveSync,
+    updateActiveSync,
+  } = useSync();
+  const { openedConnections } = useFromConnectionsContext();
 
   const updateOnboardingA = async () => {
     if (onboarding.onboarding_a) {
@@ -31,6 +40,26 @@ export const useFeedBrainHandler = () => {
     );
     const crawlPromises = urls.map((url) =>
       crawlWebsiteHandler(url, brainId, chatId)
+    );
+
+    const existingConnections = await getActiveSyncsForBrain(brainId);
+
+    await Promise.all(
+      openedConnections.map(async (openedConnection) => {
+        const existingConnectionIds = existingConnections.map(
+          (connection) => connection.id
+        );
+        if (
+          !openedConnection.id ||
+          !existingConnectionIds.includes(openedConnection.id)
+        ) {
+          await syncFiles(openedConnection, brainId);
+        } else if (!openedConnection.selectedFiles.files.length) {
+          await deleteActiveSync(openedConnection.id);
+        } else {
+          await updateActiveSync(openedConnection);
+        }
+      })
     );
 
     await Promise.all([

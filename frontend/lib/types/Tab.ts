@@ -6,4 +6,5 @@ export interface Tab {
   disabled?: boolean;
   iconName: keyof typeof iconList;
   onClick: () => void;
+  badge?: number;
 }

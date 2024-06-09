@@ -11,8 +11,7 @@ import styles from "./BrainMainInfosStep.module.scss";
 import { useBrainCreationSteps } from "../../hooks/useBrainCreationSteps";
 
 export const BrainMainInfosStep = (): JSX.Element => {
-  const { currentStepIndex, goToNextStep, goToPreviousStep } =
-    useBrainCreationSteps();
+  const { currentStepIndex, goToNextStep } = useBrainCreationSteps();
 
   const { watch } = useFormContext<CreateBrainProps>();
   const name = watch("name");
@@ -24,11 +23,7 @@ export const BrainMainInfosStep = (): JSX.Element => {
     goToNextStep();
   };
 
-  const previous = (): void => {
-    goToPreviousStep();
-  };
-
-  if (currentStepIndex !== 1) {
+  if (currentStepIndex !== 0) {
     return <></>;
   }
 
@@ -36,7 +31,7 @@ export const BrainMainInfosStep = (): JSX.Element => {
     <div className={styles.brain_main_infos_wrapper}>
       <div className={styles.inputs_wrapper}>
         <span className={styles.title}>Define brain identity</span>
-        <div>
+        <div className={styles.name_field}>
           <FieldHeader iconName="brain" label="Name" mandatory={true} />
           <Controller
             name="name"
@@ -68,12 +63,6 @@ export const BrainMainInfosStep = (): JSX.Element => {
         </div>
       </div>
       <div className={styles.buttons_wrapper}>
-        <QuivrButton
-          color="primary"
-          label="Previous Step"
-          onClick={() => previous()}
-          iconName="chevronLeft"
-        />
         <QuivrButton
           color="primary"
           label="Next Step"

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
+import { useFromConnectionsContext } from "@/app/chat/[chatId]/components/ActionsBar/components/KnowledgeToFeed/components/FromConnections/FromConnectionsProvider/hooks/useFromConnectionContext";
 import { useChatApi } from "@/lib/api/chat/useChatApi";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 import { useKnowledgeToFeedContext } from "@/lib/context/KnowledgeToFeedProvider/hooks/useKnowledgeToFeedContext";
@@ -25,6 +26,7 @@ export const useFeedBrain = ({
     useKnowledgeToFeedContext();
   const [hasPendingRequests, setHasPendingRequests] = useState(false);
   const { handleFeedBrain } = useFeedBrainHandler();
+  const { openedConnections } = useFromConnectionsContext();
 
   const { createChat, deleteChat } = useChatApi();
 
@@ -39,7 +41,7 @@ export const useFeedBrain = ({
       return;
     }
 
-    if (knowledgeToFeed.length === 0) {
+    if (knowledgeToFeed.length === 0 && !openedConnections.length) {
       publish({
         variant: "danger",
         text: t("addFiles"),
@@ -55,12 +57,11 @@ export const useFeedBrain = ({
       dispatchHasPendingRequests?.();
       closeFeedInput?.();
       setHasPendingRequests(true);
-      setShouldDisplayFeedCard(false);
       await handleFeedBrain({
         brainId,
         chatId: currentChatId,
       });
-
+      setShouldDisplayFeedCard(false);
       setKnowledgeToFeed([]);
     } catch (e) {
       publish({

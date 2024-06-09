@@ -1,3 +1,4 @@
+@use "@/styles/ScreenSizes.module.scss";
 @use "@/styles/Spacings.module.scss";
 @use "@/styles/Typography.module.scss";
 
@@ -7,6 +8,7 @@
   justify-content: space-between;
   height: 100%;
   padding-inline: Spacings.$spacing08;
+  gap: Spacings.$spacing03;
 
   .title {
     @include Typography.H2;
@@ -16,10 +18,21 @@
     display: flex;
     flex-direction: column;
     gap: Spacings.$spacing05;
+    overflow: scroll;
+
+    .name_field {
+      width: 300px;
+    }
+
+    @media (max-width: ScreenSizes.$small) {
+      .name_field {
+        width: 100%;
+      }
+    }
   }
 
   .buttons_wrapper {
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-end;
   }
 }

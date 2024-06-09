@@ -1,1 +1,1 @@
-export type IconSize = "small" | "normal" | "large" | "big";
+export type IconSize = "tiny" | "small" | "normal" | "large" | "big";

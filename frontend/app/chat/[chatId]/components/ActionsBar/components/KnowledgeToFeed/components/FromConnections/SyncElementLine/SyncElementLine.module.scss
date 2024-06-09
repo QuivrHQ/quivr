@@ -1,0 +1,28 @@
+@use "@/styles/Spacings.module.scss";
+@use "@/styles/Typography.module.scss";
+
+.sync_element_line_wrapper {
+  display: flex;
+  gap: Spacings.$spacing03;
+  padding: Spacings.$spacing03;
+  border-top: 1px solid var(--border-1);
+  align-items: center;
+  cursor: pointer;
+  font-weight: 500;
+
+  .element_name {
+    font-size: Typography.$small;
+  }
+
+  &:hover {
+    background-color: var(--background-3);
+  }
+
+  &.no_hover {
+    cursor: default;
+
+    &:hover {
+      background-color: var(--background-0);
+    }
+  }
+}

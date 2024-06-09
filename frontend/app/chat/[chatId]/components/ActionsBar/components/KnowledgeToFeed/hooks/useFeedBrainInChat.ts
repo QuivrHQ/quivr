@@ -17,6 +17,7 @@ import { useToast } from "@/lib/hooks";
 import { useOnboarding } from "@/lib/hooks/useOnboarding";
 
 import { FeedItemCrawlType, FeedItemUploadType } from "../../../types";
+import { useFromConnectionsContext } from "../components/FromConnections/FromConnectionsProvider/hooks/useFromConnectionContext";
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const useFeedBrainInChat = ({
@@ -42,6 +43,7 @@ export const useFeedBrainInChat = ({
     const fetchedNotifications = await getChatNotifications(currentChatId);
     setNotifications(fetchedNotifications);
   };
+  const { openedConnections } = useFromConnectionsContext();
   const { crawlWebsiteHandler, uploadFileHandler } = useKnowledgeToFeedInput();
   const files: File[] = (
     knowledgeToFeed.filter((c) => c.source === "upload") as FeedItemUploadType[]
@@ -58,7 +60,7 @@ export const useFeedBrainInChat = ({
 
       return;
     }
-    if (knowledgeToFeed.length === 0) {
+    if (knowledgeToFeed.length === 0 && !openedConnections.length) {
       publish({
         variant: "danger",
         text: t("addFiles"),

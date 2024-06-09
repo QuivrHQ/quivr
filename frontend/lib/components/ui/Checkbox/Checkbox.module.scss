@@ -12,9 +12,22 @@
     height: 16px;
     border: 1px solid var(--border-2);
     border-radius: Radius.$small;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 
     &.filled {
       background-color: var(--primary-0);
     }
+  }
+
+  &.disabled {
+    background-color: var(--background-3);
+    opacity: 0.4;
+    cursor: default;
+  }
+
+  &:hover {
+    background-color: var(--background-3);
   }
 }

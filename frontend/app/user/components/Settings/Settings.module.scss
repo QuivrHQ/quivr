@@ -1,9 +1,15 @@
 @use "@/styles/Radius.module.scss";
 @use "@/styles/Spacings.module.scss";
+@use "@/styles/Typography.module.scss";
 
 .settings_wrapper {
   display: flex;
   flex-direction: column;
   gap: Spacings.$spacing07;
   width: auto;
+  padding: Spacings.$spacing06;
+
+  .title {
+    @include Typography.H2;
+  }
 }

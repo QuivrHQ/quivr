@@ -38,7 +38,12 @@ export const Tabs = ({ tabList }: TabsProps): JSX.Element => {
                 : "black"
             }
           />
-          <span className={styles.label}>{tab.label}</span>
+          <div className={styles.label_wrapper}>
+            <span className={styles.label}>{tab.label}</span>
+            {!!tab.badge && tab.badge > 0 && (
+              <div className={styles.label_badge}>{tab.badge}</div>
+            )}
+          </div>
         </div>
       ))}
     </div>

@@ -8,6 +8,9 @@ from modules.sync.dto.inputs import SyncsUserInput, SyncUserUpdateInput
 from modules.sync.service.sync_service import SyncService, SyncUserService
 from modules.user.entity.user_identity import UserIdentity
 from msal import PublicClientApplication
+from .successfull_connection import successfullConnectionPage
+from fastapi.responses import HTMLResponse
+
 
 # Initialize logger
 logger = get_logger(__name__)
@@ -31,7 +34,7 @@ SCOPE = [
 ]
 
 
-@azure_sync_router.get(
+@azure_sync_router.post(
     "/sync/azure/authorize",
     dependencies=[Depends(AuthBearer())],
     tags=["Sync"],
@@ -125,4 +128,4 @@ def oauth2callback_azure(request: Request):
 
     sync_user_service.update_sync_user(current_user, state_dict, sync_user_input)
     logger.info(f"Azure sync created successfully for user: {current_user}")
-    return {"message": "Azure sync created successfully"}
+    return HTMLResponse(successfullConnectionPage)
