@@ -266,6 +266,7 @@ class GoogleSyncUtils(BaseModel):
         folders = settings.get("folders", [])
         files_to_download = settings.get("files", [])
         files = []
+        files_metadata = []
         if len(folders) > 0:
             files = []
             for folder in folders:
