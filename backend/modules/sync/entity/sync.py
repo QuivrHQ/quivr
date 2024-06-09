@@ -20,7 +20,7 @@ class SyncsActive(BaseModel):
     last_synced: datetime
     sync_interval_minutes: int
     brain_id: str
-    syncs_user: Optional[SyncsUser]
+    syncs_user: Optional[SyncsUser] = None
 
 
 class SyncsFiles(BaseModel):
