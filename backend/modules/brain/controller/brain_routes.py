@@ -1,7 +1,7 @@
 from typing import Dict
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from logger import get_logger
 from middlewares.auth.auth_bearer import AuthBearer, get_current_user
 from modules.brain.dto.inputs import (
@@ -14,7 +14,9 @@ from modules.brain.entity.integration_brain import IntegrationDescriptionEntity
 from modules.brain.service.brain_authorization_service import has_brain_authorization
 from modules.brain.service.brain_service import BrainService
 from modules.brain.service.brain_user_service import BrainUserService
-from modules.brain.service.get_question_context_from_brain import get_question_context_from_brain
+from modules.brain.service.get_question_context_from_brain import (
+    get_question_context_from_brain,
+)
 from modules.brain.service.integration_brain_service import (
     IntegrationBrainDescriptionService,
 )
@@ -58,7 +60,6 @@ async def retrieve_public_brains() -> list[PublicBrain]:
     return brain_service.get_public_brains()
 
 
-
 @brain_router.get(
     "/brains/{brain_id}/",
     dependencies=[
@@ -84,7 +85,9 @@ async def retrieve_brain_by_id(
 
 @brain_router.post("/brains/", dependencies=[Depends(AuthBearer())], tags=["Brain"])
 async def create_new_brain(
-    brain: CreateBrainProperties, current_user: UserIdentity = Depends(get_current_user)
+    brain: CreateBrainProperties,
+    request: Request,
+    current_user: UserIdentity = Depends(get_current_user),
 ):
     """Create a new brain for the user."""
     user_brains = brain_user_service.get_user_brains(current_user.id)
@@ -99,7 +102,7 @@ async def create_new_brain(
             status_code=429,
             detail=f"Maximum number of brains reached ({user_settings.get('max_brains', 5)}).",
         )
-    maybe_send_telemetry("create_brain", {"brain_name": brain.name})
+    maybe_send_telemetry("create_brain", {"brain_name": brain.name}, request)
     new_brain = brain_service.create_brain(
         brain=brain,
         user_id=current_user.id,
