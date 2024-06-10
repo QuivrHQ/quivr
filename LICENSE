@@ -127,6 +127,13 @@
       reproduction, and distribution of the Work otherwise complies with
       the conditions stated in this License.
 
+      (e) Some folders or files within the distribution may be subject to
+          different license terms and conditions. In such cases, the
+          applicable license will be specified in a separate LICENSE file
+          or within the file itself. You must comply with the terms of
+          these additional licenses when using, reproducing, or distributing
+          those specific folders or files.
+
    5. Submission of Contributions. Unless You explicitly state otherwise,
       any Contribution intentionally submitted for inclusion in the Work
       by You to the Licensor shall be under the terms and conditions of
@@ -186,7 +193,7 @@
       same "printed page" as the copyright notice for easier
       identification within third-party archives.
 
-   Copyright [2023] [StanGirard]
+   Copyright [2023-2024] [Quivr]
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
