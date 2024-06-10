@@ -23,8 +23,7 @@ export const BrainRecapStep = (): JSX.Element => {
   const { createBrain } = useBrainCreationApi();
   const { updateUserIdentity } = useUserApi();
   const { userIdentityData } = useUserData();
-  const { openedConnections, setOpenedConnections } =
-    useFromConnectionsContext();
+  const { openedConnections } = useFromConnectionsContext();
 
   const feed = async (): Promise<void> => {
     if (!userIdentityData?.onboarded) {
@@ -121,7 +120,6 @@ export const BrainRecapStep = (): JSX.Element => {
           iconName="add"
           onClick={async () => {
             await feed();
-            setOpenedConnections([]);
           }}
           disabled={
             knowledgeToFeed.length === 0 && !userIdentityData?.onboarded
