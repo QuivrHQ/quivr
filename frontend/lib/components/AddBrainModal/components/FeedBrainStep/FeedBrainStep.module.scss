@@ -8,6 +8,10 @@
   padding-inline: Spacings.$spacing08;
   height: 100%;
 
+  .tutorial {
+    padding-bottom: Spacings.$spacing05;
+  }
+
   .feed_brain {
     display: flex;
     flex-direction: column;

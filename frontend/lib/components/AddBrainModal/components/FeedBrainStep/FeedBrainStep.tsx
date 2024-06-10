@@ -45,11 +45,13 @@ export const FeedBrainStep = (): JSX.Element => {
   const renderFeedBrain = () => (
     <>
       {!userIdentityData?.onboarded && (
-        <MessageInfoBox type="tutorial">
-          <span>
-            Upload documents or add URLs to add knowledges to your brain.
-          </span>
-        </MessageInfoBox>
+        <div className={styles.tutorial}>
+          <MessageInfoBox type="tutorial">
+            <span>
+              Upload documents or add URLs to add knowledges to your brain.
+            </span>
+          </MessageInfoBox>
+        </div>
       )}
       <div className={styles.feed_brain}>
         <span className={styles.title}>Feed your brain</span>

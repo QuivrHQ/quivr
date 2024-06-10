@@ -11,6 +11,7 @@ import { UploadDocumentModal } from "@/lib/components/UploadDocumentModal/Upload
 import { MessageInfoBox } from "@/lib/components/ui/MessageInfoBox/MessageInfoBox";
 import QuivrButton from "@/lib/components/ui/QuivrButton/QuivrButton";
 import { SearchBar } from "@/lib/components/ui/SearchBar/SearchBar";
+import { useOnboardingContext } from "@/lib/context/OnboardingProvider/hooks/useOnboardingContext";
 import { useSupabase } from "@/lib/context/SupabaseProvider";
 import { useUserSettingsContext } from "@/lib/context/UserSettingsProvider/hooks/useUserSettingsContext";
 import { useUserData } from "@/lib/hooks/useUserData";
@@ -27,6 +28,7 @@ const Search = (): JSX.Element => {
     useBrainCreationContext();
   const { userIdentityData } = useUserData();
   const { isDarkMode } = useUserSettingsContext();
+  const { isBrainCreated } = useOnboardingContext();
 
   useEffect(() => {
     if (userIdentityData) {
@@ -84,6 +86,7 @@ const Search = (): JSX.Element => {
       </div>
       {!isBrainCreationModalOpened &&
         !userIdentityData?.onboarded &&
+        !isBrainCreated &&
         !!isUserDataFetched && (
           <div className={styles.onboarding_overlay}>
             <div className={styles.main_message_wrapper}>
