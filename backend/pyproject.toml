@@ -121,6 +121,7 @@ mypy = "^1.10.0"
 pre-commit = "^3.7.1"
 ipykernel = "*"
 ruff = "^0.4.8"
+pytest-asyncio = "^0.23.7"
 
 [[tool.poetry.source]]
 name = "pytorch-cpu-src"
