@@ -16,9 +16,9 @@ from backend.modules.chat.dto.inputs import (
 )
 from backend.modules.chat.dto.outputs import GetChatHistoryOutput
 from backend.modules.chat.entity.chat import Chat, ChatHistory
-from backend.modules.chat.repository.chats import Chats
-from backend.modules.chat.repository.chats_interface import ChatsInterface
+from backend.modules.chat.repository.chats import ChatRepository
 from backend.modules.chat.service.utils import merge_chat_history_and_notifications
+from backend.modules.dependencies import BaseService
 from backend.modules.notification.service.notification_service import (
     NotificationService,
 )
@@ -31,11 +31,11 @@ brain_service = BrainService()
 notification_service = NotificationService()
 
 
-class ChatService:
-    repository: ChatsInterface
+class ChatService(BaseService[ChatRepository]):
+    repository_cls = ChatRepository
 
-    def __init__(self):
-        self.repository = Chats()
+    def __init__(self, repository: ChatRepository):
+        self.repository = repository
 
     def create_chat(self, user_id: UUID, chat_data: CreateChatProperties) -> Chat:
         # Chat is created upon the user's first question asked
@@ -129,10 +129,8 @@ class ChatService:
         chat_notifications = []
         return merge_chat_history_and_notifications(chat_history, chat_notifications)
 
-    def get_user_chats(self, user_id: str) -> List[Chat]:
-        response = self.repository.get_user_chats(user_id)
-        chats = [Chat(chat_dict) for chat_dict in response.data]
-        return chats
+    async def get_user_chats(self, user_id: UUID) -> List[Chat]:
+        return list(await self.repository.get_user_chats(user_id))
 
     def update_chat_history(self, chat_history: CreateChatHistory) -> ChatHistory:
         response: List[ChatHistory] = (
@@ -189,7 +187,9 @@ class ChatService:
         updated_message = None
 
         if updates:
-            updated_message = (self.repository.update_message_by_id(message_id, updates)).data[  # type: ignore
+            updated_message = (
+                self.repository.update_message_by_id(message_id, updates)
+            ).data[  # type: ignore
                 0
             ]
             logger.info(f"Message {message_id} updated")

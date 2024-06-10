@@ -15,7 +15,7 @@ UpdateSchema = TypeVar("UpdateSchema", bound=BaseModel)
 T = TypeVar("T", bound=SQLModel)
 
 
-class BaseRepository(Generic[ModelType, CreateSchema, UpdateSchema]):
+class BaseCRUDRepository(Generic[ModelType, CreateSchema, UpdateSchema]):
     def __init__(self, model: type[ModelType], session: AsyncSession):
         """
         Base repository for default CRUD operations
@@ -30,8 +30,8 @@ class BaseRepository(Generic[ModelType, CreateSchema, UpdateSchema]):
         self, *, id: UUID, db_session: AsyncSession
     ) -> ModelType | None:
         query = select(self.model).where(self.model.id == id)
-        response = await db_session.execute(query)
-        return response.scalar_one_or_none()
+        response = await db_session.exec(query)
+        return response.one()
 
     async def get_by_ids(
         self,

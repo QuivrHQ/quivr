@@ -1,7 +1,21 @@
-from typing import Optional
-from uuid import UUID
+from typing import List, Optional
+from uuid import UUID, uuid4
 
 from pydantic import BaseModel
+from sqlmodel import Field, Relationship, SQLModel
+
+
+class User(SQLModel, table=True):
+    __tablename__ = "users"  # type: ignore
+
+    id: UUID | None = Field(
+        primary_key=True,
+        nullable=False,
+        default_factory=uuid4,
+    )
+    email: str
+    onboarded: bool
+    chats: List["Chat"] | None = Relationship(back_populates="user")  # type: ignore
 
 
 class UserIdentity(BaseModel):

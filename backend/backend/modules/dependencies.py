@@ -1,4 +1,4 @@
-from typing import AsyncGenerator
+from typing import AsyncGenerator, Callable, Generic, Type, TypeVar
 
 from fastapi import Depends
 from sqlalchemy.ext.asyncio import create_async_engine
@@ -6,7 +6,29 @@ from sqlmodel.ext.asyncio.session import AsyncSession
 
 from backend.models.settings import settings
 
-# TODO(@aminediro ): echo as param based on env
+
+class BaseRepository:
+    def __init__(self, session: AsyncSession):
+        self.session = session
+
+
+R = TypeVar("R", bound=BaseRepository)
+
+
+class BaseService(Generic[R]):
+    # associated repository type
+    repository_cls: Type[R]
+
+    def __init__(self, repository: R):
+        self.repository = repository
+
+    @classmethod
+    def get_repository_cls(cls) -> Type[R]:
+        return cls.repository_cls  # type: ignore
+
+
+S = TypeVar("S", bound=BaseService)
+
 async_engine = create_async_engine(settings.pg_database_url, echo=True, future=True)
 
 
@@ -15,8 +37,19 @@ async def get_async_session() -> AsyncGenerator[AsyncSession, None]:
         yield session
 
 
-def get_repository(repository):
-    def _get_repository(session: AsyncSession = Depends(get_async_session)):
-        return repository(session)
+def get_repository(repository_model: Type[R]) -> Callable[..., R]:
+    def _get_repository(session: AsyncSession = Depends(get_async_session)) -> R:
+        return repository_model(session)
 
     return _get_repository
+
+
+def get_service(service: Type[S]) -> Callable[..., BaseService]:
+    def _get_service(
+        repository: BaseRepository = Depends(
+            get_repository(service.get_repository_cls())
+        ),
+    ) -> S:
+        return service(repository)
+
+    return _get_service

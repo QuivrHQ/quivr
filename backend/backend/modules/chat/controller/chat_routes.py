@@ -1,8 +1,7 @@
-from typing import Annotated, List, Optional
+from typing import Annotated
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException, Query, Request
-from fastapi.responses import StreamingResponse
+from fastapi import APIRouter, Depends
 from langchain_community.embeddings import OllamaEmbeddings
 from langchain_openai import OpenAIEmbeddings
 
@@ -11,15 +10,9 @@ from backend.middlewares.auth import AuthBearer, get_current_user
 from backend.models.settings import BrainSettings, get_supabase_client
 from backend.modules.brain.service.brain_service import BrainService
 from backend.modules.chat.controller.chat.brainful_chat import BrainfulChat
-from backend.modules.chat.dto.chats import ChatItem, ChatQuestion
-from backend.modules.chat.dto.inputs import (
-    ChatMessageProperties,
-    ChatUpdatableProperties,
-    CreateChatProperties,
-    QuestionAndAnswer,
-)
-from backend.modules.chat.entity.chat import Chat
+from backend.modules.chat.dto.chats import ChatQuestion
 from backend.modules.chat.service.chat_service import ChatService
+from backend.modules.dependencies import get_service
 from backend.modules.user.entity.user_identity import UserIdentity
 from backend.modules.user.service.user_usage import UserUsage
 from backend.packages.utils.telemetry import maybe_send_telemetry
@@ -30,7 +23,9 @@ logger = get_logger(__name__)
 chat_router = APIRouter()
 
 brain_service = BrainService()
-chat_service = ChatService()
+
+ChatServiceDep = Annotated[ChatService, Depends(get_service(ChatService))]
+UserIdentityDep = Annotated[UserIdentity, Depends(get_current_user)]
 
 
 def init_vector_store(user_id: UUID) -> CustomSupabaseVectorStore:
@@ -41,9 +36,7 @@ def init_vector_store(user_id: UUID) -> CustomSupabaseVectorStore:
     supabase_client = get_supabase_client()
     embeddings = None
     if brain_settings.ollama_api_base_url:
-        embeddings = OllamaEmbeddings(
-            base_url=brain_settings.ollama_api_base_url
-        )  # pyright: ignore reportPrivateUsage=none
+        embeddings = OllamaEmbeddings(base_url=brain_settings.ollama_api_base_url)  # pyright: ignore reportPrivateUsage=none
     else:
         embeddings = OpenAIEmbeddings()
     vector_store = CustomSupabaseVectorStore(
@@ -100,7 +93,7 @@ async def healthz():
 
 # get all chats
 @chat_router.get("/chat", dependencies=[Depends(AuthBearer())], tags=["Chat"])
-async def get_chats(current_user: UserIdentity = Depends(get_current_user)):
+async def get_chats(current_user: UserIdentityDep, chat_service: ChatServiceDep):
     """
     Retrieve all chats for the current user.
 
@@ -110,7 +103,7 @@ async def get_chats(current_user: UserIdentity = Depends(get_current_user)):
     This endpoint retrieves all the chats associated with the current authenticated user. It returns a list of chat objects
     containing the chat ID and chat name for each chat.
     """
-    chats = chat_service.get_user_chats(str(current_user.id))
+    chats = await chat_service.get_user_chats(current_user.id)
     return {"chats": chats}
 
 
@@ -161,7 +154,6 @@ async def update_chat_message(
     message_id: UUID,
     current_user: UserIdentity = Depends(get_current_user),
 ):
-
     chat = chat_service.get_chat_by_id(
         chat_id  # pyright: ignore reportPrivateUsage=none
     )
@@ -242,7 +234,6 @@ async def create_stream_question_handler(
     brain_id: Annotated[UUID | None, Query()] = None,
     current_user: UserIdentity = Depends(get_current_user),
 ) -> StreamingResponse:
-
     chat_instance = BrainfulChat()
     chat_instance.validate_authorization(user_id=current_user.id, brain_id=brain_id)
 
