@@ -29,7 +29,14 @@ https://github.com/quivrhq/quivr/assets/19614572/a6463b73-76c7-4bc0-978d-70562dc
 
 ## Getting Started 🚀
 
-Follow these instructions to get a copy of the project up and running on your local machine for development and testing purposes.
+You can deploy Quivr to Porter Cloud with one-click:
+
+<a href="https://cloud.porter.run/addons/new?addon_name=quivr">
+  <img src="https://mintlify.s3-us-west-1.amazonaws.com/porter/images/deploying-applications/deploy-to-porter.svg" alt="Deploy to Porter" style="width: 150px;">
+</a>
+
+
+If you would like to deploy locally, follow these instructions to get a copy of the project up and running on your local machine for development and testing purposes.
 
 You can find everything on the [documentation](https://docs.quivr.app/).
 
