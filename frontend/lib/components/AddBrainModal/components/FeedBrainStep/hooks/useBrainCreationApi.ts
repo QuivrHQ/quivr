@@ -30,6 +30,7 @@ export const useBrainCreationApi = () => {
   const { crawlWebsiteHandler, uploadFileHandler } = useKnowledgeToFeedInput();
   const { setIsBrainCreationModalOpened, setCreating, currentSelectedBrain } =
     useBrainCreationContext();
+  const { setOpenedConnections } = useFromConnectionsContext();
   const [fields, setFields] = useState<
     { name: string; type: string; value: string }[]
   >([]);
@@ -88,6 +89,7 @@ export const useBrainCreationApi = () => {
     setCurrentBrainId(createdBrainId);
     setIsBrainCreationModalOpened(false);
     setCreating(false);
+    setOpenedConnections([]);
     reset();
 
     void queryClient.invalidateQueries({
