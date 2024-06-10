@@ -20,11 +20,10 @@ def db_setup():
     # setup
     sync_engine = create_engine("postgresql://" + pg_database_url, echo=True)
     #  TODO(@amine) : for now don't drop anything
-
     SQLModel.metadata.create_all(sync_engine, checkfirst=True)
-
     yield sync_engine
     # teardown
+    # NOTE: For now we rely on Supabase migrations for defining schemas
     # SQLModel.metadata.drop_all(sync_engine)
 
 
@@ -39,7 +38,6 @@ async def async_engine():
 
 @pytest.fixture(scope="session")
 def event_loop(request):
-    """Create an instance of the default event loop for each test case."""
     loop = asyncio.get_event_loop_policy().new_event_loop()
     yield loop
     loop.close()
@@ -47,7 +45,6 @@ def event_loop(request):
 
 @pytest_asyncio.fixture()
 async def session(async_engine):
-    asyncio.set_event_loop(asyncio.get_running_loop())
     async with async_engine.connect() as conn:
         await conn.begin()
         await conn.begin_nested()
@@ -65,15 +62,8 @@ async def session(async_engine):
         yield async_session
 
 
-@pytest.mark.asyncio
-async def test_get_user_chats_empty(session):
-    repo = ChatRepository(session)
-    chats = await repo.get_user_chats(user_id=uuid4())
-    assert len(chats) == 0
-
-
 @pytest_asyncio.fixture()
-async def test_user(session: AsyncSession) -> User:
+async def local_user(session: AsyncSession) -> User:
     user_1 = (
         await session.exec(select(User).where(User.email == "admin@quivr.app"))
     ).one()
@@ -87,8 +77,15 @@ async def test_user(session: AsyncSession) -> User:
 
 
 @pytest.mark.asyncio
-async def test_get_user_chats(session: AsyncSession, test_user: User):
+async def test_get_user_chats_empty(session):
     repo = ChatRepository(session)
-    assert test_user.id is not None
-    chats = await repo.get_user_chats(test_user.id)
+    chats = await repo.get_user_chats(user_id=uuid4())
+    assert len(chats) == 0
+
+
+@pytest.mark.asyncio
+async def test_get_user_chats(session: AsyncSession, local_user: User):
+    repo = ChatRepository(session)
+    assert local_user.id is not None
+    chats = await repo.get_user_chats(local_user.id)
     assert len(chats) == 2
