@@ -77,9 +77,6 @@ def get_answer_generator(
     brain, metadata_brain = brain_service.find_brain_from_question(
         brain_id, chat_question.question, current_user, chat_id, history, vector_store
     )
-
-    maybe_send_telemetry("question_asked", {"model_name": brain.model})
-
     gpt_answer_generator = chat_instance.get_answer_generator(
         brain=brain,
         chat_id=str(chat_id),
@@ -219,6 +216,7 @@ async def create_question_handler(
         chat_answer = gpt_answer_generator.generate_answer(
             chat_id, chat_question, save_answer=True
         )
+        maybe_send_telemetry("question_asked", {"streaming": False}, request)
 
         return chat_answer
     except HTTPException as e:
@@ -253,6 +251,7 @@ async def create_stream_question_handler(
     gpt_answer_generator = get_answer_generator(
         chat_id, chat_question, brain_id, current_user
     )
+    maybe_send_telemetry("question_asked", {"streaming": True}, request)
 
     try:
         return StreamingResponse(
