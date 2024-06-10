@@ -3,14 +3,12 @@ import { useEffect, useState } from "react";
 import styles from "./Checkbox.module.scss";
 
 import { Icon } from "../Icon/Icon";
-import Tooltip from "../Tooltip/Tooltip";
 
 interface CheckboxProps {
   label?: string;
   checked: boolean;
   setChecked: (value: boolean) => void;
   disabled?: boolean;
-  tooltip?: string;
 }
 
 export const Checkbox = ({
@@ -18,7 +16,6 @@ export const Checkbox = ({
   checked,
   setChecked,
   disabled,
-  tooltip,
 }: CheckboxProps): JSX.Element => {
   const [currentChecked, setCurrentChecked] = useState<boolean>(checked);
 
@@ -26,7 +23,7 @@ export const Checkbox = ({
     setCurrentChecked(checked);
   }, [checked]);
 
-  const checkboxElement = (
+  return (
     <div
       className={`${styles.checkbox_wrapper} ${
         disabled ? styles.disabled : ""
@@ -46,11 +43,5 @@ export const Checkbox = ({
       </div>
       {label && <span>{label}</span>}
     </div>
-  );
-
-  return tooltip ? (
-    <Tooltip tooltip={tooltip}>{checkboxElement}</Tooltip>
-  ) : (
-    checkboxElement
   );
 };

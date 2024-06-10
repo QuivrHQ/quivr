@@ -2,6 +2,7 @@ import { useState } from "react";
 
 import { Checkbox } from "@/lib/components/ui/Checkbox/Checkbox";
 import Icon from "@/lib/components/ui/Icon/Icon";
+import Tooltip from "@/lib/components/ui/Tooltip/Tooltip";
 
 import styles from "./SyncElementLine.module.scss";
 
@@ -64,7 +65,7 @@ export const SyncElementLine = ({
     setChecked((prevChecked) => !prevChecked);
   };
 
-  return (
+  const content = (
     <div
       className={`${styles.sync_element_line_wrapper} ${
         isCheckboxHovered || !isFolder || checked ? styles.no_hover : ""
@@ -85,16 +86,19 @@ export const SyncElementLine = ({
           checked={checked}
           setChecked={handleSetChecked}
           disabled={!selectable}
-          tooltip={
-            !selectable
-              ? "Only premium members can sync folders. This feature automatically adds new files from your folders to your brain, keeping it up-to-date without manual effort."
-              : ""
-          }
         />
       </div>
 
       <Icon name={isFolder ? "folder" : "file"} color="black" size="normal" />
       <span className={styles.element_name}>{name}</span>
     </div>
+  );
+
+  return selectable ? (
+    content
+  ) : (
+    <Tooltip tooltip="Only premium members can sync folders. This feature automatically adds new files from your folders to your brain, keeping it up-to-date without manual effort.">
+      {content}
+    </Tooltip>
   );
 };
