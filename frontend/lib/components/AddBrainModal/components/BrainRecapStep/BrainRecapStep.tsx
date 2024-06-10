@@ -7,6 +7,7 @@ import QuivrButton from "@/lib/components/ui/QuivrButton/QuivrButton";
 import { TextAreaInput } from "@/lib/components/ui/TextAreaInput/TextAreaInput";
 import { TextInput } from "@/lib/components/ui/TextInput/TextInput";
 import { useKnowledgeToFeedContext } from "@/lib/context/KnowledgeToFeedProvider/hooks/useKnowledgeToFeedContext";
+import { useOnboardingContext } from "@/lib/context/OnboardingProvider/hooks/useOnboardingContext";
 import { useUserData } from "@/lib/hooks/useUserData";
 
 import { BrainRecapCard } from "./BrainRecapCard/BrainRecapCard";
@@ -24,6 +25,7 @@ export const BrainRecapStep = (): JSX.Element => {
   const { updateUserIdentity } = useUserApi();
   const { userIdentityData } = useUserData();
   const { openedConnections } = useFromConnectionsContext();
+  const { setIsBrainCreated } = useOnboardingContext();
 
   const feed = async (): Promise<void> => {
     if (!userIdentityData?.onboarded) {
@@ -120,9 +122,12 @@ export const BrainRecapStep = (): JSX.Element => {
           iconName="add"
           onClick={async () => {
             await feed();
+            setIsBrainCreated(true);
           }}
           disabled={
-            knowledgeToFeed.length === 0 && !userIdentityData?.onboarded
+            knowledgeToFeed.length === 0 &&
+            !userIdentityData?.onboarded &&
+            !openedConnections.length
           }
           isLoading={creating}
           important={true}
