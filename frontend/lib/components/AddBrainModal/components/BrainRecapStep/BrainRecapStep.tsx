@@ -48,13 +48,13 @@ export const BrainRecapStep = (): JSX.Element => {
   return (
     <div className={styles.brain_recap_wrapper}>
       <div className={styles.content_wrapper}>
-        <span className={styles.title}>Brain Recap</span>
         <MessageInfoBox type="warning">
           <span className={styles.warning_message}>
             Depending on the number of knowledge, the upload can take
             <strong> few minutes</strong>.
           </span>
         </MessageInfoBox>
+        <span className={styles.title}>Brain Recap</span>
         <div className={styles.brain_info_wrapper}>
           <div className={styles.name_field}>
             <Controller
