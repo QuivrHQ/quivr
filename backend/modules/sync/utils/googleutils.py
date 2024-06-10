@@ -216,8 +216,9 @@ class GoogleSyncUtils(BaseModel):
 
         # Check if the sync is due
         last_synced = sync_active.get("last_synced")
+        force_sync = sync_active.get("force_sync", False)
         sync_interval_minutes = sync_active.get("sync_interval_minutes", 0)
-        if last_synced:
+        if last_synced and not force_sync:
             last_synced_time = datetime.fromisoformat(last_synced).astimezone(
                 timezone.utc
             )
@@ -318,7 +319,10 @@ class GoogleSyncUtils(BaseModel):
         # Update the last_synced timestamp
         self.sync_active_service.update_sync_active(
             sync_active_id,
-            SyncsActiveUpdateInput(last_synced=datetime.now().astimezone().isoformat()),
+            SyncsActiveUpdateInput(
+                last_synced=datetime.now().astimezone().isoformat(),
+                force_sync=False,
+            ),
         )
         logger.info(
             "Google Drive sync completed for sync_active_id: %s", sync_active_id

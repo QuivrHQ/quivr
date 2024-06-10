@@ -78,6 +78,7 @@ class SyncsActiveUpdateInput(BaseModel):
     name: Optional[str] = None
     settings: Optional[SyncActiveSettings] = None
     last_synced: Optional[str] = None
+    force_sync: Optional[bool] = False
 
 
 class SyncFileInput(BaseModel):

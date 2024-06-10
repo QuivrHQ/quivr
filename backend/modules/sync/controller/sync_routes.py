@@ -4,6 +4,9 @@ from typing import List
 from fastapi import APIRouter, Depends, status
 from logger import get_logger
 from middlewares.auth import AuthBearer, get_current_user
+from modules.notification.dto.inputs import CreateNotification
+from modules.notification.entity.notification import NotificationsStatusEnum
+from modules.notification.service.notification_service import NotificationService
 from modules.sync.controller.azure_sync_routes import azure_sync_router
 from modules.sync.controller.google_sync_routes import google_sync_router
 from modules.sync.dto import SyncsDescription
@@ -12,6 +15,8 @@ from modules.sync.dto.outputs import AuthMethodEnum
 from modules.sync.entity.sync import SyncsActive
 from modules.sync.service.sync_service import SyncService, SyncUserService
 from modules.user.entity.user_identity import UserIdentity
+
+notification_service = NotificationService()
 
 # Set environment variable for OAuthlib
 os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
@@ -83,6 +88,7 @@ async def get_user_syncs(current_user: UserIdentity = Depends(get_current_user))
     logger.debug(f"Fetching user syncs for user: {current_user.id}")
     return sync_user_service.get_syncs_user(str(current_user.id))
 
+
 @sync_router.delete(
     "/sync/{sync_id}",
     status_code=status.HTTP_204_NO_CONTENT,
@@ -102,7 +108,9 @@ async def delete_user_sync(
     Returns:
         None
     """
-    logger.debug(f"Deleting user sync for user: {current_user.id} with sync ID: {sync_id}")
+    logger.debug(
+        f"Deleting user sync for user: {current_user.id} with sync ID: {sync_id}"
+    )
     sync_user_service.delete_sync_user(sync_id, str(current_user.id))
     return None
 
@@ -129,6 +137,14 @@ async def create_sync_active(
     """
     logger.debug(
         f"Creating active sync for user: {current_user.id} with data: {sync_active_input}"
+    )
+    notification_service.add_notification(
+        CreateNotification(
+            user_id=current_user.id,
+            status=NotificationsStatusEnum.SUCCESS,
+            title="Sync created! Synchronization takes a few minutes to complete",
+            description="Syncing your files...",
+        )
     )
     return sync_service.create_sync_active(sync_active_input, str(current_user.id))
 
@@ -158,6 +174,15 @@ async def update_sync_active(
     logger.debug(
         f"Updating active sync for user: {current_user.id} with data: {sync_active_input}"
     )
+    notification_service.add_notification(
+        CreateNotification(
+            user_id=current_user.id,
+            status=NotificationsStatusEnum.SUCCESS,
+            title="Sync updated! Synchronization takes a few minutes to complete",
+            description="Syncing your files...",
+        )
+    )
+    sync_active_input.force_sync = True
     return sync_service.update_sync_active(sync_id, sync_active_input)
 
 
@@ -182,6 +207,14 @@ async def delete_sync_active(
     """
     logger.debug(
         f"Deleting active sync for user: {current_user.id} with sync ID: {sync_id}"
+    )
+    notification_service.add_notification(
+        CreateNotification(
+            user_id=current_user.id,
+            status=NotificationsStatusEnum.SUCCESS,
+            title="Sync deleted!",
+            description="Sync deleted!",
+        )
     )
     sync_service.delete_sync_active(sync_id, str(current_user.id))
     return None
