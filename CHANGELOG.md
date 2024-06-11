@@ -1,5 +1,29 @@
 # Changelog
 
+## 0.0.260 (2024-06-11)
+
+## What's Changed
+* feat: Add extra_hosts configuration to docker-compose.dev.yml by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2635
+* fix: sync creation fixed by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2637
+* chore: Set default value for "last_synced" column in "syncs_active" table to '2024-06-01 15:30:25+00' by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2638
+* fix: integrations by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2642
+* feat(frontend): sharepoint and gdrive integration  by @Zewed in https://github.com/QuivrHQ/quivr/pull/2643
+* fix(frontend): display bug on add knowledge by @Zewed in https://github.com/QuivrHQ/quivr/pull/2644
+* fix: files_metadata by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2645
+* fix(google): auth is now in state by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2647
+* fix(frontend): add brain modal integration doestn t work by @Zewed in https://github.com/QuivrHQ/quivr/pull/2649
+* fix(frontend): tooltip on folder line by @Zewed in https://github.com/QuivrHQ/quivr/pull/2650
+* feat: telemetry improved by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2651
+* feat: Add force_sync option to SyncsActiveUpdateInput by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2652
+* Update license to include enterprise features by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2653
+* fix(frontend): onboarding bug by @Zewed in https://github.com/QuivrHQ/quivr/pull/2655
+* Update README.md by @ferozemohideen in https://github.com/QuivrHQ/quivr/pull/2656
+
+## New Contributors
+* @ferozemohideen made their first contribution in https://github.com/QuivrHQ/quivr/pull/2656
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.259...v0.0.260
+
 ## 0.0.259 (2024-06-04)
 
 ## What's Changed
