@@ -82,7 +82,10 @@ def authorize_google(
     )
     state = f"user_id={current_user.id}"
     authorization_url, state = flow.authorization_url(
-        access_type="offline", include_granted_scopes="true", state=state
+        access_type="offline",
+        include_granted_scopes="true",
+        state=state,
+        prompt="consent",
     )
     logger.info(
         f"Generated authorization URL: {authorization_url} for user: {current_user.id}"
