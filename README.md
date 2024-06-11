@@ -31,7 +31,7 @@ https://github.com/quivrhq/quivr/assets/19614572/a6463b73-76c7-4bc0-978d-70562dc
 
 You can deploy Quivr to Porter Cloud with one-click:
 
-<a href="https://cloud.porter.run/addons/new?addon_name=quivr">
+<a href="https://cloud.porter.run/addons/new?addon_name=quivr" target="_blank">
   <img src="https://mintlify.s3-us-west-1.amazonaws.com/porter/images/deploying-applications/deploy-to-porter.svg" alt="Deploy to Porter" style="width: 150px;">
 </a>
 
