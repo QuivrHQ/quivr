@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.0.261 (2024-06-11)
+
+## What's Changed
+* feat: Update Google authorization URL with prompt for consent by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2658
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.260...v0.0.261
+
 ## 0.0.260 (2024-06-11)
 
 ## What's Changed
