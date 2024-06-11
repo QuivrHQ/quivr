@@ -1,43 +1,78 @@
 from datetime import datetime
-from typing import Optional
-from uuid import UUID, uuid4
+from typing import List
+from uuid import UUID
 
-from sqlalchemy import Column
-from sqlmodel import JSON, Field, Relationship, SQLModel
+# from sqlalchemy.dialects.postgresql import UUID
+from sqlmodel import JSON, TIMESTAMP
+from sqlmodel import UUID as PGUUID
+from sqlmodel import Column, Field, Relationship, SQLModel, text
 
 from backend.modules.user.entity.user_identity import User
 
 
 class Chat(SQLModel, table=True):
     __tablename__ = "chats"  # type: ignore
-
     chat_id: UUID | None = Field(
-        default_factory=uuid4,
-        primary_key=True,
-        index=True,
-        nullable=False,
+        default=None,
+        sa_column=Column(
+            PGUUID,
+            server_default=text("uuid_generate_v4()"),
+            primary_key=True,
+        ),
     )
     chat_name: str | None
-    chat_history: JSON | None = Field(default_factory=dict, sa_column=Column(JSON))
-    created_at: datetime | None = Field(default_factory=datetime.utcnow)
+    creation_time: datetime | None = Field(
+        default=None,
+        sa_column=Column(
+            TIMESTAMP(timezone=False),
+            server_default=text("CURRENT_TIMESTAMP"),
+        ),
+    )
     user_id: UUID | None = Field(default=None, foreign_key="users.id")
     user: User | None = Relationship(back_populates="chats")  # type: ignore
-
-    # Note: depreciated but for sqlmodel isn't compatible yet
-    class Config:
-        # Note: Pydantic can't generate schema for arbitrary types
-        arbitrary_types_allowed = True
+    chat_history: List["ChatHistory"] | None = Relationship(back_populates="chat")  # type: ignore
 
 
 class ChatHistory(SQLModel, table=True):
-    __tablename__ = "chat_history"  # type: ignore
+    __tablename__ = "chat_history"  # type: ignore # type : ignore
 
-    chat_id: UUID = Field(primary_key=True, default_factory=uuid4)
-    message_id: UUID
-    user_message: str | None
-    assistant: str
-    message_time: str
-    prompt_id: Optional[UUID]
-    brain_id: Optional[UUID]
-    metadata_: dict | None = Field(sa_column=Column("metadata", JSON, default=None))
-    thumbs: Optional[bool] = None
+    message_id: UUID | None = Field(
+        default=None,
+        sa_column=Column(
+            PGUUID,
+            server_default=text("uuid_generate_v4()"),
+            primary_key=True,
+        ),
+    )
+    chat_id: UUID | None = Field(
+        default=None,
+        foreign_key="chats.chat_id",
+        primary_key=True,
+        nullable=False,  # Added nullable constraint
+    )
+    user_message: str | None = None
+    assistant: str | None = None
+    message_time: datetime | None = Field(
+        default=None,
+        sa_column=Column(
+            TIMESTAMP(timezone=False),
+            server_default=text("CURRENT_TIMESTAMP"),
+        ),
+    )
+    # TODO: add models
+    # prompt_id: UUID | None = Field(default=None, foreign_key="prompts.id")
+    # brain_id: UUID | None = Field(
+    #     default=None,
+    #     foreign_key="brains.brain_id",
+    # )
+
+    metadata_: dict | None = Field(
+        default=None, sa_column=Column("metadata", JSON, default=None)
+    )
+    thumbs: bool | None = None
+
+    chat: Chat | None = Relationship(back_populates="chat_history")  # type: ignore
+
+    class Config:
+        # Note: Pydantic can't generate schema for arbitrary types
+        arbitrary_types_allowed = True

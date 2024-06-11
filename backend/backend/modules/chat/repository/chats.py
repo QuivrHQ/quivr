@@ -1,10 +1,12 @@
 from typing import Sequence
 from uuid import UUID
 
+from sqlalchemy import exc
 from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
 
-from backend.modules.chat.entity.chat import Chat
+from backend.modules.chat.dto.inputs import QuestionAndAnswer
+from backend.modules.chat.entity.chat import Chat, ChatHistory
 from backend.modules.dependencies import BaseRepository
 
 
@@ -17,46 +19,51 @@ class ChatRepository(BaseRepository):
         response = await self.session.exec(query)
         return response.all()
 
-    # def create_chat(self, new_chat):
-    #     response = self.db.table("chats").insert(new_chat).execute()
-    #     return response
+    async def create_chat(self, new_chat: Chat) -> Chat:
+        try:
+            self.session.add(new_chat)
+            await self.session.commit()
+        except exc.IntegrityError:
+            await self.session.rollback()
+            # TODO(@aminediro): Custom exceptions
+            raise Exception()
 
-    # def get_chat_by_id(self, chat_id: str):
-    #     response = (
-    #         self.db.from_("chats")
-    #         .select("*")
-    #         .filter("chat_id", "eq", chat_id)
-    #         .execute()
-    #     )
-    #     return response
+        await self.session.refresh(new_chat)
+        return new_chat
 
-    # def add_question_and_answer(self, chat_id, question_and_answer):
-    #     response = (
-    #         self.db.table("chat_history")
-    #         .insert(
-    #             {
-    #                 "chat_id": str(chat_id),
-    #                 "user_message": question_and_answer.question,
-    #                 "assistant": question_and_answer.answer,
-    #             }
-    #         )
-    #         .execute()
-    #     ).data
-    #     if len(response) > 0:
-    #         # response = Chat(response[0])
+    async def get_chat_by_id(self, chat_id: UUID):
+        query = select(Chat).where(Chat.chat_id == chat_id)
+        response = await self.session.exec(query)
+        return response.one()
 
-    #     return None
+    async def get_chat_history(self, chat_id: UUID) -> Sequence[ChatHistory]:
+        query = (
+            select(ChatHistory)
+            .where(ChatHistory.chat_id == chat_id)
+            # TODO: type hints of sqlmodel arent stable for order_by
+            .order_by(ChatHistory.message_time)  # type: ignore
+        )
 
-    # def get_chat_history(self, chat_id: str):
-    #     response = (
-    #         self.db.from_("chat_history")
-    #         .select("*")
-    #         .filter("chat_id", "eq", chat_id)
-    #         .order("message_time", desc=False)  # Add the ORDER BY clause
-    #         .execute()
-    #     )
+        response = await self.session.exec(query)
+        return response.all()
 
-    #     return response
+    async def add_question_and_answer(
+        self, chat_id: UUID, question_and_answer: QuestionAndAnswer
+    ) -> ChatHistory:
+        chat = ChatHistory(
+            chat_id=chat_id,
+            user_message=question_and_answer.question,
+            assistant=question_and_answer.answer,
+        )
+        try:
+            self.session.add(chat)
+            await self.session.commit()
+        except exc.IntegrityError:
+            await self.session.rollback()
+            # TODO(@aminediro) : for now, build an exception system
+            raise Exception("can't create chat_history ")
+        await self.session.refresh(chat)
+        return chat
 
     # def update_chat_history(self, chat_history):
     #     response = (

@@ -1,14 +1,16 @@
 import asyncio
+from typing import List, Tuple
 from uuid import uuid4
 
 import pytest
 import pytest_asyncio
 import sqlalchemy
 from sqlalchemy.ext.asyncio import create_async_engine
-from sqlmodel import SQLModel, create_engine, select
+from sqlmodel import create_engine, select
 from sqlmodel.ext.asyncio.session import AsyncSession
 
-from backend.modules.chat.entity.chat import Chat
+from backend.modules.chat.dto.inputs import QuestionAndAnswer
+from backend.modules.chat.entity.chat import Chat, ChatHistory
 from backend.modules.chat.repository.chats import ChatRepository
 from backend.modules.user.entity.user_identity import User
 
@@ -20,10 +22,10 @@ def db_setup():
     # setup
     sync_engine = create_engine("postgresql://" + pg_database_url, echo=True)
     #  TODO(@amine) : for now don't drop anything
-    SQLModel.metadata.create_all(sync_engine, checkfirst=True)
     yield sync_engine
     # teardown
     # NOTE: For now we rely on Supabase migrations for defining schemas
+    # SQLModel.metadata.create_all(sync_engine, checkfirst=True)
     # SQLModel.metadata.drop_all(sync_engine)
 
 
@@ -37,7 +39,7 @@ async def async_engine():
 
 
 @pytest.fixture(scope="session")
-def event_loop(request):
+def event_loop(request: pytest.FixtureRequest):
     loop = asyncio.get_event_loop_policy().new_event_loop()
     yield loop
     loop.close()
@@ -62,18 +64,37 @@ async def session(async_engine):
         yield async_session
 
 
+TestData = Tuple[User, List[Chat], List[ChatHistory]]
+
+
 @pytest_asyncio.fixture()
-async def local_user(session: AsyncSession) -> User:
+async def test_data(
+    session: AsyncSession,
+) -> TestData:
     user_1 = (
         await session.exec(select(User).where(User.email == "admin@quivr.app"))
     ).one()
     chat_1 = Chat(chat_name="chat1", user=user_1)
     chat_2 = Chat(chat_name="chat2", user=user_1)
+
+    chat_history_1 = ChatHistory(
+        user_message="Hello",
+        assistant="Hello! How can I assist you today?",
+        chat=chat_1,
+    )
+    chat_history_2 = ChatHistory(
+        user_message="Hello",
+        assistant="Hello! How can I assist you today?",
+        chat=chat_1,
+    )
     session.add(chat_1)
     session.add(chat_2)
-    # await session.refresh(user_1)
+    session.add(chat_history_1)
+    session.add(chat_history_2)
+
+    await session.refresh(user_1)
     await session.commit()
-    return user_1
+    return user_1, [chat_1, chat_2], [chat_history_1, chat_history_2]
 
 
 @pytest.mark.asyncio
@@ -84,8 +105,35 @@ async def test_get_user_chats_empty(session):
 
 
 @pytest.mark.asyncio
-async def test_get_user_chats(session: AsyncSession, local_user: User):
+async def test_get_user_chats(session: AsyncSession, test_data: TestData):
+    local_user, chats, _ = test_data
     repo = ChatRepository(session)
     assert local_user.id is not None
-    chats = await repo.get_user_chats(local_user.id)
-    assert len(chats) == 2
+    query_chats = await repo.get_user_chats(local_user.id)
+    assert len(query_chats) == len(chats)
+
+
+@pytest.mark.asyncio
+async def test_get_chat_history(session: AsyncSession, test_data: TestData):
+    _, chats, chat_history = test_data
+    assert chats[0].chat_id
+    assert len(chat_history) > 0
+    assert chat_history[-1].message_time
+    assert chat_history[0].message_time
+
+    repo = ChatRepository(session)
+    query_chat_history = await repo.get_chat_history(chats[0].chat_id)
+    assert chat_history == query_chat_history
+    assert query_chat_history[-1].message_time >= query_chat_history[0].message_time
+
+
+@pytest.mark.asyncio
+async def test_add_qa(session: AsyncSession, test_data: TestData):
+    _, [chat, *_], __ = test_data
+    assert chat.chat_id
+    qa = QuestionAndAnswer(question="question", answer="answer")
+    repo = ChatRepository(session)
+    chat = await repo.add_question_and_answer(chat.chat_id, qa)
+
+    assert chat.user_message == qa.question
+    assert chat.assistant == qa.answer
