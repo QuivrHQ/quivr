@@ -24,11 +24,12 @@ from backend.modules.chat.dto.chats import ChatQuestion
 from backend.modules.chat.dto.inputs import CreateChatHistory
 from backend.modules.chat.dto.outputs import GetChatHistoryOutput
 from backend.modules.chat.service.chat_service import ChatService
+from backend.modules.dependencies import get_service
 from backend.modules.prompt.service.get_prompt_to_use import get_prompt_to_use
 
 logger = get_logger(__name__)
 SYSTEM_MESSAGE = "Your name is Quivr. You're a helpful assistant. If you don't know the answer, just say that you don't know, don't try to make up an answer.When answering use markdown or any other techniques to display the content in a nice and aerated way."
-chat_service = ChatService()
+chat_service = get_service(ChatService)()
 
 
 class HeadlessQA(BaseModel, QAInterface):

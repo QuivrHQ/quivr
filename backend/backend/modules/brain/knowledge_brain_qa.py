@@ -9,10 +9,13 @@ from pydantic_settings import BaseSettings
 from backend.logger import get_logger
 from backend.models import BrainSettings
 from backend.modules.brain.entity.brain_entity import BrainEntity
-from backend.modules.brain.qa_interface import QAInterface
+from backend.modules.brain.qa_interface import (
+    QAInterface, model_compatible_with_function_calling)
 from backend.modules.brain.rags.quivr_rag import QuivrRAG
 from backend.modules.brain.rags.rag_interface import RAGInterface
 from backend.modules.brain.service.brain_service import BrainService
+from backend.modules.brain.service.utils.format_chat_history import \
+    format_chat_history
 from backend.modules.brain.service.utils.format_chat_history import format_chat_history
 from backend.modules.brain.service.utils.get_prompt_to_use_id import (
     get_prompt_to_use_id,
@@ -25,18 +28,17 @@ from backend.modules.chat.dto.chats import ChatQuestion, Sources
 from backend.modules.chat.dto.inputs import CreateChatHistory
 from backend.modules.chat.dto.outputs import GetChatHistoryOutput
 from backend.modules.chat.service.chat_service import ChatService
+from backend.modules.dependencies import get_service
 from backend.modules.prompt.service.get_prompt_to_use import get_prompt_to_use
 from backend.modules.upload.service.generate_file_signed_url import (
     generate_file_signed_url,
 )
-from backend.modules.user.service.user_usage import UserUsage
-
 logger = get_logger(__name__)
 QUIVR_DEFAULT_PROMPT = "Your name is Quivr. You're a helpful assistant.  If you don't know the answer, just say that you don't know, don't try to make up an answer."
 
 
 brain_service = BrainService()
-chat_service = ChatService()
+chat_service = get_service(ChatService)()
 
 
 def is_valid_uuid(uuid_to_test, version=4):
@@ -169,11 +171,11 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
         self,
         brain_id: str,
         chat_id: str,
+        user_id: str = None,
+        user_email: str = None,
         streaming: bool = False,
         prompt_id: Optional[UUID] = None,
         metadata: Optional[dict] = None,
-        user_id: str = None,
-        user_email: str = None,
         cost: int = 100,
         **kwargs,
     ):
@@ -192,7 +194,6 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
         )
         # TODO: we already have a brain before !!!
         self.brain = brain_service.get_brain_by_id(brain_id)
-
         self.user_settings = self.user_usage.get_user_settings()
 
         # Get Model settings for the user
@@ -308,7 +309,7 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
             config=config,
         )
 
-        if self.model_compatible_with_function_calling(model=self.model):
+        if model_compatible_with_function_calling(model=self.model):
             if model_response["answer"].tool_calls:
                 citations = model_response["answer"].tool_calls[-1]["args"]["citations"]
                 followup_questions = model_response["answer"].tool_calls[-1]["args"][
@@ -337,7 +338,7 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
     async def generate_stream(
         self, chat_id: UUID, question: ChatQuestion, save_answer: bool = True
     ) -> AsyncIterable:
-        if hasattr(self, "get_chain") and callable(getattr(self, "get_chain")):
+        if hasattr(self, "get_chain") and callable(self.get_chain):
             conversational_qa_chain = self.get_chain()
         else:
             conversational_qa_chain = self.knowledge_qa.get_chain()
@@ -362,7 +363,7 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
         ):
             if not streamed_chat_history.metadata:
                 streamed_chat_history.metadata = {}
-            if self.model_compatible_with_function_calling(model=self.model):
+            if model_compatible_with_function_calling(model=self.model):
                 if chunk.get("answer"):
                     if first:
                         gathered = chunk["answer"]

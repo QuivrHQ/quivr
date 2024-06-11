@@ -16,6 +16,7 @@ from backend.modules.brain.knowledge_brain_qa import KnowledgeBrainQA
 from backend.modules.chat.dto.chats import ChatQuestion
 from backend.modules.chat.dto.outputs import GetChatHistoryOutput
 from backend.modules.chat.service.chat_service import ChatService
+from backend.modules.dependencies import get_service
 from backend.modules.tools import (
     EmailSenderTool,
     ImageGeneratorTool,
@@ -30,7 +31,7 @@ class AgentState(TypedDict):
 
 logger = get_logger(__name__)
 
-chat_service = ChatService()
+chat_service = get_service(ChatService)()
 
 
 class GPT4Brain(KnowledgeBrainQA):

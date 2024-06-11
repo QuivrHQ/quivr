@@ -4,6 +4,23 @@ from uuid import UUID
 from backend.modules.chat.dto.chats import ChatQuestion
 
 
+def model_compatible_with_function_calling(model: str):
+    return model in [
+        "gpt-4o",
+        "gpt-4-turbo",
+        "gpt-4-turbo-2024-04-09",
+        "gpt-4-turbo-preview",
+        "gpt-4-0125-preview",
+        "gpt-4-1106-preview",
+        "gpt-4",
+        "gpt-4-0613",
+        "gpt-3.5-turbo",
+        "gpt-3.5-turbo-0125",
+        "gpt-3.5-turbo-1106",
+        "gpt-3.5-turbo-0613",
+    ]
+
+
 class QAInterface(ABC):
     """
     Abstract class for all QA interfaces.
@@ -39,21 +56,3 @@ class QAInterface(ABC):
         raise NotImplementedError(
             "generate_stream is an abstract method and must be implemented"
         )
-
-    def model_compatible_with_function_calling(self, model: str):
-        if model in [
-            "gpt-4o",
-            "gpt-4-turbo",
-            "gpt-4-turbo-2024-04-09",
-            "gpt-4-turbo-preview",
-            "gpt-4-0125-preview",
-            "gpt-4-1106-preview",
-            "gpt-4",
-            "gpt-4-0613",
-            "gpt-3.5-turbo",
-            "gpt-3.5-turbo-0125",
-            "gpt-3.5-turbo-1106",
-            "gpt-3.5-turbo-0613",
-        ]:
-            return True
-        return False

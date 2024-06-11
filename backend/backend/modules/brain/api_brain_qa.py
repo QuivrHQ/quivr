@@ -19,9 +19,10 @@ from backend.modules.chat.dto.chats import ChatQuestion
 from backend.modules.chat.dto.inputs import CreateChatHistory
 from backend.modules.chat.dto.outputs import GetChatHistoryOutput
 from backend.modules.chat.service.chat_service import ChatService
+from backend.modules.dependencies import get_service
 
 brain_service = BrainService()
-chat_service = ChatService()
+chat_service = get_service(ChatService)()
 
 logger = get_logger(__name__)
 

@@ -28,6 +28,7 @@ from backend.models import BrainSettings  # Importing settings related to the 'b
 from backend.models.settings import get_supabase_client
 from backend.modules.brain.service.brain_service import BrainService
 from backend.modules.chat.service.chat_service import ChatService
+from backend.modules.dependencies import get_service
 from backend.modules.knowledge.repository.knowledges import Knowledges
 from backend.modules.prompt.service.get_prompt_to_use import get_prompt_to_use
 from backend.vectorstore.supabase import CustomSupabaseVectorStore
@@ -129,7 +130,7 @@ def is_valid_uuid(uuid_to_test, version=4):
 
 
 brain_service = BrainService()
-chat_service = ChatService()
+chat_service = get_service(ChatService)()
 
 
 class QuivrRAG(BaseModel):
