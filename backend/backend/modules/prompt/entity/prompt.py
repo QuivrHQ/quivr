@@ -3,6 +3,8 @@ from typing import Optional
 from uuid import UUID
 
 from pydantic import BaseModel
+from sqlmodel import UUID as PGUUID
+from sqlmodel import Column, Field, SQLModel, text
 
 
 class PromptStatusEnum(str, Enum):
@@ -10,11 +12,19 @@ class PromptStatusEnum(str, Enum):
     public = "public"
 
 
-class Prompt(BaseModel):
-    title: str
-    content: str
-    status: PromptStatusEnum = PromptStatusEnum.private
-    id: UUID
+class Prompt(SQLModel, table=True):
+    __tablename__ = "prompts"  # type: ignore
+    id: UUID | None = Field(
+        default=None,
+        sa_column=Column(
+            PGUUID,
+            server_default=text("uuid_generate_v4()"),
+            primary_key=True,
+        ),
+    )
+    content: str | None = None
+    title: str | None = Field(default=None, max_length=255)
+    status: str = Field(default="private", max_length=255)
 
 
 class CreatePromptProperties(BaseModel):

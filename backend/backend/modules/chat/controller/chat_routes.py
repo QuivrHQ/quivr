@@ -1,27 +1,31 @@
-from typing import Annotated
+from typing import Annotated, List, Optional
 from uuid import UUID
 
-from fastapi import APIRouter, Depends
-from langchain_community.embeddings import OllamaEmbeddings
-from langchain_openai import OpenAIEmbeddings
+from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi.responses import StreamingResponse
 
 from backend.logger import get_logger
 from backend.middlewares.auth import AuthBearer, get_current_user
-from backend.models.settings import BrainSettings, get_supabase_client
+from backend.models.settings import get_embeddings, get_supabase_client
 from backend.modules.brain.service.brain_service import BrainService
 from backend.modules.chat.controller.chat.brainful_chat import BrainfulChat
-from backend.modules.chat.dto.chats import ChatQuestion
+from backend.modules.chat.dto.chats import ChatItem, ChatQuestion
+from backend.modules.chat.dto.inputs import (
+    ChatMessageProperties,
+    ChatUpdatableProperties,
+    CreateChatProperties,
+    QuestionAndAnswer,
+)
+from backend.modules.chat.entity.chat import Chat
 from backend.modules.chat.service.chat_service import ChatService
 from backend.modules.dependencies import get_service
 from backend.modules.user.entity.user_identity import UserIdentity
-from backend.modules.user.service.user_usage import UserUsage
 from backend.packages.utils.telemetry import maybe_send_telemetry
 from backend.vectorstore.supabase import CustomSupabaseVectorStore
 
 logger = get_logger(__name__)
 
 chat_router = APIRouter()
-
 brain_service = BrainService()
 
 ChatServiceDep = Annotated[ChatService, Depends(get_service(ChatService))]
@@ -32,15 +36,10 @@ def init_vector_store(user_id: UUID) -> CustomSupabaseVectorStore:
     """
     Initialize the vector store
     """
-    brain_settings = BrainSettings()
     supabase_client = get_supabase_client()
-    embeddings = None
-    if brain_settings.ollama_api_base_url:
-        embeddings = OllamaEmbeddings(base_url=brain_settings.ollama_api_base_url)  # pyright: ignore reportPrivateUsage=none
-    else:
-        embeddings = OpenAIEmbeddings()
+    embedding_service = get_embeddings()
     vector_store = CustomSupabaseVectorStore(
-        supabase_client, embeddings, table_name="vectors", user_id=user_id
+        supabase_client, embedding_service, table_name="vectors", user_id=user_id
     )
 
     return vector_store
@@ -49,16 +48,11 @@ def init_vector_store(user_id: UUID) -> CustomSupabaseVectorStore:
 def get_answer_generator(
     chat_id: UUID,
     chat_question: ChatQuestion,
+    chat_service: ChatService,
     brain_id: UUID | None,
     current_user: UserIdentity,
 ):
     chat_instance = BrainfulChat()
-
-    user_usage = UserUsage(
-        id=current_user.id,
-        email=current_user.email,
-    )
-
     vector_store = init_vector_store(user_id=current_user.id)
 
     # Get History only if needed
@@ -68,7 +62,7 @@ def get_answer_generator(
         history = []
 
     # Generic
-    # TODO(@aminediro) : pass this directy
+    # TODO(@aminediro) : chache the results here
     brain, metadata_brain = brain_service.find_brain_from_question(
         brain_id, chat_question.question, current_user, chat_id, history, vector_store
     )
@@ -111,7 +105,7 @@ async def get_chats(current_user: UserIdentityDep, chat_service: ChatServiceDep)
 @chat_router.delete(
     "/chat/{chat_id}", dependencies=[Depends(AuthBearer())], tags=["Chat"]
 )
-async def delete_chat(chat_id: UUID):
+async def delete_chat(chat_id: UUID, chat_service: ChatServiceDep):
     """
     Delete a specific chat by chat ID.
     """
@@ -127,15 +121,14 @@ async def delete_chat(chat_id: UUID):
 async def update_chat_metadata_handler(
     chat_data: ChatUpdatableProperties,
     chat_id: UUID,
-    current_user: UserIdentity = Depends(get_current_user),
+    current_user: UserIdentityDep,
+    chat_service: ChatServiceDep,
 ):
     """
     Update chat attributes
     """
 
-    chat = chat_service.get_chat_by_id(
-        chat_id  # pyright: ignore reportPrivateUsage=none
-    )
+    chat = await chat_service.get_chat_by_id(chat_id)
     if str(current_user.id) != chat.user_id:
         raise HTTPException(
             status_code=403,  # pyright: ignore reportPrivateUsage=none
@@ -145,16 +138,15 @@ async def update_chat_metadata_handler(
 
 
 # update existing message
-@chat_router.put(
-    "/chat/{chat_id}/{message_id}", dependencies=[Depends(AuthBearer())], tags=["Chat"]
-)
+@chat_router.put("/chat/{chat_id}/{message_id}", tags=["Chat"])
 async def update_chat_message(
     chat_message_properties: ChatMessageProperties,
     chat_id: UUID,
     message_id: UUID,
-    current_user: UserIdentity = Depends(get_current_user),
+    current_user: UserIdentityDep,
+    chat_service: ChatServiceDep,
 ):
-    chat = chat_service.get_chat_by_id(
+    chat = await chat_service.get_chat_by_id(
         chat_id  # pyright: ignore reportPrivateUsage=none
     )
     if str(current_user.id) != chat.user_id:
@@ -173,7 +165,8 @@ async def update_chat_message(
 @chat_router.post("/chat", dependencies=[Depends(AuthBearer())], tags=["Chat"])
 async def create_chat_handler(
     chat_data: CreateChatProperties,
-    current_user: UserIdentity = Depends(get_current_user),
+    current_user: UserIdentityDep,
+    chat_service: ChatServiceDep,
 ):
     """
     Create a new chat with initial chat messages.
@@ -193,18 +186,18 @@ async def create_chat_handler(
     tags=["Chat"],
 )
 async def create_question_handler(
-    request: Request,
     chat_question: ChatQuestion,
     chat_id: UUID,
+    current_user: UserIdentityDep,
+    chat_service: ChatServiceDep,
     brain_id: Annotated[UUID | None, Query()] = None,
-    current_user: UserIdentity = Depends(get_current_user),
 ):
     try:
         logger.info(
             f"Creating question for chat {chat_id} with brain {brain_id} of type {type(brain_id)}"
         )
         gpt_answer_generator = get_answer_generator(
-            chat_id, chat_question, brain_id, current_user
+            chat_id, chat_question, chat_service, brain_id, current_user
         )
 
         chat_answer = gpt_answer_generator.generate_answer(
@@ -228,11 +221,11 @@ async def create_question_handler(
     tags=["Chat"],
 )
 async def create_stream_question_handler(
-    request: Request,
     chat_question: ChatQuestion,
     chat_id: UUID,
+    chat_service: ChatServiceDep,
+    current_user: UserIdentityDep,
     brain_id: Annotated[UUID | None, Query()] = None,
-    current_user: UserIdentity = Depends(get_current_user),
 ) -> StreamingResponse:
     chat_instance = BrainfulChat()
     chat_instance.validate_authorization(user_id=current_user.id, brain_id=brain_id)
@@ -242,7 +235,7 @@ async def create_stream_question_handler(
     )
 
     gpt_answer_generator = get_answer_generator(
-        chat_id, chat_question, brain_id, current_user
+        chat_id, chat_question, chat_service, brain_id, current_user
     )
     maybe_send_telemetry("question_asked", {"streaming": True}, request)
 
@@ -264,6 +257,7 @@ async def create_stream_question_handler(
 )
 async def get_chat_history_handler(
     chat_id: UUID,
+    chat_service: ChatServiceDep,
 ) -> List[ChatItem]:
     # TODO: RBAC with current_user
     return chat_service.get_chat_history_with_notifications(chat_id)
@@ -277,8 +271,11 @@ async def get_chat_history_handler(
 async def add_question_and_answer_handler(
     chat_id: UUID,
     question_and_answer: QuestionAndAnswer,
+    chat_service: ChatServiceDep,
 ) -> Optional[Chat]:
     """
     Add a new question and anwser to the chat.
     """
-    return chat_service.add_question_and_answer(chat_id, question_and_answer)
+    history = await chat_service.add_question_and_answer(chat_id, question_and_answer)
+    # TODO(@aminediro) : Do we need to return the chat ??
+    return history.chat

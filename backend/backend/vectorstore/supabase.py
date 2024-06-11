@@ -1,11 +1,12 @@
 from typing import Any, List
+from uuid import UUID
 
 from langchain.docstore.document import Document
 from langchain.embeddings.base import Embeddings
 from langchain_community.vectorstores import SupabaseVectorStore
-from supabase.client import Client
 
 from backend.logger import get_logger
+from supabase.client import Client
 
 logger = get_logger(__name__)
 
@@ -13,18 +14,13 @@ logger = get_logger(__name__)
 class CustomSupabaseVectorStore(SupabaseVectorStore):
     """A custom vector store that uses the match_vectors table instead of the vectors table."""
 
-    brain_id: str = "none"
-    user_id: str = "none"
-    number_docs: int = 35
-    max_input: int = 2000
-
     def __init__(
         self,
         client: Client,
         embedding: Embeddings,
         table_name: str,
-        brain_id: str = "none",
-        user_id: str = "none",
+        brain_id: UUID | None = None,
+        user_id: UUID | None = None,
         number_docs: int = 35,
         max_input: int = 2000,
     ):

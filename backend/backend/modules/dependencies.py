@@ -1,3 +1,4 @@
+import os
 from typing import AsyncGenerator, Callable, Generic, Type, TypeVar
 
 from fastapi import Depends
@@ -29,7 +30,12 @@ class BaseService(Generic[R]):
 
 S = TypeVar("S", bound=BaseService)
 
-async_engine = create_async_engine(settings.pg_database_url, echo=True, future=True)
+# TODO: env variable debug sql_alchemy
+async_engine = create_async_engine(
+    settings.pg_database_url,
+    echo=True if os.getenv("ORM_DEBUG") else False,
+    future=True,
+)
 
 
 async def get_async_session() -> AsyncGenerator[AsyncSession, None]:
@@ -44,7 +50,7 @@ def get_repository(repository_model: Type[R]) -> Callable[..., R]:
     return _get_repository
 
 
-def get_service(service: Type[S]) -> Callable[..., BaseService]:
+def get_service(service: Type[S]) -> Callable[..., S]:
     def _get_service(
         repository: BaseRepository = Depends(
             get_repository(service.get_repository_cls())

@@ -1,5 +1,5 @@
 import random
-from typing import List, Optional
+from typing import List
 from uuid import UUID
 
 from fastapi import HTTPException
@@ -70,56 +70,57 @@ class ChatService(BaseService[ChatRepository]):
         random3 = random.sample(follow_up, 3)
         return random3
 
-    def add_question_and_answer(
+    async def add_question_and_answer(
         self, chat_id: UUID, question_and_answer: QuestionAndAnswer
-    ) -> Optional[Chat]:
-        return self.repository.add_question_and_answer(chat_id, question_and_answer)
+    ) -> ChatHistory:
+        return await self.repository.add_question_and_answer(
+            chat_id, question_and_answer
+        )
 
-    def get_chat_by_id(self, chat_id: str) -> Chat:
-        response = self.repository.get_chat_by_id(chat_id)
-        return Chat(response.data[0])
+    async def get_chat_by_id(self, chat_id: UUID) -> Chat:
+        chat = await self.repository.get_chat_by_id(chat_id)
+        return chat
 
-    def get_chat_history(self, chat_id: UUID) -> List[GetChatHistoryOutput]:
-        history: List[dict] = self.repository.get_chat_history(chat_id).data
+    async def get_chat_history(self, chat_id: UUID) -> List[GetChatHistoryOutput]:
+        history = await self.repository.get_chat_history(chat_id)
+        enriched_history: List[GetChatHistoryOutput] = []
+
         if history is None:
-            return []
-        else:
-            enriched_history: List[GetChatHistoryOutput] = []
-            brain_cache = {}
-            prompt_cache = {}
-            for message in history:
-                message = ChatHistory(message)
-                brain = None
-                if message.brain_id:
-                    if message.brain_id in brain_cache:
-                        brain = brain_cache[message.brain_id]
-                    else:
-                        brain = brain_service.get_brain_by_id(message.brain_id)
-                        brain_cache[message.brain_id] = brain
-
-                prompt = None
-                if message.prompt_id:
-                    if message.prompt_id in prompt_cache:
-                        prompt = prompt_cache[message.prompt_id]
-                    else:
-                        prompt = prompt_service.get_prompt_by_id(message.prompt_id)
-                        prompt_cache[message.prompt_id] = prompt
-
-                enriched_history.append(
-                    GetChatHistoryOutput(
-                        chat_id=(UUID(message.chat_id)),
-                        message_id=(UUID(message.message_id)),
-                        user_message=message.user_message,
-                        assistant=message.assistant,
-                        message_time=message.message_time,
-                        brain_name=brain.name if brain else None,
-                        brain_id=str(brain.id) if brain else None,
-                        prompt_title=prompt.title if prompt else None,
-                        metadata=message.metadata,
-                        thumbs=message.thumbs,
-                    )
-                )
             return enriched_history
+
+        # TODO: this is just N+1
+        brain_cache = {}
+        prompt_cache = {}
+        for message in history:
+            if message.brain_id:
+                if message.brain_id in brain_cache:
+                    brain = brain_cache[message.brain_id]
+                else:
+                    brain = brain_service.get_brain_by_id(message.brain_id)
+                    brain_cache[message.brain_id] = brain
+
+            if message.prompt_id:
+                if message.prompt_id in prompt_cache:
+                    prompt = prompt_cache[message.prompt_id]
+                else:
+                    prompt = prompt_service.get_prompt_by_id(message.prompt_id)
+                    prompt_cache[message.prompt_id] = prompt
+
+            enriched_history.append(
+                GetChatHistoryOutput(
+                    chat_id=(UUID(message.chat_id)),
+                    message_id=(UUID(message.message_id)),
+                    user_message=message.user_message,
+                    assistant=message.assistant,
+                    message_time=message.message_time,
+                    brain_name=brain.name if brain else None,
+                    brain_id=str(brain.id) if brain else None,
+                    prompt_title=prompt.title if prompt else None,
+                    metadata=message.metadata,
+                    thumbs=message.thumbs,
+                )
+            )
+        return enriched_history
 
     def get_chat_history_with_notifications(
         self,

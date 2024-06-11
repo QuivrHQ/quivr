@@ -133,7 +133,8 @@ async def test_add_qa(session: AsyncSession, test_data: TestData):
     assert chat.chat_id
     qa = QuestionAndAnswer(question="question", answer="answer")
     repo = ChatRepository(session)
-    chat = await repo.add_question_and_answer(chat.chat_id, qa)
+    resp_chat = await repo.add_question_and_answer(chat.chat_id, qa)
 
-    assert chat.user_message == qa.question
-    assert chat.assistant == qa.answer
+    assert resp_chat.chat_id == chat.chat_id
+    assert resp_chat.user_message == qa.question
+    assert resp_chat.assistant == qa.answer

@@ -1,6 +1,7 @@
 from typing import Optional
 from uuid import UUID
 
+from langchain.embeddings.base import Embeddings
 from langchain_community.embeddings.ollama import OllamaEmbeddings
 from langchain_community.vectorstores.supabase import SupabaseVectorStore
 from langchain_openai import OpenAIEmbeddings
@@ -128,6 +129,7 @@ class ResendSettings(BaseSettings):
 _supabase_client: Optional[Client] = None
 _supabase_db: Optional[SupabaseDB] = None
 _db_engine: Optional[Engine] = None
+_embedding_service = None
 
 settings = BrainSettings()
 
@@ -158,7 +160,8 @@ def get_supabase_db() -> SupabaseDB:
     return _supabase_db
 
 
-def get_embeddings():
+def get_embeddings() -> Embeddings:
+    global _embedding_service
     if settings.ollama_api_base_url:
         embeddings = OllamaEmbeddings(
             base_url=settings.ollama_api_base_url,

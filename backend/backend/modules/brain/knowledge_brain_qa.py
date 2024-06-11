@@ -8,14 +8,15 @@ from pydantic_settings import BaseSettings
 
 from backend.logger import get_logger
 from backend.models import BrainSettings
+from backend.models.databases.supabase.user_usage import UserUsage
 from backend.modules.brain.entity.brain_entity import BrainEntity
 from backend.modules.brain.qa_interface import (
-    QAInterface, model_compatible_with_function_calling)
+    QAInterface,
+    model_compatible_with_function_calling,
+)
 from backend.modules.brain.rags.quivr_rag import QuivrRAG
 from backend.modules.brain.rags.rag_interface import RAGInterface
 from backend.modules.brain.service.brain_service import BrainService
-from backend.modules.brain.service.utils.format_chat_history import \
-    format_chat_history
 from backend.modules.brain.service.utils.format_chat_history import format_chat_history
 from backend.modules.brain.service.utils.get_prompt_to_use_id import (
     get_prompt_to_use_id,
@@ -33,9 +34,9 @@ from backend.modules.prompt.service.get_prompt_to_use import get_prompt_to_use
 from backend.modules.upload.service.generate_file_signed_url import (
     generate_file_signed_url,
 )
+
 logger = get_logger(__name__)
 QUIVR_DEFAULT_PROMPT = "Your name is Quivr. You're a helpful assistant.  If you don't know the answer, just say that you don't know, don't try to make up an answer."
-
 
 brain_service = BrainService()
 chat_service = get_service(ChatService)()
@@ -161,9 +162,7 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
     models_settings: Optional[List[dict]] = None
     metadata: Optional[dict] = None
 
-    callbacks: List[AsyncIteratorCallbackHandler] = (
-        None  # pyright: ignore reportPrivateUsage=none
-    )
+    callbacks: List[AsyncIteratorCallbackHandler] = None  # pyright: ignore reportPrivateUsage=none
 
     prompt_id: Optional[UUID] = None
 
@@ -268,7 +267,6 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
         )
 
     def calculate_pricing(self):
-
         model_to_use = find_model_and_generate_metadata(
             self.chat_id,
             self.brain.model,

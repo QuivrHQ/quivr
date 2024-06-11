@@ -2,11 +2,10 @@ from datetime import datetime
 from typing import List
 from uuid import UUID
 
-# from sqlalchemy.dialects.postgresql import UUID
-from sqlmodel import JSON, TIMESTAMP
+from sqlmodel import JSON, TIMESTAMP, Column, Field, Relationship, SQLModel, text
 from sqlmodel import UUID as PGUUID
-from sqlmodel import Column, Field, Relationship, SQLModel, text
 
+from backend.modules.brain.entity.brain_entity import Brain
 from backend.modules.user.entity.user_identity import User
 
 
@@ -50,6 +49,9 @@ class ChatHistory(SQLModel, table=True):
         primary_key=True,
         nullable=False,  # Added nullable constraint
     )
+    chat: Chat | None = Relationship(
+        back_populates="chat_history", sa_relationship_kwargs={"lazy": "select"}
+    )  # type: ignore
     user_message: str | None = None
     assistant: str | None = None
     message_time: datetime | None = Field(
@@ -59,19 +61,20 @@ class ChatHistory(SQLModel, table=True):
             server_default=text("CURRENT_TIMESTAMP"),
         ),
     )
-    # TODO: add models
-    # prompt_id: UUID | None = Field(default=None, foreign_key="prompts.id")
-    # brain_id: UUID | None = Field(
-    #     default=None,
-    #     foreign_key="brains.brain_id",
-    # )
+    prompt_id: UUID | None = Field(default=None, foreign_key="prompts.id")
+    brain_id: UUID | None = Field(
+        default=None,
+        foreign_key="brains.brain_id",
+    )
 
     metadata_: dict | None = Field(
         default=None, sa_column=Column("metadata", JSON, default=None)
     )
     thumbs: bool | None = None
 
-    chat: Chat | None = Relationship(back_populates="chat_history")  # type: ignore
+    brain: Brain | None = Relationship(
+        back_populates="brain_chat_history", sa_relationship_kwargs={"lazy": "select"}
+    )  # type: ignore
 
     class Config:
         # Note: Pydantic can't generate schema for arbitrary types

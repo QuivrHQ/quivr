@@ -44,6 +44,11 @@ description = "quivr backend"
 authors = ["aminediro <amine@quivr.app>"]
 readme = "README.md"
 
+[tool.pytest.ini_options]
+addopts = "--tb=short -ra -v"
+filterwarnings = ["ignore::DeprecationWarning"]
+
+
 [tool.poetry.dependencies]
 python = "^3.11"
 torch = { version = "^2.3.1+cpu", source = "pytorch-cpu-src" }

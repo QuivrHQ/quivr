@@ -20,8 +20,9 @@ from backend.modules.brain.service.integration_brain_service import (
 )
 from backend.modules.chat.controller.chat.interface import ChatInterface
 from backend.modules.chat.service.chat_service import ChatService
+from backend.modules.dependencies import get_service
 
-chat_service = ChatService()
+chat_service = get_service(ChatService)()
 api_brain_definition_service = ApiBrainDefinitionService()
 integration_brain_description_service = IntegrationBrainDescriptionService()
 

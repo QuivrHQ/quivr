@@ -5,13 +5,9 @@ from fastapi import HTTPException
 
 from backend.logger import get_logger
 from backend.models.databases.llm_models import LLMModels
-from backend.modules.brain.service.brain_service import BrainService
-from backend.modules.chat.service.chat_service import ChatService
 from backend.modules.user.service.user_usage import UserUsage
 
 logger = get_logger(__name__)
-brain_service = BrainService()
-chat_service = ChatService()
 
 
 class NullableUUID(UUID):
@@ -36,7 +32,6 @@ def find_model_and_generate_metadata(
     user_settings,
     models_settings,
 ):
-
     # Default model is gpt-3.5-turbo-0125
     default_model = "gpt-3.5-turbo-0125"
     model_to_use = LLMModels(  # TODO Implement default models in database
@@ -89,7 +84,6 @@ def update_user_usage(usage: UserUsage, user_settings, cost: int = 100):
     Raises:
         HTTPException: Raises a 429 error if the user has reached the limit.
     """
-    usage
 
     date = time.strftime("%Y%m%d")
 

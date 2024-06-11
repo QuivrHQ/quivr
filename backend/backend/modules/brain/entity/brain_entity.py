@@ -4,6 +4,9 @@ from typing import List, Optional
 from uuid import UUID
 
 from pydantic import BaseModel
+from sqlmodel import TIMESTAMP, Column, Field, Relationship, SQLModel, text
+from sqlmodel import UUID as PGUUID
+from sqlmodel import Enum as PGEnum
 
 from backend.modules.brain.entity.api_brain_definition_entity import (
     ApiBrainDefinitionEntity,
@@ -19,6 +22,40 @@ class BrainType(str, Enum):
     API = "api"
     COMPOSITE = "composite"
     INTEGRATION = "integration"
+
+
+class Brain(SQLModel, table=True):
+    __tablename__ = "brains"  # type: ignore
+
+    brain_id: UUID | None = Field(
+        default=None,
+        sa_column=Column(
+            PGUUID,
+            server_default=text("uuid_generate_v4()"),
+            primary_key=True,
+        ),
+    )
+    name: str
+    status: str | None = None
+    description: str | None = None
+    model: str | None = None
+    max_tokens: int | None = None
+    temperature: float | None = None
+    retrieval_algorithm: str | None = None
+    prompt_id: UUID | None = Field(default=None, foreign_key="prompts.id")
+    last_update: datetime | None = Field(
+        default=None,
+        sa_column=Column(
+            TIMESTAMP(timezone=False),
+            server_default=text("CURRENT_TIMESTAMP"),
+        ),
+    )
+    brain_type: BrainType | None = Field(
+        default=None, sa_column=Column(PGEnum(BrainType), server_default="doc")
+    )
+    brain_chat_history: List["ChatHistory"] = Relationship(  # noqa: F821
+        back_populates="brain", sa_relationship_kwargs={}
+    )
 
 
 class BrainEntity(BaseModel):
