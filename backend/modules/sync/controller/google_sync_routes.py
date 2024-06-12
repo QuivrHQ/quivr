@@ -80,7 +80,7 @@ def authorize_google(
         scopes=SCOPES,
         redirect_uri=redirect_uri,
     )
-    state = f"user_id={current_user.id}"
+    state = f"user_id={current_user.id}, name={name}"
     authorization_url, state = flow.authorization_url(
         access_type="offline",
         include_granted_scopes="true",
@@ -115,7 +115,9 @@ def oauth2callback_google(request: Request):
     state = request.query_params.get("state")
     state_dict = {"state": state}
     logger.info(f"State: {state}")
-    current_user = state.split("=")[1] if state else None
+    state_split = state.split(",")
+    current_user = state_split[0].split("=")[1] if state else None
+    name = state_split[1].split("=")[1] if state else None
     logger.debug(
         f"Handling OAuth2 callback for user: {current_user} with state: {state}"
     )

@@ -2,15 +2,15 @@ import os
 
 import requests
 from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi.responses import HTMLResponse
 from logger import get_logger
 from middlewares.auth import AuthBearer, get_current_user
 from modules.sync.dto.inputs import SyncsUserInput, SyncUserUpdateInput
 from modules.sync.service.sync_service import SyncService, SyncUserService
 from modules.user.entity.user_identity import UserIdentity
 from msal import PublicClientApplication
-from .successfull_connection import successfullConnectionPage
-from fastapi.responses import HTMLResponse
 
+from .successfull_connection import successfullConnectionPage
 
 # Initialize logger
 logger = get_logger(__name__)
@@ -54,7 +54,7 @@ def authorize_azure(
     """
     client = PublicClientApplication(CLIENT_ID, authority=AUTHORITY)
     logger.debug(f"Authorizing Azure sync for user: {current_user.id}")
-    state = f"user_id={current_user.id}"
+    state = f"user_id={current_user.id}, name={name}"
     authorization_url = client.get_authorization_request_url(
         scopes=SCOPE, redirect_uri=REDIRECT_URI, state=state
     )
@@ -83,8 +83,10 @@ def oauth2callback_azure(request: Request):
     """
     client = PublicClientApplication(CLIENT_ID, authority=AUTHORITY)
     state = request.query_params.get("state")
+    state_split = state.split(",")
+    current_user = state_split[0].split("=")[1]  # Extract user_id from state
+    name = state_split[1].split("=")[1] if state else None
     state_dict = {"state": state}
-    current_user = state.split("=")[1]  # Extract user_id from state
     logger.debug(
         f"Handling OAuth2 callback for user: {current_user} with state: {state}"
     )
