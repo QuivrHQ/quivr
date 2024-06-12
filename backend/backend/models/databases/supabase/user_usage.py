@@ -55,17 +55,14 @@ class UserUsage(Repository):
 
         return user_settings
 
-    def get_model_settings(self):
-        """
-        Fetch the user settings from the database
-        """
-
+    def get_models(self):
         model_settings_response = (self.db.from_("models").select("*").execute()).data
-
         if len(model_settings_response) == 0:
             raise ValueError("An issue occured while fetching the model settings")
-
         return model_settings_response
+
+    def get_user_monthly(self, user_id):
+        pass
 
     def get_user_usage(self, user_id):
         """

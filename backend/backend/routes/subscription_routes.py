@@ -6,7 +6,7 @@ from pydantic import BaseModel
 
 from backend.logger import get_logger
 from backend.middlewares.auth.auth_bearer import AuthBearer, get_current_user
-from backend.models import BrainSubscription
+from backend.models.brains_subscription_invitations import BrainSubscription
 from backend.modules.brain.entity.brain_entity import RoleEnum
 from backend.modules.brain.repository import IntegrationBrain
 from backend.modules.brain.service.api_brain_definition_service import (

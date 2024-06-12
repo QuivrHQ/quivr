@@ -1,6 +1,7 @@
 from backend.models.databases.supabase import BrainSubscription, File, UserUsage, Vector
 
 
+# TODO: REMOVE THIS CLASS !
 class SupabaseDB(
     UserUsage,
     File,

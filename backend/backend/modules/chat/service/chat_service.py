@@ -5,6 +5,7 @@ from uuid import UUID
 from fastapi import HTTPException
 
 from backend.logger import get_logger
+from backend.modules.brain.entity.brain_entity import Brain
 from backend.modules.brain.service.brain_service import BrainService
 from backend.modules.chat.dto.chats import ChatItem
 from backend.modules.chat.dto.inputs import (
@@ -22,6 +23,7 @@ from backend.modules.dependencies import BaseService
 from backend.modules.notification.service.notification_service import (
     NotificationService,
 )
+from backend.modules.prompt.entity.prompt import Prompt
 from backend.modules.prompt.service.prompt_service import PromptService
 
 logger = get_logger(__name__)
@@ -84,20 +86,22 @@ class ChatService(BaseService[ChatRepository]):
     async def get_chat_history(self, chat_id: UUID) -> List[GetChatHistoryOutput]:
         history = await self.repository.get_chat_history(chat_id)
         enriched_history: List[GetChatHistoryOutput] = []
-        if history is None:
+        if len(history) == 0:
             return enriched_history
+        brain: Brain = await history[0].awaitable_attrs.brain
+        prompt: Prompt = await brain.awaitable_attrs.prompt
         for message in history:
             enriched_history.append(
-                # TODO : WHY bother is having ids here ??
+                # TODO : WHY bother with having ids here ??
                 GetChatHistoryOutput(
                     chat_id=(message.chat_id),
                     message_id=message.message_id,
                     user_message=message.user_message,
                     assistant=message.assistant,
                     message_time=message.message_time,
-                    brain_name=message.brain.name if message.brain else None,
-                    brain_id=message.brain.brain_id if message.brain else None,
-                    prompt_title=message.prompt.title if message.prompt else None,
+                    brain_name=brain.name if brain else None,
+                    brain_id=brain.brain_id if brain else None,
+                    prompt_title=(prompt.title if prompt else None),
                     metadata=message.metadata_,
                     thumbs=message.thumbs,
                 )
@@ -124,7 +128,7 @@ class ChatService(BaseService[ChatRepository]):
                 status_code=500,
                 detail="An exception occurred while updating chat history.",
             )
-        return ChatHistory(response[0])  # pyright: ignore reportPrivateUsage=none
+        return ChatHistory(**response[0])  # pyright: ignore reportPrivateUsage=none
 
     def update_chat(self, chat_id, chat_data: ChatUpdatableProperties) -> Chat:
         if not chat_id:
@@ -178,7 +182,7 @@ class ChatService(BaseService[ChatRepository]):
             logger.info(f"Message {message_id} updated")
         else:
             logger.info(f"No updates to apply for message {message_id}")
-        return ChatHistory(updated_message)  # pyright: ignore reportPrivateUsage=none
+        return ChatHistory(**updated_message)  # pyright: ignore reportPrivateUsage=none
 
     def delete_chat_from_db(self, chat_id):
         try:

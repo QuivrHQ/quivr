@@ -22,14 +22,6 @@ from backend.modules.brain.repository import (
     IntegrationBrain,
     IntegrationDescription,
 )
-from backend.modules.brain.repository.interfaces import (
-    BrainsInterface,
-    BrainsUsersInterface,
-    BrainsVectorsInterface,
-    ExternalApiSecretsInterface,
-    IntegrationBrainInterface,
-    IntegrationDescriptionInterface,
-)
 from backend.modules.brain.service.api_brain_definition_service import (
     ApiBrainDefinitionService,
 )
@@ -40,20 +32,19 @@ from backend.vectorstore.supabase import CustomSupabaseVectorStore
 logger = get_logger(__name__)
 
 knowledge_service = KnowledgeService()
-# TODO: directly user api_brain_definition repository
 api_brain_definition_service = ApiBrainDefinitionService()
 
 
 class BrainService:
-    brain_repository: BrainsInterface
-    brain_user_repository: BrainsUsersInterface
-    brain_vector_repository: BrainsVectorsInterface
-    external_api_secrets_repository: ExternalApiSecretsInterface
-    integration_brains_repository: IntegrationBrainInterface
-    integration_description_repository: IntegrationDescriptionInterface
+    # brain_repository: BrainsInterface
+    # brain_user_repository: BrainsUsersInterface
+    # brain_vector_repository: BrainsVectorsInterface
+    # external_api_secrets_repository: ExternalApiSecretsInterface
+    # integration_brains_repository: IntegrationBrainInterface
+    # integration_description_repository: IntegrationDescriptionInterface
 
     def __init__(self):
-        self.brain_repository = Brains()
+        self.brain_repository: Brains = Brains()
         self.brain_user_repository = BrainsUsers()
         self.brain_vector = BrainsVectors()
         self.integration_brains_repository = IntegrationBrain()
@@ -132,17 +123,17 @@ class BrainService:
         user_id: UUID,
         brain: Optional[CreateBrainProperties],
     ) -> BrainEntity:
-        if brain == None:
+        if brain is None:
             brain = CreateBrainProperties()  # type: ignore model and brain_definition
 
-        if brain.brain_type == BrainType.API:
+        if brain.brain_type == BrainType.api:
             validate_api_brain(brain)
             return self.create_brain_api(user_id, brain)
 
-        if brain.brain_type == BrainType.COMPOSITE:
+        if brain.brain_type == BrainType.composite:
             return self.create_brain_composite(brain)
 
-        if brain.brain_type == BrainType.INTEGRATION:
+        if brain.brain_type == BrainType.integration:
             return self.create_brain_integration(user_id, brain)
 
         created_brain = self.brain_repository.create_brain(brain)
@@ -238,7 +229,7 @@ class BrainService:
         if brain_to_delete is None:
             raise HTTPException(status_code=404, detail="Brain not found.")
 
-        if brain_to_delete.brain_type == BrainType.API:
+        if brain_to_delete.brain_type == BrainType.api:
             self.delete_brain_secrets_values(
                 brain_id=brain_id,
             )
@@ -286,7 +277,7 @@ class BrainService:
             )
 
         if (
-            brain_update_answer.brain_type == BrainType.API
+            brain_update_answer.brain_type == BrainType.api
             and brain_new_values.brain_definition
         ):
             existing_brain_secrets_definition = (
@@ -330,10 +321,11 @@ class BrainService:
         self, brain_id: UUID, user_id: UUID = None
     ) -> BrainEntity | None:
         brain = self.brain_repository.get_brain_details(brain_id)
-        if brain == None:
+        if brain is None:
             return None
 
-        if brain.brain_type == BrainType.INTEGRATION:
+        # TODO: N+1 here !!
+        if brain.brain_type == BrainType.integration:
             brain.integration = (
                 self.integration_brains_repository.get_integration_brain(
                     brain_id, user_id

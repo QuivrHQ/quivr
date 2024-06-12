@@ -4,7 +4,7 @@ from sqlalchemy import text
 
 from backend.logger import get_logger
 from backend.models.settings import (
-    get_embeddings,
+    get_embedding_client,
     get_pg_database_engine,
     get_supabase_client,
 )
@@ -23,7 +23,7 @@ class Brains(BrainsInterface):
         self.pg_engine = pg_engine
 
     def create_brain(self, brain):
-        embeddings = get_embeddings()
+        embeddings = get_embedding_client()
         string_to_embed = f"Name: {brain.name} Description: {brain.description}"
         brain_meaning = embeddings.embed_query(string_to_embed)
         brain_dict = brain.dict(
@@ -96,7 +96,7 @@ class Brains(BrainsInterface):
     def update_brain_by_id(
         self, brain_id: UUID, brain: BrainUpdatableProperties
     ) -> BrainEntity | None:
-        embeddings = get_embeddings()
+        embeddings = get_embedding_client()
         string_to_embed = f"Name: {brain.name} Description: {brain.description}"
         brain_meaning = embeddings.embed_query(string_to_embed)
         brain_dict = brain.dict(exclude_unset=True)

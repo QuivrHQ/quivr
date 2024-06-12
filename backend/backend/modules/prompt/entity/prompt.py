@@ -25,8 +25,8 @@ class Prompt(SQLModel, table=True):
     content: str | None = None
     title: str | None = Field(default=None, max_length=255)
     status: str = Field(default="private", max_length=255)
-    message_history: List["ChatHistory"] = Relationship(  # noqa: F821
-        back_populates="prompt", sa_relationship_kwargs={"lazy": "select"}
+    brain: List["Brain"] = Relationship(  # noqa: F821
+        back_populates="prompt", sa_relationship_kwargs={"lazy": "joined"}
     )
 
 

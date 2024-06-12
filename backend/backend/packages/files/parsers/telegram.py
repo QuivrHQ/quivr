@@ -1,4 +1,4 @@
-from backend.models import File
+from backend.models.files import File
 from backend.packages.files.loaders.telegram import TelegramChatFileLoader
 
 from .common import process_file

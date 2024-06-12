@@ -2,7 +2,7 @@ from typing import Dict
 
 import resend
 
-from backend.models import ResendSettings
+from backend.models.settings import ResendSettings
 
 
 def send_email(params: Dict):

@@ -11,8 +11,10 @@ def format_chat_history(
     """Format the chat history into a list of HumanMessage and AIMessage"""
     formatted_history = []
     for chat in history:
-        formatted_history.append(HumanMessage(chat.user_message))
-        formatted_history.append(AIMessage(chat.assistant))
+        if chat.user_message:
+            formatted_history.append(HumanMessage(content=chat.user_message))
+        if chat.assistant:
+            formatted_history.append(AIMessage(content=chat.assistant))
     return formatted_history
 
 

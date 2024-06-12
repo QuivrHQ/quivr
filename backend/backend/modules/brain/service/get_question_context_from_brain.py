@@ -3,7 +3,7 @@ from uuid import UUID
 from attr import dataclass
 
 from backend.logger import get_logger
-from backend.models.settings import get_embeddings, get_supabase_client
+from backend.models.settings import get_embedding_client, get_supabase_client
 from backend.modules.upload.service.generate_file_signed_url import (
     generate_file_signed_url,
 )
@@ -34,7 +34,7 @@ def get_question_context_from_brain(brain_id: UUID, question: str) -> str:
     """
     # TODO: Move to AnswerGenerator service
     supabase_client = get_supabase_client()
-    embeddings = get_embeddings()
+    embeddings = get_embedding_client()
 
     vector_store = CustomSupabaseVectorStore(
         supabase_client,

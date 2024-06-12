@@ -7,8 +7,8 @@ from pydantic import BaseModel, ConfigDict
 from pydantic_settings import BaseSettings
 
 from backend.logger import get_logger
-from backend.models import BrainSettings
 from backend.models.databases.supabase.user_usage import UserUsage
+from backend.models.settings import BrainSettings
 from backend.modules.brain.entity.brain_entity import BrainEntity
 from backend.modules.brain.qa_interface import (
     QAInterface,
@@ -196,7 +196,7 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
         self.user_settings = self.user_usage.get_user_settings()
 
         # Get Model settings for the user
-        self.models_settings = self.user_usage.get_model_settings()
+        self.models_settings = self.user_usage.get_models()
         self.increase_usage_user()
         self.knowledge_qa = QuivrRAG(
             model=self.brain.model if self.brain.model else self.model,
@@ -323,7 +323,9 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
                 answer = model_response["answer"].tool_calls[-1]["args"]["answer"]
         else:
             answer = model_response["answer"].content
+
         sources = model_response["docs"] or []
+
         if len(sources) > 0:
             sources_list = generate_source(sources, self.brain_id, citations=citations)
             serialized_sources_list = [source.dict() for source in sources_list]

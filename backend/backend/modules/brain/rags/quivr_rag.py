@@ -12,26 +12,28 @@ from langchain.retrievers.document_compressors import FlashrankRerank
 from langchain.schema import format_document
 from langchain_cohere import CohereRerank
 from langchain_community.chat_models import ChatLiteLLM
-from langchain_community.embeddings import OllamaEmbeddings
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate, PromptTemplate
 from langchain_core.pydantic_v1 import BaseModel as BaseModelV1
 from langchain_core.pydantic_v1 import Field as FieldV1
 from langchain_core.runnables import RunnableLambda, RunnablePassthrough
-from langchain_openai import ChatOpenAI, OpenAIEmbeddings
+from langchain_openai import ChatOpenAI
 from pydantic import BaseModel, ConfigDict
 from pydantic_settings import BaseSettings
-from supabase.client import Client
 
 from backend.logger import get_logger
-from backend.models import BrainSettings  # Importing settings related to the 'brain'
-from backend.models.settings import get_supabase_client
+from backend.models.settings import (
+    BrainSettings,  # Importing settings related to the 'brain'
+    get_embedding_client,
+    get_supabase_client,
+)
 from backend.modules.brain.service.brain_service import BrainService
 from backend.modules.chat.service.chat_service import ChatService
 from backend.modules.dependencies import get_service
-from backend.modules.knowledge.repository.knowledges import Knowledges
+from backend.modules.knowledge.repository.knowledges import KnowledgeRepository
 from backend.modules.prompt.service.get_prompt_to_use import get_prompt_to_use
 from backend.vectorstore.supabase import CustomSupabaseVectorStore
+from supabase.client import Client
 
 logger = get_logger(__name__)
 
@@ -41,8 +43,8 @@ class cited_answer(BaseModelV1):
 
     thoughts: str = FieldV1(
         ...,
-        description="""Description of the thought process, based only on the given sources. 
-        Cite the text as much as possible and give the document name it appears in. In the format : 'Doc_name states : cited_text'. Be the most 
+        description="""Description of the thought process, based only on the given sources.
+        Cite the text as much as possible and give the document name it appears in. In the format : 'Doc_name states : cited_text'. Be the most
         procedural as possible. Write all the steps needed to find the answer until you find it.""",
     )
     answer: str = FieldV1(
@@ -150,40 +152,13 @@ class QuivrRAG(BaseModel):
     max_tokens: int = 2000  # Output length
     max_input: int = 2000
     streaming: bool = False
-    knowledge_service: Knowledges = None
-
-    @property
-    def embeddings(self):
-        if self.brain_settings.ollama_api_base_url:
-            return OllamaEmbeddings(
-                base_url=self.brain_settings.ollama_api_base_url
-            )  # pyright: ignore reportPrivateUsage=none
-        else:
-            return OpenAIEmbeddings()
+    knowledge_service: KnowledgeRepository = None
 
     def prompt_to_use(self):
         if self.brain_id and is_valid_uuid(self.brain_id):
             return get_prompt_to_use(UUID(self.brain_id), self.prompt_id)
         else:
             return None
-
-    def model_compatible_with_function_calling(self):
-        if self.model in [
-            "gpt-4o",
-            "gpt-4-turbo",
-            "gpt-4-turbo-2024-04-09",
-            "gpt-4-turbo-preview",
-            "gpt-4-0125-preview",
-            "gpt-4-1106-preview",
-            "gpt-4",
-            "gpt-4-0613",
-            "gpt-3.5-turbo",
-            "gpt-3.5-turbo-0125",
-            "gpt-3.5-turbo-1106",
-            "gpt-3.5-turbo-0613",
-        ]:
-            return True
-        return False
 
     supabase_client: Optional[Client] = None
     vector_store: Optional[CustomSupabaseVectorStore] = None
@@ -210,7 +185,7 @@ class QuivrRAG(BaseModel):
             max_input=max_input,
             **kwargs,
         )
-        self.supabase_client = self._create_supabase_client()
+        self.supabase_client = get_supabase_client()
         self.vector_store = self._create_vector_store()
         self.prompt_id = prompt_id
         self.max_tokens = max_tokens
@@ -219,15 +194,13 @@ class QuivrRAG(BaseModel):
         self.brain_id = brain_id
         self.chat_id = chat_id
         self.streaming = streaming
-        self.knowledge_service = Knowledges()
-
-    def _create_supabase_client(self) -> Client:
-        return get_supabase_client()
+        self.knowledge_service = KnowledgeRepository()
 
     def _create_vector_store(self) -> CustomSupabaseVectorStore:
+        embeddings = get_embedding_client()
         return CustomSupabaseVectorStore(
             self.supabase_client,
-            self.embeddings,
+            embeddings,
             table_name="vectors",
             brain_id=self.brain_id,
             max_input=self.max_input,
@@ -311,7 +284,6 @@ class QuivrRAG(BaseModel):
         return chat_history
 
     def get_chain(self):
-
         list_files_array = self.knowledge_service.get_all_knowledge_in_brain(
             self.brain_id
         )  # pyright: ignore reportPrivateUsage=none
@@ -381,7 +353,6 @@ class QuivrRAG(BaseModel):
             api_base=api_base,
         )  # pyright: ignore reportPrivateUsage=none
         if self.model_compatible_with_function_calling():
-
             # And finally, we do the part that returns the answers
             llm_function = ChatOpenAI(
                 max_tokens=self.max_tokens,

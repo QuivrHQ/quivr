@@ -4,7 +4,7 @@ from uuid import UUID
 from fastapi import HTTPException
 
 from backend.logger import get_logger
-from backend.models.databases.llm_models import LLMModels
+from backend.models.databases.llm_models import LLMModel
 from backend.modules.user.service.user_usage import UserUsage
 
 logger = get_logger(__name__)
@@ -26,15 +26,25 @@ class NullableUUID(UUID):
             return None
 
 
+# TODO: rewrite
+def compute_cost(model_to_use, models_settings):
+    model = model_to_use.name
+    user_choosen_model_price = 1000
+    for model_setting in models_settings:
+        if model_setting["name"] == model:
+            user_choosen_model_price = model_setting["price"]
+    return user_choosen_model_price
+
+
+# TODO: rewrite
 def find_model_and_generate_metadata(
-    chat_id: UUID,
-    brain_model: str,
+    brain_model: str | None,
     user_settings,
     models_settings,
 ):
     # Default model is gpt-3.5-turbo-0125
     default_model = "gpt-3.5-turbo-0125"
-    model_to_use = LLMModels(  # TODO Implement default models in database
+    model_to_use = LLMModel(  # TODO Implement default models in database
         name=default_model, price=1, max_input=4000, max_output=1000
     )
 

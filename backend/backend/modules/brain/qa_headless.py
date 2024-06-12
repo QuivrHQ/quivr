@@ -11,7 +11,9 @@ from langchain_community.chat_models import ChatLiteLLM
 from pydantic import BaseModel, ConfigDict
 
 from backend.logger import get_logger
-from backend.models import BrainSettings  # Importing settings related to the 'brain'
+from backend.models.settings import (
+    BrainSettings,  # Importing settings related to the 'brain'
+)
 from backend.modules.brain.qa_interface import QAInterface
 from backend.modules.brain.service.utils.format_chat_history import (
     format_chat_history,

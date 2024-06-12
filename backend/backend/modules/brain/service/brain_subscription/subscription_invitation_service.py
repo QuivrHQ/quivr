@@ -1,5 +1,8 @@
 from backend.logger import get_logger
-from backend.models import BrainSubscription, get_supabase_client
+from backend.models.brains_subscription_invitations import (
+    BrainSubscription,
+)
+from backend.models.settings import get_supabase_client
 from backend.modules.brain.service.brain_user_service import BrainUserService
 from backend.modules.user.service.user_service import UserService
 

@@ -11,7 +11,7 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 from llama_parse import LlamaParse
 
 from backend.logger import get_logger
-from backend.models import File
+from backend.models.files import File
 from backend.modules.brain.service.brain_vector_service import BrainVectorService
 from backend.modules.upload.service.upload_file import DocumentSerializable
 from backend.packages.embeddings.vectors import Neurons
@@ -62,7 +62,6 @@ def process_file(
             )
             file.documents = text_splitter.split_documents([document_to_langchain])
     else:
-
         file.compute_documents(loader_class)
 
     metadata = {
@@ -82,9 +81,7 @@ def process_file(
 
     if file.documents is not None:
         logger.info("Coming here?")
-        for index, doc in enumerate(
-            file.documents, start=1
-        ):  # pyright: ignore reportPrivateUsage=none
+        for index, doc in enumerate(file.documents, start=1):  # pyright: ignore reportPrivateUsage=none
             new_metadata = metadata.copy()
             logger.info(f"Processing document {doc}")
             # Add filename at beginning of page content

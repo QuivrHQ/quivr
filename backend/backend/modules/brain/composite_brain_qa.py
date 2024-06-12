@@ -77,9 +77,9 @@ class CompositeBrainQA(
         self.user_id = user_id
 
     def get_answer_generator_from_brain_type(self, brain: BrainEntity):
-        if brain.brain_type == BrainType.COMPOSITE:
+        if brain.brain_type == BrainType.composite:
             return self.generate_answer
-        elif brain.brain_type == BrainType.API:
+        elif brain.brain_type == BrainType.api:
             return APIBrainQA(
                 brain_id=str(brain.id),
                 chat_id=self.chat_id,
@@ -92,7 +92,7 @@ class CompositeBrainQA(
                 raw=brain.raw,
                 jq_instructions=brain.jq_instructions,
             ).generate_answer
-        elif brain.brain_type == BrainType.DOC:
+        elif brain.brain_type == BrainType.doc:
             return KnowledgeBrainQA(
                 brain_id=str(brain.id),
                 chat_id=self.chat_id,

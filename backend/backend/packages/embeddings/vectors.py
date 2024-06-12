@@ -7,7 +7,7 @@ from pydantic import BaseModel
 from backend.logger import get_logger
 from backend.models.settings import (
     get_documents_vector_store,
-    get_embeddings,
+    get_embedding_client,
     get_supabase_db,
 )
 
@@ -28,7 +28,7 @@ class Neurons(BaseModel):
             logger.error(f"Error creating vector for document {e}")
 
     def create_embedding(self, content):
-        embeddings = get_embeddings()
+        embeddings = get_embedding_client()
         return embeddings.embed_query(content)
 
 

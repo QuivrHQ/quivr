@@ -2,6 +2,7 @@ import os
 
 import requests
 from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi.responses import HTMLResponse
 from msal import PublicClientApplication
 
 from backend.logger import get_logger
@@ -9,6 +10,8 @@ from backend.middlewares.auth import AuthBearer, get_current_user
 from backend.modules.sync.dto.inputs import SyncsUserInput, SyncUserUpdateInput
 from backend.modules.sync.service.sync_service import SyncService, SyncUserService
 from backend.modules.user.entity.user_identity import UserIdentity
+
+from .successfull_connection import successfullConnectionPage
 
 # Initialize logger
 logger = get_logger(__name__)

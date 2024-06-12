@@ -37,7 +37,7 @@ class CustomSupabaseVectorStore(SupabaseVectorStore):
         k: int = 6,
         table: str = "match_brain",
         threshold: float = 0.5,
-    ) -> [dict]:
+    ) -> list[dict[str, Any]]:
         vectors = self._embedding.embed_documents([query])
         query_embedding = vectors[0]
 

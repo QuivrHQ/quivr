@@ -1,7 +1,7 @@
 from uuid import UUID
 
 from backend.logger import get_logger
-from backend.models.settings import get_embeddings, get_supabase_client
+from backend.models.settings import get_embedding_client, get_supabase_client
 from backend.modules.brain.entity.brain_entity import BrainUser, MinimalUserBrainEntity
 from backend.modules.brain.repository.interfaces.brains_users_interface import (
     BrainsUsersInterface,
@@ -16,7 +16,7 @@ class BrainsUsers(BrainsUsersInterface):
         self.db = supabase_client
 
     def update_meaning(self, brain: MinimalUserBrainEntity):
-        embeddings = get_embeddings()
+        embeddings = get_embedding_client()
         string_to_embed = f"Name: {brain.name} Description: {brain.description}"
         brain_meaning = embeddings.embed_query(string_to_embed)
         brain_dict = {"meaning": brain_meaning}
@@ -145,13 +145,11 @@ class BrainsUsers(BrainsUsersInterface):
 
     def get_user_default_brain_id(self, user_id: UUID) -> UUID | None:
         response = (
-            (
-                self.db.from_("brains_users")
-                .select("brain_id")
-                .filter("user_id", "eq", user_id)
-                .filter("default_brain", "eq", True)
-                .execute()
-            )
+            self.db.from_("brains_users")
+            .select("brain_id")
+            .filter("user_id", "eq", user_id)
+            .filter("default_brain", "eq", True)
+            .execute()
         ).data
         if len(response) == 0:
             return None

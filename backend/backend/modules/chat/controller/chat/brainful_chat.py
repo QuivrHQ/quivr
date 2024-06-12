@@ -56,15 +56,16 @@ integration_list = {
 brain_service = BrainService()
 
 
-class BrainfulChat(ChatInterface):
-    def validate_authorization(self, user_id, brain_id):
-        if brain_id:
-            validate_brain_authorization(
-                brain_id=brain_id,
-                user_id=user_id,
-                required_roles=[RoleEnum.Viewer, RoleEnum.Editor, RoleEnum.Owner],
-            )
+def validate_authorization(user_id, brain_id):
+    if brain_id:
+        validate_brain_authorization(
+            brain_id=brain_id,
+            user_id=user_id,
+            required_roles=[RoleEnum.Viewer, RoleEnum.Editor, RoleEnum.Owner],
+        )
 
+
+class BrainfulChat(ChatInterface):
     def get_answer_generator(
         self,
         brain,
@@ -76,7 +77,7 @@ class BrainfulChat(ChatInterface):
         user_id,
         user_email,
     ):
-        if brain and brain.brain_type == BrainType.DOC:
+        if brain and brain.brain_type == BrainType.doc:
             return KnowledgeBrainQA(
                 chat_id=chat_id,
                 brain_id=str(brain.brain_id),
@@ -86,7 +87,7 @@ class BrainfulChat(ChatInterface):
                 user_email=user_email,
             )
 
-        if brain.brain_type == BrainType.INTEGRATION:
+        if brain.brain_type == BrainType.integration:
             integration_brain = integration_brain_description_service.get_integration_description_by_user_brain_id(
                 brain.brain_id, user_id
             )

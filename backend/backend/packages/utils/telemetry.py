@@ -5,7 +5,8 @@ import threading
 
 import httpx
 from fastapi import Request
-from logger import get_logger
+
+from backend.logger import get_logger
 
 logger = get_logger(__name__)
 
@@ -57,14 +58,3 @@ def maybe_send_telemetry(event_name: str, event_data: dict, request: Request = N
     threading.Thread(
         target=send_telemetry, args=(event_name, event_data, request)
     ).start()
-
-
-async def main():
-    await send_telemetry("user_login", {"login_success": True})
-
-
-# Run the example
-if __name__ == "__main__":
-    import asyncio
-
-    asyncio.run(main())

@@ -1,3 +1,5 @@
+from uuid import UUID
+
 from fastapi import HTTPException
 
 from backend.models.settings import get_supabase_client
@@ -6,7 +8,7 @@ from backend.modules.knowledge.entity.knowledge import Knowledge
 from backend.modules.knowledge.repository.knowledge_interface import KnowledgeInterface
 
 
-class Knowledges(KnowledgeInterface):
+class KnowledgeRepository(KnowledgeInterface):
     def __init__(self):
         supabase_client = get_supabase_client()
         self.db = supabase_client
@@ -74,7 +76,7 @@ class Knowledges(KnowledgeInterface):
 
         return Knowledge(**knowledge[0])
 
-    def get_all_knowledge_in_brain(self, brain_id):
+    def get_all_knowledge_in_brain(self, brain_id: UUID) -> list[Knowledge]:
         """
         Get all the knowledge in a brain
         Args:

@@ -1,1 +1,1 @@
-from .knowledges import Knowledges
+from .knowledges import KnowledgeRepository

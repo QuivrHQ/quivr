@@ -2,11 +2,11 @@ from datetime import datetime
 from typing import List
 from uuid import UUID
 
+from sqlalchemy.ext.asyncio import AsyncAttrs
 from sqlmodel import JSON, TIMESTAMP, Column, Field, Relationship, SQLModel, text
 from sqlmodel import UUID as PGUUID
 
 from backend.modules.brain.entity.brain_entity import Brain
-from backend.modules.prompt.entity.prompt import Prompt
 from backend.modules.user.entity.user_identity import User
 
 
@@ -33,7 +33,7 @@ class Chat(SQLModel, table=True):
     chat_history: List["ChatHistory"] | None = Relationship(back_populates="chat")  # type: ignore
 
 
-class ChatHistory(SQLModel, table=True):
+class ChatHistory(AsyncAttrs, SQLModel, table=True):
     __tablename__ = "chat_history"  # type: ignore # type : ignore
 
     message_id: UUID | None = Field(
@@ -62,21 +62,18 @@ class ChatHistory(SQLModel, table=True):
             server_default=text("CURRENT_TIMESTAMP"),
         ),
     )
+    metadata_: dict | None = Field(
+        default=None, sa_column=Column("metadata", JSON, default=None)
+    )
     prompt_id: UUID | None = Field(default=None, foreign_key="prompts.id")
     brain_id: UUID | None = Field(
         default=None,
         foreign_key="brains.brain_id",
     )
 
-    metadata_: dict | None = Field(
-        default=None, sa_column=Column("metadata", JSON, default=None)
-    )
     thumbs: bool | None = None
-    prompt: Prompt | None = Relationship(
-        back_populates="message_history", sa_relationship_kwargs={"lazy": "joined"}
-    )  # type: ignore
     brain: Brain | None = Relationship(
-        back_populates="brain_chat_history", sa_relationship_kwargs={"lazy": "joined"}
+        back_populates="brain_chat_history", sa_relationship_kwargs={"lazy": "select"}
     )  # type: ignore
 
     class Config:

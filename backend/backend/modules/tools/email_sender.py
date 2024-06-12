@@ -12,7 +12,7 @@ from langchain_core.tools import BaseTool
 from pydantic import BaseModel
 
 from backend.logger import get_logger
-from backend.models import BrainSettings
+from backend.models.settings import BrainSettings
 from backend.modules.contact_support.controller.settings import ContactsSettings
 from backend.packages.emails.send_email import send_email
 
@@ -38,8 +38,7 @@ class EmailSenderTool(BaseTool):
     def _run(
         self, text: str, run_manager: Optional[CallbackManagerForToolRun] = None
     ) -> Dict:
-
-        html_body = f"""
+        html_body = """
         <div style="text-align: center;">
                 <img src="https://quivr-cms.s3.eu-west-3.amazonaws.com/logo_quivr_white_7e3c72620f.png" alt="Quivr Logo" style="width: 100px; height: 100px; border-radius: 50%; margin: 0 auto; display: block;">
                 <br />

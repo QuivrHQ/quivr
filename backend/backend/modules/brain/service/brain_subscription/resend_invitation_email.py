@@ -1,7 +1,8 @@
 from uuid import UUID
 
 from backend.logger import get_logger
-from backend.models import BrainSettings, BrainSubscription
+from backend.models.brains_subscription_invitations import BrainSubscription
+from backend.models.settings import BrainSettings
 from backend.modules.brain.service.brain_service import BrainService
 from backend.packages.emails.send_email import send_email
 

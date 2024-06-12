@@ -1,6 +1,6 @@
 from langchain_community.document_loaders import PythonLoader
 
-from backend.models import File
+from backend.models.files import File
 
 from .common import process_file
 

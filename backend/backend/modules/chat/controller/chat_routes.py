@@ -1,14 +1,17 @@
 from typing import Annotated, List, Optional
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from fastapi.responses import StreamingResponse
 
 from backend.logger import get_logger
 from backend.middlewares.auth import AuthBearer, get_current_user
-from backend.models.settings import get_embeddings, get_supabase_client
+from backend.models.settings import get_embedding_client, get_supabase_client
 from backend.modules.brain.service.brain_service import BrainService
-from backend.modules.chat.controller.chat.brainful_chat import BrainfulChat
+from backend.modules.chat.controller.chat.brainful_chat import (
+    BrainfulChat,
+    validate_authorization,
+)
 from backend.modules.chat.dto.chats import ChatItem, ChatQuestion
 from backend.modules.chat.dto.inputs import (
     ChatMessageProperties,
@@ -19,7 +22,10 @@ from backend.modules.chat.dto.inputs import (
 from backend.modules.chat.entity.chat import Chat
 from backend.modules.chat.service.chat_service import ChatService
 from backend.modules.dependencies import get_service
+from backend.modules.knowledge.repository.knowledges import KnowledgeRepository
+from backend.modules.prompt.service.prompt_service import PromptService
 from backend.modules.user.entity.user_identity import UserIdentity
+from backend.packages.quivr_core.brain_factory import RAGService
 from backend.packages.utils.telemetry import maybe_send_telemetry
 from backend.vectorstore.supabase import CustomSupabaseVectorStore
 
@@ -27,6 +33,9 @@ logger = get_logger(__name__)
 
 chat_router = APIRouter()
 brain_service = BrainService()
+knowledge_service = KnowledgeRepository()
+prompt_service = PromptService()
+
 
 ChatServiceDep = Annotated[ChatService, Depends(get_service(ChatService))]
 UserIdentityDep = Annotated[UserIdentity, Depends(get_current_user)]
@@ -37,7 +46,7 @@ def init_vector_store(user_id: UUID) -> CustomSupabaseVectorStore:
     Initialize the vector store
     """
     supabase_client = get_supabase_client()
-    embedding_service = get_embeddings()
+    embedding_service = get_embedding_client()
     vector_store = CustomSupabaseVectorStore(
         supabase_client, embedding_service, table_name="vectors", user_id=user_id
     )
@@ -45,7 +54,7 @@ def init_vector_store(user_id: UUID) -> CustomSupabaseVectorStore:
     return vector_store
 
 
-def get_answer_generator(
+async def get_answer_generator(
     chat_id: UUID,
     chat_question: ChatQuestion,
     chat_service: ChatService,
@@ -57,12 +66,11 @@ def get_answer_generator(
 
     # Get History only if needed
     if not brain_id:
-        history = chat_service.get_chat_history(chat_id)
+        history = await chat_service.get_chat_history(chat_id)
     else:
         history = []
 
-    # Generic
-    # TODO(@aminediro) : chache the results here
+    # TODO(@aminediro) : NOT USED anymore
     brain, metadata_brain = brain_service.find_brain_from_question(
         brain_id, chat_question.question, current_user, chat_id, history, vector_store
     )
@@ -186,26 +194,35 @@ async def create_chat_handler(
     tags=["Chat"],
 )
 async def create_question_handler(
+    request: Request,
     chat_question: ChatQuestion,
     chat_id: UUID,
     current_user: UserIdentityDep,
     chat_service: ChatServiceDep,
     brain_id: Annotated[UUID | None, Query()] = None,
 ):
+    # TODO: check logic into middleware
+    validate_authorization(user_id=current_user.id, brain_id=brain_id)
     try:
-        logger.info(
-            f"Creating question for chat {chat_id} with brain {brain_id} of type {type(brain_id)}"
+        rag_service = RAGService(
+            current_user,
+            brain_id,
+            chat_id,
+            brain_service,
+            prompt_service,
+            chat_service,
+            knowledge_service,
         )
-        gpt_answer_generator = get_answer_generator(
-            chat_id, chat_question, chat_service, brain_id, current_user
-        )
+        chat_answer = await rag_service.generate_answer(chat_question.question)
 
-        chat_answer = gpt_answer_generator.generate_answer(
-            chat_id, chat_question, save_answer=True
-        )
         maybe_send_telemetry("question_asked", {"streaming": False}, request)
-
         return chat_answer
+
+    except AssertionError:
+        raise HTTPException(
+            status_code=422,
+            detail="inprocessable entity",
+        )
     except HTTPException as e:
         raise e
 
@@ -221,24 +238,25 @@ async def create_question_handler(
     tags=["Chat"],
 )
 async def create_stream_question_handler(
+    request: Request,
     chat_question: ChatQuestion,
     chat_id: UUID,
     chat_service: ChatServiceDep,
     current_user: UserIdentityDep,
     brain_id: Annotated[UUID | None, Query()] = None,
 ) -> StreamingResponse:
-    chat_instance = BrainfulChat()
-    chat_instance.validate_authorization(user_id=current_user.id, brain_id=brain_id)
+    validate_authorization(user_id=current_user.id, brain_id=brain_id)
 
     logger.info(
         f"Creating question for chat {chat_id} with brain {brain_id} of type {type(brain_id)}"
     )
 
-    gpt_answer_generator = get_answer_generator(
+    gpt_answer_generator = await get_answer_generator(
         chat_id, chat_question, chat_service, brain_id, current_user
     )
     maybe_send_telemetry("question_asked", {"streaming": True}, request)
 
+    # Generator
     try:
         return StreamingResponse(
             gpt_answer_generator.generate_stream(
@@ -259,8 +277,7 @@ async def get_chat_history_handler(
     chat_id: UUID,
     chat_service: ChatServiceDep,
 ) -> List[ChatItem]:
-    # TODO: RBAC with current_user
-    return chat_service.get_chat_history_with_notifications(chat_id)
+    return await chat_service.get_chat_history_with_notifications(chat_id)
 
 
 @chat_router.post(

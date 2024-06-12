@@ -4,7 +4,8 @@ import openai
 from langchain.schema import Document
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 
-from backend.models import File, get_documents_vector_store
+from backend.models.files import File
+from backend.models.settings import get_documents_vector_store
 from backend.packages.files.file import compute_sha1_from_content
 
 

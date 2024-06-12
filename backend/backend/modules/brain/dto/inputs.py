@@ -1,7 +1,7 @@
 from typing import Optional
 from uuid import UUID
 
-from pydantic import BaseModel, Extra
+from pydantic import BaseModel
 
 from backend.logger import get_logger
 from backend.modules.brain.entity.api_brain_definition_entity import (
@@ -52,7 +52,7 @@ class CreateBrainProperties(BaseModel, extra="ignore"):
     temperature: Optional[float] = 0.0
     max_tokens: Optional[int] = 2000
     prompt_id: Optional[UUID] = None
-    brain_type: Optional[BrainType] = BrainType.DOC
+    brain_type: Optional[BrainType] = BrainType.doc
     brain_definition: Optional[CreateApiBrainDefinition] = None
     brain_secrets_values: Optional[dict] = {}
     connected_brains_ids: Optional[list[UUID]] = []

@@ -16,19 +16,18 @@ class UserUsage(UserIdentity):
     def supabase_db(self) -> SupabaseDB:
         return get_supabase_db()
 
-    def get_user_usage(self):
+    def get_user_daily_usage(self):
         """
         Fetch the user request stats from the database
         """
         request = self.supabase_db.get_user_usage(self.id)
-
         return request
 
-    def get_model_settings(self):
+    def get_models(self):
         """
         Fetch the user request stats from the database
         """
-        request = self.supabase_db.get_model_settings()
+        request = self.supabase_db.get_models()
 
         return request
 

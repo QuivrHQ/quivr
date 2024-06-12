@@ -4,7 +4,7 @@ from backend.logger import get_logger
 from backend.modules.knowledge.dto.inputs import CreateKnowledgeProperties
 from backend.modules.knowledge.entity.knowledge import Knowledge
 from backend.modules.knowledge.repository.knowledge_interface import KnowledgeInterface
-from backend.modules.knowledge.repository.knowledges import Knowledges
+from backend.modules.knowledge.repository.knowledges import KnowledgeRepository
 
 logger = get_logger(__name__)
 
@@ -13,7 +13,7 @@ class KnowledgeService:
     repository: KnowledgeInterface
 
     def __init__(self):
-        self.repository = Knowledges()
+        self.repository = KnowledgeRepository()
 
     def add_knowledge(self, knowledge_to_add: CreateKnowledgeProperties):
         knowledge = self.repository.insert_knowledge(knowledge_to_add)

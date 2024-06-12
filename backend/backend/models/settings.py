@@ -8,10 +8,10 @@ from langchain_openai import OpenAIEmbeddings
 from posthog import Posthog
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from sqlalchemy import Engine, create_engine
-from supabase.client import Client, create_client
 
 from backend.logger import get_logger
 from backend.models.databases.supabase.supabase import SupabaseDB
+from supabase.client import Client, create_client
 
 logger = get_logger(__name__)
 
@@ -114,10 +114,11 @@ class BrainSettings(BaseSettings):
     supabase_service_key: str = ""
     resend_api_key: str = "null"
     resend_email_address: str = "brain@mail.quivr.app"
-    ollama_api_base_url: str = None
-    langfuse_public_key: str = None
-    langfuse_secret_key: str = None
-    pg_database_url: str = None
+    ollama_api_base_url: str | None = None
+    langfuse_public_key: str | None = None
+    langfuse_secret_key: str | None = None
+    pg_database_url: str
+    pg_database_async_url: str
 
 
 class ResendSettings(BaseSettings):
@@ -142,6 +143,14 @@ def get_pg_database_engine():
     return _db_engine
 
 
+def get_pg_database_async_engine():
+    global _db_engine
+    if _db_engine is None:
+        logger.info("Creating Postgres DB engine")
+        _db_engine = create_engine(settings.pg_database_async_url, pool_pre_ping=True)
+    return _db_engine
+
+
 def get_supabase_client() -> Client:
     global _supabase_client
     if _supabase_client is None:
@@ -160,7 +169,7 @@ def get_supabase_db() -> SupabaseDB:
     return _supabase_db
 
 
-def get_embeddings() -> Embeddings:
+def get_embedding_client() -> Embeddings:
     global _embedding_service
     if settings.ollama_api_base_url:
         embeddings = OllamaEmbeddings(
@@ -172,7 +181,7 @@ def get_embeddings() -> Embeddings:
 
 
 def get_documents_vector_store() -> SupabaseVectorStore:
-    embeddings = get_embeddings()
+    embeddings = get_embedding_client()
     supabase_client: Client = get_supabase_client()
     documents_vector_store = SupabaseVectorStore(
         supabase_client, embeddings, table_name="vectors"

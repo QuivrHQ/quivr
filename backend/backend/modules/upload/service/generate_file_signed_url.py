@@ -1,8 +1,7 @@
 from multiprocessing import get_logger
 
+from backend.models.settings import get_supabase_client
 from supabase.client import Client
-
-from backend.models import get_supabase_client
 
 logger = get_logger()
 

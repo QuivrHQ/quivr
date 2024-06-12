@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 
 
-class LLMModels(BaseModel):
+class LLMModel(BaseModel):
     """LLM models stored in the database that are allowed to be used by the users.
     Args:
         BaseModel (BaseModel): Pydantic BaseModel

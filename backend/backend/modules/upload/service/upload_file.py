@@ -4,10 +4,10 @@ from multiprocessing import get_logger
 
 from langchain.pydantic_v1 import Field
 from langchain.schema import Document
-from supabase.client import Client
 
 from backend.logger import get_logger
-from backend.models import get_supabase_client
+from backend.models.settings import get_supabase_client
+from supabase.client import Client
 
 logger = get_logger(__name__)
 
@@ -40,7 +40,6 @@ mime_types = {
 
 
 def check_file_exists(brain_id: str, file_identifier: str) -> bool:
-
     supabase_client: Client = get_supabase_client()
     try:
         # Check if the file exists

@@ -1,4 +1,5 @@
 import asyncio
+import os
 from typing import List, Tuple
 from uuid import uuid4
 
@@ -9,10 +10,11 @@ from sqlalchemy.ext.asyncio import create_async_engine
 from sqlmodel import create_engine, select
 from sqlmodel.ext.asyncio.session import AsyncSession
 
-from backend.modules.brain.entity.brain_entity import Brain
+from backend.modules.brain.entity.brain_entity import Brain, BrainType
 from backend.modules.chat.dto.inputs import QuestionAndAnswer
 from backend.modules.chat.entity.chat import Chat, ChatHistory
 from backend.modules.chat.repository.chats import ChatRepository
+from backend.modules.chat.service.chat_service import ChatService
 from backend.modules.user.entity.user_identity import User
 
 pg_database_url = "postgres:postgres@localhost:54322/postgres"
@@ -21,7 +23,10 @@ pg_database_url = "postgres:postgres@localhost:54322/postgres"
 @pytest.fixture(scope="session", autouse=True)
 def db_setup():
     # setup
-    sync_engine = create_engine("postgresql://" + pg_database_url, echo=True)
+    sync_engine = create_engine(
+        "postgresql://" + pg_database_url,
+        echo=True if os.getenv("ORM_DEBUG") else False,
+    )
     #  TODO(@amine) : for now don't drop anything
     yield sync_engine
     # teardown
@@ -34,7 +39,7 @@ def db_setup():
 async def async_engine():
     engine = create_async_engine(
         "postgresql+asyncpg://" + pg_database_url,
-        echo=True,  # future=True
+        echo=True if os.getenv("ORM_DEBUG") else False,
     )
     yield engine
 
@@ -65,17 +70,20 @@ async def session(async_engine):
         yield async_session
 
 
-TestData = Tuple[User, List[Chat], List[ChatHistory]]
+TestData = Tuple[Brain, User, List[Chat], List[ChatHistory]]
 
 
 @pytest_asyncio.fixture()
 async def test_data(
     session: AsyncSession,
 ) -> TestData:
+    # User data
     user_1 = (
         await session.exec(select(User).where(User.email == "admin@quivr.app"))
     ).one()
+    # Brain data
     brain_1 = Brain(name="test_brain", description="this is a test brain")
+    # Chat data
     chat_1 = Chat(chat_name="chat1", user=user_1)
     chat_2 = Chat(chat_name="chat2", user=user_1)
 
@@ -99,7 +107,7 @@ async def test_data(
 
     await session.refresh(user_1)
     await session.commit()
-    return user_1, [chat_1, chat_2], [chat_history_1, chat_history_2]
+    return brain_1, user_1, [chat_1, chat_2], [chat_history_1, chat_history_2]
 
 
 @pytest.mark.asyncio
@@ -111,7 +119,7 @@ async def test_get_user_chats_empty(session):
 
 @pytest.mark.asyncio
 async def test_get_user_chats(session: AsyncSession, test_data: TestData):
-    local_user, chats, _ = test_data
+    _, local_user, chats, _ = test_data
     repo = ChatRepository(session)
     assert local_user.id is not None
     query_chats = await repo.get_user_chats(local_user.id)
@@ -120,7 +128,7 @@ async def test_get_user_chats(session: AsyncSession, test_data: TestData):
 
 @pytest.mark.asyncio
 async def test_get_chat_history(session: AsyncSession, test_data: TestData):
-    _, chats, chat_history = test_data
+    brain_1, _, chats, chat_history = test_data
     assert chats[0].chat_id
     assert len(chat_history) > 0
     assert chat_history[-1].message_time
@@ -133,10 +141,15 @@ async def test_get_chat_history(session: AsyncSession, test_data: TestData):
     assert query_chat_history[0].message_time
     assert query_chat_history[-1].message_time >= query_chat_history[0].message_time
 
+    # TODO: Should be tested in test_brain_repository
+    # Checks that brain is correct
+    assert query_chat_history[-1].brain is not None
+    assert query_chat_history[-1].brain.brain_type == BrainType.integration
+
 
 @pytest.mark.asyncio
 async def test_add_qa(session: AsyncSession, test_data: TestData):
-    _, [chat, *_], __ = test_data
+    _, _, [chat, *_], __ = test_data
     assert chat.chat_id
     qa = QuestionAndAnswer(question="question", answer="answer")
     repo = ChatRepository(session)
@@ -145,3 +158,20 @@ async def test_add_qa(session: AsyncSession, test_data: TestData):
     assert resp_chat.chat_id == chat.chat_id
     assert resp_chat.user_message == qa.question
     assert resp_chat.assistant == qa.answer
+
+
+## CHAT SERVICE
+
+
+@pytest.mark.asyncio
+async def test_service_get_chat_history(session: AsyncSession, test_data: TestData):
+    brain, _, [chat, *_], __ = test_data
+    assert chat.chat_id
+    repo = ChatRepository(session)
+    service = ChatService(repo)
+    history = await service.get_chat_history(chat.chat_id)
+
+    assert len(history) > 0
+    assert all(h.chat_id == chat.chat_id for h in history)
+    assert history[0].brain_name == brain.name
+    assert history[0].brain_id == brain.brain_id

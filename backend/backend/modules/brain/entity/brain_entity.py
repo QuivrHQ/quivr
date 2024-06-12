@@ -4,9 +4,12 @@ from typing import List, Optional
 from uuid import UUID
 
 from pydantic import BaseModel
+
+# from sqlmodel import Enum as PGEnum
+from sqlalchemy.dialects.postgresql import ENUM as PGEnum
+from sqlalchemy.ext.asyncio import AsyncAttrs
 from sqlmodel import TIMESTAMP, Column, Field, Relationship, SQLModel, text
 from sqlmodel import UUID as PGUUID
-from sqlmodel import Enum as PGEnum
 
 from backend.modules.brain.entity.api_brain_definition_entity import (
     ApiBrainDefinitionEntity,
@@ -15,16 +18,17 @@ from backend.modules.brain.entity.integration_brain import (
     IntegrationDescriptionEntity,
     IntegrationEntity,
 )
+from backend.modules.prompt.entity.prompt import Prompt
 
 
 class BrainType(str, Enum):
-    DOC = "doc"
-    API = "api"
-    COMPOSITE = "composite"
-    INTEGRATION = "integration"
+    doc = "doc"
+    api = "api"
+    composite = "composite"
+    integration = "integration"
 
 
-class Brain(SQLModel, table=True):
+class Brain(AsyncAttrs, SQLModel, table=True):
     __tablename__ = "brains"  # type: ignore
 
     brain_id: UUID | None = Field(
@@ -41,7 +45,6 @@ class Brain(SQLModel, table=True):
     model: str | None = None
     max_tokens: int | None = None
     temperature: float | None = None
-    prompt_id: UUID | None = Field(default=None, foreign_key="prompts.id")
     last_update: datetime | None = Field(
         default=None,
         sa_column=Column(
@@ -50,12 +53,19 @@ class Brain(SQLModel, table=True):
         ),
     )
     brain_type: BrainType | None = Field(
-        default=None,
-        sa_column=Column(PGEnum(BrainType, name="brain_type_enum")),
+        sa_column=Column(
+            PGEnum(BrainType, name="brain_type_enum", create_type=False),
+            default=BrainType.integration,
+        ),
     )
-    brain_chat_history: List["ChatHistory"] = Relationship(  # noqa: F821
-        back_populates="brain", sa_relationship_kwargs={}
+    brain_chat_history: List["ChatHistory"] = Relationship(  # noqa: f821
+        back_populates="brain", sa_relationship_kwargs={"lazy": "select"}
     )
+    prompt_id: UUID | None = Field(default=None, foreign_key="prompts.id")
+    prompt: Prompt | None = Relationship(  # noqa: f821
+        back_populates="brain", sa_relationship_kwargs={"lazy": "joined"}
+    )
+
     # TODO : add
     # "meaning" "public"."vector",
     # "tags" "public"."tags"[]
