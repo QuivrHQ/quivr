@@ -7,6 +7,7 @@ from fastapi import HTTPException
 from google.auth.transport.requests import Request as GoogleRequest
 from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
+from modules.sync.utils.normalize import remove_special_characters
 from logger import get_logger
 from requests import HTTPError
 
@@ -53,6 +54,8 @@ def get_google_drive_files_by_id(credentials: dict, file_ids: List[str]):
             )
 
         logger.info("Google Drive files retrieved successfully: %s", len(files))
+        for file in files:
+            file["name"] = remove_special_characters(file["name"])
         return files
     except HTTPError as error:
         logger.error("An error occurred while retrieving Google Drive files: %s", error)
@@ -138,6 +141,9 @@ def get_google_drive_files(
                 break
 
         logger.info("Google Drive files retrieved successfully: %s", len(files))
+        
+        for file in files:
+            file["name"] = remove_special_characters(file["name"])
         return files
     except HTTPError as error:
         logger.error("An error occurred while retrieving Google Drive files: %s", error)
@@ -225,7 +231,8 @@ def list_azure_files(credentials, folder_id=None, recursive=False):
             )
 
             files.extend(folder_files)
-
+    for file in files:
+        file["name"] = remove_special_characters(file["name"])
     logger.info("Azure Drive files retrieved successfully: %s", len(files))
     return files
 
@@ -270,6 +277,8 @@ def get_azure_files_by_id(credentials: dict, file_ids: List[str]):
                 "mime_type": result.get("file", {}).get("mimeType", "folder"),
             }
         )
-
+    
+    for file in files:
+        file["name"] = remove_special_characters(file["name"])
     logger.info("Azure Drive files retrieved successfully: %s", len(files))
     return files
