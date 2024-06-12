@@ -9,6 +9,7 @@ from sqlalchemy.ext.asyncio import create_async_engine
 from sqlmodel import create_engine, select
 from sqlmodel.ext.asyncio.session import AsyncSession
 
+from backend.modules.brain.entity.brain_entity import Brain
 from backend.modules.chat.dto.inputs import QuestionAndAnswer
 from backend.modules.chat.entity.chat import Chat, ChatHistory
 from backend.modules.chat.repository.chats import ChatRepository
@@ -74,6 +75,7 @@ async def test_data(
     user_1 = (
         await session.exec(select(User).where(User.email == "admin@quivr.app"))
     ).one()
+    brain_1 = Brain(name="test_brain", description="this is a test brain")
     chat_1 = Chat(chat_name="chat1", user=user_1)
     chat_2 = Chat(chat_name="chat2", user=user_1)
 
@@ -81,12 +83,15 @@ async def test_data(
         user_message="Hello",
         assistant="Hello! How can I assist you today?",
         chat=chat_1,
+        brain=brain_1,
     )
     chat_history_2 = ChatHistory(
         user_message="Hello",
         assistant="Hello! How can I assist you today?",
         chat=chat_1,
+        brain=brain_1,
     )
+    session.add(brain_1)
     session.add(chat_1)
     session.add(chat_2)
     session.add(chat_history_1)
@@ -124,6 +129,8 @@ async def test_get_chat_history(session: AsyncSession, test_data: TestData):
     repo = ChatRepository(session)
     query_chat_history = await repo.get_chat_history(chats[0].chat_id)
     assert chat_history == query_chat_history
+    assert query_chat_history[-1].message_time
+    assert query_chat_history[0].message_time
     assert query_chat_history[-1].message_time >= query_chat_history[0].message_time
 
 

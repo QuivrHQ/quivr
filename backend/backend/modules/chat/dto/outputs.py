@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import List, Optional
 from uuid import UUID
 
@@ -5,16 +6,14 @@ from pydantic import BaseModel
 
 
 class GetChatHistoryOutput(BaseModel):
-    chat_id: UUID
-    message_id: Optional[UUID] | str
-    user_message: str
-    assistant: str
-    message_time: Optional[str] = None
-    prompt_title: Optional[str] | None = None
-    brain_name: Optional[str] | None = None
-    brain_id: Optional[str] | None = (
-        None  # string because UUID is not JSON serializable
-    )
+    chat_id: UUID | None
+    message_id: UUID | None
+    user_message: str | None
+    assistant: str | None = None
+    message_time: datetime | None = None
+    prompt_title: str | None = None
+    brain_name: str | None = None
+    brain_id: UUID | None = None  # string because UUID is not JSON serializable
     metadata: Optional[dict] | None = None
     thumbs: Optional[bool] | None = None
 

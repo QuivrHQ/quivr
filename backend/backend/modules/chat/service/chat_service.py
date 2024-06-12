@@ -84,49 +84,31 @@ class ChatService(BaseService[ChatRepository]):
     async def get_chat_history(self, chat_id: UUID) -> List[GetChatHistoryOutput]:
         history = await self.repository.get_chat_history(chat_id)
         enriched_history: List[GetChatHistoryOutput] = []
-
         if history is None:
             return enriched_history
-
-        # TODO: this is just N+1
-        brain_cache = {}
-        prompt_cache = {}
         for message in history:
-            if message.brain_id:
-                if message.brain_id in brain_cache:
-                    brain = brain_cache[message.brain_id]
-                else:
-                    brain = brain_service.get_brain_by_id(message.brain_id)
-                    brain_cache[message.brain_id] = brain
-
-            if message.prompt_id:
-                if message.prompt_id in prompt_cache:
-                    prompt = prompt_cache[message.prompt_id]
-                else:
-                    prompt = prompt_service.get_prompt_by_id(message.prompt_id)
-                    prompt_cache[message.prompt_id] = prompt
-
             enriched_history.append(
+                # TODO : WHY bother is having ids here ??
                 GetChatHistoryOutput(
-                    chat_id=(UUID(message.chat_id)),
-                    message_id=(UUID(message.message_id)),
+                    chat_id=(message.chat_id),
+                    message_id=message.message_id,
                     user_message=message.user_message,
                     assistant=message.assistant,
                     message_time=message.message_time,
-                    brain_name=brain.name if brain else None,
-                    brain_id=str(brain.id) if brain else None,
-                    prompt_title=prompt.title if prompt else None,
-                    metadata=message.metadata,
+                    brain_name=message.brain.name if message.brain else None,
+                    brain_id=message.brain.brain_id if message.brain else None,
+                    prompt_title=message.prompt.title if message.prompt else None,
+                    metadata=message.metadata_,
                     thumbs=message.thumbs,
                 )
             )
         return enriched_history
 
-    def get_chat_history_with_notifications(
+    async def get_chat_history_with_notifications(
         self,
         chat_id: UUID,
     ) -> List[ChatItem]:
-        chat_history = self.get_chat_history(str(chat_id))
+        chat_history = await self.get_chat_history(chat_id)
         chat_notifications = []
         return merge_chat_history_and_notifications(chat_history, chat_notifications)
 

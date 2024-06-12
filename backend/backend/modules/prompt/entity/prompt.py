@@ -1,10 +1,10 @@
 from enum import Enum
-from typing import Optional
+from typing import List, Optional
 from uuid import UUID
 
 from pydantic import BaseModel
 from sqlmodel import UUID as PGUUID
-from sqlmodel import Column, Field, SQLModel, text
+from sqlmodel import Column, Field, Relationship, SQLModel, text
 
 
 class PromptStatusEnum(str, Enum):
@@ -25,6 +25,9 @@ class Prompt(SQLModel, table=True):
     content: str | None = None
     title: str | None = Field(default=None, max_length=255)
     status: str = Field(default="private", max_length=255)
+    message_history: List["ChatHistory"] = Relationship(  # noqa: F821
+        back_populates="prompt", sa_relationship_kwargs={"lazy": "select"}
+    )
 
 
 class CreatePromptProperties(BaseModel):

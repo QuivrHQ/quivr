@@ -36,12 +36,11 @@ class Brain(SQLModel, table=True):
         ),
     )
     name: str
+    description: str
     status: str | None = None
-    description: str | None = None
     model: str | None = None
     max_tokens: int | None = None
     temperature: float | None = None
-    retrieval_algorithm: str | None = None
     prompt_id: UUID | None = Field(default=None, foreign_key="prompts.id")
     last_update: datetime | None = Field(
         default=None,
@@ -51,11 +50,15 @@ class Brain(SQLModel, table=True):
         ),
     )
     brain_type: BrainType | None = Field(
-        default=None, sa_column=Column(PGEnum(BrainType), server_default="doc")
+        default=None,
+        sa_column=Column(PGEnum(BrainType, name="brain_type_enum")),
     )
     brain_chat_history: List["ChatHistory"] = Relationship(  # noqa: F821
         back_populates="brain", sa_relationship_kwargs={}
     )
+    # TODO : add
+    # "meaning" "public"."vector",
+    # "tags" "public"."tags"[]
 
 
 class BrainEntity(BaseModel):

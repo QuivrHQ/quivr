@@ -6,6 +6,7 @@ from sqlmodel import JSON, TIMESTAMP, Column, Field, Relationship, SQLModel, tex
 from sqlmodel import UUID as PGUUID
 
 from backend.modules.brain.entity.brain_entity import Brain
+from backend.modules.prompt.entity.prompt import Prompt
 from backend.modules.user.entity.user_identity import User
 
 
@@ -71,9 +72,11 @@ class ChatHistory(SQLModel, table=True):
         default=None, sa_column=Column("metadata", JSON, default=None)
     )
     thumbs: bool | None = None
-
+    prompt: Prompt | None = Relationship(
+        back_populates="message_history", sa_relationship_kwargs={"lazy": "joined"}
+    )  # type: ignore
     brain: Brain | None = Relationship(
-        back_populates="brain_chat_history", sa_relationship_kwargs={"lazy": "select"}
+        back_populates="brain_chat_history", sa_relationship_kwargs={"lazy": "joined"}
     )  # type: ignore
 
     class Config:
