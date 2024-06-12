@@ -270,6 +270,7 @@ def check_if_is_premium_user():
                 supabase_db.table("user_settings")
                 .select("*")
                 .filter("user_id", "eq", user_id)
+                .filter("is_premium", "eq", True)
                 .execute()
             ).data
             if len(user_settings) > 0:
