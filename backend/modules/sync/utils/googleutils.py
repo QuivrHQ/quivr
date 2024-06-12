@@ -5,7 +5,6 @@ from fastapi import UploadFile
 from google.auth.transport.requests import Request as GoogleRequest
 from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
-from googleapiclient.errors import HttpError
 from logger import get_logger
 from modules.brain.repository.brains_vectors import BrainsVectors
 from modules.knowledge.repository.storage import Storage
@@ -125,9 +124,9 @@ class GoogleSyncUtils(BaseModel):
                 # Check if the file already exists in the storage
                 if check_file_exists(brain_id, file_name):
                     logger.debug("🔥 File already exists in the storage: %s", file_name)
-
                     self.storage.remove_file(brain_id + "/" + file_name)
                     BrainsVectors().delete_file_from_brain(brain_id, file_name)
+                   
 
                 to_upload_file = UploadFile(
                     file=BytesIO(file_data),
@@ -166,7 +165,7 @@ class GoogleSyncUtils(BaseModel):
                     )
 
                     downloaded_files.append(file_name)
-            except HttpError as error:
+            except Exception as error:
                 logger.error(
                     "An error occurred while downloading Google Drive files: %s",
                     error,

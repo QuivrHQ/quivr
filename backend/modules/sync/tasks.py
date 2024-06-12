@@ -39,10 +39,20 @@ async def _process_sync_active():
     active = await sync_active_service.get_syncs_active_in_interval()
 
     for sync in active:
-        details_user_sync = sync_user_service.get_sync_user_by_id(sync.syncs_user_id)
-        if details_user_sync["provider"].lower() == "google":
-            await google_sync_utils.sync(sync_active_id=sync.id, user_id=sync.user_id)
-        elif details_user_sync["provider"].lower() == "azure":
-            await azure_sync_utils.sync(sync_active_id=sync.id, user_id=sync.user_id)
-        else:
-            logger.info("Provider not supported: %s", details_user_sync["provider"])
+        try:
+            details_user_sync = sync_user_service.get_sync_user_by_id(
+                sync.syncs_user_id
+            )
+            if details_user_sync["provider"].lower() == "google":
+                await google_sync_utils.sync(
+                    sync_active_id=sync.id, user_id=sync.user_id
+                )
+            elif details_user_sync["provider"].lower() == "azure":
+                await azure_sync_utils.sync(
+                    sync_active_id=sync.id, user_id=sync.user_id
+                )
+            else:
+                logger.info("Provider not supported: %s", details_user_sync["provider"])
+        except Exception as e:
+            logger.error(f"Error syncing: {e}")
+            continue
