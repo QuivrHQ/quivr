@@ -188,7 +188,7 @@ def check_if_is_premium_user():
 
     paris_tz = timezone("Europe/Paris")
     paris_time = datetime.now(paris_tz).strftime("%Y-%m-%d %H:%M:%S.%f")
-    logger.warning(f"Paris time: {paris_time}")
+    logger.debug(f"Paris time: {paris_time}")
     subscriptions = (
         supabase_db.table("subscriptions")
         .select("*")
