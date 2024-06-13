@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.0.266 (2024-06-13)
+
+## What's Changed
+* fix: Add logic to filter active subscriptions in check_if_is_premium_user function by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2673
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.265...v0.0.266
+
 ## 0.0.265 (2024-06-13)
 
 ## What's Changed
