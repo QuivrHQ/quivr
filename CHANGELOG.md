@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.0.265 (2024-06-13)
+
+## What's Changed
+* feat: Add timezone conversion for premium user check by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2670
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.264...v0.0.265
+
 ## 0.0.264 (2024-06-13)
 
 ## What's Changed
