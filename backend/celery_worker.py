@@ -1,5 +1,5 @@
 import os
-from datetime import datetime, timezone
+from datetime import datetime
 from tempfile import NamedTemporaryFile
 from uuid import UUID
 
@@ -8,9 +8,8 @@ from celery_config import celery
 from logger import get_logger
 from middlewares.auth.auth_bearer import AuthBearer
 from models.files import File
-from models.settings import get_supabase_client
+from models.settings import get_supabase_client, get_supabase_db
 from modules.brain.integrations.Notion.Notion_connector import NotionConnector
-from modules.brain.repository.integration_brains import IntegrationBrain
 from modules.brain.service.brain_service import BrainService
 from modules.brain.service.brain_vector_service import BrainVectorService
 from modules.notification.dto.inputs import NotificationUpdatableProperties
@@ -180,27 +179,106 @@ def ping_telemetry():
     maybe_send_telemetry("ping", {"ping": "pong"})
 
 
-@celery.task
-def process_integration_brain_sync():
-    integration = IntegrationBrain()
-    integrations = integration.get_integration_brain_by_type_integration("notion")
+@celery.task(name="check_if_is_premium_user")
+def check_if_is_premium_user():
+    supabase = get_supabase_db()
+    supabase_db = supabase.db
+    # Get the list of subscription active
+    subscriptions = (
+        supabase_db.table("subscriptions")
+        .select("*")
+        .filter(
+            "current_period_end",
+            "gt",
+            datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f"),
+        )
+        .execute()
+    ).data
+    logger.debug(f"Subscriptions: {subscriptions}")
 
-    time = datetime.now(timezone.utc)  # Make `time` timezone-aware
-    # last_synced is a string that represents a timestampz in the database
-    # only call process_integration_brain_sync_user_brain if more than 1 day has passed since the last sync
-    if not integrations:
-        return
-    # TODO fix this
-    # for integration in integrations:
-    #     print(f"last_synced: {integration.last_synced}")
-    #     print(f"Integration Name: {integration.name}")
-    #     last_synced = datetime.strptime(
-    #         integration.last_synced, "%Y-%m-%dT%H:%M:%S.%f%z"
-    #     )
-    #     if last_synced < time - timedelta(hours=12) and integration.name == "notion":
-    #         process_integration_brain_sync_user_brain.delay(
-    #             brain_id=integration.brain_id, user_id=integration.user_id
-    #         )
+    # Get List of all customers
+    customers = (
+        supabase_db.table("customers")
+        .select("*")
+        .order("created", desc=True)
+        .execute()
+        .data
+    )
+    unique_customers = {}
+    for customer in customers:
+        if customer["email"] not in unique_customers:
+            unique_customers[customer["email"]] = customer
+    customers = list(unique_customers.values())
+    logger.debug(f"Unique Customers with latest created date: {customers}")
+
+    # Matching Products
+    matching_product_settings = (
+        supabase_db.table("product_to_features").select("*").execute()
+    ).data
+    logger.debug(f"Matching product settings: {matching_product_settings}")
+
+    # if customer.id in subscriptions.customer then find the user id in the table users where email = customer.email and then update the user_settings with is_premium = True else delete the user_settings
+
+    for customer in customers:
+        logger.debug(f"Customer: {customer}")
+        # Find the subscription of the customer
+        user_id = None
+        matching_subscription = [
+            subscription
+            for subscription in subscriptions
+            if subscription["customer"] == customer["id"]
+        ]
+        logger.debug(f"Matching subscription: {matching_subscription}")
+        user_id = (
+            supabase_db.table("users")
+            .select("id")
+            .filter("email", "eq", customer["email"])
+            .execute()
+        ).data
+        if len(user_id) > 0:
+            user_id = user_id[0]["id"]
+        else:
+            logger.debug(f"User not found for customer: {customer}")
+            continue
+        if len(matching_subscription) > 0:
+
+            # Get the matching product from the subscription
+            matching_product_settings = [
+                product
+                for product in matching_product_settings
+                if product["stripe_product_id"]
+                == matching_subscription[0]["attrs"]["items"]["data"][0]["plan"][
+                    "product"
+                ]
+            ]
+            # Update the user with the product settings
+            supabase_db.table("user_settings").update(
+                {
+                    "max_brains": matching_product_settings[0]["max_brains"],
+                    "max_brain_size": matching_product_settings[0]["max_brain_size"],
+                    "monthly_chat_credit": matching_product_settings[0][
+                        "monthly_chat_credit"
+                    ],
+                    "api_access": matching_product_settings[0]["api_access"],
+                    "models": matching_product_settings[0]["models"],
+                    "is_premium": True,
+                }
+            ).match({"user_id": str(user_id)}).execute()
+        else:
+            # check if user_settings is_premium is true then delete the user_settings
+            user_settings = (
+                supabase_db.table("user_settings")
+                .select("*")
+                .filter("user_id", "eq", user_id)
+                .filter("is_premium", "eq", True)
+                .execute()
+            ).data
+            if len(user_settings) > 0:
+                supabase_db.table("user_settings").delete().match(
+                    {"user_id": user_id}
+                ).execute()
+
+    return True
 
 
 celery.conf.beat_schedule = {
@@ -208,16 +286,16 @@ celery.conf.beat_schedule = {
         "task": f"{__name__}.remove_onboarding_more_than_x_days_task",
         "schedule": crontab(minute="0", hour="0"),
     },
-    "process_integration_brain_sync": {
-        "task": f"{__name__}.process_integration_brain_sync",
-        "schedule": crontab(minute="*/5", hour="*"),
-    },
     "ping_telemetry": {
         "task": f"{__name__}.ping_telemetry",
         "schedule": crontab(minute="*/30", hour="*"),
     },
     "process_sync_active": {
         "task": "process_sync_active",
+        "schedule": crontab(minute="*/1", hour="*"),
+    },
+    "process_premium_users": {
+        "task": "check_if_is_premium_user",
         "schedule": crontab(minute="*/1", hour="*"),
     },
 }
