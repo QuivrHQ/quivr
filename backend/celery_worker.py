@@ -199,6 +199,16 @@ def check_if_is_premium_user():
         )
         .execute()
     ).data
+    # Only get the subscriptions with status active
+    logger.info(f"Subscriptions: {subscriptions}")
+    if len(subscriptions) > 0:
+        subscriptions = [
+            subscription
+            for subscription in subscriptions
+            if subscription["attrs"]["status"] == "active"
+        ]
+    else:
+        logger.info(f"No active subscriptions found")
 
     # Get List of all customers
     customers = (
