@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.0.264 (2024-06-13)
+
+## What's Changed
+* fix: name passed in sync authorize by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2665
+* feat: Add premium user check in celery task by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2668
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.263...v0.0.264
+
 ## 0.0.263 (2024-06-12)
 
 ## What's Changed
