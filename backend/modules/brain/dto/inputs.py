@@ -10,7 +10,7 @@ from modules.brain.entity.api_brain_definition_entity import (
 )
 from modules.brain.entity.brain_entity import BrainType
 from modules.brain.entity.integration_brain import IntegrationType
-from pydantic import BaseModel, Extra
+from pydantic import BaseModel
 
 logger = get_logger(__name__)
 
@@ -56,6 +56,7 @@ class CreateBrainProperties(BaseModel, extra="ignore"):
     brain_secrets_values: Optional[dict] = {}
     connected_brains_ids: Optional[list[UUID]] = []
     integration: Optional[BrainIntegrationSettings] = None
+    quivr_assistant: Optional[bool] = False
 
     def dict(self, *args, **kwargs):
         brain_dict = super().dict(*args, **kwargs)
