@@ -20,6 +20,7 @@ from packages.files.crawl.crawler import CrawlWebsite, slugify
 from packages.files.parsers.github import process_github
 from packages.files.processors import filter_file
 from packages.utils.telemetry import maybe_send_telemetry
+from pytz import timezone
 
 logger = get_logger(__name__)
 
@@ -184,17 +185,20 @@ def check_if_is_premium_user():
     supabase = get_supabase_db()
     supabase_db = supabase.db
     # Get the list of subscription active
+
+    paris_tz = timezone("Europe/Paris")
+    paris_time = datetime.now(paris_tz).strftime("%Y-%m-%d %H:%M:%S.%f")
+    logger.debug(f"Paris time: {paris_time}")
     subscriptions = (
         supabase_db.table("subscriptions")
         .select("*")
         .filter(
             "current_period_end",
             "gt",
-            datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f"),
+            paris_time,
         )
         .execute()
     ).data
-    logger.debug(f"Subscriptions: {subscriptions}")
 
     # Get List of all customers
     customers = (
@@ -209,18 +213,16 @@ def check_if_is_premium_user():
         if customer["email"] not in unique_customers:
             unique_customers[customer["email"]] = customer
     customers = list(unique_customers.values())
-    logger.debug(f"Unique Customers with latest created date: {customers}")
 
     # Matching Products
     matching_product_settings = (
         supabase_db.table("product_to_features").select("*").execute()
     ).data
-    logger.debug(f"Matching product settings: {matching_product_settings}")
 
     # if customer.id in subscriptions.customer then find the user id in the table users where email = customer.email and then update the user_settings with is_premium = True else delete the user_settings
 
     for customer in customers:
-        logger.debug(f"Customer: {customer}")
+        logger.debug(f"Customer: {customer['email']}")
         # Find the subscription of the customer
         user_id = None
         matching_subscription = [
@@ -228,7 +230,6 @@ def check_if_is_premium_user():
             for subscription in subscriptions
             if subscription["customer"] == customer["id"]
         ]
-        logger.debug(f"Matching subscription: {matching_subscription}")
         user_id = (
             supabase_db.table("users")
             .select("id")
@@ -238,10 +239,12 @@ def check_if_is_premium_user():
         if len(user_id) > 0:
             user_id = user_id[0]["id"]
         else:
-            logger.debug(f"User not found for customer: {customer}")
+            logger.debug(f"User not found for customer: {customer['email']}")
             continue
         if len(matching_subscription) > 0:
-
+            logger.debug(
+                f"Updating subscription for user {user_id} with subscription {matching_subscription[0]['id']}"
+            )
             # Get the matching product from the subscription
             matching_product_settings = [
                 product
@@ -251,20 +254,28 @@ def check_if_is_premium_user():
                     "product"
                 ]
             ]
-            # Update the user with the product settings
-            supabase_db.table("user_settings").update(
-                {
-                    "max_brains": matching_product_settings[0]["max_brains"],
-                    "max_brain_size": matching_product_settings[0]["max_brain_size"],
-                    "monthly_chat_credit": matching_product_settings[0][
-                        "monthly_chat_credit"
-                    ],
-                    "api_access": matching_product_settings[0]["api_access"],
-                    "models": matching_product_settings[0]["models"],
-                    "is_premium": True,
-                }
-            ).match({"user_id": str(user_id)}).execute()
+            if len(matching_product_settings) > 0:
+                # Update the user with the product settings
+                supabase_db.table("user_settings").update(
+                    {
+                        "max_brains": matching_product_settings[0]["max_brains"],
+                        "max_brain_size": matching_product_settings[0][
+                            "max_brain_size"
+                        ],
+                        "monthly_chat_credit": matching_product_settings[0][
+                            "monthly_chat_credit"
+                        ],
+                        "api_access": matching_product_settings[0]["api_access"],
+                        "models": matching_product_settings[0]["models"],
+                        "is_premium": True,
+                    }
+                ).match({"user_id": str(user_id)}).execute()
+            else:
+                logger.info(
+                    f"No matching product settings found for customer: {customer['email']} with subscription {matching_subscription[0]['id']}"
+                )
         else:
+            logger.debug(f"No subscription found for customer: {customer['email']}")
             # check if user_settings is_premium is true then delete the user_settings
             user_settings = (
                 supabase_db.table("user_settings")
