@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.0.267 (2024-06-14)
+
+## What's Changed
+* fix(frontend): scroll modal payment by @Zewed in https://github.com/QuivrHQ/quivr/pull/2675
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.266...v0.0.267
+
 ## 0.0.266 (2024-06-13)
 
 ## What's Changed
