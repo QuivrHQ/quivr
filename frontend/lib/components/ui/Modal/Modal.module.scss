@@ -25,6 +25,7 @@
     max-width: 90vw;
     width: 35vw;
     height: 80vh;
+    overflow: auto;
 
     &.auto {
       height: auto;
