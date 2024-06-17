@@ -41,7 +41,6 @@ export const MessageRow = React.forwardRef(
       brainId,
       messageId,
       thumbs: initialThumbs,
-      lastMessage,
       metadata,
     }: MessageRowProps,
     ref: React.Ref<HTMLDivElement>
@@ -119,12 +118,12 @@ export const MessageRow = React.forwardRef(
     const renderMetadata = () => {
       if (!isUserSpeaker && messageContent !== "🧠") {
         return (
-          <div
-            className={`${styles.metadata_wrapper} ${
-              lastMessage ? styles.sticky : ""
-            }`}
-          >
-            <div className={styles.icons_wrapper}>
+          <div className={styles.metadata_wrapper}>
+            <div
+              className={`${styles.icons_wrapper} ${
+                sourceFiles.length === 0 ? styles.with_border : ""
+              }`}
+            >
               {metadata?.thoughts && metadata.thoughts.trim() !== "" && (
                 <ThoughtsButton text={metadata.thoughts} size="small" />
               )}
@@ -149,46 +148,52 @@ export const MessageRow = React.forwardRef(
               />
             </div>
 
-            <div className={styles.sources_and_citations_wrapper}>
-              <div className={styles.sources}>
-                {sourceFiles.map((sourceFile, i) => (
-                  <div
-                    key={i}
-                    onClick={() => handleSourceFileClick(sourceFile)}
-                  >
-                    <SourceCitations
-                      sourceFile={sourceFile}
-                      isSelected={
-                        !!selectedSourceFile &&
-                        selectedSourceFile.filename === sourceFile.filename
-                      }
-                    />
-                  </div>
-                ))}
-              </div>
-
-              {selectedSourceFile && (
-                <div className={styles.citations}>
-                  <div className={styles.file_name_wrapper}>
-                    <span className={styles.box_title}>Source:</span>
-                    <a
-                      href={selectedSourceFile.file_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
+            {sourceFiles.length > 0 && (
+              <div className={styles.sources_and_citations_wrapper}>
+                <div className={styles.title_wrapper}>
+                  <Icon name="sources" size="normal" color="black" />
+                  <span className={styles.title}>Sources</span>
+                </div>
+                <div className={styles.sources}>
+                  {sourceFiles.map((sourceFile, i) => (
+                    <div
+                      key={i}
+                      onClick={() => handleSourceFileClick(sourceFile)}
                     >
-                      <span className={styles.source}>
-                        {selectedSourceFile.filename}
-                      </span>
-                    </a>
-                  </div>
-                  {selectedSourceFile.citations.map((citation, i) => (
-                    <div key={i}>
-                      <Citation citation={citation} />
+                      <SourceCitations
+                        sourceFile={sourceFile}
+                        isSelected={
+                          !!selectedSourceFile &&
+                          selectedSourceFile.filename === sourceFile.filename
+                        }
+                      />
                     </div>
                   ))}
                 </div>
-              )}
-            </div>
+
+                {selectedSourceFile && (
+                  <div className={styles.citations}>
+                    <div className={styles.file_name_wrapper}>
+                      <span className={styles.box_title}>Source:</span>
+                      <a
+                        href={selectedSourceFile.file_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <span className={styles.source}>
+                          {selectedSourceFile.filename}
+                        </span>
+                      </a>
+                    </div>
+                    {selectedSourceFile.citations.map((citation, i) => (
+                      <div key={i}>
+                        <Citation citation={citation} />
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         );
       }

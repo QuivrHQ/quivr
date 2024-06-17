@@ -30,8 +30,7 @@
       display: flex;
       gap: Spacings.$spacing04;
       align-items: baseline;
-      font-size: Typography.$large;
-      font-weight: 500;
+      @include Typography.H2;
     }
 
     .message_row_content {
@@ -53,6 +52,18 @@
         flex-direction: column;
         gap: Spacings.$spacing03;
         max-width: 100%;
+        border-bottom: 1px solid var(--border-0);
+        padding-bottom: Spacings.$spacing05;
+
+        .title_wrapper {
+          display: flex;
+          align-items: center;
+          gap: Spacings.$spacing03;
+
+          .title {
+            @include Typography.H2;
+          }
+        }
 
         .sources {
           display: flex;
@@ -98,15 +109,10 @@
         padding-top: Spacings.$spacing03;
         padding-bottom: Spacings.$spacing05;
         width: 100%;
-        border-bottom: 1px solid var(--border-0);
         justify-content: flex-end;
 
-        .sources_icon_wrapper {
-          cursor: pointer;
-        }
-
-        &.sticky {
-          visibility: visible;
+        .with_border {
+          border-bottom: 1px solid var(--border-0);
         }
       }
     }

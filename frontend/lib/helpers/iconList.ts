@@ -145,7 +145,7 @@ export const iconList: { [name: string]: IconType } = {
   settings: IoMdSettings,
   share: IoShareSocial,
   software: CgSoftwareDownload,
-  source: GrResources,
+  sources: GrResources,
   star: FaRegStar,
   step: IoFootsteps,
   sun: MdOutlineLightMode,
