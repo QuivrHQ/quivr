@@ -145,7 +145,13 @@
           gap: Spacings.$spacing03;
 
           .text {
-            color: var(--text-1);
+            color: var(--text-4);
+            transition: color 0.5s ease;
+
+            &:hover {
+              color: var(--text-3);
+              cursor: pointer;
+            }
           }
         }
       }
