@@ -1,5 +1,7 @@
 @use "@/styles/Radius.module.scss";
+@use "@/styles/ScreenSizes.module.scss";
 @use "@/styles/Spacings.module.scss";
+@use "@/styles/Transitions.module.scss";
 @use "@/styles/Typography.module.scss";
 
 .message_row_container {
@@ -9,6 +11,7 @@
   gap: Spacings.$spacing03;
   border-bottom: 1px solid var(--border-0);
   padding-bottom: Spacings.$spacing05;
+  position: relative;
 
   &.user {
     font-size: Typography.$very_large;
@@ -20,13 +23,38 @@
     border-bottom: none;
   }
 
+  &.smaller {
+    font-size: Typography.$large;
+  }
+
+  @media screen and (max-width: ScreenSizes.$small) {
+    &.user {
+      font-size: Typography.$large;
+    }
+  }
+
+  .icon_rotate {
+    position: absolute;
+    right: 0;
+    top: -(Spacings.$spacing05);
+    transition: transform 0.3s Transitions.$easeOutBack;
+  }
+
+  .icon_rotate_down {
+    transform: rotate(0deg);
+  }
+
+  .icon_rotate_up {
+    transform: rotate(-180deg);
+  }
+
   .message_row_content {
     border-radius: Radius.$big;
     width: fit-content;
     padding-block: Spacings.$spacing03;
   }
 
-  .message_header {
+  .message_header_wrapper {
     overflow: hidden;
   }
 

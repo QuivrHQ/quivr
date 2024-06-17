@@ -1,6 +1,10 @@
 @use "@/styles/Spacings.module.scss";
 @use "@/styles/Typography.module.scss";
 
+.hiden {
+  display: none;
+}
+
 .markdown {
   p {
     margin: 0;

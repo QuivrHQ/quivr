@@ -57,6 +57,7 @@ const MessageRow = React.forwardRef(
     const [thumbs, setThumbs] = useState<boolean | undefined | null>(
       initialThumbs
     );
+    const [folded, setFolded] = useState<boolean>(false);
     const [sourceFiles, setSourceFiles] = useState<SourceFile[]>([]);
     const [selectedSourceFile, setSelectedSourceFile] =
       useState<SourceFile | null>(null);
@@ -110,10 +111,12 @@ const MessageRow = React.forwardRef(
     };
 
     const renderMessageHeader = () => {
-      if (!isUserSpeaker) {
+      if (!isUserSpeaker && !folded) {
         return (
-          <div className={styles.message_header}>
-            <QuestionBrain brainName={brainName} brainId={brainId} />
+          <div className={styles.message_header_wrapper}>
+            <div className={styles.message_header}>
+              <QuestionBrain brainName={brainName} brainId={brainId} />
+            </div>
           </div>
         );
       }
@@ -204,7 +207,11 @@ const MessageRow = React.forwardRef(
     };
 
     const renderRelatedQuestions = () => {
-      if (!isUserSpeaker && (metadata?.followup_questions?.length ?? 0) > 0) {
+      if (
+        !isUserSpeaker &&
+        !folded &&
+        (metadata?.followup_questions?.length ?? 0) > 0
+      ) {
         return (
           <div className={styles.related_questions_wrapper}>
             <div className={styles.title_wrapper}>
@@ -228,24 +235,50 @@ const MessageRow = React.forwardRef(
       }
     };
 
+    const renderOtherSections = () => {
+      return (
+        <>
+          {!folded && renderMetadata()}
+          {!folded && renderRelatedQuestions()}
+        </>
+      );
+    };
+
     return (
       <div
         className={`
       ${styles.message_row_container} 
       ${isUserSpeaker ? styles.user : styles.brain}
+      ${messageContent.length > 100 && isUserSpeaker ? styles.smaller : ""}
       ${lastMessage ? styles.last : ""}
       `}
       >
+        {!isUserSpeaker && messageContent !== "🧠" && (
+          <div onClick={() => setFolded(!folded)}>
+            <Icon
+              name="chevronDown"
+              color="black"
+              handleHover={true}
+              size="normal"
+              classname={`${styles.icon_rotate} ${
+                folded ? styles.icon_rotate_down : styles.icon_rotate_up
+              }`}
+            />
+          </div>
+        )}
         {renderMessageHeader()}
         <div ref={ref} className={styles.message_row_content}>
           {children ?? (
             <>
-              <MessageContent text={messageContent} isUser={isUserSpeaker} />
+              <MessageContent
+                text={messageContent}
+                isUser={isUserSpeaker}
+                hide={folded}
+              />
             </>
           )}
         </div>
-        {renderMetadata()}
-        {renderRelatedQuestions()}
+        {renderOtherSections()}
       </div>
     );
   }

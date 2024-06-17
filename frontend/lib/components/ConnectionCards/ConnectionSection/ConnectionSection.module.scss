@@ -37,15 +37,15 @@
       align-items: center;
     }
 
-    .iconRotate {
+    .icon_rotate {
       transition: transform 0.3s Transitions.$easeOutBack;
     }
 
-    .iconRotateDown {
+    .icon_rotate_down {
       transform: rotate(0deg);
     }
 
-    .iconRotateRight {
+    .icon_rotate_right {
       transform: rotate(-90deg);
 
       .label {
