@@ -11,7 +11,6 @@ import styles from "./MessageRow.module.scss";
 import { Citation } from "./components/Citation/Citation";
 import { MessageContent } from "./components/MessageContent/MessageContent";
 import { QuestionBrain } from "./components/QuestionBrain/QuestionBrain";
-import { QuestionPrompt } from "./components/QuestionPrompt/QuestionPrompt";
 import { SourceCitations } from "./components/Source/Source";
 import { useMessageRow } from "./hooks/useMessageRow";
 import { SourceFile } from "./types/types";
@@ -20,7 +19,6 @@ type MessageRowProps = {
   speaker: "user" | "assistant";
   text?: string;
   brainName?: string | null;
-  promptName?: string | null;
   children?: React.ReactNode;
   metadata?: {
     sources?: Source[];
@@ -39,7 +37,6 @@ export const MessageRow = React.forwardRef(
       speaker,
       text,
       brainName,
-      promptName,
       children,
       brainId,
       messageId,
@@ -114,7 +111,6 @@ export const MessageRow = React.forwardRef(
         return (
           <div className={styles.message_header}>
             <QuestionBrain brainName={brainName} brainId={brainId} />
-            <QuestionPrompt promptName={promptName} />
           </div>
         );
       }
