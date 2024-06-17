@@ -10,23 +10,28 @@ from backend.logger import get_logger
 from backend.models.settings import BrainSettings
 from backend.modules.brain.entity.brain_entity import BrainEntity
 from backend.modules.brain.qa_interface import (
-    QAInterface, model_compatible_with_function_calling)
+    QAInterface,
+    model_compatible_with_function_calling,
+)
 from backend.modules.brain.rags.quivr_rag import QuivrRAG
 from backend.modules.brain.rags.rag_interface import RAGInterface
 from backend.modules.brain.service.brain_service import BrainService
-from backend.modules.brain.service.utils.format_chat_history import \
-    format_chat_history
-from backend.modules.brain.service.utils.get_prompt_to_use_id import \
-    get_prompt_to_use_id
+from backend.modules.brain.service.utils.format_chat_history import format_chat_history
+from backend.modules.brain.service.utils.get_prompt_to_use_id import (
+    get_prompt_to_use_id,
+)
 from backend.modules.chat.controller.chat.utils import (
-    find_model_and_generate_metadata, update_user_usage)
+    find_model_and_generate_metadata,
+    update_user_usage,
+)
 from backend.modules.chat.dto.chats import ChatQuestion, Sources
 from backend.modules.chat.dto.inputs import CreateChatHistory
 from backend.modules.chat.dto.outputs import GetChatHistoryOutput
 from backend.modules.chat.service.chat_service import ChatService
 from backend.modules.prompt.service.get_prompt_to_use import get_prompt_to_use
-from backend.modules.upload.service.generate_file_signed_url import \
-    generate_file_signed_url
+from backend.modules.upload.service.generate_file_signed_url import (
+    generate_file_signed_url,
+)
 from backend.modules.user.service.user_usage import UserUsage
 
 logger = get_logger(__name__)
@@ -158,9 +163,7 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
     models_settings: Optional[List[dict]] = None
     metadata: Optional[dict] = None
 
-    callbacks: List[AsyncIteratorCallbackHandler] = (
-        None  # pyright: ignore reportPrivateUsage=none
-    )
+    callbacks: List[AsyncIteratorCallbackHandler] = None  # pyright: ignore reportPrivateUsage=none
 
     prompt_id: Optional[UUID] = None
 
@@ -340,9 +343,10 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
             conversational_qa_chain = self.get_chain()
         else:
             conversational_qa_chain = self.knowledge_qa.get_chain()
-        transformed_history, streamed_chat_history = (
-            await self.initialize_streamed_chat_history(chat_id, question)
-        )
+        (
+            transformed_history,
+            streamed_chat_history,
+        ) = await self.initialize_streamed_chat_history(chat_id, question)
         response_tokens = ""
         sources = []
         citations = []

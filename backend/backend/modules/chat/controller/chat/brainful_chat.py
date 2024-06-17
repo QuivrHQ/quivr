@@ -67,7 +67,6 @@ def validate_authorization(user_id, brain_id):
 
 # TODO: redo this
 class BrainfulChat(ChatInterface):
-
     def get_answer_generator(
         self,
         brain,

@@ -80,7 +80,7 @@ def test_create_brain_with_invalid_brain_type(brain_service):
         invalid_brain_data = CreateBrainProperties(
             name="Invalid Brain",
             description="Should fail due to invalid data",
-            brain_type="invalid-brain-type",
+            brain_type="invalid-brain-type",  # type: ignore
             integration=BrainIntegrationSettings(
                 integration_id="valid-integration-id",
                 settings={},
