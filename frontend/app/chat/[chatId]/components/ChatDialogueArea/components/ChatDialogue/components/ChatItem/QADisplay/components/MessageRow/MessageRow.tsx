@@ -180,18 +180,6 @@ const MessageRow = React.forwardRef(
 
                 {selectedSourceFile && (
                   <div className={styles.citations}>
-                    <div className={styles.file_name_wrapper}>
-                      <span className={styles.box_title}>Source:</span>
-                      <a
-                        href={selectedSourceFile.file_url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        <span className={styles.source}>
-                          {selectedSourceFile.filename}
-                        </span>
-                      </a>
-                    </div>
                     {selectedSourceFile.citations.map((citation, i) => (
                       <div key={i}>
                         <Citation citation={citation} />

@@ -5,7 +5,7 @@
 .citation_wrapper {
   padding: Spacings.$spacing03;
   border-radius: Radius.$normal;
-  background-color: var(--background-special-0);
+  border: 1px solid var(--background-special-0);
   width: 100%;
   font-size: Typography.$tiny;
   font-style: italic;
@@ -16,12 +16,7 @@
     justify-content: space-between;
     overflow: hidden;
     width: 100%;
-
-    .citation {
-      &.folded {
-        @include Typography.EllipsisOverflow;
-      }
-    }
+    height: 300px;
 
     .icon {
       visibility: hidden;

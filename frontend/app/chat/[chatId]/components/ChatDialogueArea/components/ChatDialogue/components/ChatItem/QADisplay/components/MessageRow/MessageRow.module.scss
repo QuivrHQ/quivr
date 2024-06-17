@@ -104,28 +104,12 @@
         }
 
         .citations {
-          display: flex;
-          flex-direction: column;
-          gap: Spacings.$spacing02;
+          display: grid;
+          grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+          gap: Spacings.$spacing03;
           padding: Spacings.$spacing03;
-          border: 1px solid var(--primary-0);
           border-radius: Radius.$big;
           font-size: Typography.$small;
-
-          .file_name_wrapper {
-            display: flex;
-            gap: Spacings.$spacing03;
-            align-items: center;
-
-            .box_title {
-              padding-block: Spacings.$spacing02;
-              font-weight: 600;
-            }
-
-            .source {
-              font-size: Typography.$tiny;
-            }
-          }
 
           .box_title {
             padding-block: Spacings.$spacing02;
