@@ -181,7 +181,9 @@ async def create_chat_handler(
     Create a new chat with initial chat messages.
     """
 
-    return chat_service.create_chat(user_id=current_user.id, chat_data=chat_data)
+    return await chat_service.create_chat(
+        user_id=current_user.id, new_chat_data=chat_data
+    )
 
 
 # add new question to chat

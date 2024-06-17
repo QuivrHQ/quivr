@@ -9,7 +9,6 @@ from backend.modules.notification.service.notification_service import (
     NotificationService,
 )
 from backend.modules.prompt.service.prompt_service import PromptService
-from backend.packages.utils import parse_message_time
 
 logger = get_logger(__name__)
 
@@ -25,9 +24,9 @@ def merge_chat_history_and_notifications(
 
     chat_history_and_notifications.sort(
         key=lambda x: (
-            parse_message_time(x.message_time)
-            if isinstance(x, GetChatHistoryOutput)
-            else parse_message_time(x.datetime)
+            x.message_time
+            if isinstance(x, GetChatHistoryOutput) and x.message_time
+            else x.datetime
         )
     )
 
