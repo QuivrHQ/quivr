@@ -22,7 +22,7 @@ export const KnowledgeToFeed = ({
 }): JSX.Element => {
   const { allBrains, setCurrentBrainId, currentBrainId, currentBrain } =
     useBrainContext();
-  const [selectedTab, setSelectedTab] = useState("Documents");
+  const [selectedTab, setSelectedTab] = useState("Connections");
   const { knowledgeToFeed } = useKnowledgeToFeedContext();
   const { openedConnections, setOpenedConnections, setCurrentSyncId } =
     useFromConnectionsContext();
@@ -41,6 +41,14 @@ export const KnowledgeToFeed = ({
 
   const knowledgesTabs: Tab[] = [
     {
+      label: "Connections",
+      isSelected: selectedTab === "Connections",
+      onClick: () => setSelectedTab("Connections"),
+      iconName: "sync",
+      badge: openedConnections.filter((connection) => connection.submitted)
+        .length,
+    },
+    {
       label: "Documents",
       isSelected: selectedTab === "Documents",
       onClick: () => setSelectedTab("Documents"),
@@ -50,19 +58,11 @@ export const KnowledgeToFeed = ({
       ).length,
     },
     {
-      label: "Websites",
+      label: "Websites' page",
       isSelected: selectedTab === "Websites",
       onClick: () => setSelectedTab("Websites"),
       iconName: "website",
       badge: knowledgeToFeed.filter((knowledge) => knowledge.source === "crawl")
-        .length,
-    },
-    {
-      label: "Connections",
-      isSelected: selectedTab === "Connections",
-      onClick: () => setSelectedTab("Connections"),
-      iconName: "sync",
-      badge: openedConnections.filter((connection) => connection.submitted)
         .length,
     },
   ];
@@ -123,9 +123,9 @@ export const KnowledgeToFeed = ({
       )}
       <Tabs tabList={knowledgesTabs} />
       <div className={styles.tabs_content_wrapper}>
+        {selectedTab === "Connections" && <FromConnections />}
         {selectedTab === "Documents" && <FromDocuments />}
         {selectedTab === "Websites" && <FromWebsites />}
-        {selectedTab === "Connections" && <FromConnections />}
       </div>
     </div>
   );
