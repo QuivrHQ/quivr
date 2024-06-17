@@ -42,7 +42,7 @@ const Main = (): JSX.Element => {
             <EmailLogin />
           </FormProvider>
 
-          {googleSso && <GoogleLoginButton />}
+          {!googleSso && <GoogleLoginButton />}
         </div>
         <p className={styles.restriction_message}>
           {t("restriction_message", { ns: "login" })}

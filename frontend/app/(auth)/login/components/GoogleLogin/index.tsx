@@ -4,6 +4,7 @@ import { FcGoogle } from "react-icons/fc";
 import Button from "@/lib/components/ui/Button";
 
 import { useGoogleLogin } from "./hooks/useGoogleLogin";
+import styles from "./index.module.scss";
 
 export const GoogleLoginButton = (): JSX.Element => {
   const { isPending, signInWithGoogle } = useGoogleLogin();
@@ -14,8 +15,7 @@ export const GoogleLoginButton = (): JSX.Element => {
       onClick={() => void signInWithGoogle()}
       isLoading={isPending}
       type="button"
-      data-testid="google-login-button"
-      className="font-normal bg-white text-black py-2 hover:text-white"
+      className={styles.button}
     >
       <FcGoogle />
       {t("googleLogin", { ns: "login" })}
