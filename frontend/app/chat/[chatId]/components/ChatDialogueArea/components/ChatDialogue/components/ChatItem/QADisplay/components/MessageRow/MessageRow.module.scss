@@ -117,10 +117,36 @@
       }
     }
 
-    &:hover {
-      .metadata_wrapper {
-        .icons_wrapper {
-          visibility: visible;
+    .related_questions_wrapper {
+      display: flex;
+      flex-direction: column;
+      gap: Spacings.$spacing03;
+      padding-block: Spacings.$spacing03;
+
+      .title_wrapper {
+        display: flex;
+        align-items: center;
+        gap: Spacings.$spacing03;
+
+        .title {
+          @include Typography.H2;
+        }
+      }
+
+      .questions_wrapper {
+        display: flex;
+        flex-direction: column;
+        gap: Spacings.$spacing02;
+        font-size: Typography.$small;
+
+        .question {
+          display: flex;
+          align-items: center;
+          gap: Spacings.$spacing03;
+
+          .text {
+            color: var(--text-1);
+          }
         }
       }
     }

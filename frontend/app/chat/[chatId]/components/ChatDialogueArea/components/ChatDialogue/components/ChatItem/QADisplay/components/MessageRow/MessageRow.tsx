@@ -23,6 +23,7 @@ type MessageRowProps = {
   metadata?: {
     sources?: Source[];
     thoughts?: string;
+    followup_questions?: string[];
   };
   brainId?: string;
   index?: number;
@@ -31,7 +32,7 @@ type MessageRowProps = {
   lastMessage?: boolean;
 };
 
-export const MessageRow = React.forwardRef(
+const MessageRow = React.forwardRef(
   (
     {
       speaker,
@@ -199,6 +200,27 @@ export const MessageRow = React.forwardRef(
       }
     };
 
+    const renderRelatedQuestions = () => {
+      if (!isUserSpeaker) {
+        return (
+          <div className={styles.related_questions_wrapper}>
+            <div className={styles.title_wrapper}>
+              <Icon name="search" color="black" size="normal" />
+              <span className={styles.title}>Follow up questions</span>
+            </div>
+            <div className={styles.questions_wrapper}>
+              {metadata?.followup_questions?.map((question, index) => (
+                <div className={styles.question} key={index}>
+                  <Icon name="followUp" size="small" color="grey" />
+                  <span className={styles.text}>{question}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        );
+      }
+    };
+
     return (
       <div
         className={`
@@ -215,9 +237,12 @@ export const MessageRow = React.forwardRef(
           )}
         </div>
         {renderMetadata()}
+        {renderRelatedQuestions()}
       </div>
     );
   }
 );
 
 MessageRow.displayName = "MessageRow";
+
+export default MessageRow;

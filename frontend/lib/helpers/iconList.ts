@@ -30,7 +30,6 @@ import {
 import { FaInfo } from "react-icons/fa6";
 import { FiUpload } from "react-icons/fi";
 import { GoLightBulb } from "react-icons/go";
-import { GrResources } from "react-icons/gr";
 import { HiBuildingOffice } from "react-icons/hi2";
 import {
   IoIosAdd,
@@ -44,6 +43,7 @@ import {
 } from "react-icons/io";
 import {
   IoArrowUpCircleOutline,
+  IoBookOutline,
   IoCloudDownloadOutline,
   IoFootsteps,
   IoHomeOutline,
@@ -145,7 +145,7 @@ export const iconList: { [name: string]: IconType } = {
   settings: IoMdSettings,
   share: IoShareSocial,
   software: CgSoftwareDownload,
-  sources: GrResources,
+  sources: IoBookOutline,
   star: FaRegStar,
   step: IoFootsteps,
   sun: MdOutlineLightMode,
