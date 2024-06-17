@@ -38,6 +38,11 @@ class Source(BaseModel):
     citation: str
 
 
+class RawRAGChunkResponse(TypedDict):
+    answer: dict[str, Any]
+    docs: dict[str, Any]
+
+
 class RawRAGResponse(TypedDict):
     answer: dict[str, Any]
     docs: dict[str, Any]
@@ -51,5 +56,10 @@ class RAGResponseMetadata(BaseModel):
 
 
 class ParsedRAGResponse(BaseModel):
+    answer: str
+    metadata: RAGResponseMetadata | None = None
+
+
+class ParsedRAGChunkResponse(BaseModel):
     answer: str
     metadata: RAGResponseMetadata | None = None

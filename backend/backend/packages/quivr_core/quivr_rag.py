@@ -1,5 +1,6 @@
 import os
 from operator import itemgetter
+from typing import Any, AsyncGenerator
 
 from flashrank import Ranker
 from langchain.retrievers import ContextualCompressionRetriever
@@ -182,9 +183,41 @@ class DefaultQuivrRAG:
                 "question": question,
                 "chat_history": history,
                 "custom_personality": (self.rag_config.prompt),
-                "files": concat_list_files,
             },
             config={"metadata": metadata},
         )
         response = parse_response(raw_llm_response, self.rag_config.model)
         return response
+
+    async def run_astream(
+        self,
+        question: str,
+        history: list[dict[str, str]],
+        list_files: list[Knowledge],
+        metadata: dict[str, str] = {},
+    ) -> AsyncGenerator[str, Any]:
+        concat_list_files = format_file_list(list_files, self.rag_config.max_files)
+        conversational_qa_chain = self.build_chain(concat_list_files)
+        full_answer = ""
+        first_chunk = True
+        try:
+            async for chunk in conversational_qa_chain.astream(
+                {
+                    "question": question,
+                    "chat_history": history,
+                    "custom_personality": (self.rag_config.prompt),
+                },
+                config={"metadata": metadata},
+            ):
+                if first_chunk:
+                    full_answer = chunk["answer"]
+                    first_chunk = False
+                full_answer += chunk["answer"]  # TODO: What is this assignment ?
+                # pchunk = parse_chunk(
+                #     chunk, model_compatible_with_function_calling(self.rag_config.model)
+                # )
+                # TODO(@aminediro) the parsed chunk response
+                yield ""
+        finally:
+            # Yield the last
+            pass

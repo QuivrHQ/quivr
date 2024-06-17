@@ -200,3 +200,50 @@ class RAGService:
                 ),
             }
         )
+
+    async def generate_answer_stream(
+        self,
+        question: str,
+    ):
+        logger.info(
+            f"Creating question for chat {self.chat_id} with brain {self.brain.brain_id} "
+        )
+        rag_config = RAGConfig(
+            model=self.model_to_use.name,
+            temperature=self.brain.temperature,
+            max_input=self.model_to_use.max_input,
+            max_tokens=self.brain.max_tokens,
+            streaming=False,
+        )
+        history = await self.chat_service.get_chat_history(self.chat_id)
+        # Get list of files
+        list_files = self.knowledge_service.get_all_knowledge_in_brain(
+            self.brain.brain_id
+        )
+        vector_store = self.create_vector_store(
+            self.brain.brain_id, rag_config.max_input
+        )
+        # Initialize the rag pipline
+        rag_pipeline = DefaultQuivrRAG(rag_config, vector_store)
+        #  Format the history, sanitize the input
+        transformed_history = format_chat_history(history)
+
+        async for response in rag_pipeline.run_astream(
+            question, transformed_history, list_files
+        ):
+            # Format output to be correct servicedf;j
+            streamed_chat_history = GetChatHistoryOutput(
+                chat_id=self.chat_id,
+                message_id=None,  # do we need it ?,
+                user_message=question,
+                message_time=None,
+                assistant=response,  # TODO: define result
+                prompt_title=(self.prompt.title if self.prompt else ""),
+                brain_name=self.brain.name if self.brain else None,
+                brain_id=self.brain.brain_id if self.brain else None,
+                metadata=None,  # TODO : reponse.metadata
+            )
+            yield f"data {streamed_chat_history.model_dump_json()}"
+
+        # Save the response to db
+        # new_chat_entry = self.save_answer(question, parsed_response)
