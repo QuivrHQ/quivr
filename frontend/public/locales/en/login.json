@@ -1,1 +1,18 @@
-{"password":"Password","googleLogin":"Continue with Google","errorPasswordMissed":"Please enter your password","magicLink":"Continue with email","errorMailMissed":"Please enter your email address","talk_to":"Talk to","restriction_message":"Unpaid users have access to a free and limited demo of Quivr","email":"Email address","cant_find":"Can't find it ?","try_again":"Try again","check_your_email":{"part1":"We just sent you a ","magic_link":"Magic link","part2":", check your emails and follow the steps."},"login":"Login"}
+{
+  "password": "Password",
+  "googleLogin": "Continue with Google",
+  "errorPasswordMissed": "Please enter your password",
+  "magicLink": "Continue with email",
+  "errorMailMissed": "Please enter your email address",
+  "talk_to": "Talk to",
+  "restriction_message": "Free users have access to a limited demo of Quivr",
+  "email": "Email address",
+  "cant_find": "Can't find it ?",
+  "try_again": "Try again",
+  "check_your_email": {
+    "part1": "We just sent you a ",
+    "magic_link": "Magic link",
+    "part2": ", check your emails and follow the steps."
+  },
+  "login": "Login"
+}
