@@ -124,6 +124,31 @@ export const MessageRow = React.forwardRef(
               lastMessage ? styles.sticky : ""
             }`}
           >
+            <div className={styles.icons_wrapper}>
+              {metadata?.thoughts && metadata.thoughts.trim() !== "" && (
+                <ThoughtsButton text={metadata.thoughts} size="small" />
+              )}
+              <CopyButton handleCopy={handleCopy} size="small" />
+              <Icon
+                name="thumbsUp"
+                handleHover={true}
+                color={thumbs ? "primary" : "black"}
+                size="small"
+                onClick={async () => {
+                  await thumbsUp();
+                }}
+              />
+              <Icon
+                name="thumbsDown"
+                handleHover={true}
+                color={thumbs === false ? "primary" : "black"}
+                size="small"
+                onClick={async () => {
+                  await thumbsDown();
+                }}
+              />
+            </div>
+
             <div className={styles.sources_and_citations_wrapper}>
               <div className={styles.sources}>
                 {sourceFiles.map((sourceFile, i) => (
@@ -163,31 +188,6 @@ export const MessageRow = React.forwardRef(
                   ))}
                 </div>
               )}
-            </div>
-
-            <div className={styles.icons_wrapper}>
-              {metadata?.thoughts && metadata.thoughts.trim() !== "" && (
-                <ThoughtsButton text={metadata.thoughts} size="normal" />
-              )}
-              <CopyButton handleCopy={handleCopy} size="normal" />
-              <Icon
-                name="thumbsUp"
-                handleHover={true}
-                color={thumbs ? "primary" : "black"}
-                size="normal"
-                onClick={async () => {
-                  await thumbsUp();
-                }}
-              />
-              <Icon
-                name="thumbsDown"
-                handleHover={true}
-                color={thumbs === false ? "primary" : "black"}
-                size="normal"
-                onClick={async () => {
-                  await thumbsDown();
-                }}
-              />
             </div>
           </div>
         );

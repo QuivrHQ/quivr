@@ -29,6 +29,7 @@ import {
 } from "react-icons/fa";
 import { FaInfo } from "react-icons/fa6";
 import { FiUpload } from "react-icons/fi";
+import { GoLightBulb } from "react-icons/go";
 import { GrResources } from "react-icons/gr";
 import { HiBuildingOffice } from "react-icons/hi2";
 import {
@@ -108,6 +109,7 @@ export const iconList: { [name: string]: IconType } = {
   download: IoCloudDownloadOutline,
   edit: MdOutlineModeEditOutline,
   email: MdAlternateEmail,
+  eureka: GoLightBulb,
   feed: MdDynamicFeed,
   file: FaRegFileAlt,
   fileSelected: FaFileAlt,

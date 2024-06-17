@@ -93,9 +93,13 @@
       }
 
       .icons_wrapper {
-        visibility: hidden;
         display: flex;
-        gap: Spacings.$spacing03;
+        gap: Spacings.$spacing04;
+        padding-top: Spacings.$spacing03;
+        padding-bottom: Spacings.$spacing05;
+        width: 100%;
+        border-bottom: 1px solid var(--border-0);
+        justify-content: flex-end;
 
         .sources_icon_wrapper {
           cursor: pointer;
