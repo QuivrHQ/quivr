@@ -117,13 +117,6 @@ export const MessageRow = React.forwardRef(
             <QuestionPrompt promptName={promptName} />
           </div>
         );
-      } else {
-        return (
-          <div className={styles.message_header}>
-            <Icon name="user" color="dark-grey" size="normal" />
-            <span className={styles.me}>Me</span>
-          </div>
-        );
       }
     };
 
@@ -178,10 +171,7 @@ export const MessageRow = React.forwardRef(
 
             <div className={styles.icons_wrapper}>
               {metadata?.thoughts && metadata.thoughts.trim() !== "" && (
-                <ThoughtsButton
-                  text={metadata.thoughts}
-                  size="normal"
-                />
+                <ThoughtsButton text={metadata.thoughts} size="normal" />
               )}
               <CopyButton handleCopy={handleCopy} size="normal" />
               <Icon

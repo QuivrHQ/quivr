@@ -19,7 +19,6 @@ export const MessageContent = ({
     let match;
 
     while ((match = logRegex.exec(log))) {
-      // Add two spaces and a newline for markdown line break
       // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
       logs.push("- " + match[1] + "  \n");
     }

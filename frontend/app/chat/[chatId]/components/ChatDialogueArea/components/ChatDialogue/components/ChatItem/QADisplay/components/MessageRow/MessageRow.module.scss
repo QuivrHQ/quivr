@@ -6,12 +6,15 @@
   display: flex;
   flex-direction: column;
   padding-right: Spacings.$spacing05;
-  width: 85%;
   padding-block: Spacings.$spacing03;
   gap: Spacings.$spacing03;
 
+  &.user {
+    font-size: Typography.$very_large;
+    font-weight: 500;
+  }
+
   .message_row_content {
-    align-self: flex-end;
     border-radius: Radius.$big;
     width: fit-content;
     padding-block: Spacings.$spacing03;
@@ -23,34 +26,20 @@
     overflow: hidden;
   }
 
-  &.user {
-    align-self: flex-end;
-
-    .message_header {
-      align-self: flex-end;
-      display: flex;
-      gap: Spacings.$spacing02;
-      align-items: center;
-      color: var(--text-2);
-    }
-
-    .message_row_content {
-      background-color: var(--background-2);
-    }
-  }
-
   &.brain {
     .message_header {
       display: flex;
       gap: Spacings.$spacing04;
       align-items: baseline;
+      font-size: Typography.$large;
+      font-weight: 500;
     }
 
     .message_row_content {
       align-self: flex-start;
-      background-color: var(--background-special-0);
-      margin-left: 1px;
       position: relative;
+      margin-inline: Spacings.$spacing05;
+      padding: 0;
     }
 
     .metadata_wrapper {
