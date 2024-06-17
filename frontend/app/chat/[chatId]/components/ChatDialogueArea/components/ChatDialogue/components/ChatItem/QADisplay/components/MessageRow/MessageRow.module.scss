@@ -35,7 +35,7 @@
 
   .icon_rotate {
     position: absolute;
-    right: 0;
+    right: Spacings.$spacing04;
     top: -(Spacings.$spacing05);
     transition: transform 0.3s Transitions.$easeOutBack;
   }
