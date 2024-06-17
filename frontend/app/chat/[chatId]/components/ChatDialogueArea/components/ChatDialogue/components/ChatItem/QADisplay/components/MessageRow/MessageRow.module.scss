@@ -24,11 +24,9 @@
     border-radius: Radius.$big;
     width: fit-content;
     padding-block: Spacings.$spacing03;
-    padding-inline: Spacings.$spacing05;
   }
 
   .message_header {
-    padding: Spacings.$spacing02;
     overflow: hidden;
   }
 
@@ -43,7 +41,6 @@
     .message_row_content {
       align-self: flex-start;
       position: relative;
-      margin-inline: Spacings.$spacing05;
       padding: 0;
     }
 
