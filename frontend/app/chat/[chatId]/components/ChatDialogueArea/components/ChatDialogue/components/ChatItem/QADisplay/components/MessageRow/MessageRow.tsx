@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 
+import { useChatInput } from "@/app/chat/[chatId]/components/ActionsBar/components/ChatInput/hooks/useChatInput";
 import { useChat } from "@/app/chat/[chatId]/hooks/useChat";
 import { useChatApi } from "@/lib/api/chat/useChatApi";
 import { CopyButton } from "@/lib/components/ui/CopyButton";
@@ -59,6 +60,7 @@ const MessageRow = React.forwardRef(
     const [sourceFiles, setSourceFiles] = useState<SourceFile[]>([]);
     const [selectedSourceFile, setSelectedSourceFile] =
       useState<SourceFile | null>(null);
+    const { submitQuestion } = useChatInput();
 
     const handleSourceFileClick = (sourceFile: SourceFile) => {
       setSelectedSourceFile((prev) =>
@@ -202,7 +204,7 @@ const MessageRow = React.forwardRef(
     };
 
     const renderRelatedQuestions = () => {
-      if (!isUserSpeaker) {
+      if (!isUserSpeaker && (metadata?.followup_questions?.length ?? 0) > 0) {
         return (
           <div className={styles.related_questions_wrapper}>
             <div className={styles.title_wrapper}>
@@ -211,7 +213,11 @@ const MessageRow = React.forwardRef(
             </div>
             <div className={styles.questions_wrapper}>
               {metadata?.followup_questions?.map((question, index) => (
-                <div className={styles.question} key={index}>
+                <div
+                  className={styles.question}
+                  key={index}
+                  onClick={() => submitQuestion(question)}
+                >
                   <Icon name="followUp" size="small" color="grey" />
                   <span className={styles.text}>{question}</span>
                 </div>
