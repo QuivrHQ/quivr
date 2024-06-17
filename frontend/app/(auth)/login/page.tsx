@@ -17,7 +17,7 @@ import { EmailAuthContextType } from "./types";
 
 const Main = (): JSX.Element => {
   useLogin();
-  const { googleSso } = useAuthModes();
+  const { googleSso, githubSso } = useAuthModes();
   const { isDarkMode } = useUserSettingsContext();
 
   const methods = useForm<EmailAuthContextType>({
@@ -43,8 +43,8 @@ const Main = (): JSX.Element => {
             <EmailLogin />
           </FormProvider>
 
-          {!googleSso && <GoogleLoginButton />}
-          {!googleSso && <GithubLoginButton />}
+          {googleSso && <GoogleLoginButton />}
+          {githubSso && <GithubLoginButton />}
         </div>
         <p className={styles.restriction_message}>
           {t("restriction_message", { ns: "login" })}
