@@ -14,7 +14,7 @@ class User(SQLModel, table=True):
         default_factory=uuid4,
     )
     email: str
-    onboarded: bool
+    onboarded: bool | None = None
     chats: List["Chat"] | None = Relationship(back_populates="user")  # type: ignore
 
 

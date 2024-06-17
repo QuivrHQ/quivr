@@ -77,6 +77,7 @@ async def get_answer_generator(
     gpt_answer_generator = chat_instance.get_answer_generator(
         brain=brain,
         chat_id=str(chat_id),
+        chat_service=chat_service,
         model=brain.model,
         temperature=0.1,
         streaming=True,

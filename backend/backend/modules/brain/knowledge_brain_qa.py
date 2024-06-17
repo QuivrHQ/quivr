@@ -7,39 +7,32 @@ from pydantic import BaseModel, ConfigDict
 from pydantic_settings import BaseSettings
 
 from backend.logger import get_logger
-from backend.models.databases.supabase.user_usage import UserUsage
 from backend.models.settings import BrainSettings
 from backend.modules.brain.entity.brain_entity import BrainEntity
 from backend.modules.brain.qa_interface import (
-    QAInterface,
-    model_compatible_with_function_calling,
-)
+    QAInterface, model_compatible_with_function_calling)
 from backend.modules.brain.rags.quivr_rag import QuivrRAG
 from backend.modules.brain.rags.rag_interface import RAGInterface
 from backend.modules.brain.service.brain_service import BrainService
-from backend.modules.brain.service.utils.format_chat_history import format_chat_history
-from backend.modules.brain.service.utils.get_prompt_to_use_id import (
-    get_prompt_to_use_id,
-)
+from backend.modules.brain.service.utils.format_chat_history import \
+    format_chat_history
+from backend.modules.brain.service.utils.get_prompt_to_use_id import \
+    get_prompt_to_use_id
 from backend.modules.chat.controller.chat.utils import (
-    find_model_and_generate_metadata,
-    update_user_usage,
-)
+    find_model_and_generate_metadata, update_user_usage)
 from backend.modules.chat.dto.chats import ChatQuestion, Sources
 from backend.modules.chat.dto.inputs import CreateChatHistory
 from backend.modules.chat.dto.outputs import GetChatHistoryOutput
 from backend.modules.chat.service.chat_service import ChatService
-from backend.modules.dependencies import get_service
 from backend.modules.prompt.service.get_prompt_to_use import get_prompt_to_use
-from backend.modules.upload.service.generate_file_signed_url import (
-    generate_file_signed_url,
-)
+from backend.modules.upload.service.generate_file_signed_url import \
+    generate_file_signed_url
+from backend.modules.user.service.user_usage import UserUsage
 
 logger = get_logger(__name__)
 QUIVR_DEFAULT_PROMPT = "Your name is Quivr. You're a helpful assistant.  If you don't know the answer, just say that you don't know, don't try to make up an answer."
 
 brain_service = BrainService()
-chat_service = get_service(ChatService)()
 
 
 def is_valid_uuid(uuid_to_test, version=4):
@@ -145,6 +138,9 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
     # Instantiate settings
     brain_settings: BaseSettings = BrainSettings()
 
+    # TODO: remove this !!!!! Only added for compatibility
+    chat_service: ChatService
+
     # Default class attributes
     model: str = "gpt-3.5-turbo-0125"  # pyright: ignore reportPrivateUsage=none
     temperature: float = 0.1
@@ -162,7 +158,9 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
     models_settings: Optional[List[dict]] = None
     metadata: Optional[dict] = None
 
-    callbacks: List[AsyncIteratorCallbackHandler] = None  # pyright: ignore reportPrivateUsage=none
+    callbacks: List[AsyncIteratorCallbackHandler] = (
+        None  # pyright: ignore reportPrivateUsage=none
+    )
 
     prompt_id: Optional[UUID] = None
 
@@ -170,6 +168,7 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
         self,
         brain_id: str,
         chat_id: str,
+        chat_service: ChatService,
         user_id: str = None,
         user_email: str = None,
         streaming: bool = False,
@@ -181,16 +180,15 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
         super().__init__(
             brain_id=brain_id,
             chat_id=chat_id,
+            chat_service=chat_service,
             streaming=streaming,
             **kwargs,
         )
+        self.chat_service = chat_service
         self.prompt_id = prompt_id
         self.user_id = user_id
         self.user_email = user_email
-        self.user_usage = UserUsage(
-            id=user_id,
-            email=user_email,
-        )
+        self.user_usage = UserUsage(id=user_id, email=user_email)
         # TODO: we already have a brain before !!!
         self.brain = brain_service.get_brain_by_id(brain_id)
         self.user_settings = self.user_usage.get_user_settings()
@@ -268,7 +266,6 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
 
     def calculate_pricing(self):
         model_to_use = find_model_and_generate_metadata(
-            self.chat_id,
             self.brain.model,
             self.user_settings,
             self.models_settings,
@@ -284,11 +281,12 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
 
         return user_choosen_model_price
 
-    def generate_answer(
+    # TODO: deprecated
+    async def generate_answer(
         self, chat_id: UUID, question: ChatQuestion, save_answer: bool = True
     ) -> GetChatHistoryOutput:
         conversational_qa_chain = self.knowledge_qa.get_chain()
-        transformed_history, _ = self.initialize_streamed_chat_history(
+        transformed_history, _ = await self.initialize_streamed_chat_history(
             chat_id, question
         )
         metadata = self.metadata or {}
@@ -343,7 +341,7 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
         else:
             conversational_qa_chain = self.knowledge_qa.get_chain()
         transformed_history, streamed_chat_history = (
-            self.initialize_streamed_chat_history(chat_id, question)
+            await self.initialize_streamed_chat_history(chat_id, question)
         )
         response_tokens = ""
         sources = []
@@ -410,7 +408,7 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
                 if chunk.get("answer"):
                     response_tokens += chunk["answer"].content
                     streamed_chat_history.assistant = chunk["answer"].content
-                    yield f"data: {json.dumps(streamed_chat_history.dict())}"
+                    yield f"data: {streamed_chat_history.model_dump_json()}"
 
             if chunk.get("docs"):
                 sources = chunk["docs"]
@@ -420,15 +418,15 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
         # Serialize the sources list
         serialized_sources_list = [source.dict() for source in sources_list]
         streamed_chat_history.metadata["sources"] = serialized_sources_list
-        yield f"data: {json.dumps(streamed_chat_history.dict())}"
+        yield f"data: {streamed_chat_history.model_dump_json()}"
         self.save_answer(question, response_tokens, streamed_chat_history, save_answer)
 
-    def initialize_streamed_chat_history(self, chat_id, question):
-        history = chat_service.get_chat_history(self.chat_id)
+    async def initialize_streamed_chat_history(self, chat_id, question):
+        history = await self.chat_service.get_chat_history(self.chat_id)
         transformed_history = format_chat_history(history)
         brain = brain_service.get_brain_by_id(self.brain_id)
 
-        streamed_chat_history = chat_service.update_chat_history(
+        streamed_chat_history = self.chat_service.update_chat_history(
             CreateChatHistory(
                 **{
                     "chat_id": chat_id,
@@ -465,7 +463,7 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
 
         try:
             if save_answer:
-                chat_service.update_message_by_id(
+                self.chat_service.update_message_by_id(
                     message_id=str(streamed_chat_history.message_id),
                     user_message=question.question,
                     assistant=assistant,
@@ -475,7 +473,7 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
             logger.error("Error updating message by ID: %s", e)
 
     def save_non_streaming_answer(self, chat_id, question, answer, metadata):
-        new_chat = chat_service.update_chat_history(
+        new_chat = self.chat_service.update_chat_history(
             CreateChatHistory(
                 **{
                     "chat_id": chat_id,

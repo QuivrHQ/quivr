@@ -75,6 +75,7 @@ class UserUsage(UserIdentity):
             self.id, date
         )
 
+        # BUG: could be a bug, we are assuming that 0 means no records !
         if daily_requests_count == 0:
             logger.info("Request count is 0, creating new record")
             if self.email is None:

@@ -7,19 +7,18 @@ from backend.modules.brain.entity.brain_entity import BrainEntity
 from backend.modules.brain.entity.integration_brain import IntegrationEntity
 from backend.modules.brain.integrations.Big.Brain import BigBrain
 from backend.modules.brain.integrations.GPT4.Brain import GPT4Brain
-from backend.modules.brain.integrations.Multi_Contract.Brain import MultiContractBrain
+from backend.modules.brain.integrations.Multi_Contract.Brain import \
+    MultiContractBrain
 from backend.modules.brain.integrations.Notion.Brain import NotionBrain
 from backend.modules.brain.integrations.Proxy.Brain import ProxyBrain
 from backend.modules.brain.integrations.Self.Brain import SelfBrain
 from backend.modules.brain.integrations.SQL.Brain import SQLBrain
 from backend.modules.brain.knowledge_brain_qa import KnowledgeBrainQA
 from backend.modules.brain.service.brain_service import BrainService
-from backend.modules.brain.service.utils.format_chat_history import format_chat_history
+from backend.modules.brain.service.utils.format_chat_history import \
+    format_chat_history
 from backend.modules.chat.controller.chat.utils import (
-    compute_cost,
-    find_model_and_generate_metadata,
-    update_user_usage,
-)
+    compute_cost, find_model_and_generate_metadata, update_user_usage)
 from backend.modules.chat.dto.inputs import CreateChatHistory
 from backend.modules.chat.dto.outputs import GetChatHistoryOutput
 from backend.modules.chat.service.chat_service import ChatService

@@ -65,11 +65,14 @@ def validate_authorization(user_id, brain_id):
         )
 
 
+# TODO: redo this
 class BrainfulChat(ChatInterface):
+
     def get_answer_generator(
         self,
         brain,
         chat_id,
+        chat_service,
         model,
         temperature,
         streaming,
@@ -79,6 +82,7 @@ class BrainfulChat(ChatInterface):
     ):
         if brain and brain.brain_type == BrainType.doc:
             return KnowledgeBrainQA(
+                chat_service=chat_service,
                 chat_id=chat_id,
                 brain_id=str(brain.brain_id),
                 streaming=streaming,
@@ -97,6 +101,7 @@ class BrainfulChat(ChatInterface):
             )
             if integration_class:
                 return integration_class(
+                    chat_service=chat_service,
                     chat_id=chat_id,
                     temperature=temperature,
                     brain_id=str(brain.brain_id),

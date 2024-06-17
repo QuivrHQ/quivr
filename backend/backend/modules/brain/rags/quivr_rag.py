@@ -20,20 +20,20 @@ from langchain_core.runnables import RunnableLambda, RunnablePassthrough
 from langchain_openai import ChatOpenAI
 from pydantic import BaseModel, ConfigDict
 from pydantic_settings import BaseSettings
+from supabase.client import Client
 
 from backend.logger import get_logger
 from backend.models.settings import (
-    BrainSettings,  # Importing settings related to the 'brain'
-    get_embedding_client,
-    get_supabase_client,
-)
+    BrainSettings,
+)  # Importing settings related to the 'brain'
+from backend.models.settings import get_embedding_client, get_supabase_client
+from backend.modules.brain.qa_interface import model_compatible_with_function_calling
 from backend.modules.brain.service.brain_service import BrainService
 from backend.modules.chat.service.chat_service import ChatService
 from backend.modules.dependencies import get_service
 from backend.modules.knowledge.repository.knowledges import KnowledgeRepository
 from backend.modules.prompt.service.get_prompt_to_use import get_prompt_to_use
 from backend.vectorstore.supabase import CustomSupabaseVectorStore
-from supabase.client import Client
 
 logger = get_logger(__name__)
 
@@ -352,7 +352,7 @@ class QuivrRAG(BaseModel):
             temperature=self.temperature,
             api_base=api_base,
         )  # pyright: ignore reportPrivateUsage=none
-        if self.model_compatible_with_function_calling():
+        if model_compatible_with_function_calling(self.model):
             # And finally, we do the part that returns the answers
             llm_function = ChatOpenAI(
                 max_tokens=self.max_tokens,

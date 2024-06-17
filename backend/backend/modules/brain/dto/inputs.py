@@ -66,7 +66,6 @@ class CreateBrainProperties(BaseModel, extra="ignore"):
 
 
 class BrainUpdatableProperties(BaseModel, extra="ignore"):
-
     name: Optional[str] = None
     description: Optional[str] = None
     temperature: Optional[float] = None

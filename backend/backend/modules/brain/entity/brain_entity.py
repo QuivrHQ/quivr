@@ -58,7 +58,7 @@ class Brain(AsyncAttrs, SQLModel, table=True):
             default=BrainType.integration,
         ),
     )
-    brain_chat_history: List["ChatHistory"] = Relationship(  # noqa: f821
+    brain_chat_history: List["ChatHistory"] = Relationship(  # noqa: F821
         back_populates="brain", sa_relationship_kwargs={"lazy": "select"}
     )
     prompt_id: UUID | None = Field(default=None, foreign_key="prompts.id")
