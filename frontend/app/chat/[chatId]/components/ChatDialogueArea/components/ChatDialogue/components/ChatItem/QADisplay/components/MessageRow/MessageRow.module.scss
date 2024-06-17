@@ -7,10 +7,17 @@
   flex-direction: column;
   padding-right: Spacings.$spacing05;
   gap: Spacings.$spacing03;
+  border-bottom: 1px solid var(--border-0);
+  padding-bottom: Spacings.$spacing05;
 
   &.user {
     font-size: Typography.$very_large;
     font-weight: 500;
+    border-bottom: none;
+  }
+
+  &.last {
+    border-bottom: none;
   }
 
   .message_row_content {
@@ -52,7 +59,6 @@
         flex-direction: column;
         gap: Spacings.$spacing03;
         max-width: 100%;
-        border-bottom: 1px solid var(--border-0);
         padding-bottom: Spacings.$spacing05;
 
         .title_wrapper {

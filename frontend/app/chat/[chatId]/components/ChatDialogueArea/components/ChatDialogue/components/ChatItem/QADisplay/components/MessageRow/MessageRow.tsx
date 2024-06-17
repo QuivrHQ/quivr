@@ -43,6 +43,7 @@ const MessageRow = React.forwardRef(
       messageId,
       thumbs: initialThumbs,
       metadata,
+      lastMessage,
     }: MessageRowProps,
     ref: React.Ref<HTMLDivElement>
   ) => {
@@ -226,6 +227,7 @@ const MessageRow = React.forwardRef(
         className={`
       ${styles.message_row_container} 
       ${isUserSpeaker ? styles.user : styles.brain}
+      ${lastMessage ? styles.last : ""}
       `}
       >
         {renderMessageHeader()}
