@@ -5,6 +5,7 @@ import { useFromConnectionsContext } from "@/app/chat/[chatId]/components/Action
 import { OpenedConnection } from "@/lib/api/sync/types";
 import { MessageInfoBox } from "@/lib/components/ui/MessageInfoBox/MessageInfoBox";
 import QuivrButton from "@/lib/components/ui/QuivrButton/QuivrButton";
+import { useKnowledgeToFeedContext } from "@/lib/context/KnowledgeToFeedProvider/hooks/useKnowledgeToFeedContext";
 import { createHandleGetButtonProps } from "@/lib/helpers/handleConnectionButtons";
 import { useUserData } from "@/lib/hooks/useUserData";
 
@@ -25,6 +26,7 @@ export const FeedBrainStep = (): JSX.Element => {
   const [currentConnection, setCurrentConnection] = useState<
     OpenedConnection | undefined
   >(undefined);
+  const { knowledgeToFeed } = useKnowledgeToFeedContext();
 
   useEffect(() => {
     setCurrentConnection(
@@ -96,6 +98,11 @@ export const FeedBrainStep = (): JSX.Element => {
             iconName="chevronRight"
             onClick={goToNextStep}
             important={true}
+            disabled={
+              knowledgeToFeed.length === 0 &&
+              !userIdentityData?.onboarded &&
+              !openedConnections.length
+            }
           />
         )}
       </div>
