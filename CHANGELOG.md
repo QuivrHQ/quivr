@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.0.268 (2024-06-18)
+
+## What's Changed
+* fix(frontend): rephrase unpaid to free by @Zewed in https://github.com/QuivrHQ/quivr/pull/2679
+* feat(frontend): set from connections by default in knowledge to feed by @Zewed in https://github.com/QuivrHQ/quivr/pull/2680
+* feat(frontend): rephrase from Url to from Website's page by @Zewed in https://github.com/QuivrHQ/quivr/pull/2683
+* feat(frontend): new chat interface by @Zewed in https://github.com/QuivrHQ/quivr/pull/2687
+* fix(frontend): next step impossible if no knowledge when creating brain if no onboarded by @Zewed in https://github.com/QuivrHQ/quivr/pull/2688
+* feat(turbopack): Implement turbo pack compiler by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2685
+* fix(frontend): rephrase thoughts button title by @Zewed in https://github.com/QuivrHQ/quivr/pull/2689
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.267...v0.0.268
+
 ## 0.0.267 (2024-06-14)
 
 ## What's Changed
