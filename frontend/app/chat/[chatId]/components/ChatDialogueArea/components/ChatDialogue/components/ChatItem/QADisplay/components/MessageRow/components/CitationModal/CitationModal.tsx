@@ -24,11 +24,12 @@ export const CitationModal = ({
     >
       <div className={styles.modal_wrapper}>
         <div className={styles.title_wrapper}>
-          <span className={styles.title}>Chunk from:</span>
+          <span className={styles.title}>Text extract from:</span>
           <a
             href={sourceFile.file_url}
             target="_blank"
             rel="noopener noreferrer"
+            className={styles.file_link}
           >
             <span className={styles.filename}>{sourceFile.filename}</span>
           </a>

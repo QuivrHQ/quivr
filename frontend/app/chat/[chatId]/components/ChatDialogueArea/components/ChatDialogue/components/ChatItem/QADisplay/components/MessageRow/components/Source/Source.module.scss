@@ -7,6 +7,7 @@
   display: flex;
   flex-direction: column;
   gap: Spacings.$spacing01;
+  max-width: 240px;
 
   .source_wrapper {
     padding: Spacings.$spacing03;
@@ -46,6 +47,7 @@
 .citations_container {
   display: flex;
   gap: Spacings.$spacing02;
+  flex-wrap: wrap;
 
   .citation_index {
     cursor: pointer;

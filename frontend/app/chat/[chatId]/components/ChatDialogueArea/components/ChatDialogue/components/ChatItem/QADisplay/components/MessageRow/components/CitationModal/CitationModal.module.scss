@@ -10,10 +10,21 @@
     display: flex;
     gap: Spacings.$spacing03;
     align-items: baseline;
+    overflow: hidden;
+    padding-right: Spacings.$spacing05;
 
     .title {
-      font-weight: 700;
-      font-size: Typography.$larger;
+      white-space: nowrap;
+    }
+
+    .file_link {
+      font-weight: 600;
+      overflow: hidden;
+      @include Typography.EllipsisOverflow;
+
+      .filename {
+        @include Typography.EllipsisOverflow;
+      }
     }
   }
 
