@@ -50,7 +50,7 @@ class RawRAGResponse(TypedDict):
 
 class RAGResponseMetadata(BaseModel):
     citations: list[int] | None = None
-    thoughts: str | None = None
+    thoughts: str | list[str] | None = None
     followup_questions: list[str] | None = None
     sources: list[Source] | None = None
 
@@ -62,4 +62,4 @@ class ParsedRAGResponse(BaseModel):
 
 class ParsedRAGChunkResponse(BaseModel):
     answer: str
-    metadata: RAGResponseMetadata | None = None
+    metadata: RAGResponseMetadata

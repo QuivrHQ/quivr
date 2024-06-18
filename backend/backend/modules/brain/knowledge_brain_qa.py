@@ -49,7 +49,11 @@ def is_valid_uuid(uuid_to_test, version=4):
     return str(uuid_obj) == uuid_to_test
 
 
-def generate_source(source_documents, brain_id, citations: List[int] = None):
+def generate_source(
+    source_documents,
+    brain_id: UUID,
+    citations: List[int] | None = None,
+):
     """
     Generate the sources list for the answer
     It takes in a list of sources documents and citations that points to the docs index that was used in the answer
@@ -163,7 +167,9 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
     models_settings: Optional[List[dict]] = None
     metadata: Optional[dict] = None
 
-    callbacks: List[AsyncIteratorCallbackHandler] = None  # pyright: ignore reportPrivateUsage=none
+    callbacks: List[AsyncIteratorCallbackHandler] = (
+        None  # pyright: ignore reportPrivateUsage=none
+    )
 
     prompt_id: Optional[UUID] = None
 

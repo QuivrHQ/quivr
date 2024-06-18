@@ -7,19 +7,18 @@ from backend.modules.brain.entity.brain_entity import BrainEntity
 from backend.modules.brain.entity.integration_brain import IntegrationEntity
 from backend.modules.brain.integrations.Big.Brain import BigBrain
 from backend.modules.brain.integrations.GPT4.Brain import GPT4Brain
-from backend.modules.brain.integrations.Multi_Contract.Brain import MultiContractBrain
+from backend.modules.brain.integrations.Multi_Contract.Brain import \
+    MultiContractBrain
 from backend.modules.brain.integrations.Notion.Brain import NotionBrain
 from backend.modules.brain.integrations.Proxy.Brain import ProxyBrain
 from backend.modules.brain.integrations.Self.Brain import SelfBrain
 from backend.modules.brain.integrations.SQL.Brain import SQLBrain
 from backend.modules.brain.knowledge_brain_qa import KnowledgeBrainQA
 from backend.modules.brain.service.brain_service import BrainService
-from backend.modules.brain.service.utils.format_chat_history import format_chat_history
+from backend.modules.brain.service.utils.format_chat_history import \
+    format_chat_history
 from backend.modules.chat.controller.chat.utils import (
-    compute_cost,
-    find_model_and_generate_metadata,
-    update_user_usage,
-)
+    compute_cost, find_model_and_generate_metadata, update_user_usage)
 from backend.modules.chat.dto.inputs import CreateChatHistory
 from backend.modules.chat.dto.outputs import GetChatHistoryOutput
 from backend.modules.chat.service.chat_service import ChatService
@@ -29,7 +28,8 @@ from backend.modules.user.entity.user_identity import UserIdentity
 from backend.modules.user.service.user_usage import UserUsage
 from backend.packages.quivr_core.config import RAGConfig
 from backend.packages.quivr_core.models import ParsedRAGResponse
-from backend.packages.quivr_core.quivr_rag import DefaultQuivrRAG
+from backend.packages.quivr_core.quivr_rag import QuivrQARAG
+from backend.packages.quivr_core.utils import generate_source
 from backend.vectorstore.supabase import CustomSupabaseVectorStore
 
 logger = get_logger(__name__)
@@ -174,15 +174,16 @@ class RAGService:
             self.brain.brain_id, rag_config.max_input
         )
         # Initialize the rag pipline
-        rag_pipeline = DefaultQuivrRAG(rag_config, vector_store)
+        rag_pipeline = QuivrQARAG(rag_config, vector_store)
         #  Format the history, sanitize the input
         transformed_history = format_chat_history(history)
 
-        parsed_response = rag_pipeline.run(question, transformed_history, list_files)
+        parsed_response = rag_pipeline.answer(question, transformed_history, list_files)
 
-        # Format output to be correct
+        # Save the answer to db
         new_chat_entry = self.save_answer(question, parsed_response)
 
+        # Format output to be correct
         return GetChatHistoryOutput(
             **{
                 "chat_id": self.chat_id,
@@ -224,11 +225,12 @@ class RAGService:
             self.brain.brain_id, rag_config.max_input
         )
         # Initialize the rag pipline
-        rag_pipeline = DefaultQuivrRAG(rag_config, vector_store)
+        breakpoint()
+        rag_pipeline = QuivrQARAG(rag_config, vector_store)
         #  Format the history, sanitize the input
         transformed_history = format_chat_history(history)
 
-        async for response in rag_pipeline.run_astream(
+        async for response in rag_pipeline.answer_astream(
             question, transformed_history, list_files
         ):
             # Format output to be correct servicedf;j
@@ -237,13 +239,31 @@ class RAGService:
                 message_id=None,  # do we need it ?,
                 user_message=question,
                 message_time=None,
-                assistant=response,  # TODO: define result
+                assistant=response.answer,  # TODO: define result
                 prompt_title=(self.prompt.title if self.prompt else ""),
                 brain_name=self.brain.name if self.brain else None,
                 brain_id=self.brain.brain_id if self.brain else None,
-                metadata=None,  # TODO : reponse.metadata
+                metadata={
+                    **response.metadata.model_dump(),
+                    "sources": None,
+                },
             )
             yield f"data {streamed_chat_history.model_dump_json()}"
+
+        # For last chunk yield the sources
+        if streamed_chat_history.metadata:
+            sources_urls = generate_source(
+                streamed_chat_history.metadata.sources,
+                self.brain.brain_id,
+                streamed_chat_history.metadata.citations,
+            )
+            # TODO: not great for performance
+            streamed_chat_history.metadata.sources = [
+                s.model_dump() for s in sources_urls
+            ]
+            yield f"data: {streamed_chat_history.model_dump_json()}"
+
+        # self.save_answer(question, response_tokens, streamed_chat_history, save_answer)
 
         # Save the response to db
         # new_chat_entry = self.save_answer(question, parsed_response)

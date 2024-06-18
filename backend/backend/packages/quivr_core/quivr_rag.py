@@ -21,10 +21,11 @@ from backend.modules.brain.rags.quivr_rag import (
 )
 from backend.modules.knowledge.entity.knowledge import Knowledge
 from backend.packages.quivr_core.config import RAGConfig
-from backend.packages.quivr_core.models import ParsedRAGResponse
+from backend.packages.quivr_core.models import ParsedRAGChunkResponse, ParsedRAGResponse
 from backend.packages.quivr_core.utils import (
     combine_documents,
     format_file_list,
+    parse_chunk_response,
     parse_response,
 )
 from backend.vectorstore.supabase import CustomSupabaseVectorStore
@@ -32,7 +33,7 @@ from backend.vectorstore.supabase import CustomSupabaseVectorStore
 logger = get_logger(__name__)
 
 
-class DefaultQuivrRAG:
+class QuivrQARAG:
     def __init__(self, rag_config: RAGConfig, vector_store: CustomSupabaseVectorStore):
         self.rag_config = rag_config
         # TODO(@aminediro)
@@ -40,6 +41,10 @@ class DefaultQuivrRAG:
         self.vector_store = vector_store
         self.llm = self._get_llm()
         self.reranker = self._create_reranker()
+
+        self.supports_func_calling = model_compatible_with_function_calling(
+            self.rag_config.model
+        )
 
     @property
     def retriever(self):
@@ -169,7 +174,7 @@ class DefaultQuivrRAG:
 
         return loaded_memory | standalone_question | retrieved_documents | answer
 
-    def run(
+    def answer(
         self,
         question: str,
         history: list[dict[str, str]],
@@ -189,35 +194,36 @@ class DefaultQuivrRAG:
         response = parse_response(raw_llm_response, self.rag_config.model)
         return response
 
-    async def run_astream(
+    async def answer_astream(
         self,
         question: str,
         history: list[dict[str, str]],
         list_files: list[Knowledge],
         metadata: dict[str, str] = {},
-    ) -> AsyncGenerator[str, Any]:
+    ) -> AsyncGenerator[ParsedRAGChunkResponse, Any]:
         concat_list_files = format_file_list(list_files, self.rag_config.max_files)
         conversational_qa_chain = self.build_chain(concat_list_files)
-        full_answer = ""
+        rolling_answer = ""
         first_chunk = True
-        try:
-            async for chunk in conversational_qa_chain.astream(
-                {
-                    "question": question,
-                    "chat_history": history,
-                    "custom_personality": (self.rag_config.prompt),
-                },
-                config={"metadata": metadata},
-            ):
-                if first_chunk:
-                    full_answer = chunk["answer"]
-                    first_chunk = False
-                full_answer += chunk["answer"]  # TODO: What is this assignment ?
-                # pchunk = parse_chunk(
-                #     chunk, model_compatible_with_function_calling(self.rag_config.model)
-                # )
-                # TODO(@aminediro) the parsed chunk response
-                yield ""
-        finally:
-            # Yield the last
-            pass
+        stream_response = ""
+        async for chunk in conversational_qa_chain.astream(
+            {
+                "question": question,
+                "chat_history": history,
+                "custom_personality": (self.rag_config.prompt),
+            },
+            config={"metadata": metadata},
+        ):
+            # First chunk in function calling needs to be dealt with separately
+            if self.supports_func_calling and first_chunk:
+                rolling_answer = chunk["answer"]
+                first_chunk = False
+                continue
+
+            parsed_chunk = parse_chunk_response(
+                rolling_answer,
+                stream_response,
+                chunk,
+                self.supports_func_calling,
+            )
+            yield parsed_chunk

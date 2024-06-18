@@ -249,27 +249,30 @@ async def create_stream_question_handler(
     brain_id: Annotated[UUID | None, Query()] = None,
 ) -> StreamingResponse:
     validate_authorization(user_id=current_user.id, brain_id=brain_id)
-
     logger.info(
         f"Creating question for chat {chat_id} with brain {brain_id} of type {type(brain_id)}"
     )
 
-    gpt_answer_generator = await get_answer_generator(
-        chat_id, chat_question, chat_service, brain_id, current_user
+    # try:
+    rag_service = RAGService(
+        current_user,
+        brain_id,
+        chat_id,
+        brain_service,
+        prompt_service,
+        chat_service,
+        knowledge_service,
     )
+
     maybe_send_telemetry("question_asked", {"streaming": True}, request)
 
-    # Generator
-    try:
-        return StreamingResponse(
-            gpt_answer_generator.generate_stream(
-                chat_id, chat_question, save_answer=True
-            ),
-            media_type="text/event-stream",
-        )
+    return StreamingResponse(
+        rag_service.generate_answer_stream(chat_question.question),
+        media_type="text/event-stream",
+    )
 
-    except HTTPException as e:
-        raise e
+    # except HTTPException as e:
+    #     raise e
 
 
 # get chat history
