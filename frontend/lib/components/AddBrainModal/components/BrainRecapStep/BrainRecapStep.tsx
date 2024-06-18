@@ -124,11 +124,6 @@ export const BrainRecapStep = (): JSX.Element => {
             await feed();
             setIsBrainCreated(true);
           }}
-          disabled={
-            knowledgeToFeed.length === 0 &&
-            !userIdentityData?.onboarded &&
-            !openedConnections.length
-          }
           isLoading={creating}
           important={true}
         />

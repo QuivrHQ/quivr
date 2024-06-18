@@ -1,7 +1,7 @@
-@use "@/styles/Radius.module.scss";
-@use "@/styles/Spacings.module.scss";
-@use "@/styles/Typography.module.scss";
-@use "@/styles/ZIndexes.module.scss";
+@use "styles/Radius.module.scss";
+@use "styles/Spacings.module.scss";
+@use "styles/Typography.module.scss";
+@use "styles/ZIndexes.module.scss";
 
 .tooltip_content_wrapper {
   z-index: ZIndexes.$tooltip;
@@ -12,4 +12,9 @@
   white-space: pre-wrap;
   overflow: hidden;
   max-width: 300px;
+
+  &.small {
+    max-height: 300px;
+    overflow: scroll;
+  }
 }

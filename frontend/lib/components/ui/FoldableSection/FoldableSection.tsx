@@ -43,8 +43,8 @@ export const FoldableSection = (props: FoldableSectionProps): JSX.Element => {
           name="chevronDown"
           size="normal"
           color="black"
-          classname={`${styles.iconRotate} ${
-            folded ? styles.iconRotateDown : styles.iconRotateRight
+          classname={`${styles.icon_rotate} ${
+            folded ? styles.icon_rotate_down : styles.icon_rotate_right
           }`}
         />
       </div>

@@ -1,5 +1,13 @@
-@use "@/styles/Spacings.module.scss";
-@use "@/styles/Typography.module.scss";
+@use "styles/Spacings.module.scss";
+@use "styles/Typography.module.scss";
+
+.hiden {
+  display: none;
+}
+
+.hiden {
+  display: none;
+}
 
 .markdown {
   p {
@@ -12,6 +20,9 @@
     margin-top: 0;
     padding: 0;
     margin-left: Spacings.$spacing05;
+    display: flex;
+    flex-direction: column;
+    gap: Spacings.$spacing03;
 
     li {
       white-space-collapse: collapse;
@@ -54,9 +65,11 @@
   0% {
     font-size: 6px;
   }
+
   50% {
     font-size: 16px;
   }
+
   100% {
     font-size: 6px;
   }

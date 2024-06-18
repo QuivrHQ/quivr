@@ -1,42 +1,61 @@
-@use "@/styles/Radius.module.scss";
-@use "@/styles/Spacings.module.scss";
-@use "@/styles/Typography.module.scss";
+@use "styles/Radius.module.scss";
+@use "styles/ScreenSizes.module.scss";
+@use "styles/Spacings.module.scss";
+@use "styles/Transitions.module.scss";
+@use "styles/Typography.module.scss";
 
 .message_row_container {
   display: flex;
   flex-direction: column;
   padding-right: Spacings.$spacing05;
-  width: 85%;
-  padding-block: Spacings.$spacing03;
   gap: Spacings.$spacing03;
+  border-bottom: 1px solid var(--border-0);
+  padding-bottom: Spacings.$spacing05;
+  position: relative;
+
+  &.user {
+    font-size: Typography.$very_large;
+    font-weight: 500;
+    border-bottom: none;
+  }
+
+  &.last {
+    border-bottom: none;
+  }
+
+  &.smaller {
+    font-size: Typography.$large;
+  }
+
+  @media screen and (max-width: ScreenSizes.$small) {
+    &.user {
+      font-size: Typography.$large;
+    }
+  }
+
+  .icon_rotate {
+    position: absolute;
+    right: Spacings.$spacing04;
+    top: -(Spacings.$spacing05);
+    transition: transform 0.3s Transitions.$easeOutBack;
+  }
+
+  .icon_rotate_down {
+    transform: rotate(0deg);
+  }
+
+  .icon_rotate_up {
+    transform: rotate(-180deg);
+  }
 
   .message_row_content {
-    align-self: flex-end;
     border-radius: Radius.$big;
     width: fit-content;
     padding-block: Spacings.$spacing03;
-    padding-inline: Spacings.$spacing05;
   }
 
-  .message_header {
-    padding: Spacings.$spacing02;
+  .message_header_wrapper {
     overflow: hidden;
-  }
-
-  &.user {
-    align-self: flex-end;
-
-    .message_header {
-      align-self: flex-end;
-      display: flex;
-      gap: Spacings.$spacing02;
-      align-items: center;
-      color: var(--text-2);
-    }
-
-    .message_row_content {
-      background-color: var(--background-2);
-    }
   }
 
   &.brain {
@@ -44,13 +63,13 @@
       display: flex;
       gap: Spacings.$spacing04;
       align-items: baseline;
+      @include Typography.H2;
     }
 
     .message_row_content {
       align-self: flex-start;
-      background-color: var(--background-special-0);
-      margin-left: 1px;
       position: relative;
+      padding: 0;
     }
 
     .metadata_wrapper {
@@ -65,64 +84,77 @@
         flex-direction: column;
         gap: Spacings.$spacing03;
         max-width: 100%;
+        padding-bottom: Spacings.$spacing05;
+
+        .title_wrapper {
+          display: flex;
+          align-items: center;
+          gap: Spacings.$spacing03;
+
+          .title {
+            @include Typography.H2;
+          }
+        }
 
         .sources {
           display: flex;
-          gap: Spacings.$spacing03;
+          column-gap: Spacings.$spacing06;
+          row-gap: Spacings.$spacing03;
           flex-wrap: wrap;
           max-width: 100%;
-        }
-
-        .citations {
-          display: flex;
-          flex-direction: column;
-          gap: Spacings.$spacing02;
-          padding: Spacings.$spacing03;
-          border: 1px solid var(--primary-0);
-          border-radius: Radius.$big;
-          font-size: Typography.$small;
-
-          .file_name_wrapper {
-            display: flex;
-            gap: Spacings.$spacing03;
-            align-items: center;
-
-            .box_title {
-              padding-block: Spacings.$spacing02;
-              font-weight: 600;
-            }
-
-            .source {
-              font-size: Typography.$tiny;
-            }
-          }
-
-          .box_title {
-            padding-block: Spacings.$spacing02;
-            font-weight: 600;
-          }
         }
       }
 
       .icons_wrapper {
-        visibility: hidden;
         display: flex;
-        gap: Spacings.$spacing03;
+        gap: Spacings.$spacing04;
+        padding-top: Spacings.$spacing03;
+        padding-bottom: Spacings.$spacing05;
+        width: 100%;
+        justify-content: flex-end;
 
-        .sources_icon_wrapper {
-          cursor: pointer;
-        }
-
-        &.sticky {
-          visibility: visible;
+        .with_border {
+          border-bottom: 1px solid var(--border-0);
         }
       }
     }
 
-    &:hover {
-      .metadata_wrapper {
-        .icons_wrapper {
-          visibility: visible;
+    .related_questions_wrapper {
+      display: flex;
+      flex-direction: column;
+      gap: Spacings.$spacing03;
+      padding-block: Spacings.$spacing03;
+
+      .title_wrapper {
+        display: flex;
+        align-items: center;
+        gap: Spacings.$spacing03;
+
+        .title {
+          @include Typography.H2;
+        }
+      }
+
+      .questions_wrapper {
+        display: flex;
+        flex-direction: column;
+        gap: Spacings.$spacing02;
+        font-size: Typography.$small;
+
+        .question {
+          display: flex;
+          align-items: center;
+          gap: Spacings.$spacing03;
+
+          .text {
+            color: var(--text-4);
+            transition: color 0.5s ease;
+
+            &:hover {
+              color: var(--text-3);
+              cursor: pointer;
+            }
+          }
         }
       }
     }

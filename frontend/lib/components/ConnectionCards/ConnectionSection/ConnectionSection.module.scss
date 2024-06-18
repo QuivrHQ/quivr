@@ -1,9 +1,9 @@
-@use "@/styles/BoxShadow.module.scss";
-@use "@/styles/Radius.module.scss";
-@use "@/styles/ScreenSizes.module.scss";
-@use "@/styles/Spacings.module.scss";
-@use "@/styles/Transitions.module.scss";
-@use "@/styles/Typography.module.scss";
+@use "styles/BoxShadow.module.scss";
+@use "styles/Radius.module.scss";
+@use "styles/ScreenSizes.module.scss";
+@use "styles/Spacings.module.scss";
+@use "styles/Transitions.module.scss";
+@use "styles/Typography.module.scss";
 
 .connection_section_wrapper {
   padding: Spacings.$spacing05;
@@ -37,15 +37,15 @@
       align-items: center;
     }
 
-    .iconRotate {
+    .icon_rotate {
       transition: transform 0.3s Transitions.$easeOutBack;
     }
 
-    .iconRotateDown {
+    .icon_rotate_down {
       transform: rotate(0deg);
     }
 
-    .iconRotateRight {
+    .icon_rotate_right {
       transform: rotate(-90deg);
 
       .label {

@@ -1,7 +1,7 @@
-@use "@/styles/Radius.module.scss";
-@use "@/styles/Spacings.module.scss";
-@use "@/styles/Typography.module.scss";
-@use "@/styles/Transitions.module.scss";
+@use "styles/Radius.module.scss";
+@use "styles/Spacings.module.scss";
+@use "styles/Transitions.module.scss";
+@use "styles/Typography.module.scss";
 
 .foldable_section_wrapper {
   display: flex;
@@ -53,15 +53,15 @@
     }
   }
 
-  .iconRotate {
+  .icon_rotate {
     transition: transform 0.3s Transitions.$easeOutBack;
   }
 
-  .iconRotateDown {
+  .icon_rotate_down {
     transform: rotate(0deg);
   }
 
-  .iconRotateRight {
+  .icon_rotate_right {
     transform: rotate(-90deg);
   }
 }

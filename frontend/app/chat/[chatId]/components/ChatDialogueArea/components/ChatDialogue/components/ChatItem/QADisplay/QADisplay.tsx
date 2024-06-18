@@ -1,6 +1,6 @@
 import { ChatMessage } from "@/app/chat/[chatId]/types";
 
-import { MessageRow } from "./components";
+import { MessageRow } from "./components/MessageRow/MessageRow";
 import "./styles.css";
 
 type QADisplayProps = {
@@ -18,7 +18,6 @@ export const QADisplay = ({
     message_id,
     user_message,
     brain_name,
-    prompt_title,
     metadata,
     brain_id,
     thumbs,
@@ -30,7 +29,6 @@ export const QADisplay = ({
         key={`user-${message_id}`}
         speaker={"user"}
         text={user_message}
-        promptName={prompt_title}
         metadata={metadata} // eslint-disable-line @typescript-eslint/no-unsafe-assignment
       />
       <MessageRow
@@ -38,7 +36,6 @@ export const QADisplay = ({
         speaker={"assistant"}
         text={assistant}
         brainName={brain_name}
-        promptName={prompt_title}
         brainId={brain_id}
         index={index}
         metadata={metadata} // eslint-disable-line @typescript-eslint/no-unsafe-assignment
