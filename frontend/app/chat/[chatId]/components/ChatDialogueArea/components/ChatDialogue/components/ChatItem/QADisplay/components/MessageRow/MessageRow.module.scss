@@ -102,20 +102,6 @@
           flex-wrap: wrap;
           max-width: 100%;
         }
-
-        .citations {
-          display: grid;
-          grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-          gap: Spacings.$spacing03;
-          padding: Spacings.$spacing03;
-          border-radius: Radius.$big;
-          font-size: Typography.$small;
-
-          .box_title {
-            padding-block: Spacings.$spacing02;
-            font-weight: 600;
-          }
-        }
       }
 
       .icons_wrapper {

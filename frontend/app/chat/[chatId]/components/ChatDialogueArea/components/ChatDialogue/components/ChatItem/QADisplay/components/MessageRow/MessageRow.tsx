@@ -9,7 +9,6 @@ import { ThoughtsButton } from "@/lib/components/ui/ThoughtsButton";
 import { Source } from "@/lib/types/MessageMetadata";
 
 import styles from "./MessageRow.module.scss";
-import { Citation } from "./components/Citation/Citation";
 import { MessageContent } from "./components/MessageContent/MessageContent";
 import { QuestionBrain } from "./components/QuestionBrain/QuestionBrain";
 import { SourceCitations } from "./components/Source/Source";
@@ -59,15 +58,7 @@ const MessageRow = React.forwardRef(
     );
     const [folded, setFolded] = useState<boolean>(false);
     const [sourceFiles, setSourceFiles] = useState<SourceFile[]>([]);
-    const [selectedSourceFile, setSelectedSourceFile] =
-      useState<SourceFile | null>(null);
     const { submitQuestion } = useChatInput();
-
-    const handleSourceFileClick = (sourceFile: SourceFile) => {
-      setSelectedSourceFile((prev) =>
-        prev && prev.filename === sourceFile.filename ? null : sourceFile
-      );
-    };
 
     useEffect(() => {
       setThumbs(initialThumbs);
@@ -163,30 +154,11 @@ const MessageRow = React.forwardRef(
                 </div>
                 <div className={styles.sources}>
                   {sourceFiles.map((sourceFile, i) => (
-                    <div
-                      key={i}
-                      onClick={() => handleSourceFileClick(sourceFile)}
-                    >
-                      <SourceCitations
-                        sourceFile={sourceFile}
-                        isSelected={
-                          !!selectedSourceFile &&
-                          selectedSourceFile.filename === sourceFile.filename
-                        }
-                      />
+                    <div key={i}>
+                      <SourceCitations sourceFile={sourceFile} />
                     </div>
                   ))}
                 </div>
-
-                {selectedSourceFile && (
-                  <div className={styles.citations}>
-                    {selectedSourceFile.citations.map((citation, i) => (
-                      <div key={i}>
-                        <Citation citation={citation} />
-                      </div>
-                    ))}
-                  </div>
-                )}
               </div>
             )}
           </div>

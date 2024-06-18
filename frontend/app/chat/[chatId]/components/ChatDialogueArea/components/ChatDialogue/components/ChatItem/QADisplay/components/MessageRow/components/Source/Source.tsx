@@ -1,6 +1,7 @@
 import { useState } from "react";
 
 import Icon from "@/lib/components/ui/Icon/Icon";
+import Tooltip from "@/lib/components/ui/Tooltip/Tooltip";
 
 import styles from "./Source.module.scss";
 
@@ -8,34 +9,42 @@ import { SourceFile } from "../../types/types";
 
 type SourceProps = {
   sourceFile: SourceFile;
-  isSelected: boolean;
 };
-export const SourceCitations = ({
-  sourceFile,
-  isSelected,
-}: SourceProps): JSX.Element => {
+export const SourceCitations = ({ sourceFile }: SourceProps): JSX.Element => {
   const [isExpanded, setIsExpanded] = useState<boolean>(false);
 
   return (
-    <div className={styles.source_container}>
+    <div className={styles.source_and_citations_container}>
       <div
-        className={`${styles.source_wrapper} ${
-          isSelected ? styles.selected_source : ""
-        }`}
+        className={styles.source_wrapper}
         onClick={() => setIsExpanded(!isExpanded)}
       >
-        <div className={styles.source_header}>
-          <span className={styles.filename}>{sourceFile.filename}</span>
-        </div>
+        <a
+          onClick={(event) => event.stopPropagation()}
+          href={sourceFile.file_url}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <div className={styles.source_header}>
+            <span className={styles.filename}>{sourceFile.filename}</span>
+            <Icon
+              name="externLink"
+              size="small"
+              color="black"
+              handleHover={true}
+            />
+          </div>
+        </a>
       </div>
-      <a
-        onClick={(event) => event.stopPropagation()}
-        href={sourceFile.file_url}
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        <Icon name="externLink" size="small" color="black" handleHover={true} />
-      </a>
+      <div className={styles.citations_container}>
+        {sourceFile.citations.map((citation, i) => (
+          <div key={i}>
+            <Tooltip tooltip={citation} small={true}>
+              <span className={styles.citation_index}>[{i + 1}]</span>
+            </Tooltip>
+          </div>
+        ))}
+      </div>
     </div>
   );
 };

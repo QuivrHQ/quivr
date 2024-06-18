@@ -3,10 +3,10 @@
 @use "@/styles/Spacings.module.scss";
 @use "@/styles/Typography.module.scss";
 
-.source_container {
+.source_and_citations_container {
   display: flex;
-  align-items: center;
-  gap: Spacings.$spacing03;
+  flex-direction: column;
+  gap: Spacings.$spacing01;
 
   .source_wrapper {
     padding: Spacings.$spacing03;
@@ -18,13 +18,6 @@
     display: flex;
     gap: Spacings.$spacing03;
     cursor: pointer;
-
-    &.selected_source {
-      background-color: var(--primary-0);
-      color: var(--text-0);
-      border-color: var(--primary-0);
-      transition: background-color 0.3s ease;
-    }
 
     .source_header {
       display: flex;
@@ -42,9 +35,24 @@
       }
     }
 
-    &:hover:not(.selected_source) {
+    &:hover {
       border-color: var(--primary-0);
       transition: border-color 0.3s ease;
+    }
+  }
+}
+
+.citations_container {
+  display: flex;
+  gap: Spacings.$spacing02;
+
+  .citation_index {
+    cursor: pointer;
+    color: var(--text-4);
+    font-size: Typography.$tiny;
+
+    &:hover {
+      color: var(--primary-0);
     }
   }
 }
