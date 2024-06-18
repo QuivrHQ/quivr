@@ -6,9 +6,11 @@ import styles from "./MessageContent.module.scss";
 export const MessageContent = ({
   text,
   isUser,
+  hide,
 }: {
   text: string;
   isUser: boolean;
+  hide: boolean;
 }): JSX.Element => {
   const [showLog] = useState(true);
   const [isLog, setIsLog] = useState(true);
@@ -19,7 +21,6 @@ export const MessageContent = ({
     let match;
 
     while ((match = logRegex.exec(log))) {
-      // Add two spaces and a newline for markdown line break
       // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
       logs.push("- " + match[1] + "  \n");
     }
@@ -41,7 +42,10 @@ export const MessageContent = ({
   const { logs, cleanedText } = extractLog(text);
 
   return (
-    <div data-testid="chat-message-text">
+    <div
+      className={hide && !isUser ? styles.hiden : ""}
+      data-testid="chat-message-text"
+    >
       {isLog && showLog && logs.length > 0 && (
         <div className="text-xs text-white p-2 rounded">
           <ReactMarkdown>{logs}</ReactMarkdown>

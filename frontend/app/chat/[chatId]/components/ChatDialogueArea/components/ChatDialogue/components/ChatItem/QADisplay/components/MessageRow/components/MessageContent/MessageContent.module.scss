@@ -1,6 +1,10 @@
 @use "@/styles/Spacings.module.scss";
 @use "@/styles/Typography.module.scss";
 
+.hiden {
+  display: none;
+}
+
 .markdown {
   p {
     margin: 0;
@@ -12,6 +16,9 @@
     margin-top: 0;
     padding: 0;
     margin-left: Spacings.$spacing05;
+    display: flex;
+    flex-direction: column;
+    gap: Spacings.$spacing03;
 
     li {
       white-space-collapse: collapse;
