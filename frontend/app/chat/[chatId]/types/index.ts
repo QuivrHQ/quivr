@@ -22,6 +22,7 @@ export type ChatMessage = {
   metadata?: {
     sources?: Source[];
     thoughts?: string;
+    followup_questions?: string[];
   };
   thumbs?: boolean;
 };

@@ -54,8 +54,8 @@ div:focus {
   /* Backgrounds */
   --background-0: var(--white-0);
   --background-1: var(--white-1);
-  --background-2: var(--grey-5);
-  --background-3: var(--grey-3);
+  --background-2: var(--grey-6);
+  --background-3: var(--grey-4);
   --background-4: var(--grey-0);
   --background-5: var(--black-0);
   --background-special-0: var(--primary-2);
@@ -63,21 +63,22 @@ div:focus {
   --background-blur: rgba(0, 0, 0, 0.9);
 
   /* Borders */
-  --border-0: var(--grey-4);
-  --border-1: var(--grey-3);
-  --border-2: var(--grey-1);
+  --border-0: var(--grey-5);
+  --border-1: var(--grey-4);
+  --border-2: var(--grey-2);
 
   /* Icons */
   --icon-0: var(--white-0);
-  --icon-1: var(--grey-1);
+  --icon-1: var(--grey-2);
   --icon-2: var(--grey-0);
   --icon-3: var(--black-0);
 
   /* Text */
   --text-0: var(--white-0);
-  --text-1: var(--grey-1);
+  --text-1: var(--grey-2);
   --text-2: var(--grey-0);
   --text-3: var(--black-0);
+  --text-4: var(--grey-1);
 
   /* Box Shadow */
   --box-shadow: rgba(0, 0, 0, 0.25);
@@ -98,20 +99,21 @@ body.dark_mode {
  
   /* Borders */
   --border-0: var(--white-0);
-  --border-1: var(--grey-1);
-  --border-2: var(--grey-2);
+  --border-1: var(--grey-2);
+  --border-2: var(--grey-3);
  
   /* Icons */
   --icon-0: var(--black-0);
   --icon-1: var(--grey-0);
-  --icon-2: var(--grey-1);
+  --icon-2: var(--grey-2);
   --icon-3: var(--white-0);
  
   /* Text */
   --text-0: var(--black-0);
   --text-1: var(--grey-0);
-  --text-2: var(--grey-1);
+  --text-2: var(--grey-2);
   --text-3: var(--white-2);
+  --text-4: var(--grey-1);
 
   /* Box Shadow */
   --box-shadow: rgba(255, 255, 255, 0.25);

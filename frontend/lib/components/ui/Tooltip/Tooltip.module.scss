@@ -12,4 +12,9 @@
   white-space: pre-wrap;
   overflow: hidden;
   max-width: 300px;
+
+  &.small {
+    max-height: 300px;
+    overflow: scroll;
+  }
 }

@@ -1,0 +1,35 @@
+@use "@/styles/Spacings.module.scss";
+@use "@/styles/Typography.module.scss";
+
+.modal_wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: Spacings.$spacing05;
+
+  .title_wrapper {
+    display: flex;
+    gap: Spacings.$spacing03;
+    align-items: baseline;
+    overflow: hidden;
+    padding-right: Spacings.$spacing05;
+
+    .title {
+      white-space: nowrap;
+    }
+
+    .file_link {
+      font-weight: 600;
+      overflow: hidden;
+      @include Typography.EllipsisOverflow;
+
+      .filename {
+        @include Typography.EllipsisOverflow;
+      }
+    }
+  }
+
+  .citation {
+    font-size: Typography.$small;
+    font-style: italic;
+  }
+}

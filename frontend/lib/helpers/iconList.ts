@@ -29,6 +29,7 @@ import {
 } from "react-icons/fa";
 import { FaInfo } from "react-icons/fa6";
 import { FiUpload } from "react-icons/fi";
+import { GoLightBulb } from "react-icons/go";
 import { HiBuildingOffice } from "react-icons/hi2";
 import {
   IoIosAdd,
@@ -42,6 +43,7 @@ import {
 } from "react-icons/io";
 import {
   IoArrowUpCircleOutline,
+  IoBookOutline,
   IoCloudDownloadOutline,
   IoFootsteps,
   IoHomeOutline,
@@ -57,6 +59,7 @@ import {
   LuChevronLeft,
   LuChevronRight,
   LuCopy,
+  LuExternalLink,
   LuGoal,
   LuPlusCircle,
   LuSearch,
@@ -107,6 +110,8 @@ export const iconList: { [name: string]: IconType } = {
   download: IoCloudDownloadOutline,
   edit: MdOutlineModeEditOutline,
   email: MdAlternateEmail,
+  eureka: GoLightBulb,
+  externLink: LuExternalLink,
   feed: MdDynamicFeed,
   file: FaRegFileAlt,
   fileSelected: FaFileAlt,
@@ -142,6 +147,7 @@ export const iconList: { [name: string]: IconType } = {
   settings: IoMdSettings,
   share: IoShareSocial,
   software: CgSoftwareDownload,
+  sources: IoBookOutline,
   star: FaRegStar,
   step: IoFootsteps,
   sun: MdOutlineLightMode,
