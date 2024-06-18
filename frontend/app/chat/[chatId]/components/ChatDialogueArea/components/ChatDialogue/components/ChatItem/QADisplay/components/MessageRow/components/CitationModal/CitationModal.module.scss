@@ -9,7 +9,7 @@
   .title_wrapper {
     display: flex;
     gap: Spacings.$spacing03;
-    align-items: center;
+    align-items: baseline;
 
     .title {
       font-weight: 700;

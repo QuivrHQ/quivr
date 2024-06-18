@@ -98,7 +98,8 @@
 
         .sources {
           display: flex;
-          gap: Spacings.$spacing06;
+          column-gap: Spacings.$spacing06;
+          row-gap: Spacings.$spacing03;
           flex-wrap: wrap;
           max-width: 100%;
         }
