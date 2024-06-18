@@ -112,6 +112,9 @@ class BrainSettings(BaseSettings):
     resend_api_key: str = "null"
     resend_email_address: str = "brain@mail.quivr.app"
     ollama_api_base_url: str = None
+    ollama_embeddings_model: str = None,
+    ollama_embeddings_doc_instruct: str = None,
+    ollama_embeddings_query_instruct: str = None,
     langfuse_public_key: str = None
     langfuse_secret_key: str = None
     pg_database_url: str = None
@@ -161,6 +164,9 @@ def get_embeddings():
     if settings.ollama_api_base_url:
         embeddings = OllamaEmbeddings(
             base_url=settings.ollama_api_base_url,
+            model=settings.ollama_embeddings_model,
+            embed_instruction=settings.ollama_embeddings_doc_instruct,
+            query_instruction=settings.ollama_embeddings_query_instruct,
         )  # pyright: ignore reportPrivateUsage=none
     else:
         embeddings = OpenAIEmbeddings()  # pyright: ignore reportPrivateUsage=none

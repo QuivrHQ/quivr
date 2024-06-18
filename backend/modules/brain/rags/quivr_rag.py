@@ -12,7 +12,6 @@ from langchain.retrievers.document_compressors import FlashrankRerank
 from langchain.schema import format_document
 from langchain_cohere import CohereRerank
 from langchain_community.chat_models import ChatLiteLLM
-from langchain_community.embeddings import OllamaEmbeddings
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate, PromptTemplate
 from langchain_core.pydantic_v1 import BaseModel as BaseModelV1
@@ -21,7 +20,7 @@ from langchain_core.runnables import RunnableLambda, RunnablePassthrough
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 from logger import get_logger
 from models import BrainSettings  # Importing settings related to the 'brain'
-from models.settings import get_supabase_client
+from models.settings import get_supabase_client, get_embeddings
 from modules.brain.service.brain_service import BrainService
 from modules.chat.service.chat_service import ChatService
 from modules.knowledge.repository.knowledges import Knowledges
@@ -153,9 +152,7 @@ class QuivrRAG(BaseModel):
     @property
     def embeddings(self):
         if self.brain_settings.ollama_api_base_url:
-            return OllamaEmbeddings(
-                base_url=self.brain_settings.ollama_api_base_url
-            )  # pyright: ignore reportPrivateUsage=none
+            return get_embeddings()
         else:
             return OpenAIEmbeddings()
 

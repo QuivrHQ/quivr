@@ -3,11 +3,10 @@ from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from fastapi.responses import StreamingResponse
-from langchain_community.embeddings import OllamaEmbeddings
 from langchain_openai import OpenAIEmbeddings
 from logger import get_logger
 from middlewares.auth import AuthBearer, get_current_user
-from models.settings import BrainSettings, get_supabase_client
+from models.settings import BrainSettings, get_supabase_client, get_embeddings
 from modules.brain.service.brain_service import BrainService
 from modules.chat.controller.chat.brainful_chat import BrainfulChat
 from modules.chat.dto.chats import ChatItem, ChatQuestion
@@ -40,9 +39,7 @@ def init_vector_store(user_id: UUID) -> CustomSupabaseVectorStore:
     supabase_client = get_supabase_client()
     embeddings = None
     if brain_settings.ollama_api_base_url:
-        embeddings = OllamaEmbeddings(
-            base_url=brain_settings.ollama_api_base_url
-        )  # pyright: ignore reportPrivateUsage=none
+        embeddings = get_embeddings()
     else:
         embeddings = OpenAIEmbeddings()
     vector_store = CustomSupabaseVectorStore(
