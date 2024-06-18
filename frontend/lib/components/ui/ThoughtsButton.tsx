@@ -12,7 +12,7 @@ export const ThoughtsButton = ({
   size,
 }: ThoughtsButtonProps): JSX.Element => {
   return (
-    <Tooltip tooltip={`Extra information\n\n${text}`}>
+    <Tooltip tooltip={`How did I get here?\n\n${text}`}>
       <div>
         <Icon name="eureka" size={size} color="black" handleHover={true} />
       </div>
