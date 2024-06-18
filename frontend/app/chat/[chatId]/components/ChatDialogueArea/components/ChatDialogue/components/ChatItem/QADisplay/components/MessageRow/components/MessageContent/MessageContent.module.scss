@@ -1,5 +1,9 @@
-@use "@/styles/Spacings.module.scss";
-@use "@/styles/Typography.module.scss";
+@use "styles/Spacings.module.scss";
+@use "styles/Typography.module.scss";
+
+.hiden {
+  display: none;
+}
 
 .hiden {
   display: none;
@@ -61,9 +65,11 @@
   0% {
     font-size: 6px;
   }
+
   50% {
     font-size: 16px;
   }
+
   100% {
     font-size: 6px;
   }

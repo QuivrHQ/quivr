@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "baseUrl": ".",
     "lib": [
       "dom",
       "dom.iterable",
@@ -26,6 +27,9 @@
     "paths": {
       "@/*": [
         "./*"
+      ],
+      "@/styles/*": [
+        "styles/*"
       ]
     }
   },
