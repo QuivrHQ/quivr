@@ -58,7 +58,7 @@ export const KnowledgeToFeed = ({
       ).length,
     },
     {
-      label: "Websites",
+      label: "Websites' page",
       isSelected: selectedTab === "Websites",
       onClick: () => setSelectedTab("Websites"),
       iconName: "website",

@@ -9,7 +9,7 @@ export const FromWebsites = (): JSX.Element => {
   return (
     <div className={styles.from_document_wrapper}>
       <TextInput
-        label="Enter a website URL"
+        label="Enter a website's page URL"
         setInputValue={setUrlToCrawl}
         inputValue={urlToCrawl}
         iconName="followUp"
