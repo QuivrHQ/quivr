@@ -1,7 +1,7 @@
-@use "@/styles/BoxShadow.module.scss";
-@use "@/styles/Radius.module.scss";
-@use "@/styles/Spacings.module.scss";
-@use "@/styles/ZIndexes.module.scss";
+@use "styles/BoxShadow.module.scss";
+@use "styles/Radius.module.scss";
+@use "styles/Spacings.module.scss";
+@use "styles/ZIndexes.module.scss";
 
 .options_modal_wrapper {
   background-color: var(--background-1);

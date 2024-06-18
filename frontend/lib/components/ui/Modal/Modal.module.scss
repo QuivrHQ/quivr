@@ -1,8 +1,8 @@
-@use "@/styles/BoxShadow.module.scss";
-@use "@/styles/Radius.module.scss";
-@use "@/styles/ScreenSizes.module.scss";
-@use "@/styles/Spacings.module.scss";
-@use "@/styles/ZIndexes.module.scss";
+@use "styles/BoxShadow.module.scss";
+@use "styles/Radius.module.scss";
+@use "styles/ScreenSizes.module.scss";
+@use "styles/Spacings.module.scss";
+@use "styles/ZIndexes.module.scss";
 
 .modal_container {
   display: flex;

@@ -1,6 +1,6 @@
-@use "@/styles/Radius.module.scss";
-@use "@/styles/ScreenSizes.module.scss";
-@use "@/styles/Spacings.module.scss";
+@use "styles/Radius.module.scss";
+@use "styles/ScreenSizes.module.scss";
+@use "styles/Spacings.module.scss";
 
 .user_page_container {
   padding-inline: Spacings.$spacing09;
