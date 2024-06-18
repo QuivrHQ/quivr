@@ -48,6 +48,9 @@ You can find the installation video [here](https://www.youtube.com/watch?v=cXBa6
   > OLLAMA_API_BASE_URL
   > Run the following command to start Ollama: `ollama run llama2`
   > You can find more information about Ollama [here](https://ollama.ai/).
+  > Also you need to rename `backend/supabase/migrations/local_20240107152745_ollama.sql` removing `local_` prefix.
+  > You either need to rename it before starting supabase or run supabase migration after renaming.
+  > Check `.env.example` comments regarding choosing another embeddings model in Ollama
 
 - **Step 4**: Launch the project
 
