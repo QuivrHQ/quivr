@@ -9,6 +9,8 @@ from langchain.schema import (
     format_document,
 )
 
+from backend.logger import get_logger
+
 # TODO(@aminediro): define a types packages where we clearly define IO types
 # This should be used for serialization/deseriallization later
 from backend.modules.brain.rags.quivr_rag import DEFAULT_DOCUMENT_PROMPT
@@ -24,6 +26,8 @@ from backend.packages.quivr_core.models import (
     RAGResponseMetadata,
     RawRAGResponse,
 )
+
+logger = get_logger(__name__)
 
 
 def model_supports_function_calling(model_name: str):
@@ -76,11 +80,9 @@ def parse_chunk_response(
     raw_chunk: Any,
     supports_func_calling: bool,
 ) -> ParsedRAGChunkResponse:
-    if "answer" not in raw_chunk:
-        raise Exception("no answer")
 
-    sources = raw_chunk["docs"] or []
-    metadata = {"sources": sources}
+    # Init with sources
+    metadata = {"sources": raw_chunk["docs"] if "docs" in raw_chunk else []}
 
     if supports_func_calling:
         # TODO: What is this assignment ?

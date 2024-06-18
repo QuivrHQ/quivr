@@ -200,7 +200,7 @@ class QuivrQARAG:
         history: list[dict[str, str]],
         list_files: list[Knowledge],
         metadata: dict[str, str] = {},
-    ) -> AsyncGenerator[ParsedRAGChunkResponse, Any]:
+    ) -> AsyncGenerator[ParsedRAGChunkResponse | None, Any]:
         concat_list_files = format_file_list(list_files, self.rag_config.max_files)
         conversational_qa_chain = self.build_chain(concat_list_files)
         rolling_answer = ""
@@ -218,12 +218,12 @@ class QuivrQARAG:
             if self.supports_func_calling and first_chunk:
                 rolling_answer = chunk["answer"]
                 first_chunk = False
-                continue
 
-            parsed_chunk = parse_chunk_response(
-                rolling_answer,
-                stream_response,
-                chunk,
-                self.supports_func_calling,
-            )
-            yield parsed_chunk
+            if "answer" in chunk:
+                parsed_chunk = parse_chunk_response(
+                    rolling_answer,
+                    stream_response,
+                    chunk,
+                    self.supports_func_calling,
+                )
+                yield parsed_chunk

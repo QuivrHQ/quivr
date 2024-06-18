@@ -7,18 +7,19 @@ from backend.modules.brain.entity.brain_entity import BrainEntity
 from backend.modules.brain.entity.integration_brain import IntegrationEntity
 from backend.modules.brain.integrations.Big.Brain import BigBrain
 from backend.modules.brain.integrations.GPT4.Brain import GPT4Brain
-from backend.modules.brain.integrations.Multi_Contract.Brain import \
-    MultiContractBrain
+from backend.modules.brain.integrations.Multi_Contract.Brain import MultiContractBrain
 from backend.modules.brain.integrations.Notion.Brain import NotionBrain
 from backend.modules.brain.integrations.Proxy.Brain import ProxyBrain
 from backend.modules.brain.integrations.Self.Brain import SelfBrain
 from backend.modules.brain.integrations.SQL.Brain import SQLBrain
 from backend.modules.brain.knowledge_brain_qa import KnowledgeBrainQA
 from backend.modules.brain.service.brain_service import BrainService
-from backend.modules.brain.service.utils.format_chat_history import \
-    format_chat_history
+from backend.modules.brain.service.utils.format_chat_history import format_chat_history
 from backend.modules.chat.controller.chat.utils import (
-    compute_cost, find_model_and_generate_metadata, update_user_usage)
+    compute_cost,
+    find_model_and_generate_metadata,
+    update_user_usage,
+)
 from backend.modules.chat.dto.inputs import CreateChatHistory
 from backend.modules.chat.dto.outputs import GetChatHistoryOutput
 from backend.modules.chat.service.chat_service import ChatService
@@ -225,7 +226,6 @@ class RAGService:
             self.brain.brain_id, rag_config.max_input
         )
         # Initialize the rag pipline
-        breakpoint()
         rag_pipeline = QuivrQARAG(rag_config, vector_store)
         #  Format the history, sanitize the input
         transformed_history = format_chat_history(history)
@@ -237,30 +237,33 @@ class RAGService:
             streamed_chat_history = GetChatHistoryOutput(
                 chat_id=self.chat_id,
                 message_id=None,  # do we need it ?,
-                user_message=question,
-                message_time=None,
+                user_message=question,  # TODO: define result
+                message_time=None,  # TODO: define result
                 assistant=response.answer,  # TODO: define result
                 prompt_title=(self.prompt.title if self.prompt else ""),
                 brain_name=self.brain.name if self.brain else None,
                 brain_id=self.brain.brain_id if self.brain else None,
+                # TODO: no need to serialize here ! change the OUTPUT MODEL
                 metadata={
                     **response.metadata.model_dump(),
                     "sources": None,
                 },
             )
-            yield f"data {streamed_chat_history.model_dump_json()}"
+            yield f"data: {streamed_chat_history.model_dump_json()}"
 
         # For last chunk yield the sources
         if streamed_chat_history.metadata:
             sources_urls = generate_source(
-                streamed_chat_history.metadata.sources,
+                streamed_chat_history.metadata["sources"],
                 self.brain.brain_id,
-                streamed_chat_history.metadata.citations,
+                streamed_chat_history.metadata["citations"],
             )
             # TODO: not great for performance
-            streamed_chat_history.metadata.sources = [
+            # TODO: no need to serialize here ! change the OUTPUT MODEL
+            streamed_chat_history.metadata["sources"] = [
                 s.model_dump() for s in sources_urls
             ]
+            breakpoint()
             yield f"data: {streamed_chat_history.model_dump_json()}"
 
         # self.save_answer(question, response_tokens, streamed_chat_history, save_answer)
