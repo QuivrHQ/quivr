@@ -243,34 +243,49 @@ class RAGService:
             question, transformed_history, list_files
         ):
             # Format output to be correct servicedf;j
-            streamed_chat_history = GetChatHistoryOutput(
-                chat_id=self.chat_id,
-                message_id=None,  # do we need it ?,
-                user_message=question,  # TODO: define result
-                message_time=None,  # TODO: define result
-                assistant=response.answer,  # TODO: define result
-                prompt_title=(self.prompt.title if self.prompt else ""),
-                brain_name=self.brain.name if self.brain else None,
-                brain_id=self.brain.brain_id if self.brain else None,
-                # TODO: no need to serialize here ! change the OUTPUT MODEL
-                metadata=response.metadata.model_dump(),
-            )
-            full_answer += response.answer
-            yield f"data: {streamed_chat_history.model_dump_json()}"
+            if not response.last_chunk:
+                streamed_chat_history = GetChatHistoryOutput(
+                    chat_id=self.chat_id,
+                    message_id=None,  # do we need it ?,
+                    user_message=question,  # TODO: define result
+                    message_time=None,  # TODO: define result
+                    assistant=response.answer,  # TODO: define result
+                    prompt_title=(self.prompt.title if self.prompt else ""),
+                    brain_name=self.brain.name if self.brain else None,
+                    brain_id=self.brain.brain_id if self.brain else None,
+                    # TODO: no need to serialize here ! change the OUTPUT MODEL
+                    metadata=response.metadata.model_dump(),
+                )
+                full_answer += response.answer
+                yield f"data: {streamed_chat_history.model_dump_json()}"
 
-        # For last chunk yield the sources
+        # For last chunk  parse the sources, and the full answer
+        streamed_chat_history = GetChatHistoryOutput(
+            chat_id=self.chat_id,
+            message_id=None,  # do we need it ?,
+            user_message=question,  # TODO: define result
+            message_time=None,  # TODO: define result
+            assistant=full_answer,  # TODO: define result
+            prompt_title=(self.prompt.title if self.prompt else ""),
+            brain_name=self.brain.name if self.brain else None,
+            brain_id=self.brain.brain_id if self.brain else None,
+            metadata=response.metadata.model_dump(),
+        )
+
+        # TODO: NOT GREAT TYPING
+        sources_urls = generate_source(
+            response.metadata.sources,
+            self.brain.brain_id,
+            (
+                streamed_chat_history.metadata["citations"]
+                if streamed_chat_history.metadata
+                else None
+            ),
+        )
         if streamed_chat_history.metadata:
-            sources_urls = generate_source(
-                streamed_chat_history.metadata["sources"],
-                self.brain.brain_id,
-                streamed_chat_history.metadata["citations"],
-            )
-            # TODO: not great for performance
-            # TODO: no need to serialize here ! change the OUTPUT MODEL
-            streamed_chat_history.metadata["sources"] = [
-                s.model_dump() for s in sources_urls
-            ]
-            yield f"data: {streamed_chat_history.model_dump_json()}"
+            streamed_chat_history.metadata["sources"] = sources_urls
+
+        yield f"data: {streamed_chat_history.model_dump_json()}"
 
         self.save_answer(
             question,

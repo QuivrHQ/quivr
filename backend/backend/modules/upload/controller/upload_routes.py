@@ -77,8 +77,7 @@ async def upload_file(
     filename_with_brain_id = str(brain_id) + "/" + str(uploadFile.filename)
 
     try:
-        # DEBUG
-        upload_file_storage(file_content, filename_with_brain_id, upsert="true")
+        upload_file_storage(file_content, filename_with_brain_id)
 
     except Exception as e:
         print(e)

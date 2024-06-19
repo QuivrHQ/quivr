@@ -73,51 +73,73 @@ def format_history_to_openai_mesages(
     return messages
 
 
+def cited_answer_filter(tool):
+    return tool["name"] == "cited_answer"
+
+
+def get_prev_message_str(msg: AIMessageChunk) -> str:
+    if msg.tool_calls:
+        cited_answer = next(x for x in msg.tool_calls if cited_answer_filter(x))
+        if "args" in cited_answer and "answer" in cited_answer["args"]:
+            return cited_answer["args"]["answer"]
+    return ""
+
+
+def get_chunk_metadata(
+    msg: AIMessageChunk, sources: list[Any] = []
+) -> RAGResponseMetadata:
+    # Initiate the source
+    metadata = {"sources": sources}
+    if msg.tool_calls:
+        cited_answer = next(x for x in msg.tool_calls if cited_answer_filter(x))
+
+        if "args" in cited_answer:
+            gathered_args = cited_answer["args"]
+            if "citations" in gathered_args:
+                citations = gathered_args["citations"]
+                metadata["citations"] = citations
+
+            if "followup_questions" in gathered_args:
+                followup_questions = gathered_args["followup_questions"]
+                metadata["followup_questions"] = followup_questions
+
+            if "thoughts" in gathered_args:
+                thoughts = gathered_args["thoughts"]
+                metadata["thoughts"] = thoughts
+
+    return RAGResponseMetadata(**metadata)
+
+
 # TODO: CONVOLUTED LOGIC !
 # TODO(@aminediro): redo this
 def parse_chunk_response(
-    rolling_message: AIMessageChunk,
-    rolling_response_str: str,
-    raw_chunk: Any,
+    gathered_msg: AIMessageChunk,
+    raw_chunk: dict[str, Any],
     supports_func_calling: bool,
 ) -> Tuple[AIMessageChunk, ParsedRAGChunkResponse]:
     # Init with sources
-    difference = ""
-    metadata = {"sources": raw_chunk["docs"] if "docs" in raw_chunk else []}
+    answer_str = ""
+    # Get the previously parsed answer
+    prev_answer = get_prev_message_str(gathered_msg)
 
-    breakpoint()
     if supports_func_calling:
-        rolling_message += raw_chunk["answer"]
+        gathered_msg += raw_chunk["answer"]
+        if gathered_msg.tool_calls:
+            cited_answer = next(
+                x for x in gathered_msg.tool_calls if cited_answer_filter(x)
+            )
+            if "args" in cited_answer:
+                gathered_args = cited_answer["args"]
+                if "answer" in gathered_args:
+                    # Only send the difference between answer and response_tokens which was the previous answer
+                    gathered_answer = gathered_args["answer"]
+                    answer_str: str = gathered_answer[len(prev_answer) :]
 
-        if rolling_message.tool_calls and "args" in rolling_message.tool_calls:
-            args = rolling_message.tool_calls[-1]["args"]
-
-            if "answer" in args:
-                # Only send the difference between answer and response_tokens which was the previous answer
-                answer = rolling_message.tool_calls[-1]["args"]["answer"]
-                # TODO(@aminediro) : WHYYY THIS  here?!?
-                difference: str = answer[len(rolling_response_str) :]
-                rolling_response_str = answer
-
-            if "citations" in args:
-                citations = rolling_message.tool_calls[-1]["args"]["citations"]
-                metadata["citations"] = citations
-
-            if "followup_questions" in args:
-                followup_questions = rolling_message.tool_calls[-1]["args"][
-                    "followup_questions"
-                ]
-                metadata["followup_questions"] = followup_questions
-            if "thoughts" in args:
-                thoughts = rolling_message.tool_calls[-1]["args"]["thoughts"]
-                metadata["thoughts"] = thoughts
-
-        return rolling_message, ParsedRAGChunkResponse(
-            answer=raw_chunk["answer"].content, metadata=RAGResponseMetadata(**metadata)
+        return gathered_msg, ParsedRAGChunkResponse(
+            answer=answer_str, metadata=RAGResponseMetadata()
         )
     else:
-        rolling_response_str += raw_chunk["answer"].content
-        return None, ParsedRAGChunkResponse(
+        return gathered_msg, ParsedRAGChunkResponse(
             answer=raw_chunk["answer"].content, metadata=RAGResponseMetadata()
         )
 
@@ -167,7 +189,7 @@ def format_file_list(list_files_array: list[Knowledge], max_files: int = 20) -> 
     return files_str
 
 
-# TODO: REFACTOR THIS
+# TODO: REFACTOR THIS, it does call the DB , so maybe a service
 def generate_source(
     source_documents: List[Any] | None,
     brain_id: UUID,
@@ -190,8 +212,7 @@ def generate_source(
     # If source documents exist
     if source_documents:
         logger.info(f"Citations {citations}")
-        # Iterate over each document
-        for doc, index in zip(source_documents, range(len(source_documents))):
+        for index, doc in enumerate(source_documents):
             logger.info(f"Processing source document {doc.metadata['file_name']}")
             if citations is not None:
                 if index not in citations:

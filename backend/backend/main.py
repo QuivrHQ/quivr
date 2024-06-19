@@ -69,7 +69,6 @@ if sentry_dsn:
     )
 
 app = FastAPI()
-
 add_cors_middleware(app)
 
 app.include_router(brain_router)

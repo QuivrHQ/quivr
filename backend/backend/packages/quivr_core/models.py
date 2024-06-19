@@ -52,7 +52,7 @@ class RAGResponseMetadata(BaseModel):
     citations: list[int] | None = None
     thoughts: str | list[str] | None = None
     followup_questions: list[str] | None = None
-    sources: list[Source] | None = None
+    sources: list[Any] | None = None
 
 
 class ParsedRAGResponse(BaseModel):
@@ -63,3 +63,4 @@ class ParsedRAGResponse(BaseModel):
 class ParsedRAGChunkResponse(BaseModel):
     answer: str
     metadata: RAGResponseMetadata
+    last_chunk: bool = False

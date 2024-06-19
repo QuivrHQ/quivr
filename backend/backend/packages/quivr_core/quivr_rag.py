@@ -1,6 +1,6 @@
 import os
 from operator import itemgetter
-from typing import Any, AsyncGenerator
+from typing import AsyncGenerator
 
 from flashrank import Ranker
 from langchain.retrievers import ContextualCompressionRetriever
@@ -18,6 +18,7 @@ from backend.modules.brain.qa_interface import model_compatible_with_function_ca
 from backend.modules.brain.rags.quivr_rag import (
     ANSWER_PROMPT,
     CONDENSE_QUESTION_PROMPT,
+    cited_answer,
 )
 from backend.modules.knowledge.entity.knowledge import Knowledge
 from backend.packages.quivr_core.config import RAGConfig
@@ -28,6 +29,7 @@ from backend.packages.quivr_core.models import (
 from backend.packages.quivr_core.utils import (
     combine_documents,
     format_file_list,
+    get_chunk_metadata,
     parse_chunk_response,
     parse_response,
 )
@@ -81,6 +83,7 @@ class QuivrQARAG:
             api_base=api_base,
         )  # pyright: ignore reportPrivateUsage=none
 
+    # TODO : refactor and simplify
     def filter_history(
         self, chat_history, max_history: int = 10, max_tokens: int = 2000
     ):
@@ -166,10 +169,10 @@ class QuivrQARAG:
                     model=self.rag_config.model,
                 )
 
-            # llm = llm_function.bind_tools(
-            #     [cited_answer],
-            #     tool_choice="any",
-            # )
+            llm = llm_function.bind_tools(
+                [cited_answer],
+                tool_choice="any",
+            )
 
         answer = {
             "answer": final_inputs | ANSWER_PROMPT | llm,
@@ -204,16 +207,13 @@ class QuivrQARAG:
         history: list[dict[str, str]],
         list_files: list[Knowledge],
         metadata: dict[str, str] = {},
-    ) -> AsyncGenerator[ParsedRAGChunkResponse | None, Any]:
-
+    ) -> AsyncGenerator[ParsedRAGChunkResponse, ParsedRAGChunkResponse]:
         concat_list_files = format_file_list(list_files, self.rag_config.max_files)
-
-        # Building the
         conversational_qa_chain = self.build_chain(concat_list_files)
 
         rolling_message = AIMessageChunk(content="")
-        first_chunk = True
-        local_response = ""
+        sources = []
+
         async for chunk in conversational_qa_chain.astream(
             {
                 "question": question,
@@ -222,20 +222,25 @@ class QuivrQARAG:
             },
             config={"metadata": metadata},
         ):
-            # First chunk in function calling needs to be dealt with separately
-            if self.supports_func_calling and first_chunk:
-                rolling_message = (
-                    chunk["answer"] if "answer" in chunk else rolling_message
-                )
-                first_chunk = False
+            # Could receive this anywhere so we need to save it for the last chunk
+            if "docs" in chunk:
+                sources = chunk["docs"] if "docs" in chunk else []
 
             if "answer" in chunk:
-                print("CHUNK", chunk["answer"].content)
                 rolling_message, parsed_chunk = parse_chunk_response(
                     rolling_message,
-                    local_response,
                     chunk,
                     self.supports_func_calling,
                 )
 
-                yield parsed_chunk
+                if self.supports_func_calling and len(parsed_chunk.answer) > 0:
+                    yield parsed_chunk
+                else:
+                    yield parsed_chunk
+
+        # Last chunk provies
+        yield ParsedRAGChunkResponse(
+            answer="",
+            metadata=get_chunk_metadata(rolling_message, sources),
+            last_chunk=True,
+        )

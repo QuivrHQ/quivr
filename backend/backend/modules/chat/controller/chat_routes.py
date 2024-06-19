@@ -249,11 +249,11 @@ async def create_stream_question_handler(
     brain_id: Annotated[UUID | None, Query()] = None,
 ) -> StreamingResponse:
     validate_authorization(user_id=current_user.id, brain_id=brain_id)
+
     logger.info(
         f"Creating question for chat {chat_id} with brain {brain_id} of type {type(brain_id)}"
     )
 
-    # try:
     rag_service = RAGService(
         current_user,
         brain_id,
@@ -263,16 +263,12 @@ async def create_stream_question_handler(
         chat_service,
         knowledge_service,
     )
-
     maybe_send_telemetry("question_asked", {"streaming": True}, request)
 
     return StreamingResponse(
         rag_service.generate_answer_stream(chat_question.question),
         media_type="text/event-stream",
     )
-
-    # except HTTPException as e:
-    #     raise e
 
 
 # get chat history
