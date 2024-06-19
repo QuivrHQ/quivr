@@ -8,6 +8,7 @@ from langchain.schema import (
     SystemMessage,
     format_document,
 )
+from langchain_core.messages.ai import AIMessageChunk
 
 from backend.logger import get_logger
 
@@ -75,57 +76,48 @@ def format_history_to_openai_mesages(
 # TODO: CONVOLUTED LOGIC !
 # TODO(@aminediro): redo this
 def parse_chunk_response(
-    rolling_answer: Any,
-    response_tokens: str,
+    rolling_message: AIMessageChunk,
+    rolling_response_str: str,
     raw_chunk: Any,
     supports_func_calling: bool,
-) -> ParsedRAGChunkResponse:
-
+) -> Tuple[AIMessageChunk, ParsedRAGChunkResponse]:
     # Init with sources
+    difference = ""
     metadata = {"sources": raw_chunk["docs"] if "docs" in raw_chunk else []}
 
+    breakpoint()
     if supports_func_calling:
-        # TODO: What is this assignment ?
-        rolling_answer += raw_chunk["answer"]
-        if (
-            rolling_answer.tool_calls
-            and rolling_answer.tool_calls[-1].get("args")
-            and "answer" in rolling_answer.tool_calls[-1]["args"]
-        ):
-            # Only send the difference between answer and response_tokens which was the previous answer
-            answer = rolling_answer.tool_calls[-1]["args"]["answer"]
-            # TODO(@aminediro) : WHYYY THIS  here?!?
-            difference: str = answer[len(response_tokens) :]
-            response_tokens += answer
-            if (
-                rolling_answer.tool_calls
-                and rolling_answer.tool_calls[-1].get("args")
-                and "citations" in rolling_answer.tool_calls[-1]["args"]
-            ):
-                citations = rolling_answer.tool_calls[-1]["args"]["citations"]
+        rolling_message += raw_chunk["answer"]
+
+        if rolling_message.tool_calls and "args" in rolling_message.tool_calls:
+            args = rolling_message.tool_calls[-1]["args"]
+
+            if "answer" in args:
+                # Only send the difference between answer and response_tokens which was the previous answer
+                answer = rolling_message.tool_calls[-1]["args"]["answer"]
+                # TODO(@aminediro) : WHYYY THIS  here?!?
+                difference: str = answer[len(rolling_response_str) :]
+                rolling_response_str = answer
+
+            if "citations" in args:
+                citations = rolling_message.tool_calls[-1]["args"]["citations"]
                 metadata["citations"] = citations
-            if (
-                rolling_answer.tool_calls
-                and rolling_answer.tool_calls[-1].get("args")
-                and "followup_questions" in rolling_answer.tool_calls[-1]["args"]
-            ):
-                followup_questions = rolling_answer.tool_calls[-1]["args"][
+
+            if "followup_questions" in args:
+                followup_questions = rolling_message.tool_calls[-1]["args"][
                     "followup_questions"
                 ]
                 metadata["followup_questions"] = followup_questions
-            if (
-                rolling_answer.tool_calls
-                and rolling_answer.tool_calls[-1].get("args")
-                and "thoughts" in rolling_answer.tool_calls[-1]["args"]
-            ):
-                thoughts = rolling_answer.tool_calls[-1]["args"]["thoughts"]
+            if "thoughts" in args:
+                thoughts = rolling_message.tool_calls[-1]["args"]["thoughts"]
                 metadata["thoughts"] = thoughts
-        return ParsedRAGChunkResponse(
-            answer=difference, metadata=RAGResponseMetadata(**metadata)
+
+        return rolling_message, ParsedRAGChunkResponse(
+            answer=raw_chunk["answer"].content, metadata=RAGResponseMetadata(**metadata)
         )
     else:
-        response_tokens += raw_chunk["answer"].content
-        return ParsedRAGChunkResponse(
+        rolling_response_str += raw_chunk["answer"].content
+        return None, ParsedRAGChunkResponse(
             answer=raw_chunk["answer"].content, metadata=RAGResponseMetadata()
         )
 

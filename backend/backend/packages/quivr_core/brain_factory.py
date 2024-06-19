@@ -24,11 +24,12 @@ from backend.modules.chat.dto.inputs import CreateChatHistory
 from backend.modules.chat.dto.outputs import GetChatHistoryOutput
 from backend.modules.chat.service.chat_service import ChatService
 from backend.modules.knowledge.repository.knowledges import KnowledgeRepository
+from backend.modules.prompt.entity.prompt import Prompt
 from backend.modules.prompt.service.prompt_service import PromptService
 from backend.modules.user.entity.user_identity import UserIdentity
 from backend.modules.user.service.user_usage import UserUsage
 from backend.packages.quivr_core.config import RAGConfig
-from backend.packages.quivr_core.models import ParsedRAGResponse
+from backend.packages.quivr_core.models import ParsedRAGResponse, RAGResponseMetadata
 from backend.packages.quivr_core.quivr_rag import QuivrQARAG
 from backend.packages.quivr_core.utils import generate_source
 from backend.vectorstore.supabase import CustomSupabaseVectorStore
@@ -36,7 +37,7 @@ from backend.vectorstore.supabase import CustomSupabaseVectorStore
 logger = get_logger(__name__)
 
 
-class RAGFactory:
+class RAGServiceFactory:
     integration_list: dict[str, Type[KnowledgeBrainQA]] = {
         "notion": NotionBrain,
         "gpt4": GPT4Brain,
@@ -80,7 +81,7 @@ class RAGService:
             self.current_user, self.brain
         )
 
-    def get_brain_prompt(self, brain: BrainEntity):
+    def get_brain_prompt(self, brain: BrainEntity) -> Prompt | None:
         return (
             self.prompt_service.get_prompt_by_id(brain.prompt_id)
             if brain.prompt_id
@@ -164,6 +165,7 @@ class RAGService:
             temperature=self.brain.temperature,
             max_input=self.model_to_use.max_input,
             max_tokens=self.brain.max_tokens,
+            prompt=self.prompt.content if self.prompt else None,
             streaming=False,
         )
         history = await self.chat_service.get_chat_history(self.chat_id)
@@ -210,15 +212,22 @@ class RAGService:
         logger.info(
             f"Creating question for chat {self.chat_id} with brain {self.brain.brain_id} "
         )
+        # Build the rag config
         rag_config = RAGConfig(
             model=self.model_to_use.name,
             temperature=self.brain.temperature,
             max_input=self.model_to_use.max_input,
             max_tokens=self.brain.max_tokens,
-            streaming=False,
+            prompt=self.prompt.content if self.prompt else "",
+            streaming=True,
         )
+        # Getting chat history
         history = await self.chat_service.get_chat_history(self.chat_id)
-        # Get list of files
+        #  Format the history, sanitize the input
+        transformed_history = format_chat_history(history)
+
+        # Get list of files urls
+        # TODO: Why do we get ALL the files ?
         list_files = self.knowledge_service.get_all_knowledge_in_brain(
             self.brain.brain_id
         )
@@ -227,8 +236,8 @@ class RAGService:
         )
         # Initialize the rag pipline
         rag_pipeline = QuivrQARAG(rag_config, vector_store)
-        #  Format the history, sanitize the input
-        transformed_history = format_chat_history(history)
+
+        full_answer = ""
 
         async for response in rag_pipeline.answer_astream(
             question, transformed_history, list_files
@@ -244,11 +253,9 @@ class RAGService:
                 brain_name=self.brain.name if self.brain else None,
                 brain_id=self.brain.brain_id if self.brain else None,
                 # TODO: no need to serialize here ! change the OUTPUT MODEL
-                metadata={
-                    **response.metadata.model_dump(),
-                    "sources": None,
-                },
+                metadata=response.metadata.model_dump(),
             )
+            full_answer += response.answer
             yield f"data: {streamed_chat_history.model_dump_json()}"
 
         # For last chunk yield the sources
@@ -263,10 +270,12 @@ class RAGService:
             streamed_chat_history.metadata["sources"] = [
                 s.model_dump() for s in sources_urls
             ]
-            breakpoint()
             yield f"data: {streamed_chat_history.model_dump_json()}"
 
-        # self.save_answer(question, response_tokens, streamed_chat_history, save_answer)
-
-        # Save the response to db
-        # new_chat_entry = self.save_answer(question, parsed_response)
+        self.save_answer(
+            question,
+            ParsedRAGResponse(
+                answer=full_answer,
+                metadata=RAGResponseMetadata(**streamed_chat_history.metadata),
+            ),
+        )

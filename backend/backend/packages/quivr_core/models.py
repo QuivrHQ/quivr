@@ -9,15 +9,15 @@ from typing_extensions import TypedDict
 class cited_answer(BaseModelV1):
     """Answer the user question based only on the given sources, and cite the sources used."""
 
+    answer: str = FieldV1(
+        ...,
+        description="The answer to the user question, which is based only on the given sources.",
+    )
     thoughts: str = FieldV1(
         ...,
         description="""Description of the thought process, based only on the given sources.
         Cite the text as much as possible and give the document name it appears in. In the format : 'Doc_name states : cited_text'. Be the most
         procedural as possible. Write all the steps needed to find the answer until you find it.""",
-    )
-    answer: str = FieldV1(
-        ...,
-        description="The answer to the user question, which is based only on the given sources.",
     )
     citations: list[int] = FieldV1(
         ...,

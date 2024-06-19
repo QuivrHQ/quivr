@@ -7,6 +7,7 @@ from langchain.retrievers import ContextualCompressionRetriever
 from langchain.retrievers.document_compressors.flashrank_rerank import FlashrankRerank
 from langchain_cohere import CohereRerank
 from langchain_community.chat_models import ChatLiteLLM
+from langchain_core.messages.ai import AIMessageChunk
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.runnables import RunnableLambda, RunnablePassthrough
 from langchain_openai import ChatOpenAI
@@ -17,11 +18,13 @@ from backend.modules.brain.qa_interface import model_compatible_with_function_ca
 from backend.modules.brain.rags.quivr_rag import (
     ANSWER_PROMPT,
     CONDENSE_QUESTION_PROMPT,
-    cited_answer,
 )
 from backend.modules.knowledge.entity.knowledge import Knowledge
 from backend.packages.quivr_core.config import RAGConfig
-from backend.packages.quivr_core.models import ParsedRAGChunkResponse, ParsedRAGResponse
+from backend.packages.quivr_core.models import (
+    ParsedRAGChunkResponse,
+    ParsedRAGResponse,
+)
 from backend.packages.quivr_core.utils import (
     combine_documents,
     format_file_list,
@@ -147,25 +150,26 @@ class QuivrQARAG:
             "custom_instructions": itemgetter("custom_instructions"),
             "files": lambda _: files,  # TODO: shouldn't be here
         }
+
+        # Override llm if we have a OpenAI model
         llm = self.llm
         if model_compatible_with_function_calling(self.rag_config.model):
-            # And finally, we do the part that returns the answers
             if self.rag_config.temperature:
                 llm_function = ChatOpenAI(
                     max_tokens=self.rag_config.max_tokens,
                     model=self.rag_config.model,
                     temperature=self.rag_config.temperature,
                 )
-
             else:
                 llm_function = ChatOpenAI(
                     max_tokens=self.rag_config.max_tokens,
                     model=self.rag_config.model,
                 )
-            llm = llm_function.bind_tools(
-                [cited_answer],
-                tool_choice="cited_answer",
-            )
+
+            # llm = llm_function.bind_tools(
+            #     [cited_answer],
+            #     tool_choice="any",
+            # )
 
         answer = {
             "answer": final_inputs | ANSWER_PROMPT | llm,
@@ -187,7 +191,7 @@ class QuivrQARAG:
             {
                 "question": question,
                 "chat_history": history,
-                "custom_personality": (self.rag_config.prompt),
+                "custom_instructions": (self.rag_config.prompt),
             },
             config={"metadata": metadata},
         )
@@ -201,11 +205,15 @@ class QuivrQARAG:
         list_files: list[Knowledge],
         metadata: dict[str, str] = {},
     ) -> AsyncGenerator[ParsedRAGChunkResponse | None, Any]:
+
         concat_list_files = format_file_list(list_files, self.rag_config.max_files)
+
+        # Building the
         conversational_qa_chain = self.build_chain(concat_list_files)
-        rolling_answer = ""
+
+        rolling_message = AIMessageChunk(content="")
         first_chunk = True
-        stream_response = ""
+        local_response = ""
         async for chunk in conversational_qa_chain.astream(
             {
                 "question": question,
@@ -216,14 +224,18 @@ class QuivrQARAG:
         ):
             # First chunk in function calling needs to be dealt with separately
             if self.supports_func_calling and first_chunk:
-                rolling_answer = chunk["answer"]
+                rolling_message = (
+                    chunk["answer"] if "answer" in chunk else rolling_message
+                )
                 first_chunk = False
 
             if "answer" in chunk:
-                parsed_chunk = parse_chunk_response(
-                    rolling_answer,
-                    stream_response,
+                print("CHUNK", chunk["answer"].content)
+                rolling_message, parsed_chunk = parse_chunk_response(
+                    rolling_message,
+                    local_response,
                     chunk,
                     self.supports_func_calling,
                 )
+
                 yield parsed_chunk
