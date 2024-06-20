@@ -8,19 +8,21 @@ from backend.logger import get_logger
 from backend.modules.brain.entity.brain_entity import Brain
 from backend.modules.brain.service.brain_service import BrainService
 from backend.modules.chat.dto.chats import ChatItem
-from backend.modules.chat.dto.inputs import (ChatMessageProperties,
-                                             ChatUpdatableProperties,
-                                             CreateChatHistory,
-                                             CreateChatProperties,
-                                             QuestionAndAnswer)
+from backend.modules.chat.dto.inputs import (
+    ChatMessageProperties,
+    ChatUpdatableProperties,
+    CreateChatHistory,
+    CreateChatProperties,
+    QuestionAndAnswer,
+)
 from backend.modules.chat.dto.outputs import GetChatHistoryOutput
 from backend.modules.chat.entity.chat import Chat, ChatHistory
 from backend.modules.chat.repository.chats import ChatRepository
-from backend.modules.chat.service.utils import \
-    merge_chat_history_and_notifications
+from backend.modules.chat.service.utils import merge_chat_history_and_notifications
 from backend.modules.dependencies import BaseService
-from backend.modules.notification.service.notification_service import \
-    NotificationService
+from backend.modules.notification.service.notification_service import (
+    NotificationService,
+)
 from backend.modules.prompt.entity.prompt import Prompt
 from backend.modules.prompt.service.prompt_service import PromptService
 
@@ -37,7 +39,9 @@ class ChatService(BaseService[ChatRepository]):
     def __init__(self, repository: ChatRepository):
         self.repository = repository
 
-    async def create_chat(self, user_id: UUID, new_chat_data: CreateChatProperties) -> Chat:
+    async def create_chat(
+        self, user_id: UUID, new_chat_data: CreateChatProperties
+    ) -> Chat:
         # Chat is created upon the user's first question asked
         logger.info(f"New chat entry in chats table for user {user_id}")
 

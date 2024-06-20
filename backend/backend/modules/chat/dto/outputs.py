@@ -6,11 +6,11 @@ from pydantic import BaseModel
 
 
 class GetChatHistoryOutput(BaseModel):
-    chat_id: UUID | None
-    message_id: UUID | None
-    user_message: str | None
+    chat_id: UUID
+    message_id: UUID
+    user_message: str
+    message_time: datetime
     assistant: str | None = None
-    message_time: datetime | None = None
     prompt_title: str | None = None
     brain_name: str | None = None
     brain_id: UUID | None = None  # string because UUID is not JSON serializable

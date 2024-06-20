@@ -1,5 +1,6 @@
+import datetime
 from typing import Type
-from uuid import UUID
+from uuid import UUID, uuid4
 
 from backend.logger import get_logger
 from backend.models.settings import get_embedding_client, get_supabase_client
@@ -239,40 +240,36 @@ class RAGService:
 
         full_answer = ""
 
+        message_metadata = {
+            "chat_id": self.chat_id,
+            "message_id": uuid4(),  # do we need it ?,
+            "user_message": question,  # TODO: define result
+            "message_time": datetime.datetime.now(),  # TODO: define result
+            "prompt_title": (self.prompt.title if self.prompt else ""),
+            "brain_name": self.brain.name if self.brain else None,
+            "brain_id": self.brain.brain_id if self.brain else None,
+        }
+
         async for response in rag_pipeline.answer_astream(
             question, transformed_history, list_files
         ):
             # Format output to be correct servicedf;j
             if not response.last_chunk:
                 streamed_chat_history = GetChatHistoryOutput(
-                    chat_id=self.chat_id,
-                    message_id=None,  # do we need it ?,
-                    user_message=question,  # TODO: define result
-                    message_time=None,  # TODO: define result
-                    assistant=response.answer,  # TODO: define result
-                    prompt_title=(self.prompt.title if self.prompt else ""),
-                    brain_name=self.brain.name if self.brain else None,
-                    brain_id=self.brain.brain_id if self.brain else None,
-                    # TODO: no need to serialize here ! change the OUTPUT MODEL
+                    assistant=response.answer,
                     metadata=response.metadata.model_dump(),
+                    **message_metadata,
                 )
                 full_answer += response.answer
                 yield f"data: {streamed_chat_history.model_dump_json()}"
 
         # For last chunk  parse the sources, and the full answer
         streamed_chat_history = GetChatHistoryOutput(
-            chat_id=self.chat_id,
-            message_id=None,  # do we need it ?,
-            user_message=question,  # TODO: define result
-            message_time=None,  # TODO: define result
-            assistant=full_answer,  # TODO: define result
-            prompt_title=(self.prompt.title if self.prompt else ""),
-            brain_name=self.brain.name if self.brain else None,
-            brain_id=self.brain.brain_id if self.brain else None,
+            assistant=response.answer,
             metadata=response.metadata.model_dump(),
+            **message_metadata,
         )
 
-        # TODO: NOT GREAT TYPING
         sources_urls = generate_source(
             response.metadata.sources,
             self.brain.brain_id,
@@ -285,8 +282,6 @@ class RAGService:
         if streamed_chat_history.metadata:
             streamed_chat_history.metadata["sources"] = sources_urls
 
-        yield f"data: {streamed_chat_history.model_dump_json()}"
-
         self.save_answer(
             question,
             ParsedRAGResponse(
@@ -294,3 +289,4 @@ class RAGService:
                 metadata=RAGResponseMetadata(**streamed_chat_history.metadata),
             ),
         )
+        yield f"data: {streamed_chat_history.model_dump_json()}"

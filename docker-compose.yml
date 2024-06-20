@@ -16,8 +16,8 @@ services:
         - NEXT_PUBLIC_FRONTEND_URL=${NEXT_PUBLIC_FRONTEND_URL}
         - NEXT_PUBLIC_AUTH_MODES=${NEXT_PUBLIC_AUTH_MODES}
     container_name: web
-    depends_on:
-      - backend-core
+    # depends_on:
+    #   - backend-core
     restart: always
     ports:
       - 3000:3000
