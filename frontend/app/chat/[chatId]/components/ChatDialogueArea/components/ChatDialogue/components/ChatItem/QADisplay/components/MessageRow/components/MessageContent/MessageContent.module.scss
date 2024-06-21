@@ -54,11 +54,11 @@
   }
 
   thead {
-    background-color: #f5f5f5;
+    background-color: var(--background-1);
   }
 
   tr {
-    border-bottom: 1px solid #ddd;
+    border-bottom: 1px solid var(--border-0);
   }
 
   th,
