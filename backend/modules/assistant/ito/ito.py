@@ -1,7 +1,6 @@
 import os
-import random
 import re
-import string
+import uuid
 from abc import abstractmethod
 from io import BytesIO
 from tempfile import NamedTemporaryFile
@@ -13,7 +12,6 @@ from modules.assistant.dto.inputs import InputAssistant
 from modules.assistant.ito.utils.pdf_generator import PDFGenerator, PDFModel
 from modules.chat.controller.chat.utils import update_user_usage
 from modules.contact_support.controller.settings import ContactsSettings
-from modules.upload.controller.upload_routes import upload_file
 from modules.user.entity.user_identity import UserIdentity
 from modules.user.service.user_usage import UserUsage
 from packages.emails.send_email import send_email
@@ -62,11 +60,12 @@ class ITO(BaseModel):
     def calculate_pricing(self):
         return 20
 
-    def generate_pdf(self, filename: str, title: str, content: str):
+    def generate_pdf(self, file_io: BytesIO, title: str, content: str):
         pdf_model = PDFModel(title=title, content=content)
         pdf = PDFGenerator(pdf_model)
         pdf.print_pdf()
-        pdf.output(filename, "F")
+        pdf_content = pdf.output(dest="S")
+        file_io.write(pdf_content)
 
     @abstractmethod
     async def process_assistant(self):
@@ -111,6 +110,7 @@ class ITO(BaseModel):
             </div>
             """
             params = {
+                "from": mail_from,
                 "sender": mail_from,
                 "to": [mail_to],
                 "subject": "Quivr Ingestion Processed",
@@ -128,42 +128,40 @@ class ITO(BaseModel):
         tmp_file.flush()  # Make sure all data is written to disk
         return tmp_file
 
-    async def create_and_upload_processed_file(
+    def create_and_upload_processed_file(
         self, processed_content: str, original_filename: str, file_description: str
     ) -> dict:
         """Handles creation and uploading of the processed file."""
-        # remove any special characters from the filename that aren't http safe
 
+        # Generate a new filename
+        base_filename = original_filename.rsplit(".", 1)[0]
+        safe_description = re.sub(
+            r"[^A-Za-z0-9_]", "", file_description.lower().replace(" ", "_")
+        )
         new_filename = (
-            original_filename.split(".")[0]
-            + "_"
-            + file_description.lower().replace(" ", "_")
-            + "_"
-            + str(random.randint(1000, 9999))
-            + ".pdf"
-        )
-        new_filename = unidecode(new_filename)
-        new_filename = re.sub(
-            "[^{}0-9a-zA-Z]".format(re.escape(string.punctuation)), "", new_filename
+            f"{unidecode(base_filename)}_{safe_description}_{uuid.uuid4().hex}.pdf"
         )
 
+        # Generate PDF in-memory
+        content_io = BytesIO()
         self.generate_pdf(
-            new_filename,
+            content_io,
             f"{file_description} of {original_filename}",
             processed_content,
         )
-
-        content_io = BytesIO()
-        with open(new_filename, "rb") as f:
-            content_io.write(f.read())
         content_io.seek(0)
 
+        # Prepare file for upload
         file_to_upload = UploadFile(
             filename=new_filename,
             file=content_io,
             headers={"content-type": "application/pdf"},
         )
 
+        return {"file_to_upload": file_to_upload, "new_filename": new_filename}
+
+
+"""        # Email the file if required
         if self.input.outputs.email.activated:
             await self.send_output_by_email(
                 file_to_upload,
@@ -172,24 +170,20 @@ class ITO(BaseModel):
                 f"{file_description} of {original_filename}",
                 brain_id=(
                     self.input.outputs.brain.value
-                    if (
-                        self.input.outputs.brain.activated
-                        and self.input.outputs.brain.value
-                    )
+                    if self.input.outputs.brain.activated
+                    and self.input.outputs.brain.value
                     else None
                 ),
             )
 
         # Reset to start of file before upload
         file_to_upload.file.seek(0)
+
+        # Upload the file if required
         if self.input.outputs.brain.activated:
             await upload_file(
                 uploadFile=file_to_upload,
                 brain_id=self.input.outputs.brain.value,
                 current_user=self.current_user,
                 chat_id=None,
-            )
-
-        os.remove(new_filename)
-
-        return {"message": f"{file_description} generated successfully"}
+            )"""

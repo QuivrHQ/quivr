@@ -23,6 +23,7 @@ from modules.assistant.dto.outputs import (
     Outputs,
 )
 from modules.assistant.ito.ito import ITO
+from modules.upload.service import upload_file
 from modules.user.entity.user_identity import UserIdentity
 
 logger = get_logger(__name__)
@@ -157,9 +158,44 @@ class SummaryAssistant(ITO):
 
         content = map_reduce_chain.run(split_docs)
 
-        return await self.create_and_upload_processed_file(
-            content, self.files[0].filename, "Summary"
-        )
+        original_filename = "Classic Ingredient Comparison"
+        file_description = "Difference Report"
+        processed_file = self.create_and_upload_processed_file(
+            content,
+            original_filename=original_filename,
+            file_description=file_description,
+        )  # FIXME change name
+        file_to_upload = processed_file["file_to_upload"]
+        new_filename = processed_file["new_filename"]
+
+        # Email the file if required
+        if self.input.outputs.email.activated:
+            await self.send_output_by_email(
+                file_to_upload,
+                new_filename,
+                "Summary",
+                f"{file_description} of {original_filename}",
+                brain_id=(
+                    self.input.outputs.brain.value
+                    if self.input.outputs.brain.activated
+                    and self.input.outputs.brain.value
+                    else None
+                ),
+            )
+
+        # Reset to start of file before upload
+        file_to_upload.file.seek(0)
+
+        # Upload the file if required
+        if self.input.outputs.brain.activated:
+            await upload_file(
+                uploadFile=file_to_upload,
+                brain_id=self.input.outputs.brain.value,
+                current_user=self.current_user,
+                chat_id=None,
+            )
+
+        return {"message": f"{file_description} generated successfully"}
 
 
 def summary_inputs():
