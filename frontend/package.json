@@ -97,6 +97,7 @@
     "react-use": "17.4.0",
     "rehype-highlight": "6.0.0",
     "rehype-raw": "7.0.0",
+    "remark-gfm": "^4.0.0",
     "sass": "^1.70.0",
     "sharp": "^0.32.6",
     "tailwind-merge": "1.14.0",
