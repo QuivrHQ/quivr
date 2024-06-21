@@ -1,4 +1,5 @@
 import asyncio
+import time
 
 import pandas as pd
 from pydantic import BaseModel, Field
@@ -55,7 +56,34 @@ class DifferenceAgent:
             target_content=target_content, language_verification=language_verification
         )
 
-    def run(
+    async def query_one(self, question: str, n_retry: int = 3, verbose: bool = False):
+        response = ResponseType(name=None, detailed_answer=None, decision=None)
+        retry_count = 0
+        while retry_count < n_retry and response.name is None:
+            try:
+                response: ResponseType = await self.diff_query_engine.query_engine.aquery(question[:-1])  # type: ignore
+                nodes_to_update = [response.source_nodes[int(i)] for i in response.response.used_chunks]  # type: ignore
+                self.diff_query_engine.update_query_engine(nodes_to_update)
+
+            except Exception as e:
+                # Exponential backoff
+                time.sleep(2**retry_count)
+                retry_count += 1
+                if verbose:
+                    print(f"Error with question: {question}")
+                    print("Retry ...")
+        if retry_count == n_retry:
+            print("n_retry reached, skipping question ...")
+
+        return {
+            "decision": (
+                response.decision.value if response.decision else response.decision
+            ),
+            "name": response.name,
+            "detailed_answer": response.detailed_answer,
+        }
+
+    async def run(
         self,
         target_content: str | None = None,
         language_verification: bool = False,
@@ -76,51 +104,12 @@ class DifferenceAgent:
         print("Querying generated questions to the reference document...")
         analysis = []
 
-        async def query_all(questions):
-            return await asyncio.gather(*[query_one(question) for question in questions])  # type: ignore
+        async def query_all(questions: list[str] | None, n_retry: int = 3):
+            return await asyncio.gather(*[self.query_one(question, n_retry=n_retry) for question in questions])  # type: ignore
 
-        async def query_one(question):
-            response = ResponseType(name=None, detailed_answer=None, decision=None)
-
-            for i in range(n_retry):
-                try:
-                    response: ResponseType = await self.diff_query_engine.query_engine.aquery(question[:-1])  # type: ignore
-                    nodes_to_update = [response.source_nodes[int(i)] for i in response.response.used_chunks]  # type: ignore
-                    self.diff_query_engine.update_query_engine(nodes_to_update)
-
-                except Exception as e:
-                    print(e)
-                    if verbose:
-                        print(f"Error with question: {question}")
-                        print("Retry ...")
-                        if i == 2:
-                            print(
-                                f"{n_retry} repeted errors with the same question, deleting the question."
-                            )
-                            break
-                        continue
-                break
-            return {
-                "decision": (
-                    response.decision.value if response.decision else response.decision
-                ),
-                "name": response.name,
-                "detailed_answer": response.detailed_answer,
-            }
-
-        try:
-            loop = asyncio.get_event_loop()
-        except RuntimeError:
-            loop = asyncio.new_event_loop()
-            asyncio.set_event_loop(loop)
-
-        try:
-            analysis = loop.run_until_complete(query_all(self.questions))
-            self.generated_df = pd.DataFrame(analysis)
-            return self.generated_df
-        finally:
-            if loop.is_running():
-                loop.close()
+        analysis = await query_all(self.questions, n_retry=n_retry)
+        self.generated_df = pd.DataFrame(analysis)
+        return self.generated_df
 
     def get_detail(self, category, iteration, name):
         return self.generated_df.loc[

@@ -79,5 +79,4 @@ class InputAssistant(BaseModel):
     @model_validator(mode="before")
     @classmethod
     def to_py_dict(cls, data):
-        if isinstance(data, str):
-            return json.loads(data)
+        return json.loads(data)

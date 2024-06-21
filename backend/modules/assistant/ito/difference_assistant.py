@@ -2,11 +2,11 @@ import asyncio
 import os
 import tempfile
 import traceback
+from concurrent.futures import ThreadPoolExecutor
 from typing import List
 
-import nest_asyncio
+import httpx
 import pandas as pd
-import uvloop
 from fastapi import UploadFile
 from logger import get_logger
 from megaparse.Converter import MegaParse
@@ -21,16 +21,31 @@ from modules.assistant.dto.outputs import (
 )
 from modules.assistant.ito.difference.difference_agent import ContextType
 from modules.assistant.ito.ito import ITO
-from modules.upload.service import upload_file
+
+# from modules.upload.controller.upload_routes import upload_file #FIXME circular import
 from modules.user.entity.user_identity import UserIdentity
 
 from .difference import DifferenceAgent, DiffQueryEngine
 
-if not isinstance(asyncio.get_event_loop(), uvloop.Loop):
-    nest_asyncio.apply()
-
-
 logger = get_logger(__name__)
+
+
+# FIXME: PATCHER -> find another solution
+async def upload_file_to_api(upload_file, brain_id, current_user):
+    url = "http://localhost:5050/upload"
+    headers = {
+        "Authorization": f"Bearer {current_user.token}",
+        "Content-Type": "application/json",
+    }
+    data = {
+        "uploadFile": upload_file,
+        "brain_id": brain_id,
+        "chat_id": None,
+    }
+    async with httpx.AsyncClient() as client:
+        response = await client.post(url, headers=headers, json=data)
+        response.raise_for_status()  # Raise an error for 4xx/5xx responses
+        return response.json()
 
 
 class DifferenceAssistant(ITO):
@@ -117,13 +132,23 @@ class DifferenceAssistant(ITO):
         print(target_doc_name, "\n")
         print(ref_doc_name, "\n")
 
+        def run_megaparse():
+            megaparse = MegaParse(
+                file_path=document_1_tmp.name,
+                llama_parse_api_key=os.getenv("LLAMA_CLOUD_API_KEY"),
+            )
+            return megaparse.convert(gpt4o_cleaner=True)
+
         # breakpoint()
         try:
             megaparse = MegaParse(
                 file_path=document_1_tmp.name,
                 llama_parse_api_key=os.getenv("LLAMA_CLOUD_API_KEY"),
             )
-            ref_doc_md = megaparse.convert(gpt4o_cleaner=True)
+            loop = asyncio.get_event_loop()
+            executor = ThreadPoolExecutor(max_workers=1)
+            ref_doc_md = await loop.run_in_executor(executor, run_megaparse)  # type: ignore
+            # ref_doc_md = megaparse.convert(gpt4o_cleaner=True)
         except Exception as e:
             print(e)
             print(traceback.format_exc())
@@ -164,7 +189,7 @@ class DifferenceAssistant(ITO):
 
         diff_df = pd.DataFrame()
 
-        diff_df = agent.run(additional_context=additional_context)
+        diff_df = await agent.run(additional_context=additional_context)
 
         diff_df = diff_df.dropna()
         print("\nNice, the process has succeeded, giving back the json ;)\n")
@@ -186,7 +211,7 @@ class DifferenceAssistant(ITO):
             await self.send_output_by_email(
                 file_to_upload,
                 new_filename,
-                "Summary",
+                "Difference",
                 f"{file_description} of {original_filename}",
                 brain_id=(
                     self.input.outputs.brain.value
@@ -201,11 +226,10 @@ class DifferenceAssistant(ITO):
 
         # Upload the file if required
         if self.input.outputs.brain.activated:
-            await upload_file(
-                uploadFile=file_to_upload,
+            response = await upload_file_to_api(
+                upload_file=file_to_upload,
                 brain_id=self.input.outputs.brain.value,
                 current_user=self.current_user,
-                chat_id=None,
             )
 
         return {"message": f"{file_description} generated successfully"}

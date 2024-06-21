@@ -5,7 +5,6 @@ import pickle
 from enum import Enum
 from typing import List, Optional
 
-import nest_asyncio
 import uvloop
 from langchain_core.pydantic_v1 import BaseModel, Field
 from llama_index.core import Document, QueryBundle, VectorStoreIndex
@@ -33,7 +32,6 @@ class Ingredient(BaseModel):
     used_chunks: list[int] = Field(
         description="List of chunks id used to generate the answer, None if the response was not found in the chunks. -  focus on those with high information density that directly answer the query. Never select a table of content or any text similar."
     )
-    # more_info: str = Field(description="More information on how the chunks (with ID) were used to generate the answer, start with look into chunk id to ..., then look into chunk id ..., keep it short")
 
 
 class AddChunkId(BaseNodePostprocessor):
@@ -79,8 +77,6 @@ class DiffQueryEngine:
 
     def get_query_engine(self, source_md: List[str]) -> None:
         """Get a query engine for markdown files."""
-        if not isinstance(asyncio.get_event_loop(), uvloop.Loop):
-            nest_asyncio.apply()
 
         md_document = [Document(text=sub_source_md) for sub_source_md in source_md]
         node_parser = MarkdownNodeParser()

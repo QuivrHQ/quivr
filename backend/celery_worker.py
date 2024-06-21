@@ -321,8 +321,6 @@ def process_assistant_task(
     logger.debug(f"Input: {input}")
     logger.debug(type(input))
     _input = InputAssistant.model_validate(input_in)
-    # _input = InputAssistant(**json.loads(input))  # type: ignore
-    # _input = InputAssistant(json.dumps(_input))
     _current_user = UserIdentity(**current_user)  # type: ignore
     try:
         files = []
@@ -333,25 +331,14 @@ def process_assistant_task(
             base_file_name = os.path.basename(file_name)
             _, file_extension = os.path.splitext(base_file_name)
 
-            with NamedTemporaryFile(suffix="_" + tmp_name, delete=False) as tmp_file:
-                res = supabase_client.storage.from_("quivr").download(file_name)
-                tmp_file.write(res)
-                tmp_file.flush()
-
-                file_instance = File(
-                    file_name=base_file_name,
-                    tmp_file_path=tmp_file.name,
-                    bytes_content=res,
-                    file_size=len(res),
-                    file_extension=file_extension,
-                )
-                upload_file = UploadFile(
-                    filename=file_instance.file_name,
-                    size=file_instance.file_size,
-                    file=BytesIO(file_instance.bytes_content),
-                    headers='{"content-type": "application/pdf"}',  # type : ignore
-                )
-                files.append(upload_file)
+            res = supabase_client.storage.from_("quivr").download(file_name)
+            upload_file = UploadFile(
+                filename=base_file_name,
+                size=len(res),
+                file=BytesIO(res),
+                headers='{"content-type": "application/pdf"}',  # type : ignore
+            )
+            files.append(upload_file)
 
     except Exception as e:
         logger.exception(e)
@@ -363,12 +350,14 @@ def process_assistant_task(
                     description=f"An error occurred while processing the file: {e}",
                 ),
             )
-        return
+        raise e
     loop = asyncio.get_event_loop()
 
-    asyncio.set_event_loop(asyncio.new_event_loop())
+    # asyncio.set_event_loop(asyncio.new_event_loop())
 
     if _input.name.lower() == "summary":
+        logger.debug(f"N Files given : {len(files)}")
+        logger.debug(f"Input given : {input_in}")
         summary_assistant = SummaryAssistant(
             input=_input, files=files, current_user=_current_user
         )
@@ -431,8 +420,8 @@ celery.conf.beat_schedule = {
         "task": "check_if_is_premium_user",
         "schedule": crontab(minute="*/1", hour="*"),
     },
-    "process_assistant": {
-        "task": "process_assistant_task",
-        "schedule": crontab(minute="*/1", hour="*"),
-    },
+    # "process_assistant": {
+    #     "task": "process_assistant_task",
+    #     "schedule": crontab(minute="*/1", hour="*"),
+    # },
 }
