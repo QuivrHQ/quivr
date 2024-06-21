@@ -1,6 +1,6 @@
-@use "@/styles/ScreenSizes.module.scss";
-@use "@/styles/Spacings.module.scss";
-@use "@/styles/ZIndexes.module.scss";
+@use "styles/ScreenSizes.module.scss";
+@use "styles/Spacings.module.scss";
+@use "styles/ZIndexes.module.scss";
 
 .search_modal_wrapper {
   display: flex;
