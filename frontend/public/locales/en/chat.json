@@ -61,7 +61,7 @@
   "threads": "Threads",
   "title": "Chat with {{brain}}",
   "today": "Today",
-  "tooManyRequests": "You have exceeded the number of requests per day. To continue chatting, please upgrade your account or come back tomorrow.",
+  "tooManyRequests": "You have exceeded the number of requests per day. To continue chatting, please upgrade your account.",
   "welcome": "Welcome",
   "yesterday": "Yesterday"
 }
