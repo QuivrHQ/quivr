@@ -1,8 +1,8 @@
-@use "@/styles/Radius.module.scss";
-@use "@/styles/ScreenSizes.module.scss";
-@use "@/styles/Spacings.module.scss";
-@use "@/styles/Transitions.module.scss";
-@use "@/styles/Typography.module.scss";
+@use "styles/Radius.module.scss";
+@use "styles/ScreenSizes.module.scss";
+@use "styles/Spacings.module.scss";
+@use "styles/Transitions.module.scss";
+@use "styles/Typography.module.scss";
 
 .message_row_container {
   display: flex;
