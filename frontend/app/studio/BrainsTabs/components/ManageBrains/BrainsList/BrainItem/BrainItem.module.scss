@@ -58,12 +58,13 @@
   .description {
     width: 100%;
     font-style: italic;
-    font-size: Typography.$small;
+    font-size: Typography.$tiny;
     display: -webkit-box;
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 5;
     overflow: hidden;
     text-overflow: ellipsis;
+    color: var(--text-4);
   }
 
   .options_modal {
