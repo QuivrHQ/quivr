@@ -1,8 +1,8 @@
-on:
+"on":
   push:
-    tags:
-      - "v*"
-name: Deploy to cherry-pick-backend
+    branches:
+    - main
+name: Deploy to raise
 jobs:
   porter-deploy:
     runs-on: ubuntu-latest
@@ -18,11 +18,12 @@ jobs:
       timeout-minutes: 30
       run: exec porter apply
       env:
-        PORTER_CLUSTER: "3840"
-        PORTER_DEPLOYMENT_TARGET_ID: df878836-078f-431d-9305-6c3d61627254
+        PORTER_CLUSTER: "3877"
+        PORTER_DEPLOYMENT_TARGET_ID: cd21d246-86df-49e0-ba0a-78e2802572e7
         PORTER_HOST: https://dashboard.getporter.dev
         PORTER_PR_NUMBER: ${{ github.event.number }}
         PORTER_PROJECT: "10983"
-        PORTER_STACK_NAME: cherry-pick-backend
+        PORTER_REPO_NAME: ${{ github.event.repository.name }}
+        PORTER_STACK_NAME: raise
         PORTER_TAG: ${{ steps.vars.outputs.sha_short }}
-        PORTER_TOKEN: ${{ secrets.PORTER_STACK_10983_3840 }}
+        PORTER_TOKEN: ${{ secrets.PORTER_STACK_10983_3877 }}

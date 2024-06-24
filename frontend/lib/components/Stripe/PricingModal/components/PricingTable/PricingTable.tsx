@@ -14,7 +14,7 @@ export const StripePricingTable = (): JSX.Element => {
             {"The free tier allows you to have"}
             <span className={styles.bold}> 3 brains </span>
             {"and"}
-            <span className={styles.bold}> 100 chat credits </span>
+            <span className={styles.bold}> 25 chat credits </span>
             {
               "per month. You can upgrade to unlock more brains, more chat credits and access to premium models."
             }
