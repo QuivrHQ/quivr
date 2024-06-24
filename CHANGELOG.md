@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.0.271 (2024-06-24)
+
+## What's Changed
+* fix: check user premium upsert by @AmineDiro in https://github.com/QuivrHQ/quivr/pull/2714
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.270...v0.0.271
+
 ## 0.0.270 (2024-06-24)
 
 ## What's Changed
