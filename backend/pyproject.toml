@@ -51,7 +51,7 @@ filterwarnings = ["ignore::DeprecationWarning"]
 
 [tool.poetry.dependencies]
 python = "^3.11"
-torch = { version = "^2.3.1+cpu", source = "pytorch-cpu-src" }
+torch = "^2.3.1"
 langchain = "*"
 litellm = "*"
 openai = "*"
@@ -126,9 +126,4 @@ mypy = "^1.10.0"
 pre-commit = "^3.7.1"
 ipykernel = "*"
 ruff = "^0.4.8"
-pytest-asyncio = "^0.23.7"
-
-[[tool.poetry.source]]
-name = "pytorch-cpu-src"
-url = "https://download.pytorch.org/whl/cpu"
-priority = "explicit"
+pytest-asyncio = "^1.23.7"
