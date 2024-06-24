@@ -3,6 +3,18 @@ import { BiCoin } from "react-icons/bi";
 import {
   BsArrowRightShort,
   BsChatLeftText,
+  BsFiletypeCsv,
+  BsFiletypeDocx,
+  BsFiletypeHtml,
+  BsFiletypeMd,
+  BsFiletypeMp3,
+  BsFiletypeMp4,
+  BsFiletypePdf,
+  BsFiletypePptx,
+  BsFiletypePy,
+  BsFiletypeTxt,
+  BsFiletypeXls,
+  BsFiletypeXlsx,
   BsTextParagraph,
 } from "react-icons/bs";
 import { CgSoftwareDownload } from "react-icons/cg";
@@ -12,6 +24,7 @@ import {
   FaCheck,
   FaCheckCircle,
   FaDiscord,
+  FaFile,
   FaFileAlt,
   FaFolder,
   FaGithub,
@@ -19,6 +32,7 @@ import {
   FaLinkedin,
   FaQuestionCircle,
   FaRegFileAlt,
+  FaRegFileAudio,
   FaRegKeyboard,
   FaRegStar,
   FaRegThumbsDown,
@@ -50,7 +64,7 @@ import {
   IoShareSocial,
   IoWarningOutline,
 } from "react-icons/io5";
-import { LiaRobotSolid } from "react-icons/lia";
+import { LiaFileVideo, LiaRobotSolid } from "react-icons/lia";
 import { IconType } from "react-icons/lib";
 import {
   LuBrain,
@@ -163,4 +177,27 @@ export const iconList: { [name: string]: IconType } = {
   user: FaRegUserCircle,
   warning: IoWarningOutline,
   website: TbNetwork,
+  pdf: BsFiletypePdf,
+  mp3: BsFiletypeMp3,
+  mp4: BsFiletypeMp4,
+  html: BsFiletypeHtml,
+  txt: BsFiletypeTxt,
+  csv: BsFiletypeCsv,
+  md: BsFiletypeMd,
+  markdown: BsFiletypeMd,
+  m4a: LiaFileVideo,
+  mpga: FaRegFileAudio,
+  mpeg: LiaFileVideo,
+  webm: LiaFileVideo,
+  wav: FaRegFileAudio,
+  pptx: BsFiletypePptx,
+  docx: BsFiletypeDocx,
+  odt: BsFiletypeDocx,
+  xlsx: BsFiletypeXlsx,
+  xls: BsFiletypeXls,
+  epub: FaFile,
+  ipynb: BsFiletypePy,
+  py: BsFiletypePy,
+  telegram: BsFiletypeDocx,
+  bib: FaFile,
 };

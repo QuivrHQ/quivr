@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { useKnowledgeApi } from "@/lib/api/knowledge/useKnowledgeApi";
 import Icon from "@/lib/components/ui/Icon/Icon";
 import { OptionsModal } from "@/lib/components/ui/OptionsModal/OptionsModal";
-import { getFileIcon } from "@/lib/helpers/getFileIcon";
+import { iconList } from "@/lib/helpers/iconList";
 import { useUrlBrain } from "@/lib/hooks/useBrainIdFromUrl";
 import { isUploadedKnowledge, Knowledge } from "@/lib/types/Knowledge";
 import { Option } from "@/lib/types/Options";
@@ -93,9 +93,13 @@ const KnowledgeItem = ({
       <div className={styles.left}>
         <div className={styles.icon}>
           {isUploadedKnowledge(knowledge) ? (
-            getFileIcon(knowledge.fileName)
+            <Icon
+              name={knowledge.extension.slice(1) as keyof typeof iconList}
+              size="small"
+              color="black"
+            />
           ) : (
-            <Icon name="link" size="normal" color="black" />
+            <Icon name="link" size="small" color="black" />
           )}
         </div>
         {isUploadedKnowledge(knowledge) ? (

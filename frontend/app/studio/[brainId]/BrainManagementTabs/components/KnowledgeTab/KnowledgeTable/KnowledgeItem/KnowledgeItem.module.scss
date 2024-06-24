@@ -29,10 +29,6 @@
     gap: Spacings.$spacing03;
     overflow: hidden;
 
-    .icon {
-      min-width: 16px;
-    }
-
     .file_name {
       @include Typography.EllipsisOverflow;
     }
