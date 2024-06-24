@@ -1,5 +1,9 @@
-@use "@/styles/Spacings.module.scss";
-@use "@/styles/Typography.module.scss";
+@use "styles/Spacings.module.scss";
+@use "styles/Typography.module.scss";
+
+.hiden {
+  display: none;
+}
 
 .hiden {
   display: none;
@@ -46,6 +50,30 @@
   h3 {
     @include Typography.H3;
   }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: Spacings.$spacing05 0;
+  }
+
+  thead {
+    background-color: var(--background-1);
+  }
+
+  tr {
+    border-bottom: 1px solid var(--border-0);
+  }
+
+  th,
+  td {
+    padding: Spacings.$spacing03;
+    text-align: left;
+  }
+
+  th {
+    font-weight: bold;
+  }
 }
 
 .thinking {
@@ -61,9 +89,11 @@
   0% {
     font-size: 6px;
   }
+
   50% {
     font-size: 16px;
   }
+
   100% {
     font-size: 6px;
   }

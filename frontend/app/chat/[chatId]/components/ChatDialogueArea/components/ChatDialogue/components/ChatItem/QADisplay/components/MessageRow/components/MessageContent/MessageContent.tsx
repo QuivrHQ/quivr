@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import ReactMarkdown from "react-markdown";
+import gfm from "remark-gfm";
 
 import styles from "./MessageContent.module.scss";
 
@@ -48,7 +49,7 @@ export const MessageContent = ({
     >
       {isLog && showLog && logs.length > 0 && (
         <div className="text-xs text-white p-2 rounded">
-          <ReactMarkdown>{logs}</ReactMarkdown>
+          <ReactMarkdown remarkPlugins={[gfm]}>{logs}</ReactMarkdown>
         </div>
       )}
       <ReactMarkdown
@@ -57,6 +58,7 @@ export const MessageContent = ({
         ${isUser ? styles.user : styles.brain}
         ${cleanedText === "🧠" ? styles.thinking : ""} 
         `}
+        remarkPlugins={[gfm]}
       >
         {cleanedText}
       </ReactMarkdown>
