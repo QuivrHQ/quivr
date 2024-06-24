@@ -49,9 +49,8 @@ langfuse = "*"
 pandasai = "*"
 colorlog = "*"
 psycopg2-binary = "*"
-psycopg2 = "*"
 celery = {extras = ["redis", "sqs"], version = "*"}
-unstructured = {extras = ["all-docs"], version = "*"}
+unstructured = "*"
 llama-parse = "*"
 llama-index = "*"
 lxml = {extras = ["html_clean"], version = "*"}
@@ -71,6 +70,8 @@ google-api-python-client = "*"
 google-auth-httplib2 = "*"
 google-auth-oauthlib = "*"
 msal = "*"
+llama-index-postprocessor-cohere-rerank = "*"
+megaparse = "*"
 
 [dev-packages]
 black = "*"

@@ -1,14 +1,21 @@
+import asyncio
 import os
 from datetime import datetime
+from io import BytesIO
 from tempfile import NamedTemporaryFile
+from typing import List
 from uuid import UUID
 
 from celery.schedules import crontab
 from celery_config import celery
+from fastapi import UploadFile
 from logger import get_logger
 from middlewares.auth.auth_bearer import AuthBearer
 from models.files import File
 from models.settings import get_supabase_client, get_supabase_db
+from modules.assistant.dto.inputs import InputAssistant
+from modules.assistant.ito.difference_assistant import DifferenceAssistant
+from modules.assistant.ito.summary import SummaryAssistant
 from modules.brain.integrations.Notion.Notion_connector import NotionConnector
 from modules.brain.service.brain_service import BrainService
 from modules.brain.service.brain_vector_service import BrainVectorService
@@ -16,6 +23,7 @@ from modules.notification.dto.inputs import NotificationUpdatableProperties
 from modules.notification.entity.notification import NotificationsStatusEnum
 from modules.notification.service.notification_service import NotificationService
 from modules.onboarding.service.onboarding_service import OnboardingService
+from modules.user.entity.user_identity import UserIdentity
 from packages.files.crawl.crawler import CrawlWebsite, slugify
 from packages.files.parsers.github import process_github
 from packages.files.processors import filter_file
@@ -311,6 +319,99 @@ def check_if_is_premium_user():
     return True
 
 
+@celery.task(name="process_assistant_task")
+def process_assistant_task(
+    input_in: str,
+    files_name: List[str],
+    current_user: dict,
+    notification_id=None,
+) -> None:
+
+    logger.debug(f"Input: {input}")
+    logger.debug(type(input))
+    _input = InputAssistant.model_validate(input_in)
+    _current_user = UserIdentity(**current_user)  # type: ignore
+    try:
+        files = []
+        supabase_client = get_supabase_client()
+
+        for file_name in files_name:
+            tmp_name = file_name.replace("/", "_")
+            base_file_name = os.path.basename(file_name)
+            _, file_extension = os.path.splitext(base_file_name)
+
+            res = supabase_client.storage.from_("quivr").download(file_name)
+            upload_file = UploadFile(
+                filename=base_file_name,
+                size=len(res),
+                file=BytesIO(res),
+                headers='{"content-type": "application/pdf"}',  # type : ignore
+            )
+            files.append(upload_file)
+
+    except Exception as e:
+        logger.exception(e)
+        if notification_id:
+            notification_service.update_notification_by_id(
+                notification_id,
+                NotificationUpdatableProperties(
+                    status=NotificationsStatusEnum.ERROR,
+                    description=f"An error occurred while processing the file: {e}",
+                ),
+            )
+        raise e
+    loop = asyncio.get_event_loop()
+
+    # asyncio.set_event_loop(asyncio.new_event_loop())
+
+    if _input.name.lower() == "summary":
+        logger.debug(f"N Files given : {len(files)}")
+        logger.debug(f"Input given : {input_in}")
+        summary_assistant = SummaryAssistant(
+            input=_input, files=files, current_user=_current_user
+        )
+        try:
+            summary_assistant.check_input()
+            loop.run_until_complete(summary_assistant.process_assistant())
+        except ValueError as e:
+            logger.error(f"ValueError in SummaryAssistant: {e}")
+            if notification_id:
+                notification_service.update_notification_by_id(
+                    notification_id,
+                    NotificationUpdatableProperties(
+                        status=NotificationsStatusEnum.ERROR,
+                        description=f"Error in summary processing: {e}",
+                    ),
+                )
+    elif _input.name.lower() == "difference":
+        difference_assistant = DifferenceAssistant(
+            input=_input, files=files, current_user=_current_user
+        )
+        try:
+            difference_assistant.check_input()
+            loop.run_until_complete(difference_assistant.process_assistant())
+        except ValueError as e:
+            logger.error(f"ValueError in DifferenceAssistant: {e}")
+            if notification_id:
+                notification_service.update_notification_by_id(
+                    notification_id,
+                    NotificationUpdatableProperties(
+                        status=NotificationsStatusEnum.ERROR,
+                        description=f"Error in difference processing: {e}",
+                    ),
+                )
+    else:
+        logger.error("Invalid assistant name provided.")
+        if notification_id:
+            notification_service.update_notification_by_id(
+                notification_id,
+                NotificationUpdatableProperties(
+                    status=NotificationsStatusEnum.ERROR,
+                    description="Invalid assistant name provided.",
+                ),
+            )
+
+
 celery.conf.beat_schedule = {
     "remove_onboarding_more_than_x_days_task": {
         "task": f"{__name__}.remove_onboarding_more_than_x_days_task",
@@ -328,4 +429,8 @@ celery.conf.beat_schedule = {
         "task": "check_if_is_premium_user",
         "schedule": crontab(minute="*/1", hour="*"),
     },
+    # "process_assistant": {
+    #     "task": "process_assistant_task",
+    #     "schedule": crontab(minute="*/1", hour="*"),
+    # },
 }
