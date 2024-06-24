@@ -3,7 +3,6 @@ import axios from "axios";
 import { useEffect, useRef, useState } from "react";
 
 import { useKnowledgeApi } from "@/lib/api/knowledge/useKnowledgeApi";
-import { Checkbox } from "@/lib/components/ui/Checkbox/Checkbox";
 import Icon from "@/lib/components/ui/Icon/Icon";
 import { OptionsModal } from "@/lib/components/ui/OptionsModal/OptionsModal";
 import { iconList } from "@/lib/helpers/iconList";
@@ -17,8 +16,6 @@ import styles from "./KnowledgeItem.module.scss";
 
 const KnowledgeItem = ({
   knowledge,
-  selected,
-  setSelected,
 }: {
   knowledge: Knowledge;
   selected: boolean;
@@ -96,10 +93,6 @@ const KnowledgeItem = ({
   return (
     <div className={styles.knowledge_item_wrapper}>
       <div className={styles.left}>
-        <Checkbox
-          checked={selected}
-          setChecked={() => setSelected(!selected)}
-        />
         <div className={styles.icon}>
           {isUploadedKnowledge(knowledge) ? (
             <Icon
@@ -126,7 +119,7 @@ const KnowledgeItem = ({
           setOptionsOpened(!optionsOpened);
         }}
       >
-        <Icon name="options" size="normal" color="black" handleHover={true} />
+        <Icon name="options" size="small" color="black" handleHover={true} />
       </div>
       <div ref={optionsRef} className={styles.options_modal}>
         {optionsOpened && <OptionsModal options={options} />}

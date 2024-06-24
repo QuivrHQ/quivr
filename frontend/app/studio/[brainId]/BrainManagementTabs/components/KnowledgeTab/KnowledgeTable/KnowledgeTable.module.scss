@@ -8,8 +8,14 @@
   gap: Spacings.$spacing05;
   overflow: hidden;
 
-  .title {
-    @include Typography.H3;
+  .table_header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    .title {
+      @include Typography.H3;
+    }
   }
 
   .table {
@@ -20,7 +26,7 @@
     .first_line {
       display: flex;
       justify-content: space-between;
-      padding-left: calc(Spacings.$spacing10 + Spacings.$spacing02);
+      padding-left: calc(Spacings.$spacing08 + Spacings.$spacing02);
       padding-right: Spacings.$spacing04;
       padding-block: Spacings.$spacing02;
       font-weight: 500;

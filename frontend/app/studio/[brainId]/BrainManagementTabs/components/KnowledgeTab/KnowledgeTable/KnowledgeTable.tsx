@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 
+import QuivrButton from "@/lib/components/ui/QuivrButton/QuivrButton";
 import { Knowledge } from "@/lib/types/Knowledge";
 
 import KnowledgeItem from "./KnowledgeItem/KnowledgeItem";
@@ -23,7 +24,10 @@ const KnowledgeTable = React.forwardRef<HTMLDivElement, KnowledgeTableProps>(
 
     return (
       <div ref={ref} className={styles.knowledge_table_wrapper}>
-        <span className={styles.title}>Uploaded Knowledge</span>
+        <div className={styles.table_header}>
+          <span className={styles.title}>Uploaded Knowledge</span>
+          <QuivrButton label="Clear all" iconName="delete" color="dangerous" />
+        </div>
         <div className={styles.table}>
           <div className={styles.first_line}>
             <span className={styles.name}>Name</span>
