@@ -5,22 +5,25 @@
 @use "styles/ZIndexes.module.scss";
 
 .knowledge_item_wrapper {
-  padding-inline: Spacings.$spacing05;
+  padding-inline: Spacings.$spacing06;
   overflow: hidden;
   display: flex;
   gap: Spacings.$spacing02;
   justify-content: space-between;
   align-items: center;
-  margin-block: Spacings.$spacing03;
-  border: 1px solid var(--border-1);
-  border-radius: Radius.$normal;
+  border-top: 1px solid var(--border-1);
   padding-block: Spacings.$spacing03;
   position: relative;
   overflow: visible;
+  font-size: Typography.$small;
 
   &:hover {
     border-color: var(--primary-0);
     background-color: var(--background-special-0);
+  }
+
+  &:first-child {
+    border-top: none;
   }
 
   .left {

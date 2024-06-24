@@ -6,8 +6,26 @@
   display: flex;
   flex-direction: column;
   gap: Spacings.$spacing05;
+  overflow: hidden;
 
   .title {
     @include Typography.H3;
+  }
+
+  .table {
+    border: 1px solid var(--border-1);
+    border-radius: Radius.$normal;
+    overflow: hidden;
+
+    .first_line {
+      display: flex;
+      justify-content: space-between;
+      padding-left: calc(Spacings.$spacing10 + Spacings.$spacing02);
+      padding-right: Spacings.$spacing04;
+      padding-block: Spacings.$spacing02;
+      font-weight: 500;
+      background-color: var(--background-1);
+      font-size: Typography.$small;
+    }
   }
 }

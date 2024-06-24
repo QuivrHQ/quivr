@@ -11,13 +11,14 @@
     width: 16px;
     height: 16px;
     border: 1px solid var(--border-2);
-    border-radius: Radius.$small;
+    border-radius: Radius.$normal;
     display: flex;
     justify-content: center;
     align-items: center;
 
     &.filled {
       background-color: var(--primary-0);
+      border-color: var(--primary-0);
     }
   }
 
