@@ -45,21 +45,23 @@ export const useFeedBrainHandler = () => {
     const existingConnections = await getActiveSyncsForBrain(brainId);
 
     await Promise.all(
-      openedConnections.map(async (openedConnection) => {
-        const existingConnectionIds = existingConnections.map(
-          (connection) => connection.id
-        );
-        if (
-          !openedConnection.id ||
-          !existingConnectionIds.includes(openedConnection.id)
-        ) {
-          await syncFiles(openedConnection, brainId);
-        } else if (!openedConnection.selectedFiles.files.length) {
-          await deleteActiveSync(openedConnection.id);
-        } else {
-          await updateActiveSync(openedConnection);
-        }
-      })
+      openedConnections
+        .filter((connection) => connection.selectedFiles.files.length)
+        .map(async (openedConnection) => {
+          const existingConnectionIds = existingConnections.map(
+            (connection) => connection.id
+          );
+          if (
+            !openedConnection.id ||
+            !existingConnectionIds.includes(openedConnection.id)
+          ) {
+            await syncFiles(openedConnection, brainId);
+          } else if (!openedConnection.selectedFiles.files.length) {
+            await deleteActiveSync(openedConnection.id);
+          } else {
+            await updateActiveSync(openedConnection);
+          }
+        })
     );
 
     await Promise.all([
