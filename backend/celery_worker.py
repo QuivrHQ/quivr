@@ -264,22 +264,31 @@ def check_if_is_premium_user():
                     "product"
                 ]
             ]
+
             if len(matching_product_settings) > 0:
                 # Update the user with the product settings
-                supabase_db.table("user_settings").update(
-                    {
-                        "max_brains": matching_product_settings[0]["max_brains"],
-                        "max_brain_size": matching_product_settings[0][
-                            "max_brain_size"
-                        ],
-                        "monthly_chat_credit": matching_product_settings[0][
-                            "monthly_chat_credit"
-                        ],
-                        "api_access": matching_product_settings[0]["api_access"],
-                        "models": matching_product_settings[0]["models"],
-                        "is_premium": True,
-                    }
-                ).match({"user_id": str(user_id)}).execute()
+                data, _ = (
+                    supabase_db.table("user_settings")
+                    .upsert(
+                        {
+                            "user_id": str(user_id),
+                            "max_brains": matching_product_settings[0]["max_brains"],
+                            "max_brain_size": matching_product_settings[0][
+                                "max_brain_size"
+                            ],
+                            "monthly_chat_credit": matching_product_settings[0][
+                                "monthly_chat_credit"
+                            ],
+                            "api_access": matching_product_settings[0]["api_access"],
+                            "models": matching_product_settings[0]["models"],
+                            "is_premium": True,
+                        }
+                    )
+                    .execute()
+                )
+                assert (
+                    len(data[1]) == 1
+                ), "fatal, upsert user_settings didn't update a single record"
             else:
                 logger.info(
                     f"No matching product settings found for customer: {customer['email']} with subscription {matching_subscription[0]['id']}"
