@@ -9,16 +9,16 @@
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  gap: Spacings.$spacing04;
-  justify-content: space-between;
+  gap: Spacings.$spacing03;
   align-items: center;
   cursor: pointer;
   border: 1px solid var(--border-1);
   border-radius: Radius.$normal;
-  padding-block: Spacings.$spacing03;
+  padding-block: Spacings.$spacing04;
   position: relative;
   overflow: visible;
   overflow: hidden;
+  height: 200px;
 
   &:hover {
     border-color: var(--primary-0);
