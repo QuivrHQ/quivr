@@ -4,34 +4,14 @@
 @use "styles/Typography.module.scss";
 
 .brains_wrapper {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  row-gap: Spacings.$spacing04;
+  column-gap: Spacings.$spacing04;
   border-radius: Radius.$big;
   overflow: hidden;
   width: 100%;
   overflow-y: scroll;
-
-  .columns {
-    @include Typography.H3;
-    display: flex;
-    padding: Spacings.$spacing05;
-    gap: Spacings.$spacing05;
-    background-color: var(--background-1);
-    margin-bottom: Spacings.$spacing03;
-    padding-left: Spacings.$spacing09;
-
-    .name {
-      width: 200px;
-    }
-
-    .description {
-      color: var(--text-2);
-    }
-
-    @media (max-width: ScreenSizes.$small) {
-      .description {
-        display: none;
-      }
-    }
-  }
+  padding: Spacings.$spacing01;
+  padding-bottom: Spacings.$spacing07;
 }
