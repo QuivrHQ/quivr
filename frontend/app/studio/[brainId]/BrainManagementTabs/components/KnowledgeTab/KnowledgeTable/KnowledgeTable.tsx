@@ -28,18 +28,19 @@ const KnowledgeTable = React.forwardRef<HTMLDivElement, KnowledgeTableProps>(
           <span className={styles.title}>Uploaded Knowledge</span>
           <QuivrButton label="Clear all" iconName="delete" color="dangerous" />
         </div>
-        <div className={styles.table}>
+        <div>
           <div className={styles.first_line}>
             <span className={styles.name}>Name</span>
             <span className={styles.actions}>Actions</span>
           </div>
           {knowledgeList.map((knowledge) => (
-            <KnowledgeItem
-              knowledge={knowledge}
-              key={knowledge.id}
-              selected={selectedKnowledge.includes(knowledge.id)}
-              setSelected={() => handleSelect(knowledge.id)}
-            />
+            <div key={knowledge.id} onClick={() => handleSelect(knowledge.id)}>
+              <KnowledgeItem
+                knowledge={knowledge}
+                selected={selectedKnowledge.includes(knowledge.id)}
+                setSelected={() => handleSelect}
+              />
+            </div>
           ))}
         </div>
       </div>

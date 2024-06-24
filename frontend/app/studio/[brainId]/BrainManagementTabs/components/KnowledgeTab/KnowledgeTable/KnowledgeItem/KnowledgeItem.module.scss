@@ -11,8 +11,7 @@
   gap: Spacings.$spacing02;
   justify-content: space-between;
   align-items: center;
-  border: 1px solid transparent;
-  border-top: 1px solid var(--border-1);
+  border: 1px solid var(--border-0);
   padding-block: Spacings.$spacing03;
   position: relative;
   overflow: visible;
@@ -20,6 +19,11 @@
 
   &:first-child {
     border-top: none;
+  }
+
+  &:hover {
+    border-color: var(--primary-0);
+    cursor: pointer;
   }
 
   .left {
