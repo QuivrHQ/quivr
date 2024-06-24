@@ -22,7 +22,7 @@ export const KnowledgeToFeed = ({
 }): JSX.Element => {
   const { allBrains, setCurrentBrainId, currentBrainId, currentBrain } =
     useBrainContext();
-  const [selectedTab, setSelectedTab] = useState("Connections");
+  const [selectedTab, setSelectedTab] = useState("Documents");
   const { knowledgeToFeed } = useKnowledgeToFeedContext();
   const { openedConnections, setOpenedConnections, setCurrentSyncId } =
     useFromConnectionsContext();
@@ -41,14 +41,6 @@ export const KnowledgeToFeed = ({
 
   const knowledgesTabs: Tab[] = [
     {
-      label: "Connections",
-      isSelected: selectedTab === "Connections",
-      onClick: () => setSelectedTab("Connections"),
-      iconName: "sync",
-      badge: openedConnections.filter((connection) => connection.submitted)
-        .length,
-    },
-    {
       label: "Documents",
       isSelected: selectedTab === "Documents",
       onClick: () => setSelectedTab("Documents"),
@@ -56,6 +48,14 @@ export const KnowledgeToFeed = ({
       badge: knowledgeToFeed.filter(
         (knowledge) => knowledge.source === "upload"
       ).length,
+    },
+    {
+      label: "Connections",
+      isSelected: selectedTab === "Connections",
+      onClick: () => setSelectedTab("Connections"),
+      iconName: "sync",
+      badge: openedConnections.filter((connection) => connection.submitted)
+        .length,
     },
     {
       label: "Websites' page",
