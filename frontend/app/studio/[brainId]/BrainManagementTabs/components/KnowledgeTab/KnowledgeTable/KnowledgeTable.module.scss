@@ -37,6 +37,11 @@
     border-radius: Radius.$normal Radius.$normal 0 0;
     border-bottom: none;
 
+    &.empty {
+      border: 1px solid var(--border-0);
+      border-radius: Radius.$normal;
+    }
+
     .left {
       display: flex;
       align-items: center;
