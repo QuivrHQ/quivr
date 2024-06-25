@@ -13,13 +13,43 @@ interface KnowledgeTableProps {
 const KnowledgeTable = React.forwardRef<HTMLDivElement, KnowledgeTableProps>(
   ({ knowledgeList }, ref) => {
     const [selectedKnowledge, setSelectedKnowledge] = useState<string[]>([]);
+    const [lastSelectedIndex, setLastSelectedIndex] = useState<number | null>(
+      null
+    );
 
-    const handleSelect = (id: string) => {
-      setSelectedKnowledge((prevSelected) =>
-        prevSelected.includes(id)
-          ? prevSelected.filter((selectedId) => selectedId !== id)
-          : [...prevSelected, id]
-      );
+    const handleSelect = (
+      knowledgeId: string,
+      index: number,
+      event: React.MouseEvent
+    ) => {
+      if (event.shiftKey && lastSelectedIndex !== null) {
+        const start = Math.min(lastSelectedIndex, index);
+        const end = Math.max(lastSelectedIndex, index);
+        const range = knowledgeList
+          .slice(start, end + 1)
+          .map((item) => item.id);
+
+        setSelectedKnowledge((prevSelected) => {
+          const newSelected = [...prevSelected];
+          range.forEach((id) => {
+            if (!newSelected.includes(id)) {
+              newSelected.push(id);
+            }
+          });
+
+          return newSelected;
+        });
+      } else {
+        const isSelected = selectedKnowledge.includes(knowledgeId);
+        setSelectedKnowledge((prevSelected) =>
+          isSelected
+            ? prevSelected.filter((selectedId) => selectedId !== knowledgeId)
+            : [...prevSelected, knowledgeId]
+        );
+        setLastSelectedIndex(
+          isSelected && lastSelectedIndex === index ? null : index
+        );
+      }
     };
 
     return (
@@ -34,11 +64,16 @@ const KnowledgeTable = React.forwardRef<HTMLDivElement, KnowledgeTableProps>(
             <span className={styles.actions}>Actions</span>
           </div>
           {knowledgeList.map((knowledge, index) => (
-            <div key={knowledge.id} onClick={() => handleSelect(knowledge.id)}>
+            <div
+              key={knowledge.id}
+              onClick={(event) => handleSelect(knowledge.id, index, event)}
+            >
               <KnowledgeItem
                 knowledge={knowledge}
                 selected={selectedKnowledge.includes(knowledge.id)}
-                setSelected={() => handleSelect}
+                setSelected={(selected, event) =>
+                  handleSelect(knowledge.id, index, event)
+                }
                 lastChild={index === knowledgeList.length - 1}
               />
             </div>

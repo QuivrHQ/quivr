@@ -1,6 +1,5 @@
-"use client";
 import axios from "axios";
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 import { useKnowledgeApi } from "@/lib/api/knowledge/useKnowledgeApi";
 import { Checkbox } from "@/lib/components/ui/Checkbox/Checkbox";
@@ -23,7 +22,7 @@ const KnowledgeItem = ({
 }: {
   knowledge: Knowledge;
   selected: boolean;
-  setSelected: (selected: boolean) => void;
+  setSelected: (selected: boolean, event: React.MouseEvent) => void;
   lastChild?: boolean;
 }): JSX.Element => {
   const [optionsOpened, setOptionsOpened] = useState<boolean>(false);
@@ -104,7 +103,7 @@ const KnowledgeItem = ({
       <div className={styles.left}>
         <Checkbox
           checked={selected}
-          setChecked={() => setSelected(!selected)}
+          setChecked={(checked, event) => setSelected(checked, event)}
         />
         <div className={styles.icon}>
           {isUploadedKnowledge(knowledge) ? (
@@ -129,20 +128,10 @@ const KnowledgeItem = ({
         ref={iconRef}
         onClick={(event: React.MouseEvent<HTMLElement>) => {
           event.stopPropagation();
-          event.preventDefault();
-          event.nativeEvent.stopImmediatePropagation();
           setOptionsOpened(!optionsOpened);
         }}
       >
-        <Icon
-          name="options"
-          size="small"
-          color="black"
-          handleHover={true}
-          onClick={(event) => {
-            event?.preventDefault(); // Empêche l'événement par défaut, mais la propagation est déjà stoppée
-          }}
-        />
+        <Icon name="options" size="small" color="black" handleHover={true} />
       </div>
       <div ref={optionsRef} className={styles.options_modal}>
         {optionsOpened && <OptionsModal options={options} />}
