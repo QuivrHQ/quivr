@@ -1,4 +1,5 @@
 import os
+import time
 from typing import List
 
 import msal
@@ -7,8 +8,8 @@ from fastapi import HTTPException
 from google.auth.transport.requests import Request as GoogleRequest
 from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
-from modules.sync.utils.normalize import remove_special_characters
 from logger import get_logger
+from modules.sync.utils.normalize import remove_special_characters
 from requests import HTTPError
 
 logger = get_logger(__name__)
@@ -141,7 +142,7 @@ def get_google_drive_files(
                 break
 
         logger.info("Google Drive files retrieved successfully: %s", len(files))
-        
+
         for file in files:
             file["name"] = remove_special_characters(file["name"])
         return files
@@ -188,20 +189,39 @@ def get_azure_headers(token_data):
     }
 
 
-def list_azure_files(credentials, folder_id=None, recursive=False):
+def list_azure_files(credentials, folder_id=None, recursive=False, max_retries=5):
     def fetch_files(endpoint, headers):
-        response = requests.get(endpoint, headers=headers)
-        if response.status_code == 401:
-            token_data = refresh_azure_token(credentials)
-            headers = get_azure_headers(token_data)
-            response = requests.get(endpoint, headers=headers)
-        if response.status_code != 200:
-            return {"error": response.text}
-        return response.json().get("value", [])
+        # TODO: inject better information
+        logger.debug(f"fetching files from {endpoint}.")
+        retry_count = 0
+        while retry_count <= max_retries:
+            try:
+                response = requests.get(endpoint, headers=headers)
+
+                # Retrying with refereshed token
+                if response.status_code == 401:
+                    token_data = refresh_azure_token(credentials)
+                    headers = get_azure_headers(token_data)
+                    response = requests.get(endpoint, headers=headers)
+                else:
+                    response.raise_for_status()
+                return response.json().get("value", [])
+
+            except HTTPError as e:
+                logger.exception(
+                    f"azure_list_files got exception : {e}. headers: {headers}. {retry_count} retrying."
+                )
+                # Exponential backoff
+                time.sleep(2**retry_count)
+                retry_count += 1
+
+        raise HTTPException(
+            504, detail="can't connect to azure endpoint to retrieve files."
+        )
 
     token_data = get_azure_token_data(credentials)
     headers = get_azure_headers(token_data)
-    endpoint = f"https://graph.microsoft.com/v1.0/me/drive/root/children"
+    endpoint = "https://graph.microsoft.com/v1.0/me/drive/root/children"
     if folder_id:
         endpoint = (
             f"https://graph.microsoft.com/v1.0/me/drive/items/{folder_id}/children"
@@ -277,7 +297,7 @@ def get_azure_files_by_id(credentials: dict, file_ids: List[str]):
                 "mime_type": result.get("file", {}).get("mimeType", "folder"),
             }
         )
-    
+
     for file in files:
         file["name"] = remove_special_characters(file["name"])
     logger.info("Azure Drive files retrieved successfully: %s", len(files))
