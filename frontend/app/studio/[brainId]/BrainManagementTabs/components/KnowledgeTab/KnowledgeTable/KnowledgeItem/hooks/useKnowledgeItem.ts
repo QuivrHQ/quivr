@@ -16,7 +16,7 @@ export const useKnowledgeItem = () => {
   const [isDeleting, setIsDeleting] = useState(false);
   const { publish } = useToast();
   const { track } = useEventTracking();
-  const { brainId, brain } = useUrlBrain();
+  const { brainId } = useUrlBrain();
   const { invalidateKnowledgeDataKey } = useKnowledge({
     brainId,
   });
@@ -38,15 +38,6 @@ export const useKnowledgeItem = () => {
       });
 
       invalidateKnowledgeDataKey();
-
-      publish({
-        variant: "success",
-        text: t("deleted", {
-          fileName: knowledge_name,
-          brain: brain?.name,
-          ns: "explore",
-        }),
-      });
     } catch (error) {
       publish({
         variant: "warning",
