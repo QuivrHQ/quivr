@@ -5,22 +5,27 @@
 @use "styles/ZIndexes.module.scss";
 
 .knowledge_item_wrapper {
-  padding-inline: Spacings.$spacing05;
+  padding-inline: Spacings.$spacing06;
   overflow: hidden;
   display: flex;
   gap: Spacings.$spacing02;
   justify-content: space-between;
   align-items: center;
-  margin-block: Spacings.$spacing03;
-  border: 1px solid var(--border-1);
-  border-radius: Radius.$normal;
+  border: 1px solid var(--border-0);
   padding-block: Spacings.$spacing03;
   position: relative;
   overflow: visible;
+  font-size: Typography.$small;
+  border-bottom: none;
+
+  &.last {
+    border-radius: 0 0 Radius.$normal Radius.$normal;
+    border-bottom: 1px solid var(--border-0);
+  }
 
   &:hover {
-    border-color: var(--primary-0);
-    background-color: var(--background-special-0);
+    background-color: var(--background-1);
+    cursor: pointer;
   }
 
   .left {
@@ -28,10 +33,6 @@
     align-items: center;
     gap: Spacings.$spacing03;
     overflow: hidden;
-
-    .icon {
-      min-width: 16px;
-    }
 
     .file_name {
       @include Typography.EllipsisOverflow;

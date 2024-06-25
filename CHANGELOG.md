@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.0.272 (2024-06-24)
+
+## What's Changed
+* fix(frontend): send empty sync is not allowed by @Zewed in https://github.com/QuivrHQ/quivr/pull/2716
+* feat: Improve efficiency of syncing stripe by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2719
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.271...v0.0.272
+
 ## 0.0.271 (2024-06-24)
 
 ## What's Changed

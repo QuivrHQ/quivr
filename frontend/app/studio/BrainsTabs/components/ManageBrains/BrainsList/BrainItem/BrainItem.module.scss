@@ -1,3 +1,4 @@
+@use "styles/BoxShadow.module.scss";
 @use "styles/Radius.module.scss";
 @use "styles/ScreenSizes.module.scss";
 @use "styles/Spacings.module.scss";
@@ -19,6 +20,7 @@
   overflow: visible;
   overflow: hidden;
   height: 100%;
+  box-shadow: BoxShadow.$small;
 
   &:hover {
     border-color: var(--primary-0);
