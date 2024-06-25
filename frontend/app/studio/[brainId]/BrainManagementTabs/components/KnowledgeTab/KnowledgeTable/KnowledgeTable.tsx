@@ -2,6 +2,7 @@ import React, { useState } from "react";
 
 import { Checkbox } from "@/lib/components/ui/Checkbox/Checkbox";
 import QuivrButton from "@/lib/components/ui/QuivrButton/QuivrButton";
+import { TextInput } from "@/lib/components/ui/TextInput/TextInput";
 import { Knowledge } from "@/lib/types/Knowledge";
 
 import KnowledgeItem from "./KnowledgeItem/KnowledgeItem";
@@ -14,13 +15,13 @@ interface KnowledgeTableProps {
 
 const KnowledgeTable = React.forwardRef<HTMLDivElement, KnowledgeTableProps>(
   ({ knowledgeList }, ref) => {
-    // Change selectedKnowledge to store Knowledge objects instead of string IDs
     const [selectedKnowledge, setSelectedKnowledge] = useState<Knowledge[]>([]);
     const [lastSelectedIndex, setLastSelectedIndex] = useState<number | null>(
       null
     );
     const { onDeleteKnowledge } = useKnowledgeItem();
     const [allChecked, setAllChecked] = useState<boolean>(false);
+    const [searchQuery, setSearchQuery] = useState<string>("");
 
     const handleSelect = (
       knowledge: Knowledge,
@@ -63,8 +64,16 @@ const KnowledgeTable = React.forwardRef<HTMLDivElement, KnowledgeTableProps>(
 
     return (
       <div ref={ref} className={styles.knowledge_table_wrapper}>
+        <span className={styles.title}>Uploaded Knowledge</span>
         <div className={styles.table_header}>
-          <span className={styles.title}>Uploaded Knowledge</span>
+          <div className={styles.search}>
+            <TextInput
+              iconName="search"
+              label="Search"
+              inputValue={searchQuery}
+              setInputValue={setSearchQuery}
+            />
+          </div>
           <QuivrButton
             label="Delete"
             iconName="delete"

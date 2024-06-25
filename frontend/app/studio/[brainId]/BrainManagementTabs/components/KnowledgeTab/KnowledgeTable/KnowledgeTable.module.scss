@@ -9,13 +9,18 @@
   padding-bottom: Spacings.$spacing10;
   border-radius: Radius.$normal;
 
+  .title {
+    @include Typography.H3;
+  }
+
   .table_header {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: Spacings.$spacing03;
 
-    .title {
-      @include Typography.H3;
+    .search {
+      width: 250px;
     }
   }
 
