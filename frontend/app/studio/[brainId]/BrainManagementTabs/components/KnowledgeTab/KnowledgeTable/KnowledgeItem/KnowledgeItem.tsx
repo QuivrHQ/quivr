@@ -19,10 +19,12 @@ const KnowledgeItem = ({
   knowledge,
   selected,
   setSelected,
+  lastChild,
 }: {
   knowledge: Knowledge;
   selected: boolean;
   setSelected: (selected: boolean) => void;
+  lastChild?: boolean;
 }): JSX.Element => {
   const [optionsOpened, setOptionsOpened] = useState<boolean>(false);
   const iconRef = useRef<HTMLDivElement | null>(null);
@@ -94,7 +96,11 @@ const KnowledgeItem = ({
   }, []);
 
   return (
-    <div className={styles.knowledge_item_wrapper}>
+    <div
+      className={`${styles.knowledge_item_wrapper} ${
+        lastChild ? styles.last : ""
+      }`}
+    >
       <div className={styles.left}>
         <Checkbox
           checked={selected}

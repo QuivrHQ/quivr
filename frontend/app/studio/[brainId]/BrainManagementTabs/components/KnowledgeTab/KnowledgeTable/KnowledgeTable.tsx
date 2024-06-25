@@ -33,12 +33,13 @@ const KnowledgeTable = React.forwardRef<HTMLDivElement, KnowledgeTableProps>(
             <span className={styles.name}>Name</span>
             <span className={styles.actions}>Actions</span>
           </div>
-          {knowledgeList.map((knowledge) => (
+          {knowledgeList.map((knowledge, index) => (
             <div key={knowledge.id} onClick={() => handleSelect(knowledge.id)}>
               <KnowledgeItem
                 knowledge={knowledge}
                 selected={selectedKnowledge.includes(knowledge.id)}
                 setSelected={() => handleSelect}
+                lastChild={index === knowledgeList.length - 1}
               />
             </div>
           ))}

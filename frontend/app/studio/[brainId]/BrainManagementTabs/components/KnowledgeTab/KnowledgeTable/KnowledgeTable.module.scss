@@ -7,7 +7,6 @@
   flex-direction: column;
   gap: Spacings.$spacing05;
   padding-bottom: Spacings.$spacing10;
-  overflow: visible;
   border-radius: Radius.$normal;
 
   .table_header {
@@ -30,5 +29,7 @@
     background-color: var(--background-1);
     font-size: Typography.$small;
     border: 1px solid var(--border-0);
+    border-radius: Radius.$normal Radius.$normal 0 0;
+    border-bottom: none;
   }
 }
