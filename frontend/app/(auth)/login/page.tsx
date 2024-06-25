@@ -9,6 +9,7 @@ import { useUserSettingsContext } from "@/lib/context/UserSettingsProvider/hooks
 import { useAuthModes } from "@/lib/hooks/useAuthModes";
 
 import { EmailLogin } from "./components/EmailLogin";
+import { GithubLoginButton } from "./components/GithubLogin";
 import { GoogleLoginButton } from "./components/GoogleLogin";
 import { useLogin } from "./hooks/useLogin";
 import styles from "./page.module.scss";
@@ -16,7 +17,7 @@ import { EmailAuthContextType } from "./types";
 
 const Main = (): JSX.Element => {
   useLogin();
-  const { googleSso } = useAuthModes();
+  const { googleSso, githubSso } = useAuthModes();
   const { isDarkMode } = useUserSettingsContext();
 
   const methods = useForm<EmailAuthContextType>({
@@ -43,6 +44,7 @@ const Main = (): JSX.Element => {
           </FormProvider>
 
           {googleSso && <GoogleLoginButton />}
+          {githubSso && <GithubLoginButton />}
         </div>
         <p className={styles.restriction_message}>
           {t("restriction_message", { ns: "login" })}
