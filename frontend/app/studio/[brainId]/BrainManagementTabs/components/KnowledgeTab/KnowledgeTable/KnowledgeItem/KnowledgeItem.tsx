@@ -128,11 +128,21 @@ const KnowledgeItem = ({
       <div
         ref={iconRef}
         onClick={(event: React.MouseEvent<HTMLElement>) => {
+          event.stopPropagation();
+          event.preventDefault();
           event.nativeEvent.stopImmediatePropagation();
           setOptionsOpened(!optionsOpened);
         }}
       >
-        <Icon name="options" size="small" color="black" handleHover={true} />
+        <Icon
+          name="options"
+          size="small"
+          color="black"
+          handleHover={true}
+          onClick={(event) => {
+            event?.preventDefault(); // Empêche l'événement par défaut, mais la propagation est déjà stoppée
+          }}
+        />
       </div>
       <div ref={optionsRef} className={styles.options_modal}>
         {optionsOpened && <OptionsModal options={options} />}

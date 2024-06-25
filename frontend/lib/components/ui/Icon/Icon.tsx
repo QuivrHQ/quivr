@@ -15,7 +15,7 @@ interface IconProps {
   classname?: string;
   hovered?: boolean;
   handleHover?: boolean;
-  onClick?: () => void | Promise<void>;
+  onClick?: (event?: Event) => void | Promise<void>;
 }
 
 export const Icon = ({
