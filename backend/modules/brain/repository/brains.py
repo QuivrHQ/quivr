@@ -1,12 +1,11 @@
 from uuid import UUID
 
-from sqlalchemy import text
-
 from logger import get_logger
 from models.settings import get_embeddings, get_pg_database_engine, get_supabase_client
 from modules.brain.dto.inputs import BrainUpdatableProperties
 from modules.brain.entity.brain_entity import BrainEntity, PublicBrain
 from modules.brain.repository.interfaces.brains_interface import BrainsInterface
+from sqlalchemy import text
 
 logger = get_logger(__name__)
 
@@ -56,6 +55,32 @@ class Brains(BrainsInterface):
             public_brains.append(PublicBrain(**item))
         return public_brains
 
+    def get_quivr_assistant_brain(self, user_id: UUID) -> BrainEntity:
+        try:
+            response = (
+                self.db.table("brains_users")
+                .select("brain_id")
+                .filter("user_id", "eq", user_id)
+                .execute()
+            ).data
+            if len(response) == 0:
+                return None
+            # Now get all the brains that have quivr_assistant set to true for the user
+
+            response = (
+                self.db.table("brains")
+                .select("*")
+                .in_("brain_id", [item["brain_id"] for item in response])
+                .filter("quivr_assistant", "eq", True)
+                .execute()
+            )
+            if len(response.data) == 0:
+                return None
+            return BrainEntity(**response.data[0])
+        except Exception as e:
+            logger.error(e)
+            return None
+
     def update_brain_last_update_time(self, brain_id):
         try:
             with self.pg_engine.begin() as connection:
@@ -74,7 +99,9 @@ class Brains(BrainsInterface):
             SELECT * FROM brains
             WHERE brain_id = '{brain_id}'
             """
-            response = connection.execute(text(query.format(brain_id=brain_id))).fetchall()
+            response = connection.execute(
+                text(query.format(brain_id=brain_id))
+            ).fetchall()
         if len(response) == 0:
             return None
         return BrainEntity(**response[0]._mapping)

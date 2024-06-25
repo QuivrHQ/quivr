@@ -69,18 +69,14 @@ def get_answer_generator(
 
     # Get History only if needed
     if not brain_id:
-        history = chat_service.get_chat_history(chat_id)
+        brain = brain_service.create_or_get_quivr_brain(current_user.id)
     else:
-        history = []
+        brain = brain_service.get_brain_by_id(brain_id)
 
-    # Generic
-    brain, metadata_brain = brain_service.find_brain_from_question(
-        brain_id, chat_question.question, current_user, chat_id, history, vector_store
-    )
     gpt_answer_generator = chat_instance.get_answer_generator(
         brain=brain,
         chat_id=str(chat_id),
-        model=brain.model,
+        model=brain.model,  # type: ignore
         temperature=0.1,
         streaming=True,
         prompt_id=chat_question.prompt_id,
