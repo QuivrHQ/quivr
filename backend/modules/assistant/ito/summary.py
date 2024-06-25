@@ -1,6 +1,7 @@
 import tempfile
 from typing import List
 
+from celery_config import celery
 from fastapi import UploadFile
 from langchain.chains import (
     MapReduceDocumentsChain,
@@ -23,9 +24,12 @@ from modules.assistant.dto.outputs import (
     Outputs,
 )
 from modules.assistant.ito.ito import ITO
+from modules.notification.dto.inputs import CreateNotification
+from modules.notification.service.notification_service import NotificationService
 from modules.user.entity.user_identity import UserIdentity
 
 logger = get_logger(__name__)
+notification_service = NotificationService()
 
 
 class SummaryAssistant(ITO):
@@ -69,97 +73,119 @@ class SummaryAssistant(ITO):
         return True
 
     async def process_assistant(self):
-
         try:
-            self.increase_usage_user()
+            notification = notification_service.add_notification(
+                CreateNotification(
+                    user_id=self.current_user.id,
+                    status="info",
+                    title=f"Creating Summary for {self.files[0].filename}",
+                )
+            )
+            # Create a temporary file with the uploaded file as a temporary file and then pass it to the loader
+            tmp_file = tempfile.NamedTemporaryFile(delete=False)
+
+            # Write the file to the temporary file
+            tmp_file.write(self.files[0].file.read())
+
+            # Now pass the path of the temporary file to the loader
+
+            loader = UnstructuredPDFLoader(tmp_file.name)
+
+            tmp_file.close()
+
+            data = loader.load()
+
+            text_splitter = CharacterTextSplitter.from_tiktoken_encoder(
+                chunk_size=1000, chunk_overlap=100
+            )
+            split_docs = text_splitter.split_documents(data)
+            logger.info(f"Split {len(split_docs)} documents")
+            # Jsonify the split docs
+            split_docs = [doc.to_json() for doc in split_docs]
+            ## Turn this into a task
+            brain_id = (
+                self.input.outputs.brain.value
+                if self.input.outputs.brain.activated
+                else None
+            )
+            email_activated = self.input.outputs.email.activated
+            celery.send_task(
+                name="task_summary",
+                args=(
+                    split_docs,
+                    self.files[0].filename,
+                    brain_id,
+                    email_activated,
+                    self.current_user.model_dump(mode="json"),
+                    notification.id,
+                ),
+            )
         except Exception as e:
-            logger.error(f"Error increasing usage: {e}")
-            return {"error": str(e)}
+            logger.error(f"Error processing summary: {e}")
 
-        # Create a temporary file with the uploaded file as a temporary file and then pass it to the loader
-        tmp_file = tempfile.NamedTemporaryFile(delete=False)
 
-        # Write the file to the temporary file
-        tmp_file.write(self.files[0].file.read())
+def map_reduce_chain():
+    llm = ChatLiteLLM(model="gpt-4o", max_tokens=2000)
 
-        # Now pass the path of the temporary file to the loader
+    map_template = """The following is a document that has been divided into multiple sections:
+    {docs}
+    
+    Please carefully analyze each section and identify the following:
 
-        loader = UnstructuredPDFLoader(tmp_file.name)
+    1. Main Themes: What are the overarching ideas or topics in this section?
+    2. Key Points: What are the most important facts, arguments, or ideas presented in this section?
+    3. Important Information: Are there any crucial details that stand out? This could include data, quotes, specific events, entity, or other relevant information.
+    4. People: Who are the key individuals mentioned in this section? What roles do they play?
+    5. Reasoning: What logic or arguments are used to support the key points?
+    6. Chapters: If the document is divided into chapters, what is the main focus of each chapter?
 
-        tmp_file.close()
+    Remember to consider the language and context of the document. This will help in understanding the nuances and subtleties of the text."""
+    map_prompt = PromptTemplate.from_template(map_template)
+    map_chain = LLMChain(llm=llm, prompt=map_prompt)
 
-        data = loader.load()
+    # Reduce
+    reduce_template = """The following is a set of summaries for parts of the document :
+    {docs}
+    Take these and distill it into a final, consolidated summary of the document. Make sure to include the main themes, key points, and important information such as data, quotes,people and specific events.
+    Use markdown such as bold, italics, underlined. For example, **bold**, *italics*, and _underlined_ to highlight key points.
+    Please provide the final summary with sections using bold headers. 
+    Sections should always be Summary and Key Points, but feel free to add more sections as needed.
+    Always use bold text for the sections headers.
+    Keep the same language as the documents.
+    Answer:"""
+    reduce_prompt = PromptTemplate.from_template(reduce_template)
 
-        llm = ChatLiteLLM(model="gpt-4o", max_tokens=2000)
+    # Run chain
+    llm = ChatLiteLLM(model="gpt-4o", max_tokens=2000)
+    reduce_chain = LLMChain(llm=llm, prompt=reduce_prompt)
 
-        map_template = """The following is a document that has been divided into multiple sections:
-        {docs}
-        
-        Please carefully analyze each section and identify the following:
+    # Takes a list of documents, combines them into a single string, and passes this to an LLMChain
+    combine_documents_chain = StuffDocumentsChain(
+        llm_chain=reduce_chain, document_variable_name="docs"
+    )
 
-        1. Main Themes: What are the overarching ideas or topics in this section?
-        2. Key Points: What are the most important facts, arguments, or ideas presented in this section?
-        3. Important Information: Are there any crucial details that stand out? This could include data, quotes, specific events, entity, or other relevant information.
-        4. People: Who are the key individuals mentioned in this section? What roles do they play?
-        5. Reasoning: What logic or arguments are used to support the key points?
-        6. Chapters: If the document is divided into chapters, what is the main focus of each chapter?
+    # Combines and iteratively reduces the mapped documents
+    reduce_documents_chain = ReduceDocumentsChain(
+        # This is final chain that is called.
+        combine_documents_chain=combine_documents_chain,
+        # If documents exceed context for `StuffDocumentsChain`
+        collapse_documents_chain=combine_documents_chain,
+        # The maximum number of tokens to group documents into.
+        token_max=4000,
+    )
 
-        Remember to consider the language and context of the document. This will help in understanding the nuances and subtleties of the text."""
-        map_prompt = PromptTemplate.from_template(map_template)
-        map_chain = LLMChain(llm=llm, prompt=map_prompt)
-
-        # Reduce
-        reduce_template = """The following is a set of summaries for parts of the document:
-        {docs}
-        Take these and distill it into a final, consolidated summary of the document. Make sure to include the main themes, key points, and important information such as data, quotes,people and specific events.
-        Use markdown such as bold, italics, underlined. For example, **bold**, *italics*, and _underlined_ to highlight key points.
-        Please provide the final summary with sections using bold headers. 
-        Sections should always be Summary and Key Points, but feel free to add more sections as needed.
-        Always use bold text for the sections headers.
-        Keep the same language as the documents.
-        Answer:"""
-        reduce_prompt = PromptTemplate.from_template(reduce_template)
-
-        # Run chain
-        reduce_chain = LLMChain(llm=llm, prompt=reduce_prompt)
-
-        # Takes a list of documents, combines them into a single string, and passes this to an LLMChain
-        combine_documents_chain = StuffDocumentsChain(
-            llm_chain=reduce_chain, document_variable_name="docs"
-        )
-
-        # Combines and iteratively reduces the mapped documents
-        reduce_documents_chain = ReduceDocumentsChain(
-            # This is final chain that is called.
-            combine_documents_chain=combine_documents_chain,
-            # If documents exceed context for `StuffDocumentsChain`
-            collapse_documents_chain=combine_documents_chain,
-            # The maximum number of tokens to group documents into.
-            token_max=4000,
-        )
-
-        # Combining documents by mapping a chain over them, then combining results
-        map_reduce_chain = MapReduceDocumentsChain(
-            # Map chain
-            llm_chain=map_chain,
-            # Reduce chain
-            reduce_documents_chain=reduce_documents_chain,
-            # The variable name in the llm_chain to put the documents in
-            document_variable_name="docs",
-            # Return the results of the map steps in the output
-            return_intermediate_steps=False,
-        )
-
-        text_splitter = CharacterTextSplitter.from_tiktoken_encoder(
-            chunk_size=1000, chunk_overlap=100
-        )
-        split_docs = text_splitter.split_documents(data)
-
-        content = map_reduce_chain.run(split_docs)
-
-        return await self.create_and_upload_processed_file(
-            content, self.files[0].filename, "Summary"
-        )
+    # Combining documents by mapping a chain over them, then combining results
+    map_reduce_chain = MapReduceDocumentsChain(
+        # Map chain
+        llm_chain=map_chain,
+        # Reduce chain
+        reduce_documents_chain=reduce_documents_chain,
+        # The variable name in the llm_chain to put the documents in
+        document_variable_name="docs",
+        # Return the results of the map steps in the output
+        return_intermediate_steps=False,
+    )
+    return map_reduce_chain
 
 
 def summary_inputs():

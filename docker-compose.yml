@@ -45,8 +45,6 @@ services:
       - "--workers"
       - "6"
     restart: always
-    volumes:
-      - ./backend/:/code/
     ports:
       - 5050:5050
 
