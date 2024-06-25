@@ -1,5 +1,38 @@
 # Changelog
 
+## 0.0.272 (2024-06-24)
+
+## What's Changed
+* fix(frontend): send empty sync is not allowed by @Zewed in https://github.com/QuivrHQ/quivr/pull/2716
+* feat: Improve efficiency of syncing stripe by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2719
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.271...v0.0.272
+
+## 0.0.271 (2024-06-24)
+
+## What's Changed
+* fix: check user premium upsert by @AmineDiro in https://github.com/QuivrHQ/quivr/pull/2714
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.270...v0.0.271
+
+## 0.0.270 (2024-06-24)
+
+## What's Changed
+* fix(frontend): small rephrase by @Zewed in https://github.com/QuivrHQ/quivr/pull/2699
+* feat(frontend): table markdown by @Zewed in https://github.com/QuivrHQ/quivr/pull/2702
+* Enable Porter Application raise by @porter-deployment-app in https://github.com/QuivrHQ/quivr/pull/2705
+* Enable Porter Application raise-frontend by @porter-deployment-app in https://github.com/QuivrHQ/quivr/pull/2706
+* chore: Remove Porter stack deployment workflows for cherry-pick-backend and cherry-pick-frontend by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2707
+* fix(frontend): 25 instead of 100 by @Zewed in https://github.com/QuivrHQ/quivr/pull/2708
+* fix(frontend): remove double scss class by @elazarnaaman in https://github.com/QuivrHQ/quivr/pull/2704
+* fix(frontend): documents before connections by @Zewed in https://github.com/QuivrHQ/quivr/pull/2711
+* feat(frontend): brain studio interface by @Zewed in https://github.com/QuivrHQ/quivr/pull/2712
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.269...v0.0.270
+
 ## 0.0.269 (2024-06-20)
 
 ## What's Changed
