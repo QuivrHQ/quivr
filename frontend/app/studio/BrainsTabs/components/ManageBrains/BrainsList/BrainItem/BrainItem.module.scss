@@ -8,56 +8,63 @@
   padding-inline: Spacings.$spacing05;
   overflow: hidden;
   display: flex;
-  gap: Spacings.$spacing02;
-  justify-content: space-between;
+  flex-direction: column;
+  gap: Spacings.$spacing03;
   align-items: center;
   cursor: pointer;
-  margin-block: Spacings.$spacing03;
   border: 1px solid var(--border-1);
   border-radius: Radius.$normal;
-  padding-block: Spacings.$spacing03;
+  padding-block: Spacings.$spacing04;
   position: relative;
   overflow: visible;
+  overflow: hidden;
+  height: 100%;
 
   &:hover {
     border-color: var(--primary-0);
-    background-color: var(--background-special-0);
+    color: var(--text-3);
   }
 
-  .dark_image {
-    filter: invert(100%);
-  }
-
-  .brain_info_wrapper {
-    padding-block: Spacings.$spacing03;
-    padding-left: Spacings.$spacing03;
+  .brain_header {
     display: flex;
+    justify-content: space-between;
+    width: 100%;
+    align-items: center;
+
+    .left {
+      display: flex;
+      gap: Spacings.$spacing03;
+      @include Typography.H2;
+      align-items: center;
+    }
+  }
+
+  .model {
+    display: flex;
+    gap: Spacings.$spacing03;
+    align-items: center;
+    font-size: Typography.$small;
+    width: 100%;
+
+    .title {
+      font-weight: 500;
+    }
+
+    .model_type {
+      color: var(--text-4);
+    }
+  }
+
+  .description {
+    width: 100%;
+    font-style: italic;
+    font-size: Typography.$tiny;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 5;
     overflow: hidden;
-    gap: Spacings.$spacing05;
-    overflow: hidden;
-    flex: 1;
-
-    .name {
-      @include Typography.EllipsisOverflow;
-      width: 200px;
-      color: var(--text-3);
-    }
-
-    .description {
-      @include Typography.EllipsisOverflow;
-      flex: 1;
-      color: var(--text-2);
-    }
-
-    @media (max-width: ScreenSizes.$small) {
-      .name {
-        width: auto;
-      }
-
-      .description {
-        display: none;
-      }
-    }
+    text-overflow: ellipsis;
+    color: var(--text-4);
   }
 
   .options_modal {
