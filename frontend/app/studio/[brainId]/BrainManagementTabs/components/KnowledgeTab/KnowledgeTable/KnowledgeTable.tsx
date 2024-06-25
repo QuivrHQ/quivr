@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 
+import { Checkbox } from "@/lib/components/ui/Checkbox/Checkbox";
 import QuivrButton from "@/lib/components/ui/QuivrButton/QuivrButton";
 import { Knowledge } from "@/lib/types/Knowledge";
 
@@ -19,6 +20,7 @@ const KnowledgeTable = React.forwardRef<HTMLDivElement, KnowledgeTableProps>(
       null
     );
     const { onDeleteKnowledge } = useKnowledgeItem();
+    const [allChecked, setAllChecked] = useState<boolean>(false);
 
     const handleSelect = (
       knowledge: Knowledge,
@@ -64,9 +66,10 @@ const KnowledgeTable = React.forwardRef<HTMLDivElement, KnowledgeTableProps>(
         <div className={styles.table_header}>
           <span className={styles.title}>Uploaded Knowledge</span>
           <QuivrButton
-            label="Clear all"
+            label="Delete"
             iconName="delete"
             color="dangerous"
+            disabled={selectedKnowledge.length === 0}
             onClick={() => {
               selectedKnowledge.forEach((knowledge) => {
                 void onDeleteKnowledge(knowledge);
@@ -77,7 +80,18 @@ const KnowledgeTable = React.forwardRef<HTMLDivElement, KnowledgeTableProps>(
         </div>
         <div>
           <div className={styles.first_line}>
-            <span className={styles.name}>Name</span>
+            <div className={styles.left}>
+              <Checkbox
+                checked={allChecked}
+                setChecked={(checked) => {
+                  setAllChecked(checked);
+                  checked
+                    ? setSelectedKnowledge(knowledgeList)
+                    : setSelectedKnowledge([]);
+                }}
+              />
+              <span className={styles.name}>Name</span>
+            </div>
             <span className={styles.actions}>Actions</span>
           </div>
           {knowledgeList.map((knowledge, index) => (
@@ -90,7 +104,7 @@ const KnowledgeTable = React.forwardRef<HTMLDivElement, KnowledgeTableProps>(
                 selected={selectedKnowledge.some(
                   (item) => item.id === knowledge.id
                 )}
-                setSelected={(selected, event) =>
+                setSelected={(_selected, event) =>
                   handleSelect(knowledge, index, event)
                 }
                 lastChild={index === knowledgeList.length - 1}

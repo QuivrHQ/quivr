@@ -22,7 +22,7 @@
   .first_line {
     display: flex;
     justify-content: space-between;
-    padding-left: calc(Spacings.$spacing10 + Spacings.$spacing02);
+    padding-left: calc(Spacings.$spacing06);
     padding-right: Spacings.$spacing04;
     padding-block: Spacings.$spacing02;
     font-weight: 500;
@@ -31,5 +31,11 @@
     border: 1px solid var(--border-0);
     border-radius: Radius.$normal Radius.$normal 0 0;
     border-bottom: none;
+
+    .left {
+      display: flex;
+      align-items: center;
+      gap: Spacings.$spacing06;
+    }
   }
 }
