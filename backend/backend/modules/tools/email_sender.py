@@ -53,7 +53,7 @@ class EmailSenderTool(BaseTool):
         try:
             r = send_email(
                 {
-                    "sender": self.contact_settings.resend_contact_sales_from,
+                    "from": self.contact_settings.resend_contact_sales_from,
                     "to": self.user_email,
                     "reply_to": "no-reply@quivr.app",
                     "subject": "Email from your assistant",

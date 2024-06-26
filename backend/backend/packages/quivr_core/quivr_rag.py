@@ -23,10 +23,7 @@ from backend.modules.brain.rags.quivr_rag import (
 )
 from backend.modules.knowledge.entity.knowledge import Knowledge
 from backend.packages.quivr_core.config import RAGConfig
-from backend.packages.quivr_core.models import (
-    ParsedRAGChunkResponse,
-    ParsedRAGResponse,
-)
+from backend.packages.quivr_core.models import ParsedRAGChunkResponse, ParsedRAGResponse
 from backend.packages.quivr_core.utils import (
     combine_documents,
     format_file_list,

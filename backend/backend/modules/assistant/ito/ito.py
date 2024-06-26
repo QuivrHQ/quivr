@@ -112,7 +112,7 @@ class ITO(BaseModel):
             </div>
             """
             params = {
-                "sender": mail_from,
+                "from": mail_from,
                 "to": [mail_to],
                 "subject": "Quivr Ingestion Processed",
                 "reply_to": "no-reply@quivr.app",
