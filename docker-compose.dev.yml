@@ -29,7 +29,6 @@ services:
       - "--log-level"
       - "info"
     restart: always
-
     ports:
       - 5050:5050
       - 5678:5678 # debug port
@@ -53,7 +52,7 @@ services:
     container_name: worker
     volumes:
       - ./backend/:/code/
-    command: "watchfiles 'celery -A backend.celery_worker worker -l info' "
+    command: "celery -A backend.celery_worker worker -l info"
     restart: always
     depends_on:
       - redis
@@ -65,7 +64,6 @@ services:
       - "host.docker.internal:host-gateway"
     env_file:
       - .env
-
     container_name: beat
     command: celery -A backend.celery_worker beat -l info
     volumes:

@@ -51,8 +51,18 @@ filterwarnings = ["ignore::DeprecationWarning"]
 
 [tool.poetry.dependencies]
 python = "^3.11"
-torch = { version = "^2.3.1+cpu", source = "pytorch-cpu-src" }
-torchvision = { version = "^0.18.1+cpu", source = "pytorch-cpu-src" }
+torch = [
+    { version = "2.3.1", source = "pypi", platform = "darwin" },
+    { version = "2.3.1", source = "pypi", platform = "linux", markers = "platform_machine != 'x86_64'" },
+    { version = "2.3.1+cpu", source = "pytorch-cpu-src", platform = "linux", markers = "platform_machine == 'x86_64'" },
+    { version = "2.3.1+cpu", source = "pytorch-cpu-src", platform = "win32" },
+]
+torchvision = [
+    { version = "0.18.1", source = "pypi", platform = "darwin" },
+    { version = "0.18.1", source = "pypi", platform = "linux", markers = "platform_machine != 'x86_64'" },
+    { version = "0.18.1+cpu", source = "pytorch-cpu-src", platform = "linux", markers = "platform_machine == 'x86_64'" },
+    { version = "0.18.1+cpu", source = "pytorch-cpu-src", platform = "win32" },
+]
 langchain = "*"
 litellm = "*"
 openai = "*"
@@ -133,3 +143,4 @@ pytest-celery = "*"
 name = "pytorch-cpu-src"
 url = "https://download.pytorch.org/whl/cpu"
 priority = "explicit"
+
