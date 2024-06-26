@@ -42,9 +42,10 @@ def resend_invitation_email(
     try:
         r = send_email(
             {
-                "sender": brains_settings.resend_email_address,
-                "to": brain_subscription.email,
+                "from": brains_settings.resend_email_address,
+                "to": [brain_subscription.email],
                 "subject": "Quivr - Brain Shared With You",
+                "reply_to": "no-reply@quivr.app",
                 "html": html_body,
             }
         )
