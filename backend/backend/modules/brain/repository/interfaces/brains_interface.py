@@ -24,6 +24,13 @@ class BrainsInterface(ABC):
         pass
 
     @abstractmethod
+    def get_quivr_assistant_brain(self, user_id: UUID) -> BrainEntity | None:
+        """
+        Get the quivr assistant brain
+        """
+        pass
+
+    @abstractmethod
     def get_brain_details(self, brain_id: UUID, user_id: UUID) -> BrainEntity | None:
         """
         Get all public brains

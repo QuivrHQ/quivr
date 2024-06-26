@@ -94,11 +94,11 @@ class RAGService:
         if brain_id is not None:
             brain = self.brain_service.get_brain_details(brain_id, user_id)
 
-        # TODO: Create if doesn't exist
-        assert brain
+        else:
+            brain = self.brain_service.create_or_get_quivr_brain(user_id)
 
-        if brain.integration:
-            assert brain.integration.user_id == user_id
+        # if brain.integration:
+        #     assert brain.integration.user_id == user_id
         return brain
 
     def check_and_update_user_usage(self, user: UserIdentity, brain: BrainEntity):

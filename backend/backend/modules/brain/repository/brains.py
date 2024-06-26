@@ -60,6 +60,32 @@ class Brains(BrainsInterface):
             public_brains.append(PublicBrain(**item))
         return public_brains
 
+    def get_quivr_assistant_brain(self, user_id: UUID) -> BrainEntity:
+        try:
+            response = (
+                self.db.table("brains_users")
+                .select("brain_id")
+                .filter("user_id", "eq", user_id)
+                .execute()
+            ).data
+            if len(response) == 0:
+                return None
+            # Now get all the brains that have quivr_assistant set to true for the user
+
+            response = (
+                self.db.table("brains")
+                .select("*")
+                .in_("brain_id", [item["brain_id"] for item in response])
+                .filter("quivr_assistant", "eq", True)
+                .execute()
+            )
+            if len(response.data) == 0:
+                return None
+            return BrainEntity(**response.data[0])
+        except Exception as e:
+            logger.error(e)
+            return None
+
     def update_brain_last_update_time(self, brain_id):
         try:
             with self.pg_engine.begin() as connection:
