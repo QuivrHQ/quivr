@@ -24,6 +24,7 @@ services:
 
   backend-core:
     image: stangirard/quivr-backend-prebuilt:latest
+    platform: linux/amd64
     pull_policy: if_not_present
     env_file:
       - .env
@@ -59,6 +60,7 @@ services:
 
   worker:
     pull_policy: if_not_present
+    platform: linux/amd64
     image: stangirard/quivr-backend-prebuilt:latest
     env_file:
       - .env
@@ -75,6 +77,7 @@ services:
 
   beat:
     image: stangirard/quivr-backend-prebuilt:latest
+    platform: linux/amd64
     pull_policy: if_not_present
     env_file:
       - .env
@@ -91,6 +94,7 @@ services:
 
   flower:
     image: stangirard/quivr-backend-prebuilt:latest
+    platform: linux/amd64
     pull_policy: if_not_present
     env_file:
       - .env
