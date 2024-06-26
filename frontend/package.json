@@ -93,7 +93,7 @@
     "react-ga4": "2.1.0",
     "react-hook-form": "7.45.4",
     "react-i18next": "13.0.3",
-    "react-markdown": "8.0.7",
+    "react-markdown": "9.0.0",
     "react-use": "17.4.0",
     "rehype-highlight": "6.0.0",
     "rehype-raw": "7.0.0",
