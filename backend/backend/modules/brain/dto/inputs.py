@@ -57,6 +57,7 @@ class CreateBrainProperties(BaseModel, extra="ignore"):
     brain_secrets_values: Optional[dict] = {}
     connected_brains_ids: Optional[list[UUID]] = []
     integration: Optional[BrainIntegrationSettings] = None
+    quivr_assistant: Optional[bool] = False
 
     def dict(self, *args, **kwargs):
         brain_dict = super().dict(*args, **kwargs)

@@ -6,6 +6,7 @@ from fastapi import HTTPException
 from backend.celery_config import celery
 from backend.logger import get_logger
 from backend.modules.brain.dto.inputs import (
+    BrainIntegrationSettings,
     BrainUpdatableProperties,
     CreateBrainProperties,
 )
@@ -13,6 +14,7 @@ from backend.modules.brain.entity.brain_entity import (
     BrainEntity,
     BrainType,
     PublicBrain,
+    RoleEnum,
 )
 from backend.modules.brain.entity.integration_brain import IntegrationEntity
 from backend.modules.brain.repository import (
@@ -117,6 +119,50 @@ class BrainService:
                 brain_to_use = self.get_brain_by_id(brain_id_to_use)
 
         return brain_to_use, metadata
+
+    def create_or_get_quivr_brain(self, user_id: UUID) -> BrainEntity:
+        quivr_brain = self.brain_repository.get_quivr_assistant_brain(user_id)
+        logger.debug(f"Quivr brain: {quivr_brain}")
+        if quivr_brain is None:
+            logger.debug("Quivr brain not found. Creating...")
+            # Get all description integration
+            all_integration_description = (
+                self.integration_description_repository.get_all_integration_descriptions()
+            )
+            # Get the one with the name gpt4
+            gpt4_integration_description = [
+                integration_description
+                for integration_description in all_integration_description
+                if integration_description.integration_name == "gpt4"
+            ]
+            logger.debug(
+                f"GPT4 integration description: {gpt4_integration_description}"
+            )
+            if len(gpt4_integration_description) == 0:
+                raise HTTPException(
+                    status_code=404, detail="GPT4 integration not found."
+                )
+            quivr_brain = self.create_brain_integration(
+                user_id,
+                CreateBrainProperties(
+                    name="Quivr",
+                    description="Quivr assistant. It can generate images, search the web and send emails",
+                    brain_type=BrainType.integration,
+                    integration=BrainIntegrationSettings(
+                        integration_id=str(gpt4_integration_description[0].id),
+                        settings={},
+                    ),
+                    quivr_assistant=True,
+                ),
+            )
+            self.brain_user_repository.create_brain_user(
+                user_id=user_id,
+                brain_id=quivr_brain.brain_id,
+                rights=RoleEnum.Owner,
+                default_brain=True,
+            )
+            logger.debug(f"Quivr brain created: {quivr_brain}")
+        return quivr_brain
 
     def create_brain(
         self,
