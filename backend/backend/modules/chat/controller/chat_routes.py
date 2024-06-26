@@ -25,7 +25,7 @@ from backend.modules.dependencies import get_service
 from backend.modules.knowledge.repository.knowledges import KnowledgeRepository
 from backend.modules.prompt.service.prompt_service import PromptService
 from backend.modules.user.entity.user_identity import UserIdentity
-from backend.packages.quivr_core.brain_factory import RAGService
+from backend.packages.quivr_core.rag_service import RAGService
 from backend.packages.utils.telemetry import maybe_send_telemetry
 from backend.vectorstore.supabase import CustomSupabaseVectorStore
 

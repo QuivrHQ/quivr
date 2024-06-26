@@ -10,6 +10,7 @@ from langchain_community.chat_models import ChatLiteLLM
 from langchain_core.messages.ai import AIMessageChunk
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.runnables import RunnableLambda, RunnablePassthrough
+from langchain_core.vectorstores import VectorStore
 from langchain_openai import ChatOpenAI
 
 from backend.logger import get_logger
@@ -33,13 +34,12 @@ from backend.packages.quivr_core.utils import (
     parse_chunk_response,
     parse_response,
 )
-from backend.vectorstore.supabase import CustomSupabaseVectorStore
 
 logger = get_logger(__name__)
 
 
 class QuivrQARAG:
-    def __init__(self, rag_config: RAGConfig, vector_store: CustomSupabaseVectorStore):
+    def __init__(self, rag_config: RAGConfig, vector_store: VectorStore):
         self.rag_config = rag_config
         # TODO(@aminediro)
         # RAG hard dependencies : Should be injected
