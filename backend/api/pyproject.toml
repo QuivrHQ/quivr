@@ -10,45 +10,6 @@ packages = [{ include = "quivr_api" }]
 authors = ["aminediro <amine@quivr.app>"]
 readme = "README.md"
 
-[tool.ruff]
-line-length = 88
-exclude = [".git", "__pycache__", ".mypy_cache", ".pytest_cache"]
-
-[tool.ruff.lint]
-select = [
-    "E", # pycodestyle errors
-    "W", # pycodestyle warnings
-    "F", # pyflakes
-    "I", # isort
-    "C", # flake8-comprehensions
-    "B", # flake8-bugbear
-]
-ignore = [
-    "B904",
-    "B006",
-    "E501", # line too long, handled by black
-    "B008", # do not perform function calls in argument defaults
-    "C901", # too complex
-]
-
-
-[tool.ruff.lint.isort]
-order-by-type = true
-relative-imports-order = "closest-to-furthest"
-extra-standard-library = ["typing"]
-section-order = [
-    "future",
-    "standard-library",
-    "third-party",
-    "first-party",
-    "local-folder",
-]
-known-first-party = []
-
-[tool.pytest.ini_options]
-addopts = "--tb=short -ra -v"
-filterwarnings = ["ignore::DeprecationWarning"]
-
 
 [tool.poetry.dependencies]
 quivr-core = { path = "../core", develop = true }
@@ -135,3 +96,42 @@ pytest-celery = "*"
 name = "pytorch-cpu-src"
 url = "https://download.pytorch.org/whl/cpu"
 priority = "explicit"
+
+[tool.ruff]
+line-length = 88
+exclude = [".git", "__pycache__", ".mypy_cache", ".pytest_cache"]
+
+[tool.ruff.lint]
+select = [
+    "E", # pycodestyle errors
+    "W", # pycodestyle warnings
+    "F", # pyflakes
+    "I", # isort
+    "C", # flake8-comprehensions
+    "B", # flake8-bugbear
+]
+ignore = [
+    "B904",
+    "B006",
+    "E501", # line too long, handled by black
+    "B008", # do not perform function calls in argument defaults
+    "C901", # too complex
+]
+
+
+[tool.ruff.lint.isort]
+order-by-type = true
+relative-imports-order = "closest-to-furthest"
+extra-standard-library = ["typing"]
+section-order = [
+    "future",
+    "standard-library",
+    "third-party",
+    "first-party",
+    "local-folder",
+]
+known-first-party = []
+
+[tool.pytest.ini_options]
+addopts = "--tb=short -ra -v"
+filterwarnings = ["ignore::DeprecationWarning"]
