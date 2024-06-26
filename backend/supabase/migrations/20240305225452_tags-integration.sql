@@ -3,5 +3,3 @@ create type "public"."brain_tags" as enum ('new', 'recommended', 'most_popular',
 alter table "public"."integrations" add column "information" text;
 
 alter table "public"."integrations" add column "tags" brain_tags[];
-
-

@@ -31,8 +31,6 @@ RUN apt-get clean && apt-get update && apt-get install -y \
     pandoc && \
     rm -rf /var/lib/apt/lists/*
 
-# Add Rust binaries to the PATH
-ENV PATH="/root/.cargo/bin:${PATH}"
 
 RUN ARCHITECTURE=$(uname -m) && \
     if [ "$ARCHITECTURE" = "x86_64" ]; then \
@@ -46,19 +44,31 @@ RUN ARCHITECTURE=$(uname -m) && \
     fi && \
     rm -rf /var/lib/apt/lists/*
 
+RUN curl -sSL https://install.python-poetry.org | POETRY_HOME=/opt/poetry python && \
+    cd /usr/local/bin && \
+    ln -s /opt/poetry/bin/poetry && \
+    poetry config virtualenvs.create false
+
+
+# Add Rust binaries to the PATH
+ENV PATH="/root/.cargo/bin:${PATH}" \
+    POETRY_CACHE_DIR=/tmp/poetry_cache \
+    PYTHONDONTWRITEBYTECODE=1
+
 WORKDIR /code
 
-# Copy just the requirements first
-COPY ./requirements.txt .
+# Copy pyproject and poetry
+COPY ./pyproject.toml ./poetry.lock* /code/
 
-# Upgrade pip and install dependencies
-RUN pip install --no-cache-dir --upgrade pip && \
-    pip install --no-cache-dir -r requirements.txt && \
-    playwright install --with-deps
+# Run install
+RUN poetry install --no-root  && \
+    playwright install --with-deps && \
+    rm -rf $POETRY_CACHE_DIR
+
+
+ENV PYTHONPATH=/code
 
 # Copy the rest of the application
 COPY . .
 
 EXPOSE 5050
-
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "5050", "--workers", "6"]

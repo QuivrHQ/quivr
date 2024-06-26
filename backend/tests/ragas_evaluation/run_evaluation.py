@@ -15,17 +15,18 @@ import uuid
 
 import pandas as pd
 import ragas
-from celery_worker import process_file_and_notify
 from datasets import Dataset
 from langchain_core.runnables.base import RunnableSerializable
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
-from modules.brain.rags.quivr_rag import QuivrRAG
-from modules.brain.service.brain_service import BrainService
-from modules.knowledge.dto.inputs import CreateKnowledgeProperties
-from modules.knowledge.service.knowledge_service import KnowledgeService
-from modules.upload.service.upload_file import upload_file_storage
 from ragas import evaluate
 from ragas.embeddings.base import LangchainEmbeddingsWrapper
+
+from backend.celery_worker import process_file_and_notify
+from backend.modules.brain.rags.quivr_rag import QuivrRAG
+from backend.modules.brain.service.brain_service import BrainService
+from backend.modules.knowledge.dto.inputs import CreateKnowledgeProperties
+from backend.modules.knowledge.service.knowledge_service import KnowledgeService
+from backend.modules.upload.service.upload_file import upload_file_storage
 
 
 def main(
@@ -158,7 +159,7 @@ def generate_replies(
         {
             "question": test_questions,
             "answer": answers,
-            "thoughs" : thoughts,
+            "thoughs": thoughts,
             "contexts": contexts,
             "ground_truth": test_groundtruths,
         }

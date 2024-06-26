@@ -11,5 +11,3 @@ alter table "public"."users" add column "onboarded" boolean not null default fal
 alter table "public"."user_identity" add constraint "public_user_identity_user_id_fkey" FOREIGN KEY (user_id) REFERENCES users(id) ON UPDATE CASCADE ON DELETE CASCADE not valid;
 
 alter table "public"."user_identity" validate constraint "public_user_identity_user_id_fkey";
-
-

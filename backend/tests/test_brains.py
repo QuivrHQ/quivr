@@ -1,8 +1,12 @@
 import pytest
-from modules.brain.dto.inputs import BrainIntegrationSettings, CreateBrainProperties
-from modules.brain.entity.brain_entity import BrainEntity, BrainType
-from modules.brain.service.brain_service import BrainService
 from pydantic import ValidationError
+
+from backend.modules.brain.dto.inputs import (
+    BrainIntegrationSettings,
+    CreateBrainProperties,
+)
+from backend.modules.brain.entity.brain_entity import BrainEntity, BrainType
+from backend.modules.brain.service.brain_service import BrainService
 
 
 @pytest.fixture
@@ -31,7 +35,7 @@ def test_create_brain_with_user_id(brain_service, user_id, integration_id):
             name="Innovative Brain",
             description="A brain representing innovative ideas",
             # Add other necessary fields and values
-            brain_type="integration",
+            brain_type=BrainType.doc,
             integration=BrainIntegrationSettings(
                 integration_id=integration_id,
                 settings={},
@@ -72,12 +76,11 @@ def test_create_brain_with_invalid_user_id(brain_service):
 
 # Generate a test that checks CreateBrainProperties with invalid data
 def test_create_brain_with_invalid_brain_type(brain_service):
-
     with pytest.raises(ValidationError):
         invalid_brain_data = CreateBrainProperties(
             name="Invalid Brain",
             description="Should fail due to invalid data",
-            brain_type="invalid-brain-type",
+            brain_type="invalid-brain-type",  # type: ignore
             integration=BrainIntegrationSettings(
                 integration_id="valid-integration-id",
                 settings={},
@@ -105,7 +108,7 @@ def test_create_brain_with_valid_brain_type_integration(
 
         brain_id = created_brain.brain_id
         # Assert
-        assert created_brain.brain_type == BrainType.INTEGRATION
+        assert created_brain.brain_type == BrainType.integration
     finally:
         # Teardown step: delete the brain if it was created
         if brain_id:
@@ -122,7 +125,7 @@ def test_create_brain_with_valid_brain_type_doc(brain_service, user_id):
             brain_type="doc",
         )
         created_brain = brain_service.create_brain(user_id, valid_brain_data)
-        assert created_brain.brain_type == BrainType.DOC
+        assert created_brain.brain_type == BrainType.doc
     finally:
         # Teardown step: delete the brain if it was created
         if brain_id:

@@ -62,5 +62,3 @@ grant trigger on table "public"."product_to_features" to "service_role";
 grant truncate on table "public"."product_to_features" to "service_role";
 
 grant update on table "public"."product_to_features" to "service_role";
-
-

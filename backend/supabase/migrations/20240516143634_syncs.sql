@@ -126,5 +126,3 @@ grant trigger on table "public"."syncs_user" to "service_role";
 grant truncate on table "public"."syncs_user" to "service_role";
 
 grant update on table "public"."syncs_user" to "service_role";
-
-

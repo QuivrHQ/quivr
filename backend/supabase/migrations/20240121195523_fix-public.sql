@@ -21,7 +21,7 @@ BEGIN
   LEFT JOIN
     brains_users bu ON b.brain_id = bu.brain_id
   WHERE
-    (b.status = 'public') OR 
+    (b.status = 'public') OR
     (bu.user_id = p_user_id AND bu.rights IN ('Owner', 'Editor', 'Viewer'))
   ORDER BY
     b.meaning <=> query_embedding
@@ -30,5 +30,3 @@ BEGIN
 END;
 $function$
 ;
-
-
