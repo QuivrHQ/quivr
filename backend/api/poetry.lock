@@ -6335,86 +6335,6 @@ files = [
 cffi = {version = "*", markers = "implementation_name == \"pypy\""}
 
 [[package]]
-name = "quivr-api"
-version = "0.1.0"
-description = "quivr backend API"
-optional = false
-python-versions = "^3.11"
-files = []
-develop = true
-
-[package.dependencies]
-async-generator = "*"
-asyncpg = "*"
-beautifulsoup4 = "*"
-boto3 = "*"
-botocore = "*"
-celery = {version = "*", extras = ["redis", "sqs"]}
-colorlog = "*"
-datasets = "*"
-docx2txt = "*"
-duckduckgo-search = "*"
-fastapi = "*"
-flashrank = "*"
-flower = "*"
-fpdf2 = "*"
-gitpython = "*"
-google-api-python-client = "*"
-google-auth-httplib2 = "*"
-google-auth-oauthlib = "*"
-html5lib = "*"
-jq = "*"
-langchain = "*"
-langchain-cohere = "*"
-langchain-community = "*"
-langchain-openai = "*"
-langfuse = "*"
-langgraph = "*"
-litellm = "*"
-llama-index = "*"
-llama-parse = "*"
-lxml = {version = "*", extras = ["html-clean"]}
-msal = "*"
-nest-asyncio = "*"
-newspaper3k = "*"
-openai = "*"
-pandasai = "*"
-pdf2image = "*"
-playwright = "*"
-posthog = "*"
-psycopg2-binary = "*"
-pydantic-settings = "*"
-pyinstrument = "*"
-pypandoc = "*"
-pypdf = "*"
-pyright = "*"
-pytesseract = "*"
-pytest = "*"
-python-dotenv = "*"
-python-jose = "*"
-python-multipart = "*"
-quivr-core = {path = "../core", develop = true}
-ragas = "*"
-redis = "*"
-resend = "*"
-sentry-sdk = {version = "^2.5.0", extras = ["fastapi"]}
-sqlmodel = "^0.0.19"
-supabase = "*"
-tavily-python = "*"
-tiktoken = "*"
-torch = "^2.3.1+cpu"
-torchvision = "^0.18.1+cpu"
-unidecode = "*"
-unstructured = {version = "*", extras = ["all-docs"]}
-uvicorn = "*"
-watchdog = "*"
-xlrd = "*"
-
-[package.source]
-type = "directory"
-url = "api"
-
-[[package]]
 name = "quivr-core"
 version = "0.0.1"
 description = "Quivr core RAG package"
@@ -6425,7 +6345,7 @@ develop = true
 
 [package.source]
 type = "directory"
-url = "core"
+url = "../core"
 
 [[package]]
 name = "ragas"
@@ -8974,4 +8894,4 @@ test = ["big-O", "importlib-resources", "jaraco.functools", "jaraco.itertools", 
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "f74d29231cc4a6f0f97bf1e272361907e0d28109a5893603640ed531be91d172"
+content-hash = "baaab83ad0c051257e6bf05ab5c093574557bbffede7e09ff7b0624e2728f51a"

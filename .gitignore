@@ -85,3 +85,5 @@ backend/score.json
 backend/modules/assistant/ito/utils/simple.pdf
 backend/modules/sync/controller/credentials.json
 backend/.env.test
+
+**/*.egg-info
