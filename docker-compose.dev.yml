@@ -3,7 +3,6 @@ version: "3.8"
 services:
   backend-core:
     image: backend-base:latest
-    platform: linux/amd64
     extra_hosts:
       - "host.docker.internal:host-gateway"
     pull_policy: never
@@ -36,7 +35,6 @@ services:
 
   redis:
     image: redis:latest
-    platform: linux/amd64
     container_name: redis
     extra_hosts:
       - "host.docker.internal:host-gateway"
@@ -47,7 +45,6 @@ services:
   worker:
     pull_policy: never
     image: backend-base:latest
-    platform: linux/amd64
     extra_hosts:
       - "host.docker.internal:host-gateway"
     env_file:
@@ -62,7 +59,6 @@ services:
 
   beat:
     image: backend-base:latest
-    platform: linux/amd64
     pull_policy: never
     extra_hosts:
       - "host.docker.internal:host-gateway"
@@ -78,7 +74,6 @@ services:
 
   flower:
     image: backend-base:latest
-    platform: linux/amd64
     pull_policy: never
     extra_hosts:
       - "host.docker.internal:host-gateway"
