@@ -51,7 +51,8 @@ filterwarnings = ["ignore::DeprecationWarning"]
 
 [tool.poetry.dependencies]
 python = "^3.11"
-torch = "^2.3.1"
+torch = { version = "^2.3.1+cpu", source = "pytorch-cpu-src" }
+torchvision = { version = "^0.18.1+cpu", source = "pytorch-cpu-src" }
 langchain = "*"
 litellm = "*"
 openai = "*"
@@ -68,8 +69,6 @@ pypandoc = "*"
 docx2txt = "*"
 python-jose = "*"
 asyncpg = "*"
-flake8 = "*"
-flake8-black = "*"
 pyright = "*"
 resend = "*"
 html5lib = "*"
@@ -81,8 +80,6 @@ flower = "*"
 boto3 = "*"
 botocore = "*"
 python-dotenv = "*"
-pytest-mock = "*"
-pytest-celery = "*"
 pytesseract = "*"
 async-generator = "*"
 posthog = "*"
@@ -103,7 +100,6 @@ llama-index = "*"
 lxml = { extras = ["html_clean"], version = "*" }
 ragas = "*"
 datasets = "*"
-pytest-dotenv = "*"
 fpdf2 = "*"
 unidecode = "*"
 flashrank = "*"
@@ -121,9 +117,19 @@ sentry-sdk = { version = "^2.5.0", extras = ["fastapi"] }
 sqlmodel = "^0.0.19"
 
 [tool.poetry.group.dev.dependencies]
-pytest = "*"
 mypy = "^1.10.0"
 pre-commit = "^3.7.1"
 ipykernel = "*"
 ruff = "^0.4.8"
 pytest-asyncio = "^0.23.7"
+flake8 = "*"
+flake8-black = "*"
+pytest = "*"
+pytest-dotenv = "*"
+pytest-mock = "*"
+pytest-celery = "*"
+
+[[tool.poetry.source]]
+name = "pytorch-cpu-src"
+url = "https://download.pytorch.org/whl/cpu"
+priority = "explicit"
