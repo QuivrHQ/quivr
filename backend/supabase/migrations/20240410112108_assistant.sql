@@ -110,6 +110,3 @@ on "public"."assistants"
 as permissive
 for all
 to service_role;
-
-
-

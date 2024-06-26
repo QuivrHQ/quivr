@@ -64,6 +64,3 @@ on "public"."integrations"
 as permissive
 for all
 to service_role;
-
-
-

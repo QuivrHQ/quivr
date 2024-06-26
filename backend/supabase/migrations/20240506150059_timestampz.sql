@@ -4,5 +4,3 @@ alter table "public"."notifications" alter column "datetime" set data type times
 
 alter
   publication supabase_realtime add table notifications
-
-

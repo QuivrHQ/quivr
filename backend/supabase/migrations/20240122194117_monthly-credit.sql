@@ -5,5 +5,3 @@ alter table "public"."product_to_features" add column "monthly_chat_credit" inte
 alter table "public"."user_settings" drop column "daily_chat_credit";
 
 alter table "public"."user_settings" add column "monthly_chat_credit" integer default 100;
-
-

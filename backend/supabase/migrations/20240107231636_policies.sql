@@ -484,6 +484,3 @@ on "public"."vectors"
 as permissive
 for all
 to service_role;
-
-
-

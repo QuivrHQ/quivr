@@ -549,7 +549,7 @@ BEGIN
         END IF;
 
         UPDATE user_settings
-        SET 
+        SET
             max_brains = 30,
             max_brain_size = 10000000,
             models = NEW.models
@@ -594,7 +594,7 @@ BEGIN
         END IF;
 
         UPDATE user_settings
-        SET 
+        SET
             max_brains = 30,
             max_brain_size = 100000000,
 
@@ -613,13 +613,13 @@ CREATE OR REPLACE FUNCTION public.update_user_settings()
 AS $function$
 BEGIN
     IF NEW.email LIKE '%@theodo.fr' THEN
-        -- This checks if the models key is present and is of type jsonb array, 
+        -- This checks if the models key is present and is of type jsonb array,
         -- if not it initializes it with an empty array.
         IF NEW.models IS NULL OR NOT jsonb_typeof(NEW.models) = 'array' THEN
             NEW.models := '[]'::jsonb;
         END IF;
 
-        -- Append new values to the JSONB array. 
+        -- Append new values to the JSONB array.
         -- This does not check for duplicates, so you might get repeated values.
         NEW.models := NEW.models || '["gpt-4", "gpt-3.5-turbo"]'::jsonb;
     END IF;
@@ -1754,7 +1754,7 @@ $$;
 CREATE TABLE IF NOT EXISTS api_keys(
     key_id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     user_id UUID REFERENCES auth.users (id),
-    name TEXT DEFAULT 'API_KEY', 
+    name TEXT DEFAULT 'API_KEY',
     days INT DEFAULT 30,
     only_chat BOOLEAN DEFAULT false,
     api_key TEXT UNIQUE,
@@ -1771,8 +1771,8 @@ CREATE TABLE IF NOT EXISTS prompts (
     status VARCHAR(255) DEFAULT 'private'
 );
 
-DO $$ 
-BEGIN 
+DO $$
+BEGIN
 IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'brain_type_enum') THEN
   -- Create the ENUM type 'brain_type' if it doesn't exist
   CREATE TYPE brain_type_enum AS ENUM ('doc', 'api', 'composite');
@@ -1959,11 +1959,11 @@ CREATE TABLE IF NOT EXISTS onboardings (
 CREATE EXTENSION IF NOT EXISTS wrappers;
 
 -- Create foreign data wrapper 'stripe_wrapper' if it doesn't exist
-DO $$ 
+DO $$
 BEGIN
   IF NOT EXISTS (
-    SELECT 1 
-    FROM information_schema.foreign_data_wrappers 
+    SELECT 1
+    FROM information_schema.foreign_data_wrappers
     WHERE foreign_data_wrapper_name = 'stripe_wrapper'
   ) THEN
     CREATE FOREIGN DATA WRAPPER stripe_wrapper
@@ -1972,7 +1972,7 @@ BEGIN
 END $$;
 
 -- Check if the server 'stripe_server' exists before creating it
-DO $$ 
+DO $$
 BEGIN
   IF NOT EXISTS (SELECT 1 FROM pg_foreign_server WHERE srvname = 'stripe_server') THEN
     CREATE SERVER stripe_server
@@ -1984,12 +1984,12 @@ BEGIN
 END $$;
 
 -- Create foreign table 'public.customers' if it doesn't exist
-DO $$ 
+DO $$
 BEGIN
   IF NOT EXISTS (
-    SELECT 1 
-    FROM information_schema.tables 
-    WHERE table_name = 'customers' 
+    SELECT 1
+    FROM information_schema.tables
+    WHERE table_name = 'customers'
   ) THEN
     CREATE FOREIGN TABLE public.customers (
       id text,
@@ -2013,8 +2013,8 @@ CREATE TABLE IF NOT EXISTS public.users (
   email text
 );
 
--- Create or replace function 'public.handle_new_user' 
-CREATE OR REPLACE FUNCTION public.handle_new_user() 
+-- Create or replace function 'public.handle_new_user'
+CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS TRIGGER AS $$
 BEGIN
   INSERT INTO public.users (id, email)
@@ -2024,7 +2024,7 @@ END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
 -- Check if the trigger 'on_auth_user_created' exists before creating it
-DO $$ 
+DO $$
 BEGIN
   IF NOT EXISTS (SELECT 1 FROM pg_trigger WHERE tgname = 'on_auth_user_created') THEN
     CREATE TRIGGER on_auth_user_created
@@ -2097,6 +2097,3 @@ create table if not exists
   extensions.wrappers_fdw_stats ();
 
 grant all on extensions.wrappers_fdw_stats to service_role;
-
-
-
