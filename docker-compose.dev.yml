@@ -52,7 +52,7 @@ services:
     container_name: worker
     volumes:
       - ./backend/:/code/
-    command: "watchfiles 'celery -A backend.celery_worker worker -l info' "
+    command: "celery -A backend.celery_worker worker -l info"
     restart: always
     depends_on:
       - redis
