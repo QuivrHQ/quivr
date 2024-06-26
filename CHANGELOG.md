@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.0.273 (2024-06-25)
+
+## What's Changed
+* feat(frontend): new ui ux for knowledge by @Zewed in https://github.com/QuivrHQ/quivr/pull/2732
+* fix(frontend): small issues with scss by @Zewed in https://github.com/QuivrHQ/quivr/pull/2734
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.272...v0.0.273
+
 ## 0.0.272 (2024-06-24)
 
 ## What's Changed

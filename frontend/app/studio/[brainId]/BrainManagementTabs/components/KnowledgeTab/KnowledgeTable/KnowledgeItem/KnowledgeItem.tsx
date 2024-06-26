@@ -1,11 +1,11 @@
-"use client";
 import axios from "axios";
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 import { useKnowledgeApi } from "@/lib/api/knowledge/useKnowledgeApi";
+import { Checkbox } from "@/lib/components/ui/Checkbox/Checkbox";
 import Icon from "@/lib/components/ui/Icon/Icon";
 import { OptionsModal } from "@/lib/components/ui/OptionsModal/OptionsModal";
-import { getFileIcon } from "@/lib/helpers/getFileIcon";
+import { iconList } from "@/lib/helpers/iconList";
 import { useUrlBrain } from "@/lib/hooks/useBrainIdFromUrl";
 import { isUploadedKnowledge, Knowledge } from "@/lib/types/Knowledge";
 import { Option } from "@/lib/types/Options";
@@ -16,8 +16,14 @@ import styles from "./KnowledgeItem.module.scss";
 
 const KnowledgeItem = ({
   knowledge,
+  selected,
+  setSelected,
+  lastChild,
 }: {
   knowledge: Knowledge;
+  selected: boolean;
+  setSelected: (selected: boolean, event: React.MouseEvent) => void;
+  lastChild?: boolean;
 }): JSX.Element => {
   const [optionsOpened, setOptionsOpened] = useState<boolean>(false);
   const iconRef = useRef<HTMLDivElement | null>(null);
@@ -89,13 +95,25 @@ const KnowledgeItem = ({
   }, []);
 
   return (
-    <div className={styles.knowledge_item_wrapper}>
+    <div
+      className={`${styles.knowledge_item_wrapper} ${
+        lastChild ? styles.last : ""
+      }`}
+    >
       <div className={styles.left}>
+        <Checkbox
+          checked={selected}
+          setChecked={(checked, event) => setSelected(checked, event)}
+        />
         <div className={styles.icon}>
           {isUploadedKnowledge(knowledge) ? (
-            getFileIcon(knowledge.fileName)
+            <Icon
+              name={knowledge.extension.slice(1) as keyof typeof iconList}
+              size="small"
+              color="black"
+            />
           ) : (
-            <Icon name="link" size="normal" color="black" />
+            <Icon name="link" size="small" color="black" />
           )}
         </div>
         {isUploadedKnowledge(knowledge) ? (
@@ -109,11 +127,11 @@ const KnowledgeItem = ({
       <div
         ref={iconRef}
         onClick={(event: React.MouseEvent<HTMLElement>) => {
-          event.nativeEvent.stopImmediatePropagation();
+          event.stopPropagation();
           setOptionsOpened(!optionsOpened);
         }}
       >
-        <Icon name="options" size="normal" color="black" handleHover={true} />
+        <Icon name="options" size="small" color="black" handleHover={true} />
       </div>
       <div ref={optionsRef} className={styles.options_modal}>
         {optionsOpened && <OptionsModal options={options} />}
