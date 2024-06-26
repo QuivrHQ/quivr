@@ -89,7 +89,11 @@ export const BrainRecapStep = (): JSX.Element => {
         <div className={styles.cards_wrapper}>
           <BrainRecapCard
             label="Connection"
-            number={openedConnections.length}
+            number={
+              openedConnections.filter(
+                (connection) => connection.selectedFiles.files.length
+              ).length
+            }
           />
           <BrainRecapCard
             label="URL"

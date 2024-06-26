@@ -7,7 +7,7 @@ import { Icon } from "../Icon/Icon";
 interface CheckboxProps {
   label?: string;
   checked: boolean;
-  setChecked: (value: boolean) => void;
+  setChecked: (value: boolean, event: React.MouseEvent) => void;
   disabled?: boolean;
 }
 
@@ -31,7 +31,7 @@ export const Checkbox = ({
       onClick={(event) => {
         event.stopPropagation();
         if (!disabled) {
-          setChecked(!currentChecked);
+          setChecked(!currentChecked, event);
           setCurrentChecked(!currentChecked);
         }
       }}

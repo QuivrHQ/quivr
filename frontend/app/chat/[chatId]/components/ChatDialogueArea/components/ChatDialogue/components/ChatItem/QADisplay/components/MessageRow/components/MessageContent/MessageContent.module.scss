@@ -5,10 +5,6 @@
   display: none;
 }
 
-.hiden {
-  display: none;
-}
-
 .markdown {
   p {
     margin: 0;
@@ -49,6 +45,30 @@
 
   h3 {
     @include Typography.H3;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: Spacings.$spacing05 0;
+  }
+
+  thead {
+    background-color: var(--background-1);
+  }
+
+  tr {
+    border-bottom: 1px solid var(--border-0);
+  }
+
+  th,
+  td {
+    padding: Spacings.$spacing03;
+    text-align: left;
+  }
+
+  th {
+    font-weight: bold;
   }
 }
 

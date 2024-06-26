@@ -46,9 +46,11 @@ export const useBrainCreationApi = () => {
 
     await Promise.all([...uploadPromises, ...crawlPromises]);
     await Promise.all(
-      openedConnections.map(async (openedConnection) => {
-        await syncFiles(openedConnection, brainId);
-      })
+      openedConnections
+        .filter((connection) => connection.selectedFiles.files.length)
+        .map(async (openedConnection) => {
+          await syncFiles(openedConnection, brainId);
+        })
     );
     setKnowledgeToFeed([]);
   };
