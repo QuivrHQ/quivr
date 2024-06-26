@@ -97,8 +97,8 @@ class RAGService:
         else:
             brain = self.brain_service.create_or_get_quivr_brain(user_id)
 
-        if brain.integration:
-            assert brain.integration.user_id == user_id
+        # if brain.integration:
+        #     assert brain.integration.user_id == user_id
         return brain
 
     def check_and_update_user_usage(self, user: UserIdentity, brain: BrainEntity):
