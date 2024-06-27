@@ -9,5 +9,3 @@ alter table "public"."integrations" alter column integration_type type "public".
 alter table "public"."integrations" alter column "integration_type" set default 'custom'::integration_type;
 
 drop type "public"."integration_type__old_version_to_be_dropped";
-
-

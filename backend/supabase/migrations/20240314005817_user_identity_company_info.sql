@@ -3,5 +3,3 @@ create type "public"."user_identity_company_size" as enum ('1-10', '10-25', '25-
 alter table "public"."user_identity" add column "company_size" user_identity_company_size;
 
 alter table "public"."user_identity" add column "role_in_company" text;
-
-

@@ -20,7 +20,7 @@ services:
       - ./backend/:/code/
     command:
       - "uvicorn"
-      - "main:app"
+      - "backend.main:app"
       - "--reload"
       - "--host"
       - "0.0.0.0"
@@ -29,7 +29,6 @@ services:
       - "--log-level"
       - "info"
     restart: always
-
     ports:
       - 5050:5050
       - 5678:5678 # debug port
@@ -51,9 +50,9 @@ services:
     env_file:
       - .env
     container_name: worker
-    # volumes:
-    #   - ./backend/:/code/
-    command: celery -A celery_worker worker -l info
+    volumes:
+      - ./backend/:/code/
+    command: "celery -A backend.celery_worker worker -l info"
     restart: always
     depends_on:
       - redis
@@ -65,9 +64,10 @@ services:
       - "host.docker.internal:host-gateway"
     env_file:
       - .env
-
     container_name: beat
-    command: celery -A celery_worker beat -l info
+    command: celery -A backend.celery_worker beat -l info
+    volumes:
+      - ./backend/:/code/
     restart: always
     depends_on:
       - redis
@@ -79,9 +79,10 @@ services:
       - "host.docker.internal:host-gateway"
     env_file:
       - .env
-
     container_name: flower
-    command: celery -A celery_worker flower -l info --port=5555
+    command: celery -A backend.celery_worker flower -l info --port=5555
+    volumes:
+      - ./backend/:/code/
     restart: always
     depends_on:
       - redis

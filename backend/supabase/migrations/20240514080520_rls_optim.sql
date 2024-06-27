@@ -6,6 +6,3 @@ as permissive
 for all
 to public
 using ((user_id = ( SELECT auth.uid() AS uid)));
-
-
-
