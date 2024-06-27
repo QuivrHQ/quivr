@@ -68,6 +68,8 @@ COPY api/quivr_api /code/api/quivr_api
 
 COPY ./pyproject.toml ./poetry.lock* /code/
 
+COPY ./ci-migration.sh /code/
+
 # Run install
 RUN poetry install --no-root  && \
     playwright install --with-deps && \
