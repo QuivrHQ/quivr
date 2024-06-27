@@ -104,7 +104,11 @@ export const Notifications = (): JSX.Element => {
           color="black"
           handleHover={true}
         />
-        <span className={styles.badge}>{unreadNotifications}</span>
+        {!!unreadNotifications && (
+          <span className={styles.badge}>
+            {unreadNotifications > 9 ? "9+" : unreadNotifications}
+          </span>
+        )}
       </div>
       {panelOpened && (
         <div className={styles.notifications_panel}>
