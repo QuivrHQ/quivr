@@ -39,9 +39,15 @@ export const Settings = ({
           <div className={styles.text_and_button}>
             <span className={styles.text}>
               The Quivr API key is a unique identifier that allows you to access
-              and interact with Quivr&apos;s API. It is used to authenticate
-              your requests, ensuring that only authorized users can utilize the
-              API&apos;s functionalities.
+              and interact with{" "}
+              <a
+                href="https://api.quivr.app/docs"
+                target="_blank"
+                rel="noopener noreferrer"
+                className={styles.link}
+              >
+                Quivr&apos;s API.
+              </a>
             </span>
             <div className={styles.button}>
               <ApiKeyConfig />

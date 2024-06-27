@@ -39,6 +39,17 @@
       flex-direction: column;
       gap: Spacings.$spacing04;
 
+      .text {
+        .link {
+          font-weight: 550;
+          color: var(--primary-0);
+
+          &:hover {
+            color: var(--primary-1);
+          }
+        }
+      }
+
       .button {
         display: flex;
         align-self: flex-end;
