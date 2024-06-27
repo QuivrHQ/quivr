@@ -70,6 +70,8 @@ COPY ./pyproject.toml ./poetry.lock* /code/
 
 COPY ./ci-migration.sh /code/
 
+COPY supabase /code/supabase/
+
 # Run install
 RUN poetry install --no-root  && \
     playwright install --with-deps && \
