@@ -10,6 +10,10 @@ import { useApiKeyConfig } from "./hooks/useApiKeyConfig";
 export const ApiKeyConfig = (): JSX.Element => {
   const { apiKey, handleCopyClick, handleCreateClick } = useApiKeyConfig();
 
+  const createNewApiKey = async () => {
+    await handleCreateClick();
+  };
+
   return (
     <div>
       {apiKey === "" ? (
@@ -17,7 +21,7 @@ export const ApiKeyConfig = (): JSX.Element => {
           iconName="key"
           color="primary"
           label="Create new key"
-          onClick={void handleCreateClick()}
+          onClick={() => createNewApiKey()}
           small={true}
         />
       ) : (
