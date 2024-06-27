@@ -13,7 +13,6 @@ from langchain_core.output_parsers import StrOutputParser
 from langchain_core.runnables import RunnableLambda, RunnablePassthrough
 from langchain_core.vectorstores import VectorStore
 from langchain_openai import ChatOpenAI
-
 from quivr_core.config import RAGConfig
 from quivr_core.models import (
     ParsedRAGChunkResponse,
