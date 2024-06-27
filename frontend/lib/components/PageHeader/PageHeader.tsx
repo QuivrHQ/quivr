@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { useEffect, useState } from "react";
 
 import { useMenuContext } from "@/lib/context/MenuProvider/hooks/useMenuContext";
@@ -53,13 +54,14 @@ export const PageHeader = ({
           />
         ))}
         {!isMobile && <Notifications />}
-        <Icon
-          name="settings"
-          color="black"
-          handleHover={true}
-          size="normal"
-          onClick={() => void (window.location.href = "/user")}
-        />
+        <Link href="/user">
+          <Icon
+            name="settings"
+            color="black"
+            handleHover={true}
+            size="normal"
+          />
+        </Link>
         <Icon
           name={lightModeIconName}
           color="black"
