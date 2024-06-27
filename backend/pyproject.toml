@@ -1,56 +1,18 @@
-[build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
-
-[tool.ruff]
-line-length = 88
-exclude = [".git", "__pycache__", ".mypy_cache", ".pytest_cache"]
-
-[tool.ruff.lint]
-select = [
-    "E", # pycodestyle errors
-    "W", # pycodestyle warnings
-    "F", # pyflakes
-    "I", # isort
-    "C", # flake8-comprehensions
-    "B", # flake8-bugbear
-]
-ignore = [
-    "B904",
-    "B006",
-    "E501", # line too long, handled by black
-    "B008", # do not perform function calls in argument defaults
-    "C901", # too complex
-]
-
-
-[tool.ruff.lint.isort]
-order-by-type = true
-relative-imports-order = "closest-to-furthest"
-extra-standard-library = ["typing"]
-section-order = [
-    "future",
-    "standard-library",
-    "third-party",
-    "first-party",
-    "local-folder",
-]
-known-first-party = []
 
 [tool.poetry]
-name = "backend"
-version = "0.1.0"
-description = "quivr backend"
-authors = ["aminediro <amine@quivr.app>"]
+name = "quivr-monorepo"
+version = "0.0.1"
+description = "Quivr monorepo"
+authors = ["aminediro <amine@quivr.app"]
 readme = "README.md"
-
-[tool.pytest.ini_options]
-addopts = "--tb=short -ra -v"
-filterwarnings = ["ignore::DeprecationWarning"]
 
 
 [tool.poetry.dependencies]
 python = "^3.11"
+
+[tool.poetry.group.dev.dependencies]
+quivr-core = { path = "core", develop = true }
+quivr-api = { path = "api", develop = true }
 torch = [
     { version = "2.3.1", source = "pypi", platform = "darwin" },
     { version = "2.3.1", source = "pypi", platform = "linux", markers = "platform_machine != 'x86_64'" },
@@ -63,84 +25,25 @@ torchvision = [
     { version = "0.18.1+cpu", source = "pytorch-cpu-src", platform = "linux", markers = "platform_machine == 'x86_64'" },
     { version = "0.18.1+cpu", source = "pytorch-cpu-src", platform = "win32" },
 ]
-langchain = "*"
-litellm = "*"
-openai = "*"
-gitpython = "*"
-pdf2image = "*"
-nest-asyncio = "*"
-pypdf = "*"
-supabase = "*"
-tiktoken = "*"
-fastapi = "*"
-python-multipart = "*"
-uvicorn = "*"
-pypandoc = "*"
-docx2txt = "*"
-python-jose = "*"
-asyncpg = "*"
-pyright = "*"
-resend = "*"
-html5lib = "*"
-beautifulsoup4 = "*"
-newspaper3k = "*"
-xlrd = "*"
-redis = "*"
-flower = "*"
-boto3 = "*"
-botocore = "*"
-python-dotenv = "*"
-pytesseract = "*"
-async-generator = "*"
-posthog = "*"
-jq = "*"
-pytest = "*"
-watchdog = "*"
-langchain-community = "*"
-langchain-openai = "*"
-pydantic-settings = "*"
-langfuse = "*"
-pandasai = "*"
-colorlog = "*"
-psycopg2-binary = "*"
-celery = { extras = ["redis", "sqs"], version = "*" }
-unstructured = { extras = ["all-docs"], version = "*" }
-llama-parse = "*"
-llama-index = "*"
-lxml = { extras = ["html_clean"], version = "*" }
-ragas = "*"
-datasets = "*"
-fpdf2 = "*"
-unidecode = "*"
-flashrank = "*"
-langchain-cohere = "*"
-pyinstrument = "*"
-playwright = "*"
-langgraph = "*"
-tavily-python = "*"
-duckduckgo-search = "*"
-google-api-python-client = "*"
-google-auth-httplib2 = "*"
-google-auth-oauthlib = "*"
-msal = "*"
-sentry-sdk = { version = "^2.5.0", extras = ["fastapi"] }
-sqlmodel = "^0.0.19"
-
-[tool.poetry.group.dev.dependencies]
 mypy = "^1.10.0"
 pre-commit = "^3.7.1"
 ipykernel = "*"
 ruff = "^0.4.8"
-pytest-asyncio = "^0.23.7"
 flake8 = "*"
 flake8-black = "*"
+
+[tool.poetry.group.test.dependencies]
 pytest = "*"
+pytest-asyncio = "^0.23.7"
 pytest-dotenv = "*"
 pytest-mock = "*"
 pytest-celery = "*"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
 
 [[tool.poetry.source]]
 name = "pytorch-cpu-src"
 url = "https://download.pytorch.org/whl/cpu"
 priority = "explicit"
-
