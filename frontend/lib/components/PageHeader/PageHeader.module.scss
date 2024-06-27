@@ -10,6 +10,7 @@
   padding-left: Spacings.$spacing09;
   border-bottom: 1px solid var(--border-1);
   height: 3rem;
+  width: 100%;
 
   .left {
     @include Typography.H2;
@@ -22,15 +23,19 @@
       visibility: visible;
       padding-left: Spacings.$spacing07;
     }
-
-    @media (max-width: ScreenSizes.$small) {
-      display: none;
-    }
   }
 
   .buttons_wrapper {
     display: flex;
     gap: Spacings.$spacing04;
     align-items: center;
+    justify-content: flex-end;
+  }
+
+  @media (max-width: ScreenSizes.$small) {
+    justify-content: flex-end;
+    .left {
+      display: none;
+    }
   }
 }
