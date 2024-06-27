@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.0.274 (2024-06-26)
+
+## What's Changed
+* refacto(backend): poetry package manager and chat route refactoring  by @AmineDiro in https://github.com/QuivrHQ/quivr/pull/2684
+* closes #2756 by @AmineDiro in https://github.com/QuivrHQ/quivr/pull/2757
+* fix: Update email sender parameters in backend code by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2755
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.273...v0.0.274
+
 ## 0.0.273 (2024-06-25)
 
 ## What's Changed
