@@ -1,9 +1,9 @@
 import Icon from "@/lib/components/ui/Icon/Icon";
 
+import { ApiKeyConfig } from "./ApiKeyConfig";
 import { InfoSection } from "./InfoSection/InfoSection";
 import styles from "./Settings.module.scss";
 
-import { ApiKeyConfig } from "../ApiKeyConfig";
 import { StripePricingOrManageButton } from "../StripePricingOrManageButton";
 
 type InfoDisplayerProps = {
