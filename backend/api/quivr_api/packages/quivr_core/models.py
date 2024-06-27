@@ -1,6 +1,4 @@
-from datetime import datetime
 from typing import Any
-from uuid import UUID
 
 from langchain_core.pydantic_v1 import BaseModel as BaseModelV1
 from langchain_core.pydantic_v1 import Field as FieldV1
@@ -32,27 +30,6 @@ class cited_answer(BaseModelV1):
     )
 
 
-class GetChatHistoryOutput(BaseModel):
-    chat_id: UUID
-    message_id: UUID
-    user_message: str
-    message_time: datetime
-    assistant: str | None = None
-    prompt_title: str | None = None
-    brain_name: str | None = None
-    brain_id: UUID | None = None  # string because UUID is not JSON serializable
-    metadata: dict | None = None
-    thumbs: bool | None = None
-
-
-class Source(BaseModel):
-    name: str
-    source_url: str
-    type: str
-    original_file_name: str
-    citation: str
-
-
 class RawRAGChunkResponse(TypedDict):
     answer: dict[str, Any]
     docs: dict[str, Any]
@@ -79,11 +56,3 @@ class ParsedRAGChunkResponse(BaseModel):
     answer: str
     metadata: RAGResponseMetadata
     last_chunk: bool = False
-
-
-class QuivrKnowledge(BaseModel):
-    id: UUID
-    brain_id: UUID
-    file_name: str | None = None
-    url: str | None = None
-    extension: str = "txt"

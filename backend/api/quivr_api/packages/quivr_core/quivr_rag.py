@@ -13,11 +13,12 @@ from langchain_core.output_parsers import StrOutputParser
 from langchain_core.runnables import RunnableLambda, RunnablePassthrough
 from langchain_core.vectorstores import VectorStore
 from langchain_openai import ChatOpenAI
+
+from quivr_api.modules.knowledge.entity.knowledge import Knowledge
 from quivr_api.packages.quivr_core.config import RAGConfig
 from quivr_api.packages.quivr_core.models import (
     ParsedRAGChunkResponse,
     ParsedRAGResponse,
-    QuivrKnowledge,
     cited_answer,
 )
 from quivr_api.packages.quivr_core.prompts import (
@@ -170,7 +171,7 @@ class QuivrQARAG:
         self,
         question: str,
         history: list[dict[str, str]],
-        list_files: list[QuivrKnowledge],
+        list_files: list[Knowledge],
         metadata: dict[str, str] = {},
     ) -> ParsedRAGResponse:
         concat_list_files = format_file_list(list_files, self.rag_config.max_files)
@@ -190,7 +191,7 @@ class QuivrQARAG:
         self,
         question: str,
         history: list[dict[str, str]],
-        list_files: list[QuivrKnowledge],
+        list_files: list[Knowledge],
         metadata: dict[str, str] = {},
     ) -> AsyncGenerator[ParsedRAGChunkResponse, ParsedRAGChunkResponse]:
         concat_list_files = format_file_list(list_files, self.rag_config.max_files)

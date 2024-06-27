@@ -10,17 +10,18 @@ from langchain.schema import (
     format_document,
 )
 from langchain_core.messages.ai import AIMessageChunk
+
+from quivr_api.modules.chat.dto.chats import Sources
+from quivr_api.modules.chat.dto.outputs import GetChatHistoryOutput
+from quivr_api.modules.knowledge.entity.knowledge import Knowledge
 from quivr_api.modules.upload.service.generate_file_signed_url import (
     generate_file_signed_url,
 )
 from quivr_api.packages.quivr_core.models import (
-    GetChatHistoryOutput,
     ParsedRAGChunkResponse,
     ParsedRAGResponse,
-    QuivrKnowledge,
     RAGResponseMetadata,
     RawRAGResponse,
-    Source,
 )
 from quivr_api.packages.quivr_core.prompts import DEFAULT_DOCUMENT_PROMPT
 
@@ -180,9 +181,7 @@ def combine_documents(
     return document_separator.join(doc_strings)
 
 
-def format_file_list(
-    list_files_array: list[QuivrKnowledge], max_files: int = 20
-) -> str:
+def format_file_list(list_files_array: list[Knowledge], max_files: int = 20) -> str:
     list_files = [file.file_name or file.url for file in list_files_array]
     files: list[str] = list(filter(lambda n: n is not None, list_files))  # type: ignore
     files = files[:max_files]
@@ -196,13 +195,13 @@ def generate_source(
     source_documents: List[Any] | None,
     brain_id: UUID,
     citations: List[int] | None = None,
-) -> List[Source]:
+) -> List[Sources]:
     """
     Generate the sources list for the answer
     It takes in a list of sources documents and citations that points to the docs index that was used in the answer
     """
     # Initialize an empty list for sources
-    sources_list: List[Source] = []
+    sources_list: List[Sources] = []
 
     # Initialize a dictionary for storing generated URLs
     generated_urls = {}
@@ -260,7 +259,7 @@ def generate_source(
 
             # Append a new Sources object to the list
             sources_list.append(
-                Source(
+                Sources(
                     name=name,
                     type=type_,
                     source_url=source_url,
