@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.0.277 (2024-06-27)
+
+## What's Changed
+* fix(frontend): UI Notification Ring and Fix Page Header Display on Mobile by @Zewed in https://github.com/QuivrHQ/quivr/pull/2771
+* feat(frontend): better UI for General Settings by @Zewed in https://github.com/QuivrHQ/quivr/pull/2773
+* fix(frontend): new api key creation bug by @Zewed in https://github.com/QuivrHQ/quivr/pull/2774
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.276...v0.0.277
+
 ## 0.0.276 (2024-06-27)
 
 ## What's Changed
