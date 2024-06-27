@@ -16,8 +16,8 @@ services:
         - NEXT_PUBLIC_FRONTEND_URL=${NEXT_PUBLIC_FRONTEND_URL}
         - NEXT_PUBLIC_AUTH_MODES=${NEXT_PUBLIC_AUTH_MODES}
     container_name: web
-    # depends_on:
-    #   - backend-core
+    depends_on:
+      - backend-core
     restart: always
     ports:
       - 3000:3000
@@ -37,7 +37,7 @@ services:
       test: [ "CMD", "curl", "http://localhost:5050/healthz" ]
     command:
       - "uvicorn"
-      - "backend.main:app"
+      - "quivr_api.main:app"
       - "--host"
       - "0.0.0.0"
       - "--port"
@@ -68,7 +68,7 @@ services:
     container_name: worker
     extra_hosts:
       - "host.docker.internal:host-gateway"
-    command: celery -A backend.celery_worker worker -l info
+    command: celery -A quivr_api.celery_worker worker -l info
     restart: always
     depends_on:
       - redis
@@ -84,7 +84,7 @@ services:
     container_name: beat
     extra_hosts:
       - "host.docker.internal:host-gateway"
-    command: celery -A backend.celery_worker beat -l info
+    command: celery -A quivr_api.celery_worker beat -l info
     restart: always
     depends_on:
       - redis
@@ -100,7 +100,7 @@ services:
     container_name: flower
     extra_hosts:
       - "host.docker.internal:host-gateway"
-    command: celery -A backend.celery_worker flower -l info --port=5555
+    command: celery -A quivr_api.celery_worker flower -l info --port=5555
     restart: always
     depends_on:
       - redis

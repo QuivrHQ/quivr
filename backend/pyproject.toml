@@ -17,10 +17,12 @@ mypy = "^1.10.0"
 pre-commit = "^3.7.1"
 ipykernel = "*"
 ruff = "^0.4.8"
-pytest-asyncio = "^0.23.7"
 flake8 = "*"
 flake8-black = "*"
+
+[tool.poetry.group.test.dependencies]
 pytest = "*"
+pytest-asyncio = "^0.23.7"
 pytest-dotenv = "*"
 pytest-mock = "*"
 pytest-celery = "*"

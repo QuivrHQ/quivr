@@ -20,7 +20,7 @@ services:
       - ./backend/:/code/
     command:
       - "uvicorn"
-      - "backend.main:app"
+      - "quivr_api.main:app"
       - "--reload"
       - "--host"
       - "0.0.0.0"
@@ -52,7 +52,7 @@ services:
     container_name: worker
     volumes:
       - ./backend/:/code/
-    command: "celery -A backend.celery_worker worker -l info"
+    command: "celery -A quivr_api.celery_worker worker -l info"
     restart: always
     depends_on:
       - redis
@@ -65,7 +65,7 @@ services:
     env_file:
       - .env
     container_name: beat
-    command: celery -A backend.celery_worker beat -l info
+    command: celery -A quivr_api.celery_worker beat -l info
     volumes:
       - ./backend/:/code/
     restart: always
@@ -80,7 +80,7 @@ services:
     env_file:
       - .env
     container_name: flower
-    command: celery -A backend.celery_worker flower -l info --port=5555
+    command: celery -A quivr_api.celery_worker flower -l info --port=5555
     volumes:
       - ./backend/:/code/
     restart: always
