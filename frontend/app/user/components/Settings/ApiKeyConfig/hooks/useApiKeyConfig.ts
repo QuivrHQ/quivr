@@ -60,6 +60,7 @@ export const useApiKeyConfig = () => {
   };
 
   const changeOpenAiApiKey = async () => {
+    console.info("hey");
     try {
       setChangeOpenAiApiKeyRequestPending(true);
 
