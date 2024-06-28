@@ -6,11 +6,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query, UploadFile
 
 from quivr_core.api.celery_worker import process_file_and_notify
 from quivr_core.api.logger import get_logger
-from quivr_core.api.middlewares.auth import AuthBearer, get_current_user
-from quivr_core.api.modules.brain.entity.brain_entity import RoleEnum
-from quivr_core.api.modules.brain.service.brain_authorization_service import (
-    validate_brain_authorization,
-)
+from quivr_core.api.modules.dependencies import get_current_user
 from quivr_core.api.modules.knowledge.dto.inputs import CreateKnowledgeProperties
 from quivr_core.api.modules.knowledge.service.knowledge_service import KnowledgeService
 from quivr_core.api.modules.notification.dto.inputs import (
@@ -25,8 +21,6 @@ from quivr_core.api.modules.notification.service.notification_service import (
 )
 from quivr_core.api.modules.upload.service.upload_file import upload_file_storage
 from quivr_core.api.modules.user.entity.user_identity import UserIdentity
-from quivr_core.api.modules.user.service.user_usage import UserUsage
-from quivr_core.api.packages.files.file import convert_bytes, get_file_size
 from quivr_core.api.packages.utils.telemetry import maybe_send_telemetry
 
 logger = get_logger(__name__)
@@ -41,22 +35,13 @@ async def healthz():
     return {"status": "ok"}
 
 
-@upload_router.post("/upload", dependencies=[Depends(AuthBearer())], tags=["Upload"])
+@upload_router.post("/upload", tags=["Upload"])
 async def upload_file(
     uploadFile: UploadFile,
     brain_id: UUID = Query(..., description="The ID of the brain"),
     chat_id: Optional[UUID] = Query(None, description="The ID of the chat"),
     current_user: UserIdentity = Depends(get_current_user),
 ):
-    validate_brain_authorization(
-        brain_id, current_user.id, [RoleEnum.Editor, RoleEnum.Owner]
-    )
-    uploadFile.file.seek(0)
-    user_daily_usage = UserUsage(
-        id=current_user.id,
-        email=current_user.email,
-    )
-
     upload_notification = notification_service.add_notification(
         CreateNotification(
             user_id=current_user.id,
@@ -65,17 +50,9 @@ async def upload_file(
         )
     )
 
-    user_settings = user_daily_usage.get_user_settings()
-
-    remaining_free_space = user_settings.get("max_brain_size", 1000000000)
     maybe_send_telemetry("upload_file", {"file_name": uploadFile.filename})
-    file_size = get_file_size(uploadFile)
-    if remaining_free_space - file_size < 0:
-        message = f"Brain will exceed maximum capacity. Maximum file allowed is : {convert_bytes(remaining_free_space)}"
-        raise HTTPException(status_code=403, detail=message)
 
     file_content = await uploadFile.read()
-
     filename_with_brain_id = str(brain_id) + "/" + str(uploadFile.filename)
 
     try:

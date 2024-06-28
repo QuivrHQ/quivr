@@ -1,6 +1,5 @@
 import json
 import os
-from multiprocessing import get_logger
 
 from langchain.pydantic_v1 import Field
 from langchain.schema import Document
