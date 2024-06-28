@@ -1,5 +1,5 @@
 # Using a slim version for a smaller base image
-FROM python:3.11.6-slim-bullseye@sha256:0c1fbb294096d842ad795ee232d783cab436c90b034210fe894f2bb2f2be7626 AS base
+FROM python:3.11.6-slim-bullseye
 
 ARG DEV_MODE
 ENV DEV_MODE=$DEV_MODE
@@ -73,7 +73,7 @@ COPY ./ci-migration.sh /code/
 COPY supabase /code/supabase/
 
 # Run install
-RUN poetry install --no-root  && \
+RUN poetry install --no-root --with dev,test && \
     playwright install --with-deps && \
     rm -rf $POETRY_CACHE_DIR
 
