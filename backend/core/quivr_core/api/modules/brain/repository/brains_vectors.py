@@ -1,13 +1,10 @@
 from quivr_core.api.logger import get_logger
 from quivr_core.api.models.settings import get_supabase_client
-from quivr_core.api.modules.brain.repository.interfaces.brains_vectors_interface import (
-    BrainsVectorsInterface,
-)
 
 logger = get_logger(__name__)
 
 
-class BrainsVectors(BrainsVectorsInterface):
+class BrainsVectors:
     def __init__(self):
         supabase_client = get_supabase_client()
         self.db = supabase_client

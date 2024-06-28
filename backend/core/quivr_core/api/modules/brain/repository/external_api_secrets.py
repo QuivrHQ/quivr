@@ -1,16 +1,13 @@
 from uuid import UUID
 
 from quivr_core.api.models.settings import get_supabase_client
-from quivr_core.api.modules.brain.repository.interfaces.external_api_secrets_interface import (
-    ExternalApiSecretsInterface,
-)
 
 
 def build_secret_unique_name(user_id: UUID, brain_id: UUID, secret_name: str):
     return f"{user_id}-{brain_id}-{secret_name}"
 
 
-class ExternalApiSecrets(ExternalApiSecretsInterface):
+class ExternalApiSecrets:
     def __init__(self):
         supabase_client = get_supabase_client()
         self.db = supabase_client

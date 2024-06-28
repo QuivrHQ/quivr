@@ -1,13 +1,9 @@
 from uuid import UUID
 
 import requests
-
-from quivr_core.api.logger import get_logger
-
-logger = get_logger(__name__)
-
 from fastapi import HTTPException
 
+from quivr_core.api.logger import get_logger
 from quivr_core.api.modules.brain.entity.api_brain_definition_entity import (
     ApiBrainDefinitionSchema,
 )
@@ -16,13 +12,14 @@ from quivr_core.api.modules.brain.service.api_brain_definition_service import (
 )
 from quivr_core.api.modules.brain.service.brain_service import BrainService
 
+logger = get_logger(__name__)
 brain_service = BrainService()
 api_brain_definition_service = ApiBrainDefinitionService()
 
 
 def get_api_call_response_as_text(
     method, api_url, params, search_params, secrets
-) -> str:
+) -> str | None:
     headers = {}
 
     api_url_with_search_params = api_url
@@ -84,7 +81,7 @@ def extract_api_brain_definition_values_from_llm_output(
     return params_values
 
 
-def call_brain_api(brain_id: UUID, user_id: UUID, arguments: dict) -> str:
+def call_brain_api(brain_id: UUID, user_id: UUID, arguments: dict) -> str | None:
     brain_definition = api_brain_definition_service.get_api_brain_definition(brain_id)
 
     if brain_definition is None:

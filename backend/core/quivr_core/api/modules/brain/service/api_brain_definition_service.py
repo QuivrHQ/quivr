@@ -8,13 +8,9 @@ from quivr_core.api.modules.brain.entity.api_brain_definition_entity import (
 from quivr_core.api.modules.brain.repository.api_brain_definitions import (
     ApiBrainDefinitions,
 )
-from quivr_core.api.modules.brain.repository.interfaces import (
-    ApiBrainDefinitionsInterface,
-)
 
 
 class ApiBrainDefinitionService:
-    repository: ApiBrainDefinitionsInterface
 
     def __init__(self):
         self.repository = ApiBrainDefinitions()

@@ -6,14 +6,11 @@ from quivr_core.api.modules.brain.entity.brain_entity import (
     BrainUser,
     MinimalUserBrainEntity,
 )
-from quivr_core.api.modules.brain.repository.interfaces.brains_users_interface import (
-    BrainsUsersInterface,
-)
 
 logger = get_logger(__name__)
 
 
-class BrainsUsers(BrainsUsersInterface):
+class BrainsUsers:
     def __init__(self):
         supabase_client = get_supabase_client()
         self.db = supabase_client

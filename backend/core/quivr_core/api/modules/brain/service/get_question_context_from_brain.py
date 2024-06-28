@@ -22,7 +22,7 @@ class DocumentAnswer:
     file_similarity: float = 0.0
 
 
-def get_question_context_from_brain(brain_id: UUID, question: str) -> str:
+def get_question_context_from_brain(brain_id: UUID, question: str) -> list[str]:
     """Finds the best brain to answer the question based on the question's meaning.
 
     Args:
@@ -40,7 +40,7 @@ def get_question_context_from_brain(brain_id: UUID, question: str) -> str:
         supabase_client,
         embeddings,
         table_name="vectors",
-        brain_id=str(brain_id),
+        brain_id=brain_id,
         number_docs=20,
     )
     documents = vector_store.similarity_search(question, k=20, threshold=0.8)

@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, Tuple
 from uuid import UUID
 
 from fastapi import HTTPException
@@ -22,6 +22,9 @@ from quivr_core.api.modules.brain.repository import (
     IntegrationBrain,
     IntegrationDescription,
 )
+from quivr_core.api.modules.brain.repository.external_api_secrets import (
+    ExternalApiSecrets,
+)
 from quivr_core.api.modules.brain.service.api_brain_definition_service import (
     ApiBrainDefinitionService,
 )
@@ -36,12 +39,6 @@ api_brain_definition_service = ApiBrainDefinitionService()
 
 
 class BrainService:
-    # brain_repository: BrainsInterface
-    # brain_user_repository: BrainsUsersInterface
-    # brain_vector_repository: BrainsVectorsInterface
-    # external_api_secrets_repository: ExternalApiSecretsInterface
-    # integration_brains_repository: IntegrationBrainInterface
-    # integration_description_repository: IntegrationDescriptionInterface
 
     def __init__(self):
         self.brain_repository: Brains = Brains()
@@ -49,6 +46,7 @@ class BrainService:
         self.brain_vector = BrainsVectors()
         self.integration_brains_repository = IntegrationBrain()
         self.integration_description_repository = IntegrationDescription()
+        self.external_api_secrets_repository = ExternalApiSecrets()
 
     def get_brain_by_id(self, brain_id: UUID):
         return self.brain_repository.get_brain_by_id(brain_id)
@@ -64,7 +62,7 @@ class BrainService:
         chat_id: UUID,
         history,
         vector_store: CustomSupabaseVectorStore,
-    ) -> (Optional[BrainEntity], dict[str, str]):
+    ) -> Tuple[Optional[BrainEntity], dict[str, str]]:
         """Find the brain to use for a question.
 
         Args:
@@ -154,13 +152,14 @@ class BrainService:
 
         secrets_values = brain.brain_secrets_values
 
-        for secret_name in secrets_values:
-            self.external_api_secrets_repository.create_secret(
-                user_id=user_id,
-                brain_id=created_brain.brain_id,
-                secret_name=secret_name,
-                secret_value=secrets_values[secret_name],
-            )
+        if secrets_values:
+            for secret_name in secrets_values:
+                self.external_api_secrets_repository.create_secret(
+                    user_id=user_id,
+                    brain_id=created_brain.brain_id,
+                    secret_name=secret_name,
+                    secret_value=secrets_values[secret_name],
+                )
 
         return created_brain
 

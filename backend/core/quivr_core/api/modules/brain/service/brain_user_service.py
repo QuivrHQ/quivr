@@ -2,7 +2,6 @@ from typing import List
 from uuid import UUID
 
 from fastapi import HTTPException
-
 from quivr_core.api.logger import get_logger
 from quivr_core.api.modules.brain.entity.brain_entity import (
     BrainEntity,
@@ -16,15 +15,6 @@ from quivr_core.api.modules.brain.repository.brains_users import BrainsUsers
 from quivr_core.api.modules.brain.repository.external_api_secrets import (
     ExternalApiSecrets,
 )
-from quivr_core.api.modules.brain.repository.interfaces.brains_interface import (
-    BrainsInterface,
-)
-from quivr_core.api.modules.brain.repository.interfaces.brains_users_interface import (
-    BrainsUsersInterface,
-)
-from quivr_core.api.modules.brain.repository.interfaces.external_api_secrets_interface import (
-    ExternalApiSecretsInterface,
-)
 from quivr_core.api.modules.brain.service.api_brain_definition_service import (
     ApiBrainDefinitionService,
 )
@@ -37,9 +27,6 @@ api_brain_definition_service = ApiBrainDefinitionService()
 
 
 class BrainUserService:
-    brain_repository: BrainsInterface
-    brain_user_repository: BrainsUsersInterface
-    external_api_secrets_repository: ExternalApiSecretsInterface
 
     def __init__(self):
         self.brain_repository = Brains()

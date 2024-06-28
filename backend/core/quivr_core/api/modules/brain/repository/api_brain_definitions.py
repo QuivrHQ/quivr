@@ -6,12 +6,9 @@ from quivr_core.api.modules.brain.dto.inputs import CreateApiBrainDefinition
 from quivr_core.api.modules.brain.entity.api_brain_definition_entity import (
     ApiBrainDefinitionEntity,
 )
-from quivr_core.api.modules.brain.repository.interfaces import (
-    ApiBrainDefinitionsInterface,
-)
 
 
-class ApiBrainDefinitions(ApiBrainDefinitionsInterface):
+class ApiBrainDefinitions:
     def __init__(self):
         self.db = get_supabase_client()
 
@@ -21,7 +18,7 @@ class ApiBrainDefinitions(ApiBrainDefinitionsInterface):
         response = (
             self.db.table("api_brain_definition")
             .select("*")
-            .filter("brain_id", "eq", brain_id)
+            .filter("brain_id", "eq", str(brain_id))
             .execute()
         )
         if len(response.data) == 0:

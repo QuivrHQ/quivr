@@ -13,9 +13,6 @@ from quivr_core.api.modules.brain.entity.brain_entity import PublicBrain, RoleEn
 from quivr_core.api.modules.brain.entity.integration_brain import (
     IntegrationDescriptionEntity,
 )
-from quivr_core.api.modules.brain.service.brain_authorization_service import (
-    has_brain_authorization,
-)
 from quivr_core.api.modules.brain.service.brain_service import BrainService
 from quivr_core.api.modules.brain.service.brain_user_service import BrainUserService
 from quivr_core.api.modules.brain.service.get_question_context_from_brain import (
@@ -63,13 +60,6 @@ async def retrieve_public_brains() -> list[PublicBrain]:
 
 @brain_router.get(
     "/brains/{brain_id}/",
-    dependencies=[
-        Depends(
-            has_brain_authorization(
-                required_roles=[RoleEnum.Owner, RoleEnum.Editor, RoleEnum.Viewer]
-            )
-        ),
-    ],
     tags=["Brain"],
 )
 async def retrieve_brain_by_id(

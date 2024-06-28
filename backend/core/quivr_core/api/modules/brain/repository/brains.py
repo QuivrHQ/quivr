@@ -10,14 +10,11 @@ from quivr_core.api.models.settings import (
 )
 from quivr_core.api.modules.brain.dto.inputs import BrainUpdatableProperties
 from quivr_core.api.modules.brain.entity.brain_entity import BrainEntity, PublicBrain
-from quivr_core.api.modules.brain.repository.interfaces.brains_interface import (
-    BrainsInterface,
-)
 
 logger = get_logger(__name__)
 
 
-class Brains(BrainsInterface):
+class Brains:
     def __init__(self):
         supabase_client = get_supabase_client()
         self.db = supabase_client
