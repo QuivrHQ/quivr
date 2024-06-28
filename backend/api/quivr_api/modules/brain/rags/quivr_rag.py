@@ -1,5 +1,4 @@
 import datetime
-import os
 from operator import itemgetter
 from typing import List, Optional
 from uuid import UUID
@@ -8,7 +7,6 @@ from langchain.chains import ConversationalRetrievalChain
 from langchain.llms.base import BaseLLM
 from langchain.prompts import HumanMessagePromptTemplate, SystemMessagePromptTemplate
 from langchain.retrievers import ContextualCompressionRetriever
-from langchain.retrievers.document_compressors import FlashrankRerank
 from langchain.schema import format_document
 from langchain_cohere import CohereRerank
 from langchain_community.chat_models import ChatLiteLLM
@@ -299,10 +297,11 @@ class QuivrRAG(BaseModel):
 
         # TODO(@aminediro) : Should be a class level attribute
         compressor = None
-        if os.getenv("COHERE_API_KEY"):
-            compressor = CohereRerank(top_n=20)
-        else:
-            compressor = FlashrankRerank(model="ms-marco-TinyBERT-L-2-v2", top_n=20)
+        # TODO @stangirard fix
+        # if os.getenv("COHERE_API_KEY"):
+        compressor = CohereRerank(top_n=20)
+        # else:
+        #     compressor = FlashrankRerank(model="ms-marco-TinyBERT-L-2-v2", top_n=20)
 
         retriever_doc = self.get_retriever()
         compression_retriever = ContextualCompressionRetriever(

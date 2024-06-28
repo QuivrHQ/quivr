@@ -1187,17 +1187,6 @@ files = [
 ]
 
 [[package]]
-name = "diskcache"
-version = "5.6.3"
-description = "Disk Cache -- Disk and file backed persistent cache."
-optional = false
-python-versions = ">=3"
-files = [
-    {file = "diskcache-5.6.3-py3-none-any.whl", hash = "sha256:5e31b2d5fbad117cc363ebaf6b689474db18a1f6438bc82358b024abd4c2ca19"},
-    {file = "diskcache-5.6.3.tar.gz", hash = "sha256:2c3a3fa2743d8535d832ec61c2054a1641f41775aa7c556758a109941e33e4fc"},
-]
-
-[[package]]
 name = "distlib"
 version = "0.3.8"
 description = "Distribution utilities"
@@ -1633,25 +1622,6 @@ flake8 = ">=3"
 
 [package.extras]
 develop = ["build", "twine"]
-
-[[package]]
-name = "flashrank"
-version = "0.2.5"
-description = "Ultra lite & Super fast SoTA cross-encoder based re-ranking for your search & retrieval pipelines."
-optional = false
-python-versions = ">=3.6"
-files = [
-    {file = "FlashRank-0.2.5-py3-none-any.whl", hash = "sha256:3f36289211930299ebff8fe8dd836240a1263ce9e75137a6098a7d9bbb6945a5"},
-    {file = "FlashRank-0.2.5.tar.gz", hash = "sha256:8617beb3519abfe79825b6d373066bd1c2b9c233cb74a32ebc1b0dea3d5dde63"},
-]
-
-[package.dependencies]
-llama-cpp-python = "0.2.67"
-numpy = "*"
-onnxruntime = "*"
-requests = "*"
-tokenizers = "*"
-tqdm = "*"
 
 [[package]]
 name = "flatbuffers"
@@ -3236,28 +3206,6 @@ files = [
 [package.dependencies]
 httpx = ">=0.20.0"
 pydantic = ">=1.10"
-
-[[package]]
-name = "llama-cpp-python"
-version = "0.2.67"
-description = "Python bindings for the llama.cpp library"
-optional = false
-python-versions = ">=3.8"
-files = [
-    {file = "llama_cpp_python-0.2.67.tar.gz", hash = "sha256:29e64afbe86ea19fb9ed681f79215c1029bc229017dd278cef93e96de904cfb9"},
-]
-
-[package.dependencies]
-diskcache = ">=5.6.1"
-jinja2 = ">=2.11.3"
-numpy = ">=1.20.0"
-typing-extensions = ">=4.5.0"
-
-[package.extras]
-all = ["llama_cpp_python[dev,server,test]"]
-dev = ["black (>=23.3.0)", "httpx (>=0.24.1)", "mkdocs (>=1.4.3)", "mkdocs-material (>=9.1.18)", "mkdocstrings[python] (>=0.22.0)", "pytest (>=7.4.0)", "twine (>=4.0.2)"]
-server = ["PyYAML (>=5.1)", "fastapi (>=0.100.0)", "pydantic-settings (>=2.0.1)", "sse-starlette (>=1.6.1)", "starlette-context (>=0.3.6,<0.4)", "uvicorn (>=0.22.0)"]
-test = ["httpx (>=0.24.1)", "pytest (>=7.4.0)", "scipy (>=1.10)"]
 
 [[package]]
 name = "llama-index"
@@ -6498,7 +6446,6 @@ datasets = "*"
 docx2txt = "*"
 duckduckgo-search = "*"
 fastapi = "*"
-flashrank = "0.2.5"
 flower = "*"
 fpdf2 = "*"
 gitpython = "*"
@@ -7390,13 +7337,13 @@ sqlcipher = ["sqlcipher3_binary"]
 
 [[package]]
 name = "sqlglot"
-version = "25.3.3"
+version = "25.4.0"
 description = "An easily customizable SQL parser and transpiler"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "sqlglot-25.3.3-py3-none-any.whl", hash = "sha256:678adad59a01ce58a7f33463b907dcdb43a0309caa5d55d6ac0af33acf698494"},
-    {file = "sqlglot-25.3.3.tar.gz", hash = "sha256:6b9a4c740fb8c78509eb3f51ab1d79f7c4ab3dc9d274251007acdd85faf4aeeb"},
+    {file = "sqlglot-25.4.0-py3-none-any.whl", hash = "sha256:c8eb1b45ff7e3382639012aca050a3d40c373049c2d2d47393bf23666135c8bb"},
+    {file = "sqlglot-25.4.0.tar.gz", hash = "sha256:12f198afd0b5d5722be9eecb1f364e4e01cb63935086f1b3af1b333b22b78254"},
 ]
 
 [package.dependencies]
@@ -8109,13 +8056,13 @@ test = ["argcomplete (>=3.0.3)", "mypy (>=1.7.0)", "pre-commit", "pytest (>=7.0,
 
 [[package]]
 name = "transformers"
-version = "4.42.2"
+version = "4.42.3"
 description = "State-of-the-art Machine Learning for JAX, PyTorch and TensorFlow"
 optional = false
 python-versions = ">=3.8.0"
 files = [
-    {file = "transformers-4.42.2-py3-none-any.whl", hash = "sha256:dfaa543c5907ade528b6f9dff0ee15dba5be4938a35e465caa5734bad0d77446"},
-    {file = "transformers-4.42.2.tar.gz", hash = "sha256:dbbb0bbfadcd7ca6ec0ec2cef1d12f62a0778fc2d376cd663c6fd0b9dba75ab8"},
+    {file = "transformers-4.42.3-py3-none-any.whl", hash = "sha256:a61a0df9609b7d69229d941b2fd857c841ba3043d6da503d0da1a4b133f65b92"},
+    {file = "transformers-4.42.3.tar.gz", hash = "sha256:7539873ff45809145265cbc94ea4619d2713c41ceaa277b692d8b0be3430f7eb"},
 ]
 
 [package.dependencies]
