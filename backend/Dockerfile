@@ -73,7 +73,7 @@ COPY ./ci-migration.sh /code/
 COPY supabase /code/supabase/
 
 # Run install
-RUN poetry install --no-root  && \
+RUN poetry install --no-root --with dev,test && \
     playwright install --with-deps && \
     rm -rf $POETRY_CACHE_DIR
 
