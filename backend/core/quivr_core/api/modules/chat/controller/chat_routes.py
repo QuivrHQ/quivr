@@ -175,7 +175,6 @@ async def create_stream_question_handler(
     current_user: UserIdentityDep,
     brain_id: Annotated[UUID | None, Query()] = None,
 ) -> StreamingResponse:
-
     logger.info(
         f"Creating question for chat {chat_id} with brain {brain_id} of type {type(brain_id)}"
     )
