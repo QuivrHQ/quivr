@@ -4,7 +4,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 name = "quivr-api"
-version = "0.1.0"
+version = "0.0.1"
 description = "quivr backend API"
 packages = [{ include = "quivr_api" }]
 authors = ["aminediro <amine@quivr.app>"]
