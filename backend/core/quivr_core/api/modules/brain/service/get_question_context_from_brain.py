@@ -51,6 +51,7 @@ def get_question_context_from_brain(brain_id: UUID, question: str) -> list[str]:
         if document.metadata["file_sha1"] not in file_sha1s:
             file_sha1s.append(document.metadata["file_sha1"])
             file_path_in_storage = f"{brain_id}/{document.metadata['file_name']}"
+            signed_url = generate_file_signed_url(file_path_in_storage)
             answers.append(
                 DocumentAnswer(
                     file_name=document.metadata["file_name"],
@@ -58,9 +59,7 @@ def get_question_context_from_brain(brain_id: UUID, question: str) -> list[str]:
                     file_size=document.metadata["file_size"],
                     file_id=document.metadata["id"],
                     file_similarity=document.metadata["similarity"],
-                    file_url=generate_file_signed_url(file_path_in_storage).get(
-                        "signedURL", ""
-                    ),
+                    file_url=signed_url.get("signedURL", "") if signed_url else "",
                 ),
             )
 

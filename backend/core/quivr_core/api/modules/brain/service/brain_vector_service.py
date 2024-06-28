@@ -1,11 +1,7 @@
-from typing import Any, List
 from uuid import UUID
 
 from quivr_core.api.logger import get_logger
 from quivr_core.api.modules.brain.repository.brains_vectors import BrainsVectors
-from quivr_core.api.modules.brain.repository.interfaces.brains_vectors_interface import (
-    BrainsVectorsInterface,
-)
 from quivr_core.api.modules.knowledge.repository.storage import Storage
 from quivr_core.api.packages.embeddings.vectors import get_unique_files_from_vector_ids
 
@@ -13,13 +9,11 @@ logger = get_logger(__name__)
 
 
 class BrainVectorService:
-    repository: BrainsVectorsInterface
-    id: UUID
-    files: List[Any] = []
 
     def __init__(self, brain_id: UUID):
         self.repository = BrainsVectors()
         self.id = brain_id
+        self.files = []
 
     def create_brain_vector(self, vector_id, file_sha1):
         return self.repository.create_brain_vector(self.id, vector_id, file_sha1)  # type: ignore
@@ -27,7 +21,7 @@ class BrainVectorService:
     def update_brain_with_file(self, file_sha1: str):
         # not  used
         vector_ids = self.repository.get_vector_ids_from_file_sha1(file_sha1)
-        if vector_ids == None or len(vector_ids) == 0:
+        if vector_ids is None or len(vector_ids) == 0:
             logger.info(f"No vector ids found for file {file_sha1}")
             return
 

@@ -1,4 +1,5 @@
 from typing import List
+from uuid import UUID
 
 from quivr_core.api.models.settings import get_supabase_client
 from quivr_core.api.modules.brain.entity.integration_brain import (
@@ -102,11 +103,11 @@ class IntegrationDescription:
     def __init__(self):
         self.db = get_supabase_client()
 
-    def get_integration_description(self, integration_id):
+    def get_integration_description(self, integration_id: UUID):
         response = (
             self.db.table("integrations")
             .select("*")
-            .filter("id", "eq", integration_id)
+            .filter("id", "eq", str(integration_id))
             .execute()
         )
         if len(response.data) == 0:
@@ -114,12 +115,14 @@ class IntegrationDescription:
 
         return IntegrationDescriptionEntity(**response.data[0])
 
-    def get_integration_description_by_user_brain_id(self, brain_id, user_id):
+    def get_integration_description_by_user_brain_id(
+        self, brain_id: UUID, user_id: UUID
+    ):
         response = (
             self.db.table("integrations_user")
             .select("*")
-            .filter("brain_id", "eq", brain_id)
-            .filter("user_id", "eq", user_id)
+            .filter("brain_id", "eq", str(brain_id))
+            .filter("user_id", "eq", str(user_id))
             .execute()
         )
         if len(response.data) == 0:

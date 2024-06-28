@@ -40,7 +40,7 @@ class IntegrationEntity(BaseModel):
     id: int
     user_id: str
     brain_id: str
-    integration_id: str
+    integration_id: UUID
     settings: Optional[dict] = None
     credentials: Optional[dict] = None
     last_synced: str
