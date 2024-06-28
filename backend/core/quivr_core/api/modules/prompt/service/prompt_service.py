@@ -1,7 +1,9 @@
 from typing import List
 from uuid import UUID
 
-from quivr_core.api.models.settings import get_supabase_client
+from quivr_core.api.modules.brain.service.utils.get_prompt_to_use_id import (
+    get_prompt_to_use_id,
+)
 from quivr_core.api.modules.prompt.entity.prompt import (
     CreatePromptProperties,
     DeletePromptResponse,
@@ -15,7 +17,6 @@ class PromptService:
     repository: Prompts
 
     def __init__(self):
-        supabase_client = get_supabase_client()
         self.repository = Prompts()
 
     def create_prompt(self, prompt: CreatePromptProperties) -> Prompt:
@@ -57,3 +58,13 @@ class PromptService:
         """Update a prompt by id"""
 
         return self.repository.update_prompt_by_id(prompt_id, prompt)
+
+    def get_prompt_to_use(
+        self, brain_id: UUID | None, prompt_id: UUID | None
+    ) -> Prompt | None:
+        prompt_to_use_id = get_prompt_to_use_id(brain_id, prompt_id)
+
+        if prompt_to_use_id is None:
+            return None
+
+        return self.get_prompt_by_id(prompt_to_use_id)

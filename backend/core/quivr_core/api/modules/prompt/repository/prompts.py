@@ -1,3 +1,5 @@
+from uuid import UUID
+
 from fastapi import HTTPException
 
 from quivr_core.api.models.settings import get_supabase_client
@@ -22,7 +24,7 @@ class Prompts(PromptsInterface):
 
         return Prompt(**response[0])
 
-    def delete_prompt_by_id(self, prompt_id):
+    def delete_prompt_by_id(self, prompt_id: UUID):
         """
         Delete a prompt by id
         Args:
@@ -34,19 +36,19 @@ class Prompts(PromptsInterface):
 
         # Update brains where prompt_id is equal to the value to NULL
         self.db.from_("brains").update({"prompt_id": None}).filter(
-            "prompt_id", "eq", prompt_id
+            "prompt_id", "eq", str(prompt_id)
         ).execute()
 
         # Update chat_history where prompt_id is equal to the value to NULL
         self.db.from_("chat_history").update({"prompt_id": None}).filter(
-            "prompt_id", "eq", prompt_id
+            "prompt_id", "eq", str(prompt_id)
         ).execute()
 
         # Delete the prompt
         response = (
             self.db.from_("prompts")
             .delete()
-            .filter("id", "eq", prompt_id)
+            .filter("id", "eq", str(prompt_id))
             .execute()
             .data
         )
@@ -56,7 +58,7 @@ class Prompts(PromptsInterface):
 
         return DeletePromptResponse(status="deleted", prompt_id=prompt_id)
 
-    def get_prompt_by_id(self, prompt_id):
+    def get_prompt_by_id(self, prompt_id: UUID):
         """
         Get a prompt by its id
 
@@ -68,7 +70,10 @@ class Prompts(PromptsInterface):
         """
 
         response = (
-            self.db.from_("prompts").select("*").filter("id", "eq", prompt_id).execute()
+            self.db.from_("prompts")
+            .select("*")
+            .filter("id", "eq", str(prompt_id))
+            .execute()
         ).data
 
         if response == []:
@@ -87,13 +92,13 @@ class Prompts(PromptsInterface):
             .execute()
         ).data
 
-    def update_prompt_by_id(self, prompt_id, prompt):
+    def update_prompt_by_id(self, prompt_id: UUID, prompt):
         """Update a prompt by id"""
 
         response = (
             self.db.from_("prompts")
             .update(prompt.dict(exclude_unset=True))
-            .filter("id", "eq", prompt_id)
+            .filter("id", "eq", str(prompt_id))
             .execute()
         ).data
 
