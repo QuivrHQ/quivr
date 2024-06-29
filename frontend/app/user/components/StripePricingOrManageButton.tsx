@@ -4,7 +4,13 @@ import { useUserData } from "@/lib/hooks/useUserData";
 
 const MANAGE_PLAN_URL = process.env.NEXT_PUBLIC_STRIPE_MANAGE_PLAN_URL;
 
-export const StripePricingOrManageButton = (): JSX.Element => {
+type StripePricingModalButtonProps = {
+  small?: boolean;
+};
+
+export const StripePricingOrManageButton = ({
+  small = false,
+}: StripePricingModalButtonProps): JSX.Element => {
   const { userData } = useUserData();
 
   const is_premium = userData?.is_premium ?? false;
@@ -15,6 +21,7 @@ export const StripePricingOrManageButton = (): JSX.Element => {
           label="Manage my plan"
           color="gold"
           iconName="star"
+          small={small}
         ></QuivrButton>
       </a>
     );
@@ -28,6 +35,7 @@ export const StripePricingOrManageButton = (): JSX.Element => {
             label="Upgrade my plan"
             color="gold"
             iconName="star"
+            small={small}
           ></QuivrButton>
         </div>
       }

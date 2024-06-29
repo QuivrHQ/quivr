@@ -8,8 +8,52 @@
   gap: Spacings.$spacing07;
   width: auto;
   padding: Spacings.$spacing06;
+  max-width: 700px;
 
   .title {
     @include Typography.H2;
+  }
+
+  .infos_wrapper {
+    display: flex;
+    flex-direction: column;
+
+    .bold {
+      font-weight: 550;
+    }
+
+    .credits {
+      color: var(--gold);
+      font-weight: 550;
+    }
+
+    .remaining_credits {
+      display: flex;
+      gap: Spacings.$spacing03;
+      align-items: center;
+    }
+
+    .text_and_button {
+      font-size: Typography.$small;
+      display: flex;
+      flex-direction: column;
+      gap: Spacings.$spacing04;
+
+      .text {
+        .link {
+          font-weight: 550;
+          color: var(--primary-0);
+
+          &:hover {
+            color: var(--primary-1);
+          }
+        }
+      }
+
+      .button {
+        display: flex;
+        align-self: flex-end;
+      }
+    }
   }
 }

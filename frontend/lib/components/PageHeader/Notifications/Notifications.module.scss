@@ -11,16 +11,16 @@
   .badge {
     position: absolute;
     color: var(--white-0);
-    background-color: var(--accent);
-    border-radius: Radius.$circle;
-    width: 14px;
-    height: 14px;
+    background-color: var(--dangerous-dark);
+    border-radius: Radius.$normal;
+    width: 16px;
+    height: 16px;
     display: flex;
     justify-content: center;
     align-items: center;
     font-size: Typography.$very_tiny;
-    top: -(Spacings.$spacing02);
-    right: -(Spacings.$spacing01);
+    top: -(Spacings.$spacing03);
+    right: -(Spacings.$spacing02);
   }
 
   .notifications_panel {
