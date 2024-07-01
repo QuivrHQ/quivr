@@ -3841,19 +3841,18 @@ files = [
 
 [[package]]
 name = "megaparse"
-version = "0.0.18"
+version = "0.0.19"
 description = "Parse complex files (PDF,Docx,PPTX) for LLM consumption"
 optional = false
 python-versions = "*"
 files = [
-    {file = "megaparse-0.0.18-py3-none-any.whl", hash = "sha256:5cc9a80cf1590dd64e11202cc52736f9435a42b7c837ef5babb0924c6d452ed6"},
-    {file = "megaparse-0.0.18.tar.gz", hash = "sha256:ad3716427c7e8c2cbd97d648b53ca9514c71fe6abdb5c41683266c59bda7bd42"},
+    {file = "megaparse-0.0.19-py3-none-any.whl", hash = "sha256:eda0e10c38a2fc2e25331eff20840c1397b445d4d30abe2749fd5b031f6d6852"},
+    {file = "megaparse-0.0.19.tar.gz", hash = "sha256:7f6405802600e7f9f4a0236439a83f8cb1cf37c0c4377ce70410f50575c2f6c2"},
 ]
 
 [package.dependencies]
 llama-parse = "*"
 mammoth = "*"
-nest-asyncio = "*"
 pdf2docx = "*"
 python-docx = "*"
 python-pptx = "*"
@@ -6571,7 +6570,7 @@ litellm = "*"
 llama-index = "*"
 llama-parse = "*"
 lxml = {version = "*", extras = ["html-clean"]}
-megaparse = "^0.0.18"
+megaparse = "^0.0.19"
 msal = "*"
 nest-asyncio = "*"
 newspaper3k = "*"

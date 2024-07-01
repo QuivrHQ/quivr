@@ -57,7 +57,7 @@ class AuthBearer(HTTPBearer):
 
     def get_test_user(self) -> UserIdentity:
         return UserIdentity(
-            email="admin@quivr.app", id="39418e3b-0258-4452-af60-7acfcc1263ff"  # type: ignore
+            email="chloe@quivr.app", id="9130a81a-64b8-430b-b44c-78ac12149abc"  # type: ignore
         )  # replace with test user information
 
 
