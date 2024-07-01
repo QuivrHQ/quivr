@@ -6,8 +6,8 @@ from langchain_core.documents import Document
 from pydantic import BaseModel
 
 from quivr_core.api.logger import get_logger
-from quivr_core.api.models.databases.supabase.supabase import SupabaseDB
-from quivr_core.api.models.settings import get_supabase_db
+from quivr_core.api.models.file_repository import FileRepository
+from quivr_core.api.models.vectors import Vector
 from quivr_core.api.modules.brain.service.brain_vector_service import BrainVectorService
 from quivr_core.api.packages.files.file import compute_sha1_from_content
 
@@ -28,11 +28,9 @@ class File(BaseModel):
 
     def __init__(self, **data):
         super().__init__(**data)
+        self.vectors_repository = Vector()
+        self.file_repository = FileRepository()
         data["file_sha1"] = compute_sha1_from_content(data["bytes_content"])
-
-    @property
-    def supabase_db(self) -> SupabaseDB:
-        return get_supabase_db()
 
     def compute_documents(self, loader_class):
         """
@@ -56,7 +54,7 @@ class File(BaseModel):
         Set the vectors_ids property with the ids of the vectors
         that are associated with the file in the vectors table
         """
-        self.vectors_ids = self.supabase_db.get_vectors_by_file_sha1(
+        self.vectors_ids = self.vectors_repository.get_vectors_by_file_sha1(
             self.file_sha1
         ).data
 
@@ -79,7 +77,7 @@ class File(BaseModel):
         Args:
             brain_id (str): Brain id
         """
-        response = self.supabase_db.get_brain_vectors_by_brain_id_and_file_sha1(
+        response = self.file_repository.get_brain_vectors_by_brain_id_and_file_sha1(
             brain_id,
             self.file_sha1,  # type: ignore
         )

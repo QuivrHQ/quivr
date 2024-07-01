@@ -1,23 +1,20 @@
 from typing import Optional
 from uuid import UUID
 
+from dotenv import load_dotenv
 from langchain.embeddings.base import Embeddings
 from langchain_community.embeddings.ollama import OllamaEmbeddings
 from langchain_community.vectorstores.supabase import SupabaseVectorStore
 from langchain_openai import OpenAIEmbeddings
 from posthog import Posthog
 from pydantic_settings import BaseSettings, SettingsConfigDict
-from quivr_core.api.logger import get_logger
-from quivr_core.api.models.databases.supabase.supabase import SupabaseDB
 from sqlalchemy import Engine, create_engine
 from supabase.client import Client, create_client
 
+from quivr_core.api.logger import get_logger
+
+load_dotenv()
 logger = get_logger(__name__)
-
-
-class BrainRateLimiting(BaseSettings):
-    model_config = SettingsConfigDict(validate_default=False)
-    max_brain_per_user: int = 5
 
 
 # The `PostHogSettings` class is used to initialize and interact with the PostHog analytics service.
@@ -120,14 +117,8 @@ class BrainSettings(BaseSettings):
     langfuse_secret_key: str | None = None
 
 
-class ResendSettings(BaseSettings):
-    model_config = SettingsConfigDict(validate_default=False)
-    resend_api_key: str = "null"
-
-
 # Global variables to store the Supabase client and database instances
 _supabase_client: Optional[Client] = None
-_supabase_db: Optional[SupabaseDB] = None
 _db_engine: Optional[Engine] = None
 _embedding_service = None
 
@@ -158,14 +149,6 @@ def get_supabase_client() -> Client:
             settings.supabase_url, settings.supabase_service_key
         )
     return _supabase_client
-
-
-def get_supabase_db() -> SupabaseDB:
-    global _supabase_db
-    if _supabase_db is None:
-        logger.info("Creating Supabase DB")
-        _supabase_db = SupabaseDB(get_supabase_client())
-    return _supabase_db
 
 
 def get_embedding_client() -> Embeddings:

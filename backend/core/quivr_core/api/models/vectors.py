@@ -1,9 +1,11 @@
-from quivr_core.api.models.databases.repository import Repository
+from postgrest.types import CountMethod
+
+from quivr_core.api.models.settings import get_supabase_client
 
 
-class Vector(Repository):
-    def __init__(self, supabase_client):
-        self.db = supabase_client
+class Vector:
+    def __init__(self):
+        self.db = get_supabase_client()
 
     def get_vectors_by_file_name(self, file_name):
         response = (
@@ -54,7 +56,7 @@ class Vector(Repository):
             self.db.table("vectors")
             .select(
                 "name:metadata->>file_name, size:metadata->>file_size",
-                count="exact",
+                count=CountMethod.exact,
             )
             .eq("id", batch_id)
             .execute()
@@ -67,7 +69,7 @@ class Vector(Repository):
             self.db.table("vectors")
             .select(
                 "name:metadata->>file_name, size:metadata->>file_size",
-                count="exact",
+                count=CountMethod.exact,
             )
             .in_("id", batch_ids)
             .execute()
