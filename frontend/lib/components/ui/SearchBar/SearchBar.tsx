@@ -59,10 +59,9 @@ export const SearchBar = ({
         remainingCredits={remainingCredits}
       />
       <div
-        className={`
-      ${styles.editor_wrapper}
-      ${currentBrain ? styles.with_brain : ""}
-      `}
+        className={`${styles.editor_wrapper} ${
+          !remainingCredits ? styles.disabled : ""
+        }`}
       >
         <Editor
           message={message}
