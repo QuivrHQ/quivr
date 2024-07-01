@@ -147,8 +147,8 @@ class BrainsUsers:
         response = (
             self.db.from_("brains_users")
             .select("brain_id")
-            .filter("user_id", "eq", user_id)
-            .filter("default_brain", "eq", True)
+            .filter("user_id", "eq", str(user_id))
+            .filter("default_brain", "eq", "True")
             .execute()
         ).data
         if len(response) == 0:

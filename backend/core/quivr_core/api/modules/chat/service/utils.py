@@ -1,20 +1,11 @@
 from typing import List
 
 from quivr_core.api.logger import get_logger
-from quivr_core.api.modules.brain.service.brain_service import BrainService
 from quivr_core.api.modules.chat.dto.chats import ChatItem, ChatItemType
 from quivr_core.api.modules.chat.dto.outputs import GetChatHistoryOutput
 from quivr_core.api.modules.notification.entity.notification import Notification
-from quivr_core.api.modules.notification.service.notification_service import (
-    NotificationService,
-)
-from quivr_core.api.modules.prompt.service.prompt_service import PromptService
 
 logger = get_logger(__name__)
-
-prompt_service = PromptService()
-brain_service = BrainService()
-notification_service = NotificationService()
 
 
 def merge_chat_history_and_notifications(

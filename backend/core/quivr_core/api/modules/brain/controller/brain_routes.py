@@ -1,3 +1,4 @@
+from typing import Annotated
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Request
@@ -20,7 +21,7 @@ from quivr_core.api.modules.brain.service.get_question_context_from_brain import
 from quivr_core.api.modules.brain.service.integration_brain_service import (
     IntegrationBrainDescriptionService,
 )
-from quivr_core.api.modules.dependencies import get_current_user
+from quivr_core.api.modules.dependencies import get_current_user, get_service
 from quivr_core.api.modules.prompt.service.prompt_service import PromptService
 from quivr_core.api.modules.user.entity.user_identity import UserIdentity
 from quivr_core.api.packages.utils.telemetry import maybe_send_telemetry
@@ -28,10 +29,11 @@ from quivr_core.api.packages.utils.telemetry import maybe_send_telemetry
 logger = get_logger(__name__)
 brain_router = APIRouter()
 
-prompt_service = PromptService()
 brain_service = BrainService()
 brain_user_service = BrainUserService()
 integration_brain_description_service = IntegrationBrainDescriptionService()
+
+PromptServiceDep = Annotated[PromptService, Depends(get_service(PromptService))]
 
 
 @brain_router.get(
@@ -103,6 +105,7 @@ async def create_new_brain(
 async def update_existing_brain(
     brain_id: UUID,
     brain_update_data: BrainUpdatableProperties,
+    prompt_service: PromptServiceDep,
     current_user: UserIdentity = Depends(get_current_user),
 ):
     """Update an existing brain's configuration."""

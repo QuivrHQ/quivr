@@ -18,19 +18,20 @@ from quivr_core.api.modules.chat.service.chat_service import ChatService
 from quivr_core.api.modules.dependencies import get_current_user, get_service
 from quivr_core.api.modules.knowledge.repository.knowledges import KnowledgeRepository
 from quivr_core.api.modules.prompt.service.prompt_service import PromptService
+from quivr_core.api.modules.rag.rag_service import RAGService
 from quivr_core.api.modules.user.entity.user_identity import UserIdentity
-from quivr_core.api.packages.quivr_core.rag_service import RAGService
 from quivr_core.api.packages.utils.telemetry import maybe_send_telemetry
 
 logger = get_logger(__name__)
 
 brain_service = BrainService()
 knowledge_service = KnowledgeRepository()
-prompt_service = PromptService()
 
 
 ChatServiceDep = Annotated[ChatService, Depends(get_service(ChatService))]
 UserIdentityDep = Annotated[UserIdentity, Depends(get_current_user)]
+PromptServiceDep = Annotated[PromptService, Depends(get_service(PromptService))]
+
 
 chat_router = APIRouter()
 
@@ -136,6 +137,7 @@ async def create_question_handler(
     chat_id: UUID,
     current_user: UserIdentityDep,
     chat_service: ChatServiceDep,
+    prompt_service: PromptServiceDep,
     brain_id: Annotated[UUID | None, Query()] = None,
 ):
     try:
@@ -173,6 +175,7 @@ async def create_stream_question_handler(
     chat_id: UUID,
     chat_service: ChatServiceDep,
     current_user: UserIdentityDep,
+    prompt_service: PromptServiceDep,
     brain_id: Annotated[UUID | None, Query()] = None,
 ) -> StreamingResponse:
     logger.info(

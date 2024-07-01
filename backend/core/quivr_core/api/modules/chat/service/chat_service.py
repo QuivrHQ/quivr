@@ -26,11 +26,9 @@ from quivr_core.api.modules.notification.service.notification_service import (
     NotificationService,
 )
 from quivr_core.api.modules.prompt.entity.prompt import Prompt
-from quivr_core.api.modules.prompt.service.prompt_service import PromptService
 
 logger = get_logger(__name__)
 
-prompt_service = PromptService()
 brain_service = BrainService()
 notification_service = NotificationService()
 
@@ -56,7 +54,7 @@ class ChatService(BaseService[ChatRepository]):
 
     def get_follow_up_question(
         self, brain_id: UUID = None, question: str = None
-    ) -> [str]:
+    ) -> list[str]:
         follow_up = [
             "Summarize the conversation",
             "Explain in more detail",

@@ -1,19 +1,15 @@
 from uuid import UUID
 
 from fastapi import HTTPException
-
 from quivr_core.api.models.settings import get_supabase_client
-from quivr_core.api.modules.prompt.entity.prompt import Prompt
-from quivr_core.api.modules.prompt.repository.prompts_interface import (
-    DeletePromptResponse,
-    PromptsInterface,
-)
+from quivr_core.api.modules.dependencies import BaseRepository
+from quivr_core.api.modules.prompt.entity.prompt import DeletePromptResponse, Prompt
 
 
-class Prompts(PromptsInterface):
-    def __init__(self):
-        supabase_client = get_supabase_client()
-        self.db = supabase_client
+class PromptRepository(BaseRepository):
+    def __init__(self, session):
+        super().__init__(session)
+        self.db = get_supabase_client()
 
     def create_prompt(self, prompt):
         """
