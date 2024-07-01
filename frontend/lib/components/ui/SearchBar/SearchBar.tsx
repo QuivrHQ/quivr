@@ -32,7 +32,6 @@ export const SearchBar = ({
 
   useEffect(() => {
     setIsDisabled(message === "");
-    console.info(message);
   }, [message]);
 
   const submit = async (): Promise<void> => {

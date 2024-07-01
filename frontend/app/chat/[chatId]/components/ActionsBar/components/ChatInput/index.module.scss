@@ -13,9 +13,11 @@
   .chat_wrapper {
     display: flex;
     padding: Spacings.$spacing05;
+    padding-top: 0;
 
-    &.with_brain {
-      padding-top: 0;
+    &.disabled {
+      pointer-events: none;
+      opacity: 0.4;
     }
   }
 }
