@@ -1,11 +1,8 @@
-import asyncio
 import os
 import tempfile
 import time
 
-import nest_asyncio
 import tiktoken
-import uvloop
 from langchain.schema import Document
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from llama_parse import LlamaParse
@@ -14,9 +11,6 @@ from quivr_api.models.files import File
 from quivr_api.modules.brain.service.brain_vector_service import BrainVectorService
 from quivr_api.modules.upload.service.upload_file import DocumentSerializable
 from quivr_api.packages.embeddings.vectors import Neurons
-
-if not isinstance(asyncio.get_event_loop(), uvloop.Loop):
-    nest_asyncio.apply()
 
 logger = get_logger(__name__)
 
