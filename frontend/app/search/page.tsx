@@ -72,13 +72,6 @@ const Search = (): JSX.Element => {
               <SearchBar />
             </div>
           </div>
-          <div className={styles.shortcuts_card_wrapper}>
-            <div className={styles.shortcut_wrapper}>
-              <span>Press</span>
-              <span className={styles.shortcut}>@</span>
-              <span>to select a brain</span>
-            </div>
-          </div>
         </div>
         <UploadDocumentModal />
         <AddBrainModal />

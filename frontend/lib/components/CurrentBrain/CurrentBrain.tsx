@@ -9,10 +9,12 @@ import { Icon } from "../ui/Icon/Icon";
 
 interface CurrentBrainProps {
   allowingRemoveBrain: boolean;
+  remainingCredits: number | null;
 }
 
 export const CurrentBrain = ({
   allowingRemoveBrain,
+  remainingCredits,
 }: CurrentBrainProps): JSX.Element => {
   const { currentBrain, setCurrentBrainId } = useBrainContext();
   const { isDarkMode } = useUserSettingsContext();
@@ -20,8 +22,24 @@ export const CurrentBrain = ({
     setCurrentBrainId(null);
   };
 
+  if (!remainingCredits) {
+    return (
+      <div className={styles.no_credits_left}>
+        <span>
+          You’ve run out of credits! Upgrade your plan now to continue chatting.
+        </span>
+      </div>
+    );
+  }
+
   if (!currentBrain) {
-    return <></>;
+    return (
+      <div className={styles.no_brain_selected}>
+        <span>
+          Press <strong className={styles.strong}>@</strong> to select a Brain
+        </span>
+      </div>
+    );
   }
 
   return (

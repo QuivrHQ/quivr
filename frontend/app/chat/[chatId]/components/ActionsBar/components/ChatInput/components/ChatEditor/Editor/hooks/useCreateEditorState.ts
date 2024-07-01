@@ -6,12 +6,15 @@ import { Text } from "@tiptap/extension-text";
 import { Extension, useEditor } from "@tiptap/react";
 import { useTranslation } from "react-i18next";
 
+import { useUserSettingsContext } from "@/lib/context/UserSettingsProvider/hooks/useUserSettingsContext";
+
 import { useBrainMention } from "./useBrainMention";
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const useCreateEditorState = (placeholder?: string) => {
   const { t } = useTranslation(["chat"]);
   const { BrainMention, items } = useBrainMention();
+  const { remainingCredits } = useUserSettingsContext();
 
   const PreventEnter = Extension.create({
     addKeyboardShortcuts: () => {
@@ -24,7 +27,7 @@ export const useCreateEditorState = (placeholder?: string) => {
 
   const editor = useEditor(
     {
-      autofocus: true,
+      autofocus: !!remainingCredits,
       onFocus: () => {
         editor?.commands.focus("end");
       },
