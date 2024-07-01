@@ -42,3 +42,11 @@
     }
   }
 }
+
+.no_brain_selected {
+  background-color: var(--background-2);
+  padding-inline: Spacings.$spacing05;
+  padding-block: Spacings.$spacing01;
+  font-size: Typography.$small;
+  color: var(--warning);
+}

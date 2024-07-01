@@ -18,10 +18,7 @@
     align-items: center;
     justify-content: space-between;
     padding: Spacings.$spacing05;
-
-    &.with_brain {
-      padding-top: 0;
-    }
+    padding-top: 0;
 
     .search_icon {
       width: IconSizes.$big;

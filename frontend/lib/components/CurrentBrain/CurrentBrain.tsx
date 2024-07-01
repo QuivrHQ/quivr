@@ -21,7 +21,11 @@ export const CurrentBrain = ({
   };
 
   if (!currentBrain) {
-    return <></>;
+    return (
+      <div className={styles.no_brain_selected}>
+        <span>Press @ to select a Brain</span>
+      </div>
+    );
   }
 
   return (
