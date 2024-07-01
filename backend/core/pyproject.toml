@@ -12,6 +12,15 @@ pydantic = "^2.7.4"
 langchain-core = "^0.2.10"
 langchain = "^0.2.6"
 
+[tool.poetry.group.api.dependencies]
+aiofiles = "^24.1.0"
+python-dotenv = "^1.0.1"
+fastapi = "^0.111.0"
+sqlmodel = "^0.0.19"
+asyncpg = "^0.29.0"
+uvicorn = "^0.30.1"
+supabase = { version = "^2.5.1", optional = true }
+
 [tool.ruff]
 line-length = 88
 exclude = [".git", "__pycache__", ".mypy_cache", ".pytest_cache"]

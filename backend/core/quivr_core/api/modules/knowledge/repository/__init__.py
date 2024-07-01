@@ -1,0 +1,1 @@
+from .knowledges import KnowledgeRepository
