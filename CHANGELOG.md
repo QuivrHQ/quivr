@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.0.279 (2024-07-01)
+
+## What's Changed
+* feat(frontend): remove create brain step in onboarding when share brain by @Zewed in https://github.com/QuivrHQ/quivr/pull/2791
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.278...v0.0.279
+
 ## 0.0.278 (2024-07-01)
 
 ## What's Changed
