@@ -21,7 +21,7 @@ from quivr_core.api.modules.knowledge.repository.knowledges import KnowledgeRepo
 from quivr_core.api.modules.prompt.entity.prompt import Prompt
 from quivr_core.api.modules.prompt.service.prompt_service import PromptService
 from quivr_core.api.modules.user.entity.user_identity import UserIdentity
-from quivr_core.api.vectorstore.supabase import CustomSupabaseVectorStore
+from quivr_core.api.packages.vectorstore.supabase import CustomSupabaseVectorStore
 from quivr_core.config import RAGConfig
 from quivr_core.models import ParsedRAGResponse, RAGResponseMetadata
 from quivr_core.quivr_rag import QuivrQARAG

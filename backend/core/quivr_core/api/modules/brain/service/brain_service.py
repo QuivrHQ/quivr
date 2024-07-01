@@ -22,7 +22,7 @@ from quivr_core.api.modules.brain.repository import (
     IntegrationDescription,
 )
 from quivr_core.api.modules.knowledge.service.knowledge_service import KnowledgeService
-from quivr_core.api.vectorstore.supabase import CustomSupabaseVectorStore
+from quivr_core.api.packages.vectorstore.supabase import CustomSupabaseVectorStore
 
 logger = get_logger(__name__)
 
@@ -30,7 +30,6 @@ knowledge_service = KnowledgeService()
 
 
 class BrainService:
-
     def __init__(self):
         self.brain_repository: Brains = Brains()
         self.brain_user_repository = BrainsUsers()

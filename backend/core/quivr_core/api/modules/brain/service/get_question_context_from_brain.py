@@ -7,7 +7,7 @@ from quivr_core.api.models.settings import get_embedding_client, get_supabase_cl
 from quivr_core.api.modules.upload.service.generate_file_signed_url import (
     generate_file_signed_url,
 )
-from quivr_core.api.vectorstore.supabase import CustomSupabaseVectorStore
+from quivr_core.api.packages.vectorstore.supabase import CustomSupabaseVectorStore
 
 logger = get_logger(__name__)
 
