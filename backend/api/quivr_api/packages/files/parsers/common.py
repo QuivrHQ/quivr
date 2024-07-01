@@ -55,7 +55,6 @@ def process_file(
             )
             file.documents = text_splitter.split_documents([document_to_langchain])
     else:
-        print("I AM ROLLING WITH : ", loader_class)
         file.compute_documents(loader_class)
 
     metadata = {
