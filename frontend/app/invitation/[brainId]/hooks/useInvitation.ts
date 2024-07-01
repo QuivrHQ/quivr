@@ -9,6 +9,7 @@ import { useTranslation } from "react-i18next";
 import { BrainRoleType } from "@/app/studio/[brainId]/BrainManagementTabs/components/PeopleTab/BrainUsers/types";
 import { useSubscriptionApi } from "@/lib/api/subscription/useSubscriptionApi";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
+import { useOnboardingContext } from "@/lib/context/OnboardingProvider/hooks/useOnboardingContext";
 import { useToast } from "@/lib/hooks";
 import { useEventTracking } from "@/services/analytics/june/useEventTracking";
 
@@ -21,6 +22,7 @@ export const useInvitation = () => {
   const [brainName, setBrainName] = useState<string>("");
   const [role, setRole] = useState<BrainRoleType | undefined>();
   const [isProcessingRequest, setIsProcessingRequest] = useState(false);
+  const { setIsBrainCreated } = useOnboardingContext();
 
   const { publish } = useToast();
   const { track } = useEventTracking();
@@ -63,6 +65,7 @@ export const useInvitation = () => {
   }, [brainId]);
 
   const handleAccept = async () => {
+    setIsBrainCreated(true);
     setIsProcessingRequest(true);
     try {
       await acceptInvitation(brainId);
