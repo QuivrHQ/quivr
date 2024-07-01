@@ -14,12 +14,6 @@ readme = "README.md"
 [tool.poetry.dependencies]
 quivr-core = { path = "../core", develop = true }
 python = "^3.11"
-flashrank = [
-{ version = "^0.2.6", source = "pypi", platform = "darwin" },
-    { version = "^0.2.6", source = "pypi", platform = "linux", markers = "platform_machine != 'x86_64'" },
-    { version = "^0.2.6", source = "pypi", platform = "linux", markers = "platform_machine == 'x86_64'" },
-    { version = "^0.2.6", source = "pypi", platform = "win32" },
-]
 
 torch = [
     { version = "2.3.1", source = "pypi", platform = "darwin" },
