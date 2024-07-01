@@ -1,9 +1,11 @@
 from uuid import UUID
 
+from sqlmodel.ext.asyncio.session import AsyncSession
+
 from quivr_core.api.models.settings import get_supabase_client
 from quivr_core.api.modules.dependencies import BaseRepository
+from quivr_core.api.modules.user.dto.inputs import UserUpdatableProperties
 from quivr_core.api.modules.user.entity.user_identity import UserIdentity
-from sqlmodel.ext.asyncio.session import AsyncSession
 
 
 class UserRepository(BaseRepository):
@@ -26,8 +28,8 @@ class UserRepository(BaseRepository):
 
     def update_user_properties(
         self,
-        user_id,
-        user_identity_updatable_properties,
+        user_id: UUID,
+        user_identity_updatable_properties: UserUpdatableProperties,
     ):
         response = (
             self.db.from_("user_identity")
@@ -110,7 +112,7 @@ class UserRepository(BaseRepository):
         ).execute()
         self.db.table("users").delete().filter("id", "eq", str(user_id)).execute()
 
-    def get_user_settings(self, user_id):
+    def get_user_settings(self, user_id: UUID):
         """
         Fetch the user settings from the database
         """
