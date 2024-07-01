@@ -14,8 +14,11 @@ import { SingleSelector } from "../ui/SingleSelector/SingleSelector";
 import { TextInput } from "../ui/TextInput/TextInput";
 
 export const OnboardingModal = (): JSX.Element => {
-  const { isOnboardingModalOpened, setIsOnboardingModalOpened } =
-    useOnboardingContext();
+  const {
+    isOnboardingModalOpened,
+    setIsOnboardingModalOpened,
+    isBrainCreated,
+  } = useOnboardingContext();
 
   const methods = useForm<OnboardingProps>({
     defaultValues: {
@@ -46,7 +49,7 @@ export const OnboardingModal = (): JSX.Element => {
     await updateUserIdentity({
       username: methods.getValues("username"),
       company: methods.getValues("companyName"),
-      onboarded: false,
+      onboarded: isBrainCreated,
       company_size: methods.getValues("companySize"),
       usage_purpose: methods.getValues("usagePurpose") as
         | UsagePurpose
