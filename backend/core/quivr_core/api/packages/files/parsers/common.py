@@ -10,10 +10,10 @@ from langchain.schema import Document
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from llama_parse import LlamaParse
 
-from quivr_core.logger import get_logger
-from quivr_core.models.files import File
-from quivr_core.modules.brain.service.brain_vector_service import BrainVectorService
-from quivr_core.modules.upload.service.upload_file import DocumentSerializable
+from quivr_core.api.logger import get_logger
+from quivr_core.api.models.files import File
+from quivr_core.api.modules.brain.service.brain_vector_service import BrainVectorService
+from quivr_core.api.modules.upload.service.upload_file import DocumentSerializable
 from quivr_core.packages.embeddings.vectors import Neurons
 
 if not isinstance(asyncio.get_event_loop(), uvloop.Loop):

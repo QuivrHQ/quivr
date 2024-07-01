@@ -4,8 +4,8 @@ import openai
 from langchain.schema import Document
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 
-from quivr_core.models.files import File
-from quivr_core.models.settings import get_documents_vector_store
+from quivr_core.api.models.files import File
+from quivr_core.api.models.settings import get_documents_vector_store
 from quivr_core.packages.files.file import compute_sha1_from_content
 
 

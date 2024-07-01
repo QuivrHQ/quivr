@@ -11,10 +11,10 @@ from langchain.schema import (
 )
 from langchain_core.messages.ai import AIMessageChunk
 
-from quivr_core.modules.chat.dto.chats import Sources
-from quivr_core.modules.chat.dto.outputs import GetChatHistoryOutput
-from quivr_core.modules.knowledge.entity.knowledge import Knowledge
-from quivr_core.modules.upload.service.generate_file_signed_url import (
+from quivr_core.api.modules.chat.dto.chats import Sources
+from quivr_core.api.modules.chat.dto.outputs import GetChatHistoryOutput
+from quivr_core.api.modules.knowledge.entity.knowledge import Knowledge
+from quivr_core.api.modules.upload.service.generate_file_signed_url import (
     generate_file_signed_url,
 )
 from quivr_core.packages.quivr_core.models import (

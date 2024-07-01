@@ -5,7 +5,7 @@ import unicodedata
 from langchain_community.document_loaders import PlaywrightURLLoader
 from pydantic import BaseModel
 
-from quivr_core.logger import get_logger
+from quivr_core.api.logger import get_logger
 
 logger = get_logger(__name__)
 

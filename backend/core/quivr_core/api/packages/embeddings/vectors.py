@@ -4,8 +4,8 @@ from uuid import UUID
 
 from pydantic import BaseModel
 
-from quivr_core.logger import get_logger
-from quivr_core.models.settings import (
+from quivr_core.api.logger import get_logger
+from quivr_core.api.models.settings import (
     get_documents_vector_store,
     get_embedding_client,
     get_supabase_db,

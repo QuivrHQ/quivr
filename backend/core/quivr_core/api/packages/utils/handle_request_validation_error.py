@@ -2,7 +2,7 @@ from fastapi import FastAPI, Request, status
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 
-from quivr_core.logger import get_logger
+from quivr_core.api.logger import get_logger
 
 logger = get_logger(__name__)
 

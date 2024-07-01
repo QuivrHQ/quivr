@@ -1,4 +1,4 @@
-from quivr_core.modules.brain.service.brain_service import BrainService
+from quivr_core.api.modules.brain.service.brain_service import BrainService
 
 from .parsers.audio import process_audio
 from .parsers.bibtex import process_bibtex
@@ -50,7 +50,7 @@ def create_response(message, type):
 brain_service = BrainService()
 
 
-# TODO: Move filter_file to a file service to avoid circular imports from quivr_core.models/files.py for File class
+# TODO: Move filter_file to a file service to avoid circular imports from quivr_core.api.models/files.py for File class
 def filter_file(
     file,
     brain_id,

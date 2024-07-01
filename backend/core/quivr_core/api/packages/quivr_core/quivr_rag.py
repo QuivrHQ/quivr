@@ -14,18 +14,11 @@ from langchain_core.runnables import RunnableLambda, RunnablePassthrough
 from langchain_core.vectorstores import VectorStore
 from langchain_openai import ChatOpenAI
 
-from quivr_core.modules.knowledge.entity.knowledge import Knowledge
-from quivr_core.packages.quivr_core.config import RAGConfig
-from quivr_core.packages.quivr_core.models import (
-    ParsedRAGChunkResponse,
-    ParsedRAGResponse,
-    cited_answer,
-)
-from quivr_core.packages.quivr_core.prompts import (
-    ANSWER_PROMPT,
-    CONDENSE_QUESTION_PROMPT,
-)
-from quivr_core.packages.quivr_core.utils import (
+from quivr_core.api.modules.knowledge.entity.knowledge import Knowledge
+from quivr_core.config import RAGConfig
+from quivr_core.models import ParsedRAGChunkResponse, ParsedRAGResponse, cited_answer
+from quivr_core.prompts import ANSWER_PROMPT, CONDENSE_QUESTION_PROMPT
+from quivr_core.utils import (
     combine_documents,
     format_file_list,
     get_chunk_metadata,
