@@ -36,7 +36,7 @@ export const SearchBar = ({
   }, [message]);
 
   const submit = async (): Promise<void> => {
-    if (!searching) {
+    if (!!remainingCredits && !!currentBrain && !searching) {
       setSearching(true);
       setMessages([]);
       try {
@@ -54,7 +54,10 @@ export const SearchBar = ({
 
   return (
     <div className={styles.search_bar_wrapper}>
-      <CurrentBrain allowingRemoveBrain={true} />
+      <CurrentBrain
+        allowingRemoveBrain={true}
+        remainingCredits={remainingCredits}
+      />
       <div
         className={`
       ${styles.editor_wrapper}
