@@ -1,7 +1,7 @@
-from quivr_api.logger import get_logger
-from quivr_api.modules.notification.dto.inputs import CreateNotification
-from quivr_api.modules.notification.entity.notification import Notification
-from quivr_api.modules.notification.repository.notifications_interface import (
+from quivr_core.api.logger import get_logger
+from quivr_core.api.modules.notification.dto.inputs import CreateNotification
+from quivr_core.api.modules.notification.entity.notification import Notification
+from quivr_core.api.modules.notification.repository.notifications_interface import (
     NotificationInterface,
 )
 

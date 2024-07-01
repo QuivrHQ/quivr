@@ -1,11 +1,11 @@
 from abc import ABC, abstractmethod
 from uuid import UUID
 
-from quivr_api.modules.notification.dto.inputs import (
+from quivr_core.api.modules.notification.dto.inputs import (
     CreateNotification,
     NotificationUpdatableProperties,
 )
-from quivr_api.modules.notification.entity.notification import Notification
+from quivr_core.api.modules.notification.entity.notification import Notification
 
 
 class NotificationInterface(ABC):
