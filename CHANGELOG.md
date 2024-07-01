@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.0.278 (2024-07-01)
+
+## What's Changed
+* chore: Add GitHub Actions workflow for testing and building Docker image by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2778
+* chore: Update flashrank npm dependency to version 0.2.5 by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2781
+* feat(frontend): disabled searchBar if no remaining credits or no brain selected by @Zewed in https://github.com/QuivrHQ/quivr/pull/2788
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.277...v0.0.278
+
 ## 0.0.277 (2024-06-27)
 
 ## What's Changed
