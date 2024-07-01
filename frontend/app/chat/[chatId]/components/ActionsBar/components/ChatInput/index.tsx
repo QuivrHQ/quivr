@@ -4,6 +4,7 @@ import { CurrentBrain } from "@/lib/components/CurrentBrain/CurrentBrain";
 import Icon from "@/lib/components/ui/Icon/Icon";
 import { LoaderIcon } from "@/lib/components/ui/LoaderIcon/LoaderIcon";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
+import { useUserSettingsContext } from "@/lib/context/UserSettingsProvider/hooks/useUserSettingsContext";
 
 import { ChatEditor } from "./components/ChatEditor/ChatEditor";
 import { useChatInput } from "./hooks/useChatInput";
@@ -12,10 +13,11 @@ import styles from "./index.module.scss";
 export const ChatInput = (): JSX.Element => {
   const { setMessage, submitQuestion, generatingAnswer, message } =
     useChatInput();
+  const { remainingCredits } = useUserSettingsContext();
   const { currentBrain } = useBrainContext();
 
   const handleSubmitQuestion = () => {
-    if (message.trim() !== "") {
+    if (message.trim() !== "" && remainingCredits && currentBrain) {
       submitQuestion();
     }
   };
@@ -30,12 +32,14 @@ export const ChatInput = (): JSX.Element => {
         }}
       >
         <div className={styles.chat_container}>
-          <CurrentBrain allowingRemoveBrain={false} />
+          <CurrentBrain
+            allowingRemoveBrain={false}
+            remainingCredits={remainingCredits}
+          />
           <div
-            className={`
-            ${styles.chat_wrapper}
-            ${currentBrain ? styles.with_brain : ""}
-          `}
+            className={`${styles.chat_wrapper} ${
+              !remainingCredits ? styles.disabled : ""
+            }`}
           >
             <ChatEditor
               message={message}
@@ -49,7 +53,7 @@ export const ChatInput = (): JSX.Element => {
                 name="followUp"
                 size="large"
                 color="accent"
-                disabled={!message}
+                disabled={!message || !remainingCredits || !currentBrain}
                 handleHover={true}
                 onClick={handleSubmitQuestion}
               />

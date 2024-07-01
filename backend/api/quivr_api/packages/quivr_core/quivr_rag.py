@@ -1,11 +1,8 @@
 import logging
-import os
 from operator import itemgetter
 from typing import AsyncGenerator
 
-from flashrank import Ranker
 from langchain.retrievers import ContextualCompressionRetriever
-from langchain.retrievers.document_compressors.flashrank_rerank import FlashrankRerank
 from langchain_cohere import CohereRerank
 from langchain_community.chat_models import ChatLiteLLM
 from langchain_core.messages.ai import AIMessageChunk
@@ -13,7 +10,6 @@ from langchain_core.output_parsers import StrOutputParser
 from langchain_core.runnables import RunnableLambda, RunnablePassthrough
 from langchain_core.vectorstores import VectorStore
 from langchain_openai import ChatOpenAI
-
 from quivr_api.modules.knowledge.entity.knowledge import Knowledge
 from quivr_api.packages.quivr_core.config import RAGConfig
 from quivr_api.packages.quivr_core.models import (
@@ -59,14 +55,13 @@ class QuivrQARAG:
 
     def _create_reranker(self):
         # TODO: reranker config
-        if os.getenv("COHERE_API_KEY"):
-            compressor = CohereRerank(top_n=20)
-        else:
-            ranker_model_name = "ms-marco-TinyBERT-L-2-v2"
-            flashrank_client = Ranker(model_name=ranker_model_name)
-            compressor = FlashrankRerank(
-                client=flashrank_client, model=ranker_model_name, top_n=20
-            )
+        compressor = CohereRerank(top_n=20)
+        # else:
+        #     ranker_model_name = "ms-marco-TinyBERT-L-2-v2"
+        #     flashrank_client = Ranker(model_name=ranker_model_name)
+        #     compressor = FlashrankRerank(
+        #         client=flashrank_client, model=ranker_model_name, top_n=20
+        #     ) # TODO @stangirard fix
         return compressor
 
     # TODO : refactor and simplify
