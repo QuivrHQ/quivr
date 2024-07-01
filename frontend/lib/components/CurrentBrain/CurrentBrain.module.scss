@@ -1,12 +1,20 @@
 @use "styles/Spacings.module.scss";
 @use "styles/Typography.module.scss";
 
-.current_brain_wrapper {
+%header_style {
   background-color: var(--background-2);
   padding-inline: Spacings.$spacing05;
   padding-block: Spacings.$spacing01;
   font-size: Typography.$small;
-  color: var(--text-1);
+}
+
+@mixin textColor($color) {
+  color: var(--#{$color});
+}
+
+.current_brain_wrapper {
+  @extend %header_style;
+  @include textColor(text-1);
 
   .brain_infos {
     display: flex;
@@ -20,7 +28,8 @@
       align-items: center;
       @include Typography.EllipsisOverflow;
 
-      .title {
+      .title,
+      .brain_name {
         white-space: nowrap;
       }
 
@@ -35,10 +44,27 @@
         }
 
         .brain_name {
-          color: var(--text-3);
+          @include textColor(text-3);
           @include Typography.EllipsisOverflow;
         }
       }
     }
   }
+}
+
+.no_brain_selected,
+.no_credits_left {
+  @extend %header_style;
+}
+
+.no_brain_selected {
+  @include textColor(warning);
+
+  .strong {
+    font-weight: 800;
+  }
+}
+
+.no_credits_left {
+  @include textColor(dangerous);
 }

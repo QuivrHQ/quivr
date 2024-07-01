@@ -53,23 +53,6 @@
         }
       }
     }
-
-    .shortcuts_card_wrapper {
-      background-color: var(--background-2);
-      padding: Spacings.$spacing05;
-      gap: Spacings.$spacing03;
-      border-radius: Radius.$big;
-
-      .shortcut_wrapper {
-        display: flex;
-        align-items: center;
-        gap: Spacings.$spacing02;
-
-        .shortcut {
-          color: var(--primary-0);
-        }
-      }
-    }
   }
 }
 
