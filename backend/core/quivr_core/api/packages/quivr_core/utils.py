@@ -17,13 +17,13 @@ from quivr_core.api.modules.knowledge.entity.knowledge import Knowledge
 from quivr_core.api.modules.upload.service.generate_file_signed_url import (
     generate_file_signed_url,
 )
-from quivr_core.packages.quivr_core.models import (
+from quivr_core.api.packages.quivr_core.models import (
     ParsedRAGChunkResponse,
     ParsedRAGResponse,
     RAGResponseMetadata,
     RawRAGResponse,
 )
-from quivr_core.packages.quivr_core.prompts import DEFAULT_DOCUMENT_PROMPT
+from quivr_core.api.packages.quivr_core.prompts import DEFAULT_DOCUMENT_PROMPT
 
 # TODO(@aminediro): define a types packages where we clearly define IO types
 # This should be used for serialization/deseriallization later

@@ -2,9 +2,8 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends
 
-from quivr_core.api.dependencies import get_service
 from quivr_core.api.modules.brain.service.brain_user_service import BrainUserService
-from quivr_core.api.modules.dependencies import get_current_user
+from quivr_core.api.modules.dependencies import get_current_user, get_service
 from quivr_core.api.modules.user.dto.inputs import UserUpdatableProperties
 from quivr_core.api.modules.user.entity.user_identity import UserIdentity
 from quivr_core.api.modules.user.service.user_service import UserService

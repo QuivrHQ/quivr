@@ -15,7 +15,7 @@ from quivr_core.api.modules.prompt.repository.prompts import PromptRepository
 
 
 class PromptService(BaseService[PromptRepository]):
-    repository: PromptRepository
+    repository_cls = PromptRepository
 
     def __init__(self, repository: PromptRepository):
         self.repository = repository

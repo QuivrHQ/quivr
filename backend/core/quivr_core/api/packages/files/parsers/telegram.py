@@ -1,5 +1,5 @@
 from quivr_core.api.models.files import File
-from quivr_core.packages.files.loaders.telegram import TelegramChatFileLoader
+from quivr_core.api.packages.files.loaders.telegram import TelegramChatFileLoader
 
 from .common import process_file
 

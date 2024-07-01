@@ -13,6 +13,14 @@ from quivr_core.storage.storage_base import StorageBase
 class QuivrFile:
     __slots__ = ["fd", "filename", "brain_id", "file_size"]
 
+    def __init__(
+        self, fd: BinaryIO, filename: str, brain_id: UUID, file_size: int | None = None
+    ) -> None:
+        self.fd = fd
+        self.brain_id = brain_id
+        self.filename = filename
+        self.file_size = file_size
+
     @classmethod
     def from_path(cls, path: str):
         fd = os.open(path, os.O_RDONLY)
@@ -26,14 +34,6 @@ class QuivrFile:
             filename=file_name,
             file_size=file_size,
         )
-
-    def __init__(
-        self, fd: BinaryIO, filename: str, brain_id: UUID, file_size: int | None = None
-    ) -> None:
-        self.fd = fd
-        self.brain_id = brain_id
-        self.filename = filename
-        self.file_size = file_size
 
     def local_filepath(self) -> str:
         return os.path.join(str(self.brain_id), self.filename)

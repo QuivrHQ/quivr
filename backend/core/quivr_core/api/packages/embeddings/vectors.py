@@ -8,10 +8,13 @@ from quivr_core.api.logger import get_logger
 from quivr_core.api.models.settings import (
     get_documents_vector_store,
     get_embedding_client,
-    get_supabase_db,
 )
+from quivr_core.api.models.vectors import Vector
 
 logger = get_logger(__name__)
+
+
+vector_repository = Vector()
 
 
 # TODO: Create interface for embeddings and implement it for Supabase and OpenAI (current Quivr)
@@ -37,13 +40,11 @@ def error_callback(exception):
 
 
 def process_batch(batch_ids: List[str]):
-    supabase_db = get_supabase_db()
-
     try:
         if len(batch_ids) == 1:
-            return (supabase_db.get_vectors_by_batch(UUID(batch_ids[0]))).data
+            return (vector_repository.get_vectors_by_batch(UUID(batch_ids[0]))).data
         else:
-            return (supabase_db.get_vectors_in_batch(batch_ids)).data
+            return (vector_repository.get_vectors_in_batch(batch_ids)).data
     except Exception as e:
         logger.error("Error retrieving batched vectors", e)
 

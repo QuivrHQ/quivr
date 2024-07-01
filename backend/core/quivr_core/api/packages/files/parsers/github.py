@@ -6,8 +6,8 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.document_loaders import GitLoader
 
 from quivr_core.api.models.files import File
-from quivr_core.packages.embeddings.vectors import Neurons
-from quivr_core.packages.files.file import compute_sha1_from_content
+from quivr_core.api.packages.embeddings.vectors import Neurons
+from quivr_core.api.packages.files.file import compute_sha1_from_content
 
 
 def process_github(

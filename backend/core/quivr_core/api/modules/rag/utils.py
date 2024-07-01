@@ -1,12 +1,11 @@
 from typing import Any, List
 from uuid import UUID
 
-from quivr_api.modules.chat.dto.chats import Sources
-from quivr_api.modules.upload.service.generate_file_signed_url import (
+from quivr_core.api.logger import get_logger
+from quivr_core.api.modules.chat.dto.chats import Sources
+from quivr_core.api.modules.upload.service.generate_file_signed_url import (
     generate_file_signed_url,
 )
-
-from quivr_core.api.logger import get_logger
 
 logger = get_logger(__name__)
 
