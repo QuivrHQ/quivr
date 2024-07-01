@@ -1,18 +1,16 @@
 from fastapi import APIRouter, Depends, Request
-
-from quivr_core.api.middlewares.auth import AuthBearer, get_current_user
 from quivr_core.api.modules.brain.service.brain_user_service import BrainUserService
+from quivr_core.api.modules.dependencies import get_current_user
 from quivr_core.api.modules.user.dto.inputs import UserUpdatableProperties
 from quivr_core.api.modules.user.entity.user_identity import UserIdentity
-from quivr_core.api.modules.user.repository.users import Users
-from quivr_core.api.modules.user.service.user_usage import UserUsage
+from quivr_core.api.modules.user.repository.users import UserRepository
 
 user_router = APIRouter()
 brain_user_service = BrainUserService()
-user_repository = Users()
+user_repository = UserRepository()
 
 
-@user_router.get("/user", dependencies=[Depends(AuthBearer())], tags=["User"])
+@user_router.get("/user", tags=["User"])
 async def get_user_endpoint(
     request: Request, current_user: UserIdentity = Depends(get_current_user)
 ):
@@ -28,16 +26,7 @@ async def get_user_endpoint(
     information about the user's API usage.
     """
 
-    user_daily_usage = UserUsage(
-        id=current_user.id,
-        email=current_user.email,
-    )
     user_settings = user_daily_usage.get_user_settings()
-    max_brain_size = user_settings.get("max_brain_size", 1000000000)
-
-    monthly_chat_credit = user_settings.get("monthly_chat_credit", 10)
-
-    user_daily_usage = UserUsage(id=current_user.id)
 
     return {
         "email": current_user.email,
@@ -52,7 +41,6 @@ async def get_user_endpoint(
 
 @user_router.put(
     "/user/identity",
-    dependencies=[Depends(AuthBearer())],
     tags=["User"],
 )
 def update_user_identity_route(
@@ -69,7 +57,6 @@ def update_user_identity_route(
 
 @user_router.get(
     "/user/identity",
-    dependencies=[Depends(AuthBearer())],
     tags=["User"],
 )
 def get_user_identity_route(
@@ -83,7 +70,6 @@ def get_user_identity_route(
 
 @user_router.delete(
     "/user_data",
-    dependencies=[Depends(AuthBearer())],
     tags=["User"],
 )
 async def delete_user_data_route(
@@ -100,17 +86,3 @@ async def delete_user_data_route(
     user_repository.delete_user_data(current_user.id)
 
     return {"message": "User deleted successfully"}
-
-
-@user_router.get(
-    "/user/credits",
-    dependencies=[Depends(AuthBearer())],
-    tags=["User"],
-)
-def get_user_credits(
-    current_user: UserIdentity = Depends(get_current_user),
-) -> int:
-    """
-    Get user remaining credits.
-    """
-    return user_repository.get_user_credits(current_user.id)

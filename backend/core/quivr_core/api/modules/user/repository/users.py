@@ -1,15 +1,15 @@
-import time
+from uuid import UUID
 
 from quivr_core.api.models.settings import get_supabase_client
+from quivr_core.api.modules.dependencies import BaseRepository
 from quivr_core.api.modules.user.entity.user_identity import UserIdentity
-from quivr_core.api.modules.user.repository.users_interface import UsersInterface
-from quivr_core.api.modules.user.service import user_usage
+from sqlmodel.ext.asyncio.session import AsyncSession
 
 
-class Users(UsersInterface):
-    def __init__(self):
-        supabase_client = get_supabase_client()
-        self.db = supabase_client
+class UserRepository(BaseRepository):
+    def __init__(self, session: AsyncSession):
+        super().__init__(session)
+        self.db = get_supabase_client()
 
     def create_user_identity(self, id):
         response = (
@@ -77,7 +77,7 @@ class Users(UsersInterface):
         ).execute()
         return response.data[0]["email"]
 
-    def delete_user_data(self, user_id):
+    def delete_user_data(self, user_id: UUID):
         response = (
             self.db.from_("brains_users")
             .select("brain_id")
@@ -110,18 +110,35 @@ class Users(UsersInterface):
         ).execute()
         self.db.table("users").delete().filter("id", "eq", str(user_id)).execute()
 
-    def get_user_credits(self, user_id):
-        user_usage_instance = user_usage.UserUsage(id=user_id)
+    def get_user_settings(self, user_id):
+        """
+        Fetch the user settings from the database
+        """
 
-        user_monthly_usage = user_usage_instance.get_user_monthly_usage(
-            time.strftime("%Y%m%d")
-        )
-        monthly_chat_credit = (
+        user_settings_response = (
             self.db.from_("user_settings")
-            .select("monthly_chat_credit")
+            .select("*")
             .filter("user_id", "eq", str(user_id))
             .execute()
-            .data[0]["monthly_chat_credit"]
-        )
+        ).data
 
-        return monthly_chat_credit - user_monthly_usage
+        if len(user_settings_response) == 0:
+            # Create the user settings
+            user_settings_response = (
+                self.db.table("user_settings")
+                .insert({"user_id": str(user_id)})
+                .execute()
+            ).data
+
+        if len(user_settings_response) == 0:
+            raise ValueError("User settings could not be created")
+
+        user_settings = user_settings_response[0]
+
+        return user_settings
+
+    def get_models(self):
+        model_settings_response = (self.db.from_("models").select("*").execute()).data
+        if len(model_settings_response) == 0:
+            raise ValueError("An issue occured while fetching the model settings")
+        return model_settings_response
