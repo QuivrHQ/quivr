@@ -6,41 +6,20 @@ from uuid import uuid4
 import pytest
 import pytest_asyncio
 import sqlalchemy
+from sqlalchemy.ext.asyncio import create_async_engine
+from sqlmodel import select
+from sqlmodel.ext.asyncio.session import AsyncSession
+
 from quivr_api.modules.brain.entity.brain_entity import Brain, BrainType
 from quivr_api.modules.chat.dto.inputs import QuestionAndAnswer
 from quivr_api.modules.chat.entity.chat import Chat, ChatHistory
 from quivr_api.modules.chat.repository.chats import ChatRepository
 from quivr_api.modules.chat.service.chat_service import ChatService
 from quivr_api.modules.user.entity.user_identity import User
-from sqlalchemy.ext.asyncio import create_async_engine
-from sqlmodel import create_engine, select
-from sqlmodel.ext.asyncio.session import AsyncSession
 
-pg_database_url = "postgres:postgres@localhost:54322/postgres"
+pg_database_base_url = "postgres:postgres@localhost:54322/postgres"
 
-
-@pytest.fixture(scope="session", autouse=True)
-def db_setup():
-    # setup
-    sync_engine = create_engine(
-        "postgresql://" + pg_database_url,
-        echo=True if os.getenv("ORM_DEBUG") else False,
-    )
-    #  TODO(@amine) : for now don't drop anything
-    yield sync_engine
-    # teardown
-    # NOTE: For now we rely on Supabase migrations for defining schemas
-    # SQLModel.metadata.create_all(sync_engine, checkfirst=True)
-    # SQLModel.metadata.drop_all(sync_engine)
-
-
-@pytest_asyncio.fixture(scope="session")
-async def async_engine():
-    engine = create_async_engine(
-        "postgresql+asyncpg://" + pg_database_url,
-        echo=True if os.getenv("ORM_DEBUG") else False,
-    )
-    yield engine
+TestData = Tuple[Brain, User, List[Chat], List[ChatHistory]]
 
 
 @pytest.fixture(scope="session")
@@ -48,6 +27,20 @@ def event_loop(request: pytest.FixtureRequest):
     loop = asyncio.get_event_loop_policy().new_event_loop()
     yield loop
     loop.close()
+
+
+@pytest_asyncio.fixture(scope="session")
+async def async_engine():
+    engine = create_async_engine(
+        "postgresql+asyncpg://" + pg_database_base_url,
+        echo=True if os.getenv("ORM_DEBUG") else False,
+        future=True,
+        pool_pre_ping=True,
+        pool_size=10,
+        pool_recycle=0.1,
+    )
+
+    yield engine
 
 
 @pytest_asyncio.fixture()
@@ -69,7 +62,14 @@ async def session(async_engine):
         yield async_session
 
 
-TestData = Tuple[Brain, User, List[Chat], List[ChatHistory]]
+@pytest.mark.asyncio
+async def test_pool_reconnect(session: AsyncSession):
+    # time.sleep(10)
+    response = await asyncio.gather(
+        *[session.exec(sqlalchemy.text("SELECT 1;")) for _ in range(100)]
+    )
+    result = [r.fetchall() for r in response]
+    assert list(result[0]) == [(1,)]
 
 
 @pytest_asyncio.fixture()
@@ -81,7 +81,11 @@ async def test_data(
         await session.exec(select(User).where(User.email == "admin@quivr.app"))
     ).one()
     # Brain data
-    brain_1 = Brain(name="test_brain", description="this is a test brain")
+    brain_1 = Brain(
+        name="test_brain",
+        description="this is a test brain",
+        brain_type=BrainType.integration,
+    )
     # Chat data
     chat_1 = Chat(chat_name="chat1", user=user_1)
     chat_2 = Chat(chat_name="chat2", user=user_1)
@@ -126,6 +130,15 @@ async def test_get_user_chats(session: AsyncSession, test_data: TestData):
 
 
 @pytest.mark.asyncio
+async def test_get_chat_history_close(session: AsyncSession, test_data: TestData):
+    brain_1, _, chats, chat_history = test_data
+    assert chats[0].chat_id
+    assert len(chat_history) > 0
+    assert chat_history[-1].message_time
+    assert chat_history[0].message_time
+
+
+@pytest.mark.asyncio
 async def test_get_chat_history(session: AsyncSession, test_data: TestData):
     brain_1, _, chats, chat_history = test_data
     assert chats[0].chat_id
@@ -159,7 +172,7 @@ async def test_add_qa(session: AsyncSession, test_data: TestData):
     assert resp_chat.assistant == qa.answer
 
 
-## CHAT SERVICE
+# CHAT SERVICE
 
 
 @pytest.mark.asyncio

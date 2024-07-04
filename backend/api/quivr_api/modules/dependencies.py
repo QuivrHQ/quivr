@@ -2,9 +2,10 @@ import os
 from typing import AsyncGenerator, Callable, Generic, Type, TypeVar
 
 from fastapi import Depends
-from quivr_api.models.settings import settings
 from sqlalchemy.ext.asyncio import create_async_engine
 from sqlmodel.ext.asyncio.session import AsyncSession
+
+from quivr_api.models.settings import settings
 
 
 class BaseRepository:
@@ -34,11 +35,17 @@ async_engine = create_async_engine(
     settings.pg_database_async_url,
     echo=True if os.getenv("ORM_DEBUG") else False,
     future=True,
+    # NOTE: pessimistic bound on
+    pool_pre_ping=True,
+    pool_size=10,  # NOTE: no bouncer for now, if 6 process workers => 6
+    pool_recycle=1800,
 )
 
 
 async def get_async_session() -> AsyncGenerator[AsyncSession, None]:
-    async with AsyncSession(async_engine) as session:
+    async with AsyncSession(
+        async_engine, expire_on_commit=False, autoflush=False
+    ) as session:
         yield session
 
 

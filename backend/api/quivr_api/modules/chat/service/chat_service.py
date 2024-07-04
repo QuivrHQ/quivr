@@ -3,6 +3,7 @@ from typing import List
 from uuid import UUID
 
 from fastapi import HTTPException
+
 from quivr_api.logger import get_logger
 from quivr_api.modules.brain.entity.brain_entity import Brain
 from quivr_api.modules.brain.service.brain_service import BrainService
@@ -52,7 +53,7 @@ class ChatService(BaseService[ChatRepository]):
         return inserted_chat
 
     def get_follow_up_question(
-        self, brain_id: UUID = None, question: str = None
+        self, brain_id: UUID | None = None, question: str = None
     ) -> [str]:
         follow_up = [
             "Summarize the conversation",
