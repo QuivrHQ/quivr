@@ -3,6 +3,7 @@ from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from fastapi.responses import StreamingResponse
+
 from quivr_api.logger import get_logger
 from quivr_api.middlewares.auth import AuthBearer, get_current_user
 from quivr_api.models.settings import get_embedding_client, get_supabase_client
@@ -253,21 +254,31 @@ async def create_stream_question_handler(
         f"Creating question for chat {chat_id} with brain {brain_id} of type {type(brain_id)}"
     )
 
-    rag_service = RAGService(
-        current_user,
-        brain_id,
-        chat_id,
-        brain_service,
-        prompt_service,
-        chat_service,
-        knowledge_service,
-    )
-    maybe_send_telemetry("question_asked", {"streaming": True}, request)
+    try:
+        rag_service = RAGService(
+            current_user,
+            brain_id,
+            chat_id,
+            brain_service,
+            prompt_service,
+            chat_service,
+            knowledge_service,
+        )
+        maybe_send_telemetry("question_asked", {"streaming": True}, request)
 
-    return StreamingResponse(
-        rag_service.generate_answer_stream(chat_question.question),
-        media_type="text/event-stream",
-    )
+        return StreamingResponse(
+            rag_service.generate_answer_stream(chat_question.question),
+            media_type="text/event-stream",
+        )
+
+    except AssertionError:
+        logger.error(f"assertion error request: {request}")
+        raise HTTPException(
+            status_code=422,
+            detail="inprocessable entity",
+        )
+    except HTTPException as e:
+        raise e
 
 
 # get chat history

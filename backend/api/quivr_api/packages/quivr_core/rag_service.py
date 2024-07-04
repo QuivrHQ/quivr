@@ -2,6 +2,7 @@ import datetime
 from uuid import UUID, uuid4
 
 from langchain_community.chat_models import ChatLiteLLM
+
 from quivr_api.logger import get_logger
 from quivr_api.models.settings import (
     get_embedding_client,
@@ -94,7 +95,8 @@ class RAGService:
         assert brain
 
         if brain.integration:
-            assert brain.integration.user_id == user_id
+            # TODO: entity should be UUID
+            assert brain.integration.user_id == str(user_id)
         return brain
 
     def check_and_update_user_usage(self, user: UserIdentity, brain: BrainEntity):
