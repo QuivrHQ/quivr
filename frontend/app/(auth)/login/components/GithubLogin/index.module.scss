@@ -1,0 +1,12 @@
+@use "@/styles/Spacings.module.scss";
+
+.button {
+  font-weight: 400;
+  color: var(--black-0);
+  background-color: var(--white-0);
+  height: calc(2.5rem - #{Spacings.$spacing01});
+
+  &:hover {
+    color: var(--white-0);
+  }
+}
