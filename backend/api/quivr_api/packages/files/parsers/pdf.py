@@ -1,4 +1,4 @@
-from langchain_community.document_loaders import UnstructuredPDFLoader
+from megaparse.Converter import MegaParse
 from quivr_api.models.files import File
 
 from .common import process_file
@@ -13,7 +13,7 @@ def process_pdf(
 ):
     return process_file(
         file=file,
-        loader_class=UnstructuredPDFLoader,
+        loader_class=MegaParse,
         brain_id=brain_id,
         original_file_name=original_file_name,
         integration=integration,
