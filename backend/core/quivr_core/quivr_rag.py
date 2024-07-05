@@ -4,12 +4,13 @@ from typing import AsyncGenerator
 
 from langchain.retrievers import ContextualCompressionRetriever
 from langchain_cohere import CohereRerank
-from langchain_community.chat_models import ChatLiteLLM
+from langchain_core.language_models.llms import BaseLLM
 from langchain_core.messages.ai import AIMessageChunk
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.runnables import RunnableLambda, RunnablePassthrough
 from langchain_core.vectorstores import VectorStore
 from langchain_openai import ChatOpenAI
+
 from quivr_core.config import RAGConfig
 from quivr_core.models import (
     ParsedRAGChunkResponse,
@@ -35,7 +36,7 @@ class QuivrQARAG:
         self,
         *,
         rag_config: RAGConfig,
-        llm: ChatLiteLLM,
+        llm: BaseLLM,
         vector_store: VectorStore,
     ):
         self.rag_config = rag_config
