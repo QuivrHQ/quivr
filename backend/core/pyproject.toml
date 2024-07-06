@@ -11,6 +11,7 @@ python = "^3.11"
 pydantic = "^2.7.4"
 langchain-core = "^0.2.10"
 langchain = "^0.2.6"
+faiss-cpu = "^1.8.0.post1"
 
 [tool.ruff]
 line-length = 88

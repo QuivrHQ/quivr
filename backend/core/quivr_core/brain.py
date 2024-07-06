@@ -1,5 +1,6 @@
 import logging
 from pathlib import Path
+from typing import Mapping, Self
 from uuid import UUID, uuid4
 
 from langchain_community.embeddings.openai import OpenAIEmbeddings
@@ -25,7 +26,7 @@ logger = logging.getLogger(__name__)
 def _process_files(
     storage: StorageBase,
     skip_file_error: bool,
-    processors_mapping: dict[str, ProcessorBase],
+    processors_mapping: Mapping[str, ProcessorBase],
 ) -> list[Document]:
     knowledge = []
     # Process files
@@ -53,7 +54,6 @@ class Brain:
         vector_db,
         llm: BaseLLM,
         embedder: Embeddings,
-        processors_mapping: dict[str, ProcessorBase],
         storage: StorageBase,
     ):
         self.id = id
@@ -63,10 +63,7 @@ class Brain:
         # Chat history
         self.chat_history: list[str] = []
 
-        # Doc parsing deps
-        self.processors_mapping = processors_mapping
-
-        # Rag dependencies:
+        # RAG dependencies:
         self.llm = llm
         self.vector_db = vector_db
         self.embedder = embedder
@@ -81,9 +78,9 @@ class Brain:
         llm: BaseLLM = OpenAI(),
         storage: StorageBase = TransparentStorage(),
         embedder: Embeddings = OpenAIEmbeddings(),
-        processors_mapping: dict[str, ProcessorBase] = DEFAULT_PARSERS,
+        processors_mapping: Mapping[str, ProcessorBase] = DEFAULT_PARSERS,
         skip_file_error: bool = False,
-    ):
+    ) -> Self:
         brain_id = uuid4()
 
         for path in file_paths:
@@ -97,6 +94,7 @@ class Brain:
             skip_file_error=skip_file_error,
         )
 
+        # Building brain's vectordb
         if vector_db is None:
             vector_db = FAISS.from_documents(documents=docs, embedding=embedder)
         else:
@@ -109,22 +107,22 @@ class Brain:
             llm=llm,
             embedder=embedder,
             vector_db=vector_db,
-            processors_mapping=processors_mapping,
         )
 
-    # TODO
-    def add_files(self):
+    # TODO(@aminediro)
+    def add_file(self):
         # add it to storage
         # add it to vectorstore
         raise NotImplementedError
 
-    def ask(self, question: str, rag_config: RAGConfig) -> ParsedRAGResponse:
+    def ask(
+        self, question: str, rag_config: RAGConfig = RAGConfig()
+    ) -> ParsedRAGResponse:
         rag_pipeline = QuivrQARAG(
             rag_config=rag_config, llm=self.llm, vector_store=self.vector_db
         )
 
         # transformed_history = format_chat_history(history)
-
         _list_files = self.storage.get_files()
         parsed_response = rag_pipeline.answer(question, [], [])
 
