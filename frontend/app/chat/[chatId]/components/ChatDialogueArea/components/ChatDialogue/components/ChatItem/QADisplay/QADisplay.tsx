@@ -13,15 +13,8 @@ export const QADisplay = ({
   index,
   lastMessage,
 }: QADisplayProps): JSX.Element => {
-  const {
-    assistant,
-    message_id,
-    user_message,
-    brain_name,
-    metadata,
-    brain_id,
-    thumbs,
-  } = content;
+  const { assistant, message_id, user_message, brain_name, metadata, thumbs } =
+    content;
 
   return (
     <>
@@ -36,7 +29,6 @@ export const QADisplay = ({
         speaker={"assistant"}
         text={assistant}
         brainName={brain_name}
-        brainId={brain_id}
         index={index}
         metadata={metadata} // eslint-disable-line @typescript-eslint/no-unsafe-assignment
         messageId={message_id}

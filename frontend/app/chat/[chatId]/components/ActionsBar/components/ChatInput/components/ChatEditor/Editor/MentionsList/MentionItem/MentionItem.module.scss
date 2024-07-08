@@ -12,17 +12,15 @@
   padding: Spacings.$spacing02;
   min-height: 2rem;
 
-  &:hover,
+  &:hover {
+    background-color: var(--background-3);
+  }
+
   &.selected {
-    background-color: var(--background-special-1);
-    font-weight: 550;
+    color: var(--primary-0);
   }
 
   .brain_name {
     @include Typography.EllipsisOverflow;
-  }
-
-  .dark_image {
-    filter: invert(100%);
   }
 }

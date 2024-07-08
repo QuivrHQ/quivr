@@ -12,7 +12,7 @@ export type MentionListRef = {
 
 export const MentionList = forwardRef<MentionListRef, MentionListProps>(
   (props, ref) => {
-    const { selectItem, selectedIndex } = useMentionList({
+    const { selectItem } = useMentionList({
       ...props,
       ref,
     });
@@ -29,7 +29,6 @@ export const MentionList = forwardRef<MentionListRef, MentionListProps>(
             <MentionItem
               key={item.id}
               item={item}
-              isSelected={index === selectedIndex}
               onClick={() => selectItem(index)}
               type={props.suggestionData.type}
             />
