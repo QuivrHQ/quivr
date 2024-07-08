@@ -20,11 +20,11 @@ class LocalStorage(StorageBase):
             self.dir_path = dir_path
         os.makedirs(self.dir_path, exist_ok=True)
 
-    def _load_files(self):
+    def _load_files(self) -> None:
         # TODO(@aminediro): load existing files
         pass
 
-    def upload_file(self, file: QuivrFile, exists_ok: bool = False):
+    def upload_file(self, file: QuivrFile, exists_ok: bool = False) -> None:
         dst_path = os.path.join(
             self.dir_path, str(file.brain_id), f"{file.id}{file.file_extension}"
         )
@@ -44,7 +44,7 @@ class LocalStorage(StorageBase):
     def get_files(self) -> list[QuivrFile]:
         return self.files
 
-    def remove_file(self, file_id: UUID):
+    def remove_file(self, file_id: UUID) -> None:
         raise NotImplementedError
 
 
@@ -57,10 +57,10 @@ class TransparentStorage(StorageBase):
     def __init__(self):
         self.files = []
 
-    def upload_file(self, file: QuivrFile, exists_ok: bool = False):
+    def upload_file(self, file: QuivrFile, exists_ok: bool = False) -> None:
         self.files.append(file)
 
-    def remove_file(self, file_id: UUID):
+    def remove_file(self, file_id: UUID) -> None:
         raise NotImplementedError
 
     def get_files(self) -> list[QuivrFile]:

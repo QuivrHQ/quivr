@@ -3,13 +3,12 @@ from pathlib import Path
 from typing import Mapping, Self
 from uuid import UUID, uuid4
 
-from langchain_community.embeddings.openai import OpenAIEmbeddings
-from langchain_community.vectorstores import FAISS
+
 from langchain_core.documents import Document
 from langchain_core.embeddings import Embeddings
-from langchain_core.language_models.llms import BaseLLM
+from langchain_core.language_models import BaseChatModel
 from langchain_core.vectorstores import VectorStore
-from langchain_openai import OpenAI
+
 
 from quivr_core.config import RAGConfig
 from quivr_core.models import ParsedRAGResponse
@@ -51,8 +50,8 @@ class Brain:
         *,
         name: str,
         id: UUID,
-        vector_db,
-        llm: BaseLLM,
+        vector_db: VectorStore,
+        llm: BaseChatModel,
         embedder: Embeddings,
         storage: StorageBase,
     ):
@@ -75,12 +74,37 @@ class Brain:
         name: str,
         file_paths: list[str | Path],
         vector_db: VectorStore | None = None,
-        llm: BaseLLM = OpenAI(),
         storage: StorageBase = TransparentStorage(),
-        embedder: Embeddings = OpenAIEmbeddings(),
+        llm: BaseChatModel | None = None,
+        embedder: Embeddings | None = None,
         processors_mapping: Mapping[str, ProcessorBase] = DEFAULT_PARSERS,
         skip_file_error: bool = False,
     ) -> Self:
+        # Check llm and embedder
+        if llm is None:
+            try:
+                from langchain_openai import ChatOpenAI
+
+                logger.debug("Loaded ChatOpenAI as default LLM for brain")
+
+                llm = ChatOpenAI()
+
+            except ImportError as e:
+                raise ImportError(
+                    "Please provide a valid BaseLLM or install quivr-core['base'] package"
+                ) from e
+
+        if embedder is None:
+            try:
+                from langchain_openai import OpenAIEmbeddings
+
+                logger.debug("Loaded OpenAIEmbeddings as default LLM for brain")
+                embedder = OpenAIEmbeddings()
+            except ImportError as e:
+                raise ImportError(
+                    "Please provide a valid Embedder or install quivr-core['base'] package for using the defaultone."
+                ) from e
+
         brain_id = uuid4()
 
         for path in file_paths:
@@ -96,7 +120,15 @@ class Brain:
 
         # Building brain's vectordb
         if vector_db is None:
-            vector_db = FAISS.from_documents(documents=docs, embedding=embedder)
+            try:
+                from langchain_community.vectorstores import FAISS
+
+                logger.debug("Using Faiss-CPU as vector store.")
+                vector_db = FAISS.from_documents(documents=docs, embedding=embedder)
+            except ImportError as e:
+                raise ImportError(
+                    "Please provide a valid vectore store or install quivr-core['base'] package for using the default one."
+                ) from e
         else:
             vector_db.add_documents(docs)
 
@@ -110,7 +142,7 @@ class Brain:
         )
 
     # TODO(@aminediro)
-    def add_file(self):
+    def add_file(self) -> None:
         # add it to storage
         # add it to vectorstore
         raise NotImplementedError

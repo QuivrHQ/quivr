@@ -10,9 +10,9 @@ class StorageBase(ABC):
         raise Exception("Unimplemented get_files method")
 
     @abstractmethod
-    def upload_file(self, file: QuivrFile, exists_ok: bool = False):
+    def upload_file(self, file: QuivrFile, exists_ok: bool = False) -> None:
         raise Exception("Unimplemented  upload_file method")
 
     @abstractmethod
-    def remove_file(self, file_id: UUID):
+    def remove_file(self, file_id: UUID) -> None:
         raise Exception("Unimplemented remove_file method")
