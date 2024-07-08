@@ -11,7 +11,6 @@ import { useUserSettingsContext } from "@/lib/context/UserSettingsProvider/hooks
 
 import styles from "./Menu.module.scss";
 import { AnimatedDiv } from "./components/AnimationDiv";
-import { AssistantsButton } from "./components/AssistantsButton/AssistantsButton";
 import { DiscussionButton } from "./components/DiscussionButton/DiscussionButton";
 import { HomeButton } from "./components/HomeButton/HomeButton";
 import { ProfileButton } from "./components/ProfileButton/ProfileButton";
@@ -74,7 +73,6 @@ export const Menu = (): JSX.Element => {
                 <DiscussionButton />
                 <HomeButton />
                 <StudioButton />
-                <AssistantsButton />
                 <ThreadsButton />
               </div>
               <div className={styles.block}>
