@@ -61,7 +61,7 @@ export const PeopleTab = ({ brainId }: ShareBrainModalProps): JSX.Element => {
           </div>
         </div>
       </form>
-      <div className={styles.section_wrapper}>
+      <div className={`${styles.section_wrapper} ${styles.last}`}>
         <span className={styles.section_title}>Users with access</span>
         <BrainUsers brainId={brainId} />
       </div>
