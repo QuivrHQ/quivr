@@ -10,10 +10,15 @@
   cursor: pointer;
   height: 100%;
   overflow: scroll;
+  transition: border-color 0.3s ease 0.2s, border-width 0.1s ease 0.1s;
 
   &.dragging {
     border: 3px dashed var(--accent);
     background-color: var(--background-3);
+  }
+
+  &:hover {
+    border: 3px dashed var(--accent);
   }
 
   .box_content {

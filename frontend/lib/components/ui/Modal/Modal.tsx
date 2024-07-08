@@ -5,11 +5,11 @@ import * as Dialog from "@radix-ui/react-dialog";
 import { AnimatePresence, motion } from "framer-motion";
 import { ReactNode, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { MdClose } from "react-icons/md";
 
 import styles from "./Modal.module.scss";
 
 import Button from "../Button";
+import Icon from "../Icon/Icon";
 
 type CommonModalProps = {
   title?: string;
@@ -98,16 +98,10 @@ export const Modal = ({
                   <motion.div
                     {...handleModalContentAnimation(size, !!unforceWhite)}
                   >
-                    <Dialog.Title
-                      className="m-0 text-2xl font-bold"
-                      data-testid="modal-title"
-                    >
+                    <Dialog.Title className={styles.title}>
                       {title}
                     </Dialog.Title>
-                    <Dialog.Description
-                      className="opacity-50"
-                      data-testid="modal-description"
-                    >
+                    <Dialog.Description className={styles.subtitle}>
                       {desc}
                     </Dialog.Description>
                     {children}
@@ -126,7 +120,12 @@ export const Modal = ({
                           className={styles.close_button_wrapper}
                           aria-label="Close"
                         >
-                          <MdClose />
+                          <Icon
+                            name="close"
+                            color="black"
+                            size="normal"
+                            handleHover={true}
+                          />
                         </button>
                       </Dialog.Close>
                     )}

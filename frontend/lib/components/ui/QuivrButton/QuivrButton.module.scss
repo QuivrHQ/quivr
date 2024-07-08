@@ -16,6 +16,10 @@
   background-color: var(--background-0);
   height: fit-content;
 
+  &.important {
+    text-transform: uppercase;
+  }
+
   &.hidden {
     display: none;
   }
