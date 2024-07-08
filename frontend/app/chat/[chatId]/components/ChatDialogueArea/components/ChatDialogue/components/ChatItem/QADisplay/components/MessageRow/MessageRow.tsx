@@ -25,7 +25,6 @@ type MessageRowProps = {
     thoughts?: string;
     followup_questions?: string[];
   };
-  brainId?: string;
   index?: number;
   messageId?: string;
   thumbs?: boolean;
@@ -37,7 +36,6 @@ export const MessageRow = ({
   text,
   brainName,
   children,
-  brainId,
   messageId,
   thumbs: initialThumbs,
   metadata,
@@ -102,7 +100,7 @@ export const MessageRow = ({
       return (
         <div className={styles.message_header_wrapper}>
           <div className={styles.message_header}>
-            <QuestionBrain brainName={brainName} brainId={brainId} />
+            <QuestionBrain brainName={brainName} />
           </div>
         </div>
       );
