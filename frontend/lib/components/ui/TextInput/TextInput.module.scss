@@ -1,5 +1,6 @@
 @use "styles/Radius.module.scss";
 @use "styles/Spacings.module.scss";
+@use "styles/Typography.module.scss";
 
 .text_input_container {
   display: flex;
@@ -19,6 +20,15 @@
     .text_input {
       background-color: transparent;
       width: 10px;
+    }
+  }
+
+  &.small {
+    padding-block: 0;
+
+    .text_input {
+      font-size: Typography.$small;
+      padding: Spacings.$spacing02;
     }
   }
 

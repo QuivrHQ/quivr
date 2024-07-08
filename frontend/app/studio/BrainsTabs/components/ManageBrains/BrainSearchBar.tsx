@@ -19,6 +19,7 @@ export const BrainSearchBar = ({
       label={t("searchBrain")}
       inputValue={searchQuery}
       setInputValue={setSearchQuery}
+      small={true}
     />
   );
 };
