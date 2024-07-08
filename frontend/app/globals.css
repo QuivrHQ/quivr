@@ -98,9 +98,9 @@ body.dark_mode {
   --background-blur: rgba(0, 0, 0, 0.9);
  
   /* Borders */
-  --border-0: var(--white-0);
-  --border-1: var(--grey-2);
-  --border-2: var(--grey-3);
+  --border-0: var(--black-5);
+  --border-1: var(--black-6);
+  --border-2: var(--black-7);
  
   /* Icons */
   --icon-0: var(--black-0);
