@@ -26,6 +26,7 @@ const Assistants = (): JSX.Element => {
   const { getAssistants } = useAssistants();
 
   useEffect(() => {
+    // REMOVE FOR NOW ACCESS TO QUIVR ASSISTANTS
     redirect("/search");
     if (session === null) {
       redirectToLogin();
