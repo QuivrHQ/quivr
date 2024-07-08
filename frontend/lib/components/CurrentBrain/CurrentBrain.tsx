@@ -18,7 +18,7 @@ export const CurrentBrain = ({
     setCurrentBrainId(null);
   };
 
-  if (!remainingCredits) {
+  if (remainingCredits === 0) {
     return (
       <div className={styles.no_credits_left}>
         <span>
