@@ -7,11 +7,10 @@
   flex-direction: column;
   justify-content: space-between;
   height: 100%;
-  padding-inline: Spacings.$spacing08;
-  gap: Spacings.$spacing03;
+  gap: Spacings.$spacing05;
 
   .title {
-    @include Typography.H2;
+    @include Typography.H3;
   }
 
   .inputs_wrapper {

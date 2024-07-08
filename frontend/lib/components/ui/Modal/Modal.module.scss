@@ -2,6 +2,7 @@
 @use "styles/Radius.module.scss";
 @use "styles/ScreenSizes.module.scss";
 @use "styles/Spacings.module.scss";
+@use "styles/Typography.module.scss";
 @use "styles/ZIndexes.module.scss";
 
 .modal_container {
@@ -19,13 +20,22 @@
     flex-direction: column;
     border-radius: Radius.$big;
     background-color: var(--background-0);
-    padding: Spacings.$spacing05;
+    padding-inline: Spacings.$spacing08;
+    padding-block: Spacings.$spacing06;
     cursor: auto;
     box-shadow: BoxShadow.$medium;
     max-width: 90vw;
     width: 35vw;
     height: 80vh;
     overflow: auto;
+
+    .title {
+      @include Typography.H1;
+    }
+
+    .subtitle {
+      font-size: Typography.$small;
+    }
 
     &.auto {
       height: auto;
@@ -50,7 +60,8 @@
       position: absolute;
       top: 0;
       right: 0;
-      padding: Spacings.$spacing05;
+      padding: Spacings.$spacing06;
+      padding-inline: Spacings.$spacing08;
       border-radius: 50;
       outline: none;
     }
