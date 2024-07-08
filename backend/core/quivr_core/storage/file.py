@@ -1,6 +1,10 @@
 import os
+from contextlib import asynccontextmanager
 from pathlib import Path
+from typing import AsyncGenerator, AsyncIterable
 from uuid import UUID, uuid4
+
+import aiofiles
 
 
 class QuivrFile:
@@ -22,7 +26,7 @@ class QuivrFile:
 
     @classmethod
     def from_path(cls, brain_id: UUID, path: str | Path):
-        if isinstance(path, str):
+        if not isinstance(path, Path):
             path = Path(path)
 
         if not path.exists():
@@ -44,3 +48,12 @@ class QuivrFile:
             file_size=file_size,
             file_extension=path.suffix,
         )
+
+    @asynccontextmanager
+    async def open(self) -> AsyncGenerator[AsyncIterable[bytes], None]:
+        # TODO(@aminediro) : match on path type
+        f = await aiofiles.open(self.path, mode="rb")
+        try:
+            yield f
+        finally:
+            await f.close()

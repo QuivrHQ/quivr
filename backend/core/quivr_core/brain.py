@@ -1,14 +1,13 @@
+import asyncio
 import logging
 from pathlib import Path
 from typing import Mapping, Self
 from uuid import UUID, uuid4
 
-
 from langchain_core.documents import Document
 from langchain_core.embeddings import Embeddings
 from langchain_core.language_models import BaseChatModel
 from langchain_core.vectorstores import VectorStore
-
 
 from quivr_core.config import RAGConfig
 from quivr_core.models import ParsedRAGResponse
@@ -22,24 +21,29 @@ from quivr_core.storage.storage_base import StorageBase
 logger = logging.getLogger(__name__)
 
 
-def _process_files(
+async def _process_files(
     storage: StorageBase,
     skip_file_error: bool,
     processors_mapping: Mapping[str, ProcessorBase],
 ) -> list[Document]:
     knowledge = []
-    # Process files
     for file in storage.get_files():
-        if file.file_extension:
-            processor = processors_mapping[file.file_extension]
-            docs = processor.process_file(file)
-            knowledge.extend(docs)
-        else:
-            logger.error(f"can't find processor for {file}")
+        try:
+            if file.file_extension:
+                processor = processors_mapping[file.file_extension]
+                docs = await processor.process_file(file)
+                knowledge.extend(docs)
+            else:
+                logger.error(f"can't find processor for {file}")
+                if skip_file_error:
+                    continue
+                else:
+                    raise ValueError(f"can't parse {file}. can't find file extension")
+        except KeyError as e:
             if skip_file_error:
                 continue
             else:
-                raise Exception(f"Can't parse {file}. No available processor")
+                raise Exception(f"Can't parse {file}. No available processor") from e
 
     return knowledge
 
@@ -68,7 +72,7 @@ class Brain:
         self.embedder = embedder
 
     @classmethod
-    def from_files(
+    async def afrom_files(
         cls,
         *,
         name: str,
@@ -79,8 +83,7 @@ class Brain:
         embedder: Embeddings | None = None,
         processors_mapping: Mapping[str, ProcessorBase] = DEFAULT_PARSERS,
         skip_file_error: bool = False,
-    ) -> Self:
-        # Check llm and embedder
+    ):
         if llm is None:
             try:
                 from langchain_openai import ChatOpenAI
@@ -112,7 +115,7 @@ class Brain:
             storage.upload_file(file)
 
         # Parse files
-        docs = _process_files(
+        docs = await _process_files(
             storage=storage,
             processors_mapping=processors_mapping,
             skip_file_error=skip_file_error,
@@ -124,7 +127,15 @@ class Brain:
                 from langchain_community.vectorstores import FAISS
 
                 logger.debug("Using Faiss-CPU as vector store.")
-                vector_db = FAISS.from_documents(documents=docs, embedding=embedder)
+                # TODO(@aminediro) : embedding call is not concurrent for all documents but waits
+                # We can actually wait on all processing
+                if len(docs) > 0:
+                    vector_db = await FAISS.afrom_documents(
+                        documents=docs, embedding=embedder
+                    )
+                else:
+                    raise ValueError("can't initialize brain without documents")
+
             except ImportError as e:
                 raise ImportError(
                     "Please provide a valid vectore store or install quivr-core['base'] package for using the default one."
@@ -141,6 +152,32 @@ class Brain:
             vector_db=vector_db,
         )
 
+    @classmethod
+    def from_files(
+        cls,
+        *,
+        name: str,
+        file_paths: list[str | Path],
+        vector_db: VectorStore | None = None,
+        storage: StorageBase = TransparentStorage(),
+        llm: BaseChatModel | None = None,
+        embedder: Embeddings | None = None,
+        processors_mapping: Mapping[str, ProcessorBase] = DEFAULT_PARSERS,
+        skip_file_error: bool = False,
+    ) -> Self:
+        return asyncio.run(
+            cls.afrom_files(
+                name=name,
+                file_paths=file_paths,
+                vector_db=vector_db,
+                storage=storage,
+                llm=llm,
+                embedder=embedder,
+                processors_mapping=processors_mapping,
+                skip_file_error=skip_file_error,
+            )
+        )
+
     # TODO(@aminediro)
     def add_file(self) -> None:
         # add it to storage
@@ -155,7 +192,6 @@ class Brain:
         )
 
         # transformed_history = format_chat_history(history)
-        _list_files = self.storage.get_files()
         parsed_response = rag_pipeline.answer(question, [], [])
 
         # Save answer to the chat history

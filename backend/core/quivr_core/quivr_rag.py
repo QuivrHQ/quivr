@@ -1,20 +1,15 @@
 import logging
 from operator import itemgetter
-from typing import AsyncGenerator
-
-from typing import Optional, Sequence
-
-from langchain_core.callbacks import Callbacks
-from langchain_core.documents import Document
+from typing import AsyncGenerator, Optional, Sequence
 
 from langchain.retrievers import ContextualCompressionRetriever
-from langchain_core.documents import BaseDocumentCompressor
+from langchain_core.callbacks import Callbacks
+from langchain_core.documents import BaseDocumentCompressor, Document
 from langchain_core.language_models import BaseChatModel
 from langchain_core.messages.ai import AIMessageChunk
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.runnables import RunnableLambda, RunnablePassthrough
 from langchain_core.vectorstores import VectorStore
-
 from langchain_openai import ChatOpenAI
 
 from quivr_core.config import RAGConfig
@@ -144,17 +139,11 @@ class QuivrQARAG:
         llm = self.llm
 
         if self.supports_func_calling:
-            if self.rag_config.temperature:
-                llm_function = ChatOpenAI(
-                    max_tokens=self.rag_config.max_tokens,
-                    model=self.rag_config.model,
-                    temperature=self.rag_config.temperature,
-                )
-            else:
-                llm_function = ChatOpenAI(
-                    model=self.rag_config.model,
-                    max_tokens=self.rag_config.max_tokens,
-                )
+            llm_function = ChatOpenAI(
+                model=self.rag_config.model,
+                max_tokens=self.rag_config.max_tokens,
+                temperature=self.rag_config.temperature,
+            )
 
             llm = llm_function.bind_tools(
                 [cited_answer],

@@ -7,8 +7,10 @@ from quivr_core.storage.file import QuivrFile
 
 
 class ProcessorBase(ABC):
+    supported_extensions: list[str]
+
     @abstractmethod
-    def process_file(self, file: QuivrFile) -> list[Document]:
+    async def process_file(self, file: QuivrFile) -> list[Document]:
         pass
 
 
