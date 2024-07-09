@@ -11,11 +11,11 @@ from quivr_core.llm import LLMEndpoint
 from quivr_core.storage.local_storage import TransparentStorage
 
 
-@pytest.fixture
-def temp_data_file(tmpdir):
+@pytest.fixture(scope="function")
+def temp_data_file(tmp_path):
     data = "This is some test data."
-    temp_file = tmpdir.join("data.txt")
-    temp_file.write(data)
+    temp_file = tmp_path / "data.txt"
+    temp_file.write_text(data)
     return temp_file
 
 
@@ -35,7 +35,7 @@ def embedder():
     return DeterministicFakeEmbedding(size=20)
 
 
-def test_brain_from_files_exception():
+def test_brain_empty_files():
     # Testing no files
     with pytest.raises(ValueError):
         Brain.from_files(name="test_brain", file_paths=[])
@@ -54,8 +54,9 @@ def test_brain_from_files_success(llm: LLMEndpoint, embedder, temp_data_file):
     assert len(brain.storage.get_files()) == 1
 
 
-def test_brain_ask_txt(llm: LLMEndpoint, embedder, temp_data_file, answers):
-    brain = Brain.from_files(
+@pytest.mark.asyncio
+async def test_brain_ask_txt(llm: LLMEndpoint, embedder, temp_data_file, answers):
+    brain = await Brain.afrom_files(
         name="test_brain", file_paths=[temp_data_file], embedder=embedder, llm=llm
     )
     answer = brain.ask("question")
@@ -63,7 +64,7 @@ def test_brain_ask_txt(llm: LLMEndpoint, embedder, temp_data_file, answers):
     assert answer.answer == answers[1]
     assert answer.metadata is not None
     assert answer.metadata.sources is not None
-    assert answer.metadata.sources[0].metadata["source"] == temp_data_file
+    assert answer.metadata.sources[0].metadata["source"] == str(temp_data_file)
 
 
 @pytest.mark.asyncio
