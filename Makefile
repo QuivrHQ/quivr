@@ -14,7 +14,7 @@ dev-saas-back:
 	docker compose -f docker-compose-dev-only-back-saas-supabase.yml up --build backend-core
 
 dev-stan:
-	docker compose -f docker-compose-no-frontend.dev.yml up --build 
+	docker compose -f docker-compose-no-frontend.dev.yml up --build
 
 prod:
 	docker compose build backend-core

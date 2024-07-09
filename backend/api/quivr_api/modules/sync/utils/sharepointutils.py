@@ -6,6 +6,7 @@ import msal
 import requests
 from fastapi import HTTPException, UploadFile
 from pydantic import BaseModel, ConfigDict
+
 from quivr_api.logger import get_logger
 from quivr_api.modules.brain.repository.brains_vectors import BrainsVectors
 from quivr_api.modules.knowledge.repository.storage import Storage

@@ -2,7 +2,7 @@ on:
   push:
     tags:
       - "v*"
-      
+
 name: Deploy to quivr-com-backend
 jobs:
   porter-deploy:

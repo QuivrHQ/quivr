@@ -1,11 +1,13 @@
 from uuid import UUID
 
 import requests
+
 from quivr_api.logger import get_logger
 
 logger = get_logger(__name__)
 
 from fastapi import HTTPException
+
 from quivr_api.modules.brain.entity.api_brain_definition_entity import (
     ApiBrainDefinitionSchema,
 )

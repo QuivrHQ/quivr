@@ -73,7 +73,7 @@ export const SearchBar = ({
         ) : (
           <LuSearch
             className={`
-          ${styles.search_icon} 
+          ${styles.search_icon}
           ${
             isDisabled || !remainingCredits || !currentBrain
               ? styles.disabled

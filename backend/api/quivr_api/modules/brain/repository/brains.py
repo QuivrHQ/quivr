@@ -1,5 +1,7 @@
 from uuid import UUID
 
+from sqlalchemy import text
+
 from quivr_api.logger import get_logger
 from quivr_api.models.settings import (
     get_embedding_client,
@@ -11,7 +13,6 @@ from quivr_api.modules.brain.entity.brain_entity import BrainEntity, PublicBrain
 from quivr_api.modules.brain.repository.interfaces.brains_interface import (
     BrainsInterface,
 )
-from sqlalchemy import text
 
 logger = get_logger(__name__)
 

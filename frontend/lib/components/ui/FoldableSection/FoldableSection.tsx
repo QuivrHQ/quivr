@@ -29,7 +29,7 @@ export const FoldableSection = (props: FoldableSectionProps): JSX.Element => {
   return (
     <div
       className={`
-      ${styles.foldable_section_wrapper} 
+      ${styles.foldable_section_wrapper}
       ${!folded ? styles.unfolded : ""}
       ${props.hideBorder ? styles.hide_border : ""}
       `}

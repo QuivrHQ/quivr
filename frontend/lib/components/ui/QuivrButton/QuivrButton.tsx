@@ -70,8 +70,8 @@ export const QuivrButton = ({
   return (
     <div
       className={`
-      ${styles.button_wrapper} 
-      ${styles[color]} 
+      ${styles.button_wrapper}
+      ${styles[color]}
       ${isDarkMode ? styles.dark : ""}
       ${hidden ? styles.hidden : ""}
       ${important ? styles.important : ""}

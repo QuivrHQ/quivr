@@ -7,10 +7,11 @@ from langchain_community.vectorstores.supabase import SupabaseVectorStore
 from langchain_openai import OpenAIEmbeddings
 from posthog import Posthog
 from pydantic_settings import BaseSettings, SettingsConfigDict
-from quivr_api.logger import get_logger
-from quivr_api.models.databases.supabase.supabase import SupabaseDB
 from sqlalchemy import Engine, create_engine
 from supabase.client import Client, create_client
+
+from quivr_api.logger import get_logger
+from quivr_api.models.databases.supabase.supabase import SupabaseDB
 
 logger = get_logger(__name__)
 

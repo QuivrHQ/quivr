@@ -32,7 +32,7 @@ jobs:
         with:
           path: backend/core
           token: ${{ secrets.RELEASE_PLEASE_TOKEN }}
-       
+
 
   deploy:
     if: needs.release-please.outputs.release_created == 'true'

@@ -2,6 +2,7 @@ from typing import Dict
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Request
+
 from quivr_api.logger import get_logger
 from quivr_api.middlewares.auth.auth_bearer import AuthBearer, get_current_user
 from quivr_api.modules.brain.dto.inputs import (

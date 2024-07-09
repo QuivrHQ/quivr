@@ -6,6 +6,7 @@ import jq
 import requests
 from fastapi import HTTPException
 from litellm import completion
+
 from quivr_api.logger import get_logger
 from quivr_api.modules.brain.knowledge_brain_qa import KnowledgeBrainQA
 from quivr_api.modules.brain.qa_interface import QAInterface

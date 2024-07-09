@@ -55,7 +55,6 @@ class SyncUserInterface(ABC):
 
 
 class SyncInterface(ABC):
-
     @abstractmethod
     def create_sync_active(
         self,

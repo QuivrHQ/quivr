@@ -36,5 +36,5 @@ module.exports = ({ env }) => ({
           defaultReplyTo: 'cms@mail.quivr.app',
         },
       }
-    },   
+    },
 });

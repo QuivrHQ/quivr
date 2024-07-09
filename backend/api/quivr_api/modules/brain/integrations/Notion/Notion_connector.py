@@ -7,6 +7,7 @@ from typing import Any, List, Optional
 import requests
 from fastapi import UploadFile
 from pydantic import BaseModel
+
 from quivr_api.celery_config import celery
 from quivr_api.logger import get_logger
 from quivr_api.modules.brain.entity.integration_brain import IntegrationEntity
@@ -384,7 +385,6 @@ class NotionConnector(IntegrationBrain, Integration):
 
 
 if __name__ == "__main__":
-
     notion = NotionConnector(
         brain_id="73f7d092-d596-4fd0-b24f-24031e9b53cd",
         user_id="39418e3b-0258-4452-af60-7acfcc1263ff",

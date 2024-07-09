@@ -1,4 +1,5 @@
 from llm.qa_headless import HeadlessQA
+
 from quivr_api.modules.chat.controller.chat.interface import ChatInterface
 
 

@@ -4,6 +4,7 @@ from uuid import UUID
 
 from fastapi import HTTPException
 from litellm import completion
+
 from quivr_api.logger import get_logger
 from quivr_api.modules.brain.api_brain_qa import APIBrainQA
 from quivr_api.modules.brain.entity.brain_entity import BrainEntity, BrainType

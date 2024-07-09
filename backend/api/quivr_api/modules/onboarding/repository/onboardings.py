@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
 
 from fastapi import HTTPException
+
 from quivr_api.models.settings import get_supabase_client
 from quivr_api.modules.onboarding.entity.onboarding import OnboardingStates
 

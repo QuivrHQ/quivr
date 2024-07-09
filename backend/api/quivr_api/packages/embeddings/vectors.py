@@ -3,6 +3,7 @@ from typing import List
 from uuid import UUID
 
 from pydantic import BaseModel
+
 from quivr_api.logger import get_logger
 from quivr_api.models.settings import (
     get_documents_vector_store,

@@ -2,6 +2,7 @@ import os
 from tempfile import NamedTemporaryFile
 
 from openai import OpenAI
+
 from quivr_api.logger import get_logger
 from quivr_api.modules.assistant.dto.outputs import (
     AssistantOutput,
@@ -17,7 +18,6 @@ logger = get_logger(__name__)
 
 
 class AudioTranscriptAssistant(ITO):
-
     def __init__(
         self,
         **kwargs,

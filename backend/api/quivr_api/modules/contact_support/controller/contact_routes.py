@@ -1,5 +1,6 @@
 from fastapi import APIRouter
 from pydantic import BaseModel
+
 from quivr_api.logger import get_logger
 from quivr_api.modules.contact_support.controller.settings import ContactsSettings
 from quivr_api.packages.emails.send_email import send_email

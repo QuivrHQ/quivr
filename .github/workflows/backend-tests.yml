@@ -71,4 +71,3 @@
 #           JWT_SECRET_KEY: ${{secrets.JWT_SECRET_KEY}}
 #           CI_TEST_API_KEY: ${{secrets.CI_TEST_API_KEY}}
 #           CELERY_BROKER_URL: ${{secrets.CELERY_BROKER_URL}}
-

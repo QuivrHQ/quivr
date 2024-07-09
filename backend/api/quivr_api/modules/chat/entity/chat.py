@@ -2,12 +2,12 @@ from datetime import datetime
 from typing import List
 from uuid import UUID
 
+from sqlalchemy.ext.asyncio import AsyncAttrs
+from sqlmodel import JSON, TIMESTAMP, Column, Field, Relationship, SQLModel, text
+from sqlmodel import UUID as PGUUID
+
 from quivr_api.modules.brain.entity.brain_entity import Brain
 from quivr_api.modules.user.entity.user_identity import User
-from sqlalchemy.ext.asyncio import AsyncAttrs
-from sqlmodel import JSON, TIMESTAMP
-from sqlmodel import UUID as PGUUID
-from sqlmodel import Column, Field, Relationship, SQLModel, text
 
 
 class Chat(SQLModel, table=True):

@@ -9,10 +9,13 @@ from langchain.chat_models.base import BaseChatModel
 from langchain.prompts.chat import ChatPromptTemplate, HumanMessagePromptTemplate
 from langchain_community.chat_models import ChatLiteLLM
 from pydantic import BaseModel, ConfigDict
+
 from quivr_api.logger import get_logger
 from quivr_api.models.settings import (
     BrainSettings,
-)  # Importing settings related to the 'brain'
+)
+
+# Importing settings related to the 'brain'
 from quivr_api.modules.brain.qa_interface import QAInterface
 from quivr_api.modules.brain.service.utils.format_chat_history import (
     format_chat_history,

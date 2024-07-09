@@ -1,6 +1,7 @@
 import re
 
 from fastapi import HTTPException
+
 from quivr_api.modules.brain.entity.api_brain_definition_entity import (
     ApiBrainDefinitionSchemaProperty,
 )

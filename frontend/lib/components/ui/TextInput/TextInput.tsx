@@ -30,7 +30,7 @@ export const TextInput = ({
   return (
     <div
       className={`
-      ${styles.text_input_container} 
+      ${styles.text_input_container}
       ${simple ? styles.simple : ""}
       ${disabled ? styles.disabled : ""}
       ${small ? styles.small : ""}

@@ -10,6 +10,7 @@ from langchain_core.output_parsers import StrOutputParser
 from langchain_core.runnables import RunnableLambda, RunnablePassthrough
 from langchain_core.vectorstores import VectorStore
 from langchain_openai import ChatOpenAI
+
 from quivr_api.modules.knowledge.entity.knowledge import Knowledge
 from quivr_api.packages.quivr_core.config import RAGConfig
 from quivr_api.packages.quivr_core.models import (

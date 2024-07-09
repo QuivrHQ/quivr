@@ -1,5 +1,6 @@
 from bs4 import BeautifulSoup as Soup
 from langchain_community.document_loaders.recursive_url_loader import RecursiveUrlLoader
+
 from quivr_api.logger import get_logger
 from quivr_api.modules.assistant.dto.outputs import (
     AssistantOutput,
@@ -15,7 +16,6 @@ logger = get_logger(__name__)
 
 
 class CrawlerAssistant(ITO):
-
     def __init__(
         self,
         **kwargs,
@@ -25,7 +25,6 @@ class CrawlerAssistant(ITO):
         )
 
     async def process_assistant(self):
-
         url = self.url
         loader = RecursiveUrlLoader(
             url=url, max_depth=2, extractor=lambda x: Soup(x, "html.parser").text

@@ -5,6 +5,7 @@ from uuid import UUID
 from langchain.callbacks.streaming_aiter import AsyncIteratorCallbackHandler
 from pydantic import BaseModel, ConfigDict
 from pydantic_settings import BaseSettings
+
 from quivr_api.logger import get_logger
 from quivr_api.models.settings import BrainSettings
 from quivr_api.modules.brain.entity.brain_entity import BrainEntity
@@ -168,9 +169,7 @@ class KnowledgeBrainQA(BaseModel, QAInterface):
     models_settings: Optional[List[dict]] = None
     metadata: Optional[dict] = None
 
-    callbacks: List[AsyncIteratorCallbackHandler] = (
-        None  # pyright: ignore reportPrivateUsage=none
-    )
+    callbacks: List[AsyncIteratorCallbackHandler] = None  # pyright: ignore reportPrivateUsage=none
 
     prompt_id: Optional[UUID] = None
 

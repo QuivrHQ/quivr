@@ -18,14 +18,15 @@ import ragas
 from datasets import Dataset
 from langchain_core.runnables.base import RunnableSerializable
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
+from ragas import evaluate
+from ragas.embeddings.base import LangchainEmbeddingsWrapper
+
 from quivr_api.celery_worker import process_file_and_notify
 from quivr_api.modules.brain.rags.quivr_rag import QuivrRAG
 from quivr_api.modules.brain.service.brain_service import BrainService
 from quivr_api.modules.knowledge.dto.inputs import CreateKnowledgeProperties
 from quivr_api.modules.knowledge.service.knowledge_service import KnowledgeService
 from quivr_api.modules.upload.service.upload_file import upload_file_storage
-from ragas import evaluate
-from ragas.embeddings.base import LangchainEmbeddingsWrapper
 
 
 def main(

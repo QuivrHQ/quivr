@@ -12,6 +12,7 @@ from langchain_community.chat_models import ChatLiteLLM
 from langchain_community.document_loaders import UnstructuredPDFLoader
 from langchain_core.prompts import PromptTemplate
 from langchain_text_splitters import CharacterTextSplitter
+
 from quivr_api.logger import get_logger
 from quivr_api.modules.assistant.dto.inputs import InputAssistant
 from quivr_api.modules.assistant.dto.outputs import (
@@ -29,7 +30,6 @@ logger = get_logger(__name__)
 
 
 class SummaryAssistant(ITO):
-
     def __init__(
         self,
         input: InputAssistant,
@@ -69,7 +69,6 @@ class SummaryAssistant(ITO):
         return True
 
     async def process_assistant(self):
-
         try:
             self.increase_usage_user()
         except Exception as e:
@@ -94,7 +93,7 @@ class SummaryAssistant(ITO):
 
         map_template = """The following is a document that has been divided into multiple sections:
         {docs}
-        
+
         Please carefully analyze each section and identify the following:
 
         1. Main Themes: What are the overarching ideas or topics in this section?
@@ -113,7 +112,7 @@ class SummaryAssistant(ITO):
         {docs}
         Take these and distill it into a final, consolidated summary of the document. Make sure to include the main themes, key points, and important information such as data, quotes,people and specific events.
         Use markdown such as bold, italics, underlined. For example, **bold**, *italics*, and _underlined_ to highlight key points.
-        Please provide the final summary with sections using bold headers. 
+        Please provide the final summary with sections using bold headers.
         Sections should always be Summary and Key Points, but feel free to add more sections as needed.
         Always use bold text for the sections headers.
         Keep the same language as the documents.

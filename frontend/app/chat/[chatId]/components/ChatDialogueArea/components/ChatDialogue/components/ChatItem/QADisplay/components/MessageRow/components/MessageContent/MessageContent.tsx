@@ -54,9 +54,9 @@ export const MessageContent = ({
       )}
       <ReactMarkdown
         className={`
-        ${styles.markdown} 
+        ${styles.markdown}
         ${isUser ? styles.user : styles.brain}
-        ${cleanedText === "🧠" ? styles.thinking : ""} 
+        ${cleanedText === "🧠" ? styles.thinking : ""}
         `}
         remarkPlugins={[gfm]}
       >

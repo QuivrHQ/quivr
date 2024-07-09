@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends
+
 from quivr_api.middlewares.auth import (  # Assuming you have a get_current_user function
     AuthBearer,
     get_current_user,

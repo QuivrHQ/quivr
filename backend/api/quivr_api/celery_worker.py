@@ -5,6 +5,7 @@ from uuid import UUID
 
 from celery.schedules import crontab
 from pytz import timezone
+
 from quivr_api.celery_config import celery
 from quivr_api.logger import get_logger
 from quivr_api.middlewares.auth.auth_bearer import AuthBearer

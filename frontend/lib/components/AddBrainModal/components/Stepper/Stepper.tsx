@@ -51,7 +51,7 @@ export const Stepper = ({ currentStep, steps }: StepperProps): JSX.Element => {
           {index < steps.length - 1 && (
             <div
               className={`
-              ${styles.bar} 
+              ${styles.bar}
               ${index < currentStepIndex ? styles.done : ""}
               `}
             ></div>

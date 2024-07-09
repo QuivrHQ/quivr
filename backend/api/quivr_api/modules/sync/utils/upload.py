@@ -2,6 +2,7 @@ import os
 from uuid import UUID
 
 from fastapi import HTTPException, UploadFile
+
 from quivr_api.celery_worker import process_file_and_notify
 from quivr_api.modules.brain.entity.brain_entity import RoleEnum
 from quivr_api.modules.brain.service.brain_authorization_service import (

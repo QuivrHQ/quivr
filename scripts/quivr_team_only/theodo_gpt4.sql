@@ -27,7 +27,7 @@ BEGIN
         END IF;
 
         UPDATE user_settings
-        SET 
+        SET
             max_brains = 30,
             max_brain_size = 100000000,
             daily_chat_credit = 200,
@@ -43,7 +43,7 @@ REVOKE ALL ON FUNCTION update_max_brains_theodo() FROM PUBLIC;
 
 DROP TRIGGER IF EXISTS update_max_brains_theodo_trigger ON user_settings;
 
-CREATE TRIGGER update_max_brains_theodo_trigger 
-AFTER INSERT ON user_settings 
-FOR EACH ROW 
+CREATE TRIGGER update_max_brains_theodo_trigger
+AFTER INSERT ON user_settings
+FOR EACH ROW
 EXECUTE FUNCTION update_max_brains_theodo();

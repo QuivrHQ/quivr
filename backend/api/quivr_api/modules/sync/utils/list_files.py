@@ -7,9 +7,10 @@ from fastapi import HTTPException
 from google.auth.transport.requests import Request as GoogleRequest
 from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
+from requests import HTTPError
+
 from quivr_api.logger import get_logger
 from quivr_api.modules.sync.utils.normalize import remove_special_characters
-from requests import HTTPError
 
 logger = get_logger(__name__)
 

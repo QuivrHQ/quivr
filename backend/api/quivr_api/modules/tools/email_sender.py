@@ -10,6 +10,7 @@ from langchain.pydantic_v1 import Field as FieldV1
 from langchain_community.document_loaders import PlaywrightURLLoader
 from langchain_core.tools import BaseTool
 from pydantic import BaseModel
+
 from quivr_api.logger import get_logger
 from quivr_api.models.settings import BrainSettings
 from quivr_api.modules.contact_support.controller.settings import ContactsSettings

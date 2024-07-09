@@ -1,5 +1,6 @@
 import pytest
 from pydantic import ValidationError
+
 from quivr_api.modules.brain.dto.inputs import (
     BrainIntegrationSettings,
     CreateBrainProperties,

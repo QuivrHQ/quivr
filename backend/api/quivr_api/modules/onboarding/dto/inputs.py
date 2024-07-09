@@ -1,10 +1,9 @@
 from typing import Optional
 
-from pydantic import ConfigDict, BaseModel
+from pydantic import BaseModel, ConfigDict
 
 
 class OnboardingUpdatableProperties(BaseModel):
-
     """Properties that can be received on onboarding update"""
 
     onboarding_a: Optional[bool] = None

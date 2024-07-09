@@ -88,7 +88,7 @@ export const Menu = (): JSX.Element => {
       </div>
       <div
         className={`
-        ${styles.menu_control_button_wrapper} 
+        ${styles.menu_control_button_wrapper}
         ${isOpened ? styles.shifted : ""}
         `}
       >

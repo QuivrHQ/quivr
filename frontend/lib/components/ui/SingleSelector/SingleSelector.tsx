@@ -78,7 +78,7 @@ export const SingleSelector = <T extends string | number | UUID>({
           </div>
           <div
             className={`
-            ${styles.label} 
+            ${styles.label}
             ${!selectedOption ? styles.not_set : ""}
             `}
           >

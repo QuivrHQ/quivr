@@ -5,7 +5,6 @@ from quivr_api.modules.assistant.entity.assistant import AssistantEntity
 
 
 class AssistantInterface(ABC):
-
     @abstractmethod
     def get_all_assistants(self) -> List[AssistantEntity]:
         """

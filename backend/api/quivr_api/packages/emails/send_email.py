@@ -1,6 +1,7 @@
 from typing import Dict
 
 import resend
+
 from quivr_api.models.settings import ResendSettings
 
 
