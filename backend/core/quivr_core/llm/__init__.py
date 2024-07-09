@@ -1,5 +1,4 @@
 from langchain_core.language_models.chat_models import BaseChatModel
-from langchain_openai import ChatOpenAI
 from pydantic.v1 import SecretStr
 
 from quivr_core.config import LLMEndpointConfig
@@ -19,12 +18,20 @@ class LLMEndpoint:
 
     @classmethod
     def from_config(cls, config: LLMEndpointConfig = LLMEndpointConfig()):
-        _llm = ChatOpenAI(
-            name=config.model,
-            api_key=SecretStr(config.llm_api_key) if config.llm_api_key else None,
-            base_url=config.llm_base_url,
-        )
-        return cls(llm=_llm, llm_config=config)
+        try:
+            from langchain_openai import ChatOpenAI
+
+            _llm = ChatOpenAI(
+                name=config.model,
+                api_key=SecretStr(config.llm_api_key) if config.llm_api_key else None,
+                base_url=config.llm_base_url,
+            )
+            return cls(llm=_llm, llm_config=config)
+
+        except ImportError as e:
+            raise ImportError(
+                "Please provide a valid BaseLLM or install quivr-core['base'] package"
+            ) from e
 
     def supports_func_calling(self) -> bool:
         return self._supports_func_calling
