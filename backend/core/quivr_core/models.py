@@ -2,6 +2,7 @@ from datetime import datetime
 from typing import Any
 from uuid import UUID
 
+from langchain_core.documents import Document
 from langchain_core.pydantic_v1 import BaseModel as BaseModelV1
 from langchain_core.pydantic_v1 import Field as FieldV1
 from pydantic import BaseModel
@@ -87,3 +88,9 @@ class QuivrKnowledge(BaseModel):
     file_name: str | None = None
     url: str | None = None
     extension: str = "txt"
+
+
+# NOTE: for compatibility issues with langchain <-> PydanticV1
+class SearchResult(BaseModelV1):
+    chunk: Document
+    score: float

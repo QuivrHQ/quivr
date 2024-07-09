@@ -22,3 +22,19 @@ repos:
         args: [--fix]
       # Run the formatter.
       - id: ruff-format
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.10.0
+    hooks:
+      - id: mypy
+        name: mypy
+        additional_dependencies: ["types-aiofiles"]
+
+  - repo: https://github.com/python-poetry/poetry
+    rev: "" # add version here
+    hooks:
+      - id: poetry-check
+        args: ["-C", "./backend/core"]
+      - id: poetry-lock
+        args: ["-C", "./backend/core"]
+      - id: poetry-install
+        args: ["-C", "./backend/core"]

@@ -5,14 +5,13 @@ from typing import AsyncGenerator, Optional, Sequence
 from langchain.retrievers import ContextualCompressionRetriever
 from langchain_core.callbacks import Callbacks
 from langchain_core.documents import BaseDocumentCompressor, Document
-from langchain_core.language_models import BaseChatModel
 from langchain_core.messages.ai import AIMessageChunk
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.runnables import RunnableLambda, RunnablePassthrough
 from langchain_core.vectorstores import VectorStore
-from langchain_openai import ChatOpenAI
 
 from quivr_core.config import RAGConfig
+from quivr_core.llm import LLMEndpoint
 from quivr_core.models import (
     ParsedRAGChunkResponse,
     ParsedRAGResponse,
@@ -24,7 +23,6 @@ from quivr_core.utils import (
     combine_documents,
     format_file_list,
     get_chunk_metadata,
-    model_supports_function_calling,
     parse_chunk_response,
     parse_response,
 )
@@ -47,19 +45,14 @@ class QuivrQARAG:
         self,
         *,
         rag_config: RAGConfig,
-        llm: BaseChatModel,
+        llm: LLMEndpoint,
         vector_store: VectorStore,
         reranker: BaseDocumentCompressor | None = None,
     ):
         self.rag_config = rag_config
         self.vector_store = vector_store
-        self.llm = llm
-
+        self.llm_endpoint = llm
         self.reranker = reranker if reranker is not None else IdempotentCompressor()
-
-        self.supports_func_calling = model_supports_function_calling(
-            self.rag_config.model
-        )
 
     @property
     def retriever(self):
@@ -117,7 +110,7 @@ class QuivrQARAG:
                 "chat_history": itemgetter("chat_history"),
             }
             | CONDENSE_QUESTION_PROMPT
-            | self.llm
+            | self.llm_endpoint._llm
             | StrOutputParser(),
         }
 
@@ -135,17 +128,10 @@ class QuivrQARAG:
             "files": lambda _: files,  # TODO: shouldn't be here
         }
 
-        # Override llm if we have a OpenAI model
-        llm = self.llm
-
-        if self.supports_func_calling:
-            llm_function = ChatOpenAI(
-                model=self.rag_config.model,
-                max_tokens=self.rag_config.max_tokens,
-                temperature=self.rag_config.temperature,
-            )
-
-            llm = llm_function.bind_tools(
+        # Bind the llm to cited_answer if model supports it
+        llm = self.llm_endpoint._llm
+        if self.llm_endpoint.supports_func_calling():
+            llm = self.llm_endpoint._llm.bind_tools(
                 [cited_answer],
                 tool_choice="any",
             )
@@ -174,7 +160,7 @@ class QuivrQARAG:
             },
             config={"metadata": metadata},
         )
-        response = parse_response(raw_llm_response, self.rag_config.model)
+        response = parse_response(raw_llm_response, self.rag_config.llm_config.model)
         return response
 
     async def answer_astream(
@@ -206,10 +192,13 @@ class QuivrQARAG:
                 rolling_message, parsed_chunk = parse_chunk_response(
                     rolling_message,
                     chunk,
-                    self.supports_func_calling,
+                    self.llm_endpoint.supports_func_calling(),
                 )
 
-                if self.supports_func_calling and len(parsed_chunk.answer) > 0:
+                if (
+                    self.llm_endpoint.supports_func_calling()
+                    and len(parsed_chunk.answer) > 0
+                ):
                     yield parsed_chunk
                 else:
                     yield parsed_chunk

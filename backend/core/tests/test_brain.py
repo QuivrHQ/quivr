@@ -1,8 +1,13 @@
+from uuid import uuid4
+
 import pytest
-from langchain_core.embeddings import DeterministicFakeEmbedding
+from langchain_core.documents import Document
+from langchain_core.embeddings import DeterministicFakeEmbedding, Embeddings
 from langchain_core.language_models import FakeListChatModel
 
 from quivr_core.brain import Brain
+from quivr_core.config import LLMEndpointConfig
+from quivr_core.llm import LLMEndpoint
 
 
 @pytest.fixture
@@ -20,7 +25,8 @@ def answers():
 
 @pytest.fixture(scope="function")
 def llm(answers: list[str]):
-    return FakeListChatModel(responses=answers)
+    llm = FakeListChatModel(responses=answers)
+    return LLMEndpoint(llm=llm, llm_config=LLMEndpointConfig(model="fake_model"))
 
 
 @pytest.fixture(scope="function")
@@ -34,7 +40,7 @@ def test_brain_from_files_exception():
         Brain.from_files(name="test_brain", file_paths=[])
 
 
-def test_brain_ask_txt(llm, embedder, temp_data_file, answers):
+def test_brain_ask_txt(llm: LLMEndpoint, embedder, temp_data_file, answers):
     brain = Brain.from_files(
         name="test_brain", file_paths=[temp_data_file], embedder=embedder, llm=llm
     )
@@ -44,5 +50,23 @@ def test_brain_ask_txt(llm, embedder, temp_data_file, answers):
 
     answer = brain.ask("question")
 
-    assert answer.answer == answers[0]
-    assert answer.metadata == answers[0]
+    assert answer.answer == answers[1]
+    assert answer.metadata is not None
+    assert answer.metadata.sources is not None
+    assert answer.metadata.sources[0].metadata["source"] == temp_data_file
+
+
+@pytest.mark.asyncio
+async def test_brain_search(
+    embedder: Embeddings,
+):
+    chunk = Document("content_1", metadata={"id": uuid4()})
+    brain = await Brain.afrom_langchain_documents(
+        name="test", langchain_documents=[chunk], embedder=embedder
+    )
+
+    result = await brain.asearch("content_1")
+
+    assert len(result) == 1
+    assert result[0].chunk == chunk
+    assert result[0].score == 0
