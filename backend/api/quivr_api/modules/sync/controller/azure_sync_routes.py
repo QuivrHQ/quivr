@@ -104,10 +104,10 @@ def oauth2callback_azure(request: Request):
         request.query_params.get("code"), scopes=SCOPE, redirect_uri=REDIRECT_URI
     )
     if "access_token" not in result:
-        logger.error(f"Failed to acquire token: {result.get('error_description')}")
+        logger.error(f"Failed to acquire token: {result}")
         raise HTTPException(
             status_code=400,
-            detail=f"Failed to acquire token: {result.get('error_description')}",
+            detail=f"Failed to acquire token: {result}",
         )
 
     access_token = result["access_token"]
