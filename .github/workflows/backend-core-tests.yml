@@ -1,0 +1,47 @@
+name: Run Tests with Tika Server
+
+on:
+  push:
+    paths:
+      - 'backend/core/**'
+  pull_request:
+    paths:
+      - 'backend/core/**'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    services:
+      tika:
+        image: apache/tika
+        ports:
+          - 9998:9998
+        options: >-
+          --health-cmd="curl --fail http://localhost:9998/tika" 
+          --health-interval=10s 
+          --health-timeout=5s 
+          --health-retries=5
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.11'
+
+    - name: Install dependencies
+      run: |
+        cd backend/core
+        python -m pip install --upgrade pip
+        pip install poetry
+        poetry install -E base
+
+    - name: Run tests
+      env:
+        TIKA_URL: http://localhost:9998/tika
+      run: |
+        cd backend/core
+        poetry run pytest tests
