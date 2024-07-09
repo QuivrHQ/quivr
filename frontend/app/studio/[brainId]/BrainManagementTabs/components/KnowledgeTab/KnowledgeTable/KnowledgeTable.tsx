@@ -97,6 +97,7 @@ const KnowledgeTable = React.forwardRef<HTMLDivElement, KnowledgeTableProps>(
               label="Search"
               inputValue={searchQuery}
               setInputValue={setSearchQuery}
+              small={true}
             />
           </div>
           <QuivrButton

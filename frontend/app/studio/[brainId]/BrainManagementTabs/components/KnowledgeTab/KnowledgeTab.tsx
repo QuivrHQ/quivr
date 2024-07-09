@@ -32,28 +32,32 @@ export const KnowledgeTab = ({
 
   if (allKnowledge.length === 0) {
     return (
-      <div className={styles.knowledge_tab_wrapper}>
-        <MessageInfoBox type="warning">
-          This brain is empty! You can add knowledge by clicking on
-          <QuivrButton
-            label="Add knowledge"
-            color="primary"
-            iconName="add"
-            onClick={() => setShouldDisplayFeedCard(true)}
-          />
-          .
-        </MessageInfoBox>
+      <div className={styles.knowledge_tab_container}>
+        <div className={styles.knowledge_tab_wrapper}>
+          <MessageInfoBox type="warning">
+            This brain is empty! You can add knowledge by clicking on
+            <QuivrButton
+              label="Add knowledge"
+              color="primary"
+              iconName="add"
+              onClick={() => setShouldDisplayFeedCard(true)}
+            />
+            .
+          </MessageInfoBox>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className={styles.knowledge_tab_wrapper}>
-      <motion.div layout className="w-full flex flex-col gap-5">
-        <AnimatePresence mode="popLayout">
-          <KnowledgeTable knowledgeList={allKnowledge} />
-        </AnimatePresence>
-      </motion.div>
+    <div className={styles.knowledge_tab_container}>
+      <div className={styles.knowledge_tab_wrapper}>
+        <motion.div layout className="w-full flex flex-col gap-5">
+          <AnimatePresence mode="popLayout">
+            <KnowledgeTable knowledgeList={allKnowledge} />
+          </AnimatePresence>
+        </motion.div>
+      </div>
     </div>
   );
 };

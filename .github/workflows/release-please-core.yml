@@ -1,0 +1,32 @@
+name: release-please-core
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  release-please:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0 # Fetch all history for tags and releases
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Run release-please
+        uses: google-github-actions/release-please-action@v4
+        with:
+          manifest-file: backend/core/.release-please-manifest.json
+          config-file: backend/core/release-please-config.json
+          token: ${{ secrets.RELEASE_PLEASE_TOKEN }}

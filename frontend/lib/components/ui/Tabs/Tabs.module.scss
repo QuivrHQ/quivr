@@ -12,7 +12,7 @@
     align-items: center;
     justify-content: center;
     flex: 1;
-    border-bottom: 2px solid var(--border-0);
+    border-bottom: 1px solid var(--border-2);
     padding-block: Spacings.$spacing03;
     cursor: pointer;
     box-sizing: border-box;
@@ -43,6 +43,7 @@
       display: flex;
       position: relative;
       gap: Spacings.$spacing02;
+      font-size: Typography.$small;
 
       .label_badge {
         border-radius: Radius.$circle;

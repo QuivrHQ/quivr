@@ -9,10 +9,6 @@
   color: var(--text-3);
   overflow: hidden;
 
-  .dark_image {
-    filter: invert(100%);
-  }
-
   .brain_name {
     @include Typography.EllipsisOverflow;
   }

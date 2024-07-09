@@ -15,13 +15,11 @@
     flex-direction: column;
     width: 100%;
     gap: Spacings.$spacing05;
-    box-shadow: BoxShadow.$small;
-    border-radius: Radius.$big;
-    padding: Spacings.$spacing06;
-    background-color: var(--background-1);
+    border-bottom: 1px solid var(--border-2);
+    padding-block: Spacings.$spacing05;
 
     .section_title {
-      @include Typography.H3;
+      @include Typography.H2;
     }
 
     .inputs_wrapper {
@@ -63,13 +61,11 @@
     flex-direction: column;
     width: 100%;
     gap: Spacings.$spacing05;
-    box-shadow: BoxShadow.$small;
     border-radius: Radius.$big;
-    padding: Spacings.$spacing06;
-    background-color: var(--background-1);
+    padding-block: Spacings.$spacing05;
 
     .section_title {
-      @include Typography.H3;
+      @include Typography.H2;
     }
   }
 }

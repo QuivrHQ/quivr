@@ -1,7 +1,4 @@
-import Image from "next/image";
-
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
-import { useUserSettingsContext } from "@/lib/context/UserSettingsProvider/hooks/useUserSettingsContext";
 
 import styles from "./CurrentBrain.module.scss";
 
@@ -17,12 +14,11 @@ export const CurrentBrain = ({
   remainingCredits,
 }: CurrentBrainProps): JSX.Element => {
   const { currentBrain, setCurrentBrainId } = useBrainContext();
-  const { isDarkMode } = useUserSettingsContext();
   const removeCurrentBrain = (): void => {
     setCurrentBrainId(null);
   };
 
-  if (!remainingCredits) {
+  if (remainingCredits === 0) {
     return (
       <div className={styles.no_credits_left}>
         <span>
@@ -48,17 +44,7 @@ export const CurrentBrain = ({
         <div className={styles.left}>
           <span className={styles.title}>Talking to</span>
           <div className={styles.brain_name_wrapper}>
-            <Image
-              className={isDarkMode ? styles.dark_image : ""}
-              src={
-                currentBrain.integration_logo_url
-                  ? currentBrain.integration_logo_url
-                  : "/default_brain_image.png"
-              }
-              alt="logo_image"
-              width={18}
-              height={18}
-            />
+            <Icon name="brain" size="small" color="black" />
             <span className={styles.brain_name}>{currentBrain.name}</span>
           </div>
         </div>

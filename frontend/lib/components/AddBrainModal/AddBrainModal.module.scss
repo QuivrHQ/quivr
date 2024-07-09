@@ -2,17 +2,15 @@
 
 .add_brain_modal_container {
   display: flex;
-  padding-block: Spacings.$spacing05;
+  padding-top: Spacings.$spacing06;
   flex-direction: column;
   width: 100%;
-  max-height: 90%;
-  min-height: 90%;
+  flex-grow: 1;
   overflow: hidden;
   gap: Spacings.$spacing05;
 
   .stepper_container {
     width: 100%;
-    padding-inline: Spacings.$spacing08;
   }
 
   .content_wrapper {

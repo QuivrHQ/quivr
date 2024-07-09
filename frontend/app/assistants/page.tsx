@@ -1,5 +1,5 @@
 "use client";
-import { usePathname } from "next/navigation";
+import { redirect, usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import { Assistant } from "@/lib/api/assistants/types";
@@ -13,7 +13,7 @@ import { redirectToLogin } from "@/lib/router/redirectToLogin";
 import { AssistantModal } from "./AssistantModal/AssistantModal";
 import styles from "./page.module.scss";
 
-const Search = (): JSX.Element => {
+const Assistants = (): JSX.Element => {
   const pathname = usePathname();
   const { session } = useSupabase();
   const [assistants, setAssistants] = useState<Assistant[]>([]);
@@ -26,6 +26,8 @@ const Search = (): JSX.Element => {
   const { getAssistants } = useAssistants();
 
   useEffect(() => {
+    // REMOVE FOR NOW ACCESS TO QUIVR ASSISTANTS
+    redirect("/search");
     if (session === null) {
       redirectToLogin();
     }
@@ -104,4 +106,4 @@ const Search = (): JSX.Element => {
   );
 };
 
-export default Search;
+export default Assistants;

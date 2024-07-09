@@ -29,7 +29,6 @@ ruff = "^0.4.8"
 flake8 = "*"
 flake8-black = "*"
 pytest-cov = "^5.0.0"
-types-aiofiles = "^24.1.0.20240626"
 
 [tool.poetry.group.test.dependencies]
 pytest-asyncio = "^0.23.7"

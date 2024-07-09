@@ -1,11 +1,12 @@
 @use "styles/Radius.module.scss";
 @use "styles/Spacings.module.scss";
+@use "styles/Typography.module.scss";
 
 .text_input_container {
   display: flex;
-  border: 1px solid var(--border-0);
-  gap: Spacings.$spacing03;
-  padding-block: Spacings.$spacing02;
+  border: 1px solid var(--border-2);
+  gap: Spacings.$spacing02;
+  padding-block: Spacings.$spacing01;
   padding-inline: Spacings.$spacing03;
   border-radius: Radius.$big;
   align-items: center;
@@ -22,6 +23,15 @@
     }
   }
 
+  &.small {
+    padding-block: 0;
+
+    .text_input {
+      font-size: Typography.$small;
+      padding: Spacings.$spacing02;
+    }
+  }
+
   &.disabled {
     cursor: not-allowed;
     opacity: 0.5;
@@ -33,6 +43,7 @@
     border: none;
     flex: 1;
     background-color: transparent;
+    padding: Spacings.$spacing03;
 
     &:focus {
       box-shadow: none;
