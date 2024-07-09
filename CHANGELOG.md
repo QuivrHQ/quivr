@@ -1,5 +1,25 @@
 # Changelog
 
+## 0.0.281 (2024-07-09)
+
+## What's Changed
+* feat: quivr core minimal chat by @AmineDiro in https://github.com/QuivrHQ/quivr/pull/2803
+* chore: Add release-please-core workflow and configuration files by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2809
+* chore(main): release core 0.0.2 by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2812
+* chore(main): release core 0.0.2 by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2813
+* chore(main): release core 0.0.2 by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2814
+* chore(main): release core 0.0.2 by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2815
+* fix(pyproject): fixed to quivr github by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2816
+* chore(main): release core 0.0.3 by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2817
+* feat: quivr core minimal chat by @AmineDiro in https://github.com/QuivrHQ/quivr/pull/2818
+* chore(main): release core 0.0.4 by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2819
+* feat: Add GitHub Actions workflow for running tests on backend/core by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2820
+* feat: Add GitHub Actions workflow for running tests on backend/core by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2822
+* feat(precommit): Update pre-commit hooks to latest versions by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2823
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.280...v0.0.281
+
 ## 0.0.280 (2024-07-09)
 
 ## What's Changed
