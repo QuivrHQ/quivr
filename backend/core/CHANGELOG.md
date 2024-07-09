@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.3](https://github.com/QuivrHQ/quivr/compare/core-0.0.2...core-0.0.3) (2024-07-09)
+
+
+### Bug Fixes
+
+* **pyproject:** fixed to quivr github ([#2816](https://github.com/QuivrHQ/quivr/issues/2816)) ([5a4ac00](https://github.com/QuivrHQ/quivr/commit/5a4ac001d0ba26af0c48aea7d9807c66b5fdd48d))
+
 ## [0.0.2](https://github.com/QuivrHQ/quivr/compare/core-v0.0.1...core-0.0.2) (2024-07-09)
 
 
