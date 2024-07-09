@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.0.280 (2024-07-09)
+
+## What's Changed
+* feat(frontend): add small property to textInput by @Zewed in https://github.com/QuivrHQ/quivr/pull/2798
+* fix(frontend): brain studio ui audit implem by @Zewed in https://github.com/QuivrHQ/quivr/pull/2800
+* fix(frontend): remove quivr assistant for now by @Zewed in https://github.com/QuivrHQ/quivr/pull/2801
+* feat(frontend): Uniformize brain icon by @Zewed in https://github.com/QuivrHQ/quivr/pull/2802
+* fix(frontend): out of credits when credits null by @Zewed in https://github.com/QuivrHQ/quivr/pull/2804
+* feat(frontend): better UI for big modals by @Zewed in https://github.com/QuivrHQ/quivr/pull/2805
+* fix(frontend): align brain recap step by @Zewed in https://github.com/QuivrHQ/quivr/pull/2806
+* feat: Improve error handling in acquiring token by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2807
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.279...v0.0.280
+
 ## 0.0.279 (2024-07-04)
 
 ## What's Changed
