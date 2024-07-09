@@ -27,7 +27,5 @@ jobs:
       - name: Run release-please
         uses: google-github-actions/release-please-action@v4
         with:
-          release-type: python
-          path: backend/core
-          include-component-in-tag: true
+          manifest-file: backend/core/.release-please-manifest.json
           token: ${{ secrets.RELEASE_PLEASE_TOKEN }}
