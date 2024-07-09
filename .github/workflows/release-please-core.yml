@@ -35,7 +35,7 @@ jobs:
        
 
   deploy:
-    if: needs.release-please.outputs['backend/core--release_created'] == 'true'
+    if: needs.release-please.outputs.release_created == 'true'
     needs: release-please
     runs-on: ubuntu-latest
     defaults:
