@@ -14,8 +14,7 @@ jobs:
   release-please:
     runs-on: ubuntu-latest
     outputs:
-      release_created: ${{ steps.release.outputs.release_created }}
-      tag_name: ${{ steps.release.outputs.tag_name }}
+      release_created: ${{ steps.release.outputs['backend/core--release_created'] }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -34,9 +33,10 @@ jobs:
           manifest-file: backend/core/.release-please-manifest.json
           config-file: backend/core/release-please-config.json
           token: ${{ secrets.RELEASE_PLEASE_TOKEN }}
+       
 
   deploy:
-    if: needs.release-please.outputs.release_created == 'true'
+    if: needs.release-please.outputs['backend/core--release_created'] == 'true'
     needs: release-please
     runs-on: ubuntu-latest
     defaults:
