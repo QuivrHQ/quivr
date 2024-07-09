@@ -38,6 +38,7 @@ jobs:
     - name: Run tests
       env:
         TIKA_URL: http://localhost:9998/tika
+        OPENAI_API_KEY: this-is-a-test-key
       run: |
         cd backend/core
         poetry run pytest tests
