@@ -16,7 +16,7 @@ export const NotificationsButton = (): JSX.Element => {
         color="primary"
         onClick={() => setIsVisible(!isVisible)}
       />
-      {!unreadNotifications && (
+      {!!unreadNotifications && (
         <span className={styles.badge}>
           {unreadNotifications > 9 ? "9+" : unreadNotifications}
         </span>
