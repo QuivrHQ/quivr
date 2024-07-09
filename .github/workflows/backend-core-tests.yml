@@ -18,11 +18,6 @@ jobs:
         image: apache/tika
         ports:
           - 9998:9998
-        options: >-
-          --health-cmd="curl --fail http://localhost:9998/tika --max-time 5 || exit 1" 
-          --health-interval=30s 
-          --health-timeout=10s 
-          --health-retries=10
 
     steps:
     - name: Checkout code
