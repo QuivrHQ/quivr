@@ -1,6 +1,6 @@
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.4.0
+    rev: v4.6.0
     hooks:
       - id: check-added-large-files
       - id: check-toml
@@ -8,13 +8,15 @@ repos:
       - id: end-of-file-fixer
       - id: trailing-whitespace
       - id: check-merge-conflict
+      - id: detect-private-key
+      - id: check-case-conflict
   - repo: https://github.com/pre-commit/pre-commit
     rev: v3.6.2
     hooks:
       - id: validate_manifest
   - repo: https://github.com/astral-sh/ruff-pre-commit
     # Ruff version.
-    rev: v0.4.8
+    rev: v0.5.1
     hooks:
       # Run the linter.
       - id: ruff
@@ -24,14 +26,13 @@ repos:
       - id: ruff-format
         additional_dependencies: []
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.10.0
+    rev: v1.10.1
     hooks:
       - id: mypy
         name: mypy
         additional_dependencies: ["types-aiofiles"]
-
   - repo: https://github.com/python-poetry/poetry
-    rev: "1.8.3" # add version here
+    rev: "1.8.0"
     hooks:
       - id: poetry-check
         args: ["-C", "./backend/core"]
