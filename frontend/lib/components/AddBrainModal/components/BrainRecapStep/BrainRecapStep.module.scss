@@ -7,8 +7,7 @@
   justify-content: space-between;
   flex-direction: column;
   height: 100%;
-  padding-inline: Spacings.$spacing08;
-  gap: Spacings.$spacing03;
+  gap: Spacings.$spacing05;
   overflow: hidden;
 
   .content_wrapper {
@@ -18,11 +17,12 @@
     overflow: scroll;
 
     .title {
-      @include Typography.H2;
+      @include Typography.H3;
     }
 
     .subtitle {
-      @include Typography.H3;
+      font-size: Typography.$small;
+      font-weight: 500;
     }
 
     .warning_message {
@@ -53,14 +53,14 @@
       justify-content: space-between;
       gap: Spacings.$spacing05;
 
-      >* {
+      > * {
         min-width: 120px;
         max-width: 200px;
         flex: 1;
       }
 
       @media screen and (max-width: ScreenSizes.$small) {
-        >* {
+        > * {
           min-width: 100%;
           max-width: 100%;
           flex: 1;
