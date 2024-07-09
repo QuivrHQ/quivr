@@ -7,12 +7,11 @@ repos:
       - id: check-yaml
       - id: end-of-file-fixer
       - id: trailing-whitespace
-  # Check poetry state
-  - repo: https://github.com/python-poetry/poetry
-    rev: "1.5.1"
+      - id: check-merge-conflict
+  - repo: https://github.com/pre-commit/pre-commit
+    rev: v3.6.2
     hooks:
-      - id: poetry-check
-        args: ["-C", "./backend"]
+      - id: validate_manifest
   - repo: https://github.com/astral-sh/ruff-pre-commit
     # Ruff version.
     rev: v0.4.8
@@ -20,8 +19,10 @@ repos:
       # Run the linter.
       - id: ruff
         args: [--fix]
+        additional_dependencies: []
       # Run the formatter.
       - id: ruff-format
+        additional_dependencies: []
   - repo: https://github.com/pre-commit/mirrors-mypy
     rev: v1.10.0
     hooks:
@@ -30,11 +31,9 @@ repos:
         additional_dependencies: ["types-aiofiles"]
 
   - repo: https://github.com/python-poetry/poetry
-    rev: "" # add version here
+    rev: "1.8.3" # add version here
     hooks:
       - id: poetry-check
         args: ["-C", "./backend/core"]
       - id: poetry-lock
-        args: ["-C", "./backend/core"]
-      - id: poetry-install
         args: ["-C", "./backend/core"]
