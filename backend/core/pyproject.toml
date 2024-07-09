@@ -10,7 +10,37 @@ repository = "https://github.com/langchain-ai/langchain"
 python = "^3.11"
 pydantic = "^2.7.4"
 langchain-core = "^0.2.10"
-langchain = "^0.2.6"
+httpx = "^0.27.0"
+faiss-cpu = { version = "^1.8.0.post1", optional = true }
+langchain-community = { version = "^0.2.6", optional = true }
+langchain-openai = { version = "^0.1.14", optional = true }
+aiofiles = "^24.1.0"
+
+[tool.poetry.extras]
+base = ["langchain-community", "faiss-cpu", "langchain-openai"]
+pdf = []
+
+
+[tool.poetry.group.dev.dependencies]
+mypy = "^1.10.0"
+pre-commit = "^3.7.1"
+ipykernel = "*"
+ruff = "^0.4.8"
+flake8 = "*"
+flake8-black = "*"
+pytest-cov = "^5.0.0"
+
+[tool.poetry.group.test.dependencies]
+pytest-asyncio = "^0.23.7"
+pytest = "^8.2.2"
+
+
+[tool.mypy]
+disallow_untyped_defs = true
+# Remove venv skip when integrated with pre-commit
+exclude = ["_static", "build", "examples", "notebooks", "venv", ".venv"]
+ignore_missing_imports = true
+python_version = "3.11"
 
 [tool.ruff]
 line-length = 88

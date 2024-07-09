@@ -3,9 +3,9 @@ from pydantic import BaseModel, field_validator
 
 class RAGConfig(BaseModel):
     model: str = "gpt-3.5-turbo-0125"  # pyright: ignore reportPrivateUsage=none
-    temperature: float | None = 0.1
-    max_tokens: int | None = 2000
+    temperature: float = 0.7
     max_input: int = 2000
+    max_tokens: int | None = 2000
     streaming: bool = False
     max_files: int = 20
     prompt: str | None = None
