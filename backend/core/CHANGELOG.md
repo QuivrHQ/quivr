@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.4](https://github.com/QuivrHQ/quivr/compare/core-0.0.3...core-0.0.4) (2024-07-09)
+
+
+### Features
+
+* quivr core minimal chat ([#2818](https://github.com/QuivrHQ/quivr/issues/2818)) ([481f24f](https://github.com/QuivrHQ/quivr/commit/481f24f5bed855d044c97eb881512fbf936772f8))
+
 ## [0.0.3](https://github.com/QuivrHQ/quivr/compare/core-0.0.2...core-0.0.3) (2024-07-09)
 
 
