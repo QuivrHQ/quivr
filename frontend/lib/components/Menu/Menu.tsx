@@ -7,6 +7,7 @@ import { useChatsList } from "@/app/chat/[chatId]/hooks/useChatsList";
 import { QuivrLogo } from "@/lib/assets/QuivrLogo";
 import { nonProtectedPaths } from "@/lib/config/routesConfig";
 import { useMenuContext } from "@/lib/context/MenuProvider/hooks/useMenuContext";
+import { useNotificationsContext } from "@/lib/context/NotificationsProvider/hooks/useNotificationsContext";
 import { useUserSettingsContext } from "@/lib/context/UserSettingsProvider/hooks/useUserSettingsContext";
 
 import styles from "./Menu.module.scss";
@@ -22,6 +23,7 @@ import { UpgradeToPlusButton } from "./components/UpgradeToPlusButton/UpgradeToP
 
 export const Menu = (): JSX.Element => {
   const { isOpened } = useMenuContext();
+  const { isVisible } = useNotificationsContext();
   const router = useRouter();
   const pathname = usePathname() ?? "";
   const [isLogoHovered, setIsLogoHovered] = useState<boolean>(false);
@@ -51,51 +53,54 @@ export const Menu = (): JSX.Element => {
   }
 
   return (
-    <MotionConfig transition={{ mass: 1, damping: 10, duration: 0.1 }}>
-      <div className={styles.menu_container}>
-        <AnimatedDiv>
-          <div className={styles.menu_wrapper}>
-            <div
-              className={styles.quivr_logo_wrapper}
-              onClick={() => router.push("/search")}
-              onMouseEnter={() => setIsLogoHovered(true)}
-              onMouseLeave={() => setIsLogoHovered(false)}
-            >
-              <QuivrLogo
-                size={50}
-                color={
-                  isLogoHovered ? "primary" : isDarkMode ? "white" : "black"
-                }
-              />
-            </div>
+    <div>
+      <MotionConfig transition={{ mass: 1, damping: 10, duration: 0.1 }}>
+        <div className={styles.menu_container}>
+          <AnimatedDiv>
+            <div className={styles.menu_wrapper}>
+              <div
+                className={styles.quivr_logo_wrapper}
+                onClick={() => router.push("/search")}
+                onMouseEnter={() => setIsLogoHovered(true)}
+                onMouseLeave={() => setIsLogoHovered(false)}
+              >
+                <QuivrLogo
+                  size={50}
+                  color={
+                    isLogoHovered ? "primary" : isDarkMode ? "white" : "black"
+                  }
+                />
+              </div>
 
-            <div className={styles.buttons_wrapper}>
-              <div className={styles.block}>
-                <DiscussionButton />
-                <HomeButton />
-                <NotificationsButton />
-                <StudioButton />
-                <ThreadsButton />
+              <div className={styles.buttons_wrapper}>
+                <div className={styles.block}>
+                  <DiscussionButton />
+                  <HomeButton />
+                  <StudioButton />
+                  <NotificationsButton />
+                  <ThreadsButton />
+                </div>
+                <div className={styles.block}>
+                  <UpgradeToPlusButton />
+                  <ProfileButton />
+                </div>
               </div>
-              <div className={styles.block}>
-                <UpgradeToPlusButton />
-                <ProfileButton />
+              <div className={styles.social_buttons_wrapper}>
+                <SocialsButtons />
               </div>
             </div>
-            <div className={styles.social_buttons_wrapper}>
-              <SocialsButtons />
-            </div>
-          </div>
-        </AnimatedDiv>
-      </div>
-      <div
-        className={`
+          </AnimatedDiv>
+        </div>
+        <div
+          className={`
         ${styles.menu_control_button_wrapper} 
         ${isOpened ? styles.shifted : ""}
         `}
-      >
-        <MenuControlButton />
-      </div>
-    </MotionConfig>
+        >
+          <MenuControlButton />
+        </div>
+      </MotionConfig>
+      {isVisible && <div className={styles.notifications_panel}></div>}
+    </div>
   );
 };

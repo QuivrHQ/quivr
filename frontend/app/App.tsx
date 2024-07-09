@@ -17,6 +17,7 @@ import {
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 import { ChatsProvider } from "@/lib/context/ChatsProvider";
 import { MenuProvider } from "@/lib/context/MenuProvider/Menu-provider";
+import { NotificationsProvider } from "@/lib/context/NotificationsProvider/notifications-provider";
 import { OnboardingProvider } from "@/lib/context/OnboardingProvider/Onboarding-provider";
 import { SearchModalProvider } from "@/lib/context/SearchModalProvider/search-modal-provider";
 import { useSupabase } from "@/lib/context/SupabaseProvider";
@@ -90,17 +91,19 @@ const AppWithQueryClient = ({ children }: PropsWithChildren): JSX.Element => {
         <BrainProvider>
           <KnowledgeToFeedProvider>
             <BrainCreationProvider>
-              <MenuProvider>
-                <OnboardingProvider>
-                  <FromConnectionsProvider>
-                    <ChatsProvider>
-                      <ChatProvider>
-                        <App>{children}</App>
-                      </ChatProvider>
-                    </ChatsProvider>
-                  </FromConnectionsProvider>
-                </OnboardingProvider>
-              </MenuProvider>
+              <NotificationsProvider>
+                <MenuProvider>
+                  <OnboardingProvider>
+                    <FromConnectionsProvider>
+                      <ChatsProvider>
+                        <ChatProvider>
+                          <App>{children}</App>
+                        </ChatProvider>
+                      </ChatsProvider>
+                    </FromConnectionsProvider>
+                  </OnboardingProvider>
+                </MenuProvider>
+              </NotificationsProvider>
             </BrainCreationProvider>
           </KnowledgeToFeedProvider>
         </BrainProvider>
