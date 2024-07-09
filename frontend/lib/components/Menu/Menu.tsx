@@ -13,6 +13,7 @@ import styles from "./Menu.module.scss";
 import { AnimatedDiv } from "./components/AnimationDiv";
 import { DiscussionButton } from "./components/DiscussionButton/DiscussionButton";
 import { HomeButton } from "./components/HomeButton/HomeButton";
+import { NotificationsButton } from "./components/NotificationsButton/NotificationsButton";
 import { ProfileButton } from "./components/ProfileButton/ProfileButton";
 import { SocialsButtons } from "./components/SocialsButtons/SocialsButtons";
 import { StudioButton } from "./components/StudioButton/StudioButton";
@@ -72,6 +73,7 @@ export const Menu = (): JSX.Element => {
               <div className={styles.block}>
                 <DiscussionButton />
                 <HomeButton />
+                <NotificationsButton />
                 <StudioButton />
                 <ThreadsButton />
               </div>
