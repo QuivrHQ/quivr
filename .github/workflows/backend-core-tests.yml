@@ -7,6 +7,7 @@ on:
   pull_request:
     paths:
       - 'backend/core/**'
+  workflow_dispatch:
 
 jobs:
   test:
@@ -19,9 +20,9 @@ jobs:
           - 9998:9998
         options: >-
           --health-cmd="curl --fail http://localhost:9998/tika" 
-          --health-interval=10s 
-          --health-timeout=5s 
-          --health-retries=5
+          --health-interval=30s 
+          --health-timeout=10s 
+          --health-retries=10
 
     steps:
     - name: Checkout code
