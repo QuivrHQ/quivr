@@ -1,23 +1,16 @@
-from pydantic import BaseModel, field_validator
+from pydantic import BaseModel
+
+
+class LLMEndpointConfig(BaseModel):
+    model: str = "gpt-3.5-turbo-0125"
+    llm_base_url: str | None = None
+    llm_api_key: str | None = None
+    max_input: int = 2000
+    max_tokens: int = 2000
+    streaming: bool = True
 
 
 class RAGConfig(BaseModel):
-    model: str = "gpt-3.5-turbo-0125"  # pyright: ignore reportPrivateUsage=none
-    temperature: float = 0.7
-    max_input: int = 2000
-    max_tokens: int | None = 2000
-    streaming: bool = False
+    llm_config: LLMEndpointConfig = LLMEndpointConfig()
     max_files: int = 20
     prompt: str | None = None
-
-    @field_validator("temperature", mode="before")
-    def set_default_temperature(cls, v):
-        if v is None:
-            return 0.1
-        return v
-
-    @field_validator("max_tokens", mode="before")
-    def set_default_max_tokens(cls, v):
-        if v is None:
-            return 2000
-        return v

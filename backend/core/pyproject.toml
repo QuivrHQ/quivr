@@ -33,6 +33,7 @@ pytest-cov = "^5.0.0"
 [tool.poetry.group.test.dependencies]
 pytest-asyncio = "^0.23.7"
 pytest = "^8.2.2"
+pytest-xdist = "^3.6.1"
 
 
 [tool.mypy]

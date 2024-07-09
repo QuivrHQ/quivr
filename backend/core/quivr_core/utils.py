@@ -1,5 +1,5 @@
 import logging
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List, Tuple, no_type_check
 
 from langchain.schema import (
     AIMessage,
@@ -108,6 +108,7 @@ def get_chunk_metadata(
 
 # TODO: CONVOLUTED LOGIC !
 # TODO(@aminediro): redo this
+@no_type_check
 def parse_chunk_response(
     gathered_msg: AIMessageChunk,
     raw_chunk: dict[str, Any],
@@ -140,6 +141,7 @@ def parse_chunk_response(
         )
 
 
+@no_type_check
 def parse_response(raw_response: RawRAGResponse, model_name: str) -> ParsedRAGResponse:
     answer = raw_response["answer"].content
     sources = raw_response["docs"] or []
