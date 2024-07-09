@@ -30,8 +30,7 @@ jobs:
         id: release
         uses: google-github-actions/release-please-action@v4
         with:
-          manifest-file: backend/core/.release-please-manifest.json
-          config-file: backend/core/release-please-config.json
+          path: backend/core
           token: ${{ secrets.RELEASE_PLEASE_TOKEN }}
        
 
