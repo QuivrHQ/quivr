@@ -1,0 +1,45 @@
+name: release-please-core
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  release-please:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0 # Fetch all history for tags and releases
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install Poetry
+        run: |
+          curl -sSL https://install.python-poetry.org | python3 -
+          export PATH="$HOME/.local/bin:$PATH"
+          poetry --version
+
+      - name: Configure Poetry
+        run: |
+          poetry config virtualenvs.in-project true
+          cd backend/core
+          poetry install
+
+      - name: Run release-please
+        uses: google-github-actions/release-please-action@v3
+        with:
+          release-type: manifest
+          manifest-file: release-please-config.json
+          path: backend/core
+          token: ${{ secrets.RELEASE_PLEASE_TOKEN }}
