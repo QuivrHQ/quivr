@@ -1,0 +1,13 @@
+{
+    "packages": {
+        "backend/core": {
+            "release-type": "python",
+            "package-name": "core",
+            "bump-patch-for-minor-pre-major": true,
+            "changelog-notes-type": "github",
+            "include-v-in-tag": false,
+            "tag-separator": "-",
+            "component": "core"
+        }
+    }
+}
