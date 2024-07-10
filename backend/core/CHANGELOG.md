@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.0.5](https://github.com/QuivrHQ/quivr/compare/core-0.0.4...core-0.0.5) (2024-07-10)
+
+
+### Features
+
+* Add GitHub Actions workflow for running tests on backend/core ([#2820](https://github.com/QuivrHQ/quivr/issues/2820)) ([82292f3](https://github.com/QuivrHQ/quivr/commit/82292f30acf982bbf28c1ef928440086fa342a04))
+* Add GitHub Actions workflow for running tests on backend/core ([#2822](https://github.com/QuivrHQ/quivr/issues/2822)) ([1566040](https://github.com/QuivrHQ/quivr/commit/15660409a37af8df3c58a3f396614817c9f4641b))
+* quivr core chat history ([#2824](https://github.com/QuivrHQ/quivr/issues/2824)) ([847e161](https://github.com/QuivrHQ/quivr/commit/847e161d804421e60eb246f35bf51b7ffd88f3a2))
+
 ## [0.0.4](https://github.com/QuivrHQ/quivr/compare/core-0.0.3...core-0.0.4) (2024-07-09)
 
 
