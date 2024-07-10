@@ -1,11 +1,17 @@
+import { useEffect } from "react";
+
 import { MenuButton } from "@/lib/components/Menu/components/MenuButton/MenuButton";
 import { useNotificationsContext } from "@/lib/context/NotificationsProvider/hooks/useNotificationsContext";
 
 import styles from "./NotificationsButton.module.scss";
 
 export const NotificationsButton = (): JSX.Element => {
-  const { isVisible, setIsVisible, unreadNotifications } =
+  const { isVisible, setIsVisible, unreadNotifications, updateNotifications } =
     useNotificationsContext();
+
+  useEffect(() => {
+    void updateNotifications();
+  }, []);
 
   return (
     <div className={styles.button_wrapper}>

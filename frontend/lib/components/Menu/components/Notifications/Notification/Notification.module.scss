@@ -3,7 +3,7 @@
 @use "styles/Typography.module.scss";
 
 .notification_wrapper {
-  padding: Spacings.$spacing03;
+  padding-block: Spacings.$spacing04;
   display: flex;
   flex-direction: column;
   gap: Spacings.$spacing02;
@@ -28,15 +28,9 @@
       gap: Spacings.$spacing02;
       overflow: hidden;
 
-      .badge {
-        min-width: 6px;
-        min-height: 6px;
-        border-radius: Radius.$circle;
-        background-color: var(--primary-0);
-      }
-
       .title {
         @include Typography.EllipsisOverflow;
+        font-size: Typography.$small;
       }
     }
 

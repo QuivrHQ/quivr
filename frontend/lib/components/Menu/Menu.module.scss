@@ -56,10 +56,13 @@
 }
 
 .notifications_panel {
-  width: 300px;
+  width: 400px;
   position: absolute;
   top: Variables.$pageHeaderHeight;
-  height: calc(100% - Variables.$pageHeaderHeight);
+  min-height: calc(100% - Variables.$pageHeaderHeight);
+  max-height: calc(100% - Variables.$pageHeaderHeight);
+  overflow: scroll;
   left: 231px;
   z-index: ZIndexes.$overlay;
+  border-right: 1px solid var(--border-1);
 }

@@ -5,7 +5,7 @@ import { useSupabase } from "@/lib/context/SupabaseProvider";
 
 import styles from "./Notification.module.scss";
 
-import { NotificationType } from "../../types/types";
+import { NotificationType } from "../../../types/types";
 
 interface NotificationProps {
   notification: NotificationType;
@@ -42,7 +42,6 @@ export const Notification = ({
     >
       <div className={styles.header}>
         <div className={styles.left}>
-          {!notification.read && <div className={styles.badge}></div>}
           <span className={styles.title}>{notification.title}</span>
         </div>
         <div className={styles.icons}>
@@ -50,14 +49,14 @@ export const Notification = ({
             name={notification.read ? "unread" : "read"}
             color="black"
             handleHover={true}
-            size="normal"
+            size="small"
             onClick={() => readNotif()}
           />
           <Icon
             name="delete"
             color="black"
             handleHover={true}
-            size="normal"
+            size="small"
             onClick={() => deleteNotif()}
           />
         </div>
