@@ -89,3 +89,7 @@ backend/.env.test
 **/*.egg-info
 
 .coverage
+backend/core/examples/chatbot/.files/*
+backend/core/examples/chatbot/.python-version
+backend/core/examples/chatbot/.chainlit/config.toml
+backend/core/examples/chatbot/.chainlit/translations/en-US.json
