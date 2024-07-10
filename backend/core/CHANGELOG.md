@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.6](https://github.com/QuivrHQ/quivr/compare/core-0.0.5...core-0.0.6) (2024-07-10)
+
+
+### Features
+
+* quivr-core ask streaming ([#2828](https://github.com/QuivrHQ/quivr/issues/2828)) ([0658d49](https://github.com/QuivrHQ/quivr/commit/0658d4947c10f512d2ec2bdcfb70f089ab003a5c))
+
 ## [0.0.5](https://github.com/QuivrHQ/quivr/compare/core-0.0.4...core-0.0.5) (2024-07-10)
 
 

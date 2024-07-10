@@ -59,19 +59,6 @@ def test_brain_from_files_success(fake_llm: LLMEndpoint, embedder, temp_data_fil
 
 
 @pytest.mark.asyncio
-async def test_brain_ask_txt(fake_llm: LLMEndpoint, embedder, temp_data_file, answers):
-    brain = await Brain.afrom_files(
-        name="test_brain", file_paths=[temp_data_file], embedder=embedder, llm=fake_llm
-    )
-    answer = brain.ask("question")
-
-    assert answer.answer == answers[1]
-    assert answer.metadata is not None
-    assert answer.metadata.sources is not None
-    assert answer.metadata.sources[0].metadata["source"] == str(temp_data_file)
-
-
-@pytest.mark.asyncio
 async def test_brain_from_langchain_docs(embedder):
     chunk = Document("content_1", metadata={"id": uuid4()})
     brain = await Brain.afrom_langchain_documents(
@@ -110,3 +97,18 @@ async def test_brain_get_history(
     brain.ask("question")
 
     assert len(brain.default_chat) == 4
+
+
+@pytest.mark.asyncio
+async def test_brain_ask_streaming(
+    fake_llm: LLMEndpoint, embedder, temp_data_file, answers
+):
+    brain = await Brain.afrom_files(
+        name="test_brain", file_paths=[temp_data_file], embedder=embedder, llm=fake_llm
+    )
+
+    response = ""
+    async for chunk in brain.ask_streaming("question"):
+        response += chunk.answer
+
+    assert response == answers[1]
