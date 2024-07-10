@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.7](https://github.com/QuivrHQ/quivr/compare/core-0.0.6...core-0.0.7) (2024-07-10)
+
+
+### Bug Fixes
+
+* llm model name ([#2830](https://github.com/QuivrHQ/quivr/issues/2830)) ([71d6cd9](https://github.com/QuivrHQ/quivr/commit/71d6cd9b6b381226a172a09c07a0a084d7efbc22))
+
 ## [0.0.6](https://github.com/QuivrHQ/quivr/compare/core-0.0.5...core-0.0.6) (2024-07-10)
 
 
