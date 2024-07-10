@@ -56,12 +56,10 @@
 }
 
 .notifications_panel {
-  width: 200px;
-  background-color: red;
+  width: 300px;
   position: absolute;
   top: Variables.$pageHeaderHeight;
   height: calc(100% - Variables.$pageHeaderHeight);
   left: 231px;
   z-index: ZIndexes.$overlay;
-  opacity: 0.2;
 }

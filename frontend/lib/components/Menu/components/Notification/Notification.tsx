@@ -5,7 +5,7 @@ import { useSupabase } from "@/lib/context/SupabaseProvider";
 
 import styles from "./Notification.module.scss";
 
-import { NotificationType } from "../types/types";
+import { NotificationType } from "../../types/types";
 
 interface NotificationProps {
   notification: NotificationType;

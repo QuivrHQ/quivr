@@ -1,8 +1,6 @@
-import { createContext, useEffect, useState } from "react";
+import { createContext, useState } from "react";
 
-import { NotificationType } from "@/lib/components/PageHeader/Notifications/types/types";
-
-import { useSupabase } from "../SupabaseProvider";
+import { NotificationType } from "@/lib/components/Menu/types/types";
 
 type NotificationsContextType = {
   isVisible: boolean;
@@ -25,43 +23,6 @@ export const NotificationsProvider = ({
   const [isVisible, setIsVisible] = useState(false);
   const [notifications, setNotifications] = useState<NotificationType[]>([]);
   const [unreadNotifications, setUnreadNotifications] = useState<number>(0);
-  const { supabase } = useSupabase();
-
-  const updateNotifications = async () => {
-    try {
-      let notifs = (await supabase.from("notifications").select()).data;
-      if (notifs) {
-        notifs = notifs.sort(
-          (a: NotificationType, b: NotificationType) =>
-            new Date(b.datetime).getTime() - new Date(a.datetime).getTime()
-        );
-      }
-      console.info(notifs);
-      setNotifications(notifs ?? []);
-      setUnreadNotifications(
-        notifs?.filter((n: NotificationType) => !n.read).length ?? 0
-      );
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-  useEffect(() => {
-    const channel = supabase
-      .channel("notifications")
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "notifications" },
-        () => {
-          void updateNotifications();
-        }
-      )
-      .subscribe();
-
-    return () => {
-      void supabase.removeChannel(channel);
-    };
-  }, []);
 
   return (
     <NotificationsContext.Provider

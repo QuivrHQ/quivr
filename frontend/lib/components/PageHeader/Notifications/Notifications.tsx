@@ -4,8 +4,8 @@ import { useSupabase } from "@/lib/context/SupabaseProvider";
 
 import { Notification } from "./Notification/Notification";
 import styles from "./Notifications.module.scss";
-import { NotificationType } from "./types/types";
 
+import { NotificationType } from "../../Menu/types/types";
 import { Icon } from "../../ui/Icon/Icon";
 import { TextButton } from "../../ui/TextButton/TextButton";
 
@@ -65,29 +65,6 @@ export const Notifications = (): JSX.Element => {
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, []);
-
-  useEffect(() => {
-    const channel = supabase
-      .channel("notifications")
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "notifications" },
-        () => {
-          void updateNotifications();
-        }
-      )
-      .subscribe();
-
-    return () => {
-      void supabase.removeChannel(channel);
-    };
-  }, []);
-
-  useEffect(() => {
-    void (async () => {
-      await updateNotifications();
-    })();
   }, []);
 
   return (
