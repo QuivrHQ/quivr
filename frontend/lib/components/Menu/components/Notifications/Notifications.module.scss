@@ -7,33 +7,20 @@
 .notifications_wrapper {
   position: relative;
   z-index: ZIndexes.$overlay;
-  padding-inline: Spacings.$spacing06;
-
-  .badge {
-    position: absolute;
-    color: var(--white-0);
-    background-color: var(--dangerous-dark);
-    border-radius: Radius.$normal;
-    width: 16px;
-    height: 16px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: Typography.$very_tiny;
-    top: -(Spacings.$spacing03);
-    right: -(Spacings.$spacing02);
-  }
 
   .notifications_panel_header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    border-bottom: 1px solid var(--border-2);
     font-size: Typography.$small;
-    padding: Spacings.$spacing03;
+    padding-inline: Spacings.$spacing05;
+    padding-top: Spacings.$spacing03;
+    padding-bottom: Spacings.$spacing05;
 
     .title {
       color: var(--text-2);
+      font-size: Typography.$small;
+      font-weight: 500;
     }
 
     .buttons {

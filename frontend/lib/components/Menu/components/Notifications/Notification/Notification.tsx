@@ -42,6 +42,7 @@ export const Notification = ({
     >
       <div className={styles.header}>
         <div className={styles.left}>
+          {!notification.read && <div className={styles.badge}></div>}
           <span className={styles.title}>{notification.title}</span>
         </div>
         <div className={styles.icons}>

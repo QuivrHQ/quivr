@@ -14,13 +14,20 @@ export const NotificationsButton = (): JSX.Element => {
   }, []);
 
   return (
-    <div className={styles.button_wrapper}>
+    <div
+      className={styles.button_wrapper}
+      onClick={(event) => {
+        setIsVisible(!isVisible);
+        event.preventDefault();
+        event.nativeEvent.stopImmediatePropagation();
+      }}
+      id="notifications-button"
+    >
       <MenuButton
         label="Notifications"
         iconName="notifications"
         type="open"
         color="primary"
-        onClick={() => setIsVisible(!isVisible)}
       />
       {!!unreadNotifications && (
         <span className={styles.badge}>

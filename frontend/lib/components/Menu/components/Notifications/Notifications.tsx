@@ -37,8 +37,9 @@ export const Notifications = (): JSX.Element => {
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as Node;
       const panel = document.getElementById("notifications-panel");
+      const button = document.getElementById("notifications-button");
 
-      if (!panel?.contains(target)) {
+      if (!panel?.contains(target) && !button?.contains(target)) {
         setIsVisible(false);
       }
     };
@@ -61,6 +62,7 @@ export const Notifications = (): JSX.Element => {
               color="black"
               onClick={() => void markAllAsRead()}
               disabled={unreadNotifications === 0}
+              small={true}
             />
             <span>|</span>
             <TextButton
@@ -68,6 +70,7 @@ export const Notifications = (): JSX.Element => {
               color="black"
               onClick={() => void deleteAllNotifications()}
               disabled={notifications.length === 0}
+              small={true}
             />
           </div>
         </div>
