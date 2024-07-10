@@ -1,8 +1,4 @@
-import Link from "next/link";
-import { useEffect, useState } from "react";
-
 import { useMenuContext } from "@/lib/context/MenuProvider/hooks/useMenuContext";
-import { useUserSettingsContext } from "@/lib/context/UserSettingsProvider/hooks/useUserSettingsContext";
 import { ButtonType } from "@/lib/types/QuivrButton";
 
 import styles from "./PageHeader.module.scss";
@@ -22,16 +18,6 @@ export const PageHeader = ({
   buttons,
 }: Props): JSX.Element => {
   const { isOpened } = useMenuContext();
-  const { isDarkMode, setIsDarkMode } = useUserSettingsContext();
-  const [lightModeIconName, setLightModeIconName] = useState("sun");
-
-  const toggleTheme = () => {
-    setIsDarkMode(!isDarkMode);
-  };
-
-  useEffect(() => {
-    setLightModeIconName(isDarkMode ? "sun" : "moon");
-  }, [isDarkMode]);
 
   return (
     <div className={styles.page_header_wrapper}>
@@ -50,21 +36,6 @@ export const PageHeader = ({
             hidden={button.hidden}
           />
         ))}
-        <Link href="/user">
-          <Icon
-            name="settings"
-            color="black"
-            handleHover={true}
-            size="normal"
-          />
-        </Link>
-        <Icon
-          name={lightModeIconName}
-          color="black"
-          handleHover={true}
-          size="normal"
-          onClick={toggleTheme}
-        />
       </div>
     </div>
   );
