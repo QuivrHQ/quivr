@@ -11,7 +11,7 @@ from langchain.schema import (
 from langchain_core.messages.ai import AIMessageChunk
 
 from quivr_core.models import (
-    GetChatHistoryOutput,
+    ChatMessage,
     ParsedRAGChunkResponse,
     ParsedRAGResponse,
     QuivrKnowledge,
@@ -44,7 +44,7 @@ def model_supports_function_calling(model_name: str):
 
 
 def format_chat_history(
-    history: List[GetChatHistoryOutput],
+    history: List[ChatMessage],
 ) -> List[Dict[str, str]]:
     """Format the chat history into a list of HumanMessage and AIMessage"""
     formatted_history = []

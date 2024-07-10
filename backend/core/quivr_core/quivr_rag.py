@@ -5,11 +5,13 @@ from typing import AsyncGenerator, Optional, Sequence
 from langchain.retrievers import ContextualCompressionRetriever
 from langchain_core.callbacks import Callbacks
 from langchain_core.documents import BaseDocumentCompressor, Document
+from langchain_core.messages import AIMessage, HumanMessage
 from langchain_core.messages.ai import AIMessageChunk
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.runnables import RunnableLambda, RunnablePassthrough
 from langchain_core.vectorstores import VectorStore
 
+from quivr_core.chat import ChatHistory
 from quivr_core.config import RAGConfig
 from quivr_core.llm import LLMEndpoint
 from quivr_core.models import (
@@ -59,7 +61,8 @@ class QuivrQARAG:
         return self.vector_store.as_retriever()
 
     def filter_history(
-        self, chat_history, max_history: int = 10, max_tokens: int = 2000
+        self,
+        chat_history: ChatHistory,
     ):
         """
         Filter out the chat history to only include the messages that are relevant to the current question
@@ -68,29 +71,23 @@ class QuivrQARAG:
         Returns a filtered chat_history with in priority: first max_tokens, then max_history where a Human message and an AI message count as one pair
         a token is 4 characters
         """
-        chat_history = chat_history[::-1]
         total_tokens = 0
         total_pairs = 0
-        filtered_chat_history = []
-        for i in range(0, len(chat_history), 2):
-            if i + 1 < len(chat_history):
-                human_message = chat_history[i]
-                ai_message = chat_history[i + 1]
-                message_tokens = (
-                    len(human_message.content) + len(ai_message.content)
-                ) // 4
-                if (
-                    total_tokens + message_tokens > max_tokens
-                    or total_pairs >= max_history
-                ):
-                    break
-                filtered_chat_history.append(human_message)
-                filtered_chat_history.append(ai_message)
-                total_tokens += message_tokens
-                total_pairs += 1
-        chat_history = filtered_chat_history[::-1]
+        filtered_chat_history: list[AIMessage | HumanMessage] = []
+        for human_message, ai_message in chat_history.iter_pairs():
+            # TODO: replace with tiktoken
+            message_tokens = (len(human_message.content) + len(ai_message.content)) // 4
+            if (
+                total_tokens + message_tokens > self.rag_config.llm_config.max_tokens
+                or total_pairs >= self.rag_config.max_history
+            ):
+                break
+            filtered_chat_history.append(human_message)
+            filtered_chat_history.append(ai_message)
+            total_tokens += message_tokens
+            total_pairs += 1
 
-        return chat_history
+        return filtered_chat_history[::-1]
 
     def build_chain(self, files: str):
         compression_retriever = ContextualCompressionRetriever(
@@ -146,7 +143,7 @@ class QuivrQARAG:
     def answer(
         self,
         question: str,
-        history: list[dict[str, str]],
+        history: ChatHistory,
         list_files: list[QuivrKnowledge],
         metadata: dict[str, str] = {},
     ) -> ParsedRAGResponse:
@@ -166,7 +163,7 @@ class QuivrQARAG:
     async def answer_astream(
         self,
         question: str,
-        history: list[dict[str, str]],
+        history: ChatHistory,
         list_files: list[QuivrKnowledge],
         metadata: dict[str, str] = {},
     ) -> AsyncGenerator[ParsedRAGChunkResponse, ParsedRAGChunkResponse]:

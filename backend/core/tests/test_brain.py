@@ -46,7 +46,7 @@ def test_brain_from_files_success(llm: LLMEndpoint, embedder, temp_data_file):
         name="test_brain", file_paths=[temp_data_file], embedder=embedder, llm=llm
     )
     assert brain.name == "test_brain"
-    assert brain.chat_history == []
+    assert len(brain.chat_history) == 0
     assert brain.llm == llm
     assert brain.vector_db.embeddings == embedder
     # storage
