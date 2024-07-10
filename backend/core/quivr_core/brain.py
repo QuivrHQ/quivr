@@ -1,7 +1,7 @@
 import asyncio
 import logging
 from pathlib import Path
-from typing import Any, Callable, Dict, Mapping, Self
+from typing import Any, AsyncGenerator, Callable, Dict, Mapping, Self
 from uuid import UUID, uuid4
 
 from langchain_core.documents import Document
@@ -12,7 +12,7 @@ from langchain_core.vectorstores import VectorStore
 from quivr_core.chat import ChatHistory
 from quivr_core.config import LLMEndpointConfig, RAGConfig
 from quivr_core.llm import LLMEndpoint
-from quivr_core.models import ParsedRAGResponse, SearchResult
+from quivr_core.models import ParsedRAGChunkResponse, ParsedRAGResponse, SearchResult
 from quivr_core.processor.default_parsers import DEFAULT_PARSERS
 from quivr_core.processor.processor_base import ProcessorBase
 from quivr_core.quivr_rag import QuivrQARAG
@@ -283,3 +283,36 @@ class Brain:
 
         # Save answer to the chat history
         return parsed_response
+
+    async def ask_streaming(
+        self,
+        question: str,
+        rag_config: RAGConfig | None = None,
+    ) -> AsyncGenerator[ParsedRAGChunkResponse, ParsedRAGChunkResponse]:
+        llm = self.llm
+
+        # If you passed a different llm model we'll override the brain  one
+        if rag_config:
+            if rag_config.llm_config != self.llm.get_config():
+                llm = LLMEndpoint.from_config(config=rag_config.llm_config)
+        else:
+            rag_config = RAGConfig(llm_config=self.llm.get_config())
+
+        rag_pipeline = QuivrQARAG(
+            rag_config=rag_config, llm=llm, vector_store=self.vector_db
+        )
+
+        chat_history = self.default_chat
+
+        # TODO: List of files
+        full_answer = ""
+        async for response in rag_pipeline.answer_astream(question, chat_history, []):
+            # Format output to be correct servicedf;j
+            if not response.last_chunk:
+                yield response
+            full_answer += response.answer
+
+        # TODO : add sources, metdata etc  ...
+        chat_history.append(HumanMessage(content=question))
+        chat_history.append(AIMessage(content=full_answer))
+        yield response
