@@ -65,6 +65,7 @@ import {
 import { LiaFileVideo, LiaRobotSolid } from "react-icons/lia";
 import { IconType } from "react-icons/lib";
 import {
+  LuArrowLeftFromLine,
   LuBrain,
   LuBrainCircuit,
   LuChevronDown,
@@ -144,6 +145,7 @@ export const iconList: { [name: string]: IconType } = {
   graph: VscGraph,
   hashtag: RiHashtag,
   help: IoIosHelpCircleOutline,
+  hide: LuArrowLeftFromLine,
   history: MdHistory,
   home: IoHomeOutline,
   html: BsFiletypeHtml,

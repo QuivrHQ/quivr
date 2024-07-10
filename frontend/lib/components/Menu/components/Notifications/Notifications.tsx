@@ -1,8 +1,10 @@
 import { useEffect } from "react";
 
+import Icon from "@/lib/components/ui/Icon/Icon";
 import TextButton from "@/lib/components/ui/TextButton/TextButton";
 import { useNotificationsContext } from "@/lib/context/NotificationsProvider/hooks/useNotificationsContext";
 import { useSupabase } from "@/lib/context/SupabaseProvider";
+import { useDevice } from "@/lib/hooks/useDevice";
 
 import { Notification } from "./Notification/Notification";
 import styles from "./Notifications.module.scss";
@@ -15,6 +17,7 @@ export const Notifications = (): JSX.Element => {
     setIsVisible,
   } = useNotificationsContext();
   const { supabase } = useSupabase();
+  const { isMobile } = useDevice();
 
   const deleteAllNotifications = async () => {
     for (const notification of notifications) {
@@ -55,7 +58,18 @@ export const Notifications = (): JSX.Element => {
     <div id="notifications-panel" className={styles.notifications_wrapper}>
       <div className={styles.notifications_panel}>
         <div className={styles.notifications_panel_header}>
-          <span className={styles.title}>Notifications</span>
+          <div className={styles.left}>
+            {isMobile && (
+              <Icon
+                name="hide"
+                size="small"
+                handleHover={true}
+                color="black"
+                onClick={() => setIsVisible(false)}
+              />
+            )}
+            <span className={styles.title}>Notifications</span>
+          </div>
           <div className={styles.buttons}>
             <TextButton
               label="Mark all as read"

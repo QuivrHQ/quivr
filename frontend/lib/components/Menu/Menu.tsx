@@ -56,7 +56,11 @@ export const Menu = (): JSX.Element => {
   return (
     <div>
       <MotionConfig transition={{ mass: 1, damping: 10, duration: 0.1 }}>
-        <div className={styles.menu_container}>
+        <div
+          className={`${styles.menu_container} ${
+            !isOpened ? styles.hidden : ""
+          }`}
+        >
           <AnimatedDiv>
             <div className={styles.menu_wrapper}>
               <div

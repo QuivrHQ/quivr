@@ -17,10 +17,16 @@
     padding-top: Spacings.$spacing03;
     padding-bottom: Spacings.$spacing05;
 
-    .title {
-      color: var(--text-2);
-      font-size: Typography.$small;
-      font-weight: 500;
+    .left {
+      display: flex;
+      align-items: center;
+      gap: Spacings.$spacing03;
+
+      .title {
+        color: var(--text-2);
+        font-size: Typography.$small;
+        font-weight: 500;
+      }
     }
 
     .buttons {
