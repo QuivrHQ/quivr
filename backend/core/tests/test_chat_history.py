@@ -66,9 +66,12 @@ def test_chat_history_iter_pairs_invalid(
 
 def test_chat_history_iter_pais(ai_message: AIMessage, human_message: HumanMessage):
     chat_history = ChatHistory(uuid4(), uuid4())
+
+    chat_history.append(human_message)
     chat_history.append(ai_message)
     chat_history.append(human_message)
+    chat_history.append(ai_message)
 
     result = list(chat_history.iter_pairs())
 
-    assert result == [(human_message, ai_message)]
+    assert result == [(human_message, ai_message), (human_message, ai_message)]

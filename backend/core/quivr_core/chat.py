@@ -44,7 +44,7 @@ class ChatHistory:
     def iter_pairs(self) -> Generator[Tuple[HumanMessage, AIMessage], None, None]:
         # Reverse the chat_history, newest first
         it = iter(self.get_chat_history(newest_first=True))
-        for human_message, ai_message in zip(it, it):
+        for ai_message, human_message in zip(it, it):
             assert isinstance(human_message.msg, HumanMessage)
             assert isinstance(ai_message.msg, AIMessage)
             yield (human_message.msg, ai_message.msg)
