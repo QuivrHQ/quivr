@@ -52,6 +52,12 @@ async def main(message: cl.Message):
         await cl.Message(content="Please upload a file first.").send()
         return
 
-    answer = brain.ask(message.content)
+    # Prepare the message for streaming
+    msg = cl.Message(content="")
+    await msg.send()
 
-    await cl.Message(content=answer.answer).send()
+    # Use the ask_stream method for streaming responses
+    async for chunk in brain.ask_streaming(message.content):
+        await msg.stream_token(chunk.answer)
+
+    await msg.send()

@@ -1,4 +1,4 @@
-quivr-core==0.0.5
+quivr-core==0.0.6
 langchain-community==0.2.6
 faiss-cpu==1.8.0
 langchain-openai==0.1.14
