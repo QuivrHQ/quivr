@@ -1,0 +1,65 @@
+name: release-please-core
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  release-please:
+    runs-on: ubuntu-latest
+    outputs:
+      release_created: ${{ steps.release.outputs['backend/core--release_created'] }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0 # Fetch all history for tags and releases
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Run release-please
+        id: release
+        uses: google-github-actions/release-please-action@v4
+        with:
+          path: backend/core
+          token: ${{ secrets.RELEASE_PLEASE_TOKEN }}
+       
+
+  deploy:
+    if: needs.release-please.outputs.release_created == 'true'
+    needs: release-please
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend/core
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v3
+        with:
+          python-version: '3.11'
+      - name: Check working directory
+        run: pwd
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install poetry
+      - name: Install project dependencies
+        run: poetry install
+      - name: Build package
+        run: poetry build
+      - name: Publish package
+        uses: pypa/gh-action-pypi-publish@27b31702a0e7fc50959f5ad993c78deac1bdfc29
+        with:
+          user: __token__
+          password: ${{ secrets.PYPI_API_TOKEN }}
+          packages_dir: backend/core/dist

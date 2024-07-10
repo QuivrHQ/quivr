@@ -1,5 +1,5 @@
 import logging
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List, Tuple, no_type_check
 
 from langchain.schema import (
     AIMessage,
@@ -11,7 +11,7 @@ from langchain.schema import (
 from langchain_core.messages.ai import AIMessageChunk
 
 from quivr_core.models import (
-    GetChatHistoryOutput,
+    ChatMessage,
     ParsedRAGChunkResponse,
     ParsedRAGResponse,
     QuivrKnowledge,
@@ -44,7 +44,7 @@ def model_supports_function_calling(model_name: str):
 
 
 def format_chat_history(
-    history: List[GetChatHistoryOutput],
+    history: List[ChatMessage],
 ) -> List[Dict[str, str]]:
     """Format the chat history into a list of HumanMessage and AIMessage"""
     formatted_history = []
@@ -108,6 +108,7 @@ def get_chunk_metadata(
 
 # TODO: CONVOLUTED LOGIC !
 # TODO(@aminediro): redo this
+@no_type_check
 def parse_chunk_response(
     gathered_msg: AIMessageChunk,
     raw_chunk: dict[str, Any],
@@ -140,6 +141,7 @@ def parse_chunk_response(
         )
 
 
+@no_type_check
 def parse_response(raw_response: RawRAGResponse, model_name: str) -> ParsedRAGResponse:
     answer = raw_response["answer"].content
     sources = raw_response["docs"] or []

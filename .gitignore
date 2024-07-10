@@ -87,3 +87,5 @@ backend/modules/sync/controller/credentials.json
 backend/.env.test
 
 **/*.egg-info
+
+.coverage
