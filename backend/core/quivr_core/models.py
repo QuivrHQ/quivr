@@ -3,6 +3,7 @@ from typing import Any
 from uuid import UUID
 
 from langchain_core.documents import Document
+from langchain_core.messages import AIMessage, HumanMessage
 from langchain_core.pydantic_v1 import BaseModel as BaseModelV1
 from langchain_core.pydantic_v1 import Field as FieldV1
 from pydantic import BaseModel
@@ -33,17 +34,13 @@ class cited_answer(BaseModelV1):
     )
 
 
-class GetChatHistoryOutput(BaseModel):
+class ChatMessage(BaseModelV1):
     chat_id: UUID
     message_id: UUID
-    user_message: str
+    brain_id: UUID
+    msg: AIMessage | HumanMessage
     message_time: datetime
-    assistant: str | None = None
-    prompt_title: str | None = None
-    brain_name: str | None = None
-    brain_id: UUID | None = None  # string because UUID is not JSON serializable
-    metadata: dict | None = None
-    thumbs: bool | None = None
+    metadata: dict[str, Any]
 
 
 class Source(BaseModel):

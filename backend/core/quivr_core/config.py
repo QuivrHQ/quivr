@@ -12,5 +12,6 @@ class LLMEndpointConfig(BaseModel):
 
 class RAGConfig(BaseModel):
     llm_config: LLMEndpointConfig = LLMEndpointConfig()
+    max_history: int = 10
     max_files: int = 20
     prompt: str | None = None
