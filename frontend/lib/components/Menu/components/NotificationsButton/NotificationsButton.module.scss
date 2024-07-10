@@ -1,0 +1,31 @@
+@use "styles/Radius.module.scss";
+@use "styles/Spacings.module.scss";
+@use "styles/Typography.module.scss";
+
+.button_wrapper {
+  display: flex;
+  gap: Spacings.$spacing02;
+  align-items: center;
+  border-radius: Radius.$normal;
+  justify-content: space-between;
+  padding-right: Spacings.$spacing03;
+  cursor: pointer;
+
+  .badge {
+    color: var(--white-0);
+    background-color: var(--dangerous-dark);
+    border-radius: Radius.$normal;
+    width: 18px;
+    height: 18px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: Typography.$very_tiny;
+    top: -(Spacings.$spacing03);
+    right: -(Spacings.$spacing02);
+  }
+
+  &:hover {
+    background-color: var(--background-3);
+  }
+}

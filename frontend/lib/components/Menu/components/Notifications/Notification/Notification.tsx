@@ -5,7 +5,7 @@ import { useSupabase } from "@/lib/context/SupabaseProvider";
 
 import styles from "./Notification.module.scss";
 
-import { NotificationType } from "../types/types";
+import { NotificationType } from "../../../types/types";
 
 interface NotificationProps {
   notification: NotificationType;
@@ -50,14 +50,14 @@ export const Notification = ({
             name={notification.read ? "unread" : "read"}
             color="black"
             handleHover={true}
-            size="normal"
+            size="small"
             onClick={() => readNotif()}
           />
           <Icon
             name="delete"
             color="black"
             handleHover={true}
-            size="normal"
+            size="small"
             onClick={() => deleteNotif()}
           />
         </div>

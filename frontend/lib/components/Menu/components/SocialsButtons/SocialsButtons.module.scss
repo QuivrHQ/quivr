@@ -3,5 +3,12 @@
 .socials_buttons_wrapper {
   display: flex;
   gap: Spacings.$spacing05;
-  justify-content: center;
+  justify-content: space-between;
+  padding-inline: Spacings.$spacing06;
+
+  .left {
+    display: flex;
+    gap: Spacings.$spacing05;
+    justify-content: center;
+  }
 }
