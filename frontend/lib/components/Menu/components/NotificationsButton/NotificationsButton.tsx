@@ -2,12 +2,31 @@ import { useEffect } from "react";
 
 import { MenuButton } from "@/lib/components/Menu/components/MenuButton/MenuButton";
 import { useNotificationsContext } from "@/lib/context/NotificationsProvider/hooks/useNotificationsContext";
+import { useSupabase } from "@/lib/context/SupabaseProvider";
 
 import styles from "./NotificationsButton.module.scss";
 
 export const NotificationsButton = (): JSX.Element => {
   const { isVisible, setIsVisible, unreadNotifications, updateNotifications } =
     useNotificationsContext();
+  const { supabase } = useSupabase();
+
+  useEffect(() => {
+    const channel = supabase
+      .channel("notifications")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "notifications" },
+        () => {
+          void updateNotifications();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      void supabase.removeChannel(channel);
+    };
+  }, []);
 
   useEffect(() => {
     void updateNotifications();
