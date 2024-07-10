@@ -22,7 +22,7 @@ class LLMEndpoint:
             from langchain_openai import ChatOpenAI
 
             _llm = ChatOpenAI(
-                name=config.model,
+                model=config.model,
                 api_key=SecretStr(config.llm_api_key) if config.llm_api_key else None,
                 base_url=config.llm_base_url,
             )

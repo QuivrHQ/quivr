@@ -24,6 +24,17 @@ def test_llm_endpoint_from_config_default():
     assert llm._llm.model_name in llm.get_config().model
 
 
+def test_llm_endpoint_from_config():
+    config = LLMEndpointConfig(
+        model="llama2", llm_api_key="test", llm_base_url="http://localhost:8441"
+    )
+    llm = LLMEndpoint.from_config(config)
+
+    assert not llm.supports_func_calling()
+    assert isinstance(llm._llm, ChatOpenAI)
+    assert llm._llm.model_name in llm.get_config().model
+
+
 def test_llm_endpoint_constructor():
     llm_endpoint = FakeListChatModel(responses=[])
     llm_endpoint = LLMEndpoint(
