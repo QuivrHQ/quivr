@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.0.8](https://github.com/QuivrHQ/quivr/compare/core-0.0.7...core-0.0.8) (2024-07-11)
+
+
+### Features
+
+* Add Quivr chatbot example ([#2827](https://github.com/QuivrHQ/quivr/issues/2827)) ([5ff8d4e](https://github.com/QuivrHQ/quivr/commit/5ff8d4ee81cdc5a2cf375a6b7709beb44da2b911))
+* Update aiofiles dependency to loosen version control ([#2834](https://github.com/QuivrHQ/quivr/issues/2834)) ([5e75d15](https://github.com/QuivrHQ/quivr/commit/5e75d155976dd710c65f9431e942cdeec9bd6424))
+
 ## [0.0.7](https://github.com/QuivrHQ/quivr/compare/core-0.0.6...core-0.0.7) (2024-07-10)
 
 
