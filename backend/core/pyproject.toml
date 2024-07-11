@@ -7,7 +7,7 @@ readme = "README.md"
 repository = "https://github.com/QuivrHQ/quivr"
 
 [tool.poetry.dependencies]
-python = "^3.11"
+python = ">=3.11,<4.0"
 pydantic = "^2.7.4"
 langchain-core = "^0.2.10"
 httpx = "^0.27.0"

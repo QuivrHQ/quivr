@@ -6,6 +6,9 @@
     "docker:pinDigests",
     "helpers:pinGitHubActionDigests"
   ],
+  "fileMatch": [
+    "(^|/)pyproject\\.toml$"
+  ],
   "includePaths": [
     "backend/core/**",
     "backend/api/**"
@@ -36,5 +39,8 @@
   "prConcurrentLimit": 5,
   "minimumReleaseAge": "3 days",
   "prCreation": "not-pending",
-  "dependencyDashboard": true
+  "dependencyDashboard": true,
+  "ignoreDeps": [
+    "requirements.txt"
+  ]
 }
