@@ -32,7 +32,7 @@
 
   &.disabled {
     border-color: var(--border-2);
-    pointer-events: none;
+    cursor: default;
     color: var(--text-1);
     background-color: var(--background-0);
 

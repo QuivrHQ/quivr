@@ -10,6 +10,7 @@ export interface UserStats {
   current_brain_size: number;
   monthly_chat_credit: number;
   requests_stats: RequestStat[];
+  max_brains: number;
   date: string;
   models: string[];
   is_premium: boolean;

@@ -25,6 +25,7 @@ export const AddBrainModal = (): JSX.Element => {
     isBrainCreationModalOpened,
     setIsBrainCreationModalOpened,
     setCurrentSelectedBrain,
+    setCreating,
   } = useBrainCreationContext();
   const { setCurrentSyncId, setOpenedConnections } =
     useFromConnectionsContext();
@@ -43,6 +44,7 @@ export const AddBrainModal = (): JSX.Element => {
   useEffect(() => {
     setCurrentSelectedBrain(undefined);
     setCurrentSyncId(undefined);
+    setCreating(false);
     setOpenedConnections([]);
     methods.reset(defaultValues);
     removeAllKnowledgeToFeed();
