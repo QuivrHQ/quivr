@@ -21,7 +21,7 @@
       "rangeStrategy": "widen"
     },
     {
-      "matchPaths": [
+      "matchFileNames": [
         "backend/api/**"
       ],
       "matchManagers": [
@@ -34,7 +34,7 @@
     "enabled": true
   },
   "prConcurrentLimit": 5,
-  "stabilityDays": 3,
+  "minimumReleaseAge": "3 days",
   "prCreation": "not-pending",
   "dependencyDashboard": true
 }
