@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "quivr-core"
-version = "0.0.7"
+version = "0.0.8"
 description = "Quivr core RAG package"
 authors = []
 readme = "README.md"
