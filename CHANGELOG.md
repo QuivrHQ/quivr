@@ -1,5 +1,37 @@
 # Changelog
 
+## 0.0.281 (2024-07-11)
+
+## What's Changed
+* feat: quivr core minimal chat by @AmineDiro in https://github.com/QuivrHQ/quivr/pull/2803
+* chore: Add release-please-core workflow and configuration files by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2809
+* chore(main): release core 0.0.2 by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2812
+* chore(main): release core 0.0.2 by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2813
+* chore(main): release core 0.0.2 by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2814
+* chore(main): release core 0.0.2 by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2815
+* fix(pyproject): fixed to quivr github by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2816
+* chore(main): release core 0.0.3 by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2817
+* feat: quivr core minimal chat by @AmineDiro in https://github.com/QuivrHQ/quivr/pull/2818
+* chore(main): release core 0.0.4 by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2819
+* feat: Add GitHub Actions workflow for running tests on backend/core by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2820
+* feat: Add GitHub Actions workflow for running tests on backend/core by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2822
+* feat(precommit): Update pre-commit hooks to latest versions by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2823
+* feat: quivr core chat history by @AmineDiro in https://github.com/QuivrHQ/quivr/pull/2824
+* chore(main): release core 0.0.5 by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2821
+* feat(frontend): UI / UX Notifications by @Zewed in https://github.com/QuivrHQ/quivr/pull/2826
+* feat: quivr-core ask streaming by @AmineDiro in https://github.com/QuivrHQ/quivr/pull/2828
+* chore(main): release core 0.0.6 by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2829
+* fix: llm model name by @AmineDiro in https://github.com/QuivrHQ/quivr/pull/2830
+* chore(main): release core 0.0.7 by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2831
+* feat: Add Quivr chatbot example by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2827
+* feat(renovate): updated configuration by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2835
+* feat: Update aiofiles dependency to loosen version control by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2834
+* chore(main): release core 0.0.8 by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2832
+* chore: Update quivr-core and chainlit versions in requirements.txt by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2836
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.280...v0.0.281
+
 ## 0.0.280 (2024-07-09)
 
 ## What's Changed
