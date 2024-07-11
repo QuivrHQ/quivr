@@ -18,7 +18,6 @@ from quivr_api.modules.upload.service.generate_file_signed_url import (
     generate_file_signed_url,
 )
 from quivr_api.packages.quivr_core.models import (
-    ParsedRAGChunkResponse,
     ParsedRAGResponse,
     RAGResponseMetadata,
     RawRAGResponse,
@@ -83,6 +82,7 @@ def get_prev_message_str(msg: AIMessageChunk) -> str:
         cited_answer = next(x for x in msg.tool_calls if cited_answer_filter(x))
         if "args" in cited_answer and "answer" in cited_answer["args"]:
             return cited_answer["args"]["answer"]
+
     return ""
 
 
@@ -117,11 +117,9 @@ def parse_chunk_response(
     gathered_msg: AIMessageChunk,
     raw_chunk: dict[str, Any],
     supports_func_calling: bool,
-) -> Tuple[AIMessageChunk, ParsedRAGChunkResponse]:
+) -> Tuple[AIMessageChunk, str]:
     # Init with sources
     answer_str = ""
-    # Get the previously parsed answer
-    prev_answer = get_prev_message_str(gathered_msg)
 
     if supports_func_calling:
         gathered_msg += raw_chunk["answer"]
@@ -133,16 +131,10 @@ def parse_chunk_response(
                 gathered_args = cited_answer["args"]
                 if "answer" in gathered_args:
                     # Only send the difference between answer and response_tokens which was the previous answer
-                    gathered_answer = gathered_args["answer"]
-                    answer_str: str = gathered_answer[len(prev_answer) :]
-
-        return gathered_msg, ParsedRAGChunkResponse(
-            answer=answer_str, metadata=RAGResponseMetadata()
-        )
+                    answer_str = gathered_args["answer"]
+        return gathered_msg, answer_str
     else:
-        return gathered_msg, ParsedRAGChunkResponse(
-            answer=raw_chunk["answer"].content, metadata=RAGResponseMetadata()
-        )
+        return gathered_msg, raw_chunk["answer"].content
 
 
 def parse_response(raw_response: RawRAGResponse, model_name: str) -> ParsedRAGResponse:
@@ -165,6 +157,7 @@ def parse_response(raw_response: RawRAGResponse, model_name: str) -> ParsedRAGRe
                 metadata["thoughts"] = thoughts
             answer = raw_response["answer"].tool_calls[-1]["args"]["answer"]
 
+    breakpoint()
     parsed_response = ParsedRAGResponse(
         answer=answer, metadata=RAGResponseMetadata(**metadata)
     )
