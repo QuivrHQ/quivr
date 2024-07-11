@@ -160,7 +160,6 @@ async def update_chat_message(
     )
 
     if str(current_user.id) != str(chat.user_id):
-        print("hdsqkjlhgfldkqsgkqsgdqgh")
         raise HTTPException(
             status_code=403,  # pyright: ignore reportPrivateUsage=none
             detail="You should be the owner of the chat to update it.",  # pyright: ignore reportPrivateUsage=none
