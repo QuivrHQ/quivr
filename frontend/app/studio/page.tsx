@@ -47,6 +47,8 @@ const Studio = (): JSX.Element => {
         setIsBrainCreationModalOpened(true);
       },
       iconName: "brain",
+      tooltip:
+        "You have reached the maximum number of brains allowed. Please upgrade your plan or delete some brains to create a new one.",
     },
     {
       label: "Add knowledge",
