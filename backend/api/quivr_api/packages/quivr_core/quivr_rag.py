@@ -235,6 +235,11 @@ class QuivrQARAG:
                     )
                     prev_answer += diff_answer
                     yield parsed_chunk
+                else:
+                    yield ParsedRAGChunkResponse(
+                        answer=answer_str,
+                        metadata=RAGResponseMetadata(),
+                    )
 
         # Last chunk provides metadata
         yield ParsedRAGChunkResponse(
