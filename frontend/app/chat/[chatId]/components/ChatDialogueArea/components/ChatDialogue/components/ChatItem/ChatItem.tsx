@@ -14,8 +14,6 @@ export const ChatItem = ({
   lastMessage,
 }: ChatItemProps): JSX.Element => {
   if (content.item_type === "MESSAGE") {
-    console.info(content.body);
-
     return (
       <QADisplay
         content={content.body}
