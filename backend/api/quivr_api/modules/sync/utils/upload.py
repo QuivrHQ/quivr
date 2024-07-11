@@ -1,4 +1,5 @@
 import os
+from typing import Optional
 from uuid import UUID
 
 from fastapi import HTTPException, UploadFile
@@ -98,5 +99,6 @@ async def upload_file(
         file_original_name=upload_file.filename,
         brain_id=brain_id,
         notification_id=upload_notification.id,
+        knowledge_id=added_knowledge.id,
     )
     return {"message": "File processing has started."}

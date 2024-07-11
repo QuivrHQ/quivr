@@ -67,7 +67,7 @@ class GoogleSyncUtils(BaseModel):
         for file in files:
             logger.info("🔥🔥🔥🔥: %s", file)
             try:
-                file_id = file["id"]
+                file_id = str(file["id"])
                 file_name = file["name"]
                 mime_type = file["mime_type"]
                 modified_time = file["last_modified"]

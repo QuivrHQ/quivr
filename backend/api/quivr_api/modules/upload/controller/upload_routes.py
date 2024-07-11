@@ -108,12 +108,13 @@ async def upload_file(
         )[-1].lower(),
     )
 
-    knowledge_service.add_knowledge(knowledge_to_add)
+    knowledge = knowledge_service.add_knowledge(knowledge_to_add)
 
     process_file_and_notify.delay(
         file_name=filename_with_brain_id,
         file_original_name=uploadFile.filename,
         brain_id=brain_id,
         notification_id=upload_notification.id,
+        knowledge_id=knowledge.id,
     )
     return {"message": "File processing has started."}
