@@ -1,3 +1,4 @@
+import uuid
 from datetime import datetime, timedelta, timezone
 from io import BytesIO
 
@@ -61,6 +62,8 @@ class GoogleSyncUtils(BaseModel):
 
         service = build("drive", "v3", credentials=creds)
         downloaded_files = []
+
+        bulk_id = uuid.uuid4()
         for file in files:
             logger.info("🔥🔥🔥🔥: %s", file)
             try:
@@ -140,7 +143,7 @@ class GoogleSyncUtils(BaseModel):
                 supported = False
                 if (existing_file and existing_file.supported) or not existing_file:
                     supported = True
-                    await upload_file(to_upload_file, brain_id, current_user)  # type: ignore
+                    await upload_file(to_upload_file, brain_id, current_user, bulk_id)  # type: ignore
 
                 if existing_file:
                     # Update the existing file record

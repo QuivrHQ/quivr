@@ -16,6 +16,7 @@ class NotificationsStatusEnum(str, Enum):
 class Notification(BaseModel):
     id: UUID
     user_id: UUID
+    bulk_id: Optional[UUID] = None
     status: NotificationsStatusEnum
     title: str
     description: Optional[str]

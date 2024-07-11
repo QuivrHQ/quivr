@@ -12,6 +12,7 @@ class CreateNotification(BaseModel):
     status: NotificationsStatusEnum
     title: str
     description: Optional[str] = None
+    bulk_id: Optional[UUID] = None
 
     def model_dump(self, *args, **kwargs):
         notification_dict = super().model_dump(*args, **kwargs)

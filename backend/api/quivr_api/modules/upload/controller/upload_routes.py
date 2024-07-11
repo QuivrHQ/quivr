@@ -41,6 +41,7 @@ async def healthz():
 @upload_router.post("/upload", dependencies=[Depends(AuthBearer())], tags=["Upload"])
 async def upload_file(
     uploadFile: UploadFile,
+    bulk_id: Optional[UUID] = Query(None, description="The ID of the bulk upload"),
     brain_id: UUID = Query(..., description="The ID of the brain"),
     chat_id: Optional[UUID] = Query(None, description="The ID of the chat"),
     current_user: UserIdentity = Depends(get_current_user),
@@ -57,8 +58,9 @@ async def upload_file(
     upload_notification = notification_service.add_notification(
         CreateNotification(
             user_id=current_user.id,
+            bulk_id=bulk_id,
             status=NotificationsStatusEnum.INFO,
-            title=f"Processing File {uploadFile.filename}",
+            title=f"{uploadFile.filename}",
         )
     )
 

@@ -30,6 +30,7 @@ async def upload_file(
     upload_file: UploadFile,
     brain_id: UUID,
     current_user: str,
+    bulk_id: Optional[UUID] = None,
 ):
     validate_brain_authorization(
         brain_id, current_user, [RoleEnum.Editor, RoleEnum.Owner]
@@ -40,8 +41,9 @@ async def upload_file(
     upload_notification = notification_service.add_notification(
         CreateNotification(
             user_id=current_user,
+            bulk_id=bulk_id,
             status=NotificationsStatusEnum.INFO,
-            title=f"Processing File {upload_file.filename}",
+            title=f"{upload_file.filename}",
         )
     )
 
