@@ -14,7 +14,7 @@ httpx = "^0.27.0"
 faiss-cpu = { version = "^1.8.0.post1", optional = true }
 langchain-community = { version = "^0.2.6", optional = true }
 langchain-openai = { version = "^0.1.14", optional = true }
-aiofiles = "^24.1.0"
+aiofiles = ">=23.0.0,<25.0.0"
 
 [tool.poetry.extras]
 base = ["langchain-community", "faiss-cpu", "langchain-openai"]
