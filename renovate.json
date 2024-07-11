@@ -4,7 +4,37 @@
   "extends": [
     "config:recommended",
     "docker:pinDigests",
-    "helpers:pinGitHubActionDigests",
-    ":pinDevDependencies"
-  ]
+    "helpers:pinGitHubActionDigests"
+  ],
+  "includePaths": [
+    "backend/core/**",
+    "backend/api/**"
+  ],
+  "packageRules": [
+    {
+      "matchManagers": [
+        "poetry"
+      ],
+      "matchPackagePatterns": [
+        "*"
+      ],
+      "rangeStrategy": "widen"
+    },
+    {
+      "matchFileNames": [
+        "backend/api/**"
+      ],
+      "matchManagers": [
+        "poetry"
+      ],
+      "rangeStrategy": "pin"
+    }
+  ],
+  "poetry": {
+    "enabled": true
+  },
+  "prConcurrentLimit": 5,
+  "minimumReleaseAge": "3 days",
+  "prCreation": "not-pending",
+  "dependencyDashboard": true
 }
