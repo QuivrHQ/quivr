@@ -8,7 +8,7 @@ from google.auth.transport.requests import Request as GoogleRequest
 from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
 from quivr_api.logger import get_logger
-from quivr_api.modules.sync.entity.sync import GoogleDriveFile
+from quivr_api.modules.sync.entity.sync import SyncFile
 from quivr_api.modules.sync.utils.normalize import remove_special_characters
 from requests import HTTPError
 
@@ -17,7 +17,7 @@ logger = get_logger(__name__)
 
 def get_google_drive_files_by_id(
     credentials: dict, file_ids: List[str]
-) -> List[GoogleDriveFile]:
+) -> List[SyncFile]:
     """
     Retrieve files from Google Drive by their IDs.
 
@@ -36,7 +36,7 @@ def get_google_drive_files_by_id(
 
     try:
         service = build("drive", "v3", credentials=creds)
-        files: List[GoogleDriveFile] = []
+        files: List[SyncFile] = []
 
         for file_id in file_ids:
             result = (
@@ -49,7 +49,7 @@ def get_google_drive_files_by_id(
             )
 
             files.append(
-                GoogleDriveFile(
+                SyncFile(
                     name=result["name"],
                     id=result["id"],
                     is_folder=(
@@ -72,7 +72,7 @@ def get_google_drive_files_by_id(
 
 def get_google_drive_files(
     credentials: dict, folder_id: str = None, recursive: bool = False
-) -> List[GoogleDriveFile]:
+) -> List[SyncFile]:
     """
     Retrieve files from Google Drive.
 
@@ -98,7 +98,7 @@ def get_google_drive_files(
         else:
             query = "'root' in parents or sharedWithMe"
         page_token = None
-        files: List[GoogleDriveFile] = []
+        files: List[SyncFile] = []
 
         while True:
             results = (
@@ -119,7 +119,7 @@ def get_google_drive_files(
 
             for item in items:
                 files.append(
-                    GoogleDriveFile(
+                    SyncFile(
                         name=item["name"],
                         id=item["id"],
                         is_folder=(
@@ -216,6 +216,7 @@ def list_azure_files(credentials, folder_id=None, recursive=False):
         )
 
     items = fetch_files(endpoint, headers)
+    logger.debug("!!!!!! The items returned are ", items)
 
     if not items:
         logger.info("No files found in Azure Drive")
@@ -223,24 +224,25 @@ def list_azure_files(credentials, folder_id=None, recursive=False):
 
     files = []
     for item in items:
-        file_data = {
-            "name": item["name"],
-            "id": item["id"],
-            "is_folder": "folder" in item,
-            "last_modified": item["lastModifiedDateTime"],
-            "mime_type": item.get("file", {}).get("mimeType", "folder"),
-        }
+        file_data = SyncFile(
+            name=item.get("name"),
+            id=item.get("id"),
+            is_folder="folder" in item,
+            last_modified=item.get("lastModifiedDateTime"),
+            mime_type=item.get("file", {}).get("mimeType", "folder"),
+            web_view_link=item.get("webUrl"),
+        )
         files.append(file_data)
 
         # If recursive option is enabled and the item is a folder, fetch files from it
-        if recursive and file_data["is_folder"]:
+        if recursive and file_data.is_folder:
             folder_files = list_azure_files(
-                credentials, folder_id=file_data["id"], recursive=True
+                credentials, folder_id=file_data.id, recursive=True
             )
 
             files.extend(folder_files)
     for file in files:
-        file["name"] = remove_special_characters(file["name"])
+        file.name = remove_special_characters(file.name)
     logger.info("Azure Drive files retrieved successfully: %s", len(files))
     return files
 
@@ -277,16 +279,17 @@ def get_azure_files_by_id(credentials: dict, file_ids: List[str]):
 
         result = response.json()
         files.append(
-            {
-                "name": result["name"],
-                "id": result["id"],
-                "is_folder": "folder" in result,
-                "last_modified": result["lastModifiedDateTime"],
-                "mime_type": result.get("file", {}).get("mimeType", "folder"),
-            }
+            SyncFile(
+                name=result.get("name"),
+                id=result.get("id"),
+                is_folder="folder" in result,
+                last_modified=result.get("lastModifiedDateTime"),
+                mime_type=result.get("file", {}).get("mimeType", "folder"),
+                web_view_link=result.get("webUrl"),
+            )
         )
 
     for file in files:
-        file["name"] = remove_special_characters(file["name"])
+        file.name = remove_special_characters(file.name)
     logger.info("Azure Drive files retrieved successfully: %s", len(files))
     return files

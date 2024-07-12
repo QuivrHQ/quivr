@@ -11,7 +11,7 @@ class SyncsUser(BaseModel):
     provider: str
 
 
-class GoogleDriveFile(BaseModel):
+class SyncFile(BaseModel):
     name: str
     id: str
     is_folder: bool

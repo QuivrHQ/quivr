@@ -16,7 +16,7 @@ from quivr_api.modules.sync.dto.inputs import (
     SyncFileUpdateInput,
     SyncsActiveUpdateInput,
 )
-from quivr_api.modules.sync.entity.sync import GoogleDriveFile
+from quivr_api.modules.sync.entity.sync import SyncFile
 from quivr_api.modules.sync.repository.sync_files import SyncFiles
 from quivr_api.modules.sync.service.sync_service import SyncService, SyncUserService
 from quivr_api.modules.sync.utils.list_files import (
@@ -40,7 +40,7 @@ class GoogleSyncUtils(BaseModel):
     async def _upload_files(
         self,
         credentials: dict,
-        files: List[GoogleDriveFile],
+        files: List[SyncFile],
         current_user: str,
         brain_id: str,
         sync_active_id: int,
@@ -285,8 +285,8 @@ class GoogleSyncUtils(BaseModel):
         settings = sync_active.get("settings", {})
         folders = settings.get("folders", [])
         files_to_download = settings.get("files", [])
-        files: List[GoogleDriveFile] = []
-        files_metadata: List[GoogleDriveFile] = []
+        files: List[SyncFile] = []
+        files_metadata: List[SyncFile] = []
         if len(folders) > 0:
             for folder in folders:
                 folder_files = get_google_drive_files(
