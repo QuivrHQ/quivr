@@ -1,12 +1,11 @@
 from uuid import uuid4
 
 import pytest
-from quivr_api.packages.quivr_core.models import RAGResponseMetadata
 
 from quivr_core.chat import ChatHistory
 from quivr_core.config import LLMEndpointConfig, RAGConfig
 from quivr_core.llm import LLMEndpoint
-from quivr_core.models import ParsedRAGChunkResponse
+from quivr_core.models import ParsedRAGChunkResponse, RAGResponseMetadata
 from quivr_core.quivr_rag import QuivrQARAG
 
 
