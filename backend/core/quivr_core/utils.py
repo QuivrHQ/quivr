@@ -1,18 +1,16 @@
 import logging
-from typing import Any, Dict, List, Tuple, no_type_check
+from typing import Any, List, Tuple, no_type_check
 
-from langchain.schema import (
+from langchain_core.messages import (
     AIMessage,
     BaseMessage,
     HumanMessage,
     SystemMessage,
-    format_document,
 )
 from langchain_core.messages.ai import AIMessageChunk
+from langchain_core.prompts import format_document
 
 from quivr_core.models import (
-    ChatMessage,
-    ParsedRAGChunkResponse,
     ParsedRAGResponse,
     QuivrKnowledge,
     RAGResponseMetadata,
@@ -43,19 +41,6 @@ def model_supports_function_calling(model_name: str):
     return model_name in models_supporting_function_calls
 
 
-def format_chat_history(
-    history: List[ChatMessage],
-) -> List[Dict[str, str]]:
-    """Format the chat history into a list of HumanMessage and AIMessage"""
-    formatted_history = []
-    for chat in history:
-        if chat.user_message:
-            formatted_history.append(HumanMessage(content=chat.user_message))
-        if chat.assistant:
-            formatted_history.append(AIMessage(content=chat.assistant))
-    return formatted_history
-
-
 def format_history_to_openai_mesages(
     tuple_history: List[Tuple[str, str]], system_message: str, question: str
 ) -> List[BaseMessage]:
@@ -71,14 +56,6 @@ def format_history_to_openai_mesages(
 
 def cited_answer_filter(tool):
     return tool["name"] == "cited_answer"
-
-
-def get_prev_message_str(msg: AIMessageChunk) -> str:
-    if msg.tool_calls:
-        cited_answer = next(x for x in msg.tool_calls if cited_answer_filter(x))
-        if "args" in cited_answer and "answer" in cited_answer["args"]:
-            return cited_answer["args"]["answer"]
-    return ""
 
 
 def get_chunk_metadata(
@@ -106,39 +83,39 @@ def get_chunk_metadata(
     return RAGResponseMetadata(**metadata)
 
 
+def get_prev_message_str(msg: AIMessageChunk) -> str:
+    if msg.tool_calls:
+        cited_answer = next(x for x in msg.tool_calls if cited_answer_filter(x))
+        if "args" in cited_answer and "answer" in cited_answer["args"]:
+            return cited_answer["args"]["answer"]
+    return ""
+
+
 # TODO: CONVOLUTED LOGIC !
 # TODO(@aminediro): redo this
 @no_type_check
 def parse_chunk_response(
-    gathered_msg: AIMessageChunk,
+    rolling_msg: AIMessageChunk,
     raw_chunk: dict[str, Any],
     supports_func_calling: bool,
-) -> Tuple[AIMessageChunk, ParsedRAGChunkResponse]:
+) -> Tuple[AIMessageChunk, str]:
     # Init with sources
     answer_str = ""
-    # Get the previously parsed answer
-    prev_answer = get_prev_message_str(gathered_msg)
 
+    rolling_msg += raw_chunk["answer"]
     if supports_func_calling:
-        gathered_msg += raw_chunk["answer"]
-        if gathered_msg.tool_calls:
+        if rolling_msg.tool_calls:
             cited_answer = next(
-                x for x in gathered_msg.tool_calls if cited_answer_filter(x)
+                x for x in rolling_msg.tool_calls if cited_answer_filter(x)
             )
             if "args" in cited_answer:
                 gathered_args = cited_answer["args"]
                 if "answer" in gathered_args:
                     # Only send the difference between answer and response_tokens which was the previous answer
-                    gathered_answer = gathered_args["answer"]
-                    answer_str: str = gathered_answer[len(prev_answer) :]
-
-        return gathered_msg, ParsedRAGChunkResponse(
-            answer=answer_str, metadata=RAGResponseMetadata()
-        )
+                    answer_str = gathered_args["answer"]
+        return rolling_msg, answer_str
     else:
-        return gathered_msg, ParsedRAGChunkResponse(
-            answer=raw_chunk["answer"].content, metadata=RAGResponseMetadata()
-        )
+        return rolling_msg, raw_chunk["answer"].content
 
 
 @no_type_check

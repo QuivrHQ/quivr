@@ -245,7 +245,7 @@ class Brain:
             query, k=n_results, filter=filter, fetch_k=fetch_n_neighbors
         )
 
-        return [SearchResult(chunk=d, score=s) for d, s in result]
+        return [SearchResult(chunk=d, distance=s) for d, s in result]
 
     def get_chat_history(self, chat_id: UUID):
         return self._chats[chat_id]
