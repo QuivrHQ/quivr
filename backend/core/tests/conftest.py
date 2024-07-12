@@ -31,7 +31,7 @@ def chunks_stream_answer():
     return chunks
 
 
-@pytest.fixture(scope="session", autouse=True)
+@pytest.fixture(autouse=True)
 def openai_api_key():
     os.environ["OPENAI_API_KEY"] = "abcd"
 

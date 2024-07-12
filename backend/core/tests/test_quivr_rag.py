@@ -23,10 +23,13 @@ def mock_chain_qa_stream(monkeypatch, chunks_stream_answer):
 
 
 @pytest.mark.asyncio
-async def test_quivrqarag(mem_vector_store, mock_chain_qa_stream, full_response):
-    rag_config = RAGConfig(llm_config=LLMEndpointConfig(model="gpt-4o"))
-
-    llm = LLMEndpoint.from_config(rag_config.llm_config)
+async def test_quivrqarag(
+    mem_vector_store, full_response, mock_chain_qa_stream, openai_api_key
+):
+    # Making sure the model
+    llm_config = LLMEndpointConfig(model="gpt-4o")
+    llm = LLMEndpoint.from_config(llm_config)
+    rag_config = RAGConfig(llm_config=llm_config)
     chat_history = ChatHistory(uuid4(), uuid4())
     rag_pipeline = QuivrQARAG(
         rag_config=rag_config, llm=llm, vector_store=mem_vector_store
