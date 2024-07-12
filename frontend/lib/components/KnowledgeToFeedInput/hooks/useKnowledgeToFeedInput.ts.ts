@@ -62,6 +62,7 @@ export const useKnowledgeToFeedInput = () => {
           brainId,
           formData,
           chat_id,
+          bulk_id: brainId,
         });
       } catch (e: unknown) {
         const errorParams = getAxiosErrorParams(e);
