@@ -10,14 +10,10 @@ import { useSupabase } from "../SupabaseProvider";
 type NotificationsContextType = {
   isVisible: boolean;
   setIsVisible: React.Dispatch<React.SetStateAction<boolean>>;
-  notifications: NotificationType[];
-  setNotifications: React.Dispatch<React.SetStateAction<NotificationType[]>>;
   bulkNotifications: BulkNotification[];
   setBulkNotifications: React.Dispatch<
     React.SetStateAction<BulkNotification[]>
   >;
-  unreadNotifications: number;
-  setUnreadNotifications: React.Dispatch<React.SetStateAction<number>>;
   updateNotifications: () => Promise<void>;
 };
 
@@ -31,11 +27,9 @@ export const NotificationsProvider = ({
   children: React.ReactNode;
 }): JSX.Element => {
   const [isVisible, setIsVisible] = useState(false);
-  const [notifications, setNotifications] = useState<NotificationType[]>([]);
   const [bulkNotifications, setBulkNotifications] = useState<
     BulkNotification[]
   >([]);
-  const [unreadNotifications, setUnreadNotifications] = useState<number>(0);
   const { supabase } = useSupabase();
 
   const updateNotifications = async () => {
@@ -47,10 +41,6 @@ export const NotificationsProvider = ({
             new Date(b.datetime).getTime() - new Date(a.datetime).getTime()
         );
       }
-      setNotifications(notifs ?? []);
-      setUnreadNotifications(
-        notifs?.filter((n: NotificationType) => !n.read).length ?? 0
-      );
 
       const bulkMap: { [key: string]: NotificationType[] } = {};
       notifs?.forEach((notif: NotificationType) => {
@@ -68,8 +58,6 @@ export const NotificationsProvider = ({
         })
       );
 
-      console.info(bulkNotifs);
-
       setBulkNotifications(bulkNotifs);
     } catch (error) {
       console.error(error);
@@ -81,12 +69,8 @@ export const NotificationsProvider = ({
       value={{
         isVisible,
         setIsVisible,
-        notifications,
-        setNotifications,
         bulkNotifications,
         setBulkNotifications,
-        unreadNotifications,
-        setUnreadNotifications,
         updateNotifications,
       }}
     >
