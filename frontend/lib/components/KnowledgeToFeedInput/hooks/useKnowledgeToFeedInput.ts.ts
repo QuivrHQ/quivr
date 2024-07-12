@@ -1,6 +1,7 @@
 import { UUID } from "crypto";
 import { useCallback } from "react";
 import { useTranslation } from "react-i18next";
+import { v4 as uuidv4 } from "uuid";
 
 import { useCrawlApi } from "@/lib/api/crawl/useCrawlApi";
 import { useUploadApi } from "@/lib/api/upload/useUploadApi";
@@ -62,7 +63,7 @@ export const useKnowledgeToFeedInput = () => {
           brainId,
           formData,
           chat_id,
-          bulk_id: brainId,
+          bulk_id: uuidv4().toString() as UUID,
         });
       } catch (e: unknown) {
         const errorParams = getAxiosErrorParams(e);
