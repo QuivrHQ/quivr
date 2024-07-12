@@ -2,6 +2,7 @@ from uuid import UUID
 
 from fastapi import HTTPException
 from quivr_api.models.settings import get_supabase_client
+from quivr_api.modules.knowledge.dto.inputs import KnowledgeStatus
 from quivr_api.modules.knowledge.dto.outputs import DeleteKnowledgeResponse
 from quivr_api.modules.knowledge.entity.knowledge import Knowledge
 from quivr_api.modules.knowledge.repository.knowledge_interface import (
@@ -111,3 +112,16 @@ class KnowledgeRepository(KnowledgeInterface):
         self.db.from_("knowledge").delete().filter(
             "brain_id", "eq", str(brain_id)
         ).execute()
+
+    def update_status_knowledge(self, knowledge_id: UUID, status: KnowledgeStatus):
+        """
+        Update the status of a knowledge
+        """
+        updated_knowledge = (
+            self.db.from_("knowledge")
+            .update({"status": status})
+            .filter("id", "eq", str(knowledge_id))
+            .execute()
+        ).data
+
+        return True

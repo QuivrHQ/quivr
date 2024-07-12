@@ -13,6 +13,8 @@ from quivr_api.models.settings import get_supabase_client, get_supabase_db
 from quivr_api.modules.brain.integrations.Notion.Notion_connector import NotionConnector
 from quivr_api.modules.brain.service.brain_service import BrainService
 from quivr_api.modules.brain.service.brain_vector_service import BrainVectorService
+from quivr_api.modules.knowledge.dto.inputs import KnowledgeStatus
+from quivr_api.modules.knowledge.service.knowledge_service import KnowledgeService
 from quivr_api.modules.notification.dto.inputs import NotificationUpdatableProperties
 from quivr_api.modules.notification.entity.notification import NotificationsStatusEnum
 from quivr_api.modules.notification.service.notification_service import (
@@ -40,6 +42,7 @@ def process_file_and_notify(
     notification_id=None,
     integration=None,
     delete_file=False,
+    knowledge_id: UUID = None,
 ):
     try:
         supabase_client = get_supabase_client()
@@ -61,6 +64,7 @@ def process_file_and_notify(
                 file_extension=file_extension,
             )
             brain_vector_service = BrainVectorService(brain_id)
+            knowledge_service = KnowledgeService()
             if delete_file:  # TODO fix bug
                 brain_vector_service.delete_file_from_brain(
                     file_original_name, only_vectors=True
@@ -80,6 +84,10 @@ def process_file_and_notify(
                         description="Your file has been properly uploaded!",
                     ),
                 )
+            if knowledge_id:
+                knowledge_service.update_status_knowledge(
+                    knowledge_id, KnowledgeStatus.UPLOADED
+                )
             brain_service.update_brain_last_update_time(brain_id)
 
             return True
@@ -96,6 +104,10 @@ def process_file_and_notify(
                 description=f"An error occurred while processing the file: {e}",
             ),
         )
+        if knowledge_id:
+            knowledge_service.update_status_knowledge(
+                knowledge_id, KnowledgeStatus.ERROR
+            )
 
 
 @celery.task(name="process_crawl_and_notify")
