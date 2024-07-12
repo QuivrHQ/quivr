@@ -1,12 +1,34 @@
+import json
 import os
 
 import pytest
 from langchain_core.embeddings import DeterministicFakeEmbedding
 from langchain_core.language_models import FakeListChatModel
+from langchain_core.messages.ai import AIMessageChunk
+from langchain_core.runnables.utils import AddableDict
 from langchain_core.vectorstores import InMemoryVectorStore
 
 from quivr_core.config import LLMEndpointConfig
 from quivr_core.llm import LLMEndpoint
+
+
+@pytest.fixture
+def full_response():
+    return "Natural Language Processing (NLP) is a field of artificial intelligence that focuses on the interaction between computers and humans through natural language. The ultimate objective of NLP is to enable computers to understand, interpret, and respond to human language in a way that is both valuable and meaningful. NLP combines computational linguistics—rule-based modeling of human language—with statistical, machine learning, and deep learning models. This combination allows computers to process human language in the form of text or voice data and to understand its full meaning, complete with the speaker or writer’s intent and sentiment. Key tasks in NLP include text and speech recognition, translation, sentiment analysis, and topic segmentation."
+
+
+@pytest.fixture
+def chunks_stream_answer():
+    with open("./tests/chunk_stream_fixture.jsonl", "r") as f:
+        raw_chunks = list(f)
+
+    chunks = []
+    for rc in raw_chunks:
+        chunk = AddableDict(**json.loads(rc))
+        if "answer" in chunk:
+            chunk["answer"] = AIMessageChunk(**chunk["answer"])
+            chunks.append(chunk)
+    return chunks
 
 
 @pytest.fixture(scope="session", autouse=True)

@@ -47,16 +47,20 @@ async def test_brain_from_langchain_docs(embedder):
 async def test_brain_search(
     embedder: Embeddings,
 ):
-    chunk = Document("content_1", metadata={"id": uuid4()})
+    chunk1 = Document("content_1", metadata={"id": uuid4()})
+    chunk2 = Document("content_2", metadata={"id": uuid4()})
     brain = await Brain.afrom_langchain_documents(
-        name="test", langchain_documents=[chunk], embedder=embedder
+        name="test", langchain_documents=[chunk1, chunk2], embedder=embedder
     )
 
-    result = await brain.asearch("content_1")
+    k = 2
+    result = await brain.asearch("content_1", n_results=k)
 
-    assert len(result) == 1
-    assert result[0].chunk == chunk
-    assert result[0].score == 0
+    assert len(result) == k
+    assert result[0].chunk == chunk1
+    assert result[1].chunk == chunk2
+    assert result[0].distance == 0
+    assert result[1].distance > result[0].distance
 
 
 @pytest.mark.asyncio
