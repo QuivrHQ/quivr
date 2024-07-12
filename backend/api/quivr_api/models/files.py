@@ -42,7 +42,8 @@ class File(BaseModel):
         """
         logger.info(f"Computing documents from file {self.file_name}")
         loader = loader_class(self.tmp_file_path)
-        documents = [loader.load()]
+        documents = []
+        documents.extend(loader.load())
 
         text_splitter = RecursiveCharacterTextSplitter.from_tiktoken_encoder(
             chunk_size=self.chunk_size, chunk_overlap=self.chunk_overlap
