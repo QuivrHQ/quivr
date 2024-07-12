@@ -18,6 +18,7 @@ export const uploadFile = async (
   props: UploadInputProps,
   axiosInstance: AxiosInstance
 ): Promise<UploadResponse> => {
+  console.info(props.bulk_id);
   let uploadUrl = `/upload?bulk_id=${props.bulk_id}&brain_id=${props.brainId}`;
   if (props.chat_id !== undefined) {
     uploadUrl = uploadUrl.concat(`&chat_id=${props.chat_id}`);

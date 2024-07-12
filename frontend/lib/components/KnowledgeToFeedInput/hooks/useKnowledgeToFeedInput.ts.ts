@@ -1,7 +1,6 @@
 import { UUID } from "crypto";
 import { useCallback } from "react";
 import { useTranslation } from "react-i18next";
-import { v4 as uuidv4 } from "uuid";
 
 import { useCrawlApi } from "@/lib/api/crawl/useCrawlApi";
 import { useUploadApi } from "@/lib/api/upload/useUploadApi";
@@ -55,7 +54,7 @@ export const useKnowledgeToFeedInput = () => {
   );
 
   const uploadFileHandler = useCallback(
-    async (file: File, brainId: UUID, chat_id?: UUID) => {
+    async (file: File, brainId: UUID, bulk_id: UUID, chat_id?: UUID) => {
       const formData = new FormData();
       formData.append("uploadFile", file);
       try {
@@ -63,7 +62,7 @@ export const useKnowledgeToFeedInput = () => {
           brainId,
           formData,
           chat_id,
-          bulk_id: uuidv4().toString() as UUID,
+          bulk_id,
         });
       } catch (e: unknown) {
         const errorParams = getAxiosErrorParams(e);
