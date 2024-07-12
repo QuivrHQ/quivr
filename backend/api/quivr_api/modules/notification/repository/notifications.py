@@ -17,7 +17,9 @@ class Notifications(NotificationInterface):
         Add a notification
         """
         response = (
-            self.db.from_("notifications").insert(notification.model_dump()).execute()
+            self.db.from_("notifications")
+            .insert(notification.model_dump(exclude_unset=True, exclude_none=True))
+            .execute()
         ).data
         return Notification(**response[0])
 
