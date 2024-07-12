@@ -4,6 +4,7 @@ from uuid import UUID
 
 from fastapi import HTTPException, UploadFile
 from quivr_api.celery_worker import process_file_and_notify
+from quivr_api.logger import get_logger
 from quivr_api.modules.brain.entity.brain_entity import RoleEnum
 from quivr_api.modules.brain.service.brain_authorization_service import (
     validate_brain_authorization,
@@ -23,6 +24,8 @@ from quivr_api.modules.user.service.user_usage import UserUsage
 from quivr_api.packages.files.file import convert_bytes, get_file_size
 from quivr_api.packages.utils.telemetry import maybe_send_telemetry
 
+logger = get_logger("upload_file")
+
 knowledge_service = KnowledgeService()
 notification_service = NotificationService()
 
@@ -32,6 +35,8 @@ async def upload_file(
     brain_id: UUID,
     current_user: str,
     bulk_id: Optional[UUID] = None,
+    integration: Optional[str] = None,
+    integration_link: Optional[str] = None,
 ):
     validate_brain_authorization(
         brain_id, current_user, [RoleEnum.Editor, RoleEnum.Owner]
@@ -39,14 +44,16 @@ async def upload_file(
     user_daily_usage = UserUsage(
         id=current_user,
     )
+    logger.debug("Uploading file in upload file")
     upload_notification = notification_service.add_notification(
         CreateNotification(
             user_id=current_user,
-            bulk_id=bulk_id,
+            bulk_id=str(bulk_id),
             status=NotificationsStatusEnum.INFO,
             title=f"{upload_file.filename}",
         )
     )
+    logger.debug("Notification Created: %s", upload_notification)
 
     user_settings = user_daily_usage.get_user_settings()
 
@@ -84,21 +91,30 @@ async def upload_file(
                 status_code=500, detail=f"Failed to upload file to storage. {e}"
             )
 
+    logger.debug("Creating Knowledge")
     knowledge_to_add = CreateKnowledgeProperties(
         brain_id=brain_id,
         file_name=upload_file.filename,
         extension=os.path.splitext(
             upload_file.filename  # pyright: ignore reportPrivateUsage=none
         )[-1].lower(),
+        integration=integration,
+        integration_link=integration_link,
     )
 
-    added_knowledge = knowledge_service.add_knowledge(knowledge_to_add)
+    logger.debug("Knowledge to add: %s", knowledge_to_add)
 
+    added_knowledge = knowledge_service.add_knowledge(knowledge_to_add)
+    logger.info("Added knowledge: %s", added_knowledge)
+
+    logger.debug("Processing file and notify")
     process_file_and_notify.delay(
         file_name=filename_with_brain_id,
         file_original_name=upload_file.filename,
-        brain_id=brain_id,
-        notification_id=upload_notification.id,
-        knowledge_id=added_knowledge.id,
+        brain_id=str(brain_id),
+        notification_id=str(upload_notification.id),
+        knowledge_id=str(added_knowledge.id),
+        integration=integration,
+        integration_link=integration_link,
     )
     return {"message": "File processing has started."}

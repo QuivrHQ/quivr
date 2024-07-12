@@ -55,6 +55,8 @@ def filter_file(
     file,
     brain_id,
     original_file_name=None,
+    integration=None,
+    integration_link=None,
 ):
     file_exists = file.file_already_exists()
     file_exists_in_brain = file.file_already_exists_in_brain(brain_id)
@@ -87,6 +89,8 @@ def filter_file(
                 file=file,
                 brain_id=brain_id,
                 original_file_name=original_file_name,
+                integration=integration,
+                integration_link=integration_link,
             )
             if result is None or result == 0:
                 return create_response(

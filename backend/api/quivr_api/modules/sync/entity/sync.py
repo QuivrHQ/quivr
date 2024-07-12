@@ -11,6 +11,15 @@ class SyncsUser(BaseModel):
     provider: str
 
 
+class GoogleDriveFile(BaseModel):
+    name: str
+    id: str
+    is_folder: bool
+    last_modified: str
+    mime_type: str
+    web_view_link: str
+
+
 class SyncsActive(BaseModel):
     id: int
     name: str

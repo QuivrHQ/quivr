@@ -41,6 +41,7 @@ def process_file_and_notify(
     brain_id,
     notification_id=None,
     integration=None,
+    integration_link=None,
     delete_file=False,
     knowledge_id: UUID = None,
 ):
@@ -195,6 +196,10 @@ def ping_telemetry():
 
 @celery.task(name="check_if_is_premium_user")
 def check_if_is_premium_user():
+    if os.getenv("DEACTIVATE_STRIPE") == "true":
+        logger.info("Stripe deactivated, skipping check for premium users")
+        return True
+
     supabase = get_supabase_db()
     supabase_db = supabase.db
 
@@ -238,7 +243,20 @@ def check_if_is_premium_user():
         supabase_db.table("product_to_features").select("*").execute()
     ).data
 
-    user_settings = (supabase_db.table("user_settings").select("*").execute()).data
+    user_settings = []
+    offset = 0
+    batch_size = 700
+    while True:
+        batch_settings = (
+            supabase_db.table("user_settings")
+            .select("*")
+            .range(offset, offset + batch_size - 1)
+            .execute()
+        ).data
+        user_settings.extend(batch_settings)
+        if len(batch_settings) < batch_size:
+            break
+        offset += batch_size
 
     # Create lookup dictionaries for faster access
     user_dict = {user["email"]: user["id"] for user in users}
