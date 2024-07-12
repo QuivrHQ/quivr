@@ -5,6 +5,11 @@ export enum NotificationStatus {
   Success = "success",
 }
 
+export interface BulkNotification {
+  notifications: NotificationType[];
+  bulk_id: string;
+}
+
 export interface NotificationType {
   id: string;
   title: string;
@@ -13,4 +18,5 @@ export interface NotificationType {
   archived: boolean;
   read: boolean;
   description: string;
+  bulk_id: string;
 }
