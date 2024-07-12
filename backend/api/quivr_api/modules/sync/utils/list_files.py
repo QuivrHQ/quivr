@@ -216,7 +216,6 @@ def list_azure_files(credentials, folder_id=None, recursive=False):
         )
 
     items = fetch_files(endpoint, headers)
-    logger.debug("!!!!!! The items returned are ", items)
 
     if not items:
         logger.info("No files found in Azure Drive")
