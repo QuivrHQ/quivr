@@ -18,6 +18,7 @@ from quivr_core.models import (
     ParsedRAGChunkResponse,
     ParsedRAGResponse,
     QuivrKnowledge,
+    RAGResponseMetadata,
     cited_answer,
 )
 from quivr_core.prompts import ANSWER_PROMPT, CONDENSE_QUESTION_PROMPT
@@ -172,6 +173,7 @@ class QuivrQARAG:
 
         rolling_message = AIMessageChunk(content="")
         sources = []
+        prev_answer = ""
 
         async for chunk in conversational_qa_chain.astream(
             {
@@ -186,21 +188,29 @@ class QuivrQARAG:
                 sources = chunk["docs"] if "docs" in chunk else []
 
             if "answer" in chunk:
-                rolling_message, parsed_chunk = parse_chunk_response(
+                rolling_message, answer_str = parse_chunk_response(
                     rolling_message,
                     chunk,
                     self.llm_endpoint.supports_func_calling(),
                 )
 
-                if (
-                    self.llm_endpoint.supports_func_calling()
-                    and len(parsed_chunk.answer) > 0
-                ):
-                    yield parsed_chunk
-                else:
-                    yield parsed_chunk
+                if len(answer_str) > 0:
+                    if self.llm_endpoint.supports_func_calling():
+                        diff_answer = answer_str[len(prev_answer) :]
+                        if len(diff_answer) > 0:
+                            parsed_chunk = ParsedRAGChunkResponse(
+                                answer=diff_answer,
+                                metadata=RAGResponseMetadata(),
+                            )
+                            prev_answer += diff_answer
+                            yield parsed_chunk
+                    else:
+                        yield ParsedRAGChunkResponse(
+                            answer=answer_str,
+                            metadata=RAGResponseMetadata(),
+                        )
 
-        # Last chunk provies
+        # Last chunk provides metadata
         yield ParsedRAGChunkResponse(
             answer="",
             metadata=get_chunk_metadata(rolling_message, sources),

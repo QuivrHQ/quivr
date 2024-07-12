@@ -90,4 +90,4 @@ class QuivrKnowledge(BaseModel):
 # NOTE: for compatibility issues with langchain <-> PydanticV1
 class SearchResult(BaseModelV1):
     chunk: Document
-    score: float
+    distance: float
