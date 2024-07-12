@@ -71,6 +71,8 @@ async def crawl_endpoint(
                 bulk_id=bulk_id,
                 status=NotificationsStatusEnum.INFO,
                 title=f"Processing Crawl {crawl_website.url}",
+                category="crawl",
+                brain_id=str(brain_id),
             )
         )
         knowledge_to_add = CreateKnowledgeProperties(
