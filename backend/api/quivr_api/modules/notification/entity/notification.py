@@ -23,3 +23,5 @@ class Notification(BaseModel):
     archived: Optional[bool] = False
     read: Optional[bool] = False
     datetime: Optional[datetime]  # timestamp
+    category: Optional[str]
+    brain_id: Optional[str]
