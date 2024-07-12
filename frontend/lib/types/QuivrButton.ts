@@ -12,4 +12,5 @@ export interface ButtonType {
   hidden?: boolean;
   important?: boolean;
   small?: boolean;
+  tooltip?: string;
 }

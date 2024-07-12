@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.0.282 (2024-07-11)
+
+## What's Changed
+* chore: Update quivr-core and chainlit versions in requirements.txt by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2839
+* chore(config): migrate renovate config by @renovate in https://github.com/QuivrHQ/quivr/pull/2838
+* fix: fixes duplicate response bug by @AmineDiro in https://github.com/QuivrHQ/quivr/pull/2843
+* fix(frontend): remove possibilities to create brain if max amount by @Zewed in https://github.com/QuivrHQ/quivr/pull/2847
+* fix(frontend): general before connections by @Zewed in https://github.com/QuivrHQ/quivr/pull/2848
+* fix(backend): thumbs button were broken by @Zewed in https://github.com/QuivrHQ/quivr/pull/2849
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.281...v0.0.282
+
 ## 0.0.281 (2024-07-11)
 
 ## What's Changed
