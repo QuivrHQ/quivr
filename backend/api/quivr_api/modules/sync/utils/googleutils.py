@@ -75,7 +75,6 @@ class GoogleSyncUtils(BaseModel):
                 modified_time = file.last_modified
                 file_url = file.web_view_link
                 # Convert Google Docs files to appropriate formats before downloading
-                logger.debug("🔥🔥🔥🔥: %s", mime_type)
                 if mime_type == "application/vnd.google-apps.document":
                     logger.debug(
                         "Converting Google Docs file with file_id: %s to DOCX.",
@@ -117,7 +116,6 @@ class GoogleSyncUtils(BaseModel):
                     "pptx",
                     "doc",
                 ]:
-                    logger.debug("Getting media")
                     request = service.files().get_media(fileId=file_id)
                 else:
                     logger.warning(
@@ -127,9 +125,7 @@ class GoogleSyncUtils(BaseModel):
                     )
                     continue
 
-                logger.debug("Getting file data")
                 file_data = request.execute()
-                logger.debug("File data: %s", len(file_data))
 
                 # Check if the file already exists in the storage
                 if check_file_exists(brain_id, file_name):
@@ -137,23 +133,19 @@ class GoogleSyncUtils(BaseModel):
                     self.storage.remove_file(brain_id + "/" + file_name)
                     BrainsVectors().delete_file_from_brain(brain_id, file_name)
 
-                logger.debug("Uploading file")
                 to_upload_file = UploadFile(
                     file=BytesIO(file_data),
                     filename=file_name,
                 )
 
-                logger.debug("Checking if the file already exists in the database")
                 # Check if the file already exists in the database
                 existing_files = self.sync_files_repo.get_sync_files(sync_active_id)
                 existing_file = next(
                     (f for f in existing_files if f.path == file_name), None
                 )
-                logger.debug("Existing file: %s", existing_file)
                 supported = False
                 if (existing_file and existing_file.supported) or not existing_file:
                     supported = True
-                    logger.debug("Uploading file")
                     await upload_file(
                         to_upload_file,
                         brain_id,

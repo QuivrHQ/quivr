@@ -44,7 +44,6 @@ async def upload_file(
     user_daily_usage = UserUsage(
         id=current_user,
     )
-    logger.debug("Uploading file in upload file")
     upload_notification = notification_service.add_notification(
         CreateNotification(
             user_id=current_user,
@@ -53,7 +52,6 @@ async def upload_file(
             title=f"{upload_file.filename}",
         )
     )
-    logger.debug("Notification Created: %s", upload_notification)
 
     user_settings = user_daily_usage.get_user_settings()
 
@@ -91,7 +89,6 @@ async def upload_file(
                 status_code=500, detail=f"Failed to upload file to storage. {e}"
             )
 
-    logger.debug("Creating Knowledge")
     knowledge_to_add = CreateKnowledgeProperties(
         brain_id=brain_id,
         file_name=upload_file.filename,
@@ -102,12 +99,8 @@ async def upload_file(
         integration_link=integration_link,
     )
 
-    logger.debug("Knowledge to add: %s", knowledge_to_add)
-
     added_knowledge = knowledge_service.add_knowledge(knowledge_to_add)
-    logger.info("Added knowledge: %s", added_knowledge)
 
-    logger.debug("Processing file and notify")
     process_file_and_notify.delay(
         file_name=filename_with_brain_id,
         file_original_name=upload_file.filename,
