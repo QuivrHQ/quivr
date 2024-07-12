@@ -227,14 +227,21 @@ class QuivrQARAG:
                     self.supports_func_calling,
                 )
 
-                if self.supports_func_calling and len(answer_str) > 0:
-                    diff_answer = answer_str[len(prev_answer) :]
-                    parsed_chunk = ParsedRAGChunkResponse(
-                        answer=diff_answer,
-                        metadata=RAGResponseMetadata(),
-                    )
-                    prev_answer += diff_answer
-                    yield parsed_chunk
+                if len(answer_str) > 0:
+                    if self.supports_func_calling:
+                        diff_answer = answer_str[len(prev_answer) :]
+                        if len(diff_answer) > 0:
+                            parsed_chunk = ParsedRAGChunkResponse(
+                                answer=diff_answer,
+                                metadata=RAGResponseMetadata(),
+                            )
+                            prev_answer += diff_answer
+                            yield parsed_chunk
+                    else:
+                        yield ParsedRAGChunkResponse(
+                            answer=answer_str,
+                            metadata=RAGResponseMetadata(),
+                        )
 
         # Last chunk provides metadata
         yield ParsedRAGChunkResponse(

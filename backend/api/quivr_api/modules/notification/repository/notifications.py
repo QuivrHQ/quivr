@@ -18,7 +18,11 @@ class Notifications(NotificationInterface):
         """
         response = (
             self.db.from_("notifications")
+<<<<<<< HEAD
             .insert(notification.model_dump(exclude_unset=True))
+=======
+            .insert(notification.model_dump(exclude_unset=True, exclude_none=True))
+>>>>>>> origin/main
             .execute()
         ).data
         return Notification(**response[0])

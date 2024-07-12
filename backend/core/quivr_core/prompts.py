@@ -1,7 +1,11 @@
 import datetime
 
-from langchain.prompts import HumanMessagePromptTemplate, SystemMessagePromptTemplate
-from langchain_core.prompts import ChatPromptTemplate, PromptTemplate
+from langchain_core.prompts import (
+    ChatPromptTemplate,
+    HumanMessagePromptTemplate,
+    PromptTemplate,
+    SystemMessagePromptTemplate,
+)
 
 # First step is to create the Rephrasing Prompt
 _template = """Given the following conversation and a follow up question, rephrase the follow up question to be a standalone question, in its original language. Keep as much details as possible from previous messages. Keep entity names and all.
