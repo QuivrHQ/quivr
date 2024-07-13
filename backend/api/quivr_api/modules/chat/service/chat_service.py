@@ -1,4 +1,3 @@
-import random
 from typing import List
 from uuid import UUID
 
@@ -51,25 +50,6 @@ class ChatService(BaseService[ChatRepository]):
         logger.info(f"Insert response {inserted_chat}")
 
         return inserted_chat
-
-    def get_follow_up_question(
-        self, brain_id: UUID | None = None, question: str = None
-    ) -> [str]:
-        follow_up = [
-            "Summarize the conversation",
-            "Explain in more detail",
-            "Explain like I'm 5",
-            "Provide a list",
-            "Give examples",
-            "Use simpler language",
-            "Elaborate on a specific point",
-            "Provide pros and cons",
-            "Break down into steps",
-            "Illustrate with an image or diagram",
-        ]
-        # Return 3 random follow up questions amongs the list
-        random3 = random.sample(follow_up, 3)
-        return random3
 
     async def add_question_and_answer(
         self, chat_id: UUID, question_and_answer: QuestionAndAnswer

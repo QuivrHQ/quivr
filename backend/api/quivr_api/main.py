@@ -7,6 +7,9 @@ from dotenv import load_dotenv  # type: ignore
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import HTMLResponse, JSONResponse
 from pyinstrument import Profiler
+from sentry_sdk.integrations.fastapi import FastApiIntegration
+from sentry_sdk.integrations.starlette import StarletteIntegration
+
 from quivr_api.logger import get_logger
 from quivr_api.middlewares.cors import add_cors_middleware
 from quivr_api.modules.analytics.controller.analytics_routes import analytics_router
@@ -17,6 +20,7 @@ from quivr_api.modules.chat.controller import chat_router
 from quivr_api.modules.contact_support.controller import contact_router
 from quivr_api.modules.knowledge.controller import knowledge_router
 from quivr_api.modules.misc.controller import misc_router
+from quivr_api.modules.models.controller.model_routes import model_router
 from quivr_api.modules.onboarding.controller import onboarding_router
 from quivr_api.modules.prompt.controller import prompt_router
 from quivr_api.modules.sync.controller import sync_router
@@ -26,8 +30,6 @@ from quivr_api.packages.utils import handle_request_validation_error
 from quivr_api.packages.utils.telemetry import maybe_send_telemetry
 from quivr_api.routes.crawl_routes import crawl_router
 from quivr_api.routes.subscription_routes import subscription_router
-from sentry_sdk.integrations.fastapi import FastApiIntegration
-from sentry_sdk.integrations.starlette import StarletteIntegration
 
 load_dotenv()
 
@@ -78,6 +80,7 @@ app.include_router(sync_router)
 app.include_router(onboarding_router)
 app.include_router(misc_router)
 app.include_router(analytics_router)
+app.include_router(model_router)
 
 app.include_router(upload_router)
 app.include_router(user_router)
