@@ -23,8 +23,8 @@ class KnowledgeRepository(KnowledgeInterface):
         knowledge_exists = (
             self.db.from_("knowledge")
             .select("*")
-            .filter("brain_id", "eq", knowledge.brain_id)
-            .filter("file_name", "eq", knowledge.file_name)
+            .filter("brain_id", "eq", str(knowledge.brain_id))
+            .filter("file_name", "eq", str(knowledge.file_name))
             .execute()
         ).data
 
@@ -49,7 +49,7 @@ class KnowledgeRepository(KnowledgeInterface):
         response = (
             self.db.from_("knowledge")
             .delete()
-            .filter("id", "eq", knowledge_id)
+            .filter("id", "eq", str(knowledge_id))
             .execute()
             .data
         )
