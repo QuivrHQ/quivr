@@ -32,12 +32,14 @@ def generate_source(
     # Get source documents from the result, default to an empty list if not found
     # If source documents exist
     if source_documents:
-        logger.info(f"Citations {citations}")
+        logger.debug(f"Citations {citations}")
         for index, doc in enumerate(source_documents):
-            logger.info(f"Processing source document {doc.metadata['file_name']}")
+            logger.debug(f"Processing source document {doc.metadata['file_name']}")
             if citations is not None:
                 if index not in citations:
-                    logger.info(f"Skipping source document {doc.metadata['file_name']}")
+                    logger.debug(
+                        f"Skipping source document {doc.metadata['file_name']}"
+                    )
                     continue
             # Check if 'url' is in the document metadata
             is_url = (
@@ -88,5 +90,5 @@ def generate_source(
                 )
             )
     else:
-        logger.info("No source documents found or source_documents is not a list.")
+        logger.debug("No source documents found or source_documents is not a list.")
     return sources_list
