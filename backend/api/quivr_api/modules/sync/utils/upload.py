@@ -11,10 +11,7 @@ from quivr_api.modules.brain.service.brain_authorization_service import (
 )
 from quivr_api.modules.knowledge.dto.inputs import CreateKnowledgeProperties
 from quivr_api.modules.knowledge.service.knowledge_service import KnowledgeService
-from quivr_api.modules.notification.dto.inputs import (
-    CreateNotification,
-    NotificationUpdatableProperties,
-)
+from quivr_api.modules.notification.dto.inputs import NotificationUpdatableProperties
 from quivr_api.modules.notification.entity.notification import NotificationsStatusEnum
 from quivr_api.modules.notification.service.notification_service import (
     NotificationService,
@@ -37,22 +34,13 @@ async def upload_file(
     bulk_id: Optional[UUID] = None,
     integration: Optional[str] = None,
     integration_link: Optional[str] = None,
+    notification_id: Optional[UUID] = None,
 ):
     validate_brain_authorization(
         brain_id, current_user, [RoleEnum.Editor, RoleEnum.Owner]
     )
     user_daily_usage = UserUsage(
         id=current_user,
-    )
-    upload_notification = notification_service.add_notification(
-        CreateNotification(
-            user_id=current_user,
-            bulk_id=str(bulk_id),
-            status=NotificationsStatusEnum.INFO,
-            title=f"{upload_file.filename}",
-            category="sync",
-            brain_id=str(brain_id),
-        )
     )
 
     user_settings = user_daily_usage.get_user_settings()
@@ -75,7 +63,7 @@ async def upload_file(
         print(e)
 
         notification_service.update_notification_by_id(
-            upload_notification.id if upload_notification else None,
+            notification_id,
             NotificationUpdatableProperties(
                 status=NotificationsStatusEnum.ERROR,
                 description=f"There was an error uploading the file: {e}",
@@ -107,9 +95,10 @@ async def upload_file(
         file_name=filename_with_brain_id,
         file_original_name=upload_file.filename,
         brain_id=str(brain_id),
-        notification_id=str(upload_notification.id),
-        knowledge_id=str(added_knowledge.id),
         integration=integration,
         integration_link=integration_link,
+        brain_id=brain_id,
+        notification_id=notification_id,
+        knowledge_id=added_knowledge.id,
     )
     return {"message": "File processing has started."}

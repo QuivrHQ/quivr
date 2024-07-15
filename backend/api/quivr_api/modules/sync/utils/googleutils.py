@@ -1,30 +1,22 @@
 import uuid
-from datetime import datetime, timedelta, timezone
-from io import BytesIO
 from typing import List
 
-from fastapi import UploadFile
 from google.auth.transport.requests import Request as GoogleRequest
 from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
 from pydantic import BaseModel, ConfigDict
 from quivr_api.logger import get_logger
-from quivr_api.modules.brain.repository.brains_vectors import BrainsVectors
 from quivr_api.modules.knowledge.repository.storage import Storage
-from quivr_api.modules.sync.dto.inputs import (
-    SyncFileInput,
-    SyncFileUpdateInput,
-    SyncsActiveUpdateInput,
+from quivr_api.modules.notification.dto.inputs import CreateNotification
+from quivr_api.modules.notification.entity.notification import NotificationsStatusEnum
+from quivr_api.modules.notification.service.notification_service import (
+    NotificationService,
 )
 from quivr_api.modules.sync.entity.sync import SyncFile
 from quivr_api.modules.sync.repository.sync_files import SyncFiles
 from quivr_api.modules.sync.service.sync_service import SyncService, SyncUserService
-from quivr_api.modules.sync.utils.list_files import (
-    get_google_drive_files,
-    get_google_drive_files_by_id,
-)
-from quivr_api.modules.sync.utils.upload import upload_file
-from quivr_api.modules.upload.service.upload_file import check_file_exists
+
+notification_service = NotificationService()
 
 logger = get_logger(__name__)
 
@@ -65,7 +57,22 @@ class GoogleSyncUtils(BaseModel):
         service = build("drive", "v3", credentials=creds)
         downloaded_files = []
 
-        bulk_id = str(uuid.uuid4())
+        bulk_id = uuid.uuid4()
+
+        for file in files:
+            upload_notification = notification_service.add_notification(
+                CreateNotification(
+                    user_id=current_user,
+                    bulk_id=bulk_id,
+                    status=NotificationsStatusEnum.INFO,
+                    title=file["name"],
+                    category="sync",
+                    brain_id=str(brain_id),
+                )
+            )
+
+            file["notification_id"] = upload_notification.id
+
         for file in files:
             logger.info("🔥🔥🔥🔥: %s", file)
             try:
@@ -146,6 +153,7 @@ class GoogleSyncUtils(BaseModel):
                 supported = False
                 if (existing_file and existing_file.supported) or not existing_file:
                     supported = True
+
                     await upload_file(
                         to_upload_file,
                         brain_id,
@@ -153,6 +161,7 @@ class GoogleSyncUtils(BaseModel):
                         bulk_id,
                         "Google Drive",
                         file.web_view_link,
+                        notification_id=file["notification_id"],
                     )  # type: ignore
 
                 if existing_file:
@@ -177,6 +186,13 @@ class GoogleSyncUtils(BaseModel):
                     )
 
                     downloaded_files.append(file_name)
+                notification_service.update_notification_by_id(
+                    file["notification_id"],
+                    NotificationUpdatableProperties(
+                        status=NotificationsStatusEnum.SUCCESS,
+                        description="File downloaded successfully",
+                    ),
+                )
             except Exception as error:
                 logger.error(
                     "An error occurred while downloading Google Drive files: %s",
@@ -206,6 +222,13 @@ class GoogleSyncUtils(BaseModel):
                             supported=False,
                         )
                     )
+                notification_service.update_notification_by_id(
+                    file["notification_id"],
+                    NotificationUpdatableProperties(
+                        status=NotificationsStatusEnum.ERROR,
+                        description="Error downloading file",
+                    ),
+                )
         return {"downloaded_files": downloaded_files}
 
     async def sync(self, sync_active_id: int, user_id: str):
@@ -319,8 +342,6 @@ class GoogleSyncUtils(BaseModel):
                 or not check_file_exists(sync_active["brain_id"], file.name)
             )
         ]
-
-        logger.error(files_to_download)
 
         downloaded_files = await self._upload_files(
             sync_user["credentials"],

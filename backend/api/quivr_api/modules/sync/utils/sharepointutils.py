@@ -10,6 +10,14 @@ from pydantic import BaseModel, ConfigDict
 from quivr_api.logger import get_logger
 from quivr_api.modules.brain.repository.brains_vectors import BrainsVectors
 from quivr_api.modules.knowledge.repository.storage import Storage
+from quivr_api.modules.notification.dto.inputs import (
+    CreateNotification,
+    NotificationUpdatableProperties,
+)
+from quivr_api.modules.notification.entity.notification import NotificationsStatusEnum
+from quivr_api.modules.notification.service.notification_service import (
+    NotificationService,
+)
 from quivr_api.modules.sync.dto.inputs import (
     SyncFileInput,
     SyncFileUpdateInput,
@@ -24,6 +32,8 @@ from quivr_api.modules.sync.utils.list_files import (
 )
 from quivr_api.modules.sync.utils.upload import upload_file
 from quivr_api.modules.upload.service.upload_file import check_file_exists
+
+notification_service = NotificationService()
 
 logger = get_logger(__name__)
 
@@ -83,6 +93,19 @@ class AzureSyncUtils(BaseModel):
         downloaded_files = []
         # Generate random UUID
         bulk_id = uuid.uuid4()
+        for file in files:
+            upload_notification = notification_service.add_notification(
+                CreateNotification(
+                    user_id=current_user,
+                    bulk_id=bulk_id,
+                    status=NotificationsStatusEnum.INFO,
+                    title=file["name"],
+                    category="sync",
+                    brain_id=str(brain_id),
+                )
+            )
+
+            file["notification_id"] = upload_notification.id
         for file in files:
             try:
                 file_id = file.id
@@ -150,6 +173,7 @@ class AzureSyncUtils(BaseModel):
                         bulk_id,
                         "Share Point",
                         file.web_view_link,
+                        notification_id=file["notification_id"],
                     )
 
                 if existing_file:
@@ -173,7 +197,14 @@ class AzureSyncUtils(BaseModel):
                         )
                     )
 
-                downloaded_files.append(file_name)
+                    downloaded_files.append(file_name)
+                notification_service.update_notification_by_id(
+                    file["notification_id"],
+                    NotificationUpdatableProperties(
+                        status=NotificationsStatusEnum.SUCCESS,
+                        description="File downloaded successfully",
+                    ),
+                )
             except Exception as error:
                 logger.error(
                     "An error occurred while downloading Azure files: %s", error
@@ -202,6 +233,13 @@ class AzureSyncUtils(BaseModel):
                             supported=False,
                         )
                     )
+                notification_service.update_notification_by_id(
+                    file["notification_id"],
+                    NotificationUpdatableProperties(
+                        status=NotificationsStatusEnum.ERROR,
+                        description="Error downloading file",
+                    ),
+                )
         return {"downloaded_files": downloaded_files}
 
     async def sync(self, sync_active_id: int, user_id: str):
