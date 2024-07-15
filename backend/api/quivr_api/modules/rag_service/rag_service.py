@@ -1,6 +1,12 @@
 import datetime
 from uuid import UUID, uuid4
 
+from quivr_core.chat import ChatHistory as ChatHistoryCore
+from quivr_core.config import LLMEndpointConfig, RAGConfig
+from quivr_core.llm.llm_endpoint import LLMEndpoint
+from quivr_core.models import ParsedRAGResponse, RAGResponseMetadata
+from quivr_core.quivr_rag import QuivrQARAG
+
 from quivr_api.logger import get_logger
 from quivr_api.models.settings import (
     get_embedding_client,
@@ -26,11 +32,6 @@ from quivr_api.modules.prompt.service.prompt_service import PromptService
 from quivr_api.modules.user.entity.user_identity import UserIdentity
 from quivr_api.modules.user.service.user_usage import UserUsage
 from quivr_api.vectorstore.supabase import CustomSupabaseVectorStore
-from quivr_core.chat import ChatHistory as ChatHistoryCore
-from quivr_core.config import LLMEndpointConfig, RAGConfig
-from quivr_core.llm.llm_endpoint import LLMEndpoint
-from quivr_core.models import ParsedRAGResponse, RAGResponseMetadata
-from quivr_core.quivr_rag import QuivrQARAG
 
 from .utils import generate_source
 
@@ -85,7 +86,6 @@ class RAGService:
         return chat_history
 
     def _build_rag_config(self) -> RAGConfig:
-
         ollama_url = (
             settings.ollama_api_base_url
             if settings.ollama_api_base_url

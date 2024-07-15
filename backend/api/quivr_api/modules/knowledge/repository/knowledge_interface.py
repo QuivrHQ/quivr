@@ -4,7 +4,7 @@ from uuid import UUID
 
 from quivr_api.modules.knowledge.dto.inputs import CreateKnowledgeProperties
 from quivr_api.modules.knowledge.dto.outputs import DeleteKnowledgeResponse
-from quivr_api.modules.knowledge.entity.knowledge import Knowledge
+from quivr_core.models import QuivrKnowledge as Knowledge
 
 
 class KnowledgeInterface(ABC):
