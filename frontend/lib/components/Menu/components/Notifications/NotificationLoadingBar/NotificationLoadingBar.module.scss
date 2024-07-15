@@ -1,14 +1,15 @@
 @use "styles/Radius.module.scss";
 
 .loading_bar {
-  border-radius: Radius.$normal;
   overflow: hidden;
   display: flex;
+  width: 100%;
 
   .bar_section {
-    height: 8px;
+    height: 4px;
+
     &.info {
-      background-color: var(--primary-0);
+      background-color: var(--background-3);
     }
 
     &.success {
@@ -16,7 +17,7 @@
     }
 
     &.error {
-      background-color: var(--dangerous);
+      background-color: var(--dangerous-dark);
     }
   }
 }

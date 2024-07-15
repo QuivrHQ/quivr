@@ -1,0 +1,19 @@
+@use "styles/Spacings.module.scss";
+@use "styles/Typography.module.scss";
+
+.notification {
+  padding: Spacings.$spacing03;
+
+  .loader_wrapper {
+    display: flex;
+    width: 100%;
+    align-items: center;
+
+    .count {
+      display: flex;
+      width: 70px;
+      font-size: Typography.$tiny;
+      font-weight: 600;
+    }
+  }
+}

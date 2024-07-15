@@ -1,3 +1,5 @@
+import styles from "./Notification.module.scss";
+
 import { BulkNotification } from "../../../types/types";
 import { NotificationLoadingBar } from "../NotificationLoadingBar/NotificationLoadingBar";
 
@@ -11,8 +13,21 @@ export const Notification = ({
   bulkNotification,
 }: NotificationProps): JSX.Element => {
   return (
-    <div>
-      <NotificationLoadingBar bulkNotification={bulkNotification} />
+    <div className={styles.notification}>
+      <div className={styles.loader_wrapper}>
+        <div className={styles.count}>
+          <span>
+            {
+              bulkNotification.notifications.filter(
+                (notif) => notif.status !== "info"
+              ).length
+            }
+          </span>
+          <span> / </span>
+          <span>{bulkNotification.notifications.length}</span>
+        </div>
+        <NotificationLoadingBar bulkNotification={bulkNotification} />
+      </div>
     </div>
   );
 };
