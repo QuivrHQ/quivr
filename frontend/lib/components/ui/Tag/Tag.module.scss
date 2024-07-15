@@ -11,6 +11,7 @@
   font-weight: 600;
 
   &.primary {
+    color: var(--primary-0);
     background-color: var(--primary-1);
   }
 
@@ -19,10 +20,12 @@
   }
 
   &.dangerous {
+    color: var(--dangerous-dark);
     background-color: var(--dangerous-lightest);
   }
 
   &.success {
+    color: var(--success);
     background-color: var(--success-lightest);
   }
 }

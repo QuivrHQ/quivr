@@ -1,3 +1,4 @@
+@use "styles/Radius.module.scss";
 @use "styles/Spacings.module.scss";
 @use "styles/Typography.module.scss";
 
@@ -84,6 +85,13 @@
       color: var(--success);
       gap: Spacings.$spacing02;
       font-weight: 500;
+      border-radius: Radius.$normal;
+      padding-inline: Spacings.$spacing03;
+      padding-block: Spacings.$spacing02;
+
+      &:hover {
+        background-color: var(--success-lightest);
+      }
     }
 
     .error {
@@ -92,6 +100,13 @@
       color: var(--dangerous);
       gap: Spacings.$spacing02;
       font-weight: 500;
+      border-radius: Radius.$normal;
+      padding-inline: Spacings.$spacing03;
+      padding-block: Spacings.$spacing02;
+
+      &:hover {
+        background-color: var(--dangerous-lightest);
+      }
     }
   }
 

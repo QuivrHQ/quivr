@@ -108,8 +108,8 @@ export const Notification = ({
   const { brain } = useBrainFetcher({ brainId: bulkNotification.brain_id });
   const { supabase } = useSupabase();
   const { updateNotifications } = useNotificationsContext();
-  const [errorsHovered, setErrorsHovered] = useState(false);
   const [errorsOpened, setErrorsOpened] = useState(false);
+  const [successOpened, setSuccessOpened] = useState(false);
   const router = useRouter();
 
   const navigateToBrain = () => {
@@ -192,39 +192,7 @@ export const Notification = ({
       )}
       {bulkNotification.notifications.some(
         (notif) => notif.status === "error"
-      ) && (
-        <div>
-          <div
-            className={styles.errors_header}
-            onMouseEnter={() => setErrorsHovered(true)}
-            onMouseLeave={() => setErrorsHovered(false)}
-            onClick={() => setErrorsOpened(!errorsOpened)}
-          >
-            <Icon
-              name="chevronRight"
-              size="small"
-              color={errorsHovered ? "dangerous-dark" : "dangerous"}
-            />
-            <span className={styles.title}>
-              {
-                bulkNotification.notifications.filter(
-                  (notif) => notif.status === "error"
-                ).length
-              }{" "}
-              errors
-            </span>
-          </div>
-          {errorsOpened && (
-            <div className={styles.errors}>
-              {bulkNotification.notifications
-                .filter((notif) => notif.status === "error")
-                .map((notif, index) => (
-                  <div key={index}>{notif.description}</div>
-                ))}
-            </div>
-          )}
-        </div>
-      )}
+      ) && <div></div>}
     </div>
   );
 };
