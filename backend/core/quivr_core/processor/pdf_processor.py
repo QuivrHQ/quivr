@@ -9,7 +9,7 @@ from quivr_core.processor.processor_base import ProcessorBase
 from quivr_core.processor.splitter import SplitterConfig
 from quivr_core.storage.file import QuivrFile
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("quivr_core")
 
 
 class TikaParser(ProcessorBase):

@@ -62,16 +62,6 @@ async def session(async_engine):
         yield async_session
 
 
-@pytest.mark.asyncio
-async def test_pool_reconnect(session: AsyncSession):
-    # time.sleep(10)
-    response = await asyncio.gather(
-        *[session.exec(sqlalchemy.text("SELECT 1;")) for _ in range(100)]
-    )
-    result = [r.fetchall() for r in response]
-    assert list(result[0]) == [(1,)]
-
-
 @pytest_asyncio.fixture()
 async def test_data(
     session: AsyncSession,

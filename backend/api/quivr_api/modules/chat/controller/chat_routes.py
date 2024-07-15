@@ -3,29 +3,25 @@ from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from fastapi.responses import StreamingResponse
-
 from quivr_api.logger import get_logger
 from quivr_api.middlewares.auth import AuthBearer, get_current_user
 from quivr_api.models.settings import get_embedding_client, get_supabase_client
 from quivr_api.modules.brain.service.brain_service import BrainService
 from quivr_api.modules.chat.controller.chat.brainful_chat import (
-    BrainfulChat,
-    validate_authorization,
-)
+    BrainfulChat, validate_authorization)
 from quivr_api.modules.chat.dto.chats import ChatItem, ChatQuestion
-from quivr_api.modules.chat.dto.inputs import (
-    ChatMessageProperties,
-    ChatUpdatableProperties,
-    CreateChatProperties,
-    QuestionAndAnswer,
-)
+from quivr_api.modules.chat.dto.inputs import (ChatMessageProperties,
+                                               ChatUpdatableProperties,
+                                               CreateChatProperties,
+                                               QuestionAndAnswer)
 from quivr_api.modules.chat.entity.chat import Chat
 from quivr_api.modules.chat.service.chat_service import ChatService
 from quivr_api.modules.dependencies import get_service
-from quivr_api.modules.knowledge.repository.knowledges import KnowledgeRepository
+from quivr_api.modules.knowledge.repository.knowledges import \
+    KnowledgeRepository
 from quivr_api.modules.prompt.service.prompt_service import PromptService
+from quivr_api.modules.rag_service import RAGService
 from quivr_api.modules.user.entity.user_identity import UserIdentity
-from quivr_api.packages.quivr_core.rag_service import RAGService
 from quivr_api.packages.utils.telemetry import maybe_send_telemetry
 from quivr_api.vectorstore.supabase import CustomSupabaseVectorStore
 

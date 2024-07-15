@@ -4,10 +4,10 @@ from fastapi import HTTPException
 from quivr_api.models.settings import get_supabase_client
 from quivr_api.modules.knowledge.dto.inputs import KnowledgeStatus
 from quivr_api.modules.knowledge.dto.outputs import DeleteKnowledgeResponse
-from quivr_api.modules.knowledge.entity.knowledge import Knowledge
 from quivr_api.modules.knowledge.repository.knowledge_interface import (
     KnowledgeInterface,
 )
+from quivr_core.models import QuivrKnowledge as Knowledge
 
 
 class KnowledgeRepository(KnowledgeInterface):
@@ -23,8 +23,8 @@ class KnowledgeRepository(KnowledgeInterface):
         knowledge_exists = (
             self.db.from_("knowledge")
             .select("*")
-            .filter("brain_id", "eq", knowledge.brain_id)
-            .filter("file_name", "eq", knowledge.file_name)
+            .filter("brain_id", "eq", str(knowledge.brain_id))
+            .filter("file_name", "eq", str(knowledge.file_name))
             .execute()
         ).data
 
@@ -49,7 +49,7 @@ class KnowledgeRepository(KnowledgeInterface):
         response = (
             self.db.from_("knowledge")
             .delete()
-            .filter("id", "eq", knowledge_id)
+            .filter("id", "eq", str(knowledge_id))
             .execute()
             .data
         )

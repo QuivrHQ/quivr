@@ -1,37 +1,32 @@
 import datetime
 from uuid import UUID, uuid4
 
-from langchain_community.chat_models import ChatLiteLLM
-
 from quivr_api.logger import get_logger
-from quivr_api.models.settings import (
-    get_embedding_client,
-    get_supabase_client,
-    settings,
-)
+from quivr_api.models.settings import (get_embedding_client,
+                                       get_supabase_client, settings)
 from quivr_api.modules.brain.entity.brain_entity import BrainEntity
 from quivr_api.modules.brain.service.brain_service import BrainService
-from quivr_api.modules.brain.service.utils.format_chat_history import (
-    format_chat_history,
-)
+from quivr_api.modules.brain.service.utils.format_chat_history import \
+    format_chat_history
 from quivr_api.modules.chat.controller.chat.utils import (
-    compute_cost,
-    find_model_and_generate_metadata,
-    update_user_usage,
-)
+    compute_cost, find_model_and_generate_metadata, update_user_usage)
 from quivr_api.modules.chat.dto.inputs import CreateChatHistory
 from quivr_api.modules.chat.dto.outputs import GetChatHistoryOutput
 from quivr_api.modules.chat.service.chat_service import ChatService
-from quivr_api.modules.knowledge.repository.knowledges import KnowledgeRepository
+from quivr_api.modules.knowledge.repository.knowledges import \
+    KnowledgeRepository
 from quivr_api.modules.prompt.entity.prompt import Prompt
 from quivr_api.modules.prompt.service.prompt_service import PromptService
 from quivr_api.modules.user.entity.user_identity import UserIdentity
 from quivr_api.modules.user.service.user_usage import UserUsage
-from quivr_api.packages.quivr_core.config import RAGConfig
-from quivr_api.packages.quivr_core.models import ParsedRAGResponse, RAGResponseMetadata
-from quivr_api.packages.quivr_core.quivr_rag import QuivrQARAG
-from quivr_api.packages.quivr_core.utils import generate_source
 from quivr_api.vectorstore.supabase import CustomSupabaseVectorStore
+from quivr_core.chat import ChatHistory as ChatHistoryCore
+from quivr_core.config import LLMEndpointConfig, RAGConfig
+from quivr_core.llm.llm_endpoint import LLMEndpoint
+from quivr_core.models import ParsedRAGResponse, RAGResponseMetadata
+from quivr_core.quivr_rag import QuivrQARAG
+
+from .utils import generate_source
 
 logger = get_logger(__name__)
 
@@ -71,20 +66,49 @@ class RAGService:
             else None
         )
 
-    def get_llm(self, rag_config: RAGConfig):
-        api_base = (
+    def _build_chat_history(
+        self,
+        history: list[GetChatHistoryOutput],
+    ) -> ChatHistoryCore:
+        transformed_history = format_chat_history(history)
+        chat_history = ChatHistoryCore(
+            brain_id=self.brain.brain_id, chat_id=self.chat_id
+        )
+
+        [chat_history.append(m) for m in transformed_history]
+        return chat_history
+
+    def _build_rag_config(self) -> RAGConfig:
+        ollama_url = (
             settings.ollama_api_base_url
-            if settings.ollama_api_base_url and rag_config.model.startswith("ollama")
+            if settings.ollama_api_base_url
+            and self.model_to_use.name.startswith("ollama")
             else None
         )
-        return ChatLiteLLM(
-            temperature=rag_config.temperature,
-            max_tokens=rag_config.max_tokens,
-            model=rag_config.model,
-            streaming=rag_config.streaming,
-            verbose=False,
-            api_base=api_base,
-        )  # pyright: ignore reportPrivateUsage=none
+
+        rag_config = RAGConfig(
+            llm_config=LLMEndpointConfig(
+                model=self.model_to_use.name,
+                llm_base_url=ollama_url,
+                llm_api_key="abc-123" if ollama_url else None,
+                temperature=(
+                    self.brain.temperature
+                    if self.brain.temperature
+                    else LLMEndpointConfig.model_fields["temperature"].default
+                ),
+                max_input=self.model_to_use.max_input,
+                max_tokens=(
+                    self.brain.max_tokens
+                    if self.brain.max_tokens
+                    else LLMEndpointConfig.model_fields["max_tokens"].default
+                ),
+            ),
+            prompt=self.prompt.content if self.prompt else None,
+        )
+        return rag_config
+
+    def get_llm(self, rag_config: RAGConfig):
+        return LLMEndpoint.from_config(rag_config.llm_config)
 
     def get_or_create_brain(self, brain_id: UUID | None, user_id: UUID) -> BrainEntity:
         brain = None
@@ -159,14 +183,8 @@ class RAGService:
         logger.info(
             f"Creating question for chat {self.chat_id} with brain {self.brain.brain_id} "
         )
-        rag_config = RAGConfig(
-            model=self.model_to_use.name,
-            temperature=self.brain.temperature,
-            max_input=self.model_to_use.max_input,
-            max_tokens=self.brain.max_tokens,
-            prompt=self.prompt.content if self.prompt else None,
-            streaming=False,
-        )
+        rag_config = self._build_rag_config()
+        logger.debug(f"generate_answer with config : {rag_config.model_dump()}")
         history = await self.chat_service.get_chat_history(self.chat_id)
         # Get list of files
         list_files = self.knowledge_service.get_all_knowledge_in_brain(
@@ -174,7 +192,7 @@ class RAGService:
         )
         # Build RAG dependencies to inject
         vector_store = self.create_vector_store(
-            self.brain.brain_id, rag_config.max_input
+            self.brain.brain_id, rag_config.llm_config.max_input
         )
         llm = self.get_llm(rag_config)
         # Initialize the RAG pipline
@@ -182,9 +200,9 @@ class RAGService:
             rag_config=rag_config, llm=llm, vector_store=vector_store
         )
         #  Format the history, sanitize the input
-        transformed_history = format_chat_history(history)
+        chat_history = self._build_chat_history(history)
 
-        parsed_response = rag_pipeline.answer(question, transformed_history, list_files)
+        parsed_response = rag_pipeline.answer(question, chat_history, list_files)
 
         # Save the answer to db
         new_chat_entry = self.save_answer(question, parsed_response)
@@ -216,18 +234,11 @@ class RAGService:
             f"Creating question for chat {self.chat_id} with brain {self.brain.brain_id} "
         )
         # Build the rag config
-        rag_config = RAGConfig(
-            model=self.model_to_use.name,
-            temperature=self.brain.temperature,
-            max_input=self.model_to_use.max_input,
-            max_tokens=self.brain.max_tokens,
-            prompt=self.prompt.content if self.prompt else "",
-            streaming=True,
-        )
-        # Getting chat history
+        rag_config = self._build_rag_config()
+        # Get chat history
         history = await self.chat_service.get_chat_history(self.chat_id)
         #  Format the history, sanitize the input
-        transformed_history = format_chat_history(history)
+        chat_history = self._build_chat_history(history)
 
         # Get list of files urls
         # TODO: Why do we get ALL the files ?
@@ -236,7 +247,7 @@ class RAGService:
         )
         llm = self.get_llm(rag_config)
         vector_store = self.create_vector_store(
-            self.brain.brain_id, rag_config.max_input
+            self.brain.brain_id, rag_config.llm_config.max_input
         )
         # Initialize the rag pipline
         rag_pipeline = QuivrQARAG(
@@ -256,7 +267,7 @@ class RAGService:
         }
 
         async for response in rag_pipeline.answer_astream(
-            question, transformed_history, list_files
+            question, chat_history, list_files
         ):
             # Format output to be correct servicedf;j
             if not response.last_chunk:

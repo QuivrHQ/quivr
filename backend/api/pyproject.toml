@@ -12,9 +12,8 @@ readme = "README.md"
 
 
 [tool.poetry.dependencies]
-quivr-core = { path = "../core", develop = true }
+quivr-core = { path = "../core", extras = ["base"] }
 python = "^3.11"
-
 torch = [
     { version = "2.3.1", source = "pypi", platform = "darwin" },
     { version = "2.3.1", source = "pypi", platform = "linux", markers = "platform_machine != 'x86_64'" },
