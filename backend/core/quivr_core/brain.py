@@ -20,7 +20,7 @@ from quivr_core.storage.file import QuivrFile
 from quivr_core.storage.local_storage import TransparentStorage
 from quivr_core.storage.storage_base import StorageBase
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("quivr_core")
 
 
 async def _default_vectordb(docs: list[Document], embedder: Embeddings) -> VectorStore:
