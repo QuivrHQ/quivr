@@ -1,8 +1,10 @@
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 import { useBrainFetcher } from "@/app/studio/[brainId]/BrainManagementTabs/hooks/useBrainFetcher";
 import Icon from "@/lib/components/ui/Icon/Icon";
 import { LoaderIcon } from "@/lib/components/ui/LoaderIcon/LoaderIcon";
+import { Brain } from "@/lib/context/BrainProvider/types";
 import { useNotificationsContext } from "@/lib/context/NotificationsProvider/hooks/useNotificationsContext";
 import { useSupabase } from "@/lib/context/SupabaseProvider";
 
@@ -23,7 +25,7 @@ const NotificationHeader = ({
   onDelete,
 }: {
   bulkNotification: BulkNotification;
-  brain?: { name: string };
+  brain?: Brain;
   onDelete: () => void;
 }) => (
   <div className={styles.header}>
@@ -101,6 +103,12 @@ export const Notification = ({
   const { updateNotifications } = useNotificationsContext();
   const [errorsHovered, setErrorsHovered] = useState(false);
   const [errorsOpened, setErrorsOpened] = useState(false);
+  const router = useRouter();
+
+  const navigateToBrain = () => {
+    console.info(brain);
+    router.push(`/studio/${bulkNotification.brain_id}`); // Naviguer vers l'URL
+  };
 
   const deleteNotification = async () => {
     const deletePromises = bulkNotification.notifications.map(
@@ -117,6 +125,7 @@ export const Notification = ({
       className={`${styles.notification} ${
         lastNotification ? styles.last : ""
       }`}
+      onClick={() => navigateToBrain()}
     >
       <NotificationHeader
         bulkNotification={bulkNotification}
@@ -156,6 +165,15 @@ export const Notification = ({
               errors
             </span>
           </div>
+          {errorsOpened && (
+            <div className={styles.errors}>
+              {bulkNotification.notifications
+                .filter((notif) => notif.status === "error")
+                .map((notif, index) => (
+                  <div key={index}>{notif.description}</div>
+                ))}
+            </div>
+          )}
         </div>
       )}
     </div>

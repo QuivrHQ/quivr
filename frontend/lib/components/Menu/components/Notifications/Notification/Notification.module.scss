@@ -8,6 +8,11 @@
   flex-direction: column;
   gap: Spacings.$spacing04;
 
+  &:hover {
+    cursor: pointer;
+    background-color: var(--background-2);
+  }
+
   .header {
     display: flex;
     align-items: center;
