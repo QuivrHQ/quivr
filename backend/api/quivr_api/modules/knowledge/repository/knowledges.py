@@ -1,7 +1,6 @@
 from uuid import UUID
 
 from fastapi import HTTPException
-
 from quivr_api.models.settings import get_supabase_client
 from quivr_api.modules.knowledge.dto.inputs import KnowledgeStatus
 from quivr_api.modules.knowledge.dto.outputs import DeleteKnowledgeResponse

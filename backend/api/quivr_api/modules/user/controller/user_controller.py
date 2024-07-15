@@ -1,5 +1,4 @@
 from fastapi import APIRouter, Depends, Request
-
 from quivr_api.middlewares.auth import AuthBearer, get_current_user
 from quivr_api.modules.brain.service.brain_user_service import BrainUserService
 from quivr_api.modules.user.dto.inputs import UserUpdatableProperties

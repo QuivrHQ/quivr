@@ -2,7 +2,6 @@ from typing import Optional
 from uuid import UUID
 
 from pydantic import BaseModel
-
 from quivr_api.modules.notification.entity.notification import NotificationsStatusEnum
 
 

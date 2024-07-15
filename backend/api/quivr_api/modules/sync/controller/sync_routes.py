@@ -2,7 +2,6 @@ import os
 from typing import List
 
 from fastapi import APIRouter, Depends, status
-
 from quivr_api.logger import get_logger
 from quivr_api.middlewares.auth import AuthBearer, get_current_user
 from quivr_api.modules.notification.dto.inputs import CreateNotification
