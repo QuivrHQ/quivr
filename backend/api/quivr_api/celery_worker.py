@@ -38,7 +38,7 @@ auth_bearer = AuthBearer()
 @celery.task(
     bind=True,
     retries=3,
-    default_retry_delay=1,
+    default_retry_delay=2,
     name="process_file_and_notify",
     autoretry_for=(Exception, WorkerLostError),
 )
@@ -104,9 +104,13 @@ def process_file_and_notify(
             logger.error("TimeoutError")
             self.retry()
 
-        except (Exception, WorkerLostError) as e:
+        except WorkerLostError:
+            logger.error("WorkerLostError")
+            self.retry()
+
+        except Exception as e:
             logger.exception(f"Error processing file: {str(e)}")
-            self.retry(exc=e)
+            self.retry()
 
     except MaxRetriesExceededError:
         logger.error("MaxRetriesExceededError")
@@ -122,6 +126,7 @@ def process_file_and_notify(
             knowledge_service.update_status_knowledge(
                 knowledge_id, KnowledgeStatus.ERROR
             )
+        return False
 
 
 @celery.task(name="process_crawl_and_notify")
