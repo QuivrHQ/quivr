@@ -1,10 +1,12 @@
 import axios from "axios";
+import { capitalCase } from "change-case";
 import React, { useEffect, useRef, useState } from "react";
 
 import { useKnowledgeApi } from "@/lib/api/knowledge/useKnowledgeApi";
 import { Checkbox } from "@/lib/components/ui/Checkbox/Checkbox";
 import Icon from "@/lib/components/ui/Icon/Icon";
 import { OptionsModal } from "@/lib/components/ui/OptionsModal/OptionsModal";
+import { Tag } from "@/lib/components/ui/Tag/Tag";
 import { iconList } from "@/lib/helpers/iconList";
 import { useUrlBrain } from "@/lib/hooks/useBrainIdFromUrl";
 import { isUploadedKnowledge, Knowledge } from "@/lib/types/Knowledge";
@@ -124,14 +126,28 @@ const KnowledgeItem = ({
           </a>
         )}
       </div>
-      <div
-        ref={iconRef}
-        onClick={(event: React.MouseEvent<HTMLElement>) => {
-          event.stopPropagation();
-          setOptionsOpened(!optionsOpened);
-        }}
-      >
-        <Icon name="options" size="small" color="black" handleHover={true} />
+      <div className={styles.right}>
+        <div className={styles.status}>
+          <Tag
+            name={capitalCase(knowledge.status)}
+            color={
+              knowledge.status === "ERROR"
+                ? "dangerous"
+                : knowledge.status === "PROCESSING"
+                ? "primary"
+                : "success"
+            }
+          />
+        </div>
+        <div
+          ref={iconRef}
+          onClick={(event: React.MouseEvent<HTMLElement>) => {
+            event.stopPropagation();
+            setOptionsOpened(!optionsOpened);
+          }}
+        >
+          <Icon name="options" size="small" color="black" handleHover={true} />
+        </div>
       </div>
       <div ref={optionsRef} className={styles.options_modal}>
         {optionsOpened && <OptionsModal options={options} />}

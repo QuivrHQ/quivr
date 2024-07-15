@@ -45,7 +45,12 @@
     .left {
       display: flex;
       align-items: center;
-      gap: Spacings.$spacing06;
+      gap: calc(Spacings.$spacing06 + 6px);
+    }
+
+    .right {
+      display: flex;
+      gap: calc(Spacings.$spacing09 + 6px);
     }
   }
 }

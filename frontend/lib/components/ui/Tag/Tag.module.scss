@@ -8,12 +8,21 @@
   border-radius: Radius.$big;
   width: fit-content;
   font-size: Typography.$tiny;
+  font-weight: 600;
 
   &.primary {
-    background-color: var(--background-special-1);
+    background-color: var(--primary-1);
   }
 
   &.gold {
     background-color: var(--gold);
+  }
+
+  &.dangerous {
+    background-color: var(--dangerous-lightest);
+  }
+
+  &.success {
+    background-color: var(--success-lightest);
   }
 }

@@ -126,7 +126,10 @@ const KnowledgeTable = React.forwardRef<HTMLDivElement, KnowledgeTableProps>(
               />
               <span className={styles.name}>Name</span>
             </div>
-            <span className={styles.actions}>Actions</span>
+            <div className={styles.right}>
+              <span className={styles.actions}>Status</span>
+              <span className={styles.actions}>Actions</span>
+            </div>
           </div>
           {filteredKnowledgeList.map((knowledge, index) => (
             <div
