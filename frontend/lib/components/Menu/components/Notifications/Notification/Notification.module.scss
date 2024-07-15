@@ -3,11 +3,11 @@
 @use "styles/Typography.module.scss";
 
 .notification {
-  padding: Spacings.$spacing05;
+  padding-inline: Spacings.$spacing05;
+  padding-block: Spacings.$spacing03;
   border-bottom: 1px solid var(--border-2);
   display: flex;
   flex-direction: column;
-  gap: Spacings.$spacing04;
 
   &:hover {
     cursor: pointer;
@@ -18,6 +18,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
+    padding-bottom: Spacings.$spacing03;
 
     .left {
       display: flex;
@@ -88,6 +89,7 @@
       border-radius: Radius.$normal;
       padding-inline: Spacings.$spacing03;
       padding-block: Spacings.$spacing02;
+      margin-left: -(Spacings.$spacing03);
 
       &:hover {
         background-color: var(--success-lightest);
@@ -103,6 +105,7 @@
       border-radius: Radius.$normal;
       padding-inline: Spacings.$spacing03;
       padding-block: Spacings.$spacing02;
+      margin-left: -(Spacings.$spacing03);
 
       &:hover {
         background-color: var(--dangerous-lightest);
@@ -122,6 +125,25 @@
     &:hover {
       cursor: pointer;
       color: var(--dangerous-dark);
+    }
+  }
+
+  .file_list {
+    display: flex;
+    flex-direction: column;
+    gap: Spacings.$spacing02;
+    padding-top: Spacings.$spacing02;
+
+    .title {
+      font-size: Typography.$very_tiny;
+
+      &.error {
+        color: var(--dangerous);
+      }
+
+      &.success {
+        color: var(--success);
+      }
     }
   }
 }

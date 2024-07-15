@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useBrainFetcher } from "@/app/studio/[brainId]/BrainManagementTabs/hooks/useBrainFetcher";
 import Icon from "@/lib/components/ui/Icon/Icon";
 import { LoaderIcon } from "@/lib/components/ui/LoaderIcon/LoaderIcon";
+import Tooltip from "@/lib/components/ui/Tooltip/Tooltip";
 import { Brain } from "@/lib/context/BrainProvider/types";
 import { useNotificationsContext } from "@/lib/context/NotificationsProvider/hooks/useNotificationsContext";
 import { useSupabase } from "@/lib/context/SupabaseProvider";
@@ -163,7 +164,13 @@ export const Notification = ({
           {bulkNotification.notifications.some(
             (notif) => notif.status === "success"
           ) && (
-            <div className={styles.success}>
+            <div
+              className={styles.success}
+              onClick={() => {
+                setSuccessOpened(!successOpened);
+                setErrorsOpened(false);
+              }}
+            >
               <Icon name="check" size="normal" color="success" />
               <span>
                 {
@@ -177,7 +184,13 @@ export const Notification = ({
           {bulkNotification.notifications.some(
             (notif) => notif.status === "error"
           ) && (
-            <div className={styles.error}>
+            <div
+              className={styles.error}
+              onClick={() => {
+                setErrorsOpened(!errorsOpened);
+                setSuccessOpened(false);
+              }}
+            >
               <Icon name="warning" size="normal" color="dangerous" />
               <span>
                 {
@@ -190,9 +203,32 @@ export const Notification = ({
           )}
         </div>
       )}
-      {bulkNotification.notifications.some(
-        (notif) => notif.status === "error"
-      ) && <div></div>}
+      {errorsOpened && (
+        <div className={styles.file_list}>
+          {bulkNotification.notifications
+            .filter((notif) => notif.status === "error")
+            .map((notif, index) => (
+              <Tooltip tooltip={notif.description} key={index} type="dangerous">
+                <span className={`${styles.title} ${styles.error}`}>
+                  {notif.title}
+                </span>
+              </Tooltip>
+            ))}
+        </div>
+      )}
+      {successOpened && (
+        <div className={styles.file_list}>
+          {bulkNotification.notifications
+            .filter((notif) => notif.status === "success")
+            .map((notif, index) => (
+              <Tooltip tooltip={notif.description} key={index} type="success">
+                <span className={`${styles.title} ${styles.success}`}>
+                  {notif.title}
+                </span>
+              </Tooltip>
+            ))}
+        </div>
+      )}
     </div>
   );
 };
