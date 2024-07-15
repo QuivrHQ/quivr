@@ -51,14 +51,18 @@ const NotificationHeader = ({
         </div>
       )}
     </div>
-    <div
-      onClick={(event) => {
-        event.stopPropagation();
-        onDelete();
-      }}
-    >
-      <Icon name="delete" size="small" color="dangerous" handleHover={true} />
-    </div>
+    {bulkNotification.notifications.every(
+      (notif) => notif.status !== "info"
+    ) && (
+      <div
+        onClick={(event) => {
+          event.stopPropagation();
+          onDelete();
+        }}
+      >
+        <Icon name="delete" size="small" color="dangerous" handleHover={true} />
+      </div>
+    )}
   </div>
 );
 

@@ -4,7 +4,7 @@
 
 .notification {
   padding-inline: Spacings.$spacing05;
-  padding-block: Spacings.$spacing03;
+  padding-block: Spacings.$spacing05;
   border-bottom: 1px solid var(--border-2);
   display: flex;
   flex-direction: column;
@@ -50,6 +50,7 @@
   }
 
   .loader_wrapper {
+    padding-block: Spacings.$spacing02;
     display: flex;
     width: 100%;
     align-items: center;

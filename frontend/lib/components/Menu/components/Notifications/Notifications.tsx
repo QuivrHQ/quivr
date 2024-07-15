@@ -22,7 +22,6 @@ export const Notifications = (): JSX.Element => {
       }
     }
     await updateNotifications();
-    console.info("deleteAllNotifications");
   };
 
   useEffect(() => {

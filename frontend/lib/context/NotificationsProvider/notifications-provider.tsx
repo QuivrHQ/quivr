@@ -1,4 +1,4 @@
-import { createContext, useState } from "react";
+import { createContext, useEffect, useState } from "react";
 
 import {
   BulkNotification,
@@ -71,6 +71,24 @@ export const NotificationsProvider = ({
       console.error(error);
     }
   };
+
+  useEffect(() => {
+    void (async () => {
+      for (const notifications of bulkNotifications) {
+        if (
+          notifications.notifications.every((notif) => notif.status !== "info")
+        ) {
+          for (const notification of notifications.notifications) {
+            await supabase
+              .from("notifications")
+              .update({ read: true })
+              .eq("id", notification.id);
+          }
+        }
+      }
+      await updateNotifications();
+    })();
+  }, [isVisible]);
 
   return (
     <NotificationsContext.Provider
