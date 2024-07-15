@@ -87,6 +87,7 @@ def oauth2callback_dropbox(request: Request):
         dict: A dictionary containing a success message.
     """
     state = request.query_params.get("state")
+<<<<<<< HEAD
     if not state:
         raise HTTPException(status_code=400, detail="Invalid state parameter")
     request.session["csrf-token"] = state.split("|")[0] if "|" in state else ""
@@ -94,6 +95,8 @@ def oauth2callback_dropbox(request: Request):
     logger.debug("Keys in session : %s", request.session.keys())
     logger.debug("Value in session : %s", request.session.values())
 
+=======
+>>>>>>> 96ed662b (fix: dropbox sync creds)
     state = state.split("|")[1] if "|" in state else state  # type: ignore
     state_dict = {"state": state}
     state_split = state.split(",")  # type: ignore
@@ -140,14 +143,22 @@ def oauth2callback_dropbox(request: Request):
             "access_token": oauth_result.access_token,
             "refresh_token": oauth_result.refresh_token,
             "account_id": account_id,
+<<<<<<< HEAD
             "email": user_email,
             "expires_in": str(oauth_result.expires_at),
+=======
+            "email": email,
+>>>>>>> 96ed662b (fix: dropbox sync creds)
         }
 
         sync_user_input = SyncUserUpdateInput(
             credentials=result,
             state={},
+<<<<<<< HEAD
             email=user_email,
+=======
+            email=email,
+>>>>>>> 96ed662b (fix: dropbox sync creds)
         )
         sync_user_service.update_sync_user(
             str(current_user), state_dict, sync_user_input
