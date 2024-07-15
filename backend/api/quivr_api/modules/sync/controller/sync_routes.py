@@ -11,6 +11,7 @@ from quivr_api.modules.notification.service.notification_service import (
     NotificationService,
 )
 from quivr_api.modules.sync.controller.azure_sync_routes import azure_sync_router
+from quivr_api.modules.sync.controller.dropbox_sync_routes import dropbox_sync_router
 from quivr_api.modules.sync.controller.google_sync_routes import google_sync_router
 from quivr_api.modules.sync.dto import SyncsDescription
 from quivr_api.modules.sync.dto.inputs import SyncsActiveInput, SyncsActiveUpdateInput
@@ -37,6 +38,7 @@ sync_router = APIRouter()
 # Add Google routes here
 sync_router.include_router(google_sync_router)
 sync_router.include_router(azure_sync_router)
+sync_router.include_router(dropbox_sync_router)
 
 
 # Google sync description

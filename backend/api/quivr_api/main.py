@@ -28,6 +28,7 @@ from quivr_api.routes.crawl_routes import crawl_router
 from quivr_api.routes.subscription_routes import subscription_router
 from sentry_sdk.integrations.fastapi import FastApiIntegration
 from sentry_sdk.integrations.starlette import StarletteIntegration
+from starlette.middleware.sessions import SessionMiddleware
 
 load_dotenv()
 
@@ -70,6 +71,7 @@ if sentry_dsn:
 
 app = FastAPI()
 add_cors_middleware(app)
+app.add_middleware(SessionMiddleware, secret_key=str(os.getenv("SESSION_SECRET_KEY")))
 
 app.include_router(brain_router)
 app.include_router(chat_router)
