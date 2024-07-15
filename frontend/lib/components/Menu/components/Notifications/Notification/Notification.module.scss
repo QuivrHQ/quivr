@@ -68,4 +68,19 @@
       }
     }
   }
+
+  .errors_header {
+    display: flex;
+    align-items: center;
+    color: var(--dangerous);
+
+    .title {
+      font-size: Typography.$very_tiny;
+    }
+
+    &:hover {
+      cursor: pointer;
+      color: var(--dangerous-dark);
+    }
+  }
 }
