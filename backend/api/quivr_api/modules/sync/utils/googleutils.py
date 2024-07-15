@@ -1,6 +1,7 @@
 import uuid
 from datetime import datetime, timedelta, timezone
 from io import BytesIO
+from typing import List
 
 from fastapi import UploadFile
 from google.auth.transport.requests import Request as GoogleRequest
@@ -17,12 +18,25 @@ from quivr_api.modules.notification.dto.inputs import (
 from quivr_api.modules.notification.entity.notification import NotificationsStatusEnum
 from quivr_api.modules.notification.service.notification_service import (
     NotificationService,
+from quivr_api.modules.notification.dto.inputs import (
+    CreateNotification,
+    NotificationUpdatableProperties,
+)
+from quivr_api.modules.notification.entity.notification import NotificationsStatusEnum
+from quivr_api.modules.notification.service.notification_service import (
+    NotificationService,
 )
 from quivr_api.modules.sync.dto.inputs import (
     SyncFileInput,
     SyncFileUpdateInput,
     SyncsActiveUpdateInput,
 )
+from quivr_api.modules.sync.dto.inputs import (
+    SyncFileInput,
+    SyncFileUpdateInput,
+    SyncsActiveUpdateInput,
+)
+from quivr_api.modules.sync.entity.sync import SyncFile
 from quivr_api.modules.sync.repository.sync_files import SyncFiles
 from quivr_api.modules.sync.service.sync_service import SyncService, SyncUserService
 from quivr_api.modules.sync.utils.list_files import (
@@ -31,6 +45,8 @@ from quivr_api.modules.sync.utils.list_files import (
 )
 from quivr_api.modules.sync.utils.upload import upload_file
 from quivr_api.modules.upload.service.upload_file import check_file_exists
+
+notification_service = NotificationService()
 
 notification_service = NotificationService()
 
@@ -48,7 +64,7 @@ class GoogleSyncUtils(BaseModel):
     async def _upload_files(
         self,
         credentials: dict,
-        files: list,
+        files: List[SyncFile],
         current_user: str,
         brain_id: str,
         sync_active_id: int,
@@ -81,21 +97,23 @@ class GoogleSyncUtils(BaseModel):
                     user_id=current_user,
                     bulk_id=bulk_id,
                     status=NotificationsStatusEnum.INFO,
-                    title=file["name"],
+                    title=file.name,
                     category="sync",
                     brain_id=str(brain_id),
                 )
             )
 
-            file["notification_id"] = upload_notification.id
+            file.notification_id = upload_notification.id
+
 
         for file in files:
             logger.info("🔥🔥🔥🔥: %s", file)
             try:
-                file_id = str(file["id"])
-                file_name = file["name"]
-                mime_type = file["mime_type"]
-                modified_time = file["last_modified"]
+                file_id = file.id
+                file_name = file.name
+                mime_type = file.mime_type
+                modified_time = file.last_modified
+                file_url = file.web_view_link
                 # Convert Google Docs files to appropriate formats before downloading
                 if mime_type == "application/vnd.google-apps.document":
                     logger.debug(
@@ -168,7 +186,16 @@ class GoogleSyncUtils(BaseModel):
                 supported = False
                 if (existing_file and existing_file.supported) or not existing_file:
                     supported = True
-                    await upload_file(to_upload_file, brain_id, current_user, bulk_id, notification_id=file["notification_id"])  # type: ignore
+
+                    await upload_file(
+                        to_upload_file,
+                        brain_id,
+                        current_user,
+                        bulk_id,
+                        "Google Drive",
+                        file.web_view_link,
+                        notification_id=file.notification_id,
+                    )  # type: ignore
 
                 if existing_file:
                     # Update the existing file record
@@ -186,14 +213,14 @@ class GoogleSyncUtils(BaseModel):
                             path=file_name,
                             syncs_active_id=sync_active_id,
                             last_modified=modified_time,
-                            brain_id=brain_id,
+                            brain_id=str(brain_id),  # Convert UUID to string
                             supported=supported,
                         )
                     )
 
                     downloaded_files.append(file_name)
                 notification_service.update_notification_by_id(
-                    file["notification_id"],
+                    file.notification_id,
                     NotificationUpdatableProperties(
                         status=NotificationsStatusEnum.SUCCESS,
                         description="File downloaded successfully",
@@ -202,12 +229,12 @@ class GoogleSyncUtils(BaseModel):
             except Exception as error:
                 logger.error(
                     "An error occurred while downloading Google Drive files: %s",
-                    error,
+                    str(error),  # Convert error to string
                 )
                 # Check if the file already exists in the database
                 existing_files = self.sync_files_repo.get_sync_files(sync_active_id)
                 existing_file = next(
-                    (f for f in existing_files if f.path == file["name"]), None
+                    (f for f in existing_files if f.path == file.name), None
                 )
                 # Update the existing file record
                 if existing_file:
@@ -221,15 +248,15 @@ class GoogleSyncUtils(BaseModel):
                     # Create a new file record
                     self.sync_files_repo.create_sync_file(
                         SyncFileInput(
-                            path=file["name"],
+                            path=file.name,
                             syncs_active_id=sync_active_id,
-                            last_modified=file["last_modified"],
+                            last_modified=file.last_modified,
                             brain_id=brain_id,
                             supported=False,
                         )
                     )
                 notification_service.update_notification_by_id(
-                    file["notification_id"],
+                    file.notification_id,
                     NotificationUpdatableProperties(
                         status=NotificationsStatusEnum.ERROR,
                         description="Error downloading file",
@@ -306,18 +333,21 @@ class GoogleSyncUtils(BaseModel):
         settings = sync_active.get("settings", {})
         folders = settings.get("folders", [])
         files_to_download = settings.get("files", [])
-        files = []
-        files_metadata = []
+        files: List[SyncFile] = []
+        files_metadata: List[SyncFile] = []
         if len(folders) > 0:
-            files = []
             for folder in folders:
-                files.extend(
-                    get_google_drive_files(
-                        sync_user["credentials"],
-                        folder_id=folder,
-                        recursive=True,
-                    )
+                folder_files = get_google_drive_files(
+                    sync_user["credentials"],
+                    folder_id=folder,
+                    recursive=True,
                 )
+                if isinstance(folder_files, list):
+                    files.extend(folder_files)
+                else:
+                    logger.error(
+                        f"Error fetching files for folder {folder}: {folder_files}"
+                    )
         if len(files_to_download) > 0:
             files_metadata = get_google_drive_files_by_id(
                 sync_user["credentials"], files_to_download
@@ -336,13 +366,13 @@ class GoogleSyncUtils(BaseModel):
         files_to_download = [
             file
             for file in files
-            if not file["is_folder"]
+            if not file.is_folder
             and (
                 (
                     not last_synced_time
-                    or datetime.fromisoformat(file["last_modified"]) > last_synced_time
+                    or datetime.fromisoformat(file.last_modified) > last_synced_time
                 )
-                or not check_file_exists(sync_active["brain_id"], file["name"])
+                or not check_file_exists(sync_active["brain_id"], file.name)
             )
         ]
 

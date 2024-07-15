@@ -42,6 +42,7 @@ def process_file_and_notify(
     notification_id: UUID,
     knowledge_id: UUID,
     integration=None,
+    integration_link=None,
     delete_file=False,
 ):
     logger.debug(
@@ -145,6 +146,10 @@ def ping_telemetry():
 
 @celery.task(name="check_if_is_premium_user")
 def check_if_is_premium_user():
+    if os.getenv("DEACTIVATE_STRIPE") == "true":
+        logger.info("Stripe deactivated, skipping check for premium users")
+        return True
+
     supabase = get_supabase_db()
     supabase_db = supabase.db
 

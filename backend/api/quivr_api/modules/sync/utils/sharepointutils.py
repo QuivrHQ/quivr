@@ -23,6 +23,7 @@ from quivr_api.modules.sync.dto.inputs import (
     SyncFileUpdateInput,
     SyncsActiveUpdateInput,
 )
+from quivr_api.modules.sync.entity.sync import SyncFile
 from quivr_api.modules.sync.repository.sync_files import SyncFiles
 from quivr_api.modules.sync.service.sync_service import SyncService, SyncUserService
 from quivr_api.modules.sync.utils.list_files import (
@@ -71,7 +72,7 @@ class AzureSyncUtils(BaseModel):
     async def _upload_files(
         self,
         token_data: dict,
-        files: list,
+        files: list[SyncFile],
         current_user: str,
         brain_id: str,
         sync_active_id: int,
@@ -98,18 +99,18 @@ class AzureSyncUtils(BaseModel):
                     user_id=current_user,
                     bulk_id=bulk_id,
                     status=NotificationsStatusEnum.INFO,
-                    title=file["name"],
+                    title=file.name,
                     category="sync",
                     brain_id=str(brain_id),
                 )
             )
 
-            file["notification_id"] = upload_notification.id
+            file.notification_id = str(upload_notification.id)
         for file in files:
             try:
-                file_id = file["id"]
-                file_name = file["name"]
-                modified_time = file["last_modified"]
+                file_id = file.id
+                file_name = file.name
+                modified_time = file.last_modified
 
                 download_endpoint = (
                     f"https://graph.microsoft.com/v1.0/me/drive/items/{file_id}/content"
@@ -170,7 +171,9 @@ class AzureSyncUtils(BaseModel):
                         brain_id,
                         current_user,
                         bulk_id,
-                        notification_id=file["notification_id"],
+                        "Share Point",
+                        file.web_view_link,
+                        notification_id=file.notification_id,
                     )
 
                 if existing_file:
@@ -196,7 +199,7 @@ class AzureSyncUtils(BaseModel):
 
                     downloaded_files.append(file_name)
                 notification_service.update_notification_by_id(
-                    file["notification_id"],
+                    file.notification_id,
                     NotificationUpdatableProperties(
                         status=NotificationsStatusEnum.SUCCESS,
                         description="File downloaded successfully",
@@ -209,7 +212,7 @@ class AzureSyncUtils(BaseModel):
                 # Check if the file already exists in the database
                 existing_files = self.sync_files_repo.get_sync_files(sync_active_id)
                 existing_file = next(
-                    (f for f in existing_files if f.path == file["name"]), None
+                    (f for f in existing_files if f.path == file.name), None
                 )
                 # Update the existing file record
                 if existing_file:
@@ -223,15 +226,15 @@ class AzureSyncUtils(BaseModel):
                     # Create a new file record
                     self.sync_files_repo.create_sync_file(
                         SyncFileInput(
-                            path=file["name"],
+                            path=file.name,
                             syncs_active_id=sync_active_id,
-                            last_modified=file["last_modified"],
+                            last_modified=file.last_modified,
                             brain_id=brain_id,
                             supported=False,
                         )
                     )
                 notification_service.update_notification_by_id(
-                    file["notification_id"],
+                    file.notification_id,
                     NotificationUpdatableProperties(
                         status=NotificationsStatusEnum.ERROR,
                         description="Error downloading file",
@@ -346,16 +349,16 @@ class AzureSyncUtils(BaseModel):
         files_to_download = [
             file
             for file in files
-            if not file["is_folder"]
+            if not file.is_folder
             and (
                 (
                     not last_synced_time
                     or datetime.strptime(
-                        file["last_modified"], "%Y-%m-%dT%H:%M:%SZ"
+                        file.last_modified, "%Y-%m-%dT%H:%M:%SZ"
                     ).replace(tzinfo=timezone.utc)
                     > last_synced_time
                 )
-                or not check_file_exists(sync_active["brain_id"], file["name"])
+                or not check_file_exists(sync_active["brain_id"], file.name)
             )
         ]
 

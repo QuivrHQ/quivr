@@ -8,13 +8,16 @@ from google.auth.transport.requests import Request as GoogleRequest
 from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
 from quivr_api.logger import get_logger
+from quivr_api.modules.sync.entity.sync import SyncFile
 from quivr_api.modules.sync.utils.normalize import remove_special_characters
 from requests import HTTPError
 
 logger = get_logger(__name__)
 
 
-def get_google_drive_files_by_id(credentials: dict, file_ids: List[str]):
+def get_google_drive_files_by_id(
+    credentials: dict, file_ids: List[str]
+) -> List[SyncFile]:
     """
     Retrieve files from Google Drive by their IDs.
 
@@ -33,38 +36,43 @@ def get_google_drive_files_by_id(credentials: dict, file_ids: List[str]):
 
     try:
         service = build("drive", "v3", credentials=creds)
-        files = []
+        files: List[SyncFile] = []
 
         for file_id in file_ids:
             result = (
                 service.files()
-                .get(fileId=file_id, fields="id, name, mimeType, modifiedTime")
+                .get(
+                    fileId=file_id,
+                    fields="id, name, mimeType, modifiedTime, webViewLink",
+                )
                 .execute()
             )
 
             files.append(
-                {
-                    "name": result["name"],
-                    "id": result["id"],
-                    "is_folder": result["mimeType"]
-                    == "application/vnd.google-apps.folder",
-                    "last_modified": result["modifiedTime"],
-                    "mime_type": result["mimeType"],
-                }
+                SyncFile(
+                    name=result["name"],
+                    id=result["id"],
+                    is_folder=(
+                        result["mimeType"] == "application/vnd.google-apps.folder"
+                    ),
+                    last_modified=result["modifiedTime"],
+                    mime_type=result["mimeType"],
+                    web_view_link=result["webViewLink"],
+                )
             )
 
         logger.info("Google Drive files retrieved successfully: %s", len(files))
         for file in files:
-            file["name"] = remove_special_characters(file["name"])
+            file.name = remove_special_characters(file.name)
         return files
     except HTTPError as error:
         logger.error("An error occurred while retrieving Google Drive files: %s", error)
-        return {"error": f"An error occurred: {error}"}
+        return []
 
 
 def get_google_drive_files(
     credentials: dict, folder_id: str = None, recursive: bool = False
-):
+) -> List[SyncFile]:
     """
     Retrieve files from Google Drive.
 
@@ -90,7 +98,7 @@ def get_google_drive_files(
         else:
             query = "'root' in parents or sharedWithMe"
         page_token = None
-        files = []
+        files: List[SyncFile] = []
 
         while True:
             results = (
@@ -98,7 +106,7 @@ def get_google_drive_files(
                 .list(
                     q=query,
                     pageSize=100,
-                    fields="nextPageToken, files(id, name, mimeType, modifiedTime)",
+                    fields="nextPageToken, files(id, name, mimeType, modifiedTime, webViewLink)",
                     pageToken=page_token,
                 )
                 .execute()
@@ -111,19 +119,19 @@ def get_google_drive_files(
 
             for item in items:
                 files.append(
-                    {
-                        "name": item["name"],
-                        "id": item["id"],
-                        "is_folder": item["mimeType"]
-                        == "application/vnd.google-apps.folder",
-                        "last_modified": item["modifiedTime"],
-                        "mime_type": item["mimeType"],
-                    }
+                    SyncFile(
+                        name=item["name"],
+                        id=item["id"],
+                        is_folder=(
+                            item["mimeType"] == "application/vnd.google-apps.folder"
+                        ),
+                        last_modified=item["modifiedTime"],
+                        mime_type=item["mimeType"],
+                        web_view_link=item["webViewLink"],
+                    )
                 )
 
                 # If recursive is True and the item is a folder, get files from the folder
-                if item["name"] == "Monotype":
-                    logger.warning(item)
                 if (
                     recursive
                     and item["mimeType"] == "application/vnd.google-apps.folder"
@@ -143,11 +151,11 @@ def get_google_drive_files(
         logger.info("Google Drive files retrieved successfully: %s", len(files))
 
         for file in files:
-            file["name"] = remove_special_characters(file["name"])
+            file.name = remove_special_characters(file.name)
         return files
     except HTTPError as error:
         logger.error("An error occurred while retrieving Google Drive files: %s", error)
-        return {"error": f"An error occurred: {error}"}
+        return []
 
 
 CLIENT_ID = os.getenv("SHAREPOINT_CLIENT_ID")
@@ -215,24 +223,25 @@ def list_azure_files(credentials, folder_id=None, recursive=False):
 
     files = []
     for item in items:
-        file_data = {
-            "name": item["name"],
-            "id": item["id"],
-            "is_folder": "folder" in item,
-            "last_modified": item["lastModifiedDateTime"],
-            "mime_type": item.get("file", {}).get("mimeType", "folder"),
-        }
+        file_data = SyncFile(
+            name=item.get("name"),
+            id=item.get("id"),
+            is_folder="folder" in item,
+            last_modified=item.get("lastModifiedDateTime"),
+            mime_type=item.get("file", {}).get("mimeType", "folder"),
+            web_view_link=item.get("webUrl"),
+        )
         files.append(file_data)
 
         # If recursive option is enabled and the item is a folder, fetch files from it
-        if recursive and file_data["is_folder"]:
+        if recursive and file_data.is_folder:
             folder_files = list_azure_files(
-                credentials, folder_id=file_data["id"], recursive=True
+                credentials, folder_id=file_data.id, recursive=True
             )
 
             files.extend(folder_files)
     for file in files:
-        file["name"] = remove_special_characters(file["name"])
+        file.name = remove_special_characters(file.name)
     logger.info("Azure Drive files retrieved successfully: %s", len(files))
     return files
 
@@ -269,16 +278,17 @@ def get_azure_files_by_id(credentials: dict, file_ids: List[str]):
 
         result = response.json()
         files.append(
-            {
-                "name": result["name"],
-                "id": result["id"],
-                "is_folder": "folder" in result,
-                "last_modified": result["lastModifiedDateTime"],
-                "mime_type": result.get("file", {}).get("mimeType", "folder"),
-            }
+            SyncFile(
+                name=result.get("name"),
+                id=result.get("id"),
+                is_folder="folder" in result,
+                last_modified=result.get("lastModifiedDateTime"),
+                mime_type=result.get("file", {}).get("mimeType", "folder"),
+                web_view_link=result.get("webUrl"),
+            )
         )
 
     for file in files:
-        file["name"] = remove_special_characters(file["name"])
+        file.name = remove_special_characters(file.name)
     logger.info("Azure Drive files retrieved successfully: %s", len(files))
     return files
