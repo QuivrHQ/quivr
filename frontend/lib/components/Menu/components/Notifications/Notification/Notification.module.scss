@@ -4,6 +4,39 @@
 .notification {
   padding: Spacings.$spacing05;
   border-bottom: 1px solid var(--border-2);
+  display: flex;
+  flex-direction: column;
+  gap: Spacings.$spacing04;
+
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    .left {
+      display: flex;
+      align-items: center;
+      gap: Spacings.$spacing02;
+
+      .title {
+        font-size: Typography.$small;
+        color: var(--text-4);
+      }
+
+      .brain_name {
+        display: flex;
+        align-items: center;
+        font-size: Typography.$small;
+        gap: Spacings.$spacing02;
+        font-weight: 500;
+      }
+    }
+  }
+
+  .subtitle {
+    font-size: Typography.$tiny;
+    font-style: italic;
+  }
 
   &.last {
     border-bottom: none;
@@ -15,7 +48,7 @@
     align-items: center;
 
     .left {
-      width: 70px;
+      width: 100px;
       display: flex;
       align-items: center;
       gap: Spacings.$spacing03;

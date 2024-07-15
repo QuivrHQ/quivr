@@ -55,6 +55,8 @@ export const NotificationsProvider = ({
         (bulkId) => ({
           bulk_id: bulkId,
           notifications: bulkMap[bulkId],
+          category: bulkMap[bulkId][0].category,
+          brain_id: bulkMap[bulkId][0].brain_id,
         })
       );
 

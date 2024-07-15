@@ -1,3 +1,5 @@
+import { UUID } from "crypto";
+
 export enum NotificationStatus {
   Info = "info",
   Warning = "warning",
@@ -9,6 +11,7 @@ export interface BulkNotification {
   notifications: NotificationType[];
   bulk_id: string;
   category: "sync" | "upload" | "crawl";
+  brain_id: UUID;
 }
 
 export interface NotificationType {
@@ -20,4 +23,6 @@ export interface NotificationType {
   read: boolean;
   description: string;
   bulk_id: string;
+  category: "sync" | "upload" | "crawl";
+  brain_id: UUID;
 }
