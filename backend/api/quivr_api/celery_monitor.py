@@ -2,6 +2,8 @@ from celery.result import AsyncResult
 
 from quivr_api.celery_config import celery
 from quivr_api.logger import get_logger
+from quivr_api.modules.knowledge.dto.inputs import KnowledgeStatus
+from quivr_api.modules.knowledge.service.knowledge_service import KnowledgeService
 from quivr_api.modules.notification.dto.inputs import NotificationUpdatableProperties
 from quivr_api.modules.notification.entity.notification import NotificationsStatusEnum
 from quivr_api.modules.notification.service.notification_service import (
@@ -10,6 +12,7 @@ from quivr_api.modules.notification.service.notification_service import (
 
 logger = get_logger("notifier_service", "notifier_service.log")
 notification_service = NotificationService()
+knowledge_service = KnowledgeService()
 
 
 def notifier(app):
@@ -24,6 +27,7 @@ def notifier(app):
 
             if task_name == "process_file_and_notify":
                 notification_id = task_kwargs["notification_id"]
+                knowledge_id = task_kwargs["knowledge_id"]
                 if event["type"] == "task-failed":
                     logger.error(
                         f"task {task.id} process_file_and_notify {task_kwargs} failed. Sending notifition {notification_id}"
@@ -34,6 +38,12 @@ def notifier(app):
                             status=NotificationsStatusEnum.ERROR,
                             description=f"An error occurred while processing the file: {event['exception']}",
                         ),
+                    )
+                    knowledge_service.update_status_knowledge(
+                        knowledge_id, KnowledgeStatus.ERROR
+                    )
+                    logger.error(
+                        f"task {task.id} process_file_and_notify {task_kwargs} failed. Updating knowledge {knowledge_id} to Error"
                     )
 
                 if event["type"] == "task-succeeded":
@@ -46,6 +56,13 @@ def notifier(app):
                             status=NotificationsStatusEnum.SUCCESS,
                             description="Your file has been properly uploaded!",
                         ),
+                    )
+                    # TODO(@aminediro): implement retry  if failure
+                    knowledge_service.update_status_knowledge(
+                        knowledge_id, KnowledgeStatus.UPLOADED
+                    )
+                    logger.info(
+                        f"task {task.id} process_file_and_notify {task_kwargs} failed. Updating knowledge {knowledge_id} to UPLOADED"
                     )
         except Exception as e:
             logger.exception(f"handling event {event} raised exception: {e}")
@@ -62,5 +79,5 @@ def notifier(app):
 
 
 if __name__ == "__main__":
-    logger.info("Started celery notification...")
+    logger.info("Started  quivr-notifier notification...")
     notifier(celery)
