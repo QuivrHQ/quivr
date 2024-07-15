@@ -18,18 +18,6 @@ from quivr_api.modules.notification.dto.inputs import (
 from quivr_api.modules.notification.entity.notification import NotificationsStatusEnum
 from quivr_api.modules.notification.service.notification_service import (
     NotificationService,
-from quivr_api.modules.notification.dto.inputs import (
-    CreateNotification,
-    NotificationUpdatableProperties,
-)
-from quivr_api.modules.notification.entity.notification import NotificationsStatusEnum
-from quivr_api.modules.notification.service.notification_service import (
-    NotificationService,
-)
-from quivr_api.modules.sync.dto.inputs import (
-    SyncFileInput,
-    SyncFileUpdateInput,
-    SyncsActiveUpdateInput,
 )
 from quivr_api.modules.sync.dto.inputs import (
     SyncFileInput,
@@ -103,8 +91,7 @@ class GoogleSyncUtils(BaseModel):
                 )
             )
 
-            file.notification_id = upload_notification.id
-
+            file.notification_id = str(upload_notification.id)
 
         for file in files:
             logger.info("🔥🔥🔥🔥: %s", file)

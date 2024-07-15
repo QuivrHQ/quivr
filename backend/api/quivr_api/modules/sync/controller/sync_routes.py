@@ -1,4 +1,5 @@
 import os
+import uuid
 from typing import List
 
 from fastapi import APIRouter, Depends, status
@@ -144,9 +145,10 @@ async def create_sync_active(
         CreateNotification(
             user_id=current_user.id,
             status=NotificationsStatusEnum.SUCCESS,
-            title="Sync created! Synchronization takes a few minutes to complete",
-            description="Syncing your files...",
+            title="Synchronization created! ",
+            description="Synchronization takes a few minutes to complete",
             category="generic",
+            bulk_id=uuid.uuid4(),
             brain_id=sync_active_input.brain_id,
         )
     )

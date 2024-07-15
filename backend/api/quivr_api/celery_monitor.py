@@ -39,9 +39,9 @@ def notifier(app):
                         NotificationUpdatableProperties(
                             status=NotificationsStatusEnum.ERROR,
                             description=(
-                                f"An error occurred while processing the file: {event['exception']}"
+                                f"An error occurred while processing the file"
                                 if task_name == "process_file_and_notify"
-                                else f"An error occurred while processing the URL: {event['exception']}"
+                                else f"An error occurred while processing the URL"
                             ),
                         ),
                     )
