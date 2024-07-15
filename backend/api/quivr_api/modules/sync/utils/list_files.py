@@ -190,7 +190,7 @@ def refresh_azure_token(credentials):
     return result
 
 
-def get_azure_headers(token_data):
+def get_sync_headers(token_data):
     return {
         "Authorization": f"Bearer {token_data['access_token']}",
         "Accept": "application/json",
@@ -262,7 +262,7 @@ def get_azure_files_by_id(
     """
     logger.info("Retrieving Azure Drive files with file_ids: %s", file_ids)
     token_data = get_azure_token_data(credentials)
-    headers = get_azure_headers(token_data)
+    headers = get_sync_headers(token_data)
     files = []
 
     for file_id in file_ids:
@@ -270,7 +270,7 @@ def get_azure_files_by_id(
         response = requests.get(endpoint, headers=headers)
         if response.status_code == 401:
             token_data = refresh_azure_token(credentials)
-            headers = get_azure_headers(token_data)
+            headers = get_sync_headers(token_data)
             response = requests.get(endpoint, headers=headers)
         if response.status_code != 200:
             logger.error(

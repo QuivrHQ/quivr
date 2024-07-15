@@ -148,7 +148,11 @@ def oauth2callback_dropbox(request: Request):
             "expires_in": str(oauth_result.expires_at),
 =======
             "email": email,
+<<<<<<< HEAD
 >>>>>>> 96ed662b (fix: dropbox sync creds)
+=======
+            "expires_in": str(oauth_result.expires_at),
+>>>>>>> eeee8e92 (add: list dropbox items)
         }
 
         sync_user_input = SyncUserUpdateInput(
