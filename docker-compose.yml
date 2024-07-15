@@ -82,7 +82,7 @@ services:
     container_name: worker
     extra_hosts:
       - "host.docker.internal:host-gateway"
-    command: celery -A quivr_api.celery_worker worker -l info
+    command: celery -A quivr_api.celery_worker worker -l info -E
     restart: always
     depends_on:
       - redis

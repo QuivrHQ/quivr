@@ -70,7 +70,7 @@ services:
     container_name: worker
     volumes:
       - ./backend/:/code/
-    command: "celery -A quivr_api.celery_worker worker -l info"
+    command: "celery -A quivr_api.celery_worker worker -l info -E"
     restart: always
     depends_on:
       - redis
