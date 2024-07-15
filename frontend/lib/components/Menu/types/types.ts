@@ -8,6 +8,7 @@ export enum NotificationStatus {
 export interface BulkNotification {
   notifications: NotificationType[];
   bulk_id: string;
+  category: "sync" | "upload" | "crawl";
 }
 
 export interface NotificationType {
