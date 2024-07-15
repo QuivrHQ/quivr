@@ -18,6 +18,7 @@ class SyncFile(BaseModel):
     last_modified: str
     mime_type: str
     web_view_link: str
+    notification_id: Optional[str] = None
 
 
 class SyncsActive(BaseModel):

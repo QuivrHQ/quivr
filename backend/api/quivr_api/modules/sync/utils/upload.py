@@ -94,7 +94,6 @@ async def upload_file(
     process_file_and_notify.delay(
         file_name=filename_with_brain_id,
         file_original_name=upload_file.filename,
-        brain_id=str(brain_id),
         integration=integration,
         integration_link=integration_link,
         brain_id=brain_id,

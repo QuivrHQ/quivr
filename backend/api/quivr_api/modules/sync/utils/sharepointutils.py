@@ -99,13 +99,13 @@ class AzureSyncUtils(BaseModel):
                     user_id=current_user,
                     bulk_id=bulk_id,
                     status=NotificationsStatusEnum.INFO,
-                    title=file["name"],
+                    title=file.name,
                     category="sync",
                     brain_id=str(brain_id),
                 )
             )
 
-            file["notification_id"] = upload_notification.id
+            file.notification_id = str(upload_notification.id)
         for file in files:
             try:
                 file_id = file.id
@@ -173,7 +173,7 @@ class AzureSyncUtils(BaseModel):
                         bulk_id,
                         "Share Point",
                         file.web_view_link,
-                        notification_id=file["notification_id"],
+                        notification_id=file.notification_id,
                     )
 
                 if existing_file:
@@ -199,7 +199,7 @@ class AzureSyncUtils(BaseModel):
 
                     downloaded_files.append(file_name)
                 notification_service.update_notification_by_id(
-                    file["notification_id"],
+                    file.notification_id,
                     NotificationUpdatableProperties(
                         status=NotificationsStatusEnum.SUCCESS,
                         description="File downloaded successfully",
@@ -234,7 +234,7 @@ class AzureSyncUtils(BaseModel):
                         )
                     )
                 notification_service.update_notification_by_id(
-                    file["notification_id"],
+                    file.notification_id,
                     NotificationUpdatableProperties(
                         status=NotificationsStatusEnum.ERROR,
                         description="Error downloading file",

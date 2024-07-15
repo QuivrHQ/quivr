@@ -65,13 +65,13 @@ class GoogleSyncUtils(BaseModel):
                     user_id=current_user,
                     bulk_id=bulk_id,
                     status=NotificationsStatusEnum.INFO,
-                    title=file["name"],
+                    title=file.name,
                     category="sync",
                     brain_id=str(brain_id),
                 )
             )
 
-            file["notification_id"] = upload_notification.id
+            file.notification_id = upload_notification.id
 
         for file in files:
             logger.info("🔥🔥🔥🔥: %s", file)
@@ -161,7 +161,7 @@ class GoogleSyncUtils(BaseModel):
                         bulk_id,
                         "Google Drive",
                         file.web_view_link,
-                        notification_id=file["notification_id"],
+                        notification_id=file.notification_id,
                     )  # type: ignore
 
                 if existing_file:
@@ -187,7 +187,7 @@ class GoogleSyncUtils(BaseModel):
 
                     downloaded_files.append(file_name)
                 notification_service.update_notification_by_id(
-                    file["notification_id"],
+                    file.notification_id,
                     NotificationUpdatableProperties(
                         status=NotificationsStatusEnum.SUCCESS,
                         description="File downloaded successfully",
@@ -223,7 +223,7 @@ class GoogleSyncUtils(BaseModel):
                         )
                     )
                 notification_service.update_notification_by_id(
-                    file["notification_id"],
+                    file.notification_id,
                     NotificationUpdatableProperties(
                         status=NotificationsStatusEnum.ERROR,
                         description="Error downloading file",
