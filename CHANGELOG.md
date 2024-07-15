@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.0.283 (2024-07-12)
+
+## What's Changed
+* feat: Add bulk_id field to CreateNotification and Notification models by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2850
+* feat: Add bulk_id field to CreateNotification and Notification models by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2854
+* fix: quiv core stream duplicate  and quivr-core rag tests by @AmineDiro in https://github.com/QuivrHQ/quivr/pull/2852
+* feat: Add category and brain_id fields to CreateNotification and Notification models by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2856
+* feat: Update file loading logic in File model by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2857
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.282...v0.0.283
+
 ## 0.0.282 (2024-07-11)
 
 ## What's Changed
