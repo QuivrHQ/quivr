@@ -74,6 +74,27 @@
     }
   }
 
+  .status_report {
+    display: flex;
+    gap: Spacings.$spacing06;
+
+    .success {
+      display: flex;
+      align-items: center;
+      color: var(--success);
+      gap: Spacings.$spacing02;
+      font-weight: 500;
+    }
+
+    .error {
+      display: flex;
+      align-items: center;
+      color: var(--dangerous);
+      gap: Spacings.$spacing02;
+      font-weight: 500;
+    }
+  }
+
   .errors_header {
     display: flex;
     align-items: center;

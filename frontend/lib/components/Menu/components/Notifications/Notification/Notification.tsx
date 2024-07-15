@@ -23,17 +23,24 @@ const NotificationHeader = ({
   bulkNotification,
   brain,
   onDelete,
+  allNotifsProcessed,
 }: {
   bulkNotification: BulkNotification;
   brain?: Brain;
   onDelete: () => void;
+  allNotifsProcessed: boolean;
 }) => (
   <div className={styles.header}>
     <div className={styles.left}>
       <span className={styles.title}>
-        {bulkNotification.category === "upload" && "Uploading files "}
-        {bulkNotification.category === "crawl" && "Crawling websites "}
-        {bulkNotification.category === "sync" && "Syncing files "}
+        <span>
+          {bulkNotification.category === "upload" &&
+            `${allNotifsProcessed ? "Uploaded" : "Uploading"} files `}
+          {bulkNotification.category === "crawl" &&
+            `${allNotifsProcessed ? "Crawled" : "Crawling"} websites `}
+          {bulkNotification.category === "sync" &&
+            `${allNotifsProcessed ? "Synced" : "Syncing"} files `}
+        </span>
         for
       </span>
       {brain && (
@@ -110,6 +117,10 @@ export const Notification = ({
     router.push(`/studio/${bulkNotification.brain_id}`); // Naviguer vers l'URL
   };
 
+  const allNotifsProcessed = bulkNotification.notifications.every(
+    (notif) => notif.status !== "info"
+  );
+
   const deleteNotification = async () => {
     const deletePromises = bulkNotification.notifications.map(
       async (notification) => {
@@ -131,16 +142,54 @@ export const Notification = ({
         bulkNotification={bulkNotification}
         brain={brain}
         onDelete={() => void deleteNotification()}
+        allNotifsProcessed={allNotifsProcessed}
       />
-      <div className={styles.loader_wrapper}>
-        <div className={styles.left}>
-          <div className={styles.icon_info}>
-            <NotificationIcon notifications={bulkNotification.notifications} />
+      {bulkNotification.notifications.some(
+        (notif) => notif.status === "info"
+      ) ? (
+        <div className={styles.loader_wrapper}>
+          <div className={styles.left}>
+            <div className={styles.icon_info}>
+              <NotificationIcon
+                notifications={bulkNotification.notifications}
+              />
+            </div>
+            <NotificationCount notifications={bulkNotification.notifications} />
           </div>
-          <NotificationCount notifications={bulkNotification.notifications} />
+          <NotificationLoadingBar bulkNotification={bulkNotification} />
         </div>
-        <NotificationLoadingBar bulkNotification={bulkNotification} />
-      </div>
+      ) : (
+        <div className={styles.status_report}>
+          {bulkNotification.notifications.some(
+            (notif) => notif.status === "success"
+          ) && (
+            <div className={styles.success}>
+              <Icon name="check" size="normal" color="success" />
+              <span>
+                {
+                  bulkNotification.notifications.filter(
+                    (notif) => notif.status === "success"
+                  ).length
+                }
+              </span>
+            </div>
+          )}
+          {bulkNotification.notifications.some(
+            (notif) => notif.status === "error"
+          ) && (
+            <div className={styles.error}>
+              <Icon name="warning" size="normal" color="dangerous" />
+              <span>
+                {
+                  bulkNotification.notifications.filter(
+                    (notif) => notif.status === "error"
+                  ).length
+                }
+              </span>
+            </div>
+          )}
+        </div>
+      )}
       {bulkNotification.notifications.some(
         (notif) => notif.status === "error"
       ) && (
