@@ -146,6 +146,8 @@ async def create_sync_active(
             status=NotificationsStatusEnum.SUCCESS,
             title="Sync created! Synchronization takes a few minutes to complete",
             description="Syncing your files...",
+            category="sync",
+            brain_id=sync_active_input.brain_id,
         )
     )
     return sync_service.create_sync_active(sync_active_input, str(current_user.id))
@@ -182,6 +184,7 @@ async def update_sync_active(
             status=NotificationsStatusEnum.SUCCESS,
             title="Sync updated! Synchronization takes a few minutes to complete",
             description="Syncing your files...",
+            category="sync",
         )
     )
     sync_active_input.force_sync = True

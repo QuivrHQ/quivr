@@ -36,6 +36,8 @@ elif CELERY_BROKER_URL.startswith("redis"):
         task_concurrency=4,
         worker_prefetch_multiplier=2,
         task_serializer="json",
+        result_extended=True,
+        task_send_sent_event=True,
     )
 else:
     raise ValueError(f"Unsupported broker URL: {CELERY_BROKER_URL}")

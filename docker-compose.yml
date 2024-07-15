@@ -48,6 +48,22 @@ services:
     ports:
       - 5050:5050
 
+  notifier:
+    pull_policy: never
+    image: backend-base:latest
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    env_file:
+      - .env
+    container_name: notifier
+    command:
+      - "python"
+      - "/code/api/quivr_api/celery_monitor.py"
+    restart: always
+    depends_on:
+      - redis
+      - worker
+
   redis:
     image: redis:latest@sha256:a7cee7c8178ff9b5297cb109e6240f5072cdaaafd775ce6b586c3c704b06458e
     container_name: redis

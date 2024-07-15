@@ -42,6 +42,24 @@ services:
     ports:
       - 6379:6379
 
+  notifier:
+    pull_policy: never
+    image: backend-base:latest
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    env_file:
+      - .env
+    container_name: notifier
+    volumes:
+      - ./backend/:/code/
+    command:
+      - "python"
+      - "/code/api/quivr_api/celery_monitor.py"
+    restart: always
+    depends_on:
+      - redis
+      - worker
+
   worker:
     pull_policy: never
     image: backend-base:latest

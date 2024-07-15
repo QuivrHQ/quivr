@@ -34,6 +34,8 @@ export const PageHeader = ({
             color={button.color}
             iconName={button.iconName}
             hidden={button.hidden}
+            disabled={button.disabled}
+            tooltip={button.tooltip}
           />
         ))}
       </div>

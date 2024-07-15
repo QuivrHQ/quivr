@@ -1,4 +1,5 @@
 import os
+from typing import Optional
 from uuid import UUID
 
 from fastapi import HTTPException, UploadFile
@@ -30,6 +31,7 @@ async def upload_file(
     upload_file: UploadFile,
     brain_id: UUID,
     current_user: str,
+    bulk_id: Optional[UUID] = None,
 ):
     validate_brain_authorization(
         brain_id, current_user, [RoleEnum.Editor, RoleEnum.Owner]
@@ -40,8 +42,11 @@ async def upload_file(
     upload_notification = notification_service.add_notification(
         CreateNotification(
             user_id=current_user,
+            bulk_id=bulk_id,
             status=NotificationsStatusEnum.INFO,
-            title=f"Processing File {upload_file.filename}",
+            title=f"{upload_file.filename}",
+            category="sync",
+            brain_id=str(brain_id),
         )
     )
 
@@ -96,5 +101,6 @@ async def upload_file(
         file_original_name=upload_file.filename,
         brain_id=brain_id,
         notification_id=upload_notification.id,
+        knowledge_id=added_knowledge.id,
     )
     return {"message": "File processing has started."}
