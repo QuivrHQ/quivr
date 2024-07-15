@@ -11,6 +11,7 @@ import { UploadDocumentModal } from "@/lib/components/UploadDocumentModal/Upload
 import { MessageInfoBox } from "@/lib/components/ui/MessageInfoBox/MessageInfoBox";
 import QuivrButton from "@/lib/components/ui/QuivrButton/QuivrButton";
 import { SearchBar } from "@/lib/components/ui/SearchBar/SearchBar";
+import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 import { useOnboardingContext } from "@/lib/context/OnboardingProvider/hooks/useOnboardingContext";
 import { useSupabase } from "@/lib/context/SupabaseProvider";
 import { useUserSettingsContext } from "@/lib/context/UserSettingsProvider/hooks/useUserSettingsContext";
@@ -26,9 +27,23 @@ const Search = (): JSX.Element => {
   const { session } = useSupabase();
   const { isBrainCreationModalOpened, setIsBrainCreationModalOpened } =
     useBrainCreationContext();
-  const { userIdentityData } = useUserData();
+  const { userIdentityData, userData } = useUserData();
   const { isDarkMode } = useUserSettingsContext();
   const { isBrainCreated } = useOnboardingContext();
+  const { allBrains } = useBrainContext();
+
+  const [buttons, setButtons] = useState<ButtonType[]>([
+    {
+      label: "Create brain",
+      color: "primary",
+      onClick: () => {
+        setIsBrainCreationModalOpened(true);
+      },
+      iconName: "brain",
+      tooltip:
+        "You have reached the maximum number of brains allowed. Please upgrade your plan or delete some brains to create a new one.",
+    },
+  ]);
 
   useEffect(() => {
     if (userIdentityData) {
@@ -37,21 +52,27 @@ const Search = (): JSX.Element => {
   }, [userIdentityData]);
 
   useEffect(() => {
+    if (userData) {
+      setButtons((prevButtons) => {
+        return prevButtons.map((button) => {
+          if (button.label === "Create brain") {
+            return {
+              ...button,
+              disabled: userData.max_brains <= allBrains.length,
+            };
+          }
+
+          return button;
+        });
+      });
+    }
+  }, [userData?.max_brains, allBrains.length]);
+
+  useEffect(() => {
     if (session === null) {
       redirectToLogin();
     }
   }, [pathname, session]);
-
-  const buttons: ButtonType[] = [
-    {
-      label: "Create brain",
-      color: "primary",
-      onClick: () => {
-        setIsBrainCreationModalOpened(true);
-      },
-      iconName: "brain",
-    },
-  ];
 
   return (
     <>
