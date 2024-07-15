@@ -14,11 +14,25 @@
     width: 100%;
     align-items: center;
 
-    .count {
-      display: flex;
+    .left {
       width: 70px;
-      font-size: Typography.$very_tiny;
-      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: Spacings.$spacing03;
+
+      .count {
+        display: flex;
+        font-size: Typography.$very_tiny;
+        font-weight: 600;
+
+        &.success {
+          color: var(--success);
+        }
+
+        &.warning {
+          color: var(--warning);
+        }
+      }
     }
   }
 }
