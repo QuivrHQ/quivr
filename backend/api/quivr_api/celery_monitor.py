@@ -1,5 +1,4 @@
 from celery.result import AsyncResult
-
 from quivr_api.celery_config import celery
 from quivr_api.logger import get_logger
 from quivr_api.modules.knowledge.dto.inputs import KnowledgeStatus
@@ -25,9 +24,12 @@ def notifier(app):
             task_result = AsyncResult(task.id, app=app)
             task_name, task_kwargs = task_result.name, task_result.kwargs
 
-            if task_name == "process_file_and_notify":
+            if (
+                task_name == "process_file_and_notify"
+                or task_name == "process_crawl_and_notify"
+            ):
                 notification_id = task_kwargs["notification_id"]
-                knowledge_id = task_kwargs["knowledge_id"]
+                knowledge_id = task_kwargs.get("knowledge_id", None)
                 if event["type"] == "task-failed":
                     logger.error(
                         f"task {task.id} process_file_and_notify {task_kwargs} failed. Sending notifition {notification_id}"
@@ -36,12 +38,17 @@ def notifier(app):
                         notification_id,
                         NotificationUpdatableProperties(
                             status=NotificationsStatusEnum.ERROR,
-                            description=f"An error occurred while processing the file: {event['exception']}",
+                            description=(
+                                f"An error occurred while processing the file: {event['exception']}"
+                                if task_name == "process_file_and_notify"
+                                else f"An error occurred while processing the URL: {event['exception']}"
+                            ),
                         ),
                     )
-                    knowledge_service.update_status_knowledge(
-                        knowledge_id, KnowledgeStatus.ERROR
-                    )
+                    if knowledge_id:
+                        knowledge_service.update_status_knowledge(
+                            knowledge_id, KnowledgeStatus.ERROR
+                        )
                     logger.error(
                         f"task {task.id} process_file_and_notify {task_kwargs} failed. Updating knowledge {knowledge_id} to Error"
                     )
@@ -54,13 +61,18 @@ def notifier(app):
                         notification_id,
                         NotificationUpdatableProperties(
                             status=NotificationsStatusEnum.SUCCESS,
-                            description="Your file has been properly uploaded!",
+                            description=(
+                                "Your file has been properly uploaded!"
+                                if task_name == "process_file_and_notify"
+                                else "Your URL has been properly crawled!"
+                            ),
                         ),
                     )
                     # TODO(@aminediro): implement retry  if failure
-                    knowledge_service.update_status_knowledge(
-                        knowledge_id, KnowledgeStatus.UPLOADED
-                    )
+                    if knowledge_id:
+                        knowledge_service.update_status_knowledge(
+                            knowledge_id, KnowledgeStatus.UPLOADED
+                        )
                     logger.info(
                         f"task {task.id} process_file_and_notify {task_kwargs} failed. Updating knowledge {knowledge_id} to UPLOADED"
                     )
