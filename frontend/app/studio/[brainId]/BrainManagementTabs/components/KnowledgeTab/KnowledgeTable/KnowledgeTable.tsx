@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 
 import { Checkbox } from "@/lib/components/ui/Checkbox/Checkbox";
+import Icon from "@/lib/components/ui/Icon/Icon";
 import QuivrButton from "@/lib/components/ui/QuivrButton/QuivrButton";
 import { TextInput } from "@/lib/components/ui/TextInput/TextInput";
 import { useDevice } from "@/lib/hooks/useDevice";
@@ -15,6 +16,93 @@ interface KnowledgeTableProps {
   knowledgeList: Knowledge[];
 }
 
+const filterAndSortKnowledge = (
+  knowledgeList: Knowledge[],
+  searchQuery: string,
+  sortConfig: { key: string; direction: string }
+): Knowledge[] => {
+  let filteredList = knowledgeList.filter((knowledge) =>
+    isUploadedKnowledge(knowledge)
+      ? knowledge.fileName.toLowerCase().includes(searchQuery.toLowerCase())
+      : knowledge.url.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  if (sortConfig.key) {
+    const compareStrings = (a: string | number, b: string | number) => {
+      if (a < b) {
+        return sortConfig.direction === "ascending" ? -1 : 1;
+      }
+      if (a > b) {
+        return sortConfig.direction === "ascending" ? 1 : -1;
+      }
+
+      return 0;
+    };
+
+    const getComparableValue = (item: Knowledge) => {
+      if (sortConfig.key === "name") {
+        return isUploadedKnowledge(item) ? item.fileName : item.url;
+      }
+      if (sortConfig.key === "status") {
+        return item.status;
+      }
+
+      return "";
+    };
+
+    filteredList = filteredList.sort((a, b) =>
+      compareStrings(getComparableValue(a), getComparableValue(b))
+    );
+  }
+
+  return filteredList;
+};
+
+const updateSelectedKnowledge = ({
+  knowledge,
+  index,
+  event,
+  lastSelectedIndex,
+  filteredKnowledgeList,
+  selectedKnowledge,
+}: {
+  knowledge: Knowledge;
+  index: number;
+  event: React.MouseEvent;
+  lastSelectedIndex: number | null;
+  filteredKnowledgeList: Knowledge[];
+  selectedKnowledge: Knowledge[];
+}): { selectedKnowledge: Knowledge[]; lastSelectedIndex: number | null } => {
+  if (event.shiftKey && lastSelectedIndex !== null) {
+    const start = Math.min(lastSelectedIndex, index);
+    const end = Math.max(lastSelectedIndex, index);
+    const range = filteredKnowledgeList.slice(start, end + 1);
+
+    const newSelected = [...selectedKnowledge];
+    range.forEach((item) => {
+      if (!newSelected.some((selectedItem) => selectedItem.id === item.id)) {
+        newSelected.push(item);
+      }
+    });
+
+    return { selectedKnowledge: newSelected, lastSelectedIndex: index };
+  } else {
+    const isSelected = selectedKnowledge.some(
+      (item) => item.id === knowledge.id
+    );
+    const newSelectedKnowledge = isSelected
+      ? selectedKnowledge.filter(
+          (selectedItem) => selectedItem.id !== knowledge.id
+        )
+      : [...selectedKnowledge, knowledge];
+
+    return {
+      selectedKnowledge: newSelectedKnowledge,
+      lastSelectedIndex: isSelected ? null : index,
+    };
+  }
+};
+
 const KnowledgeTable = React.forwardRef<HTMLDivElement, KnowledgeTableProps>(
   ({ knowledgeList }, ref) => {
     const [selectedKnowledge, setSelectedKnowledge] = useState<Knowledge[]>([]);
@@ -27,56 +115,32 @@ const KnowledgeTable = React.forwardRef<HTMLDivElement, KnowledgeTableProps>(
     const [filteredKnowledgeList, setFilteredKnowledgeList] =
       useState<Knowledge[]>(knowledgeList);
     const { isMobile } = useDevice();
+    const [sortConfig, setSortConfig] = useState<{
+      key: string;
+      direction: string;
+    }>({ key: "", direction: "" });
 
     useEffect(() => {
       setFilteredKnowledgeList(
-        knowledgeList.filter((knowledge) =>
-          isUploadedKnowledge(knowledge)
-            ? knowledge.fileName
-                .toLowerCase()
-                .includes(searchQuery.toLowerCase())
-            : knowledge.url.toLowerCase().includes(searchQuery.toLowerCase())
-        )
+        filterAndSortKnowledge(knowledgeList, searchQuery, sortConfig)
       );
-    }, [searchQuery, knowledgeList]);
+    }, [searchQuery, knowledgeList, sortConfig]);
 
     const handleSelect = (
       knowledge: Knowledge,
       index: number,
       event: React.MouseEvent
     ) => {
-      if (event.shiftKey && lastSelectedIndex !== null) {
-        const start = Math.min(lastSelectedIndex, index);
-        const end = Math.max(lastSelectedIndex, index);
-        const range = filteredKnowledgeList.slice(start, end + 1);
-
-        setSelectedKnowledge((prevSelected) => {
-          const newSelected = [...prevSelected];
-          range.forEach((item) => {
-            if (
-              !newSelected.some((selectedItem) => selectedItem.id === item.id)
-            ) {
-              newSelected.push(item);
-            }
-          });
-
-          return newSelected;
-        });
-      } else {
-        const isSelected = selectedKnowledge.some(
-          (item) => item.id === knowledge.id
-        );
-        setSelectedKnowledge((prevSelected) =>
-          isSelected
-            ? prevSelected.filter(
-                (selectedItem) => selectedItem.id !== knowledge.id
-              )
-            : [...prevSelected, knowledge]
-        );
-        setLastSelectedIndex(
-          isSelected && lastSelectedIndex === index ? null : index
-        );
-      }
+      const newSelectedKnowledge = updateSelectedKnowledge({
+        knowledge,
+        index,
+        event,
+        lastSelectedIndex,
+        filteredKnowledgeList,
+        selectedKnowledge,
+      });
+      setSelectedKnowledge(newSelectedKnowledge.selectedKnowledge);
+      setLastSelectedIndex(newSelectedKnowledge.lastSelectedIndex);
     };
 
     const handleDelete = () => {
@@ -87,6 +151,20 @@ const KnowledgeTable = React.forwardRef<HTMLDivElement, KnowledgeTableProps>(
         void onDeleteKnowledge(knowledge);
       });
       setSelectedKnowledge([]);
+    };
+
+    const handleSort = (key: string) => {
+      setSortConfig((prevSortConfig) => {
+        let direction = "ascending";
+        if (
+          prevSortConfig.key === key &&
+          prevSortConfig.direction === "ascending"
+        ) {
+          direction = "descending";
+        }
+
+        return { key, direction };
+      });
     };
 
     return (
@@ -121,15 +199,28 @@ const KnowledgeTable = React.forwardRef<HTMLDivElement, KnowledgeTableProps>(
                 checked={allChecked}
                 setChecked={(checked) => {
                   setAllChecked(checked);
-                  checked
-                    ? setSelectedKnowledge(filteredKnowledgeList)
-                    : setSelectedKnowledge([]);
+                  setSelectedKnowledge(checked ? filteredKnowledgeList : []);
                 }}
               />
-              <span className={styles.name}>Name</span>
+              <div className={styles.name} onClick={() => handleSort("name")}>
+                Name
+                <div className={styles.icon}>
+                  <Icon name="sort" size="small" color="black" />
+                </div>
+              </div>
             </div>
             <div className={styles.right}>
-              {!isMobile && <span className={styles.actions}>Status</span>}
+              {!isMobile && (
+                <div
+                  className={styles.status}
+                  onClick={() => handleSort("status")}
+                >
+                  Status
+                  <div className={styles.icon}>
+                    <Icon name="sort" size="small" color="black" />
+                  </div>
+                </div>
+              )}
               <span className={styles.actions}>Actions</span>
             </div>
           </div>
