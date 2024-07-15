@@ -146,7 +146,7 @@ async def create_sync_active(
             status=NotificationsStatusEnum.SUCCESS,
             title="Sync created! Synchronization takes a few minutes to complete",
             description="Syncing your files...",
-            category="sync",
+            category="generic",
             brain_id=sync_active_input.brain_id,
         )
     )
