@@ -135,6 +135,7 @@ def oauth2callback_dropbox(request: Request):
             "refresh_token": oauth_result.refresh_token,
             "account_id": account_id,
             "email": email,
+            "expires_in": str(oauth_result.expires_at),
         }
 
         sync_user_input = SyncUserUpdateInput(

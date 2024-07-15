@@ -1,6 +1,7 @@
 import os
-from typing import List
+from typing import Any, Dict, List
 
+import dropbox
 import msal
 import requests
 from fastapi import HTTPException
@@ -13,6 +14,8 @@ from quivr_api.modules.sync.utils.normalize import remove_special_characters
 from requests import HTTPError
 
 logger = get_logger(__name__)
+
+# GOOGLE
 
 
 def get_google_drive_files_by_id(
@@ -158,6 +161,7 @@ def get_google_drive_files(
         return []
 
 
+# AZURE
 CLIENT_ID = os.getenv("SHAREPOINT_CLIENT_ID")
 AUTHORITY = "https://login.microsoftonline.com/common"
 BACKEND_URL = os.getenv("BACKEND_URL", "http://localhost:5050")
@@ -189,7 +193,7 @@ def refresh_azure_token(credentials):
     return result
 
 
-def get_azure_headers(token_data):
+def get_sync_headers(token_data):
     return {
         "Authorization": f"Bearer {token_data['access_token']}",
         "Accept": "application/json",
@@ -259,7 +263,7 @@ def get_azure_files_by_id(credentials: dict, file_ids: List[str]):
     """
     logger.info("Retrieving Azure Drive files with file_ids: %s", file_ids)
     token_data = get_azure_token_data(credentials)
-    headers = get_azure_headers(token_data)
+    headers = get_sync_headers(token_data)
     files = []
 
     for file_id in file_ids:
@@ -267,7 +271,7 @@ def get_azure_files_by_id(credentials: dict, file_ids: List[str]):
         response = requests.get(endpoint, headers=headers)
         if response.status_code == 401:
             token_data = refresh_azure_token(credentials)
-            headers = get_azure_headers(token_data)
+            headers = get_sync_headers(token_data)
             response = requests.get(endpoint, headers=headers)
         if response.status_code != 200:
             logger.error(
@@ -292,3 +296,124 @@ def get_azure_files_by_id(credentials: dict, file_ids: List[str]):
         file.name = remove_special_characters(file.name)
     logger.info("Azure Drive files retrieved successfully: %s", len(files))
     return files
+
+
+# Drop Box
+def list_dropbox_files(
+    credentials: dict, folder_id: str = "", recursive: bool = False
+) -> List[dict]:
+    """
+    Retrieve files from Dropbox.
+
+    Args:
+        credentials (dict): The credentials for accessing Dropbox.
+        folder_id (str, optional): The folder ID to filter files. Defaults to "".
+        recursive (bool, optional): If True, fetch files from all subfolders. Defaults to False.
+
+    Returns:
+        dict: A dictionary containing the list of files or an error message.
+    """
+    logger.info("Retrieving Dropbox files with folder_id: %s", folder_id)
+
+    # Verify credential has the access token
+    if "access_token" not in credentials:
+        raise HTTPException(status_code=401, detail="Invalid token data")
+
+    try:
+        dbx = dropbox.Dropbox(credentials["access_token"])
+        dbx.check_and_refresh_access_token()
+        credentials["access_token"] = dbx._oauth2_access_token
+
+        def fetch_files(metadata):
+            files = []
+            for file in metadata.entries:
+                files.append(
+                    {
+                        "name": file.name,
+                        "id": file.id,
+                        "is_folder": isinstance(file, dropbox.files.FolderMetadata),
+                        "last_modified": file.client_modified,
+                        "mime_type": file.path_lower.split(".")[-1],
+                    }
+                )
+            return files
+
+        files = []
+        list_metadata = dbx.files_list_folder(folder_id, recursive=recursive)
+        files.extend(fetch_files(list_metadata))
+
+        while list_metadata.has_more:
+            list_metadata = dbx.files_list_folder_continue(list_metadata.cursor)
+            files.extend(fetch_files(list_metadata))
+
+        for file in files:
+            file["name"] = remove_special_characters(file["name"])
+
+        logger.info("Dropbox files retrieved successfully: %d", len(files))
+        return files
+
+    except dropbox.exceptions.ApiError as e:
+        logger.error("Dropbox API error: %s", e)
+        raise HTTPException(status_code=500, detail="Dropbox API error")
+    except Exception as e:
+        logger.error("Unexpected error: %s", e)
+        raise HTTPException(status_code=500, detail="Unexpected error occurred")
+
+
+def get_dropbox_files_by_id(
+    credentials: Dict[str, str], file_ids: List[str]
+) -> List[Dict[str, Any]]:
+    """
+    Retrieve files from Dropbox by their IDs.
+
+    Args:
+        credentials (dict): The credentials for accessing Dropbox.
+        file_ids (list): The list of file IDs to retrieve.
+
+    Returns:
+        list: A list of dictionaries containing the metadata of each file or an error message.
+    """
+    logger.info("Retrieving Dropbox files with file_ids: %s", file_ids)
+
+    if "access_token" not in credentials:
+        raise HTTPException(status_code=401, detail="Invalid token data")
+
+    try:
+        dbx = dropbox.Dropbox(credentials["access_token"])
+        dbx.check_and_refresh_access_token()
+        credentials["access_token"] = dbx._oauth2_access_token
+
+        files = []
+
+        for file_id in file_ids:
+            try:
+                metadata = dbx.files_get_metadata(file_id)
+                logger.debug("Metadata for file_id %s: %s", file_id, metadata)
+
+                file_info = {
+                    "name": metadata.name,
+                    "id": metadata.id,
+                    "is_folder": isinstance(metadata, dropbox.files.FolderMetadata),
+                    "last_modified": metadata.client_modified,
+                    "mime_type": metadata.path_lower.split(".")[-1],
+                }
+                files.append(file_info)
+            except dropbox.exceptions.ApiError as api_err:
+                logger.error("Dropbox API error for file_id %s: %s", file_id, api_err)
+                continue  # Skip this file and proceed with the next one
+            except Exception as err:
+                logger.error("Unexpected error for file_id %s: %s", file_id, err)
+                continue  # Skip this file and proceed with the next one
+
+        for file in files:
+            file["name"] = remove_special_characters(file["name"])
+
+        logger.info("Dropbox files retrieved successfully: %d", len(files))
+        return files
+
+    except dropbox.exceptions.AuthError as auth_err:
+        logger.error("Authentication error: %s", auth_err)
+        raise HTTPException(status_code=401, detail="Authentication error")
+    except Exception as e:
+        logger.error("Unexpected error: %s", e)
+        raise HTTPException(status_code=500, detail="Unexpected error occurred")
