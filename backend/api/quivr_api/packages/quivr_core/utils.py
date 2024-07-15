@@ -10,7 +10,6 @@ from langchain.schema import (
     format_document,
 )
 from langchain_core.messages.ai import AIMessageChunk
-
 from quivr_api.modules.chat.dto.chats import Sources
 from quivr_api.modules.chat.dto.outputs import GetChatHistoryOutput
 from quivr_api.modules.knowledge.entity.knowledge import Knowledge
@@ -139,7 +138,7 @@ def parse_chunk_response(
 
 def parse_response(raw_response: RawRAGResponse, model_name: str) -> ParsedRAGResponse:
     answer = raw_response["answer"].content
-    sources = raw_response["docs"] or []
+    sources = raw_response.get("docs", [])
 
     metadata = {"sources": sources}
 

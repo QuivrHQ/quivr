@@ -3,7 +3,6 @@ from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from fastapi.responses import StreamingResponse
-
 from quivr_api.logger import get_logger
 from quivr_api.middlewares.auth import AuthBearer, get_current_user
 from quivr_api.models.settings import get_embedding_client, get_supabase_client
@@ -25,6 +24,7 @@ from quivr_api.modules.dependencies import get_service
 from quivr_api.modules.knowledge.repository.knowledges import KnowledgeRepository
 from quivr_api.modules.prompt.service.prompt_service import PromptService
 from quivr_api.modules.user.entity.user_identity import UserIdentity
+from quivr_api.packages.quivr_core.chat_llm import ChatLLM
 from quivr_api.packages.quivr_core.rag_service import RAGService
 from quivr_api.packages.utils.telemetry import maybe_send_telemetry
 from quivr_api.vectorstore.supabase import CustomSupabaseVectorStore
@@ -208,19 +208,30 @@ async def create_question_handler(
     # TODO: check logic into middleware
     validate_authorization(user_id=current_user.id, brain_id=brain_id)
     try:
-        rag_service = RAGService(
-            current_user,
-            brain_id,
-            chat_id,
-            brain_service,
-            prompt_service,
-            chat_service,
-            knowledge_service,
-        )
-        chat_answer = await rag_service.generate_answer(chat_question.question)
+        if brain_id:
 
-        maybe_send_telemetry("question_asked", {"streaming": False}, request)
-        return chat_answer
+            rag_service = RAGService(
+                current_user,
+                brain_id,
+                chat_id,
+                brain_service,
+                prompt_service,
+                chat_service,
+                knowledge_service,
+            )
+            chat_answer = await rag_service.generate_answer(chat_question.question)
+
+            maybe_send_telemetry("question_asked", {"streaming": False}, request)
+            return chat_answer
+        else:
+            chat_llm = ChatLLM(
+                current_user,
+                chat_id,
+                chat_service,
+                chat_question.question,
+            )
+            chat_answer = await chat_llm.generate_answer(chat_question.question)
+            return chat_answer
 
     except AssertionError:
         raise HTTPException(
@@ -256,21 +267,22 @@ async def create_stream_question_handler(
     )
 
     try:
-        rag_service = RAGService(
-            current_user,
-            brain_id,
-            chat_id,
-            brain_service,
-            prompt_service,
-            chat_service,
-            knowledge_service,
-        )
-        maybe_send_telemetry("question_asked", {"streaming": True}, request)
+        if brain_id:
+            rag_service = RAGService(
+                current_user,
+                brain_id,
+                chat_id,
+                brain_service,
+                prompt_service,
+                chat_service,
+                knowledge_service,
+            )
+            maybe_send_telemetry("question_asked", {"streaming": True}, request)
 
-        return StreamingResponse(
-            rag_service.generate_answer_stream(chat_question.question),
-            media_type="text/event-stream",
-        )
+            return StreamingResponse(
+                rag_service.generate_answer_stream(chat_question.question),
+                media_type="text/event-stream",
+            )
 
     except AssertionError:
         logger.error(f"assertion error request: {request}")
