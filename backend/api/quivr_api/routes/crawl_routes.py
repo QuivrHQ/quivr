@@ -2,7 +2,6 @@ from typing import Optional
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, Query, Request
-
 from quivr_api.celery_worker import process_crawl_and_notify
 from quivr_api.logger import get_logger
 from quivr_api.middlewares.auth import AuthBearer, get_current_user
@@ -88,6 +87,7 @@ async def crawl_endpoint(
         process_crawl_and_notify.delay(
             crawl_website_url=crawl_website.url,
             brain_id=brain_id,
+            knowledge_id=added_knowledge.id,
             notification_id=upload_notification.id,
         )
 
