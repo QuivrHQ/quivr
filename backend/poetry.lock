@@ -9535,4 +9535,12 @@ test = ["big-O", "importlib-resources", "jaraco.functools", "jaraco.itertools", 
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
+<<<<<<< HEAD
 content-hash = "963b9ff228f2478505802a0e2915d2802e9d92396e33cde549f33bdb07f2a30d"
+=======
+<<<<<<< HEAD
+content-hash = "4f318e2f8561fac7ad1f4aa603e5264accf857d6e7e1bfd9fcf770279f6a2e9a"
+=======
+content-hash = "0ec8ef564660f270896d6c64a2ba7eeec066f242537d9df7b90f1bc8788d2554"
+>>>>>>> 39266b1e (add: auth dropbox)
+>>>>>>> dde151df (add: auth dropbox)

@@ -70,6 +70,7 @@ def authorize_dropbox(
         credentials={},
         state={"state": state},
     )
+    request.session["csrf-token"] = auth_flow.csrf_token_session_key
     sync_user_service.create_sync_user(sync_user_input)
     return {"authorization_url": authorize_url}
 
