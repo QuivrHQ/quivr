@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 from tempfile import NamedTemporaryFile
 from uuid import UUID
 
-from celery.exceptions import MaxRetriesExceededError, WorkerLostError
+from celery.exceptions import MaxRetriesExceededError
 from celery.schedules import crontab
 from pytz import timezone
 from quivr_api.celery_config import celery
@@ -37,10 +37,10 @@ auth_bearer = AuthBearer()
 
 @celery.task(
     bind=True,
-    retries=3,
-    default_retry_delay=2,
+    retries=5,
+    default_retry_delay=3,
     name="process_file_and_notify",
-    autoretry_for=(Exception, WorkerLostError),
+    autoretry_for=(Exception,),
 )
 def process_file_and_notify(
     self,
@@ -100,17 +100,13 @@ def process_file_and_notify(
                 brain_service.update_brain_last_update_time(brain_id)
 
                 return True
-        except TimeoutError:
+        except TimeoutError as exc:
             logger.error("TimeoutError")
-            self.retry()
-
-        except WorkerLostError:
-            logger.error("WorkerLostError")
-            self.retry()
+            self.retry(exc=exc)
 
         except Exception as e:
             logger.exception(f"Error processing file: {str(e)}")
-            self.retry()
+            self.retry(exc=e)
 
     except MaxRetriesExceededError:
         logger.error("MaxRetriesExceededError")
