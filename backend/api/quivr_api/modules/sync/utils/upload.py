@@ -45,6 +45,8 @@ async def upload_file(
             bulk_id=bulk_id,
             status=NotificationsStatusEnum.INFO,
             title=f"{upload_file.filename}",
+            category="sync",
+            brain_id=str(brain_id),
         )
     )
 

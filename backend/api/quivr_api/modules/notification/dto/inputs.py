@@ -13,6 +13,8 @@ class CreateNotification(BaseModel):
     title: str
     description: Optional[str] = None
     bulk_id: Optional[UUID] = None
+    category: Optional[str] = None
+    brain_id: Optional[str] = None
 
     def model_dump(self, *args, **kwargs):
         notification_dict = super().model_dump(*args, **kwargs)
