@@ -245,20 +245,7 @@ def check_if_is_premium_user():
         supabase_db.table("product_to_features").select("*").execute()
     ).data
 
-    user_settings = []
-    offset = 0
-    batch_size = 700
-    while True:
-        batch_settings = (
-            supabase_db.table("user_settings")
-            .select("*")
-            .range(offset, offset + batch_size - 1)
-            .execute()
-        ).data
-        user_settings.extend(batch_settings)
-        if len(batch_settings) < batch_size:
-            break
-        offset += batch_size
+    user_settings = (supabase_db.table("user_settings").select("*").execute()).data
 
     # Create lookup dictionaries for faster access
     user_dict = {user["email"]: user["id"] for user in users}
