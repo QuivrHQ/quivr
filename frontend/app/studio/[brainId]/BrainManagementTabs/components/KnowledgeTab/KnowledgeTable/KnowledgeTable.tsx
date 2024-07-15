@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import { Checkbox } from "@/lib/components/ui/Checkbox/Checkbox";
 import QuivrButton from "@/lib/components/ui/QuivrButton/QuivrButton";
 import { TextInput } from "@/lib/components/ui/TextInput/TextInput";
+import { useDevice } from "@/lib/hooks/useDevice";
 import { isUploadedKnowledge, Knowledge } from "@/lib/types/Knowledge";
 
 import { useKnowledgeItem } from "./KnowledgeItem/hooks/useKnowledgeItem";
@@ -25,6 +26,7 @@ const KnowledgeTable = React.forwardRef<HTMLDivElement, KnowledgeTableProps>(
     const [searchQuery, setSearchQuery] = useState<string>("");
     const [filteredKnowledgeList, setFilteredKnowledgeList] =
       useState<Knowledge[]>(knowledgeList);
+    const { isMobile } = useDevice();
 
     useEffect(() => {
       setFilteredKnowledgeList(
@@ -127,7 +129,7 @@ const KnowledgeTable = React.forwardRef<HTMLDivElement, KnowledgeTableProps>(
               <span className={styles.name}>Name</span>
             </div>
             <div className={styles.right}>
-              <span className={styles.actions}>Status</span>
+              {!isMobile && <span className={styles.actions}>Status</span>}
               <span className={styles.actions}>Actions</span>
             </div>
           </div>

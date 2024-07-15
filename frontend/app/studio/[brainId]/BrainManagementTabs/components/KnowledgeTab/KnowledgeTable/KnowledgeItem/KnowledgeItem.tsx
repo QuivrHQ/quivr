@@ -9,6 +9,7 @@ import { OptionsModal } from "@/lib/components/ui/OptionsModal/OptionsModal";
 import { Tag } from "@/lib/components/ui/Tag/Tag";
 import { iconList } from "@/lib/helpers/iconList";
 import { useUrlBrain } from "@/lib/hooks/useBrainIdFromUrl";
+import { useDevice } from "@/lib/hooks/useDevice";
 import { isUploadedKnowledge, Knowledge } from "@/lib/types/Knowledge";
 import { Option } from "@/lib/types/Options";
 
@@ -33,6 +34,7 @@ const KnowledgeItem = ({
   const { onDeleteKnowledge } = useKnowledgeItem();
   const { brain } = useUrlBrain();
   const { generateSignedUrlKnowledge } = useKnowledgeApi();
+  const { isMobile } = useDevice();
 
   const options: Option[] = [
     {
@@ -127,18 +129,20 @@ const KnowledgeItem = ({
         )}
       </div>
       <div className={styles.right}>
-        <div className={styles.status}>
-          <Tag
-            name={capitalCase(knowledge.status)}
-            color={
-              knowledge.status === "ERROR"
-                ? "dangerous"
-                : knowledge.status === "PROCESSING"
-                ? "primary"
-                : "success"
-            }
-          />
-        </div>
+        {!isMobile && (
+          <div className={styles.status}>
+            <Tag
+              name={capitalCase(knowledge.status)}
+              color={
+                knowledge.status === "ERROR"
+                  ? "dangerous"
+                  : knowledge.status === "PROCESSING"
+                  ? "primary"
+                  : "success"
+              }
+            />
+          </div>
+        )}
         <div
           ref={iconRef}
           onClick={(event: React.MouseEvent<HTMLElement>) => {
