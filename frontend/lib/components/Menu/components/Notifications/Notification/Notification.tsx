@@ -11,9 +11,14 @@ interface NotificationProps {
 
 export const Notification = ({
   bulkNotification,
+  lastNotification,
 }: NotificationProps): JSX.Element => {
   return (
-    <div className={styles.notification}>
+    <div
+      className={`${styles.notification} ${
+        lastNotification ? styles.last : ""
+      }`}
+    >
       <div className={styles.loader_wrapper}>
         <div className={styles.count}>
           <span>

@@ -2,7 +2,12 @@
 @use "styles/Typography.module.scss";
 
 .notification {
-  padding: Spacings.$spacing03;
+  padding: Spacings.$spacing05;
+  border-bottom: 1px solid var(--border-2);
+
+  &.last {
+    border-bottom: none;
+  }
 
   .loader_wrapper {
     display: flex;
