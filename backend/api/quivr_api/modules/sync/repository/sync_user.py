@@ -11,6 +11,7 @@ from quivr_api.modules.sync.repository.sync_interfaces import SyncUserInterface
 from quivr_api.modules.sync.utils.list_files import (
     get_google_drive_files,
     list_azure_files,
+    list_dropbox_files,
 )
 
 notification_service = NotificationService()
@@ -212,6 +213,13 @@ class SyncUser(SyncUserInterface):
             return {
                 "files": list_azure_files(
                     sync_user["credentials"], folder_id, recursive
+                )
+            }
+        elif provider == "dropbox":
+            logger.info("Getting files for Drop Box sync")
+            return {
+                "files": list_dropbox_files(
+                    sync_user["credentials"], folder_id if folder_id else "", recursive
                 )
             }
         else:
