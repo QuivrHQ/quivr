@@ -37,6 +37,7 @@ async def healthz():
 async def crawl_endpoint(
     request: Request,
     crawl_website: CrawlWebsite,
+    bulk_id: Optional[UUID] = Query(None, description="The ID of the bulk upload"),
     brain_id: UUID = Query(..., description="The ID of the brain"),
     chat_id: Optional[UUID] = Query(None, description="The ID of the chat"),
     current_user: UserIdentity = Depends(get_current_user),
@@ -67,8 +68,11 @@ async def crawl_endpoint(
         upload_notification = notification_service.add_notification(
             CreateNotification(
                 user_id=current_user.id,
+                bulk_id=bulk_id,
                 status=NotificationsStatusEnum.INFO,
                 title=f"Processing Crawl {crawl_website.url}",
+                category="crawl",
+                brain_id=str(brain_id),
             )
         )
         knowledge_to_add = CreateKnowledgeProperties(

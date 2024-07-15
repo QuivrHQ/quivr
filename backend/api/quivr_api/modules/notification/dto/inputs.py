@@ -12,10 +12,15 @@ class CreateNotification(BaseModel):
     status: NotificationsStatusEnum
     title: str
     description: Optional[str] = None
+    bulk_id: Optional[UUID] = None
+    category: Optional[str] = None
+    brain_id: Optional[str] = None
 
     def model_dump(self, *args, **kwargs):
         notification_dict = super().model_dump(*args, **kwargs)
         notification_dict["user_id"] = str(notification_dict["user_id"])
+        if "bulk_id" in notification_dict:
+            notification_dict["bulk_id"] = str(notification_dict["bulk_id"])
         return notification_dict
 
 

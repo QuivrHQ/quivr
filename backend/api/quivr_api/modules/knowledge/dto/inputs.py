@@ -1,7 +1,14 @@
+from enum import Enum
 from typing import Optional
 from uuid import UUID
 
 from pydantic import BaseModel
+
+
+class KnowledgeStatus(str, Enum):
+    PROCESSING = "PROCESSING"
+    UPLOADED = "UPLOADED"
+    ERROR = "ERROR"
 
 
 class CreateKnowledgeProperties(BaseModel):
@@ -11,6 +18,7 @@ class CreateKnowledgeProperties(BaseModel):
     extension: str = "txt"
     integration: Optional[str] = None
     integration_link: Optional[str] = None
+    status: KnowledgeStatus = KnowledgeStatus.PROCESSING
 
     def dict(self, *args, **kwargs):
         knowledge_dict = super().dict(*args, **kwargs)

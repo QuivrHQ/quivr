@@ -3,25 +3,29 @@ from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from fastapi.responses import StreamingResponse
+
 from quivr_api.logger import get_logger
 from quivr_api.middlewares.auth import AuthBearer, get_current_user
 from quivr_api.models.settings import get_embedding_client, get_supabase_client
 from quivr_api.modules.brain.service.brain_service import BrainService
 from quivr_api.modules.chat.controller.chat.brainful_chat import (
-    BrainfulChat, validate_authorization)
+    BrainfulChat,
+    validate_authorization,
+)
 from quivr_api.modules.chat.dto.chats import ChatItem, ChatQuestion
-from quivr_api.modules.chat.dto.inputs import (ChatMessageProperties,
-                                               ChatUpdatableProperties,
-                                               CreateChatProperties,
-                                               QuestionAndAnswer)
+from quivr_api.modules.chat.dto.inputs import (
+    ChatMessageProperties,
+    ChatUpdatableProperties,
+    CreateChatProperties,
+    QuestionAndAnswer,
+)
 from quivr_api.modules.chat.entity.chat import Chat
 from quivr_api.modules.chat.service.chat_service import ChatService
 from quivr_api.modules.dependencies import get_service
-from quivr_api.modules.knowledge.repository.knowledges import \
-    KnowledgeRepository
+from quivr_api.modules.knowledge.repository.knowledges import KnowledgeRepository
 from quivr_api.modules.prompt.service.prompt_service import PromptService
-from quivr_api.modules.rag_service import RAGService
 from quivr_api.modules.user.entity.user_identity import UserIdentity
+from quivr_api.packages.quivr_core.rag_service import RAGService
 from quivr_api.packages.utils.telemetry import maybe_send_telemetry
 from quivr_api.vectorstore.supabase import CustomSupabaseVectorStore
 
@@ -134,7 +138,7 @@ async def update_chat_metadata_handler(
     """
 
     chat = await chat_service.get_chat_by_id(chat_id)
-    if str(current_user.id) != chat.user_id:
+    if str(current_user.id) != str(chat.user_id):
         raise HTTPException(
             status_code=403,  # pyright: ignore reportPrivateUsage=none
             detail="You should be the owner of the chat to update it.",  # pyright: ignore reportPrivateUsage=none
@@ -154,7 +158,8 @@ async def update_chat_message(
     chat = await chat_service.get_chat_by_id(
         chat_id  # pyright: ignore reportPrivateUsage=none
     )
-    if str(current_user.id) != chat.user_id:
+
+    if str(current_user.id) != str(chat.user_id):
         raise HTTPException(
             status_code=403,  # pyright: ignore reportPrivateUsage=none
             detail="You should be the owner of the chat to update it.",  # pyright: ignore reportPrivateUsage=none

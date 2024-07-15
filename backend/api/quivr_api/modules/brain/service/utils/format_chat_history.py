@@ -1,4 +1,4 @@
-from typing import List, Tuple
+from typing import Dict, List, Tuple
 
 from langchain.schema import AIMessage, BaseMessage, HumanMessage, SystemMessage
 from quivr_api.modules.chat.dto.outputs import GetChatHistoryOutput
@@ -6,7 +6,7 @@ from quivr_api.modules.chat.dto.outputs import GetChatHistoryOutput
 
 def format_chat_history(
     history: List[GetChatHistoryOutput],
-) -> List[HumanMessage | AIMessage]:
+) -> List[Dict[str, str]]:
     """Format the chat history into a list of HumanMessage and AIMessage"""
     formatted_history = []
     for chat in history:
