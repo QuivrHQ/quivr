@@ -51,13 +51,14 @@ const NotificationHeader = ({
         </div>
       )}
     </div>
-    <Icon
-      name="delete"
-      size="small"
-      color="dangerous"
-      handleHover={true}
-      onClick={onDelete}
-    />
+    <div
+      onClick={(event) => {
+        event.stopPropagation();
+        onDelete();
+      }}
+    >
+      <Icon name="delete" size="small" color="dangerous" handleHover={true} />
+    </div>
   </div>
 );
 
@@ -166,7 +167,8 @@ export const Notification = ({
           ) && (
             <div
               className={styles.success}
-              onClick={() => {
+              onClick={(event) => {
+                event.stopPropagation();
                 setSuccessOpened(!successOpened);
                 setErrorsOpened(false);
               }}
@@ -186,7 +188,8 @@ export const Notification = ({
           ) && (
             <div
               className={styles.error}
-              onClick={() => {
+              onClick={(event) => {
+                event.stopPropagation();
                 setErrorsOpened(!errorsOpened);
                 setSuccessOpened(false);
               }}

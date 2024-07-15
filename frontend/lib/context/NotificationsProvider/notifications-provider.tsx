@@ -15,6 +15,8 @@ type NotificationsContextType = {
     React.SetStateAction<BulkNotification[]>
   >;
   updateNotifications: () => Promise<void>;
+  unreadNotifications?: number;
+  setUnreadNotifications?: React.Dispatch<React.SetStateAction<number>>;
 };
 
 export const NotificationsContext = createContext<
@@ -27,6 +29,7 @@ export const NotificationsProvider = ({
   children: React.ReactNode;
 }): JSX.Element => {
   const [isVisible, setIsVisible] = useState(false);
+  const [unreadNotifications, setUnreadNotifications] = useState(0);
   const [bulkNotifications, setBulkNotifications] = useState<
     BulkNotification[]
   >([]);
@@ -61,6 +64,9 @@ export const NotificationsProvider = ({
       );
 
       setBulkNotifications(bulkNotifs);
+      setUnreadNotifications(
+        bulkNotifs.filter((bulk) => !bulk.notifications[0].read).length
+      );
     } catch (error) {
       console.error(error);
     }
@@ -74,6 +80,7 @@ export const NotificationsProvider = ({
         bulkNotifications,
         setBulkNotifications,
         updateNotifications,
+        unreadNotifications,
       }}
     >
       {children}

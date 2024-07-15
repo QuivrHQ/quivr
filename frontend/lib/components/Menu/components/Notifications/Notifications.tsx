@@ -3,6 +3,7 @@ import { useEffect } from "react";
 import Icon from "@/lib/components/ui/Icon/Icon";
 import TextButton from "@/lib/components/ui/TextButton/TextButton";
 import { useNotificationsContext } from "@/lib/context/NotificationsProvider/hooks/useNotificationsContext";
+import { useSupabase } from "@/lib/context/SupabaseProvider";
 import { useDevice } from "@/lib/hooks/useDevice";
 
 import { Notification } from "./Notification/Notification";
@@ -12,24 +13,16 @@ export const Notifications = (): JSX.Element => {
   const { bulkNotifications, updateNotifications, setIsVisible } =
     useNotificationsContext();
   const { isMobile } = useDevice();
+  const { supabase } = useSupabase();
 
-  const deleteAllNotifications = () => {
-    // for (const notification of notifications) {
-    //   await supabase.from("notifications").delete().eq("id", notification.id);
-    // }
-    // await updateNotifications();
+  const deleteAllNotifications = async () => {
+    for (const notifications of bulkNotifications) {
+      for (const notification of notifications.notifications) {
+        await supabase.from("notifications").delete().eq("id", notification.id);
+      }
+    }
+    await updateNotifications();
     console.info("deleteAllNotifications");
-  };
-
-  const markAllAsRead = () => {
-    // for (const notification of notifications) {
-    //   await supabase
-    //     .from("notifications")
-    //     .update({ read: true })
-    //     .eq("id", notification.id);
-    // }
-    // await updateNotifications();
-    console.info("markAllAsRead");
   };
 
   useEffect(() => {
@@ -67,13 +60,6 @@ export const Notifications = (): JSX.Element => {
             <span className={styles.title}>Notifications</span>
           </div>
           <div className={styles.buttons}>
-            <TextButton
-              label="Mark all as read"
-              color="black"
-              onClick={() => void markAllAsRead()}
-              small={true}
-            />
-            <span>|</span>
             <TextButton
               label="Delete all"
               color="black"
