@@ -3,9 +3,9 @@ from datetime import datetime, timedelta
 from tempfile import NamedTemporaryFile
 from uuid import UUID
 
-from celery.exceptions import MaxRetriesExceededError
 from celery.schedules import crontab
 from pytz import timezone
+
 from quivr_api.celery_config import celery
 from quivr_api.logger import get_logger
 from quivr_api.middlewares.auth.auth_bearer import AuthBearer
@@ -14,8 +14,6 @@ from quivr_api.models.settings import get_supabase_client, get_supabase_db
 from quivr_api.modules.brain.integrations.Notion.Notion_connector import NotionConnector
 from quivr_api.modules.brain.service.brain_service import BrainService
 from quivr_api.modules.brain.service.brain_vector_service import BrainVectorService
-from quivr_api.modules.knowledge.dto.inputs import KnowledgeStatus
-from quivr_api.modules.knowledge.service.knowledge_service import KnowledgeService
 from quivr_api.modules.notification.dto.inputs import NotificationUpdatableProperties
 from quivr_api.modules.notification.entity.notification import NotificationsStatusEnum
 from quivr_api.modules.notification.service.notification_service import (
@@ -36,92 +34,54 @@ auth_bearer = AuthBearer()
 
 
 @celery.task(
-    bind=True,
     retries=3,
     default_retry_delay=1,
     name="process_file_and_notify",
     autoretry_for=(Exception,),
 )
 def process_file_and_notify(
-    self,
     file_name: str,
     file_original_name: str,
     brain_id,
-    notification_id=None,
+    notification_id: UUID,
+    knowledge_id: UUID,
     integration=None,
     delete_file=False,
-    knowledge_id: UUID = None,
 ):
-    try:
-        try:
-            supabase_client = get_supabase_client()
-            tmp_name = file_name.replace("/", "_")
-            base_file_name = os.path.basename(file_name)
-            _, file_extension = os.path.splitext(base_file_name)
+    logger.debug(
+        f"process_file file_name={file_name}, knowledge_id={knowledge_id}, brain_id={brain_id}, notification_id={notification_id}"
+    )
+    supabase_client = get_supabase_client()
+    tmp_name = file_name.replace("/", "_")
+    base_file_name = os.path.basename(file_name)
+    _, file_extension = os.path.splitext(base_file_name)
 
-            with NamedTemporaryFile(
-                suffix="_" + tmp_name,  # pyright: ignore reportPrivateUsage=none
-            ) as tmp_file:
-                res = supabase_client.storage.from_("quivr").download(file_name)
-                tmp_file.write(res)
-                tmp_file.flush()
-                file_instance = File(
-                    file_name=base_file_name,
-                    tmp_file_path=tmp_file.name,
-                    bytes_content=res,
-                    file_size=len(res),
-                    file_extension=file_extension,
-                )
-                brain_vector_service = BrainVectorService(brain_id)
-                knowledge_service = KnowledgeService()
-                if delete_file:  # TODO fix bug
-                    brain_vector_service.delete_file_from_brain(
-                        file_original_name, only_vectors=True
-                    )
-
-                filter_file(
-                    file=file_instance,
-                    brain_id=brain_id,
-                    original_file_name=file_original_name,
-                )
-
-                if notification_id:
-                    notification_service.update_notification_by_id(
-                        notification_id,
-                        NotificationUpdatableProperties(
-                            status=NotificationsStatusEnum.SUCCESS,
-                            description="Your file has been properly uploaded!",
-                        ),
-                    )
-                if knowledge_id:
-                    knowledge_service.update_status_knowledge(
-                        knowledge_id, KnowledgeStatus.UPLOADED
-                    )
-                brain_service.update_brain_last_update_time(brain_id)
-
-                return True
-        except TimeoutError:
-            logger.error("TimeoutError")
-            self.retry()
-
-        except Exception as e:
-            logger.exception(e)
-            self.retry()
-
-    except MaxRetriesExceededError:
-        logger.error("MaxRetriesExceededError")
-        knowledge_service = KnowledgeService()
-        notification_service.update_notification_by_id(
-            notification_id,
-            NotificationUpdatableProperties(
-                status=NotificationsStatusEnum.ERROR,
-                description=f"An error occurred while processing the file",
-            ),
+    with NamedTemporaryFile(
+        suffix="_" + tmp_name,  # pyright: ignore reportPrivateUsage=none
+    ) as tmp_file:
+        res = supabase_client.storage.from_("quivr").download(file_name)
+        tmp_file.write(res)
+        tmp_file.flush()
+        file_instance = File(
+            file_name=base_file_name,
+            tmp_file_path=tmp_file.name,
+            bytes_content=res,
+            file_size=len(res),
+            file_extension=file_extension,
         )
-        if knowledge_id:
-            knowledge_service.update_status_knowledge(
-                knowledge_id, KnowledgeStatus.ERROR
+        brain_vector_service = BrainVectorService(brain_id)
+        if delete_file:  # TODO fix bug
+            brain_vector_service.delete_file_from_brain(
+                file_original_name, only_vectors=True
             )
+
+        filter_file(
+            file=file_instance,
+            brain_id=brain_id,
+            original_file_name=file_original_name,
+        )
+
+        brain_service.update_brain_last_update_time(brain_id)
 
 
 @celery.task(name="process_crawl_and_notify")

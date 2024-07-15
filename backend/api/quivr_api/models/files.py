@@ -4,6 +4,7 @@ from typing import List, Optional
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_core.documents import Document
 from pydantic import BaseModel
+
 from quivr_api.logger import get_logger
 from quivr_api.models.databases.supabase.supabase import SupabaseDB
 from quivr_api.models.settings import get_supabase_db
@@ -82,7 +83,8 @@ class File(BaseModel):
             brain_id (str): Brain id
         """
         response = self.supabase_db.get_brain_vectors_by_brain_id_and_file_sha1(
-            brain_id, self.file_sha1  # type: ignore
+            brain_id,
+            self.file_sha1,  # type: ignore
         )
 
         if len(response.data) == 0:
