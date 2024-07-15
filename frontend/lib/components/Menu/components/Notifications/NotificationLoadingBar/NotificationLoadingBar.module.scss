@@ -1,0 +1,22 @@
+@use "styles/Radius.module.scss";
+
+.loading_bar {
+  border-radius: Radius.$normal;
+  overflow: hidden;
+  display: flex;
+
+  .bar_section {
+    height: 8px;
+    &.info {
+      background-color: var(--primary-0);
+    }
+
+    &.success {
+      background-color: var(--success);
+    }
+
+    &.error {
+      background-color: var(--dangerous);
+    }
+  }
+}

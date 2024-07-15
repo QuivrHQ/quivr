@@ -1,4 +1,5 @@
 import { BulkNotification } from "../../../types/types";
+import { NotificationLoadingBar } from "../NotificationLoadingBar/NotificationLoadingBar";
 
 interface NotificationProps {
   bulkNotification: BulkNotification;
@@ -11,12 +12,7 @@ export const Notification = ({
 }: NotificationProps): JSX.Element => {
   return (
     <div>
-      {
-        bulkNotification.notifications.filter(
-          (notif) => notif.status === "success"
-        ).length
-      }
-      / {bulkNotification.notifications.length}
+      <NotificationLoadingBar bulkNotification={bulkNotification} />
     </div>
   );
 };
