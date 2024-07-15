@@ -1,13 +1,20 @@
 import uuid
+from datetime import datetime, timedelta, timezone
+from io import BytesIO
 from typing import List
 
+from fastapi import UploadFile
 from google.auth.transport.requests import Request as GoogleRequest
 from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
 from pydantic import BaseModel, ConfigDict
 from quivr_api.logger import get_logger
+from quivr_api.modules.brain.repository.brains_vectors import BrainsVectors
 from quivr_api.modules.knowledge.repository.storage import Storage
-from quivr_api.modules.notification.dto.inputs import CreateNotification
+from quivr_api.modules.notification.dto.inputs import (
+    CreateNotification,
+    NotificationUpdatableProperties,
+)
 from quivr_api.modules.notification.entity.notification import NotificationsStatusEnum
 from quivr_api.modules.notification.service.notification_service import (
     NotificationService,
@@ -24,9 +31,20 @@ from quivr_api.modules.sync.dto.inputs import (
     SyncFileUpdateInput,
     SyncsActiveUpdateInput,
 )
+from quivr_api.modules.sync.dto.inputs import (
+    SyncFileInput,
+    SyncFileUpdateInput,
+    SyncsActiveUpdateInput,
+)
 from quivr_api.modules.sync.entity.sync import SyncFile
 from quivr_api.modules.sync.repository.sync_files import SyncFiles
 from quivr_api.modules.sync.service.sync_service import SyncService, SyncUserService
+from quivr_api.modules.sync.utils.list_files import (
+    get_google_drive_files,
+    get_google_drive_files_by_id,
+)
+from quivr_api.modules.sync.utils.upload import upload_file
+from quivr_api.modules.upload.service.upload_file import check_file_exists
 
 notification_service = NotificationService()
 
