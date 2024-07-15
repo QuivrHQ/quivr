@@ -5,7 +5,7 @@ from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.responses import HTMLResponse
 from quivr_api.logger import get_logger
 from quivr_api.middlewares.auth import AuthBearer, get_current_user
-from quivr_api.modules.sync.dto.inputs import SyncsUserInput
+from quivr_api.modules.sync.dto.inputs import SyncsUserInput, SyncUserUpdateInput
 from quivr_api.modules.sync.service.sync_service import SyncService, SyncUserService
 from quivr_api.modules.user.entity.user_identity import UserIdentity
 
@@ -15,7 +15,7 @@ DROPBOX_APP_KEY = os.getenv("DROPBOX_APP_KEY")
 DROPBOX_APP_SECRET = os.getenv("DROPBOX_APP_SECRET")
 BACKEND_URL = os.getenv("BACKEND_URL", "http://localhost:5050")
 BASE_REDIRECT_URI = f"{BACKEND_URL}/sync/dropbox/oauth2callback"
-SCOPE = ["files.metadata.read"]
+SCOPE = ["files.metadata.read", "account_info.read", "files.content.read"]
 
 # Initialize sync service
 sync_service = SyncService()
@@ -87,7 +87,6 @@ def oauth2callback_dropbox(request: Request):
         dict: A dictionary containing a success message.
     """
     state = request.query_params.get("state")
-    logger.info(f"------- State: {state}")
     state = state.split("|")[1] if "|" in state else state  # type: ignore
     state_dict = {"state": state}
     state_split = state.split(",")  # type: ignore
@@ -107,8 +106,6 @@ def oauth2callback_dropbox(request: Request):
         )
 
     if sync_user_state.get("user_id") != current_user:
-        logger.error("Invalid user")
-        logger.info(f"Invalid user: {current_user}")
         raise HTTPException(status_code=400, detail="Invalid user")
 
     redirect_uri = f"{BASE_REDIRECT_URI}"
@@ -122,9 +119,7 @@ def oauth2callback_dropbox(request: Request):
         scope=SCOPE,
     )
     try:
-        logger.debug(f"QUERY PARAM : {request.query_params.get('code')}")
         oauth_result = auth_flow.finish(request.query_params)
-        logger.debug(f"RESULT : {oauth_result}")
 
         access_token = oauth_result.access_token
 
@@ -135,16 +130,22 @@ def oauth2callback_dropbox(request: Request):
         email = account_info.email  # type: ignore
         account_id = account_info.account_id  # type: ignore
 
-        logger.info(f"Retrieved email for user: {current_user} - {email}")
-        logger.info(f"OAuth Result: {oauth_result}")
+        result: dict[str, str] = {
+            "access_token": oauth_result.access_token,
+            "refresh_token": oauth_result.refresh_token,
+            "account_id": account_id,
+            "email": email,
+        }
 
-        # sync_user_input = SyncUserUpdateInput(
-        # credentials=json.loads(oauth_result.to_json()),
-        # state={},
-        # email=email,
-        # )
-        # sync_user_service.update_sync_user(str(current_user), state_dict, sync_user_input)
-        # logger.info(f"Google Drive sync created successfully for user: {current_user}")
+        sync_user_input = SyncUserUpdateInput(
+            credentials=result,
+            state={},
+            email=email,
+        )
+        sync_user_service.update_sync_user(
+            str(current_user), state_dict, sync_user_input
+        )
+        logger.info(f"DropBox sync created successfully for user: {current_user}")
         return HTMLResponse(successfullConnectionPage)
     except Exception as e:
         logger.error(f"Error: {e}")
