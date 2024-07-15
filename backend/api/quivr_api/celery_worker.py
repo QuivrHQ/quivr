@@ -340,8 +340,8 @@ celery.conf.beat_schedule = {
         "task": "process_sync_active",
         "schedule": crontab(minute="*/1", hour="*"),
     },
-    # "process_premium_users": {
-    #     "task": "check_if_is_premium_user",
-    #     "schedule": crontab(minute="*/1", hour="*"),
-    # },
+    "process_premium_users": {
+        "task": "check_if_is_premium_user",
+        "schedule": crontab(minute="*/1", hour="*"),
+    },
 }
