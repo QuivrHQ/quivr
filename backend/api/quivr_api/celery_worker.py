@@ -13,16 +13,11 @@ from quivr_api.models.settings import get_supabase_client, get_supabase_db
 from quivr_api.modules.brain.integrations.Notion.Notion_connector import NotionConnector
 from quivr_api.modules.brain.service.brain_service import BrainService
 from quivr_api.modules.brain.service.brain_vector_service import BrainVectorService
-from quivr_api.modules.knowledge.dto.inputs import KnowledgeStatus
-from quivr_api.modules.knowledge.service.knowledge_service import KnowledgeService
-from quivr_api.modules.notification.dto.inputs import NotificationUpdatableProperties
-from quivr_api.modules.notification.entity.notification import NotificationsStatusEnum
 from quivr_api.modules.notification.service.notification_service import (
     NotificationService,
 )
 from quivr_api.modules.onboarding.service.onboarding_service import OnboardingService
 from quivr_api.packages.files.crawl.crawler import CrawlWebsite, slugify
-from quivr_api.packages.files.parsers.github import process_github
 from quivr_api.packages.files.processors import filter_file
 from quivr_api.packages.utils.telemetry import maybe_send_telemetry
 
@@ -34,140 +29,93 @@ brain_service = BrainService()
 auth_bearer = AuthBearer()
 
 
-@celery.task(name="process_file_and_notify")
+@celery.task(
+    retries=3,
+    default_retry_delay=1,
+    name="process_file_and_notify",
+    autoretry_for=(Exception,),
+)
 def process_file_and_notify(
     file_name: str,
     file_original_name: str,
     brain_id,
-    notification_id=None,
+    notification_id: UUID,
+    knowledge_id: UUID,
     integration=None,
     integration_link=None,
     delete_file=False,
-    knowledge_id: UUID = None,
 ):
-    try:
-        supabase_client = get_supabase_client()
-        tmp_name = file_name.replace("/", "_")
-        base_file_name = os.path.basename(file_name)
-        _, file_extension = os.path.splitext(base_file_name)
+    logger.debug(
+        f"process_file file_name={file_name}, knowledge_id={knowledge_id}, brain_id={brain_id}, notification_id={notification_id}"
+    )
+    supabase_client = get_supabase_client()
+    tmp_name = file_name.replace("/", "_")
+    base_file_name = os.path.basename(file_name)
+    _, file_extension = os.path.splitext(base_file_name)
 
-        with NamedTemporaryFile(
-            suffix="_" + tmp_name,  # pyright: ignore reportPrivateUsage=none
-        ) as tmp_file:
-            res = supabase_client.storage.from_("quivr").download(file_name)
-            tmp_file.write(res)
-            tmp_file.flush()
-            file_instance = File(
-                file_name=base_file_name,
-                tmp_file_path=tmp_file.name,
-                bytes_content=res,
-                file_size=len(res),
-                file_extension=file_extension,
-            )
-            brain_vector_service = BrainVectorService(brain_id)
-            knowledge_service = KnowledgeService()
-            if delete_file:  # TODO fix bug
-                brain_vector_service.delete_file_from_brain(
-                    file_original_name, only_vectors=True
-                )
-
-            filter_file(
-                file=file_instance,
-                brain_id=brain_id,
-                original_file_name=file_original_name,
-                integration=integration,
-                integration_link=integration_link,
-            )
-
-            if notification_id:
-                notification_service.update_notification_by_id(
-                    notification_id,
-                    NotificationUpdatableProperties(
-                        status=NotificationsStatusEnum.SUCCESS,
-                        description="Your file has been properly uploaded!",
-                    ),
-                )
-            if knowledge_id:
-                knowledge_service.update_status_knowledge(
-                    knowledge_id, KnowledgeStatus.UPLOADED
-                )
-            brain_service.update_brain_last_update_time(brain_id)
-
-            return True
-
-    except TimeoutError:
-        logger.error("TimeoutError")
-
-    except Exception as e:
-        logger.exception(e)
-        notification_service.update_notification_by_id(
-            notification_id,
-            NotificationUpdatableProperties(
-                status=NotificationsStatusEnum.ERROR,
-                description=f"An error occurred while processing the file: {e}",
-            ),
+    with NamedTemporaryFile(
+        suffix="_" + tmp_name,  # pyright: ignore reportPrivateUsage=none
+    ) as tmp_file:
+        res = supabase_client.storage.from_("quivr").download(file_name)
+        tmp_file.write(res)
+        tmp_file.flush()
+        file_instance = File(
+            file_name=base_file_name,
+            tmp_file_path=tmp_file.name,
+            bytes_content=res,
+            file_size=len(res),
+            file_extension=file_extension,
         )
-        if knowledge_id:
-            knowledge_service.update_status_knowledge(
-                knowledge_id, KnowledgeStatus.ERROR
+        brain_vector_service = BrainVectorService(brain_id)
+        if delete_file:  # TODO fix bug
+            brain_vector_service.delete_file_from_brain(
+                file_original_name, only_vectors=True
             )
 
+        filter_file(
+            file=file_instance,
+            brain_id=brain_id,
+            original_file_name=file_original_name,
+        )
 
-@celery.task(name="process_crawl_and_notify")
+        brain_service.update_brain_last_update_time(brain_id)
+
+
+@celery.task(
+    retries=3,
+    default_retry_delay=1,
+    name="process_crawl_and_notify",
+    autoretry_for=(Exception,),
+)
 def process_crawl_and_notify(
     crawl_website_url: str,
     brain_id: UUID,
+    knowledge_id: UUID,
     notification_id=None,
 ):
     crawl_website = CrawlWebsite(url=crawl_website_url)
+    # Build file data
+    extracted_content = crawl_website.process()
+    extracted_content_bytes = extracted_content.encode("utf-8")
+    file_name = slugify(crawl_website.url) + ".txt"
 
-    if not crawl_website.checkGithub():
-        # Build file data
-        extracted_content = crawl_website.process()
-        extracted_content_bytes = extracted_content.encode("utf-8")
-        file_name = slugify(crawl_website.url) + ".txt"
-
-        with NamedTemporaryFile(
-            suffix="_" + file_name,  # pyright: ignore reportPrivateUsage=none
-        ) as tmp_file:
-            tmp_file.write(extracted_content_bytes)
-            tmp_file.flush()
-            file_instance = File(
-                file_name=file_name,
-                tmp_file_path=tmp_file.name,
-                bytes_content=extracted_content_bytes,
-                file_size=len(extracted_content),
-                file_extension=".txt",
-            )
-            filter_file(
-                file=file_instance,
-                brain_id=brain_id,
-                original_file_name=crawl_website_url,
-            )
-            notification_service.update_notification_by_id(
-                notification_id,
-                NotificationUpdatableProperties(
-                    status=NotificationsStatusEnum.SUCCESS,
-                    description="Your URL has been properly crawled!",
-                ),
-            )
-    else:
-        process_github(
-            repo=crawl_website.url,
+    with NamedTemporaryFile(
+        suffix="_" + file_name,  # pyright: ignore reportPrivateUsage=none
+    ) as tmp_file:
+        tmp_file.write(extracted_content_bytes)
+        tmp_file.flush()
+        file_instance = File(
+            file_name=file_name,
+            tmp_file_path=tmp_file.name,
+            bytes_content=extracted_content_bytes,
+            file_size=len(extracted_content),
+            file_extension=".txt",
+        )
+        filter_file(
+            file=file_instance,
             brain_id=brain_id,
+            original_file_name=crawl_website_url,
         )
-
-    if notification_id:
-        notification_service.update_notification_by_id(
-            notification_id,
-            NotificationUpdatableProperties(
-                status=NotificationsStatusEnum.SUCCESS,
-                description="Your file has been properly uploaded!",
-            ),
-        )
-
-    brain_service.update_brain_last_update_time(brain_id)
-    return True
 
 
 @celery.task
