@@ -6,6 +6,7 @@ from uuid import UUID
 from celery.exceptions import MaxRetriesExceededError
 from celery.schedules import crontab
 from pytz import timezone
+
 from quivr_api.celery_config import celery
 from quivr_api.logger import get_logger
 from quivr_api.middlewares.auth.auth_bearer import AuthBearer
@@ -115,7 +116,7 @@ def process_file_and_notify(
             notification_id,
             NotificationUpdatableProperties(
                 status=NotificationsStatusEnum.ERROR,
-                description=f"An error occurred while processing the file",
+                description="An error occurred while processing the file",
             ),
         )
         if knowledge_id:
