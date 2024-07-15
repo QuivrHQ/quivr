@@ -15,7 +15,7 @@ export const useKnowledgeToFeedInput = () => {
   const { crawlWebsiteUrl } = useCrawlApi();
 
   const crawlWebsiteHandler = useCallback(
-    async (url: string, brainId: UUID, chat_id?: UUID) => {
+    async (url: string, brainId: UUID, bulk_id: UUID, chat_id?: UUID) => {
       // Configure parameters
       const config = {
         url: url,
@@ -30,6 +30,7 @@ export const useKnowledgeToFeedInput = () => {
           brainId,
           config,
           chat_id,
+          bulk_id,
         });
       } catch (error: unknown) {
         const errorParams = getAxiosErrorParams(error);
