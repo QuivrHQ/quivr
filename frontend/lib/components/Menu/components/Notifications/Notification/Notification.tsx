@@ -19,6 +19,7 @@ export const Notification = ({
         lastNotification ? styles.last : ""
       }`}
     >
+      <span></span>
       <div className={styles.loader_wrapper}>
         <div className={styles.count}>
           <span>
