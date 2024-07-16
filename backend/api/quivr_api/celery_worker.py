@@ -76,6 +76,8 @@ def process_file_and_notify(
             file=file_instance,
             brain_id=brain_id,
             original_file_name=file_original_name,
+            integration=integration,
+            integration_link=integration_link,
         )
 
         brain_service.update_brain_last_update_time(brain_id)

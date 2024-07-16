@@ -45,12 +45,14 @@ def authorize_dropbox(
     Returns:
         dict: A dictionary containing the authorization URL.
     """
-    logger.debug(f"Authorizing Drop Box sync for user: {current_user.id}")
+    logger.debug(
+        f"Authorizing Drop Box sync for user: {current_user.id}, name : {name}"
+    )
     auth_flow = DropboxOAuth2Flow(
         DROPBOX_APP_KEY,
         redirect_uri=BASE_REDIRECT_URI,
         session=request.session,
-        csrf_token_session_key="dropbox-auth-csrf-token",
+        csrf_token_session_key="csrf-token",
         consumer_secret=DROPBOX_APP_SECRET,
         token_access_type="offline",
         scope=SCOPE,
@@ -68,7 +70,6 @@ def authorize_dropbox(
         credentials={},
         state={"state": state},
     )
-    request.session["csrf-token"] = auth_flow.csrf_token_session_key
     sync_user_service.create_sync_user(sync_user_input)
     return {"authorization_url": authorize_url}
 
@@ -87,6 +88,13 @@ def oauth2callback_dropbox(request: Request):
         dict: A dictionary containing a success message.
     """
     state = request.query_params.get("state")
+    if not state:
+        raise HTTPException(status_code=400, detail="Invalid state parameter")
+    request.session["csrf-token"] = state.split("|")[0] if "|" in state else ""
+
+    logger.debug("Keys in session : %s", request.session.keys())
+    logger.debug("Value in session : %s", request.session.values())
+
     state = state.split("|")[1] if "|" in state else state  # type: ignore
     state_dict = {"state": state}
     state_split = state.split(",")  # type: ignore
@@ -113,7 +121,7 @@ def oauth2callback_dropbox(request: Request):
         DROPBOX_APP_KEY,
         redirect_uri=BASE_REDIRECT_URI,
         session=request.session,
-        csrf_token_session_key="dropbox-auth-csrf-token",
+        csrf_token_session_key="csrf-token",
         consumer_secret=DROPBOX_APP_SECRET,
         token_access_type="offline",
         scope=SCOPE,
@@ -127,21 +135,21 @@ def oauth2callback_dropbox(request: Request):
 
         # Get account information
         account_info = dbx.users_get_current_account()
-        email = account_info.email  # type: ignore
+        user_email = account_info.email  # type: ignore
         account_id = account_info.account_id  # type: ignore
 
         result: dict[str, str] = {
             "access_token": oauth_result.access_token,
             "refresh_token": oauth_result.refresh_token,
             "account_id": account_id,
-            "email": email,
+            "email": user_email,
             "expires_in": str(oauth_result.expires_at),
         }
 
         sync_user_input = SyncUserUpdateInput(
             credentials=result,
             state={},
-            email=email,
+            email=user_email,
         )
         sync_user_service.update_sync_user(
             str(current_user), state_dict, sync_user_input

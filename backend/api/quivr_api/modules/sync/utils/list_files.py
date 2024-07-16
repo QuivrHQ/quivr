@@ -1,5 +1,5 @@
 import os
-from typing import Any, Dict, List
+from typing import Dict, List
 
 import dropbox
 import msal
@@ -326,14 +326,23 @@ def list_dropbox_files(
         def fetch_files(metadata):
             files = []
             for file in metadata.entries:
+
+                shared_link = f"https://www.dropbox.com/preview{file.path_display}?context=content_suggestions&role=personal"
+                is_folder = isinstance(file, dropbox.files.FolderMetadata)
+                logger.debug(f"IS FOLDER ? {is_folder}")
+
                 files.append(
                     SyncFile(
                         name=file.name,
                         id=file.id,
-                        is_folder=isinstance(file, dropbox.files.FolderMetadata),
-                        last_modified=str(file.client_modified),
-                        mime_type=file.path_lower.split(".")[-1],
-                        web_view_link=file.path_display,
+                        is_folder=is_folder,
+                        last_modified=(
+                            str(file.client_modified) if not is_folder else ""
+                        ),
+                        mime_type=(
+                            file.path_lower.split(".")[-1] if not is_folder else ""
+                        ),
+                        web_view_link=shared_link,
                     )
                 )
             return files
@@ -362,7 +371,7 @@ def list_dropbox_files(
 
 def get_dropbox_files_by_id(
     credentials: Dict[str, str], file_ids: List[str]
-) -> List[Dict[str, Any]]:
+) -> List[SyncFile] | Dict[str, str]:
     """
     Retrieve files from Dropbox by their IDs.
 
@@ -389,14 +398,19 @@ def get_dropbox_files_by_id(
             try:
                 metadata = dbx.files_get_metadata(file_id)
                 logger.debug("Metadata for file_id %s: %s", file_id, metadata)
-
+                shared_link = f"https://www.dropbox.com/preview/{metadata.path_display}?context=content_suggestions&role=personal"
+                is_folder = isinstance(metadata, dropbox.files.FolderMetadata)
                 file_info = SyncFile(
                     name=metadata.name,
                     id=metadata.id,
-                    is_folder=isinstance(metadata, dropbox.files.FolderMetadata),
-                    last_modified=str(metadata.client_modified),
-                    mime_type=metadata.path_lower.split(".")[-1],
-                    web_view_link=metadata.path_display,
+                    is_folder=is_folder,
+                    last_modified=(
+                        str(metadata.client_modified) if not is_folder else ""
+                    ),
+                    mime_type=(
+                        metadata.path_lower.split(".")[-1] if not is_folder else ""
+                    ),
+                    web_view_link=shared_link,
                 )
 
                 files.append(file_info)
