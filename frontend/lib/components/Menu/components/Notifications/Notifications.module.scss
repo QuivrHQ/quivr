@@ -40,4 +40,11 @@
     font-size: Typography.$tiny;
     color: var(--text-2);
   }
+
+  .feeding {
+    color: var(--text-2);
+    font-size: Typography.$small;
+    font-weight: 500;
+    padding-left: Spacings.$spacing05;
+  }
 }

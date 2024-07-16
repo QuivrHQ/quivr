@@ -15,10 +15,28 @@ export const Notifications = (): JSX.Element => {
   const { isMobile } = useDevice();
   const { supabase } = useSupabase();
 
-  const deleteAllNotifications = async () => {
+  const deleteAllNotifications = async (
+    notificationType: "generic" | "feeding"
+  ) => {
     for (const notifications of bulkNotifications) {
       for (const notification of notifications.notifications) {
-        await supabase.from("notifications").delete().eq("id", notification.id);
+        if (
+          notificationType === "generic" &&
+          notification.category === "generic"
+        ) {
+          await supabase
+            .from("notifications")
+            .delete()
+            .eq("id", notification.id);
+        } else if (
+          notificationType === "feeding" &&
+          notification.category !== "generic"
+        ) {
+          await supabase
+            .from("notifications")
+            .delete()
+            .eq("id", notification.id);
+        }
       }
     }
     await updateNotifications();
@@ -62,7 +80,7 @@ export const Notifications = (): JSX.Element => {
             <TextButton
               label="Delete all"
               color="black"
-              onClick={() => void deleteAllNotifications()}
+              onClick={() => void deleteAllNotifications("generic")}
               small={true}
             />
           </div>
@@ -72,17 +90,56 @@ export const Notifications = (): JSX.Element => {
             You have no notifications
           </div>
         )}
-        {bulkNotifications.map((notification, i) =>
-          notification.category !== "generic" ? (
-            <FeedingNotification
-              key={i}
-              bulkNotification={notification}
-              lastNotification={i === bulkNotifications.length - 1}
-              updateNotifications={updateNotifications}
-            />
-          ) : (
-            <div key={i}>Generic</div>
-          )
+        {bulkNotifications.some((notif) => notif.category === "generic") && (
+          <>
+            {bulkNotifications.map((notification, i) =>
+              notification.category === "generic" ? (
+                <div key={i}>Hey</div>
+              ) : null
+            )}
+          </>
+        )}
+        {bulkNotifications.some((notif) => notif.category !== "generic") && (
+          <>
+            <div className={styles.notifications_panel_header}>
+              <div className={styles.left}>
+                {isMobile &&
+                  !bulkNotifications.some(
+                    (notif) => notif.category === "generic"
+                  ) && (
+                    <Icon
+                      name="hide"
+                      size="small"
+                      handleHover={true}
+                      color="black"
+                      onClick={() => setIsVisible(false)}
+                    />
+                  )}
+                <span className={styles.title}>
+                  Knowledge feeding in progress
+                </span>
+              </div>
+              <div className={styles.buttons}>
+                <TextButton
+                  label="Delete all"
+                  color="black"
+                  onClick={() => void deleteAllNotifications("feeding")}
+                  small={true}
+                />
+              </div>
+            </div>
+
+            {bulkNotifications.map((notification, i) =>
+              notification.category !== "generic" ? (
+                <FeedingNotification
+                  key={i}
+                  bulkNotification={notification}
+                  lastNotification={i === bulkNotifications.length - 1}
+                  updateNotifications={updateNotifications}
+                />
+              ) : null
+            )}
+          </>
         )}
       </div>
     </div>
