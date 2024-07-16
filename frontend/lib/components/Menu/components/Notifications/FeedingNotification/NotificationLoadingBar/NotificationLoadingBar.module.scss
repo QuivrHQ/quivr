@@ -1,0 +1,23 @@
+@use "styles/Radius.module.scss";
+
+.loading_bar {
+  overflow: hidden;
+  display: flex;
+  width: 100%;
+
+  .bar_section {
+    height: 4px;
+
+    &.info {
+      background-color: var(--background-3);
+    }
+
+    &.success {
+      background-color: var(--success);
+    }
+
+    &.error {
+      background-color: var(--dangerous-dark);
+    }
+  }
+}

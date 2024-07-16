@@ -146,7 +146,7 @@ async def create_sync_active(
             user_id=current_user.id,
             status=NotificationsStatusEnum.SUCCESS,
             title="Synchronization created! ",
-            description="Synchronization takes a few minutes to complete",
+            description="Your brain is preparing to sync files. This may take a few minutes before proceeding.",
             category="generic",
             bulk_id=uuid.uuid4(),
             brain_id=sync_active_input.brain_id,
@@ -186,7 +186,8 @@ async def update_sync_active(
             status=NotificationsStatusEnum.SUCCESS,
             title="Sync updated! Synchronization takes a few minutes to complete",
             description="Syncing your files...",
-            category="sync",
+            category="generic",
+            bulk_id=uuid.uuid4(),
         )
     )
     sync_active_input.force_sync = True
@@ -221,6 +222,8 @@ async def delete_sync_active(
             status=NotificationsStatusEnum.SUCCESS,
             title="Sync deleted!",
             description="Sync deleted!",
+            category="generic",
+            bulk_id=uuid.uuid4(),
         )
     )
     sync_service.delete_sync_active(sync_id, str(current_user.id))

@@ -58,9 +58,11 @@ div:focus {
   --background-3: var(--grey-4);
   --background-4: var(--grey-0);
   --background-5: var(--black-0);
-  --background-special-0: var(--primary-2);
-  --background-special-1: var(--primary-1);
+  --background-primary-0: var(--primary-2);
+  --background-primary-1: var(--primary-1);
   --background-blur: rgba(0, 0, 0, 0.9);
+  --background-success: var(--success-lightest);
+  --background-error: var(--dangerous-lightest);
 
   /* Borders */
   --border-0: var(--grey-5);
@@ -92,10 +94,12 @@ body.dark_mode {
   --background-3: var(--black-3);
   --background-4: var(--black-4);
   --background-5: var(--black-5);
-  --background-special-0: var(--black-3);
-  --background-special-1: var(--black-5);
+  --background-primary-0: var(--black-5);
+  --background-primary-1: var(--black-5);
   --background-opposite: var(--white-0);
   --background-blur: rgba(0, 0, 0, 0.9);
+  --background-success: var(--black-5);
+  --background-error: var(--black-5);
  
   /* Borders */
   --border-0: var(--black-5);

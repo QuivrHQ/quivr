@@ -1,0 +1,154 @@
+@use "styles/Radius.module.scss";
+@use "styles/Spacings.module.scss";
+@use "styles/Typography.module.scss";
+
+.notification {
+  padding-inline: Spacings.$spacing05;
+  padding-block: Spacings.$spacing05;
+  border-bottom: 1px solid var(--border-2);
+  display: flex;
+  flex-direction: column;
+
+  &:hover {
+    cursor: pointer;
+    background-color: var(--background-2);
+  }
+
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: Spacings.$spacing03;
+
+    .left {
+      display: flex;
+      align-items: center;
+      gap: Spacings.$spacing02;
+
+      .title {
+        font-size: Typography.$small;
+        color: var(--text-4);
+      }
+
+      .brain_name {
+        display: flex;
+        align-items: center;
+        font-size: Typography.$small;
+        gap: Spacings.$spacing02;
+        font-weight: 500;
+      }
+    }
+  }
+
+  .subtitle {
+    font-size: Typography.$tiny;
+    font-style: italic;
+  }
+
+  .loader_wrapper {
+    padding-block: Spacings.$spacing02;
+    display: flex;
+    width: 100%;
+    align-items: center;
+
+    .left {
+      width: 100px;
+      display: flex;
+      align-items: center;
+      gap: Spacings.$spacing03;
+
+      .count {
+        display: flex;
+        font-size: Typography.$very_tiny;
+        font-weight: 600;
+
+        &.success {
+          color: var(--success);
+        }
+
+        &.warning {
+          color: var(--warning);
+        }
+      }
+    }
+  }
+
+  .status_report {
+    display: flex;
+    gap: Spacings.$spacing06;
+
+    .success {
+      display: flex;
+      align-items: center;
+      color: var(--success);
+      gap: Spacings.$spacing02;
+      font-weight: 500;
+      border-radius: Radius.$normal;
+      padding-inline: Spacings.$spacing03;
+      padding-block: Spacings.$spacing02;
+      margin-left: -(Spacings.$spacing03);
+
+      &:hover {
+        background-color: var(--background-success);
+      }
+    }
+
+    .error {
+      display: flex;
+      align-items: center;
+      color: var(--dangerous);
+      gap: Spacings.$spacing02;
+      font-weight: 500;
+      border-radius: Radius.$normal;
+      padding-inline: Spacings.$spacing03;
+      padding-block: Spacings.$spacing02;
+      margin-left: -(Spacings.$spacing03);
+
+      &:hover {
+        background-color: var(--dangerous-lightest);
+      }
+    }
+  }
+
+  .errors_header {
+    display: flex;
+    align-items: center;
+    color: var(--dangerous);
+
+    .title {
+      font-size: Typography.$very_tiny;
+    }
+
+    &:hover {
+      cursor: pointer;
+      color: var(--dangerous-dark);
+    }
+  }
+
+  .file_list {
+    display: flex;
+    flex-direction: column;
+    gap: Spacings.$spacing02;
+    padding-top: Spacings.$spacing02;
+
+    .title {
+      font-size: Typography.$very_tiny;
+
+      &.error {
+        color: var(--dangerous);
+      }
+
+      &.success {
+        color: var(--success);
+      }
+    }
+  }
+
+  .date_time {
+    display: flex;
+    width: 100%;
+    font-size: Typography.$very_tiny;
+    justify-content: flex-end;
+    color: var(--text-4);
+  }
+}

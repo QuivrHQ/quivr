@@ -45,7 +45,46 @@
     .left {
       display: flex;
       align-items: center;
-      gap: Spacings.$spacing06;
+      gap: calc(Spacings.$spacing06 + 6px);
+
+      .name {
+        display: flex;
+        align-items: center;
+        gap: Spacings.$spacing02;
+        cursor: pointer;
+
+        .icon {
+          visibility: hidden;
+        }
+
+        &:hover {
+          .icon {
+            visibility: visible;
+          }
+        }
+      }
+    }
+
+    .right {
+      display: flex;
+      gap: calc(Spacings.$spacing06 + 12px);
+
+      .status {
+        display: flex;
+        align-items: center;
+        gap: Spacings.$spacing02;
+        cursor: pointer;
+
+        .icon {
+          visibility: hidden;
+        }
+
+        &:hover {
+          .icon {
+            visibility: visible;
+          }
+        }
+      }
     }
   }
 }

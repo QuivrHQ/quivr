@@ -85,6 +85,7 @@ class QuivrKnowledge(BaseModel):
     file_name: str | None = None
     url: str | None = None
     extension: str = "txt"
+    status: str = "PROCESSING"
 
 
 # NOTE: for compatibility issues with langchain <-> PydanticV1

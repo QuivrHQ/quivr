@@ -1,7 +1,11 @@
 import { AxiosInstance } from "axios";
 import { UUID } from "crypto";
 
-import { Knowledge } from "@/lib/types/Knowledge";
+import {
+  CrawledKnowledge,
+  Knowledge,
+  UploadedKnowledge,
+} from "@/lib/types/Knowledge";
 
 export type GetAllKnowledgeInputProps = {
   brainId: UUID;
@@ -13,6 +17,7 @@ interface BEKnowledge {
   file_name: string | null;
   url: string | null;
   extension: string;
+  status: string;
 }
 
 export const getAllKnowledge = async (
@@ -30,14 +35,16 @@ export const getAllKnowledge = async (
         brainId: knowledge.brain_id,
         fileName: knowledge.file_name,
         extension: knowledge.extension,
-      };
+        status: knowledge.status,
+      } as UploadedKnowledge;
     } else if (knowledge.url !== null) {
       return {
         id: knowledge.id,
         brainId: knowledge.brain_id,
         url: knowledge.url,
         extension: "URL",
-      };
+        status: knowledge.status,
+      } as CrawledKnowledge;
     } else {
       throw new Error(`Invalid knowledge ${knowledge.id}`);
     }
