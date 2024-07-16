@@ -117,7 +117,7 @@ export const FeedingNotification = ({
   const router = useRouter();
 
   const navigateToBrain = () => {
-    router.push(`/studio/${bulkNotification.brain_id}`); // Naviguer vers l'URL
+    router.push(`/studio/${bulkNotification.brain_id}`);
   };
 
   const allNotifsProcessed = bulkNotification.notifications.every(
