@@ -30,7 +30,7 @@ from quivr_core.utils import (
     parse_response,
 )
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("quivr_core")
 
 
 class IdempotentCompressor(BaseDocumentCompressor):
@@ -174,6 +174,7 @@ class QuivrQARAG:
         rolling_message = AIMessageChunk(content="")
         sources = []
         prev_answer = ""
+        chunk_id = 0
 
         async for chunk in conversational_qa_chain.astream(
             {
@@ -203,16 +204,30 @@ class QuivrQARAG:
                                 metadata=RAGResponseMetadata(),
                             )
                             prev_answer += diff_answer
+
+                            logger.debug(
+                                f"answer_astream func_calling=True question={question} rolling_msg={rolling_message} chunk_id={chunk_id}, chunk={parsed_chunk}"
+                            )
                             yield parsed_chunk
                     else:
-                        yield ParsedRAGChunkResponse(
+                        parsed_chunk = ParsedRAGChunkResponse(
                             answer=answer_str,
                             metadata=RAGResponseMetadata(),
                         )
+                        logger.debug(
+                            f"answer_astream func_calling=False question={question} rolling_msg={rolling_message} chunk_id={chunk_id}, chunk={parsed_chunk}"
+                        )
+                        yield parsed_chunk
+
+                    chunk_id += 1
 
         # Last chunk provides metadata
-        yield ParsedRAGChunkResponse(
+        last_chunk = ParsedRAGChunkResponse(
             answer="",
             metadata=get_chunk_metadata(rolling_message, sources),
             last_chunk=True,
         )
+        logger.debug(
+            f"answer_astream last_chunk={last_chunk} question={question} rolling_msg={rolling_message} chunk_id={chunk_id}"
+        )
+        yield last_chunk

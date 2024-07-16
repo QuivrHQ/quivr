@@ -45,6 +45,10 @@ class ChatHistory:
         # Reverse the chat_history, newest first
         it = iter(self.get_chat_history(newest_first=True))
         for ai_message, human_message in zip(it, it):
-            assert isinstance(human_message.msg, HumanMessage)
-            assert isinstance(ai_message.msg, AIMessage)
+            assert isinstance(
+                human_message.msg, HumanMessage
+            ), f"msg {human_message} is not HumanMessage"
+            assert isinstance(
+                ai_message.msg, AIMessage
+            ), f"msg {human_message} is not AIMessage"
             yield (human_message.msg, ai_message.msg)

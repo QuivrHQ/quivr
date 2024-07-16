@@ -11,3 +11,5 @@ class Knowledge(BaseModel):
     url: Optional[str] = None
     extension: str = "txt"
     status: str
+    integration: Optional[str] = None
+    integration_link: Optional[str] = None

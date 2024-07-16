@@ -7,6 +7,7 @@ class LLMEndpointConfig(BaseModel):
     llm_api_key: str | None = None
     max_input: int = 2000
     max_tokens: int = 2000
+    temperature: float = 0.7
     streaming: bool = True
 
 

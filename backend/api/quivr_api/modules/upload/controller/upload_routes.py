@@ -45,6 +45,8 @@ async def upload_file(
     brain_id: UUID = Query(..., description="The ID of the brain"),
     chat_id: Optional[UUID] = Query(None, description="The ID of the chat"),
     current_user: UserIdentity = Depends(get_current_user),
+    integration: Optional[str] = None,
+    integration_link: Optional[str] = None,
 ):
     validate_brain_authorization(
         brain_id, current_user.id, [RoleEnum.Editor, RoleEnum.Owner]
@@ -108,6 +110,8 @@ async def upload_file(
         extension=os.path.splitext(
             uploadFile.filename  # pyright: ignore reportPrivateUsage=none
         )[-1].lower(),
+        integration=integration,
+        integration_link=integration_link,
     )
 
     knowledge = knowledge_service.add_knowledge(knowledge_to_add)
@@ -118,5 +122,7 @@ async def upload_file(
         brain_id=brain_id,
         notification_id=upload_notification.id,
         knowledge_id=knowledge.id,
+        integration=integration,
+        integration_link=integration_link,
     )
     return {"message": "File processing has started."}

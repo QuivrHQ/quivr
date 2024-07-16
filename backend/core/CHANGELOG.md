@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.0.9](https://github.com/QuivrHQ/quivr/compare/core-0.0.8...core-0.0.9) (2024-07-15)
+
+
+### Features
+
+* quivr api use quivr core ([#2868](https://github.com/QuivrHQ/quivr/issues/2868)) ([9d3e9ed](https://github.com/QuivrHQ/quivr/commit/9d3e9edfd2ef24397458cc6556f6080673be96ae))
+
+
+### Bug Fixes
+
+* quiv core stream duplicate  and quivr-core rag tests ([#2852](https://github.com/QuivrHQ/quivr/issues/2852)) ([35eb07f](https://github.com/QuivrHQ/quivr/commit/35eb07f7a2664f65e482a78fabf242e1ccb36f07))
+
 ## [0.0.8](https://github.com/QuivrHQ/quivr/compare/core-0.0.7...core-0.0.8) (2024-07-11)
 
 

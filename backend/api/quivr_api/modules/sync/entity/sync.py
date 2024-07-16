@@ -11,6 +11,16 @@ class SyncsUser(BaseModel):
     provider: str
 
 
+class SyncFile(BaseModel):
+    name: str
+    id: str
+    is_folder: bool
+    last_modified: str
+    mime_type: str
+    web_view_link: str
+    notification_id: Optional[str] = None
+
+
 class SyncsActive(BaseModel):
     id: int
     name: str

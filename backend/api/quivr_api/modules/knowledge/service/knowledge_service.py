@@ -5,11 +5,11 @@ from quivr_api.modules.knowledge.dto.inputs import (
     CreateKnowledgeProperties,
     KnowledgeStatus,
 )
-from quivr_api.modules.knowledge.entity.knowledge import Knowledge
 from quivr_api.modules.knowledge.repository.knowledge_interface import (
     KnowledgeInterface,
 )
 from quivr_api.modules.knowledge.repository.knowledges import KnowledgeRepository
+from quivr_core.models import QuivrKnowledge as Knowledge
 
 logger = get_logger(__name__)
 

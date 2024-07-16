@@ -1,12 +1,7 @@
 import logging
 from typing import Any, List, Tuple, no_type_check
 
-from langchain_core.messages import (
-    AIMessage,
-    BaseMessage,
-    HumanMessage,
-    SystemMessage,
-)
+from langchain_core.messages import AIMessage, BaseMessage, HumanMessage, SystemMessage
 from langchain_core.messages.ai import AIMessageChunk
 from langchain_core.prompts import format_document
 
@@ -22,7 +17,7 @@ from quivr_core.prompts import DEFAULT_DOCUMENT_PROMPT
 # This should be used for serialization/deseriallization later
 
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("quivr_core")
 
 
 def model_supports_function_calling(model_name: str):
