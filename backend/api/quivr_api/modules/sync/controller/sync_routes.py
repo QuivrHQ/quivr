@@ -186,7 +186,8 @@ async def update_sync_active(
             status=NotificationsStatusEnum.SUCCESS,
             title="Sync updated! Synchronization takes a few minutes to complete",
             description="Syncing your files...",
-            category="sync",
+            category="generic",
+            bulk_id=uuid.uuid4(),
         )
     )
     sync_active_input.force_sync = True
@@ -221,6 +222,8 @@ async def delete_sync_active(
             status=NotificationsStatusEnum.SUCCESS,
             title="Sync deleted!",
             description="Sync deleted!",
+            category="generic",
+            bulk_id=uuid.uuid4(),
         )
     )
     sync_service.delete_sync_active(sync_id, str(current_user.id))
