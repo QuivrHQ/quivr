@@ -135,16 +135,13 @@ def get_google_drive_files(
                 )
 
                 # If recursive is True and the item is a folder, get files from the folder
-                if (
-                    recursive
-                    and item["mimeType"] == "application/vnd.google-apps.folder"
-                ):
+                if recursive and item.mimeType == "application/vnd.google-apps.folder":
                     logger.warning(
                         "Calling Recursive for folder: %s",
-                        item["name"],
+                        item.name,
                     )
                     files.extend(
-                        get_google_drive_files(credentials, item["id"], recursive)
+                        get_google_drive_files(credentials, item.id, recursive)
                     )
 
             page_token = results.get("nextPageToken", None)
@@ -334,7 +331,7 @@ def list_dropbox_files(
                         name=file.name,
                         id=file.id,
                         is_folder=isinstance(file, dropbox.files.FolderMetadata),
-                        last_modified=file.client_modified,
+                        last_modified=str(file.client_modified),
                         mime_type=file.path_lower.split(".")[-1],
                         web_view_link=file.path_display,
                     )
@@ -350,7 +347,7 @@ def list_dropbox_files(
             files.extend(fetch_files(list_metadata))
 
         for file in files:
-            file["name"] = remove_special_characters(file["name"])
+            file.name = remove_special_characters(file.name)
 
         logger.info("Dropbox files retrieved successfully: %d", len(files))
         return files
@@ -397,7 +394,7 @@ def get_dropbox_files_by_id(
                     name=metadata.name,
                     id=metadata.id,
                     is_folder=isinstance(metadata, dropbox.files.FolderMetadata),
-                    last_modified=metadata.client_modified,
+                    last_modified=str(metadata.client_modified),
                     mime_type=metadata.path_lower.split(".")[-1],
                     web_view_link=metadata.path_display,
                 )
@@ -411,7 +408,7 @@ def get_dropbox_files_by_id(
                 continue  # Skip this file and proceed with the next one
 
         for file in files:
-            file["name"] = remove_special_characters(file["name"])
+            file.name = remove_special_characters(file.name)
 
         logger.info("Dropbox files retrieved successfully: %d", len(files))
         return files
