@@ -70,10 +70,10 @@ const NotificationIcon = ({
 }: {
   notifications: NotificationType[];
 }) => {
-  const hasInfo = notifications.some((notif) => notif.status === "info");
+  const hasPending = notifications.some((notif) => notif.status === "info");
   const allSuccess = notifications.every((notif) => notif.status === "success");
 
-  if (hasInfo) {
+  if (hasPending) {
     return <LoaderIcon size="small" color="primary" />;
   }
   if (allSuccess) {
@@ -117,7 +117,6 @@ export const FeedingNotification = ({
   const router = useRouter();
 
   const navigateToBrain = () => {
-    console.info(brain);
     router.push(`/studio/${bulkNotification.brain_id}`); // Naviguer vers l'URL
   };
 

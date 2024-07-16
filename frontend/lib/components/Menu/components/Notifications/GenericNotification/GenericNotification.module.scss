@@ -14,18 +14,24 @@
     background-color: var(--background-2);
   }
 
-  .brain_name {
+  .header {
     display: flex;
+    justify-content: space-between;
     align-items: center;
-    font-size: Typography.$small;
-    gap: Spacings.$spacing02;
-    font-weight: 500;
-    padding-bottom: Spacings.$spacing03;
+
+    .brain_name {
+      display: flex;
+      align-items: center;
+      font-size: Typography.$small;
+      gap: Spacings.$spacing02;
+      font-weight: 500;
+      padding-bottom: Spacings.$spacing03;
+    }
   }
 
   .content {
     padding-bottom: Spacings.$spacing03;
-    font-size: Typography.$small;
+    font-size: Typography.$tiny;
   }
 
   .date_time {
