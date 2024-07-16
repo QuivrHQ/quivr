@@ -25,7 +25,7 @@ export const useSync = () => {
       "https://quivr-cms.s3.eu-west-3.amazonaws.com/gdrive_8316d080fd.png",
     Azure:
       "https://quivr-cms.s3.eu-west-3.amazonaws.com/sharepoint_8c41cfdb09.png",
-    Dropbox:
+    DropBox:
       "https://quivr-cms.s3.eu-west-3.amazonaws.com/dropbox_dce4f3d753.png",
   };
 

@@ -70,7 +70,6 @@ def authorize_dropbox(
         credentials={},
         state={"state": state},
     )
-    request.session["csrf-token"] = auth_flow.csrf_token_session_key
     sync_user_service.create_sync_user(sync_user_input)
     return {"authorization_url": authorize_url}
 
@@ -88,6 +87,9 @@ def oauth2callback_dropbox(request: Request):
     """
     state = request.query_params.get("state")
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 8062feee (fix: DropBox integration link & front dropbox)
     if not state:
         raise HTTPException(status_code=400, detail="Invalid state parameter")
     request.session["csrf-token"] = state.split("|")[0] if "|" in state else ""
@@ -95,8 +97,11 @@ def oauth2callback_dropbox(request: Request):
     logger.debug("Keys in session : %s", request.session.keys())
     logger.debug("Value in session : %s", request.session.values())
 
+<<<<<<< HEAD
 =======
 >>>>>>> 96ed662b (fix: dropbox sync creds)
+=======
+>>>>>>> 8062feee (fix: DropBox integration link & front dropbox)
     state = state.split("|")[1] if "|" in state else state  # type: ignore
     state_dict = {"state": state}
     state_split = state.split(",")  # type: ignore
@@ -144,6 +149,9 @@ def oauth2callback_dropbox(request: Request):
             "refresh_token": oauth_result.refresh_token,
             "account_id": account_id,
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 8062feee (fix: DropBox integration link & front dropbox)
             "email": user_email,
             "expires_in": str(oauth_result.expires_at),
 =======
@@ -159,10 +167,14 @@ def oauth2callback_dropbox(request: Request):
             credentials=result,
             state={},
 <<<<<<< HEAD
+<<<<<<< HEAD
             email=user_email,
 =======
             email=email,
 >>>>>>> 96ed662b (fix: dropbox sync creds)
+=======
+            email=user_email,
+>>>>>>> 8062feee (fix: DropBox integration link & front dropbox)
         )
         sync_user_service.update_sync_user(
             str(current_user), state_dict, sync_user_input
