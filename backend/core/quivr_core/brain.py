@@ -1,6 +1,7 @@
 import asyncio
 import logging
 from pathlib import Path
+from pprint import PrettyPrinter
 from typing import Any, AsyncGenerator, Callable, Dict, Mapping, Self
 from uuid import UUID, uuid4
 
@@ -23,7 +24,9 @@ from quivr_core.storage.storage_base import StorageBase
 logger = logging.getLogger("quivr_core")
 
 
-async def _default_vectordb(docs: list[Document], embedder: Embeddings) -> VectorStore:
+async def _build_default_vectordb(
+    docs: list[Document], embedder: Embeddings
+) -> VectorStore:
     try:
         from langchain_community.vectorstores import FAISS
 
@@ -38,7 +41,7 @@ async def _default_vectordb(docs: list[Document], embedder: Embeddings) -> Vecto
 
     except ImportError as e:
         raise ImportError(
-            "Please provide a valid vectore store or install quivr-core['base'] package for using the default one."
+            "Please provide a valid vector store or install quivr-core['base'] package for using the default one."
         ) from e
 
 
@@ -119,6 +122,25 @@ class Brain:
         self.vector_db = vector_db
         self.embedder = embedder
 
+    def __repr__(self) -> str:
+        pp = PrettyPrinter(width=80, depth=None, compact=False, sort_dicts=False)
+        return pp.pformat(self.info())
+
+    def info(self) -> dict[str, Any]:
+        return {
+            "id": str(self.id),
+            "brain name": self.name,
+            "files": self.storage.info(),
+            "chats": {
+                "nb_chats": len(self._chats),
+                "current_default_chat": self.default_chat.id,
+                "default_chat_history_length": len(self.default_chat),
+            },
+            # TODO: dim of embedding
+            # "embedder": {},
+            "llm": self.llm.info(),
+        }
+
     @property
     def chat_history(self):
         return self.default_chat
@@ -163,7 +185,7 @@ class Brain:
 
         # Building brain's vectordb
         if vector_db is None:
-            vector_db = await _default_vectordb(docs, embedder)
+            vector_db = await _build_default_vectordb(docs, embedder)
         else:
             await vector_db.aadd_documents(docs)
 
@@ -224,7 +246,7 @@ class Brain:
 
         # Building brain's vectordb
         if vector_db is None:
-            vector_db = await _default_vectordb(langchain_documents, embedder)
+            vector_db = await _build_default_vectordb(langchain_documents, embedder)
         else:
             await vector_db.aadd_documents(langchain_documents)
 
