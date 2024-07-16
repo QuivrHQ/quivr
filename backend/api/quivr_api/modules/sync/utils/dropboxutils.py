@@ -68,7 +68,6 @@ class DropboxSyncUtils(BaseModel):
 
         downloaded_files = []
         bulk_id = uuid.uuid4()
-<<<<<<< HEAD
 
         for file in files:
             upload_notification = notification_service.add_notification(
@@ -89,17 +88,6 @@ class DropboxSyncUtils(BaseModel):
                 file_name = file.name
                 mime_type = file.mime_type
                 modified_time = file.last_modified
-
-=======
-        for file in files:
-            logger.info("🔥🔥🔥🔥: %s", file)
-            try:
-                file_id = str(file.id)
-                file_name = file.name
-                mime_type = file.mime_type
-                modified_time = file.last_modified
-
->>>>>>> 8062feee (fix: DropBox integration link & front dropbox)
                 metadata, file_data = dbx.files_download(file_id)  # type: ignore
                 # logger.debug("🔥 Filedata :", file_data.content)
                 file_data = BytesIO(file_data.content)
