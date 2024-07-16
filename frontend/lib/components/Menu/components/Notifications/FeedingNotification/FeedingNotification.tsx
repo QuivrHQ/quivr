@@ -9,12 +9,12 @@ import { Brain } from "@/lib/context/BrainProvider/types";
 import { useNotificationsContext } from "@/lib/context/NotificationsProvider/hooks/useNotificationsContext";
 import { useSupabase } from "@/lib/context/SupabaseProvider";
 
-import styles from "./Notification.module.scss";
+import styles from "./FeedingNotification.module.scss";
+import { NotificationLoadingBar } from "./NotificationLoadingBar/NotificationLoadingBar";
 
 import { BulkNotification, NotificationType } from "../../../types/types";
-import { NotificationLoadingBar } from "../NotificationLoadingBar/NotificationLoadingBar";
 
-interface NotificationProps {
+interface FeedingNotificationProps {
   bulkNotification: BulkNotification;
   lastNotification?: boolean;
   updateNotifications: () => Promise<void>;
@@ -107,10 +107,10 @@ const NotificationCount = ({
   );
 };
 
-export const Notification = ({
+export const FeedingNotification = ({
   bulkNotification,
   lastNotification,
-}: NotificationProps): JSX.Element => {
+}: FeedingNotificationProps): JSX.Element => {
   const { brain } = useBrainFetcher({ brainId: bulkNotification.brain_id });
   const { supabase } = useSupabase();
   const { updateNotifications } = useNotificationsContext();

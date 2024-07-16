@@ -6,7 +6,7 @@ import { useNotificationsContext } from "@/lib/context/NotificationsProvider/hoo
 import { useSupabase } from "@/lib/context/SupabaseProvider";
 import { useDevice } from "@/lib/hooks/useDevice";
 
-import { Notification } from "./Notification/Notification";
+import { FeedingNotification } from "./FeedingNotification/FeedingNotification";
 import styles from "./Notifications.module.scss";
 
 export const Notifications = (): JSX.Element => {
@@ -73,7 +73,7 @@ export const Notifications = (): JSX.Element => {
           </div>
         )}
         {bulkNotifications.map((notification, i) => (
-          <Notification
+          <FeedingNotification
             key={i}
             bulkNotification={notification}
             lastNotification={i === bulkNotifications.length - 1}
