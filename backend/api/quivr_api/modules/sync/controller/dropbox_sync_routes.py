@@ -74,8 +74,6 @@ def authorize_dropbox(
     return {"authorization_url": authorize_url}
 
 
-# {'state': 'dNzjXyh7CuAFyrBhKNG-UQ==|user_id=39418e3b-0258-4452-af60-7acfcc1263ff, name=chloe'}
-# {'state': 'user_id=39418e3b-0258-4452-af60-7acfcc1263ff, name=chloe'}
 @dropbox_sync_router.get("/sync/dropbox/oauth2callback", tags=["Sync"])
 def oauth2callback_dropbox(request: Request):
     """
@@ -116,7 +114,6 @@ def oauth2callback_dropbox(request: Request):
     if sync_user_state.get("user_id") != current_user:
         raise HTTPException(status_code=400, detail="Invalid user")
 
-    redirect_uri = f"{BASE_REDIRECT_URI}"
     auth_flow = DropboxOAuth2Flow(
         DROPBOX_APP_KEY,
         redirect_uri=BASE_REDIRECT_URI,

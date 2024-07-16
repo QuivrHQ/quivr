@@ -70,7 +70,6 @@ class DropboxSyncUtils(BaseModel):
         bulk_id = uuid.uuid4()
 
         for file in files:
-            logger.info("🔥🔥🔥🔥: %s", file)
             upload_notification = notification_service.add_notification(
                 CreateNotification(
                     user_id=current_user,

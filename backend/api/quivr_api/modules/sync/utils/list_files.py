@@ -316,7 +316,8 @@ def list_dropbox_files(
 
     # Verify credential has the access token
     if "access_token" not in credentials:
-        raise HTTPException(status_code=401, detail="Invalid token data")
+        print("Invalid token data")
+        return {"error": "Invalid token data"}
 
     try:
         dbx = dropbox.Dropbox(credentials["access_token"])
