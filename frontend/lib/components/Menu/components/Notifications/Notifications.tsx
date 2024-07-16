@@ -7,6 +7,7 @@ import { useSupabase } from "@/lib/context/SupabaseProvider";
 import { useDevice } from "@/lib/hooks/useDevice";
 
 import { FeedingNotification } from "./FeedingNotification/FeedingNotification";
+import { GenericNotification } from "./GenericNotification/GenericNotification";
 import styles from "./Notifications.module.scss";
 
 export const Notifications = (): JSX.Element => {
@@ -94,7 +95,7 @@ export const Notifications = (): JSX.Element => {
           <>
             {bulkNotifications.map((notification, i) =>
               notification.category === "generic" ? (
-                <div key={i}>Hey</div>
+                <GenericNotification key={i} bulkNotification={notification} />
               ) : null
             )}
           </>
@@ -131,12 +132,7 @@ export const Notifications = (): JSX.Element => {
 
             {bulkNotifications.map((notification, i) =>
               notification.category !== "generic" ? (
-                <FeedingNotification
-                  key={i}
-                  bulkNotification={notification}
-                  lastNotification={i === bulkNotifications.length - 1}
-                  updateNotifications={updateNotifications}
-                />
+                <FeedingNotification key={i} bulkNotification={notification} />
               ) : null
             )}
           </>

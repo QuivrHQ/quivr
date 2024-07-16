@@ -1,3 +1,4 @@
+import { formatDistanceToNow } from "date-fns";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
@@ -16,8 +17,6 @@ import { BulkNotification, NotificationType } from "../../../types/types";
 
 interface FeedingNotificationProps {
   bulkNotification: BulkNotification;
-  lastNotification?: boolean;
-  updateNotifications: () => Promise<void>;
 }
 
 const NotificationHeader = ({
@@ -109,7 +108,6 @@ const NotificationCount = ({
 
 export const FeedingNotification = ({
   bulkNotification,
-  lastNotification,
 }: FeedingNotificationProps): JSX.Element => {
   const { brain } = useBrainFetcher({ brainId: bulkNotification.brain_id });
   const { supabase } = useSupabase();
@@ -138,12 +136,7 @@ export const FeedingNotification = ({
   };
 
   return (
-    <div
-      className={`${styles.notification} ${
-        lastNotification ? styles.last : ""
-      }`}
-      onClick={() => navigateToBrain()}
-    >
+    <div className={styles.notification} onClick={() => navigateToBrain()}>
       <NotificationHeader
         bulkNotification={bulkNotification}
         brain={brain}
@@ -236,9 +229,13 @@ export const FeedingNotification = ({
             ))}
         </div>
       )}
-      <div className={styles.date_time}>{bulkNotification.datetime}</div>
+      <div className={styles.date_time}>
+        {formatDistanceToNow(new Date(bulkNotification.datetime), {
+          addSuffix: true,
+        }).replace("about ", "")}
+      </div>
     </div>
   );
 };
 
-export default Notification;
+export default FeedingNotification;

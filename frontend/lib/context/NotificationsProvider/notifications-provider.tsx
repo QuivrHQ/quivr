@@ -53,7 +53,6 @@ export const NotificationsProvider = ({
         bulkMap[notif.bulk_id].push(notif);
       });
 
-      // Transform the grouped notifications into BulkNotification format
       const bulkNotifs: BulkNotification[] = Object.keys(bulkMap).map(
         (bulkId) => ({
           bulk_id: bulkId,

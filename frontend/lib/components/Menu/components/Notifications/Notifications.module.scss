@@ -13,9 +13,12 @@
     align-items: center;
     justify-content: space-between;
     font-size: Typography.$small;
-    padding-inline: Spacings.$spacing05;
-    padding-top: Spacings.$spacing03;
-    padding-bottom: Spacings.$spacing05;
+    padding: Spacings.$spacing05;
+
+    &:hover {
+      cursor: pointer;
+      background-color: var(--background-2);
+    }
 
     .left {
       display: flex;

@@ -146,7 +146,7 @@ async def create_sync_active(
             user_id=current_user.id,
             status=NotificationsStatusEnum.SUCCESS,
             title="Synchronization created! ",
-            description="Synchronization takes a few minutes to complete",
+            description="Your brain is preparing to sync files. This may take a few minutes before proceeding.",
             category="generic",
             bulk_id=uuid.uuid4(),
             brain_id=sync_active_input.brain_id,

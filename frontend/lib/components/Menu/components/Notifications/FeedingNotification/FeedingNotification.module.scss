@@ -45,10 +45,6 @@
     font-style: italic;
   }
 
-  &.last {
-    border-bottom: none;
-  }
-
   .loader_wrapper {
     padding-block: Spacings.$spacing02;
     display: flex;
@@ -146,5 +142,13 @@
         color: var(--success);
       }
     }
+  }
+
+  .date_time {
+    display: flex;
+    width: 100%;
+    font-size: Typography.$very_tiny;
+    justify-content: flex-end;
+    color: var(--text-4);
   }
 }
