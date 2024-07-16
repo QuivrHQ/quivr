@@ -16,8 +16,11 @@ def test_brain_empty_files():
         Brain.from_files(name="test_brain", file_paths=[])
 
 
-def test_brain_from_files_success(fake_llm: LLMEndpoint, embedder, temp_data_file):
-    brain = Brain.from_files(
+@pytest.mark.asyncio
+async def test_brain_from_files_success(
+    fake_llm: LLMEndpoint, embedder, temp_data_file
+):
+    brain = await Brain.afrom_files(
         name="test_brain", file_paths=[temp_data_file], embedder=embedder, llm=fake_llm
     )
     assert brain.name == "test_brain"
@@ -29,7 +32,7 @@ def test_brain_from_files_success(fake_llm: LLMEndpoint, embedder, temp_data_fil
 
     # storage
     assert isinstance(brain.storage, TransparentStorage)
-    assert len(brain.storage.get_files()) == 1
+    assert len(await brain.storage.get_files()) == 1
 
 
 @pytest.mark.asyncio
@@ -39,7 +42,7 @@ async def test_brain_from_langchain_docs(embedder):
         name="test", langchain_documents=[chunk], embedder=embedder
     )
     # No appended files
-    assert len(brain.storage.get_files()) == 0
+    assert len(await brain.storage.get_files()) == 0
     assert len(brain.chat_history) == 0
 
 

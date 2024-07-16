@@ -16,7 +16,7 @@ from quivr_core.models import ParsedRAGChunkResponse, ParsedRAGResponse, SearchR
 from quivr_core.processor.default_parsers import DEFAULT_PARSERS
 from quivr_core.processor.processor_base import ProcessorBase
 from quivr_core.quivr_rag import QuivrQARAG
-from quivr_core.storage.file import QuivrFile
+from quivr_core.storage.file import load_qfile
 from quivr_core.storage.local_storage import TransparentStorage
 from quivr_core.storage.storage_base import StorageBase
 
@@ -73,11 +73,12 @@ async def _process_files(
     processors_mapping: Mapping[str, ProcessorBase],
 ) -> list[Document]:
     knowledge = []
-    for file in storage.get_files():
+    for file in await storage.get_files():
         try:
             if file.file_extension:
                 processor = processors_mapping[file.file_extension]
                 docs = await processor.process_file(file)
+
                 knowledge.extend(docs)
             else:
                 logger.error(f"can't find processor for {file}")
@@ -148,9 +149,10 @@ class Brain:
 
         brain_id = uuid4()
 
+        # TODO: run in parallel using tasks
         for path in file_paths:
-            file = QuivrFile.from_path(brain_id, path)
-            storage.upload_file(file)
+            file = await load_qfile(brain_id, path)
+            await storage.upload_file(file)
 
         # Parse files
         docs = await _process_files(
@@ -187,7 +189,8 @@ class Brain:
         processors_mapping: Mapping[str, ProcessorBase] = DEFAULT_PARSERS,
         skip_file_error: bool = False,
     ) -> Self:
-        return asyncio.run(
+        loop = asyncio.get_event_loop()
+        return loop.run_until_complete(
             cls.afrom_files(
                 name=name,
                 file_paths=file_paths,

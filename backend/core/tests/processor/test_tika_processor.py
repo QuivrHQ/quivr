@@ -17,6 +17,7 @@ def pdf():
         original_filename="dummy.pdf",
         path=Path("./tests/processor/data/dummy.pdf"),
         file_extension=".pdf",
+        file_md5="",
     )
 
 
