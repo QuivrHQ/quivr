@@ -12,6 +12,7 @@ export interface BulkNotification {
   bulk_id: string;
   category: "sync" | "upload" | "crawl" | "generic";
   brain_id: UUID;
+  datetime: string;
 }
 
 export interface NotificationType {

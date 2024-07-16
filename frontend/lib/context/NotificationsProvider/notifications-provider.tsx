@@ -60,6 +60,7 @@ export const NotificationsProvider = ({
           notifications: bulkMap[bulkId],
           category: bulkMap[bulkId][0].category,
           brain_id: bulkMap[bulkId][0].brain_id,
+          datetime: bulkMap[bulkId][0].datetime,
         })
       );
 

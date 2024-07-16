@@ -236,6 +236,7 @@ export const FeedingNotification = ({
             ))}
         </div>
       )}
+      <div className={styles.date_time}>{bulkNotification.datetime}</div>
     </div>
   );
 };
