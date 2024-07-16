@@ -193,14 +193,14 @@ def refresh_azure_token(credentials):
     return result
 
 
-def get_sync_headers(token_data):
+def get_azure_headers(token_data):
     return {
         "Authorization": f"Bearer {token_data['access_token']}",
         "Accept": "application/json",
     }
 
 
-def list_azure_files(credentials, folder_id=None, recursive=False):
+def list_azure_files(credentials, folder_id=None, recursive=False) -> list[SyncFile]:
     def fetch_files(endpoint, headers):
         response = requests.get(endpoint, headers=headers)
         if response.status_code == 401:
@@ -250,7 +250,9 @@ def list_azure_files(credentials, folder_id=None, recursive=False):
     return files
 
 
-def get_azure_files_by_id(credentials: dict, file_ids: List[str]):
+def get_azure_files_by_id(
+    credentials: dict, file_ids: List[str]
+) -> List[SyncFile] | dict:
     """
     Retrieve files from Azure Drive by their IDs.
 
@@ -263,7 +265,7 @@ def get_azure_files_by_id(credentials: dict, file_ids: List[str]):
     """
     logger.info("Retrieving Azure Drive files with file_ids: %s", file_ids)
     token_data = get_azure_token_data(credentials)
-    headers = get_sync_headers(token_data)
+    headers = get_azure_headers(token_data)
     files = []
 
     for file_id in file_ids:
@@ -271,7 +273,7 @@ def get_azure_files_by_id(credentials: dict, file_ids: List[str]):
         response = requests.get(endpoint, headers=headers)
         if response.status_code == 401:
             token_data = refresh_azure_token(credentials)
-            headers = get_sync_headers(token_data)
+            headers = get_azure_headers(token_data)
             response = requests.get(endpoint, headers=headers)
         if response.status_code != 200:
             logger.error(
@@ -301,7 +303,7 @@ def get_azure_files_by_id(credentials: dict, file_ids: List[str]):
 # Drop Box
 def list_dropbox_files(
     credentials: dict, folder_id: str = "", recursive: bool = False
-) -> List[dict]:
+) -> List[SyncFile] | dict:
     """
     Retrieve files from Dropbox.
 
@@ -328,13 +330,14 @@ def list_dropbox_files(
             files = []
             for file in metadata.entries:
                 files.append(
-                    {
-                        "name": file.name,
-                        "id": file.id,
-                        "is_folder": isinstance(file, dropbox.files.FolderMetadata),
-                        "last_modified": file.client_modified,
-                        "mime_type": file.path_lower.split(".")[-1],
-                    }
+                    SyncFile(
+                        name=file.name,
+                        id=file.id,
+                        is_folder=isinstance(file, dropbox.files.FolderMetadata),
+                        last_modified=file.client_modified,
+                        mime_type=file.path_lower.split(".")[-1],
+                        web_view_link=file.path_display,
+                    )
                 )
             return files
 
@@ -390,13 +393,15 @@ def get_dropbox_files_by_id(
                 metadata = dbx.files_get_metadata(file_id)
                 logger.debug("Metadata for file_id %s: %s", file_id, metadata)
 
-                file_info = {
-                    "name": metadata.name,
-                    "id": metadata.id,
-                    "is_folder": isinstance(metadata, dropbox.files.FolderMetadata),
-                    "last_modified": metadata.client_modified,
-                    "mime_type": metadata.path_lower.split(".")[-1],
-                }
+                file_info = SyncFile(
+                    name=metadata.name,
+                    id=metadata.id,
+                    is_folder=isinstance(metadata, dropbox.files.FolderMetadata),
+                    last_modified=metadata.client_modified,
+                    mime_type=metadata.path_lower.split(".")[-1],
+                    web_view_link=metadata.path_display,
+                )
+
                 files.append(file_info)
             except dropbox.exceptions.ApiError as api_err:
                 logger.error("Dropbox API error for file_id %s: %s", file_id, api_err)
