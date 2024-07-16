@@ -162,7 +162,7 @@ async def create_sync_active(
     tags=["Sync"],
 )
 async def update_sync_active(
-    sync_id: str,
+    sync_id: int,
     sync_active_input: SyncsActiveUpdateInput,
     current_user: UserIdentity = Depends(get_current_user),
 ):
@@ -180,6 +180,8 @@ async def update_sync_active(
     logger.debug(
         f"Updating active sync for user: {current_user.id} with data: {sync_active_input}"
     )
+
+    details_sync_active = sync_service.get_details_sync_active(sync_id)
     notification_service.add_notification(
         CreateNotification(
             user_id=current_user.id,
@@ -188,6 +190,7 @@ async def update_sync_active(
             description="Syncing your files...",
             category="generic",
             bulk_id=uuid.uuid4(),
+            brain_id=details_sync_active["brain_id"],  # type: ignore
         )
     )
     sync_active_input.force_sync = True
@@ -201,7 +204,7 @@ async def update_sync_active(
     tags=["Sync"],
 )
 async def delete_sync_active(
-    sync_id: str, current_user: UserIdentity = Depends(get_current_user)
+    sync_id: int, current_user: UserIdentity = Depends(get_current_user)
 ):
     """
     Delete an existing active sync for the current user.
@@ -216,6 +219,8 @@ async def delete_sync_active(
     logger.debug(
         f"Deleting active sync for user: {current_user.id} with sync ID: {sync_id}"
     )
+
+    details_sync_active = sync_service.get_details_sync_active(sync_id)
     notification_service.add_notification(
         CreateNotification(
             user_id=current_user.id,
@@ -224,6 +229,7 @@ async def delete_sync_active(
             description="Sync deleted!",
             category="generic",
             bulk_id=uuid.uuid4(),
+            brain_id=details_sync_active["brain_id"],  # type: ignore
         )
     )
     sync_service.delete_sync_active(sync_id, str(current_user.id))
