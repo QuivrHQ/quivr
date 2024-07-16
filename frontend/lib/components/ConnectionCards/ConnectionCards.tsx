@@ -31,7 +31,7 @@ export const ConnectionCards = ({
       />
       <ConnectionSection
         label="Dropbox"
-        provider="DropBox"
+        provider="Dropbox"
         callback={(name) => syncDropbox(name)}
         fromAddKnowledge={fromAddKnowledge}
       />
