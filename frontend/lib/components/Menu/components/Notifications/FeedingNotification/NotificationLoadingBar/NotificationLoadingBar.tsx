@@ -1,6 +1,6 @@
-import styles from "./NotificationLoadingBar.module.scss";
+import { BulkNotification } from "@/lib/components/Menu/types/types";
 
-import { BulkNotification } from "../../../types/types";
+import styles from "./NotificationLoadingBar.module.scss";
 
 interface NotificationProps {
   bulkNotification: BulkNotification;

@@ -72,14 +72,18 @@ export const Notifications = (): JSX.Element => {
             You have no notifications
           </div>
         )}
-        {bulkNotifications.map((notification, i) => (
-          <FeedingNotification
-            key={i}
-            bulkNotification={notification}
-            lastNotification={i === bulkNotifications.length - 1}
-            updateNotifications={updateNotifications}
-          />
-        ))}
+        {bulkNotifications.map((notification, i) =>
+          notification.category !== "generic" ? (
+            <FeedingNotification
+              key={i}
+              bulkNotification={notification}
+              lastNotification={i === bulkNotifications.length - 1}
+              updateNotifications={updateNotifications}
+            />
+          ) : (
+            <div key={i}>Generic</div>
+          )
+        )}
       </div>
     </div>
   );

@@ -10,7 +10,7 @@ export enum NotificationStatus {
 export interface BulkNotification {
   notifications: NotificationType[];
   bulk_id: string;
-  category: "sync" | "upload" | "crawl";
+  category: "sync" | "upload" | "crawl" | "generic";
   brain_id: UUID;
 }
 
@@ -23,6 +23,6 @@ export interface NotificationType {
   read: boolean;
   description: string;
   bulk_id: string;
-  category: "sync" | "upload" | "crawl";
+  category: "sync" | "upload" | "crawl" | "generic";
   brain_id: UUID;
 }
