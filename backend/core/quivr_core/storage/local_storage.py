@@ -9,6 +9,8 @@ from quivr_core.storage.storage_base import StorageBase
 
 
 class LocalStorage(StorageBase):
+    name: str = "local_storage"
+
     def __init__(self, dir_path: Path | None = None, copy_flag: bool = True):
         self.files: list[QuivrFile] = []
         self.hashes: Set[str] = set()
@@ -25,6 +27,12 @@ class LocalStorage(StorageBase):
     def _load_files(self) -> None:
         # TODO(@aminediro): load existing files
         pass
+
+    def nb_files(self) -> int:
+        return len(self.files)
+
+    def info(self):
+        return {"directory_path": self.dir_path, **super().info()}
 
     async def upload_file(self, file: QuivrFile, exists_ok: bool = False) -> None:
         dst_path = os.path.join(
@@ -51,16 +59,18 @@ class LocalStorage(StorageBase):
 
 
 class TransparentStorage(StorageBase):
-    """Transparent Storage.
-    uses default
+    """Transparent Storage."""
 
-    """
+    name: str = "transparent_storage"
 
     def __init__(self):
         self.id_files = {}
 
     async def upload_file(self, file: QuivrFile, exists_ok: bool = False) -> None:
         self.id_files[file.id] = file
+
+    def nb_files(self) -> int:
+        return len(self.id_files)
 
     async def remove_file(self, file_id: UUID) -> None:
         raise NotImplementedError

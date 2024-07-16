@@ -1,3 +1,5 @@
+from typing import Any
+
 from langchain_core.language_models.chat_models import BaseChatModel
 from pydantic.v1 import SecretStr
 
@@ -35,3 +37,14 @@ class LLMEndpoint:
 
     def supports_func_calling(self) -> bool:
         return self._supports_func_calling
+
+    def info(self) -> dict[str, Any]:
+        return {
+            "model": self._config.model,
+            "llm_base_url": (
+                self._config.llm_base_url if self._config.llm_base_url else "openai"
+            ),
+            "temperature": self._config.temperature,
+            "max_tokens": self._config.max_tokens,
+            "supports_function_calling": self.supports_func_calling(),
+        }

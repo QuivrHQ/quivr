@@ -93,3 +93,28 @@ async def test_brain_ask_streaming(
         response += chunk.answer
 
     assert response == answers[1]
+
+
+def test_brain_info_empty(fake_llm: LLMEndpoint, embedder, mem_vector_store):
+    storage = TransparentStorage()
+    id = uuid4()
+    brain = Brain(
+        name="test",
+        id=id,
+        llm=fake_llm,
+        embedder=embedder,
+        storage=storage,
+        vector_db=mem_vector_store,
+    )
+
+    assert brain.info() == {
+        "id": str(id),
+        "brain name": "test",
+        "files": storage.info(),
+        "chats": {
+            "nb_chats": 1,  # start with a default chat
+            "current_default_chat": brain.default_chat.id,
+            "default_chat_history_length": 0,
+        },
+        "llm": fake_llm.info(),
+    }
