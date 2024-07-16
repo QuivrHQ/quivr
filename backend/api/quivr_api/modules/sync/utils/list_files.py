@@ -292,3 +292,167 @@ def get_azure_files_by_id(credentials: dict, file_ids: List[str]):
         file.name = remove_special_characters(file.name)
     logger.info("Azure Drive files retrieved successfully: %s", len(files))
     return files
+
+
+# Constants
+CLIENT_ID = os.getenv("GITHUB_CLIENT_ID")
+CLIENT_SECRET = os.getenv("GITHUB_CLIENT_SECRET")
+BACKEND_URL = os.getenv("BACKEND_URL", "http://localhost:5050")
+REDIRECT_URI = f"{BACKEND_URL}/sync/github/oauth2callback"
+SCOPE = "repo user"
+
+
+def get_github_token_data(credentials):
+    if "access_token" not in credentials:
+        raise HTTPException(status_code=401, detail="Invalid token data")
+    return credentials
+
+
+def refresh_github_token(credentials):
+    # GitHub tokens do not support refresh token, usually need to re-authenticate
+    raise HTTPException(status_code=400, detail="GitHub does not support token refresh")
+
+
+def get_github_headers(token_data):
+    return {
+        "Authorization": f"Bearer {token_data['access_token']}",
+        "Accept": "application/json",
+    }
+
+
+def list_github_repos(credentials, recursive=False):
+    def fetch_repos(endpoint, headers):
+        response = requests.get(endpoint, headers=headers)
+        if response.status_code == 401:
+            # Token expired or invalid, GitHub tokens usually don't expire
+            raise HTTPException(status_code=401, detail="Unauthorized")
+        if response.status_code != 200:
+            return {"error": response.text}
+        return response.json()
+
+    token_data = get_github_token_data(credentials)
+    headers = get_github_headers(token_data)
+    endpoint = "https://api.github.com/user/repos"
+
+    items = fetch_repos(endpoint, headers)
+
+    if not items:
+        logger.info("No repositories found in GitHub")
+        return []
+
+    repos = []
+    for item in items:
+        repo_data = SyncFile(
+            name=item.get("name"),
+            project_name=item.get("repo_name"),
+            path=item.get("path"),
+            id=str(item.get("id")),
+            is_folder=False,
+            last_modified=str(item.get("updated_at")),
+            mime_type="repository",
+            web_view_link=item.get("html_url"),
+        )
+        repos.append(repo_data)
+
+        # If recursive option is enabled and the repo has submodules, fetch files from it
+        if recursive and item.get("has_submodules", False):
+            submodule_files = list_github_files_in_repo(credentials, repo_data.name)
+            repos.extend(submodule_files)
+    for repo in repos:
+        repo.name = remove_special_characters(repo.name)
+    logger.info("GitHub repositories retrieved successfully: %s", len(repos))
+    return repos
+
+
+def list_github_files_in_repo(credentials, repo_name, folder_path="", recursive=False):
+    def fetch_files(endpoint, headers):
+        response = requests.get(endpoint, headers=headers)
+        if response.status_code == 401:
+            raise HTTPException(status_code=401, detail="Unauthorized")
+        if response.status_code != 200:
+            return {"error": response.text}
+        return response.json()
+
+    token_data = get_github_token_data(credentials)
+    headers = get_github_headers(token_data)
+    endpoint = f"https://api.github.com/repos/{repo_name}/contents/{folder_path}"
+
+    items = fetch_files(endpoint, headers)
+
+    if not items:
+        logger.info(f"No files found in GitHub repository {repo_name}")
+        return []
+
+    files = []
+    for item in items:
+        file_data = SyncFile(
+            name=item.get("name"),
+            project_name=item.get("repo_name"),
+            path=item.get("path"),
+            id=str(item.get("sha")),
+            is_folder=item.get("type") == "dir",
+            last_modified=str(item.get("updated_at")),
+            mime_type=item.get("type"),
+            web_view_link=item.get("html_url"),
+        )
+        files.append(file_data)
+
+        # If recursive option is enabled and the item is a folder, fetch files from it
+        if recursive and file_data.is_folder:
+            folder_files = list_github_files_in_repo(
+                credentials, repo_name, folder_path=file_data.name, recursive=True
+            )
+            files.extend(folder_files)
+    for file in files:
+        file.name = remove_special_characters(file.name)
+    logger.info(f"GitHub repository files retrieved successfully: {len(files)}")
+    return files
+
+
+def get_github_files_by_id(credentials: dict, file_ids: List[str], repo_name: str):
+    """
+    Retrieve files from GitHub by their IDs.
+
+    Args:
+        credentials (dict): The credentials for accessing GitHub.
+        file_ids (list): The list of file IDs to retrieve.
+        repo_name (str): The name of the repository.
+
+    Returns:
+        list: A list of dictionaries containing the metadata of each file or an error message.
+    """
+    logger.info("Retrieving GitHub files with file_ids: %s", file_ids)
+    token_data = get_github_token_data(credentials)
+    headers = get_github_headers(token_data)
+    files = []
+
+    for file_id in file_ids:
+        endpoint = f"https://api.github.com/repos/{repo_name}/git/blobs/{file_id}"
+        response = requests.get(endpoint, headers=headers)
+        if response.status_code == 401:
+            raise HTTPException(status_code=401, detail="Unauthorized")
+        if response.status_code != 200:
+            logger.error(
+                "An error occurred while retrieving GitHub files: %s",
+                response.text,
+            )
+            return {"error": response.text}
+
+        result = response.json()
+        files.append(
+            SyncFile(
+                name=result.get("name"),
+                project_name=result.get("repo_name"),
+                path=result.get("path"),
+                id=result.get("sha"),
+                is_folder=False,
+                last_modified=result.get("updated_at"),
+                mime_type=result.get("type"),
+                web_view_link=result.get("html_url"),
+            )
+        )
+
+    for file in files:
+        file.name = remove_special_characters(file.name)
+    logger.info("GitHub files retrieved successfully: %s", len(files))
+    return files
