@@ -14,10 +14,10 @@
     justify-content: space-between;
     font-size: Typography.$small;
     padding: Spacings.$spacing05;
+    background-color: var(--background-2);
 
     &:hover {
       cursor: pointer;
-      background-color: var(--background-2);
     }
 
     .left {

@@ -39,13 +39,15 @@ export const useBrainCreationApi = () => {
   const { openedConnections } = useFromConnectionsContext();
 
   const handleFeedBrain = async (brainId: UUID): Promise<void> => {
-    const bulk_id: UUID = uuidv4().toString() as UUID;
+    const crawlBulkId: UUID = uuidv4().toString() as UUID;
+    const uploadBulkId: UUID = uuidv4().toString() as UUID;
+
     const uploadPromises = files.map((file) =>
-      uploadFileHandler(file, brainId, bulk_id)
+      uploadFileHandler(file, brainId, uploadBulkId)
     );
 
     const crawlPromises = urls.map((url) =>
-      crawlWebsiteHandler(url, brainId, bulk_id)
+      crawlWebsiteHandler(url, brainId, crawlBulkId)
     );
 
     await Promise.all([...uploadPromises, ...crawlPromises]);
