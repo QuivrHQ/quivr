@@ -5,7 +5,7 @@ from io import BytesIO
 
 import dropbox
 from fastapi import UploadFile
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from quivr_api.logger import get_logger
 from quivr_api.modules.brain.repository.brains_vectors import BrainsVectors
 from quivr_api.modules.knowledge.repository.storage import Storage
@@ -30,6 +30,8 @@ APP_SECRET = os.getenv("DROPBOW_CONSUMER_SECRET")
 
 
 class DropboxSyncUtils(BaseModel):
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+
     storage: Storage
     sync_files_repo: SyncFiles
     sync_active_service: SyncService
