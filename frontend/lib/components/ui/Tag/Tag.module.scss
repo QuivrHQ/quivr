@@ -12,7 +12,7 @@
 
   &.primary {
     color: var(--primary-0);
-    background-color: var(--primary-1);
+    background-color: var(--background-primary-0);
   }
 
   &.gold {
@@ -21,11 +21,11 @@
 
   &.dangerous {
     color: var(--dangerous-dark);
-    background-color: var(--dangerous-lightest);
+    background-color: var(--background-error);
   }
 
   &.success {
     color: var(--success);
-    background-color: var(--success-lightest);
+    background-color: var(--background-success);
   }
 }

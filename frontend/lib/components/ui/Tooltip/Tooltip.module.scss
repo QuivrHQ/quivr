@@ -20,11 +20,11 @@
 
   &.dangerous {
     color: var(--dangerous-dark);
-    background-color: var(--dangerous-lightest);
+    background-color: var(--background-error);
   }
 
   &.success {
     color: var(--success);
-    background-color: var(--success-lightest);
+    background-color: var(--background-success);
   }
 }
