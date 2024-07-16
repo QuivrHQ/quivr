@@ -1,5 +1,4 @@
 from abc import ABC, abstractmethod
-from typing import Generic, TypeVar
 
 from langchain_core.documents import Document
 
@@ -11,17 +10,8 @@ class ProcessorBase(ABC):
 
     @abstractmethod
     async def process_file(self, file: QuivrFile) -> list[Document]:
-        pass
+        raise NotImplementedError
 
-
-P = TypeVar("P", bound=ProcessorBase)
-
-
-class ProcessorsMapping(Generic[P]):
-    def __init__(self, mapping: dict[str, P]) -> None:
-        # Create an empty list with items of type T
-        self.ext_parser: dict[str, P] = mapping
-
-    def add_parser(self, extension: str, parser: P):
-        # TODO: deal with existing ext keys
-        self.ext_parser[extension] = parser
+    def check_supported(self, file: QuivrFile):
+        if file.file_extension not in self.supported_extensions:
+            raise Exception(f"can't process a file of type {file.file_extension}")
