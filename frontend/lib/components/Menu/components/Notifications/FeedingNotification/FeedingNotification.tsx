@@ -169,7 +169,7 @@ export const FeedingNotification = ({
                 setErrorsOpened(false);
               }}
             >
-              <Icon name="check" size="normal" color="success" />
+              <Icon name="check" size="small" color="success" />
               <span>
                 {
                   bulkNotification.notifications.filter(
@@ -190,7 +190,7 @@ export const FeedingNotification = ({
                 setSuccessOpened(false);
               }}
             >
-              <Icon name="warning" size="normal" color="dangerous" />
+              <Icon name="warning" size="small" color="dangerous" />
               <span>
                 {
                   bulkNotification.notifications.filter(
