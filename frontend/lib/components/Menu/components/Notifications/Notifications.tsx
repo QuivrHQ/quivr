@@ -64,28 +64,31 @@ export const Notifications = (): JSX.Element => {
   return (
     <div id="notifications-panel" className={styles.notifications_wrapper}>
       <div className={styles.notifications_panel}>
-        <div className={styles.notifications_panel_header}>
-          <div className={styles.left}>
-            {isMobile && (
-              <Icon
-                name="hide"
-                size="small"
-                handleHover={true}
-                color="black"
-                onClick={() => setIsVisible(false)}
-              />
-            )}
-            <span className={styles.title}>Notifications</span>
-          </div>
-          <div className={styles.buttons}>
-            <TextButton
-              label="Delete all"
-              color="black"
-              onClick={() => void deleteAllNotifications("generic")}
-              small={true}
-            />
-          </div>
-        </div>
+        {bulkNotifications.some((notif) => notif.category === "generic") ||
+          (!bulkNotifications.some((notif) => notif.category !== "generic") && (
+            <div className={styles.notifications_panel_header}>
+              <div className={styles.left}>
+                {isMobile && (
+                  <Icon
+                    name="hide"
+                    size="small"
+                    handleHover={true}
+                    color="black"
+                    onClick={() => setIsVisible(false)}
+                  />
+                )}
+                <span className={styles.title}>Notifications</span>
+              </div>
+              <div className={styles.buttons}>
+                <TextButton
+                  label="Delete all"
+                  color="black"
+                  onClick={() => void deleteAllNotifications("generic")}
+                  small={true}
+                />
+              </div>
+            </div>
+          ))}
         {bulkNotifications.length === 0 && (
           <div className={styles.no_notifications}>
             You have no notifications
