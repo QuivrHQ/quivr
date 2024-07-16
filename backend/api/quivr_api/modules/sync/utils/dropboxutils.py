@@ -9,6 +9,11 @@ from pydantic import BaseModel, ConfigDict
 from quivr_api.logger import get_logger
 from quivr_api.modules.brain.repository.brains_vectors import BrainsVectors
 from quivr_api.modules.knowledge.repository.storage import Storage
+from quivr_api.modules.notification.dto.inputs import CreateNotification
+from quivr_api.modules.notification.entity.notification import NotificationsStatusEnum
+from quivr_api.modules.notification.service.notification_service import (
+    NotificationService,
+)
 from quivr_api.modules.sync.dto.inputs import (
     SyncFileInput,
     SyncFileUpdateInput,
@@ -27,6 +32,8 @@ logger = get_logger(__name__)
 
 APP_KEY = os.getenv("DROPBOX_APP_KEY")
 APP_SECRET = os.getenv("DROPBOW_CONSUMER_SECRET")
+
+notification_service = NotificationService()
 
 
 class DropboxSyncUtils(BaseModel):
@@ -61,8 +68,22 @@ class DropboxSyncUtils(BaseModel):
 
         downloaded_files = []
         bulk_id = uuid.uuid4()
+
         for file in files:
             logger.info("🔥🔥🔥🔥: %s", file)
+            upload_notification = notification_service.add_notification(
+                CreateNotification(
+                    user_id=current_user,
+                    bulk_id=bulk_id,
+                    status=NotificationsStatusEnum.INFO,
+                    title=file.name,
+                    category="sync",
+                    brain_id=str(brain_id),
+                )
+            )
+
+            file.notification_id = str(upload_notification.id)
+
             try:
                 file_id = str(file.id)
                 file_name = file.name

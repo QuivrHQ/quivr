@@ -36,8 +36,6 @@ from quivr_api.modules.upload.service.upload_file import check_file_exists
 
 notification_service = NotificationService()
 
-notification_service = NotificationService()
-
 logger = get_logger(__name__)
 
 
