@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
-from typing import Any
 from uuid import UUID
 
+from quivr_core.brain.info import StorageInfo
 from quivr_core.storage.local_storage import QuivrFile
 
 
@@ -32,8 +32,8 @@ class StorageBase(ABC):
     async def remove_file(self, file_id: UUID) -> None:
         raise Exception("Unimplemented remove_file method")
 
-    def info(self) -> dict[str, Any]:
-        return {
-            "storage_type": self.name,
-            "n_files": self.nb_files(),
-        }
+    def info(self) -> StorageInfo:
+        return StorageInfo(
+            storage_type=self.name,
+            n_files=self.nb_files(),
+        )

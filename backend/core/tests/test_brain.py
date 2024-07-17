@@ -1,3 +1,4 @@
+from dataclasses import asdict
 from uuid import uuid4
 
 import pytest
@@ -107,14 +108,14 @@ def test_brain_info_empty(fake_llm: LLMEndpoint, embedder, mem_vector_store):
         vector_db=mem_vector_store,
     )
 
-    assert brain.info() == {
-        "id": str(id),
-        "brain name": "test",
-        "files": storage.info(),
-        "chats": {
+    assert asdict(brain.info()) == {
+        "brain_id": id,
+        "brain_name": "test",
+        "files_info": asdict(storage.info()),
+        "chats_info": {
             "nb_chats": 1,  # start with a default chat
             "current_default_chat": brain.default_chat.id,
-            "default_chat_history_length": 0,
+            "current_chat_history_length": 0,
         },
-        "llm": fake_llm.info(),
+        "llm_info": asdict(fake_llm.info()),
     }
