@@ -67,7 +67,7 @@ export const BrainManagementTabs = (): JSX.Element => {
     return <div />;
   }
 
-  if (!isLoading) {
+  if (isLoading) {
     return (
       <div className={styles.loader}>
         <LoaderIcon size="big" color="primary" />
