@@ -389,7 +389,10 @@ def get_dropbox_files_by_id(
         raise HTTPException(status_code=401, detail="Invalid token data")
 
     try:
-        dbx = dropbox.Dropbox(credentials["access_token"])
+        dbx = dropbox.Dropbox(
+            oauth2_access_token=credentials["access_token"],
+            oauth2_refresh_token=credentials["refresh_token"],
+        )
         dbx.check_and_refresh_access_token()
         credentials["access_token"] = dbx._oauth2_access_token
 
