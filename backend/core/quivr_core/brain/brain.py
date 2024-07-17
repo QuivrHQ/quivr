@@ -9,7 +9,10 @@ from langchain_core.documents import Document
 from langchain_core.embeddings import Embeddings
 from langchain_core.messages import AIMessage, HumanMessage
 from langchain_core.vectorstores import VectorStore
+from rich.console import Console
+from rich.panel import Panel
 
+from quivr_core.brain.info import BrainInfo, ChatHistoryInfo
 from quivr_core.chat import ChatHistory
 from quivr_core.config import LLMEndpointConfig, RAGConfig
 from quivr_core.llm import LLMEndpoint
@@ -123,20 +126,28 @@ class Brain:
         pp = PrettyPrinter(width=80, depth=None, compact=False, sort_dicts=False)
         return pp.pformat(self.info())
 
-    def info(self) -> dict[str, Any]:
-        return {
-            "id": str(self.id),
-            "brain name": self.name,
-            "files": self.storage.info(),
-            "chats": {
-                "nb_chats": len(self._chats),
-                "current_default_chat": self.default_chat.id,
-                "default_chat_history_length": len(self.default_chat),
-            },
-            # TODO: dim of embedding
-            # "embedder": {},
-            "llm": self.llm.info(),
-        }
+    def print_info(self):
+        console = Console()
+        tree = self.info().to_tree()
+        panel = Panel(tree, title="Brain Info", expand=False, border_style="bold")
+        console.print(panel)
+
+    def info(self) -> BrainInfo:
+        # TODO: dim of embedding
+        # "embedder": {},
+        chats_info = ChatHistoryInfo(
+            nb_chats=len(self._chats),
+            current_default_chat=self.default_chat.id,
+            current_chat_history_length=len(self.default_chat),
+        )
+
+        return BrainInfo(
+            brain_id=self.id,
+            brain_name=self.name,
+            files_info=self.storage.info(),
+            chats_info=chats_info,
+            llm_info=self.llm.info(),
+        )
 
     @property
     def chat_history(self) -> ChatHistory:
