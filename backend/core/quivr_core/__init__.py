@@ -1,3 +1,4 @@
 from .brain import Brain
+from .processor.registry import registry
 
-__all__ = ["Brain"]
+__all__ = ["Brain", "registry"]

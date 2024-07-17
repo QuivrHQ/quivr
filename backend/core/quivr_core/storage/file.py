@@ -1,11 +1,18 @@
 import hashlib
 import os
 from contextlib import asynccontextmanager
+from enum import Enum
 from pathlib import Path
 from typing import Any, AsyncGenerator, AsyncIterable
 from uuid import UUID, uuid4
 
 import aiofiles
+
+
+class FileExtension(str, Enum):
+    txt = ".txt"
+    pdf = ".pdf"
+    docx = ".docx"
 
 
 async def load_qfile(brain_id: UUID, path: str | Path):
@@ -26,12 +33,13 @@ async def load_qfile(brain_id: UUID, path: str | Path):
     except ValueError:
         id = uuid4()
 
+    # TODO(@aminediro) : guess mimetype of file  as get extension
     return QuivrFile(
         id=id,
         brain_id=brain_id,
         path=path,
         original_filename=path.name,
-        file_extension=path.suffix,
+        file_extension=FileExtension(path.suffix),
         file_size=file_size,
         file_md5=file_md5,
     )
@@ -56,7 +64,7 @@ class QuivrFile:
         brain_id: UUID,
         file_md5: str,
         file_size: int | None = None,
-        file_extension: str | None = None,
+        file_extension: FileExtension | None = None,
     ) -> None:
         self.id = id
         self.brain_id = brain_id

@@ -2,11 +2,11 @@ from abc import ABC, abstractmethod
 
 from langchain_core.documents import Document
 
-from quivr_core.storage.file import QuivrFile
+from quivr_core.storage.file import FileExtension, QuivrFile
 
 
 class ProcessorBase(ABC):
-    supported_extensions: list[str]
+    supported_extensions: list[FileExtension]
 
     @abstractmethod
     async def process_file(self, file: QuivrFile) -> list[Document]:
@@ -14,4 +14,4 @@ class ProcessorBase(ABC):
 
     def check_supported(self, file: QuivrFile):
         if file.file_extension not in self.supported_extensions:
-            raise Exception(f"can't process a file of type {file.file_extension}")
+            raise ValueError(f"can't process a file of type {file.file_extension}")
