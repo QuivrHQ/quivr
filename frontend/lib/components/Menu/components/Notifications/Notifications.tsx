@@ -23,12 +23,14 @@ export const Notifications = (): JSX.Element => {
   const deleteAllNotifications = async (
     notificationType: "generic" | "feeding"
   ) => {
-    const categoryToMatch =
-      notificationType === "generic" ? "generic" : undefined;
-
     for (const notifications of bulkNotifications) {
       for (const notification of notifications.notifications) {
-        if (!categoryToMatch || notification.category === categoryToMatch) {
+        if (
+          (notificationType === "generic" &&
+            notification.category === "generic") ||
+          (notificationType === "feeding" &&
+            notification.category !== "generic")
+        ) {
           await supabase
             .from("notifications")
             .delete()
