@@ -8,10 +8,10 @@ from quivr_api.modules.notification.service.notification_service import (
 )
 from quivr_api.modules.sync.dto.inputs import SyncsUserInput, SyncUserUpdateInput
 from quivr_api.modules.sync.repository.sync_interfaces import SyncUserInterface
-from quivr_api.modules.sync.utils.list_files import (
-    get_google_drive_files,
-    list_azure_files,
-    list_dropbox_files,
+from quivr_api.modules.sync.utils.sync import (
+    AzureDriveSync,
+    DropboxSync,
+    GoogleDriveSync,
 )
 
 notification_service = NotificationService()
@@ -205,20 +205,19 @@ class SyncUser(SyncUserInterface):
         provider = sync_user["provider"].lower()
         if provider == "google":
             logger.info("Getting files for Google sync")
-            return {
-                "files": get_google_drive_files(sync_user["credentials"], folder_id)
-            }
+            sync = GoogleDriveSync()
+            return {"files": sync.get_files(sync_user["credentials"], folder_id)}
         elif provider == "azure":
             logger.info("Getting files for Azure sync")
+            sync = AzureDriveSync()
             return {
-                "files": list_azure_files(
-                    sync_user["credentials"], folder_id, recursive
-                )
+                "files": sync.get_files(sync_user["credentials"], folder_id, recursive)
             }
         elif provider == "dropbox":
             logger.info("Getting files for Drop Box sync")
+            sync = DropboxSync()
             return {
-                "files": list_dropbox_files(
+                "files": sync.get_files(
                     sync_user["credentials"], folder_id if folder_id else "", recursive
                 )
             }
