@@ -13,6 +13,7 @@ export type CrawlInputProps = {
     max_pages: number;
     max_time: number;
   };
+  bulk_id: UUID;
 };
 
 export type CrawlResponse = {
@@ -23,7 +24,7 @@ export const crawlWebsiteUrl = async (
   props: CrawlInputProps,
   axiosInstance: AxiosInstance
 ): Promise<CrawlResponse> => {
-  let crawlUrl = `/crawl?brain_id=${props.brainId}`;
+  let crawlUrl = `/crawl?bulk_id=${props.bulk_id}&brain_id=${props.brainId}`;
 
   if (props.chat_id !== undefined) {
     crawlUrl = crawlUrl.concat(`&chat_id=${props.chat_id}`);

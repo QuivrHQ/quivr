@@ -4,6 +4,7 @@ import { UUID } from "crypto";
 import { useState } from "react";
 import { useFormContext } from "react-hook-form";
 import { useTranslation } from "react-i18next";
+import { v4 as uuidv4 } from "uuid";
 
 import { useFromConnectionsContext } from "@/app/chat/[chatId]/components/ActionsBar/components/KnowledgeToFeed/components/FromConnections/FromConnectionsProvider/hooks/useFromConnectionContext";
 import { PUBLIC_BRAINS_KEY } from "@/lib/api/brain/config";
@@ -38,11 +39,16 @@ export const useBrainCreationApi = () => {
   const { openedConnections } = useFromConnectionsContext();
 
   const handleFeedBrain = async (brainId: UUID): Promise<void> => {
+    const crawlBulkId: UUID = uuidv4().toString() as UUID;
+    const uploadBulkId: UUID = uuidv4().toString() as UUID;
+
     const uploadPromises = files.map((file) =>
-      uploadFileHandler(file, brainId)
+      uploadFileHandler(file, brainId, uploadBulkId)
     );
 
-    const crawlPromises = urls.map((url) => crawlWebsiteHandler(url, brainId));
+    const crawlPromises = urls.map((url) =>
+      crawlWebsiteHandler(url, brainId, crawlBulkId)
+    );
 
     await Promise.all([...uploadPromises, ...crawlPromises]);
     await Promise.all(

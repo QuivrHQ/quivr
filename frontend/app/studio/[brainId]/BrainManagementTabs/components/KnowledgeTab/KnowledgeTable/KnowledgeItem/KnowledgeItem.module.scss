@@ -39,6 +39,19 @@
     }
   }
 
+  .right {
+    display: flex;
+    gap: Spacings.$spacing09;
+    align-items: center;
+
+    .status {
+      width: 100px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+  }
+
   .options_modal {
     position: absolute;
     right: Spacings.$spacing02;

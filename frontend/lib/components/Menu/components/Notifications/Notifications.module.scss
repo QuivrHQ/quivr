@@ -13,9 +13,19 @@
     align-items: center;
     justify-content: space-between;
     font-size: Typography.$small;
-    padding-inline: Spacings.$spacing05;
-    padding-top: Spacings.$spacing03;
-    padding-bottom: Spacings.$spacing05;
+    padding: Spacings.$spacing05;
+    background-color: var(--background-2);
+    border-bottom: 1px solid var(--border-2);
+
+    &:hover {
+      cursor: pointer;
+
+      .left {
+        .icon {
+          visibility: visible;
+        }
+      }
+    }
 
     .left {
       display: flex;
@@ -26,6 +36,10 @@
         color: var(--text-2);
         font-size: Typography.$small;
         font-weight: 500;
+      }
+
+      .icon {
+        visibility: hidden;
       }
     }
 
@@ -39,5 +53,12 @@
     padding: Spacings.$spacing05;
     font-size: Typography.$tiny;
     color: var(--text-2);
+  }
+
+  .feeding {
+    color: var(--text-2);
+    font-size: Typography.$small;
+    font-weight: 500;
+    padding-left: Spacings.$spacing05;
   }
 }

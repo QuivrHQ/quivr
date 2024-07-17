@@ -36,7 +36,7 @@
 
       .label {
         @include Typography.EllipsisOverflow;
-        background-color: var(--background-special-1);
+        background-color: var(--background-primary-1);
         border-radius: Radius.$normal;
         padding-inline: Spacings.$spacing05;
         padding-block: Spacings.$spacing02;
@@ -87,7 +87,7 @@
 
       &:hover {
         .option_name {
-          background-color: var(--background-special-1);
+          background-color: var(--background-primary-1);
         }
       }
 

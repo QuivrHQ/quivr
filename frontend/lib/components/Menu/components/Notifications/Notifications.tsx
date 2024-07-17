@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 import Icon from "@/lib/components/ui/Icon/Icon";
 import TextButton from "@/lib/components/ui/TextButton/TextButton";
@@ -6,47 +6,54 @@ import { useNotificationsContext } from "@/lib/context/NotificationsProvider/hoo
 import { useSupabase } from "@/lib/context/SupabaseProvider";
 import { useDevice } from "@/lib/hooks/useDevice";
 
-import { Notification } from "./Notification/Notification";
+import { FeedingNotification } from "./FeedingNotification/FeedingNotification";
+import { GenericNotification } from "./GenericNotification/GenericNotification";
 import styles from "./Notifications.module.scss";
 
 export const Notifications = (): JSX.Element => {
-  const {
-    notifications,
-    updateNotifications,
-    unreadNotifications,
-    setIsVisible,
-  } = useNotificationsContext();
-  const { supabase } = useSupabase();
+  const { bulkNotifications, updateNotifications, setIsVisible } =
+    useNotificationsContext();
   const { isMobile } = useDevice();
+  const { supabase } = useSupabase();
+  const [genericNotificationsDisplayed, setGenericNotificationsDisplayed] =
+    useState<boolean>(true);
+  const [feedingNotificationsDisplayed, setFeedingNotificationsDisplayed] =
+    useState<boolean>(true);
 
-  const deleteAllNotifications = async () => {
-    for (const notification of notifications) {
-      await supabase.from("notifications").delete().eq("id", notification.id);
+  const deleteAllNotifications = async (
+    notificationType: "generic" | "feeding"
+  ) => {
+    const categoryToMatch =
+      notificationType === "generic" ? "generic" : undefined;
+
+    for (const notifications of bulkNotifications) {
+      for (const notification of notifications.notifications) {
+        if (!categoryToMatch || notification.category === categoryToMatch) {
+          await supabase
+            .from("notifications")
+            .delete()
+            .eq("id", notification.id);
+        }
+      }
     }
     await updateNotifications();
   };
 
-  const markAllAsRead = async () => {
-    for (const notification of notifications) {
-      await supabase
-        .from("notifications")
-        .update({ read: true })
-        .eq("id", notification.id);
+  const handleClickOutside = (event: MouseEvent) => {
+    const target = event.target as Node;
+    const panel = document.getElementById("notifications-panel");
+    const button = document.getElementById("notifications-button");
+
+    if (!panel || !button) {
+      return;
     }
-    await updateNotifications();
+
+    if (!panel.contains(target) && !button.contains(target)) {
+      setIsVisible(false);
+    }
   };
 
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      const target = event.target as Node;
-      const panel = document.getElementById("notifications-panel");
-      const button = document.getElementById("notifications-button");
-
-      if (!panel?.contains(target) && !button?.contains(target)) {
-        setIsVisible(false);
-      }
-    };
-
     document.addEventListener("mousedown", handleClickOutside);
 
     return () => {
@@ -54,12 +61,33 @@ export const Notifications = (): JSX.Element => {
     };
   }, []);
 
-  return (
-    <div id="notifications-panel" className={styles.notifications_wrapper}>
-      <div className={styles.notifications_panel}>
-        <div className={styles.notifications_panel_header}>
+  const hasGenericNotifications = () => {
+    return bulkNotifications.some((notif) => notif.category === "generic");
+  };
+
+  const renderGenericNotifications = () => {
+    return (
+      <>
+        {bulkNotifications.map((notification, i) =>
+          notification.category === "generic" ? (
+            <GenericNotification key={i} bulkNotification={notification} />
+          ) : null
+        )}
+      </>
+    );
+  };
+
+  const renderFeedingNotifications = () => {
+    return (
+      <>
+        <div
+          className={styles.notifications_panel_header}
+          onClick={() =>
+            setFeedingNotificationsDisplayed(!feedingNotificationsDisplayed)
+          }
+        >
           <div className={styles.left}>
-            {isMobile && (
+            {isMobile && !hasGenericNotifications() && (
               <Icon
                 name="hide"
                 size="small"
@@ -68,39 +96,93 @@ export const Notifications = (): JSX.Element => {
                 onClick={() => setIsVisible(false)}
               />
             )}
-            <span className={styles.title}>Notifications</span>
+            <span className={styles.title}>Knowledge feeding in progress</span>
+            <div className={styles.icon}>
+              <Icon
+                name={
+                  feedingNotificationsDisplayed ? "chevronRight" : "chevronDown"
+                }
+                size="normal"
+                color="black"
+              />
+            </div>
           </div>
           <div className={styles.buttons}>
             <TextButton
-              label="Mark all as read"
-              color="black"
-              onClick={() => void markAllAsRead()}
-              disabled={unreadNotifications === 0}
-              small={true}
-            />
-            <span>|</span>
-            <TextButton
               label="Delete all"
               color="black"
-              onClick={() => void deleteAllNotifications()}
-              disabled={notifications.length === 0}
+              onClick={() => void deleteAllNotifications("feeding")}
               small={true}
             />
           </div>
         </div>
-        {notifications.length === 0 && (
+
+        {feedingNotificationsDisplayed &&
+          bulkNotifications.map((notification, i) =>
+            notification.category !== "generic" ? (
+              <FeedingNotification key={i} bulkNotification={notification} />
+            ) : null
+          )}
+      </>
+    );
+  };
+
+  return (
+    <div id="notifications-panel" className={styles.notifications_wrapper}>
+      <div className={styles.notifications_panel}>
+        {(bulkNotifications.length === 0 || hasGenericNotifications()) && (
+          <div
+            className={styles.notifications_panel_header}
+            onClick={() =>
+              setGenericNotificationsDisplayed(!genericNotificationsDisplayed)
+            }
+          >
+            <div className={styles.left}>
+              {isMobile && (
+                <Icon
+                  name="hide"
+                  size="small"
+                  handleHover={true}
+                  color="black"
+                  onClick={() => setIsVisible(false)}
+                />
+              )}
+              <span className={styles.title}>Notifications</span>
+              <div className={styles.icon}>
+                <Icon
+                  name={
+                    genericNotificationsDisplayed
+                      ? "chevronRight"
+                      : "chevronDown"
+                  }
+                  size="normal"
+                  color="black"
+                />
+              </div>
+            </div>
+            <div className={styles.buttons}>
+              <TextButton
+                label="Delete all"
+                color="black"
+                onClick={() => void deleteAllNotifications("generic")}
+                small={true}
+              />
+            </div>
+          </div>
+        )}
+
+        {bulkNotifications.length === 0 && (
           <div className={styles.no_notifications}>
             You have no notifications
           </div>
         )}
-        {notifications.map((notification, i) => (
-          <Notification
-            key={i}
-            notification={notification}
-            lastNotification={i === notifications.length - 1}
-            updateNotifications={updateNotifications}
-          />
-        ))}
+
+        {hasGenericNotifications() &&
+          genericNotificationsDisplayed &&
+          renderGenericNotifications()}
+
+        {bulkNotifications.some((notif) => notif.category !== "generic") &&
+          renderFeedingNotifications()}
       </div>
     </div>
   );

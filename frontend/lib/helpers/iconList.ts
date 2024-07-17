@@ -37,6 +37,7 @@ import {
   FaRegThumbsDown,
   FaRegThumbsUp,
   FaRegUserCircle,
+  FaSort,
   FaTwitter,
   FaUnlock,
 } from "react-icons/fa";
@@ -182,6 +183,7 @@ export const iconList: { [name: string]: IconType } = {
   settings: IoMdSettings,
   share: IoShareSocial,
   software: CgSoftwareDownload,
+  sort: FaSort,
   sources: IoBookOutline,
   star: FaRegStar,
   step: IoFootsteps,

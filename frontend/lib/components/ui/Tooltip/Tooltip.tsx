@@ -9,9 +9,15 @@ interface TooltipProps {
   children?: ReactNode;
   tooltip?: ReactNode;
   small?: boolean;
+  type?: "default" | "dangerous" | "success";
 }
 
-const Tooltip = ({ children, tooltip, small }: TooltipProps): JSX.Element => {
+const Tooltip = ({
+  children,
+  tooltip,
+  small,
+  type,
+}: TooltipProps): JSX.Element => {
   const [open, setOpen] = useState(false);
 
   return (
@@ -36,7 +42,7 @@ const Tooltip = ({ children, tooltip, small }: TooltipProps): JSX.Element => {
                   }}
                   className={`${styles.tooltip_content_wrapper} ${
                     small ? styles.small : ""
-                  }`}
+                  } ${styles[type ?? "default"]}`}
                 >
                   {tooltip}
                 </motion.div>

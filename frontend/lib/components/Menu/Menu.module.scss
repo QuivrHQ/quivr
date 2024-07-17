@@ -70,10 +70,10 @@
   min-height: calc(100% - Variables.$pageHeaderHeight);
   max-height: calc(100% - Variables.$pageHeaderHeight);
   overflow: scroll;
-  left: calc(Variables.$menuWidth + 1px);
+  left: calc(Variables.$menuWidth);
   z-index: ZIndexes.$overlay;
   border-right: 1px solid var(--border-1);
-  box-shadow: BoxShadow.$small;
+  box-shadow: 0 0 4px 0 rgba(0, 0, 0, 0.1);
   background-color: var(--background-0);
 
   @media (max-width: ScreenSizes.$small) {
