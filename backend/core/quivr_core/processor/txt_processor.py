@@ -6,17 +6,19 @@ from langchain_core.documents import Document
 from langchain_text_splitters import RecursiveCharacterTextSplitter, TextSplitter
 
 from quivr_core.processor.processor_base import ProcessorBase
+from quivr_core.processor.registry import FileExtension
 from quivr_core.processor.splitter import SplitterConfig
 from quivr_core.storage.file import QuivrFile
 
 
-class TxtProcessor(ProcessorBase):
+class TikTokenTxtProcessor(ProcessorBase):
+    supported_extensions = [FileExtension.txt]
+
     def __init__(
         self,
         splitter: TextSplitter | None = None,
         splitter_config: SplitterConfig = SplitterConfig(),
     ) -> None:
-        self.supported_extensions = [".txt"]
         self.loader_cls = TextLoader
 
         self.splitter_config = splitter_config

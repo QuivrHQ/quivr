@@ -14,7 +14,6 @@ from quivr_core.chat import ChatHistory
 from quivr_core.config import LLMEndpointConfig, RAGConfig
 from quivr_core.llm import LLMEndpoint
 from quivr_core.models import ParsedRAGChunkResponse, ParsedRAGResponse, SearchResult
-from quivr_core.processor.default_parsers import DEFAULT_PARSERS
 from quivr_core.processor.processor_base import ProcessorBase
 from quivr_core.quivr_rag import QuivrQARAG
 from quivr_core.storage.file import load_qfile
@@ -142,10 +141,10 @@ class Brain:
         }
 
     @property
-    def chat_history(self):
+    def chat_history(self) -> ChatHistory:
         return self.default_chat
 
-    def _init_chats(self):
+    def _init_chats(self) -> Dict[UUID, ChatHistory]:
         chat_id = uuid4()
         default_chat = ChatHistory(chat_id=chat_id, brain_id=self.id)
         return {chat_id: default_chat}
@@ -160,7 +159,7 @@ class Brain:
         storage: StorageBase = TransparentStorage(),
         llm: LLMEndpoint | None = None,
         embedder: Embeddings | None = None,
-        processors_mapping: Mapping[str, ProcessorBase] = DEFAULT_PARSERS,
+        processors_mapping: Mapping[str, ProcessorBase],
         skip_file_error: bool = False,
     ):
         if llm is None:
@@ -208,7 +207,7 @@ class Brain:
         storage: StorageBase = TransparentStorage(),
         llm: LLMEndpoint | None = None,
         embedder: Embeddings | None = None,
-        processors_mapping: Mapping[str, ProcessorBase] = DEFAULT_PARSERS,
+        processors_mapping: Mapping[str, ProcessorBase],
         skip_file_error: bool = False,
     ) -> Self:
         loop = asyncio.get_event_loop()
