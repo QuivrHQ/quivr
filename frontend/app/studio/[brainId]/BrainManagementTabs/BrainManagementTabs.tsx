@@ -1,11 +1,14 @@
 /* eslint-disable max-lines */
 
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
-import Spinner from "@/lib/components/ui/Spinner";
+import Icon from "@/lib/components/ui/Icon/Icon";
+import { LoaderIcon } from "@/lib/components/ui/LoaderIcon/LoaderIcon";
 import { Tabs } from "@/lib/components/ui/Tabs/Tabs";
 import { Tab } from "@/lib/types/Tab";
 
+import styles from "./BrainManagementTabs.module.scss";
 import { KnowledgeTab } from "./components/KnowledgeTab/KnowledgeTab";
 import { useAddedKnowledge } from "./components/KnowledgeTab/hooks/useAddedKnowledge";
 import { PeopleTab } from "./components/PeopleTab/PeopleTab";
@@ -17,6 +20,7 @@ export const BrainManagementTabs = (): JSX.Element => {
   const [selectedTab, setSelectedTab] = useState("Knowledge");
   const { brainId, hasEditRights } = useBrainManagementTabs();
   const { allKnowledge } = useAddedKnowledge({ brainId: brainId ?? undefined });
+  const router = useRouter();
 
   const { brain, isLoading } = useBrainFetcher({
     brainId,
@@ -65,15 +69,26 @@ export const BrainManagementTabs = (): JSX.Element => {
 
   if (isLoading) {
     return (
-      <div className="flex w-full h-full justify-center items-center">
-        <Spinner />
+      <div className={styles.loader}>
+        <LoaderIcon size="big" color="primary" />
       </div>
     );
   }
 
   return (
-    <>
-      <Tabs tabList={brainManagementTabs} />
+    <div>
+      <div className={styles.header_wrapper}>
+        <Icon
+          name="chevronLeft"
+          size="normal"
+          color="black"
+          handleHover={true}
+          onClick={() => router.push("/studio")}
+        />
+        <div className={styles.tabs}>
+          <Tabs tabList={brainManagementTabs} />
+        </div>
+      </div>
       {selectedTab === "Settings" && <SettingsTab brainId={brainId} />}
       {selectedTab === "People" && <PeopleTab brainId={brainId} />}
       {selectedTab === "Knowledge" && (
@@ -83,6 +98,6 @@ export const BrainManagementTabs = (): JSX.Element => {
           allKnowledge={allKnowledge}
         />
       )}
-    </>
+    </div>
   );
 };
