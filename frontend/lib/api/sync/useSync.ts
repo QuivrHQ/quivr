@@ -8,6 +8,7 @@ import {
   getActiveSyncs,
   getSyncFiles,
   getUserSyncs,
+  syncDropbox,
   syncFiles,
   syncGoogleDrive,
   syncSharepoint,
@@ -24,6 +25,8 @@ export const useSync = () => {
       "https://quivr-cms.s3.eu-west-3.amazonaws.com/gdrive_8316d080fd.png",
     Azure:
       "https://quivr-cms.s3.eu-west-3.amazonaws.com/sharepoint_8c41cfdb09.png",
+    DropBox:
+      "https://quivr-cms.s3.eu-west-3.amazonaws.com/dropbox_dce4f3d753.png",
   };
 
   const getActiveSyncsForBrain = async (brainId: string) => {
@@ -36,6 +39,7 @@ export const useSync = () => {
     syncGoogleDrive: async (name: string) =>
       syncGoogleDrive(name, axiosInstance),
     syncSharepoint: async (name: string) => syncSharepoint(name, axiosInstance),
+    syncDropbox: async (name: string) => syncDropbox(name, axiosInstance),
     getUserSyncs: async () => getUserSyncs(axiosInstance),
     getSyncFiles: async (userSyncId: number, folderId?: string) =>
       getSyncFiles(axiosInstance, userSyncId, folderId),

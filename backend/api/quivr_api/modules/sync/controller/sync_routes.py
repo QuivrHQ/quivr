@@ -11,6 +11,7 @@ from quivr_api.modules.notification.service.notification_service import (
     NotificationService,
 )
 from quivr_api.modules.sync.controller.azure_sync_routes import azure_sync_router
+from quivr_api.modules.sync.controller.dropbox_sync_routes import dropbox_sync_router
 from quivr_api.modules.sync.controller.google_sync_routes import google_sync_router
 from quivr_api.modules.sync.dto import SyncsDescription
 from quivr_api.modules.sync.dto.inputs import SyncsActiveInput, SyncsActiveUpdateInput
@@ -37,6 +38,7 @@ sync_router = APIRouter()
 # Add Google routes here
 sync_router.include_router(google_sync_router)
 sync_router.include_router(azure_sync_router)
+sync_router.include_router(dropbox_sync_router)
 
 
 # Google sync description
@@ -49,6 +51,12 @@ google_sync = SyncsDescription(
 azure_sync = SyncsDescription(
     name="Azure",
     description="Sync your Azure Drive with Quivr",
+    auth_method=AuthMethodEnum.URI_WITH_CALLBACK,
+)
+
+dropbox_sync = SyncsDescription(
+    name="DropBox",
+    description="Sync your DropBox Drive with Quivr",
     auth_method=AuthMethodEnum.URI_WITH_CALLBACK,
 )
 
@@ -70,7 +78,7 @@ async def get_syncs(current_user: UserIdentity = Depends(get_current_user)):
         List[SyncsDescription]: A list of available sync descriptions.
     """
     logger.debug(f"Fetching all sync descriptions for user: {current_user.id}")
-    return [google_sync, azure_sync]
+    return [google_sync, azure_sync, dropbox_sync]
 
 
 @sync_router.get(

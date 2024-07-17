@@ -5,6 +5,7 @@ from quivr_api.logger import get_logger
 from quivr_api.modules.knowledge.repository.storage import Storage
 from quivr_api.modules.sync.repository.sync_files import SyncFiles
 from quivr_api.modules.sync.service.sync_service import SyncService, SyncUserService
+from quivr_api.modules.sync.utils.dropboxutils import DropboxSyncUtils
 from quivr_api.modules.sync.utils.googleutils import GoogleSyncUtils
 from quivr_api.modules.sync.utils.sharepointutils import AzureSyncUtils
 
@@ -36,6 +37,14 @@ async def _process_sync_active():
         sync_files_repo=sync_files_repo_service,
         storage=storage,
     )
+
+    dropbox_sync_utils = DropboxSyncUtils(
+        sync_user_service=sync_user_service,
+        sync_active_service=sync_active_service,
+        sync_files_repo=sync_files_repo_service,
+        storage=storage,
+    )
+
     active = await sync_active_service.get_syncs_active_in_interval()
 
     for sync in active:
@@ -49,6 +58,10 @@ async def _process_sync_active():
                 )
             elif details_user_sync["provider"].lower() == "azure":
                 await azure_sync_utils.sync(
+                    sync_active_id=sync.id, user_id=sync.user_id
+                )
+            elif details_user_sync["provider"].lower() == "dropbox":
+                await dropbox_sync_utils.sync(
                     sync_active_id=sync.id, user_id=sync.user_id
                 )
             else:

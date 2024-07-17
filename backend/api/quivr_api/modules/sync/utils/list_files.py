@@ -1,6 +1,7 @@
 import os
-from typing import List
+from typing import Dict, List
 
+import dropbox
 import msal
 import requests
 from fastapi import HTTPException
@@ -13,6 +14,8 @@ from quivr_api.modules.sync.utils.normalize import remove_special_characters
 from requests import HTTPError
 
 logger = get_logger(__name__)
+
+# GOOGLE
 
 
 def get_google_drive_files_by_id(
@@ -132,16 +135,13 @@ def get_google_drive_files(
                 )
 
                 # If recursive is True and the item is a folder, get files from the folder
-                if (
-                    recursive
-                    and item["mimeType"] == "application/vnd.google-apps.folder"
-                ):
+                if recursive and item.mimeType == "application/vnd.google-apps.folder":
                     logger.warning(
                         "Calling Recursive for folder: %s",
-                        item["name"],
+                        item.name,
                     )
                     files.extend(
-                        get_google_drive_files(credentials, item["id"], recursive)
+                        get_google_drive_files(credentials, item.id, recursive)
                     )
 
             page_token = results.get("nextPageToken", None)
@@ -158,6 +158,7 @@ def get_google_drive_files(
         return []
 
 
+# AZURE
 CLIENT_ID = os.getenv("SHAREPOINT_CLIENT_ID")
 AUTHORITY = "https://login.microsoftonline.com/common"
 BACKEND_URL = os.getenv("BACKEND_URL", "http://localhost:5050")
@@ -196,7 +197,7 @@ def get_azure_headers(token_data):
     }
 
 
-def list_azure_files(credentials, folder_id=None, recursive=False):
+def list_azure_files(credentials, folder_id=None, recursive=False) -> list[SyncFile]:
     def fetch_files(endpoint, headers):
         response = requests.get(endpoint, headers=headers)
         if response.status_code == 401:
@@ -246,7 +247,9 @@ def list_azure_files(credentials, folder_id=None, recursive=False):
     return files
 
 
-def get_azure_files_by_id(credentials: dict, file_ids: List[str]):
+def get_azure_files_by_id(
+    credentials: dict, file_ids: List[str]
+) -> List[SyncFile] | dict:
     """
     Retrieve files from Azure Drive by their IDs.
 
@@ -292,3 +295,142 @@ def get_azure_files_by_id(credentials: dict, file_ids: List[str]):
         file.name = remove_special_characters(file.name)
     logger.info("Azure Drive files retrieved successfully: %s", len(files))
     return files
+
+
+# Drop Box
+def list_dropbox_files(
+    credentials: dict, folder_id: str = "", recursive: bool = False
+) -> List[SyncFile] | dict:
+    """
+    Retrieve files from Dropbox.
+
+    Args:
+        credentials (dict): The credentials for accessing Dropbox.
+        folder_id (str, optional): The folder ID to filter files. Defaults to "".
+        recursive (bool, optional): If True, fetch files from all subfolders. Defaults to False.
+
+    Returns:
+        dict: A dictionary containing the list of files or an error message.
+    """
+    logger.info("Retrieving Dropbox files with folder_id: %s", folder_id)
+
+    # Verify credential has the access token
+    if "access_token" not in credentials:
+        print("Invalid token data")
+        return {"error": "Invalid token data"}
+
+    try:
+        dbx = dropbox.Dropbox(credentials["access_token"])
+        dbx.check_and_refresh_access_token()
+        credentials["access_token"] = dbx._oauth2_access_token
+
+        def fetch_files(metadata):
+            files = []
+            for file in metadata.entries:
+
+                shared_link = f"https://www.dropbox.com/preview{file.path_display}?context=content_suggestions&role=personal"
+                is_folder = isinstance(file, dropbox.files.FolderMetadata)
+                logger.debug(f"IS FOLDER ? {is_folder}")
+
+                files.append(
+                    SyncFile(
+                        name=file.name,
+                        id=file.id,
+                        is_folder=is_folder,
+                        last_modified=(
+                            str(file.client_modified) if not is_folder else ""
+                        ),
+                        mime_type=(
+                            file.path_lower.split(".")[-1] if not is_folder else ""
+                        ),
+                        web_view_link=shared_link,
+                    )
+                )
+            return files
+
+        files = []
+        list_metadata = dbx.files_list_folder(folder_id, recursive=recursive)
+        files.extend(fetch_files(list_metadata))
+
+        while list_metadata.has_more:
+            list_metadata = dbx.files_list_folder_continue(list_metadata.cursor)
+            files.extend(fetch_files(list_metadata))
+
+        for file in files:
+            file.name = remove_special_characters(file.name)
+
+        logger.info("Dropbox files retrieved successfully: %d", len(files))
+        return files
+
+    except dropbox.exceptions.ApiError as e:
+        logger.error("Dropbox API error: %s", e)
+        raise HTTPException(status_code=500, detail="Dropbox API error")
+    except Exception as e:
+        logger.error("Unexpected error: %s", e)
+        raise HTTPException(status_code=500, detail="Unexpected error occurred")
+
+
+def get_dropbox_files_by_id(
+    credentials: Dict[str, str], file_ids: List[str]
+) -> List[SyncFile] | Dict[str, str]:
+    """
+    Retrieve files from Dropbox by their IDs.
+
+    Args:
+        credentials (dict): The credentials for accessing Dropbox.
+        file_ids (list): The list of file IDs to retrieve.
+
+    Returns:
+        list: A list of dictionaries containing the metadata of each file or an error message.
+    """
+    logger.info("Retrieving Dropbox files with file_ids: %s", file_ids)
+
+    if "access_token" not in credentials:
+        raise HTTPException(status_code=401, detail="Invalid token data")
+
+    try:
+        dbx = dropbox.Dropbox(credentials["access_token"])
+        dbx.check_and_refresh_access_token()
+        credentials["access_token"] = dbx._oauth2_access_token
+
+        files = []
+
+        for file_id in file_ids:
+            try:
+                metadata = dbx.files_get_metadata(file_id)
+                logger.debug("Metadata for file_id %s: %s", file_id, metadata)
+                shared_link = f"https://www.dropbox.com/preview/{metadata.path_display}?context=content_suggestions&role=personal"
+                is_folder = isinstance(metadata, dropbox.files.FolderMetadata)
+                file_info = SyncFile(
+                    name=metadata.name,
+                    id=metadata.id,
+                    is_folder=is_folder,
+                    last_modified=(
+                        str(metadata.client_modified) if not is_folder else ""
+                    ),
+                    mime_type=(
+                        metadata.path_lower.split(".")[-1] if not is_folder else ""
+                    ),
+                    web_view_link=shared_link,
+                )
+
+                files.append(file_info)
+            except dropbox.exceptions.ApiError as api_err:
+                logger.error("Dropbox API error for file_id %s: %s", file_id, api_err)
+                continue  # Skip this file and proceed with the next one
+            except Exception as err:
+                logger.error("Unexpected error for file_id %s: %s", file_id, err)
+                continue  # Skip this file and proceed with the next one
+
+        for file in files:
+            file.name = remove_special_characters(file.name)
+
+        logger.info("Dropbox files retrieved successfully: %d", len(files))
+        return files
+
+    except dropbox.exceptions.AuthError as auth_err:
+        logger.error("Authentication error: %s", auth_err)
+        raise HTTPException(status_code=401, detail="Authentication error")
+    except Exception as e:
+        logger.error("Unexpected error: %s", e)
+        raise HTTPException(status_code=500, detail="Unexpected error occurred")

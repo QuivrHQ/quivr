@@ -127,6 +127,7 @@ export const iconList: { [name: string]: IconType } = {
   custom: MdDashboardCustomize,
   delete: MdDeleteOutline,
   discord: FaDiscord,
+  doc: BsFiletypeDocx,
   docx: BsFiletypeDocx,
   download: IoCloudDownloadOutline,
   edit: MdOutlineModeEditOutline,
