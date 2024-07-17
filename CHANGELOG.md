@@ -1,5 +1,27 @@
 # Changelog
 
+## 0.0.284 (2024-07-17)
+
+## What's Changed
+* chore(cleanup): cleaned up some unused files by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2858
+* feat: Improve file loading logic in File model by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2861
+* feat(celery): add retry logic for dcos by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2862
+* feat: quivr api send notification by @AmineDiro in https://github.com/QuivrHQ/quivr/pull/2865
+* feat: Update category for sync notification by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2866
+* feat: Update crawl_endpoint to include knowledge_id in task kwargs by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2867
+* feat(integrations): Add integration fields to Knowledge and SyncsUser models by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2853
+* feat: quivr api use quivr core by @AmineDiro in https://github.com/QuivrHQ/quivr/pull/2868
+* feat: Update sync generic bulk by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2869
+* chore(main): release core 0.0.9 by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2855
+* feat(frontend): new notifications design by @Zewed in https://github.com/QuivrHQ/quivr/pull/2870
+* feat: Update sync active notification category by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2873
+* feat(integrations): dropbox by @chloedia in https://github.com/QuivrHQ/quivr/pull/2864
+* fix(frontend): delete notifications by @Zewed in https://github.com/QuivrHQ/quivr/pull/2874
+* feat(frontend): back button by @Zewed in https://github.com/QuivrHQ/quivr/pull/2876
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.283...v0.0.284
+
 ## 0.0.283 (2024-07-12)
 
 ## What's Changed
