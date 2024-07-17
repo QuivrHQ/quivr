@@ -1,5 +1,7 @@
 import hashlib
+import mimetypes
 import os
+import warnings
 from contextlib import asynccontextmanager
 from enum import Enum
 from pathlib import Path
@@ -13,6 +15,22 @@ class FileExtension(str, Enum):
     txt = ".txt"
     pdf = ".pdf"
     docx = ".docx"
+
+
+def get_file_extension(file_path: Path) -> FileExtension | str:
+    try:
+        mime_type, _ = mimetypes.guess_type(file_path.name)
+        if mime_type:
+            mime_ext = mimetypes.guess_extension(mime_type)
+            if mime_ext:
+                return FileExtension(mime_ext)
+        return FileExtension(file_path.suffix)
+    except ValueError:
+        warnings.warn(
+            f"File {file_path.name} extension isn't recognized. Make sure you have registered a parser for {file_path.suffix}",
+            stacklevel=2,
+        )
+        return file_path.suffix
 
 
 async def load_qfile(brain_id: UUID, path: str | Path):
@@ -33,13 +51,12 @@ async def load_qfile(brain_id: UUID, path: str | Path):
     except ValueError:
         id = uuid4()
 
-    # TODO(@aminediro) : guess mimetype of file  as get extension
     return QuivrFile(
         id=id,
         brain_id=brain_id,
         path=path,
         original_filename=path.name,
-        file_extension=FileExtension(path.suffix),
+        file_extension=get_file_extension(path),
         file_size=file_size,
         file_md5=file_md5,
     )
@@ -63,8 +80,8 @@ class QuivrFile:
         path: Path,
         brain_id: UUID,
         file_md5: str,
+        file_extension: FileExtension | str,
         file_size: int | None = None,
-        file_extension: FileExtension | None = None,
     ) -> None:
         self.id = id
         self.brain_id = brain_id

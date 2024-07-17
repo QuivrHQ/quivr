@@ -31,9 +31,9 @@ class SimpleTxtProcessor(ProcessorBase):
     supported_extensions = [FileExtension.txt]
 
     def __init__(
-        self,
-        splitter_config: SplitterConfig = SplitterConfig(),
+        self, splitter_config: SplitterConfig = SplitterConfig(), **kwargs
     ) -> None:
+        super().__init__(**kwargs)
         self.splitter_config = splitter_config
 
     async def process_file(self, file: QuivrFile) -> list[Document]:

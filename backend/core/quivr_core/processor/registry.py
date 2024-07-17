@@ -56,7 +56,10 @@ def get_processor_class(file_extension: FileExtension | str) -> Type[ProcessorBa
 
 
 def register_processor(
-    file_type, proc_cls: str | Type[ProcessorBase], override: bool = False, errtxt=None
+    file_type: FileExtension | str,
+    proc_cls: str | Type[ProcessorBase],
+    override: bool = False,
+    errtxt=None,
 ):
     if isinstance(proc_cls, str):
         if file_type in known_processors and override is False:

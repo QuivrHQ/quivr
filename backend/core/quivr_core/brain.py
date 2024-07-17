@@ -2,7 +2,7 @@ import asyncio
 import logging
 from pathlib import Path
 from pprint import PrettyPrinter
-from typing import Any, AsyncGenerator, Callable, Dict, Mapping, Self
+from typing import Any, AsyncGenerator, Callable, Dict, Self
 from uuid import UUID, uuid4
 
 from langchain_core.documents import Document
@@ -14,7 +14,7 @@ from quivr_core.chat import ChatHistory
 from quivr_core.config import LLMEndpointConfig, RAGConfig
 from quivr_core.llm import LLMEndpoint
 from quivr_core.models import ParsedRAGChunkResponse, ParsedRAGResponse, SearchResult
-from quivr_core.processor.processor_base import ProcessorBase
+from quivr_core.processor.registry import get_processor_class
 from quivr_core.quivr_rag import QuivrQARAG
 from quivr_core.storage.file import load_qfile
 from quivr_core.storage.local_storage import TransparentStorage
@@ -69,18 +69,16 @@ def _default_llm() -> LLMEndpoint:
         ) from e
 
 
-async def _process_files(
-    storage: StorageBase,
-    skip_file_error: bool,
-    processors_mapping: Mapping[str, ProcessorBase],
+async def process_files(
+    storage: StorageBase, skip_file_error: bool, **processor_kwargs: dict[str, Any]
 ) -> list[Document]:
     knowledge = []
     for file in await storage.get_files():
         try:
             if file.file_extension:
-                processor = processors_mapping[file.file_extension]
+                processor_cls = get_processor_class(file.file_extension)
+                processor = processor_cls(**processor_kwargs)
                 docs = await processor.process_file(file)
-
                 knowledge.extend(docs)
             else:
                 logger.error(f"can't find processor for {file}")
@@ -159,7 +157,6 @@ class Brain:
         storage: StorageBase = TransparentStorage(),
         llm: LLMEndpoint | None = None,
         embedder: Embeddings | None = None,
-        processors_mapping: Mapping[str, ProcessorBase],
         skip_file_error: bool = False,
     ):
         if llm is None:
@@ -176,9 +173,8 @@ class Brain:
             await storage.upload_file(file)
 
         # Parse files
-        docs = await _process_files(
+        docs = await process_files(
             storage=storage,
-            processors_mapping=processors_mapping,
             skip_file_error=skip_file_error,
         )
 
@@ -207,7 +203,6 @@ class Brain:
         storage: StorageBase = TransparentStorage(),
         llm: LLMEndpoint | None = None,
         embedder: Embeddings | None = None,
-        processors_mapping: Mapping[str, ProcessorBase],
         skip_file_error: bool = False,
     ) -> Self:
         loop = asyncio.get_event_loop()
@@ -219,7 +214,6 @@ class Brain:
                 storage=storage,
                 llm=llm,
                 embedder=embedder,
-                processors_mapping=processors_mapping,
                 skip_file_error=skip_file_error,
             )
         )
