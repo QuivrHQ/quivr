@@ -15,7 +15,11 @@ from quivr_api.modules.notification.entity.notification import NotificationsStat
 from quivr_api.modules.notification.service.notification_service import (
     NotificationService,
 )
-from quivr_api.modules.sync.dto.inputs import SyncFileInput, SyncFileUpdateInput
+from quivr_api.modules.sync.dto.inputs import (
+    SyncFileInput,
+    SyncFileUpdateInput,
+    SyncsActiveUpdateInput,
+)
 from quivr_api.modules.sync.entity.sync import SyncFile
 from quivr_api.modules.sync.repository.sync_files import SyncFiles
 from quivr_api.modules.sync.service.sync_service import SyncService, SyncUserService
@@ -54,13 +58,8 @@ class SyncUtils(BaseModel):
         Returns:
             dict: A dictionary containing the status of the download or an error message.
         """
-        logger.info("Downloading Azure files with metadata: %s", files)
 
-        # Get and Refresh access token
-        # ------- specific function by cloud -----
-        # FIXME
         credentials = self.sync_cloud.check_and_refresh_access_token(credentials)
-        # ----------------------------------------
 
         downloaded_files = []
         bulk_id = uuid.uuid4()
@@ -92,13 +91,12 @@ class SyncUtils(BaseModel):
                 file_data = BytesIO(file_data.content)
 =======
 
-                # Download file from cloud
-                # ------- specific function by cloud -----
-                # FIXME
-                # -> returns file data in BytesIO
                 file_data = self.sync_cloud.download_file(credentials, file_id)
+<<<<<<< HEAD
                 # ----------------------------------------
 >>>>>>> 4f4af43c (fix: refacto syncs):backend/api/quivr_api/modules/sync/utils/syncutils.py
+=======
+>>>>>>> d9f58832 (fix: remove useless debug & fix dropbox refresh)
 
                 # Check if the file already exists in the storage
                 if check_file_exists(brain_id, file_name):
@@ -270,13 +268,13 @@ class SyncUtils(BaseModel):
             logger.warning(
                 "Sync provider is not % for sync_active_id: %s",
                 self.sync_cloud.name,
-                sync_active_id,  # FIXME : to modify depending on the cloud
+                sync_active_id,
             )
             return None
 
         # Download the folders and files from Cloud
         logger.info(
-            "Downloading folders and files from % for sync_active_id: %s",  # FIXME : to modify depending on the cloud
+            "Downloading folders and files from % for sync_active_id: %s",
             self.sync_cloud.name,
             sync_active_id,
         )
@@ -291,14 +289,14 @@ class SyncUtils(BaseModel):
             files = []
             for folder in folders:
                 files.extend(
-                    self.sync_cloud.get_files(  # FIXME : to modify depending on the cloud
+                    self.sync_cloud.get_files(
                         sync_user["credentials"],
                         folder_id=folder,
                         recursive=True,
                     )
                 )
         if len(files_to_download) > 0:
-            files_metadata = self.sync_cloud.get_files_by_id(  # FIXME : to modify depending on the cloud
+            files_metadata = self.sync_cloud.get_files_by_id(
                 sync_user["credentials"],
                 files_to_download,
             )
@@ -319,10 +317,8 @@ class SyncUtils(BaseModel):
         )
         logger.info(
             "Files retrieved from %: %s", self.sync_cloud.lower_name, len(files)
-        )  # FIXME : to modify depending on the cloud
-        logger.info(
-            "Files retrieved from %: %s", self.sync_cloud.lower_name, files
-        )  # FIXME : to modify depending on the cloud
+        )
+        logger.info("Files retrieved from %: %s", self.sync_cloud.lower_name, files)
         files_to_download = [
             file
             for file in files
@@ -364,5 +360,5 @@ class SyncUtils(BaseModel):
             "%s sync completed for sync_active_id: %s",
             self.sync_cloud.lower_name,
             sync_active_id,
-        )  # FIXME : to modify depending on the cloud
+        )
         return downloaded_files

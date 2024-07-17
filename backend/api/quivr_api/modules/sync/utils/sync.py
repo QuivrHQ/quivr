@@ -49,7 +49,6 @@ class GoogleDriveSync(BaseSync):
     service: Any | None = None
 
     def check_and_refresh_access_token(self, credentials: dict) -> Dict:
-        logger.debug(f"---MY--- credentials : {credentials}")
         self.creds = Credentials.from_authorized_user_info(credentials)
         if self.creds.expired and self.creds.refresh_token:
             self.creds.refresh(GoogleRequest())
@@ -189,7 +188,6 @@ class GoogleDriveSync(BaseSync):
         logger.info("Retrieving Google Drive files with folder_id: %s", folder_id)
 
         self.check_and_refresh_access_token(credentials)
-        logger.debug(f"---MY---2 credentials : {self.creds}")
         # Updating the credentials in the database
 
         try:
@@ -421,6 +419,9 @@ class DropboxSync(BaseSync):
         return dropbox.Dropbox(
             credentials["access_token"],
             oauth2_refresh_token=credentials["refresh_token"],
+            app_key=os.getenv("DROPBOX_APP_KEY"),
+            oauth2_access_token_expiration=credentials.get("expires_at"),
+            app_secret=os.getenv("DROPBOX_APP_SECRET"),
         )
 
     def check_and_refresh_access_token(self, credentials: Dict) -> Dict:
@@ -454,7 +455,13 @@ class DropboxSync(BaseSync):
 
         try:
             if not self.dbx:
-                self.dbx = dropbox.Dropbox(credentials["access_token"])
+                self.dbx = dropbox.Dropbox(
+                    credentials["access_token"],
+                    oauth2_refresh_token=credentials["refresh_token"],
+                    app_key=os.getenv("DROPBOX_APP_KEY"),
+                    oauth2_access_token_expiration=credentials.get("expires_at"),
+                    app_secret=os.getenv("DROPBOX_APP_SECRET"),
+                )
             self.dbx.check_and_refresh_access_token()
             credentials["access_token"] = self.dbx._oauth2_access_token
 
@@ -464,7 +471,6 @@ class DropboxSync(BaseSync):
 
                     shared_link = f"https://www.dropbox.com/preview{file.path_display}?context=content_suggestions&role=personal"
                     is_folder = isinstance(file, dropbox.files.FolderMetadata)
-                    logger.debug(f"IS FOLDER ? {is_folder}")
 
                     files.append(
                         SyncFile(
@@ -534,7 +540,6 @@ class DropboxSync(BaseSync):
             for file_id in file_ids:
                 try:
                     metadata = self.dbx.files_get_metadata(file_id)
-                    logger.debug("Metadata for file_id %s: %s", file_id, metadata)
                     shared_link = f"https://www.dropbox.com/preview/{metadata.path_display}?context=content_suggestions&role=personal"
                     is_folder = isinstance(metadata, dropbox.files.FolderMetadata)
                     file_info = SyncFile(
