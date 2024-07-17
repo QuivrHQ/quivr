@@ -87,11 +87,7 @@ class QuivrKnowledge(BaseModel):
     extension: str = "txt"
     integration: str | None = None
     integration_link: str | None = None
-<<<<<<< HEAD
     status: str = "PROCESSING"
-
-=======
->>>>>>> 8062feee (fix: DropBox integration link & front dropbox)
 
 
 # NOTE: for compatibility issues with langchain <-> PydanticV1

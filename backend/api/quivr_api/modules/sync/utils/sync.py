@@ -300,7 +300,7 @@ class AzureDriveSync(BaseSync):
         def fetch_files(endpoint, headers):
             response = requests.get(endpoint, headers=headers)
             if response.status_code == 401:
-                token_data = self.refresh_azure_token(credentials)
+                token_data = self.check_and_refresh_access_token(credentials)
                 headers = self.get_azure_headers(token_data)
                 response = requests.get(endpoint, headers=headers)
             if response.status_code != 200:
@@ -367,7 +367,7 @@ class AzureDriveSync(BaseSync):
             endpoint = f"https://graph.microsoft.com/v1.0/me/drive/items/{file_id}"
             response = requests.get(endpoint, headers=headers)
             if response.status_code == 401:
-                token_data = self.refresh_azure_token(credentials)
+                token_data = self.check_and_refresh_access_token(credentials)
                 headers = self.get_azure_headers(token_data)
                 response = requests.get(endpoint, headers=headers)
             if response.status_code != 200:

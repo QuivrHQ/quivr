@@ -85,19 +85,8 @@ class SyncUtils(BaseModel):
                 file_name = file.name
                 mime_type = file.mime_type
                 modified_time = file.last_modified
-<<<<<<< HEAD:backend/api/quivr_api/modules/sync/utils/dropboxutils.py
-                metadata, file_data = dbx.files_download(file_id)  # type: ignore
-                # logger.debug("🔥 Filedata :", file_data.content)
-                file_data = BytesIO(file_data.content)
-=======
 
                 file_data = self.sync_cloud.download_file(credentials, file_id)
-<<<<<<< HEAD
-                # ----------------------------------------
->>>>>>> 4f4af43c (fix: refacto syncs):backend/api/quivr_api/modules/sync/utils/syncutils.py
-=======
->>>>>>> d9f58832 (fix: remove useless debug & fix dropbox refresh)
-
                 # Check if the file already exists in the storage
                 if check_file_exists(brain_id, file_name):
                     logger.debug("🔥 File already exists in the storage: %s", file_name)
@@ -138,7 +127,7 @@ class SyncUtils(BaseModel):
                         brain_id,
                         current_user,
                         bulk_id,
-                        sync_cloud.name,
+                        self.sync_cloud.name,
                         file.web_view_link,
                         notification_id=file.notification_id,
                     )

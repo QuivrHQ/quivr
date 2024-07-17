@@ -86,10 +86,6 @@ def oauth2callback_dropbox(request: Request):
         dict: A dictionary containing a success message.
     """
     state = request.query_params.get("state")
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 8062feee (fix: DropBox integration link & front dropbox)
     if not state:
         raise HTTPException(status_code=400, detail="Invalid state parameter")
     session = {}
@@ -98,11 +94,6 @@ def oauth2callback_dropbox(request: Request):
     logger.debug("Keys in session : %s", session.keys())
     logger.debug("Value in session : %s", session.values())
 
-<<<<<<< HEAD
-=======
->>>>>>> 96ed662b (fix: dropbox sync creds)
-=======
->>>>>>> 8062feee (fix: DropBox integration link & front dropbox)
     state = state.split("|")[1] if "|" in state else state  # type: ignore
     state_dict = {"state": state}
     state_split = state.split(",")  # type: ignore
@@ -149,33 +140,13 @@ def oauth2callback_dropbox(request: Request):
             "access_token": oauth_result.access_token,
             "refresh_token": oauth_result.refresh_token,
             "account_id": account_id,
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 8062feee (fix: DropBox integration link & front dropbox)
-            "email": user_email,
             "expires_in": str(oauth_result.expires_at),
-=======
-            "email": email,
-<<<<<<< HEAD
->>>>>>> 96ed662b (fix: dropbox sync creds)
-=======
-            "expires_in": str(oauth_result.expires_at),
->>>>>>> eeee8e92 (add: list dropbox items)
         }
 
         sync_user_input = SyncUserUpdateInput(
             credentials=result,
             state={},
-<<<<<<< HEAD
-<<<<<<< HEAD
             email=user_email,
-=======
-            email=email,
->>>>>>> 96ed662b (fix: dropbox sync creds)
-=======
-            email=user_email,
->>>>>>> 8062feee (fix: DropBox integration link & front dropbox)
         )
         sync_user_service.update_sync_user(
             str(current_user), state_dict, sync_user_input
