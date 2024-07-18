@@ -22,6 +22,7 @@ logger = get_logger(__name__)
 class BaseSync(ABC):
     name: str
     lower_name: str
+    datetime_format: str
 
     @abstractmethod
     def get_files_by_id(self, credentials: Dict, file_ids: List[str]) -> List[SyncFile]:
@@ -38,7 +39,7 @@ class BaseSync(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def download_file(self, credentials: Dict, file_id: str) -> BytesIO:
+    def download_file(self, credentials: Dict, file: SyncFile) -> BytesIO:
         raise NotImplementedError
 
 
@@ -47,6 +48,7 @@ class GoogleDriveSync(BaseSync):
     lower_name = "google"
     creds: Credentials | None = None
     service: Any | None = None
+    datetime_format: str = "%Y-%m-%dT%H:%M:%S.%fZ"
 
     def check_and_refresh_access_token(self, credentials: dict) -> Dict:
         self.creds = Credentials.from_authorized_user_info(credentials)
@@ -260,6 +262,7 @@ class GoogleDriveSync(BaseSync):
 class AzureDriveSync(BaseSync):
     name = "Azure Drive"
     lower_name = "azure"
+    datetime_format: str = "%Y-%m-%dT%H:%M:%SZ"
     CLIENT_ID = os.getenv("SHAREPOINT_CLIENT_ID")
     AUTHORITY = "https://login.microsoftonline.com/common"
     BACKEND_URL = os.getenv("BACKEND_URL", "http://localhost:5050")
@@ -294,6 +297,16 @@ class AzureDriveSync(BaseSync):
         if "access_token" not in result:
             raise HTTPException(status_code=400, detail="Failed to refresh token")
 
+        credentials.update(
+            {
+                "access_token": result["access_token"],
+                "refresh_token": result.get(
+                    "refresh_token", credentials["refresh_token"]
+                ),
+                "id_token": result.get("id_token", credentials.get("id_token")),
+            }
+        )
+
         return credentials
 
     def get_files(self, credentials, folder_id=None, recursive=False) -> List[SyncFile]:
@@ -304,7 +317,11 @@ class AzureDriveSync(BaseSync):
                 headers = self.get_azure_headers(token_data)
                 response = requests.get(endpoint, headers=headers)
             if response.status_code != 200:
-                return {"error": response.text}
+                logger.error(
+                    "An error occurred while retrieving Azure Drive files: %s",
+                    response.text,
+                )
+                return []
             return response.json().get("value", [])
 
         token_data = self.get_azure_token_data(credentials)
@@ -375,7 +392,7 @@ class AzureDriveSync(BaseSync):
                     "An error occurred while retrieving Azure Drive files: %s",
                     response.text,
                 )
-                return {"error": response.text}
+                return []
 
             result = response.json()
             files.append(
@@ -414,6 +431,7 @@ class DropboxSync(BaseSync):
     name = "Dropbox"
     lower_name = "dropbox"
     dbx: dropbox.Dropbox | None = None
+    datetime_format: str = "%Y-%m-%d %H:%M:%S"
 
     def link_dropbox(self, credentials) -> dropbox.Dropbox:
         return dropbox.Dropbox(
@@ -527,7 +545,8 @@ class DropboxSync(BaseSync):
         logger.info("Retrieving Dropbox files with file_ids: %s", file_ids)
 
         if "access_token" not in credentials:
-            raise HTTPException(status_code=401, detail="Invalid token data")
+            logger.error("Access token is not in the credentials")
+            return []
 
         try:
             if not self.dbx:
