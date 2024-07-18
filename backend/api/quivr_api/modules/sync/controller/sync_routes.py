@@ -13,6 +13,7 @@ from quivr_api.modules.notification.service.notification_service import (
 from quivr_api.modules.sync.controller.azure_sync_routes import azure_sync_router
 from quivr_api.modules.sync.controller.dropbox_sync_routes import dropbox_sync_router
 from quivr_api.modules.sync.controller.google_sync_routes import google_sync_router
+from quivr_api.modules.sync.controller.notion_sync_routes import notion_sync_router
 from quivr_api.modules.sync.dto import SyncsDescription
 from quivr_api.modules.sync.dto.inputs import SyncsActiveInput, SyncsActiveUpdateInput
 from quivr_api.modules.sync.dto.outputs import AuthMethodEnum
@@ -39,6 +40,7 @@ sync_router = APIRouter()
 sync_router.include_router(google_sync_router)
 sync_router.include_router(azure_sync_router)
 sync_router.include_router(dropbox_sync_router)
+sync_router.include_router(notion_sync_router)
 
 
 # Google sync description
@@ -57,6 +59,12 @@ azure_sync = SyncsDescription(
 dropbox_sync = SyncsDescription(
     name="DropBox",
     description="Sync your DropBox Drive with Quivr",
+    auth_method=AuthMethodEnum.URI_WITH_CALLBACK,
+)
+
+notion_sync = SyncsDescription(
+    name="Notion",
+    description="Sync your Notion with Quivr",
     auth_method=AuthMethodEnum.URI_WITH_CALLBACK,
 )
 
