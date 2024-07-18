@@ -1,5 +1,6 @@
 import json
 import os
+import time
 from abc import ABC, abstractmethod
 from io import BytesIO
 from typing import Any, Dict, List
@@ -171,7 +172,7 @@ class GoogleDriveSync(BaseSync):
             logger.error(
                 "An error occurred while retrieving Google Drive files: %s", error
             )
-            return []
+            raise Exception("Failed to retrieve files")
 
     def get_files(
         self, credentials: dict, folder_id: str | None = None, recursive: bool = False
@@ -256,7 +257,7 @@ class GoogleDriveSync(BaseSync):
             logger.error(
                 "An error occurred while retrieving Google Drive files: %s", error
             )
-            return []
+            raise Exception("Failed to retrieve files")
 
 
 class AzureDriveSync(BaseSync):
@@ -310,19 +311,34 @@ class AzureDriveSync(BaseSync):
         return credentials
 
     def get_files(self, credentials, folder_id=None, recursive=False) -> List[SyncFile]:
-        def fetch_files(endpoint, headers):
-            response = requests.get(endpoint, headers=headers)
-            if response.status_code == 401:
-                token_data = self.check_and_refresh_access_token(credentials)
-                headers = self.get_azure_headers(token_data)
-                response = requests.get(endpoint, headers=headers)
-            if response.status_code != 200:
-                logger.error(
-                    "An error occurred while retrieving Azure Drive files: %s",
-                    response.text,
-                )
-                return []
-            return response.json().get("value", [])
+        def fetch_files(endpoint, headers, max_retries=1):
+            logger.debug(f"fetching files from {endpoint}.")
+
+            retry_count = 0
+            while retry_count <= max_retries:
+                try:
+                    response = requests.get(endpoint, headers=headers)
+
+                    # Retrying with refereshed token
+                    if response.status_code == 401:
+                        token_data = self.check_and_refresh_access_token(credentials)
+                        headers = self.get_azure_headers(token_data)
+                        response = requests.get(endpoint, headers=headers)
+                    else:
+                        response.raise_for_status()
+                    return response.json().get("value", [])
+
+                except HTTPError as e:
+                    logger.exception(
+                        f"azure_list_files got exception : {e}. headers: {headers}. {retry_count} retrying."
+                    )
+                    # Exponential backoff
+                    time.sleep(2**retry_count)
+                    retry_count += 1
+
+            raise HTTPException(
+                504, detail="can't connect to azure endpoint to retrieve files."
+            )
 
         token_data = self.get_azure_token_data(credentials)
         headers = self.get_azure_headers(token_data)
@@ -392,7 +408,7 @@ class AzureDriveSync(BaseSync):
                     "An error occurred while retrieving Azure Drive files: %s",
                     response.text,
                 )
-                return []
+                raise Exception("Failed to retrieve files")
 
             result = response.json()
             files.append(
@@ -469,7 +485,7 @@ class DropboxSync(BaseSync):
         # Verify credential has the access token
         if "access_token" not in credentials:
             logger.error("Invalid access token")
-            return []
+            raise Exception("Invalid access token")
 
         try:
             if not self.dbx:
@@ -524,10 +540,10 @@ class DropboxSync(BaseSync):
 
         except dropbox.exceptions.ApiError as e:
             logger.error("Dropbox API error: %s", e)
-            return []
+            raise Exception("Failed to retrieve files")
         except Exception as e:
             logger.error("Unexpected error: %s", e)
-            return []
+            raise Exception("Failed to retrieve files")
 
     def get_files_by_id(
         self, credentials: Dict[str, str], file_ids: List[str]
@@ -546,7 +562,7 @@ class DropboxSync(BaseSync):
 
         if "access_token" not in credentials:
             logger.error("Access token is not in the credentials")
-            return []
+            raise Exception("Invalid access token")
 
         try:
             if not self.dbx:
@@ -592,10 +608,10 @@ class DropboxSync(BaseSync):
 
         except dropbox.exceptions.AuthError as auth_err:
             logger.error("Authentication error: %s", auth_err)
-            return []
+            raise Exception("Failed to retrieve files")
         except Exception as e:
             logger.error("Unexpected error: %s", e)
-            return []
+            raise Exception("Failed to retrieve files")
 
     def download_file(self, credentials: Dict, file: SyncFile) -> BytesIO:
         file_id = str(file.id)
