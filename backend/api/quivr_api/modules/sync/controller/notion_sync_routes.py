@@ -1,3 +1,4 @@
+import base64
 import os
 
 import requests
@@ -14,9 +15,11 @@ from .successfull_connection import successfullConnectionPage
 
 NOTION_CLIENT_ID = os.getenv("NOTION_CLIENT_ID")
 NOTION_CLIENT_SECRET = os.getenv("NOTION_CLIENT_SECRET")
+NOTION_AUTH_URL = os.getenv("NOTION_AUTH_URL")
 BACKEND_URL = os.getenv("BACKEND_URL", "http://localhost:5050")
 BASE_REDIRECT_URI = f"{BACKEND_URL}/sync/notion/oauth2callback"
 SCOPE = "users.read,databases.read,databases.write,blocks.read,blocks.write"
+
 
 # Initialize sync service
 sync_service = SyncService()
@@ -48,10 +51,7 @@ def authorize_notion(
     """
     logger.debug(f"Authorizing Notion sync for user: {current_user.id}, name : {name}")
     state: str = f"user_id={current_user.id}, name={name}"
-    authorize_url = (
-        f"https://api.notion.com/v1/oauth/authorize?client_id={NOTION_CLIENT_ID}"
-        f"&redirect_uri={BASE_REDIRECT_URI}&response_type=code&owner=user&scope={SCOPE}&state={state}"
-    )
+    authorize_url = str(NOTION_AUTH_URL) + f"&state={state}"
 
     logger.info(
         f"Generated authorization URL: {authorize_url} for user: {current_user.id}"
@@ -104,17 +104,23 @@ def oauth2callback_notion(request: Request):
         raise HTTPException(status_code=400, detail="Invalid user")
 
     try:
-        response = requests.post(
-            "https://api.notion.com/v1/oauth/token",
-            data={
-                "grant_type": "authorization_code",
-                "code": code,
-                "redirect_uri": BASE_REDIRECT_URI,
-                "client_id": NOTION_CLIENT_ID,
-                "client_secret": NOTION_CLIENT_SECRET,
-            },
-        )
-        response.raise_for_status()
+        token_url = "https://api.notion.com/v1/oauth/token"
+        client_credentials = f"{NOTION_CLIENT_ID}:{NOTION_CLIENT_SECRET}"
+        encoded_credentials = base64.b64encode(client_credentials.encode()).decode()
+
+        headers = {
+            "Authorization": f"Basic {encoded_credentials}",
+            "Content-Type": "application/json",
+        }
+
+        token_data = {
+            "grant_type": "authorization_code",
+            "code": code,
+            "redirect_uri": BASE_REDIRECT_URI,
+        }
+        logger.debug(f"Requesting token with data: {token_data}")
+
+        response = requests.post(token_url, headers=headers, json=token_data)
         oauth_result = response.json()
         access_token = oauth_result["access_token"]
 
@@ -122,8 +128,10 @@ def oauth2callback_notion(request: Request):
 
         # Get account information
         user_info = notion.users.me()
-        user_email = user_info["email"]
-        account_id = user_info["id"]
+
+        owner_info = user_info["bot"]["owner"]["user"]
+        user_email = owner_info["person"]["email"]
+        account_id = owner_info["id"]
 
         result: dict[str, str] = {
             "access_token": oauth_result["access_token"],
