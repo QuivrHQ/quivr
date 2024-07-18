@@ -147,6 +147,7 @@ const KnowledgeItem = ({
           ref={iconRef}
           onClick={(event: React.MouseEvent<HTMLElement>) => {
             event.stopPropagation();
+            event.preventDefault();
             setOptionsOpened(!optionsOpened);
           }}
         >
