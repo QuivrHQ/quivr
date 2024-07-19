@@ -22,8 +22,9 @@ from quivr_core.processor.registry import (
 )
 
 
+# TODO : check what are the defaults without the extra [base]
 @pytest.mark.base
-def test_get_processor_cls():
+def test_get_default_processors_cls():
     cls = get_processor_class(FileExtension.txt)
     assert cls == TikTokenTxtProcessor
 
