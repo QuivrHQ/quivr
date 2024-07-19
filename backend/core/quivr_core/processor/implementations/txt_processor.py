@@ -5,10 +5,10 @@ from langchain_community.document_loaders.text import TextLoader
 from langchain_core.documents import Document
 from langchain_text_splitters import RecursiveCharacterTextSplitter, TextSplitter
 
+from quivr_core.files.file import QuivrFile
 from quivr_core.processor.processor_base import ProcessorBase
 from quivr_core.processor.registry import FileExtension
 from quivr_core.processor.splitter import SplitterConfig
-from quivr_core.storage.file import QuivrFile
 
 
 class TikTokenTxtProcessor(ProcessorBase):

@@ -1,5 +1,6 @@
 from typing import Any, List, Type, TypeVar
 
+import tiktoken
 from langchain_community.document_loaders import (
     BibtexLoader,
     CSVLoader,
@@ -18,19 +19,27 @@ from langchain_community.document_loaders.text import TextLoader
 from langchain_core.documents import Document
 from langchain_text_splitters import RecursiveCharacterTextSplitter, TextSplitter
 
+from quivr_core.files.file import FileExtension, QuivrFile
 from quivr_core.processor.processor_base import ProcessorBase
 from quivr_core.processor.splitter import SplitterConfig
-from quivr_core.storage.file import FileExtension, QuivrFile
+
+enc = tiktoken.get_encoding("cl100k_base")
+
 
 P = TypeVar("P", bound=BaseLoader)
 
 
-# NOTE(@aminediro):
+class ProcessorInit(ProcessorBase):
+    def __init__(self, *args, **loader_kwargs) -> None:
+        pass
+
+
+# FIXME(@aminediro):
 # dynamically creates Processor classes. Maybe redo this for finer control over instanciation
 # processor classes are opaque as we don't know what params they would have -> not easy to have lsp completion
 def _build_processor(
     cls_name: str, load_cls: Type[P], cls_extensions: List[FileExtension | str]
-) -> Type[ProcessorBase]:
+) -> Type[ProcessorInit]:
     class _Processor(ProcessorBase):
         supported_extensions = cls_extensions
 
@@ -63,8 +72,6 @@ def _build_processor(
             }
 
         async def process_file_inner(self, file: QuivrFile) -> list[Document]:
-            self.check_supported(file)
-
             if "__init__" in self.loader_cls.__dict__:
                 # NOTE: mypy can't correctly type this as BaseLoader doesn't have a constructor method
                 loader = self.loader_cls(file.path, **self.loader_kwargs)  # type: ignore
@@ -74,9 +81,12 @@ def _build_processor(
             documents = await loader.aload()
             docs = self.text_splitter.split_documents(documents)
 
+            for doc in docs:
+                doc.metadata = {"chunk_size": len(enc.encode(doc.page_content))}
+
             return docs
 
-    return type(cls_name, (ProcessorBase,), dict(_Processor.__dict__))
+    return type(cls_name, (ProcessorInit,), dict(_Processor.__dict__))
 
 
 CSVProcessor = _build_processor("CSVProcessor", CSVLoader, [FileExtension.csv])

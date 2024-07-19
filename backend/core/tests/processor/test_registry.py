@@ -4,6 +4,7 @@ import pytest
 from langchain_core.documents import Document
 
 from quivr_core import registry
+from quivr_core.files.file import FileExtension, QuivrFile
 from quivr_core.processor.implementations.default import TikTokenTxtProcessor
 from quivr_core.processor.implementations.tika_processor import TikaProcessor
 from quivr_core.processor.processor_base import ProcessorBase
@@ -17,7 +18,6 @@ from quivr_core.processor.registry import (
     known_processors,
     register_processor,
 )
-from quivr_core.storage.file import FileExtension, QuivrFile
 
 
 @pytest.mark.base

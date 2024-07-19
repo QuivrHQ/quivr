@@ -3,12 +3,9 @@ from importlib.metadata import version
 from typing import Any
 from uuid import uuid4
 
-import tiktoken
 from langchain_core.documents import Document
 
-from quivr_core.storage.file import FileExtension, QuivrFile
-
-enc = tiktoken.get_encoding("cl100k_base")
+from quivr_core.files.file import FileExtension, QuivrFile
 
 
 # TODO: processors should be cached somewhere ?
@@ -30,12 +27,9 @@ class ProcessorBase(ABC):
         self.check_supported(file)
         docs = await self.process_file_inner(file)
         for idx, doc in enumerate(docs):
-            len_chunk = len(enc.encode(doc.page_content))
             doc.metadata = {
                 "id": uuid4(),
                 "chunk_index": idx,
-                "chunk_size": len_chunk,
-                "parser_name": self.__class__.__name__,
                 "quivr_core_version": version("quivr-core"),
                 **file.metadata,
                 **doc.metadata,

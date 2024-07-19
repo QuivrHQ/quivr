@@ -5,6 +5,7 @@ from dataclasses import dataclass, field
 from heapq import heappop, heappush
 from typing import Type, TypeAlias
 
+from quivr_core.files.file import FileExtension
 from quivr_core.processor.implementations.default import (
     BibTexProcessor,
     CSVProcessor,
@@ -19,7 +20,6 @@ from quivr_core.processor.implementations.default import (
     TikTokenTxtProcessor,
     XLSXProcessor,
 )
-from quivr_core.storage.file import FileExtension
 
 from .processor_base import ProcessorBase
 

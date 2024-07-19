@@ -4,7 +4,7 @@ from pathlib import Path
 from typing import Set
 from uuid import UUID
 
-from quivr_core.storage.file import QuivrFile
+from quivr_core.files.file import QuivrFile
 from quivr_core.storage.storage_base import StorageBase
 
 

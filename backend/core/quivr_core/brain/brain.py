@@ -15,11 +15,11 @@ from rich.panel import Panel
 from quivr_core.brain.info import BrainInfo, ChatHistoryInfo
 from quivr_core.chat import ChatHistory
 from quivr_core.config import RAGConfig
+from quivr_core.files.file import load_qfile
 from quivr_core.llm import LLMEndpoint
 from quivr_core.models import ParsedRAGChunkResponse, ParsedRAGResponse, SearchResult
 from quivr_core.processor.registry import get_processor_class
 from quivr_core.quivr_rag import QuivrQARAG
-from quivr_core.storage.file import load_qfile
 from quivr_core.storage.local_storage import TransparentStorage
 from quivr_core.storage.storage_base import StorageBase
 
@@ -34,9 +34,9 @@ async def process_files(
     knowledge = []
     for file in await storage.get_files():
         try:
-            logger.debug(f"processing {file}")
             if file.file_extension:
                 processor_cls = get_processor_class(file.file_extension)
+                logger.debug(f"processing {file} using class {processor_cls.__name__}")
                 processor = processor_cls(**processor_kwargs)
                 docs = await processor.process_file(file)
                 knowledge.extend(docs)

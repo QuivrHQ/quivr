@@ -1,11 +1,10 @@
-from importlib.metadata import version
 from uuid import uuid4
 
 import pytest
 
+from quivr_core.files.file import FileExtension, QuivrFile
+from quivr_core.processor.implementations.default import TikTokenTxtProcessor
 from quivr_core.processor.splitter import SplitterConfig
-from quivr_core.processor.txt_processor import TikTokenTxtProcessor
-from quivr_core.storage.file import FileExtension, QuivrFile
 
 # TODO: TIKA server should be set
 
@@ -25,21 +24,21 @@ def txt_qfile(temp_data_file):
 @pytest.mark.base
 @pytest.mark.asyncio
 async def test_process_txt(txt_qfile):
-    tparser = TikTokenTxtProcessor(
-        splitter_config=SplitterConfig(chunk_size=20, chunk_overlap=0)
-    )
+    splitter_config = SplitterConfig(chunk_size=20, chunk_overlap=0)
+    tparser = TikTokenTxtProcessor(splitter_config=splitter_config)
     doc = await tparser.process_file(txt_qfile)
     assert len(doc) > 0
     assert doc[0].page_content == "This is some test data."
-    #  assert dict1.items() <= dict2.items()
 
+    print(doc[0].metadata)
     assert (
         doc[0].metadata.items()
         >= {
-            "chunk_size": len(doc[0].page_content),
-            "chunk_overlap": 0,
-            "parser_name": tparser.__class__.__name__,
-            "quivr_core_version": version("quivr-core"),
+            "chunk_index": 0,
+            "original_file_name": "data.txt",
+            "chunk_size": 6,
+            "processor_cls": "TextLoader",
+            "splitter": {"chunk_size": 20, "chunk_overlap": 0},
             **txt_qfile.metadata,
         }.items()
     )

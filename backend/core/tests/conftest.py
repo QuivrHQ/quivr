@@ -11,8 +11,8 @@ from langchain_core.runnables.utils import AddableDict
 from langchain_core.vectorstores import InMemoryVectorStore
 
 from quivr_core.config import LLMEndpointConfig
+from quivr_core.files.file import FileExtension, QuivrFile
 from quivr_core.llm import LLMEndpoint
-from quivr_core.storage.file import FileExtension, QuivrFile
 
 
 @pytest.fixture(scope="function")
