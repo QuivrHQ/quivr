@@ -1,11 +1,8 @@
-import os
 import uuid
 from datetime import datetime, timedelta, timezone
-from io import BytesIO
+from typing import List
 
-import msal
-import requests
-from fastapi import HTTPException, UploadFile
+from fastapi import UploadFile
 from pydantic import BaseModel, ConfigDict
 from quivr_api.logger import get_logger
 from quivr_api.modules.brain.repository.brains_vectors import BrainsVectors
@@ -26,73 +23,47 @@ from quivr_api.modules.sync.dto.inputs import (
 from quivr_api.modules.sync.entity.sync import SyncFile
 from quivr_api.modules.sync.repository.sync_files import SyncFiles
 from quivr_api.modules.sync.service.sync_service import SyncService, SyncUserService
-from quivr_api.modules.sync.utils.list_files import (
-    get_azure_files_by_id,
-    list_azure_files,
-)
+from quivr_api.modules.sync.utils.sync import BaseSync
 from quivr_api.modules.sync.utils.upload import upload_file
 from quivr_api.modules.upload.service.upload_file import check_file_exists
 
 notification_service = NotificationService()
-
 logger = get_logger(__name__)
 
-CLIENT_ID = os.getenv("SHAREPOINT_CLIENT_ID")
-AUTHORITY = "https://login.microsoftonline.com/common"
-BACKEND_URL = os.getenv("BACKEND_URL", "http://localhost:5050")
-REDIRECT_URI = f"{BACKEND_URL}/sync/azure/oauth2callback"
-SCOPE = [
-    "https://graph.microsoft.com/Files.Read",
-    "https://graph.microsoft.com/User.Read",
-    "https://graph.microsoft.com/Sites.Read.All",
-]
 
-
-class AzureSyncUtils(BaseModel):
+class SyncUtils(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
     sync_user_service: SyncUserService
     sync_active_service: SyncService
     sync_files_repo: SyncFiles
     storage: Storage
-
-    def get_headers(self, token_data):
-        return {
-            "Authorization": f"Bearer {token_data['access_token']}",
-            "Accept": "application/json",
-        }
-
-    def refresh_token(self, refresh_token):
-        client = msal.PublicClientApplication(CLIENT_ID, authority=AUTHORITY)
-        result = client.acquire_token_by_refresh_token(refresh_token, scopes=SCOPE)
-        if "access_token" not in result:
-            raise HTTPException(status_code=400, detail="Failed to refresh token")
-        return result
+    sync_cloud: BaseSync
 
     async def _upload_files(
         self,
-        token_data: dict,
-        files: list[SyncFile],
+        credentials: dict,
+        files: List[SyncFile],
         current_user: str,
         brain_id: str,
         sync_active_id: int,
     ):
         """
-        Download files from Azure.
+        Download files from an external cloud.
 
         Args:
-            token_data (dict): The token data for accessing Azure.
+            credentials (dict): The token data for accessing the external cloud.
             files (list): The list of file metadata to download.
 
         Returns:
             dict: A dictionary containing the status of the download or an error message.
         """
-        logger.info("Downloading Azure files with metadata: %s", files)
-        headers = self.get_headers(token_data)
+
+        credentials = self.sync_cloud.check_and_refresh_access_token(credentials)
 
         downloaded_files = []
-        # Generate random UUID
         bulk_id = uuid.uuid4()
+
         for file in files:
             upload_notification = notification_service.add_notification(
                 CreateNotification(
@@ -104,36 +75,20 @@ class AzureSyncUtils(BaseModel):
                     brain_id=str(brain_id),
                 )
             )
-
             file.notification_id = str(upload_notification.id)
+
         for file in files:
+            logger.info("Processing file: %s", file.name)
             try:
                 file_id = file.id
                 file_name = file.name
+                mime_type = file.mime_type
                 modified_time = file.last_modified
 
-                download_endpoint = (
-                    f"https://graph.microsoft.com/v1.0/me/drive/items/{file_id}/content"
-                )
-                logger.info("Downloading file: %s", file_name)
-                download_response = requests.get(
-                    download_endpoint, headers=headers, stream=True
-                )
-                if download_response.status_code == 401:
-                    token_data = self.refresh_token(token_data["refresh_token"])
-                    headers = self.get_headers(token_data)
-                    download_response = requests.get(
-                        download_endpoint, headers=headers, stream=True
-                    )
-                if download_response.status_code != 200:
-                    logger.error("Failed to download file: %s", file_name)
-                    continue
-
-                file_data = BytesIO(download_response.content)
-
+                file_data = self.sync_cloud.download_file(credentials, file)
                 # Check if the file already exists in the storage
                 if check_file_exists(brain_id, file_name):
-                    logger.debug("🔥 File already exists in the storage: %s", file_name)
+                    logger.debug("%s already exists in the storage", file_name)
 
                     self.storage.remove_file(brain_id + "/" + file_name)
                     BrainsVectors().delete_file_from_brain(brain_id, file_name)
@@ -171,7 +126,7 @@ class AzureSyncUtils(BaseModel):
                         brain_id,
                         current_user,
                         bulk_id,
-                        "Share Point",
+                        self.sync_cloud.name,
                         file.web_view_link,
                         notification_id=file.notification_id,
                     )
@@ -207,7 +162,9 @@ class AzureSyncUtils(BaseModel):
                 )
             except Exception as error:
                 logger.error(
-                    "An error occurred while downloading Azure files: %s", error
+                    "An error occurred while downloading %s files: %s",
+                    self.sync_cloud.name,
+                    error,
                 )
                 # Check if the file already exists in the database
                 existing_files = self.sync_files_repo.get_sync_files(sync_active_id)
@@ -240,11 +197,12 @@ class AzureSyncUtils(BaseModel):
                         description="Error downloading file",
                     ),
                 )
+
         return {"downloaded_files": downloaded_files}
 
     async def sync(self, sync_active_id: int, user_id: str):
         """
-        Check if the Azure sync has not been synced and download the folders and files based on the settings.
+        Check if the Specific sync has not been synced and download the folders and files based on the settings.
 
         Args:
             sync_active_id (int): The ID of the active sync.
@@ -279,7 +237,9 @@ class AzureSyncUtils(BaseModel):
             time_difference = current_time_utc - last_synced_time
             if time_difference < timedelta(minutes=sync_interval_minutes):
                 logger.info(
-                    "Azure sync is not due for sync_active_id: %s", sync_active_id
+                    "%s sync is not due for sync_active_id: %s",
+                    self.sync_cloud.name,
+                    sync_active_id,
                 )
                 return None
 
@@ -296,15 +256,18 @@ class AzureSyncUtils(BaseModel):
             return None
 
         sync_user = sync_user[0]
-        if sync_user["provider"].lower() != "azure":
+        if sync_user["provider"].lower() != self.sync_cloud.lower_name:
             logger.warning(
-                "Sync provider is not Azure for sync_active_id: %s", sync_active_id
+                "Sync provider is not %s for sync_active_id: %s",
+                self.sync_cloud.name,
+                sync_active_id,
             )
             return None
 
-        # Download the folders and files from Azure
+        # Download the folders and files from Cloud
         logger.info(
-            "Downloading folders and files from Azure for sync_active_id: %s",
+            "Downloading folders and files from %s for sync_active_id: %s",
+            self.sync_cloud.name,
             sync_active_id,
         )
 
@@ -312,20 +275,19 @@ class AzureSyncUtils(BaseModel):
         settings = sync_active.get("settings", {})
         folders = settings.get("folders", [])
         files_to_download = settings.get("files", [])
-        files = []
+        files: List[SyncFile] = []
         files_metadata = []
         if len(folders) > 0:
-            files = []
             for folder in folders:
                 files.extend(
-                    list_azure_files(
+                    self.sync_cloud.get_files(
                         sync_user["credentials"],
                         folder_id=folder,
                         recursive=True,
                     )
                 )
         if len(files_to_download) > 0:
-            files_metadata = get_azure_files_by_id(
+            files_metadata = self.sync_cloud.get_files_by_id(
                 sync_user["credentials"],
                 files_to_download,
             )
@@ -344,8 +306,8 @@ class AzureSyncUtils(BaseModel):
             if last_synced
             else None
         )
-        logger.info("Files retrieved from Azure: %s", len(files))
-        logger.info("Files retrieved from Azure: %s", files)
+        logger.info("Files retrieved from %s: %s", self.sync_cloud.lower_name, files)
+
         files_to_download = [
             file
             for file in files
@@ -354,7 +316,8 @@ class AzureSyncUtils(BaseModel):
                 (
                     not last_synced_time
                     or datetime.strptime(
-                        file.last_modified, "%Y-%m-%dT%H:%M:%SZ"
+                        file.last_modified,
+                        (self.sync_cloud.datetime_format),
                     ).replace(tzinfo=timezone.utc)
                     > last_synced_time
                 )
@@ -383,5 +346,9 @@ class AzureSyncUtils(BaseModel):
                 last_synced=datetime.now().astimezone().isoformat(), force_sync=False
             ),
         )
-        logger.info("Azure sync completed for sync_active_id: %s", sync_active_id)
+        logger.info(
+            "%s sync completed for sync_active_id: %s",
+            self.sync_cloud.lower_name,
+            sync_active_id,
+        )
         return downloaded_files
