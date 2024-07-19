@@ -51,7 +51,7 @@ def authorize_dropbox(
     auth_flow = DropboxOAuth2Flow(
         DROPBOX_APP_KEY,
         redirect_uri=BASE_REDIRECT_URI,
-        session=request.session,
+        session={},
         csrf_token_session_key="csrf-token",
         consumer_secret=DROPBOX_APP_SECRET,
         token_access_type="offline",
@@ -88,10 +88,11 @@ def oauth2callback_dropbox(request: Request):
     state = request.query_params.get("state")
     if not state:
         raise HTTPException(status_code=400, detail="Invalid state parameter")
-    request.session["csrf-token"] = state.split("|")[0] if "|" in state else ""
+    session = {}
+    session["csrf-token"] = state.split("|")[0] if "|" in state else ""
 
-    logger.debug("Keys in session : %s", request.session.keys())
-    logger.debug("Value in session : %s", request.session.values())
+    logger.debug("Keys in session : %s", session.keys())
+    logger.debug("Value in session : %s", session.values())
 
     state = state.split("|")[1] if "|" in state else state  # type: ignore
     state_dict = {"state": state}
@@ -117,7 +118,7 @@ def oauth2callback_dropbox(request: Request):
     auth_flow = DropboxOAuth2Flow(
         DROPBOX_APP_KEY,
         redirect_uri=BASE_REDIRECT_URI,
-        session=request.session,
+        session=session,
         csrf_token_session_key="csrf-token",
         consumer_secret=DROPBOX_APP_SECRET,
         token_access_type="offline",
@@ -139,7 +140,6 @@ def oauth2callback_dropbox(request: Request):
             "access_token": oauth_result.access_token,
             "refresh_token": oauth_result.refresh_token,
             "account_id": account_id,
-            "email": user_email,
             "expires_in": str(oauth_result.expires_at),
         }
 

@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { useEffect, useState } from "react";
 
 interface QuivrLogoProps {
   size: number;
@@ -9,22 +10,19 @@ export const QuivrLogo = ({
   size,
   color = "white",
 }: QuivrLogoProps): JSX.Element => {
-  let src = "/logo-white.svg";
-  if (color === "primary") {
-    src = "/logo-primary.svg";
-  } else if (color === "accent") {
-    src = "/logo-accent.svg";
-  }
+  const [src, setSrc] = useState<string>("/logo-white.svg");
 
-  const filter = color === "black" ? "invert(1)" : "none";
+  useEffect(() => {
+    if (color === "primary") {
+      setSrc("/logo-primary.svg");
+    } else if (color === "accent") {
+      setSrc("/logo-accent.svg");
+    } else if (color === "black") {
+      setSrc("/logo-black.svg");
+    } else {
+      setSrc("/logo-white.svg");
+    }
+  }, [color]);
 
-  return (
-    <Image
-      src={src}
-      alt="Quivr Logo"
-      width={size}
-      height={size}
-      style={{ filter }}
-    />
-  );
+  return <Image src={src} alt="Quivr Logo" width={size} height={size} />;
 };
