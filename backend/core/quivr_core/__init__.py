@@ -28,7 +28,7 @@ def register_entries():
                     name,
                     spec.value.replace(":", "."),
                     errtxt=err_msg,
-                    override=True,
+                    append=True,
                 )
 
 

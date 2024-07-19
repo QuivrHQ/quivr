@@ -9,7 +9,7 @@ from quivr_core.models import ParsedRAGChunkResponse, RAGResponseMetadata
 from quivr_core.quivr_rag import QuivrQARAG
 
 
-@pytest.fixture
+@pytest.fixture(scope="function")
 def mock_chain_qa_stream(monkeypatch, chunks_stream_answer):
     class MockQAChain:
         async def astream(self, *args, **kwargs):

@@ -62,22 +62,29 @@ base_processors: ProcMapping = {
 
 
 def _append_proc_mapping(
-    processor_mapping: ProcMapping,
+    mapping: ProcMapping,
     file_ext: FileExtension | str,
     cls_mod: str,
     errtxt: str,
+    priority: int | None,
 ):
-    if file_ext in processor_mapping:
-        prev_proc = heappop(base_processors[file_ext])
+    if file_ext in mapping:
+        prev_proc = heappop(mapping[file_ext])
         proc_entry = ProcEntry(
-            priority=prev_proc.priority - 1, cls_mod=cls_mod, err=errtxt
+            priority=priority if priority is not None else prev_proc.priority - 1,
+            cls_mod=cls_mod,
+            err=errtxt,
         )
         # Repush the previous processor
-        heappush(base_processors[file_ext], prev_proc)
-        heappush(base_processors[file_ext], proc_entry)
+        heappush(mapping[file_ext], prev_proc)
+        heappush(mapping[file_ext], proc_entry)
     else:
-        proc_entry = ProcEntry(priority=_LOWEST_PRIORITY, cls_mod=cls_mod, err=errtxt)
-        processor_mapping[file_ext] = [proc_entry]
+        proc_entry = ProcEntry(
+            priority=priority if priority is not None else _LOWEST_PRIORITY,
+            cls_mod=cls_mod,
+            err=errtxt,
+        )
+        mapping[file_ext] = [proc_entry]
 
 
 def defaults_to_proc_entries(
@@ -102,10 +109,11 @@ def defaults_to_proc_entries(
         for ext in processor.supported_extensions:
             ext_str = ext.value if isinstance(ext, FileExtension) else ext
             _append_proc_mapping(
-                processor_mapping=base_processors,
+                mapping=base_processors,
                 file_ext=ext,
                 cls_mod=f"quivr_core.processor.implementations.default.{processor.__name__}",
                 errtxt=f"can't import {processor.__name__}. Please install quivr-core[{ext_str}] to access {processor.__name__}",
+                priority=None,
             )
 
     return base_processors
@@ -150,28 +158,31 @@ def get_processor_class(file_extension: FileExtension | str) -> Type[ProcessorBa
 def register_processor(
     file_ext: FileExtension | str,
     proc_cls: str | Type[ProcessorBase],
-    override: bool = False,
+    append: bool = False,
     errtxt=None,
+    priority: int | None = None,
 ):
     if isinstance(proc_cls, str):
-        if file_ext in known_processors and override is False:
+        if file_ext in known_processors and append is False:
             if all(proc_cls != proc.cls_mod for proc in known_processors[file_ext]):
                 raise ValueError(
-                    f"Processor for ({file_ext}) already in the registry and override is False"
+                    f"Processor for ({file_ext}) already in the registry and append is False"
                 )
         else:
             _append_proc_mapping(
                 known_processors,
-                file_ext,
-                proc_cls,
-                errtxt or f"{proc_cls} import failed for processor of {file_ext}",
+                file_ext=file_ext,
+                cls_mod=proc_cls,
+                errtxt=errtxt
+                or f"{proc_cls} import failed for processor of {file_ext}",
+                priority=priority,
             )
 
     else:
-        if file_ext in registry and override is False:
+        if file_ext in registry and append is False:
             if _registry[file_ext] is not proc_cls:
                 raise ValueError(
-                    f"Processor for ({file_ext}) already in the registry and override is False"
+                    f"Processor for ({file_ext}) already in the registry and append is False"
                 )
         else:
             _registry[file_ext] = proc_cls

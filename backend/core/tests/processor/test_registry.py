@@ -1,27 +1,115 @@
+from heapq import heappop
+
 import pytest
 from langchain_core.documents import Document
 
 from quivr_core import registry
+from quivr_core.processor.implementations.default import TikTokenTxtProcessor
+from quivr_core.processor.implementations.tika_processor import TikaProcessor
 from quivr_core.processor.processor_base import ProcessorBase
 from quivr_core.processor.registry import (
+    _LOWEST_PRIORITY,
+    ProcEntry,
+    ProcMapping,
+    _append_proc_mapping,
     _import_class,
     get_processor_class,
+    known_processors,
     register_processor,
 )
-from quivr_core.processor.simple_txt_processor import SimpleTxtProcessor
-from quivr_core.processor.tika_processor import TikaProcessor
 from quivr_core.storage.file import FileExtension, QuivrFile
 
 
+@pytest.mark.base
 def test_get_processor_cls():
     cls = get_processor_class(FileExtension.txt)
-    assert cls == SimpleTxtProcessor
+    assert cls == TikTokenTxtProcessor
+
     cls = get_processor_class(FileExtension.pdf)
     assert cls == TikaProcessor
 
 
+def test_append_proc_mapping_empty():
+    proc_mapping = {}
+
+    _append_proc_mapping(
+        proc_mapping,
+        file_ext=FileExtension.txt,
+        cls_mod="test.test",
+        errtxt="error",
+        priority=None,
+    )
+    assert len(proc_mapping) == 1
+    assert len(proc_mapping[FileExtension.txt]) == 1
+    assert proc_mapping[FileExtension.txt][0] == ProcEntry(
+        priority=_LOWEST_PRIORITY, cls_mod="test.test", err="error"
+    )
+
+
+def test_append_proc_mapping_priority():
+    proc_mapping: ProcMapping = {
+        FileExtension.txt: [
+            ProcEntry(
+                cls_mod="quivr_core.processor.implementations.simple_txt_processor.SimpleTxtProcessor",
+                err=None,
+                priority=_LOWEST_PRIORITY,
+            )
+        ],
+    }
+    _append_proc_mapping(
+        proc_mapping,
+        file_ext=FileExtension.txt,
+        cls_mod="test.test",
+        errtxt="error",
+        priority=0,
+    )
+
+    assert len(proc_mapping[FileExtension.txt]) == 2
+    # Procs are appended in order
+    assert heappop(proc_mapping[FileExtension.txt]) == ProcEntry(
+        priority=0, cls_mod="test.test", err="error"
+    )
+
+
+def test_append_proc_mapping():
+    proc_mapping: ProcMapping = {
+        FileExtension.txt: [
+            ProcEntry(
+                cls_mod="quivr_core.processor.implementations.simple_txt_processor.SimpleTxtProcessor",
+                err=None,
+                priority=_LOWEST_PRIORITY,
+            )
+        ],
+    }
+    _append_proc_mapping(
+        proc_mapping,
+        file_ext=FileExtension.txt,
+        cls_mod="test.test",
+        errtxt="error",
+        priority=None,
+    )
+
+    assert len(proc_mapping[FileExtension.txt]) == 2
+    # Procs are appended in order
+    assert heappop(proc_mapping[FileExtension.txt]) == ProcEntry(
+        priority=_LOWEST_PRIORITY - 1, cls_mod="test.test", err="error"
+    )
+    assert heappop(proc_mapping[FileExtension.txt]) == ProcEntry(
+        cls_mod="quivr_core.processor.implementations.simple_txt_processor.SimpleTxtProcessor",
+        err=None,
+        priority=_LOWEST_PRIORITY,
+    )
+
+
+def test_known_processors():
+    assert len(known_processors) == 15
+    assert all(
+        ext in known_processors for ext in list(FileExtension)
+    ), "Some file extensions don't have a default processor"
+
+
 def test__import_class():
-    mod_path = "quivr_core.processor.tika_processor.TikaProcessor"
+    mod_path = "quivr_core.processor.implementations.tika_processor.TikaProcessor"
     mod = _import_class(mod_path)
     assert mod == TikaProcessor
 
@@ -36,7 +124,7 @@ def test__import_class():
 
 def test_get_processor_cls_error():
     with pytest.raises(ValueError):
-        get_processor_class(".docx")
+        get_processor_class(".sdfkj")
 
 
 def test_register_new_proc():
@@ -62,6 +150,6 @@ def test_register_override_proc():
         async def process_file(self, file: QuivrFile) -> list[Document]:
             return []
 
-    register_processor(".pdf", TestProcessor, override=True)
+    register_processor(".pdf", TestProcessor, append=True)
     cls = get_processor_class(FileExtension.pdf)
     assert cls == TestProcessor
