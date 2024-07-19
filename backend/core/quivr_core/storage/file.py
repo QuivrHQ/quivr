@@ -14,7 +14,19 @@ import aiofiles
 class FileExtension(str, Enum):
     txt = ".txt"
     pdf = ".pdf"
+    csv = ".csv"
     docx = ".docx"
+    pptx = ".pptx"
+    xls = ".xls"
+    xlsx = ".xlsx"
+    md = ".md"
+    mdx = ".mdx"
+    markdown = ".markdown"
+    epub = ".epub"
+    html = ".html"
+    odt = ".odt"
+    py = ".py"
+    ipynb = ".ipynb"
 
 
 def get_file_extension(file_path: Path) -> FileExtension | str:
@@ -90,6 +102,9 @@ class QuivrFile:
         self.file_size = file_size
         self.file_extension = file_extension
         self.file_md5 = file_md5
+
+    def __repr__(self) -> str:
+        return f"QuivrFile-{self.id} original_filename:{self.original_filename}"
 
     @asynccontextmanager
     async def open(self) -> AsyncGenerator[AsyncIterable[bytes], None]:
