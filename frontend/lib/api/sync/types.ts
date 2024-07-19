@@ -1,4 +1,4 @@
-export type Provider = "Google" | "Azure" | "DropBox";
+export type Provider = "Google" | "Azure" | "DropBox | Notion";
 
 export interface SyncElement {
   name?: string;

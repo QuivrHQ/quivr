@@ -652,7 +652,7 @@ class NotionSync(BaseSync):
             # print(page)
             if "parent" in page and page["parent"]["type"] == "workspace":
                 page_info = SyncFile(
-                    name=page["properties"]["title"]["title"][0]["text"]["content"],
+                    name=f'{page["properties"]["title"]["title"][0]["text"]["content"]}.md',
                     id=page["id"],
                     is_folder=True,
                     last_modified=page["last_edited_time"],
@@ -668,25 +668,26 @@ class NotionSync(BaseSync):
 
         for block in blocks:
             block_type = block["type"]
-            # if block_type is child database mark it as unclickable
-            page_info = SyncFile(
-                name=block[block_type]["title"],
-                id=block["id"],
-                is_folder=True,
-                last_modified=block["last_edited_time"],
-                mime_type="md" if block_type == "page" else "db",
-                web_view_link=f"https://www.notion.so/{block['id'].replace('-', '')}",
-            )
-            pages.append(page_info)
+            if block_type in {"child_database", "child_page"}:
+                # if block_type is child database mark it as unclickable
+                page_info = SyncFile(
+                    name=f'{block[block_type]["title"]}.md',
+                    id=block["id"],
+                    is_folder=True,
+                    last_modified=block["last_edited_time"],
+                    mime_type="md" if block_type == "page" else "db",
+                    web_view_link=f"https://www.notion.so/{block['id'].replace('-', '')}",
+                )
+                pages.append(page_info)
 
-            if recursive:
-                sub_pages = self.fetch_pages(block["id"], recursive)
-                pages.extend(sub_pages)
+                if recursive:
+                    sub_pages = self.fetch_pages(block["id"], recursive)
+                    pages.extend(sub_pages)
 
         return pages
 
     def get_files(
-        self, credentials: Dict, page_id: str = "", recursive: bool = False
+        self, credentials: Dict, folder_id: str | None = None, recursive: bool = False
     ) -> List[SyncFile]:
         """
         Retrieve files (pages) from Notion.
@@ -700,16 +701,16 @@ class NotionSync(BaseSync):
             list: A list of SyncFile objects containing the page metadata.
         """
 
-        logger.info("Retrieving Notion files (pages) from page_id: %s", page_id)
+        logger.info("Retrieving Notion files (pages) from page_id: %s", folder_id)
 
         try:
             if not self.notion:
                 self.notion = self.link_notion(credentials)
 
-            if not page_id:
+            if not folder_id:
                 files = self.fetch_root_pages()
             else:
-                files = self.fetch_pages(page_id, recursive)
+                files = self.fetch_pages(folder_id, recursive)
 
             logger.info("Notion files (pages) retrieved successfully: %d", len(files))
             return files
@@ -735,12 +736,13 @@ class NotionSync(BaseSync):
             self.notion = self.link_notion(credentials)
 
         files = []
+        logger.debug("Retrieving Notion files by IDs: %s", file_ids)
 
         for file_id in file_ids:
             try:
                 page = self.notion.pages.retrieve(file_id)
                 page_info = SyncFile(
-                    name=page["properties"]["title"]["title"][0]["text"]["content"],
+                    name=f'{page["properties"]["title"]["title"][0]["text"]["content"]}.md',
                     id=page["id"],
                     is_folder=True,  # Notion pages are generally considered as folders
                     last_modified=page["last_edited_time"],
@@ -760,6 +762,9 @@ class NotionSync(BaseSync):
         block_type = block["type"]
         result = ""
 
+        if len(block[block_type]["rich_text"]) == 0:
+            return ""
+
         if block_type == "paragraph":
             result = markdownify.markdownify(
                 block["paragraph"]["rich_text"][0]["plain_text"]
@@ -767,24 +772,22 @@ class NotionSync(BaseSync):
 
         elif block_type == "heading_1":
             result = "# " + markdownify.markdownify(
-                block["heading_1"]["text"][0]["plain_text"]
+                block["heading_1"]["rich_text"][0]["plain_text"]
             )
 
         elif block_type == "heading_2":
             result = "## " + markdownify.markdownify(
-                block["heading_2"]["text"][0]["plain_text"]
+                block["heading_2"]["rich_text"][0]["plain_text"]
             )
         elif block_type == "heading_3":
             result = "### " + markdownify.markdownify(
-                block["heading_3"]["text"][0]["plain_text"]
+                block["heading_3"]["rich_text"][0]["plain_text"]
             )
         elif block_type == "bulleted_list_item":
-            if len(block["bulleted_list_item"]["rich_text"]) != 0:
-                result = "* " + markdownify.markdownify(
-                    block["bulleted_list_item"]["rich_text"][0]["plain_text"]
-                )
-            else:
-                result = "* "
+
+            result = "* " + markdownify.markdownify(
+                block["bulleted_list_item"]["rich_text"][0]["plain_text"]
+            )
 
         elif block_type == "numbered_list_item":
             result = "1. " + markdownify.markdownify(
@@ -838,6 +841,8 @@ class NotionSync(BaseSync):
 
         if not self.notion:
             self.notion = self.link_notion(credentials)
+
+        logger.debug("Downloading Notion file (page) with ID %s", file.id)
 
         try:
 

@@ -12,6 +12,7 @@ from quivr_api.modules.sync.utils.sync import (
     AzureDriveSync,
     DropboxSync,
     GoogleDriveSync,
+    NotionSync,
 )
 
 notification_service = NotificationService()
@@ -216,6 +217,14 @@ class SyncUser(SyncUserInterface):
         elif provider == "dropbox":
             logger.info("Getting files for Drop Box sync")
             sync = DropboxSync()
+            return {
+                "files": sync.get_files(
+                    sync_user["credentials"], folder_id if folder_id else "", recursive
+                )
+            }
+        elif provider == "notion":
+            logger.info("Getting files for Notion sync")
+            sync = NotionSync()
             return {
                 "files": sync.get_files(
                     sync_user["credentials"], folder_id if folder_id else "", recursive

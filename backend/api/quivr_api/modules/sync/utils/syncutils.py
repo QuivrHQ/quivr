@@ -58,6 +58,7 @@ class SyncUtils(BaseModel):
         Returns:
             dict: A dictionary containing the status of the download or an error message.
         """
+        logger.debug("HOW MANY FILES ARE WE DL ? %s", len(files))
 
         credentials = self.sync_cloud.check_and_refresh_access_token(credentials)
 
@@ -278,7 +279,16 @@ class SyncUtils(BaseModel):
         files: List[SyncFile] = []
         files_metadata = []
         if len(folders) > 0:
+            if self.sync_cloud.lower_name == "notion":
+                files.extend(
+                    self.sync_cloud.get_files_by_id(
+                        sync_user["credentials"],
+                        folders,
+                    )
+                )
+
             for folder in folders:
+
                 files.extend(
                     self.sync_cloud.get_files(
                         sync_user["credentials"],
@@ -307,23 +317,41 @@ class SyncUtils(BaseModel):
             else None
         )
         logger.info("Files retrieved from %s: %s", self.sync_cloud.lower_name, files)
-
-        files_to_download = [
-            file
-            for file in files
-            if not file.is_folder
-            and (
-                (
-                    not last_synced_time
-                    or datetime.strptime(
-                        file.last_modified,
-                        (self.sync_cloud.datetime_format),
-                    ).replace(tzinfo=timezone.utc)
-                    > last_synced_time
+        if not self.sync_cloud == "notion":
+            files_to_download = [
+                file
+                for file in files
+                if (
+                    (
+                        not last_synced_time
+                        or datetime.strptime(
+                            file.last_modified,
+                            (self.sync_cloud.datetime_format),
+                        ).replace(tzinfo=timezone.utc)
+                        > last_synced_time
+                    )
+                    or not check_file_exists(sync_active["brain_id"], file.name)
                 )
-                or not check_file_exists(sync_active["brain_id"], file.name)
-            )
-        ]
+            ]
+        else:
+            files_to_download = [
+                file
+                for file in files
+                if not file.is_folder
+                and (
+                    (
+                        not last_synced_time
+                        or datetime.strptime(
+                            file.last_modified,
+                            (self.sync_cloud.datetime_format),
+                        ).replace(tzinfo=timezone.utc)
+                        > last_synced_time
+                    )
+                    or not check_file_exists(sync_active["brain_id"], file.name)
+                )
+            ]
+
+        logger.debug("NUMBER OF FLIES TO DOWNLOAD %s", len(files_to_download))
 
         downloaded_files = await self._upload_files(
             sync_user["credentials"],

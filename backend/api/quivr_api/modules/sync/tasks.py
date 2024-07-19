@@ -9,6 +9,7 @@ from quivr_api.modules.sync.utils.sync import (
     AzureDriveSync,
     DropboxSync,
     GoogleDriveSync,
+    NotionSync,
 )
 from quivr_api.modules.sync.utils.syncutils import SyncUtils
 
@@ -51,6 +52,14 @@ async def _process_sync_active():
         sync_cloud=DropboxSync(),
     )
 
+    notion_sync_utils = SyncUtils(
+        sync_user_service=sync_user_service,
+        sync_active_service=sync_active_service,
+        sync_files_repo=sync_files_repo_service,
+        storage=storage,
+        sync_cloud=NotionSync(),
+    )
+
     active = await sync_active_service.get_syncs_active_in_interval()
 
     for sync in active:
@@ -68,6 +77,10 @@ async def _process_sync_active():
                 )
             elif details_user_sync["provider"].lower() == "dropbox":
                 await dropbox_sync_utils.sync(
+                    sync_active_id=sync.id, user_id=sync.user_id
+                )
+            elif details_user_sync["provider"].lower() == "notion":
+                await notion_sync_utils.sync(
                     sync_active_id=sync.id, user_id=sync.user_id
                 )
             else:
