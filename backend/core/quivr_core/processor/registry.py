@@ -158,8 +158,9 @@ def get_processor_class(file_extension: FileExtension | str) -> Type[ProcessorBa
 def register_processor(
     file_ext: FileExtension | str,
     proc_cls: str | Type[ProcessorBase],
-    append: bool = False,
-    errtxt=None,
+    append: bool = True,
+    override: bool = False,
+    errtxt: str | None = None,
     priority: int | None = None,
 ):
     if isinstance(proc_cls, str):
@@ -169,17 +170,23 @@ def register_processor(
                     f"Processor for ({file_ext}) already in the registry and append is False"
                 )
         else:
-            _append_proc_mapping(
-                known_processors,
-                file_ext=file_ext,
-                cls_mod=proc_cls,
-                errtxt=errtxt
-                or f"{proc_cls} import failed for processor of {file_ext}",
-                priority=priority,
-            )
+            if all(proc_cls != proc.cls_mod for proc in known_processors[file_ext]):
+                _append_proc_mapping(
+                    known_processors,
+                    file_ext=file_ext,
+                    cls_mod=proc_cls,
+                    errtxt=errtxt
+                    or f"{proc_cls} import failed for processor of {file_ext}",
+                    priority=priority,
+                )
+            else:
+                logger.info(f"{proc_cls} already in registry...")
 
     else:
-        if file_ext in registry and append is False:
+        assert issubclass(
+            proc_cls, ProcessorBase
+        ), f"{proc_cls} should be a subclass of quivr_core.processor.ProcessorBase"
+        if file_ext in registry and override is False:
             if _registry[file_ext] is not proc_cls:
                 raise ValueError(
                     f"Processor for ({file_ext}) already in the registry and append is False"

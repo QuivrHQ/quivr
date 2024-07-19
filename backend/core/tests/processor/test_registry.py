@@ -1,3 +1,4 @@
+import logging
 from heapq import heappop
 
 import pytest
@@ -14,6 +15,7 @@ from quivr_core.processor.registry import (
     ProcMapping,
     _append_proc_mapping,
     _import_class,
+    available_processors,
     get_processor_class,
     known_processors,
     register_processor,
@@ -122,9 +124,34 @@ def test__import_class():
         _import_class(mod_path)
 
 
+@pytest.mark.skip
+def test_get_processor_cls_import_error(caplog):
+    # TODO: run this in a env without necessary processors of some type
+    # use caplog to get logging.warnings
+    with pytest.raises(ImportError):
+        get_processor_class(".pdf")
+
+
 def test_get_processor_cls_error():
     with pytest.raises(ValueError):
         get_processor_class(".sdfkj")
+
+
+def test_register_new_proc_noappend():
+    with pytest.raises(ValueError):
+        register_processor(FileExtension.txt, "test.", append=False)
+
+
+def test_register_new_proc_append(caplog):
+    n = len(known_processors[FileExtension.txt])
+    register_processor(FileExtension.txt, "test.", append=True)
+    assert len(known_processors[FileExtension.txt]) == n + 1
+
+    with caplog.at_level(logging.INFO, logger="quivr_core"):
+        register_processor(FileExtension.txt, "test.", append=True)
+        assert caplog.record_tuples == [
+            ("quivr_core", logging.INFO, "test. already in registry...")
+        ]
 
 
 def test_register_new_proc():
@@ -143,13 +170,47 @@ def test_register_new_proc():
     assert cls == TestProcessor
 
 
+def test_register_non_processor():
+    class NOTPROC:
+        supported_extensions = [".pdf"]
+
+    with pytest.raises(AssertionError):
+        register_processor(".pdf", NOTPROC)  # type: ignore
+
+
 def test_register_override_proc():
     class TestProcessor(ProcessorBase):
         supported_extensions = [".pdf"]
 
-        async def process_file(self, file: QuivrFile) -> list[Document]:
+        @property
+        def processor_metadata(self):
+            return {}
+
+        async def process_file_inner(self, file: QuivrFile) -> list[Document]:
             return []
 
-    register_processor(".pdf", TestProcessor, append=True)
+    register_processor(".pdf", TestProcessor, override=True)
     cls = get_processor_class(FileExtension.pdf)
     assert cls == TestProcessor
+
+
+def test_register_override_error():
+    # Register class to pdf
+    _ = get_processor_class(FileExtension.pdf)
+
+    class TestProcessor(ProcessorBase):
+        supported_extensions = [FileExtension.pdf]
+
+        @property
+        def processor_metadata(self):
+            return {}
+
+        async def process_file_inner(self, file: QuivrFile) -> list[Document]:
+            return []
+
+    with pytest.raises(ValueError):
+        register_processor(".pdf", TestProcessor, override=False)
+
+
+def test_available_processors():
+    assert 15 == len(available_processors())
