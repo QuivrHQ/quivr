@@ -129,7 +129,7 @@ def oauth2callback_notion(request: Request):
         # Get account information
         user_info = notion.users.me()
 
-        owner_info = user_info["bot"]["owner"]["user"]
+        owner_info = user_info["bot"]["owner"]["user"]  # type: ignore
         user_email = owner_info["person"]["email"]
         account_id = owner_info["id"]
 

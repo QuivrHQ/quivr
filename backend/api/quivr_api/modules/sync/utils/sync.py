@@ -3,15 +3,17 @@ import os
 import time
 from abc import ABC, abstractmethod
 from io import BytesIO
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 import dropbox
+import markdownify
 import msal
 import requests
 from fastapi import HTTPException
 from google.auth.transport.requests import Request as GoogleRequest
 from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
+from notion_client import Client
 from quivr_api.logger import get_logger
 from quivr_api.modules.sync.entity.sync import SyncFile
 from quivr_api.modules.sync.utils.normalize import remove_special_characters
@@ -620,3 +622,256 @@ class DropboxSync(BaseSync):
 
         metadata, file_data = self.dbx.files_download(file_id)  # type: ignore
         return BytesIO(file_data.content)
+
+
+class NotionSync(BaseSync):
+    name = "Notion"
+    lower_name = "notion"
+    notion: Optional[Client] = None
+    datetime_format: str = "%Y-%m-%dT%H:%M:%S.%fZ"
+
+    def link_notion(self, credentials) -> Client:
+        return Client(auth=credentials["access_token"])
+
+    def check_and_refresh_access_token(self, credentials: Dict) -> Dict:
+        if not self.notion:
+            self.notion = self.link_notion(credentials)
+        # no need to refresh token for notion
+        return credentials
+
+    def fetch_root_pages(self) -> List[SyncFile]:
+        pages = []
+        if not self.notion:
+            raise Exception("Notion client is not initialized")
+
+        search_result = self.notion.search(
+            query="", filter={"property": "object", "value": "page"}
+        )["results"]
+        print(len(search_result))
+        for page in search_result:
+            # print(page)
+            if "parent" in page and page["parent"]["type"] == "workspace":
+                page_info = SyncFile(
+                    name=page["properties"]["title"]["title"][0]["text"]["content"],
+                    id=page["id"],
+                    is_folder=True,
+                    last_modified=page["last_edited_time"],
+                    mime_type="md",
+                    web_view_link=page["url"],
+                )
+                pages.append(page_info)
+        return pages
+
+    def fetch_pages(self, page_id, recursive):
+        pages = []
+        blocks = self.notion.blocks.children.list(page_id)["results"]  # type: ignore
+
+        for block in blocks:
+            block_type = block["type"]
+            # if block_type is child database mark it as unclickable
+            page_info = SyncFile(
+                name=block[block_type]["title"],
+                id=block["id"],
+                is_folder=True,
+                last_modified=block["last_edited_time"],
+                mime_type="md" if block_type == "page" else "db",
+                web_view_link=f"https://www.notion.so/{block['id'].replace('-', '')}",
+            )
+            pages.append(page_info)
+
+            if recursive:
+                sub_pages = self.fetch_pages(block["id"], recursive)
+                pages.extend(sub_pages)
+
+        return pages
+
+    def get_files(
+        self, credentials: Dict, page_id: str = "", recursive: bool = False
+    ) -> List[SyncFile]:
+        """
+        Retrieve files (pages) from Notion.
+
+        Args:
+            credentials (dict): The credentials for accessing Notion.
+            page_id (str, optional): The root page ID to start fetching files. Defaults to "".
+            recursive (bool, optional): If True, fetch files from all subpages. Defaults to False.
+
+        Returns:
+            list: A list of SyncFile objects containing the page metadata.
+        """
+
+        logger.info("Retrieving Notion files (pages) from page_id: %s", page_id)
+
+        try:
+            if not self.notion:
+                self.notion = self.link_notion(credentials)
+
+            if not page_id:
+                files = self.fetch_root_pages()
+            else:
+                files = self.fetch_pages(page_id, recursive)
+
+            logger.info("Notion files (pages) retrieved successfully: %d", len(files))
+            return files
+
+        except Exception as e:
+            logger.error("Unexpected error: %s", e)
+            raise Exception("Failed to retrieve files")
+
+    def get_files_by_id(self, credentials: Dict, file_ids: List[str]) -> List[SyncFile]:
+        """
+        Retrieve files from Notion by their IDs.
+
+        Args:
+            credentials (dict): The credentials for accessing Notion.
+            file_ids (list): The list of file IDs to retrieve.
+
+        Returns:
+            list: A list of SyncFile objects containing the metadata of each file.
+        """
+        logger.info("Retrieving Notion files by file_ids: %s", file_ids)
+
+        if not self.notion:
+            self.notion = self.link_notion(credentials)
+
+        files = []
+
+        for file_id in file_ids:
+            try:
+                page = self.notion.pages.retrieve(file_id)
+                page_info = SyncFile(
+                    name=page["properties"]["title"]["title"][0]["text"]["content"],
+                    id=page["id"],
+                    is_folder=True,  # Notion pages are generally considered as folders
+                    last_modified=page["last_edited_time"],
+                    mime_type="md",
+                    web_view_link=page["url"],
+                )
+                files.append(page_info)
+
+            except Exception as e:
+                logger.error("Error retrieving Notion file with ID %s: %s", file_id, e)
+                continue  # Skip this file and proceed with the next one
+
+        logger.info("Notion files retrieved successfully by IDs: %d", len(files))
+        return files
+
+    def get_block_content(self, block):
+        block_type = block["type"]
+        result = ""
+
+        if block_type == "paragraph":
+            result = markdownify.markdownify(
+                block["paragraph"]["rich_text"][0]["plain_text"]
+            )
+
+        elif block_type == "heading_1":
+            result = "# " + markdownify.markdownify(
+                block["heading_1"]["text"][0]["plain_text"]
+            )
+
+        elif block_type == "heading_2":
+            result = "## " + markdownify.markdownify(
+                block["heading_2"]["text"][0]["plain_text"]
+            )
+        elif block_type == "heading_3":
+            result = "### " + markdownify.markdownify(
+                block["heading_3"]["text"][0]["plain_text"]
+            )
+        elif block_type == "bulleted_list_item":
+            if len(block["bulleted_list_item"]["rich_text"]) != 0:
+                result = "* " + markdownify.markdownify(
+                    block["bulleted_list_item"]["rich_text"][0]["plain_text"]
+                )
+            else:
+                result = "* "
+
+        elif block_type == "numbered_list_item":
+            result = "1. " + markdownify.markdownify(
+                block["numbered_list_item"]["rich_text"][0]["plain_text"]
+            )
+        elif block_type == "to_do":
+            checked = "x" if block["to_do"]["checked"] else " "
+            result = f"- [{checked}] " + markdownify.markdownify(
+                block["to_do"]["rich_text"][0]["plain_text"]
+            )
+        elif block_type == "toggle":
+            result = "> " + markdownify.markdownify(
+                block["toggle"]["rich_text"][0]["plain_text"]
+            )
+
+        elif block_type == "quote":
+            result = "> " + markdownify.markdownify(
+                block["quote"]["rich_text"][0]["plain_text"]
+            )
+        elif block_type == "code":
+            result = (
+                "```"
+                + block["code"]["language"]
+                + "\n"
+                + markdownify.markdownify(block["code"]["rich_text"][0]["plain_text"])
+                + "\n```"
+            )
+
+        elif block_type == "callout":
+            result = "> " + markdownify.markdownify(
+                block["callout"]["rich_text"][0]["plain_text"]
+            )
+        else:
+            result = markdownify.markdownify(
+                block[block_type]["rich_text"][0]["plain_text"]
+            )
+
+        return result
+
+    def download_file(self, credentials: Dict, file: SyncFile) -> BytesIO:
+        """
+        Download a Notion page as a Markdown file.
+
+        Args:
+            credentials (Dict): The credentials for accessing Notion.
+            file (SyncFile): The file (page) to be downloaded.
+
+        Returns:
+            BytesIO: The downloaded file content in Markdown format.
+        """
+
+        if not self.notion:
+            self.notion = self.link_notion(credentials)
+
+        try:
+
+            def retrieve_page_content(page_id) -> List[str]:
+                # Retrieve the page content
+                blocks = self.notion.blocks.children.list(page_id)["results"]
+                if not blocks:
+                    raise Exception("Page does not exists")
+
+                # Convert blocks to Markdown
+                markdown_content = []
+                for block in blocks:
+                    markdown_content.append(self.get_block_content(block))
+                    if block["has_children"]:
+                        sub_elements = [
+                            f"\t{content}"
+                            for content in retrieve_page_content(block["id"])
+                        ]
+                        markdown_content.extend(sub_elements)
+                return markdown_content
+
+            markdown_content = retrieve_page_content(file.id)
+            # Join all markdown content
+            markdown_text = "\n\n".join(markdown_content)
+
+            print(markdown_text)
+
+            # Convert to BytesIO
+            markdown_bytes = BytesIO(markdown_text.encode("utf-8"))
+
+            return markdown_bytes
+
+        except Exception as e:
+            logger.error(
+                "Error downloading Notion file (page) with ID %s: %s", file.id, e
+            )
+            raise Exception("Failed to download file")
