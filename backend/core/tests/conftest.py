@@ -1,5 +1,7 @@
 import json
 import os
+from pathlib import Path
+from uuid import uuid4
 
 import pytest
 from langchain_core.embeddings import DeterministicFakeEmbedding
@@ -10,6 +12,39 @@ from langchain_core.vectorstores import InMemoryVectorStore
 
 from quivr_core.config import LLMEndpointConfig
 from quivr_core.llm import LLMEndpoint
+from quivr_core.storage.file import FileExtension, QuivrFile
+
+
+@pytest.fixture(scope="function")
+def temp_data_file(tmp_path):
+    data = "This is some test data."
+    temp_file = tmp_path / "data.txt"
+    temp_file.write_text(data)
+    return temp_file
+
+
+@pytest.fixture(scope="function")
+def quivr_txt(temp_data_file):
+    return QuivrFile(
+        id=uuid4(),
+        brain_id=uuid4(),
+        original_filename=temp_data_file.name,
+        path=temp_data_file,
+        file_extension=FileExtension.txt,
+        file_md5="123",
+    )
+
+
+@pytest.fixture
+def quivr_pdf():
+    return QuivrFile(
+        id=uuid4(),
+        brain_id=uuid4(),
+        original_filename="dummy.pdf",
+        path=Path("./tests/processor/data/dummy.pdf"),
+        file_extension=FileExtension.pdf,
+        file_md5="13bh234jh234",
+    )
 
 
 @pytest.fixture
@@ -34,14 +69,6 @@ def chunks_stream_answer():
 @pytest.fixture(autouse=True)
 def openai_api_key():
     os.environ["OPENAI_API_KEY"] = "abcd"
-
-
-@pytest.fixture(scope="function")
-def temp_data_file(tmp_path):
-    data = "This is some test data."
-    temp_file = tmp_path / "data.txt"
-    temp_file.write_text(data)
-    return temp_file
 
 
 @pytest.fixture

@@ -1,4 +1,5 @@
 import logging
+from importlib.metadata import version
 from typing import AsyncIterable
 
 import httpx
@@ -6,14 +7,15 @@ from langchain_core.documents import Document
 from langchain_text_splitters import RecursiveCharacterTextSplitter, TextSplitter
 
 from quivr_core.processor.processor_base import ProcessorBase
+from quivr_core.processor.registry import FileExtension
 from quivr_core.processor.splitter import SplitterConfig
 from quivr_core.storage.file import QuivrFile
 
 logger = logging.getLogger("quivr_core")
 
 
-class TikaParser(ProcessorBase):
-    supported_extensions = [".pdf"]
+class TikaProcessor(ProcessorBase):
+    supported_extensions = [FileExtension.pdf]
 
     def __init__(
         self,
@@ -51,12 +53,22 @@ class TikaParser(ProcessorBase):
         raise RuntimeError("can't send parse request to tika server")
 
     async def process_file(self, file: QuivrFile) -> list[Document]:
-        assert file.file_extension in self.supported_extensions
+        self.check_supported(file)
 
         async with file.open() as f:
             txt = await self._send_parse_tika(f)
         document = Document(page_content=txt)
-
         # Use the default splitter
         docs = self.text_splitter.split_documents([document])
+        file_metadata = file.metadata
+
+        for doc in docs:
+            doc.metadata = {
+                "chunk_size": len(doc.page_content),
+                "chunk_overlap": self.splitter_config.chunk_overlap,
+                "parser_name": self.__class__.__name__,
+                "quivr_core_version": version("quivr-core"),
+                **file_metadata,
+            }
+
         return docs

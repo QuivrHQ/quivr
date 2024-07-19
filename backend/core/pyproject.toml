@@ -15,6 +15,7 @@ aiofiles = ">=23.0.0,<25.0.0"
 faiss-cpu = { version = "^1.8.0.post1", optional = true }
 langchain-community = { version = "^0.2.6", optional = true }
 langchain-openai = { version = "^0.1.14", optional = true }
+rich = "^13.7.1"
 
 [tool.poetry.extras]
 base = ["langchain-community", "faiss-cpu", "langchain-openai"]
@@ -81,6 +82,10 @@ known-first-party = []
 [tool.pytest.ini_options]
 addopts = "--tb=short -ra -v"
 filterwarnings = ["ignore::DeprecationWarning"]
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "base: these tests require quivr-core with extra `base` to be installed",
+]
 
 [build-system]
 requires = ["poetry-core"]
