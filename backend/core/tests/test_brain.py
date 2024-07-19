@@ -11,10 +11,16 @@ from quivr_core.llm import LLMEndpoint
 from quivr_core.storage.local_storage import TransparentStorage
 
 
-def test_brain_empty_files():
+def test_brain_empty_files(fake_llm, embedder, mem_vector_store):
     # Testing no files
     with pytest.raises(ValueError):
-        Brain.from_files(name="test_brain", file_paths=[])
+        Brain.from_files(
+            name="test_brain",
+            file_paths=[],
+            llm=fake_llm,
+            embedder=embedder,
+            vector_db=mem_vector_store,
+        )
 
 
 @pytest.mark.asyncio
