@@ -115,7 +115,7 @@ export const ConnectionSection = ({
   fromAddKnowledge,
   callback,
 }: ConnectionSectionProps): JSX.Element => {
-  const { iconUrls, getUserSyncs, getSyncFiles } = useSync();
+  const { providerIconUrls, getUserSyncs, getSyncFiles } = useSync();
   const {
     setCurrentSyncElements,
     setCurrentSyncId,
@@ -216,7 +216,7 @@ export const ConnectionSection = ({
         <div className={styles.connection_section_header}>
           <div className={styles.left}>
             <Image
-              src={iconUrls[provider]}
+              src={providerIconUrls[provider]}
               alt={label}
               width={24}
               height={24}

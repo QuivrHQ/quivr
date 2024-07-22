@@ -86,6 +86,8 @@ class QuivrKnowledge(BaseModel):
     url: str | None = None
     extension: str = "txt"
     status: str = "PROCESSING"
+    integration: str | None = None
+    integration_link: str | None = None
 
 
 # NOTE: for compatibility issues with langchain <-> PydanticV1
