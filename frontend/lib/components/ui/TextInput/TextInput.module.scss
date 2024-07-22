@@ -20,6 +20,8 @@
     .text_input {
       background-color: transparent;
       width: 10px;
+      padding-block: 0;
+      font-size: Typography.$small;
     }
   }
 

@@ -9,26 +9,28 @@
   flex-direction: column;
   position: relative;
   background-color: var(--background-0);
+  font-size: Typography.$small;
 
   .first_line_wrapper {
     display: flex;
     justify-content: space-between;
     border: 1px solid var(--border-2);
-    border-radius: Radius.$big;
+    border-radius: Radius.$normal;
     align-items: center;
     cursor: pointer;
+    display: flex;
 
     &.unfolded {
-      border-radius: Radius.$big Radius.$big 0 0;
+      border-radius: Radius.$normal Radius.$normal 0 0;
     }
 
     .left {
       display: flex;
       align-items: center;
       gap: Spacings.$spacing03;
-      padding: Spacings.$spacing03;
+      padding-block: Spacings.$spacing02;
+      padding-inline: Spacings.$spacing03;
       overflow: hidden;
-      flex: 1;
 
       .icon {
         width: IconSizes.$normal;
@@ -41,6 +43,7 @@
         padding-inline: Spacings.$spacing05;
         padding-block: Spacings.$spacing02;
         white-space: nowrap;
+        font-size: Typography.$small;
 
         &.not_set {
           color: var(--text-1);
@@ -56,7 +59,8 @@
 
     .right {
       flex: 1;
-      max-width: 50%;
+      font-size: Typography.$small;
+      padding-block: Spacings.$spacing02 + Spacings.$spacing01;
 
       &.folded {
         display: none;
@@ -71,7 +75,7 @@
     top: 100%;
     border: 1px solid var(--border-2);
     border-top: none;
-    border-radius: 0 0 Radius.$big Radius.$big;
+    border-radius: 0 0 Radius.$normal Radius.$normal;
     overflow: hidden;
     max-height: 180px;
     overflow: scroll;
