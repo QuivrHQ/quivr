@@ -1,5 +1,7 @@
 export type Provider = "Google" | "Azure" | "DropBox";
 
+export type Integration = "Google Drive" | "Azure" | "Dropbox";
+
 export interface SyncElement {
   name?: string;
   id: string;

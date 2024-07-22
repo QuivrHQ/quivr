@@ -37,7 +37,7 @@ const KnowledgeItem = ({
   const { brain } = useUrlBrain();
   const { generateSignedUrlKnowledge } = useKnowledgeApi();
   const { isMobile } = useDevice();
-  const { iconUrls } = useSync();
+  const { integrationIconUrls } = useSync();
 
   const getOptions = (): Option[] => [
     {
@@ -106,7 +106,11 @@ const KnowledgeItem = ({
     if (isUploadedKnowledge(knowledge)) {
       return knowledge.integration ? (
         <Image
-          src={iconUrls[knowledge.integration as keyof typeof iconUrls]}
+          src={
+            integrationIconUrls[
+              knowledge.integration as keyof typeof integrationIconUrls
+            ]
+          }
           width="16"
           height="16"
           alt="integration_icon"
