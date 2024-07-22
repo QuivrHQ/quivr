@@ -4,6 +4,7 @@ export interface SyncElement {
   name?: string;
   id: string;
   is_folder: boolean;
+  icon?: string;
 }
 
 export interface SyncElements {

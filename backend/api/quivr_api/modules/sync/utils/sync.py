@@ -676,17 +676,22 @@ class NotionSync(BaseSync):
             return True
         return False
 
-    def get_icon(self, file_id):
-        page = self.notion.pages.retrieve(file_id)
-        logger.debug("page content --!--: %s", page)
-        return page["icon"]
+    def get_icon(self, page_id):
+        try:
+            page = self.notion.pages.retrieve(page_id)
+            logger.debug("page content --!--: %s", page)
+            return page["icon"]
+        except Exception as e:
+            logger.error("Error retrieving Notion file with ID %s: %s", page_id, e)
+            return {"emoji": "📊"}
 
     def fetch_pages(self, page_id, recursive):
         pages = []
-        icon = self.get_icon(page_id)  # FIXME: REALLY LONG
         blocks = self.notion.blocks.children.list(page_id)["results"]  # type: ignore
 
         for block in blocks:
+
+            icon = self.get_icon(block["id"])  # FIXME: REALLY LONG
             block_type = block["type"]
             is_folder = self.is_folder(block["id"])  # FIXME: REALLY LONG
             # is_folder = True
