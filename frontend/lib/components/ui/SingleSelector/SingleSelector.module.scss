@@ -80,9 +80,11 @@
     max-height: 180px;
     overflow: scroll;
     z-index: ZIndexes.$overlay;
+    padding-block: Spacings.$spacing02;
 
     .option {
-      padding: Spacings.$spacing03;
+      padding-inline: Spacings.$spacing03;
+      padding-block: Spacings.$spacing02;
       cursor: pointer;
       display: flex;
       gap: Spacings.$spacing03;
