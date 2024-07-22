@@ -29,7 +29,6 @@ class BrainService:
     # brain_repository: BrainsInterface
     # brain_user_repository: BrainsUsersInterface
     # brain_vector_repository: BrainsVectorsInterface
-    # external_api_secrets_repository: ExternalApiSecretsInterface
     # integration_brains_repository: IntegrationBrainInterface
     # integration_description_repository: IntegrationDescriptionInterface
 
