@@ -83,7 +83,9 @@ export const SingleSelector = <T extends string | number | UUID>({
             ${!selectedOption ? styles.not_set : ""}
             `}
             >
-              {selectedOption?.label ?? placeholder}
+              <span className={styles.label_text}>
+                {selectedOption?.label ?? placeholder}
+              </span>
             </div>
           )}
         </div>

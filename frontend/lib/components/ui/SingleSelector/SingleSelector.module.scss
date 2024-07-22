@@ -37,7 +37,7 @@
       }
 
       .label {
-        @include Typography.EllipsisOverflow;
+        overflow: hidden;
         background-color: var(--background-primary-1);
         border-radius: Radius.$normal;
         padding-inline: Spacings.$spacing05;
@@ -47,6 +47,10 @@
         height: 24px;
         display: flex;
         align-items: center;
+
+        .label_text {
+          @include Typography.EllipsisOverflow;
+        }
 
         &.not_set {
           color: var(--text-1);
@@ -64,6 +68,7 @@
       flex: 1;
       font-size: Typography.$small;
       padding-block: Spacings.$spacing02;
+      min-width: 50%;
 
       &.folded {
         display: none;

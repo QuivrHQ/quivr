@@ -32,12 +32,19 @@
     justify-content: space-between;
     width: 100%;
     align-items: center;
+    overflow: hidden;
+    gap: Spacings.$spacing03;
 
     .left {
       display: flex;
       gap: Spacings.$spacing03;
       @include Typography.H2;
       align-items: center;
+      overflow: hidden;
+
+      .name {
+        @include Typography.EllipsisOverflow;
+      }
     }
   }
 
