@@ -17,6 +17,7 @@ import {
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 import { ChatsProvider } from "@/lib/context/ChatsProvider";
 import { MenuProvider } from "@/lib/context/MenuProvider/Menu-provider";
+import { useMenuContext } from "@/lib/context/MenuProvider/hooks/useMenuContext";
 import { NotificationsProvider } from "@/lib/context/NotificationsProvider/notifications-provider";
 import { OnboardingProvider } from "@/lib/context/OnboardingProvider/Onboarding-provider";
 import { SearchModalProvider } from "@/lib/context/SearchModalProvider/search-modal-provider";
@@ -27,6 +28,7 @@ import { UpdateMetadata } from "@/lib/helpers/updateMetadata";
 import { usePageTracking } from "@/services/analytics/june/usePageTracking";
 
 import "../lib/config/LocaleConfig/i18n";
+import styles from "./App.module.scss";
 import { FromConnectionsProvider } from "./chat/[chatId]/components/ActionsBar/components/KnowledgeToFeed/components/FromConnections/FromConnectionsProvider/FromConnection-provider";
 
 if (
@@ -45,6 +47,7 @@ const App = ({ children }: PropsWithChildren): JSX.Element => {
   const { fetchAllBrains } = useBrainContext();
   const { onClickOutside } = useOutsideClickListener();
   const { session } = useSupabase();
+  const { isOpened } = useMenuContext();
 
   usePageTracking();
 
@@ -64,11 +67,15 @@ const App = ({ children }: PropsWithChildren): JSX.Element => {
           <div className="flex flex-1 flex-col overflow-auto">
             <SearchModalProvider>
               <SearchModal />
-              <div className="relative h-full w-full flex justify-stretch items-stretch overflow-auto">
-                <Menu />
+              <div className={styles.app_container}>
+                <div className={styles.menu_container}>
+                  <Menu />
+                </div>
                 <div
                   onClick={onClickOutside}
-                  className="flex-1 overflow-scroll"
+                  className={`${styles.content_container} ${
+                    isOpened ? styles.blured : ""
+                  }`}
                 >
                   {children}
                 </div>
