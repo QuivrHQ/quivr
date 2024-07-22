@@ -1,5 +1,5 @@
 import { StripePricingModal } from "@/lib/components/Stripe";
-import QuivrButton from "@/lib/components/ui/QuivrButton/QuivrButton";
+import { QuivrButton } from "@/lib/components/ui/QuivrButton/QuivrButton";
 import { useUserData } from "@/lib/hooks/useUserData";
 
 const MANAGE_PLAN_URL = process.env.NEXT_PUBLIC_STRIPE_MANAGE_PLAN_URL;

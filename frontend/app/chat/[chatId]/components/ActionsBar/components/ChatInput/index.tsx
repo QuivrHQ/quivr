@@ -1,7 +1,7 @@
 "use client";
 
 import { CurrentBrain } from "@/lib/components/CurrentBrain/CurrentBrain";
-import Icon from "@/lib/components/ui/Icon/Icon";
+import { Icon } from "@/lib/components/ui/Icon/Icon";
 import { LoaderIcon } from "@/lib/components/ui/LoaderIcon/LoaderIcon";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 import { useUserSettingsContext } from "@/lib/context/UserSettingsProvider/hooks/useUserSettingsContext";
