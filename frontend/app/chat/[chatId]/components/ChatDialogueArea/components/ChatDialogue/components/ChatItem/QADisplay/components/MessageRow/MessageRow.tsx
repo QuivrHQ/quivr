@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import { useChatInput } from "@/app/chat/[chatId]/components/ActionsBar/components/ChatInput/hooks/useChatInput";
 import { useChat } from "@/app/chat/[chatId]/hooks/useChat";
 import { useChatApi } from "@/lib/api/chat/useChatApi";
+import { Integration } from "@/lib/api/sync/types";
 import { CopyButton } from "@/lib/components/ui/CopyButton";
 import { Icon } from "@/lib/components/ui/Icon/Icon";
 import { Source } from "@/lib/types/MessageMetadata";
@@ -66,6 +67,8 @@ export const MessageRow = ({
             file_url: source.source_url,
             citations: [source.citation],
             selected: false,
+            integration: source.integration as Integration,
+            integration_link: source.integration_link,
           });
         }
 
