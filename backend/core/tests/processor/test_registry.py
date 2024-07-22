@@ -31,6 +31,7 @@ def test_get_default_processors_cls():
     assert cls == TikTokenTxtProcessor
 
     cls = get_processor_class(FileExtension.pdf)
+    # FIXME: using this class will actually fail if you don't have the
     assert cls == TikaProcessor
 
 
@@ -117,7 +118,7 @@ def test_append_proc_mapping():
 def test_known_processors():
     assert all(
         ext in known_processors for ext in list(FileExtension)
-    ), "Some file extensions don't have a default processor"
+    ), "base-env : Some file extensions don't have a default processor"
 
 
 def test__import_class():
@@ -223,4 +224,4 @@ def test_register_override_error():
 
 
 def test_available_processors():
-    assert 16 == len(available_processors())
+    assert 17 == len(available_processors())

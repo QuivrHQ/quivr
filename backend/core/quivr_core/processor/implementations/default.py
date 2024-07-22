@@ -9,10 +9,11 @@ from langchain_community.document_loaders import (
     PythonLoader,
     UnstructuredEPubLoader,
     UnstructuredExcelLoader,
-    UnstructuredFileLoader,
     UnstructuredHTMLLoader,
     UnstructuredMarkdownLoader,
+    UnstructuredODTLoader,
     UnstructuredPDFLoader,
+    UnstructuredPowerPointLoader,
 )
 from langchain_community.document_loaders.base import BaseLoader
 from langchain_community.document_loaders.text import TextLoader
@@ -72,9 +73,9 @@ def _build_processor(
             }
 
         async def process_file_inner(self, file: QuivrFile) -> list[Document]:
-            if "__init__" in self.loader_cls.__dict__:
+            if hasattr(self.loader_cls, "__init__"):
                 # NOTE: mypy can't correctly type this as BaseLoader doesn't have a constructor method
-                loader = self.loader_cls(file.path, **self.loader_kwargs)  # type: ignore
+                loader = self.loader_cls(file_path=file.path, **self.loader_kwargs)  # type: ignore
             else:
                 loader = self.loader_cls()
 
@@ -93,12 +94,14 @@ CSVProcessor = _build_processor("CSVProcessor", CSVLoader, [FileExtension.csv])
 TikTokenTxtProcessor = _build_processor(
     "TikTokenTxtProcessor", TextLoader, [FileExtension.txt]
 )
-DOCXProcessor = _build_processor("DOCXProcessor", Docx2txtLoader, [FileExtension.docx])
+DOCXProcessor = _build_processor(
+    "DOCXProcessor", Docx2txtLoader, [FileExtension.docx, FileExtension.doc]
+)
 XLSXProcessor = _build_processor(
     "XLSXProcessor", UnstructuredExcelLoader, [FileExtension.xlsx, FileExtension.xls]
 )
 PPTProcessor = _build_processor(
-    "PPTProcessor", UnstructuredFileLoader, [FileExtension.pptx]
+    "PPTProcessor", UnstructuredPowerPointLoader, [FileExtension.pptx]
 )
 MarkdownProcessor = _build_processor(
     "MarkdownProcessor",
@@ -110,7 +113,7 @@ EpubProcessor = _build_processor(
 )
 BibTexProcessor = _build_processor("BibTexProcessor", BibtexLoader, [FileExtension.bib])
 ODTProcessor = _build_processor(
-    "ODTProcessor", UnstructuredPDFLoader, [FileExtension.odt]
+    "ODTProcessor", UnstructuredODTLoader, [FileExtension.odt]
 )
 HTMLProcessor = _build_processor(
     "HTMLProcessor", UnstructuredHTMLLoader, [FileExtension.html]
@@ -118,4 +121,7 @@ HTMLProcessor = _build_processor(
 PythonProcessor = _build_processor("PythonProcessor", PythonLoader, [FileExtension.py])
 NotebookProcessor = _build_processor(
     "NotebookProcessor", NotebookLoader, [FileExtension.ipynb]
+)
+UnstructuredPDFProcessor = _build_processor(
+    "UnstructuredPDFProcessor", UnstructuredPDFLoader, [FileExtension.pdf]
 )

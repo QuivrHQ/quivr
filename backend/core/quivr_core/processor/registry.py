@@ -63,8 +63,6 @@ def _append_proc_mapping(
                 err=errtxt,
             )
             # Push the previous processor back
-            print(f"Pushed {prev_proc}")
-            print(f"Pushed {proc_entry}")
             heappush(mapping[file_ext], prev_proc)
             heappush(mapping[file_ext], proc_entry)
         except IndexError:
@@ -93,7 +91,7 @@ def defaults_to_proc_entries(
     for supported_extensions, processor_name in [
         ([FileExtension.csv], "CSVProcessor"),
         ([FileExtension.txt], "TikTokenTxtProcessor"),
-        ([FileExtension.docx], "DOCXProcessor"),
+        ([FileExtension.docx, FileExtension.doc], "DOCXProcessor"),
         ([FileExtension.xls, FileExtension.xlsx], "XLSXProcessor"),
         ([FileExtension.pptx], "PPTProcessor"),
         (

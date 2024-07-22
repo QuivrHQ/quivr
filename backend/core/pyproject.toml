@@ -7,7 +7,7 @@ readme = "README.md"
 repository = "https://github.com/QuivrHQ/quivr"
 
 [tool.poetry.dependencies]
-python = "^3.11"
+python = "^3.11,<3.13"
 pydantic = "^2.7.4"
 langchain-core = "^0.2.10"
 langchain = "^0.2.9"
@@ -18,11 +18,40 @@ aiofiles = ">=23.0.0,<25.0.0"
 faiss-cpu = { version = "^1.8.0.post1", optional = true }
 langchain-community = { version = "^0.2.6", optional = true }
 langchain-openai = { version = "^0.1.14", optional = true }
+# To install unstructured, you’ll also need to install the following system dependencies:
+# libmagic, poppler, libreoffice, pandoc, and tesseract.
+# NOTE: for now poetry doesn't support groups as extra:
+# see : https://github.com/python-poetry/poetry/issues/4842
+docx2txt = { version = "^0.8", optional = true }
+quivr-pdf = { path = "wrappers/quivr-pdf", optional = true }
+unstructured = { version = "^0.15.0", optional = true, extras = [
+    "epub",
+    "odt",
+    "docx",
+    "doc",
+    "pptx",
+    "ppt",
+    "xlsx",
+] }
 
 [tool.poetry.extras]
 base = ["langchain-community", "faiss-cpu", "langchain-openai"]
-pdf = []
-
+csv = ["langchain-community"]
+md = ["langchain-community"]
+ipynb = ["langchain-community"]
+epub = ["unstructured", "langchain-community"]
+odt = ["unstructured", "langchain-community", "docx2txt"]
+docx = ["unstructured", "langchain-community", "docx2txt"]
+pptx = ["unstructured", "langchain-community"]
+xlsx = ["unstructured", "langchain-community"]
+pdf = ["langchain-community", "quivr-pdf"]
+all = [
+    "langchain-community",
+    "faiss-cpu",
+    "langchain-openai",
+    "unstructured",
+    "docx2txt",
+]
 
 [tool.poetry.group.dev]
 optional = true
@@ -94,8 +123,15 @@ filterwarnings = ["ignore::DeprecationWarning"]
 markers = [
     "slow: marks tests as slow (deselect with '-m \"not slow\"')",
     "base: these tests require quivr-core with extra `base` to be installed",
+    "tika: these tests require a tika server to be running",
+    "unstructured: these tests require `unstructured` dependency",
 ]
 
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[[tool.poetry.source]]
+name = "pytorch-cpu-src"
+url = "https://download.pytorch.org/whl/cpu"
+priority = "explicit"

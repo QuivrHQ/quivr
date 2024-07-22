@@ -15,6 +15,7 @@ class FileExtension(str, Enum):
     txt = ".txt"
     pdf = ".pdf"
     csv = ".csv"
+    doc = ".doc"
     docx = ".docx"
     pptx = ".pptx"
     xls = ".xls"
