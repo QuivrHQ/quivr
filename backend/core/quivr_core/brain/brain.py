@@ -14,62 +14,18 @@ from rich.panel import Panel
 
 from quivr_core.brain.info import BrainInfo, ChatHistoryInfo
 from quivr_core.chat import ChatHistory
-from quivr_core.config import LLMEndpointConfig, RAGConfig
+from quivr_core.config import RAGConfig
+from quivr_core.files.file import load_qfile
 from quivr_core.llm import LLMEndpoint
 from quivr_core.models import ParsedRAGChunkResponse, ParsedRAGResponse, SearchResult
 from quivr_core.processor.registry import get_processor_class
 from quivr_core.quivr_rag import QuivrQARAG
-from quivr_core.storage.file import load_qfile
 from quivr_core.storage.local_storage import TransparentStorage
 from quivr_core.storage.storage_base import StorageBase
 
+from .brain_defaults import build_default_vectordb, default_embedder, default_llm
+
 logger = logging.getLogger("quivr_core")
-
-
-async def _build_default_vectordb(
-    docs: list[Document], embedder: Embeddings
-) -> VectorStore:
-    try:
-        from langchain_community.vectorstores import FAISS
-
-        logger.debug("Using Faiss-CPU as vector store.")
-        # TODO(@aminediro) : embedding call is not concurrent for all documents but waits
-        # We can actually wait on all processing
-        if len(docs) > 0:
-            vector_db = await FAISS.afrom_documents(documents=docs, embedding=embedder)
-            return vector_db
-        else:
-            raise ValueError("can't initialize brain without documents")
-
-    except ImportError as e:
-        raise ImportError(
-            "Please provide a valid vector store or install quivr-core['base'] package for using the default one."
-        ) from e
-
-
-def _default_embedder() -> Embeddings:
-    try:
-        from langchain_openai import OpenAIEmbeddings
-
-        logger.debug("Loaded OpenAIEmbeddings as default LLM for brain")
-        embedder = OpenAIEmbeddings()
-        return embedder
-    except ImportError as e:
-        raise ImportError(
-            "Please provide a valid Embedder or install quivr-core['base'] package for using the defaultone."
-        ) from e
-
-
-def _default_llm() -> LLMEndpoint:
-    try:
-        logger.debug("Loaded ChatOpenAI as default LLM for brain")
-        llm = LLMEndpoint.from_config(LLMEndpointConfig())
-        return llm
-
-    except ImportError as e:
-        raise ImportError(
-            "Please provide a valid BaseLLM or install quivr-core['base'] package"
-        ) from e
 
 
 async def process_files(
@@ -80,6 +36,7 @@ async def process_files(
         try:
             if file.file_extension:
                 processor_cls = get_processor_class(file.file_extension)
+                logger.debug(f"processing {file} using class {processor_cls.__name__}")
                 processor = processor_cls(**processor_kwargs)
                 docs = await processor.process_file(file)
                 knowledge.extend(docs)
@@ -171,17 +128,20 @@ class Brain:
         skip_file_error: bool = False,
     ):
         if llm is None:
-            llm = _default_llm()
+            llm = default_llm()
 
         if embedder is None:
-            embedder = _default_embedder()
+            embedder = default_embedder()
 
         brain_id = uuid4()
 
         # TODO: run in parallel using tasks
+
         for path in file_paths:
             file = await load_qfile(brain_id, path)
             await storage.upload_file(file)
+
+        logger.debug(f"uploaded all files to {storage}")
 
         # Parse files
         docs = await process_files(
@@ -191,9 +151,11 @@ class Brain:
 
         # Building brain's vectordb
         if vector_db is None:
-            vector_db = await _build_default_vectordb(docs, embedder)
+            vector_db = await build_default_vectordb(docs, embedder)
         else:
             await vector_db.aadd_documents(docs)
+
+        logger.debug(f"added {len(docs)} chunks to vectordb")
 
         return cls(
             id=brain_id,
@@ -241,16 +203,16 @@ class Brain:
         embedder: Embeddings | None = None,
     ) -> Self:
         if llm is None:
-            llm = _default_llm()
+            llm = default_llm()
 
         if embedder is None:
-            embedder = _default_embedder()
+            embedder = default_embedder()
 
         brain_id = uuid4()
 
         # Building brain's vectordb
         if vector_db is None:
-            vector_db = await _build_default_vectordb(langchain_documents, embedder)
+            vector_db = await build_default_vectordb(langchain_documents, embedder)
         else:
             await vector_db.aadd_documents(langchain_documents)
 

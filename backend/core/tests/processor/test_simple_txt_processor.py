@@ -1,12 +1,12 @@
 import pytest
 from langchain_core.documents import Document
 
-from quivr_core.processor.simple_txt_processor import (
+from quivr_core.files.file import FileExtension
+from quivr_core.processor.implementations.simple_txt_processor import (
     SimpleTxtProcessor,
     recursive_character_splitter,
 )
 from quivr_core.processor.splitter import SplitterConfig
-from quivr_core.storage.file import FileExtension
 
 
 def test_recursive_character_splitter():

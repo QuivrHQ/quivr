@@ -16,6 +16,9 @@ class StorageBase(ABC):
                 )
         return super().__init_subclass__(**kwargs)
 
+    def __repr__(self) -> str:
+        return f"storage_type: {self.name}"
+
     @abstractmethod
     def nb_files(self) -> int:
         raise Exception("Unimplemented nb_files method")
