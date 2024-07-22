@@ -108,6 +108,10 @@ class SyncUtils(BaseModel):
                     logger.info("File is not compatible: %s", file_name)
                     continue
 
+                if file.mime_type == "db":
+                    logger.info("File is a database: %s", file_name)
+                    continue
+
                 to_upload_file = UploadFile(
                     file=file_data,
                     filename=file_name,
@@ -305,7 +309,8 @@ class SyncUtils(BaseModel):
 
         if "error" in files:
             logger.error(
-                "Failed to download files from Azure for sync_active_id: %s",
+                "Failed to download files from %s for sync_active_id: %s",
+                self.sync_cloud.name,
                 sync_active_id,
             )
             return None
@@ -331,6 +336,7 @@ class SyncUtils(BaseModel):
                         > last_synced_time
                     )
                     or not check_file_exists(sync_active["brain_id"], file.name)
+                    or not file.mime_type == "db"
                 )
             ]
         else:
@@ -350,8 +356,6 @@ class SyncUtils(BaseModel):
                     or not check_file_exists(sync_active["brain_id"], file.name)
                 )
             ]
-
-        logger.debug("NUMBER OF FLIES TO DOWNLOAD %s", len(files_to_download))
 
         downloaded_files = await self._upload_files(
             sync_user["credentials"],

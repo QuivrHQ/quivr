@@ -662,20 +662,32 @@ class NotionSync(BaseSync):
                 pages.append(page_info)
         return pages
 
+    def is_folder(self, page_id):
+        children_blocks = self.notion.blocks.children.list(page_id)["results"]
+        if len(children_blocks) > 0:
+            return True
+        return False
+
     def fetch_pages(self, page_id, recursive):
         pages = []
         blocks = self.notion.blocks.children.list(page_id)["results"]  # type: ignore
 
         for block in blocks:
             block_type = block["type"]
+            # is_folder = self.is_folder(block["id"])
+            is_folder = True
+            logger.debug("block content --!--: %s", block)
             if block_type in {"child_database", "child_page"}:
+                if block_type == "child_database":
+                    logger.debug("CONTENT OF CHILD DATABASE: %s", block)
                 # if block_type is child database mark it as unclickable
+                logger.debug("CONTENT OF CHILD PAGE: %s", block)
                 page_info = SyncFile(
                     name=f'{block[block_type]["title"]}.md',
                     id=block["id"],
-                    is_folder=True,
+                    is_folder=is_folder,
                     last_modified=block["last_edited_time"],
-                    mime_type="md" if block_type == "page" else "db",
+                    mime_type="md" if block_type == "child_page" else "db",
                     web_view_link=f"https://www.notion.so/{block['id'].replace('-', '')}",
                 )
                 pages.append(page_info)
@@ -761,6 +773,9 @@ class NotionSync(BaseSync):
     def get_block_content(self, block):
         block_type = block["type"]
         result = ""
+
+        if "rich_text" not in block[block_type]:
+            return f'{block[block_type]["title"]} {": database" if block_type == "child_database" else ": linked page"}'
 
         if len(block[block_type]["rich_text"]) == 0:
             return ""

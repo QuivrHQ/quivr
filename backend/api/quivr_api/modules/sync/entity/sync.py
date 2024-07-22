@@ -19,6 +19,7 @@ class SyncFile(BaseModel):
     mime_type: str
     web_view_link: str
     notification_id: Optional[str] = None
+    img_url: Optional[str] = None
 
 
 class SyncsActive(BaseModel):
