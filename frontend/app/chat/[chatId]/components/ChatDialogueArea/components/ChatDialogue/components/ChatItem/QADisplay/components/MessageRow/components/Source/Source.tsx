@@ -1,6 +1,8 @@
+import Image from "next/image";
 import { useState } from "react";
 
-import Icon from "@/lib/components/ui/Icon/Icon";
+import { useSync } from "@/lib/api/sync/useSync";
+import { Icon } from "@/lib/components/ui/Icon/Icon";
 import Tooltip from "@/lib/components/ui/Tooltip/Tooltip";
 
 import styles from "./Source.module.scss";
@@ -17,6 +19,7 @@ export const SourceCitations = ({ sourceFile }: SourceProps): JSX.Element => {
   const [isCitationModalOpened, setIsCitationModalOpened] =
     useState<boolean>(false);
   const [citationIndex, setCitationIndex] = useState<number>(0);
+  const { integrationIconUrls } = useSync();
 
   return (
     <div>
@@ -29,17 +32,30 @@ export const SourceCitations = ({ sourceFile }: SourceProps): JSX.Element => {
         >
           <a
             onClick={(event) => event.stopPropagation()}
-            href={sourceFile.file_url}
+            href={
+              sourceFile.integration_link
+                ? sourceFile.integration_link
+                : sourceFile.file_url
+            }
             target="_blank"
             rel="noopener noreferrer"
           >
             <div className={styles.source_header}>
               <span className={styles.filename}>{sourceFile.filename}</span>
-              <Icon
-                name="externLink"
-                size="small"
-                color={hovered ? "primary" : "black"}
-              />
+              {sourceFile.integration ? (
+                <Image
+                  src={integrationIconUrls[sourceFile.integration]}
+                  width="16"
+                  height="16"
+                  alt="integration_icon"
+                />
+              ) : (
+                <Icon
+                  name="externLink"
+                  size="small"
+                  color={hovered ? "primary" : "black"}
+                />
+              )}
             </div>
           </a>
         </div>

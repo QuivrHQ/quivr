@@ -36,6 +36,7 @@ export const ChatProvider = ({
 
       return updatedHistory;
     });
+    console.info(messages);
   };
 
   const removeMessage = (id: string): void => {
