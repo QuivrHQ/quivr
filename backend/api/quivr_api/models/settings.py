@@ -4,7 +4,6 @@ from uuid import UUID
 from langchain.embeddings.base import Embeddings
 from langchain_community.embeddings.ollama import OllamaEmbeddings
 from langchain_community.vectorstores.supabase import SupabaseVectorStore
-
 from langchain_openai import OpenAIEmbeddings
 from posthog import Posthog
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -21,8 +20,7 @@ class BrainRateLimiting(BaseSettings):
     max_brain_per_user: int = 5
 
 
-
-class ContactsSettings(BaseSettings):
+class SendEmailSettings(BaseSettings):
     model_config = SettingsConfigDict(validate_default=False)
     resend_contact_sales_from: str = "null"
     resend_contact_sales_to: str = "null"
