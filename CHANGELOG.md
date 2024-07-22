@@ -1,5 +1,29 @@
 # Changelog
 
+## 0.0.285 (2024-07-22)
+
+## What's Changed
+* fix(frontend): select line when click on knowledge option by @Zewed in https://github.com/QuivrHQ/quivr/pull/2879
+* fix(frontend): selected item on mention list by @Zewed in https://github.com/QuivrHQ/quivr/pull/2881
+* fix(frontend): logo color on dark mode by @Zewed in https://github.com/QuivrHQ/quivr/pull/2882
+* fix: Refacto & update dropbox refresh by @chloedia in https://github.com/QuivrHQ/quivr/pull/2875
+* feat: quivr core brain info + processors registry +  by @AmineDiro in https://github.com/QuivrHQ/quivr/pull/2877
+* chore(main): release core 0.0.10 by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2872
+* feat: move parsers quivr core by @AmineDiro in https://github.com/QuivrHQ/quivr/pull/2884
+* fix(frontend): default icon for knowledge without extension by @Zewed in https://github.com/QuivrHQ/quivr/pull/2887
+* chore(main): release core 0.0.11 by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2886
+* feat(frontend): add knowledge icon when integration by @Zewed in https://github.com/QuivrHQ/quivr/pull/2888
+* fix: google conversion by @chloedia in https://github.com/QuivrHQ/quivr/pull/2891
+* fix(frontend): remove thoughts button by @Zewed in https://github.com/QuivrHQ/quivr/pull/2892
+* feat: add integration and integration link to Sources class by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2893
+* feat(azure): changed auth method by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2890
+* feat(frontend): new inputs by @Zewed in https://github.com/QuivrHQ/quivr/pull/2894
+* fix(frontend): menu on mobile by @Zewed in https://github.com/QuivrHQ/quivr/pull/2895
+* feat(api): add logging for inactive subscriptions by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2897
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.284...v0.0.285
+
 ## 0.0.284 (2024-07-17)
 
 ## What's Changed
