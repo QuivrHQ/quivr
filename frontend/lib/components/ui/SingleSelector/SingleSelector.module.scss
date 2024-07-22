@@ -41,9 +41,12 @@
         background-color: var(--background-primary-1);
         border-radius: Radius.$normal;
         padding-inline: Spacings.$spacing05;
-        padding-block: Spacings.$spacing02;
+        padding-block: Spacings.$spacing01;
         white-space: nowrap;
         font-size: Typography.$small;
+        height: 24px;
+        display: flex;
+        align-items: center;
 
         &.not_set {
           color: var(--text-1);
@@ -60,7 +63,7 @@
     .right {
       flex: 1;
       font-size: Typography.$small;
-      padding-block: Spacings.$spacing02 + Spacings.$spacing01;
+      padding-block: Spacings.$spacing02;
 
       &.folded {
         display: none;
@@ -104,9 +107,9 @@
       .option_name {
         @include Typography.EllipsisOverflow;
         border: 1px solid var(--border-1);
-        border-radius: Radius.$small;
+        border-radius: Radius.$normal;
         padding-inline: Spacings.$spacing05;
-        padding-block: Spacings.$spacing02;
+        padding-block: Spacings.$spacing01;
         white-space: nowrap;
       }
     }

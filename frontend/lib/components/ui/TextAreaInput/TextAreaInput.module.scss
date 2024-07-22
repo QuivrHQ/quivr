@@ -1,13 +1,12 @@
 @use "styles/Radius.module.scss";
 @use "styles/Spacings.module.scss";
+@use "styles/Typography.module.scss";
 
 .text_area_input_container {
   display: flex;
   border: 1px solid var(--border-0);
   gap: Spacings.$spacing03;
-  padding-block: Spacings.$spacing02;
-  padding-inline: Spacings.$spacing03;
-  border-radius: Radius.$big;
+  border-radius: Radius.$normal;
   align-items: center;
   width: 100%;
   background-color: var(--background-0);
@@ -34,6 +33,9 @@
     flex: 1;
     resize: none;
     background-color: transparent;
+    font-size: Typography.$small;
+    padding-block: Spacings.$spacing02;
+    padding-inline: Spacings.$spacing03;
 
     &:focus {
       box-shadow: none;
