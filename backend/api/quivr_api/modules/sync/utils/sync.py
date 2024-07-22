@@ -658,30 +658,40 @@ class NotionSync(BaseSync):
                     last_modified=page["last_edited_time"],
                     mime_type="md",
                     web_view_link=page["url"],
+                    icon=page["icon"]["emoji"] if page["icon"] else None,
                 )
                 pages.append(page_info)
         return pages
 
     def is_folder(self, page_id):
         children_blocks = self.notion.blocks.children.list(page_id)["results"]
-        if len(children_blocks) > 0:
+        n_child_page = len(
+            [
+                block
+                for block in children_blocks
+                if block["type"] in ["child_page", "child_database"]
+            ]
+        )
+        if n_child_page > 0:
             return True
         return False
 
+    def get_icon(self, file_id):
+        page = self.notion.pages.retrieve(file_id)
+        logger.debug("page content --!--: %s", page)
+        return page["icon"]
+
     def fetch_pages(self, page_id, recursive):
         pages = []
+        icon = self.get_icon(page_id)  # FIXME: REALLY LONG
         blocks = self.notion.blocks.children.list(page_id)["results"]  # type: ignore
 
         for block in blocks:
             block_type = block["type"]
-            # is_folder = self.is_folder(block["id"])
-            is_folder = True
-            logger.debug("block content --!--: %s", block)
+            is_folder = self.is_folder(block["id"])  # FIXME: REALLY LONG
+            # is_folder = True
             if block_type in {"child_database", "child_page"}:
-                if block_type == "child_database":
-                    logger.debug("CONTENT OF CHILD DATABASE: %s", block)
                 # if block_type is child database mark it as unclickable
-                logger.debug("CONTENT OF CHILD PAGE: %s", block)
                 page_info = SyncFile(
                     name=f'{block[block_type]["title"]}.md',
                     id=block["id"],
@@ -689,6 +699,7 @@ class NotionSync(BaseSync):
                     last_modified=block["last_edited_time"],
                     mime_type="md" if block_type == "child_page" else "db",
                     web_view_link=f"https://www.notion.so/{block['id'].replace('-', '')}",
+                    icon=icon["emoji"] if icon else None,
                 )
                 pages.append(page_info)
 
@@ -725,6 +736,7 @@ class NotionSync(BaseSync):
                 files = self.fetch_pages(folder_id, recursive)
 
             logger.info("Notion files (pages) retrieved successfully: %d", len(files))
+            logger.debug("Notion files (pages): %s", files)
             return files
 
         except Exception as e:
@@ -760,6 +772,7 @@ class NotionSync(BaseSync):
                     last_modified=page["last_edited_time"],
                     mime_type="md",
                     web_view_link=page["url"],
+                    icon=page["icon"]["emoji"] if page["icon"] else None,
                 )
                 files.append(page_info)
 
