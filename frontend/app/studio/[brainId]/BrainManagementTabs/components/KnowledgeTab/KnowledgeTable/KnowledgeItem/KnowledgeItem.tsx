@@ -6,7 +6,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { useKnowledgeApi } from "@/lib/api/knowledge/useKnowledgeApi";
 import { useSync } from "@/lib/api/sync/useSync";
 import { Checkbox } from "@/lib/components/ui/Checkbox/Checkbox";
-import Icon from "@/lib/components/ui/Icon/Icon";
+import { Icon } from "@/lib/components/ui/Icon/Icon";
 import { OptionsModal } from "@/lib/components/ui/OptionsModal/OptionsModal";
 import { Tag } from "@/lib/components/ui/Tag/Tag";
 import { iconList } from "@/lib/helpers/iconList";

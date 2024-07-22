@@ -209,15 +209,19 @@ def check_if_is_premium_user():
     premium_user_ids = set()
     settings_to_upsert = {}
     for sub in subscriptions:
+        logger.info(f"Subscription {sub['id']}")
         if sub["attrs"]["status"] != "active":
+            logger.info(f"Subscription {sub['id']} is not active")
             continue
 
         customer = customer_dict.get(sub["customer"])
         if not customer:
+            logger.info(f"No customer found for subscription: {sub['customer']}")
             continue
 
         user_id = user_dict.get(customer["email"])
         if not user_id:
+            logger.info(f"No user found for customer: {customer['email']}")
             continue
 
         current_settings = settings_dict.get(user_id, {})
@@ -226,6 +230,7 @@ def check_if_is_premium_user():
         # Skip if the user was checked recently
         if last_check and datetime.fromisoformat(last_check) > memoization_cutoff:
             premium_user_ids.add(user_id)
+            logger.info(f"User {user_id} was checked recently")
             continue
 
         user_id = str(user_id)  # Ensure user_id is a string
@@ -247,9 +252,11 @@ def check_if_is_premium_user():
             "is_premium": True,
             "last_stripe_check": current_time_str,
         }
+        logger.info(f"Upserting settings for user {user_id}")
 
     # Bulk upsert premium user settings in batches of 10
     settings_list = list(settings_to_upsert.values())
+    logger.info(f"Upserting {len(settings_list)} settings")
     for i in range(0, len(settings_list), 10):
         batch = settings_list[i : i + 10]
         supabase_db.table("user_settings").upsert(batch).execute()

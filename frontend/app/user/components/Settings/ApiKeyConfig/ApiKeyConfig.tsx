@@ -2,7 +2,7 @@
 "use client";
 
 import { CopyButton } from "@/lib/components/ui/CopyButton";
-import QuivrButton from "@/lib/components/ui/QuivrButton/QuivrButton";
+import { QuivrButton } from "@/lib/components/ui/QuivrButton/QuivrButton";
 
 import styles from "./ApiKeyConfig.module.scss";
 import { useApiKeyConfig } from "./hooks/useApiKeyConfig";

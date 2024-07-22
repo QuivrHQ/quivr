@@ -1,7 +1,7 @@
 import { Controller } from "react-hook-form";
 
 import { FieldHeader } from "@/lib/components/ui/FieldHeader/FieldHeader";
-import QuivrButton from "@/lib/components/ui/QuivrButton/QuivrButton";
+import { QuivrButton } from "@/lib/components/ui/QuivrButton/QuivrButton";
 import { TextAreaInput } from "@/lib/components/ui/TextAreaInput/TextAreaInput";
 import { TextInput } from "@/lib/components/ui/TextInput/TextInput";
 

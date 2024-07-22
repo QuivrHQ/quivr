@@ -5,7 +5,7 @@ import { useChat } from "@/app/chat/[chatId]/hooks/useChat";
 import { useChatApi } from "@/lib/api/chat/useChatApi";
 import { Integration } from "@/lib/api/sync/types";
 import { CopyButton } from "@/lib/components/ui/CopyButton";
-import Icon from "@/lib/components/ui/Icon/Icon";
+import { Icon } from "@/lib/components/ui/Icon/Icon";
 import { Source } from "@/lib/types/MessageMetadata";
 
 import styles from "./MessageRow.module.scss";

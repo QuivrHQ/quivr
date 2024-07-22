@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { SyncElement } from "@/lib/api/sync/types";
 import { useSync } from "@/lib/api/sync/useSync";
 import { ConnectionCards } from "@/lib/components/ConnectionCards/ConnectionCards";
-import TextButton from "@/lib/components/ui/TextButton/TextButton";
+import { TextButton } from "@/lib/components/ui/TextButton/TextButton";
 import { useUserData } from "@/lib/hooks/useUserData";
 
 import { FileLine } from "./FileLine/FileLine";

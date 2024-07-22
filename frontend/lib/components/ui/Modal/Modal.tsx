@@ -9,7 +9,7 @@ import { useTranslation } from "react-i18next";
 import styles from "./Modal.module.scss";
 
 import Button from "../Button";
-import Icon from "../Icon/Icon";
+import { Icon } from "../Icon/Icon";
 
 type CommonModalProps = {
   title?: string;

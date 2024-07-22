@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 
 import { Assistant } from "@/lib/api/assistants/types";
 import { useAssistants } from "@/lib/api/assistants/useAssistants";
-import PageHeader from "@/lib/components/PageHeader/PageHeader";
+import { PageHeader } from "@/lib/components/PageHeader/PageHeader";
 import { BrainCard } from "@/lib/components/ui/BrainCard/BrainCard";
 import { MessageInfoBox } from "@/lib/components/ui/MessageInfoBox/MessageInfoBox";
 import { useSupabase } from "@/lib/context/SupabaseProvider";

@@ -4,7 +4,7 @@ import { DeleteOrUnsubscribeConfirmationModal } from "@/app/studio/[brainId]/Bra
 import { useBrainFetcher } from "@/app/studio/[brainId]/BrainManagementTabs/hooks/useBrainFetcher";
 import { useBrainManagementTabs } from "@/app/studio/[brainId]/BrainManagementTabs/hooks/useBrainManagementTabs";
 import { getBrainPermissions } from "@/app/studio/[brainId]/BrainManagementTabs/utils/getBrainPermissions";
-import Icon from "@/lib/components/ui/Icon/Icon";
+import { Icon } from "@/lib/components/ui/Icon/Icon";
 import { OptionsModal } from "@/lib/components/ui/OptionsModal/OptionsModal";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 import { MinimalBrainForUser } from "@/lib/context/BrainProvider/types";
