@@ -210,8 +210,8 @@ def check_if_is_premium_user():
     settings_to_upsert = {}
     for sub in subscriptions:
         logger.info(f"Subscription {sub['id']}")
-        if sub["attrs"]["status"] != "active":
-            logger.info(f"Subscription {sub['id']} is not active")
+        if sub["attrs"]["status"] != "active" and sub["attrs"]["status"] != "trialing":
+            logger.info(f"Subscription {sub['id']} is not active or trialing")
             continue
 
         customer = customer_dict.get(sub["customer"])
