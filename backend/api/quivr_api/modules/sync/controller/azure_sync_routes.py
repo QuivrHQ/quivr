@@ -3,7 +3,7 @@ import os
 import requests
 from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.responses import HTMLResponse
-from msal import PublicClientApplication
+from msal import ConfidentialClientApplication
 from quivr_api.logger import get_logger
 from quivr_api.middlewares.auth import AuthBearer, get_current_user
 from quivr_api.modules.sync.dto.inputs import SyncsUserInput, SyncUserUpdateInput
@@ -24,6 +24,7 @@ azure_sync_router = APIRouter()
 
 # Constants
 CLIENT_ID = os.getenv("SHAREPOINT_CLIENT_ID")
+CLIENT_SECRET = os.getenv("SHAREPOINT_CLIENT_SECRET")
 AUTHORITY = "https://login.microsoftonline.com/common"
 BACKEND_URL = os.getenv("BACKEND_URL", "http://localhost:5050")
 REDIRECT_URI = f"{BACKEND_URL}/sync/azure/oauth2callback"
@@ -52,11 +53,13 @@ def authorize_azure(
     Returns:
         dict: A dictionary containing the authorization URL.
     """
-    client = PublicClientApplication(CLIENT_ID, authority=AUTHORITY)
+    client = ConfidentialClientApplication(
+        CLIENT_ID, client_credential=CLIENT_SECRET, authority=AUTHORITY
+    )
     logger.debug(f"Authorizing Azure sync for user: {current_user.id}")
     state = f"user_id={current_user.id}, name={name}"
-    authorization_url = client.get_authorization_request_url(
-        scopes=SCOPE, redirect_uri=REDIRECT_URI, state=state
+    flow = client.initiate_auth_code_flow(
+        scopes=SCOPE, redirect_uri=REDIRECT_URI, state=state, prompt="select_account"
     )
 
     sync_user_input = SyncsUserInput(
@@ -65,9 +68,10 @@ def authorize_azure(
         provider="Azure",
         credentials={},
         state={"state": state},
+        additional_data={"flow": flow},
     )
     sync_user_service.create_sync_user(sync_user_input)
-    return {"authorization_url": authorization_url}
+    return {"authorization_url": flow["auth_uri"]}
 
 
 @azure_sync_router.get("/sync/azure/oauth2callback", tags=["Sync"])
@@ -81,7 +85,9 @@ def oauth2callback_azure(request: Request):
     Returns:
         dict: A dictionary containing a success message.
     """
-    client = PublicClientApplication(CLIENT_ID, authority=AUTHORITY)
+    client = ConfidentialClientApplication(
+        CLIENT_ID, client_credential=CLIENT_SECRET, authority=AUTHORITY
+    )
     state = request.query_params.get("state")
     state_split = state.split(",")
     current_user = state_split[0].split("=")[1]  # Extract user_id from state
@@ -100,8 +106,8 @@ def oauth2callback_azure(request: Request):
         logger.error("Invalid user")
         raise HTTPException(status_code=400, detail="Invalid user")
 
-    result = client.acquire_token_by_authorization_code(
-        request.query_params.get("code"), scopes=SCOPE, redirect_uri=REDIRECT_URI
+    result = client.acquire_token_by_auth_code_flow(
+        sync_user_state["additional_data"]["flow"], dict(request.query_params)
     )
     if "access_token" not in result:
         logger.error(f"Failed to acquire token: {result}")

@@ -20,6 +20,7 @@ class SyncsUserInput(BaseModel):
     provider: str
     credentials: dict
     state: dict
+    additional_data: dict = {}
 
 
 class SyncUserUpdateInput(BaseModel):

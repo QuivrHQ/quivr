@@ -269,6 +269,7 @@ class AzureDriveSync(BaseSync):
     lower_name = "azure"
     datetime_format: str = "%Y-%m-%dT%H:%M:%SZ"
     CLIENT_ID = os.getenv("SHAREPOINT_CLIENT_ID")
+    CLIENT_SECRET = os.getenv("SHAREPOINT_CLIENT_SECRET")
     AUTHORITY = "https://login.microsoftonline.com/common"
     BACKEND_URL = os.getenv("BACKEND_URL", "http://localhost:5050")
     REDIRECT_URI = f"{BACKEND_URL}/sync/azure/oauth2callback"
@@ -295,12 +296,18 @@ class AzureDriveSync(BaseSync):
         if "refresh_token" not in credentials:
             raise HTTPException(status_code=401, detail="No refresh token available")
 
-        client = msal.PublicClientApplication(self.CLIENT_ID, authority=self.AUTHORITY)
+        client = msal.ConfidentialClientApplication(
+            self.CLIENT_ID,
+            authority=self.AUTHORITY,
+            client_credential=self.CLIENT_SECRET,
+        )
         result = client.acquire_token_by_refresh_token(
             credentials["refresh_token"], scopes=self.SCOPE
         )
         if "access_token" not in result:
-            raise HTTPException(status_code=400, detail="Failed to refresh token")
+            raise HTTPException(
+                status_code=400, detail=f"Failed to refresh token: {result}"
+            )
 
         credentials.update(
             {
