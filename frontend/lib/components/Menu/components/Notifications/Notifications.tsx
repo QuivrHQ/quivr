@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 
-import Icon from "@/lib/components/ui/Icon/Icon";
-import TextButton from "@/lib/components/ui/TextButton/TextButton";
+import { Icon } from "@/lib/components/ui/Icon/Icon";
+import { TextButton } from "@/lib/components/ui/TextButton/TextButton";
 import { useNotificationsContext } from "@/lib/context/NotificationsProvider/hooks/useNotificationsContext";
 import { useSupabase } from "@/lib/context/SupabaseProvider";
 import { useDevice } from "@/lib/hooks/useDevice";

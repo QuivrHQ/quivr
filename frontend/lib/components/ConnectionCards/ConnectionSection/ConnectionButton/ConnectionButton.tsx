@@ -1,5 +1,5 @@
 import { ConnectionIcon } from "@/lib/components/ui/ConnectionIcon/ConnectionIcon";
-import QuivrButton from "@/lib/components/ui/QuivrButton/QuivrButton";
+import { QuivrButton } from "@/lib/components/ui/QuivrButton/QuivrButton";
 
 import styles from "./ConnectionButton.module.scss";
 

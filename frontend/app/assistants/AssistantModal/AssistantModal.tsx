@@ -6,7 +6,7 @@ import { Stepper } from "@/lib/components/AddBrainModal/components/Stepper/Stepp
 import { StepValue } from "@/lib/components/AddBrainModal/types/types";
 import { MessageInfoBox } from "@/lib/components/ui/MessageInfoBox/MessageInfoBox";
 import { Modal } from "@/lib/components/ui/Modal/Modal";
-import QuivrButton from "@/lib/components/ui/QuivrButton/QuivrButton";
+import { QuivrButton } from "@/lib/components/ui/QuivrButton/QuivrButton";
 import { Step } from "@/lib/types/Modal";
 
 import styles from "./AssistantModal.module.scss";

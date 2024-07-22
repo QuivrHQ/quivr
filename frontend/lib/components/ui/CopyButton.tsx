@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-import Icon from "@/lib/components/ui/Icon/Icon";
+import { Icon } from "@/lib/components/ui/Icon/Icon";
 import { IconSize } from "@/lib/types/Icons";
 
 type CopyButtonProps = {
