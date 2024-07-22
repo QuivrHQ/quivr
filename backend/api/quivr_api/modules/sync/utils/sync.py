@@ -3,7 +3,7 @@ import os
 import time
 from abc import ABC, abstractmethod
 from io import BytesIO
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Union
 
 import dropbox
 import msal
@@ -40,7 +40,9 @@ class BaseSync(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def download_file(self, credentials: Dict, file: SyncFile) -> BytesIO:
+    def download_file(
+        self, credentials: Dict, file: SyncFile
+    ) -> Dict[str, Union[str, BytesIO]]:
         raise NotImplementedError
 
 
@@ -58,7 +60,9 @@ class GoogleDriveSync(BaseSync):
             logger.info("Google Drive credentials refreshed")
         return json.loads(self.creds.to_json())
 
-    def download_file(self, credentials: Dict, file: SyncFile) -> BytesIO:
+    def download_file(
+        self, credentials: Dict, file: SyncFile
+    ) -> Dict[str, Union[str, BytesIO]]:
         file_id = file.id
         file_name = file.name
         mime_type = file.mime_type
@@ -120,7 +124,7 @@ class GoogleDriveSync(BaseSync):
             raise Exception("Unsupported file type")
 
         file_data = request.execute()
-        return BytesIO(file_data)
+        return {"file_name": file_name, "content": BytesIO(file_data)}
 
     def get_files_by_id(self, credentials: Dict, file_ids: List[str]) -> List[SyncFile]:
         """
@@ -427,7 +431,9 @@ class AzureDriveSync(BaseSync):
         logger.info("Azure Drive files retrieved successfully: %s", len(files))
         return files
 
-    def download_file(self, credentials: Dict, file: SyncFile) -> BytesIO:
+    def download_file(
+        self, credentials: Dict, file: SyncFile
+    ) -> Dict[str, Union[str, BytesIO]]:
         file_id = file.id
         file_name = file.name
         modified_time = file.last_modified
@@ -440,7 +446,7 @@ class AzureDriveSync(BaseSync):
         download_response = requests.get(
             download_endpoint, headers=headers, stream=True
         )
-        return BytesIO(download_response.content)
+        return {"file_name": file_name, "content": BytesIO(download_response.content)}
 
 
 class DropboxSync(BaseSync):
@@ -613,10 +619,13 @@ class DropboxSync(BaseSync):
             logger.error("Unexpected error: %s", e)
             raise Exception("Failed to retrieve files")
 
-    def download_file(self, credentials: Dict, file: SyncFile) -> BytesIO:
+    def download_file(
+        self, credentials: Dict, file: SyncFile
+    ) -> Dict[str, Union[str, BytesIO]]:
         file_id = str(file.id)
+        file_name = file.name
         if not self.dbx:
             self.dbx = self.link_dropbox(credentials)
 
         metadata, file_data = self.dbx.files_download(file_id)  # type: ignore
-        return BytesIO(file_data.content)
+        return {"file_name": file_name, "content": BytesIO(file_data.content)}
