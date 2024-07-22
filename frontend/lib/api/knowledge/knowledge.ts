@@ -18,6 +18,8 @@ interface BEKnowledge {
   url: string | null;
   extension: string;
   status: string;
+  integration: string;
+  integration_link: string;
 }
 
 export const getAllKnowledge = async (
@@ -36,6 +38,8 @@ export const getAllKnowledge = async (
         fileName: knowledge.file_name,
         extension: knowledge.extension,
         status: knowledge.status,
+        integration: knowledge.integration,
+        integration_link: knowledge.integration_link,
       } as UploadedKnowledge;
     } else if (knowledge.url !== null) {
       return {
@@ -44,6 +48,8 @@ export const getAllKnowledge = async (
         url: knowledge.url,
         extension: "URL",
         status: knowledge.status,
+        integration: knowledge.integration,
+        integration_link: knowledge.integration_link,
       } as CrawledKnowledge;
     } else {
       throw new Error(`Invalid knowledge ${knowledge.id}`);
