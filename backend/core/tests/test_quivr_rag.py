@@ -1,7 +1,6 @@
 from uuid import uuid4
 
 import pytest
-
 from quivr_core.chat import ChatHistory
 from quivr_core.config import LLMEndpointConfig, RAGConfig
 from quivr_core.llm import LLMEndpoint
@@ -63,7 +62,6 @@ async def test_quivrqarag(
     # TODO(@aminediro) : test responses with sources
     assert last_response.metadata.sources == []
     assert last_response.metadata.citations == []
-    assert last_response.metadata.thoughts and len(last_response.metadata.thoughts) > 0
 
     # Assert whole response makes sense
     assert "".join([r.answer for r in stream_responses]) == full_response

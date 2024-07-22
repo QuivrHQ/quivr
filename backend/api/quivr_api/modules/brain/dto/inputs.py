@@ -3,26 +3,10 @@ from uuid import UUID
 
 from pydantic import BaseModel
 from quivr_api.logger import get_logger
-from quivr_api.modules.brain.entity.api_brain_definition_entity import (
-    ApiBrainAllowedMethods,
-    ApiBrainDefinitionEntity,
-    ApiBrainDefinitionSchema,
-    ApiBrainDefinitionSecret,
-)
 from quivr_api.modules.brain.entity.brain_entity import BrainType
 from quivr_api.modules.brain.entity.integration_brain import IntegrationType
 
 logger = get_logger(__name__)
-
-
-class CreateApiBrainDefinition(BaseModel, extra="ignore"):
-    method: ApiBrainAllowedMethods
-    url: str
-    params: Optional[ApiBrainDefinitionSchema] = ApiBrainDefinitionSchema()
-    search_params: ApiBrainDefinitionSchema = ApiBrainDefinitionSchema()
-    secrets: Optional[list[ApiBrainDefinitionSecret]] = []
-    raw: Optional[bool] = False
-    jq_instructions: Optional[str] = None
 
 
 class CreateIntegrationBrain(BaseModel, extra="ignore"):
@@ -52,9 +36,6 @@ class CreateBrainProperties(BaseModel, extra="ignore"):
     max_tokens: Optional[int] = 2000
     prompt_id: Optional[UUID] = None
     brain_type: Optional[BrainType] = BrainType.doc
-    brain_definition: Optional[CreateApiBrainDefinition] = None
-    brain_secrets_values: Optional[dict] = {}
-    connected_brains_ids: Optional[list[UUID]] = []
     integration: Optional[BrainIntegrationSettings] = None
 
     def dict(self, *args, **kwargs):
@@ -72,8 +53,6 @@ class BrainUpdatableProperties(BaseModel, extra="ignore"):
     max_tokens: Optional[int] = None
     status: Optional[str] = None
     prompt_id: Optional[UUID] = None
-    brain_definition: Optional[ApiBrainDefinitionEntity] = None
-    connected_brains_ids: Optional[list[UUID]] = []
     integration: Optional[BrainIntegrationUpdateSettings] = None
 
     def dict(self, *args, **kwargs):

@@ -4,7 +4,6 @@ from typing import Any, List, Tuple, no_type_check
 from langchain_core.messages import AIMessage, BaseMessage, HumanMessage, SystemMessage
 from langchain_core.messages.ai import AIMessageChunk
 from langchain_core.prompts import format_document
-
 from quivr_core.models import (
     ParsedRAGResponse,
     QuivrKnowledge,
@@ -71,10 +70,6 @@ def get_chunk_metadata(
                 followup_questions = gathered_args["followup_questions"]
                 metadata["followup_questions"] = followup_questions
 
-            if "thoughts" in gathered_args:
-                thoughts = gathered_args["thoughts"]
-                metadata["thoughts"] = thoughts
-
     return RAGResponseMetadata(**metadata)
 
 
@@ -127,12 +122,8 @@ def parse_response(raw_response: RawRAGResponse, model_name: str) -> ParsedRAGRe
             followup_questions = raw_response["answer"].tool_calls[-1]["args"][
                 "followup_questions"
             ]
-            thoughts = raw_response["answer"].tool_calls[-1]["args"]["thoughts"]
             if followup_questions:
                 metadata["followup_questions"] = followup_questions
-            if thoughts:
-                metadata["thoughts"] = thoughts
-            answer = raw_response["answer"].tool_calls[-1]["args"]["answer"]
 
     parsed_response = ParsedRAGResponse(
         answer=answer, metadata=RAGResponseMetadata(**metadata)

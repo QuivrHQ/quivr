@@ -142,7 +142,6 @@ def generate_replies(
     contexts = []
     test_questions = test_data.question.tolist()
     test_groundtruths = test_data.ground_truth.tolist()
-    thoughts = []
 
     for question in test_questions:
         response = brain_chain.invoke({"question": question, "chat_history": []})
@@ -151,14 +150,12 @@ def generate_replies(
         ]["arguments"]
         cited_answer_obj = json.loads(cited_answer_data)
         answers.append(cited_answer_obj["answer"])
-        thoughts.append(cited_answer_obj["thoughts"])
         contexts.append([context.page_content for context in response["docs"]])
 
     return Dataset.from_dict(
         {
             "question": test_questions,
             "answer": answers,
-            "thoughs": thoughts,
             "contexts": contexts,
             "ground_truth": test_groundtruths,
         }

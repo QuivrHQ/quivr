@@ -11,8 +11,7 @@ from langchain_community.document_loaders import PlaywrightURLLoader
 from langchain_core.tools import BaseTool
 from pydantic import BaseModel
 from quivr_api.logger import get_logger
-from quivr_api.models.settings import BrainSettings
-from quivr_api.modules.contact_support.controller.settings import ContactsSettings
+from quivr_api.models.settings import BrainSettings, SendEmailSettings
 from quivr_api.packages.emails.send_email import send_email
 
 logger = get_logger(__name__)
@@ -32,7 +31,7 @@ class EmailSenderTool(BaseTool):
     description = "useful for when you need to send an email."
     args_schema: Type[BaseModel] = EmailInput
     brain_settings: BrainSettings = BrainSettings()
-    contact_settings: ContactsSettings = ContactsSettings()
+    contact_settings: SendEmailSettings = SendEmailSettings()
 
     def _run(
         self, text: str, run_manager: Optional[CallbackManagerForToolRun] = None
