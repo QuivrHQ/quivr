@@ -108,9 +108,7 @@ MarkdownProcessor = _build_processor(
 EpubProcessor = _build_processor(
     "EpubProcessor", UnstructuredEPubLoader, [FileExtension.epub]
 )
-BibTexProcessor = _build_processor(
-    "BibTexProcessor", BibtexLoader, [FileExtension.epub]
-)
+BibTexProcessor = _build_processor("BibTexProcessor", BibtexLoader, [FileExtension.bib])
 ODTProcessor = _build_processor(
     "ODTProcessor", UnstructuredPDFLoader, [FileExtension.odt]
 )

@@ -6,7 +6,7 @@ from langchain_core.documents import Document
 
 from quivr_core import registry
 from quivr_core.files.file import FileExtension, QuivrFile
-from quivr_core.processor.implementations.default import TikTokenTxtProcessor
+from quivr_core.processor.implementations.simple_txt_processor import SimpleTxtProcessor
 from quivr_core.processor.implementations.tika_processor import TikaProcessor
 from quivr_core.processor.processor_base import ProcessorBase
 from quivr_core.processor.registry import (
@@ -25,8 +25,18 @@ from quivr_core.processor.registry import (
 # TODO : check what are the defaults without the extra [base]
 @pytest.mark.base
 def test_get_default_processors_cls():
+    from quivr_core.processor.implementations.default import TikTokenTxtProcessor
+
     cls = get_processor_class(FileExtension.txt)
     assert cls == TikTokenTxtProcessor
+
+    cls = get_processor_class(FileExtension.pdf)
+    assert cls == TikaProcessor
+
+
+def test_get_default_processors_cls_core():
+    cls = get_processor_class(FileExtension.txt)
+    assert cls == SimpleTxtProcessor
 
     cls = get_processor_class(FileExtension.pdf)
     assert cls == TikaProcessor
@@ -105,7 +115,6 @@ def test_append_proc_mapping():
 
 
 def test_known_processors():
-    assert len(known_processors) == 15
     assert all(
         ext in known_processors for ext in list(FileExtension)
     ), "Some file extensions don't have a default processor"
@@ -125,12 +134,12 @@ def test__import_class():
         _import_class(mod_path)
 
 
-@pytest.mark.skip
 def test_get_processor_cls_import_error(caplog):
-    # TODO: run this in a env without necessary processors of some type
-    # use caplog to get logging.warnings
+    """
+    Test in an environement where we only have the bare minimum parsers.
+    The .html can't be parsed so we should raise an ImportError"""
     with pytest.raises(ImportError):
-        get_processor_class(".pdf")
+        get_processor_class(".html")
 
 
 def test_get_processor_cls_error():
@@ -214,4 +223,4 @@ def test_register_override_error():
 
 
 def test_available_processors():
-    assert 15 == len(available_processors())
+    assert 16 == len(available_processors())

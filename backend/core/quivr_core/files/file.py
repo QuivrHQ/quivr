@@ -22,6 +22,7 @@ class FileExtension(str, Enum):
     md = ".md"
     mdx = ".mdx"
     markdown = ".markdown"
+    bib = ".bib"
     epub = ".epub"
     html = ".html"
     odt = ".odt"
