@@ -16,14 +16,12 @@ from quivr_api.modules.brain.service.brain_vector_service import BrainVectorServ
 from quivr_api.modules.notification.service.notification_service import (
     NotificationService,
 )
-from quivr_api.modules.onboarding.service.onboarding_service import OnboardingService
 from quivr_api.packages.files.crawl.crawler import CrawlWebsite, slugify
 from quivr_api.packages.files.processors import filter_file
 from quivr_api.packages.utils.telemetry import maybe_send_telemetry
 
 logger = get_logger(__name__)
 
-onboardingService = OnboardingService()
 notification_service = NotificationService()
 brain_service = BrainService()
 auth_bearer = AuthBearer()
@@ -118,11 +116,6 @@ def process_crawl_and_notify(
             brain_id=brain_id,
             original_file_name=crawl_website_url,
         )
-
-
-@celery.task
-def remove_onboarding_more_than_x_days_task():
-    onboardingService.remove_onboarding_more_than_x_days(7)
 
 
 @celery.task(name="NotionConnectorLoad")
@@ -278,10 +271,6 @@ def check_if_is_premium_user():
 
 
 celery.conf.beat_schedule = {
-    "remove_onboarding_more_than_x_days_task": {
-        "task": f"{__name__}.remove_onboarding_more_than_x_days_task",
-        "schedule": crontab(minute="0", hour="0"),
-    },
     "ping_telemetry": {
         "task": f"{__name__}.ping_telemetry",
         "schedule": crontab(minute="*/30", hour="*"),
