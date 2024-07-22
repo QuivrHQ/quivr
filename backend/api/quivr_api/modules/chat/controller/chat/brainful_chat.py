@@ -8,9 +8,6 @@ from quivr_api.modules.brain.integrations.Proxy.Brain import ProxyBrain
 from quivr_api.modules.brain.integrations.Self.Brain import SelfBrain
 from quivr_api.modules.brain.integrations.SQL.Brain import SQLBrain
 from quivr_api.modules.brain.knowledge_brain_qa import KnowledgeBrainQA
-from quivr_api.modules.brain.service.api_brain_definition_service import (
-    ApiBrainDefinitionService,
-)
 from quivr_api.modules.brain.service.brain_authorization_service import (
     validate_brain_authorization,
 )
@@ -23,7 +20,6 @@ from quivr_api.modules.chat.service.chat_service import ChatService
 from quivr_api.modules.dependencies import get_service
 
 chat_service = get_service(ChatService)()
-api_brain_definition_service = ApiBrainDefinitionService()
 integration_brain_description_service = IntegrationBrainDescriptionService()
 
 logger = get_logger(__name__)
