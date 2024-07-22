@@ -1,6 +1,6 @@
 export type Provider = "Google" | "Azure" | "DropBox";
 
-export type Integration = "Google Drive" | "Azure" | "Dropbox";
+export type Integration = "Google Drive" | "Share Point" | "Dropbox";
 
 export interface SyncElement {
   name?: string;

@@ -32,7 +32,7 @@ export const useSync = () => {
   const integrationIconUrls: Record<Integration, string> = {
     "Google Drive":
       "https://quivr-cms.s3.eu-west-3.amazonaws.com/gdrive_8316d080fd.png",
-    Azure:
+    "Share Point":
       "https://quivr-cms.s3.eu-west-3.amazonaws.com/sharepoint_8c41cfdb09.png",
     Dropbox:
       "https://quivr-cms.s3.eu-west-3.amazonaws.com/dropbox_dce4f3d753.png",
