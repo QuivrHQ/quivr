@@ -44,15 +44,7 @@ class SyncUser(SyncUserInterface):
         logger.info("Creating sync user with input: %s", sync_user_input)
         response = (
             self.db.from_("syncs_user")
-            .insert(
-                {
-                    "user_id": sync_user_input.user_id,
-                    "provider": sync_user_input.provider,
-                    "credentials": sync_user_input.credentials,
-                    "state": sync_user_input.state,
-                    "name": sync_user_input.name,
-                }
-            )
+            .insert(sync_user_input.model_dump(exclude_none=True, exclude_unset=True))
             .execute()
         )
         if response.data:

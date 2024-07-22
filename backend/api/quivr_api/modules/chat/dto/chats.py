@@ -34,6 +34,8 @@ class Sources(BaseModel):
     type: str
     original_file_name: str
     citation: str
+    integration: Optional[str] = None
+    integration_link: Optional[str] = None
 
 
 class ChatItemType(Enum):

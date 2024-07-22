@@ -87,6 +87,8 @@ def generate_source(
                     source_url=source_url,
                     original_file_name=name,
                     citation=doc.page_content,
+                    integration=doc.metadata["integration"],
+                    integration_link=doc.metadata["integration_link"],
                 )
             )
     else:

@@ -69,6 +69,7 @@ def authorize_dropbox(
         provider="DropBox",
         credentials={},
         state={"state": state},
+        additional_data={},
     )
     sync_user_service.create_sync_user(sync_user_input)
     return {"authorization_url": authorize_url}
