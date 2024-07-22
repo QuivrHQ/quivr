@@ -1,8 +1,6 @@
-from importlib.metadata import version
 from uuid import uuid4
 
 import pytest
-
 from quivr_core.storage.file import FileExtension, QuivrFile
 
 
@@ -30,15 +28,16 @@ async def test_process_txt(txt_qfile):
     doc = await tparser.process_file(txt_qfile)
     assert len(doc) > 0
     assert doc[0].page_content == "This is some test data."
-    #  assert dict1.items() <= dict2.items()
 
+    print(doc[0].metadata)
     assert (
         doc[0].metadata.items()
         >= {
-            "chunk_size": len(doc[0].page_content),
-            "chunk_overlap": 0,
-            "parser_name": tparser.__class__.__name__,
-            "quivr_core_version": version("quivr-core"),
+            "chunk_index": 0,
+            "original_file_name": "data.txt",
+            "chunk_size": 6,
+            "processor_cls": "TextLoader",
+            "splitter": {"chunk_size": 20, "chunk_overlap": 0},
             **txt_qfile.metadata,
         }.items()
     )

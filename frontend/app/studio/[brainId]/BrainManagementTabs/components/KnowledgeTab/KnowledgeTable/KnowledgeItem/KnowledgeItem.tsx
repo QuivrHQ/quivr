@@ -112,7 +112,11 @@ const KnowledgeItem = ({
         <div className={styles.icon}>
           {isUploadedKnowledge(knowledge) ? (
             <Icon
-              name={knowledge.extension.slice(1) as keyof typeof iconList}
+              name={
+                knowledge.extension
+                  ? (knowledge.extension.slice(1) as keyof typeof iconList)
+                  : "file"
+              }
               size="small"
               color="black"
             />
@@ -148,6 +152,7 @@ const KnowledgeItem = ({
           onClick={(event: React.MouseEvent<HTMLElement>) => {
             event.stopPropagation();
             event.preventDefault();
+
             setOptionsOpened(!optionsOpened);
           }}
         >
