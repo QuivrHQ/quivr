@@ -1,4 +1,5 @@
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
+import { useNotificationsContext } from "@/lib/context/NotificationsProvider/hooks/useNotificationsContext";
 
 import styles from "./CurrentBrain.module.scss";
 
@@ -17,6 +18,7 @@ export const CurrentBrain = ({
   const removeCurrentBrain = (): void => {
     setCurrentBrainId(null);
   };
+  const { bulkNotifications } = useNotificationsContext();
 
   if (remainingCredits === 0) {
     return (
@@ -46,6 +48,16 @@ export const CurrentBrain = ({
           <div className={styles.brain_name_wrapper}>
             <Icon name="brain" size="small" color="black" />
             <span className={styles.brain_name}>{currentBrain.name}</span>
+            {bulkNotifications.some(
+              (bulkNotif) =>
+                bulkNotif.brain_id === currentBrain.id &&
+                bulkNotif.notifications.some((notif) => notif.status === "info")
+            ) && (
+              <div className={styles.warning}>
+                <Icon name="warning" color="warning" size="small"></Icon>
+                <span>Processing knowledges</span>
+              </div>
+            )}
           </div>
         </div>
         {allowingRemoveBrain && (
