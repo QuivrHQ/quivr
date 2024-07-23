@@ -24,9 +24,6 @@ from quivr_core.files.file import FileExtension, QuivrFile
 from quivr_core.processor.processor_base import ProcessorBase
 from quivr_core.processor.splitter import SplitterConfig
 
-enc = tiktoken.get_encoding("cl100k_base")
-
-
 P = TypeVar("P", bound=BaseLoader)
 
 
@@ -41,6 +38,8 @@ class ProcessorInit(ProcessorBase):
 def _build_processor(
     cls_name: str, load_cls: Type[P], cls_extensions: List[FileExtension | str]
 ) -> Type[ProcessorInit]:
+    enc = tiktoken.get_encoding("cl100k_base")
+
     class _Processor(ProcessorBase):
         supported_extensions = cls_extensions
 
