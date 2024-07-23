@@ -58,8 +58,6 @@ class SyncUtils(BaseModel):
         Returns:
             dict: A dictionary containing the status of the download or an error message.
         """
-        logger.debug("HOW MANY FILES ARE WE DL ? %s", len(files))
-
         credentials = self.sync_cloud.check_and_refresh_access_token(credentials)
 
         downloaded_files = []
@@ -86,10 +84,13 @@ class SyncUtils(BaseModel):
                 mime_type = file.mime_type
                 modified_time = file.last_modified
 
-                file_data = self.sync_cloud.download_file(credentials, file)
+                if self.sync_cloud.lower_name == "notion":
+                    file_data = await self.sync_cloud.adownload_file(credentials, file)
+                else:
+                    file_data = self.sync_cloud.download_file(credentials, file)
                 # Check if the file already exists in the storage
                 if check_file_exists(brain_id, file_name):
-                    logger.debug("%s already exists in the storage", file_name)
+                    logger.info("%s already exists in the storage", file_name)
 
                     self.storage.remove_file(brain_id + "/" + file_name)
                     BrainsVectors().delete_file_from_brain(brain_id, file_name)
@@ -285,26 +286,43 @@ class SyncUtils(BaseModel):
         if len(folders) > 0:
             if self.sync_cloud.lower_name == "notion":
                 files.extend(
-                    self.sync_cloud.get_files_by_id(
+                    await self.sync_cloud.aget_files_by_id(
                         sync_user["credentials"],
                         folders,
                     )
                 )
 
             for folder in folders:
+                # FIXME: should just put everything asynchrounous
 
-                files.extend(
-                    self.sync_cloud.get_files(
-                        sync_user["credentials"],
-                        folder_id=folder,
-                        recursive=True,
+                if self.sync_cloud.lower_name == "notion":
+                    files.extend(
+                        await self.sync_cloud.aget_files(
+                            sync_user["credentials"],
+                            folder_id=folder,
+                            recursive=True,
+                        )
                     )
-                )
+                else:
+                    files.extend(
+                        self.sync_cloud.get_files(
+                            sync_user["credentials"],
+                            folder_id=folder,
+                            recursive=True,
+                        )
+                    )
+        # FIXME: should just put everything asynchrounous
         if len(files_to_download) > 0:
-            files_metadata = self.sync_cloud.get_files_by_id(
-                sync_user["credentials"],
-                files_to_download,
-            )
+            if self.sync_cloud.lower_name == "notion":
+                files_metadata = await self.sync_cloud.aget_files_by_id(
+                    sync_user["credentials"],
+                    files_to_download,
+                )
+            else:
+                files_metadata = self.sync_cloud.get_files_by_id(
+                    sync_user["credentials"],
+                    files_to_download,
+                )
         files = files + files_metadata  # type: ignore
 
         if "error" in files:
@@ -322,7 +340,7 @@ class SyncUtils(BaseModel):
             else None
         )
         logger.info("Files retrieved from %s: %s", self.sync_cloud.lower_name, files)
-        if not self.sync_cloud == "notion":
+        if self.sync_cloud == "notion":
             files_to_download = [
                 file
                 for file in files

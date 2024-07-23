@@ -298,7 +298,7 @@ async def get_files_folder_user_sync(
     logger.debug(
         f"Fetching files for user sync: {user_sync_id} for user: {current_user.id}"
     )
-    return sync_user_service.get_files_folder_user_sync(
+    return await sync_user_service.get_files_folder_user_sync(
         user_sync_id, str(current_user.id), folder_id
     )
 

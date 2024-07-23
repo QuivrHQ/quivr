@@ -165,7 +165,7 @@ class SyncUser(SyncUserInterface):
         ).eq("state", state_str).execute()
         logger.info("Sync user updated successfully")
 
-    def get_files_folder_user_sync(
+    async def get_files_folder_user_sync(
         self,
         sync_active_id: int,
         user_id: str,
@@ -201,7 +201,6 @@ class SyncUser(SyncUserInterface):
             return None
 
         sync_user = sync_user[0]
-        logger.info("Sync user found: %s", sync_user)
 
         provider = sync_user["provider"].lower()
         if provider == "google":
@@ -226,7 +225,7 @@ class SyncUser(SyncUserInterface):
             logger.info("Getting files for Notion sync")
             sync = NotionSync()
             return {
-                "files": sync.get_files(
+                "files": await sync.aget_files(
                     sync_user["credentials"], folder_id if folder_id else "", recursive
                 )
             }
