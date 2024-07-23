@@ -14,7 +14,6 @@ from quivr_api.modules.api_key.controller import api_key_router
 from quivr_api.modules.assistant.controller import assistant_router
 from quivr_api.modules.brain.controller import brain_router
 from quivr_api.modules.chat.controller import chat_router
-from quivr_api.modules.contact_support.controller import contact_router
 from quivr_api.modules.knowledge.controller import knowledge_router
 from quivr_api.modules.misc.controller import misc_router
 from quivr_api.modules.onboarding.controller import onboarding_router
@@ -86,7 +85,6 @@ app.include_router(api_key_router)
 app.include_router(subscription_router)
 app.include_router(prompt_router)
 app.include_router(knowledge_router)
-app.include_router(contact_router)
 
 PROFILING = os.getenv("PROFILING", "false").lower() == "true"
 

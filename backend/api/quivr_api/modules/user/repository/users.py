@@ -41,7 +41,6 @@ class Users(UsersInterface):
 
         user_identity = response.data[0]
 
-        print("USER_IDENTITY", user_identity)
         return UserIdentity(id=user_id)
 
     def get_user_identity(self, user_id):

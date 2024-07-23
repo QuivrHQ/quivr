@@ -29,7 +29,6 @@ async def list_assistants(
     summary = summary_inputs()
     # difference = difference_inputs()
     # crawler = crawler_inputs()
-    # audio_transcript = audio_transcript_inputs()
     return [summary]
 
 
