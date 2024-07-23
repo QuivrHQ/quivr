@@ -44,7 +44,7 @@ class SyncUserInterface(ABC):
         pass
 
     @abstractmethod
-    def get_files_folder_user_sync(
+    async def get_files_folder_user_sync(
         self,
         sync_active_id: int,
         user_id: str,

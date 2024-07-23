@@ -48,14 +48,14 @@ class SyncUserService:
     ):
         return self.repository.update_sync_user(sync_user_id, state, sync_user_input)
 
-    def get_files_folder_user_sync(
+    async def get_files_folder_user_sync(
         self,
         sync_active_id: int,
         user_id: str,
         folder_id: str = None,
         recursive: bool = False,
     ):
-        return self.repository.get_files_folder_user_sync(
+        return await self.repository.get_files_folder_user_sync(
             sync_active_id, user_id, folder_id, recursive
         )
 

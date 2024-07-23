@@ -9,6 +9,7 @@ from typing import Any, Dict, List, Optional, Union
 import dropbox
 import markdownify
 import msal
+import redis
 import requests
 from fastapi import HTTPException
 from google.auth.transport.requests import Request as GoogleRequest
@@ -21,6 +22,7 @@ from quivr_api.modules.sync.utils.normalize import remove_special_characters
 from requests import HTTPError
 
 logger = get_logger(__name__)
+redis_client = redis.Redis(host="redis", port=os.getenv("REDIS_PORT"), db=0)
 
 
 class BaseSync(ABC):
@@ -724,10 +726,16 @@ class NotionSync(BaseSync):
         if not self.notion:
             raise Exception("Notion client is not initialized")
 
+        t_0 = time.time()
         search_result = await self.notion.search(
             query="", filter={"property": "object", "value": "page"}
         )
         search_result = search_result["results"]
+        # store in redis
+        for page in search_result:
+            redis_client.set(page["id"], json.dumps(page))
+
+        print("Search result time: ", time.time() - t_0)
         print(len(search_result))
         for page in search_result:
             # print(page)
@@ -742,6 +750,8 @@ class NotionSync(BaseSync):
                     icon=page["icon"]["emoji"] if page["icon"] else None,
                 )
                 pages.append(page_info)
+        print("Time taken for fetching root pages: ", time.time() - t_0)
+        test_el = redis_client.get(search_result[0]["id"])
         return pages
 
     async def is_folder(self, page_id):
@@ -769,6 +779,7 @@ class NotionSync(BaseSync):
             return {"emoji": "📊"}
 
     async def fetch_icons_and_folder_statuses(self, blocks):
+        t_0 = time.time()
         icon_tasks = {
             block["id"]: asyncio.create_task(self.get_icon(block["id"]))
             for block in blocks
@@ -788,9 +799,12 @@ class NotionSync(BaseSync):
         for block_id, icon, is_folder in zip(icon_tasks.keys(), icons, folder_statuses):
             result[block_id] = {"icon": icon["emoji"], "is_folder": is_folder}
 
+        print("Time taken for fetching icons and folder statuses: ", time.time() - t_0)
+
         return result
 
     async def fetch_pages(self, page_id, recursive) -> List[SyncFile]:
+        t_0 = time.time()
         pages = []
         blocks = await self.notion.blocks.children.list(page_id)
         blocks = blocks["results"]  # type: ignore
@@ -819,7 +833,7 @@ class NotionSync(BaseSync):
                 if recursive:
                     sub_pages = await self.fetch_pages(block["id"], recursive)
                     pages.extend(sub_pages)
-
+        print("TOTAL Time taken for fetching pages: ", time.time() - t_0)
         return pages
 
     async def aget_files(
