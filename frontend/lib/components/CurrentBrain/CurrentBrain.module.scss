@@ -47,6 +47,15 @@
           @include textColor(text-3);
           @include Typography.EllipsisOverflow;
         }
+
+        .warning {
+          color: var(--warning);
+          display: flex;
+          align-items: center;
+          gap: Spacings.$spacing02;
+          margin-left: Spacings.$spacing02;
+          font-size: Typography.$tiny;
+        }
       }
     }
   }
