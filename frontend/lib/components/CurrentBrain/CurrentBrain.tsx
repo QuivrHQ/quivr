@@ -4,6 +4,7 @@ import { useNotificationsContext } from "@/lib/context/NotificationsProvider/hoo
 import styles from "./CurrentBrain.module.scss";
 
 import { Icon } from "../ui/Icon/Icon";
+import { LoaderIcon } from "../ui/LoaderIcon/LoaderIcon";
 
 interface CurrentBrainProps {
   allowingRemoveBrain: boolean;
@@ -54,7 +55,7 @@ export const CurrentBrain = ({
                 bulkNotif.notifications.some((notif) => notif.status === "info")
             ) && (
               <div className={styles.warning}>
-                <Icon name="warning" color="warning" size="small"></Icon>
+                <LoaderIcon size="small" color="warning" />
                 <span>Processing knowledges</span>
               </div>
             )}
