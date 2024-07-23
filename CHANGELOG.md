@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.0.288 (2024-07-23)
+
+## What's Changed
+* fix(sync): folder upload to Google Drive by @chloedia in https://github.com/QuivrHQ/quivr/pull/2909
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.287...v0.0.288
+
 ## 0.0.287 (2024-07-23)
 
 ## What's Changed
