@@ -1,5 +1,21 @@
 # Changelog
 
+## 0.0.286 (2024-07-23)
+
+## What's Changed
+* fix(frontend): remove warning in frontend by @Zewed in https://github.com/QuivrHQ/quivr/pull/2896
+* feat(frontend): add logo to source when integration by @Zewed in https://github.com/QuivrHQ/quivr/pull/2899
+* feat(premium): add trialing by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2900
+* feat: Remove unused onboarding code by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2901
+* feat(dead-code): removed composite & api by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2902
+* feat(frontend): add a loader when processing files by @Zewed in https://github.com/QuivrHQ/quivr/pull/2903
+* feat(frontend): icon chevron for folders by @Zewed in https://github.com/QuivrHQ/quivr/pull/2904
+* feat(frontend): loader icon for integrations by @Zewed in https://github.com/QuivrHQ/quivr/pull/2905
+* fix(frontend): remove current brain id when click on create brain by @Zewed in https://github.com/QuivrHQ/quivr/pull/2906
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.285...v0.0.286
+
 ## 0.0.285 (2024-07-22)
 
 ## What's Changed
