@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.0.287 (2024-07-23)
+
+## What's Changed
+* feat: Update AzureDriveSync name to "Share Point" by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2907
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.286...v0.0.287
+
 ## 0.0.286 (2024-07-23)
 
 ## What's Changed
