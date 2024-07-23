@@ -240,7 +240,7 @@ class GoogleDriveSync(BaseSync):
                     # If recursive is True and the item is a folder, get files from the folder
                     if (
                         recursive
-                        and item.mimeType == "application/vnd.google-apps.folder"
+                        and item["mimeType"] == "application/vnd.google-apps.folder"
                     ):
                         logger.warning(
                             "Calling Recursive for folder: %s",
