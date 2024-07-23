@@ -265,7 +265,7 @@ class GoogleDriveSync(BaseSync):
 
 
 class AzureDriveSync(BaseSync):
-    name = "Azure Drive"
+    name = "Share Point"
     lower_name = "azure"
     datetime_format: str = "%Y-%m-%dT%H:%M:%SZ"
     CLIENT_ID = os.getenv("SHAREPOINT_CLIENT_ID")
