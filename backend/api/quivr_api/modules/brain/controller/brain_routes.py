@@ -1,4 +1,3 @@
-from typing import Dict
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Request
@@ -9,7 +8,7 @@ from quivr_api.modules.brain.dto.inputs import (
     BrainUpdatableProperties,
     CreateBrainProperties,
 )
-from quivr_api.modules.brain.entity.brain_entity import PublicBrain, RoleEnum
+from quivr_api.modules.brain.entity.brain_entity import RoleEnum
 from quivr_api.modules.brain.entity.integration_brain import (
     IntegrationDescriptionEntity,
 )
@@ -44,7 +43,8 @@ integration_brain_description_service = IntegrationBrainDescriptionService()
 )
 async def get_integration_brain_description() -> list[IntegrationDescriptionEntity]:
     """Retrieve the integration brain description."""
-    return integration_brain_description_service.get_all_integration_descriptions()
+    # TODO: Deprecated, remove this endpoint
+    return []
 
 
 @brain_router.get("/brains/", dependencies=[Depends(AuthBearer())], tags=["Brain"])
@@ -54,14 +54,6 @@ async def retrieve_all_brains_for_user(
     """Retrieve all brains for the current user."""
     brains = brain_user_service.get_user_brains(current_user.id)
     return {"brains": brains}
-
-
-@brain_router.get(
-    "/brains/public", dependencies=[Depends(AuthBearer())], tags=["Brain"]
-)
-async def retrieve_public_brains() -> list[PublicBrain]:
-    """Retrieve all Quivr public brains."""
-    return brain_service.get_public_brains()
 
 
 @brain_router.get(
@@ -154,67 +146,6 @@ async def update_existing_brain(
         brain_service.update_brain_by_id(brain_id, brain_update_data)
 
         return {"message": f"Brain {brain_id} has been updated."}
-
-
-@brain_router.put(
-    "/brains/{brain_id}/secrets-values",
-    dependencies=[
-        Depends(AuthBearer()),
-    ],
-    tags=["Brain"],
-)
-async def update_existing_brain_secrets(
-    brain_id: UUID,
-    secrets: Dict[str, str],
-    current_user: UserIdentity = Depends(get_current_user),
-):
-    """Update an existing brain's secrets."""
-
-    existing_brain = brain_service.get_brain_details(brain_id, None)
-
-    if existing_brain is None:
-        raise HTTPException(status_code=404, detail="Brain not found")
-
-    if (
-        existing_brain.brain_definition is None
-        or existing_brain.brain_definition.secrets is None
-    ):
-        raise HTTPException(
-            status_code=400,
-            detail="This brain does not support secrets.",
-        )
-
-    is_brain_user = (
-        brain_user_service.get_brain_for_user(
-            user_id=current_user.id,
-            brain_id=brain_id,
-        )
-        is not None
-    )
-
-    if not is_brain_user:
-        raise HTTPException(
-            status_code=403,
-            detail="You are not authorized to update this brain.",
-        )
-
-    secrets_names = [secret.name for secret in existing_brain.brain_definition.secrets]
-
-    for key, value in secrets.items():
-        if key not in secrets_names:
-            raise HTTPException(
-                status_code=400,
-                detail=f"Secret {key} is not a valid secret.",
-            )
-        if value:
-            brain_service.update_secret_value(
-                user_id=current_user.id,
-                brain_id=brain_id,
-                secret_name=key,
-                secret_value=value,
-            )
-
-    return {"message": f"Brain {brain_id} has been updated."}
 
 
 @brain_router.post(

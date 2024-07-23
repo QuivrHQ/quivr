@@ -1,6 +1,6 @@
 import { Fragment } from "react";
 
-import Icon from "@/lib/components/ui/Icon/Icon";
+import { Icon } from "@/lib/components/ui/Icon/Icon";
 
 import styles from "./QuestionBrain.module.scss";
 

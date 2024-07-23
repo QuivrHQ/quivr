@@ -85,12 +85,21 @@ class SyncUtils(BaseModel):
                 modified_time = file.last_modified
 
                 if self.sync_cloud.lower_name == "notion":
-                    file_data = await self.sync_cloud.adownload_file(credentials, file)
+                    file_response = await self.sync_cloud.adownload_file(
+                        credentials, file
+                    )
                 else:
-                    file_data = self.sync_cloud.download_file(credentials, file)
-                # Check if the file already exists in the storage
+                    file_response = self.sync_cloud.download_file(
+                        credentials, file
+                    )  # Check if the file already exists in the storage
                 if check_file_exists(brain_id, file_name):
                     logger.info("%s already exists in the storage", file_name)
+
+                file_name = file_response["file_name"]
+                file_data = file_response["content"]
+                # Check if the file already exists in the storage
+                if check_file_exists(brain_id, file_name):
+                    logger.debug("%s already exists in the storage", file_name)
 
                     self.storage.remove_file(brain_id + "/" + file_name)
                     BrainsVectors().delete_file_from_brain(brain_id, file_name)

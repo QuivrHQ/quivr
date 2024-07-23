@@ -1,7 +1,7 @@
 import { useState } from "react";
 
 import { Checkbox } from "@/lib/components/ui/Checkbox/Checkbox";
-import Icon from "@/lib/components/ui/Icon/Icon";
+import { Icon } from "@/lib/components/ui/Icon/Icon";
 import Tooltip from "@/lib/components/ui/Tooltip/Tooltip";
 
 import styles from "./SyncElementLine.module.scss";

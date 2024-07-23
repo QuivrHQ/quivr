@@ -43,6 +43,7 @@ export const OptionsModal = ({ options }: OptionsModalProps): JSX.Element => {
           key={index}
           onClick={(event) => {
             event.preventDefault();
+            event.stopPropagation();
             option.onClick();
           }}
           onMouseEnter={() => handleMouseEnter(index)}

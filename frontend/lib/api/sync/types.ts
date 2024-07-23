@@ -1,5 +1,7 @@
 export type Provider = "Google" | "Azure" | "DropBox | Notion";
 
+export type Integration = "Google Drive" | "Share Point" | "Dropbox";
+
 export interface SyncElement {
   name?: string;
   id: string;

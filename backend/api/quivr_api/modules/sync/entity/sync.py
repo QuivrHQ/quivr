@@ -9,6 +9,9 @@ class SyncsUser(BaseModel):
     user_id: str
     name: str
     provider: str
+    credentials: dict 
+    state: dict
+    additional_data: dict
 
 
 class SyncFile(BaseModel):

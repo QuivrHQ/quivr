@@ -33,11 +33,6 @@ notification_service = NotificationService()
 knowledge_service = KnowledgeService()
 
 
-@upload_router.get("/upload/healthz", tags=["Health"])
-async def healthz():
-    return {"status": "ok"}
-
-
 @upload_router.post("/upload", dependencies=[Depends(AuthBearer())], tags=["Upload"])
 async def upload_file(
     uploadFile: UploadFile,

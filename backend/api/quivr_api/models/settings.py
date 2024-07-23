@@ -20,6 +20,12 @@ class BrainRateLimiting(BaseSettings):
     max_brain_per_user: int = 5
 
 
+class SendEmailSettings(BaseSettings):
+    model_config = SettingsConfigDict(validate_default=False)
+    resend_contact_sales_from: str = "null"
+    resend_contact_sales_to: str = "null"
+
+
 # The `PostHogSettings` class is used to initialize and interact with the PostHog analytics service.
 class PostHogSettings(BaseSettings):
     model_config = SettingsConfigDict(validate_default=False)

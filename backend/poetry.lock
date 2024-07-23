@@ -3392,13 +3392,13 @@ wrapt = "*"
 
 [[package]]
 name = "llama-index-embeddings-openai"
-version = "0.1.10"
+version = "0.1.11"
 description = "llama-index embeddings openai integration"
 optional = false
 python-versions = "<4.0,>=3.8.1"
 files = [
-    {file = "llama_index_embeddings_openai-0.1.10-py3-none-any.whl", hash = "sha256:c3cfa83b537ded34d035fc172a945dd444c87fb58a89b02dfbf785b675f9f681"},
-    {file = "llama_index_embeddings_openai-0.1.10.tar.gz", hash = "sha256:1bc1fc9b46773a12870c5d3097d3735d7ca33805f12462a8e35ae8a6e5ce1cf6"},
+    {file = "llama_index_embeddings_openai-0.1.11-py3-none-any.whl", hash = "sha256:e20806fc4baff6b8f5274decf2c1ca7c5c737648e01865475ffada164e32e173"},
+    {file = "llama_index_embeddings_openai-0.1.11.tar.gz", hash = "sha256:6025e229e375201788a9b14d6ebe470329907576cba5f6b7b832c3d68f39db30"},
 ]
 
 [package.dependencies]
@@ -4690,13 +4690,22 @@ sympy = "*"
 
 [[package]]
 name = "openai"
+<<<<<<< HEAD
 version = "1.35.15"
+=======
+version = "1.36.0"
+>>>>>>> main
 description = "The official Python library for the openai API"
 optional = false
 python-versions = ">=3.7.1"
 files = [
+<<<<<<< HEAD
     {file = "openai-1.35.15-py3-none-any.whl", hash = "sha256:1b9a6ada4239b91f38f51c426c6ee2746a2069c92cbf25ed8694e5ec00ff4597"},
     {file = "openai-1.35.15.tar.gz", hash = "sha256:307007e2036d57115612c1ecb50e9bc98fcc93537109a9f9efa1b4eedb2ea968"},
+=======
+    {file = "openai-1.36.0-py3-none-any.whl", hash = "sha256:82b74ded1fe2ea94abb19a007178bc143675f1b6903cebd63e2968d654bb0a6f"},
+    {file = "openai-1.36.0.tar.gz", hash = "sha256:a124baf0e1657d6156e12248642f88489cd030be8655b69bc1c13eb50e71a93d"},
+>>>>>>> main
 ]
 
 [package.dependencies]
@@ -6797,7 +6806,7 @@ url = "api"
 
 [[package]]
 name = "quivr-core"
-version = "0.0.9"
+version = "0.0.10"
 description = "Quivr core RAG package"
 optional = false
 python-versions = "^3.11"
@@ -6812,6 +6821,8 @@ langchain-community = {version = "^0.2.6", optional = true}
 langchain-core = "^0.2.10"
 langchain-openai = {version = "^0.1.14", optional = true}
 pydantic = "^2.7.4"
+rich = "^13.7.1"
+tiktoken = "^0.7.0"
 
 [package.extras]
 base = ["faiss-cpu (>=1.8.0.post1,<2.0.0)", "langchain-community (>=0.2.6,<0.3.0)", "langchain-openai (>=0.1.14,<0.2.0)"]

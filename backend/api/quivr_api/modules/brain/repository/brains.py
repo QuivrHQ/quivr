@@ -7,7 +7,7 @@ from quivr_api.models.settings import (
     get_supabase_client,
 )
 from quivr_api.modules.brain.dto.inputs import BrainUpdatableProperties
-from quivr_api.modules.brain.entity.brain_entity import BrainEntity, PublicBrain
+from quivr_api.modules.brain.entity.brain_entity import BrainEntity
 from quivr_api.modules.brain.repository.interfaces.brains_interface import (
     BrainsInterface,
 )
@@ -29,9 +29,6 @@ class Brains(BrainsInterface):
         brain_meaning = embeddings.embed_query(string_to_embed)
         brain_dict = brain.dict(
             exclude={
-                "brain_definition",
-                "brain_secrets_values",
-                "connected_brains_ids",
                 "integration",
             }
         )
@@ -39,27 +36,6 @@ class Brains(BrainsInterface):
         response = (self.db.table("brains").insert(brain_dict)).execute()
 
         return BrainEntity(**response.data[0])
-
-    def get_public_brains(self):
-        response = (
-            self.db.from_("brains")
-            .select(
-                "id:brain_id, name, description, last_update, brain_type, brain_definition: api_brain_definition(*), number_of_subscribers:brains_users(count)"
-            )
-            .filter("status", "eq", "public")
-            .execute()
-        )
-        public_brains: list[PublicBrain] = []
-
-        for item in response.data:
-            item["number_of_subscribers"] = item["number_of_subscribers"][0]["count"]
-            if not item["brain_definition"]:
-                del item["brain_definition"]
-            else:
-                item["brain_definition"]["secrets"] = []
-
-            public_brains.append(PublicBrain(**item))
-        return public_brains
 
     def update_brain_last_update_time(self, brain_id):
         try:

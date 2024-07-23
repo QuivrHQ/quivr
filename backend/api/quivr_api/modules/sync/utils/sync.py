@@ -4,7 +4,7 @@ import os
 import time
 from abc import ABC, abstractmethod
 from io import BytesIO
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Union
 
 import dropbox
 import markdownify
@@ -55,11 +55,15 @@ class BaseSync(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def download_file(self, credentials: Dict, file: SyncFile) -> BytesIO:
+    def download_file(
+        self, credentials: Dict, file: SyncFile
+    ) -> Dict[str, Union[str, BytesIO]]:
         raise NotImplementedError
 
     @abstractmethod
-    async def adownload_file(self, credentials: Dict, file: SyncFile) -> BytesIO:
+    async def adownload_file(
+        self, credentials: Dict, file: SyncFile
+    ) -> Dict[str, Union[str, BytesIO]]:
         pass
 
 
@@ -77,7 +81,9 @@ class GoogleDriveSync(BaseSync):
             logger.info("Google Drive credentials refreshed")
         return json.loads(self.creds.to_json())
 
-    def download_file(self, credentials: Dict, file: SyncFile) -> BytesIO:
+    def download_file(
+        self, credentials: Dict, file: SyncFile
+    ) -> Dict[str, Union[str, BytesIO]]:
         file_id = file.id
         file_name = file.name
         mime_type = file.mime_type
@@ -139,10 +145,12 @@ class GoogleDriveSync(BaseSync):
             raise Exception("Unsupported file type")
 
         file_data = request.execute()
-        return BytesIO(file_data)
+        return {"file_name": file_name, "content": BytesIO(file_data)}
 
-    async def adownload_file(self, credentials: Dict, file: SyncFile) -> BytesIO:
-        return BytesIO()
+    async def adownload_file(
+        self, credentials: Dict, file: SyncFile
+    ) -> Dict[str, Union[str, BytesIO]]:
+        return {}
 
     def get_files_by_id(self, credentials: Dict, file_ids: List[str]) -> List[SyncFile]:
         """
@@ -297,6 +305,7 @@ class AzureDriveSync(BaseSync):
     lower_name = "azure"
     datetime_format: str = "%Y-%m-%dT%H:%M:%SZ"
     CLIENT_ID = os.getenv("SHAREPOINT_CLIENT_ID")
+    CLIENT_SECRET = os.getenv("SHAREPOINT_CLIENT_SECRET")
     AUTHORITY = "https://login.microsoftonline.com/common"
     BACKEND_URL = os.getenv("BACKEND_URL", "http://localhost:5050")
     REDIRECT_URI = f"{BACKEND_URL}/sync/azure/oauth2callback"
@@ -323,12 +332,18 @@ class AzureDriveSync(BaseSync):
         if "refresh_token" not in credentials:
             raise HTTPException(status_code=401, detail="No refresh token available")
 
-        client = msal.PublicClientApplication(self.CLIENT_ID, authority=self.AUTHORITY)
+        client = msal.ConfidentialClientApplication(
+            self.CLIENT_ID,
+            authority=self.AUTHORITY,
+            client_credential=self.CLIENT_SECRET,
+        )
         result = client.acquire_token_by_refresh_token(
             credentials["refresh_token"], scopes=self.SCOPE
         )
         if "access_token" not in result:
-            raise HTTPException(status_code=400, detail="Failed to refresh token")
+            raise HTTPException(
+                status_code=400, detail=f"Failed to refresh token: {result}"
+            )
 
         credentials.update(
             {
@@ -344,6 +359,8 @@ class AzureDriveSync(BaseSync):
 
     def get_files(self, credentials, folder_id=None, recursive=False) -> List[SyncFile]:
         def fetch_files(endpoint, headers, max_retries=1):
+            logger.debug(f"fetching files from {endpoint}.")
+
             retry_count = 0
             while retry_count <= max_retries:
                 try:
@@ -467,7 +484,9 @@ class AzureDriveSync(BaseSync):
     ) -> List[SyncFile]:
         return []
 
-    def download_file(self, credentials: Dict, file: SyncFile) -> BytesIO:
+    def download_file(
+        self, credentials: Dict, file: SyncFile
+    ) -> Dict[str, Union[str, BytesIO]]:
         file_id = file.id
         file_name = file.name
         modified_time = file.last_modified
@@ -480,10 +499,12 @@ class AzureDriveSync(BaseSync):
         download_response = requests.get(
             download_endpoint, headers=headers, stream=True
         )
-        return BytesIO(download_response.content)
+        return {"file_name": file_name, "content": BytesIO(download_response.content)}
 
-    async def adownload_file(self, credentials: Dict, file: SyncFile) -> BytesIO:
-        return BytesIO()
+    async def adownload_file(
+        self, credentials: Dict, file: SyncFile
+    ) -> Dict[str, Union[str, BytesIO]]:
+        return {}
 
 
 class DropboxSync(BaseSync):
@@ -666,16 +687,21 @@ class DropboxSync(BaseSync):
     ) -> List[SyncFile]:
         return []
 
-    def download_file(self, credentials: Dict, file: SyncFile) -> BytesIO:
+    def download_file(
+        self, credentials: Dict, file: SyncFile
+    ) -> Dict[str, Union[str, BytesIO]]:
         file_id = str(file.id)
+        file_name = file.name
         if not self.dbx:
             self.dbx = self.link_dropbox(credentials)
 
         metadata, file_data = self.dbx.files_download(file_id)  # type: ignore
-        return BytesIO(file_data.content)
+        return {"file_name": file_name, "content": BytesIO(file_data.content)}
 
-    async def adownload_file(self, credentials: Dict, file: SyncFile) -> BytesIO:
-        return BytesIO()
+    async def adownload_file(
+        self, credentials: Dict, file: SyncFile
+    ) -> Dict[str, Union[str, BytesIO]]:
+        return {"file_name": file.name, "content": BytesIO()}
 
 
 class NotionSync(BaseSync):
@@ -939,7 +965,9 @@ class NotionSync(BaseSync):
 
         return result
 
-    async def adownload_file(self, credentials: Dict, file: SyncFile) -> BytesIO:
+    async def adownload_file(
+        self, credentials: Dict, file: SyncFile
+    ) -> Dict[str, Union[str, BytesIO]]:
         if not self.notion:
             self.notion = self.link_notion(credentials)
 
@@ -971,7 +999,7 @@ class NotionSync(BaseSync):
 
             markdown_bytes = BytesIO(markdown_text.encode("utf-8"))
 
-            return markdown_bytes
+            return {"file_name": f"{file.name}.md", "content": markdown_bytes}
 
         except Exception as e:
             logger.error(

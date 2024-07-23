@@ -10,8 +10,8 @@ export const useKnowledge = ({ brainId }: { brainId?: UUID }) => {
 
   const { getAllKnowledge } = useKnowledgeApi();
   const { data: allKnowledge, isLoading: isPending } = useQuery({
-    queryKey: [getKnowledgeDataKey(brainId!)],
-    queryFn: () => getAllKnowledge({ brainId: brainId! }),
+    queryKey: brainId ? [getKnowledgeDataKey(brainId)] : [],
+    queryFn: () => (brainId ? getAllKnowledge({ brainId: brainId }) : []),
     enabled: brainId !== undefined,
   });
 

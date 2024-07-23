@@ -8,7 +8,7 @@
   background-color: var(--background-1);
   border-right: 1px solid var(--border-1);
   width: Variables.$menuWidth;
-  transition: width 0.2s ease-in-out;
+  transition: width 0.1s ease-in-out;
 
   &.hidden {
     width: 0;

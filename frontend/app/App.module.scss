@@ -1,0 +1,31 @@
+@use "styles/ScreenSizes.module.scss";
+@use "styles/ZIndexes.module.scss";
+
+.app_container {
+  display: flex;
+  overflow: auto;
+  position: relative;
+  align-items: stretch;
+  width: 100%;
+  height: 100%;
+
+  @media (max-width: ScreenSizes.$small) {
+    .menu_container {
+      position: absolute;
+      left: 0;
+      top: 0;
+      z-index: ZIndexes.$overlay;
+    }
+  }
+
+  .content_container {
+    overflow: scroll;
+    flex: 1 1 0%;
+
+    @media (max-width: ScreenSizes.$small) {
+      &.blured {
+        opacity: 0.2;
+      }
+    }
+  }
+}

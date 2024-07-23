@@ -14,7 +14,6 @@ class ChatMessage(BaseModel):
     history: List[Tuple[str, str]]
     temperature: float = 0.0
     max_tokens: int = 256
-    use_summarization: bool = False
     chat_id: Optional[UUID] = None
     chat_name: Optional[str] = None
 
@@ -34,6 +33,8 @@ class Sources(BaseModel):
     type: str
     original_file_name: str
     citation: str
+    integration: Optional[str] = None
+    integration_link: Optional[str] = None
 
 
 class ChatItemType(Enum):

@@ -1,5 +1,5 @@
 /* eslint-disable max-lines */
-import axios, { AxiosResponse } from "axios";
+import { AxiosResponse, isAxiosError } from "axios";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -81,7 +81,7 @@ export const useShareBrain = (brainId: string) => {
       setIsShareModalOpen(false);
       setRoleAssignation([generateBrainAssignation()]);
     } catch (error) {
-      if (axios.isAxiosError(error) && error.response?.data !== undefined) {
+      if (isAxiosError(error) && error.response?.data !== undefined) {
         publish({
           variant: "danger",
           text: (
