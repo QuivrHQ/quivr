@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.0.289 (2024-07-25)
+
+## What's Changed
+* chore(main): release core 0.0.12 by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2889
+* fix: error dict google drive by @chloedia in https://github.com/QuivrHQ/quivr/pull/2912
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.288...v0.0.289
+
 ## 0.0.288 (2024-07-23)
 
 ## What's Changed
