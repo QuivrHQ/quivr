@@ -12,10 +12,11 @@ from fastapi import HTTPException
 from google.auth.transport.requests import Request as GoogleRequest
 from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
+from requests import HTTPError
+
 from quivr_api.logger import get_logger
 from quivr_api.modules.sync.entity.sync import SyncFile
 from quivr_api.modules.sync.utils.normalize import remove_special_characters
-from requests import HTTPError
 
 logger = get_logger(__name__)
 
@@ -244,9 +245,9 @@ class GoogleDriveSync(BaseSync):
                     ):
                         logger.warning(
                             "Calling Recursive for folder: %s",
-                            item.name,
+                            item["name"],
                         )
-                        files.extend(self.get_files(credentials, item.id, recursive))
+                        files.extend(self.get_files(credentials, item["id"], recursive))
 
                 page_token = results.get("nextPageToken", None)
                 if page_token is None:
@@ -515,7 +516,6 @@ class DropboxSync(BaseSync):
             def fetch_files(metadata):
                 files = []
                 for file in metadata.entries:
-
                     shared_link = f"https://www.dropbox.com/preview{file.path_display}?context=content_suggestions&role=personal"
                     is_folder = isinstance(file, dropbox.files.FolderMetadata)
 
