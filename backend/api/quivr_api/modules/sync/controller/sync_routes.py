@@ -149,23 +149,25 @@ async def create_sync_active(
     logger.debug(
         f"Creating active sync for user: {current_user.id} with data: {sync_active_input}"
     )
-    notification_service.add_notification(
+    bulk_id = uuid.uuid4()
+    notification = notification_service.add_notification(
         CreateNotification(
             user_id=current_user.id,
-            status=NotificationsStatusEnum.SUCCESS,
+            status=NotificationsStatusEnum.INFO,
             title="Synchronization created! ",
             description="Your brain is preparing to sync files. This may take a few minutes before proceeding.",
             category="generic",
-            bulk_id=uuid.uuid4(),
+            bulk_id=bulk_id,
             brain_id=sync_active_input.brain_id,
         )
     )
+    sync_active_input.notification_id = str(notification.id)
     return sync_service.create_sync_active(sync_active_input, str(current_user.id))
 
 
 @sync_router.put(
     "/sync/active/{sync_id}",
-    response_model=SyncsActive,
+    response_model=SyncsActive | None,
     dependencies=[Depends(AuthBearer())],
     tags=["Sync"],
 )
@@ -190,19 +192,30 @@ async def update_sync_active(
     )
 
     details_sync_active = sync_service.get_details_sync_active(sync_id)
-    notification_service.add_notification(
-        CreateNotification(
-            user_id=current_user.id,
-            status=NotificationsStatusEnum.SUCCESS,
-            title="Sync updated! Synchronization takes a few minutes to complete",
-            description="Syncing your files...",
-            category="generic",
-            bulk_id=uuid.uuid4(),
-            brain_id=details_sync_active["brain_id"],  # type: ignore
+    if (details_sync_active and sync_active_input.settings) and (
+        (details_sync_active["settings"]["files"] != sync_active_input.settings.files)
+        or (
+            details_sync_active["settings"]["folders"]
+            != sync_active_input.settings.folders
         )
-    )
-    sync_active_input.force_sync = True
-    return sync_service.update_sync_active(sync_id, sync_active_input)
+    ):
+        bulk_id = uuid.uuid4()
+        notification = notification_service.add_notification(
+            CreateNotification(
+                user_id=current_user.id,
+                status=NotificationsStatusEnum.SUCCESS,
+                title="Sync updated! Synchronization takes a few minutes to complete",
+                description="Your brain is syncing files. This may take a few minutes before proceeding.",
+                category="generic",
+                bulk_id=bulk_id,
+                brain_id=details_sync_active["brain_id"],  # type: ignore
+            )
+        )
+        sync_active_input.force_sync = True
+        sync_active_input.notification_id = str(notification.id)
+        return sync_service.update_sync_active(sync_id, sync_active_input)
+    else:
+        return None
 
 
 @sync_router.delete(
