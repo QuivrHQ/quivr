@@ -149,17 +149,19 @@ async def create_sync_active(
     logger.debug(
         f"Creating active sync for user: {current_user.id} with data: {sync_active_input}"
     )
-    notification_service.add_notification(
+    bulk_id = uuid.uuid4()
+    notification = notification_service.add_notification(
         CreateNotification(
             user_id=current_user.id,
-            status=NotificationsStatusEnum.SUCCESS,
+            status=NotificationsStatusEnum.INFO,
             title="Synchronization created! ",
             description="Your brain is preparing to sync files. This may take a few minutes before proceeding.",
             category="generic",
-            bulk_id=uuid.uuid4(),
+            bulk_id=bulk_id,
             brain_id=sync_active_input.brain_id,
         )
     )
+    sync_active_input.notification_id = str(notification.id)
     return sync_service.create_sync_active(sync_active_input, str(current_user.id))
 
 
@@ -199,18 +201,20 @@ async def update_sync_active(
     ):
         logger.info(details_sync_active["settings"])
         logger.info(sync_active_input.settings)
-        notification_service.add_notification(
+        bulk_id = uuid.uuid4()
+        notification = notification_service.add_notification(
             CreateNotification(
                 user_id=current_user.id,
                 status=NotificationsStatusEnum.SUCCESS,
                 title="Sync updated! Synchronization takes a few minutes to complete",
-                description="Syncing your files...",
+                description="Your brain is syncing files. This may take a few minutes before proceeding.",
                 category="generic",
-                bulk_id=uuid.uuid4(),
+                bulk_id=bulk_id,
                 brain_id=details_sync_active["brain_id"],  # type: ignore
             )
         )
         sync_active_input.force_sync = True
+        sync_active_input.notification_id = str(notification.id)
         return sync_service.update_sync_active(sync_id, sync_active_input)
     else:
         return None

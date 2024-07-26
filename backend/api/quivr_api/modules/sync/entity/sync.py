@@ -9,7 +9,7 @@ class SyncsUser(BaseModel):
     user_id: str
     name: str
     provider: str
-    credentials: dict 
+    credentials: dict
     state: dict
     additional_data: dict
 
@@ -34,6 +34,7 @@ class SyncsActive(BaseModel):
     sync_interval_minutes: int
     brain_id: str
     syncs_user: Optional[SyncsUser] = None
+    notification_id: Optional[str] = None
 
 
 class SyncsFiles(BaseModel):
