@@ -3,13 +3,14 @@ from typing import AsyncGenerator, Callable, Generic, Type, TypeVar
 
 from fastapi import Depends
 from sqlalchemy.ext.asyncio import create_async_engine
+from sqlmodel import Session
 from sqlmodel.ext.asyncio.session import AsyncSession
 
 from quivr_api.models.settings import settings
 
 
 class BaseRepository:
-    def __init__(self, session: AsyncSession):
+    def __init__(self, session: AsyncSession | Session):
         self.session = session
 
 

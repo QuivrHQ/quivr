@@ -1,14 +1,20 @@
 from datetime import datetime, timedelta
-from typing import List
+from typing import List, Sequence
+from uuid import UUID
+
+from sqlalchemy import select
+from sqlalchemy.exc import IntegrityError
+from sqlmodel import Session, select
 
 from quivr_api.logger import get_logger
 from quivr_api.models.settings import get_supabase_client
+from quivr_api.modules.dependencies import BaseRepository
 from quivr_api.modules.knowledge.service.knowledge_service import KnowledgeService
 from quivr_api.modules.notification.service.notification_service import (
     NotificationService,
 )
 from quivr_api.modules.sync.dto.inputs import SyncsActiveInput, SyncsActiveUpdateInput
-from quivr_api.modules.sync.entity.sync import SyncsActive
+from quivr_api.modules.sync.entity.sync import NotionSyncFile, SyncsActive
 from quivr_api.modules.sync.repository.sync_interfaces import SyncInterface
 
 notification_service = NotificationService()
@@ -198,3 +204,41 @@ class Sync(SyncInterface):
             return [SyncsActive(**sync) for sync in merge_data]
         logger.info("No active syncs found due for synchronization")
         return []
+
+
+class NotionRepository(BaseRepository):
+    def __init__(self, session: Session):
+        super().__init__(session)
+        self.db = get_supabase_client()
+
+    def get_user_notion_files(self, user_id: UUID) -> Sequence[NotionSyncFile]:
+        query = select(NotionSyncFile).where(NotionSyncFile.user_id == user_id)
+        response = self.session.exec(query)
+        return response.all()
+
+    def create_notion_file(self, new_notion_file: NotionSyncFile) -> NotionSyncFile:
+        try:
+            self.session.add(new_notion_file)
+            logger.info(f"Creating new notion file in notion repo: {new_notion_file}")
+            self.session.commit()
+        except IntegrityError as ie:
+            logger.error(f"IntegrityError occurred: {ie}")
+            self.session.rollback()
+            raise Exception("Integrity error while creating notion file.")
+        except Exception as e:
+            logger.error(f"Exception occurred: {e}")
+            self.session.rollback()
+            raise e
+
+        self.session.refresh(new_notion_file)
+        return new_notion_file
+
+    def get_notion_files_by_ids(self, ids: List[str]) -> List[NotionSyncFile]:
+        query = select(NotionSyncFile).where(NotionSyncFile.id.in_(ids))
+        response = self.session.exec(query)
+        return response.all()
+
+    def get_notion_files_by_parent_id(self, parent_id: str) -> List[NotionSyncFile]:
+        query = select(NotionSyncFile).where(NotionSyncFile.parent_id == parent_id)
+        response = self.session.exec(query)
+        return response.all()

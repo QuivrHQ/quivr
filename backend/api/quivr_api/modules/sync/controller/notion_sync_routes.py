@@ -2,9 +2,11 @@ import base64
 import os
 
 import requests
-from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Request
 from fastapi.responses import HTMLResponse
 from notion_client import Client
+
+from quivr_api.celery_worker import fetch_and_store_notion_files
 from quivr_api.logger import get_logger
 from quivr_api.middlewares.auth import AuthBearer, get_current_user
 from quivr_api.modules.sync.dto.inputs import SyncsUserInput, SyncUserUpdateInput
@@ -68,7 +70,7 @@ def authorize_notion(
 
 
 @notion_sync_router.get("/sync/notion/oauth2callback", tags=["Sync"])
-def oauth2callback_notion(request: Request):
+def oauth2callback_notion(request: Request, background_tasks: BackgroundTasks):
     """
     Handle OAuth2 callback from Notion.
 
@@ -149,7 +151,10 @@ def oauth2callback_notion(request: Request):
             str(current_user), state_dict, sync_user_input
         )
         logger.info(f"Notion sync created successfully for user: {current_user}")
+        # launch celery task to sync notion data
+        fetch_and_store_notion_files.delay(access_token, current_user)
         return HTMLResponse(successfullConnectionPage)
+
     except Exception as e:
         logger.error(f"Error: {e}")
         raise HTTPException(status_code=400, detail="Invalid user")

@@ -1,10 +1,14 @@
 import os
 from datetime import datetime, timedelta
 from tempfile import NamedTemporaryFile
+from typing import Annotated
 from uuid import UUID
 
 from celery.schedules import crontab
+from fastapi import Depends
+from notion_client import Client
 from pytz import timezone
+
 from quivr_api.celery_config import celery
 from quivr_api.logger import get_logger
 from quivr_api.middlewares.auth.auth_bearer import AuthBearer
@@ -13,9 +17,12 @@ from quivr_api.models.settings import get_supabase_client, get_supabase_db
 from quivr_api.modules.brain.integrations.Notion.Notion_connector import NotionConnector
 from quivr_api.modules.brain.service.brain_service import BrainService
 from quivr_api.modules.brain.service.brain_vector_service import BrainVectorService
+from quivr_api.modules.dependencies import get_service
 from quivr_api.modules.notification.service.notification_service import (
     NotificationService,
 )
+from quivr_api.modules.sync.entity.sync import NotionSyncFile
+from quivr_api.modules.sync.service.sync_service import SyncNotionService
 from quivr_api.packages.files.crawl.crawler import CrawlWebsite, slugify
 from quivr_api.packages.files.processors import filter_file
 from quivr_api.packages.utils.telemetry import maybe_send_telemetry
@@ -25,6 +32,7 @@ logger = get_logger(__name__)
 notification_service = NotificationService()
 brain_service = BrainService()
 auth_bearer = AuthBearer()
+NotionServiceDep = Annotated[SyncNotionService, Depends(get_service(SyncNotionService))]
 
 
 @celery.task(
@@ -268,6 +276,65 @@ def check_if_is_premium_user():
         f"Updated {len(settings_to_upsert)} premium users, deleted settings for {len(settings_to_delete)} non-premium users"
     )
     return True
+
+
+@celery.task(name="fetch_and_store_notion_files")
+def fetch_and_store_notion_files(access_token: str, user_id: str):
+    logger.debug("Fetching and storing Notion files")
+    notion_sync_service = NotionServiceDep
+    notion_client = Client(auth=access_token)
+    all_search_result = []
+    search_result = notion_client.search(
+        query="",
+        filter={"property": "object", "value": "page"},
+        sort={"direction": "descending", "timestamp": "last_edited_time"},
+    )
+    all_search_result += search_result["results"]
+
+    while search_result["has_more"]:
+        logger.debug("Next cursor: %s", search_result["next_cursor"])
+
+        search_result = notion_client.search(
+            query="",
+            filter={"property": "object", "value": "page"},
+            sort={"direction": "descending", "timestamp": "last_edited_time"},
+            start_cursor=search_result["next_cursor"],
+        )
+        all_search_result += search_result["results"]
+
+    page_to_add = []
+    logger.debug(all_search_result[:10], "\n Length: ", len(all_search_result))
+
+    for i in range(len(all_search_result)):
+        logger.debug(f"Processing page: {i}")
+        page = all_search_result[i]
+        logger.debug(f"Page: {page}")
+        parent_type = page["parent"]["type"]
+
+        if (
+            page["in_trash"] == False
+            and page["archived"] == False
+            and page["parent"]["type"] != "database_id"
+        ):
+            notion_sync_input = NotionSyncFile(
+                notion_id=page["id"],
+                parent_id=page["parent"][parent_type],
+                name=f'{page["properties"]["title"]["title"][0]["text"]["content"]}.md',
+                icon=page["icon"]["emoji"] if page["icon"] else None,
+                mime_type="md",
+                web_view_link=page["url"],
+                is_folder=True,
+                last_modified=datetime.strptime(
+                    page["last_edited_time"], "%Y-%m-%dT%H:%M:%S.%fZ"
+                ),
+                type="page",
+                user_id=UUID(user_id),
+            )
+            logger.debug(f"Notion sync input: {notion_sync_input}")
+            notion_sync_service.create_notion_file(notion_sync_input)
+            logger.debug(f"Created Notion file: {notion_sync_input}")
+        else:
+            logger.debug(f"Page did not pass filter: {page['id']}")
 
 
 celery.conf.beat_schedule = {

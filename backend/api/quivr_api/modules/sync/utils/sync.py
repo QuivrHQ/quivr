@@ -16,10 +16,11 @@ from google.auth.transport.requests import Request as GoogleRequest
 from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
 from notion_client import AsyncClient
+from requests import HTTPError
+
 from quivr_api.logger import get_logger
 from quivr_api.modules.sync.entity.sync import SyncFile
 from quivr_api.modules.sync.utils.normalize import remove_special_characters
-from requests import HTTPError
 
 logger = get_logger(__name__)
 redis_client = redis.Redis(host="redis", port=os.getenv("REDIS_PORT"), db=0)
@@ -273,13 +274,13 @@ class GoogleDriveSync(BaseSync):
                     # If recursive is True and the item is a folder, get files from the folder
                     if (
                         recursive
-                        and item.mimeType == "application/vnd.google-apps.folder"
+                        and item["mimeType"] == "application/vnd.google-apps.folder"
                     ):
                         logger.warning(
                             "Calling Recursive for folder: %s",
-                            item.name,
+                            item["name"],
                         )
-                        files.extend(self.get_files(credentials, item.id, recursive))
+                        files.extend(self.get_files(credentials, item["id"], recursive))
 
                 page_token = results.get("nextPageToken", None)
                 if page_token is None:
@@ -568,7 +569,6 @@ class DropboxSync(BaseSync):
             def fetch_files(metadata):
                 files = []
                 for file in metadata.entries:
-
                     shared_link = f"https://www.dropbox.com/preview{file.path_display}?context=content_suggestions&role=personal"
                     is_folder = isinstance(file, dropbox.files.FolderMetadata)
 
@@ -721,147 +721,40 @@ class NotionSync(BaseSync):
         # no need to refresh token for notion
         return credentials
 
-    async def fetch_root_pages(self) -> List[SyncFile]:
-        pages = []
-        if not self.notion:
-            raise Exception("Notion client is not initialized")
-
-        t_0 = time.time()
-        search_result = await self.notion.search(
-            query="", filter={"property": "object", "value": "page"}
-        )
-        search_result = search_result["results"]
-        # store in redis
-        for page in search_result:
-            redis_client.set(page["id"], json.dumps(page))
-
-        print("Search result time: ", time.time() - t_0)
-        print(len(search_result))
-        for page in search_result:
-            # print(page)
-            if "parent" in page and page["parent"]["type"] == "workspace":
-                page_info = SyncFile(
-                    name=f'{page["properties"]["title"]["title"][0]["text"]["content"]}.md',
-                    id=page["id"],
-                    is_folder=True,
-                    last_modified=page["last_edited_time"],
-                    mime_type="md",
-                    web_view_link=page["url"],
-                    icon=page["icon"]["emoji"] if page["icon"] else None,
-                )
-                pages.append(page_info)
-        print("Time taken for fetching root pages: ", time.time() - t_0)
-        test_el = redis_client.get(search_result[0]["id"])
-        return pages
-
-    async def is_folder(self, page_id):
-        children_blocks = await self.notion.blocks.children.list(page_id)
-        children_blocks = children_blocks["results"]
-        n_child_page = len(
-            [
-                block
-                for block in children_blocks
-                if block["type"] in ["child_page", "child_database"]
-            ]
-        )
-        if n_child_page > 0:
-            return True
-        return False
-
-    async def get_icon(self, page_id):
-        try:
-            page = await self.notion.pages.retrieve(page_id)
-            if page["icon"] is None:
-                return {"emoji": None}
-            return page["icon"]
-        except Exception as e:
-            logger.error("Error retrieving Notion file with ID %s: %s", page_id, e)
-            return {"emoji": "📊"}
-
-    async def fetch_icons_and_folder_statuses(self, blocks):
-        t_0 = time.time()
-        icon_tasks = {
-            block["id"]: asyncio.create_task(self.get_icon(block["id"]))
-            for block in blocks
-        }
-        folder_tasks = {
-            block["id"]: asyncio.create_task(self.is_folder(block["id"]))
-            for block in blocks
-        }
-
-        # Wait for all icon tasks to complete
-        icons = await asyncio.gather(*icon_tasks.values())
-        # Wait for all folder status tasks to complete
-        folder_statuses = await asyncio.gather(*folder_tasks.values())
-
-        # Combine results
-        result = {}
-        for block_id, icon, is_folder in zip(icon_tasks.keys(), icons, folder_statuses):
-            result[block_id] = {"icon": icon["emoji"], "is_folder": is_folder}
-
-        print("Time taken for fetching icons and folder statuses: ", time.time() - t_0)
-
-        return result
-
-    async def fetch_pages(self, page_id, recursive) -> List[SyncFile]:
-        t_0 = time.time()
-        pages = []
-        blocks = await self.notion.blocks.children.list(page_id)
-        blocks = blocks["results"]  # type: ignore
-        icon_is_folder = await self.fetch_icons_and_folder_statuses(blocks)
-
-        for block in blocks:
-            block_type = block["type"]
-            # is_folder = True
-            if block_type in {"child_database", "child_page"}:
-                # if block_type is child database mark it as unclickable
-                page_info = SyncFile(
-                    name=f'{block[block_type]["title"]}.md',
-                    id=block["id"],
-                    is_folder=icon_is_folder[block["id"]]["is_folder"],
-                    last_modified=block["last_edited_time"],
-                    mime_type="md" if block_type == "child_page" else "db",
-                    web_view_link=f"https://www.notion.so/{block['id'].replace('-', '')}",
-                    icon=(
-                        icon_is_folder[block["id"]]["icon"]
-                        if icon_is_folder[block["id"]]["icon"]
-                        else None
-                    ),
-                )
-                pages.append(page_info)
-
-                if recursive:
-                    sub_pages = await self.fetch_pages(block["id"], recursive)
-                    pages.extend(sub_pages)
-        print("TOTAL Time taken for fetching pages: ", time.time() - t_0)
-        return pages
-
     async def aget_files(
         self, credentials: Dict, folder_id: str | None = None, recursive: bool = False
     ) -> List[SyncFile]:
-        logger.info("Retrieving Notion files (pages) from page_id: %s", folder_id)
+        t_0 = time.time()
+        pages = []
 
-        try:
-            if not self.notion:
-                self.notion = self.link_notion(credentials)
+        children = notion_sync_service.get_children(folder_id)  # FIXME
 
-            if not folder_id:
-                files = await self.fetch_root_pages()
-            else:
-                files = await self.fetch_pages(folder_id, recursive)
+        logger.debug("Children: %s", children)
 
-            logger.info("Notion files (pages) retrieved successfully: %d", len(files))
-            return files
+        for page in children:
+            page_info = SyncFile(
+                name=page["name"],
+                id=page["id"],
+                is_folder=page["is_folder"],
+                last_modified=page["last_edited_time"],
+                mime_type=page["mime_type"],
+                web_view_link=page["url"],
+                icon=page["icon"],
+            )
+            redis_client.set(page["id"], json.dumps(page_info.model_dump_json()))
 
-        except Exception as e:
-            logger.error("Unexpected error: %s", e)
-            raise Exception("Failed to retrieve files")
+            pages.append(page_info)
+
+            if recursive:
+                sub_pages = await self.fetch_pages(page["id"], recursive)
+                pages.extend(sub_pages)
+        print("TOTAL Time taken for fetching pages: ", time.time() - t_0)
+        return page
 
     def get_files(
         self, credentials: Dict, folder_id: str | None = None, recursive: bool = False
     ) -> List[SyncFile]:
         loop = asyncio.get_event_loop()
-
         result = loop.run_until_complete(
             self.aget_files(credentials, folder_id, recursive)
         )
@@ -874,25 +767,20 @@ class NotionSync(BaseSync):
         self, credentials: Dict, file_ids: List[str]
     ) -> List[SyncFile]:
         logger.info("Retrieving Notion files by file_ids: %s", file_ids)
-
-        if not self.notion:
-            self.notion = self.link_notion(credentials)
-
         files = []
-        logger.info("Retrieving Notion files by IDs: %s", file_ids)
 
         for file_id in file_ids:
             try:
-                page = await self.notion.pages.retrieve(file_id)
+                page = await notion_sync_service.retrieve_id(file_id)
 
                 page_info = SyncFile(
-                    name=f'{page["properties"]["title"]["title"][0]["text"]["content"]}.md',
+                    name=page["name"],
                     id=page["id"],
-                    is_folder=True,  # Notion pages are generally considered as folders
+                    is_folder=page["is_folder"],
                     last_modified=page["last_edited_time"],
-                    mime_type="md",
+                    mime_type=page["mime_type"],
                     web_view_link=page["url"],
-                    icon=page["icon"]["emoji"] if page["icon"] else None,
+                    icon=page["icon"],
                 )
                 files.append(page_info)
 
@@ -936,7 +824,6 @@ class NotionSync(BaseSync):
                 block["heading_3"]["rich_text"][0]["plain_text"]
             )
         elif block_type == "bulleted_list_item":
-
             result = "* " + markdownify.markdownify(
                 block["bulleted_list_item"]["rich_text"][0]["plain_text"]
             )

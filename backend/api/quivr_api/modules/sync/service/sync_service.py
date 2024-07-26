@@ -1,14 +1,15 @@
 from typing import List
 
 from quivr_api.logger import get_logger
+from quivr_api.modules.dependencies import BaseService
 from quivr_api.modules.sync.dto.inputs import (
     SyncsActiveInput,
     SyncsActiveUpdateInput,
     SyncsUserInput,
     SyncUserUpdateInput,
 )
-from quivr_api.modules.sync.entity.sync import SyncsActive, SyncsUser
-from quivr_api.modules.sync.repository.sync import Sync, SyncInterface
+from quivr_api.modules.sync.entity.sync import NotionSyncFile, SyncsActive, SyncsUser
+from quivr_api.modules.sync.repository.sync import NotionRepository, Sync, SyncInterface
 from quivr_api.modules.sync.repository.sync_interfaces import (
     SyncInterface,
     SyncUserInterface,
@@ -87,3 +88,40 @@ class SyncService:
 
     def get_details_sync_active(self, sync_active_id: int):
         return self.repository.get_details_sync_active(sync_active_id)
+
+
+class SyncNotionService(BaseService[NotionRepository]):
+    repository_cls = NotionRepository
+
+    def __init__(self, repository: NotionRepository):
+        self.repository = repository
+
+    def create_notion_file(self, notion_sync_file: NotionSyncFile) -> NotionSyncFile:
+        logger.info(
+            f"New notion entry on notion table for user {notion_sync_file.user_id}"
+        )
+
+        inserted_notion_file = self.repository.create_notion_file(notion_sync_file)
+        logger.info(f"Insert response {inserted_notion_file}")
+
+        return inserted_notion_file
+
+    def get_notion_files_by_ids(self, ids: List[str]) -> List[NotionSyncFile]:
+        logger.info(f"Fetching notion files for IDs: {ids}")
+        notion_files = self.repository.get_notion_files_by_ids(ids)
+        logger.info(f"Fetched {len(notion_files)} notion files")
+        return notion_files
+
+    def get_notion_files_by_parent_id(self, parent_id: str) -> List[NotionSyncFile]:
+        logger.info(f"Fetching notion files with parent_id: {parent_id}")
+        notion_files = self.repository.get_notion_files_by_parent_id(parent_id)
+        logger.info(
+            f"Fetched {len(notion_files)} notion files with parent_id {parent_id}"
+        )
+        return notion_files
+
+    def get_root_notion_files(self) -> List[NotionSyncFile]:
+        logger.info("Fetching root notion files")
+        notion_files = self.repository.get_notion_files_by_parent_id("True")
+        logger.info(f"Fetched {len(notion_files)} root notion files")
+        return notion_files

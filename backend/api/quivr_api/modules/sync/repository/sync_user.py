@@ -86,7 +86,7 @@ class SyncUser(SyncUserInterface):
             query = query.eq("id", sync_user_id)
         response = query.execute()
         if response.data:
-            logger.info("Sync users retrieved successfully: %s", response.data)
+            # logger.info("Sync users retrieved successfully: %s", response.data)
             return response.data
         logger.warning(
             "No sync users found for user_id: %s, sync_user_id: %s",
