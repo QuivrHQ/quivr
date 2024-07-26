@@ -76,18 +76,20 @@ export const SyncElementLine = ({
         }
       }}
     >
-      <div className={styles.left}>
-        <div
-          onMouseEnter={() => setIsCheckboxHovered(true)}
-          onMouseLeave={() => setIsCheckboxHovered(false)}
-          style={{ pointerEvents: "auto" }}
-        >
-          <Checkbox
-            checked={checked}
-            setChecked={handleSetChecked}
-            disabled={!selectable}
-          />
-        </div>
+      <div className={`${styles.left} ${isFolder ? styles.folder : ""}`}>
+        {!isFolder && (
+          <div
+            onMouseEnter={() => setIsCheckboxHovered(true)}
+            onMouseLeave={() => setIsCheckboxHovered(false)}
+            style={{ pointerEvents: "auto" }}
+          >
+            <Checkbox
+              checked={checked}
+              setChecked={handleSetChecked}
+              disabled={!selectable}
+            />
+          </div>
+        )}
 
         <Icon name={isFolder ? "folder" : "file"} color="black" size="normal" />
         <span className={styles.element_name}>{name}</span>

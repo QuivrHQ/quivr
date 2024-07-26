@@ -20,6 +20,10 @@
       font-size: Typography.$small;
       @include Typography.EllipsisOverflow;
     }
+
+    &.folder {
+      margin-left: Spacings.$spacing06;
+    }
   }
 
   &:hover {
