@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.0.290 (2024-07-26)
+
+## What's Changed
+* fix(frontend): remove possibility to sync folder by @Zewed in https://github.com/QuivrHQ/quivr/pull/2913
+* fix(frontend): remove latence for delete notifications by @Zewed in https://github.com/QuivrHQ/quivr/pull/2916
+* fix(backend): fix error messages by @Zewed in https://github.com/QuivrHQ/quivr/pull/2917
+* feat(notifications): improved requirements by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2915
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.289...v0.0.290
+
 ## 0.0.289 (2024-07-25)
 
 ## What's Changed
