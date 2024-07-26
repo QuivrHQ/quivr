@@ -125,12 +125,11 @@ export const FeedingNotification = ({
   );
 
   const deleteNotification = async () => {
-    const deletePromises = bulkNotification.notifications.map(
-      async (notification) => {
-        await supabase.from("notifications").delete().eq("id", notification.id);
-      }
-    );
-    await Promise.all(deletePromises);
+    await supabase
+      .from("notifications")
+      .delete()
+      .match({ bulk_id: bulkNotification.bulk_id });
+
     await updateNotifications();
   };
 
