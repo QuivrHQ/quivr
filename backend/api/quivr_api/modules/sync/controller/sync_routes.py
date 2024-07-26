@@ -199,8 +199,6 @@ async def update_sync_active(
             != sync_active_input.settings.folders
         )
     ):
-        logger.info(details_sync_active["settings"])
-        logger.info(sync_active_input.settings)
         bulk_id = uuid.uuid4()
         notification = notification_service.add_notification(
             CreateNotification(
