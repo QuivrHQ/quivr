@@ -9,38 +9,48 @@
   flex-direction: column;
   position: relative;
   background-color: var(--background-0);
+  font-size: Typography.$small;
 
   .first_line_wrapper {
     display: flex;
     justify-content: space-between;
     border: 1px solid var(--border-2);
-    border-radius: Radius.$big;
+    border-radius: Radius.$normal;
     align-items: center;
     cursor: pointer;
+    display: flex;
 
     &.unfolded {
-      border-radius: Radius.$big Radius.$big 0 0;
+      border-radius: Radius.$normal Radius.$normal 0 0;
     }
 
     .left {
       display: flex;
       align-items: center;
       gap: Spacings.$spacing03;
-      padding: Spacings.$spacing03;
+      padding-block: Spacings.$spacing02;
+      padding-inline: Spacings.$spacing03;
       overflow: hidden;
-      flex: 1;
 
       .icon {
         width: IconSizes.$normal;
       }
 
       .label {
-        @include Typography.EllipsisOverflow;
-        background-color: var(--background-special-1);
+        overflow: hidden;
+        background-color: var(--background-primary-1);
         border-radius: Radius.$normal;
         padding-inline: Spacings.$spacing05;
-        padding-block: Spacings.$spacing02;
+        padding-block: Spacings.$spacing01;
         white-space: nowrap;
+        font-size: Typography.$small;
+        height: 24px;
+        display: flex;
+        align-items: center;
+
+        .label_text {
+          @include Typography.EllipsisOverflow;
+        }
 
         &.not_set {
           color: var(--text-1);
@@ -56,7 +66,9 @@
 
     .right {
       flex: 1;
-      max-width: 50%;
+      font-size: Typography.$small;
+      padding-block: Spacings.$spacing02;
+      min-width: 50%;
 
       &.folded {
         display: none;
@@ -71,14 +83,16 @@
     top: 100%;
     border: 1px solid var(--border-2);
     border-top: none;
-    border-radius: 0 0 Radius.$big Radius.$big;
+    border-radius: 0 0 Radius.$normal Radius.$normal;
     overflow: hidden;
     max-height: 180px;
     overflow: scroll;
     z-index: ZIndexes.$overlay;
+    padding-block: Spacings.$spacing02;
 
     .option {
-      padding: Spacings.$spacing03;
+      padding-inline: Spacings.$spacing03;
+      padding-block: Spacings.$spacing02;
       cursor: pointer;
       display: flex;
       gap: Spacings.$spacing03;
@@ -87,7 +101,7 @@
 
       &:hover {
         .option_name {
-          background-color: var(--background-special-1);
+          background-color: var(--background-primary-1);
         }
       }
 
@@ -98,9 +112,9 @@
       .option_name {
         @include Typography.EllipsisOverflow;
         border: 1px solid var(--border-1);
-        border-radius: Radius.$small;
+        border-radius: Radius.$normal;
         padding-inline: Spacings.$spacing05;
-        padding-block: Spacings.$spacing02;
+        padding-block: Spacings.$spacing01;
         white-space: nowrap;
       }
     }

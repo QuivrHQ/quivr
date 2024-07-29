@@ -40,7 +40,7 @@ export const FoldableSection = (props: FoldableSectionProps): JSX.Element => {
           <p className={styles.header_title}>{props.label}</p>
         </div>
         <Icon
-          name="chevronDown"
+          name="chevronRight"
           size="normal"
           color="black"
           classname={`${styles.icon_rotate} ${

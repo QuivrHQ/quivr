@@ -73,7 +73,9 @@ def authorize_google(
     Returns:
         dict: A dictionary containing the authorization URL.
     """
-    logger.debug(f"Authorizing Google Drive sync for user: {current_user.id}")
+    logger.debug(
+        f"Authorizing Google Drive sync for user: {current_user.id}, name : {name}"
+    )
     redirect_uri = BASE_REDIRECT_URI
     flow = Flow.from_client_config(
         CLIENT_SECRETS_FILE_CONTENT,
@@ -96,6 +98,7 @@ def authorize_google(
         provider="Google",
         credentials={},
         state={"state": state},
+        additional_data={},
     )
     sync_user_service.create_sync_user(sync_user_input)
     return {"authorization_url": authorization_url}

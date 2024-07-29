@@ -12,3 +12,5 @@ if __name__ == "__main__":
         answer = brain.ask("Property of gold?")
 
         print("answer :", answer.answer)
+
+        print("brain information: ", brain)

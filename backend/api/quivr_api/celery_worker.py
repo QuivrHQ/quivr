@@ -16,14 +16,12 @@ from quivr_api.modules.brain.service.brain_vector_service import BrainVectorServ
 from quivr_api.modules.notification.service.notification_service import (
     NotificationService,
 )
-from quivr_api.modules.onboarding.service.onboarding_service import OnboardingService
 from quivr_api.packages.files.crawl.crawler import CrawlWebsite, slugify
 from quivr_api.packages.files.processors import filter_file
 from quivr_api.packages.utils.telemetry import maybe_send_telemetry
 
 logger = get_logger(__name__)
 
-onboardingService = OnboardingService()
 notification_service = NotificationService()
 brain_service = BrainService()
 auth_bearer = AuthBearer()
@@ -76,6 +74,8 @@ def process_file_and_notify(
             file=file_instance,
             brain_id=brain_id,
             original_file_name=file_original_name,
+            integration=integration,
+            integration_link=integration_link,
         )
 
         brain_service.update_brain_last_update_time(brain_id)
@@ -116,11 +116,6 @@ def process_crawl_and_notify(
             brain_id=brain_id,
             original_file_name=crawl_website_url,
         )
-
-
-@celery.task
-def remove_onboarding_more_than_x_days_task():
-    onboardingService.remove_onboarding_more_than_x_days(7)
 
 
 @celery.task(name="NotionConnectorLoad")
@@ -207,15 +202,19 @@ def check_if_is_premium_user():
     premium_user_ids = set()
     settings_to_upsert = {}
     for sub in subscriptions:
-        if sub["attrs"]["status"] != "active":
+        logger.info(f"Subscription {sub['id']}")
+        if sub["attrs"]["status"] != "active" and sub["attrs"]["status"] != "trialing":
+            logger.info(f"Subscription {sub['id']} is not active or trialing")
             continue
 
         customer = customer_dict.get(sub["customer"])
         if not customer:
+            logger.info(f"No customer found for subscription: {sub['customer']}")
             continue
 
         user_id = user_dict.get(customer["email"])
         if not user_id:
+            logger.info(f"No user found for customer: {customer['email']}")
             continue
 
         current_settings = settings_dict.get(user_id, {})
@@ -224,6 +223,7 @@ def check_if_is_premium_user():
         # Skip if the user was checked recently
         if last_check and datetime.fromisoformat(last_check) > memoization_cutoff:
             premium_user_ids.add(user_id)
+            logger.info(f"User {user_id} was checked recently")
             continue
 
         user_id = str(user_id)  # Ensure user_id is a string
@@ -245,9 +245,11 @@ def check_if_is_premium_user():
             "is_premium": True,
             "last_stripe_check": current_time_str,
         }
+        logger.info(f"Upserting settings for user {user_id}")
 
     # Bulk upsert premium user settings in batches of 10
     settings_list = list(settings_to_upsert.values())
+    logger.info(f"Upserting {len(settings_list)} settings")
     for i in range(0, len(settings_list), 10):
         batch = settings_list[i : i + 10]
         supabase_db.table("user_settings").upsert(batch).execute()
@@ -269,10 +271,6 @@ def check_if_is_premium_user():
 
 
 celery.conf.beat_schedule = {
-    "remove_onboarding_more_than_x_days_task": {
-        "task": f"{__name__}.remove_onboarding_more_than_x_days_task",
-        "schedule": crontab(minute="0", hour="0"),
-    },
     "ping_telemetry": {
         "task": f"{__name__}.ping_telemetry",
         "schedule": crontab(minute="*/30", hour="*"),

@@ -1,7 +1,7 @@
 import { useState } from "react";
 
 import { Checkbox } from "@/lib/components/ui/Checkbox/Checkbox";
-import Icon from "@/lib/components/ui/Icon/Icon";
+import { Icon } from "@/lib/components/ui/Icon/Icon";
 import Tooltip from "@/lib/components/ui/Tooltip/Tooltip";
 
 import styles from "./SyncElementLine.module.scss";
@@ -76,21 +76,33 @@ export const SyncElementLine = ({
         }
       }}
     >
-      <div
-        className={styles.checkbox_wrapper}
-        onMouseEnter={() => setIsCheckboxHovered(true)}
-        onMouseLeave={() => setIsCheckboxHovered(false)}
-        style={{ pointerEvents: "auto" }}
-      >
-        <Checkbox
-          checked={checked}
-          setChecked={handleSetChecked}
-          disabled={!selectable}
-        />
+      <div className={`${styles.left} ${isFolder ? styles.folder : ""}`}>
+        {!isFolder && (
+          <div
+            onMouseEnter={() => setIsCheckboxHovered(true)}
+            onMouseLeave={() => setIsCheckboxHovered(false)}
+            style={{ pointerEvents: "auto" }}
+          >
+            <Checkbox
+              checked={checked}
+              setChecked={handleSetChecked}
+              disabled={!selectable}
+            />
+          </div>
+        )}
+
+        <Icon name={isFolder ? "folder" : "file"} color="black" size="normal" />
+        <span className={styles.element_name}>{name}</span>
       </div>
 
-      <Icon name={isFolder ? "folder" : "file"} color="black" size="normal" />
-      <span className={styles.element_name}>{name}</span>
+      {isFolder && (
+        <Icon
+          name="chevronRight"
+          color="black"
+          size="normal"
+          handleHover={true}
+        />
+      )}
     </div>
   );
 

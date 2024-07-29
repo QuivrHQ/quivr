@@ -4,9 +4,6 @@ from typing import List, Optional
 from uuid import UUID
 
 from pydantic import BaseModel
-from quivr_api.modules.brain.entity.api_brain_definition_entity import (
-    ApiBrainDefinitionEntity,
-)
 from quivr_api.modules.brain.entity.integration_brain import (
     IntegrationDescriptionEntity,
     IntegrationEntity,
@@ -82,10 +79,6 @@ class BrainEntity(BaseModel):
     prompt_id: Optional[UUID] = None
     last_update: datetime
     brain_type: BrainType
-    brain_definition: Optional[ApiBrainDefinitionEntity] = None
-    connected_brains_ids: Optional[List[UUID]] = None
-    raw: Optional[bool] = None
-    jq_instructions: Optional[str] = None
     integration: Optional[IntegrationEntity] = None
     integration_description: Optional[IntegrationDescriptionEntity] = None
 
@@ -99,16 +92,6 @@ class BrainEntity(BaseModel):
         )
         data["id"] = self.id
         return data
-
-
-class PublicBrain(BaseModel):
-    id: UUID
-    name: str
-    description: Optional[str] = None
-    number_of_subscribers: int = 0
-    last_update: str
-    brain_type: BrainType
-    brain_definition: Optional[ApiBrainDefinitionEntity] = None
 
 
 class RoleEnum(str, Enum):

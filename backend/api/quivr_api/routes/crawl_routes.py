@@ -70,7 +70,7 @@ async def crawl_endpoint(
                 user_id=current_user.id,
                 bulk_id=bulk_id,
                 status=NotificationsStatusEnum.INFO,
-                title=f"Processing Crawl {crawl_website.url}",
+                title=f"{crawl_website.url}",
                 category="crawl",
                 brain_id=str(brain_id),
             )

@@ -6,9 +6,9 @@
   display: flex;
   border: 1px solid var(--border-2);
   gap: Spacings.$spacing02;
-  padding-block: Spacings.$spacing01;
+  padding-block: Spacings.$spacing02;
   padding-inline: Spacings.$spacing03;
-  border-radius: Radius.$big;
+  border-radius: Radius.$normal;
   align-items: center;
   width: 100%;
   background-color: var(--background-0);
@@ -20,6 +20,8 @@
     .text_input {
       background-color: transparent;
       width: 10px;
+      padding: 0;
+      font-size: Typography.$small;
     }
   }
 
@@ -43,7 +45,8 @@
     border: none;
     flex: 1;
     background-color: transparent;
-    padding: Spacings.$spacing03;
+    padding: 0;
+    font-size: Typography.$small;
 
     &:focus {
       box-shadow: none;

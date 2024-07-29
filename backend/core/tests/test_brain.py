@@ -1,3 +1,4 @@
+from dataclasses import asdict
 from uuid import uuid4
 
 import pytest
@@ -16,8 +17,11 @@ def test_brain_empty_files():
         Brain.from_files(name="test_brain", file_paths=[])
 
 
-def test_brain_from_files_success(fake_llm: LLMEndpoint, embedder, temp_data_file):
-    brain = Brain.from_files(
+@pytest.mark.asyncio
+async def test_brain_from_files_success(
+    fake_llm: LLMEndpoint, embedder, temp_data_file
+):
+    brain = await Brain.afrom_files(
         name="test_brain", file_paths=[temp_data_file], embedder=embedder, llm=fake_llm
     )
     assert brain.name == "test_brain"
@@ -29,7 +33,7 @@ def test_brain_from_files_success(fake_llm: LLMEndpoint, embedder, temp_data_fil
 
     # storage
     assert isinstance(brain.storage, TransparentStorage)
-    assert len(brain.storage.get_files()) == 1
+    assert len(await brain.storage.get_files()) == 1
 
 
 @pytest.mark.asyncio
@@ -39,7 +43,7 @@ async def test_brain_from_langchain_docs(embedder):
         name="test", langchain_documents=[chunk], embedder=embedder
     )
     # No appended files
-    assert len(brain.storage.get_files()) == 0
+    assert len(await brain.storage.get_files()) == 0
     assert len(brain.chat_history) == 0
 
 
@@ -90,3 +94,28 @@ async def test_brain_ask_streaming(
         response += chunk.answer
 
     assert response == answers[1]
+
+
+def test_brain_info_empty(fake_llm: LLMEndpoint, embedder, mem_vector_store):
+    storage = TransparentStorage()
+    id = uuid4()
+    brain = Brain(
+        name="test",
+        id=id,
+        llm=fake_llm,
+        embedder=embedder,
+        storage=storage,
+        vector_db=mem_vector_store,
+    )
+
+    assert asdict(brain.info()) == {
+        "brain_id": id,
+        "brain_name": "test",
+        "files_info": asdict(storage.info()),
+        "chats_info": {
+            "nb_chats": 1,  # start with a default chat
+            "current_default_chat": brain.default_chat.id,
+            "current_chat_history_length": 0,
+        },
+        "llm_info": asdict(fake_llm.info()),
+    }

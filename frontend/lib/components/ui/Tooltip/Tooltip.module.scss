@@ -17,4 +17,14 @@
     max-height: 300px;
     overflow: scroll;
   }
+
+  &.dangerous {
+    color: var(--dangerous-dark);
+    background-color: var(--background-error);
+  }
+
+  &.success {
+    color: var(--success);
+    background-color: var(--background-success);
+  }
 }

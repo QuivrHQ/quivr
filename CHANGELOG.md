@@ -1,5 +1,112 @@
 # Changelog
 
+## 0.0.291 (2024-07-29)
+
+## What's Changed
+* feat(integrations): Add Azure Drive Sites support by @chloedia in https://github.com/QuivrHQ/quivr/pull/2919
+* chore: update sync notification status to INFO by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2918
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.290...v0.0.291
+
+## 0.0.290 (2024-07-26)
+
+## What's Changed
+* fix(frontend): remove possibility to sync folder by @Zewed in https://github.com/QuivrHQ/quivr/pull/2913
+* fix(frontend): remove latence for delete notifications by @Zewed in https://github.com/QuivrHQ/quivr/pull/2916
+* fix(backend): fix error messages by @Zewed in https://github.com/QuivrHQ/quivr/pull/2917
+* feat(notifications): improved requirements by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2915
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.289...v0.0.290
+
+## 0.0.289 (2024-07-25)
+
+## What's Changed
+* chore(main): release core 0.0.12 by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2889
+* fix: error dict google drive by @chloedia in https://github.com/QuivrHQ/quivr/pull/2912
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.288...v0.0.289
+
+## 0.0.288 (2024-07-23)
+
+## What's Changed
+* fix(sync): folder upload to Google Drive by @chloedia in https://github.com/QuivrHQ/quivr/pull/2909
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.287...v0.0.288
+
+## 0.0.287 (2024-07-23)
+
+## What's Changed
+* feat: Update AzureDriveSync name to "Share Point" by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2907
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.286...v0.0.287
+
+## 0.0.286 (2024-07-23)
+
+## What's Changed
+* fix(frontend): remove warning in frontend by @Zewed in https://github.com/QuivrHQ/quivr/pull/2896
+* feat(frontend): add logo to source when integration by @Zewed in https://github.com/QuivrHQ/quivr/pull/2899
+* feat(premium): add trialing by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2900
+* feat: Remove unused onboarding code by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2901
+* feat(dead-code): removed composite & api by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2902
+* feat(frontend): add a loader when processing files by @Zewed in https://github.com/QuivrHQ/quivr/pull/2903
+* feat(frontend): icon chevron for folders by @Zewed in https://github.com/QuivrHQ/quivr/pull/2904
+* feat(frontend): loader icon for integrations by @Zewed in https://github.com/QuivrHQ/quivr/pull/2905
+* fix(frontend): remove current brain id when click on create brain by @Zewed in https://github.com/QuivrHQ/quivr/pull/2906
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.285...v0.0.286
+
+## 0.0.285 (2024-07-22)
+
+## What's Changed
+* fix(frontend): select line when click on knowledge option by @Zewed in https://github.com/QuivrHQ/quivr/pull/2879
+* fix(frontend): selected item on mention list by @Zewed in https://github.com/QuivrHQ/quivr/pull/2881
+* fix(frontend): logo color on dark mode by @Zewed in https://github.com/QuivrHQ/quivr/pull/2882
+* fix: Refacto & update dropbox refresh by @chloedia in https://github.com/QuivrHQ/quivr/pull/2875
+* feat: quivr core brain info + processors registry +  by @AmineDiro in https://github.com/QuivrHQ/quivr/pull/2877
+* chore(main): release core 0.0.10 by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2872
+* feat: move parsers quivr core by @AmineDiro in https://github.com/QuivrHQ/quivr/pull/2884
+* fix(frontend): default icon for knowledge without extension by @Zewed in https://github.com/QuivrHQ/quivr/pull/2887
+* chore(main): release core 0.0.11 by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2886
+* feat(frontend): add knowledge icon when integration by @Zewed in https://github.com/QuivrHQ/quivr/pull/2888
+* fix: google conversion by @chloedia in https://github.com/QuivrHQ/quivr/pull/2891
+* fix(frontend): remove thoughts button by @Zewed in https://github.com/QuivrHQ/quivr/pull/2892
+* feat: add integration and integration link to Sources class by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2893
+* feat(azure): changed auth method by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2890
+* feat(frontend): new inputs by @Zewed in https://github.com/QuivrHQ/quivr/pull/2894
+* fix(frontend): menu on mobile by @Zewed in https://github.com/QuivrHQ/quivr/pull/2895
+* feat(api): add logging for inactive subscriptions by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2897
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.284...v0.0.285
+
+## 0.0.284 (2024-07-17)
+
+## What's Changed
+* chore(cleanup): cleaned up some unused files by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2858
+* feat: Improve file loading logic in File model by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2861
+* feat(celery): add retry logic for dcos by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2862
+* feat: quivr api send notification by @AmineDiro in https://github.com/QuivrHQ/quivr/pull/2865
+* feat: Update category for sync notification by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2866
+* feat: Update crawl_endpoint to include knowledge_id in task kwargs by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2867
+* feat(integrations): Add integration fields to Knowledge and SyncsUser models by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2853
+* feat: quivr api use quivr core by @AmineDiro in https://github.com/QuivrHQ/quivr/pull/2868
+* feat: Update sync generic bulk by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2869
+* chore(main): release core 0.0.9 by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2855
+* feat(frontend): new notifications design by @Zewed in https://github.com/QuivrHQ/quivr/pull/2870
+* feat: Update sync active notification category by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2873
+* feat(integrations): dropbox by @chloedia in https://github.com/QuivrHQ/quivr/pull/2864
+* fix(frontend): delete notifications by @Zewed in https://github.com/QuivrHQ/quivr/pull/2874
+* feat(frontend): back button by @Zewed in https://github.com/QuivrHQ/quivr/pull/2876
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.283...v0.0.284
+
 ## 0.0.283 (2024-07-12)
 
 ## What's Changed

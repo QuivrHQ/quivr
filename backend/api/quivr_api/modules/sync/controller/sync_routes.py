@@ -3,6 +3,7 @@ import uuid
 from typing import List
 
 from fastapi import APIRouter, Depends, status
+
 from quivr_api.logger import get_logger
 from quivr_api.middlewares.auth import AuthBearer, get_current_user
 from quivr_api.modules.notification.dto.inputs import CreateNotification
@@ -11,6 +12,7 @@ from quivr_api.modules.notification.service.notification_service import (
     NotificationService,
 )
 from quivr_api.modules.sync.controller.azure_sync_routes import azure_sync_router
+from quivr_api.modules.sync.controller.dropbox_sync_routes import dropbox_sync_router
 from quivr_api.modules.sync.controller.github_sync_routes import github_sync_router
 from quivr_api.modules.sync.controller.google_sync_routes import google_sync_router
 from quivr_api.modules.sync.dto import SyncsDescription
@@ -39,6 +41,7 @@ sync_router = APIRouter()
 sync_router.include_router(google_sync_router)
 sync_router.include_router(azure_sync_router)
 sync_router.include_router(github_sync_router)
+sync_router.include_router(dropbox_sync_router)
 
 
 # Google sync description
@@ -51,6 +54,12 @@ google_sync = SyncsDescription(
 azure_sync = SyncsDescription(
     name="Azure",
     description="Sync your Azure Drive with Quivr",
+    auth_method=AuthMethodEnum.URI_WITH_CALLBACK,
+)
+
+dropbox_sync = SyncsDescription(
+    name="DropBox",
+    description="Sync your DropBox Drive with Quivr",
     auth_method=AuthMethodEnum.URI_WITH_CALLBACK,
 )
 
@@ -72,7 +81,7 @@ async def get_syncs(current_user: UserIdentity = Depends(get_current_user)):
         List[SyncsDescription]: A list of available sync descriptions.
     """
     logger.debug(f"Fetching all sync descriptions for user: {current_user.id}")
-    return [google_sync, azure_sync]
+    return [google_sync, azure_sync, dropbox_sync]
 
 
 @sync_router.get(
@@ -143,28 +152,30 @@ async def create_sync_active(
     logger.debug(
         f"Creating active sync for user: {current_user.id} with data: {sync_active_input}"
     )
-    notification_service.add_notification(
+    bulk_id = uuid.uuid4()
+    notification = notification_service.add_notification(
         CreateNotification(
             user_id=current_user.id,
-            status=NotificationsStatusEnum.SUCCESS,
+            status=NotificationsStatusEnum.INFO,
             title="Synchronization created! ",
-            description="Synchronization takes a few minutes to complete",
+            description="Your brain is preparing to sync files. This may take a few minutes before proceeding.",
             category="generic",
-            bulk_id=uuid.uuid4(),
+            bulk_id=bulk_id,
             brain_id=sync_active_input.brain_id,
         )
     )
+    sync_active_input.notification_id = str(notification.id)
     return sync_service.create_sync_active(sync_active_input, str(current_user.id))
 
 
 @sync_router.put(
     "/sync/active/{sync_id}",
-    response_model=SyncsActive,
+    response_model=SyncsActive | None,
     dependencies=[Depends(AuthBearer())],
     tags=["Sync"],
 )
 async def update_sync_active(
-    sync_id: str,
+    sync_id: int,
     sync_active_input: SyncsActiveUpdateInput,
     current_user: UserIdentity = Depends(get_current_user),
 ):
@@ -182,17 +193,32 @@ async def update_sync_active(
     logger.debug(
         f"Updating active sync for user: {current_user.id} with data: {sync_active_input}"
     )
-    notification_service.add_notification(
-        CreateNotification(
-            user_id=current_user.id,
-            status=NotificationsStatusEnum.SUCCESS,
-            title="Sync updated! Synchronization takes a few minutes to complete",
-            description="Syncing your files...",
-            category="sync",
+
+    details_sync_active = sync_service.get_details_sync_active(sync_id)
+    if (details_sync_active and sync_active_input.settings) and (
+        (details_sync_active["settings"]["files"] != sync_active_input.settings.files)
+        or (
+            details_sync_active["settings"]["folders"]
+            != sync_active_input.settings.folders
         )
-    )
-    sync_active_input.force_sync = True
-    return sync_service.update_sync_active(sync_id, sync_active_input)
+    ):
+        bulk_id = uuid.uuid4()
+        notification = notification_service.add_notification(
+            CreateNotification(
+                user_id=current_user.id,
+                status=NotificationsStatusEnum.INFO,
+                title="Sync updated! Synchronization takes a few minutes to complete",
+                description="Your brain is syncing files. This may take a few minutes before proceeding.",
+                category="generic",
+                bulk_id=bulk_id,
+                brain_id=details_sync_active["brain_id"],  # type: ignore
+            )
+        )
+        sync_active_input.force_sync = True
+        sync_active_input.notification_id = str(notification.id)
+        return sync_service.update_sync_active(sync_id, sync_active_input)
+    else:
+        return None
 
 
 @sync_router.delete(
@@ -202,7 +228,7 @@ async def update_sync_active(
     tags=["Sync"],
 )
 async def delete_sync_active(
-    sync_id: str, current_user: UserIdentity = Depends(get_current_user)
+    sync_id: int, current_user: UserIdentity = Depends(get_current_user)
 ):
     """
     Delete an existing active sync for the current user.
@@ -217,12 +243,17 @@ async def delete_sync_active(
     logger.debug(
         f"Deleting active sync for user: {current_user.id} with sync ID: {sync_id}"
     )
+
+    details_sync_active = sync_service.get_details_sync_active(sync_id)
     notification_service.add_notification(
         CreateNotification(
             user_id=current_user.id,
             status=NotificationsStatusEnum.SUCCESS,
             title="Sync deleted!",
             description="Sync deleted!",
+            category="generic",
+            bulk_id=uuid.uuid4(),
+            brain_id=details_sync_active["brain_id"],  # type: ignore
         )
     )
     sync_service.delete_sync_active(sync_id, str(current_user.id))

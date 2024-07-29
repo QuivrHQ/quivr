@@ -7,6 +7,9 @@ export interface UploadedKnowledge {
   brainId: UUID;
   fileName: string;
   extension: string;
+  status: "UPLOADED" | "PROCESSING" | "ERROR";
+  integration: string;
+  integration_link: string;
 }
 
 export interface CrawledKnowledge {
@@ -14,6 +17,7 @@ export interface CrawledKnowledge {
   brainId: UUID;
   url: string;
   extension: string;
+  status: "UPLOADED" | "PROCESSING" | "ERROR";
 }
 
 export const isUploadedKnowledge = (

@@ -10,10 +10,10 @@ from typing import List, Optional
 from fastapi import UploadFile
 from pydantic import BaseModel
 from quivr_api.logger import get_logger
+from quivr_api.models.settings import SendEmailSettings
 from quivr_api.modules.assistant.dto.inputs import InputAssistant
 from quivr_api.modules.assistant.ito.utils.pdf_generator import PDFGenerator, PDFModel
 from quivr_api.modules.chat.controller.chat.utils import update_user_usage
-from quivr_api.modules.contact_support.controller.settings import ContactsSettings
 from quivr_api.modules.upload.controller.upload_routes import upload_file
 from quivr_api.modules.user.entity.user_identity import UserIdentity
 from quivr_api.modules.user.service.user_usage import UserUsage
@@ -80,7 +80,7 @@ class ITO(BaseModel):
         custom_message: str,
         brain_id: str = None,
     ):
-        settings = ContactsSettings()
+        settings = SendEmailSettings()
         file = await self.uploadfile_to_file(file)
         domain_quivr = os.getenv("QUIVR_DOMAIN", "https://chat.quivr.app/")
 

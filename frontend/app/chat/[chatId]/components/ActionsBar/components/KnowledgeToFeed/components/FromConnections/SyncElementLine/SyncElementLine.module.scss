@@ -3,15 +3,27 @@
 
 .sync_element_line_wrapper {
   display: flex;
-  gap: Spacings.$spacing03;
+  justify-content: space-between;
   padding: Spacings.$spacing03;
   border-top: 1px solid var(--border-1);
   align-items: center;
   cursor: pointer;
   font-weight: 500;
 
-  .element_name {
-    font-size: Typography.$small;
+  .left {
+    display: flex;
+    gap: Spacings.$spacing03;
+    align-items: center;
+    overflow: hidden;
+
+    .element_name {
+      font-size: Typography.$small;
+      @include Typography.EllipsisOverflow;
+    }
+
+    &.folder {
+      margin-left: Spacings.$spacing06;
+    }
   }
 
   &:hover {

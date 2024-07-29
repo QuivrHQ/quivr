@@ -8,9 +8,6 @@ from quivr_api.middlewares.auth.auth_bearer import AuthBearer, get_current_user
 from quivr_api.models.brains_subscription_invitations import BrainSubscription
 from quivr_api.modules.brain.entity.brain_entity import RoleEnum
 from quivr_api.modules.brain.repository import IntegrationBrain
-from quivr_api.modules.brain.service.api_brain_definition_service import (
-    ApiBrainDefinitionService,
-)
 from quivr_api.modules.brain.service.brain_authorization_service import (
     has_brain_authorization,
     validate_brain_authorization,
@@ -35,7 +32,6 @@ user_service = UserService()
 prompt_service = PromptService()
 brain_user_service = BrainUserService()
 brain_service = BrainService()
-api_brain_definition_service = ApiBrainDefinitionService()
 integration_brains_repository = IntegrationBrain()
 
 
@@ -425,26 +421,6 @@ async def subscribe_to_brain_handler(
             status_code=403,
             detail="You are already subscribed to this brain",
         )
-    if brain.brain_type == "api":
-        brain_definition = api_brain_definition_service.get_api_brain_definition(
-            brain_id
-        )
-        brain_secrets = brain_definition.secrets if brain_definition != None else []
-
-        for secret in brain_secrets:
-            if not secrets[secret.name]:
-                raise HTTPException(
-                    status_code=400,
-                    detail=f"Please provide the secret {secret}",
-                )
-
-        for secret in brain_secrets:
-            brain_service.external_api_secrets_repository.create_secret(
-                user_id=current_user.id,
-                brain_id=brain_id,
-                secret_name=secret.name,
-                secret_value=secrets[secret.name],
-            )
 
     try:
         brain_user_service.create_brain_user(

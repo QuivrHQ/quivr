@@ -27,6 +27,12 @@
         pointer-events: none;
       }
 
+      .loader_icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
       .empty_folder {
         font-style: italic;
         font-size: Typography.$small;

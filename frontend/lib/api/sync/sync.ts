@@ -37,6 +37,17 @@ export const syncSharepoint = async (
   ).data;
 };
 
+export const syncDropbox = async (
+  name: string,
+  axiosInstance: AxiosInstance
+): Promise<{ authorization_url: string }> => {
+  return (
+    await axiosInstance.post<{ authorization_url: string }>(
+      `/sync/dropbox/authorize?name=${name}`
+    )
+  ).data;
+};
+
 export const getUserSyncs = async (
   axiosInstance: AxiosInstance
 ): Promise<Sync[]> => {

@@ -1,5 +1,5 @@
 /* eslint-disable max-lines */
-import axios from "axios";
+import { isAxiosError } from "axios";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -151,7 +151,7 @@ export const usePrompt = (props: UsePromptProps) => {
         text: t("brainUpdated", { ns: "config" }),
       });
     } catch (err) {
-      if (axios.isAxiosError(err) && err.response?.status === 429) {
+      if (isAxiosError(err) && err.response?.status === 429) {
         publish({
           variant: "danger",
           text: `${JSON.stringify(

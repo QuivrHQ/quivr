@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { FaSpinner } from "react-icons/fa";
 
 import { MessageInfoBox } from "@/lib/components/ui/MessageInfoBox/MessageInfoBox";
-import QuivrButton from "@/lib/components/ui/QuivrButton/QuivrButton";
+import { QuivrButton } from "@/lib/components/ui/QuivrButton/QuivrButton";
 import { Brain } from "@/lib/context/BrainProvider/types";
 
 import styles from "./SettingsTab.module.scss";
