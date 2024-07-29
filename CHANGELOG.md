@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.0.291 (2024-07-29)
+
+## What's Changed
+* feat(integrations): Add Azure Drive Sites support by @chloedia in https://github.com/QuivrHQ/quivr/pull/2919
+* chore: update sync notification status to INFO by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2918
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.290...v0.0.291
+
 ## 0.0.290 (2024-07-26)
 
 ## What's Changed

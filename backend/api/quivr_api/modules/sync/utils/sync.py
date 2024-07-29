@@ -291,6 +291,7 @@ class AzureDriveSync(BaseSync):
             "Authorization": f"Bearer {token_data['access_token']}",
             "Accept": "application/json",
         }
+    
 
     def check_and_refresh_access_token(self, credentials) -> Dict:
         if "refresh_token" not in credentials:
