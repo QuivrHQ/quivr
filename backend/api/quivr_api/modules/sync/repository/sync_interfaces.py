@@ -2,12 +2,14 @@ from abc import ABC, abstractmethod
 from typing import List
 from uuid import UUID
 
-from quivr_api.modules.sync.dto.inputs import (SyncFileInput,
-                                               SyncFileUpdateInput,
-                                               SyncsActiveInput,
-                                               SyncsActiveUpdateInput,
-                                               SyncsUserInput,
-                                               SyncUserUpdateInput)
+from quivr_api.modules.sync.dto.inputs import (
+    SyncFileInput,
+    SyncFileUpdateInput,
+    SyncsActiveInput,
+    SyncsActiveUpdateInput,
+    SyncsUserInput,
+    SyncUserUpdateInput,
+)
 from quivr_api.modules.sync.entity.sync import SyncsActive, SyncsFiles
 
 
@@ -53,7 +55,6 @@ class SyncUserInterface(ABC):
 
 
 class SyncInterface(ABC):
-
     @abstractmethod
     def create_sync_active(
         self,

@@ -3,13 +3,17 @@ import asyncio
 from quivr_api.celery_config import celery
 from quivr_api.logger import get_logger
 from quivr_api.modules.knowledge.repository.storage import Storage
-from quivr_api.modules.notification.service.notification_service import \
-    NotificationService
+from quivr_api.modules.notification.service.notification_service import (
+    NotificationService,
+)
 from quivr_api.modules.sync.repository.sync_files import SyncFiles
-from quivr_api.modules.sync.service.sync_service import (SyncService,
-                                                         SyncUserService)
-from quivr_api.modules.sync.utils.sync import (AzureDriveSync, DropboxSync,
-                                               GitHubSync, GoogleDriveSync)
+from quivr_api.modules.sync.service.sync_service import SyncService, SyncUserService
+from quivr_api.modules.sync.utils.sync import (
+    AzureDriveSync,
+    DropboxSync,
+    GitHubSync,
+    GoogleDriveSync,
+)
 from quivr_api.modules.sync.utils.syncutils import SyncUtils
 
 notification_service = NotificationService()

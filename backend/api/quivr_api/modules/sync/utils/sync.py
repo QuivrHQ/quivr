@@ -13,10 +13,11 @@ from fastapi import HTTPException
 from google.auth.transport.requests import Request as GoogleRequest
 from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
+from requests import HTTPError
+
 from quivr_api.logger import get_logger
 from quivr_api.modules.sync.entity.sync import SyncFile
 from quivr_api.modules.sync.utils.normalize import remove_special_characters
-from requests import HTTPError
 
 logger = get_logger(__name__)
 
@@ -725,7 +726,6 @@ class GitHubSync(BaseSync):
             return self.list_github_repos(credentials, recursive=recursive)
 
     def get_files_by_id(self, credentials: Dict, file_ids: List[str]) -> List[SyncFile]:
-
         token_data = self.get_github_token_data(credentials)
         headers = self.get_github_headers(token_data)
         files = []
@@ -766,9 +766,7 @@ class GitHubSync(BaseSync):
         project_name, file_path = file.id.split(":")
 
         # Construct the API endpoint for the file content
-        endpoint = (
-            f"https://api.github.com/repos/{project_name}/contents/{file_path}"
-        )
+        endpoint = f"https://api.github.com/repos/{project_name}/contents/{file_path}"
 
         response = requests.get(endpoint, headers=headers)
         if response.status_code != 200:
@@ -831,9 +829,7 @@ class GitHubSync(BaseSync):
         logger.info("GitHub repositories retrieved successfully: %s", len(repos))
         return repos
 
-    def list_github_files_in_repo(
-        self, credentials, repo_folder, recursive=False
-    ):
+    def list_github_files_in_repo(self, credentials, repo_folder, recursive=False):
         def fetch_files(endpoint, headers):
             response = requests.get(endpoint, headers=headers)
             if response.status_code == 401:
@@ -872,7 +868,7 @@ class GitHubSync(BaseSync):
 
             if recursive and file_data.is_folder:
                 folder_files = self.list_github_files_in_repo(
-                    credentials, repo_folder= file_data.id, recursive=True
+                    credentials, repo_folder=file_data.id, recursive=True
                 )
                 files.extend(folder_files)
 

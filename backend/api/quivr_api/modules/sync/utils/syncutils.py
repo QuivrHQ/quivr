@@ -4,22 +4,26 @@ from typing import List
 
 from fastapi import UploadFile
 from pydantic import BaseModel, ConfigDict
+
 from quivr_api.logger import get_logger
 from quivr_api.modules.brain.repository.brains_vectors import BrainsVectors
 from quivr_api.modules.knowledge.repository.storage import Storage
 from quivr_api.modules.notification.dto.inputs import (
-    CreateNotification, NotificationUpdatableProperties)
-from quivr_api.modules.notification.entity.notification import \
-    NotificationsStatusEnum
-from quivr_api.modules.notification.service.notification_service import \
-    NotificationService
-from quivr_api.modules.sync.dto.inputs import (SyncFileInput,
-                                               SyncFileUpdateInput,
-                                               SyncsActiveUpdateInput)
+    CreateNotification,
+    NotificationUpdatableProperties,
+)
+from quivr_api.modules.notification.entity.notification import NotificationsStatusEnum
+from quivr_api.modules.notification.service.notification_service import (
+    NotificationService,
+)
+from quivr_api.modules.sync.dto.inputs import (
+    SyncFileInput,
+    SyncFileUpdateInput,
+    SyncsActiveUpdateInput,
+)
 from quivr_api.modules.sync.entity.sync import SyncFile
 from quivr_api.modules.sync.repository.sync_files import SyncFiles
-from quivr_api.modules.sync.service.sync_service import (SyncService,
-                                                         SyncUserService)
+from quivr_api.modules.sync.service.sync_service import SyncService, SyncUserService
 from quivr_api.modules.sync.utils.sync import BaseSync
 from quivr_api.modules.sync.utils.upload import upload_file
 from quivr_api.modules.upload.service.upload_file import check_file_exists
@@ -56,7 +60,7 @@ class SyncUtils(BaseModel):
             dict: A dictionary containing the status of the download or an error message.
         """
 
-        #credentials = self.sync_cloud.check_and_refresh_access_token(credentials)
+        # credentials = self.sync_cloud.check_and_refresh_access_token(credentials)
 
         downloaded_files = []
         bulk_id = uuid.uuid4()
