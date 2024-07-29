@@ -1,0 +1,23 @@
+@use "styles/Radius.module.scss";
+@use "styles/Spacings.module.scss";
+@use "styles/Typography.module.scss";
+
+.brain_button_container {
+  display: flex;
+  padding: Spacings.$spacing03;
+  border: 1px solid var(--border-0);
+  border-radius: Radius.$normal;
+  cursor: pointer;
+  gap: Spacings.$spacing03;
+  align-items: center;
+
+  .name {
+    @include Typography.EllipsisOverflow;
+    font-size: Typography.$small;
+  }
+
+  &:hover {
+    border-color: var(--primary-0);
+    color: var(--primary-0);
+  }
+}
