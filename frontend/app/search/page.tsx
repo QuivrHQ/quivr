@@ -19,6 +19,7 @@ import { useUserData } from "@/lib/hooks/useUserData";
 import { redirectToLogin } from "@/lib/router/redirectToLogin";
 import { ButtonType } from "@/lib/types/QuivrButton";
 
+import BrainButton from "./BrainButton/BrainButton";
 import styles from "./page.module.scss";
 
 const Search = (): JSX.Element => {
@@ -30,7 +31,7 @@ const Search = (): JSX.Element => {
   const { userIdentityData, userData } = useUserData();
   const { isDarkMode } = useUserSettingsContext();
   const { isBrainCreated } = useOnboardingContext();
-  const { allBrains, setCurrentBrainId } = useBrainContext();
+  const { allBrains } = useBrainContext();
 
   const [buttons, setButtons] = useState<ButtonType[]>([
     {
@@ -94,13 +95,7 @@ const Search = (): JSX.Element => {
             </div>
             <div className={styles.brains_list_container}>
               {allBrains.map((brain, index) => (
-                <div
-                  key={index}
-                  className={styles.brain_item}
-                  onClick={() => setCurrentBrainId(brain.id)}
-                >
-                  {brain.name}
-                </div>
+                <BrainButton key={index} brain={brain} />
               ))}
             </div>
           </div>
