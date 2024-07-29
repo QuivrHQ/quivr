@@ -12,11 +12,10 @@ from fastapi import HTTPException
 from google.auth.transport.requests import Request as GoogleRequest
 from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
-from requests import HTTPError
-
 from quivr_api.logger import get_logger
 from quivr_api.modules.sync.entity.sync import SyncFile
 from quivr_api.modules.sync.utils.normalize import remove_special_characters
+from requests import HTTPError
 
 logger = get_logger(__name__)
 
@@ -292,6 +291,7 @@ class AzureDriveSync(BaseSync):
             "Authorization": f"Bearer {token_data['access_token']}",
             "Accept": "application/json",
         }
+    
 
     def check_and_refresh_access_token(self, credentials) -> Dict:
         if "refresh_token" not in credentials:
@@ -322,7 +322,9 @@ class AzureDriveSync(BaseSync):
 
         return credentials
 
-    def get_files(self, credentials, folder_id=None, recursive=False) -> List[SyncFile]:
+    def get_files(
+        self, credentials, site_folder_id=None, recursive=False
+    ) -> List[SyncFile]:
         def fetch_files(endpoint, headers, max_retries=1):
             logger.debug(f"fetching files from {endpoint}.")
 
@@ -354,24 +356,48 @@ class AzureDriveSync(BaseSync):
 
         token_data = self.get_azure_token_data(credentials)
         headers = self.get_azure_headers(token_data)
-        endpoint = "https://graph.microsoft.com/v1.0/me/drive/root/children"
-        if folder_id:
-            endpoint = (
-                f"https://graph.microsoft.com/v1.0/me/drive/items/{folder_id}/children"
-            )
+        if not site_folder_id:
+            folder_id = None
+            site_id = None
+        else:
+            site_id, folder_id = site_folder_id.split(":")
+            if folder_id == "":
+                folder_id = None
 
+        if not folder_id and not site_id:
+            # Fetch the sites
+            #endpoint = "https://graph.microsoft.com/v1.0/me/followedSites"
+            endpoint = "https://graph.microsoft.com/v1.0/sites?search=*"
+        elif site_id == "root":
+            if not folder_id:
+                endpoint = "https://graph.microsoft.com/v1.0/me/drive/root/children"
+            else:
+                endpoint = f"https://graph.microsoft.com/v1.0/me/drive/items/{folder_id}/children"
+        else:
+            if not folder_id:
+                endpoint = f"https://graph.microsoft.com/v1.0/sites/{site_id}/drive/root/children"
+            else:
+                endpoint = f"https://graph.microsoft.com/v1.0/sites/{site_id}/drive/items/{folder_id}/children"
         items = fetch_files(endpoint, headers)
+
+        if not folder_id and not site_id and len(items) == 0:
+            logger.debug("No sites found in Azure Drive, files : %s", items)
+            return self.get_files(credentials, "root:", recursive)
 
         if not items:
             logger.info("No files found in Azure Drive")
             return []
+        else:
+            logger.info("Azure Drive files found: %s", items)
 
         files = []
         for item in items:
             file_data = SyncFile(
-                name=item.get("name"),
-                id=item.get("id"),
-                is_folder="folder" in item,
+                name=item.get("name") if site_folder_id else item.get("displayName"),
+                id=f'{item.get("id", {}).split(",")[1]}:'
+                if not site_folder_id
+                else f'{site_id}:{item.get("id")}',
+                is_folder="folder" in item or not site_folder_id,
                 last_modified=item.get("lastModifiedDateTime"),
                 mime_type=item.get("file", {}).get("mimeType", "folder"),
                 web_view_link=item.get("webUrl"),
@@ -381,10 +407,21 @@ class AzureDriveSync(BaseSync):
             # If recursive option is enabled and the item is a folder, fetch files from it
             if recursive and file_data.is_folder:
                 folder_files = self.get_files(
-                    credentials, folder_id=file_data.id, recursive=True
+                    credentials, site_folder_id=file_data.id, recursive=True
                 )
 
                 files.extend(folder_files)
+        if not folder_id and not site_id:
+            files.append(
+                SyncFile(
+                    name="My Drive",
+                    id="root:",
+                    is_folder=True,
+                    last_modified="",
+                    mime_type="folder",
+                    web_view_link="https://onedrive.live.com",
+                )
+            )
         for file in files:
             file.name = remove_special_characters(file.name)
         logger.info("Azure Drive files retrieved successfully: %s", len(files))
@@ -409,7 +446,15 @@ class AzureDriveSync(BaseSync):
         files = []
 
         for file_id in file_ids:
-            endpoint = f"https://graph.microsoft.com/v1.0/me/drive/items/{file_id}"
+            site_id, folder_id = file_id.split(":")
+            if folder_id == "":
+                folder_id = None
+            if site_id == "root":
+                endpoint = (
+                    f"https://graph.microsoft.com/v1.0/me/drive/items/{folder_id}"
+                )
+            else:
+                endpoint = f"https://graph.microsoft.com/v1.0/sites/{site_id}/drive/items/{folder_id}"
             response = requests.get(endpoint, headers=headers)
             if response.status_code == 401:
                 token_data = self.check_and_refresh_access_token(credentials)
@@ -426,7 +471,7 @@ class AzureDriveSync(BaseSync):
             files.append(
                 SyncFile(
                     name=result.get("name"),
-                    id=result.get("id"),
+                    id=f'{site_id}:{result.get("id")}',
                     is_folder="folder" in result,
                     last_modified=result.get("lastModifiedDateTime"),
                     mime_type=result.get("file", {}).get("mimeType", "folder"),
@@ -447,9 +492,15 @@ class AzureDriveSync(BaseSync):
         modified_time = file.last_modified
         headers = self.get_azure_headers(credentials)
 
-        download_endpoint = (
-            f"https://graph.microsoft.com/v1.0/me/drive/items/{file_id}/content"
-        )
+        site_id, folder_id = file_id.split(":")
+        if folder_id == "":
+            folder_id = None
+        if site_id == "root":
+            download_endpoint = (
+                f"https://graph.microsoft.com/v1.0/me/drive/items/{file_id}/content"
+            )
+        else:
+            download_endpoint = f"https://graph.microsoft.com/v1.0/sites/{site_id}/drive/items/{folder_id}/content"
         logger.info("Downloading file: %s", file_name)
         download_response = requests.get(
             download_endpoint, headers=headers, stream=True
