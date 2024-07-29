@@ -16,8 +16,6 @@ class SyncsUser(BaseModel):
 
 class SyncFile(BaseModel):
     name: str
-    project_name: Optional[str] = None
-    path: Optional[str] = None
     id: str
     is_folder: bool
     last_modified: str

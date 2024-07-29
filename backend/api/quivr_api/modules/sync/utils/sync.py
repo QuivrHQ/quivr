@@ -2,6 +2,7 @@ import json
 import os
 import time
 from abc import ABC, abstractmethod
+from datetime import datetime
 from io import BytesIO
 from typing import Any, Dict, List, Union
 
@@ -12,11 +13,10 @@ from fastapi import HTTPException
 from google.auth.transport.requests import Request as GoogleRequest
 from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
-from requests import HTTPError
-
 from quivr_api.logger import get_logger
 from quivr_api.modules.sync.entity.sync import SyncFile
 from quivr_api.modules.sync.utils.normalize import remove_special_characters
+from requests import HTTPError
 
 logger = get_logger(__name__)
 
@@ -716,6 +716,7 @@ class GitHubSync(BaseSync):
     def get_files(
         self, credentials: Dict, folder_id: str | None = None, recursive: bool = False
     ) -> List[SyncFile]:
+        logger.info("Retrieving GitHub files with folder_id: %s", folder_id)
         if folder_id:
             return self.list_github_files_in_repo(
                 credentials, folder_id, recursive=recursive
@@ -724,18 +725,14 @@ class GitHubSync(BaseSync):
             return self.list_github_repos(credentials, recursive=recursive)
 
     def get_files_by_id(self, credentials: Dict, file_ids: List[str]) -> List[SyncFile]:
-        # Assuming we need the repo name for this operation
-        # You might need to adjust this based on how you're storing/passing the repo name
-        repo_name = credentials.get("repo_name")
-        if not repo_name:
-            raise ValueError("Repository name is required for getting files by ID")
 
         token_data = self.get_github_token_data(credentials)
         headers = self.get_github_headers(token_data)
         files = []
 
         for file_id in file_ids:
-            endpoint = f"https://api.github.com/repos/{repo_name}/git/blobs/{file_id}"
+            repo_name, file_path = file_id.split(":")
+            endpoint = f" https://api.github.com/repos/{repo_name}/contents/{file_path}"
             response = requests.get(endpoint, headers=headers)
             if response.status_code == 401:
                 raise HTTPException(status_code=401, detail="Unauthorized")
@@ -746,14 +743,13 @@ class GitHubSync(BaseSync):
                 raise Exception("Failed to retrieve files")
 
             result = response.json()
+            logger.debug("GitHub file result: %s", result)
             files.append(
                 SyncFile(
                     name=remove_special_characters(result.get("name")),
-                    project_name=result.get("repo_name"),
-                    path=result.get("path"),
-                    id=result.get("sha"),
+                    id=f"{repo_name}:{result.get('path')}",
                     is_folder=False,
-                    last_modified=result.get("updated_at"),
+                    last_modified=datetime.now().strftime(self.datetime_format),
                     mime_type=result.get("type"),
                     web_view_link=result.get("html_url"),
                 )
@@ -767,10 +763,11 @@ class GitHubSync(BaseSync):
     ) -> Dict[str, Union[str, BytesIO]]:
         token_data = self.get_github_token_data(credentials)
         headers = self.get_github_headers(token_data)
+        project_name, file_path = file.id.split(":")
 
         # Construct the API endpoint for the file content
         endpoint = (
-            f"https://api.github.com/repos/{file.project_name}/contents/{file.path}"
+            f"https://api.github.com/repos/{project_name}/contents/{file_path}"
         )
 
         response = requests.get(endpoint, headers=headers)
@@ -788,7 +785,7 @@ class GitHubSync(BaseSync):
 
         file_content = base64.b64decode(content)
 
-        return {"name": file.name, "content": BytesIO(file_content)}
+        return {"file_name": file.name, "content": BytesIO(file_content)}
 
     def list_github_repos(self, credentials, recursive=False):
         def fetch_repos(endpoint, headers):
@@ -817,9 +814,7 @@ class GitHubSync(BaseSync):
         for item in items:
             repo_data = SyncFile(
                 name=remove_special_characters(item.get("name")),
-                project_name=item.get("full_name"),
-                path="/",
-                id=str(item.get("id")),
+                id=f"{item.get('full_name')}:",
                 is_folder=True,
                 last_modified=str(item.get("updated_at")),
                 mime_type="repository",
@@ -829,7 +824,7 @@ class GitHubSync(BaseSync):
 
             if recursive:
                 submodule_files = self.list_github_files_in_repo(
-                    credentials, repo_data.project_name
+                    credentials, repo_data.id
                 )
                 repos.extend(submodule_files)
 
@@ -837,7 +832,7 @@ class GitHubSync(BaseSync):
         return repos
 
     def list_github_files_in_repo(
-        self, credentials, repo_name, folder_path="", recursive=False
+        self, credentials, repo_folder, recursive=False
     ):
         def fetch_files(endpoint, headers):
             response = requests.get(endpoint, headers=headers)
@@ -851,9 +846,11 @@ class GitHubSync(BaseSync):
                 return []
             return response.json()
 
+        repo_name, folder_path = repo_folder.split(":")
         token_data = self.get_github_token_data(credentials)
         headers = self.get_github_headers(token_data)
         endpoint = f"https://api.github.com/repos/{repo_name}/contents/{folder_path}"
+        logger.debug(f"Fetching files from GitHub with link: {endpoint}")
 
         items = fetch_files(endpoint, headers)
 
@@ -865,9 +862,7 @@ class GitHubSync(BaseSync):
         for item in items:
             file_data = SyncFile(
                 name=remove_special_characters(item.get("name")),
-                project_name=repo_name,
-                path=item.get("path"),
-                id=str(item.get("sha")),
+                id=f"{repo_name}:{item.get('path')}",
                 is_folder=item.get("type") == "dir",
                 last_modified=str(item.get("updated_at")),
                 mime_type=item.get("type"),
@@ -877,7 +872,7 @@ class GitHubSync(BaseSync):
 
             if recursive and file_data.is_folder:
                 folder_files = self.list_github_files_in_repo(
-                    credentials, repo_name, folder_path=file_data.path, recursive=True
+                    credentials, repo_folder= file_data.id, recursive=True
                 )
                 files.extend(folder_files)
 

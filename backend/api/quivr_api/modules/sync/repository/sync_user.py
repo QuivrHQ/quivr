@@ -2,17 +2,15 @@ import json
 
 from quivr_api.logger import get_logger
 from quivr_api.models.settings import get_supabase_client
-from quivr_api.modules.knowledge.service.knowledge_service import KnowledgeService
-from quivr_api.modules.notification.service.notification_service import (
-    NotificationService,
-)
-from quivr_api.modules.sync.dto.inputs import SyncsUserInput, SyncUserUpdateInput
+from quivr_api.modules.knowledge.service.knowledge_service import \
+    KnowledgeService
+from quivr_api.modules.notification.service.notification_service import \
+    NotificationService
+from quivr_api.modules.sync.dto.inputs import (SyncsUserInput,
+                                               SyncUserUpdateInput)
 from quivr_api.modules.sync.repository.sync_interfaces import SyncUserInterface
-from quivr_api.modules.sync.utils.sync import (
-    AzureDriveSync,
-    DropboxSync,
-    GoogleDriveSync,
-)
+from quivr_api.modules.sync.utils.sync import (AzureDriveSync, DropboxSync,
+                                               GitHubSync, GoogleDriveSync)
 
 notification_service = NotificationService()
 knowledge_service = KnowledgeService()
@@ -213,6 +211,16 @@ class SyncUser(SyncUserInterface):
                     sync_user["credentials"], folder_id if folder_id else "", recursive
                 )
             }
+        elif provider == "github":
+            logger.info("Getting files for GitHub sync")
+            sync = GitHubSync()
+            return {
+                "files": sync.get_files(
+                    sync_user["credentials"], folder_id if folder_id else "", recursive
+                )
+            
+            }
+        
         else:
             logger.warning(
                 "No sync found for provider: %s", sync_user["provider"], recursive

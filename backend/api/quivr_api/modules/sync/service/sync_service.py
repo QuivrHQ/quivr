@@ -1,18 +1,14 @@
 from typing import List
 
 from quivr_api.logger import get_logger
-from quivr_api.modules.sync.dto.inputs import (
-    SyncsActiveInput,
-    SyncsActiveUpdateInput,
-    SyncsUserInput,
-    SyncUserUpdateInput,
-)
+from quivr_api.modules.sync.dto.inputs import (SyncsActiveInput,
+                                               SyncsActiveUpdateInput,
+                                               SyncsUserInput,
+                                               SyncUserUpdateInput)
 from quivr_api.modules.sync.entity.sync import SyncsActive, SyncsUser
 from quivr_api.modules.sync.repository.sync import Sync, SyncInterface
 from quivr_api.modules.sync.repository.sync_interfaces import (
-    SyncInterface,
-    SyncUserInterface,
-)
+    SyncInterface, SyncUserInterface)
 from quivr_api.modules.sync.repository.sync_user import SyncUser
 from quivr_api.modules.user.service.user_service import UserService
 
