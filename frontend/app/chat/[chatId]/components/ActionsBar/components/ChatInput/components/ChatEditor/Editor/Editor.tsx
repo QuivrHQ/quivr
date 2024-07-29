@@ -2,6 +2,8 @@ import { EditorContent } from "@tiptap/react";
 import { useEffect } from "react";
 import "./styles.css";
 
+import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
+
 import { useChatStateUpdater } from "./hooks/useChatStateUpdater";
 import { useCreateEditorState } from "./hooks/useCreateEditorState";
 import { useEditor } from "./hooks/useEditor";
@@ -20,6 +22,7 @@ export const Editor = ({
   message,
 }: EditorProps): JSX.Element => {
   const { editor } = useCreateEditorState(placeholder);
+  const { currentBrain } = useBrainContext();
 
   useEffect(() => {
     const htmlString = editor?.getHTML();
@@ -32,6 +35,10 @@ export const Editor = ({
       editor?.commands.clearContent();
     }
   }, [message, editor]);
+
+  useEffect(() => {
+    editor?.commands.focus();
+  }, [currentBrain, editor]);
 
   useEffect(() => {
     if (editor && placeholder) {
