@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.0.292 (2024-07-29)
+
+## What's Changed
+* Feat/handle_azure_sites by @chloedia in https://github.com/QuivrHQ/quivr/pull/2921
+* feat: update dev command in frontend README.md by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2922
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.291...v0.0.292
+
 ## 0.0.291 (2024-07-29)
 
 ## What's Changed
