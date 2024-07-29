@@ -426,9 +426,7 @@ class AzureDriveSync(BaseSync):
         logger.info("Azure Drive files retrieved successfully: %s", len(files))
         return files
 
-    def get_files_by_id(
-        self, credentials: dict, file_ids: List[str]
-    ) -> List[SyncFile]:
+    def get_files_by_id(self, credentials: dict, file_ids: List[str]) -> List[SyncFile]:
         """
         Retrieve files from Azure Drive by their IDs.
 
