@@ -322,8 +322,9 @@ class AzureDriveSync(BaseSync):
 
         return credentials
 
-
-    def get_files(self, credentials, site_folder_id=None, recursive=False) -> List[SyncFile]:
+    def get_files(
+        self, credentials, site_folder_id=None, recursive=False
+    ) -> List[SyncFile]:
         def fetch_files(endpoint, headers, max_retries=1):
             logger.debug(f"fetching files from {endpoint}.")
 
@@ -364,26 +365,24 @@ class AzureDriveSync(BaseSync):
                 folder_id = None
 
         if not folder_id and not site_id:
-            #Fetch the sites
-            endpoint = "https://graph.microsoft.com/v1.0/me/followedSites"
+            # Fetch the sites
+            #endpoint = "https://graph.microsoft.com/v1.0/me/followedSites"
+            endpoint = "https://graph.microsoft.com/v1.0/sites?search=*"
         elif site_id == "root":
             if not folder_id:
                 endpoint = "https://graph.microsoft.com/v1.0/me/drive/root/children"
-            else: 
-                endpoint = (
-                f"https://graph.microsoft.com/v1.0/me/drive/items/{folder_id}/children"
-            )
+            else:
+                endpoint = f"https://graph.microsoft.com/v1.0/me/drive/items/{folder_id}/children"
         else:
             if not folder_id:
                 endpoint = f"https://graph.microsoft.com/v1.0/sites/{site_id}/drive/root/children"
-            else: 
+            else:
                 endpoint = f"https://graph.microsoft.com/v1.0/sites/{site_id}/drive/items/{folder_id}/children"
         items = fetch_files(endpoint, headers)
 
-        if not folder_id and len(items) == 0:
+        if not folder_id and not site_id and len(items) == 0:
             logger.debug("No sites found in Azure Drive, files : %s", items)
-            return self.get_files(credentials, "root", recursive)
-        
+            return self.get_files(credentials, "root:", recursive)
 
         if not items:
             logger.info("No files found in Azure Drive")
@@ -395,7 +394,9 @@ class AzureDriveSync(BaseSync):
         for item in items:
             file_data = SyncFile(
                 name=item.get("name") if site_folder_id else item.get("displayName"),
-                id=f'{item.get("sharepointIds", {}).get("siteId")}:' if not site_folder_id else f'{site_id}:{item.get("id")}',
+                id=f'{item.get("id", {}).split(",")[1]}:'
+                if not site_folder_id
+                else f'{site_id}:{item.get("id")}',
                 is_folder="folder" in item or not site_folder_id,
                 last_modified=item.get("lastModifiedDateTime"),
                 mime_type=item.get("file", {}).get("mimeType", "folder"),
@@ -411,14 +412,16 @@ class AzureDriveSync(BaseSync):
 
                 files.extend(folder_files)
         if not folder_id and not site_id:
-            files.append(SyncFile(
-                name="My Drive",
-                id="root:",
-                is_folder=True,
-                last_modified="",
-                mime_type="folder",
-                web_view_link="https://onedrive.live.com"
-            ))
+            files.append(
+                SyncFile(
+                    name="My Drive",
+                    id="root:",
+                    is_folder=True,
+                    last_modified="",
+                    mime_type="folder",
+                    web_view_link="https://onedrive.live.com",
+                )
+            )
         for file in files:
             file.name = remove_special_characters(file.name)
         logger.info("Azure Drive files retrieved successfully: %s", len(files))
@@ -448,7 +451,8 @@ class AzureDriveSync(BaseSync):
                 folder_id = None
             if site_id == "root":
                 endpoint = (
-                f"https://graph.microsoft.com/v1.0/me/drive/items/{folder_id}")
+                    f"https://graph.microsoft.com/v1.0/me/drive/items/{folder_id}"
+                )
             else:
                 endpoint = f"https://graph.microsoft.com/v1.0/sites/{site_id}/drive/items/{folder_id}"
             response = requests.get(endpoint, headers=headers)
@@ -496,9 +500,7 @@ class AzureDriveSync(BaseSync):
                 f"https://graph.microsoft.com/v1.0/me/drive/items/{file_id}/content"
             )
         else:
-            download_endpoint = (
-                f"https://graph.microsoft.com/v1.0/sites/{site_id}/drive/items/{folder_id}/content"
-            )
+            download_endpoint = f"https://graph.microsoft.com/v1.0/sites/{site_id}/drive/items/{folder_id}/content"
         logger.info("Downloading file: %s", file_name)
         download_response = requests.get(
             download_endpoint, headers=headers, stream=True
