@@ -203,7 +203,7 @@ async def update_sync_active(
         notification = notification_service.add_notification(
             CreateNotification(
                 user_id=current_user.id,
-                status=NotificationsStatusEnum.SUCCESS,
+                status=NotificationsStatusEnum.INFO,
                 title="Sync updated! Synchronization takes a few minutes to complete",
                 description="Your brain is syncing files. This may take a few minutes before proceeding.",
                 category="generic",
