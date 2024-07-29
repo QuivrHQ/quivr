@@ -30,7 +30,7 @@ const Search = (): JSX.Element => {
   const { userIdentityData, userData } = useUserData();
   const { isDarkMode } = useUserSettingsContext();
   const { isBrainCreated } = useOnboardingContext();
-  const { allBrains } = useBrainContext();
+  const { allBrains, setCurrentBrainId } = useBrainContext();
 
   const [buttons, setButtons] = useState<ButtonType[]>([
     {
@@ -91,6 +91,17 @@ const Search = (): JSX.Element => {
             </div>
             <div className={styles.search_bar_wrapper}>
               <SearchBar />
+            </div>
+            <div className={styles.brains_list_container}>
+              {allBrains.map((brain, index) => (
+                <div
+                  key={index}
+                  className={styles.brain_item}
+                  onClick={() => setCurrentBrainId(brain.id)}
+                >
+                  {brain.name}
+                </div>
+              ))}
             </div>
           </div>
         </div>
