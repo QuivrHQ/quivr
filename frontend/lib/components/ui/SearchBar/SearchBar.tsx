@@ -22,6 +22,7 @@ export const SearchBar = ({
 }): JSX.Element => {
   const [searching, setSearching] = useState(false);
   const [isDisabled, setIsDisabled] = useState(true);
+  const [placeholder, setPlaceholder] = useState("Select a @brain");
   const { message, setMessage } = useChatInput();
   const { setMessages } = useChatContext();
   const { addQuestion } = useChat();
@@ -35,6 +36,10 @@ export const SearchBar = ({
   useEffect(() => {
     setIsDisabled(message === "");
   }, [message]);
+
+  useEffect(() => {
+    setPlaceholder(currentBrain ? "Ask a question..." : "Select a @brain");
+  }, [currentBrain]);
 
   const submit = async (): Promise<void> => {
     if (!!remainingCredits && !!currentBrain && !searching) {
@@ -73,7 +78,7 @@ export const SearchBar = ({
           message={message}
           setMessage={setMessage}
           onSubmit={() => void submit()}
-          placeholder="Ask a question to @brain"
+          placeholder={placeholder}
         ></Editor>
         {searching ? (
           <LoaderIcon size="big" color="accent" />

@@ -11,10 +11,15 @@
   gap: Spacings.$spacing03;
   flex-direction: column;
   align-items: center;
+  height: 80px;
+  overflow: hidden;
 
   &:hover {
     border-color: var(--primary-0);
-    color: var(--primary-0);
+
+    .header {
+      color: var(--primary-0);
+    }
   }
 
   .header {
@@ -26,13 +31,19 @@
     .name {
       @include Typography.EllipsisOverflow;
       font-size: Typography.$small;
+      font-weight: 500;
     }
   }
 
   .description {
-    @include Typography.EllipsisOverflow;
     font-size: Typography.$tiny;
+    color: var(--text-4);
     width: 100%;
     font-style: italic;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    text-overflow: ellipsis;
   }
 }

@@ -33,6 +33,17 @@ export const Editor = ({
     }
   }, [message, editor]);
 
+  useEffect(() => {
+    if (editor && placeholder) {
+      (
+        editor.extensionManager.extensions.find(
+          (ext) => ext.name === "placeholder"
+        ) as { options: { placeholder: string } }
+      ).options.placeholder = placeholder;
+      editor.view.updateState(editor.state);
+    }
+  }, [placeholder, editor]);
+
   useChatStateUpdater({
     editor,
     setMessage,
