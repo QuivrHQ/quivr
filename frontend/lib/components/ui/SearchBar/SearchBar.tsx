@@ -15,8 +15,10 @@ import { LoaderIcon } from "../LoaderIcon/LoaderIcon";
 
 export const SearchBar = ({
   onSearch,
+  newBrain,
 }: {
   onSearch?: () => void;
+  newBrain: boolean;
 }): JSX.Element => {
   const [searching, setSearching] = useState(false);
   const [isDisabled, setIsDisabled] = useState(true);
@@ -52,21 +54,26 @@ export const SearchBar = ({
   };
 
   return (
-    <div className={styles.search_bar_wrapper}>
+    <div
+      className={`${styles.search_bar_wrapper} ${
+        newBrain ? styles.new_brain : ""
+      }`}
+    >
       <CurrentBrain
         allowingRemoveBrain={true}
         remainingCredits={remainingCredits}
+        isNewBrain={newBrain}
       />
       <div
         className={`${styles.editor_wrapper} ${
           !remainingCredits ? styles.disabled : ""
-        }`}
+        } ${currentBrain ? styles.current : ""}`}
       >
         <Editor
           message={message}
           setMessage={setMessage}
           onSubmit={() => void submit()}
-          placeholder="Ask a question..."
+          placeholder="Ask a question to @brain"
         ></Editor>
         {searching ? (
           <LoaderIcon size="big" color="accent" />

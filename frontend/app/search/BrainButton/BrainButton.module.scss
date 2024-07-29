@@ -9,15 +9,30 @@
   border-radius: Radius.$normal;
   cursor: pointer;
   gap: Spacings.$spacing03;
+  flex-direction: column;
   align-items: center;
-
-  .name {
-    @include Typography.EllipsisOverflow;
-    font-size: Typography.$small;
-  }
 
   &:hover {
     border-color: var(--primary-0);
     color: var(--primary-0);
+  }
+
+  .header {
+    display: flex;
+    gap: Spacings.$spacing03;
+    width: 100%;
+    align-items: center;
+
+    .name {
+      @include Typography.EllipsisOverflow;
+      font-size: Typography.$small;
+    }
+  }
+
+  .description {
+    @include Typography.EllipsisOverflow;
+    font-size: Typography.$tiny;
+    width: 100%;
+    font-style: italic;
   }
 }

@@ -24,6 +24,7 @@ import styles from "./page.module.scss";
 
 const Search = (): JSX.Element => {
   const [isUserDataFetched, setIsUserDataFetched] = useState(false);
+  const [isNewBrain, setIsNewBrain] = useState(false);
   const pathname = usePathname();
   const { session } = useSupabase();
   const { isBrainCreationModalOpened, setIsBrainCreationModalOpened } =
@@ -45,6 +46,13 @@ const Search = (): JSX.Element => {
         "You have reached the maximum number of brains allowed. Please upgrade your plan or delete some brains to create a new one.",
     },
   ]);
+
+  const newBrain = () => {
+    setIsNewBrain(true);
+    setTimeout(() => {
+      setIsNewBrain(false);
+    }, 750);
+  };
 
   useEffect(() => {
     if (userIdentityData) {
@@ -91,11 +99,11 @@ const Search = (): JSX.Element => {
               </div>
             </div>
             <div className={styles.search_bar_wrapper}>
-              <SearchBar />
+              <SearchBar newBrain={isNewBrain} />
             </div>
             <div className={styles.brains_list_container}>
               {allBrains.map((brain, index) => (
-                <BrainButton key={index} brain={brain} />
+                <BrainButton key={index} brain={brain} newBrain={newBrain} />
               ))}
             </div>
           </div>
