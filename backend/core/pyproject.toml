@@ -23,7 +23,7 @@ langchain-openai = { version = "^0.1.14", optional = true }
 # NOTE: for now poetry doesn't support groups as extra:
 # see : https://github.com/python-poetry/poetry/issues/4842
 docx2txt = { version = "^0.8", optional = true }
-quivr-pdf = { path = "wrappers/quivr-pdf", optional = true }
+megaparse = { version = "0.0.20", optional = true }
 unstructured = { version = "^0.15.0", optional = true, extras = [
     "epub",
     "odt",
@@ -44,13 +44,14 @@ odt = ["unstructured", "langchain-community", "docx2txt"]
 docx = ["unstructured", "langchain-community", "docx2txt"]
 pptx = ["unstructured", "langchain-community"]
 xlsx = ["unstructured", "langchain-community"]
-pdf = ["langchain-community", "quivr-pdf"]
+pdf = ["langchain-community", "megaparse"]
 all = [
     "langchain-community",
     "faiss-cpu",
     "langchain-openai",
     "unstructured",
     "docx2txt",
+    "megaparse",
 ]
 
 [tool.poetry.group.dev]

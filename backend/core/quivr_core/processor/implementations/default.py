@@ -1,3 +1,4 @@
+import logging
 from typing import Any, List, Type, TypeVar
 
 import tiktoken
@@ -23,6 +24,8 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter, TextSplitte
 from quivr_core.files.file import FileExtension, QuivrFile
 from quivr_core.processor.processor_base import ProcessorBase
 from quivr_core.processor.splitter import SplitterConfig
+
+logger = logging.getLogger("quivr_core")
 
 P = TypeVar("P", bound=BaseLoader)
 
